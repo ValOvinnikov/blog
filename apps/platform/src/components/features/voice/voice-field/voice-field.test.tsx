@@ -8,6 +8,7 @@ import {
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
+import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import {
   ARCHIVED_NOTICE_TEXT,
@@ -21,6 +22,7 @@ import {
   type TVoiceDraftValue,
   type TVoiceFieldErrors,
 } from '@platform/utils/voice-draft/voice-draft';
+import userEvent from '@testing-library/user-event';
 
 import { VoiceField, type TVoiceFieldProps } from './voice-field';
 
@@ -32,6 +34,10 @@ const SUPPORTING_TEXT = 'Supporting text';
 const ARIA_INVALID = 'aria-invalid';
 const MOCK_FIELD_ID_PREFIX = faker.lorem.word();
 const MOCK_ERROR = faker.lorem.sentence();
+const MOCK_HEADING = faker.lorem.words(3);
+const { reset: RESET } = messages.fieldStatus;
+
+const setFieldValue = vi.fn();
 
 const fieldById = (id: TVoiceFieldId) =>
   VOICE_FIELDS.find((field) => field.id === id)!;
@@ -59,7 +65,7 @@ const VoiceFieldInEditor = ({
       errors={errors}
       openListFieldId={undefined}
       setOpenListFieldId={vi.fn()}
-      setFieldValue={vi.fn()}
+      setFieldValue={setFieldValue}
       specimenTheme={MOCK_SITE_PREVIEW_THEME}
     >
       <VoiceField field={field} />
@@ -74,6 +80,32 @@ const setup = customRenderInSettingsForm(VoiceFieldInEditor, {
 });
 
 describe(`<${VoiceField.name}/>`, () => {
+  it('resets a customised field to its default', async () => {
+    const user = userEvent.setup();
+    setup({ value: MOCK_HEADING });
+
+    const resetButton = screen.getByRole('button', { name: RESET });
+    await user.click(resetButton);
+
+    expect(setFieldValue).toHaveBeenCalledWith('notFoundHeading', '');
+  });
+
+  it('offers no reset for a default field', () => {
+    setup();
+
+    const resetButton = screen.queryByRole('button', { name: RESET });
+
+    expect(resetButton).not.toBeInTheDocument();
+  });
+
+  it('offers no reset for a customised field while archived', () => {
+    setup({ value: MOCK_HEADING }, { isArchived: true });
+
+    const resetButton = screen.queryByRole('button', { name: RESET });
+
+    expect(resetButton).not.toBeInTheDocument();
+  });
+
   it('labels a text field and describes it with its hint', () => {
     setup();
 

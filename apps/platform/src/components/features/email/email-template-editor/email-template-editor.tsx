@@ -4,6 +4,7 @@ import { type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
+import { FieldResetButton } from '@platform/components/shared/field-reset-button';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormField } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
@@ -45,8 +46,10 @@ export const EmailTemplateEditor = ({
   const isDisabled = isArchived || isPending;
   const [bodyRevision, setBodyRevision] = useState(0);
   const bodyHintId = useId();
-  const { stack } = emailTemplateEditorVariants();
+  const { stack, status } = emailTemplateEditorVariants();
   const { draft, saved, fallback } = copy;
+  const isSubjectCustomised = draft.subject !== '';
+  const isBodyCustomised = draft.body !== null;
 
   const handleBodyChange = (body: TEmailTemplateBlock[]) =>
     onCopyChange({
@@ -77,11 +80,15 @@ export const EmailTemplateEditor = ({
             hint={t('subjectHint')}
             control={{ isDisabled, describedBy: archivedDescribedBy }}
             actions={
-              <FieldStatus
-                isCustomised={draft.subject !== ''}
-                isUnsaved={draft.subject !== saved.subject}
-                onReset={isDisabled ? undefined : resetSubject}
-              />
+              <span className={status()}>
+                <FieldStatus
+                  isCustomised={isSubjectCustomised}
+                  isUnsaved={draft.subject !== saved.subject}
+                />
+                {isSubjectCustomised && !isDisabled && (
+                  <FieldResetButton onReset={resetSubject} />
+                )}
+              </span>
             }
           >
             <TextInput
@@ -95,11 +102,15 @@ export const EmailTemplateEditor = ({
             control={{ hasOwnAccessibleName: true }}
             hint={<span id={bodyHintId}>{t('bodyHint')}</span>}
             actions={
-              <FieldStatus
-                isCustomised={draft.body !== null}
-                isUnsaved={!isSameJson(draft.body, saved.body)}
-                onReset={isDisabled ? undefined : resetBody}
-              />
+              <span className={status()}>
+                <FieldStatus
+                  isCustomised={isBodyCustomised}
+                  isUnsaved={!isSameJson(draft.body, saved.body)}
+                />
+                {isBodyCustomised && !isDisabled && (
+                  <FieldResetButton onReset={resetBody} />
+                )}
+              </span>
             }
           >
             <PortableTextEditor
