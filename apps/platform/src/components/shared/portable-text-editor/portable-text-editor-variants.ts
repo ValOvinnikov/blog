@@ -21,7 +21,7 @@ export const portableTextEditorVariants = tv({
     placeholder: ['text-admin-muted'],
     token: [
       'rounded-admin-3 bg-admin-line-2 px-1 py-px',
-      'font-mono text-admin-12-5 font-medium',
+      'font-admin-mono text-admin-12-5 font-medium',
     ],
   },
   variants: {
