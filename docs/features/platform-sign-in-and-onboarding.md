@@ -103,8 +103,13 @@ Free site.
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
   to their own home, so an invited member never sees it). A dark left rail
   (the sidebar's `admin-side*` tokens) carries the Valstack mark, "Create your
-  site" and the step list, where each done step shows its choice ("Blog ·
-  Field Notes", the site address, the preset); the current step's fields sit
+  site" and the step list (an `ol` named "Setup steps", no `nav`), where a
+  done step shows a tick and its choice ("Blog · Field Notes", the site
+  address, the preset) and is announced as "Site, Complete, Blog · Field
+  Notes", and the current step carries `aria-current="step"`. The rail draws
+  its brand mark and intro at the wizard sizes through an `isWizard` prop on
+  `RailBrand` / `RailIntro`, so Choose a workspace keeps its own. The current
+  step's fields sit
   beside it with Back / Continue, and the live site preview follows every
   step. The preview is framed as the new site in a browser: an
   address bar shows `<slug>.<TENANT_ROOT_DOMAIN>` as it is typed

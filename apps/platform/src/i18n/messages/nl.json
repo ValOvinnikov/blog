@@ -98,6 +98,7 @@
       "REVIEW": "Controleren"
     },
     "stepsAriaLabel": "Configuratiestappen",
+    "stepComplete": "Voltooid",
     "stepProgress": "Stap {n} van {total}",
     "stepProgressNamed": "Stap {n} van {total} · {step}",
     "siteSummary": "{siteType} · {name}",
