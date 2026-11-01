@@ -10,6 +10,7 @@ import {
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { Link, usePathname } from '@platform/i18n/navigation';
+import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -57,7 +58,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                 {navSection.items.length > 0
                   ? navSection.items.map((item) => {
                       if (item.href) {
-                        const isActive = pathname === item.href;
+                        const isActive = isCurrentNavHref(item.href, pathname);
 
                         return (
                           <Menu.LinkItem

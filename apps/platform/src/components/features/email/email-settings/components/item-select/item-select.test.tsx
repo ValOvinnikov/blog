@@ -1,6 +1,7 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { pickNextOptionByKeyboard } from '@platform/testing/pick-next-option-by-keyboard';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -105,10 +106,7 @@ describe(`<${ItemSelect.name}/>`, () => {
     });
 
     it('selects an item with the arrow keys and Enter', async () => {
-      await user.tab();
-      await user.keyboard('{ArrowDown}');
-      await screen.findByRole('listbox');
-      await user.keyboard('{ArrowDown}{Enter}');
+      await pickNextOptionByKeyboard(user, optionName(MOCK_TEMPLATE_OPTION));
 
       expect(onSelect).toHaveBeenCalledWith(MOCK_TEMPLATE_OPTION.value);
     });

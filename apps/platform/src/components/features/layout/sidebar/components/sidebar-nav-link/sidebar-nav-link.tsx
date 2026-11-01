@@ -2,6 +2,7 @@
 
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
 import { Link, usePathname } from '@platform/i18n/navigation';
+import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
 import type { ReactNode } from 'react';
 
 export type TSidebarNavLinkProps = {
@@ -17,7 +18,7 @@ export const SidebarNavLink = ({
   children,
 }: TSidebarNavLinkProps) => {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive = isCurrentNavHref(href, pathname);
   const { row } = sidebarVariants();
 
   return (
