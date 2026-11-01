@@ -34,3 +34,6 @@ export const focusRingClasses = (ground: TFocusRingGround): string =>
 // For an element whose clipping parent would cut off a ring drawn outside it.
 export const insetFocusRingClasses = (ground: TInsetFocusRingGround): string =>
   `focus-visible:outline-hidden ${INSET_FOCUS_RING_SHADOW_CLASSES[ground]}`;
+
+export const SURFACE_EDITABLE_SHELL_FOCUS_RING_CLASSES =
+  'has-[[contenteditable]:focus-visible]:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]';
