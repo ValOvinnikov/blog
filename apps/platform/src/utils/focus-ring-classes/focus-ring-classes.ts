@@ -21,3 +21,6 @@ const FOCUS_RING_SHADOW_CLASSES: Record<TFocusRingGround, string> = {
 
 export const focusRingClasses = (ground: TFocusRingGround): string =>
   `focus-visible:outline-hidden ${FOCUS_RING_SHADOW_CLASSES[ground]}`;
+
+export const SURFACE_EDITABLE_SHELL_FOCUS_RING_CLASSES =
+  'has-[[contenteditable]:focus-visible]:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]';

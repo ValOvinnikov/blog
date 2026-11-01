@@ -1,5 +1,6 @@
 'use client';
 
+import { SIZE } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import {
   CONTROL_MODE,
@@ -16,17 +17,22 @@ import {
   type SchemaDefinition,
 } from '@portabletext/editor';
 import { EventListenerPlugin, NodePlugin } from '@portabletext/editor/plugins';
-import type { AriaAttributes } from 'react';
 
 import { PortableTextEditorLinkAnnotation } from './components/link-annotation/portable-text-editor-link-annotation';
 import { PortableTextEditorTextBlock } from './components/text-block/portable-text-editor-text-block';
+import { PortableTextEditorTokenDecorations } from './components/token-decorations/portable-text-editor-token-decorations';
 import { PortableTextEditorToolbar } from './components/toolbar/portable-text-editor-toolbar';
-import { portableTextEditorVariants } from './portable-text-editor-variants';
+import {
+  portableTextEditorVariants,
+  type TPortableTextEditorSize,
+} from './portable-text-editor-variants';
 
 type TPortableTextEditorField = {
   label: string;
   id?: string;
   isInvalid?: boolean;
+  describedBy?: string;
+  tokens?: readonly string[];
 };
 
 export type TPortableTextEditorProps<TBlock = TEmailTemplateBlock> = {
@@ -36,7 +42,7 @@ export type TPortableTextEditorProps<TBlock = TEmailTemplateBlock> = {
   schema?: SchemaDefinition;
   placeholder?: string;
   mode?: TControlMode;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
+  size?: TPortableTextEditorSize;
 };
 
 const strongDecorator = defineDecorator({
@@ -68,15 +74,17 @@ export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
   schema = EMAIL_PORTABLE_TEXT_SCHEMA,
   placeholder,
   mode = CONTROL_MODE.EDITABLE,
-  'aria-describedby': ariaDescribedBy,
+  size = SIZE.MD,
 }: TPortableTextEditorProps<TBlock>) => {
-  const { label, id, isInvalid = false } = field;
+  const { label, id, isInvalid = false, describedBy, tokens } = field;
   const isEditable = mode === CONTROL_MODE.EDITABLE;
+  const appliedSize = isEditable ? size : SIZE.MD;
   const {
     root,
     editable,
     placeholder: placeholderSlot,
-  } = portableTextEditorVariants({ mode });
+    token,
+  } = portableTextEditorVariants({ mode, size: appliedSize });
 
   // @portabletext/editor drops role and aria-multiline entirely when readOnly; restore both so a non-editable editor still announces as a text field instead of a nameless generic node.
   const nonEditableFieldProps = isEditable
@@ -109,11 +117,19 @@ export const PortableTextEditor = <TBlock = TEmailTemplateBlock,>({
             }
           }}
         />
-        {isEditable && <PortableTextEditorToolbar schema={schema} />}
+        {tokens !== undefined && tokens.length > 0 && (
+          <PortableTextEditorTokenDecorations
+            tokens={tokens}
+            className={token()}
+          />
+        )}
+        {isEditable && (
+          <PortableTextEditorToolbar schema={schema} size={appliedSize} />
+        )}
         <PortableTextEditable
           id={id}
           aria-label={label}
-          aria-describedby={ariaDescribedBy}
+          aria-describedby={describedBy}
           aria-invalid={isInvalid || undefined}
           data-invalid={isInvalid || undefined}
           renderPlaceholder={

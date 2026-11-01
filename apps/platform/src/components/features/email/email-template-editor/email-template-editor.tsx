@@ -106,11 +106,13 @@ export const EmailTemplateEditor = ({
               key={bodyRevision}
               initialValue={draft.body ?? fallback.body}
               onChange={handleBodyChange}
-              field={{ label: t('bodyLabel', { language: languageName }) }}
+              field={{
+                label: t('bodyLabel', { language: languageName }),
+                describedBy: [bodyHintId, archivedDescribedBy]
+                  .filter(Boolean)
+                  .join(' '),
+              }}
               mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}
-              aria-describedby={[bodyHintId, archivedDescribedBy]
-                .filter(Boolean)
-                .join(' ')}
             />
           </FormField>
           <EmailLogoField
