@@ -4,6 +4,7 @@ import { Menu } from '@base-ui/react/menu';
 import { ICONS } from '@blog/config';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
+import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -41,6 +42,7 @@ export const TenantSwitcher = ({
     itemDomain,
     itemBadge,
   } = tenantSwitcherVariants();
+  const { popup: surfacePopup } = menuSurfaceVariants();
 
   if (!active) {
     return null;
@@ -61,14 +63,14 @@ export const TenantSwitcher = ({
           </span>
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
-        <Icon name={ICONS.CHEVRON_RIGHT} className={chev()} />
+        <Icon name={ICONS.CHEVRON_DOWN} className={chev()} />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={6} align="start">
+        <Menu.Positioner sideOffset={4} align="start">
           {/* Base UI points the popup's aria-labelledby at the trigger unconditionally,
               which wins over any aria-label here per the accname algorithm — and the
               trigger's own text (active tenant + domain) is already the right name. */}
-          <Menu.Popup className={popup()}>
+          <Menu.Popup className={surfacePopup({ class: popup() })}>
             {tenants.map((tenant) => (
               <Menu.LinkItem
                 key={tenant.id}
@@ -77,6 +79,7 @@ export const TenantSwitcher = ({
                   <Link
                     href={adminRoutes.dashboardSelectTenantHref(tenant.id)}
                     prefetch={false}
+                    aria-current={tenant.id === active.id ? 'true' : undefined}
                   />
                 }
               >
