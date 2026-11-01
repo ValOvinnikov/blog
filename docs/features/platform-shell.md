@@ -24,6 +24,7 @@ code:
   - apps/platform/src/context/unsaved-changes-provider/**
   - apps/platform/src/components/shared/guarded-link/**
   - apps/platform/src/components/shared/button/**
+  - apps/platform/src/components/shared/menu-surface/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
   - apps/platform/src/styles/admin-theme*
@@ -151,6 +152,12 @@ switches the content column to full-bleed (see
   `side-muted`, and no sidebar text is drawn in `faint`, which is for icons
   and chevrons only. The onboarding rail and the Choose a workspace page read
   the separate `rail` tokens and stay dark.
+- Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
+  `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
+  border, `rounded-admin` on every corner, 4px padding, `text` colour and
+  `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
+  and its section labels and notes read `muted` and its rows `text` on that
+  ground.
 - `styles/admin-theme-contrast.test.ts` guards the light palette: each pair
   of token names must meet 4.5:1 for text and 3:1 for borders, tracks and
   focus rings, measured from the values in `admin-theme.css`.
