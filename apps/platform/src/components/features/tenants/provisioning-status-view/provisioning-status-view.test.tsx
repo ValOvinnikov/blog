@@ -69,6 +69,11 @@ const MOCK_DOMAINS_FAILURE =
   'Vercel API POST /v9/projects/prj_web/domains failed: 500 internal_server_error';
 const MOCK_QUEUED_ADMITTED_AT = '2026-10-15T13:00:00.000Z';
 const MOCK_QUEUED_STARTED_AT = '2026-10-15T13:01:00.000Z';
+const FINISHED_PENDING = '—';
+const MOCK_FINISHED_RUN = {
+  startedAt: MOCK_RUN_STARTED_AT,
+  finishedAt: MOCK_RUN_PLUS_7_MIN_AT,
+} as TProvisioningRun;
 
 const MOCK_FAILED_TENANT = mockClientTenant({
   provisioningStatus: TENANT_PROVISIONING_STATUS.FAILED,
@@ -619,6 +624,56 @@ describe(`<${ProvisioningStatusView.name}/>`, () => {
       }
 
       expect(stepsToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('shows the run as finished only once every step shows done', async () => {
+      getTenantProvisioningStatusActionMock.mockResolvedValue({
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+        provisioningSteps: {
+          ...mockDoneProvisioningSteps(),
+          run: MOCK_FINISHED_RUN,
+        },
+      });
+      setup({ tenant: MOCK_FIRST_STEP_RUNNING_TENANT });
+
+      await advance(STEP_POLL_INTERVAL_MS);
+
+      const pendingFinish = screen.getByText(FINISHED_PENDING);
+
+      expect(pendingFinish).toBeVisible();
+
+      for (let reveal = 0; reveal < REVEALS_UNTIL_ALL_DONE - 1; reveal += 1) {
+        await advance(STEP_REVEAL_DWELL_MS);
+      }
+
+      const stillPendingFinish = screen.getByText(FINISHED_PENDING);
+
+      expect(stillPendingFinish).toBeVisible();
+
+      await advance(STEP_REVEAL_DWELL_MS);
+
+      const removedPendingFinish = screen.queryByText(FINISHED_PENDING);
+
+      expect(removedPendingFinish).not.toBeInTheDocument();
+    });
+
+    it('shows a reloaded finished run as finished at once', () => {
+      setup({
+        tenant: mockClientTenant({
+          provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+          provisioningSteps: {
+            ...mockDoneProvisioningSteps(),
+            run: MOCK_FINISHED_RUN,
+          },
+        }),
+      });
+
+      const pendingFinish = screen.queryByText(FINISHED_PENDING);
+      const stepsCard = screen.getByTestId(PROVISIONING_STEPS);
+      const runningStatus = within(stepsCard).queryByText(RUNNING);
+
+      expect(pendingFinish).not.toBeInTheDocument();
+      expect(runningStatus).not.toBeInTheDocument();
     });
 
     it('counts the wait of a queued run until the workflow starts it', async () => {
