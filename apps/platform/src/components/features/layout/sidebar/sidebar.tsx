@@ -66,7 +66,9 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
 
       {sections.map((navSection) => (
         <div className={section()} key={navSection.label}>
-          <p className={sectionLabel()}>{navSection.label}</p>
+          <p className={sectionLabel()} title={navSection.label}>
+            {navSection.label}
+          </p>
           {navSection.items.length > 0 ? (
             <nav aria-label={navSection.label}>
               <ul className={list()}>
@@ -88,6 +90,8 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                   return (
                     <li key={item.label}>
                       <div
+                        role="link"
+                        aria-disabled="true"
                         className={row({ state: 'inert' })}
                         title={item.label}
                       >

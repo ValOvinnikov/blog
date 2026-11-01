@@ -162,6 +162,14 @@ switches the content column to full-bleed (see
   text and icon `text-strong` at 600, and a 3px `side-accent` bar on its left
   edge, on the collapsed rail too. A focused row keeps its rest colours and
   shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
+  An inert row (no destination) keeps the rest colours with no hover ground,
+  is exposed as a disabled link (`role="link"`, `aria-disabled`, no `href`),
+  and shows its reason under the label at 12px / 16 in `side-muted`, wrapping
+  rather than cut; on the collapsed rail it sits at opacity .5. A section note
+  (a group with no rows) is 12px / 16 `side-muted` and wraps. A section label
+  stays on one line with an ellipsis and carries its full text as its `title`,
+  so the operator's "Tenant · {name}" group reads on hover; the "Platform
+  actions" rows take the row colours with a neutral "platform" pill.
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its

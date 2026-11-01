@@ -59,7 +59,7 @@ describe(`<${Sidebar.name}/>`, () => {
     expect(link).toHaveAttribute('href', MOCK_LOOK_ITEM.href);
   });
 
-  it('renders the note instead of links when a section has no items yet', () => {
+  it('renders the note and no links when a section has no items yet', () => {
     renderSidebar({
       sections: [mockNavSection({ items: [], note: MOCK_NOTE })],
     });
@@ -69,6 +69,14 @@ describe(`<${Sidebar.name}/>`, () => {
 
     expect(note).toBeVisible();
     expect(link).not.toBeInTheDocument();
+  });
+
+  it("carries a section label's full text for the hover hint", () => {
+    renderSidebar({ sections: [MOCK_SECTION] });
+
+    const sectionLabel = screen.getByText(MOCK_SECTION.label);
+
+    expect(sectionLabel).toHaveAttribute('title', MOCK_SECTION.label);
   });
 
   it('renders the switcher slot when provided', () => {
@@ -137,12 +145,15 @@ describe(`<${Sidebar.name}/>`, () => {
       sections: [mockNavSection({ items: [MOCK_INERT_ITEM] })],
     });
 
-    const link = screen.queryByRole('link');
+    const row = screen.getByRole('link', {
+      name: new RegExp(MOCK_INERT_ITEM.label),
+    });
     const label = screen.getByText(MOCK_INERT_ITEM.label);
     const reason = screen.getByText(MOCK_DISABLED_REASON);
     const badge = screen.getByText(MOCK_BADGE.label);
 
-    expect(link).not.toBeInTheDocument();
+    expect(row).toHaveAttribute('aria-disabled', 'true');
+    expect(row).not.toHaveAttribute('href');
     expect(label).toBeVisible();
     expect(reason).toBeVisible();
     expect(badge).toBeVisible();
