@@ -1,5 +1,7 @@
 import { PRESET_ID } from '@blog/config';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const presetPickerVariants = tv({
@@ -7,8 +9,7 @@ export const presetPickerVariants = tv({
     root: ['grid grid-cols-1 gap-3 @sm:grid-cols-2'],
     card: [
       'relative cursor-pointer rounded-admin-control border-[1.5px] border-admin-line bg-admin-surface p-[14px]',
-      'outline-hidden',
-      'focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
     ],
     checkmark: [

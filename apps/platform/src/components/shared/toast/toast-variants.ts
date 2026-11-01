@@ -1,4 +1,6 @@
 import { TOAST_TYPE } from '@blog/config';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const toastVariants = tv({
@@ -27,8 +29,8 @@ export const toastVariants = tv({
     dismiss: [
       'shrink-0 cursor-pointer text-white opacity-55',
       'hover:opacity-100',
-      'focus-visible:opacity-100 focus-visible:outline-none',
-      'focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-1 focus-visible:ring-offset-admin-text',
+      'focus-visible:opacity-100',
+      focusRingClasses(FOCUS_RING_GROUND.TOAST),
     ],
   },
   variants: {
