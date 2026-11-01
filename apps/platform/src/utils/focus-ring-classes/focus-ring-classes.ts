@@ -20,4 +20,4 @@ const FOCUS_RING_SHADOW_CLASSES: Record<TFocusRingGround, string> = {
 };
 
 export const focusRingClasses = (ground: TFocusRingGround): string =>
-  `focus-visible:outline-none ${FOCUS_RING_SHADOW_CLASSES[ground]}`;
+  `focus-visible:outline-hidden ${FOCUS_RING_SHADOW_CLASSES[ground]}`;
