@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const tileVariants = tv({
@@ -8,7 +10,7 @@ export const tileVariants = tv({
       'rounded-admin border border-admin-line bg-admin-surface p-3.5',
       'shadow-admin no-underline',
       'hover:border-admin-brand hover:bg-admin-surface-2',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     icon: ['text-admin-brand'],
     text: ['flex min-w-0 flex-col md:mt-2 md:gap-0.5'],
