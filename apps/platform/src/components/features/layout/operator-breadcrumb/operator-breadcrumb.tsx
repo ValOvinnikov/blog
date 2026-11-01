@@ -22,11 +22,14 @@ export const OperatorBreadcrumb = ({ role }: TOperatorBreadcrumbProps) => {
   const t = useTranslations('navSections');
   const tTopbar = useTranslations('topbar');
 
-  const leafLabel = navLabelForPathname(operatorNavSections(t, role), pathname);
+  const isNewTenant = pathname === adminRoutes.newTenant();
+  const leafLabel = isNewTenant
+    ? t('addTenant')
+    : navLabelForPathname(operatorNavSections(t, role), pathname);
 
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },
-    ...(pathname === adminRoutes.newTenant()
+    ...(isNewTenant
       ? [{ label: t('tenants'), href: adminRoutes.tenants() }]
       : []),
     ...(leafLabel ? [{ label: leafLabel }] : []),

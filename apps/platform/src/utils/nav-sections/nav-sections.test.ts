@@ -27,9 +27,16 @@ import {
 const SUPERADMIN_ONLY_KEYS = ['releases', 'blockedSignups', 'dataRequests'];
 
 describe(operatorNavSections, () => {
+  it('lists the Platform pages in order for a SUPERADMIN, with no Add tenant row', () => {
+    const [platform] = operatorNavSections(t, ADMIN_ROLE.SUPERADMIN);
+
+    expect(labelsOf(platform!)).toEqual(
+      translated(['tenants', 'findings', ...SUPERADMIN_ONLY_KEYS]),
+    );
+  });
+
   it.each([
     ['tenants', adminRoutes.tenants()],
-    ['addTenant', adminRoutes.newTenant()],
     ['findings', adminRoutes.findings()],
   ])('links %s to its page for every admin', (key, href) => {
     const [platform] = operatorNavSections(t, ADMIN_ROLE.ADMIN);

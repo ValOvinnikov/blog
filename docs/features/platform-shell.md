@@ -103,7 +103,13 @@ switches the content column to full-bleed (see
 ## Configuration
 
 - Nav items come from `nav-sections.ts`: `operatorNavSections`,
-  `tenantNavSections` and `dashboardNavSections`.
+  `tenantNavSections` and `dashboardNavSections`. The operator's Platform
+  section lists Tenants and Findings, plus Releases, Blocked sign-ups and Data
+  requests for a SUPERADMIN. Add tenant is the Tenants page's primary action,
+  not a row; its breadcrumb leaf on `/tenants/new` is named explicitly.
+- The current row is decided once, by `isCurrentNavHref`, for the sidebar and
+  the phone Menu alike: the row whose href is the pathname, and Tenants on
+  `/tenants/new` (an explicit match, not a prefix rule).
 - On `/dashboard`, the plan decides which items appear (`planPageAccess`, see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
   than one plan locale, Email a mail-sending capability, and the inert "Coming
