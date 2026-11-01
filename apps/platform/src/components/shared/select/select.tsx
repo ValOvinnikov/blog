@@ -19,6 +19,7 @@ type TSelectProps<TValue extends string> = {
   value: TValue;
   onChange: (value: TValue) => void;
   isDisabled?: boolean;
+  isLocked?: boolean;
   children: ReactNode;
 };
 
@@ -26,12 +27,16 @@ const SelectRoot = <TValue extends string>({
   value,
   onChange,
   isDisabled = false,
+  isLocked = false,
   children,
 }: TSelectProps<TValue>) => (
   <BaseSelect.Root<TValue>
     value={value}
     onValueChange={(next) => {
-      if (next !== null) onChange(next);
+      if (!isLocked && next !== null) onChange(next);
+    }}
+    onOpenChange={(isOpening, eventDetails) => {
+      if (isLocked && isOpening) eventDetails.cancel();
     }}
     disabled={isDisabled}
   >

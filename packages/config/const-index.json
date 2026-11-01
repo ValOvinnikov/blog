@@ -4934,6 +4934,38 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "ArrowLeft": [
+      {
+        "ref": "KEY.ARROW_LEFT",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "ArrowRight": [
+      {
+        "ref": "KEY.ARROW_RIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "Home": [
+      {
+        "ref": "KEY.HOME",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "End": [
+      {
+        "ref": "KEY.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
     "leads.delete_failed": [
       {
         "ref": "LEAD_LOG.DELETE_FAILED",

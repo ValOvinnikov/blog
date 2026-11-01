@@ -45,12 +45,11 @@ export const LogoHueField = ({
   return (
     <div className={root()}>
       <Switch
+        aria={{ label: t('followAccentHue'), describedBy: ariaDescribedBy }}
         isChecked={follows}
         onCheckedChange={(checked) => onChange(checked ? undefined : accentHue)}
-        ariaLabel={t('followAccentHue')}
         labels={{ caption: t('followAccentHue') }}
         isDisabled={isDisabled}
-        aria-describedby={ariaDescribedBy}
       />
 
       <div className={hueField()}>

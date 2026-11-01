@@ -25,19 +25,19 @@ export const TypeCard = () => {
     >
       <LookField label={headingFontLabel} lock={headingFontLock.lock}>
         <FontPicker
+          aria={{ describedBy: headingFontLock.describedBy }}
           value={headingFont}
           onChange={(font) => updateField('headingFont', font)}
           isDisabled={headingFontLock.isDisabled}
-          aria-describedby={headingFontLock.describedBy}
         />
       </LookField>
 
       <LookField label={bodyFontLabel} lock={bodyFontLock.lock}>
         <FontPicker
+          aria={{ describedBy: bodyFontLock.describedBy }}
           value={bodyFont}
           onChange={(font) => updateField('bodyFont', font)}
           isDisabled={bodyFontLock.isDisabled}
-          aria-describedby={bodyFontLock.describedBy}
         />
       </LookField>
     </LookCard>

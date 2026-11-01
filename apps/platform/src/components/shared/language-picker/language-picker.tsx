@@ -24,6 +24,7 @@ export const LanguagePicker = ({
 
   return (
     <SegmentedControl
+      aria={{ label: t('ariaLabel') }}
       options={locales.map((locale) => ({
         value: locale,
         label: tLanguage(locale),
@@ -34,7 +35,6 @@ export const LanguagePicker = ({
       }))}
       value={value}
       onChange={onChange}
-      ariaLabel={t('ariaLabel')}
     />
   );
 };

@@ -124,7 +124,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                   control={{ hasOwnAccessibleName: true }}
                 >
                   <SegmentedControl<TTenantPlan>
-                    ariaLabel={t('planLabel')}
+                    aria={{ label: t('planLabel') }}
                     options={planOptions}
                     value={values.plan}
                     onChange={(plan) => updateField('plan', plan)}

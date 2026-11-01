@@ -50,11 +50,11 @@ export const HeaderCard = () => {
         lock={layoutLock.lock}
       >
         <OptionSelect
+          aria={{ describedBy: layoutLock.describedBy }}
           options={layoutOptions}
           value={headerLayout}
           onChange={(layout) => updateField('headerLayout', layout)}
           isDisabled={layoutLock.isDisabled}
-          aria-describedby={layoutLock.describedBy}
         />
       </LookField>
 
@@ -66,6 +66,7 @@ export const HeaderCard = () => {
           lock={submenuStyleLock.lock}
         >
           <SegmentedControl<THeaderSubmenuStyle>
+            aria={{ describedBy: submenuStyleLock.describedBy }}
             options={submenuStyleOptions}
             value={headerSubmenuStyle}
             onChange={(style) => {
@@ -73,7 +74,6 @@ export const HeaderCard = () => {
               markChanged();
             }}
             isDisabled={submenuStyleLock.isDisabled}
-            aria-describedby={submenuStyleLock.describedBy}
           />
         </LookField>
       </div>
@@ -85,11 +85,11 @@ export const HeaderCard = () => {
         lock={barStyleLock.lock}
       >
         <SegmentedControl<THeaderBarStyle>
+          aria={{ describedBy: barStyleLock.describedBy }}
           options={barStyleOptions}
           value={headerBarStyle}
           onChange={(style) => updateField('headerBarStyle', style)}
           isDisabled={barStyleLock.isDisabled}
-          aria-describedby={barStyleLock.describedBy}
         />
       </LookField>
 

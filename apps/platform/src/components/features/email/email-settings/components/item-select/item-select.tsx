@@ -45,7 +45,7 @@ export const ItemSelect = ({
 
   return (
     <Select value={selected} onChange={onSelect}>
-      <Select.Trigger ariaLabel={label} className={trigger()}>
+      <Select.Trigger aria={{ label: label }} className={trigger()}>
         {selectedOption && (
           <span className={value()}>
             <span className={valueName()}>{selectedOption.label}</span>

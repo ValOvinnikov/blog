@@ -131,12 +131,14 @@ export const FeaturesSettings = ({
                 lockedReason={isLocked ? t('planLockedBadge') : undefined}
               >
                 <Switch
+                  aria={{
+                    label: label,
+                    describedBy: isArchived ? archivedNoticeId : undefined,
+                  }}
                   isChecked={values[field]}
                   onCheckedChange={(checked) => handleToggle(field, checked)}
                   isDisabled={isLocked || isPending || isArchived}
-                  ariaLabel={label}
                   labels={{ on: t('switchOn'), off: t('switchOff') }}
-                  aria-describedby={isArchived ? archivedNoticeId : undefined}
                 />
               </SettingRow>
             );
