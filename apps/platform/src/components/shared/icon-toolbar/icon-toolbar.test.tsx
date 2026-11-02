@@ -103,97 +103,110 @@ describe(`<${IconToolbar.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders a named toolbar with a named group per entry', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const toolbar = screen.getByRole('toolbar', { name: MOCK_TOOLBAR_LABEL });
-    const deviceGroup = screen.getByRole('group', { name: MOCK_DEVICE_LABEL });
-    const schemeGroup = screen.getByRole('group', { name: MOCK_SCHEME_LABEL });
+    it('renders a named toolbar with a named group per entry', () => {
+      const toolbar = screen.getByRole('toolbar', { name: MOCK_TOOLBAR_LABEL });
+      const deviceGroup = screen.getByRole('group', {
+        name: MOCK_DEVICE_LABEL,
+      });
+      const schemeGroup = screen.getByRole('group', {
+        name: MOCK_SCHEME_LABEL,
+      });
 
-    expect(toolbar).toBeVisible();
-    expect(deviceGroup).toBeVisible();
-    expect(schemeGroup).toBeVisible();
-  });
+      expect(toolbar).toBeVisible();
+      expect(deviceGroup).toBeVisible();
+      expect(schemeGroup).toBeVisible();
+    });
 
-  it('renders the end slot children', () => {
-    setup();
+    it('renders the end slot children', () => {
+      const endButton = getButton(MOCK_END_LABEL);
 
-    const endButton = getButton(MOCK_END_LABEL);
+      expect(endButton).toBeVisible();
+    });
 
-    expect(endButton).toBeVisible();
-  });
+    it('presses exactly one button per group', () => {
+      expect(getButton(MOCK_PHONE_LABEL)).not.toBePressed();
+      expect(getButton(MOCK_TABLET_LABEL)).toBePressed();
+      expect(getButton(MOCK_DESKTOP_LABEL)).not.toBePressed();
+      expect(getButton(MOCK_LIGHT_LABEL)).toBePressed();
+      expect(getButton(MOCK_DARK_LABEL)).not.toBePressed();
+    });
 
-  it('presses exactly one button per group', () => {
-    setup();
+    it('keeps a solo button free of a pressed state', () => {
+      const endButton = getButton(MOCK_END_LABEL);
 
-    expect(getButton(MOCK_PHONE_LABEL)).not.toBePressed();
-    expect(getButton(MOCK_TABLET_LABEL)).toBePressed();
-    expect(getButton(MOCK_DESKTOP_LABEL)).not.toBePressed();
-    expect(getButton(MOCK_LIGHT_LABEL)).toBePressed();
-    expect(getButton(MOCK_DARK_LABEL)).not.toBePressed();
-  });
+      expect(endButton).not.toHaveAttribute(ARIA_PRESSED);
+    });
 
-  it('keeps a solo button free of a pressed state', () => {
-    setup();
+    it('lands the first Tab on the first group pressed button', async () => {
+      await user.tab();
+      const tabletButton = getButton(MOCK_TABLET_LABEL);
 
-    const endButton = getButton(MOCK_END_LABEL);
+      expect(tabletButton).toHaveFocus();
+    });
 
-    expect(endButton).not.toHaveAttribute(ARIA_PRESSED);
-  });
+    describe('once focus has entered the toolbar', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
 
-  it('lands the first Tab on the first group pressed button', async () => {
-    setup();
+      it('moves with Arrow keys across groups and solos', async () => {
+        await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+        expect(getButton(MOCK_DESKTOP_LABEL)).toHaveFocus();
 
-    await user.tab();
-    const tabletButton = getButton(MOCK_TABLET_LABEL);
+        await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+        expect(getButton(MOCK_LIGHT_LABEL)).toHaveFocus();
 
-    expect(tabletButton).toHaveFocus();
-  });
+        await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT.repeat(2));
+        expect(getButton(MOCK_SOLO_LABEL)).toHaveFocus();
 
-  it('moves with Arrow keys across groups and solos', async () => {
-    setup();
-    await user.tab();
+        await user.keyboard(USER_EVENT_KEY.ARROW_LEFT.repeat(3));
+        expect(getButton(MOCK_DESKTOP_LABEL)).toHaveFocus();
+      });
 
-    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-    expect(getButton(MOCK_DESKTOP_LABEL)).toHaveFocus();
+      it('stops at the last button without wrapping', async () => {
+        await user.keyboard(
+          `${USER_EVENT_KEY.END}${USER_EVENT_KEY.ARROW_RIGHT}`,
+        );
 
-    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-    expect(getButton(MOCK_LIGHT_LABEL)).toHaveFocus();
+        expect(getButton(MOCK_END_LABEL)).toHaveFocus();
+      });
 
-    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT.repeat(2));
-    expect(getButton(MOCK_SOLO_LABEL)).toHaveFocus();
+      it('stops at the first button without wrapping', async () => {
+        await user.keyboard(
+          `${USER_EVENT_KEY.HOME}${USER_EVENT_KEY.ARROW_LEFT}`,
+        );
 
-    await user.keyboard(USER_EVENT_KEY.ARROW_LEFT.repeat(3));
-    expect(getButton(MOCK_DESKTOP_LABEL)).toHaveFocus();
-  });
+        expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
+      });
 
-  it('stops at the last button without wrapping', async () => {
-    setup();
-    await user.tab();
+      it('jumps to the ends with Home and End', async () => {
+        await user.keyboard(USER_EVENT_KEY.END);
+        expect(getButton(MOCK_END_LABEL)).toHaveFocus();
 
-    await user.keyboard(`${USER_EVENT_KEY.END}${USER_EVENT_KEY.ARROW_RIGHT}`);
+        await user.keyboard(USER_EVENT_KEY.HOME);
+        expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
+      });
 
-    expect(getButton(MOCK_END_LABEL)).toHaveFocus();
-  });
+      it('leaves the toolbar on Tab', async () => {
+        await user.tab();
 
-  it('stops at the first button without wrapping', async () => {
-    setup();
-    await user.tab();
+        expect(document.body).toHaveFocus();
+      });
 
-    await user.keyboard(`${USER_EVENT_KEY.HOME}${USER_EVENT_KEY.ARROW_LEFT}`);
+      it('returns to the last focused button on Tab back in', async () => {
+        await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT.repeat(3));
 
-    expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
-  });
+        await user.tab();
+        await user.tab({ shift: true });
 
-  it('jumps to the ends with Home and End', async () => {
-    setup();
-    await user.tab();
-
-    await user.keyboard(USER_EVENT_KEY.END);
-    expect(getButton(MOCK_END_LABEL)).toHaveFocus();
-
-    await user.keyboard(USER_EVENT_KEY.HOME);
-    expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
+        expect(getButton(MOCK_DARK_LABEL)).toHaveFocus();
+      });
+    });
   });
 
   it('keeps Home and End inside a text input in the end slot', async () => {
@@ -204,26 +217,6 @@ describe(`<${IconToolbar.name}/>`, () => {
     await user.keyboard(`${USER_EVENT_KEY.HOME}${USER_EVENT_KEY.END}`);
 
     expect(input).toHaveFocus();
-  });
-
-  it('leaves the toolbar on Tab', async () => {
-    setup();
-    await user.tab();
-
-    await user.tab();
-
-    expect(document.body).toHaveFocus();
-  });
-
-  it('returns to the last focused button on Tab back in', async () => {
-    setup();
-    await user.tab();
-    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT.repeat(3));
-
-    await user.tab();
-    await user.tab({ shift: true });
-
-    expect(getButton(MOCK_DARK_LABEL)).toHaveFocus();
   });
 
   it('resets to the first group pressed button when the groups change', async () => {

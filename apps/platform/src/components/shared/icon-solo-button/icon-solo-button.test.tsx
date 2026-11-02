@@ -25,12 +25,32 @@ describe(`<${IconSoloButton.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('has no pressed state', () => {
-    setup();
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
+    it('has no pressed state', () => {
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
 
-    expect(button).not.toHaveAttribute(ARIA_PRESSED);
+      expect(button).not.toHaveAttribute(ARIA_PRESSED);
+    });
+
+    it('is its own Tab stop outside a toolbar', async () => {
+      await user.tab();
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+      expect(button).toHaveFocus();
+    });
+
+    it('opens its tooltip at once on keyboard focus, keeping the name', async () => {
+      await user.tab();
+      const tooltip = await screen.findByText(MOCK_TOOLTIP);
+      const button = screen.getByRole('button', { name: MOCK_LABEL });
+
+      expect(tooltip).toBeVisible();
+      expect(button).toHaveAccessibleName(MOCK_LABEL);
+    });
   });
 
   it('calls onClick when clicked', async () => {
@@ -41,25 +61,5 @@ describe(`<${IconSoloButton.name}/>`, () => {
     await user.click(button);
 
     expect(onClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('is its own Tab stop outside a toolbar', async () => {
-    setup();
-
-    await user.tab();
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-
-    expect(button).toHaveFocus();
-  });
-
-  it('opens its tooltip at once on keyboard focus, keeping the name', async () => {
-    setup();
-
-    await user.tab();
-    const tooltip = await screen.findByText(MOCK_TOOLTIP);
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-
-    expect(tooltip).toBeVisible();
-    expect(button).toHaveAccessibleName(MOCK_LABEL);
   });
 });

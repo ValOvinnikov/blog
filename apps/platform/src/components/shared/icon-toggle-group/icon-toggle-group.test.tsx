@@ -62,26 +62,77 @@ describe(`<${IconToggleGroup.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('is named by its aria-label and names each button by its own', () => {
-    setup();
-
-    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
-    const firstButton = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-
-    expect(group).toBeVisible();
-    expect(firstButton).toBeVisible();
-  });
-
-  it('presses only the button for the current value', () => {
-    setup();
-
-    const firstButton = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-    const secondButton = screen.getByRole('button', {
-      name: MOCK_SECOND_LABEL,
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(firstButton).toBePressed();
-    expect(secondButton).not.toBePressed();
+    it('is named by its aria-label and names each button by its own', () => {
+      const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
+      const firstButton = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+
+      expect(group).toBeVisible();
+      expect(firstButton).toBeVisible();
+    });
+
+    it('presses only the button for the current value', () => {
+      const firstButton = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+      const secondButton = screen.getByRole('button', {
+        name: MOCK_SECOND_LABEL,
+      });
+
+      expect(firstButton).toBePressed();
+      expect(secondButton).not.toBePressed();
+    });
+
+    it('opens a tooltip unlike the aria-label on keyboard focus, keeping the name', async () => {
+      await user.tab();
+      const tooltip = await screen.findByText(MOCK_FIRST_TOOLTIP);
+      const firstButton = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+
+      expect(tooltip).toBeVisible();
+      expect(firstButton).toHaveAccessibleName(MOCK_FIRST_LABEL);
+    });
+  });
+
+  describe('with a stateful group', () => {
+    beforeEach(() => {
+      renderWithIntl(<StatefulGroup />);
+    });
+
+    it('keeps exactly one button pressed after choosing another', async () => {
+      const firstButton = screen.getByRole('button', {
+        name: MOCK_FIRST_LABEL,
+      });
+      const secondButton = screen.getByRole('button', {
+        name: MOCK_SECOND_LABEL,
+      });
+      await user.click(secondButton);
+
+      expect(firstButton).not.toBePressed();
+      expect(secondButton).toBePressed();
+    });
+
+    it.each([USER_EVENT_KEY.ENTER, USER_EVENT_KEY.SPACE])(
+      'presses with %j and keeps focus',
+      async (key) => {
+        const secondButton = screen.getByRole('button', {
+          name: MOCK_SECOND_LABEL,
+        });
+        await user.tab();
+        await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+        await user.keyboard(key);
+
+        expect(secondButton).toBePressed();
+        expect(secondButton).toHaveFocus();
+      },
+    );
   });
 
   it('reports the clicked button', async () => {
@@ -105,46 +156,5 @@ describe(`<${IconToggleGroup.name}/>`, () => {
 
     expect(firstButton).toBePressed();
     expect(onChange).not.toHaveBeenCalled();
-  });
-
-  it('keeps exactly one button pressed after choosing another', async () => {
-    renderWithIntl(<StatefulGroup />);
-
-    const firstButton = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-    const secondButton = screen.getByRole('button', {
-      name: MOCK_SECOND_LABEL,
-    });
-    await user.click(secondButton);
-
-    expect(firstButton).not.toBePressed();
-    expect(secondButton).toBePressed();
-  });
-
-  it.each([USER_EVENT_KEY.ENTER, USER_EVENT_KEY.SPACE])(
-    'presses with %j and keeps focus',
-    async (key) => {
-      renderWithIntl(<StatefulGroup />);
-
-      const secondButton = screen.getByRole('button', {
-        name: MOCK_SECOND_LABEL,
-      });
-      await user.tab();
-      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-      await user.keyboard(key);
-
-      expect(secondButton).toBePressed();
-      expect(secondButton).toHaveFocus();
-    },
-  );
-
-  it('opens a tooltip unlike the aria-label on keyboard focus, keeping the name', async () => {
-    setup();
-
-    await user.tab();
-    const tooltip = await screen.findByText(MOCK_FIRST_TOOLTIP);
-    const firstButton = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-
-    expect(tooltip).toBeVisible();
-    expect(firstButton).toHaveAccessibleName(MOCK_FIRST_LABEL);
   });
 });
