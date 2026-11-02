@@ -211,7 +211,7 @@ switches the content column to full-bleed (see
   and the rich-text editor take it on `surface`, as do checkboxes, select
   triggers, accordion triggers, underline view tabs, preset cards, the
   hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
-  segmented options and segmented view tabs take it on `theme-track`. A ring
+  segmented options take it on `bg`, and segmented view tabs on `theme-track`. A ring
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`): the data table's scroll region, and its sort
   buttons, which fill their head cell. The toast's dismiss button is the one
