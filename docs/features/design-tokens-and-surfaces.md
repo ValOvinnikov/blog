@@ -47,7 +47,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 
 ## Configuration
 
-- **Tenant (Look)** — the accent hue drives five of the six `--brand-primary*` tokens (`-contrast` is fixed) and the brand scrims. The logo hue drives `--logo-1..3`. The radius scale sets the five radius steps, density the nine layout spacing tokens, and card style the five `--item-*` properties. Neutrals, ink, status colours, the type scale, shadows and motion are fixed for every tenant. See [look](./look.md).
+- **Tenant (Look)** — the accent hue drives five of the six `--brand-primary*` tokens (`-contrast` is fixed) and the brand scrims. The logo hue drives `--logo-1..3`. The radius scale sets the five radius steps on a 4px base step — `--radius`/`--radius-md` 4, 8, 12 or 16px for Small to Extra Large, with `--radius-sm` at half, `--radius-lg` at 1.5× and `--radius-xl` at 2× the base (Medium is the static default), density the nine layout spacing tokens, and card style the five `--item-*` properties. Neutrals, ink, status colours, the type scale, shadows and motion are fixed for every tenant. See [look](./look.md).
 - **Dark mode** — a `.dark` class on `<html>`, set before hydration by an inline script from `localStorage.theme` or `prefers-color-scheme`. `@custom-variant dark` matches `.dark` or any descendant, so a story can scope it to a wrapper.
 - No plan gating and no Voice reach.
 

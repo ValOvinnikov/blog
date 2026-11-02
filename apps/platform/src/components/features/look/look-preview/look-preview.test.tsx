@@ -74,7 +74,7 @@ describe(`<${LookPreview.name}/>`, () => {
     {
       name: 'the radius scale and density',
       values: { radiusScale: RADIUS_SCALE.XL, density: DENSITY.COMPACT },
-      tokens: { '--radius-md': '12px', '--spacing-card-x': '0.75rem' },
+      tokens: { '--radius-md': '16px', '--spacing-card-x': '0.75rem' },
     },
     {
       name: 'the outlined card style',
