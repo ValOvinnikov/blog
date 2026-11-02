@@ -5,6 +5,7 @@ import {
   featureDefaultsToValues,
   hasReaderAccountFeature,
   keepStoredOutOfPlan,
+  listSwitchedOnOutOfPlan,
   type TSettingsFeaturesValues,
   withComingSoonOff,
 } from './settings-features-fields';
@@ -109,6 +110,34 @@ describe(keepStoredOutOfPlan, () => {
       consentBannerEnabled: true,
       contactFormEnabled: true,
     });
+  });
+});
+
+describe(listSwitchedOnOutOfPlan, () => {
+  const FREE_CAPABILITIES = [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER];
+
+  it('lists an out-of-plan toggle switched on that is stored off', () => {
+    const values = { ...ALL_OFF, analyticsEnabled: true };
+
+    expect(listSwitchedOnOutOfPlan(values, ALL_OFF, FREE_CAPABILITIES)).toEqual(
+      ['analyticsEnabled'],
+    );
+  });
+
+  it('passes an out-of-plan toggle still on as stored', () => {
+    const stored = { ...ALL_OFF, analyticsEnabled: true };
+
+    expect(listSwitchedOnOutOfPlan(stored, stored, FREE_CAPABILITIES)).toEqual(
+      [],
+    );
+  });
+
+  it('passes an in-plan toggle switched on', () => {
+    const values = { ...ALL_OFF, consentBannerEnabled: true };
+
+    expect(listSwitchedOnOutOfPlan(values, ALL_OFF, FREE_CAPABILITIES)).toEqual(
+      [],
+    );
   });
 });
 

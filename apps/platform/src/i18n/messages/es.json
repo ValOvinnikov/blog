@@ -651,6 +651,11 @@
     "headerDescription": "Cómo se organiza la barra superior de su sitio y cómo se abren sus submenús.",
     "headerLayoutLabel": "Diseño",
     "headerLayoutDescription": "Dónde van el logotipo, los enlaces y los botones en pantallas anchas. En el móvil siempre hay una barra con botón de menú.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "La vista previa está en Teléfono, así que muestra la barra con un botón de menú.",
+      "TABLET": "La vista previa está en Tableta, así que muestra la barra con un botón de menú."
+    },
+    "headerShowOnDesktop": "Mostrar en Escritorio",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Clásico",
       "LINKS_BESIDE_BRAND": "Enlaces junto a la marca",
@@ -774,10 +779,6 @@
     "firstCardExcerpt": "Una tarjeta enlazada, tal como la muestran las listas de entradas.",
     "secondCardTitle": "Rumbo a la próxima temporada",
     "secondCardExcerpt": "Una tarjeta estática. Su marco sigue su estilo de tarjeta.",
-    "previewNote": "Creada con los propios componentes del sitio. Nada se publica hasta que guarde.",
-    "widthDesktop": "Escritorio",
-    "widthMobile": "Móvil",
-    "previewWidthAriaLabel": "Ancho de la vista previa",
     "navPosts": "Entradas",
     "navAbout": "Acerca de",
     "navTopics": "Temas",
@@ -792,6 +793,8 @@
     "readerStateAriaLabel": "Lector",
     "readerSignedOut": "Sin sesión",
     "readerSignedIn": "Con sesión",
+    "readerSignedInTooltip": "Sesión iniciada como {name}",
+    "readerAccountsOff": "Las cuentas de lector están desactivadas en este sitio, así que no hay selector de lector.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Cuenta",
     "accountMenuAriaLabel": "Menú de la cuenta",
@@ -822,6 +825,8 @@
   },
   "assetUploadField": {
     "remove": "Quitar",
+    "upload": "Subir",
+    "replace": "Sustituir",
     "logo": {
       "currentAlt": "Logotipo actual",
       "upload": "Subir logotipo",
@@ -1448,6 +1453,7 @@
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",
+    "notInPlan": "Su sitio está en el plan {plan, select, FREE {Free} GROWTH {Growth} other {actual}}, que no incluye {items}, así que no se ha guardado nada.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
     "save": "Guardar cambios",

@@ -9,10 +9,18 @@ import {
   LookFormProvider,
   type TLookFormContext,
 } from '@platform/components/features/look/look-form-provider';
+import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
+import {
+  PREVIEW_DEVICE,
+  type TPreviewDevice,
+} from '@platform/constants/preview';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_PRESSED } from '@platform/testing/aria';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
-import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
+import {
+  MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_NAME,
+} from '@platform/testing/tenants/fixtures';
 import {
   defaultLookFormValues,
   type TLookFormValues,
@@ -23,9 +31,23 @@ import { LookPreview } from './look-preview';
 
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const MOCK_ACCENT_HUE = 28;
-const { widthDesktop: DESKTOP, widthMobile: MOBILE } = messages.lookPreview;
+const LOOK_PREVIEW = messages.lookPreview;
+const tDevicePreview = makeEnTranslator('devicePreview');
+const TABLET = tDevicePreview('deviceTablet');
 
-const renderPreview = (values: Partial<TLookFormValues> = {}) => {
+type TRenderPreviewOptions = {
+  values?: Partial<TLookFormValues>;
+  previewDevice?: TPreviewDevice;
+  hasReaderAccounts?: boolean;
+};
+
+const setPreviewDevice = vi.fn();
+
+const renderPreview = ({
+  values = {},
+  previewDevice = PREVIEW_DEVICE.DESKTOP,
+  hasReaderAccounts = true,
+}: TRenderPreviewOptions = {}) => {
   const lookForm: TLookFormContext = {
     tenantName: MOCK_TENANT_NAME,
     values: {
@@ -46,13 +68,16 @@ const renderPreview = (values: Partial<TLookFormValues> = {}) => {
     resetToPreset: vi.fn(),
     isSubmenuPreviewOpen: false,
     setIsSubmenuPreviewOpen: vi.fn(),
+    previewDevice,
+    setPreviewDevice,
   };
 
   return renderWithIntl(
     <LookFormProvider value={lookForm}>
       <LookPreview
         liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
-        hasReaderAccounts={true}
+        hasReaderAccounts={hasReaderAccounts}
+        siteHost={MOCK_TENANT_DOMAIN}
       />
     </LookFormProvider>,
   );
@@ -74,7 +99,7 @@ describe(`<${LookPreview.name}/>`, () => {
     {
       name: 'the radius scale and density',
       values: { radiusScale: RADIUS_SCALE.XL, density: DENSITY.COMPACT },
-      tokens: { '--radius-md': '12px', '--spacing-card-x': '0.75rem' },
+      tokens: { '--radius-md': '16px', '--spacing-card-x': '0.75rem' },
     },
     {
       name: 'the outlined card style',
@@ -85,28 +110,56 @@ describe(`<${LookPreview.name}/>`, () => {
       },
     },
   ])('carries $name onto the preview surface', ({ values, tokens }) => {
-    renderPreview(values);
+    renderPreview({ values });
 
     const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
 
     expect(sampleTokens).toHaveStyle(tokens);
   });
 
-  it('switches the preview between desktop and mobile widths', async () => {
+  it('hands a picked device to the Look form', async () => {
     renderPreview();
 
-    const desktopButton = screen.getByRole('button', { name: DESKTOP });
-    const mobileButton = screen.getByRole('button', { name: MOBILE });
+    const tabletButton = screen.getByRole('button', { name: TABLET });
+    await user.click(tabletButton);
 
-    expect(desktopButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    expect(setPreviewDevice).toHaveBeenCalledWith(PREVIEW_DEVICE.TABLET);
+  });
 
-    await user.click(mobileButton);
+  it('shows the site host in the desktop browser bar', () => {
+    renderPreview();
 
-    expect(mobileButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    const browserBar = screen.getByTestId(DEVICE_FRAME_TEST_ID.BROWSER_BAR);
+
+    expect(browserBar).toHaveTextContent(MOCK_TENANT_DOMAIN);
+  });
+
+  it('offers the reader switch when reader accounts are on', () => {
+    renderPreview();
+
+    const readerGroup = screen.getByRole('group', {
+      name: LOOK_PREVIEW.readerStateAriaLabel,
+    });
+    const offNote = screen.queryByText(LOOK_PREVIEW.readerAccountsOff);
+
+    expect(readerGroup).toBeVisible();
+    expect(offNote).not.toBeInTheDocument();
+  });
+
+  it('explains the missing reader switch when reader accounts are off', () => {
+    renderPreview({ hasReaderAccounts: false });
+
+    const readerGroup = screen.queryByRole('group', {
+      name: LOOK_PREVIEW.readerStateAriaLabel,
+    });
+    const offNote = screen.getByText(LOOK_PREVIEW.readerAccountsOff);
+
+    expect(readerGroup).not.toBeInTheDocument();
+    expect(offNote).toBeVisible();
   });
 
   it('re-derives the accent tokens for the dark preview mode', async () => {
-    renderPreview({ accentHue: MOCK_ACCENT_HUE });
+    renderPreview({ values: { accentHue: MOCK_ACCENT_HUE } });
 
     const darkButton = screen.getByRole('button', { name: 'Dark' });
     await user.click(darkButton);

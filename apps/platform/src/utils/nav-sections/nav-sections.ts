@@ -73,7 +73,11 @@ export const configurationNavItems = (
   access: TPlanPageAccess,
   unreadLeadsCount: number,
 ): TSidebarNavItem[] => {
-  const comingSoon = { label: t('badgeComingSoon'), tone: 'neutral' } as const;
+  const comingSoon = {
+    label: t('badgeComingSoon'),
+    tone: 'neutral',
+    hasDot: false,
+  } as const;
   const unreadLeads =
     unreadLeadsCount > 0
       ? ({

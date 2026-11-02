@@ -1,7 +1,7 @@
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
-// The sidebar renders only from `md` and the phone Menu only below it, so `md:` scopes a class to the sidebar.
+// The sidebar renders only from `md` and the phone Menu only below it, so `md:` scopes a class to the sidebar and `max-md:` to the Menu.
 const STATUS_TEXT_MUTED = [
   'text-admin-muted',
   'md:text-admin-side-muted md:group-hover:text-admin-side-text',
@@ -49,6 +49,11 @@ export const navItemContentVariants = tv({
     hasRailBadge: {
       true: {
         rowIcon: ['group-focus-visible:text-admin-text-strong'],
+      },
+    },
+    hasNeutralBadge: {
+      true: {
+        badgeSlot: ['max-md:bg-admin-pill-neutral-popover'],
       },
     },
     tone: {

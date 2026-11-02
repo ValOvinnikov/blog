@@ -119,6 +119,9 @@ switches the content column to full-bleed (see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
   than one plan locale, Email a mail-sending capability, and the inert "Coming
   soon" rows Subscribers NEWSLETTER, Comments COMMENTS, Team any plan but FREE.
+  Their "Coming soon" pill is `neutral` with no dot, at the row's right edge,
+  in the sidebar and the phone Menu alike; Leads' unread count is a `brand`
+  pill with no dot.
   The operator's tenant view (`EVERY_PLAN_PAGE`) always shows every page.
 - UI copy is next-intl, five message files (`en`, `de`, `es`, `fr`, `nl`). It
   is fixed platform copy and never [Voice](./voice.md).
@@ -277,8 +280,13 @@ switches the content column to full-bleed (see
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
   `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   and its section labels and notes read `muted` and its rows `text` on that
-  ground. Its `item` slot (the account menu's Sign out) is a flex row with a
-  10px gap, at least 44px tall at every width, padding 6px 8px,
+  ground. Its inert rows are disabled menu items (`role="menuitem"`,
+  `aria-disabled`, outside Base UI's item list), so arrow keys skip them and
+  they take no focus; they keep the enabled rows' label and icon colours and
+  change nothing on hover. Its neutral pills sit on `pill-neutral-popover`,
+  not the page's `pill-neutral`. Its `item` slot (the account menu's Sign
+  out) is a flex row with a 10px gap, at least 44px tall at every width,
+  padding 6px 8px,
   `rounded-admin-control`, 13px/500, 2px from the next item, taking a
   `popover-hover` ground and no ring when highlighted.
 - `styles/admin-theme-contrast.test.ts` guards both palettes: each pair

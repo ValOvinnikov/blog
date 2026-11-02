@@ -30,13 +30,20 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { pickEntitledLook } from '@blog/db/utils/effective-look/effective-look';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  toNotInPlanRefusal,
+  type TNotInPlanRefusal,
+} from '@platform/utils/plan-refusal/plan-refusal';
+import { listRefusedLookFields } from '@platform/utils/refused-look-fields/refused-look-fields';
 import { z } from 'zod';
 
 const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
@@ -67,10 +74,9 @@ const updateLookInputSchema = z.object({
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
-export type TUpdateLookResult = TActionResult<
-  typeof ACTION_OUTCOME.SERVER_ERROR,
-  keyof TUpdateLookInput
->;
+export type TUpdateLookResult =
+  | TActionResult<typeof ACTION_OUTCOME.SERVER_ERROR, keyof TUpdateLookInput>
+  | TNotInPlanRefusal;
 
 export const updateLookAction = async (
   tenantId: string,
@@ -83,9 +89,21 @@ export const updateLookAction = async (
 
   const { tenant } = await requireTenantMembership(tenantId);
   const { preset, ...rest } = parsed.data;
-  const look = { preset, ...pickEntitledLook(rest, tenant.plan) };
 
   try {
+    const stored = lookFormValuesOrDefaults(
+      await queries.siteConfig.getSiteConfig(tenant.id),
+    );
+    const refused = listRefusedLookFields(
+      { ...parsed.data, logoHue: parsed.data.logoHue ?? undefined },
+      stored,
+      tenant.plan,
+    );
+    if (hasArrayGotItems(refused)) {
+      return toNotInPlanRefusal(tenant.plan, refused);
+    }
+
+    const look = { preset, ...pickEntitledLook(rest, tenant.plan) };
     await queries.siteConfig.upsertSiteConfig(tenant.id, look);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({

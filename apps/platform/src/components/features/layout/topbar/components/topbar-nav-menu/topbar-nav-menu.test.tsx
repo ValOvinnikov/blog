@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import { ARIA_CURRENT } from '@platform/testing/aria';
+import { ARIA_CURRENT, ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   mockNavBadge,
@@ -108,18 +108,36 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     expect(inactiveItem).not.toHaveAttribute(ARIA_CURRENT);
   });
 
-  it('renders an item with no href as an inert row with its badge', async () => {
+  it('renders an item with no href as a disabled menu row with its badge', async () => {
     const inertItem = mockNavInertItem({ badge: MOCK_BADGE });
     setup({ sections: [mockNavSection({ items: [inertItem] })] });
 
     const menu = await openMenu();
-    const menuItem = within(menu).queryByRole('menuitem');
-    const label = within(menu).getByText(inertItem.label);
-    const badge = within(menu).getByText(MOCK_BADGE.label);
+    const inertRow = within(menu).getByRole('menuitem', {
+      name: `${inertItem.label}${MOCK_BADGE.label}`,
+    });
+    const badge = within(inertRow).getByText(MOCK_BADGE.label);
 
-    expect(menuItem).not.toBeInTheDocument();
-    expect(label).toBeVisible();
+    expect(inertRow).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(inertRow).not.toHaveAttribute('href');
     expect(badge).toBeVisible();
+  });
+
+  it('skips a disabled row when moving through the menu by keyboard', async () => {
+    const inertItem = mockNavInertItem();
+    setup({
+      sections: [
+        mockNavSection({ items: [MOCK_LOOK_ITEM, inertItem, MOCK_VOICE_ITEM] }),
+      ],
+    });
+
+    const menu = await openMenu();
+    await user.keyboard('{ArrowDown}{ArrowDown}');
+    const voiceItem = within(menu).getByRole('menuitem', {
+      name: MOCK_VOICE_ITEM.label,
+    });
+
+    expect(voiceItem).toHaveFocus();
   });
 
   it('closes the popup after clicking a link item', async () => {

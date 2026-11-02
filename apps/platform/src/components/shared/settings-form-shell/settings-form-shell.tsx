@@ -52,6 +52,7 @@ export const SettingsFormShell = <TValues,>({
     archivedNoticeId,
     draft,
     saveError,
+    planRefusal,
   } = form;
   const t = useTranslations('saveBar');
   const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants({
@@ -143,8 +144,12 @@ export const SettingsFormShell = <TValues,>({
         <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
       )}
 
-      {errorTitle && (
-        <Alert type={ALERT_TYPE.ERROR} title={errorTitle} className={alert()} />
+      {(planRefusal ?? errorTitle) && (
+        <Alert
+          type={ALERT_TYPE.ERROR}
+          title={planRefusal ?? errorTitle}
+          className={alert()}
+        />
       )}
 
       {offer && (
@@ -179,7 +184,7 @@ export const SettingsFormShell = <TValues,>({
           changeCount={changeCount}
           breakdown={breakdown}
           invalidControls={invalidControls}
-          saveError={saveError}
+          saveError={planRefusal ?? saveError}
           isPending={isPending}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}

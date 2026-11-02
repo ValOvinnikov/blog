@@ -73,6 +73,7 @@ import {
 } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
@@ -131,6 +132,7 @@ const { lookForm: LOOK_FORM, lookPreview: LOOK_PREVIEW } = messages;
 const tLogoHue = makeEnTranslator('logoHueField');
 const tUploadErrors = makeEnTranslator('uploadErrors');
 const tSaveBar = makeEnTranslator('saveBar');
+const tDevicePreview = makeEnTranslator('devicePreview');
 
 const hueValue = (hue: number) => tLogoHue('hueValue', { hue });
 
@@ -178,12 +180,21 @@ const DISCARD = 'Discard';
 const setup = customRender(LookForm, {
   tenantId: MOCK_TENANT_ID,
   tenantName: MOCK_TENANT_NAME,
+  siteHost: MOCK_TENANT_DOMAIN,
   initialValues: defaultLookFormValues(),
   plan: TENANT_PLAN.GROWTH,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
   hasCookieBanner: true,
 });
+
+const stubLgUpWindow = () => {
+  const stubMatchMedia = window.matchMedia;
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+    ...stubMatchMedia(query),
+    matches: true,
+  }));
+};
 
 const setupWithSavedLogo = () =>
   setup({
@@ -287,7 +298,10 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('groups the settings into nine titled cards', () => {
-        const cardHeadings = screen.getAllByRole('heading', { level: 2 });
+        const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+        const cardHeadings = within(editPanel).getAllByRole('heading', {
+          level: 2,
+        });
         const cardTitles = cardHeadings.map((heading) => heading.textContent);
 
         expect(cardTitles).toEqual([
@@ -587,7 +601,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
         expect(sampleTokens).toHaveStyle({
-          '--radius-md': '12px',
+          '--radius-md': '16px',
           '--spacing-card-x': '0.75rem',
         });
       });
@@ -694,11 +708,7 @@ describe(`<${LookForm.name}/>`, () => {
   );
 
   it('drops the tab panels on desktop, where the view tabs are hidden', () => {
-    const stubMatchMedia = window.matchMedia;
-    vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-      ...stubMatchMedia(query),
-      matches: true,
-    }));
+    stubLgUpWindow();
     setup();
 
     const tabPanel = screen.queryByRole('tabpanel');
@@ -945,6 +955,74 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
+  describe('the preview device', () => {
+    const deviceButton = (
+      key: 'deviceDesktop' | 'deviceTablet' | 'devicePhone',
+    ) => screen.getByRole('button', { name: tDevicePreview(key) });
+    const showOnDesktopButton = () =>
+      screen.queryByRole('button', { name: LOOK_FORM.headerShowOnDesktop });
+
+    it('opens on Desktop from lg with no device note', () => {
+      stubLgUpWindow();
+      setup();
+
+      expect(deviceButton('deviceDesktop')).toBePressed();
+      expect(showOnDesktopButton()).not.toBeInTheDocument();
+    });
+
+    describe('below lg', () => {
+      beforeEach(() => {
+        setup();
+      });
+
+      it('opens on Phone with the phone note under the header layout', () => {
+        const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.PHONE);
+
+        expect(deviceButton('devicePhone')).toBePressed();
+        expect(note).toBeVisible();
+        expect(showOnDesktopButton()).toBeVisible();
+      });
+
+      it('shows the tablet note when the preview is on Tablet', async () => {
+        await user.click(deviceButton('deviceTablet'));
+
+        const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.TABLET);
+        expect(note).toBeVisible();
+      });
+
+      it('switches the preview to Desktop from the header note', async () => {
+        const showOnDesktop = screen.getByRole('button', {
+          name: LOOK_FORM.headerShowOnDesktop,
+        });
+        await user.click(showOnDesktop);
+
+        const note = screen.queryByText(
+          LOOK_FORM.headerPreviewDeviceNote.PHONE,
+        );
+        expect(deviceButton('deviceDesktop')).toBePressed();
+        expect(note).not.toBeInTheDocument();
+        expect(showOnDesktopButton()).not.toBeInTheDocument();
+      });
+
+      it('keeps the device and reader state across the Edit and Preview tabs', async () => {
+        const tabletButton = deviceButton('deviceTablet');
+        const signedInButton = screen.getByRole('button', {
+          name: LOOK_PREVIEW.readerSignedIn,
+        });
+        await user.click(tabletButton);
+        await user.click(signedInButton);
+
+        const previewTab = screen.getByRole('tab', { name: 'Preview' });
+        const editTab = screen.getByRole('tab', { name: 'Edit' });
+        await user.click(previewTab);
+        await user.click(editTab);
+
+        expect(tabletButton).toBePressed();
+        expect(signedInButton).toBePressed();
+      });
+    });
+  });
+
   describe('when the accent hue is rejected', () => {
     beforeEach(async () => {
       vi.mocked(isAccentHueAccessible).mockImplementation(
@@ -1186,7 +1264,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
       const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
       expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(sampleTokens).toHaveStyle({ '--radius-md': '3px' });
+      expect(sampleTokens).toHaveStyle({ '--radius-md': '4px' });
     });
   });
 
