@@ -33,22 +33,26 @@ describe(loadAdminShellChrome, () => {
 
   it.each([
     [
-      'names the user by their name when the session has one',
+      'carries the name and the email separately',
       sessionFor({ name: MOCK_USER_NAME, email: MOCK_USER_EMAIL }),
-      MOCK_USER_NAME,
+      { userName: MOCK_USER_NAME, userEmail: MOCK_USER_EMAIL },
     ],
     [
-      'falls back to the email when the session user has no name',
+      'leaves the name unset when the session user has none',
       sessionFor({ email: MOCK_USER_EMAIL }),
-      MOCK_USER_EMAIL,
+      { userName: undefined, userEmail: MOCK_USER_EMAIL },
     ],
-    ['leaves the user unnamed without a session', null, undefined],
-  ])('%s', async (_title, session, expectedUserName) => {
+    [
+      'leaves both unset without a session',
+      null,
+      { userName: undefined, userEmail: undefined },
+    ],
+  ])('%s', async (_title, session, expected) => {
     authMock.mockResolvedValueOnce(session);
 
-    const { userName } = await loadAdminShellChrome();
+    const { userName, userEmail } = await loadAdminShellChrome();
 
-    expect(userName).toBe(expectedUserName);
+    expect({ userName, userEmail }).toEqual(expected);
   });
 
   it('carries the sidebar preference and the nav translator', async () => {

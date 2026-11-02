@@ -25,7 +25,7 @@ type TProps = {
  */
 export default async function OperatorLayout({ children }: TProps) {
   const admin = await requireAdmin();
-  const { isSidebarInitiallyCollapsed, tNavSections, userName } =
+  const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
     await loadAdminShellChrome();
 
   return (
@@ -33,8 +33,9 @@ export default async function OperatorLayout({ children }: TProps) {
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={operatorNavSections(tNavSections, admin.role)}
       crumb={<OperatorBreadcrumb role={admin.role} />}
-      roleChip={{
+      account={{
         name: userName,
+        email: userEmail,
         role: admin.role,
         scope: tNavSections('platformLabel'),
       }}

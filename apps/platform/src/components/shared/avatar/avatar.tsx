@@ -2,6 +2,7 @@ import { avatarVariants, type TAvatarVariants } from './avatar-variants';
 
 export type TAvatarProps = {
   name: string;
+  email?: string;
   variant: NonNullable<TAvatarVariants['variant']>;
   className?: string;
 };
@@ -24,12 +25,12 @@ const getInitials = (name: string): string => {
 };
 
 /** Always `aria-hidden`: it sits beside the name it represents. */
-export const Avatar = ({ name, variant, className }: TAvatarProps) => (
+export const Avatar = ({ name, email, variant, className }: TAvatarProps) => (
   <span
     aria-hidden="true"
     data-testid="avatar"
     className={avatarVariants({ variant, class: className })}
   >
-    {getInitials(name)}
+    {getInitials(name) || (email ?? '').charAt(0).toUpperCase()}
   </span>
 );

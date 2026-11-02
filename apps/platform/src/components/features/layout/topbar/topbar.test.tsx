@@ -1,14 +1,14 @@
-import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_HASPOPUP } from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
+  mockAccount,
   mockNavLinkItem,
   mockNavSection,
 } from '@platform/testing/layout/fixtures';
@@ -22,43 +22,30 @@ vi.mock('@platform/server/auth/sign-out-action');
 faker.seed(5993);
 
 const MOCK_CRUMB_TEXT = faker.lorem.words(2);
-const MOCK_SCOPE = faker.company.name();
 const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
 const MOCK_NAV_ITEM = mockNavLinkItem();
-const MOCK_ROLE_CHIP = {
-  name: faker.person.fullName(),
-  role: ADMIN_ROLE.SUPERADMIN,
-  scope: MOCK_SCOPE,
-};
-
-const t = makeEnTranslator();
-const roleChipLabel = (role: string) =>
-  t('topbar.roleChip', { role: t(`roleLabel.${role}`), scope: MOCK_SCOPE });
+const MOCK_ACCOUNT = mockAccount();
 
 const setup = (overrides: Partial<TTopbarProps> = {}) =>
   renderWithIntl(
     <SidebarCollapseProvider isInitiallyCollapsed={false}>
       <Topbar
         crumb={<p>{MOCK_CRUMB_TEXT}</p>}
-        roleChip={MOCK_ROLE_CHIP}
+        account={MOCK_ACCOUNT}
         {...overrides}
       />
     </SidebarCollapseProvider>,
   );
 
 describe(`<${Topbar.name}/>`, () => {
-  it('renders the crumb and the role chip with a translated role', () => {
+  it('renders the crumb and the account pill named by the role line', () => {
     setup();
 
     const crumb = screen.getByText(MOCK_CRUMB_TEXT);
-    const roleChip = screen.getByText(roleChipLabel(ADMIN_ROLE.SUPERADMIN));
-    const rawRole = screen.queryByText(ADMIN_ROLE.SUPERADMIN, {
-      exact: false,
-    });
+    const pill = screen.getByRole('button', { name: MOCK_ACCOUNT.roleLine });
 
     expect(crumb).toBeVisible();
-    expect(roleChip).toBeVisible();
-    expect(rawRole).not.toBeInTheDocument();
+    expect(pill).toHaveAttribute(ARIA_HASPOPUP, 'menu');
   });
 
   it('leads with the collapse toggle, before the crumb', () => {
@@ -73,22 +60,6 @@ describe(`<${Topbar.name}/>`, () => {
 
     expect(firstButton).toBe(toggle);
     expect(banner).toHaveTextContent(new RegExp(`^${MOCK_CRUMB_TEXT}`));
-  });
-
-  it('never derives avatar initials from the role when the user has no name', () => {
-    setup({
-      roleChip: {
-        name: undefined,
-        role: MEMBERSHIP_ROLE.OWNER,
-        scope: MOCK_SCOPE,
-      },
-    });
-
-    const roleChip = screen.getByText(roleChipLabel(MEMBERSHIP_ROLE.OWNER));
-    const roleInitials = screen.queryByText('OW');
-
-    expect(roleChip).toBeVisible();
-    expect(roleInitials).not.toBeInTheDocument();
   });
 
   it('renders no nav menu trigger when no sections are passed', () => {

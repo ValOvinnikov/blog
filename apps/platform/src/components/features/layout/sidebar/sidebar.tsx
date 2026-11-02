@@ -33,9 +33,10 @@ export type TSidebarNavSection = {
 export type TSidebarProps = {
   sections: TSidebarNavSection[];
   switcher?: ReactNode;
+  foot?: ReactNode;
 };
 
-export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
+export const Sidebar = ({ sections, switcher, foot }: TSidebarProps) => {
   const t = useTranslations('sidebar');
   const {
     root,
@@ -44,6 +45,8 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
     brandName,
     brandTagline,
     switcherSlot,
+    navArea,
+    foot: footSlot,
     section,
     sectionLabel,
     list,
@@ -63,63 +66,67 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
 
       {switcher && <div className={switcherSlot()}>{switcher}</div>}
 
-      {sections.map((navSection) => (
-        <div className={section()} key={navSection.label}>
-          <p className={sectionLabel()} title={navSection.label}>
-            {navSection.label}
-          </p>
-          {navSection.items.length > 0 ? (
-            <nav aria-label={navSection.label}>
-              <ul className={list()}>
-                {navSection.items.map((item) => {
-                  if (item.href) {
+      <div className={navArea()}>
+        {sections.map((navSection) => (
+          <div className={section()} key={navSection.label}>
+            <p className={sectionLabel()} title={navSection.label}>
+              {navSection.label}
+            </p>
+            {navSection.items.length > 0 ? (
+              <nav aria-label={navSection.label}>
+                <ul className={list()}>
+                  {navSection.items.map((item) => {
+                    if (item.href) {
+                      return (
+                        <li key={item.label}>
+                          <SidebarRailTooltip
+                            label={item.label}
+                            row={
+                              <SidebarNavLink href={item.href}>
+                                <NavItemContent
+                                  icon={item.icon}
+                                  label={item.label}
+                                  badge={item.badge}
+                                />
+                              </SidebarNavLink>
+                            }
+                          />
+                        </li>
+                      );
+                    }
+
                     return (
                       <li key={item.label}>
                         <SidebarRailTooltip
                           label={item.label}
                           row={
-                            <SidebarNavLink href={item.href}>
+                            <div
+                              role="link"
+                              aria-disabled="true"
+                              className={row({ state: 'inert' })}
+                            >
                               <NavItemContent
                                 icon={item.icon}
                                 label={item.label}
+                                disabledReason={item.disabledReason}
                                 badge={item.badge}
                               />
-                            </SidebarNavLink>
+                            </div>
                           }
                         />
                       </li>
                     );
-                  }
+                  })}
+                </ul>
+              </nav>
+            ) : (
+              navSection.note && <p className={note()}>{navSection.note}</p>
+            )}
+          </div>
+        ))}
+      </div>
 
-                  return (
-                    <li key={item.label}>
-                      <SidebarRailTooltip
-                        label={item.label}
-                        row={
-                          <div
-                            role="link"
-                            aria-disabled="true"
-                            className={row({ state: 'inert' })}
-                          >
-                            <NavItemContent
-                              icon={item.icon}
-                              label={item.label}
-                              disabledReason={item.disabledReason}
-                              badge={item.badge}
-                            />
-                          </div>
-                        }
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
-          ) : (
-            navSection.note && <p className={note()}>{navSection.note}</p>
-          )}
-        </div>
-      ))}
+      {foot && <div className={footSlot()}>{foot}</div>}
     </aside>
   );
 };

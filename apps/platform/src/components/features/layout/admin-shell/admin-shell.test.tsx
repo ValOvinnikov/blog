@@ -2,6 +2,7 @@ import { ICONS } from '@blog/config';
 import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_EXPANDED, ARIA_HASPOPUP } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -20,6 +21,12 @@ const MOCK_CRUMB = faker.lorem.words(3);
 const MOCK_SCOPE = faker.company.name();
 const MOCK_PAGE_CONTENT = faker.lorem.sentence();
 const MOCK_SWITCHER = faker.lorem.words(2);
+const MOCK_NAME = faker.person.fullName();
+const MOCK_EMAIL = faker.internet.email();
+const MOCK_ROLE_LINE = makeEnTranslator('account')('roleLine', {
+  role: messages.roleLabel.ADMIN,
+  scope: MOCK_SCOPE,
+});
 
 const setup = customRender(AdminShell, {
   sections: [
@@ -35,8 +42,9 @@ const setup = customRender(AdminShell, {
     },
   ],
   crumb: <p>{MOCK_CRUMB}</p>,
-  roleChip: {
-    name: faker.person.fullName(),
+  account: {
+    name: MOCK_NAME,
+    email: MOCK_EMAIL,
     role: ADMIN_ROLE.ADMIN,
     scope: MOCK_SCOPE,
   },
@@ -56,19 +64,42 @@ describe(`<${AdminShell.name}/>`, () => {
     const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
     const sectionLabel = screen.getByText(MOCK_SECTION_LABEL);
     const crumb = screen.getByText(MOCK_CRUMB);
-    const roleChipLabel = screen.getByText(
-      makeEnTranslator('topbar')('roleChip', {
-        role: messages.roleLabel.ADMIN,
-        scope: MOCK_SCOPE,
-      }),
-    );
     const pageContent = screen.getByText(MOCK_PAGE_CONTENT);
 
     expect(navLink).toBeVisible();
     expect(sectionLabel).toBeVisible();
     expect(crumb).toBeVisible();
-    expect(roleChipLabel).toBeVisible();
     expect(pageContent).toBeVisible();
+  });
+
+  it('puts the account in the sidebar foot, with the role line in its menu', async () => {
+    setup();
+
+    const sidebar = screen.getByRole('complementary', {
+      name: messages.sidebar.ariaLabel,
+    });
+    const trigger = within(sidebar).getByRole('button', {
+      name: new RegExp(MOCK_EMAIL),
+    });
+    await user.click(trigger);
+
+    const menu = await screen.findByRole('menu', {
+      name: messages.account.menuLabel,
+    });
+    const name = within(trigger).getByText(MOCK_NAME);
+    const roleLine = within(menu).getByText(MOCK_ROLE_LINE);
+
+    expect(name).toBeVisible();
+    expect(roleLine).toBeVisible();
+  });
+
+  it('keeps the phone pill in the top bar, named by the role line', () => {
+    setup();
+
+    const banner = screen.getByRole('banner');
+    const pill = within(banner).getByRole('button', { name: MOCK_ROLE_LINE });
+
+    expect(pill).toHaveAttribute(ARIA_HASPOPUP, 'menu');
   });
 
   it('lists the nav items and the switcher in the topbar menu', async () => {
@@ -97,7 +128,7 @@ describe(`<${AdminShell.name}/>`, () => {
     });
     const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
 
-    expect(expandToggle).toHaveAttribute('aria-expanded', 'false');
+    expect(expandToggle).toHaveAttribute(ARIA_EXPANDED, 'false');
     expect(navLink).toBeVisible();
   });
 });

@@ -177,12 +177,15 @@
     "triggerLabel": "Menú"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Ruta de navegación",
-    "roleChip": "{role} · {scope}"
+    "breadcrumbAriaLabel": "Ruta de navegación"
   },
   "account": {
     "signOut": "Cerrar sesión",
-    "signedInAs": "Sesión iniciada como {email}"
+    "signedInAs": "Sesión iniciada como {email}",
+    "menuLabel": "Cuenta",
+    "triggerCollapsedLabel": "Cuenta: {name}, {email}",
+    "triggerCollapsedLabelNoName": "Cuenta: {email}",
+    "roleLine": "{role} · {scope}"
   },
   "roleLabel": {
     "SUPERADMIN": "Superadministrador",
