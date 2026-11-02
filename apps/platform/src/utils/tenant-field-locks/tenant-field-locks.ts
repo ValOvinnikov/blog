@@ -33,12 +33,21 @@ export type TTenantFieldLocks = Partial<
   Record<TTenantFieldKey, TTenantFieldLockReason>
 >;
 
-export const lockAllFields = (
+const EDITABLE_AFTER_PROVISIONING: readonly TTenantFieldKey[] = ['plan'];
+
+const lockFields = (
+  keys: readonly TTenantFieldKey[],
   reason: TTenantFieldLockReason,
 ): TTenantFieldLocks => {
   return Object.fromEntries(
-    ALL_FIELD_KEYS.map((key) => [key, reason]),
+    keys.map((key) => [key, reason]),
   ) as TTenantFieldLocks;
+};
+
+export const lockAllFields = (
+  reason: TTenantFieldLockReason,
+): TTenantFieldLocks => {
+  return lockFields(ALL_FIELD_KEYS, reason);
 };
 
 const computeProvisioningFieldLocks = (
@@ -69,10 +78,13 @@ const computeProvisioningFieldLocks = (
   }
 
   if (state === PROVISIONING_STATE.SUCCEEDED) {
-    const { ownerEmail, ...locks } = lockAllFields({
-      kind: TENANT_FIELD_LOCK_KIND.SUCCEEDED,
-    });
-    return owner?.hasSignedIn === false ? locks : { ...locks, ownerEmail };
+    const isOwnerEmailEditable = owner?.hasSignedIn === false;
+    const lockedKeys = ALL_FIELD_KEYS.filter(
+      (key) =>
+        !EDITABLE_AFTER_PROVISIONING.includes(key) &&
+        !(key === 'ownerEmail' && isOwnerEmailEditable),
+    );
+    return lockFields(lockedKeys, { kind: TENANT_FIELD_LOCK_KIND.SUCCEEDED });
   }
 
   return lockAllFields({ kind: TENANT_FIELD_LOCK_KIND.RUNNING });
