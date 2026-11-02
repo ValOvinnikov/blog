@@ -18,7 +18,9 @@ export const menuRadioGroupVariants = tv({
       'cursor-pointer text-admin-12-5 font-medium text-admin-muted',
       'data-[checked]:bg-admin-segment-on data-[checked]:font-semibold data-[checked]:text-admin-text data-[checked]:shadow-admin',
       'data-[highlighted]:not-data-[checked]:bg-admin-popover-hover data-[highlighted]:not-data-[checked]:text-admin-text',
-      'data-[highlighted]:not-data-[checked]:shadow-[inset_0_0_0_2px_var(--admin-brand-ink)]',
+      'data-[highlighted]:shadow-[inset_0_0_0_2px_var(--admin-brand-ink)]',
+      // Both states set box-shadow; this two-attribute selector keeps ring and raised shadow together on the checked item.
+      'data-[checked]:data-[highlighted]:shadow-[inset_0_0_0_2px_var(--admin-brand-ink),var(--admin-shadow)]',
     ],
     hint: ['text-admin-12 leading-4 text-admin-muted'],
   },
