@@ -1,4 +1,5 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   DEVICE_FRAME_FIT,
   DEVICE_FRAME_LIMIT,
@@ -87,7 +88,7 @@ export const resolveDeviceFrameLayout = ({
   fit: TDeviceFrameFit;
   stageWidth: TMaybeUndefined<number>;
 }): TMaybeUndefined<TDeviceFrameLayout> => {
-  if (stageWidth === undefined) {
+  if (isUndefined(stageWidth)) {
     return undefined;
   }
 

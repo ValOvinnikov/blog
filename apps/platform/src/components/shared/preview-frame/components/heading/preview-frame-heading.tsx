@@ -1,5 +1,6 @@
 'use client';
 
+import { isUndefined } from '@blog/utils/primitives';
 import { Heading } from '@platform/components/shared/heading';
 import { previewFrameVariants } from '@platform/components/shared/preview-frame/preview-frame-variants';
 import {
@@ -35,7 +36,7 @@ export const PreviewFrameHeading = ({
   });
   const isPhoneTab = layout === PREVIEW_HEADING_LAYOUT.PHONE_TAB;
   const isLong =
-    row === undefined || row.width >= PREVIEW_READOUT.LONG_MIN_WIDTH;
+    isUndefined(row) || row.width >= PREVIEW_READOUT.LONG_MIN_WIDTH;
   const values = {
     width: PREVIEW_DEVICE_WIDTH[device],
     percent: toScalePercent(scale),

@@ -1,3 +1,4 @@
+import { isUndefined } from '@blog/utils/primitives';
 import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import {
   PREVIEW_DEVICE_HEIGHT,
@@ -44,7 +45,7 @@ export const useDeviceFrame = ({
     fit,
     stageWidth: stage?.width,
   });
-  const isMeasured = layout !== undefined;
+  const isMeasured = !isUndefined(layout);
   const { scale, isPanning, viewport } = layout ?? {
     scale: 1,
     isPanning: false,

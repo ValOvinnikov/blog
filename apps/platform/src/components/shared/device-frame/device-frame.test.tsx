@@ -71,23 +71,6 @@ describe(`<${DeviceFrame.name}/>`, () => {
     expect(frame).not.toBeInTheDocument();
   });
 
-  it('renders the sample inside the frame, out of reach of clicks and focus', () => {
-    setup();
-
-    const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
-
-    expect(content).toHaveTextContent(MOCK_CONTENT);
-    expect(content).toHaveAttribute('inert');
-  });
-
-  it('shows the host in the desktop browser bar', () => {
-    setup();
-
-    const bar = screen.getByTestId(DEVICE_FRAME_TEST_ID.BROWSER_BAR);
-
-    expect(bar).toHaveTextContent(MOCK_HOST);
-  });
-
   it('shows the dots alone when the caller leaves the host out', () => {
     setup({ host: undefined });
 
@@ -118,16 +101,6 @@ describe(`<${DeviceFrame.name}/>`, () => {
     expect(onScaleChange).toHaveBeenLastCalledWith(0.4406);
   });
 
-  it('shows a scrollbar when the sample is taller than the frame', () => {
-    setup();
-
-    const scrollbar = screen.getByTestId(
-      DEVICE_FRAME_TEST_ID.VERTICAL_SCROLLBAR,
-    );
-
-    expect(scrollbar).toBeInTheDocument();
-  });
-
   it('shows no scrollbar when the sample fits', () => {
     contentHeight = SHORT_CONTENT_HEIGHT;
 
@@ -135,16 +108,6 @@ describe(`<${DeviceFrame.name}/>`, () => {
 
     const scrollbar = screen.queryByTestId(
       DEVICE_FRAME_TEST_ID.VERTICAL_SCROLLBAR,
-    );
-
-    expect(scrollbar).not.toBeInTheDocument();
-  });
-
-  it('shows no horizontal scrollbar when the frame does not pan', () => {
-    setup();
-
-    const scrollbar = screen.queryByTestId(
-      DEVICE_FRAME_TEST_ID.HORIZONTAL_SCROLLBAR,
     );
 
     expect(scrollbar).not.toBeInTheDocument();
@@ -177,6 +140,41 @@ describe(`<${DeviceFrame.name}/>`, () => {
 
     expect(overlay).toBeInTheDocument();
     expect(content).not.toContainElement(overlay);
+  });
+
+  describe('with the default frame', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders the sample inside the frame, out of reach of clicks and focus', () => {
+      const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
+
+      expect(content).toHaveTextContent(MOCK_CONTENT);
+      expect(content).toHaveAttribute('inert');
+    });
+
+    it('shows the host in the desktop browser bar', () => {
+      const bar = screen.getByTestId(DEVICE_FRAME_TEST_ID.BROWSER_BAR);
+
+      expect(bar).toHaveTextContent(MOCK_HOST);
+    });
+
+    it('shows a scrollbar when the sample is taller than the frame', () => {
+      const scrollbar = screen.getByTestId(
+        DEVICE_FRAME_TEST_ID.VERTICAL_SCROLLBAR,
+      );
+
+      expect(scrollbar).toBeInTheDocument();
+    });
+
+    it('shows no horizontal scrollbar when the frame does not pan', () => {
+      const scrollbar = screen.queryByTestId(
+        DEVICE_FRAME_TEST_ID.HORIZONTAL_SCROLLBAR,
+      );
+
+      expect(scrollbar).not.toBeInTheDocument();
+    });
   });
 
   describe('scroll handle', () => {
