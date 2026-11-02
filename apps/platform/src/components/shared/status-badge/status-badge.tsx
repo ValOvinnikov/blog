@@ -1,16 +1,19 @@
+import type { IWithClassName } from '@blog/config/types';
+
 import {
   statusBadgeVariants,
   type TStatusBadgeVariants,
 } from './status-badge-variants';
 
-export type TStatusBadgeProps = {
+export type TStatusBadgeProps = IWithClassName & {
+  id?: string;
   tone?: TStatusBadgeVariants['tone'];
   hasDot?: boolean;
   children: React.ReactNode;
-  className?: string;
 };
 
 export const StatusBadge = ({
+  id,
   tone,
   hasDot = true,
   children,
@@ -19,7 +22,7 @@ export const StatusBadge = ({
   const { root, dot } = statusBadgeVariants({ tone });
 
   return (
-    <span className={root({ class: className })}>
+    <span id={id} className={root({ class: className })}>
       {hasDot && (
         <span
           className={dot()}

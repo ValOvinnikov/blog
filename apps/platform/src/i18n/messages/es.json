@@ -1772,5 +1772,9 @@
     "AUDIT_EVENT": "Evento de auditoría",
     "READER_ACCOUNT": "Cuenta de lector",
     "BOOKMARK": "Marcador"
+  },
+  "growthBadge": {
+    "label": "Growth",
+    "planNote": "— forma parte del plan Growth"
   }
 }
