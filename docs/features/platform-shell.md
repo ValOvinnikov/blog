@@ -210,6 +210,23 @@ switches the content column to full-bleed (see
   carries no visual marker; its item has `aria-current` for screen readers.
   The onboarding rail and the Choose a workspace page read the
   separate `rail` tokens and stay dark.
+- The admin has a dark palette. `:root` holds the light values with
+  `color-scheme: light`; `:root[data-theme='dark']` holds the dark value of
+  every colour and shadow token with `color-scheme: dark`, so native
+  scrollbars and form controls follow; and
+  `@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) }`
+  repeats those dark values, so with no stored choice the admin follows the
+  device setting, live, without a reload. The `rail` tokens, `scrim`,
+  `frame-track` and `frame-thumb` have no dark value: the rail is dark in both
+  themes, and the preview scrollbar follows the preview's own Light / Dark,
+  never the admin theme. The tenant site preview and the email preview body
+  are unaffected. `on-brand-ink` (#ffffff / #0f1115) is the mark on a
+  `brand-ink` or tone fill — the selected preset card's tick, and the step
+  indicator's done, failed and running numbers — and `preview-stage`
+  (#eef0f3 / #1d2027) is the preview frame's stage ground. The selected
+  preset card takes a `brand-ink` border and dot with a `brand-weak` halo.
+  The toast and the shared Tooltip sit on `tooltip` (#12141a / #262b35), the
+  Tooltip with a `tooltip-line` edge.
 - The admin's Mono font is JetBrains Mono, from
   `config/font-loaders/jetbrains-mono-font.ts`, applied on the admin `<body>`
   and read through `--font-admin-mono` (`font-admin-mono`), with
@@ -220,9 +237,10 @@ switches the content column to full-bleed (see
   `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   and its section labels and notes read `muted` and its rows `text` on that
   ground.
-- `styles/admin-theme-contrast.test.ts` guards the light palette: each pair
-  of token names must meet 4.5:1 for text and 3:1 for borders, tracks and
-  focus rings, measured from the values in `admin-theme.css`.
+- `styles/admin-theme-contrast.test.ts` guards both palettes: each pair
+  of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
+  and focus rings, measured from the values in `admin-theme.css`, and the
+  device-dark block must repeat the chosen-Dark block exactly.
 - Focus is one gapped ring, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-head, popover,
@@ -285,7 +303,7 @@ switches the content column to full-bleed (see
   (`server/layout`, `server/tenant-pages`, `list-session-tenants`,
   `resolve-dashboard-tenant`, `nav-sections`, `routes`), plus
   `app/api/dashboard/select-tenant/route.test.ts`, `i18n/routing.test.ts` and
-  `proxy.test.ts`, and the light-palette contrast guard
+  `proxy.test.ts`, and the palette contrast guard
   `styles/admin-theme-contrast.test.ts`. `apps/platform` has no Storybook.
 
 ## Related

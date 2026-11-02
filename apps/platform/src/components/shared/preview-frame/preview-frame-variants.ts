@@ -5,7 +5,7 @@ export const previewFrameVariants = tv({
     root: ['@container flex min-w-0 flex-col gap-3'],
     toolbar: ['flex flex-wrap items-center gap-2'],
     actions: ['ml-auto flex flex-wrap items-center gap-2'],
-    stage: ['rounded-admin bg-admin-line-2 p-4 sm:p-6'],
+    stage: ['rounded-admin bg-admin-preview-stage p-4 sm:p-6'],
     frame: ['@container mx-auto w-full transition-[max-width]'],
     notes: ['flex flex-col gap-1 text-admin-12 text-admin-muted'],
     title: [],

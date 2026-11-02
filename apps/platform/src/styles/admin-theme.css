@@ -1,5 +1,6 @@
 /* `--admin-*` prefixed: the tenant theme preview renders the site's unprefixed tokens in this same document. */
 :root {
+  color-scheme: light;
   --admin-bg: #f6f7f9;
   --admin-surface: #ffffff;
   --admin-surface-2: #fbfbfd;
@@ -18,6 +19,7 @@
   --admin-brand-weak: #eef2ff;
   --admin-brand-line: #c7d2fe;
   --admin-brand-hover: #3730a3;
+  --admin-on-brand-ink: #ffffff;
   --admin-ok: #16794d;
   --admin-ok-weak: #e7f6ee;
   --admin-warn: #8a5f00;
@@ -65,6 +67,7 @@
   --admin-frame-thumb-dark: #a3abb8;
   --admin-fade-end: rgba(246, 247, 249, 0);
   --admin-fade-end-surface: rgba(255, 255, 255, 0);
+  --admin-preview-stage: #eef0f3;
   --admin-shadow-frame: 0 6px 20px rgba(16, 24, 40, 0.1);
   --admin-shadow-sheet: 0 -8px 24px rgba(16, 24, 40, 0.18);
   --admin-shadow-index: 0 1px 2px rgba(16, 24, 40, 0.05);
@@ -80,6 +83,141 @@
 @media (width >= 48rem) {
   :root {
     --admin-topbar: 59px;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --admin-bg: #0f1115;
+  --admin-surface: #171a20;
+  --admin-surface-2: #1b1e25;
+  --admin-surface-head: #1d2027;
+  --admin-line: #2b303a;
+  --admin-line-2: #232730;
+  --admin-control-line: #737d8d;
+  --admin-control-line-tint: #737d8d;
+  --admin-text: #e8eaef;
+  --admin-text-strong: #ffffff;
+  --admin-muted: #a3abb8;
+  --admin-faint: #8590a0;
+  --admin-brand: #5850ec;
+  --admin-brand-ink: #a5b4fc;
+  --admin-brand-strong: #c7cdfd;
+  --admin-brand-weak: #23244a;
+  --admin-brand-line: #343a78;
+  --admin-brand-hover: #6159ee;
+  --admin-on-brand-ink: #0f1115;
+  --admin-ok: #6ee7a7;
+  --admin-ok-weak: #10291d;
+  --admin-warn: #f5c451;
+  --admin-warn-weak: #2c2410;
+  --admin-bad: #fca5a0;
+  --admin-bad-weak: #331716;
+  --admin-bad-line: #e5675a;
+  --admin-warn-on-dark: #f5c451;
+  --admin-side: #0a0c0f;
+  --admin-side-line: #1c1f26;
+  --admin-side-text: #c9cfda;
+  --admin-side-muted: #8d96a6;
+  --admin-side-raised: #20242e;
+  --admin-side-accent: #a5b4fc;
+  --admin-side-field: #171a20;
+  --admin-side-field-line: #737d8d;
+  --admin-popover: #262b35;
+  --admin-popover-line: #4a5260;
+  --admin-popover-hover: #323845;
+  --admin-pill-neutral: #262a33;
+  --admin-pill-neutral-popover: #323845;
+  --admin-segment-on: #323845;
+  --admin-switch-thumb: #e8eaef;
+  --admin-theme-track: #0f1115;
+  --admin-tooltip: #262b35;
+  --admin-tooltip-text: #e8eaef;
+  --admin-tooltip-line: #4a5260;
+  --admin-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --admin-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --admin-hover: #22262f;
+  --admin-note-line: rgba(165, 180, 252, 0.3);
+  --admin-control-line-locked: #424956;
+  --admin-frame-dot: #3a404b;
+  --admin-fade-end: rgba(15, 17, 21, 0);
+  --admin-fade-end-surface: rgba(23, 26, 32, 0);
+  --admin-preview-stage: #1d2027;
+  --admin-shadow-frame: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --admin-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+  --admin-shadow-index: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --admin-shadow-unsaved: 0 -4px 12px rgba(0, 0, 0, 0.45);
+  --admin-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --admin-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
+  --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Same values as the block above: with no stored choice the admin follows the device. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --admin-bg: #0f1115;
+    --admin-surface: #171a20;
+    --admin-surface-2: #1b1e25;
+    --admin-surface-head: #1d2027;
+    --admin-line: #2b303a;
+    --admin-line-2: #232730;
+    --admin-control-line: #737d8d;
+    --admin-control-line-tint: #737d8d;
+    --admin-text: #e8eaef;
+    --admin-text-strong: #ffffff;
+    --admin-muted: #a3abb8;
+    --admin-faint: #8590a0;
+    --admin-brand: #5850ec;
+    --admin-brand-ink: #a5b4fc;
+    --admin-brand-strong: #c7cdfd;
+    --admin-brand-weak: #23244a;
+    --admin-brand-line: #343a78;
+    --admin-brand-hover: #6159ee;
+    --admin-on-brand-ink: #0f1115;
+    --admin-ok: #6ee7a7;
+    --admin-ok-weak: #10291d;
+    --admin-warn: #f5c451;
+    --admin-warn-weak: #2c2410;
+    --admin-bad: #fca5a0;
+    --admin-bad-weak: #331716;
+    --admin-bad-line: #e5675a;
+    --admin-warn-on-dark: #f5c451;
+    --admin-side: #0a0c0f;
+    --admin-side-line: #1c1f26;
+    --admin-side-text: #c9cfda;
+    --admin-side-muted: #8d96a6;
+    --admin-side-raised: #20242e;
+    --admin-side-accent: #a5b4fc;
+    --admin-side-field: #171a20;
+    --admin-side-field-line: #737d8d;
+    --admin-popover: #262b35;
+    --admin-popover-line: #4a5260;
+    --admin-popover-hover: #323845;
+    --admin-pill-neutral: #262a33;
+    --admin-pill-neutral-popover: #323845;
+    --admin-segment-on: #323845;
+    --admin-switch-thumb: #e8eaef;
+    --admin-theme-track: #0f1115;
+    --admin-tooltip: #262b35;
+    --admin-tooltip-text: #e8eaef;
+    --admin-tooltip-line: #4a5260;
+    --admin-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --admin-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
+    --admin-hover: #22262f;
+    --admin-note-line: rgba(165, 180, 252, 0.3);
+    --admin-control-line-locked: #424956;
+    --admin-frame-dot: #3a404b;
+    --admin-fade-end: rgba(15, 17, 21, 0);
+    --admin-fade-end-surface: rgba(23, 26, 32, 0);
+    --admin-preview-stage: #1d2027;
+    --admin-shadow-frame: 0 6px 20px rgba(0, 0, 0, 0.45);
+    --admin-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+    --admin-shadow-index: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --admin-shadow-unsaved: 0 -4px 12px rgba(0, 0, 0, 0.45);
+    --admin-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
+    --admin-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
+    --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -106,6 +244,7 @@
   --color-admin-brand-weak: var(--admin-brand-weak);
   --color-admin-brand-line: var(--admin-brand-line);
   --color-admin-brand-hover: var(--admin-brand-hover);
+  --color-admin-on-brand-ink: var(--admin-on-brand-ink);
   --color-admin-ok: var(--admin-ok);
   --color-admin-ok-weak: var(--admin-ok-weak);
   --color-admin-warn: var(--admin-warn);
@@ -151,6 +290,7 @@
   --color-admin-frame-thumb-dark: var(--admin-frame-thumb-dark);
   --color-admin-fade-end: var(--admin-fade-end);
   --color-admin-fade-end-surface: var(--admin-fade-end-surface);
+  --color-admin-preview-stage: var(--admin-preview-stage);
 
   --text-admin-11: 11px;
   --text-admin-11-5: 11.5px;
