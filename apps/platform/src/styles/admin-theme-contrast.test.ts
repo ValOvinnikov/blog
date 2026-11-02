@@ -39,13 +39,14 @@ const hexTokensOf = (selector: string) =>
 const lightTokens = hexTokensOf(LIGHT_SELECTOR);
 const darkTokens = new Map([...lightTokens, ...hexTokensOf(DARK_SELECTOR)]);
 
-const colourIn = (tokens: Map<string, string>) => (token: string) => {
-  if (token === WHITE) return { l: 1, c: 0, h: 0 };
-  const hex = tokens.get(token);
-  if (!hex) throw new Error(`--admin-${token} has no hex value`);
+const colourIn =
+  (tokens: ReturnType<typeof hexTokensOf>) => (token: string) => {
+    if (token === WHITE) return { l: 1, c: 0, h: 0 };
+    const hex = tokens.get(token);
+    if (!hex) throw new Error(`--admin-${token} has no hex value`);
 
-  return hexToOklch(hex);
-};
+    return hexToOklch(hex);
+  };
 
 const TOKEN = {
   BAD: 'bad',
