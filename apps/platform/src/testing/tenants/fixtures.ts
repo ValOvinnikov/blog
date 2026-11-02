@@ -133,6 +133,7 @@ export const MOCK_INVITED_OWNER_EMAIL = 'invited-owner@example.com';
 export const MOCK_NEW_OWNER_EMAIL = 'incoming-owner@example.com';
 export const MOCK_RENAMED_TENANT_NAME = 'Acme Renamed';
 export const INVITED_PENDING_TEXT = 'Invited, pending';
+export const RUN_FINISHED_PENDING_TEXT = '—';
 export const MOCK_OWNER_JOINED_AT = new Date('2026-08-12T09:00:00.000Z');
 export const MOCK_OWNER_INVITED_AT = new Date('2026-08-10T09:00:00.000Z');
 

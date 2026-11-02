@@ -1238,6 +1238,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "BUTTON_VARIANT.LINK",
+        "scope": "app:platform",
+        "from": "@platform/constants/button",
+        "file": "apps/platform/src/constants/button.ts"
       }
     ],
     "COOKIE_SETTINGS": [
@@ -1842,6 +1848,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "HUE_SLIDER_TRACK.PALETTE",
+        "scope": "app:platform",
+        "from": "@platform/constants/hue-slider",
+        "file": "apps/platform/src/constants/hue-slider.ts"
       }
     ],
     "QUOTE": [
@@ -4910,6 +4922,14 @@
         "file": "apps/platform/src/constants/github.ts"
       }
     ],
+    "RAINBOW": [
+      {
+        "ref": "HUE_SLIDER_TRACK.RAINBOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/hue-slider",
+        "file": "apps/platform/src/constants/hue-slider.ts"
+      }
+    ],
     "XXXS": [
       {
         "ref": "ICON_SIZE.XXXS",
@@ -4934,9 +4954,25 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "ArrowLeft": [
+      {
+        "ref": "KEY.ARROW_LEFT",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "ArrowRight": [
+      {
+        "ref": "KEY.ARROW_RIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
     "Home": [
       {
-        "ref": "KEYBOARD_KEY.HOME",
+        "ref": "KEY.HOME",
         "scope": "app:platform",
         "from": "@platform/constants/keyboard",
         "file": "apps/platform/src/constants/keyboard.ts"
@@ -4944,7 +4980,7 @@
     ],
     "End": [
       {
-        "ref": "KEYBOARD_KEY.END",
+        "ref": "KEY.END",
         "scope": "app:platform",
         "from": "@platform/constants/keyboard",
         "file": "apps/platform/src/constants/keyboard.ts"
@@ -4996,6 +5032,28 @@
         "scope": "app:platform",
         "from": "@platform/constants/lead",
         "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "DESKTOP": [
+      {
+        "ref": "MENU_RADIO_GROUP_SIZE.DESKTOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/menu-radio-group",
+        "file": "apps/platform/src/constants/menu-radio-group.ts"
+      },
+      {
+        "ref": "PREVIEW_WIDTH.DESKTOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "TOUCH": [
+      {
+        "ref": "MENU_RADIO_GROUP_SIZE.TOUCH",
+        "scope": "app:platform",
+        "from": "@platform/constants/menu-radio-group",
+        "file": "apps/platform/src/constants/menu-radio-group.ts"
       }
     ],
     "CHECKING": [
@@ -5140,14 +5198,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/owner-studio-access",
         "file": "apps/platform/src/constants/owner-studio-access.ts"
-      }
-    ],
-    "DESKTOP": [
-      {
-        "ref": "PREVIEW_WIDTH.DESKTOP",
-        "scope": "app:platform",
-        "from": "@platform/constants/preview",
-        "file": "apps/platform/src/constants/preview.ts"
       }
     ],
     "MOBILE": [

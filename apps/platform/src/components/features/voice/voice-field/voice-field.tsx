@@ -2,6 +2,7 @@
 
 import { Field } from '@base-ui/react/field';
 import {
+  SIZE,
   VOICE_FIELD_KIND,
   VOICE_PORTABLE_TEXT_SCHEMA,
   VOICE_SURFACE,
@@ -105,7 +106,13 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
       {isRich ? (
         <PortableTextEditor<TVoicePortableText[number]>
           key={editorRevision}
-          field={{ label, id: inputId, isInvalid: Boolean(error) }}
+          field={{
+            label,
+            id: inputId,
+            isInvalid: Boolean(error),
+            describedBy: richDescribedBy,
+            tokens: field.placeholders,
+          }}
           schema={VOICE_PORTABLE_TEXT_SCHEMA}
           initialValue={Array.isArray(value) ? value : []}
           onChange={(next) =>
@@ -113,7 +120,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
           }
           placeholder={placeholder}
           mode={isReadOnly ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
-          aria-describedby={richDescribedBy}
+          size={SIZE.SM}
         />
       ) : (
         <FormFieldControlProvider

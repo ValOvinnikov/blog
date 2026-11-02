@@ -311,7 +311,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
-- **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`
+- **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`
 
 ### `@platform/constants/contrast-result` — `apps/platform/src/constants/contrast-result.ts`
 
@@ -385,18 +385,26 @@ Every key/value const an agent should reuse before writing a literal. The
 - **GITHUB_RUN_CONCLUSION**: `SUCCESS`=`"success"`, `FAILURE`=`"failure"`, `SKIPPED`=`"skipped"`
 - **GITHUB_LOG**: `NOT_CONFIGURED`=`"github.not_configured"`, `RATE_LIMITED`=`"github.rate_limited"`, `REQUEST_ERROR`=`"github.request_error"`, `REQUEST_FAILED`=`"github.request_failed"`, `TAG_LIST_INCOMPLETE`=`"github.tag_list_incomplete"`, `UNEXPECTED_RESPONSE`=`"github.unexpected_response"`
 
+### `@platform/constants/hue-slider` — `apps/platform/src/constants/hue-slider.ts`
+
+- **HUE_SLIDER_TRACK**: `PALETTE`, `RAINBOW`
+
 ### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
 
 - **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
 
 ### `@platform/constants/keyboard` — `apps/platform/src/constants/keyboard.ts`
 
-- **KEYBOARD_KEY**: `HOME`=`"Home"`, `END`=`"End"`
+- **KEY**: `ARROW_LEFT`=`"ArrowLeft"`, `ARROW_RIGHT`=`"ArrowRight"`, `HOME`=`"Home"`, `END`=`"End"`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
 - **LEAD_REFUSAL**: `NOT_FOUND`
 - **LEAD_LOG**: `DELETE_FAILED`=`"leads.delete_failed"`, `LOAD_FAILED`=`"leads.load_failed"`, `READ_STATE_FAILED`=`"leads.read_state_failed"`, `PAGE_TITLE_SKIPPED`=`"leads.page_title_skipped"`, `PAGE_TITLE_FAILED`=`"leads.page_title_failed"`, `PAGE_TITLE_ERROR`=`"leads.page_title_error"`
+
+### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
+
+- **MENU_RADIO_GROUP_SIZE**: `DESKTOP`, `TOUCH`
 
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 

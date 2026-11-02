@@ -25,6 +25,7 @@ code:
   - apps/platform/src/components/shared/guarded-link/**
   - apps/platform/src/components/shared/button/**
   - apps/platform/src/components/shared/menu-surface/**
+  - apps/platform/src/components/shared/breadcrumbs/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
   - apps/platform/src/styles/admin-theme*
@@ -162,13 +163,32 @@ switches the content column to full-bleed (see
   text and icon `text-strong` at 600, and a 3px `side-accent` bar on its left
   edge, on the collapsed rail too. A focused row keeps its rest colours and
   shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
+  An inert row (no destination) keeps the rest colours with no hover ground,
+  is exposed as a disabled link (`role="link"`, `aria-disabled`, no `href`),
+  and shows its reason under the label at 12px / 16 in `side-muted`, wrapping
+  rather than cut; on the collapsed rail it sits at opacity .5. A section note
+  (a group with no rows) is 12px / 16 `side-muted` and wraps. A section label
+  stays on one line with an ellipsis and carries its full text as its `title`,
+  so the operator's "Tenant · {name}" group reads on hover; the "Platform
+  actions" rows take the row colours with a neutral "platform" pill.
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
   domain `muted` in the Mono font and its chevron `muted`. It carries the
   active workspace's full name as its `title`, so a name cut by its ellipsis
   reads on hover. Focused, it shows the side-gapped ring in place of its
-  shadow. The onboarding rail and the Choose a workspace page read the
+  shadow. The field is 52px tall at full sidebar width: padding 8px 8px 8px
+  10px, a 9px gap, `rounded-admin-control`, the 22×22 initials avatar, the
+  name (13px/600) on an 18px line over the domain (11px Mono) on a 16px line,
+  each cut to one line with an ellipsis, and one unrotated 16px down chevron;
+  it carries no "Workspace" label. Its dropdown opens 4px below it,
+  left-aligned at the field's width, on the shared popup frame. Each item is
+  the name (13px/500 `text`) over the Mono domain (11px `muted`), padding 6px
+  8px, `rounded-admin-control`, wrapping long text in full; the highlighted
+  item takes a `popover-hover` ground and no focus ring, and below `md` every
+  item is at least 44px tall with its lines centred. The current workspace
+  carries no visual marker; its item has `aria-current` for screen readers.
+  The onboarding rail and the Choose a workspace page read the
   separate `rail` tokens and stay dark.
 - The admin's Mono font is JetBrains Mono, from
   `config/font-loaders/jetbrains-mono-font.ts`, applied on the admin `<body>`
@@ -201,6 +221,13 @@ switches the content column to full-bleed (see
   `control-line` border, or `control-line-tint` on a card header or
   toolbar. An invalid field has a `bad-line` border, with its error in
   `bad` text and no icon.
+- The topbar breadcrumb never wraps: it fits on one row in whatever width the
+  bar leaves it. Every crumb keeps its full width except the tenant name, the
+  one crumb marked `isShrinkable`, which truncates to no less than 48px,
+  including when it is the current crumb, and carries its full name as
+  `title`. The current crumb is capped at 280px with an ellipsis and carries
+  its full text as `title` when the cap cuts it off. On a phone every
+  breadcrumb link keeps a 44px tap height. Links take the focus ring on `bg`.
 - `apps/platform` owns its own primitives on Base UI and never imports
   `@blog/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is

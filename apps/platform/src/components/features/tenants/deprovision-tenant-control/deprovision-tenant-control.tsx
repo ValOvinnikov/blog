@@ -68,9 +68,9 @@ export const DeprovisionTenantControl = ({
               confirmingButtonLabel={t('confirmingButton')}
             >
               <Switch
+                aria={{ label: t('dryRunLabel') }}
                 isChecked={isDryRun}
                 onCheckedChange={setIsDryRun}
-                ariaLabel={t('dryRunLabel')}
                 labels={{ caption: t('dryRunLabel') }}
               />
             </ConfirmDialog.Content>

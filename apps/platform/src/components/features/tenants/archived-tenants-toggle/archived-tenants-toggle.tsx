@@ -40,7 +40,7 @@ export const ArchivedTenantsToggle = ({
     <div className={root()}>
       {isPending && <Spinner label={t('loading')} size={SIZE.SM} />}
       <SegmentedControl<TTenantVisibility>
-        ariaLabel={t('ariaLabel')}
+        aria={{ label: t('ariaLabel') }}
         options={[
           { value: TENANT_VISIBILITY.ACTIVE, label: t('activeOption') },
           { value: TENANT_VISIBILITY.ALL, label: t('allOption') },

@@ -33,7 +33,11 @@ export const TenantBreadcrumb = ({
   const items: TBreadcrumbItem[] = [
     { label: t('platformLabel') },
     { label: t('tenants'), href: adminRoutes.tenants() },
-    { label: tenantName, href: adminRoutes.tenantOverview(tenantId) },
+    {
+      label: tenantName,
+      href: adminRoutes.tenantOverview(tenantId),
+      isShrinkable: true,
+    },
     ...(leafLabel ? [{ label: leafLabel }] : []),
   ];
 

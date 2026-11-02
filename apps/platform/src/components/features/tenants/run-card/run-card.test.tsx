@@ -5,6 +5,7 @@ import {
   MOCK_RUN_PLUS_4_MIN_AT,
   MOCK_RUN_PLUS_6_MIN_AT,
   MOCK_RUN_STARTED_AT,
+  RUN_FINISHED_PENDING_TEXT,
 } from '@platform/testing/tenants/fixtures';
 
 import { RunCard } from './run-card';
@@ -65,7 +66,7 @@ describe(`<${RunCard.name}/>`, () => {
   it('shows a dash placeholder for Finished while the run is in flight', () => {
     setup();
 
-    const placeholder = screen.getByText('—');
+    const placeholder = screen.getByText(RUN_FINISHED_PENDING_TEXT);
 
     expect(placeholder).toBeVisible();
     expect(placeholder.tagName).not.toBe('TIME');

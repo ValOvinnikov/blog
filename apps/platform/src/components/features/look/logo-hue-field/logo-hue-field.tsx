@@ -45,12 +45,11 @@ export const LogoHueField = ({
   return (
     <div className={root()}>
       <Switch
+        aria={{ label: t('followAccentHue'), describedBy: ariaDescribedBy }}
         isChecked={follows}
         onCheckedChange={(checked) => onChange(checked ? undefined : accentHue)}
-        ariaLabel={t('followAccentHue')}
         labels={{ caption: t('followAccentHue') }}
         isDisabled={isDisabled}
-        aria-describedby={ariaDescribedBy}
       />
 
       <div className={hueField()}>
@@ -60,7 +59,7 @@ export const LogoHueField = ({
           <span className={tone()} style={{ background: tones['--logo-3'] }} />
         </span>
         <HueSlider
-          ariaLabel={t('logoHueAriaLabel')}
+          name={{ ariaLabel: t('logoHueAriaLabel') }}
           value={resolvedHue}
           onChange={onChange}
           isDisabled={follows || isDisabled}

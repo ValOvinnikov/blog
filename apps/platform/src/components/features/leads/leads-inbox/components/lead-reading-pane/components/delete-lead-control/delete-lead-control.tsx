@@ -4,6 +4,7 @@ import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { deleteLeadAction } from '@platform/server/leads/delete-lead-action';
 import { useTranslations } from 'next-intl';
@@ -40,6 +41,7 @@ export const DeleteLeadControl = ({
     >
       <ConfirmDialog.Trigger
         size={SIZE.SM}
+        focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
         ariaLabel={t('triggerAriaLabel', { name: leadName })}
       >
         {t('triggerButton')}

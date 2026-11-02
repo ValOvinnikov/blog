@@ -1,7 +1,7 @@
 'use client';
 
+import type { TControlAria } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
-import type { AriaAttributes } from 'react';
 
 type TOptionSelectOption<TValue extends string> = {
   value: TValue;
@@ -12,22 +12,29 @@ export type TOptionSelectProps<TValue extends string> = {
   options: TOptionSelectOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
+  aria?: TControlAria;
   isDisabled?: boolean;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
+  isLocked?: boolean;
 };
 
 export const OptionSelect = <TValue extends string>({
   options,
   value,
   onChange,
+  aria,
   isDisabled,
-  'aria-describedby': ariaDescribedBy,
+  isLocked,
 }: TOptionSelectProps<TValue>) => {
   const selected = options.find((option) => option.value === value);
 
   return (
-    <Select value={value} onChange={onChange} isDisabled={isDisabled}>
-      <Select.Trigger aria-describedby={ariaDescribedBy}>
+    <Select
+      value={value}
+      onChange={onChange}
+      isDisabled={isDisabled}
+      isLocked={isLocked}
+    >
+      <Select.Trigger aria={aria} isLocked={isLocked}>
         {selected?.label}
       </Select.Trigger>
       <Select.Popup>

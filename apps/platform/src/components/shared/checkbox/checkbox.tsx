@@ -3,7 +3,7 @@
 import { Checkbox as BaseCheckbox } from '@base-ui/react/checkbox';
 import { type ReactNode, useId } from 'react';
 
-import { checkboxVariants } from './checkbox-variants';
+import { checkboxVariants, type TCheckboxVariants } from './checkbox-variants';
 
 export type TCheckboxProps = {
   isChecked: boolean;
@@ -11,6 +11,7 @@ export type TCheckboxProps = {
   label: ReactNode;
   error?: string;
   isDisabled?: boolean;
+  size?: TCheckboxVariants['size'];
 };
 
 export const Checkbox = ({
@@ -19,6 +20,7 @@ export const Checkbox = ({
   label,
   error,
   isDisabled = false,
+  size,
 }: TCheckboxProps) => {
   const errorId = useId();
   const {
@@ -27,7 +29,7 @@ export const Checkbox = ({
     box,
     tick,
     error: errorSlot,
-  } = checkboxVariants();
+  } = checkboxVariants({ size });
 
   return (
     <div className={root()}>

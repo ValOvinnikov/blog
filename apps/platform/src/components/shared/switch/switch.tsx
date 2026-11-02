@@ -1,7 +1,7 @@
 'use client';
 
 import { Switch as BaseSwitch } from '@base-ui/react/switch';
-import type { AriaAttributes } from 'react';
+import type { TNamedControlAria } from '@blog/config';
 
 import { switchVariants } from './switch-variants';
 
@@ -10,31 +10,38 @@ type TSwitchLabels = { on: string; off: string } | { caption: string };
 export type TSwitchProps = {
   isChecked: boolean;
   onCheckedChange: (checked: boolean) => void;
-  ariaLabel: string;
+  aria: TNamedControlAria;
   labels: TSwitchLabels;
   isDisabled?: boolean;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
+  isLocked?: boolean;
 };
 
 export const Switch = ({
   isChecked,
   onCheckedChange,
-  ariaLabel,
+  aria,
   labels,
   isDisabled = false,
-  'aria-describedby': ariaDescribedBy,
+  isLocked = false,
 }: TSwitchProps) => {
-  const { root, track, thumb, stateText, stateOption } = switchVariants();
+  const { label, labelledBy, describedBy } = aria;
+  const { root, track, thumb, stateText, stateOption } = switchVariants({
+    isLocked,
+  });
 
   return (
     <label className={root()}>
-      {/* A native button keeps `ariaLabel` as the name; a span would be renamed after the wrapping label. */}
+      {/* A native button keeps `aria.label` as the name; a span would be renamed after the wrapping label. */}
       <BaseSwitch.Root
         checked={isChecked}
-        onCheckedChange={onCheckedChange}
+        onCheckedChange={(checked) => {
+          if (!isLocked) onCheckedChange(checked);
+        }}
         disabled={isDisabled}
-        aria-label={ariaLabel}
-        aria-describedby={ariaDescribedBy}
+        aria-label={label}
+        aria-labelledby={labelledBy}
+        aria-describedby={describedBy}
+        aria-disabled={isLocked || undefined}
         nativeButton={true}
         render={<button type="button" />}
         className={track()}
