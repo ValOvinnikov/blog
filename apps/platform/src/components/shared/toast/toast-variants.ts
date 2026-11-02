@@ -7,7 +7,7 @@ export const toastVariants = tv({
   slots: {
     root: [
       'pointer-events-auto flex max-w-[400px] items-center gap-[9px]',
-      'rounded-admin bg-admin-text px-[14px] py-[11px]',
+      'rounded-admin bg-admin-tooltip px-[14px] py-[11px]',
       'text-admin-13 text-white shadow-admin-lg',
       'transition-[opacity,transform] duration-[300ms] ease-out',
       'motion-reduce:transition-none',
