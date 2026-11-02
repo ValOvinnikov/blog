@@ -12,9 +12,15 @@ export const stepIndicatorVariants = tv({
   },
   variants: {
     state: {
-      [STEP_INDICATOR_STATE.DONE]: { circle: ['bg-admin-ok text-white'] },
-      [STEP_INDICATOR_STATE.FAILED]: { circle: ['bg-admin-bad text-white'] },
-      [STEP_INDICATOR_STATE.RUNNING]: { circle: ['bg-admin-warn text-white'] },
+      [STEP_INDICATOR_STATE.DONE]: {
+        circle: ['bg-admin-ok text-admin-on-brand-ink'],
+      },
+      [STEP_INDICATOR_STATE.FAILED]: {
+        circle: ['bg-admin-bad text-admin-on-brand-ink'],
+      },
+      [STEP_INDICATOR_STATE.RUNNING]: {
+        circle: ['bg-admin-warn text-admin-on-brand-ink'],
+      },
       [STEP_INDICATOR_STATE.ACTIVE]: { circle: ['bg-admin-brand text-white'] },
       [STEP_INDICATOR_STATE.UPCOMING]: {
         circle: ['bg-admin-line-2 text-admin-muted'],
