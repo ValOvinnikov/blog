@@ -15,7 +15,9 @@ describe(`<${FieldStatus.name}/>`, () => {
     setup();
 
     const defaultBadge = screen.getByText(fieldStatus.default);
-    const unsavedMark = screen.queryByText(fieldStatus.unsaved);
+    const unsavedMark = screen.queryByRole('img', {
+      name: fieldStatus.unsaved,
+    });
 
     expect(defaultBadge).toBeVisible();
     expect(unsavedMark).not.toBeInTheDocument();
@@ -24,7 +26,7 @@ describe(`<${FieldStatus.name}/>`, () => {
   it('announces an unsaved field', () => {
     setup({ isUnsaved: true });
 
-    const unsavedMark = screen.getByText(fieldStatus.unsaved);
+    const unsavedMark = screen.getByRole('img', { name: fieldStatus.unsaved });
 
     expect(unsavedMark).toBeVisible();
   });
