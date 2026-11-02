@@ -2756,6 +2756,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/preset.ts"
+      },
+      {
+        "ref": "FIELD_APPEARANCE.DEFAULT",
+        "scope": "app:platform",
+        "from": "@platform/constants/field-appearance",
+        "file": "apps/platform/src/constants/field-appearance.ts"
       }
     ],
     "MENU_CODE": [
@@ -4744,6 +4750,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/email-test",
         "file": "apps/platform/src/constants/email-test.ts"
+      }
+    ],
+    "WIZARD": [
+      {
+        "ref": "FIELD_APPEARANCE.WIZARD",
+        "scope": "app:platform",
+        "from": "@platform/constants/field-appearance",
+        "file": "apps/platform/src/constants/field-appearance.ts"
       }
     ],
     "SIDE": [

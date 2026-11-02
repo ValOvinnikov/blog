@@ -140,19 +140,24 @@ Free site.
   progress bar once, as one progressbar named "Setup steps" whose value text
   is the visible line; the line and the segments themselves are hidden from
   it. From 768px up the step header reads "Step N of 4" above the heading
-  instead. The Site step's type and name sit side by side whenever the
-  content column is at least 28rem wide (a container query), in any tier.
-  The steps:
+  instead. Each step's fields stack at every width. A wizard field puts its
+  hint directly below the control and any error below the hint (13.5px
+  labels, 14px controls from 768px, 6px between label, control, hint and
+  error), and the control is described by the hint, then the error, through
+  the `FIELD_APPEARANCE.WIZARD` option on `FormField` (`control.appearance`),
+  `OptionSelect` and `FormSiteAddressInput`; every other admin form keeps the
+  hint above its control. The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
      Blank) and the site name.
   2. **Address** — the Site address (only the subdomain, with
      `.<TENANT_ROOT_DOMAIN>` shown beside it, checked live by
-     `checkSiteAddressAction` as the user types) and the starting language.
-     The check's verdict is a tinted chip in a `role="status"` region in the
-     pinned actions, between Back and Continue (on its own line above the
-     buttons in the phone action bar), never under the input, which only turns red on an error:
-     checking, "<address> is yours", the taken / reserved / invalid error, or
-     an amber "couldn't check" note.
+     `checkSiteAddressAction` as the user types) and the starting language,
+     each with its hint below it. A taken, reserved or invalid address shows
+     its error under the hint, with the input invalid and described by the
+     suffix, the hint, then the error. The other verdicts — checking,
+     "<address> is yours" and the amber "couldn't check" note — are a tinted
+     chip in a `role="status"` region in the pinned actions, between Back and
+     Continue (on its own line above the buttons in the phone action bar).
   3. **Look** — the preset and accent colour. Each site type starts on its
      own preset and that preset's accent (`STARTER_PRESET_BY_SITE_TYPE`:
      Editorial for Blog, Portfolio and Personal / résumé; Console for Docs and

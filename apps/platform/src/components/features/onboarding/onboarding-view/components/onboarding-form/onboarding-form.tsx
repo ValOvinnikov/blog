@@ -44,7 +44,7 @@ export const OnboardingForm = ({
     isContinueDisabled,
     panelRef,
     addressVerdict,
-    addressErrorId,
+    addressError,
     siteAddress,
     previewAddress,
     railSteps,
@@ -125,7 +125,7 @@ export const OnboardingForm = ({
                     step={step}
                     values={values}
                     fieldErrors={fieldErrors}
-                    addressErrorId={addressErrorId}
+                    addressError={addressError}
                     siteAddress={siteAddress}
                     changeField={changeField}
                     changeSiteType={changeSiteType}

@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -9,6 +10,7 @@ faker.seed(5995);
 
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_HINT = faker.lorem.sentence();
+const MOCK_ERROR = faker.lorem.sentence();
 
 const setup = customRender(FormSiteAddressInput, {
   label: MOCK_LABEL,
@@ -43,6 +45,28 @@ describe(`<${FormSiteAddressInput.name}/>`, () => {
 
     expect(suffix).not.toBeInTheDocument();
     expect(siteAddress).toHaveAccessibleDescription(MOCK_HINT);
+  });
+
+  it('describes an invalid input with its suffix, hint and error, in that order', () => {
+    setup({ error: MOCK_ERROR });
+
+    const siteAddress = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(siteAddress).toBeInvalid();
+    expect(siteAddress).toHaveAccessibleDescription(
+      `.${MOCK_TENANT_ROOT_DOMAIN} ${MOCK_HINT} ${MOCK_ERROR}`,
+    );
+  });
+
+  it('places the hint after the address row in the wizard appearance', () => {
+    setup({ appearance: FIELD_APPEARANCE.WIZARD });
+
+    const suffix = screen.getByText(`.${MOCK_TENANT_ROOT_DOMAIN}`);
+    const hint = screen.getByText(MOCK_HINT);
+
+    expect(suffix.compareDocumentPosition(hint)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 
   it('trims and lowercases the typed address', async () => {

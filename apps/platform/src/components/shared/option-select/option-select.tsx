@@ -2,6 +2,7 @@
 
 import type { TControlAria } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
+import type { TFieldAppearance } from '@platform/constants/field-appearance';
 
 type TOptionSelectOption<TValue extends string> = {
   value: TValue;
@@ -15,6 +16,7 @@ export type TOptionSelectProps<TValue extends string> = {
   aria?: TControlAria;
   isDisabled?: boolean;
   isLocked?: boolean;
+  appearance?: TFieldAppearance;
 };
 
 export const OptionSelect = <TValue extends string>({
@@ -24,6 +26,7 @@ export const OptionSelect = <TValue extends string>({
   aria,
   isDisabled,
   isLocked,
+  appearance,
 }: TOptionSelectProps<TValue>) => {
   const selected = options.find((option) => option.value === value);
 
@@ -34,7 +37,7 @@ export const OptionSelect = <TValue extends string>({
       isDisabled={isDisabled}
       isLocked={isLocked}
     >
-      <Select.Trigger aria={aria} isLocked={isLocked}>
+      <Select.Trigger aria={aria} isLocked={isLocked} appearance={appearance}>
         {selected?.label}
       </Select.Trigger>
       <Select.Popup>

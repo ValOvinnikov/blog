@@ -1,3 +1,4 @@
+import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
@@ -14,6 +15,7 @@ export const selectVariants = tv({
     ],
     value: ['contents'],
     icon: ['shrink-0 text-admin-muted'],
+    chevron: ['size-4'],
     popup: [
       'max-h-[var(--available-height)] w-[min(20rem,calc(100vw-2rem))] min-w-[var(--anchor-width)] overflow-y-auto',
       'rounded-admin border border-admin-popover-line bg-admin-popover p-1 shadow-admin-lg outline-none',
@@ -27,6 +29,16 @@ export const selectVariants = tv({
     indicator: ['w-4 shrink-0 text-admin-brand-ink'],
   },
   variants: {
+    appearance: {
+      [FIELD_APPEARANCE.DEFAULT]: {},
+      [FIELD_APPEARANCE.WIZARD]: {
+        trigger: ['relative py-0 pr-10 pl-3 md:text-admin-14'],
+        value: ['block min-w-0 flex-1 truncate'],
+        icon: [
+          'pointer-events-none absolute top-1/2 right-3 flex -translate-y-1/2',
+        ],
+      },
+    },
     isLocked: {
       true: {
         trigger: [
@@ -39,6 +51,7 @@ export const selectVariants = tv({
     },
   },
   defaultVariants: {
+    appearance: FIELD_APPEARANCE.DEFAULT,
     isLocked: false,
   },
 });
