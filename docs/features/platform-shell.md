@@ -166,7 +166,13 @@ switches the content column to full-bleed (see
   An inert row (no destination) keeps the rest colours with no hover ground,
   is exposed as a disabled link (`role="link"`, `aria-disabled`, no `href`),
   and shows its reason under the label at 12px / 16 in `side-muted`, wrapping
-  rather than cut; on the collapsed rail it sits at opacity .5. A section note
+  rather than cut; on the collapsed rail it sits at opacity .5. Expanded,
+  every row carries its label as its native `title`. On the collapsed rail a
+  row drops that `title` and shows its name, and only its name, in the shared
+  Tooltip instead — right of the row, 6px away, centred on it, on one line
+  that grows over the page and flips or shifts at the viewport edge; it opens
+  after the hover delay or at once on keyboard focus, closes on Escape, and is
+  `aria-hidden`, so the row's accessible name is read once. A section note
   (a group with no rows) is 12px / 16 `side-muted` and wraps. A section label
   stays on one line with an ellipsis and carries its full text as its `title`,
   so the operator's "Tenant · {name}" group reads on hover; the "Platform

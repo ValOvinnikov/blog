@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 
 import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
 import { SidebarNavLink } from './components/sidebar-nav-link';
+import { SidebarRailTooltip } from './components/sidebar-rail-tooltip';
 import { sidebarVariants } from './sidebar-variants';
 
 type TSidebarNavItemBase = {
@@ -76,32 +77,41 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
                   if (item.href) {
                     return (
                       <li key={item.label}>
-                        <SidebarNavLink href={item.href} title={item.label}>
-                          <NavItemContent
-                            icon={item.icon}
-                            label={item.label}
-                            badge={item.badge}
-                          />
-                        </SidebarNavLink>
+                        <SidebarRailTooltip
+                          label={item.label}
+                          row={
+                            <SidebarNavLink href={item.href}>
+                              <NavItemContent
+                                icon={item.icon}
+                                label={item.label}
+                                badge={item.badge}
+                              />
+                            </SidebarNavLink>
+                          }
+                        />
                       </li>
                     );
                   }
 
                   return (
                     <li key={item.label}>
-                      <div
-                        role="link"
-                        aria-disabled="true"
-                        className={row({ state: 'inert' })}
-                        title={item.label}
-                      >
-                        <NavItemContent
-                          icon={item.icon}
-                          label={item.label}
-                          disabledReason={item.disabledReason}
-                          badge={item.badge}
-                        />
-                      </div>
+                      <SidebarRailTooltip
+                        label={item.label}
+                        row={
+                          <div
+                            role="link"
+                            aria-disabled="true"
+                            className={row({ state: 'inert' })}
+                          >
+                            <NavItemContent
+                              icon={item.icon}
+                              label={item.label}
+                              disabledReason={item.disabledReason}
+                              badge={item.badge}
+                            />
+                          </div>
+                        }
+                      />
                     </li>
                   );
                 })}
