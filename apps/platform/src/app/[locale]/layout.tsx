@@ -3,9 +3,11 @@ import '../../../index.css';
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { inter } from '@platform/config/font-loaders/inter-font';
 import { jetbrainsMono } from '@platform/config/font-loaders/jetbrains-mono-font';
+import { THEME_PREFERENCE } from '@platform/constants/theme';
 import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
+import { resolveThemePreference } from '@platform/server/layout/resolve-theme-preference';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -37,10 +39,17 @@ export default async function LocaleLayout({ children, params }: TProps) {
 
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  const [messages, themePreference] = await Promise.all([
+    getMessages(),
+    resolveThemePreference(),
+  ]);
+  const dataTheme =
+    themePreference === THEME_PREFERENCE.SYSTEM
+      ? undefined
+      : themePreference.toLowerCase();
 
   return (
-    <html lang={LOCALE_BCP47_TAGS[locale]}>
+    <html lang={LOCALE_BCP47_TAGS[locale]} data-theme={dataTheme}>
       <body
         className={`${inter.variable} ${jetbrainsMono.variable} font-admin text-admin-14`}
       >

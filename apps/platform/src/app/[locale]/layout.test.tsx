@@ -4,12 +4,16 @@ import {
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { THEME_PREFERENCE } from '@platform/constants/theme';
 import messages from '@platform/i18n/messages/en.json';
+import { resolveThemePreference } from '@platform/server/layout/resolve-theme-preference';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
+
+vi.mock('@platform/server/layout/resolve-theme-preference');
 
 faker.seed(5996);
 
@@ -73,6 +77,21 @@ describe(`<${LocaleLayout.name}/>`, () => {
 
     expect((htmlElement as TAnyElement).props.lang).toBe(LOCALE_BCP47_TAGS.NL);
   });
+
+  it.each([
+    { preference: THEME_PREFERENCE.LIGHT, expected: 'light' },
+    { preference: THEME_PREFERENCE.DARK, expected: 'dark' },
+    { preference: THEME_PREFERENCE.SYSTEM, expected: undefined },
+  ])(
+    'sets data-theme to $expected on the document for a stored $preference',
+    async ({ preference, expected }) => {
+      vi.mocked(resolveThemePreference).mockResolvedValueOnce(preference);
+
+      const htmlElement = await LocaleLayout(defaultProps);
+
+      expect((htmlElement as TAnyElement).props['data-theme']).toBe(expected);
+    },
+  );
 
   it('renders its children', async () => {
     await setup();
