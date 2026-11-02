@@ -3,6 +3,8 @@ import { TENANT_LOG } from '@platform/constants/tenant';
 import { signIn } from '@platform/server/auth/auth';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { adminRoutes } from '@platform/utils/routes/routes';
+import { toSafeCallbackPath } from '@platform/utils/safe-callback-path/safe-callback-path';
 
 const AUTH_ERROR_PARAM = 'error';
 
@@ -14,6 +16,9 @@ export const sendOwnerInviteEmail = async (
     const redirectUrl: string = await signIn(MAGIC_LINK_PROVIDER_ID, {
       email: ownerEmail,
       redirect: false,
+      redirectTo: toSafeCallbackPath(
+        adminRoutes.dashboardSelectTenantHref(tenantId),
+      ),
     });
     const reason = new URL(redirectUrl).searchParams.get(AUTH_ERROR_PARAM);
     if (reason) {

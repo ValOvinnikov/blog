@@ -1,7 +1,12 @@
 import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   mockNavLinkItem,
@@ -9,7 +14,7 @@ import {
 } from '@platform/testing/layout/fixtures';
 import userEvent from '@testing-library/user-event';
 
-import { Topbar } from './topbar';
+import { Topbar, type TTopbarProps } from './topbar';
 
 vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/auth/sign-out-action');
@@ -30,10 +35,16 @@ const t = makeEnTranslator();
 const roleChipLabel = (role: string) =>
   t('topbar.roleChip', { role: t(`roleLabel.${role}`), scope: MOCK_SCOPE });
 
-const setup = customRender(Topbar, {
-  crumb: <p>{MOCK_CRUMB_TEXT}</p>,
-  roleChip: MOCK_ROLE_CHIP,
-});
+const setup = (overrides: Partial<TTopbarProps> = {}) =>
+  renderWithIntl(
+    <SidebarCollapseProvider isInitiallyCollapsed={false}>
+      <Topbar
+        crumb={<p>{MOCK_CRUMB_TEXT}</p>}
+        roleChip={MOCK_ROLE_CHIP}
+        {...overrides}
+      />
+    </SidebarCollapseProvider>,
+  );
 
 describe(`<${Topbar.name}/>`, () => {
   it('renders the crumb and the role chip with a translated role', () => {
@@ -48,6 +59,20 @@ describe(`<${Topbar.name}/>`, () => {
     expect(crumb).toBeVisible();
     expect(roleChip).toBeVisible();
     expect(rawRole).not.toBeInTheDocument();
+  });
+
+  it('leads with the collapse toggle, before the crumb', () => {
+    setup();
+
+    const banner = screen.getByRole('banner');
+    const toggle = screen.getByRole('button', {
+      name: messages.sidebar.collapseToggle,
+    });
+
+    const [firstButton] = within(banner).getAllByRole('button');
+
+    expect(firstButton).toBe(toggle);
+    expect(banner).toHaveTextContent(new RegExp(`^${MOCK_CRUMB_TEXT}`));
   });
 
   it('never derives avatar initials from the role when the user has no name', () => {
