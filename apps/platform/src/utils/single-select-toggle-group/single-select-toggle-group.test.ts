@@ -26,6 +26,19 @@ describe(singleSelectToggleGroupProps, () => {
     expect(onChange).toHaveBeenCalledWith(MOCK_NEXT_VALUE);
   });
 
+  it('reports nothing for a new value when locked', () => {
+    const onChange = vi.fn();
+    const { onValueChange } = singleSelectToggleGroupProps(
+      MOCK_VALUE,
+      onChange,
+      { isLocked: true },
+    );
+
+    onValueChange([MOCK_NEXT_VALUE]);
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('reports nothing when the pressed item is clicked again', () => {
     const onChange = vi.fn();
     const { onValueChange } = singleSelectToggleGroupProps(

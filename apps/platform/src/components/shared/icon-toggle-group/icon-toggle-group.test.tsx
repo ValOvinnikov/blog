@@ -5,6 +5,7 @@ import {
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { mockIconToggleOption } from '@platform/testing/icon-toggle-group/fixtures';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
@@ -21,18 +22,17 @@ const MOCK_SECOND_LABEL = faker.lorem.words(2);
 const MOCK_FIRST_TOOLTIP = faker.lorem.words(3);
 
 const MOCK_OPTIONS = [
-  {
+  mockIconToggleOption({
     value: MOCK_FIRST_VALUE,
     icon: ICONS.PHONE,
     ariaLabel: MOCK_FIRST_LABEL,
     tooltip: MOCK_FIRST_TOOLTIP,
-  },
-  {
+  }),
+  mockIconToggleOption({
     value: MOCK_SECOND_VALUE,
     icon: ICONS.TABLET,
     ariaLabel: MOCK_SECOND_LABEL,
-    tooltip: faker.lorem.words(3),
-  },
+  }),
 ];
 
 const setup = customRender(IconToggleGroup<string>, {
@@ -94,6 +94,17 @@ describe(`<${IconToggleGroup.name}/>`, () => {
     await user.click(secondButton);
 
     expect(onChange).toHaveBeenCalledWith(MOCK_SECOND_VALUE);
+  });
+
+  it('leaves the pressed button pressed and reports nothing when clicked', async () => {
+    const onChange = vi.fn();
+    setup({ onChange });
+
+    const firstButton = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+    await user.click(firstButton);
+
+    expect(firstButton).toBePressed();
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('keeps exactly one button pressed after choosing another', async () => {

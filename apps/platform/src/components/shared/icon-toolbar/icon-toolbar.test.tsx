@@ -1,10 +1,10 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { IconSoloToggle } from '@platform/components/shared/icon-solo-toggle';
 import { ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockIconToggleOption } from '@platform/testing/icon-toggle-group/fixtures';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -25,28 +25,27 @@ const MOCK_END_LABEL = faker.lorem.words(2);
 const MOCK_END_TOOLTIP = faker.lorem.words(3);
 const MOCK_DESKTOP_TOOLTIP = faker.lorem.words(3);
 
-const option = (
-  value: string,
-  icon: TRegisteredIconName,
-  ariaLabel: string,
-) => ({
-  value,
-  icon,
-  ariaLabel,
-  tooltip: faker.lorem.words(3),
-});
-
 const MOCK_DEVICE_GROUP = {
   ariaLabel: MOCK_DEVICE_LABEL,
   value: MOCK_TABLET_LABEL,
   onChange: vi.fn(),
   options: [
-    option(MOCK_PHONE_LABEL, ICONS.PHONE, MOCK_PHONE_LABEL),
-    option(MOCK_TABLET_LABEL, ICONS.TABLET, MOCK_TABLET_LABEL),
-    {
-      ...option(MOCK_DESKTOP_LABEL, ICONS.MONITOR, MOCK_DESKTOP_LABEL),
+    mockIconToggleOption({
+      value: MOCK_PHONE_LABEL,
+      icon: ICONS.PHONE,
+      ariaLabel: MOCK_PHONE_LABEL,
+    }),
+    mockIconToggleOption({
+      value: MOCK_TABLET_LABEL,
+      icon: ICONS.TABLET,
+      ariaLabel: MOCK_TABLET_LABEL,
+    }),
+    mockIconToggleOption({
+      value: MOCK_DESKTOP_LABEL,
+      icon: ICONS.MONITOR,
+      ariaLabel: MOCK_DESKTOP_LABEL,
       tooltip: MOCK_DESKTOP_TOOLTIP,
-    },
+    }),
   ],
 };
 
@@ -55,8 +54,16 @@ const MOCK_SCHEME_GROUP = {
   value: MOCK_LIGHT_LABEL,
   onChange: vi.fn(),
   options: [
-    option(MOCK_LIGHT_LABEL, ICONS.SUN, MOCK_LIGHT_LABEL),
-    option(MOCK_DARK_LABEL, ICONS.MOON, MOCK_DARK_LABEL),
+    mockIconToggleOption({
+      value: MOCK_LIGHT_LABEL,
+      icon: ICONS.SUN,
+      ariaLabel: MOCK_LIGHT_LABEL,
+    }),
+    mockIconToggleOption({
+      value: MOCK_DARK_LABEL,
+      icon: ICONS.MOON,
+      ariaLabel: MOCK_DARK_LABEL,
+    }),
   ],
 };
 
