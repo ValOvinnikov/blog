@@ -119,6 +119,7 @@ const SHARED_PAIRS: readonly TPair[] = [
     BOUNDARY,
   ],
   ['2px focus ring on card', TOKEN.BRAND_INK, TOKEN.SURFACE, FOCUS],
+  ['Focus ring on open row', TOKEN.BRAND_INK, TOKEN.SURFACE_2, FOCUS],
   ['Focus ring on sidebar', TOKEN.SIDE_ACCENT, TOKEN.SIDE, FOCUS],
   ['Error text on card', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Invalid border on card', TOKEN.BAD_LINE, TOKEN.SURFACE, BOUNDARY],
