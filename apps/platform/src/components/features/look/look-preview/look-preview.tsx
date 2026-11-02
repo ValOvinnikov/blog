@@ -1,8 +1,13 @@
 'use client';
 
-import { ICONS, type TLocaleIsoCode } from '@blog/config';
+import {
+  COOKIE_SETTINGS_BUTTON,
+  ICONS,
+  type TLocaleIsoCode,
+} from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
+import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
 import { DeviceFrame } from '@platform/components/shared/device-frame';
 import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
@@ -54,6 +59,8 @@ export const LookPreview = ({
     device: previewDevice,
     scale,
   });
+  const theme = buildSitePreviewTheme(values, isDark);
+  const footer = toSampleFooterStyle(values);
 
   const readerGroup: TIconToggleGroupProps<TPreviewReaderState> = {
     ariaLabel: t('readerStateAriaLabel'),
@@ -108,15 +115,20 @@ export const LookPreview = ({
           >
             <LookSample
               brand={{ name: tenantName, logoSrc: values.logo.url }}
-              theme={buildSitePreviewTheme(values, isDark)}
+              theme={theme}
               liveLocales={liveLocales}
               header={toSampleHeaderStyle(values)}
-              footer={toSampleFooterStyle(values)}
+              footer={footer}
               busy={toSampleBusyStyle(values)}
               hasReaderAccounts={hasReaderAccounts}
               isSignedIn={readerState === PREVIEW_READER_STATE.SIGNED_IN}
               isSubmenuOpen={isSubmenuPreviewOpen}
             />
+            {footer.cookieSettingsButton === COOKIE_SETTINGS_BUTTON.SHOWN && (
+              <DeviceFrame.Overlay>
+                <SampleCookieButton theme={theme} />
+              </DeviceFrame.Overlay>
+            )}
           </DeviceFrame>
         </PreviewFrame.Stage>
         {!hasReaderAccounts && (

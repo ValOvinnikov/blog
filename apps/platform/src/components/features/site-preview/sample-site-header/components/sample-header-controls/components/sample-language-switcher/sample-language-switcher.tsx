@@ -17,6 +17,7 @@ import { sampleLanguageSwitcherVariants } from './sample-language-switcher-varia
 
 // Matches apps/web's LanguageSwitcher, which falls back to MENU_CODE above it.
 const MAX_COMPACT_CODES = 4;
+const MIN_SWITCHABLE_LOCALES = 2;
 
 const toCode = (locale: TLocaleIsoCode) =>
   LOCALE_BCP47_TAGS[locale].toUpperCase();
@@ -24,17 +25,22 @@ const toCode = (locale: TLocaleIsoCode) =>
 export type TSampleLanguageSwitcherProps = {
   liveLocales: readonly TLocaleIsoCode[];
   switcherStyle: TLanguageSwitcherStyle;
+  isAlwaysShown: boolean;
 };
 
 export const SampleLanguageSwitcher = ({
   liveLocales,
   switcherStyle,
+  isAlwaysShown,
 }: TSampleLanguageSwitcherProps) => {
   const t = useTranslations('lookPreview');
   const panelId = useId();
   const [currentLocale] = liveLocales;
 
-  if (!currentLocale || liveLocales.length < 2) {
+  if (
+    !currentLocale ||
+    (liveLocales.length < MIN_SWITCHABLE_LOCALES && !isAlwaysShown)
+  ) {
     return null;
   }
 

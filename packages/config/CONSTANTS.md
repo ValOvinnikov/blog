@@ -478,6 +478,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **REQUEST_LOG**: `UNHANDLED_ERROR`=`"request.unhandled_error"`
 
+### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
+
+- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`
+
 ### `@platform/constants/settings-features` — `apps/platform/src/constants/settings-features.ts`
 
 - **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`

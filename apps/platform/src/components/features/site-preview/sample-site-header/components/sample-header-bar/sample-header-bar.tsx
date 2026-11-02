@@ -21,6 +21,7 @@ export type TSampleHeaderBarProps = IWithClassName & {
   account: IAccountControl;
   hasReaderAccounts: boolean;
   isSignedIn: boolean;
+  isBrandLarge: boolean;
 };
 
 export const SampleHeaderBar = ({
@@ -28,6 +29,7 @@ export const SampleHeaderBar = ({
   account,
   hasReaderAccounts,
   isSignedIn,
+  isBrandLarge,
   className,
 }: TSampleHeaderBarProps) => {
   const t = useTranslations('lookPreview');
@@ -42,7 +44,12 @@ export const SampleHeaderBar = ({
       className={root({ class: className })}
       data-testid={SAMPLE_HEADER_BAR_TEST_ID}
     >
-      <SampleHeaderBrand name={name} logoSrc={logoSrc} isCompact={true} />
+      <SampleHeaderBrand
+        name={name}
+        logoSrc={logoSrc}
+        isCompact={true}
+        isLarge={isBrandLarge}
+      />
       <div className={controls()}>
         {hasAccount && (
           <SampleAccountControl

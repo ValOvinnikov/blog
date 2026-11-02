@@ -1,5 +1,6 @@
 import {
   CARD_STYLE,
+  COOKIE_SETTINGS_BUTTON,
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
@@ -14,6 +15,7 @@ import {
   PREVIEW_DEVICE,
   type TPreviewDevice,
 } from '@platform/constants/preview';
+import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
 import messages from '@platform/i18n/messages/en.json';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -169,5 +171,31 @@ describe(`<${LookPreview.name}/>`, () => {
     expect(sampleTokens).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
     });
+  });
+
+  it('floats the cookie button over the sample when it is shown', () => {
+    renderPreview({
+      values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+    });
+
+    const cookieButton = screen.getByTestId(SAMPLE_COOKIE_BUTTON_TEST_ID);
+    const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
+
+    expect(cookieButton).toBeInTheDocument();
+    expect(content).not.toContainElement(cookieButton);
+  });
+
+  it('leaves the cookie button out when it is hidden', () => {
+    renderPreview({
+      values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN },
+    });
+
+    const cookieButton = screen.queryByTestId(SAMPLE_COOKIE_BUTTON_TEST_ID);
+    const cookieSettingsLink = screen.getByRole('link', {
+      name: LOOK_PREVIEW.footerCookieSettings,
+    });
+
+    expect(cookieButton).not.toBeInTheDocument();
+    expect(cookieSettingsLink).toBeInTheDocument();
   });
 });

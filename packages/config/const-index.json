@@ -5800,6 +5800,22 @@
         "file": "apps/web/src/constants/request.ts"
       }
     ],
+    "header": [
+      {
+        "ref": "SAMPLE_PART.HEADER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "footer": [
+      {
+        "ref": "SAMPLE_PART.FOOTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
     "settings_features.plan_entitlement_rejected": [
       {
         "ref": "SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED",
