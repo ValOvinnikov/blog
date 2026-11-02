@@ -11,8 +11,10 @@ import type {
   TPlanPage,
   TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
-import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
+
+import { isCurrentNavHref } from './is-current-nav-href';
 
 export const operatorNavSections = (
   t: TLooseTranslator,
@@ -194,10 +196,6 @@ export const tenantNavSections = (
   ];
 };
 
-const isNavItemFor = (href: string, pathname: string) =>
-  pathname === href ||
-  (href.endsWith(`/${STUDIO_SEGMENT}`) && pathname.startsWith(`${href}/`));
-
 export const navLabelForPathname = (
   sections: TSidebarNavSection[],
   pathname: string,
@@ -205,5 +203,6 @@ export const navLabelForPathname = (
   sections
     .flatMap((section) => section.items)
     .find(
-      (item) => !isUndefined(item.href) && isNavItemFor(item.href, pathname),
+      (item) =>
+        !isUndefined(item.href) && isCurrentNavHref(item.href, pathname),
     )?.label;
