@@ -3,6 +3,7 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import type { TControlAria } from '@blog/config';
+import { singleSelectToggleGroupProps } from '@platform/utils/single-select-toggle-group/single-select-toggle-group';
 import { useId } from 'react';
 
 import { segmentedControlVariants } from './segmented-control-variants';
@@ -24,7 +25,6 @@ export type TSegmentedControlProps<TValue extends string> = {
   className?: string;
 };
 
-/** Built on Base UI's Toggle Group, so clicking the selected option would deselect it; that is swallowed, as there is no "none selected" state. */
 export const SegmentedControl = <TValue extends string>({
   options,
   value,
@@ -47,13 +47,7 @@ export const SegmentedControl = <TValue extends string>({
 
   return (
     <ToggleGroup
-      value={[value]}
-      onValueChange={(nextValues) => {
-        const nextValue = nextValues[0];
-        if (!isLocked && nextValue !== undefined) {
-          onChange(nextValue);
-        }
-      }}
+      {...singleSelectToggleGroupProps(value, onChange, { isLocked })}
       disabled={isDisabled}
       aria-label={ariaLabel}
       aria-labelledby={labelledBy}

@@ -45,7 +45,7 @@ import {
 } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import type { TUploadResult } from '@platform/server/uploads/upload-error';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -54,6 +54,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -151,9 +152,7 @@ const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
 });
 
 const HEAVY_FORM_TIMEOUT_MS = 15_000;
-const ARROW_RIGHT_KEY = '{ArrowRight}';
 const ARIA_SELECTED = 'aria-selected';
-const ARIA_PRESSED = 'aria-pressed';
 const DATA_DISABLED = 'data-disabled';
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
@@ -236,7 +235,7 @@ const pickLogo = async (user: UserEvent) => {
 const nudgeAccentHue = async (user: UserEvent) => {
   const accentHueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
   await user.click(accentHueSlider);
-  await user.keyboard(ARROW_RIGHT_KEY);
+  await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 };
 
 const clickSave = async (user: UserEvent) => {

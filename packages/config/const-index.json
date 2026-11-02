@@ -5008,6 +5008,22 @@
         "file": "apps/platform/src/constants/keyboard.ts"
       }
     ],
+    "Enter": [
+      {
+        "ref": "KEY.ENTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    " ": [
+      {
+        "ref": "KEY.SPACE",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
     "leads.delete_failed": [
       {
         "ref": "LEAD_LOG.DELETE_FAILED",
@@ -7366,6 +7382,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "1.8": [
+      {
+        "ref": "ICON_STROKE_WIDTH.CONTROL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ]
   }

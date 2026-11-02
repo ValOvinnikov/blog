@@ -2,9 +2,10 @@ import { SIZE, VOICE_PORTABLE_TEXT_SCHEMA } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { faker } from '@faker-js/faker';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
-import { ARIA_DISABLED } from '@platform/testing/aria';
+import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   BULLET_LIST_ITEM,
   mockTextBlock,
@@ -28,7 +29,6 @@ const MOCK_ITEM_TWO = faker.lorem.words(3);
 const MOCK_ITEM_THREE = faker.lorem.words(3);
 const MOCK_ITEM_FOUR = faker.lorem.words(3);
 const MOCK_ITEM_FIVE = faker.lorem.words(3);
-const ARIA_PRESSED = 'aria-pressed';
 const ARIA_MULTILINE = 'aria-multiline';
 const ARIA_SETSIZE = 'aria-setsize';
 const ARIA_POSINSET = 'aria-posinset';
@@ -108,10 +108,10 @@ describe(`<${PortableTextEditor.name}/>`, () => {
       const italicButton = screen.getByRole('button', { name: t('italic') });
 
       await user.tab();
-      await user.keyboard('{ArrowRight}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
       expect(italicButton).toHaveFocus();
 
-      await user.keyboard('{ArrowLeft}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_LEFT);
       expect(boldButton).toHaveFocus();
     });
 
