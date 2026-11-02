@@ -40,11 +40,17 @@ module types whose capability is off for the tenant carry a warning.
 - The `studio` segment switches the shell to full-bleed: the content column is
   pinned to the viewport and the Studio fills it (`ShellFrame`).
 - The sidebar shows a Studio item under "Content" in both trees. Under
-  `/dashboard`, the owner's item carries their access state as a badge:
-  Invite sent, Activating, Ready or Action needed (STALLED). The badge
-  follows the current state without a reload (see
-  [platform-shell](./platform-shell.md)), and Ready clears after the owner's
-  first signed-in Studio session in that browser.
+  `/dashboard`, while the owner's access is not READY, the item carries one
+  muted line under its label, inside the link: a 12px icon and text —
+  INVITE_SENT (mail, `warn`) "Invite sent — check your email", ACTIVATING
+  (clock, `brand-ink`) "Setting up…", STALLED (warning, `bad`, text too)
+  "Needs attention". At READY there is no line and the item is a single-line
+  row like the others; it never shows a pill. A visually hidden comma
+  separates label and line, so the link is named "Studio, Needs attention";
+  while it has a line the link carries no native `title`, in the expanded and
+  collapsed sidebar and the phone Menu alike. The line follows the current
+  state without a reload (see [platform-shell](./platform-shell.md)).
+  Operators never see it.
 - Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
@@ -115,10 +121,10 @@ module types whose capability is off for the tenant carry a warning.
   year, per tenant) records the owner's first signed-in Studio session. Only
   `/dashboard/studio` at READY passes `onSignedIn`, through the client
   `PlatformStudioMount`, and only until the cookie exists; it then refreshes
-  the route so the sidebar drops Ready. Every mount goes through
-  `PlatformStudioMount`, so that refresh never remounts the Studio. It is a
-  hint, not a record: another browser shows Ready until the owner enters
-  there. No database column backs it.
+  the route. Every mount goes through `PlatformStudioMount`, so that refresh
+  never remounts the Studio. It is a hint, not a record, and no database
+  column backs it. Since the sidebar stopped showing Ready, no surface reads
+  it.
 - `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
   `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@blog/service` there.
 - `StudioMount` fills its parent (`height: 100%`) instead of `NextStudio`'s
@@ -208,5 +214,7 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 - #4959 owner Studio access states in the sidebar and the explainer before
   READY.
 - #6473 the Ready badge clears after the owner's first Studio entry.
+- #6362 the access state becomes a line under the Studio label, with none at
+  READY.
 - #4035 localize the Studio interface for editors.
 - #1036 draft preview with Sanity Presentation.

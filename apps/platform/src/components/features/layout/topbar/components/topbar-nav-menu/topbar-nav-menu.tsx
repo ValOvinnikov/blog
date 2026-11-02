@@ -79,6 +79,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                               icon={item.icon}
                               label={item.label}
                               badge={item.badge}
+                              status={item.status}
                             />
                           </Menu.LinkItem>
                         );
@@ -97,6 +98,7 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                             label={item.label}
                             disabledReason={item.disabledReason}
                             badge={item.badge}
+                            status={item.status}
                           />
                         </div>
                       );

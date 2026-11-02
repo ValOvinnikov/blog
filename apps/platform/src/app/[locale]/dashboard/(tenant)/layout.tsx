@@ -8,7 +8,6 @@ import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
 import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
-import { resolveHasEnteredStudio } from '@platform/server/studio-entry/resolve-has-entered-studio';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
@@ -19,19 +18,13 @@ type TProps = {
 
 export default async function DashboardTenantLayout({ children }: TProps) {
   const { tenant, membership, tenants } = await resolveDashboardTenant();
-  const [
-    { admin: sessionAdmin },
-    chrome,
-    access,
-    unreadLeadsCount,
-    hasEnteredStudio,
-  ] = await Promise.all([
-    listSessionTenants(),
-    loadAdminShellChrome(),
-    resolveTenantPageAccess(tenant, membership),
-    queries.leads.countUnreadLeadsForTenant(tenant.id),
-    resolveHasEnteredStudio(tenant.id),
-  ]);
+  const [{ admin: sessionAdmin }, chrome, access, unreadLeadsCount] =
+    await Promise.all([
+      listSessionTenants(),
+      loadAdminShellChrome(),
+      resolveTenantPageAccess(tenant, membership),
+      queries.leads.countUnreadLeadsForTenant(tenant.id),
+    ]);
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
     chrome;
   const studioAccess = ownerStudioAccessFor(tenant, membership);
@@ -44,7 +37,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       sections={dashboardNavSections(
         tNavSections,
         access,
-        studioAccess && { access: studioAccess, hasEntered: hasEnteredStudio },
+        studioAccess,
         unreadLeadsCount,
       )}
       switcher={

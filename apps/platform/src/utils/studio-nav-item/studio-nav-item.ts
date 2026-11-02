@@ -1,33 +1,41 @@
 import { ICONS } from '@blog/config';
 import type { TSidebarNavItem } from '@platform/components/features/layout/sidebar';
+import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
+  type TPendingOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { ownerStudioAccessTone } from '@platform/utils/status-tone/status-tone';
 
-export type TStudioNavState = {
-  access: TOwnerStudioAccess;
-  hasEntered: boolean;
+const STUDIO_ACCESS_LINE_ICON: Record<
+  TPendingOwnerStudioAccess,
+  TRegisteredIconName
+> = {
+  [OWNER_STUDIO_ACCESS.INVITE_SENT]: ICONS.MAIL,
+  [OWNER_STUDIO_ACCESS.ACTIVATING]: ICONS.CLOCK,
+  [OWNER_STUDIO_ACCESS.STALLED]: ICONS.WARNING,
 };
 
-const isBadged = (studio?: TStudioNavState): studio is TStudioNavState =>
-  !!studio &&
-  !(studio.access === OWNER_STUDIO_ACCESS.READY && studio.hasEntered);
+const isPending = (
+  access?: TOwnerStudioAccess,
+): access is TPendingOwnerStudioAccess =>
+  !!access && access !== OWNER_STUDIO_ACCESS.READY;
 
 export const studioNavItem = (
   t: TLooseTranslator,
   href: string,
-  studio?: TStudioNavState,
+  access?: TOwnerStudioAccess,
 ): TSidebarNavItem => ({
   label: t('studio'),
   icon: ICONS.STUDIO,
   href,
-  ...(isBadged(studio) && {
-    badge: {
-      label: t(`studioAccess.${studio.access}`),
-      tone: ownerStudioAccessTone(studio.access),
+  ...(isPending(access) && {
+    status: {
+      text: t(`studioAccessLine.${access}`),
+      icon: STUDIO_ACCESS_LINE_ICON[access],
+      tone: ownerStudioAccessTone(access),
     },
   }),
 });
