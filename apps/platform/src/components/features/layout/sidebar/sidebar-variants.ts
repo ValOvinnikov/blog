@@ -43,6 +43,7 @@ export const sidebarVariants = tv({
       'px-2.5 text-admin-12 leading-4 text-admin-side-muted',
       'group-data-[collapsed=true]/shell:hidden',
     ],
+    railDescription: ['sr-only'],
   },
   variants: {
     state: {

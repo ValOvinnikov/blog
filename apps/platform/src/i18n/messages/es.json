@@ -229,7 +229,8 @@
     },
     "blockedSignups": "Registros bloqueados",
     "dataRequests": "Solicitudes de datos",
-    "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}"
+    "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}",
+    "collapsedStatusTooltip": "{label} · {status}"
   },
   "navItemContent": {
     "statusSeparator": ","

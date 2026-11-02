@@ -69,4 +69,32 @@ describe(`<${NavItemContent.name}/>`, () => {
 
     expect(line).toBeVisible();
   });
+
+  it('renders the status line when not collapsed', () => {
+    setup({ status: MOCK_STATUS, isCollapsed: false });
+
+    const icons = screen.getAllByTestId(ICON_TEST_ID);
+    const line = screen.getByText(MOCK_STATUS.text);
+
+    expect(line).toBeVisible();
+    expect(icons).toHaveLength(2);
+  });
+
+  it('draws the status as an icon badge with no line when collapsed', () => {
+    setup({ status: MOCK_STATUS, isCollapsed: true });
+
+    const icons = screen.getAllByTestId(ICON_TEST_ID);
+    const line = screen.queryByText(MOCK_STATUS.text);
+
+    expect(line).not.toBeInTheDocument();
+    expect(icons).toHaveLength(2);
+  });
+
+  it('draws no badge when collapsed without a status', () => {
+    setup({ isCollapsed: true });
+
+    const icons = screen.getAllByTestId(ICON_TEST_ID);
+
+    expect(icons).toHaveLength(1);
+  });
 });

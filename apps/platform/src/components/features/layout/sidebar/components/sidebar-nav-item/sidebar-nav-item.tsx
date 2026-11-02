@@ -1,8 +1,8 @@
-import {
-  NavItemContent,
-  type TNavItemBadge,
-  type TNavItemStatus,
+import type {
+  TNavItemBadge,
+  TNavItemStatus,
 } from '@platform/components/features/layout/nav-item-content';
+import { SidebarNavItemContent } from '@platform/components/features/layout/sidebar/components/sidebar-nav-item-content';
 import { SidebarNavLink } from '@platform/components/features/layout/sidebar/components/sidebar-nav-link';
 import { SidebarRailTooltip } from '@platform/components/features/layout/sidebar/components/sidebar-rail-tooltip';
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
@@ -33,11 +33,11 @@ export const SidebarNavItem = ({ item }: TSidebarNavItemProps) => {
     <li>
       <SidebarRailTooltip
         label={label}
-        hasNativeTitle={!status}
+        statusText={status?.text}
         row={
           href ? (
             <SidebarNavLink href={href}>
-              <NavItemContent
+              <SidebarNavItemContent
                 icon={icon}
                 label={label}
                 badge={badge}
@@ -50,7 +50,7 @@ export const SidebarNavItem = ({ item }: TSidebarNavItemProps) => {
               aria-disabled="true"
               className={row({ state: 'inert' })}
             >
-              <NavItemContent
+              <SidebarNavItemContent
                 icon={icon}
                 label={label}
                 disabledReason={disabledReason}

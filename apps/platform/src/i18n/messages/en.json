@@ -229,7 +229,8 @@
     },
     "blockedSignups": "Blocked sign-ups",
     "dataRequests": "Data requests",
-    "badgeUnreadLeads": "{count} new"
+    "badgeUnreadLeads": "{count} new",
+    "collapsedStatusTooltip": "{label} · {status}"
   },
   "navItemContent": {
     "statusSeparator": ","

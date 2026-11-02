@@ -229,7 +229,8 @@
     },
     "blockedSignups": "Geblokkeerde aanmeldingen",
     "dataRequests": "Gegevensverzoeken",
-    "badgeUnreadLeads": "{count} nieuw"
+    "badgeUnreadLeads": "{count} nieuw",
+    "collapsedStatusTooltip": "{label} · {status}"
   },
   "navItemContent": {
     "statusSeparator": ","

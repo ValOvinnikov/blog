@@ -7,3 +7,4 @@ export const ARIA_CURRENT = 'aria-current';
 export const ARIA_PRESSED = 'aria-pressed';
 export const ARIA_EXPANDED = 'aria-expanded';
 export const ARIA_HASPOPUP = 'aria-haspopup';
+export const ARIA_DESCRIBEDBY = 'aria-describedby';
