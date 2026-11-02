@@ -25,7 +25,7 @@ import {
   type TOwnerEmailRefusal,
 } from './owner-email-change';
 import {
-  changesTenantDetails,
+  changesProvisionedTenantDetails,
   restorableTenantFields,
   tenantDetailsFields,
 } from './tenant-details-fields';
@@ -117,7 +117,7 @@ export async function updateTenantDetails(
   if (
     provisioningState === PROVISIONING_STATE.RUNNING ||
     (provisioningState === PROVISIONING_STATE.SUCCEEDED &&
-      changesTenantDetails(details, existing))
+      changesProvisionedTenantDetails(details, existing))
   ) {
     return toOutcome(OUTCOME.PROVISIONING_STARTED);
   }

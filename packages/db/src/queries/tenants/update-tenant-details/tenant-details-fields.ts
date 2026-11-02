@@ -20,14 +20,18 @@ export function tenantDetailsFields(
   };
 }
 
-export function changesTenantDetails(
+const PROVISIONED_DETAIL_KEYS = [
+  'name',
+  'primaryDomain',
+  'locale',
+] as const satisfies readonly (keyof TTenantDetailsFields)[];
+
+export function changesProvisionedTenantDetails(
   next: TTenantDetailsFields,
   existing: TTenant,
 ): boolean {
   const current = tenantDetailsFields(existing);
-  return (Object.keys(next) as (keyof TTenantDetailsFields)[]).some(
-    (key) => next[key] !== current[key],
-  );
+  return PROVISIONED_DETAIL_KEYS.some((key) => next[key] !== current[key]);
 }
 
 export function restorableTenantFields(

@@ -571,6 +571,17 @@ describe(updateTenantDetails, () => {
       expect(details?.name).toBe(MOCK_TENANT_NAME);
     });
 
+    it('refuses a plan change with provisioning-started, leaving the plan', async () => {
+      const result = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.GROWTH,
+      });
+
+      expect(result).toEqual({ outcome: PROVISIONING_STARTED });
+      const details = await readDetails(tenantId);
+      expect(details?.plan).toBe(TENANT_PLAN.FREE);
+    });
+
     it('refuses an ownerEmail edit with provisioning-started, leaving the invite', async () => {
       await insertOwnerInvite(tenantId, MOCK_OWNER_EMAIL);
 
@@ -609,6 +620,72 @@ describe(updateTenantDetails, () => {
       expect(
         decryptTestPersonalValue(ownerInvite?.emailEncrypted ?? null),
       ).toBe(MOCK_NEW_OWNER_EMAIL);
+    });
+
+    it('accepts a change to the plan alone, both ways', async () => {
+      const upgraded = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.GROWTH,
+      });
+
+      expect(unwrapUpdated(upgraded).plan).toBe(TENANT_PLAN.GROWTH);
+
+      const downgraded = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.FREE,
+      });
+
+      expect(unwrapUpdated(downgraded).plan).toBe(TENANT_PLAN.FREE);
+    });
+
+    it('accepts a plan change together with an owner-email change', async () => {
+      const result = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.GROWTH,
+        ownerEmail: MOCK_NEW_OWNER_EMAIL,
+      });
+
+      const { tenant, previousOwnerEmail } = unwrapUpdatedResult(result);
+      expect(tenant.plan).toBe(TENANT_PLAN.GROWTH);
+      expect(previousOwnerEmail).toBe(MOCK_OWNER_EMAIL);
+    });
+
+    it.each([
+      ['name', { name: MOCK_NEW_NAME }],
+      ['primaryDomain', { primaryDomain: MOCK_NEW_DOMAIN }],
+      ['locale', { locale: LOCALE_ISO_CODES.DE }],
+    ])(
+      'refuses a plan change bundled with a %s change, leaving the row',
+      async (_field, change) => {
+        const result = await updateTenantDetails(tenantId, {
+          ...MOCK_ORIGINAL_DETAILS,
+          plan: TENANT_PLAN.GROWTH,
+          ...change,
+        });
+
+        expect(result).toEqual({ outcome: PROVISIONING_STARTED });
+        expect(await readDetails(tenantId)).toEqual(MOCK_ORIGINAL_DETAILS);
+      },
+    );
+
+    it('refuses a provisioned tenant moving to FREE when its owner already has a Free site', async () => {
+      const selfServeOwnerEmailIndex = testPersonalEmailIndex(
+        MOCK_SELF_SERVE_OWNER_EMAIL,
+      );
+      await db()
+        .update(tenants)
+        .set({ plan: TENANT_PLAN.GROWTH, selfServeOwnerEmailIndex })
+        .where(eq(tenants.id, tenantId));
+      await insertTestTenant(db(), { selfServeOwnerEmailIndex });
+
+      const result = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.FREE,
+      });
+
+      expect(result).toEqual({ outcome: OWNS_FREE_TENANT });
+      const details = await readDetails(tenantId);
+      expect(details?.plan).toBe(TENANT_PLAN.GROWTH);
     });
 
     it('refuses an owner-email change bundled with another field, leaving the invite', async () => {
