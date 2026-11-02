@@ -54,6 +54,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -151,7 +152,6 @@ const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
 });
 
 const HEAVY_FORM_TIMEOUT_MS = 15_000;
-const ARROW_RIGHT_KEY = '{ArrowRight}';
 const ARIA_SELECTED = 'aria-selected';
 const DATA_DISABLED = 'data-disabled';
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
@@ -235,7 +235,7 @@ const pickLogo = async (user: UserEvent) => {
 const nudgeAccentHue = async (user: UserEvent) => {
   const accentHueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
   await user.click(accentHueSlider);
-  await user.keyboard(ARROW_RIGHT_KEY);
+  await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
 };
 
 const clickSave = async (user: UserEvent) => {

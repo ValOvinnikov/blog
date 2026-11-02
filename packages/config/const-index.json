@@ -7345,6 +7345,14 @@
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
+    ],
+    "1.8": [
+      {
+        "ref": "ICON_STROKE_WIDTH.CONTROL",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
     ]
   }
 }

@@ -69,7 +69,7 @@ export const useToolbarTabStop = (id: string) => {
   }
 
   const { stopId, resetKey } = context;
-  const onFocus = () => setStop?.({ id, resetKey });
+  const onFocus = () => context.setStop({ id, resetKey });
 
   return stopId === undefined
     ? { onFocus }

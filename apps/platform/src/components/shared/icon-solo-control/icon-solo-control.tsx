@@ -9,7 +9,7 @@ import {
 import { useToolbarTabStop } from '@platform/components/shared/toolbar-tab-stop';
 import { Tooltip } from '@platform/components/shared/tooltip';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { ICON_SIZE } from '@platform/constants/icon';
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { ReactElement } from 'react';
@@ -57,7 +57,11 @@ export const IconSoloControl = ({
           className={iconSoloControlVariants({ class: className })}
           {...stop}
         >
-          <Icon name={icon} size={ICON_SIZE.MD} strokeWidth={1.8} />
+          <Icon
+            name={icon}
+            size={ICON_SIZE.MD}
+            strokeWidth={ICON_STROKE_WIDTH.CONTROL}
+          />
         </Trigger>
       }
     />

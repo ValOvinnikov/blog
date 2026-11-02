@@ -11,3 +11,7 @@ export const ICON_SIZE = {
   XXL: 'XXL',
   XXXL: 'XXXL',
 } as const;
+
+export const ICON_STROKE_WIDTH = {
+  CONTROL: 1.8,
+} as const;

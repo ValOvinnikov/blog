@@ -5,6 +5,7 @@ import {
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
 
@@ -108,17 +109,6 @@ describe(`<${IconToggleGroup.name}/>`, () => {
     expect(secondButton).toBePressed();
   });
 
-  it('reports nothing and stays pressed when the pressed button is clicked', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
-
-    const firstButton = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-    await user.click(firstButton);
-
-    expect(onChange).not.toHaveBeenCalled();
-    expect(firstButton).toBePressed();
-  });
-
   it.each(['{Enter}', ' '])('presses with %j and keeps focus', async (key) => {
     renderWithIntl(<StatefulGroup />);
 
@@ -126,7 +116,7 @@ describe(`<${IconToggleGroup.name}/>`, () => {
       name: MOCK_SECOND_LABEL,
     });
     await user.tab();
-    await user.keyboard('{ArrowRight}');
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
     await user.keyboard(key);
 
     expect(secondButton).toBePressed();

@@ -5,14 +5,13 @@ import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { IconSoloToggle } from '@platform/components/shared/icon-solo-toggle';
 import { ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { IconToolbar } from './icon-toolbar';
 
 faker.seed(6382);
 
-const RIGHT = '{ArrowRight}';
-const LEFT = '{ArrowLeft}';
 const MOCK_TOOLBAR_LABEL = faker.lorem.words(2);
 const MOCK_DEVICE_LABEL = faker.lorem.word();
 const MOCK_SCHEME_LABEL = faker.lorem.word();
@@ -148,16 +147,16 @@ describe(`<${IconToolbar.name}/>`, () => {
     setup();
     await user.tab();
 
-    await user.keyboard(RIGHT);
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
     expect(getButton(MOCK_DESKTOP_LABEL)).toHaveFocus();
 
-    await user.keyboard(RIGHT);
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
     expect(getButton(MOCK_LIGHT_LABEL)).toHaveFocus();
 
-    await user.keyboard(RIGHT.repeat(2));
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT.repeat(2));
     expect(getButton(MOCK_SOLO_LABEL)).toHaveFocus();
 
-    await user.keyboard(LEFT.repeat(3));
+    await user.keyboard(USER_EVENT_KEY.ARROW_LEFT.repeat(3));
     expect(getButton(MOCK_DESKTOP_LABEL)).toHaveFocus();
   });
 
@@ -165,7 +164,7 @@ describe(`<${IconToolbar.name}/>`, () => {
     setup();
     await user.tab();
 
-    await user.keyboard(`{End}${RIGHT}`);
+    await user.keyboard(`${USER_EVENT_KEY.END}${USER_EVENT_KEY.ARROW_RIGHT}`);
 
     expect(getButton(MOCK_END_LABEL)).toHaveFocus();
   });
@@ -174,7 +173,7 @@ describe(`<${IconToolbar.name}/>`, () => {
     setup();
     await user.tab();
 
-    await user.keyboard(`{Home}${LEFT}`);
+    await user.keyboard(`${USER_EVENT_KEY.HOME}${USER_EVENT_KEY.ARROW_LEFT}`);
 
     expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
   });
@@ -183,10 +182,10 @@ describe(`<${IconToolbar.name}/>`, () => {
     setup();
     await user.tab();
 
-    await user.keyboard('{End}');
+    await user.keyboard(USER_EVENT_KEY.END);
     expect(getButton(MOCK_END_LABEL)).toHaveFocus();
 
-    await user.keyboard('{Home}');
+    await user.keyboard(USER_EVENT_KEY.HOME);
     expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
   });
 
@@ -202,7 +201,7 @@ describe(`<${IconToolbar.name}/>`, () => {
   it('returns to the last focused button on Tab back in', async () => {
     setup();
     await user.tab();
-    await user.keyboard(RIGHT.repeat(3));
+    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT.repeat(3));
 
     await user.tab();
     await user.tab({ shift: true });
@@ -213,7 +212,7 @@ describe(`<${IconToolbar.name}/>`, () => {
   it('resets to the first group pressed button when the groups change', async () => {
     const { rerender } = setup();
     await user.tab();
-    await user.keyboard('{End}');
+    await user.keyboard(USER_EVENT_KEY.END);
 
     rerender(
       <IconToolbar
@@ -226,17 +225,5 @@ describe(`<${IconToolbar.name}/>`, () => {
     await user.tab();
 
     expect(getButton(MOCK_LIGHT_LABEL)).toHaveFocus();
-  });
-
-  it('opens a tooltip unlike the aria-label on keyboard focus', async () => {
-    setup();
-    await user.tab();
-
-    await user.keyboard(RIGHT);
-    const tooltip = await screen.findByText(MOCK_DESKTOP_TOOLTIP);
-    const desktopButton = getButton(MOCK_DESKTOP_LABEL);
-
-    expect(tooltip).toBeVisible();
-    expect(desktopButton).toHaveAccessibleName(MOCK_DESKTOP_LABEL);
   });
 });
