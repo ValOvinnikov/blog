@@ -744,6 +744,7 @@
     "readoutPhoneTab": "{width} px · affiché à {percent} %",
     "toolbarAriaLabel": "Options d'aperçu",
     "deviceGroupAriaLabel": "Appareil d'aperçu",
+    "deviceDesktop": "Ordinateur",
     "deviceTablet": "Tablette",
     "devicePhone": "Téléphone",
     "tooltipDesktop": "Ordinateur · {width} px",

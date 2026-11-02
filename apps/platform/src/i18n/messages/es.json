@@ -744,6 +744,7 @@
     "readoutPhoneTab": "{width} px · mostrado al {percent} %",
     "toolbarAriaLabel": "Opciones de vista previa",
     "deviceGroupAriaLabel": "Dispositivo de vista previa",
+    "deviceDesktop": "Escritorio",
     "deviceTablet": "Tableta",
     "devicePhone": "Teléfono",
     "tooltipDesktop": "Escritorio · {width} px",

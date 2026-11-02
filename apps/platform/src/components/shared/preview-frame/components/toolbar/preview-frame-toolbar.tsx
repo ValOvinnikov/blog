@@ -32,7 +32,6 @@ export const PreviewFrameToolbar = ({
 }: TPreviewFrameToolbarProps) => {
   const t = useTranslations('devicePreview');
   const tMode = useTranslations('previewModeControl');
-  const tLook = useTranslations('lookPreview');
   const widthOf = (target: TPreviewDevice) => ({
     width: PREVIEW_DEVICE_WIDTH[target],
   });
@@ -45,7 +44,7 @@ export const PreviewFrameToolbar = ({
       {
         value: PREVIEW_DEVICE.DESKTOP,
         icon: ICONS.MONITOR,
-        ariaLabel: tLook('widthDesktop'),
+        ariaLabel: t('deviceDesktop'),
         tooltip: t('tooltipDesktop', widthOf(PREVIEW_DEVICE.DESKTOP)),
       },
       {
