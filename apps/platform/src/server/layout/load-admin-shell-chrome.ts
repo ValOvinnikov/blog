@@ -17,6 +17,7 @@ export const loadAdminShellChrome = async () => {
     isSidebarInitiallyCollapsed,
     // getTranslations' namespace-literal key generic is not assignable to a plain string key.
     tNavSections: tNavSections as unknown as TLooseTranslator,
-    userName: session?.user?.name ?? session?.user?.email ?? undefined,
+    userName: session?.user?.name ?? undefined,
+    userEmail: session?.user?.email ?? undefined,
   };
 };

@@ -177,12 +177,15 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Kruimelpad",
-    "roleChip": "{role} · {scope}"
+    "breadcrumbAriaLabel": "Kruimelpad"
   },
   "account": {
     "signOut": "Uitloggen",
-    "signedInAs": "Ingelogd als {email}"
+    "signedInAs": "Ingelogd als {email}",
+    "menuLabel": "Account",
+    "triggerCollapsedLabel": "Account: {name}, {email}",
+    "triggerCollapsedLabelNoName": "Account: {email}",
+    "roleLine": "{role} · {scope}"
   },
   "roleLabel": {
     "SUPERADMIN": "Superbeheerder",

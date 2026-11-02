@@ -309,6 +309,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:platform
 
+### `@platform/constants/account-menu` — `apps/platform/src/constants/account-menu.ts`
+
+- **ACCOUNT_MENU_APPEARANCE**: `SIDEBAR`, `PILL`
+- **ACCOUNT_MENU_PLACEMENT**: `FOOT`, `RAIL`, `PILL`
+
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`
@@ -387,7 +392,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/focus-ring` — `apps/platform/src/constants/focus-ring.ts`
 
-- **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`, `TOAST`
+- **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_2`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`, `TOAST`
 
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 

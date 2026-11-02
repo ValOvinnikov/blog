@@ -177,12 +177,15 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Fil d'Ariane",
-    "roleChip": "{role} · {scope}"
+    "breadcrumbAriaLabel": "Fil d'Ariane"
   },
   "account": {
     "signOut": "Se déconnecter",
-    "signedInAs": "Connecté en tant que {email}"
+    "signedInAs": "Connecté en tant que {email}",
+    "menuLabel": "Compte",
+    "triggerCollapsedLabel": "Compte : {name}, {email}",
+    "triggerCollapsedLabelNoName": "Compte : {email}",
+    "roleLine": "{role} · {scope}"
   },
   "roleLabel": {
     "SUPERADMIN": "Super-administrateur",

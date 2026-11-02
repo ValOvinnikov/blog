@@ -19,7 +19,7 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
   // Deduped against the ancestor layout's gate by `requireTenantById`'s own `cache()`.
   const { tenant, admin } = await requireTenantById(tenantId);
   const [
-    { isSidebarInitiallyCollapsed, tNavSections, userName },
+    { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail },
     t,
     unreadLeadsCount,
   ] = await Promise.all([
@@ -41,8 +41,9 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
         ),
       ]}
       crumb={<TenantBreadcrumb tenantId={tenant.id} tenantName={tenant.name} />}
-      roleChip={{
+      account={{
         name: userName,
+        email: userEmail,
         role: admin.role,
         scope: t('scopeLabel'),
       }}

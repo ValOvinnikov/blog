@@ -45,6 +45,15 @@ describe(`<${VoiceListRow.name}/>`, () => {
     expect(row).toHaveTextContent('Default');
   });
 
+  it('names the list with a button inside an h4', () => {
+    setup();
+
+    const heading = screen.getByRole('heading', { level: 4, name: /Tag page/ });
+    const row = screen.getByRole('button', { name: /Tag page/ });
+
+    expect(heading).toContainElement(row);
+  });
+
   it('summarises a customised value and announces that it is unsaved', () => {
     setup({ value: MOCK_VALUE });
 

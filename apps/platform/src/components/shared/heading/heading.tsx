@@ -2,7 +2,7 @@ import type { ReactNode, Ref } from 'react';
 
 import { headingVariants, type THeadingVariants } from './heading-variants';
 
-const HEADING_TAGS = {
+export const HEADING_TAGS = {
   1: 'h1',
   2: 'h2',
   3: 'h3',

@@ -34,6 +34,7 @@ const MOCK_SECTION = mockNavSection({ items: [MOCK_LOOK_ITEM] });
 const MOCK_BADGE = mockNavBadge();
 const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
+const MOCK_FOOT_TEXT = faker.lorem.words(2);
 const MOCK_DISABLED_REASON = faker.lorem.sentence();
 const MOCK_INERT_ITEM = mockNavInertItem({
   badge: MOCK_BADGE,
@@ -91,6 +92,17 @@ describe(`<${Sidebar.name}/>`, () => {
     const switcher = screen.getByText(MOCK_SWITCHER_TEXT);
 
     expect(switcher).toBeVisible();
+  });
+
+  it('renders the foot slot after the nav', () => {
+    renderSidebar({
+      sections: [MOCK_SECTION],
+      foot: <div>{MOCK_FOOT_TEXT}</div>,
+    });
+
+    const sidebar = screen.getByRole('complementary');
+
+    expect(sidebar).toHaveTextContent(new RegExp(`${MOCK_FOOT_TEXT}$`));
   });
 
   it('renders the brand name and tagline', () => {

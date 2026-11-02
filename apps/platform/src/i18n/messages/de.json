@@ -177,12 +177,15 @@
     "triggerLabel": "Menü"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Brotkrumennavigation",
-    "roleChip": "{role} · {scope}"
+    "breadcrumbAriaLabel": "Brotkrumennavigation"
   },
   "account": {
     "signOut": "Abmelden",
-    "signedInAs": "Angemeldet als {email}"
+    "signedInAs": "Angemeldet als {email}",
+    "menuLabel": "Konto",
+    "triggerCollapsedLabel": "Konto: {name}, {email}",
+    "triggerCollapsedLabelNoName": "Konto: {email}",
+    "roleLine": "{role} · {scope}"
   },
   "roleLabel": {
     "SUPERADMIN": "Superadmin",

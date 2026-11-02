@@ -67,6 +67,7 @@ export const VoiceListRow = ({
   return (
     <Accordion.Item value={field.id}>
       <Accordion.Trigger
+        headingLevel={4}
         aria-describedby={collapsedError === undefined ? undefined : errorId}
       >
         <span className={labelGroup()}>

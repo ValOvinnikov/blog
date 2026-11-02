@@ -20,13 +20,18 @@ export function tenantDetailsFields(
   };
 }
 
-export function changesTenantDetails(
+const EDITABLE_AFTER_PROVISIONING: readonly (keyof TTenantDetailsFields)[] = [
+  'plan',
+];
+
+export function changesProvisionedTenantDetails(
   next: TTenantDetailsFields,
   existing: TTenant,
 ): boolean {
   const current = tenantDetailsFields(existing);
-  return (Object.keys(next) as (keyof TTenantDetailsFields)[]).some(
-    (key) => next[key] !== current[key],
+  return (Object.keys(current) as (keyof TTenantDetailsFields)[]).some(
+    (key) =>
+      !EDITABLE_AFTER_PROVISIONING.includes(key) && next[key] !== current[key],
   );
 }
 
