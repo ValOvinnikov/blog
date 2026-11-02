@@ -19,6 +19,7 @@ import { buildLookFormContext } from './build-look-form-context';
 import { useLookDraftFields } from './use-look-draft-fields';
 import { useLookSave } from './use-look-save';
 import { useLookSaveErrors } from './use-look-save-errors';
+import { usePreviewDevice } from './use-preview-device';
 
 type TUseLookFormStateArgs = {
   tenantId: string;
@@ -46,6 +47,7 @@ export const useLookFormState = ({
   const draftFields = useLookDraftFields();
   const [repickKinds, setRepickKinds] = useState<TBrandAssetKind[]>([]);
   const [isSubmenuPreviewOpen, setIsSubmenuPreviewOpen] = useState(false);
+  const { previewDevice, setPreviewDevice } = usePreviewDevice();
 
   const {
     values,
@@ -116,6 +118,8 @@ export const useLookFormState = ({
     brandImageError: fieldError,
     isSubmenuPreviewOpen,
     setIsSubmenuPreviewOpen,
+    previewDevice,
+    setPreviewDevice,
   });
 
   return { lookForm, isPending, form: { ...form, saveError } };

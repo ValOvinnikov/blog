@@ -424,6 +424,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **LEAD_REFUSAL**: `NOT_FOUND`
 - **LEAD_LOG**: `DELETE_FAILED`=`"leads.delete_failed"`, `LOAD_FAILED`=`"leads.load_failed"`, `READ_STATE_FAILED`=`"leads.read_state_failed"`, `PAGE_TITLE_SKIPPED`=`"leads.page_title_skipped"`, `PAGE_TITLE_FAILED`=`"leads.page_title_failed"`, `PAGE_TITLE_ERROR`=`"leads.page_title_error"`
 
+### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
+
+- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`
+
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 
 - **MENU_RADIO_GROUP_SIZE**: `DESKTOP`, `TOUCH`

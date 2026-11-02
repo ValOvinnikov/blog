@@ -651,6 +651,11 @@
     "headerDescription": "Wie die obere Leiste Ihrer Website aufgebaut ist und wie sich ihre Untermenüs öffnen.",
     "headerLayoutLabel": "Layout",
     "headerLayoutDescription": "Wo Logo, Links und Schaltflächen auf breiten Bildschirmen sitzen. Auf dem Handy gibt es immer die Leiste mit Menü-Schaltfläche.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "Die Vorschau zeigt das Smartphone, daher erscheint die Leiste mit einer Menütaste.",
+      "TABLET": "Die Vorschau zeigt das Tablet, daher erscheint die Leiste mit einer Menütaste."
+    },
+    "headerShowOnDesktop": "Auf Desktop zeigen",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Klassisch",
       "LINKS_BESIDE_BRAND": "Links neben der Marke",
@@ -774,10 +779,6 @@
     "firstCardExcerpt": "Eine verlinkte Karte, wie Beitragslisten sie darstellen.",
     "secondCardTitle": "Kurs auf die nächste Saison",
     "secondCardExcerpt": "Eine statische Karte. Ihr Rahmen folgt Ihrem Kartenstil.",
-    "previewNote": "Aus den eigenen Komponenten der Website gebaut. Nichts ist live, bis Sie speichern.",
-    "widthDesktop": "Desktop",
-    "widthMobile": "Mobil",
-    "previewWidthAriaLabel": "Vorschaubreite",
     "navPosts": "Beiträge",
     "navAbout": "Über uns",
     "navTopics": "Themen",
@@ -792,6 +793,8 @@
     "readerStateAriaLabel": "Leser",
     "readerSignedOut": "Abgemeldet",
     "readerSignedIn": "Angemeldet",
+    "readerSignedInTooltip": "Angemeldet als {name}",
+    "readerAccountsOff": "Leserkonten sind für diese Website deaktiviert, daher gibt es keinen Leser-Schalter.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Konto",
     "accountMenuAriaLabel": "Kontomenü",

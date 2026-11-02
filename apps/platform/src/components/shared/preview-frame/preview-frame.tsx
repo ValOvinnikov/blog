@@ -22,6 +22,7 @@ type TPreviewFrameProps = {
   actions?: ReactNode;
   isNarrow?: boolean;
   notes?: ReactNode;
+  isToolbarFirst?: boolean;
   children: ReactNode;
 };
 
@@ -32,6 +33,7 @@ const PreviewFrameRoot = ({
   actions,
   isNarrow = false,
   notes,
+  isToolbarFirst = false,
   children,
 }: TPreviewFrameProps) => {
   const {
@@ -47,7 +49,7 @@ const PreviewFrameRoot = ({
 
   return (
     <section aria-label={ariaLabel} className={root()}>
-      {slots.Heading}
+      {!isToolbarFirst && slots.Heading}
       {hasToolbar && (
         <div className={toolbar()}>
           {widthControl}
@@ -56,6 +58,7 @@ const PreviewFrameRoot = ({
         </div>
       )}
       {slots.Toolbar}
+      {isToolbarFirst && slots.Heading}
       {hasArrayGotItems(unmatched) && (
         <div className={stage()}>
           <div className={frame()}>
