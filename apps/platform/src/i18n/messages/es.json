@@ -185,7 +185,12 @@
     "menuLabel": "Cuenta",
     "triggerCollapsedLabel": "Cuenta: {name}, {email}",
     "triggerCollapsedLabelNoName": "Cuenta: {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Tema",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "themeSystem": "Sistema",
+    "themeSystemHint": "Sistema sigue el ajuste de tu dispositivo."
   },
   "roleLabel": {
     "SUPERADMIN": "Superadministrador",

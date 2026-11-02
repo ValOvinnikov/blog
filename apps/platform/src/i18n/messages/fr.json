@@ -185,7 +185,12 @@
     "menuLabel": "Compte",
     "triggerCollapsedLabel": "Compte : {name}, {email}",
     "triggerCollapsedLabelNoName": "Compte : {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Thème",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeSystem": "Système",
+    "themeSystemHint": "Système suit le réglage de votre appareil."
   },
   "roleLabel": {
     "SUPERADMIN": "Super-administrateur",

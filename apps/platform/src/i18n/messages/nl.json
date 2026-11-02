@@ -185,7 +185,12 @@
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
     "triggerCollapsedLabelNoName": "Account: {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Thema",
+    "themeLight": "Licht",
+    "themeDark": "Donker",
+    "themeSystem": "Systeem",
+    "themeSystemHint": "Systeem volgt de instelling van je apparaat."
   },
   "roleLabel": {
     "SUPERADMIN": "Superbeheerder",

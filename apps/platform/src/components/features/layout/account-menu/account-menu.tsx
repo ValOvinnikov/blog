@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl';
 import { startTransition, useRef } from 'react';
 
 import { accountMenuVariants } from './account-menu-variants';
+import { AccountThemeSection } from './components/account-theme-section';
 
 export type TAccount = {
   name: TMaybeUndefined<string>;
@@ -131,6 +132,9 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
               {hasEmailLine && <span className={headerEmail()}>{email}</span>}
               <span className={headerRole()}>{roleLine}</span>
             </div>
+            {placement !== ACCOUNT_MENU_PLACEMENT.PILL && (
+              <AccountThemeSection />
+            )}
             <Menu.Item
               ref={signOutRef}
               className={item()}
