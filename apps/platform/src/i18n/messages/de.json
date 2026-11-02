@@ -1800,5 +1800,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— im Growth-Tarif enthalten"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Dashboard öffnen",
+    "GROWTH": {
+      "subject": "Deine Website ist jetzt im Growth-Tarif",
+      "previewText": "{siteName} kann jetzt alle Growth-Optionen nutzen.",
+      "changed": "{siteName} ist jetzt im Growth-Tarif.",
+      "options": "Die Growth-Optionen sind jetzt auf deiner Website verfügbar: mehr Sprachen, alle Einstellungen für das Erscheinungsbild, zusätzliche Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
+      "kept": "Alles, was du früher im Growth-Tarif eingerichtet hattest, ist wieder so da, wie du es hinterlassen hast."
+    },
+    "FREE": {
+      "subject": "Deine Website ist jetzt im Free-Tarif",
+      "previewText": "Die Growth-Optionen sind auf {siteName} ausgeschaltet.",
+      "changed": "{siteName} ist jetzt im Free-Tarif.",
+      "options": "Die Growth-Optionen sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, Growth-Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
+      "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu Growth wechselst."
+    }
   }
 }

@@ -21,6 +21,7 @@ import { auth } from '@platform/server/auth/auth';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { enqueueOwnerAccessRequest } from '@platform/server/owner-access/request-owner-access';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { notifyOwnerOfPlanChange } from '@platform/server/tenants/notify-owner-of-plan-change';
 import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
 import {
   MOCK_OPERATOR_ID,
@@ -84,6 +85,10 @@ vi.mock('@platform/server/tenants/send-owner-invite-email', () => ({
   sendOwnerInviteEmail: vi.fn(),
 }));
 
+vi.mock('@platform/server/tenants/notify-owner-of-plan-change', () => ({
+  notifyOwnerOfPlanChange: vi.fn(),
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {
@@ -101,6 +106,7 @@ const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);
+const notifyOwnerOfPlanChangeMock = vi.mocked(notifyOwnerOfPlanChange);
 const enqueueOwnerAccessRequestMock = vi.mocked(enqueueOwnerAccessRequest);
 
 const {
@@ -142,6 +148,7 @@ describe(updateTenantDetailsAction, () => {
     insertAuditEventMock.mockResolvedValue({ id: MOCK_AUDIT_EVENT_ID });
     loggerErrorMock.mockReset();
     sendOwnerInviteEmailMock.mockReset();
+    notifyOwnerOfPlanChangeMock.mockReset();
     enqueueOwnerAccessRequestMock.mockReset();
     enqueueOwnerAccessRequestMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -390,6 +397,29 @@ describe(updateTenantDetailsAction, () => {
     await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
 
     expect(revalidateSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  });
+
+  it('tells the owner about the plan change from the stored plan to the saved one', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({ plan: TENANT_PLAN.GROWTH }),
+    );
+
+    const result = await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
+
+    expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
+    expect(notifyOwnerOfPlanChangeMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      TENANT_PLAN.GROWTH,
+      MOCK_UPDATED_TENANT.plan,
+    );
+  });
+
+  it('sends no plan change notice when the update is refused', async () => {
+    updateTenantDetailsMock.mockResolvedValue({ outcome: DOMAIN_TAKEN });
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
+
+    expect(notifyOwnerOfPlanChangeMock).not.toHaveBeenCalled();
   });
 
   it('records a SETTINGS_UPDATED audit event with the operator as actor', async () => {

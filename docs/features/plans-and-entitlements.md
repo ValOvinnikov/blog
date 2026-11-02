@@ -13,6 +13,8 @@ code:
   - apps/platform/src/utils/settings-features-fields/**
   - apps/platform/src/server/settings-features/**
   - apps/platform/src/server/tenant-pages/**
+  - apps/platform/src/server/tenants/notify-owner-of-plan-change.ts
+  - packages/email/src/templates/owner/owner-plan-change/**
   - apps/platform/src/components/features/capabilities/**
   - apps/web/src/server/settings-features/**
   - apps/web/src/utils/to-effective-settings-features/**
@@ -34,6 +36,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 ## Surfaces and routes
 
 - **Platform, operator** — the plan picker in the Add tenant form and the tenant details panel; the plan shows in the tenants table and on the owner's home card.
+- **Owner email** — a saved plan change emails the owner once (see Configuration).
 - **Platform, Features page** — `/dashboard/features` (owner) and `/tenants/{id}/features` (operator). Seven capability rows: a "Coming soon" row has no switch, and a row outside the plan is locked with a "Growth plan" badge.
 - **Platform, plan-gated pages** — `/dashboard/languages` and `/dashboard/email` answer 404 when the plan does not open them. Subscribers, Comments and Team are sidebar entries with a "Coming soon" badge and no page.
 - **Public site** — no route of its own. It gates `/bookmarks` (404 with no reader-account capability) and `/account` (404 there only to a signed-out visitor), the header account menu, the bookmark button, the newsletter module and its server action, Vercel Analytics and Speed Insights, and the consent banner. A page renders only the module types its tenant's plan entitles.
@@ -53,6 +56,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 ## Configuration
 
 - **Operator** (any `admins` row) sets the plan through `createTenantAction` and `updateTenantDetailsAction`, both behind `requireAdmin`. The plan stays editable in the tenant details panel once provisioning has succeeded, and locks only while provisioning is running and on an archived tenant. A change applies on the site's next page load and deletes no stored data; a downgrade only hides what the new plan does not hold.
+- **Plan change email** — when `updateTenantDetailsAction` saves a plan that differs from the stored one, `notifyOwnerOfPlanChange(tenantId, fromPlan, toPlan)` emails the owner through `@blog/email`'s `buildOwnerPlanChangeEmail`: the upgrade or downgrade notice, with an "Open your dashboard" button to the tenant's dashboard. The copy is fixed platform copy (never Voice), in the `ownerPlanChangeEmail` namespace of the platform's message catalogues, written in the site's default language (`tenants.locale`). It goes to `getTenantOwnerEmail`, which is the pending owner-invite address until the owner joins, from `OWNER_EMAIL_FROM_ADDRESS`. With no sender address or `PLATFORM_APP_BASE_URL` it is skipped and logged (`tenants.plan_change_email_unconfigured`); with no owner address too (`tenants.plan_change_email_owner_missing`). A failed send is logged (`tenants.plan_change_email_failed`) and never fails or undoes the save.
 - **Owner or operator** saves Features through `updateFeaturesAction`, behind `requireTenantMembership` (any member; an operator gets a virtual owner membership).
 - **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` on `FREE`.
 - **Plan page access** (`planPageAccess`) — Languages when `PLAN_LOCALE_LIMIT` > 1; Email when the plan holds bookmarks, comments or newsletter; Subscribers with newsletter; Comments with comments; Team on any plan but `FREE`. The owner's sidebar omits the rest and their pages 404; the operator's `/tenants/{id}` view shows every entry and page whatever the plan.
@@ -93,6 +97,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `apps/platform/src/server/tenant-pages/render-tenant-scoped-page.ts`
 - `apps/platform/src/utils/settings-features-fields/settings-features-fields.ts`
 - `apps/platform/src/server/settings-features/update-features-action.ts`
+- `apps/platform/src/server/tenants/notify-owner-of-plan-change.ts` — the owner's plan change email
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx` — passes the plan's `modulePacks` to `StudioMount`
 - `apps/platform/src/utils/nav-sections/nav-sections.ts`
@@ -107,10 +112,11 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 ## Tests and stories
 
-- Platform: `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`, and `studio-mount-view.test.tsx`.
+- Platform: `notify-owner-of-plan-change.test.ts`, `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`, and `studio-mount-view.test.tsx`.
 - Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`, `module-renderer.test.tsx`.
 - db: `packages/db/src/queries/settings-features/**/*.test.ts`, `get-tenant-live-locales.test.ts`, `set-tenant-additional-locales.test.ts`.
 - Config: `module-pack.test.ts`.
+- Email: `owner-plan-change.test.ts`.
 - Studio: `get-missing-requirement.test.ts`, `mark-requirement-off-types.test.ts`, `entitlement-gates.test.ts`, `validate-modules-entitled.test.ts`, `entitled-module.test.ts`.
 - No Storybook stories; the platform has none.
 

@@ -1800,5 +1800,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— onderdeel van het Growth-abonnement"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Open je dashboard",
+    "GROWTH": {
+      "subject": "Je site staat nu op het Growth-plan",
+      "previewText": "{siteName} kan nu alle Growth-opties gebruiken.",
+      "changed": "{siteName} staat nu op het Growth-plan.",
+      "options": "De Growth-opties zijn nu beschikbaar op je site: meer talen, alle instellingen voor Uiterlijk, extra paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
+      "kept": "Wat je eerder op Growth had ingesteld, is terug zoals je het achterliet."
+    },
+    "FREE": {
+      "subject": "Je site staat nu op het Free-plan",
+      "previewText": "De Growth-opties staan uit op {siteName}.",
+      "changed": "{siteName} staat nu op het Free-plan.",
+      "options": "De Growth-opties staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, Growth-paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
+      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar Growth."
+    }
   }
 }

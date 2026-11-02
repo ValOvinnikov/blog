@@ -18,3 +18,7 @@ export {
   buildOwnerDeletionNoticeEmail,
   type TOwnerDeletionNoticeEmailInput,
 } from './owner-deletion-notice/owner-deletion-notice';
+export {
+  buildOwnerPlanChangeEmail,
+  type TOwnerPlanChangeEmailInput,
+} from './owner-plan-change/owner-plan-change';

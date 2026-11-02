@@ -1800,5 +1800,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— fait partie de la formule Growth"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Ouvrir votre tableau de bord",
+    "GROWTH": {
+      "subject": "Votre site est passé à l’offre Growth",
+      "previewText": "{siteName} peut désormais utiliser toutes les options Growth.",
+      "changed": "{siteName} est désormais sur l’offre Growth.",
+      "options": "Les options Growth sont maintenant disponibles sur votre site : plus de langues, tous les réglages d’Apparence, des modules de page supplémentaires et des fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
+      "kept": "Tout ce que vous aviez configuré avec Growth est de retour, tel que vous l’aviez laissé."
+    },
+    "FREE": {
+      "subject": "Votre site est passé à l’offre Free",
+      "previewText": "Les options Growth sont désactivées sur {siteName}.",
+      "changed": "{siteName} est désormais sur l’offre Free.",
+      "options": "Les options Growth sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page Growth et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
+      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à Growth."
+    }
   }
 }

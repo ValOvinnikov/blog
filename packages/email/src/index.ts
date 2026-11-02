@@ -41,6 +41,8 @@ export {
   type TOwnerInactivityWarningEmailInput,
   buildOwnerDeletionNoticeEmail,
   type TOwnerDeletionNoticeEmailInput,
+  buildOwnerPlanChangeEmail,
+  type TOwnerPlanChangeEmailInput,
 } from './templates/owner';
 export {
   buildMagicLinkEmail,
