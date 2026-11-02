@@ -177,6 +177,20 @@ switches the content column to full-bleed (see
   stays on one line with an ellipsis and carries its full text as its `title`,
   so the operator's "Tenant · {name}" group reads on hover; the "Platform
   actions" rows take the row colours with a neutral "platform" pill.
+  The sidebar is an `<aside id="sidebar">` named "Sidebar"; its brand row is
+  the gradient mark, wordmark and "admin" expanded, and the mark alone,
+  centred, collapsed. The collapse toggle is the topbar's first item from
+  `md` (below `md` that slot holds the phone Menu button and the toggle never
+  renders): a 36×36 `control-line` box on `surface` with the unrotated 16px
+  `ICONS.SIDEBAR` glyph in `muted`, hovering and focusing to a `brand-ink`
+  border and `text` icon, focus adding the `bg`-gapped `brand-ink` ring. It is
+  named "Collapse sidebar" or "Expand sidebar" with `aria-expanded` and
+  `aria-controls="sidebar"`, carries no native `title`, and shows that name in
+  the shared Tooltip below it, left-aligned, 6px away. The topbar is 59px tall
+  from `md` and 67px below it, and `--spacing-admin-topbar` (a media-query
+  override of `--admin-topbar`) holds that real height, so
+  `scroll-pt-admin-topbar` anchors and every `top-admin-topbar` sticky panel
+  sit flush under the bar.
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its

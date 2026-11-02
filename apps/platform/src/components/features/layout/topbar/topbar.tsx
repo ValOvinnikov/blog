@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { AccountMenu } from './components/account-menu';
+import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
 import { TopbarNavMenu } from './components/topbar-nav-menu';
 import { topbarVariants } from './topbar-variants';
 
@@ -34,6 +35,7 @@ export const Topbar = ({
 
   return (
     <header className={root()}>
+      <SidebarCollapseToggle />
       {sections && <TopbarNavMenu sections={sections} switcher={switcher} />}
       {crumb}
       <AccountMenu

@@ -157,6 +157,7 @@
     "label": "Pagina wordt geladen…"
   },
   "sidebar": {
+    "ariaLabel": "Zijbalk",
     "brandName": "Valstack",
     "brandTagline": "admin",
     "collapseToggle": "Zijbalk inklappen",

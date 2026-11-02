@@ -157,6 +157,7 @@
     "label": "Seite wird geladen…"
   },
   "sidebar": {
+    "ariaLabel": "Seitenleiste",
     "brandName": "Valstack",
     "brandTagline": "admin",
     "collapseToggle": "Seitenleiste einklappen",
