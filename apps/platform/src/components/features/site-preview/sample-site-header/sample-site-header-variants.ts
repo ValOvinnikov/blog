@@ -13,7 +13,7 @@ export const sampleSiteHeaderVariants = tv({
   variants: {
     barStyle: {
       [HEADER_BAR_STYLE.FULL_WIDTH]: {
-        root: ['border-b border-border'],
+        root: ['border-b border-border @max-[64rem]:-mx-card-x'],
         full: ['pb-3'],
         bar: ['px-4 @[40rem]:px-8'],
       },
