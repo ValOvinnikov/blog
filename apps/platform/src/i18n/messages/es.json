@@ -1809,5 +1809,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— forma parte del plan Growth"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Abrir tu panel",
+    "GROWTH": {
+      "subject": "Tu sitio ya está en el plan Growth",
+      "previewText": "{siteName} ya puede usar todas las opciones de Growth.",
+      "changed": "{siteName} ya está en el plan Growth.",
+      "options": "Las opciones de Growth ya están disponibles en tu sitio: más idiomas, todos los ajustes de Aspecto, módulos de página adicionales y funciones como el formulario de contacto, los marcadores y las estadísticas.",
+      "kept": "Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
+    },
+    "FREE": {
+      "subject": "Tu sitio ya está en el plan Free",
+      "previewText": "Las opciones de Growth están desactivadas en {siteName}.",
+      "changed": "{siteName} ya está en el plan Free.",
+      "options": "Las opciones de Growth están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de Growth y funciones como el formulario de contacto, los marcadores y las estadísticas.",
+      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a Growth."
+    }
   }
 }

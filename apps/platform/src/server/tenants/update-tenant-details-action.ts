@@ -126,7 +126,12 @@ export const updateTenantDetailsAction = async (
 
     switch (result.outcome) {
       case TENANT_DETAILS_UPDATE_OUTCOME.UPDATED:
-        return completeTenantDetailsUpdate(tenantId, parsed.data, result);
+        return completeTenantDetailsUpdate(
+          tenantId,
+          parsed.data,
+          result,
+          tenant.plan,
+        );
       case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN:
         return {
           outcome: ACTION_OUTCOME.INVALID,

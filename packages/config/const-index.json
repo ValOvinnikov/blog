@@ -6378,6 +6378,30 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "tenants.plan_change_email_failed": [
+      {
+        "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.plan_change_email_owner_missing": [
+      {
+        "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.plan_change_email_unconfigured": [
+      {
+        "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "tenants.platform_tenant_refused": [
       {
         "ref": "TENANT_LOG.PLATFORM_TENANT_REFUSED",

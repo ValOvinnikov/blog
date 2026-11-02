@@ -62,6 +62,9 @@ export const TENANT_LOG = {
   DOMAIN_AVAILABILITY_INVALID_DOMAIN:
     'tenants.domain_availability_invalid_domain',
   OWNER_INVITE_EMAIL_FAILED: 'tenants.owner_invite_email_failed',
+  PLAN_CHANGE_EMAIL_FAILED: 'tenants.plan_change_email_failed',
+  PLAN_CHANGE_EMAIL_OWNER_MISSING: 'tenants.plan_change_email_owner_missing',
+  PLAN_CHANGE_EMAIL_UNCONFIGURED: 'tenants.plan_change_email_unconfigured',
   PLATFORM_TENANT_REFUSED: 'tenants.platform_tenant_refused',
   ROOT_DOMAIN_MISSING: 'tenants.root_domain_missing',
   SIGN_IN_ACTIVITY_FAILED: 'tenant.sign_in_activity_failed',
