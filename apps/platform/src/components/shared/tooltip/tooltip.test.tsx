@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { render, screen, waitFor } from '@platform/testing/custom-render';
+import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Tooltip } from './tooltip';
@@ -8,7 +9,6 @@ import { Tooltip } from './tooltip';
 faker.seed(6370);
 
 const MOCK_LABEL = faker.lorem.words(2);
-const HOVER_TIMEOUT = { timeout: 2000 };
 
 const renderTooltip = () =>
   render(
@@ -80,7 +80,7 @@ describe(`<${Tooltip.name}/>`, () => {
   describe('once opened by hover', () => {
     beforeEach(async () => {
       await user.hover(trigger);
-      await screen.findByText(MOCK_LABEL, {}, HOVER_TIMEOUT);
+      await screen.findByText(MOCK_LABEL, {}, TOOLTIP_HOVER_TIMEOUT);
     });
 
     it('shows its label after the hover delay', () => {

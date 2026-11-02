@@ -2,10 +2,15 @@ import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import { ARIA_CURRENT } from '@platform/testing/aria';
+import {
+  ARIA_CURRENT,
+  ARIA_DISABLED,
+  ARIA_HIDDEN,
+} from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
+  waitFor,
   within,
 } from '@platform/testing/custom-render';
 import {
@@ -14,6 +19,8 @@ import {
   mockNavLinkItem,
   mockNavSection,
 } from '@platform/testing/layout/fixtures';
+import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Sidebar, type TSidebarProps } from './sidebar';
 
@@ -139,6 +146,17 @@ describe(`<${Sidebar.name}/>`, () => {
     },
   );
 
+  it.each([
+    { kind: 'nav link', item: MOCK_LOOK_ITEM },
+    { kind: 'inert row', item: MOCK_INERT_ITEM },
+  ])('titles each expanded $kind with its label', ({ item }) => {
+    renderSidebar({ sections: [mockNavSection({ items: [item] })] });
+
+    const row = screen.getByRole('link', { name: new RegExp(item.label) });
+
+    expect(row).toHaveAttribute('title', item.label);
+  });
+
   it('renders an item with no href as an inert row with its reason and badge', () => {
     renderSidebar({
       sections: [mockNavSection({ items: [MOCK_INERT_ITEM] })],
@@ -151,7 +169,7 @@ describe(`<${Sidebar.name}/>`, () => {
     const reason = screen.getByText(MOCK_DISABLED_REASON);
     const badge = screen.getByText(MOCK_BADGE.label);
 
-    expect(row).toHaveAttribute('aria-disabled', 'true');
+    expect(row).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(row).not.toHaveAttribute('href');
     expect(label).toBeVisible();
     expect(reason).toBeVisible();
@@ -159,7 +177,10 @@ describe(`<${Sidebar.name}/>`, () => {
   });
 
   describe('when the sidebar starts collapsed', () => {
+    let user: UserEvent;
+
     beforeEach(() => {
+      user = userEvent.setup();
       renderSidebar(
         {
           sections: [
@@ -170,19 +191,68 @@ describe(`<${Sidebar.name}/>`, () => {
       );
     });
 
-    it('keeps a nav link named and titled', () => {
+    it('keeps a nav link named with no native title', () => {
       const link = screen.getByRole('link', { name: MOCK_LOOK_ITEM.label });
 
       expect(link).toHaveAttribute('href', MOCK_LOOK_ITEM.href);
-      expect(link).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
+      expect(link).not.toHaveAttribute('title');
     });
 
-    it('keeps an inert row labelled and its badge visible', () => {
+    it('keeps an inert row labelled, its badge visible and no native title', () => {
+      const row = screen.getByRole('link', {
+        name: new RegExp(MOCK_INERT_ITEM.label),
+      });
       const label = screen.getByText(MOCK_INERT_ITEM.label);
       const badge = screen.getByText(MOCK_BADGE.label);
 
+      expect(row).not.toHaveAttribute('title');
       expect(label).toBeVisible();
       expect(badge).toBeVisible();
+    });
+
+    describe('once a nav link takes keyboard focus', () => {
+      let link: HTMLElement;
+
+      beforeEach(async () => {
+        link = screen.getByRole('link', { name: MOCK_LOOK_ITEM.label });
+        await user.tab();
+        await user.tab();
+      });
+
+      it('shows its name in a tooltip and keeps its accessible name', () => {
+        const [, tooltip] = screen.getAllByText(MOCK_LOOK_ITEM.label);
+
+        expect(link).toHaveFocus();
+        expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(link).toHaveAccessibleName(MOCK_LOOK_ITEM.label);
+        expect(link).not.toHaveAccessibleDescription();
+      });
+
+      it('hides the tooltip on Escape', async () => {
+        await user.keyboard('{Escape}');
+
+        await waitFor(() => {
+          const names = screen.getAllByText(MOCK_LOOK_ITEM.label);
+
+          expect(names).toHaveLength(1);
+        });
+      });
+    });
+
+    it("shows only an inert row's name in its tooltip on hover", async () => {
+      const row = screen.getByRole('link', {
+        name: new RegExp(MOCK_INERT_ITEM.label),
+      });
+
+      await user.hover(row);
+
+      await waitFor(() => {
+        const [, tooltip] = screen.getAllByText(MOCK_INERT_ITEM.label);
+
+        expect(tooltip).toHaveTextContent(
+          new RegExp(`^${MOCK_INERT_ITEM.label}$`),
+        );
+      }, TOOLTIP_HOVER_TIMEOUT);
     });
   });
 });
