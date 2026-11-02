@@ -20,14 +20,15 @@ const configurationOfDashboard = (access: TPlanPageAccess = EVERY_PLAN_PAGE) =>
   dashboardNavSections(t, access)[2]!;
 
 describe(dashboardNavSections, () => {
-  it("badges the Studio link with the owner's access state", () => {
-    const [, content] = dashboardNavSections(t, EVERY_PLAN_PAGE, {
-      access: OWNER_STUDIO_ACCESS.STALLED,
-      hasEntered: false,
-    });
+  it("gives the Studio link the owner's access line", () => {
+    const [, content] = dashboardNavSections(
+      t,
+      EVERY_PLAN_PAGE,
+      OWNER_STUDIO_ACCESS.STALLED,
+    );
 
-    expect(content!.items[0]?.badge?.label).toBe(
-      t(`studioAccess.${OWNER_STUDIO_ACCESS.STALLED}`),
+    expect(content!.items[0]?.status?.text).toBe(
+      t(`studioAccessLine.${OWNER_STUDIO_ACCESS.STALLED}`),
     );
   });
 

@@ -1,4 +1,8 @@
 import {
+  NavItemStatus,
+  type TNavItemStatus,
+} from '@platform/components/features/layout/nav-item-content/components/nav-item-status';
+import {
   Icon,
   type TRegisteredIconName,
 } from '@platform/components/shared/icon';
@@ -20,6 +24,7 @@ export type TNavItemContentProps = {
   label: string;
   disabledReason?: string;
   badge?: TNavItemBadge;
+  status?: TNavItemStatus;
 };
 
 export const NavItemContent = ({
@@ -27,9 +32,10 @@ export const NavItemContent = ({
   label,
   disabledReason,
   badge,
+  status,
 }: TNavItemContentProps) => {
   const { rowIcon, rowBody, rowLabel, rowReason, badgeSlot } =
-    navItemContentVariants();
+    navItemContentVariants({ hasStatus: !!status });
 
   return (
     <>
@@ -39,6 +45,7 @@ export const NavItemContent = ({
         {disabledReason && (
           <span className={rowReason()}>{disabledReason}</span>
         )}
+        {status && <NavItemStatus status={status} />}
       </span>
       {badge && (
         <StatusBadge

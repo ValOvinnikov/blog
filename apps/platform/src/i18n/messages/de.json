@@ -222,15 +222,17 @@
     "features": "Funktionen",
     "leads": "Anfragen",
     "releases": "Releases",
-    "studioAccess": {
-      "INVITE_SENT": "Einladung gesendet",
-      "ACTIVATING": "Wird aktiviert",
-      "READY": "Bereit",
-      "STALLED": "Aktion nötig"
+    "studioAccessLine": {
+      "INVITE_SENT": "Einladung gesendet — E-Mail prüfen",
+      "ACTIVATING": "Wird eingerichtet…",
+      "STALLED": "Erfordert Aufmerksamkeit"
     },
     "blockedSignups": "Gesperrte Registrierungen",
     "dataRequests": "Datenanfragen",
     "badgeUnreadLeads": "{count} neu"
+  },
+  "navItemContent": {
+    "statusSeparator": ","
   },
   "tenantLayout": {
     "scopeLabel": "Mandant"

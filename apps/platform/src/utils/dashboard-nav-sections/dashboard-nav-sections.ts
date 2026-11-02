@@ -1,5 +1,6 @@
 import { ICONS } from '@blog/config';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
+import type { TOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import {
   configurationNavItems,
@@ -7,15 +8,12 @@ import {
 } from '@platform/utils/nav-sections/nav-sections';
 import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import {
-  studioNavItem,
-  type TStudioNavState,
-} from '@platform/utils/studio-nav-item/studio-nav-item';
+import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
 
 export const dashboardNavSections = (
   t: TLooseTranslator,
   access: TPlanPageAccess,
-  studio?: TStudioNavState,
+  studioAccess?: TOwnerStudioAccess,
   unreadLeadsCount = 0,
 ): TSidebarNavSection[] => {
   const hrefs: TTenantNavHrefs = {
@@ -42,7 +40,7 @@ export const dashboardNavSections = (
     },
     {
       label: t('contentSectionLabel'),
-      items: [studioNavItem(t, hrefs.studio, studio)],
+      items: [studioNavItem(t, hrefs.studio, studioAccess)],
     },
     {
       label: t('configurationSectionLabel'),

@@ -8,6 +8,12 @@ const t = makeEnTranslator('navSections');
 
 const studioHref = adminRoutes.dashboardStudio();
 
+const PENDING_ACCESSES = [
+  OWNER_STUDIO_ACCESS.INVITE_SENT,
+  OWNER_STUDIO_ACCESS.ACTIVATING,
+  OWNER_STUDIO_ACCESS.STALLED,
+];
+
 describe(studioNavItem, () => {
   it('links to the given Studio route', () => {
     const { href } = studioNavItem(t, studioHref);
@@ -15,42 +21,35 @@ describe(studioNavItem, () => {
     expect(href).toBe(studioHref);
   });
 
-  it('badges each owner access state with a label of its own', () => {
-    const labels = Object.values(OWNER_STUDIO_ACCESS).map(
-      (access) =>
-        studioNavItem(t, studioHref, { access, hasEntered: false }).badge
-          ?.label,
+  it.each(PENDING_ACCESSES)('carries the %s access line', (access) => {
+    const { status } = studioNavItem(t, studioHref, access);
+
+    expect(status?.text).toBe(t(`studioAccessLine.${access}`));
+  });
+
+  it('gives each pending access state an icon of its own', () => {
+    const icons = PENDING_ACCESSES.map(
+      (access) => studioNavItem(t, studioHref, access).status?.icon,
     );
 
-    expect(labels.every(Boolean)).toBe(true);
-    expect(new Set(labels).size).toBe(labels.length);
+    expect(new Set(icons).size).toBe(PENDING_ACCESSES.length);
   });
 
-  it('carries no badge without an owner access state', () => {
-    const { badge } = studioNavItem(t, studioHref);
+  it.each([OWNER_STUDIO_ACCESS.READY, undefined])(
+    'carries no line when the access is %s',
+    (access) => {
+      const { status } = studioNavItem(t, studioHref, access);
 
-    expect(badge).toBeUndefined();
-  });
+      expect(status).toBeUndefined();
+    },
+  );
 
-  it('drops the Ready badge once the owner has entered the Studio', () => {
-    const { badge } = studioNavItem(t, studioHref, {
-      access: OWNER_STUDIO_ACCESS.READY,
-      hasEntered: true,
-    });
+  it.each(Object.values(OWNER_STUDIO_ACCESS))(
+    'never badges the %s state',
+    (access) => {
+      const { badge } = studioNavItem(t, studioHref, access);
 
-    expect(badge).toBeUndefined();
-  });
-
-  it.each([
-    OWNER_STUDIO_ACCESS.INVITE_SENT,
-    OWNER_STUDIO_ACCESS.ACTIVATING,
-    OWNER_STUDIO_ACCESS.STALLED,
-  ])('keeps the %s badge after a Studio entry', (access) => {
-    const { badge } = studioNavItem(t, studioHref, {
-      access,
-      hasEntered: true,
-    });
-
-    expect(badge?.label).toBe(t(`studioAccess.${access}`));
-  });
+      expect(badge).toBeUndefined();
+    },
+  );
 });

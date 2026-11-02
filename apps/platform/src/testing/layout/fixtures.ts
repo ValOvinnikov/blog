@@ -1,7 +1,10 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { TAccount } from '@platform/components/features/layout/account-menu';
-import type { TNavItemBadge } from '@platform/components/features/layout/nav-item-content';
+import type {
+  TNavItemBadge,
+  TNavItemStatus,
+} from '@platform/components/features/layout/nav-item-content';
 import type {
   TSidebarNavItem,
   TSidebarNavSection,
@@ -15,6 +18,15 @@ export const mockNavBadge = (
 ): TNavItemBadge => ({
   label: faker.lorem.words(2),
   tone: 'neutral',
+  ...overrides,
+});
+
+export const mockNavStatus = (
+  overrides: Partial<TNavItemStatus> = {},
+): TNavItemStatus => ({
+  text: faker.lorem.words(3),
+  icon: ICONS.MAIL,
+  tone: 'warn',
   ...overrides,
 });
 

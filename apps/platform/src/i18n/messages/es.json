@@ -222,15 +222,17 @@
     "features": "Funciones",
     "leads": "Contactos",
     "releases": "Versiones",
-    "studioAccess": {
-      "INVITE_SENT": "Invitación enviada",
-      "ACTIVATING": "Activando",
-      "READY": "Listo",
-      "STALLED": "Acción necesaria"
+    "studioAccessLine": {
+      "INVITE_SENT": "Invitación enviada — revise su correo",
+      "ACTIVATING": "Configurando…",
+      "STALLED": "Requiere atención"
     },
     "blockedSignups": "Registros bloqueados",
     "dataRequests": "Solicitudes de datos",
     "badgeUnreadLeads": "{count, plural, one {# nuevo} other {# nuevos}}"
+  },
+  "navItemContent": {
+    "statusSeparator": ","
   },
   "tenantLayout": {
     "scopeLabel": "Cliente"

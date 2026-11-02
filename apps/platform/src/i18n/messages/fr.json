@@ -222,15 +222,17 @@
     "features": "Fonctionnalités",
     "leads": "Messages reçus",
     "releases": "Versions",
-    "studioAccess": {
-      "INVITE_SENT": "Invitation envoyée",
-      "ACTIVATING": "Activation",
-      "READY": "Prêt",
-      "STALLED": "Action requise"
+    "studioAccessLine": {
+      "INVITE_SENT": "Invitation envoyée — consultez vos e-mails",
+      "ACTIVATING": "Configuration…",
+      "STALLED": "Nécessite votre attention"
     },
     "blockedSignups": "Inscriptions bloquées",
     "dataRequests": "Demandes de données",
     "badgeUnreadLeads": "{count, plural, one {# nouveau} other {# nouveaux}}"
+  },
+  "navItemContent": {
+    "statusSeparator": ","
   },
   "tenantLayout": {
     "scopeLabel": "Locataire"

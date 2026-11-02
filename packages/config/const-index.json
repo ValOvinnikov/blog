@@ -7433,6 +7433,14 @@
         "from": "@platform/constants/icon",
         "file": "apps/platform/src/constants/icon.ts"
       }
+    ],
+    "2.2": [
+      {
+        "ref": "ICON_STROKE_WIDTH.STATUS_LINE",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
     ]
   }
 }
