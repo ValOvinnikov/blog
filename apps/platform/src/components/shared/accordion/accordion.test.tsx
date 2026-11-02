@@ -1,13 +1,16 @@
 import { faker } from '@faker-js/faker';
+import { ACCORDION_VARIANT } from '@platform/constants/accordion';
+import { KEY } from '@platform/constants/keyboard';
 import {
   customRender,
   renderWithIntl,
   screen,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Accordion } from './accordion';
+import type { TAccordionActions } from './use-accordion-actions';
 
 faker.seed(5995);
 
@@ -19,6 +22,11 @@ const MOCK_FIRST_BODY = faker.lorem.sentence();
 const MOCK_SECOND_ROW = faker.lorem.words(3);
 const MOCK_SECOND_BODY = faker.lorem.sentence();
 const MOCK_NOTE = faker.lorem.sentence();
+const MOCK_SUMMARY = faker.lorem.words(4);
+const MOCK_TRAILING = faker.lorem.word();
+const SUMMARY_MARK_TEST_ID = 'summary-mark';
+const EXPAND_ALL = 'Expand all';
+const JUMP_TO_SECOND = 'Jump to second';
 
 type TRowValue = typeof FIRST | typeof SECOND;
 
@@ -43,6 +51,49 @@ const ControlledAccordion = ({
 };
 
 const setup = customRender(ControlledAccordion, {});
+
+const RowAccordion = () => {
+  const [openValues, setOpenValues] = useState<TRowValue[]>([]);
+  const actionsRef = useRef<TAccordionActions<TRowValue>>(null);
+
+  return (
+    <>
+      <button type="button" onClick={() => setOpenValues([FIRST, SECOND])}>
+        {EXPAND_ALL}
+      </button>
+      <button
+        type="button"
+        onClick={() => actionsRef.current?.openRow(SECOND, { focus: true })}
+      >
+        {JUMP_TO_SECOND}
+      </button>
+      <Accordion
+        multiple={true}
+        variant={ACCORDION_VARIANT.ROW}
+        openValues={openValues}
+        onOpenValuesChange={setOpenValues}
+        actionsRef={actionsRef}
+      >
+        <Accordion.Item value={FIRST}>
+          <Accordion.Trigger
+            summary={MOCK_SUMMARY}
+            summaryMark={<span data-testid={SUMMARY_MARK_TEST_ID} />}
+            trailing={MOCK_TRAILING}
+          >
+            {MOCK_FIRST_ROW}
+          </Accordion.Trigger>
+          <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value={SECOND}>
+          <Accordion.Trigger>{MOCK_SECOND_ROW}</Accordion.Trigger>
+          <Accordion.Panel>{MOCK_SECOND_BODY}</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
+    </>
+  );
+};
+
+const setupRows = customRender(RowAccordion, {});
 
 describe(`<${Accordion.name}/>`, () => {
   let user: UserEvent;
@@ -151,5 +202,93 @@ describe(`<${Accordion.name}/>`, () => {
     expect(note.compareDocumentPosition(body)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
+  });
+
+  describe('with several rows open at once', () => {
+    let firstTrigger: HTMLElement;
+    let secondTrigger: HTMLElement;
+
+    beforeEach(() => {
+      setupRows();
+      firstTrigger = screen.getByRole('button', {
+        name: new RegExp(MOCK_FIRST_ROW),
+      });
+      secondTrigger = screen.getByRole('button', { name: MOCK_SECOND_ROW });
+    });
+
+    it('opens every row the caller opens', async () => {
+      const expandAll = screen.getByRole('button', { name: EXPAND_ALL });
+      await user.click(expandAll);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
+
+    it('folds only the row folded by hand', async () => {
+      const expandAll = screen.getByRole('button', { name: EXPAND_ALL });
+      await user.click(expandAll);
+      await user.click(firstTrigger);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
+
+    it('keeps an open row open when another one opens', async () => {
+      await user.click(firstTrigger);
+      await user.click(secondTrigger);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
+
+    it('toggles a row with the Space key', async () => {
+      firstTrigger.focus();
+      await user.keyboard(KEY.SPACE);
+
+      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
+
+    it('names the body a row button controls', async () => {
+      await user.click(firstTrigger);
+
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: new RegExp(MOCK_FIRST_ROW),
+      });
+      const body = screen.getByText(MOCK_FIRST_BODY);
+
+      expect(heading).toContainElement(firstTrigger);
+      expect(firstTrigger).toHaveAttribute(
+        'aria-controls',
+        expect.stringMatching(/.+/),
+      );
+      expect(body).toBeVisible();
+    });
+
+    it('shows the summary, its mark and the trailing node while folded', () => {
+      const mark = screen.getByTestId(SUMMARY_MARK_TEST_ID);
+
+      expect(firstTrigger).toHaveTextContent(MOCK_SUMMARY);
+      expect(firstTrigger).toHaveTextContent(MOCK_TRAILING);
+      expect(firstTrigger).toContainElement(mark);
+    });
+
+    it('drops the summary while open and keeps the trailing node', async () => {
+      await user.click(firstTrigger);
+
+      const mark = screen.queryByTestId(SUMMARY_MARK_TEST_ID);
+
+      expect(firstTrigger).not.toHaveTextContent(MOCK_SUMMARY);
+      expect(firstTrigger).toHaveTextContent(MOCK_TRAILING);
+      expect(mark).not.toBeInTheDocument();
+    });
+
+    it('opens a row from code and moves focus to its button', async () => {
+      const jump = screen.getByRole('button', { name: JUMP_TO_SECOND });
+      await user.click(jump);
+
+      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondTrigger).toHaveFocus();
+    });
   });
 });

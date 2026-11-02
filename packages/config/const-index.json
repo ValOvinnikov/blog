@@ -4130,6 +4130,22 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "LIST": [
+      {
+        "ref": "ACCORDION_VARIANT.LIST",
+        "scope": "app:platform",
+        "from": "@platform/constants/accordion",
+        "file": "apps/platform/src/constants/accordion.ts"
+      }
+    ],
+    "ROW": [
+      {
+        "ref": "ACCORDION_VARIANT.ROW",
+        "scope": "app:platform",
+        "from": "@platform/constants/accordion",
+        "file": "apps/platform/src/constants/accordion.ts"
+      }
+    ],
     "FOOT": [
       {
         "ref": "ACCOUNT_MENU_PLACEMENT.FOOT",
