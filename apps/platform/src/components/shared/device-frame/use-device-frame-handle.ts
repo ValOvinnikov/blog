@@ -1,3 +1,4 @@
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import { useImperativeHandle, type Ref, type RefObject } from 'react';
@@ -11,9 +12,9 @@ export type TDeviceFrameHandle = {
 };
 
 export const useDeviceFrameHandle = (
-  ref: Ref<TDeviceFrameHandle> | undefined,
-  scrollerRef: RefObject<HTMLDivElement | null>,
-  contentRef: RefObject<HTMLDivElement | null>,
+  ref: TMaybeUndefined<Ref<TDeviceFrameHandle>>,
+  scrollerRef: RefObject<TMaybeNull<HTMLDivElement>>,
+  contentRef: RefObject<TMaybeNull<HTMLDivElement>>,
 ) => {
   useImperativeHandle(ref, () => ({
     scrollTo: (target, behavior) => {

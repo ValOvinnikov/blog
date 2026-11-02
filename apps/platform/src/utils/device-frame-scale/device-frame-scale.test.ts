@@ -13,13 +13,13 @@ import {
   toScrollThumb,
 } from './device-frame-scale';
 
-const DESKTOP_STAGE_596 = 564;
-const PHONE_TAB_HEIGHT = 523;
-const NARROW_STAGE = 358;
-const HALF_STAGE = 640;
-const WIDE_STAGE = 5000;
-const TABLET_FULLSCREEN_STAGE = 600;
-const LARGE_AVAILABLE_HEIGHT = 5000;
+const MOCK_DESKTOP_STAGE = 564;
+const MOCK_PHONE_TAB_HEIGHT = 523;
+const MOCK_NARROW_STAGE = 358;
+const MOCK_HALF_STAGE = 640;
+const MOCK_WIDE_STAGE = 5000;
+const MOCK_TABLET_FULLSCREEN_STAGE = 600;
+const MOCK_LARGE_AVAILABLE_HEIGHT = 5000;
 
 describe(fitPageScale, () => {
   it.each([
@@ -74,8 +74,8 @@ describe(fitPageScale, () => {
     {
       title: 'Phone with 523 px of height',
       device: PREVIEW_DEVICE.PHONE,
-      availableWidth: WIDE_STAGE,
-      availableHeight: PHONE_TAB_HEIGHT,
+      availableWidth: MOCK_WIDE_STAGE,
+      availableHeight: MOCK_PHONE_TAB_HEIGHT,
       scale: 0.6197,
       size: { width: 242, height: 523 },
       percent: 62,
@@ -110,8 +110,8 @@ describe(fitPageScale, () => {
   it('never grows taller than 608 px whatever height the caller passes', () => {
     const scale = fitPageScale({
       device: PREVIEW_DEVICE.PHONE,
-      availableWidth: WIDE_STAGE,
-      availableHeight: LARGE_AVAILABLE_HEIGHT,
+      availableWidth: MOCK_WIDE_STAGE,
+      availableHeight: MOCK_LARGE_AVAILABLE_HEIGHT,
     });
 
     expect(scaleDeviceSize(PREVIEW_DEVICE.PHONE, scale).height).toBe(
@@ -122,8 +122,8 @@ describe(fitPageScale, () => {
   it('never scales above 1', () => {
     const scale = fitPageScale({
       device: PREVIEW_DEVICE.DESKTOP,
-      availableWidth: WIDE_STAGE,
-      availableHeight: LARGE_AVAILABLE_HEIGHT,
+      availableWidth: MOCK_WIDE_STAGE,
+      availableHeight: MOCK_LARGE_AVAILABLE_HEIGHT,
     });
 
     expect(scale).toBeLessThanOrEqual(1);
@@ -134,11 +134,11 @@ describe(fitFullscreenScale, () => {
   it('fits by width alone and never above 100%', () => {
     const wide = fitFullscreenScale({
       device: PREVIEW_DEVICE.TABLET,
-      availableWidth: WIDE_STAGE,
+      availableWidth: MOCK_WIDE_STAGE,
     });
     const narrow = fitFullscreenScale({
       device: PREVIEW_DEVICE.TABLET,
-      availableWidth: TABLET_FULLSCREEN_STAGE,
+      availableWidth: MOCK_TABLET_FULLSCREEN_STAGE,
     });
 
     expect(wide).toStrictEqual({ scale: 1, isPanning: false });
@@ -149,7 +149,7 @@ describe(fitFullscreenScale, () => {
   it('fits without panning at exactly 50%', () => {
     const fit = fitFullscreenScale({
       device: PREVIEW_DEVICE.DESKTOP,
-      availableWidth: HALF_STAGE,
+      availableWidth: MOCK_HALF_STAGE,
     });
 
     expect(fit).toStrictEqual({ scale: 0.5, isPanning: false });
@@ -158,7 +158,7 @@ describe(fitFullscreenScale, () => {
   it('shows at 100% and pans when fitting would drop under 50%', () => {
     const fit = fitFullscreenScale({
       device: PREVIEW_DEVICE.DESKTOP,
-      availableWidth: NARROW_STAGE,
+      availableWidth: MOCK_NARROW_STAGE,
     });
 
     expect(fit).toStrictEqual({ scale: 1, isPanning: true });
@@ -180,7 +180,7 @@ describe(resolveDeviceFrameLayout, () => {
     const layout = resolveDeviceFrameLayout({
       device: PREVIEW_DEVICE.DESKTOP,
       fit: { mode: DEVICE_FRAME_FIT.PAGE },
-      stageWidth: DESKTOP_STAGE_596,
+      stageWidth: MOCK_DESKTOP_STAGE,
     });
 
     expect(layout).toStrictEqual({
@@ -194,7 +194,7 @@ describe(resolveDeviceFrameLayout, () => {
     const layout = resolveDeviceFrameLayout({
       device: PREVIEW_DEVICE.DESKTOP,
       fit: { mode: DEVICE_FRAME_FIT.FULLSCREEN },
-      stageWidth: NARROW_STAGE,
+      stageWidth: MOCK_NARROW_STAGE,
     });
 
     expect(layout).toStrictEqual({
@@ -208,7 +208,7 @@ describe(resolveDeviceFrameLayout, () => {
     const layout = resolveDeviceFrameLayout({
       device: PREVIEW_DEVICE.TABLET,
       fit: { mode: DEVICE_FRAME_FIT.FULLSCREEN },
-      stageWidth: WIDE_STAGE,
+      stageWidth: MOCK_WIDE_STAGE,
     });
 
     expect(layout).toStrictEqual({

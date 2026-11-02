@@ -7,19 +7,17 @@ export type TSampleHeaderBrandProps = {
   name: string;
   logoSrc: TMaybeUndefined<string>;
   isCompact?: boolean;
-  className?: string;
 };
 
 export const SampleHeaderBrand = ({
   name,
   logoSrc,
   isCompact = false,
-  className,
 }: TSampleHeaderBrandProps) => {
   const { root, label } = sampleHeaderBrandVariants({ isCompact });
 
   return (
-    <div className={root({ class: className })}>
+    <div className={root()}>
       <BrandMark size={SIZE.SM} title={name} src={logoSrc} />
       <span className={label()}>{name}</span>
     </div>

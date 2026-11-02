@@ -19,10 +19,10 @@ faker.seed(6390);
 const MOCK_HOST = faker.internet.domainName();
 const MOCK_CONTENT = faker.lorem.words(3);
 const MOCK_OVERLAY = faker.lorem.words(2);
-const STAGE_WIDTH = 564;
-const TALL_CONTENT_HEIGHT = 2400;
-const SHORT_CONTENT_HEIGHT = 100;
-const VIEWPORT_HEIGHT = 300;
+const MOCK_STAGE_WIDTH = 564;
+const MOCK_TALL_CONTENT_HEIGHT = 2400;
+const MOCK_SHORT_CONTENT_HEIGHT = 100;
+const MOCK_VIEWPORT_HEIGHT = 300;
 
 const setup = customRender(DeviceFrame, {
   device: PREVIEW_DEVICE.DESKTOP,
@@ -36,13 +36,13 @@ describe(`<${DeviceFrame.name}/>`, () => {
   let contentHeight: number;
 
   beforeEach(() => {
-    contentHeight = TALL_CONTENT_HEIGHT;
+    contentHeight = MOCK_TALL_CONTENT_HEIGHT;
     restoreResizeObserver = stubResizeObserver((target) => ({
-      width: STAGE_WIDTH,
+      width: MOCK_STAGE_WIDTH,
       height:
         target.getAttribute('data-testid') === DEVICE_FRAME_TEST_ID.CONTENT
           ? contentHeight
-          : VIEWPORT_HEIGHT,
+          : MOCK_VIEWPORT_HEIGHT,
     }));
   });
 
@@ -102,7 +102,7 @@ describe(`<${DeviceFrame.name}/>`, () => {
   });
 
   it('shows no scrollbar when the sample fits', () => {
-    contentHeight = SHORT_CONTENT_HEIGHT;
+    contentHeight = MOCK_SHORT_CONTENT_HEIGHT;
 
     setup();
 

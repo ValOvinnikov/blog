@@ -2,6 +2,7 @@ import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   PREVIEW_DEVICE,
+  PREVIEW_DEVICE_WIDTH,
   PREVIEW_HEADING_LAYOUT,
   PREVIEW_MODE,
   PREVIEW_READOUT,
@@ -15,6 +16,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
 import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -29,11 +31,28 @@ const MOCK_CONTROL = faker.lorem.words(2);
 const MOCK_END_SLOT = faker.lorem.words(2);
 const MOCK_STATUS = faker.lorem.words(4);
 const MOCK_ACTION = faker.lorem.words(2);
-const LIVE_PREVIEW = 'Live preview';
+const tDevicePreview = makeEnTranslator('devicePreview');
+const MOCK_LIVE_PREVIEW =
+  makeEnTranslator('previewModeControl')('livePreviewHeading');
+const MOCK_PREVIEW = makeEnTranslator('viewTabs')('previewTab');
 const NARROW_ROW = PREVIEW_READOUT.LONG_MIN_WIDTH - 1;
-const WIDE_ROW = 600;
-const DESKTOP_LONG_READOUT = '1280 px wide · shown at 44%';
-const PHONE_LONG_READOUT = '390 px wide · shown at 72%';
+const MOCK_WIDE_ROW = 600;
+
+const readoutFor = (
+  key: 'readoutLong' | 'readoutShort' | 'readoutPhoneTab',
+  device: TPreviewDevice,
+  percent: number,
+) => tDevicePreview(key, { width: PREVIEW_DEVICE_WIDTH[device], percent });
+const MOCK_DESKTOP_LONG_READOUT = readoutFor(
+  'readoutLong',
+  PREVIEW_DEVICE.DESKTOP,
+  44,
+);
+const MOCK_PHONE_LONG_READOUT = readoutFor(
+  'readoutLong',
+  PREVIEW_DEVICE.PHONE,
+  72,
+);
 
 const setup = customRender(PreviewFrame, {
   ariaLabel: MOCK_LABEL,
@@ -68,7 +87,7 @@ describe(`<${PreviewFrame.name}/>`, () => {
     );
 
     beforeEach(() => {
-      rowWidth = WIDE_ROW;
+      rowWidth = MOCK_WIDE_ROW;
       restoreResizeObserver = stubResizeObserver(() => ({
         width: rowWidth,
         height: 20,
@@ -83,31 +102,31 @@ describe(`<${PreviewFrame.name}/>`, () => {
       {
         device: PREVIEW_DEVICE.DESKTOP,
         scale: 0.4406,
-        text: DESKTOP_LONG_READOUT,
+        text: MOCK_DESKTOP_LONG_READOUT,
       },
       {
         device: PREVIEW_DEVICE.DESKTOP,
         scale: 0.3469,
-        text: '1280 px wide · shown at 35%',
+        text: readoutFor('readoutLong', PREVIEW_DEVICE.DESKTOP, 35),
       },
       {
         device: PREVIEW_DEVICE.TABLET,
         scale: 0.5153,
-        text: '820 px wide · shown at 52%',
+        text: readoutFor('readoutLong', PREVIEW_DEVICE.TABLET, 52),
       },
       {
         device: PREVIEW_DEVICE.PHONE,
         scale: 0.7204,
-        text: PHONE_LONG_READOUT,
+        text: MOCK_PHONE_LONG_READOUT,
       },
     ])(
-      'reads "$text" under "Live preview" in a wide section',
+      'reads the long readout under the live preview title in a wide section',
       ({ device, scale, text }) => {
         renderWithIntl(headingOf(device, scale));
 
         const heading = screen.getByRole('heading', {
           level: 2,
-          name: LIVE_PREVIEW,
+          name: MOCK_LIVE_PREVIEW,
         });
         const readout = screen.getByRole('status');
 
@@ -120,15 +139,15 @@ describe(`<${PreviewFrame.name}/>`, () => {
       {
         device: PREVIEW_DEVICE.TABLET,
         scale: 0.4805,
-        text: '820 px · 48%',
+        text: readoutFor('readoutShort', PREVIEW_DEVICE.TABLET, 48),
       },
       {
         device: PREVIEW_DEVICE.PHONE,
         scale: 0.7204,
-        text: '390 px · 72%',
+        text: readoutFor('readoutShort', PREVIEW_DEVICE.PHONE, 72),
       },
     ])(
-      'reads "$text" under "Preview" in a narrow section',
+      'reads the short readout under the preview title in a narrow section',
       ({ device, scale, text }) => {
         rowWidth = NARROW_ROW;
         renderWithIntl(headingOf(device, scale));
@@ -136,7 +155,7 @@ describe(`<${PreviewFrame.name}/>`, () => {
         const heading = screen.getByRole('heading', { level: 2 });
         const readout = screen.getByRole('status');
 
-        expect(heading).toHaveAccessibleName('Preview');
+        expect(heading).toHaveAccessibleName(MOCK_PREVIEW);
         expect(readout).toHaveTextContent(text);
       },
     );
@@ -148,8 +167,8 @@ describe(`<${PreviewFrame.name}/>`, () => {
       const heading = screen.getByRole('heading', { level: 2 });
       const readout = screen.getByRole('status');
 
-      expect(heading).toHaveAccessibleName(LIVE_PREVIEW);
-      expect(readout).toHaveTextContent(DESKTOP_LONG_READOUT);
+      expect(heading).toHaveAccessibleName(MOCK_LIVE_PREVIEW);
+      expect(readout).toHaveTextContent(MOCK_DESKTOP_LONG_READOUT);
     });
 
     it('reads the phone tab readout under a heading kept for assistive technology', () => {
@@ -164,12 +183,14 @@ describe(`<${PreviewFrame.name}/>`, () => {
 
       const heading = screen.getByRole('heading', {
         level: 2,
-        name: LIVE_PREVIEW,
+        name: MOCK_LIVE_PREVIEW,
       });
       const readout = screen.getByRole('status');
 
       expect(heading).toBeInTheDocument();
-      expect(readout).toHaveTextContent('390 px · shown at 62%');
+      expect(readout).toHaveTextContent(
+        readoutFor('readoutPhoneTab', PREVIEW_DEVICE.PHONE, 62),
+      );
     });
 
     it('updates the readout when the device and scale change', () => {
@@ -181,7 +202,7 @@ describe(`<${PreviewFrame.name}/>`, () => {
 
       const readout = screen.getByRole('status');
 
-      expect(readout).toHaveTextContent(PHONE_LONG_READOUT);
+      expect(readout).toHaveTextContent(MOCK_PHONE_LONG_READOUT);
     });
   });
 

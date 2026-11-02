@@ -190,7 +190,7 @@ describe(`<${LookSample.name}/>`, () => {
       expect(languageMenu).not.toBeInTheDocument();
     });
 
-    it('carries a bar of the brand, the person circle and the menu button beside the full header', () => {
+    it('pairs the brand, person circle and menu button bar with the full header', () => {
       const signInButton = withinBar().getByRole('button', { name: SIGN_IN });
       const menuButton = withinBar().getByRole('button', { name: MENU });
       const postsLink = withinBar().queryByRole('link', { name: POSTS });
@@ -225,7 +225,7 @@ describe(`<${LookSample.name}/>`, () => {
     expect(brandPrimary).toBe(MOCK_DARK_ACCENT);
   });
 
-  it('renders the uploaded logo in both header variants and the footer in place of the generated mark', () => {
+  it('renders the uploaded logo in both headers and the footer', () => {
     setup({ brand: { name: MOCK_TENANT_NAME, logoSrc: MOCK_LOGO_URL } });
 
     const logos = screen.getAllByRole('img', { name: MOCK_TENANT_NAME });
