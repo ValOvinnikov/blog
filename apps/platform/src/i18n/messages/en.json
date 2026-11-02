@@ -1808,7 +1808,7 @@
       "previewText": "{siteName} can now use every Growth option.",
       "changed": "{siteName} is now on the Growth plan.",
       "options": "Growth options are now available on your site: more languages, every Look setting, extra page modules, and features such as the contact form, bookmarks and analytics.",
-      "kept": "Anything you set up on Growth before is back as you left it."
+      "kept": "If you used Growth before, your earlier choices are back as you left them."
     },
     "FREE": {
       "subject": "Your site is now on the Free plan",

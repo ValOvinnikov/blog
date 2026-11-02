@@ -1808,7 +1808,7 @@
       "previewText": "{siteName} kann jetzt alle Growth-Optionen nutzen.",
       "changed": "{siteName} ist jetzt im Growth-Tarif.",
       "options": "Die Growth-Optionen sind jetzt auf deiner Website verfügbar: mehr Sprachen, alle Einstellungen für das Erscheinungsbild, zusätzliche Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
-      "kept": "Alles, was du früher im Growth-Tarif eingerichtet hattest, ist wieder so da, wie du es hinterlassen hast."
+      "kept": "Wenn du Growth schon einmal genutzt hast, sind deine früheren Einstellungen wieder so da, wie du sie hinterlassen hast."
     },
     "FREE": {
       "subject": "Deine Website ist jetzt im Free-Tarif",

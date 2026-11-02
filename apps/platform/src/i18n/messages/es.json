@@ -1808,7 +1808,7 @@
       "previewText": "{siteName} ya puede usar todas las opciones de Growth.",
       "changed": "{siteName} ya está en el plan Growth.",
       "options": "Las opciones de Growth ya están disponibles en tu sitio: más idiomas, todos los ajustes de Aspecto, módulos de página adicionales y funciones como el formulario de contacto, los marcadores y las estadísticas.",
-      "kept": "Todo lo que configuraste antes en Growth vuelve tal como lo dejaste."
+      "kept": "Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
     },
     "FREE": {
       "subject": "Tu sitio ya está en el plan Free",

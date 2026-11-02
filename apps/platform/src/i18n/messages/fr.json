@@ -1808,7 +1808,7 @@
       "previewText": "{siteName} peut désormais utiliser toutes les options Growth.",
       "changed": "{siteName} est désormais sur l’offre Growth.",
       "options": "Les options Growth sont maintenant disponibles sur votre site : plus de langues, tous les réglages d’Apparence, des modules de page supplémentaires et des fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
-      "kept": "Tout ce que vous aviez configuré avec Growth est de retour, tel que vous l’aviez laissé."
+      "kept": "Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
     },
     "FREE": {
       "subject": "Votre site est passé à l’offre Free",

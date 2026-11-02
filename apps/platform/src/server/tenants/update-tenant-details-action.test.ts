@@ -89,6 +89,10 @@ vi.mock('@platform/server/tenants/notify-owner-of-plan-change', () => ({
   notifyOwnerOfPlanChange: vi.fn(),
 }));
 
+vi.mock('next/server', () => ({
+  after: (task: () => unknown) => task(),
+}));
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {

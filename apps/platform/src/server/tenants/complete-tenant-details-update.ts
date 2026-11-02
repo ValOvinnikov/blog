@@ -24,6 +24,7 @@ import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/re
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { notifyOwnerOfPlanChange } from '@platform/server/tenants/notify-owner-of-plan-change';
 import { reinviteChangedOwner } from '@platform/server/tenants/reinvite-changed-owner';
+import { after } from 'next/server';
 
 type TTenantDetailsUpdate = Extract<
   TUpdateTenantDetailsResult,
@@ -65,7 +66,7 @@ export const completeTenantDetailsUpdate = async (
   previousPlan: TTenantPlan,
 ): Promise<TTenantDetailsSaved> => {
   await revalidateSiteConfig(tenantId);
-  await notifyOwnerOfPlanChange(tenantId, previousPlan, tenant.plan);
+  after(() => notifyOwnerOfPlanChange(tenantId, previousPlan, tenant.plan));
   const studioReinvite = await reinviteIfOwnerChanged(
     tenant,
     ownerEmail,
