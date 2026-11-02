@@ -825,6 +825,8 @@
   },
   "assetUploadField": {
     "remove": "Supprimer",
+    "upload": "Importer",
+    "replace": "Remplacer",
     "logo": {
       "currentAlt": "Logo actuel",
       "upload": "Importer le logo",

@@ -825,6 +825,8 @@
   },
   "assetUploadField": {
     "remove": "Entfernen",
+    "upload": "Hochladen",
+    "replace": "Ersetzen",
     "logo": {
       "currentAlt": "Aktuelles Logo",
       "upload": "Logo hochladen",

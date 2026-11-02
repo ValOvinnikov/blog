@@ -825,6 +825,8 @@
   },
   "assetUploadField": {
     "remove": "Remove",
+    "upload": "Upload",
+    "replace": "Replace",
     "logo": {
       "currentAlt": "Current logo",
       "upload": "Upload logo",

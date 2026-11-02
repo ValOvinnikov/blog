@@ -16,8 +16,6 @@ export const assetUploadFieldVariants = tv({
     title: ['truncate text-admin-13 font-semibold text-admin-text'],
     fileName: ['mt-0.5 truncate text-admin-11-5 text-admin-muted'],
     hint: ['mt-0.5'],
-    actions: ['flex items-center gap-2'],
-    input: ['sr-only'],
     error: ['text-admin-11-5 text-admin-bad'],
   },
   variants: {
@@ -27,7 +25,6 @@ export const assetUploadFieldVariants = tv({
           'flex-col rounded-admin border-[1.5px] border-dashed border-admin-line p-[14px]',
         ],
         thumb: ['size-12 rounded-admin-control'],
-        actions: ['mt-[11px] flex-wrap'],
       },
       [SIZE.SM]: {
         field: ['@container'],
@@ -37,7 +34,6 @@ export const assetUploadFieldVariants = tv({
         top: ['min-w-0 flex-1'],
         thumb: ['size-10 rounded-admin-control'],
         titleRow: ['flex-wrap'],
-        actions: ['shrink-0 @max-lg:basis-full'],
       },
     },
     isInvalid: {

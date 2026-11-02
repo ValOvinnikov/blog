@@ -1,18 +1,18 @@
 'use client';
 
 import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { Button } from '@platform/components/shared/button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
-import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
+import { KEY } from '@platform/constants/keyboard';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { useId, useRef } from 'react';
+import { useId } from 'react';
 
 import { assetUploadFieldVariants } from './asset-upload-field-variants';
+import { AssetUploadActions } from './components/asset-upload-actions';
 import { useAssetFileChoice } from './use-asset-file-choice';
 
 export type TAssetUploadSpec = {
@@ -60,7 +60,6 @@ export const AssetUploadField = ({
   const { id, isDisabled = false, describedBy: ariaDescribedBy } = control;
   const { url, file: stagedFile } = image;
   const t = useTranslations('assetUploadField');
-  const inputRef = useRef<HTMLInputElement>(null);
   const { validationError, handleFileChange, handleRemove } =
     useAssetFileChoice({ onStage, validateFile });
   const shownError = validationError ?? error;
@@ -68,7 +67,7 @@ export const AssetUploadField = ({
   const errorId = useId();
   const describedBy = [hint && hintId, ariaDescribedBy, shownError && errorId]
     .filter(Boolean)
-    .join(' ');
+    .join(KEY.SPACE);
   const fileName = size === SIZE.SM ? getFileName(image) : undefined;
 
   const {
@@ -82,8 +81,6 @@ export const AssetUploadField = ({
     title,
     fileName: fileNameSlot,
     hint: hintSlot,
-    actions,
-    input,
     error: errorSlot,
   } = assetUploadFieldVariants({ size, isInvalid: Boolean(shownError) });
 
@@ -124,41 +121,17 @@ export const AssetUploadField = ({
           </div>
         </div>
 
-        <div className={actions()}>
-          <input
-            ref={inputRef}
-            type="file"
-            accept={acceptedMimeTypes.join(',')}
-            className={input()}
-            onChange={handleFileChange}
-            tabIndex={-1}
-            aria-hidden="true"
-            data-testid="asset-upload-field-input"
-          />
-          <Button
-            id={id}
-            type="button"
-            size={SIZE.SM}
-            variant={BUTTON_VARIANT.SECONDARY}
-            onClick={() => inputRef.current?.click()}
-            isDisabled={isDisabled}
-            aria-describedby={describedBy}
-          >
-            {url ? t(`${kind}.replace`) : t(`${kind}.upload`)}
-          </Button>
-          {url && (
-            <Button
-              type="button"
-              size={SIZE.SM}
-              variant={BUTTON_VARIANT.GHOST}
-              onClick={handleRemove}
-              isDisabled={isDisabled}
-              aria-describedby={describedBy}
-            >
-              {t('remove')}
-            </Button>
-          )}
-        </div>
+        <AssetUploadActions
+          kind={kind}
+          size={size}
+          acceptedMimeTypes={acceptedMimeTypes}
+          hasImage={Boolean(url)}
+          onFileChange={handleFileChange}
+          onRemove={handleRemove}
+          id={id}
+          isDisabled={isDisabled}
+          describedBy={describedBy}
+        />
       </div>
       {shownError && (
         <p
