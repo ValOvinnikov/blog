@@ -218,7 +218,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
       await user.type(headingField, MOCK_TYPED_TEXT);
 
       const customisedBadge = within(section).getByText('Customised');
-      const unsavedBadge = within(section).getByText('Unsaved');
+      const unsavedBadge = within(section).getByRole('img', {
+        name: 'Unsaved',
+      });
       const customisedSummary = within(section).getByText(
         '3 fields · 1 customised',
       );

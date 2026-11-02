@@ -2,7 +2,11 @@ import { VOICE_FIELDS } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { Accordion } from '@platform/components/shared/accordion';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import type { ComponentProps } from 'react';
 
 import { VoiceListRow } from './voice-list-row';
@@ -60,7 +64,10 @@ describe(`<${VoiceListRow.name}/>`, () => {
     const row = screen.getByRole('button', { name: /Tag page/ });
 
     expect(row).toHaveTextContent(MOCK_VALUE);
-    expect(row).toHaveTextContent('UnsavedCustomised');
+    const unsavedMark = within(row).getByRole('img', { name: 'Unsaved' });
+
+    expect(unsavedMark).toBeVisible();
+    expect(row).toHaveTextContent('Customised');
   });
 
   it('describes a closed list with its error in text', () => {

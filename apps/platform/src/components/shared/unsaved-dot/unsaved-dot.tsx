@@ -2,14 +2,22 @@ import { useTranslations } from 'next-intl';
 
 import { unsavedDotVariants } from './unsaved-dot-variants';
 
-export const UnsavedDot = () => {
+type TUnsavedDotProps =
+  | { isDecorative: true; label?: never }
+  | { isDecorative?: false; label?: string };
+
+export const UnsavedDot = ({ isDecorative, label }: TUnsavedDotProps) => {
   const t = useTranslations('fieldStatus');
-  const { dot, label } = unsavedDotVariants();
+
+  if (isDecorative) {
+    return <span aria-hidden="true" className={unsavedDotVariants()} />;
+  }
 
   return (
-    <span>
-      <span aria-hidden="true" className={dot()} />
-      <span className={label()}>{t('unsaved')}</span>
-    </span>
+    <span
+      role="img"
+      aria-label={label ?? t('unsaved')}
+      className={unsavedDotVariants()}
+    />
   );
 };

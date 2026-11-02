@@ -126,7 +126,7 @@ describe(`<${EmailTemplateEditor.name}/>`, () => {
   it('marks an edited subject unsaved', () => {
     setup({ copy: mockCopy(MOCK_SUBJECT, '') });
 
-    const unsavedMark = screen.getByText(unsaved);
+    const unsavedMark = screen.getByRole('img', { name: unsaved });
 
     expect(unsavedMark).toBeVisible();
   });
