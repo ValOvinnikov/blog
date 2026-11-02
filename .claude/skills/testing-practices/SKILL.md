@@ -295,7 +295,11 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   inline one in the same `describe` (it double-renders); a genuinely
   different render gets its own `describe`, and a small variation is driven
   through the shared render where possible (an outside click is
-  `fireEvent.mouseDown(document.body)`). **Blocking in review:** an arrangement line
+  `fireEvent.mouseDown(document.body)`). When some cases call `setup()` bare
+  and others pass overrides, the bare ones move into a nested `describe`
+  whose `beforeEach` calls `setup()`; the override cases stay where they
+  are. A sibling's `setup({ … })` is never a reason to leave a bare
+  `setup()` repeated. **Blocking in review:** an arrangement line
   duplicated across `it`s, and the same `render(<X …/>)` prop bag three or
   more times in one file.
 
@@ -311,6 +315,31 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
       const shareButton = screen.getByRole('button', { name: 'Share' });
 
       expect(shareButton).toHaveAttribute('aria-expanded', 'false');
+    });
+  });
+  ```
+
+  The mixed case, bare and override renders in one component:
+
+  ```tsx
+  describe(`<${SiteLookFields.name}/>`, () => {
+    describe('with the default props', () => {
+      beforeEach(() => {
+        setup();
+      });
+
+      it('names the hue slider from the visible accent label', () => {
+        …
+      });
+
+      it('shows no value text beside the slider', () => {
+        …
+      });
+    });
+
+    it('reports the hue the user moves the slider to', async () => {
+      setup({ onAccentHueChange: handleAccentHueChange });
+      …
     });
   });
   ```
