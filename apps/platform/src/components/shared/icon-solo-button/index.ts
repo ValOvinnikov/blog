@@ -1,1 +1,1 @@
-export { IconSoloButton, type TIconSoloButtonProps } from './icon-solo-button';
+export { IconSoloButton } from './icon-solo-button';

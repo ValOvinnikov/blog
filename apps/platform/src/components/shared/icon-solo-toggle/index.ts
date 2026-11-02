@@ -1,1 +1,1 @@
-export { IconSoloToggle, type TIconSoloToggleProps } from './icon-solo-toggle';
+export { IconSoloToggle } from './icon-solo-toggle';

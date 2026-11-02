@@ -3,6 +3,7 @@ import { faker } from '@faker-js/faker';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
 import { IconSoloToggle } from '@platform/components/shared/icon-solo-toggle';
+import { ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -12,7 +13,6 @@ faker.seed(6382);
 
 const RIGHT = '{ArrowRight}';
 const LEFT = '{ArrowLeft}';
-const ARIA_PRESSED = 'aria-pressed';
 const MOCK_TOOLBAR_LABEL = faker.lorem.words(2);
 const MOCK_DEVICE_LABEL = faker.lorem.word();
 const MOCK_SCHEME_LABEL = faker.lorem.word();

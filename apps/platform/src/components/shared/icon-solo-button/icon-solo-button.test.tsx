@@ -1,5 +1,6 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -7,7 +8,6 @@ import { IconSoloButton } from './icon-solo-button';
 
 faker.seed(6382);
 
-const ARIA_PRESSED = 'aria-pressed';
 const MOCK_LABEL = faker.lorem.words(2);
 const MOCK_TOOLTIP = faker.lorem.words(3);
 
