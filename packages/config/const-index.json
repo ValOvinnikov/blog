@@ -2070,6 +2070,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "PREVIEW_DEVICE.PHONE",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
       }
     ],
     "TRENDING_UP": [
@@ -2158,6 +2164,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "PREVIEW_DEVICE.TABLET",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
       }
     ],
     "USER_CHECK": [
@@ -3414,6 +3426,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/timeline.ts"
+      },
+      {
+        "ref": "DEVICE_FRAME_AXIS.VERTICAL",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
     "HORIZONTAL": [
@@ -3422,6 +3440,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/timeline.ts"
+      },
+      {
+        "ref": "DEVICE_FRAME_AXIS.HORIZONTAL",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
     "SUPERADMIN": [
@@ -4596,6 +4620,86 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
+    "PAGE": [
+      {
+        "ref": "DEVICE_FRAME_FIT.PAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "FULLSCREEN": [
+      {
+        "ref": "DEVICE_FRAME_FIT.FULLSCREEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "TOP": [
+      {
+        "ref": "DEVICE_FRAME_SCROLL_TARGET.TOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "END": [
+      {
+        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "device-frame": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.FRAME",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "device-frame-viewport": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.VIEWPORT",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "device-frame-content": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.CONTENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "device-frame-browser-bar": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.BROWSER_BAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "device-frame-vertical-scrollbar": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.VERTICAL_SCROLLBAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "device-frame-horizontal-scrollbar": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.HORIZONTAL_SCROLLBAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "NOT_CONFIGURED": [
       {
         "ref": "DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED",
@@ -5084,6 +5188,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/preview",
         "file": "apps/platform/src/constants/preview.ts"
+      },
+      {
+        "ref": "PREVIEW_DEVICE.DESKTOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
       }
     ],
     "TOUCH": [
@@ -5257,6 +5367,22 @@
     "SIGNED_IN": [
       {
         "ref": "PREVIEW_READER_STATE.SIGNED_IN",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "SECTION": [
+      {
+        "ref": "PREVIEW_HEADING_LAYOUT.SECTION",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
+    "PHONE_TAB": [
+      {
+        "ref": "PREVIEW_HEADING_LAYOUT.PHONE_TAB",
         "scope": "app:platform",
         "from": "@platform/constants/preview",
         "file": "apps/platform/src/constants/preview.ts"
@@ -7248,6 +7374,14 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
+    "100": [
+      {
+        "ref": "DEVICE_FRAME_LIMIT.PERCENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "200": [
       {
         "ref": "HTTP_STATUS.OK",
@@ -7352,6 +7486,14 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "476": [
+      {
+        "ref": "PREVIEW_READOUT.LONG_MIN_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/preview",
+        "file": "apps/platform/src/constants/preview.ts"
+      }
+    ],
     "500": [
       {
         "ref": "HTTP_STATUS.INTERNAL_SERVER_ERROR",
@@ -7376,12 +7518,36 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "608": [
+      {
+        "ref": "DEVICE_FRAME_LIMIT.PAGE_HEIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "10000": [
+      {
+        "ref": "DEVICE_FRAME_LIMIT.SCALE_PRECISION",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "15000": [
       {
         "ref": "CUSTOM_DOMAIN_VERIFY_POLL.intervalMs",
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "0.5": [
+      {
+        "ref": "DEVICE_FRAME_LIMIT.FULLSCREEN_MIN_SCALE",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
     "1.8": [

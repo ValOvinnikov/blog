@@ -737,6 +737,19 @@
     "livePreviewHeading": "Aperçu en direct",
     "previewColorSchemeAriaLabel": "Jeu de couleurs de l'aperçu"
   },
+  "devicePreview": {
+    "sampleAtWidth": "Page d'exemple à {width} px",
+    "readoutLong": "{width} px de large · affiché à {percent} %",
+    "readoutShort": "{width} px · {percent} %",
+    "readoutPhoneTab": "{width} px · affiché à {percent} %",
+    "toolbarAriaLabel": "Options d'aperçu",
+    "deviceGroupAriaLabel": "Appareil d'aperçu",
+    "deviceTablet": "Tablette",
+    "devicePhone": "Téléphone",
+    "tooltipDesktop": "Ordinateur · {width} px",
+    "tooltipTablet": "Tablette · {width} px",
+    "tooltipPhone": "Téléphone · {width} px"
+  },
   "lookPreview": {
     "sampleHeading": "Lire les tables des marées",
     "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
@@ -749,8 +762,6 @@
     "firstCardExcerpt": "Une carte avec lien, telle que les listes d'articles l'affichent.",
     "secondCardTitle": "Cap sur la prochaine saison",
     "secondCardExcerpt": "Une carte statique. Son cadre suit votre style de carte.",
-    "outlinedCardHeading": "Newsletter",
-    "outlinedCardBody": "Une carte à contour, telle que l'affichent les panneaux et les offres tarifaires.",
     "previewNote": "Construit à partir des composants du site. Rien n'est publié avant l'enregistrement.",
     "widthDesktop": "Ordinateur",
     "widthMobile": "Mobile",

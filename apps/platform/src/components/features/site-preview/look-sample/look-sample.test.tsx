@@ -22,13 +22,15 @@ import {
 import { SAMPLE_FOOTER_TEST_ID } from '@platform/constants/sample-footer';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_BAR_TEST_ID,
+  SAMPLE_HEADER_FULL_TEST_ID,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
   SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
   SAMPLE_SUBMENU_TEST_ID,
 } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
@@ -87,6 +89,11 @@ const setup = customRender(LookSample, {
   hasReaderAccounts: true,
 });
 
+const withinFullHeader = () =>
+  within(screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID));
+
+const withinBar = () => within(screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID));
+
 const setupWithHeader = (
   header: Partial<TSampleHeaderStyle>,
   props: NonNullable<Parameters<typeof setup>[0]> = {},
@@ -125,7 +132,7 @@ describe(`<${LookSample.name}/>`, () => {
       expect(tokens).toHaveAttribute('inert');
     });
 
-    it('renders one linked and one static item card beside an outlined card', () => {
+    it('renders one linked and one static item card and no Newsletter panel', () => {
       const linkedCard = screen.getByRole('link', {
         name: 'Notes from the harbour',
       });
@@ -136,15 +143,14 @@ describe(`<${LookSample.name}/>`, () => {
       const staticCardLink = screen.queryByRole('link', {
         name: CHARTING_THE_NEXT_SEASON,
       });
-      const outlinedCardHeading = screen.getByRole('heading', {
-        level: 4,
+      const newsletterHeading = screen.queryByRole('heading', {
         name: 'Newsletter',
       });
 
       expect(linkedCard).toBeVisible();
       expect(staticCardHeading).toBeVisible();
       expect(staticCardLink).not.toBeInTheDocument();
-      expect(outlinedCardHeading).toBeVisible();
+      expect(newsletterHeading).not.toBeInTheDocument();
     });
 
     it('opens with a header carrying the brand and two nav links', () => {
@@ -161,7 +167,9 @@ describe(`<${LookSample.name}/>`, () => {
       const themeToggle = screen.getByRole('button', {
         name: 'Switch to dark theme',
       });
-      const signInButton = screen.getByRole('button', { name: SIGN_IN });
+      const signInButton = withinFullHeader().getByRole('button', {
+        name: SIGN_IN,
+      });
 
       expect(themeToggle).toBeVisible();
       expect(signInButton).toHaveTextContent(SIGN_IN);
@@ -200,15 +208,15 @@ describe(`<${LookSample.name}/>`, () => {
     expect(brandPrimary).toBe(MOCK_DARK_ACCENT);
   });
 
-  it('renders the uploaded logo in the header and footer in place of the generated mark', () => {
+  it('renders the uploaded logo in both header variants and the footer in place of the generated mark', () => {
     setup({ brand: { name: MOCK_TENANT_NAME, logoSrc: MOCK_LOGO_URL } });
 
-    const [headerLogo, footerLogo] = screen.getAllByRole('img', {
-      name: MOCK_TENANT_NAME,
-    });
+    const logos = screen.getAllByRole('img', { name: MOCK_TENANT_NAME });
 
-    expect(headerLogo).toHaveAttribute('src', MOCK_LOGO_URL);
-    expect(footerLogo).toHaveAttribute('src', MOCK_LOGO_URL);
+    expect(logos).toHaveLength(3);
+    logos.forEach((logo) => {
+      expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
+    });
   });
 
   it('offers the light theme from a dark preview', () => {
@@ -229,16 +237,16 @@ describe(`<${LookSample.name}/>`, () => {
     expect(signInButton).not.toBeInTheDocument();
   });
 
-  it('shows the brand, the person circle and the menu button on a narrow preview', () => {
-    setup({ isNarrow: true });
+  it('carries a bar of the brand, the person circle and the menu button beside the full header', () => {
+    setup();
+    const signInButton = withinBar().getByRole('button', { name: SIGN_IN });
+    const menuButton = withinBar().getByRole('button', { name: MENU });
+    const postsLink = withinBar().queryByRole('link', { name: POSTS });
+    const currentLanguage = withinBar().queryByTestId(CURRENT_LANGUAGE_TEST_ID);
 
-    const header = screen.getByRole('banner');
-    const signInButton = screen.getByRole('button', { name: SIGN_IN });
-    const menuButton = screen.getByRole('button', { name: MENU });
-    const postsLink = screen.queryByRole('link', { name: POSTS });
-    const currentLanguage = screen.queryByTestId(CURRENT_LANGUAGE_TEST_ID);
+    const barHeader = screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID);
 
-    expect(header).toHaveTextContent(MOCK_TENANT_NAME);
+    expect(barHeader).toHaveTextContent(MOCK_TENANT_NAME);
     expect(signInButton).toHaveTextContent('');
     expect(menuButton).toBeVisible();
     expect(postsLink).not.toBeInTheDocument();
@@ -265,9 +273,12 @@ describe(`<${LookSample.name}/>`, () => {
 
     it('opens the account menu from the Account button while signed in', () => {
       setup({ isSignedIn: true });
-
-      const accountButton = screen.getByRole('button', { name: ACCOUNT });
-      const accountMenu = screen.getByRole('menu', { name: ACCOUNT_MENU });
+      const accountButton = withinFullHeader().getByRole('button', {
+        name: ACCOUNT,
+      });
+      const accountMenu = withinFullHeader().getByRole('menu', {
+        name: ACCOUNT_MENU,
+      });
 
       expect(accountButton).toHaveAttribute('aria-expanded', 'true');
       expect(accountMenu).toBeVisible();
@@ -282,31 +293,32 @@ describe(`<${LookSample.name}/>`, () => {
       ({ panelStyle, hasDescriptions }) => {
         setupWithAccount({ panelStyle }, { isSignedIn: true });
 
-        const description = screen.queryByText(BOOKMARKS_DESCRIPTION);
+        const description = withinFullHeader().queryByText(
+          BOOKMARKS_DESCRIPTION,
+        );
 
         expect(Boolean(description)).toBe(hasDescriptions);
       },
     );
 
-    it('moves the account out of the narrow bar when it sits in the menu', () => {
-      setupWithAccount(
-        { phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU },
-        { isNarrow: true },
-      );
+    it('moves the account out of the bar when it sits in the menu', () => {
+      setupWithAccount({ phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU });
+      const barSignIn = withinBar().queryByRole('button', { name: SIGN_IN });
+      const barMenu = withinBar().getByRole('button', { name: MENU });
+      const fullSignIn = withinFullHeader().getByRole('button', {
+        name: SIGN_IN,
+      });
 
-      const signInButton = screen.queryByRole('button', { name: SIGN_IN });
-      const menuButton = screen.getByRole('button', { name: MENU });
-
-      expect(signInButton).not.toBeInTheDocument();
-      expect(menuButton).toBeVisible();
+      expect(barSignIn).not.toBeInTheDocument();
+      expect(barMenu).toBeVisible();
+      expect(fullSignIn).toBeVisible();
     });
   });
 
-  it('keeps the narrow bar to the brand and the menu button without reader accounts', () => {
-    setup({ isNarrow: true, hasReaderAccounts: false });
-
-    const menuButton = screen.getByRole('button', { name: MENU });
-    const signInButton = screen.queryByRole('button', { name: SIGN_IN });
+  it('keeps the bar to the brand and the menu button without reader accounts', () => {
+    setup({ hasReaderAccounts: false });
+    const menuButton = withinBar().getByRole('button', { name: MENU });
+    const signInButton = withinBar().queryByRole('button', { name: SIGN_IN });
 
     expect(menuButton).toBeVisible();
     expect(signInButton).not.toBeInTheDocument();
@@ -432,7 +444,9 @@ describe(`<${LookSample.name}/>`, () => {
 
         const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
         const postsLink = screen.getByRole('link', { name: POSTS });
-        const menuButton = screen.queryByRole('button', { name: MENU });
+        const menuButton = withinFullHeader().queryByRole('button', {
+          name: MENU,
+        });
 
         expect(header).toHaveAttribute(SAMPLE_HEADER_LAYOUT_ATTRIBUTE, layout);
         expect(postsLink).toBeVisible();
@@ -442,22 +456,20 @@ describe(`<${LookSample.name}/>`, () => {
 
     it('swaps the page links for a menu button with the menu button layout', () => {
       setupWithHeader({ layout: HEADER_LAYOUT.MENU_BUTTON });
-
-      const menuButton = screen.getByRole('button', { name: MENU });
-      const postsLink = screen.queryByRole('link', { name: POSTS });
+      const menuButton = withinFullHeader().getByRole('button', { name: MENU });
+      const postsLink = withinFullHeader().queryByRole('link', { name: POSTS });
 
       expect(menuButton).toBeVisible();
       expect(postsLink).not.toBeInTheDocument();
     });
 
     it.each(Object.values(HEADER_LAYOUT))(
-      'shows the same narrow bar with the %s layout',
+      'shows the same bar with the %s layout',
       (layout) => {
-        setupWithHeader({ layout }, { isNarrow: true });
-
-        const menuButton = screen.getByRole('button', { name: MENU });
-        const postsLink = screen.queryByRole('link', { name: POSTS });
-        const submenu = screen.queryByTestId(SAMPLE_SUBMENU_TEST_ID);
+        setupWithHeader({ layout }, { isSubmenuOpen: true });
+        const menuButton = withinBar().getByRole('button', { name: MENU });
+        const postsLink = withinBar().queryByRole('link', { name: POSTS });
+        const submenu = withinBar().queryByTestId(SAMPLE_SUBMENU_TEST_ID);
 
         expect(menuButton).toBeVisible();
         expect(postsLink).not.toBeInTheDocument();

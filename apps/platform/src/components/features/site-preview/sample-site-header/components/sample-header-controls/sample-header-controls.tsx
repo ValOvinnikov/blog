@@ -1,40 +1,29 @@
-import {
-  ICONS,
-  SIZE,
-  type IAccountControl,
-  type TLanguageSwitcherStyle,
-  type TLocaleIsoCode,
-} from '@blog/config';
+import { HEADER_LAYOUT, ICONS, SIZE, type TLocaleIsoCode } from '@blog/config';
 import type { IWithClassName } from '@blog/config/types';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
 import { SampleAccountControl } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-account-control/sample-account-control';
 import { SampleLanguageSwitcher } from '@platform/components/features/site-preview/sample-site-header/components/sample-header-controls/components/sample-language-switcher/sample-language-switcher';
+import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { useTranslations } from 'next-intl';
 
 import { sampleHeaderControlsVariants } from './sample-header-controls-variants';
 
 export type TSampleHeaderControlsProps = IWithClassName & {
   liveLocales: readonly TLocaleIsoCode[];
-  languageSwitcherStyle: TLanguageSwitcherStyle;
-  account: IAccountControl;
+  header: TSampleHeaderStyle;
   hasReaderAccounts: boolean;
   isSignedIn: boolean;
   isDark: boolean;
-  isNarrow: boolean;
-  hasMenuButton: boolean;
 };
 
 export const SampleHeaderControls = ({
   liveLocales,
-  languageSwitcherStyle,
-  account,
+  header: { layout, languageSwitcherStyle, account },
   hasReaderAccounts,
   isSignedIn,
   isDark,
-  isNarrow,
-  hasMenuButton,
   className,
 }: TSampleHeaderControlsProps) => {
   const t = useTranslations('lookPreview');
@@ -43,29 +32,25 @@ export const SampleHeaderControls = ({
 
   return (
     <div className={root({ class: className })}>
-      {!isNarrow && (
-        <>
-          <SampleLanguageSwitcher
-            liveLocales={liveLocales}
-            switcherStyle={languageSwitcherStyle}
-          />
-          <ThemeToggle
-            isDark={isDark}
-            onToggle={() => undefined}
-            lightLabel={t('themeToggleLight')}
-            darkLabel={t('themeToggleDark')}
-            className={themeToggle()}
-          />
-        </>
-      )}
+      <SampleLanguageSwitcher
+        liveLocales={liveLocales}
+        switcherStyle={languageSwitcherStyle}
+      />
+      <ThemeToggle
+        isDark={isDark}
+        onToggle={() => undefined}
+        lightLabel={t('themeToggleLight')}
+        darkLabel={t('themeToggleDark')}
+        className={themeToggle()}
+      />
       {hasReaderAccounts && (
         <SampleAccountControl
           account={account}
+          appearance={account.buttonStyle}
           isSignedIn={isSignedIn}
-          isNarrow={isNarrow}
         />
       )}
-      {hasMenuButton && (
+      {layout === HEADER_LAYOUT.MENU_BUTTON && (
         <IconButton variant="circle" ariaLabel={menuLabel} title={menuLabel}>
           <Icon name={ICONS.MENU} size={SIZE.MD} />
         </IconButton>

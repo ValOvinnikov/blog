@@ -5,10 +5,15 @@ import {
   RADIUS_SCALE,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import {
+  customRenderAsync,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
@@ -122,7 +127,9 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    const signInButton = screen.getByRole('button', { name: SIGN_IN });
+    const signInButton = within(
+      screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID),
+    ).getByRole('button', { name: SIGN_IN });
 
     expect(signInButton).toBeVisible();
   });

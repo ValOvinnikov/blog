@@ -31,6 +31,7 @@ import {
 import { SAMPLE_FOOTER_TEST_ID } from '@platform/constants/sample-footer';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+  SAMPLE_HEADER_FULL_TEST_ID,
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
   SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
@@ -475,7 +476,9 @@ describe(`<${LookForm.name}/>`, () => {
         });
         await user.click(signedInButton);
 
-        const accountMenu = screen.getByRole('menu', {
+        const accountMenu = within(
+          screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID),
+        ).getByRole('menu', {
           name: LOOK_PREVIEW.accountMenuAriaLabel,
         });
         expect(accountMenu).toBeVisible();

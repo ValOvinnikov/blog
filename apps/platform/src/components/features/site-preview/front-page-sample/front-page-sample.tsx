@@ -47,7 +47,6 @@ export const FrontPageSample = ({
         header={header}
         hasReaderAccounts={false}
         isSignedIn={false}
-        isNarrow={false}
         isDark={theme.isDark}
         isSubmenuOpen={false}
       />

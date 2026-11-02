@@ -3,7 +3,6 @@ import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
-import { Panel } from '@blog/ui/components/molecules/panel';
 import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
 import { SampleChip } from '@platform/components/features/site-preview/sample-chip';
 import { SampleSiteFooter } from '@platform/components/features/site-preview/sample-site-footer';
@@ -28,7 +27,6 @@ export type TLookSampleProps = {
   busy: IBusyStyle;
   hasReaderAccounts: boolean;
   isSignedIn?: boolean;
-  isNarrow?: boolean;
   isSubmenuOpen?: boolean;
 };
 
@@ -41,12 +39,11 @@ export const LookSample = ({
   busy,
   hasReaderAccounts,
   isSignedIn = false,
-  isNarrow = false,
   isSubmenuOpen = false,
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, actionsRow, cards, outlinedCard } = lookSampleVariants();
+  const { root, actionsRow, cards } = lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -60,7 +57,6 @@ export const LookSample = ({
         header={header}
         hasReaderAccounts={hasReaderAccounts}
         isSignedIn={isSignedIn}
-        isNarrow={isNarrow}
         isDark={theme.isDark}
         isSubmenuOpen={isSubmenuOpen}
       />
@@ -87,14 +83,6 @@ export const LookSample = ({
         <MediaCard isInteractive={false} excerpt={t('secondCardExcerpt')}>
           <MediaCard.Title level={4}>{t('secondCardTitle')}</MediaCard.Title>
         </MediaCard>
-        <Panel className={outlinedCard()}>
-          <Panel.Header headingLevel={4}>
-            {t('outlinedCardHeading')}
-          </Panel.Header>
-          <Panel.Body>
-            <Text variant="supporting">{t('outlinedCardBody')}</Text>
-          </Panel.Body>
-        </Panel>
       </div>
       <SampleSiteFooter brand={brand} footer={footer} />
     </SiteThemeFrame>

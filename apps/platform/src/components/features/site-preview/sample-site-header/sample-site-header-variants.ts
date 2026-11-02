@@ -4,25 +4,18 @@ import { tv } from '@platform/utils/tv/tv';
 export const sampleSiteHeaderVariants = tv({
   slots: {
     root: ['relative'],
-    inner: ['items-center gap-3'],
+    full: ['items-center gap-3 @max-[64rem]:hidden'],
+    bar: ['@[64rem]:hidden'],
     group: [],
     links: [],
     controls: [],
-    brand: ['flex items-center gap-2'],
-    brandName: ['font-display text-base font-semibold text-text'],
   },
   variants: {
-    isNarrow: {
-      true: {
-        inner: ['flex flex-nowrap justify-between'],
-        brand: ['min-w-0'],
-        brandName: ['truncate'],
-      },
-      false: {},
-    },
     barStyle: {
       [HEADER_BAR_STYLE.FULL_WIDTH]: {
-        root: ['border-b border-border pb-3'],
+        root: ['border-b border-border'],
+        full: ['pb-3'],
+        bar: ['px-4 @[40rem]:px-8'],
       },
       [HEADER_BAR_STYLE.FLOATING]: {
         root: [
@@ -32,32 +25,32 @@ export const sampleSiteHeaderVariants = tv({
     },
     layout: {
       [HEADER_LAYOUT.CLASSIC]: {
-        inner: ['flex flex-wrap justify-between'],
+        full: ['flex flex-wrap justify-between'],
         group: ['flex items-center gap-4'],
       },
       [HEADER_LAYOUT.LINKS_BESIDE_BRAND]: {
-        inner: ['grid grid-cols-[auto_1fr_auto] gap-x-6'],
+        full: ['grid grid-cols-[auto_1fr_auto] gap-x-6'],
         group: ['contents'],
       },
       [HEADER_LAYOUT.CENTRED_LINKS]: {
-        inner: ['grid grid-cols-[1fr_auto_1fr] gap-x-6'],
+        full: ['grid grid-cols-[1fr_auto_1fr] gap-x-6'],
         group: ['contents'],
         controls: ['justify-self-end'],
       },
       [HEADER_LAYOUT.TWO_ROWS]: {
-        inner: ['grid grid-cols-[1fr_auto] gap-x-6'],
+        full: ['grid grid-cols-[1fr_auto] gap-x-6'],
         group: ['contents'],
         links: ['col-span-full row-start-2 border-t border-border pt-3'],
         controls: ['justify-self-end'],
       },
       [HEADER_LAYOUT.CENTRED_BRAND]: {
-        inner: ['grid grid-cols-[1fr_auto_1fr] gap-x-6'],
+        full: ['grid grid-cols-[1fr_auto_1fr] gap-x-6'],
         group: ['contents'],
         links: ['col-start-1 row-start-1'],
         controls: ['col-start-3 row-start-1 justify-self-end'],
       },
       [HEADER_LAYOUT.MENU_BUTTON]: {
-        inner: ['flex flex-wrap justify-between'],
+        full: ['flex flex-wrap justify-between'],
         group: ['flex items-center gap-4'],
       },
     },
