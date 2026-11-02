@@ -189,6 +189,23 @@ describe(`<${LookSample.name}/>`, () => {
       expect(frenchLink).toHaveTextContent(FRENCH_CODE);
       expect(languageMenu).not.toBeInTheDocument();
     });
+
+    it('carries a bar of the brand, the person circle and the menu button beside the full header', () => {
+      const signInButton = withinBar().getByRole('button', { name: SIGN_IN });
+      const menuButton = withinBar().getByRole('button', { name: MENU });
+      const postsLink = withinBar().queryByRole('link', { name: POSTS });
+      const currentLanguage = withinBar().queryByTestId(
+        CURRENT_LANGUAGE_TEST_ID,
+      );
+
+      const barHeader = screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID);
+
+      expect(barHeader).toHaveTextContent(MOCK_TENANT_NAME);
+      expect(signInButton).toHaveTextContent('');
+      expect(menuButton).toBeVisible();
+      expect(postsLink).not.toBeInTheDocument();
+      expect(currentLanguage).not.toBeInTheDocument();
+    });
   });
 
   it('resolves the tenant accent in dark mode', () => {
@@ -237,22 +254,6 @@ describe(`<${LookSample.name}/>`, () => {
     expect(signInButton).not.toBeInTheDocument();
   });
 
-  it('carries a bar of the brand, the person circle and the menu button beside the full header', () => {
-    setup();
-    const signInButton = withinBar().getByRole('button', { name: SIGN_IN });
-    const menuButton = withinBar().getByRole('button', { name: MENU });
-    const postsLink = withinBar().queryByRole('link', { name: POSTS });
-    const currentLanguage = withinBar().queryByTestId(CURRENT_LANGUAGE_TEST_ID);
-
-    const barHeader = screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID);
-
-    expect(barHeader).toHaveTextContent(MOCK_TENANT_NAME);
-    expect(signInButton).toHaveTextContent('');
-    expect(menuButton).toBeVisible();
-    expect(postsLink).not.toBeInTheDocument();
-    expect(currentLanguage).not.toBeInTheDocument();
-  });
-
   describe('account', () => {
     const setupWithAccount = (
       account: Partial<TSampleHeaderStyle['account']>,
@@ -263,12 +264,16 @@ describe(`<${LookSample.name}/>`, () => {
         props,
       );
 
-    it('shows no account menu while signed out', () => {
-      setup();
+    describe('while signed out', () => {
+      beforeEach(() => {
+        setup();
+      });
 
-      const accountMenu = screen.queryByRole('menu', { name: ACCOUNT_MENU });
+      it('shows no account menu', () => {
+        const accountMenu = screen.queryByRole('menu', { name: ACCOUNT_MENU });
 
-      expect(accountMenu).not.toBeInTheDocument();
+        expect(accountMenu).not.toBeInTheDocument();
+      });
     });
 
     it('opens the account menu from the Account button while signed in', () => {
@@ -375,12 +380,16 @@ describe(`<${LookSample.name}/>`, () => {
     expect(englishLink).not.toBeInTheDocument();
   });
   describe('busy button', () => {
-    it('shows a busy button', () => {
-      setup();
+    describe('with the default busy style', () => {
+      beforeEach(() => {
+        setup();
+      });
 
-      const busyButton = screen.getByRole('button', { busy: true });
+      it('shows a busy button', () => {
+        const busyButton = screen.getByRole('button', { busy: true });
 
-      expect(busyButton).toBeVisible();
+        expect(busyButton).toBeVisible();
+      });
     });
 
     it.each(Object.values(BUSY_BUTTON_STYLE))(
@@ -409,16 +418,20 @@ describe(`<${LookSample.name}/>`, () => {
   });
 
   describe('footer', () => {
-    it('ends the sample with the link groups and a Cookie settings link', () => {
-      setup();
-
-      const archiveLink = screen.getByRole('link', { name: ARCHIVE });
-      const cookieSettingsLink = screen.getByRole('link', {
-        name: COOKIE_SETTINGS,
+    describe('with the default layout', () => {
+      beforeEach(() => {
+        setup();
       });
 
-      expect(archiveLink).toBeVisible();
-      expect(cookieSettingsLink).toBeVisible();
+      it('ends the sample with the link groups and a Cookie settings link', () => {
+        const archiveLink = screen.getByRole('link', { name: ARCHIVE });
+        const cookieSettingsLink = screen.getByRole('link', {
+          name: COOKIE_SETTINGS,
+        });
+
+        expect(archiveLink).toBeVisible();
+        expect(cookieSettingsLink).toBeVisible();
+      });
     });
 
     it('arranges the footer by the chosen layout, dropping the link groups when compact', () => {
@@ -491,14 +504,18 @@ describe(`<${LookSample.name}/>`, () => {
       },
     );
 
-    it('keeps the Topics sub-menu closed by default', () => {
-      setup();
+    describe('with the default header', () => {
+      beforeEach(() => {
+        setup();
+      });
 
-      const topicsTrigger = screen.getByText(TOPICS);
-      const submenu = screen.queryByTestId(SAMPLE_SUBMENU_TEST_ID);
+      it('keeps the Topics sub-menu closed by default', () => {
+        const topicsTrigger = screen.getByText(TOPICS);
+        const submenu = screen.queryByTestId(SAMPLE_SUBMENU_TEST_ID);
 
-      expect(topicsTrigger).toBeVisible();
-      expect(submenu).not.toBeInTheDocument();
+        expect(topicsTrigger).toBeVisible();
+        expect(submenu).not.toBeInTheDocument();
+      });
     });
 
     it.each(Object.values(HEADER_SUBMENU_STYLE))(

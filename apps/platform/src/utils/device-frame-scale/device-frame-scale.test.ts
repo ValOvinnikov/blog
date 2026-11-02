@@ -14,59 +14,98 @@ import {
 } from './device-frame-scale';
 
 const DESKTOP_STAGE_596 = 564;
-const DESKTOP_STAGE_476 = 444;
 const PHONE_TAB_HEIGHT = 523;
 const NARROW_STAGE = 358;
+const HALF_STAGE = 640;
 const WIDE_STAGE = 5000;
 const TABLET_FULLSCREEN_STAGE = 600;
 const LARGE_AVAILABLE_HEIGHT = 5000;
 
 describe(fitPageScale, () => {
-  it('fits Desktop to the stage width', () => {
-    const scale = fitPageScale({
+  it.each([
+    {
+      title: 'Desktop in a 596 px section',
       device: PREVIEW_DEVICE.DESKTOP,
-      availableWidth: DESKTOP_STAGE_596,
-    });
-
-    expect(scale).toBe(0.4406);
-    expect(scaleDeviceSize(PREVIEW_DEVICE.DESKTOP, scale)).toStrictEqual({
-      width: 564,
-      height: 352,
-    });
-  });
-
-  it('rounds the Desktop viewport at a 476 px section', () => {
-    const scale = fitPageScale({
+      availableWidth: 564,
+      scale: 0.4406,
+      size: { width: 564, height: 352 },
+      percent: 44,
+    },
+    {
+      title: 'Desktop in a 476 px section',
       device: PREVIEW_DEVICE.DESKTOP,
-      availableWidth: DESKTOP_STAGE_476,
-    });
-
-    expect(scaleDeviceSize(PREVIEW_DEVICE.DESKTOP, scale)).toStrictEqual({
-      width: 444,
-      height: 278,
-    });
-    expect(toScalePercent(scale)).toBe(35);
-  });
-
-  it('fits the Phone to the 608 px page height when the width allows', () => {
-    const scale = fitPageScale({
+      availableWidth: 444,
+      scale: 0.3469,
+      size: { width: 444, height: 278 },
+      percent: 35,
+    },
+    {
+      title: 'Desktop in a 426 px section',
+      device: PREVIEW_DEVICE.DESKTOP,
+      availableWidth: 394,
+      scale: 0.3078,
+      size: { width: 394, height: 246 },
+      percent: 31,
+    },
+    {
+      title: 'Desktop in a 704 px section',
+      device: PREVIEW_DEVICE.DESKTOP,
+      availableWidth: 670,
+      scale: 0.5234,
+      size: { width: 670, height: 419 },
+      percent: 52,
+    },
+    {
+      title: 'Phone in a 600 px section',
       device: PREVIEW_DEVICE.PHONE,
-      availableWidth: WIDE_STAGE,
-    });
-
-    expect(toScalePercent(scale)).toBe(72);
-    expect(scaleDeviceSize(PREVIEW_DEVICE.PHONE, scale).height).toBe(608);
-  });
-
-  it('fits to a smaller height when the caller passes one', () => {
-    const scale = fitPageScale({
+      availableWidth: 568,
+      scale: 0.7204,
+      size: { width: 281, height: 608 },
+      percent: 72,
+    },
+    {
+      title: 'Phone in a 426 px section',
+      device: PREVIEW_DEVICE.PHONE,
+      availableWidth: 394,
+      scale: 0.7204,
+      size: { width: 281, height: 608 },
+      percent: 72,
+    },
+    {
+      title: 'Phone with 523 px of height',
       device: PREVIEW_DEVICE.PHONE,
       availableWidth: WIDE_STAGE,
       availableHeight: PHONE_TAB_HEIGHT,
-    });
+      scale: 0.6197,
+      size: { width: 242, height: 523 },
+      percent: 62,
+    },
+  ])(
+    'fits the $title',
+    ({ device, availableWidth, availableHeight, scale, size, percent }) => {
+      const fitted = fitPageScale({ device, availableWidth, availableHeight });
 
-    expect(toScalePercent(scale)).toBe(62);
-  });
+      expect(fitted).toBe(scale);
+      expect(scaleDeviceSize(device, fitted)).toStrictEqual(size);
+      expect(toScalePercent(fitted)).toBe(percent);
+    },
+  );
+
+  it.each([
+    { title: '426', availableWidth: 394, scale: 0.4805, percent: 48 },
+    { title: '596', availableWidth: 564, scale: 0.5153, percent: 52 },
+  ])(
+    'fits the Tablet in a $title px section',
+    ({ availableWidth, scale, percent }) => {
+      const fitted = fitPageScale({
+        device: PREVIEW_DEVICE.TABLET,
+        availableWidth,
+      });
+
+      expect(fitted).toBe(scale);
+      expect(toScalePercent(fitted)).toBe(percent);
+    },
+  );
 
   it('never grows taller than 608 px whatever height the caller passes', () => {
     const scale = fitPageScale({
@@ -105,6 +144,15 @@ describe(fitFullscreenScale, () => {
     expect(wide).toStrictEqual({ scale: 1, isPanning: false });
     expect(narrow.isPanning).toBe(false);
     expect(toScalePercent(narrow.scale)).toBe(73);
+  });
+
+  it('fits without panning at exactly 50%', () => {
+    const fit = fitFullscreenScale({
+      device: PREVIEW_DEVICE.DESKTOP,
+      availableWidth: HALF_STAGE,
+    });
+
+    expect(fit).toStrictEqual({ scale: 0.5, isPanning: false });
   });
 
   it('shows at 100% and pans when fitting would drop under 50%', () => {

@@ -5,12 +5,19 @@ import {
   PREVIEW_HEADING_LAYOUT,
   PREVIEW_MODE,
   PREVIEW_READOUT,
+  type TPreviewDevice,
   type TPreviewHeadingLayout,
 } from '@platform/constants/preview';
 import { ARIA_PRESSED } from '@platform/testing/aria';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
-import userEvent from '@testing-library/user-event';
+import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PreviewFrame } from './preview-frame';
 
@@ -24,6 +31,9 @@ const MOCK_STATUS = faker.lorem.words(4);
 const MOCK_ACTION = faker.lorem.words(2);
 const LIVE_PREVIEW = 'Live preview';
 const NARROW_ROW = PREVIEW_READOUT.LONG_MIN_WIDTH - 1;
+const WIDE_ROW = 600;
+const DESKTOP_LONG_READOUT = '1280 px wide · shown at 44%';
+const PHONE_LONG_READOUT = '390 px wide · shown at 72%';
 
 const setup = customRender(PreviewFrame, {
   ariaLabel: MOCK_LABEL,
@@ -44,57 +54,113 @@ describe(`<${PreviewFrame.name}/>`, () => {
   });
 
   describe('heading', () => {
-    const renderHeading = (layout?: TPreviewHeadingLayout) =>
-      setup({
-        children: (
-          <PreviewFrame.Heading
-            device={PREVIEW_DEVICE.DESKTOP}
-            scale={0.4406}
-            layout={layout}
-          />
-        ),
-      });
+    let restoreResizeObserver: () => void;
+    let rowWidth: number;
 
-    it('names the section "Live preview" with the long readout', () => {
-      renderHeading();
+    const headingOf = (
+      device: TPreviewDevice,
+      scale: number,
+      layout?: TPreviewHeadingLayout,
+    ) => (
+      <PreviewFrame ariaLabel={MOCK_LABEL}>
+        <PreviewFrame.Heading device={device} scale={scale} layout={layout} />
+      </PreviewFrame>
+    );
 
-      const heading = screen.getByRole('heading', {
-        level: 2,
-        name: LIVE_PREVIEW,
-      });
-      const readout = screen.getByRole('status');
-
-      expect(heading).toBeVisible();
-      expect(readout).toHaveTextContent('1280 px wide · shown at 44%');
+    beforeEach(() => {
+      rowWidth = WIDE_ROW;
+      restoreResizeObserver = stubResizeObserver(() => ({
+        width: rowWidth,
+        height: 20,
+      }));
     });
 
-    describe('in a narrow section', () => {
-      let restoreResizeObserver: () => void;
+    afterEach(() => {
+      restoreResizeObserver();
+    });
 
-      beforeEach(() => {
-        restoreResizeObserver = stubResizeObserver(() => ({
-          width: NARROW_ROW,
-          height: 20,
-        }));
-      });
+    it.each([
+      {
+        device: PREVIEW_DEVICE.DESKTOP,
+        scale: 0.4406,
+        text: DESKTOP_LONG_READOUT,
+      },
+      {
+        device: PREVIEW_DEVICE.DESKTOP,
+        scale: 0.3469,
+        text: '1280 px wide · shown at 35%',
+      },
+      {
+        device: PREVIEW_DEVICE.TABLET,
+        scale: 0.5153,
+        text: '820 px wide · shown at 52%',
+      },
+      {
+        device: PREVIEW_DEVICE.PHONE,
+        scale: 0.7204,
+        text: PHONE_LONG_READOUT,
+      },
+    ])(
+      'reads "$text" under "Live preview" in a wide section',
+      ({ device, scale, text }) => {
+        renderWithIntl(headingOf(device, scale));
 
-      afterEach(() => {
-        restoreResizeObserver();
-      });
+        const heading = screen.getByRole('heading', {
+          level: 2,
+          name: LIVE_PREVIEW,
+        });
+        const readout = screen.getByRole('status');
 
-      it('switches to "Preview" and the short readout', () => {
-        renderHeading();
+        expect(heading).toBeVisible();
+        expect(readout).toHaveTextContent(text);
+      },
+    );
+
+    it.each([
+      {
+        device: PREVIEW_DEVICE.TABLET,
+        scale: 0.4805,
+        text: '820 px · 48%',
+      },
+      {
+        device: PREVIEW_DEVICE.PHONE,
+        scale: 0.7204,
+        text: '390 px · 72%',
+      },
+    ])(
+      'reads "$text" under "Preview" in a narrow section',
+      ({ device, scale, text }) => {
+        rowWidth = NARROW_ROW;
+        renderWithIntl(headingOf(device, scale));
 
         const heading = screen.getByRole('heading', { level: 2 });
         const readout = screen.getByRole('status');
 
-        expect(heading).toHaveTextContent('Preview');
-        expect(readout).toHaveTextContent('1280 px · 44%');
-      });
+        expect(heading).toHaveAccessibleName('Preview');
+        expect(readout).toHaveTextContent(text);
+      },
+    );
+
+    it('keeps the long form at the 476 px boundary', () => {
+      rowWidth = PREVIEW_READOUT.LONG_MIN_WIDTH;
+      renderWithIntl(headingOf(PREVIEW_DEVICE.DESKTOP, 0.4406));
+
+      const heading = screen.getByRole('heading', { level: 2 });
+      const readout = screen.getByRole('status');
+
+      expect(heading).toHaveAccessibleName(LIVE_PREVIEW);
+      expect(readout).toHaveTextContent(DESKTOP_LONG_READOUT);
     });
 
     it('reads the phone tab readout under a heading kept for assistive technology', () => {
-      renderHeading(PREVIEW_HEADING_LAYOUT.PHONE_TAB);
+      rowWidth = NARROW_ROW;
+      renderWithIntl(
+        headingOf(
+          PREVIEW_DEVICE.PHONE,
+          0.6197,
+          PREVIEW_HEADING_LAYOUT.PHONE_TAB,
+        ),
+      );
 
       const heading = screen.getByRole('heading', {
         level: 2,
@@ -103,15 +169,29 @@ describe(`<${PreviewFrame.name}/>`, () => {
       const readout = screen.getByRole('status');
 
       expect(heading).toBeInTheDocument();
-      expect(readout).toHaveTextContent('1280 px · shown at 44%');
+      expect(readout).toHaveTextContent('390 px · shown at 62%');
+    });
+
+    it('updates the readout when the device and scale change', () => {
+      const { rerender } = renderWithIntl(
+        headingOf(PREVIEW_DEVICE.DESKTOP, 0.4406),
+      );
+
+      rerender(headingOf(PREVIEW_DEVICE.PHONE, 0.7204));
+
+      const readout = screen.getByRole('status');
+
+      expect(readout).toHaveTextContent(PHONE_LONG_READOUT);
     });
   });
 
   describe('toolbar', () => {
     const onDeviceChange = vi.fn();
     const onModeChange = vi.fn();
+    let user: UserEvent;
 
     beforeEach(() => {
+      user = userEvent.setup();
       setup({
         children: (
           <PreviewFrame.Toolbar
@@ -150,9 +230,34 @@ describe(`<${PreviewFrame.name}/>`, () => {
       expect(dark).toHaveAttribute(ARIA_PRESSED, 'true');
     });
 
-    it('reports the device the user picks', async () => {
-      const user = userEvent.setup();
+    it('lands the first Tab on the pressed device', async () => {
+      await user.tab();
 
+      const tablet = screen.getByRole('button', { name: 'Tablet' });
+
+      expect(tablet).toHaveFocus();
+    });
+
+    it.each([
+      { name: 'Desktop', tooltip: 'Desktop · 1280 px' },
+      { name: 'Tablet', tooltip: 'Tablet · 820 px' },
+      { name: 'Phone', tooltip: 'Phone · 390 px' },
+      { name: 'Light', tooltip: 'Light' },
+      { name: 'Dark', tooltip: 'Dark' },
+    ])('shows the "$tooltip" tooltip on the $name button', async (option) => {
+      const button = screen.getByRole('button', { name: option.name });
+      await user.hover(button);
+
+      const tooltip = await screen.findByText(
+        option.tooltip,
+        {},
+        TOOLTIP_HOVER_TIMEOUT,
+      );
+
+      expect(tooltip).toBeVisible();
+    });
+
+    it('reports the device the user picks', async () => {
       const phone = screen.getByRole('button', { name: 'Phone' });
       await user.click(phone);
 
@@ -160,8 +265,6 @@ describe(`<${PreviewFrame.name}/>`, () => {
     });
 
     it('reports the colour scheme the user picks', async () => {
-      const user = userEvent.setup();
-
       const light = screen.getByRole('button', { name: 'Light' });
       await user.click(light);
 
@@ -187,6 +290,22 @@ describe(`<${PreviewFrame.name}/>`, () => {
 
     expect(status).toBeVisible();
     expect(action).toBeVisible();
+  });
+
+  it('shows the status text without an action when the caller passes none', () => {
+    setup({
+      children: (
+        <PreviewFrame.Status icon={ICONS.CROSSHAIR}>
+          {MOCK_STATUS}
+        </PreviewFrame.Status>
+      ),
+    });
+
+    const status = screen.getByText(MOCK_STATUS);
+    const action = screen.queryByRole('button');
+
+    expect(status).toBeVisible();
+    expect(action).not.toBeInTheDocument();
   });
 
   it('renders the stage part holding the sample', () => {
