@@ -927,8 +927,8 @@ width **and** height:
 `scale = min(availableWidth / deviceWidth, availableHeight / deviceHeight)`
 
 - `availableWidth` = the stage's inner width (stage width − 2 × stage
-  padding) minus the bezel (tablet and phone: 2 × (6 padding + 1 border) =
-  14).
+  padding), for every device; the bezel is not subtracted, as the table
+  below and #6390's criteria draw it (decided 2 Nov).
 - `availableHeight` in the two-column layout and on the Preview tab from
   `lg` = **608 px** (the tallest viewport the boards draw, LX-A); the frame
   never grows taller, whatever the pane width. On the phone Preview tab = the room left in the window under
