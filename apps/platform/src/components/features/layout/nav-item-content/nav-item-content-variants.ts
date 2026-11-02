@@ -32,27 +32,39 @@ export const navItemContentVariants = tv({
     ],
     statusIcon: ['mt-px'],
     statusText: ['min-w-0 transition-colors duration-base ease-smooth'],
+    iconFrame: ['relative flex shrink-0'],
+    // The 14px badge overlaps the 16px nav icon's lower-right corner by 6.5px on each axis.
+    railBadge: [
+      'absolute -right-[7.5px] -bottom-[7.5px] flex size-3.5 items-center justify-center rounded-full',
+      'bg-admin-side transition-colors duration-base ease-smooth',
+      'group-hover:bg-admin-side-line group-aria-[current=page]:bg-admin-side-raised',
+    ],
   },
   variants: {
     hasStatus: {
       true: {
-        rowIcon: [
-          'mt-0.5 self-start',
-          'group-data-[collapsed=true]/shell:mt-0 group-data-[collapsed=true]/shell:self-center',
-        ],
+        rowIcon: ['mt-0.5 self-start'],
+      },
+    },
+    hasRailBadge: {
+      true: {
+        rowIcon: ['group-focus-visible:text-admin-text-strong'],
       },
     },
     tone: {
       warn: {
         statusIcon: ['text-admin-warn'],
+        railBadge: ['text-admin-warn'],
         statusText: STATUS_TEXT_MUTED,
       },
       brand: {
         statusIcon: ['text-admin-brand-ink'],
+        railBadge: ['text-admin-brand-ink'],
         statusText: STATUS_TEXT_MUTED,
       },
       bad: {
         statusIcon: ['text-admin-bad'],
+        railBadge: ['text-admin-bad'],
         statusText: ['text-admin-bad'],
       },
     },

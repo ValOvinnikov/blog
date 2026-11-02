@@ -1,3 +1,4 @@
+import { NavItemRailBadge } from '@platform/components/features/layout/nav-item-content/components/nav-item-rail-badge';
 import {
   NavItemStatus,
   type TNavItemStatus,
@@ -25,6 +26,7 @@ export type TNavItemContentProps = {
   disabledReason?: string;
   badge?: TNavItemBadge;
   status?: TNavItemStatus;
+  isCollapsed?: boolean;
 };
 
 export const NavItemContent = ({
@@ -33,19 +35,34 @@ export const NavItemContent = ({
   disabledReason,
   badge,
   status,
+  isCollapsed = false,
 }: TNavItemContentProps) => {
-  const { rowIcon, rowBody, rowLabel, rowReason, badgeSlot } =
-    navItemContentVariants({ hasStatus: !!status });
+  const railStatus = isCollapsed ? status : undefined;
+  const lineStatus = isCollapsed ? undefined : status;
+  const { rowIcon, rowBody, rowLabel, rowReason, badgeSlot, iconFrame } =
+    navItemContentVariants({
+      hasStatus: !!lineStatus,
+      hasRailBadge: !!railStatus,
+    });
+
+  const rowIconElement = <Icon name={icon} className={rowIcon()} />;
 
   return (
     <>
-      <Icon name={icon} className={rowIcon()} />
+      {railStatus ? (
+        <span className={iconFrame()}>
+          {rowIconElement}
+          <NavItemRailBadge status={railStatus} />
+        </span>
+      ) : (
+        rowIconElement
+      )}
       <span className={rowBody()}>
         <span className={rowLabel()}>{label}</span>
         {disabledReason && (
           <span className={rowReason()}>{disabledReason}</span>
         )}
-        {status && <NavItemStatus status={status} />}
+        {lineStatus && <NavItemStatus status={lineStatus} />}
       </span>
       {badge && (
         <StatusBadge

@@ -4,6 +4,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
 import {
   ARIA_CURRENT,
+  ARIA_DESCRIBEDBY,
   ARIA_DISABLED,
   ARIA_HIDDEN,
 } from '@platform/testing/aria';
@@ -40,6 +41,9 @@ const MOCK_DISABLED_REASON = faker.lorem.sentence();
 const MOCK_STATUS = mockNavStatus();
 const MOCK_STATUS_ITEM = mockNavLinkItem({ status: MOCK_STATUS });
 const MOCK_STATUS_ITEM_NAME = `${MOCK_STATUS_ITEM.label}${messages.navItemContent.statusSeparator} ${MOCK_STATUS.text}`;
+const MOCK_STATUS_TOOLTIP = messages.navSections.collapsedStatusTooltip
+  .replace('{label}', MOCK_STATUS_ITEM.label)
+  .replace('{status}', MOCK_STATUS.text);
 const MOCK_INERT_ITEM = mockNavInertItem({
   badge: MOCK_BADGE,
   disabledReason: MOCK_DISABLED_REASON,
@@ -145,23 +149,16 @@ describe(`<${Sidebar.name}/>`, () => {
     expect(badge).toBeVisible();
   });
 
-  it.each([
-    { state: 'expanded', isInitiallyCollapsed: false },
-    { state: 'collapsed', isInitiallyCollapsed: true },
-  ])(
-    'names a $state link with a status by its label and line, with no native title',
-    ({ isInitiallyCollapsed }) => {
-      renderSidebar(
-        { sections: [mockNavSection({ items: [MOCK_STATUS_ITEM] })] },
-        isInitiallyCollapsed,
-      );
+  it('names an expanded link with a status by its label and line, with no native title', () => {
+    renderSidebar({
+      sections: [mockNavSection({ items: [MOCK_STATUS_ITEM] })],
+    });
 
-      const link = screen.getByRole('link', { name: MOCK_STATUS_ITEM_NAME });
+    const link = screen.getByRole('link', { name: MOCK_STATUS_ITEM_NAME });
 
-      expect(link).not.toHaveAttribute('title');
-      expect(link).not.toHaveAccessibleDescription();
-    },
-  );
+    expect(link).not.toHaveAttribute('title');
+    expect(link).not.toHaveAccessibleDescription();
+  });
 
   it.each([
     { active: MOCK_LOOK_ITEM, inactive: MOCK_VOICE_ITEM },
@@ -291,5 +288,83 @@ describe(`<${Sidebar.name}/>`, () => {
         );
       }, TOOLTIP_HOVER_TIMEOUT);
     });
+  });
+
+  describe('when a collapsed link has a status', () => {
+    let user: UserEvent;
+    let link: HTMLElement;
+
+    beforeEach(() => {
+      user = userEvent.setup();
+      renderSidebar(
+        { sections: [mockNavSection({ items: [MOCK_STATUS_ITEM] })] },
+        true,
+      );
+      link = screen.getByRole('link', { name: MOCK_STATUS_ITEM.label });
+    });
+
+    it('names it by its label alone and describes it by the status once', () => {
+      const line = screen.queryByText(MOCK_STATUS.text);
+
+      expect(line).not.toBeInTheDocument();
+      expect(link).toHaveAccessibleDescription(MOCK_STATUS_TOOLTIP);
+      expect(link).not.toHaveAttribute('title');
+    });
+
+    it('shows only the status tooltip on keyboard focus', async () => {
+      await user.tab();
+
+      const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
+      const names = screen.getAllByText(MOCK_STATUS_ITEM.label);
+
+      expect(link).toHaveFocus();
+      expect(statusTexts).toHaveLength(2);
+      expect(statusTexts[1]).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(names).toHaveLength(1);
+    });
+
+    it('hides the status tooltip on Escape', async () => {
+      await user.tab();
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => {
+        const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
+
+        expect(statusTexts).toHaveLength(1);
+      });
+    });
+
+    it('shows only the status tooltip on hover', async () => {
+      await user.hover(link);
+
+      await waitFor(() => {
+        const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
+
+        expect(statusTexts).toHaveLength(2);
+      }, TOOLTIP_HOVER_TIMEOUT);
+      const names = screen.getAllByText(MOCK_STATUS_ITEM.label);
+
+      expect(names).toHaveLength(1);
+    });
+  });
+
+  it('gives each rendered nav its own status description', () => {
+    const section = mockNavSection({ items: [MOCK_STATUS_ITEM] });
+    renderWithIntl(
+      <SidebarCollapseProvider isInitiallyCollapsed={true}>
+        <Sidebar sections={[section]} />
+        <Sidebar sections={[section]} />
+      </SidebarCollapseProvider>,
+    );
+
+    const [first, second] = screen.getAllByRole('link', {
+      name: MOCK_STATUS_ITEM.label,
+    });
+
+    expect(first).toHaveAccessibleDescription(MOCK_STATUS_TOOLTIP);
+    expect(second).toHaveAccessibleDescription(MOCK_STATUS_TOOLTIP);
+    expect(first?.getAttribute(ARIA_DESCRIBEDBY)).not.toBe(
+      second?.getAttribute(ARIA_DESCRIBEDBY),
+    );
   });
 });

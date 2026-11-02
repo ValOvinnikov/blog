@@ -48,9 +48,14 @@ module types whose capability is off for the tenant carry a warning.
   row like the others; it never shows a pill. A visually hidden comma
   separates label and line, so the link is named "Studio, Needs attention";
   while it has a line the link carries no native `title`, in the expanded and
-  collapsed sidebar and the phone Menu alike. The line follows the current
-  state without a reload (see [platform-shell](./platform-shell.md)).
-  Operators never see it.
+  collapsed sidebar and the phone Menu alike. In the collapsed rail the line
+  is not rendered: a 14px corner badge holding the state's icon sits on the
+  nav icon's lower-right corner (hidden from assistive tech, its circle taking
+  the row's ground), the link is named "Studio" alone, and a visually hidden
+  "Studio · <line>" span beside the link describes it. That same text is the
+  item's one tooltip, to the right of the row, replacing the rail's name
+  tooltip. The line follows the current state without a reload (see
+  [platform-shell](./platform-shell.md)). Operators never see it.
 - Outside the platform, `pnpm --filter @blog/studio dev` runs the same config
   standalone through the Sanity CLI (`sanity.config.ts`, title "Blog").
 
