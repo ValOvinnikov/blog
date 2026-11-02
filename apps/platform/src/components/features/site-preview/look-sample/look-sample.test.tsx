@@ -89,10 +89,15 @@ const setup = customRender(LookSample, {
   hasReaderAccounts: true,
 });
 
-const withinFullHeader = () =>
-  within(screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID));
+const withinFullHeader = () => {
+  const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+  return within(fullHeader);
+};
 
-const withinBar = () => within(screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID));
+const withinBar = () => {
+  const bar = screen.getByTestId(SAMPLE_HEADER_BAR_TEST_ID);
+  return within(bar);
+};
 
 const setupWithHeader = (
   header: Partial<TSampleHeaderStyle>,

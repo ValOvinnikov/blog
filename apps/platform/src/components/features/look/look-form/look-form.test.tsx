@@ -476,9 +476,8 @@ describe(`<${LookForm.name}/>`, () => {
         });
         await user.click(signedInButton);
 
-        const accountMenu = within(
-          screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID),
-        ).getByRole('menu', {
+        const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+        const accountMenu = within(fullHeader).getByRole('menu', {
           name: LOOK_PREVIEW.accountMenuAriaLabel,
         });
         expect(accountMenu).toBeVisible();

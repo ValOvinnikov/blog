@@ -127,9 +127,10 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     await setup();
 
-    const signInButton = within(
-      screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID),
-    ).getByRole('button', { name: SIGN_IN });
+    const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+    const signInButton = within(fullHeader).getByRole('button', {
+      name: SIGN_IN,
+    });
 
     expect(signInButton).toBeVisible();
   });
