@@ -4792,6 +4792,14 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "SURFACE_2": [
+      {
+        "ref": "FOCUS_RING_GROUND.SURFACE_2",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
     "SURFACE_HEAD": [
       {
         "ref": "FOCUS_RING_GROUND.SURFACE_HEAD",
