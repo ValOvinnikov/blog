@@ -817,6 +817,8 @@
   },
   "assetUploadField": {
     "remove": "Quitar",
+    "upload": "Subir",
+    "replace": "Sustituir",
     "logo": {
       "currentAlt": "Logotipo actual",
       "upload": "Subir logotipo",

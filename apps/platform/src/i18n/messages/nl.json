@@ -817,6 +817,8 @@
   },
   "assetUploadField": {
     "remove": "Verwijderen",
+    "upload": "Uploaden",
+    "replace": "Vervangen",
     "logo": {
       "currentAlt": "Huidig logo",
       "upload": "Logo uploaden",
