@@ -34,7 +34,9 @@ export const HueSlider = ({
   track: trackKind = HUE_SLIDER_TRACK.PALETTE,
 }: THueSliderProps) => {
   const t = useTranslations('logoHueField');
-  const { root, control, track, thumb } = hueSliderVariants();
+  const { root, control, track, thumb } = hueSliderVariants({
+    track: trackKind,
+  });
 
   return (
     <Slider.Root

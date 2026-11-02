@@ -1,4 +1,5 @@
 import { type IWithClassName, SIZE } from '@blog/config';
+import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import { buildAccentPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 
 import { accentSwatchVariants } from './accent-swatch-variants';
@@ -19,7 +20,7 @@ export const AccentSwatch = ({
     role={name ? 'img' : undefined}
     aria-label={name}
     aria-hidden={name ? undefined : true}
-    data-testid="accent-swatch"
+    data-testid={ACCENT_SWATCH_TEST_ID}
     className={accentSwatchVariants({ size, class: className })}
     style={{
       background: buildAccentPreviewTokens(hue, false)['--brand-primary'],

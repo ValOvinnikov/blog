@@ -1,3 +1,4 @@
+import { HUE_SLIDER_TRACK } from '@platform/constants/hue-slider';
 import { tv } from '@platform/utils/tv/tv';
 
 export const hueSliderVariants = tv({
@@ -5,7 +6,7 @@ export const hueSliderVariants = tv({
     root: ['min-w-24 flex-1 self-stretch touch-none select-none'],
     control: ['flex h-full min-h-11 items-center md:min-h-9'],
     track: [
-      'relative h-3 w-full grow rounded-admin bg-admin-line-2',
+      'relative h-3 w-full grow bg-admin-line-2',
       'data-[disabled]:opacity-50',
     ],
     thumb: [
@@ -16,4 +17,11 @@ export const hueSliderVariants = tv({
       'has-[:focus-visible]:not-data-[dragging]:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]',
     ],
   },
+  variants: {
+    track: {
+      [HUE_SLIDER_TRACK.PALETTE]: { track: ['rounded-full'] },
+      [HUE_SLIDER_TRACK.RAINBOW]: { track: ['rounded-admin'] },
+    },
+  },
+  defaultVariants: { track: HUE_SLIDER_TRACK.PALETTE },
 });
