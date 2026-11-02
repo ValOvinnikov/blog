@@ -32,6 +32,16 @@ const MOCK_END_SLOT = faker.lorem.words(2);
 const MOCK_STATUS = faker.lorem.words(4);
 const MOCK_ACTION = faker.lorem.words(2);
 const tDevicePreview = makeEnTranslator('devicePreview');
+const tMode = makeEnTranslator('previewModeControl');
+const MOCK_DESKTOP_NAME = makeEnTranslator('lookPreview')('widthDesktop');
+const MOCK_TABLET_NAME = tDevicePreview('deviceTablet');
+const MOCK_PHONE_NAME = tDevicePreview('devicePhone');
+const MOCK_LIGHT_NAME = tMode('modeLight');
+const MOCK_DARK_NAME = tMode('modeDark');
+const tooltipFor = (
+  key: 'tooltipDesktop' | 'tooltipTablet' | 'tooltipPhone',
+  device: TPreviewDevice,
+) => tDevicePreview(key, { width: PREVIEW_DEVICE_WIDTH[device] });
 const MOCK_LIVE_PREVIEW =
   makeEnTranslator('previewModeControl')('livePreviewHeading');
 const MOCK_PREVIEW = makeEnTranslator('viewTabs')('previewTab');
@@ -228,10 +238,14 @@ describe(`<${PreviewFrame.name}/>`, () => {
     });
 
     it('offers the devices and the colour scheme as named groups', () => {
-      const toolbar = screen.getByRole('toolbar', { name: 'Preview options' });
-      const devices = screen.getByRole('group', { name: 'Preview device' });
+      const toolbar = screen.getByRole('toolbar', {
+        name: tDevicePreview('toolbarAriaLabel'),
+      });
+      const devices = screen.getByRole('group', {
+        name: tDevicePreview('deviceGroupAriaLabel'),
+      });
       const schemes = screen.getByRole('group', {
-        name: 'Preview colour scheme',
+        name: tMode('previewColorSchemeAriaLabel'),
       });
 
       const deviceButtons = within(devices).getAllByRole('button');
@@ -244,8 +258,8 @@ describe(`<${PreviewFrame.name}/>`, () => {
     });
 
     it('presses the chosen device and colour scheme', () => {
-      const tablet = screen.getByRole('button', { name: 'Tablet' });
-      const dark = screen.getByRole('button', { name: 'Dark' });
+      const tablet = screen.getByRole('button', { name: MOCK_TABLET_NAME });
+      const dark = screen.getByRole('button', { name: MOCK_DARK_NAME });
 
       expect(tablet).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(dark).toHaveAttribute(ARIA_PRESSED, 'true');
@@ -254,17 +268,26 @@ describe(`<${PreviewFrame.name}/>`, () => {
     it('lands the first Tab on the pressed device', async () => {
       await user.tab();
 
-      const tablet = screen.getByRole('button', { name: 'Tablet' });
+      const tablet = screen.getByRole('button', { name: MOCK_TABLET_NAME });
 
       expect(tablet).toHaveFocus();
     });
 
     it.each([
-      { name: 'Desktop', tooltip: 'Desktop · 1280 px' },
-      { name: 'Tablet', tooltip: 'Tablet · 820 px' },
-      { name: 'Phone', tooltip: 'Phone · 390 px' },
-      { name: 'Light', tooltip: 'Light' },
-      { name: 'Dark', tooltip: 'Dark' },
+      {
+        name: MOCK_DESKTOP_NAME,
+        tooltip: tooltipFor('tooltipDesktop', PREVIEW_DEVICE.DESKTOP),
+      },
+      {
+        name: MOCK_TABLET_NAME,
+        tooltip: tooltipFor('tooltipTablet', PREVIEW_DEVICE.TABLET),
+      },
+      {
+        name: MOCK_PHONE_NAME,
+        tooltip: tooltipFor('tooltipPhone', PREVIEW_DEVICE.PHONE),
+      },
+      { name: MOCK_LIGHT_NAME, tooltip: MOCK_LIGHT_NAME },
+      { name: MOCK_DARK_NAME, tooltip: MOCK_DARK_NAME },
     ])('shows the "$tooltip" tooltip on the $name button', async (option) => {
       const button = screen.getByRole('button', { name: option.name });
       await user.hover(button);
@@ -279,14 +302,14 @@ describe(`<${PreviewFrame.name}/>`, () => {
     });
 
     it('reports the device the user picks', async () => {
-      const phone = screen.getByRole('button', { name: 'Phone' });
+      const phone = screen.getByRole('button', { name: MOCK_PHONE_NAME });
       await user.click(phone);
 
       expect(onDeviceChange).toHaveBeenCalledWith(PREVIEW_DEVICE.PHONE);
     });
 
     it('reports the colour scheme the user picks', async () => {
-      const light = screen.getByRole('button', { name: 'Light' });
+      const light = screen.getByRole('button', { name: MOCK_LIGHT_NAME });
       await user.click(light);
 
       expect(onModeChange).toHaveBeenCalledWith(PREVIEW_MODE.LIGHT);

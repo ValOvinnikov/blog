@@ -9,12 +9,15 @@ import {
   PREVIEW_DEVICE_WIDTH,
 } from '@platform/constants/preview';
 import { customRender, screen, within } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
 import { createRef } from 'react';
 
 import { DeviceFrame, type TDeviceFrameHandle } from './index';
 
 faker.seed(6390);
+
+const tDeviceFrame = makeEnTranslator('devicePreview');
 
 const MOCK_HOST = faker.internet.domainName();
 const MOCK_CONTENT = faker.lorem.words(3);
@@ -56,7 +59,9 @@ describe(`<${DeviceFrame.name}/>`, () => {
       setup({ device });
 
       const frame = screen.getByRole('img', {
-        name: `Sample page at ${PREVIEW_DEVICE_WIDTH[device]} px`,
+        name: tDeviceFrame('sampleAtWidth', {
+          width: PREVIEW_DEVICE_WIDTH[device],
+        }),
       });
 
       expect(frame).toBeVisible();
