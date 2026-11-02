@@ -58,48 +58,48 @@ describe(`<${AdminShell.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders the sidebar, topbar and page content together', () => {
-    setup();
-
-    const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
-    const sectionLabel = screen.getByText(MOCK_SECTION_LABEL);
-    const crumb = screen.getByText(MOCK_CRUMB);
-    const pageContent = screen.getByText(MOCK_PAGE_CONTENT);
-
-    expect(navLink).toBeVisible();
-    expect(sectionLabel).toBeVisible();
-    expect(crumb).toBeVisible();
-    expect(pageContent).toBeVisible();
-  });
-
-  it('puts the account in the sidebar foot, with the role line in its menu', async () => {
-    setup();
-
-    const sidebar = screen.getByRole('complementary', {
-      name: messages.sidebar.ariaLabel,
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
     });
-    const trigger = within(sidebar).getByRole('button', {
-      name: new RegExp(MOCK_EMAIL),
+
+    it('renders the sidebar, topbar and page content together', () => {
+      const navLink = screen.getByRole('link', { name: MOCK_NAV_ITEM_LABEL });
+      const sectionLabel = screen.getByText(MOCK_SECTION_LABEL);
+      const crumb = screen.getByText(MOCK_CRUMB);
+      const pageContent = screen.getByText(MOCK_PAGE_CONTENT);
+
+      expect(navLink).toBeVisible();
+      expect(sectionLabel).toBeVisible();
+      expect(crumb).toBeVisible();
+      expect(pageContent).toBeVisible();
     });
-    await user.click(trigger);
 
-    const menu = await screen.findByRole('menu', {
-      name: messages.account.menuLabel,
+    it('puts the account in the sidebar foot, with the role line in its menu', async () => {
+      const sidebar = screen.getByRole('complementary', {
+        name: messages.sidebar.ariaLabel,
+      });
+      const trigger = within(sidebar).getByRole('button', {
+        name: new RegExp(MOCK_EMAIL),
+      });
+      await user.click(trigger);
+
+      const menu = await screen.findByRole('menu', {
+        name: messages.account.menuLabel,
+      });
+      const name = within(trigger).getByText(MOCK_NAME);
+      const roleLine = within(menu).getByText(MOCK_ROLE_LINE);
+
+      expect(name).toBeVisible();
+      expect(roleLine).toBeVisible();
     });
-    const name = within(trigger).getByText(MOCK_NAME);
-    const roleLine = within(menu).getByText(MOCK_ROLE_LINE);
 
-    expect(name).toBeVisible();
-    expect(roleLine).toBeVisible();
-  });
+    it('keeps the phone pill in the top bar, named by the role line', () => {
+      const banner = screen.getByRole('banner');
+      const pill = within(banner).getByRole('button', { name: MOCK_ROLE_LINE });
 
-  it('keeps the phone pill in the top bar, named by the role line', () => {
-    setup();
-
-    const banner = screen.getByRole('banner');
-    const pill = within(banner).getByRole('button', { name: MOCK_ROLE_LINE });
-
-    expect(pill).toHaveAttribute(ARIA_HASPOPUP, 'menu');
+      expect(pill).toHaveAttribute(ARIA_HASPOPUP, 'menu');
+    });
   });
 
   it('lists the nav items and the switcher in the topbar menu', async () => {

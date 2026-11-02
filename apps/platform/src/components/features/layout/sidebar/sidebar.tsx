@@ -1,34 +1,13 @@
-import {
-  NavItemContent,
-  type TNavItemBadge,
-} from '@platform/components/features/layout/nav-item-content';
-import { BrandMark } from '@platform/components/shared/brand-mark';
-import type { TRegisteredIconName } from '@platform/components/shared/icon';
 import { SIDEBAR_ID } from '@platform/constants/sidebar';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { SidebarNavLink } from './components/sidebar-nav-link';
-import { SidebarRailTooltip } from './components/sidebar-rail-tooltip';
+import { SidebarBrand } from './components/sidebar-brand';
+import {
+  SidebarNavSection,
+  type TSidebarNavSection,
+} from './components/sidebar-nav-section';
 import { sidebarVariants } from './sidebar-variants';
-
-type TSidebarNavItemBase = {
-  label: string;
-  icon: TRegisteredIconName;
-  badge?: TNavItemBadge;
-};
-
-export type TSidebarNavItem = TSidebarNavItemBase &
-  (
-    | { href: string; disabledReason?: never }
-    | { href?: undefined; disabledReason?: string }
-  );
-
-export type TSidebarNavSection = {
-  label: string;
-  items: TSidebarNavItem[];
-  note?: string;
-};
 
 export type TSidebarProps = {
   sections: TSidebarNavSection[];
@@ -38,94 +17,17 @@ export type TSidebarProps = {
 
 export const Sidebar = ({ sections, switcher, foot }: TSidebarProps) => {
   const t = useTranslations('sidebar');
-  const {
-    root,
-    brand,
-    brandMeta,
-    brandName,
-    brandTagline,
-    switcherSlot,
-    navArea,
-    foot: footSlot,
-    section,
-    sectionLabel,
-    list,
-    row,
-    note,
-  } = sidebarVariants();
+  const { root, switcherSlot, navArea, foot: footSlot } = sidebarVariants();
 
   return (
     <aside id={SIDEBAR_ID} aria-label={t('ariaLabel')} className={root()}>
-      <div className={brand()}>
-        <BrandMark />
-        <div className={brandMeta()}>
-          <span className={brandName()}>{t('brandName')}</span>
-          <span className={brandTagline()}>{t('brandTagline')}</span>
-        </div>
-      </div>
-
+      <SidebarBrand />
       {switcher && <div className={switcherSlot()}>{switcher}</div>}
-
       <div className={navArea()}>
-        {sections.map((navSection) => (
-          <div className={section()} key={navSection.label}>
-            <p className={sectionLabel()} title={navSection.label}>
-              {navSection.label}
-            </p>
-            {navSection.items.length > 0 ? (
-              <nav aria-label={navSection.label}>
-                <ul className={list()}>
-                  {navSection.items.map((item) => {
-                    if (item.href) {
-                      return (
-                        <li key={item.label}>
-                          <SidebarRailTooltip
-                            label={item.label}
-                            row={
-                              <SidebarNavLink href={item.href}>
-                                <NavItemContent
-                                  icon={item.icon}
-                                  label={item.label}
-                                  badge={item.badge}
-                                />
-                              </SidebarNavLink>
-                            }
-                          />
-                        </li>
-                      );
-                    }
-
-                    return (
-                      <li key={item.label}>
-                        <SidebarRailTooltip
-                          label={item.label}
-                          row={
-                            <div
-                              role="link"
-                              aria-disabled="true"
-                              className={row({ state: 'inert' })}
-                            >
-                              <NavItemContent
-                                icon={item.icon}
-                                label={item.label}
-                                disabledReason={item.disabledReason}
-                                badge={item.badge}
-                              />
-                            </div>
-                          }
-                        />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </nav>
-            ) : (
-              navSection.note && <p className={note()}>{navSection.note}</p>
-            )}
-          </div>
+        {sections.map((section) => (
+          <SidebarNavSection key={section.label} section={section} />
         ))}
       </div>
-
       {foot && <div className={footSlot()}>{foot}</div>}
     </aside>
   );

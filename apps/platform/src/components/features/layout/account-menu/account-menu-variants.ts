@@ -1,7 +1,7 @@
+import { ACCOUNT_MENU_PLACEMENT } from '@platform/constants/account-menu';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
-import type { VariantProps } from 'tailwind-variants';
 
 const SIDEBAR_TRIGGER = [
   'rounded-admin border border-admin-control-line-tint bg-transparent',
@@ -31,21 +31,21 @@ export const accountMenuVariants = tv({
   },
   variants: {
     placement: {
-      foot: {
+      [ACCOUNT_MENU_PLACEMENT.FOOT]: {
         trigger: [
           ...SIDEBAR_TRIGGER,
           'flex min-h-[52px] w-full items-center gap-2.5 px-2.5 py-2 text-left',
         ],
         popup: ['w-[var(--anchor-width)]'],
       },
-      rail: {
+      [ACCOUNT_MENU_PLACEMENT.RAIL]: {
         trigger: [
           ...SIDEBAR_TRIGGER,
           'flex size-[52px] items-center justify-center',
         ],
         popup: ['w-60'],
       },
-      pill: {
+      [ACCOUNT_MENU_PLACEMENT.PILL]: {
         trigger: [
           'ml-auto inline-flex shrink-0 items-center rounded-full border border-admin-line md:hidden',
           'bg-admin-surface p-1 text-admin-muted shadow-admin',
@@ -59,7 +59,3 @@ export const accountMenuVariants = tv({
     },
   },
 });
-
-export type TAccountMenuPlacement = NonNullable<
-  VariantProps<typeof accountMenuVariants>['placement']
->;

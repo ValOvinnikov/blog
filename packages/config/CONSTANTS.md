@@ -312,6 +312,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/account-menu` — `apps/platform/src/constants/account-menu.ts`
 
 - **ACCOUNT_MENU_APPEARANCE**: `SIDEBAR`, `PILL`
+- **ACCOUNT_MENU_PLACEMENT**: `FOOT`, `RAIL`, `PILL`
 
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 

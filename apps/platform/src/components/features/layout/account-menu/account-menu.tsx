@@ -8,16 +8,15 @@ import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import {
   ACCOUNT_MENU_APPEARANCE,
+  ACCOUNT_MENU_PLACEMENT,
   type TAccountMenuAppearance,
+  type TAccountMenuPlacement,
 } from '@platform/constants/account-menu';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
 import { useTranslations } from 'next-intl';
 import { startTransition, useRef } from 'react';
 
-import {
-  accountMenuVariants,
-  type TAccountMenuPlacement,
-} from './account-menu-variants';
+import { accountMenuVariants } from './account-menu-variants';
 
 export type TAccount = {
   name: TMaybeUndefined<string>;
@@ -32,9 +31,17 @@ export type TAccountMenuProps = {
 
 // The rail trigger ends 12px inside the rail's edge, so 20px clears the rail by 8px.
 const POSITIONER_PROPS = {
-  foot: { side: 'top', align: 'start', sideOffset: 6 },
-  rail: { side: 'right', align: 'end', sideOffset: 20 },
-  pill: { side: 'bottom', align: 'end', sideOffset: 6 },
+  [ACCOUNT_MENU_PLACEMENT.FOOT]: { side: 'top', align: 'start', sideOffset: 6 },
+  [ACCOUNT_MENU_PLACEMENT.RAIL]: {
+    side: 'right',
+    align: 'end',
+    sideOffset: 20,
+  },
+  [ACCOUNT_MENU_PLACEMENT.PILL]: {
+    side: 'bottom',
+    align: 'end',
+    sideOffset: 6,
+  },
 } as const satisfies Record<TAccountMenuPlacement, object>;
 
 export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
@@ -47,10 +54,10 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
 
   const placement: TAccountMenuPlacement =
     appearance === ACCOUNT_MENU_APPEARANCE.PILL
-      ? 'pill'
+      ? ACCOUNT_MENU_PLACEMENT.PILL
       : isCollapsed
-        ? 'rail'
-        : 'foot';
+        ? ACCOUNT_MENU_PLACEMENT.RAIL
+        : ACCOUNT_MENU_PLACEMENT.FOOT;
   const {
     trigger,
     meta,
@@ -68,7 +75,7 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
   const { popup: surfacePopup, item } = menuSurfaceVariants();
 
   const railProps =
-    placement === 'rail'
+    placement === ACCOUNT_MENU_PLACEMENT.RAIL
       ? {
           title: displayName,
           'aria-label':
@@ -94,12 +101,14 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
         <Avatar
           name={name ?? ''}
           email={email}
-          variant={placement === 'pill' ? 'chip' : 'account'}
+          variant={
+            placement === ACCOUNT_MENU_PLACEMENT.PILL ? 'chip' : 'account'
+          }
         />
-        {placement === 'pill' && (
+        {placement === ACCOUNT_MENU_PLACEMENT.PILL && (
           <span className={pillLabel()}>{roleLine}</span>
         )}
-        {placement === 'foot' && (
+        {placement === ACCOUNT_MENU_PLACEMENT.FOOT && (
           <>
             <span className={meta()}>
               <span className={nameLine()} title={displayName}>
