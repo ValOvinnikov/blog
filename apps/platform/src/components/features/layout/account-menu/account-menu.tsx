@@ -6,6 +6,10 @@ import { useSidebarCollapse } from '@platform/components/features/layout/sidebar
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
+import {
+  ACCOUNT_MENU_APPEARANCE,
+  type TAccountMenuAppearance,
+} from '@platform/constants/account-menu';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
 import { useTranslations } from 'next-intl';
 import { startTransition, useRef } from 'react';
@@ -23,7 +27,7 @@ export type TAccount = {
 
 export type TAccountMenuProps = {
   account: TAccount;
-  appearance: 'sidebar' | 'pill';
+  appearance: TAccountMenuAppearance;
 };
 
 // The rail trigger ends 12px inside the rail's edge, so 20px clears the rail by 8px.
@@ -42,7 +46,11 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
   const hasEmailLine = Boolean(name && email);
 
   const placement: TAccountMenuPlacement =
-    appearance === 'pill' ? 'pill' : isCollapsed ? 'rail' : 'foot';
+    appearance === ACCOUNT_MENU_APPEARANCE.PILL
+      ? 'pill'
+      : isCollapsed
+        ? 'rail'
+        : 'foot';
   const {
     trigger,
     meta,

@@ -8,21 +8,45 @@ const TEXT = CONTRAST_ROLE_MIN[CONTRAST_ROLE.TEXT];
 const BOUNDARY = CONTRAST_ROLE_MIN[CONTRAST_ROLE.UI_BOUNDARY];
 const FOCUS = CONTRAST_ROLE_MIN[CONTRAST_ROLE.FOCUS];
 
+const LIGHT_SELECTOR = ':root {';
+const DARK_SELECTOR = ":root[data-theme='dark'] {";
+const SYSTEM_DARK_SELECTOR = ":root:not([data-theme='light']) {";
+
 const css = readFileSync(new URL('./admin-theme.css', import.meta.url), 'utf8');
-const lightBlock = css.slice(css.indexOf(':root {'), css.indexOf('}'));
-const lightTokens = new Map(
-  [...lightBlock.matchAll(/--admin-([a-z0-9-]+):\s*(#[0-9a-f]{6});/gi)].map(
-    ([, name, hex]) => [name, hex],
-  ),
-);
 
-const colourOf = (token: string) => {
-  if (token === WHITE) return { l: 1, c: 0, h: 0 };
-  const hex = lightTokens.get(token);
-  if (!hex) throw new Error(`--admin-${token} has no light hex value`);
+const blockOf = (selector: string) => {
+  const start = css.indexOf(selector);
+  if (start === -1) throw new Error(`admin-theme.css has no ${selector} block`);
 
-  return hexToOklch(hex);
+  return css.slice(start + selector.length, css.indexOf('}', start));
 };
+
+const declarationsOf = (selector: string) =>
+  blockOf(selector)
+    .split(';')
+    .map((declaration) => declaration.replace(/\s+/g, ''))
+    .filter(Boolean);
+
+const hexTokensOf = (selector: string) =>
+  new Map(
+    [
+      ...blockOf(selector).matchAll(
+        /--admin-([a-z0-9-]+):\s*(#[0-9a-f]{6});/gi,
+      ),
+    ].map(([, name, hex]) => [name, hex]),
+  );
+
+const lightTokens = hexTokensOf(LIGHT_SELECTOR);
+const darkTokens = new Map([...lightTokens, ...hexTokensOf(DARK_SELECTOR)]);
+
+const colourIn =
+  (tokens: ReturnType<typeof hexTokensOf>) => (token: string) => {
+    if (token === WHITE) return { l: 1, c: 0, h: 0 };
+    const hex = tokens.get(token);
+    if (!hex) throw new Error(`--admin-${token} has no hex value`);
+
+    return hexToOklch(hex);
+  };
 
 const TOKEN = {
   BAD: 'bad',
@@ -30,18 +54,22 @@ const TOKEN = {
   BAD_WEAK: 'bad-weak',
   BG: 'bg',
   BRAND: 'brand',
+  BRAND_HOVER: 'brand-hover',
   BRAND_INK: 'brand-ink',
   BRAND_STRONG: 'brand-strong',
   BRAND_WEAK: 'brand-weak',
   CONTROL_LINE: 'control-line',
   CONTROL_LINE_TINT: 'control-line-tint',
+  HOVER: 'hover',
   MUTED: 'muted',
   OK: 'ok',
   OK_WEAK: 'ok-weak',
+  ON_BRAND_INK: 'on-brand-ink',
   PILL_NEUTRAL: 'pill-neutral',
   PILL_NEUTRAL_POPOVER: 'pill-neutral-popover',
   POPOVER: 'popover',
   POPOVER_HOVER: 'popover-hover',
+  SEGMENT_ON: 'segment-on',
   SIDE: 'side',
   SIDE_ACCENT: 'side-accent',
   SIDE_FIELD_LINE: 'side-field-line',
@@ -49,16 +77,22 @@ const TOKEN = {
   SIDE_RAISED: 'side-raised',
   SIDE_TEXT: 'side-text',
   SURFACE: 'surface',
+  SURFACE_2: 'surface-2',
   SURFACE_HEAD: 'surface-head',
   TEXT: 'text',
   TEXT_STRONG: 'text-strong',
+  THEME_TRACK: 'theme-track',
   TOOLTIP: 'tooltip',
   WARN: 'warn',
   WARN_ON_DARK: 'warn-on-dark',
   WARN_WEAK: 'warn-weak',
 } as const;
 
-const LIGHT_PAIRS: readonly [string, string, string, number][] = [
+type TPair = readonly [string, string, string, number];
+
+const PRESSED_RING = 'Pressed ring';
+
+const SHARED_PAIRS: readonly TPair[] = [
   ['Text on card', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
   ['Text on card header', TOKEN.TEXT, TOKEN.SURFACE_HEAD, TEXT],
   ['Muted on card header', TOKEN.MUTED, TOKEN.SURFACE_HEAD, TEXT],
@@ -88,7 +122,6 @@ const LIGHT_PAIRS: readonly [string, string, string, number][] = [
   ['Focus ring on sidebar', TOKEN.SIDE_ACCENT, TOKEN.SIDE, FOCUS],
   ['Error text on card', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Invalid border on card', TOKEN.BAD_LINE, TOKEN.SURFACE, BOUNDARY],
-  ['Warn on dark chip', TOKEN.WARN_ON_DARK, TOKEN.TOOLTIP, TEXT],
   ['Text on menu', TOKEN.TEXT, TOKEN.POPOVER, TEXT],
   ['Muted on hovered menu row', TOKEN.MUTED, TOKEN.POPOVER_HOVER, TEXT],
   [
@@ -121,10 +154,42 @@ const LIGHT_PAIRS: readonly [string, string, string, number][] = [
   ],
   ['Name on account trigger at rest', TOKEN.TEXT_STRONG, TOKEN.SIDE, TEXT],
   ['Neutral pill in a menu', TOKEN.MUTED, TOKEN.PILL_NEUTRAL_POPOVER, TEXT],
+  ['Selected preset tick', TOKEN.ON_BRAND_INK, TOKEN.BRAND_INK, BOUNDARY],
+  ['Hovered icon on hover', TOKEN.TEXT, TOKEN.HOVER, BOUNDARY],
+  ['Rest icon on toolbar track', TOKEN.MUTED, TOKEN.THEME_TRACK, BOUNDARY],
+  ['Rest icon on hover', TOKEN.MUTED, TOKEN.HOVER, BOUNDARY],
+  ['Pressed icon on plate', TOKEN.BRAND_STRONG, TOKEN.SEGMENT_ON, BOUNDARY],
+  ['Toolbar track border on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
+  ['Solo pressed icon', TOKEN.BRAND_STRONG, TOKEN.BRAND_WEAK, BOUNDARY],
+  ['Chip text on chip', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
+  ['Chip count on chip', TOKEN.MUTED, TOKEN.SURFACE, TEXT],
+  ['Chip text on chip hover', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
+  ['Chip border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
+  ['White on active chip', WHITE, TOKEN.BRAND, TEXT],
+  ['White on active chip hover', WHITE, TOKEN.BRAND_HOVER, TEXT],
+  ['Active chip hover on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
+  ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],
+  ['Locked text on page', TOKEN.MUTED, TOKEN.BG, TEXT],
+  ['Focus ring on toolbar track', TOKEN.BRAND_INK, TOKEN.THEME_TRACK, FOCUS],
 ];
 
-describe('admin light palette contrast', () => {
-  it.each(LIGHT_PAIRS)(
+const LIGHT_PAIRS: readonly TPair[] = [
+  ...SHARED_PAIRS,
+  ['Warn on dark chip', TOKEN.WARN_ON_DARK, TOKEN.TOOLTIP, TEXT],
+  [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.THEME_TRACK, BOUNDARY],
+];
+
+const DARK_PAIRS: readonly TPair[] = [
+  ...SHARED_PAIRS,
+  ['Warn on dark on card', TOKEN.WARN_ON_DARK, TOKEN.SURFACE, TEXT],
+  [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, BOUNDARY],
+];
+
+describe.each([
+  ['light', LIGHT_PAIRS, colourIn(lightTokens)],
+  ['dark', DARK_PAIRS, colourIn(darkTokens)],
+] as const)('admin %s palette contrast', (_palette, pairs, colourOf) => {
+  it.each(pairs)(
     '%s (%s on %s) meets %d:1',
     (_pair, foreground, background, threshold) => {
       const ratio = renderedContrastRatio(colourOf(foreground), [
@@ -134,4 +199,12 @@ describe('admin light palette contrast', () => {
       expect(ratio).toBeGreaterThanOrEqual(threshold);
     },
   );
+});
+
+describe('admin dark palette', () => {
+  it('applies the same values when the device is dark as when Dark is chosen', () => {
+    expect(declarationsOf(SYSTEM_DARK_SELECTOR)).toEqual(
+      declarationsOf(DARK_SELECTOR),
+    );
+  });
 });

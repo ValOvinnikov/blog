@@ -6,6 +6,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "ACCOUNT_MENU_APPEARANCE.PILL",
+        "scope": "app:platform",
+        "from": "@platform/constants/account-menu",
+        "file": "apps/platform/src/constants/account-menu.ts"
       }
     ],
     "CIRCLE": [
@@ -2142,6 +2148,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "ACCOUNT_MENU_APPEARANCE.SIDEBAR",
+        "scope": "app:platform",
+        "from": "@platform/constants/account-menu",
+        "file": "apps/platform/src/constants/account-menu.ts"
       }
     ],
     "MONITOR": [

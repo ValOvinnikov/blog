@@ -6,6 +6,7 @@ import {
   type TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
 import { Topbar } from '@platform/components/features/layout/topbar';
+import { ACCOUNT_MENU_APPEARANCE } from '@platform/constants/account-menu';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -53,7 +54,12 @@ export const AdminShell = ({
         <Sidebar
           sections={sections}
           switcher={switcher}
-          foot={<AccountMenu account={shellAccount} appearance="sidebar" />}
+          foot={
+            <AccountMenu
+              account={shellAccount}
+              appearance={ACCOUNT_MENU_APPEARANCE.SIDEBAR}
+            />
+          }
         />
       }
       topbar={

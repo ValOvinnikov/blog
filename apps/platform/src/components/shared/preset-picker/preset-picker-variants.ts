@@ -29,8 +29,12 @@ export const presetPickerVariants = tv({
   variants: {
     selected: {
       true: {
-        card: ['border-admin-brand shadow-[0_0_0_3px_var(--admin-brand-weak)]'],
-        checkmark: ['border-admin-brand bg-admin-brand text-white'],
+        card: [
+          'border-admin-brand-ink shadow-[0_0_0_3px_var(--admin-brand-weak)]',
+        ],
+        checkmark: [
+          'border-admin-brand-ink bg-admin-brand-ink text-admin-on-brand-ink',
+        ],
       },
       false: {},
     },

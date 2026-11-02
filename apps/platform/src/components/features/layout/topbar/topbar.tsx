@@ -3,6 +3,7 @@ import {
   type TAccount,
 } from '@platform/components/features/layout/account-menu';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
+import { ACCOUNT_MENU_APPEARANCE } from '@platform/constants/account-menu';
 import type { ReactNode } from 'react';
 
 import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
@@ -29,7 +30,10 @@ export const Topbar = ({
       <SidebarCollapseToggle />
       {sections && <TopbarNavMenu sections={sections} switcher={switcher} />}
       {crumb}
-      <AccountMenu account={account} appearance="pill" />
+      <AccountMenu
+        account={account}
+        appearance={ACCOUNT_MENU_APPEARANCE.PILL}
+      />
     </header>
   );
 };
