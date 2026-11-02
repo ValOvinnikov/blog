@@ -37,6 +37,7 @@ import Plus from '@platform/assets/icons/plus.svg';
 import Power from '@platform/assets/icons/power.svg';
 import Quote from '@platform/assets/icons/quote.svg';
 import Rocket from '@platform/assets/icons/rocket.svg';
+import SelectChevron from '@platform/assets/icons/select-chevron.svg';
 import Send from '@platform/assets/icons/send.svg';
 import Settings from '@platform/assets/icons/settings.svg';
 import ShieldCheck from '@platform/assets/icons/shield-check.svg';
@@ -64,6 +65,7 @@ export const ICON_REGISTRY = {
   [ICONS.CHECK]: CheckCircle,
   [ICONS.CHECK_SHEET]: CheckSheet,
   [ICONS.CHEVRON_DOWN]: ChevronDown,
+  [ICONS.SELECT_CHEVRON]: SelectChevron,
   [ICONS.CHEVRON_RIGHT]: ChevronRight,
   [ICONS.CHEVRON_UP]: ChevronUp,
   [ICONS.CLOCK]: Clock,

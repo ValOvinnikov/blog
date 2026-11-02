@@ -1,6 +1,5 @@
 import { Select as BaseSelect } from '@base-ui/react/select';
 import { ICONS, type TControlAria } from '@blog/config';
-import SelectChevron from '@platform/assets/icons/select-chevron.svg';
 import { Icon } from '@platform/components/shared/icon';
 import { selectVariants } from '@platform/components/shared/select/select-variants';
 import {
@@ -26,7 +25,7 @@ export const SelectTrigger = ({
 }: TSelectTriggerProps) => {
   const valueId = useId();
   const { label, labelledBy, describedBy } = aria;
-  const { trigger, value, icon, chevron } = selectVariants({
+  const { trigger, value, icon } = selectVariants({
     isLocked,
     appearance,
   });
@@ -47,11 +46,13 @@ export const SelectTrigger = ({
         {children}
       </span>
       <BaseSelect.Icon className={icon()}>
-        {appearance === FIELD_APPEARANCE.WIZARD ? (
-          <SelectChevron aria-hidden={true} className={chevron()} />
-        ) : (
-          <Icon name={ICONS.CHEVRON_DOWN} />
-        )}
+        <Icon
+          name={
+            appearance === FIELD_APPEARANCE.WIZARD
+              ? ICONS.SELECT_CHEVRON
+              : ICONS.CHEVRON_DOWN
+          }
+        />
       </BaseSelect.Icon>
     </BaseSelect.Trigger>
   );

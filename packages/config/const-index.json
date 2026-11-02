@@ -1818,6 +1818,14 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
+    "SELECT_CHEVRON": [
+      {
+        "ref": "ICONS.SELECT_CHEVRON",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "ARROW": [
       {
         "ref": "ICONS.ARROW",

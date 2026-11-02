@@ -15,7 +15,6 @@ export const selectVariants = tv({
     ],
     value: ['contents'],
     icon: ['shrink-0 text-admin-muted'],
-    chevron: ['size-4'],
     popup: [
       'max-h-[var(--available-height)] w-[min(20rem,calc(100vw-2rem))] min-w-[var(--anchor-width)] overflow-y-auto',
       'rounded-admin border border-admin-popover-line bg-admin-popover p-1 shadow-admin-lg outline-none',
