@@ -28,7 +28,9 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { faker } from '@faker-js/faker';
+import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -38,6 +40,7 @@ import {
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -49,10 +52,12 @@ import { updateLookAction, type TUpdateLookInput } from './update-look-action';
 
 faker.seed(5998);
 
-const { upsertSiteConfigMock, insertAuditEventMock } = vi.hoisted(() => ({
-  upsertSiteConfigMock: vi.fn(),
-  insertAuditEventMock: vi.fn(),
-}));
+const { getSiteConfigMock, upsertSiteConfigMock, insertAuditEventMock } =
+  vi.hoisted(() => ({
+    getSiteConfigMock: vi.fn(),
+    upsertSiteConfigMock: vi.fn(),
+    insertAuditEventMock: vi.fn(),
+  }));
 
 vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -67,7 +72,10 @@ vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@blog/db', () => ({
   queries: {
-    siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
+    siteConfig: {
+      getSiteConfig: getSiteConfigMock,
+      upsertSiteConfig: upsertSiteConfigMock,
+    },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
@@ -118,6 +126,10 @@ describe(updateLookAction, () => {
     authMock.mockResolvedValue({
       user: { id: MOCK_OPERATOR_ID, email: MOCK_OPERATOR_EMAIL },
     });
+    getSiteConfigMock.mockReset();
+    getSiteConfigMock.mockResolvedValue(
+      mockSiteConfig({ ...VALID_INPUT, logoHue: undefined }),
+    );
     upsertSiteConfigMock.mockReset();
     insertAuditEventMock.mockReset();
     vi.mocked(isAccentHueAccessible).mockReset();
@@ -150,6 +162,48 @@ describe(updateLookAction, () => {
         accentHue,
         cookieSettingsButton,
       });
+    });
+
+    it('refuses a Growth-only field changed from its stored value, and writes nothing', async () => {
+      const result = await updateLookAction(MOCK_TENANT_ID, {
+        ...VALID_INPUT,
+        radiusScale: RADIUS_SCALE.LG,
+      });
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+        values: { plan: TENANT_PLAN.FREE },
+        items: ['radiusScale'],
+      });
+      expect(upsertSiteConfigMock).not.toHaveBeenCalled();
+    });
+
+    it('saves an accent hue change while the Growth-only fields keep their stored values', async () => {
+      const result = await updateLookAction(MOCK_TENANT_ID, {
+        ...VALID_INPUT,
+        accentHue: HUE_MIN,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(upsertSiteConfigMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        expect.objectContaining({ accentHue: HUE_MIN }),
+      );
+    });
+
+    it('saves when the Growth-only fields hold the preset values the Free page shows', async () => {
+      const presetValues = toEffectiveLook(
+        { ...VALID_INPUT, logoHue: undefined, radiusScale: RADIUS_SCALE.LG },
+        TENANT_PLAN.FREE,
+      );
+
+      const result = await updateLookAction(MOCK_TENANT_ID, {
+        ...presetValues,
+        logoHue: null,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     });
 
     it('audits only what it wrote', async () => {

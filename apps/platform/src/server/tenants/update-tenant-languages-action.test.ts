@@ -12,12 +12,17 @@ import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
-import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockReadyTenant,
+} from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -108,6 +113,8 @@ describe(updateTenantLanguagesAction, () => {
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+      values: { plan: TENANT_PLAN.FREE },
+      items: [NL, FR],
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
@@ -119,6 +126,20 @@ describe(updateTenantLanguagesAction, () => {
         error: ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED,
       },
     );
+  });
+
+  it('names only the languages the save would add over the plan limit', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
+      tenant: mockReadyTenant({ id: MOCK_TENANT_ID, additionalLocales: [NL] }),
+      membership: mockMembership({ tenantId: MOCK_TENANT_ID }),
+    });
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(
+      errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED),
+    );
+
+    const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
+
+    expect(result).toEqual(expect.objectContaining({ items: [FR] }));
   });
 
   it('reports the default language among the additional ones as invalid input', async () => {

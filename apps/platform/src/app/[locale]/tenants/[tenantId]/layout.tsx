@@ -1,3 +1,4 @@
+import { TenantPlanProvider } from '@platform/context/tenant-plan-provider';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
 
 type TProps = {
@@ -7,7 +8,7 @@ type TProps = {
 
 export default async function TenantByIdLayout({ children, params }: TProps) {
   const { tenantId } = await params;
-  await requireTenantById(tenantId);
+  const { tenant } = await requireTenantById(tenantId);
 
-  return children;
+  return <TenantPlanProvider plan={tenant.plan}>{children}</TenantPlanProvider>;
 }

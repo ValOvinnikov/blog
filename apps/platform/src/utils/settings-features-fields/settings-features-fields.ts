@@ -52,7 +52,6 @@ export const featureDefaultsToValues = (
   return values;
 };
 
-/** A stale `true` from a plan downgrade would otherwise ride along in every save and trip `updateFeaturesAction`'s reject-whole-save check. */
 export const clampToEntitlement = (
   values: TSettingsFeaturesValues,
   entitledCapabilities: TCapability[],
@@ -79,6 +78,18 @@ export const keepStoredOutOfPlan = (
   }
   return kept;
 };
+
+export const listSwitchedOnOutOfPlan = (
+  values: TSettingsFeaturesValues,
+  stored: TSettingsFeaturesValues,
+  entitledCapabilities: TCapability[],
+): (keyof TSettingsFeaturesValues)[] =>
+  CAPABILITY_TOGGLES.filter(
+    ({ capability, field }) =>
+      values[field] &&
+      !stored[field] &&
+      !entitledCapabilities.includes(capability),
+  ).map(({ field }) => field);
 
 export const withComingSoonOff = (
   values: TSettingsFeaturesValues,

@@ -1453,6 +1453,7 @@
     "fieldsNeedAttention": "{count, plural, one {# Feld braucht Aufmerksamkeit} other {# Felder brauchen Aufmerksamkeit}}",
     "goToFirstField": "Zum ersten Feld",
     "notSaved": "Nicht gespeichert",
+    "notInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} GROWTH {Growth} other {aktuellen}}, der {items} nicht enthält. Es wurde nichts gespeichert.",
     "shortcut": "⌘S / Strg+S",
     "discard": "Verwerfen",
     "save": "Änderungen speichern",
