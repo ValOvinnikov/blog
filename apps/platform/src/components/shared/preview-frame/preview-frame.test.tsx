@@ -216,6 +216,31 @@ describe(`<${PreviewFrame.name}/>`, () => {
     });
   });
 
+  it.each([
+    { isToolbarFirst: false, follows: Node.DOCUMENT_POSITION_PRECEDING },
+    { isToolbarFirst: true, follows: Node.DOCUMENT_POSITION_FOLLOWING },
+  ])(
+    'orders the toolbar against the readout when isToolbarFirst is $isToolbarFirst',
+    ({ isToolbarFirst, follows }) => {
+      renderWithIntl(
+        <PreviewFrame ariaLabel={MOCK_LABEL} isToolbarFirst={isToolbarFirst}>
+          <PreviewFrame.Heading device={PREVIEW_DEVICE.PHONE} scale={0.62} />
+          <PreviewFrame.Toolbar
+            device={PREVIEW_DEVICE.PHONE}
+            onDeviceChange={vi.fn()}
+            mode={PREVIEW_MODE.LIGHT}
+            onModeChange={vi.fn()}
+          />
+        </PreviewFrame>,
+      );
+
+      const toolbar = screen.getByRole('toolbar');
+      const readout = screen.getByRole('status');
+
+      expect(toolbar.compareDocumentPosition(readout)).toBe(follows);
+    },
+  );
+
   describe('toolbar', () => {
     const onDeviceChange = vi.fn();
     const onModeChange = vi.fn();

@@ -23,6 +23,8 @@ type TBuildLookFormContextArgs = Pick<
   | 'brandImageError'
   | 'isSubmenuPreviewOpen'
   | 'setIsSubmenuPreviewOpen'
+  | 'previewDevice'
+  | 'setPreviewDevice'
 > & {
   savedValues: TLookFormValues;
   setValues: Dispatch<SetStateAction<TLookFormValues>>;

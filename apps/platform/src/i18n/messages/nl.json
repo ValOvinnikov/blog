@@ -646,6 +646,11 @@
     "headerDescription": "Hoe de bovenbalk van uw site is ingedeeld en hoe de submenu’s openen.",
     "headerLayoutLabel": "Indeling",
     "headerLayoutDescription": "Waar logo, links en knoppen op brede schermen staan. Op telefoons krijgt u altijd de balk met een menuknop.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "De voorbeeldweergave staat op Telefoon, dus die toont de balk met een menuknop.",
+      "TABLET": "De voorbeeldweergave staat op Tablet, dus die toont de balk met een menuknop."
+    },
+    "headerShowOnDesktop": "Toon op Desktop",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Klassiek",
       "LINKS_BESIDE_BRAND": "Links naast het merk",
@@ -769,10 +774,6 @@
     "firstCardExcerpt": "Een gelinkte kaart, zoals berichtenlijsten hem tonen.",
     "secondCardTitle": "Koers naar het volgende seizoen",
     "secondCardExcerpt": "Een statische kaart. De omlijsting volgt uw kaartstijl.",
-    "previewNote": "Gebouwd met de eigen componenten van de site. Niets is live totdat u opslaat.",
-    "widthDesktop": "Desktop",
-    "widthMobile": "Mobiel",
-    "previewWidthAriaLabel": "Breedte voorbeeld",
     "navPosts": "Berichten",
     "navAbout": "Over",
     "navTopics": "Onderwerpen",
@@ -787,6 +788,8 @@
     "readerStateAriaLabel": "Lezer",
     "readerSignedOut": "Uitgelogd",
     "readerSignedIn": "Ingelogd",
+    "readerSignedInTooltip": "Ingelogd als {name}",
+    "readerAccountsOff": "Lezersaccounts staan uit voor deze site, dus er is geen lezersschakelaar.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Account",
     "accountMenuAriaLabel": "Accountmenu",

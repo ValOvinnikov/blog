@@ -646,6 +646,11 @@
     "headerDescription": "Comment la barre du haut de votre site est organisée et comment ses sous-menus s’ouvrent.",
     "headerLayoutLabel": "Disposition",
     "headerLayoutDescription": "Où se placent le logo, les liens et les boutons sur grand écran. Sur mobile, vous avez toujours la barre avec un bouton de menu.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "L’aperçu est sur Téléphone : il affiche donc la barre avec un bouton de menu.",
+      "TABLET": "L’aperçu est sur Tablette : il affiche donc la barre avec un bouton de menu."
+    },
+    "headerShowOnDesktop": "Afficher sur Ordinateur",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Classique",
       "LINKS_BESIDE_BRAND": "Liens à côté de la marque",
@@ -769,10 +774,6 @@
     "firstCardExcerpt": "Une carte avec lien, telle que les listes d'articles l'affichent.",
     "secondCardTitle": "Cap sur la prochaine saison",
     "secondCardExcerpt": "Une carte statique. Son cadre suit votre style de carte.",
-    "previewNote": "Construit à partir des composants du site. Rien n'est publié avant l'enregistrement.",
-    "widthDesktop": "Ordinateur",
-    "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Largeur de l'aperçu",
     "navPosts": "Articles",
     "navAbout": "À propos",
     "navTopics": "Sujets",
@@ -787,6 +788,8 @@
     "readerStateAriaLabel": "Lecteur",
     "readerSignedOut": "Déconnecté",
     "readerSignedIn": "Connecté",
+    "readerSignedInTooltip": "Connecté en tant que {name}",
+    "readerAccountsOff": "Les comptes lecteur sont désactivés pour ce site : il n’y a donc pas de sélecteur de lecteur.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Compte",
     "accountMenuAriaLabel": "Menu du compte",

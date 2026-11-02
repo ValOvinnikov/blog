@@ -646,6 +646,11 @@
     "headerDescription": "How the top bar of your site is arranged and how its sub-menus open.",
     "headerLayoutLabel": "Layout",
     "headerLayoutDescription": "Where the logo, links and buttons sit on wide screens. Phones always get the bar with a menu button.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "The preview is on Phone, so it shows the bar with a menu button.",
+      "TABLET": "The preview is on Tablet, so it shows the bar with a menu button."
+    },
+    "headerShowOnDesktop": "Show on Desktop",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Classic",
       "LINKS_BESIDE_BRAND": "Links beside the brand",
@@ -769,10 +774,6 @@
     "firstCardExcerpt": "A linked card, the way post lists render it.",
     "secondCardTitle": "Charting the next season",
     "secondCardExcerpt": "A static card. Its frame follows your card style.",
-    "previewNote": "Built from the site's own components. Nothing is live until you save.",
-    "widthDesktop": "Desktop",
-    "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Preview width",
     "navPosts": "Posts",
     "navAbout": "About",
     "navTopics": "Topics",
@@ -787,6 +788,8 @@
     "readerStateAriaLabel": "Reader",
     "readerSignedOut": "Signed out",
     "readerSignedIn": "Signed in",
+    "readerSignedInTooltip": "Signed in as {name}",
+    "readerAccountsOff": "Reader accounts are off for this site, so there is no reader switch.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Account",
     "accountMenuAriaLabel": "Account menu",
