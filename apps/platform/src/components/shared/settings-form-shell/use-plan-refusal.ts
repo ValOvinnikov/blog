@@ -1,12 +1,16 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TActionOutcome, TMaybeUndefined, TOutcome } from '@blog/config';
 import { useTenantPlan } from '@platform/context/tenant-plan-provider';
-import type { TNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
+import {
+  isNotInPlanRefusal,
+  type TNotInPlanRefusal,
+} from '@platform/utils/plan-refusal/plan-refusal';
+import { restoreRefusedItems } from '@platform/utils/restore-refused-items/restore-refused-items';
 import type { TSettingsDraftField } from '@platform/utils/settings-draft-offer/settings-draft-offer';
 import { useRouter } from 'next/navigation';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 
 export const usePlanRefusal = <TValues>(
   fields: TSettingsDraftField<TValues>[],
@@ -17,9 +21,21 @@ export const usePlanRefusal = <TValues>(
   const renderedPlan = useTenantPlan();
   const [refusal, setRefusal] = useState<TMaybeUndefined<TNotInPlanRefusal>>();
 
-  const refuse = (next: TNotInPlanRefusal) => {
-    setRefusal(next);
-    if (next.values.plan !== renderedPlan) router.refresh();
+  const submit = async <TResult extends TOutcome<TActionOutcome>>(
+    run: () => Promise<TResult>,
+    setValues: Dispatch<SetStateAction<TValues>>,
+    savedValues: TValues,
+  ) => {
+    setRefusal(undefined);
+    const result = await run();
+    if (isNotInPlanRefusal(result)) {
+      setValues((current) =>
+        restoreRefusedItems(current, savedValues, result.items),
+      );
+      setRefusal(result);
+      if (result.values.plan !== renderedPlan) router.refresh();
+    }
+    return result;
   };
 
   const labelOf = (item: string) =>
@@ -32,5 +48,5 @@ export const usePlanRefusal = <TValues>(
       items: format.list(refusal.items.map(labelOf)),
     });
 
-  return { refuse, clear: () => setRefusal(undefined), message };
+  return { submit, clear: () => setRefusal(undefined), message };
 };

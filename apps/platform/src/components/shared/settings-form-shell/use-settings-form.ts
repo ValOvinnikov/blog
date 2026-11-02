@@ -7,8 +7,6 @@ import {
   type TOutcome,
 } from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
-import { isNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
-import { restoreRefusedItems } from '@platform/utils/restore-refused-items/restore-refused-items';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useId, useState } from 'react';
 
@@ -79,17 +77,8 @@ export const useSettingsForm = <
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TValues, TResult>({
       initialValues,
-      onSubmit: async (submitted) => {
-        planRefusal.clear();
-        const result = await onSubmit(submitted);
-        if (isNotInPlanRefusal(result)) {
-          setValues((current) =>
-            restoreRefusedItems(current, savedValues, result.items),
-          );
-          planRefusal.refuse(result);
-        }
-        return result;
-      },
+      onSubmit: (submitted): Promise<TResult> =>
+        planRefusal.submit(() => onSubmit(submitted), setValues, savedValues),
       onSuccess: (submitted, result) => {
         // A save that wrote its own saved values (uploads swapped in) keeps them.
         setSavedValues((current) =>
@@ -116,10 +105,7 @@ export const useSettingsForm = <
     isArchived,
     archivedAt,
     archivedNoticeId,
-    planRefusal:
-      status === FORM_STATUS.ERROR && !isPending
-        ? planRefusal.message
-        : undefined,
+    planRefusal: status === FORM_STATUS.ERROR ? planRefusal.message : undefined,
     draft: {
       ...draft,
       values,
