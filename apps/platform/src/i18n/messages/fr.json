@@ -157,6 +157,7 @@
     "label": "Chargement de la page…"
   },
   "sidebar": {
+    "ariaLabel": "Barre latérale",
     "brandName": "Valstack",
     "brandTagline": "admin",
     "collapseToggle": "Réduire la barre latérale",

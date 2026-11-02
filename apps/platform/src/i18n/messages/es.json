@@ -157,6 +157,7 @@
     "label": "Cargando la página…"
   },
   "sidebar": {
+    "ariaLabel": "Barra lateral",
     "brandName": "Valstack",
     "brandTagline": "admin",
     "collapseToggle": "Contraer barra lateral",

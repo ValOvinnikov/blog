@@ -4,10 +4,10 @@ import {
 } from '@platform/components/features/layout/nav-item-content';
 import { BrandMark } from '@platform/components/shared/brand-mark';
 import type { TRegisteredIconName } from '@platform/components/shared/icon';
+import { SIDEBAR_ID } from '@platform/constants/sidebar';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
-import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
 import { SidebarNavLink } from './components/sidebar-nav-link';
 import { SidebarRailTooltip } from './components/sidebar-rail-tooltip';
 import { sidebarVariants } from './sidebar-variants';
@@ -43,7 +43,6 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
     brandMeta,
     brandName,
     brandTagline,
-    toggle,
     switcherSlot,
     section,
     sectionLabel,
@@ -53,14 +52,13 @@ export const Sidebar = ({ sections, switcher }: TSidebarProps) => {
   } = sidebarVariants();
 
   return (
-    <aside className={root()}>
+    <aside id={SIDEBAR_ID} aria-label={t('ariaLabel')} className={root()}>
       <div className={brand()}>
         <BrandMark />
         <div className={brandMeta()}>
           <span className={brandName()}>{t('brandName')}</span>
           <span className={brandTagline()}>{t('brandTagline')}</span>
         </div>
-        <SidebarCollapseToggle className={toggle()} />
       </div>
 
       {switcher && <div className={switcherSlot()}>{switcher}</div>}

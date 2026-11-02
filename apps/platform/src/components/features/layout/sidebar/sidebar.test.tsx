@@ -103,14 +103,18 @@ describe(`<${Sidebar.name}/>`, () => {
     expect(brandTagline).toBeVisible();
   });
 
-  it('renders the collapse toggle', () => {
+  it('is a landmark named Sidebar with no collapse toggle of its own', () => {
     renderSidebar();
 
-    const toggle = screen.getByRole('button', {
+    const sidebar = screen.getByRole('complementary', {
+      name: messages.sidebar.ariaLabel,
+    });
+    const toggle = screen.queryByRole('button', {
       name: messages.sidebar.collapseToggle,
     });
 
-    expect(toggle).toBeVisible();
+    expect(sidebar).toBeVisible();
+    expect(toggle).not.toBeInTheDocument();
   });
 
   it("carries a link item's badge as visible text inside the link", () => {
@@ -215,7 +219,6 @@ describe(`<${Sidebar.name}/>`, () => {
 
       beforeEach(async () => {
         link = screen.getByRole('link', { name: MOCK_LOOK_ITEM.label });
-        await user.tab();
         await user.tab();
       });
 

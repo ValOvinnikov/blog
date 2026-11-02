@@ -10,7 +10,7 @@ export const sidebarVariants = tv({
     ],
     brand: [
       'flex items-center gap-2.5 border-b border-admin-side-line px-[18px] py-4',
-      'group-data-[collapsed=true]/shell:flex-col group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:gap-2 group-data-[collapsed=true]/shell:px-2',
+      'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-2',
     ],
     brandMeta: [
       'flex min-w-0 flex-col',
@@ -20,7 +20,6 @@ export const sidebarVariants = tv({
       'text-admin-14 font-bold tracking-[0.2px] text-admin-text-strong',
     ],
     brandTagline: ['text-admin-12 text-admin-side-muted'],
-    toggle: ['ml-auto group-data-[collapsed=true]/shell:ml-0'],
     switcherSlot: [
       'px-3 pt-3 pb-1',
       'group-data-[collapsed=true]/shell:hidden',
