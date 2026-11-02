@@ -395,7 +395,7 @@ describe(`<${OnboardingView.name}/>`, () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
     await completeSiteStep();
     const addressField = await typeAddress();
-    await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
 
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
@@ -411,24 +411,24 @@ describe(`<${OnboardingView.name}/>`, () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
     await completeSiteStep();
     const addressField = await typeAddress();
-    await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
 
     expect(addressField).toHaveAccessibleDescription(
       `.${MOCK_TENANT_ROOT_DOMAIN} ${SITE_ADDRESS_HINT} ${ADDRESS_TAKEN}`,
     );
   });
 
-  it('keeps a taken address out of the status chip', async () => {
+  it('announces a taken address in a status region', async () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
     await completeSiteStep();
     await typeAddress();
-    await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
 
-    const statuses = screen.getAllByRole('status');
+    const announcing = screen
+      .getAllByRole('status')
+      .filter((status) => status.textContent === ADDRESS_TAKEN);
 
-    for (const status of statuses) {
-      expect(status).not.toHaveTextContent(ADDRESS_TAKEN);
-    }
+    expect(announcing).toHaveLength(1);
   });
 
   it('describes the language select by its hint', async () => {
@@ -654,10 +654,13 @@ describe(`<${OnboardingView.name}/>`, () => {
     await reachReview();
     await acceptAndCreate();
 
-    const message = await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
+    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
     const heading = stepHeading(STEPS.ADDRESS);
 
-    expect(message).toBeVisible();
+    expect(addressField).toHaveAccessibleDescription(
+      expect.stringContaining(ADDRESS_TAKEN),
+    );
     expect(heading).toBeVisible();
   });
 

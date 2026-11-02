@@ -1,12 +1,14 @@
 'use client';
 
-import { ICONS, SIZE } from '@blog/config';
+import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
+import { useFieldErrorText } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-field-error-text';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
 import {
   SITE_ADDRESS_STATUS,
   type TSiteAddressStatus,
 } from '@platform/constants/onboarding';
+import type { TCreateSiteFieldError } from '@platform/server/onboarding/create-site-input';
 import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
@@ -19,6 +21,7 @@ const addressVerdictVariants = tv({
     ],
     glyph: ['flex h-[19px] shrink-0 items-center'],
     message: ['min-w-0 text-admin-13-5 leading-[19px] font-semibold'],
+    announcement: ['sr-only'],
   },
   variants: {
     status: {
@@ -51,6 +54,7 @@ const VERDICT_ICON = {
 export type TAddressVerdict = {
   siteAddress: string;
   status: TSiteAddressStatus;
+  error: TMaybeUndefined<TCreateSiteFieldError>;
 };
 
 export type TAddressVerdictProps = {
@@ -58,17 +62,24 @@ export type TAddressVerdictProps = {
 };
 
 export const AddressVerdict = ({
-  verdict: { siteAddress, status },
+  verdict: { siteAddress, status, error },
 }: TAddressVerdictProps) => {
   const t = useTranslations('onboardingForm');
-  const { root, chip, glyph, message } = addressVerdictVariants({ status });
+  const toErrorText = useFieldErrorText();
+  const { root, chip, glyph, message, announcement } = addressVerdictVariants({
+    status,
+  });
 
-  const isShownByField =
-    status === SITE_ADDRESS_STATUS.IDLE ||
-    status === SITE_ADDRESS_STATUS.UNAVAILABLE;
-
-  if (isShownByField) {
+  if (status === SITE_ADDRESS_STATUS.IDLE) {
     return <div role="status" className={root()} />;
+  }
+
+  if (status === SITE_ADDRESS_STATUS.UNAVAILABLE) {
+    return (
+      <div role="status" className={root()}>
+        <span className={announcement()}>{error && toErrorText(error)}</span>
+      </div>
+    );
   }
 
   const messages = {

@@ -42,6 +42,7 @@ export const useOnboardingWizard = (
     status: addressError
       ? SITE_ADDRESS_STATUS.UNAVAILABLE
       : addressCheck.status,
+    error: addressError,
   };
 
   const summaries = {

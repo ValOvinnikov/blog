@@ -154,7 +154,9 @@ Free site.
      `checkSiteAddressAction` as the user types) and the starting language,
      each with its hint below it. A taken, reserved or invalid address shows
      its error under the hint, with the input invalid and described by the
-     suffix, the hint, then the error. The other verdicts — checking,
+     suffix, the hint, then the error; the actions' `role="status"` region
+     repeats it as screen-reader-only text so it is announced as it appears.
+     The other verdicts — checking,
      "<address> is yours" and the amber "couldn't check" note — are a tinted
      chip in a `role="status"` region in the pinned actions, between Back and
      Continue (on its own line above the buttons in the phone action bar).
