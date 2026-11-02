@@ -1909,7 +1909,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] Background + field dot ("Unsaved change"), Plain / Shaded✓ / Brand tint + hint
 - [ ] Surface Full width✓ / Card + hint
 - [ ] Cookie settings button Hidden / Shown✓ + hint
-- [ ] Segmented track padding 2, gap 2, `#f6f7f9`, border `#878f9d`, radius 4; buttons h30, radius 3, 13px 500; pressed white, 600, 1.5px brand inset
+- [ ] Segmented track padding 2, gap 2, `#f6f7f9`, border `#878f9d`, radius 4; buttons h30, radius 3, 13px 500; pressed white, 600, 1.5px brand-ink inset
 - [ ] Language switcher folded "Menu with globe"
 - [ ] h2 "Live preview" 15/650; readout "1280 px wide · shown at 44%" mono 12
 - [ ] Toolbar: Device (Desktop✓, Tablet, Phone) · Scheme (Light✓, Dark) · Reader (Signed out✓, Signed in) · spacer · Follow✓ · Full screen
