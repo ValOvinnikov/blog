@@ -31,6 +31,7 @@ import {
 } from './server/tenant/constants/constants';
 import { isOperatorSuspended } from './server/tenant/operator-suspension/operator-suspension';
 import { passThroughUnlessOperatorSuspended } from './server/tenant/operator-suspension/pass-through-unless-operator-suspended';
+import { isUnsubscribePagePath } from './server/tenant/operator-suspension/unsubscribe-page-path';
 import {
   resolveTenantRouting,
   type TTenantRouting,
@@ -213,7 +214,11 @@ export default async function proxy(
     return new NextResponse(null, { status: HTTP_STATUS.SERVICE_UNAVAILABLE });
   }
 
-  if (tenantRouting && isOperatorSuspended(tenantRouting.tenant)) {
+  if (
+    tenantRouting &&
+    isOperatorSuspended(tenantRouting.tenant) &&
+    !isUnsubscribePagePath(pathname, firstSegment)
+  ) {
     return FEED_PATH_PATTERN.test(pathname)
       ? siteUnavailableStatus()
       : siteUnavailablePage(
@@ -265,10 +270,14 @@ export default async function proxy(
 export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
   // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
-  // The last two entries reach the proxy only so an operator-suspended site can answer them with 503.
+  // Every entry after the first reaches the proxy only so an operator-suspended site can answer it with 503; newsletter unsubscribe stays reachable.
   matcher: [
     '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
     '/sitemap.xml',
-    '/api/:route(newsletter|account|switch-language|generate-skim|auth)/:path*',
+    '/api/newsletter/confirm',
+    '/api/account/:path*',
+    '/api/auth/:path*',
+    '/api/switch-language',
+    '/api/generate-skim',
   ],
 };

@@ -1,6 +1,7 @@
 import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
+  NEWSLETTER_RESULT,
   routes,
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
@@ -27,6 +28,7 @@ import {
 import { PRODUCTION_DATASET } from '@web/utils/is-production-environment';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { logger } from '@web/utils/logger/logger';
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 faker.seed(6012);
@@ -88,6 +90,7 @@ const ACCEPT_DUTCH = 'nl-NL,nl;q=0.9,en;q=0.8';
 const DEVELOPMENT_DATASET = 'development';
 const NEXT_HEADER = 'x-middleware-next';
 const NEWSLETTER_CONFIRM_PATH = '/api/newsletter/confirm';
+const NEWSLETTER_UNSUBSCRIBE_API_PATH = routes.newsletterUnsubscribeSubmit();
 const SITE_UNAVAILABLE_HEADING = {
   EN: SITE_MESSAGES_BY_LOCALE.EN.siteUnavailable.heading,
   NL: SITE_MESSAGES_BY_LOCALE.NL.siteUnavailable.heading,
@@ -231,6 +234,34 @@ describe('proxy matcher', () => {
     },
   ])('runs the proxy for $case', ({ path }) => {
     expect(matcher.test(path)).toBe(true);
+  });
+});
+
+describe('proxy matcher for an operator-suspended site', () => {
+  const matches = (path: string) =>
+    unstable_doesMiddlewareMatch({
+      config,
+      url: `${MOCK_TENANT_BASE_URL}${path}`,
+    });
+
+  it.each([
+    SITEMAP_PATH,
+    NEWSLETTER_CONFIRM_PATH,
+    '/api/account/export',
+    '/api/auth/session',
+    '/api/switch-language',
+    '/api/generate-skim',
+  ])('runs the proxy for %s', (path) => {
+    expect(matches(path)).toBe(true);
+  });
+
+  it.each([
+    NEWSLETTER_UNSUBSCRIBE_API_PATH,
+    '/api/revalidate',
+    '/api/revalidate-site-config',
+    '/api/client-log',
+  ])('bypasses the proxy for %s', (path) => {
+    expect(matches(path)).toBe(false);
   });
 });
 
@@ -474,6 +505,27 @@ describe(proxy, () => {
         expect(resolveTenantMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
       },
     );
+
+    it.each([
+      routes.newsletterUnsubscribeConfirmation(),
+      routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBED),
+      routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID),
+      routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED),
+      `/${LOCALE_BCP47_TAGS[NL]}${routes.newsletterUnsubscribeConfirmation()}`,
+    ])('keeps the unsubscribe page %s reachable', async (path) => {
+      const response = await visit(path);
+
+      expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+      expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
+    });
+
+    it('still answers another newsletter page with the unavailable page', async () => {
+      const response = await visit(
+        routes.newsletterResult(NEWSLETTER_RESULT.CONFIRMED),
+      );
+
+      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+    });
 
     it('serves the site of a tenant suspended for inactivity', async () => {
       resolveTenantRoutingMock.mockResolvedValue(
