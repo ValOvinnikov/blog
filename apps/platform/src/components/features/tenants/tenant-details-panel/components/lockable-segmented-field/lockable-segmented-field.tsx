@@ -36,7 +36,7 @@ export const LockableSegmentedField = <TValue extends string>({
     >
       <SegmentedControl<TValue>
         aria={{
-          label: label,
+          label,
           describedBy: lockReason ? lockReasonId : undefined,
         }}
         options={options}

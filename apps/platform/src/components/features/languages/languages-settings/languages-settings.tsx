@@ -184,7 +184,7 @@ export const LanguagesSettings = ({
                 >
                   <Switch
                     aria={{
-                      label: label,
+                      label,
                       describedBy: isArchived ? archivedNoticeId : undefined,
                     }}
                     isChecked={isLive}

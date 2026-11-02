@@ -132,7 +132,7 @@ export const FeaturesSettings = ({
               >
                 <Switch
                   aria={{
-                    label: label,
+                    label,
                     describedBy: isArchived ? archivedNoticeId : undefined,
                   }}
                   isChecked={values[field]}

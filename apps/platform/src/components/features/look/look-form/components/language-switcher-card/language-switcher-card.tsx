@@ -46,7 +46,7 @@ export const LanguageSwitcherCard = ({
         <Field.Root>
           {lock && <LockedReason id={lock.id}>{lock.reason}</LockedReason>}
           <SegmentedControl<TLanguageSwitcherStyle>
-            aria={{ label: languageSwitcherLabel, describedBy: describedBy }}
+            aria={{ label: languageSwitcherLabel, describedBy }}
             className={switcher()}
             options={languageSwitcherOptions}
             value={languageSwitcherStyle}
