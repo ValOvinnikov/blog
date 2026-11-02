@@ -2,9 +2,8 @@ import { type IBusyStyle, SIZE, type TLocaleIsoCode } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
-import { MediaCard } from '@blog/ui/components/molecules/media-card';
+import { LookSamplePosts } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/look-sample-posts';
 import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
-import { SampleChip } from '@platform/components/features/site-preview/sample-chip';
 import { SampleSiteFooter } from '@platform/components/features/site-preview/sample-site-footer';
 import {
   SampleSiteHeader,
@@ -28,6 +27,7 @@ export type TLookSampleProps = {
   hasReaderAccounts: boolean;
   isSignedIn?: boolean;
   isSubmenuOpen?: boolean;
+  shouldAlwaysShowLanguageSwitcher?: boolean;
 };
 
 export const LookSample = ({
@@ -40,10 +40,11 @@ export const LookSample = ({
   hasReaderAccounts,
   isSignedIn = false,
   isSubmenuOpen = false,
+  shouldAlwaysShowLanguageSwitcher = false,
 }: TLookSampleProps) => {
   const t = useTranslations('lookPreview');
 
-  const { root, actionsRow, cards } = lookSampleVariants();
+  const { root, main, hero, title, lead, actionsRow } = lookSampleVariants();
 
   return (
     <SiteThemeFrame
@@ -59,30 +60,28 @@ export const LookSample = ({
         isSignedIn={isSignedIn}
         isDark={theme.isDark}
         isSubmenuOpen={isSubmenuOpen}
+        isEdgeToEdge={true}
+        shouldAlwaysShowLanguageSwitcher={shouldAlwaysShowLanguageSwitcher}
       />
-      <Heading level={3} visual="preview">
-        {t('sampleHeading')}
-      </Heading>
-      <Text variant="supporting">{t('samplePara')}</Text>
-      <div className={actionsRow()}>
-        <Button type="button" size={SIZE.SM}>
-          {t('subscribeButton')}
-        </Button>
-        <Button type="button" variant="ghost" size={SIZE.SM}>
-          {t('readMoreButton')}
-        </Button>
-        <SampleBusyButton busy={busy} />
-        <SampleChip>{t('readTimeChip')}</SampleChip>
-      </div>
-      <div className={cards()}>
-        <MediaCard isInteractive={true} excerpt={t('firstCardExcerpt')}>
-          <MediaCard.Title level={4}>
-            <MediaCard.Link href="#">{t('firstCardTitle')}</MediaCard.Link>
-          </MediaCard.Title>
-        </MediaCard>
-        <MediaCard isInteractive={false} excerpt={t('secondCardExcerpt')}>
-          <MediaCard.Title level={4}>{t('secondCardTitle')}</MediaCard.Title>
-        </MediaCard>
+      <div className={main()}>
+        <div className={hero()}>
+          <Heading level={1} visual="preview" className={title()}>
+            {t('sampleHeading')}
+          </Heading>
+          <Text variant="supporting" className={lead()}>
+            {t('samplePara')}
+          </Text>
+          <div className={actionsRow()}>
+            <Button type="button" size={SIZE.SM}>
+              {t('subscribeButton')}
+            </Button>
+            <Button type="button" variant="ghost" size={SIZE.SM}>
+              {t('readMoreButton')}
+            </Button>
+            <SampleBusyButton busy={busy} />
+          </div>
+        </div>
+        <LookSamplePosts />
       </div>
       <SampleSiteFooter brand={brand} footer={footer} />
     </SiteThemeFrame>

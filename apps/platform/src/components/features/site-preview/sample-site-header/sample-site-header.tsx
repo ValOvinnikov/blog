@@ -13,6 +13,7 @@ import {
   SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
   SAMPLE_HEADER_TEST_ID,
 } from '@platform/constants/sample-header';
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 
 import { sampleSiteHeaderVariants } from './sample-site-header-variants';
@@ -30,6 +31,8 @@ export type TSampleSiteHeaderProps = {
   isSignedIn: boolean;
   isDark: boolean;
   isSubmenuOpen: boolean;
+  isEdgeToEdge?: boolean;
+  shouldAlwaysShowLanguageSwitcher?: boolean;
 };
 
 export const SampleSiteHeader = ({
@@ -40,24 +43,32 @@ export const SampleSiteHeader = ({
   isSignedIn,
   isDark,
   isSubmenuOpen,
+  isEdgeToEdge = false,
+  shouldAlwaysShowLanguageSwitcher = false,
 }: TSampleSiteHeaderProps) => {
   const { layout, submenuStyle, barStyle, account } = header;
   const { root, full, bar, group, links, controls } = sampleSiteHeaderVariants({
     barStyle,
     layout,
+    isEdgeToEdge,
   });
 
   return (
     <header
       className={root()}
       data-testid={SAMPLE_HEADER_TEST_ID}
+      data-part={SAMPLE_PART.HEADER}
       {...{
         [SAMPLE_HEADER_LAYOUT_ATTRIBUTE]: layout,
         [SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE]: barStyle,
       }}
     >
       <div className={full()} data-testid={SAMPLE_HEADER_FULL_TEST_ID}>
-        <SampleHeaderBrand name={name} logoSrc={logoSrc} />
+        <SampleHeaderBrand
+          name={name}
+          logoSrc={logoSrc}
+          isLarge={isEdgeToEdge}
+        />
         <div className={group()}>
           {layout !== HEADER_LAYOUT.MENU_BUTTON && (
             <SampleHeaderLinks
@@ -72,6 +83,7 @@ export const SampleSiteHeader = ({
             hasReaderAccounts={hasReaderAccounts}
             isSignedIn={isSignedIn}
             isDark={isDark}
+            shouldAlwaysShowLanguageSwitcher={shouldAlwaysShowLanguageSwitcher}
             className={controls()}
           />
         </div>
@@ -81,6 +93,7 @@ export const SampleSiteHeader = ({
         account={account}
         hasReaderAccounts={hasReaderAccounts}
         isSignedIn={isSignedIn}
+        isBrandLarge={isEdgeToEdge}
         className={bar()}
       />
     </header>
