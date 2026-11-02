@@ -1,10 +1,14 @@
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
+import {
+  AccordionContext,
+  AccordionItemValueContext,
+} from '@platform/components/shared/accordion/accordion-context';
 import { accordionVariants } from '@platform/components/shared/accordion/accordion-variants';
 import { AccordionNote } from '@platform/components/shared/accordion/components/note/accordion-note';
 import { AccordionPanel } from '@platform/components/shared/accordion/components/panel/accordion-panel';
 import { AccordionTrigger } from '@platform/components/shared/accordion/components/trigger/accordion-trigger';
 import { mapCompoundSlots, type TCompoundChildren } from '@platform/lib/react';
-import { Fragment, type ElementType } from 'react';
+import { Fragment, useContext, type ElementType } from 'react';
 
 const AccordionItemParts = {
   Trigger: AccordionTrigger,
@@ -23,21 +27,26 @@ export const AccordionItem = ({
   children,
   className,
 }: TAccordionItemProps) => {
+  const { variant } = useContext(AccordionContext);
   const { slots, unmatched } = mapCompoundSlots(children, AccordionItemParts);
 
   return (
     <BaseAccordion.Item
       value={value}
-      className={({ index }) =>
-        accordionVariants({ isFirst: index === 0 }).item({ class: className })
+      className={({ index, open }) =>
+        accordionVariants({ variant, isFirst: index === 0, isOpen: open }).item(
+          { class: className },
+        )
       }
     >
-      {slots.Trigger}
-      {slots.Note}
-      {slots.Panel}
-      {unmatched.map((node, i) => (
-        <Fragment key={i}>{node}</Fragment>
-      ))}
+      <AccordionItemValueContext.Provider value={value}>
+        {slots.Trigger}
+        {slots.Note}
+        {slots.Panel}
+        {unmatched.map((node, i) => (
+          <Fragment key={i}>{node}</Fragment>
+        ))}
+      </AccordionItemValueContext.Provider>
     </BaseAccordion.Item>
   );
 };
