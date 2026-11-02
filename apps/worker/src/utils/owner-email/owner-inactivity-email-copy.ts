@@ -40,7 +40,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
       paragraphs: [
         `${siteName} is paused because no one has used it for a while.`,
         `We’ll delete it on ${date}, together with its content. This can’t be undone.`,
-        'Sign in before then to keep it. Signing in brings it back online straight away.',
+        'Sign in before then to keep it. Signing in switches everything back on straight away.',
       ],
     }),
   },
@@ -61,7 +61,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
       paragraphs: [
         `${siteName} is gepauzeerd omdat niemand de site al een tijd heeft gebruikt.`,
         `We verwijderen de site op ${date}, samen met de inhoud. Dit kan niet ongedaan worden gemaakt.`,
-        'Log voor die tijd in om de site te behouden. Zodra je inlogt, is hij meteen weer online.',
+        'Log voor die tijd in om de site te behouden. Zodra je inlogt, staat alles meteen weer aan.',
       ],
     }),
   },
@@ -82,7 +82,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
       paragraphs: [
         `${siteName} est en pause, car personne ne l’a utilisé depuis un certain temps.`,
         `Nous le supprimerons le ${date}, avec son contenu. Cette action est irréversible.`,
-        'Connectez-vous d’ici là pour le conserver : votre site sera aussitôt remis en ligne.',
+        'Connectez-vous d’ici là pour le conserver : toutes ses fonctionnalités seront aussitôt réactivées.',
       ],
     }),
   },
@@ -103,7 +103,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
       paragraphs: [
         `${siteName} ist pausiert, weil die Website seit einiger Zeit nicht genutzt wurde.`,
         `Wir löschen sie am ${date} mitsamt ihren Inhalten. Das lässt sich nicht rückgängig machen.`,
-        'Melden Sie sich bis dahin an, um sie zu behalten. Mit der Anmeldung ist sie sofort wieder online.',
+        'Melden Sie sich bis dahin an, um sie zu behalten. Mit der Anmeldung ist sofort alles wieder eingeschaltet.',
       ],
     }),
   },
@@ -124,7 +124,7 @@ export const OWNER_INACTIVITY_EMAIL_COPY = {
       paragraphs: [
         `${siteName} está en pausa porque nadie lo ha usado desde hace tiempo.`,
         `Lo eliminaremos el ${date}, junto con su contenido. No se puede deshacer.`,
-        'Inicie sesión antes de esa fecha para conservarlo. Al iniciar sesión, volverá a estar en línea de inmediato.',
+        'Inicie sesión antes de esa fecha para conservarlo. Al iniciar sesión, todo volverá a activarse de inmediato.',
       ],
     }),
   },
