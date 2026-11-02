@@ -16,6 +16,7 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { sendOwnerInviteEmail } from './send-owner-invite-email';
 
@@ -32,12 +33,13 @@ describe(sendOwnerInviteEmail, () => {
     signInMock.mockResolvedValue(MOCK_VERIFY_REQUEST_URL);
   });
 
-  it('emails the owner a magic link without redirecting', async () => {
+  it("emails the owner a magic link that lands on their site's dashboard", async () => {
     await sendOwnerInviteEmail(MOCK_TENANT_ID, MOCK_OWNER_EMAIL);
 
     expect(signInMock).toHaveBeenCalledWith(MAGIC_LINK_PROVIDER_ID, {
       email: MOCK_OWNER_EMAIL,
       redirect: false,
+      redirectTo: adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
     });
   });
 
