@@ -587,7 +587,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
         expect(sampleTokens).toHaveStyle({
-          '--radius-md': '12px',
+          '--radius-md': '16px',
           '--spacing-card-x': '0.75rem',
         });
       });
@@ -1186,7 +1186,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
       const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
       expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(sampleTokens).toHaveStyle({ '--radius-md': '3px' });
+      expect(sampleTokens).toHaveStyle({ '--radius-md': '4px' });
     });
   });
 

@@ -11,6 +11,8 @@ import {
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
+const BORDER_COLOR = 'var(--border)';
+
 export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
 
 export type TOklchRamp = Record<`--${string}`, TOklchStop>;
@@ -57,31 +59,31 @@ export const IMAGE_SCRIM_RAMP = {
 export const RADIUS_DECLARATIONS: Record<TRadiusScale, TThemeDeclarations> = {
   [RADIUS_SCALE.SM]: {
     '--radius-sm': '2px',
-    '--radius': '3px',
-    '--radius-md': '3px',
-    '--radius-lg': '5px',
-    '--radius-xl': '6px',
+    '--radius': '4px',
+    '--radius-md': '4px',
+    '--radius-lg': '6px',
+    '--radius-xl': '8px',
   },
   [RADIUS_SCALE.MD]: {
-    '--radius-sm': '3px',
-    '--radius': '6px',
-    '--radius-md': '6px',
-    '--radius-lg': '10px',
-    '--radius-xl': '12px',
+    '--radius-sm': '4px',
+    '--radius': '8px',
+    '--radius-md': '8px',
+    '--radius-lg': '12px',
+    '--radius-xl': '16px',
   },
   [RADIUS_SCALE.LG]: {
-    '--radius-sm': '5px',
-    '--radius': '9px',
-    '--radius-md': '9px',
-    '--radius-lg': '15px',
-    '--radius-xl': '18px',
-  },
-  [RADIUS_SCALE.XL]: {
     '--radius-sm': '6px',
     '--radius': '12px',
     '--radius-md': '12px',
-    '--radius-lg': '20px',
+    '--radius-lg': '18px',
     '--radius-xl': '24px',
+  },
+  [RADIUS_SCALE.XL]: {
+    '--radius-sm': '8px',
+    '--radius': '16px',
+    '--radius-md': '16px',
+    '--radius-lg': '24px',
+    '--radius-xl': '32px',
   },
 };
 
@@ -122,7 +124,7 @@ export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
     '--item-radius': 'var(--radius-md)',
     '--item-border-width': '1px',
     '--item-accent-width': '1px',
-    '--item-accent-color': 'var(--border)',
+    '--item-accent-color': BORDER_COLOR,
     '--item-shadow': 'none',
   },
 };
@@ -137,7 +139,7 @@ export const HEADER_CONTROL_STYLE_DECLARATIONS: Record<
   },
   [HEADER_CONTROL_STYLE.SOFT]: {
     '--header-control-border': 'transparent',
-    '--header-control-fill': 'var(--border)',
+    '--header-control-fill': BORDER_COLOR,
   },
   [HEADER_CONTROL_STYLE.PLAIN]: {
     '--header-control-border': 'transparent',
