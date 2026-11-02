@@ -63,6 +63,8 @@
   --admin-frame-dot: #d5d9e0;
   --admin-frame-track: rgba(18, 20, 26, 0.08);
   --admin-frame-thumb: #5b6472;
+  --admin-frame-track-dark: rgba(232, 234, 239, 0.14);
+  --admin-frame-thumb-dark: #a3abb8;
   --admin-fade-end: rgba(246, 247, 249, 0);
   --admin-fade-end-surface: rgba(255, 255, 255, 0);
   --admin-preview-stage: #eef0f3;
@@ -284,6 +286,8 @@
   --color-admin-frame-track: var(--admin-frame-track);
   --color-admin-frame-thumb: var(--admin-frame-thumb);
   --color-admin-thumb-line: var(--admin-thumb-line);
+  --color-admin-frame-track-dark: var(--admin-frame-track-dark);
+  --color-admin-frame-thumb-dark: var(--admin-frame-thumb-dark);
   --color-admin-fade-end: var(--admin-fade-end);
   --color-admin-fade-end-surface: var(--admin-fade-end-surface);
   --color-admin-preview-stage: var(--admin-preview-stage);

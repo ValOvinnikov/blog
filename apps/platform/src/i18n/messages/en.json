@@ -742,6 +742,20 @@
     "livePreviewHeading": "Live preview",
     "previewColorSchemeAriaLabel": "Preview colour scheme"
   },
+  "devicePreview": {
+    "sampleAtWidth": "Sample page at {width} px",
+    "readoutLong": "{width} px wide · shown at {percent}%",
+    "readoutShort": "{width} px · {percent}%",
+    "readoutPhoneTab": "{width} px · shown at {percent}%",
+    "toolbarAriaLabel": "Preview options",
+    "deviceGroupAriaLabel": "Preview device",
+    "deviceDesktop": "Desktop",
+    "deviceTablet": "Tablet",
+    "devicePhone": "Phone",
+    "tooltipDesktop": "Desktop · {width} px",
+    "tooltipTablet": "Tablet · {width} px",
+    "tooltipPhone": "Phone · {width} px"
+  },
   "lookPreview": {
     "sampleHeading": "Reading the tide charts",
     "samplePara": "A short dispatch to show heading and body type, accent, logo tones, and radius together.",
@@ -754,8 +768,6 @@
     "firstCardExcerpt": "A linked card, the way post lists render it.",
     "secondCardTitle": "Charting the next season",
     "secondCardExcerpt": "A static card. Its frame follows your card style.",
-    "outlinedCardHeading": "Newsletter",
-    "outlinedCardBody": "An outlined card, as panels and pricing tiers render it.",
     "previewNote": "Built from the site's own components. Nothing is live until you save.",
     "widthDesktop": "Desktop",
     "widthMobile": "Mobile",

@@ -1,4 +1,6 @@
 export const SAMPLE_HEADER_TEST_ID = 'sample-site-header';
+export const SAMPLE_HEADER_FULL_TEST_ID = 'sample-site-header-full';
+export const SAMPLE_HEADER_BAR_TEST_ID = 'sample-site-header-bar';
 export const SAMPLE_SUBMENU_TEST_ID = 'sample-header-submenu';
 export const SAMPLE_HEADER_LAYOUT_ATTRIBUTE = 'data-header-layout';
 export const SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE = 'data-header-bar-style';

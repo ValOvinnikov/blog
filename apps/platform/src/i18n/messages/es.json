@@ -742,6 +742,20 @@
     "livePreviewHeading": "Vista previa en directo",
     "previewColorSchemeAriaLabel": "Esquema de color de la vista previa"
   },
+  "devicePreview": {
+    "sampleAtWidth": "Página de muestra a {width} px",
+    "readoutLong": "{width} px de ancho · mostrado al {percent} %",
+    "readoutShort": "{width} px · {percent} %",
+    "readoutPhoneTab": "{width} px · mostrado al {percent} %",
+    "toolbarAriaLabel": "Opciones de vista previa",
+    "deviceGroupAriaLabel": "Dispositivo de vista previa",
+    "deviceDesktop": "Escritorio",
+    "deviceTablet": "Tableta",
+    "devicePhone": "Teléfono",
+    "tooltipDesktop": "Escritorio · {width} px",
+    "tooltipTablet": "Tableta · {width} px",
+    "tooltipPhone": "Teléfono · {width} px"
+  },
   "lookPreview": {
     "sampleHeading": "Leyendo las tablas de mareas",
     "samplePara": "Una breve crónica para mostrar juntos la tipografía de títulos y de texto, el acento, los tonos del logotipo y el radio.",
@@ -754,8 +768,6 @@
     "firstCardExcerpt": "Una tarjeta enlazada, tal como la muestran las listas de entradas.",
     "secondCardTitle": "Rumbo a la próxima temporada",
     "secondCardExcerpt": "Una tarjeta estática. Su marco sigue su estilo de tarjeta.",
-    "outlinedCardHeading": "Boletín",
-    "outlinedCardBody": "Una tarjeta con contorno, como la muestran los paneles y los planes de precios.",
     "previewNote": "Creada con los propios componentes del sitio. Nada se publica hasta que guarde.",
     "widthDesktop": "Escritorio",
     "widthMobile": "Móvil",

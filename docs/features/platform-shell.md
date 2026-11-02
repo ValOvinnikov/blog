@@ -248,7 +248,9 @@ switches the content column to full-bleed (see
   every page, sign-in and onboarding included. The `rail` tokens, `scrim`,
   `frame-track` and `frame-thumb` have no dark value: the rail is dark in both
   themes, and the preview scrollbar follows the preview's own Light / Dark,
-  never the admin theme. The tenant site preview and the email preview body
+  never the admin theme: the device frame draws it with `frame-track` /
+  `frame-thumb` in a Light preview and `frame-track-dark` /
+  `frame-thumb-dark` in a Dark one. The tenant site preview and the email preview body
   are unaffected. `on-brand-ink` (#ffffff / #0f1115) is the mark on a
   `brand-ink` or tone fill — the selected preset card's tick, and the step
   indicator's done, failed and running numbers — and `preview-stage`

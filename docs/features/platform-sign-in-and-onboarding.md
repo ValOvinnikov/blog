@@ -115,8 +115,9 @@ Free site.
   address bar shows `<slug>.<TENANT_ROOT_DOMAIN>` as it is typed
   (`your-site.<TENANT_ROOT_DOMAIN>` before then), and below it a sample front
   page (`FrontPageSample` in `site-preview/`) renders in the chosen preset,
-  accent and light/dark mode: the header with the typed site name and its
-  Topics sub-menu closed, a hero ("Dispatches from the coast") and three
+  accent and light/dark mode: the header, which follows the preview
+  column's own width and so, the column being under 64rem, is always the
+  bar (the typed site name and the menu button, inset 16px), a hero ("Dispatches from the coast") and three
   posts. The step's content sits directly on a white column, not in a card,
   capped at 640px and left-aligned. The layout has three tiers, read in JS
   with `useMediaQuery` at the same edges the CSS uses, so the preview renders

@@ -10,6 +10,7 @@ import {
   type TLookFormContext,
 } from '@platform/components/features/look/look-form-provider';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_PRESSED } from '@platform/testing/aria';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import {
@@ -22,7 +23,6 @@ import { LookPreview } from './look-preview';
 
 const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const MOCK_ACCENT_HUE = 28;
-const ARIA_PRESSED = 'aria-pressed';
 const { widthDesktop: DESKTOP, widthMobile: MOBILE } = messages.lookPreview;
 
 const renderPreview = (values: Partial<TLookFormValues> = {}) => {
@@ -103,23 +103,6 @@ describe(`<${LookPreview.name}/>`, () => {
     await user.click(mobileButton);
 
     expect(mobileButton).toHaveAttribute(ARIA_PRESSED, 'true');
-  });
-
-  it('shows the phone header bar in the mobile preview', async () => {
-    renderPreview();
-
-    const mobileButton = screen.getByRole('button', { name: MOBILE });
-    await user.click(mobileButton);
-
-    const menuButton = screen.getByRole('button', {
-      name: messages.lookPreview.menuButton,
-    });
-    const postsLink = screen.queryByRole('link', {
-      name: messages.lookPreview.navPosts,
-    });
-
-    expect(menuButton).toBeVisible();
-    expect(postsLink).not.toBeInTheDocument();
   });
 
   it('re-derives the accent tokens for the dark preview mode', async () => {

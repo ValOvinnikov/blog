@@ -1,8 +1,4 @@
-import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-  type IAccountControl,
-} from '@blog/config';
+import type { IAccountControl, TAccountButtonStyle } from '@blog/config';
 import { AccountPanel } from '@blog/ui/components/molecules/account-panel';
 import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
@@ -15,29 +11,26 @@ const SAMPLE_LINK_HREF = '#';
 
 export type TSampleAccountControlProps = {
   account: IAccountControl;
+  appearance: TAccountButtonStyle;
   isSignedIn: boolean;
-  isNarrow: boolean;
 };
 
 export const SampleAccountControl = ({
-  account: { buttonStyle, panelStyle, phonePlacement },
+  account: { panelStyle },
+  appearance,
   isSignedIn,
-  isNarrow,
 }: TSampleAccountControlProps) => {
   const t = useTranslations('lookPreview');
   const panelId = useId();
-  const { panel } = sampleAccountControlVariants();
-
-  if (isNarrow && phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU) {
-    return null;
-  }
+  const { trigger, panel } = sampleAccountControlVariants({ appearance });
 
   const user = isSignedIn ? { name: t('sampleReaderName') } : undefined;
 
   return (
     <PopoverMenu>
       <AccountTrigger
-        appearance={isNarrow ? ACCOUNT_BUTTON_STYLE.CIRCLE : buttonStyle}
+        appearance={appearance}
+        className={trigger()}
         labels={{ signIn: t('signIn'), account: t('accountHeading') }}
         user={user}
         isOpen={isSignedIn}

@@ -347,6 +347,14 @@ Every key/value const an agent should reuse before writing a literal. The
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
 - **DATA_REQUEST_LOG**: `AUDIT_FAILED`=`"data_request.audit_failed"`, `FAILED`=`"data_request.failed"`
 
+### `@platform/constants/device-frame` — `apps/platform/src/constants/device-frame.ts`
+
+- **DEVICE_FRAME_FIT**: `PAGE`, `FULLSCREEN`
+- **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`
+- **DEVICE_FRAME_AXIS**: `VERTICAL`, `HORIZONTAL`
+- **DEVICE_FRAME_SCROLL_TARGET**: `TOP`, `END`
+- **DEVICE_FRAME_TEST_ID**: `FRAME`=`"device-frame"`, `VIEWPORT`=`"device-frame-viewport"`, `CONTENT`=`"device-frame-content"`, `BROWSER_BAR`=`"device-frame-browser-bar"`, `VERTICAL_SCROLLBAR`=`"device-frame-vertical-scrollbar"`, `HORIZONTAL_SCROLLBAR`=`"device-frame-horizontal-scrollbar"`
+
 ### `@platform/constants/dns` — `apps/platform/src/constants/dns.ts`
 
 - **DNS_TYPE**: `CNAME`=`5`, `TXT`=`16`
@@ -440,6 +448,9 @@ Every key/value const an agent should reuse before writing a literal. The
 - **PREVIEW_MODE**: `LIGHT`, `DARK`
 - **PREVIEW_WIDTH**: `DESKTOP`, `MOBILE`
 - **PREVIEW_READER_STATE**: `SIGNED_OUT`, `SIGNED_IN`
+- **PREVIEW_DEVICE**: `DESKTOP`, `TABLET`, `PHONE`
+- **PREVIEW_HEADING_LAYOUT**: `SECTION`, `PHONE_TAB`
+- **PREVIEW_READOUT**: `LONG_MIN_WIDTH`=`476`
 
 ### `@platform/constants/provisioning` — `apps/platform/src/constants/provisioning.ts`
 

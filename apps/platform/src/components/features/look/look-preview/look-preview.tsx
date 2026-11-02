@@ -87,7 +87,6 @@ export const LookPreview = ({
         busy={toSampleBusyStyle(values)}
         hasReaderAccounts={hasReaderAccounts}
         isSignedIn={readerState === PREVIEW_READER_STATE.SIGNED_IN}
-        isNarrow={isNarrow}
         isSubmenuOpen={isSubmenuPreviewOpen}
       />
     </PreviewFrame>

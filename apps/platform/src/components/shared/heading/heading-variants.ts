@@ -14,6 +14,7 @@ export const headingVariants = tv({
         'tracking-[-0.01em]',
         'wrap-anywhere',
       ],
+      previewTitle: ['text-admin-15', 'leading-5', 'font-admin-650'],
       cardTitle: [
         'text-admin-14',
         'leading-5',
