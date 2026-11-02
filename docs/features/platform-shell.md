@@ -20,6 +20,8 @@ code:
   - apps/platform/src/utils/routes/**
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/utils/sidebar-collapsed-cookie/**
+  - apps/platform/src/utils/theme-preference-cookie/**
+  - apps/platform/src/constants/theme.ts
   - apps/platform/src/utils/tenant-switcher-items/**
   - apps/platform/src/context/unsaved-changes-provider/**
   - apps/platform/src/components/shared/guarded-link/**
@@ -92,7 +94,9 @@ switches the content column to full-bleed (see
   `@blog/db` queries; nothing is written except the cookies below.
 - Cookies: `admin-active-tenant` (httpOnly, 30 days, set only by the
   select-tenant route), `admin-sidebar-collapsed` (client-written, one
-  year; read server-side for the first render) and the per-tenant
+  year; read server-side for the first render), `admin-theme` (the
+  per-device theme preference, one year; read server-side for the first
+  render) and the per-tenant
   `studio-entered-<tenantId>` (client-written, one year), which no
   surface reads any more (`embedded-studio.md`).
 - Request caching: `listSessionTenants`, `resolveDashboardTenant`,
@@ -236,7 +240,12 @@ switches the content column to full-bleed (see
   scrollbars and form controls follow; and
   `@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) }`
   repeats those dark values, so with no stored choice the admin follows the
-  device setting, live, without a reload. The `rail` tokens, `scrim`,
+  device setting, live, without a reload. The stored choice is
+  `THEME_PREFERENCE` (Light, Dark or System) in the per-device
+  `admin-theme` cookie; the root layout reads it and sets
+  `data-theme='light'` or `'dark'` on `<html>` (none for System, or for an
+  unrecognised value), so the first paint already has the chosen theme on
+  every page, sign-in and onboarding included. The `rail` tokens, `scrim`,
   `frame-track` and `frame-thumb` have no dark value: the rail is dark in both
   themes, and the preview scrollbar follows the preview's own Light / Dark,
   never the admin theme. The tenant site preview and the email preview body

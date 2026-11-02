@@ -1,15 +1,19 @@
 import {
+  COLOR_SCHEME,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
+import { resolveThemeColorScheme } from '@platform/server/layout/resolve-theme-color-scheme';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
+
+vi.mock('@platform/server/layout/resolve-theme-color-scheme');
 
 faker.seed(5996);
 
@@ -73,6 +77,21 @@ describe(`<${LocaleLayout.name}/>`, () => {
 
     expect((htmlElement as TAnyElement).props.lang).toBe(LOCALE_BCP47_TAGS.NL);
   });
+
+  it.each([
+    { colorScheme: COLOR_SCHEME.LIGHT, expected: 'light' },
+    { colorScheme: COLOR_SCHEME.DARK, expected: 'dark' },
+    { colorScheme: undefined, expected: undefined },
+  ])(
+    'sets data-theme to $expected on the document for the $colorScheme scheme',
+    async ({ colorScheme, expected }) => {
+      vi.mocked(resolveThemeColorScheme).mockResolvedValueOnce(colorScheme);
+
+      const htmlElement = await LocaleLayout(defaultProps);
+
+      expect((htmlElement as TAnyElement).props['data-theme']).toBe(expected);
+    },
+  );
 
   it('renders its children', async () => {
     await setup();
