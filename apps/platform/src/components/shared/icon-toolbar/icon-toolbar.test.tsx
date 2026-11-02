@@ -189,6 +189,16 @@ describe(`<${IconToolbar.name}/>`, () => {
     expect(getButton(MOCK_PHONE_LABEL)).toHaveFocus();
   });
 
+  it('keeps Home and End inside a text input in the end slot', async () => {
+    setup({ children: <input aria-label={MOCK_END_LABEL} /> });
+    const input = screen.getByRole('textbox', { name: MOCK_END_LABEL });
+    await user.click(input);
+
+    await user.keyboard(`${USER_EVENT_KEY.HOME}${USER_EVENT_KEY.END}`);
+
+    expect(input).toHaveFocus();
+  });
+
   it('leaves the toolbar on Tab', async () => {
     setup();
     await user.tab();

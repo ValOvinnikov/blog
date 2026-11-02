@@ -3,4 +3,6 @@ export const KEY = {
   ARROW_RIGHT: 'ArrowRight',
   HOME: 'Home',
   END: 'End',
+  ENTER: 'Enter',
+  SPACE: ' ',
 } as const;

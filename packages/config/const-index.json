@@ -4986,6 +4986,22 @@
         "file": "apps/platform/src/constants/keyboard.ts"
       }
     ],
+    "Enter": [
+      {
+        "ref": "KEY.ENTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    " ": [
+      {
+        "ref": "KEY.SPACE",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
     "leads.delete_failed": [
       {
         "ref": "LEAD_LOG.DELETE_FAILED",

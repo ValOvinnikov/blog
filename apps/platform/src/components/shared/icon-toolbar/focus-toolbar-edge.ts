@@ -6,6 +6,9 @@ export const focusToolbarEdge = (event: KeyboardEvent<HTMLElement>) => {
   if (!isHome && event.key !== KEY.END) {
     return;
   }
+  if (!(event.target instanceof Element) || !event.target.closest('button')) {
+    return;
+  }
   const buttons = event.currentTarget.querySelectorAll<HTMLButtonElement>(
     'button:not(:disabled)',
   );

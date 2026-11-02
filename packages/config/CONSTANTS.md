@@ -396,7 +396,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/keyboard` — `apps/platform/src/constants/keyboard.ts`
 
-- **KEY**: `ARROW_LEFT`=`"ArrowLeft"`, `ARROW_RIGHT`=`"ArrowRight"`, `HOME`=`"Home"`, `END`=`"End"`
+- **KEY**: `ARROW_LEFT`=`"ArrowLeft"`, `ARROW_RIGHT`=`"ArrowRight"`, `HOME`=`"Home"`, `END`=`"End"`, `ENTER`=`"Enter"`, `SPACE`=`" "`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 

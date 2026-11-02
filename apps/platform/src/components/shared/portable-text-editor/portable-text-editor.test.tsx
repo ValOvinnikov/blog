@@ -5,6 +5,7 @@ import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   BULLET_LIST_ITEM,
   mockTextBlock,
@@ -107,10 +108,10 @@ describe(`<${PortableTextEditor.name}/>`, () => {
       const italicButton = screen.getByRole('button', { name: t('italic') });
 
       await user.tab();
-      await user.keyboard('{ArrowRight}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
       expect(italicButton).toHaveFocus();
 
-      await user.keyboard('{ArrowLeft}');
+      await user.keyboard(USER_EVENT_KEY.ARROW_LEFT);
       expect(boldButton).toHaveFocus();
     });
 

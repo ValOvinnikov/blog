@@ -109,19 +109,22 @@ describe(`<${IconToggleGroup.name}/>`, () => {
     expect(secondButton).toBePressed();
   });
 
-  it.each(['{Enter}', ' '])('presses with %j and keeps focus', async (key) => {
-    renderWithIntl(<StatefulGroup />);
+  it.each([USER_EVENT_KEY.ENTER, USER_EVENT_KEY.SPACE])(
+    'presses with %j and keeps focus',
+    async (key) => {
+      renderWithIntl(<StatefulGroup />);
 
-    const secondButton = screen.getByRole('button', {
-      name: MOCK_SECOND_LABEL,
-    });
-    await user.tab();
-    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-    await user.keyboard(key);
+      const secondButton = screen.getByRole('button', {
+        name: MOCK_SECOND_LABEL,
+      });
+      await user.tab();
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+      await user.keyboard(key);
 
-    expect(secondButton).toBePressed();
-    expect(secondButton).toHaveFocus();
-  });
+      expect(secondButton).toBePressed();
+      expect(secondButton).toHaveFocus();
+    },
+  );
 
   it('opens a tooltip unlike the aria-label on keyboard focus, keeping the name', async () => {
     setup();
