@@ -62,7 +62,12 @@ const MOCK_SLUG = faker.helpers.slugify(faker.lorem.words(2));
 const MOCK_SITE_ADDRESS = `${MOCK_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
 const {
   nameLabel: NAME_LABEL,
+  nameHint: NAME_HINT,
+  siteTypeHint: SITE_TYPE_HINT,
   siteAddressLabel: SITE_ADDRESS_LABEL,
+  siteAddressHint: SITE_ADDRESS_HINT,
+  languageLabel: LANGUAGE_LABEL,
+  languageHint: LANGUAGE_HINT,
   siteAddressChecking: ADDRESS_CHECKING,
   siteAddressUnverified: ADDRESS_UNVERIFIED,
   previewAddressPlaceholder: PLACEHOLDER_SLUG,
@@ -329,6 +334,25 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(heading).toBeVisible();
   });
 
+  it('describes the site type and name by their hints', () => {
+    const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
+    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+
+    expect(siteTypeSelect).toHaveAccessibleDescription(SITE_TYPE_HINT);
+    expect(nameField).toHaveAccessibleDescription(NAME_HINT);
+  });
+
+  it('describes an empty name by its hint, then what is missing', async () => {
+    await clickContinue();
+
+    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+
+    expect(nameField).toBeInvalid();
+    expect(nameField).toHaveAccessibleDescription(
+      `${NAME_HINT} ${NAME_REQUIRED}`,
+    );
+  });
+
   it('keeps the values entered when going back a step', async () => {
     await completeSiteStep();
     const backButton = screen.getByRole('button', MOCK_BACK);
@@ -371,7 +395,7 @@ describe(`<${OnboardingView.name}/>`, () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
     await completeSiteStep();
     const addressField = await typeAddress();
-    await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
 
     const continueButton = screen.getByRole('button', MOCK_CONTINUE);
 
@@ -383,15 +407,38 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(heading).toBeVisible();
   });
 
-  it('describes a taken address field by why it is taken', async () => {
+  it('describes a taken address field by its suffix, hint and why it is taken', async () => {
     checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
     await completeSiteStep();
     const addressField = await typeAddress();
-    await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
 
     expect(addressField).toHaveAccessibleDescription(
-      expect.stringContaining(ADDRESS_TAKEN),
+      `.${MOCK_TENANT_ROOT_DOMAIN} ${SITE_ADDRESS_HINT} ${ADDRESS_TAKEN}`,
     );
+  });
+
+  it('announces a taken address in a status region', async () => {
+    checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
+    await completeSiteStep();
+    await typeAddress();
+    await screen.findAllByText(ADDRESS_TAKEN);
+
+    const announcing = screen
+      .getAllByRole('status')
+      .filter((status) => status.textContent === ADDRESS_TAKEN);
+
+    expect(announcing).toHaveLength(1);
+  });
+
+  it('describes the language select by its hint', async () => {
+    await completeSiteStep();
+
+    const languageSelect = screen.getByRole('combobox', {
+      name: LANGUAGE_LABEL,
+    });
+
+    expect(languageSelect).toHaveAccessibleDescription(LANGUAGE_HINT);
   });
 
   it('says when the address could not be checked', async () => {
@@ -607,10 +654,13 @@ describe(`<${OnboardingView.name}/>`, () => {
     await reachReview();
     await acceptAndCreate();
 
-    const message = await screen.findByText(ADDRESS_TAKEN);
+    await screen.findAllByText(ADDRESS_TAKEN);
+    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
     const heading = stepHeading(STEPS.ADDRESS);
 
-    expect(message).toBeVisible();
+    expect(addressField).toHaveAccessibleDescription(
+      expect.stringContaining(ADDRESS_TAKEN),
+    );
     expect(heading).toBeVisible();
   });
 

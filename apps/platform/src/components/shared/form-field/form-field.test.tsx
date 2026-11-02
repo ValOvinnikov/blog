@@ -1,6 +1,7 @@
 import { Input } from '@base-ui/react/input';
 import { faker } from '@faker-js/faker';
 import { TextInput } from '@platform/components/shared/text-input';
+import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import {
   customRender,
   renderWithIntl,
@@ -22,6 +23,7 @@ const MOCK_FOOTER = faker.lorem.sentence();
 const MOCK_ACTION = faker.lorem.word();
 const MOCK_CONTROL_ID = faker.lorem.slug();
 const MOCK_OWN_NAME = faker.lorem.words(3);
+const MOCK_WIZARD_CONTROL = { appearance: FIELD_APPEARANCE.WIZARD };
 
 const TextFormField = (props: Omit<TFormFieldProps, 'children'>) => (
   <FormField {...props}>
@@ -140,5 +142,47 @@ describe(`<${FormField.name}/>`, () => {
 
     expect(footer).toBeVisible();
     expect(error).toBeVisible();
+  });
+
+  it('places the hint before the control by default', () => {
+    setup({ hint: MOCK_HINT });
+
+    const hint = screen.getByText(MOCK_HINT);
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(hint.compareDocumentPosition(input)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  describe('wizard appearance', () => {
+    it('places the hint after the control', () => {
+      setup({ hint: MOCK_HINT, control: MOCK_WIZARD_CONTROL });
+
+      const hint = screen.getByText(MOCK_HINT);
+      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+      expect(input.compareDocumentPosition(hint)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    });
+
+    it('places the error after the hint and describes the control by both in that order', () => {
+      setup({
+        hint: MOCK_HINT,
+        error: MOCK_ERROR,
+        control: MOCK_WIZARD_CONTROL,
+      });
+
+      const hint = screen.getByText(MOCK_HINT);
+      const error = screen.getByText(MOCK_ERROR);
+      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+      expect(hint.compareDocumentPosition(error)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+      expect(input).toHaveAccessibleDescription(`${MOCK_HINT} ${MOCK_ERROR}`);
+      expect(input).toBeInvalid();
+    });
   });
 });

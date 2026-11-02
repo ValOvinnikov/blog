@@ -4,44 +4,64 @@ import type { TMaybeUndefined } from '@blog/config';
 import { FormField } from '@platform/components/shared/form-field';
 import { Text } from '@platform/components/shared/text';
 import { TextInput } from '@platform/components/shared/text-input';
+import {
+  FIELD_APPEARANCE,
+  type TFieldAppearance,
+} from '@platform/constants/field-appearance';
+import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { formSiteAddressInputVariants } from './form-site-address-input-variants';
+const formSiteAddressInputVariants = tv({
+  slots: {
+    row: ['flex items-center gap-2'],
+    input: ['min-w-0 flex-1'],
+    suffix: ['shrink-0'],
+  },
+  variants: {
+    appearance: {
+      [FIELD_APPEARANCE.DEFAULT]: {},
+      [FIELD_APPEARANCE.WIZARD]: {
+        suffix: ['text-admin-14'],
+      },
+    },
+  },
+  defaultVariants: {
+    appearance: FIELD_APPEARANCE.DEFAULT,
+  },
+});
 
 export type TFormSiteAddressInputProps = {
   label: string;
   hint: string;
   error?: string;
-  errorId?: string;
   value: string;
   onChange: (value: string) => void;
   rootDomain: TMaybeUndefined<string>;
+  appearance?: TFieldAppearance;
 };
 
 export const FormSiteAddressInput = ({
   label,
   hint,
   error,
-  errorId,
   value,
   onChange,
   rootDomain,
+  appearance,
 }: TFormSiteAddressInputProps) => {
   const t = useTranslations('formSiteAddressInput');
   const suffixId = useId();
-  const { row, input, suffix } = formSiteAddressInputVariants();
+  const { row, input, suffix } = formSiteAddressInputVariants({ appearance });
 
   return (
     <FormField
       label={label}
       hint={hint}
       error={error}
-      isInvalid={Boolean(errorId)}
       control={{
-        describedBy:
-          [rootDomain && suffixId, errorId].filter(Boolean).join(' ') ||
-          undefined,
+        describedBy: rootDomain ? suffixId : undefined,
+        appearance,
       }}
     >
       <div className={row()}>

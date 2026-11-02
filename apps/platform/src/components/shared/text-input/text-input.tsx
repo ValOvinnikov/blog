@@ -28,7 +28,7 @@ export const TextInput = ({
   className,
   ref,
 }: TTextInputProps) => {
-  const { id, describedBy } = useFormFieldControl();
+  const { id, describedBy, appearance } = useFormFieldControl();
 
   return (
     <Input
@@ -42,6 +42,7 @@ export const TextInput = ({
       aria-describedby={describedBy}
       className={({ disabled }) =>
         textInputVariants({
+          appearance,
           isDisabled: disabled,
           isReadOnly,
           class: className,

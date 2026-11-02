@@ -5,20 +5,24 @@ import { toOptions } from '@blog/utils/primitives';
 import { SiteAddressField } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields/components/site-address-field';
 import { FormField } from '@platform/components/shared/form-field';
 import { OptionSelect } from '@platform/components/shared/option-select';
-import type { TCreateSiteInput } from '@platform/server/onboarding/create-site-input';
+import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
+import type {
+  TCreateSiteFieldError,
+  TCreateSiteInput,
+} from '@platform/server/onboarding/create-site-input';
 import { useTranslations } from 'next-intl';
 
 export type TAddressStepFieldsProps = {
   values: TCreateSiteInput;
   rootDomain: TMaybeUndefined<string>;
-  addressErrorId: TMaybeUndefined<string>;
+  addressError: TMaybeUndefined<TCreateSiteFieldError>;
   onFieldChange: (patch: Partial<TCreateSiteInput>) => void;
 };
 
 export const AddressStepFields = ({
   values,
   rootDomain,
-  addressErrorId,
+  addressError,
   onFieldChange,
 }: TAddressStepFieldsProps) => {
   const t = useTranslations('onboardingForm');
@@ -30,13 +34,18 @@ export const AddressStepFields = ({
         value={values.slug}
         onChange={(slug) => onFieldChange({ slug })}
         rootDomain={rootDomain}
-        errorId={addressErrorId}
+        error={addressError}
       />
-      <FormField label={t('languageLabel')} hint={t('languageHint')}>
+      <FormField
+        label={t('languageLabel')}
+        hint={t('languageHint')}
+        control={{ appearance: FIELD_APPEARANCE.WIZARD }}
+      >
         <OptionSelect
           options={toOptions(LOCALE_ISO_CODES, (locale) => tLanguage(locale))}
           value={values.locale}
           onChange={(locale) => onFieldChange({ locale })}
+          appearance={FIELD_APPEARANCE.WIZARD}
         />
       </FormField>
     </>

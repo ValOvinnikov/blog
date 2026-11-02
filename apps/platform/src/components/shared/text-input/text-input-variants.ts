@@ -1,3 +1,4 @@
+import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import {
   FIELD_FOCUS_CLASSES,
@@ -15,6 +16,10 @@ export const textInputVariants = tv({
     INVALID_SURFACE_CLASSES,
   ],
   variants: {
+    appearance: {
+      [FIELD_APPEARANCE.DEFAULT]: '',
+      [FIELD_APPEARANCE.WIZARD]: 'md:h-10 md:px-3 md:py-0 md:text-admin-14',
+    },
     isDisabled: {
       true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-muted cursor-not-allowed`,
     },

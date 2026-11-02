@@ -117,6 +117,8 @@ import RssComponent from '@blog/ui/assets/icons/rss.svg';
 import RssUrl from '@blog/ui/assets/icons/rss.svg?url';
 import SearchComponent from '@blog/ui/assets/icons/search.svg';
 import SearchUrl from '@blog/ui/assets/icons/search.svg?url';
+import SelectChevronComponent from '@blog/ui/assets/icons/select-chevron.svg';
+import SelectChevronUrl from '@blog/ui/assets/icons/select-chevron.svg?url';
 import SendComponent from '@blog/ui/assets/icons/send.svg';
 import SendUrl from '@blog/ui/assets/icons/send.svg?url';
 import SettingsComponent from '@blog/ui/assets/icons/settings.svg';
@@ -192,6 +194,10 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
     url: ChevronDownUrl,
   },
   [ICONS.CHEVRON_UP]: { component: ChevronUpComponent, url: ChevronUpUrl },
+  [ICONS.SELECT_CHEVRON]: {
+    component: SelectChevronComponent,
+    url: SelectChevronUrl,
+  },
   [ICONS.EXTERNAL_LINK]: {
     component: ExternalLinkComponent,
     url: ExternalLinkUrl,
