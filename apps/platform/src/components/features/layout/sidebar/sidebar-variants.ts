@@ -27,7 +27,7 @@ export const sidebarVariants = tv({
     ],
     section: ['flex flex-col gap-1.5 px-3 pt-[14px]'],
     sectionLabel: [
-      'px-2.5 pb-1.5 text-admin-11 font-bold tracking-[0.09em] text-admin-side-muted uppercase',
+      'truncate px-2.5 pb-1.5 text-admin-11 font-bold tracking-[0.09em] text-admin-side-muted uppercase',
       'group-data-[collapsed=true]/shell:hidden',
     ],
     list: ['flex flex-col gap-0.5'],
@@ -39,7 +39,7 @@ export const sidebarVariants = tv({
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0',
     ],
     note: [
-      'px-2.5 text-admin-12 text-admin-side-muted',
+      'px-2.5 text-admin-12 leading-4 text-admin-side-muted',
       'group-data-[collapsed=true]/shell:hidden',
     ],
   },
