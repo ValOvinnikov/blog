@@ -1,3 +1,4 @@
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { PreviewFrameHeading } from '@platform/components/shared/preview-frame/components/heading/preview-frame-heading';
 import { PreviewFrameStage } from '@platform/components/shared/preview-frame/components/stage/preview-frame-stage';
 import { PreviewFrameStatus } from '@platform/components/shared/preview-frame/components/status/preview-frame-status';
@@ -55,7 +56,7 @@ const PreviewFrameRoot = ({
         </div>
       )}
       {slots.Toolbar}
-      {unmatched.length > 0 && (
+      {hasArrayGotItems(unmatched) && (
         <div className={stage()}>
           <div className={frame()}>
             {unmatched.map((node, index) => (
