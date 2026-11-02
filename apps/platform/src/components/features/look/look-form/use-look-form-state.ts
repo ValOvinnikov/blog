@@ -12,6 +12,7 @@ import {
   isBrandAssetKind,
   listLostStagedFiles,
 } from '@platform/utils/look-form-values/look-form-values';
+import type { TLookRowKey } from '@platform/utils/look-open-rows/look-open-rows';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -27,7 +28,7 @@ type TUseLookFormStateArgs = {
   plan: TTenantPlan;
   savedAt?: Date;
   archivedAt?: Date;
-  revealInvalidField: () => void;
+  revealInvalidField: (row: TLookRowKey) => void;
 };
 
 export const useLookFormState = ({
@@ -70,10 +71,15 @@ export const useLookFormState = ({
     onDiscard: () => setRepickKinds([]),
     countChanges,
     canSave: ({ accentHue }) => isAccentHueAccessible(accentHue),
-    invalidControls: ({ accentHue }) => ({
-      ids: isAccentHueAccessible(accentHue) ? [] : [accentHueFieldId],
-      revealFirst: revealInvalidField,
-    }),
+    invalidControls: ({ accentHue }) => {
+      const isHueRejected = !isAccentHueAccessible(accentHue);
+
+      return {
+        ids: isHueRejected ? [accentHueFieldId] : [],
+        revealFirst: () =>
+          revealInvalidField(isHueRejected ? 'colour' : 'brand'),
+      };
+    },
     draft: {
       tenantId,
       page: 'look',

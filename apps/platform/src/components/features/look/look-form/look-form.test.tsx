@@ -55,7 +55,10 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { USER_EVENT_KEY } from '@platform/testing/keyboard';
+import {
+  nudgeAccentHue,
+  pickLogo,
+} from '@platform/testing/look/look-form-interactions';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -92,6 +95,19 @@ vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal<typeof BlogConfig>()),
   isAccentHueAccessible: vi.fn(() => true),
 }));
+
+vi.mock(
+  '@platform/components/features/look/look-form/use-look-open-rows',
+  () => ({
+    useLookOpenRows: () => ({
+      groupProps: (rows: readonly string[]) => ({
+        openValues: rows,
+        onOpenValuesChange: vi.fn(),
+      }),
+      revealRow: vi.fn(),
+    }),
+  }),
+);
 
 const { MOCK_UPLOADED_LOGO_URL, mockActions } = await vi.hoisted(async () => {
   const { ACTION_OUTCOME: OUTCOME } = await import('@blog/config/constants');
@@ -132,6 +148,8 @@ const tLogoHue = makeEnTranslator('logoHueField');
 const tUploadErrors = makeEnTranslator('uploadErrors');
 const tSaveBar = makeEnTranslator('saveBar');
 
+const UNSAVED_DOT = tSaveBar('regionLabel');
+
 const hueValue = (hue: number) => tLogoHue('hueValue', { hue });
 
 const ACCENT_HUE = LOOK_FORM.accentHueLabel;
@@ -148,9 +166,6 @@ const FAVICON_REMOVE_FAILED = tUploadErrors('removeFailed', {
 });
 const MOCK_UPLOAD_LIMIT = '4 MB';
 const MOCK_DRAFT_TAKEN_AT = '2026-08-20T09:00:00.000Z';
-const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
-  type: 'image/png',
-});
 
 const HEAVY_FORM_TIMEOUT_MS = 15_000;
 const ARIA_SELECTED = 'aria-selected';
@@ -223,22 +238,6 @@ const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
   };
 };
 
-const pickLogo = async (user: UserEvent) => {
-  const [logoInput] = screen.getAllByTestId('asset-upload-field-input');
-  if (!logoInput) throw new Error('logo input not found');
-  await user.upload(logoInput, MOCK_LOGO_FILE);
-  await waitFor(() => {
-    const logo = screen.getByAltText(CURRENT_LOGO);
-    expect(logo).toHaveAttribute('src', MOCK_STAGED_LOGO_BLOB_URL);
-  });
-};
-
-const nudgeAccentHue = async (user: UserEvent) => {
-  const accentHueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
-  await user.click(accentHueSlider);
-  await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-};
-
 const clickSave = async (user: UserEvent) => {
   const saveChangesButton = await screen.findByRole('button', {
     name: SAVE_CHANGES,
@@ -286,26 +285,35 @@ describe(`<${LookForm.name}/>`, () => {
         setup();
       });
 
-      it('groups the settings into nine titled cards', () => {
-        const cardHeadings = screen.getAllByRole('heading', { level: 2 });
-        const cardTitles = cardHeadings.map((heading) => heading.textContent);
+      it('lists the Preset card, then the Style and Site parts rows in order', () => {
+        const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+        const presetHeading = within(editPanel).getAllByRole('heading', {
+          level: 2,
+        });
+        const rowHeadings = within(editPanel).getAllByRole('heading', {
+          level: 3,
+        });
+        const presetTitles = presetHeading.map(
+          (heading) => heading.textContent,
+        );
+        const rowTitles = rowHeadings.map((heading) => heading.textContent);
 
-        expect(cardTitles).toEqual([
-          LOOK_FORM.presetLabel,
+        expect(presetTitles).toEqual([LOOK_FORM.presetLabel]);
+        expect(rowTitles).toEqual([
           LOOK_FORM.colourHeading,
+          LOOK_FORM.brandHeading,
           LOOK_FORM.typeHeading,
           LOOK_FORM.shapeHeading,
-          LOOK_FORM.headerHeading,
           LOOK_FORM.buttonsHeading,
+          LOOK_FORM.headerHeading,
           LOOK_FORM.footerHeading,
-          LOOK_FORM.brandHeading,
           LOOK_FORM.languageSwitcherLabel,
         ]);
       });
 
       it('switches between the Edit and Preview tabs', async () => {
         const tabList = screen.getByRole('tablist', {
-          name: 'Edit or preview',
+          name: LOOK_FORM.viewTabsAriaLabel,
         });
         const editTab = within(tabList).getByRole('tab', { name: 'Edit' });
         const previewTab = screen.getByRole('tab', { name: 'Preview' });
@@ -619,7 +627,7 @@ describe(`<${LookForm.name}/>`, () => {
 
         it('marks only the card holding an unsaved change', () => {
           const colourHeading = screen.getByRole('heading', {
-            name: `${LOOK_FORM.colourHeading} Unsaved`,
+            name: `${LOOK_FORM.colourHeading}${UNSAVED_DOT}`,
           });
           const typeHeading = screen.getByRole('heading', {
             name: LOOK_FORM.typeHeading,
@@ -1356,7 +1364,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       it('stages a picked logo as an unsaved change without uploading it', () => {
         const brandHeading = screen.getByRole('heading', {
-          name: `${LOOK_FORM.brandHeading} Unsaved`,
+          name: `${LOOK_FORM.brandHeading}${UNSAVED_DOT}`,
         });
         const logo = screen.getByAltText(CURRENT_LOGO);
 

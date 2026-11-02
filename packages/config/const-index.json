@@ -7604,6 +7604,14 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "900": [
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
+      }
+    ],
     "10000": [
       {
         "ref": "DEVICE_FRAME_LIMIT.SCALE_PRECISION",

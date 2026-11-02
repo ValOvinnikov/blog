@@ -2,16 +2,26 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFormVariants = tv({
   slots: {
-    columns: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
-    editPanel: ['flex flex-col gap-6'],
-    // 160px leaves room for the topbar above and the save bar below.
+    layout: ['@container flex flex-col gap-[18px] max-lg:gap-3.5'],
+    columns: [
+      'flex flex-col @min-[900px]:flex-row @min-[900px]:items-start @min-[900px]:gap-6',
+    ],
+    editPanel: [
+      'flex min-w-0 flex-col gap-5 max-lg:gap-3.5',
+      '@min-[900px]:w-[460px] @min-[900px]:shrink-0 @min-[1120px]:w-[500px]',
+    ],
     previewPanel: [
-      'lg:sticky lg:top-admin-topbar lg:-m-1 lg:max-h-[calc(100dvh-160px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain lg:p-1',
+      'min-w-0 @min-[900px]:flex-1',
+      '@min-[900px]:sticky @min-[900px]:top-admin-topbar @min-[900px]:-m-1 @min-[900px]:self-start @min-[900px]:p-1',
+      '@min-[900px]:max-h-[calc(100dvh-var(--admin-topbar)-80px)] @min-[900px]:overflow-y-auto @min-[900px]:overscroll-contain',
     ],
   },
   variants: {
     isActive: {
-      false: { editPanel: ['max-lg:hidden'], previewPanel: ['max-lg:hidden'] },
+      false: {
+        editPanel: ['@max-[900px]:hidden'],
+        previewPanel: ['@max-[900px]:hidden'],
+      },
     },
   },
 });

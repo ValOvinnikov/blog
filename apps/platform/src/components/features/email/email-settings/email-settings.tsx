@@ -214,7 +214,7 @@ export const EmailSettings = ({
           ? t('alertError')
           : undefined
       }
-      isWide={true}
+      layout={{ isWide: true }}
       headerActions={
         <>
           <ItemSelect

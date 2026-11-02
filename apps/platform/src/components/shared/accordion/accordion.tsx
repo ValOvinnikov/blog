@@ -63,6 +63,7 @@ const AccordionRoot = <TValue extends string>(
     <AccordionContext.Provider value={context}>
       <BaseAccordion.Root<TValue>
         multiple={isMultiple}
+        keepMounted={variant === ACCORDION_VARIANT.ROW}
         value={[...openValues]}
         onValueChange={(next) => setOpenValues([...next])}
         className={accordionVariants({ variant }).root({ class: className })}

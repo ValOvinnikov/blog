@@ -8,6 +8,7 @@ import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { KEY } from '@platform/constants/keyboard';
 import {
   buildSitePreviewTheme,
   type TSitePreviewThemeValues,
@@ -73,7 +74,7 @@ export const VoiceSettings = ({
 
   return (
     <SettingsFormShell
-      isWide={true}
+      layout={{ isWide: true }}
       title={t('heading')}
       description={t('description')}
       form={form}
@@ -107,7 +108,7 @@ export const VoiceSettings = ({
               {t('fixedCopyNote')}
               {liveLocales.length > 1 && (
                 <>
-                  {' '}
+                  {KEY.SPACE}
                   {t.rich('editingLanguageNote', {
                     language: tLanguage(selectedLocale),
                     strong: (chunks) => (

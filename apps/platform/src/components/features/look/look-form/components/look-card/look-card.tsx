@@ -1,16 +1,17 @@
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { Card } from '@platform/components/shared/card';
+import { Accordion } from '@platform/components/shared/accordion';
+import { Text } from '@platform/components/shared/text';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
-import type { TLookCardKey } from '@platform/utils/look-form-values/look-form-values';
+import type { TLookRowKey } from '@platform/utils/look-open-rows/look-open-rows';
+import { useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
 
 export type TLookCardProps = {
-  card: TLookCardKey;
+  card: TLookRowKey;
   title: string;
   description: string;
-  actions?: ReactNode;
   children: ReactNode;
 };
 
@@ -18,31 +19,27 @@ export const LookCard = ({
   card,
   title,
   description,
-  actions,
   children,
 }: TLookCardProps) => {
   const { hasCardChanges } = useLookForm();
+  const t = useTranslations('saveBar');
   const titleId = useId();
-  const { title: titleSlot, body } = lookCardVariants();
+  const { body, description: descriptionSlot } = lookCardVariants();
 
   return (
-    <Card aria-labelledby={titleId}>
-      <Card.Header
-        title={
-          <span className={titleSlot()}>
-            <span id={titleId}>{title}</span>
-            {hasCardChanges(card) && (
-              <>
-                {' '}
-                <UnsavedDot />
-              </>
-            )}
-          </span>
-        }
-        supportingText={description}
-        actions={actions}
-      />
-      <Card.Body className={body()}>{children}</Card.Body>
-    </Card>
+    <Accordion.Item value={card}>
+      <Accordion.Trigger>
+        <span id={titleId}>{title}</span>
+        {hasCardChanges(card) && <UnsavedDot label={t('regionLabel')} />}
+      </Accordion.Trigger>
+      <Accordion.Panel>
+        <div role="group" aria-labelledby={titleId} className={body()}>
+          <Text variant="muted" className={descriptionSlot()}>
+            {description}
+          </Text>
+          {children}
+        </div>
+      </Accordion.Panel>
+    </Accordion.Item>
   );
 };

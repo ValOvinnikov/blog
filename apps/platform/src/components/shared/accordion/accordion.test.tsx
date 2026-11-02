@@ -242,7 +242,9 @@ describe(`<${Accordion.name}/>`, () => {
     });
 
     it('toggles a row with the Space key', async () => {
-      firstTrigger.focus();
+      await user.tab();
+      await user.tab();
+      await user.tab();
       await user.keyboard(KEY.SPACE);
 
       expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
@@ -258,11 +260,15 @@ describe(`<${Accordion.name}/>`, () => {
       const body = screen.getByText(MOCK_FIRST_BODY);
 
       expect(heading).toContainElement(firstTrigger);
-      expect(firstTrigger).toHaveAttribute(
-        'aria-controls',
-        expect.stringMatching(/.+/),
-      );
+      expect(firstTrigger.getAttribute('aria-controls')).toBeTruthy();
       expect(body).toBeVisible();
+    });
+
+    it('keeps a folded row body mounted but hidden', () => {
+      const body = screen.getByText(MOCK_FIRST_BODY);
+
+      expect(body).toBeInTheDocument();
+      expect(body).not.toBeVisible();
     });
 
     it('shows the summary, its mark and the trailing node while folded', () => {

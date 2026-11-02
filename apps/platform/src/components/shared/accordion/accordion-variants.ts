@@ -56,6 +56,7 @@ export const accordionVariants = tv({
         panelContent: ['px-2.5 pb-3.5'],
       },
       [ACCORDION_VARIANT.ROW]: {
+        item: ['border-t border-admin-line-2'],
         trigger: [
           'min-h-[52px] gap-3 rounded-admin-control px-4 font-normal max-lg:min-h-14',
           insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
@@ -88,6 +89,11 @@ export const accordionVariants = tv({
           focusRingClasses(FOCUS_RING_GROUND.SURFACE_2),
         ],
       },
+    },
+    {
+      variant: ACCORDION_VARIANT.ROW,
+      isFirst: true,
+      class: { item: ['border-t-0'] },
     },
     {
       variant: ACCORDION_VARIANT.ROW,

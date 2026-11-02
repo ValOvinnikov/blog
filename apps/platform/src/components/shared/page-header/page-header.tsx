@@ -9,6 +9,7 @@ export type TPageHeaderProps = {
   description?: ReactNode;
   badges?: ReactNode;
   actions?: ReactNode;
+  isTitleHiddenBelowLg?: boolean;
   className?: string;
 };
 
@@ -17,6 +18,7 @@ export const PageHeader = ({
   description,
   badges,
   actions,
+  isTitleHiddenBelowLg = false,
   className,
 }: TPageHeaderProps) => {
   const {
@@ -25,7 +27,10 @@ export const PageHeader = ({
     titleRow,
     description: descriptionSlot,
     actions: actionsSlot,
-  } = pageHeaderVariants();
+  } = pageHeaderVariants({
+    isTitleHiddenBelowLg,
+    hasActions: Boolean(actions),
+  });
 
   return (
     <div className={root({ class: className })}>

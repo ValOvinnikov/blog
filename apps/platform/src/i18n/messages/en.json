@@ -579,6 +579,9 @@
   "lookForm": {
     "heading": "Look",
     "subtitle": "Theme this site. The preview shows your changes — nothing is live until you save.",
+    "styleGroupHeading": "Style",
+    "sitePartsGroupHeading": "Site parts",
+    "viewTabsAriaLabel": "Look view",
     "resetButton": "Reset to preset",
     "alertSuccess": "Look saved.",
     "alertError": "Couldn't save Look settings — try again.",

@@ -339,6 +339,23 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     expect(errorAlert).toBeVisible();
   });
 
+  it('keeps the title in the accessibility tree with every layout opt-in', () => {
+    renderShell(
+      {},
+      {
+        layout: {
+          isWide: true,
+          isTitleHiddenBelowLg: true,
+          hasCompactGap: true,
+        },
+      },
+    );
+
+    const heading = screen.getByRole('heading', { level: 1, name: MOCK_TITLE });
+
+    expect(heading).toBeInTheDocument();
+  });
+
   describe('draft recovery', () => {
     afterEach(() => {
       vi.restoreAllMocks();

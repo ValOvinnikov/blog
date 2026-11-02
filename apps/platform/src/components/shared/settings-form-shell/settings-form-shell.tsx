@@ -3,7 +3,6 @@
 import { ALERT_TYPE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import { PageHeader } from '@platform/components/shared/page-header';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
@@ -12,16 +11,23 @@ import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
 import { SaveBar, type TInvalidControls } from './components/save-bar/save-bar';
+import { ShellHeader } from './components/shell-header/shell-header';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
 import { useSettingsDraft } from './use-settings-draft';
 import type { TSettingsForm } from './use-settings-form';
+
+type TSettingsFormShellLayout = {
+  isWide?: boolean;
+  isTitleHiddenBelowLg?: boolean;
+  hasCompactGap?: boolean;
+};
 
 export type TSettingsFormShellProps<TValues> = {
   title: string;
   description: string;
   form: TSettingsForm<TValues>;
   errorTitle?: string;
-  isWide?: boolean;
+  layout?: TSettingsFormShellLayout;
   headerActions?: ReactNode;
   children: ReactNode;
 };
@@ -36,7 +42,7 @@ export const SettingsFormShell = <TValues,>({
   description,
   form,
   errorTitle,
-  isWide = false,
+  layout,
   headerActions,
   children,
 }: TSettingsFormShellProps<TValues>) => {
@@ -54,8 +60,9 @@ export const SettingsFormShell = <TValues,>({
     saveError,
   } = form;
   const t = useTranslations('saveBar');
-  const { root, alert, savedStatus, liveStatus } = settingsFormShellVariants({
-    isWide,
+  const { root, alert, liveStatus } = settingsFormShellVariants({
+    isWide: layout?.isWide,
+    hasCompactGap: layout?.hasCompactGap,
   });
   const isDirty = changeCount > 0;
   const [hasSavedSinceEdit, setHasSavedSinceEdit] = useState(false);
@@ -124,19 +131,12 @@ export const SettingsFormShell = <TValues,>({
 
   return (
     <div className={root()}>
-      <PageHeader
+      <ShellHeader
         title={title}
         description={description}
-        actions={
-          (isSavedStatusShown || headerActions) && (
-            <>
-              {isSavedStatusShown && (
-                <span className={savedStatus()}>{t('allSaved')}</span>
-              )}
-              {headerActions}
-            </>
-          )
-        }
+        isSavedStatusShown={isSavedStatusShown}
+        isTitleHiddenBelowLg={layout?.isTitleHiddenBelowLg}
+        headerActions={headerActions}
       />
 
       {archivedAt && (

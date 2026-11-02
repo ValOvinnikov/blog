@@ -40,6 +40,14 @@ describe(`<${PageHeader.name}/>`, () => {
     });
   });
 
+  it('keeps the title in the accessibility tree when hidden below lg', () => {
+    setup({ isTitleHiddenBelowLg: true });
+
+    const heading = screen.getByRole('heading', { level: 1, name: MOCK_TITLE });
+
+    expect(heading).toBeInTheDocument();
+  });
+
   it('renders the description', () => {
     setup({ description: MOCK_DESCRIPTION });
 

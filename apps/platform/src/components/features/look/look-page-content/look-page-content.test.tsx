@@ -40,6 +40,19 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
+vi.mock(
+  '@platform/components/features/look/look-form/use-look-open-rows',
+  () => ({
+    useLookOpenRows: () => ({
+      groupProps: (rows: readonly string[]) => ({
+        openValues: rows,
+        onOpenValuesChange: vi.fn(),
+      }),
+      revealRow: vi.fn(),
+    }),
+  }),
+);
+
 const MOCK_ACCENT_HUE = 28;
 const SIGN_IN = 'Sign in';
 const ARIA_PRESSED = 'aria-pressed';
