@@ -1772,5 +1772,9 @@
     "AUDIT_EVENT": "Auditgebeurtenis",
     "READER_ACCOUNT": "Lezersaccount",
     "BOOKMARK": "Bladwijzer"
+  },
+  "growthBadge": {
+    "label": "Growth",
+    "planNote": "— onderdeel van het Growth-abonnement"
   }
 }

@@ -18,6 +18,13 @@ export const statusBadgeVariants = tv({
       neutral: { root: ['text-admin-muted bg-admin-pill-neutral'] },
       brand: { root: ['text-admin-brand bg-admin-brand-weak'] },
       plan: { root: ['text-admin-brand-strong bg-admin-brand-weak'] },
+      growth: {
+        root: [
+          'h-5 shrink-0 rounded-admin-10 border border-admin-line px-[7px] py-0',
+          'leading-none tracking-[0.1px] text-admin-muted bg-admin-pill-neutral',
+        ],
+        dot: ['hidden'],
+      },
     },
   },
   defaultVariants: { tone: 'neutral' },

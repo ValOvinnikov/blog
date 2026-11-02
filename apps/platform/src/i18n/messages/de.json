@@ -1772,5 +1772,9 @@
     "AUDIT_EVENT": "Audit-Ereignis",
     "READER_ACCOUNT": "Leserkonto",
     "BOOKMARK": "Lesezeichen"
+  },
+  "growthBadge": {
+    "label": "Growth",
+    "planNote": "— im Growth-Tarif enthalten"
   }
 }
