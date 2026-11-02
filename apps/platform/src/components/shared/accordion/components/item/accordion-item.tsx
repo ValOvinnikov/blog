@@ -23,11 +23,15 @@ export const AccordionItem = ({
   children,
   className,
 }: TAccordionItemProps) => {
-  const { item } = accordionVariants();
   const { slots, unmatched } = mapCompoundSlots(children, AccordionItemParts);
 
   return (
-    <BaseAccordion.Item value={value} className={item({ class: className })}>
+    <BaseAccordion.Item
+      value={value}
+      className={({ index }) =>
+        accordionVariants({ isFirst: index === 0 }).item({ class: className })
+      }
+    >
       {slots.Trigger}
       {slots.Note}
       {slots.Panel}

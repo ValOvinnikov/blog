@@ -225,11 +225,11 @@ switches the content column to full-bleed (see
   focus rings, measured from the values in `admin-theme.css`.
 - Focus is one gapped ring, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
-  `FOCUS_RING_GROUND` (side, bg, surface, surface-head, popover,
+  `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
   theme-track, toast): a 2px gap in that ground, then a 2px `brand-ink` ring
   (`side-accent` on the sidebar), with no visible outline outside forced-colors mode. Text inputs, textareas
   and the rich-text editor take it on `surface`, as do checkboxes, select
-  triggers, accordion triggers, underline view tabs, preset cards, the
+  triggers, closed accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
   hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
   segmented options take it on `bg`, and segmented view tabs on `theme-track`. A ring
   that a clipping parent would cut off is drawn inset

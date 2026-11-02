@@ -97,6 +97,39 @@ describe(`<${Accordion.name}/>`, () => {
     expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
   });
 
+  it('puts each row button inside an h3 by default', () => {
+    setup();
+
+    const heading = screen.getByRole('heading', {
+      level: 3,
+      name: MOCK_FIRST_ROW,
+    });
+    const trigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
+
+    expect(heading).toContainElement(trigger);
+  });
+
+  it('puts the row button inside the heading level it is given', () => {
+    renderWithIntl(
+      <Accordion openValue={undefined} onOpenValueChange={vi.fn()}>
+        <Accordion.Item value={FIRST}>
+          <Accordion.Trigger headingLevel={4}>
+            {MOCK_FIRST_ROW}
+          </Accordion.Trigger>
+          <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>,
+    );
+
+    const heading = screen.getByRole('heading', {
+      level: 4,
+      name: MOCK_FIRST_ROW,
+    });
+    const trigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
+
+    expect(heading).toContainElement(trigger);
+  });
+
   it('renders a row header before its body whatever order they are written in', () => {
     renderWithIntl(
       <Accordion openValue={FIRST} onOpenValueChange={vi.fn()}>

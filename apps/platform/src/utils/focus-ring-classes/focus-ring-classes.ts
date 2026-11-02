@@ -12,6 +12,8 @@ const FOCUS_RING_SHADOW_CLASSES: Record<TFocusRingGround, string> = {
     'focus-visible:shadow-[0_0_0_2px_var(--admin-bg),0_0_0_4px_var(--admin-brand-ink)]',
   [FOCUS_RING_GROUND.SURFACE]:
     'focus-visible:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]',
+  [FOCUS_RING_GROUND.SURFACE_2]:
+    'focus-visible:shadow-[0_0_0_2px_var(--admin-surface-2),0_0_0_4px_var(--admin-brand-ink)]',
   [FOCUS_RING_GROUND.SURFACE_HEAD]:
     'focus-visible:shadow-[0_0_0_2px_var(--admin-surface-head),0_0_0_4px_var(--admin-brand-ink)]',
   [FOCUS_RING_GROUND.POPOVER]:

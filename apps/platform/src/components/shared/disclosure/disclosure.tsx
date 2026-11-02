@@ -2,7 +2,10 @@
 
 import { Collapsible } from '@base-ui/react/collapsible';
 import { ICONS } from '@blog/config';
-import type { THeadingLevel } from '@platform/components/shared/heading';
+import {
+  HEADING_TAGS,
+  type THeadingLevel,
+} from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
@@ -11,12 +14,6 @@ import {
   disclosureVariants,
   type TDisclosureVariants,
 } from './disclosure-variants';
-
-const HEADING_TAGS = {
-  2: 'h2',
-  3: 'h3',
-  4: 'h4',
-} as const;
 
 export type TDisclosureProps = {
   summary: ReactNode;
