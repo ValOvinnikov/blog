@@ -227,7 +227,10 @@ Free site.
   (`reactivateTenant`, `DB_ALREADY_OWNS_FREE_TENANT`) or an operator setting
   one back to FREE (`updateTenantDetails`, shown in the tenant details form as
   a refusal alert, with no audit event) is refused while its owner holds
-  another.
+  another. The rule binds self-serve sites only, and operators may override
+  it: Add tenant (`createTenantAction`) never checks it, and an operator may
+  move an operator-created site to FREE however many Free sites its owner
+  holds.
 - A new user's first platform sign-in records `users.termsAcceptedAt`
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
   cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing
