@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const sidebarCollapseToggleVariants = tv({
@@ -7,7 +9,6 @@ export const sidebarCollapseToggleVariants = tv({
     'transition-colors duration-base ease-smooth',
     'hover:border-admin-brand-ink hover:text-admin-text',
     'focus-visible:border-admin-brand-ink focus-visible:text-admin-text',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand-ink',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-bg',
+    focusRingClasses(FOCUS_RING_GROUND.BG),
   ],
 });
