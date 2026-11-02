@@ -188,6 +188,14 @@ const setup = customRender(LookForm, {
   hasCookieBanner: true,
 });
 
+const stubLgUpWindow = () => {
+  const stubMatchMedia = window.matchMedia;
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+    ...stubMatchMedia(query),
+    matches: true,
+  }));
+};
+
 const setupWithSavedLogo = () =>
   setup({
     initialValues: { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } },
@@ -700,11 +708,7 @@ describe(`<${LookForm.name}/>`, () => {
   );
 
   it('drops the tab panels on desktop, where the view tabs are hidden', () => {
-    const stubMatchMedia = window.matchMedia;
-    vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-      ...stubMatchMedia(query),
-      matches: true,
-    }));
+    stubLgUpWindow();
     setup();
 
     const tabPanel = screen.queryByRole('tabpanel');
@@ -952,80 +956,70 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   describe('the preview device', () => {
-    const desktopButton = () =>
-      screen.getByRole('button', { name: tDevicePreview('deviceDesktop') });
+    const deviceButton = (
+      key: 'deviceDesktop' | 'deviceTablet' | 'devicePhone',
+    ) => screen.getByRole('button', { name: tDevicePreview(key) });
     const showOnDesktopButton = () =>
       screen.queryByRole('button', { name: LOOK_FORM.headerShowOnDesktop });
 
-    it('opens on Phone below lg with the phone note under the header layout', () => {
-      setup();
-
-      const phoneButton = screen.getByRole('button', {
-        name: tDevicePreview('devicePhone'),
-      });
-      const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.PHONE);
-
-      expect(phoneButton).toBePressed();
-      expect(note).toBeVisible();
-      expect(showOnDesktopButton()).toBeVisible();
-    });
-
     it('opens on Desktop from lg with no device note', () => {
-      const stubMatchMedia = window.matchMedia;
-      vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-        ...stubMatchMedia(query),
-        matches: true,
-      }));
+      stubLgUpWindow();
       setup();
 
-      expect(desktopButton()).toBePressed();
+      expect(deviceButton('deviceDesktop')).toBePressed();
       expect(showOnDesktopButton()).not.toBeInTheDocument();
     });
 
-    it('shows the tablet note when the preview is on Tablet', async () => {
-      setup();
-
-      const tabletButton = screen.getByRole('button', {
-        name: tDevicePreview('deviceTablet'),
+    describe('below lg', () => {
+      beforeEach(() => {
+        setup();
       });
-      await user.click(tabletButton);
 
-      const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.TABLET);
-      expect(note).toBeVisible();
-    });
+      it('opens on Phone with the phone note under the header layout', () => {
+        const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.PHONE);
 
-    it('switches the preview to Desktop from the header note', async () => {
-      setup();
-
-      const showOnDesktop = screen.getByRole('button', {
-        name: LOOK_FORM.headerShowOnDesktop,
+        expect(deviceButton('devicePhone')).toBePressed();
+        expect(note).toBeVisible();
+        expect(showOnDesktopButton()).toBeVisible();
       });
-      await user.click(showOnDesktop);
 
-      const note = screen.queryByText(LOOK_FORM.headerPreviewDeviceNote.PHONE);
-      expect(desktopButton()).toBePressed();
-      expect(note).not.toBeInTheDocument();
-      expect(showOnDesktopButton()).not.toBeInTheDocument();
-    });
+      it('shows the tablet note when the preview is on Tablet', async () => {
+        await user.click(deviceButton('deviceTablet'));
 
-    it('keeps the device and reader state across the Edit and Preview tabs', async () => {
-      setup();
-      const tabletButton = screen.getByRole('button', {
-        name: tDevicePreview('deviceTablet'),
+        const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.TABLET);
+        expect(note).toBeVisible();
       });
-      const signedInButton = screen.getByRole('button', {
-        name: LOOK_PREVIEW.readerSignedIn,
+
+      it('switches the preview to Desktop from the header note', async () => {
+        const showOnDesktop = screen.getByRole('button', {
+          name: LOOK_FORM.headerShowOnDesktop,
+        });
+        await user.click(showOnDesktop);
+
+        const note = screen.queryByText(
+          LOOK_FORM.headerPreviewDeviceNote.PHONE,
+        );
+        expect(deviceButton('deviceDesktop')).toBePressed();
+        expect(note).not.toBeInTheDocument();
+        expect(showOnDesktopButton()).not.toBeInTheDocument();
       });
-      await user.click(tabletButton);
-      await user.click(signedInButton);
 
-      const previewTab = screen.getByRole('tab', { name: 'Preview' });
-      const editTab = screen.getByRole('tab', { name: 'Edit' });
-      await user.click(previewTab);
-      await user.click(editTab);
+      it('keeps the device and reader state across the Edit and Preview tabs', async () => {
+        const tabletButton = deviceButton('deviceTablet');
+        const signedInButton = screen.getByRole('button', {
+          name: LOOK_PREVIEW.readerSignedIn,
+        });
+        await user.click(tabletButton);
+        await user.click(signedInButton);
 
-      expect(tabletButton).toBePressed();
-      expect(signedInButton).toBePressed();
+        const previewTab = screen.getByRole('tab', { name: 'Preview' });
+        const editTab = screen.getByRole('tab', { name: 'Edit' });
+        await user.click(previewTab);
+        await user.click(editTab);
+
+        expect(tabletButton).toBePressed();
+        expect(signedInButton).toBePressed();
+      });
     });
   });
 
