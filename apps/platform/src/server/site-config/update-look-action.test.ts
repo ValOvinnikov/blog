@@ -194,7 +194,7 @@ describe(updateLookAction, () => {
 
     it('saves when the Growth-only fields hold the preset values the Free page shows', async () => {
       const presetValues = toEffectiveLook(
-        { ...VALID_INPUT, radiusScale: RADIUS_SCALE.LG },
+        { ...VALID_INPUT, logoHue: undefined, radiusScale: RADIUS_SCALE.LG },
         TENANT_PLAN.FREE,
       );
 
