@@ -27,6 +27,7 @@ code:
   - apps/platform/src/components/shared/guarded-link/**
   - apps/platform/src/components/shared/button/**
   - apps/platform/src/components/shared/menu-surface/**
+  - apps/platform/src/components/shared/menu-radio-group/**
   - apps/platform/src/components/shared/breadcrumbs/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
@@ -211,10 +212,19 @@ switches the content column to full-bleed (see
   the shared popup frame, opens 6px above the trigger at its width, or, from
   the rail, to its right (`sideOffset` 20) at 240px with its bottom aligned
   to the trigger's. It heads with the name, the email and the role line
-  ("{role} · {scope}"), none focusable, then the Sign out item, which takes
-  focus on open. Below `md` the topbar keeps a pill (`ACCOUNT_MENU_APPEARANCE.PILL`)
-  named by the role line that opens the same menu; from `md` nothing follows
-  the breadcrumb.
+  ("{role} · {scope}"), none focusable, then — in the expanded and the rail
+  menu — a Theme section, then the Sign out item, which takes focus on open.
+  The Theme section is the shared `MenuRadioGroup`
+  (`components/shared/menu-radio-group/`) at its desktop size: a "Theme"
+  group of Light (sun), Dark (moon) and System (monitor) `menuitemradio`
+  items, described by "System follows your device setting.", with the stored
+  choice checked (System when none is stored). Choosing one writes the
+  `admin-theme` cookie and sets or clears `data-theme` on `<html>` at once,
+  without a reload and without closing the menu; the menu reads the current
+  choice back from `<html>`, since the root layout never re-renders on client
+  navigation. Below `md` the topbar keeps a pill
+  (`ACCOUNT_MENU_APPEARANCE.PILL`) named by the role line that opens the same
+  menu without the Theme section; from `md` nothing follows the breadcrumb.
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its

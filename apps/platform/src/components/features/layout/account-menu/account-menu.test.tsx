@@ -1,6 +1,8 @@
+import { COLOR_SCHEME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
 import { ACCOUNT_MENU_APPEARANCE } from '@platform/constants/account-menu';
+import { DATA_THEME, THEME_PREFERENCE } from '@platform/constants/theme';
 import messages from '@platform/i18n/messages/en.json';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
 import { ARIA_EXPANDED, ARIA_HASPOPUP } from '@platform/testing/aria';
@@ -12,6 +14,7 @@ import {
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockAccount } from '@platform/testing/layout/fixtures';
+import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { AccountMenu, type TAccountMenuProps } from './account-menu';
@@ -30,6 +33,8 @@ const MOCK_INITIALS =
 const MOCK_EMAIL_ONLY = mockAccount({ name: undefined, email: MOCK_EMAIL });
 
 const t = makeEnTranslator('account');
+const MENU_ITEM_RADIO = 'menuitemradio';
+const DATA_THEME_ATTRIBUTE = 'data-theme';
 
 const setup = (
   props: Partial<TAccountMenuProps> = {},
@@ -49,6 +54,9 @@ const openMenu = async (user: UserEvent, trigger: HTMLElement) => {
   await user.click(trigger);
   return screen.findByRole('menu', { name: messages.account.menuLabel });
 };
+
+const getThemeItem = (menu: HTMLElement, name: string) =>
+  within(menu).getByRole(MENU_ITEM_RADIO, { name });
 
 describe(`<${AccountMenu.name}/>`, () => {
   let user: UserEvent;
@@ -198,6 +206,95 @@ describe(`<${AccountMenu.name}/>`, () => {
       });
 
       expect(signOutItem).toBeVisible();
+    });
+  });
+
+  describe('Theme section', () => {
+    const openSidebarMenu = async (isInitiallyCollapsed = false) => {
+      setup({}, isInitiallyCollapsed);
+      const trigger = screen.getByRole('button', {
+        name: new RegExp(MOCK_EMAIL),
+      });
+      return openMenu(user, trigger);
+    };
+
+    afterEach(() => {
+      delete document.documentElement.dataset.theme;
+      document.cookie = `${THEME_PREFERENCE_COOKIE}=; max-age=0; path=/; SameSite=Lax`;
+    });
+
+    it('labels the group Theme, describes it by the hint and checks System with no stored choice', async () => {
+      const menu = await openSidebarMenu();
+
+      const group = within(menu).getByRole('group', {
+        name: messages.account.themeLabel,
+      });
+      const items = within(group).getAllByRole(MENU_ITEM_RADIO);
+      const systemItem = getThemeItem(menu, messages.account.themeSystem);
+
+      expect(group).toHaveAccessibleDescription(
+        messages.account.themeSystemHint,
+      );
+      expect(items.map((item) => item.textContent)).toEqual([
+        messages.account.themeLight,
+        messages.account.themeDark,
+        messages.account.themeSystem,
+      ]);
+      expect(systemItem).toBeChecked();
+    });
+
+    it('checks the stored choice', async () => {
+      document.documentElement.dataset.theme = DATA_THEME[COLOR_SCHEME.LIGHT];
+
+      const menu = await openSidebarMenu();
+      const lightItem = getThemeItem(menu, messages.account.themeLight);
+
+      expect(lightItem).toBeChecked();
+    });
+
+    it('applies and stores a chosen theme, moves the check and keeps the menu open', async () => {
+      const menu = await openSidebarMenu();
+
+      const darkItem = getThemeItem(menu, messages.account.themeDark);
+      await user.click(darkItem);
+      const systemItem = getThemeItem(menu, messages.account.themeSystem);
+
+      expect(document.documentElement).toHaveAttribute(
+        DATA_THEME_ATTRIBUTE,
+        DATA_THEME[COLOR_SCHEME.DARK],
+      );
+      expect(document.cookie).toBe(
+        `${THEME_PREFERENCE_COOKIE}=${THEME_PREFERENCE.DARK}`,
+      );
+      expect(darkItem).toBeChecked();
+      expect(systemItem).not.toBeChecked();
+      expect(menu).toBeVisible();
+    });
+
+    it('hands the theme back to the device setting when System is chosen', async () => {
+      document.documentElement.dataset.theme = DATA_THEME[COLOR_SCHEME.DARK];
+      const menu = await openSidebarMenu();
+
+      const systemItem = getThemeItem(menu, messages.account.themeSystem);
+      await user.click(systemItem);
+
+      expect(document.documentElement).not.toHaveAttribute(
+        DATA_THEME_ATTRIBUTE,
+      );
+      expect(document.cookie).toBe(
+        `${THEME_PREFERENCE_COOKIE}=${THEME_PREFERENCE.SYSTEM}`,
+      );
+      expect(systemItem).toBeChecked();
+    });
+
+    it('is carried by the menu opened from the collapsed rail', async () => {
+      const menu = await openSidebarMenu(true);
+
+      const group = within(menu).getByRole('group', {
+        name: messages.account.themeLabel,
+      });
+
+      expect(group).toBeVisible();
     });
   });
 });
