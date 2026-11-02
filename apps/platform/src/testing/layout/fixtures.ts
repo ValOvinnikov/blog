@@ -1,5 +1,6 @@
 import { ICONS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import type { TAccount } from '@platform/components/features/layout/account-menu';
 import type { TNavItemBadge } from '@platform/components/features/layout/nav-item-content';
 import type {
   TSidebarNavItem,
@@ -39,5 +40,12 @@ export const mockNavSection = (
 ): TSidebarNavSection => ({
   label: faker.company.name(),
   items: [mockNavLinkItem()],
+  ...overrides,
+});
+
+export const mockAccount = (overrides: Partial<TAccount> = {}): TAccount => ({
+  name: faker.person.fullName(),
+  email: faker.internet.email(),
+  roleLine: faker.lorem.words(3),
   ...overrides,
 });

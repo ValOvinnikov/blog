@@ -5,3 +5,5 @@ export const ARIA_VALUEMAX = 'aria-valuemax';
 export const ARIA_VALUETEXT = 'aria-valuetext';
 export const ARIA_CURRENT = 'aria-current';
 export const ARIA_PRESSED = 'aria-pressed';
+export const ARIA_EXPANDED = 'aria-expanded';
+export const ARIA_HASPOPUP = 'aria-haspopup';

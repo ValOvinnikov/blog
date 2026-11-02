@@ -4,12 +4,12 @@ export const sidebarVariants = tv({
   slots: {
     root: [
       'hidden w-full shrink-0 flex-col border-b border-admin-side-line bg-admin-side text-admin-side-text',
-      'md:flex md:h-dvh md:w-[264px] md:overflow-y-auto md:border-r md:border-b-0',
+      'md:flex md:h-dvh md:w-[264px] md:border-r md:border-b-0',
       'md:sticky md:top-0 md:self-start',
       'group-data-[collapsed=true]/shell:md:w-[76px]',
     ],
     brand: [
-      'flex items-center gap-2.5 border-b border-admin-side-line px-[18px] py-4',
+      'flex flex-none items-center gap-2.5 border-b border-admin-side-line px-[18px] py-4',
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-2',
     ],
     brandMeta: [
@@ -21,9 +21,11 @@ export const sidebarVariants = tv({
     ],
     brandTagline: ['text-admin-12 text-admin-side-muted'],
     switcherSlot: [
-      'px-3 pt-3 pb-1',
+      'flex-none px-3 pt-3 pb-1',
       'group-data-[collapsed=true]/shell:hidden',
     ],
+    navArea: ['min-h-0 flex-1 overflow-y-auto pb-[14px]'],
+    foot: ['flex-none border-t border-admin-side-line p-3'],
     section: ['flex flex-col gap-1.5 px-3 pt-[14px]'],
     sectionLabel: [
       'truncate px-2.5 pb-1.5 text-admin-11 font-bold tracking-[0.09em] text-admin-side-muted uppercase',

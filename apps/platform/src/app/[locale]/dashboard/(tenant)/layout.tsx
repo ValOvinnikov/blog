@@ -32,7 +32,8 @@ export default async function DashboardTenantLayout({ children }: TProps) {
     queries.leads.countUnreadLeadsForTenant(tenant.id),
     resolveHasEnteredStudio(tenant.id),
   ]);
-  const { isSidebarInitiallyCollapsed, tNavSections, userName } = chrome;
+  const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
+    chrome;
   const studioAccess = ownerStudioAccessFor(tenant, membership);
 
   const admin = isVirtualAdminMembership(membership) ? sessionAdmin : undefined;
@@ -55,8 +56,9 @@ export default async function DashboardTenantLayout({ children }: TProps) {
         ) : undefined
       }
       crumb={<DashboardBreadcrumb />}
-      roleChip={{
+      account={{
         name: userName,
+        email: userEmail,
         role: admin?.role ?? membership.role,
         scope: admin ? tNavSections('platformLabel') : tenant.name,
       }}

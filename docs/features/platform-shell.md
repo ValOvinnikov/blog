@@ -37,8 +37,8 @@ epics: [4979, 4980, 4840, 4959]
 ## What it does
 
 The chrome every signed-in page of `apps/platform` renders inside: a sidebar of
-nav sections, a topbar with a breadcrumb and an account menu, and a content
-column. It comes in three gated trees: the operator's Platform section, the
+nav sections with the account menu at its foot, a topbar with a breadcrumb,
+and a content column. It comes in three gated trees: the operator's Platform section, the
 operator's view of one tenant, and the owner's `/dashboard`, which never shows
 that the platform hosts more than one tenant. The 404, error and
 `/dashboard/select-tenant` pages render before the shell: the 404 and error
@@ -135,8 +135,8 @@ switches the content column to full-bleed (see
   `admin-active-tenant` cookie picks it, otherwise the picker opens. The
   select-tenant route re-checks membership (or SUPERADMIN) before setting the
   cookie, and every link to it passes `prefetch={false}`.
-- The role chip never shows a virtual membership's OWNER role; it shows the
-  admin role behind it.
+- The account's role line never shows a virtual membership's OWNER role; it
+  shows the admin role behind it.
 - Plan-gated dashboard pages go through `renderTenantScopedPage`, which 404s
   when the plan lacks the page. It is called as a function, never as JSX.
 - The tenant layouts render the sidebar once and keep it across client
@@ -191,6 +191,27 @@ switches the content column to full-bleed (see
   override of `--admin-topbar`) holds that real height, so
   `scroll-pt-admin-topbar` anchors and every `top-admin-topbar` sticky panel
   sit flush under the bar.
+  Only the sidebar's nav area scrolls: the brand row and the Workspace field
+  stay at the top and the foot at the bottom. The foot (12px padding, a 1px
+  `side-line` top rule) holds `AccountMenu`, from
+  `components/features/layout/account-menu/`. Expanded, its trigger is full
+  width and 52px tall: padding 8px 10px, a 10px gap, a 1px
+  `control-line-tint` border, `rounded-admin`, transparent; a 30px `brand`
+  circle avatar with white initials, the name (13px/600 `text`, 18px line,
+  its full text as `title`) over the email (12px `muted`, 16px line), each
+  cut with an ellipsis, and a 16px `muted` up chevron. With no name the email
+  takes the name line, there is no email line, and the avatar shows the
+  email's first letter. Hover takes a `side-raised` ground; open adds a
+  `side-accent` border; focus is the side-gapped ring. Collapsed, the trigger
+  is the 52×52 avatar alone, titled by the name and named "Account: {name},
+  {email}" ("Account: {email}" with no name). The menu, named "Account" on
+  the shared popup frame, opens 6px above the trigger at its width, or, from
+  the rail, to its right (`sideOffset` 20) at 240px with its bottom aligned
+  to the trigger's. It heads with the name, the email and the role line
+  ("{role} · {scope}"), none focusable, then the Sign out item, which takes
+  focus on open. Below `md` the topbar keeps a pill (`ACCOUNT_MENU_APPEARANCE.PILL`)
+  named by the role line that opens the same menu; from `md` nothing follows
+  the breadcrumb.
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
@@ -236,7 +257,10 @@ switches the content column to full-bleed (see
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
   `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   and its section labels and notes read `muted` and its rows `text` on that
-  ground.
+  ground. Its `item` slot (the account menu's Sign out) is a flex row with a
+  10px gap, at least 44px tall at every width, padding 6px 8px,
+  `rounded-admin-control`, 13px/500, 2px from the next item, taking a
+  `popover-hover` ground and no ring when highlighted.
 - `styles/admin-theme-contrast.test.ts` guards both palettes: each pair
   of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
   and focus rings, measured from the values in `admin-theme.css`, and the

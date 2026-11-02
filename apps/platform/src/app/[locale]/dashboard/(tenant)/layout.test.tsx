@@ -181,7 +181,7 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     const content = screen.getByText(MOCK_DASHBOARD_CONTENT);
     const platformRole = screen.getByText(
-      t('topbar.roleChip', {
+      t('account.roleLine', {
         role: roleLabel.SUPERADMIN,
         scope: navSections.platformLabel,
       }),
