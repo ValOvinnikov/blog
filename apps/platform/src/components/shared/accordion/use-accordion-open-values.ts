@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 
 export type TAccordionOpenProps<TValue extends string> =
   | {
@@ -27,7 +28,7 @@ export const useAccordionOpenValues = <TValue extends string>(
 
   return {
     isMultiple: false,
-    openValues: openValue === undefined ? [] : [openValue],
+    openValues: isUndefined(openValue) ? [] : [openValue],
     setOpenValues: (next: TValue[]) => onOpenValueChange(next.at(-1)),
   };
 };

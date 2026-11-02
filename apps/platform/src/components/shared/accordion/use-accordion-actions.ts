@@ -1,4 +1,5 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   useCallback,
   useEffect,
@@ -36,7 +37,7 @@ export const useAccordionActions = <TValue extends string>(
 
   useEffect(() => {
     const value = pendingFocus.current;
-    if (value === undefined || !openValues.includes(value)) return;
+    if (isUndefined(value) || !openValues.includes(value)) return;
     pendingFocus.current = undefined;
     buttons.current.get(value)?.focus();
   }, [openValues]);
