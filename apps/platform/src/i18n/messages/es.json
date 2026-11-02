@@ -98,6 +98,7 @@
       "REVIEW": "Revisión"
     },
     "stepsAriaLabel": "Pasos de configuración",
+    "stepComplete": "Completado",
     "stepProgress": "Paso {n} de {total}",
     "stepProgressNamed": "Paso {n} de {total} · {step}",
     "siteSummary": "{siteType} · {name}",

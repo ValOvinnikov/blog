@@ -1,9 +1,10 @@
 'use client';
 
-import { SIZE, type TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
+import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   ONBOARDING_STEP,
   type TOnboardingStep,
@@ -21,7 +22,6 @@ type TReviewRow = {
   label: string;
   value: ReactNode;
   step: TOnboardingStep;
-  isMono?: boolean;
 };
 
 export type TReviewStepProps = {
@@ -60,7 +60,6 @@ export const ReviewStep = ({
       label: t('siteAddressLabel'),
       value: siteAddress,
       step: ONBOARDING_STEP.ADDRESS,
-      isMono: true,
     },
     {
       label: t('languageLabel'),
@@ -71,7 +70,7 @@ export const ReviewStep = ({
       label: t('presetLabel'),
       value: (
         <>
-          {tPreset(PRESET_LABEL_KEY[preset])}{' '}
+          {tPreset(PRESET_LABEL_KEY[preset])}
           <span
             role="img"
             aria-label={tHue('hueValue', { hue: accentHue })}
@@ -90,15 +89,14 @@ export const ReviewStep = ({
 
   return (
     <>
-      <DetailList>
-        {rows.map(({ label, value, step, isMono }) => (
+      <DetailList isBordered={true}>
+        {rows.map(({ label, value, step }) => (
           <DetailList.Row
             key={label}
             label={label}
-            isMono={isMono}
             action={
               <Button
-                size={SIZE.SM}
+                variant={BUTTON_VARIANT.LINK}
                 onClick={() => onEdit(step)}
                 aria-label={t('editField', { field: label })}
                 className={edit()}

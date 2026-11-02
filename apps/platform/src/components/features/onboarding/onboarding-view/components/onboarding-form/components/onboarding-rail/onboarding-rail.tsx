@@ -35,10 +35,11 @@ export const OnboardingRail = ({
 
   return (
     <header className={root()}>
-      <RailBrand className={brand()} />
+      <RailBrand isWizard={true} className={brand()} />
       <RailIntro
         title={t('heading')}
         description={t('description')}
+        isWizard={true}
         className={intro()}
       />
       {currentStep && (

@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const tenantPickerRowVariants = tv({
@@ -5,7 +7,7 @@ export const tenantPickerRowVariants = tv({
     row: [
       'group flex min-h-[60px] items-center gap-3.5 rounded-admin-control px-3.5 py-2.5 no-underline',
       'transition-colors duration-base ease-smooth hover:bg-admin-surface-2',
-      'outline-hidden focus-visible:ring-2 focus-visible:ring-admin-brand focus-visible:ring-offset-2',
+      focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     tile: [
       'flex size-9 flex-none items-center justify-center rounded-admin-control',

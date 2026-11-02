@@ -5,6 +5,7 @@ import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { formatDateTime } from '@platform/utils/format-date-time/format-date-time';
 import { useLocale, useTranslations } from 'next-intl';
@@ -40,6 +41,7 @@ export const LeadReadingPane = ({
       <Button
         size={SIZE.SM}
         variant={BUTTON_VARIANT.SECONDARY}
+        focusGround={FOCUS_RING_GROUND.BG}
         className={styles.back()}
         onClick={onBack}
       >
@@ -59,6 +61,7 @@ export const LeadReadingPane = ({
                 className={buttonVariants({
                   size: SIZE.SM,
                   variant: BUTTON_VARIANT.PRIMARY,
+                  focusGround: FOCUS_RING_GROUND.SURFACE_HEAD,
                 }).root()}
               >
                 {t('reply')}
@@ -66,6 +69,7 @@ export const LeadReadingPane = ({
               <Button
                 size={SIZE.SM}
                 variant={BUTTON_VARIANT.SECONDARY}
+                focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
                 onClick={() => onMarkUnread(lead)}
               >
                 {t('markUnread')}

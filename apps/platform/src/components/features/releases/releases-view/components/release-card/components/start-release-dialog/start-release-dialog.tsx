@@ -15,6 +15,7 @@ import { FormTextInput } from '@platform/components/shared/form-text-input';
 import { Text } from '@platform/components/shared/text';
 import { Textarea } from '@platform/components/shared/textarea';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TReleaseFieldError } from '@platform/constants/release';
 import { startReleaseAction } from '@platform/server/releases/start-release-action';
 import type { TReleaseMigrationSummary } from '@platform/server/releases/summarise-release-migrations';
@@ -88,7 +89,11 @@ export const StartReleaseDialog = ({
       onConfirm={handleConfirm}
       onOpenChange={handleOpenChange}
     >
-      <ConfirmDialog.Trigger size={SIZE.SM} disabledReason={disabledReason}>
+      <ConfirmDialog.Trigger
+        size={SIZE.SM}
+        focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
+        disabledReason={disabledReason}
+      >
         {isOverrideRequired ? t('overrideTrigger') : t('trigger')}
       </ConfirmDialog.Trigger>
       <ConfirmDialog.Content

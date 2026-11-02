@@ -6,6 +6,7 @@ export const BUTTON_VARIANT = {
   GHOST: 'GHOST',
   DANGER: 'DANGER',
   UNSTYLED: 'UNSTYLED',
+  LINK: 'LINK',
 } as const;
 
 export type TButtonVariant = TValueOf<typeof BUTTON_VARIANT>;

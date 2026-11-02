@@ -5,9 +5,7 @@ import {
   CORE_PROVISIONING_STEPS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
-import { RunCard } from '@platform/components/features/tenants/run-card';
 import { RunErrorCard } from '@platform/components/features/tenants/run-error-card';
-import { RunStatusBadge } from '@platform/components/features/tenants/run-status-badge';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { Button } from '@platform/components/shared/button';
@@ -15,6 +13,7 @@ import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRelativeTimeTick } from '@platform/utils/use-relative-time-tick/use-relative-time-tick';
@@ -23,6 +22,7 @@ import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
 import { DispatchNotice } from './components/dispatch-notice/dispatch-notice';
+import { ProvisioningRunCard } from './components/provisioning-run-card/provisioning-run-card';
 import { QueuedRunNotice } from './components/queued-run-notice/queued-run-notice';
 import { provisioningStatusViewVariants } from './provisioning-status-view-variants';
 
@@ -70,6 +70,7 @@ export const ProvisioningStatusView = ({
       type="button"
       variant={BUTTON_VARIANT.SECONDARY}
       size={SIZE.SM}
+      focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
       onClick={handleDispatch}
       isDisabled={isArchived}
       aria-describedby={isArchived ? archivedNoticeId : undefined}
@@ -83,6 +84,7 @@ export const ProvisioningStatusView = ({
       <Button
         type="button"
         variant={BUTTON_VARIANT.PRIMARY}
+        focusGround={FOCUS_RING_GROUND.BG}
         onClick={handleDispatch}
         isDisabled={isArchived}
         aria-describedby={isArchived ? archivedNoticeId : undefined}
@@ -90,22 +92,6 @@ export const ProvisioningStatusView = ({
         {t('startButton')}
       </Button>
     ) : null;
-
-  const runCardActions = (
-    <>
-      <RunStatusBadge
-        status={
-          isOverallFailed
-            ? TENANT_PROVISIONING_STEP_STATUS.FAILED
-            : isRevealing
-              ? TENANT_PROVISIONING_STEP_STATUS.RUNNING
-              : displayOverallStatus
-        }
-        isPreRun={isAwaitingRunner}
-      />
-      {retryButtonNode}
-    </>
-  );
 
   return (
     <div className={root()}>
@@ -147,7 +133,14 @@ export const ProvisioningStatusView = ({
           />
         </div>
 
-        <RunCard run={provisioningRun} actions={runCardActions} />
+        <ProvisioningRunCard
+          run={provisioningRun}
+          overallStatus={displayOverallStatus}
+          isFailed={isOverallFailed}
+          isRevealingSteps={isRevealing}
+          isPreRun={isAwaitingRunner}
+          retryAction={retryButtonNode}
+        />
       </div>
 
       {isOverallFailed && errorKind && (
