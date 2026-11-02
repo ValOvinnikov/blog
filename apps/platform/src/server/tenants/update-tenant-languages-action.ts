@@ -20,18 +20,24 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import {
+  toNotInPlanRefusal,
+  type TNotInPlanRefusal,
+} from '@platform/utils/plan-refusal/plan-refusal';
 import { z } from 'zod';
 
 const updateTenantLanguagesInputSchema = z.array(
   z.string().refine(isLocaleIsoCode),
 );
 
-export type TUpdateTenantLanguagesResult = TActionResult<
-  typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
-  'additionalLocales',
-  never,
-  TSettingsRefusal
->;
+export type TUpdateTenantLanguagesResult =
+  | TActionResult<
+      typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+      'additionalLocales',
+      never,
+      TSettingsRefusal
+    >
+  | TNotInPlanRefusal;
 
 const INVALID_LANGUAGES = {
   outcome: ACTION_OUTCOME.INVALID,
@@ -66,10 +72,12 @@ export const updateTenantLanguagesAction = async (
         error: result.error,
       });
       return result.error === ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED
-        ? {
-            outcome: ACTION_OUTCOME.REFUSED,
-            reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-          }
+        ? toNotInPlanRefusal(
+            tenant.plan,
+            parsed.data.filter(
+              (locale) => !tenant.additionalLocales.includes(locale),
+            ),
+          )
         : INVALID_LANGUAGES;
     }
 

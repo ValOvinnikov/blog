@@ -1443,6 +1443,7 @@
     "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
     "goToFirstField": "Naar het eerste veld",
     "notSaved": "Niet opgeslagen",
+    "notInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} GROWTH {Growth} other {huidige}}, dat {items} niet bevat. Er is niets opgeslagen.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Verwerpen",
     "save": "Wijzigingen opslaan",

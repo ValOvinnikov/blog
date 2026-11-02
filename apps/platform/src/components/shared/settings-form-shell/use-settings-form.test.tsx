@@ -1,6 +1,13 @@
 import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
-import { act, renderHook, waitFor } from '@platform/testing/custom-render';
+import {
+  act,
+  renderHookWithIntl,
+  waitFor,
+} from '@platform/testing/custom-render';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { toNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
 
 import {
   useSettingsForm,
@@ -17,14 +24,22 @@ const MOCK_SAVED_VALUES: TValues = { name: faker.person.fullName() };
 const MOCK_EDITED_VALUES: TValues = { name: faker.person.fullName() };
 const MOCK_UPLOADED_VALUES: TValues = { name: faker.person.fullName() };
 const MOCK_FIELD_ID = faker.lorem.slug();
+const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_DRAFT = {
   tenantId: faker.string.uuid(),
   page: faker.lorem.word(),
-  fields: [],
+  fields: [
+    {
+      id: 'name',
+      label: MOCK_FIELD_LABEL,
+      display: ({ name }: TValues) => name,
+    },
+  ],
 };
+const MOCK_PLAN_REFUSAL_MESSAGE = `Your site is on the Free plan, which doesn't include ${MOCK_FIELD_LABEL}, so nothing was saved.`;
 
 const renderSettingsForm = (overrides: Partial<TArgs> = {}) =>
-  renderHook(() =>
+  renderHookWithIntl(() =>
     useSettingsForm<TValues, TResult>({
       initialValues: MOCK_SAVED_VALUES,
       archivedAt: undefined,
@@ -142,5 +157,48 @@ describe(useSettingsForm, () => {
 
     expect(result.current.isArchived).toBe(true);
     expect(result.current.form.isArchived).toBe(true);
+  });
+
+  describe('when the plan refuses the save', () => {
+    const refusePlan = async () =>
+      toNotInPlanRefusal(TENANT_PLAN.FREE, ['name']);
+    let refresh: ReturnType<typeof mockRouterRefresh>;
+
+    beforeEach(() => {
+      refresh = mockRouterRefresh();
+    });
+
+    it('names the plan and the refused fields', async () => {
+      const { result } = renderSettingsForm({ onSubmit: refusePlan });
+
+      await editAndSave(result);
+
+      expect(result.current.form.planRefusal).toBe(MOCK_PLAN_REFUSAL_MESSAGE);
+    });
+
+    it('puts the refused fields back to their saved values', async () => {
+      const { result } = renderSettingsForm({ onSubmit: refusePlan });
+
+      await editAndSave(result);
+
+      expect(result.current.values).toEqual(MOCK_SAVED_VALUES);
+    });
+
+    it('refreshes the page once so it takes the current plan', async () => {
+      const { result } = renderSettingsForm({ onSubmit: refusePlan });
+
+      await editAndSave(result);
+
+      expect(refresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('stops naming the refusal once the edits are discarded', async () => {
+      const { result } = renderSettingsForm({ onSubmit: refusePlan });
+      await editAndSave(result);
+
+      act(() => result.current.form.discard());
+
+      expect(result.current.form.planRefusal).toBeUndefined();
+    });
   });
 });

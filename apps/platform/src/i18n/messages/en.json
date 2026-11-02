@@ -1443,6 +1443,7 @@
     "fieldsNeedAttention": "{count, plural, one {# field needs attention} other {# fields need attention}}",
     "goToFirstField": "Go to the first one",
     "notSaved": "Not saved",
+    "notInPlan": "Your site is on the {plan, select, FREE {Free} GROWTH {Growth} other {current}} plan, which doesn't include {items}, so nothing was saved.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Discard",
     "save": "Save changes",

@@ -1,11 +1,19 @@
 'use client';
 
-import type { TActionOutcome, TMaybeUndefined, TOutcome } from '@blog/config';
+import {
+  FORM_STATUS,
+  type TActionOutcome,
+  type TMaybeUndefined,
+  type TOutcome,
+} from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
+import { isNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
+import { restoreRefusedItems } from '@platform/utils/restore-refused-items/restore-refused-items';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useId, useState } from 'react';
 
 import type { TInvalidControls } from './components/save-bar/save-bar';
+import { usePlanRefusal } from './use-plan-refusal';
 import type { TSettingsFormDraft } from './use-settings-draft';
 
 type TSettingsFormDraftConfig<TValues> = Omit<
@@ -46,6 +54,7 @@ export type TSettingsForm<TValues> = {
   archivedNoticeId: string;
   draft: TSettingsFormDraft<TValues>;
   saveError?: string;
+  planRefusal?: string;
 };
 
 export const useSettingsForm = <
@@ -66,10 +75,21 @@ export const useSettingsForm = <
   const archivedNoticeId = useId();
   const isArchived = Boolean(archivedAt);
   const [savedValues, setSavedValues] = useState(initialValues);
+  const planRefusal = usePlanRefusal(draft.fields);
   const { values, setValues, status, isPending, handleSubmit } =
     useFormSubmission<TValues, TResult>({
       initialValues,
-      onSubmit,
+      onSubmit: async (submitted) => {
+        planRefusal.clear();
+        const result = await onSubmit(submitted);
+        if (isNotInPlanRefusal(result)) {
+          setValues((current) =>
+            restoreRefusedItems(current, savedValues, result.items),
+          );
+          planRefusal.refuse(result);
+        }
+        return result;
+      },
       onSuccess: (submitted, result) => {
         // A save that wrote its own saved values (uploads swapped in) keeps them.
         setSavedValues((current) =>
@@ -80,6 +100,7 @@ export const useSettingsForm = <
     });
 
   const discard = () => {
+    planRefusal.clear();
     setValues(savedValues);
     onDiscard?.();
   };
@@ -95,6 +116,10 @@ export const useSettingsForm = <
     isArchived,
     archivedAt,
     archivedNoticeId,
+    planRefusal:
+      status === FORM_STATUS.ERROR && !isPending
+        ? planRefusal.message
+        : undefined,
     draft: {
       ...draft,
       values,
