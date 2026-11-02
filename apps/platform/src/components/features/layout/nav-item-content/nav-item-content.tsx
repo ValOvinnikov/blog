@@ -43,6 +43,7 @@ export const NavItemContent = ({
     navItemContentVariants({
       hasStatus: !!lineStatus,
       hasRailBadge: !!railStatus,
+      hasNeutralBadge: badge?.tone === 'neutral',
     });
 
   const rowIconElement = <Icon name={icon} className={rowIcon()} />;

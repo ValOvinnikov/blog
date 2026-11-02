@@ -88,6 +88,8 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
                       return (
                         <div
                           key={item.label}
+                          role="menuitem"
+                          aria-disabled="true"
                           className={row({
                             state: 'inert',
                             class: phoneRow(),

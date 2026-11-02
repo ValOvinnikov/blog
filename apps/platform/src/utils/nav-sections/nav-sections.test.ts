@@ -135,7 +135,7 @@ describe(tenantNavSections, () => {
     expect(item?.href).toBe(href);
   });
 
-  it('marks only Subscribers, Comments and Team as unlinked coming soon', () => {
+  it('marks only Subscribers, Comments and Team as unlinked coming soon, with no dot', () => {
     const badged = configuration.items.filter((item) => item.badge);
 
     expect(badged.map((item) => item.label)).toEqual(
@@ -143,6 +143,7 @@ describe(tenantNavSections, () => {
     );
     for (const item of badged) {
       expect(item.badge?.label).toBe(t('badgeComingSoon'));
+      expect(item.badge?.hasDot).toBe(false);
       expect(item.href).toBeUndefined();
     }
   });
