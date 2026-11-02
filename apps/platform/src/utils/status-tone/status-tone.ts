@@ -8,6 +8,7 @@ import {
   type TTenantStatus,
   type TTenantProvisioningStepStatus,
 } from '@blog/db/constants';
+import type { TNavItemStatusTone } from '@platform/components/features/layout/nav-item-content';
 import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
 import {
   DOMAIN_VERIFICATION_STATUS,
@@ -15,7 +16,7 @@ import {
 } from '@platform/constants/domain';
 import {
   OWNER_STUDIO_ACCESS,
-  type TOwnerStudioAccess,
+  type TPendingOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
 import {
   CONTRAST_STATUS,
@@ -67,10 +68,12 @@ const RELEASE_RUN_STATUS_TONE: Record<TReleaseRunStatus, TBadgeTone> = {
   [RELEASE_RUN_STATUS.FAILED]: 'bad',
 };
 
-const OWNER_STUDIO_ACCESS_TONE: Record<TOwnerStudioAccess, TBadgeTone> = {
+const OWNER_STUDIO_ACCESS_TONE: Record<
+  TPendingOwnerStudioAccess,
+  TNavItemStatusTone
+> = {
   [OWNER_STUDIO_ACCESS.INVITE_SENT]: 'warn',
   [OWNER_STUDIO_ACCESS.ACTIVATING]: 'brand',
-  [OWNER_STUDIO_ACCESS.READY]: 'ok',
   [OWNER_STUDIO_ACCESS.STALLED]: 'bad',
 };
 
@@ -124,5 +127,5 @@ export const contrastStatusTone = (status: TContrastStatus) =>
 export const releaseRunStatusTone = (status: TReleaseRunStatus) =>
   RELEASE_RUN_STATUS_TONE[status];
 
-export const ownerStudioAccessTone = (access: TOwnerStudioAccess) =>
+export const ownerStudioAccessTone = (access: TPendingOwnerStudioAccess) =>
   OWNER_STUDIO_ACCESS_TONE[access];

@@ -97,9 +97,8 @@ switches the content column to full-bleed (see
   year; read server-side for the first render), `admin-theme` (the
   per-device theme preference, one year; read server-side for the first
   render) and the per-tenant
-  `studio-entered-<tenantId>` (client-written, one year), which the
-  `/dashboard` layout reads to drop the Studio item's Ready badge
-  (`embedded-studio.md`).
+  `studio-entered-<tenantId>` (client-written, one year), which no
+  surface reads any more (`embedded-studio.md`).
 - Request caching: `listSessionTenants`, `resolveDashboardTenant`,
   `requireAdmin` and `requireTenantById` are React `cache()`-wrapped, so a
   layout and its page share one lookup per request. Nothing is cached across
@@ -144,8 +143,8 @@ switches the content column to full-bleed (see
 - Plan-gated dashboard pages go through `renderTenantScopedPage`, which 404s
   when the plan lacks the page. It is called as a function, never as JSX.
 - The tenant layouts render the sidebar once and keep it across client
-  navigation, so a badge that can change while the owner stays in
-  `/dashboard` must refresh the route itself. The Studio badge does: the
+  navigation, so a badge or line that can change while the owner stays in
+  `/dashboard` must refresh the route itself. The Studio access line does: the
   Studio page compares its fresh access state with the one the sidebar was
   rendered with (`ShellStudioAccessProvider`) and refreshes when they differ,
   and the home page's site-setup card refreshes once the run it polls

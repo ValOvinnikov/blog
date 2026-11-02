@@ -1,19 +1,19 @@
 import {
+  COLOR_SCHEME,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { THEME_PREFERENCE } from '@platform/constants/theme';
 import messages from '@platform/i18n/messages/en.json';
-import { resolveThemePreference } from '@platform/server/layout/resolve-theme-preference';
+import { resolveThemeColorScheme } from '@platform/server/layout/resolve-theme-color-scheme';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { setRequestLocale } from 'next-intl/server';
 import type { ReactElement } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
 
-vi.mock('@platform/server/layout/resolve-theme-preference');
+vi.mock('@platform/server/layout/resolve-theme-color-scheme');
 
 faker.seed(5996);
 
@@ -79,13 +79,13 @@ describe(`<${LocaleLayout.name}/>`, () => {
   });
 
   it.each([
-    { preference: THEME_PREFERENCE.LIGHT, expected: 'light' },
-    { preference: THEME_PREFERENCE.DARK, expected: 'dark' },
-    { preference: THEME_PREFERENCE.SYSTEM, expected: undefined },
+    { colorScheme: COLOR_SCHEME.LIGHT, expected: 'light' },
+    { colorScheme: COLOR_SCHEME.DARK, expected: 'dark' },
+    { colorScheme: undefined, expected: undefined },
   ])(
-    'sets data-theme to $expected on the document for a stored $preference',
-    async ({ preference, expected }) => {
-      vi.mocked(resolveThemePreference).mockResolvedValueOnce(preference);
+    'sets data-theme to $expected on the document for the $colorScheme scheme',
+    async ({ colorScheme, expected }) => {
+      vi.mocked(resolveThemeColorScheme).mockResolvedValueOnce(colorScheme);
 
       const htmlElement = await LocaleLayout(defaultProps);
 

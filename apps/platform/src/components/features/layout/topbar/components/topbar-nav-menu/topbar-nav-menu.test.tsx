@@ -8,6 +8,7 @@ import {
   mockNavInertItem,
   mockNavLinkItem,
   mockNavSection,
+  mockNavStatus,
 } from '@platform/testing/layout/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -21,6 +22,8 @@ const MOCK_LOOK_ITEM = mockNavLinkItem();
 const MOCK_VOICE_ITEM = mockNavLinkItem();
 const MOCK_BADGE = mockNavBadge();
 const MOCK_BADGED_ITEM = mockNavLinkItem({ badge: MOCK_BADGE });
+const MOCK_STATUS = mockNavStatus();
+const MOCK_STATUS_ITEM = mockNavLinkItem({ status: MOCK_STATUS });
 const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
 const MOCK_SECTION = mockNavSection({ items: [MOCK_LOOK_ITEM] });
@@ -73,6 +76,18 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     expect(link).toHaveAttribute('href', MOCK_BADGED_ITEM.href);
     expect(badge).toBeVisible();
     expect(note).toBeVisible();
+  });
+
+  it('names an item with a status by its label and line, with no native title', async () => {
+    setup({ sections: [mockNavSection({ items: [MOCK_STATUS_ITEM] })] });
+
+    const menu = await openMenu();
+    const link = within(menu).getByRole('menuitem', {
+      name: `${MOCK_STATUS_ITEM.label}${messages.navItemContent.statusSeparator} ${MOCK_STATUS.text}`,
+    });
+
+    expect(link).not.toHaveAttribute('title');
+    expect(link).not.toHaveAccessibleDescription();
   });
 
   it('marks only the item matching the current pathname active', async () => {

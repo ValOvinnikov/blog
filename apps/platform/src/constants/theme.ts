@@ -1,4 +1,4 @@
-import type { TValueOf } from '@blog/config/utils';
+import { COLOR_SCHEME } from '@blog/config';
 
 export const THEME_PREFERENCE = {
   LIGHT: 'LIGHT',
@@ -6,7 +6,7 @@ export const THEME_PREFERENCE = {
   SYSTEM: 'SYSTEM',
 } as const;
 
-export type TThemePreference = TValueOf<typeof THEME_PREFERENCE>;
-
-export const isThemePreference = (value: string): value is TThemePreference =>
-  (Object.values(THEME_PREFERENCE) as string[]).includes(value);
+export const DATA_THEME = {
+  [COLOR_SCHEME.LIGHT]: 'light',
+  [COLOR_SCHEME.DARK]: 'dark',
+} as const;

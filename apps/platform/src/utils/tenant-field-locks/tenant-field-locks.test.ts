@@ -41,6 +41,13 @@ const everyFieldLockedBy = (reason: TTenantFieldLockReason) => ({
   ownerEmail: reason,
 });
 
+const everyFieldButPlanLockedBy = (reason: TTenantFieldLockReason) => ({
+  name: reason,
+  primaryDomain: reason,
+  locale: reason,
+  ownerEmail: reason,
+});
+
 describe(computeTenantFieldLocks, () => {
   it.each([
     ['every step is idle and provisioning is pending', true],
@@ -113,7 +120,7 @@ describe(computeTenantFieldLocks, () => {
     expect(locks).toEqual(everyFieldLockedBy(RUNNING));
   });
 
-  it('locks every field as succeeded once the owner has signed in', () => {
+  it('locks every field but the plan as succeeded once the owner has signed in', () => {
     const locks = computeTenantFieldLocks(
       mockDoneProvisioningSteps(),
       TENANT_PROVISIONING_STATUS.READY,
@@ -121,7 +128,7 @@ describe(computeTenantFieldLocks, () => {
       false,
     );
 
-    expect(locks).toEqual(everyFieldLockedBy(SUCCEEDED));
+    expect(locks).toEqual(everyFieldButPlanLockedBy(SUCCEEDED));
   });
 
   it('leaves the owner email editable until the owner signs in', () => {
@@ -135,7 +142,6 @@ describe(computeTenantFieldLocks, () => {
     expect(locks).toEqual({
       name: SUCCEEDED,
       primaryDomain: SUCCEEDED,
-      plan: SUCCEEDED,
       locale: SUCCEEDED,
     });
   });
@@ -177,7 +183,7 @@ describe(computeTenantFieldLocks, () => {
       false,
     );
 
-    expect(locks).toEqual(everyFieldLockedBy(SUCCEEDED));
+    expect(locks).toEqual(everyFieldButPlanLockedBy(SUCCEEDED));
   });
 });
 

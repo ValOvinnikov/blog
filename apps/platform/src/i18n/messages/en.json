@@ -222,15 +222,17 @@
     "features": "Features",
     "leads": "Leads",
     "releases": "Releases",
-    "studioAccess": {
-      "INVITE_SENT": "Invite sent",
-      "ACTIVATING": "Activating",
-      "READY": "Ready",
-      "STALLED": "Action needed"
+    "studioAccessLine": {
+      "INVITE_SENT": "Invite sent — check your email",
+      "ACTIVATING": "Setting up…",
+      "STALLED": "Needs attention"
     },
     "blockedSignups": "Blocked sign-ups",
     "dataRequests": "Data requests",
     "badgeUnreadLeads": "{count} new"
+  },
+  "navItemContent": {
+    "statusSeparator": ","
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"

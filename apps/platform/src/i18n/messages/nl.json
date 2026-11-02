@@ -222,15 +222,17 @@
     "features": "Functies",
     "leads": "Berichten",
     "releases": "Releases",
-    "studioAccess": {
-      "INVITE_SENT": "Uitnodiging verstuurd",
-      "ACTIVATING": "Wordt geactiveerd",
-      "READY": "Klaar",
-      "STALLED": "Actie nodig"
+    "studioAccessLine": {
+      "INVITE_SENT": "Uitnodiging verstuurd — controleer uw e-mail",
+      "ACTIVATING": "Wordt ingesteld…",
+      "STALLED": "Vraagt aandacht"
     },
     "blockedSignups": "Geblokkeerde aanmeldingen",
     "dataRequests": "Gegevensverzoeken",
     "badgeUnreadLeads": "{count} nieuw"
+  },
+  "navItemContent": {
+    "statusSeparator": ","
   },
   "tenantLayout": {
     "scopeLabel": "Tenant"

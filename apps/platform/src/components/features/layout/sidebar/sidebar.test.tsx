@@ -18,6 +18,7 @@ import {
   mockNavInertItem,
   mockNavLinkItem,
   mockNavSection,
+  mockNavStatus,
 } from '@platform/testing/layout/fixtures';
 import { TOOLTIP_HOVER_TIMEOUT } from '@platform/testing/tooltip';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -36,6 +37,9 @@ const MOCK_NOTE = faker.lorem.sentence();
 const MOCK_SWITCHER_TEXT = faker.lorem.words(2);
 const MOCK_FOOT_TEXT = faker.lorem.words(2);
 const MOCK_DISABLED_REASON = faker.lorem.sentence();
+const MOCK_STATUS = mockNavStatus();
+const MOCK_STATUS_ITEM = mockNavLinkItem({ status: MOCK_STATUS });
+const MOCK_STATUS_ITEM_NAME = `${MOCK_STATUS_ITEM.label}${messages.navItemContent.statusSeparator} ${MOCK_STATUS.text}`;
 const MOCK_INERT_ITEM = mockNavInertItem({
   badge: MOCK_BADGE,
   disabledReason: MOCK_DISABLED_REASON,
@@ -140,6 +144,24 @@ describe(`<${Sidebar.name}/>`, () => {
 
     expect(badge).toBeVisible();
   });
+
+  it.each([
+    { state: 'expanded', isInitiallyCollapsed: false },
+    { state: 'collapsed', isInitiallyCollapsed: true },
+  ])(
+    'names a $state link with a status by its label and line, with no native title',
+    ({ isInitiallyCollapsed }) => {
+      renderSidebar(
+        { sections: [mockNavSection({ items: [MOCK_STATUS_ITEM] })] },
+        isInitiallyCollapsed,
+      );
+
+      const link = screen.getByRole('link', { name: MOCK_STATUS_ITEM_NAME });
+
+      expect(link).not.toHaveAttribute('title');
+      expect(link).not.toHaveAccessibleDescription();
+    },
+  );
 
   it.each([
     { active: MOCK_LOOK_ITEM, inactive: MOCK_VOICE_ITEM },
