@@ -309,6 +309,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:platform
 
+### `@platform/constants/accordion` — `apps/platform/src/constants/accordion.ts`
+
+- **ACCORDION_VARIANT**: `LIST`, `ROW`
+
 ### `@platform/constants/account-menu` — `apps/platform/src/constants/account-menu.ts`
 
 - **ACCOUNT_MENU_APPEARANCE**: `SIDEBAR`, `PILL`
