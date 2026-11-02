@@ -13,6 +13,10 @@ import { readRememberedLanguage } from '@web/utils/language-cookie';
 import { logger } from '@web/utils/logger/logger';
 import { matchAcceptLanguage } from '@web/utils/match-accept-language';
 import { privateRedirect } from '@web/utils/private-redirect';
+import {
+  siteUnavailablePage,
+  siteUnavailableStatus,
+} from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
@@ -25,6 +29,8 @@ import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
 } from './server/tenant/constants/constants';
+import { isOperatorSuspended } from './server/tenant/operator-suspension/operator-suspension';
+import { passThroughUnlessOperatorSuspended } from './server/tenant/operator-suspension/pass-through-unless-operator-suspended';
 import {
   resolveTenantRouting,
   type TTenantRouting,
@@ -114,6 +120,7 @@ const redirectToPreferredTranslation = async (
 
 const DOTTED_PATH_PATTERN = /\./;
 const FEED_PATH_PATTERN = /\/rss\.xml$/;
+const SUSPENSION_GATED_PATH_PATTERN = /^\/(?:api\/|sitemap\.xml$)/;
 
 /**
  * Decodes only the first path segment, after splitting on `/` — decoding
@@ -187,6 +194,10 @@ export default async function proxy(
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
+  if (SUSPENSION_GATED_PATH_PATTERN.test(pathname)) {
+    return passThroughUnlessOperatorSuspended(request);
+  }
+
   if (DOTTED_PATH_PATTERN.test(pathname) && !FEED_PATH_PATTERN.test(pathname)) {
     request.headers.delete(TENANT_ID_HEADER);
     return NextResponse.next({ request: { headers: request.headers } });
@@ -200,6 +211,14 @@ export default async function proxy(
   } catch (error) {
     logger.error(PROXY_LOG.TENANT_LOOKUP_FAILED, { host, error });
     return new NextResponse(null, { status: HTTP_STATUS.SERVICE_UNAVAILABLE });
+  }
+
+  if (tenantRouting && isOperatorSuspended(tenantRouting.tenant)) {
+    return FEED_PATH_PATTERN.test(pathname)
+      ? siteUnavailableStatus()
+      : siteUnavailablePage(
+          localeForPrefix(firstSegment) ?? tenantRouting.defaultLocale,
+        );
   }
 
   const tenantId = tenantRouting?.tenantId;
@@ -246,6 +265,10 @@ export default async function proxy(
 export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
   // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
-  matcher:
+  // The last two entries reach the proxy only so an operator-suspended site can answer them with 503.
+  matcher: [
     '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
+    '/sitemap.xml',
+    '/api/:route(newsletter|account|switch-language|generate-skim|auth)/:path*',
+  ],
 };

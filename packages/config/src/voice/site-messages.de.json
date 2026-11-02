@@ -20,6 +20,10 @@
     "retry": "Erneut versuchen",
     "goHome": "Zur Startseite"
   },
+  "siteUnavailable": {
+    "heading": "Diese Website ist nicht verfügbar",
+    "text": "Bitte schauen Sie später wieder vorbei."
+  },
   "postShare": {
     "shareAriaLabel": "„{title}“ teilen",
     "panelAriaLabel": "Optionen zum Teilen",

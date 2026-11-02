@@ -2,11 +2,14 @@ import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   routes,
+  SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
 } from '@blog/config';
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import type { TTranslationMap } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import { CACHE_CONTROL } from '@web/constants/http';
 import { PROXY_LOG } from '@web/constants/proxy';
 import {
   TENANT_ID_HEADER,
@@ -28,13 +31,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 faker.seed(6012);
 
-const { resolveTenantRoutingMock, getTenantTranslationMapMock, intlMock, env } =
-  vi.hoisted(() => ({
-    resolveTenantRoutingMock: vi.fn(),
-    getTenantTranslationMapMock: vi.fn(),
-    intlMock: vi.fn(),
-    env: { NEXT_PUBLIC_SANITY_DATASET: 'development' },
-  }));
+const {
+  resolveTenantRoutingMock,
+  resolveTenantMock,
+  getTenantTranslationMapMock,
+  intlMock,
+  env,
+} = vi.hoisted(() => ({
+  resolveTenantRoutingMock: vi.fn(),
+  resolveTenantMock: vi.fn(),
+  getTenantTranslationMapMock: vi.fn(),
+  intlMock: vi.fn(),
+  env: { NEXT_PUBLIC_SANITY_DATASET: 'development' },
+}));
 
 vi.mock('next-intl/middleware', () => ({
   default: (routing: unknown) => (request: NextRequest) =>
@@ -43,6 +52,7 @@ vi.mock('next-intl/middleware', () => ({
 
 vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenantRouting: resolveTenantRoutingMock,
+  resolveTenant: resolveTenantMock,
 }));
 
 vi.mock(
@@ -76,6 +86,24 @@ const REWRITE_HEADER = 'x-middleware-rewrite';
 const FORWARDED_TENANT_HEADER = `x-middleware-request-${TENANT_ID_HEADER}`;
 const ACCEPT_DUTCH = 'nl-NL,nl;q=0.9,en;q=0.8';
 const DEVELOPMENT_DATASET = 'development';
+const NEXT_HEADER = 'x-middleware-next';
+const NEWSLETTER_CONFIRM_PATH = '/api/newsletter/confirm';
+const SITE_UNAVAILABLE_HEADING = {
+  EN: SITE_MESSAGES_BY_LOCALE.EN.siteUnavailable.heading,
+  NL: SITE_MESSAGES_BY_LOCALE.NL.siteUnavailable.heading,
+};
+
+const MOCK_OPERATOR_SUSPENDED_TENANT = mockTenant({
+  id: MOCK_TENANT_ID,
+  status: TENANT_STATUS.SUSPENDED,
+  suspensionReason: SUSPENSION_REASON.OPERATOR,
+});
+
+const MOCK_INACTIVITY_SUSPENDED_TENANT = mockTenant({
+  id: MOCK_TENANT_ID,
+  status: TENANT_STATUS.SUSPENDED,
+  suspensionReason: SUSPENSION_REASON.INACTIVITY,
+});
 
 const MOCK_TRANSLATION_MAP: TTranslationMap = {
   homeLanguages: [],
@@ -93,8 +121,9 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
 const tenantRouting = (
   defaultLocale: TLocaleIsoCode = EN,
   liveLocales: TLocaleIsoCode[] = [defaultLocale],
+  tenant = mockTenant({ id: MOCK_TENANT_ID }),
 ): TTenantRouting => ({
-  tenant: mockTenant({ id: MOCK_TENANT_ID }),
+  tenant,
   tenantId: MOCK_TENANT_ID,
   defaultLocale,
   liveLocales,
@@ -155,7 +184,8 @@ describe('proxy matcher', () => {
   let matcher: RegExp;
 
   beforeEach(() => {
-    matcher = new RegExp(`^${config.matcher}$`);
+    const [pageMatcher] = config.matcher;
+    matcher = new RegExp(`^${pageMatcher}$`);
   });
 
   it.each([
@@ -397,6 +427,93 @@ describe(proxy, () => {
     });
   });
 
+  describe('operator suspension', () => {
+    beforeEach(() => {
+      resolveTenantRoutingMock.mockResolvedValue(
+        tenantRouting(EN, [EN, NL], MOCK_OPERATOR_SUSPENDED_TENANT),
+      );
+      resolveTenantMock.mockReset();
+      resolveTenantMock.mockResolvedValue(MOCK_OPERATOR_SUSPENDED_TENANT);
+    });
+
+    it('answers a page with an unindexed unavailable page', async () => {
+      const response = await visit(BLOG_POST_PATH);
+
+      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+      expect(response.headers.get('x-robots-tag')).toBe('noindex');
+      expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+      expect(intlMock).not.toHaveBeenCalled();
+      expect(await response.text()).toContain(SITE_UNAVAILABLE_HEADING.EN);
+    });
+
+    it('shows the unavailable page in the language the path names', async () => {
+      const response = await visit(`/${LOCALE_BCP47_TAGS[NL]}${BLOG_PATH}`);
+      const body = await response.text();
+
+      expect(body).toContain(SITE_UNAVAILABLE_HEADING.NL);
+      expect(body).toContain(`lang="${LOCALE_BCP47_TAGS[NL]}"`);
+    });
+
+    it.each([SITE_RSS_PATH, TAG_RSS_PATH])(
+      'answers the feed %s with service unavailable and no page',
+      async (path) => {
+        const response = await visit(path);
+
+        expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+        expect(await response.text()).toBe('');
+      },
+    );
+
+    it.each([SITEMAP_PATH, NEWSLETTER_CONFIRM_PATH])(
+      'answers %s with service unavailable',
+      async (path) => {
+        const response = await visit(path);
+
+        expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+        expect(response.headers.get(NEXT_HEADER)).toBeNull();
+        expect(resolveTenantMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
+      },
+    );
+
+    it('serves the site of a tenant suspended for inactivity', async () => {
+      resolveTenantRoutingMock.mockResolvedValue(
+        tenantRouting(EN, [EN], MOCK_INACTIVITY_SUSPENDED_TENANT),
+      );
+
+      const response = await visit(BLOG_PATH);
+
+      expect(response.headers.get(REWRITE_HEADER)).toBe(rewrittenTo(BLOG_PATH));
+    });
+
+    it.each([SITEMAP_PATH, NEWSLETTER_CONFIRM_PATH])(
+      'passes %s through for a tenant suspended for inactivity',
+      async (path) => {
+        resolveTenantMock.mockResolvedValue(MOCK_INACTIVITY_SUSPENDED_TENANT);
+
+        const response = await visit(path, {
+          headers: { [TENANT_ID_HEADER]: MOCK_SPOOFED_TENANT_ID },
+        });
+
+        expect(response.headers.get(NEXT_HEADER)).toBe('1');
+        expect(response.headers.get(FORWARDED_TENANT_HEADER)).toBeNull();
+        expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
+      },
+    );
+
+    it('answers service unavailable and logs once when the sitemap lookup fails', async () => {
+      resolveTenantMock.mockRejectedValue(MOCK_ERROR);
+
+      const response = await visit(SITEMAP_PATH);
+
+      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+      expect(logger.error).toHaveBeenCalledTimes(1);
+      expect(logger.error).toHaveBeenCalledWith(
+        PROXY_LOG.TENANT_LOOKUP_FAILED,
+        { host: MOCK_TENANT_HOST, error: MOCK_ERROR },
+      );
+    });
+  });
+
   describe('language routing', () => {
     it.each([
       { from: '/nl/blog/hello', to: '/blog/hello' },
@@ -454,7 +571,9 @@ describe(proxy, () => {
         headers: { 'accept-language': ACCEPT_DUTCH },
       });
 
-      expect(response.headers.get('cache-control')).toBe('private, no-store');
+      expect(response.headers.get('cache-control')).toBe(
+        CACHE_CONTROL.PRIVATE_NO_STORE,
+      );
     });
 
     it('stays on the page when it has no translation in that language', async () => {

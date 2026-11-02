@@ -1546,8 +1546,11 @@ credentials behind but no content fails closed instead of serving a broken
 site. That last requirement is production-scoped because local and dev tenant
 rows predate provisioning tracking and legitimately carry no status; a null
 status is refused in production, never waved through. **Writes** are refused for any tenant
-that is not ACTIVE (`isTenantActive()`), so a SUSPENDED tenant's site stays
-readable while nothing new lands against it. The first lives in
+that is not ACTIVE (`isTenantActive()`), so a tenant SUSPENDED for INACTIVITY
+stays readable while nothing new lands against it. A tenant an OPERATOR
+suspended is offline instead: `proxy.ts` answers its pages with a neutral 503
+unavailable page marked `noindex`, and its feeds, sitemap and site API routes
+with a bare 503 (`isOperatorSuspended()`). The first lives in
 `apps/web/src/server/tenant/resolve-tenant/` and the second in
 `write-gate/`, and every tenant-scoped mutation checks it — through
 `resolveWritableTenant` or the host write context's `isActive` — one shared predicate rather than a per-call-site status check, since
