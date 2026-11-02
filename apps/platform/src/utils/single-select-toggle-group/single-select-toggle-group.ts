@@ -1,3 +1,5 @@
+import { isUndefined } from '@blog/utils/primitives';
+
 type TSingleSelectOptions = {
   isLocked?: boolean;
 };
@@ -11,7 +13,7 @@ export const singleSelectToggleGroupProps = <TValue extends string>(
   value: [value],
   onValueChange: (nextValues: TValue[]) => {
     const nextValue = nextValues[0];
-    if (!isLocked && nextValue !== undefined) {
+    if (!isLocked && !isUndefined(nextValue)) {
       onChange(nextValue);
     }
   },

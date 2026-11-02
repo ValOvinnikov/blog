@@ -1,6 +1,7 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   createContext,
   useContext,
@@ -71,7 +72,7 @@ export const useToolbarTabStop = (id: string) => {
   const { stopId, resetKey } = context;
   const onFocus = () => context.setStop({ id, resetKey });
 
-  return stopId === undefined
+  return isUndefined(stopId)
     ? { onFocus }
     : { onFocus, tabIndex: stopId === id ? 0 : -1 };
 };
