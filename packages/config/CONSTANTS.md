@@ -389,6 +389,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
 
+### `@platform/constants/keyboard` — `apps/platform/src/constants/keyboard.ts`
+
+- **KEY**: `ARROW_LEFT`=`"ArrowLeft"`, `ARROW_RIGHT`=`"ArrowRight"`, `HOME`=`"Home"`, `END`=`"End"`
+
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
 - **LEAD_REFUSAL**: `NOT_FOUND`

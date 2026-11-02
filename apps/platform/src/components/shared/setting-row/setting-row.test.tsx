@@ -86,12 +86,14 @@ describe(`<${SettingRow.name}/>`, () => {
           lockedReason={MOCK_LOCKED_REASON}
         >
           <Switch
+            aria={{
+              label: MOCK_CONTROL_LABEL,
+              describedBy: MOCK_ARCHIVED_NOTICE_ID,
+            }}
             isChecked={false}
             onCheckedChange={vi.fn()}
-            ariaLabel={MOCK_CONTROL_LABEL}
             labels={{ on: 'On', off: 'Off' }}
             isDisabled={true}
-            aria-describedby={MOCK_ARCHIVED_NOTICE_ID}
           />
         </SettingRow>
       </>,

@@ -2,9 +2,11 @@
 
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
-import { useId, type AriaAttributes } from 'react';
+import type { TControlAria } from '@blog/config';
+import { useId } from 'react';
 
 import { segmentedControlVariants } from './segmented-control-variants';
+import { useLockedArrowFocus } from './use-locked-arrow-focus';
 
 type TSegmentedControlOption<TValue extends string> = {
   value: TValue;
@@ -16,10 +18,10 @@ export type TSegmentedControlProps<TValue extends string> = {
   options: TSegmentedControlOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
-  ariaLabel?: string;
+  aria?: TControlAria;
   isDisabled?: boolean;
+  isLocked?: boolean;
   className?: string;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
 /** Built on Base UI's Toggle Group, so clicking the selected option would deselect it; that is swallowed, as there is no "none selected" state. */
@@ -27,44 +29,50 @@ export const SegmentedControl = <TValue extends string>({
   options,
   value,
   onChange,
-  ariaLabel,
+  aria = {},
   isDisabled = false,
+  isLocked = false,
   className,
-  'aria-describedby': ariaDescribedBy,
 }: TSegmentedControlProps<TValue>) => {
   const idPrefix = useId();
+  const { label: ariaLabel, labelledBy, describedBy } = aria;
+  const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked);
   const hasDescriptions = options.some(({ description }) => description);
   const {
     root,
     option,
     optionLabel,
     optionDescription: optionDescriptionSlot,
-  } = segmentedControlVariants({ hasDescriptions });
+  } = segmentedControlVariants({ hasDescriptions, isLocked });
 
   return (
     <ToggleGroup
       value={[value]}
       onValueChange={(nextValues) => {
         const nextValue = nextValues[0];
-        if (nextValue !== undefined) {
+        if (!isLocked && nextValue !== undefined) {
           onChange(nextValue);
         }
       }}
       disabled={isDisabled}
       aria-label={ariaLabel}
-      aria-describedby={ariaDescribedBy}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
+      onKeyDown={onKeyDown}
       className={root({ class: className })}
     >
-      {options.map(({ value: optionValue, label, description }) => {
+      {options.map(({ value: optionValue, label, description }, index) => {
         const labelId = `${idPrefix}-${optionValue}-label`;
         const descriptionId = `${idPrefix}-${optionValue}-description`;
 
         return (
           <Toggle
             key={optionValue}
+            ref={setOptionRef(index)}
             value={optionValue}
             aria-labelledby={description ? labelId : undefined}
             aria-describedby={description ? descriptionId : undefined}
+            aria-disabled={isLocked || undefined}
             className={option()}
           >
             {description ? (

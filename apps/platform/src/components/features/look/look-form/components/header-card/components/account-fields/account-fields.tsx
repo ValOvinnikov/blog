@@ -42,11 +42,11 @@ export const AccountFields = () => {
         lock={buttonLock.lock}
       >
         <SegmentedControl<TAccountButtonStyle>
+          aria={{ describedBy: buttonLock.describedBy }}
           options={buttonOptions}
           value={accountButtonStyle}
           onChange={(style) => updateField('accountButtonStyle', style)}
           isDisabled={buttonLock.isDisabled}
-          aria-describedby={buttonLock.describedBy}
         />
       </LookField>
 
@@ -57,11 +57,11 @@ export const AccountFields = () => {
         lock={panelLock.lock}
       >
         <SegmentedControl<TAccountPanelStyle>
+          aria={{ describedBy: panelLock.describedBy }}
           options={panelOptions}
           value={accountPanelStyle}
           onChange={(style) => updateField('accountPanelStyle', style)}
           isDisabled={panelLock.isDisabled}
-          aria-describedby={panelLock.describedBy}
         />
       </LookField>
 
@@ -72,13 +72,13 @@ export const AccountFields = () => {
         lock={placementLock.lock}
       >
         <SegmentedControl<TAccountPhonePlacement>
+          aria={{ describedBy: placementLock.describedBy }}
           options={placementOptions}
           value={accountPhonePlacement}
           onChange={(placement) =>
             updateField('accountPhonePlacement', placement)
           }
           isDisabled={placementLock.isDisabled}
-          aria-describedby={placementLock.describedBy}
         />
       </LookField>
     </>

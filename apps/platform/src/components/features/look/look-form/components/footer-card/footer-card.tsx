@@ -71,11 +71,11 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
         lock={layoutLock.lock}
       >
         <OptionSelect
+          aria={{ describedBy: layoutLock.describedBy }}
           options={layoutOptions}
           value={footerLayout}
           onChange={(layout) => updateField('footerLayout', layout)}
           isDisabled={layoutLock.isDisabled}
-          aria-describedby={layoutLock.describedBy}
         />
       </LookField>
 
@@ -86,11 +86,11 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
         lock={backgroundLock.lock}
       >
         <SegmentedControl<TBrandVariant>
+          aria={{ describedBy: backgroundLock.describedBy }}
           options={backgroundOptions}
           value={footerBackground}
           onChange={(background) => updateField('footerBackground', background)}
           isDisabled={backgroundLock.isDisabled}
-          aria-describedby={backgroundLock.describedBy}
         />
       </LookField>
 
@@ -101,11 +101,11 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
         lock={surfaceLock.lock}
       >
         <SegmentedControl<TFooterSurface>
+          aria={{ describedBy: surfaceLock.describedBy }}
           options={surfaceOptions}
           value={footerSurface}
           onChange={(surface) => updateField('footerSurface', surface)}
           isDisabled={surfaceLock.isDisabled}
-          aria-describedby={surfaceLock.describedBy}
         />
       </LookField>
 
@@ -116,13 +116,13 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
         lock={cookieButtonLock.lock}
       >
         <SegmentedControl<TCookieSettingsButton>
+          aria={{ describedBy: cookieButtonDescribedBy }}
           options={cookieButtonOptions}
           value={cookieSettingsButton}
           onChange={(visibility) =>
             updateField('cookieSettingsButton', visibility)
           }
           isDisabled={cookieButtonLock.isDisabled}
-          aria-describedby={cookieButtonDescribedBy}
         />
         {!hasCookieBanner && (
           <p id={bannerOffNoteId} className={textVariants({ variant: 'hint' })}>

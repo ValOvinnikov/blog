@@ -42,11 +42,11 @@ export const ButtonsCard = () => {
         lock={busyLock.lock}
       >
         <SegmentedControl<TBusyButtonStyle>
+          aria={{ describedBy: busyLock.describedBy }}
           options={busyOptions}
           value={busyButtonStyle}
           onChange={(style) => updateField('busyButtonStyle', style)}
           isDisabled={busyLock.isDisabled}
-          aria-describedby={busyLock.describedBy}
         />
       </LookField>
 
@@ -56,11 +56,11 @@ export const ButtonsCard = () => {
         lock={spinnerLock.lock}
       >
         <OptionSelect
+          aria={{ describedBy: spinnerLock.describedBy }}
           options={spinnerOptions}
           value={spinnerStyle}
           onChange={(style) => updateField('spinnerStyle', style)}
           isDisabled={spinnerLock.isDisabled}
-          aria-describedby={spinnerLock.describedBy}
         />
       </LookField>
     </LookCard>
