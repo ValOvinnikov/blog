@@ -11,8 +11,6 @@ import {
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
-const BORDER_COLOR = 'var(--border)';
-
 export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
 
 export type TOklchRamp = Record<`--${string}`, TOklchStop>;
@@ -111,6 +109,8 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
     '--spacing-band': '0.75rem',
   },
 };
+
+const BORDER_COLOR = 'var(--border)';
 
 export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
   [CARD_STYLE.ACCENT_BAR]: {
