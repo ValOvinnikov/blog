@@ -17,9 +17,15 @@ afterEach(async () => {
 });
 
 describe(closeTenantSuspension, () => {
+  let tenantId: string;
+  let liftedBy: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+    ({ id: liftedBy } = await insertTestAdmin(db()));
+  });
+
   it('stamps who lifted the open case and when', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-    const { id: liftedBy } = await insertTestAdmin(db());
     const { reference } = await insertTestTenantSuspension(db(), tenantId);
 
     const closed = await closeTenantSuspension(tenantId, liftedBy);
@@ -29,8 +35,6 @@ describe(closeTenantSuspension, () => {
   });
 
   it('leaves an already lifted case alone', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-    const { id: liftedBy } = await insertTestAdmin(db());
     await insertTestTenantSuspension(db(), tenantId, { liftedAt: new Date() });
 
     expect(await closeTenantSuspension(tenantId, liftedBy)).toBeUndefined();

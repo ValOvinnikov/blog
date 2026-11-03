@@ -22,8 +22,13 @@ afterEach(async () => {
 });
 
 describe(getOpenTenantSuspension, () => {
+  let tenantId: string;
+
+  beforeEach(async () => {
+    ({ id: tenantId } = await insertTestTenant(db()));
+  });
+
   it('returns the open case with the suspending admin email', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const { id: suspendedBy } = await insertTestAdmin(
       db(),
       userPersonalColumns({ email: MOCK_OPERATOR_EMAIL }),
@@ -39,14 +44,12 @@ describe(getOpenTenantSuspension, () => {
   });
 
   it('returns nothing once the case is lifted', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await insertTestTenantSuspension(db(), tenantId, { liftedAt: new Date() });
 
     expect(await getOpenTenantSuspension(tenantId)).toBeUndefined();
   });
 
   it('returns nothing for another tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const other = await insertTestTenant(db());
     await insertTestTenantSuspension(db(), other.id);
 

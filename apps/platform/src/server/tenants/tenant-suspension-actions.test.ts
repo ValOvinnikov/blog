@@ -37,6 +37,7 @@ import { notFound } from 'next/navigation';
 import {
   liftTenantSuspensionAction,
   suspendTenantAction,
+  type TTenantSuspensionResult,
 } from './tenant-suspension-actions';
 
 faker.seed(4417);
@@ -127,6 +128,13 @@ const CASE_DETAILS = {
   reference: OPENED_CASE.reference,
   category: OPENED_CASE.category,
 };
+const OWNER_BLOCK = { reason: MOCK_BLOCK_REASON };
+
+const suspend = () =>
+  suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE);
+
+const suspendWithBlock = () =>
+  suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE, OWNER_BLOCK);
 
 describe('tenant suspension actions', () => {
   beforeEach(() => {
@@ -158,18 +166,15 @@ describe('tenant suspension actions', () => {
       notFound();
     });
 
-    await expect(
-      suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(suspend()).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
     expect(getTenantByIdMock).not.toHaveBeenCalled();
     expect(setTenantSuspensionMock).not.toHaveBeenCalled();
   });
 
   it('suspends the tenant, purges its cached site and records the operator action', async () => {
-    const result = await suspendTenantAction(
-      ACTIVE_TENANT.id,
-      MOCK_SUSPENSION_CASE,
-    );
+    const result = await suspend();
 
     expect(setTenantSuspensionMock).toHaveBeenCalledWith(
       ACTIVE_TENANT.id,
@@ -186,35 +191,75 @@ describe('tenant suspension actions', () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
-  it('reactivates a suspended tenant and records the lifted suspension', async () => {
-    getTenantByIdMock.mockResolvedValue({
-      ...ACTIVE_TENANT,
-      status: TENANT_STATUS.SUSPENDED,
+  describe('a suspended tenant', () => {
+    beforeEach(() => {
+      getTenantByIdMock.mockResolvedValue(SUSPENDED_TENANT);
     });
 
-    const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+    describe('lifted with no open case', () => {
+      let result: TTenantSuspensionResult;
 
-    expect(setTenantSuspensionMock).toHaveBeenCalledWith(
-      ACTIVE_TENANT.id,
-      TENANT_STATUS.ACTIVE,
-    );
-    expect(revalidateSiteConfigMock).toHaveBeenCalledWith(ACTIVE_TENANT.id);
-    expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
-      action: AUDIT_ACTION.SUSPENSION_LIFTED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: ACTIVE_TENANT.id,
-      details: { name: ACTIVE_TENANT.name },
+      beforeEach(async () => {
+        result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+      });
+
+      it('reactivates it and records the lifted suspension', () => {
+        expect(setTenantSuspensionMock).toHaveBeenCalledWith(
+          ACTIVE_TENANT.id,
+          TENANT_STATUS.ACTIVE,
+        );
+        expect(revalidateSiteConfigMock).toHaveBeenCalledWith(ACTIVE_TENANT.id);
+        expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual({
+          action: AUDIT_ACTION.SUSPENSION_LIFTED,
+          targetType: AUDIT_TARGET_TYPE.TENANT,
+          targetId: ACTIVE_TENANT.id,
+          details: { name: ACTIVE_TENANT.name },
+        });
+        expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      });
+
+      it('emails nobody', () => {
+        expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
+      });
     });
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+
+    it('still lifts a suspension on the platform tenant', async () => {
+      resolveIsPlatformTenantMock.mockResolvedValue(true);
+
+      const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(setTenantSuspensionMock).toHaveBeenCalledWith(
+        ACTIVE_TENANT.id,
+        TENANT_STATUS.ACTIVE,
+      );
+    });
+
+    it('closes the case as the lifting admin, audits its reference and emails the owner', async () => {
+      requireSuperAdminMock.mockResolvedValue(MOCK_SUPER_ADMIN);
+      closeTenantSuspensionMock.mockResolvedValue(OPENED_CASE);
+
+      await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+      expect(closeTenantSuspensionMock).toHaveBeenCalledWith(
+        ACTIVE_TENANT.id,
+        MOCK_SUPER_ADMIN.id,
+      );
+      expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual(
+        expect.objectContaining({ details: CASE_DETAILS }),
+      );
+      expect(notifyOwnerOfSuspensionMock).toHaveBeenCalledWith(
+        SUSPENDED_TENANT,
+        OPENED_CASE,
+        TENANT_STATUS.ACTIVE,
+      );
+    });
   });
 
   it('refuses an unknown tenant', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 
-    const result = await suspendTenantAction(
-      ACTIVE_TENANT.id,
-      MOCK_SUSPENSION_CASE,
-    );
+    const result = await suspend();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -269,31 +314,12 @@ describe('tenant suspension actions', () => {
     );
   });
 
-  it('still lifts a suspension on the platform tenant', async () => {
-    resolveIsPlatformTenantMock.mockResolvedValue(true);
-    getTenantByIdMock.mockResolvedValue({
-      ...ACTIVE_TENANT,
-      status: TENANT_STATUS.SUSPENDED,
-    });
-
-    const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(setTenantSuspensionMock).toHaveBeenCalledWith(
-      ACTIVE_TENANT.id,
-      TENANT_STATUS.ACTIVE,
-    );
-  });
-
   it('refuses when the tenant is archived before the write lands', async () => {
     setTenantSuspensionMock.mockResolvedValue(
       errorResult(ERROR_CODE.DB_NOT_FOUND),
     );
 
-    const result = await suspendTenantAction(
-      ACTIVE_TENANT.id,
-      MOCK_SUSPENSION_CASE,
-    );
+    const result = await suspend();
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -306,17 +332,13 @@ describe('tenant suspension actions', () => {
   it('returns a server error without an audit event when the write throws', async () => {
     setTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR);
 
-    const result = await suspendTenantAction(
-      ACTIVE_TENANT.id,
-      MOCK_SUSPENSION_CASE,
-    );
+    const result = await suspend();
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(recordAuditEventMock).not.toHaveBeenCalled();
   });
 
   describe('when the operator also blocks the owner email', () => {
-    const OWNER_BLOCK = { reason: MOCK_BLOCK_REASON };
     const SAVED_BLOCK = {
       kind: BLOCKED_IDENTITY_KIND.ADDRESS,
       identity: OWNER_EMAIL,
@@ -325,11 +347,7 @@ describe('tenant suspension actions', () => {
     };
 
     it('blocks the owner address as the admin, suspends, then audits the block', async () => {
-      const result = await suspendTenantAction(
-        ACTIVE_TENANT.id,
-        MOCK_SUSPENSION_CASE,
-        OWNER_BLOCK,
-      );
+      const result = await suspendWithBlock();
 
       expect(saveSignupBlockMock).toHaveBeenCalledWith(SAVED_BLOCK);
       expect(setTenantSuspensionMock).toHaveBeenCalledWith(
@@ -357,11 +375,7 @@ describe('tenant suspension actions', () => {
         okResult({ entry: mockBlockedAddressIdentity(), created: false }),
       );
 
-      const result = await suspendTenantAction(
-        ACTIVE_TENANT.id,
-        MOCK_SUSPENSION_CASE,
-        OWNER_BLOCK,
-      );
+      const result = await suspendWithBlock();
 
       expect(recordSignupBlockAddedMock).not.toHaveBeenCalled();
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
@@ -387,11 +401,7 @@ describe('tenant suspension actions', () => {
     it('refuses without suspending when the owner has no email on record', async () => {
       getTenantOwnerEmailMock.mockResolvedValue(undefined);
 
-      const result = await suspendTenantAction(
-        ACTIVE_TENANT.id,
-        MOCK_SUSPENSION_CASE,
-        OWNER_BLOCK,
-      );
+      const result = await suspendWithBlock();
 
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.REFUSED,
@@ -406,11 +416,7 @@ describe('tenant suspension actions', () => {
         errorResult(ERROR_CODE.DB_INVALID_EMAIL),
       );
 
-      const result = await suspendTenantAction(
-        ACTIVE_TENANT.id,
-        MOCK_SUSPENSION_CASE,
-        OWNER_BLOCK,
-      );
+      const result = await suspendWithBlock();
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
       expect(setTenantSuspensionMock).not.toHaveBeenCalled();
@@ -420,11 +426,7 @@ describe('tenant suspension actions', () => {
     it('blocks nothing for an unknown tenant', async () => {
       getTenantByIdMock.mockResolvedValue(undefined);
 
-      await suspendTenantAction(
-        ACTIVE_TENANT.id,
-        MOCK_SUSPENSION_CASE,
-        OWNER_BLOCK,
-      );
+      await suspendWithBlock();
 
       expect(saveSignupBlockMock).not.toHaveBeenCalled();
     });
@@ -449,11 +451,7 @@ describe('tenant suspension actions', () => {
         async (_, failSuspension, expected) => {
           failSuspension();
 
-          const result = await suspendTenantAction(
-            ACTIVE_TENANT.id,
-            MOCK_SUSPENSION_CASE,
-            OWNER_BLOCK,
-          );
+          const result = await suspendWithBlock();
 
           expect(result).toEqual(expected);
           expect(removeBlockedIdentityMock).toHaveBeenCalledWith(
@@ -467,11 +465,7 @@ describe('tenant suspension actions', () => {
       it('keeps the block and audits it once when only the cache purge fails', async () => {
         revalidateSiteConfigMock.mockRejectedValue(MOCK_CACHE_ERROR);
 
-        const result = await suspendTenantAction(
-          ACTIVE_TENANT.id,
-          MOCK_SUSPENSION_CASE,
-          OWNER_BLOCK,
-        );
+        const result = await suspendWithBlock();
 
         expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
         expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
@@ -490,11 +484,7 @@ describe('tenant suspension actions', () => {
           errorResult(ERROR_CODE.DB_NOT_FOUND),
         );
 
-        await suspendTenantAction(
-          ACTIVE_TENANT.id,
-          MOCK_SUSPENSION_CASE,
-          OWNER_BLOCK,
-        );
+        await suspendWithBlock();
 
         expect(removeBlockedIdentityMock).not.toHaveBeenCalled();
       });
@@ -521,11 +511,7 @@ describe('tenant suspension actions', () => {
           );
           failUndo();
 
-          const result = await suspendTenantAction(
-            ACTIVE_TENANT.id,
-            MOCK_SUSPENSION_CASE,
-            OWNER_BLOCK,
-          );
+          const result = await suspendWithBlock();
           const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
 
           expect(result).toEqual({
@@ -545,7 +531,7 @@ describe('tenant suspension actions', () => {
     it('opens the case as the suspending admin and emails the owner', async () => {
       requireSuperAdminMock.mockResolvedValue(MOCK_SUPER_ADMIN);
 
-      await suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE);
+      await suspend();
 
       expect(openTenantSuspensionMock).toHaveBeenCalledWith({
         tenantId: ACTIVE_TENANT.id,
@@ -608,7 +594,7 @@ describe('tenant suspension actions', () => {
       async (_, failSuspension) => {
         failSuspension();
 
-        await suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE);
+        await suspend();
 
         expect(discardTenantSuspensionMock).toHaveBeenCalledWith(
           OPENED_CASE.id,
@@ -620,7 +606,7 @@ describe('tenant suspension actions', () => {
     it('keeps the case when only the cache purge fails', async () => {
       revalidateSiteConfigMock.mockRejectedValue(MOCK_CACHE_ERROR);
 
-      await suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE);
+      await suspend();
 
       expect(discardTenantSuspensionMock).not.toHaveBeenCalled();
     });
@@ -628,38 +614,9 @@ describe('tenant suspension actions', () => {
     it('opens no case and emails nobody for the platform tenant', async () => {
       resolveIsPlatformTenantMock.mockResolvedValue(true);
 
-      await suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE);
+      await suspend();
 
       expect(openTenantSuspensionMock).not.toHaveBeenCalled();
-      expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
-    });
-
-    it('closes the case as the lifting admin, audits its reference and emails the owner', async () => {
-      requireSuperAdminMock.mockResolvedValue(MOCK_SUPER_ADMIN);
-      getTenantByIdMock.mockResolvedValue(SUSPENDED_TENANT);
-      closeTenantSuspensionMock.mockResolvedValue(OPENED_CASE);
-
-      await liftTenantSuspensionAction(ACTIVE_TENANT.id);
-
-      expect(closeTenantSuspensionMock).toHaveBeenCalledWith(
-        ACTIVE_TENANT.id,
-        MOCK_SUPER_ADMIN.id,
-      );
-      expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual(
-        expect.objectContaining({ details: CASE_DETAILS }),
-      );
-      expect(notifyOwnerOfSuspensionMock).toHaveBeenCalledWith(
-        SUSPENDED_TENANT,
-        OPENED_CASE,
-        TENANT_STATUS.ACTIVE,
-      );
-    });
-
-    it('emails nobody when the lifted suspension had no case', async () => {
-      getTenantByIdMock.mockResolvedValue(SUSPENDED_TENANT);
-
-      await liftTenantSuspensionAction(ACTIVE_TENANT.id);
-
       expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
     });
   });

@@ -42,21 +42,23 @@ describe(`<${OptionSelect.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('names the trigger by its aria label and shows the selected option', () => {
-    setup();
+  it.each([
+    ['the selected option', {}, MOCK_FIRST_LABEL],
+    [
+      'the placeholder while no option is selected',
+      { value: '', placeholder: MOCK_PLACEHOLDER },
+      MOCK_PLACEHOLDER,
+    ],
+  ])(
+    'names the trigger by its aria label and shows %s',
+    (_, overrides, shownText) => {
+      setup(overrides);
 
-    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+      const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
 
-    expect(trigger).toHaveTextContent(MOCK_FIRST_LABEL);
-  });
-
-  it('shows the placeholder while no option is selected', () => {
-    setup({ value: '', placeholder: MOCK_PLACEHOLDER });
-
-    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
-
-    expect(trigger).toHaveTextContent(MOCK_PLACEHOLDER);
-  });
+      expect(trigger).toHaveTextContent(shownText);
+    },
+  );
 
   it('reports the option chosen from the list', async () => {
     const onChange = vi.fn();
@@ -110,35 +112,41 @@ describe(`<${OptionSelect.name}/>`, () => {
       expect(trigger).toHaveAccessibleDescription(MOCK_BADGE);
     });
 
-    it('stays in the Tab order and announces disabled', async () => {
-      await user.tab();
-      const trigger = screen.getByRole('combobox');
+    const expectClosedAndUnchanged = () => {
+      const listbox = screen.queryByRole('listbox');
 
-      expect(trigger).toHaveFocus();
-      expect(trigger).toHaveAttribute('aria-disabled', 'true');
-      expect(trigger).toBeEnabled();
-    });
+      expect(listbox).not.toBeInTheDocument();
+      expect(onChange).not.toHaveBeenCalled();
+    };
 
     it('does not open on click', async () => {
       const trigger = screen.getByRole('combobox');
       await user.click(trigger);
 
-      const listbox = screen.queryByRole('listbox');
-
-      expect(listbox).not.toBeInTheDocument();
+      expectClosedAndUnchanged();
     });
 
-    it.each(['{Enter}', KEY.SPACE, '{ArrowDown}', '{ArrowUp}'])(
-      'does not open or change on %s',
-      async (key) => {
+    describe('focused by Tab', () => {
+      beforeEach(async () => {
         await user.tab();
-        await user.keyboard(key);
+      });
 
-        const listbox = screen.queryByRole('listbox');
+      it('stays in the Tab order and announces disabled', () => {
+        const trigger = screen.getByRole('combobox');
 
-        expect(listbox).not.toBeInTheDocument();
-        expect(onChange).not.toHaveBeenCalled();
-      },
-    );
+        expect(trigger).toHaveFocus();
+        expect(trigger).toHaveAttribute('aria-disabled', 'true');
+        expect(trigger).toBeEnabled();
+      });
+
+      it.each(['{Enter}', KEY.SPACE, '{ArrowDown}', '{ArrowUp}'])(
+        'does not open or change on %s',
+        async (key) => {
+          await user.keyboard(key);
+
+          expectClosedAndUnchanged();
+        },
+      );
+    });
   });
 });

@@ -65,6 +65,18 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
     const findConfirmButton = () =>
       screen.findByRole('button', { name: ACTIVE.confirmButton });
 
+    const confirm = async () => {
+      const confirmButton = await findConfirmButton();
+      await user.click(confirmButton);
+    };
+
+    const expectRefusal = async (message: string) => {
+      const refusal = await screen.findByText(message);
+
+      expect(refusal).toBeVisible();
+      expect(refreshMock).not.toHaveBeenCalled();
+    };
+
     const chooseToBlockOwner = async () => {
       const blockSwitch = await screen.findByRole('switch', {
         name: blockOwner.switchLabel,
@@ -122,8 +134,7 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       expect(suspendTenantActionMock).not.toHaveBeenCalled();
 
       await fillSuspensionCase();
-      const confirmButton = await findConfirmButton();
-      await user.click(confirmButton);
+      await confirm();
 
       expect(suspendTenantActionMock).toHaveBeenCalledWith(
         ACTIVE_TENANT.id,
@@ -132,22 +143,6 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       );
       expect(liftTenantSuspensionActionMock).not.toHaveBeenCalled();
       expect(refreshMock).toHaveBeenCalled();
-    });
-
-    it('keeps the dialog open with the refusal for a tenant archived meanwhile', async () => {
-      suspendTenantActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.ARCHIVED,
-      });
-
-      await fillSuspensionCase();
-      const confirmButton = await findConfirmButton();
-      await user.click(confirmButton);
-
-      const refusal = await screen.findByText(tenantLifecycleErrors.archived);
-
-      expect(refusal).toBeVisible();
-      expect(refreshMock).not.toHaveBeenCalled();
     });
 
     it.each([
@@ -162,48 +157,60 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       expect(confirmButton).toBeDisabled();
     });
 
-    it('also blocks the owner email with the entered reason when chosen', async () => {
-      await fillSuspensionCase();
-      await chooseToBlockOwner();
-      await enterBlockReason();
-
-      const confirmButton = await findConfirmButton();
-      await user.click(confirmButton);
-
-      expect(suspendTenantActionMock).toHaveBeenCalledWith(
-        ACTIVE_TENANT.id,
-        MOCK_SUSPENSION_CASE,
-        { reason: MOCK_BLOCK_REASON },
-      );
-    });
-
-    it('cannot confirm a block until a reason is entered', async () => {
-      await fillSuspensionCase();
-      await chooseToBlockOwner();
-
-      const confirmButton = await findConfirmButton();
-
-      expect(confirmButton).toBeDisabled();
-    });
-
-    it('keeps the dialog open with the refusal when the owner has no email on record', async () => {
-      suspendTenantActionMock.mockResolvedValue({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN,
+    describe('with the case filled in', () => {
+      beforeEach(async () => {
+        await fillSuspensionCase();
       });
 
-      await fillSuspensionCase();
-      await chooseToBlockOwner();
-      await enterBlockReason();
-      const confirmButton = await findConfirmButton();
-      await user.click(confirmButton);
+      it('keeps the dialog open with the refusal for a tenant archived meanwhile', async () => {
+        suspendTenantActionMock.mockResolvedValue({
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: TENANT_REFUSAL.ARCHIVED,
+        });
 
-      const refusal = await screen.findByText(
-        tenantLifecycleErrors.ownerEmailUnknown,
-      );
+        await confirm();
 
-      expect(refusal).toBeVisible();
-      expect(refreshMock).not.toHaveBeenCalled();
+        await expectRefusal(tenantLifecycleErrors.archived);
+      });
+
+      describe('and the owner block chosen', () => {
+        beforeEach(async () => {
+          await chooseToBlockOwner();
+        });
+
+        it('cannot confirm until a reason is entered', async () => {
+          const confirmButton = await findConfirmButton();
+
+          expect(confirmButton).toBeDisabled();
+        });
+
+        describe('and a reason entered', () => {
+          beforeEach(async () => {
+            await enterBlockReason();
+          });
+
+          it('also blocks the owner email with the entered reason', async () => {
+            await confirm();
+
+            expect(suspendTenantActionMock).toHaveBeenCalledWith(
+              ACTIVE_TENANT.id,
+              MOCK_SUSPENSION_CASE,
+              { reason: MOCK_BLOCK_REASON },
+            );
+          });
+
+          it('keeps the dialog open with the refusal when the owner has no email on record', async () => {
+            suspendTenantActionMock.mockResolvedValue({
+              outcome: ACTION_OUTCOME.REFUSED,
+              reason: TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN,
+            });
+
+            await confirm();
+
+            await expectRefusal(tenantLifecycleErrors.ownerEmailUnknown);
+          });
+        });
+      });
     });
   });
 
@@ -222,6 +229,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
   });
 
   describe('a suspended tenant with the reactivate dialog open', () => {
+    let confirmButton: HTMLElement;
+
     beforeEach(async () => {
       setup({ tenant: SUSPENDED_TENANT });
 
@@ -229,12 +238,12 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
         name: SUSPENDED.triggerButton,
       });
       await user.click(openDialog);
+      confirmButton = await screen.findByRole('button', {
+        name: SUSPENDED.confirmButton,
+      });
     });
 
     it('reactivates the tenant', async () => {
-      const confirmButton = await screen.findByRole('button', {
-        name: SUSPENDED.confirmButton,
-      });
       await user.click(confirmButton);
 
       expect(liftTenantSuspensionActionMock).toHaveBeenCalledWith(
@@ -244,9 +253,7 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       expect(refreshMock).toHaveBeenCalled();
     });
 
-    it('offers no block choice', async () => {
-      await screen.findByRole('button', { name: SUSPENDED.confirmButton });
-
+    it('offers no block choice', () => {
       const blockSwitch = screen.queryByRole('switch', {
         name: blockOwner.switchLabel,
       });

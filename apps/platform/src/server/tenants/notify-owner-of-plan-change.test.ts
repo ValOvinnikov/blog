@@ -48,6 +48,9 @@ const sendEmailMock = vi.mocked(sendEmail);
 
 const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
 
+const notifyDowngrade = () =>
+  notifyOwnerOfPlanChange(MOCK_TENANT_ID, TENANT_PLAN.GROWTH, TENANT_PLAN.FREE);
+
 describe(notifyOwnerOfPlanChange, () => {
   beforeEach(() => {
     mockedEnv.OWNER_EMAIL_FROM_ADDRESS = MOCK_OWNER_EMAIL_FROM_ADDRESS;
@@ -59,18 +62,30 @@ describe(notifyOwnerOfPlanChange, () => {
     vi.mocked(logger.error).mockReset();
   });
 
-  it('emails the owner the downgrade notice when the plan moves to Free', async () => {
-    await notifyOwnerOfPlanChange(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      TENANT_PLAN.FREE,
-    );
+  describe('a move to Free', () => {
+    beforeEach(async () => {
+      await notifyDowngrade();
+    });
 
-    expect(sendEmailMock).toHaveBeenCalledOnce();
-    expect(sentEmail()).toMatchObject({
-      to: MOCK_OWNER_EMAIL,
-      from: MOCK_OWNER_EMAIL_FROM_ADDRESS,
-      subject: enMessages.ownerPlanChangeEmail.FREE.subject,
+    it('emails the owner the downgrade notice', () => {
+      expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(sentEmail()).toMatchObject({
+        to: MOCK_OWNER_EMAIL,
+        from: MOCK_OWNER_EMAIL_FROM_ADDRESS,
+        subject: enMessages.ownerPlanChangeEmail.FREE.subject,
+      });
+    });
+
+    it('names the site and links to its dashboard', () => {
+      const text = sentEmail()?.text;
+
+      expect(text).toContain(MOCK_TENANT_NAME);
+      expect(text).toContain(
+        new URL(
+          adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
+          MOCK_PLATFORM_APP_BASE_URL,
+        ).toString(),
+      );
     });
   });
 
@@ -91,42 +106,17 @@ describe(notifyOwnerOfPlanChange, () => {
       mockTenant({ locale: LOCALE_ISO_CODES.NL }),
     );
 
-    await notifyOwnerOfPlanChange(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      TENANT_PLAN.FREE,
-    );
+    await notifyDowngrade();
 
     expect(sentEmail()?.subject).toBe(
       nlMessages.ownerPlanChangeEmail.FREE.subject,
     );
   });
 
-  it('names the site and links to its dashboard', async () => {
-    await notifyOwnerOfPlanChange(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      TENANT_PLAN.FREE,
-    );
-
-    const text = sentEmail()?.text;
-    expect(text).toContain(MOCK_TENANT_NAME);
-    expect(text).toContain(
-      new URL(
-        adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
-        MOCK_PLATFORM_APP_BASE_URL,
-      ).toString(),
-    );
-  });
-
   it('emails an owner who has not joined yet at the invited address', async () => {
     getTenantOwnerEmailMock.mockResolvedValue(MOCK_INVITED_OWNER_EMAIL);
 
-    await notifyOwnerOfPlanChange(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      TENANT_PLAN.FREE,
-    );
+    await notifyDowngrade();
 
     expect(sentEmail()?.to).toBe(MOCK_INVITED_OWNER_EMAIL);
   });
@@ -141,48 +131,34 @@ describe(notifyOwnerOfPlanChange, () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('skips and logs when the tenant has no owner address', async () => {
-    getTenantOwnerEmailMock.mockResolvedValue(undefined);
-
-    await notifyOwnerOfPlanChange(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      TENANT_PLAN.FREE,
-    );
-
-    expect(sendEmailMock).not.toHaveBeenCalled();
-    expect(logger.warn).toHaveBeenCalledWith(
+  it.each([
+    [
+      'the tenant has no owner address',
+      () => getTenantOwnerEmailMock.mockResolvedValue(undefined),
       TENANT_LOG.PLAN_CHANGE_EMAIL_OWNER_MISSING,
-      { tenantId: MOCK_TENANT_ID },
-    );
-  });
+    ],
+    [
+      'no owner sender address is set',
+      () => {
+        mockedEnv.OWNER_EMAIL_FROM_ADDRESS = undefined;
+      },
+      TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED,
+    ],
+  ])('skips and logs when %s', async (_, misconfigure, logEvent) => {
+    misconfigure();
 
-  it('skips and logs while no owner sender address is set', async () => {
-    mockedEnv.OWNER_EMAIL_FROM_ADDRESS = undefined;
-
-    await notifyOwnerOfPlanChange(
-      MOCK_TENANT_ID,
-      TENANT_PLAN.GROWTH,
-      TENANT_PLAN.FREE,
-    );
+    await notifyDowngrade();
 
     expect(sendEmailMock).not.toHaveBeenCalled();
-    expect(logger.warn).toHaveBeenCalledWith(
-      TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED,
-      { tenantId: MOCK_TENANT_ID },
-    );
+    expect(logger.warn).toHaveBeenCalledWith(logEvent, {
+      tenantId: MOCK_TENANT_ID,
+    });
   });
 
   it('logs a failed send without throwing', async () => {
     sendEmailMock.mockRejectedValue(MOCK_OWNER_EMAIL_SEND_ERROR);
 
-    await expect(
-      notifyOwnerOfPlanChange(
-        MOCK_TENANT_ID,
-        TENANT_PLAN.GROWTH,
-        TENANT_PLAN.FREE,
-      ),
-    ).resolves.toBeUndefined();
+    await expect(notifyDowngrade()).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
       TENANT_LOG.PLAN_CHANGE_EMAIL_FAILED,
       expect.objectContaining({

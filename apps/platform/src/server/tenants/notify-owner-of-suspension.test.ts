@@ -59,6 +59,9 @@ const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
 const withReference = (subject: string) =>
   subject.replace('{reference}', MOCK_SUSPENSION_REFERENCE);
 
+const notifySuspended = () =>
+  notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
+
 describe(notifyOwnerOfSuspension, () => {
   beforeEach(() => {
     mockedEnv.OWNER_EMAIL_FROM_ADDRESS = MOCK_OWNER_EMAIL_FROM_ADDRESS;
@@ -70,25 +73,41 @@ describe(notifyOwnerOfSuspension, () => {
     vi.mocked(logger.error).mockReset();
   });
 
-  it('emails the owner the suspension with its reference, reason and how to contest it', async () => {
-    await notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
-
-    const email = sentEmail();
-    expect(sendEmailMock).toHaveBeenCalledOnce();
-    expect(email).toMatchObject({
-      to: MOCK_OWNER_EMAIL,
-      from: MOCK_OWNER_EMAIL_FROM_ADDRESS,
-      replyTo: MOCK_REPLY_TO_ADDRESS,
-      subject: withReference(enMessages.ownerSuspensionEmail.SUSPENDED.subject),
+  describe('a suspension with everything configured', () => {
+    beforeEach(async () => {
+      await notifySuspended();
     });
-    expect(email?.text).toContain(MOCK_TENANT_NAME);
-    expect(email?.text).toContain(
-      enMessages.suspensionCategory[SUSPENSION.category],
-    );
-    expect(email?.text).toContain(MOCK_SUSPENSION_DESCRIPTION);
-    expect(email?.text).toContain(
-      withReference(enMessages.ownerSuspensionEmail.SUSPENDED.contest),
-    );
+
+    it('emails the owner the reference, reason and how to contest it', () => {
+      const email = sentEmail();
+
+      expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(email).toMatchObject({
+        to: MOCK_OWNER_EMAIL,
+        from: MOCK_OWNER_EMAIL_FROM_ADDRESS,
+        replyTo: MOCK_REPLY_TO_ADDRESS,
+        subject: withReference(
+          enMessages.ownerSuspensionEmail.SUSPENDED.subject,
+        ),
+      });
+      expect(email?.text).toContain(MOCK_TENANT_NAME);
+      expect(email?.text).toContain(
+        enMessages.suspensionCategory[SUSPENSION.category],
+      );
+      expect(email?.text).toContain(MOCK_SUSPENSION_DESCRIPTION);
+      expect(email?.text).toContain(
+        withReference(enMessages.ownerSuspensionEmail.SUSPENDED.contest),
+      );
+    });
+
+    it('links to the site’s dashboard', () => {
+      expect(sentEmail()?.text).toContain(
+        new URL(
+          adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
+          MOCK_PLATFORM_APP_BASE_URL,
+        ).toString(),
+      );
+    });
   });
 
   it('emails the owner that the site is back online under the same reference', async () => {
@@ -111,21 +130,10 @@ describe(notifyOwnerOfSuspension, () => {
     );
   });
 
-  it('links to the site’s dashboard', async () => {
-    await notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
-
-    expect(sentEmail()?.text).toContain(
-      new URL(
-        adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
-        MOCK_PLATFORM_APP_BASE_URL,
-      ).toString(),
-    );
-  });
-
   it('emails an owner who has not joined yet at the invited address', async () => {
     getTenantOwnerEmailMock.mockResolvedValue(MOCK_INVITED_OWNER_EMAIL);
 
-    await notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
+    await notifySuspended();
 
     expect(sentEmail()?.to).toBe(MOCK_INVITED_OWNER_EMAIL);
   });
@@ -133,7 +141,7 @@ describe(notifyOwnerOfSuspension, () => {
   it('sends without the reply line and logs while no support address is set', async () => {
     mockedEnv.SUPPORT_REPLY_TO_ADDRESS = undefined;
 
-    await notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
+    await notifySuspended();
 
     const email = sentEmail();
     expect(email?.replyTo).toBeUndefined();
@@ -146,36 +154,34 @@ describe(notifyOwnerOfSuspension, () => {
     );
   });
 
-  it('skips and logs when the tenant has no owner address', async () => {
-    getTenantOwnerEmailMock.mockResolvedValue(undefined);
-
-    await notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
-
-    expect(sendEmailMock).not.toHaveBeenCalled();
-    expect(logger.warn).toHaveBeenCalledWith(
+  it.each([
+    [
+      'the tenant has no owner address',
+      () => getTenantOwnerEmailMock.mockResolvedValue(undefined),
       TENANT_LOG.SUSPENSION_EMAIL_OWNER_MISSING,
-      { tenantId: MOCK_TENANT_ID },
-    );
-  });
+    ],
+    [
+      'no owner sender address is set',
+      () => {
+        mockedEnv.OWNER_EMAIL_FROM_ADDRESS = undefined;
+      },
+      TENANT_LOG.SUSPENSION_EMAIL_UNCONFIGURED,
+    ],
+  ])('skips and logs when %s', async (_, misconfigure, logEvent) => {
+    misconfigure();
 
-  it('skips and logs while no owner sender address is set', async () => {
-    mockedEnv.OWNER_EMAIL_FROM_ADDRESS = undefined;
-
-    await notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED);
+    await notifySuspended();
 
     expect(sendEmailMock).not.toHaveBeenCalled();
-    expect(logger.warn).toHaveBeenCalledWith(
-      TENANT_LOG.SUSPENSION_EMAIL_UNCONFIGURED,
-      { tenantId: MOCK_TENANT_ID },
-    );
+    expect(logger.warn).toHaveBeenCalledWith(logEvent, {
+      tenantId: MOCK_TENANT_ID,
+    });
   });
 
   it('logs a failed send without throwing', async () => {
     sendEmailMock.mockRejectedValue(MOCK_OWNER_EMAIL_SEND_ERROR);
 
-    await expect(
-      notifyOwnerOfSuspension(TENANT, SUSPENSION, TENANT_STATUS.SUSPENDED),
-    ).resolves.toBeUndefined();
+    await expect(notifySuspended()).resolves.toBeUndefined();
     expect(logger.error).toHaveBeenCalledWith(
       TENANT_LOG.SUSPENSION_EMAIL_FAILED,
       expect.objectContaining({

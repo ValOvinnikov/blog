@@ -17,9 +17,11 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 
 let suspendedBy: string;
+let tenantId: string;
 
 beforeEach(async () => {
   ({ id: suspendedBy } = await insertTestAdmin(db()));
+  ({ id: tenantId } = await insertTestTenant(db()));
 });
 
 afterEach(async () => {
@@ -29,9 +31,9 @@ afterEach(async () => {
   await db().delete(schema.users);
 });
 
-async function openFor(tenantId: string) {
+async function openFor(caseTenantId: string) {
   return openTenantSuspension({
-    tenantId,
+    tenantId: caseTenantId,
     category: SUSPENSION_CATEGORY.TERMS_VIOLATION,
     description: MOCK_SUSPENSION_DESCRIPTION,
     suspendedBy,
@@ -40,8 +42,6 @@ async function openFor(tenantId: string) {
 
 describe(openTenantSuspension, () => {
   it('opens a case under a SUS- reference', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
-
     const suspension = await openFor(tenantId);
 
     expect(suspension).toMatchObject({
@@ -55,11 +55,10 @@ describe(openTenantSuspension, () => {
   });
 
   it('numbers references sequentially across tenants', async () => {
-    const first = await insertTestTenant(db());
-    const second = await insertTestTenant(db());
+    const other = await insertTestTenant(db());
 
-    const firstCase = await openFor(first.id);
-    const secondCase = await openFor(second.id);
+    const firstCase = await openFor(tenantId);
+    const secondCase = await openFor(other.id);
 
     expect(toReferenceNumber(secondCase)).toBe(
       toReferenceNumber(firstCase) + 1,
@@ -67,7 +66,6 @@ describe(openTenantSuspension, () => {
   });
 
   it('gives a second suspension of the same tenant a new reference', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     const earlier = await insertTestTenantSuspension(db(), tenantId, {
       liftedAt: new Date(),
     });
@@ -78,7 +76,6 @@ describe(openTenantSuspension, () => {
   });
 
   it('refuses a second open case for the same tenant', async () => {
-    const { id: tenantId } = await insertTestTenant(db());
     await openFor(tenantId);
 
     await expect(openFor(tenantId)).rejects.toThrow();
