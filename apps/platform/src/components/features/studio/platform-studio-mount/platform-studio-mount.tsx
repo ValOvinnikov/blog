@@ -5,9 +5,11 @@ import { setPersistentCookie } from '@platform/utils/persistent-cookie/persisten
 import { studioEnteredCookie } from '@platform/utils/studio-entered-cookie/studio-entered-cookie';
 import { useRouter } from 'next/navigation';
 
+import { type TStudioSchemeProps, useStudioScheme } from './use-studio-scheme';
+
 export type TPlatformStudioMountProps = Omit<
   TStudioMountProps,
-  'onSignedIn'
+  'onSignedIn' | keyof TStudioSchemeProps
 > & {
   firstEntryTenantId?: string;
 };
@@ -18,6 +20,7 @@ export const PlatformStudioMount = ({
   ...studioMountProps
 }: TPlatformStudioMountProps) => {
   const router = useRouter();
+  const studioScheme = useStudioScheme();
 
   const recordFirstEntry = (tenantId: string) => () => {
     setPersistentCookie(studioEnteredCookie(tenantId), String(true));
@@ -27,6 +30,7 @@ export const PlatformStudioMount = ({
   return (
     <StudioMount
       {...studioMountProps}
+      {...studioScheme}
       onSignedIn={
         firstEntryTenantId ? recordFirstEntry(firstEntryTenantId) : undefined
       }

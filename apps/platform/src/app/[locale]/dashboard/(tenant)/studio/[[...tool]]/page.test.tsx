@@ -116,17 +116,19 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: MOCK_SANITY_PROJECT_ID,
-      dataset: tenant.sanityDataset,
-      basePath: adminRoutes.dashboardStudio(),
-      title: MOCK_TENANT_NAME,
-      enabledCapabilities: [],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: tenant.locale,
-      liveLocales: [],
-      loginProvider: undefined,
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: MOCK_SANITY_PROJECT_ID,
+        dataset: tenant.sanityDataset,
+        basePath: adminRoutes.dashboardStudio(),
+        title: MOCK_TENANT_NAME,
+        enabledCapabilities: [],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: tenant.locale,
+        liveLocales: [],
+        loginProvider: undefined,
+      }),
+    );
   });
 
   it("explains the owner's pending Studio access and leaves Studio unmounted", async () => {
@@ -147,18 +149,20 @@ describe(`<${DashboardStudioPage.name}/>`, () => {
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: MOCK_SANITY_PROJECT_ID,
-      dataset: tenant.sanityDataset,
-      basePath: adminRoutes.dashboardStudio(),
-      title: MOCK_TENANT_NAME,
-      enabledCapabilities: [],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: tenant.locale,
-      liveLocales: [],
-      loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
-      onSignedIn: expect.any(Function),
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: MOCK_SANITY_PROJECT_ID,
+        dataset: tenant.sanityDataset,
+        basePath: adminRoutes.dashboardStudio(),
+        title: MOCK_TENANT_NAME,
+        enabledCapabilities: [],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: tenant.locale,
+        liveLocales: [],
+        loginProvider: SANITY_LOGIN_PROVIDER.GOOGLE,
+        onSignedIn: expect.any(Function),
+      }),
+    );
   });
 
   it("records the owner's first Studio entry for this tenant and refreshes the shell", async () => {
