@@ -5,6 +5,7 @@ import {
   RADIUS_SCALE,
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
@@ -16,6 +17,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
@@ -23,6 +25,7 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPageContent } from './look-page-content';
 
@@ -53,7 +56,10 @@ const tenant = mockReadyTenant();
 const setup = customRenderAsync(LookPageContent, { tenant });
 
 describe(`<${LookPageContent.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     getSiteConfigMock.mockResolvedValue(undefined);
     selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
   });
@@ -78,6 +84,7 @@ describe(`<${LookPageContent.name}/>`, () => {
     );
 
     await setup();
+    await openLookRow(user, LOOK_ROW.COLOUR);
 
     const editorialRadio = screen.getByRole('radio', { name: 'Editorial' });
     const hueValue = screen.getByText(
@@ -97,6 +104,7 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     it("shows and previews the preset's radius on Free", async () => {
       await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
+      await openLookRow(user, LOOK_ROW.SHAPE);
 
       const presetRadius = screen.getByRole('button', {
         name: RADIUS_LABEL.MD,
@@ -109,6 +117,7 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     it('shows and previews the stored radius on Growth', async () => {
       await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
+      await openLookRow(user, LOOK_ROW.SHAPE);
 
       const storedRadius = screen.getByRole('button', {
         name: RADIUS_LABEL.XL,

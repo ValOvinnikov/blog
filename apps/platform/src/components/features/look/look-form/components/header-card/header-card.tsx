@@ -12,6 +12,7 @@ import { useLookFieldLock } from '@platform/components/features/look/look-form/u
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
@@ -41,7 +42,7 @@ export const HeaderCard = () => {
 
   return (
     <LookCard
-      card="header"
+      card={LOOK_ROW.HEADER}
       title={t('headerHeading')}
       description={t('headerDescription')}
     >

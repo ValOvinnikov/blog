@@ -73,7 +73,7 @@
   siblings,
   `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, a
   value compared with an env read, the const files themselves, and
-  `0`/`1`/`-1`. Co-located
+  `0`/`1`/`-1` and the single space `' '`. Co-located
   `prefer-shared-constant.test.js`.
 - `no-duplicate-string.js` — `eslint-plugin-sonarjs`'s `no-duplicate-string`
   with Tailwind class strings (the same positions as above) skipped, plus a

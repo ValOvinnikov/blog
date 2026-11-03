@@ -1,5 +1,7 @@
 import { PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
+import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import {
   brandAssetKindSchema,
   type TBrandAssetKind,
@@ -46,11 +48,16 @@ export const applyPresetDefaults = (
 };
 
 export const CARD_FIELDS = {
-  preset: ['preset'],
-  colour: ['accentHue', 'logoHue'],
-  type: ['headingFont', 'bodyFont'],
-  shape: ['radiusScale', 'density', 'cardStyle', 'headerControlStyle'],
-  header: [
+  [LOOK_CARD.PRESET]: ['preset'],
+  [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue'],
+  [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont'],
+  [LOOK_ROW.SHAPE]: [
+    'radiusScale',
+    'density',
+    'cardStyle',
+    'headerControlStyle',
+  ],
+  [LOOK_ROW.HEADER]: [
     'headerLayout',
     'headerSubmenuStyle',
     'headerBarStyle',
@@ -58,18 +65,16 @@ export const CARD_FIELDS = {
     'accountPanelStyle',
     'accountPhonePlacement',
   ],
-  buttons: ['busyButtonStyle', 'spinnerStyle'],
-  footer: [
+  [LOOK_ROW.BUTTONS]: ['busyButtonStyle', 'spinnerStyle'],
+  [LOOK_ROW.FOOTER]: [
     'footerLayout',
     'footerBackground',
     'footerSurface',
     'cookieSettingsButton',
   ],
-  brand: ['logo', 'favicon'],
-  languageSwitcher: ['languageSwitcherStyle'],
-} as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;
-
-export type TLookCardKey = keyof typeof CARD_FIELDS;
+  [LOOK_ROW.BRAND]: ['logo', 'favicon'],
+  [LOOK_ROW.LANGUAGE_SWITCHER]: ['languageSwitcherStyle'],
+} as const satisfies Record<TLookCard, readonly (keyof TLookFormValues)[]>;
 
 const BRAND_ASSET_KINDS = brandAssetKindSchema.options;
 

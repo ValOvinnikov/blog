@@ -137,27 +137,40 @@ describe(`<${Accordion.name}/>`, () => {
     });
   });
 
-  it('opens a row with the keyboard', async () => {
-    setup();
+  describe('with every row folded', () => {
+    let firstTrigger: HTMLElement;
 
-    await user.tab();
-    await user.keyboard('{Enter}');
-
-    const firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
-
-    expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-  });
-
-  it('puts each row button inside an h3 by default', () => {
-    setup();
-
-    const heading = screen.getByRole('heading', {
-      level: 3,
-      name: MOCK_FIRST_ROW,
+    beforeEach(() => {
+      setup();
+      firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
     });
-    const trigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
 
-    expect(heading).toContainElement(trigger);
+    describe('with focus on the first row', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
+
+      it('opens a row with the keyboard', async () => {
+        await user.keyboard('{Enter}');
+
+        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      });
+
+      it('opens a row with the Space key', async () => {
+        await user.keyboard(KEY.SPACE);
+
+        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      });
+    });
+
+    it('puts each row button inside an h3 by default', () => {
+      const heading = screen.getByRole('heading', {
+        level: 3,
+        name: MOCK_FIRST_ROW,
+      });
+
+      expect(heading).toContainElement(firstTrigger);
+    });
   });
 
   it('puts the row button inside the heading level it is given', () => {
@@ -216,53 +229,63 @@ describe(`<${Accordion.name}/>`, () => {
       secondTrigger = screen.getByRole('button', { name: MOCK_SECOND_ROW });
     });
 
-    it('opens every row the caller opens', async () => {
-      const expandAll = screen.getByRole('button', { name: EXPAND_ALL });
-      await user.click(expandAll);
-
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('folds only the row folded by hand', async () => {
-      const expandAll = screen.getByRole('button', { name: EXPAND_ALL });
-      await user.click(expandAll);
-      await user.click(firstTrigger);
-
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('keeps an open row open when another one opens', async () => {
-      await user.click(firstTrigger);
-      await user.click(secondTrigger);
-
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('toggles a row with the Space key', async () => {
-      firstTrigger.focus();
-      await user.keyboard(KEY.SPACE);
-
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('names the body a row button controls', async () => {
-      await user.click(firstTrigger);
-
-      const heading = screen.getByRole('heading', {
-        level: 3,
-        name: new RegExp(MOCK_FIRST_ROW),
+    describe('with every row expanded by the caller', () => {
+      beforeEach(async () => {
+        const expandAll = screen.getByRole('button', { name: EXPAND_ALL });
+        await user.click(expandAll);
       });
+
+      it('opens every row the caller opens', () => {
+        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      });
+
+      it('folds only the row folded by hand', async () => {
+        await user.click(firstTrigger);
+
+        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      });
+    });
+
+    describe('with the first row opened by hand', () => {
+      beforeEach(async () => {
+        await user.click(firstTrigger);
+      });
+
+      it('keeps an open row open when another one opens', async () => {
+        await user.click(secondTrigger);
+
+        expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      });
+
+      it('names the body a row button controls', () => {
+        const heading = screen.getByRole('heading', {
+          level: 3,
+          name: new RegExp(MOCK_FIRST_ROW),
+        });
+        const body = screen.getByText(MOCK_FIRST_BODY);
+
+        expect(heading).toContainElement(firstTrigger);
+        expect(firstTrigger.getAttribute('aria-controls')).toBeTruthy();
+        expect(body).toBeVisible();
+      });
+
+      it('drops the summary while open and keeps the trailing node', () => {
+        const mark = screen.queryByTestId(SUMMARY_MARK_TEST_ID);
+
+        expect(firstTrigger).not.toHaveTextContent(MOCK_SUMMARY);
+        expect(firstTrigger).toHaveTextContent(MOCK_TRAILING);
+        expect(mark).not.toBeInTheDocument();
+      });
+    });
+
+    it('keeps a folded row body mounted but hidden', () => {
       const body = screen.getByText(MOCK_FIRST_BODY);
 
-      expect(heading).toContainElement(firstTrigger);
-      expect(firstTrigger).toHaveAttribute(
-        'aria-controls',
-        expect.stringMatching(/.+/),
-      );
-      expect(body).toBeVisible();
+      expect(body).toBeInTheDocument();
+      expect(body).not.toBeVisible();
     });
 
     it('shows the summary, its mark and the trailing node while folded', () => {
@@ -271,16 +294,6 @@ describe(`<${Accordion.name}/>`, () => {
       expect(firstTrigger).toHaveTextContent(MOCK_SUMMARY);
       expect(firstTrigger).toHaveTextContent(MOCK_TRAILING);
       expect(firstTrigger).toContainElement(mark);
-    });
-
-    it('drops the summary while open and keeps the trailing node', async () => {
-      await user.click(firstTrigger);
-
-      const mark = screen.queryByTestId(SUMMARY_MARK_TEST_ID);
-
-      expect(firstTrigger).not.toHaveTextContent(MOCK_SUMMARY);
-      expect(firstTrigger).toHaveTextContent(MOCK_TRAILING);
-      expect(mark).not.toBeInTheDocument();
     });
 
     it('opens a row from code and moves focus to its button', async () => {

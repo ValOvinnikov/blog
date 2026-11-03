@@ -713,7 +713,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   ("Never assert the source back at itself"). Exempt: generated Sanity types,
   Sanity migrations, a Sanity `_type` value and a literal type (the
   generated types already check both), Tailwind class strings, import paths, directives,
-  public-site copy (it belongs in the Voice catalog), `0`, `1`, `-1`, and
+  public-site copy (it belongs in the Voice catalog), `0`, `1`, `-1`, the
+  single space `' '` (a separator or a JSX space, never `KEY.SPACE`), and
   vocabulary an outside standard spells — a value compared with an env read
   (`process.env.NODE_ENV === 'production'`), an env read's bracket key
   (`process.env['X']`), a `stubEnv` argument, a protocol attribute's

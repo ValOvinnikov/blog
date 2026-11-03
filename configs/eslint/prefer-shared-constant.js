@@ -25,6 +25,7 @@ const DB_CONSUMERS = new Set([
   'apps/worker',
 ]);
 const EXEMPT_NUMBERS = new Set([0, 1, -1]);
+const EXEMPT_STRINGS = new Set([' ']);
 const COMPARISON_OPERATORS = new Set([
   '===',
   '!==',
@@ -263,7 +264,11 @@ export const createPreferSharedConstantRule = (index) => ({
     };
     return {
       Literal(node) {
-        if (typeof node.value === 'string' && !isExemptString(node)) {
+        if (
+          typeof node.value === 'string' &&
+          !EXEMPT_STRINGS.has(node.value) &&
+          !isExemptString(node)
+        ) {
           report(node, `'${node.value}'`, matches('strings', node.value));
         }
         if (
@@ -277,7 +282,7 @@ export const createPreferSharedConstantRule = (index) => ({
       TemplateLiteral(node) {
         if (node.expressions.length === 0 && !isExemptString(node)) {
           const value = node.quasis[0].value.cooked;
-          if (value !== null) {
+          if (value !== null && !EXEMPT_STRINGS.has(value)) {
             report(node, `'${value}'`, matches('strings', value));
           }
         }

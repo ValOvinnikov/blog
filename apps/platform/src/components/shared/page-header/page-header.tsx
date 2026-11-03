@@ -1,15 +1,16 @@
+import type { IWithClassName } from '@blog/config';
 import { Heading } from '@platform/components/shared/heading';
 import { Text } from '@platform/components/shared/text';
 import type { ReactNode } from 'react';
 
 import { pageHeaderVariants } from './page-header-variants';
 
-export type TPageHeaderProps = {
+export type TPageHeaderProps = IWithClassName & {
   title: ReactNode;
   description?: ReactNode;
   badges?: ReactNode;
   actions?: ReactNode;
-  className?: string;
+  isTitleHiddenBelowLg?: boolean;
 };
 
 export const PageHeader = ({
@@ -17,6 +18,7 @@ export const PageHeader = ({
   description,
   badges,
   actions,
+  isTitleHiddenBelowLg = false,
   className,
 }: TPageHeaderProps) => {
   const {
@@ -25,7 +27,10 @@ export const PageHeader = ({
     titleRow,
     description: descriptionSlot,
     actions: actionsSlot,
-  } = pageHeaderVariants();
+  } = pageHeaderVariants({
+    isTitleHiddenBelowLg,
+    hasActions: Boolean(actions),
+  });
 
   return (
     <div className={root({ class: className })}>

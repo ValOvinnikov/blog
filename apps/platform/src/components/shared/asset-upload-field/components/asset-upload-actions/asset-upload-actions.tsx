@@ -1,6 +1,6 @@
 'use client';
 
-import { SIZE } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
@@ -19,7 +19,7 @@ type TAssetUploadActionsProps = {
   onRemove: () => void;
   id?: string;
   isDisabled: boolean;
-  describedBy: string;
+  describedBy: TMaybeUndefined<string>;
 };
 
 export const AssetUploadActions = ({

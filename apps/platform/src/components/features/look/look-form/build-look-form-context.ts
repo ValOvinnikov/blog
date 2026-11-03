@@ -2,13 +2,13 @@ import { isAccentHueAccessible, type TPresetId } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
 import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
+import type { TLookCard } from '@platform/constants/look-card';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   applyPresetDefaults,
   CARD_FIELDS,
   countChanges,
   isFieldChanged,
-  type TLookCardKey,
 } from '@platform/utils/look-form-values/look-form-values';
 import type { Dispatch, SetStateAction } from 'react';
 
@@ -41,7 +41,7 @@ export const buildLookFormContext = ({
   ...rest,
   values,
   isLocked: (field) => !isLookFieldEntitled(field, plan),
-  hasCardChanges: (card: TLookCardKey) =>
+  hasCardChanges: (card: TLookCard) =>
     CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues)),
   isDivergedFromPreset:
     countChanges(values, applyPresetDefaults(values.preset, values)) > 0,

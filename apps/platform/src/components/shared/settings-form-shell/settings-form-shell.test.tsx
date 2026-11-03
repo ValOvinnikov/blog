@@ -38,6 +38,7 @@ const MOCK_SAVED_VALUES: TValues = {
 const MOCK_DRAFT_TAGLINE = faker.lorem.sentence();
 const MOCK_THEIR_TAGLINE = faker.lorem.sentence();
 const MOCK_TAGLINE_LABEL = faker.lorem.word();
+const MOCK_FOOTER_FIELD_ID = faker.lorem.word();
 const MOCK_FOOTER_LABEL = faker.lorem.words(2);
 const MOCK_PAGE = faker.lorem.word();
 const MOCK_DRAFT_SAVED_AT = new Date('2026-10-08T11:05:00.000Z');
@@ -66,7 +67,11 @@ const draftFor = (
   savedAt: MOCK_DRAFT_SAVED_AT,
   fields: [
     { id: 'tagline', label: MOCK_TAGLINE_LABEL, display: (v) => v.tagline },
-    { id: 'footer', label: MOCK_FOOTER_LABEL, display: (v) => v.footer },
+    {
+      id: MOCK_FOOTER_FIELD_ID,
+      label: MOCK_FOOTER_LABEL,
+      display: (v) => v.footer,
+    },
   ],
   onRestore,
 });
@@ -339,6 +344,23 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     expect(errorAlert).toBeVisible();
   });
 
+  it('keeps the title in the accessibility tree with every layout opt-in', () => {
+    renderShell(
+      {},
+      {
+        layout: {
+          isWide: true,
+          isTitleHiddenBelowLg: true,
+          hasCompactGap: true,
+        },
+      },
+    );
+
+    const heading = screen.getByRole('heading', { level: 1, name: MOCK_TITLE });
+
+    expect(heading).toBeInTheDocument();
+  });
+
   describe('draft recovery', () => {
     afterEach(() => {
       vi.restoreAllMocks();
@@ -354,13 +376,21 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
     const BANNER_TEXT = /You have unsaved changes from/;
     const queryBanner = () => screen.queryByText(BANNER_TEXT);
+    const expectNoBanner = () => {
+      const banner = queryBanner();
+
+      expect(banner).not.toBeInTheDocument();
+    };
+    const expectNoBannerAfterRemount = (unmount: () => void) => {
+      unmount();
+      renderShell();
+      expectNoBanner();
+    };
 
     it('offers no draft on a first visit', () => {
       renderShell();
 
-      const banner = queryBanner();
-
-      expect(banner).not.toBeInTheDocument();
+      expectNoBanner();
     });
 
     describe('after leaving with unsaved changes', () => {
@@ -368,20 +398,36 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         leaveWithUnsavedChanges();
       });
 
-      it('offers to restore the unsaved changes on return', () => {
-        renderShell();
+      describe('on return', () => {
+        let unmount: ReturnType<typeof renderShell>['unmount'];
 
-        const banner = screen.getByText(BANNER_TEXT);
-        const keptNote = screen.getByText(
-          'They were kept on this device when you left the page.',
-        );
-        const restoreButton = screen.getByRole('button', {
-          name: RESTORE_1_CHANGE,
+        beforeEach(() => {
+          ({ unmount } = renderShell());
         });
 
-        expect(banner).toBeVisible();
-        expect(keptNote).toBeVisible();
-        expect(restoreButton).toBeVisible();
+        it('offers to restore the unsaved changes on return', () => {
+          const banner = screen.getByText(BANNER_TEXT);
+          const keptNote = screen.getByText(
+            'They were kept on this device when you left the page.',
+          );
+          const restoreButton = screen.getByRole('button', {
+            name: RESTORE_1_CHANGE,
+          });
+
+          expect(banner).toBeVisible();
+          expect(keptNote).toBeVisible();
+          expect(restoreButton).toBeVisible();
+        });
+
+        it('forgets the draft when it is discarded from the banner', async () => {
+          const discardButton = screen.getByRole('button', {
+            name: 'Discard them',
+          });
+          await user.click(discardButton);
+          expectNoBanner();
+
+          expectNoBannerAfterRemount(unmount);
+        });
       });
 
       it('restores exactly the unsaved changes and closes the banner', async () => {
@@ -400,32 +446,12 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         expect(banner).not.toBeInTheDocument();
       });
 
-      it('forgets the draft when it is discarded from the banner', async () => {
-        const { unmount } = renderShell();
-
-        const discardButton = screen.getByRole('button', {
-          name: 'Discard them',
-        });
-        await user.click(discardButton);
-        const bannerAfterDiscard = queryBanner();
-
-        expect(bannerAfterDiscard).not.toBeInTheDocument();
-
-        unmount();
-        renderShell();
-        const bannerAfterRemount = queryBanner();
-
-        expect(bannerAfterRemount).not.toBeInTheDocument();
-      });
-
       it('offers nothing when the draft matches what is saved now', () => {
         renderShell({
           draft: draftFor(MOCK_EDITED_VALUES, MOCK_EDITED_VALUES),
         });
 
-        const banner = queryBanner();
-
-        expect(banner).not.toBeInTheDocument();
+        expectNoBanner();
       });
 
       it('keeps drafts apart per tenant', () => {
@@ -436,9 +462,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           },
         });
 
-        const banner = queryBanner();
-
-        expect(banner).not.toBeInTheDocument();
+        expectNoBanner();
       });
 
       it('keeps drafts apart per language', () => {
@@ -449,9 +473,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           },
         });
 
-        const banner = queryBanner();
-
-        expect(banner).not.toBeInTheDocument();
+        expectNoBanner();
       });
 
       describe('when someone else saved since', () => {
@@ -515,9 +537,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
             name: 'Discard my draft',
           });
           await user.click(discardDraftButton);
-          const banner = queryBanner();
-
-          expect(banner).not.toBeInTheDocument();
+          expectNoBanner();
           expect(onRestore).not.toHaveBeenCalled();
         });
       });
@@ -539,9 +559,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         await waitFor(() => expect(baseSave).toHaveBeenCalledTimes(1));
         unmount();
         renderShell();
-        const banner = queryBanner();
-
-        expect(banner).not.toBeInTheDocument();
+        expectNoBanner();
       });
 
       it('forgets the draft once the changes are discarded', async () => {
@@ -549,9 +567,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         await user.click(discardButton);
         unmount();
         renderShell();
-        const banner = queryBanner();
-
-        expect(banner).not.toBeInTheDocument();
+        expectNoBanner();
       });
     });
 
@@ -576,9 +592,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
 
       unmount();
       renderShell();
-      const banner = queryBanner();
-
-      expect(banner).not.toBeInTheDocument();
+      expectNoBanner();
     });
   });
 });

@@ -608,6 +608,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
+      },
+      {
+        "ref": "LOOK_CARD.PRESET",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-card",
+        "file": "apps/platform/src/constants/look-card.ts"
       }
     ],
     "BRAILLE": [
@@ -5310,6 +5316,70 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "COLOUR": [
+      {
+        "ref": "LOOK_ROW.COLOUR",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "BRAND": [
+      {
+        "ref": "LOOK_ROW.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "TYPE": [
+      {
+        "ref": "LOOK_ROW.TYPE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "SHAPE": [
+      {
+        "ref": "LOOK_ROW.SHAPE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "BUTTONS": [
+      {
+        "ref": "LOOK_ROW.BUTTONS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "HEADER": [
+      {
+        "ref": "LOOK_ROW.HEADER",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "FOOTER": [
+      {
+        "ref": "LOOK_ROW.FOOTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "LANGUAGE_SWITCHER": [
+      {
+        "ref": "LOOK_ROW.LANGUAGE_SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
     "(width >= 64rem)": [
       {
         "ref": "MEDIA_QUERY.LG_UP",
@@ -7688,6 +7758,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_CLEARANCE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
       }
     ],
     "28": [
@@ -7704,6 +7780,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "64": [
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
       }
     ],
     "100": [
@@ -7864,6 +7948,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "900": [
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
       }
     ],
     "10000": [

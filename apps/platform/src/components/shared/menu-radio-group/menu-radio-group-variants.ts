@@ -7,7 +7,7 @@ export const menuRadioGroupVariants = tv({
       'mb-1 flex flex-col gap-2 border-b border-admin-popover-line px-2 pt-2 pb-2.5',
     ],
     label: [
-      'text-admin-11 leading-[14px] font-bold tracking-[0.09em] text-admin-muted uppercase',
+      'text-admin-11 leading-admin-14 font-bold tracking-[0.09em] text-admin-muted uppercase',
     ],
     track: [
       'flex gap-[3px] rounded-admin-control border border-admin-control-line bg-admin-theme-track p-[3px]',

@@ -14,6 +14,7 @@ import { LookField } from '@platform/components/features/look/look-form/componen
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
 export const ShapeCard = () => {
@@ -54,7 +55,7 @@ export const ShapeCard = () => {
 
   return (
     <LookCard
-      card="shape"
+      card={LOOK_ROW.SHAPE}
       title={t('shapeHeading')}
       description={t('shapeDescription')}
     >

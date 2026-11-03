@@ -2,24 +2,26 @@
 
 import type { TLocaleIsoCode } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
-import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
-import { ButtonsCard } from '@platform/components/features/look/look-form/components/buttons-card';
-import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
-import { FooterCard } from '@platform/components/features/look/look-form/components/footer-card';
-import { HeaderCard } from '@platform/components/features/look/look-form/components/header-card';
-import { LanguageSwitcherCard } from '@platform/components/features/look/look-form/components/language-switcher-card';
-import { PresetCard } from '@platform/components/features/look/look-form/components/preset-card';
-import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';
-import { TypeCard } from '@platform/components/features/look/look-form/components/type-card';
+import { isUndefined } from '@blog/utils/primitives';
+import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
 import { LookPreview } from '@platform/components/features/look/look-preview';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
+import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
+import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import {
+  SITE_PARTS_ROWS,
+  STYLE_ROWS,
+} from '@platform/utils/look-open-rows/look-open-rows';
+import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useTranslations } from 'next-intl';
+import { useRef } from 'react';
 
 import { lookFormVariants } from './look-form-variants';
 import { useLookFormState } from './use-look-form-state';
+import { useLookOpenRows } from './use-look-open-rows';
 
 export type TLookFormProps = {
   tenantId: string;
@@ -34,6 +36,12 @@ export type TLookFormProps = {
   archivedAt?: Date;
 };
 
+const SHELL_LAYOUT = {
+  isWide: true,
+  isTitleHiddenBelowLg: true,
+  hasCompactGap: true,
+};
+
 export const LookForm = ({
   tenantId,
   tenantName,
@@ -46,8 +54,15 @@ export const LookForm = ({
   savedAt,
   archivedAt,
 }: TLookFormProps) => {
-  const { view, tabsProps, panelProps } = useViewTabs();
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const layoutWidth = useElementSize(layoutRef)?.width;
+  const { view, tabsProps, panelProps } = useViewTabs({
+    isTabbed: isUndefined(layoutWidth)
+      ? undefined
+      : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
+  });
   const t = useTranslations('lookForm');
+  const { groupProps, revealRow } = useLookOpenRows();
   const { lookForm, isPending, form } = useLookFormState({
     tenantId,
     tenantName,
@@ -55,49 +70,54 @@ export const LookForm = ({
     plan,
     savedAt,
     archivedAt,
-    revealInvalidField: () => tabsProps.onChange('edit'),
+    revealInvalidField: (row) => {
+      tabsProps.onChange('edit');
+      revealRow(row);
+    },
   });
 
-  const { columns, editPanel, previewPanel } = lookFormVariants();
+  const { layout, columns, editPanel, previewPanel } = lookFormVariants();
 
   return (
     <SettingsFormShell
       title={t('heading')}
       description={t('subtitle')}
       form={form}
-      isWide={true}
+      layout={SHELL_LAYOUT}
     >
-      <ViewTabs {...tabsProps} />
       <LookFormProvider value={lookForm}>
-        <div className={columns()}>
-          <div
-            {...panelProps('edit')}
-            inert={isPending}
-            data-testid="look-form-edit-panel"
-            className={editPanel({ isActive: view === 'edit' })}
-          >
-            <PresetCard />
-            <ColourCard />
-            <TypeCard />
-            <ShapeCard />
-            <HeaderCard />
-            <ButtonsCard />
-            <FooterCard hasCookieBanner={hasCookieBanner} />
-            <BrandCard />
-            <LanguageSwitcherCard
-              hasMultipleLanguages={liveLocales.length > 1}
-            />
-          </div>
+        <div ref={layoutRef} className={layout()}>
+          <ViewTabs
+            {...tabsProps}
+            variant={VIEW_TABS_VARIANT.UNDERLINE}
+            isSticky={true}
+            ariaLabel={t('viewTabsAriaLabel')}
+          />
+          <div className={columns()}>
+            <div
+              {...panelProps('edit')}
+              inert={isPending}
+              data-testid="look-form-edit-panel"
+              className={editPanel({ isActive: view === 'edit' })}
+            >
+              <LookEditCards
+                styleGroup={groupProps(STYLE_ROWS)}
+                sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
+                hasCookieBanner={hasCookieBanner}
+                hasMultipleLanguages={liveLocales.length > 1}
+              />
+            </div>
 
-          <div
-            {...panelProps('preview')}
-            className={previewPanel({ isActive: view === 'preview' })}
-          >
-            <LookPreview
-              liveLocales={liveLocales}
-              hasReaderAccounts={hasReaderAccounts}
-              siteHost={siteHost}
-            />
+            <div
+              {...panelProps('preview')}
+              className={previewPanel({ isActive: view === 'preview' })}
+            >
+              <LookPreview
+                liveLocales={liveLocales}
+                hasReaderAccounts={hasReaderAccounts}
+                siteHost={siteHost}
+              />
+            </div>
           </div>
         </div>
       </LookFormProvider>

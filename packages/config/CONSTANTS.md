@@ -433,6 +433,18 @@ Every key/value const an agent should reuse before writing a literal. The
 - **LEAD_REFUSAL**: `NOT_FOUND`
 - **LEAD_LOG**: `DELETE_FAILED`=`"leads.delete_failed"`, `LOAD_FAILED`=`"leads.load_failed"`, `READ_STATE_FAILED`=`"leads.read_state_failed"`, `PAGE_TITLE_SKIPPED`=`"leads.page_title_skipped"`, `PAGE_TITLE_FAILED`=`"leads.page_title_failed"`, `PAGE_TITLE_ERROR`=`"leads.page_title_error"`
 
+### `@platform/constants/look-card` — `apps/platform/src/constants/look-card.ts`
+
+- **LOOK_CARD**: `PRESET`
+
+### `@platform/constants/look-layout` — `apps/platform/src/constants/look-layout.ts`
+
+- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `DOCKED_SAVE_BAR_HEIGHT`=`64`, `DOCKED_SAVE_BAR_CLEARANCE`=`16`
+
+### `@platform/constants/look-row` — `apps/platform/src/constants/look-row.ts`
+
+- **LOOK_ROW**: `COLOUR`, `BRAND`, `TYPE`, `SHAPE`, `BUTTONS`, `HEADER`, `FOOTER`, `LANGUAGE_SWITCHER`
+
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
 - **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`
