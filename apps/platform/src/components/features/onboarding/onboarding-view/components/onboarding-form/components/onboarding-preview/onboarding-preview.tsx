@@ -45,6 +45,8 @@ export const OnboardingPreview = ({
   const t = useTranslations('onboardingForm');
   const tPreview = useTranslations('previewModeControl');
   const [scale, setScale] = useState(1);
+  const columnRef = useRef<HTMLElement>(null);
+  const columnSize = useElementSize(columnRef);
   const stageRef = useRef<HTMLDivElement>(null);
   const stageSize = useElementSize(stageRef);
   const look = {
@@ -54,12 +56,13 @@ export const OnboardingPreview = ({
   const theme = buildSitePreviewTheme(look, isDark);
   const isAddressOnOwnLine =
     isPhone ||
-    (stageSize?.width ?? Number.POSITIVE_INFINITY) <
-      ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_STAGE_WIDTH;
+    (columnSize?.width ?? Number.POSITIVE_INFINITY) <
+      ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_COLUMN_WIDTH;
   const { section, stage } = onboardingPreviewVariants({ isPhone, isFull });
 
   return (
     <PreviewFrame
+      ref={columnRef}
       ariaLabel={tPreview('livePreviewHeading')}
       className={section()}
     >
