@@ -14,29 +14,12 @@ import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy
 import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
-import { tv } from '@platform/utils/tv/tv';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import { PreviewSiteAddress } from './components/preview-site-address/preview-site-address';
-
-const onboardingPreviewVariants = tv({
-  slots: { section: [], stage: [] },
-  variants: {
-    isPhone: {
-      true: { section: ['gap-2.5'] },
-      false: {},
-    },
-    isFull: {
-      true: {
-        section: ['min-h-0 flex-1'],
-        stage: ['min-h-0 flex-1 overflow-hidden'],
-      },
-      false: {},
-    },
-  },
-});
+import { onboardingPreviewVariants } from './onboarding-preview-variants';
 
 export type TOnboardingPreviewProps = {
   name: string;

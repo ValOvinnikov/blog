@@ -913,6 +913,22 @@ const sampleFrame = (device: TPreviewDevice) =>
     name: tDevice('sampleAtWidth', { width: PREVIEW_DEVICE_WIDTH[device] }),
   });
 
+const pressTabletAndDark = async () => {
+  await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+  const dark = within(previewToolbar()).getByRole('button', MOCK_DARK);
+  await user.click(dark);
+};
+
+const expectTabletAndDark = () => {
+  const dark = within(previewToolbar()).getByRole('button', MOCK_DARK);
+
+  expectPressed(deviceButton(PREVIEW_DEVICE.TABLET), true);
+  expectPressed(dark, true);
+};
+
+const readoutOf = (device: TPreviewDevice, percent: number) =>
+  tDevice('readoutLong', { width: PREVIEW_DEVICE_WIDTH[device], percent });
+
 describe(`<${OnboardingView.name}/> preview`, () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -941,44 +957,51 @@ describe(`<${OnboardingView.name}/> preview`, () => {
     expect(frame).toBeInTheDocument();
   });
 
-  it('offers only the device and colour scheme groups', () => {
-    renderInTier(FULL_TIER);
+  it.each([
+    { from: FULL_TIER_TITLE, queries: FULL_TIER, next: RAIL_TIER },
+    { from: RAIL_TIER_TITLE, queries: RAIL_TIER, next: [] },
+  ])(
+    'keeps the pressed device and colour scheme after the window narrows across a tier edge $from',
+    async ({ queries, next }) => {
+      const resizeTo = renderInTier(queries);
+      await pressTabletAndDark();
 
-    const groups = within(previewToolbar()).getAllByRole('group');
+      resizeTo(next);
 
-    expect(groups.map((group) => group.getAttribute('aria-label'))).toEqual([
-      tDevice('deviceGroupAriaLabel'),
-      tMode('previewColorSchemeAriaLabel'),
-    ]);
-  });
+      expectTabletAndDark();
+    },
+  );
 
-  it('names the frame by the width of the device pressed', async () => {
-    renderInTier(FULL_TIER);
-
-    await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
-
-    const frame = sampleFrame(PREVIEW_DEVICE.TABLET);
-
-    expect(frame).toBeInTheDocument();
-  });
-
-  describe('size readout', () => {
+  describe(FULL_TIER_TITLE, () => {
     let restoreResizeObserver: () => void;
 
     beforeEach(() => {
       restoreResizeObserver = stubResizeObserver(() => MOCK_FULL_STAGE);
+      renderInTier(FULL_TIER);
     });
 
     afterEach(() => {
       restoreResizeObserver();
     });
 
-    const readoutOf = (device: TPreviewDevice, percent: number) =>
-      tDevice('readoutLong', { width: PREVIEW_DEVICE_WIDTH[device], percent });
+    it('offers only the device and colour scheme groups', () => {
+      const groups = within(previewToolbar()).getAllByRole('group');
+
+      expect(groups.map((group) => group.getAttribute('aria-label'))).toEqual([
+        tDevice('deviceGroupAriaLabel'),
+        tMode('previewColorSchemeAriaLabel'),
+      ]);
+    });
+
+    it('names the frame by the width of the device pressed', async () => {
+      await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+
+      const frame = sampleFrame(PREVIEW_DEVICE.TABLET);
+
+      expect(frame).toBeInTheDocument();
+    });
 
     it('announces the long readout under the live preview heading', () => {
-      renderInTier(FULL_TIER);
-
       const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
       const heading = within(preview).getByRole('heading', {
         level: 2,
@@ -993,8 +1016,6 @@ describe(`<${OnboardingView.name}/> preview`, () => {
     });
 
     it('announces the new size when another device is pressed', async () => {
-      renderInTier(FULL_TIER);
-
       await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
 
       const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
@@ -1004,24 +1025,8 @@ describe(`<${OnboardingView.name}/> preview`, () => {
 
       expect(readout).toHaveRole('status');
     });
-  });
 
-  describe('keeps the pressed device and colour scheme', () => {
-    const pressTabletAndDark = async () => {
-      await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
-      const dark = within(previewToolbar()).getByRole('button', MOCK_DARK);
-      await user.click(dark);
-    };
-
-    const expectTabletAndDark = () => {
-      const dark = within(previewToolbar()).getByRole('button', MOCK_DARK);
-
-      expectPressed(deviceButton(PREVIEW_DEVICE.TABLET), true);
-      expectPressed(dark, true);
-    };
-
-    it('after Continue and Back', async () => {
-      renderInTier(FULL_TIER);
+    it('keeps the pressed device and colour scheme after Continue and Back', async () => {
       await pressTabletAndDark();
 
       await completeSiteStep();
@@ -1032,8 +1037,7 @@ describe(`<${OnboardingView.name}/> preview`, () => {
       expectTabletAndDark();
     });
 
-    it('after an Edit from review', async () => {
-      renderInTier(FULL_TIER);
+    it('keeps the pressed device and colour scheme after an Edit from review', async () => {
       await reachReview();
       await pressTabletAndDark();
 
@@ -1041,20 +1045,5 @@ describe(`<${OnboardingView.name}/> preview`, () => {
 
       expectTabletAndDark();
     });
-
-    it.each([
-      { from: FULL_TIER_TITLE, queries: FULL_TIER, next: RAIL_TIER },
-      { from: RAIL_TIER_TITLE, queries: RAIL_TIER, next: [] },
-    ])(
-      'after the window narrows across a tier edge $from',
-      async ({ queries, next }) => {
-        const resizeTo = renderInTier(queries);
-        await pressTabletAndDark();
-
-        resizeTo(next);
-
-        expectTabletAndDark();
-      },
-    );
   });
 });

@@ -10,31 +10,17 @@ import {
   ToolbarTabStopProvider,
 } from '@platform/components/shared/toolbar-tab-stop';
 import { Tooltip } from '@platform/components/shared/tooltip';
-import { tv } from '@platform/utils/tv/tv';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { focusToolbarEdge } from './focus-toolbar-edge';
+import { iconToolbarVariants } from './icon-toolbar-variants';
 
-const iconToolbarVariants = tv({
-  slots: {
-    root: ['flex flex-wrap items-center gap-2'],
-    endSlot: ['flex min-w-0 items-center gap-2'],
-  },
-  variants: {
-    isEndOnOwnLine: {
-      true: { endSlot: ['basis-full'] },
-      false: { endSlot: ['flex-1 basis-0 justify-end'] },
-    },
-  },
-});
-
-export type TIconToolbarProps = {
+export type TIconToolbarProps = PropsWithChildren<{
   ariaLabel: string;
   groups: TIconToggleGroupProps<string>[];
   isEndOnOwnLine?: boolean;
-  children?: ReactNode;
   className?: string;
-};
+}>;
 
 export const IconToolbar = ({
   ariaLabel,

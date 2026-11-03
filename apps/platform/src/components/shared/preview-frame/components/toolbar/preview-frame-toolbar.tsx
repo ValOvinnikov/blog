@@ -11,17 +11,16 @@ import {
   type TPreviewMode,
 } from '@platform/constants/preview';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
-export type TPreviewFrameToolbarProps = {
+export type TPreviewFrameToolbarProps = PropsWithChildren<{
   device: TPreviewDevice;
   onDeviceChange(device: TPreviewDevice): void;
   mode: TPreviewMode;
   onModeChange(mode: TPreviewMode): void;
   extraGroups?: TIconToggleGroupProps<string>[];
   isEndOnOwnLine?: boolean;
-  children?: ReactNode;
-};
+}>;
 
 export const PreviewFrameToolbar = ({
   device,

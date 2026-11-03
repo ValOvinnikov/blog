@@ -4,7 +4,12 @@ import { PreviewFrameStage } from '@platform/components/shared/preview-frame/com
 import { PreviewFrameStatus } from '@platform/components/shared/preview-frame/components/status/preview-frame-status';
 import { PreviewFrameToolbar } from '@platform/components/shared/preview-frame/components/toolbar/preview-frame-toolbar';
 import { mapCompoundSlots, type TCompoundComponent } from '@platform/lib/react';
-import { Fragment, type ElementType, type ReactNode } from 'react';
+import {
+  Fragment,
+  type ElementType,
+  type PropsWithChildren,
+  type ReactNode,
+} from 'react';
 
 import { previewFrameVariants } from './preview-frame-variants';
 
@@ -15,7 +20,7 @@ const PreviewFrameParts = {
   Status: PreviewFrameStatus,
 } satisfies Record<string, ElementType>;
 
-type TPreviewFrameProps = {
+type TPreviewFrameProps = PropsWithChildren<{
   ariaLabel: string;
   widthControl?: ReactNode;
   controls?: ReactNode;
@@ -24,8 +29,7 @@ type TPreviewFrameProps = {
   notes?: ReactNode;
   isToolbarFirst?: boolean;
   className?: string;
-  children: ReactNode;
-};
+}>;
 
 const PreviewFrameRoot = ({
   ariaLabel,

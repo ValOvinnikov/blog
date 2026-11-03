@@ -1,12 +1,11 @@
 import { previewFrameVariants } from '@platform/components/shared/preview-frame/preview-frame-variants';
-import type { ReactNode, Ref } from 'react';
+import type { PropsWithChildren, Ref } from 'react';
 
-export type TPreviewFrameStageProps = {
+export type TPreviewFrameStageProps = PropsWithChildren<{
   isCompact?: boolean;
   className?: string;
-  children: ReactNode;
   ref?: Ref<HTMLDivElement>;
-};
+}>;
 
 export const PreviewFrameStage = ({
   isCompact = false,
