@@ -45,6 +45,21 @@ describe(`<${YourSiteCard.name}/>`, () => {
     expect(badge).not.toBeInTheDocument();
   });
 
+  it('labels the four values and ends with the read-only hint', () => {
+    setup();
+
+    const terms = screen.getAllByRole('term');
+    const hint = screen.getByText(/Need one of these changed\?/);
+
+    expect(terms.map((term) => term.textContent)).toEqual([
+      'Name',
+      'Public domain',
+      'Plan',
+      'Language',
+    ]);
+    expect(hint).toBeVisible();
+  });
+
   it("nests the card's title one level under the page's own h1", () => {
     setup();
 

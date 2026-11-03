@@ -9,9 +9,13 @@ import { useLocale, useTranslations } from 'next-intl';
 
 export type TOwnerCardProps = {
   owner: TMaybeUndefined<TTenantOwnerMembership>;
+  isStackedToLg?: boolean;
 };
 
-export const OwnerCard = ({ owner }: TOwnerCardProps) => {
+export const OwnerCard = ({
+  owner,
+  isStackedToLg = false,
+}: TOwnerCardProps) => {
   const t = useTranslations('tenantOverviewPage');
   const tRole = useTranslations('roleLabel');
   const locale = useLocale();
@@ -21,7 +25,7 @@ export const OwnerCard = ({ owner }: TOwnerCardProps) => {
     <Card>
       <Card.Header title={t('ownerCardTitle')} />
       <Card.Body>
-        <DetailList>
+        <DetailList isStackedToLg={isStackedToLg}>
           <DetailList.Row
             label={t('emailLabel')}
             isMono={true}

@@ -51,21 +51,21 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       await setup();
     });
 
-    it("shows the tenant's name, status and plan, and an Open site link", () => {
+    it("shows the tenant's name and status without a plan pill, and an Open site link", () => {
       const tenantHeading = screen.getByRole('heading', {
         level: 1,
         name: MOCK_SITE_NAME,
       });
       const statusText = screen.getByText('Active');
       const titleRow = screen.getByTestId('page-header-title-row');
-      const planText = within(titleRow).getByText('Growth');
+      const planText = within(titleRow).queryByText('Growth');
       const openSiteLink = screen.getByRole('link', {
         name: 'Open site (opens in new tab)',
       });
 
       expect(tenantHeading).toBeVisible();
       expect(statusText).toBeVisible();
-      expect(planText).toBeVisible();
+      expect(planText).not.toBeInTheDocument();
       expect(openSiteLink).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
     });
 
