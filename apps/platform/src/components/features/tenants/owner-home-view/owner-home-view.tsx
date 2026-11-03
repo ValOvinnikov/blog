@@ -33,13 +33,14 @@ export const OwnerHomeView = ({
   siteSetup,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
-  const { root, cardsGrid, cardsColumn } = ownerHomeViewVariants();
+  const { root, pair } = ownerHomeViewVariants();
 
   return (
     <div className={root()}>
       <TenantPageHeader
         tenant={tenant}
         description={tOwnerHome('description')}
+        hasPlanBadge={false}
       />
 
       {tenant.deprovisionedAt && (
@@ -48,18 +49,18 @@ export const OwnerHomeView = ({
 
       {siteSetup && <SiteSetupCard {...siteSetup} />}
 
-      <div className={cardsGrid()}>
-        <YourSiteCard tenant={tenant} />
-        <div className={cardsColumn()}>
-          <Suspense fallback={<DomainCardSkeleton />}>
-            <StreamedDomainCard
-              tenant={tenant}
-              domainVerificationStatus={domainVerificationStatus}
-              dnsHref={adminRoutes.dashboardDomain()}
-            />
-          </Suspense>
-          <OwnerCard owner={owner} />
-        </div>
+      <YourSiteCard tenant={tenant} />
+
+      <div className={pair()}>
+        <Suspense fallback={<DomainCardSkeleton isStackedToLg={true} />}>
+          <StreamedDomainCard
+            tenant={tenant}
+            domainVerificationStatus={domainVerificationStatus}
+            dnsHref={adminRoutes.dashboardDomain()}
+            isStackedToLg={true}
+          />
+        </Suspense>
+        <OwnerCard owner={owner} isStackedToLg={true} />
       </div>
 
       <MakeItYoursCard />

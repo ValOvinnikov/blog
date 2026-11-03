@@ -77,6 +77,18 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   its domain and "role · plan" (role hidden for a SUPERADMIN's virtual
   membership), archived workspaces in their own read-only group, and a
   filter by name or domain that appears only when the list would scroll.
+- **Owner Overview** (`/dashboard`) is one column, 16px apart below `md` and
+  24px from `md`, in this order: the heading (tenant name, status pill, "Your
+  site at a glance…" and Open site, with no plan pill; the operator Overview
+  keeps its plan pill), the archived notice (archived tenants only), the site
+  setup card (while setup is incomplete or failed), the Your site band, the
+  Domain and Owner pair, then Make it yours. Your site is a full-width card
+  whose header holds only the title; under it one row of four label-over-value
+  cells (Name, Public domain, Plan, Language) in 3:3:2:2 widths, and below
+  `md` two columns (Name and Public domain a full row each, Plan and Language
+  sharing one). A footer strip carries the read-only hint. Domain and Owner sit
+  in two equal columns from `md` and stack below; from `md` to below `lg`
+  their detail lists stack label over value, following the window width.
 - `GET /api/dashboard/select-tenant?tenantId=` sets the active-workspace
   cookie and redirects to `/dashboard`.
 - Every other path 404s through a catch-all. `not-found.tsx` renders

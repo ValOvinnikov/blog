@@ -8,10 +8,16 @@ import { domainCardSkeletonVariants } from './domain-card-skeleton-variants';
 
 const ROW_KEYS = ['status', 'domain', 'last-checked'];
 
-export const DomainCardSkeleton = () => {
+export type TDomainCardSkeletonProps = {
+  isStackedToLg?: boolean;
+};
+
+export const DomainCardSkeleton = ({
+  isStackedToLg = false,
+}: TDomainCardSkeletonProps) => {
   const { title, action, term, value } = domainCardSkeletonVariants();
   const { header: cardHeader, headerActions, body: cardBody } = cardVariants();
-  const { root: detailList } = detailListVariants();
+  const { root: detailList } = detailListVariants({ isStackedToLg });
 
   return (
     <Card>
