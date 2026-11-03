@@ -2,17 +2,19 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const dnsRecordsTableVariants = tv({
   slots: {
-    table: ['mt-3.5 w-full border-collapse text-left font-mono text-admin-12'],
+    table: [
+      'mt-3.5 w-full border-collapse text-left font-admin-mono text-admin-12',
+    ],
     head: [
-      'border-b border-admin-line-2 px-[10px] py-2',
+      'border-b border-admin-line-2 px-2.5 py-2',
       'text-admin-11 font-bold text-admin-muted uppercase tracking-[.06em]',
     ],
     row: ['border-b border-admin-line-2 last:border-b-0'],
-    cell: ['break-all px-[10px] py-2.5 align-middle text-admin-text'],
+    cell: ['break-all p-2.5 align-middle text-admin-text'],
   },
   variants: {
-    isMono: {
-      true: { cell: ['font-admin-mono font-medium'] },
+    isRecordData: {
+      true: { cell: ['font-medium'] },
       false: {},
     },
   },
