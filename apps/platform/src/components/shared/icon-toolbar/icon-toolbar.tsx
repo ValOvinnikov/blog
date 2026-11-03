@@ -18,14 +18,20 @@ import { focusToolbarEdge } from './focus-toolbar-edge';
 const iconToolbarVariants = tv({
   slots: {
     root: ['flex flex-wrap items-center gap-2'],
-    spacer: ['flex-1'],
-    endSlot: ['inline-flex items-center gap-2'],
+    endSlot: ['flex min-w-0 items-center gap-2'],
+  },
+  variants: {
+    isEndOnOwnLine: {
+      true: { endSlot: ['basis-full'] },
+      false: { endSlot: ['flex-1 basis-0 justify-end'] },
+    },
   },
 });
 
 export type TIconToolbarProps = {
   ariaLabel: string;
   groups: TIconToggleGroupProps<string>[];
+  isEndOnOwnLine?: boolean;
   children?: ReactNode;
   className?: string;
 };
@@ -33,10 +39,11 @@ export type TIconToolbarProps = {
 export const IconToolbar = ({
   ariaLabel,
   groups,
+  isEndOnOwnLine = false,
   children,
   className,
 }: TIconToolbarProps) => {
-  const { root, spacer, endSlot } = iconToolbarVariants();
+  const { root, endSlot } = iconToolbarVariants({ isEndOnOwnLine });
   const [firstGroup] = groups;
   const defaultStopId = firstGroup
     ? getToolbarStopId(firstGroup.ariaLabel, firstGroup.value)
@@ -55,12 +62,7 @@ export const IconToolbar = ({
           {groups.map((group) => (
             <IconToggleGroup key={group.ariaLabel} {...group} />
           ))}
-          {children && (
-            <>
-              <span aria-hidden="true" className={spacer()} />
-              <span className={endSlot()}>{children}</span>
-            </>
-          )}
+          {children && <span className={endSlot()}>{children}</span>}
         </Toolbar.Root>
       </ToolbarTabStopProvider>
     </Tooltip.Provider>

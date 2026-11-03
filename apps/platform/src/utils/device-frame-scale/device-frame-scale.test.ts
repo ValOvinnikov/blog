@@ -7,6 +7,7 @@ import { PREVIEW_DEVICE } from '@platform/constants/preview';
 import {
   fitFullscreenScale,
   fitPageScale,
+  fitStageScale,
   resolveDeviceFrameLayout,
   scaleDeviceSize,
   toScalePercent,
@@ -20,6 +21,8 @@ const MOCK_HALF_STAGE = 640;
 const MOCK_WIDE_STAGE = 5000;
 const MOCK_TABLET_FULLSCREEN_STAGE = 600;
 const MOCK_LARGE_AVAILABLE_HEIGHT = 5000;
+const MOCK_FULL_STAGE = 472;
+const MOCK_SHORT_FULL_STAGE_HEIGHT = 500;
 
 describe(fitPageScale, () => {
   it.each([
@@ -130,6 +133,46 @@ describe(fitPageScale, () => {
   });
 });
 
+describe(fitStageScale, () => {
+  it('fits by width alone when no height is given', () => {
+    const scale = fitStageScale({
+      device: PREVIEW_DEVICE.PHONE,
+      availableWidth: MOCK_NARROW_STAGE,
+    });
+
+    expect(toScalePercent(scale)).toBe(92);
+  });
+
+  it('grows taller than 608 px when the stage is taller', () => {
+    const scale = fitStageScale({
+      device: PREVIEW_DEVICE.TABLET,
+      availableWidth: MOCK_FULL_STAGE,
+      availableHeight: MOCK_LARGE_AVAILABLE_HEIGHT,
+    });
+
+    expect(scaleDeviceSize(PREVIEW_DEVICE.TABLET, scale).height).toBe(679);
+  });
+
+  it('fits a short stage by its height', () => {
+    const scale = fitStageScale({
+      device: PREVIEW_DEVICE.TABLET,
+      availableWidth: MOCK_FULL_STAGE,
+      availableHeight: MOCK_SHORT_FULL_STAGE_HEIGHT,
+    });
+
+    expect(toScalePercent(scale)).toBe(42);
+  });
+
+  it('never shows the stage larger than the device', () => {
+    const scale = fitStageScale({
+      device: PREVIEW_DEVICE.DESKTOP,
+      availableWidth: MOCK_WIDE_STAGE,
+    });
+
+    expect(scale).toBe(1);
+  });
+});
+
 describe(fitFullscreenScale, () => {
   it('fits by width alone and never above 100%', () => {
     const wide = fitFullscreenScale({
@@ -187,6 +230,23 @@ describe(resolveDeviceFrameLayout, () => {
       scale: 0.4406,
       isPanning: false,
       viewport: { width: 564, height: 352 },
+    });
+  });
+
+  it('sizes the stage viewport to the scaled device', () => {
+    const layout = resolveDeviceFrameLayout({
+      device: PREVIEW_DEVICE.TABLET,
+      fit: {
+        mode: DEVICE_FRAME_FIT.STAGE,
+        availableHeight: MOCK_LARGE_AVAILABLE_HEIGHT,
+      },
+      stageWidth: MOCK_FULL_STAGE,
+    });
+
+    expect(layout).toStrictEqual({
+      scale: 0.5756,
+      isPanning: false,
+      viewport: { width: 472, height: 679 },
     });
   });
 

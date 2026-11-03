@@ -19,12 +19,14 @@ export type TPreviewFrameHeadingProps = {
   device: TPreviewDevice;
   scale: number;
   layout?: TPreviewHeadingLayout;
+  isAlwaysLong?: boolean;
 };
 
 export const PreviewFrameHeading = ({
   device,
   scale,
   layout = PREVIEW_HEADING_LAYOUT.SECTION,
+  isAlwaysLong = false,
 }: TPreviewFrameHeadingProps) => {
   const t = useTranslations('devicePreview');
   const tMode = useTranslations('previewModeControl');
@@ -36,7 +38,9 @@ export const PreviewFrameHeading = ({
   });
   const isPhoneTab = layout === PREVIEW_HEADING_LAYOUT.PHONE_TAB;
   const isLong =
-    isUndefined(row) || row.width >= PREVIEW_READOUT.LONG_MIN_WIDTH;
+    isAlwaysLong ||
+    isUndefined(row) ||
+    row.width >= PREVIEW_READOUT.LONG_MIN_WIDTH;
   const values = {
     width: PREVIEW_DEVICE_WIDTH[device],
     percent: toScalePercent(scale),

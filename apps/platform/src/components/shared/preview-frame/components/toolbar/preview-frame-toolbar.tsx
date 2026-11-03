@@ -19,6 +19,7 @@ export type TPreviewFrameToolbarProps = {
   mode: TPreviewMode;
   onModeChange(mode: TPreviewMode): void;
   extraGroups?: TIconToggleGroupProps<string>[];
+  isEndOnOwnLine?: boolean;
   children?: ReactNode;
 };
 
@@ -28,6 +29,7 @@ export const PreviewFrameToolbar = ({
   mode,
   onModeChange,
   extraGroups = [],
+  isEndOnOwnLine,
   children,
 }: TPreviewFrameToolbarProps) => {
   const t = useTranslations('devicePreview');
@@ -86,6 +88,7 @@ export const PreviewFrameToolbar = ({
     <IconToolbar
       ariaLabel={t('toolbarAriaLabel')}
       groups={[deviceGroup, modeGroup, ...extraGroups]}
+      isEndOnOwnLine={isEndOnOwnLine}
     >
       {children}
     </IconToolbar>

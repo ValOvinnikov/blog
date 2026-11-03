@@ -62,6 +62,26 @@ export const fitPageScale = ({
     ),
   );
 
+export const fitStageScale = ({
+  device,
+  availableWidth,
+  availableHeight = Number.POSITIVE_INFINITY,
+}: {
+  device: TPreviewDevice;
+  availableWidth: number;
+  availableHeight?: number;
+}) =>
+  roundScale(
+    Math.max(
+      0,
+      Math.min(
+        availableWidth / PREVIEW_DEVICE_WIDTH[device],
+        availableHeight / PREVIEW_DEVICE_HEIGHT[device],
+        1,
+      ),
+    ),
+  );
+
 export const fitFullscreenScale = ({
   device,
   availableWidth,
@@ -108,7 +128,9 @@ export const resolveDeviceFrameLayout = ({
     };
   }
 
-  const scale = fitPageScale({
+  const fitScale =
+    mode === DEVICE_FRAME_FIT.STAGE ? fitStageScale : fitPageScale;
+  const scale = fitScale({
     device,
     availableWidth: stageWidth,
     availableHeight,

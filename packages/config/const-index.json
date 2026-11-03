@@ -4690,6 +4690,14 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "STAGE": [
+      {
+        "ref": "DEVICE_FRAME_FIT.STAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "FULLSCREEN": [
       {
         "ref": "DEVICE_FRAME_FIT.FULLSCREEN",
@@ -7610,6 +7618,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "420": [
+      {
+        "ref": "ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_STAGE_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "429": [

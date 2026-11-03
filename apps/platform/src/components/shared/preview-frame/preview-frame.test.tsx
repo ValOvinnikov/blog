@@ -181,6 +181,25 @@ describe(`<${PreviewFrame.name}/>`, () => {
       expect(readout).toHaveTextContent(MOCK_DESKTOP_LONG_READOUT);
     });
 
+    it('keeps the live preview title and the long readout in a narrow section when asked', () => {
+      rowWidth = NARROW_ROW;
+      renderWithIntl(
+        <PreviewFrame ariaLabel={MOCK_LABEL}>
+          <PreviewFrame.Heading
+            device={PREVIEW_DEVICE.DESKTOP}
+            scale={0.4406}
+            isAlwaysLong={true}
+          />
+        </PreviewFrame>,
+      );
+
+      const heading = screen.getByRole('heading', { level: 2 });
+      const readout = screen.getByRole('status');
+
+      expect(heading).toHaveAccessibleName(MOCK_LIVE_PREVIEW);
+      expect(readout).toHaveTextContent(MOCK_DESKTOP_LONG_READOUT);
+    });
+
     it('reads the phone tab readout under a heading kept for assistive technology', () => {
       rowWidth = NARROW_ROW;
       renderWithIntl(

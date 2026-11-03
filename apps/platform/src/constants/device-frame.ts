@@ -2,6 +2,7 @@ import type { TValueOf } from '@blog/config/utils';
 
 export const DEVICE_FRAME_FIT = {
   PAGE: 'PAGE',
+  STAGE: 'STAGE',
   FULLSCREEN: 'FULLSCREEN',
 } as const;
 

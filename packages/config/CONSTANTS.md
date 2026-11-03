@@ -353,7 +353,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/device-frame` — `apps/platform/src/constants/device-frame.ts`
 
-- **DEVICE_FRAME_FIT**: `PAGE`, `FULLSCREEN`
+- **DEVICE_FRAME_FIT**: `PAGE`, `STAGE`, `FULLSCREEN`
 - **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`
 - **DEVICE_FRAME_AXIS**: `VERTICAL`, `HORIZONTAL`
 - **DEVICE_FRAME_SCROLL_TARGET**: `TOP`, `END`
@@ -438,6 +438,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **ONBOARDING_STEP**: `SITE`, `ADDRESS`, `LOOK`, `REVIEW`
 - **ONBOARDING_LOG**: `ROOT_DOMAIN_MISSING`=`"onboarding.root_domain_missing"`, `SESSION_EMAIL_MISSING`=`"onboarding.session_email_missing"`, `OWNS_FREE_TENANT_CHECK_FAILED`=`"onboarding.owns_free_tenant_check_failed"`, `TERMS_RECORD_FAILED`=`"onboarding.terms_record_failed"`, `CREATE_FAILED`=`"onboarding.create_failed"`
 - **ONBOARDING_TIER_QUERY**: `RAIL`=`"(width >= 48rem)"`, `FULL`=`"(width >= 85rem)"`
+- **ONBOARDING_PREVIEW**: `ADDRESS_ROW_MIN_STAGE_WIDTH`=`420`
 
 ### `@platform/constants/operator-alert` — `apps/platform/src/constants/operator-alert.ts`
 

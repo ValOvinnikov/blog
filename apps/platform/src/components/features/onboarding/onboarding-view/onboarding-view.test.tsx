@@ -13,6 +13,11 @@ import {
   type TOnboardingStep,
 } from '@platform/constants/onboarding';
 import {
+  PREVIEW_DEVICE,
+  PREVIEW_DEVICE_WIDTH,
+  type TPreviewDevice,
+} from '@platform/constants/preview';
+import {
   SIGN_UP_FIELD_ERROR,
   SIGN_UP_REFUSAL,
 } from '@platform/constants/sign-up';
@@ -21,6 +26,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { createSiteAction } from '@platform/server/onboarding/create-site-action';
 import {
+  ARIA_PRESSED,
   ARIA_VALUEMAX,
   ARIA_VALUENOW,
   ARIA_VALUETEXT,
@@ -34,6 +40,7 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { stubResizeObserver } from '@platform/testing/resize-observer';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -100,6 +107,8 @@ const MOCK_ADDRESS_AVAILABLE = t('siteAddressAvailable', {
   address: MOCK_SITE_ADDRESS,
 });
 const MOCK_PLACEHOLDER_ADDRESS = `${PLACEHOLDER_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
+const MOCK_ANNOUNCED_PLACEHOLDER_ADDRESS = `${SITE_ADDRESS_LABEL} ${MOCK_PLACEHOLDER_ADDRESS}`;
+const MOCK_ANNOUNCED_SITE_ADDRESS = `${SITE_ADDRESS_LABEL} ${MOCK_SITE_ADDRESS}`;
 const MOCK_LIVE_PREVIEW = {
   name: messages.previewModeControl.livePreviewHeading,
 };
@@ -378,7 +387,7 @@ describe(`<${OnboardingView.name}/>`, () => {
 
     const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
 
-    expect(preview).toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
+    expect(preview).toHaveTextContent(MOCK_ANNOUNCED_PLACEHOLDER_ADDRESS);
   });
 
   it('shows the typed address in the preview', async () => {
@@ -387,8 +396,21 @@ describe(`<${OnboardingView.name}/>`, () => {
 
     const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
 
-    expect(preview).toHaveTextContent(MOCK_SITE_ADDRESS);
+    expect(preview).toHaveTextContent(MOCK_ANNOUNCED_SITE_ADDRESS);
     expect(preview).not.toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
+  });
+
+  it('follows the address in the preview as each letter is typed', async () => {
+    await completeSiteStep();
+    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+    const [firstLetter] = MOCK_SLUG;
+    await user.type(addressField, firstLetter ?? '');
+
+    const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+
+    expect(preview).toHaveTextContent(
+      `${SITE_ADDRESS_LABEL} ${firstLetter}.${MOCK_TENANT_ROOT_DOMAIN}`,
+    );
   });
 
   it('keeps a taken address from continuing', async () => {
@@ -728,21 +750,39 @@ describe(`<${OnboardingView.name}/>`, () => {
 
 const stubMatchMedia = window.matchMedia;
 
-const stubTier = (matchingQueries: readonly string[]) => {
+const stubTier = (initialQueries: readonly string[]) => {
+  let matchingQueries = initialQueries;
+  const listeners = new Set<EventListener>();
   vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
     ...stubMatchMedia(query),
-    matches: matchingQueries.includes(query),
+    get matches() {
+      return matchingQueries.includes(query);
+    },
+    addEventListener: (_type: string, listener: EventListener) => {
+      listeners.add(listener);
+    },
+    removeEventListener: (_type: string, listener: EventListener) => {
+      listeners.delete(listener);
+    },
   }));
+
+  return (nextQueries: readonly string[]) => {
+    matchingQueries = nextQueries;
+    act(() => listeners.forEach((listener) => listener(new Event('change'))));
+  };
 };
 
 const FULL_TIER = [ONBOARDING_TIER_QUERY.RAIL, ONBOARDING_TIER_QUERY.FULL];
 const RAIL_TIER = [ONBOARDING_TIER_QUERY.RAIL];
+const FULL_TIER_TITLE = 'from 1360px';
+const RAIL_TIER_TITLE = 'from 768px';
 
 const renderInTier = (matchingQueries: readonly string[]) => {
   user = userEvent.setup();
   checkSiteAddressMock.mockResolvedValue(undefined);
-  stubTier(matchingQueries);
+  const resizeTo = stubTier(matchingQueries);
   setup();
+  return resizeTo;
 };
 
 const shellParts = () => ({
@@ -804,8 +844,8 @@ describe(`<${OnboardingView.name}/> layout`, () => {
   });
 
   describe.each([
-    ['from 1360px', FULL_TIER],
-    ['from 768px', RAIL_TIER],
+    [FULL_TIER_TITLE, FULL_TIER],
+    [RAIL_TIER_TITLE, RAIL_TIER],
   ])('%s', (_tier, matchingQueries) => {
     beforeEach(() => {
       renderInTier(matchingQueries);
@@ -842,5 +882,179 @@ describe(`<${OnboardingView.name}/> layout`, () => {
 
       expectClearOfFooter(acceptance, MOCK_CREATE);
     });
+  });
+});
+
+const tDevice = makeEnTranslator('devicePreview');
+const tMode = makeEnTranslator('previewModeControl');
+const DEVICE_NAME = {
+  [PREVIEW_DEVICE.DESKTOP]: tDevice('deviceDesktop'),
+  [PREVIEW_DEVICE.TABLET]: tDevice('deviceTablet'),
+  [PREVIEW_DEVICE.PHONE]: tDevice('devicePhone'),
+};
+const MOCK_LIGHT = { name: tMode('modeLight') };
+const MOCK_DARK = { name: tMode('modeDark') };
+const MOCK_FULL_STAGE = { width: 472, height: 728 };
+
+const previewToolbar = () =>
+  within(screen.getByRole('region', MOCK_LIVE_PREVIEW)).getByRole('toolbar', {
+    name: tDevice('toolbarAriaLabel'),
+  });
+
+const deviceButton = (device: TPreviewDevice) =>
+  within(previewToolbar()).getByRole('button', { name: DEVICE_NAME[device] });
+
+const expectPressed = (button: HTMLElement, isPressed: boolean) => {
+  expect(button).toHaveAttribute(ARIA_PRESSED, String(isPressed));
+};
+
+const sampleFrame = (device: TPreviewDevice) =>
+  screen.getByRole('img', {
+    name: tDevice('sampleAtWidth', { width: PREVIEW_DEVICE_WIDTH[device] }),
+  });
+
+describe(`<${OnboardingView.name}/> preview`, () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    {
+      tier: FULL_TIER_TITLE,
+      queries: FULL_TIER,
+      device: PREVIEW_DEVICE.DESKTOP,
+    },
+    {
+      tier: RAIL_TIER_TITLE,
+      queries: RAIL_TIER,
+      device: PREVIEW_DEVICE.DESKTOP,
+    },
+    { tier: 'on a phone', queries: [], device: PREVIEW_DEVICE.PHONE },
+  ])('opens on $device and Light $tier', ({ queries, device }) => {
+    renderInTier(queries);
+
+    const light = within(previewToolbar()).getByRole('button', MOCK_LIGHT);
+    const frame = sampleFrame(device);
+
+    expectPressed(deviceButton(device), true);
+    expectPressed(light, true);
+    expect(frame).toBeInTheDocument();
+  });
+
+  it('offers only the device and colour scheme groups', () => {
+    renderInTier(FULL_TIER);
+
+    const groups = within(previewToolbar()).getAllByRole('group');
+
+    expect(groups.map((group) => group.getAttribute('aria-label'))).toEqual([
+      tDevice('deviceGroupAriaLabel'),
+      tMode('previewColorSchemeAriaLabel'),
+    ]);
+  });
+
+  it('names the frame by the width of the device pressed', async () => {
+    renderInTier(FULL_TIER);
+
+    await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+
+    const frame = sampleFrame(PREVIEW_DEVICE.TABLET);
+
+    expect(frame).toBeInTheDocument();
+  });
+
+  describe('size readout', () => {
+    let restoreResizeObserver: () => void;
+
+    beforeEach(() => {
+      restoreResizeObserver = stubResizeObserver(() => MOCK_FULL_STAGE);
+    });
+
+    afterEach(() => {
+      restoreResizeObserver();
+    });
+
+    const readoutOf = (device: TPreviewDevice, percent: number) =>
+      tDevice('readoutLong', { width: PREVIEW_DEVICE_WIDTH[device], percent });
+
+    it('announces the long readout under the live preview heading', () => {
+      renderInTier(FULL_TIER);
+
+      const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+      const heading = within(preview).getByRole('heading', {
+        level: 2,
+        ...MOCK_LIVE_PREVIEW,
+      });
+      const readout = within(preview).getByText(
+        readoutOf(PREVIEW_DEVICE.DESKTOP, 37),
+      );
+
+      expect(heading).toBeVisible();
+      expect(readout).toHaveRole('status');
+    });
+
+    it('announces the new size when another device is pressed', async () => {
+      renderInTier(FULL_TIER);
+
+      await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+
+      const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+      const readout = within(preview).getByText(
+        readoutOf(PREVIEW_DEVICE.TABLET, 58),
+      );
+
+      expect(readout).toHaveRole('status');
+    });
+  });
+
+  describe('keeps the pressed device and colour scheme', () => {
+    const pressTabletAndDark = async () => {
+      await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+      const dark = within(previewToolbar()).getByRole('button', MOCK_DARK);
+      await user.click(dark);
+    };
+
+    const expectTabletAndDark = () => {
+      const dark = within(previewToolbar()).getByRole('button', MOCK_DARK);
+
+      expectPressed(deviceButton(PREVIEW_DEVICE.TABLET), true);
+      expectPressed(dark, true);
+    };
+
+    it('after Continue and Back', async () => {
+      renderInTier(FULL_TIER);
+      await pressTabletAndDark();
+
+      await completeSiteStep();
+      expectTabletAndDark();
+      const back = screen.getByRole('button', MOCK_BACK);
+      await user.click(back);
+
+      expectTabletAndDark();
+    });
+
+    it('after an Edit from review', async () => {
+      renderInTier(FULL_TIER);
+      await reachReview();
+      await pressTabletAndDark();
+
+      await changeSiteTypeFromReview(SITE_TYPES.DOCS);
+
+      expectTabletAndDark();
+    });
+
+    it.each([
+      { from: FULL_TIER_TITLE, queries: FULL_TIER, next: RAIL_TIER },
+      { from: RAIL_TIER_TITLE, queries: RAIL_TIER, next: [] },
+    ])(
+      'after the window narrows across a tier edge $from',
+      async ({ queries, next }) => {
+        const resizeTo = renderInTier(queries);
+        await pressTabletAndDark();
+
+        resizeTo(next);
+
+        expectTabletAndDark();
+      },
+    );
   });
 });
