@@ -16,7 +16,7 @@ const UNAVAILABLE_HEADERS = {
 };
 
 const PAGE_STYLE =
-  ':root{color-scheme:light dark;font-family:system-ui,sans-serif}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;text-align:center}h1{font-size:1.5rem;margin:0 0 8px}p{margin:0;opacity:.75}';
+  ':root{color-scheme:light dark;font-family:system-ui,sans-serif}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:16px;text-align:center}h1{font-size:1.5rem;margin:0 0 8px}p{margin:0;opacity:.75}a{display:inline-block;margin-top:16px;color:inherit}';
 
 export const siteUnavailableStatus = (): NextResponse =>
   new NextResponse(null, {
@@ -24,10 +24,17 @@ export const siteUnavailableStatus = (): NextResponse =>
     headers: UNAVAILABLE_HEADERS,
   });
 
-export const siteUnavailablePage = (locale: TLocaleIsoCode): NextResponse => {
-  const { heading, text } = SITE_MESSAGES_BY_LOCALE[locale].siteUnavailable;
+export const siteUnavailablePage = (
+  locale: TLocaleIsoCode,
+  accountHref?: string,
+): NextResponse => {
+  const { heading, text, manageAccount } =
+    SITE_MESSAGES_BY_LOCALE[locale].siteUnavailable;
   const title = escapeXml(heading);
-  const html = `<!doctype html><html lang="${LOCALE_BCP47_TAGS[locale]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="${NOINDEX}"><title>${title}</title><style>${PAGE_STYLE}</style></head><body><main><h1>${title}</h1><p>${escapeXml(text)}</p></main></body></html>`;
+  const accountLink = accountHref
+    ? `<a href="${escapeXml(accountHref)}">${escapeXml(manageAccount)}</a>`
+    : '';
+  const html = `<!doctype html><html lang="${LOCALE_BCP47_TAGS[locale]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="${NOINDEX}"><title>${title}</title><style>${PAGE_STYLE}</style></head><body><main><h1>${title}</h1><p>${escapeXml(text)}</p>${accountLink}</main></body></html>`;
 
   return new NextResponse(html, {
     status: HTTP_STATUS.SERVICE_UNAVAILABLE,

@@ -1,5 +1,11 @@
 import { tv } from '@platform/utils/tv/tv';
 
+export const NAV_ROW_SHAPE =
+  'group relative flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-admin-13';
+
+export const NAV_CURRENT_BAR =
+  'before:absolute before:left-0 before:w-admin-bar before:rounded-r-admin-bar';
+
 export const sidebarVariants = tv({
   slots: {
     root: [
@@ -33,7 +39,7 @@ export const sidebarVariants = tv({
     ],
     list: ['flex flex-col gap-0.5'],
     row: [
-      'group relative flex items-center gap-2.5 rounded-admin-control px-2.5 py-2 text-admin-13',
+      NAV_ROW_SHAPE,
       'transition-colors duration-base ease-smooth',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
       'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
@@ -51,7 +57,8 @@ export const sidebarVariants = tv({
         row: [
           'bg-admin-side-raised font-semibold text-admin-text-strong shadow-admin',
           'focus-visible:shadow-none',
-          'before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-admin-bar before:bg-admin-side-accent',
+          NAV_CURRENT_BAR,
+          'before:inset-y-2 before:bg-admin-side-accent',
         ],
       },
       resting: {

@@ -821,14 +821,6 @@
     "footerPrivacy": "Datenschutzerklärung",
     "footerCookieSettings": "Cookie-Einstellungen"
   },
-  "frontPageSample": {
-    "heroHeading": "Berichte von der Küste",
-    "heroText": "Notizen, Essays und Fotografien.",
-    "heroButton": "Das Neueste lesen",
-    "firstPostTitle": "Ein Morgen auf dem Pier",
-    "secondPostTitle": "Ebbe, spätes Licht",
-    "thirdPostTitle": "Der Hafen im Winter"
-  },
   "assetUploadField": {
     "remove": "Entfernen",
     "upload": "Hochladen",

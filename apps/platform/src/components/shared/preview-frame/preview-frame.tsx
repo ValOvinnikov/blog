@@ -4,7 +4,12 @@ import { PreviewFrameStage } from '@platform/components/shared/preview-frame/com
 import { PreviewFrameStatus } from '@platform/components/shared/preview-frame/components/status/preview-frame-status';
 import { PreviewFrameToolbar } from '@platform/components/shared/preview-frame/components/toolbar/preview-frame-toolbar';
 import { mapCompoundSlots, type TCompoundComponent } from '@platform/lib/react';
-import { Fragment, type ElementType, type ReactNode } from 'react';
+import {
+  Fragment,
+  type ElementType,
+  type PropsWithChildren,
+  type ReactNode,
+} from 'react';
 
 import { previewFrameVariants } from './preview-frame-variants';
 
@@ -15,7 +20,7 @@ const PreviewFrameParts = {
   Status: PreviewFrameStatus,
 } satisfies Record<string, ElementType>;
 
-type TPreviewFrameProps = {
+type TPreviewFrameProps = PropsWithChildren<{
   ariaLabel: string;
   widthControl?: ReactNode;
   controls?: ReactNode;
@@ -23,8 +28,8 @@ type TPreviewFrameProps = {
   isNarrow?: boolean;
   notes?: ReactNode;
   isToolbarFirst?: boolean;
-  children: ReactNode;
-};
+  className?: string;
+}>;
 
 const PreviewFrameRoot = ({
   ariaLabel,
@@ -34,6 +39,7 @@ const PreviewFrameRoot = ({
   isNarrow = false,
   notes,
   isToolbarFirst = false,
+  className,
   children,
 }: TPreviewFrameProps) => {
   const {
@@ -48,7 +54,7 @@ const PreviewFrameRoot = ({
   const hasToolbar = Boolean(widthControl || controls || actions);
 
   return (
-    <section aria-label={ariaLabel} className={root()}>
+    <section aria-label={ariaLabel} className={root({ class: className })}>
       {!isToolbarFirst && slots.Heading}
       {hasToolbar && (
         <div className={toolbar()}>

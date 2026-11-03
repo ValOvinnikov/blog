@@ -1,14 +1,18 @@
 import { tv } from '@platform/utils/tv/tv';
 
 export const onboardingPreviewVariants = tv({
-  slots: {
-    browser: ['overflow-hidden rounded-admin border shadow-admin-lg'],
-    site: ['p-3'],
-  },
+  slots: { section: [], stage: [] },
   variants: {
-    isDark: {
-      true: { browser: ['border-admin-rail-line bg-admin-rail'] },
-      false: { browser: ['border-admin-line bg-admin-surface'] },
+    isPhone: {
+      true: { section: ['gap-2.5'] },
+      false: {},
+    },
+    isFull: {
+      true: {
+        section: ['min-h-0 flex-1'],
+        stage: ['min-h-0 flex-1 overflow-hidden'],
+      },
+      false: {},
     },
   },
 });

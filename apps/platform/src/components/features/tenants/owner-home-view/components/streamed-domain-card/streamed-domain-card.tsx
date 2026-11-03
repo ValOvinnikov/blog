@@ -7,16 +7,19 @@ export type TStreamedDomainCardProps = {
   tenant: TTenant;
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
   dnsHref: string;
+  isStackedToLg?: boolean;
 };
 
 export const StreamedDomainCard = ({
   tenant,
   domainVerificationStatus,
   dnsHref,
+  isStackedToLg,
 }: TStreamedDomainCardProps) => (
   <DomainCard
     tenant={tenant}
     domainVerificationStatus={use(domainVerificationStatus)}
     dnsHref={dnsHref}
+    isStackedToLg={isStackedToLg}
   />
 );

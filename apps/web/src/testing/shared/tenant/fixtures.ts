@@ -32,6 +32,7 @@ export const MOCK_REQUEST_CONTEXT: TRequestContext = {
   metadataBase: new URL(MOCK_TENANT_BASE_URL),
   defaultLocale: LOCALE_ISO_CODES.EN,
   liveLocales: [LOCALE_ISO_CODES.EN],
+  isOperatorSuspended: false,
 };
 
 export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({

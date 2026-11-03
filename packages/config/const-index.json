@@ -6,18 +6,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
-      },
-      {
-        "ref": "ACCOUNT_MENU_APPEARANCE.PILL",
-        "scope": "app:platform",
-        "from": "@platform/constants/account-menu",
-        "file": "apps/platform/src/constants/account-menu.ts"
-      },
-      {
-        "ref": "ACCOUNT_MENU_PLACEMENT.PILL",
-        "scope": "app:platform",
-        "from": "@platform/constants/account-menu",
-        "file": "apps/platform/src/constants/account-menu.ts"
       }
     ],
     "CIRCLE": [
@@ -84,6 +72,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "ACCOUNT_MENU_PLACEMENT.MENU",
+        "scope": "app:platform",
+        "from": "@platform/constants/account-menu",
+        "file": "apps/platform/src/constants/account-menu.ts"
       }
     ],
     "SUCCESS": [
@@ -2172,12 +2166,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
-      },
-      {
-        "ref": "ACCOUNT_MENU_APPEARANCE.SIDEBAR",
-        "scope": "app:platform",
-        "from": "@platform/constants/account-menu",
-        "file": "apps/platform/src/constants/account-menu.ts"
       }
     ],
     "MONITOR": [
@@ -4685,6 +4673,14 @@
     "PAGE": [
       {
         "ref": "DEVICE_FRAME_FIT.PAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "STAGE": [
+      {
+        "ref": "DEVICE_FRAME_FIT.STAGE",
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
@@ -7250,6 +7246,22 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "site_settings.metadata_fetch_failed": [
+      {
+        "ref": "SITE_SETTINGS_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-settings",
+        "file": "apps/web/src/constants/site-settings.ts"
+      }
+    ],
+    "site_settings.layout_fetch_failed": [
+      {
+        "ref": "SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-settings",
+        "file": "apps/web/src/constants/site-settings.ts"
+      }
+    ],
     "tenant_write.unresolved": [
       {
         "ref": "TENANT_WRITE_LOG.UNRESOLVED",
@@ -7540,6 +7552,14 @@
         "file": "apps/platform/src/constants/dns.ts"
       }
     ],
+    "1": [
+      {
+        "ref": "DEVICE_FRAME_SIZE.BORDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "2": [
       {
         "ref": "DNS_RCODE.SERVFAIL",
@@ -7564,12 +7584,28 @@
         "file": "apps/platform/src/constants/dns.ts"
       }
     ],
+    "6": [
+      {
+        "ref": "DEVICE_FRAME_SIZE.BEZEL_PADDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "16": [
       {
         "ref": "DNS_TYPE.TXT",
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      }
+    ],
+    "28": [
+      {
+        "ref": "DEVICE_FRAME_SIZE.BROWSER_BAR_HEIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
     "40": [
@@ -7690,6 +7726,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "420": [
+      {
+        "ref": "ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_STAGE_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "429": [

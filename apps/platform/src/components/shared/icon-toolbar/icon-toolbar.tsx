@@ -10,33 +10,26 @@ import {
   ToolbarTabStopProvider,
 } from '@platform/components/shared/toolbar-tab-stop';
 import { Tooltip } from '@platform/components/shared/tooltip';
-import { tv } from '@platform/utils/tv/tv';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import { focusToolbarEdge } from './focus-toolbar-edge';
+import { iconToolbarVariants } from './icon-toolbar-variants';
 
-const iconToolbarVariants = tv({
-  slots: {
-    root: ['flex flex-wrap items-center gap-2'],
-    spacer: ['flex-1'],
-    endSlot: ['inline-flex items-center gap-2'],
-  },
-});
-
-export type TIconToolbarProps = {
+export type TIconToolbarProps = PropsWithChildren<{
   ariaLabel: string;
   groups: TIconToggleGroupProps<string>[];
-  children?: ReactNode;
+  isEndOnOwnLine?: boolean;
   className?: string;
-};
+}>;
 
 export const IconToolbar = ({
   ariaLabel,
   groups,
+  isEndOnOwnLine = false,
   children,
   className,
 }: TIconToolbarProps) => {
-  const { root, spacer, endSlot } = iconToolbarVariants();
+  const { root, endSlot } = iconToolbarVariants({ isEndOnOwnLine });
   const [firstGroup] = groups;
   const defaultStopId = firstGroup
     ? getToolbarStopId(firstGroup.ariaLabel, firstGroup.value)
@@ -55,12 +48,7 @@ export const IconToolbar = ({
           {groups.map((group) => (
             <IconToggleGroup key={group.ariaLabel} {...group} />
           ))}
-          {children && (
-            <>
-              <span aria-hidden="true" className={spacer()} />
-              <span className={endSlot()}>{children}</span>
-            </>
-          )}
+          {children && <span className={endSlot()}>{children}</span>}
         </Toolbar.Root>
       </ToolbarTabStopProvider>
     </Tooltip.Provider>

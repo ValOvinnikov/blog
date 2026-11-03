@@ -7,9 +7,15 @@ import { queries } from '@blog/db';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
-import { mockTenant } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@web/testing/shared/tenant/fixtures';
 
-import { isReaderAccountEnabled } from './is-reader-account-enabled';
+import {
+  isReaderAccountEnabled,
+  isReaderAccountEnabledForTenant,
+} from './is-reader-account-enabled';
 
 faker.seed(6010);
 
@@ -36,15 +42,15 @@ const enableOnly = (...capabilities: TCapability[]) => {
   );
 };
 
-describe(isReaderAccountEnabled, () => {
-  beforeEach(() => {
-    vi.mocked(queries.tenants.getTenantById).mockReset();
-    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
-      mockTenant({ plan: TENANT_PLAN.GROWTH }),
-    );
-    vi.mocked(queries.settingsFeatures.getSettingsFeatures).mockReset();
-  });
+beforeEach(() => {
+  vi.mocked(queries.tenants.getTenantById).mockReset();
+  vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
+    mockTenant({ plan: TENANT_PLAN.GROWTH }),
+  );
+  vi.mocked(queries.settingsFeatures.getSettingsFeatures).mockReset();
+});
 
+describe(isReaderAccountEnabled, () => {
   it.each(READER_ACCOUNT_CAPABILITIES)(
     'is enabled when %s is the only reader-account capability enabled',
     async (capability) => {
@@ -62,5 +68,36 @@ describe(isReaderAccountEnabled, () => {
     );
 
     await expect(isReaderAccountEnabled()).resolves.toBe(false);
+  });
+});
+
+describe(isReaderAccountEnabledForTenant, () => {
+  describe('with a reader-account capability on', () => {
+    beforeEach(() => {
+      enableOnly(CAPABILITY.BOOKMARKS);
+    });
+
+    it('is enabled', async () => {
+      await expect(
+        isReaderAccountEnabledForTenant(MOCK_TENANT_ID),
+      ).resolves.toBe(true);
+    });
+
+    it('reads the named tenant', async () => {
+      await isReaderAccountEnabledForTenant(MOCK_TENANT_ID);
+
+      expect(queries.tenants.getTenantById).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        expect.anything(),
+      );
+    });
+  });
+
+  it('is disabled for a tenant with no reader-account capability on', async () => {
+    enableOnly(CAPABILITY.ANALYTICS);
+
+    await expect(isReaderAccountEnabledForTenant(MOCK_TENANT_ID)).resolves.toBe(
+      false,
+    );
   });
 });

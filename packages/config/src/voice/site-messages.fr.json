@@ -22,7 +22,8 @@
   },
   "siteUnavailable": {
     "heading": "Ce site est indisponible",
-    "text": "Veuillez revenir plus tard."
+    "text": "Veuillez revenir plus tard.",
+    "manageAccount": "Gérer votre compte"
   },
   "postShare": {
     "shareAriaLabel": "Partager « {title} »",

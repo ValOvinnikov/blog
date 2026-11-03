@@ -11,16 +11,16 @@ import {
   type TPreviewMode,
 } from '@platform/constants/preview';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
-export type TPreviewFrameToolbarProps = {
+export type TPreviewFrameToolbarProps = PropsWithChildren<{
   device: TPreviewDevice;
   onDeviceChange(device: TPreviewDevice): void;
   mode: TPreviewMode;
   onModeChange(mode: TPreviewMode): void;
   extraGroups?: TIconToggleGroupProps<string>[];
-  children?: ReactNode;
-};
+  isEndOnOwnLine?: boolean;
+}>;
 
 export const PreviewFrameToolbar = ({
   device,
@@ -28,6 +28,7 @@ export const PreviewFrameToolbar = ({
   mode,
   onModeChange,
   extraGroups = [],
+  isEndOnOwnLine,
   children,
 }: TPreviewFrameToolbarProps) => {
   const t = useTranslations('devicePreview');
@@ -86,6 +87,7 @@ export const PreviewFrameToolbar = ({
     <IconToolbar
       ariaLabel={t('toolbarAriaLabel')}
       groups={[deviceGroup, modeGroup, ...extraGroups]}
+      isEndOnOwnLine={isEndOnOwnLine}
     >
       {children}
     </IconToolbar>

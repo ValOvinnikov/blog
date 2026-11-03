@@ -306,10 +306,15 @@
   --text-admin-24: 24px;
   --text-admin-28: 28px;
 
+  --leading-admin-18: 18px;
+  --leading-admin-22: 22px;
+
   --font-weight-admin-650: 650;
 
   /* Clears the sticky topbar for sticky panels and scroll targets. */
   --spacing-admin-topbar: var(--admin-topbar);
+  --spacing-admin-card: 18px;
+  --spacing-admin-bar: 3px;
 
   --radius-admin: 6px;
   --radius-admin-control: 4px;

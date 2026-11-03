@@ -67,9 +67,10 @@ new upstream here means auditing every consumer's `paths` and vitest alias.
   which list a string joins is the user's decision: take it from the ticket's
   Copy line, and report a string with no decision under **Voice candidates**
   instead of choosing (CLAUDE.md → "Check for Voice candidates").
-- `react/polymorphic.ts` — `TPolymorphicProps<C, OwnProps>`, reachable only
-  through the `@blog/config/react` subpath so the barrel stays React-free for
-  `@blog/service`. A new React-coupled helper goes in `src/react/`, with its
+- `react/` — `TPolymorphicProps<C, OwnProps>` (`polymorphic.ts`) and
+  `IWithChildren` (`with-children.ts`), reachable only through the
+  `@blog/config/react` subpath (`react/index.ts`) so the barrel stays
+  React-free for `@blog/service`. A new React-coupled helper goes in `src/react/`, with its
   own `exports` subpath when it is a distinct concern.
 - `sanity/generated/` — the `studio` agent's typegen output
   (`pnpm --filter @blog/studio typegen`): confirm a regeneration landed, never

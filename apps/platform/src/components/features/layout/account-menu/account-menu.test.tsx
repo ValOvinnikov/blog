@@ -1,7 +1,6 @@
 import { COLOR_SCHEME } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SidebarCollapseProvider } from '@platform/components/features/layout/sidebar-collapse-provider';
-import { ACCOUNT_MENU_APPEARANCE } from '@platform/constants/account-menu';
 import { DATA_THEME, THEME_PREFERENCE } from '@platform/constants/theme';
 import messages from '@platform/i18n/messages/en.json';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
@@ -45,11 +44,7 @@ const setup = (
 ) =>
   renderWithIntl(
     <SidebarCollapseProvider isInitiallyCollapsed={isInitiallyCollapsed}>
-      <AccountMenu
-        account={MOCK_ACCOUNT}
-        appearance={ACCOUNT_MENU_APPEARANCE.SIDEBAR}
-        {...props}
-      />
+      <AccountMenu account={MOCK_ACCOUNT} {...props} />
     </SidebarCollapseProvider>,
   );
 
@@ -193,22 +188,6 @@ describe(`<${AccountMenu.name}/>`, () => {
       });
 
       expect(trigger).toHaveAttribute('title', MOCK_EMAIL);
-    });
-  });
-
-  describe('as the phone pill', () => {
-    it('is named by the role line and opens the same menu', async () => {
-      setup({ appearance: ACCOUNT_MENU_APPEARANCE.PILL });
-
-      const trigger = screen.getByRole('button', {
-        name: MOCK_ACCOUNT.roleLine,
-      });
-      const menu = await openMenu(user, trigger);
-      const signOutItem = within(menu).getByRole('menuitem', {
-        name: messages.account.signOut,
-      });
-
-      expect(signOutItem).toBeVisible();
     });
   });
 

@@ -821,14 +821,6 @@
     "footerPrivacy": "Privacybeleid",
     "footerCookieSettings": "Cookie-instellingen"
   },
-  "frontPageSample": {
-    "heroHeading": "Berichten van de kust",
-    "heroText": "Notities, essays en foto’s.",
-    "heroButton": "Lees het nieuwste",
-    "firstPostTitle": "Een ochtend op de pier",
-    "secondPostTitle": "Laagtij, laat licht",
-    "thirdPostTitle": "De haven in de winter"
-  },
   "assetUploadField": {
     "remove": "Verwijderen",
     "upload": "Uploaden",
