@@ -289,8 +289,9 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   file defines, an interaction (a click, a key press, a helper that performs
   several), a query bound to a `const`, a fake's override, a fixture build,
   fake timers — it moves into the `describe`'s `beforeEach`. Compare runs,
-  not single lines: when the cases open with the same sequence of
-  statements, the whole sequence moves. The test is mechanical: take the
+  not single lines: the longest run of statements the cases all open with
+  moves, however many statements it is; a longer run only some cases share
+  moves into a nested `describe` (below). The test is mechanical: take the
   statement out of every case and write it once in `beforeEach`; if every
   case still reads true, it was arrangement. A value the cases read is a
   `let` in the `describe`, assigned in `beforeEach`; anything it changes
