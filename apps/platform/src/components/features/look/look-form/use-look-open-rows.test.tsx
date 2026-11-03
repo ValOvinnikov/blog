@@ -96,6 +96,15 @@ const rowTrigger = (title: string) => {
   return within(heading).getByRole('button');
 };
 
+const followGoToTheFirstOne = async (user: UserEvent) => {
+  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  await user.click(saveButton);
+  const goToFirstOneLink = await screen.findByRole('link', {
+    name: GO_TO_THE_FIRST_ONE,
+  });
+  await user.click(goToFirstOneLink);
+};
+
 describe(useLookOpenRows, () => {
   let user: UserEvent;
 
@@ -139,55 +148,55 @@ describe(useLookOpenRows, () => {
     expect(headerTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
   });
 
-  it('names an open row body after the row title', async () => {
-    const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
-    await user.click(colourTrigger);
+  describe('with the Colour row open', () => {
+    let colourTrigger: HTMLElement;
 
-    const body = screen.getByRole('group', { name: LOOK_FORM.colourHeading });
-    const slider = within(body).getByRole('slider', { name: ACCENT_HUE });
-
-    expect(slider).toBeVisible();
-  });
-
-  it('keeps a typed value when its row folds and opens again', async () => {
-    const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
-    await user.click(colourTrigger);
-    await nudgeAccentHue(user);
-    await user.click(colourTrigger);
-    await user.click(colourTrigger);
-
-    const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-    expect(slider).toHaveValue(String(NUDGED_ACCENT_HUE));
-  });
-
-  it('shows the unsaved dot on the changed row only', async () => {
-    const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
-    await user.click(colourTrigger);
-    await nudgeAccentHue(user);
-    await user.click(colourTrigger);
-
-    const dots = screen.getAllByRole('img', { name: UNSAVED_DOT });
-    const colourDot = within(colourTrigger).getByRole('img', {
-      name: UNSAVED_DOT,
-    });
-    expect(dots).toEqual([colourDot]);
-  });
-
-  describe('with a diverged preset', () => {
     beforeEach(async () => {
-      const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
+      colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
       await user.click(colourTrigger);
-      await nudgeAccentHue(user);
     });
 
-    it('keeps Reset to preset on a card that is not a folding row', () => {
-      const presetTrigger = screen.queryByRole('button', {
-        name: LOOK_FORM.presetLabel,
-      });
-      const resetButton = screen.getByRole('button', { name: RESET_TO_PRESET });
+    it('names an open row body after the row title', () => {
+      const body = screen.getByRole('group', { name: LOOK_FORM.colourHeading });
+      const slider = within(body).getByRole('slider', { name: ACCENT_HUE });
 
-      expect(presetTrigger).not.toBeInTheDocument();
-      expect(resetButton).toBeVisible();
+      expect(slider).toBeVisible();
+    });
+
+    describe('with the accent hue nudged', () => {
+      beforeEach(async () => {
+        await nudgeAccentHue(user);
+      });
+
+      it('keeps a typed value when its row folds and opens again', async () => {
+        await user.click(colourTrigger);
+        await user.click(colourTrigger);
+
+        const slider = screen.getByRole('slider', { name: ACCENT_HUE });
+        expect(slider).toHaveValue(String(NUDGED_ACCENT_HUE));
+      });
+
+      it('shows the unsaved dot on the changed row only', async () => {
+        await user.click(colourTrigger);
+
+        const dots = screen.getAllByRole('img', { name: UNSAVED_DOT });
+        const colourDot = within(colourTrigger).getByRole('img', {
+          name: UNSAVED_DOT,
+        });
+        expect(dots).toEqual([colourDot]);
+      });
+
+      it('keeps Reset to preset on a card that is not a folding row', () => {
+        const presetTrigger = screen.queryByRole('button', {
+          name: LOOK_FORM.presetLabel,
+        });
+        const resetButton = screen.getByRole('button', {
+          name: RESET_TO_PRESET,
+        });
+
+        expect(presetTrigger).not.toBeInTheDocument();
+        expect(resetButton).toBeVisible();
+      });
     });
   });
 
@@ -205,12 +214,7 @@ describe(useLookOpenRows, () => {
     });
 
     it('opens the Colour row, keeps Footer open and focuses the slider', async () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      await user.click(saveButton);
-      const goToFirstOneLink = screen.getByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(goToFirstOneLink);
+      await followGoToTheFirstOne(user);
 
       const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
       const footerTrigger = rowTrigger(LOOK_FORM.footerHeading);
@@ -235,12 +239,7 @@ describe(useLookOpenRows, () => {
     });
 
     it('opens the Brand row, folds nothing else and focuses the picker', async () => {
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      await user.click(saveButton);
-      const goToFirstOneLink = await screen.findByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(goToFirstOneLink);
+      await followGoToTheFirstOne(user);
 
       const brandTrigger = rowTrigger(LOOK_FORM.brandHeading);
       const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);

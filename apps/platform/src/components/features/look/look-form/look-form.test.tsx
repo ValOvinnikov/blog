@@ -256,6 +256,32 @@ const clickSave = async (user: UserEvent) => {
   await user.click(saveChangesButton);
 };
 
+const saveAndExpectLook = async (
+  user: UserEvent,
+  saved: Partial<TLookFormValues>,
+) => {
+  await clickSave(user);
+
+  await waitFor(() => {
+    expect(updateLookAction).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      savedLookValues(saved),
+    );
+  });
+};
+
+const pickAndSaveLogo = async (user: UserEvent) => {
+  await pickLogo(user);
+  await clickSave(user);
+};
+
+const stageAssetRemoval = async (user: UserEvent) => {
+  const removeButton = screen.getByRole('button', {
+    name: messages.assetUploadField.remove,
+  });
+  await user.click(removeButton);
+};
+
 const chooseOption = async (
   user: UserEvent,
   selectName: string,
@@ -447,14 +473,8 @@ describe(`<${LookForm.name}/>`, () => {
           name: option,
         });
         await user.click(optionButton);
-        await clickSave(user);
 
-        await waitFor(() => {
-          expect(updateLookAction).toHaveBeenCalledWith(
-            MOCK_TENANT_ID,
-            savedLookValues(saved),
-          );
-        });
+        await saveAndExpectLook(user, saved);
       });
 
       it.each([
@@ -475,14 +495,8 @@ describe(`<${LookForm.name}/>`, () => {
         },
       ])('saves the chosen $select', async ({ select, option, saved }) => {
         await chooseOption(user, select, option);
-        await clickSave(user);
 
-        await waitFor(() => {
-          expect(updateLookAction).toHaveBeenCalledWith(
-            MOCK_TENANT_ID,
-            savedLookValues(saved),
-          );
-        });
+        await saveAndExpectLook(user, saved);
       });
 
       it('previews the chosen account panel open while signed in', async () => {
@@ -1482,18 +1496,21 @@ describe(`<${LookForm.name}/>`, () => {
             }),
         );
         setup();
-        await pickLogo(user);
-        await clickSave(user);
+        await pickAndSaveLogo(user);
       });
+
+      const resolveUploadSuccessfully = () => {
+        resolveUpload({
+          outcome: ACTION_OUTCOME.SUCCESS,
+          url: MOCK_UPLOADED_LOGO_URL,
+        });
+      };
 
       it('locks the edit panel while a save is running', async () => {
         const lockedPanel = await screen.findByTestId(EDIT_PANEL_TEST_ID);
         expect(lockedPanel).toHaveAttribute('inert');
 
-        resolveUpload({
-          outcome: ACTION_OUTCOME.SUCCESS,
-          url: MOCK_UPLOADED_LOGO_URL,
-        });
+        resolveUploadSuccessfully();
 
         await waitFor(() => {
           const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
@@ -1504,10 +1521,7 @@ describe(`<${LookForm.name}/>`, () => {
       it('keeps an edit made while the logo uploads as an unsaved change', async () => {
         await screen.findByRole('button', { name: SAVING });
         await nudgeAccentHue(user);
-        resolveUpload({
-          outcome: ACTION_OUTCOME.SUCCESS,
-          url: MOCK_UPLOADED_LOGO_URL,
-        });
+        resolveUploadSuccessfully();
 
         await waitFor(() => {
           const unsavedRegion = screen.getByRole('region', {
@@ -1533,10 +1547,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('clears a staged removal on Save', async () => {
-        const removeButton = screen.getByRole('button', {
-          name: messages.assetUploadField.remove,
-        });
-        await user.click(removeButton);
+        await stageAssetRemoval(user);
         expect(clearBrandAssetAction).not.toHaveBeenCalled();
 
         await clickSave(user);
@@ -1572,8 +1583,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       it('fails the save on the logo picker and keeps the draft', async () => {
         await nudgeAccentHue(user);
-        await pickLogo(user);
-        await clickSave(user);
+        await pickAndSaveLogo(user);
 
         const replaceLogoButton = await screen.findByRole('button', {
           name: REPLACE_LOGO,
@@ -1593,8 +1603,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       describe('after saving a picked logo', () => {
         beforeEach(async () => {
-          await pickLogo(user);
-          await clickSave(user);
+          await pickAndSaveLogo(user);
         });
 
         it('says Not saved beside Save and links to the failed picker', async () => {
@@ -1641,8 +1650,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
       setup();
 
-      await pickLogo(user);
-      await clickSave(user);
+      await pickAndSaveLogo(user);
 
       const error = await screen.findByText(
         tUploadErrors('fileTooLarge', { limit: MOCK_UPLOAD_LIMIT }),
@@ -1662,10 +1670,7 @@ describe(`<${LookForm.name}/>`, () => {
         },
       });
 
-      const removeButton = screen.getByRole('button', {
-        name: messages.assetUploadField.remove,
-      });
-      await user.click(removeButton);
+      await stageAssetRemoval(user);
       await clickSave(user);
 
       const uploadFaviconButton = await screen.findByRole('button', {
