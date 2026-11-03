@@ -12,3 +12,4 @@ export * from './tenant-deprovisioning';
 export * from './tenant-inactivity';
 export * from './tenant-owner-access';
 export * from './tenant-provisioning';
+export * from './tenant-suspension';
