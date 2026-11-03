@@ -5,7 +5,12 @@ import { ICONS } from '@blog/config';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
+import {
+  NestableMenuRoot,
+  NestableMenuTrigger,
+} from '@platform/components/shared/nestable-menu';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
@@ -26,6 +31,7 @@ export const TenantSwitcher = ({
     tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0];
 
   const t = useTranslations('tenantSwitcher');
+  const isNested = useIsNestedMenu();
 
   const {
     trigger,
@@ -49,8 +55,8 @@ export const TenantSwitcher = ({
   }
 
   return (
-    <Menu.Root>
-      <Menu.Trigger className={trigger()} title={active.name}>
+    <NestableMenuRoot>
+      <NestableMenuTrigger className={trigger()} title={active.name}>
         <Avatar name={active.name} variant="switcher" />
         <span className={meta()}>
           <span className={nameRow()}>
@@ -64,9 +70,13 @@ export const TenantSwitcher = ({
           <span className={domain()}>{active.primaryDomain}</span>
         </span>
         <Icon name={ICONS.CHEVRON_DOWN} className={chev()} />
-      </Menu.Trigger>
+      </NestableMenuTrigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={4} align="start">
+        <Menu.Positioner
+          side={isNested ? 'bottom' : undefined}
+          sideOffset={isNested ? 6 : 4}
+          align="start"
+        >
           {/* Base UI points the popup's aria-labelledby at the trigger unconditionally,
               which wins over any aria-label here per the accname algorithm — and the
               trigger's own text (active tenant + domain) is already the right name. */}
@@ -74,6 +84,7 @@ export const TenantSwitcher = ({
             {tenants.map((tenant) => (
               <Menu.LinkItem
                 key={tenant.id}
+                closeOnClick={true}
                 className={item()}
                 render={
                   <Link
@@ -101,6 +112,6 @@ export const TenantSwitcher = ({
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
-    </Menu.Root>
+    </NestableMenuRoot>
   );
 };

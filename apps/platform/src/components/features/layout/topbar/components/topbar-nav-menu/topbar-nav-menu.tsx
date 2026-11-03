@@ -3,12 +3,10 @@
 import { Menu } from '@base-ui/react/menu';
 import { ICONS } from '@blog/config';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
-import {
-  sidebarVariants,
-  type TSidebarNavSection,
-} from '@platform/components/features/layout/sidebar';
+import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
+import { NestedMenuProvider } from '@platform/context/nested-menu-provider';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
 import { useTranslations } from 'next-intl';
@@ -19,20 +17,31 @@ import { topbarNavMenuVariants } from './topbar-nav-menu-variants';
 export type TTopbarNavMenuProps = {
   sections: TSidebarNavSection[];
   switcher?: ReactNode;
+  account: ReactNode;
 };
 
-export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
+// The Menu button spans y 11–55 of the 67px top bar; the popup opens 5px below the bar.
+const POPUP_SIDE_OFFSET = 17;
+
+export const TopbarNavMenu = ({
+  sections,
+  switcher,
+  account,
+}: TTopbarNavMenuProps) => {
   const t = useTranslations('topbarNavMenu');
   const pathname = usePathname();
   const {
     trigger,
     popup,
-    sectionLabel: phoneSectionLabel,
-    row: phoneRow,
-    note: phoneNote,
+    topZone,
+    middleZone,
+    footZone,
+    section,
+    sectionLabel,
+    row,
+    note,
   } = topbarNavMenuVariants();
   const { popup: surfacePopup } = menuSurfaceVariants();
-  const { switcherSlot, section, sectionLabel, row, note } = sidebarVariants();
 
   return (
     <Menu.Root>
@@ -44,74 +53,79 @@ export const TopbarNavMenu = ({ sections, switcher }: TTopbarNavMenuProps) => {
         <Icon name={ICONS.MENU} />
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner sideOffset={6} align="start">
+        <Menu.Positioner sideOffset={POPUP_SIDE_OFFSET} align="start">
           <Menu.Popup className={surfacePopup({ class: popup() })}>
-            {switcher && <div className={switcherSlot()}>{switcher}</div>}
+            <NestedMenuProvider>
+              {switcher && <div className={topZone()}>{switcher}</div>}
 
-            {sections.map((navSection) => (
-              <Menu.Group className={section()} key={navSection.label}>
-                <Menu.GroupLabel
-                  className={sectionLabel({ class: phoneSectionLabel() })}
-                >
-                  {navSection.label}
-                </Menu.GroupLabel>
-                {navSection.items.length > 0
-                  ? navSection.items.map((item) => {
-                      if (item.href) {
-                        const isActive = isCurrentNavHref(item.href, pathname);
+              <div className={middleZone()}>
+                {sections.map((navSection) => (
+                  <Menu.Group className={section()} key={navSection.label}>
+                    <Menu.GroupLabel className={sectionLabel()}>
+                      {navSection.label}
+                    </Menu.GroupLabel>
+                    {navSection.items.length > 0
+                      ? navSection.items.map((item) => {
+                          if (item.href) {
+                            const isCurrent = isCurrentNavHref(
+                              item.href,
+                              pathname,
+                            );
 
-                        return (
-                          <Menu.LinkItem
-                            key={item.label}
-                            closeOnClick={true}
-                            render={
-                              <Link
-                                href={item.href}
-                                aria-current={isActive ? 'page' : undefined}
+                            return (
+                              <Menu.LinkItem
+                                key={item.label}
+                                closeOnClick={true}
+                                render={
+                                  <Link
+                                    href={item.href}
+                                    title={item.status ? undefined : item.label}
+                                    aria-current={
+                                      isCurrent ? 'page' : undefined
+                                    }
+                                  />
+                                }
+                                className={row({
+                                  state: isCurrent ? 'current' : 'resting',
+                                })}
+                              >
+                                <NavItemContent
+                                  icon={item.icon}
+                                  label={item.label}
+                                  badge={item.badge}
+                                  status={item.status}
+                                />
+                              </Menu.LinkItem>
+                            );
+                          }
+
+                          return (
+                            <div
+                              key={item.label}
+                              role="menuitem"
+                              aria-disabled="true"
+                              title={item.label}
+                              className={row({ state: 'inert' })}
+                            >
+                              <NavItemContent
+                                icon={item.icon}
+                                label={item.label}
+                                disabledReason={item.disabledReason}
+                                badge={item.badge}
+                                status={item.status}
                               />
-                            }
-                            className={row({
-                              state: isActive ? 'active' : 'resting',
-                              class: phoneRow(),
-                            })}
-                          >
-                            <NavItemContent
-                              icon={item.icon}
-                              label={item.label}
-                              badge={item.badge}
-                              status={item.status}
-                            />
-                          </Menu.LinkItem>
-                        );
-                      }
+                            </div>
+                          );
+                        })
+                      : navSection.note && (
+                          <p className={note()}>{navSection.note}</p>
+                        )}
+                  </Menu.Group>
+                ))}
+              </div>
 
-                      return (
-                        <div
-                          key={item.label}
-                          role="menuitem"
-                          aria-disabled="true"
-                          className={row({
-                            state: 'inert',
-                            class: phoneRow(),
-                          })}
-                        >
-                          <NavItemContent
-                            icon={item.icon}
-                            label={item.label}
-                            disabledReason={item.disabledReason}
-                            badge={item.badge}
-                            status={item.status}
-                          />
-                        </div>
-                      );
-                    })
-                  : navSection.note && (
-                      <p className={note({ class: phoneNote() })}>
-                        {navSection.note}
-                      </p>
-                    )}
-              </Menu.Group>
-            ))}
+              <div className={footZone()}>{account}</div>
+            </NestedMenuProvider>
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>

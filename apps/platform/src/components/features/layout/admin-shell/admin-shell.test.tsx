@@ -94,15 +94,17 @@ describe(`<${AdminShell.name}/>`, () => {
       expect(roleLine).toBeVisible();
     });
 
-    it('keeps the phone pill in the top bar, named by the role line', () => {
+    it('keeps the top bar free of an account button', () => {
       const banner = screen.getByRole('banner');
-      const pill = within(banner).getByRole('button', { name: MOCK_ROLE_LINE });
+      const accountButton = within(banner).queryByRole('button', {
+        name: new RegExp(MOCK_EMAIL),
+      });
 
-      expect(pill).toHaveAttribute(ARIA_HASPOPUP, 'menu');
+      expect(accountButton).not.toBeInTheDocument();
     });
   });
 
-  it('lists the nav items and the switcher in the topbar menu', async () => {
+  it('lists the switcher, the nav items and the account in the topbar menu', async () => {
     setup({ switcher: <div>{MOCK_SWITCHER}</div> });
 
     const menuTrigger = screen.getByRole('button', {
@@ -115,9 +117,13 @@ describe(`<${AdminShell.name}/>`, () => {
       name: MOCK_NAV_ITEM_LABEL,
     });
     const menuSwitcher = within(menu).getByText(MOCK_SWITCHER);
+    const menuAccount = within(menu).getByRole('menuitem', {
+      name: new RegExp(MOCK_EMAIL),
+    });
 
     expect(menuNavItem).toBeVisible();
     expect(menuSwitcher).toBeVisible();
+    expect(menuAccount).toHaveAttribute(ARIA_HASPOPUP, 'menu');
   });
 
   it('can open with the sidebar collapsed', () => {

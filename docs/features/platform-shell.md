@@ -216,7 +216,8 @@ switches the content column to full-bleed (see
   the rail, to its right (`sideOffset` 20) at 240px with its bottom aligned
   to the trigger's. It heads with the name, the email and the role line
   ("{role} · {scope}"), none focusable, then — in the expanded and the rail
-  menu — a Theme section, then the Sign out item, which takes focus on open.
+  menu — a Theme section, then the Sign out item, which takes focus on open
+  from the sidebar.
   The Theme section is the shared `MenuRadioGroup`
   (`components/shared/menu-radio-group/`) at its desktop size: a "Theme"
   group of Light (sun), Dark (moon) and System (monitor) `menuitemradio`
@@ -225,9 +226,8 @@ switches the content column to full-bleed (see
   `admin-theme` cookie and sets or clears `data-theme` on `<html>` at once,
   without a reload and without closing the menu; the menu reads the current
   choice back from `<html>`, since the root layout never re-renders on client
-  navigation. Below `md` the topbar keeps a pill
-  (`ACCOUNT_MENU_APPEARANCE.PILL`) named by the role line that opens the same
-  menu without the Theme section; from `md` nothing follows the breadcrumb.
+  navigation. The top bar carries no account control at any width: below
+  `md` the account lives at the foot of the phone Menu (below).
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
@@ -279,8 +279,30 @@ switches the content column to full-bleed (see
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
   `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
-  and its section labels and notes read `muted` and its rows `text` on that
-  ground. Its inert rows are disabled menu items (`role="menuitem"`,
+  288px wide, 17px under the Menu button, as tall as its content up to the
+  viewport less 84px. The popup never scrolls; it holds three zones. A pinned
+  top zone (padding 6px 6px 10px, a `popover-line` rule below) holds the
+  Workspace switcher and renders only when the switcher does. A scrolling
+  middle zone (padding 0 2px 8px; sections 10px 4px 0) holds the sidebar's
+  sections, labels and notes in `muted`, its rows in the sidebar row shape at
+  least 44px tall, 13px/400 `text` with `muted` icons and `title` = the label
+  (none on a row with a status line): highlight and hover take a
+  `popover-hover` plate with no ring; the current row adds a 3px `brand-ink`
+  bar flush left, inset 10px, a 600 label and a `text` icon. A pinned foot
+  zone (padding 8px 2px 2px, a `popover-line` rule above) holds `AccountMenu`
+  in its expanded form. The Menu wraps both pinned zones in
+  `NestedMenuProvider` (`context/nested-menu-provider/`), so `TenantSwitcher`
+  and `AccountMenu` open through `NestableMenuRoot`/`NestableMenuTrigger`
+  (`components/shared/nestable-menu/`) as Base UI submenus: their triggers
+  are menu items in the Menu's arrow-key order (switcher, rows, account) on a
+  `side-field` ground with a `side-field-line` border, a `popover-hover`
+  hover, a `side-accent` border while open and the popover-gapped ring. The
+  switcher's dropdown opens 6px below it and the account menu 6px above the
+  foot, each at its trigger's width, with the Menu open behind; Escape closes
+  the inner popup onto its trigger, a second Escape closes the Menu onto its
+  button, and choosing a workspace closes both. The Menu button takes a
+  `brand-ink` border on hover, focus (with the bg-gapped ring) and open, and
+  a `text` icon while open. Its inert rows are disabled menu items (`role="menuitem"`,
   `aria-disabled`, outside Base UI's item list), so arrow keys skip them and
   they take no focus; they keep the enabled rows' label and icon colours and
   change nothing on hover. Its neutral pills sit on `pill-neutral-popover`,
