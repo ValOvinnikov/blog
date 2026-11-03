@@ -510,7 +510,7 @@
       "connecting": "Koppelen…",
       "remove": "Verwijderen",
       "removeTitle": "Dit domein verwijderen?",
-      "removeDescription": "{domain} toont je site niet meer. Je huidige adres blijft werken.",
+      "removeDescription": "<domainName>{domain}</domainName> toont je site niet meer. Je huidige adres blijft werken.",
       "removeConfirm": "Domein verwijderen",
       "removing": "Verwijderen…",
       "connectFailed": "Het domein kon niet worden gekoppeld. Probeer het opnieuw.",
@@ -545,7 +545,7 @@
       "verify": "Controleren",
       "verifying": "Controleren…",
       "verifyFailed": "Het record kon niet worden gecontroleerd. Probeer het opnieuw.",
-      "removeClaimDescription": "{domain} wacht niet meer op verificatie. Je huidige adres blijft werken.",
+      "removeClaimDescription": "<domainName>{domain}</domainName> wacht niet meer op verificatie. Je huidige adres blijft werken.",
       "mainTitle": "Je eigen domein (hoofdadres)",
       "subdomainStillWorks": "Je subdomein {subdomain} blijft werken en toont dezelfde site.",
       "mainAddress": {
@@ -553,14 +553,14 @@
         "makeMain": {
           "trigger": "Gebruik als hoofdadres",
           "title": "Dit domein als hoofdadres gebruiken?",
-          "description": "Je site is dan bekend onder {domain}. Je kunt op elk moment terug naar je subdomein.",
+          "description": "Je site is dan bekend onder <domainName>{domain}</domainName>. Je kunt op elk moment terug naar je subdomein.",
           "confirm": "Gebruik als hoofdadres",
           "confirming": "Wijzigen…"
         },
         "useSubdomain": {
           "trigger": "Gebruik mijn subdomein als hoofdadres",
           "title": "Je subdomein als hoofdadres gebruiken?",
-          "description": "Je site is dan weer bekend onder je subdomein. {domain} blijft gekoppeld.",
+          "description": "Je site is dan weer bekend onder je subdomein. <domainName>{domain}</domainName> blijft gekoppeld.",
           "confirm": "Gebruik subdomein",
           "confirming": "Wijzigen…"
         }

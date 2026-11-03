@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
+import { domainNameTag } from '@platform/components/features/tenants/domain-page-content/components/domain-name/domain-name';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
@@ -73,7 +74,10 @@ export const MainAddressControl = ({
       </ConfirmDialog.Trigger>
       <ConfirmDialog.Content
         title={t(`mainAddress.${copyKey}.title`)}
-        description={t(`mainAddress.${copyKey}.description`, { domain })}
+        description={t.rich(`mainAddress.${copyKey}.description`, {
+          domain,
+          ...domainNameTag,
+        })}
         confirmButtonLabel={t(`mainAddress.${copyKey}.confirm`)}
         confirmingButtonLabel={t(`mainAddress.${copyKey}.confirming`)}
       />

@@ -510,7 +510,7 @@
       "connecting": "Verbinden …",
       "remove": "Entfernen",
       "removeTitle": "Diese Domain entfernen?",
-      "removeDescription": "Unter {domain} wird deine Website nicht mehr ausgeliefert. Deine aktuelle Adresse funktioniert weiter.",
+      "removeDescription": "Unter <domainName>{domain}</domainName> wird deine Website nicht mehr ausgeliefert. Deine aktuelle Adresse funktioniert weiter.",
       "removeConfirm": "Domain entfernen",
       "removing": "Entfernen …",
       "connectFailed": "Die Domain konnte nicht verbunden werden. Versuche es erneut.",
@@ -545,7 +545,7 @@
       "verify": "Prüfen",
       "verifying": "Wird geprüft…",
       "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
-      "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter.",
+      "removeClaimDescription": "<domainName>{domain}</domainName> wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter.",
       "mainTitle": "Eigene Domain (Hauptadresse)",
       "subdomainStillWorks": "Deine Subdomain {subdomain} funktioniert weiter und zeigt dieselbe Website.",
       "mainAddress": {
@@ -553,14 +553,14 @@
         "makeMain": {
           "trigger": "Als Hauptadresse verwenden",
           "title": "Diese Domain als Hauptadresse verwenden?",
-          "description": "Deine Website ist dann unter {domain} erreichbar. Du kannst jederzeit zur Subdomain zurückwechseln.",
+          "description": "Deine Website ist dann unter <domainName>{domain}</domainName> erreichbar. Du kannst jederzeit zur Subdomain zurückwechseln.",
           "confirm": "Als Hauptadresse verwenden",
           "confirming": "Wechseln …"
         },
         "useSubdomain": {
           "trigger": "Meine Subdomain als Hauptadresse verwenden",
           "title": "Deine Subdomain als Hauptadresse verwenden?",
-          "description": "Deine Website ist dann wieder unter deiner Subdomain erreichbar. {domain} bleibt verbunden.",
+          "description": "Deine Website ist dann wieder unter deiner Subdomain erreichbar. <domainName>{domain}</domainName> bleibt verbunden.",
           "confirm": "Subdomain verwenden",
           "confirming": "Wechseln …"
         }

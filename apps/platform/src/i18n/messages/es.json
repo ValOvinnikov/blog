@@ -510,7 +510,7 @@
       "connecting": "Conectando…",
       "remove": "Quitar",
       "removeTitle": "¿Quitar este dominio?",
-      "removeDescription": "{domain} dejará de mostrar tu sitio. Tu dirección actual sigue funcionando.",
+      "removeDescription": "<domainName>{domain}</domainName> dejará de mostrar tu sitio. Tu dirección actual sigue funcionando.",
       "removeConfirm": "Quitar dominio",
       "removing": "Quitando…",
       "connectFailed": "No se pudo conectar el dominio. Inténtalo de nuevo.",
@@ -545,7 +545,7 @@
       "verify": "Verificar",
       "verifying": "Verificando…",
       "verifyFailed": "No se pudo comprobar el registro. Inténtalo de nuevo.",
-      "removeClaimDescription": "{domain} dejará de esperar la verificación. Tu dirección actual sigue funcionando.",
+      "removeClaimDescription": "<domainName>{domain}</domainName> dejará de esperar la verificación. Tu dirección actual sigue funcionando.",
       "mainTitle": "Tu propio dominio (dirección principal)",
       "subdomainStillWorks": "Tu subdominio {subdomain} sigue funcionando y muestra el mismo sitio.",
       "mainAddress": {
@@ -553,14 +553,14 @@
         "makeMain": {
           "trigger": "Usar como dirección principal",
           "title": "¿Usar este dominio como dirección principal?",
-          "description": "Tu sitio se conocerá como {domain}. Puedes volver a tu subdominio cuando quieras.",
+          "description": "Tu sitio se conocerá como <domainName>{domain}</domainName>. Puedes volver a tu subdominio cuando quieras.",
           "confirm": "Usar como dirección principal",
           "confirming": "Cambiando…"
         },
         "useSubdomain": {
           "trigger": "Usar mi subdominio como dirección principal",
           "title": "¿Usar tu subdominio como dirección principal?",
-          "description": "Tu sitio volverá a conocerse por tu subdominio. {domain} sigue conectado.",
+          "description": "Tu sitio volverá a conocerse por tu subdominio. <domainName>{domain}</domainName> sigue conectado.",
           "confirm": "Usar subdominio",
           "confirming": "Cambiando…"
         }

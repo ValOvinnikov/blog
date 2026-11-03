@@ -3,6 +3,7 @@
 import { ACTION_OUTCOME, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
+import { domainNameTag } from '@platform/components/features/tenants/domain-page-content/components/domain-name/domain-name';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
@@ -53,11 +54,9 @@ export const RemoveCustomDomainControl = ({
       </ConfirmDialog.Trigger>
       <ConfirmDialog.Content
         title={t('removeTitle')}
-        description={t(
+        description={t.rich(
           isClaim ? 'removeClaimDescription' : 'removeDescription',
-          {
-            domain,
-          },
+          { domain, ...domainNameTag },
         )}
         confirmButtonLabel={t('removeConfirm')}
         confirmingButtonLabel={t('removing')}

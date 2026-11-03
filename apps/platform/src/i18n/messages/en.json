@@ -510,7 +510,7 @@
       "connecting": "Connecting…",
       "remove": "Remove",
       "removeTitle": "Remove this domain?",
-      "removeDescription": "{domain} will stop serving your site. Your current address keeps working.",
+      "removeDescription": "<domainName>{domain}</domainName> will stop serving your site. Your current address keeps working.",
       "removeConfirm": "Remove domain",
       "removing": "Removing…",
       "connectFailed": "Couldn't connect the domain. Try again.",
@@ -545,7 +545,7 @@
       "verify": "Verify",
       "verifying": "Verifying…",
       "verifyFailed": "Couldn't check the record. Try again.",
-      "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working.",
+      "removeClaimDescription": "<domainName>{domain}</domainName> will no longer be waiting for verification. Your current address keeps working.",
       "mainTitle": "Your own domain (main address)",
       "subdomainStillWorks": "Your subdomain {subdomain} still works and shows the same site.",
       "mainAddress": {
@@ -553,14 +553,14 @@
         "makeMain": {
           "trigger": "Make this the main address",
           "title": "Make this the main address?",
-          "description": "Your site will be known by {domain}. You can switch back to your subdomain at any time.",
+          "description": "Your site will be known by <domainName>{domain}</domainName>. You can switch back to your subdomain at any time.",
           "confirm": "Make main address",
           "confirming": "Switching…"
         },
         "useSubdomain": {
           "trigger": "Use my subdomain as the main address",
           "title": "Use your subdomain as the main address?",
-          "description": "Your site will go back to being known by your subdomain. {domain} stays connected.",
+          "description": "Your site will go back to being known by your subdomain. <domainName>{domain}</domainName> stays connected.",
           "confirm": "Use subdomain",
           "confirming": "Switching…"
         }
