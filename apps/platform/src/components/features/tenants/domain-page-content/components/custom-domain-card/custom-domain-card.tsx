@@ -62,6 +62,7 @@ export const CustomDomainCard = ({
             isPlatformAddress={false}
             projectDomain={shown.projectDomain}
             title={isPrimaryCustom ? t('mainTitle') : t('title')}
+            note={isPrimaryCustom ? t('subdomainStillWorks') : undefined}
             actions={
               canAct && (
                 <CustomDomainActions

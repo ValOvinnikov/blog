@@ -1,7 +1,11 @@
 import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import {
+  DOMAIN_VERIFICATION_STATUS,
+  ROUTING_RECORD_TYPE,
+} from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
+import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -25,9 +29,22 @@ const MOCK_CHALLENGE_VALUE = `vc-domain-verify=${MOCK_DOMAIN},${faker.string.alp
 const MOCK_TRAVERSAL_DOMAIN = '../../v9/projects/other';
 const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
 const DNS_RECORD_TYPE_TXT = 'TXT';
-
-const respondWith = (body: unknown, status: number = HTTP_STATUS.OK) =>
-  new Response(JSON.stringify(body), { status });
+const MOCK_APEX_DOMAIN = faker.internet.domainName();
+const MOCK_SUBDOMAIN = `${faker.internet.domainWord()}.${MOCK_APEX_DOMAIN}`;
+const MOCK_A_RECORD_VALUE = faker.internet.ipv4();
+const MOCK_OTHER_A_RECORD_VALUE = faker.internet.ipv4();
+const MOCK_CNAME_VALUE = `${faker.internet.domainWord()}.vercel-dns-${faker.string.alphanumeric(3)}.com.`;
+const MOCK_OTHER_CNAME_VALUE = `${faker.internet.domainWord()}.vercel-dns.com.`;
+const ROUTING_OPTIONS = {
+  recommendedIPv4: [
+    { rank: 2, value: [MOCK_OTHER_A_RECORD_VALUE] },
+    { rank: 1, value: [MOCK_A_RECORD_VALUE] },
+  ],
+  recommendedCNAME: [
+    { rank: 2, value: MOCK_OTHER_CNAME_VALUE },
+    { rank: 1, value: MOCK_CNAME_VALUE },
+  ],
+};
 
 describe(getProjectDomain, () => {
   beforeEach(() => {
@@ -44,7 +61,7 @@ describe(getProjectDomain, () => {
 
   it('makes exactly one authenticated request scoped to the team', async () => {
     envMock.VERCEL_TEAM_ID = MOCK_TEAM_ID;
-    fetchMock.mockResolvedValue(respondWith({ verified: false }));
+    fetchMock.mockResolvedValue(mockJsonResponse({ verified: false }));
 
     await getProjectDomain(MOCK_DOMAIN);
 
@@ -86,7 +103,7 @@ describe(getProjectDomain, () => {
   });
 
   it('returns NOT_ADDED with no records for a 404 response', async () => {
-    fetchMock.mockResolvedValue(respondWith(null, HTTP_STATUS.NOT_FOUND));
+    fetchMock.mockResolvedValue(mockJsonResponse(null, HTTP_STATUS.NOT_FOUND));
 
     const result = await getProjectDomain(MOCK_DOMAIN);
 
@@ -98,7 +115,7 @@ describe(getProjectDomain, () => {
 
   it('returns ERROR with no records for an unexpected non-2xx response', async () => {
     fetchMock.mockResolvedValue(
-      respondWith(null, HTTP_STATUS.INTERNAL_SERVER_ERROR),
+      mockJsonResponse(null, HTTP_STATUS.INTERNAL_SERVER_ERROR),
     );
 
     const result = await getProjectDomain(MOCK_DOMAIN);
@@ -132,19 +149,23 @@ describe(getProjectDomain, () => {
     );
   });
 
-  it('returns VERIFIED with no records even if Vercel still lists challenges', async () => {
-    fetchMock.mockResolvedValue(
-      respondWith({
-        verified: true,
-        verification: [
-          {
-            type: DNS_RECORD_TYPE_TXT,
-            domain: MOCK_CHALLENGE_NAME,
-            value: MOCK_CHALLENGE_VALUE,
-          },
-        ],
-      }),
-    );
+  it('returns VERIFIED with no records once the domain is owned and routes, even if Vercel still lists challenges', async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        mockJsonResponse({
+          name: MOCK_DOMAIN,
+          apexName: MOCK_DOMAIN,
+          verified: true,
+          verification: [
+            {
+              type: DNS_RECORD_TYPE_TXT,
+              domain: MOCK_CHALLENGE_NAME,
+              value: MOCK_CHALLENGE_VALUE,
+            },
+          ],
+        }),
+      )
+      .mockResolvedValueOnce(mockJsonResponse({ misconfigured: false }));
 
     const result = await getProjectDomain(MOCK_DOMAIN);
 
@@ -154,9 +175,113 @@ describe(getProjectDomain, () => {
     });
   });
 
+  it("checks the domain's configuration against the web project once it is owned", async () => {
+    envMock.VERCEL_TEAM_ID = MOCK_TEAM_ID;
+    fetchMock
+      .mockResolvedValueOnce(mockJsonResponse({ verified: true }))
+      .mockResolvedValueOnce(mockJsonResponse({ misconfigured: false }));
+
+    await getProjectDomain(MOCK_DOMAIN);
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const [calledUrl] = fetchMock.mock.calls[1] as [URL];
+    expect(calledUrl.pathname).toBe(`/v6/domains/${MOCK_DOMAIN}/config`);
+    expect(calledUrl.searchParams.get('projectIdOrName')).toBe(MOCK_PROJECT_ID);
+    expect(calledUrl.searchParams.get('teamId')).toBe(MOCK_TEAM_ID);
+  });
+
+  it('returns PENDING with the preferred CNAME record for an owned subdomain that does not route', async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        mockJsonResponse({
+          name: MOCK_SUBDOMAIN,
+          apexName: MOCK_APEX_DOMAIN,
+          verified: true,
+        }),
+      )
+      .mockResolvedValueOnce(
+        mockJsonResponse({ misconfigured: true, ...ROUTING_OPTIONS }),
+      );
+
+    const result = await getProjectDomain(MOCK_SUBDOMAIN);
+
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [
+        {
+          type: ROUTING_RECORD_TYPE.CNAME,
+          name: MOCK_SUBDOMAIN,
+          value: MOCK_CNAME_VALUE,
+        },
+      ],
+    });
+  });
+
+  it('returns PENDING with the preferred A record for an owned apex domain that does not route', async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        mockJsonResponse({
+          name: MOCK_APEX_DOMAIN,
+          apexName: MOCK_APEX_DOMAIN,
+          verified: true,
+        }),
+      )
+      .mockResolvedValueOnce(
+        mockJsonResponse({ misconfigured: true, ...ROUTING_OPTIONS }),
+      );
+
+    const result = await getProjectDomain(MOCK_APEX_DOMAIN);
+
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [
+        {
+          type: ROUTING_RECORD_TYPE.A,
+          name: MOCK_APEX_DOMAIN,
+          value: MOCK_A_RECORD_VALUE,
+        },
+      ],
+    });
+  });
+
+  it('returns PENDING with no records when Vercel recommends no routing record', async () => {
+    fetchMock
+      .mockResolvedValueOnce(mockJsonResponse({ verified: true }))
+      .mockResolvedValueOnce(mockJsonResponse({ misconfigured: true }));
+
+    const result = await getProjectDomain(MOCK_DOMAIN);
+
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      dnsRecords: [],
+    });
+  });
+
+  it('returns ERROR and logs when the configuration check fails', async () => {
+    fetchMock
+      .mockResolvedValueOnce(mockJsonResponse({ verified: true }))
+      .mockResolvedValueOnce(
+        mockJsonResponse(null, HTTP_STATUS.INTERNAL_SERVER_ERROR),
+      );
+
+    const result = await getProjectDomain(MOCK_DOMAIN);
+
+    expect(result).toEqual({
+      status: DOMAIN_VERIFICATION_STATUS.ERROR,
+      dnsRecords: [],
+    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      PROVISIONING_LOG.DOMAIN_CONFIG_CHECK_FAILED,
+      {
+        domain: MOCK_DOMAIN,
+        responseStatus: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      },
+    );
+  });
+
   it('returns PENDING with the verification challenges as type/name/value records', async () => {
     fetchMock.mockResolvedValue(
-      respondWith({
+      mockJsonResponse({
         verified: false,
         verification: [
           {
@@ -184,7 +309,7 @@ describe(getProjectDomain, () => {
   });
 
   it('returns PENDING with no records when Vercel reports no challenges', async () => {
-    fetchMock.mockResolvedValue(respondWith({ verified: false }));
+    fetchMock.mockResolvedValue(mockJsonResponse({ verified: false }));
 
     const result = await getProjectDomain(MOCK_DOMAIN);
 

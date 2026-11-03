@@ -149,6 +149,14 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       expect(input).not.toBeInTheDocument();
     });
 
+    it('says the subdomain still works', async () => {
+      await renderCard({ isPrimaryCustom: true });
+
+      const note = await screen.findByText(ownDomain.subdomainStillWorks);
+
+      expect(note).toBeVisible();
+    });
+
     it('offers the way back to the subdomain to an owner', async () => {
       await renderCard({ isPrimaryCustom: true });
 
@@ -249,6 +257,15 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       });
 
       expect(makeMainButton).toBeVisible();
+    });
+
+    it('does not say the subdomain still works', async () => {
+      await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
+      await screen.findByRole('heading', TITLE);
+
+      const note = screen.queryByText(ownDomain.subdomainStillWorks);
+
+      expect(note).not.toBeInTheDocument();
     });
 
     it('offers it to nobody who cannot manage the site', async () => {

@@ -29,6 +29,7 @@ export type TDomainVerificationCardProps = {
   projectDomain: Promise<TProjectDomain>;
   title?: string;
   actions?: ReactNode;
+  note?: string;
 };
 
 export const DomainVerificationCard = ({
@@ -37,12 +38,13 @@ export const DomainVerificationCard = ({
   projectDomain,
   title,
   actions,
+  note,
 }: TDomainVerificationCardProps) => {
   const t = useTranslations('tenantDomainPage');
   const { status, dnsRecords } = use(projectDomain);
   const isVerified = status === DOMAIN_VERIFICATION_STATUS.VERIFIED;
   const wasChecked = !UNCHECKED_STATUSES.has(status);
-  const { pendingAddress } = domainVerificationCardVariants();
+  const { pendingAddress, noteText } = domainVerificationCardVariants();
   const { registerHeading } = useCustomDomainFocus();
 
   return (
@@ -93,6 +95,11 @@ export const DomainVerificationCard = ({
               <Text variant="supporting">{t('unavailableState')}</Text>
             )}
           </>
+        )}
+        {note && (
+          <Text variant="supporting" className={noteText()}>
+            {note}
+          </Text>
         )}
       </Card.Body>
     </Card>

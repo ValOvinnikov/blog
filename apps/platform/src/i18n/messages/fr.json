@@ -545,6 +545,7 @@
       "verifyFailed": "Impossible de vérifier l'enregistrement. Réessayez.",
       "removeClaimDescription": "{domain} n'attendra plus de vérification. Votre adresse actuelle continue de fonctionner.",
       "mainTitle": "Votre propre domaine (adresse principale)",
+      "subdomainStillWorks": "Votre sous-domaine fonctionne toujours et affiche le même site.",
       "mainAddress": {
         "failed": "Impossible de changer l'adresse principale. Réessayez.",
         "makeMain": {

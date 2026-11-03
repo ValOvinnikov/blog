@@ -545,6 +545,7 @@
       "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
       "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter.",
       "mainTitle": "Eigene Domain (Hauptadresse)",
+      "subdomainStillWorks": "Deine Subdomain funktioniert weiter und zeigt dieselbe Website.",
       "mainAddress": {
         "failed": "Die Hauptadresse konnte nicht gewechselt werden. Versuche es erneut.",
         "makeMain": {
