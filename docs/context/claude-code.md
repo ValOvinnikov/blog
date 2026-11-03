@@ -293,8 +293,9 @@ XModuleView` block that the rule already forbade and no review had
     for an unconditional full sweep. Measured: a targeted check runs 15-100s,
     a full sweep 100-450s.
   - `ci-watcher` — read-only, Haiku-model watcher for a single PR's CI
-    checks (#464). Dispatched in the background right after `open-pull-request`
-    Gate 5, with the PR's actual number (never the issue number or a bare
+    checks (#464). Dispatched in the background once the PR is marked ready
+    for review (`open-pull-request` Gate 5a; agent PRs open as drafts, where CI
+    skips), with the PR's actual number (never the issue number or a bare
     branch) so it needs no worktree/branch context of its own. Checks the
     PR's `mergeable` status before watching anything — a `CONFLICTING` PR has
     no merge ref, so most required checks never trigger and `gh pr checks`

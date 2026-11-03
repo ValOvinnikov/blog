@@ -50,8 +50,8 @@ gh stack sync                 # fetch, restack, force-push all       — Gate 3
   lower PR merges — the step most often forgotten — but ask first.
 - **Never run `gh stack merge`** — merging is the human's.
 - **`submit` from an agent's shell is non-interactive**: it skips its editor,
-  uses auto-generated titles and no body, and opens drafts unless `--open`
-  (or `gh pr ready <pr>` afterwards). Then run
+  uses auto-generated titles and no body, and opens drafts — keep them drafts
+  (never `--open`), as Gate 4 does. Then run
   `gh pr edit <pr> --title "…" --body "…"` on each new PR per "PR body
   template", and Gate 5 for each.
 
@@ -150,10 +150,12 @@ an explicit yes.
 
 Only on an explicit yes. Always pass `--head`: without it `gh` uses the
 current branch, which is `main` in a checkout left there for
-worktree-delegated work.
+worktree-delegated work. Always pass `--draft`: CI skips drafts, so the
+review-fix pushes that follow most reviews cost no CI minutes, and the owner
+marks the PR ready at final review, which runs the full gate once.
 
 ```
-gh pr create --base main --head <type>/<n>-<short-slug> \
+gh pr create --draft --base main --head <type>/<n>-<short-slug> \
   --title "<conventional title>" \
   --body "<per the PR body template below>"
 ```
@@ -198,16 +200,19 @@ gh pr create --base main --head <type>/<n>-<short-slug> \
      `"after merge of #<n>"` trigger.
 
 3. **Report the PR URL** only once the board write is confirmed, and hold any
-   "done"/"shipped" framing until Gate 5a reports — say "PR open, board
-   updated, CI running — watching checks next".
+   "done"/"shipped" framing until Gate 5a reports — say "Draft PR open, board
+   updated — CI runs once it is marked ready".
 
 A solo cloud session does neither step 1 nor step 2, and never substitutes an
 MCP or REST call for them (`CLAUDE.md` "Solo-session mode").
 
 ### Gate 5a — Watch CI to completion
 
-Runs automatically after Gate 5. Every fix push still goes through a fresh
-Gate 3.
+Runs once the PR is marked ready for review — never on a draft, where `CI`
+reports green with every job skipped, so a watch would report a pass that
+tested nothing. The owner marks it ready at final review: either in GitHub,
+then telling the session, or by asking the session to run `gh pr ready <pr>`.
+Every fix push still goes through a fresh Gate 3.
 
 1. **Dispatch `ci-watcher` in the background with `<pr>`** — the trailing
    number of the URL `gh pr create` printed, never the issue number or the
