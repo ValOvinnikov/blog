@@ -540,25 +540,66 @@ describe(`<${LookForm.name}/>`, () => {
         await saveAndExpectLook(user, saved);
       });
 
-      it('previews the chosen account panel open while signed in', async () => {
-        await openLookRow(user, LOOK_ROW.HEADER);
-        const hubButton = screen.getByRole('button', {
-          name: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
+      describe('with the Header row open', () => {
+        beforeEach(async () => {
+          await openLookRow(user, LOOK_ROW.HEADER);
         });
-        await user.click(hubButton);
-        const signedInButton = screen.getByRole('button', {
-          name: LOOK_PREVIEW.readerSignedIn,
-        });
-        await user.click(signedInButton);
 
-        const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
-        const accountMenu = within(fullHeader).getByRole('menu', {
-          name: LOOK_PREVIEW.accountMenuAriaLabel,
+        it('previews the chosen account panel open while signed in', async () => {
+          const hubButton = screen.getByRole('button', {
+            name: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
+          });
+          await user.click(hubButton);
+          const signedInButton = screen.getByRole('button', {
+            name: LOOK_PREVIEW.readerSignedIn,
+          });
+          await user.click(signedInButton);
+
+          const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
+          const accountMenu = within(fullHeader).getByRole('menu', {
+            name: LOOK_PREVIEW.accountMenuAriaLabel,
+          });
+          expect(accountMenu).toBeVisible();
+          expect(accountMenu).toHaveTextContent(
+            LOOK_PREVIEW.myBookmarksDescription,
+          );
         });
-        expect(accountMenu).toBeVisible();
-        expect(accountMenu).toHaveTextContent(
-          LOOK_PREVIEW.myBookmarksDescription,
-        );
+
+        it('previews the chosen header layout and bar and footer layout', async () => {
+          await chooseOption(
+            user,
+            HEADER_LAYOUT_LABEL,
+            LOOK_FORM.headerLayoutOptionLabel.MENU_BUTTON,
+          );
+          const barGroup = screen.getByRole('group', {
+            name: LOOK_FORM.headerBarStyleLabel,
+          });
+          const floatingButton = within(barGroup).getByRole('button', {
+            name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
+          });
+          await user.click(floatingButton);
+          await openLookRow(user, LOOK_ROW.FOOTER);
+          await chooseOption(
+            user,
+            FOOTER_LAYOUT_LABEL,
+            LOOK_FORM.footerLayoutOptionLabel.CENTRED,
+          );
+
+          const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
+          const sampleFooter = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
+          expect(sampleHeader).toHaveAttribute(
+            SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
+            HEADER_LAYOUT.MENU_BUTTON,
+          );
+          expect(sampleHeader).toHaveAttribute(
+            SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
+            HEADER_BAR_STYLE.FLOATING,
+          );
+          expect(sampleFooter).toHaveAttribute(
+            'data-layout',
+            FOOTER_LAYOUT.CENTRED,
+          );
+        });
       });
 
       it('shows the chosen busy style and spinner on the preview busy button', async () => {
@@ -599,43 +640,6 @@ describe(`<${LookForm.name}/>`, () => {
         expect(sample).toHaveAttribute(
           SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
           SPINNER_STYLE.RING,
-        );
-      });
-
-      it('previews the chosen header layout and bar and footer layout', async () => {
-        await openLookRow(user, LOOK_ROW.HEADER);
-        await chooseOption(
-          user,
-          HEADER_LAYOUT_LABEL,
-          LOOK_FORM.headerLayoutOptionLabel.MENU_BUTTON,
-        );
-        const barGroup = screen.getByRole('group', {
-          name: LOOK_FORM.headerBarStyleLabel,
-        });
-        const floatingButton = within(barGroup).getByRole('button', {
-          name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
-        });
-        await user.click(floatingButton);
-        await openLookRow(user, LOOK_ROW.FOOTER);
-        await chooseOption(
-          user,
-          FOOTER_LAYOUT_LABEL,
-          LOOK_FORM.footerLayoutOptionLabel.CENTRED,
-        );
-
-        const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
-        const sampleFooter = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
-        expect(sampleHeader).toHaveAttribute(
-          SAMPLE_HEADER_LAYOUT_ATTRIBUTE,
-          HEADER_LAYOUT.MENU_BUTTON,
-        );
-        expect(sampleHeader).toHaveAttribute(
-          SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
-          HEADER_BAR_STYLE.FLOATING,
-        );
-        expect(sampleFooter).toHaveAttribute(
-          'data-layout',
-          FOOTER_LAYOUT.CENTRED,
         );
       });
 
