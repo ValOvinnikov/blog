@@ -16,6 +16,7 @@ import {
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 
 import { onboardingFormVariants } from './onboarding-form-variants';
+import { useOnboardingPreviewOptions } from './use-onboarding-preview-options';
 import { useOnboardingTier } from './use-onboarding-tier';
 import { useOnboardingWizard } from './use-onboarding-wizard';
 
@@ -58,6 +59,7 @@ export const OnboardingForm = ({
     handleSubmit,
   } = useOnboardingWizard(initialLocale, rootDomain);
   const { isPhone, isRail, isFull } = useOnboardingTier();
+  const previewOptions = useOnboardingPreviewOptions(isPhone);
   const {
     root,
     form,
@@ -79,6 +81,9 @@ export const OnboardingForm = ({
       locale={values.locale}
       preset={values.preset}
       accentHue={values.accentHue}
+      isPhone={isPhone}
+      isFull={isFull}
+      options={previewOptions}
     />
   );
 

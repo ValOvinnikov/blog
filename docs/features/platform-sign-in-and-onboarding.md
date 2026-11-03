@@ -111,14 +111,28 @@ Free site.
   `RailBrand` / `RailIntro`, so Choose a workspace keeps its own. The current
   step's fields sit
   beside it with Back / Continue, and the live site preview follows every
-  step. The preview is framed as the new site in a browser: an
-  address bar shows `<slug>.<TENANT_ROOT_DOMAIN>` as it is typed
-  (`your-site.<TENANT_ROOT_DOMAIN>` before then), and below it a sample front
-  page (`FrontPageSample` in `site-preview/`) renders in the chosen preset,
-  accent and light/dark mode: the header, which follows the preview
-  column's own width and so, the column being under 64rem, is always the
-  bar (the typed site name and the menu button, inset 16px), a hero ("Dispatches from the coast") and three
-  posts. The step's content sits directly on a white column, not in a card,
+  step. The preview is the Look page's shared device frame (`PreviewFrame`
+  and `DeviceFrame`): a "Live preview" heading with its size readout ("1280
+  px wide · shown at 37%", always the long forms, a polite status), then one
+  toolbar ("Preview options") holding the Device group (Desktop, Tablet,
+  Phone) and the Colour scheme group (Light, Dark), and no reader switch,
+  follow or full screen. The toolbar ends with the chosen address behind a
+  globe — announced as "Site address" then
+  `<slug>.<TENANT_ROOT_DOMAIN>`, following the slug as it is typed
+  (`your-site.<TENANT_ROOT_DOMAIN>` before then) and cut with an ellipsis
+  when too long — on the toolbar row when the section is wide enough and on
+  its own line otherwise. The frame (an image named "Sample page at {width}
+  px") draws the desktop bar's three dots without a host, and lays Look's
+  sample (`LookSample`) out at the device width, scaled to the stage's width
+  (less its border, bezel and bar) and, in the Full tier, its inner height
+  too (no 608px cap), so the whole frame stays inside the stage. The sample
+  wears the typed name ("Your site" while empty) with no logo, the chosen
+  preset's header, footer and busy styles and the accent, the language
+  switcher, no reader accounts, and the cookie-settings button. Full and
+  Rail open on Desktop and Phone on Phone, all on Light; the wizard holds
+  the pressed device and scheme above the tier-placed preview, so Continue,
+  Back, an Edit from Review and a resize across a tier edge keep them. The
+  step's content sits directly on a white column, not in a card,
   capped at 640px and left-aligned. The layout has three tiers, read in JS
   with `useMediaQuery` at the same edges the CSS uses, so the preview renders
   once, in its tier's place, and the DOM order is the keyboard order:
@@ -342,7 +356,6 @@ Free site.
   `set-signup-terms-cookie.test.ts`, `legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
   `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
-  `front-page-sample.test.tsx`,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
   `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `sign-out-button`,
   `signed-in-account` and `dead-end-view`, plus `get-session-email.test.ts`.

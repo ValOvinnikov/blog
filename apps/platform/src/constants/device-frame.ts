@@ -2,6 +2,7 @@ import type { TValueOf } from '@blog/config/utils';
 
 export const DEVICE_FRAME_FIT = {
   PAGE: 'PAGE',
+  STAGE: 'STAGE',
   FULLSCREEN: 'FULLSCREEN',
 } as const;
 
@@ -12,6 +13,12 @@ export const DEVICE_FRAME_LIMIT = {
   FULLSCREEN_MIN_SCALE: 0.5,
   SCALE_PRECISION: 10000,
   PERCENT: 100,
+} as const;
+
+export const DEVICE_FRAME_SIZE = {
+  BORDER: 1,
+  BEZEL_PADDING: 6,
+  BROWSER_BAR_HEIGHT: 28,
 } as const;
 
 export const DEVICE_FRAME_AXIS = {

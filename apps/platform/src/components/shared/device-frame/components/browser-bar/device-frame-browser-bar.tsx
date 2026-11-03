@@ -1,6 +1,9 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { deviceFrameVariants } from '@platform/components/shared/device-frame/device-frame-variants';
-import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
+import {
+  DEVICE_FRAME_SIZE,
+  DEVICE_FRAME_TEST_ID,
+} from '@platform/constants/device-frame';
 
 export type TDeviceFrameBrowserBarProps = {
   host: TMaybeUndefined<string>;
@@ -20,6 +23,7 @@ export const DeviceFrameBrowserBar = ({
   return (
     <div
       className={browserBar()}
+      style={{ height: DEVICE_FRAME_SIZE.BROWSER_BAR_HEIGHT }}
       data-testid={DEVICE_FRAME_TEST_ID.BROWSER_BAR}
     >
       <span aria-hidden="true" className={dots()}>
