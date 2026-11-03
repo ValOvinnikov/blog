@@ -547,6 +547,7 @@
       "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
       "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter.",
       "mainTitle": "Eigene Domain (Hauptadresse)",
+      "subdomainStillWorks": "Deine Subdomain {subdomain} funktioniert weiter und zeigt dieselbe Website.",
       "mainAddress": {
         "failed": "Die Hauptadresse konnte nicht gewechselt werden. Versuche es erneut.",
         "makeMain": {
@@ -819,14 +820,6 @@
     "footerFinePrintAriaLabel": "Rechtliches",
     "footerPrivacy": "Datenschutzerklärung",
     "footerCookieSettings": "Cookie-Einstellungen"
-  },
-  "frontPageSample": {
-    "heroHeading": "Berichte von der Küste",
-    "heroText": "Notizen, Essays und Fotografien.",
-    "heroButton": "Das Neueste lesen",
-    "firstPostTitle": "Ein Morgen auf dem Pier",
-    "secondPostTitle": "Ebbe, spätes Licht",
-    "thirdPostTitle": "Der Hafen im Winter"
   },
   "assetUploadField": {
     "remove": "Entfernen",

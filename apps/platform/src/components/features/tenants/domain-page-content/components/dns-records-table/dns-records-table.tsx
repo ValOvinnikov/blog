@@ -1,5 +1,5 @@
 import { CopyButton } from '@platform/components/shared/copy-button';
-import type { TDomainDnsRecord } from '@platform/server/provisioning/vercel-domains-api';
+import type { TDomainDnsRecord } from '@platform/server/provisioning/project-domain';
 import { useTranslations } from 'next-intl';
 
 import { dnsRecordsTableVariants } from './dns-records-table-variants';
@@ -32,7 +32,7 @@ export const DnsRecordsTable = ({ records }: TDnsRecordsTableProps) => {
         {records.map(({ type, name, value }, index) => (
           <tr className={row()} key={`${type}-${name}-${index}`}>
             <td className={cell()}>{type}</td>
-            <td className={cell()}>
+            <td className={cell({ isRecordData: true })}>
               <span className={copyable()}>
                 <span className={selectable()}>{name}</span>
                 <CopyButton
@@ -41,7 +41,7 @@ export const DnsRecordsTable = ({ records }: TDnsRecordsTableProps) => {
                 />
               </span>
             </td>
-            <td className={cell()}>
+            <td className={cell({ isRecordData: true })}>
               <span className={copyable()}>
                 <span className={selectable()}>{value}</span>
                 <CopyButton

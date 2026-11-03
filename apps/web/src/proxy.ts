@@ -13,10 +13,7 @@ import { readRememberedLanguage } from '@web/utils/language-cookie';
 import { logger } from '@web/utils/logger/logger';
 import { matchAcceptLanguage } from '@web/utils/match-accept-language';
 import { privateRedirect } from '@web/utils/private-redirect';
-import {
-  siteUnavailablePage,
-  siteUnavailableStatus,
-} from '@web/utils/site-unavailable-response';
+import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 
@@ -29,9 +26,10 @@ import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
 } from './server/tenant/constants/constants';
+import { operatorSuspendedPage } from './server/tenant/operator-suspension/operator-suspended-page';
 import { isOperatorSuspended } from './server/tenant/operator-suspension/operator-suspension';
 import { passThroughUnlessOperatorSuspended } from './server/tenant/operator-suspension/pass-through-unless-operator-suspended';
-import { isUnsubscribePagePath } from './server/tenant/operator-suspension/unsubscribe-page-path';
+import { isSuspensionExemptPagePath } from './server/tenant/operator-suspension/suspension-exempt-page-path';
 import {
   resolveTenantRouting,
   type TTenantRouting,
@@ -217,13 +215,11 @@ export default async function proxy(
   if (
     tenantRouting &&
     isOperatorSuspended(tenantRouting.tenant) &&
-    !isUnsubscribePagePath(pathname, firstSegment)
+    !isSuspensionExemptPagePath(pathname, firstSegment)
   ) {
     return FEED_PATH_PATTERN.test(pathname)
       ? siteUnavailableStatus()
-      : siteUnavailablePage(
-          localeForPrefix(firstSegment) ?? tenantRouting.defaultLocale,
-        );
+      : operatorSuspendedPage(firstSegment, tenantRouting);
   }
 
   const tenantId = tenantRouting?.tenantId;
@@ -270,13 +266,11 @@ export default async function proxy(
 export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
   // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
-  // Every entry after the first reaches the proxy only so an operator-suspended site can answer it with 503; newsletter unsubscribe stays reachable.
+  // Every entry after the first reaches the proxy only so an operator-suspended site can answer it with 503; newsletter unsubscribe, sign-in and account export stay reachable.
   matcher: [
     '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
     '/sitemap.xml',
     '/api/newsletter/confirm',
-    '/api/account/:path*',
-    '/api/auth/:path*',
     '/api/switch-language',
     '/api/generate-skim',
   ],

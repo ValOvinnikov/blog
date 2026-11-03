@@ -547,6 +547,7 @@
       "verifyFailed": "Couldn't check the record. Try again.",
       "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working.",
       "mainTitle": "Your own domain (main address)",
+      "subdomainStillWorks": "Your subdomain {subdomain} still works and shows the same site.",
       "mainAddress": {
         "failed": "Couldn't switch the main address. Try again.",
         "makeMain": {
@@ -819,14 +820,6 @@
     "footerFinePrintAriaLabel": "Legal",
     "footerPrivacy": "Privacy policy",
     "footerCookieSettings": "Cookie settings"
-  },
-  "frontPageSample": {
-    "heroHeading": "Dispatches from the coast",
-    "heroText": "Notes, essays and photographs.",
-    "heroButton": "Read the latest",
-    "firstPostTitle": "A morning on the pier",
-    "secondPostTitle": "Low tide, late light",
-    "thirdPostTitle": "The harbour in winter"
   },
   "assetUploadField": {
     "remove": "Remove",

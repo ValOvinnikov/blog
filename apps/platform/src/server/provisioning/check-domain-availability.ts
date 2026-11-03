@@ -10,7 +10,7 @@ import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { getDomain } from 'tldts';
 
-import { fetchVercel, readVercelCredentials } from './vercel-domains-api';
+import { fetchVercel, readVercelCredentials } from './vercel-client';
 
 // Every tenant domain shares one apex, so its list paginates; past this cap the check returns ERROR rather than guess AVAILABLE.
 const MAX_PROJECT_DOMAINS_PAGES = 5;

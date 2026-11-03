@@ -2,17 +2,16 @@ import { HTTP_STATUS } from '@blog/config';
 import { CUSTOM_DOMAIN_TXT_TYPE } from '@platform/constants/custom-domain';
 import { DNS_RCODE, DNS_TYPE } from '@platform/constants/dns';
 import { MOCK_CLAIM_TOKEN } from '@platform/testing/custom-domain/fixtures';
+import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { MOCK_CUSTOM_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 
 import { lookupTxtRecords } from './lookup-txt-records';
 
 const MOCK_NAME = customDomainTxtName(MOCK_CUSTOM_DOMAIN);
+const HALF = MOCK_CLAIM_TOKEN.length / 2;
 
 const fetchMock = vi.fn();
-
-const dohResponse = (body: unknown, status: number = HTTP_STATUS.OK) =>
-  new Response(JSON.stringify(body), { status });
 
 const txtAnswer = (data: string) => ({
   name: MOCK_NAME,
@@ -32,7 +31,9 @@ describe(lookupTxtRecords, () => {
   });
 
   it('asks for the TXT records of the name', async () => {
-    fetchMock.mockResolvedValue(dohResponse({ Status: DNS_RCODE.NO_ERROR }));
+    fetchMock.mockResolvedValue(
+      mockJsonResponse({ Status: DNS_RCODE.NO_ERROR }),
+    );
 
     await lookupTxtRecords(MOCK_NAME);
 
@@ -41,84 +42,74 @@ describe(lookupTxtRecords, () => {
     expect(url.searchParams.get('type')).toBe(CUSTOM_DOMAIN_TXT_TYPE);
   });
 
-  it('returns each TXT value with its quotes stripped', async () => {
-    fetchMock.mockResolvedValue(
-      dohResponse({
+  it.each([
+    {
+      scenario: 'each TXT value with its quotes stripped',
+      body: {
         Status: DNS_RCODE.NO_ERROR,
         Answer: [txtAnswer(`"${MOCK_CLAIM_TOKEN}"`), txtAnswer('"unrelated"')],
-      }),
-    );
-
-    const records = await lookupTxtRecords(MOCK_NAME);
-
-    expect(records).toEqual([MOCK_CLAIM_TOKEN, 'unrelated']);
-  });
-
-  it('joins a value the resolver split into several strings', async () => {
-    const half = MOCK_CLAIM_TOKEN.length / 2;
-    fetchMock.mockResolvedValue(
-      dohResponse({
+      },
+      expected: [MOCK_CLAIM_TOKEN, 'unrelated'],
+    },
+    {
+      scenario: 'a value the resolver split into several strings, joined',
+      body: {
         Status: DNS_RCODE.NO_ERROR,
         Answer: [
           txtAnswer(
-            `"${MOCK_CLAIM_TOKEN.slice(0, half)}" "${MOCK_CLAIM_TOKEN.slice(half)}"`,
+            `"${MOCK_CLAIM_TOKEN.slice(0, HALF)}" "${MOCK_CLAIM_TOKEN.slice(HALF)}"`,
           ),
         ],
-      }),
-    );
-
-    const records = await lookupTxtRecords(MOCK_NAME);
-
-    expect(records).toEqual([MOCK_CLAIM_TOKEN]);
-  });
-
-  it('ignores answers that are not TXT records', async () => {
-    fetchMock.mockResolvedValue(
-      dohResponse({
+      },
+      expected: [MOCK_CLAIM_TOKEN],
+    },
+    {
+      scenario: 'no records for answers that are not TXT records',
+      body: {
         Status: DNS_RCODE.NO_ERROR,
         Answer: [
           { name: MOCK_NAME, type: DNS_TYPE.CNAME, data: 'other.test.' },
         ],
-      }),
-    );
+      },
+      expected: [],
+    },
+    {
+      scenario: 'no records for a name that does not exist',
+      body: { Status: DNS_RCODE.NXDOMAIN },
+      expected: [],
+    },
+    {
+      scenario: 'no records for an answer with no records',
+      body: { Status: DNS_RCODE.NO_ERROR },
+      expected: [],
+    },
+  ])('returns $scenario', async ({ body, expected }) => {
+    fetchMock.mockResolvedValue(mockJsonResponse(body));
 
     const records = await lookupTxtRecords(MOCK_NAME);
 
-    expect(records).toEqual([]);
+    expect(records).toEqual(expected);
   });
 
   it.each([
-    ['a name that does not exist', { Status: DNS_RCODE.NXDOMAIN }],
-    ['an answer with no records', { Status: DNS_RCODE.NO_ERROR }],
-  ])('returns no records for %s', async (_name, body) => {
-    fetchMock.mockResolvedValue(dohResponse(body));
-
-    const records = await lookupTxtRecords(MOCK_NAME);
-
-    expect(records).toEqual([]);
-  });
-
-  it('rejects when the resolver reports a failure', async () => {
-    fetchMock.mockResolvedValue(dohResponse({ Status: DNS_RCODE.SERVFAIL }));
-
-    await expect(lookupTxtRecords(MOCK_NAME)).rejects.toThrow();
-  });
-
-  it('rejects on a non-200 response', async () => {
-    fetchMock.mockResolvedValue(
-      dohResponse(
-        { Status: DNS_RCODE.NO_ERROR },
-        HTTP_STATUS.INTERNAL_SERVER_ERROR,
-      ),
-    );
-
-    await expect(lookupTxtRecords(MOCK_NAME)).rejects.toThrow();
-  });
-
-  it('rejects on a body that is not the expected JSON', async () => {
-    fetchMock.mockResolvedValue(
-      new Response('<html>', { status: HTTP_STATUS.OK }),
-    );
+    {
+      scenario: 'the resolver reports a failure',
+      response: () => mockJsonResponse({ Status: DNS_RCODE.SERVFAIL }),
+    },
+    {
+      scenario: 'the response is not a 200',
+      response: () =>
+        mockJsonResponse(
+          { Status: DNS_RCODE.NO_ERROR },
+          HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        ),
+    },
+    {
+      scenario: 'the body is not the expected JSON',
+      response: () => new Response('<html>', { status: HTTP_STATUS.OK }),
+    },
+  ])('rejects when $scenario', async ({ response }) => {
+    fetchMock.mockResolvedValue(response());
 
     await expect(lookupTxtRecords(MOCK_NAME)).rejects.toThrow();
   });

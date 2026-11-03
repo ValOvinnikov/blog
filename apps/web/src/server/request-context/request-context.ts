@@ -7,6 +7,7 @@ import {
 } from '@blog/service';
 import { routing } from '@web/i18n/routing';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
+import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
 import {
   isPlatformFallbackAllowed,
   isTenantServable,
@@ -26,6 +27,7 @@ export type TRequestContext = {
   metadataBase: TMaybeUndefined<URL>;
   defaultLocale: TMaybeUndefined<TLocaleIsoCode>;
   liveLocales: TMaybeUndefined<TLocaleIsoCode[]>;
+  isOperatorSuspended: boolean;
 };
 
 export type TNotFoundContext = {
@@ -108,6 +110,7 @@ const buildRequestContext = async (
     metadataBase: toMetadataBase(row),
     defaultLocale: row?.locale,
     liveLocales: row && queries.tenants.selectLiveLocales(row),
+    isOperatorSuspended: Boolean(row && isOperatorSuspended(row)),
   };
 };
 

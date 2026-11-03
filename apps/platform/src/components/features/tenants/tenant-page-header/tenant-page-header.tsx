@@ -11,11 +11,13 @@ import type { ReactNode } from 'react';
 export type TTenantPageHeaderProps = {
   tenant: Pick<TTenant, 'name' | 'status' | 'plan' | 'primaryDomain'>;
   description?: ReactNode;
+  hasPlanBadge?: boolean;
 };
 
 export const TenantPageHeader = ({
   tenant,
   description,
+  hasPlanBadge = true,
 }: TTenantPageHeaderProps) => {
   const { name, status, plan, primaryDomain } = tenant;
   const tTenantsTable = useTranslations('tenantsTable');
@@ -30,9 +32,11 @@ export const TenantPageHeader = ({
           <StatusBadge tone={tenantStatusTone(status)}>
             {tTenantsTable(`status.${status}`)}
           </StatusBadge>
-          <StatusBadge tone="plan" hasDot={false}>
-            {tTenantsTable(`plan.${plan}`)}
-          </StatusBadge>
+          {hasPlanBadge && (
+            <StatusBadge tone="plan" hasDot={false}>
+              {tTenantsTable(`plan.${plan}`)}
+            </StatusBadge>
+          )}
         </>
       }
       actions={

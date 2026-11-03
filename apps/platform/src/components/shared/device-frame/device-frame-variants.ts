@@ -7,7 +7,7 @@ export const deviceFrameVariants = tv({
     stage: ['flex w-full justify-center'],
     frame: [
       'flex w-fit flex-none flex-col overflow-hidden',
-      'border border-admin-control-line bg-admin-surface shadow-admin-frame',
+      'border-admin-control-line bg-admin-surface shadow-admin-frame',
     ],
     viewport: ['relative overflow-hidden bg-admin-surface'],
     scroller: [
@@ -20,7 +20,7 @@ export const deviceFrameVariants = tv({
       'pointer-events-none absolute bottom-0 left-0 origin-bottom-left',
     ],
     browserBar: [
-      'flex h-7 flex-none items-center gap-2.5 px-2.5',
+      'flex flex-none items-center gap-2.5 px-2.5',
       'border-b border-admin-line bg-admin-surface',
     ],
     dots: ['flex gap-[5px]'],
@@ -37,11 +37,11 @@ export const deviceFrameVariants = tv({
     device: {
       [PREVIEW_DEVICE.DESKTOP]: { frame: ['rounded-admin'] },
       [PREVIEW_DEVICE.TABLET]: {
-        frame: ['rounded-admin-14 p-1.5'],
+        frame: ['rounded-admin-14'],
         viewport: ['rounded-admin-8'],
       },
       [PREVIEW_DEVICE.PHONE]: {
-        frame: ['rounded-admin-18 p-1.5'],
+        frame: ['rounded-admin-18'],
         viewport: ['rounded-admin-12'],
       },
     },

@@ -547,6 +547,7 @@
       "verifyFailed": "Het record kon niet worden gecontroleerd. Probeer het opnieuw.",
       "removeClaimDescription": "{domain} wacht niet meer op verificatie. Je huidige adres blijft werken.",
       "mainTitle": "Je eigen domein (hoofdadres)",
+      "subdomainStillWorks": "Je subdomein {subdomain} blijft werken en toont dezelfde site.",
       "mainAddress": {
         "failed": "Het hoofdadres kon niet worden gewijzigd. Probeer het opnieuw.",
         "makeMain": {
@@ -819,14 +820,6 @@
     "footerFinePrintAriaLabel": "Juridisch",
     "footerPrivacy": "Privacybeleid",
     "footerCookieSettings": "Cookie-instellingen"
-  },
-  "frontPageSample": {
-    "heroHeading": "Berichten van de kust",
-    "heroText": "Notities, essays en foto’s.",
-    "heroButton": "Lees het nieuwste",
-    "firstPostTitle": "Een ochtend op de pier",
-    "secondPostTitle": "Laagtij, laat licht",
-    "thirdPostTitle": "De haven in de winter"
   },
   "assetUploadField": {
     "remove": "Verwijderen",

@@ -12,6 +12,7 @@ import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
 import { SiteProviders } from '@web/components/shared/site-providers';
 import { ThemeScope } from '@web/components/shared/theme-scope';
+import { SITE_SETTINGS_LOG } from '@web/constants/site-settings';
 import {
   enterRequestContext,
   getRequestContext,
@@ -75,6 +76,17 @@ const renderLayout = () =>
     children: <div>content</div>,
     params: mockRouteParams(),
   }) as unknown as Promise<TAnyElement>;
+
+const renderComposition = async () => {
+  const [themeScope] = childrenOf(await renderLayout());
+  const [providers, analytics] = childrenOf(themeScope as TAnyElement);
+  const [page] = childrenOf(providers as TAnyElement);
+  return {
+    providers,
+    analytics,
+    pageChildren: childrenOf(page as TAnyElement),
+  };
+};
 
 const settingsFailure = () =>
   getSiteSettingsMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
@@ -168,10 +180,8 @@ describe(`<${LocaleLayout.name}/>`, () => {
   });
 
   it('composes providers around header, content and footer, with analytics', async () => {
-    const [themeScope] = childrenOf(await renderLayout());
-    const [providers, analytics] = childrenOf(themeScope as TAnyElement);
-    const [page] = childrenOf(providers as TAnyElement);
-    const [header, , footer] = childrenOf(page as TAnyElement);
+    const { providers, analytics, pageChildren } = await renderComposition();
+    const [header, , footer] = pageChildren;
 
     expect(providers?.type).toBe(SiteProviders);
     expect(analytics?.type).toBe(SiteAnalytics);
@@ -179,33 +189,42 @@ describe(`<${LocaleLayout.name}/>`, () => {
     expect(footer?.type).toBe(SiteFooter);
   });
 
-  describe(SETTINGS_FAILURE_SUITE, () => {
-    beforeEach(() => {
-      settingsFailure();
+  it('leaves out the site header and footer on an operator-suspended site', async () => {
+    getRequestContextMock.mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      isOperatorSuspended: true,
     });
 
-    it('calls notFound() when the site settings fail to load', async () => {
-      await expect(renderLayout()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
+    const { pageChildren } = await renderComposition();
+    const types = pageChildren.map((child) => child?.type);
 
+    expect(types).not.toContain(SiteHeader);
+    expect(types).not.toContain(SiteFooter);
+  });
+
+  describe(SETTINGS_FAILURE_SUITE, () => {
+    let renderError: unknown;
+
+    beforeEach(async () => {
+      settingsFailure();
+      renderError = await renderLayout().catch((error: unknown) => error);
+    });
+
+    it('calls notFound() when the site settings fail to load', () => {
+      expect(renderError).toEqual(
+        new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+      );
       expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     });
 
-    it('logs the layout fetch failure', async () => {
-      await expect(renderLayout()).rejects.toThrow();
-
+    it('logs the layout fetch failure', () => {
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'site_settings.layout_fetch_failed',
+        SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });
 
-    it('enters the request context ahead of the notFound() it throws', async () => {
-      await expect(renderLayout()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
-
+    it('enters the request context ahead of the notFound() it throws', () => {
       expect(enterRequestContextMock.mock.invocationCallOrder[0]).toBeLessThan(
         vi.mocked(notFound).mock.invocationCallOrder[0]!,
       );

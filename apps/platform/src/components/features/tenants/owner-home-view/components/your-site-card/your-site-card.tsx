@@ -1,10 +1,13 @@
+import { ICONS } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Card } from '@platform/components/shared/card';
-import { DetailList } from '@platform/components/shared/detail-list';
+import { Icon } from '@platform/components/shared/icon';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
 import { useTranslations } from 'next-intl';
 
+import { BandCell } from './components/band-cell/band-cell';
 import { yourSiteCardVariants } from './your-site-card-variants';
 
 export type TYourSiteCardProps = {
@@ -15,30 +18,44 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
   const t = useTranslations('ownerHomePage');
   const tTenantsTable = useTranslations('tenantsTable');
   const tLanguage = useTranslations('languageNames');
-  const { hint } = yourSiteCardVariants();
+  const { body, band, footer, icon, hint } = yourSiteCardVariants();
 
   return (
     <Card>
       <Card.Header title={t('yourSiteCardTitle')} />
-      <Card.Body>
-        <DetailList>
-          <DetailList.Row label={t('nameLabel')}>{tenant.name}</DetailList.Row>
-          <DetailList.Row label={t('publicDomainLabel')} isMono={true}>
+      <Card.Body className={body()}>
+        <dl className={band()}>
+          <BandCell label={t('nameLabel')} isFullRow={true}>
+            {tenant.name}
+          </BandCell>
+          <BandCell
+            label={t('publicDomainLabel')}
+            isFullRow={true}
+            isMono={true}
+          >
             {tenant.primaryDomain}
-          </DetailList.Row>
-          <DetailList.Row label={t('planLabel')}>
+          </BandCell>
+          <BandCell label={t('planLabel')}>
             <StatusBadge tone="plan" hasDot={false}>
               {tTenantsTable(`plan.${tenant.plan}`)}
             </StatusBadge>
-          </DetailList.Row>
-          <DetailList.Row label={t('localeLabel')}>
+          </BandCell>
+          <BandCell label={t('localeLabel')}>
             {tLanguage(tenant.locale)}
-          </DetailList.Row>
-        </DetailList>
-        <Text variant="meta" className={hint()}>
+          </BandCell>
+        </dl>
+      </Card.Body>
+      <Card.Footer className={footer()}>
+        <Icon
+          name={ICONS.INFO}
+          size={ICON_SIZE.MD}
+          strokeWidth={ICON_STROKE_WIDTH.CONTROL}
+          className={icon()}
+        />
+        <Text variant="muted" className={hint()}>
           {t('readOnlyHint')}
         </Text>
-      </Card.Body>
+      </Card.Footer>
     </Card>
   );
 };

@@ -6,12 +6,13 @@ import { useSidebarCollapse } from '@platform/components/features/layout/sidebar
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
+import { NestableMenuRoot } from '@platform/components/shared/nestable-menu-root';
+import { NestableMenuTrigger } from '@platform/components/shared/nestable-menu-trigger';
 import {
-  ACCOUNT_MENU_APPEARANCE,
   ACCOUNT_MENU_PLACEMENT,
-  type TAccountMenuAppearance,
   type TAccountMenuPlacement,
 } from '@platform/constants/account-menu';
+import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
 import { useTranslations } from 'next-intl';
 import { startTransition, useRef } from 'react';
@@ -27,7 +28,6 @@ export type TAccount = {
 
 export type TAccountMenuProps = {
   account: TAccount;
-  appearance: TAccountMenuAppearance;
 };
 
 // The rail trigger ends 12px inside the rail's edge, so 20px clears the rail by 8px.
@@ -38,34 +38,29 @@ const POSITIONER_PROPS = {
     align: 'end',
     sideOffset: 20,
   },
-  [ACCOUNT_MENU_PLACEMENT.PILL]: {
-    side: 'bottom',
-    align: 'end',
-    sideOffset: 6,
-  },
+  [ACCOUNT_MENU_PLACEMENT.MENU]: { side: 'top', align: 'start', sideOffset: 6 },
 } as const satisfies Record<TAccountMenuPlacement, object>;
 
-export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
+export const AccountMenu = ({ account }: TAccountMenuProps) => {
   const t = useTranslations('account');
   const { isCollapsed } = useSidebarCollapse();
+  const isNested = useIsNestedMenu();
   const signOutRef = useRef<HTMLDivElement>(null);
   const { name, email, roleLine } = account;
   const displayName = name ?? email ?? '';
   const hasEmailLine = Boolean(name && email);
 
-  const placement: TAccountMenuPlacement =
-    appearance === ACCOUNT_MENU_APPEARANCE.PILL
-      ? ACCOUNT_MENU_PLACEMENT.PILL
-      : isCollapsed
-        ? ACCOUNT_MENU_PLACEMENT.RAIL
-        : ACCOUNT_MENU_PLACEMENT.FOOT;
+  const placement: TAccountMenuPlacement = isNested
+    ? ACCOUNT_MENU_PLACEMENT.MENU
+    : isCollapsed
+      ? ACCOUNT_MENU_PLACEMENT.RAIL
+      : ACCOUNT_MENU_PLACEMENT.FOOT;
   const {
     trigger,
     meta,
     nameLine,
     emailLine,
     chevron,
-    pillLabel,
     popup,
     header,
     headerName,
@@ -87,7 +82,7 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
       : {};
 
   const handleOpenChangeComplete = (isOpen: boolean) => {
-    if (isOpen) {
+    if (isOpen && !isNested) {
       signOutRef.current?.focus();
     }
   };
@@ -97,19 +92,10 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
   };
 
   return (
-    <Menu.Root onOpenChangeComplete={handleOpenChangeComplete}>
-      <Menu.Trigger className={trigger()} {...railProps}>
-        <Avatar
-          name={name ?? ''}
-          email={email}
-          variant={
-            placement === ACCOUNT_MENU_PLACEMENT.PILL ? 'chip' : 'account'
-          }
-        />
-        {placement === ACCOUNT_MENU_PLACEMENT.PILL && (
-          <span className={pillLabel()}>{roleLine}</span>
-        )}
-        {placement === ACCOUNT_MENU_PLACEMENT.FOOT && (
+    <NestableMenuRoot onOpenChangeComplete={handleOpenChangeComplete}>
+      <NestableMenuTrigger className={trigger()} {...railProps}>
+        <Avatar name={name ?? ''} email={email} variant="account" />
+        {placement !== ACCOUNT_MENU_PLACEMENT.RAIL && (
           <>
             <span className={meta()}>
               <span className={nameLine()} title={displayName}>
@@ -120,7 +106,7 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
             <Icon name={ICONS.CHEVRON_UP} className={chevron()} />
           </>
         )}
-      </Menu.Trigger>
+      </NestableMenuTrigger>
       <Menu.Portal>
         <Menu.Positioner {...POSITIONER_PROPS[placement]}>
           <Menu.Popup
@@ -132,9 +118,7 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
               {hasEmailLine && <span className={headerEmail()}>{email}</span>}
               <span className={headerRole()}>{roleLine}</span>
             </div>
-            {placement !== ACCOUNT_MENU_PLACEMENT.PILL && (
-              <AccountThemeSection />
-            )}
+            <AccountThemeSection />
             <Menu.Item
               ref={signOutRef}
               className={item()}
@@ -146,6 +130,6 @@ export const AccountMenu = ({ account, appearance }: TAccountMenuProps) => {
           </Menu.Popup>
         </Menu.Positioner>
       </Menu.Portal>
-    </Menu.Root>
+    </NestableMenuRoot>
   );
 };

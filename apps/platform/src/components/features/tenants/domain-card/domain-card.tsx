@@ -16,6 +16,7 @@ export type TDomainCardProps = {
   tenant: Pick<TTenant, 'primaryDomain'>;
   domainVerificationStatus: TDomainVerificationStatus;
   dnsHref: string;
+  isStackedToLg?: boolean;
 };
 
 const CHECKED_STATUSES: TDomainVerificationStatus[] = [
@@ -28,6 +29,7 @@ export const DomainCard = ({
   tenant,
   domainVerificationStatus,
   dnsHref,
+  isStackedToLg = false,
 }: TDomainCardProps) => {
   const t = useTranslations('tenantOverviewPage');
   const tDomainPage = useTranslations('tenantDomainPage');
@@ -48,7 +50,7 @@ export const DomainCard = ({
         }
       />
       <Card.Body>
-        <DetailList>
+        <DetailList isStackedToLg={isStackedToLg}>
           <DetailList.Row label={tDomainPage('statusLabel')}>
             <StatusBadge
               tone={domainVerificationTone(domainVerificationStatus)}

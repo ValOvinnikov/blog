@@ -22,7 +22,8 @@
   },
   "siteUnavailable": {
     "heading": "Deze site is niet beschikbaar",
-    "text": "Probeer het later opnieuw."
+    "text": "Probeer het later opnieuw.",
+    "manageAccount": "Je account beheren"
   },
   "postShare": {
     "shareAriaLabel": "\"{title}\" delen",

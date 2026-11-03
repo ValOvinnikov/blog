@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
@@ -142,8 +143,24 @@ describe('request-context', () => {
       metadataBase: new URL(`https://${MOCK_TENANT_HOST}`),
       defaultLocale: LOCALE_ISO_CODES.EN,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+      isOperatorSuspended: false,
     });
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(MOCK_SERVABLE_TENANT);
+  });
+
+  it('marks a tenant an operator suspended', async () => {
+    getTenantByIdMock.mockResolvedValue({
+      ...MOCK_SERVABLE_TENANT,
+      status: TENANT_STATUS.SUSPENDED,
+      suspensionReason: SUSPENSION_REASON.OPERATOR,
+    });
+
+    const { isOperatorSuspended } = await enterAndRead(
+      MOCK_TENANT_ID,
+      LOCALE_ISO_CODES.EN,
+    );
+
+    expect(isOperatorSuspended).toBe(true);
   });
 
   it('sets the next-intl request locale', async () => {
@@ -220,6 +237,7 @@ describe('request-context', () => {
         metadataBase: new URL(MOCK_TENANT_BASE_URL),
         defaultLocale: undefined,
         liveLocales: undefined,
+        isOperatorSuspended: false,
       });
       expect(getTenantByIdMock).not.toHaveBeenCalled();
     });
@@ -383,31 +401,37 @@ describe('request-context', () => {
   });
 
   describe(peekVoiceTenant, () => {
-    it('resolves no tenant without waiting when no route has entered', async () => {
-      const requestContext = await loadRequestContext();
+    describe('with a freshly loaded request context', () => {
+      let requestContext: typeof TModule;
 
-      await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
-    });
+      beforeEach(async () => {
+        requestContext = await loadRequestContext();
+      });
 
-    it.each([
-      ['its default language', LOCALE_ISO_CODES.EN],
-      ['a language other than the default', LOCALE_ISO_CODES.NL],
-    ])('resolves the entered tenant in %s', async (_label, locale) => {
-      const requestContext = await loadRequestContext();
-      await requestContext.enterRequestContext(params(MOCK_TENANT_ID, locale));
+      it('resolves no tenant without waiting when no route has entered', async () => {
+        await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
+      });
 
-      await expect(requestContext.peekVoiceTenant()).resolves.toBe(
-        MOCK_TENANT_ID,
-      );
-    });
+      it.each([
+        ['its default language', LOCALE_ISO_CODES.EN],
+        ['a language other than the default', LOCALE_ISO_CODES.NL],
+      ])('resolves the entered tenant in %s', async (_label, locale) => {
+        await requestContext.enterRequestContext(
+          params(MOCK_TENANT_ID, locale),
+        );
 
-    it('resolves no tenant when none was entered', async () => {
-      const requestContext = await loadRequestContext();
-      await requestContext.enterRequestContext(
-        params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
-      );
+        await expect(requestContext.peekVoiceTenant()).resolves.toBe(
+          MOCK_TENANT_ID,
+        );
+      });
 
-      await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
+      it('resolves no tenant when none was entered', async () => {
+        await requestContext.enterRequestContext(
+          params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
+        );
+
+        await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
+      });
     });
 
     it.each([

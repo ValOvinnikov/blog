@@ -1550,7 +1550,12 @@ that is not ACTIVE (`isTenantActive()`), so a tenant SUSPENDED for INACTIVITY
 stays readable while nothing new lands against it. A tenant an OPERATOR
 suspended is offline instead: `proxy.ts` answers its pages with a neutral 503
 unavailable page marked `noindex`, and its feeds, sitemap and site API routes
-with a bare 503 (`isOperatorSuspended()`). The first lives in
+with a bare 503 (`isOperatorSuspended()`). Reader self-service is the one
+exception, because a reader's own data is not the suspended content:
+newsletter unsubscribe, sign-in (`/api/auth/*`), account export
+(`/api/account/*`) and the `/account` page stay reachable, and the
+`[tenant]/[locale]` layout drops the site header and footer so `/account`
+shows only the account panel or the sign-in it needs. The first lives in
 `apps/web/src/server/tenant/resolve-tenant/` and the second in
 `write-gate/`, and every tenant-scoped mutation checks it — through
 `resolveWritableTenant` or the host write context's `isActive` — one shared predicate rather than a per-call-site status check, since
