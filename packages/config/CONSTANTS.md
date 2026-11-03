@@ -428,6 +428,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `PREVIEW_BOTTOM_ROOM`=`80`
 
+### `@platform/constants/look-row` — `apps/platform/src/constants/look-row.ts`
+
+- **LOOK_ROW**: `COLOUR`, `BRAND`, `TYPE`, `SHAPE`, `BUTTONS`, `HEADER`, `FOOTER`, `LANGUAGE_SWITCHER`
+
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
 - **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`

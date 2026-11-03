@@ -15,6 +15,8 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { textVariants } from '@platform/components/shared/text/text-variants';
+import { KEY } from '@platform/constants/keyboard';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -57,11 +59,11 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
       hasCookieBanner ? undefined : bannerOffNoteId,
     ]
       .filter(Boolean)
-      .join(' ') || undefined;
+      .join(KEY.SPACE) || undefined;
 
   return (
     <LookCard
-      card="footer"
+      card={LOOK_ROW.FOOTER}
       title={t('footerHeading')}
       description={t('footerDescription')}
     >

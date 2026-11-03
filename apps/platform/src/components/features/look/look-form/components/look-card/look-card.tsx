@@ -2,14 +2,14 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { Accordion } from '@platform/components/shared/accordion';
 import { Text } from '@platform/components/shared/text';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
-import type { TLookRowKey } from '@platform/utils/look-open-rows/look-open-rows';
+import type { TLookRow } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
 
 export type TLookCardProps = {
-  card: TLookRowKey;
+  card: TLookRow;
   title: string;
   description: string;
   children: ReactNode;

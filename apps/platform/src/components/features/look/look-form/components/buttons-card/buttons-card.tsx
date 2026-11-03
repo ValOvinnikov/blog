@@ -10,6 +10,7 @@ import { useLookFieldLock } from '@platform/components/features/look/look-form/u
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
 export const ButtonsCard = () => {
@@ -31,7 +32,7 @@ export const ButtonsCard = () => {
 
   return (
     <LookCard
-      card="buttons"
+      card={LOOK_ROW.BUTTONS}
       title={t('buttonsHeading')}
       description={t('buttonsDescription')}
     >

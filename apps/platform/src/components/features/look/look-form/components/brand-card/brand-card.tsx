@@ -1,6 +1,8 @@
 import { BrandAssetField } from '@platform/components/features/look/brand-asset-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { KEY } from '@platform/constants/keyboard';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { useTranslations } from 'next-intl';
@@ -19,7 +21,9 @@ export const BrandCard = () => {
   } = useLookForm();
   const t = useTranslations('lookForm');
   const hintId = useId();
-  const describedBy = [hintId, archivedDescribedBy].filter(Boolean).join(' ');
+  const describedBy = [hintId, archivedDescribedBy]
+    .filter(Boolean)
+    .join(KEY.SPACE);
   const { uploads, rows, hint } = brandCardVariants();
   const fieldProps = (kind: TBrandAssetKind) => ({
     kind,
@@ -34,7 +38,7 @@ export const BrandCard = () => {
 
   return (
     <LookCard
-      card="brand"
+      card={LOOK_ROW.BRAND}
       title={t('brandHeading')}
       description={t('brandImagesDescription')}
     >

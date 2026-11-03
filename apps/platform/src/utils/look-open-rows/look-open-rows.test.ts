@@ -1,55 +1,54 @@
-import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 
 import {
   nextOpenRows,
   revealOpenRow,
   SITE_PARTS_ROWS,
   STYLE_ROWS,
-  type TLookRowKey,
 } from './look-open-rows';
 
 describe(nextOpenRows, () => {
   it.each<{
     title: string;
-    openRows: TLookRowKey[];
-    groupRows: readonly TLookRowKey[];
-    nextGroupRows: TLookRowKey[];
-    expected: TLookRowKey[];
+    openRows: TLookRow[];
+    groupRows: readonly TLookRow[];
+    nextGroupRows: TLookRow[];
+    expected: TLookRow[];
   }>([
     {
       title: 'opens the first row on its own',
       openRows: [],
       groupRows: SITE_PARTS_ROWS,
-      nextGroupRows: [SAMPLE_PART.FOOTER],
-      expected: [SAMPLE_PART.FOOTER],
+      nextGroupRows: [LOOK_ROW.FOOTER],
+      expected: [LOOK_ROW.FOOTER],
     },
     {
       title: 'folds the open row when another row opens in the same group',
-      openRows: [SAMPLE_PART.FOOTER],
+      openRows: [LOOK_ROW.FOOTER],
       groupRows: SITE_PARTS_ROWS,
-      nextGroupRows: [SAMPLE_PART.FOOTER, 'languageSwitcher'],
-      expected: ['languageSwitcher'],
+      nextGroupRows: [LOOK_ROW.FOOTER, LOOK_ROW.LANGUAGE_SWITCHER],
+      expected: [LOOK_ROW.LANGUAGE_SWITCHER],
     },
     {
       title: 'folds the open row when a row opens in the other group',
-      openRows: [SAMPLE_PART.FOOTER],
+      openRows: [LOOK_ROW.FOOTER],
       groupRows: STYLE_ROWS,
-      nextGroupRows: ['colour'],
-      expected: ['colour'],
+      nextGroupRows: [LOOK_ROW.COLOUR],
+      expected: [LOOK_ROW.COLOUR],
     },
     {
       title: 'folds a row by hand and leaves the others as they were',
-      openRows: ['colour', SAMPLE_PART.FOOTER],
+      openRows: [LOOK_ROW.COLOUR, LOOK_ROW.FOOTER],
       groupRows: STYLE_ROWS,
       nextGroupRows: [],
-      expected: [SAMPLE_PART.FOOTER],
+      expected: [LOOK_ROW.FOOTER],
     },
     {
       title: 'keeps several rows open when none newly opens',
-      openRows: ['colour', 'brand', SAMPLE_PART.FOOTER],
+      openRows: [LOOK_ROW.COLOUR, LOOK_ROW.BRAND, LOOK_ROW.FOOTER],
       groupRows: STYLE_ROWS,
-      nextGroupRows: ['colour', 'brand'],
-      expected: ['colour', 'brand', SAMPLE_PART.FOOTER],
+      nextGroupRows: [LOOK_ROW.COLOUR, LOOK_ROW.BRAND],
+      expected: [LOOK_ROW.COLOUR, LOOK_ROW.BRAND, LOOK_ROW.FOOTER],
     },
   ])('$title', ({ openRows, groupRows, nextGroupRows, expected }) => {
     const result = nextOpenRows(openRows, groupRows, nextGroupRows);
@@ -60,14 +59,17 @@ describe(nextOpenRows, () => {
 
 describe(revealOpenRow, () => {
   it('adds the row and keeps the rows already open', () => {
-    const result = revealOpenRow(['colour'], SAMPLE_PART.FOOTER);
+    const result = revealOpenRow([LOOK_ROW.COLOUR], LOOK_ROW.FOOTER);
 
-    expect(result).toEqual(['colour', SAMPLE_PART.FOOTER]);
+    expect(result).toEqual([LOOK_ROW.COLOUR, LOOK_ROW.FOOTER]);
   });
 
   it('leaves the open rows as they were when the row is already open', () => {
-    const result = revealOpenRow(['colour', SAMPLE_PART.FOOTER], 'colour');
+    const result = revealOpenRow(
+      [LOOK_ROW.COLOUR, LOOK_ROW.FOOTER],
+      LOOK_ROW.COLOUR,
+    );
 
-    expect(result).toEqual(['colour', SAMPLE_PART.FOOTER]);
+    expect(result).toEqual([LOOK_ROW.COLOUR, LOOK_ROW.FOOTER]);
   });
 });

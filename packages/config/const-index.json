@@ -5246,6 +5246,70 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "COLOUR": [
+      {
+        "ref": "LOOK_ROW.COLOUR",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "BRAND": [
+      {
+        "ref": "LOOK_ROW.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "TYPE": [
+      {
+        "ref": "LOOK_ROW.TYPE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "SHAPE": [
+      {
+        "ref": "LOOK_ROW.SHAPE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "BUTTONS": [
+      {
+        "ref": "LOOK_ROW.BUTTONS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "HEADER": [
+      {
+        "ref": "LOOK_ROW.HEADER",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "FOOTER": [
+      {
+        "ref": "LOOK_ROW.FOOTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "LANGUAGE_SWITCHER": [
+      {
+        "ref": "LOOK_ROW.LANGUAGE_SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
     "(width >= 64rem)": [
       {
         "ref": "MEDIA_QUERY.LG_UP",

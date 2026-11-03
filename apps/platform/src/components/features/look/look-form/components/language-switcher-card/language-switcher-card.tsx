@@ -9,6 +9,7 @@ import { useLookFieldLock } from '@platform/components/features/look/look-form/u
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
 import { languageSwitcherCardVariants } from './language-switcher-card-variants';
@@ -38,7 +39,7 @@ export const LanguageSwitcherCard = ({
 
   return (
     <LookCard
-      card="languageSwitcher"
+      card={LOOK_ROW.LANGUAGE_SWITCHER}
       title={languageSwitcherLabel}
       description={t('languageSwitcherDescription')}
     >

@@ -3,6 +3,7 @@ import { LookField } from '@platform/components/features/look/look-form/componen
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FontPicker } from '@platform/components/shared/font-picker';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
 export const TypeCard = () => {
@@ -19,7 +20,7 @@ export const TypeCard = () => {
 
   return (
     <LookCard
-      card="type"
+      card={LOOK_ROW.TYPE}
       title={t('typeHeading')}
       description={t('typeDescription')}
     >

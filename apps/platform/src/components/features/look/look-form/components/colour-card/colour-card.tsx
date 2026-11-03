@@ -6,6 +6,7 @@ import { useLookFieldLock } from '@platform/components/features/look/look-form/u
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { HueSlider } from '@platform/components/shared/hue-slider';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 
@@ -28,7 +29,7 @@ export const ColourCard = () => {
 
   return (
     <LookCard
-      card="colour"
+      card={LOOK_ROW.COLOUR}
       title={t('colourHeading')}
       description={t('colourDescription')}
     >

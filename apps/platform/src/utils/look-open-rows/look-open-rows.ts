@@ -1,27 +1,24 @@
-import { SAMPLE_PART } from '@platform/constants/sample-part';
-import type { TLookCardKey } from '@platform/utils/look-form-values/look-form-values';
-
-export type TLookRowKey = Exclude<TLookCardKey, 'preset'>;
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 
 export const STYLE_ROWS = [
-  'colour',
-  'brand',
-  'type',
-  'shape',
-  'buttons',
-] as const satisfies readonly TLookRowKey[];
+  LOOK_ROW.COLOUR,
+  LOOK_ROW.BRAND,
+  LOOK_ROW.TYPE,
+  LOOK_ROW.SHAPE,
+  LOOK_ROW.BUTTONS,
+] as const satisfies readonly TLookRow[];
 
 export const SITE_PARTS_ROWS = [
-  SAMPLE_PART.HEADER,
-  SAMPLE_PART.FOOTER,
-  'languageSwitcher',
-] as const satisfies readonly TLookRowKey[];
+  LOOK_ROW.HEADER,
+  LOOK_ROW.FOOTER,
+  LOOK_ROW.LANGUAGE_SWITCHER,
+] as const satisfies readonly TLookRow[];
 
 export const nextOpenRows = (
-  openRows: readonly TLookRowKey[],
-  groupRows: readonly TLookRowKey[],
-  nextGroupRows: readonly TLookRowKey[],
-): TLookRowKey[] => {
+  openRows: readonly TLookRow[],
+  groupRows: readonly TLookRow[],
+  nextGroupRows: readonly TLookRow[],
+): TLookRow[] => {
   const opened = nextGroupRows.find((row) => !openRows.includes(row));
   if (opened) return [opened];
   return openRows.filter(
@@ -30,7 +27,6 @@ export const nextOpenRows = (
 };
 
 export const revealOpenRow = (
-  openRows: readonly TLookRowKey[],
-  row: TLookRowKey,
-): TLookRowKey[] =>
-  openRows.includes(row) ? [...openRows] : [...openRows, row];
+  openRows: readonly TLookRow[],
+  row: TLookRow,
+): TLookRow[] => (openRows.includes(row) ? [...openRows] : [...openRows, row]);

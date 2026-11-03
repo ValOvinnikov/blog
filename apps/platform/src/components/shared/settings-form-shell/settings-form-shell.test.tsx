@@ -1,6 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { SAMPLE_PART } from '@platform/constants/sample-part';
 import {
   renderWithIntl,
   screen,
@@ -39,6 +38,7 @@ const MOCK_SAVED_VALUES: TValues = {
 const MOCK_DRAFT_TAGLINE = faker.lorem.sentence();
 const MOCK_THEIR_TAGLINE = faker.lorem.sentence();
 const MOCK_TAGLINE_LABEL = faker.lorem.word();
+const MOCK_FOOTER_FIELD_ID = faker.lorem.word();
 const MOCK_FOOTER_LABEL = faker.lorem.words(2);
 const MOCK_PAGE = faker.lorem.word();
 const MOCK_DRAFT_SAVED_AT = new Date('2026-10-08T11:05:00.000Z');
@@ -68,7 +68,7 @@ const draftFor = (
   fields: [
     { id: 'tagline', label: MOCK_TAGLINE_LABEL, display: (v) => v.tagline },
     {
-      id: SAMPLE_PART.FOOTER,
+      id: MOCK_FOOTER_FIELD_ID,
       label: MOCK_FOOTER_LABEL,
       display: (v) => v.footer,
     },

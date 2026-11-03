@@ -1,6 +1,7 @@
 import { isAccentHueAccessible } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useToast } from '@platform/context/toast-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type {
@@ -12,7 +13,6 @@ import {
   isBrandAssetKind,
   listLostStagedFiles,
 } from '@platform/utils/look-form-values/look-form-values';
-import type { TLookRowKey } from '@platform/utils/look-open-rows/look-open-rows';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -29,7 +29,7 @@ type TUseLookFormStateArgs = {
   plan: TTenantPlan;
   savedAt?: Date;
   archivedAt?: Date;
-  revealInvalidField: (row: TLookRowKey) => void;
+  revealInvalidField: (row: TLookRow) => void;
 };
 
 export const useLookFormState = ({
@@ -79,7 +79,7 @@ export const useLookFormState = ({
       return {
         ids: isHueRejected ? [accentHueFieldId] : [],
         revealFirst: () =>
-          revealInvalidField(isHueRejected ? 'colour' : 'brand'),
+          revealInvalidField(isHueRejected ? LOOK_ROW.COLOUR : LOOK_ROW.BRAND),
       };
     },
     draft: {
