@@ -259,6 +259,9 @@ describe(`<${SiteHeader.name}/>`, () => {
 
   describe('with the account in the bar on phones', () => {
     beforeEach(async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [MOCK_BLOG_LINK] }),
+      );
       await setup();
     });
 
@@ -297,6 +300,28 @@ describe(`<${SiteHeader.name}/>`, () => {
 
       expect(signInDialog).not.toBeInTheDocument();
       expect(phoneCircle).toHaveFocus();
+    });
+  });
+
+  describe('with no navigation items', () => {
+    it('shows no phone menu button with the account in the bar', async () => {
+      await setup();
+
+      const toggleButton = screen.queryByRole('button', {
+        name: TOGGLE_NAVIGATION_MENU,
+      });
+
+      expect(toggleButton).not.toBeInTheDocument();
+    });
+
+    it('lists the account row in the phone menu with the account in the menu', async () => {
+      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+      await setup();
+      await openPhoneMenu();
+
+      const accountRow = getDrawerAccountRow(SIGN_IN);
+
+      expect(accountRow).toBeVisible();
     });
   });
 

@@ -83,6 +83,8 @@ export const SiteNavigation = ({
   }, [pathname]);
 
   const items = links.map((link) => toNavItem(pathname, link));
+  const hasMenuEntries =
+    items.length > 0 || Boolean(panelActions) || Boolean(menuAccount);
 
   return (
     <div ref={containerRef} className={siteNavigationVariants()}>
@@ -92,12 +94,16 @@ export const SiteNavigation = ({
         submenuStyle={submenuStyle}
         groupName={groupName}
         linkAs={SmartLink}
-        mobileToggle={{
-          isOpen: open,
-          onToggle: toggle,
-          ariaLabel: t('toggleMenu'),
-          panelId,
-        }}
+        mobileToggle={
+          hasMenuEntries
+            ? {
+                isOpen: open,
+                onToggle: toggle,
+                ariaLabel: t('toggleMenu'),
+                panelId,
+              }
+            : undefined
+        }
       >
         {panelActions ? (
           <PrimaryNavigation.PanelActions>

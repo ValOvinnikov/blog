@@ -19,7 +19,7 @@ epics: [4987, 4995, 4998, 5459]
 
 ## What it does
 
-The site header: the brand lockup with the header tagline, top-level links an editor curates (each optionally opening its own sub-items), and trailing controls — the theme toggle, the reader account menu when reader accounts are on, and an optional language switcher. The site owner picks the wide-screen layout, how sub-menus open and whether the bar spans the page or floats. Below the `lg` breakpoint every layout is the bar with a menu button, and the links collapse into a toggled panel. The link for the page being read is marked current.
+The site header: the brand lockup with the header tagline, top-level links an editor curates (each optionally opening its own sub-items), and trailing controls — the theme toggle, the reader account menu when reader accounts are on, and an optional language switcher. The site owner picks the wide-screen layout, how sub-menus open and whether the bar spans the page or floats. Below the `lg` breakpoint every layout is the bar with a menu button, and the links collapse into a toggled panel. The menu button renders only when the menu would hold something — a navigation item, the language and theme row, or the account row — so a site with none of them shows no button and no empty menu. The link for the page being read is marked current.
 
 ## Surfaces and routes
 
