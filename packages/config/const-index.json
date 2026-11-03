@@ -5262,6 +5262,14 @@
         "file": "apps/platform/src/constants/media-query.ts"
       }
     ],
+    "(prefers-color-scheme: dark)": [
+      {
+        "ref": "MEDIA_QUERY.PREFERS_DARK",
+        "scope": "app:platform",
+        "from": "@platform/constants/media-query",
+        "file": "apps/platform/src/constants/media-query.ts"
+      }
+    ],
     "DESKTOP": [
       {
         "ref": "MENU_RADIO_GROUP_SIZE.DESKTOP",

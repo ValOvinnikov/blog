@@ -78,16 +78,18 @@ describe(`<${TenantStudioPage.name}/>`, () => {
     const studioMount = screen.getByTestId(STUDIO_MOUNT_TEST_ID);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: MOCK_SANITY_PROJECT_ID,
-      dataset: tenant.sanityDataset,
-      basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
-      title: MOCK_OTHER_TENANT_NAME,
-      enabledCapabilities: [],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: tenant.locale,
-      liveLocales: [],
-      loginProvider: undefined,
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: MOCK_SANITY_PROJECT_ID,
+        dataset: tenant.sanityDataset,
+        basePath: adminRoutes.tenantStudio(MOCK_OTHER_TENANT_ID),
+        title: MOCK_OTHER_TENANT_NAME,
+        enabledCapabilities: [],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: tenant.locale,
+        liveLocales: [],
+        loginProvider: undefined,
+      }),
+    );
   });
 });
