@@ -38,7 +38,12 @@ export const viewTabsVariants = tv({
     },
     // 21 sits above the Look index (20) and below the tooltip (30).
     isSticky: {
-      true: { root: ['sticky top-admin-topbar z-21'] },
+      true: {
+        root: [
+          'sticky top-admin-topbar z-21',
+          '[html:has(&)]:scroll-pt-[calc(var(--spacing-admin-topbar)+45px)]!',
+        ],
+      },
     },
   },
   defaultVariants: { variant: VIEW_TABS_VARIANT.SEGMENTED },
