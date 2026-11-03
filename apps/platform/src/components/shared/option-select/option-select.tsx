@@ -17,6 +17,7 @@ export type TOptionSelectProps<TValue extends string> = {
   isDisabled?: boolean;
   isLocked?: boolean;
   appearance?: TFieldAppearance;
+  placeholder?: string;
 };
 
 export const OptionSelect = <TValue extends string>({
@@ -27,6 +28,7 @@ export const OptionSelect = <TValue extends string>({
   isDisabled,
   isLocked,
   appearance,
+  placeholder,
 }: TOptionSelectProps<TValue>) => {
   const selected = options.find((option) => option.value === value);
 
@@ -38,7 +40,7 @@ export const OptionSelect = <TValue extends string>({
       isLocked={isLocked}
     >
       <Select.Trigger aria={aria} isLocked={isLocked} appearance={appearance}>
-        {selected?.label}
+        {selected?.label ?? placeholder}
       </Select.Trigger>
       <Select.Popup>
         {options.map((option) => (

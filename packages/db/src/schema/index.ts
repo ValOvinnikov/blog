@@ -15,4 +15,5 @@ export * from './settings-features';
 export * from './site-config';
 export * from './subscribers';
 export * from './tenant-domains';
+export * from './tenant-suspensions';
 export * from './tenants';

@@ -2,12 +2,16 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
 import type * as BlogEmail from '@blog/email';
-import { faker } from '@faker-js/faker';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import enMessages from '@platform/i18n/messages/en.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import {
+  MOCK_OWNER_EMAIL_FROM_ADDRESS,
+  MOCK_OWNER_EMAIL_SEND_ERROR,
+  MOCK_PLATFORM_APP_BASE_URL,
+} from '@platform/testing/owner-email/fixtures';
 import {
   mockTenant,
   MOCK_INVITED_OWNER_EMAIL,
@@ -19,8 +23,6 @@ import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { notifyOwnerOfPlanChange } from './notify-owner-of-plan-change';
-
-faker.seed(6580);
 
 const { getTenantByIdMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
@@ -42,17 +44,13 @@ vi.mock('@blog/email', async (importOriginal) => ({
   sendEmail: vi.fn(),
 }));
 
-const MOCK_FROM_ADDRESS = faker.internet.email();
-const MOCK_PLATFORM_APP_BASE_URL = faker.internet.url({ appendSlash: false });
-const MOCK_SEND_ERROR = new Error(faker.lorem.sentence());
-
 const sendEmailMock = vi.mocked(sendEmail);
 
 const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
 
 describe(notifyOwnerOfPlanChange, () => {
   beforeEach(() => {
-    mockedEnv.OWNER_EMAIL_FROM_ADDRESS = MOCK_FROM_ADDRESS;
+    mockedEnv.OWNER_EMAIL_FROM_ADDRESS = MOCK_OWNER_EMAIL_FROM_ADDRESS;
     mockedEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
     getTenantByIdMock.mockReset().mockResolvedValue(mockTenant());
     getTenantOwnerEmailMock.mockReset().mockResolvedValue(MOCK_OWNER_EMAIL);
@@ -71,7 +69,7 @@ describe(notifyOwnerOfPlanChange, () => {
     expect(sendEmailMock).toHaveBeenCalledOnce();
     expect(sentEmail()).toMatchObject({
       to: MOCK_OWNER_EMAIL,
-      from: MOCK_FROM_ADDRESS,
+      from: MOCK_OWNER_EMAIL_FROM_ADDRESS,
       subject: enMessages.ownerPlanChangeEmail.FREE.subject,
     });
   });
@@ -176,7 +174,7 @@ describe(notifyOwnerOfPlanChange, () => {
   });
 
   it('logs a failed send without throwing', async () => {
-    sendEmailMock.mockRejectedValue(MOCK_SEND_ERROR);
+    sendEmailMock.mockRejectedValue(MOCK_OWNER_EMAIL_SEND_ERROR);
 
     await expect(
       notifyOwnerOfPlanChange(

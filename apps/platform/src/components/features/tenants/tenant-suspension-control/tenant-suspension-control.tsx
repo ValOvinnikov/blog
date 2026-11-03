@@ -1,7 +1,12 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { TENANT_STATUS, type TSuspensionStatus } from '@blog/db/constants';
+import type { TOpenTenantSuspension } from '@blog/db/queries/tenant-suspensions';
+import { errorResult } from '@blog/utils';
 import { BlockOwnerFields } from '@platform/components/features/tenants/tenant-suspension-control/components/block-owner-fields/block-owner-fields';
+import { SuspensionCaseDetails } from '@platform/components/features/tenants/tenant-suspension-control/components/suspension-case-details/suspension-case-details';
+import { SuspensionCaseFields } from '@platform/components/features/tenants/tenant-suspension-control/components/suspension-case-fields/suspension-case-fields';
 import { Card } from '@platform/components/shared/card';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { Text } from '@platform/components/shared/text';
@@ -14,16 +19,18 @@ import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { useTenantLifecycleAction } from '@platform/utils/use-tenant-lifecycle-action/use-tenant-lifecycle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
 
 import { tenantSuspensionControlVariants } from './tenant-suspension-control-variants';
+import { useSuspensionForm } from './use-suspension-form';
 
 export type TTenantSuspensionControlProps = {
   tenant: Pick<TClientTenant, 'id' | 'name' | 'status'>;
+  suspension: TMaybeUndefined<TOpenTenantSuspension>;
 };
 
 export const TenantSuspensionControl = ({
   tenant,
+  suspension,
 }: TTenantSuspensionControlProps) => {
   const t = useTranslations('tenantSuspensionControl');
   const router = useRouter();
@@ -35,24 +42,24 @@ export const TenantSuspensionControl = ({
     liftTenantSuspensionAction,
     'liftSuspensionFailed',
   );
-  const [isBlocking, setIsBlocking] = useState(false);
-  const [blockReason, setBlockReason] = useState('');
+  const {
+    caseFields,
+    blockFields,
+    suspensionCase,
+    ownerEmailBlock,
+    isComplete,
+    reset,
+  } = useSuspensionForm();
   const { id, name, status } = tenant;
   const isSuspended = status === TENANT_STATUS.SUSPENDED;
   const copyKey: TSuspensionStatus = isSuspended
     ? TENANT_STATUS.SUSPENDED
     : TENANT_STATUS.ACTIVE;
 
-  const confirm = () => {
+  const confirm = async () => {
     if (isSuspended) return liftSuspension(id);
-    return isBlocking
-      ? suspendTenant(id, { reason: blockReason })
-      : suspendTenant(id);
-  };
-
-  const resetBlockChoice = () => {
-    setIsBlocking(false);
-    setBlockReason('');
+    if (!suspensionCase) return errorResult();
+    return suspendTenant(id, suspensionCase, ownerEmailBlock);
   };
 
   const { content } = tenantSuspensionControlVariants();
@@ -64,11 +71,15 @@ export const TenantSuspensionControl = ({
         <div className={content()}>
           <Text variant="muted">{t(`${copyKey}.description`)}</Text>
 
+          {isSuspended && suspension && (
+            <SuspensionCaseDetails suspension={suspension} />
+          )}
+
           <ConfirmDialog
             tone={isSuspended ? BUTTON_VARIANT.PRIMARY : BUTTON_VARIANT.DANGER}
             onConfirm={confirm}
             onConfirmed={() => router.refresh()}
-            onOpenChange={resetBlockChoice}
+            onOpenChange={reset}
           >
             <ConfirmDialog.Trigger>
               {t(`${copyKey}.triggerButton`)}
@@ -78,15 +89,13 @@ export const TenantSuspensionControl = ({
               description={t(`${copyKey}.dialogDescription`)}
               confirmButtonLabel={t(`${copyKey}.confirmButton`)}
               confirmingButtonLabel={t(`${copyKey}.confirmingButton`)}
-              isConfirmDisabled={isBlocking && blockReason.trim() === ''}
+              isConfirmDisabled={!isSuspended && !isComplete}
             >
               {!isSuspended && (
-                <BlockOwnerFields
-                  isBlocking={isBlocking}
-                  onBlockingChange={setIsBlocking}
-                  reason={blockReason}
-                  onReasonChange={setBlockReason}
-                />
+                <>
+                  <SuspensionCaseFields {...caseFields} />
+                  <BlockOwnerFields {...blockFields} />
+                </>
               )}
             </ConfirmDialog.Content>
           </ConfirmDialog>

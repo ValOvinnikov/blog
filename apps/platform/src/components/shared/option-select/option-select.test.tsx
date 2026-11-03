@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { KEY } from '@platform/constants/keyboard';
 import {
   customRender,
   renderWithIntl,
@@ -20,6 +21,7 @@ const MOCK_LABEL_ID = faker.string.alpha(8);
 const MOCK_BADGE_ID = faker.string.alpha(8);
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_BADGE = faker.lorem.word();
+const MOCK_PLACEHOLDER = faker.lorem.words(3);
 
 const MOCK_OPTIONS = [
   { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL },
@@ -46,6 +48,14 @@ describe(`<${OptionSelect.name}/>`, () => {
     const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
 
     expect(trigger).toHaveTextContent(MOCK_FIRST_LABEL);
+  });
+
+  it('shows the placeholder while no option is selected', () => {
+    setup({ value: '', placeholder: MOCK_PLACEHOLDER });
+
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+
+    expect(trigger).toHaveTextContent(MOCK_PLACEHOLDER);
   });
 
   it('reports the option chosen from the list', async () => {
@@ -118,7 +128,7 @@ describe(`<${OptionSelect.name}/>`, () => {
       expect(listbox).not.toBeInTheDocument();
     });
 
-    it.each(['{Enter}', ' ', '{ArrowDown}', '{ArrowUp}'])(
+    it.each(['{Enter}', KEY.SPACE, '{ArrowDown}', '{ArrowUp}'])(
       'does not open or change on %s',
       async (key) => {
         await user.tab();

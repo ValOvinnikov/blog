@@ -13,6 +13,7 @@ import { TenantSuspensionControl } from '@platform/components/features/tenants/t
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
+import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-suspension';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { env } from '@platform/utils/env/env';
@@ -33,13 +34,14 @@ export const TenantOverviewView = async ({
   const { id, primaryDomain, status, deprovisionedAt } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [admin, owner, auditEvents, findings] = await Promise.all([
+  const [admin, owner, auditEvents, findings, suspension] = await Promise.all([
     requireAdmin(),
     queries.memberships.getTenantOwnerMembership(id),
     queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
       limit: 5,
     }),
     queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+    loadOperatorSuspension(tenant),
   ]);
   const canChangeSuspension =
     isSuperAdmin(admin) &&
@@ -75,7 +77,10 @@ export const TenantOverviewView = async ({
           <OwnerCard owner={owner} />
           {canChangeSuspension &&
             (isSuspensionControlShown ? (
-              <TenantSuspensionControl tenant={clientTenant} />
+              <TenantSuspensionControl
+                tenant={clientTenant}
+                suspension={suspension}
+              />
             ) : (
               <PlatformTenantNotice />
             ))}
