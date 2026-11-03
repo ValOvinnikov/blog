@@ -9,6 +9,7 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 
 type TNavLinkItem = Extract<TSidebarNavItem, { href: string }>;
 type TNavInertItem = Exclude<TSidebarNavItem, TNavLinkItem>;
@@ -59,5 +60,15 @@ export const mockAccount = (overrides: Partial<TAccount> = {}): TAccount => ({
   name: faker.person.fullName(),
   email: faker.internet.email(),
   roleLine: faker.lorem.words(3),
+  ...overrides,
+});
+
+export const mockTenantSwitcherItem = (
+  overrides: Partial<TTenantSwitcherItem> = {},
+): TTenantSwitcherItem => ({
+  id: faker.string.uuid(),
+  name: faker.company.name(),
+  primaryDomain: faker.internet.domainName(),
+  isArchived: false,
   ...overrides,
 });

@@ -1,8 +1,13 @@
 import { ADMIN_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
+import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import {
+  customRenderAsync,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -16,6 +21,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import userEvent from '@testing-library/user-event';
 
 import DashboardTenantLayout from './layout';
 
@@ -38,6 +44,7 @@ const {
 }));
 
 vi.mock('@platform/server/auth/auth');
+vi.mock('@platform/server/auth/sign-out-action');
 
 vi.mock('next/headers', () => ({
   cookies: cookiesMock,
@@ -177,10 +184,22 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     );
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
+    const user = userEvent.setup();
     await setup();
+    const session = await auth();
 
+    const sidebar = screen.getByRole('complementary', {
+      name: messages.sidebar.ariaLabel,
+    });
+    const accountTrigger = within(sidebar).getByRole('button', {
+      name: new RegExp(session?.user?.email ?? ''),
+    });
+    await user.click(accountTrigger);
+    const accountMenu = await screen.findByRole('menu', {
+      name: messages.account.menuLabel,
+    });
     const content = screen.getByText(MOCK_DASHBOARD_CONTENT);
-    const platformRole = screen.getByText(
+    const platformRole = within(accountMenu).getByText(
       t('account.roleLine', {
         role: roleLabel.SUPERADMIN,
         scope: navSections.platformLabel,

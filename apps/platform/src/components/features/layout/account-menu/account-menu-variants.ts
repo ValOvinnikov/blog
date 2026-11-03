@@ -10,6 +10,9 @@ const SIDEBAR_TRIGGER = [
   focusRingClasses(FOCUS_RING_GROUND.SIDE),
 ];
 
+const EXPANDED_TRIGGER =
+  'flex min-h-[52px] w-full items-center gap-2.5 px-2.5 py-2 text-left';
+
 export const accountMenuVariants = tv({
   slots: {
     trigger: ['transition-colors duration-base ease-smooth'],
@@ -19,7 +22,6 @@ export const accountMenuVariants = tv({
     ],
     emailLine: ['truncate text-admin-12 leading-4 text-admin-muted'],
     chevron: ['text-admin-muted'],
-    pillLabel: ['sr-only'],
     popup: [],
     header: [
       'mb-1 flex flex-col gap-0.5 border-b border-admin-popover-line px-2 py-2.5',
@@ -32,10 +34,7 @@ export const accountMenuVariants = tv({
   variants: {
     placement: {
       [ACCOUNT_MENU_PLACEMENT.FOOT]: {
-        trigger: [
-          ...SIDEBAR_TRIGGER,
-          'flex min-h-[52px] w-full items-center gap-2.5 px-2.5 py-2 text-left',
-        ],
+        trigger: [...SIDEBAR_TRIGGER, EXPANDED_TRIGGER],
         popup: ['w-[var(--anchor-width)]'],
       },
       [ACCOUNT_MENU_PLACEMENT.RAIL]: {
@@ -45,16 +44,9 @@ export const accountMenuVariants = tv({
         ],
         popup: ['w-60'],
       },
-      [ACCOUNT_MENU_PLACEMENT.PILL]: {
-        trigger: [
-          'ml-auto inline-flex shrink-0 items-center rounded-full border border-admin-line md:hidden',
-          'bg-admin-surface p-1 text-admin-muted shadow-admin',
-          'hover:border-admin-brand hover:text-admin-text',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-brand',
-          'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-bg',
-          'data-[popup-open]:border-admin-brand data-[popup-open]:text-admin-text',
-        ],
-        popup: ['w-60'],
+      [ACCOUNT_MENU_PLACEMENT.MENU]: {
+        trigger: [EXPANDED_TRIGGER, 'rounded-admin'],
+        popup: ['w-[var(--anchor-width)]'],
       },
     },
   },
