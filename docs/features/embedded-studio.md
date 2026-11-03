@@ -107,8 +107,8 @@ module types whose capability is off for the tenant carry a warning.
 
 - `StudioMount` takes plain props only (`projectId`, `dataset`, `basePath`,
   `title`, `enabledCapabilities`, `entitlements`, `defaultLocale`,
-  `liveLocales`, `loginProvider`, plus the `onSchemeChange` and `onSignedIn`
-  callbacks) and calls
+  `liveLocales`, `loginProvider`, `scheme`, plus the `onSchemeChange` and
+  `onSignedIn` callbacks) and calls
   `buildStudioConfig` itself. It is the only `'use client'` file in
   `@blog/studio`. Nothing exports a built config: calling the builder in a
   Server Component pulls the Sanity SDK into the RSC graph, where `swr`,
@@ -122,6 +122,16 @@ module types whose capability is off for the tenant carry a warning.
   user, and never while the sign-in, loading or no-access screen shows.
   Neither callback is part of the config key, so changing one never rebuilds
   the Studio.
+- **The Studio follows the admin theme.** `PlatformStudioMount` passes
+  `scheme` from `useStudioScheme`: `light` or `dark` for a stored Light or
+  Dark admin preference, and for System the device's `prefers-color-scheme`,
+  updated live. It passes `onSchemeChange` too, which keeps the Studio's own
+  Appearance menu: choosing Light, Dark or System there stores the matching
+  admin preference (the `admin-theme` cookie and `<html data-theme>`, the
+  same write as the account menu's Theme section), so the admin shell around
+  the Studio switches at once. Both read the preference through
+  `utils/use-theme-preference/`, so a change from either side reaches the
+  other without a reload.
 - **The first-entry cookie** `studio-entered-<tenantId>` (client-written, one
   year, per tenant) records the owner's first signed-in Studio session. Only
   `/dashboard/studio` at READY passes `onSignedIn`, through the client
@@ -204,6 +214,7 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
 - `packages/studio/src/studio-mount.test.tsx` and
   `packages/studio/src/studio-config.test.ts`.
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.test.tsx`,
+  `platform-studio-mount/use-studio-scheme.test.tsx`,
   `owner-studio-access-view/owner-studio-access-view.test.tsx`, the dashboard
   Studio page test, `utils/owner-studio-access/owner-studio-access.test.ts`
   and `server/owner-access/request-owner-access.test.ts`.
