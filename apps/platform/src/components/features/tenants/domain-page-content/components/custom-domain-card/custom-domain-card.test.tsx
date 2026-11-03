@@ -101,6 +101,13 @@ describe(`<${CustomDomainCard.name}/>`, () => {
   const renderCard = (props: Partial<TCustomDomainCardProps>) =>
     act(async () => setup(props));
 
+  const pressVerify = async () => {
+    const verify = await screen.findByRole('button', {
+      name: ownDomain.verify,
+    });
+    await user.click(verify);
+  };
+
   const pollOnce = async () => {
     await act(async () => {
       await vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS);
@@ -417,67 +424,85 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       });
     });
 
-    it('shows the domain and the TXT record to add', async () => {
-      await renderCard({ claim: CLAIM });
-      await screen.findByRole('heading', TITLE);
-
-      const domain = screen.getByText(MOCK_CUSTOM_DOMAIN);
-      const txtName = screen.getByText(customDomainTxtName(MOCK_CUSTOM_DOMAIN));
-      const token = screen.getByText(MOCK_CLAIM_TOKEN);
-
-      expect(domain).toBeVisible();
-      expect(txtName).toBeVisible();
-      expect(token).toBeVisible();
-    });
-
-    it.each([
-      [COPY_TXT_NAME, customDomainTxtName(MOCK_CUSTOM_DOMAIN)],
-      [COPY_TXT_VALUE, MOCK_CLAIM_TOKEN],
-    ])('copies exactly the record text with %s', async (name, expected) => {
-      await renderCard({ claim: CLAIM, canManage: false });
-
-      const button = await screen.findByRole('button', { name });
-      await user.click(button);
-      const clipboard = await navigator.clipboard.readText();
-
-      expect(clipboard).toBe(expected);
-    });
-
-    it('offers Verify and Remove to the owner, and no connect form', async () => {
-      await renderCard({ claim: CLAIM });
-      await screen.findByRole('heading', TITLE);
-
-      const verify = screen.getByRole('button', { name: ownDomain.verify });
-      const remove = screen.getByRole('button', { name: ownDomain.remove });
-      const textbox = screen.queryByRole('textbox');
-
-      expect(verify).toBeVisible();
-      expect(remove).toBeVisible();
-      expect(textbox).not.toBeInTheDocument();
-    });
-
-    it('shows the claim read-only to someone who cannot manage the site', async () => {
-      await renderCard({ claim: CLAIM, canManage: false });
-      await screen.findByRole('heading', TITLE);
-
-      const token = screen.getByText(MOCK_CLAIM_TOKEN);
-      const verify = screen.queryByRole('button', { name: ownDomain.verify });
-      const remove = screen.queryByRole('button', { name: ownDomain.remove });
-
-      expect(token).toBeVisible();
-      expect(verify).not.toBeInTheDocument();
-      expect(remove).not.toBeInTheDocument();
-    });
-
-    it('verifies the site when the owner presses Verify', async () => {
-      await renderCard({ claim: CLAIM });
-      const verify = await screen.findByRole('button', {
-        name: ownDomain.verify,
+    describe('for the owner', () => {
+      beforeEach(async () => {
+        await renderCard({ claim: CLAIM });
+        await screen.findByRole('heading', TITLE);
       });
 
-      await user.click(verify);
+      it('shows the domain and the TXT record to add', async () => {
+        const domain = screen.getByText(MOCK_CUSTOM_DOMAIN);
+        const txtName = screen.getByText(
+          customDomainTxtName(MOCK_CUSTOM_DOMAIN),
+        );
+        const token = screen.getByText(MOCK_CLAIM_TOKEN);
 
-      expect(verifyCustomDomainAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
+        expect(domain).toBeVisible();
+        expect(txtName).toBeVisible();
+        expect(token).toBeVisible();
+      });
+
+      it('offers Verify and Remove, and no connect form', async () => {
+        const verify = screen.getByRole('button', { name: ownDomain.verify });
+        const remove = screen.getByRole('button', { name: ownDomain.remove });
+        const textbox = screen.queryByRole('textbox');
+
+        expect(verify).toBeVisible();
+        expect(remove).toBeVisible();
+        expect(textbox).not.toBeInTheDocument();
+      });
+
+      it('verifies the site when the owner presses Verify', async () => {
+        await pressVerify();
+
+        expect(verifyCustomDomainAction).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      });
+
+      it("shows the worker's reason and keeps Verify after a rejected connect", async () => {
+        vi.mocked(verifyCustomDomainAction).mockResolvedValue({
+          outcome: ACTION_OUTCOME.REFUSED,
+          reason: CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
+        });
+        await pressVerify();
+
+        const refusal = await screen.findByText(
+          ownDomain.refusal.connectUnavailable,
+        );
+        const verifyAgain = await screen.findByRole('button', {
+          name: ownDomain.verify,
+        });
+
+        expect(refusal).toBeInTheDocument();
+        expect(verifyAgain).toBeInTheDocument();
+      });
+    });
+
+    describe('for someone who cannot manage the site', () => {
+      beforeEach(async () => {
+        await renderCard({ claim: CLAIM, canManage: false });
+        await screen.findByRole('heading', TITLE);
+      });
+
+      it('shows the claim read-only', async () => {
+        const token = screen.getByText(MOCK_CLAIM_TOKEN);
+        const verify = screen.queryByRole('button', { name: ownDomain.verify });
+        const remove = screen.queryByRole('button', { name: ownDomain.remove });
+
+        expect(token).toBeVisible();
+        expect(verify).not.toBeInTheDocument();
+        expect(remove).not.toBeInTheDocument();
+      });
+
+      it.each([
+        [COPY_TXT_NAME, customDomainTxtName(MOCK_CUSTOM_DOMAIN)],
+        [COPY_TXT_VALUE, MOCK_CLAIM_TOKEN],
+      ])('copies exactly the record text with %s', async (name, expected) => {
+        const button = await screen.findByRole('button', { name });
+        await user.click(button);
+        const clipboard = await navigator.clipboard.readText();
+
+        expect(clipboard).toBe(expected);
+      });
     });
 
     it('moves focus to the new card heading after a successful verify', async () => {
@@ -486,11 +511,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       });
       const refresh = mockRouterRefresh();
       const { rerender } = await renderCard({ claim: CLAIM });
-      const verify = await screen.findByRole('button', {
-        name: ownDomain.verify,
-      });
-
-      await user.click(verify);
+      await pressVerify();
       await waitFor(() => {
         expect(refresh).toHaveBeenCalledTimes(1);
       });
@@ -505,29 +526,6 @@ describe(`<${CustomDomainCard.name}/>`, () => {
 
       const heading = await screen.findByRole('heading', TITLE);
       expect(heading).toHaveFocus();
-    });
-
-    it("shows the worker's reason and keeps Verify after a rejected connect", async () => {
-      vi.mocked(verifyCustomDomainAction).mockResolvedValue({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: CUSTOM_DOMAIN_REFUSAL.CONNECT_UNAVAILABLE,
-      });
-      await renderCard({ claim: CLAIM });
-      const verify = await screen.findByRole('button', {
-        name: ownDomain.verify,
-      });
-
-      await user.click(verify);
-
-      const refusal = await screen.findByText(
-        ownDomain.refusal.connectUnavailable,
-      );
-      const verifyAgain = await screen.findByRole('button', {
-        name: ownDomain.verify,
-      });
-
-      expect(refusal).toBeInTheDocument();
-      expect(verifyAgain).toBeInTheDocument();
     });
 
     it('does not poll for someone who cannot manage the site', async () => {

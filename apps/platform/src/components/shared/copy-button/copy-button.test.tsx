@@ -16,57 +16,42 @@ const setup = customRender(CopyButton, {
 
 describe(`<${CopyButton.name}/>`, () => {
   let user: UserEvent;
+  let button: HTMLElement;
 
   beforeEach(() => {
     user = userEvent.setup();
+    setup();
+    button = screen.getByRole('button', { name: MOCK_LABEL });
   });
 
   it('is named for what it copies', () => {
-    setup();
-
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-
     expect(button).toBeVisible();
   });
 
-  it('puts exactly its value on the clipboard', async () => {
-    setup();
+  describe('once clicked', () => {
+    beforeEach(async () => {
+      await user.click(button);
+    });
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-    await user.click(button);
-    const clipboard = await navigator.clipboard.readText();
+    it('puts exactly its value on the clipboard', async () => {
+      const clipboard = await navigator.clipboard.readText();
 
-    expect(clipboard).toBe(MOCK_VALUE);
-  });
+      expect(clipboard).toBe(MOCK_VALUE);
+    });
 
-  it('announces the copy to screen readers', async () => {
-    setup();
+    it('announces the copy and keeps its name', async () => {
+      const status = await screen.findByRole('status');
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-    await user.click(button);
-    const status = await screen.findByRole('status');
-
-    expect(status).toHaveTextContent('Copied');
-  });
-
-  it('keeps its name after copying', async () => {
-    setup();
-
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
-    await user.click(button);
-    const status = await screen.findByRole('status');
-
-    expect(status).toHaveTextContent('Copied');
-    expect(button).toHaveAccessibleName(MOCK_LABEL);
+      expect(status).toHaveTextContent('Copied');
+      expect(button).toHaveAccessibleName(MOCK_LABEL);
+    });
   });
 
   it('tells the user to select the text when the clipboard refuses', async () => {
     vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValue(
       new Error('denied'),
     );
-    setup();
 
-    const button = screen.getByRole('button', { name: MOCK_LABEL });
     await user.click(button);
     const status = await screen.findByRole('status');
 
