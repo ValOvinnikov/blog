@@ -1123,15 +1123,16 @@ including both approval gates, is unchanged.)
 6. **Ask to push** — explicit approval required; separate question; wait for
    answer.
 7. **Ask to open PR** — separate question, after push; wait for answer. Once
-   approved: run `gh pr create`, then **immediately** set the issue → Code
-   Review on the board — do not report the PR URL until that update is done —
-   and tag the PR `job:<session-name>` so concurrent background jobs stay
+   approved: run `gh pr create --draft`, then **immediately** set the issue →
+   Code Review on the board — do not report the PR URL until that update is
+   done — and tag the PR `job:<session-name>` so concurrent background jobs stay
    tellable apart in the PR list: the session's slugified **name**, never its
    id (`job:static-generation`, not `job:ab922b91`), skipped silently in a
    foreground session and never applied in a cloud one (mechanics, including a
    renamed session: `open-pull-request` Gate 5). The label identifies the job,
    not the author — PRs are always opened by the orchestrator, never a
-   subagent. Then dispatch `ci-watcher` (background) to watch CI to completion,
+   subagent. CI skips drafts; the owner marks the PR ready at final review,
+   and only then dispatch `ci-watcher` (background) to watch CI to completion,
    and diagnose and fix any failure it reports (`open-pull-request` Gate 5a) —
    a fix push still needs its own fresh push-approval ask, same as any push.
 
@@ -1390,12 +1391,13 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
   Progress signal. The GitHub Actions `@claude` path can't rename:
   `claude-code-action` generates `claude/issue-<n>-<timestamp>`, which
   `board-keeper.md` Step 2 also reads as In Progress.
-- **In review:** open the PR with the issue reference (`Closes #n` on the
-  completing PR only) — an open PR is the Code Review signal. On the `@claude`
-  path, `claude.yml`'s `--append-system-prompt` tells every run to push and
-  open its own PR via `gh pr create`; if a "Create PR" link appears instead,
-  `gh pr create --head <branch>` opens one from the pushed branch without a
-  checkout.
+- **In review:** open the PR as a draft with the issue reference
+  (`Closes #n` on the completing PR only) — an open PR, draft or not, is the
+  Code Review signal, and the owner marks it ready at final review. On the
+  `@claude` path, `claude.yml`'s `--append-system-prompt` tells every run to
+  push and open its own draft PR via `gh pr create --draft`; if a "Create PR"
+  link appears instead, `gh pr create --draft --head <branch>` opens one from
+  the pushed branch without a checkout.
 - **Done:** the merged `Closes #n` PR is the Done signal; nothing extra.
 
 **The board updates itself from that evidence:**

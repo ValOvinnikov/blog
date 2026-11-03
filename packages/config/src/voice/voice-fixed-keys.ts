@@ -6,6 +6,8 @@
 export const VOICE_FIXED_KEYS = [
   'breadcrumbs.ariaLabel',
   'localeErrorPage.announcement',
+  'siteUnavailable.heading',
+  'siteUnavailable.text',
   'postShare.shareAriaLabel',
   'postShare.panelAriaLabel',
   'siteNavigation.toggleMenu',

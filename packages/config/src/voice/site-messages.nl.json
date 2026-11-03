@@ -20,6 +20,10 @@
     "retry": "Opnieuw proberen",
     "goHome": "Naar home"
   },
+  "siteUnavailable": {
+    "heading": "Deze site is niet beschikbaar",
+    "text": "Probeer het later opnieuw."
+  },
   "postShare": {
     "shareAriaLabel": "\"{title}\" delen",
     "panelAriaLabel": "Deelopties",
