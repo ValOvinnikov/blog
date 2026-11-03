@@ -5306,6 +5306,14 @@
         "file": "apps/platform/src/constants/media-query.ts"
       }
     ],
+    "(pointer: coarse)": [
+      {
+        "ref": "MEDIA_QUERY.COARSE_POINTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/media-query",
+        "file": "apps/platform/src/constants/media-query.ts"
+      }
+    ],
     "DESKTOP": [
       {
         "ref": "MENU_RADIO_GROUP_SIZE.DESKTOP",
@@ -7712,6 +7720,14 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "370": [
+      {
+        "ref": "ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_COLUMN_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
     "400": [
       {
         "ref": "HTTP_STATUS.BAD_REQUEST",
@@ -7758,14 +7774,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
-      }
-    ],
-    "420": [
-      {
-        "ref": "ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_STAGE_WIDTH",
-        "scope": "app:platform",
-        "from": "@platform/constants/onboarding",
-        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "429": [

@@ -431,7 +431,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
-- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`
+- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`
 
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 
@@ -443,7 +443,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **ONBOARDING_STEP**: `SITE`, `ADDRESS`, `LOOK`, `REVIEW`
 - **ONBOARDING_LOG**: `ROOT_DOMAIN_MISSING`=`"onboarding.root_domain_missing"`, `SESSION_EMAIL_MISSING`=`"onboarding.session_email_missing"`, `OWNS_FREE_TENANT_CHECK_FAILED`=`"onboarding.owns_free_tenant_check_failed"`, `TERMS_RECORD_FAILED`=`"onboarding.terms_record_failed"`, `CREATE_FAILED`=`"onboarding.create_failed"`
 - **ONBOARDING_TIER_QUERY**: `RAIL`=`"(width >= 48rem)"`, `FULL`=`"(width >= 85rem)"`
-- **ONBOARDING_PREVIEW**: `ADDRESS_ROW_MIN_STAGE_WIDTH`=`420`
+- **ONBOARDING_PREVIEW**: `ADDRESS_ROW_MIN_COLUMN_WIDTH`=`370`
 
 ### `@platform/constants/operator-alert` — `apps/platform/src/constants/operator-alert.ts`
 

@@ -9,6 +9,7 @@ import {
   type ElementType,
   type PropsWithChildren,
   type ReactNode,
+  type Ref,
 } from 'react';
 
 import { previewFrameVariants } from './preview-frame-variants';
@@ -29,6 +30,7 @@ type TPreviewFrameProps = PropsWithChildren<{
   notes?: ReactNode;
   isToolbarFirst?: boolean;
   className?: string;
+  ref?: Ref<HTMLElement>;
 }>;
 
 const PreviewFrameRoot = ({
@@ -41,6 +43,7 @@ const PreviewFrameRoot = ({
   isToolbarFirst = false,
   className,
   children,
+  ref,
 }: TPreviewFrameProps) => {
   const {
     root,
@@ -54,7 +57,11 @@ const PreviewFrameRoot = ({
   const hasToolbar = Boolean(widthControl || controls || actions);
 
   return (
-    <section aria-label={ariaLabel} className={root({ class: className })}>
+    <section
+      ref={ref}
+      aria-label={ariaLabel}
+      className={root({ class: className })}
+    >
       {!isToolbarFirst && slots.Heading}
       {hasToolbar && (
         <div className={toolbar()}>

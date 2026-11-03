@@ -17,7 +17,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 const iconToggleGroupOptionVariants = tv({
   base: [
-    'inline-flex size-11 cursor-pointer items-center justify-center lg:size-8 pointer-coarse:size-11',
+    'inline-flex size-11 cursor-pointer items-center justify-center md:size-7.5 pointer-coarse:size-11',
     'rounded-admin-3 border-0 bg-transparent text-admin-muted',
     'hover:bg-admin-hover hover:text-admin-text',
     'data-[pressed]:bg-admin-segment-on data-[pressed]:text-admin-brand-strong',

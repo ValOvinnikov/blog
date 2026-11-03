@@ -44,7 +44,7 @@ export const ONBOARDING_TIER_QUERY = {
 } as const;
 
 export const ONBOARDING_PREVIEW = {
-  ADDRESS_ROW_MIN_STAGE_WIDTH: 420,
+  ADDRESS_ROW_MIN_COLUMN_WIDTH: 370,
 } as const;
 
 export const ONBOARDING_SCROLL_AREA_TEST_ID = 'onboarding-scroll-area';
