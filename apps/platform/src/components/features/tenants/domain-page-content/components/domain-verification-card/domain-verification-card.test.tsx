@@ -1,6 +1,10 @@
-import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import {
+  DOMAIN_VERIFICATION_STATUS,
+  ROUTING_RECORD_TYPE,
+} from '@platform/constants/domain';
+import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_CUSTOM_DOMAIN_URL,
@@ -68,8 +72,12 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     await setup({
       status: DOMAIN_VERIFICATION_STATUS.PENDING,
       dnsRecords: [
-        { type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD },
-        { type: 'CNAME', name: 'www', value: CNAME_RECORD_VALUE },
+        { type: ROUTING_RECORD_TYPE.A, name: '@', value: MOCK_VERCEL_A_RECORD },
+        {
+          type: ROUTING_RECORD_TYPE.CNAME,
+          name: 'www',
+          value: CNAME_RECORD_VALUE,
+        },
       ],
     });
 
@@ -134,30 +142,26 @@ describe(`<${DomainVerificationCard.name}/>`, () => {
     expect(visitSite).toHaveAttribute('href', MOCK_CUSTOM_DOMAIN_URL);
   });
 
-  it('names the domain while it awaits verification, with no site link', async () => {
-    await setup({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
+  describe('while a custom domain awaits verification with known records', () => {
+    beforeEach(async () => {
+      await setup(mockPendingProjectDomain());
     });
 
-    const address = await screen.findByText(MOCK_CUSTOM_DOMAIN);
-    const visitSite = screen.queryByRole('link', { name: /Visit site/ });
+    it('names the domain, with no site link', async () => {
+      const address = await screen.findByText(MOCK_CUSTOM_DOMAIN);
+      const visitSite = screen.queryByRole('link', { name: /Visit site/ });
 
-    expect(address).toBeVisible();
-    expect(visitSite).not.toBeInTheDocument();
-  });
-
-  it('asks for the records only alongside the table', async () => {
-    await setup({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
+      expect(address).toBeVisible();
+      expect(visitSite).not.toBeInTheDocument();
     });
 
-    const instructions = await screen.findByText(
-      /Add these records at your DNS provider/,
-    );
+    it('asks for the records alongside the table', async () => {
+      const instructions = await screen.findByText(
+        /Add these records at your DNS provider/,
+      );
 
-    expect(instructions).toBeVisible();
+      expect(instructions).toBeVisible();
+    });
   });
 
   it.each([

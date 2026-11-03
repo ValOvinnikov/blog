@@ -167,6 +167,19 @@ describe(`<${DomainPageContent.name}/>`, () => {
         membership: mockMembership(),
       });
 
+    const expectNoticeWithoutInput = (notice: string) => {
+      const message = screen.getByText(notice);
+      const input = screen.queryByRole('textbox');
+      expect(message).toBeVisible();
+      expect(input).not.toBeInTheDocument();
+    };
+    const expectDomainInput = () => {
+      const input = screen.getByRole('textbox', {
+        name: ownDomain.domainLabel,
+      });
+      expect(input).toBeVisible();
+    };
+
     beforeEach(() => {
       envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
     });
@@ -177,23 +190,17 @@ describe(`<${DomainPageContent.name}/>`, () => {
       });
 
       const heading = screen.getByRole('heading', OWN_DOMAIN_TITLE);
-      const prompt = screen.getByText(ownDomain.upgradePrompt);
-      const input = screen.queryByRole('textbox');
 
       expect(heading).toBeVisible();
-      expect(prompt).toBeVisible();
-      expect(input).not.toBeInTheDocument();
+      expectNoticeWithoutInput(ownDomain.upgradePrompt);
     });
 
     it('offers a Growth tenant without a custom domain an input and a connect button', async () => {
       await renderForOwner();
 
-      const input = screen.getByRole('textbox', {
-        name: ownDomain.domainLabel,
-      });
       const connect = screen.getByRole('button', { name: ownDomain.connect });
 
-      expect(input).toBeVisible();
+      expectDomainInput();
       expect(connect).toBeVisible();
     });
 
@@ -203,21 +210,13 @@ describe(`<${DomainPageContent.name}/>`, () => {
         membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
       });
 
-      const message = screen.getByText(ownDomain.ownerOnly);
-      const input = screen.queryByRole('textbox');
-
-      expect(message).toBeVisible();
-      expect(input).not.toBeInTheDocument();
+      expectNoticeWithoutInput(ownDomain.ownerOnly);
     });
 
     it('offers an operator the input without a membership', async () => {
       await setup({ tenant: growthTenant(), admin: mockAdmin() });
 
-      const input = screen.getByRole('textbox', {
-        name: ownDomain.domainLabel,
-      });
-
-      expect(input).toBeVisible();
+      expectDomainInput();
     });
 
     it('shows a custom main address once, with the way back and without a form', async () => {
@@ -295,11 +294,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     it('tells an archived tenant without a custom domain it cannot be changed', async () => {
       await renderForOwner({ deprovisionedAt: MOCK_ARCHIVED_AT });
 
-      const message = screen.getByText(ownDomain.archivedState);
-      const input = screen.queryByRole('textbox');
-
-      expect(message).toBeVisible();
-      expect(input).not.toBeInTheDocument();
+      expectNoticeWithoutInput(ownDomain.archivedState);
     });
 
     it("shows the site's pending claim in place of the connect form", async () => {

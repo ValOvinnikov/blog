@@ -1,26 +1,13 @@
 import { DOMAIN_PATTERN } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
-import {
-  DOMAIN_VERIFICATION_STATUS,
-  type TDomainVerificationStatus,
-} from '@platform/constants/domain';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
+import { projectDomain, type TProjectDomain } from './project-domain';
 import { fetchVercel, readVercelCredentials } from './vercel-client';
 import { getDomainRouting } from './vercel-domain-routing';
-
-export type TDomainDnsRecord = {
-  type: string;
-  name: string;
-  value: string;
-};
-
-export type TProjectDomain = {
-  status: TDomainVerificationStatus;
-  dnsRecords: TDomainDnsRecord[];
-};
 
 type TVercelProjectDomainResponse = {
   name?: string;
@@ -28,11 +15,6 @@ type TVercelProjectDomainResponse = {
   verified?: boolean;
   verification?: { type: string; domain: string; value: string }[];
 };
-
-const projectDomain = (
-  status: TDomainVerificationStatus,
-  dnsRecords: TDomainDnsRecord[] = [],
-): TProjectDomain => ({ status, dnsRecords });
 
 export const getProjectDomain = async (
   domain: string,

@@ -1,6 +1,9 @@
 import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
-import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
+import {
+  DOMAIN_AVAILABILITY,
+  type TDomainAvailability,
+} from '@platform/constants/domain';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { requestedUrl } from '@platform/testing/http/requested-url';
@@ -46,6 +49,14 @@ const projectDomainsPage = (name: string, next: TMaybeNull<number> = null) =>
 const projectDomainsPath = (apex: string) =>
   `/v1/domains/${apex}/project-domains`;
 
+const expectAvailability = async (
+  expected: TDomainAvailability,
+  domain = MOCK_DOMAIN,
+) => {
+  const result = await checkDomainAvailability(domain);
+  expect(result).toBe(expected);
+};
+
 describe(checkDomainAvailability, () => {
   beforeEach(() => {
     fetchMock.mockReset();
@@ -64,16 +75,12 @@ describe(checkDomainAvailability, () => {
     envMock.VERCEL_API_TOKEN = undefined;
     envMock.VERCEL_PROJECT_ID_WEB = undefined;
 
-    const result = await checkDomainAvailability(MOCK_DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.NOT_CONFIGURED);
+    await expectAvailability(DOMAIN_AVAILABILITY.NOT_CONFIGURED);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('rejects a path-traversal domain without making a request', async () => {
-    const result = await checkDomainAvailability(MOCK_TRAVERSAL_DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
+    await expectAvailability(DOMAIN_AVAILABILITY.ERROR, MOCK_TRAVERSAL_DOMAIN);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       TENANT_LOG.DOMAIN_AVAILABILITY_INVALID_DOMAIN,
       { domain: MOCK_TRAVERSAL_DOMAIN },
@@ -84,9 +91,7 @@ describe(checkDomainAvailability, () => {
   it.each([MULTI_PART_SUFFIX, MOCK_IP_LITERAL_HOST])(
     'returns ERROR with no request, and logs, when %s has no registrable domain',
     async (domain) => {
-      const result = await checkDomainAvailability(domain);
-
-      expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
+      await expectAvailability(DOMAIN_AVAILABILITY.ERROR, domain);
       expect(fetchMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
         TENANT_LOG.DOMAIN_AVAILABILITY_APEX_UNDETERMINED,
@@ -151,9 +156,7 @@ describe(checkDomainAvailability, () => {
     async ({ domain, projectDomains, expected }) => {
       fetchMock.mockResolvedValue(mockJsonResponse({ projectDomains }));
 
-      const result = await checkDomainAvailability(domain);
-
-      expect(result).toBe(expected);
+      await expectAvailability(expected, domain);
     },
   );
 
@@ -164,9 +167,7 @@ describe(checkDomainAvailability, () => {
       )
       .mockResolvedValueOnce(projectDomainsPage(MOCK_SUBDOMAIN));
 
-    const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
+    await expectAvailability(DOMAIN_AVAILABILITY.IN_USE, MOCK_SUBDOMAIN);
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(requestedUrl(fetchMock, 1).searchParams.get('until')).toBe(
       String(MOCK_PAGE_CURSOR),
@@ -178,9 +179,7 @@ describe(checkDomainAvailability, () => {
       projectDomainsPage(MOCK_SUBDOMAIN, MOCK_PAGE_CURSOR),
     );
 
-    const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
+    await expectAvailability(DOMAIN_AVAILABILITY.IN_USE, MOCK_SUBDOMAIN);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
@@ -189,9 +188,7 @@ describe(checkDomainAvailability, () => {
       projectDomainsPage(MOCK_SIBLING_SUBDOMAIN, MOCK_PAGE_CURSOR),
     );
 
-    const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
+    await expectAvailability(DOMAIN_AVAILABILITY.ERROR, MOCK_SUBDOMAIN);
     expect(fetchMock).toHaveBeenCalledTimes(MAX_PROJECT_DOMAINS_PAGES);
   });
 
@@ -209,16 +206,12 @@ describe(checkDomainAvailability, () => {
   ])('returns $expected for $scenario', async ({ status, expected }) => {
     fetchMock.mockResolvedValue(mockJsonResponse(null, status));
 
-    const result = await checkDomainAvailability(MOCK_DOMAIN);
-
-    expect(result).toBe(expected);
+    await expectAvailability(expected);
   });
 
   it('returns ERROR when the request throws', async () => {
     fetchMock.mockRejectedValue(new Error(MOCK_NETWORK_ERROR_MESSAGE));
 
-    const result = await checkDomainAvailability(MOCK_DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
+    await expectAvailability(DOMAIN_AVAILABILITY.ERROR);
   });
 });

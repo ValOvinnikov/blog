@@ -6,8 +6,12 @@ import {
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { logger } from '@platform/utils/logger/logger';
 
+import {
+  projectDomain,
+  type TDomainDnsRecord,
+  type TProjectDomain,
+} from './project-domain';
 import { fetchVercel, type TVercelCredentials } from './vercel-client';
-import type { TDomainDnsRecord, TProjectDomain } from './vercel-domains-api';
 
 type TRankedOption<TValue> = { rank: number; value: TValue };
 
@@ -58,15 +62,15 @@ export const getDomainRouting = async (
       domain,
       responseStatus: response.status,
     });
-    return { status: DOMAIN_VERIFICATION_STATUS.ERROR, dnsRecords: [] };
+    return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
   }
 
   const config = (await response.json()) as TVercelDomainConfigResponse;
 
   return config.misconfigured
-    ? {
-        status: DOMAIN_VERIFICATION_STATUS.PENDING,
-        dnsRecords: toRoutingRecords(domain, isApex, config),
-      }
-    : { status: DOMAIN_VERIFICATION_STATUS.VERIFIED, dnsRecords: [] };
+    ? projectDomain(
+        DOMAIN_VERIFICATION_STATUS.PENDING,
+        toRoutingRecords(domain, isApex, config),
+      )
+    : projectDomain(DOMAIN_VERIFICATION_STATUS.VERIFIED);
 };

@@ -4,6 +4,7 @@ import { CUSTOM_DOMAIN_TXT_TYPE } from '@platform/constants/custom-domain';
 import {
   DOMAIN_VERIFICATION_STATUS,
   ROUTING_RECORD_TYPE,
+  type TDomainVerificationStatus,
 } from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
@@ -11,6 +12,7 @@ import { requestedUrl } from '@platform/testing/http/requested-url';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
+import type { TDomainDnsRecord } from './project-domain';
 import { getProjectDomain } from './vercel-domains-api';
 
 vi.mock('@platform/utils/env/env');
@@ -64,6 +66,17 @@ const respondOwned = (
     mockJsonResponse({ verified: true, ...projectDomain }),
     mockJsonResponse(config),
   );
+
+const expectProjectDomain = async (
+  status: TDomainVerificationStatus,
+  {
+    domain = MOCK_DOMAIN,
+    dnsRecords = [],
+  }: { domain?: string; dnsRecords?: TDomainDnsRecord[] } = {},
+) => {
+  const result = await getProjectDomain(domain);
+  expect(result).toEqual({ status, dnsRecords });
+};
 
 describe(getProjectDomain, () => {
   beforeEach(() => {
@@ -122,21 +135,13 @@ describe(getProjectDomain, () => {
   it('returns NOT_CONFIGURED with no records and no request when Vercel is unset', async () => {
     envMock.VERCEL_API_TOKEN = undefined;
 
-    const result = await getProjectDomain(MOCK_DOMAIN);
-
-    expect(result).toEqual({
-      status: DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
-      dnsRecords: [],
-    });
+    await expectProjectDomain(DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED);
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('returns ERROR, logs and makes no request for a path-traversal domain', async () => {
-    const result = await getProjectDomain(MOCK_TRAVERSAL_DOMAIN);
-
-    expect(result).toEqual({
-      status: DOMAIN_VERIFICATION_STATUS.ERROR,
-      dnsRecords: [],
+    await expectProjectDomain(DOMAIN_VERIFICATION_STATUS.ERROR, {
+      domain: MOCK_TRAVERSAL_DOMAIN,
     });
     expect(loggerErrorMock).toHaveBeenCalledWith(
       PROVISIONING_LOG.DOMAIN_CHECK_INVALID_DOMAIN,
@@ -177,9 +182,7 @@ describe(getProjectDomain, () => {
     async ({ responses, expected }) => {
       respondWith(...responses());
 
-      const result = await getProjectDomain(MOCK_DOMAIN);
-
-      expect(result).toEqual({ status: expected, dnsRecords: [] });
+      await expectProjectDomain(expected);
     },
   );
 
@@ -204,12 +207,7 @@ describe(getProjectDomain, () => {
     async ({ responses, event }) => {
       respondWith(...responses());
 
-      const result = await getProjectDomain(MOCK_DOMAIN);
-
-      expect(result).toEqual({
-        status: DOMAIN_VERIFICATION_STATUS.ERROR,
-        dnsRecords: [],
-      });
+      await expectProjectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
       expect(loggerErrorMock).toHaveBeenCalledWith(event, {
         domain: MOCK_DOMAIN,
         responseStatus: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -221,12 +219,7 @@ describe(getProjectDomain, () => {
     const error = new Error(MOCK_NETWORK_ERROR_MESSAGE);
     fetchMock.mockRejectedValue(error);
 
-    const result = await getProjectDomain(MOCK_DOMAIN);
-
-    expect(result).toEqual({
-      status: DOMAIN_VERIFICATION_STATUS.ERROR,
-      dnsRecords: [],
-    });
+    await expectProjectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
     expect(loggerErrorMock).toHaveBeenCalledWith(
       PROVISIONING_LOG.DOMAIN_CHECK_ERROR,
       { domain: MOCK_DOMAIN, errorName: error.name },
@@ -241,10 +234,7 @@ describe(getProjectDomain, () => {
       }),
     );
 
-    const result = await getProjectDomain(MOCK_DOMAIN);
-
-    expect(result).toEqual({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
+    await expectProjectDomain(DOMAIN_VERIFICATION_STATUS.PENDING, {
       dnsRecords: [
         {
           type: CUSTOM_DOMAIN_TXT_TYPE,
@@ -276,10 +266,8 @@ describe(getProjectDomain, () => {
         { name: domain, apexName: MOCK_APEX_DOMAIN },
       );
 
-      const result = await getProjectDomain(domain);
-
-      expect(result).toEqual({
-        status: DOMAIN_VERIFICATION_STATUS.PENDING,
+      await expectProjectDomain(DOMAIN_VERIFICATION_STATUS.PENDING, {
+        domain,
         dnsRecords: [{ type, name: domain, value }],
       });
     },

@@ -10,10 +10,8 @@ import { CustomDomainNoticeCard } from '@platform/components/features/tenants/do
 import { CustomDomainStatusRefresher } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-status-refresher/custom-domain-status-refresher';
 import { DomainVerificationCard } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card/domain-verification-card';
 import { DomainVerificationCardSkeleton } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card-skeleton/domain-verification-card-skeleton';
-import {
-  getProjectDomain,
-  type TProjectDomain,
-} from '@platform/server/provisioning/vercel-domains-api';
+import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
+import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 

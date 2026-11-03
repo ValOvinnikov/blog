@@ -129,13 +129,35 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     });
   };
 
-  const queryButton = async (heading: typeof TITLE, name: string) => {
-    await screen.findByRole('heading', heading);
-    return screen.queryByRole('button', { name });
+  const confirmVia = async (triggerName: string, confirmName: string) => {
+    const confirm = await openConfirm(triggerName, confirmName);
+    await user.click(confirm);
   };
 
-  const findSwitchBack = () =>
-    screen.findByRole('button', { name: useSubdomain.trigger });
+  const expectNoButton = async (heading: typeof TITLE, name: string) => {
+    await screen.findByRole('heading', heading);
+    const button = screen.queryByRole('button', { name });
+    expect(button).not.toBeInTheDocument();
+  };
+
+  const expectSwitchBackVisible = async () => {
+    const switchBack = await screen.findByRole('button', {
+      name: useSubdomain.trigger,
+    });
+    expect(switchBack).toBeVisible();
+  };
+
+  const expectHeadingFocused = async (heading: typeof TITLE) => {
+    const headingElement = await screen.findByRole('heading', heading);
+    expect(headingElement).toHaveFocus();
+  };
+
+  const expectFocusAfterRefresh = async (
+    props: Partial<TCustomDomainCardProps>,
+  ) => {
+    await rerenderAfterRefresh(props);
+    await expectHeadingFocused(TITLE);
+  };
 
   const pressVerify = async () => {
     const verify = await screen.findByRole('button', {
@@ -172,9 +194,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
   it('offers Remove only to someone who can manage the site', async () => {
     await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN, canManage: false });
 
-    const remove = await queryButton(TITLE, ownDomain.remove);
-
-    expect(remove).not.toBeInTheDocument();
+    await expectNoButton(TITLE, ownDomain.remove);
   });
 
   describe('a pending custom domain shown to an owner', () => {
@@ -183,25 +203,16 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     });
 
     it('offers no way to make it the main address', async () => {
-      const makeMainButton = await queryButton(TITLE, makeMain.trigger);
-
-      expect(makeMainButton).not.toBeInTheDocument();
+      await expectNoButton(TITLE, makeMain.trigger);
     });
 
     it('moves focus to the new card heading after a successful remove', async () => {
       vi.mocked(removeCustomDomainAction).mockResolvedValue({
         outcome: ACTION_OUTCOME.SUCCESS,
       });
-      const confirmButton = await openConfirm(
-        ownDomain.remove,
-        ownDomain.removeConfirm,
-      );
 
-      await user.click(confirmButton);
-      await rerenderAfterRefresh({});
-
-      const heading = await screen.findByRole('heading', TITLE);
-      expect(heading).toHaveFocus();
+      await confirmVia(ownDomain.remove, ownDomain.removeConfirm);
+      await expectFocusAfterRefresh({});
     });
   });
 
@@ -212,10 +223,9 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       });
 
       it('is shown as the main address with no form and no Remove', async () => {
-        const remove = await queryButton(MAIN_TITLE, ownDomain.remove);
+        await expectNoButton(MAIN_TITLE, ownDomain.remove);
         const input = screen.queryByRole('textbox');
 
-        expect(remove).not.toBeInTheDocument();
         expect(input).not.toBeInTheDocument();
       });
 
@@ -226,9 +236,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       });
 
       it('offers the way back to the subdomain', async () => {
-        const switchBack = await findSwitchBack();
-
-        expect(switchBack).toBeVisible();
+        await expectSwitchBackVisible();
       });
 
       it('switches back after confirmation and moves focus to the new heading', async () => {
@@ -244,11 +252,10 @@ describe(`<${CustomDomainCard.name}/>`, () => {
         await user.click(confirm);
         await rerenderAfterRefresh({ customDomain: MOCK_CUSTOM_DOMAIN });
 
-        const heading = await screen.findByRole('heading', TITLE);
         expect(makeSubdomainMainAddressAction).toHaveBeenCalledWith(
           MOCK_TENANT_ID,
         );
-        expect(heading).toHaveFocus();
+        await expectHeadingFocused(TITLE);
       });
     });
 
@@ -258,9 +265,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
         tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.FREE },
       });
 
-      const switchBack = await findSwitchBack();
-
-      expect(switchBack).toBeVisible();
+      await expectSwitchBackVisible();
     });
 
     it.each([
@@ -277,9 +282,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     ])('offers no switch $scenario', async ({ props }) => {
       await renderCard({ isPrimaryCustom: true, ...props });
 
-      const switchBack = await queryButton(MAIN_TITLE, useSubdomain.trigger);
-
-      expect(switchBack).not.toBeInTheDocument();
+      await expectNoButton(MAIN_TITLE, useSubdomain.trigger);
     });
   });
 
@@ -322,12 +325,11 @@ describe(`<${CustomDomainCard.name}/>`, () => {
         await user.click(confirm);
         await rerenderAfterRefresh({ isPrimaryCustom: true });
 
-        const heading = await screen.findByRole('heading', MAIN_TITLE);
         expect(makeCustomDomainMainAddressAction).toHaveBeenCalledWith(
           MOCK_TENANT_ID,
           { domain: MOCK_CUSTOM_DOMAIN },
         );
-        expect(heading).toHaveFocus();
+        await expectHeadingFocused(MAIN_TITLE);
       });
 
       it('shows the refusal in the dialog and does not refresh', async () => {
@@ -335,9 +337,8 @@ describe(`<${CustomDomainCard.name}/>`, () => {
           outcome: ACTION_OUTCOME.REFUSED,
           reason: CUSTOM_DOMAIN_REFUSAL.NOT_VERIFIED,
         });
-        const confirm = await openConfirm(makeMain.trigger, makeMain.confirm);
 
-        await user.click(confirm);
+        await confirmVia(makeMain.trigger, makeMain.confirm);
 
         const message = await screen.findByText(ownDomain.refusal.notVerified);
         expect(message).toBeVisible();
@@ -357,9 +358,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     ])('offers it to $scenario', async ({ props }) => {
       await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN, ...props });
 
-      const makeMainButton = await queryButton(TITLE, makeMain.trigger);
-
-      expect(makeMainButton).not.toBeInTheDocument();
+      await expectNoButton(TITLE, makeMain.trigger);
     });
   });
 
@@ -387,10 +386,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
 
     await user.type(domainField, MOCK_CUSTOM_DOMAIN);
     await user.click(connectButton);
-    await rerenderAfterRefresh({ customDomain: MOCK_CUSTOM_DOMAIN });
-
-    const heading = await screen.findByRole('heading', TITLE);
-    expect(heading).toHaveFocus();
+    await expectFocusAfterRefresh({ customDomain: MOCK_CUSTOM_DOMAIN });
   });
 
   describe('awaiting proof', () => {
@@ -441,10 +437,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
         });
 
         await pressVerify();
-        await rerenderAfterRefresh({ customDomain: MOCK_CUSTOM_DOMAIN });
-
-        const heading = await screen.findByRole('heading', TITLE);
-        expect(heading).toHaveFocus();
+        await expectFocusAfterRefresh({ customDomain: MOCK_CUSTOM_DOMAIN });
       });
 
       it("shows the worker's reason and keeps Verify after a rejected connect", async () => {

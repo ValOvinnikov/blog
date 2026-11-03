@@ -11,7 +11,7 @@ import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
-import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
 import { domainVerificationTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 import { use, type ReactNode } from 'react';

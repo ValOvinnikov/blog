@@ -9,6 +9,7 @@ import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
+import { findSubdomain } from '@platform/utils/find-subdomain/find-subdomain';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import { getTranslations } from 'next-intl/server';
@@ -41,9 +42,7 @@ export const DomainPageContent = async ({
     primaryDomain,
     env.TENANT_ROOT_DOMAIN,
   );
-  const subdomain = tenantDomains
-    .map(({ domain }) => domain)
-    .find((domain) => isPlatformAddress(domain, env.TENANT_ROOT_DOMAIN));
+  const subdomain = findSubdomain(tenantDomains, env.TENANT_ROOT_DOMAIN);
   const { root } = domainPageContentVariants();
 
   return (
