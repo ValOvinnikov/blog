@@ -2,6 +2,7 @@
 
 import type { TLocaleIsoCode } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
 import { LookPreview } from '@platform/components/features/look/look-preview';
@@ -56,10 +57,9 @@ export const LookForm = ({
   const layoutRef = useRef<HTMLDivElement>(null);
   const layoutWidth = useElementSize(layoutRef)?.width;
   const { view, tabsProps, panelProps } = useViewTabs({
-    isTabbed:
-      layoutWidth === undefined
-        ? undefined
-        : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
+    isTabbed: isUndefined(layoutWidth)
+      ? undefined
+      : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
   });
   const t = useTranslations('lookForm');
   const { groupProps, revealRow } = useLookOpenRows();
