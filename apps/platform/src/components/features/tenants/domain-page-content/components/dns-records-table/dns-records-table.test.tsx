@@ -1,17 +1,22 @@
+import { ROUTING_RECORD_TYPE } from '@platform/constants/domain';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { MOCK_APEX_RECORD_NAME } from '@platform/testing/domains/fixtures';
 import { MOCK_VERCEL_A_RECORD } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { DnsRecordsTable } from './dns-records-table';
 
 const CNAME_TARGET = 'cname.vercel-dns.com';
-const APEX_NAME = '@';
 const WWW_NAME = 'www';
 
 const setup = customRender(DnsRecordsTable, {
   records: [
-    { type: 'A', name: APEX_NAME, value: MOCK_VERCEL_A_RECORD },
-    { type: 'CNAME', name: WWW_NAME, value: CNAME_TARGET },
+    {
+      type: ROUTING_RECORD_TYPE.A,
+      name: MOCK_APEX_RECORD_NAME,
+      value: MOCK_VERCEL_A_RECORD,
+    },
+    { type: ROUTING_RECORD_TYPE.CNAME, name: WWW_NAME, value: CNAME_TARGET },
   ],
 });
 
@@ -45,7 +50,7 @@ describe(`<${DnsRecordsTable.name}/>`, () => {
     });
 
     it.each([
-      ['Copy the A record name', APEX_NAME],
+      ['Copy the A record name', MOCK_APEX_RECORD_NAME],
       ['Copy the A record value', MOCK_VERCEL_A_RECORD],
       ['Copy the CNAME record name', WWW_NAME],
       ['Copy the CNAME record value', CNAME_TARGET],
