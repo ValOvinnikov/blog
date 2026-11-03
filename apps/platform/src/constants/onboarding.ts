@@ -43,4 +43,8 @@ export const ONBOARDING_TIER_QUERY = {
   FULL: '(width >= 85rem)',
 } as const;
 
+export const ONBOARDING_PREVIEW = {
+  ADDRESS_ROW_MIN_STAGE_WIDTH: 420,
+} as const;
+
 export const ONBOARDING_SCROLL_AREA_TEST_ID = 'onboarding-scroll-area';

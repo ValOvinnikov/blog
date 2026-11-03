@@ -5,6 +5,7 @@ import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
 import { SiteProviders } from '@web/components/shared/site-providers';
 import { ThemeScope } from '@web/components/shared/theme-scope';
+import { SITE_SETTINGS_LOG } from '@web/constants/site-settings';
 import { routing } from '@web/i18n/routing';
 import {
   enterRequestContext,
@@ -36,7 +37,7 @@ export async function generateMetadata({
     : { robots: { index: false, follow: false } };
 
   if (!result.ok) {
-    logger.error('site_settings.metadata_fetch_failed', {
+    logger.error(SITE_SETTINGS_LOG.METADATA_FETCH_FAILED, {
       error: result.error,
     });
     return { metadataBase, ...robotsMetadata };
@@ -65,7 +66,7 @@ type TProps = {
 
 export default async function LocaleLayout({ children, params }: TProps) {
   await enterRequestContext(params);
-  const { tenantId, locale } = await getRequestContext();
+  const { tenantId, locale, isOperatorSuspended } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [settingsResult, themeTokens] = await Promise.all([
     getSiteSettings(),
@@ -73,7 +74,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
   ]);
 
   if (!settingsResult.ok) {
-    logger.error('site_settings.layout_fetch_failed', {
+    logger.error(SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED, {
       error: settingsResult.error,
     });
     // Caught by `[tenant]/not-found.tsx`; a same-segment `not-found.tsx` does not guard this layout itself.
@@ -87,9 +88,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
       <ThemeScope themeTokens={themeTokens}>
         <SiteProviders>
           <div className={s.root()}>
-            <SiteHeader />
+            {!isOperatorSuspended && <SiteHeader />}
             <div className={s.content()}>{children}</div>
-            <SiteFooter />
+            {!isOperatorSuspended && <SiteFooter />}
           </div>
         </SiteProviders>
         <SiteAnalytics />

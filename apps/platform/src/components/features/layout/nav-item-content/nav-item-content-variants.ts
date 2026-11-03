@@ -13,6 +13,7 @@ export const navItemContentVariants = tv({
     rowIcon: [
       'text-admin-side-muted transition-colors duration-base ease-smooth',
       'group-aria-[current=page]:text-admin-text-strong',
+      'max-md:text-admin-muted max-md:group-aria-[current=page]:text-admin-text',
     ],
     // `sr-only`, not `hidden`, so the label stays the row's accessible name when collapsed.
     rowBody: [

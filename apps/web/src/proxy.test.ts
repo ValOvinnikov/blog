@@ -38,8 +38,10 @@ const {
   resolveTenantMock,
   getTenantTranslationMapMock,
   intlMock,
+  isReaderAccountEnabledForTenantMock,
   env,
 } = vi.hoisted(() => ({
+  isReaderAccountEnabledForTenantMock: vi.fn(),
   resolveTenantRoutingMock: vi.fn(),
   resolveTenantMock: vi.fn(),
   getTenantTranslationMapMock: vi.fn(),
@@ -63,6 +65,13 @@ vi.mock(
 );
 
 vi.mock('@web/utils/env/env', () => ({ env }));
+
+vi.mock(
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
+  () => ({
+    isReaderAccountEnabledForTenant: isReaderAccountEnabledForTenantMock,
+  }),
+);
 
 const { config, default: proxy } = await import('./proxy');
 
@@ -95,6 +104,13 @@ const SITE_UNAVAILABLE_HEADING = {
   EN: SITE_MESSAGES_BY_LOCALE.EN.siteUnavailable.heading,
   NL: SITE_MESSAGES_BY_LOCALE.NL.siteUnavailable.heading,
 };
+const MANAGE_ACCOUNT_LABEL = {
+  EN: SITE_MESSAGES_BY_LOCALE.EN.siteUnavailable.manageAccount,
+  NL: SITE_MESSAGES_BY_LOCALE.NL.siteUnavailable.manageAccount,
+};
+const DUTCH_PREFIX = `/${LOCALE_BCP47_TAGS[NL]}`;
+const ACCOUNT_PATH = routes.account();
+const DUTCH_ACCOUNT_PATH = `${DUTCH_PREFIX}${ACCOUNT_PATH}`;
 
 const MOCK_OPERATOR_SUSPENDED_TENANT = mockTenant({
   id: MOCK_TENANT_ID,
@@ -247,8 +263,6 @@ describe('proxy matcher for an operator-suspended site', () => {
   it.each([
     SITEMAP_PATH,
     NEWSLETTER_CONFIRM_PATH,
-    '/api/account/export',
-    '/api/auth/session',
     '/api/switch-language',
     '/api/generate-skim',
   ])('runs the proxy for %s', (path) => {
@@ -257,6 +271,10 @@ describe('proxy matcher for an operator-suspended site', () => {
 
   it.each([
     NEWSLETTER_UNSUBSCRIBE_API_PATH,
+    routes.accountExport(),
+    '/api/auth/session',
+    '/api/auth/signin/email',
+    '/api/auth/callback/email',
     '/api/revalidate',
     '/api/revalidate-site-config',
     '/api/client-log',
@@ -302,11 +320,23 @@ describe(proxy, () => {
   });
 
   describe('dotted paths', () => {
-    it('passes a path with a dotted non-final segment through without resolving a tenant', async () => {
-      const response = await visit(DOTTED_SEGMENT_PATH);
+    describe('with no client-supplied headers', () => {
+      let response: NextResponse;
 
-      expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
-      expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+      beforeEach(async () => {
+        response = await visit(DOTTED_SEGMENT_PATH);
+      });
+
+      it('passes a path with a dotted non-final segment through without resolving a tenant', () => {
+        expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
+        expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+      });
+
+      it('keeps the host header on a passed-through path', () => {
+        expect(response.headers.get('x-middleware-request-host')).toBe(
+          MOCK_TENANT_HOST,
+        );
+      });
     });
 
     it('drops a client-supplied tenant header on a passed-through path', async () => {
@@ -319,14 +349,6 @@ describe(proxy, () => {
 
       expect(overriddenHeaderNames).not.toContain(TENANT_ID_HEADER);
       expect(response.headers.get(FORWARDED_TENANT_HEADER)).toBeNull();
-    });
-
-    it('keeps the host header on a passed-through path', async () => {
-      const response = await visit(DOTTED_SEGMENT_PATH);
-
-      expect(response.headers.get('x-middleware-request-host')).toBe(
-        MOCK_TENANT_HOST,
-      );
     });
   });
 
@@ -465,6 +487,7 @@ describe(proxy, () => {
       );
       resolveTenantMock.mockReset();
       resolveTenantMock.mockResolvedValue(MOCK_OPERATOR_SUSPENDED_TENANT);
+      isReaderAccountEnabledForTenantMock.mockResolvedValue(false);
     });
 
     it('answers a page with an unindexed unavailable page', async () => {
@@ -478,7 +501,7 @@ describe(proxy, () => {
     });
 
     it('shows the unavailable page in the language the path names', async () => {
-      const response = await visit(`/${LOCALE_BCP47_TAGS[NL]}${BLOG_PATH}`);
+      const response = await visit(`${DUTCH_PREFIX}${BLOG_PATH}`);
       const body = await response.text();
 
       expect(body).toContain(SITE_UNAVAILABLE_HEADING.NL);
@@ -511,12 +534,60 @@ describe(proxy, () => {
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBED),
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_INVALID),
       routes.newsletterResult(NEWSLETTER_RESULT.UNSUBSCRIBE_FAILED),
-      `/${LOCALE_BCP47_TAGS[NL]}${routes.newsletterUnsubscribeConfirmation()}`,
+      `${DUTCH_PREFIX}${routes.newsletterUnsubscribeConfirmation()}`,
     ])('keeps the unsubscribe page %s reachable', async (path) => {
       const response = await visit(path);
 
       expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
       expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
+    });
+
+    it.each([ACCOUNT_PATH, DUTCH_ACCOUNT_PATH])(
+      'keeps the account page %s reachable',
+      async (path) => {
+        const response = await visit(path);
+
+        expect(response.status).not.toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+        expect(response.headers.get(REWRITE_HEADER)).not.toBeNull();
+      },
+    );
+
+    it('still answers a page under the account path with the unavailable page', async () => {
+      const response = await visit(`${ACCOUNT_PATH}${BLOG_PATH}`);
+
+      expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
+    });
+
+    describe('when the site has reader accounts', () => {
+      beforeEach(() => {
+        isReaderAccountEnabledForTenantMock.mockResolvedValue(true);
+      });
+
+      it('links the unavailable page to the account page', async () => {
+        const body = await (await visit(BLOG_POST_PATH)).text();
+
+        expect(body).toContain(
+          `<a href="${ACCOUNT_PATH}">${MANAGE_ACCOUNT_LABEL.EN}</a>`,
+        );
+        expect(isReaderAccountEnabledForTenantMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
+      });
+
+      it('links to the account page in the language the path names', async () => {
+        const body = await (await visit(`${DUTCH_PREFIX}${BLOG_PATH}`)).text();
+
+        expect(body).toContain(
+          `<a href="${DUTCH_ACCOUNT_PATH}">${MANAGE_ACCOUNT_LABEL.NL}</a>`,
+        );
+      });
+    });
+
+    it('shows no account link when the site has no reader accounts', async () => {
+      const body = await (await visit(BLOG_POST_PATH)).text();
+
+      expect(body).not.toContain(MANAGE_ACCOUNT_LABEL.EN);
+      expect(body).not.toContain('<a ');
     });
 
     it('still answers another newsletter page with the unavailable page', async () => {

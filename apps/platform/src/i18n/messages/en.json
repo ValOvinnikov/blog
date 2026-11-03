@@ -819,14 +819,6 @@
     "footerPrivacy": "Privacy policy",
     "footerCookieSettings": "Cookie settings"
   },
-  "frontPageSample": {
-    "heroHeading": "Dispatches from the coast",
-    "heroText": "Notes, essays and photographs.",
-    "heroButton": "Read the latest",
-    "firstPostTitle": "A morning on the pier",
-    "secondPostTitle": "Low tide, late light",
-    "thirdPostTitle": "The harbour in winter"
-  },
   "assetUploadField": {
     "remove": "Remove",
     "upload": "Upload",

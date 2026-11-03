@@ -22,7 +22,8 @@
   },
   "siteUnavailable": {
     "heading": "This site is unavailable",
-    "text": "Please check back later."
+    "text": "Please check back later.",
+    "manageAccount": "Manage your account"
   },
   "postShare": {
     "shareAriaLabel": "Share \"{title}\"",

@@ -6,6 +6,7 @@ import { DeviceFrameScrollbar } from '@platform/components/shared/device-frame/c
 import {
   DEVICE_FRAME_AXIS,
   DEVICE_FRAME_FIT,
+  DEVICE_FRAME_SIZE,
   DEVICE_FRAME_TEST_ID,
 } from '@platform/constants/device-frame';
 import {
@@ -78,6 +79,7 @@ const DeviceFrameRoot = ({
   const width = PREVIEW_DEVICE_WIDTH[device];
   const height = PREVIEW_DEVICE_HEIGHT[device];
   const transform = `scale(${scale})`;
+  const isDesktop = device === PREVIEW_DEVICE.DESKTOP;
 
   return (
     <div ref={stageRef} className={stage()}>
@@ -85,11 +87,13 @@ const DeviceFrameRoot = ({
         role={isFullscreen ? undefined : 'img'}
         aria-label={isFullscreen ? undefined : t('sampleAtWidth', { width })}
         className={frame()}
+        style={{
+          borderWidth: DEVICE_FRAME_SIZE.BORDER,
+          padding: isDesktop ? undefined : DEVICE_FRAME_SIZE.BEZEL_PADDING,
+        }}
         data-testid={DEVICE_FRAME_TEST_ID.FRAME}
       >
-        {device === PREVIEW_DEVICE.DESKTOP && (
-          <DeviceFrameBrowserBar host={host} />
-        )}
+        {isDesktop && <DeviceFrameBrowserBar host={host} />}
         <div
           ref={viewportRef}
           className={viewportSlot()}

@@ -9,10 +9,11 @@ import {
   type TMaybeNull,
 } from '@blog/config';
 import { SignInPanel } from '@blog/ui/components/molecules/sign-in-panel';
-import { useSignInAttempt } from '@web/components/shared/auth-menu/hooks/use-sign-in-attempt';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, type RefObject } from 'react';
+
+import { useSignInAttempt } from './use-sign-in-attempt';
 
 export type TReaderSignInPanelProps = IWithClassName & {
   panelId: string;
