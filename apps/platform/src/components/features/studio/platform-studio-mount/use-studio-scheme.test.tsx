@@ -18,21 +18,21 @@ const STUDIO_SYSTEM_SCHEME = 'system';
 const stubMatchMedia = window.matchMedia;
 
 const stubDeviceSetting = (isInitiallyDark: boolean) => {
-  const listeners = new Set<() => void>();
+  const deviceSetting = new EventTarget();
   let isDark = isInitiallyDark;
 
   vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
     ...stubMatchMedia(query),
     matches: query === MEDIA_QUERY.PREFERS_DARK && isDark,
-    addEventListener: (_type: string, listener: () => void) =>
-      listeners.add(listener),
-    removeEventListener: (_type: string, listener: () => void) =>
-      listeners.delete(listener),
+    addEventListener: deviceSetting.addEventListener.bind(deviceSetting),
+    removeEventListener: deviceSetting.removeEventListener.bind(deviceSetting),
   }));
 
   return (nextIsDark: boolean) => {
     isDark = nextIsDark;
-    act(() => listeners.forEach((listener) => listener()));
+    act(() => {
+      deviceSetting.dispatchEvent(new Event('change'));
+    });
   };
 };
 
