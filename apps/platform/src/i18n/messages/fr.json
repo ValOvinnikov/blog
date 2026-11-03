@@ -1357,6 +1357,19 @@
       "reasonHint": "Les opérateurs le voient sur la page Inscriptions bloquées.",
       "switchOn": "Activé",
       "switchOff": "Désactivé"
+    },
+    "caseFields": {
+      "categoryLabel": "Motif",
+      "categoryPlaceholder": "Choisir un motif",
+      "descriptionLabel": "Exposé des motifs",
+      "descriptionHint": "Le propriétaire le voit dans l’e-mail de suspension et sur son tableau de bord."
+    },
+    "case": {
+      "referenceLabel": "Référence",
+      "categoryLabel": "Motif",
+      "descriptionLabel": "Exposé des motifs",
+      "suspendedByLabel": "Suspendu par",
+      "suspendedAtLabel": "Suspendu le"
     }
   },
   "tenantLifecycleErrors": {
@@ -1819,5 +1832,35 @@
       "options": "Les options Growth sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page Growth et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à Growth."
     }
+  },
+  "suspensionCategory": {
+    "ABUSE": "Abus",
+    "ILLEGAL_CONTENT": "Contenu illicite",
+    "TERMS_VIOLATION": "Violation des conditions d’utilisation",
+    "OTHER": "Autre"
+  },
+  "ownerSuspensionEmail": {
+    "actionLabel": "Ouvrir votre tableau de bord",
+    "SUSPENDED": {
+      "subject": "Votre site a été suspendu ({reference})",
+      "previewText": "{siteName} est hors ligne pour les lecteurs.",
+      "offline": "{siteName} a été suspendu et est hors ligne pour les lecteurs : ils voient une page d’indisponibilité à la place de votre site.",
+      "category": "Motif : {category}.",
+      "contest": "Pour contester cette décision, répondez à cet e-mail en indiquant {reference}."
+    },
+    "ACTIVE": {
+      "subject": "Votre site est de nouveau en ligne ({reference})",
+      "previewText": "{siteName} est de nouveau visible pour les lecteurs.",
+      "online": "La suspension {reference} a été levée. {siteName} est de nouveau visible pour les lecteurs."
+    }
+  },
+  "ownerSuspensionBanner": {
+    "title": "Votre site est suspendu",
+    "unavailable": "Les lecteurs voient une page d’indisponibilité à la place de votre site.",
+    "category": "Motif : {category}.",
+    "contest": "Pour contester cette décision, répondez à l’e-mail de suspension ou écrivez au support en indiquant {reference}.",
+    "copyButton": "Copier la référence",
+    "copied": "Référence copiée",
+    "copyFailed": "La référence n’a pas pu être copiée. Sélectionnez-la et copiez-la vous-même."
   }
 }

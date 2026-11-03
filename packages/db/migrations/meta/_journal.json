@@ -15,6 +15,13 @@
       "when": 1793461720099,
       "tag": "0001_add_tenant_sanity_management_robot_id",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793693459412,
+      "tag": "0002_add_tenant_suspensions",
+      "breakpoints": true
     }
   ]
 }

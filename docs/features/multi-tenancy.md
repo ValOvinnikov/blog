@@ -47,7 +47,8 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 - **`tenants`:** `name`, `primaryDomain`, `locale` and `additionalLocales`, `plan` and `status` (ACTIVE / SUSPENDED / ARCHIVED). It also holds `sanityProjectId` (unique), `sanityDataset`, the encrypted `sanityReadTokenEncrypted` and `sanityWriteTokenEncrypted`, `provisioningStatus` and `deprovisionedAt`.
 - **`tenant_domains`:** a unique `domain` with a `tenantId` foreign key that cascades on delete. This table decides routing. `primaryDomain` only says which domain is canonical; it is the base URL (`https://<primaryDomain>`), with `NEXT_PUBLIC_SITE_URL` as the fallback.
 - **`custom_domain_claims`:** a tenant's pending custom domain (one per tenant, `tenantId` unique and cascading on delete) with the random token its `_blog-verify` TXT record must carry. The domain is not unique across tenants and never routes; verifying it moves it into `tenant_domains`.
-- **Tenant-scoped tables:** these carry `tenantId` and cascade when the tenant is hard-deleted: `bookmarks`, `subscribers`, `site_config`, `settings_features`, `email_config`, `email_templates`, `findings`, `memberships` and `membership_invites`. The Auth.js tables stay global.
+- **`tenant_suspensions`:** one row per operator suspension — `reference`, `category` (`SUSPENSION_CATEGORY`: ABUSE, ILLEGAL_CONTENT, TERMS_VIOLATION, OTHER), the owner-facing `description`, `suspendedBy`/`suspendedAt` and, once lifted, `liftedBy`/`liftedAt`. `reference` is `SUS-` plus a six-digit number from the `tenant_suspension_reference_seq` sequence (`SUS-000042`), unique and sequential across tenants, so a second suspension of a tenant gets a new one. A partial unique index allows one open case (no `liftedAt`) per tenant. Inactivity suspensions create no row.
+- **Tenant-scoped tables:** these carry `tenantId` and cascade when the tenant is hard-deleted: `bookmarks`, `subscribers`, `site_config`, `settings_features`, `email_config`, `email_templates`, `findings`, `memberships`, `membership_invites` and `tenant_suspensions`. The Auth.js tables stay global.
 - **Caching:**
   - Sanity fetches are tagged `t:<projectId>:<tag>` (`isr()` in `@blog/service`).
   - Neon-backed per-tenant reads are tagged `site-config:<tenantId>`, `settings-features:<tenantId>` and `tenant-plan:<tenantId>`.
@@ -70,6 +71,8 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 - **Reads are gated by `isTenantServable`.** The tenant must not be ARCHIVED and must have a project, a dataset and a read token. In production it must also have `provisioningStatus` READY; a null status is refused there.
 - **Writes are gated by `isTenantActive`.** The tenant must be ACTIVE with no `deprovisionedAt`. Every tenant-scoped mutation goes through `resolveWritableTenant` or the host write context's `isActive`, never through its own status check. A site SUSPENDED for inactivity stays readable but accepts no writes (an operator-suspended one is offline, above), and the contact form, the newsletter signup and the bookmark button render only when `isRequestTenantActive` holds.
 - **Only a super admin suspends.** The operator's `/tenants/{id}` overview offers Suspend on an ACTIVE tenant and Reactivate on a SUSPENDED one, never on an archived tenant. Both go through `setTenantSuspension`, which never touches an ARCHIVED or deprovisioned row, then purge the tenant's cached site through the web revalidation call Look and Voice saves use, so the change shows on the next page load. The platform tenant (`isPlatformTenant`, `@blog/db`) is never suspended: the overview shows a notice saying why in place of Suspend, and `suspendTenantAction` refuses it with `PLATFORM_TENANT` and logs `tenants.platform_tenant_refused`. Reactivate stays available, so a platform tenant suspended earlier can be brought back. With `TENANT_ROOT_DOMAIN` unset no tenant is recognised as the platform tenant.
+- **A suspension states its reasons under a reference.** Suspend cannot be confirmed without a category and a statement of reasons, which the owner sees. `suspendTenantAction` opens the `tenant_suspensions` case before it changes the status and discards it if that change fails; `liftTenantSuspensionAction` stamps `liftedAt`/`liftedBy` on the open case before it changes the status and reopens it if that change fails, so a stale open case never blocks the next suspension. Both audit events carry the case's `reference` and `category`. While a tenant is operator-suspended, its overview's Suspension card shows the open case (reference, category, statement, who and when), and every owner dashboard page shows an error banner with the category, the statement, how to contest it quoting the reference, and a Copy reference button. A site paused for inactivity gets no banner.
+- **The owner is emailed on suspend and lift.** After either action succeeds, the owner (`getTenantOwnerEmail`, which falls back to a pending owner invite) gets one email in the site's default language: "suspended" with the reference, category, statement and, when `SUPPORT_REPLY_TO_ADDRESS` is set, a line asking them to reply to contest it; "back online" with the same reference. A lift with no case (an inactivity pause) sends nothing. The send runs after the response: a failure logs `tenant.suspension_email_failed` and never undoes the action, and a missing owner address, sender (`OWNER_EMAIL_FROM_ADDRESS`) or Reply-To is logged.
 - **What counts as production.** "Production" means `NEXT_PUBLIC_SANITY_DATASET === 'production'`, never `NODE_ENV`. The fallbacks to the console project or the sole tenant exist only outside production. In production, a missing tenant 404s or renders as having no content.
 - **Request context comes first.** `enterRequestContext(params)` must run first in every `[tenant]/[locale]` layout, page and `generateMetadata`. Calling it twice in one request with different params throws.
 - **Isolation is by query.** Every `@blog/db` function that touches tenant data takes an explicit `tenantId`. There is no row-level security.
@@ -79,7 +82,7 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 
 - **Layers:** `@blog/db` resolves domains and tenant rows and decrypts tokens. `@blog/service` builds per-tenant Sanity clients and tags. `@blog/config` supplies `ITenantLocalizedParams` and `TENANT_WRITE_REFUSAL`.
 - **Features:** [rendering and caching](./rendering-and-caching.md), [languages](./languages.md), [look](./look.md), [voice](./voice.md), [errors and 404](./errors-and-404.md), [seo and feeds](./seo-and-feeds.md), [reader auth](./reader-auth.md), [tenant provisioning](./tenant-provisioning.md).
-- **Env:** `DATABASE_URL` and `TENANT_TOKEN_ENCRYPTION_KEY` (`@blog/db`); `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` and `SANITY_API_READ_TOKEN` (the console fallback and the production check); `NEXT_PUBLIC_SITE_URL`; `SANITY_REVALIDATE_SECRET` and `SITE_CONFIG_REVALIDATE_SECRET`.
+- **Env:** `OWNER_EMAIL_FROM_ADDRESS` and `SUPPORT_REPLY_TO_ADDRESS` (the platform's suspension emails); `DATABASE_URL` and `TENANT_TOKEN_ENCRYPTION_KEY` (`@blog/db`); `NEXT_PUBLIC_SANITY_PROJECT_ID`, `NEXT_PUBLIC_SANITY_DATASET` and `SANITY_API_READ_TOKEN` (the console fallback and the production check); `NEXT_PUBLIC_SITE_URL`; `SANITY_REVALIDATE_SECRET` and `SITE_CONFIG_REVALIDATE_SECRET`.
 
 ## Entry points
 
@@ -92,14 +95,17 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 - `packages/db/src/queries/tenant-domains/get-tenant-by-domain/get-tenant-by-domain.ts`
 - `packages/service/src/sanity/client/client.ts`
 - `packages/service/src/sanity/query/isr.ts`
+- `apps/platform/src/server/tenants/tenant-suspension-actions.ts`, `tenant-suspension-writes.ts`, `lift-tenant-suspension.ts` and `notify-owner-of-suspension.ts`
+- `apps/platform/src/components/features/tenants/owner-suspension-banner/`
 
 ## Tests and stories
 
 - `apps/web/src/proxy.test.ts`, plus co-located tests under `apps/web/src/server/tenant/**` and `apps/web/src/server/request-context/`. There are `__mocks__` for `request-tenant`, `tenant-base-url` and `request-context`.
 - `apps/web/src/utils/is-tenant-shaped-path-segment/` and `tenant-cache-tags/` tests.
-- `@blog/db` query tests under `packages/db/src/queries/tenant-domains/**` and `queries/tenants/**`. They run against PGlite (`packages/db/src/testing/`).
+- `@blog/db` query tests under `packages/db/src/queries/tenant-domains/**`, `queries/tenants/**` and `queries/tenant-suspensions/**`. They run against PGlite (`packages/db/src/testing/`).
 - `packages/service/src/sanity/client/client.test.ts` and `project-cache/project-cache.test.ts`.
-- No Storybook stories; this feature has no UI.
+- `apps/platform` tests for the suspension actions, the owner emails, `tenant-suspension-control` and `owner-suspension-banner`.
+- No Storybook stories.
 
 ## Related
 
@@ -109,3 +115,4 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
 - 2440: measure the per-request tenancy cost, then cache the host → tenantId lookup.
 - 2682: verify the tenant-scoped path purge against a real running site (under 2440).
 - 4844: row-level security as a second guard on tenant isolation.
+- 6587: an operator-suspended site goes offline and its owner is told.

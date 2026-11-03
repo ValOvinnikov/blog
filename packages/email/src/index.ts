@@ -43,6 +43,10 @@ export {
   type TOwnerDeletionNoticeEmailInput,
   buildOwnerPlanChangeEmail,
   type TOwnerPlanChangeEmailInput,
+  buildOwnerSuspensionEmail,
+  type TOwnerSuspensionEmailInput,
+  buildOwnerSuspensionLiftedEmail,
+  type TOwnerSuspensionLiftedEmailInput,
 } from './templates/owner';
 export {
   buildMagicLinkEmail,
