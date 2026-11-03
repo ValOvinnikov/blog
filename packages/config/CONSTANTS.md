@@ -355,6 +355,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **DEVICE_FRAME_FIT**: `PAGE`, `STAGE`, `FULLSCREEN`
 - **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`
+- **DEVICE_FRAME_SIZE**: `BORDER`=`1`, `BEZEL_PADDING`=`6`, `BROWSER_BAR_HEIGHT`=`28`
 - **DEVICE_FRAME_AXIS**: `VERTICAL`, `HORIZONTAL`
 - **DEVICE_FRAME_SCROLL_TARGET**: `TOP`, `END`
 - **DEVICE_FRAME_TEST_ID**: `FRAME`=`"device-frame"`, `VIEWPORT`=`"device-frame-viewport"`, `CONTENT`=`"device-frame-content"`, `BROWSER_BAR`=`"device-frame-browser-bar"`, `VERTICAL_SCROLLBAR`=`"device-frame-vertical-scrollbar"`, `HORIZONTAL_SCROLLBAR`=`"device-frame-horizontal-scrollbar"`

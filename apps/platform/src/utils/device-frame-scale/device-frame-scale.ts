@@ -1,12 +1,13 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import {
-  DEVICE_FRAME_CHROME,
   DEVICE_FRAME_FIT,
   DEVICE_FRAME_LIMIT,
+  DEVICE_FRAME_SIZE,
   type TDeviceFrameFitMode,
 } from '@platform/constants/device-frame';
 import {
+  PREVIEW_DEVICE,
   PREVIEW_DEVICE_HEIGHT,
   PREVIEW_DEVICE_WIDTH,
   type TPreviewDevice,
@@ -63,6 +64,18 @@ export const fitPageScale = ({
     ),
   );
 
+const deviceFrameChrome = (device: TPreviewDevice): TElementSize => {
+  const { BORDER, BEZEL_PADDING, BROWSER_BAR_HEIGHT } = DEVICE_FRAME_SIZE;
+  const borders = 2 * BORDER;
+
+  return device === PREVIEW_DEVICE.DESKTOP
+    ? { width: borders, height: borders + BROWSER_BAR_HEIGHT }
+    : {
+        width: borders + 2 * BEZEL_PADDING,
+        height: borders + 2 * BEZEL_PADDING,
+      };
+};
+
 export const fitStageScale = ({
   device,
   availableWidth,
@@ -71,19 +84,20 @@ export const fitStageScale = ({
   device: TPreviewDevice;
   availableWidth: number;
   availableHeight?: number;
-}) =>
-  roundScale(
+}) => {
+  const chrome = deviceFrameChrome(device);
+
+  return roundScale(
     Math.max(
       0,
       Math.min(
-        (availableWidth - DEVICE_FRAME_CHROME[device].width) /
-          PREVIEW_DEVICE_WIDTH[device],
-        (availableHeight - DEVICE_FRAME_CHROME[device].height) /
-          PREVIEW_DEVICE_HEIGHT[device],
+        (availableWidth - chrome.width) / PREVIEW_DEVICE_WIDTH[device],
+        (availableHeight - chrome.height) / PREVIEW_DEVICE_HEIGHT[device],
         1,
       ),
     ),
   );
+};
 
 export const fitFullscreenScale = ({
   device,

@@ -218,11 +218,46 @@ const reachReview = async () => {
   await clickContinue();
 };
 
+const clickBack = async () => {
+  const backButton = screen.getByRole('button', MOCK_BACK);
+  await user.click(backButton);
+};
+
+const editFromReview = async (field: string) => {
+  const editButton = screen.getByRole('button', {
+    name: t('editField', { field }),
+  });
+  await user.click(editButton);
+};
+
+const clickCreate = async () => {
+  const createButton = screen.getByRole('button', MOCK_CREATE);
+  await user.click(createButton);
+};
+
 const acceptAndCreate = async () => {
   const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
   await user.click(acceptance);
-  const createButton = screen.getByRole('button', MOCK_CREATE);
-  await user.click(createButton);
+  await clickCreate();
+};
+
+const returnToReviewAfterEditingName = async () => {
+  await editFromReview(NAME_LABEL);
+  await clickContinue();
+};
+
+const createAfterChangingSiteType = async (name: string) => {
+  await changeSiteTypeFromReview(name);
+  await acceptAndCreate();
+};
+
+const expectReviewWithoutTermsError = () => {
+  const heading = stepHeading(STEPS.REVIEW);
+  const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
+
+  expect(heading).toBeVisible();
+  expect(createSiteMock).not.toHaveBeenCalled();
+  expect(termsError).not.toBeInTheDocument();
 };
 
 describe(`<${OnboardingView.name}/>`, () => {
@@ -243,27 +278,6 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(signOutButton).toBeVisible();
   });
 
-  it('creates the site from the values the user entered', async () => {
-    await reachReview();
-    await acceptAndCreate();
-
-    expect(createSiteMock).toHaveBeenCalledWith(MOCK_CREATE_SITE_INPUT);
-  });
-
-  it('starts from the accent of the preset the user picks', async () => {
-    await completeSiteStep();
-    await completeAddressStep();
-    const consolePreset = screen.getByRole('radio', { name: CONSOLE_PRESET });
-    await user.click(consolePreset);
-    await clickContinue();
-    await acceptAndCreate();
-
-    expect(createSiteMock).toHaveBeenCalledWith({
-      ...MOCK_CREATE_SITE_INPUT,
-      ...MOCK_CONSOLE_LOOK,
-    });
-  });
-
   it('creates the site type the user picks', async () => {
     await pickSiteType(SITE_TYPES.PORTFOLIO);
     await reachReview();
@@ -275,264 +289,12 @@ describe(`<${OnboardingView.name}/>`, () => {
     });
   });
 
-  it.each([SITE_TYPES.DOCS, SITE_TYPES.BLANK])(
-    'starts a %s site on the Console preset',
-    async (siteType) => {
-      await reachReview();
-      await changeSiteTypeFromReview(siteType);
-      await acceptAndCreate();
-
-      expect(createSiteMock).toHaveBeenCalledWith(
-        expect.objectContaining(MOCK_CONSOLE_LOOK),
-      );
-    },
-  );
-
-  it('returns to the Editorial preset when switching back from Docs', async () => {
-    await reachReview();
-    await changeSiteTypeFromReview(SITE_TYPES.DOCS);
-    await changeSiteTypeFromReview(SITE_TYPES.PERSONAL);
-    await acceptAndCreate();
-
-    expect(createSiteMock).toHaveBeenCalledWith(
-      expect.objectContaining(MOCK_EDITORIAL_LOOK),
-    );
-  });
-
-  it('keeps the preset the user picked when the site type changes', async () => {
-    await completeSiteStep();
-    await completeAddressStep();
-    const consolePreset = screen.getByRole('radio', { name: CONSOLE_PRESET });
-    await user.click(consolePreset);
-    await clickContinue();
-    await changeSiteTypeFromReview(SITE_TYPES.PORTFOLIO);
-    await acceptAndCreate();
-
-    expect(createSiteMock).toHaveBeenCalledWith(
-      expect.objectContaining(MOCK_CONSOLE_LOOK),
-    );
-  });
-
-  it('keeps the accent the user moved when the site type changes', async () => {
-    await completeSiteStep();
-    await completeAddressStep();
-    const accentSlider = screen.getByRole('slider', MOCK_ACCENT_SLIDER);
-    await user.click(accentSlider);
-    await user.keyboard('{ArrowRight}');
-    const movedHue = Number(accentSlider.getAttribute(ARIA_VALUENOW));
-    await clickContinue();
-    await changeSiteTypeFromReview(SITE_TYPES.DOCS);
-    await acceptAndCreate();
-
-    expect(movedHue).not.toBe(MOCK_EDITORIAL_LOOK.accentHue);
-    expect(createSiteMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        preset: PRESET_ID.EDITORIAL,
-        accentHue: movedHue,
-      }),
-    );
-  });
-
-  it('asks for a name before leaving the first step', async () => {
-    await clickContinue();
-
-    const message = screen.getByText(NAME_REQUIRED);
-    const heading = stepHeading(STEPS.SITE);
-
-    expect(message).toBeVisible();
-    expect(heading).toBeVisible();
-  });
-
   it('describes the site type and name by their hints', () => {
     const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
     const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
 
     expect(siteTypeSelect).toHaveAccessibleDescription(SITE_TYPE_HINT);
     expect(nameField).toHaveAccessibleDescription(NAME_HINT);
-  });
-
-  it('describes an empty name by its hint, then what is missing', async () => {
-    await clickContinue();
-
-    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
-
-    expect(nameField).toBeInvalid();
-    expect(nameField).toHaveAccessibleDescription(
-      `${NAME_HINT} ${NAME_REQUIRED}`,
-    );
-  });
-
-  it('keeps the values entered when going back a step', async () => {
-    await completeSiteStep();
-    const backButton = screen.getByRole('button', MOCK_BACK);
-    await user.click(backButton);
-
-    const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
-
-    expect(nameField).toHaveValue(MOCK_TENANT_NAME);
-  });
-
-  it('says the address is free once it has been checked', async () => {
-    await completeSiteStep();
-    await typeAddress();
-
-    const available = await screen.findByText(MOCK_ADDRESS_AVAILABLE);
-
-    expect(available).toBeVisible();
-    expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_SLUG);
-  });
-
-  it('shows a placeholder address in the preview before one is typed', async () => {
-    await completeSiteStep();
-
-    const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
-
-    expect(preview).toHaveTextContent(MOCK_ANNOUNCED_PLACEHOLDER_ADDRESS);
-  });
-
-  it('shows the typed address in the preview', async () => {
-    await completeSiteStep();
-    await typeAddress();
-
-    const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
-
-    expect(preview).toHaveTextContent(MOCK_ANNOUNCED_SITE_ADDRESS);
-    expect(preview).not.toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
-  });
-
-  it('follows the address in the preview as each letter is typed', async () => {
-    await completeSiteStep();
-    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
-    const [firstLetter] = MOCK_SLUG;
-    await user.type(addressField, firstLetter ?? '');
-
-    const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
-
-    expect(preview).toHaveTextContent(
-      `${SITE_ADDRESS_LABEL} ${firstLetter}.${MOCK_TENANT_ROOT_DOMAIN}`,
-    );
-  });
-
-  it('keeps a taken address from continuing', async () => {
-    checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
-    await completeSiteStep();
-    const addressField = await typeAddress();
-    await screen.findAllByText(ADDRESS_TAKEN);
-
-    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
-
-    await user.click(continueButton);
-
-    const heading = stepHeading(STEPS.ADDRESS);
-
-    expect(addressField).toBeInvalid();
-    expect(heading).toBeVisible();
-  });
-
-  it('describes a taken address field by its suffix, hint and why it is taken', async () => {
-    checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
-    await completeSiteStep();
-    const addressField = await typeAddress();
-    await screen.findAllByText(ADDRESS_TAKEN);
-
-    expect(addressField).toHaveAccessibleDescription(
-      `.${MOCK_TENANT_ROOT_DOMAIN} ${SITE_ADDRESS_HINT} ${ADDRESS_TAKEN}`,
-    );
-  });
-
-  it('announces a taken address in a status region', async () => {
-    checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
-    await completeSiteStep();
-    await typeAddress();
-    await screen.findAllByText(ADDRESS_TAKEN);
-
-    const announcing = screen
-      .getAllByRole('status')
-      .filter((status) => status.textContent === ADDRESS_TAKEN);
-
-    expect(announcing).toHaveLength(1);
-  });
-
-  it('describes the language select by its hint', async () => {
-    await completeSiteStep();
-
-    const languageSelect = screen.getByRole('combobox', {
-      name: LANGUAGE_LABEL,
-    });
-
-    expect(languageSelect).toHaveAccessibleDescription(LANGUAGE_HINT);
-  });
-
-  it('says when the address could not be checked', async () => {
-    checkSiteAddressMock.mockRejectedValue(new Error());
-    await completeSiteStep();
-    await typeAddress();
-
-    const unverified = await screen.findByText(ADDRESS_UNVERIFIED);
-
-    expect(unverified).toBeVisible();
-  });
-
-  it('lets the user continue when the address check fails', async () => {
-    checkSiteAddressMock.mockRejectedValue(new Error());
-    await completeSiteStep();
-    await typeAddress();
-    await screen.findByText(ADDRESS_UNVERIFIED);
-    await clickContinue();
-
-    const heading = stepHeading(STEPS.LOOK);
-
-    expect(heading).toBeVisible();
-  });
-
-  it('keeps Continue disabled while the address is checked', async () => {
-    await completeSiteStep();
-    await typeAddress();
-
-    const checking = screen.getByText(ADDRESS_CHECKING);
-    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
-
-    expect(checking).toBeVisible();
-    expect(continueButton).toHaveAttribute('aria-disabled', 'true');
-  });
-
-  it('keeps Continue reachable by keyboard while the address is checked', async () => {
-    await completeSiteStep();
-    await typeAddress();
-    const backButton = screen.getByRole('button', MOCK_BACK);
-    act(() => backButton.focus());
-    await user.tab();
-
-    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
-
-    expect(continueButton).toHaveFocus();
-  });
-
-  it('stays on the address step when Enter is pressed during the check', async () => {
-    await completeSiteStep();
-    const addressField = await typeAddress();
-    await user.type(addressField, '{Enter}');
-
-    const heading = stepHeading(STEPS.ADDRESS);
-
-    expect(heading).toBeVisible();
-  });
-
-  it.each([
-    [
-      STEPS.SITE,
-      t('siteSummary', { siteType: SITE_TYPES.BLOG, name: MOCK_TENANT_NAME }),
-    ],
-    [STEPS.ADDRESS, MOCK_SITE_ADDRESS],
-    [STEPS.LOOK, EDITORIAL_PRESET],
-  ])('shows the %s step’s choice once it is done', async (_, summary) => {
-    await reachReview();
-
-    const steps = screen.getByRole('list', { name: STEPS_ARIA_LABEL });
-
-    const stepSummary = within(steps).getByText(summary);
-
-    expect(stepSummary).toBeVisible();
   });
 
   it('announces the first step as one named progress bar', () => {
@@ -547,145 +309,6 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(isInaccessible(visibleText)).toBe(true);
   });
 
-  it('moves the progress bar on to the next step on Continue', async () => {
-    await completeSiteStep();
-
-    expectProgressAt(ONBOARDING_STEP.ADDRESS);
-  });
-
-  it('moves the progress bar back a step on Back', async () => {
-    await completeSiteStep();
-    const backButton = screen.getByRole('button', MOCK_BACK);
-    await user.click(backButton);
-
-    expectProgressAt(ONBOARDING_STEP.SITE);
-  });
-
-  it('announces review as the last step', async () => {
-    await reachReview();
-
-    expectProgressAt(ONBOARDING_STEP.REVIEW);
-  });
-
-  it('moves the progress bar to the step opened from review', async () => {
-    await reachReview();
-    const editAddress = screen.getByRole('button', {
-      name: t('editField', { field: SITE_ADDRESS_LABEL }),
-    });
-    await user.click(editAddress);
-
-    expectProgressAt(ONBOARDING_STEP.ADDRESS);
-  });
-
-  it('opens a step from its Edit link on review', async () => {
-    await reachReview();
-    const editAddress = screen.getByRole('button', {
-      name: t('editField', { field: SITE_ADDRESS_LABEL }),
-    });
-    await user.click(editAddress);
-
-    const heading = stepHeading(STEPS.ADDRESS);
-
-    expect(heading).toBeVisible();
-  });
-
-  it('returns to review after editing a step from it', async () => {
-    await reachReview();
-    const editName = screen.getByRole('button', {
-      name: t('editField', { field: NAME_LABEL }),
-    });
-    await user.click(editName);
-    await clickContinue();
-
-    const heading = stepHeading(STEPS.REVIEW);
-
-    expect(heading).toBeVisible();
-  });
-
-  it('replaces Continue with a separate Create site button on reaching review', async () => {
-    await completeSiteStep();
-    await completeAddressStep();
-    const continueButton = screen.getByRole('button', MOCK_CONTINUE);
-    await user.click(continueButton);
-
-    const createButton = screen.getByRole('button', MOCK_CREATE);
-
-    expect(createButton).toBeVisible();
-    expect(continueButton).not.toBeInTheDocument();
-  });
-
-  it('neither creates the site nor flags the terms on arriving at review', async () => {
-    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
-    await reachReview();
-
-    const heading = stepHeading(STEPS.REVIEW);
-    const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
-
-    expect(heading).toBeVisible();
-    expect(createSiteMock).not.toHaveBeenCalled();
-    expect(termsError).not.toBeInTheDocument();
-  });
-
-  it('neither creates the site nor flags the terms on returning to review from an edit', async () => {
-    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
-    await reachReview();
-    const editName = screen.getByRole('button', {
-      name: t('editField', { field: NAME_LABEL }),
-    });
-    await user.click(editName);
-    await clickContinue();
-
-    const heading = stepHeading(STEPS.REVIEW);
-    const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
-
-    expect(heading).toBeVisible();
-    expect(createSiteMock).not.toHaveBeenCalled();
-    expect(termsError).not.toBeInTheDocument();
-  });
-
-  it('flags the terms when Create site is pressed with the box unticked', async () => {
-    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
-    await reachReview();
-    const createButton = screen.getByRole('button', MOCK_CREATE);
-    await user.click(createButton);
-
-    const message = await screen.findByText(TERMS_NOT_ACCEPTED);
-
-    expect(message).toBeVisible();
-  });
-
-  it('clears the terms error once the box is ticked', async () => {
-    createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
-    await reachReview();
-    const createButton = screen.getByRole('button', MOCK_CREATE);
-    await user.click(createButton);
-    await screen.findByText(TERMS_NOT_ACCEPTED);
-    const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
-    await user.click(acceptance);
-
-    const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
-
-    expect(termsError).not.toBeInTheDocument();
-  });
-
-  it('returns to the address step when the address was taken meanwhile', async () => {
-    createSiteMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
-    });
-    await reachReview();
-    await acceptAndCreate();
-
-    await screen.findAllByText(ADDRESS_TAKEN);
-    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
-    const heading = stepHeading(STEPS.ADDRESS);
-
-    expect(addressField).toHaveAccessibleDescription(
-      expect.stringContaining(ADDRESS_TAKEN),
-    );
-    expect(heading).toBeVisible();
-  });
-
   it('offers Continue alone on the first step', () => {
     const backButton = screen.queryByRole('button', MOCK_BACK);
     const continueButton = screen.queryByRole('button', MOCK_CONTINUE);
@@ -694,57 +317,420 @@ describe(`<${OnboardingView.name}/>`, () => {
     expect(continueButton).toBeInTheDocument();
   });
 
-  it('offers Back beside Continue from the second step', async () => {
-    await completeSiteStep();
-
-    const backButton = screen.queryByRole('button', MOCK_BACK);
-    const continueButton = screen.queryByRole('button', MOCK_CONTINUE);
-
-    expect(backButton).toBeInTheDocument();
-    expect(continueButton).toBeInTheDocument();
-  });
-
-  it('offers Back beside Create site on review', async () => {
-    await reachReview();
-
-    const backButton = screen.queryByRole('button', MOCK_BACK);
-    const createButton = screen.queryByRole('button', MOCK_CREATE);
-
-    expect(backButton).toBeInTheDocument();
-    expect(createButton).toBeInTheDocument();
-  });
-
-  it('moves focus to the start of the new step on Continue', async () => {
-    await completeSiteStep();
-    await user.tab();
-
-    const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
-
-    expect(addressField).toHaveFocus();
-  });
-
-  it('moves focus to the start of the earlier step on Back', async () => {
-    await completeSiteStep();
-    const backButton = screen.getByRole('button', MOCK_BACK);
-    await user.click(backButton);
-    await user.tab();
-
-    const siteTypeSelect = screen.getByRole('combobox', MOCK_SITE_TYPE_SELECT);
-
-    expect(siteTypeSelect).toHaveFocus();
-  });
-
-  it('shows the neutral refusal when creation is refused', async () => {
-    createSiteMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,
+  describe('with Continue pressed before a name is typed', () => {
+    beforeEach(async () => {
+      await clickContinue();
     });
-    await reachReview();
-    await acceptAndCreate();
 
-    const refusal = await screen.findByText(TRY_AGAIN_LATER);
+    it('asks for a name before leaving the first step', () => {
+      const message = screen.getByText(NAME_REQUIRED);
+      const heading = stepHeading(STEPS.SITE);
 
-    expect(refusal).toBeVisible();
+      expect(message).toBeVisible();
+      expect(heading).toBeVisible();
+    });
+
+    it('describes an empty name by its hint, then what is missing', () => {
+      const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+
+      expect(nameField).toBeInvalid();
+      expect(nameField).toHaveAccessibleDescription(
+        `${NAME_HINT} ${NAME_REQUIRED}`,
+      );
+    });
+  });
+
+  describe('on the address step', () => {
+    beforeEach(async () => {
+      await completeSiteStep();
+    });
+
+    it('shows a placeholder address in the preview before one is typed', () => {
+      const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+
+      expect(preview).toHaveTextContent(MOCK_ANNOUNCED_PLACEHOLDER_ADDRESS);
+    });
+
+    it('follows the address in the preview as each letter is typed', async () => {
+      const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+      const [firstLetter] = MOCK_SLUG;
+      await user.type(addressField, firstLetter ?? '');
+
+      const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+
+      expect(preview).toHaveTextContent(
+        `${SITE_ADDRESS_LABEL} ${firstLetter}.${MOCK_TENANT_ROOT_DOMAIN}`,
+      );
+    });
+
+    it('describes the language select by its hint', () => {
+      const languageSelect = screen.getByRole('combobox', {
+        name: LANGUAGE_LABEL,
+      });
+
+      expect(languageSelect).toHaveAccessibleDescription(LANGUAGE_HINT);
+    });
+
+    it('moves the progress bar on to the next step on Continue', () => {
+      expectProgressAt(ONBOARDING_STEP.ADDRESS);
+    });
+
+    it('offers Back beside Continue from the second step', () => {
+      const backButton = screen.queryByRole('button', MOCK_BACK);
+      const continueButton = screen.queryByRole('button', MOCK_CONTINUE);
+
+      expect(backButton).toBeInTheDocument();
+      expect(continueButton).toBeInTheDocument();
+    });
+
+    it('moves focus to the start of the new step on Continue', async () => {
+      await user.tab();
+
+      const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+
+      expect(addressField).toHaveFocus();
+    });
+
+    describe('after Back', () => {
+      beforeEach(async () => {
+        await clickBack();
+      });
+
+      it('keeps the values entered when going back a step', () => {
+        const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
+
+        expect(nameField).toHaveValue(MOCK_TENANT_NAME);
+      });
+
+      it('moves the progress bar back a step on Back', () => {
+        expectProgressAt(ONBOARDING_STEP.SITE);
+      });
+
+      it('moves focus to the start of the earlier step on Back', async () => {
+        await user.tab();
+
+        const siteTypeSelect = screen.getByRole(
+          'combobox',
+          MOCK_SITE_TYPE_SELECT,
+        );
+
+        expect(siteTypeSelect).toHaveFocus();
+      });
+    });
+
+    describe('with an address typed', () => {
+      let addressField: HTMLElement;
+
+      beforeEach(async () => {
+        addressField = await typeAddress();
+      });
+
+      it('says the address is free once it has been checked', async () => {
+        const available = await screen.findByText(MOCK_ADDRESS_AVAILABLE);
+
+        expect(available).toBeVisible();
+        expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_SLUG);
+      });
+
+      it('shows the typed address in the preview', () => {
+        const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+
+        expect(preview).toHaveTextContent(MOCK_ANNOUNCED_SITE_ADDRESS);
+        expect(preview).not.toHaveTextContent(MOCK_PLACEHOLDER_ADDRESS);
+      });
+
+      it('keeps Continue disabled while the address is checked', () => {
+        const checking = screen.getByText(ADDRESS_CHECKING);
+        const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+        expect(checking).toBeVisible();
+        expect(continueButton).toHaveAttribute('aria-disabled', 'true');
+      });
+
+      it('keeps Continue reachable by keyboard while the address is checked', async () => {
+        const backButton = screen.getByRole('button', MOCK_BACK);
+        act(() => backButton.focus());
+        await user.tab();
+
+        const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+
+        expect(continueButton).toHaveFocus();
+      });
+
+      it('stays on the address step when Enter is pressed during the check', async () => {
+        await user.type(addressField, '{Enter}');
+
+        const heading = stepHeading(STEPS.ADDRESS);
+
+        expect(heading).toBeVisible();
+      });
+    });
+
+    describe('when the address is taken', () => {
+      let addressField: HTMLElement;
+
+      beforeEach(async () => {
+        checkSiteAddressMock.mockResolvedValue(TENANT_FIELD_ERROR.SLUG_TAKEN);
+        addressField = await typeAddress();
+        await screen.findAllByText(ADDRESS_TAKEN);
+      });
+
+      it('keeps a taken address from continuing', async () => {
+        await clickContinue();
+
+        const heading = stepHeading(STEPS.ADDRESS);
+
+        expect(addressField).toBeInvalid();
+        expect(heading).toBeVisible();
+      });
+
+      it('describes a taken address field by its suffix, hint and why it is taken', () => {
+        expect(addressField).toHaveAccessibleDescription(
+          `.${MOCK_TENANT_ROOT_DOMAIN} ${SITE_ADDRESS_HINT} ${ADDRESS_TAKEN}`,
+        );
+      });
+
+      it('announces a taken address in a status region', () => {
+        const announcing = screen
+          .getAllByRole('status')
+          .filter((status) => status.textContent === ADDRESS_TAKEN);
+
+        expect(announcing).toHaveLength(1);
+      });
+    });
+
+    describe('when the address check fails', () => {
+      beforeEach(async () => {
+        checkSiteAddressMock.mockRejectedValue(new Error());
+        await typeAddress();
+      });
+
+      it('says when the address could not be checked', async () => {
+        const unverified = await screen.findByText(ADDRESS_UNVERIFIED);
+
+        expect(unverified).toBeVisible();
+      });
+
+      it('lets the user continue when the address check fails', async () => {
+        await screen.findByText(ADDRESS_UNVERIFIED);
+        await clickContinue();
+
+        const heading = stepHeading(STEPS.LOOK);
+
+        expect(heading).toBeVisible();
+      });
+    });
+
+    describe('on the look step', () => {
+      beforeEach(async () => {
+        await completeAddressStep();
+      });
+
+      it('replaces Continue with a separate Create site button on reaching review', async () => {
+        const continueButton = screen.getByRole('button', MOCK_CONTINUE);
+        await user.click(continueButton);
+
+        const createButton = screen.getByRole('button', MOCK_CREATE);
+
+        expect(createButton).toBeVisible();
+        expect(continueButton).not.toBeInTheDocument();
+      });
+
+      it('keeps the accent the user moved when the site type changes', async () => {
+        const accentSlider = screen.getByRole('slider', MOCK_ACCENT_SLIDER);
+        await user.click(accentSlider);
+        await user.keyboard('{ArrowRight}');
+        const movedHue = Number(accentSlider.getAttribute(ARIA_VALUENOW));
+        await clickContinue();
+        await createAfterChangingSiteType(SITE_TYPES.DOCS);
+
+        expect(movedHue).not.toBe(MOCK_EDITORIAL_LOOK.accentHue);
+        expect(createSiteMock).toHaveBeenCalledWith(
+          expect.objectContaining({
+            preset: PRESET_ID.EDITORIAL,
+            accentHue: movedHue,
+          }),
+        );
+      });
+
+      describe('with Console picked', () => {
+        beforeEach(async () => {
+          const consolePreset = screen.getByRole('radio', {
+            name: CONSOLE_PRESET,
+          });
+          await user.click(consolePreset);
+          await clickContinue();
+        });
+
+        it('starts from the accent of the preset the user picks', async () => {
+          await acceptAndCreate();
+
+          expect(createSiteMock).toHaveBeenCalledWith({
+            ...MOCK_CREATE_SITE_INPUT,
+            ...MOCK_CONSOLE_LOOK,
+          });
+        });
+
+        it('keeps the preset the user picked when the site type changes', async () => {
+          await createAfterChangingSiteType(SITE_TYPES.PORTFOLIO);
+
+          expect(createSiteMock).toHaveBeenCalledWith(
+            expect.objectContaining(MOCK_CONSOLE_LOOK),
+          );
+        });
+      });
+    });
+  });
+
+  describe('on review', () => {
+    beforeEach(async () => {
+      await reachReview();
+    });
+
+    it('creates the site from the values the user entered', async () => {
+      await acceptAndCreate();
+
+      expect(createSiteMock).toHaveBeenCalledWith(MOCK_CREATE_SITE_INPUT);
+    });
+
+    it.each([SITE_TYPES.DOCS, SITE_TYPES.BLANK])(
+      'starts a %s site on the Console preset',
+      async (siteType) => {
+        await createAfterChangingSiteType(siteType);
+
+        expect(createSiteMock).toHaveBeenCalledWith(
+          expect.objectContaining(MOCK_CONSOLE_LOOK),
+        );
+      },
+    );
+
+    it('returns to the Editorial preset when switching back from Docs', async () => {
+      await changeSiteTypeFromReview(SITE_TYPES.DOCS);
+      await createAfterChangingSiteType(SITE_TYPES.PERSONAL);
+
+      expect(createSiteMock).toHaveBeenCalledWith(
+        expect.objectContaining(MOCK_EDITORIAL_LOOK),
+      );
+    });
+
+    it.each([
+      [
+        STEPS.SITE,
+        t('siteSummary', { siteType: SITE_TYPES.BLOG, name: MOCK_TENANT_NAME }),
+      ],
+      [STEPS.ADDRESS, MOCK_SITE_ADDRESS],
+      [STEPS.LOOK, EDITORIAL_PRESET],
+    ])('shows the %s step’s choice once it is done', (_, summary) => {
+      const steps = screen.getByRole('list', { name: STEPS_ARIA_LABEL });
+
+      const stepSummary = within(steps).getByText(summary);
+
+      expect(stepSummary).toBeVisible();
+    });
+
+    it('announces review as the last step', () => {
+      expectProgressAt(ONBOARDING_STEP.REVIEW);
+    });
+
+    it('offers Back beside Create site on review', () => {
+      const backButton = screen.queryByRole('button', MOCK_BACK);
+      const createButton = screen.queryByRole('button', MOCK_CREATE);
+
+      expect(backButton).toBeInTheDocument();
+      expect(createButton).toBeInTheDocument();
+    });
+
+    it('returns to review after editing a step from it', async () => {
+      await returnToReviewAfterEditingName();
+
+      const heading = stepHeading(STEPS.REVIEW);
+
+      expect(heading).toBeVisible();
+    });
+
+    it('returns to the address step when the address was taken meanwhile', async () => {
+      createSiteMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
+      });
+      await acceptAndCreate();
+
+      await screen.findAllByText(ADDRESS_TAKEN);
+      const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
+      const heading = stepHeading(STEPS.ADDRESS);
+
+      expect(addressField).toHaveAccessibleDescription(
+        expect.stringContaining(ADDRESS_TAKEN),
+      );
+      expect(heading).toBeVisible();
+    });
+
+    it('shows the neutral refusal when creation is refused', async () => {
+      createSiteMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: SIGN_UP_REFUSAL.TRY_AGAIN_LATER,
+      });
+      await acceptAndCreate();
+
+      const refusal = await screen.findByText(TRY_AGAIN_LATER);
+
+      expect(refusal).toBeVisible();
+    });
+
+    describe('with the address opened from review', () => {
+      beforeEach(async () => {
+        await editFromReview(SITE_ADDRESS_LABEL);
+      });
+
+      it('moves the progress bar to the step opened from review', () => {
+        expectProgressAt(ONBOARDING_STEP.ADDRESS);
+      });
+
+      it('opens a step from its Edit link on review', () => {
+        const heading = stepHeading(STEPS.ADDRESS);
+
+        expect(heading).toBeVisible();
+      });
+    });
+  });
+
+  describe('when creation reports the terms unaccepted', () => {
+    beforeEach(async () => {
+      createSiteMock.mockResolvedValue(MOCK_TERMS_NOT_ACCEPTED_RESULT);
+      await reachReview();
+    });
+
+    it('neither creates the site nor flags the terms on arriving at review', () => {
+      expectReviewWithoutTermsError();
+    });
+
+    it('neither creates the site nor flags the terms on returning to review from an edit', async () => {
+      await returnToReviewAfterEditingName();
+
+      expectReviewWithoutTermsError();
+    });
+
+    describe('after Create site is pressed with the box unticked', () => {
+      beforeEach(async () => {
+        await clickCreate();
+      });
+
+      it('flags the terms when Create site is pressed with the box unticked', async () => {
+        const message = await screen.findByText(TERMS_NOT_ACCEPTED);
+
+        expect(message).toBeVisible();
+      });
+
+      it('clears the terms error once the box is ticked', async () => {
+        await screen.findByText(TERMS_NOT_ACCEPTED);
+        const acceptance = screen.getByRole('checkbox', MOCK_ACCEPTANCE);
+        await user.click(acceptance);
+
+        const termsError = screen.queryByText(TERMS_NOT_ACCEPTED);
+
+        expect(termsError).not.toBeInTheDocument();
+      });
+    });
   });
 });
 
@@ -993,14 +979,6 @@ describe(`<${OnboardingView.name}/> preview`, () => {
       ]);
     });
 
-    it('names the frame by the width of the device pressed', async () => {
-      await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
-
-      const frame = sampleFrame(PREVIEW_DEVICE.TABLET);
-
-      expect(frame).toBeInTheDocument();
-    });
-
     it('announces the long readout under the live preview heading', () => {
       const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
       const heading = within(preview).getByRole('heading', {
@@ -1015,15 +993,25 @@ describe(`<${OnboardingView.name}/> preview`, () => {
       expect(readout).toHaveRole('status');
     });
 
-    it('announces the new size when another device is pressed', async () => {
-      await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+    describe('with Tablet pressed', () => {
+      beforeEach(async () => {
+        await user.click(deviceButton(PREVIEW_DEVICE.TABLET));
+      });
 
-      const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
-      const readout = within(preview).getByText(
-        readoutOf(PREVIEW_DEVICE.TABLET, 56),
-      );
+      it('names the frame by the width of the device pressed', () => {
+        const frame = sampleFrame(PREVIEW_DEVICE.TABLET);
 
-      expect(readout).toHaveRole('status');
+        expect(frame).toBeInTheDocument();
+      });
+
+      it('announces the new size when another device is pressed', () => {
+        const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
+        const readout = within(preview).getByText(
+          readoutOf(PREVIEW_DEVICE.TABLET, 56),
+        );
+
+        expect(readout).toHaveRole('status');
+      });
     });
 
     it('keeps the pressed device and colour scheme after Continue and Back', async () => {
@@ -1031,8 +1019,7 @@ describe(`<${OnboardingView.name}/> preview`, () => {
 
       await completeSiteStep();
       expectTabletAndDark();
-      const back = screen.getByRole('button', MOCK_BACK);
-      await user.click(back);
+      await clickBack();
 
       expectTabletAndDark();
     });

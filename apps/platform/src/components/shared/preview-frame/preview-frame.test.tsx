@@ -145,31 +145,6 @@ describe(`<${PreviewFrame.name}/>`, () => {
       },
     );
 
-    it.each([
-      {
-        device: PREVIEW_DEVICE.TABLET,
-        scale: 0.4805,
-        text: readoutFor('readoutShort', PREVIEW_DEVICE.TABLET, 48),
-      },
-      {
-        device: PREVIEW_DEVICE.PHONE,
-        scale: 0.7204,
-        text: readoutFor('readoutShort', PREVIEW_DEVICE.PHONE, 72),
-      },
-    ])(
-      'reads the short readout under the preview title in a narrow section',
-      ({ device, scale, text }) => {
-        rowWidth = NARROW_ROW;
-        renderWithIntl(headingOf(device, scale));
-
-        const heading = screen.getByRole('heading', { level: 2 });
-        const readout = screen.getByRole('status');
-
-        expect(heading).toHaveAccessibleName(MOCK_PREVIEW);
-        expect(readout).toHaveTextContent(text);
-      },
-    );
-
     it('keeps the long form at the 476 px boundary', () => {
       rowWidth = PREVIEW_READOUT.LONG_MIN_WIDTH;
       renderWithIntl(headingOf(PREVIEW_DEVICE.DESKTOP, 0.4406));
@@ -181,45 +156,73 @@ describe(`<${PreviewFrame.name}/>`, () => {
       expect(readout).toHaveTextContent(MOCK_DESKTOP_LONG_READOUT);
     });
 
-    it('keeps the live preview title and the long readout in a narrow section when asked', () => {
-      rowWidth = NARROW_ROW;
-      renderWithIntl(
-        <PreviewFrame ariaLabel={MOCK_LABEL}>
-          <PreviewFrame.Heading
-            device={PREVIEW_DEVICE.DESKTOP}
-            scale={0.4406}
-            isAlwaysLong={true}
-          />
-        </PreviewFrame>,
-      );
-
-      const heading = screen.getByRole('heading', { level: 2 });
-      const readout = screen.getByRole('status');
-
-      expect(heading).toHaveAccessibleName(MOCK_LIVE_PREVIEW);
-      expect(readout).toHaveTextContent(MOCK_DESKTOP_LONG_READOUT);
-    });
-
-    it('reads the phone tab readout under a heading kept for assistive technology', () => {
-      rowWidth = NARROW_ROW;
-      renderWithIntl(
-        headingOf(
-          PREVIEW_DEVICE.PHONE,
-          0.6197,
-          PREVIEW_HEADING_LAYOUT.PHONE_TAB,
-        ),
-      );
-
-      const heading = screen.getByRole('heading', {
-        level: 2,
-        name: MOCK_LIVE_PREVIEW,
+    describe('in a narrow section', () => {
+      beforeEach(() => {
+        rowWidth = NARROW_ROW;
       });
-      const readout = screen.getByRole('status');
 
-      expect(heading).toBeInTheDocument();
-      expect(readout).toHaveTextContent(
-        readoutFor('readoutPhoneTab', PREVIEW_DEVICE.PHONE, 62),
+      it.each([
+        {
+          device: PREVIEW_DEVICE.TABLET,
+          scale: 0.4805,
+          text: readoutFor('readoutShort', PREVIEW_DEVICE.TABLET, 48),
+        },
+        {
+          device: PREVIEW_DEVICE.PHONE,
+          scale: 0.7204,
+          text: readoutFor('readoutShort', PREVIEW_DEVICE.PHONE, 72),
+        },
+      ])(
+        'reads the short readout under the preview title in a narrow section',
+        ({ device, scale, text }) => {
+          renderWithIntl(headingOf(device, scale));
+
+          const heading = screen.getByRole('heading', { level: 2 });
+          const readout = screen.getByRole('status');
+
+          expect(heading).toHaveAccessibleName(MOCK_PREVIEW);
+          expect(readout).toHaveTextContent(text);
+        },
       );
+
+      it('keeps the live preview title and the long readout in a narrow section when asked', () => {
+        renderWithIntl(
+          <PreviewFrame ariaLabel={MOCK_LABEL}>
+            <PreviewFrame.Heading
+              device={PREVIEW_DEVICE.DESKTOP}
+              scale={0.4406}
+              isAlwaysLong={true}
+            />
+          </PreviewFrame>,
+        );
+
+        const heading = screen.getByRole('heading', { level: 2 });
+        const readout = screen.getByRole('status');
+
+        expect(heading).toHaveAccessibleName(MOCK_LIVE_PREVIEW);
+        expect(readout).toHaveTextContent(MOCK_DESKTOP_LONG_READOUT);
+      });
+
+      it('reads the phone tab readout under a heading kept for assistive technology', () => {
+        renderWithIntl(
+          headingOf(
+            PREVIEW_DEVICE.PHONE,
+            0.6197,
+            PREVIEW_HEADING_LAYOUT.PHONE_TAB,
+          ),
+        );
+
+        const heading = screen.getByRole('heading', {
+          level: 2,
+          name: MOCK_LIVE_PREVIEW,
+        });
+        const readout = screen.getByRole('status');
+
+        expect(heading).toBeInTheDocument();
+        expect(readout).toHaveTextContent(
+          readoutFor('readoutPhoneTab', PREVIEW_DEVICE.PHONE, 62),
+        );
+      });
     });
 
     it('updates the readout when the device and scale change', () => {
