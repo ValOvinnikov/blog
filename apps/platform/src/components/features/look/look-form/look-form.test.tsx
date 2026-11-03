@@ -23,6 +23,7 @@ import {
 import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import {
   SAMPLE_BUSY_BUTTON_TEST_ID,
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
@@ -48,18 +49,15 @@ import { uploadBrandAssetAction } from '@platform/server/site-config/upload-bran
 import type { TUploadResult } from '@platform/server/uploads/upload-error';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import {
-  customRender,
-  screen,
-  waitFor,
-  within,
-} from '@platform/testing/custom-render';
+import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   clickGoToTheFirstOne,
   nudgeAccentHue,
+  openLookRow,
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
+import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -77,9 +75,7 @@ import {
 } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
-  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
-  MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import {
   defaultLookFormValues,
@@ -97,19 +93,6 @@ vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal<typeof BlogConfig>()),
   isAccentHueAccessible: vi.fn(() => true),
 }));
-
-vi.mock(
-  '@platform/components/features/look/look-form/use-look-open-rows',
-  () => ({
-    useLookOpenRows: () => ({
-      groupProps: (rows: readonly string[]) => ({
-        openValues: rows,
-        onOpenValuesChange: vi.fn(),
-      }),
-      revealRow: vi.fn(),
-    }),
-  }),
-);
 
 const { MOCK_UPLOADED_LOGO_URL, mockActions } = await vi.hoisted(async () => {
   const { ACTION_OUTCOME: OUTCOME } = await import('@blog/config/constants');
@@ -193,17 +176,6 @@ const EDITORIAL = 'Editorial';
 const CONSOLE = 'Console';
 const DISCARD = 'Discard';
 
-const setup = customRender(LookForm, {
-  tenantId: MOCK_TENANT_ID,
-  tenantName: MOCK_TENANT_NAME,
-  siteHost: MOCK_TENANT_DOMAIN,
-  initialValues: defaultLookFormValues(),
-  plan: TENANT_PLAN.GROWTH,
-  liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
-  hasReaderAccounts: true,
-  hasCookieBanner: true,
-});
-
 const stubLgUpWindow = () => {
   const stubMatchMedia = window.matchMedia;
   vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
@@ -213,7 +185,7 @@ const stubLgUpWindow = () => {
 };
 
 const setupWithSavedLogo = () =>
-  setup({
+  setupLookForm({
     initialValues: { ...defaultLookFormValues(), logo: { url: MOCK_LOGO_URL } },
   });
 
@@ -284,15 +256,16 @@ const clickRestoreChanges = async (user: UserEvent) => {
 };
 
 const setupAndSaveNudgedHue = async (user: UserEvent) => {
-  setup();
+  setupLookForm();
   await nudgeAccentHue(user);
   await clickSave(user);
 };
 
-const setupArchived = (overrides: Parameters<typeof setup>[0] = {}) =>
-  setup({ archivedAt: MOCK_ARCHIVED_AT, ...overrides });
+const setupArchived = (overrides: Parameters<typeof setupLookForm>[0] = {}) =>
+  setupLookForm({ archivedAt: MOCK_ARCHIVED_AT, ...overrides });
 
 const stageAssetRemoval = async (user: UserEvent) => {
+  await openLookRow(user, LOOK_ROW.BRAND);
   const removeButton = screen.getByRole('button', {
     name: messages.assetUploadField.remove,
   });
@@ -336,7 +309,7 @@ describe(`<${LookForm.name}/>`, () => {
     { timeout: HEAVY_FORM_TIMEOUT_MS },
     () => {
       beforeEach(() => {
-        setup();
+        setupLookForm();
       });
 
       it('lists the Preset card, then the Style and Site parts rows in order', () => {
@@ -382,141 +355,193 @@ describe(`<${LookForm.name}/>`, () => {
         expect(previewPanel).toContainElement(sampleTokens);
       });
 
-      it("describes each Look control with its field's hint", () => {
-        const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
-        const followSwitch = screen.getByRole('switch', {
-          name: FOLLOW_ACCENT_HUE,
-        });
-        const radiusGroup = screen.getByRole('group', {
-          name: LOOK_FORM.radiusScaleLabel,
+      describe('with the Colour row open', () => {
+        beforeEach(async () => {
+          await openLookRow(user, LOOK_ROW.COLOUR);
         });
 
-        expect(hueSlider).toHaveAccessibleDescription(
-          LOOK_FORM.accentHueDescription,
-        );
-        expect(followSwitch).toHaveAccessibleDescription(
-          LOOK_FORM.logoHueDescription,
-        );
-        expect(radiusGroup).toHaveAccessibleDescription(
-          LOOK_FORM.radiusScaleDescription,
-        );
+        it("describes each Colour control with its field's hint", () => {
+          const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+          const followSwitch = screen.getByRole('switch', {
+            name: FOLLOW_ACCENT_HUE,
+          });
+
+          expect(hueSlider).toHaveAccessibleDescription(
+            LOOK_FORM.accentHueDescription,
+          );
+          expect(followSwitch).toHaveAccessibleDescription(
+            LOOK_FORM.logoHueDescription,
+          );
+        });
+
+        it('names the logo hue group with its optional tag', () => {
+          const logoHueGroup = screen.getByRole('group', {
+            name: `${LOOK_FORM.logoHueLabel} ${LOOK_FORM.optionalTag}`,
+          });
+
+          expect(logoHueGroup).toBeVisible();
+        });
       });
 
-      it('names the logo hue group with its optional tag', () => {
-        const logoHueGroup = screen.getByRole('group', {
-          name: `${LOOK_FORM.logoHueLabel} ${LOOK_FORM.optionalTag}`,
+      describe('with the Shape row open', () => {
+        beforeEach(async () => {
+          await openLookRow(user, LOOK_ROW.SHAPE);
         });
 
-        expect(logoHueGroup).toBeVisible();
-      });
+        it("describes the corner radius control with its field's hint", () => {
+          const radiusGroup = screen.getByRole('group', {
+            name: LOOK_FORM.radiusScaleLabel,
+          });
 
-      it('describes each header buttons option', () => {
-        const headerButtonsGroup = screen.getByRole('group', {
-          name: LOOK_FORM.headerControlStyleLabel,
-        });
-        const plainButton = within(headerButtonsGroup).getByRole('button', {
-          name: LOOK_FORM.headerControlStyleOptionLabel.PLAIN,
+          expect(radiusGroup).toHaveAccessibleDescription(
+            LOOK_FORM.radiusScaleDescription,
+          );
         });
 
-        expect(plainButton).toHaveAccessibleDescription(
-          LOOK_FORM.headerControlStyleOptionDescription.PLAIN,
-        );
+        it('describes each header buttons option', () => {
+          const headerButtonsGroup = screen.getByRole('group', {
+            name: LOOK_FORM.headerControlStyleLabel,
+          });
+          const plainButton = within(headerButtonsGroup).getByRole('button', {
+            name: LOOK_FORM.headerControlStyleOptionLabel.PLAIN,
+          });
+
+          expect(plainButton).toHaveAccessibleDescription(
+            LOOK_FORM.headerControlStyleOptionDescription.PLAIN,
+          );
+        });
+
+        it('previews a changed radius scale and density before saving', async () => {
+          const extraLargeButton = screen.getByRole('button', {
+            name: EXTRA_LARGE,
+          });
+          await user.click(extraLargeButton);
+          const compactButton = screen.getByRole('button', { name: COMPACT });
+          await user.click(compactButton);
+
+          const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+          expect(sampleTokens).toHaveStyle({
+            '--radius-md': '16px',
+            '--spacing-card-x': '0.75rem',
+          });
+        });
       });
 
       it.each([
         {
+          row: LOOK_ROW.SHAPE,
           group: LOOK_FORM.headerControlStyleLabel,
           option: LOOK_FORM.headerControlStyleOptionLabel.SOFT,
           saved: { headerControlStyle: HEADER_CONTROL_STYLE.SOFT },
         },
         {
+          row: LOOK_ROW.HEADER,
           group: LOOK_FORM.headerSubmenuStyleLabel,
           option: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
           saved: { headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL },
         },
         {
+          row: LOOK_ROW.HEADER,
           group: LOOK_FORM.headerBarStyleLabel,
           option: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
           saved: { headerBarStyle: HEADER_BAR_STYLE.FLOATING },
         },
         {
+          row: LOOK_ROW.HEADER,
           group: LOOK_FORM.accountButtonStyleLabel,
           option: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
           saved: { accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE },
         },
         {
+          row: LOOK_ROW.HEADER,
           group: LOOK_FORM.accountPanelStyleLabel,
           option: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
           saved: { accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB },
         },
         {
+          row: LOOK_ROW.HEADER,
           group: LOOK_FORM.accountPhonePlacementLabel,
           option: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
           saved: { accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU },
         },
         {
+          row: LOOK_ROW.BUTTONS,
           group: LOOK_FORM.busyButtonStyleLabel,
           option: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
           saved: { busyButtonStyle: BUSY_BUTTON_STYLE.EDGE },
         },
         {
+          row: LOOK_ROW.FOOTER,
           group: LOOK_FORM.footerBackgroundLabel,
           option: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
           saved: { footerBackground: BRAND_VARIANT.SECONDARY },
         },
         {
+          row: LOOK_ROW.FOOTER,
           group: LOOK_FORM.footerSurfaceLabel,
           option: LOOK_FORM.footerSurfaceOptionLabel.CARD,
           saved: { footerSurface: FOOTER_SURFACE.CARD },
         },
         {
+          row: LOOK_ROW.FOOTER,
           group: LOOK_FORM.cookieSettingsButtonLabel,
           option: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
           saved: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
         },
         {
+          row: LOOK_ROW.LANGUAGE_SWITCHER,
           group: LOOK_FORM.languageSwitcherLabel,
           option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
           saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },
         },
         {
+          row: LOOK_ROW.SHAPE,
           group: LOOK_FORM.cardStyleLabel,
           option: OUTLINED,
           saved: { cardStyle: CARD_STYLE.OUTLINED },
         },
-      ])('saves the chosen $group style', async ({ group, option, saved }) => {
-        const [styleGroup] = screen.getAllByRole('group', { name: group });
-        const optionButton = within(styleGroup!).getByRole('button', {
-          name: option,
-        });
-        await user.click(optionButton);
+      ])(
+        'saves the chosen $group style',
+        async ({ row, group, option, saved }) => {
+          await openLookRow(user, row);
+          const [styleGroup] = screen.getAllByRole('group', { name: group });
+          const optionButton = within(styleGroup!).getByRole('button', {
+            name: option,
+          });
+          await user.click(optionButton);
 
-        await saveAndExpectLook(user, saved);
-      });
+          await saveAndExpectLook(user, saved);
+        },
+      );
 
       it.each([
         {
+          row: LOOK_ROW.HEADER,
           select: HEADER_LAYOUT_LABEL,
           option: LOOK_FORM.headerLayoutOptionLabel.TWO_ROWS,
           saved: { headerLayout: HEADER_LAYOUT.TWO_ROWS },
         },
         {
+          row: LOOK_ROW.BUTTONS,
           select: SPINNER_LABEL,
           option: LOOK_FORM.spinnerStyleOptionLabel.DOTS,
           saved: { spinnerStyle: SPINNER_STYLE.DOTS },
         },
         {
+          row: LOOK_ROW.FOOTER,
           select: FOOTER_LAYOUT_LABEL,
           option: LOOK_FORM.footerLayoutOptionLabel.BIG_WORDMARK,
           saved: { footerLayout: FOOTER_LAYOUT.BIG_WORDMARK },
         },
-      ])('saves the chosen $select', async ({ select, option, saved }) => {
+      ])('saves the chosen $select', async ({ row, select, option, saved }) => {
+        await openLookRow(user, row);
         await chooseOption(user, select, option);
 
         await saveAndExpectLook(user, saved);
       });
 
       it('previews the chosen account panel open while signed in', async () => {
+        await openLookRow(user, LOOK_ROW.HEADER);
         const hubButton = screen.getByRole('button', {
           name: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
         });
@@ -537,6 +562,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('shows the chosen busy style and spinner on the preview busy button', async () => {
+        await openLookRow(user, LOOK_ROW.BUTTONS);
         const busyGroup = screen.getByRole('group', {
           name: LOOK_FORM.busyButtonStyleLabel,
         });
@@ -577,15 +603,11 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('previews the chosen header layout and bar and footer layout', async () => {
+        await openLookRow(user, LOOK_ROW.HEADER);
         await chooseOption(
           user,
           HEADER_LAYOUT_LABEL,
           LOOK_FORM.headerLayoutOptionLabel.MENU_BUTTON,
-        );
-        await chooseOption(
-          user,
-          FOOTER_LAYOUT_LABEL,
-          LOOK_FORM.footerLayoutOptionLabel.CENTRED,
         );
         const barGroup = screen.getByRole('group', {
           name: LOOK_FORM.headerBarStyleLabel,
@@ -594,6 +616,12 @@ describe(`<${LookForm.name}/>`, () => {
           name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
         });
         await user.click(floatingButton);
+        await openLookRow(user, LOOK_ROW.FOOTER);
+        await chooseOption(
+          user,
+          FOOTER_LAYOUT_LABEL,
+          LOOK_FORM.footerLayoutOptionLabel.CENTRED,
+        );
 
         const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
         const sampleFooter = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
@@ -627,30 +655,18 @@ describe(`<${LookForm.name}/>`, () => {
         expect(dirtySaveButton).toBeEnabled();
       });
 
-      it('previews a changed radius scale and density before saving', async () => {
-        const extraLargeButton = screen.getByRole('button', {
-          name: EXTRA_LARGE,
-        });
-        await user.click(extraLargeButton);
-        const compactButton = screen.getByRole('button', { name: COMPACT });
-        await user.click(compactButton);
-
-        const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
-        expect(sampleTokens).toHaveStyle({
-          '--radius-md': '16px',
-          '--spacing-card-x': '0.75rem',
-        });
-      });
-
-      it('leaves every Look control enabled for a non-archived tenant', () => {
+      it('leaves every Look control enabled for a non-archived tenant', async () => {
         const consolePreset = screen.getByRole('radio', { name: CONSOLE });
+        await openLookRow(user, LOOK_ROW.COLOUR);
         const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
         const followSwitch = screen.getByRole('switch', {
           name: FOLLOW_ACCENT_HUE,
         });
+        await openLookRow(user, LOOK_ROW.BRAND);
         const uploadLogoButton = screen.getByRole('button', {
           name: UPLOAD_LOGO,
         });
+        await openLookRow(user, LOOK_ROW.SHAPE);
         const smallButton = screen.getByRole('button', {
           name: LOOK_FORM.radiusScaleOptionLabel.SM,
         });
@@ -726,6 +742,7 @@ describe(`<${LookForm.name}/>`, () => {
       describe('after choosing the Editorial preset', () => {
         beforeEach(async () => {
           await chooseEditorial(user);
+          await openLookRow(user, LOOK_ROW.COLOUR);
         });
 
         it("resets the accent hue to the preset's", () => {
@@ -744,7 +761,7 @@ describe(`<${LookForm.name}/>`, () => {
   );
 
   it('resets the header buttons style with the rest of the preset', async () => {
-    setup({
+    setupLookForm({
       initialValues: {
         ...defaultLookFormValues(),
         headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
@@ -755,6 +772,7 @@ describe(`<${LookForm.name}/>`, () => {
       name: RESET_TO_PRESET,
     });
     await user.click(resetToPresetButton);
+    await openLookRow(user, LOOK_ROW.SHAPE);
 
     const headerButtons = screen.getByRole('group', {
       name: LOOK_FORM.headerControlStyleLabel,
@@ -767,7 +785,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('after choosing a preset over saved non-theme settings', () => {
     beforeEach(async () => {
-      setup({
+      setupLookForm({
         initialValues: {
           ...defaultLookFormValues(),
           logo: { url: MOCK_LOGO_URL },
@@ -788,7 +806,9 @@ describe(`<${LookForm.name}/>`, () => {
       await chooseEditorial(user);
     });
 
-    it('keeps the saved logo', () => {
+    it('keeps the saved logo', async () => {
+      await openLookRow(user, LOOK_ROW.BRAND);
+
       const logo = screen.getByAltText(CURRENT_LOGO);
 
       expect(logo).toBeVisible();
@@ -796,15 +816,23 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
+        row: LOOK_ROW.HEADER,
         select: HEADER_LAYOUT_LABEL,
         option: LOOK_FORM.headerLayoutOptionLabel.CENTRED_BRAND,
       },
-      { select: SPINNER_LABEL, option: LOOK_FORM.spinnerStyleOptionLabel.DOTS },
       {
+        row: LOOK_ROW.BUTTONS,
+        select: SPINNER_LABEL,
+        option: LOOK_FORM.spinnerStyleOptionLabel.DOTS,
+      },
+      {
+        row: LOOK_ROW.FOOTER,
         select: FOOTER_LAYOUT_LABEL,
         option: LOOK_FORM.footerLayoutOptionLabel.COMPACT,
       },
-    ])('keeps the saved $select', ({ select, option }) => {
+    ])('keeps the saved $select', async ({ row, select, option }) => {
+      await openLookRow(user, row);
+
       const selectBox = screen.getByRole('combobox', { name: select });
 
       expect(selectBox).toHaveTextContent(option);
@@ -812,42 +840,53 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.headerSubmenuStyleLabel,
         option: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.headerBarStyleLabel,
         option: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountButtonStyleLabel,
         option: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountPanelStyleLabel,
         option: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountPhonePlacementLabel,
         option: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
       },
       {
+        row: LOOK_ROW.BUTTONS,
         group: LOOK_FORM.busyButtonStyleLabel,
         option: LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
       },
       {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
         option: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
       },
       {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerSurfaceLabel,
         option: LOOK_FORM.footerSurfaceOptionLabel.CARD,
       },
       {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.cookieSettingsButtonLabel,
         option: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
       },
-    ])('keeps the saved $group', ({ group, option }) => {
+    ])('keeps the saved $group', async ({ row, group, option }) => {
+      await openLookRow(user, row);
+
       const styleGroup = screen.getByRole('group', { name: group });
       const optionButton = within(styleGroup).getByRole('button', {
         name: option,
@@ -862,8 +901,9 @@ describe(`<${LookForm.name}/>`, () => {
     { banner: 'off', hasCookieBanner: false, isNoteShown: true },
   ])(
     'keeps the cookie button editable with the banner $banner, noting when off',
-    ({ hasCookieBanner, isNoteShown }) => {
-      setup({ hasCookieBanner });
+    async ({ hasCookieBanner, isNoteShown }) => {
+      setupLookForm({ hasCookieBanner });
+      await openLookRow(user, LOOK_ROW.FOOTER);
 
       const note = screen.queryByText(COOKIE_BANNER_OFF_NOTE);
       const cookieButtonGroup = screen.getByRole('group', {
@@ -878,8 +918,9 @@ describe(`<${LookForm.name}/>`, () => {
     },
   );
 
-  it('shows a single-language note and no switcher choice with one language', () => {
-    setup({ liveLocales: [LOCALE_ISO_CODES.EN] });
+  it('shows a single-language note and no switcher choice with one language', async () => {
+    setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
+    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
 
     const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
     const compactCodesButton = screen.queryByRole('button', {
@@ -927,8 +968,9 @@ describe(`<${LookForm.name}/>`, () => {
   describe('the preview sub-menu', () => {
     let submenuGroup: HTMLElement;
 
-    beforeEach(() => {
-      setup();
+    beforeEach(async () => {
+      setupLookForm();
+      await openLookRow(user, LOOK_ROW.HEADER);
       submenuGroup = screen.getByRole('group', {
         name: LOOK_FORM.headerSubmenuStyleLabel,
       });
@@ -983,9 +1025,10 @@ describe(`<${LookForm.name}/>`, () => {
       screen.queryByRole('button', { name: LOOK_FORM.headerShowOnDesktop });
 
     describe('from lg', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         stubLgUpWindow();
-        setup();
+        setupLookForm();
+        await openLookRow(user, LOOK_ROW.HEADER);
       });
 
       it('opens on Desktop with no device note', () => {
@@ -1004,8 +1047,9 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     describe('below lg', () => {
-      beforeEach(() => {
-        setup();
+      beforeEach(async () => {
+        setupLookForm();
+        await openLookRow(user, LOOK_ROW.HEADER);
       });
 
       it('opens on Phone with the phone note under the header layout', () => {
@@ -1066,7 +1110,7 @@ describe(`<${LookForm.name}/>`, () => {
       vi.mocked(isAccentHueAccessible).mockImplementation(
         (hue) => hue !== NUDGED_ACCENT_HUE,
       );
-      setup();
+      setupLookForm();
       await nudgeAccentHue(user);
       await user.tab();
     });
@@ -1108,7 +1152,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('with a saved accent hue off the preset', () => {
     beforeEach(() => {
-      setup({
+      setupLookForm({
         initialValues: {
           ...defaultLookFormValues(),
           accentHue: MOCK_SAVED_ACCENT_HUE,
@@ -1126,6 +1170,7 @@ describe(`<${LookForm.name}/>`, () => {
         name: RESET_TO_PRESET,
       });
       await user.click(resetToPresetButton);
+      await openLookRow(user, LOOK_ROW.COLOUR);
 
       const hueReadout = screen.getByText(hueValue(DEFAULT_ACCENT_HUE));
       const resetButton = screen.queryByRole('button', {
@@ -1136,12 +1181,14 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('resets to the preset in the draft only, so Discard restores the saved look', async () => {
+      await openLookRow(user, LOOK_ROW.SHAPE);
       const compactButton = screen.getByRole('button', { name: COMPACT });
       await user.click(compactButton);
       const resetToPresetButton = screen.getByRole('button', {
         name: RESET_TO_PRESET,
       });
       await user.click(resetToPresetButton);
+      await openLookRow(user, LOOK_ROW.COLOUR);
 
       const resetReadout = screen.getByText(hueValue(DEFAULT_ACCENT_HUE));
       expect(resetReadout).toBeVisible();
@@ -1157,20 +1204,24 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setup({ plan: TENANT_PLAN.FREE });
+      setupLookForm({ plan: TENANT_PLAN.FREE });
     });
 
-    it('locks every Growth-only field with the Growth plan badge', () => {
+    it('locks every Growth-only field with the Growth plan badge', async () => {
       const locks = screen.getAllByText(GROWTH_PLAN);
-      const headingFont = screen.getByRole('combobox', {
-        name: LOOK_FORM.headingFontLabel,
-      });
-      const extraLargeButton = screen.getByRole('button', {
-        name: EXTRA_LARGE,
-      });
+      await openLookRow(user, LOOK_ROW.COLOUR);
       const followSwitch = screen.getByRole('switch', {
         name: FOLLOW_ACCENT_HUE,
       });
+      await openLookRow(user, LOOK_ROW.TYPE);
+      const headingFont = screen.getByRole('combobox', {
+        name: LOOK_FORM.headingFontLabel,
+      });
+      await openLookRow(user, LOOK_ROW.SHAPE);
+      const extraLargeButton = screen.getByRole('button', {
+        name: EXTRA_LARGE,
+      });
+      await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
       const codesButton = screen.getByRole('button', {
         name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
       });
@@ -1185,78 +1236,97 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
+        row: LOOK_ROW.HEADER,
         select: HEADER_LAYOUT_LABEL,
         current: LOOK_FORM.headerLayoutOptionLabel.CLASSIC,
         hint: LOOK_FORM.headerLayoutDescription,
       },
       {
+        row: LOOK_ROW.BUTTONS,
         select: SPINNER_LABEL,
         current: LOOK_FORM.spinnerStyleOptionLabel.PRESET,
         hint: LOOK_FORM.spinnerStyleDescription,
       },
       {
+        row: LOOK_ROW.FOOTER,
         select: FOOTER_LAYOUT_LABEL,
         current: LOOK_FORM.footerLayoutOptionLabel.COLUMNS,
         hint: LOOK_FORM.footerLayoutDescription,
       },
-    ])('shows $select locked at its default', ({ select, current, hint }) => {
-      const selectBox = screen.getByRole('combobox', { name: select });
+    ])(
+      'shows $select locked at its default',
+      async ({ row, select, current, hint }) => {
+        await openLookRow(user, row);
+        const selectBox = screen.getByRole('combobox', { name: select });
 
-      expect(selectBox).toHaveAttribute(DATA_DISABLED);
-      expect(selectBox).toHaveTextContent(current);
-      expect(selectBox).toHaveAccessibleDescription(`${GROWTH_PLAN} ${hint}`);
-    });
+        expect(selectBox).toHaveAttribute(DATA_DISABLED);
+        expect(selectBox).toHaveTextContent(current);
+        expect(selectBox).toHaveAccessibleDescription(`${GROWTH_PLAN} ${hint}`);
+      },
+    );
 
     it.each([
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.headerBarStyleLabel,
         current: LOOK_FORM.headerBarStyleOptionLabel.FULL_WIDTH,
         other: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountButtonStyleLabel,
         current: LOOK_FORM.accountButtonStyleOptionLabel.PILL,
         other: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountPanelStyleLabel,
         current: LOOK_FORM.accountPanelStyleOptionLabel.CARD,
         other: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
       },
       {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountPhonePlacementLabel,
         current: LOOK_FORM.accountPhonePlacementOptionLabel.BAR,
         other: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
       },
       {
+        row: LOOK_ROW.BUTTONS,
         group: LOOK_FORM.busyButtonStyleLabel,
         current: LOOK_FORM.busyButtonStyleOptionLabel.LABEL,
         other: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
       },
       {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
         current: LOOK_FORM.footerBackgroundOptionLabel.BRAND_PRIMARY,
         other: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
       },
       {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerSurfaceLabel,
         current: LOOK_FORM.footerSurfaceOptionLabel.FULL_WIDTH,
         other: LOOK_FORM.footerSurfaceOptionLabel.CARD,
       },
-    ])('shows $group locked at its default', ({ group, current, other }) => {
-      const styleGroup = screen.getByRole('group', { name: group });
-      const currentButton = within(styleGroup).getByRole('button', {
-        name: current,
-      });
-      const otherButton = within(styleGroup).getByRole('button', {
-        name: other,
-      });
+    ])(
+      'shows $group locked at its default',
+      async ({ row, group, current, other }) => {
+        await openLookRow(user, row);
+        const styleGroup = screen.getByRole('group', { name: group });
+        const currentButton = within(styleGroup).getByRole('button', {
+          name: current,
+        });
+        const otherButton = within(styleGroup).getByRole('button', {
+          name: other,
+        });
 
-      expect(currentButton).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(otherButton).toBeDisabled();
-    });
+        expect(currentButton).toHaveAttribute(ARIA_PRESSED, 'true');
+        expect(otherButton).toBeDisabled();
+      },
+    );
 
     it('saves the cookie settings button, the one footer field Free keeps', async () => {
+      await openLookRow(user, LOOK_ROW.FOOTER);
       const cookieButtonGroup = screen.getByRole('group', {
         name: LOOK_FORM.cookieSettingsButtonLabel,
       });
@@ -1270,9 +1340,11 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    it('keeps the preset, accent hue and brand images editable', () => {
+    it('keeps the preset, accent hue and brand images editable', async () => {
       const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+      await openLookRow(user, LOOK_ROW.COLOUR);
       const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
+      await openLookRow(user, LOOK_ROW.BRAND);
       const uploadLogoButton = screen.getByRole('button', {
         name: UPLOAD_LOGO,
       });
@@ -1284,6 +1356,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     it("previews a new preset's own fonts and corners", async () => {
       await chooseEditorial(user);
+      await openLookRow(user, LOOK_ROW.SHAPE);
 
       const smallButton = screen.getByRole('button', {
         name: LOOK_FORM.radiusScaleOptionLabel.SM,
@@ -1304,13 +1377,15 @@ describe(`<${LookForm.name}/>`, () => {
         expectArchivedOffersNoSave();
       });
 
-      it('disables every Look control', () => {
+      it('disables every Look control', async () => {
         const consolePreset = screen.getByRole('radio', { name: CONSOLE });
         const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+        await openLookRow(user, LOOK_ROW.COLOUR);
         const hueSlider = screen.getByRole('slider', { name: ACCENT_HUE });
         const followSwitch = screen.getByRole('switch', {
           name: FOLLOW_ACCENT_HUE,
         });
+        await openLookRow(user, LOOK_ROW.BRAND);
         const uploadLogoButton = screen.getByRole('button', {
           name: UPLOAD_LOGO,
         });
@@ -1326,7 +1401,8 @@ describe(`<${LookForm.name}/>`, () => {
         expect(uploadFaviconButton).toBeDisabled();
       });
 
-      it('disables the Header controls', () => {
+      it('disables the Header controls', async () => {
+        await openLookRow(user, LOOK_ROW.HEADER);
         const layoutSelect = screen.getByRole('combobox', {
           name: HEADER_LAYOUT_LABEL,
         });
@@ -1345,13 +1421,15 @@ describe(`<${LookForm.name}/>`, () => {
         expect(floatingButton).toBeDisabled();
       });
 
-      it('disables the Type and Shape controls', () => {
+      it('disables the Type and Shape controls', async () => {
+        await openLookRow(user, LOOK_ROW.TYPE);
         const headingFont = screen.getByRole('combobox', {
           name: LOOK_FORM.headingFontLabel,
         });
         const bodyFont = screen.getByRole('combobox', {
           name: LOOK_FORM.bodyFontLabel,
         });
+        await openLookRow(user, LOOK_ROW.SHAPE);
         const smallButton = screen.getByRole('button', {
           name: LOOK_FORM.radiusScaleOptionLabel.SM,
         });
@@ -1381,9 +1459,10 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    it('describes a rejected accent hue with both the archived notice and the error', () => {
+    it('describes a rejected accent hue with both the archived notice and the error', async () => {
       vi.mocked(isAccentHueAccessible).mockReturnValue(false);
       setupArchived();
+      await openLookRow(user, LOOK_ROW.COLOUR);
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
 
@@ -1410,7 +1489,7 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('restores unsaved changes after leaving, keeping the current brand images', async () => {
-    const { unmount } = setup();
+    const { unmount } = setupLookForm();
     await chooseEditorial(user);
     unmount();
 
@@ -1418,14 +1497,17 @@ describe(`<${LookForm.name}/>`, () => {
     await clickRestoreChanges(user);
 
     const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+    await openLookRow(user, LOOK_ROW.COLOUR);
     const hueReadout = screen.getByText(hueValue(EDITORIAL_ACCENT_HUE));
-    const logo = screen.getByAltText(CURRENT_LOGO);
     expect(editorialPreset).toBeChecked();
     expect(hueReadout).toBeVisible();
+
+    await openLookRow(user, LOOK_ROW.BRAND);
+    const logo = screen.getByAltText(CURRENT_LOGO);
     expect(logo).toBeVisible();
   });
 
-  it('drops a draft saved before the header buttons style existed', () => {
+  it('drops a draft saved before the header buttons style existed', async () => {
     const olderValues = Object.fromEntries(
       Object.entries(defaultLookFormValues()).filter(
         ([key]) => key !== 'headerControlStyle',
@@ -1439,7 +1521,8 @@ describe(`<${LookForm.name}/>`, () => {
         takenAt: MOCK_DRAFT_TAKEN_AT,
       },
     );
-    setup();
+    setupLookForm();
+    await openLookRow(user, LOOK_ROW.COLOUR);
 
     const restoreButton = screen.queryByRole('button', { name: /^Restore/ });
     const hueReadout = screen.getByText(hueValue(DEFAULT_ACCENT_HUE));
@@ -1450,7 +1533,7 @@ describe(`<${LookForm.name}/>`, () => {
   describe('brand images', () => {
     describe('with a picked logo', () => {
       beforeEach(async () => {
-        setup();
+        setupLookForm();
         await pickLogo(user);
       });
 
@@ -1498,7 +1581,7 @@ describe(`<${LookForm.name}/>`, () => {
               resolveUpload = resolve;
             }),
         );
-        setup();
+        setupLookForm();
         await pickAndSaveLogo(user);
       });
 
@@ -1581,7 +1664,7 @@ describe(`<${LookForm.name}/>`, () => {
         vi.mocked(uploadBrandAssetAction).mockResolvedValue({
           outcome: ACTION_OUTCOME.SERVER_ERROR,
         });
-        setup();
+        setupLookForm();
       });
 
       it('fails the save on the logo picker and keeps the draft', async () => {
@@ -1594,13 +1677,15 @@ describe(`<${LookForm.name}/>`, () => {
         await waitFor(() => {
           expect(replaceLogoButton).toHaveFocus();
         });
-        const hueReadout = screen.getByText(hueValue(NUDGED_ACCENT_HUE));
         const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
         expect(replaceLogoButton).toHaveAccessibleDescription(
           `${BRAND_IMAGES_HINT} ${LOGO_UPLOAD_FAILED}`,
         );
         expect(saveButton).toBeEnabled();
         expect(updateLookAction).not.toHaveBeenCalled();
+
+        await openLookRow(user, LOOK_ROW.COLOUR);
+        const hueReadout = screen.getByText(hueValue(NUDGED_ACCENT_HUE));
         expect(hueReadout).toBeVisible();
       });
 
@@ -1648,7 +1733,7 @@ describe(`<${LookForm.name}/>`, () => {
         reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
         values: { limit: MOCK_UPLOAD_LIMIT },
       });
-      setup();
+      setupLookForm();
 
       await pickAndSaveLogo(user);
 
@@ -1663,7 +1748,7 @@ describe(`<${LookForm.name}/>`, () => {
       vi.mocked(clearBrandAssetAction).mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
-      setup({
+      setupLookForm({
         initialValues: {
           ...defaultLookFormValues(),
           favicon: { url: MOCK_LOGO_URL },
@@ -1685,13 +1770,14 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('restores a draft without its staged logo and asks to pick it again', async () => {
-      const { unmount } = setup();
+      const { unmount } = setupLookForm();
       await chooseEditorial(user);
       await pickLogo(user);
       unmount();
 
-      setup();
+      setupLookForm();
       await clickRestoreChanges(user);
+      await openLookRow(user, LOOK_ROW.BRAND);
 
       const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
       const uploadLogoButton = screen.getByRole('button', {
