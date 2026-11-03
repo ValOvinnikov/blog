@@ -175,9 +175,11 @@ unless the user asks.
 6. The nearest sibling to model on (step 1), as a path. The agent mirrors its
    structure and naming; copying more than a few lines out of it means a
    shared helper to extract (→ `CLAUDE.md` "Reuse before you create"), and the
-   report says so. **State in the brief that the sibling's comments are not
-   part of the model** — its doc block is drift to leave behind, or the agent
-   writes one more `XModule — fetches module_x` block.
+   report says so. **State in the brief that only the sibling's structure and
+   naming are the model** — anything in it a rule forbids (a doc block, a
+   hardcoded or recomputed value, repeated test setup) is drift to leave
+   behind (→ `CLAUDE.md` "Existing code is evidence, never the standard"), or
+   the agent copies it into one more file.
 
 **The docs the PR owes are yours to write**, because `docs/**` and `SPEC.md`
 sit outside every agent's scope (→ `CLAUDE.md` "Spec sync" and "Feature
