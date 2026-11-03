@@ -26,6 +26,7 @@ const index = {
         file: 'packages/db/src/constants/tenant.ts',
       },
     ],
+    ' ': [configEntry('KEY.SPACE')],
     LIGHT: [
       {
         ref: 'PREVIEW_MODE.LIGHT',
@@ -89,6 +90,8 @@ ruleTester.run('prefer-shared-constant', rule, {
     },
     { code: "const s = 'ACTIVE';", filename: '/repo/packages/ui/src/a.ts' },
     { code: "const mode = 'LIGHT';", filename: WEB_SOURCE },
+    { code: "const id = parts.join(' ');", filename: WEB_SOURCE },
+    { code: 'const id = parts.join(` `);', filename: WEB_SOURCE },
     {
       code: "export const LINK_TYPE = { INTERNAL: 'INTERNAL' };",
       filename: '/repo/packages/config/src/constants/link.ts',
