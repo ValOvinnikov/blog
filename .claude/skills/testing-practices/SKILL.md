@@ -282,26 +282,42 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
     which wraps `SettingsFormProvider`) — never a stand-in provider written
     for one test file.
 
-- **Repeated arrangement goes in `beforeEach` — mandatory.** When two or more
-  `it`s in a `describe` open with the same line — a uniform `setup()`,
-  `userEvent.setup()`, a fake's override, a fixture build, fake timers — that
-  line moves into the `describe`'s `beforeEach`. A value the cases read
-  (`user`, a fixture) is a `let` in the `describe`, assigned in `beforeEach`;
-  anything it changes globally (fake timers, a stubbed global) is undone in
-  `afterEach`. Arrangement that repeats its shape but varies per case is one
-  named helper (`setup()`, `renderX()`), never copy-pasted. Each `it` keeps
-  only what differs: an inline `setup({ overrides })` is not repetition —
-  that is the factory's purpose. Never pair a `beforeEach` render with an
-  inline one in the same `describe` (it double-renders); a genuinely
-  different render gets its own `describe`, and a small variation is driven
-  through the shared render where possible (an outside click is
-  `fireEvent.mouseDown(document.body)`). When some cases call `setup()` bare
-  and others pass overrides, the bare ones move into a nested `describe`
-  whose `beforeEach` calls `setup()`; the override cases stay where they
-  are. A sibling's `setup({ … })` is never a reason to leave a bare
-  `setup()` repeated. **Blocking in review:** an arrangement line
-  duplicated across `it`s, and the same `render(<X …/>)` prop bag three or
-  more times in one file.
+- **Repeated arrangement goes in `beforeEach` — mandatory.** The rule is the
+  shape of a statement, never its name. When two or more `it`s in a
+  `describe` open with the same statement — the same callee with the same
+  arguments, whatever the callee is: a render or setup helper, a helper the
+  file defines, an interaction (a click, a key press, a helper that performs
+  several), a query bound to a `const`, a fake's override, a fixture build,
+  fake timers — it moves into the `describe`'s `beforeEach`. Compare runs,
+  not single lines: the longest run of statements the cases all open with
+  moves, however many statements it is; a longer run only some cases share
+  moves into a nested `describe` (below). The test is mechanical: take the
+  statement out of every case and write it once in `beforeEach`; if every
+  case still reads true, it was arrangement. A value the cases read is a
+  `let` in the `describe`, assigned in `beforeEach`; anything it changes
+  globally (fake timers, a stubbed global) is undone in `afterEach`.
+  - **A shared opening for some cases only** is a nested `describe` named for
+    that state, whose `beforeEach` holds the shared run; the other cases stay
+    where they are. Nest again for a run a subset of those share. A sibling
+    case that differs is never a reason to leave the run repeated.
+  - **What differs per case stays in the case.** A different argument (an
+    override, another tier, another device) is not repetition: it stays
+    inline, or cases that differ only in input and expected value become one
+    `it.each`. Arrangement that repeats its shape but varies its arguments is
+    one named helper, never copy-pasted.
+  - **A run repeated later in the cases** — two or more act or assert
+    statements written out in two or more `it`s — is one named helper in the
+    file.
+  - Never pair a `beforeEach` render with an inline one in the same
+    `describe` (it double-renders); a genuinely different render gets its own
+    `describe`, and a small variation is driven through the shared render
+    where possible (an outside click is `fireEvent.mouseDown(document.body)`).
+
+  **Blocking in review:** a statement or run repeated identically at the start
+  of two or more `it`s in one `describe`, whatever it calls; a run of act or
+  assert statements written out twice; and the same `render(<X …/>)` prop bag
+  three or more times in one file. That the existing file already repeats it
+  is no exemption in a file the diff touches.
 
   ```tsx
   const setup = customRender(PostShare, defaultProps);
@@ -319,7 +335,7 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   });
   ```
 
-  The mixed case, bare and override renders in one component:
+  A shared opening for some cases only:
 
   ```tsx
   describe(`<${SiteLookFields.name}/>`, () => {
