@@ -1,16 +1,16 @@
+import type { IWithClassName } from '@blog/config';
 import { Heading } from '@platform/components/shared/heading';
 import { Text } from '@platform/components/shared/text';
 import type { ReactNode } from 'react';
 
 import { pageHeaderVariants } from './page-header-variants';
 
-export type TPageHeaderProps = {
+export type TPageHeaderProps = IWithClassName & {
   title: ReactNode;
   description?: ReactNode;
   badges?: ReactNode;
   actions?: ReactNode;
   isTitleHiddenBelowLg?: boolean;
-  className?: string;
 };
 
 export const PageHeader = ({

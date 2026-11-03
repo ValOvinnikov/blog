@@ -2,6 +2,7 @@
 
 import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import type { IWithClassName } from '@blog/config';
+import type { IWithChildren } from '@blog/config/react';
 import { AccordionItem } from '@platform/components/shared/accordion/components/item/accordion-item';
 import { AccordionNote } from '@platform/components/shared/accordion/components/note/accordion-note';
 import { AccordionPanel } from '@platform/components/shared/accordion/components/panel/accordion-panel';
@@ -11,7 +12,7 @@ import {
   type TAccordionVariant,
 } from '@platform/constants/accordion';
 import type { TCompoundComponent } from '@platform/lib/react';
-import { useMemo, type ElementType, type ReactNode, type Ref } from 'react';
+import { useMemo, type ElementType, type Ref } from 'react';
 
 import { AccordionContext } from './accordion-context';
 import { accordionVariants } from './accordion-variants';
@@ -32,10 +33,10 @@ const AccordionParts = {
 } satisfies Record<string, ElementType>;
 
 type TAccordionProps<TValue extends string> = TAccordionOpenProps<TValue> &
-  IWithClassName & {
+  IWithClassName &
+  IWithChildren & {
     variant?: TAccordionVariant;
     actionsRef?: Ref<TAccordionActions<TValue>>;
-    children: ReactNode;
   };
 
 const AccordionRoot = <TValue extends string>(

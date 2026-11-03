@@ -1,6 +1,7 @@
 'use client';
 
 import { ALERT_TYPE } from '@blog/config';
+import type { IWithChildren } from '@blog/config/react';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
@@ -22,14 +23,13 @@ type TSettingsFormShellLayout = {
   hasCompactGap?: boolean;
 };
 
-export type TSettingsFormShellProps<TValues> = {
+export type TSettingsFormShellProps<TValues> = IWithChildren & {
   title: string;
   description: string;
   form: TSettingsForm<TValues>;
   errorTitle?: string;
   layout?: TSettingsFormShellLayout;
   headerActions?: ReactNode;
-  children: ReactNode;
 };
 
 const NO_INVALID_CONTROLS: TInvalidControls = { ids: [] };

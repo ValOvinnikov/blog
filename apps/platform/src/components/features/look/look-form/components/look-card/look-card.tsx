@@ -1,18 +1,18 @@
+import type { IWithChildren } from '@blog/config/react';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Accordion } from '@platform/components/shared/accordion';
 import { Text } from '@platform/components/shared/text';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookRow } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useId } from 'react';
+import { useId } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
 
-export type TLookCardProps = {
+export type TLookCardProps = IWithChildren & {
   card: TLookRow;
   title: string;
   description: string;
-  children: ReactNode;
 };
 
 export const LookCard = ({
