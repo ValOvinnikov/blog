@@ -10,6 +10,7 @@ import {
   type TSampleSiteHeaderProps,
 } from '@platform/components/features/site-preview/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -50,7 +51,7 @@ export const LookSample = ({
     <SiteThemeFrame
       theme={theme}
       className={root()}
-      testId="look-sample-tokens"
+      testId={LOOK_SAMPLE_TOKENS_TEST_ID}
     >
       <SampleSiteHeader
         brand={brand}

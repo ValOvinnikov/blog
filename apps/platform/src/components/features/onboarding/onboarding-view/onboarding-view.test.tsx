@@ -6,6 +6,7 @@ import {
   SITE_TYPE,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   ONBOARDING_SCROLL_AREA_TEST_ID,
   ONBOARDING_STEP,
@@ -534,6 +535,21 @@ describe(`<${OnboardingView.name}/>`, () => {
 
         expect(createButton).toBeVisible();
         expect(continueButton).not.toBeInTheDocument();
+      });
+
+      it('restyles the preview for the preset the user picks', async () => {
+        const before = screen
+          .getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID)
+          .getAttribute('style');
+        const consolePreset = screen.getByRole('radio', {
+          name: CONSOLE_PRESET,
+        });
+        await user.click(consolePreset);
+        const after = screen
+          .getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID)
+          .getAttribute('style');
+
+        expect(after).not.toBe(before);
       });
 
       it('keeps the accent the user moved when the site type changes', async () => {

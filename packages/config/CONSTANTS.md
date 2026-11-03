@@ -453,6 +453,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
 
+### `@platform/constants/preset-picker` — `apps/platform/src/constants/preset-picker.ts`
+
+- **PRESET_PICKER_LAYOUT**: `RESPONSIVE`, `PAIRED`
+
 ### `@platform/constants/preview` — `apps/platform/src/constants/preview.ts`
 
 - **PREVIEW_MODE**: `LIGHT`, `DARK`

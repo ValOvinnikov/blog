@@ -2,18 +2,32 @@
 
 import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
-import { FONT_CHOICE, PRESET_ID, type TPresetId } from '@blog/config';
+import {
+  FONT_CHOICE,
+  ICONS,
+  PRESET_ID,
+  type TNamedControlAria,
+  type TPresetId,
+} from '@blog/config';
+import { Icon } from '@platform/components/shared/icon';
 import { FONT_OPTIONS } from '@platform/config/fonts';
+import { ICON_SIZE } from '@platform/constants/icon';
+import {
+  PRESET_PICKER_LAYOUT,
+  type TPresetPickerLayout,
+} from '@platform/constants/preset-picker';
 import { useTranslations } from 'next-intl';
-import { useId, type AriaAttributes } from 'react';
+import { useId } from 'react';
 
+import { PresetMini } from './components/preset-mini';
 import { presetPickerVariants } from './preset-picker-variants';
 
 export type TPresetPickerProps = {
   value: TPresetId;
   onChange: (value: TPresetId) => void;
+  aria: TNamedControlAria;
   isDisabled?: boolean;
-  'aria-describedby'?: AriaAttributes['aria-describedby'];
+  layout?: TPresetPickerLayout;
 };
 
 type TPresetOption = {
@@ -25,6 +39,8 @@ type TPresetOption = {
   miniPrimaryFontFamily: string;
 };
 
+const TICK_STROKE_WIDTH = 3;
+
 /**
  * Choosing a preset re-applies every one of its `PRESET_REGISTRY` defaults —
  * the caller owns that reset, this component only reports the selection. The
@@ -34,8 +50,9 @@ type TPresetOption = {
 export const PresetPicker = ({
   value,
   onChange,
+  aria,
   isDisabled,
-  'aria-describedby': ariaDescribedBy,
+  layout = PRESET_PICKER_LAYOUT.RESPONSIVE,
 }: TPresetPickerProps) => {
   const t = useTranslations('presetPicker');
   const idBase = useId();
@@ -62,24 +79,18 @@ export const PresetPicker = ({
 
   return (
     <RadioGroup
-      aria-label={t('ariaLabel')}
-      aria-describedby={ariaDescribedBy}
+      aria-label={aria.label}
+      aria-labelledby={aria.labelledBy}
+      aria-describedby={aria.describedBy}
       value={value}
       onValueChange={(next) => onChange(next as TPresetId)}
       disabled={isDisabled}
-      className={presetPickerVariants().root()}
+      className={presetPickerVariants({ layout }).root()}
     >
       {presetOptions.map((preset) => {
         const selected = preset.value === value;
-        const {
-          card,
-          checkmark,
-          name,
-          description,
-          mini,
-          miniPrimary,
-          miniSecondary,
-        } = presetPickerVariants({ selected, preset: preset.value });
+        const { card, footer, footerText, name, description, dot } =
+          presetPickerVariants({ selected });
         const nameId = `${idBase}-${preset.value}-name`;
         const descriptionId = `${idBase}-${preset.value}-description`;
 
@@ -91,23 +102,30 @@ export const PresetPicker = ({
             aria-describedby={descriptionId}
             className={card()}
           >
-            <span className={checkmark()} aria-hidden="true">
-              ✓
-            </span>
-            <span id={nameId} className={name()}>
-              {preset.label}
-            </span>
-            <span id={descriptionId} className={description()}>
-              {preset.description}
-            </span>
-            <span className={mini()} aria-hidden="true">
-              <span
-                className={miniPrimary()}
-                style={{ fontFamily: preset.miniPrimaryFontFamily }}
-              >
-                {preset.miniPrimary}
+            <PresetMini
+              preset={preset.value}
+              title={preset.miniPrimary}
+              tagline={preset.miniSecondary}
+              titleFontFamily={preset.miniPrimaryFontFamily}
+            />
+            <span className={footer()}>
+              <span className={footerText()}>
+                <span id={nameId} className={name()}>
+                  {preset.label}
+                </span>
+                <span id={descriptionId} className={description()}>
+                  {preset.description}
+                </span>
               </span>
-              <span className={miniSecondary()}>{preset.miniSecondary}</span>
+              <span className={dot()} aria-hidden="true">
+                {selected && (
+                  <Icon
+                    name={ICONS.TICK}
+                    size={ICON_SIZE.XXS}
+                    strokeWidth={TICK_STROKE_WIDTH}
+                  />
+                )}
+              </span>
             </span>
           </Radio.Root>
         );

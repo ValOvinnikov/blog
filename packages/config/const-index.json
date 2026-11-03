@@ -5446,6 +5446,22 @@
         "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
+    "RESPONSIVE": [
+      {
+        "ref": "PRESET_PICKER_LAYOUT.RESPONSIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/preset-picker",
+        "file": "apps/platform/src/constants/preset-picker.ts"
+      }
+    ],
+    "PAIRED": [
+      {
+        "ref": "PRESET_PICKER_LAYOUT.PAIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/preset-picker",
+        "file": "apps/platform/src/constants/preset-picker.ts"
+      }
+    ],
     "MOBILE": [
       {
         "ref": "PREVIEW_WIDTH.MOBILE",

@@ -15,6 +15,7 @@ import {
   type IBusyStyle,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   SAMPLE_BUSY_BUTTON_TEST_ID,
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
@@ -62,7 +63,6 @@ const ENGLISH_CODE = LOCALE_ISO_CODES.EN.toUpperCase();
 const FRENCH_CODE = LOCALE_ISO_CODES.FR.toUpperCase();
 const MOCK_DARK_ACCENT = 'oklch(0.7 0.16 28)';
 const MOCK_LOGO_URL = faker.image.url();
-const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const TOPICS = 'Topics';
 const ALL_TOPICS = 'All topics';
@@ -146,7 +146,7 @@ describe(`<${LookSample.name}/>`, () => {
     });
 
     it('keeps the sample out of the tab order and the page outline', () => {
-      const tokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      const tokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
 
       expect(tokens).toHaveAttribute('inert');
     });

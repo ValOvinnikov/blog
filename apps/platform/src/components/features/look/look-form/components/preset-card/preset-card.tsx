@@ -13,6 +13,7 @@ export const PresetCard = () => {
   const { values, changePreset, resetToPreset, isDivergedFromPreset } =
     useLookForm();
   const t = useTranslations('lookForm');
+  const tPicker = useTranslations('presetPicker');
 
   return (
     <LookCard
@@ -38,8 +39,8 @@ export const PresetCard = () => {
       <PresetPicker
         value={values.preset}
         onChange={changePreset}
+        aria={{ label: tPicker('ariaLabel'), describedBy: archivedDescribedBy }}
         isDisabled={isArchived}
-        aria-describedby={archivedDescribedBy}
       />
     </LookCard>
   );
