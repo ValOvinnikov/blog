@@ -6,7 +6,7 @@ const domainNameVariants = tv({
   base: ['font-admin-mono font-medium'],
 });
 
-export const DomainName = ({ children }: IWithChildren) => (
+const DomainName = ({ children }: IWithChildren) => (
   <span className={domainNameVariants()}>{children}</span>
 );
 
