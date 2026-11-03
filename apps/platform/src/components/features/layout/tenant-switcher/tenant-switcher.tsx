@@ -5,10 +5,8 @@ import { ICONS } from '@blog/config';
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
-import {
-  NestableMenuRoot,
-  NestableMenuTrigger,
-} from '@platform/components/shared/nestable-menu';
+import { NestableMenuRoot } from '@platform/components/shared/nestable-menu-root';
+import { NestableMenuTrigger } from '@platform/components/shared/nestable-menu-trigger';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { Link } from '@platform/i18n/navigation';

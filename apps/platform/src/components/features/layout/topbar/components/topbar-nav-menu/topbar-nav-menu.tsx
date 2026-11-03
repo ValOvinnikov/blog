@@ -2,6 +2,7 @@
 
 import { Menu } from '@base-ui/react/menu';
 import { ICONS } from '@blog/config';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { NavItemContent } from '@platform/components/features/layout/nav-item-content';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
 import { Icon } from '@platform/components/shared/icon';
@@ -64,7 +65,7 @@ export const TopbarNavMenu = ({
                     <Menu.GroupLabel className={sectionLabel()}>
                       {navSection.label}
                     </Menu.GroupLabel>
-                    {navSection.items.length > 0
+                    {hasArrayGotItems(navSection.items)
                       ? navSection.items.map((item) => {
                           if (item.href) {
                             const isCurrent = isCurrentNavHref(

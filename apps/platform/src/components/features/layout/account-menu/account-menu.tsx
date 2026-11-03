@@ -6,10 +6,8 @@ import { useSidebarCollapse } from '@platform/components/features/layout/sidebar
 import { Avatar } from '@platform/components/shared/avatar';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
-import {
-  NestableMenuRoot,
-  NestableMenuTrigger,
-} from '@platform/components/shared/nestable-menu';
+import { NestableMenuRoot } from '@platform/components/shared/nestable-menu-root';
+import { NestableMenuTrigger } from '@platform/components/shared/nestable-menu-trigger';
 import {
   ACCOUNT_MENU_PLACEMENT,
   type TAccountMenuPlacement,

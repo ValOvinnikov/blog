@@ -101,18 +101,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     vi.mocked(usePathname).mockReset();
   });
 
-  it('renders a closed trigger by default', () => {
-    setup();
-
-    const trigger = screen.getByRole('button', {
-      name: messages.topbarNavMenu.triggerLabel,
-    });
-    const menu = screen.queryByRole('menu');
-
-    expect(trigger).toBeVisible();
-    expect(menu).not.toBeInTheDocument();
-  });
-
   it('opens the popup on click, showing items, badges and notes', async () => {
     setup({
       sections: [
@@ -195,19 +183,6 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     expect(voiceItem).toHaveFocus();
   });
 
-  it('closes the popup after clicking a link item', async () => {
-    setup();
-
-    const menu = await openMenu();
-    const link = within(menu).getByRole('menuitem', {
-      name: MOCK_LOOK_ITEM.label,
-    });
-    await user.click(link);
-
-    const closedMenu = screen.queryByRole('menu');
-    expect(closedMenu).not.toBeInTheDocument();
-  });
-
   it('renders the switcher slot above the nav sections when provided', async () => {
     setup({ switcher: <div>{MOCK_SWITCHER_TEXT}</div> });
 
@@ -220,90 +195,77 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     );
   });
 
-  it('renders no switcher slot when none is provided', async () => {
-    setup();
-
-    const menu = await openMenu();
-    const switcher = within(menu).queryByText(MOCK_SWITCHER_TEXT);
-
-    expect(switcher).not.toBeInTheDocument();
-  });
-
-  it('renders the account in the foot, after the nav sections', async () => {
-    setup();
-
-    const menu = await openMenu();
-
-    expect(menu).toHaveTextContent(
-      new RegExp(`${MOCK_SECTION.label}.*${MOCK_ACCOUNT_TEXT}$`),
-    );
-  });
-
-  it('titles a row by its label', async () => {
-    setup();
-
-    const menu = await openMenu();
-    const link = within(menu).getByRole('menuitem', {
-      name: MOCK_LOOK_ITEM.label,
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
     });
 
-    expect(link).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
+    it('renders a closed trigger', () => {
+      const menu = screen.queryByRole('menu');
+
+      expect(getMenuButton()).toBeVisible();
+      expect(menu).not.toBeInTheDocument();
+    });
+
+    describe('once opened', () => {
+      let menu: HTMLElement;
+
+      beforeEach(async () => {
+        menu = await openMenu();
+      });
+
+      it('closes the popup after clicking a link item', async () => {
+        const link = within(menu).getByRole('menuitem', {
+          name: MOCK_LOOK_ITEM.label,
+        });
+        await user.click(link);
+
+        expect(menu).not.toBeInTheDocument();
+      });
+
+      it('renders no switcher slot', () => {
+        const switcher = within(menu).queryByText(MOCK_SWITCHER_TEXT);
+
+        expect(switcher).not.toBeInTheDocument();
+      });
+
+      it('renders the account in the foot, after the nav sections', () => {
+        expect(menu).toHaveTextContent(
+          new RegExp(`${MOCK_SECTION.label}.*${MOCK_ACCOUNT_TEXT}$`),
+        );
+      });
+
+      it('titles a row by its label', () => {
+        const link = within(menu).getByRole('menuitem', {
+          name: MOCK_LOOK_ITEM.label,
+        });
+
+        expect(link).toHaveAttribute('title', MOCK_LOOK_ITEM.label);
+      });
+    });
   });
 
   describe('with the switcher and the account pinned', () => {
-    it('highlights the switcher first by arrow key', async () => {
-      setupPinned();
+    let menu: HTMLElement;
 
-      const menu = await openMenu();
+    beforeEach(async () => {
+      setupPinned();
+      menu = await openMenu();
+    });
+
+    it('highlights the switcher first by arrow key', async () => {
       await user.keyboard(ARROW_DOWN);
 
       expect(getSwitcherTrigger(menu)).toHaveFocus();
     });
 
     it('reaches the account after the rows by arrow keys', async () => {
-      setupPinned();
-
-      const menu = await openMenu();
       await user.keyboard(ARROW_DOWN_TO_ACCOUNT);
 
       expect(getAccountTrigger(menu)).toHaveFocus();
     });
 
-    it('opens the account menu above the Menu on Enter and closes only it on Escape', async () => {
-      setupPinned();
-
-      const menu = await openMenu();
-      const accountTrigger = getAccountTrigger(menu);
-      await user.keyboard(ARROW_DOWN_TO_ACCOUNT);
-      await user.keyboard(ENTER);
-      const accountMenu = await screen.findByRole('menu', {
-        name: messages.account.menuLabel,
-      });
-      await user.keyboard(ESCAPE);
-
-      await waitFor(() => expect(accountMenu).not.toBeInTheDocument());
-      expect(menu).toBeVisible();
-      expect(accountTrigger).toHaveFocus();
-    });
-
-    it('closes the Menu onto its button on a second Escape', async () => {
-      setupPinned();
-
-      const menu = await openMenu();
-      await user.keyboard(ARROW_DOWN_TO_ACCOUNT);
-      await user.keyboard(ENTER);
-      await screen.findByRole('menu', { name: messages.account.menuLabel });
-      await user.keyboard(ESCAPE);
-      await user.keyboard(ESCAPE);
-
-      await waitFor(() => expect(menu).not.toBeInTheDocument());
-      expect(getMenuButton()).toHaveFocus();
-    });
-
     it('closes both menus when a workspace is chosen', async () => {
-      setupPinned();
-
-      const menu = await openMenu();
       await user.click(getSwitcherTrigger(menu));
       const otherTenant = await screen.findByRole('menuitem', {
         name: new RegExp(MOCK_OTHER_TENANT.name),
@@ -312,6 +274,34 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
       await waitFor(() => expect(menu).not.toBeInTheDocument());
       expect(otherTenant).not.toBeInTheDocument();
+    });
+
+    describe('with the account menu opened by Enter', () => {
+      let accountMenu: HTMLElement;
+
+      beforeEach(async () => {
+        await user.keyboard(ARROW_DOWN_TO_ACCOUNT);
+        await user.keyboard(ENTER);
+        accountMenu = await screen.findByRole('menu', {
+          name: messages.account.menuLabel,
+        });
+      });
+
+      it('keeps the Menu open and closes only the account menu on Escape', async () => {
+        await user.keyboard(ESCAPE);
+
+        await waitFor(() => expect(accountMenu).not.toBeInTheDocument());
+        expect(menu).toBeVisible();
+        expect(getAccountTrigger(menu)).toHaveFocus();
+      });
+
+      it('closes the Menu onto its button on a second Escape', async () => {
+        await user.keyboard(ESCAPE);
+        await user.keyboard(ESCAPE);
+
+        await waitFor(() => expect(menu).not.toBeInTheDocument());
+        expect(getMenuButton()).toHaveFocus();
+      });
     });
   });
 });

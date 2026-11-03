@@ -293,7 +293,7 @@ switches the content column to full-bleed (see
   in its expanded form. The Menu wraps both pinned zones in
   `NestedMenuProvider` (`context/nested-menu-provider/`), so `TenantSwitcher`
   and `AccountMenu` open through `NestableMenuRoot`/`NestableMenuTrigger`
-  (`components/shared/nestable-menu/`) as Base UI submenus: their triggers
+  (`components/shared/nestable-menu-root/` and `nestable-menu-trigger/`) as Base UI submenus: their triggers
   are menu items in the Menu's arrow-key order (switcher, rows, account) on a
   `side-field` ground with a `side-field-line` border, a `popover-hover`
   hover, a `side-accent` border while open and the popover-gapped ring. The

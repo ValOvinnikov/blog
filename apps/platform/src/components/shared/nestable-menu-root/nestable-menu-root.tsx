@@ -4,8 +4,6 @@ import { Menu } from '@base-ui/react/menu';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import type { ReactNode } from 'react';
 
-import { nestableMenuVariants } from './nestable-menu-variants';
-
 type TNestableMenuRootProps = {
   onOpenChangeComplete?: (isOpen: boolean) => void;
   children: ReactNode;
@@ -25,28 +23,3 @@ export const NestableMenuRoot = ({
       {children}
     </Menu.Root>
   );
-
-type TNestableMenuTriggerProps = {
-  className: string;
-  title?: string;
-  'aria-label'?: string;
-  children: ReactNode;
-};
-
-export const NestableMenuTrigger = ({
-  className,
-  ...props
-}: TNestableMenuTriggerProps) => {
-  const isNested = useIsNestedMenu();
-  const { trigger } = nestableMenuVariants({ isNested });
-
-  return isNested ? (
-    <Menu.SubmenuTrigger
-      {...props}
-      openOnHover={false}
-      className={trigger({ class: className })}
-    />
-  ) : (
-    <Menu.Trigger {...props} className={trigger({ class: className })} />
-  );
-};
