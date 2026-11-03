@@ -1,4 +1,1 @@
-export {
-  ReaderSignInPanel,
-  type TReaderSignInPanelProps,
-} from './reader-sign-in-panel';
+export { ReaderSignInPanel } from './reader-sign-in-panel';
