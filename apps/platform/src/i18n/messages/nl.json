@@ -185,7 +185,12 @@
     "menuLabel": "Account",
     "triggerCollapsedLabel": "Account: {name}, {email}",
     "triggerCollapsedLabelNoName": "Account: {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Thema",
+    "themeLight": "Licht",
+    "themeDark": "Donker",
+    "themeSystem": "Systeem",
+    "themeSystemHint": "Systeem volgt de instelling van je apparaat."
   },
   "roleLabel": {
     "SUPERADMIN": "Superbeheerder",
@@ -649,6 +654,11 @@
     "headerDescription": "Hoe de bovenbalk van uw site is ingedeeld en hoe de submenu’s openen.",
     "headerLayoutLabel": "Indeling",
     "headerLayoutDescription": "Waar logo, links en knoppen op brede schermen staan. Op telefoons krijgt u altijd de balk met een menuknop.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "De voorbeeldweergave staat op Telefoon, dus die toont de balk met een menuknop.",
+      "TABLET": "De voorbeeldweergave staat op Tablet, dus die toont de balk met een menuknop."
+    },
+    "headerShowOnDesktop": "Toon op Desktop",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Klassiek",
       "LINKS_BESIDE_BRAND": "Links naast het merk",
@@ -762,20 +772,19 @@
   },
   "lookPreview": {
     "sampleHeading": "De getijdentabellen lezen",
-    "samplePara": "Een kort bericht om kop- en tekstletter, accent, logotinten en afronding samen te tonen.",
+    "samplePara": "Een kort bericht over het lezen van het water voordat je uitvaart, en wat de kaarten verzwijgen.",
     "subscribeButton": "Abonneren",
     "readMoreButton": "Lees meer",
     "readTimeChip": "4 min lezen",
     "busyButtonIdle": "Bericht versturen",
     "busyButtonLabel": "Verzenden…",
     "firstCardTitle": "Notities uit de haven",
-    "firstCardExcerpt": "Een gelinkte kaart, zoals berichtenlijsten hem tonen.",
+    "firstCardExcerpt": "Wat het springtij achterlaat op de noordkade.",
     "secondCardTitle": "Koers naar het volgende seizoen",
-    "secondCardExcerpt": "Een statische kaart. De omlijsting volgt uw kaartstijl.",
-    "previewNote": "Gebouwd met de eigen componenten van de site. Niets is live totdat u opslaat.",
-    "widthDesktop": "Desktop",
-    "widthMobile": "Mobiel",
-    "previewWidthAriaLabel": "Breedte voorbeeld",
+    "secondCardExcerpt": "Waar de boten heen gaan als de haven 's winters sluit.",
+    "latestPostsHeading": "Nieuwste berichten",
+    "firstCardDate": "12 okt 2026",
+    "secondCardDate": "28 sep 2026",
     "navPosts": "Berichten",
     "navAbout": "Over",
     "navTopics": "Onderwerpen",
@@ -790,6 +799,8 @@
     "readerStateAriaLabel": "Lezer",
     "readerSignedOut": "Uitgelogd",
     "readerSignedIn": "Ingelogd",
+    "readerSignedInTooltip": "Ingelogd als {name}",
+    "readerAccountsOff": "Lezersaccounts staan uit voor deze site, dus er is geen lezersschakelaar.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Account",
     "accountMenuAriaLabel": "Accountmenu",
@@ -820,6 +831,8 @@
   },
   "assetUploadField": {
     "remove": "Verwijderen",
+    "upload": "Uploaden",
+    "replace": "Vervangen",
     "logo": {
       "currentAlt": "Huidig logo",
       "upload": "Logo uploaden",
@@ -1446,6 +1459,7 @@
     "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
     "goToFirstField": "Naar het eerste veld",
     "notSaved": "Niet opgeslagen",
+    "notInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} GROWTH {Growth} other {huidige}}, dat {items} niet bevat. Er is niets opgeslagen.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Verwerpen",
     "save": "Wijzigingen opslaan",
@@ -1798,5 +1812,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— onderdeel van het Growth-abonnement"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Open je dashboard",
+    "GROWTH": {
+      "subject": "Je site staat nu op het Growth-plan",
+      "previewText": "{siteName} kan nu alle Growth-opties gebruiken.",
+      "changed": "{siteName} staat nu op het Growth-plan.",
+      "options": "De Growth-opties zijn nu beschikbaar op je site: meer talen, alle instellingen voor Uiterlijk, extra paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
+      "kept": "Als je Growth eerder hebt gebruikt, zijn je eerdere keuzes terug zoals je ze achterliet."
+    },
+    "FREE": {
+      "subject": "Je site staat nu op het Free-plan",
+      "previewText": "De Growth-opties staan uit op {siteName}.",
+      "changed": "{siteName} staat nu op het Free-plan.",
+      "options": "De Growth-opties staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, Growth-paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
+      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar Growth."
+    }
   }
 }

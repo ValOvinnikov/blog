@@ -3,6 +3,7 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_BAR_STYLE,
@@ -19,7 +20,10 @@ import {
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
   SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
 } from '@platform/constants/sample-busy';
-import { SAMPLE_FOOTER_TEST_ID } from '@platform/constants/sample-footer';
+import {
+  SAMPLE_FOOTER_PART_TEST_ID,
+  SAMPLE_FOOTER_TEST_ID,
+} from '@platform/constants/sample-footer';
 import {
   SAMPLE_HEADER_BAR_STYLE_ATTRIBUTE,
   SAMPLE_HEADER_BAR_TEST_ID,
@@ -29,6 +33,10 @@ import {
   SAMPLE_SUBMENU_STYLE_ATTRIBUTE,
   SAMPLE_SUBMENU_TEST_ID,
 } from '@platform/constants/sample-header';
+import {
+  SAMPLE_PART,
+  SAMPLE_PART_ATTRIBUTE,
+} from '@platform/constants/sample-part';
 import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
@@ -66,6 +74,11 @@ const {
   signOut: SIGN_OUT,
   footerArchive: ARCHIVE,
   footerCookieSettings: COOKIE_SETTINGS,
+  sampleHeading: SAMPLE_HEADING,
+  latestPostsHeading: LATEST_POSTS,
+  readTimeChip: READ_TIME,
+  firstCardDate: FIRST_CARD_DATE,
+  secondCardDate: SECOND_CARD_DATE,
 } = messages.lookPreview;
 
 const MOCK_BUSY: IBusyStyle = {
@@ -77,6 +90,7 @@ const MOCK_FOOTER: TSampleFooterStyle = {
   layout: FOOTER_LAYOUT.COLUMNS,
   tone: BRAND_VARIANT.BRAND_PRIMARY,
   surface: FOOTER_SURFACE.FULL_WIDTH,
+  cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
 };
 
 const setup = customRender(LookSample, {
@@ -137,15 +151,27 @@ describe(`<${LookSample.name}/>`, () => {
       expect(tokens).toHaveAttribute('inert');
     });
 
-    it('renders one linked and one static item card and no Newsletter panel', () => {
-      const linkedCard = screen.getByRole('link', {
+    it('opens the page with the sample heading as its h1', () => {
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: SAMPLE_HEADING,
+      });
+
+      expect(heading).toBeVisible();
+    });
+
+    it('lists one linked and one static post under Latest posts and no Newsletter panel', () => {
+      const latestPosts = within(
+        screen.getByRole('region', { name: LATEST_POSTS }),
+      );
+      const linkedCard = latestPosts.getByRole('link', {
         name: 'Notes from the harbour',
       });
-      const staticCardHeading = screen.getByRole('heading', {
-        level: 4,
+      const staticCardHeading = latestPosts.getByRole('heading', {
+        level: 3,
         name: CHARTING_THE_NEXT_SEASON,
       });
-      const staticCardLink = screen.queryByRole('link', {
+      const staticCardLink = latestPosts.queryByRole('link', {
         name: CHARTING_THE_NEXT_SEASON,
       });
       const newsletterHeading = screen.queryByRole('heading', {
@@ -156,6 +182,33 @@ describe(`<${LookSample.name}/>`, () => {
       expect(staticCardHeading).toBeVisible();
       expect(staticCardLink).not.toBeInTheDocument();
       expect(newsletterHeading).not.toBeInTheDocument();
+    });
+
+    it('dates each post and gives its reading time, with no reading time elsewhere', () => {
+      const latestPosts = screen.getByRole('region', { name: LATEST_POSTS });
+      const posts = within(latestPosts).getAllByRole('article');
+      const readTimes = screen.getAllByText(READ_TIME);
+
+      expect(posts).toHaveLength(2);
+      expect(posts[0]).toHaveTextContent(FIRST_CARD_DATE);
+      expect(posts[1]).toHaveTextContent(SECOND_CARD_DATE);
+      expect(readTimes).toHaveLength(2);
+      readTimes.forEach((readTime) => {
+        expect(latestPosts).toContainElement(readTime);
+      });
+    });
+
+    it('marks the header and the footer as sample parts', () => {
+      const header = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
+      const footerPart = screen.getByTestId(SAMPLE_FOOTER_PART_TEST_ID);
+      const footer = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
+
+      expect(header).toHaveAttribute(SAMPLE_PART_ATTRIBUTE, SAMPLE_PART.HEADER);
+      expect(footerPart).toHaveAttribute(
+        SAMPLE_PART_ATTRIBUTE,
+        SAMPLE_PART.FOOTER,
+      );
+      expect(footerPart).toContainElement(footer);
     });
 
     it('opens with a header carrying the brand and two nav links', () => {
@@ -372,6 +425,17 @@ describe(`<${LookSample.name}/>`, () => {
     expect(languageMenu).toHaveTextContent(ENGLISH_CODE);
   });
 
+  it('keeps the switcher with one live language when told to', () => {
+    setup({
+      liveLocales: [LOCALE_ISO_CODES.EN],
+      shouldAlwaysShowLanguageSwitcher: true,
+    });
+
+    const current = screen.getByTestId(CURRENT_LANGUAGE_TEST_ID);
+
+    expect(current).toHaveTextContent(ENGLISH);
+  });
+
   it('shows no switcher with one live language', () => {
     setupWithHeader(
       { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE },
@@ -422,7 +486,7 @@ describe(`<${LookSample.name}/>`, () => {
     });
   });
 
-  describe('footer', () => {
+  describe('the footer', () => {
     describe('with the default layout', () => {
       beforeEach(() => {
         setup();

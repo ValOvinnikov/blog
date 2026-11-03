@@ -13,6 +13,8 @@ code:
   - apps/platform/src/utils/settings-features-fields/**
   - apps/platform/src/server/settings-features/**
   - apps/platform/src/server/tenant-pages/**
+  - apps/platform/src/server/tenants/notify-owner-of-plan-change.ts
+  - packages/email/src/templates/owner/owner-plan-change/**
   - apps/platform/src/components/features/capabilities/**
   - apps/web/src/server/settings-features/**
   - apps/web/src/utils/to-effective-settings-features/**
@@ -34,6 +36,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 ## Surfaces and routes
 
 - **Platform, operator** — the plan picker in the Add tenant form and the tenant details panel; the plan shows in the tenants table and on the owner's home card.
+- **Owner email** — a saved plan change emails the owner once (see Configuration).
 - **Platform, Features page** — `/dashboard/features` (owner) and `/tenants/{id}/features` (operator). Seven capability rows: a "Coming soon" row has no switch, and a row outside the plan is locked with a "Growth plan" badge.
 - **Platform, plan-gated pages** — `/dashboard/languages` and `/dashboard/email` answer 404 when the plan does not open them. Subscribers, Comments and Team are sidebar entries with a "Coming soon" badge and no page.
 - **Public site** — no route of its own. It gates `/bookmarks` (404 with no reader-account capability) and `/account` (404 there only to a signed-out visitor), the header account menu, the bookmark button, the newsletter module and its server action, Vercel Analytics and Speed Insights, and the consent banner. A page renders only the module types its tenant's plan entitles.
@@ -53,6 +56,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 ## Configuration
 
 - **Operator** (any `admins` row) sets the plan through `createTenantAction` and `updateTenantDetailsAction`, both behind `requireAdmin`. The plan stays editable in the tenant details panel once provisioning has succeeded, and locks only while provisioning is running and on an archived tenant. A change applies on the site's next page load and deletes no stored data; a downgrade only hides what the new plan does not hold.
+- **Plan change email** — when `updateTenantDetailsAction` saves a plan that differs from the stored one, `notifyOwnerOfPlanChange(tenantId, fromPlan, toPlan)` runs in `after()`, once the response has gone, and emails the owner through `@blog/email`'s `buildOwnerPlanChangeEmail`: the upgrade or downgrade notice, with an "Open your dashboard" button to the tenant's dashboard. The copy is fixed platform copy (never Voice), in the `ownerPlanChangeEmail` namespace of the platform's message catalogues, written in the site's default language (`tenants.locale`). It goes to `getTenantOwnerEmail`, which is the pending owner-invite address until the owner joins, from `OWNER_EMAIL_FROM_ADDRESS`. With no sender address or `PLATFORM_APP_BASE_URL` it is skipped and logged (`tenants.plan_change_email_unconfigured`); with no owner address too (`tenants.plan_change_email_owner_missing`). A failed send is logged (`tenants.plan_change_email_failed`) and never fails or undoes the save.
 - **Owner or operator** saves Features through `updateFeaturesAction`, behind `requireTenantMembership` (any member; an operator gets a virtual owner membership).
 - **Coming soon** — `COMMENTS`, `RATINGS` and `NEWSLETTER` carry `isComingSoon` in `CAPABILITY_TOGGLES`: shown with a "Coming soon" badge and no switch, and the save writes them off whatever the payload says. An owner can switch `BOOKMARKS`, `ANALYTICS`, `CONSENT_BANNER` and `CONTACT_FORM` on `GROWTH`, and only `CONSENT_BANNER` on `FREE`.
 - **Plan page access** (`planPageAccess`) — Languages when `PLAN_LOCALE_LIMIT` > 1; Email when the plan holds bookmarks, comments or newsletter; Subscribers with newsletter; Comments with comments; Team on any plan but `FREE`. The owner's sidebar omits the rest and their pages 404; the operator's `/tenants/{id}` view shows every entry and page whatever the plan.
@@ -65,9 +69,10 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 - Most restrictive wins: `isCapabilityEnabled` is `PLAN_REGISTRY[plan].includes(capability) && toggle`. Every failure path returns `false`. A fetch error also logs (`settings_features.plan_fetch_failed` or `effective_fetch_failed`); a missing tenant or plan does not. A render site omits the capability silently, never with a placeholder.
 - Modules on the site: when the plan can't be read, only `CORE` modules render and `module_renderer.plan_fetch_failed` is logged; a missing plan also falls back to `CORE` without a log. Nothing in the module path reads request headers, so ISR pages stay static.
-- The server re-checks entitlement: `updateFeaturesAction` rejects the whole save, logging `settings_features.plan_entitlement_rejected`, when any toggle that is not coming soon is on outside the plan. A disabled switch is never the gate.
-- A downgrade deletes nothing. Toggles are clamped on read: on the site, in Studio (`getEnabledCapabilities`) and in the Features page's initial values. Saving that page never writes an out-of-plan toggle: `updateFeaturesAction` keeps its stored value, so an upgrade brings back what was on. Switching one on is still refused.
-- Look: `toEffectiveLook` (`@blog/db/utils/effective-look/effective-look`, client-safe) gives each field outside the plan its preset's value, in the platform's form and preview and in `apps/web`'s `getSiteConfig`; `updateLookAction` writes only the fields the plan includes (`pickEntitledLook`), so a downgrade keeps the stored choices and an upgrade shows them again.
+- The server re-checks entitlement on every plan-gated save, and a disabled control is never the gate. Look (`updateLookAction`), Features (`updateFeaturesAction`) and Languages (`updateTenantLanguagesAction`) refuse a save only when it changes something the current plan does not include: a value different from both the stored one and the preset value the plan shows instead. An out-of-plan value still as stored never blocks a save, so a page opened before a downgrade can still save its allowed fields. A refused save writes nothing and returns one shape, `toNotInPlanRefusal` (`apps/platform/src/utils/plan-refusal/`): `REFUSED` with `SETTINGS_REFUSAL.NOT_IN_PLAN`, the tenant's current `plan` and the refused fields or languages. A later plan-gated action adopts it by returning that helper. Features logs the refusal as `settings_features.plan_entitlement_rejected`, Languages as its `UPDATE_LANGUAGES_REJECTED` event.
+- The platform tells the owner at save time and nowhere else, with no polling or refresh on focus. `useSettingsForm` handles a `NOT_IN_PLAN` refusal for every settings page: it shows "Your site is on the {plan} plan, which doesn't include {items}, so nothing was saved." (`saveBar.notInPlan`), labelling each item from the page's draft fields, and puts the refused items back to their saved values while keeping every other edit. When the refusal's plan differs from the one `TenantPlanProvider` (`useTenantPlan`, mounted in the owner's and the operator's tenant layouts) rendered the page with, it calls `router.refresh()` once, so every lock on the page updates together.
+- A downgrade deletes nothing. Toggles are clamped on read: on the site, in Studio (`getEnabledCapabilities`) and in the Features page's initial values. Saving that page never writes an out-of-plan toggle: `updateFeaturesAction` keeps its stored value, so an upgrade brings back what was on. Switching on one that is stored off is refused.
+- Look: `toEffectiveLook` (`@blog/db/utils/effective-look/effective-look`, client-safe) gives each field outside the plan its preset's value, in the platform's form and preview and in `apps/web`'s `getSiteConfig`; `updateLookAction` refuses a change to a field outside the plan (`listRefusedLookFields`) and otherwise writes only the fields the plan includes (`pickEntitledLook`), so a downgrade keeps the stored choices and an upgrade shows them again.
 - Languages: the live set is the default plus the first `limit − 1` stored additional languages. `setTenantAdditionalLocales` refuses to add a locale past the limit (`DB_LOCALE_LIMIT_EXCEEDED`) but lets a downgraded tenant keep or reorder its stored ones.
 - A reader account exists only while bookmarks, comments or newsletter is enabled, so a `FREE` site has none.
 - Saving a tenant's details (plan, default language, domain) or its additional languages calls the revalidation route, so the site serves the change on its next load. A failed call is logged and does not fail the save; the site then catches up within 3600s.
@@ -93,6 +98,10 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `apps/platform/src/server/tenant-pages/render-tenant-scoped-page.ts`
 - `apps/platform/src/utils/settings-features-fields/settings-features-fields.ts`
 - `apps/platform/src/server/settings-features/update-features-action.ts`
+- `apps/platform/src/server/tenants/notify-owner-of-plan-change.ts` — the owner's plan change email
+- `apps/platform/src/utils/plan-refusal/plan-refusal.ts` — `toNotInPlanRefusal`, `isNotInPlanRefusal`
+- `apps/platform/src/context/tenant-plan-provider/tenant-plan-provider.tsx` — `TenantPlanProvider`, `useTenantPlan`
+- `apps/platform/src/components/shared/settings-form-shell/use-plan-refusal.ts`
 - `apps/platform/src/server/settings-features/get-enabled-capabilities.ts`
 - `apps/platform/src/components/features/studio/studio-mount-view/studio-mount-view.tsx` — passes the plan's `modulePacks` to `StudioMount`
 - `apps/platform/src/utils/nav-sections/nav-sections.ts`
@@ -107,10 +116,11 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 ## Tests and stories
 
-- Platform: `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`, and `studio-mount-view.test.tsx`.
+- Platform: `notify-owner-of-plan-change.test.ts`, `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`, and `studio-mount-view.test.tsx`.
 - Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`, `module-renderer.test.tsx`.
 - db: `packages/db/src/queries/settings-features/**/*.test.ts`, `get-tenant-live-locales.test.ts`, `set-tenant-additional-locales.test.ts`.
 - Config: `module-pack.test.ts`.
+- Email: `owner-plan-change.test.ts`.
 - Studio: `get-missing-requirement.test.ts`, `mark-requirement-off-types.test.ts`, `entitlement-gates.test.ts`, `validate-modules-entitled.test.ts`, `entitled-module.test.ts`.
 - No Storybook stories; the platform has none.
 

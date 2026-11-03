@@ -25,6 +25,7 @@ import { useLookOpenRows } from './use-look-open-rows';
 export type TLookFormProps = {
   tenantId: string;
   tenantName: string;
+  siteHost: string;
   initialValues: TLookFormValues;
   plan: TTenantPlan;
   liveLocales: readonly TLocaleIsoCode[];
@@ -43,6 +44,7 @@ const SHELL_LAYOUT = {
 export const LookForm = ({
   tenantId,
   tenantName,
+  siteHost,
   initialValues,
   plan,
   liveLocales,
@@ -113,6 +115,7 @@ export const LookForm = ({
               <LookPreview
                 liveLocales={liveLocales}
                 hasReaderAccounts={hasReaderAccounts}
+                siteHost={siteHost}
               />
             </div>
           </div>

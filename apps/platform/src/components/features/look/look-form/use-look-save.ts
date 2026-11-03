@@ -88,7 +88,7 @@ export const useLookSave = ({
         savedImages[kind] = result.data;
       }
 
-      const { outcome } = await updateLookAction(tenantId, {
+      const result = await updateLookAction(tenantId, {
         preset: vals.preset,
         accentHue: vals.accentHue,
         logoHue: vals.logoHue ?? null,
@@ -112,7 +112,8 @@ export const useLookSave = ({
         cookieSettingsButton: vals.cookieSettingsButton,
         languageSwitcherStyle: vals.languageSwitcherStyle,
       });
-      return finish(outcome);
+      finish(result.outcome);
+      return result;
     },
   });
 

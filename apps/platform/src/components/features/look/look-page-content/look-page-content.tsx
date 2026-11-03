@@ -21,6 +21,7 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
     <LookForm
       tenantId={tenant.id}
       tenantName={tenant.name}
+      siteHost={tenant.primaryDomain}
       initialValues={toEffectiveLook(
         lookFormValuesOrDefaults(siteConfig),
         tenant.plan,

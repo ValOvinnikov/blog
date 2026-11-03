@@ -426,7 +426,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/look-layout` — `apps/platform/src/constants/look-layout.ts`
 
-- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`
+- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `PREVIEW_BOTTOM_ROOM`=`80`
+
+### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
+
+- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`
 
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 
@@ -478,6 +482,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **REQUEST_LOG**: `UNHANDLED_ERROR`=`"request.unhandled_error"`
 
+### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
+
+- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`
+
 ### `@platform/constants/settings-features` — `apps/platform/src/constants/settings-features.ts`
 
 - **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`
@@ -516,7 +524,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
 - **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `PLATFORM_TENANT`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`
 - **TENANT_FIELD_LOCK_KIND**: `STEP`, `RUNNING`, `SUCCEEDED`, `ARCHIVED`, `CUSTOM_MAIN_DOMAIN`
-- **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `PLATFORM_TENANT_REFUSED`=`"tenants.platform_tenant_refused"`, `ROOT_DOMAIN_MISSING`=`"tenants.root_domain_missing"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
+- **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `PLAN_CHANGE_EMAIL_FAILED`=`"tenants.plan_change_email_failed"`, `PLAN_CHANGE_EMAIL_OWNER_MISSING`=`"tenants.plan_change_email_owner_missing"`, `PLAN_CHANGE_EMAIL_UNCONFIGURED`=`"tenants.plan_change_email_unconfigured"`, `PLATFORM_TENANT_REFUSED`=`"tenants.platform_tenant_refused"`, `ROOT_DOMAIN_MISSING`=`"tenants.root_domain_missing"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
 - **TENANT_VISIBILITY**: `ACTIVE`, `ALL`
 
 ### `@platform/constants/theme` — `apps/platform/src/constants/theme.ts`

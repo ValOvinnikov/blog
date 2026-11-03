@@ -117,7 +117,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
       expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(presetRadius).toBeDisabled();
-      expect(sampleTokens).not.toHaveStyle({ '--radius-md': '12px' });
+      expect(sampleTokens).not.toHaveStyle({ '--radius-md': '16px' });
     });
 
     it('shows and previews the stored radius on Growth', async () => {
@@ -129,7 +129,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
       expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(storedRadius).toBeEnabled();
-      expect(sampleTokens).toHaveStyle({ '--radius-md': '12px' });
+      expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
     });
   });
 

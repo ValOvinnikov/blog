@@ -13,7 +13,6 @@ export const lookFormVariants = tv({
     previewPanel: [
       'min-w-0 @min-[900px]:flex-1',
       '@min-[900px]:sticky @min-[900px]:top-admin-topbar @min-[900px]:-m-1 @min-[900px]:self-start @min-[900px]:p-1',
-      '@min-[900px]:max-h-[calc(100dvh-var(--admin-topbar)-80px)] @min-[900px]:overflow-y-auto @min-[900px]:overscroll-contain',
     ],
   },
   variants: {

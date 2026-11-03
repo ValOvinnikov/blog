@@ -1,5 +1,6 @@
 import type {
   TBrandVariant,
+  TCookieSettingsButton,
   TFooterLayout,
   TFooterSurface,
 } from '@blog/config';
@@ -9,17 +10,20 @@ export type TSampleFooterStyle = {
   layout: TFooterLayout;
   tone: TBrandVariant;
   surface: TFooterSurface;
+  cookieSettingsButton: TCookieSettingsButton;
 };
 
 export const toSampleFooterStyle = ({
   footerLayout,
   footerBackground,
   footerSurface,
+  cookieSettingsButton,
 }: Pick<
   TLookFormValues,
-  'footerLayout' | 'footerBackground' | 'footerSurface'
+  'footerLayout' | 'footerBackground' | 'footerSurface' | 'cookieSettingsButton'
 >): TSampleFooterStyle => ({
   layout: footerLayout,
   tone: footerBackground,
   surface: footerSurface,
+  cookieSettingsButton,
 });

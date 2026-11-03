@@ -12,9 +12,11 @@ import { useLookFieldLock } from '@platform/components/features/look/look-form/u
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
+import { PreviewDeviceNote } from './components/preview-device-note/preview-device-note';
 import { useSubmenuPreview } from './use-submenu-preview';
 
 export const HeaderCard = () => {
@@ -40,7 +42,7 @@ export const HeaderCard = () => {
 
   return (
     <LookCard
-      card="header"
+      card={SAMPLE_PART.HEADER}
       title={t('headerHeading')}
       description={t('headerDescription')}
     >
@@ -57,6 +59,8 @@ export const HeaderCard = () => {
           isDisabled={layoutLock.isDisabled}
         />
       </LookField>
+
+      <PreviewDeviceNote />
 
       <div {...triggerProps}>
         <LookField

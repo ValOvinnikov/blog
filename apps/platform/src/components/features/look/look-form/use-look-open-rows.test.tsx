@@ -29,6 +29,7 @@ import {
   REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
 import {
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
@@ -77,6 +78,7 @@ const ROW_TITLES = [
 const setup = customRender(LookForm, {
   tenantId: MOCK_TENANT_ID,
   tenantName: MOCK_TENANT_NAME,
+  siteHost: MOCK_TENANT_DOMAIN,
   initialValues: defaultLookFormValues(),
   plan: TENANT_PLAN.GROWTH,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],

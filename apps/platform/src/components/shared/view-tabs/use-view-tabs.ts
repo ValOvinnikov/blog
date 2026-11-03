@@ -1,3 +1,4 @@
+import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useId, useState } from 'react';
 
@@ -9,7 +10,7 @@ export const useViewTabs = ({ isTabbed }: { isTabbed?: boolean } = {}) => {
     preview: { tab: useId(), panel: useId() },
   };
   const [view, setView] = useState<TView>('edit');
-  const isBelowLg = !useMediaQuery('(width >= 64rem)');
+  const isBelowLg = !useMediaQuery(MEDIA_QUERY.LG_UP);
   const hasTabPanels = isTabbed ?? isBelowLg;
 
   const panelProps = (panel: TView) => ({

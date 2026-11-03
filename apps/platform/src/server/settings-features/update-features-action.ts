@@ -9,10 +9,7 @@ import {
 import { PLAN_REGISTRY, queries } from '@blog/db';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
-import {
-  SETTINGS_REFUSAL,
-  type TSettingsRefusal,
-} from '@platform/constants/settings';
+import type { TSettingsRefusal } from '@platform/constants/settings';
 import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -21,8 +18,12 @@ import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-si
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
-  CAPABILITY_TOGGLES,
+  toNotInPlanRefusal,
+  type TNotInPlanRefusal,
+} from '@platform/utils/plan-refusal/plan-refusal';
+import {
   keepStoredOutOfPlan,
+  listSwitchedOnOutOfPlan,
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { z } from 'zod';
@@ -38,17 +39,20 @@ const updateFeaturesInputSchema = z.object({
 });
 
 export type TUpdateFeaturesInput = z.input<typeof updateFeaturesInputSchema>;
-export type TUpdateFeaturesResult = TActionResult<
-  typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
-  keyof TUpdateFeaturesInput,
-  never,
-  TSettingsRefusal
->;
+export type TUpdateFeaturesResult =
+  | TActionResult<
+      typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
+      keyof TUpdateFeaturesInput,
+      never,
+      TSettingsRefusal
+    >
+  | TNotInPlanRefusal;
 
 /**
  * A "Coming soon" capability is always written off. Switching on a toggle
- * outside `PLAN_REGISTRY[tenant.plan]` rejects the whole save; otherwise an
- * out-of-plan toggle keeps its stored value, so a downgrade loses nothing.
+ * outside `PLAN_REGISTRY[tenant.plan]` that is stored off rejects the whole
+ * save; otherwise an out-of-plan toggle keeps its stored value, so a
+ * downgrade loses nothing.
  */
 export const updateFeaturesAction = async (
   tenantId: string,
@@ -63,24 +67,20 @@ export const updateFeaturesAction = async (
   const values = withComingSoonOff(parsed.data);
 
   const entitled = PLAN_REGISTRY[tenant.plan];
-  const outOfPlan = CAPABILITY_TOGGLES.filter(
-    ({ capability, field }) => values[field] && !entitled.includes(capability),
-  );
-
-  if (hasArrayGotItems(outOfPlan)) {
-    logger.warn(SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED, {
-      tenantId: tenant.id,
-      plan: tenant.plan,
-      capabilities: outOfPlan.map(({ capability }) => capability),
-    });
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
-    };
-  }
 
   try {
     const { values: stored } = await getSettingsFeaturesOrDefaults(tenant.id);
+    const outOfPlan = listSwitchedOnOutOfPlan(values, stored, entitled);
+
+    if (hasArrayGotItems(outOfPlan)) {
+      logger.warn(SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED, {
+        tenantId: tenant.id,
+        plan: tenant.plan,
+        fields: outOfPlan,
+      });
+      return toNotInPlanRefusal(tenant.plan, outOfPlan);
+    }
+
     const toWrite = withComingSoonOff(
       keepStoredOutOfPlan(values, stored, entitled),
     );

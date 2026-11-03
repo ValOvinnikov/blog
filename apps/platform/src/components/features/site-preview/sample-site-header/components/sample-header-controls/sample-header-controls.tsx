@@ -16,6 +16,7 @@ export type TSampleHeaderControlsProps = IWithClassName & {
   hasReaderAccounts: boolean;
   isSignedIn: boolean;
   isDark: boolean;
+  shouldAlwaysShowLanguageSwitcher: boolean;
 };
 
 export const SampleHeaderControls = ({
@@ -24,6 +25,7 @@ export const SampleHeaderControls = ({
   hasReaderAccounts,
   isSignedIn,
   isDark,
+  shouldAlwaysShowLanguageSwitcher,
   className,
 }: TSampleHeaderControlsProps) => {
   const t = useTranslations('lookPreview');
@@ -35,6 +37,7 @@ export const SampleHeaderControls = ({
       <SampleLanguageSwitcher
         liveLocales={liveLocales}
         switcherStyle={languageSwitcherStyle}
+        isAlwaysShown={shouldAlwaysShowLanguageSwitcher}
       />
       <ThemeToggle
         isDark={isDark}

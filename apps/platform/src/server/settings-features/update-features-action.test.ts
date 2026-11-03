@@ -161,6 +161,8 @@ describe(updateFeaturesAction, () => {
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.REFUSED,
         reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+        values: { plan: TENANT_PLAN.FREE },
+        items: [field],
       });
       expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
       expect(revalidateSiteConfig).not.toHaveBeenCalled();
@@ -216,17 +218,42 @@ describe(updateFeaturesAction, () => {
     );
   });
 
-  it('refuses a downgraded FREE tenant switching an out-of-plan toggle on', async () => {
-    arrangeStoredValues({ ...ALL_OFF, bookmarksEnabled: true });
+  it('saves a downgraded FREE tenant page that still sends its stored out-of-plan toggles on', async () => {
+    arrangeStoredValues({
+      ...ALL_OFF,
+      analyticsEnabled: true,
+      contactFormEnabled: true,
+    });
+    const stalePageValues = {
+      ...ALL_OFF,
+      analyticsEnabled: true,
+      contactFormEnabled: true,
+      consentBannerEnabled: true,
+    };
+
+    const result = await updateFeaturesAction(MOCK_TENANT_ID, stalePageValues);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      stalePageValues,
+    );
+  });
+
+  it('refuses a downgraded FREE tenant switching on an out-of-plan toggle stored off', async () => {
+    arrangeStoredValues({ ...ALL_OFF, analyticsEnabled: true });
 
     const result = await updateFeaturesAction(MOCK_TENANT_ID, {
       ...VALID_INPUT,
+      analyticsEnabled: true,
       bookmarksEnabled: true,
     });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SETTINGS_REFUSAL.NOT_IN_PLAN,
+      values: { plan: TENANT_PLAN.FREE },
+      items: ['bookmarksEnabled'],
     });
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });

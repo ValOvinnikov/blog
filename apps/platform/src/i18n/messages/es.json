@@ -185,7 +185,12 @@
     "menuLabel": "Cuenta",
     "triggerCollapsedLabel": "Cuenta: {name}, {email}",
     "triggerCollapsedLabelNoName": "Cuenta: {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Tema",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "themeSystem": "Sistema",
+    "themeSystemHint": "Sistema sigue el ajuste de tu dispositivo."
   },
   "roleLabel": {
     "SUPERADMIN": "Superadministrador",
@@ -649,6 +654,11 @@
     "headerDescription": "Cómo se organiza la barra superior de su sitio y cómo se abren sus submenús.",
     "headerLayoutLabel": "Diseño",
     "headerLayoutDescription": "Dónde van el logotipo, los enlaces y los botones en pantallas anchas. En el móvil siempre hay una barra con botón de menú.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "La vista previa está en Teléfono, así que muestra la barra con un botón de menú.",
+      "TABLET": "La vista previa está en Tableta, así que muestra la barra con un botón de menú."
+    },
+    "headerShowOnDesktop": "Mostrar en Escritorio",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Clásico",
       "LINKS_BESIDE_BRAND": "Enlaces junto a la marca",
@@ -762,20 +772,19 @@
   },
   "lookPreview": {
     "sampleHeading": "Leyendo las tablas de mareas",
-    "samplePara": "Una breve crónica para mostrar juntos la tipografía de títulos y de texto, el acento, los tonos del logotipo y el radio.",
+    "samplePara": "Una breve crónica sobre cómo leer el agua antes de zarpar y lo que las cartas no dicen.",
     "subscribeButton": "Suscribirse",
     "readMoreButton": "Leer más",
     "readTimeChip": "4 min de lectura",
     "busyButtonIdle": "Enviar mensaje",
     "busyButtonLabel": "Enviando…",
     "firstCardTitle": "Notas desde el puerto",
-    "firstCardExcerpt": "Una tarjeta enlazada, tal como la muestran las listas de entradas.",
+    "firstCardExcerpt": "Lo que las mareas vivas dejan en el muelle norte.",
     "secondCardTitle": "Rumbo a la próxima temporada",
-    "secondCardExcerpt": "Una tarjeta estática. Su marco sigue su estilo de tarjeta.",
-    "previewNote": "Creada con los propios componentes del sitio. Nada se publica hasta que guarde.",
-    "widthDesktop": "Escritorio",
-    "widthMobile": "Móvil",
-    "previewWidthAriaLabel": "Ancho de la vista previa",
+    "secondCardExcerpt": "Adónde van los barcos cuando el puerto cierra en invierno.",
+    "latestPostsHeading": "Últimas entradas",
+    "firstCardDate": "12 oct 2026",
+    "secondCardDate": "28 sept 2026",
     "navPosts": "Entradas",
     "navAbout": "Acerca de",
     "navTopics": "Temas",
@@ -790,6 +799,8 @@
     "readerStateAriaLabel": "Lector",
     "readerSignedOut": "Sin sesión",
     "readerSignedIn": "Con sesión",
+    "readerSignedInTooltip": "Sesión iniciada como {name}",
+    "readerAccountsOff": "Las cuentas de lector están desactivadas en este sitio, así que no hay selector de lector.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Cuenta",
     "accountMenuAriaLabel": "Menú de la cuenta",
@@ -820,6 +831,8 @@
   },
   "assetUploadField": {
     "remove": "Quitar",
+    "upload": "Subir",
+    "replace": "Sustituir",
     "logo": {
       "currentAlt": "Logotipo actual",
       "upload": "Subir logotipo",
@@ -1446,6 +1459,7 @@
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",
+    "notInPlan": "Su sitio está en el plan {plan, select, FREE {Free} GROWTH {Growth} other {actual}}, que no incluye {items}, así que no se ha guardado nada.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
     "save": "Guardar cambios",
@@ -1798,5 +1812,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— forma parte del plan Growth"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Abrir tu panel",
+    "GROWTH": {
+      "subject": "Tu sitio ya está en el plan Growth",
+      "previewText": "{siteName} ya puede usar todas las opciones de Growth.",
+      "changed": "{siteName} ya está en el plan Growth.",
+      "options": "Las opciones de Growth ya están disponibles en tu sitio: más idiomas, todos los ajustes de Aspecto, módulos de página adicionales y funciones como el formulario de contacto, los marcadores y las estadísticas.",
+      "kept": "Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
+    },
+    "FREE": {
+      "subject": "Tu sitio ya está en el plan Free",
+      "previewText": "Las opciones de Growth están desactivadas en {siteName}.",
+      "changed": "{siteName} ya está en el plan Free.",
+      "options": "Las opciones de Growth están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de Growth y funciones como el formulario de contacto, los marcadores y las estadísticas.",
+      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a Growth."
+    }
   }
 }

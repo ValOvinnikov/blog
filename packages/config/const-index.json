@@ -5246,6 +5246,14 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "(width >= 64rem)": [
+      {
+        "ref": "MEDIA_QUERY.LG_UP",
+        "scope": "app:platform",
+        "from": "@platform/constants/media-query",
+        "file": "apps/platform/src/constants/media-query.ts"
+      }
+    ],
     "DESKTOP": [
       {
         "ref": "MENU_RADIO_GROUP_SIZE.DESKTOP",
@@ -5790,6 +5798,22 @@
         "scope": "app:web",
         "from": "@web/constants/request",
         "file": "apps/web/src/constants/request.ts"
+      }
+    ],
+    "header": [
+      {
+        "ref": "SAMPLE_PART.HEADER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "footer": [
+      {
+        "ref": "SAMPLE_PART.FOOTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
       }
     ],
     "settings_features.plan_entitlement_rejected": [
@@ -6349,6 +6373,30 @@
     "tenants.owner_invite_email_failed": [
       {
         "ref": "TENANT_LOG.OWNER_INVITE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.plan_change_email_failed": [
+      {
+        "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.plan_change_email_owner_missing": [
+      {
+        "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenants.plan_change_email_unconfigured": [
+      {
+        "ref": "TENANT_LOG.PLAN_CHANGE_EMAIL_UNCONFIGURED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"
@@ -7450,6 +7498,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      }
+    ],
+    "80": [
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.PREVIEW_BOTTOM_ROOM",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
       }
     ],
     "100": [

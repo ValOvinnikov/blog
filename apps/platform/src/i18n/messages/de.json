@@ -185,7 +185,12 @@
     "menuLabel": "Konto",
     "triggerCollapsedLabel": "Konto: {name}, {email}",
     "triggerCollapsedLabelNoName": "Konto: {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Design",
+    "themeLight": "Hell",
+    "themeDark": "Dunkel",
+    "themeSystem": "System",
+    "themeSystemHint": "System folgt der Einstellung Ihres Geräts."
   },
   "roleLabel": {
     "SUPERADMIN": "Superadmin",
@@ -649,6 +654,11 @@
     "headerDescription": "Wie die obere Leiste Ihrer Website aufgebaut ist und wie sich ihre Untermenüs öffnen.",
     "headerLayoutLabel": "Layout",
     "headerLayoutDescription": "Wo Logo, Links und Schaltflächen auf breiten Bildschirmen sitzen. Auf dem Handy gibt es immer die Leiste mit Menü-Schaltfläche.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "Die Vorschau zeigt das Smartphone, daher erscheint die Leiste mit einer Menütaste.",
+      "TABLET": "Die Vorschau zeigt das Tablet, daher erscheint die Leiste mit einer Menütaste."
+    },
+    "headerShowOnDesktop": "Auf Desktop zeigen",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Klassisch",
       "LINKS_BESIDE_BRAND": "Links neben der Marke",
@@ -762,20 +772,19 @@
   },
   "lookPreview": {
     "sampleHeading": "Gezeitentabellen lesen",
-    "samplePara": "Ein kurzer Bericht, der Überschriften- und Fließtextschrift, Akzent, Logo-Töne und Eckenradius zusammen zeigt.",
+    "samplePara": "Ein kurzer Bericht darüber, wie man das Wasser liest, bevor man ablegt, und was die Karten verschweigen.",
     "subscribeButton": "Abonnieren",
     "readMoreButton": "Weiterlesen",
     "readTimeChip": "4 Min. Lesezeit",
     "busyButtonIdle": "Nachricht senden",
     "busyButtonLabel": "Wird gesendet…",
     "firstCardTitle": "Notizen aus dem Hafen",
-    "firstCardExcerpt": "Eine verlinkte Karte, wie Beitragslisten sie darstellen.",
+    "firstCardExcerpt": "Was die Springfluten am Nordkai zurücklassen.",
     "secondCardTitle": "Kurs auf die nächste Saison",
-    "secondCardExcerpt": "Eine statische Karte. Ihr Rahmen folgt Ihrem Kartenstil.",
-    "previewNote": "Aus den eigenen Komponenten der Website gebaut. Nichts ist live, bis Sie speichern.",
-    "widthDesktop": "Desktop",
-    "widthMobile": "Mobil",
-    "previewWidthAriaLabel": "Vorschaubreite",
+    "secondCardExcerpt": "Wohin die Boote fahren, wenn der Hafen im Winter schließt.",
+    "latestPostsHeading": "Neueste Beiträge",
+    "firstCardDate": "12. Okt. 2026",
+    "secondCardDate": "28. Sept. 2026",
     "navPosts": "Beiträge",
     "navAbout": "Über uns",
     "navTopics": "Themen",
@@ -790,6 +799,8 @@
     "readerStateAriaLabel": "Leser",
     "readerSignedOut": "Abgemeldet",
     "readerSignedIn": "Angemeldet",
+    "readerSignedInTooltip": "Angemeldet als {name}",
+    "readerAccountsOff": "Leserkonten sind für diese Website deaktiviert, daher gibt es keinen Leser-Schalter.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Konto",
     "accountMenuAriaLabel": "Kontomenü",
@@ -820,6 +831,8 @@
   },
   "assetUploadField": {
     "remove": "Entfernen",
+    "upload": "Hochladen",
+    "replace": "Ersetzen",
     "logo": {
       "currentAlt": "Aktuelles Logo",
       "upload": "Logo hochladen",
@@ -1446,6 +1459,7 @@
     "fieldsNeedAttention": "{count, plural, one {# Feld braucht Aufmerksamkeit} other {# Felder brauchen Aufmerksamkeit}}",
     "goToFirstField": "Zum ersten Feld",
     "notSaved": "Nicht gespeichert",
+    "notInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} GROWTH {Growth} other {aktuellen}}, der {items} nicht enthält. Es wurde nichts gespeichert.",
     "shortcut": "⌘S / Strg+S",
     "discard": "Verwerfen",
     "save": "Änderungen speichern",
@@ -1798,5 +1812,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— im Growth-Tarif enthalten"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Dashboard öffnen",
+    "GROWTH": {
+      "subject": "Deine Website ist jetzt im Growth-Tarif",
+      "previewText": "{siteName} kann jetzt alle Growth-Optionen nutzen.",
+      "changed": "{siteName} ist jetzt im Growth-Tarif.",
+      "options": "Die Growth-Optionen sind jetzt auf deiner Website verfügbar: mehr Sprachen, alle Einstellungen für das Erscheinungsbild, zusätzliche Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
+      "kept": "Wenn du Growth schon einmal genutzt hast, sind deine früheren Einstellungen wieder so da, wie du sie hinterlassen hast."
+    },
+    "FREE": {
+      "subject": "Deine Website ist jetzt im Free-Tarif",
+      "previewText": "Die Growth-Optionen sind auf {siteName} ausgeschaltet.",
+      "changed": "{siteName} ist jetzt im Free-Tarif.",
+      "options": "Die Growth-Optionen sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, Growth-Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
+      "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu Growth wechselst."
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import type { TMaybeUndefined, TPresetId } from '@blog/config';
 import type { TLookField } from '@blog/db/constants';
+import type { TPreviewDevice } from '@platform/constants/preview';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type {
   TLookFormFieldSetter,
@@ -26,6 +27,8 @@ export type TLookFormContext = {
   resetToPreset: () => void;
   isSubmenuPreviewOpen: boolean;
   setIsSubmenuPreviewOpen: (isOpen: boolean) => void;
+  previewDevice: TPreviewDevice;
+  setPreviewDevice: (device: TPreviewDevice) => void;
 };
 
 const LookFormContext =

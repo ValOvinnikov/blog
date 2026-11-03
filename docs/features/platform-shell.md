@@ -27,6 +27,7 @@ code:
   - apps/platform/src/components/shared/guarded-link/**
   - apps/platform/src/components/shared/button/**
   - apps/platform/src/components/shared/menu-surface/**
+  - apps/platform/src/components/shared/menu-radio-group/**
   - apps/platform/src/components/shared/breadcrumbs/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
@@ -118,6 +119,9 @@ switches the content column to full-bleed (see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
   than one plan locale, Email a mail-sending capability, and the inert "Coming
   soon" rows Subscribers NEWSLETTER, Comments COMMENTS, Team any plan but FREE.
+  Their "Coming soon" pill is `neutral` with no dot, at the row's right edge,
+  in the sidebar and the phone Menu alike; Leads' unread count is a `brand`
+  pill with no dot.
   The operator's tenant view (`EVERY_PLAN_PAGE`) always shows every page.
 - UI copy is next-intl, five message files (`en`, `de`, `es`, `fr`, `nl`). It
   is fixed platform copy and never [Voice](./voice.md).
@@ -211,10 +215,19 @@ switches the content column to full-bleed (see
   the shared popup frame, opens 6px above the trigger at its width, or, from
   the rail, to its right (`sideOffset` 20) at 240px with its bottom aligned
   to the trigger's. It heads with the name, the email and the role line
-  ("{role} · {scope}"), none focusable, then the Sign out item, which takes
-  focus on open. Below `md` the topbar keeps a pill (`ACCOUNT_MENU_APPEARANCE.PILL`)
-  named by the role line that opens the same menu; from `md` nothing follows
-  the breadcrumb.
+  ("{role} · {scope}"), none focusable, then — in the expanded and the rail
+  menu — a Theme section, then the Sign out item, which takes focus on open.
+  The Theme section is the shared `MenuRadioGroup`
+  (`components/shared/menu-radio-group/`) at its desktop size: a "Theme"
+  group of Light (sun), Dark (moon) and System (monitor) `menuitemradio`
+  items, described by "System follows your device setting.", with the stored
+  choice checked (System when none is stored). Choosing one writes the
+  `admin-theme` cookie and sets or clears `data-theme` on `<html>` at once,
+  without a reload and without closing the menu; the menu reads the current
+  choice back from `<html>`, since the root layout never re-renders on client
+  navigation. Below `md` the topbar keeps a pill
+  (`ACCOUNT_MENU_APPEARANCE.PILL`) named by the role line that opens the same
+  menu without the Theme section; from `md` nothing follows the breadcrumb.
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
@@ -267,8 +280,13 @@ switches the content column to full-bleed (see
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
   `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   and its section labels and notes read `muted` and its rows `text` on that
-  ground. Its `item` slot (the account menu's Sign out) is a flex row with a
-  10px gap, at least 44px tall at every width, padding 6px 8px,
+  ground. Its inert rows are disabled menu items (`role="menuitem"`,
+  `aria-disabled`, outside Base UI's item list), so arrow keys skip them and
+  they take no focus; they keep the enabled rows' label and icon colours and
+  change nothing on hover. Its neutral pills sit on `pill-neutral-popover`,
+  not the page's `pill-neutral`. Its `item` slot (the account menu's Sign
+  out) is a flex row with a 10px gap, at least 44px tall at every width,
+  padding 6px 8px,
   `rounded-admin-control`, 13px/500, 2px from the next item, taking a
   `popover-hover` ground and no ring when highlighted.
 - `styles/admin-theme-contrast.test.ts` guards both palettes: each pair

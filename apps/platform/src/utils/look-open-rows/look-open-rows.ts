@@ -1,3 +1,4 @@
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 import type { TLookCardKey } from '@platform/utils/look-form-values/look-form-values';
 
 export type TLookRowKey = Exclude<TLookCardKey, 'preset'>;
@@ -11,8 +12,8 @@ export const STYLE_ROWS = [
 ] as const satisfies readonly TLookRowKey[];
 
 export const SITE_PARTS_ROWS = [
-  'header',
-  'footer',
+  SAMPLE_PART.HEADER,
+  SAMPLE_PART.FOOTER,
   'languageSwitcher',
 ] as const satisfies readonly TLookRowKey[];
 

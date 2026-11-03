@@ -185,7 +185,12 @@
     "menuLabel": "Compte",
     "triggerCollapsedLabel": "Compte : {name}, {email}",
     "triggerCollapsedLabelNoName": "Compte : {email}",
-    "roleLine": "{role} · {scope}"
+    "roleLine": "{role} · {scope}",
+    "themeLabel": "Thème",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeSystem": "Système",
+    "themeSystemHint": "Système suit le réglage de votre appareil."
   },
   "roleLabel": {
     "SUPERADMIN": "Super-administrateur",
@@ -649,6 +654,11 @@
     "headerDescription": "Comment la barre du haut de votre site est organisée et comment ses sous-menus s’ouvrent.",
     "headerLayoutLabel": "Disposition",
     "headerLayoutDescription": "Où se placent le logo, les liens et les boutons sur grand écran. Sur mobile, vous avez toujours la barre avec un bouton de menu.",
+    "headerPreviewDeviceNote": {
+      "PHONE": "L’aperçu est sur Téléphone : il affiche donc la barre avec un bouton de menu.",
+      "TABLET": "L’aperçu est sur Tablette : il affiche donc la barre avec un bouton de menu."
+    },
+    "headerShowOnDesktop": "Afficher sur Ordinateur",
     "headerLayoutOptionLabel": {
       "CLASSIC": "Classique",
       "LINKS_BESIDE_BRAND": "Liens à côté de la marque",
@@ -762,20 +772,19 @@
   },
   "lookPreview": {
     "sampleHeading": "Lire les tables des marées",
-    "samplePara": "Une courte chronique pour montrer ensemble la typographie des titres et du texte, l'accent, les nuances du logo et l'arrondi.",
+    "samplePara": "Une courte chronique sur la lecture de l'eau avant de prendre la mer, et sur ce que les cartes taisent.",
     "subscribeButton": "S'abonner",
     "readMoreButton": "Lire la suite",
     "readTimeChip": "4 min de lecture",
     "busyButtonIdle": "Envoyer le message",
     "busyButtonLabel": "Envoi…",
     "firstCardTitle": "Notes du port",
-    "firstCardExcerpt": "Une carte avec lien, telle que les listes d'articles l'affichent.",
+    "firstCardExcerpt": "Ce que les grandes marées laissent sur le quai nord.",
     "secondCardTitle": "Cap sur la prochaine saison",
-    "secondCardExcerpt": "Une carte statique. Son cadre suit votre style de carte.",
-    "previewNote": "Construit à partir des composants du site. Rien n'est publié avant l'enregistrement.",
-    "widthDesktop": "Ordinateur",
-    "widthMobile": "Mobile",
-    "previewWidthAriaLabel": "Largeur de l'aperçu",
+    "secondCardExcerpt": "Où vont les bateaux quand le port ferme pour l'hiver.",
+    "latestPostsHeading": "Derniers articles",
+    "firstCardDate": "12 oct. 2026",
+    "secondCardDate": "28 sept. 2026",
     "navPosts": "Articles",
     "navAbout": "À propos",
     "navTopics": "Sujets",
@@ -790,6 +799,8 @@
     "readerStateAriaLabel": "Lecteur",
     "readerSignedOut": "Déconnecté",
     "readerSignedIn": "Connecté",
+    "readerSignedInTooltip": "Connecté en tant que {name}",
+    "readerAccountsOff": "Les comptes lecteur sont désactivés pour ce site : il n’y a donc pas de sélecteur de lecteur.",
     "sampleReaderName": "Robin Hale",
     "accountHeading": "Compte",
     "accountMenuAriaLabel": "Menu du compte",
@@ -820,6 +831,8 @@
   },
   "assetUploadField": {
     "remove": "Supprimer",
+    "upload": "Importer",
+    "replace": "Remplacer",
     "logo": {
       "currentAlt": "Logo actuel",
       "upload": "Importer le logo",
@@ -1446,6 +1459,7 @@
     "fieldsNeedAttention": "{count, plural, one {# champ à vérifier} other {# champs à vérifier}}",
     "goToFirstField": "Aller au premier",
     "notSaved": "Non enregistré",
+    "notInPlan": "Votre site est sur la formule {plan, select, FREE {Free} GROWTH {Growth} other {actuelle}}, qui n'inclut pas {items} : rien n'a été enregistré.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Annuler les modifications",
     "save": "Enregistrer les modifications",
@@ -1798,5 +1812,22 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— fait partie de la formule Growth"
+  },
+  "ownerPlanChangeEmail": {
+    "actionLabel": "Ouvrir votre tableau de bord",
+    "GROWTH": {
+      "subject": "Votre site est passé à l’offre Growth",
+      "previewText": "{siteName} peut désormais utiliser toutes les options Growth.",
+      "changed": "{siteName} est désormais sur l’offre Growth.",
+      "options": "Les options Growth sont maintenant disponibles sur votre site : plus de langues, tous les réglages d’Apparence, des modules de page supplémentaires et des fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
+      "kept": "Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
+    },
+    "FREE": {
+      "subject": "Votre site est passé à l’offre Free",
+      "previewText": "Les options Growth sont désactivées sur {siteName}.",
+      "changed": "{siteName} est désormais sur l’offre Free.",
+      "options": "Les options Growth sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page Growth et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
+      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à Growth."
+    }
   }
 }

@@ -13,8 +13,7 @@ export const sampleSiteHeaderVariants = tv({
   variants: {
     barStyle: {
       [HEADER_BAR_STYLE.FULL_WIDTH]: {
-        root: ['border-b border-border @max-[64rem]:-mx-card-x'],
-        full: ['pb-3'],
+        root: ['border-b border-border'],
         bar: ['px-4 @[40rem]:px-8'],
       },
       [HEADER_BAR_STYLE.FLOATING]: {
@@ -54,5 +53,26 @@ export const sampleSiteHeaderVariants = tv({
         group: ['flex items-center gap-4'],
       },
     },
+    isEdgeToEdge: {
+      true: {},
+      false: {},
+    },
   },
+  compoundVariants: [
+    {
+      barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+      isEdgeToEdge: false,
+      class: { root: ['@max-[64rem]:-mx-card-x'], full: ['pb-3'] },
+    },
+    {
+      barStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+      isEdgeToEdge: true,
+      class: { root: ['bg-primary'], full: ['min-h-18 px-8'] },
+    },
+    {
+      barStyle: HEADER_BAR_STYLE.FLOATING,
+      isEdgeToEdge: true,
+      class: { root: ['mx-3 mt-3'], full: ['min-h-14'] },
+    },
+  ],
 });

@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 import {
   renderWithIntl,
   screen,
@@ -66,7 +67,11 @@ const draftFor = (
   savedAt: MOCK_DRAFT_SAVED_AT,
   fields: [
     { id: 'tagline', label: MOCK_TAGLINE_LABEL, display: (v) => v.tagline },
-    { id: 'footer', label: MOCK_FOOTER_LABEL, display: (v) => v.footer },
+    {
+      id: SAMPLE_PART.FOOTER,
+      label: MOCK_FOOTER_LABEL,
+      display: (v) => v.footer,
+    },
   ],
   onRestore,
 });
