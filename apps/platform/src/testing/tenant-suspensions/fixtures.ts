@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker';
 export const MOCK_SUSPENSION_REFERENCE = 'SUS-000042';
 export const MOCK_SUSPENSION_DESCRIPTION = faker.lorem.sentence();
 export const MOCK_SUSPENDED_BY_EMAIL = faker.internet.email().toLowerCase();
-export const MOCK_SUSPENDED_AT = faker.date.past({
+const MOCK_SUSPENDED_AT = faker.date.past({
   refDate: new Date('2026-11-01T00:00:00.000Z'),
 });
 
