@@ -8,11 +8,9 @@ import {
 } from '@platform/testing/site-config/fixtures';
 import type { UserEvent } from '@testing-library/user-event';
 
-export const MOCK_LOGO_FILE = new File(
-  ['bytes'],
-  faker.system.commonFileName('png'),
-  { type: 'image/png' },
-);
+const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
+  type: 'image/png',
+});
 
 export const pickLogo = async (user: UserEvent) => {
   const [logoInput] = screen.getAllByTestId('asset-upload-field-input');
