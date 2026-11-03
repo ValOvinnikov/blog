@@ -7598,6 +7598,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_CLEARANCE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
       }
     ],
     "28": [
@@ -7616,9 +7622,9 @@
         "file": "apps/platform/src/constants/custom-domain.ts"
       }
     ],
-    "80": [
+    "64": [
       {
-        "ref": "LOOK_LAYOUT_LIMIT.PREVIEW_BOTTOM_ROOM",
+        "ref": "LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT",
         "scope": "app:platform",
         "from": "@platform/constants/look-layout",
         "file": "apps/platform/src/constants/look-layout.ts"

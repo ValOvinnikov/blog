@@ -426,7 +426,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/look-layout` — `apps/platform/src/constants/look-layout.ts`
 
-- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `PREVIEW_BOTTOM_ROOM`=`80`
+- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `DOCKED_SAVE_BAR_HEIGHT`=`64`, `DOCKED_SAVE_BAR_CLEARANCE`=`16`
 
 ### `@platform/constants/look-row` — `apps/platform/src/constants/look-row.ts`
 

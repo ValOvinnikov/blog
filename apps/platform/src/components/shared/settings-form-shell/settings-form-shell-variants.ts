@@ -11,7 +11,7 @@ export const settingsFormShellVariants = tv({
       false: { root: ['max-w-3xl'] },
     },
     hasCompactGap: {
-      true: { root: ['gap-[18px]'] },
+      true: { root: ['gap-admin-form-gap'] },
     },
   },
   defaultVariants: {

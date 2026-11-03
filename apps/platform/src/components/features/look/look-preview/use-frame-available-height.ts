@@ -45,7 +45,8 @@ export const useFrameAvailableHeight = ({
             stageRect.top -
             stageChrome -
             belowStage -
-            LOOK_LAYOUT_LIMIT.PREVIEW_BOTTOM_ROOM,
+            LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT -
+            LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_CLEARANCE,
         ),
       );
       setAvailableHeight((previous) => (previous === next ? previous : next));

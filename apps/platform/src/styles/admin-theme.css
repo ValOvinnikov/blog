@@ -78,11 +78,19 @@
   --admin-shadow-thumb: 0 1px 3px rgba(16, 24, 40, 0.25);
   --admin-thumb-line: rgba(16, 24, 40, 0.12);
   --admin-topbar: 67px;
+  --admin-view-tab: 44px;
+  --admin-view-tabs: calc(var(--admin-view-tab) + 1px);
 }
 
 @media (width >= 48rem) {
   :root {
     --admin-topbar: 59px;
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    --admin-view-tabs: calc(var(--admin-view-tab) + 2px);
   }
 }
 
@@ -315,6 +323,12 @@
   --spacing-admin-topbar: var(--admin-topbar);
   --spacing-admin-card: 18px;
   --spacing-admin-bar: 3px;
+  --spacing-admin-view-tab: var(--admin-view-tab);
+  --spacing-admin-view-tabs: var(--admin-view-tabs);
+  --spacing-admin-form-gap: 18px;
+
+  /* Keep equal to LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH in constants/look-layout.ts. */
+  --container-look-split: 900px;
 
   --radius-admin: 6px;
   --radius-admin-control: 4px;

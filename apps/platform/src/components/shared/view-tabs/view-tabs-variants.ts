@@ -26,7 +26,7 @@ export const viewTabsVariants = tv({
           'lg:rounded-admin lg:border lg:shadow-admin-index',
         ],
         tab: [
-          'h-11 border-b-2 border-transparent text-center',
+          'h-admin-view-tab border-b-2 border-transparent text-center',
           'text-admin-14 font-medium text-admin-muted not-data-[active]:hover:text-admin-text',
           'data-[active]:border-admin-brand data-[active]:font-semibold data-[active]:text-admin-brand-strong',
           focusRingClasses(FOCUS_RING_GROUND.SURFACE),
@@ -41,7 +41,7 @@ export const viewTabsVariants = tv({
       true: {
         root: [
           'sticky top-admin-topbar z-21',
-          '[html:has(&)]:scroll-pt-[calc(var(--spacing-admin-topbar)+45px)]!',
+          '[html:has(&)]:scroll-pt-[calc(var(--admin-topbar)+var(--admin-view-tabs))]!',
         ],
       },
     },
