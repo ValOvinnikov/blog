@@ -22,7 +22,8 @@
   },
   "siteUnavailable": {
     "heading": "Diese Website ist nicht verfügbar",
-    "text": "Bitte schauen Sie später wieder vorbei."
+    "text": "Bitte schauen Sie später wieder vorbei.",
+    "manageAccount": "Ihr Konto verwalten"
   },
   "postShare": {
     "shareAriaLabel": "„{title}“ teilen",

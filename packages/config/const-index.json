@@ -7182,6 +7182,22 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "site_settings.metadata_fetch_failed": [
+      {
+        "ref": "SITE_SETTINGS_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-settings",
+        "file": "apps/web/src/constants/site-settings.ts"
+      }
+    ],
+    "site_settings.layout_fetch_failed": [
+      {
+        "ref": "SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-settings",
+        "file": "apps/web/src/constants/site-settings.ts"
+      }
+    ],
     "tenant_write.unresolved": [
       {
         "ref": "TENANT_WRITE_LOG.UNRESOLVED",
