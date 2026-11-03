@@ -37,6 +37,7 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
+import { useLookOpenRows } from './use-look-open-rows';
 
 vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal<typeof BlogConfig>()),
@@ -95,7 +96,7 @@ const rowTrigger = (title: string) => {
   return within(heading).getByRole('button');
 };
 
-describe('the Look rows folding', () => {
+describe(useLookOpenRows, () => {
   let user: UserEvent;
 
   beforeEach(() => {

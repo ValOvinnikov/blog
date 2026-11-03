@@ -148,6 +148,17 @@ describe(`<${Accordion.name}/>`, () => {
     expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
   });
 
+  it('opens a row with the Space key', async () => {
+    setup();
+
+    await user.tab();
+    await user.keyboard(KEY.SPACE);
+
+    const firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
+
+    expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+  });
+
   it('puts each row button inside an h3 by default', () => {
     setup();
 
@@ -239,15 +250,6 @@ describe(`<${Accordion.name}/>`, () => {
 
       expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
       expect(secondTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-    });
-
-    it('toggles a row with the Space key', async () => {
-      await user.tab();
-      await user.tab();
-      await user.tab();
-      await user.keyboard(KEY.SPACE);
-
-      expect(firstTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
     });
 
     it('names the body a row button controls', async () => {
