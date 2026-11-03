@@ -20,3 +20,8 @@ export const DOMAIN_AVAILABILITY = {
 } as const;
 
 export type TDomainAvailability = TValueOf<typeof DOMAIN_AVAILABILITY>;
+
+export const ROUTING_RECORD_TYPE = {
+  A: 'A',
+  CNAME: 'CNAME',
+} as const;

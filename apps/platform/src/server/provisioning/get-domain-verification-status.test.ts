@@ -1,6 +1,6 @@
-import { HTTP_STATUS } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
+import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
 import { env } from '@platform/utils/env/env';
 
 import { getDomainVerificationStatus } from './get-domain-verification-status';
@@ -26,12 +26,10 @@ describe(getDomainVerificationStatus, () => {
     vi.unstubAllGlobals();
   });
 
-  it("returns the status of the domain's Vercel project entry", async () => {
-    fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ verified: true }), {
-        status: HTTP_STATUS.OK,
-      }),
-    );
+  it("returns the status of the domain's Vercel project entry and configuration", async () => {
+    fetchMock
+      .mockResolvedValueOnce(mockJsonResponse({ verified: true }))
+      .mockResolvedValueOnce(mockJsonResponse({ misconfigured: false }));
 
     const result = await getDomainVerificationStatus(
       faker.internet.domainName(),

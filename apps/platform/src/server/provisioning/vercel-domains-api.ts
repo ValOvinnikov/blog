@@ -1,71 +1,20 @@
 import { DOMAIN_PATTERN } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
-import {
-  DOMAIN_VERIFICATION_STATUS,
-  type TDomainVerificationStatus,
-} from '@platform/constants/domain';
+import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
-import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
-export type TDomainDnsRecord = {
-  type: string;
-  name: string;
-  value: string;
-};
-
-export type TProjectDomain = {
-  status: TDomainVerificationStatus;
-  dnsRecords: TDomainDnsRecord[];
-};
-
-type TVercelCredentials = {
-  token: string;
-  projectId: string;
-  teamId: string | undefined;
-};
+import { projectDomain, type TProjectDomain } from './project-domain';
+import { fetchVercel, readVercelCredentials } from './vercel-client';
+import { getDomainRouting } from './vercel-domain-routing';
 
 type TVercelProjectDomainResponse = {
+  name?: string;
+  apexName?: string;
   verified?: boolean;
   verification?: { type: string; domain: string; value: string }[];
 };
-
-const VERCEL_API_ORIGIN = 'https://api.vercel.com';
-
-const VERCEL_TIMEOUT_MS = 5000;
-
-export const readVercelCredentials = (): TVercelCredentials | undefined => {
-  const {
-    VERCEL_API_TOKEN: token,
-    VERCEL_PROJECT_ID_WEB: projectId,
-    VERCEL_TEAM_ID: teamId,
-  } = env;
-
-  return token && projectId ? { token, projectId, teamId } : undefined;
-};
-
-export const fetchVercel = (
-  { token, teamId }: TVercelCredentials,
-  path: string,
-  searchParams: Record<string, string> = {},
-): Promise<Response> => {
-  const url = new URL(path, VERCEL_API_ORIGIN);
-  if (teamId) url.searchParams.set('teamId', teamId);
-  for (const [name, value] of Object.entries(searchParams)) {
-    url.searchParams.set(name, value);
-  }
-
-  return fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-    signal: AbortSignal.timeout(VERCEL_TIMEOUT_MS),
-  });
-};
-
-const projectDomain = (
-  status: TDomainVerificationStatus,
-  dnsRecords: TDomainDnsRecord[] = [],
-): TProjectDomain => ({ status, dnsRecords });
 
 export const getProjectDomain = async (
   domain: string,
@@ -97,18 +46,28 @@ export const getProjectDomain = async (
       return projectDomain(DOMAIN_VERIFICATION_STATUS.ERROR);
     }
 
-    const { verified, verification = [] } =
-      (await response.json()) as TVercelProjectDomainResponse;
+    const {
+      name,
+      apexName,
+      verified,
+      verification = [],
+    } = (await response.json()) as TVercelProjectDomainResponse;
 
-    if (verified) return projectDomain(DOMAIN_VERIFICATION_STATUS.VERIFIED);
+    if (!verified) {
+      return projectDomain(
+        DOMAIN_VERIFICATION_STATUS.PENDING,
+        verification.map(({ type, domain: recordName, value }) => ({
+          type,
+          name: recordName,
+          value,
+        })),
+      );
+    }
 
-    return projectDomain(
-      DOMAIN_VERIFICATION_STATUS.PENDING,
-      verification.map(({ type, domain: name, value }) => ({
-        type,
-        name,
-        value,
-      })),
+    return await getDomainRouting(
+      credentials,
+      domain,
+      (name ?? domain) === apexName,
     );
   } catch (error) {
     logger.error(PROVISIONING_LOG.DOMAIN_CHECK_ERROR, {

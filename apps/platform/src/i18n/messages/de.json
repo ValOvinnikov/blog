@@ -545,6 +545,7 @@
       "verifyFailed": "Der Eintrag konnte nicht geprüft werden. Versuche es erneut.",
       "removeClaimDescription": "{domain} wartet nicht mehr auf die Bestätigung. Deine aktuelle Adresse funktioniert weiter.",
       "mainTitle": "Eigene Domain (Hauptadresse)",
+      "subdomainStillWorks": "Deine Subdomain {subdomain} funktioniert weiter und zeigt dieselbe Website.",
       "mainAddress": {
         "failed": "Die Hauptadresse konnte nicht gewechselt werden. Versuche es erneut.",
         "makeMain": {
@@ -1359,6 +1360,19 @@
       "reasonHint": "Betreiber sehen ihn auf der Seite „Gesperrte Registrierungen“.",
       "switchOn": "An",
       "switchOff": "Aus"
+    },
+    "caseFields": {
+      "categoryLabel": "Grund",
+      "categoryPlaceholder": "Grund auswählen",
+      "descriptionLabel": "Begründung",
+      "descriptionHint": "Der Inhaber sieht dies in der Sperr-E-Mail und in seinem Dashboard."
+    },
+    "case": {
+      "referenceLabel": "Referenz",
+      "categoryLabel": "Grund",
+      "descriptionLabel": "Begründung",
+      "suspendedByLabel": "Gesperrt von",
+      "suspendedAtLabel": "Gesperrt am"
     }
   },
   "tenantLifecycleErrors": {
@@ -1821,5 +1835,35 @@
       "options": "Die Growth-Optionen sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, Growth-Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
       "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu Growth wechselst."
     }
+  },
+  "suspensionCategory": {
+    "ABUSE": "Missbrauch",
+    "ILLEGAL_CONTENT": "Rechtswidrige Inhalte",
+    "TERMS_VIOLATION": "Verstoß gegen die Nutzungsbedingungen",
+    "OTHER": "Sonstiges"
+  },
+  "ownerSuspensionEmail": {
+    "actionLabel": "Dashboard öffnen",
+    "SUSPENDED": {
+      "subject": "Deine Website wurde gesperrt ({reference})",
+      "previewText": "{siteName} ist für Leser offline.",
+      "offline": "{siteName} wurde gesperrt und ist für Leser offline: Sie sehen statt deiner Website eine Seite „Nicht verfügbar“.",
+      "category": "Grund: {category}.",
+      "contest": "Um diese Entscheidung anzufechten, antworte auf diese E-Mail und gib {reference} an."
+    },
+    "ACTIVE": {
+      "subject": "Deine Website ist wieder online ({reference})",
+      "previewText": "{siteName} ist für Leser wieder sichtbar.",
+      "online": "Die Sperrung {reference} wurde aufgehoben. {siteName} ist für Leser wieder sichtbar."
+    }
+  },
+  "ownerSuspensionBanner": {
+    "title": "Deine Website ist gesperrt",
+    "unavailable": "Leser sehen statt deiner Website eine Seite „Nicht verfügbar“.",
+    "category": "Grund: {category}.",
+    "contest": "Um diese Entscheidung anzufechten, antworte auf die Sperr-E-Mail oder schreibe an den Support und gib {reference} an.",
+    "copyButton": "Referenz kopieren",
+    "copied": "Referenz kopiert",
+    "copyFailed": "Die Referenz konnte nicht kopiert werden. Markiere sie und kopiere sie selbst."
   }
 }

@@ -22,3 +22,11 @@ export {
   buildOwnerPlanChangeEmail,
   type TOwnerPlanChangeEmailInput,
 } from './owner-plan-change/owner-plan-change';
+export {
+  buildOwnerSuspensionEmail,
+  type TOwnerSuspensionEmailInput,
+} from './owner-suspension/owner-suspension';
+export {
+  buildOwnerSuspensionLiftedEmail,
+  type TOwnerSuspensionLiftedEmailInput,
+} from './owner-suspension-lifted/owner-suspension-lifted';
