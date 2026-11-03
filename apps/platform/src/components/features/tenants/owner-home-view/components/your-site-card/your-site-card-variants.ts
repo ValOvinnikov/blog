@@ -7,8 +7,8 @@ export const yourSiteCardVariants = tv({
       'm-0 grid grid-cols-2',
       'md:grid-cols-[minmax(0,3fr)_minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)]',
     ],
-    footer: ['items-start gap-2 px-4 md:px-[18px]'],
+    footer: ['items-start gap-2 px-4 md:px-admin-card'],
     icon: ['mt-px text-admin-muted'],
-    hint: ['leading-[18px]'],
+    hint: ['leading-admin-18'],
   },
 });

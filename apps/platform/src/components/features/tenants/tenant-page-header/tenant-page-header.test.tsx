@@ -22,6 +22,8 @@ const setup = customRender(TenantPageHeader, {
   }),
 });
 
+const withinTitleRow = () => within(screen.getByTestId(TITLE_ROW_TEST_ID));
+
 describe(`<${TenantPageHeader.name}/>`, () => {
   it('shows the name, status and plan pills and an Open site link by default', () => {
     setup();
@@ -30,9 +32,8 @@ describe(`<${TenantPageHeader.name}/>`, () => {
       level: 1,
       name: MOCK_SITE_NAME,
     });
-    const titleRow = screen.getByTestId(TITLE_ROW_TEST_ID);
-    const status = within(titleRow).getByText(ACTIVE_LABEL);
-    const plan = within(titleRow).getByText(GROWTH_LABEL);
+    const status = withinTitleRow().getByText(ACTIVE_LABEL);
+    const plan = withinTitleRow().getByText(GROWTH_LABEL);
     const openSite = screen.getByRole('link', {
       name: 'Open site (opens in new tab)',
     });
@@ -46,9 +47,8 @@ describe(`<${TenantPageHeader.name}/>`, () => {
   it('hides the plan pill but keeps the status pill when it has no plan badge', () => {
     setup({ hasPlanBadge: false });
 
-    const titleRow = screen.getByTestId(TITLE_ROW_TEST_ID);
-    const status = within(titleRow).getByText(ACTIVE_LABEL);
-    const plan = within(titleRow).queryByText(GROWTH_LABEL);
+    const status = withinTitleRow().getByText(ACTIVE_LABEL);
+    const plan = withinTitleRow().queryByText(GROWTH_LABEL);
 
     expect(status).toBeVisible();
     expect(plan).not.toBeInTheDocument();

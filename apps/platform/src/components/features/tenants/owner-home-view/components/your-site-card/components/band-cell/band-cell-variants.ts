@@ -5,13 +5,13 @@ export const bandCellVariants = tv({
     root: [
       'min-w-0 border-t border-admin-line-2 px-4 py-3',
       'first:border-t-0 last:border-l',
-      'md:border-t-0 md:border-l md:first:border-l-0 md:first:pl-[18px]',
-      'lg:px-5 lg:py-4 lg:first:pl-[18px]',
+      'md:border-t-0 md:border-l md:first:border-l-0 md:first:pl-admin-card',
+      'lg:px-5 lg:py-4 lg:first:pl-admin-card',
     ],
-    term: ['text-admin-12-5 leading-[18px] text-admin-muted'],
+    term: ['text-admin-12-5 leading-admin-18 text-admin-muted'],
     value: [
       'm-0 mt-1 min-w-0 wrap-anywhere',
-      'text-admin-14 leading-[22px] font-medium text-admin-text',
+      'text-admin-14 leading-admin-22 font-medium text-admin-text',
     ],
   },
   variants: {
