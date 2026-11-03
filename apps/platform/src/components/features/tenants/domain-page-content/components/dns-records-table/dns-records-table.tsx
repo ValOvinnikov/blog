@@ -30,8 +30,8 @@ export const DnsRecordsTable = ({ records }: TDnsRecordsTableProps) => {
         {records.map((record, index) => (
           <tr className={row()} key={`${record.type}-${record.name}-${index}`}>
             <td className={cell()}>{record.type}</td>
-            <td className={cell()}>{record.name}</td>
-            <td className={cell()}>{record.value}</td>
+            <td className={cell({ isMono: true })}>{record.name}</td>
+            <td className={cell({ isMono: true })}>{record.value}</td>
           </tr>
         ))}
       </tbody>

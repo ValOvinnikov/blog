@@ -10,4 +10,10 @@ export const dnsRecordsTableVariants = tv({
     row: ['border-b border-admin-line-2 last:border-b-0'],
     cell: ['break-all px-[10px] py-2.5 align-middle text-admin-text'],
   },
+  variants: {
+    isMono: {
+      true: { cell: ['font-admin-mono font-medium'] },
+      false: {},
+    },
+  },
 });
