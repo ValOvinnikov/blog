@@ -169,6 +169,31 @@ A domain is a module, a feature, a page, or a layout or app route.
   The exception ends when the generator reads an inline `tv()`. A
   `lib/styling/` recipe follows the rule above.
 
+## Sizes: derived, repeated, combined
+
+`CLAUDE.md`'s exemption for Tailwind class strings covers the class names, not
+the numbers written inside an arbitrary value (`min-h-[52px]`,
+`max-h-[calc(100dvh-84px)]`) or a size held in a TypeScript const. Those
+follow three rules:
+
+- **A size derived from another element reads that element's token or
+  const.** An offset, a maximum height, a scale's denominator or a
+  `calc()` that makes room for a bar, a bezel or a gap names the thing it
+  makes room for. When that element has no token, the change adds one where
+  the element is styled, and both read it. A recomputed literal is wrong the
+  day the element changes, and nothing fails.
+- **An arbitrary value written a second time becomes a token or a const** in
+  the change that writes it again: a CSS variable in the workspace's theme
+  when classes read it, a named const when code reads it. Count across files,
+  `tv()` slots and consts, not within one class string.
+- **A calculation names every term it combines.** A fit, scale or clamp that
+  adds or subtracts sizes reads each one from a named const or token. A
+  comment explaining the arithmetic ("the top bar plus its 5px gap") means
+  the terms are missing names; give them names and delete the comment.
+
+A value tuned for one element that nothing derives from stays where it is
+used.
+
 ## Size and splitting
 
 The budgets, and extracting the part a diff changes, are CLAUDE.md → "File

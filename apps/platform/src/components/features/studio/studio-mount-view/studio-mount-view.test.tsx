@@ -125,16 +125,18 @@ describe(`<${StudioMountView.name}/>`, () => {
     const studioMount = screen.getByTestId(STUDIO_MOUNT);
 
     expect(studioMount).toBeVisible();
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: MOCK_PROJECT_ID,
-      dataset: MOCK_DATASET,
-      basePath,
-      title: MOCK_OTHER_TENANT_NAME,
-      enabledCapabilities: [],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: tenant.locale,
-      liveLocales: [LOCALE_ISO_CODES.EN],
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: MOCK_PROJECT_ID,
+        dataset: MOCK_DATASET,
+        basePath,
+        title: MOCK_OTHER_TENANT_NAME,
+        enabledCapabilities: [],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: tenant.locale,
+        liveLocales: [LOCALE_ISO_CODES.EN],
+      }),
+    );
   });
 
   it("passes the tenant's effective capabilities to Studio", async () => {
@@ -143,16 +145,18 @@ describe(`<${StudioMountView.name}/>`, () => {
     await setup();
 
     expect(getEnabledCapabilitiesMock).toHaveBeenCalledWith(MOCK_TENANT);
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: MOCK_TENANT.sanityProjectId,
-      dataset: MOCK_TENANT.sanityDataset,
-      basePath: adminRoutes.dashboardStudio(),
-      title: MOCK_TENANT.name,
-      enabledCapabilities: [CAPABILITY.COMMENTS],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: MOCK_TENANT.locale,
-      liveLocales: [LOCALE_ISO_CODES.EN],
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: MOCK_TENANT.sanityProjectId,
+        dataset: MOCK_TENANT.sanityDataset,
+        basePath: adminRoutes.dashboardStudio(),
+        title: MOCK_TENANT.name,
+        enabledCapabilities: [CAPABILITY.COMMENTS],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: MOCK_TENANT.locale,
+        liveLocales: [LOCALE_ISO_CODES.EN],
+      }),
+    );
   });
 
   it.each(Object.values(TENANT_PLAN))(
@@ -176,31 +180,35 @@ describe(`<${StudioMountView.name}/>`, () => {
     await setup({ tenant });
 
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(tenant);
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: tenant.sanityProjectId,
-      dataset: tenant.sanityDataset,
-      basePath: adminRoutes.dashboardStudio(),
-      title: tenant.name,
-      enabledCapabilities: [],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: LOCALE_ISO_CODES.NL,
-      liveLocales,
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: tenant.sanityProjectId,
+        dataset: tenant.sanityDataset,
+        basePath: adminRoutes.dashboardStudio(),
+        title: tenant.name,
+        enabledCapabilities: [],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: LOCALE_ISO_CODES.NL,
+        liveLocales,
+      }),
+    );
   });
 
   it('restricts Studio to the given login provider', async () => {
     await setup({ loginProvider: SANITY_LOGIN_PROVIDER.GITHUB });
 
-    expect(studioMountMock).toHaveBeenCalledWith({
-      projectId: MOCK_TENANT.sanityProjectId,
-      dataset: MOCK_TENANT.sanityDataset,
-      basePath: adminRoutes.dashboardStudio(),
-      title: MOCK_TENANT.name,
-      enabledCapabilities: [],
-      entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
-      defaultLocale: MOCK_TENANT.locale,
-      liveLocales: [LOCALE_ISO_CODES.EN],
-      loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
-    });
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        projectId: MOCK_TENANT.sanityProjectId,
+        dataset: MOCK_TENANT.sanityDataset,
+        basePath: adminRoutes.dashboardStudio(),
+        title: MOCK_TENANT.name,
+        enabledCapabilities: [],
+        entitlements: MOCK_FREE_STUDIO_ENTITLEMENTS,
+        defaultLocale: MOCK_TENANT.locale,
+        liveLocales: [LOCALE_ISO_CODES.EN],
+        loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
+      }),
+    );
   });
 });

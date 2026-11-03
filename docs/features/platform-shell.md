@@ -21,6 +21,8 @@ code:
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/utils/sidebar-collapsed-cookie/**
   - apps/platform/src/utils/theme-preference-cookie/**
+  - apps/platform/src/utils/theme-preference/**
+  - apps/platform/src/utils/use-theme-preference/**
   - apps/platform/src/constants/theme.ts
   - apps/platform/src/utils/tenant-switcher-items/**
   - apps/platform/src/context/unsaved-changes-provider/**
@@ -225,7 +227,8 @@ switches the content column to full-bleed (see
   `admin-theme` cookie and sets or clears `data-theme` on `<html>` at once,
   without a reload and without closing the menu; the menu reads the current
   choice back from `<html>`, since the root layout never re-renders on client
-  navigation. Below `md` the topbar keeps a pill
+  navigation, and follows a choice made in the embedded Studio's Appearance
+  menu, which writes the same preference (`embedded-studio.md`). Below `md` the topbar keeps a pill
   (`ACCOUNT_MENU_APPEARANCE.PILL`) named by the role line that opens the same
   menu without the Theme section; from `md` nothing follows the breadcrumb.
   The Workspace field is a `side-field` plate with a `side-field-line` border
