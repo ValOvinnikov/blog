@@ -1,8 +1,9 @@
-import { HTTP_STATUS } from '@blog/config';
+import { HTTP_STATUS, type TMaybeNull } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { mockJsonResponse } from '@platform/testing/http/mock-json-response';
+import { requestedUrl } from '@platform/testing/http/requested-url';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -36,11 +37,14 @@ const MOCK_IP_LITERAL_HOST = faker.internet.ipv4();
 const MOCK_TRAVERSAL_DOMAIN = '../../v1/domains/other';
 const MOCK_NETWORK_ERROR_MESSAGE = faker.lorem.words(2);
 
+const projectDomainsPage = (name: string, next: TMaybeNull<number> = null) =>
+  mockJsonResponse({
+    projectDomains: [{ name, projectId: MOCK_OTHER_PROJECT_ID }],
+    pagination: { count: 1, next, prev: null },
+  });
+
 const projectDomainsPath = (apex: string) =>
   `/v1/domains/${apex}/project-domains`;
-
-const requestedUrl = (callIndex: number) =>
-  fetchMock.mock.calls[callIndex]?.[0] as URL;
 
 describe(checkDomainAvailability, () => {
   beforeEach(() => {
@@ -99,17 +103,11 @@ describe(checkDomainAvailability, () => {
     async ({ domain, apex }) => {
       await checkDomainAvailability(domain);
 
-      expect(requestedUrl(0).pathname).toBe(projectDomainsPath(apex));
+      expect(requestedUrl(fetchMock, 0).pathname).toBe(
+        projectDomainsPath(apex),
+      );
     },
   );
-
-  it('returns AVAILABLE for a 404 response, the domain being unknown to the team', async () => {
-    fetchMock.mockResolvedValue(mockJsonResponse(null, HTTP_STATUS.NOT_FOUND));
-
-    const result = await checkDomainAvailability(MOCK_DOMAIN);
-
-    expect(result).toBe(DOMAIN_AVAILABILITY.AVAILABLE);
-  });
 
   it.each([
     {
@@ -162,39 +160,22 @@ describe(checkDomainAvailability, () => {
   it('follows the pagination cursor to a conflict on a later page', async () => {
     fetchMock
       .mockResolvedValueOnce(
-        mockJsonResponse({
-          projectDomains: [
-            { name: MOCK_SIBLING_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
-          ],
-          pagination: { count: 1, next: MOCK_PAGE_CURSOR, prev: null },
-        }),
+        projectDomainsPage(MOCK_SIBLING_SUBDOMAIN, MOCK_PAGE_CURSOR),
       )
-      .mockResolvedValueOnce(
-        mockJsonResponse({
-          projectDomains: [
-            { name: MOCK_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
-          ],
-          pagination: { count: 1, next: null, prev: null },
-        }),
-      );
+      .mockResolvedValueOnce(projectDomainsPage(MOCK_SUBDOMAIN));
 
     const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
 
     expect(result).toBe(DOMAIN_AVAILABILITY.IN_USE);
     expect(fetchMock).toHaveBeenCalledTimes(2);
-    expect(requestedUrl(1).searchParams.get('until')).toBe(
+    expect(requestedUrl(fetchMock, 1).searchParams.get('until')).toBe(
       String(MOCK_PAGE_CURSOR),
     );
   });
 
   it('stops requesting pages once a conflict is found', async () => {
     fetchMock.mockResolvedValueOnce(
-      mockJsonResponse({
-        projectDomains: [
-          { name: MOCK_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
-        ],
-        pagination: { count: 1, next: MOCK_PAGE_CURSOR, prev: null },
-      }),
+      projectDomainsPage(MOCK_SUBDOMAIN, MOCK_PAGE_CURSOR),
     );
 
     const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
@@ -205,12 +186,7 @@ describe(checkDomainAvailability, () => {
 
   it('returns ERROR, not AVAILABLE, when the page cap runs out inconclusively', async () => {
     fetchMock.mockImplementation(async () =>
-      mockJsonResponse({
-        projectDomains: [
-          { name: MOCK_SIBLING_SUBDOMAIN, projectId: MOCK_OTHER_PROJECT_ID },
-        ],
-        pagination: { count: 1, next: MOCK_PAGE_CURSOR, prev: null },
-      }),
+      projectDomainsPage(MOCK_SIBLING_SUBDOMAIN, MOCK_PAGE_CURSOR),
     );
 
     const result = await checkDomainAvailability(MOCK_SUBDOMAIN);
@@ -219,14 +195,23 @@ describe(checkDomainAvailability, () => {
     expect(fetchMock).toHaveBeenCalledTimes(MAX_PROJECT_DOMAINS_PAGES);
   });
 
-  it('returns ERROR for an unexpected non-2xx response', async () => {
-    fetchMock.mockResolvedValue(
-      mockJsonResponse(null, HTTP_STATUS.INTERNAL_SERVER_ERROR),
-    );
+  it.each([
+    {
+      scenario: 'a 404 response, the domain being unknown to the team',
+      status: HTTP_STATUS.NOT_FOUND,
+      expected: DOMAIN_AVAILABILITY.AVAILABLE,
+    },
+    {
+      scenario: 'an unexpected non-2xx response',
+      status: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      expected: DOMAIN_AVAILABILITY.ERROR,
+    },
+  ])('returns $expected for $scenario', async ({ status, expected }) => {
+    fetchMock.mockResolvedValue(mockJsonResponse(null, status));
 
     const result = await checkDomainAvailability(MOCK_DOMAIN);
 
-    expect(result).toBe(DOMAIN_AVAILABILITY.ERROR);
+    expect(result).toBe(expected);
   });
 
   it('returns ERROR when the request throws', async () => {
