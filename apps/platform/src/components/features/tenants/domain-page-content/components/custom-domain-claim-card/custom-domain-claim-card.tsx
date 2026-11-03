@@ -3,6 +3,7 @@
 import { CustomDomainClaimActions } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-actions/custom-domain-claim-actions';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { Card } from '@platform/components/shared/card';
+import { CopyButton } from '@platform/components/shared/copy-button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
@@ -26,6 +27,8 @@ export const CustomDomainClaimCard = ({
   canManage,
 }: TCustomDomainClaimCardProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
+  const tRecord = useTranslations('tenantDomainPage');
+  const txtName = customDomainTxtName(domain);
   const { registerHeading } = useCustomDomainFocus();
   const { records, selectable } = customDomainClaimCardVariants();
 
@@ -49,10 +52,32 @@ export const CustomDomainClaimCard = ({
           <DetailList.Row label={t('recordTypeLabel')} isMono={true}>
             {CUSTOM_DOMAIN_TXT_TYPE}
           </DetailList.Row>
-          <DetailList.Row label={t('recordNameLabel')} isMono={true}>
-            <span className={selectable()}>{customDomainTxtName(domain)}</span>
+          <DetailList.Row
+            label={t('recordNameLabel')}
+            isMono={true}
+            action={
+              <CopyButton
+                value={txtName}
+                ariaLabel={tRecord('copyRecordName', {
+                  type: CUSTOM_DOMAIN_TXT_TYPE,
+                })}
+              />
+            }
+          >
+            <span className={selectable()}>{txtName}</span>
           </DetailList.Row>
-          <DetailList.Row label={t('recordValueLabel')} isMono={true}>
+          <DetailList.Row
+            label={t('recordValueLabel')}
+            isMono={true}
+            action={
+              <CopyButton
+                value={token}
+                ariaLabel={tRecord('copyRecordValue', {
+                  type: CUSTOM_DOMAIN_TXT_TYPE,
+                })}
+              />
+            }
+          >
             <span className={selectable()}>{token}</span>
           </DetailList.Row>
         </DetailList>

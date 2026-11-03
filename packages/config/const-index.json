@@ -1360,6 +1360,12 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
+        "ref": "COPY_STATUS.IDLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/clipboard",
+        "file": "apps/platform/src/constants/clipboard.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.IDLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -3764,6 +3770,12 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       },
       {
+        "ref": "COPY_STATUS.FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/clipboard",
+        "file": "apps/platform/src/constants/clipboard.ts"
+      },
+      {
         "ref": "CONTRAST_STATUS.FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/release",
@@ -4204,6 +4216,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/button",
         "file": "apps/platform/src/constants/button.ts"
+      }
+    ],
+    "COPIED": [
+      {
+        "ref": "COPY_STATUS.COPIED",
+        "scope": "app:platform",
+        "from": "@platform/constants/clipboard",
+        "file": "apps/platform/src/constants/clipboard.ts"
       }
     ],
     "contrast_result.record_failed": [

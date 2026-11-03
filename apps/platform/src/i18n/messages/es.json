@@ -477,6 +477,8 @@
     "columnType": "Tipo",
     "columnName": "Nombre",
     "columnValue": "Valor",
+    "copyRecordName": "Copiar el nombre del registro {type}",
+    "copyRecordValue": "Copiar el valor del registro {type}",
     "unavailableState": "Los registros DNS no están disponibles en este momento.",
     "addressLabel": "Dirección",
     "visitSiteLink": "Visitar sitio",
@@ -508,7 +510,7 @@
       "connecting": "Conectando…",
       "remove": "Quitar",
       "removeTitle": "¿Quitar este dominio?",
-      "removeDescription": "{domain} dejará de mostrar tu sitio. Tu dirección actual sigue funcionando.",
+      "removeDescription": "<domainName>{domain}</domainName> dejará de mostrar tu sitio. Tu dirección actual sigue funcionando.",
       "removeConfirm": "Quitar dominio",
       "removing": "Quitando…",
       "connectFailed": "No se pudo conectar el dominio. Inténtalo de nuevo.",
@@ -543,7 +545,7 @@
       "verify": "Verificar",
       "verifying": "Verificando…",
       "verifyFailed": "No se pudo comprobar el registro. Inténtalo de nuevo.",
-      "removeClaimDescription": "{domain} dejará de esperar la verificación. Tu dirección actual sigue funcionando.",
+      "removeClaimDescription": "<domainName>{domain}</domainName> dejará de esperar la verificación. Tu dirección actual sigue funcionando.",
       "mainTitle": "Tu propio dominio (dirección principal)",
       "subdomainStillWorks": "Tu subdominio {subdomain} sigue funcionando y muestra el mismo sitio.",
       "mainAddress": {
@@ -551,14 +553,14 @@
         "makeMain": {
           "trigger": "Usar como dirección principal",
           "title": "¿Usar este dominio como dirección principal?",
-          "description": "Tu sitio se conocerá como {domain}. Puedes volver a tu subdominio cuando quieras.",
+          "description": "Tu sitio se conocerá como <domainName>{domain}</domainName>. Puedes volver a tu subdominio cuando quieras.",
           "confirm": "Usar como dirección principal",
           "confirming": "Cambiando…"
         },
         "useSubdomain": {
           "trigger": "Usar mi subdominio como dirección principal",
           "title": "¿Usar tu subdominio como dirección principal?",
-          "description": "Tu sitio volverá a conocerse por tu subdominio. {domain} sigue conectado.",
+          "description": "Tu sitio volverá a conocerse por tu subdominio. <domainName>{domain}</domainName> sigue conectado.",
           "confirm": "Usar subdominio",
           "confirming": "Cambiando…"
         }
@@ -889,6 +891,11 @@
     "customised": "Personalizado",
     "unsaved": "Sin guardar",
     "reset": "Restablecer"
+  },
+  "copyButton": {
+    "tooltip": "Copiar",
+    "copied": "Copiado",
+    "failed": "No se pudo copiar. Selecciona el texto."
   },
   "emailPreview": {
     "heading": "Vista previa",
@@ -1859,8 +1866,6 @@
     "unavailable": "Los lectores ven una página de no disponible en lugar de tu sitio.",
     "category": "Motivo: {category}.",
     "contest": "Para impugnar esta decisión, responde al correo de suspensión o escribe a soporte indicando {reference}.",
-    "copyButton": "Copiar referencia",
-    "copied": "Referencia copiada",
-    "copyFailed": "No se pudo copiar la referencia. Selecciónala y cópiala tú."
+    "copyButton": "Copiar referencia"
   }
 }

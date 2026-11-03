@@ -11,6 +11,8 @@ export const dnsRecordsTableVariants = tv({
     ],
     row: ['border-b border-admin-line-2 last:border-b-0'],
     cell: ['break-all p-2.5 align-middle text-admin-text'],
+    copyable: ['flex items-center justify-between gap-2'],
+    selectable: ['min-w-0 select-all'],
   },
   variants: {
     isRecordData: {

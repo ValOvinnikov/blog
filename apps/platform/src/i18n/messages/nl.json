@@ -477,6 +477,8 @@
     "columnType": "Type",
     "columnName": "Naam",
     "columnValue": "Waarde",
+    "copyRecordName": "Naam van het {type}-record kopiëren",
+    "copyRecordValue": "Waarde van het {type}-record kopiëren",
     "unavailableState": "DNS-records zijn op dit moment niet beschikbaar.",
     "addressLabel": "Adres",
     "visitSiteLink": "Site bekijken",
@@ -508,7 +510,7 @@
       "connecting": "Koppelen…",
       "remove": "Verwijderen",
       "removeTitle": "Dit domein verwijderen?",
-      "removeDescription": "{domain} toont je site niet meer. Je huidige adres blijft werken.",
+      "removeDescription": "<domainName>{domain}</domainName> toont je site niet meer. Je huidige adres blijft werken.",
       "removeConfirm": "Domein verwijderen",
       "removing": "Verwijderen…",
       "connectFailed": "Het domein kon niet worden gekoppeld. Probeer het opnieuw.",
@@ -543,7 +545,7 @@
       "verify": "Controleren",
       "verifying": "Controleren…",
       "verifyFailed": "Het record kon niet worden gecontroleerd. Probeer het opnieuw.",
-      "removeClaimDescription": "{domain} wacht niet meer op verificatie. Je huidige adres blijft werken.",
+      "removeClaimDescription": "<domainName>{domain}</domainName> wacht niet meer op verificatie. Je huidige adres blijft werken.",
       "mainTitle": "Je eigen domein (hoofdadres)",
       "subdomainStillWorks": "Je subdomein {subdomain} blijft werken en toont dezelfde site.",
       "mainAddress": {
@@ -551,14 +553,14 @@
         "makeMain": {
           "trigger": "Gebruik als hoofdadres",
           "title": "Dit domein als hoofdadres gebruiken?",
-          "description": "Je site is dan bekend onder {domain}. Je kunt op elk moment terug naar je subdomein.",
+          "description": "Je site is dan bekend onder <domainName>{domain}</domainName>. Je kunt op elk moment terug naar je subdomein.",
           "confirm": "Gebruik als hoofdadres",
           "confirming": "Wijzigen…"
         },
         "useSubdomain": {
           "trigger": "Gebruik mijn subdomein als hoofdadres",
           "title": "Je subdomein als hoofdadres gebruiken?",
-          "description": "Je site is dan weer bekend onder je subdomein. {domain} blijft gekoppeld.",
+          "description": "Je site is dan weer bekend onder je subdomein. <domainName>{domain}</domainName> blijft gekoppeld.",
           "confirm": "Gebruik subdomein",
           "confirming": "Wijzigen…"
         }
@@ -889,6 +891,11 @@
     "customised": "Aangepast",
     "unsaved": "Niet opgeslagen",
     "reset": "Herstellen"
+  },
+  "copyButton": {
+    "tooltip": "Kopiëren",
+    "copied": "Gekopieerd",
+    "failed": "Kopiëren is mislukt. Selecteer de tekst handmatig."
   },
   "emailPreview": {
     "heading": "Voorbeeld",
@@ -1859,8 +1866,6 @@
     "unavailable": "Lezers zien een pagina ‘niet beschikbaar’ in plaats van je site.",
     "category": "Reden: {category}.",
     "contest": "Wil je dit besluit aanvechten? Beantwoord de schorsingsmail of schrijf naar support en vermeld {reference}.",
-    "copyButton": "Referentie kopiëren",
-    "copied": "Referentie gekopieerd",
-    "copyFailed": "De referentie kon niet worden gekopieerd. Selecteer en kopieer haar zelf."
+    "copyButton": "Referentie kopiëren"
   }
 }

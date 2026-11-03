@@ -10,6 +10,7 @@ import ChevronRight from '@platform/assets/icons/chevron-right.svg';
 import ChevronUp from '@platform/assets/icons/chevron-up.svg';
 import Clock from '@platform/assets/icons/clock.svg';
 import Comment from '@platform/assets/icons/comment.svg';
+import Copy from '@platform/assets/icons/copy.svg';
 import Crosshair from '@platform/assets/icons/crosshair.svg';
 import ErrorExclamation from '@platform/assets/icons/error-exclamation.svg';
 import ErrorCircle from '@platform/assets/icons/error.svg';
@@ -72,6 +73,7 @@ export const ICON_REGISTRY = {
   // The error notice's circled cross, the same key @blog/ui's Alert uses for ERROR.
   [ICONS.CLOSE]: ErrorCircle,
   [ICONS.COMMENT]: Comment,
+  [ICONS.COPY]: Copy,
   [ICONS.CROSSHAIR]: Crosshair,
   [ICONS.ERROR]: ErrorExclamation,
   [ICONS.EXTERNAL_LINK]: ExternalLink,
