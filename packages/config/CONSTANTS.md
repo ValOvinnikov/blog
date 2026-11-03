@@ -426,7 +426,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
-- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`
+- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`
 
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 

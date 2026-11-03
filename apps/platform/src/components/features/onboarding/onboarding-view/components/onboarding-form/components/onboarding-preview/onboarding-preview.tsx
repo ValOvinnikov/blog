@@ -7,6 +7,7 @@ import { SampleCookieButton } from '@platform/components/features/site-preview/s
 import { DeviceFrame } from '@platform/components/shared/device-frame';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
+import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { ONBOARDING_PREVIEW } from '@platform/constants/onboarding';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { applyPresetDefaults } from '@platform/utils/look-form-values/look-form-values';
@@ -15,6 +16,7 @@ import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
@@ -49,6 +51,7 @@ export const OnboardingPreview = ({
   const columnSize = useElementSize(columnRef);
   const stageRef = useRef<HTMLDivElement>(null);
   const stageSize = useElementSize(stageRef);
+  const isCoarsePointer = useMediaQuery(MEDIA_QUERY.COARSE_POINTER);
   const look = {
     ...applyPresetDefaults(preset, defaultLookFormValues()),
     accentHue,
@@ -56,6 +59,7 @@ export const OnboardingPreview = ({
   const theme = buildSitePreviewTheme(look, isDark);
   const isAddressOnOwnLine =
     isPhone ||
+    isCoarsePointer ||
     (columnSize?.width ?? Number.POSITIVE_INFINITY) <
       ONBOARDING_PREVIEW.ADDRESS_ROW_MIN_COLUMN_WIDTH;
   const { section, stage } = onboardingPreviewVariants({ isPhone, isFull });

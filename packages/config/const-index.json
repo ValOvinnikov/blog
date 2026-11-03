@@ -5258,6 +5258,14 @@
         "file": "apps/platform/src/constants/media-query.ts"
       }
     ],
+    "(pointer: coarse)": [
+      {
+        "ref": "MEDIA_QUERY.COARSE_POINTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/media-query",
+        "file": "apps/platform/src/constants/media-query.ts"
+      }
+    ],
     "DESKTOP": [
       {
         "ref": "MENU_RADIO_GROUP_SIZE.DESKTOP",
