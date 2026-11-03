@@ -608,7 +608,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   return type, a `useState` or a `createContext` alike. Derive a const's union
   with `TValueOf<typeof C>` (`@blog/config/utils`), never
   `(typeof C)[keyof typeof C]`. The same goes for `IWithClassName`,
-  `IWithDataTestId`, `ILocalizedParams` and `ITenantLocalizedParams`. Before
+  `IWithDataTestId`, `ILocalizedParams`, `ITenantLocalizedParams` and
+  `IWithChildren` (from `@blog/config/react`). Before
   writing a type, check `packages/config/src/types/` for one that already says
   it, and add a missing one there rather than locally. Exempt are the
   generated Sanity types and the workspaces below `@blog/config` in the graph,

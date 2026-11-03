@@ -1,19 +1,18 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
+import type { IWithChildren } from '@blog/config/react';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
-import type { ReactNode } from 'react';
 
 import {
   NESTED_TRIGGER_CLASSES,
   nestableMenuTriggerVariants,
 } from './nestable-menu-trigger-variants';
 
-type TNestableMenuTriggerProps = {
+type TNestableMenuTriggerProps = IWithChildren & {
   className: string;
   title?: string;
   'aria-label'?: string;
-  children: ReactNode;
 };
 
 // Nested, the pinned-trigger colours come after the caller's classes so they win the merge.

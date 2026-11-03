@@ -1,15 +1,12 @@
 'use client';
 
-import { createContext, useContext, type ReactNode } from 'react';
+import type { IWithChildren } from '@blog/config/react';
+import { createContext, useContext } from 'react';
 
 const NestedMenuContext = createContext(false);
 
-type TNestedMenuProviderProps = {
-  children: ReactNode;
-};
-
 /** Marks a subtree as sitting inside a Base UI menu popup, so a menu rendered there opens as its submenu. */
-export const NestedMenuProvider = ({ children }: TNestedMenuProviderProps) => (
+export const NestedMenuProvider = ({ children }: IWithChildren) => (
   <NestedMenuContext.Provider value={true}>
     {children}
   </NestedMenuContext.Provider>

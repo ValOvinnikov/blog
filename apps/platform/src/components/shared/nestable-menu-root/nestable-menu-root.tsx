@@ -1,12 +1,11 @@
 'use client';
 
 import { Menu } from '@base-ui/react/menu';
+import type { IWithChildren } from '@blog/config/react';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
-import type { ReactNode } from 'react';
 
-type TNestableMenuRootProps = {
+type TNestableMenuRootProps = IWithChildren & {
   onOpenChangeComplete?: (isOpen: boolean) => void;
-  children: ReactNode;
 };
 
 /** A menu that opens as a submenu, Escape closing only itself, when rendered inside another menu's popup. */
