@@ -17,6 +17,7 @@ import {
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
+  clickGoToTheFirstOne,
   nudgeAccentHue,
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
@@ -96,13 +97,11 @@ const rowTrigger = (title: string) => {
   return within(heading).getByRole('button');
 };
 
-const followGoToTheFirstOne = async (user: UserEvent) => {
+const saveAndGoToTheFirstOne = async (user: UserEvent) => {
   const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
   await user.click(saveButton);
-  const goToFirstOneLink = await screen.findByRole('link', {
-    name: GO_TO_THE_FIRST_ONE,
-  });
-  await user.click(goToFirstOneLink);
+  await screen.findByRole('link', { name: GO_TO_THE_FIRST_ONE });
+  await clickGoToTheFirstOne(user);
 };
 
 describe(useLookOpenRows, () => {
@@ -214,7 +213,7 @@ describe(useLookOpenRows, () => {
     });
 
     it('opens the Colour row, keeps Footer open and focuses the slider', async () => {
-      await followGoToTheFirstOne(user);
+      await saveAndGoToTheFirstOne(user);
 
       const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);
       const footerTrigger = rowTrigger(LOOK_FORM.footerHeading);
@@ -239,7 +238,7 @@ describe(useLookOpenRows, () => {
     });
 
     it('opens the Brand row, folds nothing else and focuses the picker', async () => {
-      await followGoToTheFirstOne(user);
+      await saveAndGoToTheFirstOne(user);
 
       const brandTrigger = rowTrigger(LOOK_FORM.brandHeading);
       const colourTrigger = rowTrigger(LOOK_FORM.colourHeading);

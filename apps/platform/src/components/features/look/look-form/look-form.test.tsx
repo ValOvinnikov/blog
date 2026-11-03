@@ -56,6 +56,7 @@ import {
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
+  clickGoToTheFirstOne,
   nudgeAccentHue,
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
@@ -274,6 +275,22 @@ const pickAndSaveLogo = async (user: UserEvent) => {
   await pickLogo(user);
   await clickSave(user);
 };
+
+const clickRestoreChanges = async (user: UserEvent) => {
+  const restoreChangesButton = screen.getByRole('button', {
+    name: RESTORE_CHANGES,
+  });
+  await user.click(restoreChangesButton);
+};
+
+const setupAndSaveNudgedHue = async (user: UserEvent) => {
+  setup();
+  await nudgeAccentHue(user);
+  await clickSave(user);
+};
+
+const setupArchived = (overrides: Parameters<typeof setup>[0] = {}) =>
+  setup({ archivedAt: MOCK_ARCHIVED_AT, ...overrides });
 
 const stageAssetRemoval = async (user: UserEvent) => {
   const removeButton = screen.getByRole('button', {
@@ -726,15 +743,6 @@ describe(`<${LookForm.name}/>`, () => {
     },
   );
 
-  it('drops the tab panels on desktop, where the view tabs are hidden', () => {
-    stubLgUpWindow();
-    setup();
-
-    const tabPanel = screen.queryByRole('tabpanel');
-
-    expect(tabPanel).not.toBeInTheDocument();
-  });
-
   it('resets the header buttons style with the rest of the preset', async () => {
     setup({
       initialValues: {
@@ -890,10 +898,7 @@ describe(`<${LookForm.name}/>`, () => {
           resolveAction = resolve;
         }),
     );
-    setup();
-
-    await nudgeAccentHue(user);
-    await clickSave(user);
+    await setupAndSaveNudgedHue(user);
 
     const saveButton = await screen.findByRole('button', { name: SAVING });
     expect(saveButton).toHaveAttribute('aria-busy', 'true');
@@ -907,10 +912,7 @@ describe(`<${LookForm.name}/>`, () => {
     vi.mocked(updateLookAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
-    setup();
-
-    await nudgeAccentHue(user);
-    await clickSave(user);
+    await setupAndSaveNudgedHue(user);
 
     const alert = await screen.findByRole(
       'alert',
@@ -923,8 +925,13 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   describe('the preview sub-menu', () => {
+    let submenuGroup: HTMLElement;
+
     beforeEach(() => {
       setup();
+      submenuGroup = screen.getByRole('group', {
+        name: LOOK_FORM.headerSubmenuStyleLabel,
+      });
     });
 
     it('starts closed', () => {
@@ -934,9 +941,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('opens while the Sub-menus field is hovered', async () => {
-      const submenuGroup = screen.getByRole('group', {
-        name: LOOK_FORM.headerSubmenuStyleLabel,
-      });
       await user.hover(submenuGroup);
 
       const openSubmenu = screen.getByTestId(SAMPLE_SUBMENU_TEST_ID);
@@ -952,9 +956,6 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('shows the picked style and stays open while the field keeps focus', async () => {
-      const submenuGroup = screen.getByRole('group', {
-        name: LOOK_FORM.headerSubmenuStyleLabel,
-      });
       const wideButton = within(submenuGroup).getByRole('button', {
         name: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
       });
@@ -981,12 +982,25 @@ describe(`<${LookForm.name}/>`, () => {
     const showOnDesktopButton = () =>
       screen.queryByRole('button', { name: LOOK_FORM.headerShowOnDesktop });
 
-    it('opens on Desktop from lg with no device note', () => {
-      stubLgUpWindow();
-      setup();
+    describe('from lg', () => {
+      beforeEach(() => {
+        stubLgUpWindow();
+        setup();
+      });
 
-      expect(deviceButton('deviceDesktop')).toBePressed();
-      expect(showOnDesktopButton()).not.toBeInTheDocument();
+      it('opens on Desktop with no device note', () => {
+        const desktopButton = deviceButton('deviceDesktop');
+        const showOnDesktop = showOnDesktopButton();
+
+        expect(desktopButton).toBePressed();
+        expect(showOnDesktop).not.toBeInTheDocument();
+      });
+
+      it('drops the tab panels, where the view tabs are hidden', () => {
+        const tabPanel = screen.queryByRole('tabpanel');
+
+        expect(tabPanel).not.toBeInTheDocument();
+      });
     });
 
     describe('below lg', () => {
@@ -996,14 +1010,17 @@ describe(`<${LookForm.name}/>`, () => {
 
       it('opens on Phone with the phone note under the header layout', () => {
         const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.PHONE);
+        const phoneButton = deviceButton('devicePhone');
+        const showOnDesktop = showOnDesktopButton();
 
-        expect(deviceButton('devicePhone')).toBePressed();
+        expect(phoneButton).toBePressed();
         expect(note).toBeVisible();
-        expect(showOnDesktopButton()).toBeVisible();
+        expect(showOnDesktop).toBeVisible();
       });
 
       it('shows the tablet note when the preview is on Tablet', async () => {
-        await user.click(deviceButton('deviceTablet'));
+        const tabletButton = deviceButton('deviceTablet');
+        await user.click(tabletButton);
 
         const note = screen.getByText(LOOK_FORM.headerPreviewDeviceNote.TABLET);
         expect(note).toBeVisible();
@@ -1018,9 +1035,11 @@ describe(`<${LookForm.name}/>`, () => {
         const note = screen.queryByText(
           LOOK_FORM.headerPreviewDeviceNote.PHONE,
         );
-        expect(deviceButton('deviceDesktop')).toBePressed();
+        const desktopButton = deviceButton('deviceDesktop');
+        const showOnDesktopAfter = showOnDesktopButton();
+        expect(desktopButton).toBePressed();
         expect(note).not.toBeInTheDocument();
-        expect(showOnDesktopButton()).not.toBeInTheDocument();
+        expect(showOnDesktopAfter).not.toBeInTheDocument();
       });
 
       it('keeps the device and reader state across the Edit and Preview tabs', async () => {
@@ -1069,10 +1088,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('focuses the accent hue slider from the save bar', async () => {
-      const goToFirstOneLink = screen.getByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(goToFirstOneLink);
+      await clickGoToTheFirstOne(user);
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
       expect(slider).toHaveFocus();
@@ -1081,10 +1097,7 @@ describe(`<${LookForm.name}/>`, () => {
     it('returns to the Edit tab to focus the accent hue slider from the Preview', async () => {
       const previewTab = screen.getByRole('tab', { name: 'Preview' });
       await user.click(previewTab);
-      const goToFirstOneLink = screen.getByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(goToFirstOneLink);
+      await clickGoToTheFirstOne(user);
 
       const editTab = screen.getByRole('tab', { name: 'Edit' });
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
@@ -1251,15 +1264,9 @@ describe(`<${LookForm.name}/>`, () => {
         name: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
       });
       await user.click(shownButton);
-      await clickSave(user);
 
-      await waitFor(() => {
-        expect(updateLookAction).toHaveBeenCalledWith(
-          MOCK_TENANT_ID,
-          savedLookValues({
-            cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
-          }),
-        );
+      await saveAndExpectLook(user, {
+        cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
       });
     });
 
@@ -1290,7 +1297,7 @@ describe(`<${LookForm.name}/>`, () => {
   describe('archived tenant', () => {
     describe('with only the archive date', () => {
       beforeEach(() => {
-        setup({ archivedAt: MOCK_ARCHIVED_AT });
+        setupArchived();
       });
 
       it('shows an archived notice and offers no Save', () => {
@@ -1376,7 +1383,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('describes a rejected accent hue with both the archived notice and the error', () => {
       vi.mocked(isAccentHueAccessible).mockReturnValue(false);
-      setup({ archivedAt: MOCK_ARCHIVED_AT });
+      setupArchived();
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
 
@@ -1386,8 +1393,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('disables Reset to preset and describes it with the archived notice', () => {
-      setup({
-        archivedAt: MOCK_ARCHIVED_AT,
+      setupArchived({
         initialValues: {
           ...defaultLookFormValues(),
           accentHue: MOCK_SAVED_ACCENT_HUE,
@@ -1409,10 +1415,7 @@ describe(`<${LookForm.name}/>`, () => {
     unmount();
 
     setupWithSavedLogo();
-    const restoreChangesButton = screen.getByRole('button', {
-      name: RESTORE_CHANGES,
-    });
-    await user.click(restoreChangesButton);
+    await clickRestoreChanges(user);
 
     const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
     const hueReadout = screen.getByText(hueValue(EDITORIAL_ACCENT_HUE));
@@ -1617,10 +1620,7 @@ describe(`<${LookForm.name}/>`, () => {
           expect(saveBar).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
           expect(alert).not.toBeInTheDocument();
 
-          const goToFirstOneLink = screen.getByRole('link', {
-            name: GO_TO_THE_FIRST_ONE,
-          });
-          await user.click(goToFirstOneLink);
+          await clickGoToTheFirstOne(user);
 
           const replaceLogoButton = screen.getByRole('button', {
             name: REPLACE_LOGO,
@@ -1691,10 +1691,7 @@ describe(`<${LookForm.name}/>`, () => {
       unmount();
 
       setup();
-      const restoreChangesButton = screen.getByRole('button', {
-        name: RESTORE_CHANGES,
-      });
-      await user.click(restoreChangesButton);
+      await clickRestoreChanges(user);
 
       const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
       const uploadLogoButton = screen.getByRole('button', {
