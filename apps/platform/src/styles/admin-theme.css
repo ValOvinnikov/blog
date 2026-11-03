@@ -300,6 +300,7 @@
   --color-admin-fade-end-surface: var(--admin-fade-end-surface);
   --color-admin-preview-stage: var(--admin-preview-stage);
 
+  --text-admin-10-5: 10.5px;
   --text-admin-11: 11px;
   --text-admin-11-5: 11.5px;
   --text-admin-12: 12px;
@@ -315,6 +316,8 @@
   --text-admin-28: 28px;
 
   --leading-admin-14: 14px;
+  --leading-admin-1-4: 1.4;
+  --leading-admin-1-45: 1.45;
   --leading-admin-18: 18px;
   --leading-admin-22: 22px;
 

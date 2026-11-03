@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
@@ -46,7 +47,6 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 const MOCK_ACCENT_HUE = 28;
 const SIGN_IN = 'Sign in';
 const ARIA_PRESSED = 'aria-pressed';
-const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
 
 const tLogoHue = makeEnTranslator('logoHueField');
@@ -109,7 +109,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       const presetRadius = screen.getByRole('button', {
         name: RADIUS_LABEL.MD,
       });
-      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
       expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(presetRadius).toBeDisabled();
       expect(sampleTokens).not.toHaveStyle({ '--radius-md': '16px' });
@@ -122,7 +122,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       const storedRadius = screen.getByRole('button', {
         name: RADIUS_LABEL.XL,
       });
-      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
       expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(storedRadius).toBeEnabled();
       expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });

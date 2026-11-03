@@ -24,6 +24,7 @@ import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   SAMPLE_BUSY_BUTTON_TEST_ID,
   SAMPLE_BUSY_STYLE_ATTRIBUTE,
@@ -156,7 +157,6 @@ const MOCK_DRAFT_TAKEN_AT = '2026-08-20T09:00:00.000Z';
 const HEAVY_FORM_TIMEOUT_MS = 15_000;
 const ARIA_SELECTED = 'aria-selected';
 const DATA_DISABLED = 'data-disabled';
-const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
 const FOLLOW_ACCENT_HUE = messages.logoHueField.followAccentHue;
 const UPLOAD_FAVICON = messages.assetUploadField.favicon.upload;
@@ -349,7 +349,7 @@ describe(`<${LookForm.name}/>`, () => {
         await user.click(previewTab);
 
         const previewPanel = screen.getByRole('tabpanel', { name: 'Preview' });
-        const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+        const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
         expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
         expect(editTab).toHaveAttribute(ARIA_SELECTED, 'false');
         expect(previewPanel).toContainElement(sampleTokens);
@@ -419,7 +419,7 @@ describe(`<${LookForm.name}/>`, () => {
           const compactButton = screen.getByRole('button', { name: COMPACT });
           await user.click(compactButton);
 
-          const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+          const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
           expect(sampleTokens).toHaveStyle({
             '--radius-md': '16px',
             '--spacing-card-x': '0.75rem',
@@ -752,7 +752,7 @@ describe(`<${LookForm.name}/>`, () => {
         });
 
         it("previews the preset's card style", () => {
-          const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+          const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
 
           expect(sampleTokens).toHaveStyle({ '--item-border-width': '1px' });
         });
@@ -1361,7 +1361,7 @@ describe(`<${LookForm.name}/>`, () => {
       const smallButton = screen.getByRole('button', {
         name: LOOK_FORM.radiusScaleOptionLabel.SM,
       });
-      const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
       expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(sampleTokens).toHaveStyle({ '--radius-md': '4px' });
     });

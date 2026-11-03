@@ -2,10 +2,10 @@
 
 import type { TPresetId } from '@blog/config';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
-import { FormField } from '@platform/components/shared/form-field';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { PresetPicker } from '@platform/components/shared/preset-picker';
 import { HUE_SLIDER_TRACK } from '@platform/constants/hue-slider';
+import { PRESET_PICKER_LAYOUT } from '@platform/constants/preset-picker';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -25,18 +25,34 @@ export const SiteLookFields = ({
   onAccentHueChange,
 }: TSiteLookFieldsProps) => {
   const t = useTranslations('onboardingForm');
+  const presetLegendId = useId();
+  const presetHintId = useId();
   const accentLabelId = useId();
-  const { accent, label, row } = siteLookFieldsVariants();
+  const {
+    preset: presetGroup,
+    legend,
+    hint,
+    accent,
+    label,
+    row,
+  } = siteLookFieldsVariants();
 
   return (
     <>
-      <FormField
-        label={t('presetLabel')}
-        hint={t('presetHint')}
-        control={{ hasOwnAccessibleName: true }}
-      >
-        <PresetPicker value={preset} onChange={onPresetChange} />
-      </FormField>
+      <fieldset className={presetGroup()}>
+        <legend id={presetLegendId} className={label({ class: legend() })}>
+          {t('presetLabel')}
+        </legend>
+        <PresetPicker
+          value={preset}
+          onChange={onPresetChange}
+          aria={{ labelledBy: presetLegendId, describedBy: presetHintId }}
+          layout={PRESET_PICKER_LAYOUT.PAIRED}
+        />
+        <p id={presetHintId} className={hint()}>
+          {t('presetHint')}
+        </p>
+      </fieldset>
       <div className={accent()}>
         <span id={accentLabelId} className={label()}>
           {t('accentLabel')}

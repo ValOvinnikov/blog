@@ -22,6 +22,7 @@ export const PresetCard = () => {
     hasCardChanges,
   } = useLookForm();
   const t = useTranslations('lookForm');
+  const tPicker = useTranslations('presetPicker');
   const titleId = useId();
   const { title, body } = presetCardVariants();
 
@@ -55,8 +56,11 @@ export const PresetCard = () => {
         <PresetPicker
           value={values.preset}
           onChange={changePreset}
+          aria={{
+            label: tPicker('ariaLabel'),
+            describedBy: archivedDescribedBy,
+          }}
           isDisabled={isArchived}
-          aria-describedby={archivedDescribedBy}
         />
       </Card.Body>
     </Card>

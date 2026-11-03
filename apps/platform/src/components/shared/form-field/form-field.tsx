@@ -29,8 +29,8 @@ const formFieldVariants = tv({
       [FIELD_APPEARANCE.WIZARD]: {
         root: ['gap-1.5'],
         label: ['text-admin-13-5'],
-        hint: ['leading-[1.45]'],
-        error: ['text-admin-12 leading-[1.45] font-medium'],
+        hint: ['leading-admin-1-45'],
+        error: ['text-admin-12 leading-admin-1-45 font-medium'],
       },
     },
   },

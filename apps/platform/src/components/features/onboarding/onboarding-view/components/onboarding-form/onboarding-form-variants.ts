@@ -20,7 +20,7 @@ export const onboardingFormVariants = tv({
     ],
     column: ['md:max-w-[640px]'],
     panel: ['flex flex-col outline-hidden'],
-    fields: ['@container mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],
+    fields: ['mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],
     railPreview: ['mt-8'],
     previewColumn: [
       'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-admin-bg px-7 py-8',

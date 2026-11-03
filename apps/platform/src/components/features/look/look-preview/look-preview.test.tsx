@@ -11,6 +11,7 @@ import {
   type TLookFormContext,
 } from '@platform/components/features/look/look-form-provider';
 import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
+import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   PREVIEW_DEVICE,
   type TPreviewDevice,
@@ -31,7 +32,6 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
 
-const SAMPLE_TOKENS_TEST_ID = 'look-sample-tokens';
 const MOCK_ACCENT_HUE = 28;
 const LOOK_PREVIEW = messages.lookPreview;
 const tDevicePreview = makeEnTranslator('devicePreview');
@@ -114,7 +114,7 @@ describe(`<${LookPreview.name}/>`, () => {
   ])('carries $name onto the preview surface', ({ values, tokens }) => {
     renderPreview({ values });
 
-    const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+    const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
 
     expect(sampleTokens).toHaveStyle(tokens);
   });
@@ -166,7 +166,7 @@ describe(`<${LookPreview.name}/>`, () => {
     const darkButton = screen.getByRole('button', { name: 'Dark' });
     await user.click(darkButton);
 
-    const sampleTokens = screen.getByTestId(SAMPLE_TOKENS_TEST_ID);
+    const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
 
     expect(sampleTokens).toHaveStyle({
       '--brand-primary-solid': 'oklch(0.7 0.16 28)',
