@@ -545,7 +545,7 @@
       "verifyFailed": "Het record kon niet worden gecontroleerd. Probeer het opnieuw.",
       "removeClaimDescription": "{domain} wacht niet meer op verificatie. Je huidige adres blijft werken.",
       "mainTitle": "Je eigen domein (hoofdadres)",
-      "subdomainStillWorks": "Je subdomein blijft werken en toont dezelfde site.",
+      "subdomainStillWorks": "Je subdomein {subdomain} blijft werken en toont dezelfde site.",
       "mainAddress": {
         "failed": "Het hoofdadres kon niet worden gewijzigd. Probeer het opnieuw.",
         "makeMain": {

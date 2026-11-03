@@ -41,6 +41,9 @@ export const DomainPageContent = async ({
     primaryDomain,
     env.TENANT_ROOT_DOMAIN,
   );
+  const subdomain = tenantDomains
+    .map(({ domain }) => domain)
+    .find((domain) => isPlatformAddress(domain, env.TENANT_ROOT_DOMAIN));
   const { root } = domainPageContentVariants();
 
   return (
@@ -63,6 +66,7 @@ export const DomainPageContent = async ({
       <CustomDomainCard
         tenant={tenant}
         customDomain={customDomain}
+        subdomain={subdomain}
         claim={claim}
         primaryProjectDomain={projectDomain}
         isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}

@@ -24,6 +24,7 @@ import {
   waitFor,
 } from '@platform/testing/custom-render';
 import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   MOCK_ARCHIVED_AT,
@@ -58,6 +59,10 @@ const CLAIM = mockCustomDomainClaim();
 const TITLE = { level: 2, name: ownDomain.title };
 const MAIN_TITLE = { level: 2, name: ownDomain.mainTitle };
 const { makeMain, useSubdomain } = ownDomain.mainAddress;
+const SUBDOMAIN_NOTE = makeEnTranslator('tenantDomainPage.ownDomain')(
+  'subdomainStillWorks',
+  { subdomain: MOCK_TENANT_DOMAIN },
+);
 
 const BASE_PROPS: TCustomDomainCardProps = {
   tenant: {
@@ -67,6 +72,7 @@ const BASE_PROPS: TCustomDomainCardProps = {
     primaryDomain: MOCK_TENANT_DOMAIN,
   },
   customDomain: undefined,
+  subdomain: MOCK_TENANT_DOMAIN,
   claim: undefined,
   isPrimaryCustom: false,
   primaryProjectDomain: Promise.resolve({
@@ -146,10 +152,10 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       expect(input).not.toBeInTheDocument();
     });
 
-    it('says the subdomain still works', async () => {
+    it('names the subdomain and says it still works', async () => {
       await renderCard({ isPrimaryCustom: true });
 
-      const note = await screen.findByText(ownDomain.subdomainStillWorks);
+      const note = await screen.findByText(SUBDOMAIN_NOTE);
 
       expect(note).toBeVisible();
     });
@@ -260,7 +266,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN });
       await screen.findByRole('heading', TITLE);
 
-      const note = screen.queryByText(ownDomain.subdomainStillWorks);
+      const note = screen.queryByText(SUBDOMAIN_NOTE);
 
       expect(note).not.toBeInTheDocument();
     });

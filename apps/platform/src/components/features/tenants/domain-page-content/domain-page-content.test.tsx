@@ -7,8 +7,11 @@ import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
   MOCK_CLAIM_TOKEN,
   mockCustomDomainClaim,
+  mockTenantDomainRows,
 } from '@platform/testing/custom-domain/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
@@ -17,7 +20,6 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ROOT_DOMAIN,
-  MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 
@@ -46,6 +48,10 @@ const getCustomDomainClaimMock = vi.mocked(
   queries.customDomainClaims.getCustomDomainClaim,
 );
 const envMock: Partial<Record<keyof typeof env, string>> = env;
+const SUBDOMAIN_NOTE = makeEnTranslator('tenantDomainPage.ownDomain')(
+  'subdomainStillWorks',
+  { subdomain: MOCK_TENANT_DOMAIN },
+);
 
 const setup = customRenderAsync(DomainPageContent, {
   tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
@@ -57,10 +63,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     listTenantDomainsMock.mockReset().mockResolvedValue([]);
     getCustomDomainClaimMock.mockReset().mockResolvedValue(undefined);
     delete envMock.TENANT_ROOT_DOMAIN;
-    getProjectDomainMock.mockResolvedValue({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
-    });
+    getProjectDomainMock.mockResolvedValue(mockPendingProjectDomain());
   });
 
   it('shows the title, description and skeleton while Vercel is silent', async () => {
@@ -234,6 +237,26 @@ describe(`<${DomainPageContent.name}/>`, () => {
         MOCK_CUSTOM_DOMAIN,
       );
     });
+
+    it.each([
+      { viewer: 'the owner', access: { membership: mockMembership() } },
+      { viewer: 'an operator', access: { admin: mockAdmin() } },
+    ])(
+      'names the subdomain that still works under a custom main address for $viewer',
+      async ({ access }) => {
+        envMock.TENANT_ROOT_DOMAIN = MOCK_TENANT_ROOT_DOMAIN;
+        listTenantDomainsMock.mockResolvedValue(mockTenantDomainRows());
+
+        await setup({
+          tenant: growthTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+          ...access,
+        });
+
+        const note = await screen.findByText(SUBDOMAIN_NOTE);
+
+        expect(note).toBeVisible();
+      },
+    );
 
     it('shows the custom domain with its status and a remove button', async () => {
       listTenantDomainsMock.mockResolvedValue([

@@ -545,7 +545,7 @@
       "verifyFailed": "Couldn't check the record. Try again.",
       "removeClaimDescription": "{domain} will no longer be waiting for verification. Your current address keeps working.",
       "mainTitle": "Your own domain (main address)",
-      "subdomainStillWorks": "Your subdomain still works and shows the same site.",
+      "subdomainStillWorks": "Your subdomain {subdomain} still works and shows the same site.",
       "mainAddress": {
         "failed": "Couldn't switch the main address. Try again.",
         "makeMain": {

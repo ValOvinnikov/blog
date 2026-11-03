@@ -545,7 +545,7 @@
       "verifyFailed": "No se pudo comprobar el registro. Inténtalo de nuevo.",
       "removeClaimDescription": "{domain} dejará de esperar la verificación. Tu dirección actual sigue funcionando.",
       "mainTitle": "Tu propio dominio (dirección principal)",
-      "subdomainStillWorks": "Tu subdominio sigue funcionando y muestra el mismo sitio.",
+      "subdomainStillWorks": "Tu subdominio {subdomain} sigue funcionando y muestra el mismo sitio.",
       "mainAddress": {
         "failed": "No se pudo cambiar la dirección principal. Inténtalo de nuevo.",
         "makeMain": {

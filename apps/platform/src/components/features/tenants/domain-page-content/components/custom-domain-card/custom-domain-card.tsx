@@ -20,6 +20,7 @@ import { Suspense } from 'react';
 export type TCustomDomainCardProps = {
   tenant: Pick<TTenant, 'id' | 'plan' | 'deprovisionedAt' | 'primaryDomain'>;
   customDomain: TMaybeUndefined<string>;
+  subdomain: TMaybeUndefined<string>;
   claim: TMaybeUndefined<Pick<TCustomDomainClaim, 'domain' | 'token'>>;
   isPrimaryCustom: boolean;
   primaryProjectDomain: Promise<TProjectDomain>;
@@ -29,6 +30,7 @@ export type TCustomDomainCardProps = {
 export const CustomDomainCard = ({
   tenant,
   customDomain,
+  subdomain,
   claim,
   isPrimaryCustom,
   primaryProjectDomain,
@@ -62,7 +64,11 @@ export const CustomDomainCard = ({
             isPlatformAddress={false}
             projectDomain={shown.projectDomain}
             title={isPrimaryCustom ? t('mainTitle') : t('title')}
-            note={isPrimaryCustom ? t('subdomainStillWorks') : undefined}
+            note={
+              isPrimaryCustom && subdomain
+                ? t('subdomainStillWorks', { subdomain })
+                : undefined
+            }
             actions={
               canAct && (
                 <CustomDomainActions
