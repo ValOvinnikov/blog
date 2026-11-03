@@ -1357,6 +1357,19 @@
       "reasonHint": "Operators see this on the Blocked sign-ups page.",
       "switchOn": "On",
       "switchOff": "Off"
+    },
+    "caseFields": {
+      "categoryLabel": "Reason",
+      "categoryPlaceholder": "Choose a reason",
+      "descriptionLabel": "Statement of reasons",
+      "descriptionHint": "The owner sees this in the suspension email and on their dashboard."
+    },
+    "case": {
+      "referenceLabel": "Reference",
+      "categoryLabel": "Reason",
+      "descriptionLabel": "Statement of reasons",
+      "suspendedByLabel": "Suspended by",
+      "suspendedAtLabel": "Suspended on"
     }
   },
   "tenantLifecycleErrors": {
@@ -1819,5 +1832,35 @@
       "options": "Growth options are switched off on your site: extra languages, the Growth Look settings, Growth page modules, and features such as the contact form, bookmarks and analytics.",
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to Growth again."
     }
+  },
+  "suspensionCategory": {
+    "ABUSE": "Abuse",
+    "ILLEGAL_CONTENT": "Illegal content",
+    "TERMS_VIOLATION": "Terms of service violation",
+    "OTHER": "Other"
+  },
+  "ownerSuspensionEmail": {
+    "actionLabel": "Open your dashboard",
+    "SUSPENDED": {
+      "subject": "Your site has been suspended ({reference})",
+      "previewText": "{siteName} is offline for readers.",
+      "offline": "{siteName} has been suspended and is offline for readers: they see an unavailable page instead of your site.",
+      "category": "Reason: {category}.",
+      "contest": "To contest this decision, reply to this email quoting {reference}."
+    },
+    "ACTIVE": {
+      "subject": "Your site is back online ({reference})",
+      "previewText": "{siteName} is visible to readers again.",
+      "online": "The suspension {reference} has been lifted. {siteName} is visible to readers again."
+    }
+  },
+  "ownerSuspensionBanner": {
+    "title": "Your site is suspended",
+    "unavailable": "Readers see an unavailable page instead of your site.",
+    "category": "Reason: {category}.",
+    "contest": "To contest this decision, reply to the suspension email or write to support quoting {reference}.",
+    "copyButton": "Copy reference",
+    "copied": "Reference copied",
+    "copyFailed": "The reference could not be copied. Select it and copy it instead."
   }
 }

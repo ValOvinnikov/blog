@@ -4002,6 +4002,38 @@
         "file": "packages/db/src/constants/tenant-provisioning.ts"
       }
     ],
+    "ABUSE": [
+      {
+        "ref": "SUSPENSION_CATEGORY.ABUSE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-suspension.ts"
+      }
+    ],
+    "ILLEGAL_CONTENT": [
+      {
+        "ref": "SUSPENSION_CATEGORY.ILLEGAL_CONTENT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-suspension.ts"
+      }
+    ],
+    "TERMS_VIOLATION": [
+      {
+        "ref": "SUSPENSION_CATEGORY.TERMS_VIOLATION",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-suspension.ts"
+      }
+    ],
+    "OTHER": [
+      {
+        "ref": "SUSPENSION_CATEGORY.OTHER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-suspension.ts"
+      }
+    ],
     "SUSPENDED": [
       {
         "ref": "TENANT_STATUS.SUSPENDED",
@@ -6481,6 +6513,54 @@
     "tenant.suspension_block_undo_failed": [
       {
         "ref": "TENANT_LOG.SUSPENSION_BLOCK_UNDO_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_case_discard_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_CASE_DISCARD_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_case_reopen_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_CASE_REOPEN_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_email_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_EMAIL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_email_owner_missing": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_EMAIL_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_email_reply_to_missing": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_EMAIL_REPLY_TO_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "tenant.suspension_email_unconfigured": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_EMAIL_UNCONFIGURED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

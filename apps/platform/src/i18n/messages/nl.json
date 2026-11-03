@@ -1357,6 +1357,19 @@
       "reasonHint": "Operators zien dit op de pagina Geblokkeerde aanmeldingen.",
       "switchOn": "Aan",
       "switchOff": "Uit"
+    },
+    "caseFields": {
+      "categoryLabel": "Reden",
+      "categoryPlaceholder": "Kies een reden",
+      "descriptionLabel": "Motivering",
+      "descriptionHint": "De eigenaar ziet dit in de schorsingsmail en op het dashboard."
+    },
+    "case": {
+      "referenceLabel": "Referentie",
+      "categoryLabel": "Reden",
+      "descriptionLabel": "Motivering",
+      "suspendedByLabel": "Geschorst door",
+      "suspendedAtLabel": "Geschorst op"
     }
   },
   "tenantLifecycleErrors": {
@@ -1819,5 +1832,35 @@
       "options": "De Growth-opties staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, Growth-paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar Growth."
     }
+  },
+  "suspensionCategory": {
+    "ABUSE": "Misbruik",
+    "ILLEGAL_CONTENT": "Illegale inhoud",
+    "TERMS_VIOLATION": "Schending van de gebruiksvoorwaarden",
+    "OTHER": "Overig"
+  },
+  "ownerSuspensionEmail": {
+    "actionLabel": "Je dashboard openen",
+    "SUSPENDED": {
+      "subject": "Je site is geschorst ({reference})",
+      "previewText": "{siteName} is offline voor lezers.",
+      "offline": "{siteName} is geschorst en offline voor lezers: zij zien een pagina ‘niet beschikbaar’ in plaats van je site.",
+      "category": "Reden: {category}.",
+      "contest": "Wil je dit besluit aanvechten? Beantwoord deze e-mail en vermeld {reference}."
+    },
+    "ACTIVE": {
+      "subject": "Je site is weer online ({reference})",
+      "previewText": "{siteName} is weer zichtbaar voor lezers.",
+      "online": "De schorsing {reference} is opgeheven. {siteName} is weer zichtbaar voor lezers."
+    }
+  },
+  "ownerSuspensionBanner": {
+    "title": "Je site is geschorst",
+    "unavailable": "Lezers zien een pagina ‘niet beschikbaar’ in plaats van je site.",
+    "category": "Reden: {category}.",
+    "contest": "Wil je dit besluit aanvechten? Beantwoord de schorsingsmail of schrijf naar support en vermeld {reference}.",
+    "copyButton": "Referentie kopiëren",
+    "copied": "Referentie gekopieerd",
+    "copyFailed": "De referentie kon niet worden gekopieerd. Selecteer en kopieer haar zelf."
   }
 }

@@ -118,8 +118,11 @@ export async function insertTestSubscriber(
   return subscriber;
 }
 
-export async function insertTestAdmin(db: TTestDb): Promise<TAdmin> {
-  const { id: userId } = await insertTestUser(db);
+export async function insertTestAdmin(
+  db: TTestDb,
+  user: Partial<typeof schema.users.$inferInsert> = {},
+): Promise<TAdmin> {
+  const { id: userId } = await insertTestUser(db, user);
 
   const [admin] = await db
     .insert(schema.admins)
