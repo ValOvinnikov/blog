@@ -1,6 +1,8 @@
 import { PRESET_ID } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 
+const BAR_SHAPE = 'h-[3px] rounded-admin-bar';
+
 export const presetMiniVariants = tv({
   slots: {
     root: [
@@ -8,33 +10,30 @@ export const presetMiniVariants = tv({
     ],
     nav: ['flex justify-between'],
     navBars: ['flex gap-1'],
-    logo: ['h-[3px] w-[22px] rounded-admin-bar opacity-70'],
-    bar: ['h-[3px] w-[9px] rounded-admin-bar'],
+    logo: [BAR_SHAPE, 'w-[22px] bg-(--preset-mini-muted) opacity-70'],
+    bar: [BAR_SHAPE, 'bg-(--preset-mini-bar)'],
+    navBar: ['w-[9px]'],
     title: ['text-admin-13 leading-[15px] whitespace-nowrap'],
-    tagline: ['text-[10.5px] leading-[13px] whitespace-nowrap'],
+    tagline: [
+      'text-admin-10-5 leading-[13px] whitespace-nowrap text-(--preset-mini-muted)',
+    ],
     skeleton: ['flex flex-col gap-[3px]'],
-    skeletonLong: ['h-[3px] w-4/5 rounded-admin-bar'],
-    skeletonShort: ['h-[3px] w-[55%] rounded-admin-bar'],
+    skeletonLong: ['w-4/5'],
+    skeletonShort: ['w-[55%]'],
   },
   variants: {
     preset: {
       [PRESET_ID.CONSOLE]: {
-        root: ['bg-[#0f1115]'],
-        logo: ['bg-[#c9cfda]'],
-        bar: ['bg-[#2a2f3a]'],
-        skeletonLong: ['bg-[#2a2f3a]'],
-        skeletonShort: ['bg-[#2a2f3a]'],
+        root: [
+          'bg-[#0f1115] [--preset-mini-bar:#2a2f3a] [--preset-mini-muted:#c9cfda]',
+        ],
         title: ['font-medium text-[#4f9cf0]'],
-        tagline: ['text-[#c9cfda]'],
       },
       [PRESET_ID.EDITORIAL]: {
-        root: ['bg-[#fbf7f0]'],
-        logo: ['bg-[#6f655b]'],
-        bar: ['bg-[#e6ddd0]'],
-        skeletonLong: ['bg-[#e6ddd0]'],
-        skeletonShort: ['bg-[#e6ddd0]'],
+        root: [
+          'bg-[#fbf7f0] [--preset-mini-bar:#e6ddd0] [--preset-mini-muted:#6f655b]',
+        ],
         title: ['font-semibold text-[#2a2320]'],
-        tagline: ['text-[#6f655b]'],
       },
     },
   },

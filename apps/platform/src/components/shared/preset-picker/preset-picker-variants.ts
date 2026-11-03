@@ -15,7 +15,7 @@ export const presetPickerVariants = tv({
     footer: ['flex items-start gap-2 px-1 pb-1'],
     footerText: ['flex min-w-0 flex-1 flex-col gap-0.5'],
     name: ['text-admin-14 font-semibold text-admin-text'],
-    description: ['text-admin-12-5 leading-[1.4] text-admin-muted'],
+    description: ['text-admin-12-5 leading-admin-1-4 text-admin-muted'],
     dot: [
       'flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]',
     ],

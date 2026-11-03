@@ -11,7 +11,7 @@ import {
 } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { FONT_OPTIONS } from '@platform/config/fonts';
-import { ICON_SIZE } from '@platform/constants/icon';
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
 import {
   PRESET_PICKER_LAYOUT,
   type TPresetPickerLayout,
@@ -38,8 +38,6 @@ type TPresetOption = {
   miniSecondary: string;
   miniPrimaryFontFamily: string;
 };
-
-const TICK_STROKE_WIDTH = 3;
 
 /**
  * Choosing a preset re-applies every one of its `PRESET_REGISTRY` defaults —
@@ -122,7 +120,7 @@ export const PresetPicker = ({
                   <Icon
                     name={ICONS.TICK}
                     size={ICON_SIZE.XXS}
-                    strokeWidth={TICK_STROKE_WIDTH}
+                    strokeWidth={ICON_STROKE_WIDTH.RADIO_TICK}
                   />
                 )}
               </span>

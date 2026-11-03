@@ -23,6 +23,7 @@ export const PresetMini = ({
     navBars,
     logo,
     bar,
+    navBar,
     title: titleClass,
     tagline: taglineClass,
     skeleton,
@@ -36,7 +37,7 @@ export const PresetMini = ({
         <span className={logo()} />
         <span className={navBars()}>
           {NAV_BAR_KEYS.map((key) => (
-            <span key={key} className={bar()} />
+            <span key={key} className={bar({ class: navBar() })} />
           ))}
         </span>
       </span>
@@ -45,8 +46,8 @@ export const PresetMini = ({
       </span>
       <span className={taglineClass()}>{tagline}</span>
       <span className={skeleton()}>
-        <span className={skeletonLong()} />
-        <span className={skeletonShort()} />
+        <span className={bar({ class: skeletonLong() })} />
+        <span className={bar({ class: skeletonShort() })} />
       </span>
     </span>
   );

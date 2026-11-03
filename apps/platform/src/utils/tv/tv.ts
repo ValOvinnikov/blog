@@ -20,6 +20,7 @@ const FONT_SIZE_TOKENS = [
   'meta',
   'label',
   'code',
+  'admin-10-5',
   'admin-11',
   'admin-11-5',
   'admin-12',
@@ -91,7 +92,7 @@ const SHADOW_TOKENS = [
   'admin-xs',
 ];
 
-const LEADING_TOKENS = ['admin-18', 'admin-22'];
+const LEADING_TOKENS = ['admin-1-4', 'admin-1-45', 'admin-18', 'admin-22'];
 
 const FONT_WEIGHT_TOKENS = ['admin-650'];
 
