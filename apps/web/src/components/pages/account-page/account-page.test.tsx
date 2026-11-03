@@ -6,6 +6,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
 import { mockSession } from '@web/testing/shared/session/fixtures';
 import { mockedAuth } from '@web/testing/shared/session/mocked-auth';
 import { toSessionUsername } from '@web/utils/to-session-username';
@@ -28,6 +29,10 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/i18n/navigation');
 
+vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
+  getEnabledOAuthProviderIds: () => [],
+}));
+
 const MOCK_HANDLE = toSessionUsername(
   MOCK_ACCOUNT_USER.name,
   MOCK_ACCOUNT_USER.email,
@@ -36,6 +41,7 @@ const PAGE_TITLE = 'Account';
 const IDENTITY_TITLE = 'Connected accounts';
 const NEWSLETTER_TITLE = 'Newsletter';
 const PRIVACY_TITLE = 'Privacy';
+const SEND_SIGN_IN_LINK = 'Email me a sign-in link';
 
 const authMock = mockedAuth();
 
@@ -67,6 +73,36 @@ describe(`<${AccountPage.name}/>`, () => {
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
     expect(vi.mocked(redirect)).toHaveBeenCalledWith(routes.home());
+  });
+
+  describe('on an operator-suspended site with no session', () => {
+    beforeEach(async () => {
+      authMock.mockResolvedValue(null);
+      mockRequestContextOnce({ isOperatorSuspended: true });
+      await setup();
+    });
+
+    it('offers sign-in under the page heading', () => {
+      const pageHeading = screen.getByRole('heading', {
+        level: 1,
+        name: PAGE_TITLE,
+      });
+      const sendLinkButton = screen.getByRole('button', {
+        name: SEND_SIGN_IN_LINK,
+      });
+
+      expect(pageHeading).toBeInTheDocument();
+      expect(sendLinkButton).toBeInTheDocument();
+      expect(vi.mocked(redirect)).not.toHaveBeenCalled();
+    });
+
+    it('shows none of the account sections', () => {
+      const privacyHeading = screen.queryByRole('heading', {
+        name: PRIVACY_TITLE,
+      });
+
+      expect(privacyHeading).not.toBeInTheDocument();
+    });
   });
 
   describe('with an active subscription', () => {

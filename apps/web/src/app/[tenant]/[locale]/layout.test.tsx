@@ -12,6 +12,7 @@ import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
 import { SiteProviders } from '@web/components/shared/site-providers';
 import { ThemeScope } from '@web/components/shared/theme-scope';
+import { SITE_SETTINGS_LOG } from '@web/constants/site-settings';
 import {
   enterRequestContext,
   getRequestContext,
@@ -179,6 +180,21 @@ describe(`<${LocaleLayout.name}/>`, () => {
     expect(footer?.type).toBe(SiteFooter);
   });
 
+  it('leaves out the site header and footer on an operator-suspended site', async () => {
+    getRequestContextMock.mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      isOperatorSuspended: true,
+    });
+
+    const [themeScope] = childrenOf(await renderLayout());
+    const [providers] = childrenOf(themeScope as TAnyElement);
+    const [page] = childrenOf(providers as TAnyElement);
+    const types = childrenOf(page as TAnyElement).map((child) => child?.type);
+
+    expect(types).not.toContain(SiteHeader);
+    expect(types).not.toContain(SiteFooter);
+  });
+
   describe(SETTINGS_FAILURE_SUITE, () => {
     beforeEach(() => {
       settingsFailure();
@@ -196,7 +212,7 @@ describe(`<${LocaleLayout.name}/>`, () => {
       await expect(renderLayout()).rejects.toThrow();
 
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        'site_settings.layout_fetch_failed',
+        SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED,
         { error: MOCK_ERROR },
       );
     });

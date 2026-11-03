@@ -4,8 +4,8 @@ import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-pr
 import { ICONS, SIZE, type TAccountPanelStyle } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { ReaderAccountPanel } from '@web/components/shared/auth-menu/components/reader-account-panel/reader-account-panel';
-import { ReaderSignInPanel } from '@web/components/shared/auth-menu/components/reader-sign-in-panel/reader-sign-in-panel';
 import { useReaderAccount } from '@web/components/shared/auth-menu/hooks/use-reader-account';
+import { ReaderSignInPanel } from '@web/components/shared/reader-sign-in-panel';
 import { SESSION_STATUS } from '@web/constants/session';
 import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
 import { useTranslations } from 'next-intl';

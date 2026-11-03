@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
+import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
@@ -142,8 +143,24 @@ describe('request-context', () => {
       metadataBase: new URL(`https://${MOCK_TENANT_HOST}`),
       defaultLocale: LOCALE_ISO_CODES.EN,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+      isOperatorSuspended: false,
     });
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(MOCK_SERVABLE_TENANT);
+  });
+
+  it('marks a tenant an operator suspended', async () => {
+    getTenantByIdMock.mockResolvedValue({
+      ...MOCK_SERVABLE_TENANT,
+      status: TENANT_STATUS.SUSPENDED,
+      suspensionReason: SUSPENSION_REASON.OPERATOR,
+    });
+
+    const { isOperatorSuspended } = await enterAndRead(
+      MOCK_TENANT_ID,
+      LOCALE_ISO_CODES.EN,
+    );
+
+    expect(isOperatorSuspended).toBe(true);
   });
 
   it('sets the next-intl request locale', async () => {
@@ -220,6 +237,7 @@ describe('request-context', () => {
         metadataBase: new URL(MOCK_TENANT_BASE_URL),
         defaultLocale: undefined,
         liveLocales: undefined,
+        isOperatorSuspended: false,
       });
       expect(getTenantByIdMock).not.toHaveBeenCalled();
     });

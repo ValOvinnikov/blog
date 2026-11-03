@@ -1,19 +1,33 @@
+import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { routes } from '@blog/config';
 import { auth } from '@web/server/auth/auth';
+import { getRequestContext } from '@web/server/request-context/request-context';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import { AccountPageView } from './account-page-view';
+import { AccountSignIn } from './components/account-sign-in/account-sign-in';
 import { IdentitySection } from './sections/identity-section';
 import { NewsletterSection } from './sections/newsletter-section';
 import { PrivacySection } from './sections/privacy-section';
 
 export const AccountPage = async () => {
-  const session = await auth();
+  const [session, { isOperatorSuspended }] = await Promise.all([
+    auth(),
+    getRequestContext(),
+  ]);
 
   if (!session?.user?.id) {
-    redirect(routes.home());
+    if (!isOperatorSuspended) redirect(routes.home());
+
+    const t = await getTranslations('accountPage');
+    return (
+      <AccountSignIn
+        heading={t('title')}
+        oauthProviderIds={getEnabledOAuthProviderIds()}
+      />
+    );
   }
 
   const { name, email } = session.user;

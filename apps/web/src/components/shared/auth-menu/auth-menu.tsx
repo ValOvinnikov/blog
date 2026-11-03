@@ -3,6 +3,7 @@
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import type { IAccountControl } from '@blog/config';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
+import { ReaderSignInPanel } from '@web/components/shared/reader-sign-in-panel';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ACCOUNT_OVERLAY_ID } from '@web/context/header-overlay-provider';
 import { useOAuthErrorParam } from '@web/hooks/use-oauth-error-param';
@@ -14,7 +15,6 @@ import { authMenuVariants } from './auth-menu-variants';
 import { AccountPlaceholder } from './components/account-placeholder/account-placeholder';
 import { AccountTriggers } from './components/account-triggers/account-triggers';
 import { ReaderAccountPanel } from './components/reader-account-panel/reader-account-panel';
-import { ReaderSignInPanel } from './components/reader-sign-in-panel/reader-sign-in-panel';
 import { useReaderAccount } from './hooks/use-reader-account';
 import { useSignedInHint } from './hooks/use-signed-in-hint';
 
