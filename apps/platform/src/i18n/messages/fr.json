@@ -477,6 +477,8 @@
     "columnType": "Type",
     "columnName": "Nom",
     "columnValue": "Valeur",
+    "copyRecordName": "Copier le nom de l'enregistrement {type}",
+    "copyRecordValue": "Copier la valeur de l'enregistrement {type}",
     "unavailableState": "Les enregistrements DNS ne sont pas disponibles pour le moment.",
     "addressLabel": "Adresse",
     "visitSiteLink": "Voir le site",
@@ -896,6 +898,11 @@
     "customised": "Personnalisé",
     "unsaved": "Non enregistré",
     "reset": "Réinitialiser"
+  },
+  "copyButton": {
+    "tooltip": "Copier",
+    "copied": "Copié",
+    "failed": "Impossible de copier. Sélectionnez le texte à la place."
   },
   "emailPreview": {
     "heading": "Aperçu",

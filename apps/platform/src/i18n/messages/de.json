@@ -477,6 +477,8 @@
     "columnType": "Typ",
     "columnName": "Name",
     "columnValue": "Wert",
+    "copyRecordName": "Name des {type}-Eintrags kopieren",
+    "copyRecordValue": "Wert des {type}-Eintrags kopieren",
     "unavailableState": "DNS-Einträge sind derzeit nicht verfügbar.",
     "addressLabel": "Adresse",
     "visitSiteLink": "Website besuchen",
@@ -896,6 +898,11 @@
     "customised": "Angepasst",
     "unsaved": "Nicht gespeichert",
     "reset": "Zurücksetzen"
+  },
+  "copyButton": {
+    "tooltip": "Kopieren",
+    "copied": "Kopiert",
+    "failed": "Kopieren fehlgeschlagen. Markiere den Text stattdessen."
   },
   "emailPreview": {
     "heading": "Vorschau",

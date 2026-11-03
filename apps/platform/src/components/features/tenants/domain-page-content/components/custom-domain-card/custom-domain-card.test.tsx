@@ -58,6 +58,8 @@ const CLAIM = mockCustomDomainClaim();
 const TITLE = { level: 2, name: ownDomain.title };
 const MAIN_TITLE = { level: 2, name: ownDomain.mainTitle };
 const { makeMain, useSubdomain } = ownDomain.mainAddress;
+const COPY_TXT_NAME = 'Copy the TXT record name';
+const COPY_TXT_VALUE = 'Copy the TXT record value';
 
 const BASE_PROPS: TCustomDomainCardProps = {
   tenant: {
@@ -426,6 +428,19 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       expect(domain).toBeVisible();
       expect(txtName).toBeVisible();
       expect(token).toBeVisible();
+    });
+
+    it.each([
+      [COPY_TXT_NAME, customDomainTxtName(MOCK_CUSTOM_DOMAIN)],
+      [COPY_TXT_VALUE, MOCK_CLAIM_TOKEN],
+    ])('copies exactly the record text with %s', async (name, expected) => {
+      await renderCard({ claim: CLAIM, canManage: false });
+
+      const button = await screen.findByRole('button', { name });
+      await user.click(button);
+      const clipboard = await navigator.clipboard.readText();
+
+      expect(clipboard).toBe(expected);
     });
 
     it('offers Verify and Remove to the owner, and no connect form', async () => {

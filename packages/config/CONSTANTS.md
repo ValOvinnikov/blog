@@ -322,6 +322,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`
 
+### `@platform/constants/clipboard` — `apps/platform/src/constants/clipboard.ts`
+
+- **COPY_STATUS**: `IDLE`, `COPIED`, `FAILED`
+
 ### `@platform/constants/contrast-result` — `apps/platform/src/constants/contrast-result.ts`
 
 - **CONTRAST_RESULT_LOG**: `RECORD_FAILED`=`"contrast_result.record_failed"`, `SECRET_MISSING`=`"contrast_result.secret_missing"`

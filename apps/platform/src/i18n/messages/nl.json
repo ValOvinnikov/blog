@@ -477,6 +477,8 @@
     "columnType": "Type",
     "columnName": "Naam",
     "columnValue": "Waarde",
+    "copyRecordName": "Naam van het {type}-record kopiëren",
+    "copyRecordValue": "Waarde van het {type}-record kopiëren",
     "unavailableState": "DNS-records zijn op dit moment niet beschikbaar.",
     "addressLabel": "Adres",
     "visitSiteLink": "Site bekijken",
@@ -896,6 +898,11 @@
     "customised": "Aangepast",
     "unsaved": "Niet opgeslagen",
     "reset": "Herstellen"
+  },
+  "copyButton": {
+    "tooltip": "Kopiëren",
+    "copied": "Gekopieerd",
+    "failed": "Kopiëren is mislukt. Selecteer de tekst handmatig."
   },
   "emailPreview": {
     "heading": "Voorbeeld",

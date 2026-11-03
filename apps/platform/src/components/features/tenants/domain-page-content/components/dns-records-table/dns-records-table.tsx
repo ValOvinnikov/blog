@@ -1,3 +1,4 @@
+import { CopyButton } from '@platform/components/shared/copy-button';
 import type { TDomainDnsRecord } from '@platform/server/provisioning/vercel-domains-api';
 import { useTranslations } from 'next-intl';
 
@@ -9,7 +10,8 @@ export type TDnsRecordsTableProps = {
 
 export const DnsRecordsTable = ({ records }: TDnsRecordsTableProps) => {
   const t = useTranslations('tenantDomainPage');
-  const { table, head, row, cell } = dnsRecordsTableVariants();
+  const { table, head, row, cell, copyable, selectable } =
+    dnsRecordsTableVariants();
 
   return (
     <table className={table()}>
@@ -27,11 +29,27 @@ export const DnsRecordsTable = ({ records }: TDnsRecordsTableProps) => {
         </tr>
       </thead>
       <tbody>
-        {records.map((record, index) => (
-          <tr className={row()} key={`${record.type}-${record.name}-${index}`}>
-            <td className={cell()}>{record.type}</td>
-            <td className={cell()}>{record.name}</td>
-            <td className={cell()}>{record.value}</td>
+        {records.map(({ type, name, value }, index) => (
+          <tr className={row()} key={`${type}-${name}-${index}`}>
+            <td className={cell()}>{type}</td>
+            <td className={cell()}>
+              <span className={copyable()}>
+                <span className={selectable()}>{name}</span>
+                <CopyButton
+                  value={name}
+                  ariaLabel={t('copyRecordName', { type })}
+                />
+              </span>
+            </td>
+            <td className={cell()}>
+              <span className={copyable()}>
+                <span className={selectable()}>{value}</span>
+                <CopyButton
+                  value={value}
+                  ariaLabel={t('copyRecordValue', { type })}
+                />
+              </span>
+            </td>
           </tr>
         ))}
       </tbody>
