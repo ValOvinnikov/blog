@@ -22,13 +22,11 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import type { TTenantLifecycleResult } from '@platform/server/provisioning/tenant-lifecycle-result';
 import { signupBlockReasonSchema } from '@platform/server/signup-block/signup-block-reason-schema';
+import { liftTenantSuspension } from '@platform/server/tenants/lift-tenant-suspension';
 import { notifyOwnerOfSuspension } from '@platform/server/tenants/notify-owner-of-suspension';
 import { resolveSuspendableTenant } from '@platform/server/tenants/resolve-suspendable-tenant';
 import type { TSuspensionCase } from '@platform/server/tenants/tenant-suspension-case';
-import {
-  applyTenantSuspension,
-  liftTenantSuspension,
-} from '@platform/server/tenants/tenant-suspension-writes';
+import { applyTenantSuspension } from '@platform/server/tenants/tenant-suspension-writes';
 import { after } from 'next/server';
 import { z } from 'zod';
 

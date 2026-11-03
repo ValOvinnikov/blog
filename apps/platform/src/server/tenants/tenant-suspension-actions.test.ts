@@ -53,6 +53,7 @@ const {
   openTenantSuspensionMock,
   closeTenantSuspensionMock,
   discardTenantSuspensionMock,
+  reopenTenantSuspensionMock,
 } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
   setTenantSuspensionMock: vi.fn(),
@@ -64,6 +65,7 @@ const {
   openTenantSuspensionMock: vi.fn(),
   closeTenantSuspensionMock: vi.fn(),
   discardTenantSuspensionMock: vi.fn(),
+  reopenTenantSuspensionMock: vi.fn(),
 }));
 
 vi.mock('next/server', () => ({
@@ -104,6 +106,7 @@ vi.mock('@blog/db', async () => ({
       openTenantSuspension: openTenantSuspensionMock,
       closeTenantSuspension: closeTenantSuspensionMock,
       discardTenantSuspension: discardTenantSuspensionMock,
+      reopenTenantSuspension: reopenTenantSuspensionMock,
     },
   },
 }));
@@ -129,6 +132,17 @@ const CASE_DETAILS = {
   category: OPENED_CASE.category,
 };
 const OWNER_BLOCK = { reason: MOCK_BLOCK_REASON };
+
+const FAILED_STATUS_CHANGES: [string, () => void][] = [
+  [
+    'returns a refusal',
+    () =>
+      setTenantSuspensionMock.mockResolvedValue(
+        errorResult(ERROR_CODE.DB_NOT_FOUND),
+      ),
+  ],
+  ['throws', () => setTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR)],
+];
 
 const suspend = () =>
   suspendTenantAction(ACTIVE_TENANT.id, MOCK_SUSPENSION_CASE);
@@ -158,6 +172,7 @@ describe('tenant suspension actions', () => {
     openTenantSuspensionMock.mockReset().mockResolvedValue(OPENED_CASE);
     closeTenantSuspensionMock.mockReset().mockResolvedValue(undefined);
     discardTenantSuspensionMock.mockReset().mockResolvedValue(undefined);
+    reopenTenantSuspensionMock.mockReset().mockResolvedValue(undefined);
     notifyOwnerOfSuspensionMock.mockReset();
   });
 
@@ -223,6 +238,63 @@ describe('tenant suspension actions', () => {
       });
     });
 
+    describe('with an open case', () => {
+      beforeEach(() => {
+        closeTenantSuspensionMock.mockResolvedValue(OPENED_CASE);
+      });
+
+      it('closes the case as the lifting admin, audits its reference and emails the owner', async () => {
+        requireSuperAdminMock.mockResolvedValue(MOCK_SUPER_ADMIN);
+
+        await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+        expect(closeTenantSuspensionMock).toHaveBeenCalledWith(
+          ACTIVE_TENANT.id,
+          MOCK_SUPER_ADMIN.id,
+        );
+        expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual(
+          expect.objectContaining({ details: CASE_DETAILS }),
+        );
+        expect(notifyOwnerOfSuspensionMock).toHaveBeenCalledWith(
+          SUSPENDED_TENANT,
+          OPENED_CASE,
+          TENANT_STATUS.ACTIVE,
+        );
+      });
+
+      it.each(FAILED_STATUS_CHANGES)(
+        'reopens the case and emails nobody when the lift %s',
+        async (_, failLift) => {
+          failLift();
+
+          await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+          expect(reopenTenantSuspensionMock).toHaveBeenCalledWith(
+            OPENED_CASE.id,
+          );
+          expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
+        },
+      );
+
+      it('keeps the case closed when only the cache purge fails', async () => {
+        revalidateSiteConfigMock.mockRejectedValue(MOCK_CACHE_ERROR);
+
+        await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+        expect(reopenTenantSuspensionMock).not.toHaveBeenCalled();
+      });
+    });
+
+    it('leaves the tenant suspended when the case cannot be closed', async () => {
+      closeTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR);
+
+      const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(setTenantSuspensionMock).not.toHaveBeenCalled();
+      expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
+    });
+
     it('still lifts a suspension on the platform tenant', async () => {
       resolveIsPlatformTenantMock.mockResolvedValue(true);
 
@@ -231,26 +303,6 @@ describe('tenant suspension actions', () => {
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
       expect(setTenantSuspensionMock).toHaveBeenCalledWith(
         ACTIVE_TENANT.id,
-        TENANT_STATUS.ACTIVE,
-      );
-    });
-
-    it('closes the case as the lifting admin, audits its reference and emails the owner', async () => {
-      requireSuperAdminMock.mockResolvedValue(MOCK_SUPER_ADMIN);
-      closeTenantSuspensionMock.mockResolvedValue(OPENED_CASE);
-
-      await liftTenantSuspensionAction(ACTIVE_TENANT.id);
-
-      expect(closeTenantSuspensionMock).toHaveBeenCalledWith(
-        ACTIVE_TENANT.id,
-        MOCK_SUPER_ADMIN.id,
-      );
-      expect(firstRecordedAuditEvent(recordAuditEventMock)).toEqual(
-        expect.objectContaining({ details: CASE_DETAILS }),
-      );
-      expect(notifyOwnerOfSuspensionMock).toHaveBeenCalledWith(
-        SUSPENDED_TENANT,
-        OPENED_CASE,
         TENANT_STATUS.ACTIVE,
       );
     });
@@ -577,19 +629,7 @@ describe('tenant suspension actions', () => {
       expect(notifyOwnerOfSuspensionMock).not.toHaveBeenCalled();
     });
 
-    it.each([
-      [
-        'returns a refusal',
-        () =>
-          setTenantSuspensionMock.mockResolvedValue(
-            errorResult(ERROR_CODE.DB_NOT_FOUND),
-          ),
-      ],
-      [
-        'throws',
-        () => setTenantSuspensionMock.mockRejectedValue(MOCK_DB_ERROR),
-      ],
-    ])(
+    it.each(FAILED_STATUS_CHANGES)(
       'discards the case and emails nobody when the suspension %s',
       async (_, failSuspension) => {
         failSuspension();

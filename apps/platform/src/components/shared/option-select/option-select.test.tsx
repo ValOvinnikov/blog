@@ -46,7 +46,7 @@ describe(`<${OptionSelect.name}/>`, () => {
     ['the selected option', {}, MOCK_FIRST_LABEL],
     [
       'the placeholder while no option is selected',
-      { value: '', placeholder: MOCK_PLACEHOLDER },
+      { value: null, placeholder: MOCK_PLACEHOLDER },
       MOCK_PLACEHOLDER,
     ],
   ])(

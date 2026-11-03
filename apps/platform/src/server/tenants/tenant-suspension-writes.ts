@@ -26,7 +26,7 @@ import {
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
-type TSuspensionWriteFailure =
+export type TSuspensionWriteFailure =
   | TOutcome<typeof ACTION_OUTCOME.SERVER_ERROR>
   | (TOutcome<typeof ACTION_OUTCOME.REFUSED> &
       TReasonedFailure<
@@ -34,14 +34,16 @@ type TSuspensionWriteFailure =
         | typeof TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN
       >);
 
-type TSuspensionWrite<TCase> = Promise<TResult<TCase, TSuspensionWriteFailure>>;
+export type TSuspensionWrite<TCase> = Promise<
+  TResult<TCase, TSuspensionWriteFailure>
+>;
 
-const ARCHIVED_REFUSAL: TSuspensionWriteFailure = {
+export const ARCHIVED_REFUSAL: TSuspensionWriteFailure = {
   outcome: ACTION_OUTCOME.REFUSED,
   reason: TENANT_REFUSAL.ARCHIVED,
 };
 
-const failWrite = (
+export const failWrite = (
   tenantId: string,
   status: TSuspensionStatus,
   error: unknown,
@@ -99,27 +101,5 @@ export const applyTenantSuspension = async (
   } catch (error) {
     if (!isSuspensionSaved) await rollBack();
     return failWrite(tenantId, TENANT_STATUS.SUSPENDED, error);
-  }
-};
-
-export const liftTenantSuspension = async (
-  admin: TAdmin,
-  tenantId: string,
-): TSuspensionWrite<TMaybeUndefined<TTenantSuspension>> => {
-  try {
-    const updated = await queries.tenants.setTenantSuspension(
-      tenantId,
-      TENANT_STATUS.ACTIVE,
-    );
-    if (!updated.ok) return errorResult(ARCHIVED_REFUSAL);
-
-    const closedCase = await queries.tenantSuspensions.closeTenantSuspension(
-      tenantId,
-      admin.id,
-    );
-    await revalidateSiteConfig(tenantId);
-    return okResult(closedCase);
-  } catch (error) {
-    return failWrite(tenantId, TENANT_STATUS.ACTIVE, error);
   }
 };

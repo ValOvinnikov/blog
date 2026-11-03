@@ -6506,6 +6506,14 @@
         "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
+    "tenant.suspension_case_reopen_failed": [
+      {
+        "ref": "TENANT_LOG.SUSPENSION_CASE_REOPEN_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "tenant.suspension_email_failed": [
       {
         "ref": "TENANT_LOG.SUSPENSION_EMAIL_FAILED",

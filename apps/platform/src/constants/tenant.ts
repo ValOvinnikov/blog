@@ -73,6 +73,7 @@ export const TENANT_LOG = {
   SUSPENSION_BLOCK_FAILED: 'tenant.suspension_block_failed',
   SUSPENSION_BLOCK_UNDO_FAILED: 'tenant.suspension_block_undo_failed',
   SUSPENSION_CASE_DISCARD_FAILED: 'tenant.suspension_case_discard_failed',
+  SUSPENSION_CASE_REOPEN_FAILED: 'tenant.suspension_case_reopen_failed',
   SUSPENSION_EMAIL_FAILED: 'tenant.suspension_email_failed',
   SUSPENSION_EMAIL_OWNER_MISSING: 'tenant.suspension_email_owner_missing',
   SUSPENSION_EMAIL_REPLY_TO_MISSING: 'tenant.suspension_email_reply_to_missing',

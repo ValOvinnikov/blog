@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeNull } from '@blog/config';
 import {
   SUSPENSION_CATEGORY,
   type TSuspensionCategory,
@@ -19,7 +20,7 @@ const suspensionCaseFieldsVariants = tv({
 const CATEGORIES = Object.values(SUSPENSION_CATEGORY);
 
 export type TSuspensionCaseFieldsProps = {
-  category: TSuspensionCategory | '';
+  category: TMaybeNull<TSuspensionCategory>;
   onCategoryChange: (category: TSuspensionCategory) => void;
   description: string;
   onDescriptionChange: (description: string) => void;
@@ -38,15 +39,13 @@ export const SuspensionCaseFields = ({
   return (
     <div className={root()}>
       <FormField label={t('categoryLabel')}>
-        <OptionSelect<TSuspensionCategory | ''>
+        <OptionSelect
           options={CATEGORIES.map((value) => ({
             value,
             label: tCategory(value),
           }))}
           value={category}
-          onChange={(next) => {
-            if (next) onCategoryChange(next);
-          }}
+          onChange={onCategoryChange}
           aria={{ label: t('categoryLabel') }}
           placeholder={t('categoryPlaceholder')}
         />

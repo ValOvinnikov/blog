@@ -1,6 +1,7 @@
 'use client';
 
 import { Select as BaseSelect } from '@base-ui/react/select';
+import type { TMaybeNull } from '@blog/config';
 import { SelectItem } from '@platform/components/shared/select/components/item/select-item';
 import { SelectItemText } from '@platform/components/shared/select/components/item-text/select-item-text';
 import { SelectPopup } from '@platform/components/shared/select/components/popup/select-popup';
@@ -16,7 +17,7 @@ const SelectParts = {
 } satisfies Record<string, ElementType>;
 
 type TSelectProps<TValue extends string> = {
-  value: TValue;
+  value: TMaybeNull<TValue>;
   onChange: (value: TValue) => void;
   isDisabled?: boolean;
   isLocked?: boolean;

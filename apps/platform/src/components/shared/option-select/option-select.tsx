@@ -1,6 +1,6 @@
 'use client';
 
-import type { TControlAria } from '@blog/config';
+import type { TControlAria, TMaybeNull } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
 import type { TFieldAppearance } from '@platform/constants/field-appearance';
 
@@ -11,7 +11,7 @@ type TOptionSelectOption<TValue extends string> = {
 
 export type TOptionSelectProps<TValue extends string> = {
   options: TOptionSelectOption<TValue>[];
-  value: TValue;
+  value: TMaybeNull<TValue>;
   onChange: (value: TValue) => void;
   aria?: TControlAria;
   isDisabled?: boolean;

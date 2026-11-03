@@ -1,16 +1,17 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TSuspensionCategory } from '@blog/db/constants';
 import type { TSuspensionCase } from '@platform/server/tenants/tenant-suspension-actions';
 import { useState } from 'react';
 
 export const useSuspensionForm = () => {
-  const [category, setCategory] = useState<TSuspensionCategory | ''>('');
+  const [category, setCategory] =
+    useState<TMaybeNull<TSuspensionCategory>>(null);
   const [description, setDescription] = useState('');
   const [isBlocking, setIsBlocking] = useState(false);
   const [blockReason, setBlockReason] = useState('');
 
   const reset = () => {
-    setCategory('');
+    setCategory(null);
     setDescription('');
     setIsBlocking(false);
     setBlockReason('');
