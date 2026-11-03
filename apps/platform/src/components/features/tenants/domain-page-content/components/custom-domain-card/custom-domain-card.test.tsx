@@ -23,13 +23,13 @@ import {
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
-  MOCK_VERCEL_A_RECORD,
 } from '@platform/testing/tenants/fixtures';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -86,10 +86,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     vi.mocked(getCustomDomainStatusAction).mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.PENDING,
     );
-    vi.mocked(getProjectDomain).mockResolvedValue({
-      status: DOMAIN_VERIFICATION_STATUS.PENDING,
-      dnsRecords: [{ type: 'A', name: '@', value: MOCK_VERCEL_A_RECORD }],
-    });
+    vi.mocked(getProjectDomain).mockResolvedValue(mockPendingProjectDomain());
   });
 
   afterEach(() => {
