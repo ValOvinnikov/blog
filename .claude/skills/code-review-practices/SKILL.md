@@ -218,6 +218,13 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   - props over the ceiling, forwarded unchanged through two or more layers or
     hand-bundled into a local object, or a view-model spread and
     re-destructured → `react-component-practices` § Props.
+- **Sizes (blocking on what the diff writes).** An offset, maximum height,
+  scale or `calc()` derived from another element's size as a literal, an
+  arbitrary value or size const the diff writes a second time, and a
+  calculation with an unnamed term are findings, in any React workspace
+  (→ `react-component-practices` § Sizes: derived, repeated, combined). A
+  comment explaining arithmetic is the tell: search for the element it
+  names and its token.
 - `apps/platform` UI: every row of `platform-ui-practices` "Red flags — stop"
   the diff writes is a finding, as is a value off its "Type", "Colour and
   contrast" or "Spacing, radius, elevation" rules.
@@ -242,7 +249,10 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   where its behaviour is still asserted (→ `testing-practices` "When you
   touch a test file").
 - **Test setup (blocking on what the diff adds)** → `testing-practices`
-  "Where tests live", "Rendering and arrangement", "What to fake"; repetition
+  "Where tests live", "Rendering and arrangement", "What to fake". Judge
+  repetition by shape: for each `describe`, compare the opening statements of
+  its `it`s, whatever they call, and the act or assert runs written out more
+  than once — a helper's name is never what makes it arrangement. Repetition
   already on `main` that the diff adds nothing to is filed (`CLAUDE.md`
   "Duplication that already existed is filed, not fixed inline").
 - **Fixtures (blocking on what the diff adds)** → `testing-practices` "Where
@@ -287,6 +297,11 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   (→ `CLAUDE.md` "Examine before you change"). Drift in untouched files is
   not. Check the implementing agent's **Examined** section exists and that
   what it left is reported, not dropped.
+- **Copied drift (blocking).** A violation the diff writes is a finding even
+  when the surrounding code or the sibling it was modelled on does the same
+  (→ `CLAUDE.md` "Existing code is evidence, never the standard"). When the
+  diff edits a file, read what it writes against the rules, not against the
+  file.
 - **Literals and consts (blocking on what the diff adds).** A literal that
   retypes the value of a const in `packages/config/CONSTANTS.md`, a value the
   diff writes a second time without making it a const, and a new key/value
