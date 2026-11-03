@@ -1866,8 +1866,6 @@
     "unavailable": "Les lecteurs voient une page d’indisponibilité à la place de votre site.",
     "category": "Motif : {category}.",
     "contest": "Pour contester cette décision, répondez à l’e-mail de suspension ou écrivez au support en indiquant {reference}.",
-    "copyButton": "Copier la référence",
-    "copied": "Référence copiée",
-    "copyFailed": "La référence n’a pas pu être copiée. Sélectionnez-la et copiez-la vous-même."
+    "copyButton": "Copier la référence"
   }
 }

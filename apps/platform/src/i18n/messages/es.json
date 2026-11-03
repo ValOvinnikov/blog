@@ -1866,8 +1866,6 @@
     "unavailable": "Los lectores ven una página de no disponible en lugar de tu sitio.",
     "category": "Motivo: {category}.",
     "contest": "Para impugnar esta decisión, responde al correo de suspensión o escribe a soporte indicando {reference}.",
-    "copyButton": "Copiar referencia",
-    "copied": "Referencia copiada",
-    "copyFailed": "No se pudo copiar la referencia. Selecciónala y cópiala tú."
+    "copyButton": "Copiar referencia"
   }
 }

@@ -1866,8 +1866,6 @@
     "unavailable": "Lezers zien een pagina ‘niet beschikbaar’ in plaats van je site.",
     "category": "Reden: {category}.",
     "contest": "Wil je dit besluit aanvechten? Beantwoord de schorsingsmail of schrijf naar support en vermeld {reference}.",
-    "copyButton": "Referentie kopiëren",
-    "copied": "Referentie gekopieerd",
-    "copyFailed": "De referentie kon niet worden gekopieerd. Selecteer en kopieer haar zelf."
+    "copyButton": "Referentie kopiëren"
   }
 }

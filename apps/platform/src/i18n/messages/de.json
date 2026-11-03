@@ -1866,8 +1866,6 @@
     "unavailable": "Leser sehen statt deiner Website eine Seite „Nicht verfügbar“.",
     "category": "Grund: {category}.",
     "contest": "Um diese Entscheidung anzufechten, antworte auf die Sperr-E-Mail oder schreibe an den Support und gib {reference} an.",
-    "copyButton": "Referenz kopieren",
-    "copied": "Referenz kopiert",
-    "copyFailed": "Die Referenz konnte nicht kopiert werden. Markiere sie und kopiere sie selbst."
+    "copyButton": "Referenz kopieren"
   }
 }

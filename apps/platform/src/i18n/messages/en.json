@@ -1866,8 +1866,6 @@
     "unavailable": "Readers see an unavailable page instead of your site.",
     "category": "Reason: {category}.",
     "contest": "To contest this decision, reply to the suspension email or write to support quoting {reference}.",
-    "copyButton": "Copy reference",
-    "copied": "Reference copied",
-    "copyFailed": "The reference could not be copied. Select it and copy it instead."
+    "copyButton": "Copy reference"
   }
 }

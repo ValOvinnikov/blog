@@ -71,14 +71,9 @@ describe(`<${OwnerSuspensionBanner.name}/>`, () => {
       });
 
       await user.click(copyButton);
-      const confirmation = await screen.findByText(
-        ownerSuspensionBanner.copied,
-      );
+      const clipboard = await navigator.clipboard.readText();
 
-      expect(await navigator.clipboard.readText()).toBe(
-        MOCK_SUSPENSION_REFERENCE,
-      );
-      expect(confirmation).toBeInTheDocument();
+      expect(clipboard).toBe(MOCK_SUSPENSION_REFERENCE);
     });
   });
 
