@@ -1,12 +1,19 @@
 import { PRESET_ID } from '@blog/config';
 import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
+import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent from '@testing-library/user-event';
 
 import { SiteLookFields } from './site-look-fields';
 
+const {
+  accentLabel: ACCENT_LABEL,
+  presetLabel: PRESET_LABEL,
+  presetHint: PRESET_HINT,
+} = messages.onboardingForm;
+const { console: CONSOLE, consoleDescription: CONSOLE_DESCRIPTION } =
+  messages.presetPicker;
 const MOCK_HUE = 28;
-const ACCENT_LABEL = 'Accent colour';
 
 const setup = customRender(SiteLookFields, {
   preset: PRESET_ID.EDITORIAL,
@@ -19,6 +26,18 @@ describe(`<${SiteLookFields.name}/>`, () => {
   describe('with the default props', () => {
     beforeEach(() => {
       setup();
+    });
+
+    it('names the preset group from its visible legend and describes it with the hint', () => {
+      const group = screen.getByRole('radiogroup', { name: PRESET_LABEL });
+
+      expect(group).toHaveAccessibleDescription(PRESET_HINT);
+    });
+
+    it('names each preset from its name and describes it with its description', () => {
+      const consolePreset = screen.getByRole('radio', { name: CONSOLE });
+
+      expect(consolePreset).toHaveAccessibleDescription(CONSOLE_DESCRIPTION);
     });
 
     it('names the hue slider from the visible accent label', () => {

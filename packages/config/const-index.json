@@ -5486,6 +5486,22 @@
         "file": "apps/platform/src/constants/owner-studio-access.ts"
       }
     ],
+    "RESPONSIVE": [
+      {
+        "ref": "PRESET_PICKER_LAYOUT.RESPONSIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/preset-picker",
+        "file": "apps/platform/src/constants/preset-picker.ts"
+      }
+    ],
+    "PAIRED": [
+      {
+        "ref": "PRESET_PICKER_LAYOUT.PAIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/preset-picker",
+        "file": "apps/platform/src/constants/preset-picker.ts"
+      }
+    ],
     "MOBILE": [
       {
         "ref": "PREVIEW_WIDTH.MOBILE",
@@ -7622,6 +7638,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "ICON_STROKE_WIDTH.RADIO_TICK",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
       }
     ],
     "5": [

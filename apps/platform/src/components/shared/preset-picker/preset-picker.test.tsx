@@ -17,6 +17,7 @@ const {
 const setup = customRender(PresetPicker, {
   value: PRESET_ID.EDITORIAL,
   onChange: vi.fn(),
+  aria: { label: PRESET_GROUP },
 });
 
 describe(`<${PresetPicker.name}/>`, () => {
@@ -57,6 +58,16 @@ describe(`<${PresetPicker.name}/>`, () => {
     expect(handleChange).toHaveBeenCalledWith(PRESET_ID.EDITORIAL);
   });
 
+  it('reports the preset the user arrows to', async () => {
+    const handleChange = vi.fn();
+    setup({ value: PRESET_ID.CONSOLE, onChange: handleChange });
+
+    await user.tab();
+    await user.keyboard('{ArrowRight}');
+
+    expect(handleChange).toHaveBeenCalledWith(PRESET_ID.EDITORIAL);
+  });
+
   describe('when disabled', () => {
     let handleChange: Mock<(value: TPresetId) => void>;
 
@@ -66,7 +77,7 @@ describe(`<${PresetPicker.name}/>`, () => {
         value: PRESET_ID.CONSOLE,
         onChange: handleChange,
         isDisabled: true,
-        'aria-describedby': ARCHIVED_NOTICE_ID,
+        aria: { label: PRESET_GROUP, describedBy: ARCHIVED_NOTICE_ID },
       });
     });
 

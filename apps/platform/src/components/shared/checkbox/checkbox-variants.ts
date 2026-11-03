@@ -35,10 +35,10 @@ export const checkboxVariants = tv({
       },
       [SIZE.LG]: {
         root: ['gap-1.5'],
-        label: ['gap-2.5 text-admin-14 leading-[1.45]'],
+        label: ['gap-2.5 text-admin-14 leading-admin-1-45'],
         box: ['size-4.5 aria-invalid:border-admin-bad-line'],
         tick: ['mb-0.5 h-[9px] w-[5px]'],
-        error: ['text-admin-12 leading-[1.45] font-medium'],
+        error: ['text-admin-12 leading-admin-1-45 font-medium'],
       },
     },
   },

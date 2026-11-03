@@ -418,7 +418,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
 
 - **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
-- **ICON_STROKE_WIDTH**: `CONTROL`=`1.8`, `STATUS_LINE`=`2.2`, `RAIL_BADGE`=`2.6`
+- **ICON_STROKE_WIDTH**: `CONTROL`=`1.8`, `STATUS_LINE`=`2.2`, `RAIL_BADGE`=`2.6`, `RADIO_TICK`=`3`
 
 ### `@platform/constants/keyboard` — `apps/platform/src/constants/keyboard.ts`
 
@@ -456,6 +456,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
 
 - **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
+
+### `@platform/constants/preset-picker` — `apps/platform/src/constants/preset-picker.ts`
+
+- **PRESET_PICKER_LAYOUT**: `RESPONSIVE`, `PAIRED`
 
 ### `@platform/constants/preview` — `apps/platform/src/constants/preview.ts`
 
