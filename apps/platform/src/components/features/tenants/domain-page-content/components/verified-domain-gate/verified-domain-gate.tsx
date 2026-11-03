@@ -1,12 +1,12 @@
 'use client';
 
+import type { IWithChildren } from '@blog/config/react';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
-import { use, type ReactNode } from 'react';
+import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
+import { use } from 'react';
 
-export type TVerifiedDomainGateProps = {
+export type TVerifiedDomainGateProps = IWithChildren & {
   projectDomain: Promise<TProjectDomain>;
-  children: ReactNode;
 };
 
 export const VerifiedDomainGate = ({

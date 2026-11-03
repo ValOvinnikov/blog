@@ -1,4 +1,4 @@
-import type { TDomainDnsRecord } from '@platform/server/provisioning/vercel-domains-api';
+import type { TDomainDnsRecord } from '@platform/server/provisioning/project-domain';
 import { useTranslations } from 'next-intl';
 
 import { dnsRecordsTableVariants } from './dns-records-table-variants';

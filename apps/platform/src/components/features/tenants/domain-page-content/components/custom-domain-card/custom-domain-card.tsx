@@ -10,16 +10,15 @@ import { CustomDomainNoticeCard } from '@platform/components/features/tenants/do
 import { CustomDomainStatusRefresher } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-status-refresher/custom-domain-status-refresher';
 import { DomainVerificationCard } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card/domain-verification-card';
 import { DomainVerificationCardSkeleton } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card-skeleton/domain-verification-card-skeleton';
-import {
-  getProjectDomain,
-  type TProjectDomain,
-} from '@platform/server/provisioning/vercel-domains-api';
+import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
+import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
 export type TCustomDomainCardProps = {
   tenant: Pick<TTenant, 'id' | 'plan' | 'deprovisionedAt' | 'primaryDomain'>;
   customDomain: TMaybeUndefined<string>;
+  subdomain: TMaybeUndefined<string>;
   claim: TMaybeUndefined<Pick<TCustomDomainClaim, 'domain' | 'token'>>;
   isPrimaryCustom: boolean;
   primaryProjectDomain: Promise<TProjectDomain>;
@@ -29,6 +28,7 @@ export type TCustomDomainCardProps = {
 export const CustomDomainCard = ({
   tenant,
   customDomain,
+  subdomain,
   claim,
   isPrimaryCustom,
   primaryProjectDomain,
@@ -62,6 +62,11 @@ export const CustomDomainCard = ({
             isPlatformAddress={false}
             projectDomain={shown.projectDomain}
             title={isPrimaryCustom ? t('mainTitle') : t('title')}
+            note={
+              isPrimaryCustom && subdomain
+                ? t('subdomainStillWorks', { subdomain })
+                : undefined
+            }
             actions={
               canAct && (
                 <CustomDomainActions

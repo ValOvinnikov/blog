@@ -2,7 +2,7 @@ import { MainAddressControl } from '@platform/components/features/tenants/domain
 import { RemoveCustomDomainControl } from '@platform/components/features/tenants/domain-page-content/components/remove-custom-domain-control/remove-custom-domain-control';
 import { VerifiedDomainGate } from '@platform/components/features/tenants/domain-page-content/components/verified-domain-gate/verified-domain-gate';
 import { MAIN_ADDRESS_TARGET } from '@platform/constants/custom-domain';
-import type { TProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
 
 export type TCustomDomainActionsProps = {
   tenantId: string;

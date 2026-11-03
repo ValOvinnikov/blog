@@ -368,6 +368,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **DOMAIN_VERIFICATION_STATUS**: `NOT_CONFIGURED`, `NOT_ADDED`, `PENDING`, `VERIFIED`, `ERROR`
 - **DOMAIN_AVAILABILITY**: `NOT_CONFIGURED`, `AVAILABLE`, `IN_USE`, `ERROR`
+- **ROUTING_RECORD_TYPE**: `A`, `CNAME`
 
 ### `@platform/constants/email-config` — `apps/platform/src/constants/email-config.ts`
 
@@ -463,7 +464,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/provisioning` — `apps/platform/src/constants/provisioning.ts`
 
-- **PROVISIONING_LOG**: `DEPROVISION_AUDIT_FAILED`=`"provisioning.deprovision_audit_failed"`, `DEPROVISION_DISPATCH_ERROR`=`"provisioning.deprovision_dispatch_error"`, `DEPROVISION_DISPATCH_FAILED`=`"provisioning.deprovision_dispatch_failed"`, `DEPROVISION_DISPATCH_SKIPPED`=`"provisioning.deprovision_dispatch_skipped"`, `DOMAIN_CHECK_ERROR`=`"provisioning.domain_check_error"`, `DOMAIN_CHECK_FAILED`=`"provisioning.domain_check_failed"`, `DOMAIN_CHECK_INVALID_DOMAIN`=`"provisioning.domain_check_invalid_domain"`, `ENQUEUE_FAILED`=`"provisioning.enqueue_failed"`, `ENQUEUE_NOT_FOUND`=`"provisioning.enqueue_not_found"`, `REACTIVATE_AUDIT_FAILED`=`"provisioning.reactivate_audit_failed"`
+- **PROVISIONING_LOG**: `DEPROVISION_AUDIT_FAILED`=`"provisioning.deprovision_audit_failed"`, `DEPROVISION_DISPATCH_ERROR`=`"provisioning.deprovision_dispatch_error"`, `DEPROVISION_DISPATCH_FAILED`=`"provisioning.deprovision_dispatch_failed"`, `DEPROVISION_DISPATCH_SKIPPED`=`"provisioning.deprovision_dispatch_skipped"`, `DOMAIN_CHECK_ERROR`=`"provisioning.domain_check_error"`, `DOMAIN_CHECK_FAILED`=`"provisioning.domain_check_failed"`, `DOMAIN_CONFIG_CHECK_FAILED`=`"provisioning.domain_config_check_failed"`, `DOMAIN_CHECK_INVALID_DOMAIN`=`"provisioning.domain_check_invalid_domain"`, `ENQUEUE_FAILED`=`"provisioning.enqueue_failed"`, `ENQUEUE_NOT_FOUND`=`"provisioning.enqueue_not_found"`, `REACTIVATE_AUDIT_FAILED`=`"provisioning.reactivate_audit_failed"`
 
 ### `@platform/constants/release` — `apps/platform/src/constants/release.ts`
 

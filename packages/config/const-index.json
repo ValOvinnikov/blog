@@ -4810,6 +4810,22 @@
         "file": "apps/platform/src/constants/domain.ts"
       }
     ],
+    "A": [
+      {
+        "ref": "ROUTING_RECORD_TYPE.A",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
+    "CNAME": [
+      {
+        "ref": "ROUTING_RECORD_TYPE.CNAME",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      }
+    ],
     "email_config.update_audit_failed": [
       {
         "ref": "EMAIL_CONFIG_LOG.UPDATE_AUDIT_FAILED",
@@ -5513,6 +5529,14 @@
     "provisioning.domain_check_failed": [
       {
         "ref": "PROVISIONING_LOG.DOMAIN_CHECK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/provisioning",
+        "file": "apps/platform/src/constants/provisioning.ts"
+      }
+    ],
+    "provisioning.domain_config_check_failed": [
+      {
+        "ref": "PROVISIONING_LOG.DOMAIN_CONFIG_CHECK_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/provisioning",
         "file": "apps/platform/src/constants/provisioning.ts"
