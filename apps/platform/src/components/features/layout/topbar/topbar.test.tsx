@@ -39,33 +39,35 @@ const setup = (overrides: Partial<TTopbarProps> = {}) =>
   );
 
 describe(`<${Topbar.name}/>`, () => {
-  it('holds only the collapse toggle, the Menu button and the crumb', () => {
-    setup();
+  describe('with the default props', () => {
+    let banner: HTMLElement;
 
-    const banner = screen.getByRole('banner');
-    const crumb = within(banner).getByText(MOCK_CRUMB_TEXT);
-    const buttons = within(banner).getAllByRole('button');
-    const menuButton = within(banner).getByRole('button', {
-      name: messages.topbarNavMenu.triggerLabel,
+    beforeEach(() => {
+      setup();
+      banner = screen.getByRole('banner');
     });
 
-    expect(crumb).toBeVisible();
-    expect(buttons).toHaveLength(2);
-    expect(menuButton).toHaveAttribute(ARIA_HASPOPUP, 'menu');
-  });
+    it('holds only the collapse toggle, the Menu button and the crumb', () => {
+      const crumb = within(banner).getByText(MOCK_CRUMB_TEXT);
+      const buttons = within(banner).getAllByRole('button');
+      const menuButton = within(banner).getByRole('button', {
+        name: messages.topbarNavMenu.triggerLabel,
+      });
 
-  it('leads with the collapse toggle, before the crumb', () => {
-    setup();
-
-    const banner = screen.getByRole('banner');
-    const toggle = screen.getByRole('button', {
-      name: messages.sidebar.collapseToggle,
+      expect(crumb).toBeVisible();
+      expect(buttons).toHaveLength(2);
+      expect(menuButton).toHaveAttribute(ARIA_HASPOPUP, 'menu');
     });
 
-    const [firstButton] = within(banner).getAllByRole('button');
+    it('leads with the collapse toggle, before the crumb', () => {
+      const toggle = screen.getByRole('button', {
+        name: messages.sidebar.collapseToggle,
+      });
+      const [firstButton] = within(banner).getAllByRole('button');
 
-    expect(firstButton).toBe(toggle);
-    expect(banner).toHaveTextContent(new RegExp(`^${MOCK_CRUMB_TEXT}`));
+      expect(firstButton).toBe(toggle);
+      expect(banner).toHaveTextContent(new RegExp(`^${MOCK_CRUMB_TEXT}`));
+    });
   });
 
   describe('with the nav menu opened', () => {

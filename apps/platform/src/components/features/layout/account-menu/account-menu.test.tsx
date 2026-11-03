@@ -13,6 +13,10 @@ import {
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockAccount } from '@platform/testing/layout/fixtures';
+import {
+  DATA_THEME_ATTRIBUTE,
+  resetThemePreference,
+} from '@platform/testing/theme-preference';
 import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -33,7 +37,6 @@ const MOCK_EMAIL_ONLY = mockAccount({ name: undefined, email: MOCK_EMAIL });
 
 const t = makeEnTranslator('account');
 const MENU_ITEM_RADIO = 'menuitemradio';
-const DATA_THEME_ATTRIBUTE = 'data-theme';
 
 const setup = (
   props: Partial<TAccountMenuProps> = {},
@@ -197,10 +200,7 @@ describe(`<${AccountMenu.name}/>`, () => {
       return openMenu(user, trigger);
     };
 
-    afterEach(() => {
-      delete document.documentElement.dataset.theme;
-      document.cookie = `${THEME_PREFERENCE_COOKIE}=; max-age=0; path=/; SameSite=Lax`;
-    });
+    afterEach(resetThemePreference);
 
     it('labels the group Theme, describes it by the hint and checks System with no stored choice', async () => {
       const menu = await openSidebarMenu();

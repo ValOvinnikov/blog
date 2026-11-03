@@ -10,6 +10,9 @@ const SIDEBAR_TRIGGER = [
   focusRingClasses(FOCUS_RING_GROUND.SIDE),
 ];
 
+const EXPANDED_TRIGGER =
+  'flex min-h-[52px] w-full items-center gap-2.5 px-2.5 py-2 text-left';
+
 export const accountMenuVariants = tv({
   slots: {
     trigger: ['transition-colors duration-base ease-smooth'],
@@ -31,10 +34,7 @@ export const accountMenuVariants = tv({
   variants: {
     placement: {
       [ACCOUNT_MENU_PLACEMENT.FOOT]: {
-        trigger: [
-          ...SIDEBAR_TRIGGER,
-          'flex min-h-[52px] w-full items-center gap-2.5 px-2.5 py-2 text-left',
-        ],
+        trigger: [...SIDEBAR_TRIGGER, EXPANDED_TRIGGER],
         popup: ['w-[var(--anchor-width)]'],
       },
       [ACCOUNT_MENU_PLACEMENT.RAIL]: {
@@ -45,9 +45,7 @@ export const accountMenuVariants = tv({
         popup: ['w-60'],
       },
       [ACCOUNT_MENU_PLACEMENT.MENU]: {
-        trigger: [
-          'flex min-h-[52px] w-full items-center gap-2.5 rounded-admin px-2.5 py-2 text-left',
-        ],
+        trigger: [EXPANDED_TRIGGER, 'rounded-admin'],
         popup: ['w-[var(--anchor-width)]'],
       },
     },

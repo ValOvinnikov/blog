@@ -22,6 +22,7 @@ import {
   mockTenantSwitcherItem,
 } from '@platform/testing/layout/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { createRef } from 'react';
 
 import { TopbarNavMenu } from './topbar-nav-menu';
 
@@ -49,9 +50,12 @@ const ARROW_DOWN_TO_ACCOUNT = ARROW_DOWN.repeat(3);
 const ENTER = '{Enter}';
 const ESCAPE = '{Escape}';
 
+const MOCK_BAR_REF = createRef<HTMLElement>();
+
 const setup = customRender(TopbarNavMenu, {
   sections: [MOCK_SECTION],
   account: <div>{MOCK_ACCOUNT_TEXT}</div>,
+  barRef: MOCK_BAR_REF,
 });
 
 const setupPinned = () =>
@@ -66,6 +70,7 @@ const setupPinned = () =>
           />
         }
         account={<AccountMenu account={MOCK_ACCOUNT} />}
+        barRef={MOCK_BAR_REF}
       />
     </SidebarCollapseProvider>,
   );
@@ -287,20 +292,23 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
         });
       });
 
-      it('keeps the Menu open and closes only the account menu on Escape', async () => {
-        await user.keyboard(ESCAPE);
+      describe('after one Escape', () => {
+        beforeEach(async () => {
+          await user.keyboard(ESCAPE);
+        });
 
-        await waitFor(() => expect(accountMenu).not.toBeInTheDocument());
-        expect(menu).toBeVisible();
-        expect(getAccountTrigger(menu)).toHaveFocus();
-      });
+        it('closes only the account menu, returning focus to its trigger', async () => {
+          await waitFor(() => expect(accountMenu).not.toBeInTheDocument());
+          expect(menu).toBeVisible();
+          expect(getAccountTrigger(menu)).toHaveFocus();
+        });
 
-      it('closes the Menu onto its button on a second Escape', async () => {
-        await user.keyboard(ESCAPE);
-        await user.keyboard(ESCAPE);
+        it('closes the Menu onto its button on a second Escape', async () => {
+          await user.keyboard(ESCAPE);
 
-        await waitFor(() => expect(menu).not.toBeInTheDocument());
-        expect(getMenuButton()).toHaveFocus();
+          await waitFor(() => expect(menu).not.toBeInTheDocument());
+          expect(getMenuButton()).toHaveFocus();
+        });
       });
     });
   });

@@ -1,3 +1,7 @@
+import {
+  NAV_CURRENT_BAR,
+  NAV_ROW_SHAPE,
+} from '@platform/components/features/layout/sidebar/sidebar-variants';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -14,10 +18,9 @@ export const topbarNavMenuVariants = tv({
       focusRingClasses(FOCUS_RING_GROUND.BG),
       'data-[popup-open]:border-admin-brand-ink data-[popup-open]:text-admin-text',
     ],
-    // 72px above the popup (the top bar plus its 5px gap) and 12px below it.
     popup: [
-      'flex w-72 max-w-[calc(100vw-2rem)] flex-col overflow-hidden p-1.5',
-      'max-h-[calc(100dvh-84px)]',
+      'flex w-72 max-w-[var(--available-width)] flex-col overflow-hidden p-1.5',
+      'max-h-[var(--available-height)]',
     ],
     topZone: [
       'flex-none border-b border-admin-popover-line px-1.5 pt-1.5 pb-2.5',
@@ -27,21 +30,17 @@ export const topbarNavMenuVariants = tv({
       'flex-none border-t border-admin-popover-line px-0.5 pt-2 pb-0.5',
     ],
     section: ['flex flex-col gap-1.5 px-1 pt-2.5'],
-    sectionLabel: [
-      'truncate px-2.5 pb-1.5 text-admin-11 font-bold tracking-[0.09em] text-admin-muted uppercase',
-    ],
-    row: [
-      'group relative flex min-h-11 items-center gap-2.5 rounded-admin-control px-2.5 py-2',
-      'text-admin-13 font-normal text-admin-text outline-none',
-    ],
-    note: ['px-2.5 text-admin-12 leading-4 text-admin-muted'],
+    sectionLabel: ['text-admin-muted'],
+    row: [NAV_ROW_SHAPE, 'min-h-11 font-normal text-admin-text outline-none'],
+    note: ['text-admin-muted'],
   },
   variants: {
     state: {
       current: {
         row: [
           'cursor-pointer bg-admin-popover-hover font-semibold',
-          'before:absolute before:inset-y-2.5 before:left-0 before:w-[3px] before:rounded-r-admin-bar before:bg-admin-brand-ink',
+          NAV_CURRENT_BAR,
+          'before:inset-y-2.5 before:bg-admin-brand-ink',
         ],
       },
       resting: {

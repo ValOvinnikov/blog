@@ -281,6 +281,15 @@ ticket itself. Then sort what you find:
   the same branch when it is the same layer and small ("Findings found mid-work
   get fixed in the current work"), and otherwise puts it to the user or files
   it. A diff never grows past its ticket silently.
+- **Existing code is evidence, never the standard.** What the file, its
+  folder or the nearest sibling does that a rule here forbids — a hardcoded
+  or recomputed value, repeated test setup, a comment, a raw type — is drift.
+  It is never copied into new code or extended into an edit, and in a file
+  the diff touches it is fixed under the first bullet. "It matches the
+  surrounding code" and "the sibling does the same" never justify a
+  violation the diff writes; the reviewer treats a copied violation as one
+  the diff created. This overrides any instruction to match the surrounding
+  code, as the comment rule does.
 - **A ticket whose premise the code contradicts stops the work.** A moved line
   reference is corrected without comment; a described behaviour that no longer
   exists, or a fix another PR already made, is reported before anything is

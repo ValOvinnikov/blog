@@ -1,9 +1,11 @@
+'use client';
+
 import {
   AccountMenu,
   type TAccount,
 } from '@platform/components/features/layout/account-menu';
 import type { TSidebarNavSection } from '@platform/components/features/layout/sidebar';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 
 import { SidebarCollapseToggle } from './components/sidebar-collapse-toggle';
 import { TopbarNavMenu } from './components/topbar-nav-menu';
@@ -23,14 +25,16 @@ export const Topbar = ({
   switcher,
 }: TTopbarProps) => {
   const { root } = topbarVariants();
+  const barRef = useRef<HTMLElement>(null);
 
   return (
-    <header className={root()}>
+    <header ref={barRef} className={root()}>
       <SidebarCollapseToggle />
       <TopbarNavMenu
         sections={sections}
         switcher={switcher}
         account={<AccountMenu account={account} />}
+        barRef={barRef}
       />
       {crumb}
     </header>

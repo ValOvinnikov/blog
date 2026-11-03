@@ -21,6 +21,8 @@ code:
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/utils/sidebar-collapsed-cookie/**
   - apps/platform/src/utils/theme-preference-cookie/**
+  - apps/platform/src/utils/theme-preference/**
+  - apps/platform/src/utils/use-theme-preference/**
   - apps/platform/src/constants/theme.ts
   - apps/platform/src/utils/tenant-switcher-items/**
   - apps/platform/src/context/unsaved-changes-provider/**
@@ -226,8 +228,10 @@ switches the content column to full-bleed (see
   `admin-theme` cookie and sets or clears `data-theme` on `<html>` at once,
   without a reload and without closing the menu; the menu reads the current
   choice back from `<html>`, since the root layout never re-renders on client
-  navigation. The top bar carries no account control at any width: below
-  `md` the account lives at the foot of the phone Menu (below).
+  navigation, and follows a choice made in the embedded Studio's Appearance
+  menu, which writes the same preference (`embedded-studio.md`). The top bar
+  carries no account control at any width: below `md` the account lives at
+  the foot of the phone Menu (below).
   The Workspace field is a `side-field` plate with a `side-field-line` border
   and the raised shadow, its border `side-accent` while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
@@ -279,8 +283,10 @@ switches the content column to full-bleed (see
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
   `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
-  288px wide, 17px under the Menu button, as tall as its content up to the
-  viewport less 84px. The popup never scrolls; it holds three zones. A pinned
+  288px wide. It is anchored to the Menu button's left edge and the top bar's
+  full height (`use-bar-anchor.ts`), so it opens 5px below the bar and grows
+  with its content until it stops 12px above the viewport's bottom (Base UI's
+  `--available-height`). The popup never scrolls; it holds three zones. A pinned
   top zone (padding 6px 6px 10px, a `popover-line` rule below) holds the
   Workspace switcher and renders only when the switcher does. A scrolling
   middle zone (padding 0 2px 8px; sections 10px 4px 0) holds the sidebar's
@@ -288,7 +294,8 @@ switches the content column to full-bleed (see
   least 44px tall, 13px/400 `text` with `muted` icons and `title` = the label
   (none on a row with a status line): highlight and hover take a
   `popover-hover` plate with no ring; the current row adds a 3px `brand-ink`
-  bar flush left, inset 10px, a 600 label and a `text` icon. A pinned foot
+  bar (`w-admin-bar`, shared with the sidebar's current row) flush left,
+  inset 10px, a 600 label and a `text` icon. A pinned foot
   zone (padding 8px 2px 2px, a `popover-line` rule above) holds `AccountMenu`
   in its expanded form. The Menu wraps both pinned zones in
   `NestedMenuProvider` (`context/nested-menu-provider/`), so `TenantSwitcher`
