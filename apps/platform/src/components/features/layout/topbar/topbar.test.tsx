@@ -32,44 +32,42 @@ const setup = (overrides: Partial<TTopbarProps> = {}) =>
       <Topbar
         crumb={<p>{MOCK_CRUMB_TEXT}</p>}
         account={MOCK_ACCOUNT}
+        sections={[mockNavSection({ items: [MOCK_NAV_ITEM] })]}
         {...overrides}
       />
     </SidebarCollapseProvider>,
   );
 
 describe(`<${Topbar.name}/>`, () => {
-  it('renders the crumb and the account pill named by the role line', () => {
-    setup();
+  describe('with the default props', () => {
+    let banner: HTMLElement;
 
-    const crumb = screen.getByText(MOCK_CRUMB_TEXT);
-    const pill = screen.getByRole('button', { name: MOCK_ACCOUNT.roleLine });
-
-    expect(crumb).toBeVisible();
-    expect(pill).toHaveAttribute(ARIA_HASPOPUP, 'menu');
-  });
-
-  it('leads with the collapse toggle, before the crumb', () => {
-    setup();
-
-    const banner = screen.getByRole('banner');
-    const toggle = screen.getByRole('button', {
-      name: messages.sidebar.collapseToggle,
+    beforeEach(() => {
+      setup();
+      banner = screen.getByRole('banner');
     });
 
-    const [firstButton] = within(banner).getAllByRole('button');
+    it('holds only the collapse toggle, the Menu button and the crumb', () => {
+      const crumb = within(banner).getByText(MOCK_CRUMB_TEXT);
+      const buttons = within(banner).getAllByRole('button');
+      const menuButton = within(banner).getByRole('button', {
+        name: messages.topbarNavMenu.triggerLabel,
+      });
 
-    expect(firstButton).toBe(toggle);
-    expect(banner).toHaveTextContent(new RegExp(`^${MOCK_CRUMB_TEXT}`));
-  });
-
-  it('renders no nav menu trigger when no sections are passed', () => {
-    setup();
-
-    const trigger = screen.queryByRole('button', {
-      name: messages.topbarNavMenu.triggerLabel,
+      expect(crumb).toBeVisible();
+      expect(buttons).toHaveLength(2);
+      expect(menuButton).toHaveAttribute(ARIA_HASPOPUP, 'menu');
     });
 
-    expect(trigger).not.toBeInTheDocument();
+    it('leads with the collapse toggle, before the crumb', () => {
+      const toggle = screen.getByRole('button', {
+        name: messages.sidebar.collapseToggle,
+      });
+      const [firstButton] = within(banner).getAllByRole('button');
+
+      expect(firstButton).toBe(toggle);
+      expect(banner).toHaveTextContent(new RegExp(`^${MOCK_CRUMB_TEXT}`));
+    });
   });
 
   describe('with the nav menu opened', () => {
@@ -77,16 +75,15 @@ describe(`<${Topbar.name}/>`, () => {
 
     beforeEach(async () => {
       const user = userEvent.setup();
-      setup({
-        sections: [mockNavSection({ items: [MOCK_NAV_ITEM] })],
-        switcher: <div>{MOCK_SWITCHER_TEXT}</div>,
-      });
+      setup({ switcher: <div>{MOCK_SWITCHER_TEXT}</div> });
 
       const trigger = screen.getByRole('button', {
         name: messages.topbarNavMenu.triggerLabel,
       });
       await user.click(trigger);
-      menu = await screen.findByRole('menu');
+      menu = await screen.findByRole('menu', {
+        name: messages.topbarNavMenu.triggerLabel,
+      });
     });
 
     it('shows the passed sections', () => {
@@ -101,6 +98,14 @@ describe(`<${Topbar.name}/>`, () => {
       const switcher = within(menu).getByText(MOCK_SWITCHER_TEXT);
 
       expect(switcher).toBeVisible();
+    });
+
+    it('shows the account in the foot', () => {
+      const account = within(menu).getByRole('menuitem', {
+        name: new RegExp(MOCK_ACCOUNT.email ?? ''),
+      });
+
+      expect(account).toBeVisible();
     });
   });
 });
