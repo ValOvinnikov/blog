@@ -1,6 +1,7 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import {
+  DEVICE_FRAME_CHROME,
   DEVICE_FRAME_FIT,
   DEVICE_FRAME_LIMIT,
   type TDeviceFrameFitMode,
@@ -75,8 +76,10 @@ export const fitStageScale = ({
     Math.max(
       0,
       Math.min(
-        availableWidth / PREVIEW_DEVICE_WIDTH[device],
-        availableHeight / PREVIEW_DEVICE_HEIGHT[device],
+        (availableWidth - DEVICE_FRAME_CHROME[device].width) /
+          PREVIEW_DEVICE_WIDTH[device],
+        (availableHeight - DEVICE_FRAME_CHROME[device].height) /
+          PREVIEW_DEVICE_HEIGHT[device],
         1,
       ),
     ),

@@ -1,4 +1,8 @@
 import type { TValueOf } from '@blog/config/utils';
+import {
+  PREVIEW_DEVICE,
+  type TPreviewDevice,
+} from '@platform/constants/preview';
 
 export const DEVICE_FRAME_FIT = {
   PAGE: 'PAGE',
@@ -14,6 +18,13 @@ export const DEVICE_FRAME_LIMIT = {
   SCALE_PRECISION: 10000,
   PERCENT: 100,
 } as const;
+
+// The border, bezel padding and desktop bar in device-frame-variants.ts.
+export const DEVICE_FRAME_CHROME = {
+  [PREVIEW_DEVICE.DESKTOP]: { width: 2, height: 30 },
+  [PREVIEW_DEVICE.TABLET]: { width: 14, height: 14 },
+  [PREVIEW_DEVICE.PHONE]: { width: 14, height: 14 },
+} as const satisfies Record<TPreviewDevice, { width: number; height: number }>;
 
 export const DEVICE_FRAME_AXIS = {
   VERTICAL: 'VERTICAL',

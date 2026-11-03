@@ -124,7 +124,8 @@ Free site.
   its own line otherwise. The frame (an image named "Sample page at {width}
   px") draws the desktop bar's three dots without a host, and lays Look's
   sample (`LookSample`) out at the device width, scaled to the stage's width
-  and, in the Full tier, its inner height too (no 608px cap). The sample
+  (less its border, bezel and bar) and, in the Full tier, its inner height
+  too (no 608px cap), so the whole frame stays inside the stage. The sample
   wears the typed name ("Your site" while empty) with no logo, the chosen
   preset's header, footer and busy styles and the accent, the language
   switcher, no reader accounts, and the cookie-settings button. Full and

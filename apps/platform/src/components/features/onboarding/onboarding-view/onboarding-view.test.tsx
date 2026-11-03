@@ -1020,7 +1020,7 @@ describe(`<${OnboardingView.name}/> preview`, () => {
 
       const preview = screen.getByRole('region', MOCK_LIVE_PREVIEW);
       const readout = within(preview).getByText(
-        readoutOf(PREVIEW_DEVICE.TABLET, 58),
+        readoutOf(PREVIEW_DEVICE.TABLET, 56),
       );
 
       expect(readout).toHaveRole('status');

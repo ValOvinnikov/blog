@@ -23,6 +23,7 @@ const MOCK_TABLET_FULLSCREEN_STAGE = 600;
 const MOCK_LARGE_AVAILABLE_HEIGHT = 5000;
 const MOCK_FULL_STAGE = 472;
 const MOCK_SHORT_FULL_STAGE_HEIGHT = 500;
+const MOCK_FULL_STAGE_HEIGHT = 728;
 
 describe(fitPageScale, () => {
   it.each([
@@ -140,7 +141,7 @@ describe(fitStageScale, () => {
       availableWidth: MOCK_NARROW_STAGE,
     });
 
-    expect(toScalePercent(scale)).toBe(92);
+    expect(toScalePercent(scale)).toBe(88);
   });
 
   it('grows taller than 608 px when the stage is taller', () => {
@@ -150,7 +151,10 @@ describe(fitStageScale, () => {
       availableHeight: MOCK_LARGE_AVAILABLE_HEIGHT,
     });
 
-    expect(scaleDeviceSize(PREVIEW_DEVICE.TABLET, scale).height).toBe(679);
+    expect(scaleDeviceSize(PREVIEW_DEVICE.TABLET, scale)).toStrictEqual({
+      width: 458,
+      height: 659,
+    });
   });
 
   it('fits a short stage by its height', () => {
@@ -160,8 +164,32 @@ describe(fitStageScale, () => {
       availableHeight: MOCK_SHORT_FULL_STAGE_HEIGHT,
     });
 
-    expect(toScalePercent(scale)).toBe(42);
+    expect(toScalePercent(scale)).toBe(41);
   });
+
+  it.each([
+    {
+      device: PREVIEW_DEVICE.DESKTOP,
+      availableHeight: MOCK_SHORT_FULL_STAGE_HEIGHT,
+      viewport: { width: 752, height: 470 },
+    },
+    {
+      device: PREVIEW_DEVICE.PHONE,
+      availableHeight: MOCK_FULL_STAGE_HEIGHT,
+      viewport: { width: 330, height: 714 },
+    },
+  ])(
+    'keeps the $device frame, its chrome included, inside a stage its height bounds',
+    ({ device, availableHeight, viewport }) => {
+      const scale = fitStageScale({
+        device,
+        availableWidth: MOCK_WIDE_STAGE,
+        availableHeight,
+      });
+
+      expect(scaleDeviceSize(device, scale)).toStrictEqual(viewport);
+    },
+  );
 
   it('never shows the stage larger than the device', () => {
     const scale = fitStageScale({
@@ -244,9 +272,9 @@ describe(resolveDeviceFrameLayout, () => {
     });
 
     expect(layout).toStrictEqual({
-      scale: 0.5756,
+      scale: 0.5585,
       isPanning: false,
-      viewport: { width: 472, height: 679 },
+      viewport: { width: 458, height: 659 },
     });
   });
 
