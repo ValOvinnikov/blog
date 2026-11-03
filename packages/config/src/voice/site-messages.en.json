@@ -20,6 +20,10 @@
     "retry": "Try again",
     "goHome": "Go home"
   },
+  "siteUnavailable": {
+    "heading": "This site is unavailable",
+    "text": "Please check back later."
+  },
   "postShare": {
     "shareAriaLabel": "Share \"{title}\"",
     "panelAriaLabel": "Share options",

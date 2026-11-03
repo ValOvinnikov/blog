@@ -6794,6 +6794,14 @@
         "file": "apps/web/src/constants/header-style.ts"
       }
     ],
+    "private, no-store": [
+      {
+        "ref": "CACHE_CONTROL.PRIVATE_NO_STORE",
+        "scope": "app:web",
+        "from": "@web/constants/http",
+        "file": "apps/web/src/constants/http.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",

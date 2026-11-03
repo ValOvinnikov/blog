@@ -20,6 +20,10 @@
     "retry": "Volver a intentarlo",
     "goHome": "Ir al inicio"
   },
+  "siteUnavailable": {
+    "heading": "Este sitio no está disponible",
+    "text": "Vuelva a consultarlo más tarde."
+  },
   "postShare": {
     "shareAriaLabel": "Compartir «{title}»",
     "panelAriaLabel": "Opciones para compartir",
