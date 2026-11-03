@@ -44,6 +44,12 @@ describe(`<${RemoveCustomDomainControl.name}/>`, () => {
     await user.click(confirm);
   };
 
+  it('names the domain it will remove', async () => {
+    const domain = await screen.findByText(MOCK_CUSTOM_DOMAIN);
+
+    expect(domain).toBeVisible();
+  });
+
   it('removes nothing until the dialog is confirmed', () => {
     expect(removeCustomDomainAction).not.toHaveBeenCalled();
   });

@@ -2,6 +2,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import {
   CUSTOM_DOMAIN_REFUSAL,
+  CUSTOM_DOMAIN_TXT_TYPE,
   CUSTOM_DOMAIN_VERIFY_POLL,
 } from '@platform/constants/custom-domain';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
@@ -63,6 +64,14 @@ const SUBDOMAIN_NOTE = makeEnTranslator('tenantDomainPage.ownDomain')(
   'subdomainStillWorks',
   { subdomain: MOCK_TENANT_DOMAIN },
 );
+
+const tDomainPage = makeEnTranslator('tenantDomainPage');
+const COPY_TXT_NAME = tDomainPage('copyRecordName', {
+  type: CUSTOM_DOMAIN_TXT_TYPE,
+});
+const COPY_TXT_VALUE = tDomainPage('copyRecordValue', {
+  type: CUSTOM_DOMAIN_TXT_TYPE,
+});
 
 const BASE_PROPS: TCustomDomainCardProps = {
   tenant: {
@@ -475,6 +484,17 @@ describe(`<${CustomDomainCard.name}/>`, () => {
         expect(token).toBeVisible();
         expect(verify).not.toBeInTheDocument();
         expect(remove).not.toBeInTheDocument();
+      });
+
+      it.each([
+        [COPY_TXT_NAME, customDomainTxtName(MOCK_CUSTOM_DOMAIN)],
+        [COPY_TXT_VALUE, MOCK_CLAIM_TOKEN],
+      ])('copies exactly the record text with %s', async (name, expected) => {
+        const button = screen.getByRole('button', { name });
+        await user.click(button);
+        const clipboard = await navigator.clipboard.readText();
+
+        expect(clipboard).toBe(expected);
       });
 
       it('does not poll', async () => {

@@ -1,10 +1,9 @@
 import { ALERT_TYPE } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { Alert } from '@platform/components/shared/alert';
+import { CopyButton } from '@platform/components/shared/copy-button';
 import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-suspension';
 import { getTranslations } from 'next-intl/server';
-
-import { CopyReferenceButton } from './components/copy-reference-button/copy-reference-button';
 
 export type TOwnerSuspensionBannerProps = {
   tenant: Pick<TTenant, 'id' | 'status' | 'suspensionReason'>;
@@ -35,7 +34,7 @@ export const OwnerSuspensionBanner = async ({
           <p>{t('contest', { reference })}</p>
         </>
       }
-      action={<CopyReferenceButton reference={reference} />}
+      action={<CopyButton value={reference} ariaLabel={t('copyButton')} />}
     />
   );
 };
