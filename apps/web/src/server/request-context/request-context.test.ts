@@ -401,31 +401,37 @@ describe('request-context', () => {
   });
 
   describe(peekVoiceTenant, () => {
-    it('resolves no tenant without waiting when no route has entered', async () => {
-      const requestContext = await loadRequestContext();
+    describe('with a freshly loaded request context', () => {
+      let requestContext: typeof TModule;
 
-      await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
-    });
+      beforeEach(async () => {
+        requestContext = await loadRequestContext();
+      });
 
-    it.each([
-      ['its default language', LOCALE_ISO_CODES.EN],
-      ['a language other than the default', LOCALE_ISO_CODES.NL],
-    ])('resolves the entered tenant in %s', async (_label, locale) => {
-      const requestContext = await loadRequestContext();
-      await requestContext.enterRequestContext(params(MOCK_TENANT_ID, locale));
+      it('resolves no tenant without waiting when no route has entered', async () => {
+        await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
+      });
 
-      await expect(requestContext.peekVoiceTenant()).resolves.toBe(
-        MOCK_TENANT_ID,
-      );
-    });
+      it.each([
+        ['its default language', LOCALE_ISO_CODES.EN],
+        ['a language other than the default', LOCALE_ISO_CODES.NL],
+      ])('resolves the entered tenant in %s', async (_label, locale) => {
+        await requestContext.enterRequestContext(
+          params(MOCK_TENANT_ID, locale),
+        );
 
-    it('resolves no tenant when none was entered', async () => {
-      const requestContext = await loadRequestContext();
-      await requestContext.enterRequestContext(
-        params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
-      );
+        await expect(requestContext.peekVoiceTenant()).resolves.toBe(
+          MOCK_TENANT_ID,
+        );
+      });
 
-      await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
+      it('resolves no tenant when none was entered', async () => {
+        await requestContext.enterRequestContext(
+          params(UNRESOLVED_TENANT_PLACEHOLDER, LOCALE_ISO_CODES.EN),
+        );
+
+        await expect(requestContext.peekVoiceTenant()).resolves.toBeUndefined();
+      });
     });
 
     it.each([

@@ -320,11 +320,23 @@ describe(proxy, () => {
   });
 
   describe('dotted paths', () => {
-    it('passes a path with a dotted non-final segment through without resolving a tenant', async () => {
-      const response = await visit(DOTTED_SEGMENT_PATH);
+    describe('with no client-supplied headers', () => {
+      let response: NextResponse;
 
-      expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
-      expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+      beforeEach(async () => {
+        response = await visit(DOTTED_SEGMENT_PATH);
+      });
+
+      it('passes a path with a dotted non-final segment through without resolving a tenant', () => {
+        expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
+        expect(response.headers.get(REWRITE_HEADER)).toBeNull();
+      });
+
+      it('keeps the host header on a passed-through path', () => {
+        expect(response.headers.get('x-middleware-request-host')).toBe(
+          MOCK_TENANT_HOST,
+        );
+      });
     });
 
     it('drops a client-supplied tenant header on a passed-through path', async () => {
@@ -337,14 +349,6 @@ describe(proxy, () => {
 
       expect(overriddenHeaderNames).not.toContain(TENANT_ID_HEADER);
       expect(response.headers.get(FORWARDED_TENANT_HEADER)).toBeNull();
-    });
-
-    it('keeps the host header on a passed-through path', async () => {
-      const response = await visit(DOTTED_SEGMENT_PATH);
-
-      expect(response.headers.get('x-middleware-request-host')).toBe(
-        MOCK_TENANT_HOST,
-      );
     });
   });
 
@@ -554,27 +558,29 @@ describe(proxy, () => {
       expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
     });
 
-    it('links the unavailable page to the account page when the site has reader accounts', async () => {
-      isReaderAccountEnabledForTenantMock.mockResolvedValue(true);
+    describe('when the site has reader accounts', () => {
+      beforeEach(() => {
+        isReaderAccountEnabledForTenantMock.mockResolvedValue(true);
+      });
 
-      const body = await (await visit(BLOG_POST_PATH)).text();
+      it('links the unavailable page to the account page', async () => {
+        const body = await (await visit(BLOG_POST_PATH)).text();
 
-      expect(body).toContain(
-        `<a href="${ACCOUNT_PATH}">${MANAGE_ACCOUNT_LABEL.EN}</a>`,
-      );
-      expect(isReaderAccountEnabledForTenantMock).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-      );
-    });
+        expect(body).toContain(
+          `<a href="${ACCOUNT_PATH}">${MANAGE_ACCOUNT_LABEL.EN}</a>`,
+        );
+        expect(isReaderAccountEnabledForTenantMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
+      });
 
-    it('links to the account page in the language the path names', async () => {
-      isReaderAccountEnabledForTenantMock.mockResolvedValue(true);
+      it('links to the account page in the language the path names', async () => {
+        const body = await (await visit(`${DUTCH_PREFIX}${BLOG_PATH}`)).text();
 
-      const body = await (await visit(`${DUTCH_PREFIX}${BLOG_PATH}`)).text();
-
-      expect(body).toContain(
-        `<a href="${DUTCH_ACCOUNT_PATH}">${MANAGE_ACCOUNT_LABEL.NL}</a>`,
-      );
+        expect(body).toContain(
+          `<a href="${DUTCH_ACCOUNT_PATH}">${MANAGE_ACCOUNT_LABEL.NL}</a>`,
+        );
+      });
     });
 
     it('shows no account link when the site has no reader accounts', async () => {
