@@ -22,8 +22,8 @@ export const viewTabsVariants = tv({
       },
       [VIEW_TABS_VARIANT.UNDERLINE]: {
         root: [
-          'border-b border-admin-line bg-admin-surface px-4',
-          'lg:rounded-admin lg:border lg:shadow-admin-index',
+          'border-b-(length:--admin-view-tab-border) border-admin-line bg-admin-surface px-4',
+          'lg:rounded-admin lg:border-(length:--admin-view-tab-border) lg:shadow-admin-index',
         ],
         tab: [
           'h-admin-view-tab border-b-2 border-transparent text-center',

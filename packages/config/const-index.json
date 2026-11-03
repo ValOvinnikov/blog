@@ -608,6 +608,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/busy-button.ts"
+      },
+      {
+        "ref": "LOOK_CARD.PRESET",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-card",
+        "file": "apps/platform/src/constants/look-card.ts"
       }
     ],
     "BRAILLE": [

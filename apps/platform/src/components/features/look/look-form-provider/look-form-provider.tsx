@@ -2,13 +2,13 @@
 
 import type { TMaybeUndefined, TPresetId } from '@blog/config';
 import type { TLookField } from '@blog/db/constants';
+import type { TLookCard } from '@platform/constants/look-card';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type {
   TLookFormFieldSetter,
   TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
-import type { TLookCardKey } from '@platform/utils/look-form-values/look-form-values';
 import { createContext, useContext, type ReactNode } from 'react';
 
 export type TLookFormContext = {
@@ -16,7 +16,7 @@ export type TLookFormContext = {
   values: TLookFormValues;
   updateField: TLookFormFieldSetter;
   isLocked: (field: TLookField) => boolean;
-  hasCardChanges: (card: TLookCardKey) => boolean;
+  hasCardChanges: (card: TLookCard) => boolean;
   isDivergedFromPreset: boolean;
   isAccentHueRejected: boolean;
   accentHueFieldId: string;

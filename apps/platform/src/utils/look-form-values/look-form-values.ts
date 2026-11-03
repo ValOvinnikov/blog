@@ -1,5 +1,6 @@
 import { PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
+import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import {
   brandAssetKindSchema,
@@ -47,7 +48,7 @@ export const applyPresetDefaults = (
 };
 
 export const CARD_FIELDS = {
-  preset: ['preset'],
+  [LOOK_CARD.PRESET]: ['preset'],
   [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue'],
   [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont'],
   [LOOK_ROW.SHAPE]: [
@@ -73,9 +74,7 @@ export const CARD_FIELDS = {
   ],
   [LOOK_ROW.BRAND]: ['logo', 'favicon'],
   [LOOK_ROW.LANGUAGE_SWITCHER]: ['languageSwitcherStyle'],
-} as const satisfies Record<string, readonly (keyof TLookFormValues)[]>;
-
-export type TLookCardKey = keyof typeof CARD_FIELDS;
+} as const satisfies Record<TLookCard, readonly (keyof TLookFormValues)[]>;
 
 const BRAND_ASSET_KINDS = brandAssetKindSchema.options;
 

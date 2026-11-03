@@ -79,7 +79,8 @@
   --admin-thumb-line: rgba(16, 24, 40, 0.12);
   --admin-topbar: 67px;
   --admin-view-tab: 44px;
-  --admin-view-tabs: calc(var(--admin-view-tab) + 1px);
+  --admin-view-tab-border: 1px;
+  --admin-view-tabs: calc(var(--admin-view-tab) + var(--admin-view-tab-border));
 }
 
 @media (width >= 48rem) {
@@ -90,7 +91,9 @@
 
 @media (width >= 64rem) {
   :root {
-    --admin-view-tabs: calc(var(--admin-view-tab) + 2px);
+    --admin-view-tabs: calc(
+      var(--admin-view-tab) + 2 * var(--admin-view-tab-border)
+    );
   }
 }
 

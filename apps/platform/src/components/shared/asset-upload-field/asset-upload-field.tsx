@@ -4,8 +4,8 @@ import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TEmailLogoKind } from '@platform/constants/email-logo';
-import { KEY } from '@platform/constants/keyboard';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { joinIds } from '@platform/utils/join-ids/join-ids';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
@@ -65,9 +65,11 @@ export const AssetUploadField = ({
   const shownError = validationError ?? error;
   const hintId = useId();
   const errorId = useId();
-  const describedBy = [hint && hintId, ariaDescribedBy, shownError && errorId]
-    .filter(Boolean)
-    .join(KEY.SPACE);
+  const describedBy = joinIds(
+    hint && hintId,
+    ariaDescribedBy,
+    shownError && errorId,
+  );
   const fileName = size === SIZE.SM ? getFileName(image) : undefined;
 
   const {

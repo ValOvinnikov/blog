@@ -15,8 +15,8 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { textVariants } from '@platform/components/shared/text/text-variants';
-import { KEY } from '@platform/constants/keyboard';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -53,13 +53,10 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
   const cookieButtonOptions = toOptions(COOKIE_SETTINGS_BUTTON, (visibility) =>
     t(`cookieSettingsButtonOptionLabel.${visibility}`),
   );
-  const cookieButtonDescribedBy =
-    [
-      cookieButtonLock.describedBy,
-      hasCookieBanner ? undefined : bannerOffNoteId,
-    ]
-      .filter(Boolean)
-      .join(KEY.SPACE) || undefined;
+  const cookieButtonDescribedBy = joinIds(
+    cookieButtonLock.describedBy,
+    hasCookieBanner ? undefined : bannerOffNoteId,
+  );
 
   return (
     <LookCard

@@ -6,6 +6,7 @@ import { PresetPicker } from '@platform/components/shared/preset-picker';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { LOOK_CARD } from '@platform/constants/look-card';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
@@ -23,6 +24,7 @@ export const PresetCard = () => {
   } = useLookForm();
   const t = useTranslations('lookForm');
   const tPicker = useTranslations('presetPicker');
+  const tSaveBar = useTranslations('saveBar');
   const titleId = useId();
   const { title, body } = presetCardVariants();
 
@@ -32,7 +34,9 @@ export const PresetCard = () => {
         title={
           <span className={title()}>
             <span id={titleId}>{t('presetLabel')}</span>
-            {hasCardChanges('preset') && <UnsavedDot />}
+            {hasCardChanges(LOOK_CARD.PRESET) && (
+              <UnsavedDot label={tSaveBar('regionLabel')} />
+            )}
           </span>
         }
         supportingText={t('presetDescription')}
