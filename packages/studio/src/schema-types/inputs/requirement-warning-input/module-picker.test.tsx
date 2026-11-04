@@ -34,9 +34,10 @@ const ModulePicker = createModulePicker({
 
 type TPickerProps = ComponentProps<typeof ModulePicker>;
 
+const onItemAppend = vi.fn();
+const onValueCreate = vi.fn(() => ({ _key: MOCK_KEY }));
+
 const renderPicker = (overrides: Partial<TPickerProps> = {}) => {
-  const onItemAppend = vi.fn();
-  const onValueCreate = vi.fn(() => ({ _key: MOCK_KEY }));
   const props = {
     schemaType: { of: [CTA_TYPE, PRICING_TYPE] },
     onItemAppend,
@@ -49,13 +50,6 @@ const renderPicker = (overrides: Partial<TPickerProps> = {}) => {
       <ModulePicker {...props} />
     </ThemeProvider>,
   );
-
-  return { onItemAppend, onValueCreate };
-};
-
-const openPicker = () => {
-  const addButton = screen.getByRole('button', { name: ADD_ITEM_KEY });
-  fireEvent.click(addButton);
 };
 
 const menuItem = (title: string) =>
@@ -77,42 +71,47 @@ describe(`<${ModulePicker.name}/>`, () => {
     }));
   });
 
-  it('shows a growth module as unavailable, labelled with its plan', () => {
-    renderPicker();
-    openPicker();
+  describe('when opened', () => {
+    beforeEach(() => {
+      renderPicker();
+      const addButton = screen.getByRole('button', { name: ADD_ITEM_KEY });
+      fireEvent.click(addButton);
+    });
 
-    const pricing = menuItem(PRICING_TITLE);
+    it('shows a growth module as unavailable, labelled with its plan', () => {
+      const pricing = menuItem(PRICING_TITLE);
+      const cta = menuItem(CTA_TITLE);
 
-    expect(pricing.disabled).toBe(true);
-    expect(pricing.textContent).toContain(GROWTH_PLAN);
-    expect(menuItem(CTA_TITLE).disabled).toBe(false);
-  });
+      expect(pricing.disabled).toBe(true);
+      expect(pricing.textContent).toContain(GROWTH_PLAN);
+      expect(cta.disabled).toBe(false);
+    });
 
-  it('appends an available module when chosen', () => {
-    const { onItemAppend, onValueCreate } = renderPicker();
-    openPicker();
+    it('appends an available module when chosen', () => {
+      const cta = menuItem(CTA_TITLE);
 
-    fireEvent.click(menuItem(CTA_TITLE));
+      fireEvent.click(cta);
 
-    expect(onValueCreate).toHaveBeenCalledWith(CTA_TYPE);
-    expect(onItemAppend).toHaveBeenCalledWith({ _key: MOCK_KEY });
-  });
+      expect(onValueCreate).toHaveBeenCalledWith(CTA_TYPE);
+      expect(onItemAppend).toHaveBeenCalledWith({ _key: MOCK_KEY });
+    });
 
-  it('appends nothing when a growth module is clicked', () => {
-    const { onItemAppend } = renderPicker();
-    openPicker();
+    it('appends nothing when a growth module is clicked', () => {
+      const pricing = menuItem(PRICING_TITLE);
 
-    fireEvent.click(menuItem(PRICING_TITLE));
+      fireEvent.click(pricing);
 
-    expect(onItemAppend).not.toHaveBeenCalled();
+      expect(onItemAppend).not.toHaveBeenCalled();
+    });
   });
 
   it('disables the add button when the field is read-only', () => {
     renderPicker({ readOnly: true });
 
-    expect(
-      screen.getByRole<HTMLButtonElement>('button', { name: ADD_ITEM_KEY })
-        .disabled,
-    ).toBe(true);
+    const addButton = screen.getByRole<HTMLButtonElement>('button', {
+      name: ADD_ITEM_KEY,
+    });
+
+    expect(addButton.disabled).toBe(true);
   });
 });
