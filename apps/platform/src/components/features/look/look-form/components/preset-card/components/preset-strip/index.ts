@@ -1,2 +1,2 @@
 export { PresetStrip } from './preset-strip';
-export type { TPresetOption, TPresetSwatch } from './preset-option';
+export type { TPresetSwatch } from './preset-option';
