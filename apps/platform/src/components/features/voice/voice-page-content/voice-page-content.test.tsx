@@ -94,14 +94,16 @@ describe(`<${VoicePageContent.name}/>`, () => {
     });
 
     it('offers a language switcher over the live languages', () => {
-      const languageSwitcher = screen.getByRole('group', { name: 'Language' });
+      const languageSwitcher = screen.getByRole('radiogroup', {
+        name: 'Language',
+      });
 
       expect(languageSwitcher).toBeVisible();
     });
 
     it('renders the empty-list specimen in the language being edited', async () => {
-      const germanButton = screen.getByRole('button', { name: 'German' });
-      await user.click(germanButton);
+      const germanRadio = screen.getByRole('radio', { name: 'German' });
+      await user.click(germanRadio);
 
       const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
       const specimenRoot = screen.getByTestId(

@@ -27,12 +27,13 @@ export const AccordionItem = ({
   children,
   className,
 }: TAccordionItemProps) => {
-  const { variant } = useContext(AccordionContext);
+  const { variant, isList } = useContext(AccordionContext);
   const { slots, unmatched } = mapCompoundSlots(children, AccordionItemParts);
 
   return (
     <BaseAccordion.Item
       value={value}
+      render={isList ? <li /> : undefined}
       className={({ index, open }) =>
         accordionVariants({ variant, isFirst: index === 0, isOpen: open }).item(
           { class: className },

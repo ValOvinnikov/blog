@@ -343,6 +343,14 @@
   --spacing-admin-view-tab: var(--admin-view-tab);
   --spacing-admin-view-tabs: var(--admin-view-tabs);
   --spacing-admin-form-gap: 18px;
+  --spacing-admin-content: 26px;
+  --spacing-admin-sidebar: 264px;
+  --spacing-admin-rail: 76px;
+  /* Keep equal to LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT and _CLEARANCE in constants/look-layout.ts. */
+  --spacing-admin-dock: 64px;
+  --spacing-admin-dock-clearance: 16px;
+  --spacing-admin-dock-room: 120px;
+  --spacing-admin-archived-room: 48px;
 
   /* Keep equal to LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH in constants/look-layout.ts. */
   --container-look-split: 900px;

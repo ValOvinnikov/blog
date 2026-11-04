@@ -173,8 +173,8 @@ const openTemplate = async (user: UserEvent, item: TEmailTemplateType) => {
 };
 
 const chooseLanguage = (user: UserEvent, name: string) => {
-  const languageButton = screen.getByRole('button', { name });
-  return user.click(languageButton);
+  const languageRadio = screen.getByRole('radio', { name });
+  return user.click(languageRadio);
 };
 
 const typeFrenchSignInSubject = async (user: UserEvent) => {
@@ -278,30 +278,30 @@ describe(`<${EmailSettings.name}/>`, () => {
     });
 
     it("describes each language's customised templates in the language picker", async () => {
-      const languageGroup = screen.getByRole('group', {
+      const languageGroup = screen.getByRole('radiogroup', {
         name: tLanguagePicker('ariaLabel'),
       });
-      const englishButton = within(languageGroup).getByRole('button', {
+      const englishRadio = within(languageGroup).getByRole('radio', {
         name: ENGLISH,
       });
-      const frenchButton = within(languageGroup).getByRole('button', {
+      const frenchRadio = within(languageGroup).getByRole('radio', {
         name: FRENCH,
       });
 
-      expect(englishButton).toHaveAccessibleDescription(
+      expect(englishRadio).toHaveAccessibleDescription(
         tLanguagePicker('optionDescription', { isDefault: 'true', count: 1 }),
       );
-      expect(frenchButton).toHaveAccessibleDescription(
+      expect(frenchRadio).toHaveAccessibleDescription(
         tLanguagePicker('optionDescription', { isDefault: 'false', count: 0 }),
       );
 
       await typeFrenchSignInSubject(user);
 
-      const updatedFrenchButton = within(languageGroup).getByRole('button', {
+      const updatedFrenchRadio = within(languageGroup).getByRole('radio', {
         name: FRENCH,
       });
 
-      expect(updatedFrenchButton).toHaveAccessibleDescription(
+      expect(updatedFrenchRadio).toHaveAccessibleDescription(
         tLanguagePicker('optionDescription', { isDefault: 'false', count: 1 }),
       );
     });

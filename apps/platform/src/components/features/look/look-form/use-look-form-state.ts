@@ -97,7 +97,7 @@ export const useLookFormState = ({
       },
     },
   });
-  const { fieldError, saveError } = useLookSaveErrors({
+  const { fieldError, errorTitle } = useLookSaveErrors({
     status,
     isPending,
     brandImageError,
@@ -128,5 +128,5 @@ export const useLookFormState = ({
     setPreviewDevice,
   });
 
-  return { lookForm, isPending, form: { ...form, saveError } };
+  return { lookForm, isPending, form, errorTitle };
 };

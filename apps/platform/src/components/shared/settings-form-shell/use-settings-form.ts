@@ -51,7 +51,6 @@ export type TSettingsForm<TValues> = {
   archivedAt: TMaybeUndefined<Date>;
   archivedNoticeId: string;
   draft: TSettingsFormDraft<TValues>;
-  saveError?: string;
   planRefusal?: string;
 };
 
