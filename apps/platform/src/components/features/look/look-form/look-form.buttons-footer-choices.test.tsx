@@ -53,6 +53,12 @@ describe(`<${LookForm.name}/>`, () => {
       },
       {
         row: LOOK_ROW.FOOTER,
+        group: FOOTER_LAYOUT_LABEL,
+        option: LOOK_FORM.footerLayoutOptionLabel.BIG_WORDMARK,
+        saved: { footerLayout: FOOTER_LAYOUT.BIG_WORDMARK },
+      },
+      {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
         option: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
         saved: { footerBackground: BRAND_VARIANT.SECONDARY },
@@ -71,7 +77,7 @@ describe(`<${LookForm.name}/>`, () => {
       },
       {
         row: LOOK_ROW.LANGUAGE_SWITCHER,
-        group: LOOK_FORM.languageSwitcherLabel,
+        group: LOOK_FORM.languageSwitcherStyleLabel,
         option: LOOK_FORM.languageSwitcherOptionLabel.CODES,
         saved: { languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES },
       },
@@ -89,18 +95,37 @@ describe(`<${LookForm.name}/>`, () => {
       },
     );
 
+    it('marks a changed field as unsaved beside its label until it is changed back', async () => {
+      await openLookRow(user, LOOK_ROW.FOOTER);
+      const surfaceGroup = screen.getByRole('group', {
+        name: LOOK_FORM.footerSurfaceLabel,
+      });
+      const cardButton = within(surfaceGroup).getByRole('button', {
+        name: LOOK_FORM.footerSurfaceOptionLabel.CARD,
+      });
+      const fullWidthButton = within(surfaceGroup).getByRole('button', {
+        name: LOOK_FORM.footerSurfaceOptionLabel.FULL_WIDTH,
+      });
+
+      await user.click(cardButton);
+      const unsavedDot = within(surfaceGroup).getByRole('img', {
+        name: LOOK_FORM.fieldUnsavedLabel,
+      });
+      expect(unsavedDot).toBeVisible();
+
+      await user.click(fullWidthButton);
+      const clearedDot = within(surfaceGroup).queryByRole('img', {
+        name: LOOK_FORM.fieldUnsavedLabel,
+      });
+      expect(clearedDot).not.toBeInTheDocument();
+    });
+
     it.each([
       {
         row: LOOK_ROW.BUTTONS,
         select: SPINNER_LABEL,
         option: LOOK_FORM.spinnerStyleOptionLabel.DOTS,
         saved: { spinnerStyle: SPINNER_STYLE.DOTS },
-      },
-      {
-        row: LOOK_ROW.FOOTER,
-        select: FOOTER_LAYOUT_LABEL,
-        option: LOOK_FORM.footerLayoutOptionLabel.BIG_WORDMARK,
-        saved: { footerLayout: FOOTER_LAYOUT.BIG_WORDMARK },
       },
     ])('saves the chosen $select', async ({ row, select, option, saved }) => {
       await openLookRow(user, row);

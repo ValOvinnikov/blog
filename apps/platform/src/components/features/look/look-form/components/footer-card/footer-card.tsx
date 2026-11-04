@@ -5,6 +5,7 @@ import {
   FOOTER_SURFACE,
   type TBrandVariant,
   type TCookieSettingsButton,
+  type TFooterLayout,
   type TFooterSurface,
 } from '@blog/config';
 import { toOptions } from '@blog/utils/primitives';
@@ -12,7 +13,6 @@ import { LookCard } from '@platform/components/features/look/look-form/component
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -66,11 +66,13 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       description={t('footerDescription')}
     >
       <LookField
+        field="footerLayout"
         label={t('footerLayoutLabel')}
         hint={t('footerLayoutDescription')}
+        isGroup={true}
         lock={layoutLock.lock}
       >
-        <OptionSelect
+        <SegmentedControl<TFooterLayout>
           aria={{ describedBy: layoutLock.describedBy }}
           options={layoutOptions}
           value={footerLayout}
@@ -80,6 +82,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       </LookField>
 
       <LookField
+        field="footerBackground"
         label={t('footerBackgroundLabel')}
         hint={t('footerBackgroundDescription')}
         isGroup={true}
@@ -95,6 +98,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       </LookField>
 
       <LookField
+        field="footerSurface"
         label={t('footerSurfaceLabel')}
         hint={t('footerSurfaceDescription')}
         isGroup={true}
@@ -110,6 +114,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       </LookField>
 
       <LookField
+        field="cookieSettingsButton"
         label={t('cookieSettingsButtonLabel')}
         hint={t('cookieSettingsButtonDescription')}
         isGroup={true}

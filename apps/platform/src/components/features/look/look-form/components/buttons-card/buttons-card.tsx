@@ -11,6 +11,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { useTranslations } from 'next-intl';
 
 export type TButtonsCardProps = {
@@ -41,6 +42,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       description={t('buttonsDescription')}
     >
       <LookField
+        field="busyButtonStyle"
         label={t('busyButtonStyleLabel')}
         hint={t('busyButtonStyleDescription')}
         isGroup={true}
@@ -56,11 +58,13 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       </LookField>
 
       <LookField
+        field="spinnerStyle"
         label={t('spinnerStyleLabel')}
         hint={t('spinnerStyleDescription')}
         lock={spinnerLock.lock}
       >
         <OptionSelect
+          appearance={SELECT_APPEARANCE.COMPACT}
           aria={{ describedBy: spinnerLock.describedBy }}
           options={spinnerOptions}
           value={spinnerStyle}

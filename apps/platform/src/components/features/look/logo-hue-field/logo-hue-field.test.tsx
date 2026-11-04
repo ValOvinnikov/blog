@@ -26,18 +26,16 @@ describe(`<${LogoHueField.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('shows the follows-accent state with the hue slider disabled when unset', () => {
+  it('shows only the switch, on, while the logo follows the accent', () => {
     setup();
 
-    const followsAccent = screen.getByText(messages.logoHueField.followsAccent);
     const followSwitch = screen.getByRole('switch', {
       name: FOLLOW_ACCENT_HUE,
     });
-    const hueSlider = screen.getByRole('slider', { name: LOGO_HUE });
+    const hueSlider = screen.queryByRole('slider', { name: LOGO_HUE });
 
-    expect(followsAccent).toBeVisible();
     expect(followSwitch).toBeChecked();
-    expect(hueSlider).toBeDisabled();
+    expect(hueSlider).not.toBeInTheDocument();
   });
 
   it('shows the explicit hue with following switched off once one is set', () => {

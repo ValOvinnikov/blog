@@ -614,6 +614,7 @@
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP oder SVG. Favicon: ein quadratisches Bild.",
     "optionalTag": "optional",
+    "fieldUnsavedLabel": "Ungespeicherte Änderung",
     "headingFontLabel": "Überschriftenschrift",
     "bodyFontLabel": "Fließtextschrift",
     "radiusScaleLabel": "Eckenradius",
@@ -649,6 +650,7 @@
       "PLAIN": "Kein Rahmen bis zum Überfahren"
     },
     "languageSwitcherLabel": "Sprachauswahl",
+    "languageSwitcherStyleLabel": "Stil",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
     "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
     "languageSwitcherOptionLabel": {
@@ -888,7 +890,6 @@
     "removeFailed": "{kind, select, favicon {Das Favicon} other {Das Logo}} konnte nicht entfernt werden — bitte erneut versuchen."
   },
   "brandAssetField": {
-    "savesWithChanges": "Wird mit den Änderungen gespeichert",
     "logo": {
       "pickAgain": "Ihr wiederhergestellter Entwurf enthielt ein neues Logo, das nicht erhalten blieb — bitte wählen Sie es erneut aus."
     },

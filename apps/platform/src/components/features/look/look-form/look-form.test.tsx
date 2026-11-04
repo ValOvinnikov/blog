@@ -104,9 +104,9 @@ describe(`<${LookForm.name}/>`, () => {
         );
       });
 
-      it('names the logo hue group with its optional tag', () => {
+      it('names the logo hue group by its label alone', () => {
         const logoHueGroup = screen.getByRole('group', {
-          name: `${LOOK_FORM.logoHueLabel} ${LOOK_FORM.optionalTag}`,
+          name: LOOK_FORM.logoHueLabel,
         });
 
         expect(logoHueGroup).toBeVisible();

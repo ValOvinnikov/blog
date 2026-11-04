@@ -60,6 +60,7 @@ const renderPreview = ({
     updateField: vi.fn(),
     isLocked: () => false,
     hasCardChanges: () => false,
+    hasFieldChanged: () => false,
     canResetToPreset: false,
     isAccentHueRejected: false,
     accentHueFieldId: 'accent-hue',

@@ -109,12 +109,6 @@ describe(`<${LookForm.name}/>`, () => {
         current: LOOK_FORM.spinnerStyleOptionLabel.PRESET,
         hint: LOOK_FORM.spinnerStyleDescription,
       },
-      {
-        row: LOOK_ROW.FOOTER,
-        select: FOOTER_LAYOUT_LABEL,
-        current: LOOK_FORM.footerLayoutOptionLabel.COLUMNS,
-        hint: LOOK_FORM.footerLayoutDescription,
-      },
     ])(
       'shows $select locked at its default',
       async ({ row, select, current, hint }) => {
@@ -126,6 +120,19 @@ describe(`<${LookForm.name}/>`, () => {
         expect(selectBox).toHaveAccessibleDescription(`${GROWTH_PLAN} ${hint}`);
       },
     );
+    it('shows Footer layout locked at its default', async () => {
+      await openLookRow(user, LOOK_ROW.FOOTER);
+      const layoutGroup = screen.getByRole('group', {
+        name: FOOTER_LAYOUT_LABEL,
+      });
+      const columnsButton = within(layoutGroup).getByRole('button', {
+        name: LOOK_FORM.footerLayoutOptionLabel.COLUMNS,
+      });
+
+      expect(columnsButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(columnsButton).toBeDisabled();
+    });
+
     it('saves the cookie settings button, the one footer field Free keeps', async () => {
       await openLookRow(user, LOOK_ROW.FOOTER);
       const cookieButtonGroup = screen.getByRole('group', {

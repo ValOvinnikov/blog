@@ -118,11 +118,13 @@ describe(`<${LookForm.name}/>`, () => {
         });
         await user.click(floatingButton);
         await openLookRow(user, LOOK_ROW.FOOTER);
-        await chooseOption(
-          user,
-          FOOTER_LAYOUT_LABEL,
-          LOOK_FORM.footerLayoutOptionLabel.CENTRED,
-        );
+        const footerLayoutGroup = screen.getByRole('group', {
+          name: FOOTER_LAYOUT_LABEL,
+        });
+        const centredButton = within(footerLayoutGroup).getByRole('button', {
+          name: LOOK_FORM.footerLayoutOptionLabel.CENTRED,
+        });
+        await user.click(centredButton);
 
         const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
         const sampleFooter = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);

@@ -110,7 +110,7 @@ describe(`<${LookForm.name}/>`, () => {
     await openLookRow(user, LOOK_ROW.SHAPE);
 
     const headerButtons = screen.getByRole('group', {
-      name: LOOK_FORM.headerControlStyleLabel,
+      name: `${LOOK_FORM.headerControlStyleLabel} ${LOOK_FORM.fieldUnsavedLabel}`,
     });
     const outlinedButton = within(headerButtons).getByRole('button', {
       name: LOOK_FORM.headerControlStyleOptionLabel.OUTLINED,
