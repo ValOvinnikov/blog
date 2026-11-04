@@ -8,7 +8,7 @@ type TPickerType = { name: string };
 
 type TPickerGroup = { name: string; title?: string; of?: string[] };
 
-export type TModulePickerSection<T extends TPickerType> = {
+type TModulePickerSection<T extends TPickerType> = {
   name: string;
   title: TMaybeUndefined<string>;
   types: T[];
