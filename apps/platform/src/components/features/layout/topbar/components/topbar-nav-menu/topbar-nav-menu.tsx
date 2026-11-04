@@ -8,6 +8,7 @@ import type { TSidebarNavSection } from '@platform/components/features/layout/si
 import { sidebarVariants } from '@platform/components/features/layout/sidebar/sidebar-variants';
 import { Icon } from '@platform/components/shared/icon';
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
+import { Tooltip } from '@platform/components/shared/tooltip';
 import { NestedMenuProvider } from '@platform/context/nested-menu-provider';
 import { Link, usePathname } from '@platform/i18n/navigation';
 import { isCurrentNavHref } from '@platform/utils/nav-sections/is-current-nav-href';
@@ -34,6 +35,7 @@ export const TopbarNavMenu = ({
   barRef,
 }: TTopbarNavMenuProps) => {
   const t = useTranslations('topbarNavMenu');
+  const triggerLabel = t('triggerLabel');
   const pathname = usePathname();
   const { triggerRef, anchor } = useBarAnchor(barRef);
   const {
@@ -52,14 +54,18 @@ export const TopbarNavMenu = ({
 
   return (
     <Menu.Root>
-      <Menu.Trigger
-        ref={triggerRef}
-        className={trigger()}
-        aria-label={t('triggerLabel')}
-        title={t('triggerLabel')}
-      >
-        <Icon name={ICONS.MENU} />
-      </Menu.Trigger>
+      <Tooltip
+        label={triggerLabel}
+        trigger={
+          <Menu.Trigger
+            ref={triggerRef}
+            className={trigger()}
+            aria-label={triggerLabel}
+          >
+            <Icon name={ICONS.MENU} />
+          </Menu.Trigger>
+        }
+      />
       <Menu.Portal>
         <Menu.Positioner
           anchor={anchor}
