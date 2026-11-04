@@ -24,7 +24,7 @@ import {
   type TLocalizationNoticeOptions,
 } from '@blog/studio/schema-types/inputs/localization-notice-input/localization-notice-input';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
 import { createSingleLanguageInput } from '@blog/studio/schema-types/inputs/single-language-input/single-language-input';
 import {
   createTranslationLinkInput,

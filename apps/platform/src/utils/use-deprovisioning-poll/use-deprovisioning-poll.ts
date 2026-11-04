@@ -1,6 +1,6 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import {
   CORE_DEPROVISIONING_STEPS,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -14,6 +14,10 @@ import type {
 import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
+  deprovisioningOverallStatus,
+  isRetryPending,
+} from '@platform/utils/deprovisioning-run-state/deprovisioning-run-state';
+import {
   classifyProvisioningError,
   type TProvisioningErrorKind,
 } from '@platform/utils/provisioning-error/provisioning-error';
@@ -23,50 +27,15 @@ import {
   stepUpdatedAtFor,
 } from '@platform/utils/run-steps/run-steps';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
+import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 export const STEP_POLL_INTERVAL_MS = 4000;
 // ~5 minutes: bounds a crashed runner, well past any realistic teardown.
 export const MAX_POLL_TICKS = 75;
 
-const OVERALL_STATUS_PRIORITY: TTenantProvisioningStepStatus[] = [
-  TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-  TENANT_PROVISIONING_STEP_STATUS.FAILED,
-  TENANT_PROVISIONING_STEP_STATUS.DONE,
-];
-
-const deriveOverallStatus = (
-  statuses: TTenantProvisioningStepStatus[],
-): TTenantProvisioningStepStatus => {
-  return (
-    OVERALL_STATUS_PRIORITY.find((candidate) => statuses.includes(candidate)) ??
-    TENANT_PROVISIONING_STEP_STATUS.IDLE
-  );
-};
-
-const isTerminalOverallStatus = (
-  status: TTenantProvisioningStepStatus,
-): boolean =>
-  status === TENANT_PROVISIONING_STEP_STATUS.DONE ||
-  status === TENANT_PROVISIONING_STEP_STATUS.FAILED;
-
-// A dispatch newer than the last run is a retry not yet reported, even over a stale FAILED run.
-const isRetryPending = (
-  deprovisionRequestedAt: TMaybeUndefined<string>,
-  run: TMaybeUndefined<TDeprovisioningRun>,
-): boolean => {
-  if (!deprovisionRequestedAt) {
-    return false;
-  }
-  const lastRunAt = run?.finishedAt ?? run?.startedAt;
-  return (
-    !lastRunAt ||
-    new Date(deprovisionRequestedAt).getTime() > new Date(lastRunAt).getTime()
-  );
-};
-
 export type TUseDeprovisioningPollResult = {
-  deprovisioningSteps: TTenantDeprovisioningState | null;
+  deprovisioningSteps: TMaybeNull<TTenantDeprovisioningState>;
   stepStatuses: TTenantProvisioningStepStatus[];
   stepUpdatedAt: TMaybeUndefined<string>[];
   run: TMaybeUndefined<TDeprovisioningRun>;
@@ -90,9 +59,11 @@ export const useDeprovisioningPoll = (
   { isEnabled, deprovisionRequestedAt }: TUseDeprovisioningPollOptions,
 ): TUseDeprovisioningPollResult => {
   const [renderedTenant, setRenderedTenant] = useState(tenant);
-  const [polledDeprovisioningSteps, setPolledDeprovisioningSteps] =
-    useState<TTenantDeprovisioningState | null>(tenant.deprovisioningSteps);
+  const [polledDeprovisioningSteps, setPolledDeprovisioningSteps] = useState<
+    TMaybeNull<TTenantDeprovisioningState>
+  >(tenant.deprovisioningSteps);
   const pollTicksRef = useRef(0);
+  const router = useRouter();
   const isVisible = useDocumentVisible();
 
   if (tenant !== renderedTenant) {
@@ -107,13 +78,15 @@ export const useDeprovisioningPoll = (
     ? null
     : polledDeprovisioningSteps;
 
+  const run = deprovisioningSteps?.run;
+  const isRunFinished = Boolean(run?.finishedAt);
   const stepStatuses = stepStatusesFor(
     deprovisioningSteps,
     CORE_DEPROVISIONING_STEPS,
   );
-  const overallStatus = deriveOverallStatus(stepStatuses);
+  const overallStatus = deprovisioningOverallStatus(stepStatuses, run);
   const isRunning = overallStatus === TENANT_PROVISIONING_STEP_STATUS.RUNNING;
-  const isInProgress = isEnabled && !isTerminalOverallStatus(overallStatus);
+  const isInProgress = isEnabled && !isRunFinished;
   const shouldPoll = isInProgress && isVisible;
 
   useEffect(() => {
@@ -139,7 +112,15 @@ export const useDeprovisioningPoll = (
           if (cancelled || !result) {
             return;
           }
-          setPolledDeprovisioningSteps(result.deprovisioningSteps);
+          const { deprovisioningSteps: polled } = result;
+          setPolledDeprovisioningSteps(polled);
+          const polledRun = polled?.run;
+          if (
+            polledRun?.finishedAt &&
+            !isRetryPending(deprovisionRequestedAt, polledRun)
+          ) {
+            router.refresh();
+          }
         })
         // A rejected tick (an expired-session redirect) leaves the next tick to retry.
         .catch(() => {});
@@ -149,13 +130,12 @@ export const useDeprovisioningPoll = (
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [tenant.id, shouldPoll]);
+  }, [tenant.id, shouldPoll, router, deprovisionRequestedAt]);
 
   const stepUpdatedAt = stepUpdatedAtFor(
     deprovisioningSteps,
     CORE_DEPROVISIONING_STEPS,
   );
-  const run = deprovisioningSteps?.run;
   const isFailed = overallStatus === TENANT_PROVISIONING_STEP_STATUS.FAILED;
   const isDone = overallStatus === TENANT_PROVISIONING_STEP_STATUS.DONE;
 

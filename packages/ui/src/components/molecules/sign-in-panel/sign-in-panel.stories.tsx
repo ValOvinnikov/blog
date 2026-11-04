@@ -196,6 +196,17 @@ export const CouldNotSend: TStory = {
   },
 };
 
+export const InvalidEmail: TStory = {
+  args: {
+    emailForm: {
+      ...meta.args.emailForm,
+      value: 'sam@',
+      status: FORM_STATUS.ERROR,
+      errorMessage: 'Enter a valid email address.',
+    },
+  },
+};
+
 export const EmailOnly: TStory = {
   args: { providers: [] },
 };

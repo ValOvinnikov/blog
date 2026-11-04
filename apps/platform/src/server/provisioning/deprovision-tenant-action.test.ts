@@ -2,11 +2,15 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
-import { PROVISIONING_LOG } from '@platform/constants/provisioning';
+import {
+  DEPROVISION_PATH,
+  PROVISIONING_LOG,
+} from '@platform/constants/provisioning';
 import {
   TENANT_FIELD_ERROR,
   TENANT_LOG,
@@ -29,7 +33,7 @@ import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
 import { deprovisionTenantAction } from './deprovision-tenant-action';
-import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
+import { enqueueWorkerRequest } from './enqueue-provisioning';
 
 vi.mock('@platform/server/auth/require-super-admin');
 
@@ -44,19 +48,14 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock(
-  '@platform/server/provisioning/dispatch-deprovisioning-workflow',
-  () => ({
-    dispatchDeprovisioningWorkflow: vi.fn(),
-  }),
-);
+vi.mock('@platform/server/provisioning/enqueue-provisioning');
 
 faker.seed(5997);
 
 const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
 const getTenantByIdMock = vi.mocked(queries.tenants.getTenantById);
 const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
-const dispatchMock = vi.mocked(dispatchDeprovisioningWorkflow);
+const enqueueMock = vi.mocked(enqueueWorkerRequest);
 const loggerErrorMock = vi.mocked(logger.error);
 const resolveIsPlatformTenantMock = vi.mocked(resolveIsPlatformTenant);
 
@@ -71,8 +70,8 @@ describe(deprovisionTenantAction, () => {
     });
     getTenantByIdMock.mockReset();
     getTenantByIdMock.mockResolvedValue(mockTenant());
-    dispatchMock.mockReset();
-    dispatchMock.mockResolvedValue(true);
+    enqueueMock.mockReset();
+    enqueueMock.mockResolvedValue(HTTP_STATUS.ACCEPTED);
     insertAuditEventMock.mockReset();
     resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
   });
@@ -85,25 +84,23 @@ describe(deprovisionTenantAction, () => {
     await expect(
       deprovisionTenantAction(MOCK_TENANT_ID, {
         confirm: MOCK_TENANT_NAME,
-        dryRun: true,
       }),
     ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(getTenantByIdMock).not.toHaveBeenCalled();
-    expect(dispatchMock).not.toHaveBeenCalled();
+    expect(enqueueMock).not.toHaveBeenCalled();
   });
 
   it('rejects a confirmation that does not match the tenant name', async () => {
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_WRONG_NAME,
-      dryRun: true,
     });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: { confirm: { reason: TENANT_FIELD_ERROR.NAME_MISMATCH } },
     });
-    expect(dispatchMock).not.toHaveBeenCalled();
+    expect(enqueueMock).not.toHaveBeenCalled();
   });
 
   it('refuses a tenant that is already deprovisioned', async () => {
@@ -113,29 +110,27 @@ describe(deprovisionTenantAction, () => {
 
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: true,
     });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.ALREADY_DEPROVISIONED,
     });
-    expect(dispatchMock).not.toHaveBeenCalled();
+    expect(enqueueMock).not.toHaveBeenCalled();
   });
 
-  it('refuses the platform tenant without dispatching or auditing, and logs it', async () => {
+  it('refuses the platform tenant without enqueuing or auditing, and logs it', async () => {
     resolveIsPlatformTenantMock.mockResolvedValue(true);
 
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: false,
     });
 
     expect(result).toStrictEqual({
       outcome: ACTION_OUTCOME.REFUSED,
       reason: TENANT_REFUSAL.PLATFORM_TENANT,
     });
-    expect(dispatchMock).not.toHaveBeenCalled();
+    expect(enqueueMock).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
       TENANT_LOG.PLATFORM_TENANT_REFUSED,
@@ -143,24 +138,20 @@ describe(deprovisionTenantAction, () => {
     );
   });
 
-  it('dispatches the deprovisioning workflow when confirm matches the name', async () => {
+  it('starts the worker run when confirm matches the name', async () => {
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: false,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(dispatchMock).toHaveBeenCalledWith({
+    expect(enqueueMock).toHaveBeenCalledWith(DEPROVISION_PATH, {
       tenantId: MOCK_TENANT_ID,
-      confirm: MOCK_TENANT_NAME,
-      dryRun: false,
     });
   });
 
-  it('records a DEPROVISION_REQUESTED audit event for a real dispatch', async () => {
+  it('records a DEPROVISION_REQUESTED audit event once the worker accepts', async () => {
     await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: false,
     });
 
     expect(insertAuditEventMock).toHaveBeenCalledWith({
@@ -172,26 +163,34 @@ describe(deprovisionTenantAction, () => {
     });
   });
 
-  it('returns a server error and no audit event when the dispatch fails', async () => {
-    dispatchMock.mockResolvedValueOnce(false);
+  it('returns a server error and no audit event when the worker is unreachable', async () => {
+    enqueueMock.mockResolvedValueOnce(null);
 
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: false,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).not.toHaveBeenCalled();
   });
 
-  it('records no audit event for a dry run', async () => {
+  it('returns a server error, logs the status and writes no audit event when the worker rejects', async () => {
+    enqueueMock.mockResolvedValueOnce(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: true,
     });
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      PROVISIONING_LOG.DEPROVISION_ENQUEUE_REJECTED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        responseStatus: HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      },
+    );
   });
 
   it('still succeeds, and logs the failure, when the audit write fails', async () => {
@@ -199,7 +198,6 @@ describe(deprovisionTenantAction, () => {
 
     const result = await deprovisionTenantAction(MOCK_TENANT_ID, {
       confirm: MOCK_TENANT_NAME,
-      dryRun: false,
     });
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });

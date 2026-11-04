@@ -70,7 +70,7 @@ export const buttonVariants = tv({
           'rounded-admin-control border-0 bg-transparent px-1 py-0',
           'text-admin-13-5 leading-5 font-semibold no-underline',
           TEXT_LINK_COLOUR_CLASSES,
-          'hover:text-admin-brand-hover',
+          'hover:text-admin-brand-strong',
         ],
       },
     },

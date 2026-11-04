@@ -1,6 +1,6 @@
 import { CAPABILITY, MODULE_PACK } from '@blog/config/constants';
-import { getRequirementOffSuffix } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
+import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
+import { getRequirementOffSuffix } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 
@@ -50,6 +50,19 @@ describe(markRequirementOffTypes, () => {
         MOCK_PRICING_TYPE.name,
         `${MOCK_PRICING_TITLE} ${getRequirementOffSuffix({ modulePack: MODULE_PACK.GROWTH })}`,
       ],
+    ]);
+  });
+
+  it('lists module types outside the entitled packs after the rest', () => {
+    const marked = markRequirementOffTypes(
+      [MOCK_PRICING_TYPE, MOCK_CTA_TYPE, MOCK_NEWSLETTER_TYPE],
+      { entitledModulePacks: CORE_ONLY },
+    );
+
+    expect(marked?.map(({ name }) => name)).toEqual([
+      MOCK_CTA_TYPE.name,
+      MOCK_NEWSLETTER_TYPE.name,
+      MOCK_PRICING_TYPE.name,
     ]);
   });
 
