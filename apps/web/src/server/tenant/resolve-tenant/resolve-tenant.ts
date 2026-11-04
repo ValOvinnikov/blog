@@ -45,7 +45,8 @@ const resolveSoleTenant = async (): Promise<TMaybeUndefined<TTenant>> => {
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
 
-const resolveUncachedTenant = async (
+// The proxy reads this, never the cached lookup: Next gives the proxy its own cache, which `revalidateTag` in a route handler never purges.
+export const resolveUncachedTenant = async (
   host: TMaybeNull<string>,
 ): Promise<TMaybeUndefined<TTenant>> => {
   const tenant = host
@@ -108,7 +109,7 @@ export const resolveTenantId = async (
 export const resolveTenantRouting = async (
   host: TMaybeNull<string>,
 ): Promise<TMaybeUndefined<TTenantRouting>> => {
-  const tenant = await resolveTenant(host);
+  const tenant = await resolveUncachedTenant(host);
 
   if (!tenant) {
     return undefined;

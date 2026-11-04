@@ -1,8 +1,7 @@
-// The base ids predate site templates and are a persisted contract on live tenants; never rename one.
 export const STARTER_DOCUMENT_IDS = {
-  NAVIGATION: 'provisioning.settings.navigation',
-  FOOTER: 'provisioning.settings.footer',
-  SITE: 'provisioning.settings.site',
+  NAVIGATION: 'settings_navigation',
+  FOOTER: 'settings_footer',
+  SITE: 'settings_site',
   HOME_TEMPLATE: 'provisioning.template.home',
   HOME: 'provisioning.settings.home',
   POST_INDEX_TEMPLATE: 'provisioning.template.postIndex',

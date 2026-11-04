@@ -1,5 +1,5 @@
 import { MODULE_PACK } from '@blog/config/constants';
-import { getModulePackOffMessage } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+import { getModulePackOffMessage } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import {
   EVERY_MODULE_PACK,
   setEntitledModulePacks,

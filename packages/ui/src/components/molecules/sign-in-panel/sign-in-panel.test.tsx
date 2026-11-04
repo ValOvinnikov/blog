@@ -34,6 +34,7 @@ const MOCK_GOOGLE = {
 const ARIA_DISABLED = 'aria-disabled';
 const MOCK_EMAIL = faker.internet.email();
 const MOCK_ERROR = faker.lorem.sentence();
+const INVALID_EMAIL = faker.lorem.word();
 
 const mockEmailForm = (overrides = {}) => ({
   value: MOCK_EMAIL,
@@ -105,6 +106,21 @@ describe(`<${SignInPanel.name}/>`, () => {
 
     expect(emailForm.onChange).toHaveBeenCalledWith(`${MOCK_EMAIL}a`);
   });
+});
+
+describe(`<${SignInPanel.name}/> with an address the browser would reject`, () => {
+  it.each([INVALID_EMAIL, ''])(
+    'hands %j to onSubmit so the caller can show its own error',
+    async (value) => {
+      const emailForm = mockEmailForm({ value });
+      setup({ emailForm });
+      const submit = screen.getByRole('button', { name: MOCK_LABELS.submit });
+
+      await userEvent.click(submit);
+
+      expect(emailForm.onSubmit).toHaveBeenCalledOnce();
+    },
+  );
 });
 
 describe(`<${SignInPanel.name}/> without providers`, () => {
@@ -233,5 +249,14 @@ describe(`<${SignInPanel.name}/> when the link could not be sent`, () => {
 
     expect(alert).toHaveTextContent(MOCK_ERROR);
     expect(email).toHaveAccessibleDescription(MOCK_ERROR);
+  });
+
+  it('marks the field invalid and keeps focus in it', async () => {
+    const email = screen.getByRole('textbox', { name: MOCK_LABELS.email });
+
+    await userEvent.click(email);
+
+    expect(email).toBeInvalid();
+    expect(email).toHaveFocus();
   });
 });

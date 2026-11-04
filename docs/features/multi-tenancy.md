@@ -54,7 +54,8 @@ One `apps/web` deployment serves every tenant's public site. Each request is mat
   - Neon-backed per-tenant reads are tagged `site-config:<tenantId>`, `settings-features:<tenantId>` and `tenant-plan:<tenantId>`.
   - `/api/revalidate` maps Sanity's `sanity-project-id` header to a tenant. `/api/revalidate-site-config` takes a `tenantId` behind a bearer secret.
   - Sanity clients are cached per project and token.
-  - The host → tenant lookup (`resolveTenant`, used by the proxy and every host-resolved route) caches a resolved, servable tenant per host under the one tag `tenant-by-host`, for `TENANT_CONFIG_REVALIDATE_SECONDS` (one hour). A miss is never cached, so a host resolves the moment its tenant is READY or its domain is added. Every `/api/revalidate-site-config` call purges the tag, whichever tenant it names, so an archive, suspension, deprovision or language change takes effect on the next request; a domain removed or repointed without that call keeps resolving for up to the hour.
+  - The proxy reads the tenant uncached (`resolveUncachedTenant`), one Neon query per proxied request, so an archive, suspension, lift, deprovision, language or domain change routes on the next request. Next gives the proxy its own cache, which `revalidateTag` in a route handler never purges, and the Next docs rule out caching there.
+  - The host-resolved routes and Server Components (`resolveTenant`) cache a resolved, servable tenant per host under the one tag `tenant-by-host`, for `TENANT_CONFIG_REVALIDATE_SECONDS` (one hour). A miss is never cached, so a host resolves the moment its tenant is READY or its domain is added. Every `/api/revalidate-site-config` call purges the tag, whichever tenant it names; a domain removed or repointed without that call keeps resolving there for up to the hour.
   - `reviveCachedTenant` restores a cached row's timestamp columns to `Date`s.
 
 ## Configuration

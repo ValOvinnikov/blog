@@ -5,15 +5,16 @@ import {
   type TModulePack,
 } from '@blog/config/constants';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
+import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
 import {
   getRequirementOffMessage,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
@@ -162,26 +163,77 @@ describe(entitlementGates, () => {
     );
   });
 
-  it('marks a gated module in the picker', () => {
-    const entitlements = packState(CORE_ONLY);
-    const { input } = getGates(entitlements);
-    const of = [{ name: PRICING_TYPE, title: pricingSchema.title }];
-    const renderDefault = vi.fn<(props: InputProps) => ReactElement>(() =>
-      createElement('div'),
+  describe('module picker', () => {
+    const renderArrayInput = (
+      entitlements: TEntitlementState,
+      of: { name: string; title?: string; jsonType: string }[],
+    ) => {
+      const { input } = getGates(entitlements);
+      const renderDefault = vi.fn<(props: InputProps) => ReactElement>(() =>
+        createElement('div'),
+      );
+      const props = {
+        path: ['modules'],
+        schemaType: { name: 'array', jsonType: 'array', of },
+        renderDefault,
+      } as unknown as InputProps;
+
+      renderToStaticMarkup(createElement(input, props));
+
+      const [renderedProps] = renderDefault.mock.calls.map(([props]) => props);
+
+      return renderedProps as InputProps & {
+        schemaType: { of: typeof of };
+        arrayFunctions?: unknown;
+      };
+    };
+
+    const pricingType = {
+      name: PRICING_TYPE,
+      title: pricingSchema.title,
+      jsonType: 'object',
+    };
+    const newsletterType = {
+      name: NEWSLETTER_TYPE,
+      title: newsletterSchema.title,
+      jsonType: 'object',
+    };
+
+    it('marks a gated module in the picker', () => {
+      const entitlements = packState(CORE_ONLY);
+      const of = [pricingType];
+      const {
+        schemaType: {
+          of: [markedType],
+        },
+      } = renderArrayInput(entitlements, of);
+      const [expectedType] = markRequirementOffTypes(of, entitlements)!;
+
+      expect(markedType?.title).toBe(expectedType?.title);
+    });
+
+    it.each([
+      {
+        plan: 'the core pack only',
+        entitlements: packState(CORE_ONLY),
+        replaced: true,
+      },
+      {
+        plan: 'every pack with a capability off',
+        entitlements: capabilityState([]),
+        replaced: false,
+      },
+    ])(
+      'replaces the add picker on $plan: $replaced',
+      ({ entitlements, replaced }) => {
+        const { arrayFunctions } = renderArrayInput(entitlements, [
+          newsletterType,
+          pricingType,
+        ]);
+
+        expect(!isUndefined(arrayFunctions)).toBe(replaced);
+      },
     );
-    const props = {
-      path: ['modules'],
-      schemaType: { name: 'array', jsonType: 'array', of },
-      renderDefault,
-    } as unknown as InputProps;
-
-    renderToStaticMarkup(createElement(input, props));
-
-    const [renderedProps] = renderDefault.mock.calls.map(([props]) => props);
-    const [markedType] = (renderedProps?.schemaType as { of: typeof of }).of;
-    const [expectedType] = markRequirementOffTypes(of, entitlements)!;
-
-    expect(markedType?.title).toBe(expectedType?.title);
   });
 
   describe('page item warning', () => {
