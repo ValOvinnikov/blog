@@ -197,13 +197,15 @@ const changeSiteTypeFromReview = async (name: string) => {
 
 const completeSiteStep = async () => {
   const nameField = screen.getByRole('textbox', MOCK_NAME_FIELD);
-  await user.type(nameField, MOCK_TENANT_NAME);
+  await user.click(nameField);
+  await user.paste(MOCK_TENANT_NAME);
   await clickContinue();
 };
 
 const typeAddress = async () => {
   const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
-  await user.type(addressField, MOCK_SLUG);
+  await user.click(addressField);
+  await user.paste(MOCK_SLUG);
   return addressField;
 };
 

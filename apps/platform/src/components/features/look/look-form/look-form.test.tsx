@@ -228,7 +228,8 @@ const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
 };
 
 const clickSave = async (user: UserEvent) => {
-  const saveChangesButton = await screen.findByRole('button', {
+  const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+  const saveChangesButton = within(saveBar).getByRole('button', {
     name: SAVE_CHANGES,
   });
   await user.click(saveChangesButton);
