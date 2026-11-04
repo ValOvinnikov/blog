@@ -150,7 +150,10 @@ describe(`<${VoiceSettings.name}/>`, () => {
     const headingField = notFoundHeading();
     await user.type(headingField, text);
 
-    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+    const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+    const saveButton = within(saveBar).getByRole('button', {
+      name: SAVE_CHANGES,
+    });
     await user.click(saveButton);
   };
 
