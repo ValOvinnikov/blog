@@ -1,11 +1,8 @@
 'use client';
 
-import { ICONS } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
-import { Icon } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import { ICON_SIZE } from '@platform/constants/icon';
 import { useTranslations } from 'next-intl';
 import type { MouseEvent } from 'react';
 import { flushSync } from 'react-dom';
@@ -24,7 +21,6 @@ export type TSaveBarProps = {
   changeCount: number;
   breakdown: string;
   invalidControls: TInvalidControls;
-  saveError?: string;
   isPending: boolean;
   onSave: () => void;
   onDiscard: () => void;
@@ -34,7 +30,6 @@ export const SaveBar = ({
   changeCount,
   breakdown,
   invalidControls,
-  saveError,
   isPending,
   onSave,
   onDiscard,
@@ -43,18 +38,22 @@ export const SaveBar = ({
   const { ids: invalidControlIds, revealFirst } = invalidControls;
   const [firstInvalidControlId] = invalidControlIds;
   const hasInvalidFields = !isUndefined(firstInvalidControlId);
-  const hasErrors = hasInvalidFields || !isUndefined(saveError);
   const {
     root,
     summary,
     dot,
     count,
     breakdown: breakdownSlot,
+    errorContent,
+    errorCount,
+    errorFollowUp,
     errorLink,
+    separator,
+    notSaved,
     actions,
     shortcut,
     button,
-  } = saveBarVariants({ hasErrors });
+  } = saveBarVariants({ hasErrors: hasInvalidFields });
 
   const goToFirstField = (event: MouseEvent<HTMLAnchorElement>) => {
     if (isUndefined(firstInvalidControlId)) return;
@@ -71,17 +70,18 @@ export const SaveBar = ({
   };
 
   return (
-    <div role="region" aria-label={t('regionLabel')} className={root()}>
-      <span className={summary()}>
-        {hasInvalidFields && (
-          <>
-            <Icon name={ICONS.WARNING} size={ICON_SIZE.XL} />
-            {!isUndefined(saveError) && (
-              <span className={count()}>{t('notSaved')}</span>
-            )}
-            <span className={isUndefined(saveError) ? count() : undefined}>
-              {t('fieldsNeedAttention', { count: invalidControlIds.length })}
-            </span>
+    <div
+      role="region"
+      aria-label={t('regionLabel')}
+      aria-busy={isPending || undefined}
+      className={root()}
+    >
+      {hasInvalidFields ? (
+        <div className={errorContent()}>
+          <span className={errorCount()}>
+            {t('fieldsNeedAttention', { count: invalidControlIds.length })}
+          </span>
+          <span className={errorFollowUp()}>
             <a
               href={`#${firstInvalidControlId}`}
               onClick={goToFirstField}
@@ -89,30 +89,27 @@ export const SaveBar = ({
             >
               {t('goToFirstField')}
             </a>
-          </>
-        )}
-        {!hasInvalidFields && !isUndefined(saveError) && (
-          <>
-            <Icon name={ICONS.WARNING} size={ICON_SIZE.XL} />
-            <span role="alert" className={count()}>
-              {saveError}
+            <span aria-hidden="true" className={separator()}>
+              ·
             </span>
-          </>
-        )}
-        {!hasErrors && (
-          <>
-            <span aria-hidden="true" className={dot()} />
-            <span className={count()}>
-              {t('unsavedChanges', { count: changeCount })}
-            </span>
-            {breakdown && <span className={breakdownSlot()}>{breakdown}</span>}
-          </>
-        )}
-      </span>
+            <span className={notSaved()}>{t('notSaved')}</span>
+          </span>
+        </div>
+      ) : (
+        <span className={summary()}>
+          <span aria-hidden="true" className={dot()} />
+          <span className={count()}>
+            {t('unsavedChanges', { count: changeCount })}
+          </span>
+          {breakdown && <span className={breakdownSlot()}>{breakdown}</span>}
+        </span>
+      )}
       <div className={actions()}>
-        <kbd aria-hidden="true" className={shortcut()}>
-          {t('shortcut')}
-        </kbd>
+        {!hasInvalidFields && (
+          <span aria-hidden="true" className={shortcut()}>
+            {t('shortcut')}
+          </span>
+        )}
         <Button onClick={onDiscard} isDisabled={isPending} className={button()}>
           {t('discard')}
         </Button>

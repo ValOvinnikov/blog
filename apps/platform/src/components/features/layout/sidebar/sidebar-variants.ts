@@ -10,9 +10,9 @@ export const sidebarVariants = tv({
   slots: {
     root: [
       'hidden w-full shrink-0 flex-col border-b border-admin-side-line bg-admin-side text-admin-side-text',
-      'md:flex md:h-dvh md:w-[264px] md:border-r md:border-b-0',
+      'md:flex md:h-dvh md:w-admin-sidebar md:border-r md:border-b-0',
       'md:sticky md:top-0 md:self-start',
-      'group-data-[collapsed=true]/shell:md:w-[76px]',
+      'group-data-[collapsed=true]/shell:md:w-admin-rail',
     ],
     brand: [
       'flex flex-none items-center gap-2.5 border-b border-admin-side-line px-[18px] py-4',

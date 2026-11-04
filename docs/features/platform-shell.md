@@ -103,6 +103,26 @@ own; spacing between page children is each page's. The Studio segment
 switches the content column to full-bleed (see
 [embedded-studio](./embedded-studio.md)).
 
+Every settings page (Voice, Look, Email, Languages, Features) renders through
+`SettingsFormShell`, whose save bar appears only while the page has unsaved
+changes and never for an archived tenant. From `md` it docks to the viewport
+bottom, from the sidebar's right edge (rail edge when collapsed) to the right
+edge: 64px tall, flat, top border and `shadow-admin-dock`. It shows a dot,
+"N unsaved changes", the "⌘S / Ctrl+S" hint (from `lg` only), Discard and Save
+changes. With invalid fields the left side becomes "N fields need attention",
+"Go to the first one" and "Not saved" — one line from `lg`, stacked on two
+lines from `md` to `lg` — and the dot, count and hint go. While saving, Save
+reads "Saving…" through the Button's pending state (focus stays on it),
+Discard is disabled and the bar is `aria-busy`. A save that fails with no
+field errors shows only the shell's error Alert; the bar keeps its unsaved
+state. From `md` the page keeps 120px of room below its last content (48px
+when archived), and the document's `scroll-padding-bottom` is the bar's 64px
+plus 16px so a focused field never sits under the bar. The 64 and 16 are the
+`--spacing-admin-dock` / `-clearance` tokens, kept equal to
+`LOOK_LAYOUT_LIMIT`. A page may opt out of the head's "All changes saved"
+status (`hasSavedStatus={false}`); Voice does. Below `md` the bar is the
+floating card at the foot of the page.
+
 ## Data
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through
