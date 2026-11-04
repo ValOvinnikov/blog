@@ -121,6 +121,46 @@ const RESTORE_1_CHANGE = 'Restore 1 change';
 const DISCARD = 'Discard';
 const UNSAVED_CHANGES_ANNOUNCEMENT_TEST_ID = 'unsaved-changes-announcement';
 
+const TaglineSettings = ({
+  hasSavedStatus,
+}: Pick<TSettingsFormShellProps<TValues>, 'hasSavedStatus'>) => {
+  const [saved, setSaved] = useState(MOCK_SAVED_VALUES);
+  const [values, setValues] = useState(MOCK_SAVED_VALUES);
+
+  return (
+    <SettingsFormShell
+      {...baseProps}
+      hasSavedStatus={hasSavedStatus}
+      form={formFor({
+        changeCount: values.tagline === saved.tagline ? 0 : 1,
+        save: async () => {
+          setSaved(values);
+          return true;
+        },
+        discard: () => setValues(saved),
+        draft: draftFor(values, saved),
+      })}
+    >
+      <label>
+        {MOCK_TAGLINE_LABEL}
+        <input
+          value={values.tagline}
+          onChange={(event) =>
+            setValues({ ...values, tagline: event.target.value })
+          }
+        />
+      </label>
+    </SettingsFormShell>
+  );
+};
+
+const editTagline = async (user: UserEvent) => {
+  const taglineInput = screen.getByRole('textbox', {
+    name: MOCK_TAGLINE_LABEL,
+  });
+  await user.type(taglineInput, '!');
+};
+
 describe(`<${SettingsFormShell.name}/>`, () => {
   let user: UserEvent;
 
@@ -244,46 +284,9 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('saved status', () => {
-    const TaglineSettings = () => {
-      const [saved, setSaved] = useState(MOCK_SAVED_VALUES);
-      const [values, setValues] = useState(MOCK_SAVED_VALUES);
-
-      return (
-        <SettingsFormShell
-          {...baseProps}
-          form={formFor({
-            changeCount: values.tagline === saved.tagline ? 0 : 1,
-            save: async () => {
-              setSaved(values);
-              return true;
-            },
-            discard: () => setValues(saved),
-            draft: draftFor(values, saved),
-          })}
-        >
-          <label>
-            {MOCK_TAGLINE_LABEL}
-            <input
-              value={values.tagline}
-              onChange={(event) =>
-                setValues({ ...values, tagline: event.target.value })
-              }
-            />
-          </label>
-        </SettingsFormShell>
-      );
-    };
-
-    const editTagline = async () => {
-      const taglineInput = screen.getByRole('textbox', {
-        name: MOCK_TAGLINE_LABEL,
-      });
-      await user.type(taglineInput, '!');
-    };
-
     beforeEach(async () => {
       renderWithIntl(<TaglineSettings />);
-      await editTagline();
+      await editTagline(user);
       const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
       await user.click(saveButton);
     });
@@ -297,7 +300,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     describe('then edited again', () => {
       beforeEach(async () => {
         await screen.findByText(ALL_CHANGES_SAVED);
-        await editTagline();
+        await editTagline(user);
       });
 
       it('disappears on the next edit after a save', () => {
@@ -319,6 +322,21 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
   });
 
+  it('shows no saved status after a save when the page opts out of it', async () => {
+    renderWithIntl(<TaglineSettings hasSavedStatus={false} />);
+    await editTagline(user);
+    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+    await user.click(saveButton);
+
+    await waitFor(() => {
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+      expect(saveBar).not.toBeInTheDocument();
+    });
+    const savedStatus = screen.queryByText(ALL_CHANGES_SAVED);
+
+    expect(savedStatus).not.toBeInTheDocument();
+  });
+
   it('does not save from the shortcut while a save is pending', async () => {
     const onSave = vi.fn().mockResolvedValue(true);
     renderShell({ save: onSave, changeCount: 1, isPending: true });
@@ -334,6 +352,14 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
 
     expect(archivedNotice).toBeVisible();
+  });
+
+  it('offers no save bar to an archived tenant', () => {
+    renderShell({ archivedAt: MOCK_ARCHIVED_AT, changeCount: 3 });
+
+    const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+
+    expect(saveBar).not.toBeInTheDocument();
   });
 
   it('shows the error alert when an error title is set', () => {

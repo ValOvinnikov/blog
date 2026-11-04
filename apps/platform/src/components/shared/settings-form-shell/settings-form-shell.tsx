@@ -8,12 +8,13 @@ import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
 import { useTranslations } from 'next-intl';
-import { useEffect, useEffectEvent, useState, type ReactNode } from 'react';
+import { useEffect, useEffectEvent, type ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
 import { SaveBar, type TInvalidControls } from './components/save-bar/save-bar';
 import { ShellHeader } from './components/shell-header/shell-header';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
+import { useSavedStatus } from './use-saved-status';
 import { useSettingsDraft } from './use-settings-draft';
 import type { TSettingsForm } from './use-settings-form';
 
@@ -30,6 +31,7 @@ export type TSettingsFormShellProps<TValues> = IWithChildren & {
   errorTitle?: string;
   layout?: TSettingsFormShellLayout;
   headerActions?: ReactNode;
+  hasSavedStatus?: boolean;
 };
 
 const NO_INVALID_CONTROLS: TInvalidControls = { ids: [] };
@@ -44,6 +46,7 @@ export const SettingsFormShell = <TValues,>({
   errorTitle,
   layout,
   headerActions,
+  hasSavedStatus = true,
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const {
@@ -57,24 +60,19 @@ export const SettingsFormShell = <TValues,>({
     archivedAt,
     archivedNoticeId,
     draft,
-    saveError,
     planRefusal,
   } = form;
   const t = useTranslations('saveBar');
   const { root, alert, liveStatus } = settingsFormShellVariants({
     isWide: layout?.isWide,
     hasCompactGap: layout?.hasCompactGap,
+    isArchived,
   });
   const isDirty = changeCount > 0;
-  const [hasSavedSinceEdit, setHasSavedSinceEdit] = useState(false);
-  const [wasDirty, setWasDirty] = useState(isDirty);
-  // Reset on the clean-to-dirty edge: a page can still be dirty for a render
-  // after onSave resolves.
-  if (isDirty !== wasDirty) {
-    setWasDirty(isDirty);
-    if (isDirty) setHasSavedSinceEdit(false);
-  }
-  const isSavedStatusShown = !isDirty && hasSavedSinceEdit;
+  const { isSavedStatusShown, markSaved } = useSavedStatus(
+    isDirty,
+    hasSavedStatus,
+  );
   const breakdown = formatLanguageChanges(changesByLanguage);
   const {
     offer,
@@ -86,7 +84,7 @@ export const SettingsFormShell = <TValues,>({
     const isSaved = await save();
     if (isSaved) {
       forgetDraft();
-      setHasSavedSinceEdit(true);
+      markSaved();
     }
     return isSaved;
   };
@@ -179,12 +177,11 @@ export const SettingsFormShell = <TValues,>({
         {isDirty ? t('unsavedChanges', { count: changeCount }) : ''}
       </span>
 
-      {isDirty && (
+      {isDirty && !isArchived && (
         <SaveBar
           changeCount={changeCount}
           breakdown={breakdown}
           invalidControls={invalidControls}
-          saveError={planRefusal ?? saveError}
           isPending={isPending}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}

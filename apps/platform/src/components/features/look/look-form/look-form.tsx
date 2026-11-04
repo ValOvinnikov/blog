@@ -63,7 +63,7 @@ export const LookForm = ({
   });
   const t = useTranslations('lookForm');
   const { groupProps, revealRow } = useLookOpenRows();
-  const { lookForm, isPending, form } = useLookFormState({
+  const { lookForm, isPending, form, errorTitle } = useLookFormState({
     tenantId,
     tenantName,
     initialValues,
@@ -83,6 +83,7 @@ export const LookForm = ({
       title={t('heading')}
       description={t('subtitle')}
       form={form}
+      errorTitle={errorTitle}
       layout={SHELL_LAYOUT}
     >
       <LookFormProvider value={lookForm}>

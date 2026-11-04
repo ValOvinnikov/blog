@@ -6,7 +6,6 @@ import {
 } from '@platform/testing/custom-render';
 import {
   GO_TO_THE_FIRST_ONE,
-  ONE_FIELD_NEEDS_ATTENTION,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
@@ -19,11 +18,12 @@ faker.seed(5995);
 
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
 const DISCARD = 'Discard';
+const NOT_SAVED = 'Not saved';
+const SAVE_SHORTCUT = '⌘S / Ctrl+S';
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_FIELD_ID = faker.string.alpha(10);
 const MOCK_SECOND_FIELD_ID = faker.string.alpha(10);
 const MOCK_BREAKDOWN = faker.lorem.words(3);
-const MOCK_SAVE_ERROR = faker.lorem.sentence();
 
 const baseProps: TSaveBarProps = {
   changeCount: 3,
@@ -78,14 +78,24 @@ describe(`<${SaveBar.name}/>`, () => {
     expect(breakdown).toBeVisible();
   });
 
-  it('shows the saving state on Save and disables Discard while pending', () => {
-    setup({ isPending: true });
+  describe('while saving', () => {
+    beforeEach(() => {
+      setup({ isPending: true });
+    });
 
-    const savingButton = screen.getByRole('button', { name: 'Saving…' });
-    const discardButton = screen.getByRole('button', { name: DISCARD });
+    it('shows the saving state on Save and disables Discard', () => {
+      const savingButton = screen.getByRole('button', { name: 'Saving…' });
+      const discardButton = screen.getByRole('button', { name: DISCARD });
 
-    expect(savingButton).toHaveAttribute('aria-disabled', 'true');
-    expect(discardButton).toBeDisabled();
+      expect(savingButton).toHaveAttribute('aria-disabled', 'true');
+      expect(discardButton).toBeDisabled();
+    });
+
+    it('marks the bar busy', () => {
+      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(region).toHaveAttribute('aria-busy', 'true');
+    });
   });
 
   describe('after a save with field errors', () => {
@@ -95,12 +105,20 @@ describe(`<${SaveBar.name}/>`, () => {
       });
     });
 
-    it('counts the fields that need attention in place of the change count', () => {
+    it('counts the fields that need attention in place of the change count and shortcut', () => {
       const attentionCount = screen.getByText('2 fields need attention');
       const changeCount = screen.queryByText(THREE_UNSAVED_CHANGES);
+      const shortcut = screen.queryByText(SAVE_SHORTCUT);
 
       expect(attentionCount).toBeVisible();
       expect(changeCount).not.toBeInTheDocument();
+      expect(shortcut).not.toBeInTheDocument();
+    });
+
+    it('says the changes are not saved', () => {
+      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(region).toHaveTextContent(NOT_SAVED);
     });
 
     it('links to the first field that needs attention', () => {
@@ -167,34 +185,6 @@ describe(`<${SaveBar.name}/>`, () => {
       });
 
       expect(firstField).toHaveFocus();
-    });
-  });
-
-  describe('after a save that failed', () => {
-    it('announces the error beside Save when no field caused it', () => {
-      setup({ saveError: MOCK_SAVE_ERROR });
-
-      const alert = screen.getByRole('alert');
-      const changeCount = screen.queryByText(THREE_UNSAVED_CHANGES);
-
-      expect(alert).toHaveTextContent(MOCK_SAVE_ERROR);
-      expect(changeCount).not.toBeInTheDocument();
-    });
-
-    it('says the save failed and links to the field that caused it', () => {
-      setup({
-        saveError: MOCK_SAVE_ERROR,
-        invalidControls: { ids: [MOCK_FIELD_ID] },
-      });
-
-      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
-      const link = screen.getByRole('link', { name: GO_TO_THE_FIRST_ONE });
-      const alert = screen.queryByRole('alert');
-
-      expect(region).toHaveTextContent('Not saved');
-      expect(region).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
-      expect(link).toHaveAttribute('href', `#${MOCK_FIELD_ID}`);
-      expect(alert).not.toBeInTheDocument();
     });
   });
 });
