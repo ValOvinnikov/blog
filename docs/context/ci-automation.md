@@ -349,6 +349,26 @@ and runner size. Note the flag sits on `turbo run` directly: pnpm forwards
 `pnpm test -- --concurrency=2` verbatim, so the `--` would hand the flag to
 vitest, not turbo.
 
+**Every test file has a time budget, enforced in CI only.** The shared
+vitest preset (`configs/vitest/preset.ts`) adds a JSON reporter beside the
+default one, writing `<workspace>/.vitest/timings.json` (a `test` output in
+`turbo.json`, so a cache hit restores it; `@blog/utils` and `@blog/insight`
+do not use the preset and report nothing). After the Test step, the Test
+job's **Test time budget** step runs `scripts/check-test-budget.mjs
+--enforce`, which fails when a file's tests ran longer than its budget —
+first test start to last test end, so import and environment setup do not
+count — and names the file, its time and the budget. The default budget is
+15s. A file already over it on 2026-11-04 (the spike in #6655) has its own
+budget in `scripts/test-budget-allowlist.json`, set about 20% above its CI
+time then. The allowlist may only shrink: the step compares it against the
+pull request's base (`TEST_BUDGET_BASE_REF`, `origin/main` by default) and
+fails on a new entry, a raised budget, or an entry whose file no longer
+exists. A slow file is fixed by making its tests cheaper, never by
+allowlisting it. Without `--enforce` — `pnpm check:test-budget` in
+`pnpm verify` — the same findings print as `warning:` lines and the script
+exits 0, because local and cloud-session timings vary too much to gate on.
+A clean run prints one line.
+
 **Lighthouse CI and Playwright smoke stay advisory by design, and neither
 runs on a PR push.** Playwright smoke is dispatch-only: it depends on a
 preview/smoke URL this repo doesn't produce yet (no PR preview deploys, per
@@ -531,7 +551,7 @@ neither Storybook.
 
 Root `pnpm verify` is one `&&` chain over every required or gating CI check
 that has a local equivalent, in this order: `type-check`, `lint`, `test`,
-`knip`, `check:client-graph`, `check:revalidate-tags-sync`,
+`check:test-budget`, `knip`, `check:client-graph`, `check:revalidate-tags-sync`,
 `check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`,
 `gen:const-index:check`, `gen:migration-ids:check`, `check:touched-lint`. The
 chain stops at the first failure, so a red step is reported once rather than
@@ -547,6 +567,7 @@ threshold at which it would have stayed out).
 | **Type-check** (via CI)             | `pnpm type-check` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                                    |
 | **Lint** (via CI)                   | `pnpm lint` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                                          |
 | **Test** (via CI)                   | `pnpm test` — in `pnpm verify`; the only step `.husky/pre-push` skips.                                                                                                                                                                                                                                                                                   |
+| **Test time budget** (via CI)       | `pnpm check:test-budget` — in `pnpm verify`, warn-only: it prints one `warning:` line per over-budget file and exits 0 (see "Test time budget" below).                                                                                                                                                                                                   |
 | **Knip** (via CI)                   | `pnpm knip` — in `pnpm verify`. CI adds `--treat-config-hints-as-errors`, so a stale ignore rule in `knip.json` is red there and only a hint locally.                                                                                                                                                                                                    |
 | **Typegen** (via CI)                | `pnpm typegen`, then `git status --porcelain -- packages/config/src/sanity/generated/` must print nothing. Not in `pnpm verify`: typegen mutates generated files, so it runs inline in the orchestrator's session, never under `verify-runner`'s read-only guard (`develop-feature` §5). Re-run until the diff is minimal; typegen is non-deterministic. |
 | **Client graph** (gating)           | `pnpm check:client-graph` — in `pnpm verify`.                                                                                                                                                                                                                                                                                                            |

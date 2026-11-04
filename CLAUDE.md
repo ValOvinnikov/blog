@@ -869,7 +869,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
     goes to the user before commit.
   - `apps/platform`'s own UI copy is never Voice.
 - Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
-  `lint`, `test`, `knip`, the seven gating scripts (`check:client-graph`,
+  `lint`, `test`, the warn-only `check:test-budget` (it names any test file
+  over its time budget but never fails locally; CI's Test job enforces it),
+  `knip`, the seven gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
   `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,
   `gen:migration-ids:check`)

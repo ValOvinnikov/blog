@@ -72,7 +72,8 @@
       "dependsOn": ["^type-check"]
     },
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "outputs": [".vitest/timings.json"]
     },
     "test:watch": {
       "cache": false,

@@ -18,6 +18,7 @@ const preset = defineConfig({
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     css: false,
     clearMocks: true,
+    reporters: ['default', ['json', { outputFile: '.vitest/timings.json' }]],
     // Vitest's 5000ms default is crossed by real render-work tests (1.3-1.9s)
     // under root `pnpm test`'s parallel-turbo contention across packages.
     testTimeout: 20_000,
