@@ -2234,6 +2234,20 @@
         "file": "packages/config/src/constants/icon.ts"
       }
     ],
+    "UPLOAD": [
+      {
+        "ref": "ICONS.UPLOAD",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "UPLOAD_OPERATION.UPLOAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/upload",
+        "file": "apps/platform/src/constants/upload.ts"
+      }
+    ],
     "FULL_BLEED": [
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",
@@ -4198,6 +4212,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/account-menu",
         "file": "apps/platform/src/constants/account-menu.ts"
+      }
+    ],
+    "FRAMED": [
+      {
+        "ref": "ASSET_UPLOAD_LAYOUT.FRAMED",
+        "scope": "app:platform",
+        "from": "@platform/constants/asset-upload",
+        "file": "apps/platform/src/constants/asset-upload.ts"
+      }
+    ],
+    "BARE": [
+      {
+        "ref": "ASSET_UPLOAD_LAYOUT.BARE",
+        "scope": "app:platform",
+        "from": "@platform/constants/asset-upload",
+        "file": "apps/platform/src/constants/asset-upload.ts"
       }
     ],
     "GHOST": [
@@ -6819,14 +6849,6 @@
     "EMAIL_LOGO_TYPE_UNSUPPORTED": [
       {
         "ref": "UPLOAD_REFUSAL.EMAIL_LOGO_TYPE_UNSUPPORTED",
-        "scope": "app:platform",
-        "from": "@platform/constants/upload",
-        "file": "apps/platform/src/constants/upload.ts"
-      }
-    ],
-    "UPLOAD": [
-      {
-        "ref": "UPLOAD_OPERATION.UPLOAD",
         "scope": "app:platform",
         "from": "@platform/constants/upload",
         "file": "apps/platform/src/constants/upload.ts"

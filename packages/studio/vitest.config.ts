@@ -35,6 +35,11 @@ export default mergeConfig(
     },
     test: {
       environment: 'node',
+      // Off so files share a worker's already-imported `sanity`; the setup file and the unstub/restore flags undo the module, global and spy state a file leaves behind.
+      isolate: false,
+      setupFiles: ['./src/testing/reset-modules.ts'],
+      unstubGlobals: true,
+      restoreMocks: true,
       projects: [
         {
           extends: true,

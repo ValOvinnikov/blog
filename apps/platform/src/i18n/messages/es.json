@@ -753,7 +753,19 @@
     "cookieSettingsButtonBannerOff": "El banner de cookies está desactivado, así que el botón permanece oculto. Activa el banner en Funciones para mostrarlo.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
-    "brandImageUnchanged": "Ninguna imagen nueva"
+    "brandImageUnchanged": "Ninguna imagen nueva",
+    "summaryHue": "Tono {hue}",
+    "summaryLogoFollowsAccent": "el logotipo sigue al acento",
+    "summaryLogoHue": "Tono del logotipo {hue}",
+    "summaryLogoUploaded": "Logotipo subido",
+    "summaryNoLogo": "Sin logotipo",
+    "summaryFaviconUploaded": "Favicon subido",
+    "summaryNoFavicon": "Sin favicon",
+    "cookieSettingsButtonSummary": {
+      "HIDDEN": "Botón de cookies oculto",
+      "SHOWN": "Botón de cookies visible"
+    },
+    "summaryOneLanguage": "Un idioma"
   },
   "previewModeControl": {
     "modeLight": "Claro",
@@ -1470,6 +1482,8 @@
     "regionLabel": "Cambios sin guardar",
     "allSaved": "Todos los cambios guardados",
     "unsavedChanges": "{count, plural, one {# cambio sin guardar} other {# cambios sin guardar}}",
+    "inCard": "en <link>{card}</link>",
+    "inCards": "en {cards, plural, one {# tarjeta} other {# tarjetas}}",
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",

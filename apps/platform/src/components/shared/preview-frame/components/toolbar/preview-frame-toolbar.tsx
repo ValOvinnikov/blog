@@ -3,10 +3,10 @@
 import { ICONS } from '@blog/config';
 import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
 import { IconToolbar } from '@platform/components/shared/icon-toolbar';
+import { usePreviewModeGroup } from '@platform/components/shared/preview-mode-group';
 import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_WIDTH,
-  PREVIEW_MODE,
   type TPreviewDevice,
   type TPreviewMode,
 } from '@platform/constants/preview';
@@ -32,7 +32,6 @@ export const PreviewFrameToolbar = ({
   children,
 }: TPreviewFrameToolbarProps) => {
   const t = useTranslations('devicePreview');
-  const tMode = useTranslations('previewModeControl');
   const widthOf = (target: TPreviewDevice) => ({
     width: PREVIEW_DEVICE_WIDTH[target],
   });
@@ -63,25 +62,7 @@ export const PreviewFrameToolbar = ({
     ],
   };
 
-  const modeGroup: TIconToggleGroupProps<TPreviewMode> = {
-    ariaLabel: tMode('previewColorSchemeAriaLabel'),
-    value: mode,
-    onChange: onModeChange,
-    options: [
-      {
-        value: PREVIEW_MODE.LIGHT,
-        icon: ICONS.SUN,
-        ariaLabel: tMode('modeLight'),
-        tooltip: tMode('modeLight'),
-      },
-      {
-        value: PREVIEW_MODE.DARK,
-        icon: ICONS.MOON,
-        ariaLabel: tMode('modeDark'),
-        tooltip: tMode('modeDark'),
-      },
-    ],
-  };
+  const modeGroup = usePreviewModeGroup(mode, onModeChange);
 
   return (
     <IconToolbar

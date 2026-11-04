@@ -1,10 +1,16 @@
 import { format } from 'node:util';
 
-import { LOCALE_ISO_CODES, SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
-import { createTranslator } from 'next-intl';
+import type { SITE_MESSAGES, TMaybeUndefined } from '@blog/config';
+import {
+  hasLength,
+  isNull,
+  isString,
+  isUndefined,
+} from '@blog/utils/primitives';
 
-import '@testing-library/jest-dom/vitest';
+if (!isUndefined(globalThis.document)) {
+  await import('@testing-library/jest-dom/vitest');
+}
 
 process.env.NEXT_PUBLIC_SANITY_PROJECT_ID ??= 'test-project';
 process.env.NEXT_PUBLIC_SANITY_DATASET ??= 'test-dataset';
@@ -30,7 +36,7 @@ console.error = (...args: unknown[]) => {
 
 afterEach(() => {
   const warnings = actWarnings.splice(0);
-  if (warnings.length > 0) {
+  if (hasLength(warnings)) {
     throw new Error(`React reported an act() warning:\n${warnings.join('\n')}`);
   }
 });
@@ -75,16 +81,16 @@ const CAROUSEL_TRACK_WIDTH = 400;
 const CAROUSEL_SLIDE_WIDTH = 300;
 
 const isInCarousel = (element: HTMLElement) =>
-  element.closest('[aria-roledescription="carousel"]') !== null;
+  !isNull(element.closest('[aria-roledescription="carousel"]'));
 
 const isCarouselSlide = (element: HTMLElement) =>
   element.tagName === 'LI' && isInCarousel(element);
 
-if (typeof HTMLImageElement !== 'undefined') {
+if (!isUndefined(globalThis.HTMLImageElement)) {
   HTMLImageElement.prototype.decode = () => Promise.resolve();
 }
 
-if (typeof HTMLElement !== 'undefined') {
+if (!isUndefined(globalThis.HTMLElement)) {
   Object.defineProperties(HTMLElement.prototype, {
     offsetWidth: {
       configurable: true,
@@ -104,36 +110,46 @@ if (typeof HTMLElement !== 'undefined') {
   });
 }
 
-type TGetTranslationsArg = string | { namespace?: string } | undefined;
+type TGetTranslationsArg = TMaybeUndefined<string | { namespace?: string }>;
 type TTranslationValues = Record<string, string | number>;
 
-const toNamespace = (arg: TGetTranslationsArg): string | undefined =>
-  typeof arg === 'string' ? arg : arg?.namespace;
+const toNamespace = (arg: TGetTranslationsArg): TMaybeUndefined<string> =>
+  isString(arg) ? arg : arg?.namespace;
 
 // `createTranslator` infers its namespace as a literal union from the messages
 // shape, which rejects the plain string this mock resolves at runtime.
 type TLooseTranslator = (key: string, values?: TTranslationValues) => string;
-const createLooseTranslator = createTranslator as unknown as (config: {
+type TLooseCreateTranslator = (config: {
   locale: string;
   messages: typeof SITE_MESSAGES;
   namespace?: string;
 }) => TLooseTranslator;
 
-vi.mock('next-intl/server', () => ({
-  setRequestLocale: vi.fn(),
-  getLocale: vi.fn(async () => 'en'),
-  getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
-    createLooseTranslator({
-      locale: LOCALE_ISO_CODES.EN,
-      messages: SITE_MESSAGES,
-      namespace: toNamespace(arg),
-    }),
-  ),
-  getFormatter: vi.fn(async () => ({
-    dateTime: (date: Date, options?: Intl.DateTimeFormatOptions) =>
-      date.toLocaleDateString('en', options),
-  })),
-}));
+// Imported inside the factories so only files that use these mocks pay for
+// the config barrel and next-intl, not every test file.
+vi.mock('next-intl/server', async () => {
+  const [{ LOCALE_ISO_CODES, SITE_MESSAGES }, nextIntl] = await Promise.all([
+    import('@blog/config'),
+    import('next-intl'),
+  ]);
+  const createLooseTranslator =
+    nextIntl.createTranslator as unknown as TLooseCreateTranslator;
+  return {
+    setRequestLocale: vi.fn(),
+    getLocale: vi.fn(async () => 'en'),
+    getTranslations: vi.fn(async (arg?: TGetTranslationsArg) =>
+      createLooseTranslator({
+        locale: LOCALE_ISO_CODES.EN,
+        messages: SITE_MESSAGES,
+        namespace: toNamespace(arg),
+      }),
+    ),
+    getFormatter: vi.fn(async () => ({
+      dateTime: (date: Date, options?: Intl.DateTimeFormatOptions) =>
+        date.toLocaleDateString('en', options),
+    })),
+  };
+});
 
 vi.mock('@web/utils/logger/logger');
 
@@ -150,23 +166,26 @@ vi.mock('next/font/local', () => ({
 
 // next-intl's `Link` reads `usePathname`/`useRouter` off `next/navigation`
 // even when a test never navigates.
-vi.mock('next/navigation', () => ({
-  notFound: vi.fn(() => {
-    throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-  }),
-  redirect: vi.fn(() => {
-    throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-  }),
-  permanentRedirect: vi.fn(() => {
-    throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-  }),
-  usePathname: vi.fn(() => '/'),
-  useRouter: vi.fn(() => ({
-    push: vi.fn(),
-    replace: vi.fn(),
-    prefetch: vi.fn(),
-    back: vi.fn(),
-    forward: vi.fn(),
-    refresh: vi.fn(),
-  })),
-}));
+vi.mock('next/navigation', async () => {
+  const { NEXT_NAVIGATION_ERROR } = await import('@blog/config/constants');
+  return {
+    notFound: vi.fn(() => {
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    }),
+    redirect: vi.fn(() => {
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+    }),
+    permanentRedirect: vi.fn(() => {
+      throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+    }),
+    usePathname: vi.fn(() => '/'),
+    useRouter: vi.fn(() => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
+      back: vi.fn(),
+      forward: vi.fn(),
+      refresh: vi.fn(),
+    })),
+  };
+});

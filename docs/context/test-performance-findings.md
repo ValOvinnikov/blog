@@ -19,7 +19,7 @@ suite figures predate that.
 | `apps/platform` | 352   | 472s                                  | 243–359s       | environment, tests, import, setup |
 | `apps/web`      | 330   | 262s                                  | 224–313s       | environment, import, setup        |
 | `packages/db`   | 207   | 366s                                  | 350s           | tests (PGlite), import            |
-| `apps/worker`   | 37    | 36s                                   | —              | import (88%)                      |
+| `apps/worker`   | 48    | 36s                                   | 30–34s → 11s   | import (88%)                      |
 | `packages/auth` | 17    | 12s                                   | —              | import, transform                 |
 
 `packages/db` is as slow alone as under turbo, so it is not slowed by
@@ -259,6 +259,9 @@ needed a product change. Also found:
 - **Keep `test`'s `dependsOn: ["^build"]`.** No package has a `build` script,
   but the dependency is likely what invalidates a suite's cache when a package
   it reads through an alias changes.
+- **`apps/worker`** runs on `vmThreads`: 30–34s → 10.5–11s alone on 4 cores,
+  all green in normal and `--sequence.shuffle` runs. `isolate: false` fails
+  files in both, and enabling `deps.optimizer.ssr` gains nothing.
 - **`apps/worker` and `packages/auth`**: `isolate: false` is unsafe for the
   same `vi.mock` reason. Their import time comes from the tests themselves:
   `importOriginal` spreads of the db tenants barrel in
@@ -266,8 +269,14 @@ needed a product change. Also found:
   through `importOriginal` (10 files), and `config.test.ts` importing the whole
   `@blog/db` barrel up to 4 times.
 - **`isolate: false` candidates** (no or few module mocks, unmeasured):
-  `packages/utils`, `packages/email`, and `packages/studio`'s `migrations`
-  project.
+  `packages/utils` and `packages/email`.
+- **`packages/studio` runs with `isolate: false` (adopted).** A setup file
+  calls `vi.resetModules()`, which re-evaluates the package's own source per
+  file but keeps `node_modules`, so `sanity` is imported once per worker.
+  Without it, shuffled file orders failed on module-level state
+  (`setDefaultLanguage`) and on a `vi.mock` factory baked into a cached
+  `studio-config`. Measured on 4 cores: 34–35s isolated, 12s after, and 23
+  `--sequence.shuffle.files` seeds green.
 
 ## Follow-ups not filed
 
@@ -280,9 +289,8 @@ decision comes first:
   a light shim that re-exports its error classes, turn db automocks into
   factories, and mock `@blog/db` in auth's `config.test.ts`. Measure with
   `--experimental.importDurations.print` first.
-- **`isolate: false` for `packages/utils`, `packages/email` and
-  `packages/studio`'s `migrations` project** — none or almost none of their
-  files mock modules. Validate each with a normal run and a
+- **`isolate: false` for `packages/utils` and `packages/email`** — none or
+  almost none of their files mock modules. Validate each with a normal run and a
   `--sequence.shuffle` run before adopting it.
 - **Import `react-syntax-highlighter`'s Prism build directly** in
   `code-block.tsx` instead of the package index, which loads highlight.js and

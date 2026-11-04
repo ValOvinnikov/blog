@@ -8,6 +8,7 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'node',
+      pool: 'vmThreads',
       mockReset: true,
       setupFiles: ['./src/vitest-setup.ts'],
       env: { SKIP_ENV_VALIDATION: 'true' },

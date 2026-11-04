@@ -13,7 +13,11 @@ import { useTranslations } from 'next-intl';
 
 import { colourCardVariants } from './colour-card-variants';
 
-export const ColourCard = () => {
+export type TColourCardProps = {
+  summary: string;
+};
+
+export const ColourCard = ({ summary }: TColourCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const {
     values: { accentHue, logoHue },
@@ -30,6 +34,8 @@ export const ColourCard = () => {
 
   return (
     <LookCard
+      summary={summary}
+      summaryMark={<AccentSwatch hue={accentHue} size={SIZE.XS} />}
       card={LOOK_ROW.COLOUR}
       title={t('colourHeading')}
       description={t('colourDescription')}
