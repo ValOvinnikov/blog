@@ -54,6 +54,10 @@ const VM_SYNTAX_HIGHLIGHTER_ESM_ALIAS = {
 
 const NODE_MODULES_GLOB = '**/node_modules/**';
 
+export const RESET_FILE_STATE_SETUP = fileURLToPath(
+  new URL('./reset-file-state.ts', import.meta.url),
+);
+
 const VM_WEB_STREAMS_SETUP = fileURLToPath(
   new URL('./vm-web-streams.ts', import.meta.url),
 );

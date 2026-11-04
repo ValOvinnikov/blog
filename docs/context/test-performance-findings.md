@@ -31,8 +31,8 @@ contention. It used only ~2.85 of 8 cores (`823s user / 351s wall`).
 
 Every db test runs against **PGlite**, Postgres compiled to WASM and running
 in-process. `src/testing/global-setup.ts` builds one migrated instance per
-vitest run and snapshots it. `createTestDb()` restores a private copy per test
-file. No test file in any workspace calls `neon(` or imports
+vitest run and snapshots it. Each vitest worker restores that snapshot once
+(`getWorkerTestDb()`) and every query file it runs reuses the instance. No test file in any workspace calls `neon(` or imports
 `@neondatabase/serverless` against a real database. The `DATABASE_URL` values
 in `packages/auth/vitest.config.ts` and `db/src/client.test.ts` are syntactic
 placeholders. So the usual advice — local Postgres instead of remote Neon,
@@ -108,23 +108,22 @@ kept that file's (now reset) mock.
 
 **Adopted:** every db test now takes the shared `src/__mocks__/client.ts`
 through a bare `vi.mock('@blog/db/client')`, and `useQueryTestDb()` points its
-`getDb` at the file's PGlite instance and closes that instance after the file.
-`vitest.config.ts` sets `unstubEnvs: true`.
+`getDb` at the worker's PGlite instance. `vitest.config.ts` sets
+`unstubEnvs: true`.
 
-**`isolate: false` stays rejected.** Measured back to back on one 4-core
-machine, both on `pool: 'threads'`:
-
-| run                    | default isolation | `--no-isolate`                       |
-| ---------------------- | ----------------- | ------------------------------------ |
-| full suite (214 files) | 136s, all pass    | 109–119s, **1–3 files fail per run** |
-| `src` only (179 files) | 119s, all pass    | 108s, all pass                       |
-
-The remaining failures are all in `scripts/deprovision-tenant` and
-`scripts/invalidate-tenant-cache`, and change with file order. Those tests
-mock shared modules (`@blog/db/queries/audit-events`, the `steps/*` modules,
-`request-tenant-cache-invalidation`) with per-file factories, or mock a module
-that a sibling file uses for real, so whichever file loads the module first
-wins. Fixing them means restructuring those mocks, for a 10–20% gain.
+**`isolate: false` is adopted, with a reset per file.** Plain `--no-isolate`
+failed 1–3 files per run in `scripts/deprovision-tenant` and
+`scripts/invalidate-tenant-cache`, whose per-file `vi.mock` factories stuck to
+modules a sibling file had already loaded. The shared
+`configs/vitest/reset-file-state.ts` setup (studio's approach) calls
+`vi.resetModules()`, which re-evaluates the package's own source per file and
+removes those failures, and unstubs envs and globals after each file: Vitest's
+`unstubEnvs` runs before each test, so the last test's `vi.stubEnv` was still
+set when the next file's module scope captured `process.env`. One PGlite per worker is held on
+`globalThis`, which the reset does not touch, and `useQueryTestDb()` truncates
+every table before each file. Measured on 4 cores: 122s isolated, 13–19s
+after; `--sequence.shuffle.files` green on 5 seeds with 4 workers and 3 with
+one worker.
 
 ### Rejected
 

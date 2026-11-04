@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url';
 
-import preset from '@blog/vitest-config/preset';
+import preset, { RESET_FILE_STATE_SETUP } from '@blog/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
 
 // Split into two projects because schema tests (src/**) always import
@@ -37,7 +37,7 @@ export default mergeConfig(
       environment: 'node',
       // Off so files share a worker's already-imported `sanity`; the setup file and the unstub/restore flags undo the module, global and spy state a file leaves behind.
       isolate: false,
-      setupFiles: ['./src/testing/reset-modules.ts'],
+      setupFiles: [RESET_FILE_STATE_SETUP],
       unstubGlobals: true,
       restoreMocks: true,
       projects: [
