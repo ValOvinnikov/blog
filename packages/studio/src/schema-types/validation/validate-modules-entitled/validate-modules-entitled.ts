@@ -1,7 +1,7 @@
 import {
   getMissingModulePack,
   getModulePackOffMessage,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { getEntitledModulePacks } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import {
   modulePath,

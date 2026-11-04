@@ -101,6 +101,7 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Section label on sidebar', TOKEN.SIDE_MUTED, TOKEN.SIDE, TEXT],
   ['Active row text', TOKEN.TEXT_STRONG, TOKEN.SIDE_RAISED, TEXT],
   ['Link on card', TOKEN.BRAND_INK, TOKEN.SURFACE, TEXT],
+  ['Link hover on card', TOKEN.BRAND_STRONG, TOKEN.SURFACE, TEXT],
   ['White on primary', WHITE, TOKEN.BRAND, TEXT],
   ['Live pill', TOKEN.OK, TOKEN.OK_WEAK, TEXT],
   ['Provisioning pill', TOKEN.WARN, TOKEN.WARN_WEAK, TEXT],

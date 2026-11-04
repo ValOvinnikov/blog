@@ -1527,7 +1527,7 @@ renders in either role. Only the Console pair and the mono font preload. Fonts a
 woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
 loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@blog/db`'s `tenant_domains`
-(`resolveTenantId()`, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
+(`resolveTenantRouting()`, uncached, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
 `web-dev` deployment) and 404ing on an unmatched host in production; the
@@ -1955,8 +1955,11 @@ toggle both allow it — the same most-restrictive-wins semantics as
 than showing a false warning. Because it is read on each Studio load,
 turning a feature on clears the warning on the next load. The same warning
 covers module packs: given an optional `entitlements.modulePacks`, a module
-type outside them (`MODULE_PACK_BY_TYPE` in `@blog/config`) reads
-"(Growth plan)" in pickers, offers no document to pick, can't be created new,
+type outside them (`MODULE_PACK_BY_TYPE` in `@blog/config`) shows as
+unavailable in pickers (disabled with a "Growth plan" badge in the modules
+field's own "Add item…" menu, passed as the array input's `arrayFunctions`;
+locked, titled "— Growth plan" and listed last in Sanity's per-row insert
+menus), offers no document to pick, can't be created new,
 and warns on its documents
 and on page references; the plan message wins over the capability one.
 Omitted, every pack is entitled.

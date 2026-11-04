@@ -4,10 +4,15 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
+  HTTP_STATUS,
   isOutcomeSuccess,
 } from '@blog/config';
+import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { PROVISIONING_LOG } from '@platform/constants/provisioning';
+import {
+  DEPROVISION_PATH,
+  PROVISIONING_LOG,
+} from '@platform/constants/provisioning';
 import {
   TENANT_FIELD_ERROR,
   TENANT_LOG,
@@ -17,22 +22,16 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { logger } from '@platform/utils/logger/logger';
-import { z } from 'zod';
+import type { z } from 'zod';
 
-import { dispatchDeprovisioningWorkflow } from './dispatch-deprovisioning-workflow';
+import { enqueueWorkerRequest } from './enqueue-provisioning';
 import {
   confirmTenantInputSchema,
   resolveConfirmedTenant,
 } from './resolve-confirmed-tenant';
 import type { TTenantLifecycleResult } from './tenant-lifecycle-result';
 
-const deprovisionTenantInputSchema = confirmTenantInputSchema.extend({
-  dryRun: z.boolean(),
-});
-
-export type TDeprovisionTenantInput = z.input<
-  typeof deprovisionTenantInputSchema
->;
+export type TDeprovisionTenantInput = z.input<typeof confirmTenantInputSchema>;
 
 export type TDeprovisionTenantResult = TTenantLifecycleResult<
   | typeof TENANT_REFUSAL.NOT_FOUND
@@ -40,17 +39,14 @@ export type TDeprovisionTenantResult = TTenantLifecycleResult<
   | typeof TENANT_REFUSAL.PLATFORM_TENANT
 >;
 
-/**
- * `confirm` is checked here as a fast-fail convenience only;
- * `deprovision-tenant.yml` re-validates it before doing anything destructive.
- */
+/** The worker's run checks neither the typed name nor the platform tenant, so this action is the only guard. */
 export const deprovisionTenantAction = async (
   tenantId: string,
   input: TDeprovisionTenantInput,
 ): Promise<TDeprovisionTenantResult> => {
   await requireSuperAdmin();
 
-  const parsed = deprovisionTenantInputSchema.safeParse(input);
+  const parsed = confirmTenantInputSchema.safeParse(input);
   if (!parsed.success) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
@@ -58,8 +54,7 @@ export const deprovisionTenantAction = async (
     };
   }
 
-  const { confirm, dryRun } = parsed.data;
-  const resolved = await resolveConfirmedTenant(tenantId, confirm, {
+  const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm, {
     precondition: ({ deprovisionedAt }) =>
       deprovisionedAt ? TENANT_REFUSAL.ALREADY_DEPROVISIONED : undefined,
   });
@@ -79,25 +74,24 @@ export const deprovisionTenantAction = async (
     };
   }
 
-  const dispatched = await dispatchDeprovisioningWorkflow({
-    tenantId,
-    confirm,
-    dryRun,
-  });
-
-  if (!dispatched) {
+  const status = await enqueueWorkerRequest(DEPROVISION_PATH, { tenantId });
+  if (status !== HTTP_STATUS.ACCEPTED) {
+    if (!isNull(status)) {
+      logger.error(PROVISIONING_LOG.DEPROVISION_ENQUEUE_REJECTED, {
+        tenantId,
+        responseStatus: status,
+      });
+    }
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
-  if (!dryRun) {
-    await recordAuditEvent({
-      logEvent: PROVISIONING_LOG.DEPROVISION_AUDIT_FAILED,
-      action: AUDIT_ACTION.DEPROVISION_REQUESTED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: tenantId,
-      details: { name: tenant.name },
-    });
-  }
+  await recordAuditEvent({
+    logEvent: PROVISIONING_LOG.DEPROVISION_AUDIT_FAILED,
+    action: AUDIT_ACTION.DEPROVISION_REQUESTED,
+    targetType: AUDIT_TARGET_TYPE.TENANT,
+    targetId: tenantId,
+    details: { name: tenant.name },
+  });
 
   return toOutcome(ACTION_OUTCOME.SUCCESS);
 };

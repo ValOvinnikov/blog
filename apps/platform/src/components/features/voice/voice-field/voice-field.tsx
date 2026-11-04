@@ -20,6 +20,7 @@ import { Textarea } from '@platform/components/shared/textarea';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
+import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isVoiceValueCustomised,
@@ -64,14 +65,12 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const isCustomised = isVoiceValueCustomised(value);
   const textValue = typeof value === 'string' ? value : '';
   const [placeholderToken] = field.placeholders;
-  const richDescribedBy = [
+  const richDescribedBy = joinIds(
     archivedDescribedBy,
     hintId,
     placeholderToken !== undefined && noteId,
     error && errorId,
-  ]
-    .filter(Boolean)
-    .join(' ');
+  );
 
   const reset = () => {
     onChange(isRich ? null : '');

@@ -9,6 +9,7 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 
 type TNavLinkItem = Extract<TSidebarNavItem, { href: string }>;
@@ -72,3 +73,6 @@ export const mockTenantSwitcherItem = (
   isArchived: false,
   ...overrides,
 });
+
+export const mockDashboardStudioInnerPath = () =>
+  `${adminRoutes.dashboardStudio()}/${faker.lorem.slug()}`;

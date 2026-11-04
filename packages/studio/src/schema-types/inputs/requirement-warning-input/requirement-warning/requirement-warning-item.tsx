@@ -2,7 +2,7 @@ import {
   getMissingRequirement,
   getRequirementOffMessage,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import type { ItemProps } from 'sanity';
 
 export const createRequirementWarningItem = (
