@@ -8,7 +8,7 @@ import {
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 import { render } from '@testing-library/react';

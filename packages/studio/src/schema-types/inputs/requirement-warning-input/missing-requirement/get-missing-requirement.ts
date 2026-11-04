@@ -74,8 +74,14 @@ export const getMissingRequirement = (
   return capability ? { capability } : null;
 };
 
+export const getModulePackPlanLabel = (modulePack: TModulePack) =>
+  `${MODULE_PACK_LABEL[modulePack]} plan`;
+
+export const getLockedModulesNote = (modulePack: TModulePack) =>
+  `Locked modules come with the ${getModulePackPlanLabel(modulePack)}.`;
+
 export const getModulePackOffMessage = (modulePack: TModulePack) =>
-  `This module is part of the ${MODULE_PACK_LABEL[modulePack]} plan. It stays saved, but the site won't show it on your current plan.`;
+  `This module is part of the ${getModulePackPlanLabel(modulePack)}. It stays saved, but the site won't show it on your current plan.`;
 
 export const getRequirementOffMessage = (requirement: TRequirement) =>
   'modulePack' in requirement
@@ -84,5 +90,5 @@ export const getRequirementOffMessage = (requirement: TRequirement) =>
 
 export const getRequirementOffSuffix = (requirement: TRequirement) =>
   'modulePack' in requirement
-    ? `(${MODULE_PACK_LABEL[requirement.modulePack]} plan)`
+    ? `— ${getModulePackPlanLabel(requirement.modulePack)}`
     : '(off in Features)';
