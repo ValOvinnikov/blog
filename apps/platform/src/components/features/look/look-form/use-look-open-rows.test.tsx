@@ -18,6 +18,7 @@ import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   GO_TO_THE_FIRST_ONE,
   SAVE_CHANGES,
+  UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_STAGED_LOGO_BLOB_URL,
@@ -139,6 +140,32 @@ describe(useLookOpenRows, () => {
         expect(presetTrigger).not.toBeInTheDocument();
         expect(resetButton).toBeVisible();
       });
+    });
+  });
+
+  describe('from the save bar link to a changed card', () => {
+    beforeEach(async () => {
+      await nudgeAccentHue(user);
+      await openLookRow(user, LOOK_ROW.FOOTER);
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const colourLink = within(saveBar).getByRole('button', {
+        name: LOOK_FORM.colourHeading,
+      });
+      await user.click(colourLink);
+    });
+
+    it('opens the changed row and folds the open one', () => {
+      const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
+      const footerTrigger = lookRowTrigger(LOOK_ROW.FOOTER);
+
+      expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(footerTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('moves focus to the changed row button', () => {
+      const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
+
+      expect(colourTrigger).toHaveFocus();
     });
   });
 

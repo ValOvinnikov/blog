@@ -25,6 +25,8 @@ import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
+import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
+import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
@@ -54,6 +56,7 @@ import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   clickGoToTheFirstOne,
   lookRowTrigger,
@@ -70,6 +73,10 @@ import {
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
+import {
+  resizeObservedElements,
+  stubResizeObserver,
+} from '@platform/testing/resize-observer';
 import {
   CURRENT_LOGO,
   MOCK_LOGO_URL,
@@ -155,12 +162,14 @@ const FAVICON_REMOVE_FAILED = tUploadErrors('removeFailed', {
   kind: 'favicon',
 });
 const MOCK_UPLOAD_LIMIT = '4 MB';
+const LOGO_TOO_LARGE = tUploadErrors('fileTooLarge', {
+  limit: MOCK_UPLOAD_LIMIT,
+});
 const MOCK_DRAFT_TAKEN_AT = '2026-08-20T09:00:00.000Z';
 
 const HEAVY_FORM_TIMEOUT_MS = 15_000;
 const ARIA_SELECTED = 'aria-selected';
 const DATA_DISABLED = 'data-disabled';
-const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
 const FOLLOW_ACCENT_HUE = messages.logoHueField.followAccentHue;
 const UPLOAD_FAVICON = messages.assetUploadField.favicon.upload;
 const RESET_TO_PRESET = LOOK_FORM.resetButton;
@@ -171,7 +180,7 @@ const USE_PRESET_RADIUS = makeEnTranslator('lookForm')(
 const EXTRA_LARGE = LOOK_FORM.radiusScaleOptionLabel.XL;
 const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
-const SAVING = 'Saving…';
+const SAVING = tSaveBar('saving');
 const GROWTH_PLAN = messages.featuresSettings.planLockedBadge;
 const GROWTH_ONLY_FIELD_COUNT = 19;
 const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
@@ -179,9 +188,21 @@ const SPINNER_LABEL = LOOK_FORM.spinnerStyleLabel;
 const FOOTER_LAYOUT_LABEL = LOOK_FORM.footerLayoutLabel;
 const COOKIE_BANNER_OFF_NOTE = LOOK_FORM.cookieSettingsButtonBannerOff;
 const RESTORE_CHANGES = /^Restore \d+ changes$/;
-const EDITORIAL = 'Editorial';
-const CONSOLE = 'Console';
-const DISCARD = 'Discard';
+const EDITORIAL = messages.presetPicker.editorial;
+const CONSOLE = messages.presetPicker.console;
+const DISCARD = tSaveBar('discard');
+const ROW_TITLES_IN_ORDER = [
+  LOOK_FORM.colourHeading,
+  LOOK_FORM.brandHeading,
+  LOOK_FORM.typeHeading,
+  LOOK_FORM.shapeHeading,
+  LOOK_FORM.buttonsHeading,
+  LOOK_FORM.headerHeading,
+  LOOK_FORM.footerHeading,
+  LOOK_FORM.languageSwitcherLabel,
+];
+const EDIT_TAB = messages.viewTabs.editTab;
+const PREVIEW_TAB = messages.viewTabs.previewTab;
 
 const stubLgUpWindow = () => {
   const stubMatchMedia = window.matchMedia;
@@ -295,6 +316,12 @@ const chooseEditorial = async (user: UserEvent) => {
   await user.click(editorialRadio);
 };
 
+const pickExtraLargeRadius = async (user: UserEvent) => {
+  await openLookRow(user, LOOK_ROW.SHAPE);
+  const extraLargeButton = screen.getByRole('button', { name: EXTRA_LARGE });
+  await user.click(extraLargeButton);
+};
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -320,7 +347,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
 
       it('lists the Preset card, then the Style and Site parts rows in order', () => {
-        const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+        const editPanel = screen.getByTestId(LOOK_EDIT_PANEL_TEST_ID);
         const presetHeading = within(editPanel).getAllByRole('heading', {
           level: 2,
         });
@@ -330,34 +357,29 @@ describe(`<${LookForm.name}/>`, () => {
         const presetTitles = presetHeading.map(
           (heading) => heading.textContent,
         );
-        const rowTitles = rowHeadings.map((heading) => heading.textContent);
-        const startsWith = (title: string) =>
-          expect.stringMatching(new RegExp(`^${title}`));
+        const rowTitles = rowHeadings.map((heading) =>
+          ROW_TITLES_IN_ORDER.find((title) =>
+            heading.textContent?.startsWith(title),
+          ),
+        );
 
         expect(presetTitles).toEqual([LOOK_FORM.presetLabel]);
-        expect(rowTitles).toEqual([
-          startsWith(LOOK_FORM.colourHeading),
-          startsWith(LOOK_FORM.brandHeading),
-          startsWith(LOOK_FORM.typeHeading),
-          startsWith(LOOK_FORM.shapeHeading),
-          startsWith(LOOK_FORM.buttonsHeading),
-          startsWith(LOOK_FORM.headerHeading),
-          startsWith(LOOK_FORM.footerHeading),
-          startsWith(LOOK_FORM.languageSwitcherLabel),
-        ]);
+        expect(rowTitles).toEqual(ROW_TITLES_IN_ORDER);
       });
 
       it('switches between the Edit and Preview tabs', async () => {
         const tabList = screen.getByRole('tablist', {
           name: LOOK_FORM.viewTabsAriaLabel,
         });
-        const editTab = within(tabList).getByRole('tab', { name: 'Edit' });
-        const previewTab = screen.getByRole('tab', { name: 'Preview' });
+        const editTab = within(tabList).getByRole('tab', { name: EDIT_TAB });
+        const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
         expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
 
         await user.click(previewTab);
 
-        const previewPanel = screen.getByRole('tabpanel', { name: 'Preview' });
+        const previewPanel = screen.getByRole('tabpanel', {
+          name: PREVIEW_TAB,
+        });
         const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
         expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
         expect(editTab).toHaveAttribute(ARIA_SELECTED, 'false');
@@ -1236,8 +1258,8 @@ describe(`<${LookForm.name}/>`, () => {
         await user.click(tabletButton);
         await user.click(signedInButton);
 
-        const previewTab = screen.getByRole('tab', { name: 'Preview' });
-        const editTab = screen.getByRole('tab', { name: 'Edit' });
+        const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
+        const editTab = screen.getByRole('tab', { name: EDIT_TAB });
         await user.click(previewTab);
         await user.click(editTab);
 
@@ -1279,17 +1301,103 @@ describe(`<${LookForm.name}/>`, () => {
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
       expect(slider).toHaveFocus();
     });
+  });
 
-    it('returns to the Edit tab to focus the accent hue slider from the Preview', async () => {
-      const previewTab = screen.getByRole('tab', { name: 'Preview' });
-      await user.click(previewTab);
-      await clickGoToTheFirstOne(user);
-
-      const editTab = screen.getByRole('tab', { name: 'Edit' });
-      const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
-      expect(slider).toHaveFocus();
+  describe('the save bar location', () => {
+    beforeEach(async () => {
+      setupLookForm();
+      await nudgeAccentHue(user);
     });
+
+    it('names the one changed card by its row title', () => {
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const colourLink = within(saveBar).getByRole('button', {
+        name: LOOK_FORM.colourHeading,
+      });
+
+      expect(colourLink).toBeVisible();
+    });
+
+    it('counts the changed cards and names none once a second card changes', async () => {
+      await pickExtraLargeRadius(user);
+
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const location = within(saveBar).getByText(
+        tSaveBar('inCards', { cards: 2 }),
+      );
+      const colourLink = within(saveBar).queryByRole('button', {
+        name: LOOK_FORM.colourHeading,
+      });
+      expect(location).toBeVisible();
+      expect(colourLink).not.toBeInTheDocument();
+    });
+
+    describe('on the Preview tab', () => {
+      beforeEach(async () => {
+        const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
+        await user.click(previewTab);
+      });
+
+      it('hides the save bar', () => {
+        const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+
+        expect(saveBar).not.toBeInTheDocument();
+      });
+
+      it('shows the save bar again on the Edit tab with the same changes', async () => {
+        const editTab = screen.getByRole('tab', { name: EDIT_TAB });
+        await user.click(editTab);
+
+        const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+        expect(saveBar).toHaveTextContent(
+          tSaveBar('unsavedChanges', { count: 1 }),
+        );
+      });
+    });
+  });
+
+  describe('when the layout widens to two columns on the Preview tab', () => {
+    let layoutWidth: number;
+    let restoreResizeObserver: () => void;
+
+    beforeEach(async () => {
+      layoutWidth = LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH - 1;
+      restoreResizeObserver = stubResizeObserver(() => ({
+        width: layoutWidth,
+        height: 0,
+      }));
+      setupLookForm();
+      await nudgeAccentHue(user);
+      const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
+      await user.click(previewTab);
+      layoutWidth = LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH;
+      await resizeObservedElements();
+    });
+
+    afterEach(() => {
+      restoreResizeObserver();
+    });
+
+    it('shows the save bar again', () => {
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(saveBar).toBeVisible();
+    });
+  });
+
+  it('counts the cards a new preset changes, never the Preset itself', async () => {
+    setupLookForm();
+    await chooseEditorial(user);
+
+    const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+    const location = within(saveBar).getByText(
+      tSaveBar('inCards', { cards: 3 }),
+    );
+    const presetLink = within(saveBar).queryByRole('button', {
+      name: LOOK_FORM.presetLabel,
+    });
+    expect(location).toBeVisible();
+    expect(presetLink).not.toBeInTheDocument();
   });
 
   describe('with a saved accent hue off the preset', () => {
@@ -1752,13 +1860,13 @@ describe(`<${LookForm.name}/>`, () => {
       };
 
       it('locks the edit panel while a save is running', async () => {
-        const lockedPanel = await screen.findByTestId(EDIT_PANEL_TEST_ID);
+        const lockedPanel = await screen.findByTestId(LOOK_EDIT_PANEL_TEST_ID);
         expect(lockedPanel).toHaveAttribute('inert');
 
         resolveUploadSuccessfully();
 
         await waitFor(() => {
-          const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+          const editPanel = screen.getByTestId(LOOK_EDIT_PANEL_TEST_ID);
           expect(editPanel).not.toHaveAttribute('inert');
         });
       });
@@ -1848,6 +1956,22 @@ describe(`<${LookForm.name}/>`, () => {
         expect(hueReadout).toBeVisible();
       });
 
+      it('returns to the Edit tab and focuses the picker when saved from the Preview', async () => {
+        await pickLogo(user);
+        const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
+        await user.click(previewTab);
+        await user.keyboard(USER_EVENT_KEY.CONTROL_S);
+
+        const replaceLogoButton = await screen.findByRole('button', {
+          name: REPLACE_LOGO,
+        });
+        const editTab = screen.getByRole('tab', { name: EDIT_TAB });
+        await waitFor(() => {
+          expect(replaceLogoButton).toHaveFocus();
+        });
+        expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      });
+
       describe('after saving a picked logo', () => {
         beforeEach(async () => {
           await pickAndSaveLogo(user);
@@ -1860,9 +1984,7 @@ describe(`<${LookForm.name}/>`, () => {
           await waitFor(() => {
             expect(saveBar).toHaveTextContent(tSaveBar('notSaved'));
           });
-          const alert = screen.queryByRole('alert');
           expect(saveBar).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
-          expect(alert).not.toBeInTheDocument();
 
           await clickGoToTheFirstOne(user);
 
@@ -1872,15 +1994,29 @@ describe(`<${LookForm.name}/>`, () => {
           expect(replaceLogoButton).toHaveFocus();
         });
 
+        it("shows the upload message in the page's error alert", async () => {
+          const alert = await screen.findByRole('alert');
+
+          expect(alert).toHaveTextContent(LOGO_UPLOAD_FAILED);
+        });
+
         it('clears the picker error once a new logo is picked', async () => {
-          await screen.findByText(LOGO_UPLOAD_FAILED);
+          const replaceLogoButton = await screen.findByRole('button', {
+            name: REPLACE_LOGO,
+          });
+          await waitFor(() => {
+            expect(replaceLogoButton).toHaveAccessibleDescription(
+              `${BRAND_IMAGES_HINT} ${LOGO_UPLOAD_FAILED}`,
+            );
+          });
           await pickLogo(user);
 
-          const error = screen.queryByText(LOGO_UPLOAD_FAILED);
           const attentionLink = screen.queryByRole('link', {
             name: GO_TO_THE_FIRST_ONE,
           });
-          expect(error).not.toBeInTheDocument();
+          expect(replaceLogoButton).toHaveAccessibleDescription(
+            BRAND_IMAGES_HINT,
+          );
           expect(attentionLink).not.toBeInTheDocument();
         });
       });
@@ -1896,10 +2032,16 @@ describe(`<${LookForm.name}/>`, () => {
 
       await pickAndSaveLogo(user);
 
-      const error = await screen.findByText(
-        tUploadErrors('fileTooLarge', { limit: MOCK_UPLOAD_LIMIT }),
-      );
-      expect(error).toBeVisible();
+      const replaceLogoButton = await screen.findByRole('button', {
+        name: REPLACE_LOGO,
+      });
+      await waitFor(() => {
+        expect(replaceLogoButton).toHaveAccessibleDescription(
+          `${BRAND_IMAGES_HINT} ${LOGO_TOO_LARGE}`,
+        );
+      });
+      const alert = screen.getByRole('alert');
+      expect(alert).toHaveTextContent(LOGO_TOO_LARGE);
       expect(updateLookAction).not.toHaveBeenCalled();
     });
 

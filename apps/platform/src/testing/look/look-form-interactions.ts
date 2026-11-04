@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { ASSET_UPLOAD_INPUT_TEST_ID } from '@platform/constants/asset-upload';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
@@ -18,21 +19,10 @@ const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
   type: 'image/png',
 });
 
-const LOOK_ROW_TITLE = {
-  [LOOK_ROW.COLOUR]: LOOK_FORM.colourHeading,
-  [LOOK_ROW.BRAND]: LOOK_FORM.brandHeading,
-  [LOOK_ROW.TYPE]: LOOK_FORM.typeHeading,
-  [LOOK_ROW.SHAPE]: LOOK_FORM.shapeHeading,
-  [LOOK_ROW.BUTTONS]: LOOK_FORM.buttonsHeading,
-  [LOOK_ROW.HEADER]: LOOK_FORM.headerHeading,
-  [LOOK_ROW.FOOTER]: LOOK_FORM.footerHeading,
-  [LOOK_ROW.LANGUAGE_SWITCHER]: LOOK_FORM.languageSwitcherLabel,
-} as const satisfies Record<TLookRow, string>;
-
 export const lookRowTrigger = (row: TLookRow) => {
   const heading = screen.getByRole('heading', {
     level: 3,
-    name: new RegExp(`^${LOOK_ROW_TITLE[row]}`),
+    name: new RegExp(`^${LOOK_FORM[LOOK_ROW_TITLE_KEY[row]]}`),
   });
 
   return within(heading).getByRole('button');

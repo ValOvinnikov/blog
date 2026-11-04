@@ -9,9 +9,17 @@ import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-import { colourCardVariants } from './colour-card-variants';
+const colourCardVariants = tv({
+  slots: {
+    hueField: ['flex w-full items-center gap-3.5'],
+    hueValue: [
+      'shrink-0 text-right text-admin-12-5 tabular-nums text-admin-muted',
+    ],
+  },
+});
 
 export type TColourCardProps = {
   summary: string;
@@ -37,7 +45,6 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
       summary={summary}
       summaryMark={<AccentSwatch hue={accentHue} size={SIZE.XS} />}
       card={LOOK_ROW.COLOUR}
-      title={t('colourHeading')}
       description={t('colourDescription')}
     >
       <LookField

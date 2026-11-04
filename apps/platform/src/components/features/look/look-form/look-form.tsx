@@ -8,7 +8,9 @@ import { LookFormProvider } from '@platform/components/features/look/look-form-p
 import { LookPreview } from '@platform/components/features/look/look-preview';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
+import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildLookRowSummaries } from '@platform/utils/look-form-values/look-row-summaries';
@@ -21,6 +23,7 @@ import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 import { lookFormVariants } from './look-form-variants';
+import { LOOK_ROW_TITLE_KEY } from './look-row-title-key';
 import { useLookFormState } from './use-look-form-state';
 import { useLookOpenRows } from './use-look-open-rows';
 
@@ -57,14 +60,14 @@ export const LookForm = ({
 }: TLookFormProps) => {
   const layoutRef = useRef<HTMLDivElement>(null);
   const layoutWidth = useElementSize(layoutRef)?.width;
-  const { view, tabsProps, panelProps } = useViewTabs({
+  const { view, hasTabPanels, tabsProps, panelProps } = useViewTabs({
     isTabbed: isUndefined(layoutWidth)
       ? undefined
       : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
   });
   const t = useTranslations('lookForm');
   const hasMultipleLanguages = liveLocales.length > 1;
-  const { groupProps, revealRow } = useLookOpenRows();
+  const { groupProps, revealRow, revealCard } = useLookOpenRows();
   const { lookForm, isPending, form, errorTitle } = useLookFormState({
     tenantId,
     tenantName,
@@ -78,6 +81,13 @@ export const LookForm = ({
     },
   });
 
+  const unsavedCards = Object.values(LOOK_ROW)
+    .filter(lookForm.hasCardChanges)
+    .map((row) => ({
+      name: t(LOOK_ROW_TITLE_KEY[row]),
+      onSelect: () => revealCard(row),
+    }));
+
   const { layout, columns, editPanel, previewPanel } = lookFormVariants();
 
   return (
@@ -87,6 +97,8 @@ export const LookForm = ({
       form={form}
       errorTitle={errorTitle}
       layout={SHELL_LAYOUT}
+      unsavedCards={unsavedCards}
+      isSaveBarHidden={hasTabPanels && view === 'preview'}
     >
       <LookFormProvider value={lookForm}>
         <div ref={layoutRef} className={layout()}>
@@ -100,7 +112,7 @@ export const LookForm = ({
             <div
               {...panelProps('edit')}
               inert={isPending}
-              data-testid="look-form-edit-panel"
+              data-testid={LOOK_EDIT_PANEL_TEST_ID}
               className={editPanel({ isActive: view === 'edit' })}
             >
               <LookEditCards

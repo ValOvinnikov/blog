@@ -48,7 +48,6 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
     <LookCard
       summary={summary}
       card={LOOK_ROW.HEADER}
-      title={t('headerHeading')}
       description={t('headerDescription')}
     >
       <LookField

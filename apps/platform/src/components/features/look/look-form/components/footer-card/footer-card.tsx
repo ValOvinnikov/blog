@@ -63,7 +63,6 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
     <LookCard
       summary={summary}
       card={LOOK_ROW.FOOTER}
-      title={t('footerHeading')}
       description={t('footerDescription')}
     >
       <LookField

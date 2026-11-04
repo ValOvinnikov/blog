@@ -7,4 +7,5 @@ export const USER_EVENT_KEY = {
   END: `{${KEY.END}}`,
   ENTER: `{${KEY.ENTER}}`,
   SPACE: KEY.SPACE,
+  CONTROL_S: '{Control>}s{/Control}',
 } as const;

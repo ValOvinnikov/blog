@@ -10,9 +10,15 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-import { languageSwitcherCardVariants } from './language-switcher-card-variants';
+const languageSwitcherCardVariants = tv({
+  slots: {
+    switcher: ['self-start'],
+    note: ['text-admin-12 text-admin-muted'],
+  },
+});
 
 export type TLanguageSwitcherCardProps = {
   hasMultipleLanguages: boolean;
@@ -43,7 +49,6 @@ export const LanguageSwitcherCard = ({
     <LookCard
       summary={summary}
       card={LOOK_ROW.LANGUAGE_SWITCHER}
-      title={languageSwitcherLabel}
       description={t('languageSwitcherDescription')}
     >
       {hasMultipleLanguages ? (
