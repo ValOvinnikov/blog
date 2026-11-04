@@ -24,7 +24,6 @@ export const useSignInAttempt = (isOpen: boolean) => {
     setStatus(FORM_STATUS.IDLE);
     setEmail('');
     setIsSendLimited(false);
-    setIsEmailInvalid(false);
   };
 
   if (isOpen !== wasOpen) {

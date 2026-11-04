@@ -426,6 +426,27 @@ describe(`<${AuthMenu.name}/>`, () => {
       },
     );
 
+    it('shows the send error, not the invalid-email error, when a corrected address fails to send', async () => {
+      mockSignInResult(false);
+      setup();
+      const panel = await sendLink(MOCK_MALFORMED_EMAIL);
+      const emailField = within(panel).getByRole('textbox', {
+        name: EMAIL_FIELD,
+      });
+      await user.clear(emailField);
+      await user.type(emailField, MOCK_READER_EMAIL);
+      const sendButton = within(panel).getByRole('button', {
+        name: SEND_LINK_LABEL,
+      });
+      await user.click(sendButton);
+
+      const error = await within(panel).findByText(EMAIL_ERROR);
+      const invalidError = within(panel).queryByText(EMAIL_INVALID);
+
+      expect(error).toBeVisible();
+      expect(invalidError).not.toBeInTheDocument();
+    });
+
     it('forgets a remembered sign-in once the session resolves signed out', () => {
       document.cookie = `${SIGNED_IN_HINT_COOKIE_NAME}=1; Path=/`;
       setup();
