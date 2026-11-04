@@ -1,87 +1,95 @@
 'use client';
 
-import { Radio } from '@base-ui/react/radio';
-import { RadioGroup } from '@base-ui/react/radio-group';
-import { ICONS, PRESET_ID, type TPresetId } from '@blog/config';
-import { Icon } from '@platform/components/shared/icon';
-import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
-import { FONT_OPTIONS } from '@platform/config/fonts';
-import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
-import { useTranslations } from 'next-intl';
-import { Fragment, useId } from 'react';
+import { MorePresetsLabel } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/more-presets-label/more-presets-label';
+import { morePresetsButtonVariants } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/more-presets-label/more-presets-label-variants';
+import { MorePresetsPopover } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/more-presets-popover/more-presets-popover';
+import { PresetChips } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-chips/preset-chips';
+import { PresetSheet } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-sheet/preset-sheet';
+import { MEDIA_QUERY } from '@platform/constants/media-query';
+import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
+import { useRef } from 'react';
 
+import type { TPresetOption } from './preset-option';
 import { presetStripVariants } from './preset-strip-variants';
-import { PRESET_SWATCH } from './preset-swatch';
+import { usePresetChipFit } from './use-preset-chip-fit';
 
-export type TPresetStripProps = {
-  value: TPresetId;
-  onChange: (value: TPresetId) => void;
+export type TPresetStripProps<TId extends string> = {
+  presets: TPresetOption<TId>[];
+  value: TId;
+  onChange: (value: TId) => void;
   labelledBy: string;
   describedBy?: string;
   isDisabled?: boolean;
 };
 
-const PRESETS = Object.values(PRESET_ID);
-
-export const PresetStrip = ({
+export const PresetStrip = <TId extends string>({
+  presets,
   value,
   onChange,
   labelledBy,
   describedBy,
   isDisabled,
-}: TPresetStripProps) => {
-  const t = useTranslations('presetPicker');
-  const idBase = useId();
+}: TPresetStripProps<TId>) => {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+  const isLgUp = useMediaQuery(MEDIA_QUERY.LG_UP);
+  const visible = usePresetChipFit({
+    rowRef,
+    measureRef,
+    presets,
+    value,
+  }).flatMap((index) => presets[index] ?? []);
+  const selected = presets.find(({ id }) => id === value);
+  const isOverflowing = visible.length < presets.length;
+  const access = { labelledBy, describedBy, isDisabled };
+  const { root, row, measure } = presetStripVariants();
 
   return (
-    <RadioGroup
-      aria-labelledby={labelledBy}
-      aria-describedby={describedBy}
-      value={value}
-      onValueChange={(next) => onChange(next as TPresetId)}
-      disabled={isDisabled}
-      className={presetStripVariants().root()}
-    >
-      {PRESETS.map((preset) => {
-        const selected = preset === value;
-        const labelKey = PRESET_LABEL_KEY[preset];
-        const { glyph, font } = PRESET_SWATCH[preset];
-        const { chip, swatch, tick, description } = presetStripVariants({
-          preset,
-          selected,
-        });
-        const descriptionId = `${idBase}-${preset}-description`;
-
-        return (
-          <Fragment key={preset}>
-            <Radio.Root
-              value={preset}
-              aria-describedby={descriptionId}
-              className={chip()}
-            >
-              <span
-                className={swatch()}
-                style={{ fontFamily: FONT_OPTIONS[font].fontFamily }}
-                aria-hidden="true"
-              >
-                {glyph}
-              </span>
-              {t(labelKey)}
-              {selected && (
-                <Icon
-                  name={ICONS.TICK}
-                  size={ICON_SIZE.MD}
-                  strokeWidth={ICON_STROKE_WIDTH.CHIP_TICK}
-                  className={tick()}
-                />
-              )}
-            </Radio.Root>
-            <span id={descriptionId} className={description()}>
-              {t(`${labelKey}Description`)}
-            </span>
-          </Fragment>
-        );
-      })}
-    </RadioGroup>
+    <div className={root()}>
+      <div ref={rowRef} className={row()}>
+        {isOverflowing && !isLgUp && selected ? (
+          <PresetSheet
+            presets={presets}
+            selected={selected}
+            onChange={onChange}
+            {...access}
+          />
+        ) : (
+          <PresetChips
+            presets={visible}
+            value={value}
+            onChange={onChange}
+            {...access}
+          />
+        )}
+        {isOverflowing && isLgUp && (
+          <MorePresetsPopover
+            presets={presets}
+            value={value}
+            onChange={onChange}
+            hiddenCount={presets.length - visible.length}
+            anchorRef={rowRef}
+            describedBy={describedBy}
+            isDisabled={isDisabled}
+          />
+        )}
+      </div>
+      <div
+        ref={measureRef}
+        className={measure()}
+        aria-hidden="true"
+        inert={true}
+      >
+        <PresetChips
+          presets={presets}
+          value={value}
+          onChange={onChange}
+          labelledBy={labelledBy}
+        />
+        <span className={morePresetsButtonVariants()}>
+          <MorePresetsLabel hiddenCount={presets.length} />
+        </span>
+      </div>
+    </div>
   );
 };

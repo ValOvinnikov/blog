@@ -5,6 +5,7 @@ import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ACCENT_HUE,
   EDIT_TAB,
@@ -78,8 +79,11 @@ describe(`<${LookForm.name}/>`, () => {
       expect(updateLookAction).not.toHaveBeenCalled();
     });
 
-    it('focuses the accent hue slider from the save bar', async () => {
-      await clickGoToTheFirstOne(user);
+    it.each([
+      { source: 'the save bar link', act: clickGoToTheFirstOne },
+      { source: 'a refused Save', act: clickSave },
+    ])('focuses the accent hue slider from $source', async ({ act }) => {
+      await act(user);
 
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });
       expect(slider).toHaveFocus();
@@ -88,7 +92,7 @@ describe(`<${LookForm.name}/>`, () => {
     it('returns to the Edit tab to focus the accent hue slider from the Preview', async () => {
       const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
       await user.click(previewTab);
-      await clickGoToTheFirstOne(user);
+      await user.keyboard(USER_EVENT_KEY.CONTROL_S);
 
       const editTab = screen.getByRole('tab', { name: EDIT_TAB });
       const slider = screen.getByRole('slider', { name: ACCENT_HUE });

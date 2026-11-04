@@ -177,7 +177,9 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Breadcrumb"
+    "breadcrumbAriaLabel": "Breadcrumb",
+    "showFullPath": "Show full path",
+    "fullPathMenuLabel": "Full path"
   },
   "account": {
     "signOut": "Sign out",
@@ -576,7 +578,12 @@
     "editorial": "Editorial",
     "editorialDescription": "Serif, warm and magazine-like.",
     "editorialMiniPrimary": "Field Notes",
-    "editorialMiniSecondary": "Dispatches from the coast"
+    "editorialMiniSecondary": "Dispatches from the coast",
+    "morePresets": "More presets",
+    "morePresetsAriaLabel": "More presets, {count} more",
+    "presetCount": "{count, plural, one {# preset} other {# presets}}",
+    "choosePreset": "Choose a preset",
+    "close": "Close"
   },
   "logoHueField": {
     "followAccentHue": "Follow accent hue",

@@ -7,6 +7,11 @@ import { uploadBrandAssetAction } from '@platform/server/site-config/upload-bran
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import {
+  ACCENT_HUE,
+  NUDGED_ACCENT_HUE,
+  RESET_TO_PRESET,
+} from '@platform/testing/look/look-form-fixtures';
+import {
   clickGoToTheFirstOne,
   clickSave,
   lookRowTrigger,
@@ -23,7 +28,6 @@ import {
   MOCK_STAGED_LOGO_BLOB_URL,
   REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { useLookOpenRows } from './use-look-open-rows';
@@ -42,9 +46,6 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action');
 faker.seed(6391);
 
 const { lookForm: LOOK_FORM } = messages;
-const ACCENT_HUE = LOOK_FORM.accentHueLabel;
-const NUDGED_ACCENT_HUE = defaultLookFormValues().accentHue + 1;
-const RESET_TO_PRESET = LOOK_FORM.resetButton;
 
 const saveAndGoToTheFirstOne = async (user: UserEvent) => {
   await clickSave(user);
@@ -100,24 +101,28 @@ describe(useLookOpenRows, () => {
         await nudgeAccentHue(user);
       });
 
-      it('keeps a typed value when its row folds and opens again', async () => {
-        const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
-        await user.click(colourTrigger);
-        await user.click(colourTrigger);
+      describe('with the Colour row folded again', () => {
+        let colourTrigger: HTMLElement;
 
-        const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-        expect(slider).toHaveValue(String(NUDGED_ACCENT_HUE));
-      });
-
-      it('shows the unsaved dot on the changed row only', async () => {
-        const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
-        await user.click(colourTrigger);
-
-        const dots = screen.getAllByRole('img', { name: UNSAVED_CHANGES });
-        const colourDot = within(colourTrigger).getByRole('img', {
-          name: UNSAVED_CHANGES,
+        beforeEach(async () => {
+          colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
+          await user.click(colourTrigger);
         });
-        expect(dots).toEqual([colourDot]);
+
+        it('keeps a typed value when its row opens again', async () => {
+          await user.click(colourTrigger);
+
+          const slider = screen.getByRole('slider', { name: ACCENT_HUE });
+          expect(slider).toHaveValue(String(NUDGED_ACCENT_HUE));
+        });
+
+        it('shows the unsaved dot on the changed row only', () => {
+          const dots = screen.getAllByRole('img', { name: UNSAVED_CHANGES });
+          const colourDot = within(colourTrigger).getByRole('img', {
+            name: UNSAVED_CHANGES,
+          });
+          expect(dots).toEqual([colourDot]);
+        });
       });
 
       it('keeps Reset to preset on a card that is not a folding row', () => {
@@ -131,6 +136,32 @@ describe(useLookOpenRows, () => {
         expect(presetTrigger).not.toBeInTheDocument();
         expect(resetButton).toBeVisible();
       });
+    });
+  });
+
+  describe('from the save bar link to a changed card', () => {
+    let colourTrigger: HTMLElement;
+
+    beforeEach(async () => {
+      await nudgeAccentHue(user);
+      await openLookRow(user, LOOK_ROW.FOOTER);
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const colourLink = within(saveBar).getByRole('button', {
+        name: LOOK_FORM.colourHeading,
+      });
+      await user.click(colourLink);
+      colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
+    });
+
+    it('opens the changed row and folds the open one', () => {
+      const footerTrigger = lookRowTrigger(LOOK_ROW.FOOTER);
+
+      expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(footerTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('moves focus to the changed row button', () => {
+      expect(colourTrigger).toHaveFocus();
     });
   });
 

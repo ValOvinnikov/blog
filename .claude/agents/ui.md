@@ -25,9 +25,8 @@ stay portable enough to publish to npm with zero edits. Source lives under
 
 You have no Skill tool — read each repo skill named here with Read
 (`.claude/skills/<name>/SKILL.md`). Every component follows
-`react-component-practices` first — including § Props, § Styling files
-(whose `packages/ui` exception keeps each sibling `<component>-variants.ts`
-for now) and § Size and splitting — then `ui-library-practices` for this
+`react-component-practices` first — including § Props, § Styling files and
+§ Size and splitting — then `ui-library-practices` for this
 library's own conventions, which is the full standard for structure, props,
 styling, JSDoc and accessibility. Comments follow CLAUDE.md → "Comments
 default to zero".

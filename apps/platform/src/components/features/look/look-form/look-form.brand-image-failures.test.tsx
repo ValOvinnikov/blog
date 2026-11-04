@@ -1,16 +1,21 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
+import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
+  BRAND_IMAGES_HINT,
+  EDIT_TAB,
   hueValue,
   NUDGED_ACCENT_HUE,
+  PREVIEW_TAB,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   clickGoToTheFirstOne,
+  findLogoPickerWithError,
   nudgeAccentHue,
   openLookRow,
   pickAndSaveLogo,
@@ -37,13 +42,9 @@ vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
 vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
-const { lookForm: LOOK_FORM } = messages;
-
 const tUploadErrors = makeEnTranslator('uploadErrors');
 
 const tSaveBar = makeEnTranslator('saveBar');
-
-const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 
 const LOGO_UPLOAD_FAILED = tUploadErrors('uploadFailed', { kind: 'logo' });
 
@@ -91,6 +92,22 @@ describe(`<${LookForm.name}/>`, () => {
         expect(hueReadout).toBeVisible();
       });
 
+      it('returns to the Edit tab and focuses the picker when saved from the Preview', async () => {
+        await pickLogo(user);
+        const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
+        await user.click(previewTab);
+        await user.keyboard(USER_EVENT_KEY.CONTROL_S);
+
+        const replaceLogoButton = await screen.findByRole('button', {
+          name: REPLACE_LOGO,
+        });
+        const editTab = screen.getByRole('tab', { name: EDIT_TAB });
+        await waitFor(() => {
+          expect(replaceLogoButton).toHaveFocus();
+        });
+        expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      });
+
       describe('after saving a picked logo', () => {
         beforeEach(async () => {
           await pickAndSaveLogo(user);
@@ -103,9 +120,7 @@ describe(`<${LookForm.name}/>`, () => {
           await waitFor(() => {
             expect(saveBar).toHaveTextContent(tSaveBar('notSaved'));
           });
-          const alert = screen.queryByRole('alert');
           expect(saveBar).toHaveTextContent(ONE_FIELD_NEEDS_ATTENTION);
-          expect(alert).not.toBeInTheDocument();
 
           await clickGoToTheFirstOne(user);
 
@@ -115,15 +130,23 @@ describe(`<${LookForm.name}/>`, () => {
           expect(replaceLogoButton).toHaveFocus();
         });
 
+        it("shows the upload message in the page's error alert", async () => {
+          const alert = await screen.findByRole('alert');
+
+          expect(alert).toHaveTextContent(LOGO_UPLOAD_FAILED);
+        });
+
         it('clears the picker error once a new logo is picked', async () => {
-          await screen.findByText(LOGO_UPLOAD_FAILED);
+          const replaceLogoButton =
+            await findLogoPickerWithError(LOGO_UPLOAD_FAILED);
           await pickLogo(user);
 
-          const error = screen.queryByText(LOGO_UPLOAD_FAILED);
           const attentionLink = screen.queryByRole('link', {
             name: GO_TO_THE_FIRST_ONE,
           });
-          expect(error).not.toBeInTheDocument();
+          expect(replaceLogoButton).toHaveAccessibleDescription(
+            BRAND_IMAGES_HINT,
+          );
           expect(attentionLink).not.toBeInTheDocument();
         });
       });

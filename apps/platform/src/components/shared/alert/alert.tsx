@@ -21,7 +21,7 @@ export type TAlertProps = {
   title?: string;
   description?: ReactNode;
   action?: ReactNode;
-  role?: 'status' | 'alert';
+  role?: 'status' | 'alert' | 'note';
   id?: string;
   className?: string;
 };
@@ -42,7 +42,7 @@ export const Alert = ({
     title: titleSlot,
     description: descriptionSlot,
     action: actionSlot,
-  } = alertVariants({ type });
+  } = alertVariants({ type, isNote: role === 'note' });
 
   return (
     <div id={id} role={role} className={root({ class: className })}>

@@ -52,7 +52,7 @@ touches; this sees the code nobody is touching.
    - Style or taste the workspace's ESLint/Prettier config doesn't flag.
    - A one-line idiom (`.claude/agents/config.md` → "Helpers").
    - Conventions that converge on touch and never through a sweep ticket: a
-     single-consumer `*-variants.ts` (`react-component-practices` § Styling
+     `tv()` still in a `.tsx` (`react-component-practices` § Styling
      files), a single-domain component in `shared/`
      (`react-component-practices` § Where a component lives), file size
      alone (CLAUDE.md → "File size budgets"), a raw type form `@blog/config`

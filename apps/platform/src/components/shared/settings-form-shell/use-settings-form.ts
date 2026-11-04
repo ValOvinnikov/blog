@@ -7,10 +7,14 @@ import {
   type TOutcome,
 } from '@blog/config';
 import type { TLanguageChangeCount } from '@platform/utils/format-language-changes/format-language-changes';
+import {
+  revealFirstInvalidControl,
+  type TInvalidControls,
+} from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useFormSubmission } from '@platform/utils/use-form-submission/use-form-submission';
 import { useId, useState } from 'react';
 
-import type { TInvalidControls } from './components/save-bar/save-bar';
+import type { TSettingsForm } from './settings-form-types';
 import { usePlanRefusal } from './use-plan-refusal';
 import type { TSettingsFormDraft } from './use-settings-draft';
 
@@ -38,20 +42,6 @@ export type TUseSettingsFormArgs<
   invalidControls?: (values: TValues) => TInvalidControls;
   canSave?: (values: TValues) => boolean;
   draft: TSettingsFormDraftConfig<TValues>;
-};
-
-export type TSettingsForm<TValues> = {
-  save: () => Promise<boolean>;
-  discard: () => void;
-  changeCount: number;
-  changesByLanguage: TLanguageChangeCount[];
-  invalidControls: TMaybeUndefined<TInvalidControls>;
-  isPending: boolean;
-  isArchived: boolean;
-  archivedAt: TMaybeUndefined<Date>;
-  archivedNoticeId: string;
-  draft: TSettingsFormDraft<TValues>;
-  planRefusal?: string;
 };
 
 export const useSettingsForm = <
@@ -93,13 +83,22 @@ export const useSettingsForm = <
     onDiscard?.();
   };
 
+  const currentInvalidControls = invalidControls?.(values);
+
+  const save = () => {
+    if (!canSave || canSave(values)) return handleSubmit();
+    if (currentInvalidControls) {
+      revealFirstInvalidControl(currentInvalidControls);
+    }
+    return Promise.resolve(false);
+  };
+
   const form: TSettingsForm<TValues> = {
-    save: () =>
-      canSave && !canSave(values) ? Promise.resolve(false) : handleSubmit(),
+    save,
     discard,
     changeCount: countChanges(values, savedValues),
     changesByLanguage: countChangesByLanguage?.(values, savedValues) ?? [],
-    invalidControls: invalidControls?.(values),
+    invalidControls: currentInvalidControls,
     isPending,
     isArchived,
     archivedAt,

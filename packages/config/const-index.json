@@ -986,6 +986,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "PRESET_LIST_LAYOUT.GRID",
+        "scope": "app:platform",
+        "from": "@platform/constants/preset-list",
+        "file": "apps/platform/src/constants/preset-list.ts"
       }
     ],
     "CAROUSEL": [
@@ -4846,6 +4852,22 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "DIM": [
+      {
+        "ref": "DIALOG_BACKDROP_TONE.DIM",
+        "scope": "app:platform",
+        "from": "@platform/constants/dialog-backdrop",
+        "file": "apps/platform/src/constants/dialog-backdrop.ts"
+      }
+    ],
+    "SCRIM": [
+      {
+        "ref": "DIALOG_BACKDROP_TONE.SCRIM",
+        "scope": "app:platform",
+        "from": "@platform/constants/dialog-backdrop",
+        "file": "apps/platform/src/constants/dialog-backdrop.ts"
+      }
+    ],
     "NOT_CONFIGURED": [
       {
         "ref": "DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED",
@@ -5266,6 +5288,22 @@
         "file": "apps/platform/src/constants/keyboard.ts"
       }
     ],
+    "ArrowUp": [
+      {
+        "ref": "KEY.ARROW_UP",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "ArrowDown": [
+      {
+        "ref": "KEY.ARROW_DOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
     "Home": [
       {
         "ref": "KEY.HOME",
@@ -5293,6 +5331,22 @@
     " ": [
       {
         "ref": "KEY.SPACE",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "Tab": [
+      {
+        "ref": "KEY.TAB",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "Escape": [
+      {
+        "ref": "KEY.ESCAPE",
         "scope": "app:platform",
         "from": "@platform/constants/keyboard",
         "file": "apps/platform/src/constants/keyboard.ts"
@@ -5604,6 +5658,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/owner-studio-access",
         "file": "apps/platform/src/constants/owner-studio-access.ts"
+      }
+    ],
+    "ROWS": [
+      {
+        "ref": "PRESET_LIST_LAYOUT.ROWS",
+        "scope": "app:platform",
+        "from": "@platform/constants/preset-list",
+        "file": "apps/platform/src/constants/preset-list.ts"
       }
     ],
     "RESPONSIVE": [

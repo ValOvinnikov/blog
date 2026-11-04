@@ -328,10 +328,13 @@
   --text-admin-24: 24px;
   --text-admin-28: 28px;
 
+  --tracking-admin-label: 0.09em;
+
   --leading-admin-14: 14px;
   --leading-admin-1-4: 1.4;
   --leading-admin-1-45: 1.45;
   --leading-admin-18: 18px;
+  --leading-admin-19: 19px;
   --leading-admin-22: 22px;
 
   --font-weight-admin-650: 650;
@@ -377,4 +380,5 @@
   --shadow-admin-dock: var(--admin-shadow-dock);
   --shadow-admin-xs: var(--admin-shadow-xs);
   --shadow-admin-thumb: var(--admin-shadow-thumb);
+  --shadow-admin-choice-ring: 0 0 0 3px var(--admin-brand-weak);
 }

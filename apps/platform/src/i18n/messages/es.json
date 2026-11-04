@@ -177,7 +177,9 @@
     "triggerLabel": "Menú"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Ruta de navegación"
+    "breadcrumbAriaLabel": "Ruta de navegación",
+    "showFullPath": "Mostrar la ruta completa",
+    "fullPathMenuLabel": "Ruta completa"
   },
   "account": {
     "signOut": "Cerrar sesión",
@@ -576,7 +578,12 @@
     "editorial": "Editorial",
     "editorialDescription": "Con serifa, cálida y de estilo revista.",
     "editorialMiniPrimary": "Field Notes",
-    "editorialMiniSecondary": "Crónicas desde la costa"
+    "editorialMiniSecondary": "Crónicas desde la costa",
+    "morePresets": "Más ajustes",
+    "morePresetsAriaLabel": "Más ajustes, {count} más",
+    "presetCount": "{count, plural, one {# ajuste} other {# ajustes}}",
+    "choosePreset": "Elige un ajuste predefinido",
+    "close": "Cerrar"
   },
   "logoHueField": {
     "followAccentHue": "Seguir el tono de acento",

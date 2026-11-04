@@ -20,7 +20,7 @@ const addressVerdictVariants = tv({
       'rounded-admin border py-[7px] pr-3 pl-[9px]',
     ],
     glyph: ['flex h-[19px] shrink-0 items-center'],
-    message: ['min-w-0 text-admin-13-5 leading-[19px] font-semibold'],
+    message: ['min-w-0 text-admin-13-5 leading-admin-19 font-semibold'],
     announcement: ['sr-only'],
   },
   variants: {

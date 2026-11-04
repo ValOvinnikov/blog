@@ -5,10 +5,17 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
+import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { brandCardVariants } from './brand-card-variants';
+const brandCardVariants = tv({
+  slots: {
+    uploads: ['flex flex-col gap-[5px]'],
+    rows: ['flex flex-col gap-2'],
+    hint: ['text-admin-11-5 text-admin-muted'],
+  },
+});
 
 export type TBrandCardProps = {
   summary: string;
@@ -42,7 +49,6 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
     <LookCard
       summary={summary}
       card={LOOK_ROW.BRAND}
-      title={t('brandHeading')}
       description={t('brandImagesDescription')}
     >
       <div className={uploads()}>

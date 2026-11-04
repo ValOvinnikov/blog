@@ -8,6 +8,7 @@ import {
 
 const { lookForm: LOOK_FORM } = messages;
 const tLogoHue = makeEnTranslator('logoHueField');
+const tSaveBar = makeEnTranslator('saveBar');
 
 export const ACCENT_HUE = LOOK_FORM.accentHueLabel;
 export const DEFAULT_ACCENT_HUE = defaultLookFormValues().accentHue;
@@ -17,6 +18,7 @@ export const EDITORIAL_ACCENT_HUE =
 export const MOCK_SAVED_ACCENT_HUE = 260;
 export const FOLLOW_ACCENT_HUE = messages.logoHueField.followAccentHue;
 export const UPLOAD_FAVICON = messages.assetUploadField.favicon.upload;
+export const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 export const RESET_TO_PRESET = LOOK_FORM.resetButton;
 export const EXTRA_LARGE = LOOK_FORM.radiusScaleOptionLabel.XL;
 export const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
@@ -24,14 +26,13 @@ export const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
 export const HEADER_LAYOUT_LABEL = LOOK_FORM.headerLayoutLabel;
 export const SPINNER_LABEL = LOOK_FORM.spinnerStyleLabel;
 export const FOOTER_LAYOUT_LABEL = LOOK_FORM.footerLayoutLabel;
-export const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
 export const DATA_DISABLED = 'data-disabled';
-export const SAVING = 'Saving…';
-export const EDITORIAL = 'Editorial';
-export const CONSOLE = 'Console';
-export const DISCARD = 'Discard';
-export const EDIT_TAB = 'Edit';
-export const PREVIEW_TAB = 'Preview';
+export const SAVING = tSaveBar('saving');
+export const EDITORIAL = messages.presetPicker.editorial;
+export const CONSOLE = messages.presetPicker.console;
+export const DISCARD = tSaveBar('discard');
+export const EDIT_TAB = messages.viewTabs.editTab;
+export const PREVIEW_TAB = messages.viewTabs.previewTab;
 
 export const hueValue = (hue: number) => tLogoHue('hueValue', { hue });
 

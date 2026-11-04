@@ -177,7 +177,9 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Fil d'Ariane"
+    "breadcrumbAriaLabel": "Fil d'Ariane",
+    "showFullPath": "Afficher le chemin complet",
+    "fullPathMenuLabel": "Chemin complet"
   },
   "account": {
     "signOut": "Se déconnecter",
@@ -576,7 +578,12 @@
     "editorial": "Éditorial",
     "editorialDescription": "Serif, chaleureux, esprit magazine.",
     "editorialMiniPrimary": "Carnet de terrain",
-    "editorialMiniSecondary": "Chroniques du littoral"
+    "editorialMiniSecondary": "Chroniques du littoral",
+    "morePresets": "Autres préréglages",
+    "morePresetsAriaLabel": "Autres préréglages, {count} de plus",
+    "presetCount": "{count, plural, one {# préréglage} other {# préréglages}}",
+    "choosePreset": "Choisir un préréglage",
+    "close": "Fermer"
   },
   "logoHueField": {
     "followAccentHue": "Suivre la teinte d'accent",

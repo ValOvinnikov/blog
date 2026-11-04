@@ -77,7 +77,7 @@ signals, and where hooks and helpers go, are `react-component-practices` →
 ```
 auth-menu/
   auth-menu.tsx           # dispatcher: Spinner | AccountMenu | SignInMenu
-  auth-menu-variants.ts   # `panel` (both menus) + `statusIndicator` (dispatcher only — a leftover)
+  auth-menu-variants.ts   # `panel` (both menus) + `statusIndicator` (dispatcher only)
   components/
     account-menu/
       account-menu.tsx    # signed-in branch
@@ -93,8 +93,6 @@ them. A diff that touches one fixes it:
   lives").
 - `use-email-sign-in.ts` sits in a one-entry `hooks/` → beside
   `sign-in-menu.tsx`.
-- `statusIndicator`, and each menu's single-consumer `*-variants.ts` → a
-  `tv()` in the `.tsx` that renders them ("Styling files").
 - The popover state reaches each menu as five forwarded props (`panelId`,
   `isOpen`, `toggle`, `triggerRef`, `panelRef`) → one object typed from its
   source ("Props").
