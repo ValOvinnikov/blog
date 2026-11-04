@@ -115,11 +115,11 @@ const HOME_LINK_NAME = 'Home';
 describe(`<${SiteHeader.name}/>`, () => {
   let user: UserEvent;
 
+  const queryPhoneMenuToggle = () =>
+    screen.queryByRole('button', { name: TOGGLE_NAVIGATION_MENU });
+
   const openPhoneMenu = async () => {
-    const toggleButton = screen.getByRole('button', {
-      name: TOGGLE_NAVIGATION_MENU,
-    });
-    await user.click(toggleButton);
+    await user.click(queryPhoneMenuToggle()!);
   };
 
   const getDrawerAccountRow = (name: string) => {
@@ -270,9 +270,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       const [, phoneCircle] = getBarSignInButtons();
       await user.click(phoneCircle!);
 
-      const toggleButton = screen.getByRole('button', {
-        name: TOGGLE_NAVIGATION_MENU,
-      });
+      const toggleButton = queryPhoneMenuToggle();
 
       expect(toggleButton).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
@@ -307,9 +305,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     it('shows no phone menu button with the account in the bar', async () => {
       await setup();
 
-      const toggleButton = screen.queryByRole('button', {
-        name: TOGGLE_NAVIGATION_MENU,
-      });
+      const toggleButton = queryPhoneMenuToggle();
 
       expect(toggleButton).not.toBeInTheDocument();
     });
