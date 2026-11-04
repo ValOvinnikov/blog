@@ -445,9 +445,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_CARD**: `PRESET`
 
+### `@platform/constants/look-group` — `apps/platform/src/constants/look-group.ts`
+
+- **LOOK_GROUP**: `STYLE`, `SITE_PARTS`
+
 ### `@platform/constants/look-layout` — `apps/platform/src/constants/look-layout.ts`
 
-- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `DOCKED_SAVE_BAR_HEIGHT`=`64`, `DOCKED_SAVE_BAR_CLEARANCE`=`16`
+- **LOOK_LAYOUT_LIMIT**: `TWO_COLUMN_MIN_WIDTH`=`900`, `DOCKED_SAVE_BAR_HEIGHT`=`64`, `DOCKED_SAVE_BAR_CLEARANCE`=`16`, `ANCHOR_SETTLE_MS`=`400`
 
 ### `@platform/constants/look-row` — `apps/platform/src/constants/look-row.ts`
 

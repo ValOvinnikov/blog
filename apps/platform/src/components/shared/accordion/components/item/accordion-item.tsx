@@ -18,12 +18,14 @@ const AccordionItemParts = {
 
 export type TAccordionItemProps = {
   value: string;
+  id?: string;
   children: TCompoundChildren<typeof AccordionItemParts>;
   className?: string;
 };
 
 export const AccordionItem = ({
   value,
+  id,
   children,
   className,
 }: TAccordionItemProps) => {
@@ -33,6 +35,7 @@ export const AccordionItem = ({
   return (
     <BaseAccordion.Item
       value={value}
+      id={id}
       render={isList ? <li /> : undefined}
       className={({ index, open }) =>
         accordionVariants({ variant, isFirst: index === 0, isOpen: open }).item(

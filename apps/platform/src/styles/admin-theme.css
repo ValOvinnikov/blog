@@ -83,6 +83,8 @@
   --admin-view-tab: 44px;
   --admin-view-tab-border: 1px;
   --admin-view-tabs: calc(var(--admin-view-tab) + var(--admin-view-tab-border));
+  /* The Look jump index's rendered height: the phone chip row, then the desktop bar from lg. */
+  --admin-look-index: 65px;
 }
 
 @media (width >= 48rem) {
@@ -96,6 +98,7 @@
     --admin-view-tabs: calc(
       var(--admin-view-tab) + 2 * var(--admin-view-tab-border)
     );
+    --admin-look-index: 46px;
   }
 }
 
@@ -345,6 +348,7 @@
   --spacing-admin-bar: 3px;
   --spacing-admin-view-tab: var(--admin-view-tab);
   --spacing-admin-view-tabs: var(--admin-view-tabs);
+  --spacing-admin-look-index: var(--admin-look-index);
   --spacing-admin-form-gap: 18px;
   --spacing-admin-content: 26px;
   --spacing-admin-sidebar: 264px;
