@@ -1,14 +1,13 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TBreadcrumbItem } from '@platform/components/shared/breadcrumbs/breadcrumbs';
 
-export type TCrumbLink = { label: string; href: string };
+export type TCrumbLink = Required<Pick<TBreadcrumbItem, 'label' | 'href'>>;
 
 type TCrumbGroup = {
   label: TMaybeUndefined<string>;
   links: TCrumbLink[];
 };
 
-/** Splits a run of crumbs into menu groups, each page-less crumb heading the links after it. */
 export const groupCrumbs = (items: TBreadcrumbItem[]): TCrumbGroup[] =>
   items.reduce<TCrumbGroup[]>((groups, { label, href }) => {
     if (!href) {

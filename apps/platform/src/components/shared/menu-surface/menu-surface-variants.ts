@@ -1,5 +1,8 @@
 import { tv } from '@platform/utils/tv/tv';
 
+export const MENU_GROUP_LABEL_TYPE =
+  'text-admin-11 leading-admin-14 font-bold tracking-admin-label text-admin-muted uppercase';
+
 export const menuSurfaceVariants = tv({
   slots: {
     popup: [
@@ -11,8 +14,6 @@ export const menuSurfaceVariants = tv({
       'text-admin-13 font-medium text-admin-text outline-none [&+&]:mt-0.5',
       'data-[highlighted]:bg-admin-popover-hover',
     ],
-    groupLabel: [
-      'px-2 pt-2 pb-1 text-admin-11 font-bold tracking-[.09em] text-admin-muted uppercase',
-    ],
+    groupLabel: [MENU_GROUP_LABEL_TYPE, 'px-2 pt-2 pb-1'],
   },
 });

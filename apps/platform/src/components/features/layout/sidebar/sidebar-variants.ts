@@ -34,7 +34,7 @@ export const sidebarVariants = tv({
     foot: ['flex-none border-t border-admin-side-line p-3'],
     section: ['flex flex-col gap-1.5 px-3 pt-[14px]'],
     sectionLabel: [
-      'truncate px-2.5 pb-1.5 text-admin-11 font-bold tracking-[0.09em] text-admin-side-muted uppercase',
+      'truncate px-2.5 pb-1.5 text-admin-11 font-bold tracking-admin-label text-admin-side-muted uppercase',
       'group-data-[collapsed=true]/shell:hidden',
     ],
     list: ['flex flex-col gap-0.5'],

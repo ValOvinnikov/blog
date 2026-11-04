@@ -13,7 +13,7 @@ import {
 } from '@platform/testing/custom-render';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { Breadcrumbs } from './breadcrumbs';
 
@@ -153,49 +153,54 @@ describe(`<${Breadcrumbs.name}/>`, () => {
   });
 
   describe('on a trail whose hidden crumbs include a link', () => {
-    it('offers a collapsed menu button for the full path', () => {
+    let trigger: HTMLElement;
+
+    beforeEach(() => {
       setup({ items: MOCK_TENANT_PAGE_TRAIL });
+      trigger = screen.getByRole('button', { name: showFullPath });
+    });
 
-      const trigger = screen.getByRole('button', { name: showFullPath });
-
+    it('offers a collapsed menu button for the full path', () => {
       expect(trigger).toHaveAttribute(ARIA_HASPOPUP, 'menu');
       expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
-    it('lists the page-less crumb as a group label over its links', async () => {
-      const user = userEvent.setup();
-      setup({ items: MOCK_TENANT_PAGE_TRAIL });
-      const trigger = screen.getByRole('button', { name: showFullPath });
+    describe('once opened', () => {
+      let user: UserEvent;
+      let menu: HTMLElement;
+      let tenantsItem: HTMLElement;
 
-      await user.click(trigger);
-      const menu = await screen.findByRole('menu', { name: fullPathMenuLabel });
-      const group = within(menu).getByRole('group', { name: MOCK_PLATFORM });
-      const items = within(menu).getAllByRole('menuitem');
-      const tenantsItem = within(group).getByRole('menuitem', {
-        name: MOCK_TENANTS,
+      beforeEach(async () => {
+        user = userEvent.setup();
+        await user.click(trigger);
+        menu = await screen.findByRole('menu', { name: fullPathMenuLabel });
+        tenantsItem = within(menu).getByRole('menuitem', {
+          name: MOCK_TENANTS,
+        });
       });
 
-      expect(items).toEqual([tenantsItem]);
-      expect(tenantsItem).toHaveAttribute('href', adminRoutes.tenants());
-    });
+      it('lists the page-less crumb as a group label over its links', () => {
+        const group = within(menu).getByRole('group', { name: MOCK_PLATFORM });
+        const groupItems = within(group).getAllByRole('menuitem');
+        const items = within(menu).getAllByRole('menuitem');
 
-    it('focuses the first link, and returns focus to the button on Escape', async () => {
-      const user = userEvent.setup();
-      setup({ items: MOCK_TENANT_PAGE_TRAIL });
-      const trigger = screen.getByRole('button', { name: showFullPath });
-
-      await user.click(trigger);
-      const menu = await screen.findByRole('menu', { name: fullPathMenuLabel });
-      const tenantsItem = within(menu).getByRole('menuitem', {
-        name: MOCK_TENANTS,
+        expect(items).toEqual([tenantsItem]);
+        expect(groupItems).toEqual([tenantsItem]);
+        expect(tenantsItem).toHaveAttribute('href', adminRoutes.tenants());
       });
-      await waitFor(() => {
-        expect(tenantsItem).toHaveFocus();
-      });
-      await user.keyboard('{Escape}');
 
-      await waitFor(() => {
-        expect(trigger).toHaveFocus();
+      it('moves focus to the first link', async () => {
+        await waitFor(() => {
+          expect(tenantsItem).toHaveFocus();
+        });
+      });
+
+      it('returns focus to the button on Escape', async () => {
+        await user.keyboard('{Escape}');
+
+        await waitFor(() => {
+          expect(trigger).toHaveFocus();
+        });
       });
     });
   });

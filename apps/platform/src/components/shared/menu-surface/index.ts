@@ -1,1 +1,4 @@
-export { menuSurfaceVariants } from './menu-surface-variants';
+export {
+  MENU_GROUP_LABEL_TYPE,
+  menuSurfaceVariants,
+} from './menu-surface-variants';

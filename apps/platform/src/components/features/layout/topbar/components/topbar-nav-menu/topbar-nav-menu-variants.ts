@@ -2,21 +2,16 @@ import {
   NAV_CURRENT_BAR,
   NAV_ROW_SHAPE,
 } from '@platform/components/features/layout/sidebar/sidebar-variants';
-import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { BAR_CONTROL_CLASSES } from '@platform/utils/bar-control-classes/bar-control-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const topbarNavMenuVariants = tv({
   slots: {
     trigger: [
+      ...BAR_CONTROL_CLASSES,
       'md:hidden',
-      'inline-flex size-11 shrink-0 items-center justify-center rounded-admin-control',
-      'border border-admin-control-line bg-admin-surface text-admin-muted',
-      'transition-colors duration-base ease-smooth',
-      'hover:border-admin-brand-ink',
-      'focus-visible:border-admin-brand-ink',
-      focusRingClasses(FOCUS_RING_GROUND.BG),
-      'data-[popup-open]:border-admin-brand-ink data-[popup-open]:text-admin-text',
+      'inline-flex size-11 shrink-0 items-center justify-center text-admin-muted',
+      'focus-visible:border-admin-brand-ink data-[popup-open]:text-admin-text',
     ],
     popup: [
       'flex w-72 max-w-[var(--available-width)] flex-col overflow-hidden p-1.5',
