@@ -3,8 +3,10 @@ import {
   getModulePickerSections,
   getOffPlanModulePack,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
+import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
+import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
@@ -32,6 +34,25 @@ describe(getModulePickerSections, () => {
 
     expect(sections.map(({ name, types }) => [name, types])).toEqual([
       [MOCK_GROUP, TYPES],
+    ]);
+  });
+
+  it('restores a locked module to its place when the list puts it last', () => {
+    const contactFormType = { name: contactFormSchema.name };
+    const newsletterType = { name: newsletterSchema.name };
+    const sections = getModulePickerSections({
+      types: [CTA_TYPE, newsletterType, contactFormType],
+      groups: [
+        {
+          name: MOCK_GROUP,
+          of: [CTA_TYPE.name, contactFormType.name, newsletterType.name],
+        },
+      ],
+      query: '',
+    });
+
+    expect(sections.map(({ types }) => types)).toEqual([
+      [CTA_TYPE, contactFormType, newsletterType],
     ]);
   });
 

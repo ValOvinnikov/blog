@@ -37,13 +37,14 @@ export const getModulePickerSections = <T extends TPickerType>({
   const matching = types.filter(({ name }) =>
     getModuleTitle(name).toLowerCase().includes(needle),
   );
+  const matchingByName = new Map(matching.map((type) => [type.name, type]));
   const grouped = new Set(groups.flatMap((group) => group.of ?? []));
 
   return [
     ...groups.map((group) => ({
       name: group.name,
       title: group.title ?? group.name,
-      types: matching.filter(({ name }) => group.of?.includes(name)),
+      types: (group.of ?? []).flatMap((name) => matchingByName.get(name) ?? []),
     })),
     {
       name: UNGROUPED_SECTION,
