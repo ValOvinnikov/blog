@@ -275,9 +275,6 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
 ## Styling
 
 - **Where a `tv()` lives:** `react-component-practices` § Styling files.
-  **This package's exception:** a `tv()` is never folded into the `.tsx` here;
-  it stays in a `-variants.ts` because `scripts/gen-ui-index.mjs` reads it,
-  until the generator reads an inline `tv()`.
 - **No Tailwind classes inline in JSX, on any element** — root or inner
   (placeholder spans, icon wrappers). Every class goes through the `tv()`.
 - **Import `tv` from `@blog/ui/lib/styling`**, never from `tailwind-variants`

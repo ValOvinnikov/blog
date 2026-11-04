@@ -313,7 +313,7 @@ A component with several exported parts follows
   rows, cells) renders `children` directly; a slot-shaped sub-part of it uses
   the helper.
 - Where the parts' `tv()` lives is `react-component-practices` → "Styling
-  files"; sibling parts sharing one count as its second consumer.
+  files".
 
 ## Function style
 
@@ -334,9 +334,9 @@ this rule across.
   `rounded-admin`). `index.css` also imports `@blog/tailwind-config/theme.css`,
   but only for `site-preview/`; a site token, a hex or a raw palette colour
   anywhere else is wrong (`platform-ui-practices` → "Colour and contrast").
-- **No class strings inline in JSX** — classes live in a module-scope `tv()`.
-  Whether it sits in the `.tsx` or a `*-variants.ts` is
-  `react-component-practices` → "Styling files". Import `tv` from
+- **No class strings inline in JSX** — classes live in a module-scope `tv()`
+  in a sibling `*-variants.ts` (`react-component-practices` → "Styling
+  files"). Import `tv` from
   `@platform/utils/tv/tv`: its tailwind-merge config registers the admin text
   sizes, which plain `tailwind-variants` misreads as colours and drops. Pass
   `class: className` into the call; never `cn()`. Group classes by concern in
