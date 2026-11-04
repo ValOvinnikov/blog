@@ -10,6 +10,7 @@ import type {
   TLookFormFieldSetter,
   TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
+import type { TPresetSeededField } from '@platform/utils/look-preset/look-preset';
 import { createContext, useContext } from 'react';
 
 export type TLookFormContext = {
@@ -25,6 +26,8 @@ export type TLookFormContext = {
   brandAssetFieldIds: Record<TBrandAssetKind, string>;
   brandImageError: TMaybeUndefined<{ kind: TBrandAssetKind; message: string }>;
   changePreset: (preset: TPresetId) => void;
+  isPresetValue: (field: TPresetSeededField) => boolean;
+  resetFieldToPreset: (field: TPresetSeededField) => void;
   resetToPreset: () => void;
   isSubmenuPreviewOpen: boolean;
   setIsSubmenuPreviewOpen: (isOpen: boolean) => void;

@@ -1527,7 +1527,7 @@ renders in either role. Only the Console pair and the mono font preload. Fonts a
 woff2 files (SIL OFL, `OFL.txt` alongside) are committed beside each app's
 loaders, so no build fetches Google Fonts. `apps/web/src/proxy.ts` resolves the request's tenant from
 its `Host` header against `@blog/db`'s `tenant_domains`
-(`resolveTenantId()`, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
+(`resolveTenantRouting()`, uncached, `apps/web/src/server/tenant/resolve-tenant/`), falling back to the
 sole `tenants` row outside production (`isProductionEnvironment()` — never
 `NODE_ENV`, which is `production` on every Vercel build including the live
 `web-dev` deployment) and 404ing on an unmatched host in production; the

@@ -223,9 +223,12 @@ most expensive kind of mistake to find later, because nothing fails — both
 versions work. No check catches a value or fixture repeated across files, so
 the search is the gate: every implementing agent reports it in a required
 **Reuse** item — for each const, literal value, fixture, builder, fake or
-helper the diff adds, where it looked (`packages/config/const-index.json`, the
-workspace's `src/testing/` and `__mocks__/`, the nearest sibling) and what it
-found. A missing or empty Reuse item is a blocking review finding.
+helper the diff adds, where it looked (`packages/config/const-index.json`,
+`packages/utils/src/`, the workspace's `src/testing/` and `__mocks__/`, the
+nearest sibling) and what it found. A missing or empty Reuse item is a
+blocking review finding. `@blog/utils` holds the shared small helpers, so
+before writing a comparison, type check, emptiness test or small transform,
+look there first.
 
 When something similar already exists and it is not obvious whether to extend
 it or add alongside it, that is **not** a judgement call to settle quietly.

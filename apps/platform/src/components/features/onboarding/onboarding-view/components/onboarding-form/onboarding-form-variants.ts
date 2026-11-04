@@ -23,7 +23,7 @@ export const onboardingFormVariants = tv({
     fields: ['mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],
     railPreview: ['mt-8'],
     previewColumn: [
-      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-admin-bg px-7 py-8',
+      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-admin-bg px-7 py-8 shadow-[inset_1px_0_0_var(--admin-preview-column-line)]',
     ],
     phonePreview: [
       'flex-1 border-t border-admin-line bg-admin-bg px-3 pt-5 pb-6 md:hidden',
