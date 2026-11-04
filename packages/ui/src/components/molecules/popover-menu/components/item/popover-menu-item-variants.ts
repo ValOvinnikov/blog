@@ -23,10 +23,7 @@ export const popoverMenuItemVariants = tv({
         'font-medium',
         'hover:border-brand-primary hover:bg-transparent',
       ],
-      tile: [
-        'flex-col items-start gap-1.5 rounded-md border border-border p-3',
-        'hover:border-brand-primary hover:bg-surface',
-      ],
+      tile: ['flex-col items-start gap-1.5 item-card rounded-item p-3'],
     },
   },
 });

@@ -146,9 +146,11 @@ floating card at the foot of the page.
   section lists Tenants and Findings, plus Releases, Blocked sign-ups and Data
   requests for a SUPERADMIN. Add tenant is the Tenants page's primary action,
   not a row; its breadcrumb leaf on `/tenants/new` is named explicitly.
-- The current row is decided once, by `isCurrentNavHref`, for the sidebar and
-  the phone Menu alike: the row whose href is the pathname, and Tenants on
-  `/tenants/new` (an explicit match, not a prefix rule).
+- The current row is decided once, by `isCurrentNavHref`, for the sidebar, the
+  rail and the phone Menu alike: the row whose href is the pathname, Tenants on
+  `/tenants/new` (an explicit match, not a prefix rule), and a Studio row on
+  every path under its own, so it stays current while the embedded Studio
+  navigates.
 - On `/dashboard`, the plan decides which items appear (`planPageAccess`, see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
   than one plan locale, Email a mail-sending capability, and the inert "Coming
@@ -341,7 +343,9 @@ floating card at the foot of the page.
   the inner popup onto its trigger, a second Escape closes the Menu onto its
   button, and choosing a workspace closes both. The Menu button takes a
   `brand-ink` border on hover, focus (with the bg-gapped ring) and open, and
-  a `text` icon while open. Its inert rows are disabled menu items (`role="menuitem"`,
+  a `text` icon while open. It is named "Menu", carries no native `title`,
+  and shows that name in the shared Tooltip below it, left-aligned, 6px away.
+  Its inert rows are disabled menu items (`role="menuitem"`,
   `aria-disabled`, outside Base UI's item list), so arrow keys skip them and
   they take no focus; they keep the enabled rows' label and icon colours and
   change nothing on hover. Its neutral pills sit on `pill-neutral-popover`,

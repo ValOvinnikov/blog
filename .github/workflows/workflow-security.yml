@@ -1,9 +1,13 @@
 name: Workflow security
 
 on:
-  # Never path- or branch-filtered: this check is required, and a skipped
-  # required check sits "Pending" forever instead of failing (see ci.yml).
+  # Never path- or branch-filtered: this check is required, and a required
+  # check that never starts sits "Pending" forever instead of failing (see
+  # ci.yml).
+  # The job skips on a draft, so `ready_for_review` is what scans a PR once it
+  # is marked ready; the default types omit it.
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_call:
     inputs:
       ref:
@@ -27,6 +31,7 @@ env:
 jobs:
   workflow-security:
     name: Workflow security
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

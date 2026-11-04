@@ -17,6 +17,7 @@ import type {
   TEmailCopyEdit,
 } from '@platform/utils/email-draft/email-draft';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
+import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
@@ -119,9 +120,7 @@ export const EmailTemplateEditor = ({
               onChange={handleBodyChange}
               field={{
                 label: t('bodyLabel', { language: languageName }),
-                describedBy: [bodyHintId, archivedDescribedBy]
-                  .filter(Boolean)
-                  .join(' '),
+                describedBy: joinIds(bodyHintId, archivedDescribedBy),
               }}
               mode={isDisabled ? CONTROL_MODE.DISABLED : CONTROL_MODE.EDITABLE}
             />
