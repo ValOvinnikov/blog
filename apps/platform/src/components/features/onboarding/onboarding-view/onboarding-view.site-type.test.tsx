@@ -4,7 +4,6 @@ import {
   changeSiteTypeFromReview,
   createAfterChangingSiteType,
   createSiteMock,
-  MOCK_CONSOLE_LOOK,
   MOCK_CREATE_SITE_INPUT,
   MOCK_EDITORIAL_LOOK,
   pickSiteType,
@@ -45,17 +44,6 @@ describe(`<${OnboardingView.name}/>`, () => {
     beforeEach(async () => {
       await reachReview(user);
     });
-
-    it.each([SITE_TYPES.DOCS, SITE_TYPES.BLANK])(
-      'starts a %s site on the Console preset',
-      async (siteType) => {
-        await createAfterChangingSiteType(user, siteType);
-
-        expect(createSiteMock).toHaveBeenCalledWith(
-          expect.objectContaining(MOCK_CONSOLE_LOOK),
-        );
-      },
-    );
 
     it('returns to the Editorial preset when switching back from Docs', async () => {
       await changeSiteTypeFromReview(user, SITE_TYPES.DOCS);

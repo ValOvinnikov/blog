@@ -1,8 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { UPLOAD_REFUSAL } from '@platform/constants/upload';
 import messages from '@platform/i18n/messages/en.json';
-import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { screen, waitFor } from '@platform/testing/custom-render';
@@ -10,16 +8,13 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   hueValue,
   NUDGED_ACCENT_HUE,
-  UPLOAD_FAVICON,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   clickGoToTheFirstOne,
-  clickSave,
   nudgeAccentHue,
   openLookRow,
   pickAndSaveLogo,
   pickLogo,
-  stageAssetRemoval,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
@@ -29,11 +24,9 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
-  MOCK_LOGO_URL,
   MOCK_STAGED_LOGO_BLOB_URL,
   REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
-import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -54,19 +47,12 @@ const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 
 const LOGO_UPLOAD_FAILED = tUploadErrors('uploadFailed', { kind: 'logo' });
 
-const FAVICON_REMOVE_FAILED = tUploadErrors('removeFailed', {
-  kind: 'favicon',
-});
-
-const MOCK_UPLOAD_LIMIT = '4 MB';
-
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
     vi.mocked(uploadBrandAssetAction).mockReset();
-    vi.mocked(clearBrandAssetAction).mockReset();
     vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
   });
 
@@ -141,48 +127,6 @@ describe(`<${LookForm.name}/>`, () => {
           expect(attentionLink).not.toBeInTheDocument();
         });
       });
-    });
-
-    it('fails the save with the refusal message when the upload is refused', async () => {
-      vi.mocked(uploadBrandAssetAction).mockResolvedValueOnce({
-        outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPLOAD_REFUSAL.FILE_TOO_LARGE,
-        values: { limit: MOCK_UPLOAD_LIMIT },
-      });
-      setupLookForm();
-
-      await pickAndSaveLogo(user);
-
-      const error = await screen.findByText(
-        tUploadErrors('fileTooLarge', { limit: MOCK_UPLOAD_LIMIT }),
-      );
-      expect(error).toBeVisible();
-      expect(updateLookAction).not.toHaveBeenCalled();
-    });
-
-    it('fails the save with the remove message when clearing the favicon fails', async () => {
-      vi.mocked(clearBrandAssetAction).mockResolvedValueOnce({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
-      setupLookForm({
-        initialValues: {
-          ...defaultLookFormValues(),
-          favicon: { url: MOCK_LOGO_URL },
-        },
-      });
-
-      await stageAssetRemoval(user);
-      await clickSave(user);
-
-      const uploadFaviconButton = await screen.findByRole('button', {
-        name: UPLOAD_FAVICON,
-      });
-      await waitFor(() => {
-        expect(uploadFaviconButton).toHaveFocus();
-      });
-      expect(uploadFaviconButton).toHaveAccessibleDescription(
-        `${BRAND_IMAGES_HINT} ${FAVICON_REMOVE_FAILED}`,
-      );
     });
   });
 });

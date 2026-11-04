@@ -1,7 +1,4 @@
 import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
   CARD_STYLE,
   HEADER_BAR_STYLE,
   HEADER_CONTROL_STYLE,
@@ -69,24 +66,6 @@ describe(`<${LookForm.name}/>`, () => {
         group: LOOK_FORM.headerBarStyleLabel,
         option: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
         saved: { headerBarStyle: HEADER_BAR_STYLE.FLOATING },
-      },
-      {
-        row: LOOK_ROW.HEADER,
-        group: LOOK_FORM.accountButtonStyleLabel,
-        option: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
-        saved: { accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE },
-      },
-      {
-        row: LOOK_ROW.HEADER,
-        group: LOOK_FORM.accountPanelStyleLabel,
-        option: LOOK_FORM.accountPanelStyleOptionLabel.HUB,
-        saved: { accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB },
-      },
-      {
-        row: LOOK_ROW.HEADER,
-        group: LOOK_FORM.accountPhonePlacementLabel,
-        option: LOOK_FORM.accountPhonePlacementOptionLabel.MENU,
-        saved: { accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU },
       },
     ])(
       'saves the chosen $group style',

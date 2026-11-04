@@ -7,6 +7,7 @@ import {
 import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view/onboarding-view';
 import {
   ONBOARDING_STEP,
+  ONBOARDING_TIER_QUERY,
   type TOnboardingStep,
 } from '@platform/constants/onboarding';
 import messages from '@platform/i18n/messages/en.json';
@@ -17,7 +18,7 @@ import {
   ARIA_VALUETEXT,
 } from '@platform/testing/aria';
 import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_TENANT_NAME,
@@ -29,8 +30,15 @@ import type { UserEvent } from '@testing-library/user-event';
 
 export const createSiteMock = vi.mocked(createSiteAction);
 export const MOCK_SITE_ADDRESS = `${MOCK_TENANT_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
-export const {
+const {
   nameLabel: NAME_LABEL,
+  previewAddressPlaceholder: PLACEHOLDER_SLUG,
+  createSite: CREATE_SITE,
+  continue: CONTINUE,
+  back: BACK,
+  siteTypeLabel: SITE_TYPE_LABEL,
+} = messages.onboardingForm;
+export const {
   nameHint: NAME_HINT,
   siteTypeHint: SITE_TYPE_HINT,
   siteAddressLabel: SITE_ADDRESS_LABEL,
@@ -39,11 +47,6 @@ export const {
   languageHint: LANGUAGE_HINT,
   siteAddressChecking: ADDRESS_CHECKING,
   siteAddressUnverified: ADDRESS_UNVERIFIED,
-  previewAddressPlaceholder: PLACEHOLDER_SLUG,
-  createSite: CREATE_SITE,
-  continue: CONTINUE,
-  back: BACK,
-  siteTypeLabel: SITE_TYPE_LABEL,
   accentLabel: ACCENT_LABEL,
   siteTypes: SITE_TYPES,
   steps: STEPS,
@@ -53,13 +56,12 @@ export const {
 } = messages.onboardingForm;
 export const { console: CONSOLE_PRESET, editorial: EDITORIAL_PRESET } =
   messages.presetPicker;
-export const {
-  acceptTerms: ACCEPT_TERMS,
-  termsNotAccepted: TERMS_NOT_ACCEPTED,
-} = messages.termsAcceptance;
-export const [ACCEPT_TERMS_LEAD] = ACCEPT_TERMS.split('<');
+const { acceptTerms: ACCEPT_TERMS } = messages.termsAcceptance;
+export const { termsNotAccepted: TERMS_NOT_ACCEPTED } =
+  messages.termsAcceptance;
+const [ACCEPT_TERMS_LEAD] = ACCEPT_TERMS.split('<');
 export const t = makeEnTranslator('onboardingForm');
-export const STEP_ORDER = Object.values(ONBOARDING_STEP);
+const STEP_ORDER = Object.values(ONBOARDING_STEP);
 
 export const MOCK_NAME_FIELD = { name: NAME_LABEL };
 export const MOCK_ADDRESS_FIELD = { name: SITE_ADDRESS_LABEL };
@@ -75,7 +77,7 @@ export const MOCK_LIVE_PREVIEW = {
   name: messages.previewModeControl.livePreviewHeading,
 };
 export const MOCK_SITE_TYPE_SELECT = { name: SITE_TYPE_LABEL };
-export const MOCK_EDIT_SITE_TYPE = {
+const MOCK_EDIT_SITE_TYPE = {
   name: t('editField', { field: SITE_TYPE_LABEL }),
 };
 export const MOCK_EDITORIAL_LOOK = {
@@ -106,7 +108,7 @@ export const setup = customRender(OnboardingView, {
 export const stepHeading = (name: string) =>
   screen.getByRole('heading', { level: 1, name });
 
-export const stepProgress = () =>
+const stepProgress = () =>
   screen.getByRole('progressbar', { name: STEPS_ARIA_LABEL });
 
 export const stepProgressText = (step: TOnboardingStep) =>
@@ -209,4 +211,42 @@ export const createAfterChangingSiteType = async (
 ) => {
   await changeSiteTypeFromReview(user, name);
   await acceptAndCreate(user);
+};
+
+const stubMatchMedia = window.matchMedia;
+
+const stubTier = (initialQueries: readonly string[]) => {
+  let matchingQueries = initialQueries;
+  const listeners = new Set<EventListener>();
+  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+    ...stubMatchMedia(query),
+    get matches() {
+      return matchingQueries.includes(query);
+    },
+    addEventListener: (_type: string, listener: EventListener) => {
+      listeners.add(listener);
+    },
+    removeEventListener: (_type: string, listener: EventListener) => {
+      listeners.delete(listener);
+    },
+  }));
+
+  return (nextQueries: readonly string[]) => {
+    matchingQueries = nextQueries;
+    act(() => listeners.forEach((listener) => listener(new Event('change'))));
+  };
+};
+
+export const FULL_TIER = [
+  ONBOARDING_TIER_QUERY.RAIL,
+  ONBOARDING_TIER_QUERY.FULL,
+];
+export const RAIL_TIER = [ONBOARDING_TIER_QUERY.RAIL];
+export const FULL_TIER_TITLE = 'from 1360px';
+export const RAIL_TIER_TITLE = 'from 768px';
+
+export const renderInTier = (matchingQueries: readonly string[]) => {
+  const resizeTo = stubTier(matchingQueries);
+  setup();
+  return resizeTo;
 };
