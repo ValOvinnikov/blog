@@ -1027,25 +1027,28 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it('adds One language to the Language switcher summary with one language', () => {
-    setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
-
-    expect(lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER)).toHaveTextContent(
-      /· One language$/,
-    );
-  });
-
-  it('shows a single-language note and no switcher choice with one language', async () => {
-    setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
-    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
-
-    const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
-    const compactCodesButton = screen.queryByRole('button', {
-      name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
+  describe('with one language', () => {
+    beforeEach(() => {
+      setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
     });
 
-    expect(note).toBeVisible();
-    expect(compactCodesButton).not.toBeInTheDocument();
+    it('adds One language to the Language switcher summary', () => {
+      expect(lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER)).toHaveTextContent(
+        /· One language$/,
+      );
+    });
+
+    it('shows a single-language note and no switcher choice', async () => {
+      await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+
+      const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
+      const compactCodesButton = screen.queryByRole('button', {
+        name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
+      });
+
+      expect(note).toBeVisible();
+      expect(compactCodesButton).not.toBeInTheDocument();
+    });
   });
 
   it('marks Save busy while the save is in flight', async () => {

@@ -30,6 +30,7 @@ const t = makeEnTranslator('lookForm');
 
 const SEED_ACCENT_HUE = 192;
 const OWN_LOGO_HUE = 40;
+const MULTIPLE_LANGUAGES = { hasMultipleLanguages: true };
 
 const seedValues = () => ({
   ...defaultLookFormValues(),
@@ -58,7 +59,7 @@ const seedValues = () => ({
 
 describe(buildLookRowSummaries, () => {
   it('summarises every row of the seeded look in its drawn order', () => {
-    expect(buildLookRowSummaries(seedValues(), t, false)).toEqual({
+    expect(buildLookRowSummaries(seedValues(), t, MULTIPLE_LANGUAGES)).toEqual({
       [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent',
       [LOOK_ROW.BRAND]: 'Logo uploaded · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
@@ -74,7 +75,7 @@ describe(buildLookRowSummaries, () => {
   it("names a logo's own hue", () => {
     const values = { ...seedValues(), logoHue: OWN_LOGO_HUE };
 
-    const summaries = buildLookRowSummaries(values, t, false);
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.COLOUR]).toBe('Hue 192 · Logo hue 40');
   });
@@ -86,7 +87,7 @@ describe(buildLookRowSummaries, () => {
       favicon: { url: MOCK_FAVICON_URL },
     };
 
-    const summaries = buildLookRowSummaries(values, t, false);
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.BRAND]).toBe('No logo · Favicon uploaded');
   });
@@ -97,7 +98,7 @@ describe(buildLookRowSummaries, () => {
       cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
     };
 
-    const summaries = buildLookRowSummaries(values, t, false);
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.FOOTER]).toBe(
       'Columns · Brand tint · Full width · Cookie button hidden',
@@ -105,7 +106,9 @@ describe(buildLookRowSummaries, () => {
   });
 
   it('adds One language to the language switcher on a one-language site', () => {
-    const summaries = buildLookRowSummaries(seedValues(), t, true);
+    const summaries = buildLookRowSummaries(seedValues(), t, {
+      hasMultipleLanguages: false,
+    });
 
     expect(summaries[LOOK_ROW.LANGUAGE_SWITCHER]).toBe(
       'Menu with globe · One language',

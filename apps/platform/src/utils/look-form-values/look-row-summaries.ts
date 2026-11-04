@@ -10,7 +10,7 @@ const join = (parts: readonly string[]): string => parts.join(SUMMARY_JOINER);
 export const buildLookRowSummaries = (
   values: TLookFormValues,
   t: TLooseTranslator,
-  isSingleLanguage: boolean,
+  { hasMultipleLanguages }: { hasMultipleLanguages: boolean },
 ): Record<TLookRow, string> => {
   const {
     accentHue,
@@ -79,7 +79,7 @@ export const buildLookRowSummaries = (
     ]),
     [LOOK_ROW.LANGUAGE_SWITCHER]: join([
       t(`languageSwitcherOptionLabel.${languageSwitcherStyle}`),
-      ...(isSingleLanguage ? [t('summaryOneLanguage')] : []),
+      ...(hasMultipleLanguages ? [] : [t('summaryOneLanguage')]),
     ]),
   };
 };

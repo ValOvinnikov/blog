@@ -63,6 +63,7 @@ export const LookForm = ({
       : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
   });
   const t = useTranslations('lookForm');
+  const hasMultipleLanguages = liveLocales.length > 1;
   const { groupProps, revealRow } = useLookOpenRows();
   const { lookForm, isPending, form } = useLookFormState({
     tenantId,
@@ -105,12 +106,10 @@ export const LookForm = ({
                 styleGroup={groupProps(STYLE_ROWS)}
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}
-                hasMultipleLanguages={liveLocales.length > 1}
-                summaries={buildLookRowSummaries(
-                  lookForm.values,
-                  t,
-                  liveLocales.length === 1,
-                )}
+                hasMultipleLanguages={hasMultipleLanguages}
+                summaries={buildLookRowSummaries(lookForm.values, t, {
+                  hasMultipleLanguages,
+                })}
               />
             </div>
 
