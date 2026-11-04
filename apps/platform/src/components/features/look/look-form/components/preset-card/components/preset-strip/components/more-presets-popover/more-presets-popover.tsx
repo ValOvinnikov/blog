@@ -9,7 +9,6 @@ import type { TPresetOption } from '@platform/components/features/look/look-form
 import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { KEY } from '@platform/constants/keyboard';
 import { PRESET_LIST_LAYOUT } from '@platform/constants/preset-list';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 import {
   useId,
@@ -19,16 +18,9 @@ import {
   type RefObject,
 } from 'react';
 
-const CHECKED_CHIP_SELECTOR = '[role="radio"][aria-checked="true"]';
+import { morePresetsPopoverVariants } from './more-presets-popover-variants';
 
-const morePresetsPopoverVariants = tv({
-  slots: {
-    positioner: ['w-(--anchor-width)'],
-    header: ['flex items-baseline justify-between gap-3 px-4 pt-3.5 pb-2.5'],
-    title: ['text-admin-14 font-semibold'],
-    count: ['text-admin-12-5 text-admin-muted'],
-  },
-});
+const CHECKED_CHIP_SELECTOR = '[role="radio"][aria-checked="true"]';
 
 type TMorePresetsPopoverProps<TId extends string> = {
   presets: TPresetOption<TId>[];

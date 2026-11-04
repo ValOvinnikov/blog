@@ -6,22 +6,12 @@ import { MorePresetsPopover } from '@platform/components/features/look/look-form
 import { PresetChips } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-chips/preset-chips';
 import { PresetSheet } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-sheet/preset-sheet';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
-import { tv } from '@platform/utils/tv/tv';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useRef } from 'react';
 
 import type { TPresetOption } from './preset-option';
+import { presetStripVariants } from './preset-strip-variants';
 import { usePresetChipFit } from './use-preset-chip-fit';
-
-const presetStripVariants = tv({
-  slots: {
-    root: ['relative min-w-0'],
-    row: ['flex w-full min-w-0 flex-nowrap items-center gap-3'],
-    measure: [
-      'pointer-events-none invisible absolute top-0 left-0 flex w-max flex-nowrap gap-3',
-    ],
-  },
-});
 
 export type TPresetStripProps<TId extends string> = {
   presets: TPresetOption<TId>[];

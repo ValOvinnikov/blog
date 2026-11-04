@@ -5,25 +5,11 @@ import {
   PRESET_LIST_LAYOUT,
   type TPresetListLayout,
 } from '@platform/constants/preset-list';
-import { tv } from '@platform/utils/tv/tv';
 import { useId, type Ref } from 'react';
 
 import { PresetListOption } from './components/preset-list-option/preset-list-option';
+import { presetOptionListVariants } from './preset-option-list-variants';
 import { useActiveOption } from './use-active-option';
-
-const presetOptionListVariants = tv({
-  base: ['group outline-none'],
-  variants: {
-    layout: {
-      [PRESET_LIST_LAYOUT.GRID]: ['grid grid-cols-2 gap-1.5 px-2.5 pb-2.5'],
-      [PRESET_LIST_LAYOUT.ROWS]: [
-        'min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-admin-line-2',
-        '[scrollbar-color:var(--admin-control-line)_transparent] [scrollbar-width:thin]',
-        '[&::-webkit-scrollbar]:w-1 [&::-webkit-scrollbar-thumb]:rounded-admin-bar [&::-webkit-scrollbar-thumb]:bg-admin-control-line',
-      ],
-    },
-  },
-});
 
 const COLUMNS = {
   [PRESET_LIST_LAYOUT.GRID]: 2,

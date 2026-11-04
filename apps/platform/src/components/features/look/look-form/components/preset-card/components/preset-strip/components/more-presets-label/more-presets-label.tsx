@@ -1,17 +1,9 @@
 import { ICONS } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-const morePresetsLabelVariants = tv({
-  slots: {
-    pill: [
-      'inline-flex h-5 min-w-5 items-center justify-center rounded-admin-10 bg-admin-brand-weak px-1.5',
-      'text-admin-11-5 font-semibold text-admin-brand-strong',
-    ],
-  },
-});
+import { morePresetsLabelVariants } from './more-presets-label-variants';
 
 type TMorePresetsLabelProps = {
   hiddenCount: number;

@@ -3,17 +3,9 @@ import { PresetSwatch } from '@platform/components/features/look/look-form/compo
 import type { TPresetOption } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
 import { Icon } from '@platform/components/shared/icon';
 import { ICON_SIZE } from '@platform/constants/icon';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-const presetSheetSummaryVariants = tv({
-  slots: {
-    text: ['flex min-w-0 flex-1 flex-col'],
-    name: ['text-admin-14 font-semibold text-admin-text'],
-    description: ['truncate text-admin-12-5 text-admin-muted'],
-    meta: ['shrink-0 text-admin-12-5 text-admin-muted'],
-  },
-});
+import { presetSheetSummaryVariants } from './preset-sheet-summary-variants';
 
 type TPresetSheetSummaryProps<TId extends string> = {
   preset: TPresetOption<TId>;
