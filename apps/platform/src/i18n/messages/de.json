@@ -177,7 +177,9 @@
     "triggerLabel": "Menü"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Brotkrumennavigation"
+    "breadcrumbAriaLabel": "Brotkrumennavigation",
+    "showFullPath": "Vollständigen Pfad anzeigen",
+    "fullPathMenuLabel": "Vollständiger Pfad"
   },
   "account": {
     "signOut": "Abmelden",
