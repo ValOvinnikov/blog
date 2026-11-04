@@ -290,18 +290,18 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('describes each live language, marking the default', () => {
-      const switcher = screen.getByRole('group', { name: LANGUAGE });
-      const englishButton = within(switcher).getByRole('button', {
+      const switcher = screen.getByRole('radiogroup', { name: LANGUAGE });
+      const englishRadio = within(switcher).getByRole('radio', {
         name: ENGLISH,
       });
-      const germanButton = within(switcher).getByRole('button', {
+      const germanRadio = within(switcher).getByRole('radio', {
         name: GERMAN,
       });
 
-      expect(englishButton).toHaveAccessibleDescription(
+      expect(englishRadio).toHaveAccessibleDescription(
         'Default language · 3 customised',
       );
-      expect(germanButton).toHaveAccessibleDescription('1 customised');
+      expect(germanRadio).toHaveAccessibleDescription('1 customised');
     });
 
     it("edits the selected language against that language's defaults", async () => {
@@ -309,8 +309,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       expect(englishHeadingField).toHaveValue(NOTHING_HERE);
 
-      const germanButton = screen.getByRole('button', { name: GERMAN });
-      await user.click(germanButton);
+      const germanRadio = screen.getByRole('radio', { name: GERMAN });
+      await user.click(germanRadio);
 
       const germanHeadingField = notFoundHeading();
       const germanLabel = activeLanguageLabel(GERMAN);
@@ -327,8 +327,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const englishHeadingField = notFoundHeading();
       await user.type(englishHeadingField, MOCK_EDIT_TEXT);
 
-      const germanButton = screen.getByRole('button', { name: GERMAN });
-      await user.click(germanButton);
+      const germanRadio = screen.getByRole('radio', { name: GERMAN });
+      await user.click(germanRadio);
 
       const germanHeadingField = notFoundHeading();
       await user.type(germanHeadingField, MOCK_EDIT_TEXT_DE);
@@ -346,7 +346,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
   it('shows no language switcher for a single-language site', () => {
     setup();
 
-    const switcher = screen.queryByRole('group', { name: LANGUAGE });
+    const switcher = screen.queryByRole('radiogroup', { name: LANGUAGE });
 
     expect(switcher).not.toBeInTheDocument();
   });
@@ -734,8 +734,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
         await editHeadingAndSave(MOCK_EDIT_TEXT);
 
-        const englishButton = screen.getByRole('button', { name: ENGLISH });
-        await user.click(englishButton);
+        const englishRadio = screen.getByRole('radio', { name: ENGLISH });
+        await user.click(englishRadio);
         await goToFirstRejectedField();
 
         const germanLabel = activeLanguageLabel(GERMAN);
@@ -783,6 +783,18 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       expect(headingField).toHaveAttribute('readonly');
       expect(resetButton).not.toBeInTheDocument();
+    });
+
+    it('keeps the language switcher operable', async () => {
+      setupBilingual({ archivedAt: MOCK_ARCHIVED_AT });
+
+      const germanRadio = screen.getByRole('radio', { name: GERMAN });
+      await user.click(germanRadio);
+
+      const germanLabel = activeLanguageLabel(GERMAN);
+
+      expect(germanRadio).toBeChecked();
+      expect(germanLabel).toBeVisible();
     });
   });
 });
