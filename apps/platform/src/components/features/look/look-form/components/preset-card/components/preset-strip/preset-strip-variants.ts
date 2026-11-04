@@ -2,6 +2,10 @@ import { PRESET_ID } from '@blog/config';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import {
+  SELECTED_CHOICE_CLASSES,
+  UNSELECTED_CHOICE_CLASSES,
+} from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const presetStripVariants = tv({
@@ -30,13 +34,12 @@ export const presetStripVariants = tv({
     },
     selected: {
       true: {
-        chip: [
-          'border-[1.5px] border-admin-brand-ink shadow-[0_0_0_3px_var(--admin-brand-weak)]',
-        ],
+        chip: SELECTED_CHOICE_CLASSES,
       },
       false: {
         chip: [
-          'm-[0.5px] border border-admin-control-line not-data-[disabled]:hover:border-admin-brand-ink',
+          ...UNSELECTED_CHOICE_CLASSES,
+          'border-admin-control-line not-data-[disabled]:hover:border-admin-brand-ink',
         ],
       },
     },

@@ -2,6 +2,10 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { PRESET_PICKER_LAYOUT } from '@platform/constants/preset-picker';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import {
+  SELECTED_CHOICE_CLASSES,
+  UNSELECTED_CHOICE_CLASSES,
+} from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const presetPickerVariants = tv({
@@ -31,15 +35,13 @@ export const presetPickerVariants = tv({
     },
     selected: {
       true: {
-        card: [
-          'border-[1.5px] border-admin-brand-ink shadow-[0_0_0_3px_var(--admin-brand-weak)]',
-        ],
+        card: SELECTED_CHOICE_CLASSES,
         dot: [
           'border-admin-brand-ink bg-admin-brand-ink text-admin-on-brand-ink',
         ],
       },
       false: {
-        card: ['m-[0.5px] border border-admin-line'],
+        card: [...UNSELECTED_CHOICE_CLASSES, 'border-admin-line'],
         dot: ['border-admin-control-line'],
       },
     },

@@ -2,6 +2,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { Heading } from '@platform/components/shared/heading';
+import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
@@ -16,7 +17,7 @@ export const PresetCard = () => {
     useLookForm();
   const t = useTranslations('lookForm');
   const titleId = useId();
-  const { body, heading, description, strip, reset } = presetCardVariants();
+  const { body, heading, strip, reset } = presetCardVariants();
 
   return (
     <Card aria-labelledby={titleId}>
@@ -25,7 +26,7 @@ export const PresetCard = () => {
           <Heading id={titleId} level={2} size="cardTitle">
             {t('presetLabel')}
           </Heading>
-          <span className={description()}>{t('presetDescription')}</span>
+          <Text variant="muted">{t('presetDescription')}</Text>
         </div>
         <div className={strip()}>
           <PresetStrip

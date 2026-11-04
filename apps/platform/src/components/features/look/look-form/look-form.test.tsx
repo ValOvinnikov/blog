@@ -751,7 +751,7 @@ describe(`<${LookForm.name}/>`, () => {
       it('selects a preset with the arrow keys and applies it to the form', async () => {
         const consolePreset = screen.getByRole('radio', { name: CONSOLE });
         const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
-        consolePreset.focus();
+        await user.click(consolePreset);
         await user.keyboard('{ArrowRight}');
         await openLookRow(user, LOOK_ROW.COLOUR);
 
