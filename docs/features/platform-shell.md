@@ -383,6 +383,18 @@ floating card at the foot of the page.
   `title`. The current crumb is capped at 280px with an ellipsis and carries
   its full text as `title` when the cap cuts it off. On a phone every
   breadcrumb link keeps a 44px tap height. Links take the focus ring on `bg`.
+- Below `md` a breadcrumb collapses to "…" › second-to-last › leaf, but only
+  when a crumb it would hide is a link (the operator tenant pages); a trail
+  hiding only the "Platform" label, and every one- or two-crumb trail,
+  renders in full, as does every trail from `md` up. The "…" is a 44×44
+  `FullPathMenu` button named "Show full path": a `control-line` border on
+  `surface`, `brand-ink` on hover and while open, the ring on `bg` on keyboard
+  focus only, no tooltip. It opens the "Full path" menu, 220px wide, 7px below
+  it with left edges aligned, on the shared popup frame. A hidden crumb with
+  no page is a group label (the `groupLabel` slot: 11px/700 uppercase
+  `muted`, never focusable) naming the group of links after it; a crumb with
+  a page is a link item. Focus lands on the first link; Escape returns it to
+  the "…".
 - `apps/platform` owns its own primitives on Base UI and never imports
   `@blog/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is

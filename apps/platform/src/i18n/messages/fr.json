@@ -177,7 +177,9 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Fil d'Ariane"
+    "breadcrumbAriaLabel": "Fil d'Ariane",
+    "showFullPath": "Afficher le chemin complet",
+    "fullPathMenuLabel": "Chemin complet"
   },
   "account": {
     "signOut": "Se déconnecter",

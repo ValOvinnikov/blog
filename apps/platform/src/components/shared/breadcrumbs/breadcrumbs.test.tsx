@@ -1,8 +1,19 @@
 import { faker } from '@faker-js/faker';
-import { ARIA_CURRENT } from '@platform/testing/aria';
-import { customRender, screen } from '@platform/testing/custom-render';
+import messages from '@platform/i18n/messages/en.json';
+import {
+  ARIA_CURRENT,
+  ARIA_EXPANDED,
+  ARIA_HASPOPUP,
+} from '@platform/testing/aria';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import userEvent from '@testing-library/user-event';
 
 import { Breadcrumbs } from './breadcrumbs';
 
@@ -16,6 +27,19 @@ const MOCK_TENANTS = faker.lorem.words(3);
 const MOCK_YOUR_SITE = faker.lorem.words(2);
 const MOCK_LOOK = faker.lorem.words(4);
 const MOCK_OVERFLOW_WIDTH = faker.number.int({ min: 300, max: 900 });
+const MOCK_DANGER_ZONE = faker.lorem.words(2);
+const MOCK_TENANT_PAGE_TRAIL = [
+  { label: MOCK_PLATFORM },
+  { label: MOCK_TENANTS, href: adminRoutes.tenants() },
+  {
+    label: MOCK_TENANT_NAME,
+    href: adminRoutes.dashboard(),
+    isShrinkable: true,
+  },
+  { label: MOCK_DANGER_ZONE },
+];
+
+const { showFullPath, fullPathMenuLabel } = messages.topbar;
 
 const setup = customRender(Breadcrumbs, {
   ariaLabel: MOCK_ARIA_LABEL,
@@ -126,5 +150,78 @@ describe(`<${Breadcrumbs.name}/>`, () => {
     const nav = screen.getByRole('navigation', { name: MOCK_ARIA_LABEL });
 
     expect(nav).toBeVisible();
+  });
+
+  describe('on a trail whose hidden crumbs include a link', () => {
+    it('offers a collapsed menu button for the full path', () => {
+      setup({ items: MOCK_TENANT_PAGE_TRAIL });
+
+      const trigger = screen.getByRole('button', { name: showFullPath });
+
+      expect(trigger).toHaveAttribute(ARIA_HASPOPUP, 'menu');
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('lists the page-less crumb as a group label over its links', async () => {
+      const user = userEvent.setup();
+      setup({ items: MOCK_TENANT_PAGE_TRAIL });
+      const trigger = screen.getByRole('button', { name: showFullPath });
+
+      await user.click(trigger);
+      const menu = await screen.findByRole('menu', { name: fullPathMenuLabel });
+      const group = within(menu).getByRole('group', { name: MOCK_PLATFORM });
+      const items = within(menu).getAllByRole('menuitem');
+      const tenantsItem = within(group).getByRole('menuitem', {
+        name: MOCK_TENANTS,
+      });
+
+      expect(items).toEqual([tenantsItem]);
+      expect(tenantsItem).toHaveAttribute('href', adminRoutes.tenants());
+    });
+
+    it('focuses the first link, and returns focus to the button on Escape', async () => {
+      const user = userEvent.setup();
+      setup({ items: MOCK_TENANT_PAGE_TRAIL });
+      const trigger = screen.getByRole('button', { name: showFullPath });
+
+      await user.click(trigger);
+      const menu = await screen.findByRole('menu', { name: fullPathMenuLabel });
+      const tenantsItem = within(menu).getByRole('menuitem', {
+        name: MOCK_TENANTS,
+      });
+      await waitFor(() => {
+        expect(tenantsItem).toHaveFocus();
+      });
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => {
+        expect(trigger).toHaveFocus();
+      });
+    });
+  });
+
+  it.each([
+    ['one crumb', [{ label: MOCK_PLATFORM }]],
+    [
+      'two crumbs',
+      [
+        { label: MOCK_TENANTS, href: adminRoutes.tenants() },
+        { label: MOCK_LOOK },
+      ],
+    ],
+    [
+      'three crumbs hiding only a label',
+      [
+        { label: MOCK_PLATFORM },
+        { label: MOCK_TENANTS, href: adminRoutes.tenants() },
+        { label: MOCK_LOOK },
+      ],
+    ],
+  ])('renders %s in full with no menu button', (_, items) => {
+    setup({ items });
+
+    const trigger = screen.queryByRole('button', { name: showFullPath });
+
+    expect(trigger).not.toBeInTheDocument();
   });
 });

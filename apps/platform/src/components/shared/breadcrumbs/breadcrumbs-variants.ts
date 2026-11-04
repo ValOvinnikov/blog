@@ -9,6 +9,7 @@ export const breadcrumbsVariants = tv({
       'flex min-w-0 list-none flex-nowrap items-center gap-[7px] p-0 whitespace-nowrap text-admin-14 text-admin-muted',
     ],
     item: ['flex min-w-0 items-center gap-[7px]'],
+    fullPathItem: ['flex flex-none items-center md:hidden'],
     sep: ['flex-none text-admin-12-5 text-admin-faint'],
     link: [
       'block min-w-0 truncate rounded-admin-control px-1 py-0.5 leading-10 text-admin-muted no-underline md:leading-normal',
@@ -22,6 +23,9 @@ export const breadcrumbsVariants = tv({
       true: { item: 'min-w-12 flex-initial', current: 'min-w-0' },
       false: { item: 'flex-none' },
     },
+    isHiddenOnPhone: {
+      true: { item: 'hidden md:flex' },
+    },
   },
-  defaultVariants: { isShrinkable: false },
+  defaultVariants: { isShrinkable: false, isHiddenOnPhone: false },
 });
