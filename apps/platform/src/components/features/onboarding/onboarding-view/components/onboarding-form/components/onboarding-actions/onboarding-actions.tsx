@@ -33,7 +33,7 @@ export const OnboardingActions = ({
   return (
     <div className={root()}>
       {!isFirstStep && (
-        <Button size={SIZE.LG} onClick={onBack} className={back()}>
+        <Button size={SIZE.XL} onClick={onBack} className={back()}>
           {t('back')}
         </Button>
       )}
@@ -43,7 +43,7 @@ export const OnboardingActions = ({
           key="create-site"
           type="submit"
           variant={BUTTON_VARIANT.PRIMARY}
-          size={SIZE.LG}
+          size={SIZE.XL}
           className={primary()}
           isPending={isPending}
           pendingLabel={t('creating')}
@@ -54,7 +54,7 @@ export const OnboardingActions = ({
         <Button
           key="continue"
           variant={BUTTON_VARIANT.PRIMARY}
-          size={SIZE.LG}
+          size={SIZE.XL}
           className={primary()}
           isAriaDisabled={isContinueDisabled}
           onClick={onContinue}

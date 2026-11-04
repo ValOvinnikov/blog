@@ -41,10 +41,6 @@ export const saveBarVariants = tv({
       'grid grid-cols-2 gap-2 md:ml-auto md:flex md:items-center md:gap-3',
     ],
     shortcut: ['hidden text-admin-12 text-admin-muted lg:inline'],
-    button: [
-      'justify-center',
-      'md:h-9 md:px-[14px] md:py-0 md:text-admin-13-5 md:font-semibold',
-    ],
   },
   variants: {
     hasErrors: {

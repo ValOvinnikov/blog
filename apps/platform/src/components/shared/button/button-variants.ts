@@ -79,6 +79,7 @@ export const buttonVariants = tv({
       [SIZE.SM]: {},
       [SIZE.MD]: {},
       [SIZE.LG]: {},
+      [SIZE.XL]: {},
     },
     focusGround: {
       [FOCUS_RING_GROUND.BG]: {},
@@ -140,6 +141,15 @@ export const buttonVariants = tv({
       size: SIZE.LG,
       class: {
         root: [
+          'h-11 justify-center px-[14px] py-0 text-admin-13-5 leading-4 font-semibold md:h-9',
+        ],
+      },
+    },
+    {
+      variant: STYLED_VARIANTS,
+      size: SIZE.XL,
+      class: {
+        root: [
           'h-11 justify-center px-5 text-admin-14 font-semibold shadow-none md:h-10',
         ],
       },
@@ -159,7 +169,7 @@ export const buttonVariants = tv({
     },
     {
       variant: BUTTON_VARIANT.SECONDARY,
-      size: SIZE.LG,
+      size: SIZE.XL,
       class: { root: ['px-[18px]'] },
     },
     {

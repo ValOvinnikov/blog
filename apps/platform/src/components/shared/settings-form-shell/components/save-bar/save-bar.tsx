@@ -1,5 +1,6 @@
 'use client';
 
+import { SIZE } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
@@ -52,7 +53,6 @@ export const SaveBar = ({
     notSaved,
     actions,
     shortcut,
-    button,
   } = saveBarVariants({ hasErrors: hasInvalidFields });
 
   const goToFirstField = (event: MouseEvent<HTMLAnchorElement>) => {
@@ -110,15 +110,15 @@ export const SaveBar = ({
             {t('shortcut')}
           </span>
         )}
-        <Button onClick={onDiscard} isDisabled={isPending} className={button()}>
+        <Button size={SIZE.LG} onClick={onDiscard} isDisabled={isPending}>
           {t('discard')}
         </Button>
         <Button
           variant={BUTTON_VARIANT.PRIMARY}
+          size={SIZE.LG}
           onClick={onSave}
           isPending={isPending}
           pendingLabel={t('saving')}
-          className={button()}
         >
           {t('save')}
         </Button>
