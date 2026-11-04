@@ -5,11 +5,16 @@ import type { TLookFormContext } from '@platform/components/features/look/look-f
 import type { TLookCard } from '@platform/constants/look-card';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
-  applyPresetDefaults,
   CARD_FIELDS,
   countChanges,
   isFieldChanged,
 } from '@platform/utils/look-form-values/look-form-values';
+import {
+  applyPresetDefaults,
+  isPresetValue,
+  switchPreset,
+  withPresetValue,
+} from '@platform/utils/look-preset/look-preset';
 import type { Dispatch, SetStateAction } from 'react';
 
 type TBuildLookFormContextArgs = Pick<
@@ -48,7 +53,10 @@ export const buildLookFormContext = ({
     countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
   isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
   changePreset: (preset: TPresetId) =>
-    setValues((prev) => applyPresetDefaults(preset, prev)),
+    setValues((prev) => switchPreset(preset, prev)),
+  isPresetValue: (field) => isPresetValue(field, values),
+  resetFieldToPreset: (field) =>
+    setValues((prev) => withPresetValue(field, prev)),
   resetToPreset: () =>
     setValues((prev) => applyPresetDefaults(prev.preset, prev)),
 });

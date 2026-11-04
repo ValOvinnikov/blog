@@ -1,23 +1,4 @@
-import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
-  BRAND_VARIANT,
-  BUSY_BUTTON_STYLE,
-  COOKIE_SETTINGS_BUTTON,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  HEADER_BAR_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  HUE_MAX,
-  HUE_MIN,
-  LANGUAGE_SWITCHER_STYLE,
-  PRESET_ID,
-  PRESET_REGISTRY,
-  RADIUS_SCALE,
-  SPINNER_STYLE,
-} from '@blog/config';
+import { RADIUS_SCALE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_LOGO_URL,
@@ -26,7 +7,6 @@ import {
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
 import {
-  applyPresetDefaults,
   countChanges,
   isFieldChanged,
   listLostStagedFiles,
@@ -38,118 +18,6 @@ const MOCK_LOGO_FILE = new File([faker.lorem.word()], faker.system.fileName(), {
   type: 'image/png',
 });
 const MOCK_STAGED_FAVICON_URL = faker.internet.url();
-const MOCK_ACCENT_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
-const MOCK_LOGO_HUE = faker.number.int({ min: HUE_MIN, max: HUE_MAX });
-
-describe(applyPresetDefaults, () => {
-  it("takes the preset's theme tokens and clears the logo hue", () => {
-    const current = {
-      ...defaultLookFormValues(),
-      accentHue: MOCK_ACCENT_HUE,
-      logoHue: MOCK_LOGO_HUE,
-      radiusScale: RADIUS_SCALE.XL,
-    };
-    const { themeTokens, cardStyle, headerControlStyle } =
-      PRESET_REGISTRY[PRESET_ID.EDITORIAL];
-
-    expect(applyPresetDefaults(PRESET_ID.EDITORIAL, current)).toMatchObject({
-      preset: PRESET_ID.EDITORIAL,
-      accentHue: themeTokens.accentHue,
-      logoHue: undefined,
-      headingFont: themeTokens.headingFont,
-      bodyFont: themeTokens.bodyFont,
-      radiusScale: themeTokens.radiusScale,
-      density: themeTokens.density,
-      cardStyle,
-      headerControlStyle,
-    });
-  });
-
-  it('keeps the footer layout, background, surface and cookie settings button', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      footerLayout: FOOTER_LAYOUT.COMPACT,
-      footerBackground: BRAND_VARIANT.PRIMARY,
-      footerSurface: FOOTER_SURFACE.CARD,
-      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next).toMatchObject({
-      footerLayout: FOOTER_LAYOUT.COMPACT,
-      footerBackground: BRAND_VARIANT.PRIMARY,
-      footerSurface: FOOTER_SURFACE.CARD,
-      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
-    });
-  });
-
-  it('keeps the header layout, sub-menus and bar', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
-      headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
-      headerBarStyle: HEADER_BAR_STYLE.FLOATING,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next).toMatchObject({
-      headerLayout: HEADER_LAYOUT.CENTRED_BRAND,
-      headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
-      headerBarStyle: HEADER_BAR_STYLE.FLOATING,
-    });
-  });
-
-  it('keeps the account button, panel and phone placement', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
-      accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
-      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next).toMatchObject({
-      accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
-      accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
-      accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
-    });
-  });
-
-  it('keeps the busy button style and spinner', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
-      spinnerStyle: SPINNER_STYLE.PULSE,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next).toMatchObject({
-      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
-      spinnerStyle: SPINNER_STYLE.PULSE,
-    });
-  });
-
-  it('keeps the language switcher style and both brand images', () => {
-    const logo = { url: MOCK_STAGED_LOGO_BLOB_URL, file: MOCK_LOGO_FILE };
-    const favicon = { url: MOCK_LOGO_URL };
-    const current = {
-      ...defaultLookFormValues(),
-      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      logo,
-      favicon,
-    };
-
-    const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
-
-    expect(next.languageSwitcherStyle).toBe(LANGUAGE_SWITCHER_STYLE.CODES);
-    expect(next.logo).toBe(logo);
-    expect(next.favicon).toBe(favicon);
-  });
-});
 
 describe(isFieldChanged, () => {
   it('treats an equal plain field as unchanged', () => {
