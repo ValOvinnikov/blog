@@ -594,7 +594,7 @@
     "alertSuccess": "Erscheinungsbild gespeichert.",
     "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
     "presetLabel": "Vorlage",
-    "presetDescription": "Der Ausgangspunkt, den fast jede Website wählt. Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
+    "presetDescription": "Legt Akzentfarbton, Überschriften- und Fließtextschrift, Eckenradius und Dichte fest.",
     "accentHueLabel": "Akzentfarbton",
     "accentHueDescription": "Färbt Links, Schaltflächen und Hervorhebungen auf der ganzen Website.",
     "accentHueInaccessible": "Mit diesem Farbton bleibt Fließtext auf seinen getönten Flächen nicht lesbar, daher würde die Website ihn ersetzen. Wählen Sie einen anderen Farbton.",

@@ -1,71 +1,53 @@
-import { SIZE } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
-import { PresetPicker } from '@platform/components/shared/preset-picker';
-import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
+import { Heading } from '@platform/components/shared/heading';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { LOOK_CARD } from '@platform/constants/look-card';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+import { PresetStrip } from './components/preset-strip';
 import { presetCardVariants } from './preset-card-variants';
 
 export const PresetCard = () => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
-  const {
-    values,
-    changePreset,
-    resetToPreset,
-    isDivergedFromPreset,
-    hasCardChanges,
-  } = useLookForm();
+  const { values, changePreset, resetToPreset, canResetToPreset } =
+    useLookForm();
   const t = useTranslations('lookForm');
-  const tPicker = useTranslations('presetPicker');
-  const tSaveBar = useTranslations('saveBar');
   const titleId = useId();
-  const { title, body } = presetCardVariants();
+  const { body, heading, description, strip, reset } = presetCardVariants();
 
   return (
     <Card aria-labelledby={titleId}>
-      <Card.Header
-        title={
-          <span className={title()}>
-            <span id={titleId}>{t('presetLabel')}</span>
-            {hasCardChanges(LOOK_CARD.PRESET) && (
-              <UnsavedDot label={tSaveBar('regionLabel')} />
-            )}
-          </span>
-        }
-        supportingText={t('presetDescription')}
-        actions={
-          isDivergedFromPreset && (
-            <Button
-              type="button"
-              variant={BUTTON_VARIANT.SECONDARY}
-              size={SIZE.SM}
-              focusGround={FOCUS_RING_GROUND.SURFACE_HEAD}
-              onClick={resetToPreset}
-              isDisabled={isArchived}
-              aria-describedby={archivedDescribedBy}
-            >
-              {t('resetButton')}
-            </Button>
-          )
-        }
-      />
       <Card.Body className={body()}>
-        <PresetPicker
-          value={values.preset}
-          onChange={changePreset}
-          aria={{
-            label: tPicker('ariaLabel'),
-            describedBy: archivedDescribedBy,
-          }}
-          isDisabled={isArchived}
-        />
+        <div className={heading()}>
+          <Heading id={titleId} level={2} size="cardTitle">
+            {t('presetLabel')}
+          </Heading>
+          <span className={description()}>{t('presetDescription')}</span>
+        </div>
+        <div className={strip()}>
+          <PresetStrip
+            value={values.preset}
+            onChange={changePreset}
+            labelledBy={titleId}
+            describedBy={archivedDescribedBy}
+            isDisabled={isArchived}
+          />
+        </div>
+        {canResetToPreset && (
+          <Button
+            type="button"
+            variant={BUTTON_VARIANT.SECONDARY}
+            onClick={resetToPreset}
+            isDisabled={isArchived}
+            aria-describedby={archivedDescribedBy}
+            className={reset()}
+          >
+            {t('resetButton')}
+          </Button>
+        )}
       </Card.Body>
     </Card>
   );

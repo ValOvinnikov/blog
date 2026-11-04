@@ -594,7 +594,7 @@
     "alertSuccess": "Look saved.",
     "alertError": "Couldn't save Look settings — try again.",
     "presetLabel": "Preset",
-    "presetDescription": "The starting point nearly every site picks. Sets accent hue, heading and body fonts, radius, and density.",
+    "presetDescription": "Sets accent hue, heading and body fonts, radius, and density.",
     "accentHueLabel": "Accent hue",
     "accentHueDescription": "Colours links, buttons and highlights across your site.",
     "accentHueInaccessible": "This hue doesn't keep body text readable on its tinted surfaces, so the site would replace it. Choose another hue.",

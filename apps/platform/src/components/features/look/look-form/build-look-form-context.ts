@@ -1,5 +1,5 @@
 import { isAccentHueAccessible, type TPresetId } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
 import type { TLookCard } from '@platform/constants/look-card';
@@ -43,7 +43,8 @@ export const buildLookFormContext = ({
   isLocked: (field) => !isLookFieldEntitled(field, plan),
   hasCardChanges: (card: TLookCard) =>
     CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues)),
-  isDivergedFromPreset:
+  canResetToPreset:
+    plan !== TENANT_PLAN.FREE &&
     countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
   isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
   changePreset: (preset: TPresetId) =>
