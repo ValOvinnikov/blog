@@ -82,9 +82,20 @@
   still ignores strings under 10 characters and strings with no separator.
   Co-located `no-duplicate-string.test.js`.
 
-  Both are registered in `base.js` under the `blog-touched` namespace, at
-  threshold 2 for the second, and only when `BLOG_LINT_TOUCHED=1` — set by
-  `.claude/hooks/post-edit-lint.sh`, `.husky/pre-commit` (lint-staged) and
+- `prefer-utils-primitive.js` — flags a raw check that
+  `@blog/utils/primitives` already wraps: `x === undefined` / `!==`
+  (`isUndefined`), `x === null` / `!==` (`isNull`), `typeof x === 'string'` /
+  `!==` (`isString`), and `x.length === 0` / `!== 0` / `> 0` (`hasLength`,
+  which takes any value with a length, because the rule has no type
+  information to tell an array from a string), in either operand order. The
+  message names the helper and its import. Exempt: `packages/utils` (where the
+  helpers live), `packages/insight` (it cannot import utils), generated Sanity
+  types, and files outside `apps/*` and `packages/*`. Co-located
+  `prefer-utils-primitive.test.js`.
+
+  All three are registered in `base.js` under the `blog-touched` namespace, at
+  threshold 2 for `no-duplicate-string`, and only when `BLOG_LINT_TOUCHED=1` —
+  set by `.claude/hooks/post-edit-lint.sh`, `.husky/pre-commit` (lint-staged) and
   `pnpm check:touched-lint`. Repo-wide `pnpm lint` never sets it, so a file
   nobody edits keeps its existing violations; turbo's strict env mode strips
   the variable even if a shell exports it.
