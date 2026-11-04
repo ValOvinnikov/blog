@@ -16,44 +16,39 @@ type TModulePickerSection<T extends TPickerType> = {
 
 const UNGROUPED_SECTION = 'ungrouped';
 
-export const hasOffPlanModuleType = (
+export const getOffPlanModulePack = (
   types: readonly TPickerType[],
   entitledModulePacks: readonly TModulePack[],
-) => types.some(({ name }) => getMissingModulePack(name, entitledModulePacks));
+): TMaybeUndefined<TModulePack> =>
+  types
+    .map(({ name }) => getMissingModulePack(name, entitledModulePacks))
+    .find((modulePack) => modulePack !== null) ?? undefined;
 
 export const getModulePickerSections = <T extends TPickerType>({
   types,
   groups = [],
-  entitledModulePacks,
   query,
 }: {
   types: readonly T[];
   groups?: readonly TPickerGroup[];
-  entitledModulePacks: readonly TModulePack[];
   query: string;
-}) => {
+}): TModulePickerSection<T>[] => {
   const needle = query.trim().toLowerCase();
   const matching = types.filter(({ name }) =>
     getModuleTitle(name).toLowerCase().includes(needle),
   );
-  const offPlan = matching.filter(({ name }) =>
-    getMissingModulePack(name, entitledModulePacks),
-  );
-  const available = matching.filter((type) => !offPlan.includes(type));
   const grouped = new Set(groups.flatMap((group) => group.of ?? []));
 
-  const sections: TModulePickerSection<T>[] = [
+  return [
     ...groups.map((group) => ({
       name: group.name,
       title: group.title ?? group.name,
-      types: available.filter(({ name }) => group.of?.includes(name)),
+      types: matching.filter(({ name }) => group.of?.includes(name)),
     })),
     {
       name: UNGROUPED_SECTION,
       title: undefined,
-      types: available.filter(({ name }) => !grouped.has(name)),
+      types: matching.filter(({ name }) => !grouped.has(name)),
     },
   ].filter(({ types: sectionTypes }) => hasArrayGotItems(sectionTypes));
-
-  return { sections, offPlan };
 };

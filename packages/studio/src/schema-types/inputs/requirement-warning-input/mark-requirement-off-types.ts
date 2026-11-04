@@ -1,15 +1,12 @@
 import type { TMaybeNull } from '@blog/config/types';
-import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
+import { LockIcon } from '@blog/studio/schema-types/icons/lock-icon/lock-icon';
 import {
   getMissingRequirement,
   getRequirementOffSuffix,
   type TEntitlementState,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { Lock } from 'lucide-react';
 
 type TNamedType = { name: string; title?: string };
-
-const LockIcon = textSizedIcon(Lock);
 
 export const markRequirementOffTypes = <T extends TNamedType>(
   types: readonly T[],

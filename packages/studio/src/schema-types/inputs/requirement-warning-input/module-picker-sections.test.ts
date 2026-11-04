@@ -1,7 +1,7 @@
 import { MODULE_PACK } from '@blog/config/constants';
 import {
   getModulePickerSections,
-  hasOffPlanModuleType,
+  getOffPlanModulePack,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
@@ -17,48 +17,28 @@ const MOCK_UNGROUPED_TYPE = { name: faker.lorem.word() };
 const CTA_TYPE = { name: ctaSchema.name };
 const FAQ_TYPE = { name: faqSchema.name };
 const PRICING_TYPE = { name: pricingSchema.name };
-const TYPES = [CTA_TYPE, FAQ_TYPE, PRICING_TYPE];
+const TYPES = [CTA_TYPE, PRICING_TYPE, FAQ_TYPE];
 const GROUPS = [
-  { name: MOCK_GROUP, of: [CTA_TYPE.name, FAQ_TYPE.name, PRICING_TYPE.name] },
+  { name: MOCK_GROUP, of: [CTA_TYPE.name, PRICING_TYPE.name, FAQ_TYPE.name] },
 ];
-const CORE_ONLY = [MODULE_PACK.CORE];
-
-const sectionNames = (
-  sections: ReturnType<typeof getModulePickerSections>['sections'],
-) => sections.map(({ name, types }) => [name, types]);
 
 describe(getModulePickerSections, () => {
-  it('moves off-plan modules out of their group', () => {
-    const { sections, offPlan } = getModulePickerSections({
+  it('keeps every module in its group, in order', () => {
+    const sections = getModulePickerSections({
       types: TYPES,
       groups: GROUPS,
-      entitledModulePacks: CORE_ONLY,
       query: '',
     });
 
-    expect(sectionNames(sections)).toEqual([
-      [MOCK_GROUP, [CTA_TYPE, FAQ_TYPE]],
+    expect(sections.map(({ name, types }) => [name, types])).toEqual([
+      [MOCK_GROUP, TYPES],
     ]);
-    expect(offPlan).toEqual([PRICING_TYPE]);
-  });
-
-  it('keeps every module in its group when every pack is entitled', () => {
-    const { sections, offPlan } = getModulePickerSections({
-      types: TYPES,
-      groups: GROUPS,
-      entitledModulePacks: EVERY_MODULE_PACK,
-      query: '',
-    });
-
-    expect(sectionNames(sections)).toEqual([[MOCK_GROUP, TYPES]]);
-    expect(offPlan).toEqual([]);
   });
 
   it('lists a module no group names in an untitled section', () => {
-    const { sections } = getModulePickerSections({
+    const sections = getModulePickerSections({
       types: [CTA_TYPE, MOCK_UNGROUPED_TYPE],
       groups: GROUPS,
-      entitledModulePacks: CORE_ONLY,
       query: '',
     });
 
@@ -69,30 +49,42 @@ describe(getModulePickerSections, () => {
   });
 
   it('keeps only modules whose title matches the search, in any case', () => {
-    const { sections, offPlan } = getModulePickerSections({
+    const sections = getModulePickerSections({
       types: TYPES,
       groups: GROUPS,
-      entitledModulePacks: CORE_ONLY,
       query: ` ${getModuleTitle(PRICING_TYPE.name).toUpperCase()} `,
     });
 
-    expect(sections).toEqual([]);
-    expect(offPlan).toEqual([PRICING_TYPE]);
+    expect(sections.map(({ types }) => types)).toEqual([[PRICING_TYPE]]);
+  });
+
+  it('returns no section when nothing matches the search', () => {
+    expect(
+      getModulePickerSections({
+        types: TYPES,
+        groups: GROUPS,
+        query: faker.string.alphanumeric(24),
+      }),
+    ).toEqual([]);
   });
 });
 
-describe(hasOffPlanModuleType, () => {
+describe(getOffPlanModulePack, () => {
   it.each([
-    { packs: 'core alone', entitledModulePacks: CORE_ONLY, expected: true },
+    {
+      packs: 'core alone',
+      entitledModulePacks: [MODULE_PACK.CORE],
+      expected: MODULE_PACK.GROWTH,
+    },
     {
       packs: 'every pack',
       entitledModulePacks: EVERY_MODULE_PACK,
-      expected: false,
+      expected: undefined,
     },
   ])(
-    'finds a growth module on $packs: $expected',
+    'finds the pack a module is missing on $packs',
     ({ entitledModulePacks, expected }) => {
-      expect(hasOffPlanModuleType(TYPES, entitledModulePacks)).toBe(expected);
+      expect(getOffPlanModulePack(TYPES, entitledModulePacks)).toBe(expected);
     },
   );
 });

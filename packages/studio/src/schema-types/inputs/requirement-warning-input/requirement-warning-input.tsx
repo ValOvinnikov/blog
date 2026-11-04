@@ -5,7 +5,7 @@ import {
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
 import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
 import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker';
-import { hasOffPlanModuleType } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
+import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
 import { Card, Stack, Text } from '@sanity/ui';
 import { useMemo } from 'react';
 import {
@@ -32,7 +32,7 @@ export const createRequirementWarningInput = (
     if (markedArrayType) {
       if (
         isArrayOfObjectsInputProps(props) &&
-        hasOffPlanModuleType(
+        getOffPlanModulePack(
           markedArrayType.of,
           entitlements.entitledModulePacks,
         )

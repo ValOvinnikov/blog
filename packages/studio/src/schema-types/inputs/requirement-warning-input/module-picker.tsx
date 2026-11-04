@@ -1,14 +1,19 @@
+import { LockIcon } from '@blog/studio/schema-types/icons/lock-icon/lock-icon';
 import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
 import {
+  getLockedModulesNote,
   getMissingModulePack,
   getModulePackPlanLabel,
   type TEntitlementState,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { getModulePickerSections } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
+import {
+  getModulePickerSections,
+  getOffPlanModulePack,
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
 import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
 import { Badge, Box, Button, Grid, Text, TextInput } from '@sanity/ui';
 import { Menu, MenuButton, MenuDivider, MenuItem } from '@sanity/ui/menu';
-import { Lock, Plus, Search } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { Fragment, useId, useState } from 'react';
 import {
   type ArrayInputFunctionsProps,
@@ -24,7 +29,6 @@ type TModulePickerProps = ArrayInputFunctionsProps<
 
 const AddIcon = textSizedIcon(Plus);
 const SearchIcon = textSizedIcon(Search);
-const LockIcon = textSizedIcon(Lock);
 
 const SectionLabel = ({ title }: { title: string }) => (
   <Box paddingX={3} paddingTop={3} paddingBottom={2}>
@@ -46,15 +50,15 @@ export const createModulePicker = ({
     const { t } = useTranslation();
     const id = useId();
     const [query, setQuery] = useState('');
-    const { sections, offPlan } = getModulePickerSections({
+    const sections = getModulePickerSections({
       types: schemaType.of,
       groups: schemaType.options?.insertMenu?.groups,
-      entitledModulePacks,
       query,
     });
-    const offPlanPack = offPlan
-      .map(({ name }) => getMissingModulePack(name, entitledModulePacks))
-      .find(Boolean);
+    const offPlanPack = getOffPlanModulePack(
+      schemaType.of,
+      entitledModulePacks,
+    );
     const addButton = (
       <Button
         icon={AddIcon}
@@ -94,39 +98,49 @@ export const createModulePicker = ({
               {sections.map((section) => (
                 <Fragment key={section.name}>
                   {section.title && <SectionLabel title={section.title} />}
-                  {section.types.map((type) => (
-                    <MenuItem
-                      key={type.name}
-                      icon={type.icon}
-                      text={type.title ?? type.name}
-                      onClick={() => append(type)}
-                    />
-                  ))}
+                  {section.types.map((type) => {
+                    const missingPack = getMissingModulePack(
+                      type.name,
+                      entitledModulePacks,
+                    );
+
+                    return missingPack ? (
+                      <MenuItem
+                        key={type.name}
+                        disabled={true}
+                        icon={LockIcon}
+                        text={getModuleTitle(type.name)}
+                        iconRight={
+                          <Badge>{getModulePackPlanLabel(missingPack)}</Badge>
+                        }
+                      />
+                    ) : (
+                      <MenuItem
+                        key={type.name}
+                        icon={type.icon}
+                        text={type.title ?? type.name}
+                        onClick={() => append(type)}
+                      />
+                    );
+                  })}
                 </Fragment>
               ))}
-              {offPlanPack && (
-                <>
-                  <MenuDivider />
-                  <SectionLabel title={getModulePackPlanLabel(offPlanPack)} />
-                  {offPlan.map(({ name }) => (
-                    <MenuItem
-                      key={name}
-                      disabled={true}
-                      icon={LockIcon}
-                      text={getModuleTitle(name)}
-                      iconRight={
-                        <Badge>{getModulePackPlanLabel(offPlanPack)}</Badge>
-                      }
-                    />
-                  ))}
-                </>
-              )}
-              {!offPlanPack && sections.length === 0 && (
+              {sections.length === 0 && (
                 <Box padding={3}>
                   <Text size={1} muted={true}>
                     {t('inputs.array.insert-menu.search.no-results')}
                   </Text>
                 </Box>
+              )}
+              {offPlanPack && (
+                <>
+                  <MenuDivider />
+                  <Box padding={3}>
+                    <Text size={1} muted={true}>
+                      {getLockedModulesNote(offPlanPack)}
+                    </Text>
+                  </Box>
+                </>
               )}
             </Menu>
           }

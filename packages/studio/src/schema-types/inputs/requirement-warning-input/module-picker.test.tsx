@@ -2,7 +2,10 @@
  * @vitest-environment jsdom
  */
 import { MODULE_PACK } from '@blog/config/constants';
-import { getModulePackPlanLabel } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+import {
+  getLockedModulesNote,
+  getModulePackPlanLabel,
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
 import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
@@ -94,6 +97,12 @@ describe(`<${ModulePicker.name}/>`, () => {
 
       expect(onValueCreate).toHaveBeenCalledWith(CTA_TYPE);
       expect(onItemAppend).toHaveBeenCalledWith({ _key: MOCK_KEY });
+    });
+
+    it('notes that locked modules come with their plan', () => {
+      const note = screen.getByText(getLockedModulesNote(MODULE_PACK.GROWTH));
+
+      expect(note).toBeTruthy();
     });
 
     it('appends nothing when a growth module is clicked', () => {
