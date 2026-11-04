@@ -8004,6 +8004,14 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "2.4": [
+      {
+        "ref": "ICON_STROKE_WIDTH.CHIP_TICK",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
     "2.6": [
       {
         "ref": "ICON_STROKE_WIDTH.RAIL_BADGE",

@@ -755,10 +755,31 @@ describe(`<${LookForm.name}/>`, () => {
         });
       });
 
+      it('selects a preset with the arrow keys and applies it to the form', async () => {
+        const consolePreset = screen.getByRole('radio', { name: CONSOLE });
+        const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+        await user.click(consolePreset);
+        await user.keyboard('{ArrowRight}');
+        await openLookRow(user, LOOK_ROW.COLOUR);
+
+        const hueReadout = screen.getByText(hueValue(EDITORIAL_ACCENT_HUE));
+        expect(editorialPreset).toBeChecked();
+        expect(hueReadout).toBeVisible();
+        expect(updateLookAction).not.toHaveBeenCalled();
+      });
+
       describe('after choosing the Editorial preset', () => {
         beforeEach(async () => {
           await chooseEditorial(user);
           await openLookRow(user, LOOK_ROW.COLOUR);
+        });
+
+        it('marks no unsaved change on the Preset title', () => {
+          const presetHeading = screen.getByRole('heading', {
+            name: LOOK_FORM.presetLabel,
+          });
+
+          expect(presetHeading).toBeVisible();
         });
 
         it("resets the accent hue to the preset's", () => {
@@ -1321,6 +1342,23 @@ describe(`<${LookForm.name}/>`, () => {
       const savedReadout = screen.getByText(hueValue(MOCK_SAVED_ACCENT_HUE));
       expect(savedReadout).toBeVisible();
     });
+  });
+
+  it('offers no Reset to preset on Free, even with an accent hue off the preset', () => {
+    setupLookForm({
+      plan: TENANT_PLAN.FREE,
+      initialValues: {
+        ...defaultLookFormValues(),
+        accentHue: MOCK_SAVED_ACCENT_HUE,
+      },
+    });
+
+    const resetButton = screen.queryByRole('button', {
+      name: RESET_TO_PRESET,
+    });
+    const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+    expect(resetButton).not.toBeInTheDocument();
+    expect(editorialPreset).not.toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   describe('on Free', () => {
