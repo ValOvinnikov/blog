@@ -4,15 +4,11 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const alertVariants = tv({
   slots: {
-    root: [
-      'flex w-full flex-wrap items-center gap-3',
-      'rounded-admin border px-4 py-3.5',
-      'shadow-admin in-data-[slot=card]:shadow-none',
-    ],
+    root: ['flex w-full rounded-admin border'],
     icon: ['mt-0.5 self-start'],
-    text: ['min-w-[200px] flex-1'],
+    text: [],
     title: ['block text-admin-13-5 font-semibold'],
-    description: ['text-admin-muted text-admin-12-5'],
+    description: [],
     action: ['flex flex-wrap items-center gap-2'],
   },
   variants: {
@@ -34,8 +30,33 @@ export const alertVariants = tv({
         icon: ['text-admin-brand'],
       },
     },
+    isNote: {
+      false: {
+        root: [
+          'flex-wrap items-center gap-3 px-4 py-3.5',
+          'shadow-admin in-data-[slot=card]:shadow-none',
+        ],
+        text: ['min-w-[200px] flex-1'],
+        description: ['text-admin-muted text-admin-12-5'],
+      },
+      true: {
+        root: ['gap-2.5 px-3.5 py-2.5'],
+        text: ['min-w-0 flex-1'],
+        description: ['text-admin-13 leading-[19px] text-admin-text'],
+      },
+    },
   },
-  defaultVariants: { type: ALERT_TYPE.INFO },
+  compoundVariants: [
+    {
+      type: ALERT_TYPE.INFO,
+      isNote: true,
+      class: { root: ['border-admin-brand-line'] },
+    },
+  ],
+  defaultVariants: {
+    type: ALERT_TYPE.INFO,
+    isNote: false,
+  },
 });
 
 export type TAlertVariants = VariantProps<typeof alertVariants>;

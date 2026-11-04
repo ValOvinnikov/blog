@@ -102,6 +102,16 @@ describe(`<${Alert.name}/>`, () => {
     expect(alert).not.toBeInTheDocument();
   });
 
+  it('gives a note the note role', () => {
+    setup({ role: 'note' });
+
+    const note = screen.getByRole('note');
+    const status = screen.queryByRole('status');
+
+    expect(note).toHaveTextContent(MOCK_TITLE);
+    expect(status).not.toBeInTheDocument();
+  });
+
   it('describes a control elsewhere on the page that points at it', () => {
     renderWithIntl(
       <>

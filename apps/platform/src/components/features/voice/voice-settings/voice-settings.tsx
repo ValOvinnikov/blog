@@ -103,6 +103,7 @@ export const VoiceSettings = ({
         </div>
         <Alert
           type={ALERT_TYPE.INFO}
+          role="note"
           description={
             <>
               {t('fixedCopyNote')}
