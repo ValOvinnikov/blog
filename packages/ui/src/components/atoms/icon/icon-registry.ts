@@ -151,6 +151,8 @@ import TrendingUpComponent from '@blog/ui/assets/icons/trending-up.svg';
 import TrendingUpUrl from '@blog/ui/assets/icons/trending-up.svg?url';
 import UnfoldComponent from '@blog/ui/assets/icons/unfold.svg';
 import UnfoldUrl from '@blog/ui/assets/icons/unfold.svg?url';
+import UploadComponent from '@blog/ui/assets/icons/upload.svg';
+import UploadUrl from '@blog/ui/assets/icons/upload.svg?url';
 import UserCheckComponent from '@blog/ui/assets/icons/user-check.svg';
 import UserCheckUrl from '@blog/ui/assets/icons/user-check.svg?url';
 import UserComponent from '@blog/ui/assets/icons/user.svg';
@@ -276,4 +278,5 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.CROSSHAIR]: { component: CrosshairComponent, url: CrosshairUrl },
   [ICONS.MAXIMIZE]: { component: MaximizeComponent, url: MaximizeUrl },
   [ICONS.PAUSE]: { component: PauseComponent, url: PauseUrl },
+  [ICONS.UPLOAD]: { component: UploadComponent, url: UploadUrl },
 };

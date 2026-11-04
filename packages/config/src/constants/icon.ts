@@ -86,6 +86,7 @@ export const ICONS = {
   CROSSHAIR: 'CROSSHAIR',
   MAXIMIZE: 'MAXIMIZE',
   PAUSE: 'PAUSE',
+  UPLOAD: 'UPLOAD',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;
