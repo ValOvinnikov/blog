@@ -200,12 +200,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(emptyBookmarks).toBeVisible();
     });
 
-    it('tells the editor that buttons and labels are not editable here', () => {
-      const note = screen.getByText(
-        /Buttons, menus and labels are translated for you/,
-      );
+    it('notes that buttons and labels are not editable here, without naming a language', () => {
+      const note = screen.getByRole('note');
 
-      expect(note).toBeVisible();
+      expect(note).toHaveTextContent(
+        /^Buttons, menus and labels are translated for you/,
+      );
+      expect(note).not.toHaveTextContent(ENGLISH);
     });
 
     it('marks an edited field customised and unsaved until Reset', async () => {
@@ -287,6 +288,12 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const restoredHeadingField = notFoundHeading();
 
       expect(restoredHeadingField).toHaveValue(NOTHING_HERE);
+    });
+
+    it('names the language being edited in the note', () => {
+      const note = screen.getByRole('note');
+
+      expect(note).toContainElement(activeLanguageLabel(ENGLISH));
     });
 
     it('describes each live language, marking the default', () => {
