@@ -751,7 +751,19 @@
     "cookieSettingsButtonBannerOff": "De cookiebanner staat uit, dus de knop blijft verborgen. Zet de banner aan bij Functies om hem te tonen.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
-    "brandImageUnchanged": "Geen nieuwe afbeelding"
+    "brandImageUnchanged": "Geen nieuwe afbeelding",
+    "summaryHue": "Tint {hue}",
+    "summaryLogoFollowsAccent": "logo volgt het accent",
+    "summaryLogoHue": "Logotint {hue}",
+    "summaryLogoUploaded": "Logo geüpload",
+    "summaryNoLogo": "Geen logo",
+    "summaryFaviconUploaded": "Favicon geüpload",
+    "summaryNoFavicon": "Geen favicon",
+    "cookieSettingsButtonSummary": {
+      "HIDDEN": "Cookieknop verborgen",
+      "SHOWN": "Cookieknop zichtbaar"
+    },
+    "summaryOneLanguage": "Eén taal"
   },
   "previewModeControl": {
     "modeLight": "Licht",

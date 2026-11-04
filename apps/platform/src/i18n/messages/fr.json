@@ -751,7 +751,19 @@
     "cookieSettingsButtonBannerOff": "La bannière des cookies est désactivée, le bouton reste donc masqué. Activez la bannière dans Fonctionnalités pour l’afficher.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
-    "brandImageUnchanged": "Aucune nouvelle image"
+    "brandImageUnchanged": "Aucune nouvelle image",
+    "summaryHue": "Teinte {hue}",
+    "summaryLogoFollowsAccent": "le logo suit l’accent",
+    "summaryLogoHue": "Teinte du logo {hue}",
+    "summaryLogoUploaded": "Logo importé",
+    "summaryNoLogo": "Aucun logo",
+    "summaryFaviconUploaded": "Favicon importé",
+    "summaryNoFavicon": "Aucun favicon",
+    "cookieSettingsButtonSummary": {
+      "HIDDEN": "Bouton des cookies masqué",
+      "SHOWN": "Bouton des cookies affiché"
+    },
+    "summaryOneLanguage": "Une seule langue"
   },
   "previewModeControl": {
     "modeLight": "Clair",

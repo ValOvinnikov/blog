@@ -6,7 +6,11 @@ import { FontPicker } from '@platform/components/shared/font-picker';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
-export const TypeCard = () => {
+export type TTypeCardProps = {
+  summary: string;
+};
+
+export const TypeCard = ({ summary }: TTypeCardProps) => {
   const {
     values: { headingFont, bodyFont },
     updateField,
@@ -20,6 +24,7 @@ export const TypeCard = () => {
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.TYPE}
       title={t('typeHeading')}
       description={t('typeDescription')}

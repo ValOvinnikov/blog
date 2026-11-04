@@ -10,7 +10,11 @@ import { useId } from 'react';
 
 import { brandCardVariants } from './brand-card-variants';
 
-export const BrandCard = () => {
+export type TBrandCardProps = {
+  summary: string;
+};
+
+export const BrandCard = ({ summary }: TBrandCardProps) => {
   const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const {
     values: { logo, favicon },
@@ -36,6 +40,7 @@ export const BrandCard = () => {
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.BRAND}
       title={t('brandHeading')}
       description={t('brandImagesDescription')}

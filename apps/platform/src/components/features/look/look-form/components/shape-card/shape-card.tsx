@@ -17,7 +17,11 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
-export const ShapeCard = () => {
+export type TShapeCardProps = {
+  summary: string;
+};
+
+export const ShapeCard = ({ summary }: TShapeCardProps) => {
   const {
     values: { radiusScale, density, cardStyle, headerControlStyle },
     updateField,
@@ -55,6 +59,7 @@ export const ShapeCard = () => {
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.SHAPE}
       title={t('shapeHeading')}
       description={t('shapeDescription')}

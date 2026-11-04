@@ -11,6 +11,7 @@ import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { buildLookRowSummaries } from '@platform/utils/look-form-values/look-row-summaries';
 import {
   SITE_PARTS_ROWS,
   STYLE_ROWS,
@@ -105,6 +106,11 @@ export const LookForm = ({
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}
                 hasMultipleLanguages={liveLocales.length > 1}
+                summaries={buildLookRowSummaries(
+                  lookForm.values,
+                  t,
+                  liveLocales.length === 1,
+                )}
               />
             </div>
 

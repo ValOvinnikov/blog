@@ -9,6 +9,7 @@ import { PresetCard } from '@platform/components/features/look/look-form/compone
 import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';
 import { TypeCard } from '@platform/components/features/look/look-form/components/type-card';
 import type { TLookRowsGroup } from '@platform/components/features/look/look-form/use-look-open-rows';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
 export type TLookEditCardsProps = {
@@ -16,6 +17,7 @@ export type TLookEditCardsProps = {
   sitePartsGroup: TLookRowsGroup;
   hasCookieBanner: boolean;
   hasMultipleLanguages: boolean;
+  summaries: Record<TLookRow, string>;
 };
 
 export const LookEditCards = ({
@@ -23,6 +25,7 @@ export const LookEditCards = ({
   sitePartsGroup,
   hasCookieBanner,
   hasMultipleLanguages,
+  summaries,
 }: TLookEditCardsProps) => {
   const t = useTranslations('lookForm');
 
@@ -30,16 +33,22 @@ export const LookEditCards = ({
     <>
       <PresetCard />
       <LookGroup title={t('styleGroupHeading')} group={styleGroup}>
-        <ColourCard />
-        <BrandCard />
-        <TypeCard />
-        <ShapeCard />
-        <ButtonsCard />
+        <ColourCard summary={summaries[LOOK_ROW.COLOUR]} />
+        <BrandCard summary={summaries[LOOK_ROW.BRAND]} />
+        <TypeCard summary={summaries[LOOK_ROW.TYPE]} />
+        <ShapeCard summary={summaries[LOOK_ROW.SHAPE]} />
+        <ButtonsCard summary={summaries[LOOK_ROW.BUTTONS]} />
       </LookGroup>
       <LookGroup title={t('sitePartsGroupHeading')} group={sitePartsGroup}>
-        <HeaderCard />
-        <FooterCard hasCookieBanner={hasCookieBanner} />
-        <LanguageSwitcherCard hasMultipleLanguages={hasMultipleLanguages} />
+        <HeaderCard summary={summaries[LOOK_ROW.HEADER]} />
+        <FooterCard
+          hasCookieBanner={hasCookieBanner}
+          summary={summaries[LOOK_ROW.FOOTER]}
+        />
+        <LanguageSwitcherCard
+          hasMultipleLanguages={hasMultipleLanguages}
+          summary={summaries[LOOK_ROW.LANGUAGE_SWITCHER]}
+        />
       </LookGroup>
     </>
   );

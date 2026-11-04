@@ -16,10 +16,12 @@ import { languageSwitcherCardVariants } from './language-switcher-card-variants'
 
 export type TLanguageSwitcherCardProps = {
   hasMultipleLanguages: boolean;
+  summary: string;
 };
 
 export const LanguageSwitcherCard = ({
   hasMultipleLanguages,
+  summary,
 }: TLanguageSwitcherCardProps) => {
   const {
     values: { languageSwitcherStyle },
@@ -39,6 +41,7 @@ export const LanguageSwitcherCard = ({
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.LANGUAGE_SWITCHER}
       title={languageSwitcherLabel}
       description={t('languageSwitcherDescription')}

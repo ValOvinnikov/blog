@@ -5,6 +5,7 @@ export const accentSwatchVariants = tv({
   base: ['inline-block shrink-0 align-middle'],
   variants: {
     size: {
+      [SIZE.XS]: ['size-3.5 rounded-admin-3 max-lg:size-3'],
       [SIZE.SM]: ['size-4 rounded-admin-control border border-admin-line'],
       [SIZE.MD]: ['size-5 rounded-admin-control border border-admin-line'],
       [SIZE.LG]: [
