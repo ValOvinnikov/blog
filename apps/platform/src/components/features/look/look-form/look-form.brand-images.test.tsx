@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
@@ -8,7 +9,6 @@ import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   DISCARD,
-  EDIT_PANEL_TEST_ID,
   hueValue,
   NUDGED_ACCENT_HUE,
   savedLookValues,
@@ -129,13 +129,13 @@ describe(`<${LookForm.name}/>`, () => {
       };
 
       it('locks the edit panel while a save is running', async () => {
-        const lockedPanel = await screen.findByTestId(EDIT_PANEL_TEST_ID);
+        const lockedPanel = await screen.findByTestId(LOOK_EDIT_PANEL_TEST_ID);
         expect(lockedPanel).toHaveAttribute('inert');
 
         resolveUploadSuccessfully();
 
         await waitFor(() => {
-          const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+          const editPanel = screen.getByTestId(LOOK_EDIT_PANEL_TEST_ID);
           expect(editPanel).not.toHaveAttribute('inert');
         });
       });

@@ -1,3 +1,4 @@
+import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
@@ -5,7 +6,6 @@ import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   ACCENT_HUE,
-  EDIT_PANEL_TEST_ID,
   EDIT_TAB,
   FOLLOW_ACCENT_HUE,
   PREVIEW_TAB,
@@ -26,6 +26,17 @@ const { lookForm: LOOK_FORM } = messages;
 
 const COOKIE_BANNER_OFF_NOTE = LOOK_FORM.cookieSettingsButtonBannerOff;
 
+const ROW_TITLES_IN_ORDER = [
+  LOOK_FORM.colourHeading,
+  LOOK_FORM.brandHeading,
+  LOOK_FORM.typeHeading,
+  LOOK_FORM.shapeHeading,
+  LOOK_FORM.buttonsHeading,
+  LOOK_FORM.headerHeading,
+  LOOK_FORM.footerHeading,
+  LOOK_FORM.languageSwitcherLabel,
+];
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -39,7 +50,7 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('lists the Preset card, then the Style and Site parts rows in order', () => {
-      const editPanel = screen.getByTestId(EDIT_PANEL_TEST_ID);
+      const editPanel = screen.getByTestId(LOOK_EDIT_PANEL_TEST_ID);
       const presetHeading = within(editPanel).getAllByRole('heading', {
         level: 2,
       });
@@ -47,22 +58,14 @@ describe(`<${LookForm.name}/>`, () => {
         level: 3,
       });
       const presetTitles = presetHeading.map((heading) => heading.textContent);
-      const rowTitles = rowHeadings.map((heading) => heading.textContent);
-
-      const startsWith = (title: string) =>
-        expect.stringMatching(new RegExp(`^${title}`));
+      const rowTitles = rowHeadings.map((heading) =>
+        ROW_TITLES_IN_ORDER.find((title) =>
+          heading.textContent?.startsWith(title),
+        ),
+      );
 
       expect(presetTitles).toEqual([LOOK_FORM.presetLabel]);
-      expect(rowTitles).toEqual([
-        startsWith(LOOK_FORM.colourHeading),
-        startsWith(LOOK_FORM.brandHeading),
-        startsWith(LOOK_FORM.typeHeading),
-        startsWith(LOOK_FORM.shapeHeading),
-        startsWith(LOOK_FORM.buttonsHeading),
-        startsWith(LOOK_FORM.headerHeading),
-        startsWith(LOOK_FORM.footerHeading),
-        startsWith(LOOK_FORM.languageSwitcherLabel),
-      ]);
+      expect(rowTitles).toEqual(ROW_TITLES_IN_ORDER);
     });
 
     it('switches between the Edit and Preview tabs', async () => {

@@ -127,6 +127,29 @@ describe(useSettingsForm, () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
+  it('reveals the first invalid control when the values cannot be saved', async () => {
+    const revealFirst = vi.fn();
+    const { result } = renderSettingsForm({
+      canSave: () => false,
+      invalidControls: () => ({ ids: [MOCK_FIELD_ID], revealFirst }),
+    });
+
+    await editAndSave(result);
+
+    expect(revealFirst).toHaveBeenCalledTimes(1);
+  });
+
+  it('reveals nothing when a form without a save check saves', async () => {
+    const revealFirst = vi.fn();
+    const { result } = renderSettingsForm({
+      invalidControls: () => ({ ids: [MOCK_FIELD_ID], revealFirst }),
+    });
+
+    await editAndSave(result);
+
+    expect(revealFirst).not.toHaveBeenCalled();
+  });
+
   it('returns to the saved values and calls onDiscard on discard', () => {
     const onDiscard = vi.fn();
     const { result } = renderSettingsForm({ onDiscard });

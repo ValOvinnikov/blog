@@ -20,7 +20,11 @@ describe(`<${LookGroup.name}/>`, () => {
     renderWithIntl(
       <LookGroup
         title={MOCK_TITLE}
-        group={{ openValues: [], onOpenValuesChange: vi.fn() }}
+        group={{
+          openValues: [],
+          onOpenValuesChange: vi.fn(),
+          actionsRef: vi.fn(),
+        }}
       >
         <Accordion.Item value={LOOK_ROW.COLOUR}>
           <Accordion.Trigger>{MOCK_COLOUR_ROW}</Accordion.Trigger>

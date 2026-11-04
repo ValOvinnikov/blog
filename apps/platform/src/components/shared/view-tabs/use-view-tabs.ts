@@ -21,6 +21,7 @@ export const useViewTabs = ({ isTabbed }: { isTabbed?: boolean } = {}) => {
 
   return {
     view,
+    hasTabPanels,
     tabsProps: { value: view, onChange: setView, ids, isTabbed },
     panelProps,
   };

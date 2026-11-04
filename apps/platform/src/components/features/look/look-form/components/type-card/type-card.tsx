@@ -27,7 +27,6 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
     <LookCard
       summary={summary}
       card={LOOK_ROW.TYPE}
-      title={t('typeHeading')}
       description={t('typeDescription')}
     >
       <LookField label={headingFontLabel} lock={headingFontLock.lock}>

@@ -38,7 +38,6 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     <LookCard
       summary={summary}
       card={LOOK_ROW.BUTTONS}
-      title={t('buttonsHeading')}
       description={t('buttonsDescription')}
     >
       <LookField

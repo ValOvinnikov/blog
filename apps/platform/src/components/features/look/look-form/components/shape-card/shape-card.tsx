@@ -62,7 +62,6 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
     <LookCard
       summary={summary}
       card={LOOK_ROW.SHAPE}
-      title={t('shapeHeading')}
       description={t('shapeDescription')}
     >
       <LookField
