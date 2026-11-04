@@ -38,6 +38,8 @@ ruleTester.run('prefer-utils-primitive', preferUtilsPrimitiveRule, {
     { code: 'const size = items.length === 2;', filename: WEB_SOURCE },
     { code: 'const sized = set.size === 0;', filename: WEB_SOURCE },
     { code: 'const literal = `a`.length === 0;', filename: WEB_SOURCE },
+    { code: 'const empty = items?.length === 0;', filename: WEB_SOURCE },
+    { code: 'const any = items?.length !== 0;', filename: WEB_SOURCE },
     { code: 'const missing = value === undefined;', filename: UTILS_SOURCE },
     { code: 'const empty = items.length === 0;', filename: INSIGHT_SOURCE },
     {
@@ -62,6 +64,6 @@ ruleTester.run('prefer-utils-primitive', preferUtilsPrimitiveRule, {
     invalid('const any = items.length > 0;', 'hasLength'),
     invalid('const any = items.length !== 0;', 'hasLength'),
     invalid('const any = 0 < items.length;', 'hasLength'),
-    invalid('const empty = items?.length === 0;', 'hasLength'),
+    invalid('const any = items?.length > 0;', 'hasLength'),
   ],
 });

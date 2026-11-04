@@ -39,6 +39,9 @@ const isLengthRead = (node) => {
   );
 };
 
+const isOptionalEquality = ({ subject, operator }) =>
+  subject.type === 'ChainExpression' && STRICT_EQUALITY.has(operator);
+
 const pairOf = ({ left, right, operator }, isMarker) => {
   if (isMarker(right)) {
     return { subject: left, operator };
@@ -66,7 +69,8 @@ const findHelper = (node) => {
   if (
     lengthPair &&
     EMPTINESS_OPERATORS.has(lengthPair.operator) &&
-    isLengthRead(lengthPair.subject)
+    isLengthRead(lengthPair.subject) &&
+    !isOptionalEquality(lengthPair)
   ) {
     return 'hasLength';
   }

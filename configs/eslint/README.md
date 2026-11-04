@@ -87,8 +87,10 @@
   (`isUndefined`), `x === null` / `!==` (`isNull`), `typeof x === 'string'` /
   `!==` (`isString`), and `x.length === 0` / `!== 0` / `> 0` (`hasLength`,
   which takes any value with a length, because the rule has no type
-  information to tell an array from a string), in either operand order. The
-  message names the helper and its import. Exempt: `packages/utils` (where the
+  information to tell an array from a string), in either operand order. An
+  optional chain compared with `=== 0` / `!== 0` is skipped, since `hasLength`
+  answers differently for `undefined`. The message names the helper and its
+  import. Exempt: `packages/utils` (where the
   helpers live), `packages/insight` (it cannot import utils), generated Sanity
   types, and files outside `apps/*` and `packages/*`. Co-located
   `prefer-utils-primitive.test.js`.
