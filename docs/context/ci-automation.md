@@ -127,8 +127,8 @@ head against its base (merge-base, triple-dot) with no install, setting four
 
 - `full` — anything in `turbo.json`'s `globalDependencies` (`configs/**`,
   `.github/actions/setup/**`, `.nvmrc`, `pnpm-lock.yaml`, `turbo.json`) or a
-  root manifest (`package.json`, `pnpm-workspace.yaml`). Verify's Type-check
-  and Lint steps and the Test job drop `--affected` when it is set (see "Affected-only runs" below).
+  root manifest (`package.json`, `pnpm-workspace.yaml`). Verify's Type-check,
+  Lint and Build steps and the Test job drop `--affected` when it is set (see "Affected-only runs" below).
 - `studio` — `packages/studio/**`, `packages/config/**`, `packages/utils/**` or
   `pnpm-lock.yaml`: @blog/studio's turbo-affected set written out as paths. It
   is wider than `packages/studio/**` on purpose: schemas and migrations import
@@ -169,7 +169,7 @@ Script helper tests step. A skipped job reads as success to `CI`, which fails
 only on a `failure` or `cancelled` need. `Changes` is in `CI`'s `needs`, so a failure there fails
 the gate.
 
-**Affected-only runs.** Verify's Type-check and Lint steps and the Test job run
+**Affected-only runs.** Verify's Type-check, Lint and Build steps and the Test job run
 `turbo run <task> --affected` with `TURBO_SCM_BASE` set to the PR's base SHA,
 so a PR that changes one package runs that package and its dependents (a
 `@blog/ui` change runs `ui`, `web` and `platform`; a `docs/**` change runs
@@ -249,8 +249,11 @@ The step names are the job names they replaced, in this order:
   differs. An `EXIT` trap restores that folder to the committed state however
   the step ends, so Build never compiles regenerated files.
 - **Build** — last, after restoring `apps/*/.next/cache` through
-  `actions/cache`. Turbo's `build` outputs exclude `.next/cache`, so without
-  it a turbo cache miss compiles both apps from nothing. The key is the
+  `actions/cache`. Like Type-check and Lint it runs `--affected`, so only the apps
+  the PR affects build (an app whose code or dependencies changed), and a PR
+  that affects no app builds nothing; `full` (and the full gate) builds every
+  app. Turbo's `build` outputs exclude `.next/cache`, so without
+  it a turbo cache miss compiles every app from nothing. The key is the
   lockfile hash plus a hash of `apps/*/src/**`, so it changes with either; the
   one restore key stops at the lockfile prefix, so no fallback serves a cache
   built against other dependencies. On `pull_request` a cache saves to the
