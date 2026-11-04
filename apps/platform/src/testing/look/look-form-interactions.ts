@@ -1,11 +1,15 @@
 import { faker } from '@faker-js/faker';
+import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { ASSET_UPLOAD_INPUT_TEST_ID } from '@platform/constants/asset-upload';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
-import { EDITORIAL } from '@platform/testing/look/look-form-fixtures';
+import {
+  BRAND_IMAGES_HINT,
+  EDITORIAL,
+} from '@platform/testing/look/look-form-fixtures';
 import {
   GO_TO_THE_FIRST_ONE,
   SAVE_CHANGES,
@@ -14,6 +18,7 @@ import {
 import {
   CURRENT_LOGO,
   MOCK_STAGED_LOGO_BLOB_URL,
+  REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
 import type { UserEvent } from '@testing-library/user-event';
 
@@ -23,21 +28,10 @@ const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
   type: 'image/png',
 });
 
-const LOOK_ROW_TITLE = {
-  [LOOK_ROW.COLOUR]: LOOK_FORM.colourHeading,
-  [LOOK_ROW.BRAND]: LOOK_FORM.brandHeading,
-  [LOOK_ROW.TYPE]: LOOK_FORM.typeHeading,
-  [LOOK_ROW.SHAPE]: LOOK_FORM.shapeHeading,
-  [LOOK_ROW.BUTTONS]: LOOK_FORM.buttonsHeading,
-  [LOOK_ROW.HEADER]: LOOK_FORM.headerHeading,
-  [LOOK_ROW.FOOTER]: LOOK_FORM.footerHeading,
-  [LOOK_ROW.LANGUAGE_SWITCHER]: LOOK_FORM.languageSwitcherLabel,
-} as const satisfies Record<TLookRow, string>;
-
 export const lookRowTrigger = (row: TLookRow) => {
   const heading = screen.getByRole('heading', {
     level: 3,
-    name: new RegExp(`^${LOOK_ROW_TITLE[row]}`),
+    name: new RegExp(`^${LOOK_FORM[LOOK_ROW_TITLE_KEY[row]]}`),
   });
 
   return within(heading).getByRole('button');
@@ -58,6 +52,18 @@ export const pickLogo = async (user: UserEvent) => {
     const logo = screen.getByAltText(CURRENT_LOGO);
     expect(logo).toHaveAttribute('src', MOCK_STAGED_LOGO_BLOB_URL);
   });
+};
+
+export const findLogoPickerWithError = async (message: string) => {
+  const replaceLogoButton = await screen.findByRole('button', {
+    name: REPLACE_LOGO,
+  });
+  await waitFor(() => {
+    expect(replaceLogoButton).toHaveAccessibleDescription(
+      `${BRAND_IMAGES_HINT} ${message}`,
+    );
+  });
+  return replaceLogoButton;
 };
 
 export const nudgeAccentHue = async (user: UserEvent) => {

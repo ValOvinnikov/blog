@@ -6,6 +6,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_ID,
@@ -25,7 +26,7 @@ import {
   SettingsFormShell,
   type TSettingsFormShellProps,
 } from './settings-form-shell';
-import type { TSettingsForm } from './use-settings-form';
+import type { TSettingsForm } from './settings-form-types';
 
 type TValues = { tagline: string; footer: string };
 
@@ -115,7 +116,6 @@ const dispatchBeforeUnload = () => {
   return event;
 };
 
-const CONTROL_S_CONTROL = '{Control>}s{/Control}';
 const THREE_UNSAVED_CHANGES = '3 unsaved changes';
 const RESTORE_1_CHANGE = 'Restore 1 change';
 const DISCARD = 'Discard';
@@ -210,7 +210,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('ignores the save shortcut', async () => {
-      await user.keyboard(CONTROL_S_CONTROL);
+      await user.keyboard(USER_EVENT_KEY.CONTROL_S);
 
       expect(onSave).not.toHaveBeenCalled();
     });
@@ -264,7 +264,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it.each([
-      ['Ctrl+S', CONTROL_S_CONTROL],
+      ['Ctrl+S', USER_EVENT_KEY.CONTROL_S],
       ['⌘S', '{Meta>}s{/Meta}'],
     ])('saves on %s', async (_, keys) => {
       await user.keyboard(keys);
@@ -302,7 +302,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
 
     it('still saves on the shortcut', async () => {
-      await user.keyboard(CONTROL_S_CONTROL);
+      await user.keyboard(USER_EVENT_KEY.CONTROL_S);
 
       expect(onSave).toHaveBeenCalledTimes(1);
     });
@@ -389,7 +389,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     const onSave = vi.fn().mockResolvedValue(true);
     renderShell({ save: onSave, changeCount: 1, isPending: true });
 
-    await user.keyboard(CONTROL_S_CONTROL);
+    await user.keyboard(USER_EVENT_KEY.CONTROL_S);
 
     expect(onSave).not.toHaveBeenCalled();
   });

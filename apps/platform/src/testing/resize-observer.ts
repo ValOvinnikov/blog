@@ -1,34 +1,23 @@
+import { act } from 'react';
+
 type TObservedSize = { width: number; height: number };
 
-type TSizeOf = (target: Element) => TObservedSize;
+const liveObservers = new Set<{ fire: () => void }>();
 
-export const stubResizeObserver = (sizeOf: TSizeOf) => {
+export const stubResizeObserver = (
+  sizeOf: (target: Element) => TObservedSize,
+) => {
   const original = globalThis.ResizeObserver;
-  const observers = new Set<StubResizeObserver>();
-  let currentSizeOf = sizeOf;
 
   class StubResizeObserver implements ResizeObserver {
     private readonly targets = new Set<Element>();
 
-    constructor(private readonly callback: ResizeObserverCallback) {
-      observers.add(this);
-    }
+    constructor(private readonly callback: ResizeObserverCallback) {}
 
     observe(target: Element) {
       this.targets.add(target);
+      liveObservers.add(this);
       this.report(target);
-    }
-
-    report(target: Element) {
-      const { width, height } = currentSizeOf(target);
-      this.callback(
-        [{ target, contentRect: { width, height } } as ResizeObserverEntry],
-        this,
-      );
-    }
-
-    reportAll() {
-      this.targets.forEach((target) => this.report(target));
     }
 
     unobserve(target: Element) {
@@ -37,20 +26,31 @@ export const stubResizeObserver = (sizeOf: TSizeOf) => {
 
     disconnect() {
       this.targets.clear();
-      observers.delete(this);
+      liveObservers.delete(this);
+    }
+
+    fire() {
+      this.targets.forEach((target) => this.report(target));
+    }
+
+    private report(target: Element) {
+      const { width, height } = sizeOf(target);
+      this.callback(
+        [{ target, contentRect: { width, height } } as ResizeObserverEntry],
+        this,
+      );
     }
   }
 
   vi.stubGlobal('ResizeObserver', StubResizeObserver);
 
-  const restore = () => {
+  return () => {
+    liveObservers.clear();
     vi.stubGlobal('ResizeObserver', original);
   };
-
-  const resize = (nextSizeOf: TSizeOf) => {
-    currentSizeOf = nextSizeOf;
-    observers.forEach((observer) => observer.reportAll());
-  };
-
-  return Object.assign(restore, { resize });
 };
+
+export const resizeObservedElements = () =>
+  act(() => {
+    liveObservers.forEach((observer) => observer.fire());
+  });

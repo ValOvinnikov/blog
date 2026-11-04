@@ -1,15 +1,13 @@
 import { FONT_CHOICE, SIZE } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
-import {
-  act,
-  customRender,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
+import { customRender, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubLgUpWindow } from '@platform/testing/match-media';
-import { stubResizeObserver } from '@platform/testing/resize-observer';
+import {
+  resizeObservedElements,
+  stubResizeObserver,
+} from '@platform/testing/resize-observer';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useId, useState } from 'react';
 import type { Mock } from 'vitest';
@@ -114,15 +112,18 @@ const render = customRender(PresetStripHarness, {
   onChange: vi.fn(),
 });
 
-let resizeObserver: ReturnType<typeof stubResizeObserver>;
-
-const editColumnOf = (width: number) => () => ({ width, height: 0 });
+let restoreResizeObserver = () => {};
+let editColumnWidth = 0;
 
 const setup = (
-  editColumnWidth: number,
+  width: number,
   overrides?: Partial<TPresetStripHarnessProps>,
 ) => {
-  resizeObserver = stubResizeObserver(editColumnOf(editColumnWidth));
+  editColumnWidth = width;
+  restoreResizeObserver = stubResizeObserver(() => ({
+    width: editColumnWidth,
+    height: 0,
+  }));
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
     new DOMRect(0, 0, MOCK_CHIP_WIDTH, 0),
   );
@@ -140,7 +141,7 @@ const KEEPS_SELECTED = 'keeps the selected preset';
 
 afterEach(() => {
   vi.restoreAllMocks();
-  resizeObserver();
+  restoreResizeObserver();
 });
 
 describe(`<${PresetStrip.name}/>`, () => {
@@ -218,7 +219,8 @@ describe(`<${PresetStrip.name}/>`, () => {
       setup(MOCK_EDIT_COLUMN_1440);
       const editorial = screen.getByRole('radio', { name: EDITORIAL });
 
-      act(() => resizeObserver.resize(editColumnOf(MOCK_EDIT_COLUMN_1280)));
+      editColumnWidth = MOCK_EDIT_COLUMN_1280;
+      resizeObservedElements();
 
       const chips = screen.getAllByRole('radio');
       expect(chips).toEqual([editorial]);

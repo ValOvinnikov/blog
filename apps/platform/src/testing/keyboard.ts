@@ -10,4 +10,5 @@ export const USER_EVENT_KEY = {
   SPACE: KEY.SPACE,
   TAB: `{${KEY.TAB}}`,
   ESCAPE: `{${KEY.ESCAPE}}`,
+  CONTROL_S: '{Control>}s{/Control}',
 } as const;

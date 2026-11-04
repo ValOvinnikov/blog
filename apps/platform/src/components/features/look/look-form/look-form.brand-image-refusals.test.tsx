@@ -1,14 +1,17 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
-import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { UPLOAD_FAVICON } from '@platform/testing/look/look-form-fixtures';
+import {
+  BRAND_IMAGES_HINT,
+  UPLOAD_FAVICON,
+} from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
+  findLogoPickerWithError,
   pickAndSaveLogo,
   stageAssetRemoval,
 } from '@platform/testing/look/look-form-interactions';
@@ -28,17 +31,17 @@ vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
 vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
-const { lookForm: LOOK_FORM } = messages;
-
 const tUploadErrors = makeEnTranslator('uploadErrors');
-
-const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 
 const FAVICON_REMOVE_FAILED = tUploadErrors('removeFailed', {
   kind: 'favicon',
 });
 
 const MOCK_UPLOAD_LIMIT = '4 MB';
+
+const LOGO_TOO_LARGE = tUploadErrors('fileTooLarge', {
+  limit: MOCK_UPLOAD_LIMIT,
+});
 
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
@@ -63,10 +66,9 @@ describe(`<${LookForm.name}/>`, () => {
 
       await pickAndSaveLogo(user);
 
-      const error = await screen.findByText(
-        tUploadErrors('fileTooLarge', { limit: MOCK_UPLOAD_LIMIT }),
-      );
-      expect(error).toBeVisible();
+      await findLogoPickerWithError(LOGO_TOO_LARGE);
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent(LOGO_TOO_LARGE);
       expect(updateLookAction).not.toHaveBeenCalled();
     });
 

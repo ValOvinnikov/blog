@@ -177,7 +177,9 @@
     "triggerLabel": "Menu"
   },
   "topbar": {
-    "breadcrumbAriaLabel": "Kruimelpad"
+    "breadcrumbAriaLabel": "Kruimelpad",
+    "showFullPath": "Volledig pad tonen",
+    "fullPathMenuLabel": "Volledig pad"
   },
   "account": {
     "signOut": "Uitloggen",

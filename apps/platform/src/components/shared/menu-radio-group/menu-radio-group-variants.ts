@@ -1,3 +1,4 @@
+import { MENU_GROUP_LABEL_TYPE } from '@platform/components/shared/menu-surface';
 import { MENU_RADIO_GROUP_SIZE } from '@platform/constants/menu-radio-group';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -6,9 +7,7 @@ export const menuRadioGroupVariants = tv({
     root: [
       'mb-1 flex flex-col gap-2 border-b border-admin-popover-line px-2 pt-2 pb-2.5',
     ],
-    label: [
-      'text-admin-11 leading-admin-14 font-bold tracking-[0.09em] text-admin-muted uppercase',
-    ],
+    label: [MENU_GROUP_LABEL_TYPE],
     track: [
       'flex gap-[3px] rounded-admin-control border border-admin-control-line bg-admin-theme-track p-[3px]',
     ],

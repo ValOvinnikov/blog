@@ -6,15 +6,16 @@ import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
+import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
 import type { TUnsavedCard } from './components/save-bar/components/save-bar-location/save-bar-location';
-import { SaveBar, type TInvalidControls } from './components/save-bar/save-bar';
+import { SaveBar } from './components/save-bar/save-bar';
 import { ShellHeader } from './components/shell-header/shell-header';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
-import type { TSettingsForm } from './use-settings-form';
+import type { TSettingsForm } from './settings-form-types';
 import { useShellSaveActions } from './use-shell-save-actions';
 import { useUnsavedPageProtection } from './use-unsaved-page-protection';
 
