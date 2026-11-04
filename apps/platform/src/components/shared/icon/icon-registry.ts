@@ -48,6 +48,7 @@ import Sun from '@platform/assets/icons/sun.svg';
 import Tablet from '@platform/assets/icons/tablet.svg';
 import Tick from '@platform/assets/icons/tick.svg';
 import Unfold from '@platform/assets/icons/unfold.svg';
+import Upload from '@platform/assets/icons/upload.svg';
 import UserCheck from '@platform/assets/icons/user-check.svg';
 import User from '@platform/assets/icons/user.svg';
 import Users from '@platform/assets/icons/users.svg';
@@ -109,6 +110,7 @@ export const ICON_REGISTRY = {
   [ICONS.TABLET]: Tablet,
   [ICONS.TICK]: Tick,
   [ICONS.UNFOLD]: Unfold,
+  [ICONS.UPLOAD]: Upload,
   [ICONS.USER]: User,
   [ICONS.USERS]: Users,
   [ICONS.USER_CHECK]: UserCheck,

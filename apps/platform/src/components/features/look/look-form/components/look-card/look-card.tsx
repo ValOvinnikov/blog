@@ -5,7 +5,7 @@ import { Text } from '@platform/components/shared/text';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookRow } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { useId, type ReactNode } from 'react';
 
 import { lookCardVariants } from './look-card-variants';
 
@@ -13,12 +13,16 @@ export type TLookCardProps = IWithChildren & {
   card: TLookRow;
   title: string;
   description: string;
+  summary: string;
+  summaryMark?: ReactNode;
 };
 
 export const LookCard = ({
   card,
   title,
   description,
+  summary,
+  summaryMark,
   children,
 }: TLookCardProps) => {
   const { hasCardChanges } = useLookForm();
@@ -28,7 +32,7 @@ export const LookCard = ({
 
   return (
     <Accordion.Item value={card}>
-      <Accordion.Trigger>
+      <Accordion.Trigger summary={summary} summaryMark={summaryMark}>
         <span id={titleId}>{title}</span>
         {hasCardChanges(card) && <UnsavedDot label={t('regionLabel')} />}
       </Accordion.Trigger>

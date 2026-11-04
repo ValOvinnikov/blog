@@ -1,3 +1,5 @@
+import { SUMMARY_JOINER } from '@platform/constants/summary';
+
 export type TLanguageChangeCount = {
   language: string;
   count: number;
@@ -9,4 +11,4 @@ export const formatLanguageChanges = (
   changesByLanguage
     .filter(({ count }) => count > 0)
     .map(({ language, count }) => `${language} ${count}`)
-    .join(' · ');
+    .join(SUMMARY_JOINER);

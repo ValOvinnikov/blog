@@ -1,7 +1,7 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { SegmentedRadioGroup } from '@platform/components/shared/segmented-control';
 import { useTranslations } from 'next-intl';
 
 export type TLanguagePickerProps = {
@@ -23,16 +23,21 @@ export const LanguagePicker = ({
   const tLanguage = useTranslations('languageNames');
 
   return (
-    <SegmentedControl
+    <SegmentedRadioGroup
       aria={{ label: t('ariaLabel') }}
-      options={locales.map((locale) => ({
-        value: locale,
-        label: tLanguage(locale),
-        description: t('optionDescription', {
-          isDefault: String(locale === defaultLocale),
-          count: countCustomised(locale),
-        }),
-      }))}
+      options={locales.map((locale) => {
+        const isDefault = locale === defaultLocale;
+
+        return {
+          value: locale,
+          label: tLanguage(locale),
+          description: t('optionDescription', {
+            isDefault: String(isDefault),
+            count: countCustomised(locale),
+          }),
+          isWide: isDefault,
+        };
+      })}
       value={value}
       onChange={onChange}
     />

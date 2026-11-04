@@ -3,6 +3,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { SUMMARY_JOINER } from '@platform/constants/summary';
 import type { TEmailPageItem } from '@platform/utils/email-draft/email-draft';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 import { fieldStatusTone } from '@platform/utils/status-tone/status-tone';
@@ -52,7 +53,7 @@ export const ItemSelect = ({
             <span className={valueMeta()}>
               {[selectedOption.group, selectedOption.statusLabel]
                 .filter(Boolean)
-                .join(' · ')}
+                .join(SUMMARY_JOINER)}
             </span>
           </span>
         )}

@@ -6,7 +6,7 @@ import { accentSwatchVariants } from './accent-swatch-variants';
 
 type TAccentSwatchProps = IWithClassName & {
   hue: number;
-  size?: typeof SIZE.SM | typeof SIZE.MD | typeof SIZE.LG;
+  size?: typeof SIZE.XS | typeof SIZE.SM | typeof SIZE.MD | typeof SIZE.LG;
   name?: string;
 };
 

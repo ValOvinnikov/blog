@@ -29,7 +29,7 @@ Voice lets a site owner reword the page-level prose the public site writes in it
 
 ## Surfaces and routes
 
-- **Platform:** `/dashboard/voice` (a member's own site) and `/tenants/<tenantId>/voice` (operator view), both rendering `VoicePageContent`. One language at a time through a switcher over the live languages, each showing its customised count; one card per surface in page order (404, error, archive, bookmarks), each field with a control for its kind, the catalog default as placeholder, a Default/Customised badge, Reset and a "Keep `{name}`" note, beside a specimen of that surface. Empty-state lists show as compact rows, one open at a time: each row is a button inside an `h4` with a right chevron that turns down when open, and an open row's button and body sit on `surface-2`. Saving goes through the shared settings save bar.
+- **Platform:** `/dashboard/voice` (a member's own site) and `/tenants/<tenantId>/voice` (operator view), both rendering `VoicePageContent`. One language at a time through a language radio group over the live languages (shown only with more than one, and still operable on an archived tenant), each option's sub-line naming the default language and its customised count, the track scrolling sideways with edge fades below `md`; one card per surface in page order (404, error, archive, bookmarks), each field with a control for its kind, the catalog default as placeholder, a Default/Customised badge, Reset and a "Keep `{name}`" note, beside a specimen of that surface. Empty-state lists show as compact rows, one open at a time: each row is a button inside an `h4` with a right chevron that turns down when open, and an open row's button and body sit on `surface-2`. Saving goes through the shared settings save bar.
 - **Public site:** `module_postList` empty state (blog, topic and tag archives), `module_taxonomyList` empty state, `/bookmarks`, the in-layout 404 (`LocaleNotFoundPage`), `app/[tenant]/not-found.tsx`, and the locale error boundary (`[tenant]/[locale]/error.tsx`). `app/global-not-found.tsx` resolves no tenant and renders the English catalog.
 - **Studio:** none. Curated UI copy has no Studio home.
 
@@ -46,7 +46,7 @@ Voice lets a site owner reword the page-level prose the public site writes in it
 - Any member of the tenant, whatever their role, or any platform admin (a virtual owner membership) can edit Voice — `requireTenantMembership`. The page is not plan-gated and sits in every tenant's sidebar.
 - The page edits only the tenant's live languages (./languages.md). Overrides stored for a language a downgrade switched off stay in the row and apply again once it is live.
 - The form is read-only for a deprovisioned tenant.
-- Specimens render in the tenant's Look (accent and logo hue, fonts, radius, density, card style) with the Look preview's light/dark toggle; Voice never changes Look.
+- Specimens render in the tenant's Look (accent and logo hue, fonts, radius, density, card style) switched between light and dark by the shared preview's Light / Dark icon group (`components/shared/preview-mode-group/`), the same group the preview toolbar shows; Voice never changes Look.
 
 ## Constraints and invariants
 

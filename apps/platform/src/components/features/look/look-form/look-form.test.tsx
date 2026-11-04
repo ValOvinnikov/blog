@@ -24,6 +24,7 @@ import {
 import type * as BlogConfig from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { ACCENT_SWATCH_TEST_ID } from '@platform/constants/accent-swatch';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
@@ -55,6 +56,7 @@ import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   clickGoToTheFirstOne,
+  lookRowTrigger,
   nudgeAccentHue,
   openLookRow,
   pickLogo,
@@ -329,17 +331,19 @@ describe(`<${LookForm.name}/>`, () => {
           (heading) => heading.textContent,
         );
         const rowTitles = rowHeadings.map((heading) => heading.textContent);
+        const startsWith = (title: string) =>
+          expect.stringMatching(new RegExp(`^${title}`));
 
         expect(presetTitles).toEqual([LOOK_FORM.presetLabel]);
         expect(rowTitles).toEqual([
-          LOOK_FORM.colourHeading,
-          LOOK_FORM.brandHeading,
-          LOOK_FORM.typeHeading,
-          LOOK_FORM.shapeHeading,
-          LOOK_FORM.buttonsHeading,
-          LOOK_FORM.headerHeading,
-          LOOK_FORM.footerHeading,
-          LOOK_FORM.languageSwitcherLabel,
+          startsWith(LOOK_FORM.colourHeading),
+          startsWith(LOOK_FORM.brandHeading),
+          startsWith(LOOK_FORM.typeHeading),
+          startsWith(LOOK_FORM.shapeHeading),
+          startsWith(LOOK_FORM.buttonsHeading),
+          startsWith(LOOK_FORM.headerHeading),
+          startsWith(LOOK_FORM.footerHeading),
+          startsWith(LOOK_FORM.languageSwitcherLabel),
         ]);
       });
 
@@ -697,11 +701,14 @@ describe(`<${LookForm.name}/>`, () => {
             name: `${LOOK_FORM.colourHeading}${UNSAVED_DOT}`,
           });
           const typeHeading = screen.getByRole('heading', {
-            name: LOOK_FORM.typeHeading,
+            name: new RegExp(`^${LOOK_FORM.typeHeading}`),
+          });
+          const typeDot = within(typeHeading).queryByRole('img', {
+            name: UNSAVED_DOT,
           });
 
           expect(colourHeading).toBeVisible();
-          expect(typeHeading).toBeVisible();
+          expect(typeDot).not.toBeInTheDocument();
         });
 
         it('discards unsaved changes back to the saved values', async () => {
@@ -966,17 +973,82 @@ describe(`<${LookForm.name}/>`, () => {
     },
   );
 
-  it('shows a single-language note and no switcher choice with one language', async () => {
-    setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
-    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
-
-    const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
-    const compactCodesButton = screen.queryByRole('button', {
-      name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
+  describe('folded row summaries', () => {
+    beforeEach(() => {
+      setupLookForm();
     });
 
-    expect(note).toBeVisible();
-    expect(compactCodesButton).not.toBeInTheDocument();
+    it('summarises a folded row and drops the summary once it opens', async () => {
+      const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
+      expect(colourTrigger).toHaveTextContent(
+        `Hue ${DEFAULT_ACCENT_HUE} · logo follows accent`,
+      );
+
+      await openLookRow(user, LOOK_ROW.COLOUR);
+
+      expect(colourTrigger).not.toHaveTextContent(/logo follows accent/);
+    });
+
+    it('updates the Colour summary and its swatch as the accent hue changes', async () => {
+      const swatchBackground = () =>
+        within(lookRowTrigger(LOOK_ROW.COLOUR)).getByTestId(
+          ACCENT_SWATCH_TEST_ID,
+        ).style.background;
+      const savedBackground = swatchBackground();
+
+      await nudgeAccentHue(user);
+      await user.click(lookRowTrigger(LOOK_ROW.COLOUR));
+
+      expect(lookRowTrigger(LOOK_ROW.COLOUR)).toHaveTextContent(
+        `Hue ${NUDGED_ACCENT_HUE} · logo follows accent`,
+      );
+      expect(swatchBackground()).not.toBe(savedBackground);
+    });
+
+    it('hides the Colour swatch from assistive technology', () => {
+      const swatchImage = within(lookRowTrigger(LOOK_ROW.COLOUR)).queryByRole(
+        'img',
+      );
+
+      expect(swatchImage).not.toBeInTheDocument();
+    });
+
+    it('reads a staged logo as uploaded before saving', async () => {
+      expect(lookRowTrigger(LOOK_ROW.BRAND)).toHaveTextContent(
+        'No logo · No favicon',
+      );
+
+      await pickLogo(user);
+      await user.click(lookRowTrigger(LOOK_ROW.BRAND));
+
+      expect(lookRowTrigger(LOOK_ROW.BRAND)).toHaveTextContent(
+        'Logo uploaded · No favicon',
+      );
+    });
+  });
+
+  describe('with one language', () => {
+    beforeEach(() => {
+      setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
+    });
+
+    it('adds One language to the Language switcher summary', () => {
+      expect(lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER)).toHaveTextContent(
+        /· One language$/,
+      );
+    });
+
+    it('shows a single-language note and no switcher choice', async () => {
+      await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+
+      const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
+      const compactCodesButton = screen.queryByRole('button', {
+        name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
+      });
+
+      expect(note).toBeVisible();
+      expect(compactCodesButton).not.toBeInTheDocument();
+    });
   });
 
   it('marks Save busy while the save is in flight', async () => {

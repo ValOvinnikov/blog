@@ -19,7 +19,11 @@ import { AccountFields } from './components/account-fields/account-fields';
 import { PreviewDeviceNote } from './components/preview-device-note/preview-device-note';
 import { useSubmenuPreview } from './use-submenu-preview';
 
-export const HeaderCard = () => {
+export type THeaderCardProps = {
+  summary: string;
+};
+
+export const HeaderCard = ({ summary }: THeaderCardProps) => {
   const {
     values: { headerLayout, headerSubmenuStyle, headerBarStyle },
     updateField,
@@ -42,6 +46,7 @@ export const HeaderCard = () => {
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.HEADER}
       title={t('headerHeading')}
       description={t('headerDescription')}

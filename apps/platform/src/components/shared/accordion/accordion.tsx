@@ -36,6 +36,7 @@ type TAccordionProps<TValue extends string> = TAccordionOpenProps<TValue> &
   IWithClassName &
   IWithChildren & {
     variant?: TAccordionVariant;
+    isList?: boolean;
     actionsRef?: Ref<TAccordionActions<TValue>>;
   };
 
@@ -44,6 +45,7 @@ const AccordionRoot = <TValue extends string>(
 ) => {
   const {
     variant = ACCORDION_VARIANT.LIST,
+    isList = false,
     actionsRef,
     children,
     className,
@@ -56,14 +58,16 @@ const AccordionRoot = <TValue extends string>(
     setOpenValues,
   );
   const context = useMemo(
-    () => ({ variant, openValues, registerButton }),
-    [variant, openValues, registerButton],
+    () => ({ variant, isList, openValues, registerButton }),
+    [variant, isList, openValues, registerButton],
   );
 
   return (
     <AccordionContext.Provider value={context}>
       <BaseAccordion.Root<TValue>
         multiple={isMultiple}
+        // Safari drops the list role from a `list-style: none` list unless it is explicit.
+        render={isList ? <ul role="list" /> : undefined}
         keepMounted={variant === ACCORDION_VARIANT.ROW}
         value={[...openValues]}
         onValueChange={(next) => setOpenValues([...next])}

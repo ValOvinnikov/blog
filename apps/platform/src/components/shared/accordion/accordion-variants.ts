@@ -30,9 +30,7 @@ export const accordionVariants = tv({
     rowSummary: [
       'flex min-w-0 flex-1 items-center gap-2 text-admin-13 text-admin-muted max-lg:text-admin-12-5',
     ],
-    rowSummaryMark: [
-      'hidden shrink-0 items-center justify-center max-lg:inline-flex max-lg:size-3',
-    ],
+    rowSummaryMark: ['inline-flex shrink-0 items-center justify-center'],
     rowSummaryText: ['min-w-0 truncate'],
     rowTrailing: ['shrink-0'],
     panel: [

@@ -13,7 +13,11 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
-export const ButtonsCard = () => {
+export type TButtonsCardProps = {
+  summary: string;
+};
+
+export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
   const {
     values: { busyButtonStyle, spinnerStyle },
     updateField,
@@ -32,6 +36,7 @@ export const ButtonsCard = () => {
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.BUTTONS}
       title={t('buttonsHeading')}
       description={t('buttonsDescription')}
