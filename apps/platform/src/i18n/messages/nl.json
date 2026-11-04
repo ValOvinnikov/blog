@@ -576,7 +576,12 @@
     "editorial": "Editorial",
     "editorialDescription": "Serif, warm en als een tijdschrift.",
     "editorialMiniPrimary": "Veldnotities",
-    "editorialMiniSecondary": "Berichten van de kust"
+    "editorialMiniSecondary": "Berichten van de kust",
+    "morePresets": "Meer voorinstellingen",
+    "morePresetsAriaLabel": "Meer voorinstellingen, nog {count}",
+    "presetCount": "{count, plural, one {# voorinstelling} other {# voorinstellingen}}",
+    "choosePreset": "Kies een voorinstelling",
+    "close": "Sluiten"
   },
   "logoHueField": {
     "followAccentHue": "Accenttint volgen",

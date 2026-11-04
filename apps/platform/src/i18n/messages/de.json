@@ -576,7 +576,12 @@
     "editorial": "Editorial",
     "editorialDescription": "Serifen, warm und magazinartig.",
     "editorialMiniPrimary": "Feldnotizen",
-    "editorialMiniSecondary": "Berichte von der Küste"
+    "editorialMiniSecondary": "Berichte von der Küste",
+    "morePresets": "Weitere Vorlagen",
+    "morePresetsAriaLabel": "Weitere Vorlagen, {count} mehr",
+    "presetCount": "{count, plural, one {# Vorlage} other {# Vorlagen}}",
+    "choosePreset": "Wähle eine Vorlage",
+    "close": "Schließen"
   },
   "logoHueField": {
     "followAccentHue": "Akzentfarbton übernehmen",

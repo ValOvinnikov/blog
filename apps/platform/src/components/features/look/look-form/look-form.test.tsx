@@ -62,6 +62,7 @@ import {
   pickLogo,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { stubLgUpWindow } from '@platform/testing/match-media';
 import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -182,14 +183,6 @@ const RESTORE_CHANGES = /^Restore \d+ changes$/;
 const EDITORIAL = 'Editorial';
 const CONSOLE = 'Console';
 const DISCARD = 'Discard';
-
-const stubLgUpWindow = () => {
-  const stubMatchMedia = window.matchMedia;
-  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-    ...stubMatchMedia(query),
-    matches: true,
-  }));
-};
 
 const setupWithSavedLogo = () =>
   setupLookForm({

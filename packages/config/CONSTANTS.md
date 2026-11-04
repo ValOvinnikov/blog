@@ -430,7 +430,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/keyboard` — `apps/platform/src/constants/keyboard.ts`
 
-- **KEY**: `ARROW_LEFT`=`"ArrowLeft"`, `ARROW_RIGHT`=`"ArrowRight"`, `HOME`=`"Home"`, `END`=`"End"`, `ENTER`=`"Enter"`, `SPACE`=`" "`
+- **KEY**: `ARROW_LEFT`=`"ArrowLeft"`, `ARROW_RIGHT`=`"ArrowRight"`, `ARROW_UP`=`"ArrowUp"`, `ARROW_DOWN`=`"ArrowDown"`, `HOME`=`"Home"`, `END`=`"End"`, `ENTER`=`"Enter"`, `SPACE`=`" "`, `TAB`=`"Tab"`
 
 ### `@platform/constants/lead` — `apps/platform/src/constants/lead.ts`
 
@@ -476,6 +476,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
 
 - **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
+
+### `@platform/constants/preset-list` — `apps/platform/src/constants/preset-list.ts`
+
+- **PRESET_LIST_LAYOUT**: `GRID`, `ROWS`
 
 ### `@platform/constants/preset-picker` — `apps/platform/src/constants/preset-picker.ts`
 

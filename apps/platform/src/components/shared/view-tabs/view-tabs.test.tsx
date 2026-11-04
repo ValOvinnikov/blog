@@ -6,6 +6,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { stubLgUpWindow } from '@platform/testing/match-media';
 import userEvent from '@testing-library/user-event';
 
 import { useViewTabs } from './use-view-tabs';
@@ -28,15 +29,6 @@ const setup = customRender(ViewTabs, {
   onChange: vi.fn(),
   ids: MOCK_IDS,
 });
-
-const stubMatchMedia = window.matchMedia;
-
-const stubDesktop = () => {
-  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-    ...stubMatchMedia(query),
-    matches: true,
-  }));
-};
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -104,14 +96,14 @@ describe(useViewTabs.name, () => {
   });
 
   it('drops the tabpanel roles from lg when the caller does not decide', () => {
-    stubDesktop();
+    stubLgUpWindow();
     const { result } = renderHookWithIntl(() => useViewTabs());
 
     expect(result.current.panelProps('edit').role).toBeUndefined();
   });
 
   it('keeps the tabpanel roles from lg while the caller says the layout is tabbed', () => {
-    stubDesktop();
+    stubLgUpWindow();
     const { result } = renderHookWithIntl(() =>
       useViewTabs({ isTabbed: true }),
     );
