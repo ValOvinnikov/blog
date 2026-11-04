@@ -5,6 +5,7 @@ import {
   customRender,
   renderWithIntl,
   screen,
+  within,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useRef, useState } from 'react';
@@ -192,6 +193,39 @@ describe(`<${Accordion.name}/>`, () => {
     const trigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
 
     expect(heading).toContainElement(trigger);
+  });
+
+  it('renders its rows as items of a list when asked to', () => {
+    renderWithIntl(
+      <Accordion
+        isList={true}
+        openValue={undefined}
+        onOpenValueChange={vi.fn()}
+      >
+        <Accordion.Item value={FIRST}>
+          <Accordion.Trigger>{MOCK_FIRST_ROW}</Accordion.Trigger>
+          <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value={SECOND}>
+          <Accordion.Trigger>{MOCK_SECOND_ROW}</Accordion.Trigger>
+          <Accordion.Panel>{MOCK_SECOND_BODY}</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>,
+    );
+
+    const items = within(screen.getByRole('list')).getAllByRole('listitem');
+    const firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });
+
+    expect(items).toHaveLength(2);
+    expect(items[0]).toContainElement(firstTrigger);
+  });
+
+  it('renders no list by default', () => {
+    setup();
+
+    const list = screen.queryByRole('list');
+
+    expect(list).not.toBeInTheDocument();
   });
 
   it('renders a row header before its body whatever order they are written in', () => {
