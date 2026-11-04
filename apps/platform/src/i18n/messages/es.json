@@ -591,6 +591,8 @@
     "sitePartsGroupHeading": "Partes del sitio",
     "viewTabsAriaLabel": "Vista de Look",
     "resetButton": "Restablecer ajuste predefinido",
+    "usePresetValueButton": "Usar el valor del ajuste predefinido",
+    "usePresetValueAriaLabel": "Usar el valor del ajuste predefinido para {field}",
     "alertSuccess": "Aspecto guardado.",
     "alertError": "No se pudo guardar la configuración de Aspecto. Vuelva a intentarlo.",
     "presetLabel": "Ajuste predefinido",

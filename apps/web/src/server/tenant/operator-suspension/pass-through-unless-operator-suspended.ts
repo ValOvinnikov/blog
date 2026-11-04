@@ -2,7 +2,7 @@ import { HTTP_STATUS } from '@blog/config';
 import { PROXY_LOG } from '@web/constants/proxy';
 import { TENANT_ID_HEADER } from '@web/server/tenant/constants/constants';
 import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
-import { resolveTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { resolveUncachedTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';
 import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -15,7 +15,7 @@ export const passThroughUnlessOperatorSuspended = async (
   const host = request.headers.get('host');
 
   try {
-    const tenant = await resolveTenant(host);
+    const tenant = await resolveUncachedTenant(host);
     if (tenant && isOperatorSuspended(tenant)) return siteUnavailableStatus();
   } catch (error) {
     logger.error(PROXY_LOG.TENANT_LOOKUP_FAILED, { host, error });

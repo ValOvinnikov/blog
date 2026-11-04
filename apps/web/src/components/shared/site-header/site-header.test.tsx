@@ -115,11 +115,17 @@ const HOME_LINK_NAME = 'Home';
 describe(`<${SiteHeader.name}/>`, () => {
   let user: UserEvent;
 
+  const queryPhoneMenuToggle = () =>
+    screen.queryByRole('button', { name: TOGGLE_NAVIGATION_MENU });
+
   const openPhoneMenu = async () => {
-    const toggleButton = screen.getByRole('button', {
-      name: TOGGLE_NAVIGATION_MENU,
-    });
-    await user.click(toggleButton);
+    await user.click(queryPhoneMenuToggle()!);
+  };
+
+  const openPhoneMenuWithAccountInIt = async () => {
+    getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+    await setup();
+    await openPhoneMenu();
   };
 
   const getDrawerAccountRow = (name: string) => {
@@ -259,6 +265,9 @@ describe(`<${SiteHeader.name}/>`, () => {
 
   describe('with the account in the bar on phones', () => {
     beforeEach(async () => {
+      getNavigationMock.mockResolvedValue(
+        okResult({ items: [MOCK_BLOG_LINK] }),
+      );
       await setup();
     });
 
@@ -267,9 +276,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       const [, phoneCircle] = getBarSignInButtons();
       await user.click(phoneCircle!);
 
-      const toggleButton = screen.getByRole('button', {
-        name: TOGGLE_NAVIGATION_MENU,
-      });
+      const toggleButton = queryPhoneMenuToggle();
 
       expect(toggleButton).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
@@ -300,6 +307,24 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
   });
 
+  describe('with no navigation items', () => {
+    it('shows no phone menu button with the account in the bar', async () => {
+      await setup();
+
+      const toggleButton = queryPhoneMenuToggle();
+
+      expect(toggleButton).not.toBeInTheDocument();
+    });
+
+    it('lists the account row in the phone menu with the account in the menu', async () => {
+      await openPhoneMenuWithAccountInIt();
+
+      const accountRow = getDrawerAccountRow(SIGN_IN);
+
+      expect(accountRow).toBeVisible();
+    });
+  });
+
   describe('with the account in the phone menu', () => {
     const getPanelRows = () => {
       const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
@@ -319,9 +344,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       getNavigationMock.mockResolvedValue(
         okResult({ items: [MOCK_TOPICS_GROUP, MOCK_BLOG_LINK] }),
       );
-      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
-      await setup();
-      await openPhoneMenu();
+      await openPhoneMenuWithAccountInIt();
     });
 
     afterEach(() => {
@@ -435,9 +458,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       getNavigationMock.mockResolvedValue(
         okResult({ items: [], showLanguageSwitcher: true }),
       );
-      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
-      await setup();
-      await openPhoneMenu();
+      await openPhoneMenuWithAccountInIt();
     });
 
     afterEach(() => {

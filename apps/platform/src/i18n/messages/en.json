@@ -591,6 +591,8 @@
     "sitePartsGroupHeading": "Site parts",
     "viewTabsAriaLabel": "Look view",
     "resetButton": "Reset to preset",
+    "usePresetValueButton": "Use preset value",
+    "usePresetValueAriaLabel": "Use preset value for {field}",
     "alertSuccess": "Look saved.",
     "alertError": "Couldn't save Look settings — try again.",
     "presetLabel": "Preset",
