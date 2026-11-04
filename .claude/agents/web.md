@@ -157,20 +157,18 @@ if (!result.ok) {
     testimonial-module-view.tsx
     testimonial-module-view.test.tsx
     testimonial-module-view.stories.tsx
+    testimonial-module-view-variants.ts
     components/
       testimonial-card/
         testimonial-card.tsx
         testimonial-card.test.tsx
+        testimonial-card-variants.ts
       testimonial-carousel/
         testimonial-carousel.tsx
         testimonial-carousel.test.tsx
   ```
 
-  On disk it also holds `testimonial-module-view-variants.ts` and
-  `testimonial-card-variants.ts`, each with one consumer; the diff that
-  touches either folds it into its `.tsx` (`react-component-practices` →
-  "Styling files"). The `*-module.tsx` / `*-module-view.tsx` pair stays at
-  the top.
+  The `*-module.tsx` / `*-module-view.tsx` pair stays at the top.
 
 - **Modules** live in `src/modules/<name>/` — the web side of the CMS
   `module_*` documents, each a `<name>-module.tsx` (fetches) and
@@ -281,10 +279,9 @@ module-evaluation time above its definition is a TDZ `ReferenceError` that
   in `tailwindcss` — never import it directly) and `@source`s
   `packages/ui/src` so ui's classes are scanned. There is no JS preset; the
   package's `./preset` export is a v3 leftover nothing imports.
-- **No class strings inline in JSX** — classes live in a module-scope `tv()`,
-  in routes, layouts and client components alike. Whether it sits in the
-  `.tsx` or a `*-variants.ts` is `react-component-practices` → "Styling
-  files". Group classes by concern in `base` arrays, no comments; pass
+- **No class strings inline in JSX** — classes live in a module-scope `tv()`
+  in a sibling `*-variants.ts`, in routes, layouts and client components alike
+  (`react-component-practices` → "Styling files"). Group classes by concern in `base` arrays, no comments; pass
   `class: className` into the call, never `cn()` (`ui-library-practices` →
   "Styling").
   - **Exception:** `next/font` variable class names are font wiring, not

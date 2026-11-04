@@ -150,24 +150,26 @@ A domain is a module, a feature, a page, or a layout or app route.
 
 ## Styling files
 
-- A component's `tv()` is a module-scope const in its own `.tsx` (class
-  strings inline in JSX stay banned). Derive its `T{X}Variants`
-  (`VariantProps<typeof xVariants>`) beside the `tv()`, wherever that lives;
-  export it once another file imports it — knip fails an unused export.
-- A separate `<name>-variants.ts`, or a recipe in
-  `packages/ui/src/lib/styling/`, exists only once a second component imports
-  it. Every importer counts: a compound-slot sibling, a consumer in another
-  workspace (`apps/web` importing `text-link-variants` by path), an import
-  through the `@blog/ui/lib/styling` barrel.
-- The change that adds the second consumer extracts the `tv()` into that file.
-- A diff that touches a component whose variants file has one consumer folds
-  the `tv()` back into the `.tsx` in that change. Never as a sweep.
-- **`packages/ui` exception:** every component there with a `tv()` of its
-  own, a new one included, keeps it in a sibling `<component>-variants.ts`,
-  because `scripts/gen-ui-index.mjs` reads that file to build
-  `COMPONENTS.md`; a component that applies no classes of its own has none.
-  The exception ends when the generator reads an inline `tv()`. A
-  `lib/styling/` recipe follows the rule above.
+- A component's own `tv()` is a module-scope const in a sibling
+  `<component>-variants.ts`, in every React workspace, even when that
+  component is its only reader. A `tv()` in a `.tsx` and class strings inline
+  in JSX are both banned; a component that applies no classes of its own has
+  no variants file. `scripts/gen-ui-index.mjs` reads this file to build
+  `COMPONENTS.md`.
+- Derive its `T{X}Variants` (`VariantProps<typeof xVariants>`) beside the
+  `tv()`; export it once another file imports it — knip fails an unused
+  export.
+- Styles repeated across components stay in the workspace that renders them,
+  never moved to another one to be shared. Inside `apps/web` or
+  `apps/platform` the others import the owning component's `-variants.ts`; a
+  look no one component owns gets `src/utils/<name>-variants/`
+  (`apps/web`'s `module-grid-actions-variants`). Neither app adds to
+  `packages/ui` for this.
+- A recipe in `packages/ui/src/lib/styling/` is for `packages/ui`'s own
+  repeats: it exists only once a second component in that package imports it,
+  a compound-slot sibling included. An app importing it never justifies one.
+- A diff that touches a component with a `tv()` in its `.tsx` moves it to the
+  sibling file in that change. Never as a sweep.
 
 ## Sizes: derived, repeated, combined
 
@@ -281,19 +283,19 @@ Overridden here:
 
 ## Red flags — stop and restructure
 
-| You are about to write…                                   | Do this instead                                      |
-| --------------------------------------------------------- | ---------------------------------------------------- |
-| `useEffect(() => setX(propX), [propX])`                   | Use `propX` directly, or derive in render            |
-| `const [count, setCount] = useState(items.length)`        | `const count = items.length`                         |
-| `onClick` on a `div`                                      | `<button type="button">`                             |
-| `key={index}`                                             | `key={item.id}`                                      |
-| `value` **and** `defaultValue` on the same component      | Pick controlled or uncontrolled                      |
-| `useCallback` "just in case"                              | Plain function; memo only with a measurement         |
-| `open?: boolean`, `image?: false`                         | `isOpen?: boolean`, `hasOwnImage?: boolean`          |
-| `'use client'` at the top of a page                       | Move it to the leaf that needs the hook              |
-| `data-testid` on a button so the test can find it         | Give the button its accessible name                  |
-| `id="field-name"` or ``id={`cta-${key}`}``                | `const id = useId()`                                 |
-| A new component in `shared/` that one domain imports      | Put it with its consumer ("Where a component lives") |
-| A `*-variants.ts` in an app that only its component reads | Keep the `tv()` in the `.tsx`                        |
-| An 8th platform prop, an 11th `ui`/`web` prop             | Drop → group → slot → hook → context first           |
-| `<CtaModuleView {...result.data} />`                      | `<CtaModuleView module={result.data} />`             |
+| You are about to write…                              | Do this instead                                      |
+| ---------------------------------------------------- | ---------------------------------------------------- |
+| `useEffect(() => setX(propX), [propX])`              | Use `propX` directly, or derive in render            |
+| `const [count, setCount] = useState(items.length)`   | `const count = items.length`                         |
+| `onClick` on a `div`                                 | `<button type="button">`                             |
+| `key={index}`                                        | `key={item.id}`                                      |
+| `value` **and** `defaultValue` on the same component | Pick controlled or uncontrolled                      |
+| `useCallback` "just in case"                         | Plain function; memo only with a measurement         |
+| `open?: boolean`, `image?: false`                    | `isOpen?: boolean`, `hasOwnImage?: boolean`          |
+| `'use client'` at the top of a page                  | Move it to the leaf that needs the hook              |
+| `data-testid` on a button so the test can find it    | Give the button its accessible name                  |
+| `id="field-name"` or ``id={`cta-${key}`}``           | `const id = useId()`                                 |
+| A new component in `shared/` that one domain imports | Put it with its consumer ("Where a component lives") |
+| A `tv()` in a component's `.tsx`                     | Move it to a sibling `<component>-variants.ts`       |
+| An 8th platform prop, an 11th `ui`/`web` prop        | Drop → group → slot → hook → context first           |
+| `<CtaModuleView {...result.data} />`                 | `<CtaModuleView module={result.data} />`             |
