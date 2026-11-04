@@ -303,7 +303,7 @@ describe('the real repo files', () => {
     const { required, optional } = collectClassification(ENV_FILES);
 
     assert.equal(required.size, 10);
-    assert.equal(optional.length, 64);
+    assert.equal(optional.length, 63);
     for (const [, entry] of required)
       for (const environment of entry.environments)
         assert.ok(KNOWN_ENVIRONMENTS.includes(environment));
