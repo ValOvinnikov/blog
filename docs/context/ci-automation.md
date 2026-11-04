@@ -210,8 +210,8 @@ The step names are the job names they replaced, in this order:
   even when passed explicitly, so a file the PR did not touch never fails it.
   It catches edits that bypassed lint-staged, such as GitHub web edits and
   Dependabot.
-- **Type-check**, **Lint** — turbo, affected-only (above). `apps/web`'s
-  `type-check` runs `next typegen` before `tsc`, so it checks against Next's
+- **Type-check**, **Lint** — turbo, affected-only (above). In `apps/web`
+  and `apps/platform`, `type-check` runs `next typegen` before `tsc`, so it checks against Next's
   generated route types (`.next/types/`) on a clean checkout, and catches
   the layout and route-handler type errors that otherwise only surface as
   `next build`'s "Failed to type check".
