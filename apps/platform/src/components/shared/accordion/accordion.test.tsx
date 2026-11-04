@@ -33,12 +33,18 @@ type TRowValue = typeof FIRST | typeof SECOND;
 
 const ControlledAccordion = ({
   initialValue,
+  isList,
 }: {
   initialValue?: TRowValue;
+  isList?: boolean;
 }) => {
   const [openValue, setOpenValue] = useState(initialValue);
   return (
-    <Accordion openValue={openValue} onOpenValueChange={setOpenValue}>
+    <Accordion
+      isList={isList}
+      openValue={openValue}
+      onOpenValueChange={setOpenValue}
+    >
       <Accordion.Item value={FIRST}>
         <Accordion.Trigger>{MOCK_FIRST_ROW}</Accordion.Trigger>
         <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
@@ -196,22 +202,7 @@ describe(`<${Accordion.name}/>`, () => {
   });
 
   it('renders its rows as items of a list when asked to', () => {
-    renderWithIntl(
-      <Accordion
-        isList={true}
-        openValue={undefined}
-        onOpenValueChange={vi.fn()}
-      >
-        <Accordion.Item value={FIRST}>
-          <Accordion.Trigger>{MOCK_FIRST_ROW}</Accordion.Trigger>
-          <Accordion.Panel>{MOCK_FIRST_BODY}</Accordion.Panel>
-        </Accordion.Item>
-        <Accordion.Item value={SECOND}>
-          <Accordion.Trigger>{MOCK_SECOND_ROW}</Accordion.Trigger>
-          <Accordion.Panel>{MOCK_SECOND_BODY}</Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>,
-    );
+    setup({ isList: true });
 
     const items = within(screen.getByRole('list')).getAllByRole('listitem');
     const firstTrigger = screen.getByRole('button', { name: MOCK_FIRST_ROW });

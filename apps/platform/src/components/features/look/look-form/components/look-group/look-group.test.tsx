@@ -40,11 +40,4 @@ describe(`<${LookGroup.name}/>`, () => {
 
     expect(items).toHaveLength(2);
   });
-
-  it('keeps each row button inside its own list item', () => {
-    const [, brandItem] = screen.getAllByRole('listitem');
-    const brandTrigger = screen.getByRole('button', { name: MOCK_BRAND_ROW });
-
-    expect(brandItem).toContainElement(brandTrigger);
-  });
 });
