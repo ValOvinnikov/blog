@@ -35,9 +35,6 @@ export const PREVIEW_TAB = 'Preview';
 
 export const hueValue = (hue: number) => tLogoHue('hueValue', { hue });
 
-export const optimizedImageSrc = (url: string) =>
-  `/_next/image?url=${encodeURIComponent(url)}&w=3840&q=75`;
-
 export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
   const defaults = defaultLookFormValues();
 

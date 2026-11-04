@@ -360,7 +360,7 @@ Free site.
   `sign-in-error/page.test.tsx`, `signup/page.test.tsx`,
   `set-signup-terms-cookie.test.ts`, `legal-page-urls.test.ts`,
   `create-site-action.test.ts`, `check-site-address-action.test.ts`,
-  `require-onboarding-user.test.ts`, `onboarding-view.test.tsx`,
+  `require-onboarding-user.test.ts`, the `onboarding-view*.test.tsx` files,
   `safe-callback-path.test.ts`, and the view tests beside `sign-up-view`,
   `sign-in-view`, `email-sign-in-form`, `centered-card-frame`, `sign-out-button`,
   `signed-in-account` and `dead-end-view`, plus `get-session-email.test.ts`.

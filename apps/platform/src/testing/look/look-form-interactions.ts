@@ -4,7 +4,12 @@ import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
-import { GO_TO_THE_FIRST_ONE } from '@platform/testing/render-in-settings-form';
+import { EDITORIAL } from '@platform/testing/look/look-form-fixtures';
+import {
+  GO_TO_THE_FIRST_ONE,
+  SAVE_CHANGES,
+  UNSAVED_CHANGES,
+} from '@platform/testing/render-in-settings-form';
 import {
   CURRENT_LOGO,
   MOCK_STAGED_LOGO_BLOB_URL,
@@ -68,4 +73,41 @@ export const clickGoToTheFirstOne = async (user: UserEvent) => {
     name: GO_TO_THE_FIRST_ONE,
   });
   await user.click(goToFirstOneLink);
+};
+
+export const clickSave = async (user: UserEvent) => {
+  const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+  const saveChangesButton = within(saveBar).getByRole('button', {
+    name: SAVE_CHANGES,
+  });
+  await user.click(saveChangesButton);
+};
+
+export const pickAndSaveLogo = async (user: UserEvent) => {
+  await pickLogo(user);
+  await clickSave(user);
+};
+
+export const stageAssetRemoval = async (user: UserEvent) => {
+  await openLookRow(user, LOOK_ROW.BRAND);
+  const removeButton = screen.getByRole('button', {
+    name: messages.assetUploadField.remove,
+  });
+  await user.click(removeButton);
+};
+
+export const chooseOption = async (
+  user: UserEvent,
+  selectName: string,
+  optionName: string,
+) => {
+  const select = screen.getByRole('combobox', { name: selectName });
+  await user.click(select);
+  const option = await screen.findByRole('option', { name: optionName });
+  await user.click(option);
+};
+
+export const chooseEditorial = async (user: UserEvent) => {
+  const editorialRadio = screen.getByRole('radio', { name: EDITORIAL });
+  await user.click(editorialRadio);
 };
