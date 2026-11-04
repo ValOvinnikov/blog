@@ -50,7 +50,7 @@ type TSegmentedRadioOption<TValue extends string> = {
   isWide?: boolean;
 };
 
-export type TSegmentedRadioGroupProps<TValue extends string> = {
+type TSegmentedRadioGroupProps<TValue extends string> = {
   options: TSegmentedRadioOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
