@@ -485,7 +485,8 @@ jobs:
           done
 
   ci:
-    name: CI
+    # A draft's skipped check would read as passed under the required name once the PR is marked ready.
+    name: ${{ github.event.pull_request.draft && 'CI (draft)' || 'CI' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs:
@@ -496,8 +497,6 @@ jobs:
       - migrations
     # Without this a failed need skips the job, and a skipped check reads as
     # passed; `!cancelled()` rather than `always()` so a superseded run stops.
-    # A draft skips it too: the skipped check reads as passed, and a draft
-    # cannot merge.
     if: ${{ !cancelled() && !github.event.pull_request.draft }}
     steps:
       - name: Every needed job succeeded or was skipped
