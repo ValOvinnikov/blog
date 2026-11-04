@@ -7,6 +7,7 @@ import {
   type TFormStatus,
   type TMaybeUndefined,
 } from '@blog/config';
+import { isValidEmail } from '@web/utils/is-valid-email';
 import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
@@ -15,6 +16,7 @@ export const useSignInAttempt = (isOpen: boolean) => {
   const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [email, setEmail] = useState('');
   const [isSendLimited, setIsSendLimited] = useState(false);
+  const [isEmailInvalid, setIsEmailInvalid] = useState(false);
   const [pendingProviderId, setPendingProviderId] =
     useState<TMaybeUndefined<TOAuthProviderId>>();
 
@@ -51,8 +53,16 @@ export const useSignInAttempt = (isOpen: boolean) => {
   };
 
   const submitEmail = async () => {
-    setStatus(FORM_STATUS.SUBMITTING);
     setIsSendLimited(false);
+
+    if (!isValidEmail(email)) {
+      setIsEmailInvalid(true);
+      setStatus(FORM_STATUS.ERROR);
+      return;
+    }
+
+    setIsEmailInvalid(false);
+    setStatus(FORM_STATUS.SUBMITTING);
 
     const result = await signIn('email', { email, redirect: false });
 
@@ -70,6 +80,7 @@ export const useSignInAttempt = (isOpen: boolean) => {
     email,
     setEmail,
     isSendLimited,
+    isEmailInvalid,
     submitEmail,
     resetEmail,
     pendingProviderId,

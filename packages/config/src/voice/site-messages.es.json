@@ -134,6 +134,7 @@
     "sentMessage": "Hemos enviado un enlace de acceso a <strong>{email}</strong>.",
     "useDifferentEmail": "Usar otro correo electrónico",
     "emailError": "No se pudo enviar el enlace. Vuelva a intentarlo.",
+    "emailInvalid": "Introduzca un correo electrónico válido.",
     "sendLimited": "Se han solicitado demasiados enlaces de inicio de sesión para esta dirección. Vuelva a intentarlo dentro de una hora.",
     "oauthError": "No se pudo iniciar sesión. Vuelva a intentarlo.",
     "accountMenuAriaLabel": "Menú de la cuenta",
