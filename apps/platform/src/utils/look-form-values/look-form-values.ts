@@ -1,4 +1,3 @@
-import { PRESET_REGISTRY, type TPresetId } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -8,44 +7,6 @@ import {
 } from '@platform/utils/brand-asset-limits/brand-asset-limits';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isSameStagedImage } from '@platform/utils/staged-image/staged-image';
-
-export const applyPresetDefaults = (
-  preset: TPresetId,
-  current: TLookFormValues,
-): TLookFormValues => {
-  const {
-    themeTokens: tokens,
-    cardStyle,
-    headerControlStyle,
-  } = PRESET_REGISTRY[preset];
-
-  return {
-    preset,
-    accentHue: tokens.accentHue,
-    logoHue: undefined,
-    headingFont: tokens.headingFont,
-    bodyFont: tokens.bodyFont,
-    radiusScale: tokens.radiusScale,
-    density: tokens.density,
-    cardStyle,
-    headerControlStyle,
-    headerLayout: current.headerLayout,
-    headerSubmenuStyle: current.headerSubmenuStyle,
-    headerBarStyle: current.headerBarStyle,
-    accountButtonStyle: current.accountButtonStyle,
-    accountPanelStyle: current.accountPanelStyle,
-    accountPhonePlacement: current.accountPhonePlacement,
-    busyButtonStyle: current.busyButtonStyle,
-    spinnerStyle: current.spinnerStyle,
-    footerLayout: current.footerLayout,
-    footerBackground: current.footerBackground,
-    footerSurface: current.footerSurface,
-    cookieSettingsButton: current.cookieSettingsButton,
-    languageSwitcherStyle: current.languageSwitcherStyle,
-    logo: current.logo,
-    favicon: current.favicon,
-  };
-};
 
 export const CARD_FIELDS = {
   [LOOK_CARD.PRESET]: ['preset'],

@@ -165,6 +165,22 @@ describe(`<${SiteNavigation.name}/>`, () => {
     expect(actionButton).toBeVisible();
   });
 
+  it('shows no menu button when the menu would be empty', () => {
+    setup({ links: [] });
+
+    const toggle = screen.queryByRole('button', { name: TOGGLE_NAME });
+
+    expect(toggle).not.toBeInTheDocument();
+  });
+
+  it('keeps the menu button for panel actions alone', () => {
+    setup({ links: [], panelActions: <button>Theme</button> });
+
+    const toggle = screen.getByRole('button', { name: TOGGLE_NAME });
+
+    expect(toggle).toBeInTheDocument();
+  });
+
   describe('mobile toggle', () => {
     let user: UserEvent;
     let toggle: HTMLElement;
