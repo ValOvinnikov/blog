@@ -8,6 +8,7 @@ import {
 } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { stubLgUpWindow } from '@platform/testing/match-media';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -21,14 +22,6 @@ vi.mock('@platform/server/site-config/clear-brand-asset-action');
 const { lookForm: LOOK_FORM, lookPreview: LOOK_PREVIEW } = messages;
 
 const tDevicePreview = makeEnTranslator('devicePreview');
-
-const stubLgUpWindow = () => {
-  const stubMatchMedia = window.matchMedia;
-  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-    ...stubMatchMedia(query),
-    matches: true,
-  }));
-};
 
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;

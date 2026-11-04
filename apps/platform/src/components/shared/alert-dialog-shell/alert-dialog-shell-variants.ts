@@ -2,11 +2,6 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const alertDialogShellVariants = tv({
   slots: {
-    backdrop: [
-      'fixed inset-0 z-40 bg-admin-text/50',
-      'data-[starting-style]:opacity-0 data-[ending-style]:opacity-0',
-      'transition-opacity duration-base ease-smooth',
-    ],
     popup: [
       'fixed top-1/2 left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2',
       'flex flex-col gap-4 rounded-admin border border-admin-line bg-admin-surface p-6 shadow-admin-lg',

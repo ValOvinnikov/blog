@@ -1,5 +1,7 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
 import { headingVariants } from '@platform/components/shared/heading/heading-variants';
+import { DIALOG_BACKDROP_TONE } from '@platform/constants/dialog-backdrop';
+import { dialogBackdropVariants } from '@platform/utils/dialog-backdrop-variants/dialog-backdrop-variants';
 import type { ReactNode } from 'react';
 
 import { alertDialogShellVariants } from './alert-dialog-shell-variants';
@@ -18,7 +20,6 @@ export const AlertDialogShell = ({
   children,
 }: TAlertDialogShellProps) => {
   const {
-    backdrop,
     popup,
     description: descriptionSlot,
     actions: actionsSlot,
@@ -26,7 +27,9 @@ export const AlertDialogShell = ({
 
   return (
     <AlertDialog.Portal>
-      <AlertDialog.Backdrop className={backdrop()} />
+      <AlertDialog.Backdrop
+        className={dialogBackdropVariants({ tone: DIALOG_BACKDROP_TONE.DIM })}
+      />
       <AlertDialog.Popup className={popup()}>
         <AlertDialog.Title className={headingVariants({ size: 'cardTitle' })}>
           {title}
