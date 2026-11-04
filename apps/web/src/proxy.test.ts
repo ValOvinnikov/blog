@@ -35,7 +35,7 @@ faker.seed(6012);
 
 const {
   resolveTenantRoutingMock,
-  resolveTenantMock,
+  resolveUncachedTenantMock,
   getTenantTranslationMapMock,
   intlMock,
   isReaderAccountEnabledForTenantMock,
@@ -43,7 +43,7 @@ const {
 } = vi.hoisted(() => ({
   isReaderAccountEnabledForTenantMock: vi.fn(),
   resolveTenantRoutingMock: vi.fn(),
-  resolveTenantMock: vi.fn(),
+  resolveUncachedTenantMock: vi.fn(),
   getTenantTranslationMapMock: vi.fn(),
   intlMock: vi.fn(),
   env: { NEXT_PUBLIC_SANITY_DATASET: 'development' },
@@ -56,7 +56,7 @@ vi.mock('next-intl/middleware', () => ({
 
 vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
   resolveTenantRouting: resolveTenantRoutingMock,
-  resolveTenant: resolveTenantMock,
+  resolveUncachedTenant: resolveUncachedTenantMock,
 }));
 
 vi.mock(
@@ -485,8 +485,10 @@ describe(proxy, () => {
       resolveTenantRoutingMock.mockResolvedValue(
         tenantRouting(EN, [EN, NL], MOCK_OPERATOR_SUSPENDED_TENANT),
       );
-      resolveTenantMock.mockReset();
-      resolveTenantMock.mockResolvedValue(MOCK_OPERATOR_SUSPENDED_TENANT);
+      resolveUncachedTenantMock.mockReset();
+      resolveUncachedTenantMock.mockResolvedValue(
+        MOCK_OPERATOR_SUSPENDED_TENANT,
+      );
       isReaderAccountEnabledForTenantMock.mockResolvedValue(false);
     });
 
@@ -525,7 +527,9 @@ describe(proxy, () => {
 
         expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
         expect(response.headers.get(NEXT_HEADER)).toBeNull();
-        expect(resolveTenantMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
+        expect(resolveUncachedTenantMock).toHaveBeenCalledWith(
+          MOCK_TENANT_HOST,
+        );
       },
     );
 
@@ -611,7 +615,9 @@ describe(proxy, () => {
     it.each([SITEMAP_PATH, NEWSLETTER_CONFIRM_PATH])(
       'passes %s through for a tenant suspended for inactivity',
       async (path) => {
-        resolveTenantMock.mockResolvedValue(MOCK_INACTIVITY_SUSPENDED_TENANT);
+        resolveUncachedTenantMock.mockResolvedValue(
+          MOCK_INACTIVITY_SUSPENDED_TENANT,
+        );
 
         const response = await visit(path, {
           headers: { [TENANT_ID_HEADER]: MOCK_SPOOFED_TENANT_ID },
@@ -624,7 +630,7 @@ describe(proxy, () => {
     );
 
     it('answers service unavailable and logs once when the sitemap lookup fails', async () => {
-      resolveTenantMock.mockRejectedValue(MOCK_ERROR);
+      resolveUncachedTenantMock.mockRejectedValue(MOCK_ERROR);
 
       const response = await visit(SITEMAP_PATH);
 
