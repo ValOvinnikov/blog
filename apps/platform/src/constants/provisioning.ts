@@ -1,8 +1,8 @@
+export const DEPROVISION_PATH = '/api/deprovision';
+
 export const PROVISIONING_LOG = {
   DEPROVISION_AUDIT_FAILED: 'provisioning.deprovision_audit_failed',
-  DEPROVISION_DISPATCH_ERROR: 'provisioning.deprovision_dispatch_error',
-  DEPROVISION_DISPATCH_FAILED: 'provisioning.deprovision_dispatch_failed',
-  DEPROVISION_DISPATCH_SKIPPED: 'provisioning.deprovision_dispatch_skipped',
+  DEPROVISION_ENQUEUE_REJECTED: 'provisioning.deprovision_enqueue_rejected',
   DOMAIN_CHECK_ERROR: 'provisioning.domain_check_error',
   DOMAIN_CHECK_FAILED: 'provisioning.domain_check_failed',
   DOMAIN_CONFIG_CHECK_FAILED: 'provisioning.domain_config_check_failed',

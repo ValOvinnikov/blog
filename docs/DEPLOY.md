@@ -467,23 +467,22 @@ Optional — each is feature-flag-by-absence (the surface it powers degrades
 with a logged, readable error rather than crashing the app), but the panel is
 not fully functional until they are set:
 
-| Key                                | Purpose                                                                |
-| ---------------------------------- | ---------------------------------------------------------------------- |
-| `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                          |
-| `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                          |
-| `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender, on a Resend-verified domain (see the web note)      |
-| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)      |
-| `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                       |
-| `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache    |
-| `SITE_CONFIG_REVALIDATE_SECRET`    | bearer token for that call — byte-identical to `apps/web`'s own        |
-| `TENANT_PROVISIONING_GITHUB_TOKEN` | `actions: write`-only PAT that dispatches the deprovisioning workflow  |
-| `TENANT_PROVISIONING_GITHUB_REPO`  | `owner/repo` those dispatches target                                   |
-| `TENANT_PROVISIONING_DATASET`      | which tenant registry deprovisioning dispatches target                 |
-| `WORKER_ENQUEUE_URL`               | the `apps/worker` origin "Add tenant", retry and reactivate enqueue to |
-| `WORKER_ENQUEUE_SECRET`            | signs each enqueue — byte-identical to the worker's own                |
-| `VERCEL_API_TOKEN`                 | read-scoped token for the tenant status page's live domain check       |
-| `VERCEL_PROJECT_ID_WEB`            | the shared `apps/web` project id that check runs against               |
-| `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                             |
+| Key                                | Purpose                                                                             |
+| ---------------------------------- | ----------------------------------------------------------------------------------- |
+| `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                                       |
+| `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                                       |
+| `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender, on a Resend-verified domain (see the web note)                   |
+| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)                   |
+| `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                                    |
+| `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache                 |
+| `SITE_CONFIG_REVALIDATE_SECRET`    | bearer token for that call — byte-identical to `apps/web`'s own                     |
+| `TENANT_PROVISIONING_GITHUB_TOKEN` | `actions: write`-only PAT that dispatches the Releases page's workflows             |
+| `TENANT_PROVISIONING_GITHUB_REPO`  | `owner/repo` those dispatches target                                                |
+| `WORKER_ENQUEUE_URL`               | the `apps/worker` origin "Add tenant", retry, reactivate and deprovision enqueue to |
+| `WORKER_ENQUEUE_SECRET`            | signs each enqueue — byte-identical to the worker's own                             |
+| `VERCEL_API_TOKEN`                 | read-scoped token for the tenant status page's live domain check                    |
+| `VERCEL_PROJECT_ID_WEB`            | the shared `apps/web` project id that check runs against                            |
+| `VERCEL_TEAM_ID`                   | only when the Vercel account is team-owned                                          |
 
 > `NEWSLETTER_FROM_ADDRESS` is `apps/web`-only — do **not** set it here.
 
@@ -577,8 +576,8 @@ whose env is listed in `docs/context/environment-variables.md`; nothing below
 provisions a tenant.
 
 `.github/workflows/deprovision-tenant.yml`/
-`invalidate-tenant-cache.yml` (`workflow_dispatch` only, the first triggered
-from `apps/platform`'s "Deprovision tenant" control) and
+`invalidate-tenant-cache.yml` (`workflow_dispatch` only, the first the
+break-glass deprovision for an operator without the admin) and
 `.github/workflows/recheck-tenant-owners.yml`/`validate-tenant-documents.yml`
 all bind to whichever
 Environment their dispatch's `environment` input names (`development`/
@@ -686,11 +685,10 @@ dispatch can point it at `development`.
 
 **`apps/platform`'s own Vercel project (not a GitHub Environment)**
 
-The tenant status page's "Deprovision tenant" control's Server Action
-dispatches `deprovision-tenant.yml` directly against the GitHub API from
-`apps/platform` itself, and "Add tenant", retry and reactivate enqueue to
-`apps/worker` — so these are Vercel env vars on that app's project, not entries
-on a GitHub Environment. See `docs/context/environment-variables.md`.
+The Releases page's Server Actions dispatch their workflows directly against
+the GitHub API from `apps/platform` itself, and "Add tenant", retry, reactivate
+and the Danger page's Deprovision enqueue to `apps/worker` — so these are
+Vercel env vars on that app's project, not entries on a GitHub Environment. See `docs/context/environment-variables.md`.
 
 - [ ] Env vars `WORKER_ENQUEUE_URL` (that environment's worker origin,
       `worker-dev` or `worker-prod`) and `WORKER_ENQUEUE_SECRET`, byte-identical
@@ -701,14 +699,6 @@ on a GitHub Environment. See `docs/context/environment-variables.md`.
       `ValOvinnikov/blog`), paired with its own
       `TENANT_PROVISIONING_GITHUB_TOKEN` — there's no `GITHUB_REPOSITORY`-style
       var to infer the repo from outside Actions.
-- [ ] Optional env var `TENANT_PROVISIONING_DATASET` (`development` or
-      `production`) is forwarded as `deprovision-tenant.yml`'s `environment`
-      input — a manually-set, per-deployment opt-in, same posture as
-      `apps/web`'s `WEB_ANALYTICS_ENABLED`, since `VERCEL_ENV` can't reliably
-      tell a dev deployment apart from real production. A `platform-dev`
-      deployment setting it to `development` points its deprovisioning
-      dispatches at the `development` tenant registry. Left unset, the
-      workflow falls back to `production`.
 
 > Repo-level `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET` remain the
 > fallback for `ci.yml` (which sets no environment) — point them at whichever
