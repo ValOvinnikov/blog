@@ -1,6 +1,7 @@
-import { lookJumpIndexVariants } from '@platform/components/features/look/look-jump-index/look-jump-index-variants';
 import type { TLookGroup } from '@platform/constants/look-group';
 import { toLookAnchorId } from '@platform/utils/look-anchor/look-anchor';
+
+import { jumpGroupItemVariants } from './jump-group-item-variants';
 
 export type TJumpGroupItemProps = {
   group: TLookGroup;
@@ -15,11 +16,11 @@ export const JumpGroupItem = ({
   isPhone,
   onSelect,
 }: TJumpGroupItemProps) => {
-  const { item, groupLink, groupLabel } = lookJumpIndexVariants({ isPhone });
+  const { item, link, label } = jumpGroupItemVariants();
 
   if (isPhone) {
     return (
-      <li aria-hidden="true" className={item({ class: groupLabel() })}>
+      <li aria-hidden="true" className={item({ class: label() })}>
         {title}
       </li>
     );
@@ -33,7 +34,7 @@ export const JumpGroupItem = ({
           event.preventDefault();
           onSelect(group);
         }}
-        className={groupLink()}
+        className={link()}
       >
         {title}
       </a>

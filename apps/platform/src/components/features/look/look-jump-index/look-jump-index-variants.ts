@@ -1,5 +1,3 @@
-import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 // Matches the fades' w-10, so a scrolled-to link clears the fade on its side.
@@ -21,15 +19,6 @@ export const lookJumpIndexVariants = tv({
     ],
     item: ['flex shrink-0'],
     divider: [DIVIDER],
-    groupLink: [
-      'flex h-8 items-center rounded-admin-control pr-1.5 pl-2.5 whitespace-nowrap no-underline',
-      'text-admin-11 font-semibold tracking-[0.06em] text-admin-muted uppercase hover:text-admin-text',
-      insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
-    ],
-    groupLabel: [
-      'pr-0.5 pl-1.5 whitespace-nowrap',
-      'text-admin-11 font-semibold tracking-[0.06em] text-admin-muted uppercase',
-    ],
     fade: ['pointer-events-none absolute inset-y-0 w-10'],
     fadeStart: ['left-0 bg-linear-to-r'],
     fadeEnd: ['right-0 bg-linear-to-l'],
