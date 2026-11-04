@@ -269,8 +269,14 @@ needed a product change. Also found:
   through `importOriginal` (10 files), and `config.test.ts` importing the whole
   `@blog/db` barrel up to 4 times.
 - **`isolate: false` candidates** (no or few module mocks, unmeasured):
-  `packages/utils`, `packages/email`, and `packages/studio`'s `migrations`
-  project.
+  `packages/utils` and `packages/email`.
+- **`packages/studio` runs with `isolate: false` (adopted).** A setup file
+  calls `vi.resetModules()`, which re-evaluates the package's own source per
+  file but keeps `node_modules`, so `sanity` is imported once per worker.
+  Without it, shuffled file orders failed on module-level state
+  (`setDefaultLanguage`) and on a `vi.mock` factory baked into a cached
+  `studio-config`. Measured on 4 cores: 34–35s isolated, 12s after, and 23
+  `--sequence.shuffle.files` seeds green.
 
 ## Follow-ups not filed
 
@@ -283,9 +289,8 @@ decision comes first:
   a light shim that re-exports its error classes, turn db automocks into
   factories, and mock `@blog/db` in auth's `config.test.ts`. Measure with
   `--experimental.importDurations.print` first.
-- **`isolate: false` for `packages/utils`, `packages/email` and
-  `packages/studio`'s `migrations` project** — none or almost none of their
-  files mock modules. Validate each with a normal run and a
+- **`isolate: false` for `packages/utils` and `packages/email`** — none or
+  almost none of their files mock modules. Validate each with a normal run and a
   `--sequence.shuffle` run before adopting it.
 - **Import `react-syntax-highlighter`'s Prism build directly** in
   `code-block.tsx` instead of the package index, which loads highlight.js and
