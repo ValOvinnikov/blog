@@ -1470,6 +1470,8 @@
     "regionLabel": "Cambios sin guardar",
     "allSaved": "Todos los cambios guardados",
     "unsavedChanges": "{count, plural, one {# cambio sin guardar} other {# cambios sin guardar}}",
+    "inCard": "en <link>{card}</link>",
+    "inCards": "en {cards, plural, one {# tarjeta} other {# tarjetas}}",
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",

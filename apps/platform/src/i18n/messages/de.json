@@ -1470,6 +1470,8 @@
     "regionLabel": "Ungespeicherte Änderungen",
     "allSaved": "Alle Änderungen gespeichert",
     "unsavedChanges": "{count, plural, one {# ungespeicherte Änderung} other {# ungespeicherte Änderungen}}",
+    "inCard": "in <link>{card}</link>",
+    "inCards": "in {cards, plural, one {# Karte} other {# Karten}}",
     "fieldsNeedAttention": "{count, plural, one {# Feld braucht Aufmerksamkeit} other {# Felder brauchen Aufmerksamkeit}}",
     "goToFirstField": "Zum ersten Feld",
     "notSaved": "Nicht gespeichert",

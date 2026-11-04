@@ -283,6 +283,54 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
   });
 
+  describe('with the save bar hidden by the page', () => {
+    let onSave: TSettingsForm<TValues>['save'];
+    let rerender: ReturnType<typeof renderShell>['rerender'];
+
+    beforeEach(() => {
+      onSave = vi.fn().mockResolvedValue(true);
+      ({ rerender } = renderShell(
+        { save: onSave, changeCount: 3 },
+        { isSaveBarHidden: true },
+      ));
+    });
+
+    it('offers no save bar', () => {
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(saveBar).not.toBeInTheDocument();
+    });
+
+    it('still saves on the shortcut', async () => {
+      await user.keyboard(CONTROL_S_CONTROL);
+
+      expect(onSave).toHaveBeenCalledTimes(1);
+    });
+
+    it('still warns before the page unloads and announces the change count', () => {
+      const event = dispatchBeforeUnload();
+      const announcement = screen.getByTestId(
+        UNSAVED_CHANGES_ANNOUNCEMENT_TEST_ID,
+      );
+
+      expect(event.defaultPrevented).toBe(true);
+      expect(announcement).toHaveTextContent(THREE_UNSAVED_CHANGES);
+    });
+
+    it('shows the bar again with its count once the page stops hiding it', () => {
+      rerender(
+        <SettingsFormShell
+          {...baseProps}
+          form={formFor({ save: onSave, changeCount: 3 })}
+        />,
+      );
+
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(saveBar).toHaveTextContent(THREE_UNSAVED_CHANGES);
+    });
+  });
+
   describe('saved status', () => {
     beforeEach(async () => {
       renderWithIntl(<TaglineSettings />);

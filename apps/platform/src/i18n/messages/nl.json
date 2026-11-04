@@ -1470,6 +1470,8 @@
     "regionLabel": "Niet-opgeslagen wijzigingen",
     "allSaved": "Alle wijzigingen opgeslagen",
     "unsavedChanges": "{count, plural, one {# niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}}",
+    "inCard": "in <link>{card}</link>",
+    "inCards": "in {cards, plural, one {# kaart} other {# kaarten}}",
     "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
     "goToFirstField": "Naar het eerste veld",
     "notSaved": "Niet opgeslagen",

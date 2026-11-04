@@ -24,6 +24,9 @@ const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_FIELD_ID = faker.string.alpha(10);
 const MOCK_SECOND_FIELD_ID = faker.string.alpha(10);
 const MOCK_BREAKDOWN = faker.lorem.words(3);
+const MOCK_CARD_NAME = faker.lorem.word();
+const MOCK_OTHER_CARD_NAME = faker.lorem.words(2);
+const IN_PREFIX = /^in /;
 
 const baseProps: TSaveBarProps = {
   changeCount: 3,
@@ -76,6 +79,56 @@ describe(`<${SaveBar.name}/>`, () => {
 
     expect(changeCount).toBeVisible();
     expect(breakdown).toBeVisible();
+  });
+
+  describe('where the changes are', () => {
+    it('names the one card holding the changes as a link that calls its handler', async () => {
+      const onSelect = vi.fn();
+      setup({ unsavedCards: [{ name: MOCK_CARD_NAME, onSelect }] });
+
+      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const cardLink = screen.getByRole('button', { name: MOCK_CARD_NAME });
+      await user.click(cardLink);
+
+      expect(region).toHaveTextContent(
+        `${THREE_UNSAVED_CHANGES}in ${MOCK_CARD_NAME}`,
+      );
+      expect(onSelect).toHaveBeenCalledTimes(1);
+    });
+
+    it('counts the cards without naming them when there are several', () => {
+      setup({
+        unsavedCards: [
+          { name: MOCK_CARD_NAME, onSelect: vi.fn() },
+          { name: MOCK_OTHER_CARD_NAME, onSelect: vi.fn() },
+        ],
+      });
+
+      const location = screen.getByText('in 2 cards');
+      const cardLink = screen.queryByRole('button', { name: MOCK_CARD_NAME });
+
+      expect(location).toBeVisible();
+      expect(cardLink).not.toBeInTheDocument();
+    });
+
+    it('shows no location when the caller passes none', () => {
+      setup();
+
+      const location = screen.queryByText(IN_PREFIX);
+
+      expect(location).not.toBeInTheDocument();
+    });
+
+    it('shows no location while fields need attention', () => {
+      setup({
+        invalidControls: { ids: [MOCK_FIELD_ID] },
+        unsavedCards: [{ name: MOCK_CARD_NAME, onSelect: vi.fn() }],
+      });
+
+      const cardLink = screen.queryByRole('button', { name: MOCK_CARD_NAME });
+
+      expect(cardLink).not.toBeInTheDocument();
+    });
   });
 
   describe('while saving', () => {

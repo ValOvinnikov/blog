@@ -73,7 +73,7 @@ export const VoiceSettings = ({
 
   return (
     <SettingsFormShell
-      layout={{ isWide: true }}
+      layout={{ isWide: true, isSaveBarFloatingOnPhone: true }}
       title={t('heading')}
       description={t('description')}
       form={form}
