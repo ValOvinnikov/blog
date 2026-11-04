@@ -361,6 +361,14 @@ jobs:
             pnpm turbo run test --affected --concurrency=2
           fi
 
+      # Reads the JSON timings the Test step's vitest runs wrote; the base
+      # ref is what the allowlist may only shrink against.
+      - name: Test time budget
+        if: ${{ !cancelled() }}
+        env:
+          TEST_BUDGET_BASE_REF: ${{ github.event.pull_request.base.sha }}
+        run: node scripts/check-test-budget.mjs --enforce
+
   required-env:
     name: Required env (${{ matrix.environment }})
     if: ${{ !github.event.pull_request.draft && needs.changes.outputs.env-presence == 'true' }}
