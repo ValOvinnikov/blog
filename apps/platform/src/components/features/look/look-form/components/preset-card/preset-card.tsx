@@ -1,3 +1,4 @@
+import { SIZE } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -41,6 +42,7 @@ export const PresetCard = () => {
           <Button
             type="button"
             variant={BUTTON_VARIANT.SECONDARY}
+            size={SIZE.MD}
             onClick={resetToPreset}
             isDisabled={isArchived}
             aria-describedby={archivedDescribedBy}
