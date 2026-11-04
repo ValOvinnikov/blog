@@ -292,9 +292,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('names the language being edited in the note', () => {
       const note = screen.getByRole('note');
-      const language = within(note).getByText(ENGLISH, { selector: 'strong' });
 
-      expect(language).toBeVisible();
+      expect(note).toContainElement(activeLanguageLabel(ENGLISH));
     });
 
     it('describes each live language, marking the default', () => {
