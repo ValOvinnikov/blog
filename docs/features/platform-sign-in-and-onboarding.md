@@ -102,7 +102,7 @@ Free site.
 - `/onboarding`: a four-step setup wizard for a signed-in user with no
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
   to their own home, so an invited member never sees it). A dark left rail
-  (the sidebar's `admin-side*` tokens) carries the Valstack mark, "Create your
+  (the `admin-rail*` tokens) carries the Valstack mark, "Create your
   site" and the step list (an `ol` named "Setup steps", no `nav`), where a
   done step shows a tick and its choice ("Blog · Field Notes", the site
   address, the preset) and is announced as "Site, Complete, Blog · Field
@@ -155,7 +155,12 @@ Free site.
   progress bar once, as one progressbar named "Setup steps" whose value text
   is the visible line; the line and the segments themselves are hidden from
   it. From 768px up the step header reads "Step N of 4" above the heading
-  instead. Each step's fields stack at every width. A wizard field puts its
+  instead. The wizard follows the admin's Light / Dark theme through
+  the admin tokens, while the rail and the phone header stay dark in both. In
+  Dark the Full preview column is ruled off from the content column, the
+  phone header gains a 1px bottom border and the hue thumb takes a dark
+  border and deeper shadow; Light draws none of these, and the preview's own
+  Light / Dark stays independent of the admin theme. Each step's fields stack at every width. A wizard field puts its
   hint directly below the control and any error below the hint (13.5px
   labels, 14px controls from 768px, 6px between label, control, hint and
   error), and the control is described by the hint, then the error, through

@@ -13,6 +13,7 @@ import { noNestedQueryRule } from './no-nested-query.js';
 import { noNodeAccessRule } from './no-node-access.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
 import { preferSharedConstantRule } from './prefer-shared-constant.js';
+import { preferUtilsPrimitiveRule } from './prefer-utils-primitive.js';
 
 // Set only by the touched-file gates (post-edit hook, pre-commit, `pnpm
 // check:touched-lint`), so files nobody edits keep their existing violations.
@@ -27,6 +28,7 @@ const touchedFilePlugins = {
       rules: {
         'prefer-shared-constant': preferSharedConstantRule,
         'no-duplicate-string': noDuplicateStringRule,
+        'prefer-utils-primitive': preferUtilsPrimitiveRule,
       },
     },
   },
@@ -38,6 +40,7 @@ const touchedFileRules = {
   rules: {
     'blog-touched/prefer-shared-constant': 'error',
     'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
+    'blog-touched/prefer-utils-primitive': 'error',
   },
 };
 

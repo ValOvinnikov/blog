@@ -2,6 +2,7 @@ import { SIZE } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
@@ -52,6 +53,7 @@ export const ColourCard = () => {
             {tHue('hueValue', { hue: accentHue })}
           </span>
         </div>
+        <PresetValueButton field="accentHue" fieldLabel={accentHueLabel} />
       </LookField>
 
       <LookField

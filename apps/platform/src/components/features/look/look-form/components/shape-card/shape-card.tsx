@@ -11,6 +11,7 @@ import {
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
@@ -72,6 +73,7 @@ export const ShapeCard = () => {
           onChange={(scale) => updateField('radiusScale', scale)}
           isDisabled={radiusScaleLock.isDisabled}
         />
+        <PresetValueButton field="radiusScale" fieldLabel={radiusScaleLabel} />
       </LookField>
 
       <LookField
@@ -87,6 +89,7 @@ export const ShapeCard = () => {
           onChange={(option) => updateField('density', option)}
           isDisabled={densityLock.isDisabled}
         />
+        <PresetValueButton field="density" fieldLabel={densityLabel} />
       </LookField>
 
       <LookField
@@ -102,6 +105,7 @@ export const ShapeCard = () => {
           onChange={(style) => updateField('cardStyle', style)}
           isDisabled={cardStyleLock.isDisabled}
         />
+        <PresetValueButton field="cardStyle" fieldLabel={cardStyleLabel} />
       </LookField>
 
       <LookField
@@ -116,6 +120,10 @@ export const ShapeCard = () => {
           value={headerControlStyle}
           onChange={(style) => updateField('headerControlStyle', style)}
           isDisabled={headerControlStyleLock.isDisabled}
+        />
+        <PresetValueButton
+          field="headerControlStyle"
+          fieldLabel={headerControlStyleLabel}
         />
       </LookField>
     </LookCard>

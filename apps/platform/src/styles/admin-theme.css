@@ -77,6 +77,8 @@
   --admin-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.08);
   --admin-shadow-thumb: 0 1px 3px rgba(16, 24, 40, 0.25);
   --admin-thumb-line: rgba(16, 24, 40, 0.12);
+  --admin-preview-column-line: transparent;
+  --admin-rail-header-line: transparent;
   --admin-topbar: 67px;
   --admin-view-tab: 44px;
   --admin-view-tab-border: 1px;
@@ -161,6 +163,10 @@
   --admin-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
   --admin-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
   --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --admin-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --admin-thumb-line: #0f1115;
+  --admin-preview-column-line: #2b303a;
+  --admin-rail-header-line: #1c1f26;
 }
 
 /* Same values as the block above: with no stored choice the admin follows the device. */
@@ -229,6 +235,10 @@
     --admin-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
     --admin-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
     --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --admin-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
+    --admin-thumb-line: #0f1115;
+    --admin-preview-column-line: #2b303a;
+    --admin-rail-header-line: #1c1f26;
   }
 }
 

@@ -591,6 +591,8 @@
     "sitePartsGroupHeading": "Parties du site",
     "viewTabsAriaLabel": "Vue Look",
     "resetButton": "Rétablir le préréglage",
+    "usePresetValueButton": "Utiliser la valeur du préréglage",
+    "usePresetValueAriaLabel": "Utiliser la valeur du préréglage pour {field}",
     "alertSuccess": "Apparence enregistrée.",
     "alertError": "Impossible d'enregistrer les paramètres d'apparence — veuillez réessayer.",
     "presetLabel": "Préréglage",
