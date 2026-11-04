@@ -130,7 +130,8 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   warning.
 - **`packages/ui`** — merges the preset with jsdom and `src/test-setup.ts`,
   with `isolate: false`, which its setup's explicit `cleanup()` makes safe.
-- **`packages/service`** runs on `vmThreads`; **`packages/db`** on `threads`,
+- **`packages/service`** and **`apps/worker`** run on `vmThreads`, which
+  keeps each file's `vi.mock`s while importing the SDKs once per worker; **`packages/db`** on `threads`,
   with `unstubEnvs: true`, query tests getting their database from
   `useQueryTestDb()` and the shared `src/__mocks__/client.ts`.
 - **Every other package** runs in `node`; `service`, `db`, `auth` and `email`

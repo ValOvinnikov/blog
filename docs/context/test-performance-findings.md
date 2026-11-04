@@ -19,7 +19,7 @@ suite figures predate that.
 | `apps/platform` | 352   | 472s                                  | 243–359s       | environment, tests, import, setup |
 | `apps/web`      | 330   | 262s                                  | 224–313s       | environment, import, setup        |
 | `packages/db`   | 207   | 366s                                  | 350s           | tests (PGlite), import            |
-| `apps/worker`   | 37    | 36s                                   | —              | import (88%)                      |
+| `apps/worker`   | 48    | 36s                                   | 30–34s → 11s   | import (88%)                      |
 | `packages/auth` | 17    | 12s                                   | —              | import, transform                 |
 
 `packages/db` is as slow alone as under turbo, so it is not slowed by
@@ -259,6 +259,9 @@ needed a product change. Also found:
 - **Keep `test`'s `dependsOn: ["^build"]`.** No package has a `build` script,
   but the dependency is likely what invalidates a suite's cache when a package
   it reads through an alias changes.
+- **`apps/worker`** runs on `vmThreads`: 30–34s → 10.5–11s alone on 4 cores,
+  all green in normal and `--sequence.shuffle` runs. `isolate: false` fails
+  files in both, and enabling `deps.optimizer.ssr` gains nothing.
 - **`apps/worker` and `packages/auth`**: `isolate: false` is unsafe for the
   same `vi.mock` reason. Their import time comes from the tests themselves:
   `importOriginal` spreads of the db tenants barrel in
