@@ -1,13 +1,18 @@
 'use client';
 
 import { SIZE } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
+import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
+import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { useTranslations } from 'next-intl';
 import type { MouseEvent } from 'react';
 import { flushSync } from 'react-dom';
 
+import {
+  SaveBarLocation,
+  type TUnsavedCard,
+} from './components/save-bar-location/save-bar-location';
 import { saveBarVariants } from './save-bar-variants';
 
 const FIELD_CONTROL =
@@ -23,6 +28,8 @@ export type TSaveBarProps = {
   breakdown: string;
   invalidControls: TInvalidControls;
   isPending: boolean;
+  unsavedCards?: TUnsavedCard[];
+  isFloatingOnPhone?: boolean;
   onSave: () => void;
   onDiscard: () => void;
 };
@@ -32,6 +39,8 @@ export const SaveBar = ({
   breakdown,
   invalidControls,
   isPending,
+  unsavedCards,
+  isFloatingOnPhone,
   onSave,
   onDiscard,
 }: TSaveBarProps) => {
@@ -42,7 +51,6 @@ export const SaveBar = ({
   const {
     root,
     summary,
-    dot,
     count,
     breakdown: breakdownSlot,
     errorContent,
@@ -53,7 +61,7 @@ export const SaveBar = ({
     notSaved,
     actions,
     shortcut,
-  } = saveBarVariants({ hasErrors: hasInvalidFields });
+  } = saveBarVariants({ hasErrors: hasInvalidFields, isFloatingOnPhone });
 
   const goToFirstField = (event: MouseEvent<HTMLAnchorElement>) => {
     if (isUndefined(firstInvalidControlId)) return;
@@ -97,11 +105,14 @@ export const SaveBar = ({
         </div>
       ) : (
         <span className={summary()}>
-          <span aria-hidden="true" className={dot()} />
+          <UnsavedDot isDecorative={true} />
           <span className={count()}>
             {t('unsavedChanges', { count: changeCount })}
           </span>
           {breakdown && <span className={breakdownSlot()}>{breakdown}</span>}
+          {hasArrayGotItems(unsavedCards) && (
+            <SaveBarLocation cards={unsavedCards} />
+          )}
         </span>
       )}
       <div className={actions()}>

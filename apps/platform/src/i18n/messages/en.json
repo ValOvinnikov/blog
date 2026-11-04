@@ -1482,6 +1482,8 @@
     "regionLabel": "Unsaved changes",
     "allSaved": "All changes saved",
     "unsavedChanges": "{count, plural, one {# unsaved change} other {# unsaved changes}}",
+    "inCard": "in <link>{card}</link>",
+    "inCards": "in {cards, plural, one {# card} other {# cards}}",
     "fieldsNeedAttention": "{count, plural, one {# field needs attention} other {# fields need attention}}",
     "goToFirstField": "Go to the first one",
     "notSaved": "Not saved",

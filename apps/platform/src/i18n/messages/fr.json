@@ -1482,6 +1482,8 @@
     "regionLabel": "Modifications non enregistrées",
     "allSaved": "Toutes les modifications sont enregistrées",
     "unsavedChanges": "{count, plural, one {# modification non enregistrée} other {# modifications non enregistrées}}",
+    "inCard": "dans <link>{card}</link>",
+    "inCards": "dans {cards, plural, one {# carte} other {# cartes}}",
     "fieldsNeedAttention": "{count, plural, one {# champ à vérifier} other {# champs à vérifier}}",
     "goToFirstField": "Aller au premier",
     "notSaved": "Non enregistré",

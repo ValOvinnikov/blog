@@ -5,23 +5,24 @@ import type { IWithChildren } from '@blog/config/react';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
-import { useUnsavedChangesGuard } from '@platform/context/unsaved-changes-provider';
 import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
 import { useTranslations } from 'next-intl';
-import { useEffect, useEffectEvent, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { DraftRecoveryBanner } from './components/draft-recovery-banner/draft-recovery-banner';
+import type { TUnsavedCard } from './components/save-bar/components/save-bar-location/save-bar-location';
 import { SaveBar, type TInvalidControls } from './components/save-bar/save-bar';
 import { ShellHeader } from './components/shell-header/shell-header';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
-import { useSavedStatus } from './use-saved-status';
-import { useSettingsDraft } from './use-settings-draft';
 import type { TSettingsForm } from './use-settings-form';
+import { useShellSaveActions } from './use-shell-save-actions';
+import { useUnsavedPageProtection } from './use-unsaved-page-protection';
 
 type TSettingsFormShellLayout = {
   isWide?: boolean;
   isTitleHiddenBelowLg?: boolean;
   hasCompactGap?: boolean;
+  isSaveBarFloatingOnPhone?: boolean;
 };
 
 export type TSettingsFormShellProps<TValues> = IWithChildren & {
@@ -32,12 +33,11 @@ export type TSettingsFormShellProps<TValues> = IWithChildren & {
   layout?: TSettingsFormShellLayout;
   headerActions?: ReactNode;
   hasSavedStatus?: boolean;
+  unsavedCards?: TUnsavedCard[];
+  isSaveBarHidden?: boolean;
 };
 
 const NO_INVALID_CONTROLS: TInvalidControls = { ids: [] };
-
-const isSaveShortcut = (event: KeyboardEvent) =>
-  (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's';
 
 export const SettingsFormShell = <TValues,>({
   title,
@@ -47,6 +47,8 @@ export const SettingsFormShell = <TValues,>({
   layout,
   headerActions,
   hasSavedStatus = true,
+  unsavedCards,
+  isSaveBarHidden = false,
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const {
@@ -63,70 +65,33 @@ export const SettingsFormShell = <TValues,>({
     planRefusal,
   } = form;
   const t = useTranslations('saveBar');
+  const isDirty = changeCount > 0;
+  const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
   const { root, alert, liveStatus } = settingsFormShellVariants({
     isWide: layout?.isWide,
     hasCompactGap: layout?.hasCompactGap,
     isArchived,
+    isSaveBarFloatingOnPhone: layout?.isSaveBarFloatingOnPhone,
+    isSaveBarShown,
   });
-  const isDirty = changeCount > 0;
-  const { isSavedStatusShown, markSaved } = useSavedStatus(
-    isDirty,
-    hasSavedStatus,
-  );
   const breakdown = formatLanguageChanges(changesByLanguage);
   const {
+    isSavedStatusShown,
     offer,
     restore,
-    forget: forgetDraft,
-  } = useSettingsDraft(draft, isDirty);
+    forgetDraft,
+    handleSave,
+    handleDiscard,
+  } = useShellSaveActions({ save, discard, draft, isDirty, hasSavedStatus });
 
-  const handleSave = async () => {
-    const isSaved = await save();
-    if (isSaved) {
-      forgetDraft();
-      markSaved();
-    }
-    return isSaved;
-  };
-
-  const handleDiscard = () => {
-    discard();
-    forgetDraft();
-  };
-
-  useUnsavedChangesGuard(
-    isDirty
-      ? {
-          pageTitle: title,
-          changeCount,
-          changesByLanguage,
-          save: handleSave,
-          discard: handleDiscard,
-        }
-      : null,
-  );
-
-  const handleShortcut = useEffectEvent((event: KeyboardEvent) => {
-    if (!isSaveShortcut(event)) return;
-    event.preventDefault();
-    if (!isPending) void handleSave();
+  useUnsavedPageProtection({
+    pageTitle: title,
+    changeCount,
+    changesByLanguage,
+    isPending,
+    save: handleSave,
+    discard: handleDiscard,
   });
-
-  useEffect(() => {
-    if (!isDirty) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => handleShortcut(event);
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      event.preventDefault();
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [isDirty]);
 
   return (
     <div className={root()}>
@@ -177,12 +142,14 @@ export const SettingsFormShell = <TValues,>({
         {isDirty ? t('unsavedChanges', { count: changeCount }) : ''}
       </span>
 
-      {isDirty && !isArchived && (
+      {isSaveBarShown && (
         <SaveBar
           changeCount={changeCount}
           breakdown={breakdown}
           invalidControls={invalidControls}
           isPending={isPending}
+          unsavedCards={unsavedCards}
+          isFloatingOnPhone={layout?.isSaveBarFloatingOnPhone}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}
         />
