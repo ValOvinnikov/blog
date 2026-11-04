@@ -135,9 +135,15 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   `useQueryTestDb()` and the shared `src/__mocks__/client.ts`.
 - **Every other package** runs in `node`; `service`, `db`, `auth` and `email`
   also set `mockReset: true`.
+- **`packages/studio`** runs with `isolate: false` and a setup file calling
+  `vi.resetModules()`, plus `unstubGlobals` and `restoreMocks`.
 - **`isolate: false` is not a free speed-up.** With isolation off, a module
-  one file imported keeps that file's `vi.mock` bindings in the next file of
-  the same worker, so it is only safe where files do not mock modules.
+  one file imported keeps that file's `vi.mock` bindings and module-level
+  state in the next file of the same worker. A setup file calling
+  `vi.resetModules()` re-evaluates the workspace's own source per file while
+  `node_modules` stay loaded, which makes it safe; without one it is only
+  safe where files do not mock modules. Validate it with several
+  `--sequence.shuffle.files` seeds, not one run.
 - **Aliases.** Vitest does not read `tsconfig` `paths`. `resolve.alias` maps
   the workspace's own alias and every dependency's
   (`blogPackageAlias('<pkg>', import.meta.url)` in the apps), or cross-package
