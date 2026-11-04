@@ -220,7 +220,7 @@ https://sanity-cdn.com`, `img-src https://cdn.sanity.io` plus GitHub and
   Studio page test, `utils/owner-studio-access/owner-studio-access.test.ts`
   and `server/owner-access/request-owner-access.test.ts`.
 - `apps/platform/src/utils/content-security-policy/content-security-policy.test.ts`.
-- Capability and plan warnings: `packages/studio/src/schema-types/inputs/requirement-warning-input/*.test.ts`.
+- Capability and plan warnings: `packages/studio/src/schema-types/inputs/requirement-warning-input/**/*.test.ts(x)`.
 - Login provider: `packages/studio/src/auth/login-provider-auth.test.ts`.
 - No Storybook in either workspace.
 

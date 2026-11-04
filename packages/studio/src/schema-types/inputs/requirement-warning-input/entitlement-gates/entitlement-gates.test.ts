@@ -5,15 +5,16 @@ import {
   type TModulePack,
 } from '@blog/config/constants';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
+import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
 import {
   getRequirementOffMessage,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
@@ -230,7 +231,7 @@ describe(entitlementGates, () => {
           pricingType,
         ]);
 
-        expect(arrayFunctions !== undefined).toBe(replaced);
+        expect(!isUndefined(arrayFunctions)).toBe(replaced);
       },
     );
   });

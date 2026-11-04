@@ -2,7 +2,7 @@ import { MODULE_PACK } from '@blog/config/constants';
 import {
   getModulePickerSections,
   getOffPlanModulePack,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';

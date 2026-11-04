@@ -1,8 +1,8 @@
 import type { TModulePack } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
-import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import { hasArrayGotItems, isNull } from '@blog/utils/primitives';
 
 type TPickerType = { name: string };
 
@@ -22,7 +22,7 @@ export const getOffPlanModulePack = (
 ): TMaybeUndefined<TModulePack> =>
   types
     .map(({ name }) => getMissingModulePack(name, entitledModulePacks))
-    .find((modulePack) => modulePack !== null) ?? undefined;
+    .find((modulePack) => !isNull(modulePack)) ?? undefined;
 
 export const getModulePickerSections = <T extends TPickerType>({
   types,

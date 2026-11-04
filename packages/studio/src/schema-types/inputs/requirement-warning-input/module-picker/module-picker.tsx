@@ -5,12 +5,13 @@ import {
   getMissingModulePack,
   getModulePackPlanLabel,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import {
   getModulePickerSections,
   getOffPlanModulePack,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
 import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
+import { hasLength } from '@blog/utils/primitives';
 import { Badge, Box, Button, Grid, Text, TextInput } from '@sanity/ui';
 import { Menu, MenuButton, MenuDivider, MenuItem } from '@sanity/ui/menu';
 import { Plus, Search } from 'lucide-react';
@@ -125,7 +126,7 @@ export const createModulePicker = ({
                   })}
                 </Fragment>
               ))}
-              {sections.length === 0 && (
+              {!hasLength(sections) && (
                 <Box padding={3}>
                   <Text size={1} muted={true}>
                     {t('inputs.array.insert-menu.search.no-results')}

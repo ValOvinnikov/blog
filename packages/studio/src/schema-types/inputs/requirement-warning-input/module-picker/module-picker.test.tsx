@@ -5,8 +5,8 @@ import { MODULE_PACK } from '@blog/config/constants';
 import {
   getLockedModulesNote,
   getModulePackPlanLabel,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';

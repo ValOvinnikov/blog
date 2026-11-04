@@ -4,7 +4,7 @@ import {
   getMissingRequirement,
   getRequirementOffSuffix,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 
 type TNamedType = { name: string; title?: string };
 

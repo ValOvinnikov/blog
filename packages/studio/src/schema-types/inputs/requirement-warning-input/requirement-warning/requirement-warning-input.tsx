@@ -1,11 +1,12 @@
+import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
 import {
   getMissingRequirement,
   getRequirementOffMessage,
   type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
-import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker';
-import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
+import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
+import { hasLength } from '@blog/utils/primitives';
 import { Card, Stack, Text } from '@sanity/ui';
 import { useMemo } from 'react';
 import {
@@ -47,10 +48,9 @@ export const createRequirementWarningInput = (
       return props.renderDefault({ ...props, schemaType: markedArrayType });
     }
 
-    const missing =
-      props.path.length === 0
-        ? getMissingRequirement(schemaType.name, entitlements)
-        : null;
+    const missing = !hasLength(props.path)
+      ? getMissingRequirement(schemaType.name, entitlements)
+      : null;
 
     if (!missing) {
       return props.renderDefault(props);

@@ -1,6 +1,6 @@
 import { CAPABILITY, MODULE_PACK } from '@blog/config/constants';
-import { getRequirementOffSuffix } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
-import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
+import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types/mark-requirement-off-types';
+import { getRequirementOffSuffix } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 
