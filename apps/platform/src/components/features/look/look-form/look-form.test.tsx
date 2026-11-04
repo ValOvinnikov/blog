@@ -18,6 +18,7 @@ import {
   LOCALE_ISO_CODES,
   PRESET_ID,
   PRESET_REGISTRY,
+  RADIUS_SCALE,
   SPINNER_STYLE,
 } from '@blog/config';
 import type * as BlogConfig from '@blog/config';
@@ -163,6 +164,10 @@ const EDIT_PANEL_TEST_ID = 'look-form-edit-panel';
 const FOLLOW_ACCENT_HUE = messages.logoHueField.followAccentHue;
 const UPLOAD_FAVICON = messages.assetUploadField.favicon.upload;
 const RESET_TO_PRESET = LOOK_FORM.resetButton;
+const USE_PRESET_RADIUS = makeEnTranslator('lookForm')(
+  'usePresetValueAriaLabel',
+  { field: LOOK_FORM.radiusScaleLabel },
+);
 const EXTRA_LARGE = LOOK_FORM.radiusScaleOptionLabel.XL;
 const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;
 const OUTLINED = LOOK_FORM.cardStyleOptionLabel.OUTLINED;
@@ -792,6 +797,45 @@ describe(`<${LookForm.name}/>`, () => {
       name: LOOK_FORM.headerControlStyleOptionLabel.OUTLINED,
     });
     expect(outlinedButton).toHaveAttribute(ARIA_PRESSED, 'true');
+  });
+
+  describe('after choosing a preset over a customised radius', () => {
+    beforeEach(async () => {
+      setupLookForm({
+        initialValues: {
+          ...defaultLookFormValues(),
+          radiusScale: RADIUS_SCALE.XL,
+        },
+      });
+      await chooseEditorial(user);
+      await openLookRow(user, LOOK_ROW.SHAPE);
+    });
+
+    it('keeps the customised radius and takes the density the owner left alone', () => {
+      const extraLargeButton = screen.getByRole('button', {
+        name: EXTRA_LARGE,
+      });
+      const compactButton = screen.getByRole('button', { name: COMPACT });
+
+      expect(extraLargeButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(compactButton).toHaveAttribute(ARIA_PRESSED, 'true');
+    });
+
+    it("puts the radius alone back to the new preset's value", async () => {
+      const usePresetRadiusLink = screen.getByRole('button', {
+        name: USE_PRESET_RADIUS,
+      });
+      await user.click(usePresetRadiusLink);
+
+      const smallButton = screen.getByRole('button', {
+        name: LOOK_FORM.radiusScaleOptionLabel.SM,
+      });
+      const usePresetRadiusButton = screen.queryByRole('button', {
+        name: USE_PRESET_RADIUS,
+      });
+      expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
+      expect(usePresetRadiusButton).not.toBeInTheDocument();
+    });
   });
 
   describe('after choosing a preset over saved non-theme settings', () => {

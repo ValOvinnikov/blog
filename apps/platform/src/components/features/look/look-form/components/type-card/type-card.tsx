@@ -1,5 +1,6 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FontPicker } from '@platform/components/shared/font-picker';
@@ -36,6 +37,7 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
           onChange={(font) => updateField('headingFont', font)}
           isDisabled={headingFontLock.isDisabled}
         />
+        <PresetValueButton field="headingFont" fieldLabel={headingFontLabel} />
       </LookField>
 
       <LookField label={bodyFontLabel} lock={bodyFontLock.lock}>
@@ -45,6 +47,7 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
           onChange={(font) => updateField('bodyFont', font)}
           isDisabled={bodyFontLock.isDisabled}
         />
+        <PresetValueButton field="bodyFont" fieldLabel={bodyFontLabel} />
       </LookField>
     </LookCard>
   );

@@ -25,6 +25,7 @@ code:
   - apps/platform/src/server/site-config/site-config-or-defaults*.ts
   - apps/platform/src/utils/default-look-values/**
   - apps/platform/src/utils/look-form-values/**
+  - apps/platform/src/utils/look-preset/**
   - apps/platform/src/utils/theme-preview-tokens/**
   - apps/platform/src/utils/brand-asset-limits/**
   - apps/web/src/server/site-config/get-site-config/**
@@ -66,7 +67,7 @@ The Look page is where a tenant owner styles their public site without touching 
 
 - Any tenant member, and any operator (as a virtual owner), can save. An archived tenant's form is read-only.
 - **Plan** — `PLAN_ENTITLEMENTS[plan].lookFields` lists the fields a plan may set. On `FREE` that is the preset, accent hue, logo, favicon and Cookie settings button; the fonts, radius, density, card style, header buttons style, header layout, sub-menu style, bar, account button, account panel, phone placement, busy-button style, spinner style, footer layout, background and surface, logo hue and language-switcher style show disabled with the Features page's "Growth plan" badge, at the preset's value, in the form and the preview. The form opens on `toEffectiveLook` of the stored row, and a restored draft goes through it too. `updateLookAction` writes only the fields the plan includes, so the stored Growth choices stay and come back on an upgrade. The public site renders the same effective Look: `getSiteConfig` passes the row and the tenant's plan (`getTenantPlan`) through `toEffectiveLook`, so every reader of the row — theme tokens, the switcher, header, account and busy styles — gets the preset's values on `FREE`, and an upgrade shows the stored choices with no Look save. Voice and the email identity, which read the same row, are untouched. When the plan can't be read, `FREE`'s fields apply and `site_config.plan_fetch_failed` is logged; the read is memoised per request with React `cache()`, so it logs once per page.
-- Picking a preset re-seeds the accent hue, fonts, radius, density, card style and header buttons style from `PRESET_REGISTRY` and clears the logo hue. The header layout, sub-menu style and bar, the account button, panel and phone placement, the busy-button and spinner styles, the footer layout, background, surface and Cookie settings button, the language-switcher style and brand images are kept. "Reset" appears once any value diverges from the preset.
+- Picking a preset re-seeds the accent hue, fonts, radius, density, card style and header buttons style from `PRESET_REGISTRY` only where each still equals the old preset's value; one the owner customised (it differs from the old preset's value) is kept, and so is a set logo hue (`switchPreset`, in the form — `site_config` is unchanged). On `FREE` the locked fields already hold the preset's values, so they follow the new preset and the stored Growth choices return on upgrade. The header layout, sub-menu style and bar, the account button, panel and phone placement, the busy-button and spinner styles, the footer layout, background, surface and Cookie settings button, the language-switcher style and brand images are kept. Each re-seeded option shows a "Use preset value" link under its control while it differs from the current preset (not on a locked field), putting that one option back; "Reset to preset" appears once any value diverges from the preset and resets them all, clearing the logo hue.
 - The five fonts are allowed in either role; each has a heading and a body loader in `apps/web`.
 - The language-switcher control appears only when the tenant has more than one live language.
 - The Cookie settings button stays editable with the cookie banner off, under a note that it shows only while the banner is on (`CAPABILITY.CONSENT_BANNER`, after plan clamping).
@@ -108,7 +109,8 @@ The Look page is where a tenant owner styles their public site without touching 
 - `packages/db/src/schema/site-config.ts`
 - `apps/platform/src/components/features/look/look-page-content/look-page-content.tsx`
 - `apps/platform/src/components/features/look/look-form/look-form.tsx`, `use-look-form-state.ts`, `use-look-save.ts`
-- `apps/platform/src/utils/look-form-values/look-form-values.ts` — `applyPresetDefaults`; `look-row-summaries.ts` — `buildLookRowSummaries`
+- `apps/platform/src/utils/look-preset/look-preset.ts` — `applyPresetDefaults`, `switchPreset`, `withPresetValue`
+- `apps/platform/src/utils/look-form-values/look-row-summaries.ts` — `buildLookRowSummaries`
 - `apps/platform/src/components/features/look/look-form/components/footer-card/footer-card.tsx`, `apps/platform/src/components/features/site-preview/sample-site-footer/sample-site-footer.tsx`
 - `apps/platform/src/server/site-config/update-look-action.ts`, `upload-brand-asset-action.ts`, `clear-brand-asset-action.ts`, `validate-brand-asset.ts`
 - `apps/platform/src/utils/theme-preview-tokens/theme-preview-tokens.ts`
@@ -122,7 +124,7 @@ The Look page is where a tenant owner styles their public site without touching 
 
 ## Tests and stories
 
-- Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `look-row-summaries.test.ts`, `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
+- Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `look-preset.test.ts`, `look-row-summaries.test.ts`, `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
 - Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `get-busy-style.test.ts`, `get-brand-logo-url.test.ts`, `icon.test.tsx`, `brand-lockup-link.test.tsx`, `site-header.test.tsx`, `apps/web/src/config/fonts.test.ts`.
 - db: `packages/db/src/queries/site-config/**/*.test.ts`.
 - Stories: `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`. The platform has no stories.

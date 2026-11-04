@@ -67,6 +67,8 @@ const renderPreview = ({
     brandAssetFieldIds: { logo: 'logo', favicon: 'favicon' },
     brandImageError: undefined,
     changePreset: vi.fn(),
+    isPresetValue: () => true,
+    resetFieldToPreset: vi.fn(),
     resetToPreset: vi.fn(),
     isSubmenuPreviewOpen: false,
     setIsSubmenuPreviewOpen: vi.fn(),
