@@ -12,6 +12,7 @@ import {
   ACCOUNT_MENU_PLACEMENT,
   type TAccountMenuPlacement,
 } from '@platform/constants/account-menu';
+import { MENU_RADIO_GROUP_SIZE } from '@platform/constants/menu-radio-group';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
 import { useTranslations } from 'next-intl';
@@ -118,7 +119,13 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
               {hasEmailLine && <span className={headerEmail()}>{email}</span>}
               <span className={headerRole()}>{roleLine}</span>
             </div>
-            <AccountThemeSection />
+            <AccountThemeSection
+              size={
+                isNested
+                  ? MENU_RADIO_GROUP_SIZE.TOUCH
+                  : MENU_RADIO_GROUP_SIZE.DESKTOP
+              }
+            />
             <Menu.Item
               ref={signOutRef}
               className={item()}

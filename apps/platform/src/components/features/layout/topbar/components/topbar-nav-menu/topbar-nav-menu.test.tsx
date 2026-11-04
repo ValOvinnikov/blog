@@ -343,6 +343,19 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
         });
       });
 
+      it('holds the Theme group with Light, Dark and System', () => {
+        const themeGroup = within(accountMenu).getByRole('group', {
+          name: messages.account.themeLabel,
+        });
+        const themeItems = within(themeGroup).getAllByRole('menuitemradio');
+
+        expect(themeItems.map((item) => item.textContent)).toEqual([
+          messages.account.themeLight,
+          messages.account.themeDark,
+          messages.account.themeSystem,
+        ]);
+      });
+
       describe('after one Escape', () => {
         beforeEach(async () => {
           await user.keyboard(ESCAPE);
