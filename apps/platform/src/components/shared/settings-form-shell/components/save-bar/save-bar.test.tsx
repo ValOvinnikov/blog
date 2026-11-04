@@ -78,22 +78,24 @@ describe(`<${SaveBar.name}/>`, () => {
     expect(breakdown).toBeVisible();
   });
 
-  it('shows the saving state on Save and disables Discard while pending', () => {
-    setup({ isPending: true });
+  describe('while saving', () => {
+    beforeEach(() => {
+      setup({ isPending: true });
+    });
 
-    const savingButton = screen.getByRole('button', { name: 'Saving…' });
-    const discardButton = screen.getByRole('button', { name: DISCARD });
+    it('shows the saving state on Save and disables Discard', () => {
+      const savingButton = screen.getByRole('button', { name: 'Saving…' });
+      const discardButton = screen.getByRole('button', { name: DISCARD });
 
-    expect(savingButton).toHaveAttribute('aria-disabled', 'true');
-    expect(discardButton).toBeDisabled();
-  });
+      expect(savingButton).toHaveAttribute('aria-disabled', 'true');
+      expect(discardButton).toBeDisabled();
+    });
 
-  it('marks the bar busy while pending', () => {
-    setup({ isPending: true });
+    it('marks the bar busy', () => {
+      const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
 
-    const region = screen.getByRole('region', { name: UNSAVED_CHANGES });
-
-    expect(region).toHaveAttribute('aria-busy', 'true');
+      expect(region).toHaveAttribute('aria-busy', 'true');
+    });
   });
 
   describe('after a save with field errors', () => {

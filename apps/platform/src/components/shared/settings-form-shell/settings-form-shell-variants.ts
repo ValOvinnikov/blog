@@ -16,10 +16,17 @@ export const settingsFormShellVariants = tv({
     hasCompactGap: {
       true: { root: ['gap-admin-form-gap'] },
     },
-    // 120px (48px archived) below the last content, less the content column's own 26px padding.
     isArchived: {
-      true: { root: ['md:pb-[22px]'] },
-      false: { root: ['md:pb-[94px]'] },
+      true: {
+        root: [
+          'md:pb-[calc(var(--spacing-admin-archived-room)-var(--spacing-admin-content))]',
+        ],
+      },
+      false: {
+        root: [
+          'md:pb-[calc(var(--spacing-admin-dock-room)-var(--spacing-admin-content))]',
+        ],
+      },
     },
   },
   defaultVariants: {

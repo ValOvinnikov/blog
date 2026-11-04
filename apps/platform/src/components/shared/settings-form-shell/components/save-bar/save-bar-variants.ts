@@ -9,7 +9,7 @@ export const saveBarVariants = tv({
       'md:fixed md:right-0 md:bottom-0 md:left-admin-sidebar md:z-20 md:h-admin-dock',
       'group-data-[collapsed=true]/shell:md:left-admin-rail',
       'md:flex-row md:items-center md:rounded-none md:border-0 md:border-t md:border-admin-line',
-      'md:bg-admin-surface md:px-[26px] md:py-0 md:text-admin-text md:shadow-admin-dock',
+      'md:bg-admin-surface md:px-admin-content md:py-0 md:text-admin-text md:shadow-admin-dock',
     ],
     summary: [
       'inline-flex flex-wrap items-center gap-2.5 text-admin-14',
@@ -20,14 +20,14 @@ export const saveBarVariants = tv({
     breakdown: ['text-admin-muted'],
     errorContent: [
       'flex flex-col gap-1 md:min-w-0 md:flex-1 md:gap-0',
-      'lg:flex-row lg:items-center lg:gap-[10px]',
+      'lg:flex-row lg:items-center lg:gap-2.5',
     ],
     errorCount: [
       'text-admin-14 font-semibold text-admin-bad',
       'md:text-admin-13-5 md:leading-5 lg:text-admin-13 lg:leading-4',
     ],
     errorFollowUp: [
-      'flex items-center gap-1.5 text-admin-13 whitespace-nowrap md:leading-[18px]',
+      'flex items-center gap-1.5 text-admin-13 whitespace-nowrap md:leading-admin-18',
       'lg:contents',
     ],
     errorLink: [

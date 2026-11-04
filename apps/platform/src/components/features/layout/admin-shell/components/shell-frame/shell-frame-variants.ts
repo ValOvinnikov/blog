@@ -9,8 +9,8 @@ export const shellFrameVariants = tv({
     main: ['flex min-h-0 min-w-0 flex-1 flex-col overflow-x-clip'],
     // Spacing sits on the children, so a streamed notice that renders nothing leaves no gap.
     noticeSlot: [
-      'w-full max-w-[1180px] px-4 md:px-[26px]',
-      '*:my-4 md:*:mt-[26px]',
+      'w-full max-w-[1180px] px-4 md:px-admin-content',
+      '*:my-4 md:*:mt-admin-content',
     ],
     content: ['flex-1'],
   },
@@ -22,7 +22,7 @@ export const shellFrameVariants = tv({
         content: ['min-h-0 overflow-hidden'],
       },
       false: {
-        content: ['w-full max-w-[1180px] p-4 md:p-[26px]'],
+        content: ['w-full max-w-[1180px] p-4 md:p-admin-content'],
       },
     },
   },
