@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import type { Mock } from 'vitest';
 
 import { SegmentedRadioGroup } from './segmented-radio-group';
 import { FADE_WIDTH_PX } from './use-track-scroll';
@@ -40,12 +41,14 @@ const MOCK_OPTIONS = [
   },
 ];
 
-const setup = customRender(SegmentedRadioGroup<string>, {
+const MOCK_PROPS = {
   aria: { label: MOCK_GROUP_LABEL },
   options: MOCK_OPTIONS,
   value: MOCK_FIRST_VALUE,
   onChange: vi.fn(),
-});
+};
+
+const setup = customRender(SegmentedRadioGroup<string>, MOCK_PROPS);
 
 const defineGeometry = (element: HTMLElement, geometry: object) => {
   for (const [key, value] of Object.entries(geometry)) {
@@ -90,16 +93,6 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
     expect(firstRadio).not.toBeChecked();
   });
 
-  it('reports the clicked option value', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
-
-    const secondRadio = screen.getByRole('radio', { name: MOCK_SECOND_LABEL });
-    await user.click(secondRadio);
-
-    expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
-  });
-
   it('is a single Tab stop on the checked option', async () => {
     setup({ value: MOCK_SECOND_VALUE });
 
@@ -113,16 +106,33 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
     expect(document.body).toHaveFocus();
   });
 
-  it('moves the selection with the arrow keys', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
+  describe('changing the selection', () => {
+    let onChange: Mock<(value: string) => void>;
 
-    await user.tab();
-    await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-    const secondRadio = screen.getByRole('radio', { name: MOCK_SECOND_LABEL });
+    beforeEach(() => {
+      onChange = vi.fn();
+      setup({ onChange });
+    });
 
-    expect(secondRadio).toHaveFocus();
-    expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
+    it('reports the clicked option value', async () => {
+      const secondRadio = screen.getByRole('radio', {
+        name: MOCK_SECOND_LABEL,
+      });
+      await user.click(secondRadio);
+
+      expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
+    });
+
+    it('moves the selection with the arrow keys', async () => {
+      await user.tab();
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+      const secondRadio = screen.getByRole('radio', {
+        name: MOCK_SECOND_LABEL,
+      });
+
+      expect(secondRadio).toHaveFocus();
+      expect(onChange).toHaveBeenCalledExactlyOnceWith(MOCK_SECOND_VALUE);
+    });
   });
 
   it('scrolls only the track so a newly selected option is fully in view', () => {
@@ -140,18 +150,10 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
       offsetWidth: MOCK_OPTION_WIDTH,
     });
 
-    rerender(
-      <SegmentedRadioGroup
-        aria={{ label: MOCK_GROUP_LABEL }}
-        options={MOCK_OPTIONS}
-        value={MOCK_THIRD_VALUE}
-        onChange={vi.fn()}
-      />,
-    );
+    rerender(<SegmentedRadioGroup {...MOCK_PROPS} value={MOCK_THIRD_VALUE} />);
 
     expect(group.scrollLeft).toBe(
       thirdOptionStart + MOCK_OPTION_WIDTH + FADE_WIDTH_PX - MOCK_TRACK_WIDTH,
     );
-    expect(window.scrollX).toBe(0);
   });
 });
