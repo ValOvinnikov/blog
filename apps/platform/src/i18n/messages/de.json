@@ -591,6 +591,8 @@
     "sitePartsGroupHeading": "Website-Bereiche",
     "viewTabsAriaLabel": "Look-Ansicht",
     "resetButton": "Auf Vorlage zurücksetzen",
+    "usePresetValueButton": "Wert der Vorlage verwenden",
+    "usePresetValueAriaLabel": "Wert der Vorlage für {field} verwenden",
     "alertSuccess": "Erscheinungsbild gespeichert.",
     "alertError": "Die Einstellungen zum Erscheinungsbild konnten nicht gespeichert werden — bitte erneut versuchen.",
     "presetLabel": "Vorlage",

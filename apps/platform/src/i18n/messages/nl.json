@@ -591,6 +591,8 @@
     "sitePartsGroupHeading": "Sitedelen",
     "viewTabsAriaLabel": "Look-weergave",
     "resetButton": "Terugzetten naar voorinstelling",
+    "usePresetValueButton": "Waarde van voorinstelling gebruiken",
+    "usePresetValueAriaLabel": "Waarde van voorinstelling gebruiken voor {field}",
     "alertSuccess": "Uiterlijk opgeslagen.",
     "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
     "presetLabel": "Voorinstelling",

@@ -10,7 +10,7 @@ import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { ONBOARDING_PREVIEW } from '@platform/constants/onboarding';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { applyPresetDefaults } from '@platform/utils/look-form-values/look-form-values';
+import { applyPresetDefaults } from '@platform/utils/look-preset/look-preset';
 import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
 import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
