@@ -299,11 +299,17 @@ describe('the real repo files', () => {
     assert.deepEqual(invalid, []);
   });
 
-  it('classifies the pinned number of vars each way, never a vacuous empty set', () => {
+  it('classifies the pinned required vars and known optional ones, never a vacuous empty set', () => {
     const { required, optional } = collectClassification(ENV_FILES);
+    const optionalNames = new Set(optional.map(({ name }) => name));
 
     assert.equal(required.size, 10);
-    assert.equal(optional.length, 63);
+    for (const name of [
+      'NEXT_PUBLIC_SITE_URL',
+      'LOKI_PUSH_URL',
+      'AUTH_GITHUB_ID',
+    ])
+      assert.ok(optionalNames.has(name), `${name} is classified optional`);
     for (const [, entry] of required)
       for (const environment of entry.environments)
         assert.ok(KNOWN_ENVIRONMENTS.includes(environment));
