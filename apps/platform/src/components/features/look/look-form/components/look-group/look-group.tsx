@@ -24,6 +24,7 @@ export const LookGroup = ({ title, group, children }: TLookGroupProps) => {
       <Accordion<TLookRow>
         multiple={true}
         variant={ACCORDION_VARIANT.ROW}
+        isList={true}
         openValues={group.openValues}
         onOpenValuesChange={group.onOpenValuesChange}
         className={list()}
