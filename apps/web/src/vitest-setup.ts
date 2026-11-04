@@ -1,9 +1,14 @@
 import { format } from 'node:util';
 
 import type { SITE_MESSAGES, TMaybeUndefined } from '@blog/config';
-import { hasLength, isNull, isString } from '@blog/utils/primitives';
+import {
+  hasLength,
+  isNull,
+  isString,
+  isUndefined,
+} from '@blog/utils/primitives';
 
-if (typeof document !== 'undefined') {
+if (!isUndefined(globalThis.document)) {
   await import('@testing-library/jest-dom/vitest');
 }
 
@@ -81,11 +86,11 @@ const isInCarousel = (element: HTMLElement) =>
 const isCarouselSlide = (element: HTMLElement) =>
   element.tagName === 'LI' && isInCarousel(element);
 
-if (typeof HTMLImageElement !== 'undefined') {
+if (!isUndefined(globalThis.HTMLImageElement)) {
   HTMLImageElement.prototype.decode = () => Promise.resolve();
 }
 
-if (typeof HTMLElement !== 'undefined') {
+if (!isUndefined(globalThis.HTMLElement)) {
   Object.defineProperties(HTMLElement.prototype, {
     offsetWidth: {
       configurable: true,
