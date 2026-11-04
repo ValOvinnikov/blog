@@ -1,19 +1,6 @@
 const WHITESPACE_PATTERN = /\s/;
 
-/**
- * Shared email-format check for the newsletter signup flow. Deliberately
- * loose — not RFC 5322 validation. Gates `NewsletterForm`'s
- * client-side check and `subscribeToNewsletterAction`'s server-side
- * re-check; real deliverability is Resend's problem, not this function's.
- *
- * Implemented with index/split checks rather than a regex, since a
- * pattern that captures this shape by construction backtracks
- * polynomially on malformed input.
- *
- * @example
- * isValidEmail('reader@example.com') // true
- * isValidEmail('not-an-email') // false
- */
+// Index/split checks, not a regex: a pattern capturing this shape backtracks polynomially on malformed input.
 export const isValidEmail = (email: string): boolean => {
   const trimmed = email.trim();
   const parts = trimmed.split('@');

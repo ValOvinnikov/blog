@@ -134,6 +134,7 @@
     "sentMessage": "We sent a sign-in link to <strong>{email}</strong>.",
     "useDifferentEmail": "Use a different email",
     "emailError": "Couldn't send the link. Try again.",
+    "emailInvalid": "Enter a valid email address.",
     "sendLimited": "Too many sign-in links were requested for this address. Try again in an hour.",
     "oauthError": "Sign-in failed. Please try again.",
     "accountMenuAriaLabel": "Account menu",

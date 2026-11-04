@@ -45,6 +45,7 @@ const {
   sentTitle: SENT_TITLE,
   useDifferentEmail: USE_DIFFERENT_EMAIL,
   emailError: EMAIL_ERROR,
+  emailInvalid: EMAIL_INVALID,
   sendLimited: SEND_LIMITED,
   oauthError: OAUTH_ERROR,
   myBookmarksDescription: BOOKMARKS_DESCRIPTION,
@@ -53,6 +54,7 @@ const {
 const MOCK_NAME = faker.person.fullName();
 const MOCK_EMAIL = faker.internet.email();
 const MOCK_READER_EMAIL = faker.internet.email();
+const MOCK_MALFORMED_EMAIL = faker.string.alpha(12);
 const MOCK_SESSION_EXPIRES = '2099-01-01T00:00:00.000Z';
 const MOCK_OAUTH_ERROR = faker.string.alpha(12);
 const CIRCLE_IN_BAR = {
@@ -108,12 +110,12 @@ describe(`<${AuthMenu.name}/>`, () => {
     return screen.getByRole('dialog', { name: SIGN_IN_LABEL });
   };
 
-  const sendLink = async () => {
+  const sendLink = async (email = MOCK_READER_EMAIL) => {
     const panel = await openSignInPanel();
     const emailField = within(panel).getByRole('textbox', {
       name: EMAIL_FIELD,
     });
-    await user.type(emailField, MOCK_READER_EMAIL);
+    if (email) await user.type(emailField, email);
     const sendButton = within(panel).getByRole('button', {
       name: SEND_LINK_LABEL,
     });
@@ -401,6 +403,26 @@ describe(`<${AuthMenu.name}/>`, () => {
 
         expect(error).toBeVisible();
         expect(emailField).toHaveAccessibleDescription(message);
+      },
+    );
+
+    it.each([
+      { title: 'a malformed address', email: MOCK_MALFORMED_EMAIL },
+      { title: 'an empty field', email: '' },
+    ])(
+      'shows the invalid-email error and requests no link for $title',
+      async ({ email }) => {
+        setup();
+        const panel = await sendLink(email);
+
+        const error = await within(panel).findByText(EMAIL_INVALID);
+        const emailField = within(panel).getByRole('textbox', {
+          name: EMAIL_FIELD,
+        });
+
+        expect(signInMock).not.toHaveBeenCalled();
+        expect(emailField).toHaveAccessibleDescription(EMAIL_INVALID);
+        expect(error).toBeVisible();
       },
     );
 
