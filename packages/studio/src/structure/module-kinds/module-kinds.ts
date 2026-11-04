@@ -75,11 +75,13 @@ const kindIndexByName = new Map<string, number>(
 const kindIndex = (name: string) =>
   kindIndexByName.get(name) ?? moduleKinds.length;
 
-const title = (name: string) => titleByName.get(name) ?? name;
+export const getModuleTitle = (name: string) => titleByName.get(name) ?? name;
 
 export const sortModulesByKind = (names: string[]) =>
   [...names].sort(
-    (a, b) => kindIndex(a) - kindIndex(b) || title(a).localeCompare(title(b)),
+    (a, b) =>
+      kindIndex(a) - kindIndex(b) ||
+      getModuleTitle(a).localeCompare(getModuleTitle(b)),
   );
 
 export const moduleInsertMenuGroups = (names: string[]) => {

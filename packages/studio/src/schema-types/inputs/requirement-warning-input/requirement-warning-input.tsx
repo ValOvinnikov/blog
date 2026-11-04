@@ -4,13 +4,21 @@ import {
   type TEntitlementState,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/get-missing-requirement';
 import { markRequirementOffTypes } from '@blog/studio/schema-types/inputs/requirement-warning-input/mark-requirement-off-types';
+import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker';
+import { hasOffPlanModuleType } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker-sections';
 import { Card, Stack, Text } from '@sanity/ui';
 import { useMemo } from 'react';
-import { type InputProps, isArraySchemaType } from 'sanity';
+import {
+  type InputProps,
+  isArrayOfObjectsInputProps,
+  isArraySchemaType,
+} from 'sanity';
 
 export const createRequirementWarningInput = (
   entitlements: TEntitlementState,
 ) => {
+  const ModulePicker = createModulePicker(entitlements);
+
   return function RequirementWarningInput(props: InputProps) {
     const { schemaType } = props;
     const markedArrayType = useMemo(() => {
@@ -22,6 +30,20 @@ export const createRequirementWarningInput = (
     }, [schemaType]);
 
     if (markedArrayType) {
+      if (
+        isArrayOfObjectsInputProps(props) &&
+        hasOffPlanModuleType(
+          markedArrayType.of,
+          entitlements.entitledModulePacks,
+        )
+      ) {
+        return props.renderDefault({
+          ...props,
+          schemaType: markedArrayType,
+          arrayFunctions: ModulePicker,
+        });
+      }
+
       return props.renderDefault({ ...props, schemaType: markedArrayType });
     }
 

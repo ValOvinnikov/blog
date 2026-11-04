@@ -53,6 +53,19 @@ describe(markRequirementOffTypes, () => {
     ]);
   });
 
+  it('lists module types outside the entitled packs after the rest', () => {
+    const marked = markRequirementOffTypes(
+      [MOCK_PRICING_TYPE, MOCK_CTA_TYPE, MOCK_NEWSLETTER_TYPE],
+      { entitledModulePacks: CORE_ONLY },
+    );
+
+    expect(marked?.map(({ name }) => name)).toEqual([
+      MOCK_CTA_TYPE.name,
+      MOCK_NEWSLETTER_TYPE.name,
+      MOCK_PRICING_TYPE.name,
+    ]);
+  });
+
   it('keeps every other property of the marked type', () => {
     const [marked] =
       markRequirementOffTypes(

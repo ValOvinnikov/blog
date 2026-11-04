@@ -162,26 +162,77 @@ describe(entitlementGates, () => {
     );
   });
 
-  it('marks a gated module in the picker', () => {
-    const entitlements = packState(CORE_ONLY);
-    const { input } = getGates(entitlements);
-    const of = [{ name: PRICING_TYPE, title: pricingSchema.title }];
-    const renderDefault = vi.fn<(props: InputProps) => ReactElement>(() =>
-      createElement('div'),
+  describe('module picker', () => {
+    const renderArrayInput = (
+      entitlements: TEntitlementState,
+      of: { name: string; title?: string; jsonType: string }[],
+    ) => {
+      const { input } = getGates(entitlements);
+      const renderDefault = vi.fn<(props: InputProps) => ReactElement>(() =>
+        createElement('div'),
+      );
+      const props = {
+        path: ['modules'],
+        schemaType: { name: 'array', jsonType: 'array', of },
+        renderDefault,
+      } as unknown as InputProps;
+
+      renderToStaticMarkup(createElement(input, props));
+
+      const [renderedProps] = renderDefault.mock.calls.map(([props]) => props);
+
+      return renderedProps as InputProps & {
+        schemaType: { of: typeof of };
+        arrayFunctions?: unknown;
+      };
+    };
+
+    const pricingType = {
+      name: PRICING_TYPE,
+      title: pricingSchema.title,
+      jsonType: 'object',
+    };
+    const newsletterType = {
+      name: NEWSLETTER_TYPE,
+      title: newsletterSchema.title,
+      jsonType: 'object',
+    };
+
+    it('marks a gated module in the picker', () => {
+      const entitlements = packState(CORE_ONLY);
+      const of = [pricingType];
+      const {
+        schemaType: {
+          of: [markedType],
+        },
+      } = renderArrayInput(entitlements, of);
+      const [expectedType] = markRequirementOffTypes(of, entitlements)!;
+
+      expect(markedType?.title).toBe(expectedType?.title);
+    });
+
+    it.each([
+      {
+        plan: 'the core pack only',
+        entitlements: packState(CORE_ONLY),
+        replaced: true,
+      },
+      {
+        plan: 'every pack with a capability off',
+        entitlements: capabilityState([]),
+        replaced: false,
+      },
+    ])(
+      'replaces the add picker on $plan: $replaced',
+      ({ entitlements, replaced }) => {
+        const { arrayFunctions } = renderArrayInput(entitlements, [
+          newsletterType,
+          pricingType,
+        ]);
+
+        expect(arrayFunctions !== undefined).toBe(replaced);
+      },
     );
-    const props = {
-      path: ['modules'],
-      schemaType: { name: 'array', jsonType: 'array', of },
-      renderDefault,
-    } as unknown as InputProps;
-
-    renderToStaticMarkup(createElement(input, props));
-
-    const [renderedProps] = renderDefault.mock.calls.map(([props]) => props);
-    const [markedType] = (renderedProps?.schemaType as { of: typeof of }).of;
-    const [expectedType] = markRequirementOffTypes(of, entitlements)!;
-
-    expect(markedType?.title).toBe(expectedType?.title);
   });
 
   describe('page item warning', () => {

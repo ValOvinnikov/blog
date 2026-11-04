@@ -95,7 +95,8 @@ module types whose capability is off for the tenant carry a warning.
   `module_newsletter` (NEWSLETTER) and `module_contactForm` (CONTACT_FORM)
   are mapped to a capability.
 - A module type outside the `entitlements` prop's module packs is not hidden
-  either: it reads "(Growth plan)" in the picker, offers no document to pick, can't
+  either: it shows as unavailable in the picker, marked "Growth plan" (disabled in
+  the modules field's own "Add item…" menu), offers no document to pick, can't
   be created new, and
   its documents and page references carry the plan warning instead
   ([plans-and-entitlements](./plans-and-entitlements.md)).

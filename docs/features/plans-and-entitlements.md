@@ -40,7 +40,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Platform, Features page** — `/dashboard/features` (owner) and `/tenants/{id}/features` (operator). Seven capability rows: a "Coming soon" row has no switch, and a row outside the plan is locked with a "Growth plan" badge.
 - **Platform, plan-gated pages** — `/dashboard/languages` and `/dashboard/email` answer 404 when the plan does not open them. Subscribers, Comments and Team are sidebar entries with a "Coming soon" badge and no page.
 - **Public site** — no route of its own. It gates `/bookmarks` (404 with no reader-account capability) and `/account` (404 there only to a signed-out visitor), the header account menu, the bookmark button, the newsletter module and its server action, Vercel Analytics and Speed Insights, and the consent banner. A page renders only the module types its tenant's plan entitles.
-- **Studio** — a module type whose capability is off is relabelled "(off in Features)" in pickers, and its documents carry a warning; `module_newsletter` and `module_contactForm` map to a capability. Given module-pack entitlements, a module type outside them is relabelled "(Growth plan)" in a page's module picker, offers no existing document to pick there, and can't be created new from the desk, the global Create menu or a reference's "Create new"; its existing documents stay listed and editable, with a banner, and a page referencing one shows a warning on that item that never blocks publishing. When a type is both off-plan and off in Features, the plan message shows.
+- **Studio** — a module type whose capability is off is relabelled "(off in Features)" in pickers, and its documents carry a warning; `module_newsletter` and `module_contactForm` map to a capability. Given module-pack entitlements, a module type outside them shows as unavailable in a page's module picker: the "Add item…" menu lists it disabled, with a lock and a "Growth plan" badge, in its own "Growth plan" section, while the per-row "Add item before/after" menus (Sanity's own, which can't be replaced) list it last with a lock and a "— Growth plan" title. It offers no existing document to pick there, and can't be created new from the desk, the global Create menu or a reference's "Create new"; its existing documents stay listed and editable, with a banner, and a page referencing one shows a warning on that item that never blocks publishing. When a type is both off-plan and off in Features, the plan message shows.
 
 ## Data
 
@@ -111,6 +111,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `apps/web/src/modules/module-gate/module-gate.tsx`
 - `packages/studio/src/schema-types/inputs/requirement-warning-input/get-missing-requirement.ts`
 - `packages/studio/src/schema-types/inputs/requirement-warning-input/entitlement-gates.ts`
+- `packages/studio/src/schema-types/inputs/requirement-warning-input/module-picker.tsx`
 - `packages/studio/src/schema-types/validation/validate-modules-entitled/validate-modules-entitled.ts`
 - `packages/studio/src/schema-types/filters/entitled-module.ts`
 
