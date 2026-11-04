@@ -122,6 +122,12 @@ describe(`<${SiteHeader.name}/>`, () => {
     await user.click(queryPhoneMenuToggle()!);
   };
 
+  const openPhoneMenuWithAccountInIt = async () => {
+    getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+    await setup();
+    await openPhoneMenu();
+  };
+
   const getDrawerAccountRow = (name: string) => {
     const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
     return within(drawerActions).getByText(name, { selector: 'summary' });
@@ -311,9 +317,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('lists the account row in the phone menu with the account in the menu', async () => {
-      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
-      await setup();
-      await openPhoneMenu();
+      await openPhoneMenuWithAccountInIt();
 
       const accountRow = getDrawerAccountRow(SIGN_IN);
 
@@ -340,9 +344,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       getNavigationMock.mockResolvedValue(
         okResult({ items: [MOCK_TOPICS_GROUP, MOCK_BLOG_LINK] }),
       );
-      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
-      await setup();
-      await openPhoneMenu();
+      await openPhoneMenuWithAccountInIt();
     });
 
     afterEach(() => {
@@ -456,9 +458,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       getNavigationMock.mockResolvedValue(
         okResult({ items: [], showLanguageSwitcher: true }),
       );
-      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
-      await setup();
-      await openPhoneMenu();
+      await openPhoneMenuWithAccountInIt();
     });
 
     afterEach(() => {
