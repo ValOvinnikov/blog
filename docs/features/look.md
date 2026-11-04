@@ -125,7 +125,7 @@ The Look page is where a tenant owner styles their public site without touching 
 
 ## Tests and stories
 
-- Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `look-preset.test.ts`, `look-row-summaries.test.ts`, `fit-preset-chips.test.ts`, `preset-strip.test.tsx` (frame H's twelve placeholder presets as fixtures), `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
+- Platform: tests beside every Look component, both `look/page.test.tsx` routes, `apps/platform/src/server/site-config/*.test.ts`, `default-look-values.test.ts`, `look-form-values.test.ts`, `look-preset.test.ts`, `look-row-summaries.test.ts`, `fit-preset-chips.test.ts`, `preset-strip.test.tsx` (frame H's twelve presets as fixtures), `theme-preview-tokens.test.ts`, `brand-asset-limits.test.ts`, `apps/platform/src/config/fonts.test.ts`, `look-sample.test.tsx`.
 - Web: `to-theme-tokens.test.ts`, `get-theme-tokens.test.ts`, `build-theme-style-block.test.ts`, `theme-scope.test.tsx`, `get-site-config.test.ts`, `get-language-switcher-style.test.ts`, `get-busy-style.test.ts`, `get-brand-logo-url.test.ts`, `icon.test.tsx`, `brand-lockup-link.test.tsx`, `site-header.test.tsx`, `apps/web/src/config/fonts.test.ts`.
 - db: `packages/db/src/queries/site-config/**/*.test.ts`.
 - Stories: `apps/web/src/components/shared/theme-scope/theme-scope.stories.tsx`. The platform has no stories.

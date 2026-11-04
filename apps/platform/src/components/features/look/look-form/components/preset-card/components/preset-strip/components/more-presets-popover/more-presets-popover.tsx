@@ -6,6 +6,7 @@ import { MorePresetsLabel } from '@platform/components/features/look/look-form/c
 import { morePresetsButtonVariants } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/more-presets-label/more-presets-label-variants';
 import { PresetOptionList } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-option-list/preset-option-list';
 import type { TPresetOption } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
+import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { KEY } from '@platform/constants/keyboard';
 import { PRESET_LIST_LAYOUT } from '@platform/constants/preset-list';
 import { tv } from '@platform/utils/tv/tv';
@@ -23,9 +24,6 @@ const CHECKED_CHIP_SELECTOR = '[role="radio"][aria-checked="true"]';
 const morePresetsPopoverVariants = tv({
   slots: {
     positioner: ['w-(--anchor-width)'],
-    popup: [
-      'rounded-admin border border-admin-popover-line bg-admin-popover text-admin-text shadow-admin-lg outline-none',
-    ],
     header: ['flex items-baseline justify-between gap-3 px-4 pt-3.5 pb-2.5'],
     title: ['text-admin-14 font-semibold'],
     count: ['text-admin-12-5 text-admin-muted'],
@@ -56,8 +54,7 @@ export const MorePresetsPopover = <TId extends string>({
   const hasChosenRef = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
-  const { positioner, popup, header, title, count } =
-    morePresetsPopoverVariants();
+  const { positioner, header, title, count } = morePresetsPopoverVariants();
 
   const choose = (id: TId) => {
     hasChosenRef.current = true;
@@ -106,7 +103,7 @@ export const MorePresetsPopover = <TId extends string>({
             initialFocus={listRef}
             finalFocus={focusAfterClose}
             onKeyDown={closeOnTab}
-            className={popup()}
+            className={menuSurfaceVariants().popup({ class: 'p-0' })}
           >
             <div className={header()}>
               <Popover.Title id={titleId} className={title()}>

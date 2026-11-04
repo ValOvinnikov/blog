@@ -15,9 +15,7 @@ const presetOptionListVariants = tv({
   base: ['group outline-none'],
   variants: {
     layout: {
-      [PRESET_LIST_LAYOUT.GRID]: [
-        'grid grid-cols-[repeat(2,minmax(0,1fr))] gap-1.5 px-2.5 pb-2.5',
-      ],
+      [PRESET_LIST_LAYOUT.GRID]: ['grid grid-cols-2 gap-1.5 px-2.5 pb-2.5'],
       [PRESET_LIST_LAYOUT.ROWS]: [
         'min-h-0 flex-1 overflow-y-auto overscroll-contain border-t border-admin-line-2',
         '[scrollbar-color:var(--admin-control-line)_transparent] [scrollbar-width:thin]',

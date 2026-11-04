@@ -4852,6 +4852,22 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "DIM": [
+      {
+        "ref": "DIALOG_BACKDROP_TONE.DIM",
+        "scope": "app:platform",
+        "from": "@platform/constants/dialog-backdrop",
+        "file": "apps/platform/src/constants/dialog-backdrop.ts"
+      }
+    ],
+    "SCRIM": [
+      {
+        "ref": "DIALOG_BACKDROP_TONE.SCRIM",
+        "scope": "app:platform",
+        "from": "@platform/constants/dialog-backdrop",
+        "file": "apps/platform/src/constants/dialog-backdrop.ts"
+      }
+    ],
     "NOT_CONFIGURED": [
       {
         "ref": "DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED",
@@ -5323,6 +5339,14 @@
     "Tab": [
       {
         "ref": "KEY.TAB",
+        "scope": "app:platform",
+        "from": "@platform/constants/keyboard",
+        "file": "apps/platform/src/constants/keyboard.ts"
+      }
+    ],
+    "Escape": [
+      {
+        "ref": "KEY.ESCAPE",
         "scope": "app:platform",
         "from": "@platform/constants/keyboard",
         "file": "apps/platform/src/constants/keyboard.ts"

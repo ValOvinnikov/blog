@@ -377,4 +377,5 @@
   --shadow-admin-dock: var(--admin-shadow-dock);
   --shadow-admin-xs: var(--admin-shadow-xs);
   --shadow-admin-thumb: var(--admin-shadow-thumb);
+  --shadow-admin-choice-ring: 0 0 0 3px var(--admin-brand-weak);
 }

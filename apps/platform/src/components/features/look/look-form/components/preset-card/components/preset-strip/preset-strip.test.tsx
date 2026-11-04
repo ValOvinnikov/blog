@@ -1,7 +1,13 @@
 import { FONT_CHOICE, SIZE } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  act,
+  customRender,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubLgUpWindow } from '@platform/testing/match-media';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -108,30 +114,33 @@ const render = customRender(PresetStripHarness, {
   onChange: vi.fn(),
 });
 
-let restoreResizeObserver = () => {};
+let resizeObserver: ReturnType<typeof stubResizeObserver>;
+
+const editColumnOf = (width: number) => () => ({ width, height: 0 });
 
 const setup = (
   editColumnWidth: number,
   overrides?: Partial<TPresetStripHarnessProps>,
 ) => {
-  restoreResizeObserver = stubResizeObserver(() => ({
-    width: editColumnWidth,
-    height: 0,
-  }));
+  resizeObserver = stubResizeObserver(editColumnOf(editColumnWidth));
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
     new DOMRect(0, 0, MOCK_CHIP_WIDTH, 0),
   );
   return render(overrides);
 };
 
+const { ARROW_DOWN, ARROW_RIGHT, END, ENTER, ESCAPE, HOME, SPACE, TAB } =
+  USER_EVENT_KEY;
 const DIALOG_POPUP = 'dialog';
 const HAS_POPUP = 'aria-haspopup';
-const TO_LEDGER = '{ArrowDown}{ArrowRight}';
+const TO_LEDGER = `${ARROW_DOWN}${ARROW_RIGHT}`;
 const ACTIVE_OPTION = 'aria-activedescendant';
+const CLOSES_PICKER = 'closes the picker';
+const KEEPS_SELECTED = 'keeps the selected preset';
 
 afterEach(() => {
   vi.restoreAllMocks();
-  restoreResizeObserver();
+  resizeObserver();
 });
 
 describe(`<${PresetStrip.name}/>`, () => {
@@ -205,6 +214,16 @@ describe(`<${PresetStrip.name}/>`, () => {
       },
     );
 
+    it('re-measures when the edit column narrows', () => {
+      setup(MOCK_EDIT_COLUMN_1440);
+      const editorial = screen.getByRole('radio', { name: EDITORIAL });
+
+      act(() => resizeObserver.resize(editColumnOf(MOCK_EDIT_COLUMN_1280)));
+
+      const chips = screen.getAllByRole('radio');
+      expect(chips).toEqual([editorial]);
+    });
+
     it('keeps More presets out of the radio group', () => {
       setup(MOCK_EDIT_COLUMN_1440);
       const group = screen.getByRole('radiogroup', { name: PRESET_LABEL });
@@ -229,6 +248,7 @@ describe(`<${PresetStrip.name}/>`, () => {
     describe('with the picker open on twelve presets', () => {
       let onChange: Mock<(value: string) => void>;
       let morePresets: HTMLElement;
+      let listbox: HTMLElement;
 
       beforeEach(async () => {
         onChange = vi.fn();
@@ -241,6 +261,7 @@ describe(`<${PresetStrip.name}/>`, () => {
           name: morePresetsName(10),
         });
         await user.click(morePresets);
+        listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
       });
 
       it('marks More presets expanded', () => {
@@ -256,28 +277,22 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
 
       it('lists every preset', () => {
-        const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
-
         const options = within(listbox).getAllByRole('option');
 
         expect(options).toHaveLength(MOCK_FRAME_H_PRESETS.length);
       });
 
       it('focuses the list', () => {
-        const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
-
         expect(listbox).toHaveFocus();
       });
 
       it('starts on the selected preset', () => {
-        const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
         const almanac = screen.getByRole('option', { name: ALMANAC });
 
         expect(listbox).toHaveAttribute(ACTIVE_OPTION, almanac.id);
       });
 
       it('moves through the grid in both directions with the arrow keys', async () => {
-        const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
         const ledger = screen.getByRole('option', { name: LEDGER });
 
         await user.keyboard(TO_LEDGER);
@@ -285,35 +300,45 @@ describe(`<${PresetStrip.name}/>`, () => {
         expect(listbox).toHaveAttribute(ACTIVE_OPTION, ledger.id);
       });
 
-      it('jumps to the last preset with End', async () => {
-        const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
-        const harbour = screen.getByRole('option', { name: HARBOUR });
+      it.each([
+        [HOME, CONSOLE],
+        [END, HARBOUR],
+      ])('jumps with %s to %s', async (key, name) => {
+        const target = screen.getByRole('option', { name });
 
-        await user.keyboard('{End}');
+        await user.keyboard(key);
 
-        expect(listbox).toHaveAttribute(ACTIVE_OPTION, harbour.id);
+        expect(listbox).toHaveAttribute(ACTIVE_OPTION, target.id);
       });
 
-      it('chooses the focused preset with Enter', async () => {
-        await user.keyboard(`${TO_LEDGER}{Enter}`);
+      it('chooses the focused preset with Space', async () => {
+        await user.keyboard(`${TO_LEDGER}${SPACE}`);
 
         expect(onChange).toHaveBeenCalledWith(LEDGER.toUpperCase());
       });
 
-      it('closes after a choice', async () => {
-        await user.keyboard(`${TO_LEDGER}{Enter}`);
+      describe('after choosing Ledger with Enter', () => {
+        beforeEach(async () => {
+          await user.keyboard(`${TO_LEDGER}${ENTER}`);
+        });
 
-        const dialog = screen.queryByRole('dialog', { name: CHOOSE_PRESET });
+        it('reports the chosen preset', () => {
+          expect(onChange).toHaveBeenCalledWith(LEDGER.toUpperCase());
+        });
 
-        expect(dialog).not.toBeInTheDocument();
-      });
+        it(CLOSES_PICKER, () => {
+          const dialog = screen.queryByRole('dialog', {
+            name: CHOOSE_PRESET,
+          });
 
-      it('moves focus to the chosen chip after a choice', async () => {
-        await user.keyboard(`${TO_LEDGER}{Enter}`);
+          expect(dialog).not.toBeInTheDocument();
+        });
 
-        const ledger = screen.getByRole('radio', { name: LEDGER });
+        it('moves focus to the chosen chip', () => {
+          const ledger = screen.getByRole('radio', { name: LEDGER });
 
-        expect(ledger).toHaveFocus();
+          expect(ledger).toHaveFocus();
+        });
       });
 
       it('chooses a preset on click', async () => {
@@ -324,12 +349,12 @@ describe(`<${PresetStrip.name}/>`, () => {
         expect(onChange).toHaveBeenCalledWith(JOURNAL.toUpperCase());
       });
 
-      describe.each(['{Escape}', '{Tab}'])('then %s', (key) => {
+      describe.each([ESCAPE, TAB])('then %s', (key) => {
         beforeEach(async () => {
           await user.keyboard(key);
         });
 
-        it('closes the picker', () => {
+        it(CLOSES_PICKER, () => {
           const dialog = screen.queryByRole('dialog', {
             name: CHOOSE_PRESET,
           });
@@ -337,7 +362,7 @@ describe(`<${PresetStrip.name}/>`, () => {
           expect(dialog).not.toBeInTheDocument();
         });
 
-        it('keeps the selected preset', () => {
+        it(KEEPS_SELECTED, () => {
           expect(onChange).not.toHaveBeenCalled();
         });
 
@@ -359,21 +384,37 @@ describe(`<${PresetStrip.name}/>`, () => {
   });
 
   describe('on a phone', () => {
-    it('shows two presets as chips with no Preset button', () => {
-      setup(MOCK_EDIT_COLUMN_1280, { presets: MOCK_TWO_PRESETS });
+    describe('with two presets', () => {
+      beforeEach(() => {
+        setup(MOCK_EDIT_COLUMN_1280, { presets: MOCK_TWO_PRESETS });
+      });
 
-      const chips = screen.getAllByRole('radio');
+      it('shows every preset as a chip', () => {
+        const chips = screen.getAllByRole('radio');
 
-      expect(chips).toHaveLength(MOCK_TWO_PRESETS.length);
+        expect(chips).toHaveLength(MOCK_TWO_PRESETS.length);
+      });
+
+      it('shows no Preset button', () => {
+        const presetButton = screen.queryByRole('button');
+
+        expect(presetButton).not.toBeInTheDocument();
+      });
     });
 
-    describe('with five presets overflowing', () => {
+    describe.each([
+      [MOCK_FIVE_PRESETS, EDITORIAL, EDITORIAL_DESCRIPTION],
+      [MOCK_FRAME_H_PRESETS, ALMANAC, ALMANAC_DESCRIPTION],
+    ])('with %#: the selected %s overflowing', (presets, name, description) => {
       let presetButton: HTMLElement;
 
       beforeEach(() => {
-        setup(MOCK_EDIT_COLUMN_1280);
+        setup(MOCK_EDIT_COLUMN_1280, {
+          presets,
+          initialValue: name.toUpperCase(),
+        });
         presetButton = screen.getByRole('button', {
-          name: `${PRESET_LABEL} ${EDITORIAL}`,
+          name: `${PRESET_LABEL} ${name}`,
         });
       });
 
@@ -384,15 +425,15 @@ describe(`<${PresetStrip.name}/>`, () => {
       });
 
       it('shows the selected preset description on the Preset button', () => {
-        const description = within(presetButton).getByText(
-          EDITORIAL_DESCRIPTION,
-        );
+        const shown = within(presetButton).getByText(description);
 
-        expect(description).toBeVisible();
+        expect(shown).toBeVisible();
       });
 
       it('counts every preset on the Preset button', () => {
-        const count = within(presetButton).getByText(presetCount(5));
+        const count = within(presetButton).getByText(
+          presetCount(presets.length),
+        );
 
         expect(count).toBeVisible();
       });
@@ -428,7 +469,7 @@ describe(`<${PresetStrip.name}/>`, () => {
         const listbox = screen.getByRole('listbox', { name: CHOOSE_PRESET });
         const gazette = screen.getByRole('option', { name: 'Gazette' });
 
-        await user.keyboard('{ArrowDown}');
+        await user.keyboard(ARROW_DOWN);
 
         expect(listbox).toHaveAttribute(ACTIVE_OPTION, gazette.id);
       });
@@ -441,20 +482,29 @@ describe(`<${PresetStrip.name}/>`, () => {
         expect(onChange).toHaveBeenCalledWith(HARBOUR.toUpperCase());
       });
 
-      it('closes with the Close button and no change', async () => {
-        const close = screen.getByRole('button', { name: CLOSE });
+      describe.each([
+        [
+          'the Close button',
+          async () => {
+            const close = screen.getByRole('button', { name: CLOSE });
+            await user.click(close);
+          },
+        ],
+        [ESCAPE, () => user.keyboard(ESCAPE)],
+      ])('then %s', (_, close) => {
+        beforeEach(async () => {
+          await close();
+        });
 
-        await user.click(close);
+        it('closes the sheet', () => {
+          const sheet = screen.queryByRole('dialog', { name: CHOOSE_PRESET });
 
-        const sheet = screen.queryByRole('dialog', { name: CHOOSE_PRESET });
-        expect([sheet, onChange.mock.calls]).toEqual([null, []]);
-      });
+          expect(sheet).not.toBeInTheDocument();
+        });
 
-      it('closes on Escape with no change', async () => {
-        await user.keyboard('{Escape}');
-
-        const sheet = screen.queryByRole('dialog', { name: CHOOSE_PRESET });
-        expect([sheet, onChange.mock.calls]).toEqual([null, []]);
+        it(KEEPS_SELECTED, () => {
+          expect(onChange).not.toHaveBeenCalled();
+        });
       });
     });
 

@@ -4,7 +4,9 @@ import { Drawer } from '@base-ui/react/drawer';
 import { ICONS } from '@blog/config';
 import { PresetOptionList } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/components/preset-option-list/preset-option-list';
 import type { TPresetOption } from '@platform/components/features/look/look-form/components/preset-card/components/preset-strip/preset-option';
+import { dialogBackdropVariants } from '@platform/components/shared/dialog-backdrop';
 import { IconSoloButton } from '@platform/components/shared/icon-solo-button';
+import { DIALOG_BACKDROP_TONE } from '@platform/constants/dialog-backdrop';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { PRESET_LIST_LAYOUT } from '@platform/constants/preset-list';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
@@ -19,19 +21,15 @@ const presetSheetVariants = tv({
   slots: {
     trigger: [
       'flex min-h-14 w-full cursor-pointer items-center gap-2.5 rounded-admin-control border border-admin-control-line bg-admin-surface px-2.5 py-2 text-left',
-      'data-[popup-open]:border-admin-brand-ink data-[popup-open]:shadow-[0_0_0_3px_var(--admin-brand-weak)]',
+      'data-[popup-open]:border-admin-brand-ink data-[popup-open]:shadow-admin-choice-ring',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
-    ],
-    backdrop: [
-      'fixed inset-0 z-40 bg-admin-scrim',
-      'transition-opacity duration-base ease-smooth data-[ending-style]:opacity-0 data-[starting-style]:opacity-0',
     ],
     viewport: ['fixed inset-0 z-40 flex items-end'],
     popup: [
       'flex max-h-[85dvh] w-full flex-col overflow-hidden rounded-t-admin-12 bg-admin-surface text-admin-text shadow-admin-sheet outline-none',
-      '[transform:translateY(var(--drawer-swipe-movement-y))] transition-transform duration-base ease-smooth data-[swiping]:duration-0',
-      'data-[ending-style]:[transform:translateY(100%)] data-[starting-style]:[transform:translateY(100%)]',
+      'translate-y-(--drawer-swipe-movement-y) transition-transform duration-base ease-smooth data-[swiping]:duration-0',
+      'data-[ending-style]:translate-y-full data-[starting-style]:translate-y-full',
     ],
     handle: [
       'mx-auto mt-2 h-1 w-9 shrink-0 rounded-admin-bar bg-admin-control-line',
@@ -64,7 +62,7 @@ export const PresetSheet = <TId extends string>({
   const listRef = useRef<HTMLDivElement>(null);
   const nameId = useId();
   const titleId = useId();
-  const { trigger, backdrop, viewport, popup, handle, header, title, close } =
+  const { trigger, viewport, popup, handle, header, title, close } =
     presetSheetVariants();
 
   const choose = (id: TId) => {
@@ -88,7 +86,11 @@ export const PresetSheet = <TId extends string>({
         />
       </Drawer.Trigger>
       <Drawer.Portal>
-        <Drawer.Backdrop className={backdrop()} />
+        <Drawer.Backdrop
+          className={dialogBackdropVariants({
+            tone: DIALOG_BACKDROP_TONE.SCRIM,
+          })}
+        />
         <Drawer.Viewport className={viewport()}>
           <Drawer.Popup
             initialFocus={listRef}

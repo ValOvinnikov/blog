@@ -8,4 +8,5 @@ export const KEY = {
   ENTER: 'Enter',
   SPACE: ' ',
   TAB: 'Tab',
+  ESCAPE: 'Escape',
 } as const;
