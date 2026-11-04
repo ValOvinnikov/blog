@@ -134,10 +134,15 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   keeps each file's `vi.mock`s while importing the SDKs once per worker; **`packages/db`** on `threads`,
   with `unstubEnvs: true`, query tests getting their database from
   `useQueryTestDb()` and the shared `src/__mocks__/client.ts`.
+  Its worker restores one PGlite and truncates every table before each file.
 - **Every other package** runs in `node`; `service`, `db`, `auth` and `email`
   also set `mockReset: true`.
-- **`packages/studio`** runs with `isolate: false` and a setup file calling
-  `vi.resetModules()`, plus `unstubGlobals` and `restoreMocks`.
+- **`packages/studio`** and **`packages/db`** run with `isolate: false` and
+  the shared `RESET_FILE_STATE_SETUP` (`@blog/vitest-config/preset`), which
+  calls `vi.resetModules()` and, after each file, unstubs envs and globals,
+  restores spies and real timers — the config's unstub/restore flags only run
+  before each test, so the last test's stubs would otherwise reach the next
+  file's module scope.
 - **`isolate: false` is not a free speed-up.** With isolation off, a module
   one file imported keeps that file's `vi.mock` bindings and module-level
   state in the next file of the same worker. A setup file calling
@@ -614,7 +619,7 @@ tenant)`) is fine: that call is the contract with the outside.
     `__mocks__/` file** in the change that would write the third copy; until
     then an inline factory is fine. db's `@blog/db/client` already has one
     (`src/__mocks__/client.ts`, which `useQueryTestDb()` points at the
-    file's PGlite instance). Service's `@blog/service/sanity/query/query` is
+    worker's PGlite instance). Service's `@blog/service/sanity/query/query` is
     far past three copies, so the next test that needs it extracts it
     instead of writing another — a partial mock, because every loader
     needs the real `q` builder, so its `__mocks__/query.ts` spreads

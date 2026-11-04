@@ -8,8 +8,10 @@ import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   COMPACT,
+  CONSOLE,
   DEFAULT_ACCENT_HUE,
   DISCARD,
+  EDITORIAL,
   EDITORIAL_ACCENT_HUE,
   EXTRA_LARGE,
   hueValue,
@@ -52,10 +54,31 @@ describe(`<${LookForm.name}/>`, () => {
       setupLookForm();
     });
 
+    it('selects a preset with the arrow keys and applies it to the form', async () => {
+      const consolePreset = screen.getByRole('radio', { name: CONSOLE });
+      const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+      await user.click(consolePreset);
+      await user.keyboard('{ArrowRight}');
+      await openLookRow(user, LOOK_ROW.COLOUR);
+
+      const hueReadout = screen.getByText(hueValue(EDITORIAL_ACCENT_HUE));
+      expect(editorialPreset).toBeChecked();
+      expect(hueReadout).toBeVisible();
+      expect(updateLookAction).not.toHaveBeenCalled();
+    });
+
     describe('after choosing the Editorial preset', () => {
       beforeEach(async () => {
         await chooseEditorial(user);
         await openLookRow(user, LOOK_ROW.COLOUR);
+      });
+
+      it('marks no unsaved change on the Preset title', () => {
+        const presetHeading = screen.getByRole('heading', {
+          name: LOOK_FORM.presetLabel,
+        });
+
+        expect(presetHeading).toBeVisible();
       });
 
       it("resets the accent hue to the preset's", () => {

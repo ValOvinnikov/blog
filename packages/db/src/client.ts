@@ -11,20 +11,12 @@ import * as schema from './schema';
 
 type TNeonDb = NeonHttpDatabase<typeof schema>;
 
-// Driver-agnostic type every `src/queries/<domain>.ts` function accepts (via
-// `getDb()`'s return value) — `PgDatabase<PgQueryResultHKT, typeof schema>`
-// is the base class both `NeonHttpDatabase` (this module, runtime) and
-// `PgliteDatabase` (the in-memory Postgres used by
-// `src/testing/create-test-db.ts` in tests) extend, so query/mutation
-// functions written against `TDb` run unmodified against either.
+// The base class of both the Neon driver and the tests' PGlite one, so a query runs unmodified against either.
 export type TDb = PgDatabase<PgQueryResultHKT, typeof schema>;
 
 let dbInstance: TNeonDb | undefined;
 
-// The pooled Neon HTTP driver — the single runtime connection every db.*
-// query/mutation goes through from apps/web (Server Components, Route
-// Handlers). Migrations use the separate unpooled DSN via drizzle-kit
-// directly (see drizzle.config.ts), never this client.
+// Migrations use the unpooled DSN through drizzle-kit, never this client.
 export function getDb(): TDb {
   if (dbInstance) return dbInstance;
 

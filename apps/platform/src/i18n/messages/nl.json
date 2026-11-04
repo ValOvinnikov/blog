@@ -596,7 +596,7 @@
     "alertSuccess": "Uiterlijk opgeslagen.",
     "alertError": "Uiterlijk-instellingen konden niet worden opgeslagen. Probeer het opnieuw.",
     "presetLabel": "Voorinstelling",
-    "presetDescription": "Het startpunt dat bijna elke site kiest. Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
+    "presetDescription": "Stelt accenttint, kop- en tekstlettertype, afronding en dichtheid in.",
     "accentHueLabel": "Accenttint",
     "accentHueDescription": "Kleurt links, knoppen en accenten op de hele site.",
     "accentHueInaccessible": "Met deze tint blijft lopende tekst op de getinte vlakken niet leesbaar, dus de site zou hem vervangen. Kies een andere tint.",

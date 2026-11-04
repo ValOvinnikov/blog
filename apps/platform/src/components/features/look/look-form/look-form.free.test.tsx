@@ -13,6 +13,8 @@ import {
   FOLLOW_ACCENT_HUE,
   FOOTER_LAYOUT_LABEL,
   HEADER_LAYOUT_LABEL,
+  MOCK_SAVED_ACCENT_HUE,
+  RESET_TO_PRESET,
   SPINNER_LABEL,
 } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -22,6 +24,7 @@ import {
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { UPLOAD_LOGO } from '@platform/testing/site-config/fixtures';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -43,6 +46,23 @@ describe(`<${LookForm.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+  });
+
+  it('offers no Reset to preset on Free, even with an accent hue off the preset', () => {
+    setupLookForm({
+      plan: TENANT_PLAN.FREE,
+      initialValues: {
+        ...defaultLookFormValues(),
+        accentHue: MOCK_SAVED_ACCENT_HUE,
+      },
+    });
+
+    const resetButton = screen.queryByRole('button', {
+      name: RESET_TO_PRESET,
+    });
+    const editorialPreset = screen.getByRole('radio', { name: EDITORIAL });
+    expect(resetButton).not.toBeInTheDocument();
+    expect(editorialPreset).not.toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   describe('on Free', () => {

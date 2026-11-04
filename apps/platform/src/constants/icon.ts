@@ -15,6 +15,7 @@ export const ICON_SIZE = {
 export const ICON_STROKE_WIDTH = {
   CONTROL: 1.8,
   STATUS_LINE: 2.2,
+  CHIP_TICK: 2.4,
   RAIL_BADGE: 2.6,
   RADIO_TICK: 3,
 } as const;

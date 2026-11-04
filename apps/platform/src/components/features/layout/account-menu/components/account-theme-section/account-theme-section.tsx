@@ -2,11 +2,16 @@
 
 import { ICONS } from '@blog/config';
 import { MenuRadioGroup } from '@platform/components/shared/menu-radio-group';
+import type { TMenuRadioGroupSize } from '@platform/constants/menu-radio-group';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
 import { useThemePreference } from '@platform/utils/use-theme-preference/use-theme-preference';
 import { useTranslations } from 'next-intl';
 
-export const AccountThemeSection = () => {
+type TAccountThemeSectionProps = {
+  size: TMenuRadioGroupSize;
+};
+
+export const AccountThemeSection = ({ size }: TAccountThemeSectionProps) => {
   const t = useTranslations('account');
   const { preference, choose } = useThemePreference();
 
@@ -33,6 +38,7 @@ export const AccountThemeSection = () => {
       ]}
       value={preference}
       onValueChange={choose}
+      size={size}
     />
   );
 };

@@ -596,7 +596,7 @@
     "alertSuccess": "Aspecto guardado.",
     "alertError": "No se pudo guardar la configuración de Aspecto. Vuelva a intentarlo.",
     "presetLabel": "Ajuste predefinido",
-    "presetDescription": "El punto de partida que elige casi todo sitio. Define el tono de acento, las fuentes de títulos y de texto, el radio y la densidad.",
+    "presetDescription": "Define el tono de acento, las fuentes de títulos y de texto, el radio y la densidad.",
     "accentHueLabel": "Tono de acento",
     "accentHueDescription": "Colorea los enlaces, los botones y los elementos destacados de todo el sitio.",
     "accentHueInaccessible": "Este tono no mantiene legible el texto sobre sus superficies tintadas, así que el sitio lo sustituiría. Elija otro tono.",
