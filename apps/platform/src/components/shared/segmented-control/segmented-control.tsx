@@ -6,6 +6,10 @@ import type { TControlAria } from '@blog/config';
 import { singleSelectToggleGroupProps } from '@platform/utils/single-select-toggle-group/single-select-toggle-group';
 import { useId } from 'react';
 
+import {
+  OptionBody,
+  optionBodyIds,
+} from './components/option-body/option-body';
 import { segmentedControlVariants } from './segmented-control-variants';
 import { useLockedArrowFocus } from './use-locked-arrow-focus';
 
@@ -56,28 +60,26 @@ export const SegmentedControl = <TValue extends string>({
       className={root({ class: className })}
     >
       {options.map(({ value: optionValue, label, description }, index) => {
-        const labelId = `${idPrefix}-${optionValue}-label`;
-        const descriptionId = `${idPrefix}-${optionValue}-description`;
+        const ids = optionBodyIds(idPrefix, optionValue);
 
         return (
           <Toggle
             key={optionValue}
             ref={setOptionRef(index)}
             value={optionValue}
-            aria-labelledby={description ? labelId : undefined}
-            aria-describedby={description ? descriptionId : undefined}
+            aria-labelledby={description ? ids.labelId : undefined}
+            aria-describedby={description ? ids.descriptionId : undefined}
             aria-disabled={isLocked || undefined}
             className={option()}
           >
             {description ? (
-              <>
-                <span id={labelId} className={optionLabel()}>
-                  {label}
-                </span>
-                <span id={descriptionId} className={optionDescriptionSlot()}>
-                  {description}
-                </span>
-              </>
+              <OptionBody
+                ids={ids}
+                label={label}
+                description={description}
+                labelClassName={optionLabel()}
+                descriptionClassName={optionDescriptionSlot()}
+              />
             ) : (
               label
             )}
