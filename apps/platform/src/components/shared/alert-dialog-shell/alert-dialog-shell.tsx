@@ -1,7 +1,7 @@
 import { AlertDialog } from '@base-ui/react/alert-dialog';
-import { dialogBackdropVariants } from '@platform/components/shared/dialog-backdrop';
 import { headingVariants } from '@platform/components/shared/heading/heading-variants';
 import { DIALOG_BACKDROP_TONE } from '@platform/constants/dialog-backdrop';
+import { dialogBackdropVariants } from '@platform/utils/dialog-backdrop-variants/dialog-backdrop-variants';
 import type { ReactNode } from 'react';
 
 import { alertDialogShellVariants } from './alert-dialog-shell-variants';

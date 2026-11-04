@@ -92,7 +92,13 @@ const SHADOW_TOKENS = [
   'admin-xs',
 ];
 
-const LEADING_TOKENS = ['admin-1-4', 'admin-1-45', 'admin-18', 'admin-22'];
+const LEADING_TOKENS = [
+  'admin-1-4',
+  'admin-1-45',
+  'admin-18',
+  'admin-19',
+  'admin-22',
+];
 
 const FONT_WEIGHT_TOKENS = ['admin-650'];
 

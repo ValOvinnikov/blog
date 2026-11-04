@@ -1,6 +1,4 @@
 {
-  "apps/platform/src/components/features/look/look-form/look-form.test.tsx": 140,
-  "apps/platform/src/components/features/onboarding/onboarding-view/onboarding-view.test.tsx": 110,
   "apps/platform/src/components/features/voice/voice-settings/voice-settings.test.tsx": 40,
   "apps/platform/src/components/features/email/email-settings/email-settings.test.tsx": 30,
   "apps/platform/src/components/features/look/look-form/use-look-open-rows.test.tsx": 20

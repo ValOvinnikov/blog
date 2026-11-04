@@ -30,7 +30,8 @@ env:
 
 jobs:
   workflow-security:
-    name: Workflow security
+    # Renamed on a draft for the same reason as ci.yml's `ci` job.
+    name: ${{ github.event.pull_request.draft && 'Workflow security (draft)' || 'Workflow security' }}
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5

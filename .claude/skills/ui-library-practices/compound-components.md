@@ -34,8 +34,8 @@ while the slot-shaped item (`TimelineItem`) resolves its own slots.
 ## Authoring a compound component
 
 Each part lives in `components/<child-name>/` and keeps its own `tv()` in a
-sibling `-variants.ts` (this package's exception — `ui-library-practices` §
-Styling); it never imports the parent's. Simplified from
+sibling `-variants.ts` (`react-component-practices` § Styling files); it
+never imports the parent's. Simplified from
 `packages/ui/src/components/organisms/header/`, which also has an `Actions`
 part and a slots `tv()` for the root's wrappers:
 
