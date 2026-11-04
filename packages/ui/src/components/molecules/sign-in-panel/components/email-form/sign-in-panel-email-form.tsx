@@ -30,7 +30,6 @@ type TSignInPanelEmailFormProps = {
   spinnerVariant?: TSpinnerProps['variant'];
 };
 
-/** The always-visible email field and send button of the sign-in panel, with its sending and couldn't-send feedback. */
 export const SignInPanelEmailForm = ({
   emailForm,
   labels,
@@ -52,7 +51,7 @@ export const SignInPanelEmailForm = ({
   };
 
   return (
-    <form className={s.root()} onSubmit={handleSubmit}>
+    <form className={s.root()} onSubmit={handleSubmit} noValidate={true}>
       <label htmlFor={inputId} className={s.label()}>
         {labels.email}
       </label>
