@@ -1,6 +1,11 @@
 import { SIZE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  ASSET_UPLOAD_LAYOUT,
+  ASSET_UPLOAD_THUMB_TEST_ID,
+} from '@platform/constants/asset-upload';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DESCRIBEDBY, ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_ID } from '@platform/testing/render-in-settings-form';
 import { selectFile } from '@platform/testing/select-file';
@@ -28,12 +33,20 @@ const MOCK_HINT = faker.lorem.sentence();
 const MOCK_REJECTION = faker.lorem.sentence();
 const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_CONTROL_ID = faker.string.alpha(8);
+const MOCK_STAGED_BADGE = faker.lorem.words(2);
 
 const MOCK_ASSET: TAssetUploadSpec = {
   kind: brandAssetKindSchema.enum.logo,
   size: SIZE.MD,
   acceptedMimeTypes: ACCEPTED_IMAGE_MIME_TYPES,
   validateFile: () => undefined,
+};
+
+const MOCK_BARE_ASSET: TAssetUploadSpec = {
+  ...MOCK_ASSET,
+  size: SIZE.SM,
+  layout: ASSET_UPLOAD_LAYOUT.BARE,
+  stagedBadgeLabel: MOCK_STAGED_BADGE,
 };
 
 const MOCK_REJECTING_ASSET: TAssetUploadSpec = {
@@ -133,7 +146,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
 
     expect(uploadButton).toBeDisabled();
     expect(uploadButton).toHaveAttribute(
-      'aria-describedby',
+      ARIA_DESCRIBEDBY,
       `${hint.id} ${ARCHIVED_NOTICE_ID}`,
     );
     expect(removeButton).toBeDisabled();
@@ -176,5 +189,108 @@ describe(`<${AssetUploadField.name}/>`, () => {
       `${MOCK_HINT} ${MOCK_ERROR}`,
     );
     expect(alert).not.toBeInTheDocument();
+  });
+
+  describe('in the bare row layout', () => {
+    it('shows the image and both controls, named for the asset', () => {
+      setup({ asset: MOCK_BARE_ASSET, image: { url: MOCK_LOGO_URL } });
+
+      const thumbnail = screen.getByAltText(CURRENT_LOGO);
+      const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
+      const removeButton = screen.getByRole('button', { name: REMOVE });
+
+      expect(thumbnail).toBeVisible();
+      expect(uploadButton).toBeVisible();
+      expect(removeButton).toBeVisible();
+    });
+
+    it('hides the empty thumbnail from assistive technology and offers no remove control', () => {
+      setup({ asset: MOCK_BARE_ASSET });
+
+      const thumb = screen.getByTestId(ASSET_UPLOAD_THUMB_TEST_ID);
+      const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
+      const removeButton = screen.queryByRole('button', { name: REMOVE });
+
+      expect(thumb).toHaveAttribute(ARIA_HIDDEN, 'true');
+      expect(uploadButton).toBeVisible();
+      expect(removeButton).not.toBeInTheDocument();
+    });
+
+    it('shows no title, staged badge or hint', () => {
+      const file = mockPngFile();
+      setup({
+        asset: MOCK_BARE_ASSET,
+        image: { url: MOCK_STAGED_LOGO_BLOB_URL, file },
+      });
+
+      const title = screen.queryByText(MOCK_LABEL);
+      const badge = screen.queryByText(MOCK_STAGED_BADGE);
+      const hint = screen.queryByText(MOCK_HINT);
+      const fileName = screen.queryByText(file.name);
+
+      expect(title).not.toBeInTheDocument();
+      expect(badge).not.toBeInTheDocument();
+      expect(hint).not.toBeInTheDocument();
+      expect(fileName).not.toBeInTheDocument();
+    });
+
+    it('stages a chosen file', async () => {
+      const onStage = vi.fn();
+      const file = mockPngFile();
+      setup({ asset: MOCK_BARE_ASSET, onStage });
+
+      await selectFile(file);
+
+      expect(onStage).toHaveBeenCalledWith({
+        url: MOCK_STAGED_LOGO_BLOB_URL,
+        file,
+      });
+    });
+
+    it('stages a removal from its remove control', async () => {
+      const onStage = vi.fn();
+      setup({
+        asset: MOCK_BARE_ASSET,
+        image: { url: MOCK_LOGO_URL },
+        onStage,
+      });
+
+      const removeButton = screen.getByRole('button', { name: REMOVE });
+      await user.click(removeButton);
+
+      expect(onStage).toHaveBeenCalledWith({ url: undefined });
+    });
+
+    it('announces a rejected file and describes the upload control with it alone', async () => {
+      setup({
+        asset: { ...MOCK_BARE_ASSET, validateFile: () => MOCK_REJECTION },
+      });
+
+      await selectFile(mockPngFile());
+
+      const alert = await screen.findByRole('alert');
+      const uploadButton = screen.getByRole('button', { name: UPLOAD_LOGO });
+
+      expect(alert).toHaveTextContent(MOCK_REJECTION);
+      expect(uploadButton).toHaveAccessibleDescription(MOCK_REJECTION);
+    });
+
+    it('keeps both controls disabled and described by the given element', () => {
+      setup({
+        asset: MOCK_BARE_ASSET,
+        image: { url: MOCK_LOGO_URL },
+        control: { isDisabled: true, describedBy: ARCHIVED_NOTICE_ID },
+      });
+
+      const uploadButton = screen.getByRole('button', { name: REPLACE_LOGO });
+      const removeButton = screen.getByRole('button', { name: REMOVE });
+
+      expect(uploadButton).toBeDisabled();
+      expect(uploadButton).toHaveAttribute(
+        ARIA_DESCRIBEDBY,
+        ARCHIVED_NOTICE_ID,
+      );
+      expect(removeButton).toBeDisabled();
+    });
   });
 });

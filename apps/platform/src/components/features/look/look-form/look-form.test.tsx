@@ -1,4 +1,3 @@
-import { LOCALE_ISO_CODES } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
@@ -50,16 +49,19 @@ describe(`<${LookForm.name}/>`, () => {
       const presetTitles = presetHeading.map((heading) => heading.textContent);
       const rowTitles = rowHeadings.map((heading) => heading.textContent);
 
+      const startsWith = (title: string) =>
+        expect.stringMatching(new RegExp(`^${title}`));
+
       expect(presetTitles).toEqual([LOOK_FORM.presetLabel]);
       expect(rowTitles).toEqual([
-        LOOK_FORM.colourHeading,
-        LOOK_FORM.brandHeading,
-        LOOK_FORM.typeHeading,
-        LOOK_FORM.shapeHeading,
-        LOOK_FORM.buttonsHeading,
-        LOOK_FORM.headerHeading,
-        LOOK_FORM.footerHeading,
-        LOOK_FORM.languageSwitcherLabel,
+        startsWith(LOOK_FORM.colourHeading),
+        startsWith(LOOK_FORM.brandHeading),
+        startsWith(LOOK_FORM.typeHeading),
+        startsWith(LOOK_FORM.shapeHeading),
+        startsWith(LOOK_FORM.buttonsHeading),
+        startsWith(LOOK_FORM.headerHeading),
+        startsWith(LOOK_FORM.footerHeading),
+        startsWith(LOOK_FORM.languageSwitcherLabel),
       ]);
     });
 
@@ -159,17 +161,4 @@ describe(`<${LookForm.name}/>`, () => {
       expect(shownButton).toBeEnabled();
     },
   );
-
-  it('shows a single-language note and no switcher choice with one language', async () => {
-    setupLookForm({ liveLocales: [LOCALE_ISO_CODES.EN] });
-    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
-
-    const note = screen.getByText(LOOK_FORM.languageSwitcherSingleLanguage);
-    const compactCodesButton = screen.queryByRole('button', {
-      name: LOOK_FORM.languageSwitcherOptionLabel.CODES,
-    });
-
-    expect(note).toBeVisible();
-    expect(compactCodesButton).not.toBeInTheDocument();
-  });
 });

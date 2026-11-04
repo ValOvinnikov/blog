@@ -6,7 +6,7 @@ import { VoiceEditorProvider } from '@platform/components/features/voice/voice-e
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
-import { PreviewModeControl } from '@platform/components/shared/preview-mode-control';
+import { PreviewModeGroup } from '@platform/components/shared/preview-mode-group';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import {
   buildSitePreviewTheme,
@@ -73,7 +73,7 @@ export const VoiceSettings = ({
 
   return (
     <SettingsFormShell
-      layout={{ isWide: true }}
+      layout={{ isWide: true, isSaveBarFloatingOnPhone: true }}
       title={t('heading')}
       description={t('description')}
       form={form}
@@ -99,7 +99,7 @@ export const VoiceSettings = ({
     >
       <div className={intro()}>
         <div className={controls()}>
-          <PreviewModeControl value={mode} onChange={setMode} />
+          <PreviewModeGroup value={mode} onChange={setMode} />
         </div>
         <Alert
           type={ALERT_TYPE.INFO}

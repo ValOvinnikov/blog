@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ASSET_UPLOAD_INPUT_TEST_ID } from '@platform/constants/asset-upload';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
@@ -50,7 +51,7 @@ export const openLookRow = async (user: UserEvent, row: TLookRow) => {
 
 export const pickLogo = async (user: UserEvent) => {
   await openLookRow(user, LOOK_ROW.BRAND);
-  const [logoInput] = screen.getAllByTestId('asset-upload-field-input');
+  const [logoInput] = screen.getAllByTestId(ASSET_UPLOAD_INPUT_TEST_ID);
   if (!logoInput) throw new Error('logo input not found');
   await user.upload(logoInput, MOCK_LOGO_FILE);
   await waitFor(() => {

@@ -46,7 +46,7 @@ Voice lets a site owner reword the page-level prose the public site writes in it
 - Any member of the tenant, whatever their role, or any platform admin (a virtual owner membership) can edit Voice — `requireTenantMembership`. The page is not plan-gated and sits in every tenant's sidebar.
 - The page edits only the tenant's live languages (./languages.md). Overrides stored for a language a downgrade switched off stay in the row and apply again once it is live.
 - The form is read-only for a deprovisioned tenant.
-- Specimens render in the tenant's Look (accent and logo hue, fonts, radius, density, card style) with the Look preview's light/dark toggle; Voice never changes Look.
+- Specimens render in the tenant's Look (accent and logo hue, fonts, radius, density, card style) switched between light and dark by the shared preview's Light / Dark icon group (`components/shared/preview-mode-group/`), the same group the preview toolbar shows; Voice never changes Look.
 
 ## Constraints and invariants
 

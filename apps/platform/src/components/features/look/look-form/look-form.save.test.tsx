@@ -5,7 +5,7 @@ import {
   type TUpdateLookResult,
 } from '@platform/server/site-config/update-look-action';
 import { ARIA_DISABLED } from '@platform/testing/aria';
-import { screen, waitFor } from '@platform/testing/custom-render';
+import { screen, waitFor, within } from '@platform/testing/custom-render';
 import {
   DEFAULT_ACCENT_HUE,
   DISCARD,
@@ -68,11 +68,14 @@ describe(`<${LookForm.name}/>`, () => {
           name: `${LOOK_FORM.colourHeading}${UNSAVED_CHANGES}`,
         });
         const typeHeading = screen.getByRole('heading', {
-          name: LOOK_FORM.typeHeading,
+          name: new RegExp(`^${LOOK_FORM.typeHeading}`),
+        });
+        const typeDot = within(typeHeading).queryByRole('img', {
+          name: UNSAVED_CHANGES,
         });
 
         expect(colourHeading).toBeVisible();
-        expect(typeHeading).toBeVisible();
+        expect(typeDot).not.toBeInTheDocument();
       });
 
       it('discards unsaved changes back to the saved values', async () => {
