@@ -1,14 +1,17 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { UPLOAD_REFUSAL } from '@platform/constants/upload';
-import messages from '@platform/i18n/messages/en.json';
 import { clearBrandAssetAction } from '@platform/server/site-config/clear-brand-asset-action';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { UPLOAD_FAVICON } from '@platform/testing/look/look-form-fixtures';
+import {
+  BRAND_IMAGES_HINT,
+  UPLOAD_FAVICON,
+} from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
+  findLogoPickerWithError,
   pickAndSaveLogo,
   stageAssetRemoval,
 } from '@platform/testing/look/look-form-interactions';
@@ -16,7 +19,6 @@ import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   MOCK_LOGO_URL,
   MOCK_STAGED_LOGO_BLOB_URL,
-  REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -29,11 +31,7 @@ vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
 vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
-const { lookForm: LOOK_FORM } = messages;
-
 const tUploadErrors = makeEnTranslator('uploadErrors');
-
-const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 
 const FAVICON_REMOVE_FAILED = tUploadErrors('removeFailed', {
   kind: 'favicon',
@@ -68,14 +66,7 @@ describe(`<${LookForm.name}/>`, () => {
 
       await pickAndSaveLogo(user);
 
-      const replaceLogoButton = await screen.findByRole('button', {
-        name: REPLACE_LOGO,
-      });
-      await waitFor(() => {
-        expect(replaceLogoButton).toHaveAccessibleDescription(
-          `${BRAND_IMAGES_HINT} ${LOGO_TOO_LARGE}`,
-        );
-      });
+      await findLogoPickerWithError(LOGO_TOO_LARGE);
       const alert = await screen.findByRole('alert');
       expect(alert).toHaveTextContent(LOGO_TOO_LARGE);
       expect(updateLookAction).not.toHaveBeenCalled();

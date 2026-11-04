@@ -18,6 +18,7 @@ export const EDITORIAL_ACCENT_HUE =
 export const MOCK_SAVED_ACCENT_HUE = 260;
 export const FOLLOW_ACCENT_HUE = messages.logoHueField.followAccentHue;
 export const UPLOAD_FAVICON = messages.assetUploadField.favicon.upload;
+export const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 export const RESET_TO_PRESET = LOOK_FORM.resetButton;
 export const EXTRA_LARGE = LOOK_FORM.radiusScaleOptionLabel.XL;
 export const COMPACT = LOOK_FORM.densityOptionLabel.COMPACT;

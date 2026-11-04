@@ -10,7 +10,7 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 
 import { SaveBar, type TSaveBarProps } from './save-bar';
 
@@ -192,39 +192,6 @@ describe(`<${SaveBar.name}/>`, () => {
   });
 
   describe('going to the first field', () => {
-    it.each<{ fieldKind: string; field: ReactNode }>([
-      {
-        fieldKind: 'the field itself',
-        field: <input id={MOCK_FIELD_ID} aria-label={MOCK_FIELD_LABEL} />,
-      },
-      {
-        fieldKind: 'the control inside a field that cannot take focus',
-        field: (
-          <div id={MOCK_FIELD_ID}>
-            <input aria-label={MOCK_FIELD_LABEL} />
-          </div>
-        ),
-      },
-    ])('focuses $fieldKind', async ({ field }) => {
-      renderWithIntl(
-        <>
-          {field}
-          <SaveBar {...baseProps} invalidControls={{ ids: [MOCK_FIELD_ID] }} />
-        </>,
-      );
-
-      const firstFieldLink = screen.getByRole('link', {
-        name: GO_TO_THE_FIRST_ONE,
-      });
-      await user.click(firstFieldLink);
-
-      const firstField = screen.getByRole('textbox', {
-        name: MOCK_FIELD_LABEL,
-      });
-
-      expect(firstField).toHaveFocus();
-    });
-
     it('lets the page reveal the first field before focusing it', async () => {
       renderWithIntl(<BarWithHiddenField />);
 

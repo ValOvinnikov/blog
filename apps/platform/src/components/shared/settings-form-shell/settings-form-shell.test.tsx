@@ -26,7 +26,7 @@ import {
   SettingsFormShell,
   type TSettingsFormShellProps,
 } from './settings-form-shell';
-import type { TSettingsForm } from './use-settings-form';
+import type { TSettingsForm } from './settings-form-types';
 
 type TValues = { tagline: string; footer: string };
 

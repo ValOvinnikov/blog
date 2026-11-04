@@ -101,24 +101,28 @@ describe(useLookOpenRows, () => {
         await nudgeAccentHue(user);
       });
 
-      it('keeps a typed value when its row folds and opens again', async () => {
-        const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
-        await user.click(colourTrigger);
-        await user.click(colourTrigger);
+      describe('with the Colour row folded again', () => {
+        let colourTrigger: HTMLElement;
 
-        const slider = screen.getByRole('slider', { name: ACCENT_HUE });
-        expect(slider).toHaveValue(String(NUDGED_ACCENT_HUE));
-      });
-
-      it('shows the unsaved dot on the changed row only', async () => {
-        const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
-        await user.click(colourTrigger);
-
-        const dots = screen.getAllByRole('img', { name: UNSAVED_CHANGES });
-        const colourDot = within(colourTrigger).getByRole('img', {
-          name: UNSAVED_CHANGES,
+        beforeEach(async () => {
+          colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
+          await user.click(colourTrigger);
         });
-        expect(dots).toEqual([colourDot]);
+
+        it('keeps a typed value when its row opens again', async () => {
+          await user.click(colourTrigger);
+
+          const slider = screen.getByRole('slider', { name: ACCENT_HUE });
+          expect(slider).toHaveValue(String(NUDGED_ACCENT_HUE));
+        });
+
+        it('shows the unsaved dot on the changed row only', () => {
+          const dots = screen.getAllByRole('img', { name: UNSAVED_CHANGES });
+          const colourDot = within(colourTrigger).getByRole('img', {
+            name: UNSAVED_CHANGES,
+          });
+          expect(dots).toEqual([colourDot]);
+        });
       });
 
       it('keeps Reset to preset on a card that is not a folding row', () => {
@@ -136,6 +140,8 @@ describe(useLookOpenRows, () => {
   });
 
   describe('from the save bar link to a changed card', () => {
+    let colourTrigger: HTMLElement;
+
     beforeEach(async () => {
       await nudgeAccentHue(user);
       await openLookRow(user, LOOK_ROW.FOOTER);
@@ -144,10 +150,10 @@ describe(useLookOpenRows, () => {
         name: LOOK_FORM.colourHeading,
       });
       await user.click(colourLink);
+      colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
     });
 
     it('opens the changed row and folds the open one', () => {
-      const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
       const footerTrigger = lookRowTrigger(LOOK_ROW.FOOTER);
 
       expect(colourTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
@@ -155,8 +161,6 @@ describe(useLookOpenRows, () => {
     });
 
     it('moves focus to the changed row button', () => {
-      const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
-
       expect(colourTrigger).toHaveFocus();
     });
   });

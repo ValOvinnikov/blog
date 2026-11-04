@@ -1,6 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import messages from '@platform/i18n/messages/en.json';
 import { updateLookAction } from '@platform/server/site-config/update-look-action';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { ARIA_SELECTED } from '@platform/testing/aria';
@@ -8,6 +7,7 @@ import { screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
+  BRAND_IMAGES_HINT,
   EDIT_TAB,
   hueValue,
   NUDGED_ACCENT_HUE,
@@ -15,6 +15,7 @@ import {
 } from '@platform/testing/look/look-form-fixtures';
 import {
   clickGoToTheFirstOne,
+  findLogoPickerWithError,
   nudgeAccentHue,
   openLookRow,
   pickAndSaveLogo,
@@ -41,13 +42,9 @@ vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
 vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
-const { lookForm: LOOK_FORM } = messages;
-
 const tUploadErrors = makeEnTranslator('uploadErrors');
 
 const tSaveBar = makeEnTranslator('saveBar');
-
-const BRAND_IMAGES_HINT = LOOK_FORM.brandFieldsHint;
 
 const LOGO_UPLOAD_FAILED = tUploadErrors('uploadFailed', { kind: 'logo' });
 
@@ -140,14 +137,8 @@ describe(`<${LookForm.name}/>`, () => {
         });
 
         it('clears the picker error once a new logo is picked', async () => {
-          const replaceLogoButton = await screen.findByRole('button', {
-            name: REPLACE_LOGO,
-          });
-          await waitFor(() => {
-            expect(replaceLogoButton).toHaveAccessibleDescription(
-              `${BRAND_IMAGES_HINT} ${LOGO_UPLOAD_FAILED}`,
-            );
-          });
+          const replaceLogoButton =
+            await findLogoPickerWithError(LOGO_UPLOAD_FAILED);
           await pickLogo(user);
 
           const attentionLink = screen.queryByRole('link', {

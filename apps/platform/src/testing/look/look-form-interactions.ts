@@ -6,7 +6,10 @@ import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
-import { EDITORIAL } from '@platform/testing/look/look-form-fixtures';
+import {
+  BRAND_IMAGES_HINT,
+  EDITORIAL,
+} from '@platform/testing/look/look-form-fixtures';
 import {
   GO_TO_THE_FIRST_ONE,
   SAVE_CHANGES,
@@ -15,6 +18,7 @@ import {
 import {
   CURRENT_LOGO,
   MOCK_STAGED_LOGO_BLOB_URL,
+  REPLACE_LOGO,
 } from '@platform/testing/site-config/fixtures';
 import type { UserEvent } from '@testing-library/user-event';
 
@@ -48,6 +52,18 @@ export const pickLogo = async (user: UserEvent) => {
     const logo = screen.getByAltText(CURRENT_LOGO);
     expect(logo).toHaveAttribute('src', MOCK_STAGED_LOGO_BLOB_URL);
   });
+};
+
+export const findLogoPickerWithError = async (message: string) => {
+  const replaceLogoButton = await screen.findByRole('button', {
+    name: REPLACE_LOGO,
+  });
+  await waitFor(() => {
+    expect(replaceLogoButton).toHaveAccessibleDescription(
+      `${BRAND_IMAGES_HINT} ${message}`,
+    );
+  });
+  return replaceLogoButton;
 };
 
 export const nudgeAccentHue = async (user: UserEvent) => {
