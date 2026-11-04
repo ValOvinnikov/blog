@@ -22,9 +22,10 @@ import { useId } from 'react';
 
 export type TFooterCardProps = {
   hasCookieBanner: boolean;
+  summary: string;
 };
 
-export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
+export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   const {
     values: {
       footerLayout,
@@ -60,6 +61,7 @@ export const FooterCard = ({ hasCookieBanner }: TFooterCardProps) => {
 
   return (
     <LookCard
+      summary={summary}
       card={LOOK_ROW.FOOTER}
       title={t('footerHeading')}
       description={t('footerDescription')}

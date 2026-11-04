@@ -11,6 +11,7 @@ import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { buildLookRowSummaries } from '@platform/utils/look-form-values/look-row-summaries';
 import {
   SITE_PARTS_ROWS,
   STYLE_ROWS,
@@ -62,6 +63,7 @@ export const LookForm = ({
       : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
   });
   const t = useTranslations('lookForm');
+  const hasMultipleLanguages = liveLocales.length > 1;
   const { groupProps, revealRow } = useLookOpenRows();
   const { lookForm, isPending, form, errorTitle } = useLookFormState({
     tenantId,
@@ -105,7 +107,10 @@ export const LookForm = ({
                 styleGroup={groupProps(STYLE_ROWS)}
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}
-                hasMultipleLanguages={liveLocales.length > 1}
+                hasMultipleLanguages={hasMultipleLanguages}
+                summaries={buildLookRowSummaries(lookForm.values, t, {
+                  hasMultipleLanguages,
+                })}
               />
             </div>
 

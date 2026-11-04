@@ -753,7 +753,19 @@
     "cookieSettingsButtonBannerOff": "The cookie banner is off, so the button stays hidden. Turn the banner on in Features to show it.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
-    "brandImageUnchanged": "No new image"
+    "brandImageUnchanged": "No new image",
+    "summaryHue": "Hue {hue}",
+    "summaryLogoFollowsAccent": "logo follows accent",
+    "summaryLogoHue": "Logo hue {hue}",
+    "summaryLogoUploaded": "Logo uploaded",
+    "summaryNoLogo": "No logo",
+    "summaryFaviconUploaded": "Favicon uploaded",
+    "summaryNoFavicon": "No favicon",
+    "cookieSettingsButtonSummary": {
+      "HIDDEN": "Cookie button hidden",
+      "SHOWN": "Cookie button shown"
+    },
+    "summaryOneLanguage": "One language"
   },
   "previewModeControl": {
     "modeLight": "Light",
