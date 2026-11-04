@@ -6,6 +6,7 @@ import {
   type INavItem,
   PrimaryNavigation,
 } from '@blog/ui/components/molecules/primary-navigation';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import {
   AccountMenuGroup,
   type TAccountMenuGroupProps,
@@ -84,7 +85,7 @@ export const SiteNavigation = ({
 
   const items = links.map((link) => toNavItem(pathname, link));
   const hasMenuEntries =
-    items.length > 0 || Boolean(panelActions) || Boolean(menuAccount);
+    hasArrayGotItems(items) || Boolean(panelActions) || Boolean(menuAccount);
 
   return (
     <div ref={containerRef} className={siteNavigationVariants()}>
