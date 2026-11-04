@@ -5640,25 +5640,9 @@
         "file": "apps/platform/src/constants/provisioning.ts"
       }
     ],
-    "provisioning.deprovision_dispatch_error": [
+    "provisioning.deprovision_enqueue_rejected": [
       {
-        "ref": "PROVISIONING_LOG.DEPROVISION_DISPATCH_ERROR",
-        "scope": "app:platform",
-        "from": "@platform/constants/provisioning",
-        "file": "apps/platform/src/constants/provisioning.ts"
-      }
-    ],
-    "provisioning.deprovision_dispatch_failed": [
-      {
-        "ref": "PROVISIONING_LOG.DEPROVISION_DISPATCH_FAILED",
-        "scope": "app:platform",
-        "from": "@platform/constants/provisioning",
-        "file": "apps/platform/src/constants/provisioning.ts"
-      }
-    ],
-    "provisioning.deprovision_dispatch_skipped": [
-      {
-        "ref": "PROVISIONING_LOG.DEPROVISION_DISPATCH_SKIPPED",
+        "ref": "PROVISIONING_LOG.DEPROVISION_ENQUEUE_REJECTED",
         "scope": "app:platform",
         "from": "@platform/constants/provisioning",
         "file": "apps/platform/src/constants/provisioning.ts"

@@ -19,6 +19,7 @@ import { taxonomyListSchema } from '@blog/studio/schema-types/modules/taxonomy-l
 import { teamSchema } from '@blog/studio/schema-types/modules/team/team';
 import { testimonialSchema } from '@blog/studio/schema-types/modules/testimonial/testimonial';
 import { timelineSchema } from '@blog/studio/schema-types/modules/timeline/timeline';
+import { hasLength } from '@blog/utils/primitives';
 
 export const moduleKinds = [
   {
@@ -75,11 +76,13 @@ const kindIndexByName = new Map<string, number>(
 const kindIndex = (name: string) =>
   kindIndexByName.get(name) ?? moduleKinds.length;
 
-const title = (name: string) => titleByName.get(name) ?? name;
+export const getModuleTitle = (name: string) => titleByName.get(name) ?? name;
 
 export const sortModulesByKind = (names: string[]) =>
   [...names].sort(
-    (a, b) => kindIndex(a) - kindIndex(b) || title(a).localeCompare(title(b)),
+    (a, b) =>
+      kindIndex(a) - kindIndex(b) ||
+      getModuleTitle(a).localeCompare(getModuleTitle(b)),
   );
 
 export const moduleInsertMenuGroups = (names: string[]) => {
@@ -88,6 +91,6 @@ export const moduleInsertMenuGroups = (names: string[]) => {
   return moduleKinds.flatMap((kind, index) => {
     const of = sorted.filter((name) => kindIndexByName.get(name) === index);
 
-    return of.length > 0 ? [{ name: kind.name, title: kind.title, of }] : [];
+    return hasLength(of) ? [{ name: kind.name, title: kind.title, of }] : [];
   });
 };

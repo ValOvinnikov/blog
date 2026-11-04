@@ -1,9 +1,14 @@
-import { ACCOUNT_BUTTON_STYLE, ACCOUNT_PANEL_STYLE } from '@blog/config';
+import {
+  ACCOUNT_BUTTON_STYLE,
+  ACCOUNT_PANEL_STYLE,
+  CARD_STYLE,
+  CARD_STYLE_DECLARATIONS,
+} from '@blog/config';
 import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
 import { PopoverMenu } from '@blog/ui/components/molecules/popover-menu';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { fn } from 'storybook/test';
 
 import { AccountPanel, type TAccountPanelProps } from './account-panel';
@@ -27,7 +32,7 @@ const InteractiveAccountPanel = (args: TAccountPanelProps) => {
         labels={{ signIn: 'Sign in', account: PANEL_LABEL }}
         user={args.user}
         isOpen={isOpen}
-        panelId={PANEL_ID}
+        panelId={args.panel.id}
         onClick={() => setIsOpen((current) => !current)}
       />
       <AccountPanel {...args} panel={{ ...args.panel, isOpen }} />
@@ -85,6 +90,23 @@ export const Profile: TStory = {
 };
 
 export const Hub: TStory = {
+  render: (args) => (
+    <div className="grid gap-6">
+      {Object.values(CARD_STYLE).map((cardStyle) => (
+        <div
+          key={cardStyle}
+          className="relative min-h-[360px]"
+          style={CARD_STYLE_DECLARATIONS[cardStyle] as CSSProperties}
+        >
+          <p>{cardStyle}</p>
+          <InteractiveAccountPanel
+            {...args}
+            panel={{ ...args.panel, id: `${PANEL_ID}-${cardStyle}` }}
+          />
+        </div>
+      ))}
+    </div>
+  ),
   args: {
     appearance: ACCOUNT_PANEL_STYLE.HUB,
     links: {

@@ -16,8 +16,8 @@ on:
   # declares its trigger independently and must stay unfiltered for the same
   # reason.
   pull_request:
-    # Every job but `CI` skips on a draft, so `ready_for_review` is what runs
-    # the full gate once a draft is marked ready.
+    # Every job skips on a draft, so `ready_for_review` is what runs the full
+    # gate once a draft is marked ready.
     types: [opened, synchronize, reopened, ready_for_review]
   # The full gate (full-gate.yml) calls this with `full: true` for a commit
   # that has no pull request: every gated check runs, and `CI` fails on any
@@ -303,7 +303,7 @@ jobs:
           exit 1
 
       # turbo's outputs exclude .next/cache, so a turbo cache miss would
-      # otherwise recompile both apps from nothing. The restore key stops at
+      # otherwise recompile every app from nothing. The restore key stops at
       # the lockfile, so no fallback serves a cache built against other
       # dependencies.
       - name: Cache Next.js build cache
@@ -322,7 +322,12 @@ jobs:
         if: ${{ !cancelled() && steps.setup.outcome == 'success' }}
         env:
           SKIP_ENV_VALIDATION: 'true'
-        run: pnpm build
+        run: |
+          if [ "${FULL}" = 'true' ]; then
+            pnpm turbo run build
+          else
+            pnpm turbo run build --affected
+          fi
 
   test:
     name: Test
@@ -483,7 +488,9 @@ jobs:
       - migrations
     # Without this a failed need skips the job, and a skipped check reads as
     # passed; `!cancelled()` rather than `always()` so a superseded run stops.
-    if: ${{ !cancelled() }}
+    # A draft skips it too: the skipped check reads as passed, and a draft
+    # cannot merge.
+    if: ${{ !cancelled() && !github.event.pull_request.draft }}
     steps:
       - name: Every needed job succeeded or was skipped
         if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}

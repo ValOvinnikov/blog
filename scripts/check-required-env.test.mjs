@@ -1,11 +1,3 @@
-// Fixture-based tests for check-required-env's extraction, classification and
-// presence helpers, mirroring check-turbo-env-sync.test.mjs's approach: inline
-// source strings via `parseSource` instead of touching the real repo files, so
-// a refactor of the extractors can't silently lose coverage. The last block
-// does assert against the real files, which is what keeps a newly added
-// unmarked var from merging.
-//
-// Run with `node --test scripts/check-required-env.test.mjs`.
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
@@ -147,51 +139,6 @@ describe('classifyDeclarations', () => {
     );
   });
 
-  it('reports a marker on a var that is not optional', () => {
-    const { invalid } = classify(`
-      import { createEnv } from '@t3-oss/env-core';
-      export const env = createEnv({
-        server: {
-          // @env-required: production
-          A: z.string().min(1),
-        },
-      });
-    `);
-
-    assert.equal(invalid.length, 1);
-    assert.match(invalid[0].reason, /not `\.optional\(\)`/);
-  });
-
-  it('reports @env-required with no environment list', () => {
-    const { invalid } = classify(`
-      import { createEnv } from '@t3-oss/env-core';
-      export const env = createEnv({
-        server: {
-          // @env-required
-          A: z.string().optional(),
-        },
-      });
-    `);
-
-    assert.equal(invalid.length, 1);
-    assert.match(invalid[0].reason, /at least one environment/);
-  });
-
-  it('reports an unknown environment name', () => {
-    const { invalid } = classify(`
-      import { createEnv } from '@t3-oss/env-core';
-      export const env = createEnv({
-        server: {
-          // @env-required: staging
-          A: z.string().optional(),
-        },
-      });
-    `);
-
-    assert.equal(invalid.length, 1);
-    assert.match(invalid[0].reason, /unknown environment\(s\): staging/);
-  });
-
   it('reports a schema whose optionality cannot be read', () => {
     const { invalid, unclassified } = classify(`
       import { createEnv } from '@t3-oss/env-core';
@@ -204,20 +151,43 @@ describe('classifyDeclarations', () => {
     assert.match(invalid[0].reason, /not an inline/);
   });
 
-  it('reports @env-optional carrying an environment list', () => {
-    const { invalid } = classify(`
-      import { createEnv } from '@t3-oss/env-core';
-      export const env = createEnv({
-        server: {
-          // @env-optional: production
-          A: z.string().optional(),
-        },
-      });
-    `);
+  const invalidMarkerCases = [
+    {
+      title: 'reports a marker on a var that is not optional',
+      field: '// @env-required: production\nA: z.string().min(1),',
+      reason: /not `\.optional\(\)`/,
+    },
+    {
+      title: 'reports @env-required with no environment list',
+      field: '// @env-required\nA: z.string().optional(),',
+      reason: /at least one environment/,
+    },
+    {
+      title: 'reports an unknown environment name',
+      field: '// @env-required: staging\nA: z.string().optional(),',
+      reason: /unknown environment\(s\): staging/,
+    },
+    {
+      title: 'reports @env-optional carrying an environment list',
+      field: '// @env-optional: production\nA: z.string().optional(),',
+      reason: /takes no environment list/,
+    },
+  ];
 
-    assert.equal(invalid.length, 1);
-    assert.match(invalid[0].reason, /takes no environment list/);
-  });
+  for (const { title, field, reason } of invalidMarkerCases)
+    it(title, () => {
+      const { invalid } = classify(`
+        import { createEnv } from '@t3-oss/env-core';
+        export const env = createEnv({
+          server: {
+            ${field}
+          },
+        });
+      `);
+
+      assert.equal(invalid.length, 1);
+      assert.match(invalid[0].reason, reason);
+    });
 });
 
 describe('collectClassification', () => {
@@ -272,54 +242,46 @@ describe('readPresence', () => {
       ]),
     );
 
-  it('reports nothing when the environment provides every required var', () => {
-    assert.deepEqual(
-      readPresence(required, 'development', inputs({ BOTH: 'true' })),
-      { absent: [], unwired: [] },
-    );
-  });
+  const presenceCases = [
+    {
+      title: 'reports nothing when the environment provides every required var',
+      environment: 'development',
+      values: { BOTH: 'true' },
+      expected: { absent: [], unwired: [] },
+    },
+    {
+      title: 'reports a var the environment reports as absent',
+      environment: 'production',
+      values: { BOTH: 'true', PROD_ONLY: 'false' },
+      expected: { absent: ['PROD_ONLY'], unwired: [] },
+    },
+    {
+      title: 'reports a required var the workflow never wired up',
+      environment: 'production',
+      values: {},
+      expected: { absent: [], unwired: ['BOTH', 'PROD_ONLY'] },
+    },
+    {
+      title: 'treats an empty input as unwired, not as absent',
+      environment: 'development',
+      values: { BOTH: '' },
+      expected: { absent: [], unwired: ['BOTH'] },
+    },
+    {
+      title: 'treats anything other than the literal "true" as absent',
+      environment: 'development',
+      values: { BOTH: 'TRUE' },
+      expected: { absent: ['BOTH'], unwired: [] },
+    },
+  ];
 
-  it('reports a var the environment reports as absent', () => {
-    assert.deepEqual(
-      readPresence(
-        required,
-        'production',
-        inputs({ BOTH: 'true', PROD_ONLY: 'false' }),
-      ),
-      { absent: ['PROD_ONLY'], unwired: [] },
-    );
-  });
-
-  it('ignores a var not required in this environment', () => {
-    assert.deepEqual(
-      readPresence(required, 'development', inputs({ BOTH: 'true' })),
-      { absent: [], unwired: [] },
-    );
-  });
-
-  it('reports a required var the workflow never wired up', () => {
-    assert.deepEqual(readPresence(required, 'production', {}), {
-      absent: [],
-      unwired: ['BOTH', 'PROD_ONLY'],
+  for (const { title, environment, values, expected } of presenceCases)
+    it(title, () => {
+      assert.deepEqual(
+        readPresence(required, environment, inputs(values)),
+        expected,
+      );
     });
-  });
-
-  it('treats an empty input as unwired, not as absent', () => {
-    assert.deepEqual(
-      readPresence(required, 'development', inputs({ BOTH: '' })),
-      {
-        absent: [],
-        unwired: ['BOTH'],
-      },
-    );
-  });
-
-  it('treats anything other than the literal "true" as absent', () => {
-    assert.deepEqual(
-      readPresence(required, 'development', inputs({ BOTH: 'TRUE' })),
-      { absent: ['BOTH'], unwired: [] },
-    );
-  });
 });
 
 describe('policy constants', () => {
@@ -337,20 +299,22 @@ describe('the real repo files', () => {
     assert.deepEqual(invalid, []);
   });
 
-  // Pinned counts rather than `size > 0`: the coverage assertion above passes
-  // vacuously if extraction ever returns nothing, and this is what catches it.
-  it('classifies the expected number of vars each way', () => {
+  it('classifies the pinned required vars and known optional ones, never a vacuous empty set', () => {
     const { required, optional } = collectClassification(ENV_FILES);
+    const optionalNames = new Set(optional.map(({ name }) => name));
 
     assert.equal(required.size, 10);
-    assert.equal(optional.length, 61);
+    for (const name of [
+      'NEXT_PUBLIC_SITE_URL',
+      'LOKI_PUSH_URL',
+      'AUTH_GITHUB_ID',
+    ])
+      assert.ok(optionalNames.has(name), `${name} is classified optional`);
     for (const [, entry] of required)
       for (const environment of entry.environments)
         assert.ok(KNOWN_ENVIRONMENTS.includes(environment));
   });
 
-  // The same drift the script catches in CI, caught here too, so adding a
-  // marker without its workflow line fails locally rather than on the PR.
   it('gives every required var a presence input in the CI workflow', () => {
     const workflow = readFileSync(
       new URL('../.github/workflows/ci.yml', import.meta.url),

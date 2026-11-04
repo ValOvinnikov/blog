@@ -103,6 +103,26 @@ own; spacing between page children is each page's. The Studio segment
 switches the content column to full-bleed (see
 [embedded-studio](./embedded-studio.md)).
 
+Every settings page (Voice, Look, Email, Languages, Features) renders through
+`SettingsFormShell`, whose save bar appears only while the page has unsaved
+changes and never for an archived tenant. From `md` it docks to the viewport
+bottom, from the sidebar's right edge (rail edge when collapsed) to the right
+edge: 64px tall, flat, top border and `shadow-admin-dock`. It shows a dot,
+"N unsaved changes", the "⌘S / Ctrl+S" hint (from `lg` only), Discard and Save
+changes. With invalid fields the left side becomes "N fields need attention",
+"Go to the first one" and "Not saved" — one line from `lg`, stacked on two
+lines from `md` to `lg` — and the dot, count and hint go. While saving, Save
+reads "Saving…" through the Button's pending state (focus stays on it),
+Discard is disabled and the bar is `aria-busy`. A save that fails with no
+field errors shows only the shell's error Alert; the bar keeps its unsaved
+state. From `md` the page keeps 120px of room below its last content (48px
+when archived), and the document's `scroll-padding-bottom` is the bar's 64px
+plus 16px so a focused field never sits under the bar. The 64 and 16 are the
+`--spacing-admin-dock` / `-clearance` tokens, kept equal to
+`LOOK_LAYOUT_LIMIT`. A page may opt out of the head's "All changes saved"
+status (`hasSavedStatus={false}`); Voice does. Below `md` the bar is the
+floating card at the foot of the page.
+
 ## Data
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through
@@ -126,9 +146,11 @@ switches the content column to full-bleed (see
   section lists Tenants and Findings, plus Releases, Blocked sign-ups and Data
   requests for a SUPERADMIN. Add tenant is the Tenants page's primary action,
   not a row; its breadcrumb leaf on `/tenants/new` is named explicitly.
-- The current row is decided once, by `isCurrentNavHref`, for the sidebar and
-  the phone Menu alike: the row whose href is the pathname, and Tenants on
-  `/tenants/new` (an explicit match, not a prefix rule).
+- The current row is decided once, by `isCurrentNavHref`, for the sidebar, the
+  rail and the phone Menu alike: the row whose href is the pathname, Tenants on
+  `/tenants/new` (an explicit match, not a prefix rule), and a Studio row on
+  every path under its own, so it stays current while the embedded Studio
+  navigates.
 - On `/dashboard`, the plan decides which items appear (`planPageAccess`, see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
   than one plan locale, Email a mail-sending capability, and the inert "Coming
@@ -321,7 +343,9 @@ switches the content column to full-bleed (see
   the inner popup onto its trigger, a second Escape closes the Menu onto its
   button, and choosing a workspace closes both. The Menu button takes a
   `brand-ink` border on hover, focus (with the bg-gapped ring) and open, and
-  a `text` icon while open. Its inert rows are disabled menu items (`role="menuitem"`,
+  a `text` icon while open. It is named "Menu", carries no native `title`,
+  and shows that name in the shared Tooltip below it, left-aligned, 6px away.
+  Its inert rows are disabled menu items (`role="menuitem"`,
   `aria-disabled`, outside Base UI's item list), so arrow keys skip them and
   they take no focus; they keep the enabled rows' label and icon colours and
   change nothing on hover. Its neutral pills sit on `pill-neutral-popover`,

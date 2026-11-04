@@ -28,6 +28,9 @@ const FOCUS_GROUNDS = [
   FOCUS_RING_GROUND.SURFACE_HEAD,
 ] as const satisfies TFocusRingGround[];
 
+const PHONE_TAP_FACE =
+  'h-11 justify-center px-3.5 py-0 text-admin-13-5 leading-4 font-semibold';
+
 const FACE = [
   'col-start-1 row-start-1 inline-flex items-center justify-center gap-[7px]',
 ];
@@ -70,7 +73,7 @@ export const buttonVariants = tv({
           'rounded-admin-control border-0 bg-transparent px-1 py-0',
           'text-admin-13-5 leading-5 font-semibold no-underline',
           TEXT_LINK_COLOUR_CLASSES,
-          'hover:text-admin-brand-hover',
+          'hover:text-admin-brand-strong',
         ],
       },
     },
@@ -79,6 +82,7 @@ export const buttonVariants = tv({
       [SIZE.SM]: {},
       [SIZE.MD]: {},
       [SIZE.LG]: {},
+      [SIZE.XL]: {},
     },
     focusGround: {
       [FOCUS_RING_GROUND.BG]: {},
@@ -116,7 +120,8 @@ export const buttonVariants = tv({
       size: SIZE.XS,
       class: {
         root: [
-          'h-11 min-w-16 justify-center px-[14px] py-0 text-admin-13-5 leading-4 font-semibold shadow-none',
+          PHONE_TAP_FACE,
+          'min-w-16 shadow-none',
           'md:h-7 md:min-w-0 md:px-[10px] md:text-admin-12-5',
         ],
       },
@@ -139,6 +144,13 @@ export const buttonVariants = tv({
       variant: STYLED_VARIANTS,
       size: SIZE.LG,
       class: {
+        root: [PHONE_TAP_FACE, 'md:h-9'],
+      },
+    },
+    {
+      variant: STYLED_VARIANTS,
+      size: SIZE.XL,
+      class: {
         root: [
           'h-11 justify-center px-5 text-admin-14 font-semibold shadow-none md:h-10',
         ],
@@ -159,7 +171,7 @@ export const buttonVariants = tv({
     },
     {
       variant: BUTTON_VARIANT.SECONDARY,
-      size: SIZE.LG,
+      size: SIZE.XL,
       class: { root: ['px-[18px]'] },
     },
     {

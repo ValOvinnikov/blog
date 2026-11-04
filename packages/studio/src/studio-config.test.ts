@@ -14,7 +14,7 @@ import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/t
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
 import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
-import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates';
+import { entitlementGates } from '@blog/studio/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates';
 import {
   EVERY_MODULE_PACK,
   getEntitledModulePacks,

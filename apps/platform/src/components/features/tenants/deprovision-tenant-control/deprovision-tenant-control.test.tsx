@@ -27,7 +27,6 @@ const setup = customRender(DeprovisionTenantControl, {
 
 const DEPROVISION = 'Deprovision';
 const DEPROVISION_DIALOG_TITLE = `Deprovision ${MOCK_TENANT_NAME}`;
-const DRY_RUN_LABEL = 'Dry run (preview only, nothing is deleted)';
 const RUN_IN_PROGRESS_HINT =
   'A deprovisioning run is already in progress for this tenant.';
 
@@ -98,7 +97,7 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
     expect(confirmButton).toBeDisabled();
   });
 
-  it('calls the action as a dry run with the typed name, then refreshes', async () => {
+  it('calls the action with the typed name, then refreshes', async () => {
     setup();
     const dialog = await openDialog(user);
 
@@ -106,48 +105,9 @@ describe(`<${DeprovisionTenantControl.name}/>`, () => {
 
     expect(deprovisionTenantActionMock).toHaveBeenCalledWith(
       MOCK_CLIENT_TENANT.id,
-      {
-        confirm: MOCK_TENANT_NAME,
-        dryRun: true,
-      },
+      { confirm: MOCK_TENANT_NAME },
     );
     await vi.waitFor(() => expect(refreshMock).toHaveBeenCalled());
-  });
-
-  it('runs for real once the dry-run switch is turned off', async () => {
-    setup();
-    const dialog = await openDialog(user);
-    const dryRunSwitch = screen.getByRole('switch', { name: DRY_RUN_LABEL });
-    await user.click(dryRunSwitch);
-
-    await typeTenantNameAndConfirm(user, dialog);
-
-    expect(deprovisionTenantActionMock).toHaveBeenCalledWith(
-      MOCK_CLIENT_TENANT.id,
-      {
-        confirm: MOCK_TENANT_NAME,
-        dryRun: false,
-      },
-    );
-  });
-
-  it('turns the dry-run switch back on when the dialog closes', async () => {
-    setup();
-    await openDialog(user);
-    const dryRunSwitch = screen.getByRole('switch', { name: DRY_RUN_LABEL });
-    await user.click(dryRunSwitch);
-
-    expect(dryRunSwitch).not.toBeChecked();
-
-    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
-    await user.click(cancelButton);
-    await openDialog(user);
-
-    const reopenedDryRunSwitch = screen.getByRole('switch', {
-      name: DRY_RUN_LABEL,
-    });
-
-    expect(reopenedDryRunSwitch).toBeChecked();
   });
 
   it('shows the error message inline and never refreshes when the action fails', async () => {

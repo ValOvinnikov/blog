@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { mockDashboardStudioInnerPath } from '@platform/testing/layout/fixtures';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { DashboardBreadcrumb } from './dashboard-breadcrumb';
@@ -11,7 +12,7 @@ vi.mock('@platform/i18n/navigation');
 faker.seed(2406);
 
 const MOCK_UNLISTED_PATHNAME = `${adminRoutes.dashboard()}/${faker.lorem.slug()}`;
-const MOCK_STUDIO_SUB_PATHNAME = `${adminRoutes.dashboardStudio()}/${faker.lorem.slug()}`;
+const MOCK_STUDIO_SUB_PATHNAME = mockDashboardStudioInnerPath();
 
 const {
   dashboardLabel,

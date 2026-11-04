@@ -4,7 +4,11 @@ import { SidebarCollapseProvider } from '@platform/components/features/layout/si
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import messages from '@platform/i18n/messages/en.json';
 import { usePathname } from '@platform/i18n/navigation';
-import { ARIA_CURRENT, ARIA_DISABLED } from '@platform/testing/aria';
+import {
+  ARIA_CURRENT,
+  ARIA_DISABLED,
+  ARIA_HIDDEN,
+} from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -14,6 +18,7 @@ import {
 } from '@platform/testing/custom-render';
 import {
   mockAccount,
+  mockDashboardStudioInnerPath,
   mockNavBadge,
   mockNavInertItem,
   mockNavLinkItem,
@@ -21,6 +26,7 @@ import {
   mockNavStatus,
   mockTenantSwitcherItem,
 } from '@platform/testing/layout/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { createRef } from 'react';
 
@@ -32,6 +38,9 @@ vi.mock('@platform/server/auth/sign-out-action');
 faker.seed(5993);
 
 const MOCK_LOOK_ITEM = mockNavLinkItem();
+const MOCK_STUDIO_ITEM = mockNavLinkItem({
+  href: adminRoutes.dashboardStudio(),
+});
 const MOCK_VOICE_ITEM = mockNavLinkItem();
 const MOCK_BADGE = mockNavBadge();
 const MOCK_BADGED_ITEM = mockNavLinkItem({ badge: MOCK_BADGE });
@@ -156,6 +165,18 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
     expect(inactiveItem).not.toHaveAttribute(ARIA_CURRENT);
   });
 
+  it('marks the Studio row current on a path inside the Studio', async () => {
+    vi.mocked(usePathname).mockReturnValue(mockDashboardStudioInnerPath());
+    setup({ sections: [mockNavSection({ items: [MOCK_STUDIO_ITEM] })] });
+
+    const menu = await openMenu();
+    const studioItem = within(menu).getByRole('menuitem', {
+      name: MOCK_STUDIO_ITEM.label,
+    });
+
+    expect(studioItem).toHaveAttribute(ARIA_CURRENT, 'page');
+  });
+
   it('renders an item with no href as a disabled menu row with its badge', async () => {
     const inertItem = mockNavInertItem({ badge: MOCK_BADGE });
     setup({ sections: [mockNavSection({ items: [inertItem] })] });
@@ -210,6 +231,36 @@ describe(`<${TopbarNavMenu.name}/>`, () => {
 
       expect(getMenuButton()).toBeVisible();
       expect(menu).not.toBeInTheDocument();
+    });
+
+    it('names the trigger once, with no native title', () => {
+      expect(getMenuButton()).not.toHaveAttribute('title');
+      expect(getMenuButton()).not.toHaveAccessibleDescription();
+    });
+
+    describe('once the trigger takes keyboard focus', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
+
+      it('shows its name in a hidden-from-assistive-tech tooltip at once', () => {
+        const tooltip = screen.getByText(messages.topbarNavMenu.triggerLabel);
+
+        expect(getMenuButton()).toHaveFocus();
+        expect(tooltip).toHaveAttribute(ARIA_HIDDEN, 'true');
+      });
+
+      it('hides the tooltip on Escape', async () => {
+        await user.keyboard(ESCAPE);
+
+        await waitFor(() => {
+          const tooltip = screen.queryByText(
+            messages.topbarNavMenu.triggerLabel,
+          );
+
+          expect(tooltip).not.toBeInTheDocument();
+        });
+      });
     });
 
     describe('once opened', () => {

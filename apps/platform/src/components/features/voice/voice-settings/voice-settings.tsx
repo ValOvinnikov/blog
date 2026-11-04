@@ -77,6 +77,7 @@ export const VoiceSettings = ({
       title={t('heading')}
       description={t('description')}
       form={form}
+      hasSavedStatus={false}
       errorTitle={
         status === FORM_STATUS.ERROR && !hasFieldErrors
           ? t('alertError')

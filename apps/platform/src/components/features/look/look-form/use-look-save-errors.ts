@@ -26,7 +26,7 @@ export const useLookSaveErrors = ({
 
   return {
     fieldError,
-    saveError: isSaveFailed
+    errorTitle: isSaveFailed
       ? (fieldError?.message ?? t('alertError'))
       : undefined,
   };
