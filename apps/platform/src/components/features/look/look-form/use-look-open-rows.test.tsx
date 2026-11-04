@@ -6,9 +6,9 @@ import messages from '@platform/i18n/messages/en.json';
 import { uploadBrandAssetAction } from '@platform/server/site-config/upload-brand-asset-action';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
-import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   clickGoToTheFirstOne,
+  clickSave,
   lookRowTrigger,
   nudgeAccentHue,
   openLookRow,
@@ -17,7 +17,7 @@ import {
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import {
   GO_TO_THE_FIRST_ONE,
-  SAVE_CHANGES,
+  UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
   MOCK_STAGED_LOGO_BLOB_URL,
@@ -33,31 +33,21 @@ vi.mock('@blog/config', async (importOriginal) => ({
   isAccentHueAccessible: vi.fn(() => true),
 }));
 
-vi.mock('@platform/server/site-config/update-look-action', () => ({
-  updateLookAction: vi.fn(),
-}));
+vi.mock('@platform/server/site-config/update-look-action');
 
-vi.mock('@platform/server/site-config/upload-brand-asset-action', () => ({
-  uploadBrandAssetAction: vi.fn(),
-}));
+vi.mock('@platform/server/site-config/upload-brand-asset-action');
 
-vi.mock('@platform/server/site-config/clear-brand-asset-action', () => ({
-  clearBrandAssetAction: vi.fn(),
-}));
+vi.mock('@platform/server/site-config/clear-brand-asset-action');
 
 faker.seed(6391);
 
 const { lookForm: LOOK_FORM } = messages;
-const tSaveBar = makeEnTranslator('saveBar');
-
-const UNSAVED_DOT = tSaveBar('regionLabel');
 const ACCENT_HUE = LOOK_FORM.accentHueLabel;
 const NUDGED_ACCENT_HUE = defaultLookFormValues().accentHue + 1;
 const RESET_TO_PRESET = LOOK_FORM.resetButton;
 
 const saveAndGoToTheFirstOne = async (user: UserEvent) => {
-  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-  await user.click(saveButton);
+  await clickSave(user);
   await screen.findByRole('link', { name: GO_TO_THE_FIRST_ONE });
   await clickGoToTheFirstOne(user);
 };
@@ -67,6 +57,8 @@ describe(useLookOpenRows, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+    vi.mocked(isAccentHueAccessible).mockReset();
+    vi.mocked(uploadBrandAssetAction).mockReset();
     vi.spyOn(URL, 'createObjectURL').mockReturnValue(MOCK_STAGED_LOGO_BLOB_URL);
     setupLookForm();
   });
@@ -121,9 +113,9 @@ describe(useLookOpenRows, () => {
         const colourTrigger = lookRowTrigger(LOOK_ROW.COLOUR);
         await user.click(colourTrigger);
 
-        const dots = screen.getAllByRole('img', { name: UNSAVED_DOT });
+        const dots = screen.getAllByRole('img', { name: UNSAVED_CHANGES });
         const colourDot = within(colourTrigger).getByRole('img', {
-          name: UNSAVED_DOT,
+          name: UNSAVED_CHANGES,
         });
         expect(dots).toEqual([colourDot]);
       });
