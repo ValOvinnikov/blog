@@ -14,6 +14,7 @@ import {
 import { objectKeys } from '@blog/utils/primitives';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
+import { userEvent, within } from 'storybook/test';
 
 import { Header, type THeaderProps } from './header';
 import { headerVariants } from './header-variants';
@@ -189,6 +190,22 @@ export const Floating: TStory = {
     barStyle: HEADER_BAR_STYLE.FLOATING,
   },
   render: (args) => <SiteHeader {...args} />,
+};
+
+export const FloatingWidePanelOpen: TStory = {
+  decorators: [withPageContent],
+  args: {
+    layout: HEADER_LAYOUT.CLASSIC,
+    barStyle: HEADER_BAR_STYLE.FLOATING,
+  },
+  render: (args) => (
+    <SiteHeader {...args} submenuStyle={HEADER_SUBMENU_STYLE.WIDE_PANEL} />
+  ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole('button', { name: 'Guides' }),
+    );
+  },
 };
 
 export const Phone: TStory = {

@@ -48,6 +48,7 @@ export const PrimaryNavigationSubmenu = ({
       <div
         id={panelId}
         popover="auto"
+        data-wide-panel={isDropdown ? undefined : true}
         className={panel()}
         style={isDropdown ? { positionAnchor: anchorName } : undefined}
       >
