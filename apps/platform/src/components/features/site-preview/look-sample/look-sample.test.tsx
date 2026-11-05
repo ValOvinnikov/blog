@@ -472,18 +472,19 @@ describe(`<${LookSample.name}/>`, () => {
       },
     );
 
-    it.each(
-      Object.values(SPINNER_STYLE).filter((s) => s !== SPINNER_STYLE.PRESET),
-    )('follows the %s spinner', (spinnerVariant) => {
-      setup({ busy: { ...MOCK_BUSY, spinnerVariant } });
+    it.each(Object.values(SPINNER_STYLE))(
+      'follows the %s spinner',
+      (spinnerVariant) => {
+        setup({ busy: { ...MOCK_BUSY, spinnerVariant } });
 
-      const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
+        const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
 
-      expect(sample).toHaveAttribute(
-        SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
-        spinnerVariant,
-      );
-    });
+        expect(sample).toHaveAttribute(
+          SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
+          spinnerVariant,
+        );
+      },
+    );
   });
 
   describe('the footer', () => {

@@ -16,7 +16,6 @@ import {
   HUE_MIN,
   PRESET_ID,
   RADIUS_SCALE,
-  SPINNER_STYLE,
 } from '@blog/config/constants';
 import type { TUpdateSiteConfigInput } from '@blog/db/queries/site-config/upsert-site-config';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
@@ -46,7 +45,6 @@ export const DEFAULT_CONTROL_STYLES = {
   accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
-  spinnerStyle: SPINNER_STYLE.PRESET,
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,

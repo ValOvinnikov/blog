@@ -1,14 +1,10 @@
-import { type IBusyStyle, toSpinnerVariant } from '@blog/config';
+import type { IBusyStyle } from '@blog/config';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
 export const toSampleBusyStyle = ({
-  preset,
   busyButtonStyle,
   spinnerStyle,
-}: Pick<
-  TLookFormValues,
-  'preset' | 'busyButtonStyle' | 'spinnerStyle'
->): IBusyStyle => ({
+}: Pick<TLookFormValues, 'busyButtonStyle' | 'spinnerStyle'>): IBusyStyle => ({
   busyStyle: busyButtonStyle,
-  spinnerVariant: toSpinnerVariant(spinnerStyle, preset),
+  spinnerVariant: spinnerStyle,
 });

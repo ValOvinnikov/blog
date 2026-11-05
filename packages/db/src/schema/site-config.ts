@@ -214,7 +214,7 @@ export const siteConfig = pgTable('site_config', {
     .default(BUSY_BUTTON_STYLE.LABEL),
   spinnerStyle: spinnerStyleEnum('spinner_style')
     .notNull()
-    .default(SPINNER_STYLE.PRESET),
+    .default(SPINNER_STYLE.BRAILLE),
   headerLayout: headerLayoutEnum('header_layout')
     .notNull()
     .default(HEADER_LAYOUT.CLASSIC),

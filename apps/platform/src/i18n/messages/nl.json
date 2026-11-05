@@ -731,7 +731,6 @@
     "spinnerStyleLabel": "Spinner",
     "spinnerStyleDescription": "De spinner op de knoppen en laadstatussen van uw site.",
     "spinnerStyleOptionLabel": {
-      "PRESET": "De preset volgen",
       "BRAILLE": "Braille",
       "RING": "Ring",
       "DOTS": "Stippen",

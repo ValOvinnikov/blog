@@ -731,7 +731,6 @@
     "spinnerStyleLabel": "Indicador de carga",
     "spinnerStyleDescription": "El indicador de los botones y de los estados de carga de su sitio.",
     "spinnerStyleOptionLabel": {
-      "PRESET": "Seguir el preset",
       "BRAILLE": "Braille",
       "RING": "Anillo",
       "DOTS": "Puntos",

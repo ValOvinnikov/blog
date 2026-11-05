@@ -144,6 +144,11 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('shows the chosen busy style and spinner on the preview busy button', async () => {
       await openLookRow(user, LOOK_ROW.BUTTONS);
+      await chooseOption(
+        user,
+        SPINNER_LABEL,
+        LOOK_FORM.spinnerStyleOptionLabel.PULSE,
+      );
       const busyGroup = screen.getByRole('group', {
         name: LOOK_FORM.busyButtonStyleLabel,
       });
@@ -151,11 +156,6 @@ describe(`<${LookForm.name}/>`, () => {
         name: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
       });
       await user.click(edgeButton);
-      await chooseOption(
-        user,
-        SPINNER_LABEL,
-        LOOK_FORM.spinnerStyleOptionLabel.PULSE,
-      );
 
       const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
       expect(sample).toHaveAttribute(
@@ -168,7 +168,7 @@ describe(`<${LookForm.name}/>`, () => {
       );
     });
 
-    it('follows the preset spinner until one is chosen', async () => {
+    it("takes the new preset's spinner when the preset changes", async () => {
       const sample = screen.getByTestId(SAMPLE_BUSY_BUTTON_TEST_ID);
       expect(sample).toHaveAttribute(
         SAMPLE_SPINNER_VARIANT_ATTRIBUTE,

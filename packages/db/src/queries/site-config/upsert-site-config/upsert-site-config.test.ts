@@ -441,6 +441,18 @@ describe(upsertSiteConfig, () => {
       expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
     });
 
+    it.each([
+      { preset: PRESET_ID.CONSOLE, spinnerStyle: SPINNER_STYLE.BRAILLE },
+      { preset: PRESET_ID.EDITORIAL, spinnerStyle: SPINNER_STYLE.RING },
+    ])(
+      "gives a new $preset config the preset's $spinnerStyle spinner",
+      async ({ preset, spinnerStyle }) => {
+        const result = expectOk(await save({ preset }));
+
+        expect(result.spinnerStyle).toBe(spinnerStyle);
+      },
+    );
+
     it.each(Object.values(PRESET_ID))(
       'gives a new %s config the default control styles',
       async (preset) => {

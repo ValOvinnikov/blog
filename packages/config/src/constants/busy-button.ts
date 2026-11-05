@@ -9,7 +9,6 @@ export const BUSY_BUTTON_STYLE = {
 export type TBusyButtonStyle = TValueOf<typeof BUSY_BUTTON_STYLE>;
 
 export const SPINNER_STYLE = {
-  PRESET: 'PRESET',
   BRAILLE: 'BRAILLE',
   RING: 'RING',
   DOTS: 'DOTS',
@@ -18,12 +17,7 @@ export const SPINNER_STYLE = {
 
 export type TSpinnerStyle = TValueOf<typeof SPINNER_STYLE>;
 
-export type TSpinnerVariant = Exclude<
-  TSpinnerStyle,
-  typeof SPINNER_STYLE.PRESET
->;
-
 export interface IBusyStyle {
   busyStyle: TBusyButtonStyle;
-  spinnerVariant: TSpinnerVariant;
+  spinnerVariant: TSpinnerStyle;
 }
