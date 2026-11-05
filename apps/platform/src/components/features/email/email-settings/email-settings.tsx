@@ -6,6 +6,7 @@ import {
   FORM_STATUS,
 } from '@blog/config';
 import type { TTenantEmailBrand } from '@blog/email/html';
+import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { EmailPreview } from '@platform/components/features/email/email-preview';
 import { EmailEditPane } from '@platform/components/features/email/email-settings/components/email-edit-pane';
 import { ItemSelect } from '@platform/components/features/email/email-settings/components/item-select';
@@ -132,7 +133,7 @@ export const EmailSettings = ({
     countChanges: (values, savedValues) =>
       countEmailDraftChanges(savedValues, values, liveLocales),
     countChangesByLanguage: (values, savedValues) =>
-      liveLocales.length > 1
+      hasArrayGotMultipleItems(liveLocales)
         ? [
             {
               language: t('allLanguagesChanges'),
@@ -210,7 +211,7 @@ export const EmailSettings = ({
       form={form}
       errorTitle={
         status === FORM_STATUS.ERROR &&
-        Object.keys(senderFieldErrors).length === 0
+        !hasLength(Object.keys(senderFieldErrors))
           ? t('alertError')
           : undefined
       }
@@ -223,7 +224,7 @@ export const EmailSettings = ({
             onSelect={selectItem}
             label={t('editingLabel')}
           />
-          {liveLocales.length > 1 && (
+          {hasArrayGotMultipleItems(liveLocales) && (
             <LanguagePicker
               locales={liveLocales}
               defaultLocale={defaultLocale}

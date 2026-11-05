@@ -2,6 +2,7 @@
 
 import { ALERT_TYPE, FORM_STATUS } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { Alert } from '@platform/components/shared/alert';
@@ -84,7 +85,7 @@ export const VoiceSettings = ({
           : undefined
       }
       headerActions={
-        liveLocales.length > 1 && (
+        hasArrayGotMultipleItems(liveLocales) && (
           <LanguagePicker
             locales={liveLocales}
             defaultLocale={defaultLocale}
@@ -107,7 +108,7 @@ export const VoiceSettings = ({
           description={
             <>
               {t('fixedCopyNote')}
-              {liveLocales.length > 1 && (
+              {hasArrayGotMultipleItems(liveLocales) && (
                 <>
                   {' '}
                   {t.rich('editingLanguageNote', {
