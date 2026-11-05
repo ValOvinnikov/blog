@@ -50,31 +50,36 @@ export const SampleLanguageSwitcher = ({
       ? LANGUAGE_SWITCHER_STYLE.MENU_CODE
       : switcherStyle;
   const hasGlobe = resolvedStyle === LANGUAGE_SWITCHER_STYLE.MENU_GLOBE;
-  const { codeList, codeLink, codeLabel, trigger, caret } =
+  const { codeList, codeLabel, trigger, caret } =
     sampleLanguageSwitcherVariants({ hasGlobe });
 
   if (resolvedStyle === LANGUAGE_SWITCHER_STYLE.CODES) {
     return (
       <ul className={codeList()}>
-        {liveLocales.map((locale) => (
-          <li key={locale}>
-            <TextLink
-              appearance="nav"
-              href={locale === currentLocale ? undefined : '#'}
-              lang={LOCALE_BCP47_TAGS[locale]}
-              isCurrent={locale === currentLocale}
-              className={codeLink()}
-              dataTestId={
-                locale === currentLocale
-                  ? 'sample-language-code-current'
-                  : undefined
-              }
-            >
-              <span aria-hidden="true">{toCode(locale)}</span>
-              <span className={codeLabel()}>{LOCALE_NATIVE_LABEL[locale]}</span>
-            </TextLink>
-          </li>
-        ))}
+        {liveLocales.map((locale) => {
+          const isCurrent = locale === currentLocale;
+          const { codeLink } = sampleLanguageSwitcherVariants({ isCurrent });
+
+          return (
+            <li key={locale}>
+              <TextLink
+                appearance="nav"
+                href={isCurrent ? undefined : '#'}
+                lang={LOCALE_BCP47_TAGS[locale]}
+                isCurrent={isCurrent}
+                className={codeLink()}
+                dataTestId={
+                  isCurrent ? 'sample-language-code-current' : undefined
+                }
+              >
+                <span aria-hidden="true">{toCode(locale)}</span>
+                <span className={codeLabel()}>
+                  {LOCALE_NATIVE_LABEL[locale]}
+                </span>
+              </TextLink>
+            </li>
+          );
+        })}
       </ul>
     );
   }
