@@ -6,7 +6,9 @@ import { useRef, type KeyboardEvent } from 'react';
 
 const { SCROLL_STEP } = LOOK_FULLSCREEN;
 
-const ARROW_SCROLL: Record<string, { left?: number; top?: number }> = {
+type TScrollDelta = Parameters<TDeviceFrameHandle['scrollBy']>[0];
+
+const ARROW_SCROLL: Record<string, TScrollDelta> = {
   [KEY.ARROW_UP]: { top: -SCROLL_STEP },
   [KEY.ARROW_DOWN]: { top: SCROLL_STEP },
   [KEY.ARROW_LEFT]: { left: -SCROLL_STEP },

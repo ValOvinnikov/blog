@@ -13,10 +13,7 @@ export const lookFullscreenDialogVariants = tv({
       'text-admin-16 leading-[22px] font-semibold',
       'lg:text-admin-15 lg:leading-5 lg:font-admin-650',
     ],
-    readout: [
-      'col-span-2 row-start-3 leading-[18px]',
-      'font-admin-mono text-admin-12 whitespace-nowrap text-admin-muted',
-    ],
+    readoutPlacement: ['col-span-2 row-start-3 leading-[18px]'],
     toolbar: [
       'col-span-2 row-start-2 min-w-0 lg:ml-auto lg:flex-none',
       '*:flex-nowrap',

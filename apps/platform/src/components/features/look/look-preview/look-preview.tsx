@@ -17,7 +17,7 @@ import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { LookFollowMark } from './components/look-follow-mark';
 import { LookFollowStatus } from './components/look-follow-status';
@@ -51,6 +51,7 @@ export const LookPreview = ({
     useLookPreviewToolbar(hasReaderAccounts);
   const [scale, setScale] = useState(1);
   const [fullscreenHandle] = useState(Dialog.createHandle);
+  const fullscreenTriggerRef = useRef<HTMLButtonElement>(null);
   const isPhoneTab = !useMediaQuery(MEDIA_QUERY.LG_UP);
   const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight({
     device: previewDevice,
@@ -68,7 +69,10 @@ export const LookPreview = ({
   const solos = (
     <>
       <LookFollowToggle follow={follow} />
-      <LookFullscreenButton handle={fullscreenHandle} />
+      <LookFullscreenButton
+        handle={fullscreenHandle}
+        triggerRef={fullscreenTriggerRef}
+      />
     </>
   );
   const sample = (
@@ -141,6 +145,7 @@ export const LookPreview = ({
         toolbar={<PreviewFrame.Toolbar {...toolbarProps} />}
         host={siteHost}
         isDark={isDark}
+        finalFocus={fullscreenTriggerRef}
       >
         {sample}
       </LookFullscreenDialog>
