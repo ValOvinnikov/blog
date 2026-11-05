@@ -103,6 +103,8 @@ const getNameInput = () => screen.getByRole('textbox', { name: NAME_LABEL });
 const getDomainInput = () =>
   screen.getByRole('textbox', { name: PRIMARY_DOMAIN_LABEL });
 const getSaveButton = () => screen.getByRole('button', { name: SAVE_CHANGES });
+const findSaveButton = () =>
+  screen.findByRole('button', { name: SAVE_CHANGES });
 
 describe(`<${TenantDetailsPanel.name}/>`, () => {
   let refreshMock: ReturnType<typeof mockRouterRefresh>;
@@ -154,7 +156,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     const alert = await screen.findByRole('alert');
 
     expect(alert).toHaveTextContent(tenantDetailsPanel.errors.saveFailed);
-    expect(alert.compareDocumentPosition(getSaveButton())).toBe(
+    expect(alert.compareDocumentPosition(await findSaveButton())).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
     expect(nameInput).toHaveValue(MOCK_RENAMED_TENANT_NAME);
@@ -172,7 +174,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     await replaceValue(getNameInput(), MOCK_RENAMED_TENANT_NAME);
     await user.click(getSaveButton());
     await screen.findByRole('alert');
-    await user.click(getSaveButton());
+    await user.click(await findSaveButton());
     await screen.findByText(tenantDetailsPanel.alertSuccess);
 
     const alert = screen.queryByRole('alert');
