@@ -10,6 +10,7 @@ import {
   CUSTOM_DOMAIN_FIELD_ERROR_KEYS,
   CUSTOM_DOMAIN_REFUSAL_KEYS,
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState, useTransition } from 'react';
@@ -32,7 +33,9 @@ export const useConnectCustomDomain = (tenantId: string) => {
 
   const submit = () => {
     startTransition(async () => {
-      const result = await connectCustomDomainAction(tenantId, { domain });
+      const result = await settleAction(
+        connectCustomDomainAction(tenantId, { domain }),
+      );
       setErrorKey(undefined);
 
       switch (result.outcome) {

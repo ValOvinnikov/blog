@@ -1,10 +1,15 @@
 'use client';
 
-import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
+import {
+  isOutcomeInvalid,
+  isOutcomeSuccess,
+  type TMaybeUndefined,
+} from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
 import { SIGNUP_BLOCK_FIELD_ERROR } from '@platform/constants/signup-block';
 import { useToast } from '@platform/context/toast-provider';
 import { addBlockedDomainAction } from '@platform/server/signup-block/add-blocked-domain-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
@@ -40,9 +45,11 @@ export const useAddBlockedDomain = ({
 
   const submit = () => {
     startTransition(async () => {
-      const result = await addBlockedDomainAction({ domain, reason });
+      const result = await settleAction(
+        addBlockedDomainAction({ domain, reason }),
+      );
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
         setDomain('');
         setReason('');
         setErrors(NO_ERRORS);
@@ -51,7 +58,7 @@ export const useAddBlockedDomain = ({
         return;
       }
 
-      if (result.outcome === ACTION_OUTCOME.INVALID) {
+      if (isOutcomeInvalid(result)) {
         const { domain: domainError, reason: reasonError } = result.fieldErrors;
         setErrors({
           domain: domainError && FIELD_ERROR_KEYS[domainError.reason],

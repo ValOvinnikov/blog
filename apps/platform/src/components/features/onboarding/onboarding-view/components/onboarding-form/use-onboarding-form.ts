@@ -21,6 +21,7 @@ import type {
   TCreateSiteRefusal,
   TCreateSiteResult,
 } from '@platform/server/onboarding/create-site-input';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useState, useTransition } from 'react';
 
 export type TOnboardingFieldErrors = TFieldErrors<
@@ -102,7 +103,7 @@ export const useOnboardingForm = (initialLocale: TLocaleIsoCode) => {
 
   const submit = (onFieldErrors: (errors: TOnboardingFieldErrors) => void) => {
     startTransition(async () => {
-      const result = await createSiteAction(values);
+      const result = await settleAction(createSiteAction(values));
       const nextFieldErrors = isOutcomeInvalid(result)
         ? result.fieldErrors
         : {};
