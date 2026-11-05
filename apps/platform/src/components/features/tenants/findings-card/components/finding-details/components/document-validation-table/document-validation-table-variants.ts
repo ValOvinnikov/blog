@@ -5,7 +5,7 @@ export const documentValidationTableVariants = tv({
     table: ['mt-2 w-full border-collapse text-left'],
     head: [
       'border-b border-admin-line-2 px-2.5 py-2',
-      'text-left text-admin-11 font-bold text-admin-muted uppercase tracking-[.06em]',
+      'text-left text-admin-11 font-bold text-admin-muted uppercase tracking-admin-caps',
     ],
     row: ['border-b border-admin-line-2 last:border-b-0'],
     cell: [

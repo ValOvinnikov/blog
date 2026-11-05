@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Accordion } from '@platform/components/shared/accordion';
+import { LOOK_GROUP } from '@platform/constants/look-group';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import {
   renderWithIntl,
@@ -19,6 +20,7 @@ describe(`<${LookGroup.name}/>`, () => {
   beforeEach(() => {
     renderWithIntl(
       <LookGroup
+        anchor={LOOK_GROUP.STYLE}
         title={MOCK_TITLE}
         group={{
           openValues: [],

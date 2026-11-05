@@ -33,7 +33,12 @@ ruleTester.run('prefer-utils-primitive', preferUtilsPrimitiveRule, {
       filename: WEB_SOURCE,
     },
     { code: 'const loose = value == null;', filename: WEB_SOURCE },
-    { code: 'const many = items.length > 1;', filename: WEB_SOURCE },
+    {
+      code: 'const many = hasArrayGotMultipleItems(items);',
+      filename: WEB_SOURCE,
+    },
+    { code: 'const few = items.length < 2;', filename: WEB_SOURCE },
+    { code: 'const single = items.length === 1;', filename: WEB_SOURCE },
     { code: 'const short = items.length < 3;', filename: WEB_SOURCE },
     { code: 'const size = items.length === 2;', filename: WEB_SOURCE },
     { code: 'const sized = set.size === 0;', filename: WEB_SOURCE },
@@ -65,5 +70,8 @@ ruleTester.run('prefer-utils-primitive', preferUtilsPrimitiveRule, {
     invalid('const any = items.length !== 0;', 'hasLength'),
     invalid('const any = 0 < items.length;', 'hasLength'),
     invalid('const any = items?.length > 0;', 'hasLength'),
+    invalid('const many = items.length > 1;', 'hasArrayGotMultipleItems'),
+    invalid('const many = 1 < items.length;', 'hasArrayGotMultipleItems'),
+    invalid('const many = items?.length > 1;', 'hasArrayGotMultipleItems'),
   ],
 });

@@ -9,6 +9,7 @@ import { PresetCard } from '@platform/components/features/look/look-form/compone
 import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';
 import { TypeCard } from '@platform/components/features/look/look-form/components/type-card';
 import type { TLookRowsGroup } from '@platform/components/features/look/look-form/use-look-open-rows';
+import { LOOK_GROUP } from '@platform/constants/look-group';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
 
@@ -32,14 +33,22 @@ export const LookEditCards = ({
   return (
     <>
       <PresetCard />
-      <LookGroup title={t('styleGroupHeading')} group={styleGroup}>
+      <LookGroup
+        anchor={LOOK_GROUP.STYLE}
+        title={t('styleGroupHeading')}
+        group={styleGroup}
+      >
         <ColourCard summary={summaries[LOOK_ROW.COLOUR]} />
         <BrandCard summary={summaries[LOOK_ROW.BRAND]} />
         <TypeCard summary={summaries[LOOK_ROW.TYPE]} />
         <ShapeCard summary={summaries[LOOK_ROW.SHAPE]} />
         <ButtonsCard summary={summaries[LOOK_ROW.BUTTONS]} />
       </LookGroup>
-      <LookGroup title={t('sitePartsGroupHeading')} group={sitePartsGroup}>
+      <LookGroup
+        anchor={LOOK_GROUP.SITE_PARTS}
+        title={t('sitePartsGroupHeading')}
+        group={sitePartsGroup}
+      >
         <HeaderCard summary={summaries[LOOK_ROW.HEADER]} />
         <FooterCard
           hasCookieBanner={hasCookieBanner}

@@ -2,9 +2,10 @@
 
 import type { TLocaleIsoCode } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
+import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
+import { LookJumpIndex } from '@platform/components/features/look/look-jump-index';
 import { LookPreview } from '@platform/components/features/look/look-preview';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
@@ -66,8 +67,9 @@ export const LookForm = ({
       : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
   });
   const t = useTranslations('lookForm');
-  const hasMultipleLanguages = liveLocales.length > 1;
-  const { groupProps, revealRow, revealCard } = useLookOpenRows();
+  const hasMultipleLanguages = hasArrayGotMultipleItems(liveLocales);
+  const { groupProps, revealRow, revealCard, engageCardAt, jumpIndex } =
+    useLookOpenRows();
   const { lookForm, isPending, form, errorTitle } = useLookFormState({
     tenantId,
     tenantName,
@@ -88,6 +90,7 @@ export const LookForm = ({
       onSelect: () => revealCard(row),
     }));
 
+  const isPreviewTab = hasTabPanels && view === 'preview';
   const { layout, columns, editPanel, previewPanel } = lookFormVariants();
 
   return (
@@ -98,7 +101,7 @@ export const LookForm = ({
       errorTitle={errorTitle}
       layout={SHELL_LAYOUT}
       unsavedCards={unsavedCards}
-      isSaveBarHidden={hasTabPanels && view === 'preview'}
+      isSaveBarHidden={isPreviewTab}
     >
       <LookFormProvider value={lookForm}>
         <div ref={layoutRef} className={layout()}>
@@ -108,10 +111,12 @@ export const LookForm = ({
             isSticky={true}
             ariaLabel={t('viewTabsAriaLabel')}
           />
+          {!isPreviewTab && <LookJumpIndex {...jumpIndex} />}
           <div className={columns()}>
             <div
               {...panelProps('edit')}
               inert={isPending}
+              onFocus={(event) => engageCardAt(event.target)}
               data-testid={LOOK_EDIT_PANEL_TEST_ID}
               className={editPanel({ isActive: view === 'edit' })}
             >

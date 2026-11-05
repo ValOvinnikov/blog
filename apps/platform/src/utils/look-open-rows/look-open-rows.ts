@@ -1,3 +1,4 @@
+import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 
 export const STYLE_ROWS = [
@@ -13,6 +14,16 @@ export const SITE_PARTS_ROWS = [
   LOOK_ROW.FOOTER,
   LOOK_ROW.LANGUAGE_SWITCHER,
 ] as const satisfies readonly TLookRow[];
+
+export const LOOK_ROWS = [
+  ...STYLE_ROWS,
+  ...SITE_PARTS_ROWS,
+] as const satisfies readonly TLookRow[];
+
+export const LOOK_CARDS = [
+  LOOK_CARD.PRESET,
+  ...LOOK_ROWS,
+] as const satisfies readonly TLookCard[];
 
 export const nextOpenRows = (
   openRows: readonly TLookRow[],

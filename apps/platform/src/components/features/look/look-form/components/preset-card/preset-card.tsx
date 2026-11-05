@@ -6,7 +6,12 @@ import { Heading } from '@platform/components/shared/heading';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
 import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { LOOK_CARD } from '@platform/constants/look-card';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import {
+  LOOK_ANCHOR_CLASSES,
+  toLookAnchorId,
+} from '@platform/utils/look-anchor/look-anchor';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -33,7 +38,11 @@ export const PresetCard = () => {
   const { body, heading, strip, reset } = presetCardVariants();
 
   return (
-    <Card aria-labelledby={titleId}>
+    <Card
+      id={toLookAnchorId(LOOK_CARD.PRESET)}
+      aria-labelledby={titleId}
+      className={LOOK_ANCHOR_CLASSES}
+    >
       <Card.Body className={body()}>
         <div className={heading()}>
           <Heading id={titleId} level={2} size="cardTitle">

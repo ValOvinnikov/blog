@@ -2,6 +2,9 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
+// Matches the fades' w-7, so a scrolled-to option clears the fade on its side.
+export const SEGMENTED_FADE_WIDTH_PX = 28;
+
 export const segmentedRadioGroupVariants = tv({
   slots: {
     root: ['relative flex w-full md:w-auto md:flex-none md:self-start'],
