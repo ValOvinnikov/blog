@@ -43,12 +43,22 @@ async function resolveOwnerAccess(
   const { tenant } = target;
   const owner = await findOwner(target);
   if (owner) {
+    // Before the grant: a granted tenant leaves the sweep, so a finding still open then never clears.
+    await resolveOwnerAccessFinding(tenant.id);
     const outcome = await grantOwnerAdministrator(target, owner);
     await deleteOwnerInvitesAfterGrant(target);
-    await resolveOwnerAccessFinding(tenant.id);
     await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.SITE_READY);
     return outcome;
   }
+  const outcome = await awaitOwnerAcceptance(target);
+  await resolveOwnerAccessFinding(tenant.id);
+  return outcome;
+}
+
+async function awaitOwnerAcceptance(
+  target: TOwnerAccessTarget,
+): Promise<TElevateTenantOwnerOutcome> {
+  const { tenant } = target;
   if (tenant.ownerInviteSentAt) {
     await sendPendingOwnerEmails(target);
     return pendingOwnerAccessOutcome(tenant);

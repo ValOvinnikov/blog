@@ -106,7 +106,7 @@ platform-wide Findings page. Tenant owners see neither.
   - The owner-access checks in the worker write one `TENANT_PROVISIONING` /
     `OWNER_ACCESS_CHECK_FAILED` WARNING per tenant once the checks have
     failed for 30 minutes in a row, with the error and the time the failures
-    began as `details`, and resolve it when the owner is granted access
+    began as `details`, and resolve it on the next check that succeeds
     ([Tenant provisioning](tenant-provisioning.md)).
     The other declared sources and kinds have no writer yet.
   - The release actions (`RELEASE_STARTED`, `RELEASE_OVERRIDE`,

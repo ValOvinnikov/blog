@@ -211,6 +211,21 @@ describe(checkOwnerAccess, () => {
       );
     });
 
+    it('retries without granting when the open finding cannot be resolved', async () => {
+      vi.mocked(listFindingsForTenant).mockResolvedValue([
+        mockOwnerAccessFinding(),
+      ]);
+      vi.mocked(resolveFinding).mockResolvedValue(
+        errorResult(ERROR_CODE.DB_NOT_FOUND),
+      );
+
+      await expect(checkOwnerAccess(MOCK_TENANT_ID)).rejects.toThrow(
+        /could not be resolved/,
+      );
+      expect(grantSanityProjectRole).not.toHaveBeenCalled();
+      expect(setTenantOwnerAccess).not.toHaveBeenCalled();
+    });
+
     it('reports the check as not failed', async () => {
       const { hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
 
@@ -442,6 +457,59 @@ describe(checkOwnerAccess, () => {
       role: SANITY_PROJECT_ROLE.VIEWER,
     });
     expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED);
+  });
+
+  describe('while the owner is still pending and a finding is open', () => {
+    beforeEach(() => {
+      vi.mocked(listFindingsForTenant).mockResolvedValue([
+        mockOwnerAccessFinding(),
+      ]);
+    });
+
+    it('resolves the finding although the owner is not found yet', async () => {
+      const { outcome } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(outcome).toBe(ELEVATE_TENANT_OWNER_OUTCOME.PENDING_ACCEPTANCE);
+      expect(resolveFinding).toHaveBeenCalledExactlyOnceWith(
+        MOCK_OWNER_ACCESS_FINDING_ID,
+      );
+    });
+
+    it('retries when the finding cannot be resolved', async () => {
+      vi.mocked(resolveFinding).mockResolvedValue(
+        errorResult(ERROR_CODE.DB_NOT_FOUND),
+      );
+
+      await expect(checkOwnerAccess(MOCK_TENANT_ID)).rejects.toThrow(
+        /could not be resolved/,
+      );
+    });
+
+    it('counts a later failure from one once the recovery resolved the finding', async () => {
+      vi.mocked(resolveFinding).mockImplementation(async () => {
+        vi.mocked(listFindingsForTenant).mockResolvedValue([]);
+        return okResult({} as never);
+      });
+      await checkOwnerAccess(MOCK_TENANT_ID);
+
+      atStepAttempt(99);
+      vi.mocked(listSanityProjectUsers).mockRejectedValue(
+        new Error(MOCK_SANITY_OUTAGE),
+      );
+      vi.mocked(getTenantById).mockResolvedValue(
+        mockOwnerAccessFailingSince(MOCK_FAILING_FOR_THRESHOLD, {
+          ownerInviteSentAt: MOCK_FAILING_FOR_THRESHOLD,
+        }),
+      );
+      await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(getFindingDetails).not.toHaveBeenCalled();
+      expect(openFinding).toHaveBeenCalledWith(
+        expect.objectContaining({
+          details: expect.objectContaining({ failureCount: 1 }),
+        }),
+      );
+    });
   });
 
   it('reports pending acceptance while the invite is fresh', async () => {
