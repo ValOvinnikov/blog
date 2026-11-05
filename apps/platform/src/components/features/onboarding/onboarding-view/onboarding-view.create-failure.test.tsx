@@ -53,14 +53,13 @@ describe.each([
   });
 
   it('shows the failure once, just before Create site and outside the scrolled fields', () => {
-    const [failure, ...otherAlerts] = screen.getAllByRole('alert');
+    const failure = screen.getByRole('alert');
     const scrollArea = screen.getByTestId(ONBOARDING_SCROLL_AREA_TEST_ID);
     const createButton = screen.getByRole('button', MOCK_CREATE);
 
-    expect(otherAlerts).toHaveLength(0);
     expect(failure).toHaveTextContent(TRY_AGAIN_LATER);
-    expect(scrollArea).not.toContainElement(failure ?? null);
-    expect(failure?.compareDocumentPosition(createButton)).toBe(
+    expect(scrollArea).not.toContainElement(failure);
+    expect(failure.compareDocumentPosition(createButton)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
   });
