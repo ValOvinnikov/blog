@@ -11,7 +11,7 @@ export const languageCodesVariants = tv({
       false: {
         list: [
           HEADER_CONTROL_FRAME,
-          'items-center gap-0.5 p-[5px] pointer-coarse:p-[9px]',
+          'items-center gap-0.5 p-[9px] lg:p-[5px] pointer-coarse:p-[9px]',
         ],
         link: [
           'h-6 min-w-6 justify-center rounded-full px-1.5 pb-0 text-label no-underline',

@@ -4,6 +4,7 @@ import { ALERT_TYPE } from '@blog/config';
 import type { IWithChildren } from '@blog/config/react';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
+import type { TSettingsFormStack } from '@platform/constants/settings-form';
 import { SettingsFormProvider } from '@platform/context/settings-form-provider';
 import { formatLanguageChanges } from '@platform/utils/format-language-changes/format-language-changes';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
@@ -22,7 +23,7 @@ import { useUnsavedPageProtection } from './use-unsaved-page-protection';
 type TSettingsFormShellLayout = {
   isWide?: boolean;
   isTitleHiddenBelowLg?: boolean;
-  hasCompactGap?: boolean;
+  stack?: TSettingsFormStack;
   hasPhoneSaveFooter?: boolean;
 };
 
@@ -72,7 +73,7 @@ export const SettingsFormShell = <TValues,>({
     Boolean(layout?.hasPhoneSaveFooter) && !isArchived && !isSaveBarHidden;
   const { root, alert, liveStatus } = settingsFormShellVariants({
     isWide: layout?.isWide,
-    hasCompactGap: layout?.hasCompactGap,
+    stack: layout?.stack,
     isArchived,
     hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
@@ -103,6 +104,7 @@ export const SettingsFormShell = <TValues,>({
         description={description}
         isSavedStatusShown={isSavedStatusShown}
         isTitleHiddenBelowLg={layout?.isTitleHiddenBelowLg}
+        stack={layout?.stack}
         headerActions={headerActions}
       />
 

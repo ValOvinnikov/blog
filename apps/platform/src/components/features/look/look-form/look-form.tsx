@@ -12,6 +12,7 @@ import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildLookRowSummaries } from '@platform/utils/look-form-values/look-row-summaries';
@@ -44,7 +45,7 @@ export type TLookFormProps = {
 const SHELL_LAYOUT = {
   isWide: true,
   isTitleHiddenBelowLg: true,
-  hasCompactGap: true,
+  stack: SETTINGS_FORM_STACK.LOOK,
 };
 
 export const LookForm = ({
