@@ -23,7 +23,7 @@ type TSettingsFormShellLayout = {
   isWide?: boolean;
   isTitleHiddenBelowLg?: boolean;
   hasCompactGap?: boolean;
-  isSaveBarFloatingOnPhone?: boolean;
+  hasPhoneSaveFooter?: boolean;
 };
 
 export type TSettingsFormShellProps<TValues> = IWithChildren & {
@@ -68,11 +68,13 @@ export const SettingsFormShell = <TValues,>({
   const t = useTranslations('saveBar');
   const isDirty = changeCount > 0;
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
+  const isPhoneSaveFooterShown =
+    Boolean(layout?.hasPhoneSaveFooter) && !isArchived && !isSaveBarHidden;
   const { root, alert, liveStatus } = settingsFormShellVariants({
     isWide: layout?.isWide,
     hasCompactGap: layout?.hasCompactGap,
     isArchived,
-    isSaveBarFloatingOnPhone: layout?.isSaveBarFloatingOnPhone,
+    hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
   });
   const breakdown = formatLanguageChanges(changesByLanguage);
@@ -143,14 +145,14 @@ export const SettingsFormShell = <TValues,>({
         {isDirty ? t('unsavedChanges', { count: changeCount }) : ''}
       </span>
 
-      {isSaveBarShown && (
+      {(isSaveBarShown || isPhoneSaveFooterShown) && (
         <SaveBar
           changeCount={changeCount}
           breakdown={breakdown}
           invalidControls={invalidControls}
           isPending={isPending}
           unsavedCards={unsavedCards}
-          isFloatingOnPhone={layout?.isSaveBarFloatingOnPhone}
+          hasPhoneFooter={layout?.hasPhoneSaveFooter}
           onSave={() => void handleSave()}
           onDiscard={handleDiscard}
         />

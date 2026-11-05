@@ -2,12 +2,12 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFieldVariants = tv({
   slots: {
-    group: ['min-w-0'],
+    field: ['flex min-w-0 flex-col gap-1.5'],
     label: [
-      'mb-[5px] flex items-center gap-2 text-admin-13 font-semibold text-admin-text',
+      'flex items-center gap-2 text-admin-13 leading-admin-18 font-semibold text-admin-text',
     ],
-    hint: ['-mt-px mb-2'],
-    lock: ['-mt-1 mb-2'],
-    error: ['mt-2 text-admin-11-5 text-admin-bad'],
+    optional: ['text-admin-12 font-medium text-admin-muted'],
+    hint: ['m-0 text-admin-12-5 leading-admin-18 text-admin-muted'],
+    error: ['text-admin-11-5 text-admin-bad'],
   },
 });

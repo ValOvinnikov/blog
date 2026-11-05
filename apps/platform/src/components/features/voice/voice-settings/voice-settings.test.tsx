@@ -8,6 +8,7 @@ import {
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
+import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
@@ -16,7 +17,9 @@ import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
+  ONE_UNSAVED_CHANGE,
   SAVE_CHANGES,
+  SAVING,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import {
@@ -150,7 +153,10 @@ describe(`<${VoiceSettings.name}/>`, () => {
     const headingField = notFoundHeading();
     await user.type(headingField, text);
 
-    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+    const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+    const saveButton = within(saveBar).getByRole('button', {
+      name: SAVE_CHANGES,
+    });
     await user.click(saveButton);
   };
 
@@ -591,6 +597,27 @@ describe(`<${VoiceSettings.name}/>`, () => {
           },
         },
       );
+    });
+
+    it('makes the page content inert while the phone footer keeps focus on Saving…', async () => {
+      saveVoiceOverridesActionMock.mockReturnValueOnce(new Promise(() => {}));
+      setup();
+
+      await user.type(notFoundHeading(), MOCK_TYPED_TEXT);
+
+      const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
+      const footerSave = within(footer).getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(footerSave);
+
+      const cards = screen.getByTestId(VOICE_CARDS_TEST_ID);
+      const savingButton = within(footer).getByRole('button', { name: SAVING });
+
+      expect(cards).toHaveAttribute('inert');
+      expect(footer).not.toContainElement(cards);
+      expect(cards).not.toContainElement(footer);
+      expect(savingButton).toHaveFocus();
     });
 
     it('shows a toast and refreshes after a successful save', async () => {

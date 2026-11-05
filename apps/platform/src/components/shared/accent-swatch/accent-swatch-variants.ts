@@ -9,7 +9,7 @@ export const accentSwatchVariants = tv({
       [SIZE.SM]: ['size-4 rounded-admin-control border border-admin-line'],
       [SIZE.MD]: ['size-5 rounded-admin-control border border-admin-line'],
       [SIZE.LG]: [
-        'size-[52px] rounded-admin shadow-admin ring-1 ring-inset ring-black/6',
+        'size-10 rounded-admin-control shadow-admin ring-1 ring-inset ring-black/6',
       ],
     },
   },

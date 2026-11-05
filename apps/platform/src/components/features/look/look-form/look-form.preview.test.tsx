@@ -31,6 +31,7 @@ import {
 import {
   chooseEditorial,
   chooseOption,
+  chooseSegment,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
@@ -118,7 +119,7 @@ describe(`<${LookForm.name}/>`, () => {
         });
         await user.click(floatingButton);
         await openLookRow(user, LOOK_ROW.FOOTER);
-        await chooseOption(
+        await chooseSegment(
           user,
           FOOTER_LAYOUT_LABEL,
           LOOK_FORM.footerLayoutOptionLabel.CENTRED,

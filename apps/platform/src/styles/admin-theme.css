@@ -346,6 +346,7 @@
   /* Clears the sticky topbar for sticky panels and scroll targets. */
   --spacing-admin-topbar: var(--admin-topbar);
   --spacing-admin-card: 18px;
+  --spacing-admin-hue-readout: 62px;
   --spacing-admin-bar: 3px;
   --spacing-admin-view-tab: var(--admin-view-tab);
   --spacing-admin-view-tabs: var(--admin-view-tabs);
@@ -359,6 +360,8 @@
   --spacing-admin-dock-clearance: 16px;
   --spacing-admin-dock-room: 120px;
   --spacing-admin-archived-room: 48px;
+  --spacing-admin-phone-footer-max: 85px;
+  --spacing-admin-phone-footer-room: 96px;
 
   /* Keep equal to LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH in constants/look-layout.ts. */
   --container-look-split: 900px;

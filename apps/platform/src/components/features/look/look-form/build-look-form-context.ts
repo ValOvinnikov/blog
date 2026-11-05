@@ -42,21 +42,27 @@ export const buildLookFormContext = ({
   setValues,
   plan,
   ...rest
-}: TBuildLookFormContextArgs): TLookFormContext => ({
-  ...rest,
-  values,
-  isLocked: (field) => !isLookFieldEntitled(field, plan),
-  hasCardChanges: (card: TLookCard) =>
-    CARD_FIELDS[card].some((key) => isFieldChanged(key, values, savedValues)),
-  canResetToPreset:
-    plan !== TENANT_PLAN.FREE &&
-    countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
-  isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
-  changePreset: (preset: TPresetId) =>
-    setValues((prev) => switchPreset(preset, prev)),
-  isPresetValue: (field) => isPresetValue(field, values),
-  resetFieldToPreset: (field) =>
-    setValues((prev) => withPresetValue(field, prev)),
-  resetToPreset: () =>
-    setValues((prev) => applyPresetDefaults(prev.preset, prev)),
-});
+}: TBuildLookFormContextArgs): TLookFormContext => {
+  const hasFieldChanged = (field: keyof TLookFormValues) =>
+    isFieldChanged(field, values, savedValues);
+
+  return {
+    ...rest,
+    values,
+    isLocked: (field) => !isLookFieldEntitled(field, plan),
+    hasCardChanges: (card: TLookCard) =>
+      CARD_FIELDS[card].some(hasFieldChanged),
+    hasFieldChanged,
+    canResetToPreset:
+      plan !== TENANT_PLAN.FREE &&
+      countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
+    isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
+    changePreset: (preset: TPresetId) =>
+      setValues((prev) => switchPreset(preset, prev)),
+    isPresetValue: (field) => isPresetValue(field, values),
+    resetFieldToPreset: (field) =>
+      setValues((prev) => withPresetValue(field, prev)),
+    resetToPreset: () =>
+      setValues((prev) => applyPresetDefaults(prev.preset, prev)),
+  };
+};

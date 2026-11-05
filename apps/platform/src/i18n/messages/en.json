@@ -618,6 +618,7 @@
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP or SVG. Favicon: a square image.",
     "optionalTag": "optional",
+    "fieldUnsavedLabel": "Unsaved change",
     "headingFontLabel": "Heading font",
     "bodyFontLabel": "Body font",
     "radiusScaleLabel": "Radius scale",
@@ -653,6 +654,7 @@
       "PLAIN": "No outline until hovered"
     },
     "languageSwitcherLabel": "Language switcher",
+    "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",
     "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
     "languageSwitcherOptionLabel": {
@@ -892,7 +894,6 @@
     "removeFailed": "Couldn't remove the {kind, select, favicon {favicon} other {logo}} — try again."
   },
   "brandAssetField": {
-    "savesWithChanges": "Saves with changes",
     "logo": {
       "pickAgain": "Your recovered draft had a new logo that couldn't be kept — pick it again."
     },

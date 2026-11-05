@@ -3,15 +3,15 @@ import { ICONS, type TControlAria } from '@blog/config';
 import { Icon } from '@platform/components/shared/icon';
 import { selectVariants } from '@platform/components/shared/select/select-variants';
 import {
-  FIELD_APPEARANCE,
-  type TFieldAppearance,
-} from '@platform/constants/field-appearance';
+  SELECT_APPEARANCE,
+  type TSelectAppearance,
+} from '@platform/constants/select-appearance';
 import { useId, type ReactNode } from 'react';
 
 export type TSelectTriggerProps = {
   aria?: TControlAria;
   isLocked?: boolean;
-  appearance?: TFieldAppearance;
+  appearance?: TSelectAppearance;
   children: ReactNode;
   className?: string;
 };
@@ -19,7 +19,7 @@ export type TSelectTriggerProps = {
 export const SelectTrigger = ({
   aria = {},
   isLocked = false,
-  appearance = FIELD_APPEARANCE.DEFAULT,
+  appearance = SELECT_APPEARANCE.DEFAULT,
   children,
   className,
 }: TSelectTriggerProps) => {
@@ -48,7 +48,7 @@ export const SelectTrigger = ({
       <BaseSelect.Icon className={icon()}>
         <Icon
           name={
-            appearance === FIELD_APPEARANCE.WIZARD
+            appearance === SELECT_APPEARANCE.WIZARD
               ? ICONS.SELECT_CHEVRON
               : ICONS.CHEVRON_DOWN
           }

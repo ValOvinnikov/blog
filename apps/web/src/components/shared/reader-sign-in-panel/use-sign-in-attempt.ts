@@ -20,10 +20,20 @@ export const useSignInAttempt = (isOpen: boolean) => {
   const [pendingProviderId, setPendingProviderId] =
     useState<TMaybeUndefined<TOAuthProviderId>>();
 
-  const resetEmail = () => {
+  const clearError = () => {
     setStatus(FORM_STATUS.IDLE);
-    setEmail('');
+    setIsEmailInvalid(false);
     setIsSendLimited(false);
+  };
+
+  const resetEmail = () => {
+    clearError();
+    setEmail('');
+  };
+
+  const changeEmail = (value: string) => {
+    setEmail(value);
+    if (status === FORM_STATUS.ERROR) clearError();
   };
 
   if (isOpen !== wasOpen) {
@@ -78,7 +88,7 @@ export const useSignInAttempt = (isOpen: boolean) => {
   return {
     status,
     email,
-    setEmail,
+    changeEmail,
     isSendLimited,
     isEmailInvalid,
     submitEmail,

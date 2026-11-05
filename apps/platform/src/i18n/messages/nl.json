@@ -618,6 +618,7 @@
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo: PNG, JPEG, WebP of SVG. Favicon: een vierkante afbeelding.",
     "optionalTag": "optioneel",
+    "fieldUnsavedLabel": "Niet-opgeslagen wijziging",
     "headingFontLabel": "Koplettertype",
     "bodyFontLabel": "Tekstlettertype",
     "radiusScaleLabel": "Afrondingsschaal",
@@ -653,6 +654,7 @@
       "PLAIN": "Geen rand tot je eroverheen beweegt"
     },
     "languageSwitcherLabel": "Taalkeuze",
+    "languageSwitcherStyleLabel": "Stijl",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
     "languageSwitcherOptionLabel": {
@@ -892,7 +894,6 @@
     "removeFailed": "{kind, select, favicon {Het favicon} other {Het logo}} kon niet worden verwijderd — probeer het opnieuw."
   },
   "brandAssetField": {
-    "savesWithChanges": "Wordt opgeslagen met de wijzigingen",
     "logo": {
       "pickAgain": "Uw herstelde concept bevatte een nieuw logo dat niet bewaard kon worden — kies het opnieuw."
     },

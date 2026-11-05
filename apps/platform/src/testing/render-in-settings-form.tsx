@@ -16,6 +16,8 @@ export const SAVE_CHANGES = 'Save changes';
 export const ALL_CHANGES_SAVED = 'All changes saved';
 export const UNSAVED_CHANGES = 'Unsaved changes';
 export const ONE_FIELD_NEEDS_ATTENTION = '1 field needs attention';
+export const ONE_UNSAVED_CHANGE = '1 unsaved change';
+export const SAVING = 'Saving…';
 export const GO_TO_THE_FIRST_ONE = 'Go to the first one';
 
 export const ARCHIVED_NOTICE_TEXT = 'This tenant is archived';

@@ -6,3 +6,5 @@ export const VOICE_SECTION = {
 } as const;
 
 export type TVoiceSection = TValueOf<typeof VOICE_SECTION>;
+
+export const VOICE_CARDS_TEST_ID = 'voice-cards';

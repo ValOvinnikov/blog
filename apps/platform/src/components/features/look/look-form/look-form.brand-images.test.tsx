@@ -12,7 +12,6 @@ import {
   hueValue,
   NUDGED_ACCENT_HUE,
   savedLookValues,
-  SAVING,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
@@ -28,6 +27,7 @@ import {
 import {
   ALL_CHANGES_SAVED,
   UNSAVED_CHANGES,
+  SAVING,
 } from '@platform/testing/render-in-settings-form';
 import {
   CURRENT_LOGO,
@@ -82,6 +82,18 @@ describe(`<${LookForm.name}/>`, () => {
         expect(brandHeading).toBeVisible();
         expect(logo).toHaveAttribute('src', MOCK_STAGED_LOGO_BLOB_URL);
         expect(uploadBrandAssetAction).not.toHaveBeenCalled();
+      });
+
+      it('marks only the logo field as unsaved, beside its optional tag', () => {
+        const logoGroup = screen.getByRole('group', {
+          name: `${LOOK_FORM.logoFieldLabel} ${LOOK_FORM.optionalTag} ${LOOK_FORM.fieldUnsavedLabel}`,
+        });
+        const faviconGroup = screen.getByRole('group', {
+          name: `${LOOK_FORM.faviconFieldLabel} ${LOOK_FORM.optionalTag}`,
+        });
+
+        expect(logoGroup).toBeVisible();
+        expect(faviconGroup).toBeVisible();
       });
 
       it('uploads a staged logo on Save, then saves the rest of the look', async () => {

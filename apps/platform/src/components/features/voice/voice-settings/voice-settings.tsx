@@ -9,6 +9,7 @@ import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { PreviewModeGroup } from '@platform/components/shared/preview-mode-group';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import {
   buildSitePreviewTheme,
   type TSitePreviewThemeValues,
@@ -74,7 +75,7 @@ export const VoiceSettings = ({
 
   return (
     <SettingsFormShell
-      layout={{ isWide: true, isSaveBarFloatingOnPhone: true }}
+      layout={{ isWide: true, hasPhoneSaveFooter: true }}
       title={t('heading')}
       description={t('description')}
       form={form}
@@ -137,6 +138,7 @@ export const VoiceSettings = ({
         <div
           key={`${selectedLocale}-${revision}`}
           inert={isPending}
+          data-testid={VOICE_CARDS_TEST_ID}
           className={cards()}
         >
           {VOICE_SURFACES_IN_PAGE_ORDER.map((surface) => (

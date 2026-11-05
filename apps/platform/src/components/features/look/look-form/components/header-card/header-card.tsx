@@ -13,6 +13,7 @@ import { useLookForm } from '@platform/components/features/look/look-form-provid
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
@@ -51,11 +52,13 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
       description={t('headerDescription')}
     >
       <LookField
+        field="headerLayout"
         label={t('headerLayoutLabel')}
         hint={t('headerLayoutDescription')}
         lock={layoutLock.lock}
       >
         <OptionSelect
+          appearance={SELECT_APPEARANCE.COMPACT}
           aria={{ describedBy: layoutLock.describedBy }}
           options={layoutOptions}
           value={headerLayout}
@@ -68,6 +71,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
 
       <div {...triggerProps}>
         <LookField
+          field="headerSubmenuStyle"
           label={t('headerSubmenuStyleLabel')}
           hint={t('headerSubmenuStyleDescription')}
           isGroup={true}
@@ -87,6 +91,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
       </div>
 
       <LookField
+        field="headerBarStyle"
         label={t('headerBarStyleLabel')}
         hint={t('headerBarStyleDescription')}
         isGroup={true}

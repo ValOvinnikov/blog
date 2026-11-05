@@ -13,6 +13,7 @@ import {
   ARCHIVED_NOTICE_DESCRIPTION,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
+  ONE_UNSAVED_CHANGE,
 } from '@platform/testing/render-in-settings-form';
 import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import {
@@ -59,9 +60,6 @@ const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
 const ANALYTICS_LABEL = toggleLabel[CAPABILITY.ANALYTICS];
 const CONTACT_FORM_LABEL = toggleLabel[CAPABILITY.CONTACT_FORM];
 const { saveBar } = messages;
-const ONE_UNSAVED_CHANGE = makeEnTranslator('saveBar')('unsavedChanges', {
-  count: 1,
-});
 const RESTORE_ONE_CHANGE = makeEnTranslator('draftRecovery')('restore', {
   count: 1,
 });

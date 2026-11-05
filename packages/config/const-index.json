@@ -1318,6 +1318,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/preset.ts"
+      },
+      {
+        "ref": "SELECT_APPEARANCE.COMPACT",
+        "scope": "app:platform",
+        "from": "@platform/constants/select-appearance",
+        "file": "apps/platform/src/constants/select-appearance.ts"
       }
     ],
     "BIG_WORDMARK": [
