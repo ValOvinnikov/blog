@@ -47,7 +47,10 @@ export const SegmentedControl = <TValue extends string>({
     option,
     optionLabel,
     optionDescription: optionDescriptionSlot,
-  } = segmentedControlVariants({ hasDescriptions, isLocked });
+  } = segmentedControlVariants({
+    hasDescriptions,
+    isLocked: isLocked || isDisabled,
+  });
 
   return (
     <ToggleGroup
