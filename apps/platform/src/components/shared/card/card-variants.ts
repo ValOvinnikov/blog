@@ -18,9 +18,10 @@ export const cardVariants = tv({
     headerActions: ['ml-auto flex items-center gap-2'],
     body: ['min-w-0 flex-1 px-admin-card py-4'],
     footer: [
-      'flex items-center gap-2.5',
+      'flex flex-wrap items-center gap-2.5',
       'border-t border-admin-line-2 bg-admin-surface-2 px-admin-card py-[11px]',
       'rounded-b-admin',
     ],
+    footerError: ['min-w-0 flex-1 basis-64'],
   },
 });

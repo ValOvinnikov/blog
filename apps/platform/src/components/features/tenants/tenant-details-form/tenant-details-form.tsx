@@ -86,10 +86,6 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
 
   return (
     <div className={root()}>
-      {isCreateFailed && (
-        <Alert type={ALERT_TYPE.ERROR} title={t('errors.createFailed')} />
-      )}
-
       <div className={cardWrap()}>
         <div
           className={cardInert()}
@@ -155,7 +151,9 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                 </FormField>
               </div>
             </Card.Body>
-            <Card.Footer>
+            <Card.Footer
+              error={isCreateFailed ? t('errors.createFailed') : undefined}
+            >
               <div className={footerActions()}>
                 <Button
                   type="button"

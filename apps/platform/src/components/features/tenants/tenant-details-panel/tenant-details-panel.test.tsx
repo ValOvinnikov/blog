@@ -141,6 +141,45 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     expect(saveButton).toBeDisabled();
   });
 
+  it('shows a failed save beside Save and keeps the edits', async () => {
+    updateTenantDetailsActionMock.mockResolvedValue({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
+    setup();
+
+    const nameInput = getNameInput();
+    await replaceValue(nameInput, MOCK_RENAMED_TENANT_NAME);
+    await user.click(getSaveButton());
+
+    const alert = await screen.findByRole('alert');
+
+    expect(alert).toHaveTextContent(tenantDetailsPanel.errors.saveFailed);
+    expect(alert.compareDocumentPosition(getSaveButton())).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(nameInput).toHaveValue(MOCK_RENAMED_TENANT_NAME);
+  });
+
+  it('clears a failed save once saving again succeeds', async () => {
+    updateTenantDetailsActionMock
+      .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SERVER_ERROR })
+      .mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+        tenant: mockClientTenant({ name: MOCK_RENAMED_TENANT_NAME }),
+      });
+    setup();
+
+    await replaceValue(getNameInput(), MOCK_RENAMED_TENANT_NAME);
+    await user.click(getSaveButton());
+    await screen.findByRole('alert');
+    await user.click(getSaveButton());
+    await screen.findByText(tenantDetailsPanel.alertSuccess);
+
+    const alert = screen.queryByRole('alert');
+
+    expect(alert).not.toBeInTheDocument();
+  });
+
   it('saves the edited values and keeps the success toast through further edits', async () => {
     updateTenantDetailsActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SUCCESS,

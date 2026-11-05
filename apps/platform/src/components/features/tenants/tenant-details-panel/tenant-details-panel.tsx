@@ -1,9 +1,8 @@
 'use client';
 
-import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
+import type { TMaybeUndefined } from '@blog/config';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import { hasArrayGotItems } from '@blog/utils/primitives';
-import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { BUTTON_VARIANT } from '@platform/constants/button';
@@ -87,8 +86,6 @@ export const TenantDetailsPanel = ({
 
   return (
     <div className={root()} data-tenant-details-panel={panelId}>
-      {formError && <Alert type={ALERT_TYPE.ERROR} title={formError} />}
-
       <Card>
         <Card.Header title={t('heading')} />
         <Card.Body>
@@ -118,7 +115,7 @@ export const TenantDetailsPanel = ({
           </div>
         </Card.Body>
 
-        <Card.Footer>
+        <Card.Footer error={formError}>
           <div className={footerActions()}>
             <Button
               type="button"

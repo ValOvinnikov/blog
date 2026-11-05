@@ -128,6 +128,14 @@ status (`hasSavedStatus={false}`); Voice does. Below `md` the bar spans the
 viewport bottom edge to edge with Discard and Save, and the page keeps 120px
 of room while it shows.
 
+A save outside `SettingsFormShell` — the tenant details panel and the Add
+tenant form — submits from its card's footer and shows a failed save there, as
+an error `Alert` (`role="alert"`) beside the Save button through
+`Card.Footer`'s `error`, wrapping above the button when the footer is too
+narrow for both. What the user entered stays. Saving again withdraws it while
+the request is in flight, so a second failure announces again, and a
+successful save clears it.
+
 Voice opts into its own phone footer below `md` (`layout.hasPhoneSaveFooter`)
 in place of that bar; from `md` it docks like every other page. The footer is
 fixed to the viewport bottom, full width, flat with a top border, and stays
