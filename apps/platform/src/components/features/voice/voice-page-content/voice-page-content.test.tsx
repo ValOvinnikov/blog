@@ -14,6 +14,12 @@ import {
   MOCK_ARCHIVED_AT,
 } from '@platform/testing/tenants/fixtures';
 import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
+import {
+  EMPTY_STATES_SECTION,
+  ERROR_PAGES_SECTION,
+  openVoiceSections,
+  voiceSectionHeader,
+} from '@platform/testing/voice/sections';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -63,6 +69,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
 
   it('shows every field at its default when there is no site_config row', async () => {
     await setup();
+    await openVoiceSections(user);
 
     const headingInput = notFoundHeading();
     const defaultBadges = screen.getAllByText('Default');
@@ -81,6 +88,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     });
 
     await setup();
+    await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
 
     const headingInput = notFoundHeading();
 
@@ -104,6 +112,7 @@ describe(`<${VoicePageContent.name}/>`, () => {
     it('renders the empty-list specimen in the language being edited', async () => {
       const germanRadio = screen.getByRole('radio', { name: 'German' });
       await user.click(germanRadio);
+      await user.click(voiceSectionHeader(EMPTY_STATES_SECTION));
 
       const { eyebrow, heading, count } = de.voiceSpecimen.lists.blogList;
       const specimenRoot = screen.getByTestId(

@@ -1,7 +1,9 @@
 import { tv } from '@platform/utils/tv/tv';
+import { VOICE_ANCHOR_CLASSES } from '@platform/utils/voice-sections/voice-sections';
 
 export const voiceSurfaceCardVariants = tv({
   slots: {
+    card: [VOICE_ANCHOR_CLASSES, '[&_h3]:outline-hidden'],
     body: ['grid grid-cols-1 p-0 lg:grid-cols-2'],
     fields: ['flex flex-col gap-4 p-[18px]'],
     previewColumn: [

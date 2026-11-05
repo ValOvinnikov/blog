@@ -597,6 +597,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/voice` — `apps/platform/src/constants/voice.ts`
 
 - **VOICE_SECTION**: `ERROR_PAGES`, `EMPTY_STATES`
+- **VOICE_COUNT_UNIT**: `LISTS`, `FIELDS`
 
 ### `@platform/constants/worker` — `apps/platform/src/constants/worker.ts`
 

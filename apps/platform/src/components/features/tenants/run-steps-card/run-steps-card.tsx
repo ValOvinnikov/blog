@@ -67,9 +67,8 @@ export const RunStepsCard = ({
   return (
     <Disclosure
       className={card()}
-      isOpen={isOpen}
-      onOpenChange={onOpenChange}
-      headingLevel={headingLevel}
+      openState={{ isOpen, onOpenChange }}
+      heading={{ level: headingLevel }}
       summary={
         <span className={summary()}>
           <span className={headingVariants({ size: 'cardTitle' })}>

@@ -13,10 +13,12 @@ import { useVoiceListSamples } from '@platform/components/features/voice/voice-l
 import { Accordion } from '@platform/components/shared/accordion';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
+import { VOICE_CARD_ID } from '@platform/constants/voice';
 import {
   countCustomisedVoiceFields,
   voiceFieldsOf,
 } from '@platform/utils/voice-draft/voice-draft';
+import { voiceSurfaceUnit } from '@platform/utils/voice-sections/voice-sections';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -57,8 +59,10 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
     previewLabel,
     previewNote,
     summary,
+    card,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
   const isArchive = surface === VOICE_SURFACE.ARCHIVE;
+  const ids = VOICE_CARD_ID[surface];
   const openFieldId = isArchive ? openListFieldId : undefined;
   const fields = voiceFieldsOf(surface);
   const trackFocusOf = (id: TVoiceFieldId) => ({
@@ -67,16 +71,23 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
   });
 
   return (
-    <Card>
+    <Card id={ids.card} className={card()}>
       <Card.Header
         title={tSurfaces(surface)}
+        headingLevel={3}
+        titleId={ids.heading}
+        titleTabIndex={-1}
         supportingText={tDescriptions(surface)}
         actions={
           <span className={summary()}>
             {t('surfaceSummary', {
-              unit: isArchive ? 'lists' : 'fields',
-              total: fields.length,
-              customised: countCustomisedVoiceFields(values, fields),
+              count: t('surfaceCount', {
+                unit: voiceSurfaceUnit(surface),
+                total: fields.length,
+              }),
+              status: t('customisedStatus', {
+                count: countCustomisedVoiceFields(values, fields),
+              }),
             })}
           </span>
         }

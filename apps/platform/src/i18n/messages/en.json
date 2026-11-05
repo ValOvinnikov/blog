@@ -1020,7 +1020,9 @@
     "description": "Reword the site's page-level messages. Every field has a default, so change only what you want to sound like you.",
     "fixedCopyNote": "Buttons, menus and labels are translated for you and stay the same on every site, so they aren't listed here.",
     "editingLanguageNote": "Editing <strong>{language}</strong> — other languages keep their own text.",
-    "surfaceSummary": "{unit, select, lists {{total, plural, one {# list} other {# lists}}} other {{total, plural, one {# field} other {# fields}}}} · {customised, plural, =0 {all default} other {# customised}}",
+    "surfaceSummary": "{count} · {status}",
+    "surfaceCount": "{unit, select, LISTS {{total, plural, one {# list} other {# lists}}} other {{total, plural, one {# field} other {# fields}}}}",
+    "customisedStatus": "{count, plural, =0 {all default} other {# customised}}",
     "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
@@ -1036,6 +1038,10 @@
       "DISALLOWED_CONTENT": "Remove formatting this field doesn't support.",
       "INVALID_LINK_URL": "The link {url} isn't a valid web address."
     }
+  },
+  "voiceSections": {
+    "ERROR_PAGES": "Error pages",
+    "EMPTY_STATES": "Empty states"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Page not found",

@@ -8,12 +8,14 @@ import {
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
+import { MEDIA_QUERY } from '@platform/constants/media-query';
 import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
+import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
@@ -28,6 +30,12 @@ import {
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
 import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
+import {
+  EMPTY_STATES_SECTION,
+  ERROR_PAGES_SECTION,
+  openVoiceSections,
+  voiceSectionHeader,
+} from '@platform/testing/voice/sections';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -118,6 +126,19 @@ const setupBilingual = (overrides: Partial<TVoiceSettingsProps> = {}) =>
 
 const card = (name: string) => screen.getByRole('region', { name });
 
+const ERROR_PAGES_BODY_ID = 'sec-errors-body';
+const EMPTY_STATES_BODY_ID = 'sec-empty-body';
+const ARIA_EXPANDED = 'aria-expanded';
+const ARIA_CONTROLS = 'aria-controls';
+const HREF = 'href';
+const LISTS_HASH = '#s-lists';
+const BOOKMARKS_HASH = '#s-bookmarks';
+const ERROR_PAGES_ALL_DEFAULT = '5 fields · all default';
+const SCROLL_TO_START = { behavior: 'smooth', block: 'start' };
+
+const summaryRow = (name: string) =>
+  screen.getByRole('link', { name: new RegExp(`^${name}`) });
+
 const PAGE_NOT_FOUND = 'Page not found';
 const ERROR_PAGE = 'Error page';
 const EMPTY_LISTS = 'Empty lists';
@@ -176,12 +197,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
   };
 
   describe(NO_OVERRIDES, () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       setup();
+      await openVoiceSections(user);
     });
 
     it('shows one card per surface, in page order', () => {
-      const headings = screen.getAllByRole('heading', { level: 2 });
+      const headings = screen.getAllByRole('heading', { level: 3 });
       const headingTexts = headings.map((heading) => heading.textContent);
 
       expect(headingTexts).toEqual([
@@ -265,8 +287,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   describe(TWO_LANGUAGES, () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       setupBilingual();
+      await openVoiceSections(user);
     });
 
     it('summarises each card with its field count and customised count', () => {
@@ -390,6 +413,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           accentHue: MOCK_ACCENT_HUE,
         },
       });
+      await openVoiceSections(user);
 
       const darkButton = screen.getByRole('button', { name: 'Dark' });
       await user.click(darkButton);
@@ -404,8 +428,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     describe(NO_OVERRIDES, () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         setup();
+        await openVoiceSections(user);
       });
 
       it('re-renders the specimen beside a field as the editor types', async () => {
@@ -494,8 +519,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
   });
 
   describe('empty lists', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       setup();
+      await openVoiceSections(user);
     });
 
     it('opens one list at a time, showing the others as compact rows', async () => {
@@ -546,7 +572,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       await user.keyboard('{Enter}');
 
       expect(row).toHaveFocus();
-      expect(row).toHaveAttribute('aria-expanded', 'true');
+      expect(row).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       await user.tab();
 
@@ -597,6 +623,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
       });
       setupBilingual();
+      await openVoiceSections(user);
 
       const headingField = notFoundHeading();
       await user.clear(headingField);
@@ -620,6 +647,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     it('makes the page content inert while the phone footer keeps focus on Saving…', async () => {
       saveVoiceOverridesActionMock.mockReturnValueOnce(new Promise(() => {}));
       setup();
+      await openVoiceSections(user);
 
       await user.type(notFoundHeading(), MOCK_TYPED_TEXT);
 
@@ -643,6 +671,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         outcome: ACTION_OUTCOME.SUCCESS,
       });
       setup();
+      await openVoiceSections(user);
 
       await editHeadingAndSave(MOCK_TYPED_TEXT);
 
@@ -657,6 +686,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
       setup();
+      await openVoiceSections(user);
 
       await editHeadingAndSave(MOCK_TYPED_TEXT);
 
@@ -672,6 +702,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         fieldErrorsByLocale: { [EN]: { notFoundHeading: tooLong } },
       });
       setup();
+      await openVoiceSections(user);
 
       await editHeadingAndSave(MOCK_TYPED_TEXT);
 
@@ -687,7 +718,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       );
       expect(alert).not.toBeInTheDocument();
       expect(saveBar).toHaveTextContent('1 field needs attention');
-      expect(firstFieldLink).toHaveAttribute('href', `#${rejectedField.id}`);
+      expect(firstFieldLink).toHaveAttribute(HREF, `#${rejectedField.id}`);
 
       await user.type(rejectedField, MOCK_EDIT_TEXT);
 
@@ -702,6 +733,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         fieldErrorsByLocale: { [DE]: { tagEmpty: missingName } },
       });
       setupBilingual();
+      await openVoiceSections(user);
 
       await editHeadingAndSave(MOCK_EDIT_TEXT);
 
@@ -728,6 +760,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           },
         });
         setupBilingual();
+        await openVoiceSections(user);
 
         await editHeadingAndSave(MOCK_EDIT_TEXT);
 
@@ -744,6 +777,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           },
         });
         setup();
+        await openVoiceSections(user);
 
         await editHeadingAndSave(MOCK_TYPED_TEXT);
         await goToFirstRejectedField();
@@ -761,6 +795,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           },
         });
         setup();
+        await openVoiceSections(user);
 
         const section = card(EMPTY_LISTS);
         const tagRow = within(section).getByRole('button', {
@@ -783,6 +818,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           fieldErrorsByLocale: { [DE]: { tagEmpty: missingName } },
         });
         setupBilingual();
+        await openVoiceSections(user);
 
         await editHeadingAndSave(MOCK_EDIT_TEXT);
 
@@ -803,8 +839,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
   describe('archived tenant', () => {
     describe('with only the archive date', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         setup({ archivedAt: MOCK_ARCHIVED_AT });
+        await openVoiceSections(user);
       });
 
       it('shows an archived notice and offers no Save', () => {
@@ -838,8 +875,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(notice.compareDocumentPosition(note)).toBe(FOLLOWS);
     });
 
-    it('makes the text fields read-only and offers no Reset', () => {
+    it('makes the text fields read-only and offers no Reset', async () => {
       setupBilingual({ archivedAt: MOCK_ARCHIVED_AT });
+      await openVoiceSections(user);
 
       const headingField = notFoundHeading();
       const resetButton = screen.queryByRole('button', { name: RESET });
@@ -850,6 +888,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('keeps the language switcher operable', async () => {
       setupBilingual({ archivedAt: MOCK_ARCHIVED_AT });
+      await openVoiceSections(user);
 
       const germanRadio = screen.getByRole('radio', { name: GERMAN });
       await user.click(germanRadio);
@@ -858,6 +897,255 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       expect(germanRadio).toBeChecked();
       expect(germanLabel).toBeVisible();
+    });
+  });
+
+  describe('sections', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+      window.history.replaceState(null, '', window.location.pathname);
+    });
+
+    it('starts with every section collapsed, each header controlling its body', () => {
+      setup();
+
+      const errorPages = voiceSectionHeader(ERROR_PAGES_SECTION);
+      const emptyStates = voiceSectionHeader(EMPTY_STATES_SECTION);
+      const cards = screen.queryAllByRole('heading', { level: 3 });
+
+      expect(errorPages).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(errorPages).toHaveAttribute(ARIA_CONTROLS, ERROR_PAGES_BODY_ID);
+      expect(emptyStates).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(emptyStates).toHaveAttribute(ARIA_CONTROLS, EMPTY_STATES_BODY_ID);
+      expect(cards).toHaveLength(0);
+    });
+
+    it('names each section by its heading', () => {
+      setup();
+
+      const errorPages = screen.getByRole('region', {
+        name: /^Error pages/,
+      });
+      const heading = within(errorPages).getByRole('heading', { level: 2 });
+
+      expect(heading).toHaveTextContent(ERROR_PAGES_SECTION);
+    });
+
+    it('lists a collapsed section as links to its cards with their counts', () => {
+      setupBilingual();
+
+      const notFound = summaryRow(PAGE_NOT_FOUND);
+      const errorPage = summaryRow(ERROR_PAGE);
+      const lists = summaryRow(EMPTY_LISTS);
+      const bookmarks = summaryRow(BOOKMARKS);
+
+      expect(notFound).toHaveAttribute(HREF, '#s-notfound');
+      expect(notFound).toHaveTextContent('3 fields');
+      expect(notFound).toHaveTextContent('Customised');
+      expect(errorPage).toHaveAttribute(HREF, '#s-error');
+      expect(errorPage).toHaveTextContent('2 fields');
+      expect(errorPage).toHaveTextContent('Default');
+      expect(lists).toHaveAttribute(HREF, LISTS_HASH);
+      expect(lists).toHaveTextContent('5 lists');
+      expect(bookmarks).toHaveAttribute(HREF, BOOKMARKS_HASH);
+      expect(bookmarks).toHaveTextContent('1 field');
+    });
+
+    it('sums each section meta from its cards', () => {
+      setupBilingual();
+
+      const errorPages = voiceSectionHeader(ERROR_PAGES_SECTION);
+      const emptyStates = voiceSectionHeader(EMPTY_STATES_SECTION);
+
+      expect(errorPages).toHaveTextContent('5 fields · 2 customised');
+      expect(emptyStates).toHaveTextContent('6 fields · 1 customised');
+    });
+
+    it('reads all default for a section nothing in is customised', () => {
+      setup();
+
+      const errorPages = voiceSectionHeader(ERROR_PAGES_SECTION);
+
+      expect(errorPages).toHaveTextContent(ERROR_PAGES_ALL_DEFAULT);
+    });
+
+    it('counts an unsaved edit at once and drops it again on Reset', async () => {
+      setup();
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+      await user.type(notFoundHeading(), MOCK_EDIT_TEXT);
+
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveTextContent(
+        '5 fields · 1 customised',
+      );
+
+      const resetButton = within(card(PAGE_NOT_FOUND)).getByRole('button', {
+        name: RESET,
+      });
+      await user.click(resetButton);
+
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveTextContent(
+        ERROR_PAGES_ALL_DEFAULT,
+      );
+    });
+
+    it('opens a section from its header and shows its cards', async () => {
+      setup();
+
+      await user.click(voiceSectionHeader(EMPTY_STATES_SECTION));
+
+      const emptyStates = voiceSectionHeader(EMPTY_STATES_SECTION);
+      const lists = card(EMPTY_LISTS);
+      const errorPages = voiceSectionHeader(ERROR_PAGES_SECTION);
+
+      expect(emptyStates).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(lists).toBeVisible();
+      expect(errorPages).toHaveAttribute(ARIA_EXPANDED, 'false');
+    });
+
+    it('jumps from a summary row to its card, focusing the card heading', async () => {
+      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+      setup();
+
+      await user.click(summaryRow(BOOKMARKS));
+
+      const bookmarks = card(BOOKMARKS);
+      const heading = within(bookmarks).getByRole('heading', { level: 3 });
+
+      expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
+        ARIA_EXPANDED,
+        'true',
+      );
+      expect(heading).toHaveFocus();
+      expect(heading).toHaveAttribute('tabindex', '-1');
+      expect(scrollIntoView).toHaveBeenLastCalledWith(SCROLL_TO_START);
+      expect(scrollIntoView.mock.contexts.at(-1)).toBe(bookmarks);
+      expect(window.location.hash).toBe(BOOKMARKS_HASH);
+    });
+
+    it('jumps from a summary row with Enter', async () => {
+      setup();
+
+      summaryRow(PAGE_NOT_FOUND).focus();
+      await user.keyboard('{Enter}');
+
+      const heading = within(card(PAGE_NOT_FOUND)).getByRole('heading', {
+        level: 3,
+      });
+
+      expect(heading).toHaveFocus();
+    });
+
+    it('jumps instantly with reduced motion', async () => {
+      stubMatchingMediaQuery(MEDIA_QUERY.REDUCED_MOTION);
+      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+      setup();
+
+      await user.click(summaryRow(ERROR_PAGE));
+
+      expect(scrollIntoView).toHaveBeenLastCalledWith({
+        ...SCROLL_TO_START,
+        behavior: 'instant',
+      });
+    });
+
+    it.each([
+      [LISTS_HASH, EMPTY_STATES_SECTION, EMPTY_LISTS],
+      ['#sec-errors', ERROR_PAGES_SECTION, PAGE_NOT_FOUND],
+    ])(
+      'opens and scrolls to what a first-load %s hash points into',
+      (hash, section, cardName) => {
+        window.history.replaceState(null, '', hash);
+        const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+        setup();
+
+        const header = voiceSectionHeader(section);
+        const shownCard = card(cardName);
+
+        expect(header).toHaveAttribute(ARIA_EXPANDED, 'true');
+        expect(shownCard).toBeVisible();
+        expect(scrollIntoView).toHaveBeenCalledWith(SCROLL_TO_START);
+      },
+    );
+
+    it('keeps sections open across a language switch', async () => {
+      setupBilingual();
+      await user.click(voiceSectionHeader(EMPTY_STATES_SECTION));
+
+      const germanRadio = screen.getByRole('radio', { name: GERMAN });
+      await user.click(germanRadio);
+
+      expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
+        ARIA_EXPANDED,
+        'true',
+      );
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
+        ARIA_EXPANDED,
+        'false',
+      );
+    });
+
+    it('keeps sections open after a save', async () => {
+      saveVoiceOverridesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      setup();
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+      await editHeadingAndSave(MOCK_EDIT_TEXT);
+
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
+        ARIA_EXPANDED,
+        'true',
+      );
+    });
+
+    it('shows a section with a rejected field as needing attention', async () => {
+      saveVoiceOverridesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrorsByLocale: { [EN]: { notFoundHeading: tooLong } },
+      });
+      setup();
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+      await editHeadingAndSave(MOCK_EDIT_TEXT);
+
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveTextContent(
+        '5 fields · 1 field needs attention',
+      );
+    });
+
+    it('opens the collapsed section that holds a rejected field', async () => {
+      saveVoiceOverridesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrorsByLocale: { [EN]: { notFoundHeading: tooLong } },
+      });
+      setup();
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+      await user.type(notFoundHeading(), MOCK_EDIT_TEXT);
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const saveButton = within(saveBar).getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveButton);
+
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
+        ARIA_EXPANDED,
+        'true',
+      );
+      expect(notFoundHeading()).toBeVisible();
+    });
+
+    it('keeps section headers and summary rows operable for an archived tenant', async () => {
+      setup({ archivedAt: MOCK_ARCHIVED_AT });
+
+      await user.click(summaryRow(EMPTY_LISTS));
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+      expect(card(EMPTY_LISTS)).toBeVisible();
+      expect(card(PAGE_NOT_FOUND)).toBeVisible();
     });
   });
 });
