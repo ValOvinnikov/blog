@@ -1,5 +1,6 @@
 import {
   HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@blog/config';
@@ -51,6 +52,8 @@ export const SampleSiteHeader = ({
     barStyle,
     layout,
     isEdgeToEdge,
+    isWidePanelOpen:
+      isSubmenuOpen && submenuStyle === HEADER_SUBMENU_STYLE.WIDE_PANEL,
   });
 
   return (
