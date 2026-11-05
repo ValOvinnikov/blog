@@ -25,6 +25,7 @@ export type TLookFollowStatusProps = {
   device: TPreviewDevice;
   isShortLine: boolean;
   readerNote: TMaybeUndefined<string>;
+  planNote: TMaybeUndefined<string>;
 };
 
 export const LookFollowStatus = ({
@@ -33,6 +34,7 @@ export const LookFollowStatus = ({
   device,
   isShortLine,
   readerNote,
+  planNote,
 }: TLookFollowStatusProps) => {
   const t = useTranslations('lookFollow');
   const tForm = useTranslations('lookForm');
@@ -79,6 +81,7 @@ export const LookFollowStatus = ({
         target={target}
         device={device}
         isShortLine={isShortLine}
+        planNote={planNote}
       />
       {readerNote && ` ${readerNote}`}
     </PreviewFrame.Status>

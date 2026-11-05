@@ -9,11 +9,13 @@ import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
+import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
+import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
@@ -33,6 +35,9 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
   const layoutLock = useLookFieldLock('headerLayout');
   const submenuStyleLock = useLookFieldLock('headerSubmenuStyle');
   const barStyleLock = useLookFieldLock('headerBarStyle');
+  const { lockLine, hasGrowthBadge } = useLookRowLock(
+    CARD_FIELDS[LOOK_ROW.HEADER],
+  );
   const { triggerProps, markChanged } = useSubmenuPreview();
 
   const layoutOptions = toOptions(HEADER_LAYOUT, (layout) =>
@@ -50,20 +55,24 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
       summary={summary}
       card={LOOK_ROW.HEADER}
       description={t('headerDescription')}
+      lockLine={lockLine}
+      hasGrowthBadge={hasGrowthBadge}
     >
       <LookField
         field="headerLayout"
         label={t('headerLayoutLabel')}
         hint={t('headerLayoutDescription')}
-        lock={layoutLock.lock}
+        labelId={layoutLock.labelId}
+        growthBadgeId={layoutLock.growthBadgeId}
       >
         <OptionSelect
           appearance={SELECT_APPEARANCE.COMPACT}
-          aria={{ describedBy: layoutLock.describedBy }}
+          aria={layoutLock.aria}
           options={layoutOptions}
           value={headerLayout}
           onChange={(layout) => updateField('headerLayout', layout)}
           isDisabled={layoutLock.isDisabled}
+          isLocked={layoutLock.isLocked}
         />
       </LookField>
 
@@ -75,10 +84,11 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
           label={t('headerSubmenuStyleLabel')}
           hint={t('headerSubmenuStyleDescription')}
           isGroup={true}
-          lock={submenuStyleLock.lock}
+          labelId={submenuStyleLock.labelId}
+          growthBadgeId={submenuStyleLock.growthBadgeId}
         >
           <SegmentedControl<THeaderSubmenuStyle>
-            aria={{ describedBy: submenuStyleLock.describedBy }}
+            aria={submenuStyleLock.aria}
             options={submenuStyleOptions}
             value={headerSubmenuStyle}
             onChange={(style) => {
@@ -86,6 +96,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
               markChanged();
             }}
             isDisabled={submenuStyleLock.isDisabled}
+            isLocked={submenuStyleLock.isLocked}
           />
         </LookField>
       </div>
@@ -95,14 +106,16 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
         label={t('headerBarStyleLabel')}
         hint={t('headerBarStyleDescription')}
         isGroup={true}
-        lock={barStyleLock.lock}
+        labelId={barStyleLock.labelId}
+        growthBadgeId={barStyleLock.growthBadgeId}
       >
         <SegmentedControl<THeaderBarStyle>
-          aria={{ describedBy: barStyleLock.describedBy }}
+          aria={barStyleLock.aria}
           options={barStyleOptions}
           value={headerBarStyle}
           onChange={(style) => updateField('headerBarStyle', style)}
           isDisabled={barStyleLock.isDisabled}
+          isLocked={barStyleLock.isLocked}
         />
       </LookField>
 

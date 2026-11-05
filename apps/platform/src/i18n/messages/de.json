@@ -657,6 +657,9 @@
     "languageSwitcherStyleLabel": "Stil",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
     "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
+    "languageSwitcherFreeDescription": "Ihr Tarif veröffentlicht eine Sprache. Mit einem Upgrade können Sie Sprachen hinzufügen und einen Stil für den Sprachwechsler wählen.",
+    "lockLineGrowthFields": "Mit Growth markierte Felder behalten den Wert der Vorlage {preset}.",
+    "lockLineTypeFonts": "Im Free-Tarif behält Schrift die Schriften der Vorlage {preset}. Eine andere Vorlage ändert sie.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Menü mit Code",
       "MENU_GLOBE": "Menü mit Globus",
@@ -865,7 +868,8 @@
     "styleCard": "<strong>{card}</strong> ändert die ganze Seite, daher bleibt der Rahmen, wo er ist.",
     "idle": "Öffne eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin.",
     "off": "Folgen ist aus. Der Rahmen bleibt, wo du ihn lässt.",
-    "allOpen": "Alle Karten sind geöffnet. Fokussiere eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin."
+    "allOpen": "Alle Karten sind geöffnet. Fokussiere eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin.",
+    "freeSample": "Das Beispiel verwendet die Werte der Vorlage {preset}, also die, die eine Free-Website veröffentlicht."
   },
   "assetUploadField": {
     "remove": "Entfernen",

@@ -16,6 +16,7 @@ export type TLogoHueFieldProps = {
   logoHue: TMaybeUndefined<number>;
   onChange: (logoHue: TMaybeUndefined<number>) => void;
   isDisabled?: boolean;
+  isLocked?: boolean;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
@@ -29,6 +30,7 @@ export const LogoHueField = ({
   logoHue,
   onChange,
   isDisabled = false,
+  isLocked = false,
   'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
@@ -42,17 +44,27 @@ export const LogoHueField = ({
     tones: tonesSlot,
     tone,
     hueValue,
+    switchRow,
+    readout,
   } = logoHueFieldVariants();
 
   return (
     <div className={root()}>
-      <Switch
-        aria={{ label: t('followAccentHue'), describedBy: ariaDescribedBy }}
-        isChecked={follows}
-        onCheckedChange={(checked) => onChange(checked ? undefined : accentHue)}
-        labels={{ caption: t('followAccentHue') }}
-        isDisabled={isDisabled}
-      />
+      <div className={switchRow()}>
+        <Switch
+          aria={{ label: t('followAccentHue'), describedBy: ariaDescribedBy }}
+          isChecked={follows}
+          onCheckedChange={(checked) =>
+            onChange(checked ? undefined : accentHue)
+          }
+          labels={{ caption: t('followAccentHue') }}
+          isDisabled={isDisabled}
+          isLocked={isLocked}
+        />
+        {isLocked && follows && (
+          <span className={readout()}>{t('followsAccent')}</span>
+        )}
+      </div>
 
       {!follows && (
         <div className={hueField()}>
@@ -80,7 +92,7 @@ export const LogoHueField = ({
             name={{ ariaLabel: t('logoHueAriaLabel') }}
             value={resolvedHue}
             onChange={onChange}
-            isDisabled={isDisabled}
+            isDisabled={isDisabled || isLocked}
             aria-describedby={ariaDescribedBy}
           />
           <span className={hueValue()}>

@@ -38,6 +38,7 @@ const setup = customRender(LookFollowStatus, {
   device: PREVIEW_DEVICE.DESKTOP,
   isShortLine: false,
   readerNote: undefined,
+  planNote: undefined,
 });
 
 const topOfPageButton = () =>

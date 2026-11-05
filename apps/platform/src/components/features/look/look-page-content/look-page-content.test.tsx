@@ -10,6 +10,7 @@ import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
+import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRenderAsync,
@@ -46,7 +47,6 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
 const MOCK_ACCENT_HUE = 28;
 const SIGN_IN = 'Sign in';
-const ARIA_PRESSED = 'aria-pressed';
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
 
 const tLogoHue = makeEnTranslator('logoHueField');
@@ -111,7 +111,7 @@ describe(`<${LookPageContent.name}/>`, () => {
       });
       const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
       expect(presetRadius).toHaveAttribute(ARIA_PRESSED, 'true');
-      expect(presetRadius).toBeDisabled();
+      expect(presetRadius).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(sampleTokens).not.toHaveStyle({ '--radius-md': '16px' });
     });
 

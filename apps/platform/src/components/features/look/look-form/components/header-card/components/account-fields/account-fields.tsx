@@ -40,14 +40,16 @@ export const AccountFields = () => {
         label={t('accountButtonStyleLabel')}
         hint={t('accountButtonStyleDescription')}
         isGroup={true}
-        lock={buttonLock.lock}
+        labelId={buttonLock.labelId}
+        growthBadgeId={buttonLock.growthBadgeId}
       >
         <SegmentedControl<TAccountButtonStyle>
-          aria={{ describedBy: buttonLock.describedBy }}
+          aria={buttonLock.aria}
           options={buttonOptions}
           value={accountButtonStyle}
           onChange={(style) => updateField('accountButtonStyle', style)}
           isDisabled={buttonLock.isDisabled}
+          isLocked={buttonLock.isLocked}
         />
       </LookField>
 
@@ -56,14 +58,16 @@ export const AccountFields = () => {
         label={t('accountPanelStyleLabel')}
         hint={t('accountPanelStyleDescription')}
         isGroup={true}
-        lock={panelLock.lock}
+        labelId={panelLock.labelId}
+        growthBadgeId={panelLock.growthBadgeId}
       >
         <SegmentedControl<TAccountPanelStyle>
-          aria={{ describedBy: panelLock.describedBy }}
+          aria={panelLock.aria}
           options={panelOptions}
           value={accountPanelStyle}
           onChange={(style) => updateField('accountPanelStyle', style)}
           isDisabled={panelLock.isDisabled}
+          isLocked={panelLock.isLocked}
         />
       </LookField>
 
@@ -72,16 +76,18 @@ export const AccountFields = () => {
         label={t('accountPhonePlacementLabel')}
         hint={t('accountPhonePlacementDescription')}
         isGroup={true}
-        lock={placementLock.lock}
+        labelId={placementLock.labelId}
+        growthBadgeId={placementLock.growthBadgeId}
       >
         <SegmentedControl<TAccountPhonePlacement>
-          aria={{ describedBy: placementLock.describedBy }}
+          aria={placementLock.aria}
           options={placementOptions}
           value={accountPhonePlacement}
           onChange={(placement) =>
             updateField('accountPhonePlacement', placement)
           }
           isDisabled={placementLock.isDisabled}
+          isLocked={placementLock.isLocked}
         />
       </LookField>
     </>
