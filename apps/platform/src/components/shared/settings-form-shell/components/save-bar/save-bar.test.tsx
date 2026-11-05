@@ -6,6 +6,7 @@ import {
 } from '@platform/testing/custom-render';
 import {
   GO_TO_THE_FIRST_ONE,
+  ONE_FIELD_NEEDS_ATTENTION,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
@@ -27,6 +28,7 @@ const MOCK_BREAKDOWN = faker.lorem.words(3);
 const MOCK_CARD_NAME = faker.lorem.word();
 const MOCK_OTHER_CARD_NAME = faker.lorem.words(2);
 const IN_PREFIX = /^in /;
+const MOCK_SAVE_ERROR = faker.lorem.sentence();
 
 const baseProps: TSaveBarProps = {
   changeCount: 3,
@@ -189,6 +191,43 @@ describe(`<${SaveBar.name}/>`, () => {
       expect(saveButton).toBeEnabled();
       expect(discardButton).toBeEnabled();
     });
+  });
+
+  describe('after a failed save', () => {
+    beforeEach(() => {
+      setup({ saveError: MOCK_SAVE_ERROR });
+    });
+
+    it('announces the failure in place of the change count and shortcut', () => {
+      const errorAlert = screen.getByRole('alert');
+      const changeCount = screen.queryByText(THREE_UNSAVED_CHANGES);
+      const shortcut = screen.queryByText(SAVE_SHORTCUT);
+
+      expect(errorAlert).toHaveTextContent(MOCK_SAVE_ERROR);
+      expect(changeCount).not.toBeInTheDocument();
+      expect(shortcut).not.toBeInTheDocument();
+    });
+
+    it('keeps Save and Discard available to try again', () => {
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const discardButton = screen.getByRole('button', { name: DISCARD });
+
+      expect(saveButton).toBeEnabled();
+      expect(discardButton).toBeEnabled();
+    });
+  });
+
+  it('counts the fields that need attention ahead of a failed save', () => {
+    setup({
+      saveError: MOCK_SAVE_ERROR,
+      invalidControls: { ids: [MOCK_FIELD_ID] },
+    });
+
+    const attentionCount = screen.getByText(ONE_FIELD_NEEDS_ATTENTION);
+    const errorAlert = screen.queryByRole('alert');
+
+    expect(attentionCount).toBeVisible();
+    expect(errorAlert).not.toBeInTheDocument();
   });
 
   describe('going to the first field', () => {

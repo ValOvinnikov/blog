@@ -25,6 +25,7 @@ faker.seed(6414);
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_FIELD_ID = faker.string.alpha(10);
 const MOCK_SECOND_FIELD_ID = faker.string.alpha(10);
+const MOCK_SAVE_ERROR = faker.lorem.sentence();
 
 const baseProps: TPhoneSaveFooterProps = {
   changeCount: 1,
@@ -152,6 +153,31 @@ describe(`<${PhoneSaveFooter.name}/>`, () => {
       });
 
       expect(firstField).toHaveFocus();
+    });
+  });
+
+  describe('after a failed save', () => {
+    it('announces the failure in place of the change count', () => {
+      setup({ saveError: MOCK_SAVE_ERROR });
+
+      const errorAlert = screen.getByRole('alert');
+      const changeCount = screen.queryByText(ONE_UNSAVED_CHANGE);
+
+      expect(errorAlert).toHaveTextContent(MOCK_SAVE_ERROR);
+      expect(changeCount).not.toBeInTheDocument();
+    });
+
+    it('counts the fields that need attention ahead of the failure', () => {
+      setup({
+        saveError: MOCK_SAVE_ERROR,
+        invalidControls: { ids: [MOCK_FIELD_ID] },
+      });
+
+      const attentionCount = screen.getByText(ONE_FIELD_NEEDS_ATTENTION);
+      const errorAlert = screen.queryByRole('alert');
+
+      expect(attentionCount).toBeVisible();
+      expect(errorAlert).not.toBeInTheDocument();
     });
   });
 
