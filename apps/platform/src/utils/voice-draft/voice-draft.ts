@@ -51,10 +51,9 @@ export const VOICE_SURFACES_BY_SECTION = {
   ],
 } as const satisfies Record<TVoiceSection, TVoiceSurface[]>;
 
-export const VOICE_SURFACES_IN_PAGE_ORDER =
-  VOICE_SECTIONS_IN_PAGE_ORDER.flatMap(
-    (section) => VOICE_SURFACES_BY_SECTION[section],
-  );
+const VOICE_SURFACES_IN_PAGE_ORDER = VOICE_SECTIONS_IN_PAGE_ORDER.flatMap(
+  (section) => VOICE_SURFACES_BY_SECTION[section],
+);
 
 export const voiceFieldsOf = (surface: TVoiceSurface): TVoiceField[] =>
   VOICE_FIELDS.filter((field) => field.surface === surface);
