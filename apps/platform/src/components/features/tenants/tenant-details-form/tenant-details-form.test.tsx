@@ -204,7 +204,10 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await clickBeginProvisioning();
 
     const alert = await screen.findByRole('alert');
-    const beginButton = screen.getByRole('button', BEGIN_PROVISIONING_BUTTON);
+    const beginButton = await screen.findByRole(
+      'button',
+      BEGIN_PROVISIONING_BUTTON,
+    );
 
     expect(alert).toHaveTextContent(tenantDetailsForm.errors.createFailed);
     expect(alert.compareDocumentPosition(beginButton)).toBe(
