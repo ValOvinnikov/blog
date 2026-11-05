@@ -453,6 +453,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **LOOK_FOLLOW_LIMIT**: `OVERFLOW_STEP`=`10`, `NEARLY_FITS_SCREENS`=`2`, `SCROLL_TOLERANCE`=`1`, `SETTLE_STILL_FRAMES`=`3`, `SETTLE_TIMEOUT_MS`=`1500`
 - **LOOK_FOLLOW_TEST_ID**: `OUTLINE`=`"look-follow-outline"`
 
+### `@platform/constants/look-fullscreen` — `apps/platform/src/constants/look-fullscreen.ts`
+
+- **LOOK_FULLSCREEN**: `SCROLL_STEP`=`40`
+
 ### `@platform/constants/look-group` — `apps/platform/src/constants/look-group.ts`
 
 - **LOOK_GROUP**: `STYLE`, `SITE_PARTS`

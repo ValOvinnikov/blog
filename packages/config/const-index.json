@@ -8038,6 +8038,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "LOOK_FULLSCREEN.SCROLL_STEP",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-fullscreen",
+        "file": "apps/platform/src/constants/look-fullscreen.ts"
       }
     ],
     "64": [

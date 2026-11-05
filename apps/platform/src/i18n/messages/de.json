@@ -871,6 +871,10 @@
     "allOpen": "Alle Karten sind geöffnet. Fokussiere eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin.",
     "freeSample": "Das Beispiel verwendet die Werte der Vorlage {preset}, also die, die eine Free-Website veröffentlicht."
   },
+  "lookFullscreen": {
+    "open": "Vorschau im Vollbild öffnen",
+    "close": "Vollbild schließen"
+  },
   "assetUploadField": {
     "remove": "Entfernen",
     "upload": "Hochladen",

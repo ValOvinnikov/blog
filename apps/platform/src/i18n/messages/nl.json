@@ -871,6 +871,10 @@
     "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe.",
     "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die een Free-site publiceert."
   },
+  "lookFullscreen": {
+    "open": "Voorbeeld op volledig scherm openen",
+    "close": "Volledig scherm sluiten"
+  },
   "assetUploadField": {
     "remove": "Verwijderen",
     "upload": "Uploaden",

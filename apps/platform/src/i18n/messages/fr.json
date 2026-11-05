@@ -871,6 +871,10 @@
     "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle.",
     "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles qu'un site Free publie."
   },
+  "lookFullscreen": {
+    "open": "Ouvrir l’aperçu en plein écran",
+    "close": "Quitter le plein écran"
+  },
   "assetUploadField": {
     "remove": "Supprimer",
     "upload": "Importer",
