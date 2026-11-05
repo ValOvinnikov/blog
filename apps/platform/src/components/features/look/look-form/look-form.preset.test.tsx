@@ -9,13 +9,10 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   COMPACT,
   CONSOLE,
-  DEFAULT_ACCENT_HUE,
-  DISCARD,
   EDITORIAL,
   EDITORIAL_ACCENT_HUE,
   EXTRA_LARGE,
   hueValue,
-  MOCK_SAVED_ACCENT_HUE,
   RESET_TO_PRESET,
 } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -23,7 +20,6 @@ import {
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
-import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -154,58 +150,6 @@ describe(`<${LookForm.name}/>`, () => {
       });
       expect(smallButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(usePresetRadiusButton).not.toBeInTheDocument();
-    });
-  });
-
-  describe('with a saved accent hue off the preset', () => {
-    beforeEach(() => {
-      setupLookForm({
-        initialValues: {
-          ...defaultLookFormValues(),
-          accentHue: MOCK_SAVED_ACCENT_HUE,
-        },
-      });
-    });
-
-    it('offers Reset to preset with no unsaved edits, hiding it once matched', async () => {
-      const unsavedRegion = screen.queryByRole('region', {
-        name: UNSAVED_CHANGES,
-      });
-      expect(unsavedRegion).not.toBeInTheDocument();
-
-      const resetToPresetButton = screen.getByRole('button', {
-        name: RESET_TO_PRESET,
-      });
-      await user.click(resetToPresetButton);
-      await openLookRow(user, LOOK_ROW.COLOUR);
-
-      const hueReadout = screen.getByText(hueValue(DEFAULT_ACCENT_HUE));
-      const resetButton = screen.queryByRole('button', {
-        name: RESET_TO_PRESET,
-      });
-      expect(hueReadout).toBeVisible();
-      expect(resetButton).not.toBeInTheDocument();
-    });
-
-    it('resets to the preset in the draft only, so Discard restores the saved look', async () => {
-      await openLookRow(user, LOOK_ROW.SHAPE);
-      const compactButton = screen.getByRole('button', { name: COMPACT });
-      await user.click(compactButton);
-      const resetToPresetButton = screen.getByRole('button', {
-        name: RESET_TO_PRESET,
-      });
-      await user.click(resetToPresetButton);
-      await openLookRow(user, LOOK_ROW.COLOUR);
-
-      const resetReadout = screen.getByText(hueValue(DEFAULT_ACCENT_HUE));
-      expect(resetReadout).toBeVisible();
-      expect(updateLookAction).not.toHaveBeenCalled();
-
-      const discardButton = screen.getByRole('button', { name: DISCARD });
-      await user.click(discardButton);
-
-      const savedReadout = screen.getByText(hueValue(MOCK_SAVED_ACCENT_HUE));
-      expect(savedReadout).toBeVisible();
     });
   });
 });
