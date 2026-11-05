@@ -1,7 +1,7 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import { LOOK_FIELD, type TTenantPlan } from '@blog/db/constants';
 import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
@@ -128,7 +128,9 @@ export const LookForm = ({
                 hasCookieBanner={hasCookieBanner}
                 hasMultipleLanguages={hasMultipleLanguages}
                 summaries={buildLookRowSummaries(lookForm.values, t, {
-                  hasMultipleLanguages,
+                  hasMultipleLanguages:
+                    hasMultipleLanguages &&
+                    !lookForm.isLocked(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE),
                 })}
               />
             </div>

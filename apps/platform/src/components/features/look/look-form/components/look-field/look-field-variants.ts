@@ -3,6 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const lookFieldVariants = tv({
   slots: {
     field: ['flex min-w-0 flex-col gap-1.5'],
+    labelRow: ['flex flex-wrap items-center gap-2'],
     label: [
       'flex items-center gap-2 text-admin-13 leading-admin-18 font-semibold text-admin-text',
     ],

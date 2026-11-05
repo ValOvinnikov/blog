@@ -657,6 +657,9 @@
     "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
+    "languageSwitcherFreeDescription": "Votre formule publie une seule langue. Passez à une formule supérieure pour ajouter des langues et choisir un style de sélecteur.",
+    "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
+    "lockLineTypeFonts": "Avec Free, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Menu avec code",
       "MENU_GLOBE": "Menu avec globe",
@@ -865,7 +868,8 @@
     "styleCard": "<strong>{card}</strong> modifie toute la page, le cadre reste donc où il est.",
     "idle": "Ouvrez une carte des Parties du site et le cadre défile jusqu’à elle.",
     "off": "Le suivi est désactivé. Le cadre reste où vous le laissez.",
-    "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle."
+    "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle.",
+    "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles qu'un site Free publie."
   },
   "assetUploadField": {
     "remove": "Supprimer",

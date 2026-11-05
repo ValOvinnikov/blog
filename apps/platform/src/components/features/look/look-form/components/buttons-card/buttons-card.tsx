@@ -7,11 +7,13 @@ import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
+import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
+import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
 export type TButtonsCardProps = {
@@ -26,6 +28,9 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
   const t = useTranslations('lookForm');
   const busyLock = useLookFieldLock('busyButtonStyle');
   const spinnerLock = useLookFieldLock('spinnerStyle');
+  const { lockLine, hasGrowthBadge } = useLookRowLock(
+    CARD_FIELDS[LOOK_ROW.BUTTONS],
+  );
 
   const busyOptions = toOptions(BUSY_BUTTON_STYLE, (style) =>
     t(`busyButtonStyleOptionLabel.${style}`),
@@ -40,20 +45,24 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       summary={summary}
       card={LOOK_ROW.BUTTONS}
       description={t('buttonsDescription')}
+      lockLine={lockLine}
+      hasGrowthBadge={hasGrowthBadge}
     >
       <LookField
         field="busyButtonStyle"
         label={t('busyButtonStyleLabel')}
         hint={t('busyButtonStyleDescription')}
         isGroup={true}
-        lock={busyLock.lock}
+        labelId={busyLock.labelId}
+        growthBadgeId={busyLock.growthBadgeId}
       >
         <SegmentedControl<TBusyButtonStyle>
-          aria={{ describedBy: busyLock.describedBy }}
+          aria={busyLock.aria}
           options={busyOptions}
           value={busyButtonStyle}
           onChange={(style) => updateField('busyButtonStyle', style)}
           isDisabled={busyLock.isDisabled}
+          isLocked={busyLock.isLocked}
         />
       </LookField>
 
@@ -61,15 +70,17 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
         field="spinnerStyle"
         label={t('spinnerStyleLabel')}
         hint={t('spinnerStyleDescription')}
-        lock={spinnerLock.lock}
+        labelId={spinnerLock.labelId}
+        growthBadgeId={spinnerLock.growthBadgeId}
       >
         <OptionSelect
           appearance={SELECT_APPEARANCE.COMPACT}
-          aria={{ describedBy: spinnerLock.describedBy }}
+          aria={spinnerLock.aria}
           options={spinnerOptions}
           value={spinnerStyle}
           onChange={(style) => updateField('spinnerStyle', style)}
           isDisabled={spinnerLock.isDisabled}
+          isLocked={spinnerLock.isLocked}
         />
       </LookField>
     </LookCard>

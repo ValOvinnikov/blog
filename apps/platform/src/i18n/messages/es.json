@@ -657,6 +657,9 @@
     "languageSwitcherStyleLabel": "Estilo",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
+    "languageSwitcherFreeDescription": "Tu plan publica un idioma. Mejora el plan para añadir idiomas y elegir un estilo de selector.",
+    "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
+    "lockLineTypeFonts": "En Free, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Menú con código",
       "MENU_GLOBE": "Menú con globo",
@@ -865,7 +868,8 @@
     "styleCard": "<strong>{card}</strong> cambia toda la página, así que el marco se queda donde está.",
     "idle": "Abre una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
     "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
-    "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella."
+    "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
+    "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica un sitio Free."
   },
   "assetUploadField": {
     "remove": "Quitar",

@@ -2,13 +2,16 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   type TLanguageSwitcherStyle,
 } from '@blog/config';
+import { LOOK_FIELD } from '@blog/db/constants';
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
+import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
 import { languageSwitcherCardVariants } from './language-switcher-card-variants';
@@ -25,35 +28,47 @@ export const LanguageSwitcherCard = ({
   const {
     values: { languageSwitcherStyle },
     updateField,
+    isLocked: isPlanLocked,
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const { isDisabled, describedBy, lock } = useLookFieldLock(
-    'languageSwitcherStyle',
+  const { isDisabled, isLocked, aria, labelId, growthBadgeId } =
+    useLookFieldLock(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
+  const { hasGrowthBadge } = useLookRowLock(
+    CARD_FIELDS[LOOK_ROW.LANGUAGE_SWITCHER],
   );
+  const isStylePlanLocked = isPlanLocked(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
 
   const languageSwitcherOptions = toOptions(LANGUAGE_SWITCHER_STYLE, (style) =>
     t(`languageSwitcherOptionLabel.${style}`),
   );
+  const description = t('languageSwitcherDescription');
 
   return (
     <LookCard
       summary={summary}
       card={LOOK_ROW.LANGUAGE_SWITCHER}
-      description={t('languageSwitcherDescription')}
+      description={isStylePlanLocked ? undefined : description}
+      lockLine={
+        isStylePlanLocked ? t('languageSwitcherFreeDescription') : undefined
+      }
+      hasGrowthBadge={hasGrowthBadge}
     >
-      {hasMultipleLanguages ? (
+      {isStylePlanLocked || hasMultipleLanguages ? (
         <LookField
           field="languageSwitcherStyle"
           label={t('languageSwitcherStyleLabel')}
+          hint={isStylePlanLocked ? description : undefined}
           isGroup={true}
-          lock={lock}
+          labelId={labelId}
+          growthBadgeId={growthBadgeId}
         >
           <SegmentedControl<TLanguageSwitcherStyle>
-            aria={{ describedBy }}
+            aria={aria}
             options={languageSwitcherOptions}
             value={languageSwitcherStyle}
             onChange={(style) => updateField('languageSwitcherStyle', style)}
             isDisabled={isDisabled}
+            isLocked={isLocked}
           />
         </LookField>
       ) : (

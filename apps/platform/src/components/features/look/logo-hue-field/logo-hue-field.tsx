@@ -7,7 +7,7 @@ import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
-import type { AriaAttributes } from 'react';
+import { useId, type AriaAttributes } from 'react';
 
 import { logoHueFieldVariants } from './logo-hue-field-variants';
 
@@ -16,6 +16,8 @@ export type TLogoHueFieldProps = {
   logoHue: TMaybeUndefined<number>;
   onChange: (logoHue: TMaybeUndefined<number>) => void;
   isDisabled?: boolean;
+  isLocked?: boolean;
+  growthBadgeId?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
@@ -29,9 +31,13 @@ export const LogoHueField = ({
   logoHue,
   onChange,
   isDisabled = false,
+  isLocked = false,
+  growthBadgeId,
   'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
+  const captionId = useId();
+  const followAccentHue = t('followAccentHue');
   const follows = isUndefined(logoHue);
   const resolvedHue = logoHue ?? accentHue;
   const tones = buildLogoPreviewTokens(resolvedHue, false);
@@ -42,17 +48,34 @@ export const LogoHueField = ({
     tones: tonesSlot,
     tone,
     hueValue,
+    switchRow,
+    readout,
   } = logoHueFieldVariants();
 
   return (
     <div className={root()}>
-      <Switch
-        aria={{ label: t('followAccentHue'), describedBy: ariaDescribedBy }}
-        isChecked={follows}
-        onCheckedChange={(checked) => onChange(checked ? undefined : accentHue)}
-        labels={{ caption: t('followAccentHue') }}
-        isDisabled={isDisabled}
-      />
+      <div className={switchRow()}>
+        <Switch
+          aria={
+            growthBadgeId
+              ? {
+                  labelledBy: `${captionId} ${growthBadgeId}`,
+                  describedBy: ariaDescribedBy,
+                }
+              : { label: followAccentHue, describedBy: ariaDescribedBy }
+          }
+          isChecked={follows}
+          onCheckedChange={(checked) =>
+            onChange(checked ? undefined : accentHue)
+          }
+          labels={{ caption: followAccentHue, captionId }}
+          isDisabled={isDisabled}
+          isLocked={isLocked}
+        />
+        {isLocked && follows && (
+          <span className={readout()}>{t('followsAccent')}</span>
+        )}
+      </div>
 
       {!follows && (
         <div className={hueField()}>
@@ -80,7 +103,7 @@ export const LogoHueField = ({
             name={{ ariaLabel: t('logoHueAriaLabel') }}
             value={resolvedHue}
             onChange={onChange}
-            isDisabled={isDisabled}
+            isDisabled={isDisabled || isLocked}
             aria-describedby={ariaDescribedBy}
           />
           <span className={hueValue()}>
