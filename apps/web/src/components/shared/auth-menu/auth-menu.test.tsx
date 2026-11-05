@@ -11,7 +11,10 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
 import { act, customRender, screen, within } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
-import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
+import {
+  ARIA_EXPANDED,
+  ARIA_INVALID,
+} from '@web/testing/shared/aria/constants';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
 
 import { AuthMenu } from './auth-menu';
@@ -57,6 +60,14 @@ const MOCK_READER_EMAIL = faker.internet.email();
 const MOCK_MALFORMED_EMAIL = faker.string.alpha(12);
 const MOCK_SESSION_EXPIRES = '2099-01-01T00:00:00.000Z';
 const MOCK_OAUTH_ERROR = faker.string.alpha(12);
+const SEND_FAILURES = [
+  { title: 'fails', code: undefined, message: EMAIL_ERROR },
+  {
+    title: 'is over the send limit',
+    code: MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED,
+    message: SEND_LIMITED,
+  },
+];
 const CIRCLE_IN_BAR = {
   ...MOCK_ACCOUNT_CONTROL,
   buttonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
@@ -382,14 +393,7 @@ describe(`<${AuthMenu.name}/>`, () => {
       });
     });
 
-    it.each([
-      { title: 'fails', code: undefined, message: EMAIL_ERROR },
-      {
-        title: 'is over the send limit',
-        code: MAGIC_LINK_SIGN_IN_CODE.SEND_LIMITED,
-        message: SEND_LIMITED,
-      },
-    ])(
+    it.each(SEND_FAILURES)(
       'shows the error under the field when the send $title',
       async ({ code, message }) => {
         mockSignInResult(false, code);
@@ -446,6 +450,58 @@ describe(`<${AuthMenu.name}/>`, () => {
       expect(error).toBeVisible();
       expect(invalidError).not.toBeInTheDocument();
     });
+
+    it('clears the invalid-email error as soon as the reader types', async () => {
+      setup();
+      const panel = await sendLink(MOCK_MALFORMED_EMAIL);
+      const emailField = within(panel).getByRole('textbox', {
+        name: EMAIL_FIELD,
+      });
+      await within(panel).findByText(EMAIL_INVALID);
+      await user.type(emailField, faker.string.alpha(1));
+
+      const error = within(panel).queryByText(EMAIL_INVALID);
+
+      expect(error).not.toBeInTheDocument();
+      expect(emailField).toHaveAttribute(ARIA_INVALID, 'false');
+    });
+
+    it('shows the invalid-email error again when the still-invalid address is submitted', async () => {
+      setup();
+      const panel = await sendLink(MOCK_MALFORMED_EMAIL);
+      const emailField = within(panel).getByRole('textbox', {
+        name: EMAIL_FIELD,
+      });
+      await user.type(emailField, faker.string.alpha(1));
+      const sendButton = within(panel).getByRole('button', {
+        name: SEND_LINK_LABEL,
+      });
+      await user.click(sendButton);
+
+      const error = await within(panel).findByText(EMAIL_INVALID);
+
+      expect(error).toBeVisible();
+      expect(emailField).toHaveAttribute(ARIA_INVALID, 'true');
+    });
+
+    it.each(SEND_FAILURES)(
+      'clears the error as soon as the reader types after the send $title',
+      async ({ code, message }) => {
+        mockSignInResult(false, code);
+        setup();
+        const panel = await sendLink();
+        const emailField = within(panel).getByRole('textbox', {
+          name: EMAIL_FIELD,
+        });
+        await within(panel).findByText(message);
+        await user.type(emailField, faker.string.alpha(1));
+
+        const error = within(panel).queryByText(message);
+
+        expect(error).not.toBeInTheDocument();
+        expect(emailField).toHaveAttribute(ARIA_INVALID, 'false');
+      },
+    );
 
     it('forgets a remembered sign-in once the session resolves signed out', () => {
       document.cookie = `${SIGNED_IN_HINT_COOKIE_NAME}=1; Path=/`;
