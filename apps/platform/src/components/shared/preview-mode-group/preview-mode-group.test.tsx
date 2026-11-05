@@ -1,10 +1,11 @@
 import { PREVIEW_MODE } from '@platform/constants/preview';
+import en from '@platform/i18n/messages/en.json';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { PreviewModeGroup } from './preview-mode-group';
 
-const GROUP_NAME = 'Preview colour scheme';
+const GROUP_NAME = en.previewModeControl.previewColorSchemeAriaLabel;
 const LIGHT = 'Light';
 const DARK = 'Dark';
 

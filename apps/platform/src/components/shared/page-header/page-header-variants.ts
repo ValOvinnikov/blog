@@ -12,6 +12,9 @@ export const pageHeaderVariants = tv({
     isTitleHiddenBelowLg: {
       true: {},
     },
+    isActionsFullWidthBelowMd: {
+      true: { actions: ['max-md:w-full'] },
+    },
     hasActions: {
       true: {},
     },
