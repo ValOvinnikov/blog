@@ -27,7 +27,6 @@
   --admin-bad: #b42318;
   --admin-bad-weak: #fdeceb;
   --admin-bad-line: #dd6152;
-  --admin-warn-on-dark: #f5c451;
   --admin-side: #eef0f3;
   --admin-side-line: #d9dde4;
   --admin-side-text: #2a303b;
@@ -131,7 +130,6 @@
   --admin-bad: #fca5a0;
   --admin-bad-weak: #331716;
   --admin-bad-line: #e5675a;
-  --admin-warn-on-dark: #f5c451;
   --admin-side: #0a0c0f;
   --admin-side-line: #1c1f26;
   --admin-side-text: #c9cfda;
@@ -203,7 +201,6 @@
     --admin-bad: #fca5a0;
     --admin-bad-weak: #331716;
     --admin-bad-line: #e5675a;
-    --admin-warn-on-dark: #f5c451;
     --admin-side: #0a0c0f;
     --admin-side-line: #1c1f26;
     --admin-side-text: #c9cfda;
@@ -278,7 +275,6 @@
   --color-admin-bad: var(--admin-bad);
   --color-admin-bad-weak: var(--admin-bad-weak);
   --color-admin-bad-line: var(--admin-bad-line);
-  --color-admin-warn-on-dark: var(--admin-warn-on-dark);
   --color-admin-side: var(--admin-side);
   --color-admin-side-line: var(--admin-side-line);
   --color-admin-side-text: var(--admin-side-text);

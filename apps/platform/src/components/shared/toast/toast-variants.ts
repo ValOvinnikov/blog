@@ -6,39 +6,52 @@ import { tv } from '@platform/utils/tv/tv';
 export const toastVariants = tv({
   slots: {
     root: [
-      'pointer-events-auto flex max-w-[400px] items-center gap-[9px]',
-      'rounded-admin bg-admin-tooltip px-[14px] py-[11px]',
-      'text-admin-13 text-white shadow-admin-lg',
+      'pointer-events-auto relative flex max-w-[400px] items-center gap-[9px] overflow-hidden',
+      'rounded-admin border border-l-0 border-admin-popover-line bg-admin-popover px-[14px] py-[11px]',
+      'text-admin-13 text-admin-text shadow-admin-lg',
+      'before:absolute before:inset-y-0 before:left-0 before:w-admin-bar',
       'transition-[opacity,transform] duration-[300ms] ease-out',
       'motion-reduce:transition-none',
     ],
-    glyph: ['shrink-0 text-admin-13 leading-none font-bold'],
+    icon: [],
     spinner: [
       'inline-block size-3.5 shrink-0 animate-spin rounded-full',
-      'border-2 border-white/30 border-t-white',
+      'border-2 border-admin-text/25 border-t-admin-text',
       'motion-reduce:animate-none',
     ],
     message: ['min-w-0 flex-1'],
     titleText: ['mr-1 font-semibold'],
-    time: ['shrink-0 text-white/60'],
+    time: ['shrink-0 text-admin-muted'],
     action: [
-      'shrink-0 cursor-pointer font-semibold text-white underline-offset-2',
+      'shrink-0 cursor-pointer font-semibold text-admin-text underline-offset-2',
       'hover:underline',
     ],
-    actionKey: ['ml-1 text-white/50'],
+    actionKey: ['ml-1 text-admin-muted'],
     dismiss: [
-      'shrink-0 cursor-pointer text-white opacity-55',
-      'hover:opacity-100',
-      'focus-visible:opacity-100',
-      focusRingClasses(FOCUS_RING_GROUND.TOAST),
+      'shrink-0 cursor-pointer rounded-admin-control text-admin-muted',
+      'hover:text-admin-text',
+      'focus-visible:text-admin-text',
+      focusRingClasses(FOCUS_RING_GROUND.POPOVER),
     ],
   },
   variants: {
     type: {
-      [TOAST_TYPE.SUCCESS]: { glyph: ['text-white'] },
-      [TOAST_TYPE.INFO]: { glyph: ['text-white'] },
-      [TOAST_TYPE.WARNING]: { glyph: ['text-admin-warn-on-dark'] },
-      [TOAST_TYPE.ERROR]: { glyph: ['text-white'] },
+      [TOAST_TYPE.SUCCESS]: {
+        root: ['before:bg-admin-ok'],
+        icon: ['text-admin-ok'],
+      },
+      [TOAST_TYPE.INFO]: {
+        root: ['before:bg-admin-brand-ink'],
+        icon: ['text-admin-brand-ink'],
+      },
+      [TOAST_TYPE.WARNING]: {
+        root: ['before:bg-admin-warn'],
+        icon: ['text-admin-warn'],
+      },
+      [TOAST_TYPE.ERROR]: {
+        root: ['before:bg-admin-bad'],
+        icon: ['text-admin-bad'],
+      },
     },
     phase: {
       entering: { root: ['translate-x-2 opacity-0'] },

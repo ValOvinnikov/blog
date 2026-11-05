@@ -1,6 +1,8 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { Button } from '@platform/components/shared/button';
+import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { useTranslations } from 'next-intl';
 
 import type { IToastRecord } from './toast-record';
@@ -9,13 +11,6 @@ import { toastVariants } from './toast-variants';
 type TToastProps = {
   record: IToastRecord;
   onDismiss: () => void;
-};
-
-const TOAST_GLYPH: Record<TToastType, string> = {
-  [TOAST_TYPE.SUCCESS]: '✓',
-  [TOAST_TYPE.INFO]: 'i',
-  [TOAST_TYPE.WARNING]: '⚠',
-  [TOAST_TYPE.ERROR]: '!',
 };
 
 const TOAST_ROLE: Record<TToastType, 'status' | 'alert'> = {
@@ -36,9 +31,11 @@ export const Toast = ({ record, onDismiss }: TToastProps) => {
       {isLoading ? (
         <span className={s.spinner()} aria-hidden="true" />
       ) : (
-        <span className={s.glyph()} aria-hidden="true">
-          {TOAST_GLYPH[type]}
-        </span>
+        <Icon
+          name={STATUS_ICON[type]}
+          size={ICON_SIZE.XS}
+          className={s.icon()}
+        />
       )}
       <span className={s.message()}>
         {title && <strong className={s.titleText()}>{title}</strong>}

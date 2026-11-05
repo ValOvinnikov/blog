@@ -1,6 +1,8 @@
 import { TOAST_TYPE } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { ICON_TEST_ID } from '@platform/constants/icon';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_HIDDEN } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -8,8 +10,6 @@ import { Toast } from './toast';
 import type { IToastRecord } from './toast-record';
 
 faker.seed(5995);
-
-const INFO_GLYPH = 'i';
 
 const MOCK_MESSAGE = faker.lorem.sentence();
 const MOCK_TITLE = faker.lorem.word();
@@ -109,15 +109,26 @@ describe(`<${Toast.name}/>`, () => {
     expect(onAct).toHaveBeenCalledOnce();
   });
 
-  it('hides the type glyph while loading', () => {
+  it.each(Object.values(TOAST_TYPE))(
+    'hides the %s status icon from assistive technology',
+    (type) => {
+      setup({ record: mockToastRecord({ type }) });
+
+      const icon = screen.getByTestId(ICON_TEST_ID);
+
+      expect(icon).toHaveAttribute(ARIA_HIDDEN, 'true');
+    },
+  );
+
+  it('hides the status icon while loading', () => {
     setup({
       record: mockToastRecord({ type: TOAST_TYPE.INFO, isLoading: true }),
     });
 
     const message = screen.getByText(MOCK_MESSAGE);
-    const glyph = screen.queryByText(INFO_GLYPH);
+    const icon = screen.queryByTestId(ICON_TEST_ID);
 
     expect(message).toBeVisible();
-    expect(glyph).not.toBeInTheDocument();
+    expect(icon).not.toBeInTheDocument();
   });
 });
