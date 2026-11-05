@@ -410,6 +410,44 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     expect(saveBar).not.toBeInTheDocument();
   });
 
+  describe('with the phone save footer', () => {
+    const phoneFooterLayout = { layout: { hasPhoneSaveFooter: true } };
+
+    it('keeps the footer saying all changes are saved with no unsaved changes', () => {
+      renderShell({}, phoneFooterLayout);
+
+      const footer = screen.getByRole('region', { name: ALL_CHANGES_SAVED });
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(footer).toBeVisible();
+      expect(saveBar).not.toBeInTheDocument();
+    });
+
+    it('offers Discard only in the docked bar, never in the footer', () => {
+      renderShell({ changeCount: 3 }, phoneFooterLayout);
+
+      const footer = screen.getByRole('region', {
+        name: THREE_UNSAVED_CHANGES,
+      });
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const footerDiscard = within(footer).queryByRole('button', {
+        name: DISCARD,
+      });
+      const barDiscard = within(saveBar).getByRole('button', { name: DISCARD });
+
+      expect(footerDiscard).not.toBeInTheDocument();
+      expect(barDiscard).toBeVisible();
+    });
+
+    it('offers no footer to an archived tenant', () => {
+      renderShell({ archivedAt: MOCK_ARCHIVED_AT }, phoneFooterLayout);
+
+      const footer = screen.queryByRole('region', { name: ALL_CHANGES_SAVED });
+
+      expect(footer).not.toBeInTheDocument();
+    });
+  });
+
   it('shows the error alert when an error title is set', () => {
     renderShell({}, { errorTitle: MOCK_ERROR_TITLE });
 

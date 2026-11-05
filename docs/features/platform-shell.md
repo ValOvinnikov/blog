@@ -120,8 +120,22 @@ when archived), and the document's `scroll-padding-bottom` is the bar's 64px
 plus 16px so a focused field never sits under the bar. The 64 and 16 are the
 `--spacing-admin-dock` / `-clearance` tokens, kept equal to
 `LOOK_LAYOUT_LIMIT`. A page may opt out of the head's "All changes saved"
-status (`hasSavedStatus={false}`); Voice does. Below `md` the bar is the
-floating card at the foot of the page.
+status (`hasSavedStatus={false}`); Voice does. Below `md` the bar spans the
+viewport bottom edge to edge with Discard and Save, and the page keeps 120px
+of room while it shows.
+
+Voice opts into its own phone footer below `md` (`layout.hasPhoneSaveFooter`)
+in place of that bar; from `md` it docks like every other page. The footer is
+fixed to the viewport bottom, full width, flat with a top border, and stays
+mounted when clean (never for an archived tenant). It is a region named by its
+own status text — "N unsaved changes" with a dot, "All changes saved" with
+Save disabled, or "N fields need attention" on a first row above "Go to the
+first one" — and has Save changes but no Discard and no shortcut hint. While
+saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
+outside Voice's `inert` content. Below `md` Voice keeps 96px of room
+(`--spacing-admin-phone-footer-room`, clearing the 85px two-row error footer,
+`--spacing-admin-phone-footer-max`) and a `scroll-padding-bottom` of that 85
+plus 16; an archived Voice page ends at 48px.
 
 ## Data
 
