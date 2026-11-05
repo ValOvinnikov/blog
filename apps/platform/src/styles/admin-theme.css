@@ -34,6 +34,7 @@
   --admin-side-muted: #5b6472;
   --admin-side-raised: #ffffff;
   --admin-side-accent: #4f46e5;
+  --admin-follow-mark: #4f46e5;
   --admin-side-field: #ffffff;
   --admin-side-field-line: #7c8493;
   --admin-rail: #0f1115;
@@ -263,6 +264,7 @@
   --color-admin-muted: var(--admin-muted);
   --color-admin-faint: var(--admin-faint);
   --color-admin-brand: var(--admin-brand);
+  --color-admin-follow-mark: var(--admin-follow-mark);
   --color-admin-brand-ink: var(--admin-brand-ink);
   --color-admin-brand-strong: var(--admin-brand-strong);
   --color-admin-brand-weak: var(--admin-brand-weak);

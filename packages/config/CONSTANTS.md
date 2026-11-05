@@ -365,11 +365,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/device-frame` — `apps/platform/src/constants/device-frame.ts`
 
 - **DEVICE_FRAME_FIT**: `PAGE`, `STAGE`, `FULLSCREEN`
-- **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`
+- **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`, `HAND_SCROLL_WINDOW_MS`=`300`
 - **DEVICE_FRAME_SIZE**: `BORDER`=`1`, `BEZEL_PADDING`=`6`, `BROWSER_BAR_HEIGHT`=`28`
 - **DEVICE_FRAME_AXIS**: `VERTICAL`, `HORIZONTAL`
 - **DEVICE_FRAME_SCROLL_TARGET**: `TOP`, `END`
-- **DEVICE_FRAME_TEST_ID**: `FRAME`=`"device-frame"`, `VIEWPORT`=`"device-frame-viewport"`, `CONTENT`=`"device-frame-content"`, `BROWSER_BAR`=`"device-frame-browser-bar"`, `VERTICAL_SCROLLBAR`=`"device-frame-vertical-scrollbar"`, `HORIZONTAL_SCROLLBAR`=`"device-frame-horizontal-scrollbar"`
+- **DEVICE_FRAME_TEST_ID**: `FRAME`=`"device-frame"`, `VIEWPORT`=`"device-frame-viewport"`, `SCROLLER`=`"device-frame-scroller"`, `CONTENT`=`"device-frame-content"`, `BROWSER_BAR`=`"device-frame-browser-bar"`, `VERTICAL_SCROLLBAR`=`"device-frame-vertical-scrollbar"`, `HORIZONTAL_SCROLLBAR`=`"device-frame-horizontal-scrollbar"`
 
 ### `@platform/constants/dialog-backdrop` — `apps/platform/src/constants/dialog-backdrop.ts`
 

@@ -8,18 +8,15 @@ import { Icon } from '@platform/components/shared/icon';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ICON_SIZE } from '@platform/constants/icon';
-import {
-  LOOK_FOLLOW_OUTCOME,
-  LOOK_FOLLOW_TARGET,
-} from '@platform/constants/look-follow';
+import { LOOK_FOLLOW_OUTCOME } from '@platform/constants/look-follow';
 import {
   PREVIEW_DEVICE,
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
 
+import { LookFollowSentence } from './components/look-follow-sentence';
 import { lookFollowStatusVariants } from './look-follow-status-variants';
 
 export type TLookFollowStatusProps = {
@@ -29,8 +26,6 @@ export type TLookFollowStatusProps = {
   isShortLine: boolean;
   readerNote: TMaybeUndefined<string>;
 };
-
-const strong = (chunks: ReactNode) => <strong>{chunks}</strong>;
 
 export const LookFollowStatus = ({
   follow,
@@ -45,33 +40,6 @@ export const LookFollowStatus = ({
     follow;
   const { action, topIcon } = lookFollowStatusVariants();
   const part = row ? tForm(LOOK_ROW_TITLE_KEY[row]) : '';
-  const values = { part, strong };
-
-  const sentence = (): ReactNode => {
-    if (!isOn) return t('off');
-    if (target.kind === LOOK_FOLLOW_TARGET.IDLE) return t('idle');
-    if (target.kind === LOOK_FOLLOW_TARGET.ALL_OPEN) return t('allOpen');
-    if (target.kind === LOOK_FOLLOW_TARGET.STYLE) {
-      return t.rich('styleCard', {
-        card: tForm(LOOK_ROW_TITLE_KEY[target.row]),
-        strong,
-      });
-    }
-    if (isPaused) return t('paused');
-    if (isShortLine || !settled) return t.rich('short', values);
-    switch (settled.outcome) {
-      case LOOK_FOLLOW_OUTCOME.NEARLY_FITS:
-        return t.rich('nearlyFits', { ...values, overflow: settled.overflow });
-      case LOOK_FOLLOW_OUTCOME.AT_END:
-        return t.rich('atEnd', values);
-      case LOOK_FOLLOW_OUTCOME.AT_TOP:
-        return t.rich('atTop', values);
-      case LOOK_FOLLOW_OUTCOME.FITS:
-        return t.rich('fits', { ...values, device });
-      default:
-        return t.rich('inView', values);
-    }
-  };
 
   const isTopOfPageShown =
     isFollowing &&
@@ -106,13 +74,13 @@ export const LookFollowStatus = ({
       isAccent={!isPauseIcon}
       action={trailing || undefined}
     >
-      {sentence()}
-      {readerNote && (
-        <>
-          {' '}
-          <span>{readerNote}</span>
-        </>
-      )}
+      <LookFollowSentence
+        follow={follow}
+        target={target}
+        device={device}
+        isShortLine={isShortLine}
+      />
+      {readerNote && ` ${readerNote}`}
     </PreviewFrame.Status>
   );
 };

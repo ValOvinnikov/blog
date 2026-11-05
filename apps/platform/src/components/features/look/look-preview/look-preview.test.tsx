@@ -19,6 +19,7 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   PREVIEW_DEVICE,
+  PREVIEW_FRAME_STATUS_TEST_ID,
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
@@ -165,10 +166,10 @@ describe(`<${LookPreview.name}/>`, () => {
     const readerGroup = screen.getByRole('group', {
       name: LOOK_PREVIEW.readerStateAriaLabel,
     });
-    const offNote = screen.queryByText(LOOK_PREVIEW.readerAccountsOff);
+    const statusText = screen.getByTestId(PREVIEW_FRAME_STATUS_TEST_ID);
 
     expect(readerGroup).toBeVisible();
-    expect(offNote).not.toBeInTheDocument();
+    expect(statusText).not.toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
   });
 
   it('explains the missing reader switch when reader accounts are off', () => {
@@ -177,10 +178,10 @@ describe(`<${LookPreview.name}/>`, () => {
     const readerGroup = screen.queryByRole('group', {
       name: LOOK_PREVIEW.readerStateAriaLabel,
     });
-    const offNote = screen.getByText(LOOK_PREVIEW.readerAccountsOff);
+    const statusText = screen.getByTestId(PREVIEW_FRAME_STATUS_TEST_ID);
 
     expect(readerGroup).not.toBeInTheDocument();
-    expect(offNote).toBeVisible();
+    expect(statusText).toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
   });
 
   it('re-derives the accent tokens for the dark preview mode', async () => {

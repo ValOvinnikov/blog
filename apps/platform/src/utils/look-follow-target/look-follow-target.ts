@@ -33,15 +33,14 @@ const isSitePartsRow = (row: TLookRow): row is TSitePartsRow =>
 export const toLookFollowTarget = (
   openRows: readonly TLookRow[],
   editedCard: TMaybeUndefined<TLookCard>,
+  isAllOpen: boolean,
 ): TLookFollowTarget => {
   const row =
     openRows.find((openRow) => openRow === editedCard) ??
     (hasArrayGotMultipleItems(openRows) ? undefined : openRows[0]);
   if (!row) {
     return {
-      kind: hasArrayGotMultipleItems(openRows)
-        ? LOOK_FOLLOW_TARGET.ALL_OPEN
-        : LOOK_FOLLOW_TARGET.IDLE,
+      kind: isAllOpen ? LOOK_FOLLOW_TARGET.ALL_OPEN : LOOK_FOLLOW_TARGET.IDLE,
     };
   }
   return isSitePartsRow(row)

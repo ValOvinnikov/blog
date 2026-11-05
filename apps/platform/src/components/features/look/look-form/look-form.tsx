@@ -143,8 +143,9 @@ export const LookForm = ({
                 followTarget={toLookFollowTarget(
                   jumpIndex.openRows,
                   jumpIndex.editedCard,
+                  jumpIndex.isAllOpen,
                 )}
-                isShown={!hasTabPanels || view === 'preview'}
+                isShown={!hasTabPanels || isPreviewTab}
               />
             </div>
           </div>

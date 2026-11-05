@@ -66,7 +66,7 @@ const DeviceFrameRoot = ({
     sizer,
     verticalThumb,
     horizontalThumb,
-    scrollerHandlers,
+    scrollerProps,
   } = useDeviceFrame({ device, fit, onScaleChange, onHandScroll, ref });
   const {
     stage,
@@ -102,7 +102,7 @@ const DeviceFrameRoot = ({
           style={{ width: viewport.width, height: viewport.height }}
           data-testid={DEVICE_FRAME_TEST_ID.VIEWPORT}
         >
-          <div ref={scrollerRef} className={scroller()} {...scrollerHandlers}>
+          <div ref={scrollerRef} className={scroller()} {...scrollerProps}>
             <div className={sizerSlot()} style={sizer}>
               <div
                 ref={contentRef}

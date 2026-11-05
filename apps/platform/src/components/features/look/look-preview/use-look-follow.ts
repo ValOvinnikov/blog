@@ -1,10 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
-import {
-  LOOK_FOLLOW_LIMIT,
-  LOOK_FOLLOW_TARGET,
-} from '@platform/constants/look-follow';
+import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import {
@@ -47,24 +44,43 @@ export const useLookFollow = ({
   }
 
   const row = target.kind === LOOK_FOLLOW_TARGET.PART ? target.row : undefined;
-  const isFollowing = isOn && !isPaused && !!row;
+  const scrollTarget = row
+    ? LOOK_FOLLOW_SCROLL[row]
+    : target.kind === LOOK_FOLLOW_TARGET.IDLE
+      ? DEVICE_FRAME_SCROLL_TARGET.TOP
+      : undefined;
+  const isActive = isOn && !isPaused;
+  const isFollowing = isActive && !!row;
   const layoutKey = `${device}|${isShown}|${scale}`;
-  const followKey = `${targetKey}|${layoutKey}|${request}`;
+  const settledKey = `${targetKey}|${device}|${request}`;
   const scrollBehavior: ScrollBehavior = isReducedMotion ? 'instant' : 'smooth';
 
   useEffect(() => {
     const isJump = layoutRef.current !== layoutKey;
     layoutRef.current = layoutKey;
     const frame = frameRef.current;
-    if (!isFollowing || !isShown || !row || !frame) return;
+    if (!isActive || !isShown || !scrollTarget || !frame) return;
     return followScroll({
       frame,
-      target: LOOK_FOLLOW_SCROLL[row],
+      target: scrollTarget,
       device,
       behavior: isJump ? 'instant' : scrollBehavior,
-      onSettled: (next) => setSettled({ ...next, key: followKey }),
+      onSettled: (next) =>
+        setSettled((previous) =>
+          previous?.key === settledKey
+            ? previous
+            : { ...next, key: settledKey },
+        ),
     });
-  }, [isFollowing, isShown, row, device, layoutKey, followKey, scrollBehavior]);
+  }, [
+    isActive,
+    isShown,
+    scrollTarget,
+    device,
+    layoutKey,
+    settledKey,
+    scrollBehavior,
+  ]);
 
   const refollow = () => {
     setIsPaused(false);
@@ -72,7 +88,9 @@ export const useLookFollow = ({
   };
 
   const currentSettled: TMaybeUndefined<TLookFollowSettled> =
-    settled?.key === followKey ? settled : undefined;
+    settled?.key === settledKey
+      ? { outcome: settled.outcome, overflow: settled.overflow }
+      : undefined;
 
   const follow = {
     row,
@@ -86,11 +104,7 @@ export const useLookFollow = ({
       else setIsPaused(false);
     },
     onHandScroll: () => {
-      const metrics = frameRef.current?.getScrollMetrics();
-      if (!isFollowing || !metrics) return;
-      if (metrics.maxTop > LOOK_FOLLOW_LIMIT.SCROLL_TOLERANCE) {
-        setIsPaused(true);
-      }
+      if (isFollowing) setIsPaused(true);
     },
     resume: refollow,
     scrollToTop: () => {

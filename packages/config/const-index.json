@@ -4832,6 +4832,14 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "device-frame-scroller": [
+      {
+        "ref": "DEVICE_FRAME_TEST_ID.SCROLLER",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
     "device-frame-content": [
       {
         "ref": "DEVICE_FRAME_TEST_ID.CONTENT",
@@ -8064,6 +8072,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "300": [
+      {
+        "ref": "DEVICE_FRAME_LIMIT.HAND_SCROLL_WINDOW_MS",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
     "303": [

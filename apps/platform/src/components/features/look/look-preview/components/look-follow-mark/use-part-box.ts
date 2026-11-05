@@ -1,12 +1,15 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { SAMPLE_PART_ATTRIBUTE } from '@platform/constants/sample-part';
+import {
+  SAMPLE_PART_ATTRIBUTE,
+  type TSamplePart,
+} from '@platform/constants/sample-part';
 import { useEffect, useState, type RefObject } from 'react';
 
 type TPartBox = { top: number; left: number; width: number; height: number };
 
 export const usePartBox = (
   markRef: RefObject<TMaybeNull<HTMLElement>>,
-  part: string,
+  part: TSamplePart,
   scale: number,
 ) => {
   const [box, setBox] = useState<TMaybeUndefined<TPartBox>>();
