@@ -1,5 +1,6 @@
 import { routes, type TVoiceFieldId, type VOICE_SURFACE } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import { Accordion } from '@platform/components/shared/accordion';
 import { FieldStatus } from '@platform/components/shared/field-status';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
@@ -57,8 +58,9 @@ export const VoiceListRow = ({
     routeHint: routeHintSlot,
     text,
     status,
+    panel,
     error: errorSlot,
-  } = voiceListRowVariants({ hasError: error !== undefined });
+  } = voiceListRowVariants({ hasError: !isUndefined(error) });
   const errorId = useId();
   const collapsedError = isOpen ? undefined : error;
   const isCustomised = isVoiceValueCustomised(value);
@@ -68,7 +70,7 @@ export const VoiceListRow = ({
     <Accordion.Item value={field.id}>
       <Accordion.Trigger
         headingLevel={4}
-        aria-describedby={collapsedError === undefined ? undefined : errorId}
+        aria-describedby={isUndefined(collapsedError) ? undefined : errorId}
       >
         <span className={labelGroup()}>
           <span className={label()}>{tLabels(field.id)}</span>
@@ -78,28 +80,26 @@ export const VoiceListRow = ({
             </span>
           )}
         </span>
-        {!isOpen && (
-          <>
-            <span className={text()}>
-              {isCustomised
-                ? voiceValueAsText(value)
-                : voiceDefaultText(locale, field)}
-            </span>
-            <span className={status()}>
-              <FieldStatus
-                isCustomised={isCustomised}
-                isUnsaved={!isSameJson(value, savedValue)}
-              />
-            </span>
-          </>
-        )}
+        <span className={text()}>
+          {isCustomised
+            ? voiceValueAsText(value)
+            : voiceDefaultText(locale, field)}
+        </span>
+        <span className={status()}>
+          <FieldStatus
+            isCustomised={isCustomised}
+            isUnsaved={!isSameJson(value, savedValue)}
+          />
+        </span>
       </Accordion.Trigger>
-      {collapsedError !== undefined && (
+      {!isUndefined(collapsedError) && (
         <Accordion.Note id={errorId} className={errorSlot()}>
           {collapsedError}
         </Accordion.Note>
       )}
-      <Accordion.Panel>{children}</Accordion.Panel>
+      <Accordion.Panel>
+        <div className={panel()}>{children}</div>
+      </Accordion.Panel>
     </Accordion.Item>
   );
 };

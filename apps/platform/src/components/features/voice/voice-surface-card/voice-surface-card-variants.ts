@@ -5,27 +5,13 @@ export const voiceSurfaceCardVariants = tv({
   slots: {
     card: [voiceAnchorVariants(), '[&_h3]:outline-hidden'],
     body: ['grid grid-cols-1 p-0 lg:grid-cols-2'],
-    fields: ['flex flex-col gap-4 p-[18px]'],
-    previewColumn: [
-      'px-[18px] pb-[18px]',
-      'lg:rounded-br-admin lg:border-l lg:border-admin-line lg:bg-admin-bg lg:p-4',
-    ],
-    previewContent: [
-      'flex flex-col gap-3 lg:sticky lg:top-admin-topbar lg:max-h-[calc(100dvh-160px)] lg:overflow-y-auto lg:overscroll-contain',
-    ],
-    previewToggle: ['w-full lg:hidden'],
-    preview: [
-      'flex flex-col gap-3',
-      'max-lg:border-l max-lg:border-admin-line max-lg:bg-admin-bg max-lg:p-4',
-    ],
-    previewLabel: [
-      'font-mono text-admin-11 font-bold uppercase tracking-admin-caps text-admin-muted',
-    ],
-    previewNote: ['text-admin-12 text-admin-muted'],
+    fields: ['flex min-w-0 flex-col gap-4 p-[18px]'],
   },
   variants: {
-    isPreviewOpen: {
-      false: { preview: ['max-lg:hidden'] },
+    isArchive: {
+      true: {
+        fields: ['max-lg:pb-0 max-md:px-3.5 max-md:pt-1'],
+      },
     },
   },
 });

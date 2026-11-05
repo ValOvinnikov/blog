@@ -62,6 +62,10 @@ export const STORED_VOICE_OVERRIDES = {
   },
 };
 
+export const STORED_BLOG_LIST_OVERRIDE = {
+  [EN]: { blogListEmpty: richText('Fresh notes soon', 'en-bl') },
+};
+
 const VoiceSettingsWithListSamples = (props: TVoiceSettingsProps) => (
   <VoiceListSamplesProvider
     samplesByLocale={{

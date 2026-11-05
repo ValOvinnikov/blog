@@ -90,14 +90,17 @@ describe(`<${VoiceListRow.name}/>`, () => {
     expect(errorText).not.toBeInTheDocument();
   });
 
-  it('trades the summary for its editor when open', () => {
-    setup({ isOpen: true });
+  it('keeps its summary and status beside its editor when open', () => {
+    setup({ isOpen: true, value: MOCK_VALUE, savedValue: null });
 
     const row = screen.getByRole('button', { name: /Tag page/ });
     const editor = screen.getByText('Editor');
+    const unsavedMark = within(row).getByRole('img', { name: 'Unsaved' });
 
     expect(row).toHaveAttribute(ARIA_EXPANDED, 'true');
-    expect(row).not.toHaveTextContent('Default');
+    expect(row).toHaveTextContent(MOCK_VALUE);
+    expect(row).toHaveTextContent('Customised');
+    expect(unsavedMark).toBeVisible();
     expect(editor).toBeVisible();
   });
 });

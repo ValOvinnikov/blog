@@ -1036,6 +1036,7 @@
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",
     "draftFieldLabel": "{surface} — {field} ({language})",
     "listRoute": "Se muestra en {path}",
+    "previewLabel": "{hasField, select, true {Vista previa · {field}} other {Vista previa}}",
     "fieldError": {
       "NOT_A_STRING": "Escriba texto en este campo.",
       "NOT_RICH_TEXT": "Escriba texto en este campo.",

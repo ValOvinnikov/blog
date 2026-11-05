@@ -1036,6 +1036,7 @@
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
     "draftFieldLabel": "{surface} — {field} ({language})",
     "listRoute": "Affichée sur {path}",
+    "previewLabel": "{hasField, select, true {Aperçu · {field}} other {Aperçu}}",
     "fieldError": {
       "NOT_A_STRING": "Saisissez du texte dans ce champ.",
       "NOT_RICH_TEXT": "Saisissez du texte dans ce champ.",
