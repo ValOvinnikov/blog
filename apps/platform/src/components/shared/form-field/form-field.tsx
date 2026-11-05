@@ -1,6 +1,7 @@
 'use client';
 
 import { Field } from '@base-ui/react/field';
+import { FieldLabel } from '@platform/components/shared/field-label';
 import { textVariants } from '@platform/components/shared/text/text-variants';
 import {
   FIELD_APPEARANCE,
@@ -99,13 +100,7 @@ export const FormField = ({
         {hasOwnAccessibleName ? (
           <span className={labelSlot()}>{label}</span>
         ) : (
-          <Field.Label
-            nativeLabel={false}
-            render={<div />}
-            className={labelSlot()}
-          >
-            {label}
-          </Field.Label>
+          <FieldLabel className={labelSlot()}>{label}</FieldLabel>
         )}
         {actions}
       </div>

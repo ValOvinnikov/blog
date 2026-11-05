@@ -20,10 +20,10 @@ describe(`<${LookForm.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+    setupLookForm();
   });
 
   it('focuses a select from its title and leaves its list closed', async () => {
-    setupLookForm();
     await openLookRow(user, LOOK_ROW.BUTTONS);
 
     const title = screen.getByText(LOOK_FORM.spinnerStyleLabel);
@@ -39,7 +39,6 @@ describe(`<${LookForm.name}/>`, () => {
   });
 
   it('focuses the hue slider from its title', async () => {
-    setupLookForm();
     await openLookRow(user, LOOK_ROW.COLOUR);
 
     const title = screen.getByText(LOOK_FORM.accentHueLabel);

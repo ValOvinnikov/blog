@@ -12,7 +12,7 @@ import {
   ARCHIVED_NOTICE_ID,
   ARCHIVED_NOTICE_TEXT,
 } from '@platform/testing/render-in-settings-form';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { FormField, type TFormFieldProps } from './form-field';
 
@@ -45,38 +45,44 @@ describe(`<${FormField.name}/>`, () => {
     expect(input).toBeVisible();
   });
 
-  it('focuses the control when its label is clicked', async () => {
-    const user = userEvent.setup();
-    setup();
+  describe('when its label is clicked', () => {
+    let user: UserEvent;
 
-    const label = screen.getByText(MOCK_LABEL);
-    await user.click(label);
+    beforeEach(() => {
+      user = userEvent.setup();
+    });
 
-    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+    it('focuses the control', async () => {
+      setup();
 
-    expect(input).toHaveFocus();
-  });
+      const label = screen.getByText(MOCK_LABEL);
+      await user.click(label);
 
-  it('focuses a select when its label is clicked and leaves its list closed', async () => {
-    const user = userEvent.setup();
-    renderWithIntl(
-      <FormField label={MOCK_LABEL}>
-        <OptionSelect
-          options={[MOCK_OPTION]}
-          value={MOCK_OPTION.value}
-          onChange={vi.fn()}
-        />
-      </FormField>,
-    );
+      const input = screen.getByRole('textbox', { name: MOCK_LABEL });
 
-    const label = screen.getByText(MOCK_LABEL);
-    await user.click(label);
+      expect(input).toHaveFocus();
+    });
 
-    const select = screen.getByRole('combobox', { name: MOCK_LABEL });
-    const list = screen.queryByRole('listbox');
+    it('focuses a select and leaves its list closed', async () => {
+      renderWithIntl(
+        <FormField label={MOCK_LABEL}>
+          <OptionSelect
+            options={[MOCK_OPTION]}
+            value={MOCK_OPTION.value}
+            onChange={vi.fn()}
+          />
+        </FormField>,
+      );
 
-    expect(select).toHaveFocus();
-    expect(list).not.toBeInTheDocument();
+      const label = screen.getByText(MOCK_LABEL);
+      await user.click(label);
+
+      const select = screen.getByRole('combobox', { name: MOCK_LABEL });
+      const list = screen.queryByRole('listbox');
+
+      expect(select).toHaveFocus();
+      expect(list).not.toBeInTheDocument();
+    });
   });
 
   it('leaves a control that names itself with its own name', () => {

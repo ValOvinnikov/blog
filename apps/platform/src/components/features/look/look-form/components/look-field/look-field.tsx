@@ -3,6 +3,7 @@ import { Fieldset } from '@base-ui/react/fieldset';
 import type { IWithChildren } from '@blog/config/react';
 import type { TLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { FieldLabel } from '@platform/components/shared/field-label';
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -85,13 +86,7 @@ export const LookField = ({
         </Fieldset.Root>
       ) : (
         <>
-          <Field.Label
-            nativeLabel={false}
-            render={<div />}
-            className={labelSlot()}
-          >
-            {labelContent}
-          </Field.Label>
+          <FieldLabel className={labelSlot()}>{labelContent}</FieldLabel>
           {description}
           {children}
         </>
