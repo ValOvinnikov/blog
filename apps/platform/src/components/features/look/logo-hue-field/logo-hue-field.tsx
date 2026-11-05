@@ -1,7 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
+import { accentSwatchVariants } from '@platform/components/shared/accent-swatch/accent-swatch-variants';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -55,7 +56,13 @@ export const LogoHueField = ({
 
       {!follows && (
         <div className={hueField()}>
-          <span className={tonesSlot()} aria-hidden="true">
+          <span
+            className={accentSwatchVariants({
+              size: SIZE.LG,
+              class: tonesSlot(),
+            })}
+            aria-hidden="true"
+          >
             <span
               className={tone()}
               style={{ background: tones['--logo-1'] }}

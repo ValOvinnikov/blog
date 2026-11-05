@@ -1,5 +1,6 @@
 import { SIZE } from '@blog/config';
 import { LogoHueField } from '@platform/components/features/look/logo-hue-field';
+import { logoHueFieldVariants } from '@platform/components/features/look/logo-hue-field/logo-hue-field-variants';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
@@ -10,8 +11,6 @@ import { HueSlider } from '@platform/components/shared/hue-slider';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { useTranslations } from 'next-intl';
-
-import { colourCardVariants } from './colour-card-variants';
 
 export type TColourCardProps = {
   summary: string;
@@ -28,7 +27,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
   const t = useTranslations('lookForm');
   const tHue = useTranslations('logoHueField');
   const logoHueLock = useLookFieldLock('logoHue');
-  const { hueField, hueValue } = colourCardVariants();
+  const { hueField, hueValue } = logoHueFieldVariants();
 
   const accentHueLabel = t('accentHueLabel');
 

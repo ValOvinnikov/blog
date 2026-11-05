@@ -1,5 +1,4 @@
 import { SIZE, type TMaybeUndefined } from '@blog/config';
-import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 
@@ -9,7 +8,6 @@ type TAssetUploadDetailsProps = {
   label: string;
   image: TStagedImage;
   size: typeof SIZE.SM | typeof SIZE.MD;
-  stagedBadgeLabel?: string;
   hint?: string;
   hintId: string;
 };
@@ -24,29 +22,20 @@ export const AssetUploadDetails = ({
   label,
   image,
   size,
-  stagedBadgeLabel,
   hint,
   hintId,
 }: TAssetUploadDetailsProps) => {
   const fileName = size === SIZE.SM ? getFileName(image) : undefined;
   const {
     root,
-    titleRow,
     title,
     fileName: fileNameSlot,
     hint: hintSlot,
-  } = assetUploadDetailsVariants({ size });
+  } = assetUploadDetailsVariants();
 
   return (
     <div className={root()}>
-      <div className={titleRow()}>
-        <p className={title()}>{label}</p>
-        {image.file && stagedBadgeLabel && (
-          <StatusBadge tone="plan" hasDot={false}>
-            {stagedBadgeLabel}
-          </StatusBadge>
-        )}
-      </div>
+      <p className={title()}>{label}</p>
       {fileName && <p className={fileNameSlot()}>{fileName}</p>}
       {hint && (
         <Text id={hintId} variant="hint" className={hintSlot()}>

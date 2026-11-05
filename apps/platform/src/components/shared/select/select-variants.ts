@@ -39,8 +39,8 @@ export const selectVariants = tv({
       },
       [SELECT_APPEARANCE.COMPACT]: {
         trigger: [
-          'h-9 min-h-9 w-auto min-w-[220px] gap-3 self-start md:min-h-9',
-          'py-0 pr-2.5 pl-3 text-admin-13-5',
+          'md:h-9 md:min-h-9 md:w-auto md:min-w-55 md:gap-3 md:self-start',
+          'md:py-0 md:pr-2.5 md:pl-3',
         ],
       },
     },

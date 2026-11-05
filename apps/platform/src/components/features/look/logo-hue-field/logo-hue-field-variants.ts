@@ -4,12 +4,10 @@ export const logoHueFieldVariants = tv({
   slots: {
     root: ['flex w-full flex-col gap-3'],
     hueField: ['flex items-center gap-3.5'],
-    tones: [
-      'flex size-10 shrink-0 overflow-hidden rounded-admin-control shadow-admin ring-1 ring-inset ring-black/6',
-    ],
+    tones: ['flex overflow-hidden'],
     tone: ['h-full w-1/3'],
     hueValue: [
-      'w-[62px] shrink-0 text-right font-admin-mono text-admin-12-5 tabular-nums text-admin-muted',
+      'w-admin-hue-readout shrink-0 text-right font-admin-mono text-admin-12-5 tabular-nums text-admin-muted',
     ],
   },
 });

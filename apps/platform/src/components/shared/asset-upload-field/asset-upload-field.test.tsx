@@ -33,7 +33,6 @@ const MOCK_HINT = faker.lorem.sentence();
 const MOCK_REJECTION = faker.lorem.sentence();
 const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_CONTROL_ID = faker.string.alpha(8);
-const MOCK_STAGED_BADGE = faker.lorem.words(2);
 
 const MOCK_ASSET: TAssetUploadSpec = {
   kind: brandAssetKindSchema.enum.logo,
@@ -46,7 +45,6 @@ const MOCK_BARE_ASSET: TAssetUploadSpec = {
   ...MOCK_ASSET,
   size: SIZE.SM,
   layout: ASSET_UPLOAD_LAYOUT.BARE,
-  stagedBadgeLabel: MOCK_STAGED_BADGE,
 };
 
 const MOCK_REJECTING_ASSET: TAssetUploadSpec = {
@@ -216,7 +214,7 @@ describe(`<${AssetUploadField.name}/>`, () => {
       expect(removeButton).not.toBeInTheDocument();
     });
 
-    it('shows no title, staged badge or hint', () => {
+    it('shows no title, file name or hint', () => {
       const file = mockPngFile();
       setup({
         asset: MOCK_BARE_ASSET,
@@ -224,12 +222,10 @@ describe(`<${AssetUploadField.name}/>`, () => {
       });
 
       const title = screen.queryByText(MOCK_LABEL);
-      const badge = screen.queryByText(MOCK_STAGED_BADGE);
       const hint = screen.queryByText(MOCK_HINT);
       const fileName = screen.queryByText(file.name);
 
       expect(title).not.toBeInTheDocument();
-      expect(badge).not.toBeInTheDocument();
       expect(hint).not.toBeInTheDocument();
       expect(fileName).not.toBeInTheDocument();
     });

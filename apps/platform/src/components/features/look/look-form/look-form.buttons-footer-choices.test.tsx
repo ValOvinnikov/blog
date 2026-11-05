@@ -16,6 +16,7 @@ import {
 } from '@platform/testing/look/look-form-fixtures';
 import {
   chooseOption,
+  chooseSegment,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
@@ -97,24 +98,22 @@ describe(`<${LookForm.name}/>`, () => {
 
     it('marks a changed field as unsaved beside its label until it is changed back', async () => {
       await openLookRow(user, LOOK_ROW.FOOTER);
-      const surfaceGroup = screen.getByRole('group', {
-        name: LOOK_FORM.footerSurfaceLabel,
-      });
-      const cardButton = within(surfaceGroup).getByRole('button', {
-        name: LOOK_FORM.footerSurfaceOptionLabel.CARD,
-      });
-      const fullWidthButton = within(surfaceGroup).getByRole('button', {
-        name: LOOK_FORM.footerSurfaceOptionLabel.FULL_WIDTH,
-      });
-
-      await user.click(cardButton);
-      const unsavedDot = within(surfaceGroup).getByRole('img', {
+      await chooseSegment(
+        user,
+        LOOK_FORM.footerSurfaceLabel,
+        LOOK_FORM.footerSurfaceOptionLabel.CARD,
+      );
+      const unsavedDot = screen.getByRole('img', {
         name: LOOK_FORM.fieldUnsavedLabel,
       });
       expect(unsavedDot).toBeVisible();
 
-      await user.click(fullWidthButton);
-      const clearedDot = within(surfaceGroup).queryByRole('img', {
+      await chooseSegment(
+        user,
+        `${LOOK_FORM.footerSurfaceLabel} ${LOOK_FORM.fieldUnsavedLabel}`,
+        LOOK_FORM.footerSurfaceOptionLabel.FULL_WIDTH,
+      );
+      const clearedDot = screen.queryByRole('img', {
         name: LOOK_FORM.fieldUnsavedLabel,
       });
       expect(clearedDot).not.toBeInTheDocument();

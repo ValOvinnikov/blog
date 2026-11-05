@@ -125,10 +125,15 @@ describe(`<${LookForm.name}/>`, () => {
       const layoutGroup = screen.getByRole('group', {
         name: FOOTER_LAYOUT_LABEL,
       });
-      const columnsButton = within(layoutGroup).getByRole('button', {
+      const layoutControl = within(layoutGroup).getByRole('group');
+      const columnsButton = within(layoutControl).getByRole('button', {
         name: LOOK_FORM.footerLayoutOptionLabel.COLUMNS,
       });
 
+      expect(layoutGroup).toHaveAccessibleDescription(
+        LOOK_FORM.footerLayoutDescription,
+      );
+      expect(layoutControl).toHaveAccessibleDescription(GROWTH_PLAN);
       expect(columnsButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(columnsButton).toBeDisabled();
     });

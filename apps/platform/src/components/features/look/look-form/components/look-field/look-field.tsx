@@ -1,5 +1,6 @@
 import { Field } from '@base-ui/react/field';
 import { Fieldset } from '@base-ui/react/fieldset';
+import type { IWithChildren } from '@blog/config/react';
 import type { TLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LockedReason } from '@platform/components/shared/locked-reason';
@@ -7,18 +8,17 @@ import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isBrandAssetKind } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
-import { useId, type ReactNode } from 'react';
+import { useId } from 'react';
 
 import { lookFieldVariants } from './look-field-variants';
 
-export type TLookFieldProps = {
+export type TLookFieldProps = IWithChildren & {
   field: keyof TLookFormValues;
   label: string;
   hint?: string;
   error?: string;
   isGroup?: boolean;
   lock?: TLookFieldLock;
-  children: ReactNode;
 };
 
 export const LookField = ({

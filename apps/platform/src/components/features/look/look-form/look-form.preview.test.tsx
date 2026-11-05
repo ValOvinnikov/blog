@@ -31,6 +31,7 @@ import {
 import {
   chooseEditorial,
   chooseOption,
+  chooseSegment,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
@@ -118,13 +119,11 @@ describe(`<${LookForm.name}/>`, () => {
         });
         await user.click(floatingButton);
         await openLookRow(user, LOOK_ROW.FOOTER);
-        const footerLayoutGroup = screen.getByRole('group', {
-          name: FOOTER_LAYOUT_LABEL,
-        });
-        const centredButton = within(footerLayoutGroup).getByRole('button', {
-          name: LOOK_FORM.footerLayoutOptionLabel.CENTRED,
-        });
-        await user.click(centredButton);
+        await chooseSegment(
+          user,
+          FOOTER_LAYOUT_LABEL,
+          LOOK_FORM.footerLayoutOptionLabel.CENTRED,
+        );
 
         const sampleHeader = screen.getByTestId(SAMPLE_HEADER_TEST_ID);
         const sampleFooter = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
