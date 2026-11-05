@@ -11,6 +11,12 @@ import {
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
+import {
+  hasLength,
+  isNull,
+  isString,
+  isUndefined,
+} from '@blog/utils/primitives';
 import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 
@@ -32,12 +38,12 @@ type TStoredVoiceOverrides = Partial<
   Record<TLocaleIsoCode, Partial<Record<string, unknown>>>
 >;
 
-const VOICE_SECTIONS_IN_PAGE_ORDER = [
+export const VOICE_SECTIONS_IN_PAGE_ORDER = [
   VOICE_SECTION.ERROR_PAGES,
   VOICE_SECTION.EMPTY_STATES,
 ] as const satisfies TVoiceSection[];
 
-const VOICE_SURFACES_BY_SECTION = {
+export const VOICE_SURFACES_BY_SECTION = {
   [VOICE_SECTION.ERROR_PAGES]: [VOICE_SURFACE.NOT_FOUND, VOICE_SURFACE.ERROR],
   [VOICE_SECTION.EMPTY_STATES]: [
     VOICE_SURFACE.ARCHIVE,
@@ -45,10 +51,9 @@ const VOICE_SURFACES_BY_SECTION = {
   ],
 } as const satisfies Record<TVoiceSection, TVoiceSurface[]>;
 
-export const VOICE_SURFACES_IN_PAGE_ORDER =
-  VOICE_SECTIONS_IN_PAGE_ORDER.flatMap(
-    (section) => VOICE_SURFACES_BY_SECTION[section],
-  );
+const VOICE_SURFACES_IN_PAGE_ORDER = VOICE_SECTIONS_IN_PAGE_ORDER.flatMap(
+  (section) => VOICE_SURFACES_BY_SECTION[section],
+);
 
 export const voiceFieldsOf = (surface: TVoiceSurface): TVoiceField[] =>
   VOICE_FIELDS.filter((field) => field.surface === surface);
@@ -71,7 +76,7 @@ export const voiceErrorsInOrder = (
     ...liveLocales.filter((locale) => locale !== selectedLocale),
   ].flatMap((locale) =>
     VOICE_FIELDS_IN_PAGE_ORDER.filter(
-      ({ id }) => errors[locale]?.[id] !== undefined,
+      ({ id }) => !isUndefined(errors[locale]?.[id]),
     ).map(({ id }) => ({ locale, fieldId: id })),
   );
 
@@ -111,14 +116,14 @@ const toDraftValue = (
   stored: unknown,
 ): TVoiceDraftValue => {
   if (field.kind === VOICE_FIELD_KIND.RICH) {
-    if (Array.isArray(stored) && stored.length > 0) {
+    if (Array.isArray(stored) && hasLength(stored)) {
       return stored as TVoicePortableText;
     }
-    return typeof stored === 'string' && stored.trim() !== ''
+    return isString(stored) && stored.trim() !== ''
       ? toParagraph(field.id, stored)
       : null;
   }
-  if (typeof stored === 'string') return stored;
+  if (isString(stored)) return stored;
   return Array.isArray(stored)
     ? portableTextToPlainText(stored as TVoicePortableText)
     : '';
@@ -160,11 +165,11 @@ export const withVoiceValue = (
 });
 
 export const isVoiceValueCustomised = (value: TVoiceDraftValue): boolean =>
-  typeof value === 'string' ? value.trim() !== '' : value !== null;
+  isString(value) ? value.trim() !== '' : !isNull(value);
 
 export const voiceValueAsText = (value: TVoiceDraftValue): string => {
-  if (value === null) return '';
-  return typeof value === 'string' ? value : portableTextToPlainText(value);
+  if (isNull(value)) return '';
+  return isString(value) ? value : portableTextToPlainText(value);
 };
 
 export const countLanguageVoiceChanges = (
@@ -203,12 +208,12 @@ export const voiceDefaultText = (
     .split('.')
     .reduce<unknown>(
       (node, segment) =>
-        typeof node === 'object' && node !== null
+        typeof node === 'object' && !isNull(node)
           ? (node as Record<string, unknown>)[segment]
           : undefined,
       SITE_MESSAGES_BY_LOCALE[locale],
     );
-  return typeof value === 'string' ? value : '';
+  return isString(value) ? value : '';
 };
 
 export const toVoiceOverridesInput = (
@@ -230,6 +235,6 @@ export const resolveVoiceValue = (
   field: TVoiceField,
   value: TVoiceDraftValue,
 ): string | TVoicePortableText =>
-  value !== null && isVoiceValueCustomised(value)
+  !isNull(value) && isVoiceValueCustomised(value)
     ? value
     : voiceDefaultText(locale, field);
