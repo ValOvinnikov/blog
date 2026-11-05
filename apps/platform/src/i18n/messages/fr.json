@@ -867,6 +867,10 @@
     "off": "Le suivi est désactivé. Le cadre reste où vous le laissez.",
     "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle."
   },
+  "lookFullscreen": {
+    "open": "Ouvrir l’aperçu en plein écran",
+    "close": "Quitter le plein écran"
+  },
   "assetUploadField": {
     "remove": "Supprimer",
     "upload": "Importer",

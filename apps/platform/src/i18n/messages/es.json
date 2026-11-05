@@ -867,6 +867,10 @@
     "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
     "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella."
   },
+  "lookFullscreen": {
+    "open": "Abrir la vista previa a pantalla completa",
+    "close": "Cerrar pantalla completa"
+  },
   "assetUploadField": {
     "remove": "Quitar",
     "upload": "Subir",

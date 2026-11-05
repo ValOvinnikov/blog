@@ -19,17 +19,20 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   PREVIEW_DEVICE,
+  PREVIEW_DEVICE_WIDTH,
   PREVIEW_FRAME_STATUS_TEST_ID,
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_PRESSED } from '@platform/testing/aria';
 import {
   renderWithIntl,
   screen,
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import { stubLgUpWindow } from '@platform/testing/match-media';
 import {
   MOCK_TENANT_DOMAIN,
@@ -51,8 +54,13 @@ const FOOTER_TARGET: TLookFollowTarget = {
   kind: LOOK_FOLLOW_TARGET.PART,
   row: LOOK_ROW.FOOTER,
 };
+const LOOK_FULLSCREEN = messages.lookFullscreen;
 const tDevicePreview = makeEnTranslator('devicePreview');
 const TABLET = tDevicePreview('deviceTablet');
+const DESKTOP = tDevicePreview('deviceDesktop');
+const DESKTOP_WIDTH = PREVIEW_DEVICE_WIDTH[PREVIEW_DEVICE.DESKTOP];
+const DARK = messages.previewModeControl.modeDark;
+const LIVE_PREVIEW = messages.previewModeControl.livePreviewHeading;
 
 type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;
@@ -114,6 +122,10 @@ describe(`<${LookPreview.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it.each([
@@ -265,6 +277,110 @@ describe(`<${LookPreview.name}/>`, () => {
       expect(followButton()).not.toBePressed();
       expect(outline).not.toBeInTheDocument();
       expect(offNote).toBeVisible();
+    });
+  });
+
+  describe('full screen', () => {
+    const openButton = () =>
+      screen.getByRole('button', { name: LOOK_FULLSCREEN.open });
+    const dialog = () => screen.getByRole('dialog', { name: LIVE_PREVIEW });
+    const inDialog = (name: string) =>
+      within(dialog()).getByRole('button', { name });
+
+    it('puts Open preview full screen last in the toolbar from lg', () => {
+      stubLgUpWindow();
+      renderPreview();
+
+      const toolbarButtons = within(screen.getByRole('toolbar')).getAllByRole(
+        'button',
+      );
+
+      expect(toolbarButtons.at(-1)).toBe(openButton());
+      expect(openButton()).not.toHaveAttribute(ARIA_PRESSED);
+    });
+
+    it('puts Open preview full screen beside Follow, outside the toolbar, on the phone tab', () => {
+      renderPreview();
+
+      const toolbar = screen.getByRole('toolbar');
+
+      expect(toolbar).not.toContainElement(openButton());
+    });
+
+    describe('once opened', () => {
+      beforeEach(async () => {
+        stubLgUpWindow();
+        renderPreview();
+        await user.click(openButton());
+      });
+
+      it('opens a modal dialog named Live preview', () => {
+        expect(dialog()).toHaveAttribute('aria-modal', 'true');
+      });
+
+      it('moves focus to the pressed device button', () => {
+        expect(inDialog(DESKTOP)).toHaveFocus();
+      });
+
+      it('names the stage region by the device width, once', () => {
+        const name = tDevicePreview('sampleAtWidth', { width: DESKTOP_WIDTH });
+
+        const region = within(dialog()).getByRole('region', { name });
+        const image = within(dialog()).queryByRole('img', { name });
+
+        expect(region).toHaveAttribute('tabindex', '0');
+        expect(image).not.toBeInTheDocument();
+      });
+
+      it('leaves Follow and the status line out', () => {
+        const follow = within(dialog()).queryByRole('button', {
+          name: LOOK_FOLLOW.followToggle,
+        });
+        const status = within(dialog()).queryByTestId(
+          PREVIEW_FRAME_STATUS_TEST_ID,
+        );
+
+        expect(follow).not.toBeInTheDocument();
+        expect(status).not.toBeInTheDocument();
+      });
+
+      it('reads the device width and scale in a live readout', () => {
+        const readout = within(dialog()).getByText(
+          tDevicePreview('readoutLong', {
+            width: DESKTOP_WIDTH,
+            percent: 100,
+          }),
+        );
+
+        expect(readout).toHaveAttribute('role', 'status');
+      });
+
+      it('hands a device picked inside to the Look form', async () => {
+        await user.click(inDialog(TABLET));
+
+        expect(setPreviewDevice).toHaveBeenCalledWith(PREVIEW_DEVICE.TABLET);
+      });
+
+      it('keeps a colour scheme picked inside once closed by Close', async () => {
+        await user.click(inDialog(DARK));
+        await user.click(inDialog(LOOK_FULLSCREEN.close));
+
+        const pageDark = screen.getByRole('button', { name: DARK });
+        const closedDialog = screen.queryByRole('dialog');
+
+        expect(closedDialog).not.toBeInTheDocument();
+        expect(pageDark).toBePressed();
+        expect(openButton()).toHaveFocus();
+      });
+
+      it('closes on Escape, after the focused tooltip, and returns focus to Open preview full screen', async () => {
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
+        const closedDialog = screen.queryByRole('dialog');
+
+        expect(closedDialog).not.toBeInTheDocument();
+        expect(openButton()).toHaveFocus();
+      });
     });
   });
 });

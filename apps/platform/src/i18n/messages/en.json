@@ -867,6 +867,10 @@
     "off": "Following is off. The frame stays where you leave it.",
     "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it."
   },
+  "lookFullscreen": {
+    "open": "Open preview full screen",
+    "close": "Close full screen"
+  },
   "assetUploadField": {
     "remove": "Remove",
     "upload": "Upload",

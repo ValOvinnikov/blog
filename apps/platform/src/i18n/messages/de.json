@@ -867,6 +867,10 @@
     "off": "Folgen ist aus. Der Rahmen bleibt, wo du ihn lässt.",
     "allOpen": "Alle Karten sind geöffnet. Fokussiere eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin."
   },
+  "lookFullscreen": {
+    "open": "Vorschau im Vollbild öffnen",
+    "close": "Vollbild schließen"
+  },
   "assetUploadField": {
     "remove": "Entfernen",
     "upload": "Hochladen",

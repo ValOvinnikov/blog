@@ -867,6 +867,10 @@
     "off": "Volgen staat uit. Het kader blijft waar je het laat.",
     "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe."
   },
+  "lookFullscreen": {
+    "open": "Voorbeeld op volledig scherm openen",
+    "close": "Volledig scherm sluiten"
+  },
   "assetUploadField": {
     "remove": "Verwijderen",
     "upload": "Uploaden",

@@ -1,5 +1,6 @@
 'use client';
 
+import { Dialog } from '@base-ui/react/dialog';
 import { COOKIE_SETTINGS_BUTTON, type TLocaleIsoCode } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
@@ -15,16 +16,17 @@ import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import { buildSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
-import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/use-preview-color-scheme';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { LookFollowMark } from './components/look-follow-mark';
 import { LookFollowStatus } from './components/look-follow-status';
 import { LookFollowToggle } from './components/look-follow-toggle';
+import { LookFullscreenButton } from './components/look-fullscreen-button';
+import { LookFullscreenDialog } from './components/look-fullscreen-dialog';
 import { useFrameAvailableHeight } from './use-frame-available-height';
 import { useLookFollow } from './use-look-follow';
-import { useReaderGroup } from './use-reader-group';
+import { useLookPreviewToolbar } from './use-look-preview-toolbar';
 
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
@@ -41,18 +43,14 @@ export const LookPreview = ({
   followTarget,
   isShown,
 }: TLookPreviewProps) => {
-  const {
-    tenantName,
-    values,
-    isSubmenuPreviewOpen,
-    previewDevice,
-    setPreviewDevice,
-  } = useLookForm();
+  const { tenantName, values, isSubmenuPreviewOpen, previewDevice } =
+    useLookForm();
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
-  const { mode, setMode, isDark } = usePreviewColorScheme();
-  const { readerGroup, isSignedIn } = useReaderGroup();
+  const { toolbarProps, isDark, isSignedIn } =
+    useLookPreviewToolbar(hasReaderAccounts);
   const [scale, setScale] = useState(1);
+  const [fullscreenHandle] = useState(Dialog.createHandle);
   const isPhoneTab = !useMediaQuery(MEDIA_QUERY.LG_UP);
   const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight({
     device: previewDevice,
@@ -67,7 +65,32 @@ export const LookPreview = ({
   const theme = buildSitePreviewTheme(values, isDark);
   const footer = toSampleFooterStyle(values);
 
-  const followToggle = <LookFollowToggle follow={follow} />;
+  const solos = (
+    <>
+      <LookFollowToggle follow={follow} />
+      <LookFullscreenButton handle={fullscreenHandle} />
+    </>
+  );
+  const sample = (
+    <>
+      <LookSample
+        brand={{ name: tenantName, logoSrc: values.logo.url }}
+        theme={theme}
+        liveLocales={liveLocales}
+        header={toSampleHeaderStyle(values)}
+        footer={footer}
+        busy={toSampleBusyStyle(values)}
+        hasReaderAccounts={hasReaderAccounts}
+        isSignedIn={isSignedIn}
+        isSubmenuOpen={isSubmenuPreviewOpen}
+      />
+      {footer.cookieSettingsButton === COOKIE_SETTINGS_BUTTON.SHOWN && (
+        <DeviceFrame.Overlay>
+          <SampleCookieButton theme={theme} />
+        </DeviceFrame.Overlay>
+      )}
+    </>
+  );
 
   return (
     <div ref={rootRef}>
@@ -83,16 +106,10 @@ export const LookPreview = ({
               ? PREVIEW_HEADING_LAYOUT.PHONE_TAB
               : PREVIEW_HEADING_LAYOUT.SECTION
           }
-          actions={isPhoneTab && followToggle}
+          actions={isPhoneTab && solos}
         />
-        <PreviewFrame.Toolbar
-          device={previewDevice}
-          onDeviceChange={setPreviewDevice}
-          mode={mode}
-          onModeChange={setMode}
-          extraGroups={hasReaderAccounts ? [readerGroup] : []}
-        >
-          {!isPhoneTab && followToggle}
+        <PreviewFrame.Toolbar {...toolbarProps}>
+          {!isPhoneTab && solos}
         </PreviewFrame.Toolbar>
         <PreviewFrame.Stage ref={stageRef} isCompact={isPhoneTab}>
           <DeviceFrame
@@ -104,24 +121,9 @@ export const LookPreview = ({
             onScaleChange={setScale}
             onHandScroll={follow.onHandScroll}
           >
-            <LookSample
-              brand={{ name: tenantName, logoSrc: values.logo.url }}
-              theme={theme}
-              liveLocales={liveLocales}
-              header={toSampleHeaderStyle(values)}
-              footer={footer}
-              busy={toSampleBusyStyle(values)}
-              hasReaderAccounts={hasReaderAccounts}
-              isSignedIn={isSignedIn}
-              isSubmenuOpen={isSubmenuPreviewOpen}
-            />
+            {sample}
             {follow.isFollowing && follow.row && (
               <LookFollowMark row={follow.row} scale={scale} />
-            )}
-            {footer.cookieSettingsButton === COOKIE_SETTINGS_BUTTON.SHOWN && (
-              <DeviceFrame.Overlay>
-                <SampleCookieButton theme={theme} />
-              </DeviceFrame.Overlay>
             )}
           </DeviceFrame>
         </PreviewFrame.Stage>
@@ -133,6 +135,15 @@ export const LookPreview = ({
           readerNote={hasReaderAccounts ? undefined : t('readerAccountsOff')}
         />
       </PreviewFrame>
+      <LookFullscreenDialog
+        handle={fullscreenHandle}
+        device={previewDevice}
+        toolbar={<PreviewFrame.Toolbar {...toolbarProps} />}
+        host={siteHost}
+        isDark={isDark}
+      >
+        {sample}
+      </LookFullscreenDialog>
     </div>
   );
 };
