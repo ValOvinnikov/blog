@@ -25,7 +25,9 @@ export const detailListVariants = tv({
   },
   variants: {
     isMono: {
-      true: { value: ['font-mono text-admin-12-5 leading-5 font-medium'] },
+      true: {
+        value: ['font-admin-mono text-admin-12-5 leading-5 font-medium'],
+      },
       false: {},
     },
     isStackedToLg: {

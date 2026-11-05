@@ -22,7 +22,8 @@ const formSiteAddressInputVariants = tv({
     appearance: {
       [FIELD_APPEARANCE.DEFAULT]: {},
       [FIELD_APPEARANCE.WIZARD]: {
-        suffix: ['text-admin-14'],
+        input: ['font-admin-mono font-medium'],
+        suffix: ['font-admin-mono text-admin-14 font-medium'],
       },
     },
   },
