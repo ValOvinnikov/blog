@@ -451,22 +451,35 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('a failed save', () => {
-    it('shows its message in the save bar in place of the change count while changes remain', () => {
-      renderShell({ changeCount: 3 }, { errorTitle: MOCK_ERROR_TITLE });
+    describe('while changes remain', () => {
+      beforeEach(() => {
+        renderShell({ changeCount: 3 }, { errorTitle: MOCK_ERROR_TITLE });
+      });
 
-      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
-      const errorAlert = within(saveBar).getByRole('alert');
+      it('shows its message in the save bar in place of the change count', () => {
+        const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+        const errorAlert = within(saveBar).getByRole('alert');
 
-      expect(errorAlert).toHaveTextContent(MOCK_ERROR_TITLE);
-      expect(saveBar).not.toHaveTextContent(THREE_UNSAVED_CHANGES);
+        expect(errorAlert).toHaveTextContent(MOCK_ERROR_TITLE);
+        expect(saveBar).not.toHaveTextContent(THREE_UNSAVED_CHANGES);
+      });
+
+      it('announces its message once, from the save bar', () => {
+        const errorAlerts = screen.getAllByRole('alert');
+
+        expect(errorAlerts).toHaveLength(1);
+      });
     });
 
-    it('announces its message once, from the save bar', () => {
-      renderShell({ changeCount: 3 }, { errorTitle: MOCK_ERROR_TITLE });
+    it('withdraws its message while the next save is in flight', () => {
+      renderShell(
+        { changeCount: 3, isPending: true, planRefusal: MOCK_PLAN_REFUSAL },
+        { errorTitle: MOCK_ERROR_TITLE },
+      );
 
-      const errorAlerts = screen.getAllByRole('alert');
+      const errorAlert = screen.queryByRole('alert');
 
-      expect(errorAlerts).toHaveLength(1);
+      expect(errorAlert).not.toBeInTheDocument();
     });
 
     it('shows its message at the top of the page when no save bar shows', () => {

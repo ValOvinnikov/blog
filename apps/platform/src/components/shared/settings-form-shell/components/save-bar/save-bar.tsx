@@ -1,20 +1,18 @@
 'use client';
 
 import { SIZE } from '@blog/config';
-import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@blog/utils/primitives';
 import { Button } from '@platform/components/shared/button';
-import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useTranslations } from 'next-intl';
+import { useRef } from 'react';
 
-import { FirstInvalidFieldLink } from './components/first-invalid-field-link/first-invalid-field-link';
 import { PhoneSaveFooter } from './components/phone-save-footer/phone-save-footer';
-import {
-  SaveBarLocation,
-  type TUnsavedCard,
-} from './components/save-bar-location/save-bar-location';
+import type { TUnsavedCard } from './components/save-bar-location/save-bar-location';
+import { SaveBarSummary } from './components/save-bar-summary/save-bar-summary';
 import { saveBarVariants } from './save-bar-variants';
+import { useSaveBarHeight } from './use-save-bar-height';
 
 export type TSaveBarProps = {
   changeCount: number;
@@ -40,79 +38,34 @@ export const SaveBar = ({
   onDiscard,
 }: TSaveBarProps) => {
   const t = useTranslations('saveBar');
-  const { ids: invalidControlIds } = invalidControls;
-  const [firstInvalidControlId] = invalidControlIds;
-  const hasInvalidFields = !isUndefined(firstInvalidControlId);
+  const barRef = useRef<HTMLDivElement>(null);
+  const phoneFooterRef = useRef<HTMLDivElement>(null);
   const isDirty = changeCount > 0;
-  const isSaveErrorShown = !hasInvalidFields && Boolean(saveError);
-  const {
-    root,
-    summary,
-    count,
-    breakdown: breakdownSlot,
-    errorContent,
-    errorCount,
-    errorFollowUp,
-    errorLink,
-    separator,
-    notSaved,
-    actions,
-    shortcut,
-  } = saveBarVariants({ hasPhoneFooter });
+  const isSummaryAnError =
+    !isUndefined(invalidControls.ids[0]) || Boolean(saveError);
+  const { root, actions, shortcut } = saveBarVariants({ hasPhoneFooter });
 
-  const renderSummary = () => {
-    if (hasInvalidFields) {
-      return (
-        <div className={errorContent()}>
-          <span className={errorCount()}>
-            {t('fieldsNeedAttention', { count: invalidControlIds.length })}
-          </span>
-          <span className={errorFollowUp()}>
-            <FirstInvalidFieldLink
-              invalidControls={invalidControls}
-              className={errorLink()}
-            />
-            <span aria-hidden="true" className={separator()}>
-              ·
-            </span>
-            <span className={notSaved()}>{t('notSaved')}</span>
-          </span>
-        </div>
-      );
-    }
-    if (isSaveErrorShown) {
-      return (
-        <div role="alert" className={errorContent()}>
-          <span className={errorCount()}>{saveError}</span>
-        </div>
-      );
-    }
-    return (
-      <span className={summary()}>
-        <UnsavedDot isDecorative={true} />
-        <span className={count()}>
-          {t('unsavedChanges', { count: changeCount })}
-        </span>
-        {breakdown && <span className={breakdownSlot()}>{breakdown}</span>}
-        {hasArrayGotItems(unsavedCards) && (
-          <SaveBarLocation cards={unsavedCards} />
-        )}
-      </span>
-    );
-  };
+  useSaveBarHeight(barRef, phoneFooterRef, isDirty);
 
   return (
     <>
       {isDirty && (
         <div
+          ref={barRef}
           role="region"
           aria-label={t('regionLabel')}
           aria-busy={isPending || undefined}
           className={root()}
         >
-          {renderSummary()}
+          <SaveBarSummary
+            changeCount={changeCount}
+            breakdown={breakdown}
+            invalidControls={invalidControls}
+            saveError={saveError}
+            unsavedCards={unsavedCards}
+          />
           <div className={actions()}>
-            {!hasInvalidFields && !isSaveErrorShown && (
+            {!isSummaryAnError && (
               <span aria-hidden="true" className={shortcut()}>
                 {t('shortcut')}
               </span>
@@ -134,6 +87,7 @@ export const SaveBar = ({
       )}
       {hasPhoneFooter && (
         <PhoneSaveFooter
+          ref={phoneFooterRef}
           changeCount={changeCount}
           invalidControls={invalidControls}
           isPending={isPending}

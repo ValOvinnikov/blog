@@ -11,7 +11,10 @@ import { VoiceListSamplesProvider } from '@platform/components/features/voice/vo
 import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import de from '@platform/i18n/messages/de.json';
 import en from '@platform/i18n/messages/en.json';
-import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
+import {
+  saveVoiceOverridesAction,
+  type TSaveVoiceOverridesResult,
+} from '@platform/server/site-config/save-voice-overrides-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -147,7 +150,7 @@ const previewColorSchemeGroup = () =>
 const activeLanguageLabel = (language: string) =>
   screen.getByText(language, { selector: 'strong' });
 
-const COULDNT_SAVE = "Couldn't save";
+const { alertError: SAVE_FAILED } = en.voiceSettings;
 
 describe(`<${VoiceSettings.name}/>`, () => {
   let user: UserEvent;
@@ -620,7 +623,12 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('makes the page content inert while the phone footer keeps focus on Saving…', async () => {
-      saveVoiceOverridesActionMock.mockReturnValueOnce(new Promise(() => {}));
+      let resolveSave: (result: TSaveVoiceOverridesResult) => void = () => {};
+      saveVoiceOverridesActionMock.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveSave = resolve;
+        }),
+      );
       setup();
 
       await user.type(notFoundHeading(), MOCK_TYPED_TEXT);
@@ -638,6 +646,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(footer).not.toContainElement(cards);
       expect(cards).not.toContainElement(footer);
       expect(savingButton).toHaveFocus();
+
+      resolveSave({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      await screen.findAllByRole('alert');
     });
 
     it('shows a toast and refreshes after a successful save', async () => {
@@ -662,15 +673,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       await editHeadingAndSave(MOCK_TYPED_TEXT);
 
-      const saveBar = await screen.findByRole('region', {
-        name: UNSAVED_CHANGES,
-      });
-      const barAlert = await within(saveBar).findByRole('alert');
-      const alerts = screen.getAllByRole('alert');
+      const alerts = await screen.findAllByRole('alert');
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const barAlert = within(saveBar).getByRole('alert');
 
-      expect(barAlert).toHaveTextContent(COULDNT_SAVE);
+      expect(barAlert).toHaveTextContent(SAVE_FAILED);
       expect(alerts).toHaveLength(2);
-      alerts.forEach((alert) => expect(alert).toHaveTextContent(COULDNT_SAVE));
+      alerts.forEach((alert) => expect(alert).toHaveTextContent(SAVE_FAILED));
       expect(refresh).not.toHaveBeenCalled();
     });
 

@@ -117,7 +117,7 @@ Discard is disabled and the bar is `aria-busy`. A save that fails with no
 field errors — a server error, offline, or a plan refusal — shows the page's
 failure message in the bar's left side in place of the dot, count and hint, as
 one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
-until they are cleared. The next edit or a successful save clears it. Only when
+until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--admin-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as fallbacks. Only when
 no bar shows (a plan refusal that restored every refused value) does the
 message sit in an error `Alert` under the header. From `md` the page keeps 120px of room below its last content (48px
 when archived), and the document's `scroll-padding-bottom` is the bar's 64px

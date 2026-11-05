@@ -69,7 +69,7 @@ export const SettingsFormShell = <TValues,>({
   const t = useTranslations('saveBar');
   const isDirty = changeCount > 0;
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
-  const saveError = planRefusal ?? errorTitle;
+  const saveError = isPending ? undefined : (planRefusal ?? errorTitle);
   const isPhoneSaveFooterShown =
     Boolean(layout?.hasPhoneSaveFooter) && !isArchived && !isSaveBarHidden;
   const { root, alert, liveStatus } = settingsFormShellVariants({

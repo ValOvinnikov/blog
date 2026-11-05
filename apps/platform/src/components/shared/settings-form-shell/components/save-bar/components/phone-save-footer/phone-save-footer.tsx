@@ -6,11 +6,12 @@ import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
+import { type Ref, useId } from 'react';
 
 import { phoneSaveFooterVariants } from './phone-save-footer-variants';
 
 export type TPhoneSaveFooterProps = {
+  ref?: Ref<HTMLDivElement>;
   changeCount: number;
   invalidControls: TInvalidControls;
   isPending: boolean;
@@ -19,6 +20,7 @@ export type TPhoneSaveFooterProps = {
 };
 
 export const PhoneSaveFooter = ({
+  ref,
   changeCount,
   invalidControls,
   isPending,
@@ -47,6 +49,7 @@ export const PhoneSaveFooter = ({
 
   return (
     <div
+      ref={ref}
       role="region"
       aria-labelledby={statusId}
       aria-busy={isPending || undefined}
