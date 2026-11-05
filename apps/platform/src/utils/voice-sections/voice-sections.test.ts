@@ -1,7 +1,12 @@
 import { VOICE_SURFACE, type TVoiceFieldId } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
-import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
+import {
+  VOICE_CARD_ID,
+  VOICE_SECTION,
+  VOICE_SECTION_ID,
+  type TVoiceSection,
+} from '@platform/constants/voice';
 import {
   buildVoiceDraft,
   localeDraftOf,
@@ -10,6 +15,7 @@ import {
 import {
   countVoiceSectionCustomised,
   countVoiceSectionErrors,
+  voiceCardHref,
   voiceHashTarget,
   voiceSectionFields,
   voiceSectionOf,
@@ -82,10 +88,22 @@ describe(countVoiceSectionErrors, () => {
 
 describe(voiceHashTarget, () => {
   it.each([
-    ['#sec-errors', VOICE_SECTION.ERROR_PAGES, 'sec-errors'],
-    ['#s-lists', VOICE_SECTION.EMPTY_STATES, 's-lists'],
-  ])('resolves %s to its section', (hash, section, id) => {
-    expect(voiceHashTarget(hash)).toEqual({ section, id });
+    [
+      VOICE_SECTION_ID[VOICE_SECTION.ERROR_PAGES].section,
+      VOICE_SECTION.ERROR_PAGES,
+    ],
+    [VOICE_CARD_ID[VOICE_SURFACE.ARCHIVE].card, VOICE_SECTION.EMPTY_STATES],
+  ])('resolves the hash of %s to its section', (id, section) => {
+    expect(voiceHashTarget(`#${id}`)).toEqual({ section, id });
+  });
+
+  it('resolves a card href back to its own card', () => {
+    const target = voiceHashTarget(voiceCardHref(VOICE_SURFACE.BOOKMARKS));
+
+    expect(target).toEqual({
+      section: VOICE_SECTION.EMPTY_STATES,
+      id: VOICE_CARD_ID[VOICE_SURFACE.BOOKMARKS].card,
+    });
   });
 
   it.each(['', '#elsewhere'])('ignores the hash %j', (hash) => {

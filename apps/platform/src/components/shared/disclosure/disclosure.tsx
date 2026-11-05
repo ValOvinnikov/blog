@@ -62,7 +62,7 @@ export const Disclosure = ({
   const triggerButton = (
     <Collapsible.Trigger
       className={trigger()}
-      aria-controls={collapsedBody?.id}
+      {...(collapsedBody && { 'aria-controls': collapsedBody.id })}
     >
       {summary}
       <Icon

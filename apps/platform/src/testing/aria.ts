@@ -9,3 +9,4 @@ export const ARIA_EXPANDED = 'aria-expanded';
 export const ARIA_HASPOPUP = 'aria-haspopup';
 export const ARIA_DESCRIBEDBY = 'aria-describedby';
 export const ARIA_SELECTED = 'aria-selected';
+export const ARIA_CONTROLS = 'aria-controls';

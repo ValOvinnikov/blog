@@ -14,14 +14,11 @@ import { Accordion } from '@platform/components/shared/accordion';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { VOICE_CARD_ID } from '@platform/constants/voice';
-import {
-  countCustomisedVoiceFields,
-  voiceFieldsOf,
-} from '@platform/utils/voice-draft/voice-draft';
-import { voiceSurfaceUnit } from '@platform/utils/voice-sections/voice-sections';
+import { voiceFieldsOf } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
+import { VoiceSurfaceSummary } from './components/voice-surface-summary';
 import { voiceSurfaceCardVariants } from './voice-surface-card-variants';
 
 export type TVoiceSurfaceCardProps = {
@@ -38,7 +35,6 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
     setOpenListFieldId,
     specimenTheme,
   } = useVoiceEditor();
-  const t = useTranslations('voiceSettings');
   const tSurfaces = useTranslations('voiceSurfaces');
   const tDescriptions = useTranslations('voiceSurfaceDescriptions');
   const tSpecimen = useTranslations('voiceSpecimen');
@@ -58,7 +54,6 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
     preview,
     previewLabel,
     previewNote,
-    summary,
     card,
   } = voiceSurfaceCardVariants({ isPreviewOpen });
   const isArchive = surface === VOICE_SURFACE.ARCHIVE;
@@ -78,19 +73,7 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
         titleId={ids.heading}
         titleTabIndex={-1}
         supportingText={tDescriptions(surface)}
-        actions={
-          <span className={summary()}>
-            {t('surfaceSummary', {
-              count: t('surfaceCount', {
-                unit: voiceSurfaceUnit(surface),
-                total: fields.length,
-              }),
-              status: t('customisedStatus', {
-                count: countCustomisedVoiceFields(values, fields),
-              }),
-            })}
-          </span>
-        }
+        actions={<VoiceSurfaceSummary surface={surface} />}
       />
       <Card.Body className={body()}>
         <div className={fieldsSlot()}>

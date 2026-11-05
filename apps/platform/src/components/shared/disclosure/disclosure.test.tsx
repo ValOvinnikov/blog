@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -10,8 +11,6 @@ import { useState } from 'react';
 import { Disclosure } from './disclosure';
 
 faker.seed(5995);
-
-const ARIA_EXPANDED = 'aria-expanded';
 
 const MOCK_SUMMARY = faker.lorem.word();
 const MOCK_BODY = faker.lorem.sentence();
@@ -92,6 +91,15 @@ describe(`<${Disclosure.name}/>`, () => {
 
     expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
     expect(body).toBeVisible();
+  });
+
+  it('points the open trigger at its panel', async () => {
+    setup();
+
+    const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute(ARIA_CONTROLS);
   });
 
   it('renders no heading without a heading level', () => {
@@ -222,7 +230,7 @@ describe(`<${Disclosure.name}/>`, () => {
       const trigger = screen.getByRole('button', { name: MOCK_SUMMARY });
       if (isOpen) await user.click(trigger);
 
-      expect(trigger).toHaveAttribute('aria-controls', MOCK_BODY_ID);
+      expect(trigger).toHaveAttribute(ARIA_CONTROLS, MOCK_BODY_ID);
     });
 
     it('gives the heading its id', () => {

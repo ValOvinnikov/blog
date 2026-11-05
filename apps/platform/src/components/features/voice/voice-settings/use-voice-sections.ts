@@ -14,9 +14,10 @@ import { flushSync } from 'react-dom';
 const subscribeToNothing = () => () => {};
 
 export const useVoiceSections = () => {
+  const firstLoadHashRef = useRef<TMaybeUndefined<string>>(undefined);
   const hash = useSyncExternalStore(
     subscribeToNothing,
-    () => window.location.hash,
+    () => (firstLoadHashRef.current ??= window.location.hash),
     () => '',
   );
   const hashTarget = voiceHashTarget(hash);
@@ -40,11 +41,7 @@ export const useVoiceSections = () => {
     document
       .getElementById(card)
       ?.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
-    window.history.replaceState(
-      window.history.state,
-      '',
-      voiceCardHref(surface),
-    );
+    window.history.replaceState(null, '', voiceCardHref(surface));
   };
 
   const hashTargetId = hashTarget?.id;

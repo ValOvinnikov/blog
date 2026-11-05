@@ -1,9 +1,9 @@
 import { tv } from '@platform/utils/tv/tv';
-import { VOICE_ANCHOR_CLASSES } from '@platform/utils/voice-sections/voice-sections';
+import { voiceAnchorVariants } from '@platform/utils/voice-anchor-variants/voice-anchor-variants';
 
 export const voiceSectionVariants = tv({
   slots: {
-    root: [VOICE_ANCHOR_CLASSES],
+    root: [voiceAnchorVariants()],
     disclosure: ['flex flex-col gap-2'],
     titleBlock: ['flex min-w-0 flex-col'],
     title: ['text-admin-16 leading-admin-22 font-semibold text-admin-text'],

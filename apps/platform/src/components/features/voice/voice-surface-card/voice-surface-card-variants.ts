@@ -1,9 +1,9 @@
 import { tv } from '@platform/utils/tv/tv';
-import { VOICE_ANCHOR_CLASSES } from '@platform/utils/voice-sections/voice-sections';
+import { voiceAnchorVariants } from '@platform/utils/voice-anchor-variants/voice-anchor-variants';
 
 export const voiceSurfaceCardVariants = tv({
   slots: {
-    card: [VOICE_ANCHOR_CLASSES, '[&_h3]:outline-hidden'],
+    card: [voiceAnchorVariants(), '[&_h3]:outline-hidden'],
     body: ['grid grid-cols-1 p-0 lg:grid-cols-2'],
     fields: ['flex flex-col gap-4 p-[18px]'],
     previewColumn: [
@@ -22,7 +22,6 @@ export const voiceSurfaceCardVariants = tv({
       'font-mono text-admin-11 font-bold uppercase tracking-admin-caps text-admin-muted',
     ],
     previewNote: ['text-admin-12 text-admin-muted'],
-    summary: ['text-admin-12 font-medium text-admin-muted'],
   },
   variants: {
     isPreviewOpen: {
