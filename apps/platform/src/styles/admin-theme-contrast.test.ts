@@ -82,9 +82,7 @@ const TOKEN = {
   TEXT: 'text',
   TEXT_STRONG: 'text-strong',
   THEME_TRACK: 'theme-track',
-  TOOLTIP: 'tooltip',
   WARN: 'warn',
-  WARN_ON_DARK: 'warn-on-dark',
   WARN_WEAK: 'warn-weak',
 } as const;
 
@@ -173,17 +171,18 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Locked text on page', TOKEN.MUTED, TOKEN.BG, TEXT],
   ['Focus ring on toolbar track', TOKEN.BRAND_INK, TOKEN.THEME_TRACK, FOCUS],
+  ['Success edge and icon on toast', TOKEN.OK, TOKEN.POPOVER, BOUNDARY],
+  ['Warning edge and icon on toast', TOKEN.WARN, TOKEN.POPOVER, BOUNDARY],
+  ['Error edge and icon on toast', TOKEN.BAD, TOKEN.POPOVER, BOUNDARY],
 ];
 
 const LIGHT_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
-  ['Warn on dark chip', TOKEN.WARN_ON_DARK, TOKEN.TOOLTIP, TEXT],
   [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.THEME_TRACK, BOUNDARY],
 ];
 
 const DARK_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
-  ['Warn on dark on card', TOKEN.WARN_ON_DARK, TOKEN.SURFACE, TEXT],
   [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, BOUNDARY],
 ];
 

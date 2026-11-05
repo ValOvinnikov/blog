@@ -1,20 +1,10 @@
-import { ALERT_TYPE, ICONS } from '@blog/config';
-import {
-  Icon,
-  type TRegisteredIconName,
-} from '@platform/components/shared/icon';
+import { ALERT_TYPE } from '@blog/config';
+import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
 import type { ReactNode } from 'react';
 
 import { alertVariants, type TAlertVariants } from './alert-variants';
 
 type TAlertType = NonNullable<TAlertVariants['type']>;
-
-const ALERT_ICON = {
-  [ALERT_TYPE.SUCCESS]: ICONS.CHECK,
-  [ALERT_TYPE.WARNING]: ICONS.WARNING,
-  [ALERT_TYPE.ERROR]: ICONS.CLOSE,
-  [ALERT_TYPE.INFO]: ICONS.INFO,
-} as const satisfies Record<TAlertType, TRegisteredIconName>;
 
 export type TAlertProps = {
   type: TAlertType;
@@ -46,7 +36,7 @@ export const Alert = ({
 
   return (
     <div id={id} role={role} className={root({ class: className })}>
-      <Icon name={ALERT_ICON[type]} className={icon()} />
+      <Icon name={STATUS_ICON[type]} className={icon()} />
       <div className={text()}>
         {title && <strong className={titleSlot()}>{title}</strong>}
         {description && <div className={descriptionSlot()}>{description}</div>}
