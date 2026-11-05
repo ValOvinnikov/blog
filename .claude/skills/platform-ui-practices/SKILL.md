@@ -346,7 +346,7 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `Alert` (ERROR) under the header only when no bar does.
 - An embedded edit panel outside the shell (today only the tenant details panel)
   calls `useUnsavedChangesGuard`, submits from a right-aligned `Card.Footer`,
-  and shows its save error above the card.
+  and shows its save error beside Save through `Card.Footer`'s `error`.
 - `SettingRow` describes a Base UI control in its slot by its description and
   lock reason, through `Field`. `FormField` links its hint and error to the
   control itself; never wire them per call site (no `` `${id}-error` `` strings,

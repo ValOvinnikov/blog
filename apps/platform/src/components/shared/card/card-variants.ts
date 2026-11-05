@@ -22,5 +22,15 @@ export const cardVariants = tv({
       'border-t border-admin-line-2 bg-admin-surface-2 px-admin-card py-[11px]',
       'rounded-b-admin',
     ],
+    footerError: ['min-w-0 flex-1 basis-64'],
+  },
+  variants: {
+    hasFooterError: {
+      true: { footer: ['flex-wrap'] },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    hasFooterError: false,
   },
 });

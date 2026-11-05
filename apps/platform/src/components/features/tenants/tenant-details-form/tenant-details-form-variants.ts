@@ -2,7 +2,6 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const tenantDetailsFormVariants = tv({
   slots: {
-    root: ['flex flex-col gap-6'],
     cardWrap: ['relative'],
     cardInert: [],
     overlay: [

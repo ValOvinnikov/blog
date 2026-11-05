@@ -85,6 +85,36 @@ describe(`<${Card.name}/>`, () => {
     );
   });
 
+  it('shows a footer error as an alert before the footer actions', () => {
+    renderWithIntl(
+      <Card>
+        <Card.Footer error={MOCK_FOOTER}>
+          <button type="button">{MOCK_ACTION}</button>
+        </Card.Footer>
+      </Card>,
+    );
+
+    const alert = screen.getByRole('alert');
+    const actionButton = screen.getByRole('button', { name: MOCK_ACTION });
+
+    expect(alert).toHaveTextContent(MOCK_FOOTER);
+    expect(alert.compareDocumentPosition(actionButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('shows no alert in a footer without an error', () => {
+    renderWithIntl(
+      <Card>
+        <Card.Footer>{MOCK_FOOTER}</Card.Footer>
+      </Card>,
+    );
+
+    const alert = screen.queryByRole('alert');
+
+    expect(alert).not.toBeInTheDocument();
+  });
+
   it('is a region named by its header title', () => {
     renderWithIntl(
       <Card>

@@ -195,7 +195,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     );
   });
 
-  it('shows a general error when creating the tenant fails', async () => {
+  it('shows a failed create beside its button and keeps the entered values', async () => {
     createTenantActionMock.mockResolvedValue({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
@@ -204,8 +204,31 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     await clickBeginProvisioning();
 
     const alert = await screen.findByRole('alert');
+    const beginButton = screen.getByRole('button', BEGIN_PROVISIONING_BUTTON);
 
     expect(alert).toHaveTextContent(tenantDetailsForm.errors.createFailed);
+    expect(alert.compareDocumentPosition(beginButton)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(getNameInput()).toHaveValue(MOCK_TENANT_NAME);
+    expect(getOwnerEmailInput()).toHaveValue(MOCK_OWNER_EMAIL);
+  });
+
+  it('clears a failed create when it is submitted again', async () => {
+    createTenantActionMock.mockResolvedValueOnce({
+      outcome: ACTION_OUTCOME.SERVER_ERROR,
+    });
+
+    await fillForm();
+    await clickBeginProvisioning();
+    await screen.findByRole('alert');
+    await clickBeginProvisioning();
+
+    await waitFor(() => {
+      const alert = screen.queryByRole('alert');
+
+      expect(alert).not.toBeInTheDocument();
+    });
   });
 
   it('blocks the whole form behind a loading overlay while submitting', async () => {
