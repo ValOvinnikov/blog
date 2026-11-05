@@ -464,6 +464,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
           isWide: true,
           isTitleHiddenBelowLg: true,
           hasCompactGap: true,
+          hasTightGap: true,
         },
       },
     );

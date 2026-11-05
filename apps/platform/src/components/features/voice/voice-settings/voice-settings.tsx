@@ -1,12 +1,10 @@
 'use client';
 
-import { ALERT_TYPE, FORM_STATUS } from '@blog/config';
+import { FORM_STATUS } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
-import { Alert } from '@platform/components/shared/alert';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
-import { PreviewModeGroup } from '@platform/components/shared/preview-mode-group';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import {
@@ -22,6 +20,7 @@ import {
 } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
 
+import { VoiceNoteRow } from './components/voice-note-row/voice-note-row';
 import { useVoiceDraft } from './use-voice-draft';
 import { voiceSettingsVariants } from './voice-settings-variants';
 
@@ -45,7 +44,6 @@ export const VoiceSettings = ({
   archivedAt,
 }: TVoiceSettingsProps) => {
   const t = useTranslations('voiceSettings');
-  const tLanguage = useTranslations('languageNames');
   const { mode, setMode, isDark } = usePreviewColorScheme();
   const {
     values,
@@ -70,11 +68,13 @@ export const VoiceSettings = ({
     savedAt,
     archivedAt,
   });
-  const { intro, controls, languageEmphasis, cards } = voiceSettingsVariants();
+  const { shell, cards } = voiceSettingsVariants();
+  const isMultilingual = liveLocales.length > 1;
 
   return (
     <SettingsFormShell
-      layout={{ isWide: true, hasPhoneSaveFooter: true }}
+      layout={{ isWide: true, hasTightGap: true, hasPhoneSaveFooter: true }}
+      className={shell()}
       title={t('heading')}
       description={t('description')}
       form={form}
@@ -85,7 +85,7 @@ export const VoiceSettings = ({
           : undefined
       }
       headerActions={
-        liveLocales.length > 1 && (
+        isMultilingual && (
           <LanguagePicker
             locales={liveLocales}
             defaultLocale={defaultLocale}
@@ -98,31 +98,12 @@ export const VoiceSettings = ({
         )
       }
     >
-      <div className={intro()}>
-        <div className={controls()}>
-          <PreviewModeGroup value={mode} onChange={setMode} />
-        </div>
-        <Alert
-          type={ALERT_TYPE.INFO}
-          role="note"
-          description={
-            <>
-              {t('fixedCopyNote')}
-              {liveLocales.length > 1 && (
-                <>
-                  {' '}
-                  {t.rich('editingLanguageNote', {
-                    language: tLanguage(selectedLocale),
-                    strong: (chunks) => (
-                      <strong className={languageEmphasis()}>{chunks}</strong>
-                    ),
-                  })}
-                </>
-              )}
-            </>
-          }
-        />
-      </div>
+      <VoiceNoteRow
+        selectedLocale={selectedLocale}
+        isMultilingual={isMultilingual}
+        previewMode={mode}
+        onPreviewModeChange={setMode}
+      />
       <VoiceEditorProvider
         locale={selectedLocale}
         fieldIdPrefix={fieldIdPrefix}

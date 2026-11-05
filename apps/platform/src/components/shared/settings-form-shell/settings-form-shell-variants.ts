@@ -16,6 +16,9 @@ export const settingsFormShellVariants = tv({
     hasCompactGap: {
       true: { root: ['gap-admin-form-gap'] },
     },
+    hasTightGap: {
+      true: { root: ['gap-4 md:gap-5'] },
+    },
     hasPhoneSaveFooter: {
       true: {},
       false: {},
@@ -78,6 +81,7 @@ export const settingsFormShellVariants = tv({
   defaultVariants: {
     isWide: false,
     hasCompactGap: false,
+    hasTightGap: false,
     isArchived: false,
     hasPhoneSaveFooter: false,
     isSaveBarShown: false,

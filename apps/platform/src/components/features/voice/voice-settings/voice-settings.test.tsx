@@ -133,6 +133,7 @@ const HEADING_KEY_TEST_ID = 'voice-key-notFoundHeading';
 const DATA_FOCUSED = 'data-focused';
 const NO_OVERRIDES = 'with no overrides';
 const TWO_LANGUAGES = 'with stored overrides in two live languages';
+const FOLLOWS = Node.DOCUMENT_POSITION_FOLLOWING;
 
 const notFoundHeading = () =>
   within(card(PAGE_NOT_FOUND)).getByRole('textbox', { name: 'Heading' });
@@ -294,6 +295,19 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const restoredHeadingField = notFoundHeading();
 
       expect(restoredHeadingField).toHaveValue(NOTHING_HERE);
+    });
+
+    it('reads the heading, the language switcher, the note, then the Live preview switch', () => {
+      const heading = screen.getByRole('heading', { level: 1, name: 'Voice' });
+      const switcher = screen.getByRole('radiogroup', { name: LANGUAGE });
+      const note = screen.getByRole('note');
+      const previewSwitch = screen.getByRole('group', {
+        name: 'Preview colour scheme',
+      });
+
+      expect(heading.compareDocumentPosition(switcher)).toBe(FOLLOWS);
+      expect(switcher.compareDocumentPosition(note)).toBe(FOLLOWS);
+      expect(note.compareDocumentPosition(previewSwitch)).toBe(FOLLOWS);
     });
 
     it('names the language being edited in the note', () => {

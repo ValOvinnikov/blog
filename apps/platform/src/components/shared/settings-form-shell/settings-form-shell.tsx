@@ -1,6 +1,6 @@
 'use client';
 
-import { ALERT_TYPE } from '@blog/config';
+import { ALERT_TYPE, type IWithClassName } from '@blog/config';
 import type { IWithChildren } from '@blog/config/react';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -23,20 +23,22 @@ type TSettingsFormShellLayout = {
   isWide?: boolean;
   isTitleHiddenBelowLg?: boolean;
   hasCompactGap?: boolean;
+  hasTightGap?: boolean;
   hasPhoneSaveFooter?: boolean;
 };
 
-export type TSettingsFormShellProps<TValues> = IWithChildren & {
-  title: string;
-  description: string;
-  form: TSettingsForm<TValues>;
-  errorTitle?: string;
-  layout?: TSettingsFormShellLayout;
-  headerActions?: ReactNode;
-  hasSavedStatus?: boolean;
-  unsavedCards?: TUnsavedCard[];
-  isSaveBarHidden?: boolean;
-};
+export type TSettingsFormShellProps<TValues> = IWithChildren &
+  IWithClassName & {
+    title: string;
+    description: string;
+    form: TSettingsForm<TValues>;
+    errorTitle?: string;
+    layout?: TSettingsFormShellLayout;
+    headerActions?: ReactNode;
+    hasSavedStatus?: boolean;
+    unsavedCards?: TUnsavedCard[];
+    isSaveBarHidden?: boolean;
+  };
 
 const NO_INVALID_CONTROLS: TInvalidControls = { ids: [] };
 
@@ -50,6 +52,7 @@ export const SettingsFormShell = <TValues,>({
   hasSavedStatus = true,
   unsavedCards,
   isSaveBarHidden = false,
+  className,
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const {
@@ -73,6 +76,7 @@ export const SettingsFormShell = <TValues,>({
   const { root, alert, liveStatus } = settingsFormShellVariants({
     isWide: layout?.isWide,
     hasCompactGap: layout?.hasCompactGap,
+    hasTightGap: layout?.hasTightGap,
     isArchived,
     hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
@@ -97,7 +101,7 @@ export const SettingsFormShell = <TValues,>({
   });
 
   return (
-    <div className={root()}>
+    <div className={root({ class: className })}>
       <ShellHeader
         title={title}
         description={description}
