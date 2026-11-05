@@ -5,7 +5,8 @@ import type { TNamedControlAria } from '@blog/config';
 
 import { switchVariants } from './switch-variants';
 
-type TSwitchLabels = { on: string; off: string } | { caption: string };
+type TSwitchLabels =
+  { on: string; off: string } | { caption: string; captionId?: string };
 
 export type TSwitchProps = {
   isChecked: boolean;
@@ -49,7 +50,7 @@ export const Switch = ({
         <BaseSwitch.Thumb className={thumb()} />
       </BaseSwitch.Root>
       {'caption' in labels ? (
-        <span>{labels.caption}</span>
+        <span id={labels.captionId}>{labels.caption}</span>
       ) : (
         <span className={stateText()}>
           <span className={stateOption({ isShown: isChecked })}>

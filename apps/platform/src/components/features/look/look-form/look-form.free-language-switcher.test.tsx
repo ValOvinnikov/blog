@@ -12,7 +12,10 @@ import {
   lookRowTrigger,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupArchived,
+  setupLookForm,
+} from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -78,5 +81,29 @@ describe(`<${LookForm.name}/>`, () => {
       expect(menuCodeButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(codesButton).toHaveAttribute(ARIA_DISABLED, 'true');
     });
+  });
+
+  it('keeps the Free message and a disabled style, unbadged, on an archived Free site', async () => {
+    setupArchived({
+      plan: TENANT_PLAN.FREE,
+      liveLocales: [LOCALE_ISO_CODES.EN],
+    });
+    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+
+    const freeLine = screen.getByText(
+      LOOK_FORM.languageSwitcherFreeDescription,
+    );
+    const singleLanguageNote = screen.queryByText(
+      LOOK_FORM.languageSwitcherSingleLanguage,
+    );
+    const codesButton = screen.getByRole('button', {
+      name: SWITCHER_OPTION.CODES,
+    });
+    const badges = screen.queryAllByText(GROWTH, { exact: true });
+
+    expect(freeLine).toBeVisible();
+    expect(singleLanguageNote).not.toBeInTheDocument();
+    expect(codesButton).toBeDisabled();
+    expect(badges).toHaveLength(0);
   });
 });

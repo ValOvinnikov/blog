@@ -2,7 +2,7 @@ import { COOKIE_SETTINGS_BUTTON } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { FONT_OPTIONS } from '@platform/config/fonts';
-import { LOOK_ROW } from '@platform/constants/look-row';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
@@ -49,7 +49,7 @@ const GROWTH_FIELDS_LINE = tLookForm('lockLineGrowthFields', {
 });
 const HEADING_FONT = FONT_OPTIONS[defaultLookFormValues().headingFont].label;
 
-const growthRowBadge = (row: Parameters<typeof lookRowTrigger>[0]) =>
+const growthRowBadge = (row: TLookRow) =>
   within(lookRowTrigger(row)).queryByText(GROWTH, { exact: true });
 
 describe(`<${LookForm.name}/>`, () => {
@@ -76,16 +76,14 @@ describe(`<${LookForm.name}/>`, () => {
     expect(editorialPreset).not.toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
-  it('shows no Growth badge on Growth', () => {
-    setupLookForm();
-
-    const badges = screen.queryAllByText(GROWTH, { exact: true });
-
-    expect(badges).toHaveLength(0);
-  });
-
-  it('shows no Growth badge on an archived Free site', () => {
-    setupArchived({ plan: TENANT_PLAN.FREE });
+  it.each([
+    { site: 'a Growth site', setup: () => setupLookForm() },
+    {
+      site: 'an archived Free site',
+      setup: () => setupArchived({ plan: TENANT_PLAN.FREE }),
+    },
+  ])('shows no Growth badge on $site', ({ setup }) => {
+    setup();
 
     const badges = screen.queryAllByText(GROWTH, { exact: true });
 
@@ -113,6 +111,20 @@ describe(`<${LookForm.name}/>`, () => {
         expect(growthRowBadge(row)).not.toBeInTheDocument();
       },
     );
+
+    it('drops the row badge once the row opens, leaving the field badges', async () => {
+      await openLookRow(user, LOOK_ROW.TYPE);
+
+      const typeCard = screen.getByRole('group', {
+        name: LOOK_FORM.typeHeading,
+      });
+      const fieldBadges = within(typeCard).getAllByText(GROWTH, {
+        exact: true,
+      });
+
+      expect(growthRowBadge(LOOK_ROW.TYPE)).not.toBeInTheDocument();
+      expect(fieldBadges).toHaveLength(2);
+    });
 
     it('never shows the old Growth plan lock wording', () => {
       const oldLock = screen.queryByText(
@@ -177,7 +189,7 @@ describe(`<${LookForm.name}/>`, () => {
     it('keeps the logo hue following the accent behind a locked switch', async () => {
       await openLookRow(user, LOOK_ROW.COLOUR);
       const followSwitch = screen.getByRole('switch', {
-        name: FOLLOW_ACCENT_HUE,
+        name: `${FOLLOW_ACCENT_HUE} ${GROWTH_BADGE_TEXT}`,
       });
       const accentSlider = screen.getByRole('slider', { name: ACCENT_HUE });
 

@@ -31,6 +31,7 @@ import {
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { followLine } from '@platform/testing/look/look-follow';
+import { CONSOLE } from '@platform/testing/look/look-form-fixtures';
 import { stubLgUpWindow } from '@platform/testing/match-media';
 import {
   MOCK_TENANT_DOMAIN,
@@ -57,7 +58,7 @@ const STYLE_TARGET: TLookFollowTarget = {
   row: LOOK_ROW.TYPE,
 };
 const FREE_SAMPLE_NOTE = followLine('freeSample', {
-  preset: messages.presetPicker.console,
+  preset: CONSOLE,
 });
 const tDevicePreview = makeEnTranslator('devicePreview');
 const TABLET = tDevicePreview('deviceTablet');

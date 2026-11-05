@@ -657,7 +657,7 @@
     "languageSwitcherStyleLabel": "Stijl",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
-    "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkiezer te kiezen.",
+    "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkeuze te kiezen.",
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
     "lockLineTypeFonts": "Op Free houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {

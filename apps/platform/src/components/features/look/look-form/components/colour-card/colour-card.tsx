@@ -79,6 +79,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
           onChange={(hue) => updateField('logoHue', hue)}
           isDisabled={logoHueLock.isDisabled}
           isLocked={logoHueLock.isLocked}
+          growthBadgeId={logoHueLock.growthBadgeId}
           aria-describedby={logoHueLock.aria.describedBy}
         />
       </LookField>

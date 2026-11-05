@@ -2,6 +2,7 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   type TLanguageSwitcherStyle,
 } from '@blog/config';
+import { LOOK_FIELD } from '@blog/db/constants';
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
@@ -27,14 +28,15 @@ export const LanguageSwitcherCard = ({
   const {
     values: { languageSwitcherStyle },
     updateField,
+    isLocked: isPlanLocked,
   } = useLookForm();
   const t = useTranslations('lookForm');
   const { isDisabled, isLocked, aria, labelId, growthBadgeId } =
-    useLookFieldLock('languageSwitcherStyle');
-  const { lockLine, hasGrowthBadge } = useLookRowLock(
+    useLookFieldLock(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
+  const { hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.LANGUAGE_SWITCHER],
-    'languageSwitcherFreeDescription',
   );
+  const isStylePlanLocked = isPlanLocked(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
 
   const languageSwitcherOptions = toOptions(LANGUAGE_SWITCHER_STYLE, (style) =>
     t(`languageSwitcherOptionLabel.${style}`),
@@ -45,15 +47,17 @@ export const LanguageSwitcherCard = ({
     <LookCard
       summary={summary}
       card={LOOK_ROW.LANGUAGE_SWITCHER}
-      description={isLocked ? undefined : description}
-      lockLine={lockLine}
+      description={isStylePlanLocked ? undefined : description}
+      lockLine={
+        isStylePlanLocked ? t('languageSwitcherFreeDescription') : undefined
+      }
       hasGrowthBadge={hasGrowthBadge}
     >
-      {isLocked || hasMultipleLanguages ? (
+      {isStylePlanLocked || hasMultipleLanguages ? (
         <LookField
           field="languageSwitcherStyle"
           label={t('languageSwitcherStyleLabel')}
-          hint={isLocked ? description : undefined}
+          hint={isStylePlanLocked ? description : undefined}
           isGroup={true}
           labelId={labelId}
           growthBadgeId={growthBadgeId}

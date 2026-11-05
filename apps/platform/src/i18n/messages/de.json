@@ -657,7 +657,7 @@
     "languageSwitcherStyleLabel": "Stil",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",
     "languageSwitcherSingleLanguage": "Fügen Sie unter Sprachen eine weitere Sprache hinzu, um einen Stil zu wählen.",
-    "languageSwitcherFreeDescription": "Ihr Tarif veröffentlicht eine Sprache. Mit einem Upgrade können Sie Sprachen hinzufügen und einen Stil für den Sprachwechsler wählen.",
+    "languageSwitcherFreeDescription": "Ihr Tarif veröffentlicht eine Sprache. Mit einem Upgrade können Sie Sprachen hinzufügen und einen Stil für die Sprachauswahl wählen.",
     "lockLineGrowthFields": "Mit Growth markierte Felder behalten den Wert der Vorlage {preset}.",
     "lockLineTypeFonts": "Im Free-Tarif behält Schrift die Schriften der Vorlage {preset}. Eine andere Vorlage ändert sie.",
     "languageSwitcherOptionLabel": {

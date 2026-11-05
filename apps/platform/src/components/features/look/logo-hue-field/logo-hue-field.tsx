@@ -7,7 +7,7 @@ import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import { useTranslations } from 'next-intl';
-import type { AriaAttributes } from 'react';
+import { useId, type AriaAttributes } from 'react';
 
 import { logoHueFieldVariants } from './logo-hue-field-variants';
 
@@ -17,6 +17,7 @@ export type TLogoHueFieldProps = {
   onChange: (logoHue: TMaybeUndefined<number>) => void;
   isDisabled?: boolean;
   isLocked?: boolean;
+  growthBadgeId?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
 };
 
@@ -31,9 +32,12 @@ export const LogoHueField = ({
   onChange,
   isDisabled = false,
   isLocked = false,
+  growthBadgeId,
   'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
+  const captionId = useId();
+  const followAccentHue = t('followAccentHue');
   const follows = isUndefined(logoHue);
   const resolvedHue = logoHue ?? accentHue;
   const tones = buildLogoPreviewTokens(resolvedHue, false);
@@ -52,12 +56,19 @@ export const LogoHueField = ({
     <div className={root()}>
       <div className={switchRow()}>
         <Switch
-          aria={{ label: t('followAccentHue'), describedBy: ariaDescribedBy }}
+          aria={
+            growthBadgeId
+              ? {
+                  labelledBy: `${captionId} ${growthBadgeId}`,
+                  describedBy: ariaDescribedBy,
+                }
+              : { label: followAccentHue, describedBy: ariaDescribedBy }
+          }
           isChecked={follows}
           onCheckedChange={(checked) =>
             onChange(checked ? undefined : accentHue)
           }
-          labels={{ caption: t('followAccentHue') }}
+          labels={{ caption: followAccentHue, captionId }}
           isDisabled={isDisabled}
           isLocked={isLocked}
         />

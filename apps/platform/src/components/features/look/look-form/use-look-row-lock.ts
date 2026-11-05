@@ -6,10 +6,7 @@ import { useTranslations } from 'next-intl';
 
 import { useLookPresetName } from './use-look-preset-name';
 
-type TLookLockLineKey =
-  | 'lockLineGrowthFields'
-  | 'lockLineTypeFonts'
-  | 'languageSwitcherFreeDescription';
+type TLookLockLineKey = 'lockLineGrowthFields' | 'lockLineTypeFonts';
 
 export const useLookRowLock = (
   fields: readonly TLookField[],
