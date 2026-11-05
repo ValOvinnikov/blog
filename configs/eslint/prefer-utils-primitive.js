@@ -25,6 +25,8 @@ const isTypeofOperand = (node) =>
 
 const isZero = (node) => node.type === 'Literal' && node.value === 0;
 
+const isOne = (node) => node.type === 'Literal' && node.value === 1;
+
 const isStringValue = (node) =>
   (node.type === 'Literal' && typeof node.value === 'string') ||
   node.type === 'TemplateLiteral';
@@ -73,6 +75,14 @@ const findHelper = (node) => {
     !isOptionalEquality(lengthPair)
   ) {
     return 'hasLength';
+  }
+  const multiplePair = pairOf(node, isOne);
+  if (
+    multiplePair &&
+    multiplePair.operator === '>' &&
+    isLengthRead(multiplePair.subject)
+  ) {
+    return 'hasArrayGotMultipleItems';
   }
   return undefined;
 };
