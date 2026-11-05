@@ -1028,7 +1028,9 @@
     "description": "Formulieren Sie die seitenweiten Hinweise der Website um. Jedes Feld hat einen Standardtext – ändern Sie nur, was nach Ihnen klingen soll.",
     "fixedCopyNote": "Schaltflächen, Menüs und Beschriftungen werden für Sie übersetzt und sind auf jeder Website gleich, deshalb sind sie hier nicht aufgeführt.",
     "editingLanguageNote": "Sie bearbeiten <strong>{language}</strong> — andere Sprachen behalten ihren eigenen Text.",
-    "surfaceSummary": "{unit, select, lists {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}} · {customised, plural, =0 {alles Standard} other {# angepasst}}",
+    "surfaceSummary": "{count} · {status}",
+    "surfaceCount": "{unit, select, LISTS {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}}",
+    "customisedStatus": "{count, plural, =0 {alles Standard} other {# angepasst}}",
     "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
@@ -1044,6 +1046,10 @@
       "DISALLOWED_CONTENT": "Entfernen Sie Formatierungen, die dieses Feld nicht unterstützt.",
       "INVALID_LINK_URL": "Der Link {url} ist keine gültige Webadresse."
     }
+  },
+  "voiceSections": {
+    "ERROR_PAGES": "Fehlerseiten",
+    "EMPTY_STATES": "Leere Zustände"
   },
   "voiceSurfaces": {
     "NOT_FOUND": "Seite nicht gefunden",

@@ -8,6 +8,7 @@ import {
   DEVICE_FRAME_FIT,
   DEVICE_FRAME_SIZE,
   DEVICE_FRAME_TEST_ID,
+  DEVICE_FRAME_VIEWPORT_ATTRIBUTE,
 } from '@platform/constants/device-frame';
 import {
   PREVIEW_DEVICE,
@@ -101,6 +102,7 @@ const DeviceFrameRoot = ({
           className={viewportSlot()}
           style={{ width: viewport.width, height: viewport.height }}
           data-testid={DEVICE_FRAME_TEST_ID.VIEWPORT}
+          {...{ [DEVICE_FRAME_VIEWPORT_ATTRIBUTE]: '' }}
         >
           <div ref={scrollerRef} className={scroller()} {...scrollerProps}>
             <div className={sizerSlot()} style={sizer}>

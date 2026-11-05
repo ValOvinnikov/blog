@@ -54,10 +54,8 @@ export const LookPreview = ({
   const [fullscreenHandle] = useState(Dialog.createHandle);
   const fullscreenTriggerRef = useRef<HTMLButtonElement>(null);
   const isPhoneTab = !useMediaQuery(MEDIA_QUERY.LG_UP);
-  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight({
-    device: previewDevice,
-    scale,
-  });
+  const { rootRef, stageRef, availableHeight } =
+    useFrameAvailableHeight(previewDevice);
   const { frameRef, follow } = useLookFollow({
     target: followTarget,
     device: previewDevice,

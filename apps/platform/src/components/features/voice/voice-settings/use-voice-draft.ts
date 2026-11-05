@@ -28,11 +28,13 @@ import {
   type TVoiceFieldErrorsByLocale,
 } from '@platform/utils/voice-draft/voice-draft';
 import { toVoiceFieldMessages } from '@platform/utils/voice-field-errors/voice-field-errors';
+import { voiceSectionOfField } from '@platform/utils/voice-sections/voice-sections';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { useVoiceDraftFields } from './use-voice-draft-fields';
+import { useVoiceSections } from './use-voice-sections';
 
 type TUseVoiceDraftArgs = {
   tenantId: string;
@@ -62,10 +64,12 @@ export const useVoiceDraft = ({
     useState<TMaybeUndefined<TVoiceFieldId>>('blogListEmpty');
   const [fieldErrors, setFieldErrors] = useState<TVoiceFieldErrorsByLocale>({});
   const [revision, setRevision] = useState(0);
+  const sections = useVoiceSections();
 
   const revealError = (error: TVoiceFieldError) => {
     const { locale, listFieldId } = voiceErrorReveal(error);
     setSelectedLocale(locale);
+    sections.setSectionOpen(voiceSectionOfField(error.fieldId), true);
     if (listFieldId) setOpenListFieldId(listFieldId);
   };
 
@@ -157,5 +161,6 @@ export const useVoiceDraft = ({
     setOpenListFieldId,
     setFieldValue,
     revision,
+    sections,
   };
 };

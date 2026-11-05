@@ -2,14 +2,13 @@ import type { TMaybeUndefined } from '@blog/config';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
-import { MEDIA_QUERY } from '@platform/constants/media-query';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import {
   LOOK_FOLLOW_SCROLL,
   toLookFollowKey,
   type TLookFollowTarget,
 } from '@platform/utils/look-follow-target/look-follow-target';
-import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
+import { useMotionScrollBehavior } from '@platform/utils/use-motion-scroll-behavior/use-motion-scroll-behavior';
 import { useEffect, useRef, useState } from 'react';
 
 import { followScroll, type TLookFollowSettled } from './follow-scroll';
@@ -31,7 +30,7 @@ export const useLookFollow = ({
 }: TUseLookFollowOptions) => {
   const frameRef = useRef<TDeviceFrameHandle>(null);
   const layoutRef = useRef<TMaybeUndefined<string>>(undefined);
-  const isReducedMotion = useMediaQuery(MEDIA_QUERY.REDUCED_MOTION);
+  const scrollBehavior = useMotionScrollBehavior();
   const [isOn, setIsOn] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [request, setRequest] = useState(0);
@@ -53,7 +52,6 @@ export const useLookFollow = ({
   const isFollowing = isActive && !!row;
   const layoutKey = `${device}|${isShown}|${scale}`;
   const settledKey = `${targetKey}|${device}|${request}`;
-  const scrollBehavior: ScrollBehavior = isReducedMotion ? 'instant' : 'smooth';
 
   useEffect(() => {
     const isJump = layoutRef.current !== layoutKey;

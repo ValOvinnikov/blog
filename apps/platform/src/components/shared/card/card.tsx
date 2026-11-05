@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import {
   mapCompoundSlots,
   type TCompoundChildren,
@@ -39,9 +40,12 @@ const CardRoot = ({
   'aria-labelledby': ariaLabelledBy,
 }: TCardProps) => {
   const { root } = cardVariants();
-  const titleId = useId();
+  const generatedTitleId = useId();
   const { slots, unmatched } = mapCompoundSlots(children, CardParts);
-  const { Header } = slots;
+  const Header = slots.Header as TMaybeUndefined<
+    ReactElement<TCardHeaderProps>
+  >;
+  const titleId = Header?.props.titleId ?? generatedTitleId;
   const labelledBy = ariaLabelledBy ?? (Header ? titleId : undefined);
   const Root = labelledBy ? 'section' : 'div';
 
@@ -52,8 +56,7 @@ const CardRoot = ({
       aria-labelledby={labelledBy}
       className={root({ class: className })}
     >
-      {Header &&
-        cloneElement(Header as ReactElement<TCardHeaderProps>, { titleId })}
+      {Header && cloneElement(Header, { titleId })}
       {slots.Body}
       {slots.Footer}
       {unmatched.map((node, i) => (

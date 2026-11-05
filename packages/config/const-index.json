@@ -7084,6 +7084,22 @@
         "file": "apps/platform/src/constants/voice.ts"
       }
     ],
+    "LISTS": [
+      {
+        "ref": "VOICE_COUNT_UNIT.LISTS",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
+      }
+    ],
+    "FIELDS": [
+      {
+        "ref": "VOICE_COUNT_UNIT.FIELDS",
+        "scope": "app:platform",
+        "from": "@platform/constants/voice",
+        "file": "apps/platform/src/constants/voice.ts"
+      }
+    ],
     "worker.enqueue_error": [
       {
         "ref": "WORKER_LOG.ENQUEUE_ERROR",
