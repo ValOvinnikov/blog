@@ -1,3 +1,6 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { ICON_SIZE } from '@platform/constants/icon';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -29,6 +32,15 @@ export const disclosureVariants = tv({
         ],
         chevron: ['order-first text-admin-text'],
       },
+      section: {
+        trigger: [
+          'min-h-11 w-full gap-3 rounded-admin bg-transparent py-1.5 pr-2 pl-1 text-admin-text',
+          focusRingClasses(FOCUS_RING_GROUND.BG),
+        ],
+        chevron: [
+          'order-first text-admin-muted duration-150 motion-reduce:transition-none',
+        ],
+      },
     },
   },
   defaultVariants: {
@@ -37,3 +49,11 @@ export const disclosureVariants = tv({
 });
 
 export type TDisclosureVariants = VariantProps<typeof disclosureVariants>;
+
+type TDisclosureVariant = NonNullable<TDisclosureVariants['variant']>;
+
+export const DISCLOSURE_CHEVRON_SIZE = {
+  card: ICON_SIZE.XL,
+  inline: ICON_SIZE.XL,
+  section: ICON_SIZE.MD,
+} as const satisfies Record<TDisclosureVariant, string>;

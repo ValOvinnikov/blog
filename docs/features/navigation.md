@@ -56,7 +56,7 @@ The site header: the brand lockup with the header tagline, top-level links an ed
 - Controls are grouped by gap, never by divider: from `lg` the links sit 16px apart, then 24px to the `panelActions` group (8px apart inside it), then 24px to the `actions`; below `lg` every control in the bar sits 8px apart.
 - The `<nav>` landmark is named by `PrimaryNavigation`'s default `ariaLabel`, `Primary`, in every language; the menu toggle's name is the catalog's `siteNavigation.toggleMenu`.
 - The header reads no site settings. A failed navigation read is logged (`NAVIGATION_LOG.LAYOUT_FETCH_FAILED`) and the header renders with no links, no switcher and no tagline.
-- Under the floating bar the open phone menu spans the bar's width, not the page's. The sticky offsets below the header (the docs rail and in-page heading anchors from `lg`) follow the header's measured height (`--site-header-height`), so the floating bar never hides an anchored heading.
+- Under the floating bar the open phone menu spans the bar's width, not the page's. While a wide panel is open under the floating bar, the bar's bottom corners go square so the two read as one shape; a dropdown leaves them rounded. The sticky offsets below the header (the docs rail and in-page heading anchors from `lg`) follow the header's measured height (`--site-header-height`), so the floating bar never hides an anchored heading.
 - `@blog/ui`'s `Header`, `PrimaryNavigation` and `TextLink` stay prop-driven: `apps/web` passes resolved links, `linkAs={SmartLink}` and the mobile toggle state.
 
 ## Dependencies

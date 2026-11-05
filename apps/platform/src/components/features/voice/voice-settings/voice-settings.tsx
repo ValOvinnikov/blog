@@ -4,7 +4,7 @@ import { FORM_STATUS } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
-import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
+import { VoiceSection } from '@platform/components/features/voice/voice-section';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
@@ -17,7 +17,7 @@ import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/
 import {
   countCustomisedVoiceFields,
   localeDraftOf,
-  VOICE_SURFACES_IN_PAGE_ORDER,
+  VOICE_SECTIONS_IN_PAGE_ORDER,
   type TVoiceDraft,
 } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
@@ -62,6 +62,7 @@ export const VoiceSettings = ({
     setOpenListFieldId,
     setFieldValue,
     revision,
+    sections,
   } = useVoiceDraft({
     tenantId,
     initialDraft,
@@ -70,7 +71,7 @@ export const VoiceSettings = ({
     savedAt,
     archivedAt,
   });
-  const { cards } = voiceSettingsVariants();
+  const { sections: sectionsSlot } = voiceSettingsVariants();
   const isMultilingual = hasArrayGotMultipleItems(liveLocales);
 
   return (
@@ -124,10 +125,18 @@ export const VoiceSettings = ({
           key={`${selectedLocale}-${revision}`}
           inert={isPending}
           data-testid={VOICE_CARDS_TEST_ID}
-          className={cards()}
+          className={sectionsSlot()}
         >
-          {VOICE_SURFACES_IN_PAGE_ORDER.map((surface) => (
-            <VoiceSurfaceCard key={surface} surface={surface} />
+          {VOICE_SECTIONS_IN_PAGE_ORDER.map((section) => (
+            <VoiceSection
+              key={section}
+              section={section}
+              isOpen={sections.isSectionOpen(section)}
+              onOpenChange={(isOpen) =>
+                sections.setSectionOpen(section, isOpen)
+              }
+              onJumpToCard={sections.jumpToCard}
+            />
           ))}
         </div>
       </VoiceEditorProvider>

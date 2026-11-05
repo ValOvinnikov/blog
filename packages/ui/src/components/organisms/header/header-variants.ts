@@ -37,6 +37,7 @@ export const headerVariants = tv({
         inner: [
           'relative',
           'rounded-card border border-border bg-primary shadow-float',
+          'has-[[data-wide-panel]:popover-open]:rounded-b-none',
           HEADER_ANCHOR,
         ],
       },

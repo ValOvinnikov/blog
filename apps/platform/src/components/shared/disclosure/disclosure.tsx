@@ -7,57 +7,93 @@ import {
   type THeadingLevel,
 } from '@platform/components/shared/heading';
 import { Icon } from '@platform/components/shared/icon';
-import { ICON_SIZE } from '@platform/constants/icon';
 import type { ReactNode } from 'react';
 
 import {
+  DISCLOSURE_CHEVRON_SIZE,
   disclosureVariants,
   type TDisclosureVariants,
 } from './disclosure-variants';
 
-export type TDisclosureProps = {
+type TDisclosureHeading = {
+  level: Exclude<THeadingLevel, 1>;
+  id?: string;
+};
+
+type TDisclosureOpenState = {
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
+};
+
+type TDisclosureCollapsedBody = {
+  id: string;
+  content: ReactNode;
+};
+
+type TDisclosureBaseProps = {
   summary: ReactNode;
   children: ReactNode;
   variant?: TDisclosureVariants['variant'];
-  headingLevel?: Exclude<THeadingLevel, 1>;
-  isOpen?: boolean;
-  onOpenChange?: (isOpen: boolean) => void;
+  heading?: TDisclosureHeading;
   className?: string;
 };
+
+export type TDisclosureProps = TDisclosureBaseProps &
+  (
+    | { openState?: TDisclosureOpenState; collapsedBody?: never }
+    | {
+        openState: TDisclosureOpenState;
+        collapsedBody: TDisclosureCollapsedBody;
+      }
+  );
 
 export const Disclosure = ({
   summary,
   children,
-  variant,
-  headingLevel,
-  isOpen,
-  onOpenChange,
+  variant = 'card',
+  heading,
+  openState,
+  collapsedBody,
   className,
 }: TDisclosureProps) => {
   const { root, trigger, chevron, inner } = disclosureVariants({ variant });
+  const isOpen = openState?.isOpen;
 
   const triggerButton = (
-    <Collapsible.Trigger className={trigger()}>
+    <Collapsible.Trigger
+      className={trigger()}
+      {...(collapsedBody && { 'aria-controls': collapsedBody.id })}
+    >
       {summary}
       <Icon
         name={ICONS.CHEVRON_RIGHT}
-        size={ICON_SIZE.XL}
+        size={DISCLOSURE_CHEVRON_SIZE[variant]}
         className={chevron()}
       />
     </Collapsible.Trigger>
   );
-  const HeadingTag = headingLevel ? HEADING_TAGS[headingLevel] : undefined;
+  const HeadingTag = heading ? HEADING_TAGS[heading.level] : undefined;
 
   return (
     <Collapsible.Root
       className={root({ class: className })}
       open={isOpen}
-      onOpenChange={(nextOpen) => onOpenChange?.(nextOpen)}
+      onOpenChange={(nextOpen) => openState?.onOpenChange(nextOpen)}
     >
-      {HeadingTag ? <HeadingTag>{triggerButton}</HeadingTag> : triggerButton}
-      <Collapsible.Panel keepMounted={true} className={inner()}>
-        {children}
-      </Collapsible.Panel>
+      {HeadingTag ? (
+        <HeadingTag id={heading?.id}>{triggerButton}</HeadingTag>
+      ) : (
+        triggerButton
+      )}
+      {collapsedBody ? (
+        <div id={collapsedBody.id} className={inner()}>
+          {isOpen ? children : collapsedBody.content}
+        </div>
+      ) : (
+        <Collapsible.Panel keepMounted={true} className={inner()}>
+          {children}
+        </Collapsible.Panel>
+      )}
     </Collapsible.Root>
   );
 };

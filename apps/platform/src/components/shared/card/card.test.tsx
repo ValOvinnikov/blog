@@ -149,6 +149,21 @@ describe(`<${Card.name}/>`, () => {
     expect(second).toHaveTextContent(MOCK_FOOTER);
   });
 
+  it("keeps a header title's own id and is named by it", () => {
+    renderWithIntl(
+      <Card>
+        <Card.Header title={MOCK_TITLE} titleId={MOCK_TITLE_ID} />
+        <Card.Body>{MOCK_BODY}</Card.Body>
+      </Card>,
+    );
+
+    const region = screen.getByRole('region', { name: MOCK_TITLE });
+    const heading = screen.getByRole('heading', { name: MOCK_TITLE });
+
+    expect(region).toHaveTextContent(MOCK_BODY);
+    expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
+  });
+
   it('is a region named by the element it is labelled by over its header title', () => {
     renderWithIntl(
       <Card aria-labelledby={MOCK_TITLE_ID}>

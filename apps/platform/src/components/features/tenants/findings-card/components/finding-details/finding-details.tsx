@@ -1,6 +1,7 @@
 'use client';
 
 import type { TFinding } from '@blog/db/schema/findings';
+import { isUndefined } from '@blog/utils/primitives';
 import { Disclosure } from '@platform/components/shared/disclosure';
 import { Spinner } from '@platform/components/shared/spinner';
 import { getFindingDetailsAction } from '@platform/server/findings/get-finding-details-action';
@@ -51,10 +52,9 @@ export const FindingDetails = ({
     <Disclosure
       variant="inline"
       summary={t('detailsToggle')}
-      isOpen={isOpen}
-      onOpenChange={handleOpenChange}
+      openState={{ isOpen, onOpenChange: handleOpenChange }}
     >
-      {details === undefined ? (
+      {isUndefined(details) ? (
         <Spinner label={t('detailsLoading')} hasLabel={true} />
       ) : parsed ? (
         <DocumentValidationTable documents={parsed.documents} />
