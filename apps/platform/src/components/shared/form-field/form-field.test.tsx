@@ -1,5 +1,6 @@
 import { Input } from '@base-ui/react/input';
 import { faker } from '@faker-js/faker';
+import { OptionSelect } from '@platform/components/shared/option-select';
 import { TextInput } from '@platform/components/shared/text-input';
 import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import {
@@ -11,6 +12,7 @@ import {
   ARCHIVED_NOTICE_ID,
   ARCHIVED_NOTICE_TEXT,
 } from '@platform/testing/render-in-settings-form';
+import userEvent from '@testing-library/user-event';
 
 import { FormField, type TFormFieldProps } from './form-field';
 
@@ -24,6 +26,7 @@ const MOCK_ACTION = faker.lorem.word();
 const MOCK_CONTROL_ID = faker.lorem.slug();
 const MOCK_OWN_NAME = faker.lorem.words(3);
 const MOCK_WIZARD_CONTROL = { appearance: FIELD_APPEARANCE.WIZARD };
+const MOCK_OPTION = { value: faker.lorem.slug(), label: faker.lorem.word() };
 
 const TextFormField = (props: Omit<TFormFieldProps, 'children'>) => (
   <FormField {...props}>
@@ -40,6 +43,40 @@ describe(`<${FormField.name}/>`, () => {
     const input = screen.getByRole('textbox', { name: MOCK_LABEL });
 
     expect(input).toBeVisible();
+  });
+
+  it('focuses the control when its label is clicked', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    const label = screen.getByText(MOCK_LABEL);
+    await user.click(label);
+
+    const input = screen.getByRole('textbox', { name: MOCK_LABEL });
+
+    expect(input).toHaveFocus();
+  });
+
+  it('focuses a select when its label is clicked and leaves its list closed', async () => {
+    const user = userEvent.setup();
+    renderWithIntl(
+      <FormField label={MOCK_LABEL}>
+        <OptionSelect
+          options={[MOCK_OPTION]}
+          value={MOCK_OPTION.value}
+          onChange={vi.fn()}
+        />
+      </FormField>,
+    );
+
+    const label = screen.getByText(MOCK_LABEL);
+    await user.click(label);
+
+    const select = screen.getByRole('combobox', { name: MOCK_LABEL });
+    const list = screen.queryByRole('listbox');
+
+    expect(select).toHaveFocus();
+    expect(list).not.toBeInTheDocument();
   });
 
   it('leaves a control that names itself with its own name', () => {

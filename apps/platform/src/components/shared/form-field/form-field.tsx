@@ -99,7 +99,13 @@ export const FormField = ({
         {hasOwnAccessibleName ? (
           <span className={labelSlot()}>{label}</span>
         ) : (
-          <Field.Label className={labelSlot()}>{label}</Field.Label>
+          <Field.Label
+            nativeLabel={false}
+            render={<div />}
+            className={labelSlot()}
+          >
+            {label}
+          </Field.Label>
         )}
         {actions}
       </div>

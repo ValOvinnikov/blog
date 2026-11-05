@@ -85,7 +85,13 @@ export const LookField = ({
         </Fieldset.Root>
       ) : (
         <>
-          <Field.Label className={labelSlot()}>{labelContent}</Field.Label>
+          <Field.Label
+            nativeLabel={false}
+            render={<div />}
+            className={labelSlot()}
+          >
+            {labelContent}
+          </Field.Label>
           {description}
           {children}
         </>
