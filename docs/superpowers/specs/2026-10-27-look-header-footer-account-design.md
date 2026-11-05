@@ -61,10 +61,10 @@ to the cookie choice.
 
 ### Busy buttons and spinner
 
-| Setting (Look › Buttons) | Options                                                | Default           | Plan   |
-| ------------------------ | ------------------------------------------------------ | ----------------- | ------ |
-| While busy               | Busy label (L1) · Label kept (L2) · Progress edge (L3) | Busy label        | Growth |
-| Spinner                  | Follow the preset · Braille · Ring · Dots · Pulse      | Follow the preset | Growth |
+| Setting (Look › Buttons) | Options                                                | Default      | Plan   |
+| ------------------------ | ------------------------------------------------------ | ------------ | ------ |
+| While busy               | Busy label (L1) · Label kept (L2) · Progress edge (L3) | Busy label   | Growth |
+| Spinner                  | Braille · Ring · Dots · Pulse                          | The preset's | Growth |
 
 - Platform buttons always use L1 (ring in the button's text colour, busy label,
   full colour, width held, keeps focus). Not a setting.
@@ -72,8 +72,9 @@ to the cookie choice.
   bar take the button's text colour.
 - With reduced motion, Label kept switches to the busy label; spinners show a
   still glyph.
-- Follow the preset: Console uses Braille, Editorial uses Ring. The setting
-  changes every spinner on the public site. Progress edge draws no glyph.
+- The preset seeds the spinner: Console uses Braille, Editorial uses Ring. The
+  setting changes every spinner on the public site. Progress edge draws no
+  glyph, so the Spinner field hides while it is chosen.
 
 ### Header
 

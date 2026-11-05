@@ -114,7 +114,7 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.BUTTONS,
         label: SPINNER_LABEL,
-        current: LOOK_FORM.spinnerStyleOptionLabel.PRESET,
+        current: LOOK_FORM.spinnerStyleOptionLabel.BRAILLE,
       },
     ])(
       'shows $label as a locked select that keeps its value shut',

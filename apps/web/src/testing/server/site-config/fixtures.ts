@@ -47,7 +47,7 @@ export const mockSiteConfig = (
   accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
-  spinnerStyle: SPINNER_STYLE.PRESET,
+  spinnerStyle: SPINNER_STYLE.BRAILLE,
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,

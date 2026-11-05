@@ -4,6 +4,7 @@ import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { SUMMARY_JOINER } from '@platform/constants/summary';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
+import { hasBusySpinner } from '@platform/utils/sample-busy-style/sample-busy-style';
 
 const join = (parts: readonly string[]): string => parts.join(SUMMARY_JOINER);
 
@@ -63,7 +64,9 @@ export const buildLookRowSummaries = (
     ]),
     [LOOK_ROW.BUTTONS]: join([
       t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
-      t(`spinnerStyleOptionLabel.${spinnerStyle}`),
+      ...(hasBusySpinner(busyButtonStyle)
+        ? [t(`spinnerStyleOptionLabel.${spinnerStyle}`)]
+        : []),
     ]),
     [LOOK_ROW.HEADER]: join([
       t(`headerLayoutOptionLabel.${headerLayout}`),

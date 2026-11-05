@@ -8,7 +8,8 @@ export type TPresetSeededField =
   | 'radiusScale'
   | 'density'
   | 'cardStyle'
-  | 'headerControlStyle';
+  | 'headerControlStyle'
+  | 'spinnerStyle';
 
 type TPresetSeededValues = Pick<TLookFormValues, TPresetSeededField>;
 
@@ -17,6 +18,7 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     themeTokens: { accentHue, headingFont, bodyFont, radiusScale, density },
     cardStyle,
     headerControlStyle,
+    spinnerStyle,
   } = PRESET_REGISTRY[preset];
 
   return {
@@ -27,6 +29,7 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     density,
     cardStyle,
     headerControlStyle,
+    spinnerStyle,
   };
 };
 
@@ -67,6 +70,7 @@ export const switchPreset = (
     density: keepCustomised('density'),
     cardStyle: keepCustomised('cardStyle'),
     headerControlStyle: keepCustomised('headerControlStyle'),
+    spinnerStyle: keepCustomised('spinnerStyle'),
   };
 };
 

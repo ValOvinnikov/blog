@@ -45,7 +45,7 @@ const seedValues = () => ({
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
-  spinnerStyle: SPINNER_STYLE.PRESET,
+  spinnerStyle: SPINNER_STYLE.BRAILLE,
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
@@ -64,7 +64,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.BRAND]: 'Logo uploaded · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
       [LOOK_ROW.SHAPE]: 'Medium · Default · Accent bar · Outlined',
-      [LOOK_ROW.BUTTONS]: 'Busy label · Follow the preset',
+      [LOOK_ROW.BUTTONS]: 'Busy label · Braille',
       [LOOK_ROW.HEADER]: 'Classic · Full width · Dropdown · Pill with label',
       [LOOK_ROW.FOOTER]:
         'Columns · Brand tint · Full width · Cookie button shown',
@@ -90,6 +90,17 @@ describe(buildLookRowSummaries, () => {
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.BRAND]).toBe('No logo · Favicon uploaded');
+  });
+
+  it('names only the busy style while busy buttons draw a progress edge', () => {
+    const values = {
+      ...seedValues(),
+      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
+    };
+
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
+
+    expect(summaries[LOOK_ROW.BUTTONS]).toBe('Progress edge');
   });
 
   it('reads a hidden cookie button', () => {
