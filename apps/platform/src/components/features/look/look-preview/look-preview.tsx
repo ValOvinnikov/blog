@@ -1,23 +1,15 @@
 'use client';
 
-import {
-  COOKIE_SETTINGS_BUTTON,
-  ICONS,
-  type TLocaleIsoCode,
-} from '@blog/config';
+import { COOKIE_SETTINGS_BUTTON, type TLocaleIsoCode } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
 import { DeviceFrame } from '@platform/components/shared/device-frame';
-import type { TIconToggleGroupProps } from '@platform/components/shared/icon-toggle-group';
 import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
-import {
-  PREVIEW_HEADING_LAYOUT,
-  PREVIEW_READER_STATE,
-  type TPreviewReaderState,
-} from '@platform/constants/preview';
+import { PREVIEW_HEADING_LAYOUT } from '@platform/constants/preview';
+import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import { toSampleBusyStyle } from '@platform/utils/sample-busy-style/sample-busy-style';
 import { toSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { toSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
@@ -27,18 +19,27 @@ import { usePreviewColorScheme } from '@platform/utils/use-preview-color-scheme/
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { LookFollowMark } from './components/look-follow-mark';
+import { LookFollowStatus } from './components/look-follow-status';
+import { LookFollowToggle } from './components/look-follow-toggle';
 import { useFrameAvailableHeight } from './use-frame-available-height';
+import { useLookFollow } from './use-look-follow';
+import { useReaderGroup } from './use-reader-group';
 
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
   siteHost: string;
+  followTarget: TLookFollowTarget;
+  isShown: boolean;
 };
 
 export const LookPreview = ({
   liveLocales,
   hasReaderAccounts,
   siteHost,
+  followTarget,
+  isShown,
 }: TLookPreviewProps) => {
   const {
     tenantName,
@@ -50,38 +51,23 @@ export const LookPreview = ({
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
   const { mode, setMode, isDark } = usePreviewColorScheme();
-  const [readerState, setReaderState] = useState<TPreviewReaderState>(
-    PREVIEW_READER_STATE.SIGNED_OUT,
-  );
+  const { readerGroup, isSignedIn } = useReaderGroup();
   const [scale, setScale] = useState(1);
   const isPhoneTab = !useMediaQuery(MEDIA_QUERY.LG_UP);
   const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight({
     device: previewDevice,
     scale,
   });
+  const { frameRef, follow } = useLookFollow({
+    target: followTarget,
+    device: previewDevice,
+    scale,
+    isShown,
+  });
   const theme = buildSitePreviewTheme(values, isDark);
   const footer = toSampleFooterStyle(values);
 
-  const readerGroup: TIconToggleGroupProps<TPreviewReaderState> = {
-    ariaLabel: t('readerStateAriaLabel'),
-    value: readerState,
-    onChange: setReaderState,
-    options: [
-      {
-        value: PREVIEW_READER_STATE.SIGNED_OUT,
-        icon: ICONS.USER,
-        ariaLabel: t('readerSignedOut'),
-        tooltip: t('readerSignedOut'),
-      },
-      {
-        value: PREVIEW_READER_STATE.SIGNED_IN,
-        icon: ICONS.USER_CHECK,
-        ariaLabel: t('readerSignedIn'),
-        tooltip: t('readerSignedInTooltip', { name: t('sampleReaderName') }),
-        isTooltipEndAligned: true,
-      },
-    ],
-  };
+  const followToggle = <LookFollowToggle follow={follow} />;
 
   return (
     <div ref={rootRef}>
@@ -97,6 +83,7 @@ export const LookPreview = ({
               ? PREVIEW_HEADING_LAYOUT.PHONE_TAB
               : PREVIEW_HEADING_LAYOUT.SECTION
           }
+          actions={isPhoneTab && followToggle}
         />
         <PreviewFrame.Toolbar
           device={previewDevice}
@@ -104,14 +91,18 @@ export const LookPreview = ({
           mode={mode}
           onModeChange={setMode}
           extraGroups={hasReaderAccounts ? [readerGroup] : []}
-        />
+        >
+          {!isPhoneTab && followToggle}
+        </PreviewFrame.Toolbar>
         <PreviewFrame.Stage ref={stageRef} isCompact={isPhoneTab}>
           <DeviceFrame
+            ref={frameRef}
             device={previewDevice}
             host={siteHost}
             fit={{ mode: DEVICE_FRAME_FIT.PAGE, availableHeight }}
             isDark={isDark}
             onScaleChange={setScale}
+            onHandScroll={follow.onHandScroll}
           >
             <LookSample
               brand={{ name: tenantName, logoSrc: values.logo.url }}
@@ -121,9 +112,12 @@ export const LookPreview = ({
               footer={footer}
               busy={toSampleBusyStyle(values)}
               hasReaderAccounts={hasReaderAccounts}
-              isSignedIn={readerState === PREVIEW_READER_STATE.SIGNED_IN}
+              isSignedIn={isSignedIn}
               isSubmenuOpen={isSubmenuPreviewOpen}
             />
+            {follow.isFollowing && follow.row && (
+              <LookFollowMark row={follow.row} scale={scale} />
+            )}
             {footer.cookieSettingsButton === COOKIE_SETTINGS_BUTTON.SHOWN && (
               <DeviceFrame.Overlay>
                 <SampleCookieButton theme={theme} />
@@ -131,11 +125,13 @@ export const LookPreview = ({
             )}
           </DeviceFrame>
         </PreviewFrame.Stage>
-        {!hasReaderAccounts && (
-          <PreviewFrame.Status icon={ICONS.INFO}>
-            {t('readerAccountsOff')}
-          </PreviewFrame.Status>
-        )}
+        <LookFollowStatus
+          follow={follow}
+          target={followTarget}
+          device={previewDevice}
+          isShortLine={isPhoneTab || !hasReaderAccounts}
+          readerNote={hasReaderAccounts ? undefined : t('readerAccountsOff')}
+        />
       </PreviewFrame>
     </div>
   );

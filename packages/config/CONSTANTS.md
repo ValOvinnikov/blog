@@ -365,11 +365,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/device-frame` — `apps/platform/src/constants/device-frame.ts`
 
 - **DEVICE_FRAME_FIT**: `PAGE`, `STAGE`, `FULLSCREEN`
-- **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`
+- **DEVICE_FRAME_LIMIT**: `PAGE_HEIGHT`=`608`, `FULLSCREEN_MIN_SCALE`=`0.5`, `SCALE_PRECISION`=`10000`, `PERCENT`=`100`, `HAND_SCROLL_WINDOW_MS`=`300`
 - **DEVICE_FRAME_SIZE**: `BORDER`=`1`, `BEZEL_PADDING`=`6`, `BROWSER_BAR_HEIGHT`=`28`
 - **DEVICE_FRAME_AXIS**: `VERTICAL`, `HORIZONTAL`
 - **DEVICE_FRAME_SCROLL_TARGET**: `TOP`, `END`
-- **DEVICE_FRAME_TEST_ID**: `FRAME`=`"device-frame"`, `VIEWPORT`=`"device-frame-viewport"`, `CONTENT`=`"device-frame-content"`, `BROWSER_BAR`=`"device-frame-browser-bar"`, `VERTICAL_SCROLLBAR`=`"device-frame-vertical-scrollbar"`, `HORIZONTAL_SCROLLBAR`=`"device-frame-horizontal-scrollbar"`
+- **DEVICE_FRAME_TEST_ID**: `FRAME`=`"device-frame"`, `VIEWPORT`=`"device-frame-viewport"`, `SCROLLER`=`"device-frame-scroller"`, `CONTENT`=`"device-frame-content"`, `BROWSER_BAR`=`"device-frame-browser-bar"`, `VERTICAL_SCROLLBAR`=`"device-frame-vertical-scrollbar"`, `HORIZONTAL_SCROLLBAR`=`"device-frame-horizontal-scrollbar"`
 
 ### `@platform/constants/dialog-backdrop` — `apps/platform/src/constants/dialog-backdrop.ts`
 
@@ -445,6 +445,14 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_CARD**: `PRESET`
 
+### `@platform/constants/look-follow` — `apps/platform/src/constants/look-follow.ts`
+
+- **LOOK_FOLLOW_TARGET**: `IDLE`, `UNEDITED`, `ALL_OPEN`, `STYLE`, `PART`
+- **LOOK_FOLLOW_OUTCOME**: `IN_VIEW`, `FITS`, `AT_TOP`, `AT_END`, `NEARLY_FITS`
+- **LOOK_FOLLOW_MARK**: `OUTLINE_WIDTH`=`2`, `TAG_FONT_SIZE`=`11`, `TAG_HEIGHT`=`20`, `TAG_PADDING_X`=`7`, `TAG_RADIUS`=`3`
+- **LOOK_FOLLOW_LIMIT**: `OVERFLOW_STEP`=`10`, `NEARLY_FITS_SCREENS`=`2`, `SCROLL_TOLERANCE`=`1`, `SETTLE_STILL_FRAMES`=`3`, `SETTLE_TIMEOUT_MS`=`1500`
+- **LOOK_FOLLOW_TEST_ID**: `OUTLINE`=`"look-follow-outline"`
+
 ### `@platform/constants/look-group` — `apps/platform/src/constants/look-group.ts`
 
 - **LOOK_GROUP**: `STYLE`, `SITE_PARTS`
@@ -459,7 +467,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
-- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`
+- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`, `REDUCED_MOTION`=`"(prefers-reduced-motion: reduce)"`
 
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 

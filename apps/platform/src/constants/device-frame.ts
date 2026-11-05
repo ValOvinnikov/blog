@@ -13,6 +13,8 @@ export const DEVICE_FRAME_LIMIT = {
   FULLSCREEN_MIN_SCALE: 0.5,
   SCALE_PRECISION: 10000,
   PERCENT: 100,
+  // Covers the scroll a wheel tick or swipe sets off; a later follow scroll is not read as a hand.
+  HAND_SCROLL_WINDOW_MS: 300,
 } as const;
 
 export const DEVICE_FRAME_SIZE = {
@@ -36,6 +38,7 @@ export const DEVICE_FRAME_SCROLL_TARGET = {
 export const DEVICE_FRAME_TEST_ID = {
   FRAME: 'device-frame',
   VIEWPORT: 'device-frame-viewport',
+  SCROLLER: 'device-frame-scroller',
   CONTENT: 'device-frame-content',
   BROWSER_BAR: 'device-frame-browser-bar',
   VERTICAL_SCROLLBAR: 'device-frame-vertical-scrollbar',

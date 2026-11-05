@@ -1,5 +1,9 @@
 import { isUndefined } from '@blog/utils/primitives';
-import { DEVICE_FRAME_FIT } from '@platform/constants/device-frame';
+import {
+  DEVICE_FRAME_FIT,
+  DEVICE_FRAME_LIMIT,
+  DEVICE_FRAME_TEST_ID,
+} from '@platform/constants/device-frame';
 import {
   PREVIEW_DEVICE_HEIGHT,
   PREVIEW_DEVICE_WIDTH,
@@ -23,6 +27,7 @@ type TUseDeviceFrameOptions = {
   device: TPreviewDevice;
   fit: TDeviceFrameFit;
   onScaleChange?(scale: number): void;
+  onHandScroll?(): void;
   ref?: Ref<TDeviceFrameHandle>;
 };
 
@@ -30,12 +35,14 @@ export const useDeviceFrame = ({
   device,
   fit,
   onScaleChange,
+  onHandScroll,
   ref,
 }: TUseDeviceFrameOptions) => {
   const stageRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const handInputAtRef = useRef(-Infinity);
   const [offset, setOffset] = useState({ left: 0, top: 0 });
   const stage = useElementSize(stageRef);
   const measuredViewport = useElementSize(viewportRef);
@@ -59,6 +66,10 @@ export const useDeviceFrame = ({
   }, [isMeasured, scale, onScaleChange]);
 
   useDeviceFrameHandle(ref, scrollerRef, contentRef);
+
+  const noteHandInput = () => {
+    handInputAtRef.current = Date.now();
+  };
 
   const deviceWidth = PREVIEW_DEVICE_WIDTH[device];
   const sizer = {
@@ -96,11 +107,20 @@ export const useDeviceFrame = ({
           contentSize: deviceWidth,
         })
       : null,
-    onScroll: ({ currentTarget }: UIEvent<HTMLDivElement>) => {
-      setOffset({
-        left: currentTarget.scrollLeft,
-        top: currentTarget.scrollTop,
-      });
+    scrollerProps: {
+      'data-testid': DEVICE_FRAME_TEST_ID.SCROLLER,
+      onScroll: ({ currentTarget }: UIEvent<HTMLDivElement>) => {
+        setOffset({
+          left: currentTarget.scrollLeft,
+          top: currentTarget.scrollTop,
+        });
+        const sinceHandInput = Date.now() - handInputAtRef.current;
+        if (sinceHandInput < DEVICE_FRAME_LIMIT.HAND_SCROLL_WINDOW_MS) {
+          onHandScroll?.();
+        }
+      },
+      onWheel: noteHandInput,
+      onTouchMove: noteHandInput,
     },
   };
 };

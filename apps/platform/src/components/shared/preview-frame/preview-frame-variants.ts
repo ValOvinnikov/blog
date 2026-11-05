@@ -9,7 +9,8 @@ export const previewFrameVariants = tv({
     frame: ['@container mx-auto w-full transition-[max-width]'],
     notes: ['flex flex-col gap-1 text-admin-12 text-admin-muted'],
     title: [],
-    headingRow: ['flex items-baseline justify-between gap-3'],
+    headingRow: ['flex justify-between gap-3'],
+    headingActions: ['ml-auto flex flex-none items-center gap-1.5'],
     readout: [
       'font-admin-mono text-admin-12 whitespace-nowrap text-admin-muted',
     ],
@@ -36,6 +37,10 @@ export const previewFrameVariants = tv({
     isTitleHidden: {
       true: { title: ['sr-only'] },
       false: {},
+    },
+    hasHeadingActions: {
+      true: { headingRow: ['items-center gap-2'] },
+      false: { headingRow: ['items-baseline'] },
     },
     isAccent: {
       true: { statusIcon: ['text-admin-brand-strong'] },

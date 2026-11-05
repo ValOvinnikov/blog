@@ -8,7 +8,12 @@ import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_WIDTH,
 } from '@platform/constants/preview';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  fireEvent,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
 import { createRef } from 'react';
@@ -204,6 +209,38 @@ describe(`<${DeviceFrame.name}/>`, () => {
       ref.current?.scrollTo(DEVICE_FRAME_SCROLL_TARGET.TOP, 'smooth');
 
       expect(scrollTo).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  describe('hand scroll', () => {
+    const scroller = () => screen.getByTestId(DEVICE_FRAME_TEST_ID.SCROLLER);
+
+    it('reports a wheel that moves the frame', () => {
+      const onHandScroll = vi.fn();
+      setup({ onHandScroll });
+
+      fireEvent.wheel(scroller());
+      fireEvent.scroll(scroller());
+
+      expect(onHandScroll).toHaveBeenCalledOnce();
+    });
+
+    it('ignores a wheel that leaves the frame where it is', () => {
+      const onHandScroll = vi.fn();
+      setup({ onHandScroll });
+
+      fireEvent.wheel(scroller());
+
+      expect(onHandScroll).not.toHaveBeenCalled();
+    });
+
+    it('ignores a scroll no hand started', () => {
+      const onHandScroll = vi.fn();
+      setup({ onHandScroll });
+
+      fireEvent.scroll(scroller());
+
+      expect(onHandScroll).not.toHaveBeenCalled();
     });
   });
 });

@@ -36,6 +36,7 @@ type TDeviceFrameProps = {
   fit?: TDeviceFrameFit;
   isDark: boolean;
   onScaleChange?(scale: number): void;
+  onHandScroll?(): void;
   children: ReactNode;
   ref?: Ref<TDeviceFrameHandle>;
 };
@@ -46,6 +47,7 @@ const DeviceFrameRoot = ({
   fit = PAGE_FIT,
   isDark,
   onScaleChange,
+  onHandScroll,
   children,
   ref,
 }: TDeviceFrameProps) => {
@@ -64,8 +66,8 @@ const DeviceFrameRoot = ({
     sizer,
     verticalThumb,
     horizontalThumb,
-    onScroll,
-  } = useDeviceFrame({ device, fit, onScaleChange, ref });
+    scrollerProps,
+  } = useDeviceFrame({ device, fit, onScaleChange, onHandScroll, ref });
   const {
     stage,
     frame,
@@ -100,11 +102,8 @@ const DeviceFrameRoot = ({
           style={{ width: viewport.width, height: viewport.height }}
           data-testid={DEVICE_FRAME_TEST_ID.VIEWPORT}
         >
-          <div ref={scrollerRef} className={scroller()} onScroll={onScroll}>
-            <div
-              className={sizerSlot()}
-              style={{ width: sizer.width, height: sizer.height }}
-            >
+          <div ref={scrollerRef} className={scroller()} {...scrollerProps}>
+            <div className={sizerSlot()} style={sizer}>
               <div
                 ref={contentRef}
                 inert={true}

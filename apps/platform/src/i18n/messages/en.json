@@ -851,6 +851,22 @@
     "footerPrivacy": "Privacy policy",
     "footerCookieSettings": "Cookie settings"
   },
+  "lookFollow": {
+    "followToggle": "Follow the card you are editing",
+    "nearlyFits": "Following <strong>{part}</strong> — outlined in the frame. The whole sample nearly fits at 1280 px, so the frame scrolls only its last {overflow} px.",
+    "atEnd": "Following <strong>{part}</strong> — scrolled to the end of the page.",
+    "atTop": "Following <strong>{part}</strong> — back at the top of the page.",
+    "inView": "Following <strong>{part}</strong> — outlined in the frame.",
+    "fits": "Following <strong>{part}</strong>. The sample fits one {device, select, DESKTOP {desktop} TABLET {tablet} other {phone}} screen, so following only outlines.",
+    "short": "Following <strong>{part}</strong>",
+    "paused": "You scrolled the frame. Following is paused.",
+    "backTo": "Back to {part}",
+    "topOfPage": "Top of page",
+    "styleCard": "<strong>{card}</strong> changes the whole page, so the frame stays where it is.",
+    "idle": "Open a Site parts card and the frame scrolls to it.",
+    "off": "Following is off. The frame stays where you leave it.",
+    "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it."
+  },
   "assetUploadField": {
     "remove": "Remove",
     "upload": "Upload",

@@ -6,9 +6,16 @@ import { useImperativeHandle, type Ref, type RefObject } from 'react';
 type TDeviceFrameScrollTarget =
   TValueOf<typeof DEVICE_FRAME_SCROLL_TARGET> | HTMLElement;
 
+type TDeviceFrameScrollMetrics = {
+  top: number;
+  maxTop: number;
+  contentHeight: number;
+};
+
 export type TDeviceFrameHandle = {
   scrollTo(target: TDeviceFrameScrollTarget, behavior?: ScrollBehavior): void;
   scrollBy(delta: { left?: number; top?: number }): void;
+  getScrollMetrics(): TMaybeUndefined<TDeviceFrameScrollMetrics>;
 };
 
 export const useDeviceFrameHandle = (
@@ -37,6 +44,18 @@ export const useDeviceFrameHandle = (
     },
     scrollBy: (delta) => {
       scrollerRef.current?.scrollBy(delta);
+    },
+    getScrollMetrics: () => {
+      const scroller = scrollerRef.current;
+      const content = contentRef.current;
+      if (!scroller || !content) {
+        return undefined;
+      }
+      return {
+        top: scroller.scrollTop,
+        maxTop: scroller.scrollHeight - scroller.clientHeight,
+        contentHeight: content.offsetHeight,
+      };
     },
   }));
 };

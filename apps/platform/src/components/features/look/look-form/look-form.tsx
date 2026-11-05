@@ -15,6 +15,7 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { toLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import { buildLookRowSummaries } from '@platform/utils/look-form-values/look-row-summaries';
 import {
   SITE_PARTS_ROWS,
@@ -140,6 +141,12 @@ export const LookForm = ({
                 liveLocales={liveLocales}
                 hasReaderAccounts={hasReaderAccounts}
                 siteHost={siteHost}
+                followTarget={toLookFollowTarget(
+                  jumpIndex.openRows,
+                  jumpIndex.editedCard,
+                  jumpIndex.isAllOpen,
+                )}
+                isShown={!hasTabPanels || isPreviewTab}
               />
             </div>
           </div>
