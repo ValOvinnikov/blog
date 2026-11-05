@@ -34,7 +34,7 @@ export const ReaderSignInPanel = ({
   const {
     status,
     email,
-    setEmail,
+    changeEmail,
     isSendLimited,
     isEmailInvalid,
     submitEmail,
@@ -106,7 +106,7 @@ export const ReaderSignInPanel = ({
       }}
       emailForm={{
         value: email,
-        onChange: setEmail,
+        onChange: changeEmail,
         onSubmit: () => void submitEmail(),
         onReset: resetEmail,
         status,
