@@ -7,6 +7,7 @@ import {
   type TAssetUploadControl,
   type TAssetUploadSpec,
 } from '@platform/components/shared/asset-upload-field';
+import { ASSET_UPLOAD_LAYOUT } from '@platform/constants/asset-upload';
 import {
   ACCEPTED_IMAGE_MIME_TYPES,
   quickClientImageCheck,
@@ -40,7 +41,8 @@ export const BrandAssetField = ({
 
   const asset: TAssetUploadSpec = {
     kind,
-    size: SIZE.SM,
+    size: SIZE.MD,
+    layout: ASSET_UPLOAD_LAYOUT.BARE,
     acceptedMimeTypes: ACCEPTED_IMAGE_MIME_TYPES,
     validateFile: (file) => {
       const quickError = quickClientImageCheck(file, kind);
@@ -49,7 +51,6 @@ export const BrandAssetField = ({
         ? t('unsupportedType')
         : t('tooLarge', { limit: quickError.limit });
     },
-    stagedBadgeLabel: t('savesWithChanges'),
   };
 
   return (

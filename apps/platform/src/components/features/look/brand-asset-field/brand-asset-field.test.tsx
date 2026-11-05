@@ -12,8 +12,6 @@ import { BrandAssetField } from './brand-asset-field';
 faker.seed(5993);
 
 const MOCK_PNG_FILE_NAME = faker.system.commonFileName('png');
-const MOCK_STORED_LOGO_FILE_NAME = 'brand-logo.png';
-const { savesWithChanges: SAVES_WITH_CHANGES } = messages.brandAssetField;
 
 const mockPngFile = () =>
   new File(['bytes'], MOCK_PNG_FILE_NAME, { type: 'image/png' });
@@ -33,36 +31,32 @@ describe(`<${BrandAssetField.name}/>`, () => {
     vi.restoreAllMocks();
   });
 
-  it('names the field and its upload button after the asset kind', () => {
+  it('names its upload button after the asset kind', () => {
     setup({ kind: 'favicon' });
 
-    const label = screen.getByText(messages.lookForm.faviconFieldLabel);
     const uploadButton = screen.getByRole('button', {
       name: messages.assetUploadField.favicon.upload,
     });
 
-    expect(label).toBeVisible();
     expect(uploadButton).toBeVisible();
   });
 
-  it('names the stored file without marking it as saving with changes', () => {
-    setup({ image: { url: `${MOCK_LOGO_URL}?v=2` } });
+  it('shows the current image with its replace and remove controls', () => {
+    setup({ image: { url: MOCK_LOGO_URL } });
 
-    const fileName = screen.getByText(MOCK_STORED_LOGO_FILE_NAME);
-    const savesWithChanges = screen.queryByText(SAVES_WITH_CHANGES);
+    const thumbnail = screen.getByAltText(
+      messages.assetUploadField.logo.currentAlt,
+    );
+    const replaceButton = screen.getByRole('button', {
+      name: messages.assetUploadField.logo.replace,
+    });
+    const removeButton = screen.getByRole('button', {
+      name: messages.assetUploadField.remove,
+    });
 
-    expect(fileName).toBeVisible();
-    expect(savesWithChanges).not.toBeInTheDocument();
-  });
-
-  it('names a staged file and marks it as saving with changes', () => {
-    setup({ image: { url: MOCK_STAGED_LOGO_BLOB_URL, file: mockPngFile() } });
-
-    const fileName = screen.getByText(MOCK_PNG_FILE_NAME);
-    const savesWithChanges = screen.getByText(SAVES_WITH_CHANGES);
-
-    expect(fileName).toBeVisible();
-    expect(savesWithChanges).toBeVisible();
+    expect(thumbnail).toBeVisible();
+    expect(replaceButton).toBeVisible();
+    expect(removeButton).toBeVisible();
   });
 
   it('stages a picked file with a local preview URL', async () => {

@@ -84,6 +84,18 @@ describe(`<${LookForm.name}/>`, () => {
         expect(uploadBrandAssetAction).not.toHaveBeenCalled();
       });
 
+      it('marks only the logo field as unsaved, beside its optional tag', () => {
+        const logoGroup = screen.getByRole('group', {
+          name: `${LOOK_FORM.logoFieldLabel} ${LOOK_FORM.optionalTag} ${LOOK_FORM.fieldUnsavedLabel}`,
+        });
+        const faviconGroup = screen.getByRole('group', {
+          name: `${LOOK_FORM.faviconFieldLabel} ${LOOK_FORM.optionalTag}`,
+        });
+
+        expect(logoGroup).toBeVisible();
+        expect(faviconGroup).toBeVisible();
+      });
+
       it('uploads a staged logo on Save, then saves the rest of the look', async () => {
         await clickSave(user);
 

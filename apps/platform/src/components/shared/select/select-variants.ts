@@ -1,5 +1,5 @@
-import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -29,12 +29,18 @@ export const selectVariants = tv({
   },
   variants: {
     appearance: {
-      [FIELD_APPEARANCE.DEFAULT]: {},
-      [FIELD_APPEARANCE.WIZARD]: {
+      [SELECT_APPEARANCE.DEFAULT]: {},
+      [SELECT_APPEARANCE.WIZARD]: {
         trigger: ['relative py-0 pr-10 pl-3 md:text-admin-14'],
         value: ['block min-w-0 flex-1 truncate'],
         icon: [
           'pointer-events-none absolute top-1/2 right-3 flex -translate-y-1/2',
+        ],
+      },
+      [SELECT_APPEARANCE.COMPACT]: {
+        trigger: [
+          'md:h-9 md:min-h-9 md:w-auto md:min-w-55 md:gap-3 md:self-start',
+          'md:py-0 md:pr-2.5 md:pl-3',
         ],
       },
     },
@@ -50,7 +56,7 @@ export const selectVariants = tv({
     },
   },
   defaultVariants: {
-    appearance: FIELD_APPEARANCE.DEFAULT,
+    appearance: SELECT_APPEARANCE.DEFAULT,
     isLocked: false,
   },
 });

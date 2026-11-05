@@ -19,6 +19,7 @@ export type TLookFormContext = {
   updateField: TLookFormFieldSetter;
   isLocked: (field: TLookField) => boolean;
   hasCardChanges: (card: TLookCard) => boolean;
+  hasFieldChanged: (field: keyof TLookFormValues) => boolean;
   canResetToPreset: boolean;
   isAccentHueRejected: boolean;
   accentHueFieldId: string;

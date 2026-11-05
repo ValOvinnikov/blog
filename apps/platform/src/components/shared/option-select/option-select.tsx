@@ -2,7 +2,7 @@
 
 import type { TControlAria, TMaybeNull } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
-import type { TFieldAppearance } from '@platform/constants/field-appearance';
+import type { TSelectAppearance } from '@platform/constants/select-appearance';
 
 type TOptionSelectOption<TValue extends string> = {
   value: TValue;
@@ -16,7 +16,7 @@ export type TOptionSelectProps<TValue extends string> = {
   aria?: TControlAria;
   isDisabled?: boolean;
   isLocked?: boolean;
-  appearance?: TFieldAppearance;
+  appearance?: TSelectAppearance;
   placeholder?: string;
 };
 

@@ -114,6 +114,16 @@ export const chooseOption = async (
   await user.click(option);
 };
 
+export const chooseSegment = async (
+  user: UserEvent,
+  groupName: string,
+  optionName: string,
+) => {
+  const group = screen.getByRole('group', { name: groupName });
+  const option = within(group).getByRole('button', { name: optionName });
+  await user.click(option);
+};
+
 export const chooseEditorial = async (user: UserEvent) => {
   const editorialRadio = screen.getByRole('radio', { name: EDITORIAL });
   await user.click(editorialRadio);

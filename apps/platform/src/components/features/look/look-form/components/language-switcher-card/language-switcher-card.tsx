@@ -1,24 +1,17 @@
-import { Field } from '@base-ui/react/field';
 import {
   LANGUAGE_SWITCHER_STYLE,
   type TLanguageSwitcherStyle,
 } from '@blog/config';
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { tv } from '@platform/utils/tv/tv';
 import { useTranslations } from 'next-intl';
 
-const languageSwitcherCardVariants = tv({
-  slots: {
-    switcher: ['self-start'],
-    note: ['text-admin-12 text-admin-muted'],
-  },
-});
+import { languageSwitcherCardVariants } from './language-switcher-card-variants';
 
 export type TLanguageSwitcherCardProps = {
   hasMultipleLanguages: boolean;
@@ -37,9 +30,6 @@ export const LanguageSwitcherCard = ({
   const { isDisabled, describedBy, lock } = useLookFieldLock(
     'languageSwitcherStyle',
   );
-  const { switcher, note } = languageSwitcherCardVariants();
-
-  const languageSwitcherLabel = t('languageSwitcherLabel');
 
   const languageSwitcherOptions = toOptions(LANGUAGE_SWITCHER_STYLE, (style) =>
     t(`languageSwitcherOptionLabel.${style}`),
@@ -52,19 +42,24 @@ export const LanguageSwitcherCard = ({
       description={t('languageSwitcherDescription')}
     >
       {hasMultipleLanguages ? (
-        <Field.Root>
-          {lock && <LockedReason id={lock.id}>{lock.reason}</LockedReason>}
+        <LookField
+          field="languageSwitcherStyle"
+          label={t('languageSwitcherStyleLabel')}
+          isGroup={true}
+          lock={lock}
+        >
           <SegmentedControl<TLanguageSwitcherStyle>
-            aria={{ label: languageSwitcherLabel, describedBy }}
-            className={switcher()}
+            aria={{ describedBy }}
             options={languageSwitcherOptions}
             value={languageSwitcherStyle}
             onChange={(style) => updateField('languageSwitcherStyle', style)}
             isDisabled={isDisabled}
           />
-        </Field.Root>
+        </LookField>
       ) : (
-        <p className={note()}>{t('languageSwitcherSingleLanguage')}</p>
+        <p className={languageSwitcherCardVariants()}>
+          {t('languageSwitcherSingleLanguage')}
+        </p>
       )}
     </LookCard>
   );

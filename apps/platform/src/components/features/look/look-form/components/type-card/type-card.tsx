@@ -29,7 +29,11 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
       card={LOOK_ROW.TYPE}
       description={t('typeDescription')}
     >
-      <LookField label={headingFontLabel} lock={headingFontLock.lock}>
+      <LookField
+        field="headingFont"
+        label={headingFontLabel}
+        lock={headingFontLock.lock}
+      >
         <FontPicker
           aria={{ describedBy: headingFontLock.describedBy }}
           value={headingFont}
@@ -39,7 +43,11 @@ export const TypeCard = ({ summary }: TTypeCardProps) => {
         <PresetValueButton field="headingFont" fieldLabel={headingFontLabel} />
       </LookField>
 
-      <LookField label={bodyFontLabel} lock={bodyFontLock.lock}>
+      <LookField
+        field="bodyFont"
+        label={bodyFontLabel}
+        lock={bodyFontLock.lock}
+      >
         <FontPicker
           aria={{ describedBy: bodyFontLock.describedBy }}
           value={bodyFont}

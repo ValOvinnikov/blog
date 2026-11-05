@@ -36,6 +36,7 @@ export const AccountFields = () => {
   return (
     <>
       <LookField
+        field="accountButtonStyle"
         label={t('accountButtonStyleLabel')}
         hint={t('accountButtonStyleDescription')}
         isGroup={true}
@@ -51,6 +52,7 @@ export const AccountFields = () => {
       </LookField>
 
       <LookField
+        field="accountPanelStyle"
         label={t('accountPanelStyleLabel')}
         hint={t('accountPanelStyleDescription')}
         isGroup={true}
@@ -66,6 +68,7 @@ export const AccountFields = () => {
       </LookField>
 
       <LookField
+        field="accountPhonePlacement"
         label={t('accountPhonePlacementLabel')}
         hint={t('accountPhonePlacementDescription')}
         isGroup={true}

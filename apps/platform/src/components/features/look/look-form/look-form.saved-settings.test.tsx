@@ -85,11 +85,6 @@ describe(`<${LookForm.name}/>`, () => {
         select: SPINNER_LABEL,
         option: LOOK_FORM.spinnerStyleOptionLabel.DOTS,
       },
-      {
-        row: LOOK_ROW.FOOTER,
-        select: FOOTER_LAYOUT_LABEL,
-        option: LOOK_FORM.footerLayoutOptionLabel.COMPACT,
-      },
     ])('keeps the saved $select', async ({ row, select, option }) => {
       await openLookRow(user, row);
 
@@ -102,6 +97,11 @@ describe(`<${LookForm.name}/>`, () => {
         row: LOOK_ROW.BUTTONS,
         group: LOOK_FORM.busyButtonStyleLabel,
         option: LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
+      },
+      {
+        row: LOOK_ROW.FOOTER,
+        group: FOOTER_LAYOUT_LABEL,
+        option: LOOK_FORM.footerLayoutOptionLabel.COMPACT,
       },
       {
         row: LOOK_ROW.FOOTER,

@@ -614,6 +614,7 @@
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logo : PNG, JPEG, WebP ou SVG. Favicon : une image carrée.",
     "optionalTag": "facultatif",
+    "fieldUnsavedLabel": "Modification non enregistrée",
     "headingFontLabel": "Police des titres",
     "bodyFontLabel": "Police du texte",
     "radiusScaleLabel": "Échelle d'arrondi",
@@ -649,6 +650,7 @@
       "PLAIN": "Aucun contour avant le survol"
     },
     "languageSwitcherLabel": "Sélecteur de langue",
+    "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
     "languageSwitcherOptionLabel": {
@@ -888,7 +890,6 @@
     "removeFailed": "Impossible de supprimer {kind, select, favicon {le favicon} other {le logo}} — veuillez réessayer."
   },
   "brandAssetField": {
-    "savesWithChanges": "Enregistré avec les modifications",
     "logo": {
       "pickAgain": "Votre brouillon restauré contenait un nouveau logo qui n'a pas pu être conservé — choisissez-le à nouveau."
     },

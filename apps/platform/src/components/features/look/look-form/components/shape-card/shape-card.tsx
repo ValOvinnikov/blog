@@ -65,6 +65,7 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
       description={t('shapeDescription')}
     >
       <LookField
+        field="radiusScale"
         label={radiusScaleLabel}
         hint={t('radiusScaleDescription')}
         isGroup={true}
@@ -81,6 +82,7 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
       </LookField>
 
       <LookField
+        field="density"
         label={densityLabel}
         hint={t('densityDescription')}
         isGroup={true}
@@ -97,6 +99,7 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
       </LookField>
 
       <LookField
+        field="cardStyle"
         label={cardStyleLabel}
         hint={t('cardStyleDescription')}
         isGroup={true}
@@ -113,6 +116,7 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
       </LookField>
 
       <LookField
+        field="headerControlStyle"
         label={headerControlStyleLabel}
         hint={t('headerControlStyleDescription')}
         isGroup={true}

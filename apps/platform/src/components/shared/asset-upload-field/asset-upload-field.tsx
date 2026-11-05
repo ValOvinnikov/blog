@@ -23,7 +23,6 @@ export type TAssetUploadSpec = {
   size: typeof SIZE.SM | typeof SIZE.MD;
   acceptedMimeTypes: readonly string[];
   validateFile: (file: File) => TMaybeUndefined<string>;
-  stagedBadgeLabel?: string;
   layout?: TAssetUploadLayout;
 };
 
@@ -58,7 +57,6 @@ export const AssetUploadField = ({
     size,
     acceptedMimeTypes,
     validateFile,
-    stagedBadgeLabel,
     layout = ASSET_UPLOAD_LAYOUT.FRAMED,
   } = asset;
   const { id, isDisabled = false, describedBy: ariaDescribedBy } = control;
@@ -138,7 +136,6 @@ export const AssetUploadField = ({
             label={label}
             image={image}
             size={size}
-            stagedBadgeLabel={stagedBadgeLabel}
             hint={hint}
             hintId={hintId}
           />

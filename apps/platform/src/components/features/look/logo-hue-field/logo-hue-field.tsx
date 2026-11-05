@@ -1,6 +1,8 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
+import { accentSwatchVariants } from '@platform/components/shared/accent-swatch/accent-swatch-variants';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { Switch } from '@platform/components/shared/switch';
 import { buildLogoPreviewTokens } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -30,7 +32,7 @@ export const LogoHueField = ({
   'aria-describedby': ariaDescribedBy,
 }: TLogoHueFieldProps) => {
   const t = useTranslations('logoHueField');
-  const follows = logoHue === undefined;
+  const follows = isUndefined(logoHue);
   const resolvedHue = logoHue ?? accentHue;
   const tones = buildLogoPreviewTokens(resolvedHue, false);
 
@@ -40,7 +42,7 @@ export const LogoHueField = ({
     tones: tonesSlot,
     tone,
     hueValue,
-  } = logoHueFieldVariants({ follows });
+  } = logoHueFieldVariants();
 
   return (
     <div className={root()}>
@@ -52,23 +54,40 @@ export const LogoHueField = ({
         isDisabled={isDisabled}
       />
 
-      <div className={hueField()}>
-        <span className={tonesSlot()} aria-hidden="true">
-          <span className={tone()} style={{ background: tones['--logo-1'] }} />
-          <span className={tone()} style={{ background: tones['--logo-2'] }} />
-          <span className={tone()} style={{ background: tones['--logo-3'] }} />
-        </span>
-        <HueSlider
-          name={{ ariaLabel: t('logoHueAriaLabel') }}
-          value={resolvedHue}
-          onChange={onChange}
-          isDisabled={follows || isDisabled}
-          aria-describedby={ariaDescribedBy}
-        />
-        <span className={hueValue()}>
-          {follows ? t('followsAccent') : t('hueValue', { hue: resolvedHue })}
-        </span>
-      </div>
+      {!follows && (
+        <div className={hueField()}>
+          <span
+            className={accentSwatchVariants({
+              size: SIZE.LG,
+              class: tonesSlot(),
+            })}
+            aria-hidden="true"
+          >
+            <span
+              className={tone()}
+              style={{ background: tones['--logo-1'] }}
+            />
+            <span
+              className={tone()}
+              style={{ background: tones['--logo-2'] }}
+            />
+            <span
+              className={tone()}
+              style={{ background: tones['--logo-3'] }}
+            />
+          </span>
+          <HueSlider
+            name={{ ariaLabel: t('logoHueAriaLabel') }}
+            value={resolvedHue}
+            onChange={onChange}
+            isDisabled={isDisabled}
+            aria-describedby={ariaDescribedBy}
+          />
+          <span className={hueValue()}>
+            {t('hueValue', { hue: resolvedHue })}
+          </span>
+        </div>
+      )}
     </div>
   );
 };

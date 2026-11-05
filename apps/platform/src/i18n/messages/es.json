@@ -614,6 +614,7 @@
     "faviconFieldLabel": "Favicon",
     "brandFieldsHint": "Logotipo: PNG, JPEG, WebP o SVG. Favicon: una imagen cuadrada.",
     "optionalTag": "opcional",
+    "fieldUnsavedLabel": "Cambio sin guardar",
     "headingFontLabel": "Fuente de títulos",
     "bodyFontLabel": "Fuente del texto",
     "radiusScaleLabel": "Escala de radio",
@@ -649,6 +650,7 @@
       "PLAIN": "Sin contorno hasta pasar el cursor"
     },
     "languageSwitcherLabel": "Selector de idioma",
+    "languageSwitcherStyleLabel": "Estilo",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
     "languageSwitcherOptionLabel": {
@@ -888,7 +890,6 @@
     "removeFailed": "No se pudo quitar {kind, select, favicon {el favicon} other {el logotipo}}. Vuelva a intentarlo."
   },
   "brandAssetField": {
-    "savesWithChanges": "Se guarda con los cambios",
     "logo": {
       "pickAgain": "El borrador recuperado tenía un logotipo nuevo que no se pudo conservar: vuelva a elegirlo."
     },
