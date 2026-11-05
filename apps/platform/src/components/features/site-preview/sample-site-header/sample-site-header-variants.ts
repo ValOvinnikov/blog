@@ -57,6 +57,10 @@ export const sampleSiteHeaderVariants = tv({
       true: {},
       false: {},
     },
+    isWidePanelOpen: {
+      true: {},
+      false: {},
+    },
   },
   compoundVariants: [
     {
@@ -73,6 +77,11 @@ export const sampleSiteHeaderVariants = tv({
       barStyle: HEADER_BAR_STYLE.FLOATING,
       isEdgeToEdge: true,
       class: { root: ['mx-3 mt-3'], full: ['min-h-14'] },
+    },
+    {
+      barStyle: HEADER_BAR_STYLE.FLOATING,
+      isWidePanelOpen: true,
+      class: { root: ['@[64rem]:rounded-b-none'] },
     },
   ],
 });
