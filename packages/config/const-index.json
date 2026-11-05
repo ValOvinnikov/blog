@@ -5420,6 +5420,14 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "UNEDITED": [
+      {
+        "ref": "LOOK_FOLLOW_TARGET.UNEDITED",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
     "ALL_OPEN": [
       {
         "ref": "LOOK_FOLLOW_TARGET.ALL_OPEN",

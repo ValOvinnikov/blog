@@ -31,7 +31,12 @@ export const LookFollowSentence = ({
   const values = { part: row ? tForm(LOOK_ROW_TITLE_KEY[row]) : '', strong };
 
   if (!isOn) return t('off');
-  if (target.kind === LOOK_FOLLOW_TARGET.IDLE) return t('idle');
+  if (
+    target.kind === LOOK_FOLLOW_TARGET.IDLE ||
+    target.kind === LOOK_FOLLOW_TARGET.UNEDITED
+  ) {
+    return t('idle');
+  }
   if (target.kind === LOOK_FOLLOW_TARGET.ALL_OPEN) return t('allOpen');
   if (target.kind === LOOK_FOLLOW_TARGET.STYLE) {
     return t.rich('styleCard', {

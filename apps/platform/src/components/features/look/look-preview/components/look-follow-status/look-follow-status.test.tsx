@@ -50,6 +50,12 @@ describe(`<${LookFollowStatus.name}/>`, () => {
     expect(followStatusText()).toBe(LOOK_FOLLOW.idle);
   });
 
+  it('asks for a Site parts card while some rows are open and none edited', () => {
+    setup({ target: { kind: LOOK_FOLLOW_TARGET.UNEDITED } });
+
+    expect(followStatusText()).toBe(LOOK_FOLLOW.idle);
+  });
+
   it('asks for a focused card after Expand all', () => {
     setup({ target: { kind: LOOK_FOLLOW_TARGET.ALL_OPEN } });
 

@@ -6,8 +6,12 @@ import {
   followLine,
   followStatusText,
 } from '@platform/testing/look/look-follow';
-import { openLookRow } from '@platform/testing/look/look-form-interactions';
+import {
+  lookRowTrigger,
+  openLookRow,
+} from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { toggleAllButton } from '@platform/testing/look/look-jump-index';
 import { stubLgUpWindow } from '@platform/testing/match-media';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -59,6 +63,15 @@ describe(`<${LookForm.name}/> follow`, () => {
     const line = followLine('styleCard', { card: LOOK_FORM.typeHeading });
 
     expect(followStatusText()).toBe(line);
+    expect(outline()).not.toBeInTheDocument();
+  });
+
+  it('asks for a Site parts card without outlining once a row folds after Expand all', async () => {
+    await user.click(toggleAllButton(LOOK_FORM.expandAll));
+
+    await user.click(lookRowTrigger(LOOK_ROW.HEADER));
+
+    expect(followStatusText()).toBe(LOOK_FOLLOW.idle);
     expect(outline()).not.toBeInTheDocument();
   });
 });

@@ -19,6 +19,7 @@ import { useLookFollow } from './use-look-follow';
 
 const IDLE: TLookFollowTarget = { kind: LOOK_FOLLOW_TARGET.IDLE };
 const ALL_OPEN: TLookFollowTarget = { kind: LOOK_FOLLOW_TARGET.ALL_OPEN };
+const UNEDITED: TLookFollowTarget = { kind: LOOK_FOLLOW_TARGET.UNEDITED };
 const HEADER: TLookFollowTarget = {
   kind: LOOK_FOLLOW_TARGET.PART,
   row: LOOK_ROW.HEADER,
@@ -157,6 +158,18 @@ describe(useLookFollow, () => {
     update({ target: IDLE });
 
     expect(position.top).toBe(0);
+  });
+
+  it('leaves the frame where it is once a row folds after Expand all', () => {
+    const { position, scrollTo, update } = setup();
+    update({ target: FOOTER });
+    update({ target: ALL_OPEN });
+    scrollTo.mockClear();
+
+    update({ target: UNEDITED });
+
+    expect(scrollTo).not.toHaveBeenCalled();
+    expect(position.top).toBe(MAX_TOP);
   });
 
   it.each([

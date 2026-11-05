@@ -1,5 +1,8 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
+import {
+  hasArrayGotItems,
+  hasArrayGotMultipleItems,
+} from '@blog/utils/primitives';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import type { TLookCard } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
@@ -11,6 +14,7 @@ export type TSitePartsRow = (typeof SITE_PARTS_ROWS)[number];
 
 export type TLookFollowTarget =
   | { kind: typeof LOOK_FOLLOW_TARGET.IDLE }
+  | { kind: typeof LOOK_FOLLOW_TARGET.UNEDITED }
   | { kind: typeof LOOK_FOLLOW_TARGET.ALL_OPEN }
   | { kind: typeof LOOK_FOLLOW_TARGET.STYLE; row: TLookRow }
   | { kind: typeof LOOK_FOLLOW_TARGET.PART; row: TSitePartsRow };
@@ -38,9 +42,12 @@ export const toLookFollowTarget = (
   const row =
     openRows.find((openRow) => openRow === editedCard) ??
     (hasArrayGotMultipleItems(openRows) ? undefined : openRows[0]);
+  if (isAllOpen && !row) return { kind: LOOK_FOLLOW_TARGET.ALL_OPEN };
   if (!row) {
     return {
-      kind: isAllOpen ? LOOK_FOLLOW_TARGET.ALL_OPEN : LOOK_FOLLOW_TARGET.IDLE,
+      kind: hasArrayGotItems(openRows)
+        ? LOOK_FOLLOW_TARGET.UNEDITED
+        : LOOK_FOLLOW_TARGET.IDLE,
     };
   }
   return isSitePartsRow(row)

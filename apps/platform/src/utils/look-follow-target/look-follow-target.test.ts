@@ -18,10 +18,12 @@ describe(toLookFollowTarget, () => {
     });
   });
 
-  it('waits for a card once a row folds after Expand all', () => {
+  it('waits for a card without moving once a row folds after Expand all', () => {
     const partlyOpen = LOOK_ROWS.filter((row) => row !== LOOK_ROW.FOOTER);
 
-    expect(toLookFollowTarget(partlyOpen, undefined, false)).toEqual(IDLE);
+    expect(toLookFollowTarget(partlyOpen, undefined, false)).toEqual({
+      kind: LOOK_FOLLOW_TARGET.UNEDITED,
+    });
   });
 
   it('follows the focused Site parts card after Expand all', () => {

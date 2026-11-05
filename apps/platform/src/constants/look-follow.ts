@@ -2,6 +2,7 @@ import type { TValueOf } from '@blog/config/utils';
 
 export const LOOK_FOLLOW_TARGET = {
   IDLE: 'IDLE',
+  UNEDITED: 'UNEDITED',
   ALL_OPEN: 'ALL_OPEN',
   STYLE: 'STYLE',
   PART: 'PART',
