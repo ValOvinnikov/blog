@@ -13,13 +13,14 @@ import {
 import { toScalePercent } from '@platform/utils/device-frame-scale/device-frame-scale';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useRef, type ReactNode } from 'react';
 
 export type TPreviewFrameHeadingProps = {
   device: TPreviewDevice;
   scale: number;
   layout?: TPreviewHeadingLayout;
   isAlwaysLong?: boolean;
+  actions?: ReactNode;
 };
 
 export const PreviewFrameHeading = ({
@@ -27,14 +28,16 @@ export const PreviewFrameHeading = ({
   scale,
   layout = PREVIEW_HEADING_LAYOUT.SECTION,
   isAlwaysLong = false,
+  actions,
 }: TPreviewFrameHeadingProps) => {
   const t = useTranslations('devicePreview');
   const tMode = useTranslations('previewModeControl');
   const tTabs = useTranslations('viewTabs');
   const rowRef = useRef<HTMLDivElement>(null);
   const row = useElementSize(rowRef);
-  const { headingRow, readout, title } = previewFrameVariants({
+  const { headingRow, readout, title, headingActions } = previewFrameVariants({
     isTitleHidden: layout === PREVIEW_HEADING_LAYOUT.PHONE_TAB,
+    hasHeadingActions: Boolean(actions),
   });
   const isPhoneTab = layout === PREVIEW_HEADING_LAYOUT.PHONE_TAB;
   const isLong =
@@ -60,6 +63,7 @@ export const PreviewFrameHeading = ({
       <span role="status" className={readout()}>
         {readoutText}
       </span>
+      {actions && <span className={headingActions()}>{actions}</span>}
     </div>
   );
 };

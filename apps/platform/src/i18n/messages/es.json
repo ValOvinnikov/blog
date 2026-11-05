@@ -851,6 +851,22 @@
     "footerPrivacy": "Política de privacidad",
     "footerCookieSettings": "Configuración de cookies"
   },
+  "lookFollow": {
+    "followToggle": "Seguir la tarjeta que estás editando",
+    "nearlyFits": "Siguiendo <strong>{part}</strong>: resaltado en el marco. La muestra casi cabe entera a 1280 px, así que el marco solo desplaza sus últimos {overflow} px.",
+    "atEnd": "Siguiendo <strong>{part}</strong>: desplazado hasta el final de la página.",
+    "atTop": "Siguiendo <strong>{part}</strong>: de vuelta al principio de la página.",
+    "inView": "Siguiendo <strong>{part}</strong>: resaltado en el marco.",
+    "fits": "Siguiendo <strong>{part}</strong>. La muestra cabe en una pantalla de {device, select, DESKTOP {escritorio} TABLET {tableta} other {teléfono}}, así que seguir solo resalta.",
+    "short": "Siguiendo <strong>{part}</strong>",
+    "paused": "Has desplazado el marco. El seguimiento está en pausa.",
+    "backTo": "Volver a {part}",
+    "topOfPage": "Principio de la página",
+    "styleCard": "<strong>{card}</strong> cambia toda la página, así que el marco se queda donde está.",
+    "idle": "Abre una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
+    "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
+    "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella."
+  },
   "assetUploadField": {
     "remove": "Quitar",
     "upload": "Subir",

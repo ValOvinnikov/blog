@@ -851,6 +851,22 @@
     "footerPrivacy": "Privacybeleid",
     "footerCookieSettings": "Cookie-instellingen"
   },
+  "lookFollow": {
+    "followToggle": "De kaart volgen die je bewerkt",
+    "nearlyFits": "Volgt <strong>{part}</strong> — gemarkeerd in het kader. Het hele voorbeeld past bijna op 1280 px, dus het kader scrolt alleen de laatste {overflow} px.",
+    "atEnd": "Volgt <strong>{part}</strong> — naar het einde van de pagina gescrold.",
+    "atTop": "Volgt <strong>{part}</strong> — terug bovenaan de pagina.",
+    "inView": "Volgt <strong>{part}</strong> — gemarkeerd in het kader.",
+    "fits": "Volgt <strong>{part}</strong>. Het voorbeeld past op één {device, select, DESKTOP {desktopscherm} TABLET {tabletscherm} other {telefoonscherm}}, dus volgen markeert alleen.",
+    "short": "Volgt <strong>{part}</strong>",
+    "paused": "Je hebt het kader gescrold. Volgen is gepauzeerd.",
+    "backTo": "Terug naar {part}",
+    "topOfPage": "Bovenaan de pagina",
+    "styleCard": "<strong>{card}</strong> verandert de hele pagina, dus het kader blijft waar het is.",
+    "idle": "Open een kaart bij Sitedelen en het kader scrolt ernaartoe.",
+    "off": "Volgen staat uit. Het kader blijft waar je het laat.",
+    "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe."
+  },
   "assetUploadField": {
     "remove": "Verwijderen",
     "upload": "Uploaden",

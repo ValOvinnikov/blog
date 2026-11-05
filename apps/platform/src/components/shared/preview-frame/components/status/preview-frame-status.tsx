@@ -4,6 +4,7 @@ import {
 } from '@platform/components/shared/icon';
 import { previewFrameVariants } from '@platform/components/shared/preview-frame/preview-frame-variants';
 import { ICON_SIZE } from '@platform/constants/icon';
+import { PREVIEW_FRAME_STATUS_TEST_ID } from '@platform/constants/preview';
 import type { ReactNode } from 'react';
 
 export type TPreviewFrameStatusProps = {
@@ -28,7 +29,9 @@ export const PreviewFrameStatus = ({
       <span className={statusIcon()}>
         <Icon name={icon} size={ICON_SIZE.MD} strokeWidth={2} />
       </span>
-      <span className={statusText()}>{children}</span>
+      <span className={statusText()} data-testid={PREVIEW_FRAME_STATUS_TEST_ID}>
+        {children}
+      </span>
       {action && <span className={statusAction()}>{action}</span>}
     </div>
   );

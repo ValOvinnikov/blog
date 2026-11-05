@@ -851,6 +851,22 @@
     "footerPrivacy": "Politique de confidentialité",
     "footerCookieSettings": "Paramètres des cookies"
   },
+  "lookFollow": {
+    "followToggle": "Suivre la carte que vous modifiez",
+    "nearlyFits": "Suivi de <strong>{part}</strong> — encadré dans l’aperçu. L’exemple tient presque entier à 1280 px, le cadre ne défile donc que de ses derniers {overflow} px.",
+    "atEnd": "Suivi de <strong>{part}</strong> — défilé jusqu’à la fin de la page.",
+    "atTop": "Suivi de <strong>{part}</strong> — retour en haut de la page.",
+    "inView": "Suivi de <strong>{part}</strong> — encadré dans l’aperçu.",
+    "fits": "Suivi de <strong>{part}</strong>. L’exemple tient sur un écran {device, select, DESKTOP {d’ordinateur} TABLET {de tablette} other {de téléphone}}, le suivi ne fait donc qu’encadrer.",
+    "short": "Suivi de <strong>{part}</strong>",
+    "paused": "Vous avez fait défiler le cadre. Le suivi est en pause.",
+    "backTo": "Revenir à {part}",
+    "topOfPage": "Haut de page",
+    "styleCard": "<strong>{card}</strong> modifie toute la page, le cadre reste donc où il est.",
+    "idle": "Ouvrez une carte des Parties du site et le cadre défile jusqu’à elle.",
+    "off": "Le suivi est désactivé. Le cadre reste où vous le laissez.",
+    "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle."
+  },
   "assetUploadField": {
     "remove": "Supprimer",
     "upload": "Importer",

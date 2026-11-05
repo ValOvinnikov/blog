@@ -851,6 +851,22 @@
     "footerPrivacy": "Datenschutzerklärung",
     "footerCookieSettings": "Cookie-Einstellungen"
   },
+  "lookFollow": {
+    "followToggle": "Der Karte folgen, die du bearbeitest",
+    "nearlyFits": "Folgt <strong>{part}</strong> – im Rahmen markiert. Das ganze Beispiel passt bei 1280 px fast hinein, daher scrollt der Rahmen nur die letzten {overflow} px.",
+    "atEnd": "Folgt <strong>{part}</strong> – bis zum Ende der Seite gescrollt.",
+    "atTop": "Folgt <strong>{part}</strong> – wieder oben auf der Seite.",
+    "inView": "Folgt <strong>{part}</strong> – im Rahmen markiert.",
+    "fits": "Folgt <strong>{part}</strong>. Das Beispiel passt auf einen {device, select, DESKTOP {Desktop-Bildschirm} TABLET {Tablet-Bildschirm} other {Handy-Bildschirm}}, daher wird nur markiert.",
+    "short": "Folgt <strong>{part}</strong>",
+    "paused": "Du hast den Rahmen gescrollt. Das Folgen ist pausiert.",
+    "backTo": "Zurück zu {part}",
+    "topOfPage": "Seitenanfang",
+    "styleCard": "<strong>{card}</strong> ändert die ganze Seite, daher bleibt der Rahmen, wo er ist.",
+    "idle": "Öffne eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin.",
+    "off": "Folgen ist aus. Der Rahmen bleibt, wo du ihn lässt.",
+    "allOpen": "Alle Karten sind geöffnet. Fokussiere eine Karte unter Website-Bereiche, und der Rahmen scrollt dorthin."
+  },
   "assetUploadField": {
     "remove": "Entfernen",
     "upload": "Hochladen",

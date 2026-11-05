@@ -1,0 +1,64 @@
+import { LOOK_FOLLOW_TEST_ID } from '@platform/constants/look-follow';
+import { LOOK_ROW } from '@platform/constants/look-row';
+import messages from '@platform/i18n/messages/en.json';
+import { screen } from '@platform/testing/custom-render';
+import {
+  followLine,
+  followStatusText,
+} from '@platform/testing/look/look-follow';
+import { openLookRow } from '@platform/testing/look/look-form-interactions';
+import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { stubLgUpWindow } from '@platform/testing/match-media';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
+
+import { LookForm } from './look-form';
+
+vi.mock('@platform/server/site-config/update-look-action');
+
+vi.mock('@platform/server/site-config/upload-brand-asset-action');
+
+vi.mock('@platform/server/site-config/clear-brand-asset-action');
+
+const { lookForm: LOOK_FORM, lookFollow: LOOK_FOLLOW } = messages;
+
+const outline = () => screen.queryByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
+
+describe(`<${LookForm.name}/> follow`, () => {
+  let user: UserEvent;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+    stubLgUpWindow();
+    setupLookForm();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('waits for a Site parts card on first load', () => {
+    expect(followStatusText()).toBe(LOOK_FOLLOW.idle);
+    expect(outline()).not.toBeInTheDocument();
+  });
+
+  it('outlines the part of an opened Site parts card', async () => {
+    await openLookRow(user, LOOK_ROW.FOOTER);
+
+    expect(outline()).toHaveTextContent(LOOK_FORM.footerHeading);
+  });
+
+  it('outlines the header under the Language switcher name', async () => {
+    await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+
+    expect(outline()).toHaveTextContent(LOOK_FORM.languageSwitcherLabel);
+  });
+
+  it('holds the frame still for an opened Style card', async () => {
+    await openLookRow(user, LOOK_ROW.TYPE);
+
+    const line = followLine('styleCard', { card: LOOK_FORM.typeHeading });
+
+    expect(followStatusText()).toBe(line);
+    expect(outline()).not.toBeInTheDocument();
+  });
+});

@@ -23,6 +23,7 @@ type TUseDeviceFrameOptions = {
   device: TPreviewDevice;
   fit: TDeviceFrameFit;
   onScaleChange?(scale: number): void;
+  onHandScroll?(): void;
   ref?: Ref<TDeviceFrameHandle>;
 };
 
@@ -30,6 +31,7 @@ export const useDeviceFrame = ({
   device,
   fit,
   onScaleChange,
+  onHandScroll,
   ref,
 }: TUseDeviceFrameOptions) => {
   const stageRef = useRef<HTMLDivElement>(null);
@@ -96,11 +98,15 @@ export const useDeviceFrame = ({
           contentSize: deviceWidth,
         })
       : null,
-    onScroll: ({ currentTarget }: UIEvent<HTMLDivElement>) => {
-      setOffset({
-        left: currentTarget.scrollLeft,
-        top: currentTarget.scrollTop,
-      });
+    scrollerHandlers: {
+      onScroll: ({ currentTarget }: UIEvent<HTMLDivElement>) => {
+        setOffset({
+          left: currentTarget.scrollLeft,
+          top: currentTarget.scrollTop,
+        });
+      },
+      onWheel: onHandScroll,
+      onTouchMove: onHandScroll,
     },
   };
 };

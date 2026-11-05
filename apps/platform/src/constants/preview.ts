@@ -51,3 +51,5 @@ export type TPreviewHeadingLayout = TValueOf<typeof PREVIEW_HEADING_LAYOUT>;
 export const PREVIEW_READOUT = {
   LONG_MIN_WIDTH: 476,
 } as const;
+
+export const PREVIEW_FRAME_STATUS_TEST_ID = 'preview-frame-status-text';

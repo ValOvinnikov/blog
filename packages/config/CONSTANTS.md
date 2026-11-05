@@ -445,6 +445,14 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_CARD**: `PRESET`
 
+### `@platform/constants/look-follow` — `apps/platform/src/constants/look-follow.ts`
+
+- **LOOK_FOLLOW_TARGET**: `IDLE`, `ALL_OPEN`, `STYLE`, `PART`
+- **LOOK_FOLLOW_OUTCOME**: `IN_VIEW`, `FITS`, `AT_TOP`, `AT_END`, `NEARLY_FITS`
+- **LOOK_FOLLOW_MARK**: `OUTLINE_WIDTH`=`2`, `TAG_FONT_SIZE`=`11`, `TAG_HEIGHT`=`20`, `TAG_PADDING_X`=`7`, `TAG_RADIUS`=`3`
+- **LOOK_FOLLOW_LIMIT**: `OVERFLOW_STEP`=`10`, `NEARLY_FITS_SCREENS`=`2`, `SCROLL_TOLERANCE`=`1`, `SETTLE_STILL_FRAMES`=`3`, `SETTLE_TIMEOUT_MS`=`1500`
+- **LOOK_FOLLOW_TEST_ID**: `OUTLINE`=`"look-follow-outline"`
+
 ### `@platform/constants/look-group` — `apps/platform/src/constants/look-group.ts`
 
 - **LOOK_GROUP**: `STYLE`, `SITE_PARTS`
@@ -459,7 +467,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
-- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`
+- **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`, `REDUCED_MOTION`=`"(prefers-reduced-motion: reduce)"`
 
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 

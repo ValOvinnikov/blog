@@ -11,6 +11,11 @@ import {
   type TLookFormContext,
 } from '@platform/components/features/look/look-form-provider';
 import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
+import {
+  LOOK_FOLLOW_TARGET,
+  LOOK_FOLLOW_TEST_ID,
+} from '@platform/constants/look-follow';
+import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
   PREVIEW_DEVICE,
@@ -18,8 +23,13 @@ import {
 } from '@platform/constants/preview';
 import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
 import messages from '@platform/i18n/messages/en.json';
-import { renderWithIntl, screen } from '@platform/testing/custom-render';
+import {
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { stubLgUpWindow } from '@platform/testing/match-media';
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_NAME,
@@ -28,12 +38,18 @@ import {
   defaultLookFormValues,
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
+import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
 
 const MOCK_ACCENT_HUE = 28;
 const LOOK_PREVIEW = messages.lookPreview;
+const LOOK_FOLLOW = messages.lookFollow;
+const FOOTER_TARGET: TLookFollowTarget = {
+  kind: LOOK_FOLLOW_TARGET.PART,
+  row: LOOK_ROW.FOOTER,
+};
 const tDevicePreview = makeEnTranslator('devicePreview');
 const TABLET = tDevicePreview('deviceTablet');
 
@@ -41,6 +57,7 @@ type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;
   previewDevice?: TPreviewDevice;
   hasReaderAccounts?: boolean;
+  followTarget?: TLookFollowTarget;
 };
 
 const setPreviewDevice = vi.fn();
@@ -49,6 +66,7 @@ const renderPreview = ({
   values = {},
   previewDevice = PREVIEW_DEVICE.DESKTOP,
   hasReaderAccounts = true,
+  followTarget = { kind: LOOK_FOLLOW_TARGET.IDLE },
 }: TRenderPreviewOptions = {}) => {
   const lookForm: TLookFormContext = {
     tenantName: MOCK_TENANT_NAME,
@@ -83,6 +101,8 @@ const renderPreview = ({
         liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
         hasReaderAccounts={hasReaderAccounts}
         siteHost={MOCK_TENANT_DOMAIN}
+        followTarget={followTarget}
+        isShown={true}
       />
     </LookFormProvider>,
   );
@@ -200,5 +220,50 @@ describe(`<${LookPreview.name}/>`, () => {
 
     expect(cookieButton).not.toBeInTheDocument();
     expect(cookieSettingsLink).toBeInTheDocument();
+  });
+
+  describe('follow', () => {
+    const followButton = () =>
+      screen.getByRole('button', { name: LOOK_FOLLOW.followToggle });
+    const toolbar = () => screen.getByRole('toolbar');
+
+    it('presses Follow beside the readout, outside the toolbar, on the phone tab', () => {
+      renderPreview();
+
+      expect(followButton()).toBePressed();
+      expect(toolbar()).not.toContainElement(followButton());
+    });
+
+    it('puts Follow inside the toolbar from lg', () => {
+      stubLgUpWindow();
+      renderPreview();
+
+      const toolbarFollow = within(toolbar()).getByRole('button', {
+        name: LOOK_FOLLOW.followToggle,
+      });
+
+      expect(toolbarFollow).toBePressed();
+    });
+
+    it('outlines the followed part with its name', () => {
+      renderPreview({ followTarget: FOOTER_TARGET });
+
+      const outline = screen.getByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
+
+      expect(outline).toHaveTextContent(messages.lookForm.footerHeading);
+    });
+
+    it('drops the outline and says so once Follow is turned off', async () => {
+      renderPreview({ followTarget: FOOTER_TARGET });
+
+      await user.click(followButton());
+
+      const outline = screen.queryByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
+      const offNote = screen.getByText(LOOK_FOLLOW.off);
+
+      expect(followButton()).not.toBePressed();
+      expect(outline).not.toBeInTheDocument();
+      expect(offNote).toBeVisible();
+    });
   });
 });

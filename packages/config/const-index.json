@@ -1384,6 +1384,12 @@
         "file": "apps/platform/src/constants/clipboard.ts"
       },
       {
+        "ref": "LOOK_FOLLOW_TARGET.IDLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.IDLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -5406,12 +5412,82 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "ALL_OPEN": [
+      {
+        "ref": "LOOK_FOLLOW_TARGET.ALL_OPEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
     "STYLE": [
+      {
+        "ref": "LOOK_FOLLOW_TARGET.STYLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
       {
         "ref": "LOOK_GROUP.STYLE",
         "scope": "app:platform",
         "from": "@platform/constants/look-group",
         "file": "apps/platform/src/constants/look-group.ts"
+      }
+    ],
+    "PART": [
+      {
+        "ref": "LOOK_FOLLOW_TARGET.PART",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "IN_VIEW": [
+      {
+        "ref": "LOOK_FOLLOW_OUTCOME.IN_VIEW",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "FITS": [
+      {
+        "ref": "LOOK_FOLLOW_OUTCOME.FITS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "AT_TOP": [
+      {
+        "ref": "LOOK_FOLLOW_OUTCOME.AT_TOP",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "AT_END": [
+      {
+        "ref": "LOOK_FOLLOW_OUTCOME.AT_END",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "NEARLY_FITS": [
+      {
+        "ref": "LOOK_FOLLOW_OUTCOME.NEARLY_FITS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "look-follow-outline": [
+      {
+        "ref": "LOOK_FOLLOW_TEST_ID.OUTLINE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
     "SITE_PARTS": [
@@ -5505,6 +5581,14 @@
     "(pointer: coarse)": [
       {
         "ref": "MEDIA_QUERY.COARSE_POINTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/media-query",
+        "file": "apps/platform/src/constants/media-query.ts"
+      }
+    ],
+    "(prefers-reduced-motion: reduce)": [
+      {
+        "ref": "MEDIA_QUERY.REDUCED_MOTION",
         "scope": "app:platform",
         "from": "@platform/constants/media-query",
         "file": "apps/platform/src/constants/media-query.ts"
@@ -7802,6 +7886,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_LIMIT.SCROLL_TOLERANCE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
     "2": [
@@ -7810,6 +7900,18 @@
         "scope": "app:platform",
         "from": "@platform/constants/dns",
         "file": "apps/platform/src/constants/dns.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_MARK.OUTLINE_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_LIMIT.NEARLY_FITS_SCREENS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
     "3": [
@@ -7824,6 +7926,18 @@
         "scope": "app:platform",
         "from": "@platform/constants/icon",
         "file": "apps/platform/src/constants/icon.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_MARK.TAG_RADIUS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_LIMIT.SETTLE_STILL_FRAMES",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
     "5": [
@@ -7842,6 +7956,30 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "7": [
+      {
+        "ref": "LOOK_FOLLOW_MARK.TAG_PADDING_X",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "10": [
+      {
+        "ref": "LOOK_FOLLOW_LIMIT.OVERFLOW_STEP",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "11": [
+      {
+        "ref": "LOOK_FOLLOW_MARK.TAG_FONT_SIZE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
     "16": [
       {
         "ref": "DNS_TYPE.TXT",
@@ -7854,6 +7992,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-layout",
         "file": "apps/platform/src/constants/look-layout.ts"
+      }
+    ],
+    "20": [
+      {
+        "ref": "LOOK_FOLLOW_MARK.TAG_HEIGHT",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
     "28": [
@@ -8052,6 +8198,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-layout",
         "file": "apps/platform/src/constants/look-layout.ts"
+      }
+    ],
+    "1500": [
+      {
+        "ref": "LOOK_FOLLOW_LIMIT.SETTLE_TIMEOUT_MS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
     "10000": [
