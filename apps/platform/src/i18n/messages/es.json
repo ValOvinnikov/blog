@@ -871,6 +871,10 @@
     "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
     "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica un sitio Free."
   },
+  "lookFullscreen": {
+    "open": "Abrir la vista previa a pantalla completa",
+    "close": "Cerrar pantalla completa"
+  },
   "assetUploadField": {
     "remove": "Quitar",
     "upload": "Subir",

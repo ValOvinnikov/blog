@@ -24,18 +24,27 @@ const TooltipRoot = ({
   side = 'bottom',
   align = 'start',
   sideOffset = 6,
-}: TTooltipProps) => (
-  <BaseTooltip.Root>
-    <BaseTooltip.Trigger render={trigger} />
-    <BaseTooltip.Portal>
-      <BaseTooltip.Positioner side={side} align={align} sideOffset={sideOffset}>
-        <BaseTooltip.Popup aria-hidden="true" className={tooltipVariants()}>
-          {label}
-        </BaseTooltip.Popup>
-      </BaseTooltip.Positioner>
-    </BaseTooltip.Portal>
-  </BaseTooltip.Root>
-);
+}: TTooltipProps) => {
+  const { positioner, popup } = tooltipVariants();
+
+  return (
+    <BaseTooltip.Root>
+      <BaseTooltip.Trigger render={trigger} />
+      <BaseTooltip.Portal>
+        <BaseTooltip.Positioner
+          side={side}
+          align={align}
+          sideOffset={sideOffset}
+          className={positioner()}
+        >
+          <BaseTooltip.Popup aria-hidden="true" className={popup()}>
+            {label}
+          </BaseTooltip.Popup>
+        </BaseTooltip.Positioner>
+      </BaseTooltip.Portal>
+    </BaseTooltip.Root>
+  );
+};
 
 export const Tooltip: TCompoundComponent<
   typeof TooltipRoot,

@@ -35,6 +35,8 @@ export const DEVICE_FRAME_SCROLL_TARGET = {
   END: 'END',
 } as const;
 
+export const DEVICE_FRAME_VIEWPORT_ATTRIBUTE = 'data-device-frame-viewport';
+
 export const DEVICE_FRAME_TEST_ID = {
   FRAME: 'device-frame',
   VIEWPORT: 'device-frame-viewport',

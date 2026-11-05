@@ -24,7 +24,12 @@ export const SampleHeaderLinks = ({
 
   return (
     <div className={root({ class: className })}>
-      <TextLink appearance="nav" href="#" isCurrent={true}>
+      <TextLink
+        appearance="nav"
+        href="#"
+        isCurrent={true}
+        currentStyle="weight"
+      >
         {t('navPosts')}
       </TextLink>
       <TextLink appearance="nav" href="#">

@@ -871,6 +871,10 @@
     "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it.",
     "freeSample": "The sample uses the {preset} preset's values, the ones a Free site publishes."
   },
+  "lookFullscreen": {
+    "open": "Open preview full screen",
+    "close": "Close full screen"
+  },
   "assetUploadField": {
     "remove": "Remove",
     "upload": "Upload",

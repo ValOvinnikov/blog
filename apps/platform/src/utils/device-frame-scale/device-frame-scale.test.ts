@@ -17,7 +17,7 @@ import {
 const MOCK_DESKTOP_STAGE = 564;
 const MOCK_PHONE_TAB_HEIGHT = 523;
 const MOCK_NARROW_STAGE = 358;
-const MOCK_HALF_STAGE = 640;
+const MOCK_HALF_FULLSCREEN_STAGE = 642;
 const MOCK_WIDE_STAGE = 5000;
 const MOCK_TABLET_FULLSCREEN_STAGE = 600;
 const MOCK_LARGE_AVAILABLE_HEIGHT = 5000;
@@ -214,13 +214,39 @@ describe(fitFullscreenScale, () => {
 
     expect(wide).toStrictEqual({ scale: 1, isPanning: false });
     expect(narrow.isPanning).toBe(false);
-    expect(toScalePercent(narrow.scale)).toBe(73);
+    expect(toScalePercent(narrow.scale)).toBe(71);
   });
+
+  it.each([
+    {
+      title: 'Phone on a 390 phone',
+      device: PREVIEW_DEVICE.PHONE,
+      availableWidth: 370,
+      percent: 91,
+    },
+    {
+      title: 'Desktop in a 1024 window',
+      device: PREVIEW_DEVICE.DESKTOP,
+      availableWidth: 976,
+      percent: 76,
+    },
+  ])(
+    'fits the frame and its chrome inside the stage: $title',
+    ({ device, availableWidth, percent }) => {
+      const { scale, isPanning } = fitFullscreenScale({
+        device,
+        availableWidth,
+      });
+
+      expect(isPanning).toBe(false);
+      expect(toScalePercent(scale)).toBe(percent);
+    },
+  );
 
   it('fits without panning at exactly 50%', () => {
     const fit = fitFullscreenScale({
       device: PREVIEW_DEVICE.DESKTOP,
-      availableWidth: MOCK_HALF_STAGE,
+      availableWidth: MOCK_HALF_FULLSCREEN_STAGE,
     });
 
     expect(fit).toStrictEqual({ scale: 0.5, isPanning: false });

@@ -18,8 +18,9 @@ import {
   ARIA_VALUETEXT,
 } from '@platform/testing/aria';
 import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
-import { act, customRender, screen } from '@platform/testing/custom-render';
+import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { stubChangingMediaQueries } from '@platform/testing/match-media';
 import {
   MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
@@ -213,30 +214,6 @@ export const createAfterChangingSiteType = async (
   await acceptAndCreate(user);
 };
 
-const stubMatchMedia = window.matchMedia;
-
-const stubTier = (initialQueries: readonly string[]) => {
-  let matchingQueries = initialQueries;
-  const listeners = new Set<EventListener>();
-  vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
-    ...stubMatchMedia(query),
-    get matches() {
-      return matchingQueries.includes(query);
-    },
-    addEventListener: (_type: string, listener: EventListener) => {
-      listeners.add(listener);
-    },
-    removeEventListener: (_type: string, listener: EventListener) => {
-      listeners.delete(listener);
-    },
-  }));
-
-  return (nextQueries: readonly string[]) => {
-    matchingQueries = nextQueries;
-    act(() => listeners.forEach((listener) => listener(new Event('change'))));
-  };
-};
-
 export const FULL_TIER = [
   ONBOARDING_TIER_QUERY.RAIL,
   ONBOARDING_TIER_QUERY.FULL,
@@ -246,7 +223,7 @@ export const FULL_TIER_TITLE = 'from 1360px';
 export const RAIL_TIER_TITLE = 'from 768px';
 
 export const renderInTier = (matchingQueries: readonly string[]) => {
-  const resizeTo = stubTier(matchingQueries);
+  const resizeTo = stubChangingMediaQueries(matchingQueries);
   setup();
   return resizeTo;
 };

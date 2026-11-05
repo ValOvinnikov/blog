@@ -106,7 +106,11 @@ export const fitFullscreenScale = ({
   device: TPreviewDevice;
   availableWidth: number;
 }): Pick<TDeviceFrameLayout, 'scale' | 'isPanning'> => {
-  const scale = Math.min(availableWidth / PREVIEW_DEVICE_WIDTH[device], 1);
+  const chrome = deviceFrameChrome(device);
+  const scale = Math.min(
+    (availableWidth - chrome.width) / PREVIEW_DEVICE_WIDTH[device],
+    1,
+  );
 
   return scale < DEVICE_FRAME_LIMIT.FULLSCREEN_MIN_SCALE
     ? { scale: 1, isPanning: true }
