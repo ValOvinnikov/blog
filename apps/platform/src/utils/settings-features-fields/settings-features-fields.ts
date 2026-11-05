@@ -1,5 +1,6 @@
 import {
   CAPABILITY,
+  COMING_SOON_CAPABILITIES,
   READER_ACCOUNT_CAPABILITIES,
   type TCapability,
 } from '@blog/config';
@@ -17,30 +18,28 @@ export type TSettingsFeaturesValues = {
 export type TCapabilityToggle = {
   capability: TCapability;
   field: keyof TSettingsFeaturesValues;
-  isComingSoon?: boolean;
+  isComingSoon: boolean;
 };
 
-export const CAPABILITY_TOGGLES: TCapabilityToggle[] = [
-  {
-    capability: CAPABILITY.COMMENTS,
-    field: 'commentsEnabled',
-    isComingSoon: true,
-  },
-  {
-    capability: CAPABILITY.RATINGS,
-    field: 'ratingsEnabled',
-    isComingSoon: true,
-  },
-  { capability: CAPABILITY.BOOKMARKS, field: 'bookmarksEnabled' },
-  {
-    capability: CAPABILITY.NEWSLETTER,
-    field: 'newsletterEnabled',
-    isComingSoon: true,
-  },
-  { capability: CAPABILITY.ANALYTICS, field: 'analyticsEnabled' },
-  { capability: CAPABILITY.CONSENT_BANNER, field: 'consentBannerEnabled' },
-  { capability: CAPABILITY.CONTACT_FORM, field: 'contactFormEnabled' },
-];
+const CAPABILITY_FIELDS: Record<TCapability, keyof TSettingsFeaturesValues> = {
+  [CAPABILITY.COMMENTS]: 'commentsEnabled',
+  [CAPABILITY.RATINGS]: 'ratingsEnabled',
+  [CAPABILITY.BOOKMARKS]: 'bookmarksEnabled',
+  [CAPABILITY.NEWSLETTER]: 'newsletterEnabled',
+  [CAPABILITY.ANALYTICS]: 'analyticsEnabled',
+  [CAPABILITY.CONSENT_BANNER]: 'consentBannerEnabled',
+  [CAPABILITY.CONTACT_FORM]: 'contactFormEnabled',
+};
+
+export const CAPABILITY_TOGGLES: TCapabilityToggle[] = Object.values(
+  CAPABILITY,
+).map((capability) => ({
+  capability,
+  field: CAPABILITY_FIELDS[capability],
+  isComingSoon: COMING_SOON_CAPABILITIES.some(
+    (comingSoon) => comingSoon === capability,
+  ),
+}));
 
 export const featureDefaultsToValues = (
   defaults: Record<TCapability, boolean>,
