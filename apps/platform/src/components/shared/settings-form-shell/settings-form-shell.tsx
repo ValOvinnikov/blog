@@ -69,6 +69,7 @@ export const SettingsFormShell = <TValues,>({
   const t = useTranslations('saveBar');
   const isDirty = changeCount > 0;
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
+  const saveError = isPending ? undefined : (planRefusal ?? errorTitle);
   const isPhoneSaveFooterShown =
     Boolean(layout?.hasPhoneSaveFooter) && !isArchived && !isSaveBarHidden;
   const { root, alert, liveStatus } = settingsFormShellVariants({
@@ -112,12 +113,8 @@ export const SettingsFormShell = <TValues,>({
         <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
       )}
 
-      {(planRefusal ?? errorTitle) && (
-        <Alert
-          type={ALERT_TYPE.ERROR}
-          title={planRefusal ?? errorTitle}
-          className={alert()}
-        />
+      {saveError && !isSaveBarShown && (
+        <Alert type={ALERT_TYPE.ERROR} title={saveError} className={alert()} />
       )}
 
       {offer && (
@@ -153,6 +150,7 @@ export const SettingsFormShell = <TValues,>({
           breakdown={breakdown}
           invalidControls={invalidControls}
           isPending={isPending}
+          saveError={isSaveBarShown ? saveError : undefined}
           unsavedCards={unsavedCards}
           hasPhoneFooter={layout?.hasPhoneSaveFooter}
           onSave={() => void handleSave()}

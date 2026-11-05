@@ -657,6 +657,9 @@
     "languageSwitcherStyleLabel": "Stijl",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
+    "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkeuze te kiezen.",
+    "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
+    "lockLineTypeFonts": "Op Free houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Menu met code",
       "MENU_GLOBE": "Menu met wereldbol",
@@ -865,7 +868,8 @@
     "styleCard": "<strong>{card}</strong> verandert de hele pagina, dus het kader blijft waar het is.",
     "idle": "Open een kaart bij Sitedelen en het kader scrolt ernaartoe.",
     "off": "Volgen staat uit. Het kader blijft waar je het laat.",
-    "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe."
+    "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe.",
+    "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die een Free-site publiceert."
   },
   "lookFullscreen": {
     "open": "Voorbeeld op volledig scherm openen",

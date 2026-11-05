@@ -1,5 +1,10 @@
 import { isAccentHueAccessible, type TPresetId } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import {
+  LOOK_FIELDS,
+  TENANT_PLAN,
+  type TLookField,
+  type TTenantPlan,
+} from '@blog/db/constants';
 import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
 import type { TLookCard } from '@platform/constants/look-card';
@@ -45,11 +50,13 @@ export const buildLookFormContext = ({
 }: TBuildLookFormContextArgs): TLookFormContext => {
   const hasFieldChanged = (field: keyof TLookFormValues) =>
     isFieldChanged(field, values, savedValues);
+  const isLocked = (field: TLookField) => !isLookFieldEntitled(field, plan);
 
   return {
     ...rest,
     values,
-    isLocked: (field) => !isLookFieldEntitled(field, plan),
+    isLocked,
+    hasLockedFields: LOOK_FIELDS.some(isLocked),
     hasCardChanges: (card: TLookCard) =>
       CARD_FIELDS[card].some(hasFieldChanged),
     hasFieldChanged,

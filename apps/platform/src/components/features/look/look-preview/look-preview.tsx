@@ -27,6 +27,7 @@ import { LookFullscreenDialog } from './components/look-fullscreen-dialog';
 import { useFrameAvailableHeight } from './use-frame-available-height';
 import { useLookFollow } from './use-look-follow';
 import { useLookPreviewToolbar } from './use-look-preview-toolbar';
+import { useLookStatusNotes } from './use-look-status-notes';
 
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
@@ -45,10 +46,10 @@ export const LookPreview = ({
 }: TLookPreviewProps) => {
   const { tenantName, values, isSubmenuPreviewOpen, previewDevice } =
     useLookForm();
-  const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
   const { toolbarProps, isDark, isSignedIn } =
     useLookPreviewToolbar(hasReaderAccounts);
+  const { readerNote, planNote } = useLookStatusNotes(hasReaderAccounts);
   const [scale, setScale] = useState(1);
   const [fullscreenHandle] = useState(Dialog.createHandle);
   const fullscreenTriggerRef = useRef<HTMLButtonElement>(null);
@@ -136,7 +137,8 @@ export const LookPreview = ({
           target={followTarget}
           device={previewDevice}
           isShortLine={isPhoneTab || !hasReaderAccounts}
-          readerNote={hasReaderAccounts ? undefined : t('readerAccountsOff')}
+          readerNote={readerNote}
+          planNote={planNote}
         />
       </PreviewFrame>
       <LookFullscreenDialog

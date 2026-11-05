@@ -22,6 +22,7 @@ type TReviewRow = {
   label: string;
   value: ReactNode;
   step: TOnboardingStep;
+  isMono?: boolean;
 };
 
 export type TReviewStepProps = {
@@ -60,6 +61,7 @@ export const ReviewStep = ({
       label: t('siteAddressLabel'),
       value: siteAddress,
       step: ONBOARDING_STEP.ADDRESS,
+      isMono: true,
     },
     {
       label: t('languageLabel'),
@@ -86,10 +88,11 @@ export const ReviewStep = ({
   return (
     <>
       <DetailList isBordered={true}>
-        {rows.map(({ label, value, step }) => (
+        {rows.map(({ label, value, step, isMono }) => (
           <DetailList.Row
             key={label}
             label={label}
+            isMono={isMono}
             action={
               <Button
                 variant={BUTTON_VARIANT.LINK}

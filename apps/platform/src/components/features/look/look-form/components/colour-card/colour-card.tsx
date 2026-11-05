@@ -5,11 +5,13 @@ import { LookCard } from '@platform/components/features/look/look-form/component
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
+import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { HueSlider } from '@platform/components/shared/hue-slider';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
 export type TColourCardProps = {
@@ -27,6 +29,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
   const t = useTranslations('lookForm');
   const tHue = useTranslations('logoHueField');
   const logoHueLock = useLookFieldLock('logoHue');
+  const { lockLine } = useLookRowLock(CARD_FIELDS[LOOK_ROW.COLOUR]);
   const { hueField, hueValue } = logoHueFieldVariants();
 
   const accentHueLabel = t('accentHueLabel');
@@ -37,6 +40,7 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
       summaryMark={<AccentSwatch hue={accentHue} size={SIZE.XS} />}
       card={LOOK_ROW.COLOUR}
       description={t('colourDescription')}
+      lockLine={lockLine}
     >
       <LookField
         field="accentHue"
@@ -66,14 +70,17 @@ export const ColourCard = ({ summary }: TColourCardProps) => {
         label={t('logoHueLabel')}
         hint={t('logoHueDescription')}
         isGroup={true}
-        lock={logoHueLock.lock}
+        labelId={logoHueLock.labelId}
+        growthBadgeId={logoHueLock.growthBadgeId}
       >
         <LogoHueField
           accentHue={accentHue}
           logoHue={logoHue}
           onChange={(hue) => updateField('logoHue', hue)}
           isDisabled={logoHueLock.isDisabled}
-          aria-describedby={logoHueLock.describedBy}
+          isLocked={logoHueLock.isLocked}
+          growthBadgeId={logoHueLock.growthBadgeId}
+          aria-describedby={logoHueLock.aria.describedBy}
         />
       </LookField>
     </LookCard>

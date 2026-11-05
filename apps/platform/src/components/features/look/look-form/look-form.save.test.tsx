@@ -141,7 +141,7 @@ describe(`<${LookForm.name}/>`, () => {
     await screen.findByText(ALL_CHANGES_SAVED);
   });
 
-  it('shows the error alert above the form and keeps the save bar unsaved when the save fails', async () => {
+  it('shows the failure in the save bar and keeps the change unsaved when the save fails', async () => {
     vi.mocked(updateLookAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
@@ -154,7 +154,6 @@ describe(`<${LookForm.name}/>`, () => {
     );
     const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
     expect(alert).toHaveTextContent(LOOK_FORM.alertError);
-    expect(saveBar).not.toContainElement(alert);
-    expect(saveBar).toHaveTextContent(/unsaved change/);
+    expect(saveBar).toContainElement(alert);
   });
 });

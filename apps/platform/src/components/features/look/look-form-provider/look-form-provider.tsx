@@ -18,6 +18,7 @@ export type TLookFormContext = {
   values: TLookFormValues;
   updateField: TLookFormFieldSetter;
   isLocked: (field: TLookField) => boolean;
+  hasLockedFields: boolean;
   hasCardChanges: (card: TLookCard) => boolean;
   hasFieldChanged: (field: keyof TLookFormValues) => boolean;
   canResetToPreset: boolean;
