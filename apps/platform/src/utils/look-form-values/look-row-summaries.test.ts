@@ -68,7 +68,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.HEADER]: 'Classic · Full width · Dropdown · Pill with label',
       [LOOK_ROW.FOOTER]:
         'Columns · Brand tint · Full width · Cookie button shown',
-      [LOOK_ROW.LANGUAGE_SWITCHER]: 'Menu with globe',
+      [LOOK_ROW.LANGUAGE_SWITCHER]: 'Globe',
     });
   });
 
@@ -121,8 +121,6 @@ describe(buildLookRowSummaries, () => {
       hasMultipleLanguages: false,
     });
 
-    expect(summaries[LOOK_ROW.LANGUAGE_SWITCHER]).toBe(
-      'Menu with globe · One language',
-    );
+    expect(summaries[LOOK_ROW.LANGUAGE_SWITCHER]).toBe('Globe · One language');
   });
 });

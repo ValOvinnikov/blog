@@ -661,9 +661,9 @@
     "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
     "lockLineTypeFonts": "En Free, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
     "languageSwitcherOptionLabel": {
-      "MENU_CODE": "Menú con código",
-      "MENU_GLOBE": "Menú con globo",
-      "CODES": "Códigos compactos"
+      "MENU_CODE": "Código",
+      "MENU_GLOBE": "Globo",
+      "CODES": "Compacto"
     },
     "colourHeading": "Color",
     "colourDescription": "Solo cambia el tono, para que el texto siga siendo legible.",

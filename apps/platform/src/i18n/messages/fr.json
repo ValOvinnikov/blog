@@ -661,9 +661,9 @@
     "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
     "lockLineTypeFonts": "Avec Free, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
-      "MENU_CODE": "Menu avec code",
-      "MENU_GLOBE": "Menu avec globe",
-      "CODES": "Codes compacts"
+      "MENU_CODE": "Code",
+      "MENU_GLOBE": "Globe",
+      "CODES": "Compact"
     },
     "colourHeading": "Couleur",
     "colourDescription": "Seule la teinte change, pour que le texte reste lisible.",

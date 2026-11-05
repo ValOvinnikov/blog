@@ -661,9 +661,9 @@
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
     "lockLineTypeFonts": "Op Free houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
-      "MENU_CODE": "Menu met code",
-      "MENU_GLOBE": "Menu met wereldbol",
-      "CODES": "Compacte codes"
+      "MENU_CODE": "Code",
+      "MENU_GLOBE": "Wereldbol",
+      "CODES": "Compact"
     },
     "colourHeading": "Kleur",
     "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",

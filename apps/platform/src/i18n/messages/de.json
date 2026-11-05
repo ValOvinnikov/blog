@@ -661,9 +661,9 @@
     "lockLineGrowthFields": "Mit Growth markierte Felder behalten den Wert der Vorlage {preset}.",
     "lockLineTypeFonts": "Im Free-Tarif behält Schrift die Schriften der Vorlage {preset}. Eine andere Vorlage ändert sie.",
     "languageSwitcherOptionLabel": {
-      "MENU_CODE": "Menü mit Code",
-      "MENU_GLOBE": "Menü mit Globus",
-      "CODES": "Kompakte Codes"
+      "MENU_CODE": "Code",
+      "MENU_GLOBE": "Globus",
+      "CODES": "Kompakt"
     },
     "colourHeading": "Farbe",
     "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",
