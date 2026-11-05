@@ -24,6 +24,15 @@ const MOCK_OLDER_CREATED_AT = faker.date.past({
 const MOCK_SEARCH_WORD = faker.string.alpha({ length: 8, casing: 'lower' });
 const MOCK_SLUG = faker.string.alpha({ length: 10, casing: 'lower' });
 const MOCK_CUSTOM_PRIMARY_DOMAIN = faker.internet.domainName();
+const MOCK_FIRST_EXTRA_DOMAIN = `a-${MOCK_SLUG}.example.com`;
+const MOCK_SECOND_EXTRA_DOMAIN = `b-${MOCK_SLUG}.example.com`;
+const MOCK_SEARCH_PRIMARY_DOMAIN = `${MOCK_SEARCH_WORD}-site.example.com`;
+
+async function insertTenantDomains(tenantId: string, domains: string[]) {
+  await db()
+    .insert(schema.tenantDomains)
+    .values(domains.map((domain) => ({ tenantId, domain })));
+}
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -134,38 +143,44 @@ describe(listTenants, () => {
       expect(result).toEqual([matchingTenant]);
     });
 
-    it('matches against the primary domain', async () => {
+    it('matches against the primary domain without a matched address', async () => {
       const domainTenant = await insertTestTenant(db(), {
         name: MOCK_LAST_NAME,
-        primaryDomain: `${MOCK_SEARCH_WORD}-site.example.com`,
+        primaryDomain: MOCK_SEARCH_PRIMARY_DOMAIN,
       });
+      await insertTenantDomains(domainTenant.id, [MOCK_SEARCH_PRIMARY_DOMAIN]);
 
       const result = await listTenants({ search: `${MOCK_SEARCH_WORD}-site` });
 
       expect(result).toEqual([domainTenant]);
     });
 
-    it('matches against any of the tenant domains', async () => {
+    it('returns a tenant matched only through extra addresses once, with the first of them', async () => {
       const customDomainTenant = await insertTestTenant(db(), {
         name: MOCK_LAST_NAME,
         primaryDomain: MOCK_CUSTOM_PRIMARY_DOMAIN,
       });
-      await db()
-        .insert(schema.tenantDomains)
-        .values([
-          {
-            tenantId: customDomainTenant.id,
-            domain: MOCK_CUSTOM_PRIMARY_DOMAIN,
-          },
-          {
-            tenantId: customDomainTenant.id,
-            domain: `${MOCK_SLUG}.example.com`,
-          },
-        ]);
+      await insertTenantDomains(customDomainTenant.id, [
+        MOCK_CUSTOM_PRIMARY_DOMAIN,
+        MOCK_SECOND_EXTRA_DOMAIN,
+        MOCK_FIRST_EXTRA_DOMAIN,
+      ]);
 
       const result = await listTenants({ search: MOCK_SLUG });
 
-      expect(result).toEqual([customDomainTenant]);
+      expect(result).toEqual([
+        { ...customDomainTenant, matchedDomain: MOCK_FIRST_EXTRA_DOMAIN },
+      ]);
+    });
+
+    it('returns no matched address for a name match', async () => {
+      await insertTenantDomains(matchingTenant.id, [
+        `${MOCK_SEARCH_WORD}.example.com`,
+      ]);
+
+      const result = await listTenants({ search: MOCK_SEARCH_WORD });
+
+      expect(result).toEqual([matchingTenant]);
     });
 
     it('treats wildcard characters as literal text', async () => {
