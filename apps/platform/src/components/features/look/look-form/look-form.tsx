@@ -2,7 +2,7 @@
 
 import type { TLocaleIsoCode } from '@blog/config';
 import type { TTenantPlan } from '@blog/db/constants';
-import { isUndefined } from '@blog/utils/primitives';
+import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
 import { LookJumpIndex } from '@platform/components/features/look/look-jump-index';
@@ -67,7 +67,7 @@ export const LookForm = ({
       : layoutWidth < LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH,
   });
   const t = useTranslations('lookForm');
-  const hasMultipleLanguages = liveLocales.length > 1;
+  const hasMultipleLanguages = hasArrayGotMultipleItems(liveLocales);
   const { groupProps, revealRow, revealCard, engageCardAt, jumpIndex } =
     useLookOpenRows();
   const { lookForm, isPending, form, errorTitle } = useLookFormState({
