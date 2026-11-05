@@ -14,8 +14,8 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
+import { hasBusySpinner } from '@platform/utils/has-busy-spinner/has-busy-spinner';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
-import { hasBusySpinner } from '@platform/utils/sample-busy-style/sample-busy-style';
 import { useTranslations } from 'next-intl';
 
 export type TButtonsCardProps = {

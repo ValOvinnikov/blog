@@ -141,50 +141,51 @@ describe(`<${LookForm.name}/>`, () => {
       await saveAndExpectLook(user, saved);
     });
 
-    it('hides the spinner while busy buttons draw a progress edge and brings it back with its value', async () => {
-      await openLookRow(user, LOOK_ROW.BUTTONS);
-      await chooseOption(
-        user,
-        SPINNER_LABEL,
-        LOOK_FORM.spinnerStyleOptionLabel.DOTS,
-      );
-      await chooseSegment(
-        user,
-        LOOK_FORM.busyButtonStyleLabel,
-        LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
-      );
-      const hiddenSpinner = screen.queryByRole('combobox', {
-        name: UNSAVED_SPINNER,
-      });
-      expect(hiddenSpinner).not.toBeInTheDocument();
-
-      await chooseSegment(
-        user,
-        UNSAVED_BUSY_STYLE,
-        LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
-      );
-
-      const spinner = screen.getByRole('combobox', { name: UNSAVED_SPINNER });
-      expect(spinner).toHaveTextContent(LOOK_FORM.spinnerStyleOptionLabel.DOTS);
-    });
-
-    it("puts a changed spinner back to the preset's", async () => {
-      await openLookRow(user, LOOK_ROW.BUTTONS);
-      await chooseOption(
-        user,
-        SPINNER_LABEL,
-        LOOK_FORM.spinnerStyleOptionLabel.DOTS,
-      );
-      const usePresetSpinnerButton = screen.getByRole('button', {
-        name: USE_PRESET_SPINNER,
+    describe('after choosing the Dots spinner', () => {
+      beforeEach(async () => {
+        await openLookRow(user, LOOK_ROW.BUTTONS);
+        await chooseOption(
+          user,
+          SPINNER_LABEL,
+          LOOK_FORM.spinnerStyleOptionLabel.DOTS,
+        );
       });
 
-      await user.click(usePresetSpinnerButton);
+      it('hides the spinner while busy buttons draw a progress edge and brings it back with its value', async () => {
+        await chooseSegment(
+          user,
+          LOOK_FORM.busyButtonStyleLabel,
+          LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
+        );
+        const hiddenSpinner = screen.queryByRole('combobox', {
+          name: UNSAVED_SPINNER,
+        });
+        expect(hiddenSpinner).not.toBeInTheDocument();
 
-      const spinner = screen.getByRole('combobox', { name: SPINNER_LABEL });
-      expect(spinner).toHaveTextContent(
-        LOOK_FORM.spinnerStyleOptionLabel.BRAILLE,
-      );
+        await chooseSegment(
+          user,
+          UNSAVED_BUSY_STYLE,
+          LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
+        );
+
+        const spinner = screen.getByRole('combobox', { name: UNSAVED_SPINNER });
+        expect(spinner).toHaveTextContent(
+          LOOK_FORM.spinnerStyleOptionLabel.DOTS,
+        );
+      });
+
+      it("puts the spinner back to the preset's", async () => {
+        const usePresetSpinnerButton = screen.getByRole('button', {
+          name: USE_PRESET_SPINNER,
+        });
+
+        await user.click(usePresetSpinnerButton);
+
+        const spinner = screen.getByRole('combobox', { name: SPINNER_LABEL });
+        expect(spinner).toHaveTextContent(
+          LOOK_FORM.spinnerStyleOptionLabel.BRAILLE,
+        );
+      });
     });
   });
 });

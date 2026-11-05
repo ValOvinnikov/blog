@@ -635,7 +635,7 @@ mid-edit, after the owner opened Footer.
 | Brand             | "Logo uploaded · No favicon"                                      | same                                                                                                                               |
 | Type              | "Fraunces · Inter"                                                | "Fraunces · Inter" + badge                                                                                                         |
 | Shape             | "Medium · Default · Accent bar · Outlined"                        | "Small · Compact · Outlined · Outlined" + badge                                                                                    |
-| Buttons           | "Busy label · Follow the preset"                                  | same + badge                                                                                                                       |
+| Buttons           | "Busy label · Ring"                                               | same + badge                                                                                                                       |
 | Header            | "Classic · Full width · Dropdown · Pill with label"               | same + badge                                                                                                                       |
 | Footer            | (open)                                                            | "Columns · Brand tint · Full width · Cookie button shown", no badge                                                                |
 | Language switcher | "Menu with globe"                                                 | "Menu with code · One language" + badge (§ 22 D-7; LXG draws "Menu with globe · One language", LX-G "Not shown with one language") |
@@ -764,10 +764,10 @@ framed."
 **Buttons.** Description "How buttons look while they work, and the spinner
 they show."
 
-| Field      | Hint                                                                                     | Control                                                               |
-| ---------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| While busy | "What a button shows while it saves or sends. It keeps its place and stays full colour." | segmented **Busy label** / Label kept / Progress edge                 |
-| Spinner    | "The spinner on your site's buttons and loading states."                                 | select trigger (§ 10, min-width 220, align start) "Follow the preset" |
+| Field      | Hint                                                                                     | Control                                                  |
+| ---------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| While busy | "What a button shows while it saves or sends. It keeps its place and stays full colour." | segmented **Busy label** / Label kept / Progress edge    |
+| Spinner    | "The spinner on your site's buttons and loading states."                                 | select trigger (§ 10, min-width 220, align start) "Ring" |
 
 **Header** (after Layout, § 10.2). Description "How the top bar of your site is
 arranged and how its sub-menus open."
@@ -1900,7 +1900,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] Console chip: h40, padding 0 12 0 6, border `#878f9d`, 28×28 swatch `#eef1f5` ">\_" mono
 - [ ] Editorial chip checked: 1.5px brand border, 3px `#eef2ff` ring, swatch `#f6efe4` "Aa" Fraunces, trailing stroke check
 - [ ] "STYLE" label 11/14 600 .06em uppercase, margin 0 0 8 2
-- [ ] Style card: Colour (14×14 `#0d6466` swatch + "Hue 192 · logo follows accent"), Brand "Logo uploaded · No favicon", Type "Fraunces · Inter", Shape "Medium · Default · Accent bar · Outlined", Buttons "Busy label · Follow the preset"; all folded, chevrons right
+- [ ] Style card: Colour (14×14 `#0d6466` swatch + "Hue 192 · logo follows accent"), Brand "Logo uploaded · No favicon", Type "Fraunces · Inter", Shape "Medium · Default · Accent bar · Outlined", Buttons "Busy label · Ring"; all folded, chevrons right
 - [ ] Rows min-height 52, padding 0 16, gap 12; titles 132 wide 14/600; summaries 13px `#5b6472` ellipsis; dividers `#eef0f3`
 - [ ] "SITE PARTS" label; Header folded "Classic · Full width · Dropdown · Pill with label"
 - [ ] Footer open: chevron down, inset 3px brand bar, title "Footer" + dot ("Unsaved changes"), empty summary
@@ -2096,7 +2096,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] Colour: description; Accent hue — 40×40 swatch (the shared `AccentSwatch`), 10 px hue track, mono "hue 192°" 62 px wide, gap 14, range named by the label; Logo hue — fieldset, hint, the "Follow accent hue" Switch on (GC's checkbox not built, D-39); the thumb is #6330's and is not ticked here
 - [ ] Brand: description, formats line 8 px under it; Logo + "optional", 52×52 thumb with the logo, "Replace logo" (upload icon) and "Remove"; Favicon + "optional", empty dashed thumb, "Upload favicon"
 - [ ] Shape: Radius scale, Density, Card style segmented with hints; Header buttons — fixed hint above, two-line options each with its own description inside (padding 6 10, max-width 146, label 13 / 18, description 11.5 / 16 `#5b6472`)
-- [ ] Buttons: While busy segmented Busy label✓ / Label kept / Progress edge; Spinner select "Follow the preset"
+- [ ] Buttons: While busy segmented Busy label✓ / Label kept / Progress edge; Spinner select "Ring"
 - [ ] Header: Layout select, then Sub-menus, Bar, Account button, Account panel and "On phones, the account sits" segmented, each with its hint (§ 10.5)
 - [ ] From here, opening a folded row by hand folds every other open row
 - [ ] The save bar and the preview's 80 px clearance are unchanged
