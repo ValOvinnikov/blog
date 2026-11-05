@@ -7,7 +7,10 @@ import {
 import {
   ALL_CHANGES_SAVED,
   GO_TO_THE_FIRST_ONE,
+  ONE_FIELD_NEEDS_ATTENTION,
+  ONE_UNSAVED_CHANGE,
   SAVE_CHANGES,
+  SAVING,
 } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useState } from 'react';
@@ -19,9 +22,6 @@ import {
 
 faker.seed(6414);
 
-const ONE_UNSAVED_CHANGE = '1 unsaved change';
-const ONE_FIELD_NEEDS_ATTENTION = '1 field needs attention';
-const SAVING = 'Saving…';
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_FIELD_ID = faker.string.alpha(10);
 const MOCK_SECOND_FIELD_ID = faker.string.alpha(10);
@@ -60,27 +60,24 @@ describe(`<${PhoneSaveFooter.name}/>`, () => {
   });
 
   describe('with unsaved changes', () => {
-    it('is a region named by its change count', () => {
+    beforeEach(() => {
       setup();
+    });
 
+    it('is a region named by its change count', () => {
       const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
 
       expect(footer).toBeVisible();
     });
 
     it('saves from an enabled Save changes', async () => {
-      const onSave = vi.fn();
-      setup({ onSave });
-
       const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
       await user.click(saveButton);
 
-      expect(onSave).toHaveBeenCalledTimes(1);
+      expect(baseProps.onSave).toHaveBeenCalledTimes(1);
     });
 
     it('offers no Discard and no shortcut', () => {
-      setup();
-
       const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
       const buttons = screen.getAllByRole('button');
 
@@ -108,16 +105,26 @@ describe(`<${PhoneSaveFooter.name}/>`, () => {
   });
 
   describe('with fields that need attention', () => {
-    it('is a region named by the count of fields that need attention', () => {
-      setup({ invalidControls: { ids: [MOCK_FIELD_ID] } });
-
-      const footer = screen.getByRole('region', {
-        name: ONE_FIELD_NEEDS_ATTENTION,
+    describe('with one field', () => {
+      beforeEach(() => {
+        setup({ invalidControls: { ids: [MOCK_FIELD_ID] } });
       });
 
-      expect(footer).toHaveTextContent(
-        `${ONE_FIELD_NEEDS_ATTENTION}${GO_TO_THE_FIRST_ONE}${SAVE_CHANGES}`,
-      );
+      it('is a region named by the count of fields that need attention', () => {
+        const footer = screen.getByRole('region', {
+          name: ONE_FIELD_NEEDS_ATTENTION,
+        });
+
+        expect(footer).toHaveTextContent(
+          `${ONE_FIELD_NEEDS_ATTENTION}${GO_TO_THE_FIRST_ONE}${SAVE_CHANGES}`,
+        );
+      });
+
+      it('keeps Save changes enabled', () => {
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+
+        expect(saveButton).toBeEnabled();
+      });
     });
 
     it('counts two fields in the plural', () => {
@@ -130,14 +137,6 @@ describe(`<${PhoneSaveFooter.name}/>`, () => {
       });
 
       expect(footer).toBeVisible();
-    });
-
-    it('keeps Save changes enabled', () => {
-      setup({ invalidControls: { ids: [MOCK_FIELD_ID] } });
-
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-
-      expect(saveButton).toBeEnabled();
     });
 
     it('reveals and focuses the first field from "Go to the first one"', async () => {
@@ -157,29 +156,26 @@ describe(`<${PhoneSaveFooter.name}/>`, () => {
   });
 
   describe('while saving', () => {
-    it('marks the footer busy', () => {
+    beforeEach(() => {
       setup({ isPending: true });
+    });
 
+    it('marks the footer busy', () => {
       const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
 
       expect(footer).toHaveAttribute('aria-busy', 'true');
     });
 
     it('keeps Saving… focusable while ignoring presses', async () => {
-      const onSave = vi.fn();
-      setup({ isPending: true, onSave });
-
       const savingButton = screen.getByRole('button', { name: SAVING });
       await user.click(savingButton);
 
       expect(savingButton).toHaveFocus();
       expect(savingButton).toHaveAttribute('aria-disabled', 'true');
-      expect(onSave).not.toHaveBeenCalled();
+      expect(baseProps.onSave).not.toHaveBeenCalled();
     });
 
     it('announces Saving… once', () => {
-      setup({ isPending: true });
-
       const announcement = screen.getByRole('status');
 
       expect(announcement).toHaveTextContent(SAVING);

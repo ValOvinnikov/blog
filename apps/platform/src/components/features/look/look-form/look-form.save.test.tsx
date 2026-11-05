@@ -12,7 +12,6 @@ import {
   hueValue,
   NUDGED_ACCENT_HUE,
   savedLookValues,
-  SAVING,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
@@ -23,6 +22,7 @@ import {
   ALL_CHANGES_SAVED,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
+  SAVING,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';

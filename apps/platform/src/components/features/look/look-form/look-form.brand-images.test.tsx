@@ -12,7 +12,6 @@ import {
   hueValue,
   NUDGED_ACCENT_HUE,
   savedLookValues,
-  SAVING,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   clickSave,
@@ -28,6 +27,7 @@ import {
 import {
   ALL_CHANGES_SAVED,
   UNSAVED_CHANGES,
+  SAVING,
 } from '@platform/testing/render-in-settings-form';
 import {
   CURRENT_LOGO,
