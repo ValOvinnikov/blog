@@ -21,15 +21,15 @@ export type TLookRowsGroup = {
 
 export const useLookOpenRows = () => {
   const [openRows, setOpenRows] = useState<readonly TLookRow[]>([]);
-  const [engagedCard, setEngagedCard] =
-    useState<TMaybeUndefined<TLookCard>>(undefined);
+  const [editedRow, setEditedRow] =
+    useState<TMaybeUndefined<TLookRow>>(undefined);
   const rowActions = useRef(new Map<TLookRow, TLookRowActions>());
 
   const groupProps = (groupRows: readonly TLookRow[]): TLookRowsGroup => ({
     openValues: openRows.filter((row) => groupRows.includes(row)),
     onOpenValuesChange: (next) => {
       const opened = next.find((row) => !openRows.includes(row));
-      if (opened) setEngagedCard(opened);
+      if (opened) setEditedRow(opened);
       setOpenRows((prev) => nextOpenRows(prev, groupRows, next));
     },
     actionsRef: (actions: TMaybeNull<TLookRowActions>) => {
@@ -47,30 +47,30 @@ export const useLookOpenRows = () => {
     setOpenRows((prev) => revealOpenRow(prev, row));
 
   const revealCard = (card: TLookCard) => {
-    setEngagedCard(card);
-    if (card === LOOK_CARD.PRESET) return;
+    if (card === LOOK_CARD.PRESET) {
+      setEditedRow(undefined);
+      return;
+    }
+    setEditedRow(card);
     rowActions.current.get(card)?.openRow(card, { focus: true });
   };
 
   const engageCardAt = (target: Node) => {
     const card = findLookCardContaining(target);
-    if (card) setEngagedCard(card);
+    if (card === LOOK_CARD.PRESET) setEditedRow(undefined);
+    else if (openRows.some((row) => row === card)) setEditedRow(card);
   };
 
   const isAllOpen = openRows.length === LOOK_ROWS.length;
 
   const toggleAll = () => {
-    setEngagedCard(undefined);
+    setEditedRow(undefined);
     setOpenRows(isAllOpen ? [] : [...LOOK_ROWS]);
   };
 
-  const isEngagedShown =
-    engagedCard === LOOK_CARD.PRESET ||
-    openRows.some((row) => row === engagedCard);
-
   const jumpIndex: TLookJumpIndexProps = {
     openRows,
-    editedCard: isEngagedShown ? engagedCard : undefined,
+    editedCard: openRows.find((row) => row === editedRow),
     isAllOpen,
     onSelectCard: revealCard,
     onToggleAll: toggleAll,

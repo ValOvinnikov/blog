@@ -4,6 +4,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const jumpCardLinkVariants = tv({
   slots: {
+    item: ['flex shrink-0'],
     link: [
       'flex items-center gap-1.5 whitespace-nowrap no-underline',
       insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),

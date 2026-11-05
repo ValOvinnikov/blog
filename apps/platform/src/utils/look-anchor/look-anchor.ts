@@ -6,8 +6,7 @@ import { LOOK_CARDS } from '@platform/utils/look-open-rows/look-open-rows';
 
 export type TLookAnchor = TLookCard | TLookGroup;
 
-export const LOOK_ANCHOR_CLASSES =
-  'scroll-mt-[calc(var(--spacing-admin-look-index)+var(--spacing-admin-form-gap))]';
+export const LOOK_ANCHOR_CLASSES = 'scroll-mt-admin-form-gap';
 
 export const toLookAnchorId = (anchor: TLookAnchor) =>
   `look-${anchor.toLowerCase()}`;

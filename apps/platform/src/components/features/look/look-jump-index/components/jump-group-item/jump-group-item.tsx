@@ -16,7 +16,7 @@ export const JumpGroupItem = ({
   isPhone,
   onSelect,
 }: TJumpGroupItemProps) => {
-  const { item, link, label } = jumpGroupItemVariants();
+  const { item, divider, link, label } = jumpGroupItemVariants();
 
   if (isPhone) {
     return (
@@ -27,17 +27,20 @@ export const JumpGroupItem = ({
   }
 
   return (
-    <li className={item()}>
-      <a
-        href={`#${toLookAnchorId(group)}`}
-        onClick={(event) => {
-          event.preventDefault();
-          onSelect(group);
-        }}
-        className={link()}
-      >
-        {title}
-      </a>
-    </li>
+    <>
+      <li aria-hidden="true" className={divider()} />
+      <li className={item()}>
+        <a
+          href={`#${toLookAnchorId(group)}`}
+          onClick={(event) => {
+            event.preventDefault();
+            onSelect(group);
+          }}
+          className={link()}
+        >
+          {title}
+        </a>
+      </li>
+    </>
   );
 };

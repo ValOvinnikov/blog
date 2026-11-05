@@ -1,8 +1,19 @@
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
+import { LOOK_CARD, type TLookCard } from '@platform/constants/look-card';
+import {
+  LOOK_INDEX_FADE_END_TEST_ID,
+  LOOK_INDEX_FADE_START_TEST_ID,
+} from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
-import { screen, waitFor, within } from '@platform/testing/custom-render';
+import {
+  act,
+  fireEvent,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { PREVIEW_TAB } from '@platform/testing/look/look-form-fixtures';
 import {
   lookRowTrigger,
@@ -11,7 +22,11 @@ import {
 } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import { stubLgUpWindow } from '@platform/testing/match-media';
-import { LOOK_ROWS } from '@platform/utils/look-open-rows/look-open-rows';
+import { toLookAnchorId } from '@platform/utils/look-anchor/look-anchor';
+import {
+  LOOK_CARDS,
+  LOOK_ROWS,
+} from '@platform/utils/look-open-rows/look-open-rows';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -37,6 +52,34 @@ const rowLink = (row: keyof typeof LOOK_ROW_TITLE_KEY) =>
 
 const toggleAllButton = (name: string) =>
   within(jumpIndex()).getByRole('button', { name });
+
+const ABOVE_INDEX = -1;
+const BELOW_INDEX = 1;
+const TRACK_WIDTH = 400;
+const LIST_WIDTH = 900;
+
+const scrollPastCardsAbove = (topmost: TLookCard) => {
+  const aboveIds = LOOK_CARDS.slice(0, LOOK_CARDS.indexOf(topmost)).map(
+    toLookAnchorId,
+  );
+  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(
+    function (this: Element) {
+      const bottom = aboveIds.includes(this.id) ? ABOVE_INDEX : BELOW_INDEX;
+      return { bottom } as DOMRect;
+    },
+  );
+  fireEvent.scroll(window);
+};
+
+const scrollIndexList = (scrollLeft: number) => {
+  const list = within(jumpIndex()).getByRole('list');
+  Object.defineProperties(list, {
+    clientWidth: { configurable: true, value: TRACK_WIDTH },
+    scrollWidth: { configurable: true, value: LIST_WIDTH },
+    scrollLeft: { configurable: true, writable: true, value: scrollLeft },
+  });
+  fireEvent.scroll(list);
+};
 
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
@@ -125,39 +168,112 @@ describe(`<${LookForm.name}/>`, () => {
       );
     });
 
-    it('opens every row with Expand all, then reads Collapse all', async () => {
-      await user.click(toggleAllButton(LOOK_FORM.expandAll));
+    describe('after Expand all', () => {
+      beforeEach(async () => {
+        await user.click(toggleAllButton(LOOK_FORM.expandAll));
+      });
 
-      for (const row of LOOK_ROWS) {
-        expect(lookRowTrigger(row)).toHaveAttribute(ARIA_EXPANDED, 'true');
-      }
-      expect(toggleAllButton(LOOK_FORM.collapseAll)).toBeInTheDocument();
-      expect(cardLink(LOOK_FORM.presetLabel)).toHaveAttribute(
+      it('opens every row and reads Collapse all', () => {
+        for (const row of LOOK_ROWS) {
+          expect(lookRowTrigger(row)).toHaveAttribute(ARIA_EXPANDED, 'true');
+        }
+        expect(toggleAllButton(LOOK_FORM.collapseAll)).toBeInTheDocument();
+      });
+
+      it('marks the topmost card in view current', async () => {
+        scrollPastCardsAbove(LOOK_CARD.BRAND);
+
+        await waitFor(() =>
+          expect(rowLink(LOOK_ROW.BRAND)).toHaveAttribute(
+            ARIA_CURRENT,
+            CURRENT_LOCATION,
+          ),
+        );
+      });
+
+      it('marks a row current once a control inside it takes focus', () => {
+        const typeTrigger = lookRowTrigger(LOOK_ROW.TYPE);
+
+        act(() => typeTrigger.focus());
+
+        expect(rowLink(LOOK_ROW.TYPE)).toHaveAttribute(
+          ARIA_CURRENT,
+          CURRENT_LOCATION,
+        );
+      });
+
+      it('folds every row with Collapse all', async () => {
+        await user.click(toggleAllButton(LOOK_FORM.collapseAll));
+
+        for (const row of LOOK_ROWS) {
+          expect(lookRowTrigger(row)).toHaveAttribute(ARIA_EXPANDED, 'false');
+        }
+      });
+
+      it('reads Expand all again and keeps the rest open once one row folds by hand', async () => {
+        await user.click(lookRowTrigger(LOOK_ROW.TYPE));
+
+        expect(toggleAllButton(LOOK_FORM.expandAll)).toBeInTheDocument();
+        expect(lookRowTrigger(LOOK_ROW.COLOUR)).toHaveAttribute(
+          ARIA_EXPANDED,
+          'true',
+        );
+      });
+    });
+
+    it('follows the topmost card in view as the page scrolls', async () => {
+      scrollPastCardsAbove(LOOK_CARD.SHAPE);
+
+      await waitFor(() =>
+        expect(rowLink(LOOK_ROW.SHAPE)).toHaveAttribute(
+          ARIA_CURRENT,
+          CURRENT_LOCATION,
+        ),
+      );
+    });
+
+    it('keeps the open row current while a folded row takes focus', async () => {
+      await openLookRow(user, LOOK_ROW.FOOTER);
+      const languageSwitcher = lookRowTrigger(LOOK_ROW.LANGUAGE_SWITCHER);
+
+      act(() => languageSwitcher.focus());
+
+      expect(rowLink(LOOK_ROW.FOOTER)).toHaveAttribute(
         ARIA_CURRENT,
         CURRENT_LOCATION,
       );
     });
 
-    it('folds every row with Collapse all', async () => {
-      await user.click(toggleAllButton(LOOK_FORM.expandAll));
+    it('lets go of Preset once it scrolls out of view', async () => {
+      await openLookRow(user, LOOK_ROW.FOOTER);
+      await user.click(cardLink(LOOK_FORM.presetLabel));
 
-      await user.click(toggleAllButton(LOOK_FORM.collapseAll));
+      scrollPastCardsAbove(LOOK_CARD.HEADER);
 
-      for (const row of LOOK_ROWS) {
-        expect(lookRowTrigger(row)).toHaveAttribute(ARIA_EXPANDED, 'false');
-      }
+      await waitFor(() =>
+        expect(rowLink(LOOK_ROW.HEADER)).toHaveAttribute(
+          ARIA_CURRENT,
+          CURRENT_LOCATION,
+        ),
+      );
     });
 
-    it('reads Expand all again and keeps the rest open once one row folds by hand', async () => {
-      await user.click(toggleAllButton(LOOK_FORM.expandAll));
+    it('fades only the end while more links lie to the right', () => {
+      scrollIndexList(0);
 
-      await user.click(lookRowTrigger(LOOK_ROW.TYPE));
+      const start = screen.queryByTestId(LOOK_INDEX_FADE_START_TEST_ID);
+      const end = screen.getByTestId(LOOK_INDEX_FADE_END_TEST_ID);
+      expect(start).not.toBeInTheDocument();
+      expect(end).toBeInTheDocument();
+    });
 
-      expect(toggleAllButton(LOOK_FORM.expandAll)).toBeInTheDocument();
-      expect(lookRowTrigger(LOOK_ROW.COLOUR)).toHaveAttribute(
-        ARIA_EXPANDED,
-        'true',
-      );
+    it('fades only the start once scrolled to the end', () => {
+      scrollIndexList(LIST_WIDTH - TRACK_WIDTH);
+
+      const start = screen.getByTestId(LOOK_INDEX_FADE_START_TEST_ID);
+      const end = screen.queryByTestId(LOOK_INDEX_FADE_END_TEST_ID);
+      expect(start).toBeInTheDocument();
+      expect(end).not.toBeInTheDocument();
     });
 
     it('names a card with unsaved changes', async () => {
