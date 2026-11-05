@@ -3,14 +3,17 @@
 import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
 import type { TNamedControlAria } from '@blog/config';
+import { useTrackScroll } from '@platform/utils/use-track-scroll/use-track-scroll';
 import { useId } from 'react';
 
 import {
   OptionBody,
   optionBodyIds,
 } from './components/option-body/option-body';
-import { segmentedRadioGroupVariants } from './segmented-radio-group-variants';
-import { useTrackScroll } from './use-track-scroll';
+import {
+  SEGMENTED_FADE_WIDTH_PX,
+  segmentedRadioGroupVariants,
+} from './segmented-radio-group-variants';
 
 type TSegmentedRadioOption<TValue extends string> = {
   value: TValue;
@@ -39,8 +42,11 @@ export const SegmentedRadioGroup = <TValue extends string>({
   const selectedIndex = options.findIndex(
     ({ value: optionValue }) => optionValue === value,
   );
-  const { trackRef, setOptionRef, onScroll, hasMoreStart, hasMoreEnd } =
-    useTrackScroll(selectedIndex);
+  const { trackRef, setItemRef, onScroll, hasMoreStart, hasMoreEnd } =
+    useTrackScroll<HTMLDivElement, HTMLButtonElement>({
+      selectedIndex,
+      fadeWidth: SEGMENTED_FADE_WIDTH_PX,
+    });
   const {
     root,
     track,
@@ -71,7 +77,7 @@ export const SegmentedRadioGroup = <TValue extends string>({
             return (
               <Radio.Root
                 key={optionValue}
-                ref={setOptionRef(index)}
+                ref={setItemRef(index)}
                 value={optionValue}
                 nativeButton={true}
                 render={<button type="button" />}

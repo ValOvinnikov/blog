@@ -89,7 +89,10 @@
   which takes any value with a length, because the rule has no type
   information to tell an array from a string), in either operand order. An
   optional chain compared with `=== 0` / `!== 0` is skipped, since `hasLength`
-  answers differently for `undefined`. The message names the helper and its
+  answers differently for `undefined`. `x.length > 1` (either order, optional
+  chain included) suggests `hasArrayGotMultipleItems`; with no type
+  information it also flags a string's length, which that helper does not
+  take. The message names the helper and its
   import. Exempt: `packages/utils` (where the
   helpers live), `packages/insight` (it cannot import utils), generated Sanity
   types, and files outside `apps/*` and `packages/*`. Co-located

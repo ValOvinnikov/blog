@@ -1,4 +1,10 @@
-import { hasArrayGotItems, hasLength } from './arrays';
+import {
+  hasArrayGotItems,
+  hasArrayGotMultipleItems,
+  hasLength,
+} from './arrays';
+
+const REJECTS = 'rejects %j';
 
 describe(hasArrayGotItems, () => {
   it('accepts an array with at least one item', () => {
@@ -14,12 +20,22 @@ describe(hasArrayGotItems, () => {
   });
 });
 
+describe(hasArrayGotMultipleItems, () => {
+  it('accepts an array with at least two items', () => {
+    expect(hasArrayGotMultipleItems([undefined, undefined])).toBe(true);
+  });
+
+  it.each([[[undefined]], [[]], [undefined]])(REJECTS, (value) => {
+    expect(hasArrayGotMultipleItems(value)).toBe(false);
+  });
+});
+
 describe(hasLength, () => {
   it.each([[['a']], ['a']])('accepts %j', (value) => {
     expect(hasLength(value)).toBe(true);
   });
 
-  it.each([[[]], [''], [undefined]])('rejects %j', (value) => {
+  it.each([[[]], [''], [undefined]])(REJECTS, (value) => {
     expect(hasLength(value)).toBe(false);
   });
 });

@@ -5,7 +5,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
 import { SegmentedRadioGroup } from './segmented-radio-group';
-import { FADE_WIDTH_PX } from './use-track-scroll';
+import { SEGMENTED_FADE_WIDTH_PX } from './segmented-radio-group-variants';
 
 faker.seed(6407);
 
@@ -153,7 +153,10 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
     rerender(<SegmentedRadioGroup {...MOCK_PROPS} value={MOCK_THIRD_VALUE} />);
 
     expect(group.scrollLeft).toBe(
-      thirdOptionStart + MOCK_OPTION_WIDTH + FADE_WIDTH_PX - MOCK_TRACK_WIDTH,
+      thirdOptionStart +
+        MOCK_OPTION_WIDTH +
+        SEGMENTED_FADE_WIDTH_PX -
+        MOCK_TRACK_WIDTH,
     );
   });
 });

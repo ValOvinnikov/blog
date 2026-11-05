@@ -6,6 +6,7 @@ import {
   type TVoiceFieldId,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { useSettingsForm } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import {
@@ -111,7 +112,7 @@ export const useVoiceDraft = ({
     countChanges: (draft, saved) =>
       countVoiceChanges(saved, draft, liveLocales),
     countChangesByLanguage: (draft, saved) =>
-      liveLocales.length > 1
+      hasArrayGotMultipleItems(liveLocales)
         ? liveLocales.map((locale) => ({
             language: tLanguage(locale),
             count: countLanguageVoiceChanges(saved, draft, locale),
@@ -151,7 +152,7 @@ export const useVoiceDraft = ({
     selectedLocale,
     setSelectedLocale,
     fieldErrors,
-    hasFieldErrors: firstError !== undefined,
+    hasFieldErrors: !isUndefined(firstError),
     openListFieldId,
     setOpenListFieldId,
     setFieldValue,

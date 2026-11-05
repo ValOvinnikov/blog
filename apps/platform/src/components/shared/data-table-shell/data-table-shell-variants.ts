@@ -12,7 +12,7 @@ export const dataTableShellVariants = tv({
     table: ['w-full border-collapse text-left'],
     head: [
       'border-b border-admin-line-2 px-[14px] py-2.5',
-      'text-left text-admin-11 font-bold text-admin-muted uppercase tracking-[.06em]',
+      'text-left text-admin-11 font-bold text-admin-muted uppercase tracking-admin-caps',
     ],
     sortButton: [
       'flex w-full cursor-pointer items-center gap-1 px-[14px] py-2.5 uppercase',

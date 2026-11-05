@@ -17,7 +17,7 @@ export const voiceSurfaceCardVariants = tv({
       'max-lg:border-l max-lg:border-admin-line max-lg:bg-admin-bg max-lg:p-4',
     ],
     previewLabel: [
-      'font-mono text-admin-11 font-bold uppercase tracking-[.06em] text-admin-muted',
+      'font-mono text-admin-11 font-bold uppercase tracking-admin-caps text-admin-muted',
     ],
     previewNote: ['text-admin-12 text-admin-muted'],
     summary: ['text-admin-12 font-medium text-admin-muted'],

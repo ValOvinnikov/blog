@@ -5406,6 +5406,22 @@
         "file": "apps/platform/src/constants/lead.ts"
       }
     ],
+    "STYLE": [
+      {
+        "ref": "LOOK_GROUP.STYLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-group",
+        "file": "apps/platform/src/constants/look-group.ts"
+      }
+    ],
+    "SITE_PARTS": [
+      {
+        "ref": "LOOK_GROUP.SITE_PARTS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-group",
+        "file": "apps/platform/src/constants/look-group.ts"
+      }
+    ],
     "COLOUR": [
       {
         "ref": "LOOK_ROW.COLOUR",
@@ -7934,6 +7950,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"
+      },
+      {
+        "ref": "LOOK_LAYOUT_LIMIT.ANCHOR_SETTLE_MS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-layout",
+        "file": "apps/platform/src/constants/look-layout.ts"
       }
     ],
     "401": [

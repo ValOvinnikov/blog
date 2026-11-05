@@ -2,6 +2,7 @@
 
 import { FORM_STATUS } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
@@ -69,7 +70,7 @@ export const VoiceSettings = ({
     archivedAt,
   });
   const { shell, cards } = voiceSettingsVariants();
-  const isMultilingual = liveLocales.length > 1;
+  const isMultilingual = hasArrayGotMultipleItems(liveLocales);
 
   return (
     <SettingsFormShell

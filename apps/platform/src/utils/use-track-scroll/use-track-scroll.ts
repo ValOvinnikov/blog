@@ -1,12 +1,12 @@
 import type { TMaybeNull } from '@blog/config';
 import { useEffect, useRef, useState } from 'react';
 
-type TTrackNode = TMaybeNull<HTMLDivElement>;
-type TOptionNode = TMaybeNull<HTMLButtonElement>;
 type TTrackOverflow = { hasMoreStart: boolean; hasMoreEnd: boolean };
 
-// Matches the fades' w-7, so a scrolled-to option clears the fade on its side.
-export const FADE_WIDTH_PX = 28;
+type TUseTrackScrollOptions = {
+  selectedIndex: number;
+  fadeWidth: number;
+};
 
 const NO_OVERFLOW: TTrackOverflow = { hasMoreStart: false, hasMoreEnd: false };
 
@@ -14,27 +14,37 @@ const overflowOf = ({
   scrollLeft,
   scrollWidth,
   clientWidth,
-}: HTMLDivElement): TTrackOverflow => ({
+}: HTMLElement): TTrackOverflow => ({
   hasMoreStart: scrollLeft > 0,
   hasMoreEnd: Math.ceil(scrollLeft + clientWidth) < scrollWidth,
 });
 
-const scrollLeftToReveal = (track: HTMLDivElement, option: HTMLElement) => {
-  const start = option.offsetLeft - FADE_WIDTH_PX;
-  const end = option.offsetLeft + option.offsetWidth + FADE_WIDTH_PX;
+const scrollLeftToReveal = (
+  track: HTMLElement,
+  item: HTMLElement,
+  fadeWidth: number,
+) => {
+  const start = item.offsetLeft - fadeWidth;
+  const end = item.offsetLeft + item.offsetWidth + fadeWidth;
   if (start < track.scrollLeft) return start;
   if (end > track.scrollLeft + track.clientWidth)
     return end - track.clientWidth;
   return track.scrollLeft;
 };
 
-export const useTrackScroll = (selectedIndex: number) => {
-  const trackRef = useRef<TTrackNode>(null);
-  const optionRefs = useRef<TOptionNode[]>([]);
+export const useTrackScroll = <
+  TTrack extends HTMLElement,
+  TItem extends HTMLElement,
+>({
+  selectedIndex,
+  fadeWidth,
+}: TUseTrackScrollOptions) => {
+  const trackRef = useRef<TMaybeNull<TTrack>>(null);
+  const itemRefs = useRef<TMaybeNull<TItem>[]>([]);
   const [overflow, setOverflow] = useState(NO_OVERFLOW);
 
-  const setOptionRef = (index: number) => (node: TOptionNode) => {
-    optionRefs.current[index] = node;
+  const setItemRef = (index: number) => (node: TMaybeNull<TItem>) => {
+    itemRefs.current[index] = node;
   };
 
   const onScroll = () => {
@@ -51,11 +61,11 @@ export const useTrackScroll = (selectedIndex: number) => {
 
   useEffect(() => {
     const track = trackRef.current;
-    const option = optionRefs.current[selectedIndex];
-    if (!track || !option) return;
-    track.scrollLeft = scrollLeftToReveal(track, option);
+    const item = itemRefs.current[selectedIndex];
+    if (!track || !item) return;
+    track.scrollLeft = scrollLeftToReveal(track, item, fadeWidth);
     setOverflow(overflowOf(track));
-  }, [selectedIndex]);
+  }, [selectedIndex, fadeWidth]);
 
-  return { trackRef, setOptionRef, onScroll, ...overflow };
+  return { trackRef, setItemRef, onScroll, ...overflow };
 };

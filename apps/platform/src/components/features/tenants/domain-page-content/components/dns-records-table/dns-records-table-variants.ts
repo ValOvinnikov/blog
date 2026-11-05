@@ -7,7 +7,7 @@ export const dnsRecordsTableVariants = tv({
     ],
     head: [
       'border-b border-admin-line-2 px-2.5 py-2',
-      'text-admin-11 font-bold text-admin-muted uppercase tracking-[.06em]',
+      'text-admin-11 font-bold text-admin-muted uppercase tracking-admin-caps',
     ],
     row: ['border-b border-admin-line-2 last:border-b-0'],
     cell: ['break-all p-2.5 align-middle text-admin-text'],

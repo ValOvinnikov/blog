@@ -26,12 +26,14 @@ const CardParts = {
 } satisfies Record<string, ElementType>;
 
 type TCardProps = {
+  id?: string;
   children?: TCompoundChildren<typeof CardParts>;
   className?: string;
   'aria-labelledby'?: string;
 };
 
 const CardRoot = ({
+  id,
   children,
   className,
   'aria-labelledby': ariaLabelledBy,
@@ -45,6 +47,7 @@ const CardRoot = ({
 
   return (
     <Root
+      id={id}
       data-slot="card"
       aria-labelledby={labelledBy}
       className={root({ class: className })}
