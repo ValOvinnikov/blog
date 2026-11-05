@@ -7,6 +7,7 @@ import { VoiceEditorProvider } from '@platform/components/features/voice/voice-e
 import { VoiceSurfaceCard } from '@platform/components/features/voice/voice-surface-card';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
+import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import { VOICE_CARDS_TEST_ID } from '@platform/constants/voice';
 import {
   buildSitePreviewTheme,
@@ -69,13 +70,16 @@ export const VoiceSettings = ({
     savedAt,
     archivedAt,
   });
-  const { shell, cards } = voiceSettingsVariants();
+  const { cards } = voiceSettingsVariants();
   const isMultilingual = hasArrayGotMultipleItems(liveLocales);
 
   return (
     <SettingsFormShell
-      layout={{ isWide: true, hasTightGap: true, hasPhoneSaveFooter: true }}
-      className={shell()}
+      layout={{
+        isWide: true,
+        stack: SETTINGS_FORM_STACK.VOICE,
+        hasPhoneSaveFooter: true,
+      }}
       title={t('heading')}
       description={t('description')}
       form={form}

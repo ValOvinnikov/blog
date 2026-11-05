@@ -17,6 +17,7 @@ import { customRender, screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
+  ARCHIVED_NOTICE_TEXT,
   ONE_UNSAVED_CHANGE,
   SAVE_CHANGES,
   SAVING,
@@ -137,6 +138,11 @@ const FOLLOWS = Node.DOCUMENT_POSITION_FOLLOWING;
 
 const notFoundHeading = () =>
   within(card(PAGE_NOT_FOUND)).getByRole('textbox', { name: 'Heading' });
+
+const previewColorSchemeGroup = () =>
+  screen.getByRole('group', {
+    name: en.previewModeControl.previewColorSchemeAriaLabel,
+  });
 
 const activeLanguageLabel = (language: string) =>
   screen.getByText(language, { selector: 'strong' });
@@ -301,9 +307,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const heading = screen.getByRole('heading', { level: 1, name: 'Voice' });
       const switcher = screen.getByRole('radiogroup', { name: LANGUAGE });
       const note = screen.getByRole('note');
-      const previewSwitch = screen.getByRole('group', {
-        name: 'Preview colour scheme',
-      });
+      const previewSwitch = previewColorSchemeGroup();
 
       expect(heading.compareDocumentPosition(switcher)).toBe(FOLLOWS);
       expect(switcher.compareDocumentPosition(note)).toBe(FOLLOWS);
@@ -821,6 +825,17 @@ describe(`<${VoiceSettings.name}/>`, () => {
           );
         }
       });
+    });
+
+    it('reads the archived notice between the language switcher and the note', () => {
+      setupBilingual({ archivedAt: MOCK_ARCHIVED_AT });
+
+      const switcher = screen.getByRole('radiogroup', { name: LANGUAGE });
+      const notice = screen.getByText(ARCHIVED_NOTICE_TEXT);
+      const note = screen.getByRole('note');
+
+      expect(switcher.compareDocumentPosition(notice)).toBe(FOLLOWS);
+      expect(notice.compareDocumentPosition(note)).toBe(FOLLOWS);
     });
 
     it('makes the text fields read-only and offers no Reset', () => {

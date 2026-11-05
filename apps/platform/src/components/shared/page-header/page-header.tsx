@@ -11,6 +11,7 @@ export type TPageHeaderProps = IWithClassName & {
   badges?: ReactNode;
   actions?: ReactNode;
   isTitleHiddenBelowLg?: boolean;
+  isActionsFullWidthBelowMd?: boolean;
 };
 
 export const PageHeader = ({
@@ -19,6 +20,7 @@ export const PageHeader = ({
   badges,
   actions,
   isTitleHiddenBelowLg = false,
+  isActionsFullWidthBelowMd = false,
   className,
 }: TPageHeaderProps) => {
   const {
@@ -29,6 +31,7 @@ export const PageHeader = ({
     actions: actionsSlot,
   } = pageHeaderVariants({
     isTitleHiddenBelowLg,
+    isActionsFullWidthBelowMd,
     hasActions: Boolean(actions),
   });
 

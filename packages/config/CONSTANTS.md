@@ -532,6 +532,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SETTINGS_FEATURES_LOG**: `PLAN_ENTITLEMENT_REJECTED`=`"settings_features.plan_entitlement_rejected"`, `UPDATE_AUDIT_FAILED`=`"settings_features.update_audit_failed"`, `UPDATE_FAILED`=`"settings_features.update_failed"`
 
+### `@platform/constants/settings-form` — `apps/platform/src/constants/settings-form.ts`
+
+- **SETTINGS_FORM_STACK**: `LOOK`, `VOICE`
+
 ### `@platform/constants/settings` — `apps/platform/src/constants/settings.ts`
 
 - **SETTINGS_REFUSAL**: `NOT_IN_PLAN`, `NOT_FOUND`, `LOCALE_NOT_LIVE`

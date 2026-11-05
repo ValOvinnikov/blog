@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import {
   renderWithIntl,
   screen,
@@ -463,8 +464,7 @@ describe(`<${SettingsFormShell.name}/>`, () => {
         layout: {
           isWide: true,
           isTitleHiddenBelowLg: true,
-          hasCompactGap: true,
-          hasTightGap: true,
+          stack: SETTINGS_FORM_STACK.VOICE,
         },
       },
     );

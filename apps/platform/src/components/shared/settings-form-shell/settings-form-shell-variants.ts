@@ -1,3 +1,4 @@
+import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import { tv } from '@platform/utils/tv/tv';
 
 export const settingsFormShellVariants = tv({
@@ -13,11 +14,12 @@ export const settingsFormShellVariants = tv({
     isWide: {
       false: { root: ['max-w-3xl'] },
     },
-    hasCompactGap: {
-      true: { root: ['gap-admin-form-gap'] },
-    },
-    hasTightGap: {
-      true: { root: ['gap-4 md:gap-5'] },
+    stack: {
+      [SETTINGS_FORM_STACK.LOOK]: { root: ['gap-admin-form-gap'] },
+      [SETTINGS_FORM_STACK.VOICE]: {
+        // The content column's 16px phone padding less 2: the board's 14.
+        root: ['gap-4 max-md:-mt-0.5 md:gap-5'],
+      },
     },
     hasPhoneSaveFooter: {
       true: {},
@@ -80,8 +82,6 @@ export const settingsFormShellVariants = tv({
   ],
   defaultVariants: {
     isWide: false,
-    hasCompactGap: false,
-    hasTightGap: false,
     isArchived: false,
     hasPhoneSaveFooter: false,
     isSaveBarShown: false,

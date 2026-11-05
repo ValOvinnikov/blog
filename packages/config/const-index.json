@@ -5560,6 +5560,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
         "file": "apps/platform/src/constants/onboarding.ts"
+      },
+      {
+        "ref": "SETTINGS_FORM_STACK.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-form",
+        "file": "apps/platform/src/constants/settings-form.ts"
       }
     ],
     "REVIEW": [
@@ -6110,6 +6116,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/settings-features",
         "file": "apps/platform/src/constants/settings-features.ts"
+      }
+    ],
+    "VOICE": [
+      {
+        "ref": "SETTINGS_FORM_STACK.VOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-form",
+        "file": "apps/platform/src/constants/settings-form.ts"
       }
     ],
     "NOT_IN_PLAN": [
