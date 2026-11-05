@@ -48,13 +48,8 @@ export const saveBarVariants = tv({
       true: { root: ['max-md:hidden'] },
       false: {},
     },
-    hasErrors: {
-      true: {},
-      false: {},
-    },
   },
   defaultVariants: {
     hasPhoneFooter: false,
-    hasErrors: false,
   },
 });

@@ -130,10 +130,12 @@ describe(`<${LookForm.name}/>`, () => {
           expect(replaceLogoButton).toHaveFocus();
         });
 
-        it("shows the upload message in the page's error alert", async () => {
-          const alert = await screen.findByRole('alert');
+        it('keeps the upload message on the picker, with no page alert', async () => {
+          await findLogoPickerWithError(LOGO_UPLOAD_FAILED);
 
-          expect(alert).toHaveTextContent(LOGO_UPLOAD_FAILED);
+          const alert = screen.queryByRole('alert');
+
+          expect(alert).not.toBeInTheDocument();
         });
 
         it('clears the picker error once a new logo is picked', async () => {

@@ -21,6 +21,7 @@ export type TSaveBarProps = {
   breakdown: string;
   invalidControls: TInvalidControls;
   isPending: boolean;
+  saveError?: string;
   unsavedCards?: TUnsavedCard[];
   hasPhoneFooter?: boolean;
   onSave: () => void;
@@ -32,6 +33,7 @@ export const SaveBar = ({
   breakdown,
   invalidControls,
   isPending,
+  saveError,
   unsavedCards,
   hasPhoneFooter,
   onSave,
@@ -42,6 +44,7 @@ export const SaveBar = ({
   const [firstInvalidControlId] = invalidControlIds;
   const hasInvalidFields = !isUndefined(firstInvalidControlId);
   const isDirty = changeCount > 0;
+  const isSaveErrorShown = !hasInvalidFields && Boolean(saveError);
   const {
     root,
     summary,
@@ -55,7 +58,48 @@ export const SaveBar = ({
     notSaved,
     actions,
     shortcut,
-  } = saveBarVariants({ hasErrors: hasInvalidFields, hasPhoneFooter });
+  } = saveBarVariants({ hasPhoneFooter });
+
+  const renderSummary = () => {
+    if (hasInvalidFields) {
+      return (
+        <div className={errorContent()}>
+          <span className={errorCount()}>
+            {t('fieldsNeedAttention', { count: invalidControlIds.length })}
+          </span>
+          <span className={errorFollowUp()}>
+            <FirstInvalidFieldLink
+              invalidControls={invalidControls}
+              className={errorLink()}
+            />
+            <span aria-hidden="true" className={separator()}>
+              ·
+            </span>
+            <span className={notSaved()}>{t('notSaved')}</span>
+          </span>
+        </div>
+      );
+    }
+    if (isSaveErrorShown) {
+      return (
+        <div role="alert" className={errorContent()}>
+          <span className={errorCount()}>{saveError}</span>
+        </div>
+      );
+    }
+    return (
+      <span className={summary()}>
+        <UnsavedDot isDecorative={true} />
+        <span className={count()}>
+          {t('unsavedChanges', { count: changeCount })}
+        </span>
+        {breakdown && <span className={breakdownSlot()}>{breakdown}</span>}
+        {hasArrayGotItems(unsavedCards) && (
+          <SaveBarLocation cards={unsavedCards} />
+        )}
+      </span>
+    );
+  };
 
   return (
     <>
@@ -66,38 +110,9 @@ export const SaveBar = ({
           aria-busy={isPending || undefined}
           className={root()}
         >
-          {hasInvalidFields ? (
-            <div className={errorContent()}>
-              <span className={errorCount()}>
-                {t('fieldsNeedAttention', { count: invalidControlIds.length })}
-              </span>
-              <span className={errorFollowUp()}>
-                <FirstInvalidFieldLink
-                  invalidControls={invalidControls}
-                  className={errorLink()}
-                />
-                <span aria-hidden="true" className={separator()}>
-                  ·
-                </span>
-                <span className={notSaved()}>{t('notSaved')}</span>
-              </span>
-            </div>
-          ) : (
-            <span className={summary()}>
-              <UnsavedDot isDecorative={true} />
-              <span className={count()}>
-                {t('unsavedChanges', { count: changeCount })}
-              </span>
-              {breakdown && (
-                <span className={breakdownSlot()}>{breakdown}</span>
-              )}
-              {hasArrayGotItems(unsavedCards) && (
-                <SaveBarLocation cards={unsavedCards} />
-              )}
-            </span>
-          )}
+          {renderSummary()}
           <div className={actions()}>
-            {!hasInvalidFields && (
+            {!hasInvalidFields && !isSaveErrorShown && (
               <span aria-hidden="true" className={shortcut()}>
                 {t('shortcut')}
               </span>
@@ -122,6 +137,7 @@ export const SaveBar = ({
           changeCount={changeCount}
           invalidControls={invalidControls}
           isPending={isPending}
+          saveError={saveError}
           onSave={onSave}
         />
       )}

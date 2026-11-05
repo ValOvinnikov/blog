@@ -14,6 +14,7 @@ export type TPhoneSaveFooterProps = {
   changeCount: number;
   invalidControls: TInvalidControls;
   isPending: boolean;
+  saveError?: string;
   onSave: () => void;
 };
 
@@ -21,6 +22,7 @@ export const PhoneSaveFooter = ({
   changeCount,
   invalidControls,
   isPending,
+  saveError,
   onSave,
 }: TPhoneSaveFooterProps) => {
   const t = useTranslations('saveBar');
@@ -28,8 +30,9 @@ export const PhoneSaveFooter = ({
   const { ids: invalidControlIds } = invalidControls;
   const hasInvalidFields = !isUndefined(invalidControlIds[0]);
   const isClean = changeCount === 0;
+  const isSaveErrorShown = !hasInvalidFields && !isClean && Boolean(saveError);
   const { root, status, link, save } = phoneSaveFooterVariants({
-    hasErrors: hasInvalidFields,
+    hasErrors: hasInvalidFields || isSaveErrorShown,
   });
 
   const statusText = () => {
@@ -49,10 +52,18 @@ export const PhoneSaveFooter = ({
       aria-busy={isPending || undefined}
       className={root()}
     >
-      {!hasInvalidFields && !isClean && <UnsavedDot isDecorative={true} />}
-      <span id={statusId} className={status()}>
-        {statusText()}
-      </span>
+      {!hasInvalidFields && !isClean && !isSaveErrorShown && (
+        <UnsavedDot isDecorative={true} />
+      )}
+      {isSaveErrorShown ? (
+        <span key="save-error" id={statusId} role="alert" className={status()}>
+          {saveError}
+        </span>
+      ) : (
+        <span key="status" id={statusId} className={status()}>
+          {statusText()}
+        </span>
+      )}
       {hasInvalidFields && (
         <FirstInvalidFieldLink
           invalidControls={invalidControls}

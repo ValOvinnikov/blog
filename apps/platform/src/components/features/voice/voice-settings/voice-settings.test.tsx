@@ -147,6 +147,8 @@ const previewColorSchemeGroup = () =>
 const activeLanguageLabel = (language: string) =>
   screen.getByText(language, { selector: 'strong' });
 
+const COULDNT_SAVE = "Couldn't save";
+
 describe(`<${VoiceSettings.name}/>`, () => {
   let user: UserEvent;
   let refresh: ReturnType<typeof mockRouterRefresh>;
@@ -652,7 +654,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(refresh).toHaveBeenCalled();
     });
 
-    it('shows an error alert and does not refresh when the save fails', async () => {
+    it('shows the failure in the save bar and the phone footer and does not refresh when the save fails', async () => {
       saveVoiceOverridesActionMock.mockResolvedValueOnce({
         outcome: ACTION_OUTCOME.SERVER_ERROR,
       });
@@ -660,9 +662,15 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       await editHeadingAndSave(MOCK_TYPED_TEXT);
 
-      const alert = await screen.findByRole('alert');
+      const saveBar = await screen.findByRole('region', {
+        name: UNSAVED_CHANGES,
+      });
+      const barAlert = await within(saveBar).findByRole('alert');
+      const alerts = screen.getAllByRole('alert');
 
-      expect(alert).toHaveTextContent("Couldn't save");
+      expect(barAlert).toHaveTextContent(COULDNT_SAVE);
+      expect(alerts).toHaveLength(2);
+      alerts.forEach((alert) => expect(alert).toHaveTextContent(COULDNT_SAVE));
       expect(refresh).not.toHaveBeenCalled();
     });
 

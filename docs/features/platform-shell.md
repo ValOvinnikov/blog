@@ -114,8 +114,12 @@ changes. With invalid fields the left side becomes "N fields need attention",
 lines from `md` to `lg` — and the dot, count and hint go. While saving, Save
 reads "Saving…" through the Button's pending state (focus stays on it),
 Discard is disabled and the bar is `aria-busy`. A save that fails with no
-field errors shows only the shell's error Alert; the bar keeps its unsaved
-state. From `md` the page keeps 120px of room below its last content (48px
+field errors — a server error, offline, or a plan refusal — shows the page's
+failure message in the bar's left side in place of the dot, count and hint, as
+one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
+until they are cleared. The next edit or a successful save clears it. Only when
+no bar shows (a plan refusal that restored every refused value) does the
+message sit in an error `Alert` under the header. From `md` the page keeps 120px of room below its last content (48px
 when archived), and the document's `scroll-padding-bottom` is the bar's 64px
 plus 16px so a focused field never sits under the bar. The 64 and 16 are the
 `--spacing-admin-dock` / `-clearance` tokens, kept equal to
@@ -129,8 +133,8 @@ in place of that bar; from `md` it docks like every other page. The footer is
 fixed to the viewport bottom, full width, flat with a top border, and stays
 mounted when clean (never for an archived tenant). It is a region named by its
 own status text — "N unsaved changes" with a dot, "All changes saved" with
-Save disabled, or "N fields need attention" on a first row above "Go to the
-first one" — and has Save changes but no Discard and no shortcut hint. While
+Save disabled, "N fields need attention" on a first row above "Go to the
+first one", or a failed save's message (an alert, while changes remain) — and has Save changes but no Discard and no shortcut hint. While
 saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
 outside Voice's `inert` content. Below `md` Voice keeps 96px of room
 (`--spacing-admin-phone-footer-room`, clearing the 85px two-row error footer,
