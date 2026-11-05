@@ -2,17 +2,12 @@
 
 import { Form } from '@base-ui/react/form';
 import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
-import { AddressVerdict } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-verdict';
-import { OnboardingActions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-actions';
-import { OnboardingFailureAlert } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-failure-alert';
+import { OnboardingFooter } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-footer';
 import { OnboardingPreview } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-preview';
 import { OnboardingRail } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-rail';
 import { OnboardingStepFields } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-step-fields';
 import { OnboardingStepHeader } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/onboarding-step-header';
-import {
-  ONBOARDING_SCROLL_AREA_TEST_ID,
-  ONBOARDING_STEP,
-} from '@platform/constants/onboarding';
+import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import type { TLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
 
 import { onboardingFormVariants } from './onboarding-form-variants';
@@ -71,7 +66,6 @@ export const OnboardingForm = ({
     railPreview,
     previewColumn,
     phonePreview,
-    actions,
   } = onboardingFormVariants();
 
   const preview = (
@@ -88,20 +82,17 @@ export const OnboardingForm = ({
   );
 
   const footer = (
-    <div className={actions()}>
-      <OnboardingActions
-        isFirstStep={isFirstStep}
-        isLastStep={isLastStep}
-        isPending={isPending}
-        isContinueDisabled={isContinueDisabled}
-        onBack={goBack}
-        onContinue={goNext}
-      >
-        {step === ONBOARDING_STEP.ADDRESS && (
-          <AddressVerdict verdict={addressVerdict} />
-        )}
-      </OnboardingActions>
-    </div>
+    <OnboardingFooter
+      step={step}
+      addressVerdict={addressVerdict}
+      failure={failure}
+      isFirstStep={isFirstStep}
+      isLastStep={isLastStep}
+      isPending={isPending}
+      isContinueDisabled={isContinueDisabled}
+      onBack={goBack}
+      onContinue={goNext}
+    />
   );
 
   return (
@@ -125,7 +116,6 @@ export const OnboardingForm = ({
                   stepTotal={railSteps.length}
                 />
                 <div className={fields()}>
-                  {failure && <OnboardingFailureAlert failure={failure} />}
                   <OnboardingStepFields
                     step={step}
                     values={values}

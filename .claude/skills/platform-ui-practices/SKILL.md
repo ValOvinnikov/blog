@@ -493,6 +493,19 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - One notice primitive renders page notices and form results: `Alert` with an
   optional `action` and `role`. Never hand-build a tone box or add another
   notice style.
+- A message appears where the user is looking when it happens:
+  - an invalid field shows under the field, plus the count in the save bar;
+  - a success is `toast.success`;
+  - a failed save from the save bar shows in the bar, beside Save, until the
+    next edit or save;
+  - a failed one-off button action is `toast.error`, or an error `Alert`
+    directly beside the button;
+  - a failure inside a dialog is an `Alert` in the dialog, which stays open;
+  - a failed save in an embedded panel, or a wizard step, is an `Alert`
+    beside its Save or submit button.
+- A top-of-page `Alert` describes page state only (archived, plan limits,
+  draft recovery, warnings), never the result of an action, except a save
+  failure with no bar left to show it in.
 - A notice's title is a short phrase; the explanation is its description, at
   regular weight. Weight marks a title, never a sentence.
 - An empty state never removes the card or the header. A card whose data doesn't
