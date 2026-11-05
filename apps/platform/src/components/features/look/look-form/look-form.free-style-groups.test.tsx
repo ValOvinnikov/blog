@@ -1,8 +1,14 @@
 import { TENANT_PLAN } from '@blog/db/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_PRESSED } from '@platform/testing/aria';
+import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
+import {
+  FOOTER_LAYOUT_LABEL,
+  GROWTH_BADGE_TEXT,
+  HEADER_LAYOUT_LABEL,
+  SPINNER_LABEL,
+} from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -61,6 +67,12 @@ describe(`<${LookForm.name}/>`, () => {
       },
       {
         row: LOOK_ROW.FOOTER,
+        group: FOOTER_LAYOUT_LABEL,
+        current: LOOK_FORM.footerLayoutOptionLabel.COLUMNS,
+        other: LOOK_FORM.footerLayoutOptionLabel.CENTRED,
+      },
+      {
+        row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.footerBackgroundLabel,
         current: LOOK_FORM.footerBackgroundOptionLabel.BRAND_PRIMARY,
         other: LOOK_FORM.footerBackgroundOptionLabel.SECONDARY,
@@ -75,7 +87,9 @@ describe(`<${LookForm.name}/>`, () => {
       'shows $group locked at its default',
       async ({ row, group, current, other }) => {
         await openLookRow(user, row);
-        const styleGroup = screen.getByRole('group', { name: group });
+        const styleGroup = screen.getByRole('group', {
+          name: `${group} ${GROWTH_BADGE_TEXT}`,
+        });
         const currentButton = within(styleGroup).getByRole('button', {
           name: current,
         });
@@ -83,8 +97,41 @@ describe(`<${LookForm.name}/>`, () => {
           name: other,
         });
 
+        await user.click(otherButton);
+
         expect(currentButton).toHaveAttribute(ARIA_PRESSED, 'true');
-        expect(otherButton).toBeDisabled();
+        expect(otherButton).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(otherButton).toHaveAttribute(ARIA_PRESSED, 'false');
+      },
+    );
+
+    it.each([
+      {
+        row: LOOK_ROW.HEADER,
+        label: HEADER_LAYOUT_LABEL,
+        current: LOOK_FORM.headerLayoutOptionLabel.CLASSIC,
+      },
+      {
+        row: LOOK_ROW.BUTTONS,
+        label: SPINNER_LABEL,
+        current: LOOK_FORM.spinnerStyleOptionLabel.PRESET,
+      },
+    ])(
+      'shows $label as a locked select that keeps its value shut',
+      async ({ row, label, current }) => {
+        await openLookRow(user, row);
+        const select = screen.getByRole('combobox', {
+          name: `${label} ${GROWTH_BADGE_TEXT} ${current}`,
+        });
+
+        await user.click(select);
+
+        const listbox = screen.queryByRole('listbox');
+        expect(select).toHaveAttribute(ARIA_DISABLED, 'true');
+        expect(select).toHaveAccessibleDescription(
+          expect.stringContaining(GROWTH_BADGE_TEXT),
+        );
+        expect(listbox).not.toBeInTheDocument();
       },
     );
   });

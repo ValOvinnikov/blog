@@ -5,7 +5,7 @@ export const settingsFormShellVariants = tv({
   slots: {
     root: [
       'flex flex-col gap-6',
-      'md:[html:has(&)]:scroll-pb-[calc(var(--spacing-admin-dock)+var(--spacing-admin-dock-clearance))]',
+      'md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-dock))+var(--spacing-admin-dock-clearance))]',
     ],
     alert: ['w-fit'],
     liveStatus: ['sr-only'],
@@ -37,7 +37,7 @@ export const settingsFormShellVariants = tv({
       },
       false: {
         root: [
-          'md:pb-[calc(var(--spacing-admin-dock-room)-var(--spacing-admin-content))]',
+          'md:pb-[calc(max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-room)-var(--spacing-admin-dock))-var(--spacing-admin-content))]',
         ],
       },
     },
@@ -48,8 +48,8 @@ export const settingsFormShellVariants = tv({
       isSaveBarShown: true,
       class: {
         root: [
-          'max-md:pb-[calc(var(--spacing-admin-dock-room)-(--spacing(4)))]',
-          'max-md:[html:has(&)]:scroll-pb-admin-dock-room',
+          'max-md:pb-[calc(max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-clearance))-(--spacing(4)))]',
+          'max-md:[html:has(&)]:scroll-pb-[max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-clearance))]',
         ],
       },
     },
@@ -65,8 +65,8 @@ export const settingsFormShellVariants = tv({
       isArchived: false,
       class: {
         root: [
-          'max-md:pb-[calc(var(--spacing-admin-phone-footer-room)-(--spacing(4)))]',
-          'max-md:[html:has(&)]:scroll-pb-[calc(var(--spacing-admin-phone-footer-max)+var(--spacing-admin-dock-clearance))]',
+          'max-md:pb-[calc(max(var(--spacing-admin-phone-footer-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-phone-footer-room)-var(--spacing-admin-phone-footer-max))-(--spacing(4)))]',
+          'max-md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-phone-footer-max))+var(--spacing-admin-dock-clearance))]',
         ],
       },
     },

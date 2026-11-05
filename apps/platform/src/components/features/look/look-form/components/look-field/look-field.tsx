@@ -1,10 +1,9 @@
 import { Field } from '@base-ui/react/field';
 import { Fieldset } from '@base-ui/react/fieldset';
 import type { IWithChildren } from '@blog/config/react';
-import type { TLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { FieldLabel } from '@platform/components/shared/field-label';
-import { LockedReason } from '@platform/components/shared/locked-reason';
+import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import { UnsavedDot } from '@platform/components/shared/unsaved-dot';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import { isBrandAssetKind } from '@platform/utils/look-form-values/look-form-values';
@@ -19,7 +18,8 @@ export type TLookFieldProps = IWithChildren & {
   hint?: string;
   error?: string;
   isGroup?: boolean;
-  lock?: TLookFieldLock;
+  labelId?: string;
+  growthBadgeId?: string;
 };
 
 export const LookField = ({
@@ -28,7 +28,8 @@ export const LookField = ({
   hint,
   error,
   isGroup = false,
-  lock,
+  labelId,
+  growthBadgeId,
   children,
 }: TLookFieldProps) => {
   const { hasFieldChanged } = useLookForm();
@@ -36,6 +37,7 @@ export const LookField = ({
   const hintId = useId();
   const {
     field: fieldSlot,
+    labelRow,
     label: labelSlot,
     optional,
     hint: hintSlot,
@@ -59,15 +61,11 @@ export const LookField = ({
       )}
     </>
   );
-  const description = (
-    <>
-      {hint && (
-        <Field.Description id={hintId} className={hintSlot()}>
-          {hint}
-        </Field.Description>
-      )}
-      {lock && <LockedReason id={lock.id}>{lock.reason}</LockedReason>}
-    </>
+  const growthBadge = growthBadgeId && <GrowthBadge id={growthBadgeId} />;
+  const description = hint && (
+    <Field.Description id={hintId} className={hintSlot()}>
+      {hint}
+    </Field.Description>
   );
 
   return (
@@ -78,15 +76,23 @@ export const LookField = ({
           aria-describedby={hint ? hintId : undefined}
           className={fieldSlot()}
         >
-          <Fieldset.Legend className={labelSlot()}>
-            {labelContent}
-          </Fieldset.Legend>
+          <div className={labelRow()}>
+            <Fieldset.Legend id={labelId} className={labelSlot()}>
+              {labelContent}
+            </Fieldset.Legend>
+            {growthBadge}
+          </div>
           {description}
           {children}
         </Fieldset.Root>
       ) : (
         <>
-          <FieldLabel className={labelSlot()}>{labelContent}</FieldLabel>
+          <div className={labelRow()}>
+            <FieldLabel id={labelId} className={labelSlot()}>
+              {labelContent}
+            </FieldLabel>
+            {growthBadge}
+          </div>
           {description}
           {children}
         </>

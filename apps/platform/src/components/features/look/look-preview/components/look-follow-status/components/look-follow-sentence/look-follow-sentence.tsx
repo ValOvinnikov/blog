@@ -1,5 +1,6 @@
 'use client';
 
+import type { TMaybeUndefined } from '@blog/config';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import {
@@ -16,6 +17,7 @@ export type TLookFollowSentenceProps = {
   target: TLookFollowTarget;
   device: TPreviewDevice;
   isShortLine: boolean;
+  planNote: TMaybeUndefined<string>;
 };
 
 const strong = (chunks: ReactNode) => <strong>{chunks}</strong>;
@@ -25,6 +27,7 @@ export const LookFollowSentence = ({
   target,
   device,
   isShortLine,
+  planNote,
 }: TLookFollowSentenceProps) => {
   const t = useTranslations('lookFollow');
   const tForm = useTranslations('lookForm');
@@ -39,10 +42,15 @@ export const LookFollowSentence = ({
   }
   if (target.kind === LOOK_FOLLOW_TARGET.ALL_OPEN) return t('allOpen');
   if (target.kind === LOOK_FOLLOW_TARGET.STYLE) {
-    return t.rich('styleCard', {
-      card: tForm(LOOK_ROW_TITLE_KEY[target.row]),
-      strong,
-    });
+    return (
+      <>
+        {t.rich('styleCard', {
+          card: tForm(LOOK_ROW_TITLE_KEY[target.row]),
+          strong,
+        })}
+        {planNote && ` ${planNote}`}
+      </>
+    );
   }
   if (isPaused) return t('paused');
   if (isShortLine || !settled) return t.rich('short', values);

@@ -67,8 +67,6 @@ describe(`<${LookForm.name}/>`, () => {
       await pickAndSaveLogo(user);
 
       await findLogoPickerWithError(LOGO_TOO_LARGE);
-      const alert = await screen.findByRole('alert');
-      expect(alert).toHaveTextContent(LOGO_TOO_LARGE);
       expect(updateLookAction).not.toHaveBeenCalled();
     });
 

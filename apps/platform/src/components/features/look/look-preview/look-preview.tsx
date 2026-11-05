@@ -1,6 +1,7 @@
 'use client';
 
 import { COOKIE_SETTINGS_BUTTON, type TLocaleIsoCode } from '@blog/config';
+import { useLookPresetName } from '@platform/components/features/look/look-form/use-look-preset-name';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
@@ -44,12 +45,15 @@ export const LookPreview = ({
   const {
     tenantName,
     values,
+    hasLockedFields,
     isSubmenuPreviewOpen,
     previewDevice,
     setPreviewDevice,
   } = useLookForm();
   const t = useTranslations('lookPreview');
   const tPreview = useTranslations('previewModeControl');
+  const tFollow = useTranslations('lookFollow');
+  const presetName = useLookPresetName();
   const { mode, setMode, isDark } = usePreviewColorScheme();
   const { readerGroup, isSignedIn } = useReaderGroup();
   const [scale, setScale] = useState(1);
@@ -131,6 +135,11 @@ export const LookPreview = ({
           device={previewDevice}
           isShortLine={isPhoneTab || !hasReaderAccounts}
           readerNote={hasReaderAccounts ? undefined : t('readerAccountsOff')}
+          planNote={
+            hasLockedFields
+              ? tFollow('freeSample', { preset: presetName })
+              : undefined
+          }
         />
       </PreviewFrame>
     </div>

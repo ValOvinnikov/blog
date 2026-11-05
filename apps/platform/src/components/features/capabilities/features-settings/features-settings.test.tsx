@@ -5,7 +5,12 @@ import {
   type TUpdateFeaturesResult,
 } from '@platform/server/settings-features/update-features-action';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import { customRender, screen, waitFor } from '@platform/testing/custom-render';
+import {
+  customRender,
+  screen,
+  waitFor,
+  within,
+} from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -63,6 +68,15 @@ const { saveBar } = messages;
 const RESTORE_ONE_CHANGE = makeEnTranslator('draftRecovery')('restore', {
   count: 1,
 });
+
+const toggleAnalyticsAndSave = async (user: UserEvent) => {
+  const analyticsSwitch = screen.getByRole('switch', {
+    name: ANALYTICS_LABEL,
+  });
+  await user.click(analyticsSwitch);
+  const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+  await user.click(saveButton);
+};
 
 const setup = customRender(FeaturesSettings, {
   tenantId: MOCK_TENANT_ID,
@@ -303,16 +317,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         }),
     );
     setup();
-
-    const analyticsSwitch = screen.getByRole('switch', {
-      name: ANALYTICS_LABEL,
-    });
-
-    await user.click(analyticsSwitch);
-
-    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-
-    await user.click(saveButton);
+    await toggleAnalyticsAndSave(user);
 
     const savingButton = await screen.findByRole('button', {
       name: saveBar.saving,
@@ -327,26 +332,64 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     expect(allSaved).toBeVisible();
   });
 
-  it('shows an error alert and does not refresh when the save fails', async () => {
-    updateFeaturesActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.SERVER_ERROR,
+  describe('when the save fails', () => {
+    beforeEach(async () => {
+      updateFeaturesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      setup();
+      await toggleAnalyticsAndSave(user);
+      await screen.findByRole('alert');
     });
-    setup();
 
-    const analyticsSwitch = screen.getByRole('switch', {
-      name: ANALYTICS_LABEL,
+    it('shows the failure in the save bar and does not refresh', () => {
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const alert = within(saveBar).getByRole('alert');
+
+      expect(alert).toHaveTextContent(alertError);
+      expect(refresh).not.toHaveBeenCalled();
     });
 
-    await user.click(analyticsSwitch);
+    it('clears the failure on the next edit', async () => {
+      const contactFormSwitch = screen.getByRole('switch', {
+        name: CONTACT_FORM_LABEL,
+      });
+      await user.click(contactFormSwitch);
 
-    const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      const alert = screen.queryByRole('alert');
 
-    await user.click(saveButton);
+      expect(alert).not.toBeInTheDocument();
+    });
 
-    const alert = await screen.findByRole('alert');
+    it('clears the failure once a retry saves', async () => {
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
 
-    expect(alert).toHaveTextContent(alertError);
-    expect(refresh).not.toHaveBeenCalled();
+      await screen.findByText(ALL_CHANGES_SAVED);
+      const alert = screen.queryByRole('alert');
+
+      expect(alert).not.toBeInTheDocument();
+    });
+
+    it('withdraws the failure during a retry and announces it again when the retry fails', async () => {
+      let resolveAction: (value: TUpdateFeaturesResult) => void = () => {};
+      updateFeaturesActionMock.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveAction = resolve;
+          }),
+      );
+      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+      await user.click(saveButton);
+
+      await screen.findByRole('button', { name: saveBar.saving });
+      const alertDuringRetry = screen.queryByRole('alert');
+      resolveAction({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      const alertAfterRetry = await screen.findByRole('alert');
+
+      expect(alertDuringRetry).not.toBeInTheDocument();
+      expect(alertAfterRetry).toHaveTextContent(alertError);
+    });
   });
 
   describe('with every reader feature off', () => {

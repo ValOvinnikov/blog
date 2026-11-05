@@ -340,8 +340,10 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   the field; `invalidControls.ids` names the focusable controls, in page order,
   one entry per invalid field. When the first one can be hidden (another
   language, a collapsed row), `invalidControls.revealFirst` shows it before the
-  save bar's link focuses it. A failure that belongs to no field is one
-  `Alert` (ERROR) under the header.
+  save bar's link focuses it. A save failure that belongs to no field goes
+  to the shell as `errorTitle` (a plan refusal arrives as `form.planRefusal`):
+  it shows in the save bar's error slot while the bar shows, and as one
+  `Alert` (ERROR) under the header only when no bar does.
 - An embedded edit panel outside the shell (today only the tenant details panel)
   calls `useUnsavedChangesGuard`, submits from a right-aligned `Card.Footer`,
   and shows its save error above the card.

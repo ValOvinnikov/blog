@@ -48,6 +48,7 @@ const MOCK_TITLE = faker.lorem.word();
 const MOCK_DESCRIPTION = faker.lorem.sentence();
 const MOCK_BODY = faker.lorem.sentence();
 const MOCK_ERROR_TITLE = faker.lorem.sentence();
+const MOCK_PLAN_REFUSAL = faker.lorem.sentence();
 const MOCK_EDITED_VALUES: TValues = {
   ...MOCK_SAVED_VALUES,
   tagline: MOCK_DRAFT_TAGLINE,
@@ -449,12 +450,67 @@ describe(`<${SettingsFormShell.name}/>`, () => {
     });
   });
 
-  it('shows the error alert when an error title is set', () => {
-    renderShell({}, { errorTitle: MOCK_ERROR_TITLE });
+  describe('a failed save', () => {
+    describe('while changes remain', () => {
+      beforeEach(() => {
+        renderShell({ changeCount: 3 }, { errorTitle: MOCK_ERROR_TITLE });
+      });
 
-    const errorAlert = screen.getByText(MOCK_ERROR_TITLE);
+      it('shows its message in the save bar in place of the change count', () => {
+        const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+        const errorAlert = within(saveBar).getByRole('alert');
 
-    expect(errorAlert).toBeVisible();
+        expect(errorAlert).toHaveTextContent(MOCK_ERROR_TITLE);
+        expect(saveBar).not.toHaveTextContent(THREE_UNSAVED_CHANGES);
+      });
+
+      it('announces its message once, from the save bar', () => {
+        const errorAlerts = screen.getAllByRole('alert');
+
+        expect(errorAlerts).toHaveLength(1);
+      });
+    });
+
+    it('withdraws its message while the next save is in flight', () => {
+      renderShell(
+        { changeCount: 3, isPending: true, planRefusal: MOCK_PLAN_REFUSAL },
+        { errorTitle: MOCK_ERROR_TITLE },
+      );
+
+      const errorAlert = screen.queryByRole('alert');
+
+      expect(errorAlert).not.toBeInTheDocument();
+    });
+
+    it('shows its message at the top of the page when no save bar shows', () => {
+      renderShell({}, { errorTitle: MOCK_ERROR_TITLE });
+
+      const errorAlert = screen.getByRole('alert');
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+
+      expect(errorAlert).toHaveTextContent(MOCK_ERROR_TITLE);
+      expect(saveBar).not.toBeInTheDocument();
+    });
+
+    it('shows a plan refusal in the save bar while changes remain', () => {
+      renderShell(
+        { changeCount: 1, planRefusal: MOCK_PLAN_REFUSAL },
+        { errorTitle: MOCK_ERROR_TITLE },
+      );
+
+      const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
+      const errorAlert = within(saveBar).getByRole('alert');
+
+      expect(errorAlert).toHaveTextContent(MOCK_PLAN_REFUSAL);
+    });
+
+    it('shows a plan refusal at the top of the page once no changes remain', () => {
+      renderShell({ planRefusal: MOCK_PLAN_REFUSAL });
+
+      const errorAlert = screen.getByRole('alert');
+
+      expect(errorAlert).toHaveTextContent(MOCK_PLAN_REFUSAL);
+    });
   });
 
   it('keeps the title in the accessibility tree with every layout opt-in', () => {

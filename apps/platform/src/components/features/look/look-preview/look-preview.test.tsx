@@ -30,6 +30,8 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { followLine } from '@platform/testing/look/look-follow';
+import { CONSOLE } from '@platform/testing/look/look-form-fixtures';
 import { stubLgUpWindow } from '@platform/testing/match-media';
 import {
   MOCK_TENANT_DOMAIN,
@@ -51,6 +53,13 @@ const FOOTER_TARGET: TLookFollowTarget = {
   kind: LOOK_FOLLOW_TARGET.PART,
   row: LOOK_ROW.FOOTER,
 };
+const STYLE_TARGET: TLookFollowTarget = {
+  kind: LOOK_FOLLOW_TARGET.STYLE,
+  row: LOOK_ROW.TYPE,
+};
+const FREE_SAMPLE_NOTE = followLine('freeSample', {
+  preset: CONSOLE,
+});
 const tDevicePreview = makeEnTranslator('devicePreview');
 const TABLET = tDevicePreview('deviceTablet');
 
@@ -59,6 +68,7 @@ type TRenderPreviewOptions = {
   previewDevice?: TPreviewDevice;
   hasReaderAccounts?: boolean;
   followTarget?: TLookFollowTarget;
+  hasLockedFields?: boolean;
 };
 
 const setPreviewDevice = vi.fn();
@@ -68,6 +78,7 @@ const renderPreview = ({
   previewDevice = PREVIEW_DEVICE.DESKTOP,
   hasReaderAccounts = true,
   followTarget = { kind: LOOK_FOLLOW_TARGET.IDLE },
+  hasLockedFields = false,
 }: TRenderPreviewOptions = {}) => {
   const lookForm: TLookFormContext = {
     tenantName: MOCK_TENANT_NAME,
@@ -78,6 +89,7 @@ const renderPreview = ({
     },
     updateField: vi.fn(),
     isLocked: () => false,
+    hasLockedFields,
     hasCardChanges: () => false,
     hasFieldChanged: () => false,
     canResetToPreset: false,
@@ -182,6 +194,30 @@ describe(`<${LookPreview.name}/>`, () => {
 
     expect(readerGroup).not.toBeInTheDocument();
     expect(statusText).toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
+  });
+
+  it.each([
+    { target: STYLE_TARGET, hasLockedFields: false },
+    { target: FOOTER_TARGET, hasLockedFields: true },
+  ])(
+    'leaves the Free sample note off a $target.row line when locked fields are $hasLockedFields',
+    ({ target, hasLockedFields }) => {
+      renderPreview({ followTarget: target, hasLockedFields });
+
+      const statusText = screen.getByTestId(PREVIEW_FRAME_STATUS_TEST_ID);
+
+      expect(statusText).not.toHaveTextContent(FREE_SAMPLE_NOTE);
+    },
+  );
+
+  it('adds the Free sample note after a Style card line on a Free site', () => {
+    renderPreview({ followTarget: STYLE_TARGET, hasLockedFields: true });
+
+    const statusText = screen.getByTestId(PREVIEW_FRAME_STATUS_TEST_ID);
+
+    expect(statusText).toHaveTextContent(
+      `${followLine('styleCard', { card: messages.lookForm.typeHeading })} ${FREE_SAMPLE_NOTE}`,
+    );
   });
 
   it('re-derives the accent tokens for the dark preview mode', async () => {
