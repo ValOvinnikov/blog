@@ -141,6 +141,20 @@ outside Voice's `inert` content. Below `md` Voice keeps 96px of room
 `--spacing-admin-phone-footer-max`) and a `scroll-padding-bottom` of that 85
 plus 16; an archived Voice page ends at 48px.
 
+A message appears where the user is looking when it happens. An invalid
+field shows under the field, plus the count in the save bar; a success is a
+toast. A failed save shows in the save bar or beside its Save button, and a
+failed one-off button action is an error toast or an error `Alert` right
+beside the button. A failure inside a dialog stays in the dialog, which stays
+open. A top-of-page `Alert` describes page state only (archived, plan limits,
+draft recovery, warnings), never an action's result, except a save failure
+with no bar left to show it in. So the custom-domain claim's connect
+rejection sits directly above Remove and Verify, the site setup card's failed
+retry directly below the notice holding its Try again or Start setup
+button, the email sign-in refusal two rows above its send button, and
+onboarding's failed Create site in the pinned footer above Back and Create
+site, never at the top of the step.
+
 ## Data
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through

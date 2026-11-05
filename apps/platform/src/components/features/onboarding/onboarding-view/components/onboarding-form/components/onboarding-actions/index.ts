@@ -1,1 +1,4 @@
-export { OnboardingActions } from './onboarding-actions';
+export {
+  OnboardingActions,
+  type TOnboardingActionsProps,
+} from './onboarding-actions';

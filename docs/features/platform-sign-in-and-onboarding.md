@@ -200,7 +200,9 @@ Free site.
   checks it again. Back keeps every value, and Continue after an
   Edit from Review returns straight to Review. Nothing is saved until **Create site** on Review runs
   `createSiteAction` once with every value; a field error it returns (an
-  address taken meanwhile) opens that field's step. Success redirects to
+  address taken meanwhile) opens that field's step, and a refusal or server
+  error shows as one error `Alert` in the footer, above Back and Create site,
+  with every value kept. Success redirects to
   `/dashboard`, whose site setup card follows provisioning.
 
 ## Data
