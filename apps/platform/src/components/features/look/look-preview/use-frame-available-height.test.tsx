@@ -1,4 +1,8 @@
-import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
+import {
+  DEVICE_FRAME_TEST_ID,
+  DEVICE_FRAME_VIEWPORT_ATTRIBUTE,
+} from '@platform/constants/device-frame';
+import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import {
   PREVIEW_DEVICE,
   type TPreviewDevice,
@@ -22,7 +26,13 @@ const STAGE_TOP = 120;
 const STAGE_WIDTH = 1200;
 const STAGE_CHROME = 50;
 const BELOW_STAGE = 40;
-const SETTLED_HEIGHT = 410;
+const SETTLED_HEIGHT =
+  WINDOW_HEIGHT -
+  STAGE_TOP -
+  STAGE_CHROME -
+  BELOW_STAGE -
+  LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT -
+  LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_CLEARANCE;
 const RESIZE_ROUNDS = 5;
 
 const Harness = ({ device }: { device: TPreviewDevice }) => {
@@ -38,7 +48,11 @@ const Harness = ({ device }: { device: TPreviewDevice }) => {
   return (
     <div ref={rootRef}>
       <div ref={stageRef} data-testid={STAGE_TEST_ID}>
-        <div data-testid={DEVICE_FRAME_TEST_ID.VIEWPORT} style={{ height }} />
+        <div
+          data-testid={DEVICE_FRAME_TEST_ID.VIEWPORT}
+          {...{ [DEVICE_FRAME_VIEWPORT_ATTRIBUTE]: '' }}
+          style={{ height }}
+        />
       </div>
       <output data-testid={AVAILABLE_TEST_ID}>{availableHeight}</output>
     </div>
@@ -76,7 +90,7 @@ const stubLayout = () => {
   );
 };
 
-describe('useFrameAvailableHeight', () => {
+describe(useFrameAvailableHeight, () => {
   it.each([PREVIEW_DEVICE.TABLET, PREVIEW_DEVICE.PHONE])(
     'settles on one height after switching from desktop to %s',
     (device) => {

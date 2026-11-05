@@ -1,11 +1,11 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
+import { DEVICE_FRAME_VIEWPORT_ATTRIBUTE } from '@platform/constants/device-frame';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useEffect, useRef, useState } from 'react';
 
-const VIEWPORT_SELECTOR = `[data-testid="${DEVICE_FRAME_TEST_ID.VIEWPORT}"]`;
+const VIEWPORT_SELECTOR = `[${DEVICE_FRAME_VIEWPORT_ATTRIBUTE}]`;
 
 export const useFrameAvailableHeight = (device: TPreviewDevice) => {
   const rootRef = useRef<TMaybeNull<HTMLDivElement>>(null);
