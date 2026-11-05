@@ -157,6 +157,7 @@ export const VOICE_FIXED_KEYS = [
   'authMenu.sentMessage',
   'authMenu.useDifferentEmail',
   'authMenu.emailError',
+  'authMenu.emailInvalid',
   'authMenu.sendLimited',
   'authMenu.oauthError',
   'authMenu.signOut',

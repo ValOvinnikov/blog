@@ -36,12 +36,18 @@ export const ReaderSignInPanel = ({
     email,
     setEmail,
     isSendLimited,
+    isEmailInvalid,
     submitEmail,
     resetEmail,
     pendingProviderId,
     selectProvider,
   } = useSignInAttempt(isOpen);
   const isSent = status === FORM_STATUS.SUCCESS;
+  const errorMessage = isEmailInvalid
+    ? t('emailInvalid')
+    : isSendLimited
+      ? t('sendLimited')
+      : t('emailError');
   const wasSent = useRef(isSent);
 
   useEffect(() => {
@@ -104,7 +110,7 @@ export const ReaderSignInPanel = ({
         onSubmit: () => void submitEmail(),
         onReset: resetEmail,
         status,
-        errorMessage: isSendLimited ? t('sendLimited') : t('emailError'),
+        errorMessage,
       }}
     />
   );

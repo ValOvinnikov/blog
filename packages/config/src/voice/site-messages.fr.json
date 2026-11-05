@@ -134,6 +134,7 @@
     "sentMessage": "Nous avons envoyé un lien de connexion à <strong>{email}</strong>.",
     "useDifferentEmail": "Utiliser une autre adresse e-mail",
     "emailError": "Le lien n'a pas pu être envoyé. Veuillez réessayer.",
+    "emailInvalid": "Saisissez une adresse e-mail valide.",
     "sendLimited": "Trop de liens de connexion ont été demandés pour cette adresse. Réessayez dans une heure.",
     "oauthError": "La connexion a échoué. Veuillez réessayer.",
     "accountMenuAriaLabel": "Menu du compte",

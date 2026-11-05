@@ -134,6 +134,7 @@
     "sentMessage": "Wir haben einen Anmeldelink an <strong>{email}</strong> gesendet.",
     "useDifferentEmail": "Andere E-Mail-Adresse verwenden",
     "emailError": "Der Link konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+    "emailInvalid": "Geben Sie eine gültige E-Mail-Adresse ein.",
     "sendLimited": "Für diese Adresse wurden zu viele Anmeldelinks angefordert. Versuchen Sie es in einer Stunde erneut.",
     "oauthError": "Die Anmeldung ist fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "accountMenuAriaLabel": "Kontomenü",
