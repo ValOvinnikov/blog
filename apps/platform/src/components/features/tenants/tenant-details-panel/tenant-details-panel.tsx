@@ -59,7 +59,7 @@ export const TenantDetailsPanel = ({
     onFieldsLocked: revertFields,
   });
 
-  const { root, bodyStack, fields, lockAnnouncementLive, footerActions } =
+  const { bodyStack, fields, lockAnnouncementLive, footerActions } =
     tenantDetailsPanelVariants();
 
   const handleSave = () => {
@@ -85,7 +85,7 @@ export const TenantDetailsPanel = ({
   );
 
   return (
-    <div className={root()} data-tenant-details-panel={panelId}>
+    <div data-tenant-details-panel={panelId}>
       <Card>
         <Card.Header title={t('heading')} />
         <Card.Body>

@@ -4,7 +4,6 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const tenantDetailsPanelVariants = tv({
   slots: {
-    root: [],
     bodyStack: ['flex flex-col gap-4'],
     fields: [
       'grid grid-cols-1 gap-x-[18px] gap-y-4 lg:grid-cols-2',
