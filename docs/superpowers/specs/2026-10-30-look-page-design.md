@@ -629,16 +629,16 @@ mid-edit, after the owner opened Footer.
 
 ### 9.3 Summaries (folded) — drawn values
 
-| Row               | Paid (LX-D)                                                       | Free (LXG-D / LXG-C)                                                                                                               |
-| ----------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Colour            | 14×14 swatch radius 3 `#0d6466` + "Hue 192 · logo follows accent" | same (phone swatch 12×12)                                                                                                          |
-| Brand             | "Logo uploaded · No favicon"                                      | same                                                                                                                               |
-| Type              | "Fraunces · Inter"                                                | "Fraunces · Inter" + badge                                                                                                         |
-| Shape             | "Medium · Default · Accent bar · Outlined"                        | "Small · Compact · Outlined · Outlined" + badge                                                                                    |
-| Buttons           | "Busy label · Ring"                                               | same + badge                                                                                                                       |
-| Header            | "Classic · Full width · Dropdown · Pill with label"               | same + badge                                                                                                                       |
-| Footer            | (open)                                                            | "Columns · Brand tint · Full width · Cookie button shown", no badge                                                                |
-| Language switcher | "Menu with globe"                                                 | "Menu with code · One language" + badge (§ 22 D-7; LXG draws "Menu with globe · One language", LX-G "Not shown with one language") |
+| Row               | Paid (LX-D)                                                       | Free (LXG-D / LXG-C)                                                                                           |
+| ----------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| Colour            | 14×14 swatch radius 3 `#0d6466` + "Hue 192 · logo follows accent" | same (phone swatch 12×12)                                                                                      |
+| Brand             | "Logo uploaded · No favicon"                                      | same                                                                                                           |
+| Type              | "Fraunces · Inter"                                                | "Fraunces · Inter" + badge                                                                                     |
+| Shape             | "Medium · Default · Accent bar · Outlined"                        | "Small · Compact · Outlined · Outlined" + badge                                                                |
+| Buttons           | "Busy label · Ring"                                               | same + badge                                                                                                   |
+| Header            | "Classic · Full width · Dropdown · Pill with label"               | same + badge                                                                                                   |
+| Footer            | (open)                                                            | "Columns · Brand tint · Full width · Cookie button shown", no badge                                            |
+| Language switcher | "Globe"                                                           | "Code · One language" + badge (§ 22 D-7; LXG draws "Globe · One language", LX-G "Not shown with one language") |
 
 Summary rule: the current form values (unsaved edits included), option labels
 (`lookForm.*OptionLabel`) joined by " · ", using **exactly these fields in
@@ -713,7 +713,9 @@ width selects. Free state in § 15.
 
 Paid: unchanged controls, description "How the language switcher looks on
 desktop, in the header and footer." Field "Style" (a new label, drawn on GC
-and GO-E): Menu with code / Menu with globe / Compact codes. Free state in § 15.6.
+and GO-E): Code / Globe / Compact, each described under its label ("A menu
+showing the language code" / "A menu showing a globe icon" / "Every language
+code in a row"). Free state in § 15.6.
 
 ### 10.5 Colour, Brand, Shape, Buttons and the other Header fields (GC)
 
@@ -1437,16 +1439,16 @@ Buttons and Header carry the Footer line when open is not drawn; they do
 Open: description (`#12141a`) "Your plan publishes one language. Upgrade to
 add languages and choose a switcher style."; field "Style" + badge; hint "How
 the language switcher looks on desktop, in the header and footer."; locked
-segmented **Menu with code** / Menu with globe / Compact codes (§ 22 D-7: the
-value `effective-look` publishes; LXG draws Menu with globe pressed). Folded:
-"Menu with code · One language" + one badge. A Growth site with
+segmented **Code** / Globe / Compact (§ 22 D-7: the
+value `effective-look` publishes; LXG draws Globe pressed). Folded:
+"Code · One language" + one badge. A Growth site with
 one language keeps today's "Add another language in Languages settings to
 choose a style." (G2-7's no-control variant is superseded.)
 
-Verbatim LXG-F bullets (their "Menu with globe" is the illustrative value D-7
-replaces): "Folded, the row reads Menu with globe · One language,
+Verbatim LXG-F bullets (their "Globe" is the illustrative value D-7
+replaces): "Folded, the row reads Globe · One language,
 with one Growth badge: style is its only field." / "Open, the card says why it
-is quiet, then the locked style showing the preset's Menu with globe."
+is quiet, then the locked style showing the preset's Globe."
 
 ### 15.7 Free preview
 
@@ -1721,7 +1723,7 @@ one answer.
 | D-4  | [DOWNGRADE SIGNAL] and the G2-8 operator card.                                                                                                                                                                                                                                                                                                                                                                                            | Out of scope (§ 25).                                                                                                                                                                                                                                                                                                       | spec                                           | —                          |
 | D-5  | Growth note link order.                                                                                                                                                                                                                                                                                                                                                                                                                   | Reading order: Colour, Type, Shape, Buttons, Header, Footer.                                                                                                                                                                                                                                                               | board (G2-3, LXG-A notes)                      | NEW-look-25                |
 | D-6  | Icon button size: LX-F text says 32 from lg; its CSS draws 30.                                                                                                                                                                                                                                                                                                                                                                            | 32 px from `lg`, 44 px below it and on touch; solos 34.                                                                                                                                                                                                                                                                    | board (LX-F note; the 30 px CSS is incidental) | #6382, #6390               |
-| D-7  | Language switcher value on Free: the boards show Menu with globe; `effective-look` gives Free `MENU_CODE`.                                                                                                                                                                                                                                                                                                                                | Menu with code; folded "Menu with code · One language". The board value was illustrative data.                                                                                                                                                                                                                             | rule (the code's data value)                   | #6400                      |
+| D-7  | Language switcher value on Free: the boards show Globe; `effective-look` gives Free `MENU_CODE`.                                                                                                                                                                                                                                                                                                                                          | Code; folded "Code · One language". The board value was illustrative data.                                                                                                                                                                                                                                                 | rule (the code's data value)                   | #6400                      |
 | D-8  | Reset to preset on a paid site: always visible, or only when diverged?                                                                                                                                                                                                                                                                                                                                                                    | **Decided 31 Oct (Q15):** only while the form differs from the selected preset (today's rule; every drawn paid state is diverged). Hiding it on Free is new: today it shows on Free whenever the accent hue diverges.                                                                                                      | —                                              | #6425                      |
 | D-9  | How the sample lays out at the device width.                                                                                                                                                                                                                                                                                                                                                                                              | Container queries: the sample header switches on the frame's width at the site's `lg`; no iframe, no `isNarrow`.                                                                                                                                                                                                           | user (30 Oct)                                  | #6390                      |
 | D-9b | The `@blog/ui` post cards switch on viewport media queries, which a container query does not reach. (Half is settled: #6306, merged 30 Oct, lays the `@blog/ui` Footer's groups grid and bottom row out by its container's width, so they follow the frame. Its top row stays a column until its container reaches 64 rem and its padding is `@blog/ui`'s, so the boards' row (gap 40) at 820 and 24 px column gap at 390 are not built.) | **Decided 31 Oct (Q16):** not now. The Footer already follows the container width (#6306); the post cards and the Footer's top row do not, and an optional `@blog/ui` container-query follow-up for both is not filed. The post cards follow the admin window, and the 820 / 390 frames are compared for every other part. | —                                              | #6390, #6397               |
@@ -1872,8 +1874,7 @@ Tick each against the build at the frame's width, side by side with the board.
   Medium / Default / Accent bar / Outlined; Buttons Busy label / Follow the
   preset; Header Classic / Dropdown / Full width / Pill with label (account
   panel and phone placement at their defaults); Footer Columns / **Brand
-  tint** / Full width / cookie button Shown; Language switcher Menu with
-  globe. LX-D is then reached by opening Footer and changing Background to
+  tint** / Full width / cookie button Shown; Language switcher Globe. LX-D is then reached by opening Footer and changing Background to
   Shaded (one unsaved change, its field dot and the bar).
 - Free copy of the tenant: one language, reader accounts off, preset
   Editorial (the Free summaries are the Editorial values).
@@ -1910,7 +1911,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] Surface Full width✓ / Card + hint
 - [ ] Cookie settings button Hidden / Shown✓ + hint
 - [ ] Segmented track padding 2, gap 2, `#f6f7f9`, border `#878f9d`, radius 4; buttons h30, radius 3, 13px 500; pressed white, 600, 1.5px brand-ink inset
-- [ ] Language switcher folded "Menu with globe"
+- [ ] Language switcher folded "Globe"
 - [ ] h2 "Live preview" 15/650; readout "1280 px wide · shown at 44%" mono 12
 - [ ] Toolbar: Device (Desktop✓, Tablet, Phone) · Scheme (Light✓, Dark) · Reader (Signed out✓, Signed in) · spacer · Follow✓ · Full screen
 - [ ] Tracks padding 2, gap 2, `theme-track`, border `control-line`, radius 5; buttons 32 (D-6); solos 34
@@ -2009,7 +2010,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] Colour, Brand: no badge
 - [ ] Type open: description; lock line "On Free, Type keeps the Editorial preset's fonts. Picking another preset changes them."; Heading font + badge, locked select "Fraunces" in Fraunces; Body font + badge, locked select "Inter"
 - [ ] Shape "Small · Compact · Outlined · Outlined" + badge; Buttons + badge
-- [ ] Header + badge; Footer "Columns · Brand tint · Full width · Cookie button shown", no badge; Language switcher "Menu with code · One language" + badge (D-7)
+- [ ] Header + badge; Footer "Columns · Brand tint · Full width · Cookie button shown", no badge; Language switcher "Code · One language" + badge (D-7)
 - [ ] Preview: no reader group; Desktop frame at the top, no outline / tag; thumb top 0 height 86%
 - [ ] Sample header: no "Sign in" pill and no language switcher (reader accounts off, one language — D-34; the board's Sign in and EN are not built)
 - [ ] Status "Type changes the whole page, so the frame stays where it is. The sample uses the Editorial preset's values, the ones a Free site publishes." + reader line
@@ -2060,8 +2061,8 @@ depend on an open decision cite it; tick them against the answer recorded in
 
 ### LXG-F · Language switcher on Free
 
-- [ ] Open: "Your plan publishes one language. Upgrade to add languages and choose a switcher style."; Style + badge; hint; locked segmented Menu with code✓ / Menu with globe / Compact codes (D-7)
-- [ ] Folded: "Menu with code · One language" + one badge
+- [ ] Open: "Your plan publishes one language. Upgrade to add languages and choose a switcher style."; Style + badge; hint; locked segmented Code✓ / Globe / Compact (D-7)
+- [ ] Folded: "Code · One language" + one badge
 - [ ] A Growth site with one language still shows "Add another language in Languages settings to choose a style."
 
 ### G2-1 … G2-6 · Note and badge anatomy
