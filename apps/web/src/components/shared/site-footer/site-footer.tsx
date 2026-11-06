@@ -1,6 +1,5 @@
 import {
   CAPABILITY,
-  COOKIE_SETTINGS_BUTTON,
   FOOTER_FINE_PRINT_KIND,
   ICONS,
   routes,
@@ -28,6 +27,7 @@ import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { arrangeFooterLinks } from '@web/utils/arrange-footer-links';
 import { logger } from '@web/utils/logger/logger';
+import { resolveCookieSettingsControls } from '@web/utils/resolve-cookie-settings-controls';
 import { getTranslations } from 'next-intl/server';
 
 import { FooterLink } from './components/footer-link/footer-link';
@@ -70,14 +70,14 @@ export const SiteFooter = async () => {
   const social = footer?.social ?? [];
   const hasLanguageSwitcher = footer?.showLanguageSwitcher === true;
   const hasRssFeed = footer?.showRssFeed ?? true;
+  const { layout, background, surface, cookieSettingsButton } = footerStyle;
+  const { hasCookieSettingsLink, hasCookieSettingsButton } =
+    resolveCookieSettingsControls(cookieSettingsButton, isConsentBannerEnabled);
   const { groups, finePrint } = arrangeFooterLinks({
     groups: footer?.groups ?? [],
     finePrint: footer?.finePrint ?? [],
+    hasCookieSettingsLink,
   });
-  const { layout, background, surface, cookieSettingsButton } = footerStyle;
-  const hasFloatingCookieSettings =
-    isConsentBannerEnabled &&
-    cookieSettingsButton === COOKIE_SETTINGS_BUTTON.SHOWN;
 
   return (
     <>
@@ -146,7 +146,7 @@ export const SiteFooter = async () => {
           )}
         </Footer.Nav>
       </Footer>
-      {hasFloatingCookieSettings && <FloatingCookieSettingsButton />}
+      {hasCookieSettingsButton && <FloatingCookieSettingsButton />}
     </>
   );
 };
