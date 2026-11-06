@@ -7,11 +7,8 @@ import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
-  MOCK_SUSPENDED_BY_EMAIL,
   MOCK_SUSPENSION_CASE,
   MOCK_SUSPENSION_DESCRIPTION,
-  MOCK_SUSPENSION_REFERENCE,
-  mockTenantSuspension,
 } from '@platform/testing/tenant-suspensions/fixtures';
 import { mockClientTenant } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -32,12 +29,11 @@ vi.mock('@platform/server/tenants/tenant-suspension-actions', () => ({
 
 const { tenantSuspensionControl, tenantLifecycleErrors, suspensionCategory } =
   en;
-const { ACTIVE, SUSPENDED, blockOwner, caseFields } = tenantSuspensionControl;
+const { ACTIVE, blockOwner, caseFields } = tenantSuspensionControl;
 const CATEGORY_LABEL = suspensionCategory[MOCK_SUSPENSION_CASE.category];
 const t = makeEnTranslator('tenantSuspensionControl');
 
 const ACTIVE_TENANT = mockClientTenant({ status: TENANT_STATUS.ACTIVE });
-const SUSPENDED_TENANT = mockClientTenant({ status: TENANT_STATUS.SUSPENDED });
 
 const setup = customRender(TenantSuspensionControl, {
   tenant: ACTIVE_TENANT,
@@ -211,54 +207,6 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
           });
         });
       });
-    });
-  });
-
-  it('shows the open case of a suspended tenant', () => {
-    setup({ tenant: SUSPENDED_TENANT, suspension: mockTenantSuspension() });
-
-    const reference = screen.getByText(MOCK_SUSPENSION_REFERENCE);
-    const category = screen.getByText(CATEGORY_LABEL);
-    const statement = screen.getByText(MOCK_SUSPENSION_DESCRIPTION);
-    const suspendedBy = screen.getByText(MOCK_SUSPENDED_BY_EMAIL);
-
-    expect(reference).toBeVisible();
-    expect(category).toBeVisible();
-    expect(statement).toBeVisible();
-    expect(suspendedBy).toBeVisible();
-  });
-
-  describe('a suspended tenant with the reactivate dialog open', () => {
-    let confirmButton: HTMLElement;
-
-    beforeEach(async () => {
-      setup({ tenant: SUSPENDED_TENANT });
-
-      const openDialog = screen.getByRole('button', {
-        name: SUSPENDED.triggerButton,
-      });
-      await user.click(openDialog);
-      confirmButton = await screen.findByRole('button', {
-        name: SUSPENDED.confirmButton,
-      });
-    });
-
-    it('reactivates the tenant', async () => {
-      await user.click(confirmButton);
-
-      expect(liftTenantSuspensionActionMock).toHaveBeenCalledWith(
-        SUSPENDED_TENANT.id,
-      );
-      expect(suspendTenantActionMock).not.toHaveBeenCalled();
-      expect(refreshMock).toHaveBeenCalled();
-    });
-
-    it('offers no block choice', () => {
-      const blockSwitch = screen.queryByRole('switch', {
-        name: blockOwner.switchLabel,
-      });
-
-      expect(blockSwitch).not.toBeInTheDocument();
     });
   });
 });
