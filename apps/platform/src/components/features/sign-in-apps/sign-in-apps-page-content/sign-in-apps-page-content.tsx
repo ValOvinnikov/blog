@@ -7,6 +7,7 @@ import { SignInAppCard } from '@platform/components/features/sign-in-apps/sign-i
 import { SignInAppReadOnlyCard } from '@platform/components/features/sign-in-apps/sign-in-app-read-only-card';
 import { SignInAppsFreeCard } from '@platform/components/features/sign-in-apps/sign-in-apps-free-card';
 import { SignInAppsGrowthNote } from '@platform/components/features/sign-in-apps/sign-in-apps-growth-note';
+import { SignInAppsGuardProvider } from '@platform/components/features/sign-in-apps/sign-in-apps-guard-provider';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import {
@@ -71,15 +72,18 @@ export const SignInAppsPageContent = async (
         </>
       )}
 
-      {mode === SIGN_IN_APPS_MODE.EDIT &&
-        apps.map((app) => (
-          <SignInAppCard
-            key={app.provider}
-            tenantId={id}
-            app={app}
-            domain={primaryDomain}
-          />
-        ))}
+      {mode === SIGN_IN_APPS_MODE.EDIT && (
+        <SignInAppsGuardProvider pageTitle={t('pageTitle')}>
+          {apps.map((app) => (
+            <SignInAppCard
+              key={app.provider}
+              tenantId={id}
+              app={app}
+              domain={primaryDomain}
+            />
+          ))}
+        </SignInAppsGuardProvider>
+      )}
 
       {(mode === SIGN_IN_APPS_MODE.READ_ONLY ||
         mode === SIGN_IN_APPS_MODE.OPERATOR) &&

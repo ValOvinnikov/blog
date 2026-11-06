@@ -3,6 +3,7 @@ import 'server-only';
 import type { TMaybeUndefined } from '@blog/config';
 import type { TOAuthProvider } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   OAUTH_PROVIDERS,
@@ -15,6 +16,7 @@ import { oauthCallbackUrl } from '@platform/utils/oauth-callback-url/oauth-callb
 export type TSignInAppView = {
   provider: TOAuthProvider;
   hasOwnApp: boolean;
+  hasKeptApp: boolean;
   callbackUrl: string;
   clientId?: string;
   maskedClientId?: string;
@@ -35,7 +37,8 @@ export const loadSignInApps = async (
   tenant: TTenant,
   mode: TSignInAppsMode,
 ): Promise<TSignInAppView[]> => {
-  const { id, primaryDomain, deprovisionedAt } = tenant;
+  const { id, plan, primaryDomain, deprovisionedAt } = tenant;
+  const isEntitled = PLAN_ENTITLEMENTS[plan].hasOwnOAuthApps;
   const clients =
     await queries.tenantOAuthCredentials.listTenantOAuthClients(id);
   const isWarnable =
@@ -47,14 +50,16 @@ export const loadSignInApps = async (
       (saved) => saved.provider === provider,
     );
     const callbackDomain = client?.callbackDomain ?? primaryDomain;
+    const hasOwnApp = Boolean(client) && isEntitled;
 
     return {
       provider,
-      hasOwnApp: Boolean(client),
+      hasOwnApp,
+      hasKeptApp: Boolean(client) && !isEntitled,
       callbackUrl: oauthCallbackUrl(primaryDomain, provider),
       hasCallbackWarning:
-        isWarnable && Boolean(client) && callbackDomain !== primaryDomain,
-      ...(client ? shownClientId(mode, client.clientId) : {}),
+        isWarnable && hasOwnApp && callbackDomain !== primaryDomain,
+      ...(client && hasOwnApp ? shownClientId(mode, client.clientId) : {}),
     };
   });
 };

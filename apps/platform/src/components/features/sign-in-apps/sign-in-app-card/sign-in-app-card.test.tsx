@@ -154,6 +154,26 @@ describe(`<${SignInAppCard.name}/>`, () => {
       expect(secret).toHaveValue(MOCK_CLIENT_SECRET);
     });
 
+    it('clears the failure once a retried save succeeds', async () => {
+      vi.mocked(saveSignInAppAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      const clientId = clientIdInput();
+      const secret = secretInput();
+      const save = button(SAVE_NAME);
+      await user.type(clientId, MOCK_CLIENT_ID);
+      await user.type(secret, MOCK_CLIENT_SECRET);
+      await user.click(save);
+      await screen.findByText(page.saveFailed);
+
+      await user.click(save);
+
+      const saved = await screen.findByText(t('saved', { provider: GOOGLE }));
+      const failure = screen.queryByText(page.saveFailed);
+      expect(saved).toBeVisible();
+      expect(failure).not.toBeInTheDocument();
+    });
+
     it('links out to the provider console', () => {
       const link = screen.getByRole('link', {
         name: new RegExp(page.consoleLink.google),

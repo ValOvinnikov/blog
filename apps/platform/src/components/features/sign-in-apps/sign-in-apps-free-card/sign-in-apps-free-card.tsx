@@ -19,11 +19,11 @@ export const SignInAppsFreeCard = ({ apps }: TSignInAppsFreeCardProps) => {
   return (
     <Card>
       <ul className={list()}>
-        {apps.map(({ provider, hasOwnApp }) => (
+        {apps.map(({ provider, hasKeptApp }) => (
           <li key={provider} className={row()}>
             <div className={name()}>
               <SignInAppTitle provider={provider} />
-              {hasOwnApp && <Text variant="muted">{t('keptOnGrowth')}</Text>}
+              {hasKeptApp && <Text variant="muted">{t('keptOnGrowth')}</Text>}
             </div>
             <div className={badges()}>
               <GrowthBadge />

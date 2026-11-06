@@ -1,5 +1,7 @@
 import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { TENANT_PLAN } from '@blog/db/constants';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { SIGN_IN_APPS_MODE } from '@platform/constants/sign-in-apps';
 import {
   MOCK_CLIENT_ID,
@@ -21,11 +23,14 @@ vi.mock('@blog/db', async () => {
   return mockSignInAppsDb();
 });
 
+const growthTenant = (overrides: Partial<TTenant> = {}) =>
+  mockTenant({ plan: TENANT_PLAN.GROWTH, ...overrides });
+
 const { listTenantOAuthClients } = queries.tenantOAuthCredentials;
 
 const googleOf = async (
   mode: Parameters<typeof loadSignInApps>[1],
-  tenant = mockTenant(),
+  tenant = growthTenant(),
 ) =>
   (await loadSignInApps(tenant, mode)).find(
     (app) => app.provider === OAUTH_PROVIDER.GOOGLE,
@@ -41,7 +46,7 @@ describe(loadSignInApps, () => {
   it('lists Google then GitHub, each with the callback on the main address', async () => {
     vi.mocked(listTenantOAuthClients).mockResolvedValue([]);
 
-    const apps = await loadSignInApps(mockTenant(), SIGN_IN_APPS_MODE.EDIT);
+    const apps = await loadSignInApps(growthTenant(), SIGN_IN_APPS_MODE.EDIT);
 
     expect(apps.map(({ provider }) => provider)).toEqual([
       OAUTH_PROVIDER.GOOGLE,
@@ -50,6 +55,7 @@ describe(loadSignInApps, () => {
     expect(apps[0]).toEqual({
       provider: OAUTH_PROVIDER.GOOGLE,
       hasOwnApp: false,
+      hasKeptApp: false,
       callbackUrl: MOCK_GOOGLE_CALLBACK_URL,
       hasCallbackWarning: false,
     });
@@ -79,6 +85,16 @@ describe(loadSignInApps, () => {
     },
   );
 
+  it('shows a downgraded site’s saved app as kept, not in use, with no client ID', async () => {
+    const app = await googleOf(
+      SIGN_IN_APPS_MODE.OPERATOR,
+      mockTenant({ plan: TENANT_PLAN.FREE }),
+    );
+
+    expect(app).toMatchObject({ hasOwnApp: false, hasKeptApp: true });
+    expect(app).not.toHaveProperty('maskedClientId');
+  });
+
   it('warns when the app was registered against an earlier main address', async () => {
     vi.mocked(listTenantOAuthClients).mockResolvedValue([
       mockOAuthClient({ callbackDomain: MOCK_CUSTOM_DOMAIN }),
@@ -94,19 +110,19 @@ describe(loadSignInApps, () => {
       'an unrecorded callback domain',
       null,
       SIGN_IN_APPS_MODE.EDIT,
-      mockTenant(),
+      growthTenant(),
     ],
     [
       'an operator',
       MOCK_CUSTOM_DOMAIN,
       SIGN_IN_APPS_MODE.OPERATOR,
-      mockTenant(),
+      growthTenant(),
     ],
     [
       'an archived site',
       MOCK_CUSTOM_DOMAIN,
       SIGN_IN_APPS_MODE.READ_ONLY,
-      mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+      growthTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     ],
   ])('does not warn for %s', async (_name, callbackDomain, mode, tenant) => {
     vi.mocked(listTenantOAuthClients).mockResolvedValue([

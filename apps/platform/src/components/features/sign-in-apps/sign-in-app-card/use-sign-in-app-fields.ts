@@ -59,11 +59,14 @@ export const useSignInAppFields = (app: TSignInAppView, onEdit: () => void) => {
   };
 
   const isSecretEditable = !saved.hasOwnApp || isReplacing;
+  const isClientIdChanged = clientId !== saved.clientId;
+  const isSecretChanged = isReplacing || clientSecret !== '';
 
   return {
     saved,
     values: { clientId, clientSecret, isSecretEditable },
-    isDirty: clientId !== saved.clientId || isReplacing || clientSecret !== '',
+    isDirty: isClientIdChanged || isSecretChanged,
+    changeCount: Number(isClientIdChanged) + Number(isSecretChanged),
     clientId: {
       value: clientId,
       error: errors.clientId,

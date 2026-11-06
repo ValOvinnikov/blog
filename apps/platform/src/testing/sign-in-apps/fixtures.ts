@@ -36,6 +36,7 @@ export const mockSignInAppView = (
 ): TSignInAppView => ({
   provider: OAUTH_PROVIDER.GOOGLE,
   hasOwnApp: false,
+  hasKeptApp: false,
   callbackUrl: MOCK_GOOGLE_CALLBACK_URL,
   hasCallbackWarning: false,
   ...overrides,
