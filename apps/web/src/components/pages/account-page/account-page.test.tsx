@@ -18,6 +18,8 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/auth/auth');
 
+vi.mock('@web/server/auth/site-oauth-credentials/site-oauth-credentials');
+
 vi.mock('@blog/db', () => ({
   queries: {
     account: { getLinkedProviders: vi.fn() },

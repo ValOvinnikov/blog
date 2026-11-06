@@ -9,6 +9,7 @@ import { SiteNavigation } from '@web/components/shared/site-navigation';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { routing } from '@web/i18n/routing';
+import { getSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   isReaderAccountEnabled,
@@ -35,6 +36,7 @@ export const SiteHeader = async () => {
     brandLogoUrl,
     accountControl,
     headerStyle,
+    siteOAuthCredentials,
   ] = await Promise.all([
     service.global.navigation.v1.getNavigation(sanityContext),
     isReaderAccountEnabled(),
@@ -43,6 +45,7 @@ export const SiteHeader = async () => {
     getBrandLogoUrl(siteConfigTenant),
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
+    getSiteOAuthCredentials(tenantId),
   ]);
 
   if (!navResult.ok) {
@@ -56,7 +59,7 @@ export const SiteHeader = async () => {
   const { layout, submenuStyle, barStyle } = headerStyle;
   const hasLanguageSwitcher =
     navResult.ok && navResult.data.showLanguageSwitcher === true;
-  const oauthProviderIds = getEnabledOAuthProviderIds();
+  const oauthProviderIds = getEnabledOAuthProviderIds(siteOAuthCredentials);
   const hasAccountInPhoneMenu =
     hasReaderAccounts &&
     accountControl.phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU;
