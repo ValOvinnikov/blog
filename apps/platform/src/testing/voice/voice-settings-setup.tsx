@@ -16,7 +16,7 @@ import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
 import { openVoiceSections } from '@platform/testing/voice/sections';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import type { UserEvent } from '@testing-library/user-event';
 
 const { EN, DE } = LOCALE_ISO_CODES;

@@ -38,7 +38,7 @@ import {
   settingsDraftStorageKey,
   writeSettingsDraft,
 } from '@platform/utils/settings-draft-storage/settings-draft-storage';
-import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';

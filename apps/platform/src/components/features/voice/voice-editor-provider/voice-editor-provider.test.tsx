@@ -4,10 +4,10 @@ import { faker } from '@faker-js/faker';
 import { act, renderHook } from '@platform/testing/custom-render';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
-  buildVoiceDraft,
   localeDraftOf,
   withVoiceValue,
 } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import type { ReactNode } from 'react';
 
 import {

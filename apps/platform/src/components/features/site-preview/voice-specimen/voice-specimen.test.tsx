@@ -8,10 +8,8 @@ import {
   MOCK_BRAND_PRIMARY,
   MOCK_SITE_PREVIEW_THEME,
 } from '@platform/testing/site-preview-theme';
-import {
-  buildVoiceDraft,
-  withVoiceValue,
-} from '@platform/utils/voice-draft/voice-draft';
+import { withVoiceValue } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 
 import { VoiceSpecimen } from './voice-specimen';
 

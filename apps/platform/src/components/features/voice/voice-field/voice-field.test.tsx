@@ -21,12 +21,12 @@ import {
   UNSAVED_MARK,
 } from '@platform/testing/voice/fixtures';
 import {
-  buildVoiceDraft,
   localeDraftOf,
   withVoiceValue,
   type TVoiceDraftValue,
   type TVoiceFieldErrors,
 } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
