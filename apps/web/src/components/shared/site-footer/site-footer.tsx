@@ -67,6 +67,7 @@ export const SiteFooter = async () => {
   const social = footer?.social ?? [];
   const hasLanguageSwitcher = footer?.showLanguageSwitcher === true;
   const hasRssFeed = footer?.showRssFeed ?? true;
+  const copyrightName = footer?.copyrightName ?? brandName;
   const { layout, background, surface, cookieSettingsButton } = footerStyle;
   const { hasCookieSettingsLink, hasCookieSettingsButton } =
     resolveCookieSettingsControls(cookieSettingsButton, isConsentBannerEnabled);
@@ -110,8 +111,11 @@ export const SiteFooter = async () => {
           ))}
         </Footer.Groups>
         <Footer.Wordmark>{brandName}</Footer.Wordmark>
-        {isString(brandName) && (
-          <Footer.Copyright title={brandName} year={new Date().getFullYear()} />
+        {isString(copyrightName) && (
+          <Footer.Copyright
+            title={copyrightName}
+            year={new Date().getFullYear()}
+          />
         )}
         <Footer.FinePrint ariaLabel={t('finePrintAriaLabel')}>
           {finePrint.map((item) =>
