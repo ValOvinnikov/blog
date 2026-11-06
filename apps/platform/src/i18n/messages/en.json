@@ -661,9 +661,14 @@
     "lockLineGrowthFields": "Fields marked Growth keep the {preset} preset's value.",
     "lockLineTypeFonts": "On Free, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
     "languageSwitcherOptionLabel": {
-      "MENU_CODE": "Menu with code",
-      "MENU_GLOBE": "Menu with globe",
-      "CODES": "Compact codes"
+      "MENU_CODE": "Code",
+      "MENU_GLOBE": "Globe",
+      "CODES": "Compact"
+    },
+    "languageSwitcherOptionDescription": {
+      "MENU_CODE": "A menu showing the language code",
+      "MENU_GLOBE": "A menu showing a globe icon",
+      "CODES": "Every language code in a row"
     },
     "colourHeading": "Colour",
     "colourDescription": "Only the hue changes, so text stays readable.",
@@ -1035,6 +1040,7 @@
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
     "draftFieldLabel": "{surface} — {field} ({language})",
     "listRoute": "Shown at {path}",
+    "previewLabel": "{hasField, select, true {Preview · {field}} other {Preview}}",
     "fieldError": {
       "NOT_A_STRING": "Enter text in this field.",
       "NOT_RICH_TEXT": "Enter text in this field.",

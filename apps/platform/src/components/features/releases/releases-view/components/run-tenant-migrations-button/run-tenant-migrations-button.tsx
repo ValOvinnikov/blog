@@ -21,6 +21,7 @@ import {
   startTenantMigrationsAction,
   type TStartTenantMigrationsResult,
 } from '@platform/server/releases/start-tenant-migrations-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -62,13 +63,15 @@ export const RunTenantMigrationsButton = ({
 
   const handleClick = () => {
     startTransition(async () => {
-      const result = await startTenantMigrationsAction(
-        retryTenant
-          ? {
-              environment: MIGRATION_ENVIRONMENT.PRODUCTION,
-              tenantId: retryTenant.id,
-            }
-          : { environment: MIGRATION_ENVIRONMENT.DEVELOPMENT },
+      const result = await settleAction(
+        startTenantMigrationsAction(
+          retryTenant
+            ? {
+                environment: MIGRATION_ENVIRONMENT.PRODUCTION,
+                tenantId: retryTenant.id,
+              }
+            : { environment: MIGRATION_ENVIRONMENT.DEVELOPMENT },
+        ),
       );
 
       if (isOutcomeSuccess(result)) {

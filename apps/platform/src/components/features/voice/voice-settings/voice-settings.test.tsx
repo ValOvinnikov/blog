@@ -1,7 +1,7 @@
 import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
-import { ARIA_EXPANDED } from '@platform/testing/aria';
+import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -11,7 +11,13 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
-import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
+import {
+  BLOG_INDEX_ROW,
+  NOTHING_HERE,
+  TAG_ROW,
+  TOPIC_ROW,
+  UNSAVED_MARK,
+} from '@platform/testing/voice/fixtures';
 import { openVoiceSections } from '@platform/testing/voice/sections';
 import {
   BOOKMARKS,
@@ -51,6 +57,7 @@ const LANGUAGE = 'Language';
 const TAG_PAGE = 'Tag page';
 const BLOG_INDEX_PAGE = 'Blog index page';
 const SHOW_PREVIEW = 'Show preview';
+const PREVIEW = 'Preview';
 const HEADING_KEY_TEST_ID = 'voice-key-notFoundHeading';
 const DATA_FOCUSED = 'data-focused';
 const FOLLOWS = Node.DOCUMENT_POSITION_FOLLOWING;
@@ -132,7 +139,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       const customisedBadge = within(section).getByText('Customised');
       const unsavedBadge = within(section).getByRole('img', {
-        name: 'Unsaved',
+        name: UNSAVED_MARK,
       });
       const customisedSummary = within(section).getByText(
         '3 fields · 1 customised',
@@ -337,7 +344,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('shows the open list in the empty-lists specimen', async () => {
         const topicRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
-          name: /Topic page/,
+          name: TOPIC_ROW,
         });
         await user.click(topicRow);
 
@@ -352,18 +359,23 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
 
       it.each([
-        [PAGE_NOT_FOUND, 'The return button is fixed and translated for you.'],
-        [ERROR_PAGE, 'The buttons are fixed and translated for you.'],
+        [
+          PAGE_NOT_FOUND,
+          PREVIEW,
+          'The return button is fixed and translated for you.',
+        ],
+        [ERROR_PAGE, PREVIEW, 'The buttons are fixed and translated for you.'],
         [
           EMPTY_LISTS,
+          `Preview · ${BLOG_INDEX_PAGE}`,
           'The heading comes from Studio; only the message is yours here.',
         ],
-        [BOOKMARKS, 'The page title and panel heading are fixed.'],
+        [BOOKMARKS, PREVIEW, 'The page title and panel heading are fixed.'],
       ])(
-        'labels the %s preview with the text that is theirs',
-        (surface, note) => {
+        'labels the %s preview %s, with the text that is theirs',
+        (surface, label, note) => {
           const preview = within(voiceCard(surface)).getByRole('group', {
-            name: 'Live preview',
+            name: label,
           });
           const noteText = within(preview).getByText(note);
 
@@ -371,28 +383,67 @@ describe(`<${VoiceSettings.name}/>`, () => {
         },
       );
 
-      it('toggles each preview behind its own Show preview button', async () => {
-        const toggle = within(voiceCard(BOOKMARKS)).getByRole('button', {
+      it('names the open list in the empty-lists preview label', async () => {
+        const section = voiceCard(EMPTY_LISTS);
+        const topicRow = within(section).getByRole('button', {
+          name: TOPIC_ROW,
+        });
+        await user.click(topicRow);
+
+        const preview = within(section).getByRole('group', {
+          name: 'Preview · Topic page',
+        });
+
+        expect(preview).toBeInTheDocument();
+      });
+
+      it('names the first list in the preview label while no list is open', async () => {
+        const section = voiceCard(EMPTY_LISTS);
+        const openRow = within(section).getByRole('button', {
+          name: BLOG_INDEX_ROW,
+          expanded: true,
+        });
+        await user.click(openRow);
+
+        const preview = within(section).getByRole('group', {
+          name: `Preview · ${BLOG_INDEX_PAGE}`,
+        });
+
+        expect(preview).toBeInTheDocument();
+      });
+
+      it('toggles the empty-lists preview and keeps focus on its button', async () => {
+        const toggle = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
           name: SHOW_PREVIEW,
           expanded: false,
         });
         await user.click(toggle);
 
-        const hideButton = within(voiceCard(BOOKMARKS)).getByRole('button', {
-          name: 'Hide preview',
-          expanded: true,
+        const preview = within(voiceCard(EMPTY_LISTS)).getByRole('group', {
+          name: `Preview · ${BLOG_INDEX_PAGE}`,
         });
-        const errorShowButton = within(voiceCard(ERROR_PAGE)).getByRole(
-          'button',
-          {
-            name: SHOW_PREVIEW,
-            expanded: false,
-          },
-        );
 
-        expect(hideButton).toBeVisible();
-        expect(errorShowButton).toBeVisible();
+        expect(toggle).toHaveAttribute(ARIA_CONTROLS, preview.id);
+        expect(toggle).toHaveFocus();
+        expect(toggle).toHaveAccessibleName('Hide preview');
+        expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
+
+        await user.click(toggle);
+
+        expect(toggle).toHaveAccessibleName(SHOW_PREVIEW);
+        expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'false');
       });
+
+      it.each([PAGE_NOT_FOUND, ERROR_PAGE, BOOKMARKS])(
+        'offers no Show preview on the %s card',
+        (surface) => {
+          const toggle = within(voiceCard(surface)).queryByRole('button', {
+            name: SHOW_PREVIEW,
+          });
+
+          expect(toggle).not.toBeInTheDocument();
+        },
+      );
     });
   });
 
@@ -410,8 +461,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(blogIndexField).toBeVisible();
 
       for (const name of [
-        /Topic page/,
-        /Tag page/,
+        TOPIC_ROW,
+        TAG_ROW,
         /Topics index page/,
         /Tags index page/,
       ]) {
@@ -423,7 +474,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         expect(compactRow).toBeVisible();
       }
 
-      const tagRow = within(section).getByRole('button', { name: /Tag page/ });
+      const tagRow = within(section).getByRole('button', { name: TAG_ROW });
       await user.click(tagRow);
 
       const tagField = within(section).getByRole('textbox', { name: TAG_PAGE });
@@ -431,7 +482,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         name: BLOG_INDEX_PAGE,
       });
       const blogIndexRow = within(section).getByRole('button', {
-        name: /Blog index page/,
+        name: BLOG_INDEX_ROW,
       });
 
       expect(tagField).toBeVisible();
@@ -443,7 +494,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('keeps keyboard focus on a list row as it opens, then tabs in', async () => {
       const section = voiceCard(EMPTY_LISTS);
-      const row = within(section).getByRole('button', { name: /Tag page/ });
+      const row = within(section).getByRole('button', { name: TAG_ROW });
 
       await user.pointer({ keys: '[MouseLeft>]', target: row });
       await user.keyboard('{Enter}');
@@ -469,13 +520,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
     it('closes the open list from its header', async () => {
       const section = voiceCard(EMPTY_LISTS);
       const openRow = within(section).getByRole('button', {
-        name: /Blog index page/,
+        name: BLOG_INDEX_ROW,
         expanded: true,
       });
       await user.click(openRow);
 
       const closedRow = within(section).getByRole('button', {
-        name: /Blog index page/,
+        name: BLOG_INDEX_ROW,
         expanded: false,
       });
 
@@ -483,7 +534,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('asks the editor to keep the name placeholder on a topic message', async () => {
-      const topicRow = screen.getByRole('button', { name: /Topic page/ });
+      const topicRow = screen.getByRole('button', { name: TOPIC_ROW });
       await user.click(topicRow);
 
       const hint = screen.getByText(
@@ -510,7 +561,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('describes every open control with the archived notice', async () => {
         const tagRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
-          name: /Tag page/,
+          name: TAG_ROW,
         });
         await user.click(tagRow);
 

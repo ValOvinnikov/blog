@@ -1,12 +1,13 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE } from '@blog/config';
+import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { SIGNUP_BLOCK_REFUSAL } from '@platform/constants/signup-block';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
 import { removeBlockedIdentityAction } from '@platform/server/signup-block/remove-blocked-identity-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -22,11 +23,11 @@ export const RemoveBlockedIdentityControl = ({
   const { id, displayValue } = entry;
 
   const remove = async () => {
-    const result = await removeBlockedIdentityAction(id);
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) return okResult();
+    const result = await settleAction(removeBlockedIdentityAction(id));
+    if (isOutcomeSuccess(result)) return okResult();
 
     const isNotFound =
-      result.outcome === ACTION_OUTCOME.REFUSED &&
+      isOutcomeRefused(result) &&
       result.reason === SIGNUP_BLOCK_REFUSAL.ENTRY_NOT_FOUND;
     return errorResult(t(isNotFound ? 'alreadyRemoved' : 'removalFailed'));
   };

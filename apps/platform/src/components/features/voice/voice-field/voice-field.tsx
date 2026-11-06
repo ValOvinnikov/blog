@@ -9,9 +9,8 @@ import {
   type TVoiceFieldKind,
   type TVoicePortableText,
 } from '@blog/config';
+import { isString, isUndefined } from '@blog/utils/primitives';
 import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
-import { FieldResetButton } from '@platform/components/shared/field-reset-button';
-import { FieldStatus } from '@platform/components/shared/field-status';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { textVariants } from '@platform/components/shared/text/text-variants';
@@ -29,6 +28,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { VoiceFieldHeader } from './components/voice-field-header';
 import { voiceFieldVariants } from './voice-field-variants';
 
 export type TVoiceFieldProps = {
@@ -46,16 +46,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const tLabels = useTranslations('voiceFieldLabels');
   const tHints = useTranslations('voiceFieldHints');
   const [editorRevision, setEditorRevision] = useState(0);
-  const hasVisibleLabel = field.surface !== VOICE_SURFACE.ARCHIVE;
-  const {
-    root,
-    header,
-    status,
-    labelGroup,
-    label: labelSlot,
-    token,
-    error: errorSlot,
-  } = voiceFieldVariants({ hasVisibleLabel });
+  const { root, note, token, error: errorSlot } = voiceFieldVariants();
 
   const hintId = `${inputId}-hint`;
   const noteId = `${inputId}-note`;
@@ -63,12 +54,12 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const label = tLabels(field.id);
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const isCustomised = isVoiceValueCustomised(value);
-  const textValue = typeof value === 'string' ? value : '';
+  const textValue = isString(value) ? value : '';
   const [placeholderToken] = field.placeholders;
   const richDescribedBy = joinIds(
     archivedDescribedBy,
     hintId,
-    placeholderToken !== undefined && noteId,
+    !isUndefined(placeholderToken) && noteId,
     error && errorId,
   );
 
@@ -79,29 +70,16 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
 
   return (
     <Field.Root className={root()} invalid={Boolean(error)}>
-      <div className={header()}>
-        <div className={labelGroup()}>
-          {isRich ? (
-            hasVisibleLabel && <span className={labelSlot()}>{label}</span>
-          ) : (
-            <Field.Label className={labelSlot()}>{label}</Field.Label>
-          )}
-          <Field.Description
-            id={hintId}
-            render={<span />}
-            className={textVariants({ variant: 'hint' })}
-          >
-            {tHints(field.id)}
-          </Field.Description>
-        </div>
-        <div className={status()}>
-          <FieldStatus
-            isCustomised={isCustomised}
-            isUnsaved={!isSameJson(value, savedValue)}
-          />
-          {isCustomised && !isReadOnly && <FieldResetButton onReset={reset} />}
-        </div>
-      </div>
+      <VoiceFieldHeader
+        label={label}
+        hint={tHints(field.id)}
+        hintId={hintId}
+        isRich={isRich}
+        isInListRow={field.surface === VOICE_SURFACE.ARCHIVE}
+        isCustomised={isCustomised}
+        isUnsaved={!isSameJson(value, savedValue)}
+        onReset={isCustomised && !isReadOnly ? reset : undefined}
+      />
       {isRich ? (
         <PortableTextEditor<TVoicePortableText[number]>
           key={editorRevision}
@@ -144,11 +122,11 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
           )}
         </FormFieldControlProvider>
       )}
-      {placeholderToken !== undefined && (
+      {!isUndefined(placeholderToken) && (
         <Field.Description
           id={noteId}
           render={<span />}
-          className={textVariants({ variant: 'hint' })}
+          className={textVariants({ variant: 'hint', class: note() })}
         >
           {t.rich('keepPlaceholder', {
             token: `{${placeholderToken}}`,

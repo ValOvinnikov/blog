@@ -1,13 +1,15 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
   ALERT_TYPE,
+  isOutcomeInvalid,
+  isOutcomeSuccess,
   SIZE,
   type TFieldErrors,
   type TMaybeUndefined,
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { FormField } from '@platform/components/shared/form-field';
@@ -19,6 +21,7 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TReleaseFieldError } from '@platform/constants/release';
 import { startReleaseAction } from '@platform/server/releases/start-release-action';
 import type { TReleaseMigrationSummary } from '@platform/server/releases/summarise-release-migrations';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -57,18 +60,20 @@ export const StartReleaseDialog = ({
   const handleConfirm = async () => {
     const startedAt = Date.now();
     setFieldErrors({});
-    const result = await startReleaseAction({
-      version,
-      overrideReason: isOverrideRequired ? overrideReason : undefined,
-    });
+    const result = await settleAction(
+      startReleaseAction({
+        version,
+        overrideReason: isOverrideRequired ? overrideReason : undefined,
+      }),
+    );
 
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+    if (isOutcomeSuccess(result)) {
       onStarted(startedAt);
       return okResult();
     }
     if (
-      result.outcome === ACTION_OUTCOME.INVALID &&
-      Object.keys(result.fieldErrors).length > 0
+      isOutcomeInvalid(result) &&
+      hasArrayGotItems(Object.keys(result.fieldErrors))
     ) {
       setFieldErrors(result.fieldErrors);
       return errorResult();

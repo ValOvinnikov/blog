@@ -3,7 +3,6 @@ import {
   type TLanguageSwitcherStyle,
 } from '@blog/config';
 import { LOOK_FIELD } from '@blog/db/constants';
-import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -38,8 +37,12 @@ export const LanguageSwitcherCard = ({
   );
   const isStylePlanLocked = isPlanLocked(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
 
-  const languageSwitcherOptions = toOptions(LANGUAGE_SWITCHER_STYLE, (style) =>
-    t(`languageSwitcherOptionLabel.${style}`),
+  const languageSwitcherOptions = Object.values(LANGUAGE_SWITCHER_STYLE).map(
+    (style) => ({
+      value: style,
+      label: t(`languageSwitcherOptionLabel.${style}`),
+      description: t(`languageSwitcherOptionDescription.${style}`),
+    }),
   );
   const description = t('languageSwitcherDescription');
 

@@ -57,7 +57,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(badge).toBeVisible();
     });
 
-    it('says why the card is quiet and shows the style locked at Menu with code', async () => {
+    it('says why the card is quiet and shows the style locked at Code', async () => {
       await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
 
       const freeLine = screen.getByText(

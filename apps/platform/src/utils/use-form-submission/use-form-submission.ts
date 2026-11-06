@@ -1,12 +1,13 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
   FORM_STATUS,
+  isOutcomeSuccess,
   type TActionOutcome,
   type TFormStatus,
   type TOutcome,
 } from '@blog/config';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import {
   useState,
   useTransition,
@@ -55,20 +56,15 @@ export const useFormSubmission = <
   const handleSubmit = () =>
     new Promise<boolean>((resolve) => {
       startTransition(async () => {
-        let result: TResult;
-        try {
-          result = await onSubmit(values);
-        } catch {
+        const result = await settleAction(onSubmit(values));
+        if (!isOutcomeSuccess(result)) {
           setStatus(FORM_STATUS.ERROR);
           resolve(false);
           return;
         }
-        const isSuccess = result.outcome === ACTION_OUTCOME.SUCCESS;
-        setStatus(isSuccess ? FORM_STATUS.SUCCESS : FORM_STATUS.ERROR);
-        if (isSuccess) {
-          onSuccess?.(values, result);
-        }
-        resolve(isSuccess);
+        setStatus(FORM_STATUS.SUCCESS);
+        onSuccess?.(values, result);
+        resolve(true);
       });
     });
 

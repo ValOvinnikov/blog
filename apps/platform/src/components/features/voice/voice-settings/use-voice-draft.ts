@@ -109,6 +109,7 @@ export const useVoiceDraft = ({
       return result;
     },
     onSuccess: () => {
+      setRevision((current) => current + 1);
       toast.success({ message: t('alertSuccess') });
       router.refresh();
     },

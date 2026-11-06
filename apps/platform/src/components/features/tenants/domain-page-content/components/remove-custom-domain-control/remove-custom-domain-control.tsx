@@ -7,6 +7,7 @@ import { domainNameTag } from '@platform/components/features/tenants/domain-page
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { removeCustomDomainAction } from '@platform/server/custom-domain/remove-custom-domain-action';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -26,7 +27,9 @@ export const RemoveCustomDomainControl = ({
   const { requestFocus } = useCustomDomainFocus();
 
   const confirm = async () => {
-    const result = await removeCustomDomainAction(tenantId, { domain });
+    const result = await settleAction(
+      removeCustomDomainAction(tenantId, { domain }),
+    );
 
     switch (result.outcome) {
       case ACTION_OUTCOME.SUCCESS:

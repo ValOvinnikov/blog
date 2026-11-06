@@ -1,7 +1,9 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
+  isOutcomeInvalid,
+  isOutcomeRefused,
+  isOutcomeServerError,
   type TFieldErrors,
   type TMaybeNull,
 } from '@blog/config';
@@ -11,6 +13,7 @@ import {
   type TOwnerInviteConfirmation,
 } from '@platform/server/tenants/create-tenant-action';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useState, useTransition } from 'react';
 
 type TCreateTenantValues = Omit<TCreateTenantInput, 'confirmOwnerInviteToken'>;
@@ -29,16 +32,16 @@ export const useCreateTenantSubmit = () => {
     setFieldErrors({});
 
     startTransition(async () => {
-      const result = await createTenantAction({
-        ...values,
-        confirmOwnerInviteToken: ownerInviteConfirmation?.token,
-      });
-      setFieldErrors(
-        result.outcome === ACTION_OUTCOME.INVALID ? result.fieldErrors : {},
+      const result = await settleAction(
+        createTenantAction({
+          ...values,
+          confirmOwnerInviteToken: ownerInviteConfirmation?.token,
+        }),
       );
-      setIsCreateFailed(result.outcome === ACTION_OUTCOME.SERVER_ERROR);
+      setFieldErrors(isOutcomeInvalid(result) ? result.fieldErrors : {});
+      setIsCreateFailed(isOutcomeServerError(result));
       setOwnerInviteConfirmation(
-        result.outcome === ACTION_OUTCOME.REFUSED
+        isOutcomeRefused(result)
           ? { email: result.email, token: result.token }
           : null,
       );
