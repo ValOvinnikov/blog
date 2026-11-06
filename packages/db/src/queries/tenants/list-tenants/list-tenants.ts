@@ -3,7 +3,11 @@ import {
   TENANT_SORT_COLUMN,
   type TTenantSortColumn,
 } from '@blog/config/constants';
-import type { TColumnSort, TMaybeUndefined } from '@blog/config/types';
+import type {
+  TColumnSort,
+  TMaybeNull,
+  TMaybeUndefined,
+} from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
@@ -13,9 +17,11 @@ import {
   desc,
   eq,
   exists,
+  getTableColumns,
   ilike,
   isNull,
   or,
+  sql,
   type SQL,
 } from 'drizzle-orm';
 
@@ -26,6 +32,8 @@ export type TListTenantsOptions = {
   sort?: TTenantSort;
   search?: string;
 };
+
+export type TListedTenant = TTenant & { matchedDomain?: string };
 
 const SORT_COLUMNS = {
   [TENANT_SORT_COLUMN.NAME]: tenants.name,
@@ -39,12 +47,11 @@ const DEFAULT_SORT: TTenantSort = {
   direction: SORT_DIRECTION.ASCENDING,
 };
 
-function escapeLikePattern(value: string): string {
-  return value.replace(/[\\%_]/g, (character) => `\\${character}`);
+function toLikePattern(search: string): string {
+  return `%${search.replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
 }
 
-function matchesSearch(search: string): TMaybeUndefined<SQL> {
-  const pattern = `%${escapeLikePattern(search)}%`;
+function matchesSearch(pattern: string): TMaybeUndefined<SQL> {
   const matchingDomain = getDb()
     .select({ id: tenantDomains.id })
     .from(tenantDomains)
@@ -62,21 +69,39 @@ function matchesSearch(search: string): TMaybeUndefined<SQL> {
   );
 }
 
+function matchedExtraDomain(pattern: string): SQL<TMaybeNull<string>> {
+  return sql<TMaybeNull<string>>`case
+    when ${ilike(tenants.name, pattern)} or ${ilike(tenants.primaryDomain, pattern)} then null
+    else (
+      select ${tenantDomains.domain} from ${tenantDomains}
+      where ${eq(tenantDomains.tenantId, tenants.id)} and ${ilike(tenantDomains.domain, pattern)}
+      order by ${tenantDomains.domain}
+      limit 1
+    )
+  end`;
+}
+
 export async function listTenants({
   includeArchived = false,
   sort = DEFAULT_SORT,
   search = '',
-}: TListTenantsOptions = {}): Promise<TTenant[]> {
+}: TListTenantsOptions = {}): Promise<TListedTenant[]> {
   const order = sort.direction === SORT_DIRECTION.ASCENDING ? asc : desc;
   const trimmedSearch = search.trim();
+  const pattern = toLikePattern(trimmedSearch);
 
-  return getDb()
-    .select()
+  const rows = await getDb()
+    .select({
+      ...getTableColumns(tenants),
+      matchedDomain: trimmedSearch
+        ? matchedExtraDomain(pattern)
+        : sql<TMaybeNull<string>>`null`,
+    })
     .from(tenants)
     .where(
       and(
         includeArchived ? undefined : isNull(tenants.deprovisionedAt),
-        trimmedSearch ? matchesSearch(trimmedSearch) : undefined,
+        trimmedSearch ? matchesSearch(pattern) : undefined,
       ),
     )
     .orderBy(
@@ -84,4 +109,9 @@ export async function listTenants({
       asc(tenants.name),
       asc(tenants.id),
     );
+
+  return rows.map(({ matchedDomain, ...tenant }) => ({
+    ...tenant,
+    matchedDomain: matchedDomain ?? undefined,
+  }));
 }
