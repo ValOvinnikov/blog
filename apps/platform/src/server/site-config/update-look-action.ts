@@ -37,8 +37,8 @@ import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
-import { blankToNull } from '@platform/utils/email-draft/email-draft';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {

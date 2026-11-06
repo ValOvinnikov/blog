@@ -3,7 +3,7 @@ import { BrandAssetField } from '@platform/components/features/look/brand-asset-
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { FormField } from '@platform/components/shared/form-field';
+import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
@@ -51,7 +51,8 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
       card={LOOK_ROW.BRAND}
       description={t('brandImagesDescription')}
     >
-      <FormField
+      <LookField
+        field="brandName"
         label={t('brandNameLabel')}
         hint={t('brandNameHint')}
         error={
@@ -59,18 +60,19 @@ export const BrandCard = ({ summary }: TBrandCardProps) => {
             ? t('brandNameTooLong', { max: BRAND_NAME_MAX_LENGTH })
             : undefined
         }
-        control={{
-          id: brandNameFieldId,
-          isDisabled: isArchived,
-          describedBy: archivedDescribedBy,
-        }}
+        isDisabled={isArchived}
       >
-        <TextInput
-          placeholder={tenantName}
-          value={brandName}
-          onChange={(value) => updateField('brandName', value)}
-        />
-      </FormField>
+        <FormFieldControlProvider
+          id={brandNameFieldId}
+          describedBy={archivedDescribedBy}
+        >
+          <TextInput
+            placeholder={tenantName}
+            value={brandName}
+            onChange={(value) => updateField('brandName', value)}
+          />
+        </FormFieldControlProvider>
+      </LookField>
       <p id={hintId} className={brandCardVariants()}>
         {t('brandFieldsHint')}
       </p>

@@ -10,7 +10,10 @@ import {
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupArchived,
+  setupLookForm,
+} from '@platform/testing/look/look-form-setup';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -32,6 +35,8 @@ const BRAND_NAME_TOO_LONG = LOOK_FORM.brandNameTooLong.replace(
   '{max}',
   String(BRAND_NAME_MAX_LENGTH),
 );
+
+const UNSAVED_BRAND_NAME = `${LOOK_FORM.brandNameLabel} ${LOOK_FORM.fieldUnsavedLabel}`;
 
 const brandNameInput = () =>
   screen.getByRole('textbox', {
@@ -65,6 +70,15 @@ describe(`<${LookForm.name}/>`, () => {
       expect(previewHeader()).not.toHaveTextContent(MOCK_TENANT_NAME);
     });
 
+    it('marks the field with an unsaved dot once it differs from the saved name', async () => {
+      await user.type(brandNameInput(), MOCK_BRAND_NAME);
+
+      const unsavedInput = screen.getByRole('textbox', {
+        name: UNSAVED_BRAND_NAME,
+      });
+      expect(unsavedInput).toHaveValue(MOCK_BRAND_NAME);
+    });
+
     it('saves the brand name with the rest of the Look', async () => {
       await user.type(brandNameInput(), MOCK_BRAND_NAME);
 
@@ -90,6 +104,19 @@ describe(`<${LookForm.name}/>`, () => {
 
         expect(updateLookAction).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('on an archived site', () => {
+    beforeEach(async () => {
+      setupArchived();
+      await openLookRow(user, LOOK_ROW.BRAND);
+    });
+
+    it('disables the field', () => {
+      const input = brandNameInput();
+
+      expect(input).toBeDisabled();
     });
   });
 
