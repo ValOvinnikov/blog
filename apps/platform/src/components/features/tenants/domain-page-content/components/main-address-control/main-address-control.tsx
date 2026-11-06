@@ -9,6 +9,7 @@ import {
 import { errorResult, okResult } from '@blog/utils';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import { domainNameTag } from '@platform/components/features/tenants/domain-page-content/components/domain-name/domain-name';
+import { MainAddressSignInAppsWarning } from '@platform/components/features/tenants/domain-page-content/components/main-address-sign-in-apps-warning/main-address-sign-in-apps-warning';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
@@ -82,7 +83,9 @@ export const MainAddressControl = ({
         })}
         confirmButtonLabel={t(`mainAddress.${copyKey}.confirm`)}
         confirmingButtonLabel={t(`mainAddress.${copyKey}.confirming`)}
-      />
+      >
+        <MainAddressSignInAppsWarning />
+      </ConfirmDialog.Content>
     </ConfirmDialog>
   );
 };

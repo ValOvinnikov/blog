@@ -23,6 +23,7 @@ export const dashboardNavSections = (
     leads: adminRoutes.dashboardLeads(),
     languages: adminRoutes.dashboardLanguages(),
     domain: adminRoutes.dashboardDomain(),
+    signIn: adminRoutes.dashboardSignIn(),
     email: adminRoutes.dashboardEmail(),
     studio: adminRoutes.dashboardStudio(),
   };

@@ -14,6 +14,7 @@
     "tenantProvisioning": "Bereitstellung · Admin",
     "tenantDanger": "Gefahrenzone · Admin",
     "tenantDomain": "Domain · Admin",
+    "signInApps": "Anmeldung · Admin",
     "features": "Funktionen · Admin",
     "languages": "Sprachen · Admin",
     "studio": "Studio · Admin",
@@ -217,6 +218,7 @@
     "voice": "Tonalität",
     "languages": "Sprachen",
     "domain": "Domain",
+    "signIn": "Anmeldung",
     "studio": "Studio",
     "email": "E-Mail",
     "subscribers": "Abonnenten",
@@ -568,9 +570,73 @@
           "description": "Deine Website ist dann wieder unter deiner Subdomain erreichbar. <domainName>{domain}</domainName> bleibt verbunden.",
           "confirm": "Subdomain verwenden",
           "confirming": "Wechseln …"
-        }
+        },
+        "signInAppsWarningOne": "Deine {provider}-Anmelde-App nutzt deine Hauptadresse. Füge ihr die neue Callback-Adresse hinzu, sonst können Leser sich damit nicht anmelden.",
+        "signInAppsWarningMany": "Deine {providers}-Anmelde-Apps nutzen deine Hauptadresse. Füge ihnen die neuen Callback-Adressen hinzu, sonst können Leser sich mit diesen Apps nicht anmelden."
       }
     }
+  },
+  "signInAppsPage": {
+    "pageTitle": "Anmeldung",
+    "description": "Lass Leser über deine eigenen Google- und GitHub-Apps anmelden, damit sie den Namen deiner Website statt unseres sehen.",
+    "providerName": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "sharedDescription": "Leser sehen auf dem Anmeldebildschirm von {provider} unseren App-Namen.",
+    "ownDescription": "Leser sehen auf dem Anmeldebildschirm von {provider} den Namen deiner App.",
+    "sharedStatus": "Gemeinsame App",
+    "ownStatus": "Deine eigene App",
+    "callbackLabel": "Callback-Adresse",
+    "callbackHint": "Füge genau diese Adresse in deiner {provider}-App hinzu.",
+    "copy": "Kopieren",
+    "copied": "Kopiert",
+    "copyFailed": "Kopieren fehlgeschlagen. Markiere den Text stattdessen.",
+    "consoleLink": {
+      "google": "Google Cloud Console öffnen",
+      "github": "GitHub-Entwicklereinstellungen öffnen"
+    },
+    "clientIdLabel": "Client-ID",
+    "clientIdHint": "Aus deiner {provider}-App.",
+    "clientSecretLabel": "Client-Secret",
+    "clientSecretHint": "Beim Speichern verschlüsselt. Wird nie wieder angezeigt.",
+    "secretSet": "Festgelegt",
+    "secretNotSet": "Nicht festgelegt",
+    "replace": "Ersetzen",
+    "cancel": "Abbrechen",
+    "showClientId": "Client-ID anzeigen",
+    "hideClientId": "Client-ID ausblenden",
+    "showClientSecret": "Client-Secret anzeigen",
+    "hideClientSecret": "Client-Secret ausblenden",
+    "save": "{provider} speichern",
+    "saving": "Wird gespeichert…",
+    "remove": "Entfernen",
+    "saved": "{provider}-App gespeichert.",
+    "fieldError": {
+      "clientIdRequired": "Gib die Client-ID ein.",
+      "clientSecretRequired": "Gib das Client-Secret ein."
+    },
+    "saveFailed": "Speichern fehlgeschlagen – versuch es noch einmal.",
+    "refusal": {
+      "ARCHIVED": "Diese Website ist archiviert, daher können ihre Anmelde-Apps nicht geändert werden.",
+      "NOT_ON_PLAN": "Eigene Anmelde-Apps gibt es mit Growth.",
+      "NO_SAVED_APP": "Diese App wurde bereits entfernt. Lade die Seite neu."
+    },
+    "removeDialog": {
+      "title": "Deine {provider}-App entfernen?",
+      "description": "Leser sehen auf dem Anmeldebildschirm von {provider} wieder unseren App-Namen. Deine Client-ID und dein Secret werden gelöscht.",
+      "confirm": "App entfernen",
+      "confirming": "Wird entfernt…",
+      "failed": "Entfernen fehlgeschlagen – versuch es noch einmal."
+    },
+    "archivedNotice": "Diese Website ist archiviert, daher können ihre Anmelde-Apps nicht geändert werden.",
+    "notOwnerNotice": "Nur der Inhaber der Website kann Anmelde-Apps ändern.",
+    "keptOnGrowth": "Deine gespeicherte App bleibt erhalten. Mit Growth ist sie wieder da.",
+    "growthNoteTitle": "Mehr Optionen mit Growth",
+    "growthNoteDescription": "Mit <badge></badge> markierte Optionen auf dieser Seite gibt es im Growth-Tarif.",
+    "callbackWarning": "Deine Hauptadresse ist jetzt {domain}. Füge die neue Callback-Adresse in deiner {provider}-App hinzu, sonst können Leser sich nicht mit {provider} anmelden.",
+    "callbackConfirm": "Erledigt",
+    "callbackConfirmFailed": "Speichern fehlgeschlagen – versuch es noch einmal."
   },
   "presetPicker": {
     "ariaLabel": "Vorlage",

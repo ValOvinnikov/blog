@@ -14,6 +14,7 @@
     "tenantProvisioning": "Inrichting · Admin",
     "tenantDanger": "Gevarenzone · Admin",
     "tenantDomain": "Domein · Admin",
+    "signInApps": "Inloggen · Admin",
     "features": "Functies · Admin",
     "languages": "Talen · Admin",
     "studio": "Studio · Admin",
@@ -217,6 +218,7 @@
     "voice": "Toon",
     "languages": "Talen",
     "domain": "Domein",
+    "signIn": "Inloggen",
     "studio": "Studio",
     "email": "E-mail",
     "subscribers": "Abonnees",
@@ -568,9 +570,73 @@
           "description": "Je site is dan weer bekend onder je subdomein. <domainName>{domain}</domainName> blijft gekoppeld.",
           "confirm": "Gebruik subdomein",
           "confirming": "Wijzigen…"
-        }
+        },
+        "signInAppsWarningOne": "Je {provider}-inlog-app gebruikt je hoofdadres. Voeg het nieuwe callback-adres eraan toe, anders kunnen lezers er niet mee inloggen.",
+        "signInAppsWarningMany": "Je {providers}-inlog-apps gebruiken je hoofdadres. Voeg de nieuwe callback-adressen eraan toe, anders kunnen lezers niet inloggen met die apps."
       }
     }
+  },
+  "signInAppsPage": {
+    "pageTitle": "Inloggen",
+    "description": "Laat lezers inloggen via je eigen Google- en GitHub-apps, zodat ze de naam van je site zien in plaats van de onze.",
+    "providerName": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "sharedDescription": "Lezers zien de naam van onze app op het inlogscherm van {provider}.",
+    "ownDescription": "Lezers zien de naam van jouw app op het inlogscherm van {provider}.",
+    "sharedStatus": "Gedeelde app",
+    "ownStatus": "Je eigen app",
+    "callbackLabel": "Callback-adres",
+    "callbackHint": "Voeg precies dit adres toe aan je {provider}-app.",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "copyFailed": "Kopiëren mislukt. Selecteer de tekst.",
+    "consoleLink": {
+      "google": "Google Cloud-console openen",
+      "github": "GitHub-ontwikkelaarsinstellingen openen"
+    },
+    "clientIdLabel": "Client-ID",
+    "clientIdHint": "Uit je {provider}-app.",
+    "clientSecretLabel": "Clientgeheim",
+    "clientSecretHint": "Versleuteld bij opslaan. Nooit meer getoond.",
+    "secretSet": "Ingesteld",
+    "secretNotSet": "Niet ingesteld",
+    "replace": "Vervangen",
+    "cancel": "Annuleren",
+    "showClientId": "Client-ID tonen",
+    "hideClientId": "Client-ID verbergen",
+    "showClientSecret": "Clientgeheim tonen",
+    "hideClientSecret": "Clientgeheim verbergen",
+    "save": "{provider} opslaan",
+    "saving": "Opslaan…",
+    "remove": "Verwijderen",
+    "saved": "{provider}-app opgeslagen.",
+    "fieldError": {
+      "clientIdRequired": "Vul de client-ID in.",
+      "clientSecretRequired": "Vul het clientgeheim in."
+    },
+    "saveFailed": "Opslaan mislukt. Probeer het opnieuw.",
+    "refusal": {
+      "ARCHIVED": "Deze site is gearchiveerd, dus de inlog-apps kunnen niet worden gewijzigd.",
+      "NOT_ON_PLAN": "Eigen inlog-apps horen bij Growth.",
+      "NO_SAVED_APP": "Deze app is al verwijderd. Laad de pagina opnieuw."
+    },
+    "removeDialog": {
+      "title": "Je {provider}-app verwijderen?",
+      "description": "Lezers zien weer de naam van onze app op het inlogscherm van {provider}. Je client-ID en geheim worden verwijderd.",
+      "confirm": "App verwijderen",
+      "confirming": "Verwijderen…",
+      "failed": "Verwijderen mislukt. Probeer het opnieuw."
+    },
+    "archivedNotice": "Deze site is gearchiveerd, dus de inlog-apps kunnen niet worden gewijzigd.",
+    "notOwnerNotice": "Alleen de eigenaar van de site kan inlog-apps wijzigen.",
+    "keptOnGrowth": "Je opgeslagen app blijft bewaard. Met Growth komt hij terug.",
+    "growthNoteTitle": "Meer opties met Growth",
+    "growthNoteDescription": "Opties met <badge></badge> op deze pagina komen beschikbaar met het Growth-abonnement.",
+    "callbackWarning": "Je hoofdadres is nu {domain}. Voeg het nieuwe callback-adres toe aan je {provider}-app, anders kunnen lezers niet inloggen met {provider}.",
+    "callbackConfirm": "Toegevoegd",
+    "callbackConfirmFailed": "Opslaan mislukt. Probeer het opnieuw."
   },
   "presetPicker": {
     "ariaLabel": "Voorinstelling",

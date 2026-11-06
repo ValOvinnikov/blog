@@ -14,6 +14,7 @@
     "tenantProvisioning": "Aprovisionamiento · Administración",
     "tenantDanger": "Zona de peligro · Administración",
     "tenantDomain": "Dominio · Administración",
+    "signInApps": "Inicio de sesión · Admin",
     "features": "Funciones · Administración",
     "languages": "Idiomas · Administración",
     "studio": "Studio · Administración",
@@ -217,6 +218,7 @@
     "voice": "Voz",
     "languages": "Idiomas",
     "domain": "Dominio",
+    "signIn": "Inicio de sesión",
     "studio": "Studio",
     "email": "Correo electrónico",
     "subscribers": "Suscriptores",
@@ -568,9 +570,73 @@
           "description": "Tu sitio volverá a conocerse por tu subdominio. <domainName>{domain}</domainName> sigue conectado.",
           "confirm": "Usar subdominio",
           "confirming": "Cambiando…"
-        }
+        },
+        "signInAppsWarningOne": "Tu app de inicio de sesión de {provider} usa tu dirección principal. Añádele la nueva dirección de callback o los lectores no podrán iniciar sesión con ella.",
+        "signInAppsWarningMany": "Tus apps de inicio de sesión de {providers} usan tu dirección principal. Añádeles las nuevas direcciones de callback o los lectores no podrán iniciar sesión con esas apps."
       }
     }
+  },
+  "signInAppsPage": {
+    "pageTitle": "Inicio de sesión",
+    "description": "Permite que los lectores inicien sesión con tus propias apps de Google y GitHub, para que vean el nombre de tu sitio en lugar del nuestro.",
+    "providerName": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "sharedDescription": "Los lectores ven el nombre de nuestra app en la pantalla de inicio de sesión de {provider}.",
+    "ownDescription": "Los lectores ven el nombre de tu app en la pantalla de inicio de sesión de {provider}.",
+    "sharedStatus": "App compartida",
+    "ownStatus": "Tu propia app",
+    "callbackLabel": "Dirección de callback",
+    "callbackHint": "Añade exactamente esta dirección a tu app de {provider}.",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "copyFailed": "No se pudo copiar. Selecciona el texto.",
+    "consoleLink": {
+      "google": "Abrir la consola de Google Cloud",
+      "github": "Abrir los ajustes de desarrollador de GitHub"
+    },
+    "clientIdLabel": "ID de cliente",
+    "clientIdHint": "De tu app de {provider}.",
+    "clientSecretLabel": "Secreto de cliente",
+    "clientSecretHint": "Se cifra al guardarlo. No se vuelve a mostrar.",
+    "secretSet": "Configurado",
+    "secretNotSet": "Sin configurar",
+    "replace": "Sustituir",
+    "cancel": "Cancelar",
+    "showClientId": "Mostrar el ID de cliente",
+    "hideClientId": "Ocultar el ID de cliente",
+    "showClientSecret": "Mostrar el secreto de cliente",
+    "hideClientSecret": "Ocultar el secreto de cliente",
+    "save": "Guardar {provider}",
+    "saving": "Guardando…",
+    "remove": "Eliminar",
+    "saved": "App de {provider} guardada.",
+    "fieldError": {
+      "clientIdRequired": "Introduce el ID de cliente.",
+      "clientSecretRequired": "Introduce el secreto de cliente."
+    },
+    "saveFailed": "No se pudo guardar. Inténtalo de nuevo.",
+    "refusal": {
+      "ARCHIVED": "Este sitio está archivado, así que sus apps de inicio de sesión no se pueden cambiar.",
+      "NOT_ON_PLAN": "Tus propias apps de inicio de sesión vienen con Growth.",
+      "NO_SAVED_APP": "Esta app ya se eliminó. Vuelve a cargar la página."
+    },
+    "removeDialog": {
+      "title": "¿Eliminar tu app de {provider}?",
+      "description": "Los lectores volverán a ver el nombre de nuestra app en la pantalla de inicio de sesión de {provider}. Tu ID de cliente y tu secreto se borran.",
+      "confirm": "Eliminar app",
+      "confirming": "Eliminando…",
+      "failed": "No se pudo eliminar. Inténtalo de nuevo."
+    },
+    "archivedNotice": "Este sitio está archivado, así que sus apps de inicio de sesión no se pueden cambiar.",
+    "notOwnerNotice": "Solo el propietario del sitio puede cambiar las apps de inicio de sesión.",
+    "keptOnGrowth": "Tu app guardada se conserva. Vuelve con Growth.",
+    "growthNoteTitle": "Más opciones con Growth",
+    "growthNoteDescription": "Las opciones marcadas con <badge></badge> en esta página se activan con el plan Growth.",
+    "callbackWarning": "Tu dirección principal ahora es {domain}. Añade la nueva dirección de callback a tu app de {provider} o los lectores no podrán iniciar sesión con {provider}.",
+    "callbackConfirm": "Ya la añadí",
+    "callbackConfirmFailed": "No se pudo guardar. Inténtalo de nuevo."
   },
   "presetPicker": {
     "ariaLabel": "Ajuste predefinido",

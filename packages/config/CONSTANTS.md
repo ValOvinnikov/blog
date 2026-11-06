@@ -28,7 +28,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/audit.ts`
 
 - **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -127,7 +127,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/icon.ts`
 
-- **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `SELECT_CHEVRON`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`, `UNFOLD`, `TICK`, `SIDEBAR`, `MONITOR`, `TABLET`, `USER_CHECK`, `CROSSHAIR`, `MAXIMIZE`, `PAUSE`, `UPLOAD`
+- **ICONS**: `SUN`, `MOON`, `HOUSE`, `SHARE`, `COPY`, `CHECK`, `CHECK_SHEET`, `EXTERNAL_LINK`, `MENU`, `MENU_ROWS`, `CLOSE`, `X`, `GITHUB`, `LINKEDIN`, `FACEBOOK`, `YOUTUBE`, `INSTAGRAM`, `MASTODON`, `BLUESKY`, `THREADS`, `RSS`, `ARROW_UP`, `GOOGLE`, `BOOKMARK`, `SPINNER`, `WARNING`, `INFO`, `SETTINGS`, `POWER`, `MAIL`, `CHEVRON_RIGHT`, `CHEVRON_LEFT`, `CHEVRON_DOWN`, `CHEVRON_UP`, `SELECT_CHEVRON`, `ARROW`, `SHIELD_CHECK`, `GRID`, `PLUS`, `PALETTE`, `QUOTE`, `GLOBE`, `STUDIO`, `COMMENT`, `USER`, `USERS`, `CODE`, `LAYERS`, `ZAP`, `SEARCH`, `CHART`, `CLOCK`, `WRENCH`, `ROCKET`, `BOOK`, `PEN`, `STAR`, `LOCK`, `CLOUD`, `CPU`, `TARGET`, `HEART`, `CAMERA`, `LIGHTBULB`, `MAP_PIN`, `PHONE`, `TRENDING_UP`, `SMILE`, `BOLD`, `ITALIC`, `LINK`, `SEND`, `COOKIE`, `UNFOLD`, `TICK`, `SIDEBAR`, `MONITOR`, `TABLET`, `USER_CHECK`, `CROSSHAIR`, `MAXIMIZE`, `PAUSE`, `UPLOAD`, `EYE`, `EYE_OFF`
 
 ### `@blog/config/constants` — `packages/config/src/constants/image-layout.ts`
 
@@ -555,6 +555,14 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/settings` — `apps/platform/src/constants/settings.ts`
 
 - **SETTINGS_REFUSAL**: `NOT_IN_PLAN`, `NOT_FOUND`, `LOCALE_NOT_LIVE`
+
+### `@platform/constants/sign-in-apps` — `apps/platform/src/constants/sign-in-apps.ts`
+
+- **SIGN_IN_APP_FIELD_ERROR**: `REQUIRED`
+- **SIGN_IN_APP_REFUSAL**: `NOT_ON_PLAN`, `NO_SAVED_APP`
+- **SIGN_IN_APP_LOG**: `SAVE_FAILED`=`"sign_in_app.save_failed"`, `SAVE_AUDIT_FAILED`=`"sign_in_app.save_audit_failed"`, `REMOVE_FAILED`=`"sign_in_app.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"sign_in_app.remove_audit_failed"`, `CONFIRM_CALLBACK_FAILED`=`"sign_in_app.confirm_callback_failed"`
+- **SIGN_IN_APPS_MODE**: `EDIT`, `READ_ONLY`, `OPERATOR`, `FREE`
+- **SIGN_IN_APPS_NOTICE**: `ARCHIVED`, `NOT_OWNER`
 
 ### `@platform/constants/sign-in` — `apps/platform/src/constants/sign-in.ts`
 

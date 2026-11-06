@@ -128,6 +128,7 @@ describe(tenantNavSections, () => {
     ['leads', adminRoutes.leads(MOCK_TENANT_ID)],
     ['languages', adminRoutes.languages(MOCK_TENANT_ID)],
     ['domain', adminRoutes.tenantDomain(MOCK_TENANT_ID)],
+    ['signIn', adminRoutes.tenantSignIn(MOCK_TENANT_ID)],
     ['email', adminRoutes.email(MOCK_TENANT_ID)],
   ])('links Configuration %s to the tenant page', (key, href) => {
     const item = itemKeyed(configuration, key);

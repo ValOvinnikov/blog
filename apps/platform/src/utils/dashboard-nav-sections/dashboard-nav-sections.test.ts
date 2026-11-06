@@ -105,6 +105,7 @@ describe(dashboardNavSections, () => {
     ['leads', adminRoutes.dashboardLeads()],
     ['languages', adminRoutes.dashboardLanguages()],
     ['domain', adminRoutes.dashboardDomain()],
+    ['signIn', adminRoutes.dashboardSignIn()],
     ['email', adminRoutes.dashboardEmail()],
   ])('links Configuration %s to its dashboard page', (key, href) => {
     const item = itemKeyed(configurationOfDashboard(), key);

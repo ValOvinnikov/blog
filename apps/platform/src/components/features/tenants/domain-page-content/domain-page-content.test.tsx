@@ -1,8 +1,10 @@
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { listOwnSignInAppProviders } from '@platform/server/sign-in-apps/list-own-sign-in-app-providers';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
   MOCK_CLAIM_TOKEN,
@@ -22,6 +24,7 @@ import {
   MOCK_TENANT_ROOT_DOMAIN,
 } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
+import userEvent from '@testing-library/user-event';
 
 import { DomainPageContent } from './domain-page-content';
 
@@ -31,6 +34,10 @@ vi.mock('@platform/server/provisioning/vercel-domains-api', () => ({
 
 vi.mock('@platform/utils/env/env');
 
+vi.mock('@platform/server/sign-in-apps/list-own-sign-in-app-providers', () => ({
+  listOwnSignInAppProviders: vi.fn(),
+}));
+
 vi.mock('@blog/db', () => ({
   queries: {
     tenantDomains: { listTenantDomains: vi.fn() },
@@ -38,7 +45,9 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-const { tenantDomainPage } = en;
+const { tenantDomainPage, signInAppsPage } = en;
+const { google: GOOGLE_NAME, github: GITHUB_NAME } =
+  signInAppsPage.providerName;
 const { ownDomain } = tenantDomainPage;
 const getProjectDomainMock = vi.mocked(getProjectDomain);
 const listTenantDomainsMock = vi.mocked(
@@ -47,6 +56,8 @@ const listTenantDomainsMock = vi.mocked(
 const getCustomDomainClaimMock = vi.mocked(
   queries.customDomainClaims.getCustomDomainClaim,
 );
+const listOwnSignInAppProvidersMock = vi.mocked(listOwnSignInAppProviders);
+const tMainAddress = makeEnTranslator('tenantDomainPage.ownDomain.mainAddress');
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const SUBDOMAIN_NOTE = makeEnTranslator('tenantDomainPage.ownDomain')(
   'subdomainStillWorks',
@@ -62,6 +73,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     getProjectDomainMock.mockReset();
     listTenantDomainsMock.mockReset().mockResolvedValue([]);
     getCustomDomainClaimMock.mockReset().mockResolvedValue(undefined);
+    listOwnSignInAppProvidersMock.mockReset().mockResolvedValue([]);
     delete envMock.TENANT_ROOT_DOMAIN;
     getProjectDomainMock.mockResolvedValue(mockPendingProjectDomain());
   });
@@ -238,6 +250,53 @@ describe(`<${DomainPageContent.name}/>`, () => {
       expect(getProjectDomainMock).toHaveBeenCalledExactlyOnceWith(
         MOCK_CUSTOM_DOMAIN,
       );
+    });
+
+    describe('switching the main address on a site with its own sign-in apps', () => {
+      const openSwitchBack = async () => {
+        const user = userEvent.setup();
+        await renderForOwner({ primaryDomain: MOCK_CUSTOM_DOMAIN });
+        const switchBack = await screen.findByRole('button', {
+          name: ownDomain.mainAddress.useSubdomain.trigger,
+        });
+        await user.click(switchBack);
+        return screen.findByRole('alertdialog');
+      };
+
+      it('warns in the confirmation, naming the one provider with an app', async () => {
+        listOwnSignInAppProvidersMock.mockResolvedValue([
+          OAUTH_PROVIDER.GOOGLE,
+        ]);
+
+        const dialog = await openSwitchBack();
+
+        expect(dialog).toHaveTextContent(
+          tMainAddress('signInAppsWarningOne', { provider: GOOGLE_NAME }),
+        );
+      });
+
+      it('names both providers when both have an app', async () => {
+        listOwnSignInAppProvidersMock.mockResolvedValue([
+          OAUTH_PROVIDER.GOOGLE,
+          OAUTH_PROVIDER.GITHUB,
+        ]);
+
+        const dialog = await openSwitchBack();
+
+        expect(dialog).toHaveTextContent(
+          tMainAddress('signInAppsWarningMany', {
+            providers: `${GOOGLE_NAME} and ${GITHUB_NAME}`,
+          }),
+        );
+      });
+
+      it('keeps the usual confirmation for a site with no app of its own', async () => {
+        const dialog = await openSwitchBack();
+        const warning = screen.queryByRole('note');
+
+        expect(dialog).toBeVisible();
+        expect(warning).not.toBeInTheDocument();
+      });
     });
 
     describe('with the subdomain and a custom domain connected', () => {
