@@ -57,7 +57,7 @@ describe(`<${LookForm.name}/>`, () => {
       expect(badge).toBeVisible();
     });
 
-    it('says why the card is quiet and shows the style locked at Code', async () => {
+    it('says why the card is quiet and shows the style locked at Code, described below', async () => {
       await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
 
       const freeLine = screen.getByText(
@@ -80,6 +80,11 @@ describe(`<${LookForm.name}/>`, () => {
       expect(singleLanguageNote).not.toBeInTheDocument();
       expect(menuCodeButton).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(codesButton).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(styleGroup).toHaveAccessibleDescription(
+        expect.stringContaining(
+          LOOK_FORM.languageSwitcherOptionDescription.MENU_CODE,
+        ),
+      );
     });
   });
 

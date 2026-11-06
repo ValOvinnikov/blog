@@ -4,6 +4,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const segmentedControlVariants = tv({
   slots: {
+    wrapper: ['flex w-full flex-col gap-1.5'],
     root: [
       'grid w-full grid-cols-2 gap-[6px]',
       'lg:inline-flex lg:w-auto lg:flex-wrap lg:items-center lg:gap-[2px] lg:self-start',
@@ -17,21 +18,11 @@ export const segmentedControlVariants = tv({
       'disabled:cursor-not-allowed',
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
-    optionLabel: ['text-admin-13 leading-[18px]'],
-    optionDescription: [
-      'text-admin-11-5 leading-4 font-normal text-admin-muted',
+    selectedDescription: [
+      'm-0 text-admin-12-5 leading-admin-18 text-admin-muted',
     ],
   },
   variants: {
-    hasDescriptions: {
-      true: {
-        root: ['lg:items-stretch'],
-        option: [
-          'flex-col items-start justify-center gap-[2px] py-[6px]',
-          'lg:h-auto lg:max-w-[146px] lg:justify-start lg:px-[10px] lg:text-left',
-        ],
-      },
-    },
     isLocked: {
       true: {
         root: ['lg:border-admin-control-line-locked'],
@@ -54,7 +45,6 @@ export const segmentedControlVariants = tv({
     },
   },
   defaultVariants: {
-    hasDescriptions: false,
     isLocked: false,
   },
 });

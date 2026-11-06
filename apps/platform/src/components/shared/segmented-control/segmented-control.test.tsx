@@ -17,6 +17,7 @@ const MOCK_SECOND_VALUE = faker.string.uuid();
 const MOCK_FIRST_LABEL = faker.lorem.words(2);
 const MOCK_SECOND_LABEL = faker.lorem.words(2);
 const MOCK_DESCRIPTION = faker.lorem.sentence();
+const MOCK_SECOND_DESCRIPTION = faker.lorem.sentence();
 const MOCK_HINT_ID = faker.string.alpha(8);
 const MOCK_HINT = faker.lorem.sentence();
 const MOCK_LABEL_ID = faker.string.alpha(8);
@@ -58,21 +59,82 @@ describe(`<${SegmentedControl.name}/>`, () => {
     expect(secondOption).toBeVisible();
   });
 
-  it('names an option by its label and describes it by its second line', () => {
+  it('describes the group by the selected option description, shown below the options', () => {
     setup({
       options: [
         { ...MOCK_FIRST_OPTION, description: MOCK_DESCRIPTION },
-        MOCK_SECOND_OPTION,
+        { ...MOCK_SECOND_OPTION, description: MOCK_SECOND_DESCRIPTION },
       ],
     });
 
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
     const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
-    const secondOption = screen.getByRole('button', {
-      name: MOCK_SECOND_LABEL,
+    const description = screen.getByText(MOCK_DESCRIPTION);
+    const secondDescription = screen.queryByText(MOCK_SECOND_DESCRIPTION);
+
+    expect(group).toHaveAccessibleDescription(MOCK_DESCRIPTION);
+    expect(description).toBeVisible();
+    expect(group).not.toContainElement(description);
+    expect(firstOption).not.toHaveAccessibleDescription();
+    expect(secondDescription).not.toBeInTheDocument();
+  });
+
+  it('follows the value to the newly selected option description', () => {
+    const renderControl = (value: string) => (
+      <SegmentedControl
+        aria={{ label: MOCK_GROUP_LABEL }}
+        options={[
+          { ...MOCK_FIRST_OPTION, description: MOCK_DESCRIPTION },
+          { ...MOCK_SECOND_OPTION, description: MOCK_SECOND_DESCRIPTION },
+        ]}
+        value={value}
+        onChange={vi.fn()}
+      />
+    );
+    const { rerender } = renderWithIntl(renderControl(MOCK_FIRST_VALUE));
+    rerender(renderControl(MOCK_SECOND_VALUE));
+
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
+
+    expect(group).toHaveAccessibleDescription(MOCK_SECOND_DESCRIPTION);
+  });
+
+  it('adds the selected option description after the description it is pointed at', () => {
+    renderWithIntl(
+      <div>
+        <span id={MOCK_HINT_ID}>{MOCK_HINT}</span>
+        <SegmentedControl
+          aria={{ label: MOCK_GROUP_LABEL, describedBy: MOCK_HINT_ID }}
+          options={[
+            { ...MOCK_FIRST_OPTION, description: MOCK_DESCRIPTION },
+            MOCK_SECOND_OPTION,
+          ]}
+          value={MOCK_FIRST_VALUE}
+          onChange={vi.fn()}
+        />
+      </div>,
+    );
+
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
+
+    expect(group).toHaveAccessibleDescription(
+      `${MOCK_HINT} ${MOCK_DESCRIPTION}`,
+    );
+  });
+
+  it('shows no description line when the selected option has none', () => {
+    setup({
+      options: [
+        MOCK_FIRST_OPTION,
+        { ...MOCK_SECOND_OPTION, description: MOCK_SECOND_DESCRIPTION },
+      ],
     });
 
-    expect(firstOption).toHaveAccessibleDescription(MOCK_DESCRIPTION);
-    expect(secondOption).not.toHaveAccessibleDescription();
+    const group = screen.getByRole('group', { name: MOCK_GROUP_LABEL });
+    const secondDescription = screen.queryByText(MOCK_SECOND_DESCRIPTION);
+
+    expect(group).not.toHaveAccessibleDescription();
+    expect(secondDescription).not.toBeInTheDocument();
   });
 
   it('describes the group by the element it is pointed at', () => {

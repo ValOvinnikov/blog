@@ -666,9 +666,9 @@
       "CODES": "Compacto"
     },
     "languageSwitcherOptionDescription": {
-      "MENU_CODE": "Un menú que muestra el código de idioma",
-      "MENU_GLOBE": "Un menú que muestra un icono de globo",
-      "CODES": "Todos los códigos de idioma en una fila"
+      "MENU_CODE": "El código del idioma actual abre un menú",
+      "MENU_GLOBE": "Un icono de globo abre el menú de idiomas",
+      "CODES": "Códigos de idioma uno al lado del otro, para pocos idiomas"
     },
     "colourHeading": "Color",
     "colourDescription": "Solo cambia el tono, para que el texto siga siendo legible.",

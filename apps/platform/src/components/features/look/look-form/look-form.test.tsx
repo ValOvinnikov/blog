@@ -128,15 +128,23 @@ describe(`<${LookForm.name}/>`, () => {
         );
       });
 
-      it('describes each header buttons option', () => {
-        const headerButtonsGroup = screen.getByRole('group', {
+      it('shows only labels in the header buttons tiles and describes the chosen one below', async () => {
+        const headerButtonsField = screen.getByRole('group', {
           name: LOOK_FORM.headerControlStyleLabel,
         });
-        const plainButton = within(headerButtonsGroup).getByRole('button', {
+        const plainButton = within(headerButtonsField).getByRole('button', {
           name: LOOK_FORM.headerControlStyleOptionLabel.PLAIN,
         });
+        await user.click(plainButton);
+        const toggleGroup = within(headerButtonsField).getByRole('group');
 
-        expect(plainButton).toHaveAccessibleDescription(
+        const tileDescription = within(plainButton).queryByText(
+          LOOK_FORM.headerControlStyleOptionDescription.PLAIN,
+        );
+
+        expect(tileDescription).not.toBeInTheDocument();
+        expect(plainButton).not.toHaveAccessibleDescription();
+        expect(toggleGroup).toHaveAccessibleDescription(
           LOOK_FORM.headerControlStyleOptionDescription.PLAIN,
         );
       });
@@ -147,15 +155,22 @@ describe(`<${LookForm.name}/>`, () => {
         await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
       });
 
-      it('describes each language switcher option', () => {
-        const styleGroup = screen.getByRole('group', {
+      it('describes the chosen language switcher option below the control', async () => {
+        const styleField = screen.getByRole('group', {
           name: LOOK_FORM.languageSwitcherStyleLabel,
         });
-        const globeButton = within(styleGroup).getByRole('button', {
+        const globeButton = within(styleField).getByRole('button', {
           name: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
         });
+        const toggleGroup = within(styleField).getByRole('group');
 
-        expect(globeButton).toHaveAccessibleDescription(
+        expect(toggleGroup).toHaveAccessibleDescription(
+          LOOK_FORM.languageSwitcherOptionDescription.MENU_CODE,
+        );
+
+        await user.click(globeButton);
+
+        expect(toggleGroup).toHaveAccessibleDescription(
           LOOK_FORM.languageSwitcherOptionDescription.MENU_GLOBE,
         );
       });
