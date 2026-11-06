@@ -24,11 +24,9 @@ import { buildSectionPages } from './starter-section-pages';
 const ids = STARTER_DOCUMENT_IDS;
 
 export function buildDocsDocuments({
-  siteName,
   locale,
   copy,
 }: {
-  siteName: string;
   locale: TLocaleIsoCode;
   copy: TStarterCopy;
 }): TStarterDocumentUnion[] {
@@ -36,7 +34,6 @@ export function buildDocsDocuments({
 
   return [
     ...buildBaseDocuments({
-      siteName,
       locale,
       copy,
       navigationItems: [navigationLink(ids.DOCS_GUIDES_LINK)],

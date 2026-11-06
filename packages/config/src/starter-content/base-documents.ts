@@ -28,7 +28,6 @@ type TStarterTemplateLayout<TTemplate extends Template_home> = Pick<
 >;
 
 export type TBaseDocumentsInput = {
-  siteName: string;
   locale: TLocaleIsoCode;
   copy: TStarterCopy;
   navigationItems?: Settings_navigation['items'];
@@ -37,7 +36,6 @@ export type TBaseDocumentsInput = {
 };
 
 export function buildBaseDocuments({
-  siteName,
   locale,
   copy: { home, postIndex },
   navigationItems = [],
@@ -61,7 +59,6 @@ export function buildBaseDocuments({
       _type: 'settings_site',
       title: 'Site Settings',
       currency: DEFAULT_SITE_CURRENCY,
-      brand: { _type: 'brand', name: siteName },
     } satisfies TStarterDocument<Settings_site, 'title'>,
     {
       _id: STARTER_DOCUMENT_IDS.HOME_TEMPLATE,

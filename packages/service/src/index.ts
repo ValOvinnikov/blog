@@ -110,7 +110,7 @@ export type {
   TNavigation,
   TNavigationItem,
 } from './features/global/navigation';
-export type { TBrand, TSiteSettings } from './features/global/site-settings';
+export type { TSiteSettings } from './features/global/site-settings';
 export type {
   TTranslationEntry,
   TTranslationGroup,

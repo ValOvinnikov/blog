@@ -719,12 +719,6 @@ export type PostTakeaways = {
   model?: string;
 };
 
-export type Brand = {
-  _type: 'brand';
-  name?: string;
-  logo?: ImageWithAlt;
-};
-
 export type BrandTagline = {
   _type: 'brandTagline';
   items?: Array<
@@ -977,7 +971,6 @@ export type Settings_site = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brand?: Brand;
   currency?:
     | 'AED'
     | 'AFN'
@@ -2322,7 +2315,6 @@ export type AllSanitySchemaTypes =
   | TimelineItem
   | Stat
   | PostTakeaways
-  | Brand
   | BrandTagline
   | BrandTaglineItem
   | Seo

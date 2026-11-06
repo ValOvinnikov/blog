@@ -12,7 +12,6 @@ import {
   MOCK_PAGE_TOPIC_CACHE_TAG,
   MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
-import { mockRawSanityImage } from '@blog/service/testing/shared/fixtures';
 
 export const MOCK_LINKED_PAGE_CACHE_TAGS = [
   MOCK_PAGE_POST_CACHE_TAG,
@@ -30,10 +29,6 @@ export function mockRawSiteSettings(
   overrides: Partial<TRawSiteSettings> = {},
 ): TRawSiteSettings {
   return {
-    brand: {
-      name: 'My Blog',
-      logo: mockRawSanityImage('Logo'),
-    },
     currency: 'USD',
     ...overrides,
   };

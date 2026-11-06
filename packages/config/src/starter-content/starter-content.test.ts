@@ -242,12 +242,6 @@ describe(buildStarterDocuments, () => {
     expect(parents).toEqual([section?._id, section?._id, section?._id]);
   });
 
-  it('the site settings brand carries the site name', () => {
-    const { brand } = findByType(build(), 'settings_site');
-
-    expect(brand?.name).toBe(MOCK_SITE_NAME);
-  });
-
   it('the NL home page takes its copy from the Dutch catalogue', () => {
     const { headingBlock } = findByType(
       build(SITE_TYPE.BLANK, LOCALE_ISO_CODES.NL),

@@ -30,7 +30,6 @@ export function buildPersonalDocuments({
 
   return [
     ...buildBaseDocuments({
-      siteName,
       locale,
       copy,
       navigationItems: [navigationLink(ids.PERSONAL_WRITING_LINK)],

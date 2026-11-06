@@ -43,7 +43,6 @@ export function buildBlogDocuments({
 
   return [
     ...buildBaseDocuments({
-      siteName,
       locale,
       copy,
       navigationItems: [ids.BLOG_POST_INDEX_LINK, ids.BLOG_ABOUT_LINK].map(
