@@ -102,7 +102,10 @@ export const voiceFieldInputId = (
   id: TVoiceFieldId,
 ): string => `${idPrefix}-${id}`;
 
-const toParagraph = (id: TVoiceFieldId, text: string): TVoicePortableText => [
+export const voiceTextToPortableText = (
+  id: TVoiceFieldId,
+  text: string,
+): TVoicePortableText => [
   {
     _type: 'block',
     _key: `${id}-block`,
@@ -120,7 +123,7 @@ const toDraftValue = (
       return stored as TVoicePortableText;
     }
     return isString(stored) && stored.trim() !== ''
-      ? toParagraph(field.id, stored)
+      ? voiceTextToPortableText(field.id, stored)
       : null;
   }
   if (isString(stored)) return stored;
@@ -215,6 +218,17 @@ export const voiceDefaultText = (
     );
   return isString(value) ? value : '';
 };
+
+export const isVoicePlainCopyOf = (
+  value: TVoicePortableText,
+  text: string,
+): boolean =>
+  value.length === 1 &&
+  value.every(
+    ({ children, markDefs }) =>
+      !hasLength(markDefs) && children.every(({ marks }) => !hasLength(marks)),
+  ) &&
+  portableTextToPlainText(value) === text;
 
 export const toVoiceOverridesInput = (
   draft: TVoiceDraft,

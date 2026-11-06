@@ -2,17 +2,17 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const voiceFieldHeaderVariants = tv({
   slots: {
-    root: ['flex flex-wrap items-start justify-between gap-x-3 gap-y-1.5'],
-    labelGroup: ['flex min-w-0 flex-col gap-0.5'],
-    label: ['text-admin-13 font-semibold text-admin-text'],
-    hint: ['leading-4'],
-    status: ['inline-flex shrink-0 items-center gap-2'],
+    labelRow: ['flex min-h-5 items-center gap-2'],
+    label: [
+      'flex-1 text-admin-14 leading-5 font-semibold text-admin-text',
+      'md:text-admin-13 md:leading-admin-18',
+    ],
+    hintRow: ['flex min-h-11 items-center gap-2 md:min-h-7'],
+    hint: ['flex-1 leading-4'],
   },
   variants: {
     isInListRow: {
       true: {
-        root: ['flex-nowrap items-center gap-2'],
-        labelGroup: ['flex-1'],
         label: ['sr-only'],
       },
     },

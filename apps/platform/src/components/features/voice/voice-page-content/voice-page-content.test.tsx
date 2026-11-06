@@ -1,4 +1,8 @@
-import { VOICE_FIELDS, VOICE_SURFACE } from '@blog/config';
+import {
+  SITE_MESSAGES_BY_LOCALE,
+  VOICE_FIELDS,
+  VOICE_SURFACE,
+} from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import de from '@platform/i18n/messages/de.json';
@@ -74,7 +78,9 @@ describe(`<${VoicePageContent.name}/>`, () => {
     const headingInput = notFoundHeading();
     const defaultBadges = screen.getAllByText('Default');
 
-    expect(headingInput).toHaveValue('');
+    expect(headingInput).toHaveValue(
+      SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
+    );
     expect(defaultBadges).toHaveLength(VOICE_FIELDS.length);
   });
 

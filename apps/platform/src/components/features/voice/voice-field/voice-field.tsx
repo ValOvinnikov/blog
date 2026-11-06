@@ -2,33 +2,29 @@
 
 import { Field } from '@base-ui/react/field';
 import {
-  SIZE,
   VOICE_FIELD_KIND,
-  VOICE_PORTABLE_TEXT_SCHEMA,
   VOICE_SURFACE,
   type TVoiceFieldKind,
-  type TVoicePortableText,
 } from '@blog/config';
-import { isString, isUndefined } from '@blog/utils/primitives';
+import { isNull, isUndefined } from '@blog/utils/primitives';
 import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
-import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
-import { textVariants } from '@platform/components/shared/text/text-variants';
 import { TextInput } from '@platform/components/shared/text-input';
 import { Textarea } from '@platform/components/shared/textarea';
-import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
-import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
   isVoiceValueCustomised,
   type TVoiceField,
 } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useState, type FocusEvent } from 'react';
 
 import { VoiceFieldHeader } from './components/voice-field-header';
+import { VoiceFieldNote } from './components/voice-field-note';
+import { VoiceFieldRichControl } from './components/voice-field-rich-control';
+import { useVoiceTextControl } from './use-voice-text-control';
 import { voiceFieldVariants } from './voice-field-variants';
 
 export type TVoiceFieldProps = {
@@ -38,15 +34,15 @@ export type TVoiceFieldProps = {
 };
 
 export const VoiceField = ({ field }: TVoiceFieldProps) => {
-  const { inputId, value, savedValue, error, placeholder, onChange } =
+  const { inputId, value, savedValue, error, defaultText, onChange } =
     useVoiceFieldState(field.id);
-  const t = useTranslations('voiceSettings');
   const { isArchived: isReadOnly, archivedDescribedBy } =
     useSettingsFormState();
   const tLabels = useTranslations('voiceFieldLabels');
   const tHints = useTranslations('voiceFieldHints');
   const [editorRevision, setEditorRevision] = useState(0);
-  const { root, note, token, error: errorSlot } = voiceFieldVariants();
+  const textControl = useVoiceTextControl({ value, defaultText, onChange });
+  const { root, input, error: errorSlot } = voiceFieldVariants();
 
   const hintId = `${inputId}-hint`;
   const noteId = `${inputId}-note`;
@@ -54,7 +50,6 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const label = tLabels(field.id);
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const isCustomised = isVoiceValueCustomised(value);
-  const textValue = isString(value) ? value : '';
   const [placeholderToken] = field.placeholders;
   const richDescribedBy = joinIds(
     archivedDescribedBy,
@@ -63,13 +58,22 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
     error && errorId,
   );
 
+  const showDefaultAgain = () => setEditorRevision((revision) => revision + 1);
+
   const reset = () => {
     onChange(isRich ? null : '');
-    setEditorRevision((revision) => revision + 1);
+    showDefaultAgain();
+  };
+
+  const handleBlur = ({ currentTarget, relatedTarget }: FocusEvent) => {
+    textControl.onBlur();
+    if (isRich && isNull(value) && !currentTarget.contains(relatedTarget)) {
+      showDefaultAgain();
+    }
   };
 
   return (
-    <Field.Root className={root()} invalid={Boolean(error)}>
+    <Field.Root className={root()} invalid={Boolean(error)} onBlur={handleBlur}>
       <VoiceFieldHeader
         label={label}
         hint={tHints(field.id)}
@@ -81,23 +85,13 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
         onReset={isCustomised && !isReadOnly ? reset : undefined}
       />
       {isRich ? (
-        <PortableTextEditor<TVoicePortableText[number]>
+        <VoiceFieldRichControl
           key={editorRevision}
-          field={{
-            label,
-            id: inputId,
-            isInvalid: Boolean(error),
-            describedBy: richDescribedBy,
-            tokens: field.placeholders,
-          }}
-          schema={VOICE_PORTABLE_TEXT_SCHEMA}
-          initialValue={Array.isArray(value) ? value : []}
-          onChange={(next) =>
-            onChange(isBlankPortableTextValue(next) ? null : next)
-          }
-          placeholder={placeholder}
-          mode={isReadOnly ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
-          size={SIZE.SM}
+          fieldId={field.id}
+          label={label}
+          describedBy={richDescribedBy}
+          isInvalid={Boolean(error)}
+          tokens={field.placeholders}
         />
       ) : (
         <FormFieldControlProvider
@@ -106,33 +100,23 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
         >
           {field.kind === VOICE_FIELD_KIND.MULTILINE ? (
             <Textarea
-              value={textValue}
-              onChange={onChange}
-              placeholder={placeholder}
+              value={textControl.shownText}
+              onChange={textControl.onChange}
               isReadOnly={isReadOnly}
               rows={3}
             />
           ) : (
             <TextInput
-              value={textValue}
-              onChange={onChange}
-              placeholder={placeholder}
+              value={textControl.shownText}
+              onChange={textControl.onChange}
               isReadOnly={isReadOnly}
+              className={input()}
             />
           )}
         </FormFieldControlProvider>
       )}
       {!isUndefined(placeholderToken) && (
-        <Field.Description
-          id={noteId}
-          render={<span />}
-          className={textVariants({ variant: 'hint', class: note() })}
-        >
-          {t.rich('keepPlaceholder', {
-            token: `{${placeholderToken}}`,
-            code: (chunks) => <code className={token()}>{chunks}</code>,
-          })}
-        </Field.Description>
+        <VoiceFieldNote id={noteId} placeholderToken={placeholderToken} />
       )}
       {error && (
         <Field.Error

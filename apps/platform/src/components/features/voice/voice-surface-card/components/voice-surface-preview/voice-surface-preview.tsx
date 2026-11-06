@@ -11,6 +11,7 @@ import { isUndefined } from '@blog/utils/primitives';
 import { VoiceSpecimen } from '@platform/components/features/site-preview/voice-specimen';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { useVoiceListSamples } from '@platform/components/features/voice/voice-list-samples-provider';
+import { VoiceSurfaceNote } from '@platform/components/features/voice/voice-surface-card/components/voice-surface-note';
 import { Button } from '@platform/components/shared/button';
 import { voiceFieldsOf } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
@@ -33,14 +34,13 @@ export const VoiceSurfacePreview = ({
   const t = useTranslations('voiceSettings');
   const tLabels = useTranslations('voiceFieldLabels');
   const tSpecimen = useTranslations('voiceSpecimen');
-  const tNotes = useTranslations('voiceSurfaceNotes');
   const listSamples = useVoiceListSamples(locale);
   const previewId = useId();
   const labelId = useId();
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const isArchive = surface === VOICE_SURFACE.ARCHIVE;
-  const { column, content, toggle, preview, label, specimen, note } =
-    voiceSurfacePreviewVariants({ isArchive, isPreviewOpen });
+  const { column, content, toggle, preview, label, specimen } =
+    voiceSurfacePreviewVariants({ surface, isArchive, isPreviewOpen });
   const [firstField] = voiceFieldsOf(surface);
   const labelFieldId = isArchive
     ? (openListFieldId ?? firstField?.id)
@@ -83,7 +83,7 @@ export const VoiceSurfacePreview = ({
               theme={specimenTheme}
             />
           </div>
-          <p className={note()}>{tNotes(surface)}</p>
+          <VoiceSurfaceNote surface={surface} />
         </div>
       </div>
     </div>
