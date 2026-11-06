@@ -10,6 +10,7 @@ export const saveBarLinkClasses = [
 
 export const saveBarVariants = tv({
   slots: {
+    container: ['contents'],
     root: [
       'fixed inset-x-0 bottom-0 z-20 flex flex-col gap-2 rounded-none border-t border-admin-line',
       'bg-admin-surface text-admin-text shadow-admin-unsaved',
