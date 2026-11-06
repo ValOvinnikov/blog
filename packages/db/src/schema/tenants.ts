@@ -31,7 +31,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN } from './columns';
+import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
 
 export const tenantPlanEnum = pgEnum(
   'tenant_plan',
@@ -164,7 +164,7 @@ export const tenants = pgTable(
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()
       .defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: 'date' })
+    updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
       .notNull()
       .defaultNow()
       .$onUpdate(() => new Date()),

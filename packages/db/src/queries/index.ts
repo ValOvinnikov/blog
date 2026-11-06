@@ -19,6 +19,7 @@ export * as settingsFeatures from './settings-features';
 export * as siteConfig from './site-config';
 export * as subscribers from './subscribers';
 export * as tenantDomains from './tenant-domains';
+export * as tenantOAuthCredentials from './tenant-oauth-credentials';
 export * as tenantSuspensions from './tenant-suspensions';
 export * as tenants from './tenants';
 export * as users from './users';

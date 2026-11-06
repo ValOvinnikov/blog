@@ -1,6 +1,6 @@
 import { boolean, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN } from './columns';
+import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
 // Column defaults mirror `PRESET_REGISTRY`'s `CONSOLE` `featureDefaults`; a
@@ -26,7 +26,7 @@ export const settingsFeatures = pgTable('settings_features', {
   createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: 'date' })
+  updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),

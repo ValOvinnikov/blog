@@ -14,6 +14,8 @@ export const env = createEnv({
     // @env-required: development, production
     TENANT_TOKEN_ENCRYPTION_KEY: z.string().min(1).optional(),
     // @env-optional
+    TENANT_OAUTH_ENCRYPTION_KEY: z.string().min(1).optional(),
+    // @env-optional
     PERSONAL_DATA_ENCRYPTION_KEY: z.string().min(1).optional(),
     // @env-optional
     PERSONAL_DATA_INDEX_KEY: z.string().min(1).optional(),
