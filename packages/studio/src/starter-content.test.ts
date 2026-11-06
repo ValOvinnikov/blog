@@ -121,33 +121,16 @@ describe(buildStarterDocuments, () => {
           (document) => document._type === siteSettingsSchema.name,
         )!;
 
-        it.each([
-          {
-            missing: 'a required top-level field',
-            document: { ...siteSettings, currency: undefined },
-            path: ['currency'],
-          },
-          {
-            missing: 'a required field inside a present object',
-            document: { ...siteSettings, brand: { _type: 'brand' as const } },
-            path: ['brand', 'name'],
-          },
-        ])(
-          'reports an error when $missing is missing',
-          async ({ document, path }) => {
-            const markers = await validateStarterDocument(
-              document,
-              blogDocuments,
-            );
+        it('reports an error when a required field is missing', async () => {
+          const markers = await validateStarterDocument(
+            { ...siteSettings, currency: undefined },
+            blogDocuments,
+          );
 
-            expect(
-              markers.map(({ level, path: markerPath }) => ({
-                level,
-                path: markerPath,
-              })),
-            ).toContainEqual({ level: 'error', path });
-          },
-        );
+          expect(
+            markers.map(({ level, path }) => ({ level, path })),
+          ).toContainEqual({ level: 'error', path: ['currency'] });
+        });
       });
     },
   );

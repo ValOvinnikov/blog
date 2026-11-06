@@ -1,6 +1,5 @@
 import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
-import { brandSchema } from './brand/brand';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
 import { brandTaglineItemSchema } from './brand-tagline-item/brand-tagline-item';
 import { cookieSettingsItemSchema } from './cookie-settings-item/cookie-settings-item';
@@ -58,7 +57,6 @@ export const objects = [
   seoSchema,
   brandTaglineItemSchema,
   brandTaglineSchema,
-  brandSchema,
   postTakeawaysSchema,
   statSchema,
   timelineItemSchema,

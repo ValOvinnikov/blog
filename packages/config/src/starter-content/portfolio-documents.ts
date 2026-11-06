@@ -29,7 +29,6 @@ export function buildPortfolioDocuments({
 
   return [
     ...buildBaseDocuments({
-      siteName,
       locale,
       copy,
       navigationItems: [navigationLink(ids.PORTFOLIO_WORK_LINK)],

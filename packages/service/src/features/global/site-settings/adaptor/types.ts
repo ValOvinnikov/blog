@@ -1,15 +1,5 @@
-import type {
-  ISanityImage,
-  Settings_site,
-  TMaybeUndefined,
-} from '@blog/config';
-
-export type TBrand = {
-  name: string;
-  logo: TMaybeUndefined<ISanityImage>;
-};
+import type { Settings_site } from '@blog/config';
 
 export type TSiteSettings = {
-  brand: TBrand;
   currency: NonNullable<Settings_site['currency']>;
 };

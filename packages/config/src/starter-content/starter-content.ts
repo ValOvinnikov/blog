@@ -1,4 +1,5 @@
 import type { TMaybeNull } from '@blog/config/types';
+import { isNull } from '@blog/utils/primitives';
 
 import {
   PRESET_ID,
@@ -40,15 +41,13 @@ const BUILD_BY_SITE_TYPE = {
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
     }),
-  [SITE_TYPE.DOCS]: ({ siteName, locale }: TStarterInput) =>
+  [SITE_TYPE.DOCS]: ({ locale }: TStarterInput) =>
     buildDocsDocuments({
-      siteName,
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
     }),
-  [SITE_TYPE.BLANK]: ({ siteName, locale }: TStarterInput) =>
+  [SITE_TYPE.BLANK]: ({ locale }: TStarterInput) =>
     buildBaseDocuments({
-      siteName,
       locale,
       copy: STARTER_COPY_BY_LOCALE[locale],
     }),
@@ -77,7 +76,7 @@ function isStarterSiteType(siteType: TSiteType): siteType is TStarterSiteType {
 export function toStarterSiteType(
   siteType: TMaybeNull<TSiteType>,
 ): TStarterSiteType {
-  return siteType !== null && isStarterSiteType(siteType)
+  return !isNull(siteType) && isStarterSiteType(siteType)
     ? siteType
     : SITE_TYPE.BLANK;
 }

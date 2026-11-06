@@ -1,2 +1,2 @@
-export type { TBrand, TSiteSettings } from './adaptor/types';
+export type { TSiteSettings } from './adaptor/types';
 export { createSiteSettingsService } from './application/service';
