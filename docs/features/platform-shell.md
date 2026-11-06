@@ -149,6 +149,14 @@ outside Voice's `inert` content. Below `md` Voice keeps 96px of room
 `--spacing-admin-phone-footer-max`) and a `scroll-padding-bottom` of that 85
 plus 16; an archived Voice page ends at 48px.
 
+A successful save pressed from Save changes — in the docked bar or Voice's
+phone footer — returns focus, without scrolling, to the control that had it
+before Save was pressed, so the bar unmounting or the footer's Save disabling
+never drops a keyboard user's place. If that control has left the page, focus
+moves to the page's `h1` instead. A save from ⌘S / Ctrl+S never moves focus,
+and a failed or refused save leaves it where it is (a refused save reveals and
+focuses the first invalid field).
+
 A message appears where the user is looking when it happens. An invalid
 field shows under the field, plus the count in the save bar; a success is a
 toast. A failed save shows in the save bar or beside its Save button, and a

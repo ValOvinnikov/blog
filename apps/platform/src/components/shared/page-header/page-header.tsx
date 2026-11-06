@@ -1,12 +1,13 @@
 import type { IWithClassName } from '@blog/config';
 import { Heading } from '@platform/components/shared/heading';
 import { Text } from '@platform/components/shared/text';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { pageHeaderVariants } from './page-header-variants';
 
 export type TPageHeaderProps = IWithClassName & {
   title: ReactNode;
+  titleRef?: Ref<HTMLHeadingElement>;
   description?: ReactNode;
   badges?: ReactNode;
   actions?: ReactNode;
@@ -16,6 +17,7 @@ export type TPageHeaderProps = IWithClassName & {
 
 export const PageHeader = ({
   title,
+  titleRef,
   description,
   badges,
   actions,
@@ -39,7 +41,12 @@ export const PageHeader = ({
     <div className={root({ class: className })}>
       <div className={titleGroup()}>
         <div className={titleRow()} data-testid="page-header-title-row">
-          <Heading level={1} size="pageTitle">
+          <Heading
+            ref={titleRef}
+            tabIndex={titleRef ? -1 : undefined}
+            level={1}
+            size="pageTitle"
+          >
             {title}
           </Heading>
           {badges}
