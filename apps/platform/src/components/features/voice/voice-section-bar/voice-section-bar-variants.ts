@@ -10,7 +10,7 @@ export const voiceSectionBarVariants = tv({
       'border border-admin-line bg-admin-surface md:py-2',
     ],
     jumpTo: [
-      'shrink-0 text-admin-12 leading-4 font-semibold whitespace-nowrap text-admin-muted',
+      'hidden shrink-0 text-admin-12 leading-4 font-semibold whitespace-nowrap text-admin-muted lg:block',
     ],
     nav: ['relative flex min-w-0 flex-1'],
     // The 4px block inset keeps the chips' focus ring inside the scroll clip.

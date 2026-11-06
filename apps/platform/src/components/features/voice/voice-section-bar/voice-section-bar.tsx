@@ -1,12 +1,10 @@
 'use client';
 
-import { MEDIA_QUERY } from '@platform/constants/media-query';
 import {
   VOICE_SECTION_BAR_FADE_END_TEST_ID,
   VOICE_SECTION_BAR_FADE_START_TEST_ID,
   type TVoiceSection,
 } from '@platform/constants/voice';
-import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useTrackScroll } from '@platform/utils/use-track-scroll/use-track-scroll';
 import { VOICE_SECTIONS_IN_PAGE_ORDER } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
@@ -34,7 +32,6 @@ export const VoiceSectionBar = ({
   onSetAllSectionsOpen,
 }: TVoiceSectionBarProps) => {
   const t = useTranslations('voiceSettings');
-  const isLgUp = useMediaQuery(MEDIA_QUERY.LG_UP);
   const barRef = useRef<HTMLElement>(null);
   useVoiceSectionBarHeight(barRef);
   const isPinned = useIsSectionBarPinned(barRef);
@@ -63,11 +60,9 @@ export const VoiceSectionBar = ({
       aria-label={t('sectionsRegionLabel')}
       className={styles.root()}
     >
-      {isLgUp && (
-        <span aria-hidden="true" className={styles.jumpTo()}>
-          {t('jumpTo')}
-        </span>
-      )}
+      <span aria-hidden="true" className={styles.jumpTo()}>
+        {t('jumpTo')}
+      </span>
       <nav aria-label={t('sectionsNavLabel')} className={styles.nav()}>
         <ul
           ref={trackRef}
@@ -101,7 +96,6 @@ export const VoiceSectionBar = ({
         )}
       </nav>
       <VoiceSectionBarActions
-        hasTextButtons={isLgUp}
         isEverySectionOpen={
           openSections.length === VOICE_SECTIONS_IN_PAGE_ORDER.length
         }

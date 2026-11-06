@@ -19,10 +19,7 @@ import {
   waitFor,
   within,
 } from '@platform/testing/custom-render';
-import {
-  stubLgUpWindow,
-  stubMatchingMediaQuery,
-} from '@platform/testing/match-media';
+import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
 import {
@@ -298,11 +295,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     });
   });
 
-  describe('from 1024', () => {
-    beforeEach(() => {
-      stubLgUpWindow();
-    });
-
+  describe('with the text buttons shown from 1024', () => {
     describe('and nothing customised', () => {
       beforeEach(() => {
         setupVoiceSettings();
@@ -314,7 +307,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
         expect(label).toHaveAttribute(ARIA_HIDDEN, 'true');
       });
 
-      it('tabs through the chips, Expand all and Collapse all before the sections', async () => {
+      it('orders the chips, then the bar buttons, before the sections', async () => {
         chip(ERROR_PAGES_SECTION).focus();
 
         await user.tab();
@@ -323,6 +316,8 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
         expect(barButton(VOICE_SETTINGS.expandAll)).toHaveFocus();
         await user.tab();
         expect(barButton(VOICE_SETTINGS.collapseAll)).toHaveFocus();
+        await user.tab();
+        expect(barButton(VOICE_SETTINGS.expandAllSections)).toHaveFocus();
         await user.tab();
         expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
       });
@@ -360,21 +355,8 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     });
   });
 
-  describe('below 1024', () => {
+  describe('with the icon button shown below 1024', () => {
     const expandAllSections = () => barButton(VOICE_SETTINGS.expandAllSections);
-
-    it('shows no Jump to label and no text buttons', () => {
-      setupVoiceSettings();
-
-      const bar = within(sectionBar());
-      expect(bar.queryByText(VOICE_SETTINGS.jumpTo)).not.toBeInTheDocument();
-      expect(
-        bar.queryByRole('button', { name: VOICE_SETTINGS.expandAll }),
-      ).not.toBeInTheDocument();
-      expect(
-        bar.queryByRole('button', { name: VOICE_SETTINGS.collapseAll }),
-      ).not.toBeInTheDocument();
-    });
 
     it('lets the icon button control every section body', () => {
       setupVoiceSettings();
@@ -406,7 +388,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
     it('shows its current name as a tooltip at once on keyboard focus', async () => {
       setupVoiceSettings();
-      chip(EMPTY_STATES_SECTION).focus();
+      barButton(VOICE_SETTINGS.collapseAll).focus();
 
       await user.tab();
 
@@ -416,18 +398,6 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       );
       expect(expandAllSections()).toHaveFocus();
       expect(tooltip).toBeVisible();
-    });
-
-    it('tabs from the chips to the icon button, then the sections', async () => {
-      setupVoiceSettings();
-      chip(ERROR_PAGES_SECTION).focus();
-
-      await user.tab();
-      expect(chip(EMPTY_STATES_SECTION)).toHaveFocus();
-      await user.tab();
-      expect(expandAllSections()).toHaveFocus();
-      await user.tab();
-      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
     });
 
     it('marks no chip active while the bar is in flow, even past a header', async () => {

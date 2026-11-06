@@ -14,7 +14,6 @@ import { useTranslations } from 'next-intl';
 import { voiceSectionBarActionsVariants } from './voice-section-bar-actions-variants';
 
 export type TVoiceSectionBarActionsProps = {
-  hasTextButtons: boolean;
   isEverySectionOpen: boolean;
   onSetAllSectionsOpen: (isOpen: boolean) => void;
 };
@@ -26,15 +25,18 @@ const SECTION_BODY_IDS = joinIds(
 );
 
 export const VoiceSectionBarActions = ({
-  hasTextButtons,
   isEverySectionOpen,
   onSetAllSectionsOpen,
 }: TVoiceSectionBarActionsProps) => {
   const t = useTranslations('voiceSettings');
   const { textButtons, divider, iconButton } = voiceSectionBarActionsVariants();
 
-  if (hasTextButtons) {
-    return (
+  const name = isEverySectionOpen
+    ? t('collapseAllSections')
+    : t('expandAllSections');
+
+  return (
+    <>
       <div className={textButtons()}>
         <Button
           size={SIZE.XS}
@@ -55,20 +57,12 @@ export const VoiceSectionBarActions = ({
           {t('collapseAll')}
         </Button>
       </div>
-    );
-  }
-
-  const name = isEverySectionOpen
-    ? t('collapseAllSections')
-    : t('expandAllSections');
-
-  return (
-    <>
       <span aria-hidden="true" className={divider()} />
       <IconSoloControl
         ariaLabel={name}
         tooltip={name}
         icon={ICONS.UNFOLD}
+        isTooltipEndAligned={true}
         className={iconButton()}
         control={
           <BaseButton
