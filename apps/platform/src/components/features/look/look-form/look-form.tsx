@@ -150,6 +150,7 @@ export const LookForm = ({
                   jumpIndex.isAllOpen,
                 )}
                 isShown={!hasTabPanels || isPreviewTab}
+                isScrollingWithPage={hasTabPanels}
               />
             </div>
           </div>
