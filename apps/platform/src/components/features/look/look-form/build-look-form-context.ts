@@ -50,8 +50,6 @@ export const buildLookFormContext = ({
   plan,
   ...rest
 }: TBuildLookFormContextArgs): TLookFormContext => {
-  const brandName = values.brandName.trim();
-
   const hasFieldChanged = (field: keyof TLookFormValues) =>
     isFieldChanged(field, values, savedValues);
   const isLocked = (field: TLookField) => !isLookFieldEntitled(field, plan);
@@ -69,7 +67,7 @@ export const buildLookFormContext = ({
       countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
     isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
     isBrandNameTooLong: isBrandNameTooLong(values.brandName),
-    shownBrandName: brandName || rest.tenantName,
+    shownBrandName: values.brandName.trim() || rest.tenantName,
     changePreset: (preset: TPresetId) =>
       setValues((prev) => switchPreset(preset, prev)),
     isPresetValue: (field) => isPresetValue(field, values),
