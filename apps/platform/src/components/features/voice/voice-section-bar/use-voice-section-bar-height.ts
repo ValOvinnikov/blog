@@ -1,22 +1,22 @@
 import type { TMaybeNull } from '@blog/config';
-import { type RefObject, useEffect } from 'react';
+import { VOICE_BAR_HEIGHT_PROPERTY } from '@platform/constants/voice';
+import { type RefObject, useLayoutEffect } from 'react';
 
-const VOICE_BAR_HEIGHT_PROPERTY = '--admin-voice-bar-height';
-
-// Publishes the bar's height on <html>, where the sections' scroll margin and the sticky preview read it.
+// A layout effect, so the first-load hash scroll in a parent's passive effect already reads the height.
 export const useVoiceSectionBarHeight = (
   barRef: RefObject<TMaybeNull<HTMLElement>>,
 ) => {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const bar = barRef.current;
     if (!bar) return;
     const root = document.documentElement;
-    const observer = new ResizeObserver(() =>
+    const publish = () =>
       root.style.setProperty(
         VOICE_BAR_HEIGHT_PROPERTY,
         `${bar.offsetHeight}px`,
-      ),
-    );
+      );
+    publish();
+    const observer = new ResizeObserver(publish);
     observer.observe(bar);
 
     return () => {

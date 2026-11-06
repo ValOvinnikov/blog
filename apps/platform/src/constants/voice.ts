@@ -44,3 +44,5 @@ export const VOICE_SECTION_BAR_FADE_START_TEST_ID =
   'voice-section-bar-fade-start';
 
 export const VOICE_SECTION_BAR_FADE_END_TEST_ID = 'voice-section-bar-fade-end';
+
+export const VOICE_BAR_HEIGHT_PROPERTY = '--admin-voice-bar-height';

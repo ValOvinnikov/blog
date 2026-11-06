@@ -1,5 +1,6 @@
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import {
+  VOICE_BAR_HEIGHT_PROPERTY,
   VOICE_SECTION,
   VOICE_SECTION_BAR_FADE_END_TEST_ID,
   VOICE_SECTION_BAR_FADE_START_TEST_ID,
@@ -44,8 +45,10 @@ const EMPTY_IDS = VOICE_SECTION_ID[VOICE_SECTION.EMPTY_STATES];
 const SECTION_BODY_IDS = `${ERRORS_IDS.body} ${EMPTY_IDS.body}`;
 const HREF = 'href';
 const ACTIVE = 'true';
-const BAR_BOTTOM = 100;
-const ABOVE_LINE = 110;
+const IN_FLOW_BAR_TOP = 100;
+const BAR_HEIGHT = 50;
+const SECTION_GAP = 20;
+const ABOVE_LINE = 10;
 const BELOW_LINE = 400;
 const TRACK_WIDTH = 120;
 const LIST_WIDTH = 300;
@@ -65,17 +68,36 @@ const chip = (name: string) =>
 const barButton = (name: string) =>
   within(sectionBar()).getByRole('button', { name });
 
-const placeHeaders = (errorsTop: number, emptyTop: number) => {
+const placeHeaders = (
+  errorsTop: number,
+  emptyTop: number,
+  barBox?: { element: Element; top: number; bottom: number },
+) => {
   const tops: Record<string, number> = {
     [ERRORS_IDS.heading]: errorsTop,
     [EMPTY_IDS.heading]: emptyTop,
   };
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(
     function (this: Element) {
-      return { top: tops[this.id] ?? 0, bottom: BAR_BOTTOM } as DOMRect;
+      if (this === barBox?.element) {
+        return { top: barBox.top, bottom: barBox.bottom } as DOMRect;
+      }
+      const top = tops[this.id] ?? 0;
+      return { top, bottom: top } as DOMRect;
     },
   );
   fireEvent.scroll(window);
+};
+
+const placeBarInFlowAboveSections = () => {
+  const bar = sectionBar();
+  vi.spyOn(bar, 'offsetHeight', 'get').mockReturnValue(BAR_HEIGHT);
+  const barBottom = IN_FLOW_BAR_TOP + BAR_HEIGHT;
+  placeHeaders(barBottom + SECTION_GAP, BELOW_LINE * 2, {
+    element: bar,
+    top: IN_FLOW_BAR_TOP,
+    bottom: barBottom,
+  });
 };
 
 const scrollToPageEnd = () => {
@@ -137,6 +159,23 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
     it('marks no chip active before a header reaches the bar', async () => {
       placeHeaders(BELOW_LINE, BELOW_LINE * 2);
+
+      await waitFor(() =>
+        expect(chip(EMPTY_STATES_SECTION)).not.toHaveAttribute(ARIA_CURRENT),
+      );
+      expect(chip(ERROR_PAGES_SECTION)).not.toHaveAttribute(ARIA_CURRENT);
+    });
+
+    it('marks no chip active at the top of the page, with the bar in flow above the first header', async () => {
+      placeHeaders(-BELOW_LINE, -BELOW_LINE);
+      await waitFor(() =>
+        expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(
+          ARIA_CURRENT,
+          ACTIVE,
+        ),
+      );
+
+      placeBarInFlowAboveSections();
 
       await waitFor(() =>
         expect(chip(EMPTY_STATES_SECTION)).not.toHaveAttribute(ARIA_CURRENT),
@@ -269,6 +308,22 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
 
     expect(errorPages.getByText('2 customised')).toBeInTheDocument();
     expect(emptyStates.getByText('1 customised')).toBeInTheDocument();
+  });
+
+  it('publishes the bar height before a first-load hash scrolls to its section', () => {
+    window.history.replaceState(null, '', `#${ERRORS_IDS.section}`);
+    const heightsAtScroll: string[] = [];
+    vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {
+      heightsAtScroll.push(
+        document.documentElement.style.getPropertyValue(
+          VOICE_BAR_HEIGHT_PROPERTY,
+        ),
+      );
+    });
+
+    setupVoiceSettings();
+
+    expect(heightsAtScroll).toEqual(['0px']);
   });
 
   it('jumps instantly with reduced motion', async () => {
