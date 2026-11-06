@@ -467,7 +467,10 @@
       "SIGNUP_BLOCK_REMOVED": "Registrierungssperre aufgehoben",
       "PERSONAL_DATA_LOOKED_UP": "Personenbezogene Daten abgefragt",
       "PERSONAL_DATA_EXPORTED": "Personenbezogene Daten exportiert",
-      "PERSONAL_DATA_ERASED": "Personenbezogene Daten gelöscht"
+      "PERSONAL_DATA_ERASED": "Personenbezogene Daten gelöscht",
+      "OAUTH_APP_SAVED": "Anmelde-App gespeichert",
+      "OAUTH_APP_REPLACED": "Anmelde-App ersetzt",
+      "OAUTH_APP_REMOVED": "Anmelde-App entfernt"
     }
   },
   "tenantDomainPage": {

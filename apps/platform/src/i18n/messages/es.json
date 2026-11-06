@@ -467,7 +467,10 @@
       "SIGNUP_BLOCK_REMOVED": "Bloqueo de registro eliminado",
       "PERSONAL_DATA_LOOKED_UP": "Datos personales consultados",
       "PERSONAL_DATA_EXPORTED": "Datos personales exportados",
-      "PERSONAL_DATA_ERASED": "Datos personales borrados"
+      "PERSONAL_DATA_ERASED": "Datos personales borrados",
+      "OAUTH_APP_SAVED": "App de inicio de sesión guardada",
+      "OAUTH_APP_REPLACED": "App de inicio de sesión sustituida",
+      "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada"
     }
   },
   "tenantDomainPage": {

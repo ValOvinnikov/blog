@@ -467,7 +467,10 @@
       "SIGNUP_BLOCK_REMOVED": "Blocage d’inscription retiré",
       "PERSONAL_DATA_LOOKED_UP": "Données personnelles consultées",
       "PERSONAL_DATA_EXPORTED": "Données personnelles exportées",
-      "PERSONAL_DATA_ERASED": "Données personnelles effacées"
+      "PERSONAL_DATA_ERASED": "Données personnelles effacées",
+      "OAUTH_APP_SAVED": "Application de connexion enregistrée",
+      "OAUTH_APP_REPLACED": "Application de connexion remplacée",
+      "OAUTH_APP_REMOVED": "Application de connexion supprimée"
     }
   },
   "tenantDomainPage": {

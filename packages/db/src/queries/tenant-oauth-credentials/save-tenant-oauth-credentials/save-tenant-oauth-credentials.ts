@@ -9,6 +9,7 @@ export const saveTenantOAuthCredentialsInputSchema = z.object({
   provider: z.enum(OAUTH_PROVIDER),
   clientId: z.string().trim().min(1),
   clientSecret: z.string().trim().min(1),
+  callbackDomain: z.string().trim().min(1).optional(),
 });
 
 export type TSaveTenantOAuthCredentialsInput = z.input<
@@ -19,8 +20,12 @@ export async function saveTenantOAuthCredentials(
   tenantId: string,
   input: TSaveTenantOAuthCredentialsInput,
 ): Promise<void> {
-  const { provider, clientId, clientSecret } =
-    saveTenantOAuthCredentialsInputSchema.parse(input);
+  const {
+    provider,
+    clientId,
+    clientSecret,
+    callbackDomain = null,
+  } = saveTenantOAuthCredentialsInputSchema.parse(input);
   const clientSecretEncrypted = encryptSecret(
     clientSecret,
     requireTenantOAuthEncryptionKey(),
@@ -28,12 +33,18 @@ export async function saveTenantOAuthCredentials(
 
   await getDb()
     .insert(tenantOAuthCredentials)
-    .values({ tenantId, provider, clientId, clientSecretEncrypted })
+    .values({
+      tenantId,
+      provider,
+      clientId,
+      clientSecretEncrypted,
+      callbackDomain,
+    })
     .onConflictDoUpdate({
       target: [
         tenantOAuthCredentials.tenantId,
         tenantOAuthCredentials.provider,
       ],
-      set: { clientId, clientSecretEncrypted },
+      set: { clientId, clientSecretEncrypted, callbackDomain },
     });
 }

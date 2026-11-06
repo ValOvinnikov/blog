@@ -7,7 +7,7 @@ import { asc, eq } from 'drizzle-orm';
 
 export type TTenantOAuthClient = Pick<
   TTenantOAuthCredentials,
-  'provider' | 'clientId' | 'updatedAt'
+  'provider' | 'clientId' | 'callbackDomain' | 'updatedAt'
 >;
 
 export async function listTenantOAuthClients(
@@ -17,6 +17,7 @@ export async function listTenantOAuthClients(
     .select({
       provider: tenantOAuthCredentials.provider,
       clientId: tenantOAuthCredentials.clientId,
+      callbackDomain: tenantOAuthCredentials.callbackDomain,
       updatedAt: tenantOAuthCredentials.updatedAt,
     })
     .from(tenantOAuthCredentials)

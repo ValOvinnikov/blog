@@ -467,7 +467,10 @@
       "SIGNUP_BLOCK_REMOVED": "Aanmeldblokkade verwijderd",
       "PERSONAL_DATA_LOOKED_UP": "Persoonsgegevens opgezocht",
       "PERSONAL_DATA_EXPORTED": "Persoonsgegevens geëxporteerd",
-      "PERSONAL_DATA_ERASED": "Persoonsgegevens gewist"
+      "PERSONAL_DATA_ERASED": "Persoonsgegevens gewist",
+      "OAUTH_APP_SAVED": "Inlog-app opgeslagen",
+      "OAUTH_APP_REPLACED": "Inlog-app vervangen",
+      "OAUTH_APP_REMOVED": "Inlog-app verwijderd"
     }
   },
   "tenantDomainPage": {

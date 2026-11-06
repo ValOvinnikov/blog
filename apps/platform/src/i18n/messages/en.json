@@ -467,7 +467,10 @@
       "SIGNUP_BLOCK_REMOVED": "Sign-up block removed",
       "PERSONAL_DATA_LOOKED_UP": "Personal data looked up",
       "PERSONAL_DATA_EXPORTED": "Personal data exported",
-      "PERSONAL_DATA_ERASED": "Personal data erased"
+      "PERSONAL_DATA_ERASED": "Personal data erased",
+      "OAUTH_APP_SAVED": "Sign-in app saved",
+      "OAUTH_APP_REPLACED": "Sign-in app replaced",
+      "OAUTH_APP_REMOVED": "Sign-in app removed"
     }
   },
   "tenantDomainPage": {
