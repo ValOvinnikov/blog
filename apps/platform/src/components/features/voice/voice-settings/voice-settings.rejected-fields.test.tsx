@@ -5,6 +5,7 @@ import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voic
 import { screen, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
+import { TOPIC_FIELD } from '@platform/testing/voice/fixtures';
 import {
   ERROR_PAGES_SECTION,
   openVoiceSections,
@@ -32,7 +33,6 @@ const { EN, DE } = LOCALE_ISO_CODES;
 const MOCK_TYPED_TEXT = faker.lorem.words(2);
 const MOCK_EDIT_TEXT = faker.lorem.word();
 const TAG_PAGE = 'Tag page';
-const TOPIC_PAGE = 'Topic page';
 const ENGLISH = 'English';
 
 const missingName = {
@@ -149,7 +149,7 @@ describe(`<${VoiceSettings.name}/> rejected fields`, () => {
     await goToFirstRejectedField();
 
     const topicField = within(section).getByRole('textbox', {
-      name: TOPIC_PAGE,
+      name: TOPIC_FIELD,
     });
 
     expect(topicField).toHaveFocus();

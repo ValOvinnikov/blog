@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
@@ -15,7 +15,13 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
-import { BLOG_INDEX_ROW, UNSAVED_MARK } from '@platform/testing/voice/fixtures';
+import {
+  BLOG_INDEX_ROW,
+  KEEP_NAME_NOTE,
+  TOPIC_FIELD,
+  TOPIC_ROW,
+  UNSAVED_MARK,
+} from '@platform/testing/voice/fixtures';
 import {
   DRAFTED_BLOG_LIST_OVERRIDE,
   DRAFTED_BLOG_LIST_TEXT,
@@ -32,7 +38,7 @@ import {
   settingsDraftStorageKey,
   writeSettingsDraft,
 } from '@platform/utils/settings-draft-storage/settings-draft-storage';
-import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';
@@ -126,6 +132,60 @@ describe(`<${VoiceSettings.name}/> empty lists`, () => {
       const unsavedMark = within(card).getByRole('img', { name: UNSAVED_MARK });
 
       expect(openRow).toContainElement(unsavedMark);
+    });
+  });
+
+  describe('a list default holding the name placeholder', () => {
+    beforeEach(async () => {
+      saveVoiceOverridesActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      await setupVoiceSettingsWithSectionsOpen(user);
+      const topicRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
+        name: TOPIC_ROW,
+      });
+      await user.click(topicRow);
+    });
+
+    it('shows the raw placeholder as text, keeps its note and stays untouched', async () => {
+      const section = voiceCard(EMPTY_LISTS);
+      const editor = await within(section).findByRole('textbox', {
+        name: TOPIC_FIELD,
+      });
+      const unsavedMark = within(section).queryByRole('img', {
+        name: UNSAVED_MARK,
+      });
+      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
+      const openRow = within(section).getByRole('button', {
+        name: TOPIC_ROW,
+        expanded: true,
+      });
+
+      expect(editor).toHaveTextContent(
+        SITE_MESSAGES_BY_LOCALE.EN.topicPage.empty,
+      );
+      expect(editor).toHaveAccessibleDescription(
+        expect.stringContaining(KEEP_NAME_NOTE),
+      );
+      expect(unsavedMark).not.toBeInTheDocument();
+      expect(saveBar).not.toBeInTheDocument();
+      expect(openRow).toHaveTextContent(en.fieldStatus.default);
+    });
+
+    it('sends no override for it when another field is saved', async () => {
+      const section = voiceCard(EMPTY_LISTS);
+      await within(section).findByRole('textbox', { name: TOPIC_FIELD });
+
+      await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
+
+      expect(saveVoiceOverridesActionMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        {
+          [EN]: {
+            notFoundHeading: `${SITE_MESSAGES_BY_LOCALE.EN.notFound.heading}${MOCK_TYPED_TEXT}`,
+          },
+        },
+      );
     });
   });
 

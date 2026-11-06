@@ -11,12 +11,7 @@ import {
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
-import {
-  hasLength,
-  isNull,
-  isString,
-  isUndefined,
-} from '@blog/utils/primitives';
+import { isNull, isString, isUndefined } from '@blog/utils/primitives';
 import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 
@@ -32,10 +27,6 @@ export type TVoiceFieldErrors = Partial<Record<TVoiceFieldId, string>>;
 
 export type TVoiceFieldErrorsByLocale = Partial<
   Record<TLocaleIsoCode, TVoiceFieldErrors>
->;
-
-type TStoredVoiceOverrides = Partial<
-  Record<TLocaleIsoCode, Partial<Record<string, unknown>>>
 >;
 
 export const VOICE_SECTIONS_IN_PAGE_ORDER = [
@@ -102,52 +93,12 @@ export const voiceFieldInputId = (
   id: TVoiceFieldId,
 ): string => `${idPrefix}-${id}`;
 
-const toParagraph = (id: TVoiceFieldId, text: string): TVoicePortableText => [
-  {
-    _type: 'block',
-    _key: `${id}-block`,
-    style: 'normal',
-    children: [{ _type: 'span', _key: `${id}-span`, text }],
-  },
-];
-
-const toDraftValue = (
-  field: TVoiceField,
-  stored: unknown,
-): TVoiceDraftValue => {
-  if (field.kind === VOICE_FIELD_KIND.RICH) {
-    if (Array.isArray(stored) && hasLength(stored)) {
-      return stored as TVoicePortableText;
-    }
-    return isString(stored) && stored.trim() !== ''
-      ? toParagraph(field.id, stored)
-      : null;
-  }
-  if (isString(stored)) return stored;
-  return Array.isArray(stored)
-    ? portableTextToPlainText(stored as TVoicePortableText)
-    : '';
-};
-
-const buildLocaleDraft = (
-  stored: Partial<Record<string, unknown>> | undefined,
-): TVoiceLocaleDraft =>
-  Object.fromEntries(
-    VOICE_FIELDS.map((field) => [
-      field.id,
-      toDraftValue(field, stored?.[field.id]),
-    ]),
-  ) as TVoiceLocaleDraft;
-
-const EMPTY_LOCALE_DRAFT = buildLocaleDraft(undefined);
-
-export const buildVoiceDraft = (
-  stored: TStoredVoiceOverrides,
-  liveLocales: TLocaleIsoCode[],
-): TVoiceDraft =>
-  Object.fromEntries(
-    liveLocales.map((locale) => [locale, buildLocaleDraft(stored[locale])]),
-  );
+const EMPTY_LOCALE_DRAFT = Object.fromEntries(
+  VOICE_FIELDS.map(({ id, kind }) => [
+    id,
+    kind === VOICE_FIELD_KIND.RICH ? null : '',
+  ]),
+) as TVoiceLocaleDraft;
 
 export const localeDraftOf = (
   draft: TVoiceDraft,

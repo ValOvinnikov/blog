@@ -12,9 +12,9 @@ import en from '@platform/i18n/messages/en.json';
 import es from '@platform/i18n/messages/es.json';
 import fr from '@platform/i18n/messages/fr.json';
 import nl from '@platform/i18n/messages/nl.json';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 
 import {
-  buildVoiceDraft,
   countLanguageVoiceChanges,
   countVoiceChanges,
   toVoiceOverridesInput,
@@ -37,8 +37,6 @@ const TOPIC_EMPTY_ID = 'topicEmpty' satisfies TVoiceFieldId;
 
 const MOCK_EN_HEADING = faker.lorem.words(2);
 const MOCK_DE_HEADING = faker.lorem.words(2);
-const MOCK_FR_HEADING = faker.lorem.words(2);
-const MOCK_LEGACY_TEXT = faker.lorem.sentence();
 const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_DE_ERROR = faker.lorem.sentence();
 const MOCK_BLOCK_KEY = faker.string.uuid();
@@ -74,54 +72,6 @@ const MOCK_RICH_TEXT: TVoicePortableText = [
 
 const notFoundField = VOICE_FIELDS.find(({ id }) => id === HEADING_ID)!;
 const topicField = VOICE_FIELDS.find(({ id }) => id === TOPIC_EMPTY_ID)!;
-
-describe(buildVoiceDraft, () => {
-  it('keeps a stored rich value exactly as stored', () => {
-    const draft = buildVoiceDraft(
-      { [EN]: { [SUPPORTING_TEXT_ID]: MOCK_RICH_TEXT } },
-      [EN],
-    );
-
-    expect(draft[EN]?.[SUPPORTING_TEXT_ID]).toEqual(MOCK_RICH_TEXT);
-  });
-
-  it('reads a legacy plain string on a rich field as one paragraph', () => {
-    const draft = buildVoiceDraft(
-      { [EN]: { [BLOG_LIST_EMPTY_ID]: MOCK_LEGACY_TEXT } },
-      [EN],
-    );
-
-    expect(draft[EN]?.[BLOG_LIST_EMPTY_ID]).toEqual([
-      {
-        _type: 'block',
-        _key: `${BLOG_LIST_EMPTY_ID}-block`,
-        style: 'normal',
-        children: [
-          {
-            _type: 'span',
-            _key: `${BLOG_LIST_EMPTY_ID}-span`,
-            text: MOCK_LEGACY_TEXT,
-          },
-        ],
-      },
-    ]);
-  });
-
-  it('builds one map per live language, leaving untouched fields empty', () => {
-    const draft = buildVoiceDraft(
-      {
-        [DE]: { [HEADING_ID]: MOCK_DE_HEADING },
-        [FR]: { [HEADING_ID]: MOCK_FR_HEADING },
-      },
-      [EN, DE],
-    );
-
-    expect(Object.keys(draft)).toEqual([EN, DE]);
-    expect(draft[EN]?.[HEADING_ID]).toBe('');
-    expect(draft[EN]?.[SUPPORTING_TEXT_ID]).toBeNull();
-    expect(draft[DE]?.[HEADING_ID]).toBe(MOCK_DE_HEADING);
-  });
-});
 
 describe(toVoiceOverridesInput, () => {
   it('sends customised values unflattened and leaves defaults out', () => {

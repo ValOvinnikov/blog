@@ -60,12 +60,13 @@ export const useVoiceEditor = (): TVoiceEditor => {
 export const useVoiceFieldState = (fieldId: TVoiceFieldId) => {
   const { locale, fieldIdPrefix, values, savedValues, errors, setFieldValue } =
     useVoiceEditor();
+  const defaultText = voiceDefaultText(locale, VOICE_FIELD_BY_ID[fieldId]);
   return {
     inputId: voiceFieldInputId(fieldIdPrefix, fieldId),
     value: values[fieldId],
     savedValue: savedValues[fieldId],
     error: errors[fieldId],
-    placeholder: voiceDefaultText(locale, VOICE_FIELD_BY_ID[fieldId]),
+    defaultText,
     onChange: (value: TVoiceDraftValue) => setFieldValue(fieldId, value),
   };
 };

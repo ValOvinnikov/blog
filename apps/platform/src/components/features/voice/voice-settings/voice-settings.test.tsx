@@ -13,8 +13,11 @@ import {
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
 import {
   BLOG_INDEX_ROW,
+  KEEP_NAME_NOTE,
   NOTHING_HERE,
+  SUPPORTING_TEXT_FIELD,
   TAG_ROW,
+  TOPIC_FIELD,
   TOPIC_ROW,
   UNSAVED_MARK,
 } from '@platform/testing/voice/fixtures';
@@ -48,8 +51,6 @@ const MOCK_TYPED_TEXT = faker.lorem.words(2);
 const MOCK_EDIT_TEXT = faker.lorem.word();
 const MOCK_EDIT_TEXT_DE = faker.lorem.word();
 
-const KEEP_NAME_PLACEHOLDER = 'Keep {name} — the site fills it in.';
-
 vi.mock('@platform/server/site-config/save-voice-overrides-action');
 
 const ENGLISH = 'English';
@@ -58,6 +59,7 @@ const TAG_PAGE = 'Tag page';
 const BLOG_INDEX_PAGE = 'Blog index page';
 const SHOW_PREVIEW = 'Show preview';
 const PREVIEW = 'Preview';
+const ERROR_PAGE_NOTE = 'The buttons are fixed and translated for you.';
 const HEADING_KEY_TEST_ID = 'voice-key-notFoundHeading';
 const DATA_FOCUSED = 'data-focused';
 const FOLLOWS = Node.DOCUMENT_POSITION_FOLLOWING;
@@ -92,30 +94,33 @@ describe(`<${VoiceSettings.name}/>`, () => {
       ]);
     });
 
-    it('offers every field with its default as the placeholder', () => {
+    it('shows every field at its default as the control value', async () => {
       const headingField = notFoundHeadingField();
-      const supportingText = within(voiceCard(PAGE_NOT_FOUND)).getByRole(
-        'textbox',
-        {
-          name: 'Supporting text',
-        },
-      );
-      const errorDescription = within(voiceCard(ERROR_PAGE)).getByRole(
-        'textbox',
-        {
-          name: 'Description',
-        },
-      );
-      const emptyBookmarks = within(voiceCard(BOOKMARKS)).getByRole('textbox', {
-        name: 'Empty bookmarks',
+      const eyebrow = within(voiceCard(PAGE_NOT_FOUND)).getByRole('textbox', {
+        name: 'Eyebrow',
       });
+      const errorHeading = within(voiceCard(ERROR_PAGE)).getByRole('textbox', {
+        name: 'Heading',
+      });
+      const supportingText = await within(voiceCard(PAGE_NOT_FOUND)).findByRole(
+        'textbox',
+        { name: SUPPORTING_TEXT_FIELD },
+      );
+      const emptyBookmarks = await within(voiceCard(BOOKMARKS)).findByRole(
+        'textbox',
+        { name: 'Empty bookmarks' },
+      );
 
-      expect(headingField).toHaveAttribute(
-        'placeholder',
+      expect(headingField).toHaveValue(
         SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
       );
-      expect(supportingText).toBeVisible();
-      expect(errorDescription).toBeVisible();
+      expect(eyebrow).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.eyebrow);
+      expect(errorHeading).toHaveValue(
+        SITE_MESSAGES_BY_LOCALE.EN.localeErrorPage.title,
+      );
+      expect(supportingText).toHaveTextContent(
+        SITE_MESSAGES_BY_LOCALE.EN.notFound.supportingText,
+      );
       expect(emptyBookmarks).toBeVisible();
     });
 
@@ -135,6 +140,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(defaultBadges).toHaveLength(3);
 
       const headingField = notFoundHeadingField();
+      await user.clear(headingField);
       await user.type(headingField, MOCK_TYPED_TEXT);
 
       const customisedBadge = within(section).getByText('Customised');
@@ -157,7 +163,9 @@ describe(`<${VoiceSettings.name}/>`, () => {
         '3 fields · all default',
       );
 
-      expect(resetHeadingField).toHaveValue('');
+      expect(resetHeadingField).toHaveValue(
+        SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
+      );
       expect(defaultSummary).toBeVisible();
     });
 
@@ -252,9 +260,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       const germanHeadingField = notFoundHeadingField();
       const germanLabel = activeLanguageLabel(GERMAN);
 
-      expect(germanHeadingField).toHaveValue('');
-      expect(germanHeadingField).toHaveAttribute(
-        'placeholder',
+      expect(germanHeadingField).toHaveValue(
         SITE_MESSAGES_BY_LOCALE.DE.notFound.heading,
       );
       expect(germanLabel).toBeVisible();
@@ -317,6 +323,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('re-renders the specimen beside a field as the editor types', async () => {
         const headingField = notFoundHeadingField();
+        await user.clear(headingField);
         await user.type(headingField, MOCK_TYPED_TEXT);
 
         const specimen = screen.getByTestId(
@@ -364,7 +371,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
           PREVIEW,
           'The return button is fixed and translated for you.',
         ],
-        [ERROR_PAGE, PREVIEW, 'The buttons are fixed and translated for you.'],
+        [ERROR_PAGE, PREVIEW, ERROR_PAGE_NOTE],
         [
           EMPTY_LISTS,
           `Preview · ${BLOG_INDEX_PAGE}`,
@@ -383,6 +390,38 @@ describe(`<${VoiceSettings.name}/>`, () => {
         },
       );
 
+      it.each([PAGE_NOT_FOUND, ERROR_PAGE, BOOKMARKS])(
+        'offers no Show preview button on the %s card',
+        (surface) => {
+          const toggle = within(voiceCard(surface)).queryByRole('button', {
+            name: SHOW_PREVIEW,
+          });
+
+          expect(toggle).not.toBeInTheDocument();
+        },
+      );
+
+      it('outlines no field in a card whose fields have no focus', () => {
+        const keys = within(voiceCard(ERROR_PAGE)).getAllByTestId(
+          /^voice-key-/,
+        );
+        const focusStates = keys.map((key) => key.getAttribute(DATA_FOCUSED));
+
+        expect(focusStates).toEqual(keys.map(() => 'false'));
+      });
+
+      it('repeats the note under the last field of a field card', () => {
+        const section = voiceCard(ERROR_PAGE);
+        const preview = within(section).getByRole('group', { name: PREVIEW });
+        const [closingNote] = within(section).getAllByText(ERROR_PAGE_NOTE);
+        const lastField = within(section).getByRole('textbox', {
+          name: 'Description',
+        });
+
+        expect(preview).not.toContainElement(closingNote!);
+        expect(lastField.compareDocumentPosition(closingNote!)).toBe(FOLLOWS);
+      });
+
       it('names the open list in the empty-lists preview label', async () => {
         const section = voiceCard(EMPTY_LISTS);
         const topicRow = within(section).getByRole('button', {
@@ -391,7 +430,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         await user.click(topicRow);
 
         const preview = within(section).getByRole('group', {
-          name: 'Preview · Topic page',
+          name: `Preview · ${TOPIC_FIELD}`,
         });
 
         expect(preview).toBeInTheDocument();
@@ -539,8 +578,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       const hint = screen.getByText(
         (_, element) =>
-          element?.tagName === 'SPAN' &&
-          element.textContent === KEEP_NAME_PLACEHOLDER,
+          element?.tagName === 'SPAN' && element.textContent === KEEP_NAME_NOTE,
       );
 
       expect(hint).toBeVisible();

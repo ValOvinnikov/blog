@@ -4,7 +4,7 @@ import type { TVoiceListSamples } from '@platform/components/features/site-previ
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
 import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
-import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import { getTranslations } from 'next-intl/server';
 
 export type TVoicePageContentProps = {
