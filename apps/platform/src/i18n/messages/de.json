@@ -1048,6 +1048,8 @@
     "jumpTo": "Springen zu",
     "expandAll": "Alle aufklappen",
     "collapseAll": "Alle zuklappen",
+    "expandAllSections": "Alle Abschnitte aufklappen",
+    "collapseAllSections": "Alle Abschnitte zuklappen",
     "alertSuccess": "Tonalität gespeichert.",
     "alertError": "Speichern fehlgeschlagen — bitte erneut versuchen.",
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",

@@ -6,8 +6,8 @@ export const voiceSectionChipVariants = tv({
   slots: {
     item: ['flex shrink-0'],
     link: [
-      'flex h-8 items-center gap-2 rounded-full border px-3 whitespace-nowrap no-underline',
-      'text-admin-13 leading-4 font-semibold',
+      'flex h-11 items-center gap-2 rounded-full border px-3.5 whitespace-nowrap no-underline md:h-8 md:px-3',
+      'text-admin-13-5 leading-4 font-semibold md:text-admin-13',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     count: ['text-admin-12 leading-admin-15 font-medium'],

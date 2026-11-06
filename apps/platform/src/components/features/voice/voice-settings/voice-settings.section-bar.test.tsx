@@ -68,6 +68,15 @@ const chip = (name: string) =>
 const barButton = (name: string) =>
   within(sectionBar()).getByRole('button', { name });
 
+const expectEverySection = (isOpen: boolean) => {
+  for (const name of [ERROR_PAGES_SECTION, EMPTY_STATES_SECTION]) {
+    expect(voiceSectionHeader(name)).toHaveAttribute(
+      ARIA_EXPANDED,
+      String(isOpen),
+    );
+  }
+};
+
 const placeHeaders = (
   errorsTop: number,
   emptyTop: number,
@@ -133,12 +142,6 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
   describe('with nothing customised', () => {
     beforeEach(() => {
       setupVoiceSettings();
-    });
-
-    it('hides the Jump to label from screen readers', () => {
-      const label = within(sectionBar()).getByText(VOICE_SETTINGS.jumpTo);
-
-      expect(label).toHaveAttribute(ARIA_HIDDEN, 'true');
     });
 
     it('links one chip to each section', () => {
@@ -234,53 +237,6 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
     });
 
-    it('tabs through the chips, Expand all and Collapse all before the sections', async () => {
-      chip(ERROR_PAGES_SECTION).focus();
-
-      await user.tab();
-      expect(chip(EMPTY_STATES_SECTION)).toHaveFocus();
-      await user.tab();
-      expect(barButton(VOICE_SETTINGS.expandAll)).toHaveFocus();
-      await user.tab();
-      expect(barButton(VOICE_SETTINGS.collapseAll)).toHaveFocus();
-      await user.tab();
-      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
-    });
-
-    it('opens every section with Expand all and closes them with Collapse all', async () => {
-      await user.click(barButton(VOICE_SETTINGS.expandAll));
-
-      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
-        'true',
-      );
-      expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
-        'true',
-      );
-
-      await user.click(barButton(VOICE_SETTINGS.collapseAll));
-
-      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
-        'false',
-      );
-      expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-        ARIA_EXPANDED,
-        'false',
-      );
-    });
-
-    it.each([VOICE_SETTINGS.expandAll, VOICE_SETTINGS.collapseAll])(
-      'lets %s control every section body and stay enabled',
-      (name) => {
-        const button = barButton(name);
-
-        expect(button).toHaveAttribute(ARIA_CONTROLS, SECTION_BODY_IDS);
-        expect(button).toBeEnabled();
-      },
-    );
-
     it('fades only the end while more chips lie to the right', () => {
       scrollChipList(0);
 
@@ -339,16 +295,140 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     });
   });
 
-  it('keeps the bar operable for an archived tenant', async () => {
-    setupVoiceSettings({ archivedAt: MOCK_ARCHIVED_AT });
+  describe('with the text buttons shown from 1024', () => {
+    describe('and nothing customised', () => {
+      beforeEach(() => {
+        setupVoiceSettings();
+      });
 
-    await user.click(barButton(VOICE_SETTINGS.expandAll));
-    await user.click(chip(ERROR_PAGES_SECTION));
+      it('hides the Jump to label from screen readers', () => {
+        const label = within(sectionBar()).getByText(VOICE_SETTINGS.jumpTo);
 
-    expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
-      ARIA_EXPANDED,
-      'true',
-    );
-    expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
+        expect(label).toHaveAttribute(ARIA_HIDDEN, 'true');
+      });
+
+      it('orders the chips, then the bar buttons, before the sections', async () => {
+        chip(ERROR_PAGES_SECTION).focus();
+
+        await user.tab();
+        expect(chip(EMPTY_STATES_SECTION)).toHaveFocus();
+        await user.tab();
+        expect(barButton(VOICE_SETTINGS.expandAll)).toHaveFocus();
+        await user.tab();
+        expect(barButton(VOICE_SETTINGS.collapseAll)).toHaveFocus();
+        await user.tab();
+        expect(barButton(VOICE_SETTINGS.expandAllSections)).toHaveFocus();
+        await user.tab();
+        expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
+      });
+
+      it('opens every section with Expand all and closes them with Collapse all', async () => {
+        await user.click(barButton(VOICE_SETTINGS.expandAll));
+        expectEverySection(true);
+
+        await user.click(barButton(VOICE_SETTINGS.collapseAll));
+        expectEverySection(false);
+      });
+
+      it.each([VOICE_SETTINGS.expandAll, VOICE_SETTINGS.collapseAll])(
+        'lets %s control every section body and stay enabled',
+        (name) => {
+          const button = barButton(name);
+
+          expect(button).toHaveAttribute(ARIA_CONTROLS, SECTION_BODY_IDS);
+          expect(button).toBeEnabled();
+        },
+      );
+    });
+
+    it('keeps the bar operable for an archived tenant', async () => {
+      setupVoiceSettings({ archivedAt: MOCK_ARCHIVED_AT });
+
+      await user.click(barButton(VOICE_SETTINGS.expandAll));
+      await user.click(chip(ERROR_PAGES_SECTION));
+
+      expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
+        ARIA_EXPANDED,
+        'true',
+      );
+      expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
+    });
+  });
+
+  describe('with the icon button shown below 1024', () => {
+    const expandAllSections = () => barButton(VOICE_SETTINGS.expandAllSections);
+
+    it('lets the icon button control every section body', () => {
+      setupVoiceSettings();
+
+      expect(expandAllSections()).toHaveAttribute(
+        ARIA_CONTROLS,
+        SECTION_BODY_IDS,
+      );
+    });
+
+    it('expands every section, then names itself Collapse all sections and collapses them', async () => {
+      setupVoiceSettings();
+
+      await user.click(expandAllSections());
+      expectEverySection(true);
+
+      await user.click(barButton(VOICE_SETTINGS.collapseAllSections));
+      expectEverySection(false);
+      expect(expandAllSections()).toBeInTheDocument();
+    });
+
+    it('stays Expand all sections while any section is collapsed', async () => {
+      setupVoiceSettings();
+
+      await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
+
+      expect(expandAllSections()).toBeInTheDocument();
+    });
+
+    it('shows its current name as a tooltip at once on keyboard focus', async () => {
+      setupVoiceSettings();
+      barButton(VOICE_SETTINGS.collapseAll).focus();
+
+      await user.tab();
+
+      const tooltip = await screen.findByText(
+        VOICE_SETTINGS.expandAllSections,
+        { ignore: 'button' },
+      );
+      expect(expandAllSections()).toHaveFocus();
+      expect(tooltip).toBeVisible();
+    });
+
+    it('marks no chip active while the bar is in flow, even past a header', async () => {
+      setupVoiceSettings();
+      placeHeaders(-BELOW_LINE, -BELOW_LINE);
+      await waitFor(() =>
+        expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(
+          ARIA_CURRENT,
+          ACTIVE,
+        ),
+      );
+
+      const bar = sectionBar();
+      placeHeaders(-BELOW_LINE, -BELOW_LINE, {
+        element: bar,
+        top: IN_FLOW_BAR_TOP,
+        bottom: IN_FLOW_BAR_TOP + BAR_HEIGHT,
+      });
+
+      await waitFor(() =>
+        expect(chip(EMPTY_STATES_SECTION)).not.toHaveAttribute(ARIA_CURRENT),
+      );
+      expect(chip(ERROR_PAGES_SECTION)).not.toHaveAttribute(ARIA_CURRENT);
+    });
+
+    it('keeps the icon button operable for an archived tenant', async () => {
+      setupVoiceSettings({ archivedAt: MOCK_ARCHIVED_AT });
+
+      await user.click(expandAllSections());
+
+      expectEverySection(true);
+    });
   });
 });

@@ -1,27 +1,22 @@
 'use client';
 
-import { SIZE } from '@blog/config';
-import { Button } from '@platform/components/shared/button';
-import { BUTTON_VARIANT } from '@platform/constants/button';
-import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import {
   VOICE_SECTION_BAR_FADE_END_TEST_ID,
   VOICE_SECTION_BAR_FADE_START_TEST_ID,
-  VOICE_SECTION_ID,
   type TVoiceSection,
 } from '@platform/constants/voice';
-import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { useTrackScroll } from '@platform/utils/use-track-scroll/use-track-scroll';
 import { VOICE_SECTIONS_IN_PAGE_ORDER } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
+import { VoiceSectionBarActions } from './components/voice-section-bar-actions';
 import { VoiceSectionChip } from './components/voice-section-chip';
 import { useActiveVoiceSection } from './use-active-voice-section';
 import { useIsSectionBarPinned } from './use-is-section-bar-pinned';
 import { useVoiceSectionBarHeight } from './use-voice-section-bar-height';
 import {
-  VOICE_SECTION_BAR_FADE_WIDTH_PX,
+  VOICE_SECTION_BAR_REVEAL_INSET_PX,
   voiceSectionBarVariants,
 } from './voice-section-bar-variants';
 
@@ -30,12 +25,6 @@ export type TVoiceSectionBarProps = {
   onJumpToSection: (section: TVoiceSection) => void;
   onSetAllSectionsOpen: (isOpen: boolean) => void;
 };
-
-const SECTION_BODY_IDS = joinIds(
-  ...VOICE_SECTIONS_IN_PAGE_ORDER.map(
-    (section) => VOICE_SECTION_ID[section].body,
-  ),
-);
 
 export const VoiceSectionBar = ({
   openSections,
@@ -50,12 +39,13 @@ export const VoiceSectionBar = ({
     barRef,
     openSections,
   );
+  const shownActiveSection = isPinned ? activeSection : undefined;
   const { trackRef, setItemRef, onScroll, hasMoreStart, hasMoreEnd } =
     useTrackScroll<HTMLUListElement, HTMLAnchorElement>({
-      selectedIndex: activeSection
-        ? VOICE_SECTIONS_IN_PAGE_ORDER.indexOf(activeSection)
+      selectedIndex: shownActiveSection
+        ? VOICE_SECTIONS_IN_PAGE_ORDER.indexOf(shownActiveSection)
         : -1,
-      fadeWidth: VOICE_SECTION_BAR_FADE_WIDTH_PX,
+      fadeWidth: VOICE_SECTION_BAR_REVEAL_INSET_PX,
     });
   const styles = voiceSectionBarVariants({ isPinned });
 
@@ -85,7 +75,7 @@ export const VoiceSectionBar = ({
               key={section}
               ref={setItemRef(index)}
               section={section}
-              isActive={section === activeSection}
+              isActive={section === shownActiveSection}
               onSelect={selectSection}
             />
           ))}
@@ -105,26 +95,12 @@ export const VoiceSectionBar = ({
           />
         )}
       </nav>
-      <div className={styles.actions()}>
-        <Button
-          size={SIZE.XS}
-          variant={BUTTON_VARIANT.SECONDARY}
-          focusGround={FOCUS_RING_GROUND.SURFACE}
-          aria-controls={SECTION_BODY_IDS}
-          onClick={() => onSetAllSectionsOpen(true)}
-        >
-          {t('expandAll')}
-        </Button>
-        <Button
-          size={SIZE.XS}
-          variant={BUTTON_VARIANT.SECONDARY}
-          focusGround={FOCUS_RING_GROUND.SURFACE}
-          aria-controls={SECTION_BODY_IDS}
-          onClick={() => onSetAllSectionsOpen(false)}
-        >
-          {t('collapseAll')}
-        </Button>
-      </div>
+      <VoiceSectionBarActions
+        isEverySectionOpen={
+          openSections.length === VOICE_SECTIONS_IN_PAGE_ORDER.length
+        }
+        onSetAllSectionsOpen={onSetAllSectionsOpen}
+      />
     </section>
   );
 };

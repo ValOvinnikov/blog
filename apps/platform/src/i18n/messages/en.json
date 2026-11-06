@@ -1048,6 +1048,8 @@
     "jumpTo": "Jump to",
     "expandAll": "Expand all",
     "collapseAll": "Collapse all",
+    "expandAllSections": "Expand all sections",
+    "collapseAllSections": "Collapse all sections",
     "alertSuccess": "Voice saved.",
     "alertError": "Couldn't save — try again.",
     "keepPlaceholder": "Keep <code>{token}</code> — the site fills it in.",
