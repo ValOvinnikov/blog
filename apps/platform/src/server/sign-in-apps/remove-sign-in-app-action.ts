@@ -15,11 +15,11 @@ import {
   type TSignInAppRefusal,
 } from '@platform/constants/sign-in-apps';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
+import { requireSignInAppOwner } from './require-sign-in-app-owner';
 import { signInAppProviderSchema } from './sign-in-app-input';
 
 export type TRemoveSignInAppResult = TActionResult<
@@ -33,7 +33,7 @@ export const removeSignInAppAction = async (
   tenantId: string,
   provider: TOAuthProvider,
 ): Promise<TRemoveSignInAppResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireSignInAppOwner(tenantId);
 
   const parsed = signInAppProviderSchema.safeParse(provider);
   if (!parsed.success) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);

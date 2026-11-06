@@ -18,11 +18,11 @@ import {
   type TSignInAppRefusal,
 } from '@platform/constants/sign-in-apps';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
+import { requireSignInAppOwner } from './require-sign-in-app-owner';
 import {
   signInAppInputSchema,
   type TSignInAppInput,
@@ -42,7 +42,7 @@ export const saveSignInAppAction = async (
   tenantId: string,
   input: TSignInAppInput,
 ): Promise<TSaveSignInAppResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireSignInAppOwner(tenantId);
 
   const parsed = signInAppInputSchema.safeParse(input);
   if (!parsed.success) {

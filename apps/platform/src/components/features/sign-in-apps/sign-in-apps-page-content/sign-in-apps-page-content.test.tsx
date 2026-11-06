@@ -2,6 +2,7 @@ import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
+import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
@@ -13,6 +14,7 @@ import {
 } from '@platform/testing/sign-in-apps/fixtures';
 import {
   MOCK_ARCHIVED_AT,
+  MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
 
@@ -91,20 +93,34 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
     },
   );
 
-  it('shows an operator only each status and callback address', async () => {
-    await setup({ membership: undefined, admin: mockAdmin() });
+  it.each([
+    ['on the operator route', { membership: undefined, admin: mockAdmin() }],
+    [
+      'through a virtual owner membership',
+      {
+        membership: buildVirtualAdminMembership(
+          mockAdmin().userId,
+          MOCK_TENANT_ID,
+        ),
+      },
+    ],
+  ])(
+    'shows an operator %s only each status and callback address',
+    async (_name, access) => {
+      await setup(access);
 
-    const pill = screen.getByText(page.ownStatus);
-    const callback = screen.getByText(MOCK_GOOGLE_CALLBACK_URL);
-    const input = screen.queryByRole('textbox');
-    const secretState = screen.queryByText(page.secretSet);
-    const link = screen.queryByRole('link');
-    expect(pill).toBeVisible();
-    expect(callback).toBeVisible();
-    expect(input).not.toBeInTheDocument();
-    expect(secretState).not.toBeInTheDocument();
-    expect(link).not.toBeInTheDocument();
-  });
+      const pill = screen.getByText(page.ownStatus);
+      const callback = screen.getByText(MOCK_GOOGLE_CALLBACK_URL);
+      const input = screen.queryByRole('textbox');
+      const secretState = screen.queryByText(page.secretSet);
+      const link = screen.queryByRole('link');
+      expect(pill).toBeVisible();
+      expect(callback).toBeVisible();
+      expect(input).not.toBeInTheDocument();
+      expect(secretState).not.toBeInTheDocument();
+      expect(link).not.toBeInTheDocument();
+    },
+  );
 
   it('shows a downgraded site the Free page, keeping its saved app', async () => {
     vi.mocked(listTenantOAuthClients).mockResolvedValue([

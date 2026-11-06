@@ -14,8 +14,10 @@ import {
   SIGN_IN_APP_REFUSAL,
 } from '@platform/constants/sign-in-apps';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
+import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
@@ -88,6 +90,17 @@ describe(saveSignInAppAction, () => {
         vi.mocked(requireTenantMembership).mockResolvedValueOnce({
           ...mockOwnerContext({ plan: TENANT_PLAN.GROWTH }),
           membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        }),
+    ],
+    [
+      'an operator acting through a virtual owner membership',
+      () =>
+        vi.mocked(requireTenantMembership).mockResolvedValueOnce({
+          ...mockOwnerContext({ plan: TENANT_PLAN.GROWTH }),
+          membership: buildVirtualAdminMembership(
+            mockAdmin().userId,
+            MOCK_TENANT_ID,
+          ),
         }),
     ],
   ])('rejects %s', async (_name, arrange) => {

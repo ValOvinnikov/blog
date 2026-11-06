@@ -9,10 +9,10 @@ import {
   SIGN_IN_APP_REFUSAL,
   type TSignInAppRefusal,
 } from '@platform/constants/sign-in-apps';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
+import { requireSignInAppOwner } from './require-sign-in-app-owner';
 import { signInAppProviderSchema } from './sign-in-app-input';
 
 export type TConfirmSignInCallbackResult = TActionResult<
@@ -26,7 +26,7 @@ export const confirmSignInCallbackAction = async (
   tenantId: string,
   provider: TOAuthProvider,
 ): Promise<TConfirmSignInCallbackResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireSignInAppOwner(tenantId);
 
   const parsed = signInAppProviderSchema.safeParse(provider);
   if (!parsed.success) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
