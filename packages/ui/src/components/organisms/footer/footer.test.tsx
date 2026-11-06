@@ -26,6 +26,12 @@ const MOCK_PRIVACY_LINK = {
   href: `/${faker.lorem.slug(2)}`,
 };
 
+const MOCK_POWERED_BY = {
+  label: faker.lorem.words(2),
+  productName: faker.company.name(),
+  href: faker.internet.url(),
+};
+
 const ALL_LAYOUTS = Object.values(FOOTER_LAYOUT);
 const FULL_LAYOUTS = ALL_LAYOUTS.filter(
   (layout) => layout !== FOOTER_LAYOUT.COMPACT,
@@ -254,6 +260,37 @@ describe(`<${Footer.name}/>`, () => {
 
     expect(link).toHaveAttribute('href', MOCK_LINK.href);
   });
+
+  it.each(ALL_LAYOUTS)(
+    'renders the powered-by link after the fine print and outside its navigation in the %s layout',
+    (layout) => {
+      renderElement(
+        <Footer layout={layout}>
+          <Footer.PoweredBy {...MOCK_POWERED_BY} />
+          <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
+          <Footer.FinePrint ariaLabel={MOCK_FINE_PRINT_LABEL}>
+            <TextLink appearance="nav" href={MOCK_PRIVACY_LINK.href}>
+              {MOCK_PRIVACY_LINK.label}
+            </TextLink>
+          </Footer.FinePrint>
+        </Footer>,
+      );
+
+      const finePrint = screen.getByRole('navigation', {
+        name: MOCK_FINE_PRINT_LABEL,
+      });
+      const poweredBy = screen.getByRole('link', {
+        name: `${MOCK_POWERED_BY.label} ${MOCK_POWERED_BY.productName}`,
+      });
+      const followsFinePrint =
+        finePrint.compareDocumentPosition(poweredBy) &
+        Node.DOCUMENT_POSITION_FOLLOWING;
+
+      expect(poweredBy).toHaveAttribute('href', MOCK_POWERED_BY.href);
+      expect(finePrint).not.toContainElement(poweredBy);
+      expect(followsFinePrint).toBeTruthy();
+    },
+  );
 
   it('renders unmatched children without dropping them', () => {
     renderElement(
