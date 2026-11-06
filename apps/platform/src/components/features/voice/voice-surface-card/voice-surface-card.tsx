@@ -5,19 +5,17 @@ import {
   type TVoiceFieldId,
   type TVoiceSurface,
 } from '@blog/config';
-import { VoiceSpecimen } from '@platform/components/features/site-preview/voice-specimen';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceField } from '@platform/components/features/voice/voice-field';
 import { VoiceListRow } from '@platform/components/features/voice/voice-list-row';
-import { useVoiceListSamples } from '@platform/components/features/voice/voice-list-samples-provider';
 import { Accordion } from '@platform/components/shared/accordion';
-import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { VOICE_CARD_ID } from '@platform/constants/voice';
 import { voiceFieldsOf } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
+import { VoiceSurfacePreview } from './components/voice-surface-preview';
 import { VoiceSurfaceSummary } from './components/voice-surface-summary';
 import { voiceSurfaceCardVariants } from './voice-surface-card-variants';
 
@@ -33,30 +31,16 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
     errors,
     openListFieldId,
     setOpenListFieldId,
-    specimenTheme,
   } = useVoiceEditor();
   const tSurfaces = useTranslations('voiceSurfaces');
   const tDescriptions = useTranslations('voiceSurfaceDescriptions');
-  const tSpecimen = useTranslations('voiceSpecimen');
-  const tNotes = useTranslations('voiceSurfaceNotes');
-  const tPreview = useTranslations('previewModeControl');
-  const listSamples = useVoiceListSamples(locale);
-  const previewId = useId();
-  const previewLabelId = useId();
   const [focusedFieldId, setFocusedFieldId] = useState<TVoiceFieldId>();
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const isArchive = surface === VOICE_SURFACE.ARCHIVE;
   const {
     body,
     fields: fieldsSlot,
-    previewColumn,
-    previewContent,
-    previewToggle,
-    preview,
-    previewLabel,
-    previewNote,
     card,
-  } = voiceSurfaceCardVariants({ isPreviewOpen });
-  const isArchive = surface === VOICE_SURFACE.ARCHIVE;
+  } = voiceSurfaceCardVariants({ isArchive });
   const ids = VOICE_CARD_ID[surface];
   const openFieldId = isArchive ? openListFieldId : undefined;
   const fields = voiceFieldsOf(surface);
@@ -79,22 +63,24 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
         <div className={fieldsSlot()}>
           {isArchive ? (
             <Accordion
+              isList={true}
               openValue={openFieldId}
               onOpenValueChange={setOpenListFieldId}
             >
               {fields.map((field) => (
-                <div key={field.id} {...trackFocusOf(field.id)}>
-                  <VoiceListRow
-                    field={field}
-                    locale={locale}
-                    value={values[field.id]}
-                    savedValue={savedValues[field.id]}
-                    error={errors[field.id]}
-                    isOpen={openFieldId === field.id}
-                  >
+                <VoiceListRow
+                  key={field.id}
+                  field={field}
+                  locale={locale}
+                  value={values[field.id]}
+                  savedValue={savedValues[field.id]}
+                  error={errors[field.id]}
+                  isOpen={openFieldId === field.id}
+                >
+                  <div {...trackFocusOf(field.id)}>
                     <VoiceField field={field} />
-                  </VoiceListRow>
-                </div>
+                  </div>
+                </VoiceListRow>
               ))}
             </Accordion>
           ) : (
@@ -105,38 +91,11 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
             ))
           )}
         </div>
-        <div className={previewColumn()}>
-          <div className={previewContent()}>
-            <Button
-              className={previewToggle()}
-              aria-expanded={isPreviewOpen}
-              aria-controls={previewId}
-              onClick={() => setIsPreviewOpen((open) => !open)}
-            >
-              {tSpecimen(isPreviewOpen ? 'hidePreview' : 'showPreview')}
-            </Button>
-            <div
-              id={previewId}
-              role="group"
-              aria-labelledby={previewLabelId}
-              className={preview()}
-            >
-              <p id={previewLabelId} className={previewLabel()}>
-                {tPreview('livePreviewHeading')}
-              </p>
-              <VoiceSpecimen
-                surface={surface}
-                locale={locale}
-                values={values}
-                listSamples={listSamples}
-                openListFieldId={openFieldId}
-                focusedFieldId={focusedFieldId}
-                theme={specimenTheme}
-              />
-              <p className={previewNote()}>{tNotes(surface)}</p>
-            </div>
-          </div>
-        </div>
+        <VoiceSurfacePreview
+          surface={surface}
+          openListFieldId={openFieldId}
+          focusedFieldId={focusedFieldId}
+        />
       </Card.Body>
     </Card>
   );

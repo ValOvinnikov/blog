@@ -14,6 +14,7 @@ import {
   type TSendSignInLinkFieldError,
   type TSendSignInLinkRefusal,
 } from '@platform/server/auth/send-sign-in-link-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useState, useTransition } from 'react';
 
 export const useEmailSignIn = ({
@@ -32,11 +33,9 @@ export const useEmailSignIn = ({
 
   const submit = () => {
     startTransition(async () => {
-      const result = await sendSignInLinkAction({
-        email,
-        callbackPath,
-        isSignUp,
-      });
+      const result = await settleAction(
+        sendSignInLinkAction({ email, callbackPath, isSignUp }),
+      );
 
       setEmailError(
         isOutcomeInvalid(result) ? result.fieldErrors.email : undefined,

@@ -2,6 +2,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RunContrastCheckButton } from './run-contrast-check-button';
@@ -15,6 +16,8 @@ vi.mock('@platform/server/releases/start-contrast-check-action', () => ({
 }));
 
 const RUN_CONTRAST_CHECK = { name: 'Run contrast check' };
+const STARTED = 'Contrast check started.';
+const START_FAILED = 'The contrast check could not be started.';
 
 const setup = customRender(RunContrastCheckButton, {
   isRunning: false,
@@ -43,7 +46,7 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
 
     await run();
 
-    const confirmation = await screen.findByText('Contrast check started.');
+    const confirmation = await screen.findByText(STARTED);
 
     expect(startContrastCheckActionMock).toHaveBeenCalledOnce();
     expect(confirmation).toBeVisible();
@@ -91,7 +94,7 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
       ACTION_OUTCOME.UNAVAILABLE,
       'GitHub could not be reached. Try again in a moment.',
     ],
-    [ACTION_OUTCOME.SERVER_ERROR, 'The contrast check could not be started.'],
+    [ACTION_OUTCOME.SERVER_ERROR, START_FAILED],
   ])('explains a %s answer', async (outcome, message) => {
     startContrastCheckActionMock.mockResolvedValue({ outcome });
     setup();
@@ -101,5 +104,22 @@ describe(`<${RunContrastCheckButton.name}/>`, () => {
     const explanation = await screen.findByText(message);
 
     expect(explanation).toBeVisible();
+  });
+
+  it('says the check could not start when the request never reaches the server, and starts it on retry', async () => {
+    startContrastCheckActionMock.mockRejectedValueOnce(MOCK_UNREACHED_REQUEST);
+    setup();
+
+    await run();
+
+    const failure = await screen.findByText(START_FAILED);
+
+    expect(failure).toBeVisible();
+
+    await run();
+
+    const confirmation = await screen.findByText(STARTED);
+
+    expect(confirmation).toBeVisible();
   });
 });

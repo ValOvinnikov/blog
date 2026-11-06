@@ -661,9 +661,14 @@
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
     "lockLineTypeFonts": "Op Free houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
-      "MENU_CODE": "Menu met code",
-      "MENU_GLOBE": "Menu met wereldbol",
-      "CODES": "Compacte codes"
+      "MENU_CODE": "Code",
+      "MENU_GLOBE": "Wereldbol",
+      "CODES": "Compact"
+    },
+    "languageSwitcherOptionDescription": {
+      "MENU_CODE": "Een menu met de taalcode",
+      "MENU_GLOBE": "Een menu met een wereldbolicoon",
+      "CODES": "Alle taalcodes op een rij"
     },
     "colourHeading": "Kleur",
     "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",
@@ -1035,6 +1040,7 @@
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
     "draftFieldLabel": "{surface} — {field} ({language})",
     "listRoute": "Getoond op {path}",
+    "previewLabel": "{hasField, select, true {Voorbeeld · {field}} other {Voorbeeld}}",
     "fieldError": {
       "NOT_A_STRING": "Vul in dit veld tekst in.",
       "NOT_RICH_TEXT": "Vul in dit veld tekst in.",

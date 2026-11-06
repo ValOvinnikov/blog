@@ -15,6 +15,7 @@ import {
   lookUpPersonalDataAction,
   type TLookUpPersonalDataResult,
 } from '@platform/server/data-requests/look-up-personal-data-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRef, useState, useTransition } from 'react';
 
 type TEmailError = TReasonedFailure<typeof TENANT_FIELD_ERROR.EMAIL_INVALID>;
@@ -53,7 +54,7 @@ export const useDataRequest = ({
 
   const lookUp = () => {
     startLookUp(async () => {
-      const result = await lookUpPersonalDataAction({ email });
+      const result = await settleAction(lookUpPersonalDataAction({ email }));
 
       if (isOutcomeSuccess(result)) {
         const { matches, readerAccount } = result;
@@ -76,10 +77,9 @@ export const useDataRequest = ({
     lookedUpEmail: string,
     includesReaderAccount: boolean,
   ): Promise<TConfirmDialogActionResult> => {
-    const result = await erasePersonalDataAction({
-      email: lookedUpEmail,
-      includesReaderAccount,
-    });
+    const result = await settleAction(
+      erasePersonalDataAction({ email: lookedUpEmail, includesReaderAccount }),
+    );
     if (!isOutcomeSuccess(result)) return errorResult(eraseFailed);
 
     erasure.current = {

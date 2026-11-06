@@ -9,6 +9,7 @@ import {
 import { customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { RemoveBlockedIdentityControl } from './remove-blocked-identity-control';
@@ -87,4 +88,24 @@ describe(`<${RemoveBlockedIdentityControl.name}/>`, () => {
       expect(refresh).not.toHaveBeenCalled();
     },
   );
+
+  it('keeps the dialog open with the error when the request never reaches the server, and removes on retry', async () => {
+    vi.mocked(removeBlockedIdentityAction)
+      .mockRejectedValueOnce(MOCK_UNREACHED_REQUEST)
+      .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS });
+
+    const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+    await user.click(confirm);
+
+    const error = await screen.findByText(
+      removeBlockedIdentityControl.removalFailed,
+    );
+
+    expect(error).toBeVisible();
+    expect(refresh).not.toHaveBeenCalled();
+
+    await user.click(confirm);
+
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
 });

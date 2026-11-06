@@ -17,6 +17,7 @@ import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsRefusal,
 } from '@platform/server/tenants/update-tenant-details-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -52,7 +53,9 @@ export const useTenantDetailsSave = (
   };
 
   const resendStudioInvite = async () => {
-    const result = await resendChangedOwnerStudioInviteAction(tenantId);
+    const result = await settleAction(
+      resendChangedOwnerStudioInviteAction(tenantId),
+    );
     if (isOutcomeSuccess(result)) {
       toast.success({ message: t('studioInviteResent') });
     } else {
@@ -63,7 +66,9 @@ export const useTenantDetailsSave = (
   const save = async (): Promise<boolean> => {
     clearErrors();
 
-    const result = await updateTenantDetailsAction(tenantId, values);
+    const result = await settleAction(
+      updateTenantDetailsAction(tenantId, values),
+    );
     switch (result.outcome) {
       case ACTION_OUTCOME.SUCCESS: {
         if (result.isStudioReinviteUnsent) {
