@@ -46,7 +46,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const tLabels = useTranslations('voiceFieldLabels');
   const tHints = useTranslations('voiceFieldHints');
   const [editorRevision, setEditorRevision] = useState(0);
-  const { root, token, error: errorSlot } = voiceFieldVariants();
+  const { root, note, token, error: errorSlot } = voiceFieldVariants();
 
   const hintId = `${inputId}-hint`;
   const noteId = `${inputId}-note`;
@@ -126,7 +126,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
         <Field.Description
           id={noteId}
           render={<span />}
-          className={textVariants({ variant: 'hint' })}
+          className={textVariants({ variant: 'hint', class: note() })}
         >
           {t.rich('keepPlaceholder', {
             token: `{${placeholderToken}}`,

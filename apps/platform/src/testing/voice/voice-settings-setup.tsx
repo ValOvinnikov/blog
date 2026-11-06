@@ -62,8 +62,14 @@ export const STORED_VOICE_OVERRIDES = {
   },
 };
 
+export const DRAFTED_BLOG_LIST_TEXT = 'Notes are on their way';
+
 export const STORED_BLOG_LIST_OVERRIDE = {
   [EN]: { blogListEmpty: richText('Fresh notes soon', 'en-bl') },
+};
+
+export const DRAFTED_BLOG_LIST_OVERRIDE = {
+  [EN]: { blogListEmpty: richText(DRAFTED_BLOG_LIST_TEXT, 'en-bl-d') },
 };
 
 const VoiceSettingsWithListSamples = (props: TVoiceSettingsProps) => (

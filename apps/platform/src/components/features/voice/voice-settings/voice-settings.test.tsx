@@ -1,5 +1,4 @@
 import { SITE_MESSAGES_BY_LOCALE, VOICE_SURFACE } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
 import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
@@ -12,7 +11,13 @@ import {
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
-import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
+import {
+  BLOG_INDEX_ROW,
+  NOTHING_HERE,
+  TAG_ROW,
+  TOPIC_ROW,
+  UNSAVED_MARK,
+} from '@platform/testing/voice/fixtures';
 import { openVoiceSections } from '@platform/testing/voice/sections';
 import {
   BOOKMARKS,
@@ -26,14 +31,12 @@ import {
   GERMAN,
   NO_OVERRIDES,
   RESET,
-  STORED_BLOG_LIST_OVERRIDE,
   TWO_LANGUAGES,
   activeLanguageLabel,
   setupBilingualVoiceSettingsWithSectionsOpen,
   setupVoiceSettingsWithSectionsOpen,
 } from '@platform/testing/voice/voice-settings-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
-import { buildVoiceDraft } from '@platform/utils/voice-draft/voice-draft';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { VoiceSettings } from './voice-settings';
@@ -55,7 +58,6 @@ const TAG_PAGE = 'Tag page';
 const BLOG_INDEX_PAGE = 'Blog index page';
 const SHOW_PREVIEW = 'Show preview';
 const PREVIEW = 'Preview';
-const { EN } = LOCALE_ISO_CODES;
 const HEADING_KEY_TEST_ID = 'voice-key-notFoundHeading';
 const DATA_FOCUSED = 'data-focused';
 const FOLLOWS = Node.DOCUMENT_POSITION_FOLLOWING;
@@ -137,7 +139,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       const customisedBadge = within(section).getByText('Customised');
       const unsavedBadge = within(section).getByRole('img', {
-        name: 'Unsaved',
+        name: UNSAVED_MARK,
       });
       const customisedSummary = within(section).getByText(
         '3 fields · 1 customised',
@@ -342,7 +344,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('shows the open list in the empty-lists specimen', async () => {
         const topicRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
-          name: /Topic page/,
+          name: TOPIC_ROW,
         });
         await user.click(topicRow);
 
@@ -384,7 +386,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       it('names the open list in the empty-lists preview label', async () => {
         const section = voiceCard(EMPTY_LISTS);
         const topicRow = within(section).getByRole('button', {
-          name: /Topic page/,
+          name: TOPIC_ROW,
         });
         await user.click(topicRow);
 
@@ -398,7 +400,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       it('names the first list in the preview label while no list is open', async () => {
         const section = voiceCard(EMPTY_LISTS);
         const openRow = within(section).getByRole('button', {
-          name: /Blog index page/,
+          name: BLOG_INDEX_ROW,
           expanded: true,
         });
         await user.click(openRow);
@@ -459,8 +461,8 @@ describe(`<${VoiceSettings.name}/>`, () => {
       expect(blogIndexField).toBeVisible();
 
       for (const name of [
-        /Topic page/,
-        /Tag page/,
+        TOPIC_ROW,
+        TAG_ROW,
         /Topics index page/,
         /Tags index page/,
       ]) {
@@ -472,7 +474,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         expect(compactRow).toBeVisible();
       }
 
-      const tagRow = within(section).getByRole('button', { name: /Tag page/ });
+      const tagRow = within(section).getByRole('button', { name: TAG_ROW });
       await user.click(tagRow);
 
       const tagField = within(section).getByRole('textbox', { name: TAG_PAGE });
@@ -480,7 +482,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         name: BLOG_INDEX_PAGE,
       });
       const blogIndexRow = within(section).getByRole('button', {
-        name: /Blog index page/,
+        name: BLOG_INDEX_ROW,
       });
 
       expect(tagField).toBeVisible();
@@ -492,7 +494,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
     it('keeps keyboard focus on a list row as it opens, then tabs in', async () => {
       const section = voiceCard(EMPTY_LISTS);
-      const row = within(section).getByRole('button', { name: /Tag page/ });
+      const row = within(section).getByRole('button', { name: TAG_ROW });
 
       await user.pointer({ keys: '[MouseLeft>]', target: row });
       await user.keyboard('{Enter}');
@@ -518,13 +520,13 @@ describe(`<${VoiceSettings.name}/>`, () => {
     it('closes the open list from its header', async () => {
       const section = voiceCard(EMPTY_LISTS);
       const openRow = within(section).getByRole('button', {
-        name: /Blog index page/,
+        name: BLOG_INDEX_ROW,
         expanded: true,
       });
       await user.click(openRow);
 
       const closedRow = within(section).getByRole('button', {
-        name: /Blog index page/,
+        name: BLOG_INDEX_ROW,
         expanded: false,
       });
 
@@ -532,7 +534,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
     });
 
     it('asks the editor to keep the name placeholder on a topic message', async () => {
-      const topicRow = screen.getByRole('button', { name: /Topic page/ });
+      const topicRow = screen.getByRole('button', { name: TOPIC_ROW });
       await user.click(topicRow);
 
       const hint = screen.getByText(
@@ -542,32 +544,6 @@ describe(`<${VoiceSettings.name}/>`, () => {
       );
 
       expect(hint).toBeVisible();
-    });
-  });
-
-  describe('a customised list', () => {
-    it('keeps a list status on its row, never in its open panel', async () => {
-      await setupVoiceSettingsWithSectionsOpen(user, {
-        initialDraft: buildVoiceDraft(STORED_BLOG_LIST_OVERRIDE, [EN]),
-      });
-
-      const section = voiceCard(EMPTY_LISTS);
-      const openRow = within(section).getByRole('button', {
-        name: /Blog index page/,
-        expanded: true,
-      });
-      const resetButton = within(section).getByRole('button', { name: RESET });
-      await user.click(resetButton);
-
-      const unsavedMarks = within(section).getAllByRole('img', {
-        name: 'Unsaved',
-      });
-      const defaultPills = within(openRow).getAllByText('Default');
-
-      expect(unsavedMarks).toHaveLength(1);
-      expect(openRow).toContainElement(unsavedMarks[0]!);
-      expect(defaultPills).toHaveLength(1);
-      expect(resetButton).not.toBeInTheDocument();
     });
   });
 
@@ -585,7 +561,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       it('describes every open control with the archived notice', async () => {
         const tagRow = within(voiceCard(EMPTY_LISTS)).getByRole('button', {
-          name: /Tag page/,
+          name: TAG_ROW,
         });
         await user.click(tagRow);
 

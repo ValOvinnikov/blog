@@ -5,6 +5,7 @@ export const voiceFieldHeaderVariants = tv({
     root: ['flex flex-wrap items-start justify-between gap-x-3 gap-y-1.5'],
     labelGroup: ['flex min-w-0 flex-col gap-0.5'],
     label: ['text-admin-13 font-semibold text-admin-text'],
+    hint: ['leading-4'],
     status: ['inline-flex shrink-0 items-center gap-2'],
   },
   variants: {

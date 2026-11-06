@@ -30,6 +30,7 @@ export const VoiceFieldHeader = ({
     root,
     labelGroup,
     label: labelSlot,
+    hint: hintSlot,
     status,
   } = voiceFieldHeaderVariants({ isInListRow });
 
@@ -44,7 +45,7 @@ export const VoiceFieldHeader = ({
         <Field.Description
           id={hintId}
           render={<span />}
-          className={textVariants({ variant: 'hint' })}
+          className={textVariants({ variant: 'hint', class: hintSlot() })}
         >
           {hint}
         </Field.Description>
