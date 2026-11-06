@@ -1748,8 +1748,8 @@ text; there are no metadata-only Voice fields.
 **The Voice page** (`apps/platform`) edits one language at a time through a
 switcher over the tenant's live languages, each showing its customised count.
 It is one column of four cards, one per surface. Each card holds its fields
-(the control for the field's kind, the catalog default as placeholder, a
-Default/Customised badge, Reset, and a "Keep `{name}`" note) beside a
+(the control for the field's kind showing the catalog default as its
+value, a Default/Customised badge, Reset, and a "Keep `{name}`" note) beside a
 specimen of that surface. The empty lists show as compact rows with one
 open at a time. Saving goes through the settings save bar, which shows
 `fieldErrorsByLocale` inline. The specimens live in
