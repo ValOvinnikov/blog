@@ -731,7 +731,6 @@
     "spinnerStyleLabel": "Spinner",
     "spinnerStyleDescription": "Der Spinner auf den Schaltflächen und Ladezuständen Ihrer Website.",
     "spinnerStyleOptionLabel": {
-      "PRESET": "Dem Preset folgen",
       "BRAILLE": "Braille",
       "RING": "Ring",
       "DOTS": "Punkte",

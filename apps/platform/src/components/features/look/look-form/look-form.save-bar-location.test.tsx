@@ -134,7 +134,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
     const location = within(saveBar).getByText(
-      tSaveBar('inCards', { cards: 3 }),
+      tSaveBar('inCards', { cards: 4 }),
     );
     const presetLink = within(saveBar).queryByRole('button', {
       name: LOOK_FORM.presetLabel,

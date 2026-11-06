@@ -48,7 +48,7 @@ describe(applyPresetDefaults, () => {
       logoHue: MOCK_LOGO_HUE,
       radiusScale: RADIUS_SCALE.XL,
     };
-    const { themeTokens, cardStyle, headerControlStyle } =
+    const { themeTokens, cardStyle, headerControlStyle, spinnerStyle } =
       PRESET_REGISTRY[PRESET_ID.EDITORIAL];
 
     expect(applyPresetDefaults(PRESET_ID.EDITORIAL, current)).toMatchObject({
@@ -61,6 +61,7 @@ describe(applyPresetDefaults, () => {
       density: themeTokens.density,
       cardStyle,
       headerControlStyle,
+      spinnerStyle,
     });
   });
 
@@ -117,19 +118,15 @@ describe(applyPresetDefaults, () => {
     });
   });
 
-  it('keeps the busy button style and spinner', () => {
+  it('keeps the busy button style', () => {
     const current = {
       ...defaultLookFormValues(),
       busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
-      spinnerStyle: SPINNER_STYLE.PULSE,
     };
 
     const next = applyPresetDefaults(PRESET_ID.EDITORIAL, current);
 
-    expect(next).toMatchObject({
-      busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
-      spinnerStyle: SPINNER_STYLE.PULSE,
-    });
+    expect(next.busyButtonStyle).toBe(BUSY_BUTTON_STYLE.EDGE);
   });
 
   it('keeps the language switcher style and both brand images', () => {
@@ -167,7 +164,19 @@ describe(switchPreset, () => {
       density: EDITORIAL.themeTokens.density,
       cardStyle: EDITORIAL.cardStyle,
       headerControlStyle: EDITORIAL.headerControlStyle,
+      spinnerStyle: EDITORIAL.spinnerStyle,
     });
+  });
+
+  it('keeps a spinner the owner changed', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      spinnerStyle: SPINNER_STYLE.PULSE,
+    };
+
+    expect(switchPreset(PRESET_ID.EDITORIAL, current).spinnerStyle).toBe(
+      SPINNER_STYLE.PULSE,
+    );
   });
 
   it('keeps a customised accent hue', () => {

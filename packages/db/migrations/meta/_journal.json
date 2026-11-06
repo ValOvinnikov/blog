@@ -22,6 +22,13 @@
       "when": 1793693459412,
       "tag": "0002_add_tenant_suspensions",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793888772685,
+      "tag": "0003_drop_spinner_style_preset",
+      "breakpoints": true
     }
   ]
 }

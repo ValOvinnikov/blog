@@ -602,20 +602,6 @@
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
-    "PRESET": [
-      {
-        "ref": "SPINNER_STYLE.PRESET",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/busy-button.ts"
-      },
-      {
-        "ref": "LOOK_CARD.PRESET",
-        "scope": "app:platform",
-        "from": "@platform/constants/look-card",
-        "file": "apps/platform/src/constants/look-card.ts"
-      }
-    ],
     "BRAILLE": [
       {
         "ref": "SPINNER_STYLE.BRAILLE",
@@ -5410,6 +5396,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/lead",
         "file": "apps/platform/src/constants/lead.ts"
+      }
+    ],
+    "PRESET": [
+      {
+        "ref": "LOOK_CARD.PRESET",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-card",
+        "file": "apps/platform/src/constants/look-card.ts"
       }
     ],
     "UNEDITED": [

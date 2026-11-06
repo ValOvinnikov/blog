@@ -6,6 +6,7 @@ import {
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
@@ -13,6 +14,7 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
+import { hasBusySpinner } from '@platform/utils/has-busy-spinner/has-busy-spinner';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
@@ -40,6 +42,8 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     t(`spinnerStyleOptionLabel.${style}`),
   );
 
+  const spinnerStyleLabel = t('spinnerStyleLabel');
+
   return (
     <LookCard
       summary={summary}
@@ -66,23 +70,29 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
         />
       </LookField>
 
-      <LookField
-        field="spinnerStyle"
-        label={t('spinnerStyleLabel')}
-        hint={t('spinnerStyleDescription')}
-        labelId={spinnerLock.labelId}
-        growthBadgeId={spinnerLock.growthBadgeId}
-      >
-        <OptionSelect
-          appearance={SELECT_APPEARANCE.COMPACT}
-          aria={spinnerLock.aria}
-          options={spinnerOptions}
-          value={spinnerStyle}
-          onChange={(style) => updateField('spinnerStyle', style)}
-          isDisabled={spinnerLock.isDisabled}
-          isLocked={spinnerLock.isLocked}
-        />
-      </LookField>
+      {hasBusySpinner(busyButtonStyle) && (
+        <LookField
+          field="spinnerStyle"
+          label={spinnerStyleLabel}
+          hint={t('spinnerStyleDescription')}
+          labelId={spinnerLock.labelId}
+          growthBadgeId={spinnerLock.growthBadgeId}
+        >
+          <OptionSelect
+            appearance={SELECT_APPEARANCE.COMPACT}
+            aria={spinnerLock.aria}
+            options={spinnerOptions}
+            value={spinnerStyle}
+            onChange={(style) => updateField('spinnerStyle', style)}
+            isDisabled={spinnerLock.isDisabled}
+            isLocked={spinnerLock.isLocked}
+          />
+          <PresetValueButton
+            field="spinnerStyle"
+            fieldLabel={spinnerStyleLabel}
+          />
+        </LookField>
+      )}
     </LookCard>
   );
 };
