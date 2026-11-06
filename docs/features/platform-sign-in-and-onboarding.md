@@ -128,7 +128,8 @@ Free site.
   too (no 608px cap), so the whole frame stays inside the stage. The sample
   wears the typed name ("Your site" while empty) with no logo, the chosen
   preset's header, footer and busy styles and the accent, the language
-  switcher, no reader accounts, and the cookie-settings button. Full and
+  switcher, no reader accounts, and the cookie-settings link or button only
+  where the preset's Look and feature defaults would show them. Full and
   Rail open on Desktop and Phone on Phone, all on Light; the wizard holds
   the pressed device and scheme above the tier-placed preview, so Continue,
   Back, an Edit from Review and a resize across a tier edge keep them. The

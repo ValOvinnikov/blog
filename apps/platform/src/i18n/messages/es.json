@@ -742,7 +742,7 @@
       "PULSE": "Pulso"
     },
     "footerHeading": "Pie de página",
-    "footerDescription": "Cómo se organiza la parte inferior de tu sitio, su fondo y un acceso flotante a la configuración de cookies.",
+    "footerDescription": "Cómo se organiza la parte inferior de tu sitio, su fondo y cómo vuelven los lectores a la configuración de cookies.",
     "footerLayoutLabel": "Diseño del pie de página",
     "footerLayoutDescription": "Dónde se colocan la marca, los grupos de enlaces y la letra pequeña. Compacto no muestra grupos, texto de presentación ni dirección.",
     "footerLayoutOptionLabel": {
@@ -764,13 +764,14 @@
       "FULL_WIDTH": "Ancho completo",
       "CARD": "Tarjeta"
     },
-    "cookieSettingsButtonLabel": "Botón de configuración de cookies",
-    "cookieSettingsButtonDescription": "Un botón redondo en la esquina inferior izquierda que vuelve a abrir la configuración de cookies, una vez que el lector ha respondido al banner de cookies.",
+    "cookieSettingsButtonLabel": "Configuración de cookies",
+    "cookieSettingsButtonDescription": "Cómo vuelven a abrir los lectores la configuración de cookies después de responder al banner de cookies: un enlace en el pie de página, un botón redondo en la esquina inferior izquierda o ambos.",
     "cookieSettingsButtonOptionLabel": {
-      "HIDDEN": "Oculto",
-      "SHOWN": "Visible"
+      "HIDDEN": "Enlace en el pie",
+      "ONLY": "Botón flotante",
+      "SHOWN": "Ambos"
     },
-    "cookieSettingsButtonBannerOff": "El banner de cookies está desactivado, así que el botón permanece oculto. Activa el banner en Funciones para mostrarlo.",
+    "cookieSettingsButtonBannerOff": "El banner de cookies está desactivado, así que los lectores no ven ni el enlace ni el botón. Activa el banner en Funciones para elegir.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva",
@@ -782,8 +783,9 @@
     "summaryFaviconUploaded": "Favicon subido",
     "summaryNoFavicon": "Sin favicon",
     "cookieSettingsButtonSummary": {
-      "HIDDEN": "Botón de cookies oculto",
-      "SHOWN": "Botón de cookies visible"
+      "HIDDEN": "Enlace de cookies en el pie",
+      "ONLY": "Botón de cookies flotante",
+      "SHOWN": "Enlace y botón de cookies"
     },
     "summaryOneLanguage": "Un idioma"
   },

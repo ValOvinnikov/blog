@@ -1,6 +1,11 @@
 'use client';
 
-import type { TLocaleIsoCode, TPresetId } from '@blog/config';
+import {
+  CAPABILITY,
+  PRESET_REGISTRY,
+  type TLocaleIsoCode,
+  type TPresetId,
+} from '@blog/config';
 import type { TOnboardingPreviewOptions } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/use-onboarding-preview-options';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
@@ -57,6 +62,10 @@ export const OnboardingPreview = ({
     accentHue,
   };
   const theme = buildSitePreviewTheme(look, isDark);
+  const footer = toSampleFooterStyle(
+    look,
+    PRESET_REGISTRY[preset].featureDefaults[CAPABILITY.CONSENT_BANNER],
+  );
   const isAddressOnOwnLine =
     isPhone ||
     isCoarsePointer ||
@@ -102,14 +111,16 @@ export const OnboardingPreview = ({
             theme={theme}
             liveLocales={[locale]}
             header={toSampleHeaderStyle(look)}
-            footer={toSampleFooterStyle(look)}
+            footer={footer}
             busy={toSampleBusyStyle(look)}
             hasReaderAccounts={false}
             shouldAlwaysShowLanguageSwitcher={true}
           />
-          <DeviceFrame.Overlay>
-            <SampleCookieButton theme={theme} />
-          </DeviceFrame.Overlay>
+          {footer.hasCookieSettingsButton && (
+            <DeviceFrame.Overlay>
+              <SampleCookieButton theme={theme} />
+            </DeviceFrame.Overlay>
+          )}
         </DeviceFrame>
       </PreviewFrame.Stage>
     </PreviewFrame>

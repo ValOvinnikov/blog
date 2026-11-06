@@ -21,6 +21,7 @@ export type TFooterSurface = TValueOf<typeof FOOTER_SURFACE>;
 export const COOKIE_SETTINGS_BUTTON = {
   HIDDEN: 'HIDDEN',
   SHOWN: 'SHOWN',
+  ONLY: 'ONLY',
 } as const;
 
 export type TCookieSettingsButton = TValueOf<typeof COOKIE_SETTINGS_BUTTON>;
