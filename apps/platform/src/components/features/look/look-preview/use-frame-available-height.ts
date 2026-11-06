@@ -7,7 +7,10 @@ import { useEffect, useRef, useState } from 'react';
 
 const VIEWPORT_SELECTOR = `[${DEVICE_FRAME_VIEWPORT_ATTRIBUTE}]`;
 
-export const useFrameAvailableHeight = (device: TPreviewDevice) => {
+export const useFrameAvailableHeight = (
+  device: TPreviewDevice,
+  isScrollingWithPage: boolean,
+) => {
   const rootRef = useRef<TMaybeNull<HTMLDivElement>>(null);
   const stageRef = useRef<TMaybeNull<HTMLDivElement>>(null);
   const root = useElementSize(rootRef);
@@ -31,11 +34,14 @@ export const useFrameAvailableHeight = (device: TPreviewDevice) => {
         stageRect.height - viewportElement.getBoundingClientRect().height;
       const belowStage =
         rootElement.getBoundingClientRect().bottom - stageRect.bottom;
+      const stageTop = isScrollingWithPage
+        ? stageRect.top + window.scrollY
+        : stageRect.top;
       const next = Math.max(
         0,
         Math.floor(
           window.innerHeight -
-            stageRect.top -
+            stageTop -
             stageChrome -
             belowStage -
             LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT -
@@ -49,7 +55,7 @@ export const useFrameAvailableHeight = (device: TPreviewDevice) => {
     window.addEventListener('resize', measure);
 
     return () => window.removeEventListener('resize', measure);
-  }, [device, root?.height, stage?.width, stage?.height]);
+  }, [device, isScrollingWithPage, root?.height, stage?.width, stage?.height]);
 
   return { rootRef, stageRef, availableHeight };
 };

@@ -28,6 +28,10 @@ export const settingsFormShellVariants = tv({
       true: {},
       false: {},
     },
+    isSaveBarHidden: {
+      true: {},
+      false: {},
+    },
     isArchived: {
       true: {
         root: [
@@ -42,6 +46,10 @@ export const settingsFormShellVariants = tv({
     },
   },
   compoundVariants: [
+    {
+      isSaveBarHidden: true,
+      class: { root: ['md:pb-0'] },
+    },
     {
       hasPhoneSaveFooter: false,
       isSaveBarShown: true,
@@ -84,5 +92,6 @@ export const settingsFormShellVariants = tv({
     isArchived: false,
     hasPhoneSaveFooter: false,
     isSaveBarShown: false,
+    isSaveBarHidden: false,
   },
 });
