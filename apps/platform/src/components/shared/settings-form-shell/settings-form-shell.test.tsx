@@ -12,6 +12,7 @@ import {
   ALL_CHANGES_SAVED,
   ARCHIVED_NOTICE_ID,
   ARCHIVED_NOTICE_TEXT,
+  ONE_UNSAVED_CHANGE,
   SAVE_CHANGES,
   UNSAVED_CHANGES,
 } from '@platform/testing/render-in-settings-form';
@@ -47,6 +48,7 @@ const MOCK_DRAFT_SAVED_AT = new Date('2026-10-08T11:05:00.000Z');
 const MOCK_TITLE = faker.lorem.word();
 const MOCK_DESCRIPTION = faker.lorem.sentence();
 const MOCK_BODY = faker.lorem.sentence();
+const MOCK_REMOVE_LABEL = faker.lorem.words(2);
 const MOCK_ERROR_TITLE = faker.lorem.sentence();
 const MOCK_PLAN_REFUSAL = faker.lorem.sentence();
 const MOCK_EDITED_VALUES: TValues = {
@@ -125,7 +127,8 @@ const UNSAVED_CHANGES_ANNOUNCEMENT_TEST_ID = 'unsaved-changes-announcement';
 
 const TaglineSettings = ({
   hasSavedStatus,
-}: Pick<TSettingsFormShellProps<TValues>, 'hasSavedStatus'>) => {
+  layout,
+}: Pick<TSettingsFormShellProps<TValues>, 'hasSavedStatus' | 'layout'>) => {
   const [saved, setSaved] = useState(MOCK_SAVED_VALUES);
   const [values, setValues] = useState(MOCK_SAVED_VALUES);
 
@@ -133,6 +136,7 @@ const TaglineSettings = ({
     <SettingsFormShell
       {...baseProps}
       hasSavedStatus={hasSavedStatus}
+      layout={layout}
       form={formFor({
         changeCount: values.tagline === saved.tagline ? 0 : 1,
         save: async () => {
@@ -156,11 +160,23 @@ const TaglineSettings = ({
   );
 };
 
+const RemovableControl = () => {
+  const [isShown, setIsShown] = useState(true);
+
+  return (
+    isShown && (
+      <button type="button" onClick={() => setIsShown(false)}>
+        {MOCK_REMOVE_LABEL}
+      </button>
+    )
+  );
+};
+
+const getTaglineInput = () =>
+  screen.getByRole('textbox', { name: MOCK_TAGLINE_LABEL });
+
 const editTagline = async (user: UserEvent) => {
-  const taglineInput = screen.getByRole('textbox', {
-    name: MOCK_TAGLINE_LABEL,
-  });
-  await user.type(taglineInput, '!');
+  await user.type(getTaglineInput(), '!');
 };
 
 describe(`<${SettingsFormShell.name}/>`, () => {
@@ -762,6 +778,69 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       unmount();
       renderShell();
       expectNoBanner();
+    });
+  });
+
+  describe('focus after a save', () => {
+    const saveFrom = async (regionName: string) => {
+      const region = screen.getByRole('region', { name: regionName });
+      const saveButton = within(region).getByRole('button', {
+        name: SAVE_CHANGES,
+      });
+      await user.click(saveButton);
+      return saveButton;
+    };
+
+    it('returns to the last control after a save from the save bar', async () => {
+      renderWithIntl(<TaglineSettings />);
+      await editTagline(user);
+
+      await saveFrom(UNSAVED_CHANGES);
+
+      await waitFor(() => expect(getTaglineInput()).toHaveFocus());
+    });
+
+    it('returns to the last control after a save from the phone footer', async () => {
+      renderWithIntl(<TaglineSettings layout={{ hasPhoneSaveFooter: true }} />);
+      await editTagline(user);
+
+      await saveFrom(ONE_UNSAVED_CHANGE);
+
+      await waitFor(() => expect(getTaglineInput()).toHaveFocus());
+    });
+
+    it('moves to the page heading when the last control has left the page', async () => {
+      renderShell({ changeCount: 1 }, { children: <RemovableControl /> });
+      const removeButton = screen.getByRole('button', {
+        name: MOCK_REMOVE_LABEL,
+      });
+      await user.click(removeButton);
+
+      await saveFrom(UNSAVED_CHANGES);
+
+      const heading = screen.getByRole('heading', {
+        level: 1,
+        name: MOCK_TITLE,
+      });
+      await waitFor(() => expect(heading).toHaveFocus());
+    });
+
+    it('leaves focus where it was after a save from the shortcut', async () => {
+      renderWithIntl(<TaglineSettings />);
+      await editTagline(user);
+
+      await user.keyboard(USER_EVENT_KEY.CONTROL_S);
+
+      await screen.findByText(ALL_CHANGES_SAVED);
+      expect(getTaglineInput()).toHaveFocus();
+    });
+
+    it('stays on Save changes after a failed save', async () => {
+      renderShell({ changeCount: 1, save: vi.fn().mockResolvedValue(false) });
+
+      const saveButton = await saveFrom(UNSAVED_CHANGES);
+
+      expect(saveButton).toHaveFocus();
     });
   });
 });

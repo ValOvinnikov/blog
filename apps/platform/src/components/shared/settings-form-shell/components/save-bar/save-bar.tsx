@@ -6,7 +6,7 @@ import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TInvalidControls } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { type Ref, useRef } from 'react';
 
 import { PhoneSaveFooter } from './components/phone-save-footer/phone-save-footer';
 import type { TUnsavedCard } from './components/save-bar-location/save-bar-location';
@@ -15,6 +15,7 @@ import { saveBarVariants } from './save-bar-variants';
 import { useSaveBarHeight } from './use-save-bar-height';
 
 export type TSaveBarProps = {
+  ref?: Ref<HTMLDivElement>;
   changeCount: number;
   breakdown: string;
   invalidControls: TInvalidControls;
@@ -27,6 +28,7 @@ export type TSaveBarProps = {
 };
 
 export const SaveBar = ({
+  ref,
   changeCount,
   breakdown,
   invalidControls,
@@ -43,12 +45,14 @@ export const SaveBar = ({
   const isDirty = changeCount > 0;
   const isSummaryAnError =
     !isUndefined(invalidControls.ids[0]) || Boolean(saveError);
-  const { root, actions, shortcut } = saveBarVariants({ hasPhoneFooter });
+  const { container, root, actions, shortcut } = saveBarVariants({
+    hasPhoneFooter,
+  });
 
   useSaveBarHeight(barRef, phoneFooterRef, isDirty);
 
   return (
-    <>
+    <div ref={ref} className={container()}>
       {isDirty && (
         <div
           ref={barRef}
@@ -95,6 +99,6 @@ export const SaveBar = ({
           onSave={onSave}
         />
       )}
-    </>
+    </div>
   );
 };

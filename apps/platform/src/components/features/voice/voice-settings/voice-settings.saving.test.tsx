@@ -7,7 +7,7 @@ import {
   saveVoiceOverridesAction,
   type TSaveVoiceOverridesResult,
 } from '@platform/server/site-config/save-voice-overrides-action';
-import { screen, within } from '@platform/testing/custom-render';
+import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ONE_UNSAVED_CHANGE,
@@ -40,7 +40,7 @@ const { EN, DE } = LOCALE_ISO_CODES;
 const MOCK_TYPED_TEXT = faker.lorem.words(2);
 const MOCK_EDIT_TEXT = faker.lorem.word();
 const TOO_LONG_MESSAGE = `Use ${MOCK_MAX_LENGTH} characters or fewer.`;
-const { alertError: SAVE_FAILED } = en.voiceSettings;
+const { alertError: SAVE_FAILED, alertSuccess: VOICE_SAVED } = en.voiceSettings;
 
 vi.mock('@platform/server/site-config/save-voice-overrides-action');
 
@@ -116,6 +116,26 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
     await screen.findAllByRole('alert');
   });
 
+  it('returns focus to the edited field after a save from the phone footer', async () => {
+    saveVoiceOverridesActionMock.mockResolvedValueOnce({
+      outcome: ACTION_OUTCOME.SUCCESS,
+    });
+    setupVoiceSettings();
+
+    await openErrorPages();
+
+    await user.type(notFoundHeadingField(), MOCK_TYPED_TEXT);
+
+    const footer = screen.getByRole('region', { name: ONE_UNSAVED_CHANGE });
+    const footerSave = within(footer).getByRole('button', {
+      name: SAVE_CHANGES,
+    });
+    await user.click(footerSave);
+
+    await screen.findByText(VOICE_SAVED);
+    await waitFor(() => expect(notFoundHeadingField()).toHaveFocus());
+  });
+
   it('shows a toast and refreshes after a successful save', async () => {
     saveVoiceOverridesActionMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -126,7 +146,7 @@ describe(`<${VoiceSettings.name}/> saving`, () => {
 
     await editVoiceHeadingAndSave(user, MOCK_TYPED_TEXT);
 
-    const toast = await screen.findByText('Voice saved.');
+    const toast = await screen.findByText(VOICE_SAVED);
 
     expect(toast).toBeVisible();
     expect(refresh).toHaveBeenCalled();

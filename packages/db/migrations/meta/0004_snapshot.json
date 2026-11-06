@@ -1,5 +1,5 @@
 {
-  "id": "a4cf0cb0-1f92-442e-a120-27f7801f9351",
+  "id": "6140d6d5-2f10-4304-8a68-cbf7490d8a0e",
   "prevId": "f2eb7640-d5fc-4250-b06c-e3b4f877d740",
   "version": "7",
   "dialect": "postgresql",
@@ -1318,26 +1318,19 @@
           "primaryKey": false,
           "notNull": true
         },
-        "reader_accounts_enabled": {
-          "name": "reader_accounts_enabled",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
-        },
         "comments_enabled": {
           "name": "comments_enabled",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": true
         },
         "ratings_enabled": {
           "name": "ratings_enabled",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": false
+          "default": true
         },
         "bookmarks_enabled": {
           "name": "bookmarks_enabled",
@@ -2308,7 +2301,7 @@
     "public.cookie_settings_button": {
       "name": "cookie_settings_button",
       "schema": "public",
-      "values": ["HIDDEN", "SHOWN"]
+      "values": ["HIDDEN", "SHOWN", "ONLY"]
     },
     "public.density": {
       "name": "density",

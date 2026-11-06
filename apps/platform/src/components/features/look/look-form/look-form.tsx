@@ -142,6 +142,7 @@ export const LookForm = ({
               <LookPreview
                 liveLocales={liveLocales}
                 hasReaderAccounts={hasReaderAccounts}
+                hasCookieBanner={hasCookieBanner}
                 siteHost={siteHost}
                 followTarget={toLookFollowTarget(
                   jumpIndex.openRows,

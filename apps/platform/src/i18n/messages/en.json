@@ -742,7 +742,7 @@
       "PULSE": "Pulse"
     },
     "footerHeading": "Footer",
-    "footerDescription": "How the bottom of your site is arranged, its background, and a floating way back to cookie settings.",
+    "footerDescription": "How the bottom of your site is laid out, its background, and how readers reopen cookie settings.",
     "footerLayoutLabel": "Footer layout",
     "footerLayoutDescription": "Where the brand, link groups and fine print sit. Compact shows no groups, about text or address.",
     "footerLayoutOptionLabel": {
@@ -764,13 +764,14 @@
       "FULL_WIDTH": "Full width",
       "CARD": "Card"
     },
-    "cookieSettingsButtonLabel": "Cookie settings button",
-    "cookieSettingsButtonDescription": "A round button in the bottom-left corner that reopens cookie settings, once a reader has answered the cookie banner.",
+    "cookieSettingsButtonLabel": "Cookie settings",
+    "cookieSettingsButtonDescription": "How readers reopen cookie settings after answering the cookie banner: a link in the footer, a round button in the bottom-left corner, or both.",
     "cookieSettingsButtonOptionLabel": {
-      "HIDDEN": "Hidden",
-      "SHOWN": "Shown"
+      "HIDDEN": "Footer link",
+      "ONLY": "Floating button",
+      "SHOWN": "Both"
     },
-    "cookieSettingsButtonBannerOff": "The cookie banner is off, so the button stays hidden. Turn the banner on in Features to show it.",
+    "cookieSettingsButtonBannerOff": "The cookie banner is off, so readers see neither the link nor the button. Turn the banner on in Features to choose.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image",
@@ -782,8 +783,9 @@
     "summaryFaviconUploaded": "Favicon uploaded",
     "summaryNoFavicon": "No favicon",
     "cookieSettingsButtonSummary": {
-      "HIDDEN": "Cookie button hidden",
-      "SHOWN": "Cookie button shown"
+      "HIDDEN": "Cookie link in footer",
+      "ONLY": "Floating cookie button",
+      "SHOWN": "Cookie link and button"
     },
     "summaryOneLanguage": "One language"
   },

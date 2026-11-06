@@ -18,7 +18,6 @@ import { ShellHeader } from './components/shell-header/shell-header';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
 import type { TSettingsForm } from './settings-form-types';
 import { useShellSaveActions } from './use-shell-save-actions';
-import { useUnsavedPageProtection } from './use-unsaved-page-protection';
 
 type TSettingsFormShellLayout = {
   isWide?: boolean;
@@ -54,8 +53,6 @@ export const SettingsFormShell = <TValues,>({
   children,
 }: TSettingsFormShellProps<TValues>) => {
   const {
-    save,
-    discard,
     changeCount,
     changesByLanguage,
     invalidControls = NO_INVALID_CONTROLS,
@@ -67,7 +64,18 @@ export const SettingsFormShell = <TValues,>({
     planRefusal,
   } = form;
   const t = useTranslations('saveBar');
-  const isDirty = changeCount > 0;
+  const {
+    isDirty,
+    isSavedStatusShown,
+    offer,
+    restore,
+    forgetDraft,
+    handleDiscard,
+    titleRef,
+    saveBarRef,
+    rememberControl,
+    saveAndReturnFocus,
+  } = useShellSaveActions({ form, pageTitle: title, hasSavedStatus });
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
   const saveError = isPending ? undefined : (planRefusal ?? errorTitle);
   const isPhoneSaveFooterShown =
@@ -79,29 +87,12 @@ export const SettingsFormShell = <TValues,>({
     hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
   });
-  const breakdown = formatLanguageChanges(changesByLanguage);
-  const {
-    isSavedStatusShown,
-    offer,
-    restore,
-    forgetDraft,
-    handleSave,
-    handleDiscard,
-  } = useShellSaveActions({ save, discard, draft, isDirty, hasSavedStatus });
-
-  useUnsavedPageProtection({
-    pageTitle: title,
-    changeCount,
-    changesByLanguage,
-    isPending,
-    save: handleSave,
-    discard: handleDiscard,
-  });
 
   return (
-    <div className={root()}>
+    <div className={root()} onFocus={rememberControl}>
       <ShellHeader
         title={title}
+        titleRef={titleRef}
         description={description}
         isSavedStatusShown={isSavedStatusShown}
         isTitleHiddenBelowLg={layout?.isTitleHiddenBelowLg}
@@ -146,14 +137,15 @@ export const SettingsFormShell = <TValues,>({
 
       {(isSaveBarShown || isPhoneSaveFooterShown) && (
         <SaveBar
+          ref={saveBarRef}
           changeCount={changeCount}
-          breakdown={breakdown}
+          breakdown={formatLanguageChanges(changesByLanguage)}
           invalidControls={invalidControls}
           isPending={isPending}
           saveError={isSaveBarShown ? saveError : undefined}
           unsavedCards={unsavedCards}
           hasPhoneFooter={layout?.hasPhoneSaveFooter}
-          onSave={() => void handleSave()}
+          onSave={() => void saveAndReturnFocus()}
           onDiscard={handleDiscard}
         />
       )}

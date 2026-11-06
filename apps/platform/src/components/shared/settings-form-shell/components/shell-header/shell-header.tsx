@@ -4,12 +4,13 @@ import {
   type TSettingsFormStack,
 } from '@platform/constants/settings-form';
 import { useTranslations } from 'next-intl';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { shellHeaderVariants } from './shell-header-variants';
 
 export type TShellHeaderProps = {
   title: string;
+  titleRef?: Ref<HTMLHeadingElement>;
   description: string;
   isSavedStatusShown: boolean;
   isTitleHiddenBelowLg?: boolean;
@@ -19,6 +20,7 @@ export type TShellHeaderProps = {
 
 export const ShellHeader = ({
   title,
+  titleRef,
   description,
   isSavedStatusShown,
   isTitleHiddenBelowLg,
@@ -31,6 +33,7 @@ export const ShellHeader = ({
   return (
     <PageHeader
       title={title}
+      titleRef={titleRef}
       description={description}
       isTitleHiddenBelowLg={isTitleHiddenBelowLg}
       isActionsFullWidthBelowMd={stack === SETTINGS_FORM_STACK.VOICE}

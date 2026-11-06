@@ -101,7 +101,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FOOTER_LAYOUT**: `COLUMNS`, `CENTRED`, `COMPACT`, `BIG_WORDMARK`
 - **FOOTER_SURFACE**: `FULL_WIDTH`, `CARD`
-- **COOKIE_SETTINGS_BUTTON**: `HIDDEN`, `SHOWN`
+- **COOKIE_SETTINGS_BUTTON**: `HIDDEN`, `SHOWN`, `ONLY`
 
 ### `@blog/config/constants` — `packages/config/src/constants/form-status.ts`
 

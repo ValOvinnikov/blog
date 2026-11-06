@@ -16,7 +16,8 @@ import type { ReactElement } from 'react';
 
 const iconSoloControlVariants = tv({
   base: [
-    'inline-flex size-11 flex-none cursor-pointer items-center justify-center lg:size-8.5 pointer-coarse:size-11',
+    // md:size-11 outranks the md:h-8 of the Button this control may render.
+    'inline-flex size-11 flex-none cursor-pointer items-center justify-center md:size-11 lg:size-8.5 pointer-coarse:size-11',
     'rounded-admin-5 border border-admin-control-line bg-admin-surface text-admin-text',
     'hover:bg-admin-hover',
     'data-[pressed]:border-admin-brand-ink data-[pressed]:bg-admin-brand-weak data-[pressed]:text-admin-brand-strong',
