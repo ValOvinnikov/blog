@@ -24,6 +24,9 @@ export type TLookFormContext = {
   canResetToPreset: boolean;
   isAccentHueRejected: boolean;
   accentHueFieldId: string;
+  isBrandNameTooLong: boolean;
+  brandNameFieldId: string;
+  shownBrandName: string;
   repickKinds: readonly TBrandAssetKind[];
   brandAssetFieldIds: Record<TBrandAssetKind, string>;
   brandImageError: TMaybeUndefined<{ kind: TBrandAssetKind; message: string }>;

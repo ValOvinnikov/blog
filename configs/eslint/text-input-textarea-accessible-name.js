@@ -1,6 +1,7 @@
 const TARGET_COMPONENTS = new Set(['TextInput', 'Textarea']);
 const FORM_FIELD_COMPONENT = 'FormField';
 const FIELD_ROOT_COMPONENT = 'Field.Root';
+const LOOK_FIELD_COMPONENT = 'LookField';
 
 function getElementName(openingElement) {
   const { name } = openingElement;
@@ -41,14 +42,17 @@ function hasLabellingFieldAncestor(ancestors) {
         'hasOwnAccessibleName',
       );
     }
+    if (name === LOOK_FIELD_COMPONENT) {
+      return !getAttributeNames(ancestor.openingElement).has('isGroup');
+    }
   }
   return false;
 }
 
 /**
  * Requires every `<TextInput>`/`<Textarea>` to have an accessible name:
- * `ariaLabel`, or a `FormField` or Base UI `Field.Root` ancestor whose
- * `Field.Label` names it. A syntactic check — it cannot see whether a
+ * `ariaLabel`, or a `FormField`, a non-group `LookField` or a Base UI
+ * `Field.Root` ancestor whose `Field.Label` names it. A syntactic check — it cannot see whether a
  * `Field.Root` actually renders a `Field.Label`.
  */
 export const textInputTextareaAccessibleNameRule = {
@@ -56,12 +60,12 @@ export const textInputTextareaAccessibleNameRule = {
     type: 'problem',
     docs: {
       description:
-        'TextInput/Textarea must have an accessible name (ariaLabel, or a FormField or Field.Root ancestor).',
+        'TextInput/Textarea must have an accessible name (ariaLabel, or a FormField, LookField or Field.Root ancestor).',
     },
     schema: [],
     messages: {
       missingAccessibleName:
-        "'<{{name}}>' has no accessible name — pass ariaLabel, or render it inside a FormField (without hasOwnAccessibleName) or a Field.Root with a Field.Label.",
+        "'<{{name}}>' has no accessible name — pass ariaLabel, or render it inside a FormField (without hasOwnAccessibleName), a LookField (without isGroup) or a Field.Root with a Field.Label.",
     },
   },
   create(context) {

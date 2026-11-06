@@ -5,9 +5,12 @@ import {
 } from '@blog/config';
 import type { TAuthoredEmailTemplateCopy } from '@blog/db/queries/email-templates';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+import { isUndefined } from '@blog/utils/primitives';
+import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
+import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 
-export const EMAIL_SENDER_ITEM = 'SENDER' as const;
+export const EMAIL_SENDER_ITEM = EMAIL_LOGO_KIND.SENDER;
 
 export const EMAIL_TEMPLATE_TYPES = Object.values(EMAIL_TEMPLATE_TYPE);
 
@@ -111,11 +114,6 @@ export const withCopy = (
   },
 });
 
-export const blankToNull = (value: string): string | null => {
-  const trimmed = value.trim();
-  return trimmed === '' ? null : trimmed;
-};
-
 export const toTestSenderInput = (sender: TEmailSenderDraft) => ({
   senderName: blankToNull(sender.senderName),
   replyToAddress: blankToNull(sender.replyToAddress),
@@ -124,7 +122,7 @@ export const toTestSenderInput = (sender: TEmailSenderDraft) => ({
 
 export const toSenderInput = (sender: TEmailSenderDraft) => ({
   ...toTestSenderInput(sender),
-  ...(sender.contactRecipient !== undefined && {
+  ...(!isUndefined(sender.contactRecipient) && {
     contactRecipient: blankToNull(sender.contactRecipient),
   }),
 });

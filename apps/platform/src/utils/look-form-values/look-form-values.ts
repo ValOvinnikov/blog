@@ -33,7 +33,7 @@ export const CARD_FIELDS = {
     'footerSurface',
     'cookieSettingsButton',
   ],
-  [LOOK_ROW.BRAND]: ['logo', 'favicon'],
+  [LOOK_ROW.BRAND]: ['brandName', 'logo', 'favicon'],
   [LOOK_ROW.LANGUAGE_SWITCHER]: ['languageSwitcherStyle'],
 } as const satisfies Record<TLookCard, readonly (keyof TLookFormValues)[]>;
 

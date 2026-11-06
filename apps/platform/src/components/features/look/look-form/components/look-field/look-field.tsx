@@ -18,6 +18,7 @@ export type TLookFieldProps = IWithChildren & {
   hint?: string;
   error?: string;
   isGroup?: boolean;
+  isDisabled?: boolean;
   labelId?: string;
   growthBadgeId?: string;
 };
@@ -28,6 +29,7 @@ export const LookField = ({
   hint,
   error,
   isGroup = false,
+  isDisabled = false,
   labelId,
   growthBadgeId,
   children,
@@ -69,7 +71,11 @@ export const LookField = ({
   );
 
   return (
-    <Field.Root invalid={Boolean(error)} className={fieldSlot()}>
+    <Field.Root
+      invalid={Boolean(error)}
+      disabled={isDisabled}
+      className={fieldSlot()}
+    >
       {isGroup ? (
         // ToggleGroup ignores Field's description ids, so the group carries the hint.
         <Fieldset.Root

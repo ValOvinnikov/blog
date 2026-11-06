@@ -8,6 +8,7 @@ import {
 import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
 import type { TLookCard } from '@platform/constants/look-card';
+import { isBrandNameTooLong } from '@platform/utils/brand-name/brand-name';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import {
   CARD_FIELDS,
@@ -28,6 +29,7 @@ type TBuildLookFormContextArgs = Pick<
   | 'values'
   | 'updateField'
   | 'accentHueFieldId'
+  | 'brandNameFieldId'
   | 'repickKinds'
   | 'brandAssetFieldIds'
   | 'brandImageError'
@@ -64,6 +66,8 @@ export const buildLookFormContext = ({
       plan !== TENANT_PLAN.FREE &&
       countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
     isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
+    isBrandNameTooLong: isBrandNameTooLong(values.brandName),
+    shownBrandName: values.brandName.trim() || rest.tenantName,
     changePreset: (preset: TPresetId) =>
       setValues((prev) => switchPreset(preset, prev)),
     isPresetValue: (field) => isPresetValue(field, values),

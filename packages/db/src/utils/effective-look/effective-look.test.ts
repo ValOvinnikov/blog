@@ -33,6 +33,7 @@ import {
 faker.seed(5052);
 
 const MOCK_LOGO_HUE = MOCK_ACCENT_HUE - 1;
+const MOCK_BRAND_NAME = faker.company.name();
 const MOCK_LOGO_ASSET_URL = faker.internet.url();
 const MOCK_FAVICON_ASSET_URL = faker.internet.url();
 
@@ -59,6 +60,7 @@ const STORED_LOOK: TLook = {
   footerBackground: BRAND_VARIANT.SECONDARY,
   footerSurface: FOOTER_SURFACE.CARD,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+  brandName: MOCK_BRAND_NAME,
   logoAssetUrl: MOCK_LOGO_ASSET_URL,
   faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
 };
@@ -94,6 +96,7 @@ describe(toEffectiveLook, () => {
       footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
       footerSurface: FOOTER_SURFACE.FULL_WIDTH,
       cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+      brandName: MOCK_BRAND_NAME,
       logoAssetUrl: MOCK_LOGO_ASSET_URL,
       faviconAssetUrl: MOCK_FAVICON_ASSET_URL,
     });
@@ -113,6 +116,7 @@ describe(isLookFieldEntitled, () => {
   it.each([
     ['preset', TENANT_PLAN.FREE, true],
     ['logoAssetUrl', TENANT_PLAN.FREE, true],
+    ['brandName', TENANT_PLAN.FREE, true],
     ['headingFont', TENANT_PLAN.FREE, false],
     ['cookieSettingsButton', TENANT_PLAN.FREE, true],
     ['footerLayout', TENANT_PLAN.FREE, false],

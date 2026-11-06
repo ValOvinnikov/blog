@@ -1,0 +1,1 @@
+ALTER TABLE "site_config" ADD COLUMN "brand_name" text;

@@ -63,6 +63,7 @@ export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     footerSurface: defaults.footerSurface,
     cookieSettingsButton: defaults.cookieSettingsButton,
     languageSwitcherStyle: defaults.languageSwitcherStyle,
+    brandName: defaults.brandName,
     ...overrides,
   };
 };

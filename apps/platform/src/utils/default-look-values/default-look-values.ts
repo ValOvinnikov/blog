@@ -49,6 +49,7 @@ export type TLookFormValues = {
   footerSurface: TFooterSurface;
   cookieSettingsButton: TCookieSettingsButton;
   languageSwitcherStyle: TLanguageSwitcherStyle;
+  brandName: string;
   logo: TStagedImage;
   favicon: TStagedImage;
 };
@@ -101,6 +102,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     footerSurface,
     cookieSettingsButton,
     languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+    brandName: '',
     logo: { url: undefined },
     favicon: { url: undefined },
   };
@@ -132,6 +134,7 @@ export const toLookFormValues = (
     footerSurface: siteConfig.footerSurface,
     cookieSettingsButton: siteConfig.cookieSettingsButton,
     languageSwitcherStyle: siteConfig.languageSwitcherStyle,
+    brandName: siteConfig.brandName ?? '',
     logo: { url: siteConfig.logoAssetUrl },
     favicon: { url: siteConfig.faviconAssetUrl },
   };

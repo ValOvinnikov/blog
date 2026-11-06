@@ -4,6 +4,7 @@ import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useToast } from '@platform/context/toast-provider';
 import type { TBrandAssetKind } from '@platform/utils/brand-asset-limits/brand-asset-limits';
+import { isBrandNameTooLong } from '@platform/utils/brand-name/brand-name';
 import type {
   TLookFormFieldSetter,
   TLookFormValues,
@@ -42,6 +43,7 @@ export const useLookFormState = ({
   revealInvalidField,
 }: TUseLookFormStateArgs) => {
   const accentHueFieldId = useId();
+  const brandNameFieldId = useId();
   const brandAssetFieldIds = { logo: useId(), favicon: useId() };
   const toast = useToast();
   const t = useTranslations('lookForm');
@@ -72,12 +74,17 @@ export const useLookFormState = ({
     },
     onDiscard: () => setRepickKinds([]),
     countChanges,
-    canSave: ({ accentHue }) => isAccentHueAccessible(accentHue),
-    invalidControls: ({ accentHue }) => {
+    canSave: ({ accentHue, brandName }) =>
+      isAccentHueAccessible(accentHue) && !isBrandNameTooLong(brandName),
+    invalidControls: ({ accentHue, brandName }) => {
       const isHueRejected = !isAccentHueAccessible(accentHue);
+      const isNameTooLong = isBrandNameTooLong(brandName);
 
       return {
-        ids: isHueRejected ? [accentHueFieldId] : [],
+        ids: [
+          ...(isHueRejected ? [accentHueFieldId] : []),
+          ...(isNameTooLong ? [brandNameFieldId] : []),
+        ],
         revealFirst: () =>
           revealInvalidField(isHueRejected ? LOOK_ROW.COLOUR : LOOK_ROW.BRAND),
       };
@@ -119,6 +126,7 @@ export const useLookFormState = ({
     updateField,
     plan,
     accentHueFieldId,
+    brandNameFieldId,
     repickKinds,
     brandAssetFieldIds,
     brandImageError: fieldError,

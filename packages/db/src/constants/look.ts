@@ -25,6 +25,7 @@ export const LOOK_FIELD = {
   FOOTER_BACKGROUND: 'footerBackground',
   FOOTER_SURFACE: 'footerSurface',
   COOKIE_SETTINGS_BUTTON: 'cookieSettingsButton',
+  BRAND_NAME: 'brandName',
   LOGO_ASSET_URL: 'logoAssetUrl',
   FAVICON_ASSET_URL: 'faviconAssetUrl',
 } as const satisfies Record<string, keyof TSiteConfig>;
@@ -32,3 +33,5 @@ export const LOOK_FIELD = {
 export type TLookField = TValueOf<typeof LOOK_FIELD>;
 
 export const LOOK_FIELDS: readonly TLookField[] = Object.values(LOOK_FIELD);
+
+export const BRAND_NAME_MAX_LENGTH = 60;

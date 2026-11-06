@@ -37,6 +37,11 @@ ruleTester.run(
           </div>
         </Field.Root>
       );`,
+      `const el = (
+        <LookField field="brandName" label="Brand name">
+          <TextInput value={v} onChange={onChange} />
+        </LookField>
+      );`,
       // Unrelated components are untouched.
       'const el = <Button onClick={onClick}>Save</Button>;',
     ],
@@ -47,6 +52,14 @@ ruleTester.run(
       },
       {
         code: 'const el = <Textarea value={v} onChange={onChange} />;',
+        errors: [{ messageId: 'missingAccessibleName' }],
+      },
+      {
+        code: `const el = (
+          <LookField field="logo" label="Logo" isGroup={true}>
+            <TextInput value={v} onChange={onChange} />
+          </LookField>
+        );`,
         errors: [{ messageId: 'missingAccessibleName' }],
       },
       {
