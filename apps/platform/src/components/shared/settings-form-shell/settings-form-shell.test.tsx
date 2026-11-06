@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
+import { TOAST_TEST_ID } from '@platform/constants/toast';
 import {
   renderWithIntl,
   screen,
@@ -498,14 +499,33 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       expect(errorAlert).not.toBeInTheDocument();
     });
 
-    it('shows its message at the top of the page when no save bar shows', () => {
+    it('shows its message as a toast when no changes remain', () => {
       renderShell({}, { errorTitle: MOCK_ERROR_TITLE });
 
+      const toasts = screen.getByTestId(TOAST_TEST_ID.VIEWPORT);
       const errorAlert = screen.getByRole('alert');
-      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
 
       expect(errorAlert).toHaveTextContent(MOCK_ERROR_TITLE);
-      expect(saveBar).not.toBeInTheDocument();
+      expect(toasts).toContainElement(errorAlert);
+    });
+
+    it('shows a plan refusal nowhere while the page hides the save bar over remaining changes', () => {
+      const refusedForm = { changeCount: 1, planRefusal: MOCK_PLAN_REFUSAL };
+      const { rerender } = renderShell(refusedForm, { isSaveBarHidden: true });
+      rerender(
+        <SettingsFormShell {...baseProps} form={formFor(refusedForm)} />,
+      );
+      rerender(
+        <SettingsFormShell
+          {...baseProps}
+          form={formFor(refusedForm)}
+          isSaveBarHidden={true}
+        />,
+      );
+
+      const errorAlerts = screen.queryAllByRole('alert');
+
+      expect(errorAlerts).toHaveLength(0);
     });
 
     it('shows a plan refusal in the save bar while changes remain', () => {
@@ -520,12 +540,45 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       expect(errorAlert).toHaveTextContent(MOCK_PLAN_REFUSAL);
     });
 
-    it('shows a plan refusal at the top of the page once no changes remain', () => {
-      renderShell({ planRefusal: MOCK_PLAN_REFUSAL });
+    describe('a plan refusal once no changes remain', () => {
+      let rerender: ReturnType<typeof renderShell>['rerender'];
 
-      const errorAlert = screen.getByRole('alert');
+      beforeEach(() => {
+        ({ rerender } = renderShell({ planRefusal: MOCK_PLAN_REFUSAL }));
+      });
 
-      expect(errorAlert).toHaveTextContent(MOCK_PLAN_REFUSAL);
+      it('shows as a toast, not on the page', () => {
+        const toasts = screen.getByTestId(TOAST_TEST_ID.VIEWPORT);
+        const errorAlert = screen.getByRole('alert');
+
+        expect(errorAlert).toHaveTextContent(MOCK_PLAN_REFUSAL);
+        expect(toasts).toContainElement(errorAlert);
+      });
+
+      it('stays until it is dismissed by keyboard', async () => {
+        await user.keyboard(USER_EVENT_KEY.ESCAPE);
+
+        await waitFor(() => {
+          const errorAlert = screen.queryByRole('alert');
+
+          expect(errorAlert).not.toBeInTheDocument();
+        });
+      });
+
+      it('goes once the next save is in flight', async () => {
+        rerender(
+          <SettingsFormShell
+            {...baseProps}
+            form={formFor({ changeCount: 1, isPending: true })}
+          />,
+        );
+
+        await waitFor(() => {
+          const errorAlert = screen.queryByRole('alert');
+
+          expect(errorAlert).not.toBeInTheDocument();
+        });
+      });
     });
   });
 

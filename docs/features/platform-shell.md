@@ -117,9 +117,12 @@ Discard is disabled and the bar is `aria-busy`. A save that fails with no
 field errors — a server error, offline, or a plan refusal — shows the page's
 failure message in the bar's left side in place of the dot, count and hint, as
 one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
-until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--admin-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as fallbacks. Only when
-no bar shows (a plan refusal that restored every refused value) does the
-message sit in an error `Alert` under the header. From `md` the page keeps 120px of room below its last content (48px
+until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--admin-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as fallbacks. When the
+failure leaves nothing unsaved (a plan refusal that restored every refused
+value), the message is an error toast instead, which stays until it is
+dismissed or the next save starts; the toast viewport sits above the bar's
+measured height. While a page hides the bar over remaining changes, the
+message waits for the bar to return. From `md` the page keeps 120px of room below its last content (48px
 when archived), and the document's `scroll-padding-bottom` is the bar's 64px
 plus 16px so a focused field never sits under the bar. The 64 and 16 are the
 `--spacing-admin-dock` / `-clearance` tokens, kept equal to
@@ -159,12 +162,12 @@ focuses the first invalid field).
 
 A message appears where the user is looking when it happens. An invalid
 field shows under the field, plus the count in the save bar; a success is a
-toast. A failed save shows in the save bar or beside its Save button, and a
+toast. A failed save shows in the save bar or beside its Save button (an error
+toast once nothing is left unsaved), and a
 failed one-off button action is an error toast or an error `Alert` right
 beside the button. A failure inside a dialog stays in the dialog, which stays
 open. A top-of-page `Alert` describes page state only (archived, plan limits,
-draft recovery, warnings), never an action's result, except a save failure
-with no bar left to show it in. So the custom-domain claim's connect
+draft recovery, warnings), never an action's result. So the custom-domain claim's connect
 rejection sits directly above Remove and Verify, the site setup card's failed
 retry directly below the notice holding its Try again or Start setup
 button, the email sign-in refusal two rows above its send button, and
