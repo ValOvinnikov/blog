@@ -22,7 +22,7 @@ epics: [5047, 4979, 1040, 1041]
 
 ## What it does
 
-A signed-in reader manages their own account at `/account`: edit the display name, link or unlink GitHub and Google, manage an existing newsletter subscription, download their data as JSON, and delete the account. Reader accounts exist on a site only while at least one of bookmarks, comments or newsletter is enabled for it; otherwise the header offers no sign-in and `/bookmarks` answers 404, but a reader who is already signed in can still open `/account` to export or delete their account.
+A signed-in reader manages their own account at `/account`: edit the display name, link or unlink GitHub and Google, manage an existing newsletter subscription, download their data as JSON, and delete the account. Reader accounts exist on a site only while its Reader accounts switch (`READER_ACCOUNTS`) is on; otherwise the header offers no sign-in and `/bookmarks` answers 404, but a reader who is already signed in can still open `/account` to export or delete their account.
 
 ## Surfaces and routes
 
@@ -43,8 +43,8 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 
 ## Configuration
 
-- **Owner or operator (platform Features)** — bookmarks, comments and newsletter are the reader-account capabilities (`READER_ACCOUNT_CAPABILITIES`), but only the live ones decide whether reader accounts exist (`isReaderAccountEnabled` reads `LIVE_READER_ACCOUNT_CAPABILITIES`, which leaves out `COMING_SOON_CAPABILITIES`). Today that is Bookmarks alone: comments and newsletter are Coming soon, every Features save writes them off, and a stored row that predates the lock does not turn reader accounts on (the preset defaults leave both off). Bookmarks defaults on in both presets and in the column default, so a never-saved `GROWTH` site still has reader accounts; the sites the Coming-soon rule changes are those with comments or newsletter stored on and Bookmarks off. A capability counts again the moment it leaves `COMING_SOON_CAPABILITIES`. On `FREE` none of the three is in the plan, so a `FREE` site has no reader accounts.
-- **Platform Features page** — Reader accounts (`READER_ACCOUNTS`) is the main switch, with Bookmarks, Comments and Ratings under it. While it is off in the form, an info note tells the owner that nobody new can sign in and that readers already signed in keep their account page, to download or delete their data, until their session ends. Turning it on hides the note. The platform Look preview follows the switch; the public site still offers sign-in from the live list above.
+- **Owner or operator (platform Features)** — `READER_ACCOUNTS` alone decides whether a site has reader accounts (`isReaderAccountEnabled`). It is off in both presets and in the column default, so a site offers sign-in only once its owner turns it on. Bookmarks, Comments and Ratings apply only while it is on (`isReaderAccountFeatureEnabled`); Newsletter does not depend on it. `READER_ACCOUNTS` is in `GROWTH` only, so a `FREE` site has no reader accounts.
+- **Platform Features page** — Reader accounts (`READER_ACCOUNTS`) is the main switch, with Bookmarks, Comments and Ratings under it. While it is off in the form, an info note tells the owner that nobody new can sign in and that readers already signed in keep their account page, to download or delete their data, until their session ends. Turning it on hides the note. The platform Look preview and the public site both follow the switch.
 - **Voice** — none; account copy is fixed (`accountPage.*`).
 - **Look** — the page renders through `@blog/ui` primitives (`Panel`, `SettingRow`) and follows the site's Look.
 

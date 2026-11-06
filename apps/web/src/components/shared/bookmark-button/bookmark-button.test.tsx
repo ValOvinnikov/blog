@@ -61,6 +61,7 @@ const setup = () =>
       <AuthMenu
         oauthProviderIds={['github']}
         accountControl={MOCK_ACCOUNT_CONTROL}
+        hasBookmarks={true}
       />
       <BookmarkButton postId={MOCK_POST_ID} />
     </ToastProvider>,

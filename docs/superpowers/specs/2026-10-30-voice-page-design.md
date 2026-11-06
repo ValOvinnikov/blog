@@ -1060,17 +1060,22 @@ place. Each affected section's chip and meta show their own error counts
 Implementation notes that follow from them:
 
 - Scroll target: the shell sets `scroll-padding-top` =
-  `--spacing-admin-topbar` (**68**, X4) on `<html>`
+  `--spacing-admin-topbar` on `<html>`
   (`[html:has(&)]:scroll-pt-admin-topbar` in `shell-frame-variants.ts`), and
-  scroll-padding and scroll-margin add up. The drawn top bar is 59 from `md`
-  and 67 below (§ 5.3), so for a header to land 16px below the pinned bar
-  (B4-4) each section and card has `scroll-margin-top` = top-bar height + bar
-  height + 16 − 68: **bar height + 7** from `md`, **bar height + 15** below
-  `md`. The bar's rendered height is read once mounted and on resize (a
-  `ResizeObserver` writing a CSS variable on the section stack), because it
-  differs by width: desktop pinned 8 + 32 + 8 + 1 = **49** (margin 56, also
-  768–1023, M2), phone 8 + 44 + 8 + 1 = **61** (margin 76; the in-flow phone
-  bar is 61 too, U1).
+  scroll-padding and scroll-margin add up. `--admin-topbar` is the drawn top
+  bar, 59 from `md` and 67 below (§ 5.3), so the padding already clears it and
+  the bar's sticky `top` is `top-admin-topbar`. For a header to land 16px below
+  the pinned bar (B4-4) everything inside the section stack — sections, cards
+  and every control, so focus never lands under the bar — has
+  `scroll-margin-top` = **bar height + 16** at every width. The bar's rendered
+  height is published on `<html>` as `--admin-voice-bar-height`, set in a
+  layout effect as soon as the bar mounts (before the first-load hash scroll)
+  and kept current by a `ResizeObserver`, because it differs by width: desktop
+  pinned 8 + 32 + 8 + 1 = **49** (margin 65, also 768–1023, M2), phone
+  8 + 44 + 8 + 1 = **61** (margin 77; the in-flow phone bar is 61 too, U1).
+- Activation line (§ 8.4): a fixed line at the pinned bar's bottom edge + 20 —
+  the bar's sticky `top` + its height + 20 — never the in-flow bar's live
+  bottom, so no chip is active at the top of the page.
 - Expand all opens every section; Collapse all closes every section and leaves
   open list rows as they are (D17).
 - Collapsing a section with unsaved edits keeps the draft (the save bar still

@@ -21,11 +21,13 @@ import { useSignedInHint } from './hooks/use-signed-in-hint';
 export interface IAuthMenuProps {
   oauthProviderIds: readonly TOAuthProviderId[];
   accountControl: IAccountControl;
+  hasBookmarks: boolean;
 }
 
 export const AuthMenu = ({
   oauthProviderIds,
   accountControl,
+  hasBookmarks,
 }: IAuthMenuProps) => {
   const { status, expires, user, onImageError } = useReaderAccount();
   const oauthError = useOAuthErrorParam();
@@ -58,6 +60,7 @@ export const AuthMenu = ({
             appearance={accountControl.panelStyle}
             user={user}
             onImageError={onImageError}
+            hasBookmarks={hasBookmarks}
             panelId={panelId}
             isOpen={open}
             panelRef={panelRef}

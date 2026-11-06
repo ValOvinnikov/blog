@@ -76,6 +76,7 @@ const CIRCLE_IN_BAR = {
 const setup = customRender(AuthMenu, {
   oauthProviderIds: [PROVIDER.GITHUB, PROVIDER.GOOGLE],
   accountControl: CIRCLE_IN_BAR,
+  hasBookmarks: true,
 });
 
 const setLocationSearch = (search: string) => {
