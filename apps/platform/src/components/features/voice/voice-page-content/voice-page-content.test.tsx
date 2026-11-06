@@ -17,13 +17,14 @@ import {
   mockReadyTenant,
   MOCK_ARCHIVED_AT,
 } from '@platform/testing/tenants/fixtures';
-import { NOTHING_HERE } from '@platform/testing/voice/fixtures';
+import { NOTHING_HERE, UNSAVED_MARK } from '@platform/testing/voice/fixtures';
 import {
   EMPTY_STATES_SECTION,
   ERROR_PAGES_SECTION,
   openVoiceSections,
   voiceSectionHeader,
 } from '@platform/testing/voice/sections';
+import { RESET } from '@platform/testing/voice/voice-settings-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -82,6 +83,29 @@ describe(`<${VoicePageContent.name}/>`, () => {
       SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
     );
     expect(defaultBadges).toHaveLength(VOICE_FIELDS.length);
+  });
+
+  it('reads stored values equal to their defaults as Default on load', async () => {
+    getSiteConfigMock.mockResolvedValue({
+      ...defaultLookFormValues(),
+      voiceOverridesByLocale: {
+        [EN]: {
+          notFoundHeading: SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
+          notFoundSupportingText:
+            SITE_MESSAGES_BY_LOCALE.EN.notFound.supportingText,
+        },
+      },
+    });
+    await setup();
+    await openVoiceSections(user);
+
+    const defaultBadges = screen.getAllByText('Default');
+    const resetButton = screen.queryByRole('button', { name: RESET });
+    const unsavedMark = screen.queryByRole('img', { name: UNSAVED_MARK });
+
+    expect(defaultBadges).toHaveLength(VOICE_FIELDS.length);
+    expect(resetButton).not.toBeInTheDocument();
+    expect(unsavedMark).not.toBeInTheDocument();
   });
 
   it("renders the default language's saved override as the field value", async () => {

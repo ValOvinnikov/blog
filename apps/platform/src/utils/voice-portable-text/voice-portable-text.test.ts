@@ -1,8 +1,15 @@
-import type { TVoicePortableText, TVoiceFieldId } from '@blog/config';
+import {
+  VOICE_FIELDS,
+  type TVoiceFieldId,
+  type TVoicePortableText,
+} from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
+import { voiceDefaultText } from '@platform/utils/voice-draft/voice-draft';
 
 import {
   isVoicePlainCopyOf,
+  toVoiceRichDraft,
   voiceTextToPortableText,
 } from './voice-portable-text';
 
@@ -46,5 +53,40 @@ describe(isVoicePlainCopyOf, () => {
 
   it('rejects the same text once a mark or link is applied', () => {
     expect(isVoicePlainCopyOf(MOCK_MARKED_TEXT, MOCK_LEAD_TEXT)).toBe(false);
+  });
+});
+
+describe(toVoiceRichDraft, () => {
+  const { EN, DE } = LOCALE_ISO_CODES;
+  const field = VOICE_FIELDS.find(({ id }) => id === FIELD_ID)!;
+  const typed = (text: string) => voiceTextToPortableText(FIELD_ID, text);
+
+  it("stores nothing for the edited language's own default copy", () => {
+    const germanDefault = voiceDefaultText(DE, field);
+
+    expect(toVoiceRichDraft(typed(germanDefault), germanDefault)).toBeNull();
+  });
+
+  it("customises another language's default copy typed in the edited language", () => {
+    const germanDefault = voiceDefaultText(DE, field);
+    const englishCopy = typed(voiceDefaultText(EN, field));
+
+    expect(toVoiceRichDraft(englishCopy, germanDefault)).toBe(englishCopy);
+  });
+
+  it('stores nothing for an emptied value', () => {
+    expect(toVoiceRichDraft(typed(''), MOCK_LEAD_TEXT)).toBeNull();
+  });
+
+  it('keeps a formatted value even when its text is the default', () => {
+    expect(toVoiceRichDraft(MOCK_MARKED_TEXT, MOCK_LEAD_TEXT)).toBe(
+      MOCK_MARKED_TEXT,
+    );
+  });
+
+  it('keeps a second paragraph', () => {
+    const twoParagraphs = [...typed(MOCK_LEAD_TEXT), ...typed(MOCK_OTHER_TEXT)];
+
+    expect(toVoiceRichDraft(twoParagraphs, MOCK_LEAD_TEXT)).toBe(twoParagraphs);
   });
 });

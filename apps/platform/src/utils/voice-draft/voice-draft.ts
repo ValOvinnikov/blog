@@ -19,6 +19,7 @@ import {
 } from '@blog/utils/primitives';
 import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
+import { withoutDefaultCopy } from '@platform/utils/voice-default-copy/voice-default-copy';
 import { voiceTextToPortableText } from '@platform/utils/voice-portable-text/voice-portable-text';
 
 export type TVoiceField = (typeof VOICE_FIELDS)[number];
@@ -121,24 +122,33 @@ const toDraftValue = (
     : '';
 };
 
+const EMPTY_LOCALE_DRAFT = Object.fromEntries(
+  VOICE_FIELDS.map((field) => [field.id, toDraftValue(field, undefined)]),
+) as TVoiceLocaleDraft;
+
 const buildLocaleDraft = (
+  locale: TLocaleIsoCode,
   stored: Partial<Record<string, unknown>> | undefined,
 ): TVoiceLocaleDraft =>
   Object.fromEntries(
     VOICE_FIELDS.map((field) => [
       field.id,
-      toDraftValue(field, stored?.[field.id]),
+      withoutDefaultCopy(
+        toDraftValue(field, stored?.[field.id]),
+        voiceDefaultText(locale, field),
+      ),
     ]),
   ) as TVoiceLocaleDraft;
-
-const EMPTY_LOCALE_DRAFT = buildLocaleDraft(undefined);
 
 export const buildVoiceDraft = (
   stored: TStoredVoiceOverrides,
   liveLocales: TLocaleIsoCode[],
 ): TVoiceDraft =>
   Object.fromEntries(
-    liveLocales.map((locale) => [locale, buildLocaleDraft(stored[locale])]),
+    liveLocales.map((locale) => [
+      locale,
+      buildLocaleDraft(locale, stored[locale]),
+    ]),
   );
 
 export const localeDraftOf = (

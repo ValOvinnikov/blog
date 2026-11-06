@@ -13,8 +13,10 @@ import {
 import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
 import {
   BLOG_INDEX_ROW,
+  KEEP_NAME_NOTE,
   NOTHING_HERE,
   TAG_ROW,
+  TOPIC_FIELD,
   TOPIC_ROW,
   UNSAVED_MARK,
 } from '@platform/testing/voice/fixtures';
@@ -47,8 +49,6 @@ const MOCK_ACCENT_HUE = 28;
 const MOCK_TYPED_TEXT = faker.lorem.words(2);
 const MOCK_EDIT_TEXT = faker.lorem.word();
 const MOCK_EDIT_TEXT_DE = faker.lorem.word();
-
-const KEEP_NAME_PLACEHOLDER = 'Keep {name} — the site fills it in.';
 
 vi.mock('@platform/server/site-config/save-voice-overrides-action');
 
@@ -429,7 +429,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
         await user.click(topicRow);
 
         const preview = within(section).getByRole('group', {
-          name: 'Preview · Topic page',
+          name: `Preview · ${TOPIC_FIELD}`,
         });
 
         expect(preview).toBeInTheDocument();
@@ -577,8 +577,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
 
       const hint = screen.getByText(
         (_, element) =>
-          element?.tagName === 'SPAN' &&
-          element.textContent === KEEP_NAME_PLACEHOLDER,
+          element?.tagName === 'SPAN' && element.textContent === KEEP_NAME_NOTE,
       );
 
       expect(hint).toBeVisible();

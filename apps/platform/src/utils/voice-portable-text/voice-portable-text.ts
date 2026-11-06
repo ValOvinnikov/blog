@@ -1,9 +1,11 @@
 import {
   portableTextToPlainText,
+  type TMaybeNull,
   type TVoiceFieldId,
   type TVoicePortableText,
 } from '@blog/config';
 import { hasLength } from '@blog/utils/primitives';
+import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 
 export const voiceTextToPortableText = (
   id: TVoiceFieldId,
@@ -27,3 +29,11 @@ export const isVoicePlainCopyOf = (
       !hasLength(markDefs) && children.every(({ marks }) => !hasLength(marks)),
   ) &&
   portableTextToPlainText(value) === text;
+
+export const toVoiceRichDraft = (
+  value: TVoicePortableText,
+  defaultText: string,
+): TMaybeNull<TVoicePortableText> =>
+  isBlankPortableTextValue(value) || isVoicePlainCopyOf(value, defaultText)
+    ? null
+    : value;

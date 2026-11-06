@@ -12,6 +12,7 @@ import en from '@platform/i18n/messages/en.json';
 import es from '@platform/i18n/messages/es.json';
 import fr from '@platform/i18n/messages/fr.json';
 import nl from '@platform/i18n/messages/nl.json';
+import { voiceTextToPortableText } from '@platform/utils/voice-portable-text/voice-portable-text';
 
 import {
   buildVoiceDraft,
@@ -105,6 +106,42 @@ describe(buildVoiceDraft, () => {
         ],
       },
     ]);
+  });
+
+  it("reads stored text equal to its language's default as the empty value", () => {
+    const draft = buildVoiceDraft(
+      { [DE]: { [HEADING_ID]: SITE_MESSAGES_BY_LOCALE.DE.notFound.heading } },
+      [DE],
+    );
+
+    expect(draft[DE]?.[HEADING_ID]).toBe('');
+  });
+
+  it("reads a stored plain paragraph equal to its language's default as null", () => {
+    const draft = buildVoiceDraft(
+      {
+        [DE]: {
+          [SUPPORTING_TEXT_ID]: voiceTextToPortableText(
+            SUPPORTING_TEXT_ID,
+            SITE_MESSAGES_BY_LOCALE.DE.notFound.supportingText,
+          ),
+        },
+      },
+      [DE],
+    );
+
+    expect(draft[DE]?.[SUPPORTING_TEXT_ID]).toBeNull();
+  });
+
+  it("keeps another language's default copy as a customisation", () => {
+    const draft = buildVoiceDraft(
+      { [DE]: { [HEADING_ID]: SITE_MESSAGES_BY_LOCALE.EN.notFound.heading } },
+      [DE],
+    );
+
+    expect(draft[DE]?.[HEADING_ID]).toBe(
+      SITE_MESSAGES_BY_LOCALE.EN.notFound.heading,
+    );
   });
 
   it('builds one map per live language, leaving untouched fields empty', () => {

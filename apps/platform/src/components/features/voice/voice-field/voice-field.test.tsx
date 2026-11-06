@@ -15,7 +15,11 @@ import {
   customRenderInSettingsForm,
 } from '@platform/testing/render-in-settings-form';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
-import { UNSAVED_MARK } from '@platform/testing/voice/fixtures';
+import {
+  KEEP_NAME_NOTE,
+  TOPIC_FIELD,
+  UNSAVED_MARK,
+} from '@platform/testing/voice/fixtures';
 import {
   buildVoiceDraft,
   localeDraftOf,
@@ -32,7 +36,6 @@ faker.seed(5994);
 
 const { EN } = LOCALE_ISO_CODES;
 const HEADING = 'Heading';
-const TOPIC_PAGE = 'Topic page';
 const SUPPORTING_TEXT = 'Supporting text';
 const ARIA_INVALID = 'aria-invalid';
 const MOCK_FIELD_ID_PREFIX = faker.lorem.word();
@@ -198,10 +201,10 @@ describe(`<${VoiceField.name}/>`, () => {
   it('notes the placeholder a field must keep', async () => {
     setup({ field: fieldById('topicEmpty'), value: null });
 
-    const editor = await screen.findByRole('textbox', { name: TOPIC_PAGE });
+    const editor = await screen.findByRole('textbox', { name: TOPIC_FIELD });
 
     expect(editor).toHaveAccessibleDescription(
-      'A topic with no posts yet Keep {name} — the site fills it in.',
+      `A topic with no posts yet ${KEEP_NAME_NOTE}`,
     );
   });
 
@@ -357,11 +360,11 @@ describe(`<${VoiceField.name}/>`, () => {
       { isArchived: true },
     );
 
-    const editor = await screen.findByRole('textbox', { name: TOPIC_PAGE });
+    const editor = await screen.findByRole('textbox', { name: TOPIC_FIELD });
 
     expect(editor).toHaveAccessibleDescription(
       new RegExp(
-        `^${ARCHIVED_NOTICE_TEXT}.*A topic with no posts yet.*Keep {name}`,
+        `^${ARCHIVED_NOTICE_TEXT}.*A topic with no posts yet.*${KEEP_NAME_NOTE}`,
       ),
     );
   });

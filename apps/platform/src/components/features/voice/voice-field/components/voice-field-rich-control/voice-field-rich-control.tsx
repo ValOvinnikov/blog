@@ -11,9 +11,8 @@ import { useVoiceFieldState } from '@platform/components/features/voice/voice-ed
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import {
-  isVoicePlainCopyOf,
+  toVoiceRichDraft,
   voiceTextToPortableText,
 } from '@platform/utils/voice-portable-text/voice-portable-text';
 
@@ -44,14 +43,7 @@ export const VoiceFieldRichControl = ({
           ? value
           : voiceTextToPortableText(fieldId, defaultText)
       }
-      onChange={(next) =>
-        onChange(
-          isBlankPortableTextValue(next) ||
-            isVoicePlainCopyOf(next, defaultText)
-            ? null
-            : next,
-        )
-      }
+      onChange={(next) => onChange(toVoiceRichDraft(next, defaultText))}
       mode={isArchived ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
       size={SIZE.SM}
     />
