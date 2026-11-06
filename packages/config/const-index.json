@@ -3086,12 +3086,6 @@
         "file": "packages/db/src/constants/tenant.ts"
       },
       {
-        "ref": "SIGN_IN_APPS_NOTICE.ARCHIVED",
-        "scope": "app:platform",
-        "from": "@platform/constants/sign-in-apps",
-        "file": "apps/platform/src/constants/sign-in-apps.ts"
-      },
-      {
         "ref": "TENANT_REFUSAL.ARCHIVED",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
@@ -6389,14 +6383,6 @@
     "EDIT": [
       {
         "ref": "SIGN_IN_APPS_MODE.EDIT",
-        "scope": "app:platform",
-        "from": "@platform/constants/sign-in-apps",
-        "file": "apps/platform/src/constants/sign-in-apps.ts"
-      }
-    ],
-    "NOT_OWNER": [
-      {
-        "ref": "SIGN_IN_APPS_NOTICE.NOT_OWNER",
         "scope": "app:platform",
         "from": "@platform/constants/sign-in-apps",
         "file": "apps/platform/src/constants/sign-in-apps.ts"

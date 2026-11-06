@@ -50,13 +50,6 @@ export const SIGN_IN_APPS_MODE = {
 
 export type TSignInAppsMode = TValueOf<typeof SIGN_IN_APPS_MODE>;
 
-export const SIGN_IN_APPS_NOTICE = {
-  ARCHIVED: 'ARCHIVED',
-  NOT_OWNER: 'NOT_OWNER',
-} as const;
-
-export type TSignInAppsNotice = TValueOf<typeof SIGN_IN_APPS_NOTICE>;
-
 export const OAUTH_PROVIDER_ICON = {
   [OAUTH_PROVIDER.GOOGLE]: ICONS.GOOGLE,
   [OAUTH_PROVIDER.GITHUB]: ICONS.GITHUB,

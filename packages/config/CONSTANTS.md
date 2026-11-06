@@ -562,7 +562,6 @@ Every key/value const an agent should reuse before writing a literal. The
 - **SIGN_IN_APP_REFUSAL**: `NOT_ON_PLAN`, `NO_SAVED_APP`
 - **SIGN_IN_APP_LOG**: `SAVE_FAILED`=`"sign_in_app.save_failed"`, `SAVE_AUDIT_FAILED`=`"sign_in_app.save_audit_failed"`, `REMOVE_FAILED`=`"sign_in_app.remove_failed"`, `REMOVE_AUDIT_FAILED`=`"sign_in_app.remove_audit_failed"`, `CONFIRM_CALLBACK_FAILED`=`"sign_in_app.confirm_callback_failed"`
 - **SIGN_IN_APPS_MODE**: `EDIT`, `READ_ONLY`, `OPERATOR`, `FREE`
-- **SIGN_IN_APPS_NOTICE**: `ARCHIVED`, `NOT_OWNER`
 
 ### `@platform/constants/sign-in` — `apps/platform/src/constants/sign-in.ts`
 
