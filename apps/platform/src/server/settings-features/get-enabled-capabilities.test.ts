@@ -17,6 +17,7 @@ vi.mock(
 );
 
 const MOCK_ALL_ON = mockSettingsFeaturesValues({
+  readerAccountsEnabled: true,
   commentsEnabled: true,
   ratingsEnabled: true,
   bookmarksEnabled: true,
@@ -73,6 +74,20 @@ describe(getEnabledCapabilities, () => {
     });
 
     expect(result).not.toContain(CAPABILITY.CONTACT_FORM);
-    expect(result).toContain(CAPABILITY.RATINGS);
+    expect(result).toContain(CAPABILITY.CONSENT_BANNER);
+  });
+
+  it('omits every Reader accounts sub-item while Reader accounts is off', async () => {
+    arrangeSavedValues({ ...MOCK_ALL_ON, readerAccountsEnabled: false });
+
+    const result = await getEnabledCapabilities({
+      id: MOCK_TENANT_ID,
+      plan: TENANT_PLAN.GROWTH,
+    });
+
+    expect(result).not.toContain(CAPABILITY.READER_ACCOUNTS);
+    expect(result).not.toContain(CAPABILITY.BOOKMARKS);
+    expect(result).not.toContain(CAPABILITY.COMMENTS);
+    expect(result).toContain(CAPABILITY.CONTACT_FORM);
   });
 });

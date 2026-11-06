@@ -1,6 +1,7 @@
 import type { TValueOf } from '@blog/config/utils';
 
 export const CAPABILITY = {
+  READER_ACCOUNTS: 'READER_ACCOUNTS',
   COMMENTS: 'COMMENTS',
   RATINGS: 'RATINGS',
   BOOKMARKS: 'BOOKMARKS',

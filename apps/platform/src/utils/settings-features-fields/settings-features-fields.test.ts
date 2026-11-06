@@ -1,26 +1,21 @@
 import { CAPABILITY } from '@blog/config';
+import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 
 import {
   clampToEntitlement,
   featureDefaultsToValues,
-  hasReaderAccountFeature,
+  blockSwitchOnWhileParentOff,
   keepStoredOutOfPlan,
   listSwitchedOnOutOfPlan,
   type TSettingsFeaturesValues,
   withComingSoonOff,
+  withParentOffApplied,
 } from './settings-features-fields';
 
-const ALL_OFF: TSettingsFeaturesValues = {
-  commentsEnabled: false,
-  ratingsEnabled: false,
-  bookmarksEnabled: false,
-  newsletterEnabled: false,
-  analyticsEnabled: false,
-  consentBannerEnabled: false,
-  contactFormEnabled: false,
-};
+const ALL_OFF = mockSettingsFeaturesValues();
 
 const ALL_ON: TSettingsFeaturesValues = {
+  readerAccountsEnabled: true,
   commentsEnabled: true,
   ratingsEnabled: true,
   bookmarksEnabled: true,
@@ -33,6 +28,7 @@ const ALL_ON: TSettingsFeaturesValues = {
 describe(featureDefaultsToValues, () => {
   it('converts a capability-keyed defaults map into the column-keyed view model', () => {
     const defaults = {
+      [CAPABILITY.READER_ACCOUNTS]: true,
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
       [CAPABILITY.BOOKMARKS]: false,
@@ -44,6 +40,7 @@ describe(featureDefaultsToValues, () => {
 
     expect(featureDefaultsToValues(defaults)).toEqual({
       ...ALL_OFF,
+      readerAccountsEnabled: true,
       commentsEnabled: true,
       ratingsEnabled: true,
       analyticsEnabled: true,
@@ -114,7 +111,7 @@ describe(keepStoredOutOfPlan, () => {
 });
 
 describe(listSwitchedOnOutOfPlan, () => {
-  const FREE_CAPABILITIES = [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER];
+  const FREE_CAPABILITIES = [CAPABILITY.CONSENT_BANNER];
 
   it('lists an out-of-plan toggle switched on that is stored off', () => {
     const values = { ...ALL_OFF, analyticsEnabled: true };
@@ -160,23 +157,50 @@ describe(withComingSoonOff, () => {
   });
 });
 
-describe(hasReaderAccountFeature, () => {
-  it('is false when bookmarks, comments and newsletter are all off', () => {
-    expect(
-      hasReaderAccountFeature({
-        ...ALL_ON,
-        bookmarksEnabled: false,
-        commentsEnabled: false,
-        newsletterEnabled: false,
-      }),
-    ).toBe(false);
+describe(blockSwitchOnWhileParentOff, () => {
+  it('keeps a sub-item stored on while its parent is off', () => {
+    const values = { ...ALL_OFF, bookmarksEnabled: true };
+
+    expect(blockSwitchOnWhileParentOff(values, values)).toEqual(values);
   });
 
-  it.each([
-    'bookmarksEnabled',
-    'commentsEnabled',
-    'newsletterEnabled',
-  ] as const)('is true when only %s is on', (field) => {
-    expect(hasReaderAccountFeature({ ...ALL_OFF, [field]: true })).toBe(true);
+  it('refuses to switch a sub-item on while its parent is off', () => {
+    const submitted = { ...ALL_OFF, bookmarksEnabled: true };
+
+    expect(blockSwitchOnWhileParentOff(submitted, ALL_OFF)).toEqual(ALL_OFF);
+  });
+
+  it('lets a sub-item be switched off while its parent is off', () => {
+    const stored = { ...ALL_OFF, bookmarksEnabled: true };
+
+    expect(blockSwitchOnWhileParentOff(ALL_OFF, stored)).toEqual(ALL_OFF);
+  });
+
+  it('takes a sub-item as submitted while its parent is on', () => {
+    const submitted = {
+      ...ALL_OFF,
+      readerAccountsEnabled: true,
+      bookmarksEnabled: true,
+    };
+
+    expect(blockSwitchOnWhileParentOff(submitted, ALL_OFF)).toEqual(submitted);
+  });
+});
+
+describe(withParentOffApplied, () => {
+  it('turns every sub-item off while its parent is off', () => {
+    expect(
+      withParentOffApplied({ ...ALL_ON, readerAccountsEnabled: false }),
+    ).toEqual({
+      ...ALL_ON,
+      readerAccountsEnabled: false,
+      bookmarksEnabled: false,
+      commentsEnabled: false,
+      ratingsEnabled: false,
+    });
+  });
+
+  it('leaves sub-items as given while their parent is on', () => {
+    expect(withParentOffApplied(ALL_ON)).toEqual(ALL_ON);
   });
 });

@@ -11,6 +11,7 @@ import { eq } from 'drizzle-orm';
 
 export type TSettingsFeatureToggles = Pick<
   TSettingsFeatures,
+  | 'readerAccountsEnabled'
   | 'commentsEnabled'
   | 'ratingsEnabled'
   | 'bookmarksEnabled'
@@ -32,6 +33,7 @@ export async function getSettingsFeaturesAndPreset(
   const [row] = await getDb()
     .select({
       features: {
+        readerAccountsEnabled: settingsFeatures.readerAccountsEnabled,
         commentsEnabled: settingsFeatures.commentsEnabled,
         ratingsEnabled: settingsFeatures.ratingsEnabled,
         bookmarksEnabled: settingsFeatures.bookmarksEnabled,

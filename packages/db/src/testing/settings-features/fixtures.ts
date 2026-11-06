@@ -4,6 +4,7 @@ export function mockSettingsFeaturesToggles(
   overrides: Partial<typeof schema.settingsFeatures.$inferInsert> = {},
 ) {
   return {
+    readerAccountsEnabled: false,
     commentsEnabled: false,
     ratingsEnabled: false,
     bookmarksEnabled: false,

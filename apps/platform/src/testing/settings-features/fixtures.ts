@@ -4,6 +4,7 @@ import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-
 export const mockSettingsFeaturesValues = (
   overrides: Partial<TSettingsFeaturesValues> = {},
 ): TSettingsFeaturesValues => ({
+  readerAccountsEnabled: false,
   commentsEnabled: false,
   ratingsEnabled: false,
   bookmarksEnabled: false,

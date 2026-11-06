@@ -634,6 +634,14 @@
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
+    "READER_ACCOUNTS": [
+      {
+        "ref": "CAPABILITY.READER_ACCOUNTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/capability.ts"
+      }
+    ],
     "COMMENTS": [
       {
         "ref": "CAPABILITY.COMMENTS",

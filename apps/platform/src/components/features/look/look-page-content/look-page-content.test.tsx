@@ -129,9 +129,9 @@ describe(`<${LookPageContent.name}/>`, () => {
     });
   });
 
-  it('previews Sign in when a reader feature is on', async () => {
+  it('previews Sign in when Reader accounts is on', async () => {
     vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
-      CAPABILITY.BOOKMARKS,
+      CAPABILITY.READER_ACCOUNTS,
     ]);
 
     await setup();
@@ -144,8 +144,9 @@ describe(`<${LookPageContent.name}/>`, () => {
     expect(signInButton).toBeVisible();
   });
 
-  it('previews no Sign in when only non-reader features are on', async () => {
+  it('previews no Sign in while Reader accounts is off', async () => {
     vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
+      CAPABILITY.BOOKMARKS,
       CAPABILITY.ANALYTICS,
     ]);
 

@@ -61,6 +61,7 @@ describe(getEffectiveSettingsFeatures, () => {
 
     expect(result).toEqual(
       okResult({
+        [CAPABILITY.READER_ACCOUNTS]: true,
         [CAPABILITY.COMMENTS]: false,
         [CAPABILITY.RATINGS]: true,
         [CAPABILITY.BOOKMARKS]: true,

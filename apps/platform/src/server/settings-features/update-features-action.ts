@@ -22,6 +22,7 @@ import {
   type TNotInPlanRefusal,
 } from '@platform/utils/plan-refusal/plan-refusal';
 import {
+  blockSwitchOnWhileParentOff,
   keepStoredOutOfPlan,
   listSwitchedOnOutOfPlan,
   withComingSoonOff,
@@ -29,6 +30,7 @@ import {
 import { z } from 'zod';
 
 const updateFeaturesInputSchema = z.object({
+  readerAccountsEnabled: z.boolean(),
   commentsEnabled: z.boolean(),
   ratingsEnabled: z.boolean(),
   bookmarksEnabled: z.boolean(),
@@ -52,7 +54,8 @@ export type TUpdateFeaturesResult =
  * A "Coming soon" capability is always written off. Switching on a toggle
  * outside `PLAN_REGISTRY[tenant.plan]` that is stored off rejects the whole
  * save; otherwise an out-of-plan toggle keeps its stored value, so a
- * downgrade loses nothing.
+ * downgrade loses nothing. A toggle whose parent is off can be switched
+ * off but not on, so switching the parent back on restores what was kept.
  */
 export const updateFeaturesAction = async (
   tenantId: string,
@@ -82,7 +85,11 @@ export const updateFeaturesAction = async (
     }
 
     const toWrite = withComingSoonOff(
-      keepStoredOutOfPlan(values, stored, entitled),
+      keepStoredOutOfPlan(
+        blockSwitchOnWhileParentOff(values, stored),
+        stored,
+        entitled,
+      ),
     );
     await queries.settingsFeatures.upsertSettingsFeatures(tenant.id, toWrite);
     await revalidateSiteConfig(tenant.id);

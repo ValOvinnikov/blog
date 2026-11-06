@@ -1470,8 +1470,9 @@
     "switchOn": "On",
     "switchOff": "Off",
     "capabilitiesHeading": "Capabilities",
-    "readerAccountNote": "Bookmarks, comments and newsletter are all off, so nobody new can sign in to your site. Readers who are already signed in can still open their account page to download or delete their data until their session ends.",
+    "readerAccountNote": "Reader accounts are off, so nobody new can sign in to your site. Readers who are already signed in can still open their account page to download or delete their data until their session ends.",
     "toggleLabel": {
+      "READER_ACCOUNTS": "Reader accounts",
       "COMMENTS": "Comments",
       "RATINGS": "Ratings",
       "BOOKMARKS": "Bookmarks",
@@ -1481,6 +1482,7 @@
       "CONTACT_FORM": "Contact form"
     },
     "toggleDescription": {
+      "READER_ACCOUNTS": "Let readers sign in to your site. Bookmarks, comments and ratings need it.",
       "COMMENTS": "Let readers leave comments on posts.",
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",

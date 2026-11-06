@@ -1,4 +1,4 @@
-import { CAPABILITY, LIVE_READER_ACCOUNT_CAPABILITIES } from '@blog/config';
+import { CAPABILITY } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
@@ -28,8 +28,8 @@ export const LookPageContent = async ({ tenant }: TLookPageContentProps) => {
       )}
       plan={tenant.plan}
       liveLocales={liveLocales}
-      hasReaderAccounts={LIVE_READER_ACCOUNT_CAPABILITIES.some((capability) =>
-        enabledCapabilities.includes(capability),
+      hasReaderAccounts={enabledCapabilities.includes(
+        CAPABILITY.READER_ACCOUNTS,
       )}
       hasCookieBanner={enabledCapabilities.includes(CAPABILITY.CONSENT_BANNER)}
       savedAt={siteConfig?.updatedAt}
