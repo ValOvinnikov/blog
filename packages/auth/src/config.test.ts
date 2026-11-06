@@ -5,6 +5,9 @@ import {
   MOCK_GITHUB_SECRET,
   MOCK_GOOGLE_ID,
   MOCK_GOOGLE_SECRET,
+  MOCK_REDIRECT_PROXY_URL,
+  MOCK_SITE_GITHUB_CREDENTIALS,
+  MOCK_SITE_GITHUB_ID,
 } from '@blog/auth/testing/oauth-fixtures';
 import {
   MOCK_AUTH_SECRET,
@@ -13,7 +16,7 @@ import {
   MOCK_SESSION_TOKEN,
   MOCK_USER_ID,
 } from '@blog/auth/testing/session-fixtures';
-import { AUTH_APP } from '@blog/config/constants';
+import { AUTH_APP, OAUTH_PROVIDER } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { schema } from '@blog/db';
 import type { DefaultSession, NextAuthConfig } from 'next-auth';
@@ -82,6 +85,24 @@ function providerIdsOf(config: NextAuthConfig): unknown[] {
   });
 }
 
+type TOAuthProviderOptions = { clientId?: string; redirectProxyUrl?: string };
+
+function oauthProviderOptionsOf(
+  config: NextAuthConfig,
+  id: string,
+): TMaybeUndefined<TOAuthProviderOptions> {
+  const provider = config.providers.find(
+    (candidate) => typeof candidate !== 'function' && candidate.id === id,
+  );
+  return (provider as { options?: TOAuthProviderOptions } | undefined)?.options;
+}
+
+function redirectProxyUrlOf(
+  options: TMaybeUndefined<TOAuthProviderOptions>,
+): TMaybeUndefined<string> {
+  return options?.redirectProxyUrl ?? MOCK_REDIRECT_PROXY_URL;
+}
+
 describe(buildAuthConfig, () => {
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -131,10 +152,56 @@ describe(buildAuthConfig, () => {
     const config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
 
     expect(providerIdsOf(config)).toEqual([
-      'github',
-      'google',
+      OAUTH_PROVIDER.GITHUB,
+      OAUTH_PROVIDER.GOOGLE,
       MAGIC_LINK_PROVIDER_ID,
     ]);
+  });
+
+  describe("with the site's own credentials", () => {
+    beforeEach(() => {
+      vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
+      vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
+      vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
+      vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
+    });
+
+    it("signs in with the site's credentials on its own callback", () => {
+      const config = buildAuthConfig(
+        AUTH_APP.SITE,
+        onMagicLinkSendRefused,
+        MOCK_SITE_GITHUB_CREDENTIALS,
+      );
+      const options = oauthProviderOptionsOf(config, OAUTH_PROVIDER.GITHUB);
+
+      expect(options?.clientId).toBe(MOCK_SITE_GITHUB_ID);
+      expect(redirectProxyUrlOf(options)).toBeFalsy();
+    });
+
+    it('keeps the env credentials and the redirect proxy for a provider the site has none for', () => {
+      const config = buildAuthConfig(
+        AUTH_APP.SITE,
+        onMagicLinkSendRefused,
+        MOCK_SITE_GITHUB_CREDENTIALS,
+      );
+      const options = oauthProviderOptionsOf(config, OAUTH_PROVIDER.GOOGLE);
+
+      expect(options?.clientId).toBe(MOCK_GOOGLE_ID);
+      expect(redirectProxyUrlOf(options)).toBe(MOCK_REDIRECT_PROXY_URL);
+    });
+  });
+
+  it('uses the env credentials and the redirect proxy when no site credentials are passed', () => {
+    vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
+    vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
+
+    const options = oauthProviderOptionsOf(
+      buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused),
+      OAUTH_PROVIDER.GITHUB,
+    );
+
+    expect(options?.clientId).toBe(MOCK_GITHUB_ID);
+    expect(redirectProxyUrlOf(options)).toBe(MOCK_REDIRECT_PROXY_URL);
   });
 
   describe('for a site', () => {
