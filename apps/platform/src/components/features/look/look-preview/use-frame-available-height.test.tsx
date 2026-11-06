@@ -36,9 +36,17 @@ const SETTLED_HEIGHT =
 const RESIZE_ROUNDS = 5;
 const SCROLLED_BY = 300;
 
-const Harness = ({ device }: { device: TPreviewDevice }) => {
-  const { rootRef, stageRef, availableHeight } =
-    useFrameAvailableHeight(device);
+const Harness = ({
+  device,
+  isScrollingWithPage = true,
+}: {
+  device: TPreviewDevice;
+  isScrollingWithPage?: boolean;
+}) => {
+  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight(
+    device,
+    isScrollingWithPage,
+  );
   const scale = fitPageScale({
     device,
     availableWidth: STAGE_WIDTH,
@@ -66,14 +74,14 @@ const viewportHeight = () => parseFloat(viewport().style.height);
 
 const stageHeight = () => STAGE_CHROME + viewportHeight();
 
-const stubLayout = () => {
+const stubLayout = ({ isStageSticky = false } = {}) => {
   vi.stubGlobal('innerHeight', WINDOW_HEIGHT);
   vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(
     function (this: Element) {
       if (this === viewport()) {
         return { height: viewportHeight() } as DOMRect;
       }
-      const stageTop = STAGE_TOP - window.scrollY;
+      const stageTop = isStageSticky ? STAGE_TOP : STAGE_TOP - window.scrollY;
       const stageBottom = stageTop + stageHeight();
       if (this === stage()) {
         return {
@@ -112,6 +120,21 @@ describe(useFrameAvailableHeight, () => {
   it('measures the same height after the page scrolls', () => {
     stubLayout();
     render(<Harness device={PREVIEW_DEVICE.TABLET} />);
+
+    vi.stubGlobal('scrollY', SCROLLED_BY);
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+
+    const availableHeight = screen.getByTestId(AVAILABLE_TEST_ID);
+    expect(availableHeight).toHaveTextContent(String(SETTLED_HEIGHT));
+  });
+
+  it('measures the same height after the page scrolls under a sticky preview', () => {
+    stubLayout({ isStageSticky: true });
+    render(
+      <Harness device={PREVIEW_DEVICE.TABLET} isScrollingWithPage={false} />,
+    );
 
     vi.stubGlobal('scrollY', SCROLLED_BY);
     act(() => {

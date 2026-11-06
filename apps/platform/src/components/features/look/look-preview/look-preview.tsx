@@ -36,6 +36,7 @@ export type TLookPreviewProps = {
   siteHost: string;
   followTarget: TLookFollowTarget;
   isShown: boolean;
+  isScrollingWithPage: boolean;
 };
 
 export const LookPreview = ({
@@ -45,6 +46,7 @@ export const LookPreview = ({
   siteHost,
   followTarget,
   isShown,
+  isScrollingWithPage,
 }: TLookPreviewProps) => {
   const { shownBrandName, values, isSubmenuPreviewOpen, previewDevice } =
     useLookForm();
@@ -56,8 +58,10 @@ export const LookPreview = ({
   const [fullscreenHandle] = useState(Dialog.createHandle);
   const fullscreenTriggerRef = useRef<HTMLButtonElement>(null);
   const isPhoneTab = !useMediaQuery(MEDIA_QUERY.LG_UP);
-  const { rootRef, stageRef, availableHeight } =
-    useFrameAvailableHeight(previewDevice);
+  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight(
+    previewDevice,
+    isScrollingWithPage,
+  );
   const { frameRef, follow } = useLookFollow({
     target: followTarget,
     device: previewDevice,

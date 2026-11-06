@@ -16,6 +16,7 @@ export const settingsFormShellVariants = tv({
     stack: {
       [SETTINGS_FORM_STACK.LOOK]: { root: ['gap-admin-form-gap'] },
       [SETTINGS_FORM_STACK.VOICE]: {
+        // The content column's 16px phone padding less 2: the board's 14.
         root: ['gap-4 max-md:-mt-0.5 md:gap-5'],
       },
     },

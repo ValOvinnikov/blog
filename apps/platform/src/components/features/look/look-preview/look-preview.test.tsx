@@ -136,6 +136,7 @@ const renderPreview = ({
         siteHost={MOCK_TENANT_DOMAIN}
         followTarget={followTarget}
         isShown={true}
+        isScrollingWithPage={false}
       />
     </LookFormProvider>,
   );
