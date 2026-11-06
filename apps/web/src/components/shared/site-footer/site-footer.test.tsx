@@ -85,6 +85,7 @@ const MOCK_POWERED_BY_MARK = {
 const POWERED_BY_NAME = `${SITE_MESSAGES.siteFooter.poweredByLabel} ${MOCK_POWERED_BY_MARK.productName}`;
 const [MOCK_ABOUT, MOCK_ADDRESS, MOCK_GROUP_HEADING] =
   faker.helpers.uniqueArray(faker.lorem.word, 3);
+const MOCK_COPYRIGHT_NAME = faker.company.name();
 const MOCK_LOGO_URL = faker.image.url();
 const MOCK_NEW_TAB_LINK: ILink = {
   ...MOCK_ABOUT_LINK,
@@ -295,6 +296,22 @@ describe(`<${SiteFooter.name}/>`, () => {
           `${MOCK_ABOUT}.*${MOCK_ADDRESS}.*${MOCK_GROUP_HEADING}.*${MOCK_HOME_LINK.label}.*${MOCK_BLOG_LINK.label}`,
         ),
       );
+    });
+
+    it('names the copyright line after the copyright name and keeps the brand name in the wordmark', async () => {
+      getFooterStyleMock.mockResolvedValueOnce({
+        ...MOCK_FOOTER_STYLE,
+        layout: FOOTER_LAYOUT.BIG_WORDMARK,
+      });
+
+      await setupWithFooter({ copyrightName: MOCK_COPYRIGHT_NAME });
+
+      const copyright = screen.getByText(new RegExp(MOCK_COPYRIGHT_NAME));
+      const wordmark = screen.getByText(MOCK_TENANT_NAME, { ignore: 'p' });
+
+      expect(copyright).toHaveTextContent(String(MOCK_NOW.getFullYear()));
+      expect(copyright).not.toHaveTextContent(MOCK_TENANT_NAME);
+      expect(wordmark).toBeInTheDocument();
     });
 
     it('shows the logo when the site has one', async () => {
