@@ -429,7 +429,7 @@ Slots:
 - **Footer.Copyright** — The copyright line in the site `Footer`, rendering "© {year} {title}". Props: title: string · year: number _(extends IWithClassName, IWithDataTestId)_
 - **Footer.FinePrint** — The legal and settings links in the footer's bottom row, beside the copyright line. Props: ariaLabel: string _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
 - **Footer.Nav** — The navigation region of the site `Footer`; a labelled `<nav>` wrapping the footer links. Props: ariaLabel?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Footer.PoweredBy** — The platform's attribution link, always the last item of the footer's bottom row and outside the site's own legal links. Props: label: string · productName: string · href: string _(extends IWithClassName, IWithDataTestId)_
+- **Footer.PoweredBy** — The platform's attribution link, always the last item of the footer's bottom row and outside the site's own legal links. Props: label: string · productName: string · href: string · linkAs?: TAnchorElementType _(extends IWithClassName, IWithDataTestId)_
 - **Footer.Group** — One named group of footer links under the heading the editor gave it. Props: heading: string · headingLevel: THeadingLevel · children?: TCompoundChildren<{ Item: typeof FooterGroupItem }> _(extends IWithClassName, IWithDataTestId)_
 - **Footer.GroupItem** — One entry in a footer link group: a link, or any other content such as plain text. Props: _(extends IWithClassName, IWithDataTestId, PropsWithChildren)_
 

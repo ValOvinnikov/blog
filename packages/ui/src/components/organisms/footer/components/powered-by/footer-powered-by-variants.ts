@@ -1,13 +1,10 @@
-import { FOCUS_RING, TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
+import { TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
 
 export const footerPoweredByVariants = tv({
   slots: {
     root: [
-      'group/powered-by rounded-sm whitespace-nowrap',
-      'font-mono text-meta text-muted hover:text-text',
+      'group/powered-by whitespace-nowrap',
       '@min-[40rem]/footer:ms-auto group-data-[layout=CENTRED]/footer:ms-0',
-      TRANSITION_COLORS,
-      FOCUS_RING,
     ],
     name: [
       'font-medium',
