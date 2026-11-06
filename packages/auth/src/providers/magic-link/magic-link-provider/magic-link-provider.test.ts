@@ -34,7 +34,11 @@ import {
   EMAIL_TEMPLATE_DEFAULT_COPY,
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
 } from '@blog/db/constants';
-import { PLATFORM_EMAIL_BRAND_NAME, type TSendEmailInput } from '@blog/email';
+import {
+  escapeHtml,
+  PLATFORM_EMAIL_BRAND_NAME,
+  type TSendEmailInput,
+} from '@blog/email';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -468,7 +472,7 @@ describe(buildMagicLinkProvider, () => {
 
       const { html } = sentEmail();
       expect(html).toContain(`src="${MOCK_TEMPLATE_LOGO_URL}"`);
-      expect(html).toContain(MOCK_POSTAL_ADDRESS);
+      expect(html).toContain(escapeHtml(MOCK_POSTAL_ADDRESS));
     });
 
     it.each([
