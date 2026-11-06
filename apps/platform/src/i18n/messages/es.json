@@ -1046,6 +1046,8 @@
     "jumpTo": "Ir a",
     "expandAll": "Desplegar todo",
     "collapseAll": "Plegar todo",
+    "expandAllSections": "Desplegar todas las secciones",
+    "collapseAllSections": "Plegar todas las secciones",
     "alertSuccess": "Voz guardada.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
     "keepPlaceholder": "Conserve <code>{token}</code>: el sitio lo rellena.",

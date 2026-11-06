@@ -1046,6 +1046,8 @@
     "jumpTo": "Ga naar",
     "expandAll": "Alles uitklappen",
     "collapseAll": "Alles inklappen",
+    "expandAllSections": "Alle secties uitklappen",
+    "collapseAllSections": "Alle secties inklappen",
     "alertSuccess": "Toon opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",

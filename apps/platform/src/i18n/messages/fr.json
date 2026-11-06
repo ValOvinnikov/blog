@@ -1046,6 +1046,8 @@
     "jumpTo": "Aller à",
     "expandAll": "Tout déplier",
     "collapseAll": "Tout replier",
+    "expandAllSections": "Déplier toutes les sections",
+    "collapseAllSections": "Replier toutes les sections",
     "alertSuccess": "Voix enregistrée.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
     "keepPlaceholder": "Conservez <code>{token}</code> — le site le remplit.",
