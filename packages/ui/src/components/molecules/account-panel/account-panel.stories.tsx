@@ -124,6 +124,24 @@ export const Hub: TStory = {
   },
 };
 
+export const WithoutBookmarks: TStory = {
+  render: (args) => (
+    <div className="grid gap-6">
+      {Object.values(ACCOUNT_PANEL_STYLE).map((appearance) => (
+        <div key={appearance} className="relative min-h-[300px]">
+          <p>{appearance}</p>
+          <InteractiveAccountPanel
+            {...args}
+            appearance={appearance}
+            links={{ settings: args.links.settings }}
+            panel={{ ...args.panel, id: `${PANEL_ID}-${appearance}` }}
+          />
+        </div>
+      ))}
+    </div>
+  ),
+};
+
 export const WithPhoto: TStory = {
   args: {
     user: {
