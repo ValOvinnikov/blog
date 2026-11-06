@@ -3,6 +3,7 @@ import 'server-only';
 import { oauthEnv } from '@blog/auth/utils/oauth-env/oauth-env';
 import type { TMaybeUndefined, TOAuthCredentials } from '@blog/config';
 import { OAUTH_PROVIDER, type TOAuthProvider } from '@blog/config/constants';
+import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
 import { isUndefined } from '@blog/utils/primitives';
 
 export type TOAuthProviderId = TOAuthProvider;
@@ -39,12 +40,15 @@ const OAUTH_CREDENTIAL_GETTERS: Record<
  */
 export function getOAuthProviderCredentials(
   id: TOAuthProviderId,
+  siteCredentials: TTenantOAuthCredentialsByProvider = {},
 ): TMaybeUndefined<TOAuthCredentials> {
-  return OAUTH_CREDENTIAL_GETTERS[id]();
+  return siteCredentials[id] ?? OAUTH_CREDENTIAL_GETTERS[id]();
 }
 
-export function getEnabledOAuthProviderIds(): TOAuthProviderId[] {
+export function getEnabledOAuthProviderIds(
+  siteCredentials: TTenantOAuthCredentialsByProvider = {},
+): TOAuthProviderId[] {
   return OAUTH_PROVIDER_IDS.filter(
-    (id) => !isUndefined(getOAuthProviderCredentials(id)),
+    (id) => !isUndefined(getOAuthProviderCredentials(id, siteCredentials)),
   );
 }

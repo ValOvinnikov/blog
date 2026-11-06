@@ -3,15 +3,18 @@ import {
   MOCK_GITHUB_SECRET,
   MOCK_GOOGLE_ID,
   MOCK_GOOGLE_SECRET,
+  MOCK_SITE_GITHUB_CREDENTIALS,
+  MOCK_SITE_GITHUB_ID,
+  MOCK_SITE_GITHUB_SECRET,
 } from '@blog/auth/testing/oauth-fixtures';
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 
 import {
   getEnabledOAuthProviderIds,
   getOAuthProviderCredentials,
 } from './oauth-providers';
 
-const GITHUB = 'github';
-const GOOGLE = 'google';
+const { GITHUB, GOOGLE } = OAUTH_PROVIDER;
 
 async function importOAuthProviders(): Promise<
   typeof import('./oauth-providers')
@@ -57,6 +60,12 @@ describe('oauth-providers', () => {
       expect(getEnabledOAuthProviderIds()).toEqual([GITHUB]);
     });
 
+    it('includes a provider only the site has credentials for', () => {
+      expect(getEnabledOAuthProviderIds(MOCK_SITE_GITHUB_CREDENTIALS)).toEqual([
+        GITHUB,
+      ]);
+    });
+
     it('lists GitHub before Google when both are enabled', () => {
       withGitHubCredentials();
       vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
@@ -74,6 +83,26 @@ describe('oauth-providers', () => {
         clientId: MOCK_GITHUB_ID,
         clientSecret: MOCK_GITHUB_SECRET,
       });
+    });
+
+    it("prefers the site's own credentials over the env pair", () => {
+      withGitHubCredentials();
+
+      expect(
+        getOAuthProviderCredentials(GITHUB, MOCK_SITE_GITHUB_CREDENTIALS),
+      ).toEqual({
+        clientId: MOCK_SITE_GITHUB_ID,
+        clientSecret: MOCK_SITE_GITHUB_SECRET,
+      });
+    });
+
+    it('falls back to the env pair for a provider the site has no credentials for', () => {
+      vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
+      vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
+
+      expect(
+        getOAuthProviderCredentials(GOOGLE, MOCK_SITE_GITHUB_CREDENTIALS),
+      ).toEqual({ clientId: MOCK_GOOGLE_ID, clientSecret: MOCK_GOOGLE_SECRET });
     });
 
     it('returns undefined when the credential pair is incomplete', () => {

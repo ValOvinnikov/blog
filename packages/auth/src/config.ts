@@ -7,20 +7,60 @@ import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-li
 import { scopeAdapterToApp } from '@blog/auth/sessions/app-scoped-adapter';
 import { buildPlatformCookies } from '@blog/auth/sessions/platform-cookies';
 import { env } from '@blog/auth/utils/env/env';
-import { getOAuthProviderCredentials } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { AUTH_APP, type TAuthApp } from '@blog/config/constants';
+import {
+  getOAuthProviderCredentials,
+  OAUTH_PROVIDER_IDS,
+  type TOAuthProviderId,
+} from '@blog/auth/utils/oauth-providers/oauth-providers';
+import type { TOAuthCredentials } from '@blog/config';
+import {
+  AUTH_APP,
+  OAUTH_PROVIDER,
+  type TAuthApp,
+} from '@blog/config/constants';
 import type { IMagicLinkSendRefusal } from '@blog/config/types';
 import { getDb, schema } from '@blog/db';
+import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
+import { isUndefined } from '@blog/utils/primitives';
 import type { NextAuthConfig } from 'next-auth';
+import type { Provider } from 'next-auth/providers';
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
+
+type TOAuthProviderOptions = TOAuthCredentials & { redirectProxyUrl?: string };
+
+const OAUTH_PROVIDER_FACTORIES: Record<
+  TOAuthProviderId,
+  (options: TOAuthProviderOptions) => Provider
+> = {
+  [OAUTH_PROVIDER.GITHUB]: GitHub,
+  [OAUTH_PROVIDER.GOOGLE]: Google,
+};
+
+// Auth.js falls back to AUTH_REDIRECT_PROXY_URL on a nullish value, so only an empty string turns the proxy off.
+const WITHOUT_REDIRECT_PROXY = { redirectProxyUrl: '' };
+
+function buildOAuthProviders(
+  siteCredentials: TTenantOAuthCredentialsByProvider,
+): Provider[] {
+  return OAUTH_PROVIDER_IDS.flatMap((id) => {
+    const credentials = getOAuthProviderCredentials(id, siteCredentials);
+    if (isUndefined(credentials)) return [];
+
+    return [
+      OAUTH_PROVIDER_FACTORIES[id]({
+        ...credentials,
+        ...(siteCredentials[id] && WITHOUT_REDIRECT_PROXY),
+      }),
+    ];
+  });
+}
 
 export function buildAuthConfig(
   app: TAuthApp,
   onMagicLinkSendRefused: (refusal: IMagicLinkSendRefusal) => void,
+  siteCredentials: TTenantOAuthCredentialsByProvider = {},
 ): NextAuthConfig {
-  const githubCredentials = getOAuthProviderCredentials('github');
-  const googleCredentials = getOAuthProviderCredentials('google');
   const adapter = DrizzleAdapter(getDb(), {
     usersTable: schema.users,
     accountsTable: schema.accounts,
@@ -61,8 +101,7 @@ export function buildAuthConfig(
       },
     }),
     providers: [
-      ...(githubCredentials ? [GitHub(githubCredentials)] : []),
-      ...(googleCredentials ? [Google(googleCredentials)] : []),
+      ...buildOAuthProviders(siteCredentials),
       buildMagicLinkProvider(app, onMagicLinkSendRefused),
     ],
   };
