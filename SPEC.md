@@ -1802,26 +1802,26 @@ was taken down while its site kept serving from cache. See
 and [`docs/context/rendering-caching-i18n.md`](./docs/context/rendering-caching-i18n.md).
 
 **Feature-toggle layer** (Phase 4 of the configurability epic, #1285/#1289):
-`@blog/db`'s `settings_features` table (one row per tenant, seven `NOT NULL`
-boolean columns — `commentsEnabled`/`ratingsEnabled`/`bookmarksEnabled`/
+`@blog/db`'s `settings_features` table (one row per tenant, eight `NOT NULL`
+boolean columns — `readerAccountsEnabled`/`commentsEnabled`/`ratingsEnabled`/`bookmarksEnabled`/
 `newsletterEnabled`/`analyticsEnabled`/`consentBannerEnabled`/
 `contactFormEnabled`) holds the
 tenant's own on/off choice for each of `@blog/config`'s `CAPABILITY` keys. It
 is never eagerly seeded at tenant-provisioning time — like `site_config`, an
 absent row is resolved lazily at read time by falling back to the tenant's
 current preset's `PRESET_REGISTRY[preset].featureDefaults`
-(`comments`/`ratings`/`bookmarks`/`contactForm` default on, `newsletter`/`analytics`/
-`consentBanner` default off — a deliberate opt-in posture for those three,
-not a "match legacy behavior" default). Two gating layers stack on top of the tenant toggle,
+(`bookmarks`/`contactForm` default on; `readerAccounts`/`comments`/`ratings`/
+`newsletter`/`analytics`/`consentBanner` default off — a deliberate opt-in
+posture, not a "match legacy behavior" default). Two gating layers stack on top of the tenant toggle,
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
-entitles `ratings`/`consentBanner`; `GROWTH` entitles all seven:
-`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/`consentBanner`/
-`contactForm`).
-`comments` and `bookmarks` are `GROWTH`-only because each makes readers sign
-in — magic-link email on a shared Resend quota — and comments will carry
-moderation cost.
+entitles `consentBanner`; `GROWTH` entitles all eight:
+`readerAccounts`/`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/
+`consentBanner`/`contactForm`).
+`readerAccounts`, and the `comments`, `ratings` and `bookmarks` nested under
+it, are `GROWTH`-only because each makes readers sign in — magic-link email on
+a shared Resend quota — and comments will carry moderation cost.
 `PLAN_REGISTRY` lives in `@blog/db`, not `@blog/config`, despite mirroring
 `PRESET_REGISTRY`'s shape: it keys off `TENANT_PLAN`, which `db` owns per
 its storage-layer-vocabulary exception, and `config` sits below `db` in the

@@ -14,6 +14,7 @@ describe(toEffectiveSettingsFeatures, () => {
   it('maps each column to its capability when a row exists', () => {
     const result = toEffectiveSettingsFeatures(
       {
+        readerAccountsEnabled: true,
         commentsEnabled: false,
         ratingsEnabled: true,
         bookmarksEnabled: false,
@@ -26,6 +27,7 @@ describe(toEffectiveSettingsFeatures, () => {
     );
 
     expect(result).toEqual({
+      [CAPABILITY.READER_ACCOUNTS]: true,
       [CAPABILITY.COMMENTS]: false,
       [CAPABILITY.RATINGS]: true,
       [CAPABILITY.BOOKMARKS]: false,
@@ -39,6 +41,7 @@ describe(toEffectiveSettingsFeatures, () => {
   it('lets an existing row win whole over the preset defaults', () => {
     const result = toEffectiveSettingsFeatures(
       {
+        readerAccountsEnabled: false,
         commentsEnabled: false,
         ratingsEnabled: false,
         bookmarksEnabled: false,
@@ -50,6 +53,6 @@ describe(toEffectiveSettingsFeatures, () => {
       PRESET_ID.EDITORIAL,
     );
 
-    expect(result[CAPABILITY.COMMENTS]).toBe(false);
+    expect(result[CAPABILITY.CONTACT_FORM]).toBe(false);
   });
 });

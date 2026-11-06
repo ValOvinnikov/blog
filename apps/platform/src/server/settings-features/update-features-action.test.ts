@@ -174,16 +174,18 @@ describe(updateFeaturesAction, () => {
     'lets a GROWTH tenant switch %s on',
     async (field) => {
       arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
-
-      const result = await updateFeaturesAction(MOCK_OTHER_TENANT_ID, {
+      const input = {
         ...VALID_INPUT,
+        readerAccountsEnabled: true,
         [field]: true,
-      });
+      };
+
+      const result = await updateFeaturesAction(MOCK_OTHER_TENANT_ID, input);
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
       expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
         MOCK_OTHER_TENANT_ID,
-        { ...VALID_INPUT, [field]: true },
+        input,
       );
     },
   );
@@ -267,6 +269,39 @@ describe(updateFeaturesAction, () => {
     expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
       MOCK_OTHER_TENANT_ID,
       VALID_INPUT,
+    );
+  });
+
+  it('keeps Bookmarks off when a GROWTH tenant switches it on with Reader accounts off', async () => {
+    arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
+
+    const result = await updateFeaturesAction(MOCK_OTHER_TENANT_ID, {
+      ...VALID_INPUT,
+      bookmarksEnabled: true,
+    });
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_OTHER_TENANT_ID,
+      VALID_INPUT,
+    );
+  });
+
+  it('keeps stored Bookmarks when a GROWTH tenant switches Reader accounts off', async () => {
+    arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
+    const stored = {
+      ...VALID_INPUT,
+      readerAccountsEnabled: true,
+      bookmarksEnabled: true,
+    };
+    arrangeStoredValues(stored);
+    const input = { ...stored, readerAccountsEnabled: false };
+
+    await updateFeaturesAction(MOCK_OTHER_TENANT_ID, input);
+
+    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+      MOCK_OTHER_TENANT_ID,
+      input,
     );
   });
 

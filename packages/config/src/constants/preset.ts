@@ -143,8 +143,9 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     footerSurface: FOOTER_SURFACE.FULL_WIDTH,
     cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
     featureDefaults: {
-      [CAPABILITY.COMMENTS]: true,
-      [CAPABILITY.RATINGS]: true,
+      [CAPABILITY.READER_ACCOUNTS]: false,
+      [CAPABILITY.COMMENTS]: false,
+      [CAPABILITY.RATINGS]: false,
       [CAPABILITY.BOOKMARKS]: true,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: false,
@@ -175,8 +176,9 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     footerSurface: FOOTER_SURFACE.FULL_WIDTH,
     cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
     featureDefaults: {
-      [CAPABILITY.COMMENTS]: true,
-      [CAPABILITY.RATINGS]: true,
+      [CAPABILITY.READER_ACCOUNTS]: false,
+      [CAPABILITY.COMMENTS]: false,
+      [CAPABILITY.RATINGS]: false,
       [CAPABILITY.BOOKMARKS]: true,
       [CAPABILITY.NEWSLETTER]: false,
       [CAPABILITY.ANALYTICS]: false,

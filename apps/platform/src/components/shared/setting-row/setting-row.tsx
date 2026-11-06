@@ -8,6 +8,7 @@ import { settingRowVariants } from './setting-row-variants';
 export type TSettingRowProps = {
   label: string;
   description?: string;
+  isNested?: boolean;
   isLocked?: boolean;
   lockedReason?: string;
   children: ReactNode;
@@ -17,6 +18,7 @@ export type TSettingRowProps = {
 export const SettingRow = ({
   label,
   description,
+  isNested = false,
   isLocked = false,
   lockedReason,
   children,
@@ -28,7 +30,7 @@ export const SettingRow = ({
     label: labelSlot,
     description: descriptionSlot,
     control,
-  } = settingRowVariants();
+  } = settingRowVariants({ isNested });
 
   return (
     <Field.Root className={root({ class: className })}>

@@ -13,6 +13,7 @@ export const mockSettingsFeaturesRow = (
 ): TSettingsFeatures => ({
   id: faker.string.uuid(),
   tenantId: MOCK_TENANT_ID,
+  readerAccountsEnabled: true,
   commentsEnabled: true,
   ratingsEnabled: true,
   bookmarksEnabled: true,
@@ -29,6 +30,7 @@ export const mockSettingsFeaturesRowEnabling = (
   enabled: readonly TCapability[],
 ): TSettingsFeatures =>
   mockSettingsFeaturesRow({
+    readerAccountsEnabled: enabled.includes(CAPABILITY.READER_ACCOUNTS),
     commentsEnabled: enabled.includes(CAPABILITY.COMMENTS),
     ratingsEnabled: enabled.includes(CAPABILITY.RATINGS),
     bookmarksEnabled: enabled.includes(CAPABILITY.BOOKMARKS),

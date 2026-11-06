@@ -12,4 +12,9 @@ export const settingRowVariants = tv({
     description: ['mt-0.5 block'],
     control: ['flex shrink-0 items-center gap-2'],
   },
+  variants: {
+    isNested: {
+      true: { root: 'ms-6' },
+    },
+  },
 });

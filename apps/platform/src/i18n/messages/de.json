@@ -1472,8 +1472,9 @@
     "switchOn": "An",
     "switchOff": "Aus",
     "capabilitiesHeading": "Verfügbare Funktionen",
-    "readerAccountNote": "Lesezeichen, Kommentare und Newsletter sind alle deaktiviert, daher kann sich niemand neu auf Ihrer Website anmelden. Bereits angemeldete Leser können ihre Kontoseite weiterhin öffnen, um ihre Daten herunterzuladen oder zu löschen, bis ihre Sitzung endet.",
+    "readerAccountNote": "Leserkonten sind deaktiviert, daher kann sich niemand neu auf Ihrer Website anmelden. Bereits angemeldete Leser können ihre Kontoseite weiterhin öffnen, um ihre Daten herunterzuladen oder zu löschen, bis ihre Sitzung endet.",
     "toggleLabel": {
+      "READER_ACCOUNTS": "Leserkonten",
       "COMMENTS": "Kommentare",
       "RATINGS": "Bewertungen",
       "BOOKMARKS": "Lesezeichen",
@@ -1483,6 +1484,7 @@
       "CONTACT_FORM": "Kontaktformular"
     },
     "toggleDescription": {
+      "READER_ACCOUNTS": "Leser können sich auf Ihrer Website anmelden. Lesezeichen, Kommentare und Bewertungen setzen das voraus.",
       "COMMENTS": "Leser können Beiträge kommentieren.",
       "RATINGS": "Leser können Beiträge bewerten.",
       "BOOKMARKS": "Leser können Beiträge für später merken.",

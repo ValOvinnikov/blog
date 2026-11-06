@@ -37,12 +37,14 @@ const updateFeaturesActionMock = vi.mocked(updateFeaturesAction);
 
 const ALL_ENTITLED = Object.values(CAPABILITY);
 const PARTIAL_ENTITLEMENT = [
+  CAPABILITY.READER_ACCOUNTS,
   CAPABILITY.COMMENTS,
   CAPABILITY.RATINGS,
   CAPABILITY.BOOKMARKS,
 ];
 
 const INITIAL_VALUES = mockSettingsFeaturesValues({
+  readerAccountsEnabled: true,
   commentsEnabled: true,
   ratingsEnabled: true,
   bookmarksEnabled: true,
@@ -61,6 +63,7 @@ const {
   toggleDescription,
 } = messages.featuresSettings;
 
+const READER_ACCOUNTS_LABEL = toggleLabel[CAPABILITY.READER_ACCOUNTS];
 const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
 const ANALYTICS_LABEL = toggleLabel[CAPABILITY.ANALYTICS];
 const CONTACT_FORM_LABEL = toggleLabel[CAPABILITY.CONTACT_FORM];
@@ -116,7 +119,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(bookmarksSwitch).toBeChecked();
       expect(analyticsSwitch).not.toBeChecked();
       expect(contactFormSwitch).toBeChecked();
-      expect(switches).toHaveLength(4);
+      expect(switches).toHaveLength(5);
     });
 
     it('badges exactly the three unfinished capabilities "Coming soon"', () => {
@@ -392,9 +395,11 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
   });
 
-  describe('with every reader feature off', () => {
+  describe('with Reader accounts off', () => {
     beforeEach(() => {
-      setup({ initialValues: mockSettingsFeaturesValues() });
+      setup({
+        initialValues: mockSettingsFeaturesValues({ bookmarksEnabled: true }),
+      });
     });
 
     it('tells the owner signed-in readers keep their account page', () => {
@@ -403,25 +408,60 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(note).toBeVisible();
     });
 
-    it('withdraws the note once Bookmarks is switched on', async () => {
+    it('disables Bookmarks and keeps its stored value', () => {
       const bookmarksSwitch = screen.getByRole('switch', {
         name: BOOKMARKS_LABEL,
       });
 
-      await user.click(bookmarksSwitch);
+      expect(bookmarksSwitch).toBeDisabled();
+      expect(bookmarksSwitch).toBeChecked();
+    });
 
-      const note = screen.queryByText(readerAccountNote);
+    describe('once Reader accounts is switched on', () => {
+      beforeEach(async () => {
+        const readerAccountsSwitch = screen.getByRole('switch', {
+          name: READER_ACCOUNTS_LABEL,
+        });
 
-      expect(note).not.toBeInTheDocument();
+        await user.click(readerAccountsSwitch);
+      });
+
+      it('withdraws the note', () => {
+        const note = screen.queryByText(readerAccountNote);
+
+        expect(note).not.toBeInTheDocument();
+      });
+
+      it('enables Bookmarks', () => {
+        const bookmarksSwitch = screen.getByRole('switch', {
+          name: BOOKMARKS_LABEL,
+        });
+
+        expect(bookmarksSwitch).toBeEnabled();
+      });
     });
   });
 
-  it('shows no reader-account note while a reader feature is on', () => {
+  it('shows no reader-account note while Reader accounts is on', () => {
     setup();
 
     const note = screen.queryByText(readerAccountNote);
 
     expect(note).not.toBeInTheDocument();
+  });
+
+  it('locks Reader accounts and Bookmarks on a plan without them', () => {
+    setup({ entitledCapabilities: [CAPABILITY.CONSENT_BANNER] });
+
+    const readerAccountsSwitch = screen.getByRole('switch', {
+      name: READER_ACCOUNTS_LABEL,
+    });
+    const bookmarksSwitch = screen.getByRole('switch', {
+      name: BOOKMARKS_LABEL,
+    });
+
+    expect(readerAccountsSwitch).toBeDisabled();
+    expect(bookmarksSwitch).toBeDisabled();
   });
 
   describe('for an archived tenant', () => {

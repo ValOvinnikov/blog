@@ -1,11 +1,12 @@
 import {
   CAPABILITY,
   isComingSoonCapability,
-  READER_ACCOUNT_CAPABILITIES,
   type TCapability,
+  type TMaybeUndefined,
 } from '@blog/config';
 
 export type TSettingsFeaturesValues = {
+  readerAccountsEnabled: boolean;
   commentsEnabled: boolean;
   ratingsEnabled: boolean;
   bookmarksEnabled: boolean;
@@ -19,9 +20,11 @@ export type TCapabilityToggle = {
   capability: TCapability;
   field: keyof TSettingsFeaturesValues;
   isComingSoon: boolean;
+  parentField: TMaybeUndefined<keyof TSettingsFeaturesValues>;
 };
 
 const CAPABILITY_FIELDS: Record<TCapability, keyof TSettingsFeaturesValues> = {
+  [CAPABILITY.READER_ACCOUNTS]: 'readerAccountsEnabled',
   [CAPABILITY.COMMENTS]: 'commentsEnabled',
   [CAPABILITY.RATINGS]: 'ratingsEnabled',
   [CAPABILITY.BOOKMARKS]: 'bookmarksEnabled',
@@ -31,12 +34,21 @@ const CAPABILITY_FIELDS: Record<TCapability, keyof TSettingsFeaturesValues> = {
   [CAPABILITY.CONTACT_FORM]: 'contactFormEnabled',
 };
 
+const PARENT_FIELDS: Partial<
+  Record<TCapability, keyof TSettingsFeaturesValues>
+> = {
+  [CAPABILITY.COMMENTS]: 'readerAccountsEnabled',
+  [CAPABILITY.RATINGS]: 'readerAccountsEnabled',
+  [CAPABILITY.BOOKMARKS]: 'readerAccountsEnabled',
+};
+
 export const CAPABILITY_TOGGLES: TCapabilityToggle[] = Object.values(
   CAPABILITY,
 ).map((capability) => ({
   capability,
   field: CAPABILITY_FIELDS[capability],
   isComingSoon: isComingSoonCapability(capability),
+  parentField: PARENT_FIELDS[capability],
 }));
 
 export const featureDefaultsToValues = (
@@ -99,13 +111,3 @@ export const withComingSoonOff = (
   }
   return clamped;
 };
-
-const READER_ACCOUNT_FIELDS = CAPABILITY_TOGGLES.filter(({ capability }) =>
-  READER_ACCOUNT_CAPABILITIES.some(
-    (readerCapability) => readerCapability === capability,
-  ),
-).map(({ field }) => field);
-
-export const hasReaderAccountFeature = (
-  values: TSettingsFeaturesValues,
-): boolean => READER_ACCOUNT_FIELDS.some((field) => values[field]);

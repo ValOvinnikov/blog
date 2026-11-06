@@ -11,8 +11,11 @@ export const settingsFeatures = pgTable('settings_features', {
     .notNull()
     .unique()
     .references(() => tenants.id, { onDelete: 'cascade' }),
-  commentsEnabled: boolean('comments_enabled').notNull().default(true),
-  ratingsEnabled: boolean('ratings_enabled').notNull().default(true),
+  readerAccountsEnabled: boolean('reader_accounts_enabled')
+    .notNull()
+    .default(false),
+  commentsEnabled: boolean('comments_enabled').notNull().default(false),
+  ratingsEnabled: boolean('ratings_enabled').notNull().default(false),
   bookmarksEnabled: boolean('bookmarks_enabled').notNull().default(true),
   newsletterEnabled: boolean('newsletter_enabled').notNull().default(false),
   analyticsEnabled: boolean('analytics_enabled').notNull().default(false),

@@ -1,5 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { settingsFeatures } from '@blog/db/schema/settings-features';
+import { isUndefined } from '@blog/utils/primitives';
 
 import type { TSettingsFeaturesResult } from '../get-settings-features';
 
@@ -8,6 +9,7 @@ import type { TSettingsFeaturesResult } from '../get-settings-features';
 // tenant) — each capability toggle saves independently, so one save must
 // never flip a toggle the caller didn't touch.
 export type TUpdateSettingsFeaturesInput = {
+  readerAccountsEnabled?: boolean;
   commentsEnabled?: boolean;
   ratingsEnabled?: boolean;
   bookmarksEnabled?: boolean;
@@ -24,25 +26,28 @@ function presentFields(
 ): TSettingsFeaturesWritable {
   const fields: TSettingsFeaturesWritable = {};
 
-  if (input.commentsEnabled !== undefined) {
+  if (!isUndefined(input.readerAccountsEnabled)) {
+    fields.readerAccountsEnabled = input.readerAccountsEnabled;
+  }
+  if (!isUndefined(input.commentsEnabled)) {
     fields.commentsEnabled = input.commentsEnabled;
   }
-  if (input.ratingsEnabled !== undefined) {
+  if (!isUndefined(input.ratingsEnabled)) {
     fields.ratingsEnabled = input.ratingsEnabled;
   }
-  if (input.bookmarksEnabled !== undefined) {
+  if (!isUndefined(input.bookmarksEnabled)) {
     fields.bookmarksEnabled = input.bookmarksEnabled;
   }
-  if (input.newsletterEnabled !== undefined) {
+  if (!isUndefined(input.newsletterEnabled)) {
     fields.newsletterEnabled = input.newsletterEnabled;
   }
-  if (input.analyticsEnabled !== undefined) {
+  if (!isUndefined(input.analyticsEnabled)) {
     fields.analyticsEnabled = input.analyticsEnabled;
   }
-  if (input.consentBannerEnabled !== undefined) {
+  if (!isUndefined(input.consentBannerEnabled)) {
     fields.consentBannerEnabled = input.consentBannerEnabled;
   }
-  if (input.contactFormEnabled !== undefined) {
+  if (!isUndefined(input.contactFormEnabled)) {
     fields.contactFormEnabled = input.contactFormEnabled;
   }
 

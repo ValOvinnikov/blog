@@ -22,6 +22,7 @@ const CAPABILITY_BY_TYPE: Readonly<Record<string, TCapability>> = {
 };
 
 const CAPABILITY_LABEL: Readonly<Record<TCapability, string>> = {
+  [CAPABILITY.READER_ACCOUNTS]: 'Reader accounts',
   [CAPABILITY.COMMENTS]: 'Comments',
   [CAPABILITY.RATINGS]: 'Ratings',
   [CAPABILITY.BOOKMARKS]: 'Bookmarks',

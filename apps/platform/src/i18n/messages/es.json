@@ -1472,8 +1472,9 @@
     "switchOn": "Activado",
     "switchOff": "Desactivado",
     "capabilitiesHeading": "Funciones disponibles",
-    "readerAccountNote": "Guardados, comentarios y boletín están desactivados, así que nadie nuevo puede iniciar sesión en su sitio. Los lectores que ya han iniciado sesión aún pueden abrir la página de su cuenta para descargar o eliminar sus datos hasta que termine su sesión.",
+    "readerAccountNote": "Las cuentas de lector están desactivadas, así que nadie nuevo puede iniciar sesión en su sitio. Los lectores que ya han iniciado sesión aún pueden abrir la página de su cuenta para descargar o eliminar sus datos hasta que termine su sesión.",
     "toggleLabel": {
+      "READER_ACCOUNTS": "Cuentas de lector",
       "COMMENTS": "Comentarios",
       "RATINGS": "Valoraciones",
       "BOOKMARKS": "Guardados",
@@ -1483,6 +1484,7 @@
       "CONTACT_FORM": "Formulario de contacto"
     },
     "toggleDescription": {
+      "READER_ACCOUNTS": "Permite a los lectores iniciar sesión en su sitio. Guardados, comentarios y valoraciones lo necesitan.",
       "COMMENTS": "Permite a los lectores comentar los artículos.",
       "RATINGS": "Permite a los lectores valorar los artículos.",
       "BOOKMARKS": "Permite a los lectores guardar artículos para leerlos más tarde.",
