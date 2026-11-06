@@ -141,6 +141,25 @@ describe(`<${LookForm.name}/>`, () => {
         );
       });
     });
+
+    describe('with the Language switcher row open', () => {
+      beforeEach(async () => {
+        await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
+      });
+
+      it('describes each language switcher option', () => {
+        const styleGroup = screen.getByRole('group', {
+          name: LOOK_FORM.languageSwitcherStyleLabel,
+        });
+        const globeButton = within(styleGroup).getByRole('button', {
+          name: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
+        });
+
+        expect(globeButton).toHaveAccessibleDescription(
+          LOOK_FORM.languageSwitcherOptionDescription.MENU_GLOBE,
+        );
+      });
+    });
   });
 
   it.each([

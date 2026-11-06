@@ -665,6 +665,11 @@
       "MENU_GLOBE": "Globe",
       "CODES": "Compact"
     },
+    "languageSwitcherOptionDescription": {
+      "MENU_CODE": "A menu showing the language code",
+      "MENU_GLOBE": "A menu showing a globe icon",
+      "CODES": "Every language code in a row"
+    },
     "colourHeading": "Colour",
     "colourDescription": "Only the hue changes, so text stays readable.",
     "typeHeading": "Type",

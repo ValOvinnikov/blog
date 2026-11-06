@@ -665,6 +665,11 @@
       "MENU_GLOBE": "Globus",
       "CODES": "Kompakt"
     },
+    "languageSwitcherOptionDescription": {
+      "MENU_CODE": "Ein Menü mit dem Sprachcode",
+      "MENU_GLOBE": "Ein Menü mit einem Globus-Symbol",
+      "CODES": "Alle Sprachcodes in einer Reihe"
+    },
     "colourHeading": "Farbe",
     "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",
     "typeHeading": "Schrift",

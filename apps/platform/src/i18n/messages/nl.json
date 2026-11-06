@@ -665,6 +665,11 @@
       "MENU_GLOBE": "Wereldbol",
       "CODES": "Compact"
     },
+    "languageSwitcherOptionDescription": {
+      "MENU_CODE": "Een menu met de taalcode",
+      "MENU_GLOBE": "Een menu met een wereldbolicoon",
+      "CODES": "Alle taalcodes op een rij"
+    },
     "colourHeading": "Kleur",
     "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",
     "typeHeading": "Lettertype",
