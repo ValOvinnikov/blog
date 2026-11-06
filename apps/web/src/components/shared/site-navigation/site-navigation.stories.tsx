@@ -105,6 +105,7 @@ const headerControls = {
     <AuthMenu
       oauthProviderIds={['github']}
       accountControl={MOCK_ACCOUNT_CONTROL}
+      hasBookmarks={true}
     />
   ),
 };
@@ -120,9 +121,14 @@ const headerControlsWithAccountInMenu = {
   menuAccount: {
     oauthProviderIds: ['github'] as const,
     panelStyle: ACCOUNT_IN_MENU.panelStyle,
+    hasBookmarks: true,
   },
   actions: (
-    <AuthMenu oauthProviderIds={['github']} accountControl={ACCOUNT_IN_MENU} />
+    <AuthMenu
+      oauthProviderIds={['github']}
+      accountControl={ACCOUNT_IN_MENU}
+      hasBookmarks={true}
+    />
   ),
 };
 
@@ -239,6 +245,7 @@ export const HubPanelFromCircle: TStory = {
           buttonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
           panelStyle: ACCOUNT_PANEL_STYLE.HUB,
         }}
+        hasBookmarks={true}
       />
     ),
   },

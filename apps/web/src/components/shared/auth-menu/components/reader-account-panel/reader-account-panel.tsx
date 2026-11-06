@@ -23,6 +23,7 @@ export type TReaderAccountPanelProps = IWithClassName & {
   appearance: TAccountPanelStyle;
   user: IReaderAccountUser;
   onImageError: () => void;
+  hasBookmarks: boolean;
   panelId: string;
   isOpen: boolean;
   panelRef?: RefObject<TMaybeNull<HTMLDivElement>>;
@@ -32,6 +33,7 @@ export const ReaderAccountPanel = ({
   appearance,
   user,
   onImageError,
+  hasBookmarks,
   panelId,
   isOpen,
   panelRef,
@@ -49,11 +51,13 @@ export const ReaderAccountPanel = ({
       className={className}
       panel={{ id: panelId, isOpen, ariaLabel: t('accountMenuAriaLabel') }}
       links={{
-        bookmarks: {
-          href: routes.bookmarks(),
-          label: t('myBookmarks'),
-          description: t('myBookmarksDescription'),
-        },
+        ...(hasBookmarks && {
+          bookmarks: {
+            href: routes.bookmarks(),
+            label: t('myBookmarks'),
+            description: t('myBookmarksDescription'),
+          },
+        }),
         settings: {
           href: routes.account(),
           label: t('accountSettings'),

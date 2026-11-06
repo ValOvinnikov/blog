@@ -49,7 +49,7 @@ A reader saves a post for later with a toggle in the post header and finds every
 - Server actions read the session themselves; a client never supplies the user id.
 - A suspended site renders no button (`isRequestTenantActive`), and shows it again on the first page load after reactivation. `setBookmarkStatus` writes only through `resolveWritableTenant`: an inactive or deprovisioned tenant refuses with an "unavailable" result, which shows its own no-retry toast.
 - `addBookmark` is idempotent (`onConflictDoNothing`), and removing a missing bookmark is a no-op.
-- The button and `/bookmarks` gate on the same rule (`isReaderAccountFeatureEnabled`): Reader accounts and Bookmarks both on. With Reader accounts off, Bookmarks keeps its stored value but shows nothing.
+- The button, `/bookmarks` and the account menu's My bookmarks link gate on the same rule (`isReaderAccountFeatureEnabled`): Reader accounts and Bookmarks both on. With Reader accounts off, Bookmarks keeps its stored value but shows nothing.
 - A capability switched off hides the button and keeps the stored rows.
 
 ## Dependencies

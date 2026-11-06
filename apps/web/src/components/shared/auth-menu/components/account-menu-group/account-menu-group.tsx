@@ -16,12 +16,14 @@ import { accountMenuGroupVariants } from './account-menu-group-variants';
 export type TAccountMenuGroupProps = {
   oauthProviderIds: readonly TOAuthProviderId[];
   panelStyle: TAccountPanelStyle;
+  hasBookmarks: boolean;
   groupName: string;
 };
 
 export const AccountMenuGroup = ({
   oauthProviderIds,
   panelStyle,
+  hasBookmarks,
   groupName,
 }: TAccountMenuGroupProps) => {
   const { status, user, onImageError } = useReaderAccount();
@@ -54,6 +56,7 @@ export const AccountMenuGroup = ({
           appearance={panelStyle}
           user={user}
           onImageError={onImageError}
+          hasBookmarks={hasBookmarks}
           panelId={panelId}
           isOpen={isExpanded}
           panelRef={panelRef}

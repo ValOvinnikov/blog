@@ -1,11 +1,18 @@
-import { ACCOUNT_PHONE_PLACEMENT, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  ACCOUNT_PHONE_PLACEMENT,
+  LOCALE_ISO_CODES,
+  SITE_MESSAGES,
+} from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { SESSION_STATUS } from '@web/constants/session';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import {
+  isReaderAccountEnabled,
+  isReaderAccountFeatureEnabled,
+} from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
@@ -62,6 +69,7 @@ vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
   () => ({
     isReaderAccountEnabled: vi.fn(),
+    isReaderAccountFeatureEnabled: vi.fn(),
   }),
 );
 
@@ -84,6 +92,9 @@ vi.mock('next-auth/react', () => ({
 const getRequestContextMock = vi.mocked(getRequestContext);
 const getHeaderStyleMock = vi.mocked(getHeaderStyle);
 const isReaderAccountEnabledMock = vi.mocked(isReaderAccountEnabled);
+const isReaderAccountFeatureEnabledMock = vi.mocked(
+  isReaderAccountFeatureEnabled,
+);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
 const getAccountControlMock = vi.mocked(getAccountControl);
 
@@ -111,6 +122,11 @@ const ACCOUNT_IN_PHONE_MENU = {
   phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
 };
 const HOME_LINK_NAME = 'Home';
+const {
+  myBookmarks: MY_BOOKMARKS,
+  accountSettings: ACCOUNT_SETTINGS,
+  accountMenuAriaLabel: ACCOUNT_MENU,
+} = SITE_MESSAGES.authMenu;
 
 describe(`<${SiteHeader.name}/>`, () => {
   let user: UserEvent;
@@ -143,6 +159,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     getNavigationMock.mockResolvedValue(okResult({ items: [] }));
     getBrandLogoUrlMock.mockResolvedValue(undefined);
     isReaderAccountEnabledMock.mockResolvedValue(true);
+    isReaderAccountFeatureEnabledMock.mockResolvedValue(true);
     getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
     useSessionMock.mockReturnValue({
       data: null,
@@ -527,6 +544,45 @@ describe(`<${SiteHeader.name}/>`, () => {
     const accountRow = getDrawerAccountRow(ACCOUNT);
 
     expect(accountRow).toBeVisible();
+  });
+
+  describe('for a signed-in reader with Bookmarks off', () => {
+    beforeEach(() => {
+      isReaderAccountFeatureEnabledMock.mockResolvedValue(false);
+      useSessionMock.mockReturnValue({
+        data: { user: MOCK_READER },
+        status: SESSION_STATUS.AUTHENTICATED,
+      });
+    });
+
+    it('leaves My bookmarks out of the account menu', async () => {
+      await setup();
+      const banner = screen.getByRole('banner');
+      const [accountButton] = within(banner).getAllByRole('button', {
+        name: ACCOUNT,
+      });
+      await user.click(accountButton!);
+
+      const accountMenu = screen.getByRole('menu', { name: ACCOUNT_MENU });
+      const settingsText = within(accountMenu).getByText(ACCOUNT_SETTINGS);
+      const bookmarksText = within(accountMenu).queryByText(MY_BOOKMARKS);
+
+      expect(settingsText).toBeVisible();
+      expect(bookmarksText).not.toBeInTheDocument();
+    });
+
+    it('leaves My bookmarks out of the phone menu account panel', async () => {
+      await openPhoneMenuWithAccountInIt();
+      const accountRow = getDrawerAccountRow(ACCOUNT);
+      await user.click(accountRow);
+
+      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
+      const settingsText = within(drawerActions).getByText(ACCOUNT_SETTINGS);
+      const bookmarksText = within(drawerActions).queryByText(MY_BOOKMARKS);
+
+      expect(settingsText).toBeVisible();
+      expect(bookmarksText).not.toBeInTheDocument();
+    });
   });
 
   it('hides the language switcher when its toggle is off', async () => {

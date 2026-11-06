@@ -1,5 +1,5 @@
 import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
-import { ACCOUNT_PHONE_PLACEMENT } from '@blog/config';
+import { ACCOUNT_PHONE_PLACEMENT, CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
 import { Header } from '@blog/ui/components/organisms/header';
 import { AuthMenu } from '@web/components/shared/auth-menu';
@@ -10,7 +10,10 @@ import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import {
+  isReaderAccountEnabled,
+  isReaderAccountFeatureEnabled,
+} from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
@@ -27,6 +30,7 @@ export const SiteHeader = async () => {
   const [
     navResult,
     hasReaderAccounts,
+    hasBookmarks,
     switcherStyle,
     brandLogoUrl,
     accountControl,
@@ -34,6 +38,7 @@ export const SiteHeader = async () => {
   ] = await Promise.all([
     service.global.navigation.v1.getNavigation(sanityContext),
     isReaderAccountEnabled(),
+    isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
     getLanguageSwitcherStyle(siteConfigTenant),
     getBrandLogoUrl(siteConfigTenant),
     getAccountControl(siteConfigTenant),
@@ -81,7 +86,11 @@ export const SiteHeader = async () => {
           }
           menuAccount={
             hasAccountInPhoneMenu
-              ? { oauthProviderIds, panelStyle: accountControl.panelStyle }
+              ? {
+                  oauthProviderIds,
+                  panelStyle: accountControl.panelStyle,
+                  hasBookmarks,
+                }
               : undefined
           }
           actions={
@@ -91,6 +100,7 @@ export const SiteHeader = async () => {
                 <AuthMenu
                   oauthProviderIds={oauthProviderIds}
                   accountControl={accountControl}
+                  hasBookmarks={hasBookmarks}
                 />
               )}
             </>
