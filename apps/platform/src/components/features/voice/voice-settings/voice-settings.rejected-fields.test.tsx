@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME, VOICE_FIELD_ERROR } from '@blog/config';
+import { ACTION_OUTCOME } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
@@ -14,6 +14,8 @@ import {
 import {
   EMPTY_LISTS,
   GERMAN,
+  MISSING_NAME_ERROR,
+  MISSING_NAME_MESSAGE,
   TOO_LONG_ERROR,
   activeLanguageLabel,
   editVoiceHeadingAndSave,
@@ -34,11 +36,6 @@ const MOCK_TYPED_TEXT = faker.lorem.words(2);
 const MOCK_EDIT_TEXT = faker.lorem.word();
 const TAG_PAGE = 'Tag page';
 const ENGLISH = 'English';
-
-const missingName = {
-  reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
-  values: { placeholders: '{name}', count: 1 },
-};
 
 vi.mock('@platform/server/site-config/save-voice-overrides-action');
 
@@ -67,7 +64,7 @@ describe(`<${VoiceSettings.name}/> rejected fields`, () => {
   it('opens the language and list that hold a rejected field', async () => {
     saveVoiceOverridesActionMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrorsByLocale: { [DE]: { tagEmpty: missingName } },
+      fieldErrorsByLocale: { [DE]: { tagEmpty: MISSING_NAME_ERROR } },
     });
     setupBilingualVoiceSettings();
 
@@ -75,9 +72,7 @@ describe(`<${VoiceSettings.name}/> rejected fields`, () => {
 
     await editVoiceHeadingAndSave(user, MOCK_EDIT_TEXT);
 
-    const fieldError = await screen.findByText(
-      'Keep the placeholder {name} — the site fills it in.',
-    );
+    const fieldError = await screen.findByText(MISSING_NAME_MESSAGE);
     const tagField = within(voiceCard(EMPTY_LISTS)).getByRole('textbox', {
       name: TAG_PAGE,
     });
@@ -112,7 +107,7 @@ describe(`<${VoiceSettings.name}/> rejected fields`, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrorsByLocale: {
         [EN]: {
-          blogListEmpty: missingName,
+          blogListEmpty: MISSING_NAME_ERROR,
           notFoundHeading: TOO_LONG_ERROR,
         },
       },
@@ -133,7 +128,7 @@ describe(`<${VoiceSettings.name}/> rejected fields`, () => {
     saveVoiceOverridesActionMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrorsByLocale: {
-        [EN]: { topicEmpty: missingName, tagEmpty: missingName },
+        [EN]: { topicEmpty: MISSING_NAME_ERROR, tagEmpty: MISSING_NAME_ERROR },
       },
     });
     setupVoiceSettings();
@@ -158,7 +153,7 @@ describe(`<${VoiceSettings.name}/> rejected fields`, () => {
   it('returns to the language that holds the first rejected field', async () => {
     saveVoiceOverridesActionMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrorsByLocale: { [DE]: { tagEmpty: missingName } },
+      fieldErrorsByLocale: { [DE]: { tagEmpty: MISSING_NAME_ERROR } },
     });
     setupBilingualVoiceSettings();
 

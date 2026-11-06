@@ -6,34 +6,36 @@ import {
   type TVoiceFieldId,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
+import {
+  hasArrayGotItems,
+  hasArrayGotMultipleItems,
+} from '@blog/utils/primitives';
 import { useSettingsForm } from '@platform/components/shared/settings-form-shell';
 import { useToast } from '@platform/context/toast-provider';
 import {
   saveVoiceOverridesAction,
   type TSaveVoiceOverridesResult,
 } from '@platform/server/site-config/save-voice-overrides-action';
+import { revealFirstInvalidControl } from '@platform/utils/reveal-first-invalid-control/reveal-first-invalid-control';
+import { useAfterSave } from '@platform/utils/use-after-save/use-after-save';
 import {
   countLanguageVoiceChanges,
   countVoiceChanges,
   toVoiceOverridesInput,
-  voiceErrorReveal,
   voiceErrorsInOrder,
-  voiceFieldInputId,
   withVoiceValue,
   type TVoiceDraft,
   type TVoiceDraftValue,
-  type TVoiceFieldError,
   type TVoiceFieldErrorsByLocale,
 } from '@platform/utils/voice-draft/voice-draft';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import { toVoiceFieldMessages } from '@platform/utils/voice-field-errors/voice-field-errors';
-import { voiceSectionOfField } from '@platform/utils/voice-sections/voice-sections';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
 import { useVoiceDraftFields } from './use-voice-draft-fields';
+import { useVoiceErrorReveal } from './use-voice-error-reveal';
 import { useVoiceSections } from './use-voice-sections';
 
 type TUseVoiceDraftArgs = {
@@ -60,25 +62,21 @@ export const useVoiceDraft = ({
   const fieldIdPrefix = useId();
   const draftFields = useVoiceDraftFields(liveLocales);
   const [selectedLocale, setSelectedLocale] = useState(defaultLocale);
-  const [openListFieldId, setOpenListFieldId] =
-    useState<TMaybeUndefined<TVoiceFieldId>>('blogListEmpty');
   const [fieldErrors, setFieldErrors] = useState<TVoiceFieldErrorsByLocale>({});
   const [revision, setRevision] = useState(0);
   const sections = useVoiceSections();
-
-  const revealError = (error: TVoiceFieldError) => {
-    const { locale, listFieldId } = voiceErrorReveal(error);
-    setSelectedLocale(locale);
-    sections.setSectionOpen(voiceSectionOfField(error.fieldId), true);
-    if (listFieldId) setOpenListFieldId(listFieldId);
-  };
+  const { openListFieldId, setOpenListFieldId, invalidControlsOf } =
+    useVoiceErrorReveal({
+      fieldIdPrefix,
+      setSelectedLocale,
+      setSectionOpen: sections.setSectionOpen,
+    });
 
   const errorsInOrder = voiceErrorsInOrder(
     fieldErrors,
     selectedLocale,
     liveLocales,
   );
-  const [firstError] = errorsInOrder;
 
   const resetEdits = () => {
     setFieldErrors({});
@@ -100,12 +98,13 @@ export const useVoiceDraft = ({
             )
           : {};
       setFieldErrors(errors);
-      const [firstSaveError] = voiceErrorsInOrder(
-        errors,
-        selectedLocale,
-        liveLocales,
+      const { ids, revealFirst } = invalidControlsOf(
+        voiceErrorsInOrder(errors, selectedLocale, liveLocales),
       );
-      if (firstSaveError) revealError(firstSaveError);
+      if (revealFirst) {
+        revealFirst();
+        afterSave(() => revealFirstInvalidControl({ ids }));
+      }
       return result;
     },
     onSuccess: () => {
@@ -123,12 +122,7 @@ export const useVoiceDraft = ({
             count: countLanguageVoiceChanges(saved, draft, locale),
           }))
         : [],
-    invalidControls: () => ({
-      ids: errorsInOrder.map(({ fieldId }) =>
-        voiceFieldInputId(fieldIdPrefix, fieldId),
-      ),
-      revealFirst: firstError && (() => revealError(firstError)),
-    }),
+    invalidControls: () => invalidControlsOf(errorsInOrder),
     draft: {
       tenantId,
       page: 'voice',
@@ -140,6 +134,8 @@ export const useVoiceDraft = ({
       },
     },
   });
+
+  const afterSave = useAfterSave(settings.isPending);
 
   const setFieldValue = (id: TVoiceFieldId, value: TVoiceDraftValue) => {
     settings.setValues((prev) =>
@@ -157,7 +153,7 @@ export const useVoiceDraft = ({
     selectedLocale,
     setSelectedLocale,
     fieldErrors,
-    hasFieldErrors: !isUndefined(firstError),
+    hasFieldErrors: hasArrayGotItems(errorsInOrder),
     openListFieldId,
     setOpenListFieldId,
     setFieldValue,

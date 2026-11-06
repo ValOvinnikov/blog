@@ -1043,6 +1043,7 @@
     "surfaceSummary": "{count} · {status}",
     "surfaceCount": "{unit, select, LISTS {{total, plural, one {# lijst} other {# lijsten}}} other {{total, plural, one {# veld} other {# velden}}}}",
     "customisedStatus": "{count, plural, =0 {alles standaard} other {# aangepast}}",
+    "chipErrors": "{count, plural, one {# fout} other {# fouten}}",
     "sectionsRegionLabel": "Onderdelen",
     "sectionsNavLabel": "Toononderdelen",
     "jumpTo": "Ga naar",

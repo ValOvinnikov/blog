@@ -1,5 +1,5 @@
 import en from '@platform/i18n/messages/en.json';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
 
 export const ERROR_PAGES_SECTION = en.voiceSections.ERROR_PAGES;
@@ -12,3 +12,16 @@ export const openVoiceSections = async (user: UserEvent) => {
   await user.click(voiceSectionHeader(ERROR_PAGES_SECTION));
   await user.click(voiceSectionHeader(EMPTY_STATES_SECTION));
 };
+
+export const voiceSectionBar = () =>
+  screen.getByRole('region', { name: en.voiceSettings.sectionsRegionLabel });
+
+export const voiceSectionNav = () =>
+  within(voiceSectionBar()).getByRole('navigation', {
+    name: en.voiceSettings.sectionsNavLabel,
+  });
+
+export const voiceSectionChip = (name: string) =>
+  within(voiceSectionNav()).getByRole('link', {
+    name: new RegExp(`^${name}`),
+  });

@@ -1043,6 +1043,7 @@
     "surfaceSummary": "{count} · {status}",
     "surfaceCount": "{unit, select, LISTS {{total, plural, one {# Liste} other {# Listen}}} other {{total, plural, one {# Feld} other {# Felder}}}}",
     "customisedStatus": "{count, plural, =0 {alles Standard} other {# angepasst}}",
+    "chipErrors": "{count, plural, one {# Fehler} other {# Fehler}}",
     "sectionsRegionLabel": "Abschnitte",
     "sectionsNavLabel": "Abschnitte der Tonalität",
     "jumpTo": "Springen zu",
