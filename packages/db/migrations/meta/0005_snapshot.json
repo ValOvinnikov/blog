@@ -1,5 +1,5 @@
 {
-  "id": "cf187c3a-564d-4cca-b13f-6c9a13b92010",
+  "id": "67e501ef-a8fb-4a12-be96-4ca73cbd0e56",
   "prevId": "6140d6d5-2f10-4304-8a68-cbf7490d8a0e",
   "version": "7",
   "dialect": "postgresql",
@@ -1318,19 +1318,26 @@
           "primaryKey": false,
           "notNull": true
         },
+        "reader_accounts_enabled": {
+          "name": "reader_accounts_enabled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
         "comments_enabled": {
           "name": "comments_enabled",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": true
+          "default": false
         },
         "ratings_enabled": {
           "name": "ratings_enabled",
           "type": "boolean",
           "primaryKey": false,
           "notNull": true,
-          "default": true
+          "default": false
         },
         "bookmarks_enabled": {
           "name": "bookmarks_enabled",
@@ -1589,12 +1596,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'HIDDEN'"
-        },
-        "brand_name": {
-          "name": "brand_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         },
         "logo_asset_url": {
           "name": "logo_asset_url",

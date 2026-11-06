@@ -1,38 +1,26 @@
 import { CAPABILITY } from '@blog/config';
+import {
+  mockAllOnSettingsFeaturesValues,
+  mockSettingsFeaturesValues,
+} from '@platform/testing/settings-features/fixtures';
 
 import {
   clampToEntitlement,
   featureDefaultsToValues,
-  hasReaderAccountFeature,
   keepStoredOutOfPlan,
   listSwitchedOnOutOfPlan,
   type TSettingsFeaturesValues,
   withComingSoonOff,
 } from './settings-features-fields';
 
-const ALL_OFF: TSettingsFeaturesValues = {
-  commentsEnabled: false,
-  ratingsEnabled: false,
-  bookmarksEnabled: false,
-  newsletterEnabled: false,
-  analyticsEnabled: false,
-  consentBannerEnabled: false,
-  contactFormEnabled: false,
-};
+const ALL_OFF = mockSettingsFeaturesValues();
 
-const ALL_ON: TSettingsFeaturesValues = {
-  commentsEnabled: true,
-  ratingsEnabled: true,
-  bookmarksEnabled: true,
-  newsletterEnabled: true,
-  analyticsEnabled: true,
-  consentBannerEnabled: true,
-  contactFormEnabled: true,
-};
+const ALL_ON = mockAllOnSettingsFeaturesValues();
 
 describe(featureDefaultsToValues, () => {
   it('converts a capability-keyed defaults map into the column-keyed view model', () => {
     const defaults = {
+      [CAPABILITY.READER_ACCOUNTS]: true,
       [CAPABILITY.COMMENTS]: true,
       [CAPABILITY.RATINGS]: true,
       [CAPABILITY.BOOKMARKS]: false,
@@ -44,6 +32,7 @@ describe(featureDefaultsToValues, () => {
 
     expect(featureDefaultsToValues(defaults)).toEqual({
       ...ALL_OFF,
+      readerAccountsEnabled: true,
       commentsEnabled: true,
       ratingsEnabled: true,
       analyticsEnabled: true,
@@ -114,7 +103,7 @@ describe(keepStoredOutOfPlan, () => {
 });
 
 describe(listSwitchedOnOutOfPlan, () => {
-  const FREE_CAPABILITIES = [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER];
+  const FREE_CAPABILITIES = [CAPABILITY.CONSENT_BANNER];
 
   it('lists an out-of-plan toggle switched on that is stored off', () => {
     const values = { ...ALL_OFF, analyticsEnabled: true };
@@ -157,26 +146,5 @@ describe(withComingSoonOff, () => {
     const values = { ...ALL_OFF, bookmarksEnabled: true };
 
     expect(withComingSoonOff(values)).toEqual(values);
-  });
-});
-
-describe(hasReaderAccountFeature, () => {
-  it('is false when bookmarks, comments and newsletter are all off', () => {
-    expect(
-      hasReaderAccountFeature({
-        ...ALL_ON,
-        bookmarksEnabled: false,
-        commentsEnabled: false,
-        newsletterEnabled: false,
-      }),
-    ).toBe(false);
-  });
-
-  it.each([
-    'bookmarksEnabled',
-    'commentsEnabled',
-    'newsletterEnabled',
-  ] as const)('is true when only %s is on', (field) => {
-    expect(hasReaderAccountFeature({ ...ALL_OFF, [field]: true })).toBe(true);
   });
 });

@@ -17,6 +17,7 @@ import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-feature
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { blockSwitchOnWhileParentOff } from '@platform/utils/parent-toggle/parent-toggle';
 import {
   toNotInPlanRefusal,
   type TNotInPlanRefusal,
@@ -29,6 +30,7 @@ import {
 import { z } from 'zod';
 
 const updateFeaturesInputSchema = z.object({
+  readerAccountsEnabled: z.boolean(),
   commentsEnabled: z.boolean(),
   ratingsEnabled: z.boolean(),
   bookmarksEnabled: z.boolean(),
@@ -52,7 +54,8 @@ export type TUpdateFeaturesResult =
  * A "Coming soon" capability is always written off. Switching on a toggle
  * outside `PLAN_REGISTRY[tenant.plan]` that is stored off rejects the whole
  * save; otherwise an out-of-plan toggle keeps its stored value, so a
- * downgrade loses nothing.
+ * downgrade loses nothing. A toggle whose parent is off can be switched
+ * off but not on, so switching the parent back on restores what was kept.
  */
 export const updateFeaturesAction = async (
   tenantId: string,
@@ -82,7 +85,11 @@ export const updateFeaturesAction = async (
     }
 
     const toWrite = withComingSoonOff(
-      keepStoredOutOfPlan(values, stored, entitled),
+      keepStoredOutOfPlan(
+        blockSwitchOnWhileParentOff(values, stored),
+        stored,
+        entitled,
+      ),
     );
     await queries.settingsFeatures.upsertSettingsFeatures(tenant.id, toWrite);
     await revalidateSiteConfig(tenant.id);

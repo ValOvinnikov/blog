@@ -7,6 +7,7 @@ import {
 } from '@blog/config';
 
 type TSettingsFeaturesRow = {
+  readerAccountsEnabled: boolean;
   commentsEnabled: boolean;
   ratingsEnabled: boolean;
   bookmarksEnabled: boolean;
@@ -24,6 +25,7 @@ export const toEffectiveSettingsFeatures = (
   if (!row) return PRESET_REGISTRY[preset].featureDefaults;
 
   return {
+    [CAPABILITY.READER_ACCOUNTS]: row.readerAccountsEnabled,
     [CAPABILITY.COMMENTS]: row.commentsEnabled,
     [CAPABILITY.RATINGS]: row.ratingsEnabled,
     [CAPABILITY.BOOKMARKS]: row.bookmarksEnabled,

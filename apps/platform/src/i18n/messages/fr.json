@@ -1476,8 +1476,9 @@
     "switchOn": "Activé",
     "switchOff": "Désactivé",
     "capabilitiesHeading": "Fonctionnalités disponibles",
-    "readerAccountNote": "Les favoris, les commentaires et la newsletter sont tous désactivés : personne de nouveau ne peut se connecter à votre site. Les lecteurs déjà connectés peuvent encore ouvrir la page de leur compte pour télécharger ou supprimer leurs données jusqu’à la fin de leur session.",
+    "readerAccountNote": "Les comptes lecteurs sont désactivés : personne de nouveau ne peut se connecter à votre site. Les lecteurs déjà connectés peuvent encore ouvrir la page de leur compte pour télécharger ou supprimer leurs données jusqu’à la fin de leur session.",
     "toggleLabel": {
+      "READER_ACCOUNTS": "Comptes lecteurs",
       "COMMENTS": "Commentaires",
       "RATINGS": "Notes",
       "BOOKMARKS": "Favoris",
@@ -1487,6 +1488,7 @@
       "CONTACT_FORM": "Formulaire de contact"
     },
     "toggleDescription": {
+      "READER_ACCOUNTS": "Permettre aux lecteurs de se connecter à votre site. Les favoris, les commentaires et les notes en ont besoin.",
       "COMMENTS": "Permettre aux lecteurs de commenter les articles.",
       "RATINGS": "Permettre aux lecteurs de noter les articles.",
       "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",

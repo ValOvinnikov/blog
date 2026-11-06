@@ -40,8 +40,15 @@
     {
       "idx": 5,
       "version": "7",
-      "when": 1793954000666,
-      "tag": "0005_add_site_config_brand_name",
+      "when": 1793953221330,
+      "tag": "0005_add_reader_accounts_toggle",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793954625728,
+      "tag": "0006_add_site_config_brand_name",
       "breakpoints": true
     }
   ]

@@ -1476,8 +1476,9 @@
     "switchOn": "Aan",
     "switchOff": "Uit",
     "capabilitiesHeading": "Mogelijkheden",
-    "readerAccountNote": "Bladwijzers, reacties en nieuwsbrief staan allemaal uit, dus niemand nieuw kan inloggen op je site. Lezers die al zijn ingelogd, kunnen hun accountpagina nog openen om hun gegevens te downloaden of te verwijderen tot hun sessie afloopt.",
+    "readerAccountNote": "Lezersaccounts staan uit, dus niemand nieuw kan inloggen op je site. Lezers die al zijn ingelogd, kunnen hun accountpagina nog openen om hun gegevens te downloaden of te verwijderen tot hun sessie afloopt.",
     "toggleLabel": {
+      "READER_ACCOUNTS": "Lezersaccounts",
       "COMMENTS": "Reacties",
       "RATINGS": "Beoordelingen",
       "BOOKMARKS": "Bladwijzers",
@@ -1487,6 +1488,7 @@
       "CONTACT_FORM": "Contactformulier"
     },
     "toggleDescription": {
+      "READER_ACCOUNTS": "Laat lezers inloggen op je site. Bladwijzers, reacties en beoordelingen hebben dit nodig.",
       "COMMENTS": "Laat lezers reageren op berichten.",
       "RATINGS": "Laat lezers berichten beoordelen.",
       "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",

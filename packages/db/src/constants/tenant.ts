@@ -39,8 +39,9 @@ export const TENANT_DETAILS_UPDATE_OUTCOME = {
 
 // The ceiling a tenant's own `settings_features` toggles can never exceed.
 export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
-  [TENANT_PLAN.FREE]: [CAPABILITY.RATINGS, CAPABILITY.CONSENT_BANNER],
+  [TENANT_PLAN.FREE]: [CAPABILITY.CONSENT_BANNER],
   [TENANT_PLAN.GROWTH]: [
+    CAPABILITY.READER_ACCOUNTS,
     CAPABILITY.COMMENTS,
     CAPABILITY.RATINGS,
     CAPABILITY.BOOKMARKS,

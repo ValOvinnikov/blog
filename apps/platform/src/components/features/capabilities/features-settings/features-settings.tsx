@@ -1,6 +1,7 @@
 'use client';
 
 import { ALERT_TYPE, FORM_STATUS, type TCapability } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
 import { SettingRow } from '@platform/components/shared/setting-row';
@@ -17,7 +18,6 @@ import {
 } from '@platform/server/settings-features/update-features-action';
 import {
   CAPABILITY_TOGGLES,
-  hasReaderAccountFeature,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { useRouter } from 'next/navigation';
@@ -97,52 +97,60 @@ export const FeaturesSettings = ({
       form={form}
       errorTitle={status === FORM_STATUS.ERROR ? t('alertError') : undefined}
     >
-      {!hasReaderAccountFeature(values) && (
+      {!values.readerAccountsEnabled && (
         <Alert type={ALERT_TYPE.INFO} description={t('readerAccountNote')} />
       )}
       <Card>
         <Card.Header title={t('capabilitiesHeading')} />
         <Card.Body>
-          {CAPABILITY_TOGGLES.map(({ capability, field, isComingSoon }) => {
-            const isLocked = !entitledCapabilities.includes(capability);
-            const label = t(`toggleLabel.${capability}`);
-            const description = t(`toggleDescription.${capability}`);
+          {CAPABILITY_TOGGLES.map(
+            ({ capability, field, isComingSoon, parentField }) => {
+              const isLocked = !entitledCapabilities.includes(capability);
+              const isNested = !isUndefined(parentField);
+              const isParentOff = isNested && !values[parentField];
+              const label = t(`toggleLabel.${capability}`);
+              const description = t(`toggleDescription.${capability}`);
 
-            if (isComingSoon) {
+              if (isComingSoon) {
+                return (
+                  <SettingRow
+                    key={capability}
+                    label={label}
+                    description={description}
+                    isNested={isNested}
+                  >
+                    <StatusBadge hasDot={false}>
+                      {t('comingSoonBadge')}
+                    </StatusBadge>
+                  </SettingRow>
+                );
+              }
+
               return (
                 <SettingRow
                   key={capability}
                   label={label}
                   description={description}
+                  isNested={isNested}
+                  isLocked={isLocked}
+                  lockedReason={isLocked ? t('planLockedBadge') : undefined}
                 >
-                  <StatusBadge hasDot={false}>
-                    {t('comingSoonBadge')}
-                  </StatusBadge>
+                  <Switch
+                    aria={{
+                      label,
+                      describedBy: isArchived ? archivedNoticeId : undefined,
+                    }}
+                    isChecked={values[field]}
+                    onCheckedChange={(checked) => handleToggle(field, checked)}
+                    isDisabled={
+                      isLocked || isParentOff || isPending || isArchived
+                    }
+                    labels={{ on: t('switchOn'), off: t('switchOff') }}
+                  />
                 </SettingRow>
               );
-            }
-
-            return (
-              <SettingRow
-                key={capability}
-                label={label}
-                description={description}
-                isLocked={isLocked}
-                lockedReason={isLocked ? t('planLockedBadge') : undefined}
-              >
-                <Switch
-                  aria={{
-                    label,
-                    describedBy: isArchived ? archivedNoticeId : undefined,
-                  }}
-                  isChecked={values[field]}
-                  onCheckedChange={(checked) => handleToggle(field, checked)}
-                  isDisabled={isLocked || isPending || isArchived}
-                  labels={{ on: t('switchOn'), off: t('switchOff') }}
-                />
-              </SettingRow>
-            );
-          })}
+            },
+          )}
         </Card.Body>
       </Card>
     </SettingsFormShell>

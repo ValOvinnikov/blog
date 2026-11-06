@@ -4,6 +4,7 @@ import type { TCapability } from '@blog/config';
 import { PLAN_REGISTRY } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
+import { withParentOffApplied } from '@platform/utils/parent-toggle/parent-toggle';
 import {
   CAPABILITY_TOGGLES,
   clampToEntitlement,
@@ -14,7 +15,9 @@ export const getEnabledCapabilities = async ({
   plan,
 }: Pick<TTenant, 'id' | 'plan'>): Promise<TCapability[]> => {
   const { values: savedValues } = await getSettingsFeaturesOrDefaults(id);
-  const values = clampToEntitlement(savedValues, PLAN_REGISTRY[plan]);
+  const values = withParentOffApplied(
+    clampToEntitlement(savedValues, PLAN_REGISTRY[plan]),
+  );
 
   return CAPABILITY_TOGGLES.filter(({ field }) => values[field]).map(
     ({ capability }) => capability,

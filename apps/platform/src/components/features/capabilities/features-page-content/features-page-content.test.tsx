@@ -67,12 +67,12 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
     const analyticsSwitch = screen.getByRole('switch', {
       name: toggleLabel[CAPABILITY.ANALYTICS],
     });
-    const bookmarksSwitch = screen.getByRole('switch', {
-      name: toggleLabel[CAPABILITY.BOOKMARKS],
+    const readerAccountsSwitch = screen.getByRole('switch', {
+      name: toggleLabel[CAPABILITY.READER_ACCOUNTS],
     });
 
     expect(analyticsSwitch).toBeEnabled();
-    expect(bookmarksSwitch).toBeEnabled();
+    expect(readerAccountsSwitch).toBeEnabled();
   });
 
   describe('on the Free plan', () => {

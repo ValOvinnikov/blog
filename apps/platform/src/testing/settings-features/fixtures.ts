@@ -4,6 +4,7 @@ import type { TSettingsFeaturesValues } from '@platform/utils/settings-features-
 export const mockSettingsFeaturesValues = (
   overrides: Partial<TSettingsFeaturesValues> = {},
 ): TSettingsFeaturesValues => ({
+  readerAccountsEnabled: false,
   commentsEnabled: false,
   ratingsEnabled: false,
   bookmarksEnabled: false,
@@ -12,6 +13,17 @@ export const mockSettingsFeaturesValues = (
   consentBannerEnabled: false,
   contactFormEnabled: false,
   ...overrides,
+});
+
+export const mockAllOnSettingsFeaturesValues = (): TSettingsFeaturesValues => ({
+  readerAccountsEnabled: true,
+  commentsEnabled: true,
+  ratingsEnabled: true,
+  bookmarksEnabled: true,
+  newsletterEnabled: true,
+  analyticsEnabled: true,
+  consentBannerEnabled: true,
+  contactFormEnabled: true,
 });
 
 export const mockUnsavedSettingsFeaturesAndPreset =

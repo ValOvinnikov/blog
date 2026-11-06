@@ -1,6 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
+import { mockAllOnSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getEnabledCapabilities } from './get-enabled-capabilities';
@@ -16,15 +16,7 @@ vi.mock(
   }),
 );
 
-const MOCK_ALL_ON = mockSettingsFeaturesValues({
-  commentsEnabled: true,
-  ratingsEnabled: true,
-  bookmarksEnabled: true,
-  newsletterEnabled: true,
-  analyticsEnabled: true,
-  consentBannerEnabled: true,
-  contactFormEnabled: true,
-});
+const MOCK_ALL_ON = mockAllOnSettingsFeaturesValues();
 
 const arrangeSavedValues = (values = MOCK_ALL_ON) => {
   getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
@@ -73,6 +65,20 @@ describe(getEnabledCapabilities, () => {
     });
 
     expect(result).not.toContain(CAPABILITY.CONTACT_FORM);
-    expect(result).toContain(CAPABILITY.RATINGS);
+    expect(result).toContain(CAPABILITY.CONSENT_BANNER);
+  });
+
+  it('omits every Reader accounts sub-item while Reader accounts is off', async () => {
+    arrangeSavedValues({ ...MOCK_ALL_ON, readerAccountsEnabled: false });
+
+    const result = await getEnabledCapabilities({
+      id: MOCK_TENANT_ID,
+      plan: TENANT_PLAN.GROWTH,
+    });
+
+    expect(result).not.toContain(CAPABILITY.READER_ACCOUNTS);
+    expect(result).not.toContain(CAPABILITY.BOOKMARKS);
+    expect(result).not.toContain(CAPABILITY.COMMENTS);
+    expect(result).toContain(CAPABILITY.CONTACT_FORM);
   });
 });
