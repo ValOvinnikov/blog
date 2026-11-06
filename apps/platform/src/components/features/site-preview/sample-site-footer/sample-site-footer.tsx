@@ -19,7 +19,7 @@ type TSampleSiteFooterProps = {
 
 export const SampleSiteFooter = ({
   brand: { name, logoSrc },
-  footer: { layout, tone, surface },
+  footer: { layout, tone, surface, hasCookieSettingsLink },
 }: TSampleSiteFooterProps) => {
   const t = useTranslations('lookPreview');
 
@@ -68,10 +68,12 @@ export const SampleSiteFooter = ({
           <TextLink appearance="nav" href="#">
             {t('footerPrivacy')}
           </TextLink>
-          <TextLink appearance="nav" href="#">
-            <Icon name={ICONS.COOKIE} size={SIZE.SM} />
-            {t('footerCookieSettings')}
-          </TextLink>
+          {hasCookieSettingsLink && (
+            <TextLink appearance="nav" href="#">
+              <Icon name={ICONS.COOKIE} size={SIZE.SM} />
+              {t('footerCookieSettings')}
+            </TextLink>
+          )}
         </Footer.FinePrint>
       </Footer>
     </div>

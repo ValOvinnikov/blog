@@ -3,7 +3,6 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
-  COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_BAR_STYLE,
@@ -90,7 +89,8 @@ const MOCK_FOOTER: TSampleFooterStyle = {
   layout: FOOTER_LAYOUT.COLUMNS,
   tone: BRAND_VARIANT.BRAND_PRIMARY,
   surface: FOOTER_SURFACE.FULL_WIDTH,
-  cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+  hasCookieSettingsLink: true,
+  hasCookieSettingsButton: true,
 };
 
 const setup = customRender(LookSample, {
@@ -502,6 +502,16 @@ describe(`<${LookSample.name}/>`, () => {
         expect(archiveLink).toBeVisible();
         expect(cookieSettingsLink).toBeVisible();
       });
+    });
+
+    it('leaves the Cookie settings link out when the footer has none', () => {
+      setup({ footer: { ...MOCK_FOOTER, hasCookieSettingsLink: false } });
+
+      const cookieSettingsLink = screen.queryByRole('link', {
+        name: COOKIE_SETTINGS,
+      });
+
+      expect(cookieSettingsLink).not.toBeInTheDocument();
     });
 
     it('arranges the footer by the chosen layout, dropping the link groups when compact', () => {
