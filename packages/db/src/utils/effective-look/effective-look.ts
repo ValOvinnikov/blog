@@ -57,6 +57,7 @@ function presetLook(preset: TPresetId): TLook {
     footerBackground,
     footerSurface,
     cookieSettingsButton,
+    brandName: undefined,
     logoAssetUrl: undefined,
     faviconAssetUrl: undefined,
   };

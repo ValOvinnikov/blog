@@ -17,8 +17,8 @@ import {
   type TSenderFieldErrors,
 } from '@platform/server/email-config/update-email-config-action';
 import { updateEmailTemplateAction } from '@platform/server/email-templates/update-email-template-action';
+import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import {
-  blankToNull,
   EMAIL_SENDER_ITEM,
   withCopy,
   toSenderInput,

@@ -37,6 +37,7 @@ import {
 faker.seed(6006);
 
 const MOCK_REF_DATE = '2026-10-19T10:00:00.000Z';
+const MOCK_BRAND_NAME = faker.company.name();
 
 const MOCK_SITE_CONFIG: TSiteConfigResult = {
   id: faker.string.uuid(),
@@ -63,6 +64,7 @@ const MOCK_SITE_CONFIG: TSiteConfigResult = {
   footerBackground: BRAND_VARIANT.SECONDARY,
   footerSurface: FOOTER_SURFACE.CARD,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+  brandName: MOCK_BRAND_NAME,
   logoAssetUrl: MOCK_LOGO_URL,
   faviconAssetUrl: MOCK_FAVICON_URL,
   voiceOverridesByLocale: {},
@@ -116,6 +118,7 @@ describe(defaultLookFormValues, () => {
       footerSurface,
       cookieSettingsButton,
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
+      brandName: '',
       logo: { url: undefined },
       favicon: { url: undefined },
     });
@@ -149,9 +152,19 @@ describe(toLookFormValues, () => {
       footerBackground: MOCK_SITE_CONFIG.footerBackground,
       footerSurface: MOCK_SITE_CONFIG.footerSurface,
       cookieSettingsButton: MOCK_SITE_CONFIG.cookieSettingsButton,
+      brandName: MOCK_BRAND_NAME,
       logo: { url: MOCK_LOGO_URL },
       favicon: { url: MOCK_FAVICON_URL },
     });
+  });
+
+  it('reads an unset brand name as a blank field', () => {
+    const values = toLookFormValues({
+      ...MOCK_SITE_CONFIG,
+      brandName: undefined,
+    });
+
+    expect(values.brandName).toBe('');
   });
 });
 

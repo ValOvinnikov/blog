@@ -112,6 +112,12 @@ export const useLookDraftFields = () => {
         t(`languageSwitcherOptionLabel.${languageSwitcherStyle}`),
     },
     {
+      id: 'brandName',
+      label: t('brandNameLabel'),
+      display: ({ brandName }: TLookFormValues) =>
+        brandName.trim() || t('brandNameUnset'),
+    },
+    {
       id: 'logo',
       label: t('logoFieldLabel'),
       display: ({ logo }: TLookFormValues) => displayBrandImage(logo),

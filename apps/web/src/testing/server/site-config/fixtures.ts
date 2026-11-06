@@ -36,6 +36,7 @@ export const mockSiteConfig = (
   preset: PRESET_ID.CONSOLE,
   accentHue: faker.number.int({ min: 0, max: 359 }),
   logoHue: undefined,
+  brandName: undefined,
   headingFont: FONT_CHOICE.SPACE_GROTESK,
   bodyFont: FONT_CHOICE.NEWSREADER,
   radiusScale: RADIUS_SCALE.MD,

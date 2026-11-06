@@ -3,7 +3,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { EmailSettings } from '@platform/components/features/email/email-settings';
 import { canEditContactRecipient } from '@platform/server/auth/can-edit-contact-recipient';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { loadTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
+import { toTenantEmailBrand } from '@platform/server/email/load-tenant-email-brand';
 import { buildEmailDraft } from '@platform/utils/email-draft/email-draft';
 
 export type TEmailPageContentProps = {
@@ -11,9 +11,9 @@ export type TEmailPageContentProps = {
 };
 
 export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
-  const [brand, emailConfig, templateLogoUrls, authored, { membership }] =
+  const [siteConfig, emailConfig, templateLogoUrls, authored, { membership }] =
     await Promise.all([
-      loadTenantEmailBrand(tenant.id),
+      queries.siteConfig.getSiteConfig(tenant.id),
       queries.emailConfig.getEmailConfig(tenant.id),
       queries.emailTemplates.listEmailTemplateLogoUrls(tenant.id),
       queries.emailTemplates.listAuthoredEmailTemplates(tenant.id),
@@ -43,8 +43,8 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
       initialDraft={initialDraft}
       defaultLocale={tenant.locale}
       liveLocales={liveLocales}
-      brand={brand}
-      brandName={tenant.name}
+      brand={toTenantEmailBrand(siteConfig)}
+      brandName={siteConfig?.brandName ?? tenant.name}
       savedAt={emailConfig?.updatedAt}
       archivedAt={tenant.deprovisionedAt ?? undefined}
     />

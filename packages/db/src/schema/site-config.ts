@@ -236,6 +236,7 @@ export const siteConfig = pgTable('site_config', {
   cookieSettingsButton: cookieSettingsButtonEnum('cookie_settings_button')
     .notNull()
     .default(COOKIE_SETTINGS_BUTTON.HIDDEN),
+  brandName: text('brand_name'),
   logoAssetUrl: text('logo_asset_url'),
   faviconAssetUrl: text('favicon_asset_url'),
   voiceOverridesByLocale: jsonb('voice_overrides')

@@ -54,6 +54,7 @@ export const mockSiteConfig = (
   tenantId: MOCK_TENANT_ID,
   ...MOCK_THEME_FIELDS,
   logoHue: undefined,
+  brandName: undefined,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,

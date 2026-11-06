@@ -49,6 +49,7 @@ describe(getSiteConfig, () => {
       ...row,
       cardStyle: CARD_STYLE.ACCENT_BAR,
       logoHue: undefined,
+      brandName: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},
@@ -87,6 +88,7 @@ describe(getSiteConfig, () => {
     expect(result).toEqual({
       ...row,
       logoHue: undefined,
+      brandName: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: { notFoundHeading: MOCK_NOT_FOUND_HEADING },

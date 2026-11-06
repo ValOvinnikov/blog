@@ -1,4 +1,5 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
   siteConfig,
@@ -8,16 +9,15 @@ import {
 import { tenants } from '@blog/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
-// `logoHue`/`logoAssetUrl`/`faviconAssetUrl` are Postgres `null` when unset;
-// mapped to `undefined` here so callers never have to reason about two
-// different "absent" representations.
+// Nullable columns are mapped to `undefined` so callers never reason about two "absent" representations.
 export type TSiteConfigResult = Omit<
   TSiteConfig,
-  'logoHue' | 'logoAssetUrl' | 'faviconAssetUrl'
+  'logoHue' | 'brandName' | 'logoAssetUrl' | 'faviconAssetUrl'
 > & {
-  logoHue: number | undefined;
-  logoAssetUrl: string | undefined;
-  faviconAssetUrl: string | undefined;
+  logoHue: TMaybeUndefined<number>;
+  brandName: TMaybeUndefined<string>;
+  logoAssetUrl: TMaybeUndefined<string>;
+  faviconAssetUrl: TMaybeUndefined<string>;
   /** @deprecated The default locale's slice of `voiceOverridesByLocale`, kept until every caller reads per language. */
   voiceOverrides: TVoiceOverrides;
 };
@@ -29,6 +29,7 @@ export function toSiteConfigResult(
   return {
     ...row,
     logoHue: row.logoHue ?? undefined,
+    brandName: row.brandName ?? undefined,
     logoAssetUrl: row.logoAssetUrl ?? undefined,
     faviconAssetUrl: row.faviconAssetUrl ?? undefined,
     voiceOverrides: row.voiceOverridesByLocale[defaultLocale] ?? {},
@@ -37,7 +38,7 @@ export function toSiteConfigResult(
 
 export async function getSiteConfig(
   tenantId: string,
-): Promise<TSiteConfigResult | undefined> {
+): Promise<TMaybeUndefined<TSiteConfigResult>> {
   const db = getDb();
 
   const [row] = await db

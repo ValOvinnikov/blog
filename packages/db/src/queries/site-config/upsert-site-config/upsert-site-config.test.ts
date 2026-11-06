@@ -27,6 +27,7 @@ import {
   RADIUS_SCALE,
   SPINNER_STYLE,
 } from '@blog/config/constants';
+import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -106,6 +107,7 @@ const MOCK_RICH_LINK_KEY = faker.string.uuid();
 const MOCK_RICH_BLOCK_KEY = faker.string.uuid();
 const MOCK_RICH_SPAN_KEY = faker.string.uuid();
 const MOCK_NON_RICH_TEXT_VALUE = faker.number.int();
+const MOCK_BRAND_NAME = faker.company.name();
 const NAME_PLACEHOLDER = '{name}';
 
 const baseInput: TUpdateSiteConfigInput = MOCK_SITE_CONFIG_FIELDS;
@@ -200,6 +202,11 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     },
   ],
   [
+    'a brand name over the cap',
+    { brandName: 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1) },
+  ],
+  ['a blank brand name', { brandName: ' ' }],
+  [
     'an unknown spinner style',
     {
       spinnerStyle:
@@ -269,6 +276,7 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
 
 const OPTIONAL_COLUMNS = [
   { field: 'logoHue', value: MOCK_LOGO_HUE },
+  { field: 'brandName', value: MOCK_BRAND_NAME },
   { field: 'logoAssetUrl', value: MOCK_LOGO_ASSET_URL },
   { field: 'faviconAssetUrl', value: MOCK_FAVICON_ASSET_URL },
 ] as const;
@@ -352,6 +360,7 @@ describe(upsertSiteConfig, () => {
     expect(result).toEqual({
       ...row,
       logoHue: undefined,
+      brandName: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       voiceOverrides: {},
