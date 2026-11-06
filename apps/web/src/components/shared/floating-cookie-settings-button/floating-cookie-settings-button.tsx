@@ -32,7 +32,7 @@ export const FloatingCookieSettingsButton = () => {
       className={floatingCookieSettingsButtonVariants()}
       dataTestId="floating-cookie-settings-button"
     >
-      <Icon name={ICONS.COOKIE} size={SIZE.SM} />
+      <Icon name={ICONS.COOKIE} size={SIZE.LG} />
     </IconButton>
   );
 };
