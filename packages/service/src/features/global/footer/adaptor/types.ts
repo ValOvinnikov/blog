@@ -19,6 +19,7 @@ export type TFooter = {
   groups: TFooterLinkGroup[];
   about: TMaybeUndefined<string>;
   address: TMaybeUndefined<string>;
+  copyrightName?: string;
   finePrint: TFooterFinePrintItem[];
   showLanguageSwitcher?: boolean;
   showRssFeed: boolean;

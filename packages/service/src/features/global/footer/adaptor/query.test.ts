@@ -27,6 +27,8 @@ const MOCK_DUTCH_HEADING = faker.lorem.word();
 const MOCK_ENGLISH_ABOUT = faker.lorem.sentence();
 const MOCK_DUTCH_ABOUT = faker.lorem.sentence();
 const MOCK_ADDRESS = faker.location.streetAddress({ useFullAddress: true });
+const MOCK_ENGLISH_COPYRIGHT_NAME = faker.company.name();
+const MOCK_DUTCH_COPYRIGHT_NAME = faker.company.name();
 const MOCK_COOKIE_SETTINGS_TYPE = 'cookieSettingsItem';
 
 function mockLinkRef(id: string) {
@@ -56,6 +58,10 @@ const MOCK_FOOTER_DOCUMENT = {
     [NL]: MOCK_DUTCH_ABOUT,
   }),
   address: [mockLocalizedEntry(EN, MOCK_ADDRESS)],
+  copyrightName: mockLocalizedStrings({
+    [EN]: MOCK_ENGLISH_COPYRIGHT_NAME,
+    [NL]: MOCK_DUTCH_COPYRIGHT_NAME,
+  }),
   finePrint: [
     mockLinkRef(MOCK_LINK_ID),
     { _key: faker.string.uuid(), _type: MOCK_COOKIE_SETTINGS_TYPE },
@@ -104,12 +110,13 @@ describe('footerQuery', () => {
     ]);
   });
 
-  it('picks the heading and about text in the visitor language', async () => {
-    const { groups, about } = await runFooterQuery(NL);
+  it('picks the heading, about text and copyright name in the visitor language', async () => {
+    const { groups, about, copyrightName } = await runFooterQuery(NL);
 
-    expect({ heading: groups?.[0]?.heading, about }).toEqual({
+    expect({ heading: groups?.[0]?.heading, about, copyrightName }).toEqual({
       heading: MOCK_DUTCH_HEADING,
       about: MOCK_DUTCH_ABOUT,
+      copyrightName: MOCK_DUTCH_COPYRIGHT_NAME,
     });
   });
 

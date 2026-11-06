@@ -56,6 +56,7 @@ export function mockRawFooter(overrides: Partial<TRawFooter> = {}): TRawFooter {
     groups: null,
     about: null,
     address: null,
+    copyrightName: null,
     finePrint: null,
     showLanguageSwitcher: null,
     showRssFeed: null,
