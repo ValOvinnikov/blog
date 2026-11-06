@@ -29,6 +29,13 @@
       "when": 1793888772685,
       "tag": "0003_drop_spinner_style_preset",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793925300085,
+      "tag": "0004_add_cookie_settings_button_only",
+      "breakpoints": true
     }
   ]
 }

@@ -177,25 +177,33 @@ describe(`<${LookForm.name}/>`, () => {
     });
   });
 
-  it.each([
-    { banner: 'on', hasCookieBanner: true, isNoteShown: false },
-    { banner: 'off', hasCookieBanner: false, isNoteShown: true },
-  ])(
-    'keeps the cookie button editable with the banner $banner, noting when off',
-    async ({ hasCookieBanner, isNoteShown }) => {
+  describe('the cookie settings choice', () => {
+    const cookieChoice = async (hasCookieBanner: boolean) => {
       setupLookForm({ hasCookieBanner });
       await openLookRow(user, LOOK_ROW.FOOTER);
-
-      const note = screen.queryByText(COOKIE_BANNER_OFF_NOTE);
       const cookieButtonGroup = screen.getByRole('group', {
         name: LOOK_FORM.cookieSettingsButtonLabel,
       });
-      const shownButton = within(cookieButtonGroup).getByRole('button', {
+
+      return within(cookieButtonGroup).getByRole('button', {
         name: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
       });
+    };
 
-      expect(Boolean(note)).toBe(isNoteShown);
-      expect(shownButton).toBeEnabled();
-    },
-  );
+    it('is editable with no note while the cookie banner is on', async () => {
+      const bothButton = await cookieChoice(true);
+      const note = screen.queryByText(COOKIE_BANNER_OFF_NOTE);
+
+      expect(bothButton).toBeEnabled();
+      expect(note).not.toBeInTheDocument();
+    });
+
+    it('is disabled with a note saying why while the cookie banner is off', async () => {
+      const bothButton = await cookieChoice(false);
+      const note = screen.getByText(COOKIE_BANNER_OFF_NOTE);
+
+      expect(bothButton).toBeDisabled();
+      expect(note).toBeVisible();
+    });
+  });
 });

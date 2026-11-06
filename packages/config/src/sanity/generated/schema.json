@@ -6075,6 +6075,14 @@
         },
         "optional": true
       },
+      "copyrightName": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "internationalizedArrayString"
+        },
+        "optional": true
+      },
       "finePrint": {
         "type": "objectAttribute",
         "value": {

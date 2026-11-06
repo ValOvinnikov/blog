@@ -81,8 +81,8 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.FOOTER,
         group: LOOK_FORM.cookieSettingsButtonLabel,
-        option: LOOK_FORM.cookieSettingsButtonOptionLabel.SHOWN,
-        saved: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+        option: LOOK_FORM.cookieSettingsButtonOptionLabel.ONLY,
+        saved: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.ONLY },
       },
       {
         row: LOOK_ROW.LANGUAGE_SWITCHER,

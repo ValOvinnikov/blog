@@ -1350,6 +1350,14 @@
         "file": "packages/config/src/constants/footer-layout.ts"
       }
     ],
+    "ONLY": [
+      {
+        "ref": "COOKIE_SETTINGS_BUTTON.ONLY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/footer-layout.ts"
+      }
+    ],
     "IDLE": [
       {
         "ref": "FORM_STATUS.IDLE",

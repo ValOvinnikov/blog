@@ -938,6 +938,7 @@ export type Settings_footer = {
   >;
   about?: InternationalizedArrayString;
   address?: InternationalizedArrayText;
+  copyrightName?: InternationalizedArrayString;
   finePrint?: Array<
     | ({
         _key: string;

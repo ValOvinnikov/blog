@@ -742,7 +742,7 @@
       "PULSE": "Puls"
     },
     "footerHeading": "Voettekst",
-    "footerDescription": "Hoe de onderkant van je site is ingedeeld, de achtergrond en een zwevende weg terug naar de cookie-instellingen.",
+    "footerDescription": "Hoe de onderkant van je site is ingedeeld, de achtergrond en hoe lezers de cookie-instellingen opnieuw openen.",
     "footerLayoutLabel": "Indeling van de voettekst",
     "footerLayoutDescription": "Waar het merk, de linkgroepen en de kleine lettertjes staan. Compact toont geen groepen, introtekst of adres.",
     "footerLayoutOptionLabel": {
@@ -764,13 +764,14 @@
       "FULL_WIDTH": "Volle breedte",
       "CARD": "Kaart"
     },
-    "cookieSettingsButtonLabel": "Knop voor cookie-instellingen",
-    "cookieSettingsButtonDescription": "Een ronde knop linksonder die de cookie-instellingen opnieuw opent, zodra een lezer de cookiebanner heeft beantwoord.",
+    "cookieSettingsButtonLabel": "Cookie-instellingen",
+    "cookieSettingsButtonDescription": "Hoe lezers de cookie-instellingen opnieuw openen nadat ze de cookiebanner hebben beantwoord: een link in de voettekst, een ronde knop linksonder, of beide.",
     "cookieSettingsButtonOptionLabel": {
-      "HIDDEN": "Verborgen",
-      "SHOWN": "Getoond"
+      "HIDDEN": "Link in voettekst",
+      "ONLY": "Zwevende knop",
+      "SHOWN": "Beide"
     },
-    "cookieSettingsButtonBannerOff": "De cookiebanner staat uit, dus de knop blijft verborgen. Zet de banner aan bij Functies om hem te tonen.",
+    "cookieSettingsButtonBannerOff": "De cookiebanner staat uit, dus lezers zien de link noch de knop. Zet de banner aan bij Functies om te kiezen.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding",
@@ -782,8 +783,9 @@
     "summaryFaviconUploaded": "Favicon geüpload",
     "summaryNoFavicon": "Geen favicon",
     "cookieSettingsButtonSummary": {
-      "HIDDEN": "Cookieknop verborgen",
-      "SHOWN": "Cookieknop zichtbaar"
+      "HIDDEN": "Cookielink in voettekst",
+      "ONLY": "Zwevende cookieknop",
+      "SHOWN": "Cookielink en -knop"
     },
     "summaryOneLanguage": "Eén taal"
   },

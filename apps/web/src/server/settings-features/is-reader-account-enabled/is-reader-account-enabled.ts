@@ -1,4 +1,7 @@
-import { READER_ACCOUNT_CAPABILITIES, type TCapability } from '@blog/config';
+import {
+  LIVE_READER_ACCOUNT_CAPABILITIES,
+  type TCapability,
+} from '@blog/config';
 import {
   isCapabilityEnabled,
   isCapabilityEnabledForTenant,
@@ -7,7 +10,9 @@ import {
 const isAnyReaderAccountCapabilityEnabled = async (
   isEnabled: (capability: TCapability) => Promise<boolean>,
 ): Promise<boolean> => {
-  const enabled = await Promise.all(READER_ACCOUNT_CAPABILITIES.map(isEnabled));
+  const enabled = await Promise.all(
+    LIVE_READER_ACCOUNT_CAPABILITIES.map(isEnabled),
+  );
   return enabled.some(Boolean);
 };
 

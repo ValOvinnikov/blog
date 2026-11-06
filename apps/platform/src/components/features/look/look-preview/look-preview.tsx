@@ -1,7 +1,7 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
-import { COOKIE_SETTINGS_BUTTON, type TLocaleIsoCode } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { LookSample } from '@platform/components/features/site-preview/look-sample';
 import { SampleCookieButton } from '@platform/components/features/site-preview/sample-cookie-button';
@@ -32,6 +32,7 @@ import { useLookStatusNotes } from './use-look-status-notes';
 export type TLookPreviewProps = {
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
+  hasCookieBanner: boolean;
   siteHost: string;
   followTarget: TLookFollowTarget;
   isShown: boolean;
@@ -40,6 +41,7 @@ export type TLookPreviewProps = {
 export const LookPreview = ({
   liveLocales,
   hasReaderAccounts,
+  hasCookieBanner,
   siteHost,
   followTarget,
   isShown,
@@ -63,7 +65,7 @@ export const LookPreview = ({
     isShown,
   });
   const theme = buildSitePreviewTheme(values, isDark);
-  const footer = toSampleFooterStyle(values);
+  const footer = toSampleFooterStyle(values, hasCookieBanner);
 
   const solos = (
     <>
@@ -87,7 +89,7 @@ export const LookPreview = ({
         isSignedIn={isSignedIn}
         isSubmenuOpen={isSubmenuPreviewOpen}
       />
-      {footer.cookieSettingsButton === COOKIE_SETTINGS_BUTTON.SHOWN && (
+      {footer.hasCookieSettingsButton && (
         <DeviceFrame.Overlay>
           <SampleCookieButton theme={theme} />
         </DeviceFrame.Overlay>

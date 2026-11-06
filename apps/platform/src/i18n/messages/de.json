@@ -742,7 +742,7 @@
       "PULSE": "Puls"
     },
     "footerHeading": "Fußzeile",
-    "footerDescription": "Wie der untere Bereich Ihrer Website aufgebaut ist, sein Hintergrund und ein schwebender Weg zurück zu den Cookie-Einstellungen.",
+    "footerDescription": "Wie der untere Bereich Ihrer Website aufgebaut ist, sein Hintergrund und wie Leser die Cookie-Einstellungen wieder öffnen.",
     "footerLayoutLabel": "Fußzeilen-Layout",
     "footerLayoutDescription": "Wo Marke, Linkgruppen und Kleingedrucktes stehen. Kompakt zeigt keine Gruppen, keinen Info-Text und keine Adresse.",
     "footerLayoutOptionLabel": {
@@ -764,13 +764,14 @@
       "FULL_WIDTH": "Volle Breite",
       "CARD": "Karte"
     },
-    "cookieSettingsButtonLabel": "Cookie-Einstellungen-Schaltfläche",
-    "cookieSettingsButtonDescription": "Eine runde Schaltfläche unten links, die die Cookie-Einstellungen wieder öffnet, sobald Leser das Cookie-Banner beantwortet haben.",
+    "cookieSettingsButtonLabel": "Cookie-Einstellungen",
+    "cookieSettingsButtonDescription": "Wie Leser die Cookie-Einstellungen wieder öffnen, nachdem sie das Cookie-Banner beantwortet haben: über einen Link in der Fußzeile, eine runde Schaltfläche unten links oder beides.",
     "cookieSettingsButtonOptionLabel": {
-      "HIDDEN": "Ausgeblendet",
-      "SHOWN": "Angezeigt"
+      "HIDDEN": "Link in der Fußzeile",
+      "ONLY": "Schwebende Schaltfläche",
+      "SHOWN": "Beides"
     },
-    "cookieSettingsButtonBannerOff": "Das Cookie-Banner ist aus, daher bleibt die Schaltfläche ausgeblendet. Schalten Sie das Banner unter Funktionen ein, um sie anzuzeigen.",
+    "cookieSettingsButtonBannerOff": "Das Cookie-Banner ist aus, daher sehen Leser weder den Link noch die Schaltfläche. Schalten Sie das Banner unter Funktionen ein, um zu wählen.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild",
@@ -782,8 +783,9 @@
     "summaryFaviconUploaded": "Favicon hochgeladen",
     "summaryNoFavicon": "Kein Favicon",
     "cookieSettingsButtonSummary": {
-      "HIDDEN": "Cookie-Schaltfläche ausgeblendet",
-      "SHOWN": "Cookie-Schaltfläche sichtbar"
+      "HIDDEN": "Cookie-Link in der Fußzeile",
+      "ONLY": "Schwebende Cookie-Schaltfläche",
+      "SHOWN": "Cookie-Link und -Schaltfläche"
     },
     "summaryOneLanguage": "Eine Sprache"
   },

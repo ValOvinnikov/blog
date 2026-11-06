@@ -17,3 +17,9 @@ export const READER_ACCOUNT_CAPABILITIES = [
   CAPABILITY.COMMENTS,
   CAPABILITY.NEWSLETTER,
 ] as const satisfies readonly TCapability[];
+
+export const COMING_SOON_CAPABILITIES = [
+  CAPABILITY.COMMENTS,
+  CAPABILITY.RATINGS,
+  CAPABILITY.NEWSLETTER,
+] as const satisfies readonly TCapability[];

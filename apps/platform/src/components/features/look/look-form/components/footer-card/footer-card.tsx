@@ -23,6 +23,12 @@ import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+const COOKIE_SETTINGS_BUTTON_ORDER = [
+  COOKIE_SETTINGS_BUTTON.HIDDEN,
+  COOKIE_SETTINGS_BUTTON.ONLY,
+  COOKIE_SETTINGS_BUTTON.SHOWN,
+];
+
 export type TFooterCardProps = {
   hasCookieBanner: boolean;
   summary: string;
@@ -55,9 +61,10 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   const surfaceOptions = toOptions(FOOTER_SURFACE, (surface) =>
     t(`footerSurfaceOptionLabel.${surface}`),
   );
-  const cookieButtonOptions = toOptions(COOKIE_SETTINGS_BUTTON, (visibility) =>
-    t(`cookieSettingsButtonOptionLabel.${visibility}`),
-  );
+  const cookieButtonOptions = COOKIE_SETTINGS_BUTTON_ORDER.map((reach) => ({
+    value: reach,
+    label: t(`cookieSettingsButtonOptionLabel.${reach}`),
+  }));
   const cookieButtonDescribedBy = joinIds(
     archivedDescribedBy,
     hasCookieBanner ? undefined : bannerOffNoteId,
@@ -134,10 +141,8 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
           aria={{ describedBy: cookieButtonDescribedBy }}
           options={cookieButtonOptions}
           value={cookieSettingsButton}
-          onChange={(visibility) =>
-            updateField('cookieSettingsButton', visibility)
-          }
-          isDisabled={isArchived}
+          onChange={(reach) => updateField('cookieSettingsButton', reach)}
+          isDisabled={isArchived || !hasCookieBanner}
         />
         {!hasCookieBanner && (
           <p id={bannerOffNoteId} className={textVariants({ variant: 'hint' })}>
