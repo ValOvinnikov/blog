@@ -114,7 +114,8 @@
   },
   "siteFooter": {
     "groupsAriaLabel": "Footer links",
-    "finePrintAriaLabel": "Legal"
+    "finePrintAriaLabel": "Legal",
+    "poweredByLabel": "Powered by"
   },
   "authMenu": {
     "signIn": "Sign in",

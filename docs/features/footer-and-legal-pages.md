@@ -14,7 +14,7 @@ epics: [3726, 4995]
 
 ## What it does
 
-The site footer closes every page with a brand column (the Look logo, an about line, an address and the site's social profiles as icon links), the editor's link groups under their headings, and a fine-print row: the copyright line, the editor's fine-print links and, when the owner's choice includes it, the Cookie settings link. An optional language switcher and a link to the RSS feed sit beside the fine print. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
+The site footer closes every page with a brand column (the Look logo, an about line, an address and the site's social profiles as icon links), the editor's link groups under their headings, and a fine-print row: the copyright line, the editor's fine-print links and, when the owner's choice includes it, the Cookie settings link. An optional language switcher and a link to the RSS feed sit beside the fine print. On a Free site, a "Powered by {product name}" text link to the marketing site closes the bottom row. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
 
 ## Surfaces and routes
 
@@ -32,6 +32,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - **Cache:** the query is tagged `footer`, `link` and every page type, tenant-scoped; the publish webhook maps `settings_footer` → `footer` and `link` → `link`.
 - **Look:** `site_config.footer_layout`, `footer_background`, `footer_surface` and `cookie_settings_button`, read by `getFooterStyle` through `getSiteConfig`, so a plan without the field gets the preset's value. A failed read logs `footer.site_config_fetch_failed` and falls back to the preset (Columns, Brand tint, Full width, Cookie settings as the footer link).
 - **Copyright:** `© {year} {brand name}`, the year computed at render time; the format is fixed in `@blog/ui`'s `Footer.Copyright` and no editor or owner can reword it.
+- **Powered-by mark:** `getPoweredByMark(tenant)` returns the product name and link from `PRODUCT_NAME` and `MARKETING_SITE_URL` when the tenant's plan carries `PLAN_ENTITLEMENTS[plan].hasPoweredByMark` (`FREE` yes, `GROWTH` no), reading the plan through `getEffectivePlan`, as the Look does. When the plan cannot be read, Free's rules apply. Its label is the fixed catalog key `siteFooter.poweredByLabel`, translated in every site language.
 - **Legal pages:** no page type, table or route exists for them; the footer links them as ordinary links, in `groups` or `finePrint`.
 
 ## Configuration
@@ -40,26 +41,29 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - The switcher shows only with two or more live languages, and Studio hides its toggle otherwise (./languages.md). Its style comes from Look (./look.md).
 - The cookie settings button reopens the consent preferences dialog (./consent-and-analytics.md). The RSS link goes to the current language's feed (./seo-and-feeds.md).
 - Layout, Background and Surface are Growth-only; a Free site renders the preset's. The content is not plan-gated.
+- The powered-by mark follows the plan alone: Free cannot hide it and Growth cannot show it. A plan change shows or hides it on the next page load.
 - Big wordmark sets the brand name large and `aria-hidden`, since the copyright line already names the site. Compact shows no groups, about text or address.
 
 ## Constraints and invariants
 
 - A social link renders as an icon only. Its accessible name is derived from the platform through the catalog's `socialLinks.linkAriaLabel`, never stored per link, so it stays translated; the list is named by `socialLinks.listAriaLabel`.
 - A social profile holds no destination of its own — always a `link` document reference.
-- Footer order is fixed in code: the brand column (logo, about, address, social links), the groups, then the bottom row — copyright, fine print, language switcher, RSS. Each part renders only when it has content.
+- Footer order is fixed in code: the brand column (logo, about, address, social links), the groups, then the bottom row — copyright, fine print, language switcher, RSS, then the powered-by mark. Each part renders only when it has content.
 - The Cookie settings link renders in the fine print only with the `CONSENT_BANNER` capability on and Look's choice Footer link or Both (`resolveCookieSettingsControls`): at the `cookieSettingsItem`'s position when set, at the end otherwise, and once even if the item repeats. With the choice Floating button, or the banner off, it is left out even where the item sits.
 - A group or fine-print link whose href an earlier one already carries is skipped, groups before fine print; a group left with no links, or with no heading, is dropped. A link opens in a new tab only when its `link` document says so.
+- The powered-by mark (`Footer.PoweredBy`) is always the last item of the bottom row and sits after the fine-print `nav`, never inside it. It opens in the same tab and its accessible name is its visible text. With `PRODUCT_NAME` or `MARKETING_SITE_URL` unset it is not drawn, and `footer.powered_by_unconfigured` is logged.
 - The groups and the fine print are two `nav` landmarks named by the fixed catalog keys `siteFooter.groupsAriaLabel` and `siteFooter.finePrintAriaLabel`.
 - A failed site-settings read renders no footer. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no editor content and no switcher, and with the copyright, RSS link and, when the choice includes it, Cookie settings shown.
 - The footer's links (`TextLink` `appearance="nav"`), including the footer language codes, mark the current item with `aria-current="page"` and the active colour and underline.
-- `@blog/ui`'s `Footer` is a compound shell (`Footer.Logo`, `About`, `Address`, `Social`, `Groups`/`Group`/`GroupItem`, `Wordmark`, `Copyright`, `FinePrint`, `Nav`) and stays prop-driven; `apps/web` composes the content. On a phone the groups sit two per row.
+- `@blog/ui`'s `Footer` is a compound shell (`Footer.Logo`, `About`, `Address`, `Social`, `Groups`/`Group`/`GroupItem`, `Wordmark`, `Copyright`, `FinePrint`, `Nav`, `PoweredBy`) and stays prop-driven; `apps/web` composes the content. On a phone the groups sit two per row.
 - The `Footer` lays out by its own width (container queries on `@container/footer`), never the window's, so it renders the same in any frame; on the public site it spans the window. The Big wordmark's `text-wordmark` size scales with the footer's width (`cqi`) for the same reason.
 
 ## Dependencies
 
 - Layers: `studio` (schema), `service` (loader), `ui` (footer shell), `web` (composition).
 - Features: ./links.md, ./languages.md, ./look.md, ./people.md, ./consent-and-analytics.md, ./seo-and-feeds.md, ./navigation.md, ./rendering-and-caching.md, ./tenant-provisioning.md.
-- Env: none of its own.
+- Env: `PRODUCT_NAME` and `MARKETING_SITE_URL` (web), for the powered-by mark.
+- Plans: [plans-and-entitlements](./plans-and-entitlements.md) decides which sites carry the mark.
 
 ## Entry points
 
@@ -71,6 +75,8 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - `apps/web/src/utils/arrange-footer-links/arrange-footer-links.ts`
 - `apps/web/src/utils/resolve-cookie-settings-controls/resolve-cookie-settings-controls.ts`
 - `apps/web/src/server/site-config/get-footer-style/get-footer-style.ts`
+- `apps/web/src/server/site-config/get-powered-by-mark/get-powered-by-mark.ts`
+- `apps/web/src/server/site-config/get-effective-plan/get-effective-plan.ts`
 - `apps/web/src/components/shared/social-links/social-link.tsx`
 - `packages/ui/src/components/organisms/footer/footer.tsx`
 
@@ -78,7 +84,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 
 - `packages/studio/src/schema-types/validation/validate-array-type-at-most-once/validate-array-type-at-most-once.test.ts`
 - `packages/service/src/features/global/footer/adaptor/loader.test.ts`, `query.test.ts`, `packages/service/src/shared/transformers/social-profile/to-social-profiles.test.ts`
-- `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
+- `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `get-powered-by-mark/get-powered-by-mark.test.ts`, `get-effective-plan/get-effective-plan.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
 - `packages/ui/src/components/organisms/footer/footer.test.tsx`
 - Stories: `packages/ui/src/components/organisms/footer/footer.stories.tsx`, `apps/web/src/components/shared/social-links/social-links.stories.tsx`.
 

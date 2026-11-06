@@ -114,7 +114,8 @@
   },
   "siteFooter": {
     "groupsAriaLabel": "Enlaces del pie de página",
-    "finePrintAriaLabel": "Información legal"
+    "finePrintAriaLabel": "Información legal",
+    "poweredByLabel": "Con la tecnología de"
   },
   "authMenu": {
     "signIn": "Iniciar sesión",

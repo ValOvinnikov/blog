@@ -114,7 +114,8 @@
   },
   "siteFooter": {
     "groupsAriaLabel": "Voettekstlinks",
-    "finePrintAriaLabel": "Juridisch"
+    "finePrintAriaLabel": "Juridisch",
+    "poweredByLabel": "Mogelijk gemaakt door"
   },
   "authMenu": {
     "signIn": "Inloggen",

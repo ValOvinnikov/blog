@@ -61,6 +61,7 @@ export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
 export type TPlanEntitlements = {
   lookFields: readonly TLookField[];
   modulePacks: readonly TModulePack[];
+  hasPoweredByMark: boolean;
 };
 
 export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
@@ -73,9 +74,11 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
       LOOK_FIELD.COOKIE_SETTINGS_BUTTON,
     ],
     modulePacks: [MODULE_PACK.CORE],
+    hasPoweredByMark: true,
   },
   [TENANT_PLAN.GROWTH]: {
     lookFields: LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE, MODULE_PACK.GROWTH],
+    hasPoweredByMark: false,
   },
 };

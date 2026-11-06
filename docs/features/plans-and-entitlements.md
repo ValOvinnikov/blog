@@ -47,7 +47,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `tenants.plan` — required, the `tenant_plan` pgEnum built from `TENANT_PLAN`.
 - `PLAN_REGISTRY` (`@blog/db/constants`) — `FREE`: `CONSENT_BANNER`. `GROWTH`: all eight `CAPABILITY` keys (`READER_ACCOUNTS`, `COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`). Ratings is Growth only because rating needs sign-in.
 - `PLAN_LOCALE_LIMIT` — languages per plan including the default: `FREE` 1, `GROWTH` 3.
-- `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` the preset, accent hue, logo, favicon and Cookie settings button; `GROWTH` every Look column. `modulePacks` lists the module packs the plan entitles: `FREE` `CORE`; `GROWTH` `CORE` and `GROWTH`. The epic's later entitlements join this record as fields of their own.
+- `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` the preset, accent hue, logo, favicon and Cookie settings button; `GROWTH` every Look column. `modulePacks` lists the module packs the plan entitles: `FREE` `CORE`; `GROWTH` `CORE` and `GROWTH`. `hasPoweredByMark` says whether the site's footer carries the "Powered by" mark: `FREE` yes, `GROWTH` no (see [footer-and-legal-pages](./footer-and-legal-pages.md)). The epic's later entitlements join this record as fields of their own.
 - `settings_features` — one row per tenant (unique `tenant_id`, cascade delete), eight `NOT NULL` boolean toggles. Provisioning writes no row; an absent row resolves to the tenant's current preset's `featureDefaults` (both presets: bookmarks and contact form on; reader accounts, comments, ratings, newsletter, analytics and consent banner off). The column defaults match.
 - `MODULE_PACK` (`CORE`, `GROWTH`) and `MODULE_PACK_BY_TYPE` (`@blog/config/constants`) give every module `_type` exactly one pack; the map `satisfies Record<TModuleType, TModulePack>`, so a new module type fails type-check until it has one. Core: the four heroes (the deprecated `module_hero` included), the five Posts modules, content, FAQ, section pages, CTA, newsletter and cookie settings. Growth: testimonial, team, logo wall, stats, pricing, feature list, feature highlights, timeline and contact form. `isModuleTypeEntitled(type, packs)` is the one check; an unknown type is never entitled.
 - No price exists anywhere in the code.
@@ -64,6 +64,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - **Look** — fields outside `lookFields` show locked on the Look page with a Growth badge beside the label, at the preset's value, focusable and announced as unavailable (see [look](./look.md)).
 - **Module packs in Studio** — `StudioMount` takes an optional plain-data `entitlements` object whose `modulePacks` lists the entitled packs. Omitted, every pack is entitled: the site is the enforcement point, and the Sanity CLI Studio has no tenant. The platform's `StudioMountView` passes the tenant plan's `PLAN_ENTITLEMENTS` `modulePacks`, read on every load, so the owner's `/dashboard` Studio and the operator's `/tenants/{id}` Studio both follow the current plan.
 - **Module packs on the site** — `renderModules` wraps each module in `ModuleGate`, and `renderHeroModule` runs the same check: `isModuleEntitled` reads `getRequestContext().tenantId` and the cached `getTenantPlan`, once per request, and renders a module only when `isModuleTypeEntitled` passes for the plan's `modulePacks`. A skipped module renders nothing, and its component never runs, so its data is never fetched. With no tenant (the local and dev platform fallback) every module renders. A downgrade deletes no content; an upgrade shows the modules again once the plan cache refreshes.
+- **Powered-by mark** — `SiteFooter` draws `Footer.PoweredBy` when `getPoweredByMark` finds the plan's `hasPoweredByMark` set. It reads the plan through `getEffectivePlan`, the cached `getTenantPlan` with Free's rules when the plan cannot be read (`site_config.plan_fetch_failed`), the same reader `getSiteConfig` uses for the Look. No call site compares against `FREE`.
 - **Not plan-gated** — Voice, Domain, Studio, the Features page itself, page types, team seats, AI takeaways.
 
 ## Constraints and invariants
@@ -86,7 +87,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 
 - Layers: `config` (`CAPABILITY`, preset `featureDefaults`), `db`, `studio`, `web`, `platform`.
 - Features: [multi-tenancy](./multi-tenancy.md), [tenant-access](./tenant-access.md), [platform-shell](./platform-shell.md), [embedded-studio](./embedded-studio.md), [languages](./languages.md), [look](./look.md) (presets carry the feature defaults), [bookmarks](./bookmarks.md), [newsletter](./newsletter.md), [comments-and-ratings](./comments-and-ratings.md), [consent-and-analytics](./consent-and-analytics.md), [reader-account](./reader-account.md), [email](./email.md), [rendering-and-caching](./rendering-and-caching.md).
-- Env: `SITE_CONFIG_REVALIDATE_SECRET` (both apps), `WEB_APP_URL` (platform), `WEB_ANALYTICS_ENABLED` (web, ANDed with `ANALYTICS`).
+- Env: `SITE_CONFIG_REVALIDATE_SECRET` (both apps), `WEB_APP_URL` (platform), `WEB_ANALYTICS_ENABLED` (web, ANDed with `ANALYTICS`), `PRODUCT_NAME` and `MARKETING_SITE_URL` (web, the powered-by mark).
 
 ## Entry points
 
@@ -109,6 +110,8 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 - `packages/db/src/queries/tenants/get-tenant-live-locales/get-tenant-live-locales.ts`
 - `packages/config/src/constants/module-pack.ts` — `MODULE_PACK`, `MODULE_PACK_BY_TYPE`, `isModuleTypeEntitled`
 - `apps/web/src/server/settings-features/is-module-entitled/is-module-entitled.ts`
+- `apps/web/src/server/site-config/get-effective-plan/get-effective-plan.ts` — the plan a site renders under
+- `apps/web/src/server/site-config/get-powered-by-mark/get-powered-by-mark.ts`
 - `apps/web/src/modules/module-gate/module-gate.tsx`
 - `packages/studio/src/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement.ts`
 - `packages/studio/src/schema-types/inputs/requirement-warning-input/entitlement-gates/entitlement-gates.ts`
@@ -119,7 +122,7 @@ Every tenant is on one plan, `FREE` or `GROWTH`, which an operator sets. The pla
 ## Tests and stories
 
 - Platform: `notify-owner-of-plan-change.test.ts`, `plan-page-access.test.ts`, `settings-features-fields.test.ts`, `apps/platform/src/server/settings-features/*.test.ts`, `render-tenant-scoped-page.test.ts`, `nav-sections.test.ts`, and the Features page's `features-page-content.test.tsx` and `features-settings.test.tsx`, and `studio-mount-view.test.tsx`.
-- Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`, `module-renderer.test.tsx`.
+- Web: `apps/web/src/server/settings-features/**/*.test.ts`, `to-effective-settings-features.test.ts`, `module-renderer.test.tsx`, `get-effective-plan.test.ts`, `get-powered-by-mark.test.ts`.
 - db: `packages/db/src/queries/settings-features/**/*.test.ts`, `get-tenant-live-locales.test.ts`, `set-tenant-additional-locales.test.ts`.
 - Config: `module-pack.test.ts`.
 - Email: `owner-plan-change.test.ts`.

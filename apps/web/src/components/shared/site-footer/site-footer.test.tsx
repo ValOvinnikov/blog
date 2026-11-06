@@ -16,6 +16,7 @@ import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
+import { getPoweredByMark } from '@web/server/site-config/get-powered-by-mark/get-powered-by-mark';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import {
   clearConsentCookie,
@@ -55,6 +56,8 @@ vi.mock('@web/server/site-config/get-footer-style/get-footer-style');
 
 vi.mock('@web/server/site-config/get-brand-logo-url/get-brand-logo-url');
 
+vi.mock('@web/server/site-config/get-powered-by-mark/get-powered-by-mark');
+
 vi.mock(
   '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
 );
@@ -72,6 +75,11 @@ const FLOATING_COOKIE_SETTINGS_TEST_ID = 'floating-cookie-settings-button';
 const COOKIE_SETTINGS_NAME = SITE_MESSAGES.consent.footerSettingsLabel;
 const GROUPS_NAV_NAME = SITE_MESSAGES.siteFooter.groupsAriaLabel;
 const FINE_PRINT_NAV_NAME = SITE_MESSAGES.siteFooter.finePrintAriaLabel;
+const MOCK_POWERED_BY_MARK = {
+  productName: faker.company.name(),
+  href: faker.internet.url(),
+};
+const POWERED_BY_NAME = `${SITE_MESSAGES.siteFooter.poweredByLabel} ${MOCK_POWERED_BY_MARK.productName}`;
 const [MOCK_ABOUT, MOCK_ADDRESS, MOCK_GROUP_HEADING] =
   faker.helpers.uniqueArray(faker.lorem.word, 3);
 const MOCK_LOGO_URL = faker.image.url();
@@ -102,6 +110,7 @@ const getRequestContextMock = vi.mocked(getRequestContext);
 const getFooterStyleMock = vi.mocked(getFooterStyle);
 const getBrandLogoUrlMock = vi.mocked(getBrandLogoUrl);
 const isCapabilityEnabledMock = vi.mocked(isCapabilityEnabled);
+const getPoweredByMarkMock = vi.mocked(getPoweredByMark);
 
 const setup = customRenderAsync(SiteFooter, {});
 
@@ -434,6 +443,49 @@ describe(`<${SiteFooter.name}/>`, () => {
         expect(queryFloatingButton()).not.toBeInTheDocument();
       },
     );
+  });
+
+  describe('with the powered-by mark', () => {
+    beforeEach(async () => {
+      getPoweredByMarkMock.mockResolvedValueOnce(MOCK_POWERED_BY_MARK);
+      getFooterMock.mockResolvedValue(
+        okResult(mockFooter({ finePrint: [linkItem(MOCK_ABOUT_LINK)] })),
+      );
+      await setup();
+    });
+
+    it("asks for the request's own tenant's mark", () => {
+      expect(getPoweredByMarkMock).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+      );
+    });
+
+    it('links to the marketing site in the same tab', () => {
+      const link = screen.getByRole('link', { name: POWERED_BY_NAME });
+
+      expect(link).toHaveAttribute('href', MOCK_POWERED_BY_MARK.href);
+      expect(link).not.toHaveAttribute('target');
+    });
+
+    it('keeps the mark out of the fine-print navigation', () => {
+      const finePrint = screen.getByRole('navigation', {
+        name: FINE_PRINT_NAV_NAME,
+      });
+
+      const markInFinePrint = within(finePrint).queryByRole('link', {
+        name: POWERED_BY_NAME,
+      });
+
+      expect(markInFinePrint).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows no powered-by mark when the site has none', async () => {
+    await setup();
+
+    const mark = screen.queryByRole('link', { name: POWERED_BY_NAME });
+
+    expect(mark).not.toBeInTheDocument();
   });
 
   describe('when the footer fails to load', () => {

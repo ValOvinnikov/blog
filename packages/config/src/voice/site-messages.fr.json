@@ -114,7 +114,8 @@
   },
   "siteFooter": {
     "groupsAriaLabel": "Liens du pied de page",
-    "finePrintAriaLabel": "Mentions légales"
+    "finePrintAriaLabel": "Mentions légales",
+    "poweredByLabel": "Propulsé par"
   },
   "authMenu": {
     "signIn": "Se connecter",
