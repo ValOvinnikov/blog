@@ -24,7 +24,7 @@ A reader saves a post for later with a toggle in the post header and finds every
 
 ## Surfaces and routes
 
-- **Post page** — `BookmarkButtonGate` in the article header renders `BookmarkButton` when the `BOOKMARKS` capability is on and the tenant is active. The button is server-rendered with the post for every reader, as Save, inside a cell sized to the longer of its two labels so nothing moves when it settles. For a signed-in reader it switches to Saved once the post's saved state loads, and presses before then are ignored. A signed-out reader's press opens the header's sign-in panel through `HeaderOverlayProvider`, and either sign-in method returns them to the same post.
+- **Post page** — `BookmarkButtonGate` in the article header renders `BookmarkButton` when both `READER_ACCOUNTS` and `BOOKMARKS` are on and the tenant is active. The button is server-rendered with the post for every reader, as Save, inside a cell sized to the longer of its two labels so nothing moves when it settles. For a signed-in reader it switches to Saved once the post's saved state loads, and presses before then are ignored. A signed-out reader's press opens the header's sign-in panel through `HeaderOverlayProvider`, and either sign-in method returns them to the same post.
 - `/[locale]/bookmarks` — `force-dynamic`. 404 when the site has no reader account; a signed-out visitor is redirected home. Lists title, date and link per post, with an empty state when there are none.
 - **Header avatar menu** — "My bookmarks" links here (see [reader-auth](./reader-auth.md)).
 - No platform or Studio surface.
@@ -39,7 +39,7 @@ A reader saves a post for later with a toggle in the post header and finds every
 
 ## Configuration
 
-- **Owner or operator (platform Features)** — the `BOOKMARKS` toggle, which only `GROWTH` includes.
+- **Owner or operator (platform Features)** — the `BOOKMARKS` toggle, nested under Reader accounts (`READER_ACCOUNTS`); both are `GROWTH` only.
 - **Voice** — the `/bookmarks` empty state (`bookmarksEmpty`, path `bookmarksPage.empty`) is tenant-editable. The button labels, toasts and page title are fixed (`bookmarkButton.*`, `bookmarksPage.*`).
 - **Look** — `BookmarkToggle` and the page follow the site's Look.
 
@@ -49,7 +49,7 @@ A reader saves a post for later with a toggle in the post header and finds every
 - Server actions read the session themselves; a client never supplies the user id.
 - A suspended site renders no button (`isRequestTenantActive`), and shows it again on the first page load after reactivation. `setBookmarkStatus` writes only through `resolveWritableTenant`: an inactive or deprovisioned tenant refuses with an "unavailable" result, which shows its own no-retry toast.
 - `addBookmark` is idempotent (`onConflictDoNothing`), and removing a missing bookmark is a no-op.
-- The button gates on `BOOKMARKS`, but `/bookmarks` gates on any reader capability (bookmarks, comments or newsletter), so with bookmarks off and another reader feature on the page still answers. That state is reachable only through a stored `settings_features` row written before comments and newsletter were locked as Coming soon: every Features save writes both off, and with no stored row Bookmarks defaults on.
+- The button and `/bookmarks` gate on the same rule (`isReaderAccountFeatureEnabled`): Reader accounts and Bookmarks both on. With Reader accounts off, Bookmarks keeps its stored value but shows nothing.
 - A capability switched off hides the button and keeps the stored rows.
 
 ## Dependencies

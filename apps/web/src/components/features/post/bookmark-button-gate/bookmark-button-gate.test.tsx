@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';
 import { getBookmarkStatus } from '@web/server/bookmarks/bookmark-actions/bookmark-actions';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import {
   customRenderServerAsync,
@@ -18,9 +18,9 @@ import { BookmarkButtonGate } from './bookmark-button-gate';
 faker.seed(5776);
 
 vi.mock(
-  '@web/server/settings-features/is-capability-enabled/is-capability-enabled',
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
   () => ({
-    isCapabilityEnabled: vi.fn(),
+    isReaderAccountFeatureEnabled: vi.fn(),
   }),
 );
 
@@ -47,7 +47,7 @@ const setup = customRenderServerAsync(
 
 describe(`<${BookmarkButtonGate.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
     vi.mocked(useSession).mockReturnValue({
       data: { user: { id: faker.string.uuid() }, expires: '' },
       status: SESSION_STATUS.AUTHENTICATED,
@@ -69,7 +69,7 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
   it.each<[string, () => void]>([
     [
       'bookmarks are not enabled',
-      () => vi.mocked(isCapabilityEnabled).mockResolvedValue(false),
+      () => vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(false),
     ],
     [
       'the site is suspended',
@@ -88,9 +88,11 @@ describe(`<${BookmarkButtonGate.name}/>`, () => {
     expect(toggle).not.toBeInTheDocument();
   });
 
-  it('checks the bookmarks capability', async () => {
+  it('checks bookmarks as a reader-account feature', async () => {
     await setup();
 
-    expect(isCapabilityEnabled).toHaveBeenCalledWith(CAPABILITY.BOOKMARKS);
+    expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
+      CAPABILITY.BOOKMARKS,
+    );
   });
 });

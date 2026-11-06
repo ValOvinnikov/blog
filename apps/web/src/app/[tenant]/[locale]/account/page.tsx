@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: TProps): Promise<Metadata> {
   return buildAccountMetadata();
 }
 
-// A reader signed in before the site's reader features went off keeps export and deletion here.
+// A reader signed in before Reader accounts went off keeps export and deletion here.
 const isAccountReachable = async (): Promise<boolean> =>
   (await isReaderAccountEnabled()) || Boolean((await auth())?.user?.id);
 

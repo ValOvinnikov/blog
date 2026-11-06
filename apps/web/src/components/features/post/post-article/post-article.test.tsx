@@ -139,7 +139,7 @@ describe(`<${PostArticle.name}/>`, () => {
   });
 
   it('renders the bookmark toggle and share button in the header', async () => {
-    vi.mocked(isCapabilityEnabled).mockResolvedValueOnce(true);
+    vi.mocked(isCapabilityEnabled).mockResolvedValue(true);
     getPostMock.mockResolvedValueOnce(
       okResult({ ...MOCK_POST, tags: [], heroImage: undefined }),
     );

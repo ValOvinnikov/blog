@@ -577,7 +577,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     expect(googleButton).not.toBeInTheDocument();
   });
 
-  it('hides the sign-in menu without a reader-account capability', async () => {
+  it('hides the sign-in menu with Reader accounts off', async () => {
     isReaderAccountEnabledMock.mockResolvedValue(false);
 
     await setup();
@@ -604,7 +604,7 @@ describe(`<${SiteHeader.name}/>`, () => {
       );
     });
 
-    it('shows the sign-in menu with a reader-account capability enabled', () => {
+    it('shows the sign-in menu with Reader accounts on', () => {
       const [signInButton] = getBarSignInButtons();
 
       expect(signInButton).toBeVisible();

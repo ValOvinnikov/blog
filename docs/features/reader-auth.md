@@ -40,7 +40,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 - **Operator (env)** — an OAuth provider is registered only when both its id and secret are set; the header advertises exactly the registered set (`getEnabledOAuthProviderIds`). The magic-link provider is always registered.
 - **Owner (platform Email page)** — the magic-link and invite email subject, body, logo, sender name, reply-to and footer postal address (see [email](./email.md)).
-- **Plan / capability** — no capability of its own. The sign-in entry point exists only while bookmarks, comments or newsletter is enabled, so a `FREE` site shows no sign-in.
+- **Plan / capability** — `READER_ACCOUNTS`, the Reader accounts switch on Features. The sign-in entry point, in the bar and the phone menu, exists only while it is on; it is `GROWTH` only, so a `FREE` site shows no sign-in.
 - **Look** — the account button, account panel and phone placement (Growth-only on the Look page) shape the header control; the email brand follows the tenant's preset, accent and logo hue (`resolveTenantEmailBrand`). Panel copy is fixed (`authMenu.*`), not Voice, including Hub's two tile lines.
 
 ## Constraints and invariants
