@@ -8,7 +8,6 @@ import {
 
 type TLooseNode = Record<string, unknown>;
 
-/** Whether a Portable Text value carries no real authored content — an unset/empty value, or a single empty default-style paragraph. */
 export const isBlankPortableTextValue = (value: unknown): boolean => {
   if (isUndefined(value) || isNull(value) || !Array.isArray(value)) return true;
   const blocks = value as TLooseNode[];
