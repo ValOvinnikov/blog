@@ -67,6 +67,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     lookFields: [
       LOOK_FIELD.PRESET,
       LOOK_FIELD.ACCENT_HUE,
+      LOOK_FIELD.BRAND_NAME,
       LOOK_FIELD.LOGO_ASSET_URL,
       LOOK_FIELD.FAVICON_ASSET_URL,
       LOOK_FIELD.COOKIE_SETTINGS_BUTTON,

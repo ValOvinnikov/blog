@@ -29,6 +29,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
 import { pickEntitledLook } from '@blog/db/utils/effective-look/effective-look';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -37,6 +38,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
+import { blankToNull } from '@platform/utils/email-draft/email-draft';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -71,6 +73,7 @@ const updateLookInputSchema = z.object({
   footerBackground: z.enum(BRAND_VARIANT),
   footerSurface: z.enum(FOOTER_SURFACE),
   cookieSettingsButton: z.enum(COOKIE_SETTINGS_BUTTON),
+  brandName: z.string().trim().max(BRAND_NAME_MAX_LENGTH),
 });
 
 export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
@@ -88,7 +91,7 @@ export const updateLookAction = async (
   }
 
   const { tenant } = await requireTenantMembership(tenantId);
-  const { preset, ...rest } = parsed.data;
+  const { preset, brandName, ...rest } = parsed.data;
 
   try {
     const stored = lookFormValuesOrDefaults(
@@ -103,7 +106,13 @@ export const updateLookAction = async (
       return toNotInPlanRefusal(tenant.plan, refused);
     }
 
-    const look = { preset, ...pickEntitledLook(rest, tenant.plan) };
+    const look = {
+      preset,
+      ...pickEntitledLook(
+        { ...rest, brandName: blankToNull(brandName) },
+        tenant.plan,
+      ),
+    };
     await queries.siteConfig.upsertSiteConfig(tenant.id, look);
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({

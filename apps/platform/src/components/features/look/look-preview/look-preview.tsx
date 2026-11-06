@@ -46,7 +46,7 @@ export const LookPreview = ({
   followTarget,
   isShown,
 }: TLookPreviewProps) => {
-  const { tenantName, values, isSubmenuPreviewOpen, previewDevice } =
+  const { shownBrandName, values, isSubmenuPreviewOpen, previewDevice } =
     useLookForm();
   const tPreview = useTranslations('previewModeControl');
   const { toolbarProps, isDark, isSignedIn } =
@@ -79,7 +79,7 @@ export const LookPreview = ({
   const sample = (
     <>
       <LookSample
-        brand={{ name: tenantName, logoSrc: values.logo.url }}
+        brand={{ name: shownBrandName, logoSrc: values.logo.url }}
         theme={theme}
         liveLocales={liveLocales}
         header={toSampleHeaderStyle(values)}

@@ -12,6 +12,7 @@ import {
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
+import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   mockReadyTenant,
   MOCK_ARCHIVED_AT,
@@ -81,6 +82,7 @@ const MOCK_TENANT = mockReadyTenant();
 const MOCK_GROWTH_TENANT = { ...MOCK_TENANT, plan: TENANT_PLAN.GROWTH };
 const MOCK_INVITE_SUBJECT = faker.lorem.sentence();
 const MOCK_CONFIG_DATE = faker.date.past();
+const MOCK_BRAND_NAME = faker.company.name();
 
 const mockEmailConfig = (
   overrides: Partial<TEmailConfig> = {},
@@ -165,6 +167,26 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
       expect(subjectInput).toBeVisible();
     });
+  });
+
+  it('names the tenant in the email preview when no brand name is saved', async () => {
+    await setup();
+
+    const preview = screen.getByTitle(en.emailPreview.iframeTitle);
+
+    expect(preview.getAttribute('srcdoc')).toContain(MOCK_TENANT.name);
+  });
+
+  it('names the saved brand name in the email preview', async () => {
+    getSiteConfigMock.mockResolvedValueOnce(
+      mockSiteConfig({ brandName: MOCK_BRAND_NAME }),
+    );
+
+    await setup();
+
+    const preview = screen.getByTitle(en.emailPreview.iframeTitle);
+
+    expect(preview.getAttribute('srcdoc')).toContain(MOCK_BRAND_NAME);
   });
 
   it("renders the tenant's saved sender settings", async () => {

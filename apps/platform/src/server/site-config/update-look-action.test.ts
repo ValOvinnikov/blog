@@ -27,7 +27,11 @@ import {
   SPINNER_STYLE,
   type TMaybeNull,
 } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import {
+  BRAND_NAME_MAX_LENGTH,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@blog/db/constants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
@@ -89,6 +93,8 @@ const UNSUPPORTED_BUSY_BUTTON_STYLE = 'SHAKE';
 const UNSUPPORTED_ACCOUNT_PANEL_STYLE = 'DRAWER';
 const UNSUPPORTED_FOOTER_LAYOUT = 'MASONRY';
 
+const MOCK_BRAND_NAME = faker.company.name();
+
 const VALID_INPUT: TUpdateLookInput = {
   preset: PRESET_ID.EDITORIAL,
   accentHue: faker.number.int({ min: HUE_MIN, max: HUE_MAX }),
@@ -112,6 +118,7 @@ const VALID_INPUT: TUpdateLookInput = {
   footerBackground: BRAND_VARIANT.SECONDARY,
   footerSurface: FOOTER_SURFACE.CARD,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
+  brandName: MOCK_BRAND_NAME,
 };
 
 const onPlan = (plan: TTenantPlan) =>
@@ -152,8 +159,9 @@ describe(updateLookAction, () => {
       onPlan(TENANT_PLAN.FREE);
     });
 
-    it('writes only the preset, accent hue and cookie settings button, leaving every Growth-only field stored as it is', async () => {
-      const { preset, accentHue, cookieSettingsButton } = VALID_INPUT;
+    it('writes only the preset, accent hue, cookie settings button and brand name, leaving every Growth-only field stored as it is', async () => {
+      const { preset, accentHue, cookieSettingsButton, brandName } =
+        VALID_INPUT;
 
       await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
@@ -161,6 +169,7 @@ describe(updateLookAction, () => {
         preset,
         accentHue,
         cookieSettingsButton,
+        brandName,
       });
     });
 
@@ -207,16 +216,39 @@ describe(updateLookAction, () => {
     });
 
     it('audits only what it wrote', async () => {
-      const { preset, accentHue, cookieSettingsButton } = VALID_INPUT;
+      const { preset, accentHue, cookieSettingsButton, brandName } =
+        VALID_INPUT;
 
       await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
       expect(insertAuditEventMock).toHaveBeenCalledWith(
         expect.objectContaining({
-          details: { preset, accentHue, cookieSettingsButton },
+          details: { preset, accentHue, cookieSettingsButton, brandName },
         }),
       );
     });
+  });
+
+  it('clears the brand name when it is saved blank', async () => {
+    await updateLookAction(MOCK_TENANT_ID, { ...VALID_INPUT, brandName: ' ' });
+
+    expect(upsertSiteConfigMock).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      expect.objectContaining({ brandName: null }),
+    );
+  });
+
+  it('rejects a brand name over the length limit without writing it', async () => {
+    const result = await updateLookAction(MOCK_TENANT_ID, {
+      ...VALID_INPUT,
+      brandName: 'x'.repeat(BRAND_NAME_MAX_LENGTH + 1),
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+    expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
   it('revalidates the site config after a successful save', async () => {

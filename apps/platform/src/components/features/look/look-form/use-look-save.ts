@@ -112,6 +112,7 @@ export const useLookSave = ({
         footerSurface: vals.footerSurface,
         cookieSettingsButton: vals.cookieSettingsButton,
         languageSwitcherStyle: vals.languageSwitcherStyle,
+        brandName: vals.brandName,
       });
       finish(result.outcome);
       return result;
