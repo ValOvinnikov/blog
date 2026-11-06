@@ -128,7 +128,7 @@ export const WithoutBookmarks: TStory = {
   render: (args) => (
     <div className="grid gap-6">
       {Object.values(ACCOUNT_PANEL_STYLE).map((appearance) => (
-        <div key={appearance} className="relative min-h-[300px]">
+        <div key={appearance} className="relative min-h-[360px]">
           <p>{appearance}</p>
           <InteractiveAccountPanel
             {...args}
