@@ -19,6 +19,7 @@ import { FooterGroupItem } from './components/group-item/footer-group-item';
 import { FooterGroups } from './components/groups/footer-groups';
 import { FooterLogo } from './components/logo/footer-logo';
 import { FooterNav } from './components/nav/footer-nav';
+import { FooterPoweredBy } from './components/powered-by/footer-powered-by';
 import { FooterSocial } from './components/social/footer-social';
 import { FooterWordmark } from './components/wordmark/footer-wordmark';
 import {
@@ -40,6 +41,7 @@ const FooterSlotParts = {
   Copyright: FooterCopyright,
   FinePrint: FooterFinePrint,
   Nav: FooterNav,
+  PoweredBy: FooterPoweredBy,
 } satisfies Record<TFooterSlot, ElementType>;
 
 const FooterParts = {

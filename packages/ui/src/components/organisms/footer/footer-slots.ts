@@ -13,7 +13,8 @@ export type TFooterSlot =
   | 'Wordmark'
   | 'Copyright'
   | 'FinePrint'
-  | 'Nav';
+  | 'Nav'
+  | 'PoweredBy';
 
 export const BRAND_SLOTS: readonly TFooterSlot[] = [
   'Logo',
@@ -25,6 +26,7 @@ export const BOTTOM_SLOTS: readonly TFooterSlot[] = [
   'Copyright',
   'FinePrint',
   'Nav',
+  'PoweredBy',
 ];
 const FULL_SLOTS = [...BRAND_SLOTS, 'Groups', ...BOTTOM_SLOTS] as const;
 
@@ -52,4 +54,5 @@ export const SLOT_HAS_CONTENT: Record<
   Copyright: isValidElement,
   FinePrint: hasSlotContent,
   Nav: hasSlotContent,
+  PoweredBy: isValidElement,
 };
