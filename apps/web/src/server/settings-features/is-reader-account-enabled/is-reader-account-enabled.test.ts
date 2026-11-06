@@ -1,9 +1,4 @@
-import {
-  CAPABILITY,
-  COMING_SOON_CAPABILITIES,
-  LIVE_READER_ACCOUNT_CAPABILITIES,
-  type TCapability,
-} from '@blog/config';
+import { CAPABILITY, type TCapability } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
@@ -16,6 +11,7 @@ import {
 import {
   isReaderAccountEnabled,
   isReaderAccountEnabledForTenant,
+  isReaderAccountFeatureEnabled,
 } from './is-reader-account-enabled';
 
 faker.seed(6010);
@@ -52,32 +48,37 @@ beforeEach(() => {
 });
 
 describe(isReaderAccountEnabled, () => {
-  it.each(LIVE_READER_ACCOUNT_CAPABILITIES)(
-    'is enabled when %s is the only live reader-account capability enabled',
-    async (capability) => {
-      enableOnly(capability);
+  it('is enabled when Reader accounts is on', async () => {
+    enableOnly(CAPABILITY.READER_ACCOUNTS);
 
-      await expect(isReaderAccountEnabled()).resolves.toBe(true);
-    },
-  );
+    await expect(isReaderAccountEnabled()).resolves.toBe(true);
+  });
 
-  it('is disabled when only capabilities that need no reader account are enabled', async () => {
-    enableOnly(CAPABILITY.ANALYTICS, CAPABILITY.CONSENT_BANNER);
+  it('is disabled when Reader accounts is off, whatever else is on', async () => {
+    enableOnly(
+      CAPABILITY.BOOKMARKS,
+      CAPABILITY.COMMENTS,
+      CAPABILITY.RATINGS,
+      CAPABILITY.NEWSLETTER,
+    );
 
     await expect(isReaderAccountEnabled()).resolves.toBe(false);
   });
 
-  it('is disabled when only coming-soon capabilities are enabled', async () => {
-    enableOnly(...COMING_SOON_CAPABILITIES);
+  it('is disabled on a Free site with Reader accounts on', async () => {
+    vi.mocked(queries.tenants.getTenantById).mockResolvedValue(
+      mockTenant({ plan: TENANT_PLAN.FREE }),
+    );
+    enableOnly(CAPABILITY.READER_ACCOUNTS);
 
     await expect(isReaderAccountEnabled()).resolves.toBe(false);
   });
 });
 
 describe(isReaderAccountEnabledForTenant, () => {
-  describe('with a reader-account capability on', () => {
+  describe('with Reader accounts on', () => {
     beforeEach(() => {
-      enableOnly(CAPABILITY.BOOKMARKS);
+      enableOnly(CAPABILITY.READER_ACCOUNTS);
     });
 
     it('is enabled', async () => {
@@ -96,11 +97,32 @@ describe(isReaderAccountEnabledForTenant, () => {
     });
   });
 
-  it('is disabled for a tenant with no reader-account capability on', async () => {
-    enableOnly(CAPABILITY.ANALYTICS);
+  it('is disabled for a tenant with Reader accounts off', async () => {
+    enableOnly(CAPABILITY.BOOKMARKS);
 
     await expect(isReaderAccountEnabledForTenant(MOCK_TENANT_ID)).resolves.toBe(
       false,
     );
+  });
+});
+
+describe(isReaderAccountFeatureEnabled, () => {
+  it('is enabled when both Reader accounts and the feature are on', async () => {
+    enableOnly(CAPABILITY.READER_ACCOUNTS, CAPABILITY.BOOKMARKS);
+
+    await expect(
+      isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
+    ).resolves.toBe(true);
+  });
+
+  it.each<[string, TCapability[]]>([
+    ['Reader accounts is off', [CAPABILITY.BOOKMARKS]],
+    ['the feature is off', [CAPABILITY.READER_ACCOUNTS]],
+  ])('is disabled when %s', async (_, enabled) => {
+    enableOnly(...enabled);
+
+    await expect(
+      isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
+    ).resolves.toBe(false);
   });
 });

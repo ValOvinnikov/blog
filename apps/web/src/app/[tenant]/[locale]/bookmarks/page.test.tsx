@@ -1,5 +1,5 @@
-import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { isReaderAccountEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
+import { CAPABILITY, NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { notFound } from 'next/navigation';
@@ -19,7 +19,7 @@ vi.mock('@web/server/request-context/request-context');
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
   () => ({
-    isReaderAccountEnabled: vi.fn(),
+    isReaderAccountFeatureEnabled: vi.fn(),
   }),
 );
 
@@ -27,11 +27,11 @@ const setup = customRenderAsync(BookmarksRoute, { params: mockRouteParams() });
 
 describe(`<${BookmarksRoute.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(isReaderAccountEnabled).mockReset();
+    vi.mocked(isReaderAccountFeatureEnabled).mockReset();
   });
 
-  it('renders BookmarksPage when the tenant has reader accounts enabled', async () => {
-    vi.mocked(isReaderAccountEnabled).mockResolvedValue(true);
+  it('renders BookmarksPage when bookmarks are enabled', async () => {
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
 
     await setup();
 
@@ -40,11 +40,21 @@ describe(`<${BookmarksRoute.name}/>`, () => {
     expect(notFound).not.toHaveBeenCalled();
   });
 
-  it('responds not-found when the tenant has reader accounts disabled', async () => {
-    vi.mocked(isReaderAccountEnabled).mockResolvedValue(false);
+  it('responds not-found when bookmarks are disabled', async () => {
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(false);
 
     await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
 
     expect(notFound).toHaveBeenCalledTimes(1);
+  });
+
+  it('checks bookmarks as a reader-account feature', async () => {
+    vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValue(true);
+
+    await setup();
+
+    expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
+      CAPABILITY.BOOKMARKS,
+    );
   });
 });

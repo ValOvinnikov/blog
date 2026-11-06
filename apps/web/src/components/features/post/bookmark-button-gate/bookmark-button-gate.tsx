@@ -1,6 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { BookmarkButton } from '@web/components/shared/bookmark-button';
-import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { isRequestTenantActive } from '@web/server/tenant/write-gate/write-gate';
 
 export type TBookmarkButtonGateProps = {
@@ -11,7 +11,7 @@ export const BookmarkButtonGate = async ({
   postId,
 }: TBookmarkButtonGateProps) => {
   const [isEnabled, isActive] = await Promise.all([
-    isCapabilityEnabled(CAPABILITY.BOOKMARKS),
+    isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
     isRequestTenantActive(),
   ]);
   if (!isEnabled || !isActive) return null;
