@@ -666,9 +666,9 @@
       "CODES": "Compact"
     },
     "languageSwitcherOptionDescription": {
-      "MENU_CODE": "A menu showing the language code",
-      "MENU_GLOBE": "A menu showing a globe icon",
-      "CODES": "Every language code in a row"
+      "MENU_CODE": "The current language's code opens a menu",
+      "MENU_GLOBE": "A globe icon opens the language menu",
+      "CODES": "Language codes side by side, for a few languages"
     },
     "colourHeading": "Colour",
     "colourDescription": "Only the hue changes, so text stays readable.",

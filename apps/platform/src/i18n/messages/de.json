@@ -666,9 +666,9 @@
       "CODES": "Kompakt"
     },
     "languageSwitcherOptionDescription": {
-      "MENU_CODE": "Ein Menü mit dem Sprachcode",
-      "MENU_GLOBE": "Ein Menü mit einem Globus-Symbol",
-      "CODES": "Alle Sprachcodes in einer Reihe"
+      "MENU_CODE": "Der Code der aktuellen Sprache öffnet ein Menü",
+      "MENU_GLOBE": "Ein Globus-Symbol öffnet das Sprachmenü",
+      "CODES": "Sprachcodes nebeneinander, für wenige Sprachen"
     },
     "colourHeading": "Farbe",
     "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",

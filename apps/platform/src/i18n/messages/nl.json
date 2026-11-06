@@ -666,9 +666,9 @@
       "CODES": "Compact"
     },
     "languageSwitcherOptionDescription": {
-      "MENU_CODE": "Een menu met de taalcode",
-      "MENU_GLOBE": "Een menu met een wereldbolicoon",
-      "CODES": "Alle taalcodes op een rij"
+      "MENU_CODE": "De code van de huidige taal opent een menu",
+      "MENU_GLOBE": "Een wereldbolicoon opent het taalmenu",
+      "CODES": "Taalcodes naast elkaar, voor een paar talen"
     },
     "colourHeading": "Kleur",
     "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",
