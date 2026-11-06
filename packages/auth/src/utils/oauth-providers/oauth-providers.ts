@@ -7,7 +7,10 @@ import { isUndefined } from '@blog/utils/primitives';
 
 export type TOAuthProviderId = TOAuthProvider;
 
-export const OAUTH_PROVIDER_IDS = Object.values(OAUTH_PROVIDER);
+export const OAUTH_PROVIDER_IDS = [
+  OAUTH_PROVIDER.GITHUB,
+  OAUTH_PROVIDER.GOOGLE,
+] as const satisfies readonly TOAuthProviderId[];
 
 const OAUTH_CREDENTIAL_GETTERS: Record<
   TOAuthProviderId,
