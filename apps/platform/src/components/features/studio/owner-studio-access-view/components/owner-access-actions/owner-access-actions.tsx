@@ -11,6 +11,10 @@ import { useToast } from '@platform/context/toast-provider';
 import { checkOwnerAccessAction } from '@platform/server/owner-access/check-owner-access-action';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
 import { resendOwnerInviteAction } from '@platform/server/owner-access/resend-owner-invite-action';
+import {
+  settleAction,
+  type TUnreachedAction,
+} from '@platform/utils/settle-action/settle-action';
 import { tv } from '@platform/utils/tv/tv';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -40,7 +44,10 @@ export const OwnerAccessActions = ({
   const isInviteSent = studioAccess === OWNER_STUDIO_ACCESS.INVITE_SENT;
   const isStalled = studioAccess === OWNER_STUDIO_ACCESS.STALLED;
 
-  const settle = (result: TOwnerAccessRequestResult, successKey: string) => {
+  const settle = (
+    result: TOwnerAccessRequestResult | TUnreachedAction,
+    successKey: string,
+  ) => {
     if (!isOutcomeSuccess(result)) {
       toast.error({ message: t('requestFailed') });
       return;
@@ -51,13 +58,19 @@ export const OwnerAccessActions = ({
 
   const handleCheck = () => {
     startCheck(async () => {
-      settle(await checkOwnerAccessAction(tenantId), 'checkStarted');
+      settle(
+        await settleAction(checkOwnerAccessAction(tenantId)),
+        'checkStarted',
+      );
     });
   };
 
   const handleResend = () => {
     startResend(async () => {
-      settle(await resendOwnerInviteAction(tenantId), 'inviteResent');
+      settle(
+        await settleAction(resendOwnerInviteAction(tenantId)),
+        'inviteResent',
+      );
     });
   };
 

@@ -30,6 +30,7 @@ import {
   CUSTOM_DOMAIN_FIELD_ERROR_KEYS,
   CUSTOM_DOMAIN_REFUSAL_KEYS,
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
@@ -119,7 +120,7 @@ export const useVerifyCustomDomain = (tenantId: string) => {
 
   const verify = () => {
     startTransition(async () => {
-      const result = await verifyCustomDomainAction(tenantId);
+      const result = await settleAction(verifyCustomDomainAction(tenantId));
       setManual(result);
 
       if (isOutcomeSuccess(result)) {

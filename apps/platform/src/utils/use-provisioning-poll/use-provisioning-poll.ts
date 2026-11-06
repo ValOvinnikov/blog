@@ -1,7 +1,9 @@
 'use client';
 
 import {
-  ACTION_OUTCOME,
+  type ACTION_OUTCOME,
+  isOutcomeRefused,
+  isOutcomeSuccess,
   type TMaybeNull,
   type TMaybeUndefined,
 } from '@blog/config';
@@ -22,6 +24,7 @@ import {
   provisioningViewState,
   type TProvisioningViewState,
 } from '@platform/utils/provisioning-view-state/provisioning-view-state';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useDocumentVisible } from '@platform/utils/use-document-visible/use-document-visible';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
@@ -126,21 +129,19 @@ export const useProvisioningPoll = (
     setIsDispatchPending(true);
     setPollTicks(0);
     startTransition(async () => {
-      const result = await retryProvisioningStepAction(tenant.id);
+      const result = await settleAction(retryProvisioningStepAction(tenant.id));
 
       const isRunUnderway =
-        result.outcome === ACTION_OUTCOME.SUCCESS ||
-        (result.outcome === ACTION_OUTCOME.REFUSED &&
+        isOutcomeSuccess(result) ||
+        (isOutcomeRefused(result) &&
           result.reason === TENANT_REFUSAL.ALREADY_IN_PROGRESS);
       if (isRunUnderway) {
         setPolledProvisioningStatus(TENANT_PROVISIONING_STATUS.PROVISIONING);
         router.refresh();
       }
-      if (result.outcome !== ACTION_OUTCOME.SUCCESS) {
+      if (!isOutcomeSuccess(result)) {
         setDispatchNotice(
-          result.outcome === ACTION_OUTCOME.REFUSED
-            ? result.reason
-            : result.outcome,
+          isOutcomeRefused(result) ? result.reason : result.outcome,
         );
       }
 

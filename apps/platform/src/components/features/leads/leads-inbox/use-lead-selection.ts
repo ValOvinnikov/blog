@@ -8,6 +8,7 @@ import { useLeadsTenantId } from '@platform/components/features/leads/leads-tena
 import { useToast } from '@platform/context/toast-provider';
 import { setLeadReadAction } from '@platform/server/leads/set-lead-read-action';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
@@ -55,7 +56,7 @@ export const useLeadSelection = ({
     isRead: boolean,
   ) => {
     updateLead(id, { isRead });
-    const result = await setLeadReadAction(tenantId, id, isRead);
+    const result = await settleAction(setLeadReadAction(tenantId, id, isRead));
     if (isOutcomeSuccess(result)) {
       router.refresh();
       return;

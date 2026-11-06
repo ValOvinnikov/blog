@@ -8,6 +8,7 @@ import {
 } from '@platform/testing/blocked-signups/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
+import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { AddBlockedDomainCard } from './add-blocked-domain-card';
@@ -87,5 +88,29 @@ describe(`<${AddBlockedDomainCard.name}/>`, () => {
     expect(error).toBeVisible();
     expect(reasonField).toHaveValue(MOCK_BLOCK_REASON);
     expect(refresh).not.toHaveBeenCalled();
+  });
+
+  it('keeps the input when the request never reaches the server, and blocks the domain on retry', async () => {
+    vi.mocked(addBlockedDomainAction)
+      .mockRejectedValueOnce(MOCK_UNREACHED_REQUEST)
+      .mockResolvedValueOnce({ outcome: ACTION_OUTCOME.SUCCESS });
+
+    const submit = screen.getByRole('button', SUBMIT_BUTTON);
+    await user.click(submit);
+
+    const error = await screen.findByText(
+      addBlockedDomainCard.domainBlockFailed,
+    );
+
+    const domainField = screen.getByRole('textbox', DOMAIN_FIELD);
+    const reasonField = screen.getByRole('textbox', REASON_FIELD);
+
+    expect(error).toBeVisible();
+    expect(domainField).toHaveValue(MOCK_BLOCKED_DOMAIN);
+    expect(reasonField).toHaveValue(MOCK_BLOCK_REASON);
+
+    await user.click(submit);
+
+    expect(refresh).toHaveBeenCalledTimes(1);
   });
 });

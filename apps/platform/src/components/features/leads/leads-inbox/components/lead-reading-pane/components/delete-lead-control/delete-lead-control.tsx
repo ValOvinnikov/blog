@@ -1,12 +1,13 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE } from '@blog/config';
+import { isOutcomeRefused, isOutcomeSuccess, SIZE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import { ConfirmDialog } from '@platform/components/shared/confirm-dialog';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { LEAD_REFUSAL } from '@platform/constants/lead';
 import { deleteLeadAction } from '@platform/server/leads/delete-lead-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useTranslations } from 'next-intl';
 
 export type TDeleteLeadControlProps = {
@@ -24,12 +25,11 @@ export const DeleteLeadControl = ({
   const tenantId = useLeadsTenantId();
 
   const handleConfirm = async () => {
-    const result = await deleteLeadAction(tenantId, leadId);
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) return okResult();
+    const result = await settleAction(deleteLeadAction(tenantId, leadId));
+    if (isOutcomeSuccess(result)) return okResult();
 
     const isGone =
-      result.outcome === ACTION_OUTCOME.REFUSED &&
-      result.reason === LEAD_REFUSAL.NOT_FOUND;
+      isOutcomeRefused(result) && result.reason === LEAD_REFUSAL.NOT_FOUND;
     if (isGone) onDeleted(leadId);
     return errorResult(t(isGone ? 'errors.notFound' : 'errors.failed'));
   };

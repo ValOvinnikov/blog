@@ -8,6 +8,7 @@ import type {
   TTenantLifecycleRefusal,
   TTenantLifecycleResult,
 } from '@platform/server/provisioning/tenant-lifecycle-result';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useTranslations } from 'next-intl';
 
 const FIELD_ERROR_KEYS = {
@@ -61,7 +62,7 @@ export const useTenantLifecycleAction = <
   };
 
   return async (...args: TArgs) => {
-    const result = await action(...args);
+    const result = await settleAction(action(...args));
     if (isOutcomeSuccess(result)) return okResult();
     return errorResult(t(errorKey(result)));
   };

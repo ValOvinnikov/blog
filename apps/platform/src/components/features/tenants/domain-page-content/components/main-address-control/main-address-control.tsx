@@ -18,6 +18,7 @@ import {
 import { makeCustomDomainMainAddressAction } from '@platform/server/custom-domain/make-custom-domain-main-address-action';
 import { makeSubdomainMainAddressAction } from '@platform/server/custom-domain/make-subdomain-main-address-action';
 import { CUSTOM_DOMAIN_REFUSAL_KEYS } from '@platform/utils/custom-domain-keys/custom-domain-keys';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
@@ -43,10 +44,11 @@ export const MainAddressControl = ({
   const copyKey = COPY_KEY[target];
 
   const confirm = async () => {
-    const result =
+    const result = await settleAction(
       target === MAIN_ADDRESS_TARGET.CUSTOM_DOMAIN
-        ? await makeCustomDomainMainAddressAction(tenantId, { domain })
-        : await makeSubdomainMainAddressAction(tenantId);
+        ? makeCustomDomainMainAddressAction(tenantId, { domain })
+        : makeSubdomainMainAddressAction(tenantId),
+    );
 
     if (isOutcomeSuccess(result)) return okResult();
     if (isOutcomeInvalid(result)) return errorResult(t('invalidInput'));

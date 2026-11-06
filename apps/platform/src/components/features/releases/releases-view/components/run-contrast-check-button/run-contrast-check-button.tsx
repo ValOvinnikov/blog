@@ -1,12 +1,18 @@
 'use client';
 
-import { ACTION_OUTCOME, SIZE, type TOutcome } from '@blog/config';
+import {
+  isOutcomeRefused,
+  isOutcomeSuccess,
+  isOutcomeUnavailable,
+  SIZE,
+} from '@blog/config';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { RELEASE_REFUSAL } from '@platform/constants/release';
 import { useToast } from '@platform/context/toast-provider';
 import { startContrastCheckAction } from '@platform/server/releases/start-contrast-check-action';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
@@ -16,17 +22,12 @@ const REFUSAL_KEYS = {
 } satisfies Record<typeof RELEASE_REFUSAL.CONTRAST_CHECK_RUNNING, string>;
 
 const failureKey = (
-  result: Exclude<
-    Awaited<ReturnType<typeof startContrastCheckAction>>,
-    TOutcome<typeof ACTION_OUTCOME.SUCCESS>
-  >,
+  result: Awaited<ReturnType<typeof startContrastCheckAction>>,
 ) => {
-  if (result.outcome === ACTION_OUTCOME.REFUSED) {
+  if (isOutcomeRefused(result)) {
     return REFUSAL_KEYS[result.reason];
   }
-  return result.outcome === ACTION_OUTCOME.UNAVAILABLE
-    ? 'githubUnavailable'
-    : 'startFailed';
+  return isOutcomeUnavailable(result) ? 'githubUnavailable' : 'startFailed';
 };
 
 export type TRunContrastCheckButtonProps = {
@@ -45,9 +46,9 @@ export const RunContrastCheckButton = ({
 
   const handleClick = () => {
     startTransition(async () => {
-      const result = await startContrastCheckAction();
+      const result = await settleAction(startContrastCheckAction());
 
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      if (isOutcomeSuccess(result)) {
         onStarted();
         toast.success({ message: t('started') });
         router.refresh();

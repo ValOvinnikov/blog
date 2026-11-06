@@ -1,7 +1,10 @@
 import { isUndefined } from '@blog/utils/primitives';
 import { useLeadsTenantId } from '@platform/components/features/leads/leads-tenant-provider';
 import type { TInboxLeadsPage } from '@platform/server/leads/list-inbox-leads';
-import { loadMoreLeadsAction } from '@platform/server/leads/load-more-leads-action';
+import {
+  loadMoreLeadsAction,
+  type TLoadMoreLeadsResult,
+} from '@platform/server/leads/load-more-leads-action';
 import type { TInboxLead } from '@platform/server/leads/to-inbox-lead';
 import { useState, useTransition } from 'react';
 
@@ -16,7 +19,9 @@ export const useLeadsPages = (initialPage: TInboxLeadsPage) => {
     if (!nextCursor || isLoading) return;
     setHasLoadFailed(false);
     startLoading(async () => {
-      const result = await loadMoreLeadsAction(tenantId, nextCursor);
+      const result = await loadMoreLeadsAction(tenantId, nextCursor).catch(
+        (): TLoadMoreLeadsResult => ({ isLoaded: false }),
+      );
       if (!result.isLoaded) {
         setHasLoadFailed(true);
         return;

@@ -19,6 +19,7 @@ import {
 } from '@platform/testing/leads/fixtures';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { MOCK_UNREACHED_REQUEST } from '@platform/testing/unreached-request';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LeadsInbox } from './leads-inbox';
@@ -122,18 +123,34 @@ describe(`<${LeadsInbox.name}/>`, () => {
       expect(row).toHaveTextContent(leadsInbox.unread);
     });
 
-    it('puts the read state back and says so when saving it fails', async () => {
-      vi.mocked(setLeadReadAction).mockResolvedValueOnce({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
+    it.each([
+      [
+        'fails',
+        () =>
+          vi.mocked(setLeadReadAction).mockResolvedValueOnce({
+            outcome: ACTION_OUTCOME.SERVER_ERROR,
+          }),
+      ],
+      [
+        'never reaches the server',
+        () =>
+          vi
+            .mocked(setLeadReadAction)
+            .mockRejectedValueOnce(MOCK_UNREACHED_REQUEST),
+      ],
+    ])(
+      'puts the read state back and says so when saving it %s',
+      async (_, failSave) => {
+        failSave();
 
-      await user.click(row);
+        await user.click(row);
 
-      const error = await screen.findByText(leadsInbox.readStateFailed);
-      expect(error).toBeVisible();
-      expect(row).toHaveTextContent(leadsInbox.unread);
-      expect(refresh).not.toHaveBeenCalled();
-    });
+        const error = await screen.findByText(leadsInbox.readStateFailed);
+        expect(error).toBeVisible();
+        expect(row).toHaveTextContent(leadsInbox.unread);
+        expect(refresh).not.toHaveBeenCalled();
+      },
+    );
 
     it('moves focus to the message heading when the lead is opened by keyboard', async () => {
       await user.tab();

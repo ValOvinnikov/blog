@@ -13,6 +13,7 @@ import {
 } from '@platform/server/data-requests/export-personal-data-action';
 import { downloadFile } from '@platform/utils/download-file/download-file';
 import { toPersonalDataExportCsv } from '@platform/utils/personal-data-export-csv/personal-data-export-csv';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useState, useTransition } from 'react';
 
 const JSON_INDENT = 2;
@@ -50,7 +51,7 @@ export const useDataRequestExport = (exportFailed: string) => {
   ) => {
     setFormat(requestedFormat);
     startExport(async () => {
-      const result = await exportPersonalDataAction({ email });
+      const result = await settleAction(exportPersonalDataAction({ email }));
 
       if (isOutcomeSuccess(result)) {
         downloadFile(
