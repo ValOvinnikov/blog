@@ -1,7 +1,7 @@
 import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
-import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
+import { requireTenantOAuthEncryptionKey } from '@blog/db/utils/tenant-oauth-encryption-key/tenant-oauth-encryption-key';
 import { encryptSecret } from '@blog/utils';
 import { z } from 'zod';
 
@@ -23,7 +23,7 @@ export async function saveTenantOAuthCredentials(
     saveTenantOAuthCredentialsInputSchema.parse(input);
   const clientSecretEncrypted = encryptSecret(
     clientSecret,
-    requireTenantTokenEncryptionKey(),
+    requireTenantOAuthEncryptionKey(),
   );
 
   await getDb()
@@ -34,6 +34,6 @@ export async function saveTenantOAuthCredentials(
         tenantOAuthCredentials.tenantId,
         tenantOAuthCredentials.provider,
       ],
-      set: { clientId, clientSecretEncrypted, updatedAt: new Date() },
+      set: { clientId, clientSecretEncrypted },
     });
 }

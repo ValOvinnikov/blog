@@ -2,7 +2,7 @@ import type { TOAuthCredentials } from '@blog/config';
 import type { TOAuthProvider } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { tenantOAuthCredentials } from '@blog/db/schema/tenant-oauth-credentials';
-import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
+import { requireTenantOAuthEncryptionKey } from '@blog/db/utils/tenant-oauth-encryption-key/tenant-oauth-encryption-key';
 import { decryptSecret } from '@blog/utils';
 import { hasLength } from '@blog/utils/primitives';
 import { eq } from 'drizzle-orm';
@@ -25,7 +25,7 @@ export async function getTenantOAuthCredentials(
 
   if (!hasLength(rows)) return {};
 
-  const key = requireTenantTokenEncryptionKey();
+  const key = requireTenantOAuthEncryptionKey();
 
   return Object.fromEntries(
     rows.map(({ provider, clientId, clientSecretEncrypted }) => [

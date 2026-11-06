@@ -7,14 +7,14 @@ import {
   MOCK_OAUTH_CREDENTIALS,
   MOCK_REPLACEMENT_OAUTH_CREDENTIALS,
 } from '@blog/db/testing/tenant-oauth-credentials/fixtures';
-import { useTenantTokenEncryptionKey } from '@blog/db/testing/tenant-token-encryption-key';
+import { useTenantOAuthEncryptionKey } from '@blog/db/testing/tenant-oauth-encryption-key';
 
 import { getTenantOAuthCredentials } from './get-tenant-oauth-credentials';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-useTenantTokenEncryptionKey();
+useTenantOAuthEncryptionKey();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
