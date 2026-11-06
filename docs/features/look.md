@@ -107,7 +107,7 @@ The Look page is where a tenant owner styles their public site without touching 
 
 - Layers: `config` (presets, theme declaration tables, the hue guard), `db` (`site_config`), `web`, `platform`.
 - Features: [design-tokens-and-surfaces](./design-tokens-and-surfaces.md), [voice](./voice.md) (shares the row, preview tokens and revalidation), [languages](./languages.md), [email](./email.md), [platform-shell](./platform-shell.md), [tenant-access](./tenant-access.md), [audit-and-findings](./audit-and-findings.md), [rendering-and-caching](./rendering-and-caching.md), [plans-and-entitlements](./plans-and-entitlements.md) (preset feature defaults).
-- Env: `SITE_CONFIG_REVALIDATE_SECRET` (both apps), `WEB_APP_URL` and `BLOB_READ_WRITE_TOKEN` (platform).
+- Env: `SITE_CONFIG_REVALIDATE_SECRET` (both apps), `WEB_APP_URL`, `BLOB_READ_WRITE_TOKEN` and `PRODUCT_NAME` (platform, the powered-by mark in the preview and the Footer card note).
 
 ## Entry points
 
