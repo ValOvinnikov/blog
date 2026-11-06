@@ -4,7 +4,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { useToast } from '@platform/context/toast-provider';
 import { useEffect, useRef } from 'react';
 
-export const useRefusalToast = (
+export const useSaveErrorToast = (
   message: TMaybeUndefined<string>,
   isPending: boolean,
 ) => {

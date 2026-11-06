@@ -7,7 +7,6 @@ export const settingsFormShellVariants = tv({
       'flex flex-col gap-6',
       'md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-dock))+var(--spacing-admin-dock-clearance))]',
     ],
-    alert: ['w-fit'],
     liveStatus: ['sr-only'],
   },
   variants: {

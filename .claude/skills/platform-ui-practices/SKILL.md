@@ -342,9 +342,9 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   language, a collapsed row), `invalidControls.revealFirst` shows it before the
   save bar's link focuses it. A save failure that belongs to no field goes
   to the shell as `errorTitle` (a plan refusal arrives as `form.planRefusal`):
-  it shows in the save bar's error slot while the bar shows. A plan refusal
-  that leaves nothing unsaved is a `toast.error`, which stays until the owner
-  dismisses it or saves again.
+  it shows in the save bar's error slot while changes remain. A failure that
+  leaves nothing unsaved (a plan refusal that restored every refused value) is
+  a `toast.error`, which stays until the owner dismisses it or saves again.
 - An embedded edit panel outside the shell (today only the tenant details panel)
   calls `useUnsavedChangesGuard`, submits from a right-aligned `Card.Footer`,
   and shows its save error beside Save through `Card.Footer`'s `error`.
@@ -498,8 +498,8 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   - an invalid field shows under the field, plus the count in the save bar;
   - a success is `toast.success`;
   - a failed save from the save bar shows in the bar, beside Save, until the
-    next edit or save; a plan refusal that leaves nothing unsaved is a
-    `toast.error` instead;
+    next edit or save; one that leaves nothing unsaved is a `toast.error`
+    instead;
   - a failed one-off button action is `toast.error`, or an error `Alert`
     directly beside the button;
   - a failure inside a dialog is an `Alert` in the dialog, which stays open;

@@ -499,14 +499,33 @@ describe(`<${SettingsFormShell.name}/>`, () => {
       expect(errorAlert).not.toBeInTheDocument();
     });
 
-    it('shows its message at the top of the page when no save bar shows', () => {
+    it('shows its message as a toast when no changes remain', () => {
       renderShell({}, { errorTitle: MOCK_ERROR_TITLE });
 
+      const toasts = screen.getByTestId(TOAST_TEST_ID.VIEWPORT);
       const errorAlert = screen.getByRole('alert');
-      const saveBar = screen.queryByRole('region', { name: UNSAVED_CHANGES });
 
       expect(errorAlert).toHaveTextContent(MOCK_ERROR_TITLE);
-      expect(saveBar).not.toBeInTheDocument();
+      expect(toasts).toContainElement(errorAlert);
+    });
+
+    it('shows a plan refusal nowhere while the page hides the save bar over remaining changes', () => {
+      const refusedForm = { changeCount: 1, planRefusal: MOCK_PLAN_REFUSAL };
+      const { rerender } = renderShell(refusedForm, { isSaveBarHidden: true });
+      rerender(
+        <SettingsFormShell {...baseProps} form={formFor(refusedForm)} />,
+      );
+      rerender(
+        <SettingsFormShell
+          {...baseProps}
+          form={formFor(refusedForm)}
+          isSaveBarHidden={true}
+        />,
+      );
+
+      const errorAlerts = screen.queryAllByRole('alert');
+
+      expect(errorAlerts).toHaveLength(0);
     });
 
     it('shows a plan refusal in the save bar while changes remain', () => {
