@@ -19,6 +19,7 @@ export const tenantOAuthCredentials = pgTable(
     provider: text('provider').$type<TOAuthProvider>().notNull(),
     clientId: text('client_id').notNull(),
     clientSecretEncrypted: text('client_secret_encrypted').notNull(),
+    callbackDomain: text('callback_domain'),
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()
       .defaultNow(),

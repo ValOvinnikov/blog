@@ -87,6 +87,8 @@ export const ICONS = {
   MAXIMIZE: 'MAXIMIZE',
   PAUSE: 'PAUSE',
   UPLOAD: 'UPLOAD',
+  EYE: 'EYE',
+  EYE_OFF: 'EYE_OFF',
 } as const;
 
 export type TIconName = TValueOf<typeof ICONS>;

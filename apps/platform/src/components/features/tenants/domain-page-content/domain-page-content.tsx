@@ -3,10 +3,12 @@ import type { TAdmin } from '@blog/db/schema/admins';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { CustomDomainCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-card/custom-domain-card';
+import { MainAddressSignInAppsProvider } from '@platform/components/features/tenants/domain-page-content/components/main-address-sign-in-apps-provider/main-address-sign-in-apps-provider';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import { listOwnSignInAppProviders } from '@platform/server/sign-in-apps/list-own-sign-in-app-providers';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
 import { findSubdomain } from '@platform/utils/find-subdomain/find-subdomain';
@@ -30,12 +32,13 @@ export const DomainPageContent = async ({
   membership,
   admin,
 }: TDomainPageContentProps) => {
-  const { id, primaryDomain, deprovisionedAt } = tenant;
+  const { id, primaryDomain, deprovisionedAt, plan } = tenant;
   const projectDomain = getProjectDomain(primaryDomain);
-  const [t, tenantDomains, claim] = await Promise.all([
+  const [t, tenantDomains, claim, signInAppProviders] = await Promise.all([
     getTranslations('tenantDomainPage'),
     queries.tenantDomains.listTenantDomains(id),
     queries.customDomainClaims.getCustomDomainClaim(id),
+    listOwnSignInAppProviders(id, plan),
   ]);
   const customDomain = findCustomDomain(
     tenantDomains,
@@ -62,17 +65,22 @@ export const DomainPageContent = async ({
         />
       </Suspense>
 
-      <CustomDomainCard
-        tenant={tenant}
-        customDomain={customDomain}
-        subdomain={subdomain}
-        claim={claim}
-        primaryProjectDomain={projectDomain}
-        isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}
-        canManage={
-          Boolean(admin) || (membership ? isTenantOwner(membership) : false)
-        }
-      />
+      <MainAddressSignInAppsProvider providers={signInAppProviders}>
+        <CustomDomainCard
+          tenant={tenant}
+          customDomain={customDomain}
+          subdomain={subdomain}
+          claim={claim}
+          primaryProjectDomain={projectDomain}
+          isPrimaryCustom={isCustomDomain(
+            primaryDomain,
+            env.TENANT_ROOT_DOMAIN,
+          )}
+          canManage={
+            Boolean(admin) || (membership ? isTenantOwner(membership) : false)
+          }
+        />
+      </MainAddressSignInAppsProvider>
     </div>
   );
 };

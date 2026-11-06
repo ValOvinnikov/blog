@@ -8,6 +8,7 @@ import {
   MOCK_REPLACEMENT_OAUTH_CREDENTIALS,
 } from '@blog/db/testing/tenant-oauth-credentials/fixtures';
 import { useTenantOAuthEncryptionKey } from '@blog/db/testing/tenant-oauth-encryption-key';
+import { MOCK_TENANT_DOMAIN } from '@blog/db/testing/tenants/fixtures';
 
 import { listTenantOAuthClients } from './list-tenant-oauth-clients';
 
@@ -27,7 +28,7 @@ describe(listTenantOAuthClients, () => {
     ({ id: tenantId } = await insertTestTenant(db()));
   });
 
-  it('lists each saved provider’s client id without its secret', async () => {
+  it('lists each saved provider’s client id and callback domain without its secret', async () => {
     await saveTenantOAuthCredentials(tenantId, {
       provider: OAUTH_PROVIDER.GOOGLE,
       ...MOCK_REPLACEMENT_OAUTH_CREDENTIALS,
@@ -35,6 +36,7 @@ describe(listTenantOAuthClients, () => {
     await saveTenantOAuthCredentials(tenantId, {
       provider: OAUTH_PROVIDER.GITHUB,
       ...MOCK_OAUTH_CREDENTIALS,
+      callbackDomain: MOCK_TENANT_DOMAIN,
     });
 
     const clients = await listTenantOAuthClients(tenantId);
@@ -43,11 +45,13 @@ describe(listTenantOAuthClients, () => {
       {
         provider: OAUTH_PROVIDER.GITHUB,
         clientId: MOCK_OAUTH_CREDENTIALS.clientId,
+        callbackDomain: MOCK_TENANT_DOMAIN,
         updatedAt: expect.any(Date),
       },
       {
         provider: OAUTH_PROVIDER.GOOGLE,
         clientId: MOCK_REPLACEMENT_OAUTH_CREDENTIALS.clientId,
+        callbackDomain: null,
         updatedAt: expect.any(Date),
       },
     ]);

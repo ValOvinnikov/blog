@@ -14,6 +14,7 @@
     "tenantProvisioning": "Provisionnement · Administration",
     "tenantDanger": "Zone de danger · Administration",
     "tenantDomain": "Domaine · Administration",
+    "signInApps": "Connexion · Admin",
     "features": "Fonctionnalités · Administration",
     "languages": "Langues · Administration",
     "studio": "Studio · Administration",
@@ -217,6 +218,7 @@
     "voice": "Voix",
     "languages": "Langues",
     "domain": "Domaine",
+    "signIn": "Connexion",
     "studio": "Studio",
     "email": "E-mail",
     "subscribers": "Abonnés",
@@ -467,7 +469,10 @@
       "SIGNUP_BLOCK_REMOVED": "Blocage d’inscription retiré",
       "PERSONAL_DATA_LOOKED_UP": "Données personnelles consultées",
       "PERSONAL_DATA_EXPORTED": "Données personnelles exportées",
-      "PERSONAL_DATA_ERASED": "Données personnelles effacées"
+      "PERSONAL_DATA_ERASED": "Données personnelles effacées",
+      "OAUTH_APP_SAVED": "Application de connexion enregistrée",
+      "OAUTH_APP_REPLACED": "Application de connexion remplacée",
+      "OAUTH_APP_REMOVED": "Application de connexion supprimée"
     }
   },
   "tenantDomainPage": {
@@ -565,9 +570,73 @@
           "description": "Votre site sera de nouveau connu sous votre sous-domaine. <domainName>{domain}</domainName> reste connecté.",
           "confirm": "Utiliser le sous-domaine",
           "confirming": "Changement…"
-        }
+        },
+        "signInAppsWarningOne": "Votre application de connexion {provider} utilise votre adresse principale. Ajoutez-y la nouvelle adresse de rappel, sinon les lecteurs ne pourront pas s'y connecter.",
+        "signInAppsWarningMany": "Vos applications de connexion {providers} utilisent votre adresse principale. Ajoutez-y les nouvelles adresses de rappel, sinon les lecteurs ne pourront pas se connecter avec ces applications."
       }
     }
+  },
+  "signInAppsPage": {
+    "pageTitle": "Connexion",
+    "description": "Permettez aux lecteurs de se connecter avec vos propres applications Google et GitHub, pour qu'ils voient le nom de votre site plutôt que le nôtre.",
+    "providerName": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "sharedDescription": "Les lecteurs voient le nom de notre application sur l'écran de connexion de {provider}.",
+    "ownDescription": "Les lecteurs voient le nom de votre application sur l'écran de connexion de {provider}.",
+    "sharedStatus": "Application partagée",
+    "ownStatus": "Votre application",
+    "callbackLabel": "Adresse de rappel",
+    "callbackHint": "Ajoutez exactement cette adresse à votre application {provider}.",
+    "copy": "Copier",
+    "copied": "Copié",
+    "copyFailed": "Copie impossible. Sélectionnez le texte.",
+    "consoleLink": {
+      "google": "Ouvrir la console Google Cloud",
+      "github": "Ouvrir les paramètres développeur GitHub"
+    },
+    "clientIdLabel": "ID client",
+    "clientIdHint": "Depuis votre application {provider}.",
+    "clientSecretLabel": "Secret client",
+    "clientSecretHint": "Chiffré à l'enregistrement. Jamais réaffiché.",
+    "secretSet": "Défini",
+    "secretNotSet": "Non défini",
+    "replace": "Remplacer",
+    "cancel": "Annuler",
+    "showClientId": "Afficher l'ID client",
+    "hideClientId": "Masquer l'ID client",
+    "showClientSecret": "Afficher le secret client",
+    "hideClientSecret": "Masquer le secret client",
+    "save": "Enregistrer {provider}",
+    "saving": "Enregistrement…",
+    "remove": "Supprimer",
+    "saved": "Application {provider} enregistrée.",
+    "fieldError": {
+      "clientIdRequired": "Saisissez l'ID client.",
+      "clientSecretRequired": "Saisissez le secret client."
+    },
+    "saveFailed": "Enregistrement impossible. Réessayez.",
+    "refusal": {
+      "ARCHIVED": "Ce site est archivé, ses applications de connexion ne peuvent donc pas être modifiées.",
+      "NOT_ON_PLAN": "Vos propres applications de connexion sont incluses dans Growth.",
+      "NO_SAVED_APP": "Cette application a déjà été supprimée. Rechargez la page."
+    },
+    "removeDialog": {
+      "title": "Supprimer votre application {provider} ?",
+      "description": "Les lecteurs verront de nouveau le nom de notre application sur l'écran de connexion de {provider}. Votre ID client et votre secret sont effacés.",
+      "confirm": "Supprimer l'application",
+      "confirming": "Suppression…",
+      "failed": "Suppression impossible. Réessayez."
+    },
+    "archivedNotice": "Ce site est archivé, ses applications de connexion ne peuvent donc pas être modifiées.",
+    "notOwnerNotice": "Seul le propriétaire du site peut modifier les applications de connexion.",
+    "keptOnGrowth": "Votre application enregistrée est conservée. Elle revient avec Growth.",
+    "growthNoteTitle": "Plus d'options avec Growth",
+    "growthNoteDescription": "Les options marquées <badge></badge> sur cette page sont disponibles avec l'offre Growth.",
+    "callbackWarning": "Votre adresse principale est désormais {domain}. Ajoutez la nouvelle adresse de rappel à votre application {provider}, sinon les lecteurs ne pourront pas se connecter avec {provider}.",
+    "callbackConfirm": "C'est fait",
+    "callbackConfirmFailed": "Enregistrement impossible. Réessayez."
   },
   "presetPicker": {
     "ariaLabel": "Préréglage",

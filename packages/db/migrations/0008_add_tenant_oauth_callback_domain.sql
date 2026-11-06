@@ -1,0 +1,1 @@
+ALTER TABLE "tenant_oauth_credentials" ADD COLUMN "callback_domain" text;

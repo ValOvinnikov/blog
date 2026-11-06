@@ -518,6 +518,30 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "OAUTH_APP_SAVED": [
+      {
+        "ref": "AUDIT_ACTION.OAUTH_APP_SAVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "OAUTH_APP_REPLACED": [
+      {
+        "ref": "AUDIT_ACTION.OAUTH_APP_REPLACED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
+    "OAUTH_APP_REMOVED": [
+      {
+        "ref": "AUDIT_ACTION.OAUTH_APP_REMOVED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "SITE": [
       {
         "ref": "AUTH_APP.SITE",
@@ -2268,6 +2292,22 @@
         "file": "apps/platform/src/constants/upload.ts"
       }
     ],
+    "EYE": [
+      {
+        "ref": "ICONS.EYE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
+    "EYE_OFF": [
+      {
+        "ref": "ICONS.EYE_OFF",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      }
+    ],
     "FULL_BLEED": [
       {
         "ref": "IMAGE_LAYOUT.FULL_BLEED",
@@ -3748,6 +3788,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-inactivity.ts"
+      },
+      {
+        "ref": "SIGN_IN_APPS_MODE.OPERATOR",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
       }
     ],
     "VIEWER": [
@@ -4116,6 +4162,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "SIGN_IN_APPS_MODE.FREE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
       }
     ],
     "UPDATED": [
@@ -4328,6 +4380,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/control-mode",
         "file": "apps/platform/src/constants/control-mode.ts"
+      },
+      {
+        "ref": "SIGN_IN_APPS_MODE.READ_ONLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
       }
     ],
     "DISABLED": [
@@ -4408,6 +4466,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/custom-domain",
         "file": "apps/platform/src/constants/custom-domain.ts"
+      },
+      {
+        "ref": "SIGN_IN_APP_REFUSAL.NOT_ON_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
       }
     ],
     "NOT_PROVISIONED": [
@@ -6258,6 +6322,70 @@
         "scope": "app:platform",
         "from": "@platform/constants/settings",
         "file": "apps/platform/src/constants/settings.ts"
+      }
+    ],
+    "REQUIRED": [
+      {
+        "ref": "SIGN_IN_APP_FIELD_ERROR.REQUIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "NO_SAVED_APP": [
+      {
+        "ref": "SIGN_IN_APP_REFUSAL.NO_SAVED_APP",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "sign_in_app.save_failed": [
+      {
+        "ref": "SIGN_IN_APP_LOG.SAVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "sign_in_app.save_audit_failed": [
+      {
+        "ref": "SIGN_IN_APP_LOG.SAVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "sign_in_app.remove_failed": [
+      {
+        "ref": "SIGN_IN_APP_LOG.REMOVE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "sign_in_app.remove_audit_failed": [
+      {
+        "ref": "SIGN_IN_APP_LOG.REMOVE_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "sign_in_app.confirm_callback_failed": [
+      {
+        "ref": "SIGN_IN_APP_LOG.CONFIRM_CALLBACK_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
+      }
+    ],
+    "EDIT": [
+      {
+        "ref": "SIGN_IN_APPS_MODE.EDIT",
+        "scope": "app:platform",
+        "from": "@platform/constants/sign-in-apps",
+        "file": "apps/platform/src/constants/sign-in-apps.ts"
       }
     ],
     "ACCOUNT_NOT_LINKED": [

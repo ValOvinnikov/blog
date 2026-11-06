@@ -15,6 +15,8 @@ import Crosshair from '@platform/assets/icons/crosshair.svg';
 import ErrorExclamation from '@platform/assets/icons/error-exclamation.svg';
 import ErrorCircle from '@platform/assets/icons/error.svg';
 import ExternalLink from '@platform/assets/icons/external-link.svg';
+import EyeOff from '@platform/assets/icons/eye-off.svg';
+import Eye from '@platform/assets/icons/eye.svg';
 import GitHub from '@platform/assets/icons/github.svg';
 import Globe from '@platform/assets/icons/globe.svg';
 import Google from '@platform/assets/icons/google.svg';
@@ -78,6 +80,8 @@ export const ICON_REGISTRY = {
   [ICONS.CROSSHAIR]: Crosshair,
   [ICONS.ERROR]: ErrorExclamation,
   [ICONS.EXTERNAL_LINK]: ExternalLink,
+  [ICONS.EYE]: Eye,
+  [ICONS.EYE_OFF]: EyeOff,
   [ICONS.GITHUB]: GitHub,
   [ICONS.GLOBE]: Globe,
   [ICONS.GOOGLE]: Google,

@@ -63,6 +63,7 @@ export type TTenantNavHrefs = {
   leads?: string;
   languages: string;
   domain: string;
+  signIn: string;
   email: string;
   studio: string;
 };
@@ -107,6 +108,7 @@ export const configurationNavItems = (
       href: hrefs.languages,
     }),
     { label: t('domain'), icon: ICONS.GLOBE, href: hrefs.domain },
+    { label: t('signIn'), icon: ICONS.USER_CHECK, href: hrefs.signIn },
     ...ifAccessible('email', {
       label: t('email'),
       icon: ICONS.MAIL,
@@ -157,6 +159,7 @@ export const tenantNavSections = (
     leads: adminRoutes.leads(tenantId),
     languages: adminRoutes.languages(tenantId),
     domain: adminRoutes.tenantDomain(tenantId),
+    signIn: adminRoutes.tenantSignIn(tenantId),
     email: adminRoutes.email(tenantId),
     studio: adminRoutes.tenantStudio(tenantId),
   };

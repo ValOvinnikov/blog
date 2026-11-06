@@ -20,13 +20,20 @@ export const CONFIGURATION_KEYS = [
   'leads',
   'languages',
   'domain',
+  'signIn',
   'email',
   'subscribers',
   'comments',
   'team',
 ];
 export const COMING_SOON_KEYS = ['subscribers', 'comments', 'team'];
-export const ALWAYS_AVAILABLE_KEYS = ['look', 'voice', 'features', 'domain'];
+export const ALWAYS_AVAILABLE_KEYS = [
+  'look',
+  'voice',
+  'features',
+  'domain',
+  'signIn',
+];
 export const MOCK_UNREAD_LEADS_COUNT = 3;
 
 export const translated = (keys: string[]) =>

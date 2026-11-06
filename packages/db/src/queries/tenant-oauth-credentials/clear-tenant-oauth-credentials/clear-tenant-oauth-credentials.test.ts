@@ -37,7 +37,12 @@ describe(clearTenantOAuthCredentials, () => {
   });
 
   it('removes only the named provider’s credentials', async () => {
-    await clearTenantOAuthCredentials(tenantId, OAUTH_PROVIDER.GITHUB);
+    const isCleared = await clearTenantOAuthCredentials(
+      tenantId,
+      OAUTH_PROVIDER.GITHUB,
+    );
+
+    expect(isCleared).toBe(true);
 
     const rows = await db().select().from(tenantOAuthCredentials);
     expect(rows.map(({ provider }) => provider)).toEqual([
@@ -56,5 +61,13 @@ describe(clearTenantOAuthCredentials, () => {
 
     const rows = await db().select().from(tenantOAuthCredentials);
     expect(rows).toHaveLength(2);
+  });
+
+  it('resolves false when the provider has no saved credentials', async () => {
+    await clearTenantOAuthCredentials(tenantId, OAUTH_PROVIDER.GITHUB);
+
+    expect(
+      await clearTenantOAuthCredentials(tenantId, OAUTH_PROVIDER.GITHUB),
+    ).toBe(false);
   });
 });

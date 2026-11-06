@@ -51,6 +51,10 @@ import ErrorComponent from '@blog/ui/assets/icons/error.svg';
 import ErrorUrl from '@blog/ui/assets/icons/error.svg?url';
 import ExternalLinkComponent from '@blog/ui/assets/icons/external-link.svg';
 import ExternalLinkUrl from '@blog/ui/assets/icons/external-link.svg?url';
+import EyeOffComponent from '@blog/ui/assets/icons/eye-off.svg';
+import EyeOffUrl from '@blog/ui/assets/icons/eye-off.svg?url';
+import EyeComponent from '@blog/ui/assets/icons/eye.svg';
+import EyeUrl from '@blog/ui/assets/icons/eye.svg?url';
 import FacebookComponent from '@blog/ui/assets/icons/facebook.svg';
 import FacebookUrl from '@blog/ui/assets/icons/facebook.svg?url';
 import GitHubComponent from '@blog/ui/assets/icons/github.svg';
@@ -279,4 +283,6 @@ export const ICON_REGISTRY: Record<TIconName, TIconRegistryEntry> = {
   [ICONS.MAXIMIZE]: { component: MaximizeComponent, url: MaximizeUrl },
   [ICONS.PAUSE]: { component: PauseComponent, url: PauseUrl },
   [ICONS.UPLOAD]: { component: UploadComponent, url: UploadUrl },
+  [ICONS.EYE]: { component: EyeComponent, url: EyeUrl },
+  [ICONS.EYE_OFF]: { component: EyeOffComponent, url: EyeOffUrl },
 };

@@ -14,6 +14,7 @@
     "tenantProvisioning": "Provisioning · Admin",
     "tenantDanger": "Danger zone · Admin",
     "tenantDomain": "Domain · Admin",
+    "signInApps": "Sign-in · Admin",
     "features": "Features · Admin",
     "languages": "Languages · Admin",
     "studio": "Studio · Admin",
@@ -217,6 +218,7 @@
     "voice": "Voice",
     "languages": "Languages",
     "domain": "Domain",
+    "signIn": "Sign-in",
     "studio": "Studio",
     "email": "Email",
     "subscribers": "Subscribers",
@@ -467,7 +469,10 @@
       "SIGNUP_BLOCK_REMOVED": "Sign-up block removed",
       "PERSONAL_DATA_LOOKED_UP": "Personal data looked up",
       "PERSONAL_DATA_EXPORTED": "Personal data exported",
-      "PERSONAL_DATA_ERASED": "Personal data erased"
+      "PERSONAL_DATA_ERASED": "Personal data erased",
+      "OAUTH_APP_SAVED": "Sign-in app saved",
+      "OAUTH_APP_REPLACED": "Sign-in app replaced",
+      "OAUTH_APP_REMOVED": "Sign-in app removed"
     }
   },
   "tenantDomainPage": {
@@ -565,9 +570,73 @@
           "description": "Your site will go back to being known by your subdomain. <domainName>{domain}</domainName> stays connected.",
           "confirm": "Use subdomain",
           "confirming": "Switching…"
-        }
+        },
+        "signInAppsWarningOne": "Your {provider} sign-in app uses your main address. Add the new callback address to it, or readers can't sign in with it.",
+        "signInAppsWarningMany": "Your {providers} sign-in apps use your main address. Add the new callback addresses to them, or readers can't sign in with those apps."
       }
     }
+  },
+  "signInAppsPage": {
+    "pageTitle": "Sign-in",
+    "description": "Let readers sign in through your own Google and GitHub apps, so they see your site's name instead of ours.",
+    "providerName": {
+      "google": "Google",
+      "github": "GitHub"
+    },
+    "sharedDescription": "Readers see our app name on {provider}'s sign-in screen.",
+    "ownDescription": "Readers see your app's name on {provider}'s sign-in screen.",
+    "sharedStatus": "Shared app",
+    "ownStatus": "Your own app",
+    "callbackLabel": "Callback address",
+    "callbackHint": "Add this exact address to your {provider} app.",
+    "copy": "Copy",
+    "copied": "Copied",
+    "copyFailed": "Couldn't copy. Select the text instead.",
+    "consoleLink": {
+      "google": "Open Google Cloud console",
+      "github": "Open GitHub developer settings"
+    },
+    "clientIdLabel": "Client ID",
+    "clientIdHint": "From your {provider} app.",
+    "clientSecretLabel": "Client secret",
+    "clientSecretHint": "Encrypted when saved. Never shown again.",
+    "secretSet": "Set",
+    "secretNotSet": "Not set",
+    "replace": "Replace",
+    "cancel": "Cancel",
+    "showClientId": "Show the client ID",
+    "hideClientId": "Hide the client ID",
+    "showClientSecret": "Show the client secret",
+    "hideClientSecret": "Hide the client secret",
+    "save": "Save {provider}",
+    "saving": "Saving…",
+    "remove": "Remove",
+    "saved": "{provider} app saved.",
+    "fieldError": {
+      "clientIdRequired": "Enter the client ID.",
+      "clientSecretRequired": "Enter the client secret."
+    },
+    "saveFailed": "Couldn't save — try again.",
+    "refusal": {
+      "ARCHIVED": "This site is archived, so its sign-in apps can't be changed.",
+      "NOT_ON_PLAN": "Your own sign-in apps come with Growth.",
+      "NO_SAVED_APP": "This app was already removed. Reload the page."
+    },
+    "removeDialog": {
+      "title": "Remove your {provider} app?",
+      "description": "Readers go back to seeing our app name on {provider}'s sign-in screen. Your client ID and secret are deleted.",
+      "confirm": "Remove app",
+      "confirming": "Removing…",
+      "failed": "Couldn't remove — try again."
+    },
+    "archivedNotice": "This site is archived, so its sign-in apps can't be changed.",
+    "notOwnerNotice": "Only the site owner can change sign-in apps.",
+    "keptOnGrowth": "Your saved app is kept. It comes back on Growth.",
+    "growthNoteTitle": "More options come with Growth",
+    "growthNoteDescription": "Options marked <badge></badge> on this page open up on the Growth plan.",
+    "callbackWarning": "Your main address is now {domain}. Add the new callback address to your {provider} app, or readers can't sign in with {provider}.",
+    "callbackConfirm": "I've added it",
+    "callbackConfirmFailed": "Couldn't save — try again."
   },
   "presetPicker": {
     "ariaLabel": "Preset",

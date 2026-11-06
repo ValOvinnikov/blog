@@ -57,6 +57,13 @@
       "when": 1793970359457,
       "tag": "0007_add_tenant_oauth_credentials",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793981253742,
+      "tag": "0008_add_tenant_oauth_callback_domain",
+      "breakpoints": true
     }
   ]
 }
