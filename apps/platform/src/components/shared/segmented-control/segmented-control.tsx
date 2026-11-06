@@ -38,6 +38,7 @@ export const SegmentedControl = <TValue extends string>({
   const descriptionId = useId();
   const { label: ariaLabel, labelledBy, describedBy } = aria;
   const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked);
+  const hasDescriptions = options.some(({ description }) => description);
   const selectedDescription = options.find(
     ({ value: optionValue }) => optionValue === value,
   )?.description;
@@ -59,7 +60,7 @@ export const SegmentedControl = <TValue extends string>({
         selectedDescription && descriptionId,
       )}
       onKeyDown={onKeyDown}
-      className={root({ class: selectedDescription ? undefined : className })}
+      className={root({ class: hasDescriptions ? undefined : className })}
     >
       {options.map(({ value: optionValue, label }, index) => (
         <Toggle
@@ -75,14 +76,14 @@ export const SegmentedControl = <TValue extends string>({
     </ToggleGroup>
   );
 
-  if (!selectedDescription) {
+  if (!hasDescriptions) {
     return group;
   }
 
   return (
     <div className={wrapper({ class: className })}>
       {group}
-      <p id={descriptionId} className={descriptionSlot()}>
+      <p id={descriptionId} aria-live="polite" className={descriptionSlot()}>
         {selectedDescription}
       </p>
     </div>
