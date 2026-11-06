@@ -1,6 +1,6 @@
 import {
   CAPABILITY,
-  COMING_SOON_CAPABILITIES,
+  isComingSoonCapability,
   READER_ACCOUNT_CAPABILITIES,
   type TCapability,
 } from '@blog/config';
@@ -36,9 +36,7 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = Object.values(
 ).map((capability) => ({
   capability,
   field: CAPABILITY_FIELDS[capability],
-  isComingSoon: COMING_SOON_CAPABILITIES.some(
-    (comingSoon) => comingSoon === capability,
-  ),
+  isComingSoon: isComingSoonCapability(capability),
 }));
 
 export const featureDefaultsToValues = (

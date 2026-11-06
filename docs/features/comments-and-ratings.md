@@ -48,8 +48,8 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 - One rating per user per post, enforced by the database, not the app.
 - The post page stays statically generated; only the island is dynamic.
 - Account export and deletion must cover both tables when they ship. A deleted reader's comments are tombstoned, not cascade-deleted, so a thread keeps its shape.
-- The coming-soon clamp lives only in the platform's save path. `apps/web` knows nothing of it: a tenant with no `settings_features` row falls back to its preset's defaults, so a `GROWTH` tenant resolves both capabilities on and a `FREE` tenant resolves `RATINGS` on. That is harmless only because no render site exists, so a comment or rating island must not ship before its `isComingSoon` flag is dropped deliberately.
-- `COMMENTS` already counts toward `isReaderAccountEnabled`, which opens `/account`, `/bookmarks` and the header account menu.
+- Both capabilities are on `COMING_SOON_CAPABILITIES` (`@blog/config`), the one list both apps read; taking a capability off it is the deliberate step that ships it. The platform's Features save writes every listed capability off, and `apps/web` leaves listed capabilities out of `isReaderAccountEnabled`. A tenant with no `settings_features` row still falls back to its preset's defaults, so a `GROWTH` tenant resolves both capabilities on and a `FREE` tenant resolves `RATINGS` on; that is harmless only because no render site exists, so a comment or rating island must not ship while its capability is still on the list.
+- `COMMENTS` is a reader-account capability, but counts toward `isReaderAccountEnabled` (which opens `/account`, `/bookmarks` and the header account menu) only once it leaves `COMING_SOON_CAPABILITIES`.
 
 ## Dependencies
 

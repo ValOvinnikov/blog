@@ -23,9 +23,3 @@ export const COMING_SOON_CAPABILITIES = [
   CAPABILITY.RATINGS,
   CAPABILITY.NEWSLETTER,
 ] as const satisfies readonly TCapability[];
-
-export const LIVE_READER_ACCOUNT_CAPABILITIES: readonly TCapability[] =
-  READER_ACCOUNT_CAPABILITIES.filter(
-    (capability) =>
-      !COMING_SOON_CAPABILITIES.some((comingSoon) => comingSoon === capability),
-  );
