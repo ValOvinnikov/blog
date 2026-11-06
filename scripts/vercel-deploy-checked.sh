@@ -30,15 +30,19 @@ esac
 headers=$(mktemp)
 trap 'rm -f "$headers"' EXIT
 
+# Vercel generates the bypass secret per project, so each app reads its own.
+bypass_name="VERCEL_AUTOMATION_BYPASS_SECRET_$(printf '%s' "$app" | tr '[:lower:]' '[:upper:]')"
+bypass_secret=${!bypass_name:-}
 bypass=()
-if [ -n "${VERCEL_AUTOMATION_BYPASS_SECRET:-}" ]; then
-	bypass=(--header "x-vercel-protection-bypass: ${VERCEL_AUTOMATION_BYPASS_SECRET}")
+if [ -n "$bypass_secret" ]; then
+	bypass=(--header "x-vercel-protection-bypass: ${bypass_secret}")
 fi
+protection_hint="set ${bypass_name} on this GitHub Environment to the project's Protection Bypass for Automation secret."
 
 # Retries cover a cold start's transient 5xx; a real startup crash fails all three.
 status=$(curl --silent --show-error --max-time 60 --retry 2 \
 	--output /dev/null --dump-header "$headers" --write-out '%{http_code}' \
-	"${bypass[@]}" "${url}${path}") ||
+	${bypass[@]+"${bypass[@]}"} "${url}${path}") ||
 	fail "The new ${app} deployment (${url}) did not answer ${path}."
 
 final=$(awk 'tolower($0) ~ /^http\// { buf = "" } { buf = buf $0 "\n" } END { printf "%s", buf }' "$headers")
@@ -47,13 +51,19 @@ header() {
 }
 vercel_error=$(header x-vercel-error)
 content_type=$(header content-type)
+location=$(header location)
 
 if [ "$status" -ge 500 ] || [ -n "$vercel_error" ]; then
 	fail "The new ${app} deployment (${url}) answered ${path} with HTTP ${status}${vercel_error:+ (${vercel_error})} — check its runtime logs for the startup error."
 fi
+case "$location" in
+*vercel.com/sso-api*)
+	fail "Deployment Protection redirected the check on ${url}${path} to Vercel's sign-in — ${protection_hint}"
+	;;
+esac
 # The apps answer 401 with JSON; Vercel's protection page is HTML.
 if [ "$status" -eq 401 ] && [[ "$content_type" != application/json* ]]; then
-	fail "Deployment Protection refused the check on ${url}${path} — set the VERCEL_AUTOMATION_BYPASS_SECRET secret on this GitHub Environment."
+	fail "Deployment Protection refused the check on ${url}${path} — ${protection_hint}"
 fi
 
 echo "${app}: ${url}${path} answered HTTP ${status}; promoting."
