@@ -4,10 +4,10 @@ import type { TCapability } from '@blog/config';
 import { PLAN_REGISTRY } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
+import { withParentOffApplied } from '@platform/utils/parent-toggle/parent-toggle';
 import {
   CAPABILITY_TOGGLES,
   clampToEntitlement,
-  withParentOffApplied,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 
 export const getEnabledCapabilities = async ({

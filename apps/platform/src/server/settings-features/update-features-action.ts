@@ -17,12 +17,12 @@ import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-feature
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { blockSwitchOnWhileParentOff } from '@platform/utils/parent-toggle/parent-toggle';
 import {
   toNotInPlanRefusal,
   type TNotInPlanRefusal,
 } from '@platform/utils/plan-refusal/plan-refusal';
 import {
-  blockSwitchOnWhileParentOff,
   keepStoredOutOfPlan,
   listSwitchedOnOutOfPlan,
   withComingSoonOff,

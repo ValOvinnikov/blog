@@ -15,6 +15,17 @@ export const mockSettingsFeaturesValues = (
   ...overrides,
 });
 
+export const mockAllOnSettingsFeaturesValues = (): TSettingsFeaturesValues => ({
+  readerAccountsEnabled: true,
+  commentsEnabled: true,
+  ratingsEnabled: true,
+  bookmarksEnabled: true,
+  newsletterEnabled: true,
+  analyticsEnabled: true,
+  consentBannerEnabled: true,
+  contactFormEnabled: true,
+});
+
 export const mockUnsavedSettingsFeaturesAndPreset =
   (): TSettingsFeaturesAndPreset => ({
     features: undefined,

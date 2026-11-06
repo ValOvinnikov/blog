@@ -28,7 +28,7 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 ## Data
 
 - `CAPABILITY.COMMENTS` and `CAPABILITY.RATINGS` in `@blog/config`.
-- `settings_features.comments_enabled` and `ratings_enabled` — `NOT NULL`, default `true`. Both presets' `featureDefaults` turn them on.
+- `settings_features.comments_enabled` and `ratings_enabled` — `NOT NULL`, default `false`. Both presets' `featureDefaults` leave them off.
 - No `comments` or `ratings` table exists. The decided shapes:
   - `comments` — `tenantId` (foreign key to `tenants`; every query scoped by it), `postId` as the Sanity `_id` string (a cross-store reference, not a foreign key), `userId`, plain-text `body`, `status` (pending, approved, spam), nullable `parentId` for threads, timestamps and a soft-delete flag.
   - `ratings` — `tenantId` (foreign key to `tenants`), `userId`, `postId`, unique together as `(tenantId, userId, postId)`, `value` 1–5 (a vote is an upsert); the summary is a SQL average and count.
@@ -36,7 +36,8 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 
 ## Configuration
 
-- **Plan** — `PLAN_REGISTRY` gives `RATINGS` to `FREE` and `GROWTH`, `COMMENTS` to `GROWTH` only (comments make readers sign in and carry moderation cost).
+- **Plan** — `PLAN_REGISTRY` gives `COMMENTS` and `RATINGS` to `GROWTH` only: both make readers sign in, and comments carry moderation cost.
+- **Reader accounts** — both sit under the `READER_ACCOUNTS` switch on Features and stop applying while it is off.
 - **Owner or operator** — no one can switch either on: `isComingSoon` in `CAPABILITY_TOGGLES` renders the row read-only and every save, an operator's included, writes both off whatever the payload says. Shipping either feature means dropping that flag.
 - **Platform pages** — `planPageAccess` opens Comments and counts `COMMENTS` toward the Email page; the Comments page does not exist yet (its sidebar entry has no link).
 - **Voice** — no copy exists. New public strings get classified Voice or fixed when the work is planned.

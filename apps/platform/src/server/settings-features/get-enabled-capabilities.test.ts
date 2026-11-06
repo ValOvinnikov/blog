@@ -1,6 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
+import { mockAllOnSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { getEnabledCapabilities } from './get-enabled-capabilities';
@@ -16,16 +16,7 @@ vi.mock(
   }),
 );
 
-const MOCK_ALL_ON = mockSettingsFeaturesValues({
-  readerAccountsEnabled: true,
-  commentsEnabled: true,
-  ratingsEnabled: true,
-  bookmarksEnabled: true,
-  newsletterEnabled: true,
-  analyticsEnabled: true,
-  consentBannerEnabled: true,
-  contactFormEnabled: true,
-});
+const MOCK_ALL_ON = mockAllOnSettingsFeaturesValues();
 
 const arrangeSavedValues = (values = MOCK_ALL_ON) => {
   getSettingsFeaturesOrDefaultsMock.mockResolvedValue({
