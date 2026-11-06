@@ -43,6 +43,7 @@ export function toFooter(raw: TRawFooter): TFooter {
     ),
     about: raw.about ?? undefined,
     address: raw.address ?? undefined,
+    copyrightName: raw.copyrightName ?? undefined,
     finePrint: (raw.finePrint ?? []).flatMap(
       (item) => toFooterFinePrintItem(item) ?? [],
     ),
