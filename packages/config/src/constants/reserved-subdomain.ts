@@ -5,6 +5,7 @@ export const RESERVED_SUBDOMAINS = [
   'www',
   'api',
   'app',
+  'auth',
   'mail',
   'ui-library',
   'web-storybook',

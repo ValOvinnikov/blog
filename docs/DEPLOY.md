@@ -511,6 +511,39 @@ mismatch — before it ever reaches our code, so nothing in this repo can
 detect or report it. On GitHub it reads "The redirect_uri is not associated
 with this application."
 
+#### OAuth on tenant sites — the redirect proxy
+
+Every tenant subdomain and custom domain is its own origin, and neither
+provider accepts a wildcard callback, so the web projects send Google and
+GitHub one registered callback on a dedicated host instead of their own.
+That host only redirects: Auth.js decodes the encrypted `state`, sends the
+reader back to the tenant host's own `/api/auth/callback/<provider>`, and the
+tenant host finishes the sign-in, so the session cookie belongs to the
+tenant's address and the reader lands back on the page they started from. A
+cancelled sign-in is forwarded the same way and shows the site's usual error
+alert. `/api/auth` answers on any host because `apps/web/src/proxy.ts` skips
+`/api`, so the host needs no tenant. `auth` is a reserved subdomain, so no
+tenant can claim it. Magic links are unaffected.
+
+Per environment (`dev.{your-hosting}` for `web-dev`, `{your-hosting}` for
+`web-prod`):
+
+- [ ] Add `auth.dev.{your-hosting}` to `web-dev` and `auth.{your-hosting}` to
+      `web-prod` (Settings → Domains), assigned explicitly so it does not
+      depend on the tenant wildcard.
+- [ ] **Google** — add `https://auth.dev.{your-hosting}/api/auth/callback/google`
+      and `https://auth.{your-hosting}/api/auth/callback/google` to the web
+      projects' OAuth client.
+- [ ] **GitHub** — set the web OAuth App's single callback to
+      `https://auth.<root>/api/auth/callback/github`, one App per
+      environment.
+- [ ] Set `AUTH_REDIRECT_PROXY_URL=https://auth.<root>/api/auth` on
+      `web-dev` and `web-prod` only (Production scope). Never on the platform
+      projects, which keep the callbacks above; local dev leaves it unset.
+- [ ] Give the OAuth client and both Apps a neutral product name, not a
+      tenant's, and verify the Google brand so the consent screen shows it.
+- [ ] Redeploy both web projects.
+
 ### 4. GitHub Actions — environment-scoped variables & secrets
 
 The deploy jobs run in the `development` / `production` **GitHub Environments**,
