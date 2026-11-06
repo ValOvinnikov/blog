@@ -1,15 +1,9 @@
-import {
-  TENANT_CONFIG_REVALIDATE_SECONDS,
-  type TMaybeUndefined,
-} from '@blog/config';
+import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
 import { queries } from '@blog/db';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
-import { safeAsync, type TResult } from '@blog/utils';
-import { SITE_CONFIG_LOG } from '@web/constants/site-config';
-import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
+import { safeAsync } from '@blog/utils';
+import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
-import { logger } from '@web/utils/logger/logger';
 import { buildSiteConfigCacheTag } from '@web/utils/tenant-cache-tags';
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
@@ -25,29 +19,17 @@ const getCachedSiteConfigForTenant = (tenantId: string) =>
     },
   )(tenantId);
 
-const toLookPlan = (
-  planResult: TResult<TMaybeUndefined<TTenantPlan>>,
-): TTenantPlan => {
-  if (!planResult.ok) {
-    logger.error(SITE_CONFIG_LOG.PLAN_FETCH_FAILED, {
-      error: planResult.error,
-    });
-    return TENANT_PLAN.FREE;
-  }
-  return planResult.data ?? TENANT_PLAN.FREE;
-};
-
 const getSiteConfigForTenantId = cache(
   safeAsync(async (tenantId?: string) => {
     if (!tenantId) return undefined;
 
-    const [siteConfig, planResult] = await Promise.all([
+    const [siteConfig, plan] = await Promise.all([
       getCachedSiteConfigForTenant(tenantId),
-      getTenantPlan(tenantId),
+      getEffectivePlan(tenantId),
     ]);
     if (!siteConfig) return undefined;
 
-    return toEffectiveLook(siteConfig, toLookPlan(planResult));
+    return toEffectiveLook(siteConfig, plan);
   }),
 );
 

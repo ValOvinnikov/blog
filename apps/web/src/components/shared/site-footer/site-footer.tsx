@@ -1,20 +1,11 @@
-import {
-  CAPABILITY,
-  FOOTER_FINE_PRINT_KIND,
-  ICONS,
-  routes,
-  SIZE,
-} from '@blog/config';
+import { CAPABILITY, FOOTER_FINE_PRINT_KIND } from '@blog/config';
 import { service } from '@blog/service';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { Footer } from '@blog/ui/components/organisms/footer';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { FloatingCookieSettingsButton } from '@web/components/shared/floating-cookie-settings-button';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
-import { SmartLink } from '@web/components/shared/smart-link';
 import { SocialLinks } from '@web/components/shared/social-links';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { routing } from '@web/i18n/routing';
@@ -23,6 +14,7 @@ import { isCapabilityEnabled } from '@web/server/settings-features/is-capability
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
+import { getPoweredByMark } from '@web/server/site-config/get-powered-by-mark/get-powered-by-mark';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { arrangeFooterLinks } from '@web/utils/arrange-footer-links';
@@ -31,6 +23,7 @@ import { resolveCookieSettingsControls } from '@web/utils/resolve-cookie-setting
 import { getTranslations } from 'next-intl/server';
 
 import { FooterLink } from './components/footer-link/footer-link';
+import { FooterRssLink } from './components/footer-rss-link/footer-rss-link';
 
 export const SiteFooter = async () => {
   const { tenantId, sanityContext, locale, defaultLocale, liveLocales } =
@@ -45,6 +38,7 @@ export const SiteFooter = async () => {
     footerStyle,
     brandLogoUrl,
     isConsentBannerEnabled,
+    poweredByMark,
   ] = await Promise.all([
     getSiteSettings(),
     service.global.footer.v1.getFooter(sanityContext),
@@ -54,6 +48,7 @@ export const SiteFooter = async () => {
     getFooterStyle(tenant),
     getBrandLogoUrl(tenant),
     isCapabilityEnabled(CAPABILITY.CONSENT_BANNER),
+    getPoweredByMark(tenant),
   ]);
 
   if (!settingsResult.ok) {
@@ -133,18 +128,15 @@ export const SiteFooter = async () => {
               isInFooter={true}
             />
           )}
-          {hasRssFeed && (
-            <TextLink
-              appearance="nav"
-              as={SmartLink}
-              href={routes.rssFeed()}
-              ariaLabel={tRss('feedLinkLabel')}
-              title={tRss('feedLinkLabel')}
-            >
-              <Icon name={ICONS.RSS} size={SIZE.SM} dataTestId="rss-icon" />
-            </TextLink>
-          )}
+          {hasRssFeed && <FooterRssLink label={tRss('feedLinkLabel')} />}
         </Footer.Nav>
+        {poweredByMark && (
+          <Footer.PoweredBy
+            label={t('poweredByLabel')}
+            productName={poweredByMark.productName}
+            href={poweredByMark.href}
+          />
+        )}
       </Footer>
       {hasCookieSettingsButton && <FloatingCookieSettingsButton />}
     </>

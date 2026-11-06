@@ -114,7 +114,8 @@
   },
   "siteFooter": {
     "groupsAriaLabel": "Fußzeilen-Links",
-    "finePrintAriaLabel": "Rechtliches"
+    "finePrintAriaLabel": "Rechtliches",
+    "poweredByLabel": "Bereitgestellt von"
   },
   "authMenu": {
     "signIn": "Anmelden",

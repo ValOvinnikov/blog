@@ -59,6 +59,7 @@
         "OWNER_EMAIL_FROM_ADDRESS",
         "SUPPORT_REPLY_TO_ADDRESS",
         "PRODUCT_NAME",
+        "MARKETING_SITE_URL",
         "CONTRAST_RESULT_SECRET",
         "SANITY_LIVE_CONTENT"
       ],

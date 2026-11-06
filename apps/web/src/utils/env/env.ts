@@ -7,63 +7,31 @@ import {
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
-// Single validated entry point for the web app's environment.
-// `env-nextjs` (not `env-core`) is used because this is Next.js: it enforces
-// the server/client boundary and throws if a server secret is read on the
-// client bundle.
 export const env = createEnv({
   server: {
-    // Feature-flag-by-absence: the on-demand revalidation route
-    // (`/api/revalidate`) 500s without it instead of revalidating.
+    // Absent, `/api/revalidate` answers 500 instead of revalidating.
     // @env-required: development, production
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
-    // Verifies `apps/platform`'s Look/Voice-save revalidation call
-    // (`/api/revalidate-site-config`), same feature-flag-by-absence stance
-    // as `SANITY_REVALIDATE_SECRET`: absent, the route 500s instead of
-    // revalidating.
+    // Absent, `/api/revalidate-site-config` answers 500 instead of revalidating.
     // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
     // @env-optional
     INTERNAL_PAGES_SECRET: z.string().min(1).optional(),
-    // Both optional (feature-flag-by-absence, same stance as
-    // SANITY_REVALIDATE_SECRET): the publish-time skim-generation pipeline
-    // (`/api/generate-skim`) returns 503 without them; the reader path is
-    // fully unaffected either way.
+    // With this and SANITY_GENERATE_SECRET absent, `/api/generate-skim` answers 503.
     // @env-optional
     ANTHROPIC_API_KEY: z.string().min(1).optional(),
     // @env-optional
     SANITY_GENERATE_SECRET: z.string().min(1).optional(),
-    // Feature-flag-by-absence (same stance as the two vars above): Web
-    // Analytics (`<Analytics />`) and Speed Insights (`<SpeedInsights />`) each load a same-origin script
-    // (`/_vercel/insights/script.js` / `/_vercel/speed-insights/script.js`)
-    // that Vercel's edge only proxies when the matching feature is turned on
-    // for that project in the dashboard — off, the request falls through to
-    // the app's own 404 page (a console MIME-type error).
-    // `VERCEL_ENV` can't tell "real production" apart from blog-dev's own
-    // production target (both report `production`), so this is an explicit
-    // opt-in set only on the Vercel project(s) where those dashboard
-    // features are actually enabled — same human-gated console posture as
-    // this repo's other one-time Vercel/Sanity setup (`docs/DEPLOY.md`).
-    // Named `WEB_` because this is a repo-owned feature flag, not a
-    // Vercel-owned value — this repo's convention keeps values we define
-    // under our own namespace rather than a vendor's.
-    // Server-only: whether `<Analytics />`/`<SpeedInsights />` render at all
-    // is decided in a Server Component before the
-    // RSC payload is built, so the flag never needs to reach the client
-    // bundle.
+    // Set only where Web Analytics and Speed Insights are enabled in the Vercel dashboard; otherwise their scripts 404.
     // @env-optional
     WEB_ANALYTICS_ENABLED: z.enum(['true', 'false']).optional(),
-    // The newsletter confirmation email's `from` address: optional, falls
-    // back to Resend's own shared testing sender until a verified sending
-    // domain is configured.
+    // Absent, Resend's shared testing sender is used.
     // @env-optional
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
-    // The admin panel's origin, for links in owner emails, which are inert
-    // without it.
+    // Absent, links in owner emails are inert.
     // @env-optional
     PLATFORM_APP_URL: z.string().url().optional(),
-    // Injected by the Upstash Redis Marketplace integration; the rate limiter
-    // refuses to start without them when VERCEL_ENV is production.
+    // The rate limiter refuses to start without these when VERCEL_ENV is production.
     // @env-optional
     KV_REST_API_URL: z.string().url().optional(),
     // @env-optional
@@ -89,6 +57,10 @@ export const env = createEnv({
     // Without it no confirmation email can be sent; changing it breaks every unsubscribe link already sent.
     // @env-optional
     NEWSLETTER_UNSUBSCRIBE_KEY: z.string().min(1).optional(),
+    // @env-optional
+    PRODUCT_NAME: z.string().trim().min(1).optional(),
+    // @env-optional
+    MARKETING_SITE_URL: z.string().url().optional(),
   },
   client: {
     // @env-optional
@@ -96,8 +68,6 @@ export const env = createEnv({
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
   },
-  // env-nextjs needs client vars mapped explicitly (bundler can't statically
-  // pick them up otherwise).
   runtimeEnv: {
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
@@ -116,6 +86,8 @@ export const env = createEnv({
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
     NEWSLETTER_UNSUBSCRIBE_KEY: process.env.NEWSLETTER_UNSUBSCRIBE_KEY,
+    PRODUCT_NAME: process.env.PRODUCT_NAME,
+    MARKETING_SITE_URL: process.env.MARKETING_SITE_URL,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
