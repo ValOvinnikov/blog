@@ -1091,7 +1091,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    dev.** See
    `.claude/agents/db.md`'s "Migrations" section.
 5. **`deploy-web`** → `web-dev` via the Vercel CLI
-   (`vercel pull → build --prod → deploy --prebuilt --prod`).
+   (`vercel pull → build --prod`, then `scripts/vercel-deploy-checked.sh`:
+   `deploy --prebuilt --prod --skip-domain → request → promote`; see
+   "A deploy goes live only after it starts" below).
 6. **`deploy-admin`** → `platform-dev` via the Vercel CLI, same mechanism.
    `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
@@ -1109,6 +1111,27 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    server starts, so a malformed `PERSONAL_DATA_ENCRYPTION_KEY` or
    `PERSONAL_DATA_INDEX_KEY` fails there with the same format message.
    Production deploys the same way.
+
+   **A deploy goes live only after it starts.** Each deploy job ends in
+   `scripts/vercel-deploy-checked.sh <app> <path>`. It deploys with
+   `--skip-domain`, so the new deployment gets no domain yet, then requests
+   `<path>` on the deployment's own URL. That request starts the server with
+   the real env, Sensitive values included. A 5xx or an `x-vercel-error`
+   header fails the job with `<app> deployment did not start` and the
+   deployment is never promoted, so the sites keep serving the previous one.
+   Otherwise the script runs `vercel promote`. Web and admin are requested at
+   `/`, where the proxy runs; the worker has no page, so it is requested at
+   `/api/inactivity-sweep`, which loads its env and answers 401 without the
+   cron secret. A non-JSON 401 is Vercel's Deployment Protection page, not the
+   app, and fails the job.
+
+   **Human gate — Deployment Protection.** If a project has Deployment
+   Protection on its production deployments, the check cannot reach the app.
+   Turn on **Protection Bypass for Automation** in the Vercel project's
+   Deployment Protection settings and store its secret as the
+   `VERCEL_AUTOMATION_BYPASS_SECRET` secret on the `development` and
+   `production` GitHub Environments; the script sends it as
+   `x-vercel-protection-bypass`. Without protection, leave it unset.
 
 Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
 `deploy-*` each keep `cancel-in-progress: true`, so a newer merge still
@@ -1167,8 +1190,9 @@ There are **no PR preview deployments** — deploys happen only on merge to
    reasoning as `migrate` above, with the `pg_dump` backup skipped alongside
    the migration. `deploy-web` and `deploy-admin` `need` it (the Studio never
    touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
-4. **`deploy-web`** → `web-prod` via the Vercel CLI
-   (`vercel pull → build --prod → deploy --prebuilt --prod`).
+4. **`deploy-web`** → `web-prod` via the Vercel CLI, through the same
+   start check as dev (`vercel pull → build --prod`, then
+   `scripts/vercel-deploy-checked.sh`).
 5. **`deploy-admin`** → `platform-prod` via the Vercel CLI, same mechanism. A tag
    is a deliberate full release, so both apps deploy — there is no change
    detection on the production side.
