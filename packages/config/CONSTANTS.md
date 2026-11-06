@@ -682,7 +682,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
 
-- **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `SITE_SETTINGS_FETCH_FAILED`=`"rss.site_settings_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
+- **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
 
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 
@@ -694,11 +694,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
+- **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
 
-### `@web/constants/site-settings` — `apps/web/src/constants/site-settings.ts`
+### `@web/constants/tenant-email-identity` — `apps/web/src/constants/tenant-email-identity.ts`
 
-- **SITE_SETTINGS_LOG**: `METADATA_FETCH_FAILED`=`"site_settings.metadata_fetch_failed"`, `LAYOUT_FETCH_FAILED`=`"site_settings.layout_fetch_failed"`
+- **TENANT_EMAIL_IDENTITY_LOG**: `TENANT_ROW_NOT_FOUND`=`"tenant_email_identity.tenant_row_not_found"`
 
 ### `@web/constants/tenant-write` — `apps/web/src/constants/tenant-write.ts`
 

@@ -23,9 +23,9 @@ import {
   mockFaqPageQuestion,
 } from '@web/testing/shared/json-ld/fixtures';
 import { readJsonLd } from '@web/testing/shared/json-ld/read-json-ld';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_NAME,
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -37,7 +37,7 @@ faker.seed(6008);
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -96,7 +96,7 @@ describe(`<${LandingPage.name}/>`, () => {
         name: SITE_MESSAGES.breadcrumbs.ariaLabel,
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_SITE_SETTINGS.brand.name,
+        name: MOCK_TENANT_NAME,
       });
       const currentCrumb = within(breadcrumbs).getByText(MOCK_PAGE_HEADING);
       const main = screen.getByRole('main');

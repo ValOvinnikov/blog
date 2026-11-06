@@ -135,6 +135,7 @@ describe('request-context', () => {
       enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.NL),
     ).resolves.toEqual({
       tenantId: MOCK_TENANT_ID,
+      tenantName: MOCK_SERVABLE_TENANT.name,
       locale: LOCALE_ISO_CODES.NL,
       sanityContext: {
         ...MOCK_TENANT_CREDENTIALS,

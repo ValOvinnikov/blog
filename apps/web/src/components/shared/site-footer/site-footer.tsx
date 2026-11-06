@@ -1,7 +1,7 @@
 import { CAPABILITY, FOOTER_FINE_PRINT_KIND } from '@blog/config';
 import { service } from '@blog/service';
 import { Footer } from '@blog/ui/components/organisms/footer';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import { hasArrayGotItems, isString } from '@blog/utils/primitives';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { FloatingCookieSettingsButton } from '@web/components/shared/floating-cookie-settings-button';
@@ -12,10 +12,10 @@ import { routing } from '@web/i18n/routing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { getPoweredByMark } from '@web/server/site-config/get-powered-by-mark/get-powered-by-mark';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { arrangeFooterLinks } from '@web/utils/arrange-footer-links';
 import { logger } from '@web/utils/logger/logger';
@@ -26,11 +26,17 @@ import { FooterLink } from './components/footer-link/footer-link';
 import { FooterRssLink } from './components/footer-rss-link/footer-rss-link';
 
 export const SiteFooter = async () => {
-  const { tenantId, sanityContext, locale, defaultLocale, liveLocales } =
-    await getRequestContext();
+  const {
+    tenantId,
+    tenantName,
+    sanityContext,
+    locale,
+    defaultLocale,
+    liveLocales,
+  } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [
-    settingsResult,
+    brandName,
     footerResult,
     tRss,
     t,
@@ -40,7 +46,7 @@ export const SiteFooter = async () => {
     isConsentBannerEnabled,
     poweredByMark,
   ] = await Promise.all([
-    getSiteSettings(),
+    getBrandName({ tenantId, tenantName }),
     service.global.footer.v1.getFooter(sanityContext),
     getTranslations('rss'),
     getTranslations('siteFooter'),
@@ -51,16 +57,12 @@ export const SiteFooter = async () => {
     getPoweredByMark(tenant),
   ]);
 
-  if (!settingsResult.ok) {
-    return null;
-  }
   if (!footerResult.ok) {
     logger.error(FOOTER_LOG.CONTENT_FETCH_FAILED, {
       error: footerResult.error,
     });
   }
 
-  const { brand } = settingsResult.data;
   const footer = footerResult.ok ? footerResult.data : undefined;
   const social = footer?.social ?? [];
   const hasLanguageSwitcher = footer?.showLanguageSwitcher === true;
@@ -107,8 +109,10 @@ export const SiteFooter = async () => {
             </Footer.Group>
           ))}
         </Footer.Groups>
-        <Footer.Wordmark>{brand.name}</Footer.Wordmark>
-        <Footer.Copyright title={brand.name} year={new Date().getFullYear()} />
+        <Footer.Wordmark>{brandName}</Footer.Wordmark>
+        {isString(brandName) && (
+          <Footer.Copyright title={brandName} year={new Date().getFullYear()} />
+        )}
         <Footer.FinePrint ariaLabel={t('finePrintAriaLabel')}>
           {finePrint.map((item) =>
             item.kind === FOOTER_FINE_PRINT_KIND.LINK ? (

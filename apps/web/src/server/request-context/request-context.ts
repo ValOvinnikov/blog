@@ -22,6 +22,7 @@ import { cache } from 'react';
 
 export type TRequestContext = {
   tenantId: TMaybeUndefined<string>;
+  tenantName: TMaybeUndefined<string>;
   locale: TLocaleIsoCode;
   sanityContext: TTenantSanityContext;
   metadataBase: TMaybeUndefined<URL>;
@@ -105,6 +106,7 @@ const buildRequestContext = async (
 
   return {
     tenantId,
+    tenantName: row?.name,
     locale,
     sanityContext: { ...toSanityContext(tenantId, row), locale },
     metadataBase: toMetadataBase(row),

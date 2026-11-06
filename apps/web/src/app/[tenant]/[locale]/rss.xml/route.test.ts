@@ -11,6 +11,7 @@ import {
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { RSS_LOG } from '@web/constants/rss';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_FEED_POST_SLUG,
@@ -18,10 +19,10 @@ import {
 } from '@web/testing/shared/feed-post/fixtures';
 import { parseRssFeed } from '@web/testing/shared/rss/parse-rss-feed';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -32,13 +33,11 @@ faker.seed(6009);
 
 const {
   getAllPublishedPostsMock,
-  getSiteSettingsMock,
   getIndexPageMock,
   getNavigationMock,
   getHostTenantSanityContextMock,
 } = vi.hoisted(() => ({
   getAllPublishedPostsMock: vi.fn(),
-  getSiteSettingsMock: vi.fn(),
   getIndexPageMock: vi.fn(),
   getNavigationMock: vi.fn(),
   getHostTenantSanityContextMock: vi.fn(),
@@ -50,7 +49,6 @@ vi.mock('@blog/service', () => ({
       posts: { v1: { getAllPublishedPosts: getAllPublishedPostsMock } },
     },
     global: {
-      siteSettings: { v1: { getSiteSettings: getSiteSettingsMock } },
       navigation: { v1: { getNavigation: getNavigationMock } },
     },
     pages: { blog: { v1: { getIndexPage: getIndexPageMock } } },
@@ -65,6 +63,10 @@ vi.mock(
 );
 
 vi.mock('@web/server/tenant/tenant-base-url/tenant-base-url');
+
+vi.mock('@web/server/tenant/request-tenant/request-tenant');
+
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 const { EN, NL } = LOCALE_ISO_CODES;
 
@@ -104,13 +106,11 @@ describe(GET, () => {
     });
     getIndexPageMock.mockResolvedValue(okResult());
     getAllPublishedPostsMock.mockResolvedValue(okResult([]));
-    getSiteSettingsMock.mockResolvedValue(okResult(MOCK_SITE_SETTINGS));
     getNavigationMock.mockResolvedValue(okResult({ items: [] }));
   });
 
   afterEach(() => {
     getAllPublishedPostsMock.mockReset();
-    getSiteSettingsMock.mockReset();
     getIndexPageMock.mockReset();
     getNavigationMock.mockReset();
     getHostTenantSanityContextMock.mockReset();
@@ -134,7 +134,7 @@ describe(GET, () => {
 
       expect(contentType).toBe(RSS_CONTENT_TYPE);
       expect(isWellFormed).toBe(true);
-      expect(channel.title).toBe(MOCK_SITE_SETTINGS.brand.name);
+      expect(channel.title).toBe(MOCK_TENANT_NAME);
       expect(channel.description).toBe(MOCK_SITE_DESCRIPTION);
       expect(items).toEqual([
         {
@@ -156,8 +156,17 @@ describe(GET, () => {
     });
   });
 
-  it('falls back to generic channel copy when site settings fail', async () => {
-    getSiteSettingsMock.mockResolvedValue(errorResult(MOCK_ERROR));
+  it("names the channel after the host tenant's brand", async () => {
+    await getFeed();
+
+    expect(vi.mocked(getBrandName)).toHaveBeenCalledWith({
+      tenantId: MOCK_TENANT_ID,
+      tenantName: MOCK_TENANT_NAME,
+    });
+  });
+
+  it('falls back to generic channel copy without a brand name', async () => {
+    vi.mocked(getBrandName).mockResolvedValueOnce(undefined);
 
     const { channel } = await getParsedFeed();
 
@@ -237,7 +246,6 @@ describe(GET, () => {
     const localizedTenant = { ...tenant, locale: NL };
 
     expect(getAllPublishedPostsMock).toHaveBeenCalledWith(localizedTenant);
-    expect(getSiteSettingsMock).toHaveBeenCalledWith(localizedTenant);
     expect(getIndexPageMock).toHaveBeenCalledWith(localizedTenant);
     expect(getNavigationMock).toHaveBeenCalledWith(localizedTenant);
   });

@@ -11,14 +11,14 @@ import {
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { MOCK_TENANT_NAME } from '@web/testing/shared/tenant/fixtures';
 import { mockTopic } from '@web/testing/shared/topic/fixtures';
 
 import { TopicBreadcrumbs } from './topic-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 const { getTopicPageMock } = vi.hoisted(() => ({
   getTopicPageMock: vi.fn(),
@@ -32,7 +32,7 @@ vi.mock('@web/server/topic/get-topic-page/get-topic-page', () => ({
 
 faker.seed(5776);
 
-const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
+const SITE_NAME = MOCK_TENANT_NAME;
 const MOCK_TOPIC_SLUG = faker.lorem.slug();
 const MOCK_TOPIC = mockTopic({
   id: faker.string.uuid(),

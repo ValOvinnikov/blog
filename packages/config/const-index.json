@@ -7558,14 +7558,6 @@
         "file": "apps/web/src/constants/rss.ts"
       }
     ],
-    "rss.site_settings_fetch_failed": [
-      {
-        "ref": "RSS_LOG.SITE_SETTINGS_FETCH_FAILED",
-        "scope": "app:web",
-        "from": "@web/constants/rss",
-        "file": "apps/web/src/constants/rss.ts"
-      }
-    ],
     "rss.index_page_fetch_failed": [
       {
         "ref": "RSS_LOG.INDEX_PAGE_FETCH_FAILED",
@@ -7614,6 +7606,14 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
+    "brand_name.site_config_fetch_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.BRAND_NAME_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/site-config",
+        "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
     "site_config.plan_fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.PLAN_FETCH_FAILED",
@@ -7630,20 +7630,12 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
-    "site_settings.metadata_fetch_failed": [
+    "tenant_email_identity.tenant_row_not_found": [
       {
-        "ref": "SITE_SETTINGS_LOG.METADATA_FETCH_FAILED",
+        "ref": "TENANT_EMAIL_IDENTITY_LOG.TENANT_ROW_NOT_FOUND",
         "scope": "app:web",
-        "from": "@web/constants/site-settings",
-        "file": "apps/web/src/constants/site-settings.ts"
-      }
-    ],
-    "site_settings.layout_fetch_failed": [
-      {
-        "ref": "SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED",
-        "scope": "app:web",
-        "from": "@web/constants/site-settings",
-        "file": "apps/web/src/constants/site-settings.ts"
+        "from": "@web/constants/tenant-email-identity",
+        "file": "apps/web/src/constants/tenant-email-identity.ts"
       }
     ],
     "tenant_write.unresolved": [

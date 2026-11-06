@@ -14,8 +14,10 @@ import {
   MOCK_POST_DETAIL_BODY_TEXT,
 } from '@web/testing/pages/blog-post-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_TENANT_NAME,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -27,7 +29,7 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@blog/service', async (importOriginal) => {
   const actual = await importOriginal<object>();
@@ -96,7 +98,7 @@ describe(`<${BlogPostPage.name}/>`, () => {
         name: SITE_MESSAGES.breadcrumbs.ariaLabel,
       });
       const brandLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_SITE_SETTINGS.brand.name,
+        name: MOCK_TENANT_NAME,
       });
       const topicLink = within(breadcrumbs).getByRole('link', {
         name: MOCK_POST_DETAIL.topic.title,
