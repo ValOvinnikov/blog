@@ -16,15 +16,17 @@ export const useActiveVoiceSection = (
   const [activeSection, setActiveSection] =
     useState<TMaybeUndefined<TVoiceSection>>();
   const isHeldRef = useRef(false);
+  const activeRef = useRef<TMaybeUndefined<TVoiceSection>>(undefined);
 
   useLayoutMeasure(() => {
     const bar = barRef.current;
     if (!bar || isHeldRef.current) return;
-    setActiveSection(
-      findActiveVoiceSection(
-        bar.getBoundingClientRect().bottom + ACTIVATION_LINE_OFFSET_PX,
-      ),
+    const next = findActiveVoiceSection(
+      bar.getBoundingClientRect().bottom + ACTIVATION_LINE_OFFSET_PX,
     );
+    if (next === activeRef.current) return;
+    activeRef.current = next;
+    setActiveSection(next);
   }, openSections);
 
   useEffect(() => {
@@ -44,6 +46,7 @@ export const useActiveVoiceSection = (
 
   const holdActiveSection = (section: TVoiceSection) => {
     isHeldRef.current = true;
+    activeRef.current = section;
     setActiveSection(section);
   };
 
