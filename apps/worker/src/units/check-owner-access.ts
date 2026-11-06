@@ -45,10 +45,18 @@ async function resolveOwnerAccess(
   if (owner) {
     const outcome = await grantOwnerAdministrator(target, owner);
     await deleteOwnerInvitesAfterGrant(target);
-    await resolveOwnerAccessFinding(tenant.id);
     await sendOwnerEmailOnce(target, TENANT_OWNER_EMAIL.SITE_READY);
     return outcome;
   }
+  const outcome = await awaitOwnerAcceptance(target);
+  await resolveOwnerAccessFinding(tenant.id);
+  return outcome;
+}
+
+async function awaitOwnerAcceptance(
+  target: TOwnerAccessTarget,
+): Promise<TElevateTenantOwnerOutcome> {
+  const { tenant } = target;
   if (tenant.ownerInviteSentAt) {
     await sendPendingOwnerEmails(target);
     return pendingOwnerAccessOutcome(tenant);

@@ -15,7 +15,6 @@ export const OWNER_ACCESS_LOG = {
   ACTIVITY_TOUCH_FAILED: 'owner_access.activity_touch_failed',
   INVITE_DELETE_FAILED: 'owner_access.invite_delete_failed',
   FINDING_OPEN_FAILED: 'owner_access.finding_open_failed',
-  FINDING_RESOLVE_FAILED: 'owner_access.finding_resolve_failed',
   SWEEP_NOT_CONFIGURED: 'owner_access.sweep_not_configured',
   SWEEP_FAILED: 'owner_access.sweep_failed',
   SWEEP_TENANT_FAILED: 'owner_access.sweep_tenant_failed',

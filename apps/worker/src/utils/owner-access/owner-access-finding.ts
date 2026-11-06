@@ -90,9 +90,8 @@ export async function resolveOwnerAccessFinding(
 
   const resolved = await resolveFinding(finding.id);
   if (!resolved.ok) {
-    logger.error(OWNER_ACCESS_LOG.FINDING_RESOLVE_FAILED, {
-      tenantId,
-      error: resolved.error,
-    });
+    throw new Error(
+      `Tenant "${tenantId}"'s owner-access finding could not be resolved (${resolved.error}).`,
+    );
   }
 }

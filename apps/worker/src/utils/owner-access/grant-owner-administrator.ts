@@ -21,10 +21,12 @@ import {
 } from '@blog/db/utils/sanity-management-client/sanity-project-access';
 import type { TSanityUser } from '@blog/db/utils/sanity-management-client/sanity-project-users';
 import { sanityRoleChangeToken } from '@blog/db/utils/sanity-management-client/sanity-role-change-token';
+import { hasLength } from '@blog/utils/primitives';
 import { OWNER_ACCESS_LOG } from '@worker/constants/owner-access';
 import { logger } from '@worker/utils/logger/logger';
 
 import { findProjectAclEntry } from './find-project-acl-entry';
+import { resolveOwnerAccessFinding } from './owner-access-finding';
 import type { TOwnerAccessTarget } from './owner-access-target';
 
 function toLoginProvider(
@@ -104,6 +106,8 @@ export async function grantOwnerAdministrator(
     });
   }
   await revokeRoles(target, entry, otherRoles);
+  // Before recording administrator: a granted tenant leaves the sweep, so a finding still open then never clears.
+  await resolveOwnerAccessFinding(tenant.id);
 
   const inviteAcceptedAt = tenant.ownerInviteAcceptedAt ?? new Date();
   const recorded = await setTenantOwnerAccess(tenant.id, {
@@ -122,7 +126,7 @@ export async function grantOwnerAdministrator(
     await touchActivityOnInviteAcceptance(tenant.id, inviteAcceptedAt);
   }
 
-  return isAdministrator && otherRoles.length === 0
+  return isAdministrator && !hasLength(otherRoles)
     ? ELEVATE_TENANT_OWNER_OUTCOME.ALREADY_ADMINISTRATOR
     : ELEVATE_TENANT_OWNER_OUTCOME.ELEVATED;
 }
