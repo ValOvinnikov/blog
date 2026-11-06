@@ -3,11 +3,13 @@ import {
   LOCALE_ISO_CODES,
   SITE_MESSAGES,
 } from '@blog/config';
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NAVIGATION_LOG } from '@web/constants/navigation';
 import { SESSION_STATUS } from '@web/constants/session';
+import { getSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import {
   isReaderAccountEnabled,
@@ -17,6 +19,7 @@ import { getAccountControl } from '@web/server/site-config/get-account-control/g
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
+import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import { ARIA_EXPANDED } from '@web/testing/shared/aria/constants';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -49,6 +52,8 @@ const { getNavigationMock, getEnabledOAuthProviderIdsMock, useSessionMock } =
   }));
 
 vi.mock('@web/server/request-context/request-context');
+
+vi.mock('@web/server/auth/site-oauth-credentials/site-oauth-credentials');
 
 vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
@@ -160,7 +165,10 @@ describe(`<${SiteHeader.name}/>`, () => {
     getBrandLogoUrlMock.mockResolvedValue(undefined);
     isReaderAccountEnabledMock.mockResolvedValue(true);
     isReaderAccountFeatureEnabledMock.mockResolvedValue(true);
-    getEnabledOAuthProviderIdsMock.mockReturnValue(['github', 'google']);
+    getEnabledOAuthProviderIdsMock.mockReturnValue([
+      OAUTH_PROVIDER.GITHUB,
+      OAUTH_PROVIDER.GOOGLE,
+    ]);
     useSessionMock.mockReturnValue({
       data: null,
       status: SESSION_STATUS.UNAUTHENTICATED,
@@ -615,7 +623,7 @@ describe(`<${SiteHeader.name}/>`, () => {
   });
 
   it('offers only the enabled OAuth providers in the sign-in menu', async () => {
-    getEnabledOAuthProviderIdsMock.mockReturnValue(['github']);
+    getEnabledOAuthProviderIdsMock.mockReturnValue([OAUTH_PROVIDER.GITHUB]);
     await setup();
 
     const [signInButton] = getBarSignInButtons();
@@ -631,6 +639,21 @@ describe(`<${SiteHeader.name}/>`, () => {
 
     expect(githubButton).toBeVisible();
     expect(googleButton).not.toBeInTheDocument();
+  });
+
+  it("advertises the providers the site's own credentials register", async () => {
+    vi.mocked(getSiteOAuthCredentials).mockResolvedValueOnce(
+      MOCK_SITE_OAUTH_CREDENTIALS,
+    );
+
+    await setup();
+
+    expect(vi.mocked(getSiteOAuthCredentials)).toHaveBeenCalledWith(
+      MOCK_REQUEST_CONTEXT.tenantId,
+    );
+    expect(getEnabledOAuthProviderIdsMock).toHaveBeenCalledWith(
+      MOCK_SITE_OAUTH_CREDENTIALS,
+    );
   });
 
   it('hides the sign-in menu with Reader accounts off', async () => {
