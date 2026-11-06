@@ -81,6 +81,7 @@ type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;
   previewDevice?: TPreviewDevice;
   hasReaderAccounts?: boolean;
+  hasCookieBanner?: boolean;
   followTarget?: TLookFollowTarget;
   hasLockedFields?: boolean;
 };
@@ -91,6 +92,7 @@ const renderPreview = ({
   values = {},
   previewDevice = PREVIEW_DEVICE.DESKTOP,
   hasReaderAccounts = true,
+  hasCookieBanner = true,
   followTarget = { kind: LOOK_FOLLOW_TARGET.IDLE },
   hasLockedFields = false,
 }: TRenderPreviewOptions = {}) => {
@@ -127,6 +129,7 @@ const renderPreview = ({
       <LookPreview
         liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
         hasReaderAccounts={hasReaderAccounts}
+        hasCookieBanner={hasCookieBanner}
         siteHost={MOCK_TENANT_DOMAIN}
         followTarget={followTarget}
         isShown={true}
@@ -251,30 +254,46 @@ describe(`<${LookPreview.name}/>`, () => {
     });
   });
 
-  it('floats the cookie button over the sample when it is shown', () => {
-    renderPreview({
-      values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+  describe('cookie settings', () => {
+    const cookieButton = () =>
+      screen.queryByTestId(SAMPLE_COOKIE_BUTTON_TEST_ID);
+    const cookieSettingsLink = () =>
+      screen.queryByRole('link', { name: LOOK_PREVIEW.footerCookieSettings });
+
+    it('floats the cookie button over the sample, outside the page', () => {
+      renderPreview({
+        values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+      });
+
+      const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
+
+      expect(cookieButton()).toBeInTheDocument();
+      expect(content).not.toContainElement(cookieButton());
     });
 
-    const cookieButton = screen.getByTestId(SAMPLE_COOKIE_BUTTON_TEST_ID);
-    const content = screen.getByTestId(DEVICE_FRAME_TEST_ID.CONTENT);
+    it.each([
+      [COOKIE_SETTINGS_BUTTON.HIDDEN, true, false],
+      [COOKIE_SETTINGS_BUTTON.ONLY, false, true],
+      [COOKIE_SETTINGS_BUTTON.SHOWN, true, true],
+    ])(
+      'with %s chosen, shows the footer link: %s, the floating button: %s',
+      (cookieSettingsButton, hasLink, hasButton) => {
+        renderPreview({ values: { cookieSettingsButton } });
 
-    expect(cookieButton).toBeInTheDocument();
-    expect(content).not.toContainElement(cookieButton);
-  });
+        expect(Boolean(cookieSettingsLink())).toBe(hasLink);
+        expect(Boolean(cookieButton())).toBe(hasButton);
+      },
+    );
 
-  it('leaves the cookie button out when it is hidden', () => {
-    renderPreview({
-      values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN },
+    it('shows neither the link nor the button while the cookie banner is off', () => {
+      renderPreview({
+        values: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
+        hasCookieBanner: false,
+      });
+
+      expect(cookieSettingsLink()).not.toBeInTheDocument();
+      expect(cookieButton()).not.toBeInTheDocument();
     });
-
-    const cookieButton = screen.queryByTestId(SAMPLE_COOKIE_BUTTON_TEST_ID);
-    const cookieSettingsLink = screen.getByRole('link', {
-      name: LOOK_PREVIEW.footerCookieSettings,
-    });
-
-    expect(cookieButton).not.toBeInTheDocument();
-    expect(cookieSettingsLink).toBeInTheDocument();
   });
 
   describe('follow', () => {

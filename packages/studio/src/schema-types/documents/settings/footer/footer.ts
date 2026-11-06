@@ -46,6 +46,12 @@ export const footerSettingsSchema = defineType({
       description:
         'A postal address, shown under the about text with each line as you type it.',
     }),
+    localizedOneLineTextField({
+      name: 'copyrightName',
+      title: 'Copyright name',
+      description:
+        'Shown in the copyright line. Leave empty to use your brand name.',
+    }),
     defineField({
       name: 'finePrint',
       title: 'Fine Print',

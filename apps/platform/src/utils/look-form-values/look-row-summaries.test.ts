@@ -67,7 +67,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.BUTTONS]: 'Busy label · Braille',
       [LOOK_ROW.HEADER]: 'Classic · Full width · Dropdown · Pill with label',
       [LOOK_ROW.FOOTER]:
-        'Columns · Brand tint · Full width · Cookie button shown',
+        'Columns · Brand tint · Full width · Cookie link and button',
       [LOOK_ROW.LANGUAGE_SWITCHER]: 'Globe',
     });
   });
@@ -103,16 +103,16 @@ describe(buildLookRowSummaries, () => {
     expect(summaries[LOOK_ROW.BUTTONS]).toBe('Progress edge');
   });
 
-  it('reads a hidden cookie button', () => {
-    const values = {
-      ...seedValues(),
-      cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN,
-    };
+  it.each([
+    [COOKIE_SETTINGS_BUTTON.HIDDEN, 'Cookie link in footer'],
+    [COOKIE_SETTINGS_BUTTON.ONLY, 'Floating cookie button'],
+  ])('reads the %s cookie settings choice', (cookieSettingsButton, reads) => {
+    const values = { ...seedValues(), cookieSettingsButton };
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.FOOTER]).toBe(
-      'Columns · Brand tint · Full width · Cookie button hidden',
+      `Columns · Brand tint · Full width · ${reads}`,
     );
   });
 

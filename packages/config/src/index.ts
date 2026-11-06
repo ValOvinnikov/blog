@@ -1,4 +1,5 @@
 export * from './action-outcome';
+export * from './capability';
 export * from './client/objects';
 export * from './constants';
 export * from './portable-text';

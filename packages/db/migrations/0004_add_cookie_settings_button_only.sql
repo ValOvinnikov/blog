@@ -1,0 +1,1 @@
+ALTER TYPE "public"."cookie_settings_button" ADD VALUE 'ONLY';

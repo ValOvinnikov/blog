@@ -1,6 +1,7 @@
 import {
   CAPABILITY,
-  READER_ACCOUNT_CAPABILITIES,
+  COMING_SOON_CAPABILITIES,
+  LIVE_READER_ACCOUNT_CAPABILITIES,
   type TCapability,
 } from '@blog/config';
 import { queries } from '@blog/db';
@@ -51,8 +52,8 @@ beforeEach(() => {
 });
 
 describe(isReaderAccountEnabled, () => {
-  it.each(READER_ACCOUNT_CAPABILITIES)(
-    'is enabled when %s is the only reader-account capability enabled',
+  it.each(LIVE_READER_ACCOUNT_CAPABILITIES)(
+    'is enabled when %s is the only live reader-account capability enabled',
     async (capability) => {
       enableOnly(capability);
 
@@ -61,11 +62,13 @@ describe(isReaderAccountEnabled, () => {
   );
 
   it('is disabled when only capabilities that need no reader account are enabled', async () => {
-    enableOnly(
-      CAPABILITY.RATINGS,
-      CAPABILITY.ANALYTICS,
-      CAPABILITY.CONSENT_BANNER,
-    );
+    enableOnly(CAPABILITY.ANALYTICS, CAPABILITY.CONSENT_BANNER);
+
+    await expect(isReaderAccountEnabled()).resolves.toBe(false);
+  });
+
+  it('is disabled when only coming-soon capabilities are enabled', async () => {
+    enableOnly(...COMING_SOON_CAPABILITIES);
 
     await expect(isReaderAccountEnabled()).resolves.toBe(false);
   });

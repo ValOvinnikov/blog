@@ -137,7 +137,7 @@ export const buttonVariants = tv({
       variant: STYLED_VARIANTS,
       size: SIZE.MD,
       class: {
-        root: ['min-h-11 px-[13px] py-[8px] text-admin-13 md:min-h-0'],
+        root: ['h-11 px-[13px] py-0 text-admin-13 md:h-8'],
       },
     },
     {
