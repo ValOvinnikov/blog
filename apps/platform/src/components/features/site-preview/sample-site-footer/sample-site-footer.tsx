@@ -3,12 +3,14 @@ import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { Footer } from '@blog/ui/components/organisms/footer';
+import { isUndefined } from '@blog/utils/primitives';
 import type { TSampleSiteHeaderProps } from '@platform/components/features/site-preview/sample-site-header';
 import {
   SAMPLE_FOOTER_PART_TEST_ID,
   SAMPLE_FOOTER_TEST_ID,
 } from '@platform/constants/sample-footer';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { usePoweredByProductName } from '@platform/context/powered-by-mark-provider';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import { useTranslations } from 'next-intl';
 
@@ -22,6 +24,7 @@ export const SampleSiteFooter = ({
   footer: { layout, tone, surface, hasCookieSettingsLink },
 }: TSampleSiteFooterProps) => {
   const t = useTranslations('lookPreview');
+  const poweredByProductName = usePoweredByProductName();
 
   const groups = [
     {
@@ -75,6 +78,13 @@ export const SampleSiteFooter = ({
             </TextLink>
           )}
         </Footer.FinePrint>
+        {!isUndefined(poweredByProductName) && (
+          <Footer.PoweredBy
+            label={t('footerPoweredByLabel')}
+            productName={poweredByProductName}
+            href="#"
+          />
+        )}
       </Footer>
     </div>
   );

@@ -776,6 +776,7 @@
       "SHOWN": "Beide"
     },
     "cookieSettingsButtonBannerOff": "De cookiebanner staat uit, dus lezers zien de link noch de knop. Zet de banner aan bij Functies om te kiezen.",
+    "footerPoweredByNote": "Gratis sites tonen ‘Mogelijk gemaakt door {productName}’ aan het einde van de footer. Met het Growth-abonnement verdwijnt dit.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding",
@@ -862,6 +863,7 @@
     "footerContact": "Contact",
     "footerFinePrintAriaLabel": "Juridisch",
     "footerPrivacy": "Privacybeleid",
+    "footerPoweredByLabel": "Mogelijk gemaakt door",
     "footerCookieSettings": "Cookie-instellingen"
   },
   "lookFollow": {

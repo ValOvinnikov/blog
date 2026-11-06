@@ -62,7 +62,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 
 - Layers: `studio` (schema), `service` (loader), `ui` (footer shell), `web` (composition).
 - Features: ./links.md, ./languages.md, ./look.md, ./people.md, ./consent-and-analytics.md, ./seo-and-feeds.md, ./navigation.md, ./rendering-and-caching.md, ./tenant-provisioning.md.
-- Env: `PRODUCT_NAME` and `MARKETING_SITE_URL` (web), for the powered-by mark.
+- Env: `PRODUCT_NAME` (web and platform) and `MARKETING_SITE_URL` (web), for the powered-by mark.
 - Plans: [plans-and-entitlements](./plans-and-entitlements.md) decides which sites carry the mark.
 
 ## Entry points

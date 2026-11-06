@@ -40,6 +40,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+vi.mock('@platform/utils/env/env');
+
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const setup = customRenderAsync(DashboardLookPage, {});

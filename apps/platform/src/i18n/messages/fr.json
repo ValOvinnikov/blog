@@ -776,6 +776,7 @@
       "SHOWN": "Les deux"
     },
     "cookieSettingsButtonBannerOff": "La bannière des cookies est désactivée, les lecteurs ne voient donc ni le lien ni le bouton. Activez la bannière dans Fonctionnalités pour choisir.",
+    "footerPoweredByNote": "Les sites gratuits affichent « Propulsé par {productName} » à la fin du pied de page. Il disparaît avec la formule Growth.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image",
@@ -862,6 +863,7 @@
     "footerContact": "Contact",
     "footerFinePrintAriaLabel": "Mentions légales",
     "footerPrivacy": "Politique de confidentialité",
+    "footerPoweredByLabel": "Propulsé par",
     "footerCookieSettings": "Paramètres des cookies"
   },
   "lookFollow": {
