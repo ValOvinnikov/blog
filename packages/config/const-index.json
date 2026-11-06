@@ -7630,14 +7630,6 @@
         "file": "apps/web/src/constants/site-config.ts"
       }
     ],
-    "site_settings.layout_fetch_failed": [
-      {
-        "ref": "SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED",
-        "scope": "app:web",
-        "from": "@web/constants/site-settings",
-        "file": "apps/web/src/constants/site-settings.ts"
-      }
-    ],
     "tenant_email_identity.tenant_row_not_found": [
       {
         "ref": "TENANT_EMAIL_IDENTITY_LOG.TENANT_ROW_NOT_FOUND",

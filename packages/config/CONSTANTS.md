@@ -696,10 +696,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
 
-### `@web/constants/site-settings` — `apps/web/src/constants/site-settings.ts`
-
-- **SITE_SETTINGS_LOG**: `LAYOUT_FETCH_FAILED`=`"site_settings.layout_fetch_failed"`
-
 ### `@web/constants/tenant-email-identity` — `apps/web/src/constants/tenant-email-identity.ts`
 
 - **TENANT_EMAIL_IDENTITY_LOG**: `TENANT_ROW_NOT_FOUND`=`"tenant_email_identity.tenant_row_not_found"`
