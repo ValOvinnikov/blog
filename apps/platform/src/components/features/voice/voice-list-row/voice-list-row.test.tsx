@@ -7,6 +7,7 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import { TAG_ROW, UNSAVED_MARK } from '@platform/testing/voice/fixtures';
 import type { ComponentProps } from 'react';
 
 import { VoiceListRow } from './voice-list-row';
@@ -42,7 +43,7 @@ describe(`<${VoiceListRow.name}/>`, () => {
   it('summarises a closed list with its route, default text and status', () => {
     setup();
 
-    const row = screen.getByRole('button', { name: /Tag page/ });
+    const row = screen.getByRole('button', { name: TAG_ROW });
 
     expect(row).toHaveAttribute(ARIA_EXPANDED, 'false');
     expect(row).toHaveTextContent('Shown at /tags/…');
@@ -52,8 +53,8 @@ describe(`<${VoiceListRow.name}/>`, () => {
   it('names the list with a button inside an h4', () => {
     setup();
 
-    const heading = screen.getByRole('heading', { level: 4, name: /Tag page/ });
-    const row = screen.getByRole('button', { name: /Tag page/ });
+    const heading = screen.getByRole('heading', { level: 4, name: TAG_ROW });
+    const row = screen.getByRole('button', { name: TAG_ROW });
 
     expect(heading).toContainElement(row);
   });
@@ -61,10 +62,10 @@ describe(`<${VoiceListRow.name}/>`, () => {
   it('summarises a customised value and announces that it is unsaved', () => {
     setup({ value: MOCK_VALUE });
 
-    const row = screen.getByRole('button', { name: /Tag page/ });
+    const row = screen.getByRole('button', { name: TAG_ROW });
 
     expect(row).toHaveTextContent(MOCK_VALUE);
-    const unsavedMark = within(row).getByRole('img', { name: 'Unsaved' });
+    const unsavedMark = within(row).getByRole('img', { name: UNSAVED_MARK });
 
     expect(unsavedMark).toBeVisible();
     expect(row).toHaveTextContent('Customised');
@@ -73,7 +74,7 @@ describe(`<${VoiceListRow.name}/>`, () => {
   it('describes a closed list with its error in text', () => {
     setup({ error: MOCK_ERROR });
 
-    const row = screen.getByRole('button', { name: /Tag page/ });
+    const row = screen.getByRole('button', { name: TAG_ROW });
     const errorText = screen.getByText(MOCK_ERROR);
 
     expect(row).toHaveAccessibleDescription(MOCK_ERROR);
@@ -83,21 +84,24 @@ describe(`<${VoiceListRow.name}/>`, () => {
   it('leaves the error to the open editor', () => {
     setup({ isOpen: true, error: MOCK_ERROR });
 
-    const row = screen.getByRole('button', { name: /Tag page/ });
+    const row = screen.getByRole('button', { name: TAG_ROW });
     const errorText = screen.queryByText(MOCK_ERROR);
 
     expect(row).not.toHaveAccessibleDescription();
     expect(errorText).not.toBeInTheDocument();
   });
 
-  it('trades the summary for its editor when open', () => {
-    setup({ isOpen: true });
+  it('keeps its summary and status beside its editor when open', () => {
+    setup({ isOpen: true, value: MOCK_VALUE, savedValue: null });
 
-    const row = screen.getByRole('button', { name: /Tag page/ });
+    const row = screen.getByRole('button', { name: TAG_ROW });
     const editor = screen.getByText('Editor');
+    const unsavedMark = within(row).getByRole('img', { name: UNSAVED_MARK });
 
     expect(row).toHaveAttribute(ARIA_EXPANDED, 'true');
-    expect(row).not.toHaveTextContent('Default');
+    expect(row).toHaveTextContent(MOCK_VALUE);
+    expect(row).toHaveTextContent('Customised');
+    expect(unsavedMark).toBeVisible();
     expect(editor).toBeVisible();
   });
 });

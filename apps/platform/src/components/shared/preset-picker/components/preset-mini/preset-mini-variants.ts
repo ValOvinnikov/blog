@@ -13,7 +13,7 @@ export const presetMiniVariants = tv({
     logo: [BAR_SHAPE, 'w-[22px] bg-(--preset-mini-muted) opacity-70'],
     bar: [BAR_SHAPE, 'bg-(--preset-mini-bar)'],
     navBar: ['w-[9px]'],
-    title: ['text-admin-13 leading-[15px] whitespace-nowrap'],
+    title: ['text-admin-13 leading-admin-15 whitespace-nowrap'],
     tagline: [
       'text-admin-10-5 leading-[13px] whitespace-nowrap text-(--preset-mini-muted)',
     ],

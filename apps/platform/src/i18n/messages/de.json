@@ -1040,6 +1040,7 @@
     "keepPlaceholder": "<code>{token}</code> beibehalten — die Website setzt den Wert ein.",
     "draftFieldLabel": "{surface} — {field} ({language})",
     "listRoute": "Angezeigt unter {path}",
+    "previewLabel": "{hasField, select, true {Vorschau · {field}} other {Vorschau}}",
     "fieldError": {
       "NOT_A_STRING": "Geben Sie in diesem Feld Text ein.",
       "NOT_RICH_TEXT": "Geben Sie in diesem Feld Text ein.",

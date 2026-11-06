@@ -1040,6 +1040,7 @@
     "keepPlaceholder": "Laat <code>{token}</code> staan — de site vult het in.",
     "draftFieldLabel": "{surface} — {field} ({language})",
     "listRoute": "Getoond op {path}",
+    "previewLabel": "{hasField, select, true {Voorbeeld · {field}} other {Voorbeeld}}",
     "fieldError": {
       "NOT_A_STRING": "Vul in dit veld tekst in.",
       "NOT_RICH_TEXT": "Vul in dit veld tekst in.",
