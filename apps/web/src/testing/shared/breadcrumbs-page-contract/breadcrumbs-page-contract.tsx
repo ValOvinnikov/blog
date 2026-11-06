@@ -2,7 +2,10 @@ import { LOCALE_ISO_CODES, NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
 import { JSON_LD_SCRIPT_TEST_ID } from '@web/constants/json-ld';
-import { getRequestContext } from '@web/server/request-context/request-context';
+import {
+  getRequestContext,
+  type TRequestContext,
+} from '@web/server/request-context/request-context';
 import { screen, within } from '@web/testing/custom-render';
 import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -10,6 +13,16 @@ import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 import type { Mock } from 'vitest';
+
+const mockRequestContextForTest = (overrides: Partial<TRequestContext>) => {
+  vi.mocked(getRequestContext).mockResolvedValue({
+    ...MOCK_REQUEST_CONTEXT,
+    ...overrides,
+  });
+  onTestFinished(() => {
+    vi.mocked(getRequestContext).mockReset();
+  });
+};
 
 interface IBreadcrumbTrailStep {
   label: string;
@@ -115,10 +128,7 @@ export const testBreadcrumbsJsonLdSchema = <TData,>({
 
   it('prefixes the JSON-LD item URLs with the language on a non-default-language page', async () => {
     pageLoaderMock?.mockResolvedValue(okResult(successData));
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...MOCK_REQUEST_CONTEXT,
-      locale: LOCALE_ISO_CODES.NL,
-    });
+    mockRequestContextForTest({ locale: LOCALE_ISO_CODES.NL });
 
     await setup();
 
@@ -139,10 +149,7 @@ export const testNoJsonLdWithoutBaseUrl = <TData,>({
 }) => {
   it('renders no JSON-LD script when the base URL cannot be resolved', async () => {
     pageLoaderMock?.mockResolvedValue(okResult(successData));
-    vi.mocked(getRequestContext).mockResolvedValueOnce({
-      ...MOCK_REQUEST_CONTEXT,
-      metadataBase: undefined,
-    });
+    mockRequestContextForTest({ metadataBase: undefined });
 
     await setup();
 

@@ -5,7 +5,7 @@ import {
   testBreadcrumbsJsonLdSchema,
   testNoJsonLdWithoutBaseUrl,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { MOCK_TENANT_NAME } from '@web/testing/shared/tenant/fixtures';
 
 interface IStaticBreadcrumbsContractOptions {
   setup: TAsyncSetup;
@@ -24,7 +24,7 @@ export const testStaticBreadcrumbsContract = ({
     const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
 
     const homeLink = within(nav).getByRole('link', {
-      name: MOCK_SITE_SETTINGS.brand.name,
+      name: MOCK_TENANT_NAME,
     });
     expect(homeLink).toHaveAttribute('href', '/');
 

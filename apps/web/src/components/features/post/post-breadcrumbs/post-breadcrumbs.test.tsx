@@ -11,13 +11,13 @@ import {
   testNotFoundOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
+import { MOCK_TENANT_NAME } from '@web/testing/shared/tenant/fixtures';
 
 import { PostBreadcrumbs } from './post-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 const { getPostPageMock } = vi.hoisted(() => ({
   getPostPageMock: vi.fn(),
@@ -38,7 +38,7 @@ const MOCK_POST = {
 };
 
 const POST_SLUG = MOCK_POST.slug;
-const SITE_NAME = MOCK_SITE_SETTINGS.brand.name;
+const SITE_NAME = MOCK_TENANT_NAME;
 const HOME_HREF = routes.home();
 const TOPIC_HREF = routes.topic(MOCK_TOPIC_SLUG);
 const POST_HREF = routes.post(POST_SLUG);

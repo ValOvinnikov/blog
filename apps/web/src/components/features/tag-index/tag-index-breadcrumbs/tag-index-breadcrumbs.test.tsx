@@ -13,7 +13,7 @@ import { TagIndexBreadcrumbs } from './tag-index-breadcrumbs';
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 const { getTagIndexPageMock } = vi.hoisted(() => ({
   getTagIndexPageMock: vi.fn(),

@@ -17,13 +17,14 @@ import {
   enterRequestContext,
   getRequestContext,
 } from '@web/server/request-context/request-context';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { mockRouteParams } from '@web/testing/app/route-params';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
@@ -46,6 +47,8 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -103,16 +106,22 @@ describe(generateStaticParams, () => {
 });
 
 describe(generateMetadata, () => {
-  it('builds the title from site settings and stays indexable in production', async () => {
+  it('builds the title from the brand name and stays indexable in production', async () => {
     const metadata = await generateMetadata({ params: mockRouteParams() });
 
     expect(metadata).toEqual({
       metadataBase: MOCK_REQUEST_CONTEXT.metadataBase,
       title: {
-        default: MOCK_SITE_SETTINGS.brand.name,
-        template: `%s | ${MOCK_SITE_SETTINGS.brand.name}`,
+        default: MOCK_TENANT_NAME,
+        template: `%s | ${MOCK_TENANT_NAME}`,
       },
     });
+  });
+
+  it("reads the brand name for the request context's tenant", async () => {
+    await generateMetadata({ params: mockRouteParams() });
+
+    expect(vi.mocked(getBrandName)).toHaveBeenCalledWith(MOCK_REQUEST_CONTEXT);
   });
 
   it('adds noindex, nofollow robots metadata outside production', async () => {
@@ -131,9 +140,9 @@ describe(generateMetadata, () => {
     expect(enterRequestContextMock).toHaveBeenCalledWith(params);
   });
 
-  describe(SETTINGS_FAILURE_SUITE, () => {
+  describe('without a brand name', () => {
     beforeEach(() => {
-      settingsFailure();
+      vi.mocked(getBrandName).mockResolvedValueOnce(undefined);
     });
 
     it('falls back to metadataBase only', async () => {

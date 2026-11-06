@@ -11,6 +11,7 @@ import {
   enterRequestContext,
   getRequestContext,
 } from '@web/server/request-context/request-context';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { getThemeTokens } from '@web/utils/get-theme-tokens';
@@ -29,28 +30,18 @@ export async function generateMetadata({
   params,
 }: TGenerateMetadataProps): Promise<Metadata> {
   await enterRequestContext(params);
-  const { metadataBase } = await getRequestContext();
-  const result = await getSiteSettings();
+  const requestContext = await getRequestContext();
+  const brandName = await getBrandName(requestContext);
 
   const robotsMetadata = isProductionEnvironment()
     ? {}
     : { robots: { index: false, follow: false } };
 
-  if (!result.ok) {
-    logger.error(SITE_SETTINGS_LOG.METADATA_FETCH_FAILED, {
-      error: result.error,
-    });
-    return { metadataBase, ...robotsMetadata };
-  }
-
-  const { brand } = result.data;
-
   return {
-    metadataBase,
-    title: {
-      default: brand.name,
-      template: `%s | ${brand.name}`,
-    },
+    metadataBase: requestContext.metadataBase,
+    ...(brandName && {
+      title: { default: brandName, template: `%s | ${brandName}` },
+    }),
     ...robotsMetadata,
   };
 }

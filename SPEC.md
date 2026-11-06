@@ -602,8 +602,9 @@ Studio's internal list label. The breadcrumb trail rests on the same
 guarantee: `page_landing`'s trailing crumb comes from
 `headingBlock.heading`, which always exists, so it is always present in
 both the visible trail and the `BreadcrumbList` JSON-LD. Every other crumb
-label comes from Studio as well — the root crumb is `settings_site`'s
-`brand.name`, and the blog, topics and tags index crumbs are their
+label comes from content as well — the root crumb is the brand name set on
+the platform's Look page (`site_config.brand_name`, falling back to the
+tenant name), and the blog, topics and tags index crumbs are their
 singleton's `headingBlock.heading` — so the message catalogue keeps only the
 trail's `aria-label`.
 
