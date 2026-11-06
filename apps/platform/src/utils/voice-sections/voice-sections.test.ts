@@ -7,10 +7,8 @@ import {
   VOICE_SECTION_ID,
   type TVoiceSection,
 } from '@platform/constants/voice';
-import {
-  buildVoiceDraft,
-  localeDraftOf,
-} from '@platform/utils/voice-draft/voice-draft';
+import { localeDraftOf } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 
 import {
   countVoiceSectionCustomised,

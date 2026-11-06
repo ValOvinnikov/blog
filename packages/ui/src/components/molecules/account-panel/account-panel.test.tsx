@@ -61,11 +61,40 @@ describe.each(Object.values(ACCOUNT_PANEL_STYLE))(
     });
 
     it('signs out from its own menu item', async () => {
-      await userEvent.click(
-        screen.getByRole('menuitem', { name: MOCK_SIGN_OUT_LABEL }),
-      );
+      const signOut = screen.getByRole('menuitem', {
+        name: MOCK_SIGN_OUT_LABEL,
+      });
+
+      await userEvent.click(signOut);
 
       expect(onSignOut).toHaveBeenCalledOnce();
+    });
+  },
+);
+
+describe.each(Object.values(ACCOUNT_PANEL_STYLE))(
+  `<${AccountPanel.name}/> as %s without a bookmarks link`,
+  (appearance) => {
+    beforeEach(() => {
+      setup({ appearance, links: { settings: MOCK_SETTINGS } });
+    });
+
+    it('leaves out the bookmarks entry', () => {
+      const bookmarks = screen.queryByRole('menuitem', {
+        name: MOCK_BOOKMARKS.label,
+      });
+
+      expect(bookmarks).not.toBeInTheDocument();
+    });
+
+    it('keeps the settings link and sign-out', () => {
+      const items = screen.getAllByRole('menuitem');
+      const signOut = screen.getByRole('menuitem', {
+        name: MOCK_SIGN_OUT_LABEL,
+      });
+
+      expect(items[0]).toHaveAttribute('href', MOCK_SETTINGS.href);
+      expect(signOut).toBeInTheDocument();
     });
   },
 );

@@ -15,6 +15,7 @@ import { voiceFieldsOf } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { VoiceSurfaceNote } from './components/voice-surface-note';
 import { VoiceSurfacePreview } from './components/voice-surface-preview';
 import { VoiceSurfaceSummary } from './components/voice-surface-summary';
 import { voiceSurfaceCardVariants } from './voice-surface-card-variants';
@@ -89,6 +90,9 @@ export const VoiceSurfaceCard = ({ surface }: TVoiceSurfaceCardProps) => {
                 <VoiceField field={field} />
               </div>
             ))
+          )}
+          {!isArchive && (
+            <VoiceSurfaceNote surface={surface} isClosingCard={true} />
           )}
         </div>
         <VoiceSurfacePreview

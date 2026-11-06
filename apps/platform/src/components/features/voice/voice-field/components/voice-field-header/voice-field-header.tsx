@@ -27,21 +27,27 @@ export const VoiceFieldHeader = ({
   onReset,
 }: TVoiceFieldHeaderProps) => {
   const {
-    root,
-    labelGroup,
+    labelRow,
     label: labelSlot,
+    hintRow,
     hint: hintSlot,
-    status,
   } = voiceFieldHeaderVariants({ isInListRow });
 
   return (
-    <div className={root()}>
-      <div className={labelGroup()}>
-        {isRich ? (
-          !isInListRow && <span className={labelSlot()}>{label}</span>
-        ) : (
-          <Field.Label className={labelSlot()}>{label}</Field.Label>
-        )}
+    <>
+      {isInListRow ? (
+        !isRich && <Field.Label className={labelSlot()}>{label}</Field.Label>
+      ) : (
+        <div className={labelRow()}>
+          {isRich ? (
+            <span className={labelSlot()}>{label}</span>
+          ) : (
+            <Field.Label className={labelSlot()}>{label}</Field.Label>
+          )}
+          <FieldStatus isCustomised={isCustomised} isUnsaved={isUnsaved} />
+        </div>
+      )}
+      <div className={hintRow()}>
         <Field.Description
           id={hintId}
           render={<span />}
@@ -49,13 +55,8 @@ export const VoiceFieldHeader = ({
         >
           {hint}
         </Field.Description>
-      </div>
-      <div className={status()}>
-        {!isInListRow && (
-          <FieldStatus isCustomised={isCustomised} isUnsaved={isUnsaved} />
-        )}
         {onReset && <FieldResetButton onReset={onReset} />}
       </div>
-    </div>
+    </>
   );
 };

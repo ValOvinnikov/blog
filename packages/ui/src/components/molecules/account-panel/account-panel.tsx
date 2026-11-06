@@ -29,7 +29,7 @@ export interface IAccountPanelLink {
 }
 
 export interface IAccountPanelLinks {
-  bookmarks: IAccountPanelLink;
+  bookmarks?: IAccountPanelLink;
   settings: IAccountPanelLink;
 }
 
@@ -74,7 +74,9 @@ export const AccountPanel = ({
   const isCard = appearance === ACCOUNT_PANEL_STYLE.CARD;
   const isHub = appearance === ACCOUNT_PANEL_STYLE.HUB;
   const destinations: { icon: TIconName; link: IAccountPanelLink }[] = [
-    { icon: ICONS.BOOKMARK, link: links.bookmarks },
+    ...(links.bookmarks
+      ? [{ icon: ICONS.BOOKMARK, link: links.bookmarks }]
+      : []),
     { icon: ICONS.SETTINGS, link: links.settings },
   ];
 

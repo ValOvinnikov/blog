@@ -1,10 +1,7 @@
 import { serializePortableText } from '@blog/email';
 import { faker } from '@faker-js/faker';
 
-import {
-  EMAIL_PORTABLE_TEXT_SCHEMA,
-  isBlankPortableTextValue,
-} from './portable-text-schema';
+import { EMAIL_PORTABLE_TEXT_SCHEMA } from './portable-text-schema';
 
 faker.seed(1);
 
@@ -72,26 +69,5 @@ describe('EMAIL_PORTABLE_TEXT_SCHEMA', () => {
     ]);
 
     expect(html).not.toBe(plainHtml);
-  });
-});
-
-describe(isBlankPortableTextValue, () => {
-  it.each([
-    { value: undefined, shape: 'undefined' },
-    { value: null, shape: 'null' },
-    { value: [], shape: 'an empty array' },
-    { value: [mockBlock({ style: 'normal' })], shape: 'one empty paragraph' },
-    { value: [mockBlock({ text: '   ' })], shape: 'whitespace-only text' },
-  ])('treats $shape as blank', ({ value }) => {
-    expect(isBlankPortableTextValue(value)).toBe(true);
-  });
-
-  it.each([
-    { value: [mockBlock({ text: MOCK_TEXT })], shape: 'real text' },
-    { value: [mockBlock({ style: 'h2' })], shape: 'an empty heading' },
-    { value: [mockBlock({ listItem: 'bullet' })], shape: 'an empty list item' },
-    { value: [mockBlock(), mockBlock()], shape: 'more than one block' },
-  ])('treats $shape as not blank', ({ value }) => {
-    expect(isBlankPortableTextValue(value)).toBe(false);
   });
 });

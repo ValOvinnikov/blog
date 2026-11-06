@@ -6,7 +6,7 @@ export const cookieSettingsItemSchema = defineType({
   title: 'Cookie Settings',
   type: 'object',
   description:
-    'Sets where the Cookie settings link sits among the fine print. The link shows on every site either way.',
+    'Sets where the Cookie settings link sits among the fine print when it shows. The Footer settings on the Look page and the cookie banner decide whether it does.',
   icon: Cookie,
   fields: [
     // Sanity rejects an object type with no fields; this one only marks a position.

@@ -13,11 +13,14 @@ const COOKIE_SETTINGS_ITEM: TFooterFinePrintItem = {
   kind: FOOTER_FINE_PRINT_KIND.COOKIE_SETTINGS,
 };
 
-/** Drops every link whose href an earlier group or fine-print link already carries, and keeps Cookie settings in the fine print exactly once. */
+/** Drops every link whose href an earlier group or fine-print link already carries, and keeps Cookie settings in the fine print exactly once while the link shows. */
 export const arrangeFooterLinks = ({
   groups,
   finePrint,
-}: Pick<TFooter, 'groups' | 'finePrint'>): TArrangedFooterLinks => {
+  hasCookieSettingsLink,
+}: Pick<TFooter, 'groups' | 'finePrint'> & {
+  hasCookieSettingsLink: boolean;
+}): TArrangedFooterLinks => {
   const seenHrefs = new Set<string>();
   let hasCookieSettings = false;
 
@@ -33,7 +36,7 @@ export const arrangeFooterLinks = ({
     }
     const isFirst = !hasCookieSettings;
     hasCookieSettings = true;
-    return isFirst;
+    return isFirst && hasCookieSettingsLink;
   };
 
   const arrangedGroups = groups.flatMap(({ heading, links }) => {
@@ -49,8 +52,9 @@ export const arrangeFooterLinks = ({
 
   return {
     groups: arrangedGroups,
-    finePrint: hasCookieSettings
-      ? arrangedFinePrint
-      : [...arrangedFinePrint, COOKIE_SETTINGS_ITEM],
+    finePrint:
+      hasCookieSettings || !hasCookieSettingsLink
+        ? arrangedFinePrint
+        : [...arrangedFinePrint, COOKIE_SETTINGS_ITEM],
   };
 };

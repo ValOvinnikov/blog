@@ -1,3 +1,4 @@
+import { VOICE_SURFACE } from '@blog/config';
 import { tv } from '@platform/utils/tv/tv';
 
 export const voiceSurfacePreviewVariants = tv({
@@ -17,7 +18,6 @@ export const voiceSurfacePreviewVariants = tv({
       'font-admin-mono text-admin-11 leading-admin-15 font-medium tracking-admin-caps text-admin-muted uppercase',
     ],
     specimen: ['grid'],
-    note: ['text-admin-12 leading-4 text-admin-muted'],
   },
   variants: {
     isArchive: {
@@ -31,6 +31,12 @@ export const voiceSurfacePreviewVariants = tv({
       false: {
         column: ['max-lg:hidden'],
       },
+    },
+    surface: {
+      [VOICE_SURFACE.NOT_FOUND]: { specimen: ['min-h-[300px]'] },
+      [VOICE_SURFACE.ERROR]: { specimen: ['min-h-[240px]'] },
+      [VOICE_SURFACE.BOOKMARKS]: { specimen: ['min-h-[150px]'] },
+      [VOICE_SURFACE.ARCHIVE]: {},
     },
     isPreviewOpen: {
       false: { preview: ['max-lg:hidden'] },

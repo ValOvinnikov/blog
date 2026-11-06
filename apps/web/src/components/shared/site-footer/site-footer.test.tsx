@@ -241,20 +241,10 @@ describe(`<${SiteFooter.name}/>`, () => {
     expect(wordmark).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('shows the footer Cookie settings link with the consent banner off', async () => {
-    await setup();
-
-    const footer = screen.getByRole('contentinfo');
-    const cookieSettings = within(footer).getByRole('button', {
-      name: COOKIE_SETTINGS_NAME,
-    });
-
-    expect(cookieSettings).toBeVisible();
-  });
-
   describe("with the editor's footer content", () => {
     const setupWithFooter = async (overrides: Partial<TFooter>) => {
       getFooterMock.mockResolvedValue(okResult(mockFooter(overrides)));
+      isCapabilityEnabledMock.mockResolvedValueOnce(true);
       await setup();
     };
 
@@ -389,43 +379,61 @@ describe(`<${SiteFooter.name}/>`, () => {
   });
 
   describe('when the reader has answered the consent banner', () => {
+    const queryCookieSettingsLink = () =>
+      within(screen.getByRole('contentinfo')).queryByRole('button', {
+        name: COOKIE_SETTINGS_NAME,
+      });
+    const queryFloatingButton = () =>
+      screen.queryByTestId(FLOATING_COOKIE_SETTINGS_TEST_ID);
+
     beforeEach(() => {
       grantConsent();
+      getFooterMock.mockResolvedValue(
+        okResult(mockFooter({ finePrint: [COOKIE_SETTINGS_ITEM] })),
+      );
     });
 
     afterEach(clearConsentCookie);
 
-    it('shows the floating Cookie settings button when it is Shown and the banner is on', async () => {
+    it('shows the footer link and no floating button when the footer link is chosen', async () => {
+      await setupWithFooterStyle({
+        style: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.HIDDEN },
+        isConsentBannerEnabled: true,
+      });
+
+      expect(queryCookieSettingsLink()).toBeVisible();
+      expect(queryFloatingButton()).not.toBeInTheDocument();
+    });
+
+    it('shows the floating button and no footer link when only the button is chosen, even with the Studio item set', async () => {
+      await setupWithFooterStyle({
+        style: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.ONLY },
+        isConsentBannerEnabled: true,
+      });
+
+      expect(queryCookieSettingsLink()).not.toBeInTheDocument();
+      expect(queryFloatingButton()).toBeVisible();
+    });
+
+    it('shows both when both are chosen', async () => {
       await setupWithFooterStyle({
         style: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
         isConsentBannerEnabled: true,
       });
 
-      const floatingButton = screen.getByTestId(
-        FLOATING_COOKIE_SETTINGS_TEST_ID,
-      );
-      expect(floatingButton).toBeVisible();
+      expect(queryCookieSettingsLink()).toBeVisible();
+      expect(queryFloatingButton()).toBeVisible();
     });
 
-    it('leaves the floating button out while it is Hidden', async () => {
-      await setupWithFooterStyle({ isConsentBannerEnabled: true });
+    it.each(Object.values(COOKIE_SETTINGS_BUTTON))(
+      'shows neither with the consent banner off, whatever is chosen (%s)',
+      async (cookieSettingsButton) => {
+        await setupWithFooterStyle({ style: { cookieSettingsButton } });
 
-      const floatingButton = screen.queryByTestId(
-        FLOATING_COOKIE_SETTINGS_TEST_ID,
-      );
-      expect(floatingButton).not.toBeInTheDocument();
-    });
-
-    it('leaves the floating button out with the consent banner off', async () => {
-      await setupWithFooterStyle({
-        style: { cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN },
-      });
-
-      const floatingButton = screen.queryByTestId(
-        FLOATING_COOKIE_SETTINGS_TEST_ID,
-      );
-      expect(floatingButton).not.toBeInTheDocument();
-    });
+        expect(queryCookieSettingsLink()).not.toBeInTheDocument();
+        expect(queryFloatingButton()).not.toBeInTheDocument();
+      },
+    );
   });
 
   describe('when the footer fails to load', () => {

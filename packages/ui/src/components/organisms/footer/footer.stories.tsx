@@ -196,6 +196,68 @@ export const WithoutGroupsAboutOrAddress: TStory = {
   },
 };
 
+const PoweredBy = (
+  <Footer.PoweredBy
+    label="Powered by"
+    productName="Inkwell"
+    href="https://example.com"
+  />
+);
+
+const WithPoweredBy = (
+  <>
+    {FullContent}
+    {PoweredBy}
+  </>
+);
+
+export const PoweredByColumns: TStory = {
+  args: { layout: FOOTER_LAYOUT.COLUMNS, children: WithPoweredBy },
+};
+
+export const PoweredByCentred: TStory = {
+  args: { layout: FOOTER_LAYOUT.CENTRED, children: WithPoweredBy },
+};
+
+export const PoweredByCompact: TStory = {
+  args: { layout: FOOTER_LAYOUT.COMPACT, children: WithPoweredBy },
+};
+
+export const PoweredByBigWordmark: TStory = {
+  args: { layout: FOOTER_LAYOUT.BIG_WORDMARK, children: WithPoweredBy },
+};
+
+export const PoweredByLongCopyright: TStory = {
+  render: AllLayoutsNarrow,
+  args: {
+    children: (
+      <>
+        <Footer.Copyright
+          title="The Harbour Street Journal of Software Craft"
+          year={2027}
+        />
+        <Footer.FinePrint ariaLabel="Legal">
+          <TextLink appearance="nav" href="/privacy">
+            Privacybeleid
+          </TextLink>
+          <TextLink appearance="nav" href="/terms">
+            Algemene voorwaarden
+          </TextLink>
+          <TextLink appearance="nav" href="/cookies">
+            <Icon name={ICONS.COOKIE} size={SIZE.SM} />
+            Cookie-instellingen
+          </TextLink>
+        </Footer.FinePrint>
+        <Footer.PoweredBy
+          label="Mogelijk gemaakt door"
+          productName="Inkwell"
+          href="https://example.com"
+        />
+      </>
+    ),
+  },
+};
+
 export const Minimal: TStory = {
   args: {
     children: <Footer.Copyright title="My Blog" year={2027} />,

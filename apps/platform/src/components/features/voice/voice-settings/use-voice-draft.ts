@@ -14,7 +14,6 @@ import {
   type TSaveVoiceOverridesResult,
 } from '@platform/server/site-config/save-voice-overrides-action';
 import {
-  buildVoiceDraft,
   countLanguageVoiceChanges,
   countVoiceChanges,
   toVoiceOverridesInput,
@@ -27,6 +26,7 @@ import {
   type TVoiceFieldError,
   type TVoiceFieldErrorsByLocale,
 } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import { toVoiceFieldMessages } from '@platform/utils/voice-field-errors/voice-field-errors';
 import { voiceSectionOfField } from '@platform/utils/voice-sections/voice-sections';
 import { useRouter } from 'next/navigation';

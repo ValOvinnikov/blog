@@ -19,6 +19,7 @@ export const footerQuery = q
       .nullable(true),
     about: getLocalizedField(sub, 'about'),
     address: getLocalizedField(sub, 'address'),
+    copyrightName: getLocalizedField(sub, 'copyrightName'),
     finePrint: sub
       .field('finePrint[]')
       .project((item) => ({

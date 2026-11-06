@@ -18,6 +18,7 @@ import {
   mockRawExternalLinkDocument,
 } from '@blog/service/testing/shared/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
+import { isNull } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 
 import { getFooter } from './loader';
@@ -35,13 +36,14 @@ const MOCK_FIRST_URL = faker.internet.url();
 const MOCK_SECOND_URL = faker.internet.url();
 const MOCK_ABOUT = faker.lorem.sentence();
 const MOCK_ADDRESS = faker.location.streetAddress({ useFullAddress: true });
+const MOCK_COPYRIGHT_NAME = faker.company.name();
 
 const MOCK_UNRESOLVABLE_LINK = mockRawExternalLinkDocument({ url: null });
 
 function mockRawLinkRef(url: TMaybeNull<string>) {
   return {
     _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
-    link: url === null ? null : mockRawExternalLinkDocument({ url }),
+    link: isNull(url) ? null : mockRawExternalLinkDocument({ url }),
   };
 }
 
@@ -178,7 +180,7 @@ describe(getFooter, () => {
     ]);
   });
 
-  it('returns no groups, fine print, about text or address when none are set', async () => {
+  it('returns no groups, fine print, about text, address or copyright name when none are set', async () => {
     const result = await getFooter(MOCK_TENANT);
 
     expect(result).toMatchObject({
@@ -186,19 +188,25 @@ describe(getFooter, () => {
       finePrint: [],
       about: undefined,
       address: undefined,
+      copyrightName: undefined,
     });
   });
 
-  it('passes the about text and address through', async () => {
+  it('passes the about text, address and copyright name through', async () => {
     mockRun.mockResolvedValueOnce(
-      mockRawFooter({ about: MOCK_ABOUT, address: MOCK_ADDRESS }),
+      mockRawFooter({
+        about: MOCK_ABOUT,
+        address: MOCK_ADDRESS,
+        copyrightName: MOCK_COPYRIGHT_NAME,
+      }),
     );
 
-    const result = await getFooter(MOCK_TENANT);
+    const { about, address, copyrightName } = await getFooter(MOCK_TENANT);
 
-    expect({ about: result.about, address: result.address }).toEqual({
+    expect({ about, address, copyrightName }).toEqual({
       about: MOCK_ABOUT,
       address: MOCK_ADDRESS,
+      copyrightName: MOCK_COPYRIGHT_NAME,
     });
   });
 

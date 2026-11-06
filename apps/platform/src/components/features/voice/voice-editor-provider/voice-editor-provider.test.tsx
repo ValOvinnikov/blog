@@ -4,10 +4,10 @@ import { faker } from '@faker-js/faker';
 import { act, renderHook } from '@platform/testing/custom-render';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
-  buildVoiceDraft,
   localeDraftOf,
   withVoiceValue,
 } from '@platform/utils/voice-draft/voice-draft';
+import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import type { ReactNode } from 'react';
 
 import {
@@ -60,13 +60,13 @@ describe(`<${VoiceEditorProvider.name}/>`, () => {
     const { result } = renderHook(() => useVoiceFieldState('notFoundHeading'), {
       wrapper: Wrapper,
     });
-    const { inputId, value, savedValue, error, placeholder } = result.current;
+    const { inputId, value, savedValue, error, defaultText } = result.current;
 
     expect(inputId).toBe(`${MOCK_FIELD_ID_PREFIX}-notFoundHeading`);
     expect(value).toBe(MOCK_VALUE);
     expect(savedValue).toBe('');
     expect(error).toBe(MOCK_ERROR);
-    expect(placeholder).toBe(SITE_MESSAGES_BY_LOCALE.DE.notFound.heading);
+    expect(defaultText).toBe(SITE_MESSAGES_BY_LOCALE.DE.notFound.heading);
   });
 
   it('writes a field change under that field', () => {

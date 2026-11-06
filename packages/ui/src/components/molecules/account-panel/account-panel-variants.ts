@@ -20,7 +20,7 @@ export const accountPanelVariants = tv({
       },
       [ACCOUNT_PANEL_STYLE.HUB]: {
         panel: ['gap-3.5'],
-        links: ['grid grid-cols-2 gap-2'],
+        links: ['grid grid-cols-2 gap-2', '*:only:col-span-2'],
         footer: ['flex justify-end', 'border-t border-border pt-3'],
         signOut: ['w-auto min-h-8 px-2.5 py-1.5'],
       },

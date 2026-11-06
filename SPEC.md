@@ -1748,8 +1748,8 @@ text; there are no metadata-only Voice fields.
 **The Voice page** (`apps/platform`) edits one language at a time through a
 switcher over the tenant's live languages, each showing its customised count.
 It is one column of four cards, one per surface. Each card holds its fields
-(the control for the field's kind, the catalog default as placeholder, a
-Default/Customised badge, Reset, and a "Keep `{name}`" note) beside a
+(the control for the field's kind showing the catalog default as its
+value, a Default/Customised badge, Reset, and a "Keep `{name}`" note) beside a
 specimen of that surface. The empty lists show as compact rows with one
 open at a time. Saving goes through the settings save bar, which shows
 `fieldErrorsByLocale` inline. The specimens live in
@@ -1876,16 +1876,18 @@ costs convenience, never compliance.
   value from `apps/web`'s `constants/consent.ts`. `ConsentPreferencesProvider`,
   mounted for every tenant through the locale layout's client providers, holds
   only the preferences dialog's open state (`isOpen`, `open`, `close`) and the
-  footer button it returns focus to.
+  footer link and floating button it returns focus to.
 - _Banner._ Shown only when the tenant's `CONSENT_BANNER` capability is
   enabled and the status is `UNANSWERED`: a non-modal card with equal-weight
   Accept all / Reject all and a Settings action.
 - _Preferences._ `@blog/ui`'s `Dialog` wrapping `ConsentPreferences` —
   Necessary locked on, External media never pre-ticked, one Close beside Save.
   Escape and a backdrop click close it without saving; closing returns focus to
-  the opener, or to the footer's "Cookie settings" button when the opener (the
-  banner) is gone. That button reopens it on every tenant, banner or not, so
-  withdrawing is as easy as granting.
+  the opener, or, when the opener (the banner) is gone, to the floating
+  "Cookie settings" button, else the footer's "Cookie settings" link. With the
+  banner on, Look › Footer shows the link, the floating button or both — never
+  neither — so withdrawing is as easy as granting; with the banner off neither
+  shows, and only a Cookie settings module an editor placed reopens it.
 - _Copy._ The `consent.*` messages ship in every locale catalog and are
   fixed (`VOICE_FIXED_KEYS`): they state what the code enforces, and
   rewording the message would never re-ask visitors who consented under the
