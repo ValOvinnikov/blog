@@ -1,44 +1,34 @@
 import {
   SITE_MESSAGES_BY_LOCALE,
   VOICE_FIELD_KIND,
-  VOICE_FIELDS,
   VOICE_SURFACE,
-  type TVoiceFieldId,
 } from '@blog/config';
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
-import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import {
   ARCHIVED_NOTICE_TEXT,
   customRenderInSettingsForm,
 } from '@platform/testing/render-in-settings-form';
-import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import {
   KEEP_NAME_NOTE,
+  SUPPORTING_TEXT_FIELD,
   TOPIC_FIELD,
   UNSAVED_MARK,
 } from '@platform/testing/voice/fixtures';
 import {
-  localeDraftOf,
-  withVoiceValue,
-  type TVoiceDraftValue,
-  type TVoiceFieldErrors,
-} from '@platform/utils/voice-draft/voice-draft';
-import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
+  MOCK_FIELD_ID_PREFIX,
+  VoiceFieldInEditor,
+  fieldById,
+} from '@platform/testing/voice/voice-field-in-editor';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
 
-import { VoiceField, type TVoiceFieldProps } from './voice-field';
+import { VoiceField } from './voice-field';
 
 faker.seed(5994);
 
-const { EN } = LOCALE_ISO_CODES;
 const HEADING = 'Heading';
-const SUPPORTING_TEXT = 'Supporting text';
 const ARIA_INVALID = 'aria-invalid';
-const MOCK_FIELD_ID_PREFIX = faker.lorem.word();
 const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_HEADING = faker.lorem.words(3);
 const { reset: RESET } = messages.fieldStatus;
@@ -47,54 +37,11 @@ const MOCK_SUFFIX = faker.string.alpha(3);
 
 const setFieldValue = vi.fn();
 
-const fieldById = (id: TVoiceFieldId) =>
-  VOICE_FIELDS.find((field) => field.id === id)!;
-
-type TVoiceFieldInEditorProps = TVoiceFieldProps & {
-  value: TVoiceDraftValue;
-  savedValue?: TVoiceDraftValue;
-  errors: TVoiceFieldErrors;
-};
-
-const VoiceFieldInEditor = ({
-  field,
-  value,
-  savedValue = value,
-  errors,
-}: TVoiceFieldInEditorProps) => {
-  const [draftValue, setDraftValue] = useState(value);
-  const values = localeDraftOf(
-    withVoiceValue(buildVoiceDraft({}, [EN]), EN, field.id, draftValue),
-    EN,
-  );
-  const savedValues = localeDraftOf(
-    withVoiceValue(buildVoiceDraft({}, [EN]), EN, field.id, savedValue),
-    EN,
-  );
-  return (
-    <VoiceEditorProvider
-      locale={EN}
-      fieldIdPrefix={MOCK_FIELD_ID_PREFIX}
-      values={values}
-      savedValues={savedValues}
-      errors={errors}
-      openListFieldId={undefined}
-      setOpenListFieldId={vi.fn()}
-      setFieldValue={(id, next) => {
-        setFieldValue(id, next);
-        setDraftValue(next);
-      }}
-      specimenTheme={MOCK_SITE_PREVIEW_THEME}
-    >
-      <VoiceField field={field} />
-    </VoiceEditorProvider>
-  );
-};
-
 const setup = customRenderInSettingsForm(VoiceFieldInEditor, {
   field: fieldById('notFoundHeading'),
   value: '',
   errors: {},
+  onSetFieldValue: setFieldValue,
 });
 
 describe(`<${VoiceField.name}/>`, () => {
@@ -160,7 +107,7 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({ field: fieldById('notFoundSupportingText'), value: null });
 
     const editor = await screen.findByRole('textbox', {
-      name: SUPPORTING_TEXT,
+      name: SUPPORTING_TEXT_FIELD,
     });
     const controls = screen.getAllByRole('button');
 
@@ -214,7 +161,7 @@ describe(`<${VoiceField.name}/>`, () => {
       { isArchived: true },
     );
 
-    const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT });
+    const editor = screen.getByRole('textbox', { name: SUPPORTING_TEXT_FIELD });
     const editingControl = screen.queryByRole('button');
 
     expect(editingControl).not.toBeInTheDocument();
@@ -224,7 +171,7 @@ describe(`<${VoiceField.name}/>`, () => {
 
   it.each([
     ['text', 'notFoundHeading', HEADING],
-    ['rich', 'notFoundSupportingText', SUPPORTING_TEXT],
+    ['rich', 'notFoundSupportingText', SUPPORTING_TEXT_FIELD],
   ] as const)(
     'describes a read-only %s field with the archived notice',
     (_kind, id, name) => {
@@ -246,7 +193,7 @@ describe(`<${VoiceField.name}/>`, () => {
     });
 
     const editor = await screen.findByRole('textbox', {
-      name: SUPPORTING_TEXT,
+      name: SUPPORTING_TEXT_FIELD,
     });
 
     expect(editor).toHaveAttribute(
@@ -307,7 +254,7 @@ describe(`<${VoiceField.name}/>`, () => {
     setup({ field: fieldById('notFoundSupportingText'), value: null });
 
     const editor = await screen.findByRole('textbox', {
-      name: SUPPORTING_TEXT,
+      name: SUPPORTING_TEXT_FIELD,
     });
 
     expect(editor).toHaveTextContent(

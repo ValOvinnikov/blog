@@ -5,7 +5,7 @@ import {
   type TVoicePortableText,
 } from '@blog/config';
 import { hasLength } from '@blog/utils/primitives';
-import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
+import { isBlankPortableTextValue } from '@platform/utils/is-blank-portable-text-value/is-blank-portable-text-value';
 
 export const voiceTextToPortableText = (
   id: TVoiceFieldId,

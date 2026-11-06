@@ -15,6 +15,7 @@ import {
   BLOG_INDEX_ROW,
   KEEP_NAME_NOTE,
   NOTHING_HERE,
+  SUPPORTING_TEXT_FIELD,
   TAG_ROW,
   TOPIC_FIELD,
   TOPIC_ROW,
@@ -103,7 +104,7 @@ describe(`<${VoiceSettings.name}/>`, () => {
       });
       const supportingText = await within(voiceCard(PAGE_NOT_FOUND)).findByRole(
         'textbox',
-        { name: 'Supporting text' },
+        { name: SUPPORTING_TEXT_FIELD },
       );
       const emptyBookmarks = await within(voiceCard(BOOKMARKS)).findByRole(
         'textbox',

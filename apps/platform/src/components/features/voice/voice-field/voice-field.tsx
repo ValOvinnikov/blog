@@ -6,7 +6,7 @@ import {
   VOICE_SURFACE,
   type TVoiceFieldKind,
 } from '@blog/config';
-import { isNull, isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@blog/utils/primitives';
 import { useVoiceFieldState } from '@platform/components/features/voice/voice-editor-provider';
 import { FormFieldControlProvider } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
@@ -19,7 +19,7 @@ import {
   type TVoiceField,
 } from '@platform/utils/voice-draft/voice-draft';
 import { useTranslations } from 'next-intl';
-import { useState, type FocusEvent } from 'react';
+import { useRef, useState, type FocusEvent } from 'react';
 
 import { VoiceFieldHeader } from './components/voice-field-header';
 import { VoiceFieldNote } from './components/voice-field-note';
@@ -58,7 +58,12 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
     error && errorId,
   );
 
-  const showDefaultAgain = () => setEditorRevision((revision) => revision + 1);
+  const isEmptiedRef = useRef(false);
+
+  const showDefaultAgain = () => {
+    isEmptiedRef.current = false;
+    setEditorRevision((revision) => revision + 1);
+  };
 
   const reset = () => {
     onChange(isRich ? null : '');
@@ -68,7 +73,8 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
 
   const handleBlur = ({ currentTarget, relatedTarget }: FocusEvent) => {
     textControl.clearTypedText();
-    if (isRich && isNull(value) && !currentTarget.contains(relatedTarget)) {
+    const hasLeftField = !currentTarget.contains(relatedTarget);
+    if (isRich && isEmptiedRef.current && hasLeftField && document.hasFocus()) {
       showDefaultAgain();
     }
   };
@@ -93,6 +99,9 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
           describedBy={richDescribedBy}
           isInvalid={Boolean(error)}
           tokens={field.placeholders}
+          onEmptiedChange={(isEmptied) => {
+            isEmptiedRef.current = isEmptied;
+          }}
         />
       ) : (
         <FormFieldControlProvider

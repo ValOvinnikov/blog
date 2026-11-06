@@ -2,6 +2,7 @@ import {
   portableTextToPlainText,
   VOICE_FIELD_KIND,
   VOICE_FIELDS,
+  type TMaybeUndefined,
   type TVoicePortableText,
 } from '@blog/config';
 import type { TLocaleIsoCode } from '@blog/config/constants';
@@ -40,7 +41,7 @@ const toDraftValue = (
 
 const buildLocaleDraft = (
   locale: TLocaleIsoCode,
-  stored: Partial<Record<string, unknown>> | undefined,
+  stored: TMaybeUndefined<Partial<Record<string, unknown>>>,
 ): TVoiceLocaleDraft =>
   Object.fromEntries(
     VOICE_FIELDS.map((field) => [

@@ -2,6 +2,7 @@
 
 import { type TEmailTemplateType } from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
+import { isNull } from '@blog/utils/primitives';
 import { EmailLogoField } from '@platform/components/features/email/email-logo-field';
 import { Card } from '@platform/components/shared/card';
 import { FieldResetButton } from '@platform/components/shared/field-reset-button';
@@ -16,9 +17,9 @@ import type {
   TEmailCopyDraft,
   TEmailCopyEdit,
 } from '@platform/utils/email-draft/email-draft';
+import { isBlankPortableTextValue } from '@platform/utils/is-blank-portable-text-value/is-blank-portable-text-value';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
-import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
@@ -50,7 +51,7 @@ export const EmailTemplateEditor = ({
   const { stack, status } = emailTemplateEditorVariants();
   const { draft, saved, fallback } = copy;
   const isSubjectCustomised = draft.subject !== '';
-  const isBodyCustomised = draft.body !== null;
+  const isBodyCustomised = !isNull(draft.body);
 
   const handleBodyChange = (body: TEmailTemplateBlock[]) =>
     onCopyChange({

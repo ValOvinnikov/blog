@@ -11,6 +11,7 @@ import { useVoiceFieldState } from '@platform/components/features/voice/voice-ed
 import { PortableTextEditor } from '@platform/components/shared/portable-text-editor';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
+import { isBlankPortableTextValue } from '@platform/utils/is-blank-portable-text-value/is-blank-portable-text-value';
 import {
   toVoiceRichDraft,
   voiceTextToPortableText,
@@ -22,6 +23,7 @@ export type TVoiceFieldRichControlProps = {
   describedBy: TMaybeUndefined<string>;
   isInvalid: boolean;
   tokens: readonly string[];
+  onEmptiedChange: (isEmptied: boolean) => void;
 };
 
 export const VoiceFieldRichControl = ({
@@ -30,6 +32,7 @@ export const VoiceFieldRichControl = ({
   describedBy,
   isInvalid,
   tokens,
+  onEmptiedChange,
 }: TVoiceFieldRichControlProps) => {
   const { inputId, value, defaultText, onChange } = useVoiceFieldState(fieldId);
   const { isArchived } = useSettingsFormState();
@@ -43,7 +46,10 @@ export const VoiceFieldRichControl = ({
           ? value
           : voiceTextToPortableText(fieldId, defaultText)
       }
-      onChange={(next) => onChange(toVoiceRichDraft(next, defaultText))}
+      onChange={(next) => {
+        onChange(toVoiceRichDraft(next, defaultText));
+        onEmptiedChange(isBlankPortableTextValue(next));
+      }}
       mode={isArchived ? CONTROL_MODE.READ_ONLY : CONTROL_MODE.EDITABLE}
       size={SIZE.SM}
     />
