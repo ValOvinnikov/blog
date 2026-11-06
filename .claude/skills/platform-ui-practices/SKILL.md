@@ -342,8 +342,9 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   language, a collapsed row), `invalidControls.revealFirst` shows it before the
   save bar's link focuses it. A save failure that belongs to no field goes
   to the shell as `errorTitle` (a plan refusal arrives as `form.planRefusal`):
-  it shows in the save bar's error slot while the bar shows, and as one
-  `Alert` (ERROR) under the header only when no bar does.
+  it shows in the save bar's error slot while the bar shows. A plan refusal
+  that leaves nothing unsaved is a `toast.error`, which stays until the owner
+  dismisses it or saves again.
 - An embedded edit panel outside the shell (today only the tenant details panel)
   calls `useUnsavedChangesGuard`, submits from a right-aligned `Card.Footer`,
   and shows its save error beside Save through `Card.Footer`'s `error`.
@@ -497,15 +498,18 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   - an invalid field shows under the field, plus the count in the save bar;
   - a success is `toast.success`;
   - a failed save from the save bar shows in the bar, beside Save, until the
-    next edit or save;
+    next edit or save; a plan refusal that leaves nothing unsaved is a
+    `toast.error` instead;
   - a failed one-off button action is `toast.error`, or an error `Alert`
     directly beside the button;
   - a failure inside a dialog is an `Alert` in the dialog, which stays open;
   - a failed save in an embedded panel, or a wizard step, is an `Alert`
     beside its Save or submit button.
+- Feedback on something the user just did appears where they are and can be
+  dismissed. A persistent state of the site stays in place, with no dismiss
+  button, until the state changes.
 - A top-of-page `Alert` describes page state only (archived, plan limits,
-  draft recovery, warnings), never the result of an action, except a save
-  failure with no bar left to show it in.
+  draft recovery, warnings), never the result of an action.
 - A notice's title is a short phrase; the explanation is its description, at
   regular weight. Weight marks a title, never a sentence.
 - An empty state never removes the card or the header. A card whose data doesn't

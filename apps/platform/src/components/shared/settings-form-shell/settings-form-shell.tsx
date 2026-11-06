@@ -17,6 +17,7 @@ import { SaveBar } from './components/save-bar/save-bar';
 import { ShellHeader } from './components/shell-header/shell-header';
 import { settingsFormShellVariants } from './settings-form-shell-variants';
 import type { TSettingsForm } from './settings-form-types';
+import { useRefusalToast } from './use-refusal-toast';
 import { useShellSaveActions } from './use-shell-save-actions';
 
 type TSettingsFormShellLayout = {
@@ -78,6 +79,8 @@ export const SettingsFormShell = <TValues,>({
   } = useShellSaveActions({ form, pageTitle: title, hasSavedStatus });
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
   const saveError = isPending ? undefined : (planRefusal ?? errorTitle);
+  const isRefusalToasted = Boolean(planRefusal) && !isSaveBarShown;
+  useRefusalToast(isRefusalToasted ? saveError : undefined, isPending);
   const isPhoneSaveFooterShown =
     Boolean(layout?.hasPhoneSaveFooter) && !isArchived && !isSaveBarHidden;
   const { root, alert, liveStatus } = settingsFormShellVariants({
@@ -104,7 +107,7 @@ export const SettingsFormShell = <TValues,>({
         <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
       )}
 
-      {saveError && !isSaveBarShown && (
+      {saveError && !isSaveBarShown && !isRefusalToasted && (
         <Alert type={ALERT_TYPE.ERROR} title={saveError} className={alert()} />
       )}
 

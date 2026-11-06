@@ -1,11 +1,14 @@
 'use client';
 
 import { TOAST_TYPE } from '@blog/config';
+import { hasLength } from '@blog/utils/primitives';
 import type {
   IToastPayload,
   IToastRecord,
 } from '@platform/components/shared/toast';
 import { ToastViewport } from '@platform/components/shared/toast-viewport';
+import { KEY } from '@platform/constants/keyboard';
+import { TOAST_TEST_ID } from '@platform/constants/toast';
 import { useTranslations } from 'next-intl';
 import {
   createContext,
@@ -67,7 +70,7 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
     store.getState,
     store.getServerState,
   );
-  const hasVisibleToasts = state.visible.length > 0;
+  const hasVisibleToasts = hasLength(state.visible);
 
   useEffect(() => () => store.destroy(), [store]);
 
@@ -87,7 +90,7 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
     if (!hasVisibleToasts) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') store.actions.dismiss();
+      if (event.key === KEY.ESCAPE) store.actions.dismiss();
     };
 
     document.addEventListener('keydown', handleKeyDown);
@@ -99,7 +102,7 @@ export const ToastProvider = ({ children }: TToastProviderProps) => {
       {children}
       <ToastViewport
         ariaLabel={t('viewportAriaLabel')}
-        dataTestId="toast-viewport"
+        dataTestId={TOAST_TEST_ID.VIEWPORT}
       >
         {state.visible.map((record) => (
           <ToastRow

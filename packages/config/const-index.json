@@ -6950,6 +6950,14 @@
         "file": "apps/platform/src/constants/theme.ts"
       }
     ],
+    "toast-viewport": [
+      {
+        "ref": "TOAST_TEST_ID.VIEWPORT",
+        "scope": "app:platform",
+        "from": "@platform/constants/toast",
+        "file": "apps/platform/src/constants/toast.ts"
+      }
+    ],
     "UPLOADS_NOT_CONFIGURED": [
       {
         "ref": "UPLOAD_REFUSAL.UPLOADS_NOT_CONFIGURED",
