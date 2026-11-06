@@ -1,9 +1,13 @@
 'use client';
 
+import { ICONS } from '@blog/config';
 import { useVoiceEditor } from '@platform/components/features/voice/voice-editor-provider';
+import { Icon } from '@platform/components/shared/icon';
+import { ICON_SIZE, ICON_STROKE_WIDTH } from '@platform/constants/icon';
 import type { TVoiceSection } from '@platform/constants/voice';
 import {
   countVoiceSectionCustomised,
+  countVoiceSectionErrors,
   voiceSectionHref,
 } from '@platform/utils/voice-sections/voice-sections';
 import { useTranslations } from 'next-intl';
@@ -24,11 +28,14 @@ export const VoiceSectionChip = ({
   onSelect,
   ref,
 }: TVoiceSectionChipProps) => {
-  const { values } = useVoiceEditor();
+  const { values, errors } = useVoiceEditor();
   const t = useTranslations('voiceSettings');
   const tSections = useTranslations('voiceSections');
   const customised = countVoiceSectionCustomised(values, section);
-  const { item, link, count } = voiceSectionChipVariants({ isActive });
+  const errorCount = countVoiceSectionErrors(errors, section);
+  const { item, link, count, errorPill } = voiceSectionChipVariants({
+    isActive,
+  });
 
   return (
     <li className={item()}>
@@ -43,10 +50,21 @@ export const VoiceSectionChip = ({
         className={link()}
       >
         {tSections(section)}
-        {customised > 0 && (
-          <span className={count()}>
-            {t('customisedStatus', { count: customised })}
+        {errorCount > 0 ? (
+          <span className={errorPill()}>
+            <Icon
+              name={ICONS.ERROR}
+              size={ICON_SIZE.XXS}
+              strokeWidth={ICON_STROKE_WIDTH.CHIP_ERROR}
+            />
+            {t('chipErrors', { count: errorCount })}
           </span>
+        ) : (
+          customised > 0 && (
+            <span className={count()}>
+              {t('customisedStatus', { count: customised })}
+            </span>
+          )
         )}
       </a>
     </li>

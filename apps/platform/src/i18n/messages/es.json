@@ -1043,6 +1043,7 @@
     "surfaceSummary": "{count} · {status}",
     "surfaceCount": "{unit, select, LISTS {{total, plural, one {# lista} other {# listas}}} other {{total, plural, one {# campo} other {# campos}}}}",
     "customisedStatus": "{count, plural, =0 {todo predeterminado} one {# personalizado} other {# personalizados}}",
+    "chipErrors": "{count, plural, one {# error} other {# errores}}",
     "sectionsRegionLabel": "Secciones",
     "sectionsNavLabel": "Secciones de Voz",
     "jumpTo": "Ir a",

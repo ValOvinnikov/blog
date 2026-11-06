@@ -25,7 +25,10 @@ import { MOCK_ARCHIVED_AT } from '@platform/testing/tenants/fixtures';
 import {
   EMPTY_STATES_SECTION,
   ERROR_PAGES_SECTION,
+  voiceSectionBar,
+  voiceSectionChip,
   voiceSectionHeader,
+  voiceSectionNav,
 } from '@platform/testing/voice/sections';
 import {
   setupBilingualVoiceSettings,
@@ -54,19 +57,8 @@ const TRACK_WIDTH = 120;
 const LIST_WIDTH = 300;
 const SCROLL_TO_START = { behavior: 'smooth', block: 'start' };
 
-const sectionBar = () =>
-  screen.getByRole('region', { name: VOICE_SETTINGS.sectionsRegionLabel });
-
-const sectionNav = () =>
-  within(sectionBar()).getByRole('navigation', {
-    name: VOICE_SETTINGS.sectionsNavLabel,
-  });
-
-const chip = (name: string) =>
-  within(sectionNav()).getByRole('link', { name: new RegExp(`^${name}`) });
-
 const barButton = (name: string) =>
-  within(sectionBar()).getByRole('button', { name });
+  within(voiceSectionBar()).getByRole('button', { name });
 
 const expectEverySection = (isOpen: boolean) => {
   for (const name of [ERROR_PAGES_SECTION, EMPTY_STATES_SECTION]) {
@@ -99,7 +91,7 @@ const placeHeaders = (
 };
 
 const placeBarInFlowAboveSections = () => {
-  const bar = sectionBar();
+  const bar = voiceSectionBar();
   vi.spyOn(bar, 'offsetHeight', 'get').mockReturnValue(BAR_HEIGHT);
   const barBottom = IN_FLOW_BAR_TOP + BAR_HEIGHT;
   placeHeaders(barBottom + SECTION_GAP, BELOW_LINE * 2, {
@@ -117,7 +109,7 @@ const scrollToPageEnd = () => {
 };
 
 const scrollChipList = (scrollLeft: number) => {
-  const list = within(sectionNav()).getByRole('list');
+  const list = within(voiceSectionNav()).getByRole('list');
   Object.defineProperties(list, {
     clientWidth: { configurable: true, value: TRACK_WIDTH },
     scrollWidth: { configurable: true, value: LIST_WIDTH },
@@ -145,16 +137,16 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     });
 
     it('links one chip to each section', () => {
-      const errorPages = chip(ERROR_PAGES_SECTION);
-      const emptyStates = chip(EMPTY_STATES_SECTION);
+      const errorPages = voiceSectionChip(ERROR_PAGES_SECTION);
+      const emptyStates = voiceSectionChip(EMPTY_STATES_SECTION);
 
       expect(errorPages).toHaveAttribute(HREF, `#${ERRORS_IDS.section}`);
       expect(emptyStates).toHaveAttribute(HREF, `#${EMPTY_IDS.section}`);
     });
 
     it('shows no count on any chip', () => {
-      const errorPages = chip(ERROR_PAGES_SECTION);
-      const emptyStates = chip(EMPTY_STATES_SECTION);
+      const errorPages = voiceSectionChip(ERROR_PAGES_SECTION);
+      const emptyStates = voiceSectionChip(EMPTY_STATES_SECTION);
 
       expect(errorPages).toHaveAccessibleName(ERROR_PAGES_SECTION);
       expect(emptyStates).toHaveAccessibleName(EMPTY_STATES_SECTION);
@@ -164,15 +156,19 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       placeHeaders(BELOW_LINE, BELOW_LINE * 2);
 
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).not.toHaveAttribute(ARIA_CURRENT),
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
+          ARIA_CURRENT,
+        ),
       );
-      expect(chip(ERROR_PAGES_SECTION)).not.toHaveAttribute(ARIA_CURRENT);
+      expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
+        ARIA_CURRENT,
+      );
     });
 
     it('marks no chip active at the top of the page, with the bar in flow above the first header', async () => {
       placeHeaders(-BELOW_LINE, -BELOW_LINE);
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
           ARIA_CURRENT,
           ACTIVE,
         ),
@@ -181,21 +177,27 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       placeBarInFlowAboveSections();
 
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).not.toHaveAttribute(ARIA_CURRENT),
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
+          ARIA_CURRENT,
+        ),
       );
-      expect(chip(ERROR_PAGES_SECTION)).not.toHaveAttribute(ARIA_CURRENT);
+      expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
+        ARIA_CURRENT,
+      );
     });
 
     it('marks the last section whose header passed the line active', async () => {
       placeHeaders(-BELOW_LINE, ABOVE_LINE);
 
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
           ARIA_CURRENT,
           ACTIVE,
         ),
       );
-      expect(chip(ERROR_PAGES_SECTION)).not.toHaveAttribute(ARIA_CURRENT);
+      expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
+        ARIA_CURRENT,
+      );
     });
 
     it('marks the last section with its header in view active at the end of the page', async () => {
@@ -203,7 +205,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       placeHeaders(ABOVE_LINE, BELOW_LINE);
 
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
           ARIA_CURRENT,
           ACTIVE,
         ),
@@ -213,12 +215,15 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     it('jumps from a chip: opens the section, focuses its header and replaces the hash', async () => {
       const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
 
-      await user.click(chip(EMPTY_STATES_SECTION));
+      await user.click(voiceSectionChip(EMPTY_STATES_SECTION));
 
       const header = voiceSectionHeader(EMPTY_STATES_SECTION);
       expect(header).toHaveAttribute(ARIA_EXPANDED, 'true');
       expect(header).toHaveFocus();
-      expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(ARIA_CURRENT, ACTIVE);
+      expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
+        ARIA_CURRENT,
+        ACTIVE,
+      );
       expect(scrollIntoView).toHaveBeenLastCalledWith(SCROLL_TO_START);
       expect(scrollIntoView.mock.contexts.at(-1)).toBe(
         screen.getByRole('region', {
@@ -231,7 +236,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     });
 
     it('jumps from a chip with Enter', async () => {
-      chip(ERROR_PAGES_SECTION).focus();
+      voiceSectionChip(ERROR_PAGES_SECTION).focus();
       await user.keyboard('{Enter}');
 
       expect(voiceSectionHeader(ERROR_PAGES_SECTION)).toHaveFocus();
@@ -259,8 +264,8 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
   it('counts customised fields on each chip', () => {
     setupBilingualVoiceSettings();
 
-    const errorPages = within(chip(ERROR_PAGES_SECTION));
-    const emptyStates = within(chip(EMPTY_STATES_SECTION));
+    const errorPages = within(voiceSectionChip(ERROR_PAGES_SECTION));
+    const emptyStates = within(voiceSectionChip(EMPTY_STATES_SECTION));
 
     expect(errorPages.getByText('2 customised')).toBeInTheDocument();
     expect(emptyStates.getByText('1 customised')).toBeInTheDocument();
@@ -287,7 +292,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
     const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
     setupVoiceSettings();
 
-    await user.click(chip(ERROR_PAGES_SECTION));
+    await user.click(voiceSectionChip(ERROR_PAGES_SECTION));
 
     expect(scrollIntoView).toHaveBeenLastCalledWith({
       ...SCROLL_TO_START,
@@ -302,16 +307,18 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       });
 
       it('hides the Jump to label from screen readers', () => {
-        const label = within(sectionBar()).getByText(VOICE_SETTINGS.jumpTo);
+        const label = within(voiceSectionBar()).getByText(
+          VOICE_SETTINGS.jumpTo,
+        );
 
         expect(label).toHaveAttribute(ARIA_HIDDEN, 'true');
       });
 
       it('orders the chips, then the bar buttons, before the sections', async () => {
-        chip(ERROR_PAGES_SECTION).focus();
+        voiceSectionChip(ERROR_PAGES_SECTION).focus();
 
         await user.tab();
-        expect(chip(EMPTY_STATES_SECTION)).toHaveFocus();
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveFocus();
         await user.tab();
         expect(barButton(VOICE_SETTINGS.expandAll)).toHaveFocus();
         await user.tab();
@@ -345,7 +352,7 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       setupVoiceSettings({ archivedAt: MOCK_ARCHIVED_AT });
 
       await user.click(barButton(VOICE_SETTINGS.expandAll));
-      await user.click(chip(ERROR_PAGES_SECTION));
+      await user.click(voiceSectionChip(ERROR_PAGES_SECTION));
 
       expect(voiceSectionHeader(EMPTY_STATES_SECTION)).toHaveAttribute(
         ARIA_EXPANDED,
@@ -404,13 +411,13 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       setupVoiceSettings();
       placeHeaders(-BELOW_LINE, -BELOW_LINE);
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).toHaveAttribute(
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).toHaveAttribute(
           ARIA_CURRENT,
           ACTIVE,
         ),
       );
 
-      const bar = sectionBar();
+      const bar = voiceSectionBar();
       placeHeaders(-BELOW_LINE, -BELOW_LINE, {
         element: bar,
         top: IN_FLOW_BAR_TOP,
@@ -418,9 +425,13 @@ describe(`<${VoiceSettings.name}/> section bar`, () => {
       });
 
       await waitFor(() =>
-        expect(chip(EMPTY_STATES_SECTION)).not.toHaveAttribute(ARIA_CURRENT),
+        expect(voiceSectionChip(EMPTY_STATES_SECTION)).not.toHaveAttribute(
+          ARIA_CURRENT,
+        ),
       );
-      expect(chip(ERROR_PAGES_SECTION)).not.toHaveAttribute(ARIA_CURRENT);
+      expect(voiceSectionChip(ERROR_PAGES_SECTION)).not.toHaveAttribute(
+        ARIA_CURRENT,
+      );
     });
 
     it('keeps the icon button operable for an archived tenant', async () => {

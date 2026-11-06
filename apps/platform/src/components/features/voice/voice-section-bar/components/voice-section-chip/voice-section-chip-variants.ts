@@ -11,6 +11,9 @@ export const voiceSectionChipVariants = tv({
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     count: ['text-admin-12 leading-admin-15 font-medium'],
+    errorPill: [
+      'inline-flex items-center justify-center gap-1 text-admin-12 leading-admin-15 font-semibold text-admin-bad',
+    ],
   },
   variants: {
     isActive: {
@@ -26,6 +29,7 @@ export const voiceSectionChipVariants = tv({
           'hover:border-admin-brand-hover hover:bg-admin-brand-hover',
         ],
         count: ['text-white'],
+        errorPill: ['h-5 rounded-full bg-admin-surface px-1.5'],
       },
     },
   },

@@ -51,10 +51,11 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
   const isRich = field.kind === VOICE_FIELD_KIND.RICH;
   const isCustomised = isVoiceValueCustomised(value);
   const [placeholderToken] = field.placeholders;
+  const hasNote = !error && !isUndefined(placeholderToken);
   const richDescribedBy = joinIds(
     archivedDescribedBy,
     hintId,
-    !isUndefined(placeholderToken) && noteId,
+    hasNote && noteId,
     error && errorId,
   );
 
@@ -125,7 +126,7 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
           )}
         </FormFieldControlProvider>
       )}
-      {!isUndefined(placeholderToken) && (
+      {hasNote && (
         <VoiceFieldNote id={noteId} placeholderToken={placeholderToken} />
       )}
       {error && (
