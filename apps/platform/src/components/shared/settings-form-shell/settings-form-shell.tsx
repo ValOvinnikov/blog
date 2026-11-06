@@ -64,7 +64,18 @@ export const SettingsFormShell = <TValues,>({
     planRefusal,
   } = form;
   const t = useTranslations('saveBar');
-  const isDirty = changeCount > 0;
+  const {
+    isDirty,
+    isSavedStatusShown,
+    offer,
+    restore,
+    forgetDraft,
+    handleDiscard,
+    titleRef,
+    saveBarRef,
+    rememberControl,
+    saveAndReturnFocus,
+  } = useShellSaveActions({ form, pageTitle: title, hasSavedStatus });
   const isSaveBarShown = isDirty && !isArchived && !isSaveBarHidden;
   const saveError = isPending ? undefined : (planRefusal ?? errorTitle);
   const isPhoneSaveFooterShown =
@@ -76,17 +87,6 @@ export const SettingsFormShell = <TValues,>({
     hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
   });
-  const {
-    isSavedStatusShown,
-    offer,
-    restore,
-    forgetDraft,
-    handleDiscard,
-    titleRef,
-    saveBarRef,
-    rememberControl,
-    saveAndReturnFocus,
-  } = useShellSaveActions({ form, pageTitle: title, hasSavedStatus });
 
   return (
     <div className={root()} onFocus={rememberControl}>

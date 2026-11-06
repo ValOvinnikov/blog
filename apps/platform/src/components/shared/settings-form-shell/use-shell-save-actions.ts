@@ -1,3 +1,5 @@
+import { useAfterSave } from '@platform/utils/use-after-save/use-after-save';
+
 import type { TSettingsForm } from './settings-form-types';
 import { useSaveFocusReturn } from './use-save-focus-return';
 import { useSavedStatus } from './use-saved-status';
@@ -29,6 +31,7 @@ export const useShellSaveActions = <TValues>({
   } = useSettingsDraft(draft, isDirty);
   const { titleRef, saveBarRef, rememberControl, returnFocus } =
     useSaveFocusReturn();
+  const afterSave = useAfterSave(isPending);
 
   const handleSave = async () => {
     const isSaved = await save();
@@ -40,7 +43,7 @@ export const useShellSaveActions = <TValues>({
   };
 
   const saveAndReturnFocus = async () => {
-    if (await handleSave()) returnFocus();
+    if (await handleSave()) afterSave(returnFocus);
   };
 
   const handleDiscard = () => {
@@ -58,6 +61,7 @@ export const useShellSaveActions = <TValues>({
   });
 
   return {
+    isDirty,
     isSavedStatusShown,
     offer,
     restore,

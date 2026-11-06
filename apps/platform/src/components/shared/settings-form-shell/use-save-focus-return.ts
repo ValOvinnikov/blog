@@ -1,6 +1,11 @@
 import type { TMaybeNull } from '@blog/config';
 import { type FocusEvent, useRef } from 'react';
 
+const findControl = (control: TMaybeNull<HTMLElement>) => {
+  if (!control || control.isConnected) return control;
+  return control.id ? document.getElementById(control.id) : null;
+};
+
 export const useSaveFocusReturn = () => {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const saveBarRef = useRef<HTMLDivElement>(null);
@@ -13,8 +18,7 @@ export const useSaveFocusReturn = () => {
   };
 
   const returnFocus = () => {
-    const control = lastControlRef.current;
-    const target = control?.isConnected ? control : titleRef.current;
+    const target = findControl(lastControlRef.current) ?? titleRef.current;
     target?.focus({ preventScroll: true });
   };
 

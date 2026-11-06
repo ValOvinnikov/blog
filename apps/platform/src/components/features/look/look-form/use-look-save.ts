@@ -22,10 +22,9 @@ import {
   persistStagedImage,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
+import { useAfterSave } from '@platform/utils/use-after-save/use-after-save';
 import type { TUploadErrorState } from '@platform/utils/use-upload-error-text/use-upload-error-text';
 import { useState } from 'react';
-
-import { useFocusAfterSave } from './use-focus-after-save';
 
 type TUseLookSaveArgs = Omit<
   TUseSettingsFormArgs<TLookFormValues, TOutcome<TActionOutcome>>,
@@ -82,7 +81,9 @@ export const useLookSave = ({
         if (!result.ok) {
           setBrandImageError({ ...result.error, kind });
           invalidControls?.(vals).revealFirst?.();
-          focusAfterSave(brandAssetFieldIds[kind]);
+          afterSave(() =>
+            document.getElementById(brandAssetFieldIds[kind])?.focus(),
+          );
           return finish(result.error.failure.outcome);
         }
         savedImages[kind] = result.data;
@@ -117,7 +118,7 @@ export const useLookSave = ({
     },
   });
 
-  const focusAfterSave = useFocusAfterSave(settings.isPending);
+  const afterSave = useAfterSave(settings.isPending);
 
   const clearBrandImageError = (kind: TBrandAssetKind) =>
     setBrandImageError((prev) => (prev?.kind === kind ? undefined : prev));
