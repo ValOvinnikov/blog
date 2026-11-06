@@ -12,7 +12,6 @@ export const footerVariants = tv({
     ],
     main: ['grid min-w-0 gap-10'],
     brand: ['flex min-w-0 flex-col gap-4'],
-    divider: ['-mb-4 border-0 border-t border-border'],
     bottom: [
       'flex min-w-0 flex-col gap-3',
       '@min-[40rem]/footer:flex-row @min-[40rem]/footer:flex-wrap @min-[40rem]/footer:items-center @min-[40rem]/footer:justify-between',

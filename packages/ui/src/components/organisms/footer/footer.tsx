@@ -75,11 +75,7 @@ const FooterRoot = ({
   const hasBrand = BRAND_SLOTS.some(isShown);
   const hasMain = hasBrand || isShown('Groups');
   const hasBottom = BOTTOM_SLOTS.some(isShown);
-  const isDivided =
-    layout !== FOOTER_LAYOUT.COMPACT &&
-    hasBottom &&
-    (hasMain || isShown('Wordmark'));
-  const { root, inner, main, brand, divider, bottom } = footerVariants({
+  const { root, inner, main, brand, bottom } = footerVariants({
     layout,
     surface,
     tone,
@@ -105,7 +101,6 @@ const FooterRoot = ({
           </div>
         )}
         {isShown('Wordmark') && slots.Wordmark}
-        {isDivided && <hr className={divider()} />}
         {hasBottom && (
           <div className={bottom()}>
             {BOTTOM_SLOTS.filter(isShown).map((key) => (

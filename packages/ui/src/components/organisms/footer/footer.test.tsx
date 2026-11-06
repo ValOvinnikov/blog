@@ -176,38 +176,7 @@ describe(`<${Footer.name}/>`, () => {
     expect(textItem).toBeVisible();
   });
 
-  it('divides the brand column from the fine-print row', () => {
-    renderElement(
-      <Footer>
-        <Footer.About>{MOCK_ABOUT}</Footer.About>
-        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
-      </Footer>,
-    );
-
-    const divider = screen.getByRole('separator');
-
-    expect(divider).toBeInTheDocument();
-  });
-
-  it.each([
-    ['logo', <Footer.Logo key="logo" />],
-    ['about text', <Footer.About key="about" />],
-    ['address', <Footer.Address key="address" />],
-    ['social links', <Footer.Social key="social" />],
-  ])('draws no brand column or divider for empty %s', (_, emptySlot) => {
-    renderElement(
-      <Footer>
-        {emptySlot}
-        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
-      </Footer>,
-    );
-
-    const divider = screen.queryByRole('separator');
-
-    expect(divider).not.toBeInTheDocument();
-  });
-
-  it('draws no navigation or divider for link groups that have no items', () => {
+  it('draws no navigation for link groups that have no items', () => {
     renderElement(
       <Footer>
         <Footer.Groups ariaLabel={MOCK_GROUPS_LABEL}>
@@ -224,24 +193,9 @@ describe(`<${Footer.name}/>`, () => {
       name: MOCK_GROUPS_LABEL,
     });
     const heading = screen.queryByRole('heading', { name: MOCK_GROUP_HEADING });
-    const divider = screen.queryByRole('separator');
 
     expect(groups).not.toBeInTheDocument();
     expect(heading).not.toBeInTheDocument();
-    expect(divider).not.toBeInTheDocument();
-  });
-
-  it('draws no divider for an empty wordmark in the Big wordmark layout', () => {
-    renderElement(
-      <Footer layout={FOOTER_LAYOUT.BIG_WORDMARK}>
-        <Footer.Wordmark />
-        <Footer.Copyright title={MOCK_SITE_TITLE} year={MOCK_YEAR} />
-      </Footer>,
-    );
-
-    const divider = screen.queryByRole('separator');
-
-    expect(divider).not.toBeInTheDocument();
   });
 
   it('renders Footer.Nav as a labelled navigation', () => {
