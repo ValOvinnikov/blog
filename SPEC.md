@@ -112,8 +112,13 @@ reading, page canvas elevation) are documented in full in
   email-magic-link sign-in against `@blog/db`'s adapter tables (database
   session strategy). The magic-link provider (`sendVerificationRequest`)
   lives in `@blog/auth`, which builds its email through `@blog/email`'s
-  per-template builders and sends through its transport directly — `buildAuthConfig(app)` takes only the
-  calling app, and neither app carries a send transport of its own. Only the
+  per-template builders and sends through its transport directly —
+  `buildAuthConfig(app, onMagicLinkSendRefused, siteCredentials?)` takes the
+  calling app, a callback that logs a refused magic-link send, and, from
+  `apps/web` only, the site's own Google and GitHub credentials, and neither
+  app carries a send transport of its own. A provider given site credentials
+  uses them with the redirect proxy off, so the provider calls back on the
+  site's own domain; any other provider keeps the shared app. Only the
   platform's sign-in email uses the invite template, and only a platform
   sign-in consumes pending membership invites. It writes each email
   in the recipient's language: on a tenant's host, the first segment of the
@@ -234,6 +239,17 @@ and minting one per request would require an admin-scoped management token
 inside `apps/web`. It is revoked on any seeding failure, so a failed run
 leaves nothing live. This is deliberately a higher-privilege, longer-lived
 secret than the read token.
+
+A Growth site's own Google and GitHub sign-in apps live in
+`tenant_oauth_credentials`, one row per tenant and provider: the client ID in
+plain text and the client secret encrypted under
+`TENANT_OAUTH_ENCRYPTION_KEY`, a key of its own that `apps/web` and
+`apps/platform` hold and never `TENANT_TOKEN_ENCRYPTION_KEY`, so the platform
+cannot decrypt a Sanity token. Only `apps/web`'s sign-in decrypts a secret
+(`getTenantOAuthCredentials`, gated on the plan's `hasOwnOAuthApps`). The
+platform writes one through its owner-only Sign-in page and never reads it
+back: its page query selects no secret, the page shows a saved one as "Set",
+and only the site owner sees the full client ID.
 
 ¹ `@blog/db`'s "never log" rule has one scoped exception, decided on
 #2120: `packages/db/scripts/deprovision-tenant/`,
