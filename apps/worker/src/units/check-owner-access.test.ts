@@ -211,7 +211,7 @@ describe(checkOwnerAccess, () => {
       );
     });
 
-    it('retries without granting when the open finding cannot be resolved', async () => {
+    it('retries without recording the access when the open finding cannot be resolved', async () => {
       vi.mocked(listFindingsForTenant).mockResolvedValue([
         mockOwnerAccessFinding(),
       ]);
@@ -222,8 +222,35 @@ describe(checkOwnerAccess, () => {
       await expect(checkOwnerAccess(MOCK_TENANT_ID)).rejects.toThrow(
         /could not be resolved/,
       );
-      expect(grantSanityProjectRole).not.toHaveBeenCalled();
       expect(setTenantOwnerAccess).not.toHaveBeenCalled();
+    });
+
+    it('keeps the open finding and counts onto it when the grant fails', async () => {
+      atStepAttempt(99);
+      vi.mocked(getTenantById).mockResolvedValue(
+        mockOwnerAccessFailingSince(MOCK_FAILING_FOR_THRESHOLD, {
+          ownerInviteSentAt: MOCK_FAILING_FOR_THRESHOLD,
+        }),
+      );
+      vi.mocked(listSanityProjectAcl).mockResolvedValue([]);
+      vi.mocked(listFindingsForTenant).mockResolvedValue([
+        mockOwnerAccessFinding(),
+      ]);
+      vi.mocked(getFindingDetails).mockResolvedValue({
+        failureCount: MOCK_PRIOR_FAILURE_COUNT,
+      });
+
+      const { hasFailed } = await checkOwnerAccess(MOCK_TENANT_ID);
+
+      expect(hasFailed).toBe(true);
+      expect(resolveFinding).not.toHaveBeenCalled();
+      expect(openFinding).toHaveBeenCalledWith(
+        expect.objectContaining({
+          details: expect.objectContaining({
+            failureCount: MOCK_PRIOR_FAILURE_COUNT + 1,
+          }),
+        }),
+      );
     });
 
     it('reports the check as not failed', async () => {
