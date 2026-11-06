@@ -695,6 +695,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 
 - **SESSION_STATUS**: `AUTHENTICATED`=`"authenticated"`, `UNAUTHENTICATED`=`"unauthenticated"`, `LOADING`=`"loading"`
+- **AUTH_ACTION**: `SESSION`=`"session"`
 
 ### `@web/constants/sign-in` — `apps/web/src/constants/sign-in.ts`
 

@@ -4,6 +4,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
+import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
@@ -40,11 +41,17 @@ export const getSiteOAuthCredentials = cache(
     orSharedApps(() => loadEntitledCredentials(tenantId)),
 );
 
-// Auth.js passes no request when `auth()` reads a session, which registers no provider.
+const isProviderUsingRequest = (
+  request: TMaybeUndefined<NextRequest>,
+): request is NextRequest =>
+  Boolean(request) &&
+  request?.nextUrl.pathname.split('/').at(-1) !== AUTH_ACTION.SESSION;
+
+// A session read registers no provider: `auth()` passes no request, and `SessionProvider` polls `/api/auth/session` on every page load.
 export const getRequestSiteOAuthCredentials = async (
   request: TMaybeUndefined<NextRequest>,
 ): Promise<TTenantOAuthCredentialsByProvider> =>
-  request
+  isProviderUsingRequest(request)
     ? orSharedApps(async () =>
         loadEntitledCredentials(
           await resolveTenantId(request.headers.get('host')),

@@ -1,5 +1,6 @@
 import { queries } from '@blog/db';
 import { TENANT_PLAN } from '@blog/db/constants';
+import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
@@ -35,8 +36,8 @@ const getTenantOAuthCredentialsMock = vi.mocked(
 const getEffectivePlanMock = vi.mocked(getEffectivePlan);
 const resolveTenantIdMock = vi.mocked(resolveTenantId);
 
-const mockTenantRequest = (): NextRequest =>
-  new NextRequest(`https://${MOCK_TENANT_HOST}/api/auth/signin`, {
+const mockTenantRequest = (action = 'signin'): NextRequest =>
+  new NextRequest(`https://${MOCK_TENANT_HOST}/api/auth/${action}`, {
     headers: { host: MOCK_TENANT_HOST },
   });
 
@@ -98,6 +99,14 @@ describe(getRequestSiteOAuthCredentials, () => {
       {},
     );
     expect(resolveTenantIdMock).not.toHaveBeenCalled();
+  });
+
+  it('reads nothing for a session read', async () => {
+    await expect(
+      getRequestSiteOAuthCredentials(mockTenantRequest(AUTH_ACTION.SESSION)),
+    ).resolves.toEqual({});
+    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(getTenantOAuthCredentialsMock).not.toHaveBeenCalled();
   });
 
   it('falls back to the shared apps and logs when the host cannot be resolved', async () => {
