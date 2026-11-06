@@ -26,6 +26,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - **Sign-in panel** — a 320px popover under its button from 30rem (480px), scrolling inside the viewport below `lg`; below 30rem, a sheet anchored to the header (gutter to gutter, 8px under the header, scrolling inside the viewport), as is the account panel and the OAuth error notice. One button per configured OAuth provider, "or", then the email field and "Email me a sign-in link", all visible at once. A pressed provider row says where it is taking the reader while the others wait; the send button shows "Sending…" while busy; a sent link replaces the whole form with "Check your inbox", the address and "Use a different email"; a failed send shows the error under the field. The form does its own validation, not the browser's: an empty or malformed address requests no link and shows `authMenu.emailInvalid` ("Enter a valid email address.", fixed site copy) under the field, checked with the same `isValidEmail` the newsletter signup uses. Any error under the field — invalid address, failed send or send limit — clears as soon as the reader types, and a still-invalid address shows it again on the next submit.
 - `/api/auth/*` — the Auth.js handlers (`GET`/`POST`).
 - **OAuth on any site host** — with `AUTH_REDIRECT_PROXY_URL` set, every site sends Google and GitHub the callback on one dedicated auth host. That host only redirects the reader back to the tenant host's own callback, which completes the sign-in, so the session and the reader's return page stay on the tenant's address. The platform does not use it.
+- **A site's own OAuth apps** — on a plan with `hasOwnOAuthApps` (Growth), a provider the site has saved its own client id and secret for signs in with that app on the site's own callback, skipping the redirect proxy, so the provider's screen shows the site's app and never our host. The other provider keeps the shared app. A reader is the same reader through either app: Google and GitHub give the same account id to every app, and the `accounts` row keys on it.
 - There is no `/login` page. A failed OAuth callback redirects to `/` with `?error=`; `useOAuthErrorParam` reads it, strips it from the URL and the header shows an alert beside the account control.
 - The platform builds its own `NextAuth()` from the same `buildAuthConfig` (see [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md)).
 
@@ -38,7 +39,8 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 ## Configuration
 
-- **Operator (env)** — an OAuth provider is registered only when both its id and secret are set; the header advertises exactly the registered set (`getEnabledOAuthProviderIds`). The magic-link provider is always registered.
+- **Operator (env)** — an OAuth provider is registered only when both its id and secret are set, by env or by the site's own credentials; the header and the signed-out `/account` page advertise exactly the registered set (`getEnabledOAuthProviderIds` with the same site credentials). The magic-link provider is always registered.
+- **Owner (site's own credentials)** — `/api/auth/*` resolves the tenant from the request's `Host` and passes its stored credentials to `buildAuthConfig` (`getRequestSiteOAuthCredentials`); the header and `/account` read them by the page's tenant id (`getSiteOAuthCredentials`). Both read them only while the plan (`getEffectivePlan`) has `hasOwnOAuthApps`, so a downgrade signs in through the shared apps and keeps what is stored, and an upgrade restores them. A session read (`auth()` with no request) loads none. A failed tenant, plan or credential read, an unset `TENANT_OAUTH_ENCRYPTION_KEY` included, falls back to the shared apps and logs `auth.site_oauth_credentials_failed`.
 - **Owner (platform Email page)** — the magic-link and invite email subject, body, logo, sender name, reply-to and footer postal address (see [email](./email.md)).
 - **Plan / capability** — `READER_ACCOUNTS`, the Reader accounts switch on Features. The sign-in entry point, in the bar and the phone menu, exists only while it is on; it is `GROWTH` only, so a `FREE` site shows no sign-in.
 - **Look** — the account button, account panel and phone placement (Growth-only on the Look page) shape the header control; the email brand follows the tenant's preset, accent and logo hue (`resolveTenantEmailBrand`). Panel copy is fixed (`authMenu.*`), not Voice, including Hub's two tile lines.
@@ -61,7 +63,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 - Layers: `auth` (config, providers), `db` (adapter tables, invites, email settings), `email` (templates, Resend transport), `config` (locales, template types), `web`.
 - Features: [reader-account](./reader-account.md), [bookmarks](./bookmarks.md), [email](./email.md), [tenant-access](./tenant-access.md) (invites), [languages](./languages.md), [plans-and-entitlements](./plans-and-entitlements.md).
-- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `AUTH_REDIRECT_PROXY_URL` (web only, unset locally), `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `RESEND_API_KEY`, `DATABASE_URL`.
+- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `AUTH_REDIRECT_PROXY_URL` (web only, unset locally), `TENANT_OAUTH_ENCRYPTION_KEY` (web reads a site's own client secrets under it), `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `RESEND_API_KEY`, `DATABASE_URL`.
 
 ## Entry points
 
@@ -70,6 +72,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - `packages/auth/src/utils/oauth-providers/oauth-providers.ts`
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.ts`
 - `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.error: '/'`
+- `apps/web/src/server/auth/site-oauth-credentials/site-oauth-credentials.ts` — the site's entitled credentials
 - `apps/web/src/components/shared/auth-menu/auth-menu.tsx`
 - `apps/web/src/components/shared/auth-menu/components/account-menu-group/account-menu-group.tsx` — the phone menu's account row
 - `apps/web/src/components/shared/reader-sign-in-panel/use-sign-in-attempt.ts`

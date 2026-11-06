@@ -698,7 +698,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/sign-in` — `apps/web/src/constants/sign-in.ts`
 
-- **SIGN_IN_LOG**: `LINK_REFUSED`=`"auth.sign_in_link_refused"`
+- **SIGN_IN_LOG**: `LINK_REFUSED`=`"auth.sign_in_link_refused"`, `SITE_CREDENTIALS_FAILED`=`"auth.site_oauth_credentials_failed"`
 
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 

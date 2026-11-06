@@ -7622,6 +7622,14 @@
         "file": "apps/web/src/constants/session.ts"
       }
     ],
+    "auth.site_oauth_credentials_failed": [
+      {
+        "ref": "SIGN_IN_LOG.SITE_CREDENTIALS_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sign-in",
+        "file": "apps/web/src/constants/sign-in.ts"
+      }
+    ],
     "site_config.fetch_failed": [
       {
         "ref": "SITE_CONFIG_LOG.FETCH_FAILED",
