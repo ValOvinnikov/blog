@@ -28,6 +28,14 @@ export const TOO_LONG_ERROR = {
   values: { max: MOCK_MAX_LENGTH },
 };
 
+export const MISSING_NAME_ERROR = {
+  reason: VOICE_FIELD_ERROR.MISSING_PLACEHOLDER,
+  values: { placeholders: '{name}', count: 1 },
+};
+
+export const MISSING_NAME_MESSAGE =
+  'Keep the placeholder {name} — the site fills it in.';
+
 export const NO_OVERRIDES = 'with no overrides';
 export const TWO_LANGUAGES = 'with stored overrides in two live languages';
 export const GERMAN = en.languageNames.DE;

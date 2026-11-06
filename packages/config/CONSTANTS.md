@@ -434,7 +434,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/icon` — `apps/platform/src/constants/icon.ts`
 
 - **ICON_SIZE**: `XXXS`, `XXS`, `XS`, `SM`, `MD`, `LG`, `XL`, `XXL`, `XXXL`
-- **ICON_STROKE_WIDTH**: `CONTROL`=`1.8`, `STATUS_LINE`=`2.2`, `CHIP_TICK`=`2.4`, `RAIL_BADGE`=`2.6`, `RADIO_TICK`=`3`
+- **ICON_STROKE_WIDTH**: `CONTROL`=`1.8`, `STATUS_LINE`=`2.2`, `CHIP_TICK`=`2.4`, `CHIP_ERROR`=`2.5`, `RAIL_BADGE`=`2.6`, `RADIO_TICK`=`3`
 
 ### `@platform/constants/keyboard` — `apps/platform/src/constants/keyboard.ts`
 

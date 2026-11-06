@@ -8350,6 +8350,14 @@
         "file": "apps/platform/src/constants/icon.ts"
       }
     ],
+    "2.5": [
+      {
+        "ref": "ICON_STROKE_WIDTH.CHIP_ERROR",
+        "scope": "app:platform",
+        "from": "@platform/constants/icon",
+        "file": "apps/platform/src/constants/icon.ts"
+      }
+    ],
     "2.6": [
       {
         "ref": "ICON_STROKE_WIDTH.RAIL_BADGE",
