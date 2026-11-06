@@ -1,11 +1,17 @@
 'use client';
 
 import type { TMaybeUndefined, TVoiceSurface } from '@blog/config';
-import { VOICE_CARD_ID, type TVoiceSection } from '@platform/constants/voice';
+import {
+  VOICE_CARD_ID,
+  VOICE_SECTION_ID,
+  type TVoiceSection,
+} from '@platform/constants/voice';
 import { useMotionScrollBehavior } from '@platform/utils/use-motion-scroll-behavior/use-motion-scroll-behavior';
+import { VOICE_SECTIONS_IN_PAGE_ORDER } from '@platform/utils/voice-draft/voice-draft';
 import {
   voiceCardHref,
   voiceHashTarget,
+  voiceSectionHref,
   voiceSectionOf,
 } from '@platform/utils/voice-sections/voice-sections';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
@@ -33,6 +39,23 @@ export const useVoiceSections = () => {
       current.filter((open) => open !== section).concat(isOpen ? section : []),
     );
 
+  const setAllSectionsOpen = (isOpen: boolean) =>
+    setChosenSections(isOpen ? VOICE_SECTIONS_IN_PAGE_ORDER : []);
+
+  const jumpToSection = (section: TVoiceSection) => {
+    const { section: sectionId, heading } = VOICE_SECTION_ID[section];
+    hasScrolledToHashRef.current = true;
+    flushSync(() => setSectionOpen(section, true));
+    document
+      .getElementById(heading)
+      ?.querySelector('button')
+      ?.focus({ preventScroll: true });
+    document
+      .getElementById(sectionId)
+      ?.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+    window.history.replaceState(null, '', voiceSectionHref(section));
+  };
+
   const jumpToCard = (surface: TVoiceSurface) => {
     const { card, heading } = VOICE_CARD_ID[surface];
     hasScrolledToHashRef.current = true;
@@ -54,8 +77,11 @@ export const useVoiceSections = () => {
   }, [hashTargetId, scrollBehavior]);
 
   return {
+    openSections,
     isSectionOpen: (section: TVoiceSection) => openSections.includes(section),
     setSectionOpen,
+    setAllSectionsOpen,
+    jumpToSection,
     jumpToCard,
   };
 };

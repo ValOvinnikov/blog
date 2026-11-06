@@ -2,7 +2,11 @@ import { ACTION_OUTCOME, VOICE_SURFACE } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
-import { VOICE_SECTION, VOICE_SECTION_ID } from '@platform/constants/voice';
+import {
+  VOICE_CARDS_TEST_ID,
+  VOICE_SECTION,
+  VOICE_SECTION_ID,
+} from '@platform/constants/voice';
 import { saveVoiceOverridesAction } from '@platform/server/site-config/save-voice-overrides-action';
 import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
@@ -55,7 +59,9 @@ vi.mock('@platform/server/site-config/save-voice-overrides-action');
 const saveVoiceOverridesActionMock = vi.mocked(saveVoiceOverridesAction);
 
 const summaryRow = (name: string) =>
-  screen.getByRole('link', { name: new RegExp(`^${name}`) });
+  within(screen.getByTestId(VOICE_CARDS_TEST_ID)).getByRole('link', {
+    name: new RegExp(`^${name}`),
+  });
 
 describe(`<${VoiceSettings.name}/> sections`, () => {
   let user: UserEvent;

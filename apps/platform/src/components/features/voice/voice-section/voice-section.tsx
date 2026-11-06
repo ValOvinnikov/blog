@@ -40,8 +40,10 @@ export const VoiceSection = ({
   const ids = VOICE_SECTION_ID[section];
   const errorCount = countVoiceSectionErrors(errors, section);
   const hasErrors = errorCount > 0;
-  const { root, disclosure, titleBlock, title, meta, cards } =
-    voiceSectionVariants({ isOpen, hasErrors });
+  const { disclosure, titleBlock, title, meta, cards } = voiceSectionVariants({
+    isOpen,
+    hasErrors,
+  });
   const count = t('surfaceCount', {
     unit: VOICE_COUNT_UNIT.FIELDS,
     total: voiceSectionFields(section).length,
@@ -53,7 +55,7 @@ export const VoiceSection = ({
       });
 
   return (
-    <section id={ids.section} aria-labelledby={ids.heading} className={root()}>
+    <section id={ids.section} aria-labelledby={ids.heading}>
       <Disclosure
         variant="section"
         className={disclosure()}

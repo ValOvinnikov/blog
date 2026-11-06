@@ -5,6 +5,7 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { VoiceEditorProvider } from '@platform/components/features/voice/voice-editor-provider';
 import { VoiceSection } from '@platform/components/features/voice/voice-section';
+import { VoiceSectionBar } from '@platform/components/features/voice/voice-section-bar';
 import { LanguagePicker } from '@platform/components/shared/language-picker';
 import { SettingsFormShell } from '@platform/components/shared/settings-form-shell';
 import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
@@ -121,6 +122,11 @@ export const VoiceSettings = ({
         setFieldValue={setFieldValue}
         specimenTheme={buildSitePreviewTheme(previewTheme, isDark)}
       >
+        <VoiceSectionBar
+          openSections={sections.openSections}
+          onJumpToSection={sections.jumpToSection}
+          onSetAllSectionsOpen={sections.setAllSectionsOpen}
+        />
         <div
           key={`${selectedLocale}-${revision}`}
           inert={isPending}
