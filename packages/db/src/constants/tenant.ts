@@ -62,6 +62,7 @@ export type TPlanEntitlements = {
   lookFields: readonly TLookField[];
   modulePacks: readonly TModulePack[];
   hasPoweredByMark: boolean;
+  hasOwnOAuthApps: boolean;
 };
 
 export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
@@ -76,10 +77,12 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     ],
     modulePacks: [MODULE_PACK.CORE],
     hasPoweredByMark: true,
+    hasOwnOAuthApps: false,
   },
   [TENANT_PLAN.GROWTH]: {
     lookFields: LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE, MODULE_PACK.GROWTH],
     hasPoweredByMark: false,
+    hasOwnOAuthApps: true,
   },
 };

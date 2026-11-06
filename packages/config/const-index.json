@@ -2740,6 +2740,22 @@
         "file": "packages/config/src/constants/next-navigation-error.ts"
       }
     ],
+    "github": [
+      {
+        "ref": "OAUTH_PROVIDER.GITHUB",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/oauth-provider.ts"
+      }
+    ],
+    "google": [
+      {
+        "ref": "OAUTH_PROVIDER.GOOGLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/oauth-provider.ts"
+      }
+    ],
     "OWNER_ELEVATION": [
       {
         "ref": "OPERATOR_ALERT_KIND.OWNER_ELEVATION",

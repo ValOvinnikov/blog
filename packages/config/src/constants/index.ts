@@ -38,6 +38,7 @@ export * from './module-pack';
 export * from './next-dynamic-error';
 export * from './next-navigation-error';
 export * from './newsletter-result';
+export * from './oauth-provider';
 export * from './operator-alert';
 export * from './path';
 export * from './portable-text-block-type';

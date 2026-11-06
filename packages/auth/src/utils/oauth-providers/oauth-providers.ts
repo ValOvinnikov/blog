@@ -1,31 +1,26 @@
 import 'server-only';
 
 import { oauthEnv } from '@blog/auth/utils/oauth-env/oauth-env';
+import type { TMaybeUndefined, TOAuthCredentials } from '@blog/config';
+import { OAUTH_PROVIDER, type TOAuthProvider } from '@blog/config/constants';
+import { isUndefined } from '@blog/utils/primitives';
 
-export type TOAuthProviderId = 'github' | 'google';
+export type TOAuthProviderId = TOAuthProvider;
 
-type TOAuthCredentials = {
-  clientId: string;
-  clientSecret: string;
-};
-
-export const OAUTH_PROVIDER_IDS = [
-  'github',
-  'google',
-] as const satisfies readonly TOAuthProviderId[];
+export const OAUTH_PROVIDER_IDS = Object.values(OAUTH_PROVIDER);
 
 const OAUTH_CREDENTIAL_GETTERS: Record<
   TOAuthProviderId,
-  () => TOAuthCredentials | undefined
+  () => TMaybeUndefined<TOAuthCredentials>
 > = {
-  github: () =>
+  [OAUTH_PROVIDER.GITHUB]: () =>
     oauthEnv.AUTH_GITHUB_ID && oauthEnv.AUTH_GITHUB_SECRET
       ? {
           clientId: oauthEnv.AUTH_GITHUB_ID,
           clientSecret: oauthEnv.AUTH_GITHUB_SECRET,
         }
       : undefined,
-  google: () =>
+  [OAUTH_PROVIDER.GOOGLE]: () =>
     oauthEnv.AUTH_GOOGLE_ID && oauthEnv.AUTH_GOOGLE_SECRET
       ? {
           clientId: oauthEnv.AUTH_GOOGLE_ID,
@@ -41,12 +36,12 @@ const OAUTH_CREDENTIAL_GETTERS: Record<
  */
 export function getOAuthProviderCredentials(
   id: TOAuthProviderId,
-): TOAuthCredentials | undefined {
+): TMaybeUndefined<TOAuthCredentials> {
   return OAUTH_CREDENTIAL_GETTERS[id]();
 }
 
 export function getEnabledOAuthProviderIds(): TOAuthProviderId[] {
   return OAUTH_PROVIDER_IDS.filter(
-    (id) => getOAuthProviderCredentials(id) !== undefined,
+    (id) => !isUndefined(getOAuthProviderCredentials(id)),
   );
 }

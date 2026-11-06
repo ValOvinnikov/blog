@@ -178,6 +178,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **NEXT_NAVIGATION_ERROR**: `NEXT_NOT_FOUND`, `NEXT_REDIRECT`
 
+### `@blog/config/constants` — `packages/config/src/constants/oauth-provider.ts`
+
+- **OAUTH_PROVIDER**: `GITHUB`=`"github"`, `GOOGLE`=`"google"`
+
 ### `@blog/config/constants` — `packages/config/src/constants/operator-alert.ts`
 
 - **OPERATOR_ALERT_KIND**: `OWNER_ELEVATION`, `DOCUMENT_VALIDATION`

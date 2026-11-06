@@ -1,12 +1,14 @@
 import type { TOutcome } from '@blog/config';
+import type { TOAuthProvider } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { accounts, users } from '@blog/db/schema/auth';
+import { hasLength } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { and, eq, sql } from 'drizzle-orm';
 
 // The magic-link method has no `accounts` row to delete, so it is not a
 // valid target; dropping it means clearing `users.emailVerified` instead.
-export type TLinkableProvider = 'github' | 'google';
+export type TLinkableProvider = TOAuthProvider;
 
 export type TUnlinkProviderResult =
   TOutcome<'unlinked'> | TOutcome<'last-method'>;
@@ -48,7 +50,7 @@ export async function unlinkProvider(
     )
     .returning();
 
-  if (deletedRows.length > 0) {
+  if (hasLength(deletedRows)) {
     return toOutcome('unlinked');
   }
 
