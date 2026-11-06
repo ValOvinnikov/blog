@@ -9,7 +9,6 @@ import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
 import {
   voiceDefaultText,
-  voiceTextToPortableText,
   voiceFieldInputId,
   type TVoiceDraftValue,
   type TVoiceField,
@@ -68,7 +67,6 @@ export const useVoiceFieldState = (fieldId: TVoiceFieldId) => {
     savedValue: savedValues[fieldId],
     error: errors[fieldId],
     defaultText,
-    defaultBlocks: voiceTextToPortableText(fieldId, defaultText),
     onChange: (value: TVoiceDraftValue) => setFieldValue(fieldId, value),
   };
 };

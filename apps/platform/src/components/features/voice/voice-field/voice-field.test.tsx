@@ -24,6 +24,7 @@ import {
   type TVoiceFieldErrors,
 } from '@platform/utils/voice-draft/voice-draft';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 
 import { VoiceField, type TVoiceFieldProps } from './voice-field';
 
@@ -58,8 +59,9 @@ const VoiceFieldInEditor = ({
   savedValue = value,
   errors,
 }: TVoiceFieldInEditorProps) => {
+  const [draftValue, setDraftValue] = useState(value);
   const values = localeDraftOf(
-    withVoiceValue(buildVoiceDraft({}, [EN]), EN, field.id, value),
+    withVoiceValue(buildVoiceDraft({}, [EN]), EN, field.id, draftValue),
     EN,
   );
   const savedValues = localeDraftOf(
@@ -75,7 +77,10 @@ const VoiceFieldInEditor = ({
       errors={errors}
       openListFieldId={undefined}
       setOpenListFieldId={vi.fn()}
-      setFieldValue={setFieldValue}
+      setFieldValue={(id, next) => {
+        setFieldValue(id, next);
+        setDraftValue(next);
+      }}
       specimenTheme={MOCK_SITE_PREVIEW_THEME}
     >
       <VoiceField field={field} />
@@ -359,5 +364,18 @@ describe(`<${VoiceField.name}/>`, () => {
         `^${ARCHIVED_NOTICE_TEXT}.*A topic with no posts yet.*Keep {name}`,
       ),
     );
+  });
+
+  it('shows the default again and stores the empty value when Reset follows typing', async () => {
+    const user = userEvent.setup();
+    setup();
+
+    const input = screen.getByRole('textbox', { name: HEADING });
+    await user.type(input, MOCK_SUFFIX);
+    const resetButton = screen.getByRole('button', { name: RESET });
+    await user.click(resetButton);
+
+    expect(setFieldValue).toHaveBeenLastCalledWith('notFoundHeading', '');
+    expect(input).toHaveValue(SITE_MESSAGES_BY_LOCALE.EN.notFound.heading);
   });
 });

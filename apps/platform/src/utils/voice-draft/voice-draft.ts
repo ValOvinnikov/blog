@@ -19,6 +19,7 @@ import {
 } from '@blog/utils/primitives';
 import { VOICE_SECTION, type TVoiceSection } from '@platform/constants/voice';
 import { isSameJson } from '@platform/utils/is-same-json/is-same-json';
+import { voiceTextToPortableText } from '@platform/utils/voice-portable-text/voice-portable-text';
 
 export type TVoiceField = (typeof VOICE_FIELDS)[number];
 
@@ -101,18 +102,6 @@ export const voiceFieldInputId = (
   idPrefix: string,
   id: TVoiceFieldId,
 ): string => `${idPrefix}-${id}`;
-
-export const voiceTextToPortableText = (
-  id: TVoiceFieldId,
-  text: string,
-): TVoicePortableText => [
-  {
-    _type: 'block',
-    _key: `${id}-block`,
-    style: 'normal',
-    children: [{ _type: 'span', _key: `${id}-span`, text }],
-  },
-];
 
 const toDraftValue = (
   field: TVoiceField,
@@ -218,17 +207,6 @@ export const voiceDefaultText = (
     );
   return isString(value) ? value : '';
 };
-
-export const isVoicePlainCopyOf = (
-  value: TVoicePortableText,
-  text: string,
-): boolean =>
-  value.length === 1 &&
-  value.every(
-    ({ children, markDefs }) =>
-      !hasLength(markDefs) && children.every(({ marks }) => !hasLength(marks)),
-  ) &&
-  portableTextToPlainText(value) === text;
 
 export const toVoiceOverridesInput = (
   draft: TVoiceDraft,

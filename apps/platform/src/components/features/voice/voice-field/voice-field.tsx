@@ -62,11 +62,12 @@ export const VoiceField = ({ field }: TVoiceFieldProps) => {
 
   const reset = () => {
     onChange(isRich ? null : '');
+    textControl.clearTypedText();
     showDefaultAgain();
   };
 
   const handleBlur = ({ currentTarget, relatedTarget }: FocusEvent) => {
-    textControl.onBlur();
+    textControl.clearTypedText();
     if (isRich && isNull(value) && !currentTarget.contains(relatedTarget)) {
       showDefaultAgain();
     }

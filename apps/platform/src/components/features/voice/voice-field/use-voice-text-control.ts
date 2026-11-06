@@ -27,6 +27,6 @@ export const useVoiceTextControl = ({
       setTypedText(next);
       onChange(next === defaultText || next.trim() === '' ? '' : next);
     },
-    onBlur: () => setTypedText(null),
+    clearTypedText: () => setTypedText(null),
   };
 };

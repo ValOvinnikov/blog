@@ -12,7 +12,10 @@ import { PortableTextEditor } from '@platform/components/shared/portable-text-ed
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { useSettingsFormState } from '@platform/context/settings-form-provider';
 import { isBlankPortableTextValue } from '@platform/utils/portable-text-schema/portable-text-schema';
-import { isVoicePlainCopyOf } from '@platform/utils/voice-draft/voice-draft';
+import {
+  isVoicePlainCopyOf,
+  voiceTextToPortableText,
+} from '@platform/utils/voice-portable-text/voice-portable-text';
 
 export type TVoiceFieldRichControlProps = {
   fieldId: TVoiceFieldId;
@@ -29,15 +32,18 @@ export const VoiceFieldRichControl = ({
   isInvalid,
   tokens,
 }: TVoiceFieldRichControlProps) => {
-  const { inputId, value, defaultText, defaultBlocks, onChange } =
-    useVoiceFieldState(fieldId);
+  const { inputId, value, defaultText, onChange } = useVoiceFieldState(fieldId);
   const { isArchived } = useSettingsFormState();
 
   return (
     <PortableTextEditor<TVoicePortableText[number]>
       field={{ label, id: inputId, isInvalid, describedBy, tokens }}
       schema={VOICE_PORTABLE_TEXT_SCHEMA}
-      initialValue={Array.isArray(value) ? value : defaultBlocks}
+      initialValue={
+        Array.isArray(value)
+          ? value
+          : voiceTextToPortableText(fieldId, defaultText)
+      }
       onChange={(next) =>
         onChange(
           isBlankPortableTextValue(next) ||

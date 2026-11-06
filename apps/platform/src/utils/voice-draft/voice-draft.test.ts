@@ -17,12 +17,10 @@ import {
   buildVoiceDraft,
   countLanguageVoiceChanges,
   countVoiceChanges,
-  isVoicePlainCopyOf,
   toVoiceOverridesInput,
   voiceDefaultText,
   voiceErrorReveal,
   voiceErrorsInOrder,
-  voiceTextToPortableText,
   withVoiceValue,
   type TVoiceFieldError,
 } from './voice-draft';
@@ -290,25 +288,5 @@ describe(voiceErrorReveal, () => {
     const reveal = voiceErrorReveal(error);
 
     expect(reveal).toEqual(expected);
-  });
-});
-
-describe(isVoicePlainCopyOf, () => {
-  it('accepts a single unmarked paragraph of the same text', () => {
-    const value = voiceTextToPortableText(SUPPORTING_TEXT_ID, MOCK_LEAD_TEXT);
-
-    expect(isVoicePlainCopyOf(value, MOCK_LEAD_TEXT)).toBe(true);
-  });
-
-  it('rejects a paragraph of different text', () => {
-    const value = voiceTextToPortableText(SUPPORTING_TEXT_ID, MOCK_LEAD_TEXT);
-
-    expect(isVoicePlainCopyOf(value, MOCK_LINK_TEXT)).toBe(false);
-  });
-
-  it('rejects the same text once a mark or link is applied', () => {
-    expect(
-      isVoicePlainCopyOf(MOCK_RICH_TEXT, MOCK_LEAD_TEXT + MOCK_LINK_TEXT),
-    ).toBe(false);
   });
 });
