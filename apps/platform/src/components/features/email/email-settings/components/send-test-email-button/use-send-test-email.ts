@@ -1,6 +1,10 @@
 'use client';
 
-import { ACTION_OUTCOME, type TEmailTemplateType } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TEmailTemplateType,
+} from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
 import { useToast } from '@platform/context/toast-provider';
 import {
@@ -11,6 +15,7 @@ import {
   toTestSenderInput,
   type TEmailSenderDraft,
 } from '@platform/utils/email-draft/email-draft';
+import { settleAction } from '@platform/utils/settle-action/settle-action';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
@@ -37,12 +42,14 @@ export const useSendTestEmail = (tenantId: string) => {
 
   const sendTest = ({ templateType, subject, body, sender }: TTestEmail) =>
     startTransition(async () => {
-      const result = await sendTestEmailAction(tenantId, {
-        templateType,
-        copy: { subject, body },
-        sender: toTestSenderInput(sender),
-      });
-      if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+      const result = await settleAction(
+        sendTestEmailAction(tenantId, {
+          templateType,
+          copy: { subject, body },
+          sender: toTestSenderInput(sender),
+        }),
+      );
+      if (isOutcomeSuccess(result)) {
         toast.success({ message: t('testSent', { email: result.to }) });
       } else {
         toast.error({ message: t(FAILURE_MESSAGE_KEYS[result.outcome]) });

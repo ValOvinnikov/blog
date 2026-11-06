@@ -20,7 +20,6 @@ delete this doc, its row in `README.md`, and the sentence pointing here in
 `CLAUDE.md`'s "Read an action result through its outcome guards" — the rule
 itself stays.
 
-- `apps/platform/src/components/features/email/email-settings/components/send-test-email-button/use-send-test-email.ts` — SUCCESS
 - `apps/platform/src/components/features/email/email-settings/use-email-draft.ts` — INVALID, SUCCESS
 - `apps/platform/src/components/features/look/look-form/use-look-save.ts` — SUCCESS
 - `apps/platform/src/components/features/voice/voice-settings/use-voice-draft.ts` — INVALID
