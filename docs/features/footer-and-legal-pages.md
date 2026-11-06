@@ -19,12 +19,12 @@ The site footer closes every page with a brand column (the Look logo, an about l
 ## Surfaces and routes
 
 - **Public site:** every page rendered inside `app/[tenant]/[locale]/layout.tsx`, which mounts `SiteFooter`. The standalone 404 boundaries above that layout have no footer.
-- **Studio:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Fine Print, Show language switcher, Show RSS feed. The copyright name is the brand name in Settings → Site Settings.
+- **Studio:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line still shows the brand name from Settings → Site Settings; the site does not read Copyright name yet.
 - **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
 
 ## Data
 
-- **`settings_footer`:** `title`, `social[]` (`socialProfile` objects), `groups[]` (`footerLinkGroup` objects), `about` (localized one-line text), `address` (localized multi-line text), `finePrint[]` (`linkRef` items and at most one `cookieSettingsItem`), `showLanguageSwitcher` (boolean, initial `false`), `showRssFeed` (boolean, initial `true`). Every field after `social` is optional. Provisioning seeds it empty, and seed verification requires the singleton.
+- **`settings_footer`:** `title`, `social[]` (`socialProfile` objects), `groups[]` (`footerLinkGroup` objects), `about` (localized one-line text), `address` (localized multi-line text), `copyrightName` (localized one-line text, empty by default), `finePrint[]` (`linkRef` items and at most one `cookieSettingsItem`), `showLanguageSwitcher` (boolean, initial `false`), `showRssFeed` (boolean, initial `true`). Every field after `social` is optional. Provisioning seeds it empty, and seed verification requires the singleton.
 - **`footerLinkGroup`:** a localized `heading`, required in the default language, and `links[]`, one or more `linkRef`s in order. No fixed categories.
 - **`cookieSettingsItem`:** marks where the Cookie settings link sits in the fine print; it has no editable field. The link shows on every site whether or not the item is present.
 - **`socialProfile`:** a required `link` reference to a `link` document plus a `platform` from `SOCIAL_PLATFORMS` (X, GitHub, LinkedIn, YouTube, Instagram, Mastodon, Bluesky, Facebook, Threads, RSS). The same object backs `person.socialLinks` (./people.md), through one shared fragment and transformer.
@@ -36,7 +36,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 
 ## Configuration
 
-- **Editors** manage social profiles, link groups, the about line, the address, the fine-print links, the switcher toggle and the RSS toggle in Studio; a profile's destination is edited on its `link` document (./links.md).
+- **Editors** manage social profiles, link groups, the about line, the address, the copyright name, the fine-print links, the switcher toggle and the RSS toggle in Studio; a profile's destination is edited on its `link` document (./links.md).
 - The switcher shows only with two or more live languages, and Studio hides its toggle otherwise (./languages.md). Its style comes from Look (./look.md).
 - The cookie settings button reopens the consent preferences dialog (./consent-and-analytics.md). The RSS link goes to the current language's feed (./seo-and-feeds.md).
 - Layout, Background and Surface are Growth-only; a Free site renders the preset's. The content is not plan-gated.
