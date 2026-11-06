@@ -16,7 +16,6 @@ export const settingsFormShellVariants = tv({
     stack: {
       [SETTINGS_FORM_STACK.LOOK]: { root: ['gap-admin-form-gap'] },
       [SETTINGS_FORM_STACK.VOICE]: {
-        // The content column's 16px phone padding less 2: the board's 14.
         root: ['gap-4 max-md:-mt-0.5 md:gap-5'],
       },
     },
@@ -25,6 +24,10 @@ export const settingsFormShellVariants = tv({
       false: {},
     },
     isSaveBarShown: {
+      true: {},
+      false: {},
+    },
+    isSaveBarHidden: {
       true: {},
       false: {},
     },
@@ -42,6 +45,10 @@ export const settingsFormShellVariants = tv({
     },
   },
   compoundVariants: [
+    {
+      isSaveBarHidden: true,
+      class: { root: ['md:pb-0'] },
+    },
     {
       hasPhoneSaveFooter: false,
       isSaveBarShown: true,
@@ -84,5 +91,6 @@ export const settingsFormShellVariants = tv({
     isArchived: false,
     hasPhoneSaveFooter: false,
     isSaveBarShown: false,
+    isSaveBarHidden: false,
   },
 });

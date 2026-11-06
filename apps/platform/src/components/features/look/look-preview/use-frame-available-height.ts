@@ -31,11 +31,12 @@ export const useFrameAvailableHeight = (device: TPreviewDevice) => {
         stageRect.height - viewportElement.getBoundingClientRect().height;
       const belowStage =
         rootElement.getBoundingClientRect().bottom - stageRect.bottom;
+      const stageTop = stageRect.top + window.scrollY;
       const next = Math.max(
         0,
         Math.floor(
           window.innerHeight -
-            stageRect.top -
+            stageTop -
             stageChrome -
             belowStage -
             LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT -
