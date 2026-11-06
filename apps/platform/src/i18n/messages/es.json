@@ -776,6 +776,7 @@
       "SHOWN": "Ambos"
     },
     "cookieSettingsButtonBannerOff": "El banner de cookies está desactivado, así que los lectores no ven ni el enlace ni el botón. Activa el banner en Funciones para elegir.",
+    "footerPoweredByNote": "Los sitios gratuitos muestran «Con la tecnología de {productName}» al final del pie de página. Desaparece con el plan Growth.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva",
@@ -862,6 +863,7 @@
     "footerContact": "Contacto",
     "footerFinePrintAriaLabel": "Legal",
     "footerPrivacy": "Política de privacidad",
+    "footerPoweredByLabel": "Con la tecnología de",
     "footerCookieSettings": "Configuración de cookies"
   },
   "lookFollow": {

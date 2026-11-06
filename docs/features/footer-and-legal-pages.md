@@ -19,7 +19,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 ## Surfaces and routes
 
 - **Public site:** every page rendered inside `app/[tenant]/[locale]/layout.tsx`, which mounts `SiteFooter`. The standalone 404 boundaries above that layout have no footer.
-- **Studio:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line still shows the brand name from Settings → Site Settings; the site does not read Copyright name yet.
+- **Studio:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line and the Big wordmark show the brand name set on Look's Brand card, or the tenant name when it is blank (./look.md); the site does not read Copyright name yet.
 - **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
 
 ## Data
@@ -53,7 +53,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - A group or fine-print link whose href an earlier one already carries is skipped, groups before fine print; a group left with no links, or with no heading, is dropped. A link opens in a new tab only when its `link` document says so.
 - The powered-by mark (`Footer.PoweredBy`) is always the last item of the bottom row and sits after the fine-print `nav`, never inside it. It opens in the same tab and its accessible name is its visible text. With `PRODUCT_NAME` or `MARKETING_SITE_URL` unset it is not drawn, and `footer.powered_by_unconfigured` is logged.
 - The groups and the fine print are two `nav` landmarks named by the fixed catalog keys `siteFooter.groupsAriaLabel` and `siteFooter.finePrintAriaLabel`.
-- A failed site-settings read renders no footer. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no editor content and no switcher, and with the copyright, RSS link and, when the choice includes it, Cookie settings shown.
+- The footer reads no Site Settings. A failed Look read names the site with the tenant name; with no tenant at all the copyright line is left out. A failed footer read is logged (`footer.layout_fetch_failed`) and the footer renders with no editor content and no switcher, and with the copyright, RSS link and, when the choice includes it, Cookie settings shown.
 - The footer's links (`TextLink` `appearance="nav"`), including the footer language codes, mark the current item with `aria-current="page"` and the active colour and underline.
 - `@blog/ui`'s `Footer` is a compound shell (`Footer.Logo`, `About`, `Address`, `Social`, `Groups`/`Group`/`GroupItem`, `Wordmark`, `Copyright`, `FinePrint`, `Nav`, `PoweredBy`) and stays prop-driven; `apps/web` composes the content. On a phone the groups sit two per row.
 - The `Footer` lays out by its own width (container queries on `@container/footer`), never the window's, so it renders the same in any frame; on the public site it spans the window. The Big wordmark's `text-wordmark` size scales with the footer's width (`cqi`) for the same reason.
@@ -62,7 +62,7 @@ The site footer closes every page with a brand column (the Look logo, an about l
 
 - Layers: `studio` (schema), `service` (loader), `ui` (footer shell), `web` (composition).
 - Features: ./links.md, ./languages.md, ./look.md, ./people.md, ./consent-and-analytics.md, ./seo-and-feeds.md, ./navigation.md, ./rendering-and-caching.md, ./tenant-provisioning.md.
-- Env: `PRODUCT_NAME` and `MARKETING_SITE_URL` (web), for the powered-by mark.
+- Env: `PRODUCT_NAME` (web and platform) and `MARKETING_SITE_URL` (web), for the powered-by mark.
 - Plans: [plans-and-entitlements](./plans-and-entitlements.md) decides which sites carry the mark.
 
 ## Entry points

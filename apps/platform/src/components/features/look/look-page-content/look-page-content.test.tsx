@@ -18,6 +18,8 @@ import {
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
+import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
@@ -45,9 +47,12 @@ vi.mock('@blog/db', async () => ({
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
+vi.mock('@platform/utils/env/env');
+
 const MOCK_ACCENT_HUE = 28;
 const SIGN_IN = 'Sign in';
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
+const POWERED_BY_MARK = `${messages.lookPreview.footerPoweredByLabel} ${MOCK_PRODUCT_NAME}`;
 
 const tLogoHue = makeEnTranslator('logoHueField');
 
@@ -155,6 +160,32 @@ describe(`<${LookPageContent.name}/>`, () => {
     const signInButton = screen.queryByRole('button', { name: SIGN_IN });
 
     expect(signInButton).not.toBeInTheDocument();
+  });
+
+  describe('with the product name set', () => {
+    beforeEach(() => {
+      mockedEnv.PRODUCT_NAME = MOCK_PRODUCT_NAME;
+    });
+
+    afterEach(() => {
+      delete mockedEnv.PRODUCT_NAME;
+    });
+
+    it('previews the Powered by mark on Free', async () => {
+      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
+
+      const mark = screen.getByRole('link', { name: POWERED_BY_MARK });
+
+      expect(mark).toBeInTheDocument();
+    });
+
+    it('previews no Powered by mark on Growth', async () => {
+      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
+
+      const mark = screen.queryByRole('link', { name: POWERED_BY_MARK });
+
+      expect(mark).not.toBeInTheDocument();
+    });
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {

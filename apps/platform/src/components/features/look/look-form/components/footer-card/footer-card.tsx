@@ -23,6 +23,8 @@ import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+import { FooterPoweredByNote } from './components/footer-powered-by-note';
+
 const COOKIE_SETTINGS_BUTTON_ORDER = [
   COOKIE_SETTINGS_BUTTON.HIDDEN,
   COOKIE_SETTINGS_BUTTON.ONLY,
@@ -150,6 +152,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
           </p>
         )}
       </LookField>
+      <FooterPoweredByNote />
     </LookCard>
   );
 };

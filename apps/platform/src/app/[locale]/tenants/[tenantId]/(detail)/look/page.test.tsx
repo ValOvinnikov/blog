@@ -30,6 +30,8 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
+vi.mock('@platform/utils/env/env');
+
 const setup = customRenderAsync(LookPage, {
   params: Promise.resolve({ tenantId: MOCK_TENANT_ID }),
 });

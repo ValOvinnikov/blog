@@ -14,9 +14,9 @@ import { mockIndexPage } from '@web/testing/pages/index-page/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_NAME,
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { mockTopicWithPostCount } from '@web/testing/shared/topic/fixtures';
@@ -29,7 +29,7 @@ faker.seed(6008);
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 vi.mock('@web/server/site-config/get-voice-rich/get-voice-rich');
 
 vi.mock('@blog/service', () => ({
@@ -104,7 +104,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
         name: SITE_MESSAGES.breadcrumbs.ariaLabel,
       });
       const homeLink = within(breadcrumbs).getByRole('link', {
-        name: MOCK_SITE_SETTINGS.brand.name,
+        name: MOCK_TENANT_NAME,
       });
       const currentCrumb = within(breadcrumbs).getByText(MOCK_PAGE_HEADING);
       const main = screen.getByRole('main');

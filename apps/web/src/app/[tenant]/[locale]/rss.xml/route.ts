@@ -2,6 +2,8 @@ import { HTTP_STATUS, type ITenantLocalizedParams, routes } from '@blog/config';
 import { service } from '@blog/service';
 import { RSS_LOG } from '@web/constants/rss';
 import { getFeedContext } from '@web/server/feed/get-feed-context/get-feed-context';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
+import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildRssFeed } from '@web/utils/build-rss-feed';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
@@ -26,10 +28,11 @@ export async function GET(
   }
   const { tenant, language, toLocalizedUrl, toRssItem } = feed;
 
-  const [postsResult, siteSettingsResult, indexPageResult, navResult, t] =
+  const hostTenant = await resolveRequestTenant();
+  const [postsResult, brandName, indexPageResult, navResult, t] =
     await Promise.all([
       service.entities.posts.v1.getAllPublishedPosts(tenant),
-      service.global.siteSettings.v1.getSiteSettings(tenant),
+      getBrandName({ tenantId: hostTenant?.id, tenantName: hostTenant?.name }),
       service.pages.blog.v1.getIndexPage(tenant),
       service.global.navigation.v1.getNavigation(tenant),
       getTranslations({ locale, namespace: 'rss' }),
@@ -42,14 +45,7 @@ export async function GET(
   }
   const posts = postsResult.ok ? postsResult.data : [];
 
-  const title = siteSettingsResult.ok
-    ? siteSettingsResult.data.brand.name
-    : t('fallbackTitle');
-  if (!siteSettingsResult.ok) {
-    logger.error(RSS_LOG.SITE_SETTINGS_FETCH_FAILED, {
-      error: siteSettingsResult.error,
-    });
-  }
+  const title = brandName ?? t('fallbackTitle');
 
   if (!indexPageResult.ok) {
     logger.error(RSS_LOG.INDEX_PAGE_FETCH_FAILED, {

@@ -776,6 +776,7 @@
       "SHOWN": "Beides"
     },
     "cookieSettingsButtonBannerOff": "Das Cookie-Banner ist aus, daher sehen Leser weder den Link noch die Schaltfläche. Schalten Sie das Banner unter Funktionen ein, um zu wählen.",
+    "footerPoweredByNote": "Kostenlose Websites zeigen „Bereitgestellt von {productName}“ am Ende des Footers. Mit dem Growth-Tarif entfällt der Hinweis.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild",
@@ -862,6 +863,7 @@
     "footerContact": "Kontakt",
     "footerFinePrintAriaLabel": "Rechtliches",
     "footerPrivacy": "Datenschutzerklärung",
+    "footerPoweredByLabel": "Bereitgestellt von",
     "footerCookieSettings": "Cookie-Einstellungen"
   },
   "lookFollow": {

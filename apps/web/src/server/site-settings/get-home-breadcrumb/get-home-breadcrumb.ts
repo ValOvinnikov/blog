@@ -1,12 +1,12 @@
 import { routes } from '@blog/config';
 import type { IBreadcrumbItem } from '@blog/ui/components/molecules/breadcrumbs';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { getRequestContext } from '@web/server/request-context/request-context';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { notFound } from 'next/navigation';
 
 export const getHomeBreadcrumb = async (): Promise<IBreadcrumbItem> => {
-  const result = await getSiteSettings();
-  // The locale layout logs this failure from the same cached call.
-  if (!result.ok) notFound();
+  const brandName = await getBrandName(await getRequestContext());
+  if (!brandName) notFound();
 
-  return { label: result.data.brand.name, href: routes.home() };
+  return { label: brandName, href: routes.home() };
 };

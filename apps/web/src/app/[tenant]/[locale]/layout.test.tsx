@@ -3,30 +3,24 @@ import {
   FONT_CHOICE,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
   RADIUS_SCALE,
 } from '@blog/config';
-import { errorResult } from '@blog/utils';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
 import { SiteProviders } from '@web/components/shared/site-providers';
 import { ThemeScope } from '@web/components/shared/theme-scope';
-import { SITE_SETTINGS_LOG } from '@web/constants/site-settings';
 import {
   enterRequestContext,
   getRequestContext,
 } from '@web/server/request-context/request-context';
-import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { mockRouteParams } from '@web/testing/app/route-params';
-import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
 } from '@web/testing/shared/tenant/fixtures';
-import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 import type { ReactElement } from 'react';
 
 import LocaleLayout, { generateMetadata, generateStaticParams } from './layout';
@@ -45,7 +39,7 @@ const { getThemeTokensMock, isProductionEnvironmentMock } = vi.hoisted(() => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/utils/is-production-environment', () => ({
   isProductionEnvironment: isProductionEnvironmentMock,
@@ -57,7 +51,6 @@ vi.mock('@web/utils/get-theme-tokens', () => ({
 
 const enterRequestContextMock = vi.mocked(enterRequestContext);
 const getRequestContextMock = vi.mocked(getRequestContext);
-const getSiteSettingsMock = vi.mocked(getSiteSettings);
 
 const MOCK_THEME_TOKENS = {
   accentHue: 250,
@@ -68,8 +61,6 @@ const MOCK_THEME_TOKENS = {
 };
 
 const NOINDEX_ROBOTS = { index: false, follow: false };
-
-const SETTINGS_FAILURE_SUITE = 'when site settings fail to load';
 
 const renderLayout = () =>
   LocaleLayout({
@@ -88,9 +79,6 @@ const renderComposition = async () => {
   };
 };
 
-const settingsFailure = () =>
-  getSiteSettingsMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
-
 beforeEach(() => {
   getThemeTokensMock.mockResolvedValue(MOCK_THEME_TOKENS);
   isProductionEnvironmentMock.mockReturnValue(true);
@@ -103,16 +91,22 @@ describe(generateStaticParams, () => {
 });
 
 describe(generateMetadata, () => {
-  it('builds the title from site settings and stays indexable in production', async () => {
+  it('builds the title from the brand name and stays indexable in production', async () => {
     const metadata = await generateMetadata({ params: mockRouteParams() });
 
     expect(metadata).toEqual({
       metadataBase: MOCK_REQUEST_CONTEXT.metadataBase,
       title: {
-        default: MOCK_SITE_SETTINGS.brand.name,
-        template: `%s | ${MOCK_SITE_SETTINGS.brand.name}`,
+        default: MOCK_TENANT_NAME,
+        template: `%s | ${MOCK_TENANT_NAME}`,
       },
     });
+  });
+
+  it("reads the brand name for the request context's tenant", async () => {
+    await generateMetadata({ params: mockRouteParams() });
+
+    expect(vi.mocked(getBrandName)).toHaveBeenCalledWith(MOCK_REQUEST_CONTEXT);
   });
 
   it('adds noindex, nofollow robots metadata outside production', async () => {
@@ -131,9 +125,9 @@ describe(generateMetadata, () => {
     expect(enterRequestContextMock).toHaveBeenCalledWith(params);
   });
 
-  describe(SETTINGS_FAILURE_SUITE, () => {
+  describe('without a brand name', () => {
     beforeEach(() => {
-      settingsFailure();
+      vi.mocked(getBrandName).mockResolvedValueOnce(undefined);
     });
 
     it('falls back to metadataBase only', async () => {
@@ -200,34 +194,5 @@ describe(`<${LocaleLayout.name}/>`, () => {
 
     expect(types).not.toContain(SiteHeader);
     expect(types).not.toContain(SiteFooter);
-  });
-
-  describe(SETTINGS_FAILURE_SUITE, () => {
-    let renderError: unknown;
-
-    beforeEach(async () => {
-      settingsFailure();
-      renderError = await renderLayout().catch((error: unknown) => error);
-    });
-
-    it('calls notFound() when the site settings fail to load', () => {
-      expect(renderError).toEqual(
-        new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
-      );
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
-    });
-
-    it('logs the layout fetch failure', () => {
-      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        SITE_SETTINGS_LOG.LAYOUT_FETCH_FAILED,
-        { error: MOCK_ERROR },
-      );
-    });
-
-    it('enters the request context ahead of the notFound() it throws', () => {
-      expect(enterRequestContextMock.mock.invocationCallOrder[0]).toBeLessThan(
-        vi.mocked(notFound).mock.invocationCallOrder[0]!,
-      );
-    });
   });
 });

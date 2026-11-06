@@ -37,8 +37,15 @@ import {
   SAMPLE_PART,
   SAMPLE_PART_ATTRIBUTE,
 } from '@platform/constants/sample-part';
+import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import messages from '@platform/i18n/messages/en.json';
-import { customRender, screen, within } from '@platform/testing/custom-render';
+import {
+  customRender,
+  renderWithIntl,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
+import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
@@ -46,7 +53,7 @@ import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sam
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { CSSProperties } from 'react';
 
-import { LookSample } from './look-sample';
+import { LookSample, type TLookSampleProps } from './look-sample';
 
 faker.seed(5994);
 
@@ -73,6 +80,7 @@ const {
   signOut: SIGN_OUT,
   footerArchive: ARCHIVE,
   footerCookieSettings: COOKIE_SETTINGS,
+  footerPoweredByLabel: POWERED_BY,
   sampleHeading: SAMPLE_HEADING,
   latestPostsHeading: LATEST_POSTS,
   readTimeChip: READ_TIME,
@@ -93,7 +101,7 @@ const MOCK_FOOTER: TSampleFooterStyle = {
   hasCookieSettingsButton: true,
 };
 
-const setup = customRender(LookSample, {
+const LOOK_SAMPLE_PROPS: TLookSampleProps = {
   brand: { name: MOCK_TENANT_NAME, logoSrc: undefined },
   theme: MOCK_SITE_PREVIEW_THEME,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
@@ -101,7 +109,9 @@ const setup = customRender(LookSample, {
   footer: MOCK_FOOTER,
   busy: MOCK_BUSY,
   hasReaderAccounts: true,
-});
+};
+
+const setup = customRender(LookSample, LOOK_SAMPLE_PROPS);
 
 const withinFullHeader = () => {
   const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
@@ -512,6 +522,30 @@ describe(`<${LookSample.name}/>`, () => {
       });
 
       expect(cookieSettingsLink).not.toBeInTheDocument();
+    });
+
+    it('draws the Powered by mark when given a product name', () => {
+      renderWithIntl(
+        <PoweredByMarkProvider productName={MOCK_PRODUCT_NAME}>
+          <LookSample {...LOOK_SAMPLE_PROPS} />
+        </PoweredByMarkProvider>,
+      );
+
+      const mark = screen.getByRole('link', {
+        name: `${POWERED_BY} ${MOCK_PRODUCT_NAME}`,
+      });
+
+      expect(mark).toBeVisible();
+    });
+
+    it('draws no Powered by mark without a product name', () => {
+      setup();
+
+      const mark = screen.queryByRole('link', {
+        name: new RegExp(POWERED_BY),
+      });
+
+      expect(mark).not.toBeInTheDocument();
     });
 
     it('arranges the footer by the chosen layout, dropping the link groups when compact', () => {

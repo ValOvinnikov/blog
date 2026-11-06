@@ -15,6 +15,7 @@ import { FOOTER_LOG } from '@web/constants/footer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { isCapabilityEnabled } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getFooterStyle } from '@web/server/site-config/get-footer-style/get-footer-style';
 import { getPoweredByMark } from '@web/server/site-config/get-powered-by-mark/get-powered-by-mark';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
@@ -30,12 +31,14 @@ import {
   MOCK_BLOG_LINK,
   MOCK_HOME_LINK,
 } from '@web/testing/shared/link/fixtures';
-import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_LINKEDIN_PROFILE,
   MOCK_MASTODON_PROFILE,
 } from '@web/testing/shared/social-profile/fixtures';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_NAME,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SiteFooter } from './site-footer';
@@ -50,7 +53,7 @@ vi.mock(
   '@web/server/site-config/get-language-switcher-style/get-language-switcher-style',
 );
 
-vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/server/site-config/get-footer-style/get-footer-style');
 
@@ -153,8 +156,15 @@ describe(`<${SiteFooter.name}/>`, () => {
     it('shows the brand name and the current year in the copyright', () => {
       const footer = screen.getByRole('contentinfo');
 
-      expect(footer).toHaveTextContent(MOCK_SITE_SETTINGS.brand.name);
+      expect(footer).toHaveTextContent(MOCK_TENANT_NAME);
       expect(footer).toHaveTextContent(String(MOCK_NOW.getFullYear()));
+    });
+
+    it("reads the brand name for the request context's tenant", () => {
+      expect(vi.mocked(getBrandName)).toHaveBeenCalledWith({
+        tenantId: MOCK_REQUEST_CONTEXT.tenantId,
+        tenantName: MOCK_REQUEST_CONTEXT.tenantName,
+      });
     });
 
     it('adds a visible RSS feed link to the footer nav', () => {
@@ -244,10 +254,20 @@ describe(`<${SiteFooter.name}/>`, () => {
       style: { layout: FOOTER_LAYOUT.BIG_WORDMARK },
     });
 
-    const wordmark = screen.getByText(MOCK_SITE_SETTINGS.brand.name, {
+    const wordmark = screen.getByText(MOCK_TENANT_NAME, {
       ignore: 'p',
     });
     expect(wordmark).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('leaves out the copyright line without a brand name', async () => {
+    vi.mocked(getBrandName).mockResolvedValueOnce(undefined);
+
+    await setup();
+
+    const footer = screen.getByRole('contentinfo');
+
+    expect(footer).not.toHaveTextContent('©');
   });
 
   describe("with the editor's footer content", () => {

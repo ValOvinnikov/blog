@@ -5,3 +5,4 @@ export const MOCK_LOKI_ENV = {
   LOKI_USER: '612345',
   LOKI_TOKEN: 'loki-test-token',
 };
+export const MOCK_PRODUCT_NAME = 'Quillstack';

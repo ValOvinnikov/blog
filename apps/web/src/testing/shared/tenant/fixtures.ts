@@ -11,7 +11,7 @@ export const MOCK_TENANT_ID = mockFaker.string.uuid();
 
 export const MOCK_OTHER_TENANT_ID = mockFaker.string.uuid();
 
-const MOCK_TENANT_NAME = mockFaker.company.name();
+export const MOCK_TENANT_NAME = mockFaker.company.name();
 
 const MOCK_TENANT_CREATED_AT = mockFaker.date.past();
 
@@ -27,6 +27,7 @@ export const MOCK_TENANT_SANITY_CONTEXT: TTenantSanityContext = {
 
 export const MOCK_REQUEST_CONTEXT: TRequestContext = {
   tenantId: MOCK_TENANT_ID,
+  tenantName: MOCK_TENANT_NAME,
   locale: LOCALE_ISO_CODES.EN,
   sanityContext: MOCK_TENANT_SANITY_CONTEXT,
   metadataBase: new URL(MOCK_TENANT_BASE_URL),
