@@ -39,3 +39,8 @@ export const VOICE_CARD_ID = {
 } as const satisfies Record<TVoiceSurface, { card: string; heading: string }>;
 
 export const VOICE_CARDS_TEST_ID = 'voice-cards';
+
+export const VOICE_SECTION_BAR_FADE_START_TEST_ID =
+  'voice-section-bar-fade-start';
+
+export const VOICE_SECTION_BAR_FADE_END_TEST_ID = 'voice-section-bar-fade-end';

@@ -80,3 +80,32 @@ export const voiceHashTarget = (
   );
   return section && { section, id };
 };
+
+export const voiceSectionHref = (section: TVoiceSection): string =>
+  `#${VOICE_SECTION_ID[section].section}`;
+
+const voiceSectionHeaderBox = (section: TVoiceSection) =>
+  document
+    .getElementById(VOICE_SECTION_ID[section].heading)
+    ?.getBoundingClientRect();
+
+const isScrolledToPageEnd = () =>
+  window.scrollY > 0 &&
+  Math.ceil(window.scrollY + window.innerHeight) >=
+    document.documentElement.scrollHeight;
+
+export const findActiveVoiceSection = (
+  activationLine: number,
+): TMaybeUndefined<TVoiceSection> => {
+  if (isScrolledToPageEnd()) {
+    const inView = VOICE_SECTIONS_IN_PAGE_ORDER.findLast((section) => {
+      const box = voiceSectionHeaderBox(section);
+      return !isUndefined(box) && box.top >= 0 && box.top < window.innerHeight;
+    });
+    if (inView) return inView;
+  }
+  return VOICE_SECTIONS_IN_PAGE_ORDER.findLast(
+    (section) =>
+      (voiceSectionHeaderBox(section)?.top ?? Infinity) <= activationLine,
+  );
+};

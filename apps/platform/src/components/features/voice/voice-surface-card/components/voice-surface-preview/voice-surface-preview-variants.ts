@@ -7,7 +7,7 @@ export const voiceSurfacePreviewVariants = tv({
       'lg:rounded-br-admin lg:border-l lg:border-admin-line-2 lg:bg-admin-bg lg:p-admin-card',
     ],
     content: [
-      'flex flex-col gap-2.5 lg:sticky lg:top-admin-topbar lg:max-h-[calc(100dvh-160px)] lg:overflow-y-auto lg:overscroll-contain',
+      'flex flex-col gap-2.5 lg:sticky lg:top-[calc(var(--spacing-admin-topbar)+var(--admin-voice-bar-height,0px)+--spacing(4))] lg:max-h-[calc(100dvh-var(--spacing-admin-topbar)-var(--admin-voice-bar-height,0px)-(--spacing(4))-var(--spacing-admin-dock))] lg:overflow-y-auto lg:overscroll-contain',
     ],
     toggle: ['w-full md:h-11 lg:hidden'],
     preview: [
