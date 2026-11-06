@@ -776,6 +776,7 @@
       "SHOWN": "Both"
     },
     "cookieSettingsButtonBannerOff": "The cookie banner is off, so readers see neither the link nor the button. Turn the banner on in Features to choose.",
+    "footerPoweredByNote": "Free sites show “Powered by {productName}” at the end of the footer. It goes with the Growth plan.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image",
@@ -862,6 +863,7 @@
     "footerContact": "Contact",
     "footerFinePrintAriaLabel": "Legal",
     "footerPrivacy": "Privacy policy",
+    "footerPoweredByLabel": "Powered by",
     "footerCookieSettings": "Cookie settings"
   },
   "lookFollow": {

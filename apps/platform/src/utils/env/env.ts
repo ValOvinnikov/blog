@@ -84,6 +84,8 @@ export const env = createEnv({
       .refine(isPersonalDataKeyring, PERSONAL_DATA_KEYRING_FORMAT)
       .optional(),
     // @env-optional
+    PRODUCT_NAME: z.string().trim().min(1).optional(),
+    // @env-optional
     PERSONAL_DATA_INDEX_KEY: z
       .string()
       .refine(isPersonalDataKey, PERSONAL_DATA_KEY_FORMAT)
@@ -120,6 +122,7 @@ export const env = createEnv({
     AUTH_SECRET: process.env.AUTH_SECRET,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
+    PRODUCT_NAME: process.env.PRODUCT_NAME,
   },
   emptyStringAsUndefined: true,
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -53,7 +53,6 @@ retirement into an epic body.
 - `superpowers/specs/2026-10-30-onboarding-wizard-parity-design.md` — the onboarding wizard matching the W2 boards.
 - `superpowers/specs/2026-10-30-admin-redesign-resolutions.md` — the cross-set rulings, shared-primitive owners, dependencies and undrawn frames for the six specs above.
 - `superpowers/specs/2026-11-05-entitlement-grants-design.md` — spike: a super admin grants one tenant a feature outside its plan (storage, resolver, granularity, UI, billing).
-- `superpowers/specs/2026-11-06-powered-by-mark-design.md` — the "powered by" mark on Free sites' footers: placement rule, states, contrast, copy and env vars; boards in `design-reference/powered-by-mark-boards.html`.
 
 ## Archived design docs (frozen history — pre-2026-07-27 only)
 
