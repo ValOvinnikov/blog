@@ -4,6 +4,14 @@ import { type RefObject, useEffect } from 'react';
 
 const SAVE_BAR_HEIGHT_PROPERTY = '--admin-save-bar-height';
 
+// The bar's room grows the page without scrolling it, so a control edited at the page's end would sit under the bar.
+const revealFocusedControl = () => {
+  const focused = document.activeElement;
+  if (focused instanceof HTMLElement && focused !== document.body) {
+    focused.scrollIntoView({ block: 'nearest' });
+  }
+};
+
 // Publishes the visible bar's height on <html>, where the page's bottom room and scroll padding read it.
 export const useSaveBarHeight = (
   barRef: RefObject<TMaybeNull<HTMLElement>>,
@@ -26,6 +34,7 @@ export const useSaveBarHeight = (
     };
 
     measure();
+    if (isDirty) revealFocusedControl();
     const observer = new ResizeObserver(measure);
     bars.forEach((bar) => observer.observe(bar));
 

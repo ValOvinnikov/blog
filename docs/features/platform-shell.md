@@ -127,7 +127,9 @@ the side gutter, 26px from `md` and 16px below — plus the visible bar's
 measured height, so the gap above the bar matches the sides and no extra room
 is left while no bar shows (archived included). From `md` the document's
 `scroll-padding-bottom` is the bar's 64px
-plus 16px so a focused field never sits under the bar. The 64 and 16 are the
+plus 16px so a focused field never sits under the bar, and when the bar
+first appears the focused control is scrolled into view (`block: 'nearest'`),
+since the bar's new room grows the page without scrolling it. The 64 and 16 are the
 `--spacing-admin-dock` / `-clearance` tokens, kept equal to
 `LOOK_LAYOUT_LIMIT`. A page may opt out of the head's "All changes saved"
 status (`hasSavedStatus={false}`); Voice does. Below `md` the bar spans the
@@ -149,10 +151,11 @@ own status text — "N unsaved changes" with a dot, "All changes saved" with
 Save disabled, "N fields need attention" on a first row above "Go to the
 first one", or a failed save's message (an alert, while changes remain) — and has Save changes but no Discard and no shortcut hint. While
 saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
-outside Voice's `inert` content. Below `md` Voice keeps 96px of room
-(`--spacing-admin-phone-footer-room`, clearing the 85px two-row error footer,
-`--spacing-admin-phone-footer-max`) and a `scroll-padding-bottom` of that 85
-plus 16; an archived Voice page ends at 48px.
+outside Voice's `inert` content. Below `md` Voice's bottom room is the
+16px gutter plus the footer's measured height, and its `scroll-padding-bottom`
+is that height plus 16 (85px plus 16 before it is measured,
+`--spacing-admin-phone-footer-max`, the two-row error footer); an archived
+Voice page shows no footer, so it ends at the 16px gutter.
 
 A successful save pressed from Save changes — in the docked bar or Voice's
 phone footer — returns focus, without scrolling, to the control that had it
