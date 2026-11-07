@@ -1433,6 +1433,7 @@
     "resendStudioInvite": "Resend invite",
     "studioInviteResent": "A new Studio invite is on its way to the owner.",
     "studioInviteResendFailed": "Couldn't reach the setup service — try again.",
+    "studioInviteUnsentNotice": "The new owner's Studio invite hasn't been sent.",
     "lockedAnnouncement": "Some tenant detail fields are now locked.",
     "unlockedAnnouncement": "More tenant detail fields are now editable.",
     "fieldLockedReasonStep": "Locked — the \"{step}\" step has already completed and used this value.",

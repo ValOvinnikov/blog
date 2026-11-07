@@ -1433,6 +1433,7 @@
     "resendStudioInvite": "Einladung erneut senden",
     "studioInviteResent": "Eine neue Studio-Einladung ist an den Inhaber unterwegs.",
     "studioInviteResendFailed": "Der Einrichtungsdienst war nicht erreichbar – versuchen Sie es erneut.",
+    "studioInviteUnsentNotice": "Die Studio-Einladung an den neuen Inhaber wurde noch nicht gesendet.",
     "lockedAnnouncement": "Einige Felder der Mandantendetails sind jetzt gesperrt.",
     "unlockedAnnouncement": "Weitere Felder der Mandantendetails sind jetzt bearbeitbar.",
     "fieldLockedReasonStep": "Gesperrt — der Schritt „{step}“ ist bereits abgeschlossen und hat diesen Wert verwendet.",

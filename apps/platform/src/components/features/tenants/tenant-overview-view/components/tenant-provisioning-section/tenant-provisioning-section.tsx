@@ -14,12 +14,14 @@ export type TTenantProvisioningSectionProps = {
   tenant: TClientTenant;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
   isPrimaryCustom: boolean;
+  isStudioReinviteUnsent: boolean;
 };
 
 export const TenantProvisioningSection = ({
   tenant,
   owner,
   isPrimaryCustom,
+  isStudioReinviteUnsent,
 }: TTenantProvisioningSectionProps) => {
   const { id, deprovisionedAt } = tenant;
   const archivedNoticeId = useId();
@@ -46,6 +48,7 @@ export const TenantProvisioningSection = ({
           isPrimaryCustom,
         )}
         owner={owner}
+        isStudioReinviteUnsent={isStudioReinviteUnsent}
         archivedNoticeId={archivedNoticeId}
       />
     </>

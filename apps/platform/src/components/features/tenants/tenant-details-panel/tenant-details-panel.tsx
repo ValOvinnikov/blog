@@ -16,6 +16,7 @@ import {
 import { useTranslations } from 'next-intl';
 import { useId, useTransition } from 'react';
 
+import { StudioReinviteNotice } from './components/studio-reinvite-notice';
 import { TenantDetailsFields } from './components/tenant-details-fields';
 import { tenantDetailsPanelVariants } from './tenant-details-panel-variants';
 import { useLockStateChange } from './use-lock-state-change';
@@ -26,6 +27,7 @@ export type TTenantDetailsPanelProps = {
   tenant: TClientTenant;
   fieldLocks: TTenantFieldLocks;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
+  isStudioReinviteUnsent: boolean;
   archivedNoticeId?: string;
 };
 
@@ -33,6 +35,7 @@ export const TenantDetailsPanel = ({
   tenant,
   fieldLocks,
   owner,
+  isStudioReinviteUnsent,
   archivedNoticeId,
 }: TTenantDetailsPanelProps) => {
   const t = useTranslations('tenantDetailsPanel');
@@ -90,6 +93,9 @@ export const TenantDetailsPanel = ({
         <Card.Header title={t('heading')} />
         <Card.Body>
           <div className={bodyStack()}>
+            {isStudioReinviteUnsent && (
+              <StudioReinviteNotice tenantId={tenant.id} />
+            )}
             <span
               className={lockAnnouncementLive()}
               aria-live="assertive"

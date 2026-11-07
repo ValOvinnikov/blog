@@ -59,6 +59,7 @@ faker.seed(7319);
 
 const MOCK_ADMIN_ID = faker.string.uuid();
 const MOCK_STEP_ERROR = faker.lorem.sentence();
+const MOCK_ENCRYPTED_FORMER_OWNER_EMAIL = faker.string.alphanumeric(32);
 
 const {
   getTenantOwnerMembershipMock,
@@ -140,6 +141,7 @@ const TENANT_DETAILS = 'Tenant details';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   'Locked while provisioning is running.';
 const SUSPEND_TENANT = 'Suspend tenant';
+const UNSENT_INVITE_NOTICE = en.tenantDetailsPanel.studioInviteUnsentNotice;
 
 describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
@@ -188,6 +190,27 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(heading).toBeVisible();
     expect(statusBadge).toBeVisible();
     expect(planBadge).toBeVisible();
+  });
+
+  it('shows the unsent Studio invite notice while a re-invite is owed', async () => {
+    await setup({
+      tenant: mockTenant({
+        unsentReinviteFormerOwnerEmailEncrypted:
+          MOCK_ENCRYPTED_FORMER_OWNER_EMAIL,
+      }),
+    });
+
+    const notice = screen.getByText(UNSENT_INVITE_NOTICE);
+
+    expect(notice).toBeVisible();
+  });
+
+  it('shows no unsent Studio invite notice when no re-invite is owed', async () => {
+    await setup();
+
+    const notice = screen.queryByText(UNSENT_INVITE_NOTICE);
+
+    expect(notice).not.toBeInTheDocument();
   });
 
   it('relocates the tenant details panel here as the Identity card', async () => {

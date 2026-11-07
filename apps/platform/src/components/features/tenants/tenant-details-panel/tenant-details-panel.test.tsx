@@ -47,15 +47,24 @@ import { tenantDetailsValuesOf } from './tenant-details-values';
 
 faker.seed(5994);
 
-const { updateTenantDetailsActionMock } = vi.hoisted(() => ({
-  updateTenantDetailsActionMock: vi.fn(),
-}));
+const { updateTenantDetailsActionMock, resendStudioInviteActionMock } =
+  vi.hoisted(() => ({
+    updateTenantDetailsActionMock: vi.fn(),
+    resendStudioInviteActionMock: vi.fn(),
+  }));
 
 vi.mock('@platform/i18n/base-navigation');
 
 vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: updateTenantDetailsActionMock,
 }));
+
+vi.mock(
+  '@platform/server/tenants/resend-changed-owner-studio-invite-action',
+  () => ({
+    resendChangedOwnerStudioInviteAction: resendStudioInviteActionMock,
+  }),
+);
 
 const {
   tenantDetailsPanel,
@@ -71,6 +80,8 @@ const NAME_LABEL = tenantDetailsPanel.nameLabel;
 const PLAN_LABEL = tenantDetailsPanel.planLabel;
 const FIELDS_GROUP_LABEL = tenantDetailsPanel.fieldsGroupLabel;
 const SAVING_LABEL = tenantDetailsPanel.savingButton;
+const RESEND_INVITE_LABEL = tenantDetailsPanel.resendStudioInvite;
+const UNSENT_INVITE_NOTICE = tenantDetailsPanel.studioInviteUnsentNotice;
 const TENANTS_LABEL = navSections.tenants;
 const ENGLISH_LABEL = languageNames[LOCALE_ISO_CODES.EN];
 const FREE_LABEL = tenantDetailsPanel.planOptionFree;
@@ -91,6 +102,7 @@ const DEFAULT_PROPS: TTenantDetailsPanelProps = {
   tenant: DEFAULT_TENANT,
   fieldLocks: {},
   owner: mockJoinedOwner(),
+  isStudioReinviteUnsent: false,
 };
 
 const panel = (props: Partial<TTenantDetailsPanelProps> = {}) => (
@@ -118,6 +130,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     updateTenantDetailsActionMock.mockReset();
+    resendStudioInviteActionMock.mockReset();
     refreshMock = mockRouterRefresh();
   });
 
@@ -276,6 +289,63 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     expect(domainInput).toBeDisabled();
     expect(liveRegion).toHaveTextContent(tenantDetailsPanel.lockedAnnouncement);
     expect(fieldsGroup).toHaveFocus();
+  });
+
+  it('shows no unsent Studio invite notice when no re-invite is owed', () => {
+    setup();
+
+    const notice = screen.queryByText(UNSENT_INVITE_NOTICE);
+
+    expect(notice).not.toBeInTheDocument();
+  });
+
+  describe('with an unsent Studio re-invite', () => {
+    const getResendButton = () =>
+      screen.getByRole('button', { name: RESEND_INVITE_LABEL });
+
+    it('says the invite has not been sent, with Resend invite', () => {
+      setup({ isStudioReinviteUnsent: true });
+
+      const notice = screen.getByText(UNSENT_INVITE_NOTICE);
+
+      expect(notice).toBeVisible();
+      expect(getResendButton()).toBeVisible();
+    });
+
+    it('resends it, confirms and refreshes the page', async () => {
+      resendStudioInviteActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SUCCESS,
+      });
+      setup({ isStudioReinviteUnsent: true });
+
+      await user.click(getResendButton());
+      const resentToast = await screen.findByText(
+        tenantDetailsPanel.studioInviteResent,
+      );
+
+      expect(resendStudioInviteActionMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+      );
+      expect(resentToast).toBeVisible();
+      expect(refreshMock).toHaveBeenCalled();
+    });
+
+    it('reports a failed resend and keeps the notice', async () => {
+      resendStudioInviteActionMock.mockResolvedValue({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
+      setup({ isStudioReinviteUnsent: true });
+
+      await user.click(getResendButton());
+      const failedToast = await screen.findByText(
+        tenantDetailsPanel.studioInviteResendFailed,
+      );
+      const notice = screen.getByText(UNSENT_INVITE_NOTICE);
+
+      expect(failedToast).toBeVisible();
+      expect(notice).toBeVisible();
+      expect(refreshMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('with an archived tenant', () => {

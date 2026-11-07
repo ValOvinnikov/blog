@@ -1,6 +1,7 @@
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isNull } from '@blog/utils/primitives';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
@@ -31,7 +32,13 @@ export type TTenantOverviewViewProps = {
 export const TenantOverviewView = async ({
   tenant,
 }: TTenantOverviewViewProps) => {
-  const { id, primaryDomain, status, deprovisionedAt } = tenant;
+  const {
+    id,
+    primaryDomain,
+    status,
+    deprovisionedAt,
+    unsentReinviteFormerOwnerEmailEncrypted,
+  } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
   const [admin, owner, auditEvents, findings, suspension] = await Promise.all([
@@ -61,6 +68,9 @@ export const TenantOverviewView = async ({
         tenant={clientTenant}
         owner={owner}
         isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}
+        isStudioReinviteUnsent={
+          !isNull(unsentReinviteFormerOwnerEmailEncrypted)
+        }
       />
 
       <FindingsCard tenantId={id} findings={findings} />
