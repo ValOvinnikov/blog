@@ -72,10 +72,6 @@ vi.mock('@web/server/site-config/get-header-style/get-header-style');
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
-  () => ({
-    isReaderAccountEnabled: vi.fn(),
-    isReaderAccountFeatureEnabled: vi.fn(),
-  }),
 );
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({

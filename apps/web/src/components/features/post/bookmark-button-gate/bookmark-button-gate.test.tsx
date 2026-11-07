@@ -19,9 +19,6 @@ faker.seed(5776);
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
-  () => ({
-    isReaderAccountFeatureEnabled: vi.fn(),
-  }),
 );
 
 vi.mock('@web/server/request-context/request-context');

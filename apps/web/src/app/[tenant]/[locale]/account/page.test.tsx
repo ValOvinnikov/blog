@@ -24,9 +24,6 @@ vi.mock('@web/server/auth/auth');
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
-  () => ({
-    isReaderAccountEnabled: vi.fn(),
-  }),
 );
 
 const authMock = mockedAuth();

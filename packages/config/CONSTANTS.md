@@ -635,7 +635,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/bookmark` — `apps/web/src/constants/bookmark.ts`
 
-- **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`
+- **BOOKMARK_LOG**: `BUTTON_STATUS_FETCH_FAILED`=`"bookmark_button.status_fetch_failed"`, `TENANT_NOT_ACTIVE`=`"bookmark.tenant_not_active"`, `UPDATE_FAILED`=`"bookmark.update_failed"`
 
 ### `@web/constants/busy-style` — `apps/web/src/constants/busy-style.ts`
 

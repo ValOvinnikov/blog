@@ -1,7 +1,13 @@
-import { ACTION_OUTCOME, ERROR_CODE, TENANT_WRITE_REFUSAL } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  CAPABILITY,
+  ERROR_CODE,
+  TENANT_WRITE_REFUSAL,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
@@ -16,6 +22,10 @@ vi.mock('@web/server/auth/auth');
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
 
 vi.mock('@web/server/tenant/write-gate/write-gate');
+
+vi.mock(
+  '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
+);
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -88,14 +98,31 @@ describe(setBookmarkStatus, () => {
           .mocked(resolveWritableTenant)
           .mockResolvedValueOnce(errorResult(TENANT_WRITE_REFUSAL.INACTIVE)),
     ],
+    [
+      ACTION_OUTCOME.UNAVAILABLE,
+      'bookmarks are switched off',
+      () =>
+        vi.mocked(isReaderAccountFeatureEnabled).mockResolvedValueOnce(false),
+    ],
   ])('answers %s without writing when %s', async (outcome, _, arrange) => {
     arrange();
 
-    const result = await setBookmarkStatus(MOCK_POST_ID, true);
+    const saveResult = await setBookmarkStatus(MOCK_POST_ID, true);
+    arrange();
+    const removeResult = await setBookmarkStatus(MOCK_POST_ID, false);
 
-    expect(result).toEqual({ outcome });
+    expect(saveResult).toEqual({ outcome });
+    expect(removeResult).toEqual({ outcome });
     expect(queries.bookmarks.addBookmark).not.toHaveBeenCalled();
     expect(queries.bookmarks.removeBookmark).not.toHaveBeenCalled();
+  });
+
+  it('checks bookmarks as a reader-account feature', async () => {
+    await setBookmarkStatus(MOCK_POST_ID, true);
+
+    expect(isReaderAccountFeatureEnabled).toHaveBeenCalledWith(
+      CAPABILITY.BOOKMARKS,
+    );
   });
 
   it('adds a bookmark for the signed-in user when bookmarking', async () => {
