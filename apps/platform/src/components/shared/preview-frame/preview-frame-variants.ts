@@ -17,8 +17,8 @@ export const previewFrameVariants = tv({
     sharedStage: ['relative rounded-admin bg-admin-theme-track'],
     status: [
       'flex items-start gap-x-2.5',
-      // A trailing button's height less its −7px lift, held with or without one so the row never resizes.
-      'min-h-[calc(--spacing(11)-7px)] lg:min-h-[calc(--spacing(8)-7px)] lg:pointer-coarse:min-h-[calc(--spacing(11)-7px)]',
+      // Held with or without a trailing button, so the row never resizes when one appears.
+      'min-h-admin-status-row-touch lg:min-h-admin-status-row lg:pointer-coarse:min-h-admin-status-row-touch',
       'text-admin-12-5 leading-[18px] text-admin-muted',
     ],
     statusIcon: ['mt-px flex-none'],

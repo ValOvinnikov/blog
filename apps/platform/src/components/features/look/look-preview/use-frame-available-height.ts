@@ -4,8 +4,10 @@ import {
   DEVICE_FRAME_VIEWPORT_ATTRIBUTE,
 } from '@platform/constants/device-frame';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
+import { MEDIA_QUERY } from '@platform/constants/media-query';
 import type { TPreviewDevice } from '@platform/constants/preview';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useEffect, useRef, useState } from 'react';
 
 const VIEWPORT_SELECTOR = `[${DEVICE_FRAME_VIEWPORT_ATTRIBUTE}]`;
@@ -22,18 +24,12 @@ const pageBottomPadding = (element: Element) => {
   return padding;
 };
 
-type TFrameAvailableHeightInput = {
-  device: TPreviewDevice;
-  isScrollingWithPage: boolean;
-  isHeightCapped: boolean;
-};
-
 // The status line's height is read only when the frame re-fits, so a follow rewording it never rescales the frame.
-export const useFrameAvailableHeight = ({
-  device,
-  isScrollingWithPage,
-  isHeightCapped,
-}: TFrameAvailableHeightInput) => {
+export const useFrameAvailableHeight = (
+  device: TPreviewDevice,
+  isScrollingWithPage: boolean,
+) => {
+  const isHeightCapped = useMediaQuery(MEDIA_QUERY.LG_UP);
   const rootRef = useRef<TMaybeNull<HTMLDivElement>>(null);
   const stageRef = useRef<TMaybeNull<HTMLDivElement>>(null);
   const stage = useElementSize(stageRef);
@@ -59,9 +55,10 @@ export const useFrameAvailableHeight = ({
       const stageTop = isScrollingWithPage
         ? stageRect.top + window.scrollY
         : stageRect.top;
-      const bottomRoom = isScrollingWithPage
-        ? pageBottomPadding(rootElement)
-        : DOCKED_SAVE_BAR_ROOM;
+      const bottomRoom = Math.max(
+        pageBottomPadding(rootElement),
+        isScrollingWithPage ? 0 : DOCKED_SAVE_BAR_ROOM,
+      );
       const fitted = Math.max(
         0,
         Math.floor(

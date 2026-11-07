@@ -1,5 +1,4 @@
 import type { TLookFollowSettled } from '@platform/components/features/look/look-preview/follow-scroll';
-import { PreviewFrame } from '@platform/components/shared/preview-frame';
 import {
   LOOK_FOLLOW_OUTCOME,
   LOOK_FOLLOW_TARGET,
@@ -15,10 +14,7 @@ import {
 } from '@platform/testing/look/look-follow';
 import userEvent from '@testing-library/user-event';
 
-import {
-  type TLookFollowStatusInput,
-  useLookFollowStatus,
-} from './use-look-follow-status';
+import { LookFollowStatus } from './look-follow-status';
 
 const { lookForm: LOOK_FORM, lookFollow: LOOK_FOLLOW } = messages;
 const FOOTER = LOOK_FORM.footerHeading;
@@ -36,11 +32,7 @@ const AT_END: TLookFollowSettled = {
 const followingFooter = (settled = AT_END) =>
   mockLookFollow({ row: LOOK_ROW.FOOTER, isFollowing: true, settled });
 
-const FollowStatus = (input: TLookFollowStatusInput) => (
-  <PreviewFrame.Status {...useLookFollowStatus(input)} />
-);
-
-const setup = customRender(FollowStatus, {
+const setup = customRender(LookFollowStatus, {
   follow: mockLookFollow(),
   target: { kind: LOOK_FOLLOW_TARGET.IDLE },
   device: PREVIEW_DEVICE.DESKTOP,
@@ -52,7 +44,7 @@ const setup = customRender(FollowStatus, {
 const topOfPageButton = () =>
   screen.queryByRole('button', { name: LOOK_FOLLOW.topOfPage });
 
-describe(useLookFollowStatus, () => {
+describe(`<${LookFollowStatus.name}/>`, () => {
   it('asks for a Site parts card while every row is folded', () => {
     setup();
 

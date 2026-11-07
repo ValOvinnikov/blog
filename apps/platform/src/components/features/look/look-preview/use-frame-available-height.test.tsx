@@ -10,6 +10,10 @@ import {
 } from '@platform/constants/preview';
 import { act, render, screen } from '@platform/testing/custom-render';
 import {
+  stubChangingMediaQueries,
+  stubLgUpWindow,
+} from '@platform/testing/match-media';
+import {
   resizeObservedElements,
   stubResizeObserver,
 } from '@platform/testing/resize-observer';
@@ -29,6 +33,8 @@ const STAGE_WIDTH = 1200;
 const STAGE_CHROME = 50;
 const BELOW_STAGE = 40;
 const WRAPPED_STATUS_GROWTH = 18;
+const PAGE_BOTTOM_PADDING = 24;
+const TALL_PAGE_BOTTOM_PADDING = 120;
 const roomUnderStageTop = (windowHeight: number) =>
   windowHeight - STAGE_TOP - STAGE_CHROME - BELOW_STAGE;
 const SETTLED_HEIGHT = roomUnderStageTop(WINDOW_HEIGHT);
@@ -42,17 +48,14 @@ const SCROLLED_BY = 300;
 const Harness = ({
   device,
   isScrollingWithPage = true,
-  isHeightCapped = true,
 }: {
   device: TPreviewDevice;
   isScrollingWithPage?: boolean;
-  isHeightCapped?: boolean;
 }) => {
-  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight({
+  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight(
     device,
     isScrollingWithPage,
-    isHeightCapped,
-  });
+  );
   const scale = fitPageScale({
     device,
     availableWidth: STAGE_WIDTH,
@@ -157,6 +160,34 @@ describe(useFrameAvailableHeight, () => {
     expect(availableHeight).toHaveTextContent(String(DOCKED_SETTLED_HEIGHT));
   });
 
+  it("leaves the page's bottom padding under a preview that scrolls with the page", () => {
+    stubLayout();
+    render(
+      <div style={{ paddingBottom: PAGE_BOTTOM_PADDING }}>
+        <Harness device={PREVIEW_DEVICE.TABLET} />
+      </div>,
+    );
+
+    const availableHeight = screen.getByTestId(AVAILABLE_TEST_ID);
+    expect(availableHeight).toHaveTextContent(
+      String(SETTLED_HEIGHT - PAGE_BOTTOM_PADDING),
+    );
+  });
+
+  it('leaves the page bottom padding under a sticky preview when it outgrows the save bar room', () => {
+    stubLayout({ isStageSticky: true });
+    render(
+      <div style={{ paddingBottom: TALL_PAGE_BOTTOM_PADDING }}>
+        <Harness device={PREVIEW_DEVICE.TABLET} isScrollingWithPage={false} />
+      </div>,
+    );
+
+    const availableHeight = screen.getByTestId(AVAILABLE_TEST_ID);
+    expect(availableHeight).toHaveTextContent(
+      String(SETTLED_HEIGHT - TALL_PAGE_BOTTOM_PADDING),
+    );
+  });
+
   it('keeps its height when the status line under the stage grows', () => {
     stubLayout();
     render(<Harness device={PREVIEW_DEVICE.TABLET} />);
@@ -169,7 +200,8 @@ describe(useFrameAvailableHeight, () => {
     expect(availableHeight).toHaveTextContent(String(SETTLED_HEIGHT));
   });
 
-  it('never passes 608 px while capped', () => {
+  it('never passes 608 px from lg', () => {
+    stubLgUpWindow();
     stubLayout({ windowHeight: TALL_WINDOW_HEIGHT });
     render(<Harness device={PREVIEW_DEVICE.PHONE} />);
 
@@ -179,9 +211,10 @@ describe(useFrameAvailableHeight, () => {
     );
   });
 
-  it('fills the window when uncapped', () => {
+  it('fills the window below lg', () => {
+    stubChangingMediaQueries([]);
     stubLayout({ windowHeight: TALL_WINDOW_HEIGHT });
-    render(<Harness device={PREVIEW_DEVICE.PHONE} isHeightCapped={false} />);
+    render(<Harness device={PREVIEW_DEVICE.PHONE} />);
 
     const availableHeight = screen.getByTestId(AVAILABLE_TEST_ID);
     expect(availableHeight).toHaveTextContent(

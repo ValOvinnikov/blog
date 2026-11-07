@@ -28,6 +28,7 @@ type TPreviewFrameProps = PropsWithChildren<{
   actions?: ReactNode;
   isNarrow?: boolean;
   notes?: ReactNode;
+  status?: ReactNode;
   isToolbarFirst?: boolean;
   className?: string;
   ref?: Ref<HTMLElement>;
@@ -40,6 +41,7 @@ const PreviewFrameRoot = ({
   actions,
   isNarrow = false,
   notes,
+  status,
   isToolbarFirst = false,
   className,
   children,
@@ -83,6 +85,7 @@ const PreviewFrameRoot = ({
       )}
       {slots.Stage}
       {slots.Status}
+      {status}
       {notes && <div className={notesSlot()}>{notes}</div>}
     </section>
   );

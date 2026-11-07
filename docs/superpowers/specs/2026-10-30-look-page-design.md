@@ -179,42 +179,42 @@ Non-goals:
 
 ## 4. Frames and breakpoints
 
-| Frame  | Size / width          | What it shows                                                                                                  |
-| ------ | --------------------- | -------------------------------------------------------------------------------------------------------------- |
-| LX-D   | 1440×1290, shell 1060 | Paid site, Desktop preview, Footer open, 1 unsaved change (Background), following Footer.                      |
-| LX-A   | edit 520, preview 600 | Phone selected, Footer open; frame scrolled to the footer; "Top of page".                                      |
-| LX-B   | 426 + 426             | Phone selected, Header open; frame back at the top; "Show on Desktop" hint.                                    |
-| LX-C   | 426 + 426             | Tablet selected, Header open; tablet frame fits one screen; outline only.                                      |
-| LX-D2  | 426                   | Phone, Footer open, frame scrolled by hand; Follow off, paused status with "Back to Footer". (Board letter D.) |
-| LX-E1  | 390×844               | Phone Look page, Edit tab: index chips, Site parts, Footer open, sticky unsaved bar.                           |
-| LX-E2  | 390×844               | Phone Look page, Preview tab: one row of 44 px switches, readout + follow + full screen, phone frame at 62%.   |
-| LX-F   | card 560              | Keyboard focus on the icon toolbar: Tablet focused with tooltip; Dark focused with tooltip.                    |
-| LX-G   | 520 + 600             | Free plan, Footer open (badge style superseded by LXG).                                                        |
-| LX-H   | 500 / 460 / 390 cells | Preset strip with 2, 5 and 12 presets at 1440, 1280 and phone; picker open (desktop popover, phone sheet).     |
-| LXG-D  | 1440×1454, shell 1204 | Free site, desktop: note collapsed, Type open, Desktop preview at top.                                         |
-| LXG-A  | 560                   | Note expanded — the Growth card opens in place.                                                                |
-| LXG-C  | 560                   | Folded overview — one badge per all-Growth row.                                                                |
-| LXG-B  | 520 + 600             | Site parts — Footer open, Phone preview following to the footer.                                               |
-| LXG-D2 | 390×844               | Phone, Edit tab, first view. (Board letter D.)                                                                 |
-| LXG-E  | 520                   | Keyboard focus order through the note.                                                                         |
-| LXG-F  | flex                  | Language switcher on Free.                                                                                     |
-| G2-1…6 | desktop / 390 phone   | Note collapsed, expanded, focus, phone collapsed, phone expanded, locked-field anatomy.                        |
-| GF-A   | 1440×900              | Full-screen dialog opened from the keyboard: Desktop at 100%, focus and tooltip on the pressed Desktop button. |
-| GF-B   | 1440, head only       | Tab past the toolbar lands on Close; end-aligned tooltip "Close full screen".                                  |
-| GF-C   | 390×844               | Full screen on a phone: Phone at 91%, focus on the pressed Phone button.                                       |
-| GF-D   | 390×844               | Full screen on a phone: Desktop at 100%, panned both ways; Close focused.                                      |
-| GC     | 1440×3980             | Every row open after Expand all; the index button reads "Collapse all"; Preset current; Footer unsaved.        |
-| GS-A   | 1440                  | Colour, Type and Footer unsaved: "4 unsaved changes in 3 cards".                                               |
-| GS-B   | 390×844, two frames   | The same changes on the phone Edit tab: Footer open, then every card folded.                                   |
-| GS-C   | strip                 | The bar for 1 card, 1 card with several changes, 2 cards and 6 cards, desktop and phone.                       |
-| GO-A   | 1440                  | First load: every row folded, Preset current, Desktop frame at the top, nothing outlined.                      |
-| GO-B   | 1440                  | Desktop, Header opened first: the frame does not move; outline and tag only.                                   |
-| GO-C   | two columns, Phone    | Follow off, Footer open: nothing scrolls, nothing outlined.                                                    |
-| GO-D   | two columns, Phone    | After Top of page: following paused, "Back to Footer".                                                         |
-| GO-E   | 1440                  | Footer, then Language switcher: frame back at the top, header outlined, tag "Language switcher".               |
-| GW-A   | 1024, sidebar open    | Content area 704: Edit tab, desktop index scrolled to the current Footer with fades at both ends, save bar.    |
-| GW-B   | 1024, sidebar open    | Preview tab: the desktop toolbar and a 670 px desktop frame at 52%.                                            |
-| GW-C   | 1280, sidebar open    | Content area 960: two columns 460 + 24 + 476; the index just overflows (right fade only).                      |
+| Frame  | Size / width          | What it shows                                                                                                                       |
+| ------ | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| LX-D   | 1440×1290, shell 1060 | Paid site, Desktop preview, Footer open, 1 unsaved change (Background), following Footer.                                           |
+| LX-A   | edit 520, preview 600 | Phone selected, Footer open; frame scrolled to the footer; "Top of page".                                                           |
+| LX-B   | 426 + 426             | Phone selected, Header open; frame back at the top; "Show on Desktop" hint.                                                         |
+| LX-C   | 426 + 426             | Tablet selected, Header open; tablet frame fits one screen; outline only.                                                           |
+| LX-D2  | 426                   | Phone, Footer open, frame scrolled by hand; Follow off, paused status with "Back to Footer". (Board letter D.)                      |
+| LX-E1  | 390×844               | Phone Look page, Edit tab: index chips, Site parts, Footer open, sticky unsaved bar.                                                |
+| LX-E2  | 390×844               | Phone Look page, Preview tab: one row of 44 px switches, readout + follow + full screen, phone frame at 62% (built at 57%, § 12.3). |
+| LX-F   | card 560              | Keyboard focus on the icon toolbar: Tablet focused with tooltip; Dark focused with tooltip.                                         |
+| LX-G   | 520 + 600             | Free plan, Footer open (badge style superseded by LXG).                                                                             |
+| LX-H   | 500 / 460 / 390 cells | Preset strip with 2, 5 and 12 presets at 1440, 1280 and phone; picker open (desktop popover, phone sheet).                          |
+| LXG-D  | 1440×1454, shell 1204 | Free site, desktop: note collapsed, Type open, Desktop preview at top.                                                              |
+| LXG-A  | 560                   | Note expanded — the Growth card opens in place.                                                                                     |
+| LXG-C  | 560                   | Folded overview — one badge per all-Growth row.                                                                                     |
+| LXG-B  | 520 + 600             | Site parts — Footer open, Phone preview following to the footer.                                                                    |
+| LXG-D2 | 390×844               | Phone, Edit tab, first view. (Board letter D.)                                                                                      |
+| LXG-E  | 520                   | Keyboard focus order through the note.                                                                                              |
+| LXG-F  | flex                  | Language switcher on Free.                                                                                                          |
+| G2-1…6 | desktop / 390 phone   | Note collapsed, expanded, focus, phone collapsed, phone expanded, locked-field anatomy.                                             |
+| GF-A   | 1440×900              | Full-screen dialog opened from the keyboard: Desktop at 100%, focus and tooltip on the pressed Desktop button.                      |
+| GF-B   | 1440, head only       | Tab past the toolbar lands on Close; end-aligned tooltip "Close full screen".                                                       |
+| GF-C   | 390×844               | Full screen on a phone: Phone at 91%, focus on the pressed Phone button.                                                            |
+| GF-D   | 390×844               | Full screen on a phone: Desktop at 100%, panned both ways; Close focused.                                                           |
+| GC     | 1440×3980             | Every row open after Expand all; the index button reads "Collapse all"; Preset current; Footer unsaved.                             |
+| GS-A   | 1440                  | Colour, Type and Footer unsaved: "4 unsaved changes in 3 cards".                                                                    |
+| GS-B   | 390×844, two frames   | The same changes on the phone Edit tab: Footer open, then every card folded.                                                        |
+| GS-C   | strip                 | The bar for 1 card, 1 card with several changes, 2 cards and 6 cards, desktop and phone.                                            |
+| GO-A   | 1440                  | First load: every row folded, Preset current, Desktop frame at the top, nothing outlined.                                           |
+| GO-B   | 1440                  | Desktop, Header opened first: the frame does not move; outline and tag only.                                                        |
+| GO-C   | two columns, Phone    | Follow off, Footer open: nothing scrolls, nothing outlined.                                                                         |
+| GO-D   | two columns, Phone    | After Top of page: following paused, "Back to Footer".                                                                              |
+| GO-E   | 1440                  | Footer, then Language switcher: frame back at the top, header outlined, tag "Language switcher".                                    |
+| GW-A   | 1024, sidebar open    | Content area 704: Edit tab, desktop index scrolled to the current Footer with fades at both ends, save bar.                         |
+| GW-B   | 1024, sidebar open    | Preview tab: the desktop toolbar and a 670 px desktop frame at 52%.                                                                 |
+| GW-C   | 1280, sidebar open    | Content area 960: two columns 460 + 24 + 476; the index just overflows (right fade only).                                           |
 
 | Range           | Layout                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -828,7 +828,7 @@ Readout `role="status"`, JetBrains Mono 12px `#5b6472`, nowrap:
 | ------- | ----------------------------- | ------------------------------------------------- |
 | Desktop | "1280 px wide · shown at 44%" | —                                                 |
 | Tablet  | —                             | "820 px · 48%"                                    |
-| Phone   | "390 px wide · shown at 72%"  | "390 px · 72%"; phone tab "390 px · shown at 62%" |
+| Phone   | "390 px wide · shown at 72%"  | "390 px · 72%"; phone tab "390 px · shown at 57%" |
 
 The percentage is the live scale × 100, rounded to a whole number. Tablet in a
 596 px pane (not drawn) reads "820 px wide · shown at 52%" (§ 12.3 rule);
@@ -935,8 +935,9 @@ width **and** height:
 - `availableHeight` in the two-column layout and on the Preview tab from
   `lg` = **608 px** (the tallest viewport the boards draw, LX-A); the frame
   never grows taller, whatever the pane width. On the phone Preview tab = the room left in the window under
-  the top bar, tabs, rows 1–2 and the status line, with stage padding 10
-  (523 px in a 390×844 window).
+  the top bar, tabs, rows 1–2, the status row (37 px reserved, § 12.5) and
+  the page's own bottom padding (24 px), with stage padding 10 (477 px in a
+  390×844 window); the save bar is hidden there, so nothing is kept for it.
 - Never above 1. Viewport size = device size × scale, both rounded to whole
   px; the readout percentage is the scale rounded.
 
@@ -948,7 +949,7 @@ width **and** height:
 | Tablet  | 426                    | 394×566  | 0.48   | width  | LX-C        |
 | Phone   | 600                    | 281×608  | 0.72   | height | LX-A        |
 | Phone   | 426                    | 281×608  | 0.72   | height | LX-B, LX-D2 |
-| Phone   | phone Preview tab 358  | 242×523  | 0.62   | height | LX-E2       |
+| Phone   | phone Preview tab 358  | 220×477  | 0.5652 | height | LX-E2       |
 | Desktop | 476 (1280 window)      | 444×278  | 0.3469 | width  | GW-C        |
 | Desktop | Preview tab 704 (1024) | 670×419  | 0.5234 | width  | GW-B        |
 
@@ -1168,12 +1169,12 @@ off; scrolling the frame by hand pauses it until you choose Back to the part."
 
 Outline on the part (`data-part="header|footer"`): `outline: Wpx solid
 #4f46e5; outline-offset: -Wpx`, W = 2 / scale → always 2 screen px (4.5 @0.4406,
-4.2 @0.48, 3.2 @0.62, 2.8 @0.72).
+4.2 @0.48, 3.5 @0.5652, 2.8 @0.72).
 
 Tag: absolute left 0, bg `#4f46e5`, `#fff`, Inter 600, line-height 1, z 2,
 text = the part name. Size = 11px font, 20px height, 7px horizontal padding,
 3px radius, each ÷ scale (@0.4406: 25 / 45.4 / 15.9 / 6.8; @0.48: 22.9 / 41.7 /
-14.6 / 6.2; @0.62: 17.7 / 32.3 / 11.3 / 4.8; @0.72: 15.3 / 27.8 / 9.7 / 4.2).
+14.6 / 6.2; @0.5652: 19.5 / 35.4 / 12.4 / 5.3; @0.72: 15.3 / 27.8 / 9.7 / 4.2).
 Footer tag sits **above** the footer (`bottom:100%`, top corners rounded);
 Header tag hangs **below** the header (`top:100%`, bottom corners rounded).
 
@@ -1536,10 +1537,10 @@ flex-start`, padding 0 12), unlike the centred desktop control (LX-E1
   - row 1: the toolbar (`role="toolbar"`, one Tab stop) with Device
     (Phone✓), Colour scheme (Light✓), Reader (Signed out✓; Signed-in tooltip
     right-aligned), every button 44×44;
-  - row 2: space-between gap 8: readout "390 px · shown at 62%"
+  - row 2: space-between gap 8: readout "390 px · shown at 57%"
     (`role="status"`), then Follow (✓) and Full screen solos 44×44, gap 6,
     **outside the toolbar** — each its own Tab stop, tooltips right-aligned;
-  - stage padding 10; phone frame 242×523 @0.62; status "Following
+  - stage padding 10; phone frame 220×477 @0.5652; status "Following
     **Footer**";
   - the frame opens at the part of the last Site parts card open on Edit (§ 13).
 - **Preview tab from `lg`** (GW-B): the desktop heading row, toolbar (32 px,
@@ -1977,8 +1978,8 @@ depend on an open decision cite it; tick them against the answer recorded in
 
 - [ ] No visible h2 (sr-only per D-28)
 - [ ] Row 1, the toolbar: Device (Phone✓), Scheme (Light✓), Reader (Signed out✓), all 44; one Tab stop, arrows inside; Signed-in tooltip right-aligned
-- [ ] Row 2: "390 px · shown at 62%" + Follow✓ and Full screen 44×44, gap 6, outside the toolbar — two further Tab stops, tooltips right-aligned
-- [ ] Stage padding 10; frame 242×523 at 0.62 at the footer, outline + tag; cookie button; status "Following **Footer**" with no "Top of page"
+- [ ] Row 2: "390 px · shown at 57%" + Follow✓ and Full screen 44×44, gap 6, outside the toolbar — two further Tab stops, tooltips right-aligned
+- [ ] Stage padding 10; frame 220×477 at 0.5652 at the footer, outline + tag; cookie button; status "Following **Footer**" with no "Top of page"
 - [ ] Preview opens at the last card open on Edit
 
 ### LX-F · Toolbar focus

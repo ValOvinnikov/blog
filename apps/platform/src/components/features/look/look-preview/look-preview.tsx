@@ -20,12 +20,11 @@ import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 
 import { LookFollowMark } from './components/look-follow-mark';
-import { LookFollowToggle } from './components/look-follow-toggle';
-import { LookFullscreenButton } from './components/look-fullscreen-button';
 import { LookFullscreenDialog } from './components/look-fullscreen-dialog';
+import { LookPreviewSolos } from './components/look-preview-solos';
+import { LookPreviewStatus } from './components/look-preview-status';
 import { useFrameAvailableHeight } from './use-frame-available-height';
 import { useLookFollow } from './use-look-follow';
-import { useLookPreviewStatus } from './use-look-preview-status';
 import { useLookPreviewToolbar } from './use-look-preview-toolbar';
 
 export type TLookPreviewProps = {
@@ -56,35 +55,25 @@ export const LookPreview = ({
   const [fullscreenHandle] = useState(Dialog.createHandle);
   const fullscreenTriggerRef = useRef<HTMLButtonElement>(null);
   const isPhoneTab = !useMediaQuery(MEDIA_QUERY.LG_UP);
-  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight({
-    device: previewDevice,
+  const { rootRef, stageRef, availableHeight } = useFrameAvailableHeight(
+    previewDevice,
     isScrollingWithPage,
-    isHeightCapped: !isPhoneTab,
-  });
+  );
   const { frameRef, follow } = useLookFollow({
     target: followTarget,
     device: previewDevice,
     scale,
     isShown,
   });
-  const followStatus = useLookPreviewStatus({
-    follow,
-    target: followTarget,
-    device: previewDevice,
-    isPhoneTab,
-    hasReaderAccounts,
-  });
   const theme = buildSitePreviewTheme(values, isDark);
   const footer = toSampleFooterStyle(values, hasCookieBanner);
 
   const solos = (
-    <>
-      <LookFollowToggle follow={follow} />
-      <LookFullscreenButton
-        handle={fullscreenHandle}
-        triggerRef={fullscreenTriggerRef}
-      />
-    </>
+    <LookPreviewSolos
+      follow={follow}
+      fullscreenHandle={fullscreenHandle}
+      fullscreenTriggerRef={fullscreenTriggerRef}
+    />
   );
   const sample = (
     <>
@@ -112,6 +101,13 @@ export const LookPreview = ({
       <PreviewFrame
         ariaLabel={tPreview('livePreviewHeading')}
         isToolbarFirst={isPhoneTab}
+        status={
+          <LookPreviewStatus
+            follow={follow}
+            target={followTarget}
+            hasReaderAccounts={hasReaderAccounts}
+          />
+        }
       >
         <PreviewFrame.Heading
           device={previewDevice}
@@ -142,7 +138,6 @@ export const LookPreview = ({
             )}
           </DeviceFrame>
         </PreviewFrame.Stage>
-        <PreviewFrame.Status {...followStatus} />
       </PreviewFrame>
       <LookFullscreenDialog
         handle={fullscreenHandle}

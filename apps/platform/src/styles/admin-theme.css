@@ -358,6 +358,9 @@
   --spacing-admin-dock: 64px;
   --spacing-admin-dock-clearance: 16px;
   --spacing-admin-dock-room: 120px;
+  /* A preview status row's trailing button height less its −7px lift: 32px from `lg`, 44px touch targets. */
+  --spacing-admin-status-row: calc(var(--spacing) * 8 - 7px);
+  --spacing-admin-status-row-touch: calc(var(--spacing) * 11 - 7px);
   --spacing-admin-archived-room: 48px;
   --spacing-admin-phone-footer-max: 85px;
   --spacing-admin-phone-footer-room: 96px;
