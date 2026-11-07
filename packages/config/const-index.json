@@ -3490,6 +3490,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
+      },
+      {
+        "ref": "TENANT_DETAILS_FIELD.NAME",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "PLAN": [
@@ -3498,6 +3504,18 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
+      },
+      {
+        "ref": "ACTIVITY_DETAIL.PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      },
+      {
+        "ref": "TENANT_DETAILS_FIELD.PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
       }
     ],
     "STATUS": [
@@ -4300,6 +4318,94 @@
         "scope": "app:platform",
         "from": "@platform/constants/account-menu",
         "file": "apps/platform/src/constants/account-menu.ts"
+      }
+    ],
+    "CHANGED_FIELDS": [
+      {
+        "ref": "ACTIVITY_DETAIL.CHANGED_FIELDS",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "STUDIO_INVITE_SENT": [
+      {
+        "ref": "ACTIVITY_DETAIL.STUDIO_INVITE_SENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "STUDIO_INVITE_UNSENT": [
+      {
+        "ref": "ACTIVITY_DETAIL.STUDIO_INVITE_UNSENT",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "MAIN_ADDRESS_CHANGED": [
+      {
+        "ref": "ACTIVITY_DETAIL.MAIN_ADDRESS_CHANGED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "CUSTOM_DOMAIN_REQUESTED": [
+      {
+        "ref": "ACTIVITY_DETAIL.CUSTOM_DOMAIN_REQUESTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "CUSTOM_DOMAIN_REMOVED": [
+      {
+        "ref": "ACTIVITY_DETAIL.CUSTOM_DOMAIN_REMOVED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "ADDITIONAL_LANGUAGES": [
+      {
+        "ref": "ACTIVITY_DETAIL.ADDITIONAL_LANGUAGES",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "SUSPENSION_REASON": [
+      {
+        "ref": "ACTIVITY_DETAIL.SUSPENSION_REASON",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "SUSPENSION_REFERENCE": [
+      {
+        "ref": "ACTIVITY_DETAIL.SUSPENSION_REFERENCE",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "SIGN_IN_PROVIDER": [
+      {
+        "ref": "ACTIVITY_DETAIL.SIGN_IN_PROVIDER",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
+      }
+    ],
+    "CLIENT_SECRET_REPLACED": [
+      {
+        "ref": "ACTIVITY_DETAIL.CLIENT_SECRET_REPLACED",
+        "scope": "app:platform",
+        "from": "@platform/constants/activity",
+        "file": "apps/platform/src/constants/activity.ts"
       }
     ],
     "FRAMED": [
@@ -6809,6 +6915,30 @@
     "STUDIO_NOT_PROVISIONED": [
       {
         "ref": "TENANT_REFUSAL.STUDIO_NOT_PROVISIONED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "PRIMARY_DOMAIN": [
+      {
+        "ref": "TENANT_DETAILS_FIELD.PRIMARY_DOMAIN",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "LOCALE": [
+      {
+        "ref": "TENANT_DETAILS_FIELD.LOCALE",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
+    "OWNER_EMAIL": [
+      {
+        "ref": "TENANT_DETAILS_FIELD.OWNER_EMAIL",
         "scope": "app:platform",
         "from": "@platform/constants/tenant",
         "file": "apps/platform/src/constants/tenant.ts"

@@ -42,6 +42,7 @@ export const TenantActivityPageContent = async ({
   return (
     <TenantActivityView
       events={events}
+      backHref={adminRoutes.tenantOverview(id)}
       pagination={
         <Pagination
           page={page}

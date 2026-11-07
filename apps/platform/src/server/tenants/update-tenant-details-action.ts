@@ -130,7 +130,7 @@ export const updateTenantDetailsAction = async (
           tenantId,
           parsed.data,
           result,
-          tenant.plan,
+          tenant,
         );
       case TENANT_DETAILS_UPDATE_OUTCOME.DOMAIN_TAKEN:
         return {

@@ -11,6 +11,7 @@ import {
   mockReadyTenant,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 
 import { TenantActivityPageContent } from './tenant-activity-page-content';
@@ -105,6 +106,15 @@ describe(`<${TenantActivityPageContent.name}/>`, () => {
       const navigation = screen.queryByRole('navigation');
 
       expect(navigation).not.toBeInTheDocument();
+    });
+
+    it("links back to the tenant's overview", () => {
+      const backLink = screen.getByRole('link', { name: 'Back' });
+
+      expect(backLink).toHaveAttribute(
+        'href',
+        adminRoutes.tenantOverview(MOCK_TENANT_ID),
+      );
     });
   });
 });

@@ -439,7 +439,8 @@
   },
   "tenantActivityPage": {
     "title": "Activity",
-    "description": "Lifecycle and operator actions on this tenant, newest first."
+    "description": "Lifecycle and operator actions on this tenant, newest first.",
+    "backLink": "Back"
   },
   "activityList": {
     "empty": "No activity recorded yet.",
@@ -473,6 +474,27 @@
       "OAUTH_APP_SAVED": "Sign-in app saved",
       "OAUTH_APP_REPLACED": "Sign-in app replaced",
       "OAUTH_APP_REMOVED": "Sign-in app removed"
+    },
+    "detail": {
+      "field": {
+        "NAME": "Name",
+        "PRIMARY_DOMAIN": "Primary domain",
+        "PLAN": "Plan",
+        "LOCALE": "Default language",
+        "OWNER_EMAIL": "Owner email"
+      },
+      "CHANGED_FIELDS": "Changed: {fields}",
+      "STUDIO_INVITE_SENT": "New owner's Studio invite sent",
+      "STUDIO_INVITE_UNSENT": "New owner's Studio invite not sent",
+      "MAIN_ADDRESS_CHANGED": "Main address: {from} → {to}",
+      "CUSTOM_DOMAIN_REQUESTED": "Custom domain connection requested: {domain}",
+      "CUSTOM_DOMAIN_REMOVED": "Custom domain removed: {domain}",
+      "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Additional languages: none} other {Additional languages: {languages}}}",
+      "SUSPENSION_REASON": "Reason: {category}",
+      "SUSPENSION_REFERENCE": "Reference: {reference}",
+      "PLAN": "Plan: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "SIGN_IN_PROVIDER": "Sign-in provider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
+      "CLIENT_SECRET_REPLACED": "Client secret replaced"
     }
   },
   "tenantDomainPage": {

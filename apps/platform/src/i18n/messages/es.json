@@ -439,7 +439,8 @@
   },
   "tenantActivityPage": {
     "title": "Actividad",
-    "description": "Acciones de ciclo de vida y de operadores en este cliente, de la más reciente a la más antigua."
+    "description": "Acciones de ciclo de vida y de operadores en este cliente, de la más reciente a la más antigua.",
+    "backLink": "Volver"
   },
   "activityList": {
     "empty": "Todavía no hay actividad registrada.",
@@ -473,6 +474,27 @@
       "OAUTH_APP_SAVED": "App de inicio de sesión guardada",
       "OAUTH_APP_REPLACED": "App de inicio de sesión sustituida",
       "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada"
+    },
+    "detail": {
+      "field": {
+        "NAME": "Nombre",
+        "PRIMARY_DOMAIN": "Dominio principal",
+        "PLAN": "Plan",
+        "LOCALE": "Idioma predeterminado",
+        "OWNER_EMAIL": "Correo electrónico del propietario"
+      },
+      "CHANGED_FIELDS": "Cambios: {fields}",
+      "STUDIO_INVITE_SENT": "Invitación a Studio enviada al nuevo propietario",
+      "STUDIO_INVITE_UNSENT": "Invitación a Studio no enviada al nuevo propietario",
+      "MAIN_ADDRESS_CHANGED": "Dirección principal: {from} → {to}",
+      "CUSTOM_DOMAIN_REQUESTED": "Conexión de dominio propio solicitada: {domain}",
+      "CUSTOM_DOMAIN_REMOVED": "Dominio propio eliminado: {domain}",
+      "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Idiomas adicionales: ninguno} other {Idiomas adicionales: {languages}}}",
+      "SUSPENSION_REASON": "Motivo: {category}",
+      "SUSPENSION_REFERENCE": "Referencia: {reference}",
+      "PLAN": "Plan: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "SIGN_IN_PROVIDER": "Proveedor de inicio de sesión: {provider, select, google {Google} github {GitHub} other {{provider}}}",
+      "CLIENT_SECRET_REPLACED": "Secreto de cliente sustituido"
     }
   },
   "tenantDomainPage": {

@@ -40,6 +40,16 @@ export const TENANT_REFUSAL = {
 
 export type TTenantRefusal = TValueOf<typeof TENANT_REFUSAL>;
 
+export const TENANT_DETAILS_FIELD = {
+  NAME: 'NAME',
+  PRIMARY_DOMAIN: 'PRIMARY_DOMAIN',
+  PLAN: 'PLAN',
+  LOCALE: 'LOCALE',
+  OWNER_EMAIL: 'OWNER_EMAIL',
+} as const;
+
+export type TTenantDetailsField = TValueOf<typeof TENANT_DETAILS_FIELD>;
+
 export const TENANT_FIELD_LOCK_KIND = {
   STEP: 'STEP',
   RUNNING: 'RUNNING',
