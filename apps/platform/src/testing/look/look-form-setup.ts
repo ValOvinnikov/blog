@@ -17,6 +17,7 @@ export const setupLookForm = customRender(LookForm, {
   siteHost: MOCK_TENANT_DOMAIN,
   initialValues: defaultLookFormValues(),
   plan: TENANT_PLAN.GROWTH,
+  isOperator: false,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
   hasCookieBanner: true,

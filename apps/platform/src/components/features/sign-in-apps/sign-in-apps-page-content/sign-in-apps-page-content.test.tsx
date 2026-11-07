@@ -128,6 +128,14 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
     },
   );
 
+  it('shows an operator on a Free tenant no Growth note', async () => {
+    await setup({ tenant: mockTenant(), admin: mockAdmin() });
+
+    const note = screen.queryByText(growthNote.title);
+
+    expect(note).not.toBeInTheDocument();
+  });
+
   it('shows a downgraded site the Free page, keeping its saved app', async () => {
     vi.mocked(listTenantOAuthClients).mockResolvedValue([
       mockOAuthClient({ provider: OAUTH_PROVIDER.GITHUB }),

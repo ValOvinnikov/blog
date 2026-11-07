@@ -35,6 +35,7 @@ export type TLookFormProps = {
   siteHost: string;
   initialValues: TLookFormValues;
   plan: TTenantPlan;
+  isOperator: boolean;
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
   hasCookieBanner: boolean;
@@ -54,6 +55,7 @@ export const LookForm = ({
   siteHost,
   initialValues,
   plan,
+  isOperator,
   liveLocales,
   hasReaderAccounts,
   hasCookieBanner,
@@ -121,7 +123,7 @@ export const LookForm = ({
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}
                 hasMultipleLanguages={hasMultipleLanguages}
-                hasGrowthNote={plan === TENANT_PLAN.FREE}
+                hasGrowthNote={plan === TENANT_PLAN.FREE && !isOperator}
                 onSelectCard={jumpIndex.onSelectCard}
                 summaries={buildLookRowSummaries(lookForm.values, t, {
                   hasMultipleLanguages:
