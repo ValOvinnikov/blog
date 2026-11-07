@@ -50,34 +50,38 @@ describe(`<${LookForm.name}/> Growth note`, () => {
       expect(button).toHaveAttribute(ARIA_EXPANDED, 'false');
     });
 
-    it('lists what Growth adds in reading order, then the closing line', async () => {
-      const list = await openNote(user);
+    describe('when opened', () => {
+      let list: HTMLElement;
 
-      const links = within(list).getAllByRole('link');
-      const closing = screen.getByText(LOOK_FORM.growthAddsClosing);
-
-      expect(links.map((link) => link.textContent)).toEqual([
-        `${LOOK_FORM.colourHeading}${LOOK_FORM.growthAddsColour}`,
-        `${LOOK_FORM.typeHeading}${LOOK_FORM.growthAddsType}`,
-        `${LOOK_FORM.shapeHeading}${LOOK_FORM.growthAddsShape}`,
-        `${LOOK_FORM.buttonsHeading}${LOOK_FORM.growthAddsButtons}`,
-        `${LOOK_FORM.headerHeading}${LOOK_FORM.growthAddsHeader}`,
-        `${LOOK_FORM.footerHeading}${LOOK_FORM.growthAddsFooter}`,
-      ]);
-      expect(closing).toBeVisible();
-    });
-
-    it('opens a folded row from its link and moves focus to the row button', async () => {
-      const list = await openNote(user);
-
-      const footerLink = within(list).getByRole('link', {
-        name: new RegExp(`^${LOOK_FORM.footerHeading}`),
+      beforeEach(async () => {
+        list = await openNote(user);
       });
-      await user.click(footerLink);
 
-      const trigger = lookRowTrigger(LOOK_ROW.FOOTER);
-      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
-      await waitFor(() => expect(trigger).toHaveFocus());
+      it('lists what Growth adds in reading order, then the closing line', () => {
+        const links = within(list).getAllByRole('link');
+        const closing = screen.getByText(LOOK_FORM.growthAddsClosing);
+
+        expect(links.map((link) => link.textContent)).toEqual([
+          `${LOOK_FORM.colourHeading}${LOOK_FORM.growthAddsColour}`,
+          `${LOOK_FORM.typeHeading}${LOOK_FORM.growthAddsType}`,
+          `${LOOK_FORM.shapeHeading}${LOOK_FORM.growthAddsShape}`,
+          `${LOOK_FORM.buttonsHeading}${LOOK_FORM.growthAddsButtons}`,
+          `${LOOK_FORM.headerHeading}${LOOK_FORM.growthAddsHeader}`,
+          `${LOOK_FORM.footerHeading}${LOOK_FORM.growthAddsFooter}`,
+        ]);
+        expect(closing).toBeVisible();
+      });
+
+      it('opens a folded row from its link and moves focus to the row button', async () => {
+        const footerLink = within(list).getByRole('link', {
+          name: new RegExp(`^${LOOK_FORM.footerHeading}`),
+        });
+        await user.click(footerLink);
+
+        const trigger = lookRowTrigger(LOOK_ROW.FOOTER);
+        expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+        await waitFor(() => expect(trigger).toHaveFocus());
+      });
     });
   });
 
