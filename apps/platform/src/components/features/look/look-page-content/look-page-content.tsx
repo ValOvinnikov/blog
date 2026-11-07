@@ -6,7 +6,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { LookForm } from '@platform/components/features/look/look-form';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
-import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { isOperatorView } from '@platform/server/auth/is-operator-view';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
 import { env } from '@platform/utils/env/env';
@@ -42,9 +42,7 @@ export const LookPageContent = async ({
           tenant.plan,
         )}
         plan={tenant.plan}
-        isOperator={
-          !!admin || (!!membership && isVirtualAdminMembership(membership))
-        }
+        isOperator={isOperatorView({ admin, membership })}
         liveLocales={liveLocales}
         hasReaderAccounts={enabledCapabilities.includes(
           CAPABILITY.READER_ACCOUNTS,

@@ -14,7 +14,7 @@ import {
   SIGN_IN_APPS_MODE,
   type TSignInAppsMode,
 } from '@platform/constants/sign-in-apps';
-import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { isOperatorView } from '@platform/server/auth/is-operator-view';
 import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { loadSignInApps } from '@platform/server/sign-in-apps/load-sign-in-apps';
 import { getTranslations } from 'next-intl/server';
@@ -32,7 +32,7 @@ const resolveMode = ({
   membership,
   admin,
 }: TSignInAppsPageContentProps): TSignInAppsMode => {
-  if (admin || (membership && isVirtualAdminMembership(membership))) {
+  if (isOperatorView({ admin, membership })) {
     return SIGN_IN_APPS_MODE.OPERATOR;
   }
   if (!PLAN_ENTITLEMENTS[tenant.plan].hasOwnOAuthApps) {
