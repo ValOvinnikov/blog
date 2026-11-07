@@ -1,1 +1,1 @@
-export { LookFollowStatus } from './look-follow-status';
+export { useLookFollowStatus } from './use-look-follow-status';

@@ -1,11 +1,35 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import { DEVICE_FRAME_VIEWPORT_ATTRIBUTE } from '@platform/constants/device-frame';
 import {
+  SAMPLE_PART,
   SAMPLE_PART_ATTRIBUTE,
   type TSamplePart,
 } from '@platform/constants/sample-part';
 import { useEffect, useState, type RefObject } from 'react';
 
-type TPartBox = { top: number; left: number; width: number; height: number };
+type TPartBox = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+  borderRadius: string;
+};
+
+const edgeCornersRadius = (
+  content: Element,
+  part: TSamplePart,
+  scale: number,
+) => {
+  const viewport = content.closest(`[${DEVICE_FRAME_VIEWPORT_ATTRIBUTE}]`);
+  const viewportRadius = viewport
+    ? parseFloat(getComputedStyle(viewport).borderTopLeftRadius) || 0
+    : 0;
+  const radius = `${viewportRadius / scale}px`;
+
+  return part === SAMPLE_PART.HEADER
+    ? `${radius} ${radius} 0 0`
+    : `0 0 ${radius} ${radius}`;
+};
 
 export const usePartBox = (
   markRef: RefObject<TMaybeNull<HTMLElement>>,
@@ -29,6 +53,7 @@ export const usePartBox = (
         left: (left - contentRect.left) / scale,
         width: width / scale,
         height: height / scale,
+        borderRadius: edgeCornersRadius(content, part, scale),
       });
     });
     observer.observe(content);

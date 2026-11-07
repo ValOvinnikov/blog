@@ -1,11 +1,9 @@
-'use client';
-
 import { ICONS, SIZE, type TMaybeUndefined } from '@blog/config';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import { Button } from '@platform/components/shared/button';
 import { Icon } from '@platform/components/shared/icon';
-import { PreviewFrame } from '@platform/components/shared/preview-frame';
+import type { TPreviewFrameStatusProps } from '@platform/components/shared/preview-frame/components/status/preview-frame-status';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { LOOK_FOLLOW_OUTCOME } from '@platform/constants/look-follow';
@@ -19,7 +17,7 @@ import { useTranslations } from 'next-intl';
 import { LookFollowSentence } from './components/look-follow-sentence';
 import { lookFollowStatusVariants } from './look-follow-status-variants';
 
-export type TLookFollowStatusProps = {
+export type TLookFollowStatusInput = {
   follow: TLookFollow;
   target: TLookFollowTarget;
   device: TPreviewDevice;
@@ -28,14 +26,14 @@ export type TLookFollowStatusProps = {
   planNote: TMaybeUndefined<string>;
 };
 
-export const LookFollowStatus = ({
+export const useLookFollowStatus = ({
   follow,
   target,
   device,
   isShortLine,
   readerNote,
   planNote,
-}: TLookFollowStatusProps) => {
+}: TLookFollowStatusInput): TPreviewFrameStatusProps => {
   const t = useTranslations('lookFollow');
   const tForm = useTranslations('lookForm');
   const { isOn, isPaused, isFollowing, row, settled, resume, scrollToTop } =
@@ -70,20 +68,21 @@ export const LookFollowStatus = ({
 
   const isPauseIcon = !isOn || isPaused;
 
-  return (
-    <PreviewFrame.Status
-      icon={isPauseIcon ? ICONS.PAUSE : ICONS.CROSSHAIR}
-      isAccent={!isPauseIcon}
-      action={trailing || undefined}
-    >
-      <LookFollowSentence
-        follow={follow}
-        target={target}
-        device={device}
-        isShortLine={isShortLine}
-        planNote={planNote}
-      />
-      {readerNote && ` ${readerNote}`}
-    </PreviewFrame.Status>
-  );
+  return {
+    icon: isPauseIcon ? ICONS.PAUSE : ICONS.CROSSHAIR,
+    isAccent: !isPauseIcon,
+    action: trailing || undefined,
+    children: (
+      <>
+        <LookFollowSentence
+          follow={follow}
+          target={target}
+          device={device}
+          isShortLine={isShortLine}
+          planNote={planNote}
+        />
+        {readerNote && ` ${readerNote}`}
+      </>
+    ),
+  };
 };

@@ -745,12 +745,12 @@ are the folded Colour row's 14×14 (desktop) and 12×12 (phone) swatches
 resized or cropped.", then the formats line "Logo: PNG, JPEG, WebP or SVG.
 Favicon: a square image." (`brandFieldsHint`, hint style) 8 px under it.
 
-| Field   | Label tag                      | Control                                                                                                                                                                                                                                                                        |
-| ------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Logo    | "optional", 12px 500 `#5b6472` | asset row, align center, gap **12**: a 52×52 thumb (`surface-2` #fbfbfd, 1 px `line`, radius 4) showing the logo; then (wrap, gap 8) "Replace logo" (`btn-sec btn-sm` with a leading 14 px upload icon, stroke 2: `M12 16V4`, `m7 9 5-5 5 5`, `M4 20h16`) and "Remove" (ghost) |
-| Favicon | "optional", 12px 500 `#5b6472` | the same row with an **empty** thumb (1 px dashed `control-line` on white, `aria-hidden`) and "Upload favicon" (`btn-sec btn-sm`, same icon)                                                                                                                                   |
+| Field   | Label tag                      | Control                                                                                                                                                                                                                                                                                         |
+| ------- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Logo    | "optional", 12px 500 `#5b6472` | asset row, align center, gap **12**: a 52×52 thumb (`surface-2` #fbfbfd, 1 px `line`, radius 4) showing the logo; then (wrap, gap 8) "Replace", named "Replace logo" (`btn-sec btn-sm` with a leading 14 px upload icon, stroke 2: `M12 16V4`, `m7 9 5-5 5 5`, `M4 20h16`) and "Remove" (ghost) |
+| Favicon | "optional", 12px 500 `#5b6472` | the same row with an **empty** thumb (1 px dashed `control-line` on white, `aria-hidden`) and "Upload", named "Upload favicon" (`btn-sec btn-sm`, same icon)                                                                                                                                    |
 
-No logo shows the empty thumb and "Upload logo" in the same row. The asset row
+No logo shows the empty thumb and "Upload" (named "Upload logo") in the same row. The asset row
 is an opt-in layout of the shared `AssetUploadField` (#6393); Email's
 logo field keeps today's.
 
@@ -1097,9 +1097,11 @@ file.
 
 ### 12.5 Status line
 
-Under the frame: flex, align start, gap 8 10, wrap, 12.5px / 18px `#5b6472`;
+Under the frame: flex, align start, gap 10, no wrap, 12.5px / 18px `#5b6472`;
 icon margin-top 1; text `flex 1 1 300px`; bold part name `#12141a` 600; a
-trailing button margin-top −7. Icon: crosshair 16 stroke `#3730a3` 2 while
+trailing button margin-top −7. The row is always as tall as a trailing button
+less that −7 (25 px from `lg`, 37 px below it and on a coarse pointer), so
+"Back to {part}" or "Top of page" appearing never resizes it. Icon: crosshair 16 stroke `#3730a3` 2 while
 following, pause 16 stroke `#5b6472` 2 (`M9 5v14M15 5v14`) when paused. It
 replaces today's "Built from the site's own components. Nothing is live until
 you save." See § 13 for the lines.
@@ -2096,7 +2098,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] The frame does not move and nothing is outlined; status crosshair + "Every card is open. Focus a Site parts card and the frame scrolls to it."
 - [ ] Language switcher open shows its field label "Style"
 - [ ] Colour: description; Accent hue — 40×40 swatch (the shared `AccentSwatch`), 10 px hue track, mono "hue 192°" 62 px wide, gap 14, range named by the label; Logo hue — fieldset, hint, the "Follow accent hue" Switch on (GC's checkbox not built, D-39); the thumb is #6330's and is not ticked here
-- [ ] Brand: description, formats line 8 px under it; Logo + "optional", 52×52 thumb with the logo, "Replace logo" (upload icon) and "Remove"; Favicon + "optional", empty dashed thumb, "Upload favicon"
+- [ ] Brand: description, formats line 8 px under it; Logo + "optional", 52×52 thumb with the logo, "Replace" (upload icon, named "Replace logo") and "Remove"; Favicon + "optional", empty dashed thumb, "Upload" (named "Upload favicon")
 - [ ] Shape: Radius scale, Density, Card style segmented with hints; Header buttons — fixed hint above, label-only options, and one line under the control describing the selected option (12.5 / 18 `#5b6472`), changing with the selection
 - [ ] Buttons: While busy segmented Busy label✓ / Label kept / Progress edge; Spinner select "Ring"
 - [ ] Header: Layout select, then Sub-menus, Bar, Account button, Account panel and "On phones, the account sits" segmented, each with its hint (§ 10.5)

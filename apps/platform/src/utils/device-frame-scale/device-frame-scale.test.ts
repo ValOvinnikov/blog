@@ -16,6 +16,7 @@ import {
 
 const MOCK_DESKTOP_STAGE = 564;
 const MOCK_PHONE_TAB_HEIGHT = 523;
+const MOCK_TALL_PHONE_TAB_HEIGHT = 650;
 const MOCK_NARROW_STAGE = 358;
 const MOCK_HALF_FULLSCREEN_STAGE = 642;
 const MOCK_WIDE_STAGE = 5000;
@@ -111,15 +112,26 @@ describe(fitPageScale, () => {
     },
   );
 
-  it('never grows taller than 608 px whatever height the caller passes', () => {
+  it('stops at 608 px when no height is passed', () => {
     const scale = fitPageScale({
       device: PREVIEW_DEVICE.PHONE,
       availableWidth: MOCK_WIDE_STAGE,
-      availableHeight: MOCK_LARGE_AVAILABLE_HEIGHT,
     });
 
     expect(scaleDeviceSize(PREVIEW_DEVICE.PHONE, scale).height).toBe(
       DEVICE_FRAME_LIMIT.PAGE_HEIGHT,
+    );
+  });
+
+  it('grows taller than 608 px when the caller passes the room', () => {
+    const scale = fitPageScale({
+      device: PREVIEW_DEVICE.PHONE,
+      availableWidth: MOCK_WIDE_STAGE,
+      availableHeight: MOCK_TALL_PHONE_TAB_HEIGHT,
+    });
+
+    expect(scaleDeviceSize(PREVIEW_DEVICE.PHONE, scale).height).toBe(
+      MOCK_TALL_PHONE_TAB_HEIGHT,
     );
   });
 

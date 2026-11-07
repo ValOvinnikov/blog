@@ -57,8 +57,7 @@ export const fitPageScale = ({
       0,
       Math.min(
         availableWidth / PREVIEW_DEVICE_WIDTH[device],
-        Math.min(availableHeight, DEVICE_FRAME_LIMIT.PAGE_HEIGHT) /
-          PREVIEW_DEVICE_HEIGHT[device],
+        availableHeight / PREVIEW_DEVICE_HEIGHT[device],
         1,
       ),
     ),
