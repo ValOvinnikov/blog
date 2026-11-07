@@ -32,17 +32,16 @@ export type TTenantOverviewViewProps = {
 export const TenantOverviewView = async ({
   tenant,
 }: TTenantOverviewViewProps) => {
-  const { id, primaryDomain, status, deprovisionedAt } = tenant;
+  const {
+    id,
+    primaryDomain,
+    status,
+    deprovisionedAt,
+    unsentReinviteFormerOwnerEmailEncrypted,
+  } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [
-    admin,
-    owner,
-    auditEvents,
-    findings,
-    suspension,
-    unsentStudioReinviteEmail,
-  ] = await Promise.all([
+  const [admin, owner, auditEvents, findings, suspension] = await Promise.all([
     requireAdmin(),
     queries.memberships.getTenantOwnerMembership(id),
     queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
@@ -50,7 +49,6 @@ export const TenantOverviewView = async ({
     }),
     queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
     loadOperatorSuspension(tenant),
-    queries.tenants.getUnsentStudioReinviteEmail(id),
   ]);
   const canChangeSuspension =
     isSuperAdmin(admin) &&
@@ -70,7 +68,9 @@ export const TenantOverviewView = async ({
         tenant={clientTenant}
         owner={owner}
         isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}
-        isStudioReinviteUnsent={!isNull(unsentStudioReinviteEmail)}
+        isStudioReinviteUnsent={
+          !isNull(unsentReinviteFormerOwnerEmailEncrypted)
+        }
       />
 
       <FindingsCard tenantId={id} findings={findings} />
