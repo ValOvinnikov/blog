@@ -571,6 +571,9 @@ names, so their block below applies to **both** environments rather than only to
       — the `deploy-admin` job's target; until it's set that job no-ops green.
 - [ ] Variable `VERCEL_PROJECT_ID_WORKER` = `<VERCEL_PROJECT_ID>` (**worker-dev**)
       — the `deploy-worker` job's target; unset, that job fails naming it.
+- [ ] Secrets `VERCEL_AUTOMATION_BYPASS_SECRET_WEB`, `_PLATFORM` and `_WORKER`
+      = each dev project's Protection Bypass for Automation secret — see
+      "Human gate — Deployment Protection" below.
 - [ ] Every entry in **"Tenant lifecycle — both environments"** below, with this
       environment's own values.
 
@@ -591,6 +594,8 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-prod**)
       — the `deploy-admin` job's target; until it's set that job no-ops green.
+- [ ] Secrets `VERCEL_AUTOMATION_BYPASS_SECRET_WEB` and `_PLATFORM` = each prod
+      project's Protection Bypass for Automation secret.
 - [ ] Variable `BACKUP_R2_ENDPOINT` = `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
       and Variable `BACKUP_R2_BUCKET` = the backup bucket's name; Secrets
       `BACKUP_R2_ACCESS_KEY_ID` and `BACKUP_R2_SECRET_ACCESS_KEY` = the
@@ -1122,16 +1127,20 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    Otherwise the script runs `vercel promote`. Web and admin are requested at
    `/`, where the proxy runs; the worker has no page, so it is requested at
    `/api/inactivity-sweep`, which loads its env and answers 401 without the
-   cron secret. A non-JSON 401 is Vercel's Deployment Protection page, not the
-   app, and fails the job.
+   cron secret. Deployment Protection answers before the app does: a `302` to
+   `vercel.com/sso-api`, or a non-JSON 401, fails the job and names the
+   missing secret. The platform's own redirect to its sign-in still passes.
 
-   **Human gate — Deployment Protection.** If a project has Deployment
-   Protection on its production deployments, the check cannot reach the app.
-   Turn on **Protection Bypass for Automation** in the Vercel project's
-   Deployment Protection settings and store its secret as the
-   `VERCEL_AUTOMATION_BYPASS_SECRET` secret on the `development` and
-   `production` GitHub Environments; the script sends it as
-   `x-vercel-protection-bypass`. Without protection, leave it unset.
+   **Human gate — Deployment Protection.** The deployment URLs of `web`,
+   `platform` and `worker` are protected, so the check reaches the app only
+   with a bypass, and every deploy fails without one. Vercel generates the
+   **Protection Bypass for Automation** secret per project, so turn it on in
+   each project's Deployment Protection settings and store each secret on the
+   `development` and `production` GitHub Environments as
+   `VERCEL_AUTOMATION_BYPASS_SECRET_WEB`, `VERCEL_AUTOMATION_BYPASS_SECRET_PLATFORM`
+   and `VERCEL_AUTOMATION_BYPASS_SECRET_WORKER` (development only — the worker
+   has no production deploy job). The script sends the app's own secret as
+   `x-vercel-protection-bypass`.
 
 Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
 `deploy-*` each keep `cancel-in-progress: true`, so a newer merge still

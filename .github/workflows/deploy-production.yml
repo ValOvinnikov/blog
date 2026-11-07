@@ -73,7 +73,7 @@ jobs:
     environment: production
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      VERCEL_AUTOMATION_BYPASS_SECRET_WEB: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET_WEB }}
       # Org/project ids are not sensitive — they live as environment-scoped
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
@@ -122,7 +122,7 @@ jobs:
     environment: production
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-      VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+      VERCEL_AUTOMATION_BYPASS_SECRET_PLATFORM: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET_PLATFORM }}
       # Org/project ids are not sensitive — they live as environment-scoped
       # Variables (not Secrets) so they stay inspectable in run logs.
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}

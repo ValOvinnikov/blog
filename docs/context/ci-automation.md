@@ -668,10 +668,12 @@ rather than a bare `vercel deploy --prebuilt --prod`. The script deploys with
 header. Otherwise the job fails with `<app> deployment did not start`, and the
 domains keep serving the previous deployment. Web and admin are checked at
 `/`; the worker at `/api/inactivity-sweep`, its 401 without the cron secret
-being proof that the route loaded its env. A non-JSON 401 is Vercel's
-Deployment Protection page and fails the job too, naming the optional
-`VERCEL_AUTOMATION_BYPASS_SECRET` Environment secret that the script sends as
-`x-vercel-protection-bypass` (`docs/DEPLOY.md`). The script's cases are pinned
+being proof that the route loaded its env. Deployment Protection answers
+before the app: a redirect to `vercel.com/sso-api`, or a non-JSON 401, fails
+the job too, naming the app's required `VERCEL_AUTOMATION_BYPASS_SECRET_<APP>`
+Environment secret (`_WEB`, `_PLATFORM`, `_WORKER`, one per Vercel project)
+that the script sends as `x-vercel-protection-bypass` (`docs/DEPLOY.md`). The
+app's own redirect to its sign-in passes. The script's cases are pinned
 by `scripts/vercel-deploy-checked.test.sh`, run in Workflow security.
 
 ## Required env vars
