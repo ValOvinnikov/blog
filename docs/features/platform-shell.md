@@ -117,19 +117,23 @@ Discard is disabled and the bar is `aria-busy`. A save that fails with no
 field errors — a server error, offline, or a plan refusal — shows the page's
 failure message in the bar's left side in place of the dot, count and hint, as
 one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
-until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--admin-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as fallbacks. When the
+until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--admin-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as scroll-padding fallbacks. When the
 failure leaves nothing unsaved (a plan refusal that restored every refused
 value), the message is an error toast instead, which stays until it is
 dismissed or the next save starts; the toast viewport sits above the bar's
 measured height. While a page hides the bar over remaining changes, the
-message waits for the bar to return. From `md` the page keeps 120px of room below its last content (48px
-when archived), and the document's `scroll-padding-bottom` is the bar's 64px
-plus 16px so a focused field never sits under the bar. The 64 and 16 are the
+message waits for the bar to return. Below its last content the page keeps the content column's own padding —
+the side gutter, 26px from `md` and 16px below — plus the visible bar's
+measured height, so the gap above the bar matches the sides and no extra room
+is left while no bar shows (archived included). From `md` the document's
+`scroll-padding-bottom` is the bar's 64px
+plus 16px so a focused field never sits under the bar, and when the bar
+first appears the focused control is scrolled into view (`block: 'nearest'`),
+since the bar's new room grows the page without scrolling it. The 64 and 16 are the
 `--spacing-admin-dock` / `-clearance` tokens, kept equal to
 `LOOK_LAYOUT_LIMIT`. A page may opt out of the head's "All changes saved"
 status (`hasSavedStatus={false}`); Voice does. Below `md` the bar spans the
-viewport bottom edge to edge with Discard and Save, and the page keeps 120px
-of room while it shows.
+viewport bottom edge to edge with Discard and Save.
 
 A save outside `SettingsFormShell` — the tenant details panel and the Add
 tenant form — submits from its card's footer and shows a failed save there, as
@@ -147,10 +151,11 @@ own status text — "N unsaved changes" with a dot, "All changes saved" with
 Save disabled, "N fields need attention" on a first row above "Go to the
 first one", or a failed save's message (an alert, while changes remain) — and has Save changes but no Discard and no shortcut hint. While
 saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
-outside Voice's `inert` content. Below `md` Voice keeps 96px of room
-(`--spacing-admin-phone-footer-room`, clearing the 85px two-row error footer,
-`--spacing-admin-phone-footer-max`) and a `scroll-padding-bottom` of that 85
-plus 16; an archived Voice page ends at 48px.
+outside Voice's `inert` content. Below `md` Voice's bottom room is the
+16px gutter plus the footer's measured height, and its `scroll-padding-bottom`
+is that height plus 16 (85px plus 16 before it is measured,
+`--spacing-admin-phone-footer-max`, the two-row error footer); an archived
+Voice page shows no footer, so it ends at the 16px gutter.
 
 A successful save pressed from Save changes — in the docked bar or Voice's
 phone footer — returns focus, without scrolling, to the control that had it

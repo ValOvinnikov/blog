@@ -358,9 +358,7 @@
   --spacing-admin-dock: 64px;
   --spacing-admin-dock-clearance: 16px;
   --spacing-admin-dock-room: 120px;
-  --spacing-admin-archived-room: 48px;
   --spacing-admin-phone-footer-max: 85px;
-  --spacing-admin-phone-footer-room: 96px;
 
   /* Keep equal to LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH in constants/look-layout.ts. */
   --container-look-split: 900px;
