@@ -4,7 +4,7 @@ import en from '@platform/i18n/messages/en.json';
 import { confirmSignInCallbackAction } from '@platform/server/sign-in-apps/confirm-sign-in-callback-action';
 import { removeSignInAppAction } from '@platform/server/sign-in-apps/remove-sign-in-app-action';
 import { saveSignInAppAction } from '@platform/server/sign-in-apps/save-sign-in-app-action';
-import { customRender, screen } from '@platform/testing/custom-render';
+import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -87,7 +87,7 @@ describe(`<${SignInAppCard.name}/>`, () => {
 
       const clientId = clientIdInput();
       const secret = secretInput();
-      expect(clientId).toBeInvalid();
+      await waitFor(() => expect(clientId).toBeInvalid());
       expect(clientId).toHaveAccessibleDescription(
         expect.stringContaining(page.fieldError.clientIdRequired),
       );
@@ -270,11 +270,11 @@ describe(`<${SignInAppCard.name}/>`, () => {
 
       await user.click(confirm);
 
+      await waitFor(() => expect(warning).not.toBeInTheDocument());
       expect(confirmSignInCallbackAction).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         OAUTH_PROVIDER.GOOGLE,
       );
-      expect(warning).not.toBeInTheDocument();
       expect(copy).toHaveFocus();
     });
   });
