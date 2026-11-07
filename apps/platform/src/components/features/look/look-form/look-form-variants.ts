@@ -12,7 +12,7 @@ export const lookFormVariants = tv({
     ],
     previewPanel: [
       'min-w-0 @min-look-split:flex-1',
-      '@min-look-split:sticky @min-look-split:top-[calc(var(--spacing-admin-topbar)+var(--spacing-admin-look-index)+var(--spacing-admin-form-gap))] @min-look-split:-m-1 @min-look-split:self-start @min-look-split:p-1',
+      '@min-look-split:sticky @min-look-split:top-[calc(var(--spacing-admin-topbar)+var(--spacing-admin-look-index)+var(--spacing-admin-form-gap)-(--spacing(1)))] @min-look-split:-m-1 @min-look-split:self-start @min-look-split:p-1',
     ],
   },
   variants: {

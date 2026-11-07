@@ -16,14 +16,16 @@ export const previewFrameVariants = tv({
     ],
     sharedStage: ['relative rounded-admin bg-admin-theme-track'],
     status: [
-      'flex flex-wrap items-start gap-x-2.5 gap-y-2',
+      'flex items-start gap-x-2.5',
+      // Held with or without a trailing button, so the row never resizes when one appears.
+      'min-h-admin-status-row-phone lg:min-h-admin-status-row lg:pointer-coarse:min-h-admin-status-row-touch',
       'text-admin-12-5 leading-[18px] text-admin-muted',
     ],
     statusIcon: ['mt-px flex-none'],
     statusText: [
       'min-w-0 flex-[1_1_300px] [&_strong]:font-semibold [&_strong]:text-admin-text',
     ],
-    statusAction: ['-mt-[7px]'],
+    statusAction: ['-mt-[7px] flex-none'],
   },
   variants: {
     isNarrow: {

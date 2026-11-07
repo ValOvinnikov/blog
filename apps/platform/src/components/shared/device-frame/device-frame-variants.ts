@@ -15,7 +15,7 @@ export const deviceFrameVariants = tv({
       '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
     ],
     sizer: ['relative'],
-    content: ['@container origin-top-left'],
+    content: ['@container flex origin-top-left flex-col'],
     overlay: [
       'pointer-events-none absolute bottom-0 left-0 origin-bottom-left',
     ],

@@ -158,6 +158,16 @@ describe(`<${LookFollowStatus.name}/>`, () => {
     expect(follow.resume).toHaveBeenCalled();
   });
 
+  it('drops the reader note while the way back shows', () => {
+    setup({
+      target: FOOTER_TARGET,
+      follow: mockLookFollow({ row: LOOK_ROW.FOOTER, isPaused: true }),
+      readerNote: READER_NOTE,
+    });
+
+    expect(followStatusText()).toBe(LOOK_FOLLOW.paused);
+  });
+
   it('says following is off with no way back but the toggle', () => {
     setup({
       target: FOOTER_TARGET,

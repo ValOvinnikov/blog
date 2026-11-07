@@ -48,9 +48,9 @@ export const AssetUploadActions = ({
     assetUploadActionsVariants({ size, layout });
   const pickAction = hasImage ? 'replace' : 'upload';
   const pickLabel = t(`${kind}.${pickAction}`);
-  // A row already names its asset, so its buttons show the bare verb and keep the asset in their accessible name.
-  const isRow = size === SIZE.SM;
-  const pickText = isRow ? t(pickAction) : pickLabel;
+  // A row's or a bare field's label already names the asset, so the visible text drops it.
+  const isBareVerb = size === SIZE.SM || layout === ASSET_UPLOAD_LAYOUT.BARE;
+  const pickText = isBareVerb ? t(pickAction) : pickLabel;
 
   return (
     <div className={root()}>
@@ -72,7 +72,7 @@ export const AssetUploadActions = ({
         onClick={() => inputRef.current?.click()}
         isDisabled={isDisabled}
         aria-describedby={describedBy}
-        aria-label={isRow ? pickLabel : undefined}
+        aria-label={isBareVerb ? pickLabel : undefined}
         className={pickButton()}
       >
         {layout === ASSET_UPLOAD_LAYOUT.BARE ? (

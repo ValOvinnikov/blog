@@ -1,19 +1,54 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
-import { DEVICE_FRAME_VIEWPORT_ATTRIBUTE } from '@platform/constants/device-frame';
+import {
+  DEVICE_FRAME_LIMIT,
+  DEVICE_FRAME_VIEWPORT_ATTRIBUTE,
+} from '@platform/constants/device-frame';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
+import { MEDIA_QUERY } from '@platform/constants/media-query';
 import type { TPreviewDevice } from '@platform/constants/preview';
+import { SAVE_BAR_HEIGHT_PROPERTY } from '@platform/constants/settings-form';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
+import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useEffect, useRef, useState } from 'react';
 
 const VIEWPORT_SELECTOR = `[${DEVICE_FRAME_VIEWPORT_ATTRIBUTE}]`;
 
+const DOCKED_SAVE_BAR_ROOM =
+  LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT +
+  LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_CLEARANCE;
+
+const pageBottomPadding = (element: Element) => {
+  let padding = 0;
+  for (let node = element.parentElement; node; node = node.parentElement) {
+    padding += parseFloat(getComputedStyle(node).paddingBottom) || 0;
+  }
+  return padding;
+};
+
+const shownSaveBarHeight = () =>
+  parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      SAVE_BAR_HEIGHT_PROPERTY,
+    ),
+  ) || 0;
+
+// Sized as if the docked save bar shows, so its arrival never pushes the sticky preview under the jump index.
+const dockedBottomRoom = (element: Element) =>
+  Math.max(
+    pageBottomPadding(element) -
+      shownSaveBarHeight() +
+      LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT,
+    DOCKED_SAVE_BAR_ROOM,
+  );
+
+// The status line's height is read only when the frame re-fits, so a follow rewording it never rescales the frame.
 export const useFrameAvailableHeight = (
   device: TPreviewDevice,
   isScrollingWithPage: boolean,
 ) => {
+  const isHeightCapped = useMediaQuery(MEDIA_QUERY.LG_UP);
   const rootRef = useRef<TMaybeNull<HTMLDivElement>>(null);
   const stageRef = useRef<TMaybeNull<HTMLDivElement>>(null);
-  const root = useElementSize(rootRef);
   const stage = useElementSize(stageRef);
   const [availableHeight, setAvailableHeight] =
     useState<TMaybeUndefined<number>>();
@@ -37,17 +72,18 @@ export const useFrameAvailableHeight = (
       const stageTop = isScrollingWithPage
         ? stageRect.top + window.scrollY
         : stageRect.top;
-      const next = Math.max(
+      const bottomRoom = isScrollingWithPage
+        ? pageBottomPadding(rootElement)
+        : dockedBottomRoom(rootElement);
+      const fitted = Math.max(
         0,
         Math.floor(
-          window.innerHeight -
-            stageTop -
-            stageChrome -
-            belowStage -
-            LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT -
-            LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_CLEARANCE,
+          window.innerHeight - stageTop - stageChrome - belowStage - bottomRoom,
         ),
       );
+      const next = isHeightCapped
+        ? Math.min(fitted, DEVICE_FRAME_LIMIT.PAGE_HEIGHT)
+        : fitted;
       setAvailableHeight((previous) => (previous === next ? previous : next));
     };
 
@@ -55,7 +91,13 @@ export const useFrameAvailableHeight = (
     window.addEventListener('resize', measure);
 
     return () => window.removeEventListener('resize', measure);
-  }, [device, isScrollingWithPage, root?.height, stage?.width, stage?.height]);
+  }, [
+    device,
+    isScrollingWithPage,
+    isHeightCapped,
+    stage?.width,
+    stage?.height,
+  ]);
 
   return { rootRef, stageRef, availableHeight };
 };

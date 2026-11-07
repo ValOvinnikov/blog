@@ -399,6 +399,24 @@ describe(`<${PreviewFrame.name}/>`, () => {
     expect(action).not.toBeInTheDocument();
   });
 
+  it('places a status passed as a node under the stage', () => {
+    setup({
+      status: <p>{MOCK_STATUS}</p>,
+      children: (
+        <PreviewFrame.Stage>
+          <p>{MOCK_SAMPLE}</p>
+        </PreviewFrame.Stage>
+      ),
+    });
+
+    const sample = screen.getByText(MOCK_SAMPLE);
+    const status = screen.getByText(MOCK_STATUS);
+
+    expect(sample.compareDocumentPosition(status)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
   it('renders the stage part holding the sample', () => {
     setup({
       children: (

@@ -17,7 +17,7 @@ export const selectVariants = tv({
     icon: ['shrink-0 text-admin-muted'],
     popup: [
       'max-h-[var(--available-height)] w-[min(20rem,calc(100vw-2rem))] min-w-[var(--anchor-width)] overflow-y-auto',
-      'rounded-admin border border-admin-popover-line bg-admin-popover p-1 shadow-admin-lg outline-none',
+      'rounded-admin border border-admin-popover-line bg-admin-popover p-1 text-admin-text shadow-admin-lg outline-none',
     ],
     item: [
       'flex min-h-11 cursor-pointer items-center gap-2 rounded-admin-control px-2 py-2',

@@ -1,8 +1,7 @@
 import type { TMaybeNull } from '@blog/config';
 import { isNull } from '@blog/utils/primitives';
+import { SAVE_BAR_HEIGHT_PROPERTY } from '@platform/constants/settings-form';
 import { type RefObject, useEffect } from 'react';
-
-const SAVE_BAR_HEIGHT_PROPERTY = '--admin-save-bar-height';
 
 // The bar's room grows the page without scrolling it, so a control edited at the page's end would sit under the bar.
 const revealFocusedControl = () => {
