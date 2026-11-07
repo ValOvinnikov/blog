@@ -32,7 +32,7 @@ const CAPABILITY_LABEL: Readonly<Record<TCapability, string>> = {
   [CAPABILITY.CONTACT_FORM]: 'Contact form',
 };
 
-const MODULE_PACK_LABEL: Readonly<Record<TModulePack, string>> = {
+export const MODULE_PACK_LABEL: Readonly<Record<TModulePack, string>> = {
   [MODULE_PACK.CORE]: 'Core',
   [MODULE_PACK.GROWTH]: 'Growth',
 };

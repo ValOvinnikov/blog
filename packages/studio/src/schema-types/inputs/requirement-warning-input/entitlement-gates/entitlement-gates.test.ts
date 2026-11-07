@@ -30,6 +30,7 @@ const MOCK_MODULE_KEY = faker.string.alphanumeric(12);
 const NEWSLETTER_TYPE = newsletterSchema.name;
 const PRICING_TYPE = pricingSchema.name;
 const CORE_ONLY = [MODULE_PACK.CORE];
+const OBJECT_JSON_TYPE = 'object';
 const NEWSLETTER_OFF_MARKUP = renderToStaticMarkup(
   getRequirementOffMessage({ capability: CAPABILITY.NEWSLETTER }),
 );
@@ -191,12 +192,12 @@ describe(entitlementGates, () => {
     const pricingType = {
       name: PRICING_TYPE,
       title: pricingSchema.title,
-      jsonType: 'object',
+      jsonType: OBJECT_JSON_TYPE,
     };
     const newsletterType = {
       name: NEWSLETTER_TYPE,
       title: newsletterSchema.title,
-      jsonType: 'object',
+      jsonType: OBJECT_JSON_TYPE,
     };
 
     it('marks a gated module in the picker', () => {
@@ -213,27 +214,28 @@ describe(entitlementGates, () => {
     });
 
     it.each([
-      {
-        plan: 'the core pack only',
-        entitlements: packState(CORE_ONLY),
-        replaced: true,
-      },
+      { plan: 'the core pack only', entitlements: packState(CORE_ONLY) },
       {
         plan: 'every pack with a capability off',
         entitlements: capabilityState([]),
-        replaced: false,
       },
-    ])(
-      'replaces the add picker on $plan: $replaced',
-      ({ entitlements, replaced }) => {
-        const { arrayFunctions } = renderArrayInput(entitlements, [
-          newsletterType,
-          pricingType,
-        ]);
+      { plan: 'every module pack', entitlements: packState(EVERY_MODULE_PACK) },
+    ])('replaces the add picker on $plan', ({ entitlements }) => {
+      const { arrayFunctions } = renderArrayInput(entitlements, [
+        newsletterType,
+        pricingType,
+      ]);
 
-        expect(!isUndefined(arrayFunctions)).toBe(replaced);
-      },
-    );
+      expect(isUndefined(arrayFunctions)).toBe(false);
+    });
+
+    it('keeps the add picker of an array that holds no modules', () => {
+      const { arrayFunctions } = renderArrayInput(packState(CORE_ONLY), [
+        { name: migrationStateSchema.name, jsonType: OBJECT_JSON_TYPE },
+      ]);
+
+      expect(isUndefined(arrayFunctions)).toBe(true);
+    });
   });
 
   describe('page item warning', () => {

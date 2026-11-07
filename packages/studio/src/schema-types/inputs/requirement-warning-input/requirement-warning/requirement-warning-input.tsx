@@ -5,7 +5,7 @@ import {
   type TEntitlementState,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
-import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
+import { hasModuleMembers } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
 import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { hasLength } from '@blog/utils/primitives';
@@ -24,9 +24,13 @@ export const createRequirementWarningInput = (
 
   return function RequirementWarningInput(props: InputProps) {
     const { schemaType } = props;
-    const { markedArrayType, pickerTypes } = useMemo(() => {
+    const { markedArrayType, pickerTypes, isModulesArray } = useMemo(() => {
       if (!isArraySchemaType(schemaType)) {
-        return { markedArrayType: null, pickerTypes: null };
+        return {
+          markedArrayType: null,
+          pickerTypes: null,
+          isModulesArray: false,
+        };
       }
 
       const of = markRequirementOffTypes(schemaType.of, entitlements);
@@ -40,28 +44,23 @@ export const createRequirementWarningInput = (
           ? Object.create(schemaType, { of: { value: of } })
           : null,
         pickerTypes: everyPackOf ?? schemaType.of,
+        isModulesArray: hasModuleMembers(schemaType.of),
       };
     }, [schemaType]);
 
-    if (markedArrayType) {
-      if (
-        isArrayOfObjectsInputProps(props) &&
-        getOffPlanModulePack(
-          markedArrayType.of,
-          entitlements.entitledModulePacks,
-        )
-      ) {
-        return (
-          <ModulePickerTypesContext.Provider value={pickerTypes}>
-            {props.renderDefault({
-              ...props,
-              schemaType: markedArrayType,
-              arrayFunctions: ModulePicker,
-            })}
-          </ModulePickerTypesContext.Provider>
-        );
-      }
+    if (isModulesArray && isArrayOfObjectsInputProps(props)) {
+      return (
+        <ModulePickerTypesContext.Provider value={pickerTypes}>
+          {props.renderDefault({
+            ...props,
+            schemaType: markedArrayType ?? props.schemaType,
+            arrayFunctions: ModulePicker,
+          })}
+        </ModulePickerTypesContext.Provider>
+      );
+    }
 
+    if (markedArrayType) {
       return props.renderDefault({ ...props, schemaType: markedArrayType });
     }
 
