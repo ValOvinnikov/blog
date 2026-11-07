@@ -38,7 +38,7 @@ code:
   - apps/web/src/components/shared/theme-scope/**
   - apps/web/src/config/fonts.ts
   - apps/web/src/config/font-loaders/**
-epics: [4987, 4991, 4992, 4993, 4999, 4960]
+epics: [4987, 4991, 4992, 4993, 4999, 4960, 6317]
 ---
 
 # Look
@@ -122,7 +122,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - `apps/platform/src/components/features/look/look-form/components/footer-card/footer-card.tsx`, `apps/platform/src/components/features/site-preview/sample-site-footer/sample-site-footer.tsx`
 - `apps/platform/src/server/site-config/update-look-action.ts`, `upload-brand-asset-action.ts`, `clear-brand-asset-action.ts`, `validate-brand-asset.ts`
 - `apps/platform/src/utils/theme-preview-tokens/theme-preview-tokens.ts`
-- `apps/platform/src/components/shared/device-frame/`, `apps/platform/src/components/shared/preview-frame/` (`PreviewFrame.Heading`, `.Toolbar`, `.Stage`, `.Status`), `apps/platform/src/components/shared/icon-toolbar/` and `apps/platform/src/utils/device-frame-scale/` — the shared device-frame preview: a desktop, tablet or phone frame laid out at the device width and scaled to fit, its size readout, and the Device and Light / Dark toolbar. The Look preview renders it (`look-preview/`, with `use-frame-available-height.ts`, and `use-look-follow.ts` driving the frame through `DeviceFrame`'s `scrollTo` / `getScrollMetrics` handle and `onHandScroll`); onboarding does not yet
+- `apps/platform/src/components/shared/device-frame/`, `apps/platform/src/components/shared/preview-frame/` (`PreviewFrame.Heading`, `.Toolbar`, `.Stage`, `.Status`), `apps/platform/src/components/shared/icon-toolbar/` and `apps/platform/src/utils/device-frame-scale/` — the shared device-frame preview: a desktop, tablet or phone frame laid out at the device width and scaled to fit, its size readout, and the Device and Light / Dark toolbar. The Look preview renders it (`look-preview/`, with `use-frame-available-height.ts`, and `use-look-follow.ts` driving the frame through `DeviceFrame`'s `scrollTo` / `getScrollMetrics` handle and `onHandScroll`), and so does the onboarding preview (`onboarding-preview.tsx`)
 - `apps/web/src/utils/to-theme-tokens/to-theme-tokens.ts`
 - `apps/web/src/utils/build-theme-style-block/build-theme-style-block.ts`
 - `apps/web/src/components/shared/theme-scope/theme-scope.tsx`
@@ -140,6 +140,8 @@ The Look page is where a tenant owner styles their public site without touching 
 
 ## Related
 
+- #6317 — epic: the Look page is one grouped form with a shared device-frame preview (the LX, LXG and G2 boards).
+- #6844 — the Growth note's "See what's included" disclosure on Look and Sign-in.
 - #5459 — epic: header controls are one round family, and the Look page sets how they're framed.
 - #4987 — epic: accessible text and colour on the public site. It retunes the ramps and rebuilds the hue guard.
 - #4991 — brand and metadata colours reach AA at every accent hue.

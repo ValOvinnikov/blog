@@ -48,10 +48,9 @@ retirement into an epic body.
 - `superpowers/specs/2026-10-30-admin-shell-design.md` — the admin shell (SH1 sidebar, top bar, account and phone Menu).
 - `superpowers/specs/2026-10-30-admin-theme-design.md` — the admin theme (TH1 palettes, tokens, focus ring, shared controls).
 - `superpowers/specs/2026-10-30-owner-dashboard-design.md` — the owner Overview (Layout B site band, Studio status, cards).
-- `superpowers/specs/2026-10-30-look-page-design.md` — the Look page (LX, LXG and G2) and the shared device-frame preview.
 - `superpowers/specs/2026-10-30-voice-page-design.md` — the Voice page (V3a chip bar, docked save bar, previews).
 - `superpowers/specs/2026-10-30-onboarding-wizard-parity-design.md` — the onboarding wizard matching the W2 boards.
-- `superpowers/specs/2026-10-30-admin-redesign-resolutions.md` — the cross-set rulings, shared-primitive owners, dependencies and undrawn frames for the six specs above.
+- `superpowers/specs/2026-10-30-admin-redesign-resolutions.md` — the cross-set rulings, shared-primitive owners, dependencies and undrawn frames for the admin redesign specs above.
 - `superpowers/specs/2026-11-05-entitlement-grants-design.md` — spike: a super admin grants one tenant a feature outside its plan (storage, resolver, granularity, UI, billing).
 
 ## Archived design docs (frozen history — pre-2026-07-27 only)

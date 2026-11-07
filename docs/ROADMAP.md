@@ -4,7 +4,7 @@ The order the open epics ship in, from today to selling sites through the
 marketing page. Status lives on the project board and in each epic's sub-issue
 list; this page holds only the order, the decisions still open, and why. Written
 2026-10-14 from a platform inspection; restructured 2026-10-31 around a single
-launch.
+launch; refreshed 2026-11-07.
 
 ## One launch
 
@@ -25,22 +25,29 @@ old production project (`web-prod` v0.3.0, Sanity `7fuqzuyl`) is retired.
   has no env vars, and production deploys are paused. The stand-up is owner
   console work, deferred until there is less left to deliver.
 - **Automatic dev deploys are off** (cost freeze, #2648). Dev lags `main`
-  until the owner dispatches a deploy, so manual tests wait on it.
+  until the owner dispatches a deploy, so manual tests wait on it. A dispatched
+  deploy stages every app, checks each staged URL through its Vercel
+  protection bypass, and promotes them together only when all pass.
 - **Provisioning is on the worker**, and it survives a rotation of the Sanity
   organisation token (#6273): each tenant has its own `developer` token.
 - **Done since 2026-10-18:** the form-status vocabulary (#5385), magic-link
   send limits (#4958), the contact form (#1292), production logging to
   Grafana Loki (#1645), and the wildcard subdomain on dev.
+- **Done since 2026-10-31:** the Look page redesign (#6317) with the Growth
+  note on Look and Sign-in (#6844), the "Powered by" mark on Free footers
+  (#6794, its manual test left), reader self-service on a downgraded site
+  (#5062, #6437), and choosing the surviving language after a downgrade
+  (#5064).
 
 ## Before the launch
 
-| Epic      | What it delivers                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **#4840** | Self-serve signup on the worker: `/sign-in`, `/signup`, the `/onboarding` wizard and **Create site**; reserved subdomains and `*.<domain>`; TRIAL / PAST_DUE, tenant deletion and the abandoned-tenant sweep; site templates (#2798), the signup blocklist (#5649) and per-tenant revalidate secrets (#5719). Then **Stripe** billing (Order 5): Checkout, Customer Portal, webhooks, Stripe Tax, test mode first. **The Stripe tickets are not cut yet.** |
-| **#5047** | Plans and entitlements. Free = the 13 blog modules; Growth adds testimonial, team, logoWall, stats, pricing, featureList, featureHighlights and timeline. On a downgrade gated modules stop rendering and nothing is deleted. Reader self-service follows option (b) (#5062, #6437). Seats (#5055), the Free AI quota (#5056) and the surviving language (#5064) wait on owner decisions.                                                                  |
-| **#5085** | Launch readiness: legal pages and links (#5086 → #5087 → #3726 → #5088 → #5089, then #5090's final text), newsletter guards, encrypted backups to a private Cloudflare R2 bucket (#5094 → #5095 → #5096), production error shipping and uptime checks (#5349), and Lighthouse on the marketing pages (#5097, after the apex cutover).                                                                                                                      |
-| **#4979** | The two apps stay separate: language, sign-in and sessions per app. Left: its manual test.                                                                                                                                                                                                                                                                                                                                                                 |
-| **#4987** | Accessible text and colour on the public site, guarded by a brand-matrix CI job.                                                                                                                                                                                                                                                                                                                                                                           |
+| Epic      | What it delivers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **#4840** | Self-serve signup on the worker: `/sign-in`, `/signup`, the `/onboarding` wizard and **Create site**; reserved subdomains and `*.<domain>`; TRIAL / PAST_DUE, tenant deletion and the abandoned-tenant sweep; site templates (#2798), the signup blocklist (#5649) and per-tenant revalidate secrets (#5719). Then **Stripe** billing (Order 5): Checkout, Customer Portal, webhooks, Stripe Tax, test mode first. **The Stripe tickets are not cut yet.** The Growth note's "Ask about Growth" button waits for this upgrade flow. |
+| **#5047** | Plans and entitlements. Free = the 13 blog modules; Growth adds testimonial, team, logoWall, stats, pricing, featureList, featureHighlights and timeline. On a downgrade gated modules stop rendering and nothing is deleted. Seats (#5055) and the Free AI quota (#5056) wait on owner decisions; a super admin granting one tenant a feature outside its plan is #6779.                                                                                                                                                           |
+| **#5085** | Launch readiness: legal pages and links (#5086 → #5087 → #3726 → #5088 → #5089, then #5090's final text), newsletter guards, encrypted backups to a private Cloudflare R2 bucket (#5094 → #5095 → #5096), production error shipping and uptime checks (#5349), and Lighthouse on the marketing pages (#5097, after the apex cutover).                                                                                                                                                                                               |
+| **#4979** | The two apps stay separate: language, sign-in and sessions per app. Left: its manual test.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **#4987** | Accessible text and colour on the public site, guarded by a brand-matrix CI job.                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 Production's first content is copied from the `marketing.dev` and `demo.dev`
 tenants: launch needs a dev→prod Sanity dataset copy and a way to carry their
@@ -59,13 +66,13 @@ Product.
 
 ## The admin redesign
 
-Specs merged in #6427. Run in its own session, alongside the launch work.
-
-| Epic      | What it delivers                                                                |
-| --------- | ------------------------------------------------------------------------------- |
-| **#6313** | The admin matches the redesign boards: shell, tenants table, layout and wizard. |
-| **#6317** | The Look page is one grouped form with a shared device-frame preview.           |
-| **#6319** | The Voice page in grouped sections with a sticky chip bar.                      |
+Specs merged in #6427; run in its own session, alongside the launch work.
+Umbrella #6313. The building is done but for the Voice save bar on phones
+(#6868). Left: each area's manual test (#6380 shell, #6353 colours, #6368 and
+#6369 dashboard, #6423 Voice, #6334 onboarding), then each area epic's final
+docs PR, which syncs its feature page and deletes its spec: #6287, #6315,
+#6316, #6319, #6320 and #6717. The Look epic (#6317) is closed out. The last
+of them also deletes `2026-10-30-admin-redesign-resolutions.md`.
 
 ## Alongside
 
@@ -100,9 +107,8 @@ module presets (#2803).
 
 ## Open decisions
 
-- **Plans (#5047):** Growth's seat count, the Free AI-takeaway quota, whether
-  the default language may change after a downgrade, a "powered by" mark on
-  Free, and whether the Subscribers page stays on Free.
+- **Plans (#5047):** Growth's seat count, the Free AI-takeaway quota, and
+  whether the Subscribers page stays on Free.
 - **Domain:** the admin is `platform.<domain>`, but the domain itself is not
   chosen. It doesn't block development.
 - **Prices**: Growth banded by subscriber count? Sell the newsletter before
