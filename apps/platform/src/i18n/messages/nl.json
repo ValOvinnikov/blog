@@ -654,8 +654,8 @@
     "archivedNotice": "Deze site is gearchiveerd, dus de inlog-apps kunnen niet worden gewijzigd.",
     "notOwnerNotice": "Alleen de eigenaar van de site kan inlog-apps wijzigen.",
     "keptOnGrowth": "Je opgeslagen app blijft bewaard. Met Growth komt hij terug.",
-    "growthNoteTitle": "Meer opties met Growth",
-    "growthNoteDescription": "Opties met <badge></badge> op deze pagina komen beschikbaar met het Growth-abonnement.",
+    "growthAddsGoogle": "Je eigen Google-app, zodat lezers de naam van je site zien in plaats van die van ons",
+    "growthAddsGithub": "Je eigen GitHub-app, zodat lezers de naam van je site zien in plaats van die van ons",
     "callbackWarning": "Je hoofdadres is nu {domain}. Voeg het nieuwe callback-adres toe aan je {provider}-app, anders kunnen lezers niet inloggen met {provider}.",
     "callbackConfirm": "Toegevoegd",
     "callbackConfirmFailed": "Opslaan mislukt. Probeer het opnieuw."
@@ -689,6 +689,13 @@
     "sitePartsGroupHeading": "Sitedelen",
     "viewTabsAriaLabel": "Look-weergave",
     "jumpIndexAriaLabel": "Look-onderdelen",
+    "growthAddsColour": "Een eigen tint voor het logo",
+    "growthAddsType": "Lettertypen voor koppen en lopende tekst",
+    "growthAddsShape": "Hoeken, ruimte en de stijl van kaarten en koptekstknop",
+    "growthAddsButtons": "Bezig-status en spinner",
+    "growthAddsHeader": "Indeling, submenu’s, balk en accountknoppen",
+    "growthAddsFooter": "Indeling, achtergrond en vlak",
+    "growthAddsClosing": "Growth voegt ook meer talen toe (met keuze uit taalwisselaarstijlen), een eigen domein en meer sitefuncties.",
     "jumpIndexUnsaved": ", niet-opgeslagen wijzigingen",
     "expandAll": "Alles uitklappen",
     "collapseAll": "Alles inklappen",
@@ -1997,6 +2004,13 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— onderdeel van het Growth-abonnement"
+  },
+  "growthNote": {
+    "title": "Meer opties met Growth",
+    "description": "Opties met <badge></badge> op deze pagina komen beschikbaar met het Growth-abonnement.",
+    "show": "Bekijk wat erbij zit",
+    "hide": "Verbergen",
+    "listLabel": "Wat Growth op deze pagina toevoegt"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open je dashboard",

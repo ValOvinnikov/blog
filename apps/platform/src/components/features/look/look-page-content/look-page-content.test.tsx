@@ -9,7 +9,9 @@ import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
+import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
@@ -20,7 +22,11 @@ import {
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { openLookRow } from '@platform/testing/look/look-form-interactions';
+import {
+  growthBadgesOutsideNote,
+  openLookRow,
+} from '@platform/testing/look/look-form-interactions';
+import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
@@ -98,6 +104,47 @@ describe(`<${LookPageContent.name}/>`, () => {
 
     expect(editorialRadio).toBeChecked();
     expect(hueValue).toBeVisible();
+  });
+
+  describe('the Growth note on a Free tenant', () => {
+    const freeTenant = mockReadyTenant({ plan: TENANT_PLAN.FREE });
+
+    it('shows an owner the note', async () => {
+      await setup({ tenant: freeTenant, membership: mockMembership() });
+
+      const title = screen.getByText(messages.growthNote.title);
+
+      expect(title).toBeVisible();
+    });
+
+    it.each([
+      ['an admin', { admin: mockAdmin() }],
+      [
+        'an admin with a virtual membership',
+        {
+          membership: buildVirtualAdminMembership(
+            mockAdmin().userId,
+            MOCK_TENANT_ID,
+          ),
+        },
+      ],
+    ])(
+      'shows %s no note, but the badges and locked fields',
+      async (_name, access) => {
+        await setup({ tenant: freeTenant, ...access });
+        await openLookRow(user, LOOK_ROW.SHAPE);
+
+        const title = screen.queryByText(messages.growthNote.title);
+        const badges = growthBadgesOutsideNote();
+        const lockedRadius = screen.getByRole('button', {
+          name: RADIUS_LABEL.MD,
+        });
+
+        expect(title).not.toBeInTheDocument();
+        expect(badges.length).toBeGreaterThan(0);
+        expect(lockedRadius).toHaveAttribute(ARIA_DISABLED, 'true');
+      },
+    );
   });
 
   describe('with a stored Growth-only corner radius', () => {

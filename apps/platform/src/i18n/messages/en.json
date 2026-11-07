@@ -654,8 +654,8 @@
     "archivedNotice": "This site is archived, so its sign-in apps can't be changed.",
     "notOwnerNotice": "Only the site owner can change sign-in apps.",
     "keptOnGrowth": "Your saved app is kept. It comes back on Growth.",
-    "growthNoteTitle": "More options come with Growth",
-    "growthNoteDescription": "Options marked <badge></badge> on this page open up on the Growth plan.",
+    "growthAddsGoogle": "Your own Google app, so readers see your site's name instead of ours",
+    "growthAddsGithub": "Your own GitHub app, so readers see your site's name instead of ours",
     "callbackWarning": "Your main address is now {domain}. Add the new callback address to your {provider} app, or readers can't sign in with {provider}.",
     "callbackConfirm": "I've added it",
     "callbackConfirmFailed": "Couldn't save — try again."
@@ -689,6 +689,13 @@
     "sitePartsGroupHeading": "Site parts",
     "viewTabsAriaLabel": "Look view",
     "jumpIndexAriaLabel": "Look sections",
+    "growthAddsColour": "A logo hue of its own",
+    "growthAddsType": "Heading and body fonts",
+    "growthAddsShape": "Corners, spacing, card and header-button style",
+    "growthAddsButtons": "Busy state and spinner",
+    "growthAddsHeader": "Layout, sub-menus, bar and account controls",
+    "growthAddsFooter": "Layout, background and surface",
+    "growthAddsClosing": "Growth also adds more languages (with a choice of language switcher style), your own domain and more site features.",
     "jumpIndexUnsaved": ", unsaved changes",
     "expandAll": "Expand all",
     "collapseAll": "Collapse all",
@@ -1997,6 +2004,13 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— included in the Growth plan"
+  },
+  "growthNote": {
+    "title": "More options come with Growth",
+    "description": "Options marked <badge></badge> on this page open up on the Growth plan.",
+    "show": "See what's included",
+    "hide": "Hide",
+    "listLabel": "What Growth adds on this page"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open your dashboard",

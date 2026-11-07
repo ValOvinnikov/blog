@@ -654,8 +654,8 @@
     "archivedNotice": "Diese Website ist archiviert, daher können ihre Anmelde-Apps nicht geändert werden.",
     "notOwnerNotice": "Nur der Inhaber der Website kann Anmelde-Apps ändern.",
     "keptOnGrowth": "Deine gespeicherte App bleibt erhalten. Mit Growth ist sie wieder da.",
-    "growthNoteTitle": "Mehr Optionen mit Growth",
-    "growthNoteDescription": "Mit <badge></badge> markierte Optionen auf dieser Seite gibt es im Growth-Tarif.",
+    "growthAddsGoogle": "Deine eigene Google-App, damit Leser den Namen deiner Website statt unseres sehen",
+    "growthAddsGithub": "Deine eigene GitHub-App, damit Leser den Namen deiner Website statt unseres sehen",
     "callbackWarning": "Deine Hauptadresse ist jetzt {domain}. Füge die neue Callback-Adresse in deiner {provider}-App hinzu, sonst können Leser sich nicht mit {provider} anmelden.",
     "callbackConfirm": "Erledigt",
     "callbackConfirmFailed": "Speichern fehlgeschlagen – versuch es noch einmal."
@@ -689,6 +689,13 @@
     "sitePartsGroupHeading": "Website-Bereiche",
     "viewTabsAriaLabel": "Look-Ansicht",
     "jumpIndexAriaLabel": "Look-Abschnitte",
+    "growthAddsColour": "Ein eigener Logo-Farbton",
+    "growthAddsType": "Überschrift- und Fließtextschriften",
+    "growthAddsShape": "Ecken, Abstände sowie Karten- und Header-Button-Stil",
+    "growthAddsButtons": "Ladezustand und Spinner",
+    "growthAddsHeader": "Layout, Untermenüs, Leiste und Kontosteuerung",
+    "growthAddsFooter": "Layout, Hintergrund und Fläche",
+    "growthAddsClosing": "Mit Growth kommen außerdem weitere Sprachen (mit Auswahl des Sprachumschalter-Stils), eine eigene Domain und weitere Website-Funktionen hinzu.",
     "jumpIndexUnsaved": ", ungespeicherte Änderungen",
     "expandAll": "Alle aufklappen",
     "collapseAll": "Alle zuklappen",
@@ -1997,6 +2004,13 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— im Growth-Tarif enthalten"
+  },
+  "growthNote": {
+    "title": "Mehr Optionen mit Growth",
+    "description": "Mit <badge></badge> markierte Optionen auf dieser Seite gibt es im Growth-Tarif.",
+    "show": "Das ist enthalten",
+    "hide": "Ausblenden",
+    "listLabel": "Was Growth auf dieser Seite ergänzt"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Dashboard öffnen",

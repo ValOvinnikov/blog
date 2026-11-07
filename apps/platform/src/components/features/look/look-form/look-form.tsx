@@ -1,7 +1,7 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config';
-import { LOOK_FIELD, type TTenantPlan } from '@blog/db/constants';
+import { LOOK_FIELD, TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
@@ -11,7 +11,6 @@ import { SettingsFormShell } from '@platform/components/shared/settings-form-she
 import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
-import { LOOK_ROW } from '@platform/constants/look-row';
 import { SETTINGS_FORM_STACK } from '@platform/constants/settings-form';
 import { VIEW_TABS_VARIANT } from '@platform/constants/view-tabs';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -26,9 +25,9 @@ import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 import { lookFormVariants } from './look-form-variants';
-import { LOOK_ROW_TITLE_KEY } from './look-row-title-key';
 import { useLookFormState } from './use-look-form-state';
 import { useLookOpenRows } from './use-look-open-rows';
+import { useLookUnsavedCards } from './use-look-unsaved-cards';
 
 export type TLookFormProps = {
   tenantId: string;
@@ -36,6 +35,7 @@ export type TLookFormProps = {
   siteHost: string;
   initialValues: TLookFormValues;
   plan: TTenantPlan;
+  isOperator: boolean;
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
   hasCookieBanner: boolean;
@@ -55,6 +55,7 @@ export const LookForm = ({
   siteHost,
   initialValues,
   plan,
+  isOperator,
   liveLocales,
   hasReaderAccounts,
   hasCookieBanner,
@@ -85,12 +86,7 @@ export const LookForm = ({
     },
   });
 
-  const unsavedCards = Object.values(LOOK_ROW)
-    .filter(lookForm.hasCardChanges)
-    .map((row) => ({
-      name: t(LOOK_ROW_TITLE_KEY[row]),
-      onSelect: () => revealCard(row),
-    }));
+  const unsavedCards = useLookUnsavedCards(lookForm, revealCard);
 
   const isPreviewTab = hasTabPanels && view === 'preview';
   const { layout, columns, editPanel, previewPanel } = lookFormVariants();
@@ -127,6 +123,8 @@ export const LookForm = ({
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}
                 hasMultipleLanguages={hasMultipleLanguages}
+                hasGrowthNote={plan === TENANT_PLAN.FREE && !isOperator}
+                onSelectCard={jumpIndex.onSelectCard}
                 summaries={buildLookRowSummaries(lookForm.values, t, {
                   hasMultipleLanguages:
                     hasMultipleLanguages &&

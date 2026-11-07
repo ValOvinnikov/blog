@@ -9,6 +9,7 @@ import {
   GROWTH_BADGE_TEXT,
 } from '@platform/testing/look/look-form-fixtures';
 import {
+  growthBadgesOutsideNote,
   lookRowTrigger,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
@@ -104,7 +105,7 @@ describe(`<${LookForm.name}/>`, () => {
     const codesButton = screen.getByRole('button', {
       name: SWITCHER_OPTION.CODES,
     });
-    const badges = screen.queryAllByText(GROWTH, { exact: true });
+    const badges = growthBadgesOutsideNote();
 
     expect(freeLine).toBeVisible();
     expect(singleLanguageNote).not.toBeInTheDocument();
