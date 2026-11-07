@@ -191,11 +191,11 @@ describe(useFrameAvailableHeight, () => {
           SAVE_BAR_HEIGHT_PROPERTY,
           `${barHeight}px`,
         );
-        onTestFinished(() =>
+        onTestFinished(() => {
           document.documentElement.style.removeProperty(
             SAVE_BAR_HEIGHT_PROPERTY,
-          ),
-        );
+          );
+        });
       }
       stubLayout({ isStageSticky: true });
       render(
