@@ -6,6 +6,7 @@ import {
 import { LOOK_LAYOUT_LIMIT } from '@platform/constants/look-layout';
 import { MEDIA_QUERY } from '@platform/constants/media-query';
 import type { TPreviewDevice } from '@platform/constants/preview';
+import { SAVE_BAR_HEIGHT_PROPERTY } from '@platform/constants/settings-form';
 import { useElementSize } from '@platform/utils/use-element-size/use-element-size';
 import { useMediaQuery } from '@platform/utils/use-media-query/use-media-query';
 import { useEffect, useRef, useState } from 'react';
@@ -23,6 +24,22 @@ const pageBottomPadding = (element: Element) => {
   }
   return padding;
 };
+
+const shownSaveBarHeight = () =>
+  parseFloat(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      SAVE_BAR_HEIGHT_PROPERTY,
+    ),
+  ) || 0;
+
+// Sized as if the docked save bar shows, so its arrival never pushes the sticky preview under the jump index.
+const dockedBottomRoom = (element: Element) =>
+  Math.max(
+    pageBottomPadding(element) -
+      shownSaveBarHeight() +
+      LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT,
+    DOCKED_SAVE_BAR_ROOM,
+  );
 
 // The status line's height is read only when the frame re-fits, so a follow rewording it never rescales the frame.
 export const useFrameAvailableHeight = (
@@ -55,10 +72,9 @@ export const useFrameAvailableHeight = (
       const stageTop = isScrollingWithPage
         ? stageRect.top + window.scrollY
         : stageRect.top;
-      const bottomRoom = Math.max(
-        pageBottomPadding(rootElement),
-        isScrollingWithPage ? 0 : DOCKED_SAVE_BAR_ROOM,
-      );
+      const bottomRoom = isScrollingWithPage
+        ? pageBottomPadding(rootElement)
+        : dockedBottomRoom(rootElement);
       const fitted = Math.max(
         0,
         Math.floor(

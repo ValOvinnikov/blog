@@ -936,7 +936,7 @@ width **and** height:
   `lg` = **608 px** (the tallest viewport the boards draw, LX-A); the frame
   never grows taller, whatever the pane width. On the phone Preview tab = the room left in the window under
   the top bar, tabs, rows 1–2, the status row (54 px reserved, § 12.5) and
-  the page's own bottom padding (24 px), with stage padding 10 (460 px in a
+  the page's own bottom padding (16 px), with stage padding 10 (468 px in a
   390×844 window); the save bar is hidden there, so nothing is kept for it.
 - Never above 1. Viewport size = device size × scale, both rounded to whole
   px; the readout percentage is the scale rounded.
@@ -949,7 +949,7 @@ width **and** height:
 | Tablet  | 426                    | 394×566  | 0.48   | width  | LX-C        |
 | Phone   | 600                    | 281×608  | 0.72   | height | LX-A        |
 | Phone   | 426                    | 281×608  | 0.72   | height | LX-B, LX-D2 |
-| Phone   | phone Preview tab 358  | 213×460  | 0.545  | height | LX-E2       |
+| Phone   | phone Preview tab 358  | 216×468  | 0.5545 | height | LX-E2       |
 | Desktop | 476 (1280 window)      | 444×278  | 0.3469 | width  | GW-C        |
 | Desktop | Preview tab 704 (1024) | 670×419  | 0.5234 | width  | GW-B        |
 
@@ -1171,12 +1171,12 @@ off; scrolling the frame by hand pauses it until you choose Back to the part."
 
 Outline on the part (`data-part="header|footer"`): `outline: Wpx solid
 #4f46e5; outline-offset: -Wpx`, W = 2 / scale → always 2 screen px (4.5 @0.4406,
-4.2 @0.48, 3.7 @0.545, 2.8 @0.72).
+4.2 @0.48, 3.6 @0.5545, 2.8 @0.72).
 
 Tag: absolute left 0, bg `#4f46e5`, `#fff`, Inter 600, line-height 1, z 2,
 text = the part name. Size = 11px font, 20px height, 7px horizontal padding,
 3px radius, each ÷ scale (@0.4406: 25 / 45.4 / 15.9 / 6.8; @0.48: 22.9 / 41.7 /
-14.6 / 6.2; @0.545: 20.2 / 36.7 / 12.8 / 5.5; @0.72: 15.3 / 27.8 / 9.7 / 4.2).
+14.6 / 6.2; @0.5545: 19.8 / 36.1 / 12.6 / 5.4; @0.72: 15.3 / 27.8 / 9.7 / 4.2).
 Footer tag sits **above** the footer (`bottom:100%`, top corners rounded);
 Header tag hangs **below** the header (`top:100%`, bottom corners rounded).
 
@@ -1542,7 +1542,7 @@ flex-start`, padding 0 12), unlike the centred desktop control (LX-E1
   - row 2: space-between gap 8: readout "390 px · shown at 55%"
     (`role="status"`), then Follow (✓) and Full screen solos 44×44, gap 6,
     **outside the toolbar** — each its own Tab stop, tooltips right-aligned;
-  - stage padding 10; phone frame 213×460 @0.545; status "Following
+  - stage padding 10; phone frame 216×468 @0.5545; status "Following
     **Footer**";
   - the frame opens at the part of the last Site parts card open on Edit (§ 13).
 - **Preview tab from `lg`** (GW-B): the desktop heading row, toolbar (32 px,
@@ -1763,7 +1763,7 @@ one answer.
 | D-37 | Layout between a 1024 window and about 1300.                                                                                                                                                                                                                                                                                                                                                                                              | Drawn: GW-A–GW-C. Two columns from a 900 px content area, tabs below. **Confirmed 31 Oct:** in the tabbed layout from `lg` the index keeps the desktop bar (GW-A marks it "confirm"); below `lg` the chip row.                                                                                                             | board                                          | #6391, #6396               |
 | D-38 | Growth note: G2's six links or LXG-A's seven.                                                                                                                                                                                                                                                                                                                                                                                             | G2's six; its closing line covers the switcher.                                                                                                                                                                                                                                                                            | rule (G2 owns the note)                        | NEW-look-25                |
 | D-39 | Logo hue control: G2 draws a checkbox at .55 (locked) and GC a native checkbox (paid); today it is a Switch.                                                                                                                                                                                                                                                                                                                              | **Confirm-only:** the shared Switch on every plan — paid: checked track `brand`; locked: `aria-disabled`, checked track `control-line`, no opacity. Neither board's checkbox is built.                                                                                                                                     | —                                              | #6384, #6394, #6400        |
-| D-40 | Desktop save bar can cover the preview's status line.                                                                                                                                                                                                                                                                                                                                                                                     | **Confirm-only:** the preview column always leaves 80 px at the bottom — #6413's 64 px docked bar + 16 (§ 6.2); LX-D's 92 px was its floating bar's.                                                                                                                                                                       | —                                              | #6391                      |
+| D-40 | Desktop save bar can cover the preview's status line.                                                                                                                                                                                                                                                                                                                                                                                     | **Confirm-only:** the preview column always leaves the page's bottom padding plus #6413's 64 px docked bar, shown or not, and at least 80 px (§ 6.2); LX-D's 92 px was its floating bar's.                                                                                                                                 | —                                              | #6391                      |
 | D-41 | #6297 items this set replaces.                                                                                                                                                                                                                                                                                                                                                                                                            | Settled: #6297 is closed. PR #6302 shipped the card group naming, which #6391 keeps on the open row's body; it left the phone-width sample footer for a follow-up, which is D-9b. No comment on #6297 is needed.                                                                                                           | code (#6302 merged)                            | #6391                      |
 | D-42 | #6290 after X25 holds only the `LockedReason` SVG; Look's badges replace the glyph once #6400 lands, leaving `SettingRow` on Features (a backdrop page) and Languages — the operator's suspension fields never pass a lock — and Look's own two calls until then.                                                                                                                                                                         | **Decided 31 Oct (Q13):** keep #6290, narrowed to the `LockedReason` SVG, because Features, Languages and suspension still show the glyph. Its own manual test (#6402) is filed with it; nothing in this set depends on it.                                                                                                | —                                              | #6290                      |
 | D-43 | Hue slider thumb: GC draws a 2 px `#12141a` border; the onboarding spec (#6330, which builds the shared thumb for both pages) a 1 px `rgba(16,24,40,.12)` border, same shadow.                                                                                                                                                                                                                                                            | **Decided 31 Oct (Q17):** W2's 1 px border. The thumb is #6330's; Look shows whatever it ships, and no Look ticket builds or checks the knob, so no Look ticket waits on this.                                                                                                                                             | —                                              | #6330                      |
@@ -1981,7 +1981,7 @@ depend on an open decision cite it; tick them against the answer recorded in
 - [ ] No visible h2 (sr-only per D-28)
 - [ ] Row 1, the toolbar: Device (Phone✓), Scheme (Light✓), Reader (Signed out✓), all 44; one Tab stop, arrows inside; Signed-in tooltip right-aligned
 - [ ] Row 2: "390 px · shown at 55%" + Follow✓ and Full screen 44×44, gap 6, outside the toolbar — two further Tab stops, tooltips right-aligned
-- [ ] Stage padding 10; frame 213×460 at 0.545 at the footer, outline + tag; cookie button; status "Following **Footer**" with no "Top of page"
+- [ ] Stage padding 10; frame 216×468 at 0.5545 at the footer, outline + tag; cookie button; status "Following **Footer**" with no "Top of page"
 - [ ] Preview opens at the last card open on Edit
 
 ### LX-F · Toolbar focus

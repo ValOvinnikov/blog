@@ -8,6 +8,7 @@ import {
   PREVIEW_DEVICE,
   type TPreviewDevice,
 } from '@platform/constants/preview';
+import { SAVE_BAR_HEIGHT_PROPERTY } from '@platform/constants/settings-form';
 import { act, render, screen } from '@platform/testing/custom-render';
 import {
   stubChangingMediaQueries,
@@ -34,7 +35,8 @@ const STAGE_CHROME = 50;
 const BELOW_STAGE = 40;
 const WRAPPED_STATUS_GROWTH = 18;
 const PAGE_BOTTOM_PADDING = 24;
-const TALL_PAGE_BOTTOM_PADDING = 120;
+const CONTENT_BOTTOM_PADDING = 26;
+const SHOWN_SAVE_BAR_HEIGHT = 64;
 const roomUnderStageTop = (windowHeight: number) =>
   windowHeight - STAGE_TOP - STAGE_CHROME - BELOW_STAGE;
 const SETTLED_HEIGHT = roomUnderStageTop(WINDOW_HEIGHT);
@@ -174,19 +176,44 @@ describe(useFrameAvailableHeight, () => {
     );
   });
 
-  it('leaves the page bottom padding under a sticky preview when it outgrows the save bar room', () => {
-    stubLayout({ isStageSticky: true });
-    render(
-      <div style={{ paddingBottom: TALL_PAGE_BOTTOM_PADDING }}>
-        <Harness device={PREVIEW_DEVICE.TABLET} isScrollingWithPage={false} />
-      </div>,
-    );
+  it.each([
+    { title: 'before the save bar shows', padding: CONTENT_BOTTOM_PADDING },
+    {
+      title: 'while the save bar shows',
+      padding: CONTENT_BOTTOM_PADDING + SHOWN_SAVE_BAR_HEIGHT,
+      barHeight: SHOWN_SAVE_BAR_HEIGHT,
+    },
+  ])(
+    'leaves the page padding and the docked save bar under a sticky preview $title',
+    ({ padding, barHeight }) => {
+      if (barHeight) {
+        document.documentElement.style.setProperty(
+          SAVE_BAR_HEIGHT_PROPERTY,
+          `${barHeight}px`,
+        );
+        onTestFinished(() =>
+          document.documentElement.style.removeProperty(
+            SAVE_BAR_HEIGHT_PROPERTY,
+          ),
+        );
+      }
+      stubLayout({ isStageSticky: true });
+      render(
+        <div style={{ paddingBottom: padding }}>
+          <Harness device={PREVIEW_DEVICE.TABLET} isScrollingWithPage={false} />
+        </div>,
+      );
 
-    const availableHeight = screen.getByTestId(AVAILABLE_TEST_ID);
-    expect(availableHeight).toHaveTextContent(
-      String(SETTLED_HEIGHT - TALL_PAGE_BOTTOM_PADDING),
-    );
-  });
+      const availableHeight = screen.getByTestId(AVAILABLE_TEST_ID);
+      expect(availableHeight).toHaveTextContent(
+        String(
+          SETTLED_HEIGHT -
+            CONTENT_BOTTOM_PADDING -
+            LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT,
+        ),
+      );
+    },
+  );
 
   it('keeps its height when the status line under the stage grows', () => {
     stubLayout();
