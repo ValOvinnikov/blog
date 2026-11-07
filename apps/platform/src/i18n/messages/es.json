@@ -654,8 +654,8 @@
     "archivedNotice": "Este sitio está archivado, así que sus apps de inicio de sesión no se pueden cambiar.",
     "notOwnerNotice": "Solo el propietario del sitio puede cambiar las apps de inicio de sesión.",
     "keptOnGrowth": "Tu app guardada se conserva. Vuelve con Growth.",
-    "growthAddsGoogle": "Su propia app de Google, para que los lectores vean el nombre de su sitio en lugar del nuestro",
-    "growthAddsGithub": "Su propia app de GitHub, para que los lectores vean el nombre de su sitio en lugar del nuestro",
+    "growthAddsGoogle": "Tu propia app de Google, para que los lectores vean el nombre de tu sitio en lugar del nuestro",
+    "growthAddsGithub": "Tu propia app de GitHub, para que los lectores vean el nombre de tu sitio en lugar del nuestro",
     "callbackWarning": "Tu dirección principal ahora es {domain}. Añade la nueva dirección de callback a tu app de {provider} o los lectores no podrán iniciar sesión con {provider}.",
     "callbackConfirm": "Ya la añadí",
     "callbackConfirmFailed": "No se pudo guardar. Inténtalo de nuevo."

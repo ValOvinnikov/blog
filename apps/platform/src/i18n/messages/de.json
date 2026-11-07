@@ -654,8 +654,8 @@
     "archivedNotice": "Diese Website ist archiviert, daher können ihre Anmelde-Apps nicht geändert werden.",
     "notOwnerNotice": "Nur der Inhaber der Website kann Anmelde-Apps ändern.",
     "keptOnGrowth": "Deine gespeicherte App bleibt erhalten. Mit Growth ist sie wieder da.",
-    "growthAddsGoogle": "Ihre eigene Google-App, damit Leser den Namen Ihrer Website statt unseres sehen",
-    "growthAddsGithub": "Ihre eigene GitHub-App, damit Leser den Namen Ihrer Website statt unseres sehen",
+    "growthAddsGoogle": "Deine eigene Google-App, damit Leser den Namen deiner Website statt unseres sehen",
+    "growthAddsGithub": "Deine eigene GitHub-App, damit Leser den Namen deiner Website statt unseres sehen",
     "callbackWarning": "Deine Hauptadresse ist jetzt {domain}. Füge die neue Callback-Adresse in deiner {provider}-App hinzu, sonst können Leser sich nicht mit {provider} anmelden.",
     "callbackConfirm": "Erledigt",
     "callbackConfirmFailed": "Speichern fehlgeschlagen – versuch es noch einmal."
