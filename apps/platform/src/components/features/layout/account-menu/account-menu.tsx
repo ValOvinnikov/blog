@@ -69,7 +69,7 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
     headerRole,
     signOutIcon,
   } = accountMenuVariants({ placement });
-  const { popup: surfacePopup, item } = menuSurfaceVariants();
+  const { positioner, popup: surfacePopup, item } = menuSurfaceVariants();
 
   const railProps =
     placement === ACCOUNT_MENU_PLACEMENT.RAIL
@@ -109,7 +109,10 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
         )}
       </NestableMenuTrigger>
       <Menu.Portal>
-        <Menu.Positioner {...POSITIONER_PROPS[placement]}>
+        <Menu.Positioner
+          {...POSITIONER_PROPS[placement]}
+          className={positioner()}
+        >
           <Menu.Popup
             aria-label={t('menuLabel')}
             className={surfacePopup({ class: popup() })}

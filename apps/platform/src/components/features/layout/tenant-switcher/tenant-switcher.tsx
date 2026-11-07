@@ -46,7 +46,7 @@ export const TenantSwitcher = ({
     itemDomain,
     itemBadge,
   } = tenantSwitcherVariants();
-  const { popup: surfacePopup } = menuSurfaceVariants();
+  const { positioner, popup: surfacePopup } = menuSurfaceVariants();
 
   if (!active) {
     return null;
@@ -74,6 +74,7 @@ export const TenantSwitcher = ({
           side={isNested ? 'bottom' : undefined}
           sideOffset={isNested ? 6 : 4}
           align="start"
+          className={positioner()}
         >
           {/* Base UI points the popup's aria-labelledby at the trigger unconditionally,
               which wins over any aria-label here per the accname algorithm — and the

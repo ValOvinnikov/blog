@@ -1,3 +1,4 @@
+import { MENU_POPUP_FIT_WIDTH } from '@platform/components/shared/menu-surface';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -22,7 +23,7 @@ export const tenantSwitcherVariants = tv({
     ],
     chev: ['shrink-0 text-admin-muted'],
     badge: ['shrink-0'],
-    popup: ['w-[var(--anchor-width)]'],
+    popup: [MENU_POPUP_FIT_WIDTH],
     item: [
       'flex min-h-11 cursor-pointer flex-col justify-center rounded-admin-control px-2 py-1.5 outline-none md:min-h-0',
       'data-[highlighted]:bg-admin-popover-hover',

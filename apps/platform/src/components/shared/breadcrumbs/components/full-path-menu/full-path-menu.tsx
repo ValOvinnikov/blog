@@ -22,7 +22,12 @@ export const FullPathMenu = ({ items }: TFullPathMenuProps) => {
   const groups = groupCrumbs(items);
   const firstLink = groups.find(({ links }) => hasLength(links))?.links[0];
   const { trigger, popup } = fullPathMenuVariants();
-  const { popup: surfacePopup, item, groupLabel } = menuSurfaceVariants();
+  const {
+    positioner,
+    popup: surfacePopup,
+    item,
+    groupLabel,
+  } = menuSurfaceVariants();
 
   const handleOpenChangeComplete = (isOpen: boolean) => {
     if (isOpen) {
@@ -48,7 +53,12 @@ export const FullPathMenu = ({ items }: TFullPathMenuProps) => {
         …
       </Menu.Trigger>
       <Menu.Portal>
-        <Menu.Positioner side="bottom" align="start" sideOffset={7}>
+        <Menu.Positioner
+          side="bottom"
+          align="start"
+          sideOffset={7}
+          className={positioner()}
+        >
           <Menu.Popup
             aria-label={t('fullPathMenuLabel')}
             className={surfacePopup({ class: popup() })}

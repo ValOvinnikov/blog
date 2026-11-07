@@ -47,6 +47,8 @@ export const MorePresetsPopover = <TId extends string>({
   const listRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const { positioner, header, title, count } = morePresetsPopoverVariants();
+  const { positioner: surfacePositioner, popup: surfacePopup } =
+    menuSurfaceVariants();
 
   const choose = (id: TId) => {
     hasChosenRef.current = true;
@@ -89,13 +91,13 @@ export const MorePresetsPopover = <TId extends string>({
           side="bottom"
           align="start"
           sideOffset={8}
-          className={positioner()}
+          className={surfacePositioner({ class: positioner() })}
         >
           <Popover.Popup
             initialFocus={listRef}
             finalFocus={focusAfterClose}
             onKeyDown={closeOnTab}
-            className={menuSurfaceVariants().popup({ class: 'p-0' })}
+            className={surfacePopup({ class: 'p-0' })}
           >
             <div className={header()}>
               <Popover.Title id={titleId} className={title()}>

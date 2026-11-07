@@ -1,3 +1,4 @@
+import { MENU_POPUP_FIT_WIDTH } from '@platform/components/shared/menu-surface';
 import { ACCOUNT_MENU_PLACEMENT } from '@platform/constants/account-menu';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
@@ -35,7 +36,7 @@ export const accountMenuVariants = tv({
     placement: {
       [ACCOUNT_MENU_PLACEMENT.FOOT]: {
         trigger: [...SIDEBAR_TRIGGER, EXPANDED_TRIGGER],
-        popup: ['w-[var(--anchor-width)]'],
+        popup: [MENU_POPUP_FIT_WIDTH],
       },
       [ACCOUNT_MENU_PLACEMENT.RAIL]: {
         trigger: [
