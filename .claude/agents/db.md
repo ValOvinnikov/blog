@@ -145,7 +145,7 @@ to dev's existing rows, so a new `NOT NULL` column needs a default.
    development Neon branch needs no backup. `deploy-development.yml`'s
    `migrate-db` job also applies pending migrations on each dev deploy
    (currently manual dispatch — CLAUDE.md → Deployment), ahead of
-   `deploy-web`/`deploy-admin`, and fails loudly if its host matches the repo
+   `deploy-web`/`deploy-platform`, and fails loudly if its host matches the repo
    Variable `PRODUCTION_DB_HOST`.
 4. **Production only through CI.** `deploy-production.yml`'s `migrate-db`
    job runs on a `vX.Y.Z` tag plus the `production` Environment's

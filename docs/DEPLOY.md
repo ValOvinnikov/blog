@@ -88,7 +88,7 @@ distinct GitHub Environment variables (`VERCEL_PROJECT_ID_WEB` /
 Most workflows are written to **no-op green until their secrets exist**, so the
 code can merge first; the pipeline activates once the steps below are done.
 `deploy-production.yml` is the deliberate exception: its `deploy-web` and
-`deploy-admin` jobs fail loudly on a missing Vercel token, org id or project
+`deploy-platform` jobs fail loudly on a missing Vercel token, org id or project
 id, because a skipped step reports green and a tag that shipped only one of the
 two apps would otherwise look like a complete release.
 
@@ -568,7 +568,7 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-dev**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-dev**)
-      — the `deploy-admin` job's target; until it's set that job no-ops green.
+      — the `deploy-platform` job's target; until it's set that job no-ops green.
 - [ ] Variable `VERCEL_PROJECT_ID_WORKER` = `<VERCEL_PROJECT_ID>` (**worker-dev**)
       — the `deploy-worker` job's target; unset, that job fails naming it.
 - [ ] Secrets `VERCEL_AUTOMATION_BYPASS_SECRET_WEB`, `_PLATFORM` and `_WORKER`
@@ -593,7 +593,7 @@ names, so their block below applies to **both** environments rather than only to
 - [ ] Variable `VERCEL_ORG_ID` = `<VERCEL_ORG_ID>`
 - [ ] Variable `VERCEL_PROJECT_ID_WEB` = `<VERCEL_PROJECT_ID>` (**web-prod**)
 - [ ] Variable `VERCEL_PROJECT_ID_PLATFORM` = `<VERCEL_PROJECT_ID>` (**platform-prod**)
-      — the `deploy-admin` job's target; until it's set that job no-ops green.
+      — the `deploy-platform` job's target; until it's set that job no-ops green.
 - [ ] Secrets `VERCEL_AUTOMATION_BYPASS_SECRET_WEB` and `_PLATFORM` = each prod
       project's Protection Bypass for Automation secret.
 - [ ] Variable `BACKUP_R2_ENDPOINT` = `https://<ACCOUNT_ID>.r2.cloudflarestorage.com`
@@ -1068,7 +1068,7 @@ nothing deploys before checks pass):
    to the **development** dataset via `migrate:deploy` (a no-op when none are
    pending), so dev's data never lags its code — the #355 failure mode. It is
    gated on `studio`-or-`web` — the union of the jobs that depend on it, narrower
-   than `verify`'s condition, so an admin-only merge doesn't run a Sanity
+   than `verify`'s condition, so a platform-only merge doesn't run a Sanity
    migration for an app that never touches Sanity, while still never being
    skipped out from under a deploy that needs it. `deploy-web` `needs: [changes, verify,
 migrate, migrate-db]` (see step 4 below for `migrate-db`). No
@@ -1084,7 +1084,7 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`, a no-op when
    none are pending). Gated on `web`, `admin` or `worker` (the Studio never
    touches Postgres, so a studio-only change doesn't trigger it);
-   `deploy-web`, `deploy-admin` and `deploy-worker` `need` it. No artifact backup here,
+   `deploy-web`, `deploy-platform` and `deploy-worker` `need` it. No artifact backup here,
    same disposable-staging-line stance as `migrate`; a missing
    `DATABASE_URL_UNPOOLED` fails the job with a message naming that secret,
    rather than skipping the steps (#2734). Before
@@ -1099,7 +1099,7 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    (`vercel pull → build --prod`, then `scripts/vercel-deploy-checked.sh
 stage`: `deploy --prebuilt --prod --skip-domain → request`; see "A deploy
    goes live only after every app starts" below).
-6. **`deploy-admin`** → `platform-dev` via the Vercel CLI, same mechanism.
+6. **`deploy-platform`** → `platform-dev` via the Vercel CLI, same mechanism.
    `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
    public site is, but not on `migrate`, since it never reads Sanity.
@@ -1156,7 +1156,7 @@ Concurrency is scoped **per job**, not workflow-wide. `changes` / `verify` /
 `deploy-*` each keep `cancel-in-progress: true`, so a newer merge still
 supersedes an in-flight build/deploy — "latest merge wins" still holds. (The
 supersede is slightly lazier than the old workflow-level cancel: a per-job
-group cancels an older run's `deploy-web`/`deploy-admin` only once the newer
+group cancels an older run's `deploy-web`/`deploy-platform` only once the newer
 run's _same_ job is ready to start — i.e. after the newer run clears its own
 `changes` → `verify` → `migrate`/`migrate-db` chain — so an old deploy can
 finish before being superseded rather than being cut off the instant a new
@@ -1207,19 +1207,19 @@ There are **no PR preview deployments** — deploys happen only on merge to
    unset or malformed. A missing `DATABASE_URL_UNPOOLED` likewise **fails the
    job**, naming that secret, rather than skipping its steps (#2734) — same
    reasoning as `migrate` above, with the `pg_dump` backup skipped alongside
-   the migration. `deploy-web` and `deploy-admin` `need` it (the Studio never
+   the migration. `deploy-web` and `deploy-platform` `need` it (the Studio never
    touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
 4. **`deploy-web`** (Stage prod web) → stages `web-prod` via the Vercel CLI,
    through the same start check as dev (`vercel pull → build --prod`, then
    `scripts/vercel-deploy-checked.sh stage`).
-5. **`deploy-admin`** (Stage prod admin) → stages `platform-prod`, same
+5. **`deploy-platform`** (Stage prod platform) → stages `platform-prod`, same
    mechanism. A tag is a deliberate full release, so both apps deploy — there
    is no change detection on the production side.
 6. **`promote`** (Promote prod apps) → promotes both apps only when both
    stage jobs passed; a failed or skipped stage job promotes neither.
 
 `deploy-web` `needs: [full-gate,
-migrate, migrate-db]`; `deploy-admin` `needs: [full-gate, migrate-db]` — so **new
+migrate, migrate-db]`; `deploy-platform` `needs: [full-gate, migrate-db]` — so **new
 code is never served before pending migrations run**; a failed or
 reviewer-rejected `migrate`/`migrate-db` skips the deploy(s) that depend on
 it, leaving the old code serving the old (un-migrated) data.
