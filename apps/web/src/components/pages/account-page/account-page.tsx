@@ -1,7 +1,7 @@
 import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { routes } from '@blog/config';
 import { auth } from '@web/server/auth/auth';
-import { getSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
+import { getHostSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { redirect } from 'next/navigation';
@@ -14,7 +14,7 @@ import { NewsletterSection } from './sections/newsletter-section';
 import { PrivacySection } from './sections/privacy-section';
 
 export const AccountPage = async () => {
-  const [session, { isOperatorSuspended, tenantId }] = await Promise.all([
+  const [session, { isOperatorSuspended }] = await Promise.all([
     auth(),
     getRequestContext(),
   ]);
@@ -24,7 +24,7 @@ export const AccountPage = async () => {
 
     const [t, siteOAuthCredentials] = await Promise.all([
       getTranslations('accountPage'),
-      getSiteOAuthCredentials(tenantId),
+      getHostSiteOAuthCredentials(),
     ]);
     return (
       <AccountSignIn

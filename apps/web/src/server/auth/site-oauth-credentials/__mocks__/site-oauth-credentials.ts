@@ -7,3 +7,7 @@ export const getSiteOAuthCredentials = vi.fn<
 export const getRequestSiteOAuthCredentials = vi.fn<
   typeof TModule.getRequestSiteOAuthCredentials
 >(async () => ({}));
+
+export const getHostSiteOAuthCredentials = vi.fn<
+  typeof TModule.getHostSiteOAuthCredentials
+>(async () => ({}));
