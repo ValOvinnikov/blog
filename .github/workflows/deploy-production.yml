@@ -60,7 +60,7 @@ jobs:
     secrets: inherit
 
   deploy-web:
-    name: Deploy prod web
+    name: Stage prod web
     needs: [full-gate, migrate, migrate-db]
     # A migration job is skipped only on the callable path, where release.yml
     # has already run it; anything else short of success blocks the deploy.
@@ -71,6 +71,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
+    outputs:
+      url: ${{ steps.stage.outputs.url }}
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_AUTOMATION_BYPASS_SECRET_WEB: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET_WEB }}
@@ -92,7 +94,8 @@ jobs:
       # Vercel CLI runs its own `next build` with the project's Production env
       # vars pulled from Vercel (root directory apps/web is stored on the
       # project, so build resolves the monorepo workspaces correctly).
-      - name: Deploy to Vercel (production)
+      - name: Stage on Vercel (web-prod)
+        id: stage
         run: |
           set -euo pipefail
           # Every value is checked here rather than in an `if:`, because a
@@ -107,12 +110,12 @@ jobs:
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
           # A Sensitive var reaches this runner as the literal `[SENSITIVE]`, so the
           # build skips env validation. The script validates instead: it starts
-          # the new deployment with the real env and promotes it only if it starts.
+          # the new deployment with the real env and stages it only if it starts.
           SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
-          bash scripts/vercel-deploy-checked.sh web /
+          bash scripts/vercel-deploy-checked.sh stage web /
 
   deploy-admin:
-    name: Deploy prod admin
+    name: Stage prod admin
     needs: [full-gate, migrate-db]
     if: >-
       ${{ !cancelled() && needs.full-gate.result == 'success' &&
@@ -120,6 +123,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
+    outputs:
+      url: ${{ steps.stage.outputs.url }}
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_AUTOMATION_BYPASS_SECRET_PLATFORM: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET_PLATFORM }}
@@ -144,7 +149,8 @@ jobs:
       # Vercel CLI runs its own `next build` with the project's Production env
       # vars pulled from Vercel (root directory apps/platform is stored on the
       # project, so build resolves the monorepo workspaces correctly).
-      - name: Deploy to Vercel (platform-prod)
+      - name: Stage on Vercel (platform-prod)
+        id: stage
         run: |
           set -euo pipefail
           # Every value is checked here rather than in an `if:`, because a
@@ -158,6 +164,48 @@ jobs:
           npx --yes "vercel@${VERCEL_CLI_VERSION}" pull --yes --environment=production --token="$VERCEL_TOKEN"
           # A Sensitive var reaches this runner as the literal `[SENSITIVE]`, so the
           # build skips env validation. The script validates instead: it starts
-          # the new deployment with the real env and promotes it only if it starts.
+          # the new deployment with the real env and stages it only if it starts.
           SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
-          bash scripts/vercel-deploy-checked.sh platform /
+          bash scripts/vercel-deploy-checked.sh stage platform /
+
+  # A release is all or nothing: neither app is promoted until both have passed
+  # their checks. A tag always deploys both, so a skipped stage job blocks too.
+  promote:
+    name: Promote prod apps
+    needs: [full-gate, migrate, migrate-db, deploy-web, deploy-admin]
+    if: ${{ !cancelled() && needs.full-gate.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+          persist-credentials: false
+
+      - name: Both apps passed their checks
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+          REQUIRED_JOBS: deploy-web deploy-admin
+        run: bash scripts/vercel-deploy-checked.sh gate
+
+      - name: Promote web-prod
+        env:
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_WEB }}
+          URL: ${{ needs.deploy-web.outputs.url }}
+        run: |
+          set -euo pipefail
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_WEB Variable on the production environment}"
+          bash scripts/vercel-deploy-checked.sh promote web "$URL"
+
+      - name: Promote platform-prod
+        env:
+          VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_PLATFORM }}
+          URL: ${{ needs.deploy-admin.outputs.url }}
+        run: |
+          set -euo pipefail
+          : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the production environment}"
+          bash scripts/vercel-deploy-checked.sh promote platform "$URL"

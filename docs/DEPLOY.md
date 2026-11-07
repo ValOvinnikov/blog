@@ -1095,10 +1095,10 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    skips) if that Variable is unset or malformed. **No approval gate on
    dev.** See
    `.claude/agents/db.md`'s "Migrations" section.
-5. **`deploy-web`** → `web-dev` via the Vercel CLI
-   (`vercel pull → build --prod`, then `scripts/vercel-deploy-checked.sh`:
-   `deploy --prebuilt --prod --skip-domain → request → promote`; see
-   "A deploy goes live only after it starts" below).
+5. **`deploy-web`** (Stage dev web) → stages `web-dev` via the Vercel CLI
+   (`vercel pull → build --prod`, then `scripts/vercel-deploy-checked.sh
+stage`: `deploy --prebuilt --prod --skip-domain → request`; see "A deploy
+   goes live only after every app starts" below).
 6. **`deploy-admin`** → `platform-dev` via the Vercel CLI, same mechanism.
    `needs: [changes, verify, migrate-db]` — it depends on `@blog/db` (it
    writes `site_config`), so it is at least as exposed to schema drift as the
@@ -1108,6 +1108,9 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    it writes the tenant registry through `@blog/db`, and reaches Sanity only
    through the Management API and `@sanity/client`, never the dev dataset's
    content migrations.
+8. **`promote`** (Promote dev apps) → once every stage job this run deployed
+   has passed its check, runs `vercel promote` on every staged app. One
+   failed check promotes none.
 
    **The personal-data keys may be stored as Sensitive.** The
    build runs on the GitHub runner, where `vercel pull` writes a Sensitive
@@ -1117,14 +1120,21 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    `PERSONAL_DATA_INDEX_KEY` fails there with the same format message.
    Production deploys the same way.
 
-   **A deploy goes live only after it starts.** Each deploy job ends in
-   `scripts/vercel-deploy-checked.sh <app> <path>`. It deploys with
+   **A deploy goes live only after every app starts.** Each stage job ends
+   in `scripts/vercel-deploy-checked.sh stage <app> <path>`. It deploys with
    `--skip-domain`, so the new deployment gets no domain yet, then requests
    `<path>` on the deployment's own URL. That request starts the server with
    the real env, Sensitive values included. A 5xx or an `x-vercel-error`
-   header fails the job with `<app> deployment did not start` and the
-   deployment is never promoted, so the sites keep serving the previous one.
-   Otherwise the script runs `vercel promote`. Web and admin are requested at
+   header fails the job with `<app> deployment did not start` and writes the
+   app's failure to the run summary. Otherwise the job outputs the
+   deployment URL. The `promote` job then runs `vercel-deploy-checked.sh
+gate`, which fails with `No app was promoted`, naming every job that did
+   not succeed, unless every stage job that ran passed; only then does it
+   run `vercel-deploy-checked.sh promote` for each staged app. A failed check
+   therefore leaves every site on its previous deployment, and an app the
+   change detection skipped is neither staged nor waited for. Migrations
+   still run before the stage jobs, so a failed check leaves the database
+   migrated and the code unchanged. Web and admin are requested at
    `/`, where the proxy runs; the worker has no page, so it is requested at
    `/api/inactivity-sweep`, which loads its env and answers 401 without the
    cron secret. Deployment Protection answers before the app does: a `302` to
@@ -1199,12 +1209,14 @@ There are **no PR preview deployments** — deploys happen only on merge to
    reasoning as `migrate` above, with the `pg_dump` backup skipped alongside
    the migration. `deploy-web` and `deploy-admin` `need` it (the Studio never
    touches Postgres). See `.claude/agents/db.md`'s "Migrations" section.
-4. **`deploy-web`** → `web-prod` via the Vercel CLI, through the same
-   start check as dev (`vercel pull → build --prod`, then
-   `scripts/vercel-deploy-checked.sh`).
-5. **`deploy-admin`** → `platform-prod` via the Vercel CLI, same mechanism. A tag
-   is a deliberate full release, so both apps deploy — there is no change
-   detection on the production side.
+4. **`deploy-web`** (Stage prod web) → stages `web-prod` via the Vercel CLI,
+   through the same start check as dev (`vercel pull → build --prod`, then
+   `scripts/vercel-deploy-checked.sh stage`).
+5. **`deploy-admin`** (Stage prod admin) → stages `platform-prod`, same
+   mechanism. A tag is a deliberate full release, so both apps deploy — there
+   is no change detection on the production side.
+6. **`promote`** (Promote prod apps) → promotes both apps only when both
+   stage jobs passed; a failed or skipped stage job promotes neither.
 
 `deploy-web` `needs: [full-gate,
 migrate, migrate-db]`; `deploy-admin` `needs: [full-gate, migrate-db]` — so **new
