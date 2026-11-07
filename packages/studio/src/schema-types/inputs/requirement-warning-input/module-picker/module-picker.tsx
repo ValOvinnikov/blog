@@ -1,25 +1,17 @@
-import { LockIcon } from '@blog/studio/schema-types/icons/lock-icon/lock-icon';
+import type { TMaybeNull } from '@blog/config/types';
 import { textSizedIcon } from '@blog/studio/schema-types/icons/text-sized-icon/text-sized-icon';
-import {
-  getLockedModulesNote,
-  getMissingModulePack,
-  getModulePackPlanLabel,
-  type TEntitlementState,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import {
-  getModulePickerSections,
-  getOffPlanModulePack,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
-import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
-import { hasLength } from '@blog/utils/primitives';
-import { Badge, Box, Button, Grid, Text, TextInput } from '@sanity/ui';
-import { Menu, MenuButton, MenuDivider, MenuItem } from '@sanity/ui/menu';
-import { Plus, Search } from 'lucide-react';
-import { Fragment, useId, useState } from 'react';
+import type { TEntitlementState } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
+import { ModulePickerMenu } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-menu';
+import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
+import { Button, Grid, useClickOutsideEvent } from '@sanity/ui';
+import { Popover } from '@sanity/ui/popover';
+import { Plus } from 'lucide-react';
+import { useContext, useRef, useState } from 'react';
 import {
   type ArrayInputFunctionsProps,
   type ArraySchemaType,
   type SchemaType,
+  usePortalBoundary,
   useTranslation,
 } from 'sanity';
 
@@ -29,15 +21,10 @@ type TModulePickerProps = ArrayInputFunctionsProps<
 >;
 
 const AddIcon = textSizedIcon(Plus);
-const SearchIcon = textSizedIcon(Search);
 
-const SectionLabel = ({ title }: { title: string }) => (
-  <Box paddingX={3} paddingTop={3} paddingBottom={2}>
-    <Text size={1} weight="medium" muted={true}>
-      {title}
-    </Text>
-  </Box>
-);
+const GRID_STYLE = {
+  gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+};
 
 export const createModulePicker = ({
   entitledModulePacks,
@@ -49,103 +36,68 @@ export const createModulePicker = ({
     onValueCreate,
   }: TModulePickerProps) {
     const { t } = useTranslation();
-    const id = useId();
-    const [query, setQuery] = useState('');
-    const sections = getModulePickerSections({
-      types: schemaType.of,
-      groups: schemaType.options?.insertMenu?.groups,
-      query,
-    });
-    const offPlanPack = getOffPlanModulePack(
-      schemaType.of,
-      entitledModulePacks,
-    );
-    const addButton = (
-      <Button
-        icon={AddIcon}
-        mode="ghost"
-        padding={3}
-        text={t('inputs.array.action.add-item-select-type')}
-        disabled={readOnly}
-      />
+    const types = useContext(ModulePickerTypesContext) ?? schemaType.of;
+    const [open, setOpen] = useState(false);
+    const [gridElement, setGridElement] =
+      useState<TMaybeNull<HTMLDivElement>>(null);
+    const [toggleElement, setToggleElement] =
+      useState<TMaybeNull<HTMLButtonElement>>(null);
+    const popoverRef = useRef<TMaybeNull<HTMLDivElement>>(null);
+    const floatingBoundary = usePortalBoundary() ?? undefined;
+
+    useClickOutsideEvent(
+      () => setOpen(false),
+      () => [popoverRef.current, toggleElement],
     );
 
-    if (readOnly) {
-      return <Grid>{addButton}</Grid>;
-    }
+    const close = () => {
+      setOpen(false);
+      toggleElement?.focus();
+    };
 
-    const append = (type: SchemaType) =>
+    const append = (type: SchemaType) => {
       // Sanity types `onValueCreate` with the array's own schema type, but calls it with the member type.
       onItemAppend(onValueCreate(type as ArraySchemaType));
+      setOpen(false);
+    };
 
     return (
-      <Grid>
-        <MenuButton
-          id={id}
-          button={addButton}
-          onClose={() => setQuery('')}
-          popover={{ portal: true, matchReferenceWidth: true }}
-          menu={
-            <Menu>
-              <TextInput
-                autoFocus={true}
-                border={false}
-                fontSize={1}
-                icon={SearchIcon}
-                placeholder={t('inputs.array.insert-menu.search.placeholder')}
-                value={query}
-                onChange={(event) => setQuery(event.currentTarget.value)}
-              />
-              {sections.map((section) => (
-                <Fragment key={section.name}>
-                  {section.title && <SectionLabel title={section.title} />}
-                  {section.types.map((type) => {
-                    const missingPack = getMissingModulePack(
-                      type.name,
-                      entitledModulePacks,
-                    );
-
-                    return missingPack ? (
-                      <MenuItem
-                        key={type.name}
-                        disabled={true}
-                        icon={LockIcon}
-                        text={getModuleTitle(type.name)}
-                        iconRight={
-                          <Badge>{getModulePackPlanLabel(missingPack)}</Badge>
-                        }
-                      />
-                    ) : (
-                      <MenuItem
-                        key={type.name}
-                        icon={type.icon}
-                        text={type.title ?? type.name}
-                        onClick={() => append(type)}
-                      />
-                    );
-                  })}
-                </Fragment>
-              ))}
-              {!hasLength(sections) && (
-                <Box padding={3}>
-                  <Text size={1} muted={true}>
-                    {t('inputs.array.insert-menu.search.no-results')}
-                  </Text>
-                </Box>
-              )}
-              {offPlanPack && (
-                <>
-                  <MenuDivider />
-                  <Box padding={3}>
-                    <Text size={1} muted={true}>
-                      {getLockedModulesNote(offPlanPack)}
-                    </Text>
-                  </Box>
-                </>
-              )}
-            </Menu>
-          }
+      <Grid ref={setGridElement} gap={1} style={GRID_STYLE}>
+        <Button
+          ref={setToggleElement}
+          icon={AddIcon}
+          mode="ghost"
+          gap={3}
+          padding={3}
+          text={t('inputs.array.action.add-item-select-type')}
+          disabled={readOnly}
+          selected={open}
+          onClick={() => setOpen((wasOpen) => !wasOpen)}
         />
+        {!readOnly && (
+          <Popover
+            ref={popoverRef}
+            open={open}
+            animate={true}
+            constrainSize={true}
+            overflow="hidden"
+            portal={true}
+            placement="bottom"
+            fallbackPlacements={['top']}
+            floatingBoundary={floatingBoundary}
+            referenceBoundary={gridElement}
+            referenceElement={toggleElement}
+            content={
+              <ModulePickerMenu
+                types={types}
+                insertMenu={schemaType.options?.insertMenu}
+                entitledModulePacks={entitledModulePacks}
+                onSelect={append}
+                onEscape={close}
+              />
+            }
+          />
+        )}
       </Grid>
     );
   };

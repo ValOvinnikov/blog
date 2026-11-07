@@ -1,20 +1,17 @@
 import type { TModulePack } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
-import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
-import { hasArrayGotItems, isNull } from '@blog/utils/primitives';
+import { isNull, isUndefined } from '@blog/utils/primitives';
+import type { ComponentType } from 'react';
+import type { InsertMenuOptions, SchemaType } from 'sanity';
 
 type TPickerType = { name: string };
 
-type TPickerGroup = { name: string; title?: string; of?: string[] };
+type TPickerGroup = NonNullable<InsertMenuOptions['groups']>[number];
 
-type TModulePickerSection<T extends TPickerType> = {
-  name: string;
-  title: TMaybeUndefined<string>;
-  types: T[];
-};
+const AUTO_FILTER_MIN_TYPES = 6;
 
-const UNGROUPED_SECTION = 'ungrouped';
+export const ALL_ITEMS_TAB = 'all-items';
 
 export const getOffPlanModulePack = (
   types: readonly TPickerType[],
@@ -24,32 +21,56 @@ export const getOffPlanModulePack = (
     .map(({ name }) => getMissingModulePack(name, entitledModulePacks))
     .find((modulePack) => !isNull(modulePack)) ?? undefined;
 
-export const getModulePickerSections = <T extends TPickerType>({
+export const isModulePickerSearchShown = (
+  filter: InsertMenuOptions['filter'],
+  typeCount: number,
+) =>
+  isUndefined(filter) || filter === 'auto'
+    ? typeCount >= AUTO_FILTER_MIN_TYPES
+    : filter;
+
+const matchesQuery = ({ name, title }: SchemaType, query: string) => {
+  const needle = query.trim().toLowerCase();
+
+  return title ? title.toLowerCase().includes(needle) : name.includes(needle);
+};
+
+const matchesTab = (
+  { name }: SchemaType,
+  groups: readonly TPickerGroup[],
+  tab: string,
+) =>
+  tab === ALL_ITEMS_TAB ||
+  Boolean(groups.find((group) => group.name === tab)?.of?.includes(name));
+
+export const filterModulePickerTypes = ({
   types,
   groups = [],
+  tab,
   query,
 }: {
-  types: readonly T[];
+  types: readonly SchemaType[];
   groups?: readonly TPickerGroup[];
+  tab: string;
   query: string;
-}): TModulePickerSection<T>[] => {
-  const needle = query.trim().toLowerCase();
-  const matching = types.filter(({ name }) =>
-    getModuleTitle(name).toLowerCase().includes(needle),
+}) =>
+  types.filter(
+    (type) => matchesTab(type, groups, tab) && matchesQuery(type, query),
   );
-  const matchingByName = new Map(matching.map((type) => [type.name, type]));
-  const grouped = new Set(groups.flatMap((group) => group.of ?? []));
 
-  return [
-    ...groups.map((group) => ({
-      name: group.name,
-      title: group.title ?? group.name,
-      types: (group.of ?? []).flatMap((name) => matchingByName.get(name) ?? []),
-    })),
-    {
-      name: UNGROUPED_SECTION,
-      title: undefined,
-      types: matching.filter(({ name }) => !grouped.has(name)),
-    },
-  ].filter(({ types: sectionTypes }) => hasArrayGotItems(sectionTypes));
+const isReferenceType = (type: unknown): type is { to: SchemaType[] } =>
+  typeof type === 'object' &&
+  !isNull(type) &&
+  'name' in type &&
+  (type.name === 'reference' || ('type' in type && isReferenceType(type.type)));
+
+export const getModulePickerIcon = (
+  type: SchemaType,
+): TMaybeUndefined<ComponentType> => {
+  const referenceIcon =
+    isReferenceType(type) && type.to?.length === 1
+      ? type.to[0]?.icon
+      : undefined;
+
+  return type.icon ?? type.type?.icon ?? referenceIcon;
 };

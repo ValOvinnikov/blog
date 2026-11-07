@@ -1,92 +1,140 @@
 import { MODULE_PACK } from '@blog/config/constants';
 import {
-  getModulePickerSections,
+  ALL_ITEMS_TAB,
+  filterModulePickerTypes,
+  getModulePickerIcon,
   getOffPlanModulePack,
+  isModulePickerSearchShown,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
-import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
-import { newsletterSchema } from '@blog/studio/schema-types/modules/newsletter/newsletter';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
-import { getModuleTitle } from '@blog/studio/structure/module-kinds/module-kinds';
 import { faker } from '@faker-js/faker';
+import type { ComponentType } from 'react';
+import type { SchemaType } from 'sanity';
 
 faker.seed(6569);
 
 const MOCK_GROUP = faker.lorem.word();
-const MOCK_UNGROUPED_TYPE = { name: faker.lorem.word() };
-const CTA_TYPE = { name: ctaSchema.name };
-const FAQ_TYPE = { name: faqSchema.name };
-const PRICING_TYPE = { name: pricingSchema.name };
+const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_ICON: ComponentType = () => null;
+const MOCK_TARGET_ICON: ComponentType = () => null;
+
+const asSchemaType = (type: object) => type as SchemaType;
+
+const CTA_TYPE = asSchemaType({ name: ctaSchema.name, title: MOCK_TITLE });
+const FAQ_TYPE = asSchemaType({ name: faqSchema.name });
+const PRICING_TYPE = asSchemaType({ name: pricingSchema.name });
 const TYPES = [CTA_TYPE, PRICING_TYPE, FAQ_TYPE];
-const GROUPS = [
-  { name: MOCK_GROUP, of: [CTA_TYPE.name, PRICING_TYPE.name, FAQ_TYPE.name] },
-];
+const GROUPS = [{ name: MOCK_GROUP, of: [FAQ_TYPE.name, CTA_TYPE.name] }];
 
-describe(getModulePickerSections, () => {
-  it('keeps every module in its group, in order', () => {
-    const sections = getModulePickerSections({
-      types: TYPES,
-      groups: GROUPS,
-      query: '',
-    });
-
-    expect(sections.map(({ name, types }) => [name, types])).toEqual([
-      [MOCK_GROUP, TYPES],
-    ]);
-  });
-
-  it('restores a locked module to its place when the list puts it last', () => {
-    const contactFormType = { name: contactFormSchema.name };
-    const newsletterType = { name: newsletterSchema.name };
-    const sections = getModulePickerSections({
-      types: [CTA_TYPE, newsletterType, contactFormType],
-      groups: [
-        {
-          name: MOCK_GROUP,
-          of: [CTA_TYPE.name, contactFormType.name, newsletterType.name],
-        },
-      ],
-      query: '',
-    });
-
-    expect(sections.map(({ types }) => types)).toEqual([
-      [CTA_TYPE, contactFormType, newsletterType],
-    ]);
-  });
-
-  it('lists a module no group names in an untitled section', () => {
-    const sections = getModulePickerSections({
-      types: [CTA_TYPE, MOCK_UNGROUPED_TYPE],
-      groups: GROUPS,
-      query: '',
-    });
-
-    expect(sections.map(({ title, types }) => [title, types])).toEqual([
-      [MOCK_GROUP, [CTA_TYPE]],
-      [undefined, [MOCK_UNGROUPED_TYPE]],
-    ]);
-  });
-
-  it('keeps only modules whose title matches the search, in any case', () => {
-    const sections = getModulePickerSections({
-      types: TYPES,
-      groups: GROUPS,
-      query: ` ${getModuleTitle(PRICING_TYPE.name).toUpperCase()} `,
-    });
-
-    expect(sections.map(({ types }) => types)).toEqual([[PRICING_TYPE]]);
-  });
-
-  it('returns no section when nothing matches the search', () => {
+describe(filterModulePickerTypes, () => {
+  it('keeps every type, in order, on the all tab', () => {
     expect(
-      getModulePickerSections({
+      filterModulePickerTypes({
         types: TYPES,
         groups: GROUPS,
-        query: faker.string.alphanumeric(24),
+        tab: ALL_ITEMS_TAB,
+        query: '',
+      }),
+    ).toEqual(TYPES);
+  });
+
+  it("keeps only a group's types, in the field's order, on its tab", () => {
+    expect(
+      filterModulePickerTypes({
+        types: TYPES,
+        groups: GROUPS,
+        tab: MOCK_GROUP,
+        query: '',
+      }),
+    ).toEqual([CTA_TYPE, FAQ_TYPE]);
+  });
+
+  it('matches the search against the title, in any case', () => {
+    expect(
+      filterModulePickerTypes({
+        types: TYPES,
+        groups: GROUPS,
+        tab: MOCK_GROUP,
+        query: ` ${MOCK_TITLE.toUpperCase()} `,
+      }),
+    ).toEqual([CTA_TYPE]);
+  });
+
+  it('matches the search against the name of an untitled type', () => {
+    expect(
+      filterModulePickerTypes({
+        types: TYPES,
+        tab: ALL_ITEMS_TAB,
+        query: pricingSchema.name,
+      }),
+    ).toEqual([PRICING_TYPE]);
+  });
+
+  it('keeps nothing when the search matches no type on the tab', () => {
+    expect(
+      filterModulePickerTypes({
+        types: TYPES,
+        groups: GROUPS,
+        tab: MOCK_GROUP,
+        query: pricingSchema.name,
       }),
     ).toEqual([]);
+  });
+});
+
+describe(isModulePickerSearchShown, () => {
+  it.each([
+    { filter: undefined, typeCount: 5, expected: false },
+    { filter: undefined, typeCount: 6, expected: true },
+    { filter: 'auto' as const, typeCount: 6, expected: true },
+    { filter: false, typeCount: 6, expected: false },
+    { filter: true, typeCount: 1, expected: true },
+  ])(
+    'shows the search with filter $filter and $typeCount types: $expected',
+    ({ filter, typeCount, expected }) => {
+      expect(isModulePickerSearchShown(filter, typeCount)).toBe(expected);
+    },
+  );
+});
+
+describe(getModulePickerIcon, () => {
+  const reference = { name: 'reference' };
+
+  it('uses the icon of the one type a reference points to', () => {
+    const type = asSchemaType({
+      name: ctaSchema.name,
+      type: reference,
+      to: [{ name: ctaSchema.name, icon: MOCK_TARGET_ICON }],
+    });
+
+    expect(getModulePickerIcon(type)).toBe(MOCK_TARGET_ICON);
+  });
+
+  it("prefers the type's own icon", () => {
+    const type = asSchemaType({
+      name: ctaSchema.name,
+      icon: MOCK_ICON,
+      type: reference,
+      to: [{ name: ctaSchema.name, icon: MOCK_TARGET_ICON }],
+    });
+
+    expect(getModulePickerIcon(type)).toBe(MOCK_ICON);
+  });
+
+  it('has no icon for a reference to several types', () => {
+    const type = asSchemaType({
+      name: ctaSchema.name,
+      type: reference,
+      to: [
+        { name: ctaSchema.name, icon: MOCK_TARGET_ICON },
+        { name: faqSchema.name, icon: MOCK_ICON },
+      ],
+    });
+
+    expect(getModulePickerIcon(type)).toBeUndefined();
   });
 });
 
