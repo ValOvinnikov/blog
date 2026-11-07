@@ -1,14 +1,15 @@
 import 'server-only';
 
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
-import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { resolveTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { logger } from '@web/utils/logger/logger';
+import { headers } from 'next/headers';
 import type { NextRequest } from 'next/server';
 import { cache } from 'react';
 
@@ -41,6 +42,20 @@ export const getSiteOAuthCredentials = cache(
     orSharedApps(() => loadEntitledCredentials(tenantId)),
 );
 
+// An owner registers only the main address's callback with their provider, so any other address keeps the shared apps.
+const loadHostCredentials = async (
+  host: TMaybeNull<string>,
+): Promise<TTenantOAuthCredentialsByProvider> => {
+  const tenant = await resolveTenant(host);
+  return tenant && tenant.primaryDomain === host
+    ? loadEntitledCredentials(tenant.id)
+    : SHARED_APPS;
+};
+
+export const getHostSiteOAuthCredentials = cache(async () =>
+  orSharedApps(async () => loadHostCredentials((await headers()).get('host'))),
+);
+
 const isProviderUsingRequest = (
   request: TMaybeUndefined<NextRequest>,
 ): request is NextRequest =>
@@ -52,9 +67,5 @@ export const getRequestSiteOAuthCredentials = async (
   request: TMaybeUndefined<NextRequest>,
 ): Promise<TTenantOAuthCredentialsByProvider> =>
   isProviderUsingRequest(request)
-    ? orSharedApps(async () =>
-        loadEntitledCredentials(
-          await resolveTenantId(request.headers.get('host')),
-        ),
-      )
+    ? orSharedApps(() => loadHostCredentials(request.headers.get('host')))
     : SHARED_APPS;
