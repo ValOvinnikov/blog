@@ -10,6 +10,7 @@ import {
   RESET_TO_PRESET,
 } from '@platform/testing/look/look-form-fixtures';
 import {
+  growthBadgesOutsideNote,
   lookRowTrigger,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
@@ -65,7 +66,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
   ])('shows no Growth badge on $site', ({ setup }) => {
     setup();
 
-    const badges = screen.queryAllByText(GROWTH, { exact: true });
+    const badges = growthBadgesOutsideNote();
 
     expect(badges).toHaveLength(0);
   });

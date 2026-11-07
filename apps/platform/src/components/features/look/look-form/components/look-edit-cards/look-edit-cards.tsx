@@ -9,6 +9,8 @@ import { PresetCard } from '@platform/components/features/look/look-form/compone
 import { ShapeCard } from '@platform/components/features/look/look-form/components/shape-card';
 import { TypeCard } from '@platform/components/features/look/look-form/components/type-card';
 import type { TLookRowsGroup } from '@platform/components/features/look/look-form/use-look-open-rows';
+import { LookGrowthNote } from '@platform/components/features/look/look-growth-note';
+import type { TLookCard } from '@platform/constants/look-card';
 import { LOOK_GROUP } from '@platform/constants/look-group';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useTranslations } from 'next-intl';
@@ -18,6 +20,8 @@ export type TLookEditCardsProps = {
   sitePartsGroup: TLookRowsGroup;
   hasCookieBanner: boolean;
   hasMultipleLanguages: boolean;
+  hasGrowthNote: boolean;
+  onSelectCard: (card: TLookCard) => void;
   summaries: Record<TLookRow, string>;
 };
 
@@ -26,12 +30,15 @@ export const LookEditCards = ({
   sitePartsGroup,
   hasCookieBanner,
   hasMultipleLanguages,
+  hasGrowthNote,
+  onSelectCard,
   summaries,
 }: TLookEditCardsProps) => {
   const t = useTranslations('lookForm');
 
   return (
     <>
+      {hasGrowthNote && <LookGrowthNote onSelectCard={onSelectCard} />}
       <PresetCard />
       <LookGroup
         anchor={LOOK_GROUP.STYLE}

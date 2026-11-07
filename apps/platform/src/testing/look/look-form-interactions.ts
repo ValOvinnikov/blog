@@ -9,6 +9,7 @@ import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   BRAND_IMAGES_HINT,
   EDITORIAL,
+  GROWTH,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   GO_TO_THE_FIRST_ONE,
@@ -27,6 +28,14 @@ const { lookForm: LOOK_FORM } = messages;
 const MOCK_LOGO_FILE = new File(['bytes'], faker.system.commonFileName('png'), {
   type: 'image/png',
 });
+
+export const growthBadgesOutsideNote = () => {
+  const note = screen.queryByRole('note');
+
+  return screen
+    .queryAllByText(GROWTH, { exact: true })
+    .filter((badge) => !note?.contains(badge));
+};
 
 export const lookRowTrigger = (row: TLookRow) => {
   const heading = screen.getByRole('heading', {

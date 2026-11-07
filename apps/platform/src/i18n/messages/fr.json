@@ -654,8 +654,8 @@
     "archivedNotice": "Ce site est archivé, ses applications de connexion ne peuvent donc pas être modifiées.",
     "notOwnerNotice": "Seul le propriétaire du site peut modifier les applications de connexion.",
     "keptOnGrowth": "Votre application enregistrée est conservée. Elle revient avec Growth.",
-    "growthNoteTitle": "Plus d'options avec Growth",
-    "growthNoteDescription": "Les options marquées <badge></badge> sur cette page sont disponibles avec l'offre Growth.",
+    "growthAddsGoogle": "Votre propre application Google, pour que les lecteurs voient le nom de votre site plutôt que le nôtre",
+    "growthAddsGithub": "Votre propre application GitHub, pour que les lecteurs voient le nom de votre site plutôt que le nôtre",
     "callbackWarning": "Votre adresse principale est désormais {domain}. Ajoutez la nouvelle adresse de rappel à votre application {provider}, sinon les lecteurs ne pourront pas se connecter avec {provider}.",
     "callbackConfirm": "C'est fait",
     "callbackConfirmFailed": "Enregistrement impossible. Réessayez."
@@ -689,6 +689,13 @@
     "sitePartsGroupHeading": "Parties du site",
     "viewTabsAriaLabel": "Vue Look",
     "jumpIndexAriaLabel": "Sections de Look",
+    "growthAddsColour": "Une teinte de logo à part",
+    "growthAddsType": "Polices des titres et du texte",
+    "growthAddsShape": "Coins, espacement, style des cartes et du bouton d'en-tête",
+    "growthAddsButtons": "État de chargement et indicateur de progression",
+    "growthAddsHeader": "Mise en page, sous-menus, barre et commandes du compte",
+    "growthAddsFooter": "Mise en page, arrière-plan et surface",
+    "growthAddsClosing": "Growth ajoute aussi d'autres langues (avec le choix du style du sélecteur de langue), un domaine personnalisé et d'autres fonctionnalités du site.",
     "jumpIndexUnsaved": ", modifications non enregistrées",
     "expandAll": "Tout déplier",
     "collapseAll": "Tout replier",
@@ -1997,6 +2004,13 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— fait partie de la formule Growth"
+  },
+  "growthNote": {
+    "title": "Plus d'options avec Growth",
+    "description": "Les options marquées <badge></badge> sur cette page sont disponibles avec l'offre Growth.",
+    "show": "Voir ce qui est inclus",
+    "hide": "Masquer",
+    "listLabel": "Ce que Growth ajoute sur cette page"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Ouvrir votre tableau de bord",

@@ -654,8 +654,8 @@
     "archivedNotice": "Este sitio está archivado, así que sus apps de inicio de sesión no se pueden cambiar.",
     "notOwnerNotice": "Solo el propietario del sitio puede cambiar las apps de inicio de sesión.",
     "keptOnGrowth": "Tu app guardada se conserva. Vuelve con Growth.",
-    "growthNoteTitle": "Más opciones con Growth",
-    "growthNoteDescription": "Las opciones marcadas con <badge></badge> en esta página se activan con el plan Growth.",
+    "growthAddsGoogle": "Su propia app de Google, para que los lectores vean el nombre de su sitio en lugar del nuestro",
+    "growthAddsGithub": "Su propia app de GitHub, para que los lectores vean el nombre de su sitio en lugar del nuestro",
     "callbackWarning": "Tu dirección principal ahora es {domain}. Añade la nueva dirección de callback a tu app de {provider} o los lectores no podrán iniciar sesión con {provider}.",
     "callbackConfirm": "Ya la añadí",
     "callbackConfirmFailed": "No se pudo guardar. Inténtalo de nuevo."
@@ -689,6 +689,13 @@
     "sitePartsGroupHeading": "Partes del sitio",
     "viewTabsAriaLabel": "Vista de Look",
     "jumpIndexAriaLabel": "Secciones de Look",
+    "growthAddsColour": "Un tono de logotipo propio",
+    "growthAddsType": "Fuentes de títulos y de texto",
+    "growthAddsShape": "Esquinas, espaciado y estilo de las tarjetas y del botón de la cabecera",
+    "growthAddsButtons": "Estado de carga e indicador de progreso",
+    "growthAddsHeader": "Diseño, submenús, barra y controles de cuenta",
+    "growthAddsFooter": "Diseño, fondo y superficie",
+    "growthAddsClosing": "Growth también añade más idiomas (con elección del estilo del selector de idioma), un dominio propio y más funciones para el sitio.",
     "jumpIndexUnsaved": ", cambios sin guardar",
     "expandAll": "Desplegar todo",
     "collapseAll": "Plegar todo",
@@ -1997,6 +2004,13 @@
   "growthBadge": {
     "label": "Growth",
     "planNote": "— forma parte del plan Growth"
+  },
+  "growthNote": {
+    "title": "Más opciones con Growth",
+    "description": "Las opciones marcadas con <badge></badge> en esta página se activan con el plan Growth.",
+    "show": "Ver qué incluye",
+    "hide": "Ocultar",
+    "listLabel": "Qué añade Growth en esta página"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Abrir tu panel",

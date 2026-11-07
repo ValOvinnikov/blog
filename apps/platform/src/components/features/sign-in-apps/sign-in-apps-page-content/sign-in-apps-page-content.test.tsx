@@ -4,7 +4,11 @@ import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import {
+  customRenderAsync,
+  screen,
+  within,
+} from '@platform/testing/custom-render';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CLIENT_ID,
@@ -17,6 +21,7 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import userEvent from '@testing-library/user-event';
 
 import { SignInAppsPageContent } from './sign-in-apps-page-content';
 
@@ -29,6 +34,7 @@ vi.mock('@blog/db', async () => {
 });
 
 const page = en.signInAppsPage;
+const { growthNote } = en;
 const { listTenantOAuthClients } = queries.tenantOAuthCredentials;
 const growthTenant = (overrides = {}) =>
   mockTenant({ plan: TENANT_PLAN.GROWTH, ...overrides });
@@ -129,7 +135,7 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
 
     await setup({ tenant: mockTenant() });
 
-    const note = screen.getByText(page.growthNoteTitle);
+    const note = screen.getByText(growthNote.title);
     const kept = screen.getAllByText(page.keptOnGrowth);
     const shared = screen.getAllByText(page.sharedStatus);
     const input = screen.queryByRole('textbox');
@@ -137,5 +143,22 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
     expect(kept).toHaveLength(1);
     expect(shared).toHaveLength(2);
     expect(input).not.toBeInTheDocument();
+  });
+
+  it('lists both own apps a Free owner gets on Growth, as plain text', async () => {
+    await setup({ tenant: mockTenant() });
+
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: growthNote.show }));
+
+    const list = screen.getByRole('list', { name: growthNote.listLabel });
+    const items = within(list).getAllByRole('listitem');
+    const links = within(list).queryAllByRole('link');
+    expect(items.map((item) => item.textContent)).toEqual([
+      page.growthAddsGoogle,
+      page.growthAddsGithub,
+    ]);
+    expect(links).toHaveLength(0);
   });
 });
