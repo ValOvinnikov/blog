@@ -4,7 +4,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const settingsFormShellVariants = tv({
   slots: {
     root: [
-      'flex flex-col gap-6',
+      'flex flex-col gap-6 pb-[var(--admin-save-bar-height,0px)]',
       'md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-dock))+var(--spacing-admin-dock-clearance))]',
     ],
     liveStatus: ['sr-only'],
@@ -28,43 +28,19 @@ export const settingsFormShellVariants = tv({
       true: {},
       false: {},
     },
-    isSaveBarHidden: {
+    isArchived: {
       true: {},
       false: {},
     },
-    isArchived: {
-      true: {
-        root: [
-          'md:pb-[calc(var(--spacing-admin-archived-room)-var(--spacing-admin-content))]',
-        ],
-      },
-      false: {
-        root: [
-          'md:pb-[calc(max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-room)-var(--spacing-admin-dock))-var(--spacing-admin-content))]',
-        ],
-      },
-    },
   },
   compoundVariants: [
-    {
-      isSaveBarHidden: true,
-      class: { root: ['md:pb-0'] },
-    },
     {
       hasPhoneSaveFooter: false,
       isSaveBarShown: true,
       class: {
         root: [
-          'max-md:pb-[calc(max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-clearance))-(--spacing(4)))]',
           'max-md:[html:has(&)]:scroll-pb-[max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-clearance))]',
         ],
-      },
-    },
-    {
-      hasPhoneSaveFooter: false,
-      isSaveBarShown: false,
-      class: {
-        root: ['max-md:pb-[calc(--spacing(6)-(--spacing(4)))]'],
       },
     },
     {
@@ -72,17 +48,7 @@ export const settingsFormShellVariants = tv({
       isArchived: false,
       class: {
         root: [
-          'max-md:pb-[calc(max(var(--spacing-admin-phone-footer-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-phone-footer-room)-var(--spacing-admin-phone-footer-max))-(--spacing(4)))]',
           'max-md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-phone-footer-max))+var(--spacing-admin-dock-clearance))]',
-        ],
-      },
-    },
-    {
-      hasPhoneSaveFooter: true,
-      isArchived: true,
-      class: {
-        root: [
-          'max-md:pb-[calc(var(--spacing-admin-archived-room)-(--spacing(4)))]',
         ],
       },
     },
@@ -92,6 +58,5 @@ export const settingsFormShellVariants = tv({
     isArchived: false,
     hasPhoneSaveFooter: false,
     isSaveBarShown: false,
-    isSaveBarHidden: false,
   },
 });

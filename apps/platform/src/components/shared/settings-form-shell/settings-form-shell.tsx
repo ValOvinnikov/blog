@@ -86,7 +86,6 @@ export const SettingsFormShell = <TValues,>({
     isArchived,
     hasPhoneSaveFooter: layout?.hasPhoneSaveFooter,
     isSaveBarShown,
-    isSaveBarHidden,
   });
 
   return (
