@@ -82,8 +82,15 @@ run 401 'HTTP/2 401\r\ncontent-type: application/json\r\n\r\n'
 check "the app's own JSON 401 is promoted" '[ $code -eq 0 ] && promoted'
 
 run 401 'HTTP/2 401\r\ncontent-type: text/html; charset=utf-8\r\n\r\n'
-check 'a Deployment Protection page fails and names the bypass secret' \
-	'[ $code -ne 0 ] && ! promoted && [[ "$out" == *VERCEL_AUTOMATION_BYPASS_SECRET* ]]'
+check "a Deployment Protection page fails and names the app's bypass secret" \
+	'[ $code -ne 0 ] && ! promoted && [[ "$out" == *VERCEL_AUTOMATION_BYPASS_SECRET_WEB* ]]'
+
+run 302 'HTTP/2 302\r\nlocation: https://vercel.com/sso-api?url=https%3A%2F%2Fweb-abc123.vercel.app%2F\r\ncontent-type: text/plain\r\n\r\n'
+check "a redirect to Vercel's sign-in fails and names the app's bypass secret" \
+	'[ $code -ne 0 ] && ! promoted && [[ "$out" == *VERCEL_AUTOMATION_BYPASS_SECRET_WEB* ]]'
+
+run 307 'HTTP/2 307\r\nlocation: /sign-in?callbackUrl=%2F\r\n\r\n'
+check "the app's own redirect to its sign-in is promoted" '[ $code -eq 0 ] && promoted'
 
 CURL_EXIT=28 run 000 ''
 check 'a request that never answers fails without promoting' '[ $code -ne 0 ] && ! promoted'
@@ -93,11 +100,11 @@ check 'a deploy that prints no URL fails before any request' \
 	'[ $code -ne 0 ] && ! grep -q "^curl" "$STUB_LOG"'
 
 out=$(PATH="$stubdir:$PATH" VERCEL_TOKEN=t VERCEL_CLI_VERSION=1.0.0 \
-	VERCEL_AUTOMATION_BYPASS_SECRET=s3cret STUB_LOG="$workdir/log" \
-	STUB_DEPLOY_URL="$deployment_url" STUB_STATUS=200 STUB_HEADERS='' STUB_CURL_EXIT=0 \
+	VERCEL_AUTOMATION_BYPASS_SECRET_WEB=web-s3cret VERCEL_AUTOMATION_BYPASS_SECRET_PLATFORM=platform-s3cret \
+	STUB_LOG="$workdir/log" STUB_DEPLOY_URL="$deployment_url" STUB_STATUS=200 STUB_HEADERS='' STUB_CURL_EXIT=0 \
 	bash "$script" web / 2>&1)
-check 'the bypass secret is sent as the protection-bypass header' \
-	'grep -q "x-vercel-protection-bypass: s3cret" "$workdir/log"'
+check "the app's own bypass secret is sent as the protection-bypass header" \
+	'grep -q "x-vercel-protection-bypass: web-s3cret" "$workdir/log" && ! grep -q platform-s3cret "$workdir/log"'
 
 [ "$fails" -eq 0 ] || {
 	echo "$fails failing"

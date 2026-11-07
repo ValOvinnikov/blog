@@ -3,20 +3,26 @@ import { TENANT_PLAN } from '@blog/db/constants';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
-import { resolveTenantId } from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { resolveTenant } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_HOST,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { NextRequest } from 'next/server';
 
 import {
+  getHostSiteOAuthCredentials,
   getRequestSiteOAuthCredentials,
   getSiteOAuthCredentials,
 } from './site-oauth-credentials';
+
+const { headersMock } = vi.hoisted(() => ({ headersMock: vi.fn() }));
+
+vi.mock('next/headers', () => ({ headers: headersMock }));
 
 vi.mock('@blog/db', () => ({
   queries: {
@@ -27,18 +33,23 @@ vi.mock('@blog/db', () => ({
 vi.mock('@web/server/site-config/get-effective-plan/get-effective-plan');
 
 vi.mock('@web/server/tenant/resolve-tenant/resolve-tenant', () => ({
-  resolveTenantId: vi.fn(),
+  resolveTenant: vi.fn(),
 }));
 
 const getTenantOAuthCredentialsMock = vi.mocked(
   queries.tenantOAuthCredentials.getTenantOAuthCredentials,
 );
 const getEffectivePlanMock = vi.mocked(getEffectivePlan);
-const resolveTenantIdMock = vi.mocked(resolveTenantId);
+const resolveTenantMock = vi.mocked(resolveTenant);
 
-const mockTenantRequest = (action = 'signin'): NextRequest =>
-  new NextRequest(`https://${MOCK_TENANT_HOST}/api/auth/${action}`, {
-    headers: { host: MOCK_TENANT_HOST },
+const MOCK_SECONDARY_HOST = 'secondary.example.com';
+
+const mockTenantRequest = (
+  action = 'signin',
+  host = MOCK_TENANT_HOST,
+): NextRequest =>
+  new NextRequest(`https://${host}/api/auth/${action}`, {
+    headers: { host },
   });
 
 describe(getSiteOAuthCredentials, () => {
@@ -83,34 +94,53 @@ describe(getRequestSiteOAuthCredentials, () => {
     getTenantOAuthCredentialsMock.mockResolvedValue(
       MOCK_SITE_OAUTH_CREDENTIALS,
     );
+    resolveTenantMock.mockResolvedValue(mockTenant());
   });
 
-  it("returns the credentials of the site the request's host names", async () => {
-    resolveTenantIdMock.mockResolvedValueOnce(MOCK_TENANT_ID);
-
+  it("returns the site's own credentials on its main address", async () => {
     await expect(
       getRequestSiteOAuthCredentials(mockTenantRequest()),
     ).resolves.toEqual(MOCK_SITE_OAUTH_CREDENTIALS);
-    expect(resolveTenantIdMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
+    expect(resolveTenantMock).toHaveBeenCalledWith(MOCK_TENANT_HOST);
+    expect(getTenantOAuthCredentialsMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  });
+
+  it("keeps the shared apps on another of the site's addresses", async () => {
+    await expect(
+      getRequestSiteOAuthCredentials(
+        mockTenantRequest(undefined, MOCK_SECONDARY_HOST),
+      ),
+    ).resolves.toEqual({});
+    expect(resolveTenantMock).toHaveBeenCalledWith(MOCK_SECONDARY_HOST);
+    expect(getTenantOAuthCredentialsMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps the shared apps when the host names no site', async () => {
+    resolveTenantMock.mockResolvedValueOnce(undefined);
+
+    await expect(
+      getRequestSiteOAuthCredentials(mockTenantRequest()),
+    ).resolves.toEqual({});
+    expect(getTenantOAuthCredentialsMock).not.toHaveBeenCalled();
   });
 
   it('reads nothing when there is no request', async () => {
     await expect(getRequestSiteOAuthCredentials(undefined)).resolves.toEqual(
       {},
     );
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantMock).not.toHaveBeenCalled();
   });
 
   it('reads nothing for a session read', async () => {
     await expect(
       getRequestSiteOAuthCredentials(mockTenantRequest(AUTH_ACTION.SESSION)),
     ).resolves.toEqual({});
-    expect(resolveTenantIdMock).not.toHaveBeenCalled();
+    expect(resolveTenantMock).not.toHaveBeenCalled();
     expect(getTenantOAuthCredentialsMock).not.toHaveBeenCalled();
   });
 
   it('falls back to the shared apps and logs when the host cannot be resolved', async () => {
-    resolveTenantIdMock.mockRejectedValueOnce(MOCK_ERROR);
+    resolveTenantMock.mockRejectedValueOnce(MOCK_ERROR);
 
     await expect(
       getRequestSiteOAuthCredentials(mockTenantRequest()),
@@ -119,5 +149,31 @@ describe(getRequestSiteOAuthCredentials, () => {
       SIGN_IN_LOG.SITE_CREDENTIALS_FAILED,
       { error: MOCK_ERROR },
     );
+  });
+});
+
+describe(getHostSiteOAuthCredentials, () => {
+  beforeEach(() => {
+    getTenantOAuthCredentialsMock.mockResolvedValue(
+      MOCK_SITE_OAUTH_CREDENTIALS,
+    );
+    resolveTenantMock.mockResolvedValue(mockTenant());
+  });
+
+  it("advertises the site's own apps when the page is served on its main address", async () => {
+    headersMock.mockResolvedValueOnce(new Headers({ host: MOCK_TENANT_HOST }));
+
+    await expect(getHostSiteOAuthCredentials()).resolves.toEqual(
+      MOCK_SITE_OAUTH_CREDENTIALS,
+    );
+  });
+
+  it('advertises the shared apps when the page is served on another address', async () => {
+    headersMock.mockResolvedValueOnce(
+      new Headers({ host: MOCK_SECONDARY_HOST }),
+    );
+
+    await expect(getHostSiteOAuthCredentials()).resolves.toEqual({});
+    expect(getTenantOAuthCredentialsMock).not.toHaveBeenCalled();
   });
 });

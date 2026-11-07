@@ -83,6 +83,35 @@ describe(`<${SaveBar.name}/>`, () => {
     expect(breakdown).toBeVisible();
   });
 
+  describe('when the bar appears', () => {
+    const BarAfterField = ({ changeCount }: { changeCount: number }) => (
+      <>
+        <input aria-label={MOCK_FIELD_LABEL} />
+        <SaveBar {...baseProps} changeCount={changeCount} />
+      </>
+    );
+
+    it('scrolls the focused control clear of the bar', async () => {
+      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+      const { rerender } = renderWithIntl(<BarAfterField changeCount={0} />);
+      const field = screen.getByRole('textbox', { name: MOCK_FIELD_LABEL });
+      await user.click(field);
+
+      rerender(<BarAfterField changeCount={1} />);
+
+      expect(scrollIntoView).toHaveBeenCalledTimes(1);
+      expect(scrollIntoView.mock.contexts[0]).toBe(field);
+    });
+
+    it('scrolls nothing when no control has focus', () => {
+      const scrollIntoView = vi.spyOn(Element.prototype, 'scrollIntoView');
+
+      setup();
+
+      expect(scrollIntoView).not.toHaveBeenCalled();
+    });
+  });
+
   describe('where the changes are', () => {
     it('names the one card holding the changes as a link that calls its handler', async () => {
       const onSelect = vi.fn();

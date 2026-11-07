@@ -1,11 +1,14 @@
+import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { routes, SUBSCRIBER_OUTCOME } from '@blog/config';
 import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { ToastProvider } from '@web/context/toast-provider';
+import { getHostSiteOAuthCredentials } from '@web/server/auth/site-oauth-credentials/site-oauth-credentials';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_USER } from '@web/testing/pages/account-page/session-user-fixtures';
+import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
 import { mockRequestContextOnce } from '@web/testing/server/request-context/mock-request-context-once';
 import { mockSession } from '@web/testing/shared/session/fixtures';
 import { mockedAuth } from '@web/testing/shared/session/mocked-auth';
@@ -32,7 +35,7 @@ vi.mock('@web/server/tenant/request-tenant/request-tenant');
 vi.mock('@web/i18n/navigation');
 
 vi.mock('@blog/auth/utils/oauth-providers/oauth-providers', () => ({
-  getEnabledOAuthProviderIds: () => [],
+  getEnabledOAuthProviderIds: vi.fn(() => []),
 }));
 
 const MOCK_HANDLE = toSessionUsername(
@@ -81,7 +84,16 @@ describe(`<${AccountPage.name}/>`, () => {
     beforeEach(async () => {
       authMock.mockResolvedValue(null);
       mockRequestContextOnce({ isOperatorSuspended: true });
+      vi.mocked(getHostSiteOAuthCredentials).mockResolvedValueOnce(
+        MOCK_SITE_OAUTH_CREDENTIALS,
+      );
       await setup();
+    });
+
+    it("advertises the providers the request's host registers", () => {
+      expect(vi.mocked(getEnabledOAuthProviderIds)).toHaveBeenCalledWith(
+        MOCK_SITE_OAUTH_CREDENTIALS,
+      );
     });
 
     it('offers sign-in under the page heading', () => {
