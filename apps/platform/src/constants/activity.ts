@@ -1,5 +1,3 @@
-import type { TValueOf } from '@blog/config/utils';
-
 export const ACTIVITY_DETAIL = {
   CHANGED_FIELDS: 'CHANGED_FIELDS',
   STUDIO_INVITE_SENT: 'STUDIO_INVITE_SENT',
@@ -14,5 +12,3 @@ export const ACTIVITY_DETAIL = {
   SIGN_IN_PROVIDER: 'SIGN_IN_PROVIDER',
   CLIENT_SECRET_REPLACED: 'CLIENT_SECRET_REPLACED',
 } as const;
-
-export type TActivityDetailKind = TValueOf<typeof ACTIVITY_DETAIL>;
