@@ -304,7 +304,9 @@ site, never at the top of the step.
   `side-accent` border; focus is the side-gapped ring. Collapsed, the trigger
   is the 52×52 avatar alone, titled by the name and named "Account: {name},
   {email}" ("Account: {email}" with no name). The menu, named "Account" on
-  the shared popup frame, opens 6px above the trigger at its width, or, from
+  the shared popup frame, opens 6px above the trigger from its left edge, at
+  least its width and growing to fit a long email up to 300px, never wider
+  than the viewport less 16px, or, from
   the rail, to its right (`sideOffset` 20) at 240px with its bottom aligned
   to the trigger's. It heads with the name, the email and the role line
   ("{role} · {scope}"), none focusable, then — in the expanded and the rail
@@ -333,7 +335,9 @@ site, never at the top of the step.
   name (13px/600) on an 18px line over the domain (11px Mono) on a 16px line,
   each cut to one line with an ellipsis, and one unrotated 16px down chevron;
   it carries no "Workspace" label. Its dropdown opens 4px below it,
-  left-aligned at the field's width, on the shared popup frame. Each item is
+  left-aligned, on the shared popup frame, at least the field's width and
+  growing to fit a long name or domain up to 300px, never wider than the
+  viewport less 16px (`MENU_POPUP_FIT_WIDTH`). Each item is
   the name (13px/500 `text`) over the Mono domain (11px `muted`), padding 6px
   8px, `rounded-admin-control`, wrapping long text in full; the highlighted
   item takes a `popover-hover` ground and no focus ring, and below `md` every
@@ -377,7 +381,11 @@ site, never at the top of the step.
 - Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
   border, `rounded-admin` on every corner, 4px padding, `text` colour and
-  `shadow-admin-lg`. The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
+  `shadow-admin-lg`. Its `positioner` slot puts every shell popup — the
+  phone Menu, the full-path menu, the account menu, the Workspace dropdown,
+  `Select` and More presets — on one layer, `z-30`: above the sticky
+  `ViewTabs` (`z-21`) and `LookJumpIndex` (`z-20`), below dialogs (`z-40`)
+  and toasts and tooltips (`z-50`). The phone Menu (`TopbarNavMenu`) uses it with 6px padding,
   288px wide. It is anchored to the Menu button's left edge and the top bar's
   full height (`use-bar-anchor.ts`), so it opens 5px below the bar and grows
   with its content until it stops 12px above the viewport's bottom (Base UI's
@@ -400,7 +408,8 @@ site, never at the top of the step.
   `side-field` ground with a `side-field-line` border, a `popover-hover`
   hover, a `side-accent` border while open and the popover-gapped ring. The
   switcher's dropdown opens 6px below it and the account menu 6px above the
-  foot, each at its trigger's width, with the Menu open behind; Escape closes
+  foot, each at least its trigger's width (the account menu exactly it), with
+  the Menu open behind; Escape closes
   the inner popup onto its trigger, a second Escape closes the Menu onto its
   button, and choosing a workspace closes both. The Menu button takes a
   `brand-ink` border on hover, focus (with the bg-gapped ring) and open, and

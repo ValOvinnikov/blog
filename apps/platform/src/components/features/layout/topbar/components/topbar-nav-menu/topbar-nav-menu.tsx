@@ -50,7 +50,7 @@ export const TopbarNavMenu = ({
     note: phoneNote,
   } = topbarNavMenuVariants();
   const { sectionLabel, note } = sidebarVariants();
-  const { popup: surfacePopup } = menuSurfaceVariants();
+  const { positioner, popup: surfacePopup } = menuSurfaceVariants();
 
   return (
     <Menu.Root>
@@ -72,6 +72,7 @@ export const TopbarNavMenu = ({
           sideOffset={POPUP_GAP_BELOW_BAR}
           collisionPadding={POPUP_VIEWPORT_MARGIN}
           align="start"
+          className={positioner()}
         >
           <Menu.Popup className={surfacePopup({ class: popup() })}>
             <NestedMenuProvider>
