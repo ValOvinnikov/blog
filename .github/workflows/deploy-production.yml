@@ -114,8 +114,8 @@ jobs:
           SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
           bash scripts/vercel-deploy-checked.sh stage web /
 
-  deploy-admin:
-    name: Stage prod admin
+  deploy-platform:
+    name: Stage prod platform
     needs: [full-gate, migrate-db]
     if: >-
       ${{ !cancelled() && needs.full-gate.result == 'success' &&
@@ -172,7 +172,7 @@ jobs:
   # their checks. A tag always deploys both, so a skipped stage job blocks too.
   promote:
     name: Promote prod apps
-    needs: [full-gate, migrate, migrate-db, deploy-web, deploy-admin]
+    needs: [full-gate, migrate, migrate-db, deploy-web, deploy-platform]
     if: ${{ !cancelled() && needs.full-gate.result == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -189,7 +189,7 @@ jobs:
       - name: Both apps passed their checks
         env:
           NEEDS: ${{ toJSON(needs) }}
-          REQUIRED_JOBS: deploy-web deploy-admin
+          REQUIRED_JOBS: deploy-web deploy-platform
         run: bash scripts/vercel-deploy-checked.sh gate
 
       - name: Promote web-prod
@@ -204,7 +204,7 @@ jobs:
       - name: Promote platform-prod
         env:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_PLATFORM }}
-          URL: ${{ needs.deploy-admin.outputs.url }}
+          URL: ${{ needs.deploy-platform.outputs.url }}
         run: |
           set -euo pipefail
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the production environment}"

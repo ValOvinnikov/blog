@@ -141,9 +141,9 @@ run_gate() {
 	code=$?
 }
 staged_web='"deploy-web":{"result":"success","outputs":{"url":"https://web-abc123.vercel.app"}}'
-staged_platform='"deploy-admin":{"result":"success","outputs":{"url":"https://platform-abc123.vercel.app"}}'
-skipped_platform='"deploy-admin":{"result":"skipped","outputs":{}}'
-failed_platform='"deploy-admin":{"result":"failure","outputs":{}}'
+staged_platform='"deploy-platform":{"result":"success","outputs":{"url":"https://platform-abc123.vercel.app"}}'
+skipped_platform='"deploy-platform":{"result":"skipped","outputs":{}}'
+failed_platform='"deploy-platform":{"result":"failure","outputs":{}}'
 migrated='"migrate-db":{"result":"success","outputs":{}}'
 
 run_gate "{$migrated,$staged_web,$staged_platform}"
@@ -155,7 +155,7 @@ check 'the gate does not wait for an app the run does not deploy' '[ $code -eq 0
 run_gate "{$migrated,$staged_web,$failed_platform}"
 check 'the gate fails when one app failed its check' '[ $code -ne 0 ]'
 check 'the run summary says no app was promoted and names the failed job' \
-	'grep -q "No app was promoted" "$GITHUB_STEP_SUMMARY" && grep -q "deploy-admin (failure)" "$GITHUB_STEP_SUMMARY" && ! grep -q deploy-web "$GITHUB_STEP_SUMMARY"'
+	'grep -q "No app was promoted" "$GITHUB_STEP_SUMMARY" && grep -q "deploy-platform (failure)" "$GITHUB_STEP_SUMMARY" && ! grep -q deploy-web "$GITHUB_STEP_SUMMARY"'
 
 run_gate '{"migrate-db":{"result":"failure","outputs":{}},"deploy-web":{"result":"skipped","outputs":{}}}'
 check 'the gate fails when a job ahead of the checks failed' '[ $code -ne 0 ] && [[ "$out" == *"migrate-db (failure)"* ]]'
@@ -166,8 +166,8 @@ check 'the gate fails when a check was cancelled' '[ $code -ne 0 ]'
 run_gate '{"deploy-web":{"result":"success","outputs":{}}}'
 check 'the gate fails when a check passed without a staged URL' '[ $code -ne 0 ]'
 
-run_gate "{$staged_web,$skipped_platform}" 'deploy-web deploy-admin'
-check 'the gate fails when a required app was skipped' '[ $code -ne 0 ] && [[ "$out" == *"deploy-admin (skipped)"* ]]'
+run_gate "{$staged_web,$skipped_platform}" 'deploy-web deploy-platform'
+check 'the gate fails when a required app was skipped' '[ $code -ne 0 ] && [[ "$out" == *"deploy-platform (skipped)"* ]]'
 
 [ "$fails" -eq 0 ] || {
 	echo "$fails failing"

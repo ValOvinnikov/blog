@@ -115,7 +115,7 @@ jobs:
     outputs:
       studio: ${{ steps.studio.outputs.changed }}
       web: ${{ steps.web.outputs.changed }}
-      admin: ${{ steps.admin.outputs.changed }}
+      platform: ${{ steps.platform.outputs.changed }}
       worker: ${{ steps.worker.outputs.changed }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -193,8 +193,8 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Is admin affected?
-        id: admin
+      - name: Is platform affected?
+        id: platform
         env:
           BASE_REF: ${{ steps.baseline.outputs.ref }}
         run: |
@@ -229,7 +229,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.studio == 'true' ||
       needs.changes.outputs.web == 'true' ||
-      needs.changes.outputs.admin == 'true' ||
+      needs.changes.outputs.platform == 'true' ||
       needs.changes.outputs.worker == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -317,7 +317,7 @@ jobs:
   # failure mode). No artifact backup here — dev is the disposable staging line
   # (also refreshed from prod by #363); prod keeps the backup + approval gate.
   # Gated on studio||web — the union of the jobs that `needs` it — rather than on
-  # `verify`'s wider condition, so an admin-only merge doesn't run a Sanity
+  # `verify`'s wider condition, so a platform-only merge doesn't run a Sanity
   # migration for an app that never touches Sanity; migrate is still never
   # skipped out from under a deploy that depends on it. migrate:deploy is a
   # no-op when nothing is pending; a missing SANITY_MIGRATE_TOKEN fails the job
@@ -367,9 +367,9 @@ jobs:
   # serves new code — the same "code never ships ahead of a pending
   # migration" discipline as the content `migrate` job above, for the
   # separate relational store (`packages/db`, see .claude/agents/db.md's
-  # "Migrations" section). `deploy-web`, `deploy-admin` and `deploy-worker` all
+  # "Migrations" section). `deploy-web`, `deploy-platform` and `deploy-worker` all
   # depend on `@blog/db` (the Studio never touches Postgres), so this is gated
-  # on web||admin||worker, not `studio`, and only those three need it below. No
+  # on web||platform||worker, not `studio`, and only those three need it below. No
   # artifact backup here — dev is the disposable staging line, same
   # stance as the content migrate job. `drizzle-kit migrate` is a no-op when nothing is
   # pending; a missing DATABASE_URL_UNPOOLED fails the job rather than skipping
@@ -381,7 +381,7 @@ jobs:
     if: >-
       github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.web == 'true' ||
-      needs.changes.outputs.admin == 'true' ||
+      needs.changes.outputs.platform == 'true' ||
       needs.changes.outputs.worker == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -503,16 +503,16 @@ jobs:
           SKIP_ENV_VALIDATION=true npx --yes "vercel@${VERCEL_CLI_VERSION}" build --prod --token="$VERCEL_TOKEN"
           bash scripts/vercel-deploy-checked.sh stage web /
 
-  deploy-admin:
-    name: Stage dev admin
+  deploy-platform:
+    name: Stage dev platform
     needs: [changes, verify, migrate-db]
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      needs.changes.outputs.admin == 'true'
+      needs.changes.outputs.platform == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
-      group: deploy-dev-admin
+      group: deploy-dev-platform
       cancel-in-progress: true
     environment: development
     outputs:
@@ -613,13 +613,13 @@ jobs:
         migrate,
         migrate-db,
         deploy-web,
-        deploy-admin,
+        deploy-platform,
         deploy-worker,
       ]
     if: >-
       ${{ !cancelled() && (github.event_name == 'workflow_dispatch' ||
       needs.changes.outputs.web == 'true' ||
-      needs.changes.outputs.admin == 'true' ||
+      needs.changes.outputs.platform == 'true' ||
       needs.changes.outputs.worker == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -651,10 +651,10 @@ jobs:
           bash scripts/vercel-deploy-checked.sh promote web "$URL"
 
       - name: Promote platform-dev
-        if: needs.deploy-admin.outputs.url != ''
+        if: needs.deploy-platform.outputs.url != ''
         env:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID_PLATFORM }}
-          URL: ${{ needs.deploy-admin.outputs.url }}
+          URL: ${{ needs.deploy-platform.outputs.url }}
         run: |
           set -euo pipefail
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the development environment}"
