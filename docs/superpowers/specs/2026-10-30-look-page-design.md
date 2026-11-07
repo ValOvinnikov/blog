@@ -187,7 +187,7 @@ Non-goals:
 | LX-C   | 426 + 426             | Tablet selected, Header open; tablet frame fits one screen; outline only.                                                           |
 | LX-D2  | 426                   | Phone, Footer open, frame scrolled by hand; Follow off, paused status with "Back to Footer". (Board letter D.)                      |
 | LX-E1  | 390×844               | Phone Look page, Edit tab: index chips, Site parts, Footer open, sticky unsaved bar.                                                |
-| LX-E2  | 390×844               | Phone Look page, Preview tab: one row of 44 px switches, readout + follow + full screen, phone frame at 62% (built at 57%, § 12.3). |
+| LX-E2  | 390×844               | Phone Look page, Preview tab: one row of 44 px switches, readout + follow + full screen, phone frame at 62% (built at 55%, § 12.3). |
 | LX-F   | card 560              | Keyboard focus on the icon toolbar: Tablet focused with tooltip; Dark focused with tooltip.                                         |
 | LX-G   | 520 + 600             | Free plan, Footer open (badge style superseded by LXG).                                                                             |
 | LX-H   | 500 / 460 / 390 cells | Preset strip with 2, 5 and 12 presets at 1440, 1280 and phone; picker open (desktop popover, phone sheet).                          |
@@ -828,7 +828,7 @@ Readout `role="status"`, JetBrains Mono 12px `#5b6472`, nowrap:
 | ------- | ----------------------------- | ------------------------------------------------- |
 | Desktop | "1280 px wide · shown at 44%" | —                                                 |
 | Tablet  | —                             | "820 px · 48%"                                    |
-| Phone   | "390 px wide · shown at 72%"  | "390 px · 72%"; phone tab "390 px · shown at 57%" |
+| Phone   | "390 px wide · shown at 72%"  | "390 px · 72%"; phone tab "390 px · shown at 55%" |
 
 The percentage is the live scale × 100, rounded to a whole number. Tablet in a
 596 px pane (not drawn) reads "820 px wide · shown at 52%" (§ 12.3 rule);
@@ -935,8 +935,8 @@ width **and** height:
 - `availableHeight` in the two-column layout and on the Preview tab from
   `lg` = **608 px** (the tallest viewport the boards draw, LX-A); the frame
   never grows taller, whatever the pane width. On the phone Preview tab = the room left in the window under
-  the top bar, tabs, rows 1–2, the status row (37 px reserved, § 12.5) and
-  the page's own bottom padding (24 px), with stage padding 10 (477 px in a
+  the top bar, tabs, rows 1–2, the status row (54 px reserved, § 12.5) and
+  the page's own bottom padding (24 px), with stage padding 10 (460 px in a
   390×844 window); the save bar is hidden there, so nothing is kept for it.
 - Never above 1. Viewport size = device size × scale, both rounded to whole
   px; the readout percentage is the scale rounded.
@@ -949,7 +949,7 @@ width **and** height:
 | Tablet  | 426                    | 394×566  | 0.48   | width  | LX-C        |
 | Phone   | 600                    | 281×608  | 0.72   | height | LX-A        |
 | Phone   | 426                    | 281×608  | 0.72   | height | LX-B, LX-D2 |
-| Phone   | phone Preview tab 358  | 220×477  | 0.5652 | height | LX-E2       |
+| Phone   | phone Preview tab 358  | 213×460  | 0.545  | height | LX-E2       |
 | Desktop | 476 (1280 window)      | 444×278  | 0.3469 | width  | GW-C        |
 | Desktop | Preview tab 704 (1024) | 670×419  | 0.5234 | width  | GW-B        |
 
@@ -1100,9 +1100,11 @@ file.
 
 Under the frame: flex, align start, gap 10, no wrap, 12.5px / 18px `#5b6472`;
 icon margin-top 1; text `flex 1 1 300px`; bold part name `#12141a` 600; a
-trailing button margin-top −7. The row is always as tall as a trailing button
-less that −7 (25 px from `lg`, 37 px below it and on a coarse pointer), so
-"Back to {part}" or "Top of page" appearing never resizes it. Icon: crosshair 16 stroke `#3730a3` 2 while
+trailing button margin-top −7. The row keeps one height whatever it shows: from `lg` a
+trailing button less that −7 (25 px, 37 px on a coarse pointer); below `lg`
+three lines (54 px), the longest paused line beside its 44 px button in any
+catalogue language. So that the paused line fits, the reader-accounts
+sentence is left out while "Back to {part}" shows (decided 7 Nov). Icon: crosshair 16 stroke `#3730a3` 2 while
 following, pause 16 stroke `#5b6472` 2 (`M9 5v14M15 5v14`) when paused. It
 replaces today's "Built from the site's own components. Nothing is live until
 you save." See § 13 for the lines.
@@ -1169,12 +1171,12 @@ off; scrolling the frame by hand pauses it until you choose Back to the part."
 
 Outline on the part (`data-part="header|footer"`): `outline: Wpx solid
 #4f46e5; outline-offset: -Wpx`, W = 2 / scale → always 2 screen px (4.5 @0.4406,
-4.2 @0.48, 3.5 @0.5652, 2.8 @0.72).
+4.2 @0.48, 3.7 @0.545, 2.8 @0.72).
 
 Tag: absolute left 0, bg `#4f46e5`, `#fff`, Inter 600, line-height 1, z 2,
 text = the part name. Size = 11px font, 20px height, 7px horizontal padding,
 3px radius, each ÷ scale (@0.4406: 25 / 45.4 / 15.9 / 6.8; @0.48: 22.9 / 41.7 /
-14.6 / 6.2; @0.5652: 19.5 / 35.4 / 12.4 / 5.3; @0.72: 15.3 / 27.8 / 9.7 / 4.2).
+14.6 / 6.2; @0.545: 20.2 / 36.7 / 12.8 / 5.5; @0.72: 15.3 / 27.8 / 9.7 / 4.2).
 Footer tag sits **above** the footer (`bottom:100%`, top corners rounded);
 Header tag hangs **below** the header (`top:100%`, bottom corners rounded).
 
@@ -1537,10 +1539,10 @@ flex-start`, padding 0 12), unlike the centred desktop control (LX-E1
   - row 1: the toolbar (`role="toolbar"`, one Tab stop) with Device
     (Phone✓), Colour scheme (Light✓), Reader (Signed out✓; Signed-in tooltip
     right-aligned), every button 44×44;
-  - row 2: space-between gap 8: readout "390 px · shown at 57%"
+  - row 2: space-between gap 8: readout "390 px · shown at 55%"
     (`role="status"`), then Follow (✓) and Full screen solos 44×44, gap 6,
     **outside the toolbar** — each its own Tab stop, tooltips right-aligned;
-  - stage padding 10; phone frame 220×477 @0.5652; status "Following
+  - stage padding 10; phone frame 213×460 @0.545; status "Following
     **Footer**";
   - the frame opens at the part of the last Site parts card open on Edit (§ 13).
 - **Preview tab from `lg`** (GW-B): the desktop heading row, toolbar (32 px,
@@ -1978,8 +1980,8 @@ depend on an open decision cite it; tick them against the answer recorded in
 
 - [ ] No visible h2 (sr-only per D-28)
 - [ ] Row 1, the toolbar: Device (Phone✓), Scheme (Light✓), Reader (Signed out✓), all 44; one Tab stop, arrows inside; Signed-in tooltip right-aligned
-- [ ] Row 2: "390 px · shown at 57%" + Follow✓ and Full screen 44×44, gap 6, outside the toolbar — two further Tab stops, tooltips right-aligned
-- [ ] Stage padding 10; frame 220×477 at 0.5652 at the footer, outline + tag; cookie button; status "Following **Footer**" with no "Top of page"
+- [ ] Row 2: "390 px · shown at 55%" + Follow✓ and Full screen 44×44, gap 6, outside the toolbar — two further Tab stops, tooltips right-aligned
+- [ ] Stage padding 10; frame 213×460 at 0.545 at the footer, outline + tag; cookie button; status "Following **Footer**" with no "Top of page"
 - [ ] Preview opens at the last card open on Edit
 
 ### LX-F · Toolbar focus

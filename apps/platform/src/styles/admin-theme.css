@@ -361,6 +361,8 @@
   /* A preview status row's trailing button height less its −7px lift: 32px from `lg`, 44px touch targets. */
   --spacing-admin-status-row: calc(var(--spacing) * 8 - 7px);
   --spacing-admin-status-row-touch: calc(var(--spacing) * 11 - 7px);
+  /* Three 18px lines: the longest paused line beside its button on the phone Preview tab. */
+  --spacing-admin-status-row-phone: 54px;
   --spacing-admin-archived-room: 48px;
   --spacing-admin-phone-footer-max: 85px;
   --spacing-admin-phone-footer-room: 96px;

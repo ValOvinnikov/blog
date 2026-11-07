@@ -18,7 +18,7 @@ export const previewFrameVariants = tv({
     status: [
       'flex items-start gap-x-2.5',
       // Held with or without a trailing button, so the row never resizes when one appears.
-      'min-h-admin-status-row-touch lg:min-h-admin-status-row lg:pointer-coarse:min-h-admin-status-row-touch',
+      'min-h-admin-status-row-phone lg:min-h-admin-status-row lg:pointer-coarse:min-h-admin-status-row-touch',
       'text-admin-12-5 leading-[18px] text-admin-muted',
     ],
     statusIcon: ['mt-px flex-none'],

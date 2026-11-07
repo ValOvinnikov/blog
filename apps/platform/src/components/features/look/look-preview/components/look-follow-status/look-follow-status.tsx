@@ -83,7 +83,7 @@ export const LookFollowStatus = ({
         isShortLine={isShortLine}
         planNote={planNote}
       />
-      {readerNote && ` ${readerNote}`}
+      {readerNote && !isPaused && ` ${readerNote}`}
     </PreviewFrame.Status>
   );
 };
