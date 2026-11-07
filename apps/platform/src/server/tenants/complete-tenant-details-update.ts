@@ -8,10 +8,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import type {
-  TENANT_DETAILS_UPDATE_OUTCOME,
-  TTenantPlan,
-} from '@blog/db/constants';
+import type { TENANT_DETAILS_UPDATE_OUTCOME } from '@blog/db/constants';
 import type {
   TUpdateTenantDetailsInput,
   TUpdateTenantDetailsResult,
@@ -22,6 +19,7 @@ import { TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { changedTenantDetailsFields } from '@platform/server/tenants/changed-tenant-details-fields';
 import { notifyOwnerOfPlanChange } from '@platform/server/tenants/notify-owner-of-plan-change';
 import { reinviteChangedOwner } from '@platform/server/tenants/reinvite-changed-owner';
 import { after } from 'next/server';
@@ -63,10 +61,12 @@ export const completeTenantDetailsUpdate = async (
   tenantId: string,
   { ownerEmail, ...auditedDetails }: TUpdateTenantDetailsInput,
   { tenant, previousOwnerEmail }: TTenantDetailsUpdate,
-  previousPlan: TTenantPlan,
+  previousTenant: TTenant,
 ): Promise<TTenantDetailsSaved> => {
   await revalidateSiteConfig(tenantId);
-  after(() => notifyOwnerOfPlanChange(tenantId, previousPlan, tenant.plan));
+  after(() =>
+    notifyOwnerOfPlanChange(tenantId, previousTenant.plan, tenant.plan),
+  );
   const studioReinvite = await reinviteIfOwnerChanged(
     tenant,
     ownerEmail,
@@ -74,6 +74,8 @@ export const completeTenantDetailsUpdate = async (
   );
   const studioReinviteRequested =
     !isUndefined(studioReinvite) && isOutcomeSuccess(studioReinvite);
+  const isStudioReinviteUnsent =
+    !isUndefined(studioReinvite) && !studioReinviteRequested;
   await recordAuditEvent({
     logEvent: TENANT_LOG.UPDATE_DETAILS_AUDIT_FAILED,
     action: AUDIT_ACTION.SETTINGS_UPDATED,
@@ -81,15 +83,20 @@ export const completeTenantDetailsUpdate = async (
     targetId: tenantId,
     details: {
       ...auditedDetails,
+      changedFields: changedTenantDetailsFields(
+        auditedDetails,
+        previousTenant,
+        previousOwnerEmail,
+      ),
       ownerEmailUpdated: !isUndefined(previousOwnerEmail),
       studioReinviteRequested,
+      studioReinviteUnsent: isStudioReinviteUnsent,
     },
   });
 
   return {
     outcome: ACTION_OUTCOME.SUCCESS,
     tenant,
-    isStudioReinviteUnsent:
-      !isUndefined(studioReinvite) && !studioReinviteRequested,
+    isStudioReinviteUnsent,
   };
 };

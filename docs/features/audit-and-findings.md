@@ -66,7 +66,17 @@ platform-wide Findings page. Tenant owners see neither.
   `AUDIT_EVENTS_PAGE_SIZE` per page (`?page=n`), rows shown as on the card.
   The count is read first, and a page past the end redirects to the last page
   without reading rows. Paging is by offset, so an event recorded between two
-  page loads shifts rows by one.
+  page loads shifts rows by one. A Back link above the heading returns to the
+  tenant's overview.
+- Activity rows, on the card and the page, show what each event's `details`
+  record as translated lines (`toActivityDetails`): the tenant fields a
+  details save changed, whether a changed owner's Studio invite was sent or
+  not, a main-address switch (from → to), a custom domain requested or
+  removed, the additional languages saved, a suspension's reason and
+  reference, a created tenant's plan, and a sign-in app's provider and
+  replaced client secret. Unknown keys and values of the wrong shape show
+  nothing. Details events written before `changedFields` existed show no
+  field list.
 - `/tenants/{id}/danger`: reads the latest `DEPROVISION_REQUESTED` time to
   decide whether a deprovisioning run is current or a retry.
 - No page lists `SITE_CONFIG` or `SETTINGS_FEATURES` events, and no UI
@@ -137,7 +147,10 @@ Nothing is configurable. Only admins (any role) see either record.
   inactivity sweep runs both (see tenant-provisioning.md).
 - Neither `details` column holds an email address or other personal field.
   Writers record field names or ids instead: email config lists the saved
-  field names, tenant details records `ownerEmailUpdated`, and tenant
+  field names, tenant details records `ownerEmailUpdated` (and, in
+  `changedFields`, the `TENANT_DETAILS_FIELD` names whose value differs from
+  the stored tenant, plus whether the Studio re-invite was requested or went
+  unsent), and tenant
   creation records `ownerUserId` (null for an invited owner). Migration
   `0053` scrubbed the rows written before that: tenant details events gained
   `ownerEmailUpdated: true`, email config events became `fields`, any other

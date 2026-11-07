@@ -439,7 +439,8 @@
   },
   "tenantActivityPage": {
     "title": "Activiteit",
-    "description": "Levenscyclus- en operatoracties voor deze tenant, nieuwste eerst."
+    "description": "Levenscyclus- en operatoracties voor deze tenant, nieuwste eerst.",
+    "backLink": "Terug"
   },
   "activityList": {
     "empty": "Nog geen activiteit geregistreerd.",
@@ -473,6 +474,27 @@
       "OAUTH_APP_SAVED": "Inlog-app opgeslagen",
       "OAUTH_APP_REPLACED": "Inlog-app vervangen",
       "OAUTH_APP_REMOVED": "Inlog-app verwijderd"
+    },
+    "detail": {
+      "field": {
+        "NAME": "Naam",
+        "PRIMARY_DOMAIN": "Primair domein",
+        "PLAN": "Abonnement",
+        "LOCALE": "Standaardtaal",
+        "OWNER_EMAIL": "E-mailadres eigenaar"
+      },
+      "CHANGED_FIELDS": "Gewijzigd: {fields}",
+      "STUDIO_INVITE_SENT": "Studio-uitnodiging voor nieuwe eigenaar verstuurd",
+      "STUDIO_INVITE_UNSENT": "Studio-uitnodiging voor nieuwe eigenaar niet verstuurd",
+      "MAIN_ADDRESS_CHANGED": "Hoofdadres: {from} → {to}",
+      "CUSTOM_DOMAIN_REQUESTED": "Koppeling eigen domein aangevraagd: {domain}",
+      "CUSTOM_DOMAIN_REMOVED": "Eigen domein verwijderd: {domain}",
+      "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Extra talen: geen} other {Extra talen: {languages}}}",
+      "SUSPENSION_REASON": "Reden: {category}",
+      "SUSPENSION_REFERENCE": "Referentie: {reference}",
+      "PLAN": "Abonnement: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "SIGN_IN_PROVIDER": "Aanmeldprovider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
+      "CLIENT_SECRET_REPLACED": "Clientgeheim vervangen"
     }
   },
   "tenantDomainPage": {

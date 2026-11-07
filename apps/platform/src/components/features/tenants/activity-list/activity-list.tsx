@@ -6,6 +6,9 @@ import {
   WORKER_AUDIT_ACTOR_ID,
 } from '@blog/config';
 import type { TListedAuditEvent } from '@blog/db/queries/audit-events';
+import { hasArrayGotItems } from '@blog/utils/primitives';
+import { ActivityDetails } from '@platform/components/features/tenants/activity-list/components/activity-details/activity-details';
+import { toActivityDetails } from '@platform/components/features/tenants/activity-list/to-activity-details';
 import { CardList } from '@platform/components/shared/card-list';
 import {
   Icon,
@@ -62,20 +65,31 @@ export const ActivityList = ({ events }: TActivityListProps) => {
     <CardList
       items={events}
       emptyMessage={t('empty')}
-      renderRow={(event) => (
-        <CardList.Row key={event.id}>
-          <CardList.Lead>
-            <span className={activityIcon()}>
-              <Icon name={ACTIVITY_ICON[event.action]} />
-            </span>
-          </CardList.Lead>
-          <CardList.Primary>{t(`action.${event.action}`)}</CardList.Primary>
-          <CardList.Secondary>{actorLabel(event)}</CardList.Secondary>
-          <CardList.Time date={event.createdAt}>
-            {formatRelativeTime(event.createdAt, t, locale)}
-          </CardList.Time>
-        </CardList.Row>
-      )}
+      renderRow={(event) => {
+        const { id, action, details, createdAt } = event;
+        const activityDetails = toActivityDetails(action, details);
+        const hasDetails = hasArrayGotItems(activityDetails);
+
+        return (
+          <CardList.Row key={id} align={hasDetails ? 'start' : 'center'}>
+            <CardList.Lead>
+              <span className={activityIcon()}>
+                <Icon name={ACTIVITY_ICON[action]} />
+              </span>
+            </CardList.Lead>
+            <CardList.Primary>{t(`action.${action}`)}</CardList.Primary>
+            <CardList.Secondary>{actorLabel(event)}</CardList.Secondary>
+            {hasDetails && (
+              <CardList.Footer>
+                <ActivityDetails details={activityDetails} />
+              </CardList.Footer>
+            )}
+            <CardList.Time date={createdAt}>
+              {formatRelativeTime(createdAt, t, locale)}
+            </CardList.Time>
+          </CardList.Row>
+        );
+      }}
     />
   );
 };

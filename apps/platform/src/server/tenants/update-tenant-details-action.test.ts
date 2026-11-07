@@ -13,6 +13,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { OWNER_INVITE_RESEND_PATH } from '@platform/constants/owner-access';
 import {
+  TENANT_DETAILS_FIELD,
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
   TENANT_LOG,
@@ -436,10 +437,26 @@ describe(updateTenantDetailsAction, () => {
       targetId: MOCK_TENANT_ID,
       details: {
         ...validInput,
+        changedFields: [],
         ownerEmailUpdated: false,
         studioReinviteRequested: false,
+        studioReinviteUnsent: false,
       },
     });
+  });
+
+  it('records which tenant details differ from the stored tenant', async () => {
+    getTenantByIdMock.mockResolvedValue(
+      mockTenant({ name: MOCK_RENAMED_TENANT_NAME, plan: TENANT_PLAN.GROWTH }),
+    );
+
+    await updateTenantDetailsAction(MOCK_TENANT_ID, validInput);
+
+    const [event] = insertAuditEventMock.mock.lastCall ?? [];
+    expect(event.details.changedFields).toStrictEqual([
+      TENANT_DETAILS_FIELD.NAME,
+      TENANT_DETAILS_FIELD.PLAN,
+    ]);
   });
 
   it("records that the owner's invite email changed without recording the address", async () => {
@@ -458,8 +475,10 @@ describe(updateTenantDetailsAction, () => {
 
     expect(event.details).toStrictEqual({
       ...validInput,
+      changedFields: [TENANT_DETAILS_FIELD.OWNER_EMAIL],
       ownerEmailUpdated: true,
       studioReinviteRequested: false,
+      studioReinviteUnsent: false,
     });
   });
 
@@ -542,6 +561,7 @@ describe(updateTenantDetailsAction, () => {
 
       const [event] = insertAuditEventMock.mock.lastCall ?? [];
       expect(event.details.studioReinviteRequested).toBe(false);
+      expect(event.details.studioReinviteUnsent).toBe(true);
       expect(result).toEqual({
         outcome: ACTION_OUTCOME.SUCCESS,
         tenant: readyTenant,

@@ -439,7 +439,8 @@
   },
   "tenantActivityPage": {
     "title": "Activité",
-    "description": "Actions de cycle de vie et d'opérateur sur ce locataire, de la plus récente à la plus ancienne."
+    "description": "Actions de cycle de vie et d'opérateur sur ce locataire, de la plus récente à la plus ancienne.",
+    "backLink": "Retour"
   },
   "activityList": {
     "empty": "Aucune activité enregistrée pour le moment.",
@@ -473,6 +474,27 @@
       "OAUTH_APP_SAVED": "Application de connexion enregistrée",
       "OAUTH_APP_REPLACED": "Application de connexion remplacée",
       "OAUTH_APP_REMOVED": "Application de connexion supprimée"
+    },
+    "detail": {
+      "field": {
+        "NAME": "Nom",
+        "PRIMARY_DOMAIN": "Domaine principal",
+        "PLAN": "Formule",
+        "LOCALE": "Langue par défaut",
+        "OWNER_EMAIL": "E-mail du propriétaire"
+      },
+      "CHANGED_FIELDS": "Modifié : {fields}",
+      "STUDIO_INVITE_SENT": "Invitation Studio envoyée au nouveau propriétaire",
+      "STUDIO_INVITE_UNSENT": "Invitation Studio non envoyée au nouveau propriétaire",
+      "MAIN_ADDRESS_CHANGED": "Adresse principale : {from} → {to}",
+      "CUSTOM_DOMAIN_REQUESTED": "Connexion du domaine personnalisé demandée : {domain}",
+      "CUSTOM_DOMAIN_REMOVED": "Domaine personnalisé supprimé : {domain}",
+      "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Langues supplémentaires : aucune} other {Langues supplémentaires : {languages}}}",
+      "SUSPENSION_REASON": "Motif : {category}",
+      "SUSPENSION_REFERENCE": "Référence : {reference}",
+      "PLAN": "Formule : {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
+      "CLIENT_SECRET_REPLACED": "Secret client remplacé"
     }
   },
   "tenantDomainPage": {

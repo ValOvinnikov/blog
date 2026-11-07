@@ -439,7 +439,8 @@
   },
   "tenantActivityPage": {
     "title": "Aktivität",
-    "description": "Lebenszyklus- und Operatoraktionen für diesen Mandanten, neueste zuerst."
+    "description": "Lebenszyklus- und Operatoraktionen für diesen Mandanten, neueste zuerst.",
+    "backLink": "Zurück"
   },
   "activityList": {
     "empty": "Noch keine Aktivitäten erfasst.",
@@ -473,6 +474,27 @@
       "OAUTH_APP_SAVED": "Anmelde-App gespeichert",
       "OAUTH_APP_REPLACED": "Anmelde-App ersetzt",
       "OAUTH_APP_REMOVED": "Anmelde-App entfernt"
+    },
+    "detail": {
+      "field": {
+        "NAME": "Name",
+        "PRIMARY_DOMAIN": "Primäre Domain",
+        "PLAN": "Tarif",
+        "LOCALE": "Standardsprache",
+        "OWNER_EMAIL": "E-Mail des Inhabers"
+      },
+      "CHANGED_FIELDS": "Geändert: {fields}",
+      "STUDIO_INVITE_SENT": "Studio-Einladung für neuen Inhaber gesendet",
+      "STUDIO_INVITE_UNSENT": "Studio-Einladung für neuen Inhaber nicht gesendet",
+      "MAIN_ADDRESS_CHANGED": "Hauptadresse: {from} → {to}",
+      "CUSTOM_DOMAIN_REQUESTED": "Verbindung der eigenen Domain angefordert: {domain}",
+      "CUSTOM_DOMAIN_REMOVED": "Eigene Domain entfernt: {domain}",
+      "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Zusätzliche Sprachen: keine} other {Zusätzliche Sprachen: {languages}}}",
+      "SUSPENSION_REASON": "Grund: {category}",
+      "SUSPENSION_REFERENCE": "Referenz: {reference}",
+      "PLAN": "Tarif: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "SIGN_IN_PROVIDER": "Anmeldeanbieter: {provider, select, google {Google} github {GitHub} other {{provider}}}",
+      "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt"
     }
   },
   "tenantDomainPage": {

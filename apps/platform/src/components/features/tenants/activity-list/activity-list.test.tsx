@@ -4,6 +4,7 @@ import {
   WORKER_AUDIT_ACTOR_ID,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { TENANT_DETAILS_FIELD } from '@platform/constants/tenant';
 import {
   mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
@@ -19,6 +20,8 @@ const MOCK_SECOND_EVENT_ID = faker.string.uuid();
 const MOCK_GITHUB_HANDLE = faker.internet.username();
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const MOCK_NOW = new Date(MOCK_AUDIT_EVENT_AT.getTime() + FIVE_MINUTES_MS);
+const MOCK_FROM_DOMAIN = faker.internet.domainName();
+const MOCK_TO_DOMAIN = faker.internet.domainName();
 
 const setup = customRender(ActivityList, {
   events: [
@@ -102,6 +105,65 @@ describe(`<${ActivityList.name}/>`, () => {
     const handleLabel = screen.getByText(MOCK_GITHUB_HANDLE);
 
     expect(handleLabel).toBeVisible();
+  });
+
+  it('says which tenant details a save changed and that the Studio invite went unsent', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.SETTINGS_UPDATED,
+          details: {
+            changedFields: [
+              TENANT_DETAILS_FIELD.NAME,
+              TENANT_DETAILS_FIELD.OWNER_EMAIL,
+            ],
+            studioReinviteRequested: false,
+            studioReinviteUnsent: true,
+          },
+        }),
+      ],
+    });
+
+    const changedFields = screen.getByText('Changed: Name and Owner email');
+    const unsentInvite = screen.getByText("New owner's Studio invite not sent");
+
+    expect(changedFields).toBeVisible();
+    expect(unsentInvite).toBeVisible();
+  });
+
+  it('shows the previous and new main address of an address switch', () => {
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.SETTINGS_UPDATED,
+          details: {
+            mainAddressChanged: { from: MOCK_FROM_DOMAIN, to: MOCK_TO_DOMAIN },
+          },
+        }),
+      ],
+    });
+
+    const mainAddress = screen.getByText(
+      `Main address: ${MOCK_FROM_DOMAIN} → ${MOCK_TO_DOMAIN}`,
+    );
+
+    expect(mainAddress).toBeVisible();
+  });
+
+  it('shows no raw detail keys it does not know', () => {
+    const unknownKey = faker.lorem.word();
+    setup({
+      events: [
+        mockAuditEvent({
+          action: AUDIT_ACTION.SETTINGS_UPDATED,
+          details: { [unknownKey]: MOCK_TO_DOMAIN },
+        }),
+      ],
+    });
+
+    const rawValue = screen.queryByText(MOCK_TO_DOMAIN, { exact: false });
+
+    expect(rawValue).not.toBeInTheDocument();
   });
 
   it('shows an empty state when there is no recorded activity', () => {
