@@ -51,6 +51,7 @@ vi.mock('@blog/db', async () => ({
     memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },
+    tenants: { getUnsentStudioReinviteEmail: vi.fn().mockResolvedValue(null) },
   },
 }));
 
