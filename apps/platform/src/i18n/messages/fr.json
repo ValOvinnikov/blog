@@ -1411,6 +1411,7 @@
     "resendStudioInvite": "Renvoyer l'invitation",
     "studioInviteResent": "Une nouvelle invitation Studio est en route vers le propriétaire.",
     "studioInviteResendFailed": "Le service de configuration est injoignable. Réessayez.",
+    "studioInviteUnsentNotice": "L'invitation Studio n'a pas encore été envoyée au nouveau propriétaire.",
     "lockedAnnouncement": "Certains champs des détails du locataire sont désormais verrouillés.",
     "unlockedAnnouncement": "D'autres champs des détails du locataire sont désormais modifiables.",
     "fieldLockedReasonStep": "Verrouillé — l'étape « {step} » est déjà terminée et a utilisé cette valeur.",

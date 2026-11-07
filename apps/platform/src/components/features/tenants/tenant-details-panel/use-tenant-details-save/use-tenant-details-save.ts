@@ -1,18 +1,14 @@
 'use client';
 
-import {
-  ACTION_OUTCOME,
-  isOutcomeSuccess,
-  type TMaybeUndefined,
-} from '@blog/config';
+import { ACTION_OUTCOME, type TMaybeUndefined } from '@blog/config';
 import type { TValueOf } from '@blog/config/utils';
 import type {
   TTenantDetailsFieldErrors,
   TTenantDetailsValues,
 } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
+import { useResendStudioInvite } from '@platform/components/features/tenants/tenant-details-panel/use-resend-studio-invite';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { useToast } from '@platform/context/toast-provider';
-import { resendChangedOwnerStudioInviteAction } from '@platform/server/tenants/resend-changed-owner-studio-invite-action';
 import {
   updateTenantDetailsAction,
   type TUpdateTenantDetailsRefusal,
@@ -43,6 +39,7 @@ export const useTenantDetailsSave = (
   const t = useTranslations('tenantDetailsPanel');
   const toast = useToast();
   const router = useRouter();
+  const resendStudioInvite = useResendStudioInvite(tenantId);
   const [fieldErrors, setFieldErrors] = useState<TTenantDetailsFieldErrors>({});
   const [formErrorKey, setFormErrorKey] =
     useState<TMaybeUndefined<TFormErrorKey>>(undefined);
@@ -50,17 +47,6 @@ export const useTenantDetailsSave = (
   const clearErrors = () => {
     setFieldErrors({});
     setFormErrorKey(undefined);
-  };
-
-  const resendStudioInvite = async () => {
-    const result = await settleAction(
-      resendChangedOwnerStudioInviteAction(tenantId),
-    );
-    if (isOutcomeSuccess(result)) {
-      toast.success({ message: t('studioInviteResent') });
-    } else {
-      toast.error({ message: t('studioInviteResendFailed') });
-    }
   };
 
   const save = async (): Promise<boolean> => {

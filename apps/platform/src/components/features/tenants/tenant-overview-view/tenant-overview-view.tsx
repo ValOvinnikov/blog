@@ -1,6 +1,7 @@
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isNull } from '@blog/utils/primitives';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
@@ -34,7 +35,14 @@ export const TenantOverviewView = async ({
   const { id, primaryDomain, status, deprovisionedAt } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [admin, owner, auditEvents, findings, suspension] = await Promise.all([
+  const [
+    admin,
+    owner,
+    auditEvents,
+    findings,
+    suspension,
+    unsentStudioReinviteEmail,
+  ] = await Promise.all([
     requireAdmin(),
     queries.memberships.getTenantOwnerMembership(id),
     queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
@@ -42,6 +50,7 @@ export const TenantOverviewView = async ({
     }),
     queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
     loadOperatorSuspension(tenant),
+    queries.tenants.getUnsentStudioReinviteEmail(id),
   ]);
   const canChangeSuspension =
     isSuperAdmin(admin) &&
@@ -61,6 +70,7 @@ export const TenantOverviewView = async ({
         tenant={clientTenant}
         owner={owner}
         isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}
+        isStudioReinviteUnsent={!isNull(unsentStudioReinviteEmail)}
       />
 
       <FindingsCard tenantId={id} findings={findings} />

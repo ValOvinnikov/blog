@@ -66,12 +66,14 @@ const {
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
   requireAdminMock,
+  getUnsentStudioReinviteEmailMock,
 } = vi.hoisted(() => ({
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
   requireAdminMock: vi.fn(),
+  getUnsentStudioReinviteEmailMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
@@ -80,6 +82,9 @@ vi.mock('@blog/db', async () => ({
     memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },
+    tenants: {
+      getUnsentStudioReinviteEmail: getUnsentStudioReinviteEmailMock,
+    },
   },
 }));
 
@@ -140,6 +145,7 @@ const TENANT_DETAILS = 'Tenant details';
 const LOCKED_WHILE_PROVISIONING_IS_RUNNING =
   'Locked while provisioning is running.';
 const SUSPEND_TENANT = 'Suspend tenant';
+const UNSENT_INVITE_NOTICE = en.tenantDetailsPanel.studioInviteUnsentNotice;
 
 describe(`<${TenantOverviewView.name}/>`, () => {
   beforeEach(() => {
@@ -153,6 +159,8 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
+    getUnsentStudioReinviteEmailMock.mockReset();
+    getUnsentStudioReinviteEmailMock.mockResolvedValue(null);
     requireAdminMock.mockReset();
     requireAdminMock.mockResolvedValue({
       id: MOCK_ADMIN_ID,
@@ -189,6 +197,24 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(statusBadge).toBeVisible();
     expect(planBadge).toBeVisible();
   });
+
+  it.each([
+    [null, false],
+    [MOCK_INVITED_OWNER_EMAIL, true],
+  ])(
+    'shows the unsent Studio invite notice only while a re-invite is owed (%s)',
+    async (unsentEmail, isNoticeShown) => {
+      getUnsentStudioReinviteEmailMock.mockResolvedValue(unsentEmail);
+      await setup({ tenant: mockTenant({ id: MOCK_TENANT_ID }) });
+
+      const notice = screen.queryByText(UNSENT_INVITE_NOTICE);
+
+      expect(getUnsentStudioReinviteEmailMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      expect(Boolean(notice)).toBe(isNoticeShown);
+    },
+  );
 
   it('relocates the tenant details panel here as the Identity card', async () => {
     await setup({ tenant: mockTenant({ name: MOCK_TENANT_NAME }) });
