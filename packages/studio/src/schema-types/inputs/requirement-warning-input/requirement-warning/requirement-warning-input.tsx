@@ -5,7 +5,7 @@ import {
   type TEntitlementState,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
-import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
+import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
 import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
 import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { hasLength } from '@blog/utils/primitives';

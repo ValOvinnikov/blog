@@ -3,7 +3,11 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { isNull, isUndefined } from '@blog/utils/primitives';
 import type { ComponentType } from 'react';
-import type { InsertMenuOptions, SchemaType } from 'sanity';
+import {
+  type InsertMenuOptions,
+  isReferenceSchemaType,
+  type SchemaType,
+} from 'sanity';
 
 type TPickerType = { name: string };
 
@@ -58,17 +62,11 @@ export const filterModulePickerTypes = ({
     (type) => matchesTab(type, groups, tab) && matchesQuery(type, query),
   );
 
-const isReferenceType = (type: unknown): type is { to: SchemaType[] } =>
-  typeof type === 'object' &&
-  !isNull(type) &&
-  'name' in type &&
-  (type.name === 'reference' || ('type' in type && isReferenceType(type.type)));
-
 export const getModulePickerIcon = (
   type: SchemaType,
 ): TMaybeUndefined<ComponentType> => {
   const referenceIcon =
-    isReferenceType(type) && type.to?.length === 1
+    isReferenceSchemaType(type) && type.to.length === 1
       ? type.to[0]?.icon
       : undefined;
 

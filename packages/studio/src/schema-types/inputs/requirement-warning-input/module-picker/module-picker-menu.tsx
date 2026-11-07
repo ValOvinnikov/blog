@@ -6,7 +6,7 @@ import {
   filterModulePickerTypes,
   getModulePickerIcon,
   isModulePickerSearchShown,
-} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
+} from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
 import { hasArrayGotItems, hasLength } from '@blog/utils/primitives';
 import { Box, Card, Flex, Tab, TabList, Text, TextInput } from '@sanity/ui';
 import { Menu, MenuItem } from '@sanity/ui/menu';
