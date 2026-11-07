@@ -1,15 +1,13 @@
-import { MODULE_PACK } from '@blog/config/constants';
 import {
   ALL_ITEMS_TAB,
   filterModulePickerTypes,
   getModulePickerIcon,
-  getOffPlanModulePack,
+  hasModuleMembers,
   isModulePickerSearchShown,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
-import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 import type { ComponentType } from 'react';
 import type { SchemaType } from 'sanity';
@@ -138,22 +136,16 @@ describe(getModulePickerIcon, () => {
   });
 });
 
-describe(getOffPlanModulePack, () => {
+describe(hasModuleMembers, () => {
   it.each([
+    { members: 'modules', types: TYPES, expected: true },
     {
-      packs: 'core alone',
-      entitledModulePacks: [MODULE_PACK.CORE],
-      expected: MODULE_PACK.GROWTH,
+      members: 'other types',
+      types: [asSchemaType({ name: MOCK_GROUP })],
+      expected: false,
     },
-    {
-      packs: 'every pack',
-      entitledModulePacks: EVERY_MODULE_PACK,
-      expected: undefined,
-    },
-  ])(
-    'finds the pack a module is missing on $packs',
-    ({ entitledModulePacks, expected }) => {
-      expect(getOffPlanModulePack(TYPES, entitledModulePacks)).toBe(expected);
-    },
-  );
+    { members: 'nothing', types: [], expected: false },
+  ])('is $expected for an array of $members', ({ types, expected }) => {
+    expect(hasModuleMembers(types)).toBe(expected);
+  });
 });

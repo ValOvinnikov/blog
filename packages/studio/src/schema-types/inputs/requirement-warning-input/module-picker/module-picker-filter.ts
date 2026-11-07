@@ -1,6 +1,5 @@
-import type { TModulePack } from '@blog/config/constants';
+import { getModulePack } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
-import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { isNull, isUndefined } from '@blog/utils/primitives';
 import type { ComponentType } from 'react';
 import {
@@ -17,13 +16,8 @@ const AUTO_FILTER_MIN_TYPES = 6;
 
 export const ALL_ITEMS_TAB = 'all-items';
 
-export const getOffPlanModulePack = (
-  types: readonly TPickerType[],
-  entitledModulePacks: readonly TModulePack[],
-): TMaybeUndefined<TModulePack> =>
-  types
-    .map(({ name }) => getMissingModulePack(name, entitledModulePacks))
-    .find((modulePack) => !isNull(modulePack)) ?? undefined;
+export const hasModuleMembers = (types: readonly TPickerType[]) =>
+  types.some(({ name }) => !isNull(getModulePack(name)));
 
 export const isModulePickerSearchShown = (
   filter: InsertMenuOptions['filter'],

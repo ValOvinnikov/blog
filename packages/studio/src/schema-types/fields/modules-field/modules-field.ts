@@ -7,6 +7,7 @@ import {
 } from '@blog/studio/schema-types/validation/module-path/module-path';
 import { validateModulesEntitled } from '@blog/studio/schema-types/validation/validate-modules-entitled/validate-modules-entitled';
 import {
+  getModuleTitle,
   moduleInsertMenuGroups,
   sortModulesByKind,
 } from '@blog/studio/structure/module-kinds/module-kinds';
@@ -36,6 +37,7 @@ export const modulesField = ({
     of: allow.map((type) =>
       defineArrayMember({
         name: type,
+        title: getModuleTitle(type),
         type: 'reference',
         to: [{ type }],
         options: { filter: entitledModuleFilter },
@@ -43,10 +45,7 @@ export const modulesField = ({
     ),
     options: { insertMenu: { groups: moduleInsertMenuGroups(allow) } },
     validation: (rule) => {
-      // `unique()` compares array items by `_ref` for reference-typed array
-      // members, so this rejects the same module document being referenced
-      // twice in one page. That guarantee is what makes a module's `_id`
-      // safe to use as a React key downstream in the web app.
+      // A module's `_id` is a React key on the web, so a page may reference each module document only once.
       const uniqueRule = rule
         .unique()
         .error('Each module can only be referenced once per page.');
