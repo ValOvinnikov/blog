@@ -4,12 +4,12 @@ import { getMissingModulePack } from '@blog/studio/schema-types/inputs/requireme
 import {
   ALL_ITEMS_TAB,
   filterModulePickerTypes,
-  getModulePickerIcon,
   isModulePickerSearchShown,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
+import { ModulePickerRow } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-row';
 import { hasArrayGotItems, hasLength } from '@blog/utils/primitives';
 import { Box, Card, Flex, Tab, TabList, Text, TextInput } from '@sanity/ui';
-import { Menu, MenuItem } from '@sanity/ui/menu';
+import { Menu } from '@sanity/ui/menu';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -94,14 +94,14 @@ export const ModulePickerMenu = ({
         {hasLength(shown) ? (
           <Flex direction="column" gap={1}>
             {shown.map((type) => (
-              <MenuItem
+              <ModulePickerRow
                 key={type.name}
-                disabled={Boolean(
-                  getMissingModulePack(type.name, entitledModulePacks),
+                type={type}
+                missingModulePack={getMissingModulePack(
+                  type.name,
+                  entitledModulePacks,
                 )}
-                icon={getModulePickerIcon(type)}
-                text={type.title ?? type.name}
-                onClick={() => onSelect(type)}
+                onSelect={onSelect}
               />
             ))}
           </Flex>

@@ -2,12 +2,15 @@
 
 import {
   ACTION_OUTCOME,
+  CAPABILITY,
   TENANT_WRITE_REFUSAL,
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
+import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { auth } from '@web/server/auth/auth';
+import { isReaderAccountFeatureEnabled } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
@@ -16,9 +19,9 @@ export type TSetBookmarkResult = TActionResult<
   typeof ACTION_OUTCOME.UNAVAILABLE | typeof ACTION_OUTCOME.SERVER_ERROR
 >;
 
-const UPDATE_FAILED_EVENT = 'bookmark.update_failed';
-
 const SERVER_ERROR = toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+
+const UNAVAILABLE = toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 
 export const getBookmarkStatus = async (postId: string): Promise<boolean> => {
   const session = await auth();
@@ -42,12 +45,16 @@ export const setBookmarkStatus = async (
   const tenant = await resolveWritableTenant('bookmark.set');
   if (!tenant.ok) {
     if (tenant.error === TENANT_WRITE_REFUSAL.INACTIVE) {
-      logger.warn('bookmark.tenant_not_active', { postId });
-      return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
+      logger.warn(BOOKMARK_LOG.TENANT_NOT_ACTIVE, { postId });
+      return UNAVAILABLE;
     }
     return SERVER_ERROR;
   }
   const { data: tenantId } = tenant;
+
+  if (!(await isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS))) {
+    return UNAVAILABLE;
+  }
 
   try {
     if (isBookmarked) {
@@ -57,7 +64,7 @@ export const setBookmarkStatus = async (
         postId,
       );
       if (!result.ok) {
-        logger.error(UPDATE_FAILED_EVENT, {
+        logger.error(BOOKMARK_LOG.UPDATE_FAILED, {
           postId,
           error: result.error,
         });
@@ -68,7 +75,7 @@ export const setBookmarkStatus = async (
     }
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
-    logger.error(UPDATE_FAILED_EVENT, { postId, error });
+    logger.error(BOOKMARK_LOG.UPDATE_FAILED, { postId, error });
     return SERVER_ERROR;
   }
 };

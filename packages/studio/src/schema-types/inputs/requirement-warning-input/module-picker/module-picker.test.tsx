@@ -2,11 +2,13 @@
  * @vitest-environment jsdom
  */
 import { MODULE_PACK } from '@blog/config/constants';
+import { MODULE_PACK_LABEL } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
 import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
 import { ctaSchema } from '@blog/studio/schema-types/modules/cta/cta';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { pricingSchema } from '@blog/studio/schema-types/modules/pricing/pricing';
+import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
@@ -39,9 +41,15 @@ const PRICING_TYPE = {
   title: PRICING_TITLE,
 } as SchemaType;
 const TYPES = [CTA_TYPE, PRICING_TYPE, FAQ_TYPE];
+const TITLES = [CTA_TITLE, PRICING_TITLE, FAQ_TITLE];
+const GROWTH_LABEL = MODULE_PACK_LABEL[MODULE_PACK.GROWTH];
 
 const ModulePicker = createModulePicker({
   entitledModulePacks: [MODULE_PACK.CORE],
+});
+
+const GrowthModulePicker = createModulePicker({
+  entitledModulePacks: EVERY_MODULE_PACK,
 });
 
 type TPickerProps = ComponentProps<typeof ModulePicker>;
@@ -53,10 +61,12 @@ const renderPicker = ({
   types = TYPES,
   fieldTypes = TYPES,
   readOnly = false,
+  Picker = ModulePicker,
 }: {
   types?: SchemaType[];
   fieldTypes?: SchemaType[];
   readOnly?: boolean;
+  Picker?: typeof ModulePicker;
 } = {}) => {
   const props = {
     schemaType: {
@@ -82,7 +92,7 @@ const renderPicker = ({
   render(
     <ThemeProvider theme={buildTheme()}>
       <ModulePickerTypesContext.Provider value={types}>
-        <ModulePicker {...props} />
+        <Picker {...props} />
       </ModulePickerTypesContext.Provider>
     </ThemeProvider>,
   );
@@ -94,8 +104,11 @@ const addButton = () =>
 const menuItem = (title: string) =>
   screen.getByRole<HTMLButtonElement>('menuitem', { name: title });
 
-const menuItemNames = () =>
-  screen.getAllByRole('menuitem').map((item) => item.textContent);
+const expectMenuItems = (titles: string[]) => {
+  const items = screen.getAllByRole('menuitem');
+
+  expect(items).toEqual(titles.map(menuItem));
+};
 
 describe(`<${ModulePicker.name}/>`, () => {
   beforeEach(() => {
@@ -118,12 +131,25 @@ describe(`<${ModulePicker.name}/>`, () => {
     });
 
     it('lists every module in its usual place', () => {
-      expect(menuItemNames()).toEqual([CTA_TITLE, PRICING_TITLE, FAQ_TITLE]);
+      expectMenuItems(TITLES);
     });
 
-    it('disables a module outside the plan, labelled only by its title', () => {
-      expect(menuItem(PRICING_TITLE).disabled).toBe(true);
-      expect(menuItem(CTA_TITLE).disabled).toBe(false);
+    it('disables a module outside the plan, described by the plan it needs', () => {
+      const growthItem = screen.getByRole<HTMLButtonElement>('menuitem', {
+        name: PRICING_TITLE,
+        description: GROWTH_LABEL,
+      });
+
+      expect(growthItem.disabled).toBe(true);
+    });
+
+    it('leaves a module in the plan available, with no plan described', () => {
+      const coreItem = screen.getByRole<HTMLButtonElement>('menuitem', {
+        name: CTA_TITLE,
+        description: '',
+      });
+
+      expect(coreItem.disabled).toBe(false);
     });
 
     it('appends an available module when chosen', () => {
@@ -144,7 +170,7 @@ describe(`<${ModulePicker.name}/>`, () => {
 
       fireEvent.click(kindTab);
 
-      expect(menuItemNames()).toEqual([FAQ_TITLE]);
+      expectMenuItems([FAQ_TITLE]);
     });
 
     it('searches within the selected tab', () => {
@@ -165,15 +191,26 @@ describe(`<${ModulePicker.name}/>`, () => {
       fireEvent.click(kindTab);
       fireEvent.click(allTab);
 
-      expect(menuItemNames()).toEqual([CTA_TITLE, PRICING_TITLE, FAQ_TITLE]);
+      expectMenuItems(TITLES);
     });
+  });
+
+  it('disables nothing when every module pack is in the plan', () => {
+    renderPicker({ Picker: GrowthModulePicker });
+    fireEvent.click(addButton());
+
+    expect(
+      screen
+        .getAllByRole<HTMLButtonElement>('menuitem')
+        .map((item) => item.disabled),
+    ).toEqual([false, false, false]);
   });
 
   it("lists the module types it is given over the field's own", () => {
     renderPicker({ fieldTypes: [CTA_TYPE, FAQ_TYPE, PRICING_TYPE] });
     fireEvent.click(addButton());
 
-    expect(menuItemNames()).toEqual([CTA_TITLE, PRICING_TITLE, FAQ_TITLE]);
+    expectMenuItems(TITLES);
   });
 
   it('disables the add button when the field is read-only', () => {
