@@ -5,7 +5,9 @@ import {
   type TEntitlementState,
 } from '@blog/studio/schema-types/inputs/requirement-warning-input/missing-requirement/get-missing-requirement';
 import { createModulePicker } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker';
-import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-sections';
+import { getOffPlanModulePack } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-filter';
+import { ModulePickerTypesContext } from '@blog/studio/schema-types/inputs/requirement-warning-input/module-picker/module-picker-types-context';
+import { EVERY_MODULE_PACK } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { hasLength } from '@blog/utils/primitives';
 import { Card, Stack, Text } from '@sanity/ui';
 import { useMemo } from 'react';
@@ -22,12 +24,23 @@ export const createRequirementWarningInput = (
 
   return function RequirementWarningInput(props: InputProps) {
     const { schemaType } = props;
-    const markedArrayType = useMemo(() => {
-      const of =
-        isArraySchemaType(schemaType) &&
-        markRequirementOffTypes(schemaType.of, entitlements);
+    const { markedArrayType, pickerTypes } = useMemo(() => {
+      if (!isArraySchemaType(schemaType)) {
+        return { markedArrayType: null, pickerTypes: null };
+      }
 
-      return of ? Object.create(schemaType, { of: { value: of } }) : null;
+      const of = markRequirementOffTypes(schemaType.of, entitlements);
+      const everyPackOf = markRequirementOffTypes(schemaType.of, {
+        ...entitlements,
+        entitledModulePacks: EVERY_MODULE_PACK,
+      });
+
+      return {
+        markedArrayType: of
+          ? Object.create(schemaType, { of: { value: of } })
+          : null,
+        pickerTypes: everyPackOf ?? schemaType.of,
+      };
     }, [schemaType]);
 
     if (markedArrayType) {
@@ -38,11 +51,15 @@ export const createRequirementWarningInput = (
           entitlements.entitledModulePacks,
         )
       ) {
-        return props.renderDefault({
-          ...props,
-          schemaType: markedArrayType,
-          arrayFunctions: ModulePicker,
-        });
+        return (
+          <ModulePickerTypesContext.Provider value={pickerTypes}>
+            {props.renderDefault({
+              ...props,
+              schemaType: markedArrayType,
+              arrayFunctions: ModulePicker,
+            })}
+          </ModulePickerTypesContext.Provider>
+        );
       }
 
       return props.renderDefault({ ...props, schemaType: markedArrayType });

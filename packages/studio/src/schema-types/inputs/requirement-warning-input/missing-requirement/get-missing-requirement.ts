@@ -75,11 +75,8 @@ export const getMissingRequirement = (
   return capability ? { capability } : null;
 };
 
-export const getModulePackPlanLabel = (modulePack: TModulePack) =>
+const getModulePackPlanLabel = (modulePack: TModulePack) =>
   `${MODULE_PACK_LABEL[modulePack]} plan`;
-
-export const getLockedModulesNote = (modulePack: TModulePack) =>
-  `Locked modules come with the ${getModulePackPlanLabel(modulePack)}.`;
 
 export const getModulePackOffMessage = (modulePack: TModulePack) =>
   `This module is part of the ${getModulePackPlanLabel(modulePack)}. It stays saved, but the site won't show it on your current plan.`;

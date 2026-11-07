@@ -76,7 +76,7 @@ const kindIndexByName = new Map<string, number>(
 const kindIndex = (name: string) =>
   kindIndexByName.get(name) ?? moduleKinds.length;
 
-export const getModuleTitle = (name: string) => titleByName.get(name) ?? name;
+const getModuleTitle = (name: string) => titleByName.get(name) ?? name;
 
 export const sortModulesByKind = (names: string[]) =>
   [...names].sort(

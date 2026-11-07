@@ -1975,10 +1975,11 @@ than showing a false warning. Because it is read on each Studio load,
 turning a feature on clears the warning on the next load. The same warning
 covers module packs: given an optional `entitlements.modulePacks`, a module
 type outside them (`MODULE_PACK_BY_TYPE` in `@blog/config`) shows as
-unavailable in pickers (disabled with a "Growth plan" badge in the modules
-field's own "Add item…" menu, passed as the array input's `arrayFunctions`;
-locked, titled "— Growth plan" and listed last in Sanity's per-row insert
-menus), offers no document to pick, can't be created new,
+unavailable in pickers (disabled, and otherwise as a site with every pack
+sees it, in the modules field's own "Add item…" menu — a copy of Sanity's
+insert menu passed as the array input's `arrayFunctions`, since Sanity's has
+no disabled row; locked, titled "— Growth plan" and listed last in Sanity's
+per-row insert menus), offers no document to pick, can't be created new,
 and warns on its documents
 and on page references; the plan message wins over the capability one.
 Omitted, every pack is entitled.
