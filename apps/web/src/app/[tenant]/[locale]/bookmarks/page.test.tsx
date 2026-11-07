@@ -18,9 +18,6 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock(
   '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled',
-  () => ({
-    isReaderAccountFeatureEnabled: vi.fn(),
-  }),
 );
 
 const setup = customRenderAsync(BookmarksRoute, { params: mockRouteParams() });

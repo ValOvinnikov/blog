@@ -7424,6 +7424,22 @@
         "file": "apps/web/src/constants/bookmark.ts"
       }
     ],
+    "bookmark.tenant_not_active": [
+      {
+        "ref": "BOOKMARK_LOG.TENANT_NOT_ACTIVE",
+        "scope": "app:web",
+        "from": "@web/constants/bookmark",
+        "file": "apps/web/src/constants/bookmark.ts"
+      }
+    ],
+    "bookmark.update_failed": [
+      {
+        "ref": "BOOKMARK_LOG.UPDATE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/bookmark",
+        "file": "apps/web/src/constants/bookmark.ts"
+      }
+    ],
     "busy_style.site_config_fetch_failed": [
       {
         "ref": "BUSY_STYLE_LOG.SITE_CONFIG_FETCH_FAILED",
