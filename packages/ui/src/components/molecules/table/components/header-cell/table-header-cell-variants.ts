@@ -1,9 +1,19 @@
 import { tv } from '@blog/ui/lib/styling';
+import type { VariantProps } from 'tailwind-variants';
 
 export const tableHeaderCellVariants = tv({
-  base: [
-    'min-w-32 px-3 py-2 align-bottom',
-    'border-b-2 border-border-strong',
-    'font-semibold',
-  ],
+  base: ['min-w-32 px-3 py-2', 'font-semibold'],
+  variants: {
+    isColumnHeader: {
+      true: ['align-bottom', 'border-b-2 border-border-strong'],
+      false: ['align-top', 'border-b border-divider'],
+    },
+  },
+  defaultVariants: {
+    isColumnHeader: false,
+  },
 });
+
+export type TTableHeaderCellVariants = VariantProps<
+  typeof tableHeaderCellVariants
+>;

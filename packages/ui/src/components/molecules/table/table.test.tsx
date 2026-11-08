@@ -24,8 +24,9 @@ const renderTable = () =>
           ))}
         </Table.Row>
       </Table.Head>
-      {MOCK_ROWS.map((cells) => (
-        <Table.Row key={cells.join()}>
+      {MOCK_ROWS.map(([rowHeading, ...cells]) => (
+        <Table.Row key={rowHeading}>
+          <Table.HeaderCell>{rowHeading}</Table.HeaderCell>
           {cells.map((cell) => (
             <Table.Cell key={cell}>{cell}</Table.Cell>
           ))}
@@ -60,8 +61,17 @@ describe(`<${Table.name}/>`, () => {
   it.each(MOCK_COLUMNS)('renders "%s" as a column header', (column) => {
     const header = screen.getByRole('columnheader', { name: column });
 
-    expect(header).toHaveAttribute('scope', 'col');
+    expect(header).toBeVisible();
   });
+
+  it.each(MOCK_ROWS.map(([rowHeading]) => rowHeading))(
+    'renders "%s" in a body row as a row header',
+    (rowHeading) => {
+      const header = screen.getByRole('rowheader', { name: rowHeading });
+
+      expect(header).toBeVisible();
+    },
+  );
 
   it('keeps header rows apart from the data rows', () => {
     const [headGroup, bodyGroup] = screen.getAllByRole('rowgroup');
@@ -72,9 +82,12 @@ describe(`<${Table.name}/>`, () => {
     expect(bodyRows).toHaveLength(MOCK_ROWS.length);
   });
 
-  it.each(MOCK_ROWS.flat())('renders "%s" as a data cell', (cell) => {
-    const dataCell = screen.getByRole('cell', { name: cell });
+  it.each(MOCK_ROWS.flatMap(([, ...cells]) => cells))(
+    'renders "%s" as a data cell',
+    (cell) => {
+      const dataCell = screen.getByRole('cell', { name: cell });
 
-    expect(dataCell).toBeVisible();
-  });
+      expect(dataCell).toBeVisible();
+    },
+  );
 });

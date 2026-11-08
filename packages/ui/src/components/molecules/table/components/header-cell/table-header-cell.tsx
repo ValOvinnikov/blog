@@ -1,21 +1,27 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { IWithChildren } from '@blog/config/react';
 
-import { tableHeaderCellVariants } from './table-header-cell-variants';
+import {
+  tableHeaderCellVariants,
+  type TTableHeaderCellVariants,
+} from './table-header-cell-variants';
 
 export type TTableHeaderCellProps = IWithClassName &
   IWithDataTestId &
-  IWithChildren;
+  IWithChildren & {
+    isColumnHeader?: TTableHeaderCellVariants['isColumnHeader'];
+  };
 
-/** A column heading that screen readers announce with every cell beneath it. */
+/** A heading cell that screen readers announce with the cells it names: the column below it inside `Table.Head`, the rest of its row in the body. */
 export const TableHeaderCell = ({
+  isColumnHeader = false,
   className,
   dataTestId,
   children,
 }: TTableHeaderCellProps) => (
   <th
-    scope="col"
-    className={tableHeaderCellVariants({ class: className })}
+    scope={isColumnHeader ? 'col' : 'row'}
+    className={tableHeaderCellVariants({ isColumnHeader, class: className })}
     data-testid={dataTestId}
   >
     {children}

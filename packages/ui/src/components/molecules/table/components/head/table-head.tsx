@@ -1,7 +1,8 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TCompoundChildren } from '@blog/ui/lib/react';
+import { Children, cloneElement, isValidElement } from 'react';
 
-import type { TableRow } from '../row/table-row';
+import { TableRow, type TTableRowProps } from '../row/table-row';
 
 export type TTableHeadProps = IWithClassName &
   IWithDataTestId & {
@@ -15,6 +16,10 @@ export const TableHead = ({
   children,
 }: TTableHeadProps) => (
   <thead className={className} data-testid={dataTestId}>
-    {children}
+    {Children.map(children, (child) =>
+      isValidElement<TTableRowProps>(child) && child.type === TableRow
+        ? cloneElement(child, { isHeadRow: true })
+        : child,
+    )}
   </thead>
 );

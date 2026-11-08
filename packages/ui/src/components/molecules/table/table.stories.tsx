@@ -52,6 +52,16 @@ const renderBodyRows = (bodyRows: TTableStoryRow[]) =>
     </Table.Row>
   ));
 
+const renderBodyRowsWithHeaders = (bodyRows: TTableStoryRow[]) =>
+  bodyRows.map(({ id, cells: [rowHeading, ...cells] }) => (
+    <Table.Row key={id}>
+      {rowHeading && <Table.HeaderCell>{rowHeading.text}</Table.HeaderCell>}
+      {cells.map(({ id, text }) => (
+        <Table.Cell key={id}>{text}</Table.Cell>
+      ))}
+    </Table.Row>
+  ));
+
 const atPhoneWidth: Decorator = (Story) => (
   <div className="max-w-[390px] outline outline-dashed outline-divider">
     <Story />
@@ -99,6 +109,16 @@ export const TwoHeaderRows: TStory = {
         {renderHeaderRow(columns)}
       </Table.Head>,
       renderBodyRows(rows),
+    ],
+  },
+};
+
+export const RowHeaders: TStory = {
+  args: {
+    children: [
+      <Table.Caption key="caption">{faker.lorem.sentence()}</Table.Caption>,
+      <Table.Head key="head">{renderHeaderRow(columns)}</Table.Head>,
+      renderBodyRowsWithHeaders(rows),
     ],
   },
 };
