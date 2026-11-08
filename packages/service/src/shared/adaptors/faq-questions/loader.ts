@@ -15,7 +15,16 @@ export async function getFaqQuestions(
   const raw = await runQuery(faqQuestionsQuery, {
     parameters: { ids },
     tenant,
-    ...isr(['modules:faq', 'block_faq', 'link'], tenant.projectId),
+    ...isr(
+      [
+        'modules:faq',
+        'block_faq',
+        'link',
+        'page_privacyDocument',
+        'page_legalDocument',
+      ],
+      tenant.projectId,
+    ),
   });
 
   return toFaqModuleQuestions(raw, ids);

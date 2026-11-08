@@ -21,6 +21,8 @@ export async function getFeatureList(
         `module:${id}`,
         'block_feature',
         'link',
+        'page_privacyDocument',
+        'page_legalDocument',
         'homePage',
         'page_landing',
       ],

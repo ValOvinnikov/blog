@@ -14,7 +14,15 @@ export async function getPageTitle(
   const raw = await runQuery(pageTitleQuery, {
     tenant,
     parameters: { id },
-    ...isr(['homePage', 'page_landing'], tenant.projectId),
+    ...isr(
+      [
+        'homePage',
+        'page_landing',
+        'page_privacyDocument',
+        'page_legalDocument',
+      ],
+      tenant.projectId,
+    ),
   });
   if (!raw) return undefined;
 

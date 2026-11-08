@@ -20,6 +20,8 @@ export async function getFooter(
         'page_landing',
         'page_postIndex',
         'link',
+        'page_privacyDocument',
+        'page_legalDocument',
         'homePage',
         'page_topic',
         'page_topicIndex',

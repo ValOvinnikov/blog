@@ -3,6 +3,8 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
 
@@ -28,7 +30,7 @@ describe(getPageTitle, () => {
     expect(await getPageTitle(MOCK_PAGE_ID, tenant)).toBeUndefined();
   });
 
-  it('reads the id under the tags the webhook purges for home and landing pages', async () => {
+  it('reads the id under the tags the webhook purges for every page it can title', async () => {
     mockRun.mockResolvedValueOnce({ title: MOCK_PAGE_TITLE });
 
     await getPageTitle(MOCK_PAGE_ID, tenant);
@@ -38,7 +40,12 @@ describe(getPageTitle, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [MOCK_HOME_PAGE_CACHE_TAG, MOCK_PAGE_LANDING_CACHE_TAG],
+        tags: [
+          MOCK_HOME_PAGE_CACHE_TAG,
+          MOCK_PAGE_LANDING_CACHE_TAG,
+          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+        ],
       },
     });
   });

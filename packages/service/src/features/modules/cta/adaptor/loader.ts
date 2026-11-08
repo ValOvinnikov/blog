@@ -20,6 +20,8 @@ export async function getCta(
         'modules:cta',
         `module:${id}`,
         'link',
+        'page_privacyDocument',
+        'page_legalDocument',
         'homePage',
         'page_landing',
         'page_post',

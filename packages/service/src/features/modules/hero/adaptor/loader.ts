@@ -27,6 +27,8 @@ export async function getHero(
           'page_post',
           'page_landing',
           'page_postIndex',
+          'page_privacyDocument',
+          'page_legalDocument',
         ],
         tenant.projectId,
       ),

@@ -3,6 +3,8 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawHeroStatementModule } from '@blog/service/testing/modules/fixtures';
 import {
   MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
@@ -60,6 +62,8 @@ describe(getHeroStatement, () => {
           mockCacheTag('modules:heroStatement'),
           mockCacheTag(`module:${MOCK_HERO_STATEMENT_ID}`),
           MOCK_LINK_CACHE_TAG,
+          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
         ],
       },
     });

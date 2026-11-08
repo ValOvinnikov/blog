@@ -25,6 +25,8 @@ export async function getTranslationMap(
         'page_postIndex',
         'page_topicIndex',
         'page_tagIndex',
+        'page_privacyDocument',
+        'page_legalDocument',
       ],
       tenant.projectId,
     ),

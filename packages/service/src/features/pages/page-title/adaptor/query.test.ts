@@ -9,6 +9,10 @@ const MOCK_LANDING_ID = 'landing-contact-nl';
 const MOCK_POST_ID = 'blog-post-en';
 const MOCK_HOME_TITLE = 'Welcome home';
 const MOCK_LANDING_TITLE = 'Neem contact op';
+const MOCK_PRIVACY_ID = 'privacy-policy-nl';
+const MOCK_PRIVACY_TITLE = 'Privacybeleid';
+const MOCK_LEGAL_ID = 'terms-en';
+const MOCK_LEGAL_TITLE = 'Terms';
 
 const dataset = [
   { _id: MOCK_HOME_ID, _type: 'page_home', title: MOCK_HOME_TITLE },
@@ -17,6 +21,18 @@ const dataset = [
     _type: 'page_landing',
     language: NL,
     title: MOCK_LANDING_TITLE,
+  },
+  {
+    _id: MOCK_PRIVACY_ID,
+    _type: 'page_privacyDocument',
+    language: NL,
+    title: MOCK_PRIVACY_TITLE,
+  },
+  {
+    _id: MOCK_LEGAL_ID,
+    _type: 'page_legalDocument',
+    language: EN,
+    title: MOCK_LEGAL_TITLE,
   },
   { _id: MOCK_POST_ID, _type: 'page_post', language: EN, title: 'A post' },
 ];
@@ -36,6 +52,16 @@ describe('pageTitleQuery', () => {
     });
   });
 
+  it.each([
+    ['privacy', MOCK_PRIVACY_ID, NL, MOCK_PRIVACY_TITLE],
+    ['legal', MOCK_LEGAL_ID, EN, MOCK_LEGAL_TITLE],
+  ])(
+    "reads a %s document page's title in its own language",
+    async (_, id, locale, title) => {
+      expect(await run(id, locale)).toEqual({ title });
+    },
+  );
+
   it('reads a Home with no language as the default language', async () => {
     expect(await run(MOCK_HOME_ID, EN)).toEqual({ title: MOCK_HOME_TITLE });
   });
@@ -45,7 +71,7 @@ describe('pageTitleQuery', () => {
     expect(await run(MOCK_HOME_ID, NL)).toBeNull();
   });
 
-  it('resolves nothing for a document that is not a home or landing page', async () => {
+  it('resolves nothing for a post', async () => {
     expect(await run(MOCK_POST_ID, EN)).toBeNull();
   });
 
