@@ -61,6 +61,7 @@ const MOCK_NESTED_LINK_TEXT = faker.lorem.words(2);
 const MOCK_BOLD_TEXT = faker.lorem.words(2);
 const MOCK_CUSTOM_CODE_TEXT = faker.lorem.words(2);
 const MOCK_SECOND_PARAGRAPH_TEXT = faker.lorem.sentence();
+const MOCK_COOKIE_LINK_TEXT = faker.lorem.words(2);
 const CODE_REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
 
 const RESOLVED_LINK_REF = {
@@ -273,6 +274,27 @@ describe(`<${PortableText.name}/>`, () => {
     const text = screen.getByText(MOCK_DANGLING_LINK_TEXT);
     expect(link).not.toBeInTheDocument();
     expect(text).toBeVisible();
+  });
+
+  it('renders a cookie-preferences annotation as a button', () => {
+    const value: TPortableTextBody = [
+      mockPortableTextBlock(
+        [mockPortableTextSpan(MOCK_COOKIE_LINK_TEXT, [MOCK_LINK_KEY])],
+        {
+          markDefs: [
+            {
+              _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK,
+              _key: MOCK_LINK_KEY,
+            },
+          ],
+        },
+      ),
+    ];
+
+    setup({ value });
+
+    const button = screen.getByRole('button', { name: MOCK_COOKIE_LINK_TEXT });
+    expect(button).toBeVisible();
   });
 
   it('renders sibling blocks in their authored order', () => {
