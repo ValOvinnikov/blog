@@ -2,6 +2,7 @@ import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
 import { brandTaglineItemSchema } from './brand-tagline-item/brand-tagline-item';
+import { cookiePreferencesLinkSchema } from './cookie-preferences-link/cookie-preferences-link';
 import { cookieSettingsItemSchema } from './cookie-settings-item/cookie-settings-item';
 import {
   ctaButtonSchema,
@@ -45,6 +46,7 @@ export const objects = [
   asideSchema,
   inlineLinkSchema,
   linkRefSchema,
+  cookiePreferencesLinkSchema,
   linkRefWithSubItemsSchema,
   logoItemSchema,
   socialProfileSchema,

@@ -1,7 +1,7 @@
 import {
   PORTABLE_TEXT_BLOCK_TYPE,
-  type IPortableTextLinkMark,
   type TPortableTextBlock,
+  type TPortableTextMark,
 } from '@blog/config';
 import type { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
 import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
@@ -20,7 +20,11 @@ type TRawPortableTextSpan = {
 
 function toPortableTextMarkDef(
   raw: TRawPortableTextMarkDef,
-): IPortableTextLinkMark {
+): TPortableTextMark {
+  if (raw._type === PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK) {
+    return { _key: raw._key, _type: raw._type };
+  }
+
   const link = toLinkDocument(raw.link);
 
   return {

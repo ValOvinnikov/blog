@@ -653,9 +653,12 @@ export type ArticleText = Array<
       style?: 'normal' | 'h2' | 'h3' | 'h4' | 'blockquote';
       listItem?: 'bullet' | 'number';
       markDefs?: Array<
-        {
-          _key: string;
-        } & LinkRef
+        | ({
+            _key: string;
+          } & LinkRef)
+        | ({
+            _key: string;
+          } & CookiePreferencesLink)
       >;
       level?: number;
       _type: 'block';
@@ -795,7 +798,7 @@ export type CtaButton = {
 
 export type CookieSettingsItem = {
   _type: 'cookieSettingsItem';
-  placement?: string;
+  marker?: string;
 };
 
 export type FooterLinkGroup = {
@@ -868,6 +871,11 @@ export type LinkRefWithSubItems = {
       _key: string;
     } & LinkRef
   >;
+};
+
+export type CookiePreferencesLink = {
+  _type: 'cookiePreferencesLink';
+  marker?: string;
 };
 
 export type LinkRef = {
@@ -2380,6 +2388,7 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | LinkRefWithSubItems
+  | CookiePreferencesLink
   | LinkRef
   | Aside
   | BodyImage

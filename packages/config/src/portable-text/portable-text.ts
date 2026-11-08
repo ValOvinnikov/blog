@@ -14,7 +14,14 @@ export interface IPortableTextLinkMark extends PortableTextMarkDefinition {
   link: TMaybeUndefined<TPortableTextLink>;
 }
 
+export interface IPortableTextCookiePreferencesMark extends PortableTextMarkDefinition {
+  _type: typeof PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK;
+}
+
+export type TPortableTextMark =
+  IPortableTextLinkMark | IPortableTextCookiePreferencesMark;
+
 export type TPortableTextBlock = PortableTextBlock<
-  IPortableTextLinkMark,
+  TPortableTextMark,
   PortableTextSpan
 > & { _type: 'block'; _key: string };

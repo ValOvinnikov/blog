@@ -1,5 +1,6 @@
 import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
+import { cookiePreferencesLinkSchema } from '@blog/studio/schema-types/objects/cookie-preferences-link/cookie-preferences-link';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import {
   boldDecorator,
@@ -39,7 +40,10 @@ export const articleTextSchema = defineType({
           subscriptDecorator,
           superscriptDecorator,
         ],
-        annotations: [{ type: linkRefSchema.name }],
+        annotations: [
+          { type: linkRefSchema.name },
+          { type: cookiePreferencesLinkSchema.name },
+        ],
       },
     }),
     defineArrayMember({ type: bodyImageSchema.name }),
