@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { postLatestModulePostsQuery } from './posts.query';
 import { postLatestModuleQuery } from './query';
@@ -21,7 +22,10 @@ export async function getPostLatest(
 
   const rawPosts = await runQuery(postLatestModulePostsQuery(raw.limit), {
     tenant,
-    ...isr(['posts', 'author', 'topic'], tenant.projectId),
+    ...isr(
+      ['posts', 'author', 'topic', ...LINK_TARGET_CACHE_TAGS],
+      tenant.projectId,
+    ),
   });
 
   return toPostLatestModule(raw, rawPosts);

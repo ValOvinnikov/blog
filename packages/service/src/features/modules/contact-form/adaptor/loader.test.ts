@@ -1,7 +1,10 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawContactFormModule } from '@blog/service/testing/modules/fixtures';
-import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_LINK_TARGET_CACHE_TAGS,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
   mockRawHeadingBlock,
@@ -57,6 +60,7 @@ describe(getContactForm, () => {
         tags: [
           mockCacheTag('modules:contactForm'),
           mockCacheTag(`module:${MOCK_CONTACT_FORM_ID}`),
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

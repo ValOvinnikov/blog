@@ -2421,7 +2421,9 @@ an author or a post it reads (`authorDetailFragment` derefs a `link` from
 `profilePage`, `bio` markDefs and `socialLinks`), which is three or four hops
 out and not resolved — so `hero`, `hero-blog` and `hero-profile` keep the
 page-type tags covering those paths, and only `hero-statement`, which reads
-neither an author nor a post, carries none.
+neither an author nor a post, carries none. Every loader that returns post
+cards carries them for the same reason: `personCardFragment` derefs the
+author's `profilePage` link.
 
 That purge is best-effort, and the backstop behind it is a time-based
 expiry declared per content route: `export const revalidate = 21600` (6 hours)

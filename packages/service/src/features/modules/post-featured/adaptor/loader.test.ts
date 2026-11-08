@@ -4,6 +4,7 @@ import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/fixture
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
   mockCacheTag,
@@ -73,6 +74,7 @@ describe(getPostFeatured, () => {
           MOCK_POSTS_CACHE_TAG,
           MOCK_AUTHOR_CACHE_TAG,
           MOCK_TOPIC_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

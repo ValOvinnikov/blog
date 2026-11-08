@@ -10,11 +10,7 @@ import {
 } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_POST_CACHE_TAG,
-  MOCK_PAGE_POST_INDEX_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
   mockCacheTag,
@@ -37,6 +33,7 @@ const POST_TAGS = [
   MOCK_POSTS_CACHE_TAG,
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
+  ...MOCK_LINK_TARGET_CACHE_TAGS,
 ];
 
 describe(getHero, () => {
@@ -76,11 +73,6 @@ describe(getHero, () => {
             mockCacheTag('modules:hero'),
             mockCacheTag(`module:${MOCK_HERO_MODULE_ID}`),
             ...POST_TAGS,
-            MOCK_PAGE_POST_CACHE_TAG,
-            MOCK_PAGE_LANDING_CACHE_TAG,
-            MOCK_PAGE_POST_INDEX_CACHE_TAG,
-            MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-            MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
           ],
         },
       });

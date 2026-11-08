@@ -9,6 +9,7 @@ import {
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_MODULES_POST_LIST_CACHE_TAG,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
@@ -129,6 +130,7 @@ describe(getPostList, () => {
             MOCK_AUTHOR_CACHE_TAG,
             MOCK_TOPIC_CACHE_TAG,
             MOCK_TAG_CACHE_TAG,
+            ...MOCK_LINK_TARGET_CACHE_TAGS,
           ],
         },
       });
