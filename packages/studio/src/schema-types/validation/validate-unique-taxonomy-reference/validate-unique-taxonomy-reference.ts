@@ -1,5 +1,9 @@
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@blog/utils/primitives';
 import type { ValidationContext } from 'sanity';
 
 type TReferenceValue = { _ref?: string } | undefined;
@@ -21,13 +25,13 @@ export const validateUniqueTaxonomyReference =
 
     const language = context.document?.[LANGUAGE_FIELD];
 
-    const conflictingCount = await fetchDraftsFailSafe<number>(
-      context,
+    const conflictingCount = await fetchFailSafe<number>(
+      getDraftsClient(context),
       `count(*[_type == $type && ${referenceField}._ref == $refId && coalesce(${LANGUAGE_FIELD}, "") == $language && !(_id in [$publishedId, "drafts." + $publishedId])])`,
       {
         type: pageType,
         refId: value._ref,
-        language: typeof language === 'string' ? language : '',
+        language: isString(language) ? language : '',
         publishedId,
       },
       FAIL_SAFE_ASSUMES_NO_CONFLICT,

@@ -47,6 +47,22 @@ describe(validateUniqueLegalPageKind, () => {
     );
   });
 
+  it('counts a page without a language as the default language', async () => {
+    const unlocalizedDraft = mockLegalPage({
+      _id: getDraftId(MOCK_PAGE_ID),
+      language: undefined,
+    });
+
+    await expect(
+      validateUniqueLegalPageKind(
+        TERMS,
+        mockGroqValidationContext([mockLegalPage()], {
+          document: unlocalizedDraft,
+        }),
+      ),
+    ).resolves.toEqual(expect.any(String));
+  });
+
   it('reads pages through the published perspective', async () => {
     const { context, withConfigCalls } = mockFetchContext(false, ownDraft);
 
@@ -56,33 +72,34 @@ describe(validateUniqueLegalPageKind, () => {
   });
 
   it.each([
-    ['its own published copy', mockLegalPage({ _id: MOCK_PAGE_ID })],
-    [
-      'a page of another kind',
-      mockLegalPage({ [LEGAL_PAGE_KIND_FIELD]: IMPRINT }),
-    ],
-    ['a page in another language', mockLegalPage({ language: NL })],
-    [
-      'a page of another type',
-      mockLegalPage({ _type: PAGE_PRIVACY_DOCUMENT_TYPE }),
-    ],
-  ])('passes beside %s', async (_case, page) => {
-    await expect(validateAgainst([page], TERMS)).resolves.toBe(true);
-  });
-
-  it('passes a second Other page', async () => {
-    await expect(
-      validateAgainst(
-        [mockLegalPage({ [LEGAL_PAGE_KIND_FIELD]: OTHER })],
-        OTHER,
-      ),
-    ).resolves.toBe(true);
-  });
-
-  it('passes when no kind is chosen', async () => {
-    await expect(validateAgainst([mockLegalPage()], undefined)).resolves.toBe(
-      true,
-    );
+    {
+      case: 'beside its own published copy',
+      page: mockLegalPage({ _id: MOCK_PAGE_ID }),
+      kind: TERMS,
+    },
+    {
+      case: 'beside a page of another kind',
+      page: mockLegalPage({ [LEGAL_PAGE_KIND_FIELD]: IMPRINT }),
+      kind: TERMS,
+    },
+    {
+      case: 'beside a page in another language',
+      page: mockLegalPage({ language: NL }),
+      kind: TERMS,
+    },
+    {
+      case: 'beside a page of another type',
+      page: mockLegalPage({ _type: PAGE_PRIVACY_DOCUMENT_TYPE }),
+      kind: TERMS,
+    },
+    {
+      case: 'a second Other page',
+      page: mockLegalPage({ [LEGAL_PAGE_KIND_FIELD]: OTHER }),
+      kind: OTHER,
+    },
+    { case: 'when no kind is chosen', page: mockLegalPage(), kind: undefined },
+  ])('passes $case', async ({ page, kind }) => {
+    await expect(validateAgainst([page], kind)).resolves.toBe(true);
   });
 
   it('passes when the fetch fails', async () => {

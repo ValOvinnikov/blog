@@ -1,4 +1,4 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TLegalPageKind, TLocaleIsoCode } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { LEGAL_PAGE_KIND_FIELD } from '@blog/studio/schema-types/validation/validate-unique-legal-page-kind/validate-unique-legal-page-kind';
@@ -16,7 +16,7 @@ export const legalPageKindPreview = {
     language,
   }: {
     title?: string;
-    kind?: string;
+    kind?: TLegalPageKind;
     language?: TLocaleIsoCode;
   }) => ({
     title: title ?? 'Unknown',

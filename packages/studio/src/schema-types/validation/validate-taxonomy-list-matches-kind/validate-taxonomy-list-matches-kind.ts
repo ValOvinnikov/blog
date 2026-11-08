@@ -1,5 +1,9 @@
 import type { TTaxonomyKind } from '@blog/config/constants';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { hasLength } from '@blog/utils/primitives';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string; _key?: string };
@@ -52,12 +56,12 @@ export const validateTaxonomyListReferencesMatchKind =
   ): Promise<true | { message: string; path: TPathSegment[] }[]> => {
     const locations = collectTaxonomyListRefLocations(document, moduleTypeName);
 
-    if (locations.length === 0) return true;
+    if (!hasLength(locations)) return true;
 
     const ids = [...new Set(locations.map((location) => location.id))];
 
-    const modules = await fetchDraftsFailSafe<TTaxonomyListModule[]>(
-      context,
+    const modules = await fetchFailSafe<TTaxonomyListModule[]>(
+      getDraftsClient(context),
       `*[_id in $ids]{ _id, taxonomy }`,
       { ids },
       FAIL_SAFE_ASSUMES_NO_MISMATCH,
@@ -74,5 +78,5 @@ export const validateTaxonomyListReferencesMatchKind =
       .filter((location) => mismatchedIds.has(location.id))
       .map((location) => ({ message: mismatchError, path: location.path }));
 
-    return violations.length > 0 ? violations : true;
+    return hasLength(violations) ? violations : true;
   };

@@ -1,7 +1,11 @@
 import { isLocaleIsoCode, type TLocaleIsoCode } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@blog/utils/primitives';
 import { getPublishedId, type ValidationContext } from 'sanity';
 
 type TDefaultLanguagePageField<T> = {
@@ -22,15 +26,15 @@ export const fetchDefaultLanguagePageField = async <T>(
   const language = document[LANGUAGE_FIELD];
 
   if (
-    typeof language !== 'string' ||
+    !isString(language) ||
     !isLocaleIsoCode(language) ||
     language === defaultLanguage
   ) {
     return null;
   }
 
-  const page = await fetchDraftsFailSafe<{ value?: T | null } | null>(
-    context,
+  const page = await fetchFailSafe<{ value?: T | null } | null>(
+    getDraftsClient(context),
     `*[_type == "translation.metadata" && references($id)][0].translations[${LANGUAGE_FIELD} == $defaultLanguage][0].value->{ "value": ${fieldPath} }`,
     { id: getPublishedId(document._id), defaultLanguage },
     null,

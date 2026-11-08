@@ -5,7 +5,11 @@ import {
   LANDING_PARENT_CHAIN_PROJECTION,
   type TLandingParentChainNode,
 } from '@blog/studio/schema-types/queries/landing-parent-chain/landing-parent-chain';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { hasLength, isString } from '@blog/utils/primitives';
 import { getPublishedId, type Reference, type ValidationContext } from 'sanity';
 
 type TDescendant = { _id: string; children?: TDescendant[] | null };
@@ -34,12 +38,11 @@ const PARENT_PLACEMENT_QUERY = `{
 }`;
 
 const subtreeHeight = (nodes: TDescendant[] | null | undefined): number =>
-  nodes && nodes.length > 0
+  nodes && hasLength(nodes)
     ? 1 + Math.max(...nodes.map(({ children }) => subtreeHeight(children)))
     : 0;
 
-const languageOf = (value: unknown): string =>
-  typeof value === 'string' ? value : '';
+const languageOf = (value: unknown): string => (isString(value) ? value : '');
 
 export const validateLandingParent = async (
   value: Reference | undefined,
@@ -54,8 +57,8 @@ export const validateLandingParent = async (
 
   if (getPublishedId(parentId) === id) return LANDING_PARENT_CYCLE_ERROR;
 
-  const placement = await fetchDraftsFailSafe<TParentPlacement | null>(
-    context,
+  const placement = await fetchFailSafe<TParentPlacement | null>(
+    getDraftsClient(context),
     PARENT_PLACEMENT_QUERY,
     { parentId, id, type: document._type },
     null,

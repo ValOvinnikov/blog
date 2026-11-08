@@ -1,5 +1,5 @@
 import {
-  fetchDraftsFailSafe,
+  fetchFailSafe,
   getDraftsClient,
 } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import { mockFetchContext } from '@blog/studio/testing/mock-validation-context';
@@ -41,12 +41,12 @@ describe(getDraftsClient, () => {
   });
 });
 
-describe(fetchDraftsFailSafe, () => {
+describe(fetchFailSafe, () => {
   it('resolves to the fetched value when the fetch succeeds', async () => {
     const { context } = mockFetchContext(MOCK_FETCHED_VALUE);
 
-    const result = await fetchDraftsFailSafe(
-      context,
+    const result = await fetchFailSafe(
+      getDraftsClient(context),
       MOCK_QUERY,
       MOCK_PARAMS,
       MOCK_FALLBACK,
@@ -58,8 +58,8 @@ describe(fetchDraftsFailSafe, () => {
   it('resolves to the fallback when the fetch rejects', async () => {
     const { context } = mockFetchContext(new Error(faker.lorem.sentence()));
 
-    const result = await fetchDraftsFailSafe(
-      context,
+    const result = await fetchFailSafe(
+      getDraftsClient(context),
       MOCK_QUERY,
       MOCK_PARAMS,
       MOCK_FALLBACK,
@@ -68,10 +68,15 @@ describe(fetchDraftsFailSafe, () => {
     expect(result).toBe(MOCK_FALLBACK);
   });
 
-  it('sends the query and params to the drafts client', async () => {
+  it('sends the query and params to the client it is given', async () => {
     const { context, fetchCalls } = mockFetchContext(MOCK_FETCHED_VALUE);
 
-    await fetchDraftsFailSafe(context, MOCK_QUERY, MOCK_PARAMS, MOCK_FALLBACK);
+    await fetchFailSafe(
+      getDraftsClient(context),
+      MOCK_QUERY,
+      MOCK_PARAMS,
+      MOCK_FALLBACK,
+    );
 
     expect(fetchCalls).toEqual([{ query: MOCK_QUERY, params: MOCK_PARAMS }]);
   });

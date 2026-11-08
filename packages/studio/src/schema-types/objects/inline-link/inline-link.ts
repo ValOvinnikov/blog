@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import {
   SOCIAL_PLATFORMS,
   SOCIAL_PLATFORM_LABEL,
@@ -19,7 +20,7 @@ type TLinkParent = {
 };
 
 const isLinkType = (parent: unknown, linkType: string) =>
-  (parent as TLinkParent | undefined)?.linkType === linkType;
+  (parent as TMaybeUndefined<TLinkParent>)?.linkType === linkType;
 
 export const inlineLinkSchema = defineType({
   name: 'inlineLink',

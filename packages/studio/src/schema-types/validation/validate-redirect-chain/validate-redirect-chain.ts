@@ -1,6 +1,10 @@
 import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@blog/utils/primitives';
 import { getDraftId, getPublishedId, type ValidationContext } from 'sanity';
 
 type TOtherRedirect = {
@@ -29,10 +33,10 @@ const fetchOtherRedirects = async (
   const { document } = context;
   const language = document?.[LANGUAGE_FIELD];
 
-  if (!document || typeof language !== 'string') return [];
+  if (!document || !isString(language)) return [];
 
-  return fetchDraftsFailSafe<TOtherRedirect[]>(
-    context,
+  return fetchFailSafe<TOtherRedirect[]>(
+    getDraftsClient(context),
     OTHER_REDIRECTS_QUERY,
     {
       type: REDIRECT_TYPE,
