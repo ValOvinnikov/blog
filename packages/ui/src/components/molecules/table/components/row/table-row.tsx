@@ -15,23 +15,25 @@ type TTableRowChildren = TCompoundChildren<{
 
 export type TTableRowProps = IWithClassName &
   IWithDataTestId & {
-    isHeadRow?: boolean;
+    isBodyRow?: boolean;
     children?: TTableRowChildren | TTableRowChildren[];
   };
 
 /** One row of header cells or data cells. */
 export const TableRow = ({
-  isHeadRow = false,
+  isBodyRow = false,
   className,
   dataTestId,
   children,
 }: TTableRowProps) => (
   <tr className={className} data-testid={dataTestId}>
-    {Children.map(children, (child) =>
-      isValidElement<TTableHeaderCellProps>(child) &&
-      child.type === TableHeaderCell
-        ? cloneElement(child, { isColumnHeader: isHeadRow })
-        : child,
-    )}
+    {isBodyRow
+      ? Children.map(children, (child) =>
+          isValidElement<TTableHeaderCellProps>(child) &&
+          child.type === TableHeaderCell
+            ? cloneElement(child, { isRowHeader: true })
+            : child,
+        )
+      : children}
   </tr>
 );

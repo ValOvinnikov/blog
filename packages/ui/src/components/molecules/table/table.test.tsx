@@ -1,6 +1,7 @@
 import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 
 import { Table } from './table';
 
@@ -90,4 +91,25 @@ describe(`<${Table.name}/>`, () => {
       expect(dataCell).toBeVisible();
     },
   );
+});
+
+const WrappedHeaderCell = ({ children }: { children: ReactNode }) => (
+  <Table.HeaderCell>{children}</Table.HeaderCell>
+);
+
+it('reads a header cell outside any row-header context as a column header', () => {
+  const [column] = MOCK_COLUMNS;
+  renderElement(
+    <Table ariaLabel={MOCK_REGION_LABEL}>
+      <Table.Head>
+        <Table.Row>
+          <WrappedHeaderCell>{column}</WrappedHeaderCell>
+        </Table.Row>
+      </Table.Head>
+    </Table>,
+  );
+
+  const header = screen.getByRole('columnheader', { name: column });
+
+  expect(header).toBeVisible();
 });

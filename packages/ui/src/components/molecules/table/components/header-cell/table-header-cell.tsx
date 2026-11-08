@@ -9,19 +9,19 @@ import {
 export type TTableHeaderCellProps = IWithClassName &
   IWithDataTestId &
   IWithChildren & {
-    isColumnHeader?: TTableHeaderCellVariants['isColumnHeader'];
+    isRowHeader?: TTableHeaderCellVariants['isRowHeader'];
   };
 
-/** A heading cell that screen readers announce with the cells it names: the column below it inside `Table.Head`, the rest of its row in the body. */
+/** A heading cell that screen readers announce with the cells it names: the column below it, or the rest of its row when a body row marks it as a row header. */
 export const TableHeaderCell = ({
-  isColumnHeader = false,
+  isRowHeader = false,
   className,
   dataTestId,
   children,
 }: TTableHeaderCellProps) => (
   <th
-    scope={isColumnHeader ? 'col' : 'row'}
-    className={tableHeaderCellVariants({ isColumnHeader, class: className })}
+    scope={isRowHeader ? 'row' : 'col'}
+    className={tableHeaderCellVariants({ isRowHeader, class: className })}
     data-testid={dataTestId}
   >
     {children}

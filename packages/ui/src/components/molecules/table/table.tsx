@@ -4,13 +4,18 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
-import { type ElementType, Fragment } from 'react';
+import {
+  cloneElement,
+  type ElementType,
+  Fragment,
+  isValidElement,
+} from 'react';
 
 import { TableCaption } from './components/caption/table-caption';
 import { TableCell } from './components/cell/table-cell';
 import { TableHead } from './components/head/table-head';
 import { TableHeaderCell } from './components/header-cell/table-header-cell';
-import { TableRow } from './components/row/table-row';
+import { TableRow, type TTableRowProps } from './components/row/table-row';
 import { tableVariants } from './table-variants';
 
 const TableSlotParts = {
@@ -59,7 +64,11 @@ const TableRoot = ({
         {slots.Head}
         <tbody>
           {unmatched.map((node, i) => (
-            <Fragment key={i}>{node}</Fragment>
+            <Fragment key={i}>
+              {isValidElement<TTableRowProps>(node) && node.type === TableRow
+                ? cloneElement(node, { isBodyRow: true })
+                : node}
+            </Fragment>
           ))}
         </tbody>
       </table>
