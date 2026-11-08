@@ -1,12 +1,9 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { IWithChildren } from '@blog/config/react';
 
 import { tableCellVariants } from './table-cell-variants';
 
-export type TTableCellProps = IWithClassName &
-  IWithDataTestId & {
-    children?: ReactNode;
-  };
+export type TTableCellProps = IWithClassName & IWithDataTestId & IWithChildren;
 
 /** A data cell, read with the heading of its column. */
 export const TableCell = ({

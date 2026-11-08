@@ -340,11 +340,11 @@ Props: ariaLabel: string · children?: TTableChildren | TTableChildren[] _(exten
 
 Slots:
 
-- **Table.Caption** — The table's title, announced by screen readers as the table's name. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Table.Caption** — The table's title, announced by screen readers as the table's name. Props: _(extends IWithClassName, IWithDataTestId, IWithChildren)_
 - **Table.Head** — The table's header rows, whose cells name the columns below them. Props: children?: TCompoundChildren<{ Row: typeof TableRow }> _(extends IWithClassName, IWithDataTestId)_
 - **Table.Row** — One row of header cells or data cells. Props: children?: TCompoundChildren<{ HeaderCell: typeof TableHeaderCell; Cell: t… _(extends IWithClassName, IWithDataTestId)_
-- **Table.HeaderCell** — A column heading that screen readers announce with every cell beneath it. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
-- **Table.Cell** — A data cell, read with the heading of its column. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Table.HeaderCell** — A column heading that screen readers announce with every cell beneath it. Props: _(extends IWithClassName, IWithDataTestId, IWithChildren)_
+- **Table.Cell** — A data cell, read with the heading of its column. Props: _(extends IWithClassName, IWithDataTestId, IWithChildren)_
 
 ### TagList — `components/molecules/tag-list/tag-list.tsx`
 

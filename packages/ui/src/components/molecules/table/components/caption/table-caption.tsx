@@ -1,12 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { IWithChildren } from '@blog/config/react';
 
 import { tableCaptionVariants } from './table-caption-variants';
 
 export type TTableCaptionProps = IWithClassName &
-  IWithDataTestId & {
-    children?: ReactNode;
-  };
+  IWithDataTestId &
+  IWithChildren;
 
 /** The table's title, announced by screen readers as the table's name. */
 export const TableCaption = ({

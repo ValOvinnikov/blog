@@ -1,12 +1,11 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
-import type { ReactNode } from 'react';
+import type { IWithChildren } from '@blog/config/react';
 
 import { tableHeaderCellVariants } from './table-header-cell-variants';
 
 export type TTableHeaderCellProps = IWithClassName &
-  IWithDataTestId & {
-    children?: ReactNode;
-  };
+  IWithDataTestId &
+  IWithChildren;
 
 /** A column heading that screen readers announce with every cell beneath it. */
 export const TableHeaderCell = ({
