@@ -16,7 +16,15 @@ export async function getTeamModule(
     parameters: { id },
     tenant,
     ...isr(
-      ['modules:team', `module:${id}`, 'link', 'homePage', 'page_landing'],
+      [
+        'modules:team',
+        `module:${id}`,
+        'link',
+        'page_privacyDocument',
+        'page_legalDocument',
+        'homePage',
+        'page_landing',
+      ],
       tenant.projectId,
     ),
   });

@@ -8,6 +8,8 @@ import {
 import {
   MOCK_HOME_PAGE_CACHE_TAG,
   MOCK_LINK_CACHE_TAG,
+  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
@@ -87,6 +89,8 @@ describe(getFeatureList, () => {
           mockCacheTag(`module:${MOCK_FEATURE_LIST_MODULE_ID}`),
           mockCacheTag('block_feature'),
           MOCK_LINK_CACHE_TAG,
+          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,
         ],

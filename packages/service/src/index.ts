@@ -38,6 +38,7 @@ import { createLandingPageService } from './features/pages/landing';
 import { createPageTitleService } from './features/pages/page-title';
 import { createPostService } from './features/pages/post';
 import { createBlogService } from './features/pages/post-index';
+import { createSectionDocumentService } from './features/pages/section-document';
 import { createTagService } from './features/pages/tag';
 import { createTagIndexService } from './features/pages/tag-index';
 import { createTopicService } from './features/pages/topic';
@@ -53,6 +54,7 @@ export const service = {
     pageTitle: createPageTitleService(),
     blog: createBlogService(),
     post: createPostService(),
+    sectionDocument: createSectionDocumentService(),
     topic: createTopicService(),
     topicIndex: createTopicIndexService(),
     tag: createTagService(),
@@ -180,6 +182,12 @@ export type {
   TPostTakeaways,
 } from './features/pages/post';
 export type { TBlogIndexPage } from './features/pages/post-index';
+export type {
+  TSectionDocumentDetail,
+  TSectionDocumentKind,
+  TSectionDocumentLink,
+  TSectionDocumentType,
+} from './features/pages/section-document';
 export type { TTagDetailPage } from './features/pages/tag';
 export type { TTagIndexPage } from './features/pages/tag-index';
 export type { TTopicDetailPage } from './features/pages/topic';

@@ -1,8 +1,9 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config/constants';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawBlogPage } from '@blog/service/features/pages/post-index/adaptor/index-page/transformer';
+import type { TRawSectionDocumentDetail } from '@blog/service/features/pages/section-document/adaptor/detail-page/transformer';
 import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
@@ -378,6 +379,22 @@ export function mockRawLandingPage(
         children: null,
       },
     ],
+    ...overrides,
+  };
+}
+
+export function mockRawSectionDocumentDetail(
+  overrides: Partial<TRawSectionDocumentDetail> = {},
+): TRawSectionDocumentDetail {
+  return {
+    _id: faker.string.uuid(),
+    _type: 'page_privacyDocument',
+    title: faker.lorem.words(2),
+    slug: faker.lorem.slug(),
+    kind: LEGAL_PAGE_KIND.PRIVACY_POLICY,
+    body: [],
+    seo: mockRawSeo(),
+    translations: [],
     ...overrides,
   };
 }

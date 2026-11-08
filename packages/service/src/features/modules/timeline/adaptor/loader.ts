@@ -16,7 +16,15 @@ export async function getTimelineModule(
     parameters: { id },
     tenant,
     ...isr(
-      ['modules:timeline', `module:${id}`, 'link', 'homePage', 'page_landing'],
+      [
+        'modules:timeline',
+        `module:${id}`,
+        'link',
+        'page_privacyDocument',
+        'page_legalDocument',
+        'homePage',
+        'page_landing',
+      ],
       tenant.projectId,
     ),
   });

@@ -29,6 +29,8 @@ type TCachedDocumentType =
   | 'page_landing'
   | 'page_post'
   | 'page_home'
+  | 'page_privacyDocument'
+  | 'page_legalDocument'
   | 'template_home'
   | 'template_landing'
   | 'template_postIndex'
@@ -87,6 +89,8 @@ const REVALIDATE_TAGS = {
   page_topic: ['page_topic'],
   page_topicIndex: ['page_topicIndex'],
   page_tagIndex: ['page_tagIndex'],
+  page_privacyDocument: ['page_privacyDocument'],
+  page_legalDocument: ['page_legalDocument'],
   module_hero: ['modules:hero'],
   module_heroBlog: ['modules:heroBlog'],
   module_heroProfile: ['modules:heroProfile'],

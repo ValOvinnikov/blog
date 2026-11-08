@@ -21,6 +21,8 @@ export async function getHeroProfile(
         `module:${id}`,
         'author',
         'link',
+        'page_privacyDocument',
+        'page_legalDocument',
         'homePage',
         'page_landing',
       ],

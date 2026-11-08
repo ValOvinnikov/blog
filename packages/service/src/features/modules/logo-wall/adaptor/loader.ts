@@ -16,7 +16,15 @@ export async function getLogoWallModule(
     parameters: { id },
     tenant,
     ...isr(
-      ['modules:logoWall', `module:${id}`, 'link', 'homePage', 'page_landing'],
+      [
+        'modules:logoWall',
+        `module:${id}`,
+        'link',
+        'page_privacyDocument',
+        'page_legalDocument',
+        'homePage',
+        'page_landing',
+      ],
       tenant.projectId,
     ),
   });

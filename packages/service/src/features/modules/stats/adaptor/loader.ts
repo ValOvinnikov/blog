@@ -16,7 +16,15 @@ export async function getStatsModule(
     parameters: { id },
     tenant,
     ...isr(
-      ['modules:stats', `module:${id}`, 'link', 'homePage', 'page_landing'],
+      [
+        'modules:stats',
+        `module:${id}`,
+        'link',
+        'page_privacyDocument',
+        'page_legalDocument',
+        'homePage',
+        'page_landing',
+      ],
       tenant.projectId,
     ),
   });

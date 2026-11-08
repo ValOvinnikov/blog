@@ -23,6 +23,8 @@ export async function getPost(
         'topic',
         'tag',
         'link',
+        'page_privacyDocument',
+        'page_legalDocument',
         'homePage',
         'page_landing',
         'page_postIndex',

@@ -20,6 +20,8 @@ export async function getFeatureHighlightsModule(
         'modules:featureHighlights',
         `module:${id}`,
         'link',
+        'page_privacyDocument',
+        'page_legalDocument',
         'homePage',
         'page_landing',
       ],

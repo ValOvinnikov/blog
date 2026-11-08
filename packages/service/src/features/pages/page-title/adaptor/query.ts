@@ -3,7 +3,12 @@ import type { TLocaleQueryParams } from '@blog/service/shared/localization/local
 
 export const pageTitleQuery = q
   .parameters<TLocaleQueryParams & { id: string }>()
-  .star.filterByType('page_home', 'page_landing')
+  .star.filterByType(
+    'page_home',
+    'page_landing',
+    'page_privacyDocument',
+    'page_legalDocument',
+  )
   .filterBy('_id == $id')
   // groqd's typed filterBy has no coalesce, and a Home with no language is the default language's
   .filterRaw('coalesce(language, $defaultLocale) == $locale')

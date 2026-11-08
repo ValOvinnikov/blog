@@ -85,4 +85,32 @@ describe('inlineLinkFragment', () => {
       accessibleLabel: null,
     });
   });
+
+  it.each(['page_privacyDocument', 'page_legalDocument'])(
+    'links a %s by its slug',
+    async (_type) => {
+      const dataset = [
+        {
+          _id: MOCK_LINK_ID,
+          _type: 'inlineLink',
+          label: MOCK_LINK_LABEL,
+          linkType: LINK_TYPE.INTERNAL,
+          internalReference: mockReference(MOCK_CHILD_PAGE_ID),
+        },
+        { _id: MOCK_CHILD_PAGE_ID, _type, slug: { current: MOCK_POST_SLUG } },
+      ];
+
+      const link = await evaluateGroqExpression(
+        inlineLinkDocQuery.query,
+        dataset,
+        null,
+        { locale: EN },
+      );
+
+      expect(link).toHaveProperty('internalReference', {
+        _type,
+        slug: MOCK_POST_SLUG,
+      });
+    },
+  );
 });
