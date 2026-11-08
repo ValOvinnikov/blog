@@ -2,7 +2,7 @@
 
 # @blog/ui component index
 
-_68 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
+_69 components · generated from `packages/ui/src`. Paths are relative to `packages/ui/src`._
 
 ## Atoms
 
@@ -332,6 +332,19 @@ Props: as?: TAnchorElementType _(extends IShareLinkItem, IWithClassName, IWithDa
 
 The signed-out reader's sign-in dialog, offering every provider and the email link at once and reporting each step of the attempt.
 Props: panel: ISignInPanelSurface · labels: ISignInPanelLabels · providers: ISignInPanelProvider[] · pendingProviderId?: string · emailForm: ISignInPanelEmailForm · busyStyle?: TButtonProps['busyStyle'] · spinnerVariant?: TSpinnerProps['variant'] · ref?: Ref<HTMLDivElement> _(extends IWithClassName, IWithDataTestId)_
+
+### Table — `components/molecules/table/table.tsx`
+
+A data table that scrolls sideways inside its own focusable region when it is wider than its container.
+Props: ariaLabel: string · children?: TTableChildren | TTableChildren[] _(extends IWithClassName, IWithDataTestId)_
+
+Slots:
+
+- **Table.Caption** — The table's title, announced by screen readers as the table's name. Props: _(extends IWithClassName, IWithDataTestId, IWithChildren)_
+- **Table.Head** — The table's header rows, whose cells name the columns below them. Props: children?: TCompoundChildren<{ Row: typeof TableRow }> _(extends IWithClassName, IWithDataTestId)_
+- **Table.Row** — One row of header cells or data cells. Props: isBodyRow?: boolean · children?: TTableRowChildren | TTableRowChildren[] _(extends IWithClassName, IWithDataTestId)_
+- **Table.HeaderCell** — A heading cell that screen readers announce with the cells it names: the column below it, or the rest of its row when a body row marks it as a row header. Props: isRowHeader?: TTableHeaderCellVariants['isRowHeader'] _(extends IWithClassName, IWithDataTestId, IWithChildren)_ · Variants: isRowHeader: (boolean)
+- **Table.Cell** — A data cell, read with the heading of its column. Props: _(extends IWithClassName, IWithDataTestId, IWithChildren)_
 
 ### TagList — `components/molecules/tag-list/tag-list.tsx`
 
