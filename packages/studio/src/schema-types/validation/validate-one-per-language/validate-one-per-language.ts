@@ -1,8 +1,13 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { isLocaleIsoCode } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
 import { getDefaultLanguage } from '@blog/studio/schema-types/validation/default-language/default-language';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@blog/utils/primitives';
 import {
   getPublishedId,
   type SanityDocument,
@@ -12,7 +17,7 @@ import {
 const FAIL_SAFE_ASSUMES_UNIQUE = true;
 
 export const validateOnePerLanguage = async (
-  document: SanityDocument | undefined,
+  document: TMaybeUndefined<SanityDocument>,
   context: ValidationContext,
 ): Promise<true | string> => {
   if (!document) return true;
@@ -20,12 +25,10 @@ export const validateOnePerLanguage = async (
   const value = document[LANGUAGE_FIELD];
   const defaultLanguage = getDefaultLanguage();
   const language =
-    typeof value === 'string' && isLocaleIsoCode(value)
-      ? value
-      : defaultLanguage;
+    isString(value) && isLocaleIsoCode(value) ? value : defaultLanguage;
 
-  const isUnique = await fetchDraftsFailSafe<boolean>(
-    context,
+  const isUnique = await fetchFailSafe<boolean>(
+    getDraftsClient(context),
     `!defined(*[_type == $type && _id != $id && coalesce(${LANGUAGE_FIELD}, $defaultLanguage) == $language][0]._id)`,
     {
       type: document._type,

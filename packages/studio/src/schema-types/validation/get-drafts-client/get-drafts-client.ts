@@ -1,4 +1,4 @@
-import type { ValidationContext } from 'sanity';
+import type { SanityClient, ValidationContext } from 'sanity';
 
 const DRAFTS_CLIENT_API_VERSION = '2024-01-01';
 
@@ -18,20 +18,15 @@ export const getPublishedClient = (context: ValidationContext) =>
     .getClient({ apiVersion: DRAFTS_CLIENT_API_VERSION })
     .withConfig({ perspective: 'published' });
 
-/**
- * A rejected `fetch` means the network failed, not that the document is
- * invalid — every `getDraftsClient`-based validator routes its fetch through
- * here so a transient outage resolves to `fallback` instead of rejecting the
- * validator and blocking publish.
- */
-export const fetchDraftsFailSafe = async <T>(
-  context: ValidationContext,
+/** A rejected fetch is a network failure, not an invalid document, so a validator resolves to `fallback` rather than blocking publish. */
+export const fetchFailSafe = async <T>(
+  client: Pick<SanityClient, 'fetch'>,
   query: string,
   params: Record<string, unknown>,
   fallback: T,
 ): Promise<T> => {
   try {
-    return await getDraftsClient(context).fetch<T>(query, params);
+    return await client.fetch<T>(query, params);
   } catch {
     return fallback;
   }

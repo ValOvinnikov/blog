@@ -1,5 +1,10 @@
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TTaxonomyKind } from '@blog/config/constants';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { hasLength } from '@blog/utils/primitives';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 type TModuleReference = { _type?: string; _ref?: string; _key?: string };
@@ -9,15 +14,15 @@ type TTaxonomyListReferencesDocument = {
 };
 type TPathSegment = string | number | { _key: string };
 type TRefLocation = { id: string; path: TPathSegment[] };
-type TTaxonomyListModule = { _id?: string; taxonomy?: string | null };
+type TTaxonomyListModule = { _id?: string; taxonomy?: TMaybeNull<string> };
 
 const FAIL_SAFE_ASSUMES_NO_MISMATCH: TTaxonomyListModule[] = [];
 
 const collectTaxonomyListRefLocations = (
-  document: SanityDocument | undefined,
+  document: TMaybeUndefined<SanityDocument>,
   moduleTypeName: string,
 ): TRefLocation[] => {
-  const doc = document as TTaxonomyListReferencesDocument | undefined;
+  const doc = document as TMaybeUndefined<TTaxonomyListReferencesDocument>;
 
   const moduleLocations = (doc?.modules ?? []).flatMap((module, index) =>
     module._type === moduleTypeName && module._ref
@@ -47,17 +52,17 @@ const collectTaxonomyListRefLocations = (
 export const validateTaxonomyListReferencesMatchKind =
   (kind: TTaxonomyKind, moduleTypeName: string, mismatchError: string) =>
   async (
-    document: SanityDocument | undefined,
+    document: TMaybeUndefined<SanityDocument>,
     context: ValidationContext,
   ): Promise<true | { message: string; path: TPathSegment[] }[]> => {
     const locations = collectTaxonomyListRefLocations(document, moduleTypeName);
 
-    if (locations.length === 0) return true;
+    if (!hasLength(locations)) return true;
 
     const ids = [...new Set(locations.map((location) => location.id))];
 
-    const modules = await fetchDraftsFailSafe<TTaxonomyListModule[]>(
-      context,
+    const modules = await fetchFailSafe<TTaxonomyListModule[]>(
+      getDraftsClient(context),
       `*[_id in $ids]{ _id, taxonomy }`,
       { ids },
       FAIL_SAFE_ASSUMES_NO_MISMATCH,
@@ -74,5 +79,5 @@ export const validateTaxonomyListReferencesMatchKind =
       .filter((location) => mismatchedIds.has(location.id))
       .map((location) => ({ message: mismatchError, path: location.path }));
 
-    return violations.length > 0 ? violations : true;
+    return hasLength(violations) ? violations : true;
   };

@@ -1,4 +1,8 @@
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import type { TMaybeUndefined } from '@blog/config';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
 import type { SanityDocument, ValidationContext } from 'sanity';
 
 const FAIL_SAFE_ASSUMES_REFERENCED = 1;
@@ -11,15 +15,15 @@ const FAIL_SAFE_ASSUMES_REFERENCED = 1;
 export const validateHasPage =
   (pageType: string, referenceField: string, noPageError: string) =>
   async (
-    document: SanityDocument | undefined,
+    document: TMaybeUndefined<SanityDocument>,
     context: ValidationContext,
   ): Promise<string | true> => {
     const publishedId = document?._id.replace(/^drafts\./, '');
 
     if (!publishedId) return true;
 
-    const referencingCount = await fetchDraftsFailSafe<number>(
-      context,
+    const referencingCount = await fetchFailSafe<number>(
+      getDraftsClient(context),
       `count(*[_type == $type && ${referenceField}._ref == $id])`,
       { type: pageType, id: publishedId },
       FAIL_SAFE_ASSUMES_REFERENCED,

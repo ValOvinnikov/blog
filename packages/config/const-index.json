@@ -2566,6 +2566,52 @@
         "file": "packages/config/src/constants/layout.ts"
       }
     ],
+    "PRIVACY_POLICY": [
+      {
+        "ref": "LEGAL_PAGE_KIND.PRIVACY_POLICY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/legal-page-kind.ts"
+      }
+    ],
+    "TERMS": [
+      {
+        "ref": "LEGAL_PAGE_KIND.TERMS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/legal-page-kind.ts"
+      }
+    ],
+    "IMPRINT": [
+      {
+        "ref": "LEGAL_PAGE_KIND.IMPRINT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/legal-page-kind.ts"
+      }
+    ],
+    "COOKIE_STATEMENT": [
+      {
+        "ref": "LEGAL_PAGE_KIND.COOKIE_STATEMENT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/legal-page-kind.ts"
+      }
+    ],
+    "OTHER": [
+      {
+        "ref": "LEGAL_PAGE_KIND.OTHER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/legal-page-kind.ts"
+      },
+      {
+        "ref": "SUSPENSION_CATEGORY.OTHER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant-suspension.ts"
+      }
+    ],
     "INTERNAL": [
       {
         "ref": "LINK_TYPE.INTERNAL",
@@ -4153,14 +4199,6 @@
     "TERMS_VIOLATION": [
       {
         "ref": "SUSPENSION_CATEGORY.TERMS_VIOLATION",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/tenant-suspension.ts"
-      }
-    ],
-    "OTHER": [
-      {
-        "ref": "SUSPENSION_CATEGORY.OTHER",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant-suspension.ts"

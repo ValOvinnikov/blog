@@ -30,6 +30,12 @@ describe('routes', () => {
     ['post', routes.post(MOCK_SLUG), `/blog/${MOCK_SLUG}`],
     ['landing page', routes.landingPage(MOCK_SLUG), `/${MOCK_SLUG}`],
     [
+      'privacy document',
+      routes.privacyDocument(MOCK_SLUG),
+      `/privacy/${MOCK_SLUG}`,
+    ],
+    ['legal document', routes.legalDocument(MOCK_SLUG), `/legal/${MOCK_SLUG}`],
+    [
       'per-tag RSS feed',
       routes.tagRssFeed(MOCK_SLUG),
       `/tags/${MOCK_SLUG}/rss.xml`,
@@ -124,6 +130,8 @@ describe(pageHref, () => {
     ['page_topic', `/topics/${MOCK_SLUG}`],
     ['page_tag', `/tags/${MOCK_SLUG}`],
     ['page_landing', `/${MOCK_SLUG}`],
+    ['page_privacyDocument', `/privacy/${MOCK_SLUG}`],
+    ['page_legalDocument', `/legal/${MOCK_SLUG}`],
   ])('builds the slugged path of %s', (type, expected) => {
     expect(pageHref(type, MOCK_SLUG)).toBe(expected);
   });

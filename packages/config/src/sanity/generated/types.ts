@@ -554,6 +554,20 @@ export type Page_postIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_postIndex';
 };
 
+export type Page_privacyDocumentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
+};
+
+export type Page_legalDocumentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalDocument';
+};
+
 export type InlineLink = {
   _type: 'inlineLink';
   label?: string;
@@ -563,7 +577,9 @@ export type InlineLink = {
     | Page_postReference
     | Blog_topicReference
     | Page_landingReference
-    | Page_postIndexReference;
+    | Page_postIndexReference
+    | Page_privacyDocumentReference
+    | Page_legalDocumentReference;
   url?: string;
   openInNewTab?: boolean;
   platform?:
@@ -1311,7 +1327,9 @@ export type InternationalizedArrayReferenceValue = {
     | Page_landingReference
     | Page_postReference
     | Page_topicReference
-    | Page_tagReference;
+    | Page_tagReference
+    | Page_privacyDocumentReference
+    | Page_legalDocumentReference;
   language?: string;
 };
 
@@ -1658,9 +1676,45 @@ export type Link = {
     | Page_topicReference
     | Page_topicIndexReference
     | Page_tagReference
-    | Page_tagIndexReference;
+    | Page_tagIndexReference
+    | Page_privacyDocumentReference
+    | Page_legalDocumentReference;
   url?: InternationalizedArrayString;
   openInNewTab?: boolean;
+};
+
+export type Page_legalDocument = {
+  _id: string;
+  _type: 'page_legalDocument';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  title?: string;
+  slug?: Slug;
+  kind?: 'TERMS' | 'IMPRINT' | 'OTHER';
+  content?: ArticleText;
+  seo?: Seo;
+};
+
+export type Slug = {
+  _type: 'slug';
+  current?: string;
+  source?: string;
+};
+
+export type Page_privacyDocument = {
+  _id: string;
+  _type: 'page_privacyDocument';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  title?: string;
+  slug?: Slug;
+  kind?: 'PRIVACY_POLICY' | 'OTHER';
+  content?: ArticleText;
+  seo?: Seo;
 };
 
 export type Template_tagIndexReference = {
@@ -1783,12 +1837,6 @@ export type Blog_tag = {
   _rev: string;
   title?: InternationalizedArrayString;
   description?: InternationalizedArrayText;
-};
-
-export type Slug = {
-  _type: 'slug';
-  current?: string;
-  source?: string;
 };
 
 export type Template_topicIndexReference = {
@@ -2303,6 +2351,8 @@ export type AllSanitySchemaTypes =
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
+  | Page_privacyDocumentReference
+  | Page_legalDocumentReference
   | InlineLink
   | ImageWithAlt
   | ListedText
@@ -2386,6 +2436,9 @@ export type AllSanitySchemaTypes =
   | Page_post
   | Person
   | Link
+  | Page_legalDocument
+  | Slug
+  | Page_privacyDocument
   | Template_tagIndexReference
   | Page_tagIndex
   | Template_tagIndex
@@ -2394,7 +2447,6 @@ export type AllSanitySchemaTypes =
   | Module_postListReference
   | Template_tag
   | Blog_tag
-  | Slug
   | Template_topicIndexReference
   | Page_topicIndex
   | Module_taxonomyList

@@ -1,11 +1,15 @@
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@blog/utils/primitives';
 import { getPublishedId, type SlugValidationContext } from 'sanity';
 
 const FAIL_SAFE_ASSUMES_UNIQUE = true;
 
 const stringOrEmpty = (value: unknown): string =>
-  typeof value === 'string' ? value : '';
+  isString(value) ? value : '';
 
 const parentIdOf = (parent: unknown): string => {
   const ref =
@@ -13,7 +17,7 @@ const parentIdOf = (parent: unknown): string => {
       ? parent._ref
       : undefined;
 
-  return typeof ref === 'string' ? getPublishedId(ref) : '';
+  return isString(ref) ? getPublishedId(ref) : '';
 };
 
 export const validateLandingSlugUniqueAmongSiblings = async (
@@ -24,8 +28,8 @@ export const validateLandingSlugUniqueAmongSiblings = async (
 
   if (!document) return true;
 
-  return fetchDraftsFailSafe<boolean>(
-    context,
+  return fetchFailSafe<boolean>(
+    getDraftsClient(context),
     `!defined(*[_type == $type && _id != $id && slug.current == $slug && coalesce(${LANGUAGE_FIELD}, "") == $language && coalesce(parent._ref, "") == $parentId][0]._id)`,
     {
       type: document._type,

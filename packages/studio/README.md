@@ -38,7 +38,8 @@ Studio from one deployment.
 - `src/schema-types/documents/` — document types, grouped by area:
   `blog/` (`blog_tag`, `blog_topic`), `pages/` (`page_home`,
   `page_postIndex`, `page_landing`, `page_post`, `page_tag`,
-  `page_topic`, `page_tagIndex`, `page_topicIndex`), `person/` (`person`),
+  `page_topic`, `page_tagIndex`, `page_topicIndex`, `page_privacyDocument`,
+  `page_legalDocument`), `person/` (`person`),
   and `settings/` (singletons: `settings_site`, `settings_navigation`,
   `settings_footer`).
   `page_postIndex` is the post-index singleton.

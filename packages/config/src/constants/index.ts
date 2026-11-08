@@ -31,6 +31,7 @@ export * from './image-layout';
 export * from './landing-page';
 export * from './language';
 export * from './layout';
+export * from './legal-page-kind';
 export * from './link';
 export * from './magic-link-refusal';
 export * from './module';

@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import {
   SOCIAL_PLATFORMS,
   SOCIAL_PLATFORM_LABEL,
@@ -5,9 +6,12 @@ import {
 } from '@blog/config/constants';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
+import { PAGE_LEGAL_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PAGE_POST_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/post-index/post-index-type';
+import { PAGE_PRIVACY_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/privacy-document/privacy-document-type';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { isString } from '@blog/utils/primitives';
 import { Link2 } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
@@ -16,7 +20,7 @@ type TLinkParent = {
 };
 
 const isLinkType = (parent: unknown, linkType: string) =>
-  (parent as TLinkParent | undefined)?.linkType === linkType;
+  (parent as TMaybeUndefined<TLinkParent>)?.linkType === linkType;
 
 export const inlineLinkSchema = defineType({
   name: 'inlineLink',
@@ -70,6 +74,8 @@ export const inlineLinkSchema = defineType({
         { type: topicSchema.name },
         { type: PAGE_LANDING_TYPE },
         { type: PAGE_POST_INDEX_TYPE },
+        { type: PAGE_PRIVACY_DOCUMENT_TYPE },
+        { type: PAGE_LEGAL_DOCUMENT_TYPE },
       ],
       hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.INTERNAL),
       validation: (rule) =>
@@ -140,7 +146,7 @@ export const inlineLinkSchema = defineType({
         subtitle:
           linkType === LINK_TYPE.INTERNAL
             ? `Internal: ${
-                typeof internalTitle === 'string'
+                isString(internalTitle)
                   ? internalTitle
                   : (defaultLanguageValue(internalTitle) ?? 'not selected')
               }`

@@ -1,12 +1,17 @@
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { REDIRECT_TYPE } from '@blog/studio/schema-types/documents/redirect/redirect-type';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
-import { fetchDraftsFailSafe } from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import {
+  fetchFailSafe,
+  getDraftsClient,
+} from '@blog/studio/schema-types/validation/get-drafts-client/get-drafts-client';
+import { isString } from '@blog/utils/primitives';
 import { getDraftId, getPublishedId, type ValidationContext } from 'sanity';
 
 type TOtherRedirect = {
-  source?: string | null;
-  destination?: string | null;
-  isPrefix?: boolean | null;
+  source?: TMaybeNull<string>;
+  destination?: TMaybeNull<string>;
+  isPrefix?: TMaybeNull<boolean>;
 };
 
 export const REDIRECT_DUPLICATE_SOURCE_ERROR =
@@ -29,10 +34,10 @@ const fetchOtherRedirects = async (
   const { document } = context;
   const language = document?.[LANGUAGE_FIELD];
 
-  if (!document || typeof language !== 'string') return [];
+  if (!document || !isString(language)) return [];
 
-  return fetchDraftsFailSafe<TOtherRedirect[]>(
-    context,
+  return fetchFailSafe<TOtherRedirect[]>(
+    getDraftsClient(context),
     OTHER_REDIRECTS_QUERY,
     {
       type: REDIRECT_TYPE,
@@ -45,7 +50,7 @@ const fetchOtherRedirects = async (
 };
 
 export const validateRedirectSource = async (
-  value: string | undefined,
+  value: TMaybeUndefined<string>,
   context: ValidationContext,
 ): Promise<string | true> => {
   if (!value) return true;
@@ -69,7 +74,7 @@ export const validateRedirectSource = async (
 };
 
 export const validateRedirectDestination = async (
-  value: string | undefined,
+  value: TMaybeUndefined<string>,
   context: ValidationContext,
 ): Promise<string | true> => {
   if (!value) return true;

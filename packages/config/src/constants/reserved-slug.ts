@@ -1,11 +1,4 @@
-/**
- * Path segments claimed by static routes in `apps/web`, listed below every
- * static route in Next.js route priority (static > dynamic > catch-all).
- * A generic content page (routed by the `/[slug]` catch-all)
- * slugged with one of these values would be silently unreachable, so both
- * `packages/studio` (slug validation) and `apps/web` (route-subset coverage) consume
- * this as the single source of truth.
- */
+/** Top-level path segments owned by static routes, which a landing page slug would otherwise be shadowed by. */
 export const RESERVED_SLUGS = [
   'blog',
   'category',
@@ -15,6 +8,8 @@ export const RESERVED_SLUGS = [
   'page',
   'topics',
   'tags',
+  'privacy',
+  'legal',
 ] as const;
 
 export type TReservedSlug = (typeof RESERVED_SLUGS)[number];

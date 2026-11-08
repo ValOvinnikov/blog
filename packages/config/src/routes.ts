@@ -1,3 +1,9 @@
+import type {
+  TMaybeNull,
+  TMaybeUndefined,
+  TNullable,
+} from '@blog/config/types';
+
 import {
   NEWSLETTER_RESULT_SLUGS,
   type TLocaleIsoCode,
@@ -9,11 +15,6 @@ const toNewsletterLinkQuery = (token: string, locale?: TLocaleIsoCode) => {
   return locale ? `${tokenQuery}&lang=${locale}` : tokenQuery;
 };
 
-/**
- * Single source of truth for app URL construction. Consumed by `service`
- * (href-emitting transformers) and `web` (routes, pagination `createHref`,
- * sitemap, JSON-LD) — never build these paths inline elsewhere.
- */
 export const routes = {
   home: () => '/',
   blogIndex: (page = 1) => (page === 1 ? '/blog' : `/blog/page/${page}`),
@@ -24,9 +25,7 @@ export const routes = {
     page === 1 ? `/tags/${slug}` : `/tags/${slug}/page/${page}`,
   topics: () => '/topics',
   tags: () => '/tags',
-  /** Auth-gated "My bookmarks" listing — no slug/pagination, one static path per reader. */
   bookmarks: () => '/bookmarks',
-  /** Auth-gated account hub — one static path per reader; additional sections mount here without a new route. */
   account: () => '/account',
   /** A Route Handler, not a page, so it's outside `[locale]`. */
   accountExport: () => '/api/account/export',
@@ -42,6 +41,8 @@ export const routes = {
   newsletterResult: (result: TNewsletterResult) =>
     `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
   landingPage: (slug: string) => `/${slug}`,
+  privacyDocument: (slug: string) => `/privacy/${slug}`,
+  legalDocument: (slug: string) => `/legal/${slug}`,
   terms: () => '/terms',
   privacy: () => '/privacy',
   switchLanguage: (to: string, from: string) =>
@@ -59,9 +60,12 @@ const PAGE_HREF_BUILDERS = {
   page_topicIndex: () => routes.topics(),
   page_tag: (slug) => (slug ? routes.tag(slug) : undefined),
   page_tagIndex: () => routes.tags(),
+  page_privacyDocument: (slug) =>
+    slug ? routes.privacyDocument(slug) : undefined,
+  page_legalDocument: (slug) => (slug ? routes.legalDocument(slug) : undefined),
 } satisfies Record<
   string,
-  (slug: string | null | undefined) => string | undefined
+  (slug: TNullable<string>) => TMaybeUndefined<string>
 >;
 
 type TLinkablePageType = keyof typeof PAGE_HREF_BUILDERS;
@@ -69,9 +73,8 @@ type TLinkablePageType = keyof typeof PAGE_HREF_BUILDERS;
 const isLinkablePageType = (type: string): type is TLinkablePageType =>
   type in PAGE_HREF_BUILDERS;
 
-/** Resolves the site path of a page document a link points at; undefined when the type is unknown or a slugged page has no slug yet. */
 export const pageHref = (
-  type: string | null | undefined,
-  slug?: string | null,
-): string | undefined =>
+  type: TNullable<string>,
+  slug?: TMaybeNull<string>,
+): TMaybeUndefined<string> =>
   type && isLinkablePageType(type) ? PAGE_HREF_BUILDERS[type](slug) : undefined;
