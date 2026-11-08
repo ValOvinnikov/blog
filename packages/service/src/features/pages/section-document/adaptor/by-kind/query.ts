@@ -1,3 +1,4 @@
+import { LEGAL_PAGE_KIND } from '@blog/config/constants';
 import { q } from '@blog/service/sanity/query/query';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
 
@@ -8,7 +9,7 @@ export const sectionDocumentByKindQuery = q
   .parameters<TLocaleQueryParams & { kind: TSectionDocumentKind }>()
   .star.filterByType('page_privacyDocument', 'page_legalDocument')
   .filterBy('kind == $kind')
-  .filterBy('kind != "OTHER"')
+  .filterBy(`kind != "${LEGAL_PAGE_KIND.OTHER}"` as const)
   .filterBy('language == $locale')
   .slice(0)
   .project((sub) => ({
