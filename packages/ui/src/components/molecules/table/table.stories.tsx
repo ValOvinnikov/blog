@@ -5,34 +5,40 @@ import { Table } from './table';
 
 faker.seed(6520);
 
-type TTableStoryRow = { id: string; cells: string[] };
+type TTableStoryCell = { id: string; text: string };
+type TTableStoryRow = { id: string; cells: TTableStoryCell[] };
+
+const createCell = (text: string): TTableStoryCell => ({
+  id: faker.string.uuid(),
+  text,
+});
 
 const createColumns = (count: number) =>
-  Array.from({ length: count }, () => faker.commerce.department());
+  Array.from({ length: count }, () => createCell(faker.commerce.department()));
 
 const createRows = (
   columnCount: number,
   rowCount: number,
-  createCell: () => string,
+  createText: () => string,
 ): TTableStoryRow[] =>
   Array.from({ length: rowCount }, () => ({
     id: faker.string.uuid(),
-    cells: Array.from({ length: columnCount }, createCell),
+    cells: Array.from({ length: columnCount }, () => createCell(createText())),
   }));
 
 const shortCell = () => faker.lorem.words(2);
 
 const columns = createColumns(3);
 const rows = createRows(columns.length, 4, shortCell);
-const groupHeadings = [faker.lorem.word(), faker.lorem.word()];
+const groupHeadings = createColumns(2);
 const longRows = createRows(columns.length, 3, () => faker.lorem.sentences(3));
 const wideColumns = createColumns(6);
 const wideRows = createRows(wideColumns.length, 4, shortCell);
 
-const renderHeaderRow = (headings: string[]) => (
+const renderHeaderRow = (headings: TTableStoryCell[]) => (
   <Table.Row>
-    {headings.map((heading) => (
-      <Table.HeaderCell key={heading}>{heading}</Table.HeaderCell>
+    {headings.map(({ id, text }) => (
+      <Table.HeaderCell key={id}>{text}</Table.HeaderCell>
     ))}
   </Table.Row>
 );
@@ -40,8 +46,8 @@ const renderHeaderRow = (headings: string[]) => (
 const renderBodyRows = (bodyRows: TTableStoryRow[]) =>
   bodyRows.map(({ id, cells }) => (
     <Table.Row key={id}>
-      {cells.map((cell) => (
-        <Table.Cell key={cell}>{cell}</Table.Cell>
+      {cells.map(({ id, text }) => (
+        <Table.Cell key={id}>{text}</Table.Cell>
       ))}
     </Table.Row>
   ));
@@ -89,7 +95,7 @@ export const TwoHeaderRows: TStory = {
     children: [
       <Table.Caption key="caption">{faker.lorem.sentence()}</Table.Caption>,
       <Table.Head key="head">
-        {renderHeaderRow([...groupHeadings, faker.lorem.word()])}
+        {renderHeaderRow([...groupHeadings, createCell(faker.lorem.word())])}
         {renderHeaderRow(columns)}
       </Table.Head>,
       renderBodyRows(rows),

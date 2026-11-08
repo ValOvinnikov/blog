@@ -37,7 +37,7 @@ export type TTableProps = IWithClassName &
 
 const s = tableVariants();
 
-/** A data table that scrolls sideways inside its own focusable region when it is wider than the screen. */
+/** A data table that scrolls sideways inside its own focusable region when it is wider than its container. */
 const TableRoot = ({
   ariaLabel,
   children,

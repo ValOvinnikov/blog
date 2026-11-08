@@ -335,7 +335,7 @@ Props: panel: ISignInPanelSurface · labels: ISignInPanelLabels · providers: IS
 
 ### Table — `components/molecules/table/table.tsx`
 
-A data table that scrolls sideways inside its own focusable region when it is wider than the screen.
+A data table that scrolls sideways inside its own focusable region when it is wider than its container.
 Props: ariaLabel: string · children?: TTableChildren | TTableChildren[] _(extends IWithClassName, IWithDataTestId)_
 
 Slots:

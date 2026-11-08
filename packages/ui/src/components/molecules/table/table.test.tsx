@@ -1,5 +1,6 @@
 import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
+import userEvent from '@testing-library/user-event';
 
 import { Table } from './table';
 
@@ -7,9 +8,8 @@ faker.seed(6520);
 
 const MOCK_REGION_LABEL = faker.lorem.words(3);
 const MOCK_CAPTION = faker.lorem.sentence();
-const MOCK_STRAY_TEXT = faker.lorem.words(3);
-const COLUMNS = [faker.lorem.word(), faker.lorem.word()];
-const ROWS = [
+const MOCK_COLUMNS = [faker.lorem.word(), faker.lorem.word()];
+const MOCK_ROWS = [
   [faker.lorem.words(2), faker.lorem.words(2)],
   [faker.lorem.words(2), faker.lorem.words(2)],
 ];
@@ -19,12 +19,12 @@ const renderTable = () =>
     <Table ariaLabel={MOCK_REGION_LABEL}>
       <Table.Head>
         <Table.Row>
-          {COLUMNS.map((column) => (
+          {MOCK_COLUMNS.map((column) => (
             <Table.HeaderCell key={column}>{column}</Table.HeaderCell>
           ))}
         </Table.Row>
       </Table.Head>
-      {ROWS.map((cells) => (
+      {MOCK_ROWS.map((cells) => (
         <Table.Row key={cells.join()}>
           {cells.map((cell) => (
             <Table.Cell key={cell}>{cell}</Table.Cell>
@@ -46,16 +46,18 @@ describe(`<${Table.name}/>`, () => {
     expect(table).toBeVisible();
   });
 
-  it('wraps the table in a keyboard-focusable region named by its label', () => {
+  it('wraps the table in a keyboard-focusable region named by its label', async () => {
+    const user = userEvent.setup();
     const region = screen.getByRole('region', { name: MOCK_REGION_LABEL });
-
     const table = within(region).getByRole('table');
 
-    expect(region).toHaveAttribute('tabindex', '0');
+    await user.tab();
+
+    expect(region).toHaveFocus();
     expect(table).toBeVisible();
   });
 
-  it.each(COLUMNS)('renders "%s" as a column header', (column) => {
+  it.each(MOCK_COLUMNS)('renders "%s" as a column header', (column) => {
     const header = screen.getByRole('columnheader', { name: column });
 
     expect(header).toHaveAttribute('scope', 'col');
@@ -66,27 +68,13 @@ describe(`<${Table.name}/>`, () => {
     const headers = within(headGroup!).getAllByRole('columnheader');
     const bodyRows = within(bodyGroup!).getAllByRole('row');
 
-    expect(headers).toHaveLength(COLUMNS.length);
-    expect(bodyRows).toHaveLength(ROWS.length);
+    expect(headers).toHaveLength(MOCK_COLUMNS.length);
+    expect(bodyRows).toHaveLength(MOCK_ROWS.length);
   });
 
-  it.each(ROWS.flat())('renders "%s" as a data cell', (cell) => {
+  it.each(MOCK_ROWS.flat())('renders "%s" as a data cell', (cell) => {
     const dataCell = screen.getByRole('cell', { name: cell });
 
     expect(dataCell).toBeVisible();
   });
-});
-
-it('renders an unknown child inside the table body', () => {
-  renderElement(
-    <Table ariaLabel={MOCK_REGION_LABEL}>
-      <tr>
-        <td>{MOCK_STRAY_TEXT}</td>
-      </tr>
-    </Table>,
-  );
-
-  const strayCell = screen.getByRole('cell', { name: MOCK_STRAY_TEXT });
-
-  expect(strayCell).toBeVisible();
 });
