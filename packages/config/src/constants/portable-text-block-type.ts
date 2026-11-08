@@ -5,6 +5,7 @@ export const PORTABLE_TEXT_BLOCK_TYPE = {
   ASIDE: 'aside',
   LINK_REF: 'linkRef',
   COOKIE_PREFERENCES_LINK: 'cookiePreferencesLink',
+  COOKIE_LIST: 'cookieList',
 } as const;
 
 export type TPortableTextBlockType = TValueOf<typeof PORTABLE_TEXT_BLOCK_TYPE>;
