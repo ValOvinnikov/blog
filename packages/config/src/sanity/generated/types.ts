@@ -673,6 +673,9 @@ export type ArticleText = Array<
   | ({
       _key: string;
     } & Aside)
+  | ({
+      _key: string;
+    } & CookieList)
 >;
 
 export type NewsletterTrustCue = {
@@ -871,6 +874,11 @@ export type LinkRefWithSubItems = {
       _key: string;
     } & LinkRef
   >;
+};
+
+export type CookieList = {
+  _type: 'cookieList';
+  marker?: string;
 };
 
 export type CookiePreferencesLink = {
@@ -2388,6 +2396,7 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | LinkRefWithSubItems
+  | CookieList
   | CookiePreferencesLink
   | LinkRef
   | Aside

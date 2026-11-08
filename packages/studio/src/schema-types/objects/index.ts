@@ -2,6 +2,7 @@ import { asideSchema } from './aside/aside';
 import { bodyImageSchema } from './body-image/body-image';
 import { brandTaglineSchema } from './brand-tagline/brand-tagline';
 import { brandTaglineItemSchema } from './brand-tagline-item/brand-tagline-item';
+import { cookieListSchema } from './cookie-list/cookie-list';
 import { cookiePreferencesLinkSchema } from './cookie-preferences-link/cookie-preferences-link';
 import { cookieSettingsItemSchema } from './cookie-settings-item/cookie-settings-item';
 import {
@@ -47,6 +48,7 @@ export const objects = [
   inlineLinkSchema,
   linkRefSchema,
   cookiePreferencesLinkSchema,
+  cookieListSchema,
   linkRefWithSubItemsSchema,
   logoItemSchema,
   socialProfileSchema,

@@ -1,5 +1,6 @@
 import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
+import { cookieListSchema } from '@blog/studio/schema-types/objects/cookie-list/cookie-list';
 import { cookiePreferencesLinkSchema } from '@blog/studio/schema-types/objects/cookie-preferences-link/cookie-preferences-link';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import {
@@ -49,5 +50,6 @@ export const articleTextSchema = defineType({
     defineArrayMember({ type: bodyImageSchema.name }),
     defineArrayMember({ type: 'code' }),
     defineArrayMember({ type: asideSchema.name }),
+    defineArrayMember({ type: cookieListSchema.name }),
   ],
 });
