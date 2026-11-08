@@ -1,14 +1,25 @@
-import { LOCALE_BCP47_TAGS, routes, type TLocaleIsoCode } from '@blog/config';
+import {
+  LOCALE_BCP47_TAGS,
+  routes,
+  type TLocaleIsoCode,
+  type TValueOf,
+} from '@blog/config';
 import { queries } from '@blog/db';
-import { service, type TTranslationMap } from '@blog/service';
+import { service } from '@blog/service';
+import type { TResult } from '@blog/utils';
+import { SITEMAP_LOG } from '@web/constants/sitemap';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { toLanguageAlternates } from '@web/utils/to-language-alternates';
-import { toLiveLanguagePages } from '@web/utils/to-live-language-pages';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
+import {
+  toAbsoluteAlternates,
+  toLocalizedSitemapUrl,
+  toTranslatedSitemapEntry,
+} from '@web/utils/to-translated-sitemap-entry';
 import type { MetadataRoute } from 'next';
 
 const toEntry = (
@@ -27,17 +38,6 @@ const toEntry = (
     },
   };
 };
-
-const toAbsoluteAlternates = (
-  alternates: Record<string, string>,
-  siteUrl: string,
-): Record<string, string> =>
-  Object.fromEntries(
-    Object.entries(alternates).map(([language, path]) => [
-      language,
-      `${siteUrl}${path}`,
-    ]),
-  );
 
 type TLanguagePageEntriesParams = {
   href: string;
@@ -87,77 +87,15 @@ const toLanguagePageEntries = ({
   }));
 };
 
-type TTranslatedPage = { slug: string; language: TLocaleIsoCode };
-
-type TTranslatedPageEntryParams = {
-  page: TTranslatedPage;
-  documentType: string;
-  toHref: (slug: string) => string;
-  lastModified?: string;
-  translationMap: TTranslationMap;
-  liveLocales: readonly TLocaleIsoCode[];
-  defaultLocale: TLocaleIsoCode;
-  siteUrl: string;
-};
-
-const toLocalizedUrl = (
-  href: string,
-  language: TLocaleIsoCode,
-  defaultLocale: TLocaleIsoCode,
-  siteUrl: string,
-) =>
-  `${siteUrl}${toLocalizedPathname({ href, locale: language, defaultLocale })}`;
-
-const toTranslatedPageEntry = ({
-  page,
-  documentType,
-  toHref,
-  lastModified,
-  translationMap,
-  liveLocales,
-  defaultLocale,
-  siteUrl,
-}: TTranslatedPageEntryParams): MetadataRoute.Sitemap[number] => {
-  const url = toLocalizedUrl(
-    toHref(page.slug),
-    page.language,
-    defaultLocale,
-    siteUrl,
-  );
-  const liveTranslations = toLiveLanguagePages({
-    pages:
-      service.global.translationMap.v1.findTranslationGroup(translationMap, {
-        documentType,
-        slug: page.slug,
-        language: page.language,
-      }) ?? [],
-    liveLocales,
-  });
-
-  if (liveTranslations.length < 2) {
-    return {
-      url,
-      ...(lastModified ? { lastModified } : {}),
-      alternates: { languages: { [LOCALE_BCP47_TAGS[page.language]]: url } },
-    };
+const toListOrEmpty = <T>(
+  result: TResult<T[]>,
+  logEvent: TValueOf<typeof SITEMAP_LOG>,
+): T[] => {
+  if (result.ok) {
+    return result.data;
   }
-
-  return {
-    url,
-    ...(lastModified ? { lastModified } : {}),
-    alternates: {
-      languages: toAbsoluteAlternates(
-        toLanguageAlternates({
-          pages: liveTranslations.map(({ language, slug }) => ({
-            language,
-            href: toHref(slug),
-          })),
-          defaultLocale,
-        }),
-        siteUrl,
-      ),
-    },
-  };
+  logger.error(logEvent, { error: result.error });
+  return [];
 };
 
 const toPaginatedPageEntry = (
@@ -166,7 +104,7 @@ const toPaginatedPageEntry = (
   defaultLocale: TLocaleIsoCode,
   siteUrl: string,
 ): MetadataRoute.Sitemap[number] => {
-  const url = toLocalizedUrl(href, language, defaultLocale, siteUrl);
+  const url = toLocalizedSitemapUrl(href, language, defaultLocale, siteUrl);
   return {
     url,
     alternates: { languages: { [LOCALE_BCP47_TAGS[language]]: url } },
@@ -176,7 +114,7 @@ const toPaginatedPageEntry = (
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = await getTenantBaseUrl();
   if (!siteUrl) {
-    logger.error('sitemap.site_url_missing');
+    logger.error(SITEMAP_LOG.SITE_URL_MISSING);
     return [];
   }
 
@@ -200,6 +138,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     tagPaginationParamsResult,
     blogParamsResult,
     landingPageSlugsResult,
+    privacyDocumentParamsResult,
+    legalDocumentParamsResult,
     translationMapResult,
   ] = await Promise.all([
     service.pages.post.v1.getPostParams(tenant, liveLocales),
@@ -209,68 +149,58 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     service.pages.tag.v1.getTagPaginationParams(tenant, liveLocales),
     service.pages.blog.v1.getIndexPageParams(tenant),
     service.pages.landing.v1.getPageSlugs(tenant, liveLocales),
+    service.pages.sectionDocument.v1.getSectionDocumentParams(
+      'page_privacyDocument',
+      tenant,
+      liveLocales,
+    ),
+    service.pages.sectionDocument.v1.getSectionDocumentParams(
+      'page_legalDocument',
+      tenant,
+      liveLocales,
+    ),
     service.global.translationMap.v1.getTranslationMap(tenant),
   ]);
 
-  if (!postParamsResult.ok) {
-    logger.error('sitemap.post_params_fetch_failed', {
-      error: postParamsResult.error,
-    });
-  }
-  const posts = postParamsResult.ok ? postParamsResult.data : [];
-
-  if (!topicParamsResult.ok) {
-    logger.error('sitemap.topic_params_fetch_failed', {
-      error: topicParamsResult.error,
-    });
-  }
-  const topics = topicParamsResult.ok ? topicParamsResult.data : [];
-
-  if (!tagParamsResult.ok) {
-    logger.error('sitemap.tag_params_fetch_failed', {
-      error: tagParamsResult.error,
-    });
-  }
-  const tags = tagParamsResult.ok ? tagParamsResult.data : [];
-
-  if (!topicPaginationParamsResult.ok) {
-    logger.error('sitemap.topic_pagination_params_fetch_failed', {
-      error: topicPaginationParamsResult.error,
-    });
-  }
-  const topicPages = topicPaginationParamsResult.ok
-    ? topicPaginationParamsResult.data
-    : [];
-
-  if (!tagPaginationParamsResult.ok) {
-    logger.error('sitemap.tag_pagination_params_fetch_failed', {
-      error: tagPaginationParamsResult.error,
-    });
-  }
-  const tagPages = tagPaginationParamsResult.ok
-    ? tagPaginationParamsResult.data
-    : [];
-
-  if (!blogParamsResult.ok) {
-    logger.error('sitemap.blog_page_params_fetch_failed', {
-      error: blogParamsResult.error,
-    });
-  }
-  const blogPageNumbers = blogParamsResult.ok
-    ? blogParamsResult.data.map(({ page }) => Number(page))
-    : [];
-
-  if (!landingPageSlugsResult.ok) {
-    logger.error('sitemap.landing_page_slugs_fetch_failed', {
-      error: landingPageSlugsResult.error,
-    });
-  }
-  const landingPageSlugs = landingPageSlugsResult.ok
-    ? landingPageSlugsResult.data
-    : [];
+  const posts = toListOrEmpty(
+    postParamsResult,
+    SITEMAP_LOG.POST_PARAMS_FETCH_FAILED,
+  );
+  const topics = toListOrEmpty(
+    topicParamsResult,
+    SITEMAP_LOG.TOPIC_PARAMS_FETCH_FAILED,
+  );
+  const tags = toListOrEmpty(
+    tagParamsResult,
+    SITEMAP_LOG.TAG_PARAMS_FETCH_FAILED,
+  );
+  const topicPages = toListOrEmpty(
+    topicPaginationParamsResult,
+    SITEMAP_LOG.TOPIC_PAGINATION_PARAMS_FETCH_FAILED,
+  );
+  const tagPages = toListOrEmpty(
+    tagPaginationParamsResult,
+    SITEMAP_LOG.TAG_PAGINATION_PARAMS_FETCH_FAILED,
+  );
+  const blogPageNumbers = toListOrEmpty(
+    blogParamsResult,
+    SITEMAP_LOG.BLOG_PAGE_PARAMS_FETCH_FAILED,
+  ).map(({ page }) => Number(page));
+  const landingPageSlugs = toListOrEmpty(
+    landingPageSlugsResult,
+    SITEMAP_LOG.LANDING_PAGE_SLUGS_FETCH_FAILED,
+  );
+  const privacyDocuments = toListOrEmpty(
+    privacyDocumentParamsResult,
+    SITEMAP_LOG.PRIVACY_DOCUMENT_PARAMS_FETCH_FAILED,
+  );
+  const legalDocuments = toListOrEmpty(
+    legalDocumentParamsResult,
+    SITEMAP_LOG.LEGAL_DOCUMENT_PARAMS_FETCH_FAILED,
+  );
 
   if (!translationMapResult.ok) {
-    logger.error('sitemap.translation_map_fetch_failed', {
+    logger.error(SITEMAP_LOG.TRANSLATION_MAP_FETCH_FAILED, {
       error: translationMapResult.error,
     });
   }
@@ -317,7 +247,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...toTranslatedPageEntries(routes.tags(), translationMap.tagIndexLanguages),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ publishedAt, ...page }) =>
-      toTranslatedPageEntry({
+      toTranslatedSitemapEntry({
         page,
         documentType: 'page_post',
         toHref: routes.post,
@@ -326,7 +256,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     ),
     ...topics.map((page) =>
-      toTranslatedPageEntry({
+      toTranslatedSitemapEntry({
         page,
         documentType: 'page_topic',
         toHref: routes.topic,
@@ -342,7 +272,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ),
     ),
     ...tags.map((page) =>
-      toTranslatedPageEntry({
+      toTranslatedSitemapEntry({
         page,
         documentType: 'page_tag',
         toHref: routes.tag,
@@ -358,10 +288,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ),
     ),
     ...landingPageSlugs.map((page) =>
-      toTranslatedPageEntry({
+      toTranslatedSitemapEntry({
         page,
         documentType: 'page_landing',
         toHref: routes.landingPage,
+        ...translatedPageContext,
+      }),
+    ),
+    ...privacyDocuments.map((page) =>
+      toTranslatedSitemapEntry({
+        page,
+        documentType: 'page_privacyDocument',
+        toHref: routes.privacyDocument,
+        ...translatedPageContext,
+      }),
+    ),
+    ...legalDocuments.map((page) =>
+      toTranslatedSitemapEntry({
+        page,
+        documentType: 'page_legalDocument',
+        toHref: routes.legalDocument,
         ...translatedPageContext,
       }),
     ),
