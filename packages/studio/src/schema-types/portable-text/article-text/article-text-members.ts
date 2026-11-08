@@ -1,3 +1,4 @@
+import { PORTABLE_TEXT_STYLE } from '@blog/config/constants';
 import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
 import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
 import { cookieListSchema } from '@blog/studio/schema-types/objects/cookie-list/cookie-list';
@@ -18,18 +19,21 @@ import {
   type BlockStyleDefinition,
 } from 'sanity';
 
-const normalStyle: BlockStyleDefinition = { title: 'Normal', value: 'normal' };
+const normalStyle: BlockStyleDefinition = {
+  title: 'Normal',
+  value: PORTABLE_TEXT_STYLE.NORMAL,
+};
 
 const subheadingAndQuoteStyles: BlockStyleDefinition[] = [
-  { title: 'H3', value: 'h3' },
-  { title: 'H4', value: 'h4' },
-  { title: 'Quote', value: 'blockquote' },
+  { title: 'H3', value: PORTABLE_TEXT_STYLE.H3 },
+  { title: 'H4', value: PORTABLE_TEXT_STYLE.H4 },
+  { title: 'Quote', value: PORTABLE_TEXT_STYLE.BLOCKQUOTE },
 ];
 
 // Excludes H1 so the body never competes with the post/page title's own heading.
 export const articleTextStyles: BlockStyleDefinition[] = [
   normalStyle,
-  { title: 'H2', value: 'h2' },
+  { title: 'H2', value: PORTABLE_TEXT_STYLE.H2 },
   ...subheadingAndQuoteStyles,
 ];
 
