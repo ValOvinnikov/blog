@@ -1,5 +1,6 @@
 'use client';
 
+import type { IWithClassName } from '@blog/config';
 import {
   SidebarNav,
   type TSidebarNavItem,
@@ -8,14 +9,13 @@ import { useActiveHeadingId } from '@web/hooks/use-active-heading-id';
 import type { TContentsHeading } from '@web/utils/extract-contents-headings';
 import { useTranslations } from 'next-intl';
 
-export type TContentsRailProps = {
+export interface IContentsRailProps extends IWithClassName {
   headings: TContentsHeading[];
-  className?: string;
-};
+}
 
 const toAnchor = (key: string) => `#${key}`;
 
-export const ContentsRail = ({ headings, className }: TContentsRailProps) => {
+export const ContentsRail = ({ headings, className }: IContentsRailProps) => {
   const t = useTranslations('contentsRail');
   const activeHeadingId = useActiveHeadingId(headings.map(({ key }) => key));
   const items: TSidebarNavItem[] = headings.map(({ text, level, key }) => ({

@@ -43,7 +43,8 @@
   into a two-column grid: a sticky rail (desktop `≥1024px`) or a compact
   selector (below `1024px`) alongside the still-`max-w-measure`-capped
   reading column. The `max-w-measure` cap lives on each grid child
-  (`content`, `rail`, `footerInRail`), not on `body` — nesting it on both double-shrank
+  (`content`, `rail`, `footer` in
+  `contents-rail-layout-variants.ts`), not on its `root` — nesting it on both double-shrank
   the reading column below `lg:` (to ~536px); capping per-child keeps it a
   consistent 68ch (~616px) at every width (#995). The rail is labelled
   **Topics**: at `≥1024px` a full vertical topic list with active-topic

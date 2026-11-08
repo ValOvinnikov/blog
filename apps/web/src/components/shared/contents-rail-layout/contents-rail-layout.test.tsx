@@ -34,7 +34,7 @@ describe(`<${ContentsRailLayout.name}/>`, () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the contents rail beside the content and footer when the body has enough H2 headings', () => {
+  it('renders the rail beside the content and footer at 3+ H2s', () => {
     setup();
     const rail = screen.getByRole('navigation', { name: NAV_NAME });
     const content = screen.getByText(MOCK_CONTENT_TEXT);
@@ -45,7 +45,7 @@ describe(`<${ContentsRailLayout.name}/>`, () => {
     expect(footer).toBeVisible();
   });
 
-  it('renders the content and footer without a rail when the body has too few H2 headings', () => {
+  it('renders content and footer without a rail below 3 H2s', () => {
     setup({ body: MOCK_SHORT_BODY });
     const rail = screen.queryByRole('navigation', { name: NAV_NAME });
     const content = screen.getByText(MOCK_CONTENT_TEXT);

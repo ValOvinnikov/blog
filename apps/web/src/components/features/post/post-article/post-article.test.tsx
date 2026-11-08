@@ -327,14 +327,6 @@ describe(`<${PostArticle.name}/>`, () => {
       expect(avatarImage).toHaveAttribute('src', expectedAvatarUrl);
     });
 
-    it('renders no contents rail when the body has fewer than 3 H2 headings', () => {
-      const contentsNav = screen.queryByRole('navigation', {
-        name: contentsLabel,
-      });
-
-      expect(contentsNav).not.toBeInTheDocument();
-    });
-
     it('renders no tag chips when the post has no tags', () => {
       const typeScriptLink = screen.queryByRole('link', {
         name: MOCK_TYPESCRIPT_TAG.title,
