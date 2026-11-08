@@ -1,3 +1,4 @@
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TTaxonomyKind } from '@blog/config/constants';
 import {
   fetchFailSafe,
@@ -13,15 +14,15 @@ type TTaxonomyListReferencesDocument = {
 };
 type TPathSegment = string | number | { _key: string };
 type TRefLocation = { id: string; path: TPathSegment[] };
-type TTaxonomyListModule = { _id?: string; taxonomy?: string | null };
+type TTaxonomyListModule = { _id?: string; taxonomy?: TMaybeNull<string> };
 
 const FAIL_SAFE_ASSUMES_NO_MISMATCH: TTaxonomyListModule[] = [];
 
 const collectTaxonomyListRefLocations = (
-  document: SanityDocument | undefined,
+  document: TMaybeUndefined<SanityDocument>,
   moduleTypeName: string,
 ): TRefLocation[] => {
-  const doc = document as TTaxonomyListReferencesDocument | undefined;
+  const doc = document as TMaybeUndefined<TTaxonomyListReferencesDocument>;
 
   const moduleLocations = (doc?.modules ?? []).flatMap((module, index) =>
     module._type === moduleTypeName && module._ref
@@ -51,7 +52,7 @@ const collectTaxonomyListRefLocations = (
 export const validateTaxonomyListReferencesMatchKind =
   (kind: TTaxonomyKind, moduleTypeName: string, mismatchError: string) =>
   async (
-    document: SanityDocument | undefined,
+    document: TMaybeUndefined<SanityDocument>,
     context: ValidationContext,
   ): Promise<true | { message: string; path: TPathSegment[] }[]> => {
     const locations = collectTaxonomyListRefLocations(document, moduleTypeName);

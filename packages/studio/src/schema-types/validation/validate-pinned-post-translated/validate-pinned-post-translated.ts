@@ -1,3 +1,4 @@
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
@@ -18,10 +19,12 @@ const joinWithOr = (items: readonly string[]) =>
     : (items[0] ?? '');
 
 export const validatePinnedPostTranslated = async (
-  value: { _ref?: string } | undefined,
+  value: TMaybeUndefined<{ _ref?: string }>,
   context: ValidationContext,
 ): Promise<string | true> => {
-  const parent = context.parent as { postSource?: TPostSource } | undefined;
+  const parent = context.parent as TMaybeUndefined<{
+    postSource?: TPostSource;
+  }>;
   const liveLanguages = getLiveLanguages();
 
   if (
@@ -32,7 +35,7 @@ export const validatePinnedPostTranslated = async (
     return true;
   }
 
-  const postLanguages = await fetchFailSafe<unknown[] | null>(
+  const postLanguages = await fetchFailSafe<TMaybeNull<unknown[]>>(
     getDraftsClient(context),
     POST_LANGUAGES_QUERY,
     { id: getPublishedId(value._ref) },

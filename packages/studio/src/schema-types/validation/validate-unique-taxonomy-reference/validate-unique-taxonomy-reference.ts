@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import {
   fetchFailSafe,
@@ -6,7 +7,7 @@ import {
 import { isString } from '@blog/utils/primitives';
 import type { ValidationContext } from 'sanity';
 
-type TReferenceValue = { _ref?: string } | undefined;
+type TReferenceValue = TMaybeUndefined<{ _ref?: string }>;
 
 const FAIL_SAFE_ASSUMES_NO_CONFLICT = 0;
 

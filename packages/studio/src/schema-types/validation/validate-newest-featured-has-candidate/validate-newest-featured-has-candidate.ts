@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { POST_SOURCE } from '@blog/config/constants';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { PUBLISHED_POST_CONDITION } from '@blog/studio/schema-types/filters/published-post';
@@ -12,7 +13,7 @@ const FAIL_SAFE_ASSUMES_CANDIDATE = 1;
 export const validateNewestFeaturedHasCandidate =
   (renderTarget: string) =>
   async (
-    value: string | undefined,
+    value: TMaybeUndefined<string>,
     context: ValidationContext,
   ): Promise<string | true> => {
     if (value !== POST_SOURCE.NEWEST_FEATURED) return true;

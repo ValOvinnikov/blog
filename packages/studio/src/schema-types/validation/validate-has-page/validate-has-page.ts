@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import {
   fetchFailSafe,
   getDraftsClient,
@@ -14,7 +15,7 @@ const FAIL_SAFE_ASSUMES_REFERENCED = 1;
 export const validateHasPage =
   (pageType: string, referenceField: string, noPageError: string) =>
   async (
-    document: SanityDocument | undefined,
+    document: TMaybeUndefined<SanityDocument>,
     context: ValidationContext,
   ): Promise<string | true> => {
     const publishedId = document?._id.replace(/^drafts\./, '');

@@ -1,3 +1,4 @@
+import type { TMaybeNull, TMaybeUndefined, TNullable } from '@blog/config';
 import { LANDING_PAGE_MAX_DEPTH } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import {
@@ -12,11 +13,11 @@ import {
 import { hasLength, isString } from '@blog/utils/primitives';
 import { getPublishedId, type Reference, type ValidationContext } from 'sanity';
 
-type TDescendant = { _id: string; children?: TDescendant[] | null };
+type TDescendant = { _id: string; children?: TMaybeNull<TDescendant[]> };
 
 type TParentPlacement = {
-  ancestors: TLandingParentChainNode | null;
-  descendants: TDescendant[] | null;
+  ancestors: TMaybeNull<TLandingParentChainNode>;
+  descendants: TMaybeNull<TDescendant[]>;
 };
 
 export const LANDING_PARENT_CYCLE_ERROR =
@@ -37,7 +38,7 @@ const PARENT_PLACEMENT_QUERY = `{
   "descendants": *[_type == $type && parent._ref == $id]${nestChildren(LANDING_PAGE_MAX_DEPTH - 2)}
 }`;
 
-const subtreeHeight = (nodes: TDescendant[] | null | undefined): number =>
+const subtreeHeight = (nodes: TNullable<TDescendant[]>): number =>
   nodes && hasLength(nodes)
     ? 1 + Math.max(...nodes.map(({ children }) => subtreeHeight(children)))
     : 0;
@@ -45,7 +46,7 @@ const subtreeHeight = (nodes: TDescendant[] | null | undefined): number =>
 const languageOf = (value: unknown): string => (isString(value) ? value : '');
 
 export const validateLandingParent = async (
-  value: Reference | undefined,
+  value: TMaybeUndefined<Reference>,
   context: ValidationContext,
 ): Promise<string | true> => {
   const parentId = value?._ref;
@@ -57,7 +58,7 @@ export const validateLandingParent = async (
 
   if (getPublishedId(parentId) === id) return LANDING_PARENT_CYCLE_ERROR;
 
-  const placement = await fetchFailSafe<TParentPlacement | null>(
+  const placement = await fetchFailSafe<TMaybeNull<TParentPlacement>>(
     getDraftsClient(context),
     PARENT_PLACEMENT_QUERY,
     { parentId, id, type: document._type },

@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { isLocaleIsoCode } from '@blog/config/constants';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { LOCALE_LABEL } from '@blog/studio/schema-types/inputs/localization-notice-input/missing-locales';
@@ -16,7 +17,7 @@ import {
 const FAIL_SAFE_ASSUMES_UNIQUE = true;
 
 export const validateOnePerLanguage = async (
-  document: SanityDocument | undefined,
+  document: TMaybeUndefined<SanityDocument>,
   context: ValidationContext,
 ): Promise<true | string> => {
   if (!document) return true;
