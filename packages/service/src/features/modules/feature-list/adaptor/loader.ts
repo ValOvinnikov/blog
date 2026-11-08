@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { featureListModuleQuery } from './query';
 import { toFeatureListModule } from './transformer';
@@ -20,11 +21,7 @@ export async function getFeatureList(
         'modules:featureList',
         `module:${id}`,
         'block_feature',
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
+        ...LINK_TARGET_CACHE_TAGS,
       ],
       tenant.projectId,
     ),

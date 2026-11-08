@@ -4,6 +4,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { postPageQuery } from './query';
 import { toPostDetail } from './transformer';
@@ -17,22 +18,7 @@ export async function getPost(
     parameters: { slug },
     tenant,
     ...isr(
-      [
-        'page_post',
-        'author',
-        'topic',
-        'tag',
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
-        'page_postIndex',
-        'page_topic',
-        'page_topicIndex',
-        'page_tag',
-        'page_tagIndex',
-      ],
+      ['page_post', 'author', 'topic', 'tag', ...LINK_TARGET_CACHE_TAGS],
       tenant.projectId,
     ),
   });

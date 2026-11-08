@@ -6,11 +6,7 @@ import {
   mockRawFeatureListModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
-  MOCK_HOME_PAGE_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
@@ -88,11 +84,7 @@ describe(getFeatureList, () => {
           mockCacheTag('modules:featureList'),
           mockCacheTag(`module:${MOCK_FEATURE_LIST_MODULE_ID}`),
           mockCacheTag('block_feature'),
-          MOCK_LINK_CACHE_TAG,
-          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-          MOCK_HOME_PAGE_CACHE_TAG,
-          MOCK_PAGE_LANDING_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

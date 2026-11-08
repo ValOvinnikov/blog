@@ -5,11 +5,7 @@ import {
   mockRawLogoWallModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
-  MOCK_HOME_PAGE_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
@@ -73,11 +69,7 @@ describe(getLogoWallModule, () => {
         tags: [
           mockCacheTag('modules:logoWall'),
           mockCacheTag(`module:${MOCK_LOGO_WALL_ID}`),
-          MOCK_LINK_CACHE_TAG,
-          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-          MOCK_HOME_PAGE_CACHE_TAG,
-          MOCK_PAGE_LANDING_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

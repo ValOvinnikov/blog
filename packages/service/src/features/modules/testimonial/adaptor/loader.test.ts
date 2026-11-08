@@ -6,9 +6,7 @@ import {
   mockRawTestimonialModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
-  MOCK_HOME_PAGE_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
@@ -86,9 +84,7 @@ describe(getTestimonialModule, () => {
           mockCacheTag('modules:testimonial'),
           mockCacheTag(`module:${MOCK_TESTIMONIAL_MODULE_ID}`),
           mockCacheTag('block_testimonial'),
-          MOCK_LINK_CACHE_TAG,
-          MOCK_HOME_PAGE_CACHE_TAG,
-          MOCK_PAGE_LANDING_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

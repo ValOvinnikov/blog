@@ -222,8 +222,9 @@ The step names are the job names they replaced, in this order:
   and which nothing cheaper catches, because every workspace aliases
   `@blog/<pkg>/*` straight to that package's `src/`.
 - **Revalidate tags sync** — `scripts/check-revalidate-tags-sync.mjs` fails
-  when an `isr(...)` tag literal in `packages/service/src` is missing from
-  `apps/web`'s `REVALIDATE_TAGS`, which would purge nothing on publish.
+  when an `isr(...)` tag literal in `packages/service/src` — or a tag in a
+  shared list under `shared/cache-tags/` that a call spreads — is missing
+  from `apps/web`'s `REVALIDATE_TAGS`, which would purge nothing on publish.
 - **Turbo env sync** — `scripts/check-turbo-env-sync.mjs` fails when a var
   declared in an app's (or its packages') `env.ts` is missing from
   `turbo.json`'s `build` `env` allowlist, which strict env mode strips.

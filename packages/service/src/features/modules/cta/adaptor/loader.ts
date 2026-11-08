@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { ctaModuleQuery } from './query';
 import { toCtaModule } from './transformer';
@@ -16,22 +17,7 @@ export async function getCta(
     parameters: { id },
     tenant,
     ...isr(
-      [
-        'modules:cta',
-        `module:${id}`,
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
-        'page_post',
-        'page_postIndex',
-        'page_topic',
-        'page_topicIndex',
-        'page_tag',
-        'page_tagIndex',
-        'topic',
-      ],
+      ['modules:cta', `module:${id}`, 'topic', ...LINK_TARGET_CACHE_TAGS],
       tenant.projectId,
     ),
   });

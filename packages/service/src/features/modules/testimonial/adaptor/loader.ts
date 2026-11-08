@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { testimonialModuleQuery } from './query';
 import { toTestimonialModule } from './transformer';
@@ -20,9 +21,7 @@ export async function getTestimonialModule(
         'modules:testimonial',
         `module:${id}`,
         'block_testimonial',
-        'link',
-        'homePage',
-        'page_landing',
+        ...LINK_TARGET_CACHE_TAGS,
       ],
       tenant.projectId,
     ),
