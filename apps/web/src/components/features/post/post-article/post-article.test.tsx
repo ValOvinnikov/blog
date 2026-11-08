@@ -90,7 +90,7 @@ const HEADER_TEST_ID = 'post-article-header';
 
 const { author, topic } = MOCK_POST;
 const { saveAriaLabel } = SITE_MESSAGES.bookmarkButton;
-const { label: contentsLabel } = SITE_MESSAGES.postContentsRail;
+const { label: contentsLabel } = SITE_MESSAGES.contentsRail;
 const shareButtonName = SITE_MESSAGES.postShare.shareAriaLabel.replace(
   '{title}',
   MOCK_POST_DETAIL.title,
@@ -325,14 +325,6 @@ describe(`<${PostArticle.name}/>`, () => {
       const avatarImage = screen.getByRole('presentation');
 
       expect(avatarImage).toHaveAttribute('src', expectedAvatarUrl);
-    });
-
-    it('renders no contents rail when the body has fewer than 3 H2 headings', () => {
-      const contentsNav = screen.queryByRole('navigation', {
-        name: contentsLabel,
-      });
-
-      expect(contentsNav).not.toBeInTheDocument();
     });
 
     it('renders no tag chips when the post has no tags', () => {

@@ -2349,7 +2349,7 @@ own branch. Each page inside a section has "Show section navigation on this
 page" (default on) to opt out. Both settings live on the page rather than the
 template and warn when they differ from the default-language version. Labels
 use each page's public heading, never its internal `title`. The same
-`SidebarNav` renders a post's table of contents (`PostTableOfContents`).
+`SidebarNav` renders a post's contents rail (`ContentsRail`, inside `ContentsRailLayout`).
 
 **Section Pages module** (`module_sectionPages`, allowed on `template_landing`)
 renders a card per direct child of the page using the template, in drag

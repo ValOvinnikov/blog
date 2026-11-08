@@ -60,13 +60,13 @@ globs only `src/components/**` and `src/modules/**`.
 the same prefix (`shared/portable-text/components/code-block/` →
 `Components/CodeBlock`).
 
-| Folder                                  | `title`                                                          |
-| --------------------------------------- | ---------------------------------------------------------------- |
-| `src/modules/<x>/`                      | `Modules/<X>Module`                                              |
-| `src/components/pages/<x>/`             | `Pages/<Name>` (`Pages/Landing/LandingPageLayout`)               |
-| `src/components/features/<domain>/<x>/` | `Features/<Domain>/<Name>` (`Features/Post/PostTableOfContents`) |
-| `src/components/page-templates/<x>/`    | `Page Templates/<Name>`                                          |
-| `src/components/shared/<x>/`            | `Components/<Name>`                                              |
+| Folder                                  | `title`                                                      |
+| --------------------------------------- | ------------------------------------------------------------ |
+| `src/modules/<x>/`                      | `Modules/<X>Module`                                          |
+| `src/components/pages/<x>/`             | `Pages/<Name>` (`Pages/Landing/LandingPageLayout`)           |
+| `src/components/features/<domain>/<x>/` | `Features/<Domain>/<Name>` (`Features/Post/PostArticleBody`) |
+| `src/components/page-templates/<x>/`    | `Page Templates/<Name>`                                      |
+| `src/components/shared/<x>/`            | `Components/<Name>`                                          |
 
 ## Story shape
 

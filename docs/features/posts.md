@@ -79,8 +79,8 @@ A post is an article written in the Studio: a heading and lead, an optional hero
 ## Tests and stories
 
 - Service: `packages/service/src/features/pages/post/**/*.test.ts`, `features/entities/posts/**/*.test.ts`, `post-count.test.ts`, `word-count.test.ts`, `published-posts-in-locale.test.ts`, `post-link.test.ts`, `to-post-card.test.ts`.
-- Web: `blog-post-page.test.tsx`, `blog-post-module-renderer.test.tsx`, `post-article.test.tsx`, `post-breadcrumbs.test.tsx`, `post-table-of-contents.test.tsx`, `blog-posting-schema.test.tsx`, `bookmark-button-gate.test.tsx`, `get-post-page.test.ts`, `build-post-metadata.test.ts`, `build-post-publish-paths.test.ts`, `derive-revalidate-paths.test.ts`.
-- Stories: `post-article.stories.tsx`, `post-table-of-contents.stories.tsx`.
+- Web: `blog-post-page.test.tsx`, `blog-post-module-renderer.test.tsx`, `post-article.test.tsx`, `post-breadcrumbs.test.tsx`, `blog-posting-schema.test.tsx`, `bookmark-button-gate.test.tsx`, `get-post-page.test.ts`, `build-post-metadata.test.ts`, `build-post-publish-paths.test.ts`, `derive-revalidate-paths.test.ts`.
+- Stories: `post-article.stories.tsx`.
 
 ## Related
 

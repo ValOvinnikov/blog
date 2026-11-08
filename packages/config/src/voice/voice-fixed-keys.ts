@@ -175,7 +175,7 @@ export const VOICE_FIXED_KEYS = [
   'blogPostPage.depthToggle.deep',
   'blogPostPage.skimPanel.label',
   'blogPostPage.skimPanel.readFullArticle',
-  'postContentsRail.label',
+  'contentsRail.label',
   'sectionNavigation.label',
   'sectionNavigation.backTo',
   'postShare.copyLink',

@@ -2,25 +2,25 @@ import { SITE_MESSAGES } from '@blog/config';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
+  MOCK_CONFIGURATION_HEADING,
+  MOCK_GETTING_STARTED_HEADING,
+  MOCK_CONTENTS_HEADINGS,
+} from '@web/testing/shared/contents-rail/fixtures';
+import {
   FakeIntersectionObserver,
   stubFakeIntersectionObserver,
 } from '@web/testing/shared/intersection-observer/fake-intersection-observer';
-import {
-  MOCK_CONFIGURATION_HEADING,
-  MOCK_GETTING_STARTED_HEADING,
-  MOCK_POST_HEADINGS,
-} from '@web/testing/shared/post-table-of-contents/fixtures';
 
-import { PostTableOfContents } from './post-table-of-contents';
+import { ContentsRail } from './contents-rail';
 
 vi.mock('@web/i18n/navigation');
 
-const NAV_NAME = SITE_MESSAGES.postContentsRail.label;
+const NAV_NAME = SITE_MESSAGES.contentsRail.label;
 
-const PostWithTableOfContents = () => (
+const ArticleWithContentsRail = () => (
   <>
-    <PostTableOfContents headings={MOCK_POST_HEADINGS} />
-    {MOCK_POST_HEADINGS.map(({ key, text }) => (
+    <ContentsRail headings={MOCK_CONTENTS_HEADINGS} />
+    {MOCK_CONTENTS_HEADINGS.map(({ key, text }) => (
       <h2 key={key} id={key}>
         {text}
       </h2>
@@ -28,9 +28,9 @@ const PostWithTableOfContents = () => (
   </>
 );
 
-const setup = customRender(PostWithTableOfContents, {});
+const setup = customRender(ArticleWithContentsRail, {});
 
-describe(`<${PostTableOfContents.name}/>`, () => {
+describe(`<${ContentsRail.name}/>`, () => {
   beforeEach(() => {
     stubFakeIntersectionObserver();
   });
@@ -51,7 +51,7 @@ describe(`<${PostTableOfContents.name}/>`, () => {
     });
 
     it('renders every heading as a link to its anchor', () => {
-      MOCK_POST_HEADINGS.forEach((heading) => {
+      MOCK_CONTENTS_HEADINGS.forEach((heading) => {
         const link = screen.getByRole('link', { name: heading.text });
 
         expect(link).toHaveAttribute('href', `#${heading.key}`);
@@ -72,7 +72,7 @@ describe(`<${PostTableOfContents.name}/>`, () => {
       });
 
       expect(firstLink).toHaveAttribute(ARIA_CURRENT, 'location');
-      MOCK_POST_HEADINGS.slice(1).forEach((heading) => {
+      MOCK_CONTENTS_HEADINGS.slice(1).forEach((heading) => {
         const link = screen.getByRole('link', { name: heading.text });
 
         expect(link).not.toHaveAttribute(ARIA_CURRENT);

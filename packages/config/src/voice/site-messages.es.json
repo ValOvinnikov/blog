@@ -78,7 +78,7 @@
   "postCard": {
     "readingTime": "{count, plural, one {1 min} other {{count} min}}"
   },
-  "postContentsRail": {
+  "contentsRail": {
     "label": "Contenido"
   },
   "sectionNavigation": {
