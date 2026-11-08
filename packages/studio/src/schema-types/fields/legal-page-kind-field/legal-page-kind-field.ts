@@ -14,7 +14,6 @@ export const legalPageKindField = (kinds: readonly TLegalPageKind[]) =>
     description:
       'What this page is. Only one page of each kind can be published per language; Other pages are unlimited.',
     options: {
-      layout: 'radio',
       list: kinds.map((value) => ({ title: toTitleCase(value), value })),
     },
     validation: (rule) => rule.required().custom(validateUniqueLegalPageKind),
