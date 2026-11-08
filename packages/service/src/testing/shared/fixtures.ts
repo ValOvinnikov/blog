@@ -25,6 +25,10 @@ import { faker } from '@faker-js/faker';
 import type { InferFragmentType } from 'groqd';
 
 type TRawPostLink = InferFragmentType<typeof postLinkFragment>;
+type TRawLinkRefMarkDef = Extract<
+  TRawPortableTextMarkDef,
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.LINK_REF }
+>;
 type TRawBodyImageBlock = Extract<
   TRawPortableTextBody[number],
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE }
@@ -85,8 +89,8 @@ export function mockRawInternalLinkDocument(
 }
 
 export function mockRawPortableTextMarkDef(
-  overrides: Partial<TRawPortableTextMarkDef> = {},
-): TRawPortableTextMarkDef {
+  overrides: Partial<TRawLinkRefMarkDef> = {},
+): TRawLinkRefMarkDef {
   return {
     _key: 'mark-1',
     _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,

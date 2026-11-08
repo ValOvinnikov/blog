@@ -12,6 +12,7 @@ faker.seed(6017);
 const MOCK_BLOCK_KEY = faker.string.uuid();
 const MOCK_SPAN_KEY = faker.string.uuid();
 const MOCK_MARK_KEY = faker.string.uuid();
+const MOCK_COOKIE_MARK_KEY = faker.string.uuid();
 const MOCK_SPAN_TEXT = faker.lorem.sentence();
 
 describe(toPortableText, () => {
@@ -57,6 +58,32 @@ describe(toPortableText, () => {
         },
       ],
     });
+  });
+
+  it('keeps a cookie-preferences mark as its key and type beside a link mark', () => {
+    const result = toPortableText({
+      _type: 'block',
+      _key: MOCK_BLOCK_KEY,
+      markDefs: [
+        mockRawPortableTextMarkDef({ _key: MOCK_MARK_KEY }),
+        {
+          _key: MOCK_COOKIE_MARK_KEY,
+          _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK,
+        },
+      ],
+    });
+
+    expect(result.markDefs).toEqual([
+      {
+        _key: MOCK_MARK_KEY,
+        _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+        link: { href: MOCK_EXTERNAL_URL, target: undefined },
+      },
+      {
+        _key: MOCK_COOKIE_MARK_KEY,
+        _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK,
+      },
+    ]);
   });
 
   it('spreads every other block field unchanged', () => {
