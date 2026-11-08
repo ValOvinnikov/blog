@@ -6,8 +6,10 @@ import { topicSchema } from './blog/topic/topic';
 import { linkSchema } from './link/link';
 import { homePageSchema } from './pages/home/home';
 import { landingPageSchema } from './pages/landing/landing';
+import { legalDocumentPageSchema } from './pages/legal-document/legal-document';
 import { postPageSchema } from './pages/post/post';
 import { postIndexPageSchema } from './pages/post-index/post-index';
+import { privacyDocumentPageSchema } from './pages/privacy-document/privacy-document';
 import { tagPageSchema } from './pages/tag/tag';
 import { tagIndexPageSchema } from './pages/tag-index/tag-index';
 import { topicPageSchema } from './pages/topic/topic';
@@ -49,6 +51,8 @@ export const documents = [
   postPageSchema,
   tagIndexPageSchema,
   tagPageSchema,
+  privacyDocumentPageSchema,
+  legalDocumentPageSchema,
   redirectSchema,
   siteSettingsSchema,
   navigationSettingsSchema,

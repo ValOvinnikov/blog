@@ -3716,6 +3716,66 @@
     }
   },
   {
+    "type": "type",
+    "name": "page_privacyDocument.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_privacyDocument"
+    }
+  },
+  {
+    "type": "type",
+    "name": "page_legalDocument.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_legalDocument"
+    }
+  },
+  {
     "name": "inlineLink",
     "type": "type",
     "value": {
@@ -3779,6 +3839,14 @@
               {
                 "type": "inline",
                 "name": "page_postIndex.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_privacyDocument.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_legalDocument.reference"
               }
             ]
           },
@@ -7803,6 +7871,14 @@
               {
                 "type": "inline",
                 "name": "page_tag.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_privacyDocument.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_legalDocument.reference"
               }
             ]
           },
@@ -9693,6 +9769,14 @@
             {
               "type": "inline",
               "name": "page_tagIndex.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_privacyDocument.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_legalDocument.reference"
             }
           ]
         },
@@ -9710,6 +9794,268 @@
         "type": "objectAttribute",
         "value": {
           "type": "boolean"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "page_legalDocument",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "page_legalDocument"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "EN"
+            },
+            {
+              "type": "string",
+              "value": "NL"
+            },
+            {
+              "type": "string",
+              "value": "FR"
+            },
+            {
+              "type": "string",
+              "value": "DE"
+            },
+            {
+              "type": "string",
+              "value": "ES"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "slug": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "slug"
+        },
+        "optional": true
+      },
+      "kind": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "TERMS"
+            },
+            {
+              "type": "string",
+              "value": "IMPRINT"
+            },
+            {
+              "type": "string",
+              "value": "OTHER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "content": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "articleText"
+        },
+        "optional": true
+      },
+      "seo": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "seo"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "slug",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "slug"
+          }
+        },
+        "current": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        },
+        "source": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "page_privacyDocument",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "page_privacyDocument"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "EN"
+            },
+            {
+              "type": "string",
+              "value": "NL"
+            },
+            {
+              "type": "string",
+              "value": "FR"
+            },
+            {
+              "type": "string",
+              "value": "DE"
+            },
+            {
+              "type": "string",
+              "value": "ES"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "slug": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "slug"
+        },
+        "optional": true
+      },
+      "kind": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIVACY_POLICY"
+            },
+            {
+              "type": "string",
+              "value": "OTHER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "content": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "articleText"
+        },
+        "optional": true
+      },
+      "seo": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "seo"
         },
         "optional": true
       }
@@ -10415,36 +10761,6 @@
           "name": "internationalizedArrayText"
         },
         "optional": true
-      }
-    }
-  },
-  {
-    "name": "slug",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "slug"
-          }
-        },
-        "current": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        },
-        "source": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string"
-          },
-          "optional": true
-        }
       }
     }
   },

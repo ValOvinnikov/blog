@@ -42,6 +42,8 @@ export const routes = {
   newsletterResult: (result: TNewsletterResult) =>
     `/newsletter/${NEWSLETTER_RESULT_SLUGS[result]}`,
   landingPage: (slug: string) => `/${slug}`,
+  privacyDocument: (slug: string) => `/privacy/${slug}`,
+  legalDocument: (slug: string) => `/legal/${slug}`,
   terms: () => '/terms',
   privacy: () => '/privacy',
   switchLanguage: (to: string, from: string) =>
@@ -59,6 +61,9 @@ const PAGE_HREF_BUILDERS = {
   page_topicIndex: () => routes.topics(),
   page_tag: (slug) => (slug ? routes.tag(slug) : undefined),
   page_tagIndex: () => routes.tags(),
+  page_privacyDocument: (slug) =>
+    slug ? routes.privacyDocument(slug) : undefined,
+  page_legalDocument: (slug) => (slug ? routes.legalDocument(slug) : undefined),
 } satisfies Record<
   string,
   (slug: string | null | undefined) => string | undefined

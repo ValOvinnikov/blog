@@ -19,6 +19,9 @@ const INTERNAL_HREF_BUILDERS: Record<
   blog_topic: (slug) => (slug ? routes.topic(slug) : undefined),
   page_landing: (slug) => (slug ? routes.landingPage(slug) : undefined),
   page_postIndex: () => routes.blogIndex(),
+  page_privacyDocument: (slug) =>
+    slug ? routes.privacyDocument(slug) : undefined,
+  page_legalDocument: (slug) => (slug ? routes.legalDocument(slug) : undefined),
 };
 
 function toInternalHref(raw: TInternalReference): TMaybeUndefined<string> {

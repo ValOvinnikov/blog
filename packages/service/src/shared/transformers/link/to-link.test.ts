@@ -62,6 +62,16 @@ describe(toLink, () => {
     },
     { _type: 'page_landing', slug: MOCK_ABOUT_SLUG, href: MOCK_ABOUT_HREF },
     { _type: 'page_postIndex', slug: null, href: routes.blogIndex() },
+    {
+      _type: 'page_privacyDocument',
+      slug: MOCK_POST_SLUG,
+      href: routes.privacyDocument(MOCK_POST_SLUG),
+    },
+    {
+      _type: 'page_legalDocument',
+      slug: MOCK_POST_SLUG,
+      href: routes.legalDocument(MOCK_POST_SLUG),
+    },
   ] as const)(
     'resolves an internal $_type reference to its route',
     ({ _type, slug, href }) => {

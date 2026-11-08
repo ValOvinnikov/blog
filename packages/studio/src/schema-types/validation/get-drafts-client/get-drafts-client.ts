@@ -36,3 +36,16 @@ export const fetchDraftsFailSafe = async <T>(
     return fallback;
   }
 };
+
+export const fetchPublishedFailSafe = async <T>(
+  context: ValidationContext,
+  query: string,
+  params: Record<string, unknown>,
+  fallback: T,
+): Promise<T> => {
+  try {
+    return await getPublishedClient(context).fetch<T>(query, params);
+  } catch {
+    return fallback;
+  }
+};

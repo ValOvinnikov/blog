@@ -145,6 +145,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **CONTENT_ALIGNMENT**: `LEFT`, `CENTER`, `RIGHT`
 - **MEDIA_ORDER**: `LAST`, `FIRST`
 
+### `@blog/config/constants` — `packages/config/src/constants/legal-page-kind.ts`
+
+- **LEGAL_PAGE_KIND**: `PRIVACY_POLICY`, `TERMS`, `IMPRINT`, `COOKIE_STATEMENT`, `OTHER`
+
 ### `@blog/config/constants` — `packages/config/src/constants/link.ts`
 
 - **LINK_TYPE**: `INTERNAL`, `EXTERNAL`
