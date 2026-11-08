@@ -4344,19 +4344,39 @@
                 "value": {
                   "type": "array",
                   "of": {
-                    "type": "object",
-                    "attributes": {
-                      "_key": {
-                        "type": "objectAttribute",
-                        "value": {
-                          "type": "string"
+                    "type": "union",
+                    "of": [
+                      {
+                        "type": "object",
+                        "attributes": {
+                          "_key": {
+                            "type": "objectAttribute",
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "rest": {
+                          "type": "inline",
+                          "name": "linkRef"
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "attributes": {
+                          "_key": {
+                            "type": "objectAttribute",
+                            "value": {
+                              "type": "string"
+                            }
+                          }
+                        },
+                        "rest": {
+                          "type": "inline",
+                          "name": "cookiePreferencesLink"
                         }
                       }
-                    },
-                    "rest": {
-                      "type": "inline",
-                      "name": "linkRef"
-                    }
+                    ]
                   }
                 },
                 "optional": true
@@ -5163,7 +5183,7 @@
             "value": "cookieSettingsItem"
           }
         },
-        "placement": {
+        "marker": {
           "type": "objectAttribute",
           "value": {
             "type": "string"
@@ -5545,6 +5565,29 @@
                 "name": "linkRef"
               }
             }
+          },
+          "optional": true
+        }
+      }
+    }
+  },
+  {
+    "name": "cookiePreferencesLink",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "cookiePreferencesLink"
+          }
+        },
+        "marker": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
           },
           "optional": true
         }

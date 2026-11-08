@@ -2880,6 +2880,14 @@
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
+    "cookiePreferencesLink": [
+      {
+        "ref": "PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/portable-text-block-type.ts"
+      }
+    ],
     "CONSOLE": [
       {
         "ref": "PRESET_ID.CONSOLE",
