@@ -7,7 +7,7 @@ import type { MetadataRoute } from 'next';
 
 type TTranslatedPage = { slug: string; language: TLocaleIsoCode };
 
-export type TTranslatedSitemapContext = {
+type TTranslatedSitemapContext = {
   translationMap: TTranslationMap;
   liveLocales: readonly TLocaleIsoCode[];
   defaultLocale: TLocaleIsoCode;

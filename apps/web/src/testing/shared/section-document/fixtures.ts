@@ -3,7 +3,7 @@ import type { TSectionDocumentDetail } from '@blog/service';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
 
-export const MOCK_SECTION_DOCUMENT_SLUG = 'privacy-policy';
+const MOCK_SECTION_DOCUMENT_SLUG = 'privacy-policy';
 
 export const mockSectionDocumentDetail = (
   overrides: Partial<TSectionDocumentDetail> = {},

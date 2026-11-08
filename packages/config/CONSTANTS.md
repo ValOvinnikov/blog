@@ -708,6 +708,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
 
+### `@web/constants/section-document` — `apps/web/src/constants/section-document.ts`
+
+- **SECTION_DOCUMENT_LOG**: `PAGE_FETCH_FAILED`=`"section_document_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_document_metadata.fetch_failed"`
+
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 
 - **SESSION_STATUS**: `AUTHENTICATED`=`"authenticated"`, `UNAUTHENTICATED`=`"unauthenticated"`, `LOADING`=`"loading"`
@@ -720,6 +724,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/site-config` — `apps/web/src/constants/site-config.ts`
 
 - **SITE_CONFIG_LOG**: `FETCH_FAILED`=`"site_config.fetch_failed"`, `BRAND_NAME_FETCH_FAILED`=`"brand_name.site_config_fetch_failed"`, `PLAN_FETCH_FAILED`=`"site_config.plan_fetch_failed"`, `VOICE_RICH_FETCH_FAILED`=`"voice_rich.fetch_failed"`
+
+### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
+
+- **SITEMAP_LOG**: `SITE_URL_MISSING`=`"sitemap.site_url_missing"`, `POST_PARAMS_FETCH_FAILED`=`"sitemap.post_params_fetch_failed"`, `TOPIC_PARAMS_FETCH_FAILED`=`"sitemap.topic_params_fetch_failed"`, `TAG_PARAMS_FETCH_FAILED`=`"sitemap.tag_params_fetch_failed"`, `TOPIC_PAGINATION_PARAMS_FETCH_FAILED`=`"sitemap.topic_pagination_params_fetch_failed"`, `TAG_PAGINATION_PARAMS_FETCH_FAILED`=`"sitemap.tag_pagination_params_fetch_failed"`, `BLOG_PAGE_PARAMS_FETCH_FAILED`=`"sitemap.blog_page_params_fetch_failed"`, `LANDING_PAGE_SLUGS_FETCH_FAILED`=`"sitemap.landing_page_slugs_fetch_failed"`, `PRIVACY_DOCUMENT_PARAMS_FETCH_FAILED`=`"sitemap.privacy_document_params_fetch_failed"`, `LEGAL_DOCUMENT_PARAMS_FETCH_FAILED`=`"sitemap.legal_document_params_fetch_failed"`, `TRANSLATION_MAP_FETCH_FAILED`=`"sitemap.translation_map_fetch_failed"`
 
 ### `@web/constants/tenant-email-identity` — `apps/web/src/constants/tenant-email-identity.ts`
 

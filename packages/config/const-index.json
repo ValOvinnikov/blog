@@ -7918,6 +7918,22 @@
         "file": "apps/web/src/constants/rss.ts"
       }
     ],
+    "section_document_page.fetch_failed": [
+      {
+        "ref": "SECTION_DOCUMENT_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-document",
+        "file": "apps/web/src/constants/section-document.ts"
+      }
+    ],
+    "section_document_metadata.fetch_failed": [
+      {
+        "ref": "SECTION_DOCUMENT_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-document",
+        "file": "apps/web/src/constants/section-document.ts"
+      }
+    ],
     "authenticated": [
       {
         "ref": "SESSION_STATUS.AUTHENTICATED",
@@ -7988,6 +8004,94 @@
         "scope": "app:web",
         "from": "@web/constants/site-config",
         "file": "apps/web/src/constants/site-config.ts"
+      }
+    ],
+    "sitemap.site_url_missing": [
+      {
+        "ref": "SITEMAP_LOG.SITE_URL_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.post_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.POST_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.topic_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.TOPIC_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.tag_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.TAG_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.topic_pagination_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.TOPIC_PAGINATION_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.tag_pagination_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.TAG_PAGINATION_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.blog_page_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.BLOG_PAGE_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.landing_page_slugs_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.LANDING_PAGE_SLUGS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.privacy_document_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.PRIVACY_DOCUMENT_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.legal_document_params_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.LEGAL_DOCUMENT_PARAMS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "sitemap.translation_map_fetch_failed": [
+      {
+        "ref": "SITEMAP_LOG.TRANSLATION_MAP_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/sitemap",
+        "file": "apps/web/src/constants/sitemap.ts"
       }
     ],
     "tenant_email_identity.tenant_row_not_found": [
