@@ -27,5 +27,9 @@ export const portableTextBodyItemFragment = q
           .project(textBlockFragment)
           .nullable(true),
       }),
+      cookieList: {
+        _key: true,
+        _type: true,
+      },
     }),
   }));
