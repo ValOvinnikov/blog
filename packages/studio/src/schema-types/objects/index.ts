@@ -10,6 +10,7 @@ import {
   ctaSecondaryButtonSchema,
 } from './cta-button/cta-button';
 import { ctaLayoutSchema } from './cta-layout/cta-layout';
+import { expandableSectionSchema } from './expandable-section/expandable-section';
 import { featureHighlightSchema } from './feature-highlight/feature-highlight';
 import { footerLinkGroupSchema } from './footer-link-group/footer-link-group';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
@@ -49,6 +50,7 @@ export const objects = [
   linkRefSchema,
   cookiePreferencesLinkSchema,
   cookieListSchema,
+  expandableSectionSchema,
   linkRefWithSubItemsSchema,
   logoItemSchema,
   socialProfileSchema,
