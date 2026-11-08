@@ -4,6 +4,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { service, type TTranslationMap } from '@blog/service';
+import { hasLength, isUndefined } from '@blog/utils/primitives';
 import { findListPage } from '@web/utils/find-list-page';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 
@@ -22,6 +23,18 @@ type TTranslatablePage = {
 };
 
 const POST_SEGMENT = 'blog';
+
+const DOCUMENT_PAGES = new Map<string, Omit<TTranslatablePage, 'slug'>>([
+  [POST_SEGMENT, { documentType: 'page_post', toHref: routes.post }],
+  [
+    'privacy',
+    { documentType: 'page_privacyDocument', toHref: routes.privacyDocument },
+  ],
+  [
+    'legal',
+    { documentType: 'page_legalDocument', toHref: routes.legalDocument },
+  ],
+]);
 
 const ARCHIVE_PAGES = new Map<string, Omit<TTranslatablePage, 'slug'>>([
   ['topics', { documentType: 'page_topic', toHref: routes.topic }],
@@ -42,16 +55,15 @@ const toTranslatablePage = (
 ): TMaybeUndefined<TTranslatablePage> => {
   const segments = pathname.split('/').filter(Boolean);
   const [first = '', second, ...rest] = segments;
+  const documentPage = DOCUMENT_PAGES.get(first);
   const archivePage = ARCHIVE_PAGES.get(first);
   const isArchivePath =
-    second !== undefined &&
-    (rest.length === 0 || (rest.length === 2 && rest[0] === 'page'));
+    !isUndefined(second) &&
+    (!hasLength(rest) || (rest.length === 2 && rest[0] === 'page'));
 
-  if (first === POST_SEGMENT && second !== undefined && rest.length === 0) {
+  if (documentPage && !isUndefined(second) && !hasLength(rest)) {
     const slug = decodeSegment(second);
-    return slug
-      ? { documentType: 'page_post', slug, toHref: routes.post }
-      : undefined;
+    return slug ? { ...documentPage, slug } : undefined;
   }
 
   if (archivePage && isArchivePath) {
@@ -60,7 +72,7 @@ const toTranslatablePage = (
   }
 
   const decoded = segments.map(decodeSegment);
-  if (decoded.length === 0 || !decoded.every(Boolean)) {
+  if (!hasLength(decoded) || !decoded.every(Boolean)) {
     return undefined;
   }
 
@@ -80,7 +92,7 @@ const toListPage = (pathname: string, translationMap: TTranslationMap) => {
   const isNumberedPostIndexPage =
     first === POST_SEGMENT && rest.length === 2 && rest[0] === 'page';
 
-  return rest.length === 0 || isNumberedPostIndexPage
+  return !hasLength(rest) || isNumberedPostIndexPage
     ? findListPage(first, translationMap)
     : undefined;
 };

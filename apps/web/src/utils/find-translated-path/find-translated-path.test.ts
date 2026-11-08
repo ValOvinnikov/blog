@@ -17,6 +17,8 @@ const LANDING_TYPE = 'page_landing';
 const TOPIC_TYPE = 'page_topic';
 const TAG_TYPE = 'page_tag';
 const POST_TYPE = 'page_post';
+const PRIVACY_TYPE = 'page_privacyDocument';
+const LEGAL_TYPE = 'page_legalDocument';
 
 const MOCK_EN_LANDING = faker.lorem.slug();
 const MOCK_NL_LANDING = faker.lorem.slug();
@@ -28,6 +30,10 @@ const MOCK_EN_TAG = faker.lorem.slug();
 const MOCK_NL_TAG = faker.lorem.slug();
 const MOCK_EN_POST = faker.lorem.slug();
 const MOCK_NL_POST = faker.lorem.slug();
+const MOCK_EN_PRIVACY = faker.lorem.slug();
+const MOCK_NL_PRIVACY = faker.lorem.slug();
+const MOCK_EN_LEGAL = faker.lorem.slug();
+const MOCK_NL_LEGAL = faker.lorem.slug();
 const MOCK_UNKNOWN_SLUG = faker.lorem.slug();
 const MOCK_NESTED_SEGMENT = faker.lorem.word();
 const MOCK_EN_NESTED = `${MOCK_NESTED_SEGMENT}/${MOCK_EN_NESTED_LEAF}`;
@@ -61,6 +67,14 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
     [
       { documentType: POST_TYPE, language: EN, slug: MOCK_EN_POST },
       { documentType: POST_TYPE, language: NL, slug: MOCK_NL_POST },
+    ],
+    [
+      { documentType: PRIVACY_TYPE, language: EN, slug: MOCK_EN_PRIVACY },
+      { documentType: PRIVACY_TYPE, language: NL, slug: MOCK_NL_PRIVACY },
+    ],
+    [
+      { documentType: LEGAL_TYPE, language: EN, slug: MOCK_EN_LEGAL },
+      { documentType: LEGAL_TYPE, language: NL, slug: MOCK_NL_LEGAL },
     ],
   ],
 };
@@ -109,6 +123,16 @@ describe(findTranslatedPath, () => {
       expected: nlPath(routes.post(MOCK_NL_POST)),
     },
     {
+      case: "a privacy document's translation under its own slug",
+      pathname: routes.privacyDocument(MOCK_EN_PRIVACY),
+      expected: nlPath(routes.privacyDocument(MOCK_NL_PRIVACY)),
+    },
+    {
+      case: "a legal document's translation under its own slug",
+      pathname: routes.legalDocument(MOCK_EN_LEGAL),
+      expected: nlPath(routes.legalDocument(MOCK_NL_LEGAL)),
+    },
+    {
       case: 'the first page of the translation from a numbered archive page',
       pathname: routes.topic(MOCK_EN_TOPIC, 3),
       expected: nlPath(routes.topic(MOCK_NL_TOPIC)),
@@ -154,6 +178,11 @@ describe(findTranslatedPath, () => {
       expected: routes.post(MOCK_EN_POST),
     },
     {
+      case: "a legal document's default-language translation",
+      pathname: routes.legalDocument(MOCK_NL_LEGAL),
+      expected: routes.legalDocument(MOCK_EN_LEGAL),
+    },
+    {
       case: 'the default-language list page without a prefix',
       pathname: routes.topics(),
       expected: routes.topics(),
@@ -182,6 +211,10 @@ describe(findTranslatedPath, () => {
   it.each([
     { case: 'a page', pathname: routes.landingPage(MOCK_EN_LANDING) },
     { case: 'a post', pathname: routes.post(MOCK_EN_POST) },
+    {
+      case: 'a privacy document',
+      pathname: routes.privacyDocument(MOCK_EN_PRIVACY),
+    },
     { case: 'a Topic page', pathname: routes.topic(MOCK_EN_TOPIC) },
     { case: 'the blog list page', pathname: routes.blogIndex() },
     { case: 'a numbered blog list page', pathname: routes.blogIndex(2) },
@@ -203,6 +236,10 @@ describe(findTranslatedPath, () => {
       pathname: routes.landingPage(MOCK_EN_TOPIC),
     },
     { case: 'a Topic slug as a Tag page', pathname: routes.tag(MOCK_EN_TOPIC) },
+    {
+      case: 'a privacy slug as a legal document',
+      pathname: routes.legalDocument(MOCK_EN_PRIVACY),
+    },
     {
       case: 'a landing slug as a post',
       pathname: routes.post(MOCK_EN_LANDING),

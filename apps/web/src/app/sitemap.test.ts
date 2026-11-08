@@ -47,6 +47,11 @@ const MOCK_NL_TAG_SLUG = mockSlug();
 const MOCK_LANDING_SLUG = mockSlug();
 const MOCK_NL_LANDING_SLUG = mockSlug();
 const MOCK_UNTRANSLATED_LANDING_SLUG = mockSlug();
+const MOCK_PRIVACY_SLUG = mockSlug();
+const MOCK_NL_PRIVACY_SLUG = mockSlug();
+const MOCK_LEGAL_SLUG = mockSlug();
+const PRIVACY_TYPE = 'page_privacyDocument';
+const LEGAL_TYPE = 'page_legalDocument';
 
 const HOME_URL = `${MOCK_TENANT_BASE_URL}${routes.home()}`;
 const NL_HOME_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}`;
@@ -103,6 +108,8 @@ const POPULATED_URLS = [
   toUrl(routes.tag(MOCK_TAG_SLUG, 2)),
   toUrl(routes.tag(MOCK_TAG_SLUG, 3)),
   toUrl(routes.landingPage(MOCK_LANDING_SLUG)),
+  toUrl(routes.privacyDocument(MOCK_PRIVACY_SLUG)),
+  toUrl(routes.legalDocument(MOCK_LEGAL_SLUG)),
 ];
 
 vi.mock('@web/server/tenant/request-tenant/request-tenant');
@@ -138,6 +145,7 @@ vi.mock('@blog/service', async (importOriginal) => ({
       tag: { v1: { getTagParams: vi.fn(), getTagPaginationParams: vi.fn() } },
       blog: { v1: { getIndexPageParams: vi.fn() } },
       landing: { v1: { getPageSlugs: vi.fn() } },
+      sectionDocument: { v1: { getSectionDocumentParams: vi.fn() } },
     },
   },
 }));
@@ -154,6 +162,9 @@ const getTagPaginationParams = vi.mocked(
 );
 const getIndexPageParams = vi.mocked(service.pages.blog.v1.getIndexPageParams);
 const getPageSlugs = vi.mocked(service.pages.landing.v1.getPageSlugs);
+const getSectionDocumentParams = vi.mocked(
+  service.pages.sectionDocument.v1.getSectionDocumentParams,
+);
 const getTranslationMap = vi.mocked(
   service.global.translationMap.v1.getTranslationMap,
 );
@@ -189,6 +200,14 @@ const mockPopulatedLoaders = () => {
   getPageSlugs.mockResolvedValue(
     okResult([{ slug: MOCK_LANDING_SLUG, language: EN }]),
   );
+  getSectionDocumentParams.mockImplementation(async (type) =>
+    okResult([
+      {
+        slug: type === PRIVACY_TYPE ? MOCK_PRIVACY_SLUG : MOCK_LEGAL_SLUG,
+        language: EN,
+      },
+    ]),
+  );
 };
 
 const getUrls = async () => (await sitemap()).map(({ url }) => url);
@@ -207,10 +226,11 @@ describe(sitemap, () => {
     getTagPaginationParams.mockResolvedValue(okResult([]));
     getIndexPageParams.mockResolvedValue(okResult([]));
     getPageSlugs.mockResolvedValue(okResult([]));
+    getSectionDocumentParams.mockResolvedValue(okResult([]));
     getTranslationMap.mockResolvedValue(okResult(mockTranslationMap()));
   });
 
-  it('lists the static, post, topic, tag, pagination and landing entries', async () => {
+  it('lists the static, post, topic, tag, pagination, landing and document entries', async () => {
     mockPopulatedLoaders();
 
     const urls = await getUrls();
@@ -258,6 +278,19 @@ describe(sitemap, () => {
         await sitemap();
 
         expect(loader).toHaveBeenCalledWith(
+          MOCK_TENANT_SANITY_CONTEXT,
+          MOCK_LIVE_LOCALES,
+        );
+      },
+    );
+
+    it.each([PRIVACY_TYPE, LEGAL_TYPE])(
+      'requests %s params with the tenant context and live languages',
+      async (type) => {
+        await sitemap();
+
+        expect(getSectionDocumentParams).toHaveBeenCalledWith(
+          type,
           MOCK_TENANT_SANITY_CONTEXT,
           MOCK_LIVE_LOCALES,
         );
@@ -602,6 +635,54 @@ describe(sitemap, () => {
       });
     });
 
+    it('lists each privacy document under its own language prefix with live translations', async () => {
+      const privacyUrl = toUrl(routes.privacyDocument(MOCK_PRIVACY_SLUG));
+      const nlPrivacyUrl = toUrl(
+        routes.privacyDocument(MOCK_NL_PRIVACY_SLUG),
+        NL_PREFIX,
+      );
+      const privacyAlternates = toAlternates(
+        [
+          [EN, privacyUrl],
+          [NL, nlPrivacyUrl],
+        ],
+        privacyUrl,
+      );
+      getSectionDocumentParams.mockImplementation(async (type) =>
+        okResult(
+          type === PRIVACY_TYPE
+            ? [
+                { slug: MOCK_PRIVACY_SLUG, language: EN },
+                { slug: MOCK_NL_PRIVACY_SLUG, language: NL },
+              ]
+            : [],
+        ),
+      );
+      getTranslationMap.mockResolvedValue(
+        okResult(
+          mockTranslationMap({
+            groups: [
+              mockTranslationGroup(PRIVACY_TYPE, [
+                [EN, MOCK_PRIVACY_SLUG],
+                [NL, MOCK_NL_PRIVACY_SLUG],
+              ]),
+            ],
+          }),
+        ),
+      );
+
+      const entries = await sitemap();
+
+      expect(entries).toContainEqual({
+        url: privacyUrl,
+        alternates: { languages: privacyAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: nlPrivacyUrl,
+        alternates: { languages: privacyAlternates },
+      });
+    });
+
     it('lists numbered Topic pages under their own language prefix', async () => {
       getTopicPaginationParams.mockResolvedValue(
         okResult([{ slug: MOCK_NL_TOPIC_SLUG, language: NL, page: '2' }]),
@@ -668,6 +749,14 @@ describe(sitemap, () => {
         name: 'tags',
         loader: getTagParams,
         omittedUrls: [toUrl(routes.tag(MOCK_TAG_SLUG))],
+      },
+      {
+        name: 'documents',
+        loader: getSectionDocumentParams,
+        omittedUrls: [
+          toUrl(routes.privacyDocument(MOCK_PRIVACY_SLUG)),
+          toUrl(routes.legalDocument(MOCK_LEGAL_SLUG)),
+        ],
       },
     ])('omits only $name', async ({ loader, omittedUrls }) => {
       loader.mockResolvedValue(errorResult(MOCK_FETCH_ERROR));
