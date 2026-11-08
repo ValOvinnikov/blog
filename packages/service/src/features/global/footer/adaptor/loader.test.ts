@@ -7,12 +7,12 @@ import {
   PORTABLE_TEXT_BLOCK_TYPE,
   SOCIAL_PLATFORMS,
 } from '@blog/config/constants';
-import {
-  MOCK_LINKED_PAGE_CACHE_TAGS,
-  mockRawFooter,
-} from '@blog/service/testing/global/fixtures';
+import { mockRawFooter } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_LINK_TARGET_CACHE_TAGS,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
@@ -246,7 +246,7 @@ describe(getFooter, () => {
       tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [mockCacheTag('footer'), ...MOCK_LINKED_PAGE_CACHE_TAGS],
+        tags: [mockCacheTag('footer'), ...MOCK_LINK_TARGET_CACHE_TAGS],
       },
     });
   });

@@ -1,7 +1,7 @@
 // Fixture-based tests for check-revalidate-tags-sync's extraction and
-// classification helpers. Every fixture is a single inline source string —
-// the checker resolves nothing across files, so no cross-file/import
-// fixtures are needed here.
+// classification helpers. Every fixture is a single inline source string; a
+// shared tag list is handed to the collector as a Map, the way main() builds
+// it from packages/service/src/shared/cache-tags/.
 //
 // Run with `node --test scripts/check-revalidate-tags-sync.test.mjs`.
 import { readFileSync } from 'node:fs';
@@ -11,7 +11,9 @@ import { describe, it } from 'node:test';
 
 import {
   collectServiceTags,
+  collectSharedTagLists,
   collectTagsFromSource,
+  extractSharedTagLists,
   extractRevalidateTagValues,
   findMissingTags,
   listServiceSourceFiles,
@@ -122,6 +124,27 @@ describe('collectTagsFromSource', () => {
     assert.equal(unresolved[0].text, '...someTags');
   });
 
+  it('reads a spread of a shared tag list inside an array argument', () => {
+    const { tags, unresolved } = collectTagsFromSource(
+      '/virtual/loader.ts',
+      `isr(['footer', ...LINK_TARGET_CACHE_TAGS], tenant.projectId);`,
+      new Map([['LINK_TARGET_CACHE_TAGS', ['link', 'page_post']]]),
+    );
+    assert.deepEqual([...tags].sort(), ['footer', 'link', 'page_post']);
+    assert.deepEqual(unresolved, []);
+  });
+
+  it('fails on a spread of a list that is not a shared tag list', () => {
+    const { tags, unresolved } = collectTagsFromSource(
+      '/virtual/loader.ts',
+      `isr(['footer', ...otherTags], tenant.projectId);`,
+      new Map([['LINK_TARGET_CACHE_TAGS', ['link']]]),
+    );
+    assert.deepEqual([...tags], ['footer']);
+    assert.equal(unresolved.length, 1);
+    assert.equal(unresolved[0].text, '...otherTags');
+  });
+
   it('fails on a computed/function-call argument', () => {
     const { tags, unresolved } = collectTagsFromSource(
       '/virtual/loader.ts',
@@ -173,6 +196,27 @@ describe('collectTagsFromSource', () => {
   });
 });
 
+describe('extractSharedTagLists', () => {
+  it('reads an as-const array of string literals by its name', () => {
+    const sf = parseSource(
+      '/virtual/link-target-cache-tags.ts',
+      `export const LINK_TARGET_CACHE_TAGS = ['link', 'homePage'] as const;`,
+    );
+    assert.deepEqual(
+      extractSharedTagLists(sf),
+      new Map([['LINK_TARGET_CACHE_TAGS', ['link', 'homePage']]]),
+    );
+  });
+
+  it('ignores an array holding anything but string literals', () => {
+    const sf = parseSource(
+      '/virtual/cache-tags.ts',
+      `export const MIXED_TAGS = ['link', someTag] as const;`,
+    );
+    assert.deepEqual(extractSharedTagLists(sf), new Map());
+  });
+});
+
 describe('findMissingTags', () => {
   it('reports nothing missing when every service tag is registered', () => {
     const serviceTags = new Set(['post', 'posts']);
@@ -207,7 +251,10 @@ describe('the real repo files', () => {
     const files = listServiceSourceFiles(serviceSrcDir);
     assert.ok(files.length > 0);
 
-    const { tags, unresolved } = collectServiceTags(files);
+    const sharedLists = collectSharedTagLists(
+      listServiceSourceFiles(`${serviceSrcDir}/shared/cache-tags`),
+    );
+    const { tags, unresolved } = collectServiceTags(files, sharedLists);
     assert.deepEqual(unresolved, []);
     assert.deepEqual(findMissingTags(tags, revalidateTagValues), []);
   });

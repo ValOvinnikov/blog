@@ -3,17 +3,7 @@ import { LEGAL_PAGE_KIND } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawSectionDocumentDetail } from '@blog/service/testing/pages/fixtures';
 import {
-  MOCK_HOME_PAGE_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_POST_CACHE_TAG,
-  MOCK_PAGE_POST_INDEX_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_TAG_CACHE_TAG,
-  MOCK_PAGE_TAG_INDEX_CACHE_TAG,
-  MOCK_PAGE_TOPIC_CACHE_TAG,
-  MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_TOPIC_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockRawSeo } from '@blog/service/testing/shared/fixtures';
@@ -87,20 +77,7 @@ describe(getSectionDocument, () => {
       tenant,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [
-          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-          MOCK_LINK_CACHE_TAG,
-          MOCK_PAGE_POST_CACHE_TAG,
-          MOCK_TOPIC_CACHE_TAG,
-          MOCK_HOME_PAGE_CACHE_TAG,
-          MOCK_PAGE_LANDING_CACHE_TAG,
-          MOCK_PAGE_POST_INDEX_CACHE_TAG,
-          MOCK_PAGE_TOPIC_CACHE_TAG,
-          MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
-          MOCK_PAGE_TAG_CACHE_TAG,
-          MOCK_PAGE_TAG_INDEX_CACHE_TAG,
-        ],
+        tags: [MOCK_TOPIC_CACHE_TAG, ...MOCK_LINK_TARGET_CACHE_TAGS],
       },
     });
   });

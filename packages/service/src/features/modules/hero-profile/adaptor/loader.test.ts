@@ -3,11 +3,7 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawHeroProfileModule } from '@blog/service/testing/modules/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,
-  MOCK_HOME_PAGE_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import {
@@ -64,11 +60,7 @@ describe(getHeroProfile, () => {
           mockCacheTag('modules:heroProfile'),
           mockCacheTag(`module:${MOCK_HERO_PROFILE_ID}`),
           MOCK_AUTHOR_CACHE_TAG,
-          MOCK_LINK_CACHE_TAG,
-          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-          MOCK_HOME_PAGE_CACHE_TAG,
-          MOCK_PAGE_LANDING_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

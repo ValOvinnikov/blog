@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { heroBlogModuleQuery } from './query';
 import { toHeroBlogModule } from './transformer';
@@ -21,17 +22,8 @@ export async function getHeroBlog(
         `module:${id}`,
         'posts',
         'author',
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
-        'page_postIndex',
-        'page_topic',
-        'page_topicIndex',
-        'page_tag',
-        'page_tagIndex',
         'topic',
+        ...LINK_TARGET_CACHE_TAGS,
       ],
       tenant.projectId,
     ),

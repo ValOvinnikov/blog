@@ -3,12 +3,12 @@ import {
   BRAND_TAGLINE_SEPARATORS,
   PORTABLE_TEXT_BLOCK_TYPE,
 } from '@blog/config/constants';
-import {
-  MOCK_LINKED_PAGE_CACHE_TAGS,
-  mockRawNavigation,
-} from '@blog/service/testing/global/fixtures';
+import { mockRawNavigation } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
+import {
+  MOCK_LINK_TARGET_CACHE_TAGS,
+  mockCacheTag,
+} from '@blog/service/testing/sanity/query/cache-tags';
 import {
   mockLinkView,
   mockRawExternalLinkDocument,
@@ -186,7 +186,7 @@ describe(getNavigation, () => {
       tenant: MOCK_TENANT,
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
-        tags: [mockCacheTag('navigation'), ...MOCK_LINKED_PAGE_CACHE_TAGS],
+        tags: [mockCacheTag('navigation'), ...MOCK_LINK_TARGET_CACHE_TAGS],
       },
     });
   });

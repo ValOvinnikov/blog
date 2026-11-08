@@ -6,17 +6,7 @@ import {
   mockRawCtaModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
-  MOCK_HOME_PAGE_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_LANDING_CACHE_TAG,
-  MOCK_PAGE_POST_CACHE_TAG,
-  MOCK_PAGE_POST_INDEX_CACHE_TAG,
-  MOCK_PAGE_TAG_CACHE_TAG,
-  MOCK_PAGE_TAG_INDEX_CACHE_TAG,
-  MOCK_PAGE_TOPIC_CACHE_TAG,
-  MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_TOPIC_CACHE_TAG,
   mockCacheTag,
 } from '@blog/service/testing/sanity/query/cache-tags';
@@ -72,18 +62,8 @@ describe(getCta, () => {
         tags: [
           mockCacheTag('modules:cta'),
           mockCacheTag(`module:${MOCK_CTA_ID}`),
-          MOCK_LINK_CACHE_TAG,
-          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-          MOCK_HOME_PAGE_CACHE_TAG,
-          MOCK_PAGE_LANDING_CACHE_TAG,
-          MOCK_PAGE_POST_CACHE_TAG,
-          MOCK_PAGE_POST_INDEX_CACHE_TAG,
-          MOCK_PAGE_TOPIC_CACHE_TAG,
-          MOCK_PAGE_TOPIC_INDEX_CACHE_TAG,
-          MOCK_PAGE_TAG_CACHE_TAG,
-          MOCK_PAGE_TAG_INDEX_CACHE_TAG,
           MOCK_TOPIC_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

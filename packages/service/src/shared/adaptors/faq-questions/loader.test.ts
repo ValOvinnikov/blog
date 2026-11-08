@@ -6,9 +6,7 @@ import {
 } from '@blog/service/testing/modules/fixtures';
 import {
   MOCK_BLOCK_FAQ_CACHE_TAG,
-  MOCK_LINK_CACHE_TAG,
-  MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
-  MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_MODULES_FAQ_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
@@ -41,9 +39,7 @@ describe(getFaqQuestions, () => {
         tags: [
           MOCK_MODULES_FAQ_CACHE_TAG,
           MOCK_BLOCK_FAQ_CACHE_TAG,
-          MOCK_LINK_CACHE_TAG,
-          MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
-          MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
         ],
       },
     });

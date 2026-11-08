@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { statsModuleQuery } from './query';
 import { toStatsModule } from './transformer';
@@ -16,15 +17,7 @@ export async function getStatsModule(
     parameters: { id },
     tenant,
     ...isr(
-      [
-        'modules:stats',
-        `module:${id}`,
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
-      ],
+      ['modules:stats', `module:${id}`, ...LINK_TARGET_CACHE_TAGS],
       tenant.projectId,
     ),
   });

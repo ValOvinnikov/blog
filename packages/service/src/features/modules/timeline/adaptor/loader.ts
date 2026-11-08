@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { timelineModuleQuery } from './query';
 import { toTimelineModule } from './transformer';
@@ -16,15 +17,7 @@ export async function getTimelineModule(
     parameters: { id },
     tenant,
     ...isr(
-      [
-        'modules:timeline',
-        `module:${id}`,
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
-      ],
+      ['modules:timeline', `module:${id}`, ...LINK_TARGET_CACHE_TAGS],
       tenant.projectId,
     ),
   });

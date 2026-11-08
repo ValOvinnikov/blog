@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { footerQuery } from './query';
 import { toFooter } from './transformer';
@@ -13,23 +14,7 @@ export async function getFooter(
 ): Promise<TFooter> {
   const raw = await runQuery(footerQuery, {
     tenant,
-    ...isr(
-      [
-        'footer',
-        'page_post',
-        'page_landing',
-        'page_postIndex',
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_topic',
-        'page_topicIndex',
-        'page_tag',
-        'page_tagIndex',
-      ],
-      tenant.projectId,
-    ),
+    ...isr(['footer', ...LINK_TARGET_CACHE_TAGS], tenant.projectId),
   });
   return toFooter(raw);
 }

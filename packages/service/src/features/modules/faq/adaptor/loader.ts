@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { faqModuleQuery } from './query';
 import { toFaqModule } from './transformer';
@@ -16,18 +17,7 @@ export async function getFaqModule(
     parameters: { id },
     tenant,
     ...isr(
-      [
-        'modules:faq',
-        `module:${id}`,
-        'block_faq',
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
-        'page_topic',
-        'page_tag',
-      ],
+      ['modules:faq', `module:${id}`, 'block_faq', ...LINK_TARGET_CACHE_TAGS],
       tenant.projectId,
     ),
   });

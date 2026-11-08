@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { heroProfileModuleQuery } from './query';
 import { toHeroProfileModule } from './transformer';
@@ -20,11 +21,7 @@ export async function getHeroProfile(
         'modules:heroProfile',
         `module:${id}`,
         'author',
-        'link',
-        'page_privacyDocument',
-        'page_legalDocument',
-        'homePage',
-        'page_landing',
+        ...LINK_TARGET_CACHE_TAGS,
       ],
       tenant.projectId,
     ),
