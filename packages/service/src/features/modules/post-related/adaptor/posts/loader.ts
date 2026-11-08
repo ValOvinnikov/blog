@@ -3,7 +3,9 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
+import { hasLength } from '@blog/utils/primitives';
 
 import { relatedPostAnchorQuery } from './anchor.query';
 import { relatedByTagsQuery } from './by-tags.query';
@@ -26,11 +28,14 @@ export async function getRelatedPosts(
   const topicId = anchor?.topicId?._id;
 
   const [byTags, byTopic] = await Promise.all([
-    tagIds.length > 0
+    hasLength(tagIds)
       ? runQuery(relatedByTagsQuery, {
           parameters: { currentId: postId, tagIds },
           tenant,
-          ...isr(['posts', 'author', 'topic', 'tag'], tenant.projectId),
+          ...isr(
+            ['posts', 'author', 'topic', 'tag', ...LINK_TARGET_CACHE_TAGS],
+            tenant.projectId,
+          ),
         })
       : Promise.resolve([]),
     topicId
@@ -39,7 +44,10 @@ export async function getRelatedPosts(
           {
             parameters: { currentId: postId, topicId },
             tenant,
-            ...isr(['posts', 'author', 'topic'], tenant.projectId),
+            ...isr(
+              ['posts', 'author', 'topic', ...LINK_TARGET_CACHE_TAGS],
+              tenant.projectId,
+            ),
           },
         )
       : Promise.resolve([]),

@@ -3,6 +3,8 @@ import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
+  MOCK_AUTHOR_CACHE_TAG,
+  MOCK_LINK_TARGET_CACHE_TAGS,
   MOCK_POSTS_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
@@ -12,6 +14,7 @@ import { MOCK_TENANT } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
 
 import { relatedPostAnchorQuery } from './anchor.query';
+import { relatedByTagsQuery } from './by-tags.query';
 import { getRelatedPosts } from './loader';
 
 vi.mock('@blog/service/sanity/query/query');
@@ -104,6 +107,48 @@ describe(getRelatedPosts, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [MOCK_POSTS_CACHE_TAG, MOCK_TOPIC_CACHE_TAG, MOCK_TAG_CACHE_TAG],
+      },
+    });
+  });
+
+  it('tags both candidate queries with the post-card content and its link targets', async () => {
+    mockRun
+      .mockResolvedValueOnce({
+        tagIds: MOCK_SHARED_TAG_IDS,
+        topicId: MOCK_TOPIC_REF,
+      })
+      .mockResolvedValue([]);
+
+    await getRelatedPosts(MOCK_POST_ID, MOCK_RELATED_LIMIT, MOCK_TENANT);
+
+    expect(mockRun).toHaveBeenCalledWith(relatedByTagsQuery, {
+      parameters: {
+        currentId: MOCK_POST_ID,
+        tagIds: MOCK_SHARED_TAG_IDS.map((tag) => tag._id),
+      },
+      tenant: MOCK_TENANT,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_POSTS_CACHE_TAG,
+          MOCK_AUTHOR_CACHE_TAG,
+          MOCK_TOPIC_CACHE_TAG,
+          MOCK_TAG_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
+        ],
+      },
+    });
+    expect(mockRun).toHaveBeenCalledWith(expect.anything(), {
+      parameters: { currentId: MOCK_POST_ID, topicId: MOCK_TOPIC_ID },
+      tenant: MOCK_TENANT,
+      next: {
+        revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
+        tags: [
+          MOCK_POSTS_CACHE_TAG,
+          MOCK_AUTHOR_CACHE_TAG,
+          MOCK_TOPIC_CACHE_TAG,
+          ...MOCK_LINK_TARGET_CACHE_TAGS,
+        ],
       },
     });
   });

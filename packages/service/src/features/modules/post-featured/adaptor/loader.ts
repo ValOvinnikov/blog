@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { postFeaturedModuleQuery } from './query';
 import { toPostFeaturedModule } from './transformer';
@@ -16,7 +17,14 @@ export async function getPostFeatured(
     parameters: { id },
     tenant,
     ...isr(
-      ['modules:postFeatured', `module:${id}`, 'posts', 'author', 'topic'],
+      [
+        'modules:postFeatured',
+        `module:${id}`,
+        'posts',
+        'author',
+        'topic',
+        ...LINK_TARGET_CACHE_TAGS,
+      ],
       tenant.projectId,
     ),
   });
