@@ -14,10 +14,10 @@ code:
   - apps/web/src/components/shared/deep-aside/**
   - apps/web/src/components/shared/back-to-top-button/**
   - apps/web/src/components/shared/sidebar-nav/**
-  - apps/web/src/components/features/post/post-table-of-contents/**
+  - apps/web/src/components/shared/contents-rail-layout/**
   - apps/web/src/hooks/use-active-heading-id/**
-  - apps/web/src/utils/extract-post-headings/**
-  - apps/web/src/testing/shared/post-table-of-contents/**
+  - apps/web/src/utils/extract-contents-headings/**
+  - apps/web/src/testing/shared/contents-rail/**
   - apps/web/src/testing/shared/sidebar-nav/**
 epics: []
 ---
@@ -40,7 +40,7 @@ A post page offers the reader three depths: **30s** (a short list of takeaways),
 - `page_post.postTakeaways` (`takeaways[]`, `generatedAt`, `model`), read as `TPostDetail.postTakeaways`. Fewer than 3 takeaways is treated as none (`toPostTakeaways`).
 - `TPostDetail.hasAsides` is true when any top-level body block is an `aside`.
 - `TPostDetail.readingTimeMinutes` comes from a GROQ word count over the top-level `block`s of `content` (`WORD_COUNT_EXPRESSION`, split on spaces) and `toReadingTimeMinutes` (200 words a minute, rounded up, at least 1). Asides, code and images are not counted.
-- The contents outline is derived on the server from the body (`extractPostHeadings`); nothing is stored.
+- The contents outline is derived on the server from the body (`extractContentsHeadings`); nothing is stored.
 - The reader's chosen depth lives only in the browser: `localStorage` key `reading-depth` (`DEPTH_STORAGE_KEY`), one value for the whole site.
 - Cache: everything rides the post read (`getPostPage` → `service.pages.post.v1.getPost`), tagged with the post and the types it references and revalidated by the publish webhook, with the route's 21600s backstop. Switching depth never fetches. See ./rendering-and-caching.md.
 
@@ -49,7 +49,7 @@ A post page offers the reader three depths: **30s** (a short list of takeaways),
 - Not plan-gated and not a capability: every tenant's posts get all of it.
 - Editors decide availability per post: approved takeaways (3 or more) enable **30s**, at least one aside enables **Deep**. A post with neither shows no control.
 - Look reaches it through the shared tokens (the `SegmentedControl`, the skim cards, the aside styling). See ./look.md.
-- Every string is fixed catalog copy, not Voice: `blogPostPage.depthToggle.*`, `blogPostPage.skimPanel.*`, `blogPostPage.asideKind.*`, `blogPostPage.backToTop.ariaLabel`, `blogPostPage.readingTime`, `postCard.readingTime` and `postContentsRail.label`. See ./voice.md.
+- Every string is fixed catalog copy, not Voice: `blogPostPage.depthToggle.*`, `blogPostPage.skimPanel.*`, `blogPostPage.asideKind.*`, `blogPostPage.backToTop.ariaLabel`, `blogPostPage.readingTime`, `postCard.readingTime` and `contentsRail.label`. See ./voice.md.
 
 ## Constraints and invariants
 
@@ -77,15 +77,15 @@ A post page offers the reader three depths: **30s** (a short list of takeaways),
 - `apps/web/src/context/depth-provider/depth-provider.tsx`, `apps/web/src/config/depth-script.ts`
 - `apps/web/src/components/shared/depth-toggle/depth-toggle.tsx`
 - `apps/web/src/components/shared/skim-panel/skim-panel.tsx`, `apps/web/src/components/shared/deep-aside/deep-aside.tsx`
-- `apps/web/src/components/features/post/post-table-of-contents/post-table-of-contents.tsx`, `apps/web/src/components/shared/sidebar-nav/sidebar-nav.tsx`
-- `apps/web/src/utils/extract-post-headings/extract-post-headings.ts`, `apps/web/src/hooks/use-active-heading-id/use-active-heading-id.ts`
+- `apps/web/src/components/shared/contents-rail-layout/contents-rail-layout.tsx`, `apps/web/src/components/shared/sidebar-nav/sidebar-nav.tsx`
+- `apps/web/src/utils/extract-contents-headings/extract-contents-headings.ts`, `apps/web/src/hooks/use-active-heading-id/use-active-heading-id.ts`
 - `packages/service/src/features/pages/post/adaptor/detail-page/transformer.ts`, `packages/service/src/shared/expressions/post/word-count.ts`
 
 ## Tests and stories
 
-- Tests beside `depth-provider`, `depth-toggle`, `skim-panel`, `switch-to-read-button`, `deep-aside`, `back-to-top-button`, `sidebar-nav`, `post-table-of-contents`, `use-active-heading-id` and `extract-post-headings` in `apps/web`; `blog-post-page.test.tsx` and `post-article.test.tsx` for the composition.
+- Tests beside `depth-provider`, `depth-toggle`, `skim-panel`, `switch-to-read-button`, `deep-aside`, `back-to-top-button`, `sidebar-nav`, `contents-rail-layout`, `contents-rail`, `use-active-heading-id` and `extract-contents-headings` in `apps/web`; `blog-post-page.test.tsx` and `post-article.test.tsx` for the composition.
 - `packages/utils/src/reading-time/to-reading-time.test.ts`; `packages/ui` `back-to-top` and `segmented-control` tests.
-- Stories: `depth-toggle`, `deep-aside`, `sidebar-nav`, `post-table-of-contents` and `post-article` in `apps/web`; `back-to-top` and `segmented-control` in `packages/ui`.
+- Stories: `depth-toggle`, `deep-aside`, `sidebar-nav`, `contents-rail-layout`, `contents-rail` and `post-article` in `apps/web`; `back-to-top` and `segmented-control` in `packages/ui`.
 
 ## Related
 

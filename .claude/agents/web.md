@@ -191,8 +191,7 @@ if (!result.ok) {
   (`utils/to-post-list-items/`); never a bare file directly under
   `src/utils/`. `utils/logger/` and `utils/env/` carry no barrel and are
   imported by file (`@web/utils/logger/logger`, `@web/utils/env/env`).
-  `extract-post-headings/` and `parse-page-param/` lack one too — add it when
-  a diff touches them.
+  `parse-page-param/` lacks one too — add it when a diff touches it.
 - **Context providers**: `src/context/<name>-provider/`, with a barrel.
 - **Size and hooks:** budgets → CLAUDE.md → "File size budgets"; what to
   extract and where hooks live → `react-component-practices` → "Size and

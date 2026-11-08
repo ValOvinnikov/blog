@@ -3,7 +3,7 @@ import { type TImageTransformOptions, urlForSanityImage } from '@blog/service';
 import { Prose } from '@blog/ui/components/atoms/prose';
 import { Article } from '@blog/ui/components/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
-import { PostTableOfContents } from '@web/components/features/post/post-table-of-contents';
+import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {
   createAsideOverride,
   PortableText,
@@ -14,10 +14,6 @@ import { SmartLink } from '@web/components/shared/smart-link';
 import { routing } from '@web/i18n/routing';
 import { getPostPage } from '@web/server/post/get-post-page/get-post-page';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import {
-  extractPostHeadings,
-  MIN_H2_HEADINGS_FOR_RAIL,
-} from '@web/utils/extract-post-headings/extract-post-headings';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import { getFormatter, getTranslations } from 'next-intl/server';
@@ -83,8 +79,6 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
     month: 'long',
     day: 'numeric',
   });
-  const headings = extractPostHeadings(body);
-  const hasContentsRail = headings.length >= MIN_H2_HEADINGS_FOR_RAIL;
   const path = toLocalizedPathname({
     href: routes.post(slug),
     locale,
@@ -144,26 +138,15 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
         }
       />
 
-      <Article.Body className={s.body({ withRail: hasContentsRail })}>
-        {hasContentsRail ? (
-          <>
-            <PostTableOfContents className={s.rail()} headings={headings} />
-            <div className={s.content({ withRail: true })}>
-              <Prose className={s.prose()}>
-                <PortableText value={body} components={components} />
-              </Prose>
-            </div>
-          </>
-        ) : (
+      <Article.Body className={s.body()}>
+        <ContentsRailLayout
+          body={body}
+          footer={<Article.Footer tags={footerTags} linkAs={SmartLink} />}
+        >
           <Prose className={s.prose()}>
             <PortableText value={body} components={components} />
           </Prose>
-        )}
-        <Article.Footer
-          className={hasContentsRail ? s.footerInRail() : s.footer()}
-          tags={footerTags}
-          linkAs={SmartLink}
-        />
+        </ContentsRailLayout>
       </Article.Body>
     </Article>
   );

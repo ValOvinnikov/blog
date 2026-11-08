@@ -90,7 +90,7 @@ const HEADER_TEST_ID = 'post-article-header';
 
 const { author, topic } = MOCK_POST;
 const { saveAriaLabel } = SITE_MESSAGES.bookmarkButton;
-const { label: contentsLabel } = SITE_MESSAGES.postContentsRail;
+const { label: contentsLabel } = SITE_MESSAGES.contentsRail;
 const shareButtonName = SITE_MESSAGES.postShare.shareAriaLabel.replace(
   '{title}',
   MOCK_POST_DETAIL.title,

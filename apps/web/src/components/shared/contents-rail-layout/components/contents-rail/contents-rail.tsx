@@ -5,21 +5,18 @@ import {
   type TSidebarNavItem,
 } from '@web/components/shared/sidebar-nav';
 import { useActiveHeadingId } from '@web/hooks/use-active-heading-id';
-import type { TPostHeading } from '@web/utils/extract-post-headings/extract-post-headings';
+import type { TContentsHeading } from '@web/utils/extract-contents-headings';
 import { useTranslations } from 'next-intl';
 
-export type TPostTableOfContentsProps = {
-  headings: TPostHeading[];
+export type TContentsRailProps = {
+  headings: TContentsHeading[];
   className?: string;
 };
 
 const toAnchor = (key: string) => `#${key}`;
 
-export const PostTableOfContents = ({
-  headings,
-  className,
-}: TPostTableOfContentsProps) => {
-  const t = useTranslations('postContentsRail');
+export const ContentsRail = ({ headings, className }: TContentsRailProps) => {
+  const t = useTranslations('contentsRail');
   const activeHeadingId = useActiveHeadingId(headings.map(({ key }) => key));
   const items: TSidebarNavItem[] = headings.map(({ text, level, key }) => ({
     label: text,

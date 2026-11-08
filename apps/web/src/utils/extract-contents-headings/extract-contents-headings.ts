@@ -1,14 +1,14 @@
 import type { TPortableTextBlock } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
+import { hasLength } from '@blog/utils/primitives';
 
-/** A post needs at least this many H2 headings before a table-of-contents rail earns its place. */
 export const MIN_H2_HEADINGS_FOR_RAIL = 3;
 
-type TPostHeadingLevel = 2 | 3;
+type TContentsHeadingLevel = 2 | 3;
 
-export type TPostHeading = {
+export type TContentsHeading = {
   text: string;
-  level: TPostHeadingLevel;
+  level: TContentsHeadingLevel;
   key: string;
 };
 
@@ -23,23 +23,20 @@ const blockText = (block: TPortableTextBlock): string =>
     .join('')
     .trim();
 
-/**
- * Returns the ordered h2/h3 outline of a post body, gated to the same
- * threshold `BlogPostPage` uses so a non-empty result is always render-worthy.
- */
-export const extractPostHeadings = (
+/** Returns an empty outline when the body has too few H2s to earn a contents rail. */
+export const extractContentsHeadings = (
   body: TPortableTextBody | undefined,
-): TPostHeading[] => {
+): TContentsHeading[] => {
   if (!body) return [];
 
   const headings = body
     .filter(isHeadingBlock)
     .map((block) => ({
       key: block._key,
-      level: (block.style === 'h2' ? 2 : 3) as TPostHeadingLevel,
+      level: (block.style === 'h2' ? 2 : 3) as TContentsHeadingLevel,
       text: blockText(block),
     }))
-    .filter((heading) => heading.text.length > 0);
+    .filter((heading) => hasLength(heading.text));
 
   const h2Count = headings.filter((heading) => heading.level === 2).length;
   if (h2Count < MIN_H2_HEADINGS_FOR_RAIL) return [];

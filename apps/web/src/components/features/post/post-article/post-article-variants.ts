@@ -4,47 +4,9 @@ import { proseMeasureCapSlot } from '@web/components/shared/portable-text/config
 export const postArticleVariants = tv({
   slots: {
     hero: ['mx-auto w-full', 'max-w-page px-gutter'],
-    body: [
-      'mx-auto w-full px-gutter',
-      'mt-8',
-      'group-data-[depth=SKIM]/depth:hidden',
-    ],
-    content: ['w-full', 'lg:col-start-2 lg:row-start-1'],
+    body: ['mt-8', 'group-data-[depth=SKIM]/depth:hidden'],
     prose: proseMeasureCapSlot,
-    // `text-prose` matches `Prose`'s font-size so `max-w-measure`'s `ch` lines up with it.
-    rail: [
-      'mx-auto max-w-measure text-prose',
-      'lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:mx-0 lg:max-w-none',
-    ],
-    // The content→footer vertical gap comes from `Article.Footer`'s own
-    // `mt-8` (`article-footer-variants.ts`), not a grid row-gap here.
-    footerInRail: [
-      'mx-auto text-prose',
-      'max-w-measure',
-      'lg:col-start-2 lg:row-start-2 lg:mx-0',
-      'group-data-[depth=SKIM]/depth:hidden',
-    ],
-    footer: ['group-data-[depth=SKIM]/depth:hidden'],
     coverImage: ['size-full object-cover'],
     metaActions: ['inline-flex items-center gap-2'],
-  },
-  variants: {
-    withRail: {
-      true: {
-        body: ['lg:max-w-page', 'lg:grid lg:grid-cols-[220px_1fr] lg:gap-x-10'],
-        // The grid column is not viewport-centred, so a viewport-wide breakout would overflow it; a full bleed image fills the column instead.
-        content: [
-          'lg:[&_[data-full-bleed]_figure]:left-0',
-          'lg:[&_[data-full-bleed]_figure]:w-full',
-          'lg:[&_[data-full-bleed]_figure]:translate-x-0',
-        ],
-      },
-      false: {
-        body: ['max-w-measure'],
-      },
-    },
-  },
-  defaultVariants: {
-    withRail: false,
   },
 });

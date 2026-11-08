@@ -3,9 +3,9 @@ import { faker } from '@faker-js/faker';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 
 import {
-  extractPostHeadings,
+  extractContentsHeadings,
   MIN_H2_HEADINGS_FOR_RAIL,
-} from './extract-post-headings';
+} from './extract-contents-headings';
 
 faker.seed(110);
 
@@ -34,9 +34,9 @@ const mockH2Blocks = (count: number): TPortableTextBody =>
     mockPortableTextBlock(faker.lorem.words(2), { style: H2_STYLE }),
   );
 
-describe(extractPostHeadings, () => {
+describe(extractContentsHeadings, () => {
   it('returns an empty array for an undefined body', () => {
-    const headings = extractPostHeadings(undefined);
+    const headings = extractContentsHeadings(undefined);
 
     expect(headings).toEqual([]);
   });
@@ -47,7 +47,7 @@ describe(extractPostHeadings, () => {
       mockPortableTextBlock(MOCK_H3_TEXT, { style: H3_STYLE }),
     ];
 
-    const headings = extractPostHeadings(body);
+    const headings = extractContentsHeadings(body);
 
     expect(headings).toEqual([]);
   });
@@ -58,7 +58,7 @@ describe(extractPostHeadings, () => {
       mockPortableTextBlock(MOCK_PARAGRAPH_TEXT),
     ];
 
-    const headings = extractPostHeadings(body);
+    const headings = extractContentsHeadings(body);
 
     expect(headings).toEqual([]);
   });
@@ -84,7 +84,7 @@ describe(extractPostHeadings, () => {
       }),
     ];
 
-    const headings = extractPostHeadings(body);
+    const headings = extractContentsHeadings(body);
 
     expect(headings).toEqual([
       { key: MOCK_FIRST_KEY, text: MOCK_H2_TEXT, level: 2 },
@@ -102,7 +102,7 @@ describe(extractPostHeadings, () => {
       { _type: 'code', _key: faker.string.uuid(), code: faker.lorem.word() },
     ];
 
-    const headings = extractPostHeadings(body);
+    const headings = extractContentsHeadings(body);
 
     expect(headings.map((heading) => heading.key)).toEqual(
       h2Blocks.map((block) => block._key),
@@ -115,7 +115,7 @@ describe(extractPostHeadings, () => {
       mockPortableTextBlock('  ', { style: H2_STYLE }),
     ];
 
-    const headings = extractPostHeadings(body);
+    const headings = extractContentsHeadings(body);
 
     expect(headings).toEqual([]);
   });
