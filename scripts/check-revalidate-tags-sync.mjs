@@ -6,10 +6,12 @@
 // no per-tag Object.hasOwn miss to report, so this is the only guard against
 // that failure class.
 //
-// This check trusts argument literals only — it never resolves what a name
-// refers to. Each `isr(...)` call is read straight off its own file's AST,
-// per file, with no cross-file resolution: no TypeScript program, no symbol
-// lookup, no declaration tracing. It still has to find the call in the first
+// This check trusts literals only. Each `isr(...)` call is read straight off
+// its own file's AST, with no TypeScript program and no symbol lookup. The one
+// name it resolves is a spread of a shared tag list: every list declared under
+// packages/service/src/shared/cache-tags/ is read first and matched by its
+// bare name, and two lists sharing a name fail the run, so a spread can never
+// be checked against the wrong list. It still has to find the call in the first
 // place, and does so by name: a call is recognized only when its callee is
 // the bare identifier `isr`. An aliased import (`isr as buildCacheOptions`)
 // or a property-access call (`ns.isr(...)`) is not matched at all, so such a
@@ -155,10 +157,9 @@ const toRelative = (file) => relative(repoRoot, file);
 /**
  * Classifies a single `isr(...)` argument node — the whole first argument,
  * or one element of an array-literal first argument — into `target.tags`
- * (a string literal), `target.dynamic` (a substituted template, a
- * per-document runtime tag) or `target.unresolved` (anything else, which
- * fails the run). No resolution is attempted for any shape in the third
- * bucket.
+ * (a string literal, or every tag of a spread shared tag list),
+ * `target.dynamic` (a substituted template, a per-document runtime tag) or
+ * `target.unresolved` (anything else, which fails the run).
  */
 const classifyArgumentNode = (node, sf, fileRel, target, sharedLists) => {
   if (
@@ -233,15 +234,23 @@ export const collectServiceTags = (files, sharedLists = new Map()) => {
 export const findMissingTags = (serviceTags, revalidateTagValues) =>
   [...serviceTags].filter((tag) => !revalidateTagValues.has(tag)).sort();
 
-export const collectSharedTagLists = (files) => {
+export const mergeSharedTagLists = (listsPerFile) => {
   const lists = new Map();
-  for (const file of files) {
-    for (const [name, tags] of extractSharedTagLists(parse(file))) {
+  for (const fileLists of listsPerFile) {
+    for (const [name, tags] of fileLists) {
+      if (lists.has(name)) {
+        throw new Error(
+          `Shared tag list ${name} is declared more than once under packages/service/src/shared/cache-tags/.`,
+        );
+      }
       lists.set(name, tags);
     }
   }
   return lists;
 };
+
+export const collectSharedTagLists = (files) =>
+  mergeSharedTagLists(files.map((file) => extractSharedTagLists(parse(file))));
 
 const formatReport = (missing, unresolved, revalidateTagsRelPath) => {
   const lines = [];

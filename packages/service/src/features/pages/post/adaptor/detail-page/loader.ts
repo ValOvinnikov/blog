@@ -18,7 +18,7 @@ export async function getPost(
     parameters: { slug },
     tenant,
     ...isr(
-      ['author', 'topic', 'tag', ...LINK_TARGET_CACHE_TAGS],
+      ['page_post', 'author', 'topic', 'tag', ...LINK_TARGET_CACHE_TAGS],
       tenant.projectId,
     ),
   });

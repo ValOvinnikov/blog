@@ -17,6 +17,7 @@ import {
   extractRevalidateTagValues,
   findMissingTags,
   listServiceSourceFiles,
+  mergeSharedTagLists,
   parseSource,
 } from './check-revalidate-tags-sync.mjs';
 
@@ -214,6 +215,32 @@ describe('extractSharedTagLists', () => {
       `export const MIXED_TAGS = ['link', someTag] as const;`,
     );
     assert.deepEqual(extractSharedTagLists(sf), new Map());
+  });
+});
+
+describe('mergeSharedTagLists', () => {
+  it('merges the lists declared across files', () => {
+    assert.deepEqual(
+      mergeSharedTagLists([
+        new Map([['LINK_TARGET_CACHE_TAGS', ['link']]]),
+        new Map([['POST_CACHE_TAGS', ['posts']]]),
+      ]),
+      new Map([
+        ['LINK_TARGET_CACHE_TAGS', ['link']],
+        ['POST_CACHE_TAGS', ['posts']],
+      ]),
+    );
+  });
+
+  it('fails when two files declare a list with the same name', () => {
+    assert.throws(
+      () =>
+        mergeSharedTagLists([
+          new Map([['LINK_TARGET_CACHE_TAGS', ['link']]]),
+          new Map([['LINK_TARGET_CACHE_TAGS', ['homePage']]]),
+        ]),
+      /LINK_TARGET_CACHE_TAGS/,
+    );
   });
 });
 

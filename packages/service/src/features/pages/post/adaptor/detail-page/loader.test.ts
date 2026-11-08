@@ -19,6 +19,7 @@ import {
 import {
   MOCK_AUTHOR_CACHE_TAG,
   MOCK_LINK_TARGET_CACHE_TAGS,
+  MOCK_PAGE_POST_CACHE_TAG,
   MOCK_TAG_CACHE_TAG,
   MOCK_TOPIC_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
@@ -238,6 +239,7 @@ describe(getPost, () => {
       next: {
         revalidate: SANITY_CONTENT_REVALIDATE_SECONDS,
         tags: [
+          MOCK_PAGE_POST_CACHE_TAG,
           MOCK_AUTHOR_CACHE_TAG,
           MOCK_TOPIC_CACHE_TAG,
           MOCK_TAG_CACHE_TAG,
