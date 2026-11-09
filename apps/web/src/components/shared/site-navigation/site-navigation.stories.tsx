@@ -6,6 +6,7 @@ import {
   LOCALE_ISO_CODES,
   type TMaybeNull,
 } from '@blog/config';
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
@@ -55,7 +56,7 @@ const meta = {
   component: SiteNavigation,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
-  args: { links, actions: <ThemeToggleButton /> },
+  args: { links, actions: <ThemeToggleButton />, hasReaderAccounts: true },
 } satisfies Meta<typeof SiteNavigation>;
 
 export default meta;
@@ -103,9 +104,10 @@ const headerControls = {
   ),
   actions: (
     <AuthMenu
-      oauthProviderIds={['github']}
+      oauthProviderIds={[OAUTH_PROVIDER.GITHUB]}
       accountControl={MOCK_ACCOUNT_CONTROL}
       hasBookmarks={true}
+      hasReaderAccounts={true}
     />
   ),
 };
@@ -119,15 +121,16 @@ const ACCOUNT_IN_MENU = {
 const headerControlsWithAccountInMenu = {
   ...headerControls,
   menuAccount: {
-    oauthProviderIds: ['github'] as const,
+    oauthProviderIds: [OAUTH_PROVIDER.GITHUB],
     panelStyle: ACCOUNT_IN_MENU.panelStyle,
     hasBookmarks: true,
   },
   actions: (
     <AuthMenu
-      oauthProviderIds={['github']}
+      oauthProviderIds={[OAUTH_PROVIDER.GITHUB]}
       accountControl={ACCOUNT_IN_MENU}
       hasBookmarks={true}
+      hasReaderAccounts={true}
     />
   ),
 };
@@ -239,13 +242,14 @@ export const HubPanelFromCircle: TStory = {
     ...headerControls,
     actions: (
       <AuthMenu
-        oauthProviderIds={['github']}
+        oauthProviderIds={[OAUTH_PROVIDER.GITHUB]}
         accountControl={{
           ...MOCK_ACCOUNT_CONTROL,
           buttonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
           panelStyle: ACCOUNT_PANEL_STYLE.HUB,
         }}
         hasBookmarks={true}
+        hasReaderAccounts={true}
       />
     ),
   },

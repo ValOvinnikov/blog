@@ -61,7 +61,6 @@ export const SiteHeader = async () => {
     navResult.ok && navResult.data.showLanguageSwitcher === true;
   const oauthProviderIds = getEnabledOAuthProviderIds(siteOAuthCredentials);
   const hasAccountInPhoneMenu =
-    hasReaderAccounts &&
     accountControl.phonePlacement === ACCOUNT_PHONE_PLACEMENT.MENU;
 
   return (
@@ -96,16 +95,16 @@ export const SiteHeader = async () => {
                 }
               : undefined
           }
+          hasReaderAccounts={hasReaderAccounts}
           actions={
             <>
               {!hasLanguageSwitcher && <ThemeToggleButton />}
-              {hasReaderAccounts && (
-                <AuthMenu
-                  oauthProviderIds={oauthProviderIds}
-                  accountControl={accountControl}
-                  hasBookmarks={hasBookmarks}
-                />
-              )}
+              <AuthMenu
+                oauthProviderIds={oauthProviderIds}
+                accountControl={accountControl}
+                hasBookmarks={hasBookmarks}
+                hasReaderAccounts={hasReaderAccounts}
+              />
             </>
           }
         />

@@ -6,14 +6,18 @@ import { useId } from 'react';
 
 export interface IAccountPlaceholderProps {
   accountControl: IAccountControl;
+  isSignedInHintRequired: boolean;
 }
 
 export const AccountPlaceholder = ({
   accountControl,
+  isSignedInHintRequired,
 }: IAccountPlaceholderProps) => {
   const t = useTranslations('authMenu');
   const panelId = useId();
-  const { slot, emptyOutline, loadingStatus } = authMenuVariants();
+  const { slot, emptyOutline, loadingStatus } = authMenuVariants({
+    isSignedInHintRequired,
+  });
 
   return (
     <span className={slot()}>

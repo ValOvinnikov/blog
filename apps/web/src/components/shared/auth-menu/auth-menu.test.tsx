@@ -6,6 +6,7 @@ import {
   MAGIC_LINK_SIGN_IN_CODE,
   SITE_MESSAGES,
 } from '@blog/config';
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
@@ -33,12 +34,12 @@ vi.mock('next-auth/react', () => ({
   signOut: signOutMock,
 }));
 
-const PROVIDER = { GITHUB: 'github', GOOGLE: 'google' } as const;
 const {
   signIn: SIGN_IN_LABEL,
   accountHeading: ACCOUNT_LABEL,
   accountMenuAriaLabel: ACCOUNT_MENU_LABEL,
   signOut: SIGN_OUT_LABEL,
+  accountSettings: ACCOUNT_SETTINGS_LABEL,
   continueWithGithub: GITHUB_BUTTON,
   continueWithGoogle: GOOGLE_BUTTON,
   continuingWithGithub: GITHUB_PENDING,
@@ -74,9 +75,10 @@ const CIRCLE_IN_BAR = {
 };
 
 const setup = customRender(AuthMenu, {
-  oauthProviderIds: [PROVIDER.GITHUB, PROVIDER.GOOGLE],
+  oauthProviderIds: [OAUTH_PROVIDER.GITHUB, OAUTH_PROVIDER.GOOGLE],
   accountControl: CIRCLE_IN_BAR,
   hasBookmarks: true,
+  hasReaderAccounts: true,
 });
 
 const setLocationSearch = (search: string) => {
@@ -254,12 +256,12 @@ describe(`<${AuthMenu.name}/>`, () => {
     it.each([
       {
         title: 'every provider is enabled',
-        providers: [PROVIDER.GITHUB, PROVIDER.GOOGLE],
+        providers: [OAUTH_PROVIDER.GITHUB, OAUTH_PROVIDER.GOOGLE],
         buttonNames: [GITHUB_BUTTON, GOOGLE_BUTTON, SEND_LINK_LABEL],
       },
       {
         title: 'only GitHub is enabled',
-        providers: [PROVIDER.GITHUB],
+        providers: [OAUTH_PROVIDER.GITHUB],
         buttonNames: [GITHUB_BUTTON, SEND_LINK_LABEL],
       },
       {
@@ -305,7 +307,7 @@ describe(`<${AuthMenu.name}/>`, () => {
 
       const pendingRow = within(panel).getByText(GITHUB_PENDING);
 
-      expect(signInMock).toHaveBeenCalledWith(PROVIDER.GITHUB);
+      expect(signInMock).toHaveBeenCalledWith(OAUTH_PROVIDER.GITHUB);
       expect(pendingRow).toBeVisible();
     });
 
@@ -591,6 +593,52 @@ describe(`<${AuthMenu.name}/>`, () => {
       it('forgets the remembered sign-in', () => {
         expect(hasSignedInHint()).toBe(false);
       });
+    });
+  });
+
+  describe('with Reader accounts off', () => {
+    it('offers no sign-in to a signed-out visitor', () => {
+      mockSession(SESSION_STATUS.UNAUTHENTICATED);
+      setup({ hasReaderAccounts: false });
+
+      const button = screen.queryByRole('button');
+
+      expect(button).not.toBeInTheDocument();
+    });
+
+    it('keeps Account settings and Sign out for a signed-in reader', async () => {
+      mockSignedIn();
+      setup({ hasReaderAccounts: false });
+      const trigger = screen.getByRole('button', { name: ACCOUNT_LABEL });
+      await user.click(trigger);
+
+      const panel = screen.getByRole('menu', { name: ACCOUNT_MENU_LABEL });
+      const settingsItem = within(panel).getByText(ACCOUNT_SETTINGS_LABEL);
+      const signOutItem = within(panel).getByRole('menuitem', {
+        name: SIGN_OUT_LABEL,
+      });
+
+      expect(settingsItem).toBeVisible();
+      expect(signOutItem).toBeVisible();
+    });
+
+    it('removes the account control once the reader signs out', () => {
+      mockSignedIn();
+      const { rerender } = setup({ hasReaderAccounts: false });
+      mockSession(SESSION_STATUS.UNAUTHENTICATED);
+
+      rerender(
+        <AuthMenu
+          oauthProviderIds={[OAUTH_PROVIDER.GITHUB]}
+          accountControl={CIRCLE_IN_BAR}
+          hasBookmarks={true}
+          hasReaderAccounts={false}
+        />,
+      );
+
+      const button = screen.queryByRole('button');
+
+      expect(button).not.toBeInTheDocument();
     });
   });
 });

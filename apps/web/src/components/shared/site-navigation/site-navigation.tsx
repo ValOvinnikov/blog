@@ -6,15 +6,17 @@ import {
   type INavItem,
   PrimaryNavigation,
 } from '@blog/ui/components/molecules/primary-navigation';
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
 import {
   AccountMenuGroup,
   type TAccountMenuGroupProps,
 } from '@web/components/shared/auth-menu';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { SESSION_STATUS } from '@web/constants/session';
 import { HeaderOverlayParent } from '@web/context/header-overlay-provider';
 import { useMobileNavToggle } from '@web/hooks/use-mobile-nav-toggle';
 import { usePublicPathname } from '@web/hooks/use-public-pathname';
+import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, useId, type ReactNode } from 'react';
 
@@ -27,6 +29,7 @@ type TSiteNavigationProps = {
   actions?: ReactNode;
   panelActions?: ReactNode;
   menuAccount?: Omit<TAccountMenuGroupProps, 'groupName'>;
+  hasReaderAccounts: boolean;
 };
 
 const isNavItemActive = (pathname: string, href: string): boolean => {
@@ -62,12 +65,14 @@ export const SiteNavigation = ({
   actions,
   panelActions,
   menuAccount,
+  hasReaderAccounts,
 }: TSiteNavigationProps) => {
   const t = useTranslations('siteNavigation');
   const pathname = usePublicPathname();
   const panelId = useId();
   const groupName = useId();
   const { open, toggle, close, containerRef } = useMobileNavToggle(panelId);
+  const { status } = useSession();
 
   const closeMenusLeftOpenByNavigation = useEffectEvent(() => {
     containerRef.current
@@ -84,8 +89,11 @@ export const SiteNavigation = ({
   }, [pathname]);
 
   const items = links.map((link) => toNavItem(pathname, link));
+  const hasMenuAccount =
+    !isUndefined(menuAccount) &&
+    (hasReaderAccounts || status === SESSION_STATUS.AUTHENTICATED);
   const hasMenuEntries =
-    hasArrayGotItems(items) || Boolean(panelActions) || Boolean(menuAccount);
+    hasArrayGotItems(items) || Boolean(panelActions) || hasMenuAccount;
 
   return (
     <div ref={containerRef} className={siteNavigationVariants()}>
@@ -116,7 +124,7 @@ export const SiteNavigation = ({
         {actions ? (
           <PrimaryNavigation.Actions>{actions}</PrimaryNavigation.Actions>
         ) : null}
-        {menuAccount && (
+        {hasMenuAccount && (
           <PrimaryNavigation.DrawerActions>
             <HeaderOverlayParent id={panelId}>
               <AccountMenuGroup {...menuAccount} groupName={groupName} />
