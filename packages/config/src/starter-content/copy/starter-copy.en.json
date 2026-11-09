@@ -13,6 +13,16 @@
     "metaTitle": "Blog — the latest posts from this site",
     "metaDescription": "Every post on this site, newest first. Edit this page’s Heading Block and SEO fields once you have real copy."
   },
+  "cookieStatement": {
+    "title": "Cookie statement",
+    "metaTitle": "Cookie statement — the cookies this site uses",
+    "metaDescription": "Which cookies and browser storage this site uses, what each is for, and how to change your choice.",
+    "intro": "This cookie statement explains which cookies and similar browser storage this site uses and why. It is placeholder text: replace it with your own statement before you rely on it.",
+    "listIntro": "The site uses the following cookies and browser storage:",
+    "preferencesLead": "You can change or withdraw your consent at any time: ",
+    "preferencesLink": "open the cookie preferences",
+    "preferencesTail": "."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Start here",

@@ -4,6 +4,7 @@ import { blockTestimonialSchema } from './blocks/testimonial/testimonial';
 import { tagSchema } from './blog/tag/tag';
 import { topicSchema } from './blog/topic/topic';
 import { linkSchema } from './link/link';
+import { cookieStatementPageSchema } from './pages/cookie-statement/cookie-statement';
 import { homePageSchema } from './pages/home/home';
 import { landingPageSchema } from './pages/landing/landing';
 import { legalDocumentPageSchema } from './pages/legal-document/legal-document';
@@ -53,6 +54,7 @@ export const documents = [
   tagPageSchema,
   privacyDocumentPageSchema,
   legalDocumentPageSchema,
+  cookieStatementPageSchema,
   redirectSchema,
   siteSettingsSchema,
   navigationSettingsSchema,

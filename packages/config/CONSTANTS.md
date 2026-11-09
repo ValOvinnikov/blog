@@ -215,6 +215,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **RELEASE_CHANGE**: `RENDERING`, `DB_MIGRATION`, `SANITY_MIGRATION`, `ENV`
 - **CONTRAST_CHECK_OUTCOME**: `PASS`, `FAIL`
 
+### `@blog/config/constants` — `packages/config/src/constants/sanity-document-action.ts`
+
+- **SANITY_DOCUMENT_ACTION**: `PUBLISH`=`"publish"`, `DISCARD_CHANGES`=`"discardChanges"`, `UNPUBLISH`=`"unpublish"`, `DUPLICATE`=`"duplicate"`, `DELETE`=`"delete"`
+
 ### `@blog/config/constants` — `packages/config/src/constants/sanity-project.ts`
 
 - **SANITY_PROJECT_DELETE_OUTCOME**: `DELETED`, `ALREADY_GONE`, `BLOCKED_BY_BILLING_PERMISSION`

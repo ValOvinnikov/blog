@@ -3108,6 +3108,46 @@
         "file": "packages/config/src/constants/release.ts"
       }
     ],
+    "publish": [
+      {
+        "ref": "SANITY_DOCUMENT_ACTION.PUBLISH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-document-action.ts"
+      }
+    ],
+    "discardChanges": [
+      {
+        "ref": "SANITY_DOCUMENT_ACTION.DISCARD_CHANGES",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-document-action.ts"
+      }
+    ],
+    "unpublish": [
+      {
+        "ref": "SANITY_DOCUMENT_ACTION.UNPUBLISH",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-document-action.ts"
+      }
+    ],
+    "duplicate": [
+      {
+        "ref": "SANITY_DOCUMENT_ACTION.DUPLICATE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-document-action.ts"
+      }
+    ],
+    "delete": [
+      {
+        "ref": "SANITY_DOCUMENT_ACTION.DELETE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-document-action.ts"
+      }
+    ],
     "ALREADY_GONE": [
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE",

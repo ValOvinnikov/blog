@@ -1,6 +1,10 @@
 import { faker } from '@faker-js/faker';
 
-import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  PORTABLE_TEXT_BLOCK_TYPE,
+  SITE_TYPE,
+} from '@blog/config/constants';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
 import { buildStarterDocuments, toStarterSiteType } from './starter-content';
@@ -21,6 +25,7 @@ const STARTER_SITE_TYPES = [
   SITE_TYPE.BLANK,
 ] as const;
 const LOCALES = Object.values(LOCALE_ISO_CODES);
+const COOKIE_STATEMENT_TYPE = 'page_cookieStatement';
 
 const build = (
   siteType: (typeof STARTER_SITE_TYPES)[number] = SITE_TYPE.BLANK,
@@ -71,6 +76,7 @@ describe(buildStarterDocuments, () => {
       'page_home',
       'template_postIndex',
       'page_postIndex',
+      'page_cookieStatement',
     ]);
   });
 
@@ -109,14 +115,68 @@ describe(buildStarterDocuments, () => {
   );
 
   it.each(STARTER_SITE_TYPES)(
-    '%s builds the same ids whatever the site name and locale',
+    '%s builds the same ids whatever the site name and locale, the cookie statement aside',
     (siteType) => {
       const [firstIds, secondIds] = [
         build(siteType, LOCALE_ISO_CODES.EN, MOCK_SITE_NAME),
         build(siteType, LOCALE_ISO_CODES.DE, MOCK_OTHER_SITE_NAME),
-      ].map((documents) => documents.map(({ _id }) => _id));
+      ].map((documents) =>
+        documents
+          .filter(({ _type }) => _type !== COOKIE_STATEMENT_TYPE)
+          .map(({ _id }) => _id),
+      );
 
       expect(firstIds).toEqual(secondIds);
+    },
+  );
+
+  it.each(LOCALES)(
+    'gives the %s cookie statement the same id on every site type',
+    (locale) => {
+      const ids = STARTER_SITE_TYPES.map(
+        (siteType) =>
+          findByType(build(siteType, locale), COOKIE_STATEMENT_TYPE)._id,
+      );
+
+      expect(new Set(ids).size).toBe(1);
+    },
+  );
+
+  it('gives each language its own cookie statement id', () => {
+    const ids = LOCALES.map(
+      (locale) =>
+        findByType(build(SITE_TYPE.BLANK, locale), COOKIE_STATEMENT_TYPE)._id,
+    );
+
+    expect(new Set(ids).size).toBe(LOCALES.length);
+  });
+
+  it.each(everyCombination)(
+    '%s in %s seeds a cookie statement with a cookie list and a cookie-preferences link',
+    (siteType, locale) => {
+      const { language, content = [] } = findByType(
+        build(siteType, locale),
+        COOKIE_STATEMENT_TYPE,
+      );
+      const preferencesLinks = content.flatMap((block) =>
+        block._type === 'block'
+          ? (block.children ?? []).filter(({ marks = [] }) =>
+              (block.markDefs ?? []).some(
+                ({ _key, _type }) =>
+                  _type === PORTABLE_TEXT_BLOCK_TYPE.COOKIE_PREFERENCES_LINK &&
+                  marks.includes(_key),
+              ),
+            )
+          : [],
+      );
+
+      expect(language).toBe(locale);
+      expect(
+        content.filter(
+          ({ _type }) => _type === PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST,
+        ),
+      ).toHaveLength(1);
+      expect(preferencesLinks).toHaveLength(1);
     },
   );
 

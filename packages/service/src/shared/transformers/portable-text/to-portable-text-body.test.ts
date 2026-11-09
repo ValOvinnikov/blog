@@ -20,6 +20,8 @@ import {
 faker.seed(6018);
 
 const MOCK_ASIDE_KEY = faker.string.uuid();
+const MOCK_SECTION_KEY = faker.string.uuid();
+const MOCK_SECTION_TITLE = faker.lorem.words(3);
 const MOCK_BLOCK_KEY = faker.string.uuid();
 const MOCK_MARK_KEY = faker.string.uuid();
 const MOCK_CODE_KEY = faker.string.uuid();
@@ -62,6 +64,15 @@ function mockRawAsideBlock(body: unknown) {
     _type: PORTABLE_TEXT_BLOCK_TYPE.ASIDE,
     _key: MOCK_ASIDE_KEY,
     kind: ASIDE_KIND.CONTEXT,
+    body,
+  };
+}
+
+function mockRawExpandableSectionBlock(body: unknown) {
+  return {
+    _type: PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION,
+    _key: MOCK_SECTION_KEY,
+    title: MOCK_SECTION_TITLE,
     body,
   };
 }
@@ -140,5 +151,31 @@ describe(toPortableTextBody, () => {
     ] as TRawPortableTextBody);
 
     expect(result).toEqual([mockRawAsideBlock(undefined)]);
+  });
+
+  it('resolves the blocks inside an expandable section in place, keeping its title', () => {
+    const result = toPortableTextBody([
+      MOCK_CODE_BLOCK,
+      mockRawExpandableSectionBlock([
+        mockRawLinkedBlock(),
+        MOCK_COOKIE_LIST_BLOCK,
+      ]),
+    ] as TRawPortableTextBody);
+
+    expect(result).toEqual([
+      MOCK_CODE_BLOCK,
+      {
+        ...mockRawExpandableSectionBlock(undefined),
+        body: [MOCK_RESOLVED_BLOCK, MOCK_COOKIE_LIST_BLOCK],
+      },
+    ]);
+  });
+
+  it('leaves the body of an expandable section with no blocks undefined', () => {
+    const result = toPortableTextBody([
+      mockRawExpandableSectionBlock(null),
+    ] as TRawPortableTextBody);
+
+    expect(result).toEqual([mockRawExpandableSectionBlock(undefined)]);
   });
 });

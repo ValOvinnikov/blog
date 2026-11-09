@@ -1,3 +1,4 @@
+import { cookieStatementPageSchema } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement';
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
 import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
 import { legalDocumentPageSchema } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document';
@@ -41,7 +42,10 @@ export const pagesSection: TStructureSection = {
     },
     {
       title: 'Legal',
-      items: [{ schema: legalDocumentPageSchema, mode: 'byLanguage' }],
+      items: [
+        { schema: legalDocumentPageSchema, mode: 'byLanguage' },
+        { schema: cookieStatementPageSchema, mode: 'onePerLanguage' },
+      ],
     },
   ],
 };

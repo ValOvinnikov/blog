@@ -13,6 +13,16 @@
     "metaTitle": "Blog — de nieuwste berichten op deze site",
     "metaDescription": "Alle berichten op deze site, de nieuwste eerst. Pas de kop en de SEO-velden van deze pagina aan zodra je echte tekst hebt."
   },
+  "cookieStatement": {
+    "title": "Cookieverklaring",
+    "metaTitle": "Cookieverklaring — de cookies die deze site gebruikt",
+    "metaDescription": "Welke cookies en browseropslag deze site gebruikt, waarvoor ze dienen en hoe je je keuze wijzigt.",
+    "intro": "Deze cookieverklaring legt uit welke cookies en vergelijkbare browseropslag deze site gebruikt en waarom. Dit is voorbeeldtekst: vervang hem door je eigen verklaring voordat je erop vertrouwt.",
+    "listIntro": "De site gebruikt de volgende cookies en browseropslag:",
+    "preferencesLead": "Je kunt je toestemming altijd wijzigen of intrekken: ",
+    "preferencesLink": "open de cookievoorkeuren",
+    "preferencesTail": "."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Begin hier",

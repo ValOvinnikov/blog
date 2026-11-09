@@ -5,6 +5,7 @@ import {
   LINK_TYPE,
 } from '@blog/config/constants';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
+import { PAGE_COOKIE_STATEMENT_TYPE } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_LEGAL_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
@@ -76,6 +77,7 @@ export const inlineLinkSchema = defineType({
         { type: PAGE_POST_INDEX_TYPE },
         { type: PAGE_PRIVACY_DOCUMENT_TYPE },
         { type: PAGE_LEGAL_DOCUMENT_TYPE },
+        { type: PAGE_COOKIE_STATEMENT_TYPE },
       ],
       hidden: ({ parent }) => !isLinkType(parent, LINK_TYPE.INTERNAL),
       validation: (rule) =>

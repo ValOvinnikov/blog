@@ -6,7 +6,9 @@ import {
 import type { TMaybeUndefined } from '@blog/config/types';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
+import { templateIdFor } from '@blog/studio/structure/locales/template-id-for';
 import { createPageTreeResolver } from '@blog/studio/structure/page-tree/page-tree';
+import { hasLength, isUndefined } from '@blog/utils/primitives';
 import type { ComponentType } from 'react';
 import { getPublishedId, type SchemaTypeDefinition } from 'sanity';
 import type {
@@ -44,7 +46,7 @@ const requireSchemaField = <TValue>(
   schemaName: string,
   field: string,
 ): TValue => {
-  if (value === undefined) {
+  if (isUndefined(value)) {
     throw new Error(
       `Studio desk schema "${schemaName}" has no "${field}" — every desk entry needs one.`,
     );
@@ -59,9 +61,6 @@ type TPageItem = {
   title: string;
   icon: TStructureSchema['icon'];
 };
-
-const templateIdFor = (name: string, locale: TLocaleIsoCode) =>
-  `${name}-${locale}`;
 
 const topLevelOnly = (filter: string) => `${filter} && !defined(parent)`;
 
@@ -246,7 +245,7 @@ const buildGroupedListItems = (
   locales: readonly TLocaleIsoCode[],
 ): (ListItemBuilder | TDividerBuilder)[] =>
   groups
-    .filter((group) => group.items.length > 0)
+    .filter((group) => hasLength(group.items))
     .flatMap((group) => [
       ...(group.title
         ? [S.divider().title(group.title)]
