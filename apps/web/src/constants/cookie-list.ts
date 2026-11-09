@@ -31,7 +31,7 @@ export const COOKIE_ID = {
   THEME: 'THEME',
 } as const;
 
-export type TCookieId = TValueOf<typeof COOKIE_ID>;
+type TCookieId = TValueOf<typeof COOKIE_ID>;
 
 export interface ICookieListEntry {
   id: TCookieId;
