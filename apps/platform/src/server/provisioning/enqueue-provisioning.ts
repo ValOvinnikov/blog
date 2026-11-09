@@ -1,4 +1,5 @@
 import { HTTP_METHOD, type TMaybeNull } from '@blog/config';
+import type { TLocaleIsoCode } from '@blog/config/constants';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { env } from '@platform/utils/env/env';
@@ -13,6 +14,7 @@ type TWorkerRequestBody = {
   tenantId: string;
   formerOwnerEmail?: string;
   domain?: string;
+  locales?: TLocaleIsoCode[];
 };
 
 /** Never throws: a missing worker URL or secret, or a network failure, is logged and returns `null`; any response returns its status. */

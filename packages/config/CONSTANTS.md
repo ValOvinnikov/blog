@@ -357,6 +357,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CONTROL_MODE**: `EDITABLE`, `READ_ONLY`, `DISABLED`
 
+### `@platform/constants/cookie-statement` — `apps/platform/src/constants/cookie-statement.ts`
+
+- **COOKIE_STATEMENT_PATH**: `SEED`=`"/api/cookie-statement/seed"`
+- **COOKIE_STATEMENT_LOG**: `SEED_ENQUEUE_REJECTED`=`"cookie_statement.seed_enqueue_rejected"`
+
 ### `@platform/constants/create-site-gate` — `apps/platform/src/constants/create-site-gate.ts`
 
 - **CREATE_SITE_GATE_LOG**: `ALERT_FAILED`=`"create_site_gate.alert_failed"`, `ALERT_NO_RECIPIENTS`=`"create_site_gate.alert_no_recipients"`, `ALERT_SEND_FAILED`=`"create_site_gate.alert_send_failed"`, `BLOCKED`=`"create_site_gate.blocked"`, `BLOCK_CHECK_FAILED`=`"create_site_gate.block_check_failed"`, `GLOBAL_LIMITED`=`"create_site_gate.global_limited"`, `IP_LIMITED`=`"create_site_gate.ip_limited"`

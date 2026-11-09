@@ -13,6 +13,7 @@ import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { auth } from '@platform/server/auth/auth';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { enqueueCookieStatementSeed } from '@platform/server/cookie-statement/enqueue-cookie-statement-seed';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   MOCK_OPERATOR_EMAIL,
@@ -34,6 +35,8 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/site-config/revalidate-site-config');
 
+vi.mock('@platform/server/cookie-statement/enqueue-cookie-statement-seed');
+
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: { setTenantAdditionalLocales: vi.fn() },
@@ -53,7 +56,7 @@ const setTenantAdditionalLocalesMock = vi.mocked(
 const authMock = vi.mocked<() => Promise<Session | null>>(auth);
 const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
 
-const { NL, FR } = LOCALE_ISO_CODES;
+const { EN, NL, FR } = LOCALE_ISO_CODES;
 
 describe(updateTenantLanguagesAction, () => {
   beforeEach(() => {
@@ -91,6 +94,18 @@ describe(updateTenantLanguagesAction, () => {
     expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
+  it('asks for the cookie statement in the default and every saved language', async () => {
+    setTenantAdditionalLocalesMock.mockResolvedValueOnce(okResult([NL, FR]));
+
+    await updateTenantLanguagesAction(MOCK_TENANT_ID, [NL, FR]);
+
+    expect(enqueueCookieStatementSeed).toHaveBeenCalledWith(MOCK_TENANT_ID, [
+      EN,
+      NL,
+      FR,
+    ]);
+  });
+
   it('rejects a language outside the supported list without saving', async () => {
     const result = await updateTenantLanguagesAction(MOCK_TENANT_ID, [
       MOCK_UNSUPPORTED_LOCALE,
@@ -118,6 +133,7 @@ describe(updateTenantLanguagesAction, () => {
     });
     expect(insertAuditEventMock).not.toHaveBeenCalled();
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
+    expect(enqueueCookieStatementSeed).not.toHaveBeenCalled();
     expect(logger.warn).toHaveBeenCalledWith(
       TENANT_LOG.UPDATE_LANGUAGES_REJECTED,
       {
