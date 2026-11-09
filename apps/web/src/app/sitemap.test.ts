@@ -60,6 +60,8 @@ const NL_BLOG_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}${routes.blogIndex()}`;
 const TOPICS_URL = `${MOCK_TENANT_BASE_URL}${routes.topics()}`;
 const NL_TOPICS_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}${routes.topics()}`;
 const TAGS_URL = `${MOCK_TENANT_BASE_URL}${routes.tags()}`;
+const COOKIE_STATEMENT_URL = `${MOCK_TENANT_BASE_URL}${routes.cookieStatement()}`;
+const NL_COOKIE_STATEMENT_URL = `${MOCK_TENANT_BASE_URL}${NL_PREFIX}${routes.cookieStatement()}`;
 
 const toUrl = (path: string, prefix = '') =>
   `${MOCK_TENANT_BASE_URL}${prefix}${path}`;
@@ -509,6 +511,34 @@ describe(sitemap, () => {
       expect(urls).not.toContain(toUrl(routes.blogIndex(), DE_PREFIX));
     });
 
+    it('lists each live cookie statement with every live cookie statement as an alternate', async () => {
+      getTranslationMap.mockResolvedValue(
+        okResult(
+          mockTranslationMap({ cookieStatementLanguages: [EN, NL, DE] }),
+        ),
+      );
+      const cookieStatementAlternates = toAlternates(
+        [
+          [EN, COOKIE_STATEMENT_URL],
+          [NL, NL_COOKIE_STATEMENT_URL],
+        ],
+        COOKIE_STATEMENT_URL,
+      );
+
+      const entries = await sitemap();
+      const urls = entries.map(({ url }) => url);
+
+      expect(entries).toContainEqual({
+        url: COOKIE_STATEMENT_URL,
+        alternates: { languages: cookieStatementAlternates },
+      });
+      expect(entries).toContainEqual({
+        url: NL_COOKIE_STATEMENT_URL,
+        alternates: { languages: cookieStatementAlternates },
+      });
+      expect(urls).not.toContain(toUrl(routes.cookieStatement(), DE_PREFIX));
+    });
+
     it('lists only the languages that have each list page', async () => {
       getTranslationMap.mockResolvedValue(
         okResult(
@@ -529,6 +559,7 @@ describe(sitemap, () => {
       expect(urls).not.toContain(TOPICS_URL);
       expect(urls).not.toContain(TAGS_URL);
       expect(urls).not.toContain(toUrl(routes.tags(), NL_PREFIX));
+      expect(urls).not.toContain(COOKIE_STATEMENT_URL);
     });
   });
 
