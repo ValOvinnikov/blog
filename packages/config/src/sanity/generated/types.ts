@@ -554,11 +554,25 @@ export type Page_postIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_postIndex';
 };
 
+export type Page_privacyIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_privacyIndex';
+};
+
 export type Page_privacyDocumentReference = {
   _ref: string;
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
+};
+
+export type Page_legalIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
 };
 
 export type Page_legalDocumentReference = {
@@ -585,7 +599,9 @@ export type InlineLink = {
     | Blog_topicReference
     | Page_landingReference
     | Page_postIndexReference
+    | Page_privacyIndexReference
     | Page_privacyDocumentReference
+    | Page_legalIndexReference
     | Page_legalDocumentReference
     | Page_cookieStatementReference;
   url?: string;
@@ -1393,6 +1409,8 @@ export type InternationalizedArrayReferenceValue = {
     | Page_postIndexReference
     | Page_topicIndexReference
     | Page_tagIndexReference
+    | Page_privacyIndexReference
+    | Page_legalIndexReference
     | Page_cookieStatementReference
     | Page_landingReference
     | Page_postReference
@@ -1747,7 +1765,9 @@ export type Link = {
     | Page_topicIndexReference
     | Page_tagReference
     | Page_tagIndexReference
+    | Page_privacyIndexReference
     | Page_privacyDocumentReference
+    | Page_legalIndexReference
     | Page_legalDocumentReference
     | Page_cookieStatementReference;
   url?: InternationalizedArrayString;
@@ -1786,6 +1806,103 @@ export type Slug = {
   source?: string;
 };
 
+export type Template_legalIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'template_legalIndex';
+};
+
+export type Page_legalIndex = {
+  _id: string;
+  _type: 'page_legalIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  title?: string;
+  headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
+  template?: Template_legalIndexReference;
+  seo?: Seo;
+};
+
+export type Module_sectionPagesReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_sectionPages';
+};
+
+export type Template_legalIndex = {
+  _id: string;
+  _type: 'template_legalIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  hero?:
+    | Module_heroBlogReference
+    | Module_heroProfileReference
+    | Module_heroStatementReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_featureHighlightsReference)
+    | ({
+        _key: string;
+      } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_sectionPagesReference)
+    | ({
+        _key: string;
+      } & Module_timelineReference)
+    | ({
+        _key: string;
+      } & Module_logoWallReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_contactFormReference)
+    | ({
+        _key: string;
+      } & Module_cookieSettingsReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
+  >;
+};
+
 export type Page_privacyDocument = {
   _id: string;
   _type: 'page_privacyDocument';
@@ -1798,6 +1915,96 @@ export type Page_privacyDocument = {
   kind?: 'PRIVACY_POLICY' | 'OTHER';
   content?: ArticleText;
   seo?: Seo;
+};
+
+export type Template_privacyIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'template_privacyIndex';
+};
+
+export type Page_privacyIndex = {
+  _id: string;
+  _type: 'page_privacyIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  title?: string;
+  headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
+  template?: Template_privacyIndexReference;
+  seo?: Seo;
+};
+
+export type Template_privacyIndex = {
+  _id: string;
+  _type: 'template_privacyIndex';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  hero?:
+    | Module_heroBlogReference
+    | Module_heroProfileReference
+    | Module_heroStatementReference;
+  modules?: Array<
+    | ({
+        _key: string;
+      } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_faqReference)
+    | ({
+        _key: string;
+      } & Module_featureHighlightsReference)
+    | ({
+        _key: string;
+      } & Module_featureListReference)
+    | ({
+        _key: string;
+      } & Module_sectionPagesReference)
+    | ({
+        _key: string;
+      } & Module_timelineReference)
+    | ({
+        _key: string;
+      } & Module_logoWallReference)
+    | ({
+        _key: string;
+      } & Module_statsReference)
+    | ({
+        _key: string;
+      } & Module_teamReference)
+    | ({
+        _key: string;
+      } & Module_testimonialReference)
+    | ({
+        _key: string;
+      } & Module_ctaReference)
+    | ({
+        _key: string;
+      } & Module_contactFormReference)
+    | ({
+        _key: string;
+      } & Module_cookieSettingsReference)
+    | ({
+        _key: string;
+      } & Module_newsletterReference)
+    | ({
+        _key: string;
+      } & Module_pricingReference)
+    | ({
+        _key: string;
+      } & Module_postFeaturedReference)
+    | ({
+        _key: string;
+      } & Module_postLatestReference)
+    | ({
+        _key: string;
+      } & Module_taxonomyListReference)
+  >;
 };
 
 export type Template_tagIndexReference = {
@@ -2135,13 +2342,6 @@ export type Page_landing = {
   seo?: Seo;
 };
 
-export type Module_sectionPagesReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'module_sectionPages';
-};
-
 export type Template_landing = {
   _id: string;
   _type: 'template_landing';
@@ -2434,7 +2634,9 @@ export type AllSanitySchemaTypes =
   | Blog_topicReference
   | Page_landingReference
   | Page_postIndexReference
+  | Page_privacyIndexReference
   | Page_privacyDocumentReference
+  | Page_legalIndexReference
   | Page_legalDocumentReference
   | Page_cookieStatementReference
   | InlineLink
@@ -2527,7 +2729,14 @@ export type AllSanitySchemaTypes =
   | Page_cookieStatement
   | Page_legalDocument
   | Slug
+  | Template_legalIndexReference
+  | Page_legalIndex
+  | Module_sectionPagesReference
+  | Template_legalIndex
   | Page_privacyDocument
+  | Template_privacyIndexReference
+  | Page_privacyIndex
+  | Template_privacyIndex
   | Template_tagIndexReference
   | Page_tagIndex
   | Template_tagIndex
@@ -2549,7 +2758,6 @@ export type AllSanitySchemaTypes =
   | Template_postIndex
   | Template_landingReference
   | Page_landing
-  | Module_sectionPagesReference
   | Template_landing
   | Module_heroStatement
   | Module_heroProfile

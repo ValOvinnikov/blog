@@ -23,6 +23,21 @@
     "preferencesLink": "open the cookie preferences",
     "preferencesTail": "."
   },
+  "privacyIndex": {
+    "title": "Privacy",
+    "heading": "Privacy",
+    "supportingText": "How this site handles your personal data.",
+    "metaTitle": "Privacy — how this site handles your data",
+    "metaDescription": "The privacy policy and other privacy information for this site. Replace this placeholder page with your own once you have real copy."
+  },
+  "legalIndex": {
+    "title": "Legal",
+    "heading": "Legal",
+    "supportingText": "The terms, notices and statements that apply to this site.",
+    "metaTitle": "Legal — the terms and notices for this site",
+    "metaDescription": "The terms, the imprint, the cookie statement and other legal information for this site.",
+    "intro": "This page lists the legal pages of this site. It is placeholder text: replace it with your own before you rely on it."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Start here",

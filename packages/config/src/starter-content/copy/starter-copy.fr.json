@@ -23,6 +23,21 @@
     "preferencesLink": "ouvrez les préférences de cookies",
     "preferencesTail": "."
   },
+  "privacyIndex": {
+    "title": "Confidentialité",
+    "heading": "Confidentialité",
+    "supportingText": "Comment ce site traite vos données personnelles.",
+    "metaTitle": "Confidentialité — comment ce site traite vos données",
+    "metaDescription": "La politique de confidentialité et les autres informations sur la vie privée de ce site. Remplacez cette page d’exemple par votre propre texte."
+  },
+  "legalIndex": {
+    "title": "Mentions légales",
+    "heading": "Mentions légales",
+    "supportingText": "Les conditions, mentions et déclarations qui s’appliquent à ce site.",
+    "metaTitle": "Mentions légales — les conditions de ce site",
+    "metaDescription": "Les conditions, les mentions légales, la déclaration relative aux cookies et les autres informations juridiques de ce site.",
+    "intro": "Cette page liste les pages juridiques de ce site. Il s’agit d’un texte d’exemple : remplacez-le par le vôtre avant de vous y fier."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Commencez ici",

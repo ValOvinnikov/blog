@@ -77,6 +77,12 @@ describe(buildStarterDocuments, () => {
       'template_postIndex',
       'page_postIndex',
       'page_cookieStatement',
+      'template_privacyIndex',
+      'page_privacyIndex',
+      'link',
+      'module_content',
+      'template_legalIndex',
+      'page_legalIndex',
     ]);
   });
 
@@ -177,6 +183,32 @@ describe(buildStarterDocuments, () => {
         ),
       ).toHaveLength(1);
       expect(preferencesLinks).toHaveLength(1);
+    },
+  );
+
+  it.each(everyCombination)(
+    '%s in %s seeds a legal hub whose modules link the cookie statement',
+    (siteType, locale) => {
+      const documents = build(siteType, locale);
+      const byId = (id?: string) => documents.find(({ _id }) => _id === id);
+      const { template } = findByType(documents, 'page_legalIndex');
+      const legalTemplate = byId(template._ref);
+      const linkedIds = referencedIds(
+        legalTemplate && 'modules' in legalTemplate
+          ? (legalTemplate.modules ?? []).flatMap(({ _ref }) => {
+              const module = byId(_ref);
+              return module ? [module] : [];
+            })
+          : [],
+      );
+      const linkTargets = linkedIds.flatMap((id) => {
+        const link = byId(id);
+        return link && 'internalReference' in link
+          ? [byId(link.internalReference?._ref)?._type]
+          : [];
+      });
+
+      expect(linkTargets).toEqual([COOKIE_STATEMENT_TYPE]);
     },
   );
 

@@ -23,6 +23,21 @@
     "preferencesLink": "abre las preferencias de cookies",
     "preferencesTail": "."
   },
+  "privacyIndex": {
+    "title": "Privacidad",
+    "heading": "Privacidad",
+    "supportingText": "Cómo trata este sitio tus datos personales.",
+    "metaTitle": "Privacidad — cómo trata este sitio tus datos",
+    "metaDescription": "La política de privacidad y otra información sobre privacidad de este sitio. Sustituye esta página de ejemplo por tu propio texto cuando lo tengas."
+  },
+  "legalIndex": {
+    "title": "Legal",
+    "heading": "Legal",
+    "supportingText": "Las condiciones, avisos y declaraciones que se aplican a este sitio.",
+    "metaTitle": "Legal — las condiciones y avisos de este sitio",
+    "metaDescription": "Las condiciones, el aviso legal, la declaración de cookies y otra información legal de este sitio.",
+    "intro": "Esta página reúne las páginas legales de este sitio. Es un texto de ejemplo: sustitúyelo por el tuyo antes de confiar en él."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Empieza aquí",

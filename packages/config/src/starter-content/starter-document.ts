@@ -15,8 +15,10 @@ import type {
   Page_cookieStatement,
   Page_home,
   Page_landing,
+  Page_legalIndex,
   Page_post,
   Page_postIndex,
+  Page_privacyIndex,
   Page_tagIndex,
   Page_topic,
   Page_topicIndex,
@@ -26,7 +28,9 @@ import type {
   Settings_site,
   Template_home,
   Template_landing,
+  Template_legalIndex,
   Template_postIndex,
+  Template_privacyIndex,
   Template_tagIndex,
   Template_topic,
   Template_topicIndex,
@@ -47,7 +51,9 @@ export type TStarterPage<
     | Page_landing
     | Page_topicIndex
     | Page_tagIndex
-    | Page_topic,
+    | Page_topic
+    | Page_privacyIndex
+    | Page_legalIndex,
 > = TStarterDocument<TPage, 'title' | 'headingBlock' | 'template' | 'seo'>;
 
 export type TStarterModule<
@@ -78,6 +84,10 @@ export type TStarterDocumentUnion =
   | TStarterDocument<Template_postIndex, 'title'>
   | TStarterPage<Page_postIndex>
   | TStarterDocument<Page_cookieStatement, 'title' | 'content' | 'seo'>
+  | TStarterDocument<Template_privacyIndex, 'title'>
+  | TStarterPage<Page_privacyIndex>
+  | TStarterDocument<Template_legalIndex, 'title'>
+  | TStarterPage<Page_legalIndex>
   | TStarterDocument<Template_landing, 'title'>
   | TStarterPage<Page_landing>
   | TStarterDocument<Template_topicIndex, 'title'>

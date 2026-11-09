@@ -13,6 +13,8 @@ const MOCK_RESERVED_CHARACTER_TOKEN = 'a b&c=d';
 const MOCK_CURRENT_PATH = '/nl/over ons';
 const NEWSLETTER_UNSUBSCRIBE_PATH = '/api/newsletter/unsubscribe';
 const COOKIE_STATEMENT_PATH = '/legal/cookie-statement';
+const PRIVACY_INDEX_PATH = '/privacy';
+const LEGAL_INDEX_PATH = '/legal';
 
 describe('routes', () => {
   it.each([
@@ -24,6 +26,7 @@ describe('routes', () => {
     ['account data-export', routes.accountExport(), '/api/account/export'],
     ['site-wide RSS feed', routes.rssFeed(), '/rss.xml'],
     ['cookie statement', routes.cookieStatement(), COOKIE_STATEMENT_PATH],
+    ['legal hub', routes.legal(), LEGAL_INDEX_PATH],
   ])('builds the %s path', (_route, path, expected) => {
     expect(path).toBe(expected);
   });
@@ -124,6 +127,8 @@ describe(pageHref, () => {
     ['page_topicIndex', '/topics'],
     ['page_tagIndex', '/tags'],
     ['page_cookieStatement', COOKIE_STATEMENT_PATH],
+    ['page_privacyIndex', PRIVACY_INDEX_PATH],
+    ['page_legalIndex', LEGAL_INDEX_PATH],
   ])('builds the static path of %s', (type, expected) => {
     expect(pageHref(type)).toBe(expected);
   });

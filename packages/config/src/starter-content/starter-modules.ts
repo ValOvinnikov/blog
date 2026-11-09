@@ -1,4 +1,5 @@
 import type {
+  ArticleText,
   Module_content,
   Module_cta,
   Module_heroProfile,
@@ -15,7 +16,7 @@ import {
 
 import type { TStarterDocument, TStarterModule } from './starter-document';
 import {
-  localizedArticleText,
+  localizedArticleBlocks,
   localizedString,
   moduleHeadingBlock,
   reference,
@@ -66,13 +67,13 @@ export function buildContentModule({
   title,
   locale,
   body,
-}: TModuleInput & { body: readonly string[] }): TStarterModule<Module_content> {
+}: TModuleInput & { body: ArticleText }): TStarterModule<Module_content> {
   return {
     _id: id,
     _type: 'module_content',
     title,
     brandVariant: BRAND_VARIANT.PRIMARY,
-    body: localizedArticleText(locale, body),
+    body: localizedArticleBlocks(locale, body),
   };
 }
 

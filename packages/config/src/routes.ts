@@ -47,6 +47,7 @@ export const routes = {
   cookieStatement: () => routes.legalDocument(COOKIE_STATEMENT_SLUG),
   terms: () => '/terms',
   privacy: () => '/privacy',
+  legal: () => '/legal',
   switchLanguage: (to: string, from: string) =>
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
   rssFeed: () => '/rss.xml',
@@ -62,8 +63,10 @@ const PAGE_HREF_BUILDERS = {
   page_topicIndex: () => routes.topics(),
   page_tag: (slug) => (slug ? routes.tag(slug) : undefined),
   page_tagIndex: () => routes.tags(),
+  page_privacyIndex: () => routes.privacy(),
   page_privacyDocument: (slug) =>
     slug ? routes.privacyDocument(slug) : undefined,
+  page_legalIndex: () => routes.legal(),
   page_legalDocument: (slug) => (slug ? routes.legalDocument(slug) : undefined),
   page_cookieStatement: () => routes.cookieStatement(),
 } satisfies Record<

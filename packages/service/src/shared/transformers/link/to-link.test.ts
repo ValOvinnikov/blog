@@ -77,6 +77,8 @@ describe(toLink, () => {
       slug: null,
       href: routes.cookieStatement(),
     },
+    { _type: 'page_privacyIndex', slug: null, href: routes.privacy() },
+    { _type: 'page_legalIndex', slug: null, href: routes.legal() },
   ] as const)(
     'resolves an internal $_type reference to its route',
     ({ _type, slug, href }) => {

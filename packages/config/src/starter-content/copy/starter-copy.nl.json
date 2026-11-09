@@ -23,6 +23,21 @@
     "preferencesLink": "open de cookievoorkeuren",
     "preferencesTail": "."
   },
+  "privacyIndex": {
+    "title": "Privacy",
+    "heading": "Privacy",
+    "supportingText": "Hoe deze site met je persoonsgegevens omgaat.",
+    "metaTitle": "Privacy — hoe deze site met je gegevens omgaat",
+    "metaDescription": "Het privacybeleid en andere privacy-informatie van deze site. Vervang deze voorbeeldpagina door je eigen tekst zodra je die hebt."
+  },
+  "legalIndex": {
+    "title": "Juridisch",
+    "heading": "Juridisch",
+    "supportingText": "De voorwaarden, vermeldingen en verklaringen die voor deze site gelden.",
+    "metaTitle": "Juridisch — de voorwaarden en vermeldingen van deze site",
+    "metaDescription": "De voorwaarden, het colofon, de cookieverklaring en andere juridische informatie van deze site.",
+    "intro": "Deze pagina toont de juridische pagina's van deze site. Dit is voorbeeldtekst: vervang hem door je eigen tekst voordat je erop vertrouwt."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Begin hier",
