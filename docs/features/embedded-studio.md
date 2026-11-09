@@ -146,6 +146,12 @@ module types whose capability is off for the tenant carry a warning.
   it.
 - `apps/platform` reaches Sanity only through `StudioMount`. ESLint bans
   `sanity`, `next-sanity`, `@sanity/*`, `groqd` and `@blog/service` there.
+- **The Studio renders only in the browser.** `PlatformStudioMount` loads
+  `StudioMount` with `next/dynamic` and `ssr: false`, because Sanity Studio
+  cannot render on the server: a full page load would otherwise show Sanity's
+  error screen until hydration. Until it loads, the Studio slot shows a
+  centred `Spinner` labelled "Loading Studio" (`studioPage.loading`), which
+  screen readers announce as a status.
 - `StudioMount` fills its parent (`height: 100%`) instead of `NextStudio`'s
   `100vh` and adds no global styles of its own. The Studio's Inter
   `@font-face` stays loaded on every platform route after one visit.
