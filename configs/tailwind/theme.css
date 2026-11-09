@@ -569,7 +569,7 @@
 }
 
 /* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
-   brand-primary text on it holds ~4.05:1 / ~4.40:1. */
+   brand-primary-hover text on it holds ≥5.86:1 / ≥5.11:1 across hues. */
 @utility surface-brand-primary {
   --ambient: var(--brand-primary-muted);
   --divider: var(--border-strong);
