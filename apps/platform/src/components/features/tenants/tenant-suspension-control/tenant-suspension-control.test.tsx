@@ -95,7 +95,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       const descriptionField = screen.getByRole('textbox', {
         name: caseFields.descriptionLabel,
       });
-      await user.type(descriptionField, MOCK_SUSPENSION_DESCRIPTION);
+      await user.click(descriptionField);
+      await user.paste(MOCK_SUSPENSION_DESCRIPTION);
     };
 
     const fillSuspensionCase = async () => {
@@ -107,7 +108,8 @@ describe(`<${TenantSuspensionControl.name}/>`, () => {
       const reasonField = screen.getByRole('textbox', {
         name: blockOwner.reasonLabel,
       });
-      await user.type(reasonField, MOCK_BLOCK_REASON);
+      await user.click(reasonField);
+      await user.paste(MOCK_BLOCK_REASON);
     };
 
     beforeEach(async () => {
