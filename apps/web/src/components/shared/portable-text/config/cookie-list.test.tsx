@@ -11,30 +11,50 @@ import { NextIntlClientProvider } from 'next-intl';
 import { CookieList } from './cookie-list';
 
 const NL_MESSAGES = SITE_MESSAGES_BY_LOCALE.NL;
+const { ariaLabel, cookies, intro, analyticsNote } = SITE_MESSAGES.cookieList;
 
 const getCookieRow = (name: string) =>
   screen.getByRole('row', {
     name: (accessibleName) => accessibleName.startsWith(`${name} `),
   });
 
+const getStackedEntries = () =>
+  within(screen.getByRole('list', { name: ariaLabel })).getAllByRole(
+    'listitem',
+  );
+
 describe(`<${CookieList.name}/>`, () => {
   it.each(COOKIE_LIST)(
-    'lists $name with its provider, purpose, duration and category',
+    'lists $name in the table with its purpose and duration',
     ({ id, name }) => {
       renderElement(<CookieList />);
 
       const row = within(getCookieRow(name));
-      const { purpose, duration } = SITE_MESSAGES.cookieList.cookies[id];
-      expect(
-        row.getByText(SITE_MESSAGES.cookieList.providers.site),
-      ).toBeVisible();
+      const { purpose, duration } = cookies[id];
       expect(row.getByText(purpose)).toBeVisible();
       expect(row.getByText(duration)).toBeVisible();
-      expect(
-        row.getByText(SITE_MESSAGES.consent.categories.necessary.label),
-      ).toBeVisible();
     },
   );
+
+  it.each(COOKIE_LIST.map((entry, index) => ({ ...entry, index })))(
+    'stacks $name with its purpose and duration',
+    ({ id, name, index }) => {
+      renderElement(<CookieList />);
+
+      const entry = getStackedEntries()[index];
+      const { purpose, duration } = cookies[id];
+      expect(entry).toHaveTextContent(name);
+      expect(entry).toHaveTextContent(purpose);
+      expect(entry).toHaveTextContent(duration);
+    },
+  );
+
+  it('says every item is set by this site and strictly necessary', () => {
+    renderElement(<CookieList />);
+
+    const sentence = screen.getByText(intro);
+    expect(sentence).toBeVisible();
+  });
 
   it('renders the list in the page language', () => {
     renderElement(
@@ -49,8 +69,10 @@ describe(`<${CookieList.name}/>`, () => {
     const table = screen.getByRole('region', {
       name: NL_MESSAGES.cookieList.ariaLabel,
     });
+    const sentence = screen.getByText(NL_MESSAGES.cookieList.intro);
     const row = within(getCookieRow(LANGUAGE_COOKIE_NAME));
     expect(table).toBeVisible();
+    expect(sentence).toBeVisible();
     expect(
       row.getByText(NL_MESSAGES.cookieList.cookies[COOKIE_ID.LANGUAGE].purpose),
     ).toBeVisible();
@@ -59,7 +81,7 @@ describe(`<${CookieList.name}/>`, () => {
   it('shows the analytics note below the list', () => {
     renderElement(<CookieList />);
 
-    const note = screen.getByText(SITE_MESSAGES.cookieList.analyticsNote);
+    const note = screen.getByText(analyticsNote);
     expect(note).toBeVisible();
   });
 });

@@ -337,15 +337,11 @@
   },
   "cookieList": {
     "ariaLabel": "Cookies und Browserspeicher",
+    "intro": "Alles Folgende setzt diese Website selbst, und es ist unbedingt erforderlich.",
     "columns": {
       "name": "Name",
-      "provider": "Anbieter",
       "purpose": "Zweck",
-      "duration": "Speicherdauer",
-      "category": "Kategorie"
-    },
-    "providers": {
-      "site": "Diese Website"
+      "duration": "Speicherdauer"
     },
     "cookies": {
       "CONSENT": {
