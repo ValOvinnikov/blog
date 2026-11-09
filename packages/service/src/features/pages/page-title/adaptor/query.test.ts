@@ -13,6 +13,10 @@ const MOCK_PRIVACY_ID = 'privacy-policy-nl';
 const MOCK_PRIVACY_TITLE = 'Privacybeleid';
 const MOCK_LEGAL_ID = 'terms-en';
 const MOCK_LEGAL_TITLE = 'Terms';
+const MOCK_PRIVACY_INDEX_ID = 'privacy-index-en';
+const MOCK_PRIVACY_INDEX_TITLE = 'Privacy';
+const MOCK_LEGAL_INDEX_ID = 'legal-index-nl';
+const MOCK_LEGAL_INDEX_TITLE = 'Juridisch';
 const MOCK_COOKIE_STATEMENT_ID = 'cookie-statement-nl';
 const MOCK_COOKIE_STATEMENT_TITLE = 'Cookieverklaring';
 
@@ -35,6 +39,18 @@ const dataset = [
     _type: 'page_legalDocument',
     language: EN,
     title: MOCK_LEGAL_TITLE,
+  },
+  {
+    _id: MOCK_PRIVACY_INDEX_ID,
+    _type: 'page_privacyIndex',
+    language: EN,
+    title: MOCK_PRIVACY_INDEX_TITLE,
+  },
+  {
+    _id: MOCK_LEGAL_INDEX_ID,
+    _type: 'page_legalIndex',
+    language: NL,
+    title: MOCK_LEGAL_INDEX_TITLE,
   },
   {
     _id: MOCK_COOKIE_STATEMENT_ID,
@@ -61,6 +77,8 @@ describe('pageTitleQuery', () => {
   });
 
   it.each([
+    ['privacy hub', MOCK_PRIVACY_INDEX_ID, EN, MOCK_PRIVACY_INDEX_TITLE],
+    ['legal hub', MOCK_LEGAL_INDEX_ID, NL, MOCK_LEGAL_INDEX_TITLE],
     ['privacy document', MOCK_PRIVACY_ID, NL, MOCK_PRIVACY_TITLE],
     ['legal document', MOCK_LEGAL_ID, EN, MOCK_LEGAL_TITLE],
     [

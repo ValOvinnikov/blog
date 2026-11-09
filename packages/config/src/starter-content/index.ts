@@ -1,4 +1,5 @@
 export {
+  buildStarterCookieStatement,
   buildStarterDocuments,
   STARTER_PRESET_BY_SITE_TYPE,
   STARTER_TEMPLATE_VERSION,

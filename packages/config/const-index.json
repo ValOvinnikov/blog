@@ -2904,6 +2904,14 @@
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
+    "table": [
+      {
+        "ref": "PORTABLE_TEXT_BLOCK_TYPE.TABLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/portable-text-block-type.ts"
+      }
+    ],
     "CONSOLE": [
       {
         "ref": "PRESET_ID.CONSOLE",
@@ -8282,6 +8290,22 @@
         "scope": "app:web",
         "from": "@web/constants/tenant-write",
         "file": "apps/web/src/constants/tenant-write.ts"
+      }
+    ],
+    "cookie_statement.seed_start_failed": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.SEED_START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/cookie-statement",
+        "file": "apps/worker/src/constants/cookie-statement.ts"
+      }
+    ],
+    "cookie_statement.seed_failed": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.SEED_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/cookie-statement",
+        "file": "apps/worker/src/constants/cookie-statement.ts"
       }
     ],
     "custom_domain.connect_start_failed": [

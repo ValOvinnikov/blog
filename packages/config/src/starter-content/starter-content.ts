@@ -11,6 +11,7 @@ import {
 
 import { buildBaseDocuments } from './base-documents';
 import { buildBlogDocuments } from './blog-documents';
+import { buildCookieStatementDocument } from './cookie-statement-document';
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
 import { buildDocsDocuments } from './docs-documents';
 import { buildPersonalDocuments } from './personal-documents';
@@ -86,4 +87,11 @@ export function buildStarterDocuments({
   ...input
 }: TStarterInput & { siteType: TStarterSiteType }): TStarterDocumentUnion[] {
   return BUILD_BY_SITE_TYPE[siteType](input);
+}
+
+export function buildStarterCookieStatement(locale: TLocaleIsoCode) {
+  return buildCookieStatementDocument(
+    locale,
+    STARTER_COPY_BY_LOCALE[locale].cookieStatement,
+  );
 }

@@ -5,7 +5,6 @@ import type {
   TLocaleIsoCode,
   TSanityLoginProvider,
 } from '@blog/config/constants';
-import type { ThemeColorSchemeKey } from '@sanity/ui';
 import { type FC, type RefObject, useEffect, useRef, useState } from 'react';
 import {
   StudioLayout,
@@ -26,7 +25,7 @@ export type TStudioMountProps = {
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
   loginProvider?: TSanityLoginProvider;
-  scheme?: ThemeColorSchemeKey;
+  scheme?: StudioThemeColorSchemeKey;
   onSchemeChange?: (nextScheme: StudioThemeColorSchemeKey) => void;
   onSignedIn?: () => void;
 };

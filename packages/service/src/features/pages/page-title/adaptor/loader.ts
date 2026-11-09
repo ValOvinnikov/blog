@@ -18,7 +18,9 @@ export async function getPageTitle(
       [
         'homePage',
         'page_landing',
+        'page_privacyIndex',
         'page_privacyDocument',
+        'page_legalIndex',
         'page_legalDocument',
         'page_cookieStatement',
       ],

@@ -32,6 +32,7 @@ import { pricingTierSchema } from './pricing-tier/pricing-tier';
 import { seoSchema } from './seo/seo';
 import { socialProfileSchema } from './social-profile/social-profile';
 import { statSchema } from './stat/stat';
+import { tableSchema } from './table/table';
 import { timelineItemSchema } from './timeline-item/timeline-item';
 import { wideLayoutSchema } from './wide-layout/wide-layout';
 
@@ -51,6 +52,7 @@ export const objects = [
   cookiePreferencesLinkSchema,
   cookieListSchema,
   expandableSectionSchema,
+  tableSchema,
   linkRefWithSubItemsSchema,
   logoItemSchema,
   socialProfileSchema,

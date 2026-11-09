@@ -192,7 +192,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
-- **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`, `COOKIE_PREFERENCES_LINK`=`"cookiePreferencesLink"`, `COOKIE_LIST`=`"cookieList"`, `EXPANDABLE_SECTION`=`"expandableSection"`
+- **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`, `COOKIE_PREFERENCES_LINK`=`"cookiePreferencesLink"`, `COOKIE_LIST`=`"cookieList"`, `EXPANDABLE_SECTION`=`"expandableSection"`, `TABLE`=`"table"`
 
 ### `@blog/config/constants` — `packages/config/src/constants/preset.ts`
 
@@ -751,6 +751,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`
 
 ## app:worker
+
+### `@worker/constants/cookie-statement` — `apps/worker/src/constants/cookie-statement.ts`
+
+- **COOKIE_STATEMENT_LOG**: `SEED_START_FAILED`=`"cookie_statement.seed_start_failed"`, `SEED_FAILED`=`"cookie_statement.seed_failed"`
 
 ### `@worker/constants/custom-domain` — `apps/worker/src/constants/custom-domain.ts`
 

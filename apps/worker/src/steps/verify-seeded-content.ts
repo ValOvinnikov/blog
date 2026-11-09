@@ -5,7 +5,9 @@ import {
   listSanityWebhooks,
   type TSanityWebhook,
 } from '@blog/db/utils/sanity-management-client/sanity-webhooks';
+import { hasLength } from '@blog/utils/primitives';
 import { createClient } from '@sanity/client';
+import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import {
@@ -19,8 +21,6 @@ import {
 } from '@worker/utils/vercel-client/vercel-client';
 
 import { revalidateWebhookUrl } from './create-revalidate-webhook';
-
-const SANITY_API_VERSION = '2024-01-01';
 
 const REQUIRED_SINGLETON_TYPES = [
   'settings_site',
@@ -114,7 +114,7 @@ export async function verifyTenantSeededContent(
     (type) => !foundTypes.includes(type),
   );
 
-  if (missingTypes.length > 0) {
+  if (hasLength(missingTypes)) {
     throw new Error(
       `verifyTenantSeededContent: tenant "${tenant.id}"'s dataset is missing required starter document(s): ${missingTypes.join(', ')}.`,
     );

@@ -13,6 +13,7 @@ import {
 } from '@blog/db/utils/sanity-management-client/sanity-robot-tokens';
 import { buildSanityTokenLabels } from '@blog/db/utils/sanity-management-client/sanity-token-labels';
 import { createClient } from '@sanity/client';
+import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import {
   buildAppliedMigrationLedger,
@@ -20,8 +21,6 @@ import {
 } from '@worker/utils/migration-ledger/migration-ledger';
 import { retryWithBackoff } from '@worker/utils/retry-with-backoff/retry-with-backoff';
 import { requireTenantManagementToken } from '@worker/utils/tenant-management-token/tenant-management-token';
-
-const SANITY_API_VERSION = '2024-01-01';
 
 export type TSeedContentDeps = {
   createClient: typeof createClient;

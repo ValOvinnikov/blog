@@ -739,6 +739,9 @@ export type ArticleText = Array<
   | ({
       _key: string;
     } & ExpandableSection)
+  | ({
+      _key: string;
+    } & Table)
 >;
 
 export type NewsletterTrustCue = {
@@ -937,6 +940,37 @@ export type LinkRefWithSubItems = {
       _key: string;
     } & LinkRef
   >;
+};
+
+export type Table = {
+  _type: 'table';
+  headerRows?: number;
+  rows?: Array<{
+    cells?: Array<{
+      value?: Array<{
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: 'span';
+          _key: string;
+        }>;
+        style?: 'normal';
+        listItem?: never;
+        markDefs?: Array<
+          {
+            _key: string;
+          } & LinkRef
+        >;
+        level?: number;
+        _type: 'block';
+        _key: string;
+      }>;
+      _type: 'cell';
+      _key: string;
+    }>;
+    _type: 'row';
+    _key: string;
+  }>;
 };
 
 export type ExpandableSection = {
@@ -2667,6 +2701,7 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | LinkRefWithSubItems
+  | Table
   | ExpandableSection
   | CookieList
   | CookiePreferencesLink

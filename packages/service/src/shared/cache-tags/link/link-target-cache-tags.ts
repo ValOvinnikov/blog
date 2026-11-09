@@ -8,7 +8,9 @@ export const LINK_TARGET_CACHE_TAGS = [
   'page_topicIndex',
   'page_tag',
   'page_tagIndex',
+  'page_privacyIndex',
   'page_privacyDocument',
+  'page_legalIndex',
   'page_legalDocument',
   'page_cookieStatement',
 ] as const;
