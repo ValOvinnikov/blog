@@ -2,7 +2,7 @@ import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const tableHeaderCellVariants = tv({
-  base: ['min-w-32 px-3 py-2', 'border border-divider', 'font-semibold'],
+  base: ['px-3 py-2', 'border border-divider', 'font-semibold'],
   variants: {
     isRowHeader: {
       true: ['align-top'],

@@ -34,6 +34,12 @@ const groupHeadings = createColumns(2);
 const longRows = createRows(columns.length, 3, () => faker.lorem.sentences(3));
 const wideColumns = createColumns(6);
 const wideRows = createRows(wideColumns.length, 4, shortCell);
+const sparseColumns = createColumns(5);
+const sparseRows = createRows(
+  sparseColumns.length,
+  4,
+  () => faker.helpers.maybe(shortCell, { probability: 0.4 }) ?? '',
+);
 
 const renderHeaderRow = (headings: TTableStoryCell[]) => (
   <Table.Row>
@@ -144,6 +150,22 @@ export const WideTableAtPhoneWidth: TStory = {
   decorators: [atPhoneWidth],
 };
 
+export const EmptyCellsAtPhoneWidth: TStory = {
+  args: {
+    children: [
+      <Table.Caption key="caption">{faker.lorem.sentence()}</Table.Caption>,
+      <Table.Head key="head">{renderHeaderRow(sparseColumns)}</Table.Head>,
+      renderBodyRows(sparseRows),
+    ],
+  },
+  decorators: [atPhoneWidth],
+};
+
+export const LongContentAtPhoneWidth: TStory = {
+  ...LongContent,
+  decorators: [atPhoneWidth],
+};
+
 export const DefaultInDarkMode: TStory = {
   ...Default,
   globals: { theme: 'dark' },
@@ -156,5 +178,15 @@ export const RowHeadersInDarkMode: TStory = {
 
 export const WideTableAtPhoneWidthInDarkMode: TStory = {
   ...WideTableAtPhoneWidth,
+  globals: { theme: 'dark' },
+};
+
+export const EmptyCellsAtPhoneWidthInDarkMode: TStory = {
+  ...EmptyCellsAtPhoneWidth,
+  globals: { theme: 'dark' },
+};
+
+export const LongContentAtPhoneWidthInDarkMode: TStory = {
+  ...LongContentAtPhoneWidth,
   globals: { theme: 'dark' },
 };
