@@ -25,6 +25,17 @@ const MOCK_MARK_KEY = faker.string.uuid();
 const MOCK_CODE_KEY = faker.string.uuid();
 const MOCK_CODE = faker.lorem.word();
 
+const MOCK_CODE_BLOCK = {
+  _type: 'code' as const,
+  _key: MOCK_CODE_KEY,
+  code: MOCK_CODE,
+};
+
+const MOCK_COOKIE_LIST_BLOCK = {
+  _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST,
+  _key: faker.string.uuid(),
+};
+
 const MOCK_RESOLVED_BLOCK = {
   _type: 'block',
   _key: MOCK_BLOCK_KEY,
@@ -89,15 +100,20 @@ describe(toPortableTextBody, () => {
   });
 
   it('passes a code block through unchanged', () => {
-    const block = {
-      _type: 'code' as const,
-      _key: MOCK_CODE_KEY,
-      code: MOCK_CODE,
-    };
+    const result = toPortableTextBody([
+      MOCK_CODE_BLOCK,
+    ] as TRawPortableTextBody);
 
-    const result = toPortableTextBody([block] as TRawPortableTextBody);
+    expect(result).toEqual([MOCK_CODE_BLOCK]);
+  });
 
-    expect(result).toEqual([block]);
+  it('keeps a cookie-list block in place as a cookie-list block', () => {
+    const result = toPortableTextBody([
+      MOCK_COOKIE_LIST_BLOCK,
+      MOCK_CODE_BLOCK,
+    ] as TRawPortableTextBody);
+
+    expect(result).toEqual([MOCK_COOKIE_LIST_BLOCK, MOCK_CODE_BLOCK]);
   });
 
   it('resolves the link marks of a top-level text block', () => {

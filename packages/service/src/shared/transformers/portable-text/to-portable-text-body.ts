@@ -22,6 +22,12 @@ type TRawAsideBlock = Extract<
   TRawPortableTextBody[number],
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.ASIDE }
 >;
+type TRawCookieListBlock = Extract<
+  TRawPortableTextBody[number],
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST }
+>;
+
+type TCookieListBlock = Pick<TRawCookieListBlock, '_type' | '_key'>;
 
 type TResolvedAsideBlock = Omit<TRawAsideBlock, 'body'> & {
   body: TMaybeUndefined<TPortableTextBlock[]>;
@@ -32,6 +38,7 @@ export type TPortableTextBody = Array<
   | IBodyImageBlock
   | Extract<ArticleText[number], { _type: 'code' }>
   | TResolvedAsideBlock
+  | TCookieListBlock
 >;
 
 function toBodyImageBlock(raw: TRawBodyImageBlock): IBodyImageBlock {
@@ -50,6 +57,13 @@ function toAsideBlock(raw: TRawAsideBlock): TResolvedAsideBlock {
   };
 }
 
+function toCookieListBlock({
+  _type,
+  _key,
+}: TRawCookieListBlock): TCookieListBlock {
+  return { _type, _key };
+}
+
 export function toPortableTextBody(
   raw: TRawPortableTextBody,
 ): TPortableTextBody {
@@ -59,6 +73,8 @@ export function toPortableTextBody(
         return toBodyImageBlock(block);
       case PORTABLE_TEXT_BLOCK_TYPE.ASIDE:
         return toAsideBlock(block);
+      case PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST:
+        return toCookieListBlock(block);
       case 'block':
         return toPortableText(block);
       default:

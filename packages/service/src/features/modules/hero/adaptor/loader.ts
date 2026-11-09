@@ -3,6 +3,7 @@ import {
   runQuery,
   type TTenantSanityContext,
 } from '@blog/service/sanity/query/query';
+import { LINK_TARGET_CACHE_TAGS } from '@blog/service/shared/cache-tags/link/link-target-cache-tags';
 
 import { heroFallbackFeaturedPostQuery } from './featured-post.query';
 import { heroModuleQuery } from './query';
@@ -24,18 +25,17 @@ export async function getHero(
           'posts',
           'author',
           'topic',
-          'page_post',
-          'page_landing',
-          'page_postIndex',
-          'page_privacyDocument',
-          'page_legalDocument',
+          ...LINK_TARGET_CACHE_TAGS,
         ],
         tenant.projectId,
       ),
     }),
     runQuery(heroFallbackFeaturedPostQuery, {
       tenant,
-      ...isr(['posts', 'author', 'topic'], tenant.projectId),
+      ...isr(
+        ['posts', 'author', 'topic', ...LINK_TARGET_CACHE_TAGS],
+        tenant.projectId,
+      ),
     }),
   ]);
 
