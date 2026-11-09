@@ -1,8 +1,6 @@
 import { routes, type TMaybeUndefined } from '@blog/config';
+import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 import { cookies } from 'next/headers';
-
-export const NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME =
-  'newsletter_unsubscribe_token';
 
 // Long enough for a reader to read the page and confirm, short enough not to linger.
 const NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_MAX_AGE_SECONDS = 60 * 60;

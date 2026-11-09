@@ -4,10 +4,10 @@ import {
   mockCookieStore,
   stubCookieStore,
 } from '@web/testing/server/newsletter-cookies/fixtures';
+import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 
 import {
   clearNewsletterUnsubscribeToken,
-  NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME,
   readNewsletterUnsubscribeToken,
   storeNewsletterUnsubscribeToken,
 } from './newsletter-unsubscribe-token-cookie';

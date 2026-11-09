@@ -4,10 +4,10 @@ import { AUTH_APP } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { THEME_STORAGE_KEY } from '@web/config/theme-script';
-import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/server/newsletter/newsletter-unsubscribe-token-cookie/newsletter-unsubscribe-token-cookie';
 import { CONSENT_COOKIE_NAME } from '@web/utils/consent-cookie';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
+import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
 
 export const COOKIE_PROVIDER = {
