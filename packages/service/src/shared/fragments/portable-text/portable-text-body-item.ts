@@ -1,35 +1,22 @@
 import type { ArticleText } from '@blog/config';
 import { q } from '@blog/service/sanity/query/query';
-import { bodyImageFragment } from '@blog/service/shared/fragments/image/image';
-import { portableTextMarkDefFragment } from '@blog/service/shared/fragments/portable-text/portable-text-mark-def';
-import { textBlockFragment } from '@blog/service/shared/fragments/portable-text/text-block';
+import { articleTextMemberProjections } from '@blog/service/shared/fragments/portable-text/article-text-member';
 
 export const portableTextBodyItemFragment = q
   .fragment<ArticleText[number]>()
   .project((sub) => ({
     '...': true,
     ...sub.conditionalByType({
-      block: (blockSub) => ({
+      ...articleTextMemberProjections,
+      expandableSection: (sectionSub) => ({
         '...': true,
-        markDefs: blockSub
-          .field('markDefs[]')
-          .project(portableTextMarkDefFragment)
-          .nullable(true),
-      }),
-      bodyImage: (img) => ({
-        layout: img.field('layout').nullable(true),
-        ...bodyImageFragment,
-      }),
-      aside: (asideSub) => ({
-        '...': true,
-        body: asideSub
+        body: sectionSub
           .field('body[]')
-          .project(textBlockFragment)
+          .project((itemSub) => ({
+            '...': true,
+            ...itemSub.conditionalByType(articleTextMemberProjections),
+          }))
           .nullable(true),
       }),
-      cookieList: {
-        _key: true,
-        _type: true,
-      },
     }),
   }));
