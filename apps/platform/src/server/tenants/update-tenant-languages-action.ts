@@ -17,6 +17,7 @@ import {
 import { TENANT_LOG } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { enqueueCookieStatementSeed } from '@platform/server/cookie-statement/enqueue-cookie-statement-seed';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -89,6 +90,10 @@ export const updateTenantLanguagesAction = async (
       targetId: tenant.id,
       details: { additionalLocales: result.data },
     });
+    await enqueueCookieStatementSeed(tenant.id, [
+      tenant.locale,
+      ...result.data,
+    ]);
     return toOutcome(ACTION_OUTCOME.SUCCESS);
   } catch (error) {
     logger.error(TENANT_LOG.UPDATE_LANGUAGES_FAILED, {

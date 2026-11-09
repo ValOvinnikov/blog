@@ -4618,6 +4618,22 @@
         "file": "apps/platform/src/constants/control-mode.ts"
       }
     ],
+    "/api/cookie-statement/seed": [
+      {
+        "ref": "COOKIE_STATEMENT_PATH.SEED",
+        "scope": "app:platform",
+        "from": "@platform/constants/cookie-statement",
+        "file": "apps/platform/src/constants/cookie-statement.ts"
+      }
+    ],
+    "cookie_statement.seed_enqueue_rejected": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.SEED_ENQUEUE_REJECTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/cookie-statement",
+        "file": "apps/platform/src/constants/cookie-statement.ts"
+      }
+    ],
     "create_site_gate.alert_failed": [
       {
         "ref": "CREATE_SITE_GATE_LOG.ALERT_FAILED",
