@@ -1,4 +1,4 @@
-import { routes, type TMaybeUndefined } from '@blog/config';
+import { LEGAL_PAGE_KIND, routes, type TMaybeUndefined } from '@blog/config';
 import { tenantSiteUrl } from '@platform/utils/routes/routes';
 
 export type TLegalPageUrls = {
@@ -14,7 +14,7 @@ export const toLegalPageUrls = (
 
   const siteUrl = tenantSiteUrl(rootDomain);
   return {
-    terms: `${siteUrl}${routes.terms()}`,
-    privacy: `${siteUrl}${routes.privacy()}`,
+    terms: `${siteUrl}${routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS)}`,
+    privacy: `${siteUrl}${routes.legalPageByKind(LEGAL_PAGE_KIND.PRIVACY_POLICY)}`,
   };
 };
