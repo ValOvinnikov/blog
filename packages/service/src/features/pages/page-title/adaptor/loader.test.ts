@@ -2,6 +2,7 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_HOME_PAGE_CACHE_TAG,
+  MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
   MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
   MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
@@ -45,6 +46,7 @@ describe(getPageTitle, () => {
           MOCK_PAGE_LANDING_CACHE_TAG,
           MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
           MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+          MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
         ],
       },
     });

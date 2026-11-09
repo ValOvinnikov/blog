@@ -1,11 +1,7 @@
-import type {
-  LEGAL_PAGE_KIND,
-  Page_legalDocument,
-  Page_privacyDocument,
-} from '@blog/config';
+import type { LEGAL_PAGE_KIND, TLegalPageKind } from '@blog/config';
 
 export type TSectionDocumentKind = Exclude<
-  NonNullable<(Page_privacyDocument | Page_legalDocument)['kind']>,
+  TLegalPageKind,
   typeof LEGAL_PAGE_KIND.OTHER
 >;
 

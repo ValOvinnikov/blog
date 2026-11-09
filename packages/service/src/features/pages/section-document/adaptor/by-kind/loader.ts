@@ -16,7 +16,10 @@ export async function getSectionDocumentByKind(
   const raw = await runQuery(sectionDocumentByKindQuery, {
     parameters: { kind },
     tenant,
-    ...isr(['page_privacyDocument', 'page_legalDocument'], tenant.projectId),
+    ...isr(
+      ['page_privacyDocument', 'page_legalDocument', 'page_cookieStatement'],
+      tenant.projectId,
+    ),
   });
   if (!raw) return undefined;
 

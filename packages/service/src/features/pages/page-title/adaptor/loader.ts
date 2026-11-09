@@ -20,6 +20,7 @@ export async function getPageTitle(
         'page_landing',
         'page_privacyDocument',
         'page_legalDocument',
+        'page_cookieStatement',
       ],
       tenant.projectId,
     ),

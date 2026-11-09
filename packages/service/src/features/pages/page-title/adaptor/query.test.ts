@@ -13,6 +13,8 @@ const MOCK_PRIVACY_ID = 'privacy-policy-nl';
 const MOCK_PRIVACY_TITLE = 'Privacybeleid';
 const MOCK_LEGAL_ID = 'terms-en';
 const MOCK_LEGAL_TITLE = 'Terms';
+const MOCK_COOKIE_STATEMENT_ID = 'cookie-statement-nl';
+const MOCK_COOKIE_STATEMENT_TITLE = 'Cookieverklaring';
 
 const dataset = [
   { _id: MOCK_HOME_ID, _type: 'page_home', title: MOCK_HOME_TITLE },
@@ -34,6 +36,12 @@ const dataset = [
     language: EN,
     title: MOCK_LEGAL_TITLE,
   },
+  {
+    _id: MOCK_COOKIE_STATEMENT_ID,
+    _type: 'page_cookieStatement',
+    language: NL,
+    title: MOCK_COOKIE_STATEMENT_TITLE,
+  },
   { _id: MOCK_POST_ID, _type: 'page_post', language: EN, title: 'A post' },
 ];
 
@@ -53,10 +61,16 @@ describe('pageTitleQuery', () => {
   });
 
   it.each([
-    ['privacy', MOCK_PRIVACY_ID, NL, MOCK_PRIVACY_TITLE],
-    ['legal', MOCK_LEGAL_ID, EN, MOCK_LEGAL_TITLE],
+    ['privacy document', MOCK_PRIVACY_ID, NL, MOCK_PRIVACY_TITLE],
+    ['legal document', MOCK_LEGAL_ID, EN, MOCK_LEGAL_TITLE],
+    [
+      'cookie statement',
+      MOCK_COOKIE_STATEMENT_ID,
+      NL,
+      MOCK_COOKIE_STATEMENT_TITLE,
+    ],
   ])(
-    "reads a %s document page's title in its own language",
+    "reads a %s page's title in its own language",
     async (_, id, locale, title) => {
       expect(await run(id, locale)).toEqual({ title });
     },

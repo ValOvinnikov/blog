@@ -10,4 +10,5 @@ export const LINK_TARGET_CACHE_TAGS = [
   'page_tagIndex',
   'page_privacyDocument',
   'page_legalDocument',
+  'page_cookieStatement',
 ] as const;

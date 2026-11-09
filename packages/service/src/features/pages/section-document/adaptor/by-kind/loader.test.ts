@@ -2,6 +2,7 @@ import { routes, SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { LEGAL_PAGE_KIND } from '@blog/config/constants';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
+  MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
   MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
   MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
@@ -21,10 +22,11 @@ const tenant = mockTenant();
 
 describe(getSectionDocumentByKind, () => {
   it.each([
-    ['page_privacyDocument', routes.privacyDocument(MOCK_SLUG)],
-    ['page_legalDocument', routes.legalDocument(MOCK_SLUG)],
-  ] as const)('links a %s to its section path', async (_type, href) => {
-    mockRun.mockResolvedValueOnce({ _type, slug: MOCK_SLUG });
+    ['page_privacyDocument', MOCK_SLUG, routes.privacyDocument(MOCK_SLUG)],
+    ['page_legalDocument', MOCK_SLUG, routes.legalDocument(MOCK_SLUG)],
+    ['page_cookieStatement', null, routes.cookieStatement()],
+  ] as const)('links a %s to its path', async (_type, slug, href) => {
+    mockRun.mockResolvedValueOnce({ _type, slug });
 
     const result = await getSectionDocumentByKind(
       LEGAL_PAGE_KIND.TERMS,
@@ -45,7 +47,7 @@ describe(getSectionDocumentByKind, () => {
     expect(result).toBeUndefined();
   });
 
-  it('queries the kind for the tenant under both section tags', async () => {
+  it('queries the kind for the tenant under every tag a kind can resolve to', async () => {
     mockRun.mockResolvedValueOnce(null);
 
     await getSectionDocumentByKind(LEGAL_PAGE_KIND.PRIVACY_POLICY, tenant);
@@ -58,6 +60,7 @@ describe(getSectionDocumentByKind, () => {
         tags: [
           MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
           MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+          MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
         ],
       },
     });
