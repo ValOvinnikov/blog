@@ -1,4 +1,6 @@
+import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { isPlatformFallbackAllowed } from '@web/server/tenant/resolve-tenant/resolve-tenant';
@@ -15,12 +17,13 @@ const EMPTY_TRANSLATION_MAP = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  cookieStatementLanguages: [],
 };
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   const tenant = await resolveRequestTenant();
   if (!tenant && !isPlatformFallbackAllowed()) {
-    return new NextResponse(null, { status: 404 });
+    return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
   const { defaultLocale, liveLocales } = tenant
@@ -34,13 +37,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     liveLocales,
   );
   if (!switchRequest) {
-    return new NextResponse(null, { status: 400 });
+    return new NextResponse(null, { status: HTTP_STATUS.BAD_REQUEST });
   }
 
   const { to, from } = switchRequest;
   const translationMap =
     (tenant &&
-      liveLocales.length > 1 &&
+      hasArrayGotMultipleItems(liveLocales) &&
       (await getTenantTranslationMap(tenant))) ||
     EMPTY_TRANSLATION_MAP;
   const target = request.nextUrl.clone();

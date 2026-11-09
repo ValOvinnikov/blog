@@ -33,6 +33,7 @@ import { createTaxonomyListModuleService } from './features/modules/taxonomy-lis
 import { createTeamModuleService } from './features/modules/team';
 import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createTimelineModuleService } from './features/modules/timeline';
+import { createCookieStatementService } from './features/pages/cookie-statement';
 import { createHomeService } from './features/pages/home';
 import { createLandingPageService } from './features/pages/landing';
 import { createPageTitleService } from './features/pages/page-title';
@@ -55,6 +56,7 @@ export const service = {
     blog: createBlogService(),
     post: createPostService(),
     sectionDocument: createSectionDocumentService(),
+    cookieStatement: createCookieStatementService(),
     topic: createTopicService(),
     topicIndex: createTopicIndexService(),
     tag: createTagService(),
@@ -167,6 +169,7 @@ export type {
   TTimelineItem,
   TTimelineModule,
 } from './features/modules/timeline';
+export type { TCookieStatementPage } from './features/pages/cookie-statement';
 export type { THomePage } from './features/pages/home';
 export type {
   TLandingBreadcrumb,

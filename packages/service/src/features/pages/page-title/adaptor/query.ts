@@ -8,6 +8,7 @@ export const pageTitleQuery = q
     'page_landing',
     'page_privacyDocument',
     'page_legalDocument',
+    'page_cookieStatement',
   )
   .filterBy('_id == $id')
   // groqd's typed filterBy has no coalesce, and a Home with no language is the default language's

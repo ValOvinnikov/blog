@@ -32,6 +32,7 @@ const dataset = [
     language: NL,
     kind: LEGAL_PAGE_KIND.OTHER,
   }),
+  { _type: 'page_cookieStatement', language: NL },
 ];
 
 function run(kind: string, locale: string): Promise<unknown> {
@@ -54,8 +55,16 @@ describe('sectionDocumentByKindQuery', () => {
     },
   );
 
+  it('finds the cookie statement in the language asked for', async () => {
+    expect(await run(LEGAL_PAGE_KIND.COOKIE_STATEMENT, NL)).toEqual({
+      _type: 'page_cookieStatement',
+      slug: null,
+    });
+  });
+
   it('finds nothing when no page of the kind exists in that language', async () => {
     expect(await run(LEGAL_PAGE_KIND.TERMS, EN)).toBeNull();
+    expect(await run(LEGAL_PAGE_KIND.COOKIE_STATEMENT, EN)).toBeNull();
     expect(await run(LEGAL_PAGE_KIND.IMPRINT, NL)).toBeNull();
   });
 

@@ -24,4 +24,5 @@ export const translationMapQuery = q.project((root) => ({
   postIndexes: pageLanguagesQuery('page_postIndex'),
   topicIndexes: pageLanguagesQuery('page_topicIndex'),
   tagIndexes: pageLanguagesQuery('page_tagIndex'),
+  cookieStatements: pageLanguagesQuery('page_cookieStatement'),
 }));

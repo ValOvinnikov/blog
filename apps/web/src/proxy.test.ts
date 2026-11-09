@@ -129,6 +129,7 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  cookieStatementLanguages: [],
   groups: [
     [
       { documentType: 'page_landing', language: EN, slug: 'about' },

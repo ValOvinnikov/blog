@@ -11,4 +11,5 @@ export type TTranslationMap = {
   postIndexLanguages: TLocaleIsoCode[];
   topicIndexLanguages: TLocaleIsoCode[];
   tagIndexLanguages: TLocaleIsoCode[];
+  cookieStatementLanguages: TLocaleIsoCode[];
 };
