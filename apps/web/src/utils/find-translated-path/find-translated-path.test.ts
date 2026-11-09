@@ -46,8 +46,8 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   postIndexLanguages: [EN, NL],
   topicIndexLanguages: [EN, NL],
   tagIndexLanguages: [EN],
-  privacyIndexLanguages: [],
-  legalIndexLanguages: [],
+  privacyIndexLanguages: [EN, NL],
+  legalIndexLanguages: [EN, NL],
   cookieStatementLanguages: [EN, NL],
   groups: [
     [
@@ -141,6 +141,16 @@ describe(findTranslatedPath, () => {
       expected: nlPath(routes.cookieStatement()),
     },
     {
+      case: 'the privacy hub in another language under its prefix',
+      pathname: routes.privacy(),
+      expected: nlPath(routes.privacy()),
+    },
+    {
+      case: 'the legal hub in another language under its prefix',
+      pathname: routes.legal(),
+      expected: nlPath(routes.legal()),
+    },
+    {
       case: 'the first page of the translation from a numbered archive page',
       pathname: routes.topic(MOCK_EN_TOPIC, 3),
       expected: nlPath(routes.topic(MOCK_NL_TOPIC)),
@@ -196,6 +206,11 @@ describe(findTranslatedPath, () => {
       expected: routes.cookieStatement(),
     },
     {
+      case: 'the default-language legal hub without a prefix',
+      pathname: routes.legal(),
+      expected: routes.legal(),
+    },
+    {
       case: 'the default-language list page without a prefix',
       pathname: routes.topics(),
       expected: routes.topics(),
@@ -230,6 +245,7 @@ describe(findTranslatedPath, () => {
     },
     { case: 'a Topic page', pathname: routes.topic(MOCK_EN_TOPIC) },
     { case: 'the cookie statement', pathname: routes.cookieStatement() },
+    { case: 'the privacy hub', pathname: routes.privacy() },
     { case: 'the blog list page', pathname: routes.blogIndex() },
     { case: 'a numbered blog list page', pathname: routes.blogIndex(2) },
     { case: 'Home', pathname: routes.home() },

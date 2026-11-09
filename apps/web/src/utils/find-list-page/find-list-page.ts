@@ -30,6 +30,16 @@ export const findListPage = (
         href: routes.tags(),
         languages: translationMap.tagIndexLanguages,
       };
+    case 'privacy':
+      return {
+        href: routes.privacy(),
+        languages: translationMap.privacyIndexLanguages,
+      };
+    case 'legal':
+      return {
+        href: routes.legal(),
+        languages: translationMap.legalIndexLanguages,
+      };
     default:
       return undefined;
   }

@@ -541,6 +541,40 @@ describe(sitemap, () => {
       expect(urls).not.toContain(toUrl(routes.cookieStatement(), DE_PREFIX));
     });
 
+    it.each([
+      { hub: 'privacy', path: routes.privacy(), key: 'privacyIndexLanguages' },
+      { hub: 'legal', path: routes.legal(), key: 'legalIndexLanguages' },
+    ] as const)(
+      'lists each live $hub hub with every live $hub hub as an alternate',
+      async ({ path, key }) => {
+        getTranslationMap.mockResolvedValue(
+          okResult(mockTranslationMap({ [key]: [EN, NL, DE] })),
+        );
+        const hubUrl = toUrl(path);
+        const nlHubUrl = toUrl(path, NL_PREFIX);
+        const hubAlternates = toAlternates(
+          [
+            [EN, hubUrl],
+            [NL, nlHubUrl],
+          ],
+          hubUrl,
+        );
+
+        const entries = await sitemap();
+        const urls = entries.map(({ url }) => url);
+
+        expect(entries).toContainEqual({
+          url: hubUrl,
+          alternates: { languages: hubAlternates },
+        });
+        expect(entries).toContainEqual({
+          url: nlHubUrl,
+          alternates: { languages: hubAlternates },
+        });
+        expect(urls).not.toContain(toUrl(path, DE_PREFIX));
+      },
+    );
+
     it('lists only the languages that have each list page', async () => {
       getTranslationMap.mockResolvedValue(
         okResult(
@@ -548,7 +582,7 @@ describe(sitemap, () => {
             postIndexLanguages: [EN],
             topicIndexLanguages: [NL],
             tagIndexLanguages: [],
-            privacyIndexLanguages: [],
+            privacyIndexLanguages: [NL],
             legalIndexLanguages: [],
             cookieStatementLanguages: [],
           }),
@@ -564,6 +598,9 @@ describe(sitemap, () => {
       expect(urls).not.toContain(TAGS_URL);
       expect(urls).not.toContain(toUrl(routes.tags(), NL_PREFIX));
       expect(urls).not.toContain(COOKIE_STATEMENT_URL);
+      expect(urls).toContain(toUrl(routes.privacy(), NL_PREFIX));
+      expect(urls).not.toContain(toUrl(routes.privacy()));
+      expect(urls).not.toContain(toUrl(routes.legal()));
     });
   });
 

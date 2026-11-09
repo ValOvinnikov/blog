@@ -27,8 +27,8 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   postIndexLanguages: [EN, NL],
   topicIndexLanguages: [EN, NL],
   tagIndexLanguages: [EN, NL],
-  privacyIndexLanguages: [],
-  legalIndexLanguages: [],
+  privacyIndexLanguages: [EN, NL],
+  legalIndexLanguages: [EN, NL],
   cookieStatementLanguages: [],
   groups: [
     [
@@ -109,6 +109,18 @@ describe(toSwitchLanguageTarget, () => {
       expected: routes.tags(),
     },
     {
+      case: 'the privacy hub in the other language',
+      from: routes.privacy(),
+      to: NL,
+      expected: inLanguage(NL, routes.privacy()),
+    },
+    {
+      case: 'the legal hub back in the default language',
+      from: inLanguage(NL, routes.legal()),
+      to: EN,
+      expected: routes.legal(),
+    },
+    {
       case: 'a later page of the blog',
       from: routes.blogIndex(MOCK_PAGE_NUMBER),
       to: NL,
@@ -140,6 +152,7 @@ describe(toSwitchLanguageTarget, () => {
       from: routes.topic(MOCK_ARCHIVE_SLUG, MOCK_PAGE_NUMBER),
     },
     { case: 'a tag page', from: routes.tag(MOCK_ARCHIVE_SLUG) },
+    { case: 'the privacy hub', from: routes.privacy() },
   ])(
     "lands on the language's home page when $case has no counterpart there",
     ({ from }) => {
@@ -177,6 +190,12 @@ describe(toSwitchLanguageTarget, () => {
       from: routes.tag(MOCK_ARCHIVE_SLUG),
       to: NL,
       expected: inLanguage(NL, routes.tags()),
+    },
+    {
+      case: 'an untranslated legal document',
+      from: routes.legalDocument(MOCK_ARCHIVE_SLUG),
+      to: NL,
+      expected: inLanguage(NL, routes.legal()),
     },
     {
       case: 'an untranslated tag back in the default language',
