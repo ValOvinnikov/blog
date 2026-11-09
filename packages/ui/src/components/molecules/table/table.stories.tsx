@@ -143,3 +143,18 @@ export const WideTableAtPhoneWidth: TStory = {
   },
   decorators: [atPhoneWidth],
 };
+
+export const DefaultInDarkMode: TStory = {
+  ...Default,
+  globals: { theme: 'dark' },
+};
+
+export const RowHeadersInDarkMode: TStory = {
+  ...RowHeaders,
+  globals: { theme: 'dark' },
+};
+
+export const WideTableAtPhoneWidthInDarkMode: TStory = {
+  ...WideTableAtPhoneWidth,
+  globals: { theme: 'dark' },
+};
