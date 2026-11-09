@@ -11,7 +11,7 @@ export const statsModuleViewVariants = tv({
       'font-bold tracking-tight tabular-nums whitespace-nowrap text-brand-primary',
     ],
     label: ['order-2 max-w-3xs', 'text-sm font-medium text-text'],
-    description: ['order-3 max-w-3xs', 'text-sm text-text'],
+    description: ['order-3 max-w-3xs', 'text-base text-text'],
     footnote: ['mt-5 max-w-measure'],
   },
   variants: {
