@@ -118,7 +118,7 @@ export const textLinkVariants = tv({
     {
       appearance: 'quiet',
       hasHref: true,
-      class: { root: ['hover:text-brand-primary'] },
+      class: { root: ['hover:text-brand-primary-hover'] },
     },
     {
       appearance: 'accent',
