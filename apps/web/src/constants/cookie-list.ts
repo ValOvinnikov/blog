@@ -10,11 +10,11 @@ import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscri
 import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
 import { SIGNED_IN_HINT_COOKIE_NAME } from '@web/utils/signed-in-hint-cookie';
 
-export const COOKIE_PROVIDER = {
+const COOKIE_PROVIDER = {
   FIRST_PARTY: 'FIRST_PARTY',
 } as const;
 
-export type TCookieProvider = TValueOf<typeof COOKIE_PROVIDER>;
+type TCookieProvider = TValueOf<typeof COOKIE_PROVIDER>;
 
 export const COOKIE_ID = {
   CONSENT: 'CONSENT',

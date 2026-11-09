@@ -7644,14 +7644,6 @@
         "file": "apps/web/src/constants/contact-form.ts"
       }
     ],
-    "FIRST_PARTY": [
-      {
-        "ref": "COOKIE_PROVIDER.FIRST_PARTY",
-        "scope": "app:web",
-        "from": "@web/constants/cookie-list",
-        "file": "apps/web/src/constants/cookie-list.ts"
-      }
-    ],
     "CONSENT": [
       {
         "ref": "COOKIE_ID.CONSENT",

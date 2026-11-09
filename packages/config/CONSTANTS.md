@@ -669,7 +669,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
 
-- **COOKIE_PROVIDER**: `FIRST_PARTY`
 - **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
 
 ### `@web/constants/cookie-statement` — `apps/web/src/constants/cookie-statement.ts`

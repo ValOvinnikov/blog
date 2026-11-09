@@ -337,15 +337,11 @@
   },
   "cookieList": {
     "ariaLabel": "Cookies en browseropslag",
+    "intro": "Alles hieronder wordt door deze site zelf geplaatst en is strikt noodzakelijk.",
     "columns": {
       "name": "Naam",
-      "provider": "Aanbieder",
       "purpose": "Doel",
-      "duration": "Bewaartermijn",
-      "category": "Categorie"
-    },
-    "providers": {
-      "site": "Deze site"
+      "duration": "Bewaartermijn"
     },
     "cookies": {
       "CONSENT": {
