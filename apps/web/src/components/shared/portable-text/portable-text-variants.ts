@@ -1,4 +1,5 @@
 import { tv } from '@blog/ui/lib/styling';
+import { FULL_BLEED_TABLE } from '@web/components/shared/portable-text/config/full-bleed';
 
 export const portableTextVariants = tv({
   slots: {
@@ -11,5 +12,6 @@ export const portableTextVariants = tv({
     image: ['h-auto w-full'],
     bulletList: ['list-disc space-y-1 pl-5'],
     numberList: ['list-decimal space-y-1 pl-5'],
+    table: FULL_BLEED_TABLE,
   },
 });

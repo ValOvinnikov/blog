@@ -5,6 +5,7 @@ import { COOKIE_LIST } from '@web/constants/cookie-list';
 import { useTranslations } from 'next-intl';
 
 import { cookieListVariants } from './cookie-list-variants';
+import { FULL_BLEED_DATA_ATTR } from './full-bleed';
 
 const s = cookieListVariants();
 
@@ -30,24 +31,26 @@ export const CookieList = () => {
           </li>
         ))}
       </ul>
-      <Table ariaLabel={ariaLabel} className={s.table()}>
-        <Table.Head>
-          <Table.Row>
-            <Table.HeaderCell>{t('columns.name')}</Table.HeaderCell>
-            <Table.HeaderCell>{purposeLabel}</Table.HeaderCell>
-            <Table.HeaderCell>{durationLabel}</Table.HeaderCell>
-          </Table.Row>
-        </Table.Head>
-        {COOKIE_LIST.map(({ id, name }) => (
-          <Table.Row key={name}>
-            <Table.HeaderCell isRowHeader={true}>
-              <InlineCode>{name}</InlineCode>
-            </Table.HeaderCell>
-            <Table.Cell>{t(`cookies.${id}.purpose`)}</Table.Cell>
-            <Table.Cell>{t(`cookies.${id}.duration`)}</Table.Cell>
-          </Table.Row>
-        ))}
-      </Table>
+      <div {...{ [FULL_BLEED_DATA_ATTR]: '' }} className={s.table()}>
+        <Table ariaLabel={ariaLabel}>
+          <Table.Head>
+            <Table.Row>
+              <Table.HeaderCell>{t('columns.name')}</Table.HeaderCell>
+              <Table.HeaderCell>{purposeLabel}</Table.HeaderCell>
+              <Table.HeaderCell>{durationLabel}</Table.HeaderCell>
+            </Table.Row>
+          </Table.Head>
+          {COOKIE_LIST.map(({ id, name }) => (
+            <Table.Row key={name}>
+              <Table.HeaderCell isRowHeader={true}>
+                <InlineCode>{name}</InlineCode>
+              </Table.HeaderCell>
+              <Table.Cell>{t(`cookies.${id}.purpose`)}</Table.Cell>
+              <Table.Cell>{t(`cookies.${id}.duration`)}</Table.Cell>
+            </Table.Row>
+          ))}
+        </Table>
+      </div>
       <p>{t('analyticsNote')}</p>
     </>
   );

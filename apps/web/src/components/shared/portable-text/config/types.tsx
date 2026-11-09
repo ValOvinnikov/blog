@@ -151,14 +151,16 @@ export const makeTableTypeComponent = (
     const bodyRows = rows.slice(headerRowCount);
 
     return (
-      <Table ariaLabel={t('regionLabel')}>
-        {hasLength(headerRows) && (
-          <Table.Head>
-            {headerRows.map((row) => renderRow(row, true))}
-          </Table.Head>
-        )}
-        {bodyRows.map((row) => renderRow(row, false))}
-      </Table>
+      <div {...{ [FULL_BLEED_DATA_ATTR]: '' }} className={s.table()}>
+        <Table ariaLabel={t('regionLabel')}>
+          {hasLength(headerRows) && (
+            <Table.Head>
+              {headerRows.map((row) => renderRow(row, true))}
+            </Table.Head>
+          )}
+          {bodyRows.map((row) => renderRow(row, false))}
+        </Table>
+      </div>
     );
   };
 
