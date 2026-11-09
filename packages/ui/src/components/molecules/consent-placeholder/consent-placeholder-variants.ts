@@ -6,8 +6,8 @@ export const consentPlaceholderVariants = tv({
       'absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-y-auto p-4 text-center',
     ],
     provider: ['font-mono text-copy font-medium text-text'],
-    message: ['max-w-prose text-card-copy text-subtle'],
+    message: ['max-w-prose text-lead text-subtle'],
     actions: ['flex flex-wrap items-center justify-center gap-2'],
-    scope: ['max-w-prose text-card-copy text-subtle'],
+    scope: ['max-w-prose text-lead text-subtle'],
   },
 });

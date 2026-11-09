@@ -9,7 +9,7 @@ export const mediaCardVariants = tv({
     ],
     media: [],
     content: ['flex flex-col flex-1', 'px-card-x py-card-y gap-2'],
-    excerpt: ['text-copy text-muted line-clamp-3'],
+    excerpt: ['text-lead text-muted line-clamp-3'],
     tags: ['flex flex-wrap gap-1.5 mt-1'],
   },
   variants: {
