@@ -13,3 +13,8 @@ export const DATA_THEME = {
   [COLOR_SCHEME.LIGHT]: 'light',
   [COLOR_SCHEME.DARK]: 'dark',
 } as const;
+
+export const STUDIO_SCHEME = {
+  ...DATA_THEME,
+  [THEME_PREFERENCE.SYSTEM]: 'system',
+} as const;
