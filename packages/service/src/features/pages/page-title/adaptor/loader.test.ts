@@ -5,7 +5,9 @@ import {
   MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
   MOCK_PAGE_LANDING_CACHE_TAG,
   MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
+  MOCK_PAGE_LEGAL_INDEX_CACHE_TAG,
   MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+  MOCK_PAGE_PRIVACY_INDEX_CACHE_TAG,
 } from '@blog/service/testing/sanity/query/cache-tags';
 import { mockTenant } from '@blog/service/testing/tenant';
 
@@ -44,7 +46,9 @@ describe(getPageTitle, () => {
         tags: [
           MOCK_HOME_PAGE_CACHE_TAG,
           MOCK_PAGE_LANDING_CACHE_TAG,
+          MOCK_PAGE_PRIVACY_INDEX_CACHE_TAG,
           MOCK_PAGE_PRIVACY_DOCUMENT_CACHE_TAG,
+          MOCK_PAGE_LEGAL_INDEX_CACHE_TAG,
           MOCK_PAGE_LEGAL_DOCUMENT_CACHE_TAG,
           MOCK_PAGE_COOKIE_STATEMENT_CACHE_TAG,
         ],

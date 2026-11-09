@@ -27,6 +27,8 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   postIndexLanguages: [EN, NL],
   topicIndexLanguages: [EN, NL],
   tagIndexLanguages: [EN, NL],
+  privacyIndexLanguages: [],
+  legalIndexLanguages: [],
   cookieStatementLanguages: [],
   groups: [
     [

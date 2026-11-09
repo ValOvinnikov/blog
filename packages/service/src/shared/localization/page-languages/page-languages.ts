@@ -5,6 +5,8 @@ type TOnePerLanguagePageType =
   | 'page_postIndex'
   | 'page_topicIndex'
   | 'page_tagIndex'
+  | 'page_privacyIndex'
+  | 'page_legalIndex'
   | 'page_cookieStatement';
 
 export function pageLanguagesQuery(documentType: TOnePerLanguagePageType) {

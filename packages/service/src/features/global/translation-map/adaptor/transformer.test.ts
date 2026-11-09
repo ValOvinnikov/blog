@@ -40,6 +40,9 @@ const MOCK_POST_INDEX_EN_ID = faker.string.uuid();
 const MOCK_POST_INDEX_NL_ID = faker.string.uuid();
 const MOCK_TOPIC_INDEX_ID = faker.string.uuid();
 const MOCK_TAG_INDEX_DE_ID = faker.string.uuid();
+const MOCK_PRIVACY_INDEX_EN_ID = faker.string.uuid();
+const MOCK_PRIVACY_INDEX_NL_ID = faker.string.uuid();
+const MOCK_LEGAL_INDEX_DE_ID = faker.string.uuid();
 const MOCK_COOKIE_STATEMENT_EN_ID = faker.string.uuid();
 const MOCK_COOKIE_STATEMENT_NL_ID = faker.string.uuid();
 
@@ -129,6 +132,8 @@ describe(toTranslationMap, () => {
       postIndexLanguages: [],
       topicIndexLanguages: [],
       tagIndexLanguages: [],
+      privacyIndexLanguages: [],
+      legalIndexLanguages: [],
       cookieStatementLanguages: [],
     });
   });
@@ -164,6 +169,25 @@ describe(toTranslationMap, () => {
     expect(postIndexLanguages).toEqual([EN, NL]);
     expect(topicIndexLanguages).toEqual([EN]);
     expect(tagIndexLanguages).toEqual([DE]);
+  });
+
+  it('lists every language that has each section hub', async () => {
+    const { privacyIndexLanguages, legalIndexLanguages } = await buildMap([
+      {
+        _id: MOCK_PRIVACY_INDEX_EN_ID,
+        _type: 'page_privacyIndex',
+        language: EN,
+      },
+      {
+        _id: MOCK_PRIVACY_INDEX_NL_ID,
+        _type: 'page_privacyIndex',
+        language: NL,
+      },
+      { _id: MOCK_LEGAL_INDEX_DE_ID, _type: 'page_legalIndex', language: DE },
+    ]);
+
+    expect(privacyIndexLanguages).toEqual([EN, NL]);
+    expect(legalIndexLanguages).toEqual([DE]);
   });
 
   it('lists every language that has a cookie statement', async () => {

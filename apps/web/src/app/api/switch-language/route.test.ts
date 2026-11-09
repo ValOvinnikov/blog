@@ -51,6 +51,8 @@ const translationMap = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  privacyIndexLanguages: [],
+  legalIndexLanguages: [],
   cookieStatementLanguages: [],
   groups: [
     [

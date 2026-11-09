@@ -17,6 +17,8 @@ const EMPTY_TRANSLATION_MAP = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  privacyIndexLanguages: [],
+  legalIndexLanguages: [],
   cookieStatementLanguages: [],
 };
 

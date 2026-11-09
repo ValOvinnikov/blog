@@ -6,7 +6,9 @@ export const pageTitleQuery = q
   .star.filterByType(
     'page_home',
     'page_landing',
+    'page_privacyIndex',
     'page_privacyDocument',
+    'page_legalIndex',
     'page_legalDocument',
     'page_cookieStatement',
   )
