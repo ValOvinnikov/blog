@@ -8116,6 +8116,22 @@
         "file": "apps/web/src/constants/section-document.ts"
       }
     ],
+    "section_index_page.fetch_failed": [
+      {
+        "ref": "SECTION_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-index",
+        "file": "apps/web/src/constants/section-index.ts"
+      }
+    ],
+    "section_index_metadata.fetch_failed": [
+      {
+        "ref": "SECTION_INDEX_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-index",
+        "file": "apps/web/src/constants/section-index.ts"
+      }
+    ],
     "authenticated": [
       {
         "ref": "SESSION_STATUS.AUTHENTICATED",

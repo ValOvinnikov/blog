@@ -13,7 +13,7 @@ import {
   mockModule,
 } from './fixtures';
 
-const getStubTestIds = () =>
+export const getStubTestIds = () =>
   screen
     .getAllByTestId(/^stub-/)
     .map((stub) => stub.getAttribute('data-testid'));

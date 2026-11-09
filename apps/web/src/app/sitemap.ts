@@ -249,6 +249,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ),
     ...toTranslatedPageEntries(routes.tags(), translationMap.tagIndexLanguages),
     ...toTranslatedPageEntries(
+      routes.privacy(),
+      translationMap.privacyIndexLanguages,
+    ),
+    ...toTranslatedPageEntries(
+      routes.legal(),
+      translationMap.legalIndexLanguages,
+    ),
+    ...toTranslatedPageEntries(
       routes.cookieStatement(),
       translationMap.cookieStatementLanguages,
     ),

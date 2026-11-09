@@ -725,6 +725,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SECTION_DOCUMENT_LOG**: `PAGE_FETCH_FAILED`=`"section_document_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_document_metadata.fetch_failed"`
 
+### `@web/constants/section-index` — `apps/web/src/constants/section-index.ts`
+
+- **SECTION_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"section_index_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_index_metadata.fetch_failed"`
+
 ### `@web/constants/session` — `apps/web/src/constants/session.ts`
 
 - **SESSION_STATUS**: `AUTHENTICATED`=`"authenticated"`, `UNAUTHENTICATED`=`"unauthenticated"`, `LOADING`=`"loading"`
