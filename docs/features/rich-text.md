@@ -27,6 +27,8 @@ code:
   - apps/web/src/testing/shared/portable-text/**
   - packages/studio/src/schema-types/objects/expandable-section/**
   - packages/studio/src/schema-types/objects/table/**
+  - packages/studio/src/schema-types/validation/validate-table-column-count/**
+  - packages/config/src/constants/table.ts
   - packages/studio/src/schema-types/objects/cookie-list/**
   - packages/studio/src/schema-types/objects/cookie-preferences-link/**
   - packages/studio/src/schema-types/portable-text/expandable-section-text/**
@@ -65,7 +67,7 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 ## Constraints and invariants
 
 - An expandable section allows H3 and below only, so the contents rail, built from the page's H2s, stays accurate. It renders as an `Accordion` item, closed by default, with a nested renderer.
-- A table renders `@blog/ui`'s `Table`: its first `headerRows` rows as header cells, the rest as body rows, in a region named by the fixed `table.regionLabel`. Tables are entered in the Studio; paste from outside the Studio is not supported (#6914, #6915).
+- A table renders `@blog/ui`'s `Table`: its first `headerRows` rows as header cells, the rest as body rows, in a scrolling region named by the fixed `table.regionLabel`. Columns size to their content, and a non-empty cell keeps a 10-character floor. Edge shadows show on whichever side has more table to scroll. From `lg`, a table widens past the text measure (`FULL_BLEED_TABLE`): with a contents rail it fills the column beside the rail; without one it takes the page width minus the gutters; in a content module it fills the section. Below `lg` it keeps the text width and scrolls. The Studio warns when a row has `TABLE_COLUMN_WARNING_THRESHOLD` (five) or more cells, and publishing is never blocked. Tables are entered in the Studio; paste from outside the Studio is not supported (#6914, #6915).
 - The cookie list renders from code, never from editor text: `COOKIE_LIST` in `apps/web/src/constants/cookie-list.ts` names every cookie and storage key the site sets, with a purpose and duration per id under the fixed `cookieList.*` catalog keys. Three columns (name, purpose, duration) from `sm` up; stacked entries on phones.
 - The cookie-preferences link renders a `button` styled as a prose link that opens the consent preferences dialog (./consent-and-analytics.md).
 - `articleText` has no H1, so the body never competes with the page title. A stored `h1` block still renders, as a level-2 heading without an anchor.
@@ -90,10 +92,11 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 - `packages/studio/src/schema-types/objects/aside/aside.ts`, `objects/body-image/body-image.ts`
 - `packages/service/src/shared/fragments/portable-text/portable-text-body-item.ts`
 - `packages/service/src/shared/transformers/portable-text/to-portable-text-body.ts`, `to-portable-text-mark-def.ts`
-- `apps/web/src/components/shared/portable-text/portable-text.tsx` and `config/{block,list,marks,types,full-bleed}.ts(x)`
+- `apps/web/src/components/shared/portable-text/portable-text.tsx` and `config/{block,list,marks,types,full-bleed}.ts(x)` (`full-bleed.ts` holds `FULL_BLEED_TABLE`)
 - `apps/web/src/components/shared/portable-text/components/code-block/code-block.tsx`
 - `apps/web/src/components/shared/portable-text/config/cookie-list.tsx`, `cookie-preferences-link.tsx`
 - `packages/studio/src/schema-types/objects/expandable-section/expandable-section.ts`, `table/table.ts`, `cookie-list/cookie-list.ts`, `cookie-preferences-link/cookie-preferences-link.ts`
+- `packages/studio/src/schema-types/validation/validate-table-column-count/validate-table-column-count.ts`
 
 ## Tests and stories
 
