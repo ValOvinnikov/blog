@@ -94,7 +94,10 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   };
 
   const clickBeginProvisioning = async () => {
-    const beginButton = screen.getByRole('button', BEGIN_PROVISIONING_BUTTON);
+    const beginButton = await screen.findByRole(
+      'button',
+      BEGIN_PROVISIONING_BUTTON,
+    );
 
     await user.click(beginButton);
   };
