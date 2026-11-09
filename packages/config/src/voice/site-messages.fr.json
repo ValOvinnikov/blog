@@ -347,31 +347,51 @@
       "site": "Ce site"
     },
     "cookies": {
-      "consent": {
+      "CONSENT": {
         "purpose": "Mémorise votre choix en matière de cookies, pour ne pas vous le redemander.",
         "duration": "180 jours"
       },
-      "NEXT_LOCALE": {
+      "LANGUAGE": {
         "purpose": "Mémorise la langue que vous avez choisie pour ce site.",
         "duration": "1 an"
       },
-      "signed_in_hint": {
+      "SESSION": {
+        "purpose": "Vous garde connecté.",
+        "duration": "Jusqu’à la fin de votre connexion"
+      },
+      "CSRF": {
+        "purpose": "Protège le formulaire de connexion contre les requêtes falsifiées.",
+        "duration": "Jusqu’à la fermeture de votre navigateur"
+      },
+      "SIGN_IN_RETURN": {
+        "purpose": "Vous ramène à la page depuis laquelle vous vous êtes connecté.",
+        "duration": "Jusqu’à la fermeture de votre navigateur"
+      },
+      "OAUTH_VERIFIER": {
+        "purpose": "Sécurise une connexion avec Google ou GitHub pendant qu’elle est en cours.",
+        "duration": "15 minutes"
+      },
+      "OAUTH_STATE": {
+        "purpose": "Vérifie qu’une connexion avec Google ou GitHub qui revient est bien celle que vous avez lancée.",
+        "duration": "15 minutes"
+      },
+      "SIGNED_IN_HINT": {
         "purpose": "Permet à la page d’afficher tout de suite votre menu de compte lorsque vous êtes connecté.",
         "duration": "Jusqu’à la fin de votre connexion"
       },
-      "newsletter_subscribed": {
+      "NEWSLETTER_SUBSCRIBED": {
         "purpose": "Mémorise votre abonnement à la newsletter, pour que le formulaire d’inscription reste masqué.",
         "duration": "1 an"
       },
-      "newsletter_unsubscribe_token": {
+      "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
         "purpose": "Conserve le lien de votre e-mail de désabonnement le temps de confirmer.",
         "duration": "1 heure"
       },
-      "reading-depth": {
+      "READING_DEPTH": {
         "purpose": "Mémorise la part de chaque article que vous avez choisi de lire. Conservé dans le stockage local de votre navigateur.",
         "duration": "Jusqu’à ce que vous effaciez les données de votre navigateur"
       },
-      "theme": {
+      "THEME": {
         "purpose": "Mémorise si vous avez choisi le thème clair ou sombre. Conservé dans le stockage local de votre navigateur.",
         "duration": "Jusqu’à ce que vous effaciez les données de votre navigateur"
       }

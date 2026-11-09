@@ -4,8 +4,8 @@ import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { consumePendingInvitesOnSignIn } from '@blog/auth/events/consume-pending-invites-on-sign-in';
 import { recordSignupTermsOnSignIn } from '@blog/auth/events/record-signup-terms-on-sign-in';
 import { buildMagicLinkProvider } from '@blog/auth/providers/magic-link/magic-link-provider/magic-link-provider';
+import { buildAppCookies } from '@blog/auth/sessions/app-cookies';
 import { scopeAdapterToApp } from '@blog/auth/sessions/app-scoped-adapter';
-import { buildPlatformCookies } from '@blog/auth/sessions/platform-cookies';
 import { env } from '@blog/auth/utils/env/env';
 import {
   getOAuthProviderCredentials,
@@ -74,10 +74,8 @@ export function buildAuthConfig(
     adapter: scopeAdapterToApp(adapter, app),
     session: { strategy: 'database' },
     secret: env.AUTH_SECRET,
-    ...(app === AUTH_APP.PLATFORM && {
-      useSecureCookies,
-      cookies: buildPlatformCookies(useSecureCookies),
-    }),
+    useSecureCookies,
+    cookies: buildAppCookies(app, useSecureCookies),
     callbacks: {
       // The returned object is the public /api/auth/session body, so it never spreads the session row.
       session: ({ session, user }) => ({

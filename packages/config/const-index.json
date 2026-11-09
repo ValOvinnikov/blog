@@ -3020,6 +3020,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/price-period.ts"
+      },
+      {
+        "ref": "COOKIE_ID.SESSION",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
     "MONTH": [
@@ -7577,6 +7583,94 @@
     "FIRST_PARTY": [
       {
         "ref": "COOKIE_PROVIDER.FIRST_PARTY",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "CONSENT": [
+      {
+        "ref": "COOKIE_ID.CONSENT",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "LANGUAGE": [
+      {
+        "ref": "COOKIE_ID.LANGUAGE",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "CSRF": [
+      {
+        "ref": "COOKIE_ID.CSRF",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "SIGN_IN_RETURN": [
+      {
+        "ref": "COOKIE_ID.SIGN_IN_RETURN",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "OAUTH_VERIFIER": [
+      {
+        "ref": "COOKIE_ID.OAUTH_VERIFIER",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "OAUTH_STATE": [
+      {
+        "ref": "COOKIE_ID.OAUTH_STATE",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "SIGNED_IN_HINT": [
+      {
+        "ref": "COOKIE_ID.SIGNED_IN_HINT",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "NEWSLETTER_SUBSCRIBED": [
+      {
+        "ref": "COOKIE_ID.NEWSLETTER_SUBSCRIBED",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "NEWSLETTER_UNSUBSCRIBE_TOKEN": [
+      {
+        "ref": "COOKIE_ID.NEWSLETTER_UNSUBSCRIBE_TOKEN",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "READING_DEPTH": [
+      {
+        "ref": "COOKIE_ID.READING_DEPTH",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-list",
+        "file": "apps/web/src/constants/cookie-list.ts"
+      }
+    ],
+    "THEME": [
+      {
+        "ref": "COOKIE_ID.THEME",
         "scope": "app:web",
         "from": "@web/constants/cookie-list",
         "file": "apps/web/src/constants/cookie-list.ts"

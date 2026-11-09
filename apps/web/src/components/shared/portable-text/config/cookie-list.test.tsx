@@ -3,14 +3,12 @@ import {
   SITE_MESSAGES,
   SITE_MESSAGES_BY_LOCALE,
 } from '@blog/config';
-import { COOKIE_LIST } from '@web/constants/cookie-list';
+import { COOKIE_ID, COOKIE_LIST } from '@web/constants/cookie-list';
 import { renderElement, screen, within } from '@web/testing/custom-render';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NextIntlClientProvider } from 'next-intl';
 
 import { CookieList } from './cookie-list';
-
-type TCookieName = keyof typeof SITE_MESSAGES.cookieList.cookies;
 
 const NL_MESSAGES = SITE_MESSAGES_BY_LOCALE.NL;
 
@@ -20,13 +18,13 @@ const getCookieRow = (name: string) =>
   });
 
 describe(`<${CookieList.name}/>`, () => {
-  it.each(COOKIE_LIST.map(({ name }) => name as TCookieName))(
-    'lists %s with its provider, purpose, duration and category',
-    (name) => {
+  it.each(COOKIE_LIST)(
+    'lists $name with its provider, purpose, duration and category',
+    ({ id, name }) => {
       renderElement(<CookieList />);
 
       const row = within(getCookieRow(name));
-      const { purpose, duration } = SITE_MESSAGES.cookieList.cookies[name];
+      const { purpose, duration } = SITE_MESSAGES.cookieList.cookies[id];
       expect(
         row.getByText(SITE_MESSAGES.cookieList.providers.site),
       ).toBeVisible();
@@ -54,9 +52,7 @@ describe(`<${CookieList.name}/>`, () => {
     const row = within(getCookieRow(LANGUAGE_COOKIE_NAME));
     expect(table).toBeVisible();
     expect(
-      row.getByText(
-        NL_MESSAGES.cookieList.cookies[LANGUAGE_COOKIE_NAME].purpose,
-      ),
+      row.getByText(NL_MESSAGES.cookieList.cookies[COOKIE_ID.LANGUAGE].purpose),
     ).toBeVisible();
   });
 

@@ -103,6 +103,9 @@ function redirectProxyUrlOf(
   return options?.redirectProxyUrl ?? MOCK_REDIRECT_PROXY_URL;
 }
 
+const DEFAULT_SESSION_COOKIE_NAME = 'authjs.session-token';
+const DEFAULT_CSRF_COOKIE_NAME = 'authjs.csrf-token';
+
 describe(buildAuthConfig, () => {
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -211,8 +214,12 @@ describe(buildAuthConfig, () => {
       config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
     });
 
-    it('keeps the default Auth.js cookies', () => {
-      expect(config.cookies).toBeUndefined();
+    it("keeps Auth.js's default cookie names outside production", () => {
+      expect(config.useSecureCookies).toBe(false);
+      expect(config.cookies?.sessionToken?.name).toBe(
+        DEFAULT_SESSION_COOKIE_NAME,
+      );
+      expect(config.cookies?.csrfToken?.name).toBe(DEFAULT_CSRF_COOKIE_NAME);
     });
 
     it('returns only the public user fields and the expiry as the session', async () => {
@@ -264,7 +271,7 @@ describe(buildAuthConfig, () => {
 
     it('names every cookie apart from the default Auth.js cookies', () => {
       expect(config.cookies?.sessionToken?.name).not.toBe(
-        'authjs.session-token',
+        DEFAULT_SESSION_COOKIE_NAME,
       );
       expect(Object.keys(config.cookies ?? {})).toEqual([
         'sessionToken',
@@ -280,6 +287,24 @@ describe(buildAuthConfig, () => {
     it('drops the secure cookie prefixes outside production', () => {
       expect(config.useSecureCookies).toBe(false);
       expect(config.cookies?.sessionToken?.name).not.toMatch(/^__/);
+    });
+  });
+
+  describe('for a site in production', () => {
+    beforeEach(() => {
+      vi.stubEnv('NODE_ENV', 'production');
+    });
+
+    it("keeps Auth.js's default secure cookie names", () => {
+      const config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+
+      expect(config.useSecureCookies).toBe(true);
+      expect(config.cookies?.sessionToken?.name).toBe(
+        `__Secure-${DEFAULT_SESSION_COOKIE_NAME}`,
+      );
+      expect(config.cookies?.csrfToken?.name).toBe(
+        `__Host-${DEFAULT_CSRF_COOKIE_NAME}`,
+      );
     });
   });
 

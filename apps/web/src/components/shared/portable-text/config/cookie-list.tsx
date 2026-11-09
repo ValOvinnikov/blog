@@ -37,14 +37,14 @@ export const CookieList = () => {
             <Table.HeaderCell>{t('columns.category')}</Table.HeaderCell>
           </Table.Row>
         </Table.Head>
-        {COOKIE_LIST.map(({ name, provider, category }) => (
+        {COOKIE_LIST.map(({ id, name, provider, category }) => (
           <Table.Row key={name}>
             <Table.HeaderCell isRowHeader={true}>
               <InlineCode>{name}</InlineCode>
             </Table.HeaderCell>
             <Table.Cell>{t(PROVIDER_LABEL_KEY[provider])}</Table.Cell>
-            <Table.Cell>{t(`cookies.${name}.purpose`)}</Table.Cell>
-            <Table.Cell>{t(`cookies.${name}.duration`)}</Table.Cell>
+            <Table.Cell>{t(`cookies.${id}.purpose`)}</Table.Cell>
+            <Table.Cell>{t(`cookies.${id}.duration`)}</Table.Cell>
             <Table.Cell>{tConsent(CATEGORY_LABEL_KEY[category])}</Table.Cell>
           </Table.Row>
         ))}

@@ -347,31 +347,51 @@
       "site": "Deze site"
     },
     "cookies": {
-      "consent": {
+      "CONSENT": {
         "purpose": "Onthoudt je cookiekeuze, zodat we het niet opnieuw vragen.",
         "duration": "180 dagen"
       },
-      "NEXT_LOCALE": {
+      "LANGUAGE": {
         "purpose": "Onthoudt de taal die je voor deze site hebt gekozen.",
         "duration": "1 jaar"
       },
-      "signed_in_hint": {
+      "SESSION": {
+        "purpose": "Houdt je ingelogd.",
+        "duration": "Tot je uitlogt of je sessie verloopt"
+      },
+      "CSRF": {
+        "purpose": "Beschermt het inlogformulier tegen vervalste verzoeken.",
+        "duration": "Tot je je browser sluit"
+      },
+      "SIGN_IN_RETURN": {
+        "purpose": "Brengt je terug naar de pagina waarop je inlogde.",
+        "duration": "Tot je je browser sluit"
+      },
+      "OAUTH_VERIFIER": {
+        "purpose": "Beveiligt het inloggen met Google of GitHub terwijl het bezig is.",
+        "duration": "15 minuten"
+      },
+      "OAUTH_STATE": {
+        "purpose": "Controleert dat een inlogpoging via Google of GitHub die terugkomt, de jouwe is.",
+        "duration": "15 minuten"
+      },
+      "SIGNED_IN_HINT": {
         "purpose": "Laat de pagina meteen je accountmenu tonen zolang je bent ingelogd.",
         "duration": "Tot je uitlogt of je sessie verloopt"
       },
-      "newsletter_subscribed": {
+      "NEWSLETTER_SUBSCRIBED": {
         "purpose": "Onthoudt dat je je voor de nieuwsbrief hebt aangemeld, zodat het aanmeldformulier verborgen blijft.",
         "duration": "1 jaar"
       },
-      "newsletter_unsubscribe_token": {
+      "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
         "purpose": "Bewaart de link uit je afmeldmail terwijl je bevestigt.",
         "duration": "1 uur"
       },
-      "reading-depth": {
+      "READING_DEPTH": {
         "purpose": "Onthoudt hoeveel je van elk bericht wilt lezen. Opgeslagen in de lokale opslag van je browser.",
         "duration": "Tot je je browsergegevens wist"
       },
-      "theme": {
+      "THEME": {
         "purpose": "Onthoudt of je het lichte of donkere thema hebt gekozen. Opgeslagen in de lokale opslag van je browser.",
         "duration": "Tot je je browsergegevens wist"
       }
