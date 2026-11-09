@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import { faker } from '@faker-js/faker';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
   renderElement,
@@ -18,6 +19,7 @@ import {
   mockPortableTextSpan,
 } from '@web/testing/shared/portable-text/fixtures';
 
+import { createAsideOverride } from './config';
 import { PortableText } from './portable-text';
 
 vi.mock('@web/i18n/navigation');
@@ -32,6 +34,10 @@ type TBlock = TPortableTextBody[number];
 type TAsideBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.ASIDE }
+>;
+type TExpandableSectionBlock = Extract<
+  TBlock,
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
 type TBodyImageBlock = Extract<
   TBlock,
@@ -62,6 +68,11 @@ const MOCK_BOLD_TEXT = faker.lorem.words(2);
 const MOCK_CUSTOM_CODE_TEXT = faker.lorem.words(2);
 const MOCK_SECOND_PARAGRAPH_TEXT = faker.lorem.sentence();
 const MOCK_COOKIE_LINK_TEXT = faker.lorem.words(2);
+const MOCK_SECTION_TITLE = faker.lorem.words(3);
+const MOCK_SECTION_BODY_TEXT = faker.lorem.sentence();
+const MOCK_SECTION_LINK_TEXT = faker.lorem.words(2);
+const MOCK_SECTION_ASIDE_LABEL = faker.lorem.word();
+const ARIA_EXPANDED = 'aria-expanded';
 const CODE_REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
 
 const RESOLVED_LINK_REF = {
@@ -79,6 +90,29 @@ const mockAsideBlock = (
   kind,
   body,
 });
+
+const mockExpandableSectionBlock = (
+  body: TExpandableSectionBlock['body'],
+): TExpandableSectionBlock => ({
+  _type: PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION,
+  _key: 'section-1',
+  title: MOCK_SECTION_TITLE,
+  body,
+});
+
+const mockSectionWithBody = () =>
+  mockExpandableSectionBlock([
+    mockPortableTextBlock(
+      [
+        mockPortableTextSpan(MOCK_SECTION_BODY_TEXT, ['strong']),
+        mockPortableTextSpan(MOCK_SECTION_LINK_TEXT, [MOCK_LINK_KEY]),
+      ],
+      { markDefs: [RESOLVED_LINK_REF] },
+    ),
+  ]);
+
+const getSectionTrigger = () =>
+  screen.getByRole('button', { name: MOCK_SECTION_TITLE });
 
 const mockBodyImageBlock = (
   image: TBodyImageBlock['image'],
@@ -431,6 +465,67 @@ describe(`<${PortableText.name}/>`, () => {
 
     const link = screen.getByRole('link', { name: MOCK_NESTED_LINK_TEXT });
     expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
+  });
+
+  describe('with an expandable section', () => {
+    let user: UserEvent;
+
+    beforeEach(() => {
+      user = userEvent.setup();
+      setup({ value: [mockSectionWithBody()] });
+    });
+
+    it('renders it closed, keeping its body in the page', () => {
+      const trigger = getSectionTrigger();
+      const body = screen.getByText(MOCK_SECTION_BODY_TEXT, {
+        selector: 'strong',
+      });
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(body).toBeInTheDocument();
+      expect(body).not.toBeVisible();
+    });
+
+    it('opens it by click to show its formatted body and links', async () => {
+      await user.click(getSectionTrigger());
+
+      const body = screen.getByText(MOCK_SECTION_BODY_TEXT, {
+        selector: 'strong',
+      });
+      const link = screen.getByRole('link', { name: MOCK_SECTION_LINK_TEXT });
+      expect(body).toBeVisible();
+      expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
+    });
+
+    it('opens it from the keyboard', async () => {
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      const trigger = getSectionTrigger();
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
+  });
+
+  it('labels an aside inside an expandable section from the caller override', async () => {
+    const user = userEvent.setup();
+    setup({
+      value: [
+        mockExpandableSectionBlock([
+          mockAsideBlock(
+            [mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)],
+            ASIDE_KIND.WHY_NOT,
+          ),
+        ]),
+      ],
+      components: createAsideOverride({
+        [ASIDE_KIND.WHY_NOT]: MOCK_SECTION_ASIDE_LABEL,
+      }),
+    });
+
+    await user.click(getSectionTrigger());
+
+    const label = screen.getByText(MOCK_SECTION_ASIDE_LABEL);
+    expect(label).toBeVisible();
   });
 
   it('keeps the default strong mark when a caller overrides the code mark', () => {

@@ -3,6 +3,7 @@ import {
   defaultComponents,
   mergeComponents,
   type PortableTextComponents,
+  type PortableTextTypeComponent,
 } from '@portabletext/react';
 
 import { blockComponents } from './block';
@@ -13,6 +14,7 @@ import {
   bodyImageTypeComponent,
   codeTypeComponent,
   makeAsideTypeComponent,
+  makeExpandableSectionTypeComponent,
   type TAsideKindLabels,
 } from './types';
 
@@ -31,29 +33,45 @@ const baseForAsideRecursion = mergeComponents(
   componentsWithoutAside,
 );
 
-const portableTextComponents: PortableTextComponents = {
-  block: blockComponents,
-  marks: markComponents,
-  list: listComponents,
+const makeArticleTextComponents = (
+  aside: PortableTextTypeComponent,
+): PortableTextComponents => ({
+  ...componentsWithoutAside,
   types: {
-    code: codeTypeComponent,
-    bodyImage: bodyImageTypeComponent,
-    aside: makeAsideTypeComponent(baseForAsideRecursion),
+    ...componentsWithoutAside.types,
+    aside,
     [PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST]: CookieList,
   },
-};
+});
 
-export const baseComponents = mergeComponents(
-  defaultComponents,
-  portableTextComponents,
-);
+const makeSectionTypeComponent = (aside: PortableTextTypeComponent) =>
+  makeExpandableSectionTypeComponent(
+    mergeComponents(defaultComponents, makeArticleTextComponents(aside)),
+  );
+
+const makeTypeOverrides = (aside: PortableTextTypeComponent) => ({
+  aside,
+  [PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION]:
+    makeSectionTypeComponent(aside),
+});
+
+const defaultAside = makeAsideTypeComponent(baseForAsideRecursion);
+const articleTextComponents = makeArticleTextComponents(defaultAside);
+
+export const baseComponents = mergeComponents(defaultComponents, {
+  ...articleTextComponents,
+  types: {
+    ...articleTextComponents.types,
+    ...makeTypeOverrides(defaultAside),
+  },
+});
 
 export const createAsideOverride = (
   asideKindLabels?: TAsideKindLabels,
 ): PortableTextComponents => ({
-  types: {
-    aside: makeAsideTypeComponent(baseForAsideRecursion, asideKindLabels),
-  },
+  types: makeTypeOverrides(
+    makeAsideTypeComponent(baseForAsideRecursion, asideKindLabels),
+  ),
 });
 
 export type { TAsideKindLabels } from './types';
