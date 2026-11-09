@@ -7,7 +7,7 @@ import { Scale } from 'lucide-react';
 
 export const legalDocumentPageSchema = sectionDocumentSchema({
   name: PAGE_LEGAL_DOCUMENT_TYPE,
-  title: 'Legal Document Page',
+  title: 'Legal Page',
   description:
     "A page in the site's legal section, such as the terms or the imprint, at its own address under /legal.",
   icon: Scale,

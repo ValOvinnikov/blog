@@ -11,7 +11,7 @@ import {
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocument } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { paragraphs, seo } from './starter-fields';
+import { pageHeadingBlock, paragraphs, seo } from './starter-fields';
 
 const COOKIE_PREFERENCES_MARK_KEY = 'cookiePreferences';
 
@@ -59,12 +59,19 @@ function cookieStatementContent({
 export function buildCookieStatementDocument(
   locale: TLocaleIsoCode,
   cookieStatement: TStarterCopy['cookieStatement'],
-): TStarterDocument<Page_cookieStatement, 'title' | 'content' | 'seo'> {
+): TStarterDocument<
+  Page_cookieStatement,
+  'title' | 'headingBlock' | 'content' | 'seo'
+> {
   return {
     _id: cookieStatementDocumentId(locale),
     _type: 'page_cookieStatement',
     language: locale,
     title: cookieStatement.title,
+    headingBlock: pageHeadingBlock(
+      cookieStatement.heading,
+      cookieStatement.supportingText,
+    ),
     content: cookieStatementContent(cookieStatement),
     seo: seo(cookieStatement.metaTitle, cookieStatement.metaDescription),
   };

@@ -1816,6 +1816,8 @@ export type Page_cookieStatement = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
+  headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   content?: ArticleText;
   seo?: Seo;
 };
@@ -1828,6 +1830,8 @@ export type Page_legalDocument = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
+  headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   slug?: Slug;
   kind?: 'TERMS' | 'IMPRINT' | 'OTHER';
   content?: ArticleText;
@@ -1945,6 +1949,8 @@ export type Page_privacyDocument = {
   _rev: string;
   language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
   title?: string;
+  headingBlock?: PageHeadingBlock;
+  contentAlignment?: 'LEFT' | 'CENTER';
   slug?: Slug;
   kind?: 'PRIVACY_POLICY' | 'OTHER';
   content?: ArticleText;

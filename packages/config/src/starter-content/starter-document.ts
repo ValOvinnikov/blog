@@ -83,7 +83,10 @@ export type TStarterDocumentUnion =
   | TStarterPage<Page_home>
   | TStarterDocument<Template_postIndex, 'title'>
   | TStarterPage<Page_postIndex>
-  | TStarterDocument<Page_cookieStatement, 'title' | 'content' | 'seo'>
+  | TStarterDocument<
+      Page_cookieStatement,
+      'title' | 'headingBlock' | 'content' | 'seo'
+    >
   | TStarterDocument<Template_privacyIndex, 'title'>
   | TStarterPage<Page_privacyIndex>
   | TStarterDocument<Template_legalIndex, 'title'>
