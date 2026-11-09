@@ -15,6 +15,7 @@ import {
   keyedReference,
   localizedString,
   moduleHeadingBlock,
+  paragraphs,
   reference,
 } from './starter-fields';
 import { ctaButton, internalLink, navigationLink } from './starter-links';
@@ -60,7 +61,7 @@ export function buildDocsDocuments({
       id: ids.DOCS_INTRO,
       title: 'Introduction',
       locale,
-      body: intro.body,
+      body: paragraphs(intro.body),
     }),
     ...buildFaqModule({ id: ids.DOCS_FAQ, title: 'Questions', locale, faq }),
     internalLink(ids.DOCS_GUIDES_LINK, guides.title, locale, ids.DOCS_GUIDES),

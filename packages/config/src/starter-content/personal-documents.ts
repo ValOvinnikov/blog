@@ -5,7 +5,7 @@ import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
 import { buildFaqModule } from './starter-faq';
-import { keyedReference, reference } from './starter-fields';
+import { keyedReference, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   buildAuthor,
@@ -54,7 +54,7 @@ export function buildPersonalDocuments({
       id: ids.PERSONAL_INTRO,
       title: 'Introduction',
       locale,
-      body: intro.body,
+      body: paragraphs(intro.body),
     }),
     ...buildFaqModule({
       id: ids.PERSONAL_FAQ,

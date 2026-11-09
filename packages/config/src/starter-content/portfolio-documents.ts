@@ -4,7 +4,7 @@ import { buildBaseDocuments } from './base-documents';
 import type { TStarterCopy } from './copy/starter-copy';
 import type { TStarterDocumentUnion } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { keyedReference, reference } from './starter-fields';
+import { keyedReference, paragraphs, reference } from './starter-fields';
 import { internalLink, navigationLink } from './starter-links';
 import {
   buildAuthor,
@@ -50,7 +50,7 @@ export function buildPortfolioDocuments({
       id: ids.PORTFOLIO_INTRO,
       title: 'Introduction',
       locale,
-      body: intro.body,
+      body: paragraphs(intro.body),
     }),
     buildCalloutCta({
       id: ids.PORTFOLIO_CTA,

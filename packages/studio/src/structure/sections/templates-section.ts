@@ -1,6 +1,8 @@
 import { homeTemplateSchema } from '@blog/studio/schema-types/documents/templates/home/home';
 import { landingTemplateSchema } from '@blog/studio/schema-types/documents/templates/landing/landing';
+import { legalIndexTemplateSchema } from '@blog/studio/schema-types/documents/templates/legal-index/legal-index';
 import { postIndexTemplateSchema } from '@blog/studio/schema-types/documents/templates/post-index/post-index';
+import { privacyIndexTemplateSchema } from '@blog/studio/schema-types/documents/templates/privacy-index/privacy-index';
 import { tagTemplateSchema } from '@blog/studio/schema-types/documents/templates/tag/tag';
 import { tagIndexTemplateSchema } from '@blog/studio/schema-types/documents/templates/tag-index/tag-index';
 import { topicTemplateSchema } from '@blog/studio/schema-types/documents/templates/topic/topic';
@@ -30,6 +32,14 @@ export const templatesSection: TStructureSection = {
         { schema: tagIndexTemplateSchema },
         { schema: tagTemplateSchema },
       ],
+    },
+    {
+      title: 'Privacy',
+      items: [{ schema: privacyIndexTemplateSchema }],
+    },
+    {
+      title: 'Legal',
+      items: [{ schema: legalIndexTemplateSchema }],
     },
   ],
 };

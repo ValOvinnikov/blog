@@ -2,9 +2,11 @@ import { cookieStatementPageSchema } from '@blog/studio/schema-types/documents/p
 import { homePageSchema } from '@blog/studio/schema-types/documents/pages/home/home';
 import { landingPageSchema } from '@blog/studio/schema-types/documents/pages/landing/landing';
 import { legalDocumentPageSchema } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document';
+import { legalIndexPageSchema } from '@blog/studio/schema-types/documents/pages/legal-index/legal-index';
 import { postPageSchema } from '@blog/studio/schema-types/documents/pages/post/post';
 import { postIndexPageSchema } from '@blog/studio/schema-types/documents/pages/post-index/post-index';
 import { privacyDocumentPageSchema } from '@blog/studio/schema-types/documents/pages/privacy-document/privacy-document';
+import { privacyIndexPageSchema } from '@blog/studio/schema-types/documents/pages/privacy-index/privacy-index';
 import { tagPageSchema } from '@blog/studio/schema-types/documents/pages/tag/tag';
 import { tagIndexPageSchema } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index';
 import { topicPageSchema } from '@blog/studio/schema-types/documents/pages/topic/topic';
@@ -38,11 +40,15 @@ export const pagesSection: TStructureSection = {
     },
     {
       title: 'Privacy',
-      items: [{ schema: privacyDocumentPageSchema, mode: 'byLanguage' }],
+      items: [
+        { schema: privacyIndexPageSchema, mode: 'onePerLanguage' },
+        { schema: privacyDocumentPageSchema, mode: 'byLanguage' },
+      ],
     },
     {
       title: 'Legal',
       items: [
+        { schema: legalIndexPageSchema, mode: 'onePerLanguage' },
         { schema: legalDocumentPageSchema, mode: 'byLanguage' },
         { schema: cookieStatementPageSchema, mode: 'onePerLanguage' },
       ],

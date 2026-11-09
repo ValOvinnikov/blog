@@ -1,3 +1,5 @@
+import type { ArticleText } from '@blog/config/sanity/generated/types';
+
 import type { TLocaleIsoCode } from '@blog/config/constants';
 
 export function seo(metaTitle: string, metaDescription: string) {
@@ -62,25 +64,19 @@ function localizedBlocks<
   TValueType extends
     | 'internationalizedArrayArticleTextValue'
     | 'internationalizedArrayListedTextValue',
->(valueType: TValueType, locale: TLocaleIsoCode, texts: readonly string[]) {
-  return [
-    {
-      _key: locale,
-      _type: valueType,
-      language: locale,
-      value: paragraphs(texts),
-    },
-  ];
+  TBlock,
+>(valueType: TValueType, locale: TLocaleIsoCode, value: TBlock[]) {
+  return [{ _key: locale, _type: valueType, language: locale, value }];
 }
 
-export function localizedArticleText(
+export function localizedArticleBlocks(
   locale: TLocaleIsoCode,
-  texts: readonly string[],
+  blocks: ArticleText,
 ) {
   return localizedBlocks(
     'internationalizedArrayArticleTextValue',
     locale,
-    texts,
+    blocks,
   );
 }
 
@@ -91,7 +87,7 @@ export function localizedListedText(
   return localizedBlocks(
     'internationalizedArrayListedTextValue',
     locale,
-    texts,
+    paragraphs(texts),
   );
 }
 

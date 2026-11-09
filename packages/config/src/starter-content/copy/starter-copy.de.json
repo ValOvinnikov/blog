@@ -23,6 +23,21 @@
     "preferencesLink": "Cookie-Einstellungen öffnen",
     "preferencesTail": "."
   },
+  "privacyIndex": {
+    "title": "Datenschutz",
+    "heading": "Datenschutz",
+    "supportingText": "Wie diese Website mit deinen personenbezogenen Daten umgeht.",
+    "metaTitle": "Datenschutz — wie diese Website mit Daten umgeht",
+    "metaDescription": "Die Datenschutzerklärung und weitere Datenschutzhinweise dieser Website. Ersetze diese Beispielseite durch eigene Texte, sobald du sie hast."
+  },
+  "legalIndex": {
+    "title": "Rechtliches",
+    "heading": "Rechtliches",
+    "supportingText": "Die Bedingungen, Hinweise und Erklärungen, die für diese Website gelten.",
+    "metaTitle": "Rechtliches — Bedingungen und Hinweise dieser Website",
+    "metaDescription": "Die Nutzungsbedingungen, das Impressum, die Cookie-Erklärung und weitere rechtliche Informationen dieser Website.",
+    "intro": "Diese Seite listet die rechtlichen Seiten dieser Website auf. Es ist ein Platzhaltertext: Ersetze ihn durch deinen eigenen, bevor du dich darauf verlässt."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Hier beginnen",

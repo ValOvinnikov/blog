@@ -13,6 +13,7 @@ import type {
 import {
   keyedReference,
   pageHeadingBlock,
+  paragraphs,
   reference,
   seo,
   slug,
@@ -50,7 +51,7 @@ export function buildSectionChildPage({
       id: bodyId,
       title: `${page.title} Body`,
       locale,
-      body: page.body,
+      body: paragraphs(page.body),
     }),
     {
       _id: templateId,
