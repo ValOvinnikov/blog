@@ -32,7 +32,10 @@ export const contentsRailLayoutVariants = tv({
       },
       false: {
         // `box-content` keeps the gutter outside the measure, and `text-prose` resolves its `ch` at the prose font size.
-        root: ['box-content max-w-measure text-prose'],
+        root: [
+          'box-content max-w-measure text-prose',
+          'lg:[--full-bleed-table-width:calc(min(100vw,var(--container-page))-2*var(--spacing-gutter))]',
+        ],
       },
     },
   },

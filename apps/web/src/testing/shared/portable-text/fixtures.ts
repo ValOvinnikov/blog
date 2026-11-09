@@ -125,3 +125,51 @@ export const MOCK_FULL_BLEED_IMAGE_DEMO: TPortableTextBody = [
     'A paragraph after the full bleed image, continuing at the regular text measure.',
   ),
 ];
+
+type TTableBlock = Extract<
+  TPortableTextBody[number],
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.TABLE }
+>;
+type TTableRow = NonNullable<TTableBlock['rows']>[number];
+
+export const mockTableRow = (cells: TPortableTextBlock[]): TTableRow => ({
+  _type: 'row',
+  _key: nextKey('row'),
+  cells: cells.map((block) => ({
+    _type: 'cell',
+    _key: nextKey('cell'),
+    value: [block],
+  })),
+});
+
+export const mockTableBlock = (
+  rows: TTableRow[],
+  headerRows?: number,
+): TTableBlock => ({
+  _type: PORTABLE_TEXT_BLOCK_TYPE.TABLE,
+  _key: nextKey(PORTABLE_TEXT_BLOCK_TYPE.TABLE),
+  headerRows,
+  rows,
+});
+
+const MOCK_WIDE_TABLE_CELLS = [
+  ['Plan', 'Monthly price', 'Included seats', 'Custom domain', 'Support'],
+  ['Free', '£0', '1 editor', 'Not included', 'Community forum'],
+  ['Growth', '£24', '5 editors', 'Included', 'Email within two days'],
+  ['Scale', '£96', 'Unlimited editors', 'Included', 'Email within four hours'],
+];
+
+export const MOCK_WIDE_TABLE_DEMO: TPortableTextBody = [
+  mockPortableTextBlock(
+    'A paragraph before a five column table. From the lg breakpoint a table widens past the text measure so its columns fit without scrolling.',
+  ),
+  mockTableBlock(
+    MOCK_WIDE_TABLE_CELLS.map((row) =>
+      mockTableRow(row.map((text) => mockPortableTextBlock(text))),
+    ),
+    1,
+  ),
+  mockPortableTextBlock(
+    'A paragraph after the table, back at the regular text measure.',
+  ),
+];

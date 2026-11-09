@@ -17,6 +17,8 @@ import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import {
   mockPortableTextBlock,
   mockPortableTextSpan,
+  mockTableBlock,
+  mockTableRow,
 } from '@web/testing/shared/portable-text/fixtures';
 
 import { createAsideOverride } from './config';
@@ -39,11 +41,6 @@ type TExpandableSectionBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
-type TTableBlock = Extract<
-  TBlock,
-  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.TABLE }
->;
-type TTableRow = NonNullable<TTableBlock['rows']>[number];
 type TBodyImageBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE }
@@ -119,26 +116,6 @@ const mockSectionWithBody = () =>
       { markDefs: [RESOLVED_LINK_REF] },
     ),
   ]);
-
-const mockTableRow = (cells: TPortableTextBlock[]): TTableRow => ({
-  _type: 'row',
-  _key: faker.string.uuid(),
-  cells: cells.map((block) => ({
-    _type: 'cell',
-    _key: faker.string.uuid(),
-    value: [block],
-  })),
-});
-
-const mockTableBlock = (
-  rows: TTableRow[],
-  headerRows?: number,
-): TTableBlock => ({
-  _type: PORTABLE_TEXT_BLOCK_TYPE.TABLE,
-  _key: faker.string.uuid(),
-  headerRows,
-  rows,
-});
 
 const mockTableWithHeaderRow = () =>
   mockTableBlock(
