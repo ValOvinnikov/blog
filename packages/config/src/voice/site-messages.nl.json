@@ -398,5 +398,8 @@
       }
     },
     "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze."
+  },
+  "table": {
+    "regionLabel": "Tabel"
   }
 }
