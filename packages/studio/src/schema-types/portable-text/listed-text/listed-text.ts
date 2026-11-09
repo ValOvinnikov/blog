@@ -12,9 +12,12 @@ import {
   type BlockStyleDefinition,
 } from 'sanity';
 
-export const listedTextStyles: BlockStyleDefinition[] = [
-  { title: 'Normal', value: 'normal' },
-];
+export const normalBlockStyle: BlockStyleDefinition = {
+  title: 'Normal',
+  value: 'normal',
+};
+
+export const listedTextStyles: BlockStyleDefinition[] = [normalBlockStyle];
 
 export const listedTextMarks: BlockMarksDefinition = {
   decorators: [

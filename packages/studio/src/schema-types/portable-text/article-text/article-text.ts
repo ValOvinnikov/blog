@@ -1,17 +1,9 @@
-import { asideSchema } from '@blog/studio/schema-types/objects/aside/aside';
-import { bodyImageSchema } from '@blog/studio/schema-types/objects/body-image/body-image';
-import { cookieListSchema } from '@blog/studio/schema-types/objects/cookie-list/cookie-list';
-import { cookiePreferencesLinkSchema } from '@blog/studio/schema-types/objects/cookie-preferences-link/cookie-preferences-link';
-import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
+import { expandableSectionSchema } from '@blog/studio/schema-types/objects/expandable-section/expandable-section';
 import {
-  boldDecorator,
-  codeDecorator,
-  italicDecorator,
-  strikeThroughDecorator,
-  subscriptDecorator,
-  superscriptDecorator,
-  underlineDecorator,
-} from '@blog/studio/schema-types/portable-text/decorators/decorators';
+  articleTextEmbeds,
+  articleTextMarks,
+  articleTextStyles,
+} from '@blog/studio/schema-types/portable-text/article-text/article-text-members';
 import { defineArrayMember, defineType } from 'sanity';
 
 export const articleTextSchema = defineType({
@@ -23,33 +15,10 @@ export const articleTextSchema = defineType({
   of: [
     defineArrayMember({
       type: 'block',
-      // Excludes H1 so the body never competes with the post/page title's own heading.
-      styles: [
-        { title: 'Normal', value: 'normal' },
-        { title: 'H2', value: 'h2' },
-        { title: 'H3', value: 'h3' },
-        { title: 'H4', value: 'h4' },
-        { title: 'Quote', value: 'blockquote' },
-      ],
-      marks: {
-        decorators: [
-          boldDecorator,
-          italicDecorator,
-          codeDecorator,
-          underlineDecorator,
-          strikeThroughDecorator,
-          subscriptDecorator,
-          superscriptDecorator,
-        ],
-        annotations: [
-          { type: linkRefSchema.name },
-          { type: cookiePreferencesLinkSchema.name },
-        ],
-      },
+      styles: articleTextStyles,
+      marks: articleTextMarks,
     }),
-    defineArrayMember({ type: bodyImageSchema.name }),
-    defineArrayMember({ type: 'code' }),
-    defineArrayMember({ type: asideSchema.name }),
-    defineArrayMember({ type: cookieListSchema.name }),
+    ...articleTextEmbeds,
+    defineArrayMember({ type: expandableSectionSchema.name }),
   ],
 });

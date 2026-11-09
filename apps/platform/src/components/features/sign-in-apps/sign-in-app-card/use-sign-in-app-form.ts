@@ -57,6 +57,7 @@ export const useSignInAppForm = (tenantId: string, app: TSignInAppView) => {
     );
     if (isOutcomeSuccess(result)) {
       reset({ hasOwnApp: true, clientId: clientId.trim() });
+      setSaveError(undefined);
       setSavedMessage(t('saved', { provider: t(`providerName.${provider}`) }));
       router.refresh();
       return true;

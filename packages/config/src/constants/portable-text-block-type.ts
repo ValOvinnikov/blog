@@ -6,6 +6,7 @@ export const PORTABLE_TEXT_BLOCK_TYPE = {
   LINK_REF: 'linkRef',
   COOKIE_PREFERENCES_LINK: 'cookiePreferencesLink',
   COOKIE_LIST: 'cookieList',
+  EXPANDABLE_SECTION: 'expandableSection',
 } as const;
 
 export type TPortableTextBlockType = TValueOf<typeof PORTABLE_TEXT_BLOCK_TYPE>;

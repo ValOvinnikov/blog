@@ -604,6 +604,42 @@ export type ImageWithAlt = {
   alt?: string;
 };
 
+export type ExpandableSectionText = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: 'span';
+        _key: string;
+      }>;
+      style?: 'normal' | 'h3' | 'h4' | 'blockquote';
+      listItem?: 'bullet' | 'number';
+      markDefs?: Array<
+        | ({
+            _key: string;
+          } & LinkRef)
+        | ({
+            _key: string;
+          } & CookiePreferencesLink)
+      >;
+      level?: number;
+      _type: 'block';
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & BodyImage)
+  | ({
+      _key: string;
+    } & Code)
+  | ({
+      _key: string;
+    } & Aside)
+  | ({
+      _key: string;
+    } & CookieList)
+>;
+
 export type ListedText = Array<{
   children?: Array<{
     marks?: Array<string>;
@@ -676,6 +712,9 @@ export type ArticleText = Array<
   | ({
       _key: string;
     } & CookieList)
+  | ({
+      _key: string;
+    } & ExpandableSection)
 >;
 
 export type NewsletterTrustCue = {
@@ -874,6 +913,12 @@ export type LinkRefWithSubItems = {
       _key: string;
     } & LinkRef
   >;
+};
+
+export type ExpandableSection = {
+  _type: 'expandableSection';
+  title?: string;
+  body?: ExpandableSectionText;
 };
 
 export type CookieList = {
@@ -2371,6 +2416,7 @@ export type AllSanitySchemaTypes =
   | Page_legalDocumentReference
   | InlineLink
   | ImageWithAlt
+  | ExpandableSectionText
   | ListedText
   | ParagraphText
   | ArticleText
@@ -2396,6 +2442,7 @@ export type AllSanitySchemaTypes =
   | SanityImageCrop
   | SanityImageHotspot
   | LinkRefWithSubItems
+  | ExpandableSection
   | CookieList
   | CookiePreferencesLink
   | LinkRef
