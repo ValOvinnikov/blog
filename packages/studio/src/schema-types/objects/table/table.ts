@@ -5,6 +5,7 @@ import {
   italicDecorator,
 } from '@blog/studio/schema-types/portable-text/decorators/decorators';
 import { normalBlockStyle } from '@blog/studio/schema-types/portable-text/listed-text/listed-text';
+import { validateTableColumnCount } from '@blog/studio/schema-types/validation/validate-table-column-count/validate-table-column-count';
 import { Table } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -54,6 +55,7 @@ export const tableSchema = defineType({
   description:
     'Rows and columns of short text, such as a list of tools and what each one does.',
   icon: Table,
+  validation: (rule) => rule.custom(validateTableColumnCount).warning(),
   fields: [
     defineField({
       name: 'headerRows',
