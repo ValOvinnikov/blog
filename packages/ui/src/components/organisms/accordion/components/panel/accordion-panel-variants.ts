@@ -7,6 +7,6 @@ export const accordionPanelVariants = tv({
       'transition-[height] duration-slow ease-smooth motion-reduce:transition-none',
       'data-starting-style:h-0 data-ending-style:h-0',
     ],
-    content: ['pb-4 text-copy text-text-muted'],
+    content: ['pb-4 text-base text-text'],
   },
 });

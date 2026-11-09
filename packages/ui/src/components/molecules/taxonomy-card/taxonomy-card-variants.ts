@@ -9,7 +9,7 @@ export const taxonomyCardVariants = tv({
       'px-card-x py-card-y',
     ],
     accessibleName: ['sr-only'],
-    description: ['text-copy', 'text-muted line-clamp-2'],
+    description: ['text-lead', 'text-muted line-clamp-2'],
     count: ['font-mono text-meta', 'text-subtle'],
   },
   variants: {

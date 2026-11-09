@@ -13,7 +13,7 @@ export const tableVariants = tv({
     ],
     table: [
       'w-full border-collapse',
-      'text-left text-sm leading-normal text-text',
+      'text-left text-base leading-normal text-text',
     ],
   },
 });
