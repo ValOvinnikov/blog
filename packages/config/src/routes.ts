@@ -47,7 +47,6 @@ export const routes = {
   legalDocument: (slug: string) => `/legal/${slug}`,
   cookieStatement: () => routes.legalDocument(COOKIE_STATEMENT_SLUG),
   legalPageByKind: (kind: TLegalPageKind) => `/api/legal-page/${kind}`,
-  terms: () => '/terms',
   privacy: () => '/privacy',
   legal: () => '/legal',
   switchLanguage: (to: string, from: string) =>
