@@ -192,7 +192,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/portable-text-block-type.ts`
 
-- **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`, `COOKIE_PREFERENCES_LINK`=`"cookiePreferencesLink"`, `COOKIE_LIST`=`"cookieList"`, `EXPANDABLE_SECTION`=`"expandableSection"`
+- **PORTABLE_TEXT_BLOCK_TYPE**: `BODY_IMAGE`=`"bodyImage"`, `ASIDE`=`"aside"`, `LINK_REF`=`"linkRef"`, `COOKIE_PREFERENCES_LINK`=`"cookiePreferencesLink"`, `COOKIE_LIST`=`"cookieList"`, `EXPANDABLE_SECTION`=`"expandableSection"`, `TABLE`=`"table"`
 
 ### `@blog/config/constants` — `packages/config/src/constants/preset.ts`
 

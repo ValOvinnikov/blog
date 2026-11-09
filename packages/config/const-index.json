@@ -2904,6 +2904,14 @@
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
+    "table": [
+      {
+        "ref": "PORTABLE_TEXT_BLOCK_TYPE.TABLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/portable-text-block-type.ts"
+      }
+    ],
     "CONSOLE": [
       {
         "ref": "PRESET_ID.CONSOLE",
