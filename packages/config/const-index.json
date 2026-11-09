@@ -7724,6 +7724,22 @@
         "file": "apps/web/src/constants/cookie-list.ts"
       }
     ],
+    "cookie_statement_page.fetch_failed": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-statement",
+        "file": "apps/web/src/constants/cookie-statement.ts"
+      }
+    ],
+    "cookie_statement_metadata.fetch_failed": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.METADATA_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/cookie-statement",
+        "file": "apps/web/src/constants/cookie-statement.ts"
+      }
+    ],
     "footer.layout_fetch_failed": [
       {
         "ref": "FOOTER_LOG.CONTENT_FETCH_FAILED",

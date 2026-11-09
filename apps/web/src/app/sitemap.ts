@@ -248,6 +248,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       translationMap.topicIndexLanguages,
     ),
     ...toTranslatedPageEntries(routes.tags(), translationMap.tagIndexLanguages),
+    ...toTranslatedPageEntries(
+      routes.cookieStatement(),
+      translationMap.cookieStatementLanguages,
+    ),
     ...blogPageNumbers.map((page) => toEntry(routes.blogIndex(page), siteUrl)),
     ...posts.map(({ publishedAt, ...page }) =>
       toTranslatedSitemapEntry({

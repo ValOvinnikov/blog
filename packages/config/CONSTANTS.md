@@ -667,6 +667,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **COOKIE_PROVIDER**: `FIRST_PARTY`
 - **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
 
+### `@web/constants/cookie-statement` — `apps/web/src/constants/cookie-statement.ts`
+
+- **COOKIE_STATEMENT_LOG**: `PAGE_FETCH_FAILED`=`"cookie_statement_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"cookie_statement_metadata.fetch_failed"`
+
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`

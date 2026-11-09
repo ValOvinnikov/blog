@@ -48,7 +48,7 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   tagIndexLanguages: [EN],
   privacyIndexLanguages: [],
   legalIndexLanguages: [],
-  cookieStatementLanguages: [],
+  cookieStatementLanguages: [EN, NL],
   groups: [
     [
       { documentType: LANDING_TYPE, language: EN, slug: MOCK_EN_LANDING },
@@ -136,6 +136,11 @@ describe(findTranslatedPath, () => {
       expected: nlPath(routes.legalDocument(MOCK_NL_LEGAL)),
     },
     {
+      case: 'the cookie statement in another language under its prefix',
+      pathname: routes.cookieStatement(),
+      expected: nlPath(routes.cookieStatement()),
+    },
+    {
       case: 'the first page of the translation from a numbered archive page',
       pathname: routes.topic(MOCK_EN_TOPIC, 3),
       expected: nlPath(routes.topic(MOCK_NL_TOPIC)),
@@ -186,6 +191,11 @@ describe(findTranslatedPath, () => {
       expected: routes.legalDocument(MOCK_EN_LEGAL),
     },
     {
+      case: 'the default-language cookie statement without a prefix',
+      pathname: routes.cookieStatement(),
+      expected: routes.cookieStatement(),
+    },
+    {
       case: 'the default-language list page without a prefix',
       pathname: routes.topics(),
       expected: routes.topics(),
@@ -219,6 +229,7 @@ describe(findTranslatedPath, () => {
       pathname: routes.privacyDocument(MOCK_EN_PRIVACY),
     },
     { case: 'a Topic page', pathname: routes.topic(MOCK_EN_TOPIC) },
+    { case: 'the cookie statement', pathname: routes.cookieStatement() },
     { case: 'the blog list page', pathname: routes.blogIndex() },
     { case: 'a numbered blog list page', pathname: routes.blogIndex(2) },
     { case: 'Home', pathname: routes.home() },
