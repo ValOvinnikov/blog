@@ -2,6 +2,7 @@ import { tagSchema } from '@blog/studio/schema-types/documents/blog/tag/tag';
 import { topicSchema } from '@blog/studio/schema-types/documents/blog/topic/topic';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { personSchema } from '@blog/studio/schema-types/documents/person/person';
+import { articleContentField } from '@blog/studio/schema-types/fields/article-content-field/article-content-field';
 import { languageField } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { modulesField } from '@blog/studio/schema-types/fields/modules-field/modules-field';
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
@@ -14,7 +15,6 @@ import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with
 import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { postTakeawaysSchema } from '@blog/studio/schema-types/objects/post-takeaways/post-takeaways';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
-import { articleTextSchema } from '@blog/studio/schema-types/portable-text/article-text/article-text';
 import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
 import { Newspaper } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
@@ -44,14 +44,9 @@ export const postPageSchema = defineType({
       description:
         'Optional hero image shown at the top of the post and in social shares.',
     }),
-    defineField({
-      name: 'content',
-      title: 'Content',
-      type: articleTextSchema.name,
-      description:
-        'Full post content — supports rich text, images, and code blocks.',
-      validation: (rule) => rule.required(),
-    }),
+    articleContentField(
+      'Full post content — supports rich text, images, and code blocks.',
+    ),
     defineField({
       name: 'featured',
       title: 'Featured',

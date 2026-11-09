@@ -12,6 +12,7 @@ import type {
   Module_postList,
   Module_sectionPages,
   Module_taxonomyList,
+  Page_cookieStatement,
   Page_home,
   Page_landing,
   Page_post,
@@ -76,6 +77,7 @@ export type TStarterDocumentUnion =
   | TStarterPage<Page_home>
   | TStarterDocument<Template_postIndex, 'title'>
   | TStarterPage<Page_postIndex>
+  | TStarterDocument<Page_cookieStatement, 'title' | 'content' | 'seo'>
   | TStarterDocument<Template_landing, 'title'>
   | TStarterPage<Page_landing>
   | TStarterDocument<Template_topicIndex, 'title'>

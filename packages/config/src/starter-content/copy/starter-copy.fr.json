@@ -13,6 +13,16 @@
     "metaTitle": "Blog — les derniers articles de ce site",
     "metaDescription": "Tous les articles de ce site, du plus récent au plus ancien. Modifiez le titre et les champs SEO de cette page dès que vous avez votre texte."
   },
+  "cookieStatement": {
+    "title": "Déclaration relative aux cookies",
+    "metaTitle": "Cookies — les cookies utilisés par ce site",
+    "metaDescription": "Les cookies et le stockage du navigateur utilisés par ce site, leur rôle et comment modifier votre choix.",
+    "intro": "Cette déclaration explique quels cookies et quel stockage similaire du navigateur ce site utilise, et pourquoi. Il s’agit d’un texte provisoire : remplacez-le par votre propre déclaration avant de vous y fier.",
+    "listIntro": "Le site utilise les cookies et le stockage du navigateur suivants :",
+    "preferencesLead": "Vous pouvez modifier ou retirer votre consentement à tout moment : ",
+    "preferencesLink": "ouvrez les préférences de cookies",
+    "preferencesTail": "."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Commencez ici",

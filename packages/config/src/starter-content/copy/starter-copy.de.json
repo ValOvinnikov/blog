@@ -13,6 +13,16 @@
     "metaTitle": "Blog — die neuesten Beiträge dieser Website",
     "metaDescription": "Alle Beiträge dieser Website, die neuesten zuerst. Bearbeite Überschrift und SEO-Felder dieser Seite, sobald du echte Texte hast."
   },
+  "cookieStatement": {
+    "title": "Cookie-Erklärung",
+    "metaTitle": "Cookie-Erklärung — die Cookies dieser Website",
+    "metaDescription": "Welche Cookies und welchen Browserspeicher diese Website nutzt, wofür sie dienen und wie du deine Wahl änderst.",
+    "intro": "Diese Cookie-Erklärung beschreibt, welche Cookies und ähnlichen Browserspeicher diese Website nutzt und warum. Es ist ein Platzhaltertext: Ersetze ihn durch deine eigene Erklärung, bevor du dich darauf verlässt.",
+    "listIntro": "Die Website nutzt folgende Cookies und folgenden Browserspeicher:",
+    "preferencesLead": "Du kannst deine Einwilligung jederzeit ändern oder widerrufen: ",
+    "preferencesLink": "Cookie-Einstellungen öffnen",
+    "preferencesTail": "."
+  },
   "blog": {
     "hero": {
       "eyebrow": "Hier beginnen",

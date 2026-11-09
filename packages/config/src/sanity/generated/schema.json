@@ -3776,6 +3776,36 @@
     }
   },
   {
+    "type": "type",
+    "name": "page_cookieStatement.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "page_cookieStatement"
+    }
+  },
+  {
     "name": "inlineLink",
     "type": "type",
     "value": {
@@ -3847,6 +3877,10 @@
               {
                 "type": "inline",
                 "name": "page_legalDocument.reference"
+              },
+              {
+                "type": "inline",
+                "name": "page_cookieStatement.reference"
               }
             ]
           },
@@ -8218,6 +8252,10 @@
               },
               {
                 "type": "inline",
+                "name": "page_cookieStatement.reference"
+              },
+              {
+                "type": "inline",
                 "name": "page_landing.reference"
               },
               {
@@ -10137,6 +10175,10 @@
             {
               "type": "inline",
               "name": "page_legalDocument.reference"
+            },
+            {
+              "type": "inline",
+              "name": "page_cookieStatement.reference"
             }
           ]
         },
@@ -10154,6 +10196,95 @@
         "type": "objectAttribute",
         "value": {
           "type": "boolean"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "page_cookieStatement",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "page_cookieStatement"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "language": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "EN"
+            },
+            {
+              "type": "string",
+              "value": "NL"
+            },
+            {
+              "type": "string",
+              "value": "FR"
+            },
+            {
+              "type": "string",
+              "value": "DE"
+            },
+            {
+              "type": "string",
+              "value": "ES"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "content": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "articleText"
+        },
+        "optional": true
+      },
+      "seo": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "seo"
         },
         "optional": true
       }

@@ -72,6 +72,11 @@ describe(toLink, () => {
       slug: MOCK_POST_SLUG,
       href: routes.legalDocument(MOCK_POST_SLUG),
     },
+    {
+      _type: 'page_cookieStatement',
+      slug: null,
+      href: routes.cookieStatement(),
+    },
   ] as const)(
     'resolves an internal $_type reference to its route',
     ({ _type, slug, href }) => {

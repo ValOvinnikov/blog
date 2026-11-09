@@ -568,6 +568,13 @@ export type Page_legalDocumentReference = {
   [internalGroqTypeReferenceTo]?: 'page_legalDocument';
 };
 
+export type Page_cookieStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
+};
+
 export type InlineLink = {
   _type: 'inlineLink';
   label?: string;
@@ -579,7 +586,8 @@ export type InlineLink = {
     | Page_landingReference
     | Page_postIndexReference
     | Page_privacyDocumentReference
-    | Page_legalDocumentReference;
+    | Page_legalDocumentReference
+    | Page_cookieStatementReference;
   url?: string;
   openInNewTab?: boolean;
   platform?:
@@ -1385,6 +1393,7 @@ export type InternationalizedArrayReferenceValue = {
     | Page_postIndexReference
     | Page_topicIndexReference
     | Page_tagIndexReference
+    | Page_cookieStatementReference
     | Page_landingReference
     | Page_postReference
     | Page_topicReference
@@ -1739,9 +1748,22 @@ export type Link = {
     | Page_tagReference
     | Page_tagIndexReference
     | Page_privacyDocumentReference
-    | Page_legalDocumentReference;
+    | Page_legalDocumentReference
+    | Page_cookieStatementReference;
   url?: InternationalizedArrayString;
   openInNewTab?: boolean;
+};
+
+export type Page_cookieStatement = {
+  _id: string;
+  _type: 'page_cookieStatement';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  language?: 'EN' | 'NL' | 'FR' | 'DE' | 'ES';
+  title?: string;
+  content?: ArticleText;
+  seo?: Seo;
 };
 
 export type Page_legalDocument = {
@@ -2414,6 +2436,7 @@ export type AllSanitySchemaTypes =
   | Page_postIndexReference
   | Page_privacyDocumentReference
   | Page_legalDocumentReference
+  | Page_cookieStatementReference
   | InlineLink
   | ImageWithAlt
   | ExpandableSectionText
@@ -2501,6 +2524,7 @@ export type AllSanitySchemaTypes =
   | Page_post
   | Person
   | Link
+  | Page_cookieStatement
   | Page_legalDocument
   | Slug
   | Page_privacyDocument

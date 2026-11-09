@@ -6,6 +6,7 @@ export const STARTER_DOCUMENT_IDS = {
   HOME: 'provisioning.settings.home',
   POST_INDEX_TEMPLATE: 'provisioning.template.postIndex',
   POST_INDEX: 'provisioning.page.postIndex',
+  COOKIE_STATEMENT_PREFIX: 'provisioning.page.cookieStatement',
   TOPIC_INDEX_LIST: 'taxonomyList-topics',
   TAG_INDEX_LIST: 'taxonomyList-tags',
   BLOG_HERO: 'starter.blog.hero',
