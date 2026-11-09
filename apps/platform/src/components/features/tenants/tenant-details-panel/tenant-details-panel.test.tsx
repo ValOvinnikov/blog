@@ -190,9 +190,11 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     await user.click(await findSaveButton());
     await screen.findByText(tenantDetailsPanel.alertSuccess);
 
-    const alert = screen.queryByRole('alert');
+    await waitFor(() => {
+      const alert = screen.queryByRole('alert');
 
-    expect(alert).not.toBeInTheDocument();
+      expect(alert).not.toBeInTheDocument();
+    });
   });
 
   it('saves the edited values and keeps the success toast through further edits', async () => {
