@@ -6,7 +6,7 @@ import {
 } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
   renderElement,
@@ -467,42 +467,43 @@ describe(`<${PortableText.name}/>`, () => {
     expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
   });
 
-  it('renders an expandable section closed, keeping its body in the page', () => {
-    setup({ value: [mockSectionWithBody()] });
+  describe('with an expandable section', () => {
+    let user: UserEvent;
 
-    const trigger = getSectionTrigger();
-    const body = screen.getByText(MOCK_SECTION_BODY_TEXT, {
-      selector: 'strong',
+    beforeEach(() => {
+      user = userEvent.setup();
+      setup({ value: [mockSectionWithBody()] });
     });
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
-    expect(body).toBeInTheDocument();
-    expect(body).not.toBeVisible();
-  });
 
-  it('opens an expandable section by click to show its formatted body and links', async () => {
-    const user = userEvent.setup();
-    setup({ value: [mockSectionWithBody()] });
-
-    await user.click(getSectionTrigger());
-
-    const body = screen.getByText(MOCK_SECTION_BODY_TEXT, {
-      selector: 'strong',
+    it('renders it closed, keeping its body in the page', () => {
+      const trigger = getSectionTrigger();
+      const body = screen.getByText(MOCK_SECTION_BODY_TEXT, {
+        selector: 'strong',
+      });
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(body).toBeInTheDocument();
+      expect(body).not.toBeVisible();
     });
-    const link = screen.getByRole('link', { name: MOCK_SECTION_LINK_TEXT });
-    expect(body).toBeVisible();
-    expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
-  });
 
-  it('opens an expandable section from the keyboard', async () => {
-    const user = userEvent.setup();
-    setup({ value: [mockSectionWithBody()] });
+    it('opens it by click to show its formatted body and links', async () => {
+      await user.click(getSectionTrigger());
 
-    await user.tab();
-    await user.keyboard('{Enter}');
+      const body = screen.getByText(MOCK_SECTION_BODY_TEXT, {
+        selector: 'strong',
+      });
+      const link = screen.getByRole('link', { name: MOCK_SECTION_LINK_TEXT });
+      expect(body).toBeVisible();
+      expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
+    });
 
-    const trigger = getSectionTrigger();
-    expect(trigger).toHaveFocus();
-    expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    it('opens it from the keyboard', async () => {
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      const trigger = getSectionTrigger();
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    });
   });
 
   it('labels an aside inside an expandable section from the caller override', async () => {
