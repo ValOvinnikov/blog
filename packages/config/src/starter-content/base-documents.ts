@@ -75,7 +75,7 @@ function cookieStatementContent({
   ];
 }
 
-export function buildCookieStatementDocument(
+function buildCookieStatementDocument(
   locale: TLocaleIsoCode,
 ): TStarterDocument<Page_cookieStatement, 'title' | 'content' | 'seo'> {
   const copy = STARTER_COPY_BY_LOCALE[locale].cookieStatement;
