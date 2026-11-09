@@ -88,6 +88,13 @@ const toListPage = (pathname: string, translationMap: TTranslationMap) => {
     return { href: routes.home(), languages: translationMap.homeLanguages };
   }
 
+  if (pathname === routes.cookieStatement()) {
+    return {
+      href: routes.cookieStatement(),
+      languages: translationMap.cookieStatementLanguages,
+    };
+  }
+
   const [first = '', ...rest] = pathname.split('/').filter(Boolean);
   const isNumberedPostIndexPage =
     first === POST_SEGMENT && rest.length === 2 && rest[0] === 'page';
