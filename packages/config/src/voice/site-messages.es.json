@@ -398,5 +398,8 @@
       }
     },
     "analyticsNote": "Cuando este sitio mide las visitas y la velocidad de las páginas, usa Vercel Web Analytics y Speed Insights. No instalan cookies y se cargan sea cual sea tu elección sobre cookies."
+  },
+  "table": {
+    "regionLabel": "Tabla"
   }
 }

@@ -39,6 +39,11 @@ type TExpandableSectionBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
+type TTableBlock = Extract<
+  TBlock,
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.TABLE }
+>;
+type TTableRow = NonNullable<TTableBlock['rows']>[number];
 type TBodyImageBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.BODY_IMAGE }
@@ -72,7 +77,11 @@ const MOCK_SECTION_TITLE = faker.lorem.words(3);
 const MOCK_SECTION_BODY_TEXT = faker.lorem.sentence();
 const MOCK_SECTION_LINK_TEXT = faker.lorem.words(2);
 const MOCK_SECTION_ASIDE_LABEL = faker.lorem.word();
+const MOCK_COLUMN_HEADING = faker.lorem.words(2);
+const MOCK_CELL_TEXT = faker.lorem.words(2);
+const MOCK_CELL_LINK_TEXT = faker.lorem.words(2);
 const ARIA_EXPANDED = 'aria-expanded';
+const TABLE_REGION_NAME = SITE_MESSAGES.table.regionLabel;
 const CODE_REGION_NAME = SITE_MESSAGES.codeBlock.regionLabel;
 
 const RESOLVED_LINK_REF = {
@@ -110,6 +119,43 @@ const mockSectionWithBody = () =>
       { markDefs: [RESOLVED_LINK_REF] },
     ),
   ]);
+
+const mockTableRow = (cells: TPortableTextBlock[]): TTableRow => ({
+  _type: 'row',
+  _key: faker.string.uuid(),
+  cells: cells.map((block) => ({
+    _type: 'cell',
+    _key: faker.string.uuid(),
+    value: [block],
+  })),
+});
+
+const mockTableBlock = (
+  rows: TTableRow[],
+  headerRows?: number,
+): TTableBlock => ({
+  _type: PORTABLE_TEXT_BLOCK_TYPE.TABLE,
+  _key: faker.string.uuid(),
+  headerRows,
+  rows,
+});
+
+const mockTableWithHeaderRow = () =>
+  mockTableBlock(
+    [
+      mockTableRow([mockPortableTextBlock(MOCK_COLUMN_HEADING)]),
+      mockTableRow([
+        mockPortableTextBlock(
+          [
+            mockPortableTextSpan(MOCK_CELL_TEXT, ['strong']),
+            mockPortableTextSpan(MOCK_CELL_LINK_TEXT, [MOCK_LINK_KEY]),
+          ],
+          { markDefs: [RESOLVED_LINK_REF] },
+        ),
+      ]),
+    ],
+    1,
+  );
 
 const getSectionTrigger = () =>
   screen.getByRole('button', { name: MOCK_SECTION_TITLE });
@@ -342,6 +388,52 @@ describe(`<${PortableText.name}/>`, () => {
       name: SITE_MESSAGES.cookieList.ariaLabel,
     });
     expect(table).toBeVisible();
+  });
+
+  describe('with a table', () => {
+    it('reads its header row cells as column headers', () => {
+      setup({ value: [mockTableWithHeaderRow()] });
+
+      const columnHeader = screen.getByRole('columnheader', {
+        name: MOCK_COLUMN_HEADING,
+      });
+      const cell = screen.getByRole('cell');
+      expect(columnHeader).toBeVisible();
+      expect(cell).toHaveTextContent(MOCK_CELL_TEXT);
+    });
+
+    it('renders formatting and links inside its cells', () => {
+      setup({ value: [mockTableWithHeaderRow()] });
+
+      const bold = screen.getByText(MOCK_CELL_TEXT, { selector: 'strong' });
+      const link = screen.getByRole('link', { name: MOCK_CELL_LINK_TEXT });
+      expect(bold).toBeVisible();
+      expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
+    });
+
+    it('names its scroll region with the fixed table label', () => {
+      setup({ value: [mockTableWithHeaderRow()] });
+
+      const region = screen.getByRole('region', { name: TABLE_REGION_NAME });
+      const columnHeader = screen.getByRole('columnheader');
+      expect(region).toContainElement(columnHeader);
+    });
+
+    it('reads every row as data when it has no header rows', () => {
+      setup({
+        value: [
+          mockTableBlock([
+            mockTableRow([mockPortableTextBlock(MOCK_COLUMN_HEADING)]),
+            mockTableRow([mockPortableTextBlock(MOCK_CELL_TEXT)]),
+          ]),
+        ],
+      });
+
+      const columnHeader = screen.queryByRole('columnheader');
+      const cells = screen.getAllByRole('cell');
+      expect(columnHeader).not.toBeInTheDocument();
+      expect(cells).toHaveLength(2);
+    });
   });
 
   it('renders sibling blocks in their authored order', () => {
