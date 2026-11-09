@@ -41,17 +41,17 @@ on the public site or the platform yet).
 
 ## Content and pages
 
-| Page                                                | Status  | Layers                           | One-line purpose                                                                                                |
-| --------------------------------------------------- | ------- | -------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [Page types](page-types.md)                         | built   | config, studio, service, web     | Every public page is a Sanity document of one of eight fixed types, each with its own heading, SEO and slug.    |
-| [Landing tree](landing-tree.md)                     | built   | config, studio, service, web     | Free-form landing pages nest under parents to build sections with their own sidebar navigation and breadcrumbs. |
-| [Module system](module-system.md)                   | built   | config, studio, service, web     | Pages are built from reusable module documents that a page template references in order.                        |
-| [Links](links.md)                                   | built   | config, studio, service, web     | A link is authored once as a `link` document and every place that links points at it.                           |
-| [People](people.md)                                 | built   | config, studio, service, ui, web | One reusable record for an author, team member or profile subject, shown wherever the site credits them.        |
-| [Studio authoring](studio-authoring.md)             | built   | studio, config                   | How content is modelled and edited in the Studio: the desk, the shared field kit, previews and validation.      |
-| [Navigation](navigation.md)                         | built   | studio, service, ui, web         | The site header: brand lockup, curated top-level links and trailing controls, collapsing below `lg`.            |
-| [Footer and legal pages](footer-and-legal-pages.md) | partial | studio, service, ui, web         | The footer closes every page with copyright, social links and settings; legal pages are not built yet.          |
-| [Errors and 404](errors-and-404.md)                 | built   | web, platform, config            | A tenant-themed, translated 404 and error panels with recovery actions, on both apps.                           |
+| Page                                                | Status | Layers                                             | One-line purpose                                                                                                |
+| --------------------------------------------------- | ------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [Page types](page-types.md)                         | built  | config, studio, service, web                       | Every public page is a Sanity document of one of eight fixed types, each with its own heading, SEO and slug.    |
+| [Landing tree](landing-tree.md)                     | built  | config, studio, service, web                       | Free-form landing pages nest under parents to build sections with their own sidebar navigation and breadcrumbs. |
+| [Module system](module-system.md)                   | built  | config, studio, service, web                       | Pages are built from reusable module documents that a page template references in order.                        |
+| [Links](links.md)                                   | built  | config, studio, service, web                       | A link is authored once as a `link` document and every place that links points at it.                           |
+| [People](people.md)                                 | built  | config, studio, service, ui, web                   | One reusable record for an author, team member or profile subject, shown wherever the site credits them.        |
+| [Studio authoring](studio-authoring.md)             | built  | studio, config                                     | How content is modelled and edited in the Studio: the desk, the shared field kit, previews and validation.      |
+| [Navigation](navigation.md)                         | built  | studio, service, ui, web                           | The site header: brand lockup, curated top-level links and trailing controls, collapsing below `lg`.            |
+| [Footer and legal pages](footer-and-legal-pages.md) | built  | config, studio, service, ui, web, worker, platform | The footer, the privacy and legal sections, and the cookie statement the consent banner links to.               |
+| [Errors and 404](errors-and-404.md)                 | built  | web, platform, config                              | A tenant-themed, translated 404 and error panels with recovery actions, on both apps.                           |
 
 ## Reading
 

@@ -14,11 +14,17 @@ export const SectionDocumentPage = async ({
   slug,
 }: TSectionDocumentPageProps) => {
   const result = await getSectionDocumentPage(type, slug);
-  const { title, body } = guardPageLoaderResult(
+  const { headingBlock, headingAlignment, body } = guardPageLoaderResult(
     result,
     SECTION_DOCUMENT_LOG.PAGE_FETCH_FAILED,
     { type, slug },
   );
 
-  return <DocumentArticle title={title} body={body} />;
+  return (
+    <DocumentArticle
+      headingBlock={headingBlock}
+      headingAlignment={headingAlignment}
+      body={body}
+    />
+  );
 };

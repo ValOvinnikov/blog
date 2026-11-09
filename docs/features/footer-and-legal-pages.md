@@ -1,25 +1,46 @@
 ---
 title: Footer and legal pages
-status: partial
-layers: [studio, service, ui, web]
+status: built
+layers: [config, studio, service, ui, web, worker, platform]
 code:
   - packages/studio/src/schema-types/documents/settings/footer/**
+  - packages/studio/src/schema-types/documents/pages/privacy-index/**
+  - packages/studio/src/schema-types/documents/pages/legal-index/**
+  - packages/studio/src/schema-types/documents/pages/section-document/**
+  - packages/studio/src/schema-types/documents/pages/privacy-document/**
+  - packages/studio/src/schema-types/documents/pages/legal-document/**
+  - packages/studio/src/schema-types/documents/pages/cookie-statement/**
+  - packages/config/src/constants/legal-page-kind.ts
+  - packages/config/src/starter-content/legal-pages.ts
+  - packages/config/src/starter-content/cookie-statement-document.ts
   - packages/service/src/features/global/footer/**
+  - packages/service/src/features/pages/section-index/**
+  - packages/service/src/features/pages/section-document/**
+  - packages/service/src/features/pages/cookie-statement/**
   - packages/ui/src/components/organisms/footer/**
   - apps/web/src/components/shared/site-footer/**
-epics: [3726, 4995]
+  - apps/web/src/components/page-templates/document-article/**
+  - apps/web/src/components/pages/section-index-page/**
+  - apps/web/src/components/pages/section-document-page/**
+  - apps/web/src/components/pages/cookie-statement-page/**
+  - apps/web/src/app/api/legal-page/**
+  - apps/worker/src/app/api/cookie-statement/**
+  - apps/platform/src/server/cookie-statement/**
+epics: [3726, 4995, 6505]
 ---
 
 # Footer and legal pages
 
 ## What it does
 
-The site footer closes every page with a brand column (the Look logo, an about line, an address and the site's social profiles as icon links), the editor's link groups under their headings, and a fine-print row: the copyright line, the editor's fine-print links and, when the owner's choice includes it, the Cookie settings link. An optional language switcher and a link to the RSS feed sit beside the fine print. On a Free site, a "Powered by {product name}" text link to the marketing site closes the bottom row. No privacy, terms or imprint page type exists, and the consent banner has no policy page to point to; a legal text is published as an ordinary landing page and linked through a `link` document.
+The site footer closes every page with a brand column (the Look logo, an about line, an address and the site's social profiles as icon links), the editor's link groups under their headings, and a fine-print row: the copyright line, the editor's fine-print links and, when the owner's choice includes it, the Cookie settings link. An optional language switcher and a link to the RSS feed sit beside the fine print. On a Free site, a "Powered by {product name}" text link to the marketing site closes the bottom row. Every site also has a privacy section, a legal section and a cookie statement. `/privacy` and `/legal` are hubs built from a heading and landing modules; their documents live at `/privacy/[slug]` and `/legal/[slug]`, each with a kind (privacy policy, terms, imprint or other). The cookie statement is one page per language at `/legal/cookie-statement`, which the consent banner links to. The footer links any of them as ordinary links; the platform's signup and onboarding reach the terms and privacy policy by kind, through a public redirect.
 
 ## Surfaces and routes
 
 - **Public site:** every page rendered inside `app/[tenant]/[locale]/layout.tsx`, which mounts `SiteFooter`. The standalone 404 boundaries above that layout have no footer.
-- **Studio:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line shows Copyright name, or the brand name when it is blank; the Big wordmark always shows the brand name. The brand name is set on Look's Brand card, or is the tenant name when that is blank (./look.md).
+- **Public site, legal pages:** `/privacy` and `/legal` (hubs), `/privacy/[slug]` and `/legal/[slug]` (documents), `/legal/cookie-statement` (the cookie statement), and `/api/legal-page/[kind]`, which redirects to the published document of that kind in the tenant's default language. All five page routes are in the sitemap and follow the language switch.
+- **Studio:** Privacy Index Page and Legal Index Page (one per language, with their templates), Privacy Page and Legal Page (`page_privacyDocument`, `page_legalDocument`) and Cookie Statement (`page_cookieStatement`).
+- **Studio, footer:** Settings → Footer, the `settings_footer` singleton — Social Links, Groups, About, Address, Copyright name, Fine Print, Show language switcher, Show RSS feed. The copyright line shows Copyright name, or the brand name when it is blank; the Big wordmark always shows the brand name. The brand name is set on Look's Brand card, or is the tenant name when that is blank (./look.md).
 - **Platform:** Look › Footer sets Footer layout (Columns default · Centred · Compact · Big wordmark), Background (Plain · Shaded · Brand tint default) and Surface (Full width default · Card), all Growth-only, plus the Cookie settings button (./consent-and-analytics.md). Look also picks the switcher style and the theme tokens.
 
 ## Data
@@ -33,7 +54,11 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - **Look:** `site_config.footer_layout`, `footer_background`, `footer_surface` and `cookie_settings_button`, read by `getFooterStyle` through `getSiteConfig`, so a plan without the field gets the preset's value. A failed read logs `footer.site_config_fetch_failed` and falls back to the preset (Columns, Brand tint, Full width, Cookie settings as the footer link).
 - **Copyright:** `© {year} {copyright name or brand name}`, the year computed at render time; the format is fixed in `@blog/ui`'s `Footer.Copyright` and no editor or owner can reword it.
 - **Powered-by mark:** `getPoweredByMark(tenant)` returns the product name and link from `PRODUCT_NAME` and `MARKETING_SITE_URL` when the tenant's plan carries `PLAN_ENTITLEMENTS[plan].hasPoweredByMark` (`FREE` yes, `GROWTH` no), reading the plan through `getEffectivePlan`, as the Look does. When the plan cannot be read, Free's rules apply. Its label is the fixed catalog key `siteFooter.poweredByLabel`, translated in every site language.
-- **Legal pages:** no page type, table or route exists for them; the footer links them as ordinary links, in `groups` or `finePrint`.
+- **Hubs:** `page_privacyIndex` and `page_legalIndex`, index pages (heading block plus their template's hero and modules), one per language, read by `service.pages.sectionIndex`.
+- **Documents:** `page_privacyDocument` and `page_legalDocument` share one schema (`sectionDocumentSchema`): `language`, `title` (internal to the Studio, never shown on the site), the page heading block (`headingBlock`, `contentAlignment`), `slug`, `kind` and `content` (`articleText`; each document is one language), plus `seo`. Kinds come from `LEGAL_PAGE_KIND`: `PRIVACY_POLICY` and `OTHER` under privacy (`PRIVACY_DOCUMENT_KINDS`), `TERMS`, `IMPRINT` and `OTHER` under legal (`LEGAL_DOCUMENT_KINDS`).
+- **Cookie statement:** `page_cookieStatement` with `language`, `title`, the heading block, `content` and `seo`; its kind is always `COOKIE_STATEMENT`. Its fixed id comes from `cookieStatementDocumentId(locale)`.
+- **Service:** `service.pages.sectionDocument.v1` loads a document by type and slug, lists params for the sitemap and resolves `getSectionDocumentByKind(kind, context)` (a cookie statement for `COOKIE_STATEMENT`); `service.pages.cookieStatement.v1.getCookieStatementPage` loads the statement. Both detail loaders return `headingBlock` (undefined when unset) and `headingAlignment` (left when unset).
+- **Seeding:** provisioning seeds both hubs and the cookie statement from `packages/config/src/starter-content/legal-pages.ts`. Adding a language seeds only the cookie statement: the platform's language action enqueues a signed `POST /api/cookie-statement/seed` on the worker (`enqueueCookieStatementSeed`) with the default and every added language, and the worker's `seedCookieStatements` run writes `buildStarterCookieStatement(locale)` with `createIfNotExists`. The starter text is a placeholder until the final text lands (#5090).
 
 ## Configuration
 
@@ -45,6 +70,12 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - Big wordmark sets the brand name large and `aria-hidden`, since the copyright line already names the site. Compact shows no groups, about text or address.
 
 ## Constraints and invariants
+
+- A document page and the cookie statement render the heading block as their only H1, in its alignment, above the text column and the contents rail; the `title` never appears on the site. A document without a heading block renders no page heading — a dev-only state, since the Studio requires the heading.
+- At most one published page per kind and language; `OTHER` is unlimited and is reached by links only, so `/api/legal-page/OTHER` and an unknown kind return 404, as does a kind with no published page.
+- A legal page can't take the slug `cookie-statement`. The cookie statement can't be created, deleted, duplicated or unpublished in the Studio; one per language exists from seeding.
+- A language goes live at once and its cookie statement follows within seconds; until the seed lands, its `/legal/cookie-statement` returns 404. A failed seed retries and never undoes the language change. Stored-but-not-live languages are seeded too.
+- Footer links stay ordinary `linkRef`s; the footer has no kind field. Only the platform links by kind (`toLegalPageUrls`).
 
 - A social link renders as an icon only. Its accessible name is derived from the platform through the catalog's `socialLinks.linkAriaLabel`, never stored per link, so it stays translated; the list is named by `socialLinks.listAriaLabel`.
 - A social profile holds no destination of its own — always a `link` document reference.
@@ -60,8 +91,8 @@ The site footer closes every page with a brand column (the Look logo, an about l
 
 ## Dependencies
 
-- Layers: `studio` (schema), `service` (loader), `ui` (footer shell), `web` (composition).
-- Features: ./links.md, ./languages.md, ./look.md, ./people.md, ./consent-and-analytics.md, ./seo-and-feeds.md, ./navigation.md, ./rendering-and-caching.md, ./tenant-provisioning.md.
+- Layers: `config` (kinds, routes, starter content), `studio` (schemas), `service` (loaders), `ui` (footer shell), `web` (composition and pages), `worker` (cookie-statement seed), `platform` (seed enqueue and by-kind links).
+- Features: ./rich-text.md (the document text and its legal blocks), ./reading-experience.md (the contents rail), ./links.md, ./languages.md, ./look.md, ./people.md, ./consent-and-analytics.md, ./seo-and-feeds.md, ./navigation.md, ./rendering-and-caching.md, ./tenant-provisioning.md.
 - Env: `PRODUCT_NAME` (web and platform) and `MARKETING_SITE_URL` (web), for the powered-by mark.
 - Plans: [plans-and-entitlements](./plans-and-entitlements.md) decides which sites carry the mark.
 
@@ -79,6 +110,12 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - `apps/web/src/server/site-config/get-effective-plan/get-effective-plan.ts`
 - `apps/web/src/components/shared/social-links/social-link.tsx`
 - `packages/ui/src/components/organisms/footer/footer.tsx`
+- `packages/studio/src/schema-types/documents/pages/section-document/section-document.ts`, `cookie-statement/cookie-statement.ts`, `privacy-index/privacy-index.ts`, `legal-index/legal-index.ts`
+- `packages/studio/src/document-actions/document-options/document-options.ts` (the cookie statement's locked actions)
+- `apps/web/src/app/[tenant]/[locale]/privacy/**`, `legal/**`, `apps/web/src/app/api/legal-page/[kind]/route.ts`
+- `apps/web/src/components/page-templates/document-article/document-article.tsx`
+- `apps/worker/src/app/api/cookie-statement/seed/route.ts`, `apps/worker/src/units/ensure-cookie-statements-seeded.ts`
+- `apps/platform/src/server/cookie-statement/enqueue-cookie-statement-seed.ts`, `apps/platform/src/utils/legal-page-urls/legal-page-urls.ts`
 
 ## Tests and stories
 
@@ -86,10 +123,15 @@ The site footer closes every page with a brand column (the Look logo, an about l
 - `packages/service/src/features/global/footer/adaptor/loader.test.ts`, `query.test.ts`, `packages/service/src/shared/transformers/social-profile/to-social-profiles.test.ts`
 - `apps/web/src/components/shared/site-footer/site-footer.test.tsx`, `apps/web/src/server/site-config/get-footer-style/get-footer-style.test.ts`, `get-powered-by-mark/get-powered-by-mark.test.ts`, `get-effective-plan/get-effective-plan.test.ts`, `social-links/social-links.test.tsx`, `social-links/social-link.test.tsx`
 - `packages/ui/src/components/organisms/footer/footer.test.tsx`
-- Stories: `packages/ui/src/components/organisms/footer/footer.stories.tsx`, `apps/web/src/components/shared/social-links/social-links.stories.tsx`.
+- `apps/web/src/components/page-templates/document-article/document-article.test.tsx`, `section-document-page.test.tsx`, `cookie-statement-page.test.tsx`, `apps/web/src/app/api/legal-page/[kind]/route.test.ts` and the route tests under `app/[tenant]/[locale]/privacy` and `legal`.
+- `packages/service/src/features/pages/section-document/**/*.test.ts`, `cookie-statement/**/*.test.ts`, `section-index/**/*.test.ts`.
+- `apps/worker/src/app/api/cookie-statement/seed/route.test.ts` and `ensure-cookie-statements-seeded.test.ts`.
+- Stories: `packages/ui/src/components/organisms/footer/footer.stories.tsx`, `apps/web/src/components/shared/social-links/social-links.stories.tsx`, `apps/web/src/components/page-templates/document-article/document-article.stories.tsx`.
 
 ## Related
 
 - #3726 — the footer renders the editor's footer content.
 - #4995 — the current page in navigation, footer links included, is marked by more than colour.
 - #6743 — the Cookie settings link follows Look's choice and the cookie banner.
+- #6505 epic — the privacy and legal sections and the cookie statement; manual test #5101.
+- #5090 — the final cookie-statement starter text.

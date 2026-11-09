@@ -26,11 +26,13 @@ epics: [3774, 3726, 5037, 5029]
 
 ## What it does
 
-A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, and nothing on the site consumes it yet; analytics is not gated on consent.
+A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, and nothing on the site consumes it yet; analytics is not gated on consent.
 
 ## Surfaces and routes
 
-- **Banner** — `ConsentBannerSlot`, mounted once in `SiteProviders`, shows when the `CONSENT_BANNER` capability is on and the reader has no valid consent cookie.
+- **Banner** — `ConsentBannerSlot`, mounted once in `SiteProviders`, shows when the `CONSENT_BANNER` capability is on and the reader has no valid consent cookie. Its policy link goes to `/legal/cookie-statement` (`routes.cookieStatement()`), labelled by the fixed `consent.banner.policyLinkLabel` (./footer-and-legal-pages.md).
+- **Cookie list** — a rich-text block on the cookie statement (or any article text) rendered from `COOKIE_LIST` in `apps/web/src/constants/cookie-list.ts`: name, purpose and duration, three columns from `sm` up and stacked entries on phones. Purposes and durations are fixed catalog keys (`cookieList.*`). A cookie the site starts setting joins that list in the same change.
+- **Cookie-preferences link** — a rich-text annotation that turns the editor's text into a button opening the preferences dialog (./rich-text.md).
 - **Preferences dialog** — `ConsentPreferencesDialog`: Necessary (locked on) and External media switches, Save and Close. Opened from the banner's settings button, from the footer's `CookieSettingsButton` and from the floating button. On close focus returns to the control that opened it; when that control has gone (the banner, after Save), it falls back to the floating button, else the footer link.
 - **Floating button** — `FloatingCookieSettingsButton`, a 44px round icon button fixed bottom left and named "Cookie settings". `SiteFooter` mounts it when Look's Cookie settings choice is Floating button or Both and the `CONSENT_BANNER` capability is on. It renders only once the reader has answered the banner, never during SSR, sits below toasts and the banner (`z-20`), and hides while a header overlay is open.
 - **Cookie settings module** — `module_cookieSettings` on the home and landing pages. Renders the same switches and Save inline, under the editor's heading or, without one, `consent.preferences.heading`. The switches appear only once the reader's saved choice is known, and a `role="status"` line confirms each save (`consent.preferences.savedStatus`), re-announced on a repeat Save and cleared when a switch changes or another surface saves.
@@ -67,7 +69,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 ## Dependencies
 
 - Layers: `config` (categories, `CAPABILITY`), `ui` (`ConsentBanner`, `ConsentPreferences`, `ConsentPlaceholder`, `Dialog`), `web`.
-- Features: [plans-and-entitlements](./plans-and-entitlements.md), [footer-and-legal-pages](./footer-and-legal-pages.md), [embed-module](./embed-module.md) (the intended external-media consumer), [rendering-and-caching](./rendering-and-caching.md).
+- Features: [plans-and-entitlements](./plans-and-entitlements.md), [footer-and-legal-pages](./footer-and-legal-pages.md), [rich-text](./rich-text.md), [embed-module](./embed-module.md) (the intended external-media consumer), [rendering-and-caching](./rendering-and-caching.md).
 - Packages: `@vercel/analytics`, `@vercel/speed-insights`.
 - Env: `WEB_ANALYTICS_ENABLED`.
 
@@ -84,6 +86,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `apps/web/src/context/consent-preferences-provider/consent-preferences-provider.tsx` — the footer and floating control refs and the focus-return fallback
 - `apps/web/src/components/features/layout/site-providers/site-providers.tsx`
 - `apps/web/src/components/shared/site-analytics/site-analytics.tsx`
+- `apps/web/src/constants/cookie-list.ts`, `apps/web/src/components/shared/portable-text/config/cookie-list.tsx`, `cookie-preferences-link.tsx`
 - `apps/web/src/app/[tenant]/[locale]/layout.tsx`
 
 ## Tests and stories
@@ -99,4 +102,5 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - #5037 — the banner, dialog and setting-row headings take text roles.
 - #6088 — the Cookie settings module (epic #6082).
 - #5029 — the cookie-settings dialog title is dialog-size again (#5046 manual test).
+- #6505 — the banner's cookie-statement link, the cookie list and the cookie-preferences link.
 - #6743 — owners choose the footer link, the floating button or both; with the banner off neither shows.

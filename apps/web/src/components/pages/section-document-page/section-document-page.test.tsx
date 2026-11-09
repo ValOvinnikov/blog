@@ -5,6 +5,7 @@ import { faker } from '@faker-js/faker';
 import { SECTION_DOCUMENT_LOG } from '@web/constants/section-document';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { stubFakeIntersectionObserver } from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 import { mockSectionDocumentDetail } from '@web/testing/shared/section-document/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
@@ -31,6 +32,7 @@ const getSectionDocumentMock = vi.mocked(
 const MOCK_TYPE = 'page_legalDocument';
 const MOCK_SLUG = faker.lorem.slug();
 const MOCK_TITLE = faker.lorem.words(3);
+const MOCK_HEADING = faker.lorem.words(4);
 
 const setup = customRenderServerAsync(SectionDocumentPage, {
   type: MOCK_TYPE,
@@ -46,7 +48,12 @@ describe(`<${SectionDocumentPage.name}/>`, () => {
   beforeEach(() => {
     stubFakeIntersectionObserver();
     getSectionDocumentMock.mockResolvedValue(
-      okResult(mockSectionDocumentDetail({ title: MOCK_TITLE })),
+      okResult(
+        mockSectionDocumentDetail({
+          title: MOCK_TITLE,
+          headingBlock: mockHeadingBlock({ heading: MOCK_HEADING }),
+        }),
+      ),
     );
   });
 
@@ -67,10 +74,16 @@ describe(`<${SectionDocumentPage.name}/>`, () => {
       );
     });
 
-    it('renders the title as the page heading', () => {
+    it('renders the heading block as the page heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
 
-      expect(heading).toHaveTextContent(MOCK_TITLE);
+      expect(heading).toHaveTextContent(MOCK_HEADING);
+    });
+
+    it('never renders the internal title', () => {
+      const title = screen.queryByText(MOCK_TITLE);
+
+      expect(title).not.toBeInTheDocument();
     });
   });
 
