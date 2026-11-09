@@ -15,6 +15,7 @@ import {
   codeTypeComponent,
   makeAsideTypeComponent,
   makeExpandableSectionTypeComponent,
+  makeTableTypeComponent,
   type TAsideKindLabels,
 } from './types';
 
@@ -27,6 +28,10 @@ const componentsWithoutAside: PortableTextComponents = {
     bodyImage: bodyImageTypeComponent,
   },
 };
+
+const tableTypeComponent = makeTableTypeComponent(
+  mergeComponents(defaultComponents, { marks: markComponents }),
+);
 
 const baseForAsideRecursion = mergeComponents(
   defaultComponents,
@@ -41,6 +46,7 @@ const makeArticleTextComponents = (
     ...componentsWithoutAside.types,
     aside,
     [PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST]: CookieList,
+    [PORTABLE_TEXT_BLOCK_TYPE.TABLE]: tableTypeComponent,
   },
 });
 

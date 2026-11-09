@@ -1,23 +1,25 @@
 import {
   ASIDE_KIND,
   IMAGE_LAYOUT,
-  type PORTABLE_TEXT_BLOCK_TYPE,
+  PORTABLE_TEXT_BLOCK_TYPE,
   type Code,
   type IBodyImageBlock,
   type TAsideKind,
 } from '@blog/config';
 import type { TPortableTextBody } from '@blog/service';
 import { ImageWithCaption } from '@blog/ui/components/molecules/image-with-caption';
+import { Table } from '@blog/ui/components/molecules/table';
 import { Accordion } from '@blog/ui/components/organisms/accordion';
+import { hasLength } from '@blog/utils/primitives';
 import {
   PortableText as PortableTextRoot,
   type PortableTextReactComponents,
 } from '@portabletext/react';
 import { DeepAside } from '@web/components/shared/deep-aside';
+import { CodeBlock } from '@web/components/shared/portable-text/components/code-block';
+import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';
 import { SanityImage } from '@web/components/shared/sanity-image';
-
-import { CodeBlock } from '../components/code-block';
-import { portableTextVariants } from '../portable-text-variants';
+import { useTranslations } from 'next-intl';
 
 import { FULL_BLEED_DATA_ATTR } from './full-bleed';
 
@@ -34,6 +36,13 @@ type TResolvedExpandableSectionBlock = Extract<
   TPortableTextBody[number],
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
+
+type TResolvedTableBlock = Extract<
+  TPortableTextBody[number],
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.TABLE }
+>;
+
+type TResolvedTableRow = NonNullable<TResolvedTableBlock['rows']>[number];
 
 const renderBodyImage = (block: IBodyImageBlock) => {
   if (!block.image) return null;
@@ -112,4 +121,46 @@ export const makeExpandableSectionTypeComponent = (
   );
 
   return ExpandableSectionType;
+};
+
+export const makeTableTypeComponent = (
+  cellComponents: PortableTextReactComponents,
+) => {
+  const renderRow = (row: TResolvedTableRow, isHeaderRow: boolean) => {
+    const Cell = isHeaderRow ? Table.HeaderCell : Table.Cell;
+
+    return (
+      <Table.Row key={row._key}>
+        {row.cells?.map((cell) => (
+          <Cell key={cell._key}>
+            <PortableTextRoot
+              value={cell.value ?? []}
+              components={cellComponents}
+            />
+          </Cell>
+        ))}
+      </Table.Row>
+    );
+  };
+
+  const TableType = ({ value }: { value: TResolvedTableBlock }) => {
+    const t = useTranslations(PORTABLE_TEXT_BLOCK_TYPE.TABLE);
+    const rows = value.rows ?? [];
+    const headerRowCount = value.headerRows ?? 0;
+    const headerRows = rows.slice(0, headerRowCount);
+    const bodyRows = rows.slice(headerRowCount);
+
+    return (
+      <Table ariaLabel={t('regionLabel')}>
+        {hasLength(headerRows) && (
+          <Table.Head>
+            {headerRows.map((row) => renderRow(row, true))}
+          </Table.Head>
+        )}
+        {bodyRows.map((row) => renderRow(row, false))}
+      </Table>
+    );
+  };
+
+  return TableType;
 };

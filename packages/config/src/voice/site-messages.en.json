@@ -398,5 +398,8 @@
       }
     },
     "analyticsNote": "Where this site measures visits and page speed, it uses Vercel Web Analytics and Speed Insights. They set no cookies and load regardless of your cookie choice."
+  },
+  "table": {
+    "regionLabel": "Table"
   }
 }

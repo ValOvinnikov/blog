@@ -268,4 +268,5 @@ export const VOICE_FIXED_KEYS = [
   'cookieList.cookies.THEME.purpose',
   'cookieList.cookies.THEME.duration',
   'cookieList.analyticsNote',
+  'table.regionLabel',
 ] as const;
