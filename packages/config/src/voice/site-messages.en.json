@@ -333,5 +333,49 @@
       }
     },
     "footerSettingsLabel": "Cookie settings"
+  },
+  "cookieList": {
+    "ariaLabel": "Cookies and browser storage",
+    "columns": {
+      "name": "Name",
+      "provider": "Provider",
+      "purpose": "Purpose",
+      "duration": "Duration",
+      "category": "Category"
+    },
+    "providers": {
+      "site": "This site"
+    },
+    "cookies": {
+      "consent": {
+        "purpose": "Remembers your cookie choice, so you are not asked again.",
+        "duration": "180 days"
+      },
+      "NEXT_LOCALE": {
+        "purpose": "Remembers the language you chose for this site.",
+        "duration": "1 year"
+      },
+      "signed_in_hint": {
+        "purpose": "Lets the page show your account menu straight away while you are signed in.",
+        "duration": "Until your sign-in ends"
+      },
+      "newsletter_subscribed": {
+        "purpose": "Remembers that you subscribed to the newsletter, so the sign-up form stays hidden.",
+        "duration": "1 year"
+      },
+      "newsletter_unsubscribe_token": {
+        "purpose": "Keeps the link from your unsubscribe email while you confirm.",
+        "duration": "1 hour"
+      },
+      "reading-depth": {
+        "purpose": "Remembers how much of each post you chose to read. Kept in your browser’s local storage.",
+        "duration": "Until you clear your browser data"
+      },
+      "theme": {
+        "purpose": "Remembers whether you chose the light or dark theme. Kept in your browser’s local storage.",
+        "duration": "Until you clear your browser data"
+      }
+    },
+    "analyticsNote": "Where this site measures visits and page speed, it uses Vercel Web Analytics and Speed Insights. They set no cookies and load regardless of your cookie choice."
   }
 }

@@ -333,5 +333,49 @@
       }
     },
     "footerSettingsLabel": "Cookie-instellingen"
+  },
+  "cookieList": {
+    "ariaLabel": "Cookies en browseropslag",
+    "columns": {
+      "name": "Naam",
+      "provider": "Aanbieder",
+      "purpose": "Doel",
+      "duration": "Bewaartermijn",
+      "category": "Categorie"
+    },
+    "providers": {
+      "site": "Deze site"
+    },
+    "cookies": {
+      "consent": {
+        "purpose": "Onthoudt je cookiekeuze, zodat we het niet opnieuw vragen.",
+        "duration": "180 dagen"
+      },
+      "NEXT_LOCALE": {
+        "purpose": "Onthoudt de taal die je voor deze site hebt gekozen.",
+        "duration": "1 jaar"
+      },
+      "signed_in_hint": {
+        "purpose": "Laat de pagina meteen je accountmenu tonen zolang je bent ingelogd.",
+        "duration": "Tot je uitlogt of je sessie verloopt"
+      },
+      "newsletter_subscribed": {
+        "purpose": "Onthoudt dat je je voor de nieuwsbrief hebt aangemeld, zodat het aanmeldformulier verborgen blijft.",
+        "duration": "1 jaar"
+      },
+      "newsletter_unsubscribe_token": {
+        "purpose": "Bewaart de link uit je afmeldmail terwijl je bevestigt.",
+        "duration": "1 uur"
+      },
+      "reading-depth": {
+        "purpose": "Onthoudt hoeveel je van elk bericht wilt lezen. Opgeslagen in de lokale opslag van je browser.",
+        "duration": "Tot je je browsergegevens wist"
+      },
+      "theme": {
+        "purpose": "Onthoudt of je het lichte of donkere thema hebt gekozen. Opgeslagen in de lokale opslag van je browser.",
+        "duration": "Tot je je browsergegevens wist"
+      }
+    },
+    "analyticsNote": "Als deze site bezoeken en paginasnelheid meet, gebruikt ze Vercel Web Analytics en Speed Insights. Die plaatsen geen cookies en laden ongeacht je cookiekeuze."
   }
 }

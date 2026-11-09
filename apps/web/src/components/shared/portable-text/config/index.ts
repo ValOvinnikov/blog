@@ -1,3 +1,4 @@
+import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
 import {
   defaultComponents,
   mergeComponents,
@@ -5,6 +6,7 @@ import {
 } from '@portabletext/react';
 
 import { blockComponents } from './block';
+import { CookieList } from './cookie-list';
 import { listComponents } from './list';
 import { markComponents } from './marks';
 import {
@@ -37,6 +39,7 @@ const portableTextComponents: PortableTextComponents = {
     code: codeTypeComponent,
     bodyImage: bodyImageTypeComponent,
     aside: makeAsideTypeComponent(baseForAsideRecursion),
+    [PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST]: CookieList,
   },
 };
 

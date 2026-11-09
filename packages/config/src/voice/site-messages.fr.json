@@ -333,5 +333,49 @@
       }
     },
     "footerSettingsLabel": "Paramètres des cookies"
+  },
+  "cookieList": {
+    "ariaLabel": "Cookies et stockage du navigateur",
+    "columns": {
+      "name": "Nom",
+      "provider": "Fournisseur",
+      "purpose": "Finalité",
+      "duration": "Durée",
+      "category": "Catégorie"
+    },
+    "providers": {
+      "site": "Ce site"
+    },
+    "cookies": {
+      "consent": {
+        "purpose": "Mémorise votre choix en matière de cookies, pour ne pas vous le redemander.",
+        "duration": "180 jours"
+      },
+      "NEXT_LOCALE": {
+        "purpose": "Mémorise la langue que vous avez choisie pour ce site.",
+        "duration": "1 an"
+      },
+      "signed_in_hint": {
+        "purpose": "Permet à la page d’afficher tout de suite votre menu de compte lorsque vous êtes connecté.",
+        "duration": "Jusqu’à la fin de votre connexion"
+      },
+      "newsletter_subscribed": {
+        "purpose": "Mémorise votre abonnement à la newsletter, pour que le formulaire d’inscription reste masqué.",
+        "duration": "1 an"
+      },
+      "newsletter_unsubscribe_token": {
+        "purpose": "Conserve le lien de votre e-mail de désabonnement le temps de confirmer.",
+        "duration": "1 heure"
+      },
+      "reading-depth": {
+        "purpose": "Mémorise la part de chaque article que vous avez choisi de lire. Conservé dans le stockage local de votre navigateur.",
+        "duration": "Jusqu’à ce que vous effaciez les données de votre navigateur"
+      },
+      "theme": {
+        "purpose": "Mémorise si vous avez choisi le thème clair ou sombre. Conservé dans le stockage local de votre navigateur.",
+        "duration": "Jusqu’à ce que vous effaciez les données de votre navigateur"
+      }
+    },
+    "analyticsNote": "Lorsque ce site mesure les visites et la vitesse des pages, il utilise Vercel Web Analytics et Speed Insights. Ils ne déposent aucun cookie et se chargent quel que soit votre choix en matière de cookies."
   }
 }

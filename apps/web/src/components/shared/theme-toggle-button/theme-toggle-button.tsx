@@ -2,6 +2,7 @@
 
 import { ThemeToggle } from '@blog/ui/components/atoms/theme-toggle';
 import { headerControlVariants } from '@web/components/shared/header-control';
+import { THEME_STORAGE_KEY } from '@web/config/theme-script';
 import { useEffect, useState } from 'react';
 
 export const ThemeToggleButton = () => {
@@ -21,10 +22,9 @@ export const ThemeToggleButton = () => {
     document.documentElement.style.colorScheme = next;
 
     try {
-      localStorage.setItem('theme', next);
+      localStorage.setItem(THEME_STORAGE_KEY, next);
     } catch {
-      // localStorage can throw in private browsing; the class change above
-      // still applies even if persistence fails.
+      // localStorage can throw in private browsing; the theme still applies for this page.
     }
 
     setIsDark(next === 'dark');
