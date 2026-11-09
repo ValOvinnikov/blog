@@ -49,6 +49,7 @@ export * from './redirect';
 export * from './release';
 export * from './reserved-slug';
 export * from './reserved-subdomain';
+export * from './sanity-document-action';
 export * from './sanity-project';
 export * from './site-type';
 export * from './subscriber-outcome';

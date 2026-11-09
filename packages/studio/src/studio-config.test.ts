@@ -2,9 +2,11 @@ import {
   CAPABILITY,
   LOCALE_ISO_CODES,
   MODULE_PACK,
+  SANITY_DOCUMENT_ACTION,
   SANITY_LOGIN_PROVIDER,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
+import { PAGE_COOKIE_STATEMENT_TYPE } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
@@ -47,7 +49,6 @@ const MOCK_BASE_PATH = `/${faker.lorem.word()}/studio`;
 const MOCK_DOCUMENT_ID = faker.string.uuid();
 const MOCK_UNTRANSLATED_TYPE = faker.lorem.word();
 
-const PUBLISH_ACTION = 'publish';
 const TRANSLATIONS_PLUGIN_NAME = '@sanity/document-internationalization';
 const ENTITLEMENT_GATES_NAME = entitlementGates({
   entitledModulePacks: EVERY_MODULE_PACK,
@@ -124,9 +125,9 @@ describe(buildStudioConfig, () => {
 
     it('wraps only the landing page publish action', () => {
       const publish: DocumentActionComponent = () => null;
-      publish.action = PUBLISH_ACTION;
+      publish.action = SANITY_DOCUMENT_ACTION.PUBLISH;
       const discard: DocumentActionComponent = () => null;
-      discard.action = 'discardChanges';
+      discard.action = SANITY_DOCUMENT_ACTION.DISCARD_CHANGES;
 
       const [landingPublish, landingDiscard] = actions(
         [publish, discard],
@@ -135,23 +136,60 @@ describe(buildStudioConfig, () => {
       const [topicPublish] = actions([publish], PAGE_TOPIC_TYPE);
 
       expect(landingPublish).not.toBe(publish);
-      expect(landingPublish?.action).toBe(PUBLISH_ACTION);
+      expect(landingPublish?.action).toBe(SANITY_DOCUMENT_ACTION.PUBLISH);
       expect(landingDiscard).toBe(discard);
       expect(topicPublish).toBe(publish);
     });
+
+    it('offers no delete, duplicate or unpublish action on the cookie statement', () => {
+      const prev = Object.values(SANITY_DOCUMENT_ACTION).map((name) => {
+        const action: DocumentActionComponent = () => null;
+        action.action = name;
+        return action;
+      });
+
+      const names = actions(prev, PAGE_COOKIE_STATEMENT_TYPE).map(
+        ({ action }) => action,
+      );
+
+      expect(names).toEqual([
+        SANITY_DOCUMENT_ACTION.PUBLISH,
+        SANITY_DOCUMENT_ACTION.DISCARD_CHANGES,
+      ]);
+    });
   });
 
-  it('hides the migration ledger from the new-document menu', () => {
+  const getNewDocumentOptions = () => {
     const newDocumentOptions = config.document?.newDocumentOptions;
     if (typeof newDocumentOptions !== 'function') {
       throw new Error('expected config.document.newDocumentOptions');
     }
+    return newDocumentOptions;
+  };
+
+  it('hides the migration ledger from the new-document menu', () => {
+    const newDocumentOptions = getNewDocumentOptions();
     const ledgerItem = {
       templateId: migrationStateSchema.name,
     } as TemplateItem;
     const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
 
     const options = newDocumentOptions([ledgerItem, otherItem]);
+
+    expect(options).toEqual([otherItem]);
+  });
+
+  it('hides the cookie statement from the new-document menu in every language', () => {
+    const newDocumentOptions = getNewDocumentOptions();
+    const cookieStatementItems = Object.values(LOCALE_ISO_CODES).map(
+      (locale) =>
+        ({
+          templateId: `${PAGE_COOKIE_STATEMENT_TYPE}-${locale}`,
+        }) as TemplateItem,
+    );
+    const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
+
+    const options = newDocumentOptions([...cookieStatementItems, otherItem]);
 
     expect(options).toEqual([otherItem]);
   });
@@ -165,6 +203,7 @@ describe(buildStudioConfig, () => {
     PAGE_POST_TYPE,
     PAGE_TOPIC_TYPE,
     PAGE_TAG_TYPE,
+    PAGE_COOKIE_STATEMENT_TYPE,
   ])('creates a %s only through a language template', (type) => {
     const templates = config.schema?.templates;
     if (typeof templates !== 'function') {

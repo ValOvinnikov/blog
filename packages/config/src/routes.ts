@@ -5,6 +5,7 @@ import type {
 } from '@blog/config/types';
 
 import {
+  COOKIE_STATEMENT_SLUG,
   NEWSLETTER_RESULT_SLUGS,
   type TLocaleIsoCode,
   type TNewsletterResult,
@@ -43,6 +44,7 @@ export const routes = {
   landingPage: (slug: string) => `/${slug}`,
   privacyDocument: (slug: string) => `/privacy/${slug}`,
   legalDocument: (slug: string) => `/legal/${slug}`,
+  cookieStatement: () => routes.legalDocument(COOKIE_STATEMENT_SLUG),
   terms: () => '/terms',
   privacy: () => '/privacy',
   switchLanguage: (to: string, from: string) =>
@@ -63,6 +65,7 @@ const PAGE_HREF_BUILDERS = {
   page_privacyDocument: (slug) =>
     slug ? routes.privacyDocument(slug) : undefined,
   page_legalDocument: (slug) => (slug ? routes.legalDocument(slug) : undefined),
+  page_cookieStatement: () => routes.cookieStatement(),
 } satisfies Record<
   string,
   (slug: TNullable<string>) => TMaybeUndefined<string>

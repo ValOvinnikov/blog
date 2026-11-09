@@ -24,6 +24,7 @@ const INTERNAL_HREF_BUILDERS: Record<
   page_privacyDocument: (slug) =>
     slug ? routes.privacyDocument(slug) : undefined,
   page_legalDocument: (slug) => (slug ? routes.legalDocument(slug) : undefined),
+  page_cookieStatement: () => routes.cookieStatement(),
 };
 
 function toInternalHref(raw: TInternalReference): TMaybeUndefined<string> {

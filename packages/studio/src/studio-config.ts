@@ -6,8 +6,9 @@ import {
   type TSanityLoginProvider,
 } from '@blog/config/constants';
 import { buildLoginProviderAuth } from '@blog/studio/auth/login-provider-auth';
-import { withLandingRedirects } from '@blog/studio/document-actions/with-landing-redirects/with-landing-redirects';
+import { documentOptions } from '@blog/studio/document-actions/document-options/document-options';
 import { schemaTypes } from '@blog/studio/schema-types';
+import { PAGE_COOKIE_STATEMENT_TYPE } from '@blog/studio/schema-types/documents/pages/cookie-statement/cookie-statement-type';
 import { PAGE_HOME_TYPE } from '@blog/studio/schema-types/documents/pages/home/home-type';
 import { PAGE_LANDING_TYPE } from '@blog/studio/schema-types/documents/pages/landing/landing-type';
 import { PAGE_LEGAL_DOCUMENT_TYPE } from '@blog/studio/schema-types/documents/pages/legal-document/legal-document-type';
@@ -18,7 +19,6 @@ import { PAGE_TAG_TYPE } from '@blog/studio/schema-types/documents/pages/tag/tag
 import { PAGE_TAG_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/tag-index/tag-index-type';
 import { PAGE_TOPIC_TYPE } from '@blog/studio/schema-types/documents/pages/topic/topic-type';
 import { PAGE_TOPIC_INDEX_TYPE } from '@blog/studio/schema-types/documents/pages/topic-index/topic-index-type';
-import { migrationStateSchema } from '@blog/studio/schema-types/documents/system/migration-state/migration-state';
 import { LANGUAGE_FIELD } from '@blog/studio/schema-types/fields/language-field/language-field';
 import { createLanguageSwitcherField } from '@blog/studio/schema-types/inputs/language-switcher-field/language-switcher-field';
 import {
@@ -74,6 +74,7 @@ const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [
   PAGE_POST_INDEX_TYPE,
   PAGE_TOPIC_INDEX_TYPE,
   PAGE_TAG_INDEX_TYPE,
+  PAGE_COOKIE_STATEMENT_TYPE,
 ];
 
 const TRANSLATED_DOCUMENT_TYPES: string[] = [
@@ -206,17 +207,6 @@ export const buildStudioConfig = ({
       file: { assetSources: [mediaAssetSource] },
     },
 
-    document: {
-      actions: (prev, { schemaType }) => {
-        if (schemaType === migrationStateSchema.name) return [];
-        if (schemaType !== PAGE_LANDING_TYPE) return prev;
-
-        return prev.map((action) =>
-          action.action === 'publish' ? withLandingRedirects(action) : action,
-        );
-      },
-      newDocumentOptions: (prev) =>
-        prev.filter((item) => item.templateId !== migrationStateSchema.name),
-    },
+    document: documentOptions,
   });
 };
