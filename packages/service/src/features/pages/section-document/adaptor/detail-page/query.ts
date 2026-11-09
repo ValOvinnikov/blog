@@ -1,4 +1,6 @@
 import { q } from '@blog/service/sanity/query/query';
+import { pageHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/page-heading-block';
+import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { portableTextBodyItemFragment } from '@blog/service/shared/fragments/portable-text/portable-text-body-item';
 import { seoFragment } from '@blog/service/shared/fragments/seo/seo';
 import { translationsQuery } from '@blog/service/shared/localization/page-translations/translations';
@@ -18,6 +20,11 @@ export const sectionDocumentPageQuery = q
     title: sub.field('title').notNull(),
     slug: sub.field('slug.current').notNull(),
     kind: sub.field('kind').notNull(),
+    headingBlock: sub
+      .field('headingBlock')
+      .project(pageHeadingBlockFragment)
+      .nullable(true),
+    ...moduleContentAlignmentLeftCenterFragment,
     body: sub
       .field('content[]')
       .project(portableTextBodyItemFragment)

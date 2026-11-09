@@ -1,9 +1,13 @@
+import { CONTENT_ALIGNMENT } from '@blog/config';
 import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   mockRawSectionDocumentDetail,
   mockSlugPageDocument,
 } from '@blog/service/testing/pages/fixtures';
-import { mockRawSeo } from '@blog/service/testing/shared/fixtures';
+import {
+  mockRawHeadingBlock,
+  mockRawSeo,
+} from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
 
@@ -16,6 +20,7 @@ const { EN, NL } = LOCALE_ISO_CODES;
 const MOCK_SLUG = faker.lorem.slug();
 const MOCK_PRIVACY_ID = faker.string.uuid();
 const MOCK_LEGAL_ID = faker.string.uuid();
+const MOCK_HEADING = faker.lorem.words(3);
 
 const dataset = [
   mockSlugPageDocument({
@@ -25,6 +30,8 @@ const dataset = [
     language: NL,
     title: faker.lorem.words(2),
     kind: LEGAL_PAGE_KIND.PRIVACY_POLICY,
+    headingBlock: mockRawHeadingBlock(MOCK_HEADING),
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
     content: [],
     seo: mockRawSeo(),
   }),
@@ -55,6 +62,22 @@ describe('sectionDocumentPageQuery', () => {
     ['page_legalDocument', MOCK_LEGAL_ID],
   ])('loads a %s by its section, slug and locale', async (type, id) => {
     expect(await run(type, MOCK_SLUG, NL)).toHaveProperty('_id', id);
+  });
+
+  it('projects the heading block and its alignment', async () => {
+    expect(await run('page_privacyDocument', MOCK_SLUG, NL)).toMatchObject({
+      headingBlock: { heading: MOCK_HEADING },
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    });
+  });
+
+  it('parses a page saved without a heading block', async () => {
+    const raw = await run('page_legalDocument', MOCK_SLUG, NL);
+
+    expect(sectionDocumentPageQuery.parse(raw)).toMatchObject({
+      headingBlock: null,
+      contentAlignment: null,
+    });
   });
 
   it('resolves nothing in another language', async () => {
