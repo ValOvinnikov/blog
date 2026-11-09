@@ -314,7 +314,8 @@
       "message": "We gebruiken alleen cookies die nodig zijn om deze site te laten werken, tenzij je externe media toestaat. Je kunt je keuze op elk moment wijzigen via Cookie-instellingen in de footer.",
       "acceptLabel": "Alles accepteren",
       "rejectLabel": "Alles weigeren",
-      "settingsLabel": "Instellingen"
+      "settingsLabel": "Instellingen",
+      "policyLinkLabel": "Cookieverklaring"
     },
     "preferences": {
       "heading": "Cookie-instellingen",

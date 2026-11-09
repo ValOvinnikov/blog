@@ -5,10 +5,10 @@ import {
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
 } from '@blog/config';
+import { SiteProviders } from '@web/components/features/layout/site-providers';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
-import { SiteProviders } from '@web/components/shared/site-providers';
 import { ThemeScope } from '@web/components/shared/theme-scope';
 import {
   enterRequestContext,

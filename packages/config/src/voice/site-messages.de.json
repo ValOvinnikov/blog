@@ -314,7 +314,8 @@
       "message": "Wir verwenden nur Cookies, die für den Betrieb dieser Website notwendig sind, es sei denn, du erlaubst externe Medien. Du kannst deine Auswahl jederzeit über Cookie-Einstellungen im Footer ändern.",
       "acceptLabel": "Alle akzeptieren",
       "rejectLabel": "Alle ablehnen",
-      "settingsLabel": "Einstellungen"
+      "settingsLabel": "Einstellungen",
+      "policyLinkLabel": "Cookie-Erklärung"
     },
     "preferences": {
       "heading": "Cookie-Einstellungen",
