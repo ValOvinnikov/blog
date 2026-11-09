@@ -10,6 +10,9 @@ export const LEGAL_PAGE_KIND = {
 
 export type TLegalPageKind = TValueOf<typeof LEGAL_PAGE_KIND>;
 
+export const isLegalPageKind = (value: string): value is TLegalPageKind =>
+  (Object.values(LEGAL_PAGE_KIND) as string[]).includes(value);
+
 export const PRIVACY_DOCUMENT_KINDS = [
   LEGAL_PAGE_KIND.PRIVACY_POLICY,
   LEGAL_PAGE_KIND.OTHER,

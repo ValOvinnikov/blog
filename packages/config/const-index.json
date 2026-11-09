@@ -8132,6 +8132,14 @@
         "file": "apps/web/src/constants/section-document.ts"
       }
     ],
+    "section_document_by_kind.fetch_failed": [
+      {
+        "ref": "SECTION_DOCUMENT_LOG.BY_KIND_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-document",
+        "file": "apps/web/src/constants/section-document.ts"
+      }
+    ],
     "section_index_page.fetch_failed": [
       {
         "ref": "SECTION_INDEX_LOG.PAGE_FETCH_FAILED",
