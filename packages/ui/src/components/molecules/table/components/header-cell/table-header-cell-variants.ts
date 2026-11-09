@@ -2,11 +2,14 @@ import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const tableHeaderCellVariants = tv({
-  base: ['min-w-32 px-3 py-2', 'font-semibold'],
+  base: ['min-w-32 px-3 py-2', 'border border-divider', 'font-semibold'],
   variants: {
     isRowHeader: {
-      true: ['align-top', 'border-b border-divider'],
-      false: ['align-bottom', 'border-b-2 border-border-strong'],
+      true: ['align-top'],
+      false: [
+        'align-bottom',
+        'bg-brand-primary-solid text-brand-primary-contrast',
+      ],
     },
   },
   defaultVariants: {
