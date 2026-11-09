@@ -1402,7 +1402,8 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio is nog niet klaar",
-    "notProvisionedDescription": "Het Sanity-project van deze site is nog niet klaar. Probeer het over een paar minuten opnieuw."
+    "notProvisionedDescription": "Het Sanity-project van deze site is nog niet klaar. Probeer het over een paar minuten opnieuw.",
+    "loading": "Studio wordt geladen"
   },
   "ownerStudioAccess": {
     "title": {

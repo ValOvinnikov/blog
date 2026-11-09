@@ -1402,7 +1402,8 @@
   "studioPage": {
     "title": "Studio",
     "notProvisionedTitle": "Studio n'est pas encore prêt",
-    "notProvisionedDescription": "Le projet Sanity de ce site n'est pas encore prêt. Réessayez dans quelques minutes."
+    "notProvisionedDescription": "Le projet Sanity de ce site n'est pas encore prêt. Réessayez dans quelques minutes.",
+    "loading": "Chargement de Studio"
   },
   "ownerStudioAccess": {
     "title": {
