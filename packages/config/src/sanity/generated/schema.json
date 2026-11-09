@@ -10581,6 +10581,31 @@
         },
         "optional": true
       },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "pageHeadingBlock"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
       "content": {
         "type": "objectAttribute",
         "value": {
@@ -10667,6 +10692,31 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "pageHeadingBlock"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
         },
         "optional": true
       },
@@ -11336,6 +11386,31 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "pageHeadingBlock"
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
         },
         "optional": true
       },

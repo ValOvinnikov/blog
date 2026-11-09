@@ -6,6 +6,7 @@ import { legalPageKindField } from '@blog/studio/schema-types/fields/legal-page-
 import { slugField } from '@blog/studio/schema-types/fields/slug-field/slug-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { createSlugUrlPreviewInput } from '@blog/studio/schema-types/inputs/slug-url-preview/slug-url-preview-input';
+import { pageHeadingBlockField } from '@blog/studio/schema-types/objects/page-heading-block/page-heading-block-field';
 import { seoField } from '@blog/studio/schema-types/objects/seo/seo-field';
 import { legalPageKindPreview } from '@blog/studio/schema-types/preview/legal-page-kind-preview/legal-page-kind-preview';
 import { validateSlugUniqueInLanguage } from '@blog/studio/schema-types/validation/validate-slug-unique-in-language/validate-slug-unique-in-language';
@@ -41,6 +42,7 @@ export const sectionDocumentSchema = <TName extends string>({
     fields: [
       languageField(),
       titleField(),
+      ...pageHeadingBlockField(),
       slugField({
         description: 'URL path segment — auto-generated from title.',
         previewInput: createSlugUrlPreviewInput(routePrefix),
