@@ -24,11 +24,17 @@ const MOCK_SECTION_TITLE = faker.lorem.words(3);
 const MOCK_BLOCK_KEY = faker.string.uuid();
 const MOCK_MARK_KEY = faker.string.uuid();
 const MOCK_LINK_ID = faker.string.uuid();
+const MOCK_TABLE_KEY = faker.string.uuid();
+const MOCK_ROW_KEY = faker.string.uuid();
+const MOCK_CELL_KEY = faker.string.uuid();
+const MOCK_CELL_TEXT = faker.lorem.words(2);
+const MOCK_HEADER_ROWS = 1;
 
 const bodyItemQuery = q.star
   .filterByType(
     PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST,
     PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION,
+    PORTABLE_TEXT_BLOCK_TYPE.TABLE,
   )
   .slice(0)
   .as<ArticleText[number]>()
@@ -87,6 +93,72 @@ describe('portableTextBodyItemFragment', () => {
         {
           _key: MOCK_BLOCK_KEY,
           markDefs: [{ _key: MOCK_MARK_KEY, link: { label: MOCK_LINK_LABEL } }],
+        },
+      ],
+    });
+  });
+
+  it('projects a table with its header-row count and the links in its cells resolved', async () => {
+    const item = await projectBodyItem({
+      _type: PORTABLE_TEXT_BLOCK_TYPE.TABLE,
+      _key: MOCK_TABLE_KEY,
+      headerRows: MOCK_HEADER_ROWS,
+      rows: [
+        {
+          _type: 'row',
+          _key: MOCK_ROW_KEY,
+          cells: [
+            {
+              _type: 'cell',
+              _key: MOCK_CELL_KEY,
+              value: [
+                {
+                  _type: 'block',
+                  _key: MOCK_BLOCK_KEY,
+                  children: [
+                    {
+                      _type: 'span',
+                      _key: MOCK_MARK_KEY,
+                      text: MOCK_CELL_TEXT,
+                      marks: [MOCK_MARK_KEY],
+                    },
+                  ],
+                  markDefs: [
+                    {
+                      _type: PORTABLE_TEXT_BLOCK_TYPE.LINK_REF,
+                      _key: MOCK_MARK_KEY,
+                      link: mockReference(MOCK_LINK_ID),
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(item).toMatchObject({
+      _type: PORTABLE_TEXT_BLOCK_TYPE.TABLE,
+      _key: MOCK_TABLE_KEY,
+      headerRows: MOCK_HEADER_ROWS,
+      rows: [
+        {
+          _key: MOCK_ROW_KEY,
+          cells: [
+            {
+              _key: MOCK_CELL_KEY,
+              value: [
+                {
+                  _key: MOCK_BLOCK_KEY,
+                  children: [{ text: MOCK_CELL_TEXT }],
+                  markDefs: [
+                    { _key: MOCK_MARK_KEY, link: { label: MOCK_LINK_LABEL } },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
     });

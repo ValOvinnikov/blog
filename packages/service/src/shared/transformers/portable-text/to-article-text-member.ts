@@ -17,10 +17,19 @@ export type TRawExpandableSectionBlock = Extract<
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
 
+export type TRawTableBlock = Extract<
+  TRawBodyItem,
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.TABLE }
+>;
+
 export type TRawArticleTextMember =
   | Exclude<
       TRawBodyItem,
-      { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
+      {
+        _type:
+          | typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION
+          | typeof PORTABLE_TEXT_BLOCK_TYPE.TABLE;
+      }
     >
   | NonNullable<TRawExpandableSectionBlock['body']>[number];
 

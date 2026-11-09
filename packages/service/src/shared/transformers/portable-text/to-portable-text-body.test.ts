@@ -26,6 +26,10 @@ const MOCK_BLOCK_KEY = faker.string.uuid();
 const MOCK_MARK_KEY = faker.string.uuid();
 const MOCK_CODE_KEY = faker.string.uuid();
 const MOCK_CODE = faker.lorem.word();
+const MOCK_TABLE_KEY = faker.string.uuid();
+const MOCK_ROW_KEY = faker.string.uuid();
+const MOCK_CELL_KEY = faker.string.uuid();
+const MOCK_HEADER_ROWS = 1;
 
 const MOCK_CODE_BLOCK = {
   _type: 'code' as const,
@@ -74,6 +78,23 @@ function mockRawExpandableSectionBlock(body: unknown) {
     _key: MOCK_SECTION_KEY,
     title: MOCK_SECTION_TITLE,
     body,
+  };
+}
+
+function mockRawTableBlock(rows: unknown) {
+  return {
+    _type: PORTABLE_TEXT_BLOCK_TYPE.TABLE,
+    _key: MOCK_TABLE_KEY,
+    headerRows: MOCK_HEADER_ROWS,
+    rows,
+  };
+}
+
+function mockTableRow(value: unknown) {
+  return {
+    _type: 'row',
+    _key: MOCK_ROW_KEY,
+    cells: [{ _type: 'cell', _key: MOCK_CELL_KEY, value }],
   };
 }
 
@@ -177,5 +198,33 @@ describe(toPortableTextBody, () => {
     ] as TRawPortableTextBody);
 
     expect(result).toEqual([mockRawExpandableSectionBlock(undefined)]);
+  });
+
+  it('resolves the link marks inside each table cell in place, keeping its header-row count', () => {
+    const result = toPortableTextBody([
+      MOCK_CODE_BLOCK,
+      mockRawTableBlock([mockTableRow([mockRawLinkedBlock()])]),
+    ] as TRawPortableTextBody);
+
+    expect(result).toEqual([
+      MOCK_CODE_BLOCK,
+      mockRawTableBlock([mockTableRow([MOCK_RESOLVED_BLOCK])]),
+    ]);
+  });
+
+  it('leaves the content of an empty table cell undefined', () => {
+    const result = toPortableTextBody([
+      mockRawTableBlock([mockTableRow(null)]),
+    ] as TRawPortableTextBody);
+
+    expect(result).toEqual([mockRawTableBlock([mockTableRow(undefined)])]);
+  });
+
+  it('leaves the rows of a table with no rows undefined', () => {
+    const result = toPortableTextBody([
+      mockRawTableBlock(null),
+    ] as TRawPortableTextBody);
+
+    expect(result).toEqual([mockRawTableBlock(undefined)]);
   });
 });
