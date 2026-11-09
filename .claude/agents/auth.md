@@ -71,10 +71,11 @@ test); a folder of two or fewer stays flat, and the third module splits all.
 - **The adapter binding** — `DrizzleAdapter` over `getDb()` and the four
   adapter tables.
 - **Session strategy** — `database`, backed by `sessions`.
-- **Cookie options** — only `PLATFORM` gets them: every Auth.js cookie
-  renamed apart from the defaults (`sessions/platform-cookies.ts`), keeping
-  the `__Secure-`/`__Host-` prefixes when `useSecureCookies` is on. A site
-  keeps Auth.js's default names. A changed cookie name silently signs
+- **Cookie options** — `buildAppCookies(app, useSecureCookies)`
+  (`sessions/app-cookies.ts`) names every Auth.js cookie for both apps,
+  keeping the `__Secure-`/`__Host-` prefixes when `useSecureCookies` is on.
+  `PLATFORM`'s names sit apart from the defaults; `SITE`'s are Auth.js's
+  defaults, spelled out so `apps/web`'s cookie list reads the same names. A changed cookie name silently signs
   everyone out: change one only when a ticket asks, never as a tidy-up.
 - **The session shape and its callback** — the `session` callback putting
   `user.id` on `session.user`, and its augmentation in

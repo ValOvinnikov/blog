@@ -333,5 +333,69 @@
       }
     },
     "footerSettingsLabel": "Cookie-Einstellungen"
+  },
+  "cookieList": {
+    "ariaLabel": "Cookies und Browserspeicher",
+    "columns": {
+      "name": "Name",
+      "provider": "Anbieter",
+      "purpose": "Zweck",
+      "duration": "Speicherdauer",
+      "category": "Kategorie"
+    },
+    "providers": {
+      "site": "Diese Website"
+    },
+    "cookies": {
+      "CONSENT": {
+        "purpose": "Speichert deine Cookie-Auswahl, damit wir nicht erneut fragen.",
+        "duration": "180 Tage"
+      },
+      "LANGUAGE": {
+        "purpose": "Speichert die Sprache, die du für diese Website gewählt hast.",
+        "duration": "1 Jahr"
+      },
+      "SESSION": {
+        "purpose": "Hält dich angemeldet.",
+        "duration": "Bis deine Anmeldung endet"
+      },
+      "CSRF": {
+        "purpose": "Schützt das Anmeldeformular vor gefälschten Anfragen.",
+        "duration": "Bis du deinen Browser schließt"
+      },
+      "SIGN_IN_RETURN": {
+        "purpose": "Bringt dich zurück zu der Seite, auf der du dich angemeldet hast.",
+        "duration": "Bis du deinen Browser schließt"
+      },
+      "OAUTH_VERIFIER": {
+        "purpose": "Sichert eine Anmeldung mit Google oder GitHub, solange sie läuft.",
+        "duration": "15 Minuten"
+      },
+      "OAUTH_STATE": {
+        "purpose": "Prüft, ob eine zurückkehrende Anmeldung mit Google oder GitHub die ist, die du gestartet hast.",
+        "duration": "15 Minuten"
+      },
+      "SIGNED_IN_HINT": {
+        "purpose": "Lässt die Seite dein Kontomenü sofort anzeigen, solange du angemeldet bist.",
+        "duration": "Bis deine Anmeldung endet"
+      },
+      "NEWSLETTER_SUBSCRIBED": {
+        "purpose": "Speichert, dass du den Newsletter abonniert hast, damit das Anmeldeformular ausgeblendet bleibt.",
+        "duration": "1 Jahr"
+      },
+      "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
+        "purpose": "Bewahrt den Link aus deiner Abmelde-E-Mail auf, während du bestätigst.",
+        "duration": "1 Stunde"
+      },
+      "READING_DEPTH": {
+        "purpose": "Speichert, wie viel von jedem Beitrag du lesen möchtest. Liegt im lokalen Speicher deines Browsers.",
+        "duration": "Bis du deine Browserdaten löschst"
+      },
+      "THEME": {
+        "purpose": "Speichert, ob du das helle oder dunkle Design gewählt hast. Liegt im lokalen Speicher deines Browsers.",
+        "duration": "Bis du deine Browserdaten löschst"
+      }
+    },
+    "analyticsNote": "Wenn diese Website Besuche und Seitengeschwindigkeit misst, nutzt sie Vercel Web Analytics und Speed Insights. Diese setzen keine Cookies und laden unabhängig von deiner Cookie-Auswahl."
   }
 }

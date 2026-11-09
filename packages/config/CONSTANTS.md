@@ -662,6 +662,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **CONTACT_FORM_LOG**: `MODULE_FETCH_FAILED`=`"contact_form_module.fetch_failed"`
 
+### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
+
+- **COOKIE_PROVIDER**: `FIRST_PARTY`
+- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
+
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`

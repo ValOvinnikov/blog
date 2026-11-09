@@ -333,5 +333,69 @@
       }
     },
     "footerSettingsLabel": "Configuración de cookies"
+  },
+  "cookieList": {
+    "ariaLabel": "Cookies y almacenamiento del navegador",
+    "columns": {
+      "name": "Nombre",
+      "provider": "Proveedor",
+      "purpose": "Finalidad",
+      "duration": "Duración",
+      "category": "Categoría"
+    },
+    "providers": {
+      "site": "Este sitio"
+    },
+    "cookies": {
+      "CONSENT": {
+        "purpose": "Recuerda tu elección sobre cookies para no volver a preguntarte.",
+        "duration": "180 días"
+      },
+      "LANGUAGE": {
+        "purpose": "Recuerda el idioma que elegiste para este sitio.",
+        "duration": "1 año"
+      },
+      "SESSION": {
+        "purpose": "Mantiene tu sesión iniciada.",
+        "duration": "Hasta que termine tu sesión"
+      },
+      "CSRF": {
+        "purpose": "Protege el formulario de inicio de sesión contra solicitudes falsificadas.",
+        "duration": "Hasta que cierres el navegador"
+      },
+      "SIGN_IN_RETURN": {
+        "purpose": "Te devuelve a la página desde la que iniciaste sesión.",
+        "duration": "Hasta que cierres el navegador"
+      },
+      "OAUTH_VERIFIER": {
+        "purpose": "Protege un inicio de sesión con Google o GitHub mientras está en curso.",
+        "duration": "15 minutos"
+      },
+      "OAUTH_STATE": {
+        "purpose": "Comprueba que un inicio de sesión con Google o GitHub que vuelve es el que tú empezaste.",
+        "duration": "15 minutos"
+      },
+      "SIGNED_IN_HINT": {
+        "purpose": "Permite que la página muestre tu menú de cuenta al instante mientras tienes la sesión iniciada.",
+        "duration": "Hasta que termine tu sesión"
+      },
+      "NEWSLETTER_SUBSCRIBED": {
+        "purpose": "Recuerda que te suscribiste al boletín, para que el formulario de suscripción siga oculto.",
+        "duration": "1 año"
+      },
+      "NEWSLETTER_UNSUBSCRIBE_TOKEN": {
+        "purpose": "Guarda el enlace de tu correo de baja mientras confirmas.",
+        "duration": "1 hora"
+      },
+      "READING_DEPTH": {
+        "purpose": "Recuerda cuánto de cada artículo elegiste leer. Se guarda en el almacenamiento local de tu navegador.",
+        "duration": "Hasta que borres los datos de tu navegador"
+      },
+      "THEME": {
+        "purpose": "Recuerda si elegiste el tema claro u oscuro. Se guarda en el almacenamiento local de tu navegador.",
+        "duration": "Hasta que borres los datos de tu navegador"
+      }
+    },
+    "analyticsNote": "Cuando este sitio mide las visitas y la velocidad de las páginas, usa Vercel Web Analytics y Speed Insights. No instalan cookies y se cargan sea cual sea tu elección sobre cookies."
   }
 }

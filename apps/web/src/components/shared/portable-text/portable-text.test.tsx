@@ -297,6 +297,19 @@ describe(`<${PortableText.name}/>`, () => {
     expect(button).toBeVisible();
   });
 
+  it('renders a cookie-list block as the cookie table', () => {
+    setup({
+      value: [
+        { _type: PORTABLE_TEXT_BLOCK_TYPE.COOKIE_LIST, _key: MOCK_LINK_KEY },
+      ],
+    });
+
+    const table = screen.getByRole('region', {
+      name: SITE_MESSAGES.cookieList.ariaLabel,
+    });
+    expect(table).toBeVisible();
+  });
+
   it('renders sibling blocks in their authored order', () => {
     setup({
       value: [
