@@ -5,6 +5,7 @@ import { COOKIE_STATEMENT_LOG } from '@web/constants/cookie-statement';
 import { customRenderServerAsync, screen } from '@web/testing/custom-render';
 import { mockCookieStatementPage } from '@web/testing/shared/cookie-statement/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { stubFakeIntersectionObserver } from '@web/testing/shared/intersection-observer/fake-intersection-observer';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -25,7 +26,8 @@ const getCookieStatementPageMock = vi.mocked(
   service.pages.cookieStatement.v1.getCookieStatementPage,
 );
 
-const MOCK_PAGE = mockCookieStatementPage();
+const MOCK_HEADING_BLOCK = mockHeadingBlock({ heading: 'Cookies we use' });
+const MOCK_PAGE = mockCookieStatementPage({ headingBlock: MOCK_HEADING_BLOCK });
 
 const setup = customRenderServerAsync(CookieStatementPage, {});
 
@@ -55,10 +57,16 @@ describe(`<${CookieStatementPage.name}/>`, () => {
       );
     });
 
-    it('renders the title as the page heading', () => {
+    it('renders the heading block as the page heading', () => {
       const heading = screen.getByRole('heading', { level: 1 });
 
-      expect(heading).toHaveTextContent(MOCK_PAGE.title);
+      expect(heading).toHaveTextContent(MOCK_HEADING_BLOCK.heading);
+    });
+
+    it('never renders the internal title', () => {
+      const title = screen.queryByText(MOCK_PAGE.title);
+
+      expect(title).not.toBeInTheDocument();
     });
   });
 

@@ -5,10 +5,16 @@ import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
 export const CookieStatementPage = async () => {
   const result = await getCookieStatementPage();
-  const { title, body } = guardPageLoaderResult(
+  const { headingBlock, headingAlignment, body } = guardPageLoaderResult(
     result,
     COOKIE_STATEMENT_LOG.PAGE_FETCH_FAILED,
   );
 
-  return <DocumentArticle title={title} body={body} />;
+  return (
+    <DocumentArticle
+      headingBlock={headingBlock}
+      headingAlignment={headingAlignment}
+      body={body}
+    />
+  );
 };

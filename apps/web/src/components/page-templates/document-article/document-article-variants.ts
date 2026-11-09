@@ -3,8 +3,7 @@ import { proseMeasureCapSlot } from '@web/components/shared/portable-text/config
 
 export const documentArticleVariants = tv({
   slots: {
-    root: ['w-full', 'pt-6 pb-page-y'],
-    header: ['mx-auto w-full', 'max-w-page px-gutter'],
+    root: ['w-full', 'pb-page-y'],
     body: ['mt-8'],
     prose: proseMeasureCapSlot,
   },

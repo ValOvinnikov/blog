@@ -25,25 +25,33 @@ code:
   - packages/ui/src/components/molecules/image-with-caption/**
   - apps/web/src/components/shared/portable-text/**
   - apps/web/src/testing/shared/portable-text/**
-epics: [4987, 2788]
+  - packages/studio/src/schema-types/objects/expandable-section/**
+  - packages/studio/src/schema-types/objects/table/**
+  - packages/studio/src/schema-types/objects/cookie-list/**
+  - packages/studio/src/schema-types/objects/cookie-preferences-link/**
+  - packages/studio/src/schema-types/portable-text/expandable-section-text/**
+  - packages/ui/src/components/molecules/table/**
+  - apps/web/src/constants/cookie-list.ts
+epics: [4987, 2788, 6505]
 ---
 
 # Rich text
 
 ## What it does
 
-Editors write formatted text in Sanity's Portable Text editor, and the public site renders it with one shared renderer. Three shapes exist, each allowing only what its place needs: a full article body (headings, quotes, bullet and numbered lists, images, code, asides), short text with lists, and plain paragraphs. Links inside text always point at a reusable link document. The same renderer serves the post body, every module that carries formatted text, and Voice rich values on the public site (through `VoiceRichText`).
+Editors write formatted text in Sanity's Portable Text editor, and the public site renders it with one shared renderer. Three shapes exist, each allowing only what its place needs: a full article body (headings, quotes, bullet and numbered lists, images, code, asides, expandable sections, tables, the cookie list and cookie-preferences links), short text with lists, and plain paragraphs. Links inside text always point at a reusable link document. The same renderer serves the post body, every module that carries formatted text, and Voice rich values on the public site (through `VoiceRichText`).
 
 ## Surfaces and routes
 
-- **Studio:** the post's `content`; the content module's `body`; the CTA module's `content`, the FAQ block's `answer` and a feature highlight's `body` and a testimonial's `quote` (listed text); a person's `bio`, a timeline item's `body` and an aside's `body` (paragraph text).
-- **Public site:** `/blog/{slug}` (post body, inside `Prose`), and the content, CTA, FAQ, feature-highlights, hero-profile, team, testimonial and timeline modules wherever a page places them.
+- **Studio:** the post's `content`; a privacy or legal page's and the cookie statement's `content` (./footer-and-legal-pages.md); the content module's `body`; the CTA module's `content`, the FAQ block's `answer` and a feature highlight's `body` and a testimonial's `quote` (listed text); a person's `bio`, a timeline item's `body` and an aside's `body` (paragraph text).
+- **Public site:** `/blog/{slug}` (post body, inside `Prose`), `/privacy/{slug}`, `/legal/{slug}` and `/legal/cookie-statement`, and the content, CTA, FAQ, feature-highlights, hero-profile, team, testimonial and timeline modules wherever a page places them.
 - **Platform:** none. Voice's rich fields use their own schema and editor (./voice.md), though the public site renders them with this renderer; emails serialise Portable Text with their own HTML serialiser (./email.md).
 
 ## Data
 
-- **Studio types:** `articleText` (styles Normal, H2, H3, H4, Quote; decorators bold, italic, code, underline, strike, subscript, superscript; bullet and numbered lists (Sanity defaults); members `block`, `bodyImage`, `code`, `aside`), `listedText` (Normal only; bold, italic, sub, sup; bullet and numbered lists), `paragraphText` (as `listedText` with no lists). All three take one annotation, `linkRef` (a reference to a `link` document, ./links.md).
+- **Studio types:** `articleText` (styles Normal, H2, H3, H4, Quote; decorators bold, italic, code, underline, strike, subscript, superscript; bullet and numbered lists (Sanity defaults); members `block`, `bodyImage`, `code`, `aside`, `cookieList`, `expandableSection`, `table`; annotations `linkRef` and `cookiePreferencesLink`), `listedText` (Normal only; bold, italic, sub, sup; bullet and numbered lists), `paragraphText` (as `listedText` with no lists). All three take the `linkRef` annotation (a reference to a `link` document, ./links.md).
 - **Objects:** `aside` (`kind` from `ASIDE_KIND`: `WHY_NOT`, `DIGRESSION`, `CONTEXT`; `body` as `paragraphText`), `bodyImage` (image with hotspot, `alt`, optional `layout` from `IMAGE_LAYOUT`: `INLINE`, `FULL_BLEED`, `FLOAT_LEFT`, `FLOAT_RIGHT`), and `code` from `@sanity/code-input` (`code`, `language`, `highlightedLines`).
+- **Legal blocks:** `expandableSection` (`title`, required; `body` as `expandableSectionText` — `articleText`'s blocks and embeds, styles Normal, H3, H4 and Quote, no H2 and no nested section or table); `table`, Sanity's Portable Text table (`headerRows`, `rows[].cells[].value`, each cell Normal text with bold, italic and `linkRef`; no caption); `cookieList`, a marker with no editable field; `cookiePreferencesLink`, an annotation with no field whose label is the selected text.
 - **Localisation:** the post body is a plain `articleText` (each post is one language). Module and document fields use `internationalizedArrayArticleText`, `…ListedText` or `…ParagraphText`, read with `getLocalizedArticleText` / `getLocalizedPortableTextBlock`, which fall back from the request language to the default language.
 - **Service shape:** `portableTextBodyItemFragment` projects blocks with their `markDefs` dereferenced to the link document, body images with their layout, and aside bodies; `toPortableTextBody` returns `TPortableTextBody`. A link mark becomes `IPortableTextLinkMark` with a resolved `{ href, target }`, or `link: undefined` when the link document is gone.
 - **Cache:** none of its own; it rides the query of the page or module that carries it (./rendering-and-caching.md).
@@ -56,6 +64,10 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 
 ## Constraints and invariants
 
+- An expandable section allows H3 and below only, so the contents rail, built from the page's H2s, stays accurate. It renders as an `Accordion` item, closed by default, with a nested renderer.
+- A table renders `@blog/ui`'s `Table`: its first `headerRows` rows as header cells, the rest as body rows, in a region named by the fixed `table.regionLabel`. Tables are entered in the Studio; paste from outside the Studio is not supported (#6914, #6915).
+- The cookie list renders from code, never from editor text: `COOKIE_LIST` in `apps/web/src/constants/cookie-list.ts` names every cookie and storage key the site sets, with a purpose and duration per id under the fixed `cookieList.*` catalog keys. Three columns (name, purpose, duration) from `sm` up; stacked entries on phones.
+- The cookie-preferences link renders a `button` styled as a prose link that opens the consent preferences dialog (./consent-and-analytics.md).
 - `articleText` has no H1, so the body never competes with the page title. A stored `h1` block still renders, as a level-2 heading without an anchor.
 - H2 and H3 render with `id={block._key}` and scroll margins that clear the sticky header and the mobile contents bar; the contents rail links to those ids (./reading-experience.md).
 - Marks: `code` → `InlineCode`, `sub`/`sup` → native elements, `linkRef` → `TextLink` (`appearance="prose"`) rendered as `SmartLink`. The link is always underlined in its own colour: 1px at rest, 2px on hover. A link whose document was deleted renders its text unlinked. Bold, italic, underline and strike use `@portabletext/react` defaults.
@@ -80,10 +92,12 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 - `packages/service/src/shared/transformers/portable-text/to-portable-text-body.ts`, `to-portable-text-mark-def.ts`
 - `apps/web/src/components/shared/portable-text/portable-text.tsx` and `config/{block,list,marks,types,full-bleed}.ts(x)`
 - `apps/web/src/components/shared/portable-text/components/code-block/code-block.tsx`
+- `apps/web/src/components/shared/portable-text/config/cookie-list.tsx`, `cookie-preferences-link.tsx`
+- `packages/studio/src/schema-types/objects/expandable-section/expandable-section.ts`, `table/table.ts`, `cookie-list/cookie-list.ts`, `cookie-preferences-link/cookie-preferences-link.ts`
 
 ## Tests and stories
 
-- `apps/web/src/components/shared/portable-text/portable-text.test.tsx`, `code-block.test.tsx`, `code-block-syntax-theme.test.ts`; story `code-block.stories.tsx`.
+- `apps/web/src/components/shared/portable-text/portable-text.test.tsx`, `config/cookie-list.test.tsx`, `config/cookie-preferences-link.test.tsx`, `code-block.test.tsx`, `code-block-syntax-theme.test.ts`; story `code-block.stories.tsx`.
 - `packages/service/src/shared/transformers/portable-text/*.test.ts`, `get-localized-portable-text-block.test.ts`.
 - `packages/studio/src/schema-types/portable-text/to-plain-text/to-plain-text.test.ts`.
 - `packages/ui`: tests and stories beside `prose`, `text-link`, `inline-code`, `quote-block`, `aside`, `image-with-caption` and `heading`.
@@ -93,4 +107,5 @@ Editors write formatted text in Sanity's Portable Text editor, and the public si
 - #4987 epic: accessible, correctly rendered text and colour on the public site.
   - #5008 a scrolling code block can be focused and is named.
   - #4989 prose-sized headings keep their text colour.
+- #6505 epic: the expandable section, table, cookie list and cookie-preferences link (manual test #6533).
 - #2788 epic: embeds. #3775, #3776 and #3777 add an embed block to the post body (studio, service, web).
