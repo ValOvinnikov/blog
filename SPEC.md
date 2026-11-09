@@ -967,8 +967,9 @@ It is allowed in `page_home.modules[]` and `page_landing.modules[]` only.
 `QuoteCard`'s `isSpotlight` drops the surface and the accent rule, centres the
 figure, takes the avatar from 80 to 112 pixels and caps the measure in `ch`.
 That cap reads tighter than its number suggests: the spotlight quote renders at
-`text-prose-h4` while body copy is smaller, and `ch` is font-relative, so the
-same character count is physically wider here than in running text.
+`text-prose-h4`, never smaller than body copy, and `ch` is font-relative, so the
+same character count is physically wider here than in running text once the
+heading grows past the 18px body size.
 
 **Grid columns are derived from the item count, not authored** — 2→2, 3→3, 4→2,
 5→3, 6→3, 7→3, 8→2 — capped at three rather than the feature grid's four,
