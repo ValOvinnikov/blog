@@ -13,7 +13,7 @@ code:
   - apps/web/src/hooks/use-consent-store/**
   - apps/web/src/hooks/use-consent-preferences-form/**
   - apps/web/src/context/consent-preferences-provider/**
-  - apps/web/src/components/shared/consent-banner-slot/**
+  - apps/web/src/components/features/layout/site-providers/components/consent-banner-slot/**
   - apps/web/src/components/shared/consent-preferences-dialog/**
   - apps/web/src/components/shared/cookie-settings-button/**
   - apps/web/src/modules/cookie-settings/**
@@ -76,13 +76,13 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `apps/web/src/utils/consent-cookie/consent-cookie.ts` — `encodeConsent`, `decodeConsent`
 - `apps/web/src/hooks/use-consent-store/use-consent-store.ts`
 - `apps/web/src/hooks/use-consent/use-consent.ts`
-- `apps/web/src/components/shared/consent-banner-slot/consent-banner-slot.tsx`
+- `apps/web/src/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot.tsx`
 - `apps/web/src/components/shared/consent-preferences-dialog/consent-preferences-dialog.tsx`
 - `apps/web/src/hooks/use-consent-preferences-form/use-consent-preferences-form.ts`
 - `apps/web/src/modules/cookie-settings/cookie-settings-module.tsx`
 - `apps/web/src/components/shared/floating-cookie-settings-button/floating-cookie-settings-button.tsx`
 - `apps/web/src/context/consent-preferences-provider/consent-preferences-provider.tsx` — the footer and floating control refs and the focus-return fallback
-- `apps/web/src/components/shared/site-providers/site-providers.tsx`
+- `apps/web/src/components/features/layout/site-providers/site-providers.tsx`
 - `apps/web/src/components/shared/site-analytics/site-analytics.tsx`
 - `apps/web/src/app/[tenant]/[locale]/layout.tsx`
 

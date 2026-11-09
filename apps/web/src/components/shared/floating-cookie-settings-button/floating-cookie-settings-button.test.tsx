@@ -1,6 +1,6 @@
 import { SITE_MESSAGES } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
+import { ConsentBannerSlot } from '@web/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { useHeaderOverlay } from '@web/context/header-overlay-provider';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';

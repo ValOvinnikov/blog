@@ -227,6 +227,7 @@ export const VOICE_FIXED_KEYS = [
   'consent.banner.acceptLabel',
   'consent.banner.rejectLabel',
   'consent.banner.settingsLabel',
+  'consent.banner.policyLinkLabel',
   'consent.preferences.heading',
   'consent.preferences.saveLabel',
   'consent.preferences.savedStatus',

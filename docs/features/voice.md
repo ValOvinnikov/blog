@@ -74,7 +74,7 @@ Voice lets a site owner reword the page-level prose the public site writes in it
 - `apps/platform/src/components/features/voice/voice-page-content/voice-page-content.tsx`
 - `apps/platform/src/components/features/site-preview/voice-specimen/voice-specimen.tsx`
 - `apps/web/src/utils/resolve-tenant-messages/resolve-tenant-messages.ts`
-- `apps/web/src/components/shared/site-providers/site-providers.tsx`, `apps/web/src/i18n/request.ts`
+- `apps/web/src/components/features/layout/site-providers/site-providers.tsx`, `apps/web/src/i18n/request.ts`
 - `apps/web/src/server/site-config/get-voice-rich/get-voice-rich.ts`
 
 ## Tests and stories

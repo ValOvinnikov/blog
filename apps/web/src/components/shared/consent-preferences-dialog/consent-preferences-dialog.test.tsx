@@ -1,6 +1,6 @@
 import { CONSENT_CATEGORY } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
+import { ConsentBannerSlot } from '@web/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot';
 import { CookieSettingsButton } from '@web/components/shared/cookie-settings-button';
 import { renderElement, screen, waitFor } from '@web/testing/custom-render';
 import {
@@ -109,7 +109,7 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
       expect(readGrantedConsent()).toBeUndefined();
     });
 
-    it('reopens with the stored choice rather than the discarded one', async () => {
+    it('reopens with the stored choice after a discarded change', async () => {
       const externalMediaSwitch = screen.getByRole('switch', {
         name: EXTERNAL_MEDIA_SWITCH_NAME,
       });

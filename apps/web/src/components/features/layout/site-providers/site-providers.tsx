@@ -1,6 +1,5 @@
 import { CAPABILITY, SITE_MESSAGES_BY_LOCALE } from '@blog/config';
 import { getSanityImageBaseUrl } from '@blog/service';
-import { ConsentBannerSlot } from '@web/components/shared/consent-banner-slot';
 import { ConsentPreferencesDialog } from '@web/components/shared/consent-preferences-dialog';
 import { BusyStyleProvider } from '@web/context/busy-style-provider';
 import { ConsentPreferencesProvider } from '@web/context/consent-preferences-provider';
@@ -17,6 +16,8 @@ import { SessionProvider } from 'next-auth/react';
 import { NextIntlClientProvider } from 'next-intl';
 import { getNow, getTimeZone } from 'next-intl/server';
 import type { ReactNode } from 'react';
+
+import { ConsentBannerSlot } from './components/consent-banner-slot/consent-banner-slot';
 
 export interface ISiteProvidersProps {
   children: ReactNode;

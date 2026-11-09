@@ -314,7 +314,8 @@
       "message": "Nous n'utilisons que les cookies nécessaires au fonctionnement de ce site, sauf si vous autorisez les médias externes. Vous pouvez modifier votre choix à tout moment via Paramètres des cookies dans le pied de page.",
       "acceptLabel": "Tout accepter",
       "rejectLabel": "Tout refuser",
-      "settingsLabel": "Paramètres"
+      "settingsLabel": "Paramètres",
+      "policyLinkLabel": "Déclaration relative aux cookies"
     },
     "preferences": {
       "heading": "Paramètres des cookies",

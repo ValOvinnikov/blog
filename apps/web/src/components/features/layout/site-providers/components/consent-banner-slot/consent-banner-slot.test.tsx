@@ -1,4 +1,4 @@
-import { CONSENT_CATEGORY } from '@blog/config';
+import { CONSENT_CATEGORY, routes } from '@blog/config';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import {
   customRender,
@@ -18,6 +18,7 @@ import {
 import { ConsentBannerSlot } from './consent-banner-slot';
 
 const BANNER_HEADING = 'Cookies on this site';
+const COOKIE_STATEMENT_LINK = 'Cookie statement';
 
 const setup = customRender(ConsentBannerSlot, { isEnabled: true });
 
@@ -63,6 +64,22 @@ describe(`<${ConsentBannerSlot.name}/>`, () => {
       const heading = screen.getByRole('heading', { name: BANNER_HEADING });
 
       expect(heading).toBeVisible();
+    });
+
+    it('links the cookie statement', () => {
+      const link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+
+      expect(link).toHaveAttribute('href', routes.cookieStatement());
+    });
+
+    it('leaves the choice unanswered when the cookie statement is followed', async () => {
+      const link = screen.getByRole('link', { name: COOKIE_STATEMENT_LINK });
+
+      await user.click(link);
+
+      const heading = screen.getByRole('heading', { name: BANNER_HEADING });
+      expect(heading).toBeVisible();
+      expect(readGrantedConsent()).toBeUndefined();
     });
 
     it('hides and remembers the choice on accept all', async () => {

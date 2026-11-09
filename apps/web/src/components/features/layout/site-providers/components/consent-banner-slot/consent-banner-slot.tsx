@@ -1,6 +1,8 @@
 'use client';
 
+import { routes } from '@blog/config';
 import { ConsentBanner } from '@blog/ui/components/molecules/consent-banner';
+import { SmartLink } from '@web/components/shared/smart-link';
 import { CONSENT_STATUS } from '@web/constants/consent';
 import { useConsentPreferences } from '@web/context/consent-preferences-provider';
 import { useConsentStore } from '@web/hooks/use-consent-store';
@@ -22,6 +24,11 @@ export const ConsentBannerSlot = ({ isEnabled }: IConsentBannerSlotProps) => {
       headingLevel={2}
       heading={t('heading')}
       message={t('message')}
+      policyLink={{
+        href: routes.cookieStatement(),
+        label: t('policyLinkLabel'),
+      }}
+      linkAs={SmartLink}
       acceptLabel={t('acceptLabel')}
       rejectLabel={t('rejectLabel')}
       settingsLabel={t('settingsLabel')}
