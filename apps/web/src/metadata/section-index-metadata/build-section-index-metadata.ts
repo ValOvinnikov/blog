@@ -1,9 +1,9 @@
+import { pageHref, routes } from '@blog/config';
 import type { TSectionIndexType } from '@blog/service';
 import { SECTION_INDEX_LOG } from '@web/constants/section-index';
 import { toLocalizedPageMetadata } from '@web/metadata/to-localized-page-metadata';
 import { getSectionIndexPage } from '@web/server/section-index/get-section-index-page/get-section-index-page';
 import { logger } from '@web/utils/logger/logger';
-import { sectionIndexHref } from '@web/utils/section-index-href';
 import type { Metadata } from 'next';
 
 export const buildSectionIndexMetadata = async (
@@ -24,7 +24,7 @@ export const buildSectionIndexMetadata = async (
   }
 
   const { seo, translations } = result.data;
-  const href = sectionIndexHref(type);
+  const href = pageHref(type) ?? routes.home();
 
   return toLocalizedPageMetadata(seo, {
     href,
