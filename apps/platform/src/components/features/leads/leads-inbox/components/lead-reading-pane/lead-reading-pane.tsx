@@ -1,4 +1,5 @@
 import { SIZE, type TMaybeNull } from '@blog/config';
+import { BackLink } from '@platform/components/shared/back-link';
 import { Button } from '@platform/components/shared/button';
 import { buttonVariants } from '@platform/components/shared/button/button-variants';
 import { Card } from '@platform/components/shared/card';
@@ -38,15 +39,9 @@ export const LeadReadingPane = ({
 
   return (
     <div className={styles.root()}>
-      <Button
-        size={SIZE.SM}
-        variant={BUTTON_VARIANT.SECONDARY}
-        focusGround={FOCUS_RING_GROUND.BG}
-        className={styles.back()}
-        onClick={onBack}
-      >
+      <BackLink className={styles.back()} onClick={onBack}>
         {t('back')}
-      </Button>
+      </BackLink>
       <Card className={styles.card()}>
         <Card.Header
           title={
