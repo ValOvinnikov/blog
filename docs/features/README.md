@@ -43,7 +43,7 @@ on the public site or the platform yet).
 
 | Page                                                | Status | Layers                                             | One-line purpose                                                                                                |
 | --------------------------------------------------- | ------ | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| [Page types](page-types.md)                         | built  | config, studio, service, web                       | Every public page is a Sanity document of one of eight fixed types, each with its own heading, SEO and slug.    |
+| [Page types](page-types.md)                         | built  | config, studio, service, web                       | Every public page is a Sanity document of one of thirteen fixed types, each with its own heading, SEO and slug. |
 | [Landing tree](landing-tree.md)                     | built  | config, studio, service, web                       | Free-form landing pages nest under parents to build sections with their own sidebar navigation and breadcrumbs. |
 | [Module system](module-system.md)                   | built  | config, studio, service, web                       | Pages are built from reusable module documents that a page template references in order.                        |
 | [Links](links.md)                                   | built  | config, studio, service, web                       | A link is authored once as a `link` document and every place that links points at it.                           |
