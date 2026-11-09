@@ -728,7 +728,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/section-document` — `apps/web/src/constants/section-document.ts`
 
-- **SECTION_DOCUMENT_LOG**: `PAGE_FETCH_FAILED`=`"section_document_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_document_metadata.fetch_failed"`
+- **SECTION_DOCUMENT_LOG**: `PAGE_FETCH_FAILED`=`"section_document_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_document_metadata.fetch_failed"`, `BY_KIND_FETCH_FAILED`=`"section_document_by_kind.fetch_failed"`
 
 ### `@web/constants/section-index` — `apps/web/src/constants/section-index.ts`
 

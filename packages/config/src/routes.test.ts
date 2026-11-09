@@ -1,6 +1,10 @@
 import { faker } from '@faker-js/faker';
 
-import { LOCALE_ISO_CODES, NEWSLETTER_RESULT } from '@blog/config/constants';
+import {
+  LEGAL_PAGE_KIND,
+  LOCALE_ISO_CODES,
+  NEWSLETTER_RESULT,
+} from '@blog/config/constants';
 
 import { pageHref, routes } from './routes';
 
@@ -27,6 +31,11 @@ describe('routes', () => {
     ['site-wide RSS feed', routes.rssFeed(), '/rss.xml'],
     ['cookie statement', routes.cookieStatement(), COOKIE_STATEMENT_PATH],
     ['legal hub', routes.legal(), LEGAL_INDEX_PATH],
+    [
+      'legal page by kind',
+      routes.legalPageByKind(LEGAL_PAGE_KIND.TERMS),
+      '/api/legal-page/TERMS',
+    ],
   ])('builds the %s path', (_route, path, expected) => {
     expect(path).toBe(expected);
   });
