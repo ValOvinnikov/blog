@@ -1,4 +1,6 @@
 import { toPageTranslations } from '@blog/service/shared/localization/page-translations/to-page-translations';
+import { toHeadingAlignment } from '@blog/service/shared/transformers/heading-block/to-heading-alignment';
+import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import { toPortableTextBody } from '@blog/service/shared/transformers/portable-text/to-portable-text-body';
 import { resolveSeo } from '@blog/service/shared/transformers/seo/resolve-seo';
 import type { InferResultType } from 'groqd';
@@ -13,14 +15,29 @@ export type TRawSectionDocumentDetail = NonNullable<
 export function toSectionDocumentDetail(
   raw: TRawSectionDocumentDetail,
 ): TSectionDocumentDetail {
+  const {
+    _id,
+    _type,
+    title,
+    slug,
+    kind,
+    headingBlock,
+    contentAlignment,
+    body,
+    seo,
+    translations,
+  } = raw;
+
   return {
-    id: raw._id,
-    type: raw._type,
-    title: raw.title,
-    slug: raw.slug,
-    kind: raw.kind,
-    body: toPortableTextBody(raw.body),
-    seo: resolveSeo(raw.seo),
-    translations: toPageTranslations(raw.translations),
+    id: _id,
+    type: _type,
+    title,
+    slug,
+    kind,
+    headingBlock: toHeadingBlock(headingBlock),
+    headingAlignment: toHeadingAlignment(contentAlignment),
+    body: toPortableTextBody(body),
+    seo: resolveSeo(seo),
+    translations: toPageTranslations(translations),
   };
 }

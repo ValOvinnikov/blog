@@ -1,4 +1,5 @@
 import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config/constants';
+import type { TRawCookieStatementPage } from '@blog/service/features/pages/cookie-statement/adaptor/transformer';
 import type { TRawHomePage } from '@blog/service/features/pages/home/adaptor/transformer';
 import type { TRawLandingPage } from '@blog/service/features/pages/landing/adaptor/detail-page/transformer';
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
@@ -393,6 +394,23 @@ export function mockRawSectionDocumentDetail(
     title: faker.lorem.words(2),
     slug: faker.lorem.slug(),
     kind: LEGAL_PAGE_KIND.PRIVACY_POLICY,
+    headingBlock: null,
+    contentAlignment: null,
+    body: [],
+    seo: mockRawSeo(),
+    translations: [],
+    ...overrides,
+  };
+}
+
+export function mockRawCookieStatementPage(
+  overrides: Partial<TRawCookieStatementPage> = {},
+): TRawCookieStatementPage {
+  return {
+    _id: faker.string.uuid(),
+    title: faker.lorem.words(2),
+    headingBlock: null,
+    contentAlignment: null,
     body: [],
     seo: mockRawSeo(),
     translations: [],

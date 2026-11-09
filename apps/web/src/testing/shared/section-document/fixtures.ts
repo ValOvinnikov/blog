@@ -1,4 +1,8 @@
-import { LEGAL_PAGE_KIND, LOCALE_ISO_CODES } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  LEGAL_PAGE_KIND,
+  LOCALE_ISO_CODES,
+} from '@blog/config';
 import type { TSectionDocumentDetail } from '@blog/service';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
@@ -14,6 +18,8 @@ export const mockSectionDocumentDetail = (
     title: 'Privacy policy',
     slug: MOCK_SECTION_DOCUMENT_SLUG,
     kind: LEGAL_PAGE_KIND.PRIVACY_POLICY,
+    headingBlock: undefined,
+    headingAlignment: CONTENT_ALIGNMENT.LEFT,
     body: MOCK_CONTENTS_RAIL_BODY,
     seo: mockSeo(),
     translations: [
