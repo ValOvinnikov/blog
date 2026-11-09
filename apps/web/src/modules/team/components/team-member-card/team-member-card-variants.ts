@@ -7,7 +7,7 @@ export const teamMemberCardVariants = tv({
     media: [],
     image: ['size-full object-cover'],
     role: ['text-sm text-subtle'],
-    bio: ['text-prose text-sm text-muted'],
+    bio: ['text-base text-muted'],
   },
   variants: {
     shape: {
