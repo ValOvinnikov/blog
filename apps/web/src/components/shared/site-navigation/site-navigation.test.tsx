@@ -1,5 +1,6 @@
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
+import { SESSION_STATUS } from '@web/constants/session';
 import { usePathname } from '@web/i18n/navigation';
 import {
   customRender,
@@ -20,19 +21,28 @@ import {
   unstubHidePopover,
 } from '@web/testing/shared/popover/stub-hide-popover';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { useSession, type SessionContextValue } from 'next-auth/react';
 import type { Mock } from 'vitest';
 
 import { SiteNavigation } from './site-navigation';
 
 vi.mock('@web/i18n/navigation');
 
+vi.mock('next-auth/react');
+
 const TOGGLE_NAME = 'Toggle navigation menu';
+const SIGNED_OUT_SESSION: SessionContextValue = {
+  data: null,
+  status: SESSION_STATUS.UNAUTHENTICATED,
+  update: vi.fn(),
+};
 const BLOG_POST_PATH = `${MOCK_BLOG_LINK.href}/hello-world`;
 
 const links = [MOCK_HOME_LINK, MOCK_BLOG_LINK, MOCK_ABOUT_LINK];
 
 const setup = customRender(SiteNavigation, {
   links,
+  hasReaderAccounts: true,
 });
 
 describe(`<${SiteNavigation.name}/>`, () => {
@@ -40,6 +50,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
 
   beforeEach(() => {
     vi.mocked(usePathname).mockReset();
+    vi.mocked(useSession).mockReturnValue(SIGNED_OUT_SESSION);
     hidePopover = stubHidePopover();
   });
 
@@ -134,7 +145,9 @@ describe(`<${SiteNavigation.name}/>`, () => {
     hidePopover.mockClear();
 
     vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-    view.rerender(<SiteNavigation links={[MOCK_TOPICS_GROUP]} />);
+    view.rerender(
+      <SiteNavigation links={[MOCK_TOPICS_GROUP]} hasReaderAccounts={true} />,
+    );
 
     expect(hidePopover).toHaveBeenCalledOnce();
   });
@@ -152,7 +165,9 @@ describe(`<${SiteNavigation.name}/>`, () => {
     expect(disclosure).toHaveAttribute('open');
 
     vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-    view.rerender(<SiteNavigation links={[MOCK_TOPICS_GROUP]} />);
+    view.rerender(
+      <SiteNavigation links={[MOCK_TOPICS_GROUP]} hasReaderAccounts={true} />,
+    );
 
     expect(disclosure).not.toHaveAttribute('open');
   });
@@ -222,7 +237,7 @@ describe(`<${SiteNavigation.name}/>`, () => {
       expect(toggle).toHaveAttribute(ARIA_EXPANDED, 'true');
 
       vi.mocked(usePathname).mockReturnValue(MOCK_BLOG_LINK.href);
-      view.rerender(<SiteNavigation links={links} />);
+      view.rerender(<SiteNavigation links={links} hasReaderAccounts={true} />);
 
       const rerenderedToggle = screen.getByRole('button', {
         name: TOGGLE_NAME,

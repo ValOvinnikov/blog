@@ -22,7 +22,7 @@ epics: [5047, 4979, 1040, 1041]
 
 ## What it does
 
-A signed-in reader manages their own account at `/account`: edit the display name, link or unlink GitHub and Google, manage an existing newsletter subscription, download their data as JSON, and delete the account. Reader accounts exist on a site only while its Reader accounts switch (`READER_ACCOUNTS`) is on; otherwise the header offers no sign-in and `/bookmarks` answers 404, but a reader who is already signed in can still open `/account` to export or delete their account.
+A signed-in reader manages their own account at `/account`: edit the display name, link or unlink GitHub and Google, manage an existing newsletter subscription, download their data as JSON, and delete the account. Reader accounts exist on a site only while its Reader accounts switch (`READER_ACCOUNTS`) is on; otherwise the header offers no sign-in and `/bookmarks` answers 404, but a reader who is already signed in keeps the header's account menu, with Account settings and Sign out, and can still open `/account` to export or delete their account.
 
 ## Surfaces and routes
 

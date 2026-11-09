@@ -26,4 +26,9 @@ export const authMenuVariants = tv({
     ],
     loadingStatus: ['sr-only'],
   },
+  variants: {
+    isSignedInHintRequired: {
+      true: { slot: ['hidden [[data-signed-in]_&]:inline-flex'] },
+    },
+  },
 });

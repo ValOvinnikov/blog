@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -59,9 +60,10 @@ const setup = () =>
   renderElement(
     <ToastProvider>
       <AuthMenu
-        oauthProviderIds={['github']}
+        oauthProviderIds={[OAUTH_PROVIDER.GITHUB]}
         accountControl={MOCK_ACCOUNT_CONTROL}
         hasBookmarks={true}
+        hasReaderAccounts={true}
       />
       <BookmarkButton postId={MOCK_POST_ID} />
     </ToastProvider>,

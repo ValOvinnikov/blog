@@ -127,6 +127,7 @@ const {
   myBookmarks: MY_BOOKMARKS,
   accountSettings: ACCOUNT_SETTINGS,
   accountMenuAriaLabel: ACCOUNT_MENU,
+  signOut: SIGN_OUT,
 } = SITE_MESSAGES.authMenu;
 
 describe(`<${SiteHeader.name}/>`, () => {
@@ -652,14 +653,70 @@ describe(`<${SiteHeader.name}/>`, () => {
     );
   });
 
-  it('hides the sign-in menu with Reader accounts off', async () => {
-    isReaderAccountEnabledMock.mockResolvedValue(false);
+  describe('with Reader accounts off', () => {
+    beforeEach(() => {
+      isReaderAccountEnabledMock.mockResolvedValue(false);
+    });
 
-    await setup();
+    it('hides the sign-in menu from a signed-out visitor', async () => {
+      await setup();
 
-    const signInButton = screen.queryByRole('button', { name: SIGN_IN });
+      const signInButton = screen.queryByRole('button', { name: SIGN_IN });
 
-    expect(signInButton).not.toBeInTheDocument();
+      expect(signInButton).not.toBeInTheDocument();
+    });
+
+    it('shows no phone menu button for an account in the menu with nothing else in it', async () => {
+      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+
+      await setup();
+
+      const toggleButton = queryPhoneMenuToggle();
+
+      expect(toggleButton).not.toBeInTheDocument();
+    });
+
+    describe('for a signed-in reader', () => {
+      beforeEach(() => {
+        useSessionMock.mockReturnValue({
+          data: { user: MOCK_READER },
+          status: SESSION_STATUS.AUTHENTICATED,
+        });
+      });
+
+      it('keeps the account menu in the header', async () => {
+        await setup();
+        const banner = screen.getByRole('banner');
+        const [accountButton] = within(banner).getAllByRole('button', {
+          name: ACCOUNT,
+        });
+        await user.click(accountButton!);
+
+        const accountMenu = screen.getByRole('menu', { name: ACCOUNT_MENU });
+        const settingsText = within(accountMenu).getByText(ACCOUNT_SETTINGS);
+        const signOutItem = within(accountMenu).getByRole('menuitem', {
+          name: SIGN_OUT,
+        });
+
+        expect(settingsText).toBeVisible();
+        expect(signOutItem).toBeVisible();
+      });
+
+      it('keeps the account row in the phone menu', async () => {
+        await openPhoneMenuWithAccountInIt();
+        const accountRow = getDrawerAccountRow(ACCOUNT);
+        await user.click(accountRow);
+
+        const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
+        const settingsText = within(drawerActions).getByText(ACCOUNT_SETTINGS);
+        const signOutItem = within(drawerActions).getByRole('menuitem', {
+          name: SIGN_OUT,
+        });
+
+        expect(settingsText).toBeVisible();
+        expect(signOutItem).toBeVisible();
+      });
+    });
   });
 
   describe('with the default tenant', () => {

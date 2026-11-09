@@ -22,12 +22,14 @@ export interface IAuthMenuProps {
   oauthProviderIds: readonly TOAuthProviderId[];
   accountControl: IAccountControl;
   hasBookmarks: boolean;
+  hasReaderAccounts: boolean;
 }
 
 export const AuthMenu = ({
   oauthProviderIds,
   accountControl,
   hasBookmarks,
+  hasReaderAccounts,
 }: IAuthMenuProps) => {
   const { status, expires, user, onImageError } = useReaderAccount();
   const oauthError = useOAuthErrorParam();
@@ -40,7 +42,16 @@ export const AuthMenu = ({
   useSignedInHint(status, expires);
 
   if (status === SESSION_STATUS.LOADING) {
-    return <AccountPlaceholder accountControl={accountControl} />;
+    return (
+      <AccountPlaceholder
+        accountControl={accountControl}
+        isSignedInHintRequired={!hasReaderAccounts}
+      />
+    );
+  }
+
+  if (!user && !hasReaderAccounts) {
+    return null;
   }
 
   return (
