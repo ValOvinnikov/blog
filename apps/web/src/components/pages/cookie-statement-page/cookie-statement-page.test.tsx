@@ -29,6 +29,11 @@ const MOCK_PAGE = mockCookieStatementPage();
 
 const setup = customRenderServerAsync(CookieStatementPage, {});
 
+const expectNotFound = async () => {
+  await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+  expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+};
+
 describe(`<${CookieStatementPage.name}/>`, () => {
   beforeEach(() => {
     stubFakeIntersectionObserver();
@@ -39,36 +44,37 @@ describe(`<${CookieStatementPage.name}/>`, () => {
     vi.unstubAllGlobals();
   });
 
-  it("loads the tenant's cookie statement", async () => {
-    await setup();
+  describe('when the page loads', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getCookieStatementPageMock).toHaveBeenCalledWith(
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
-  });
+    it("loads the tenant's cookie statement", () => {
+      expect(getCookieStatementPageMock).toHaveBeenCalledWith(
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
 
-  it('renders the title as the page heading', async () => {
-    await setup();
-    const heading = screen.getByRole('heading', { level: 1 });
+    it('renders the title as the page heading', () => {
+      const heading = screen.getByRole('heading', { level: 1 });
 
-    expect(heading).toHaveTextContent(MOCK_PAGE.title);
+      expect(heading).toHaveTextContent(MOCK_PAGE.title);
+    });
   });
 
   it('calls notFound() without logging when no statement is published', async () => {
     getCookieStatementPageMock.mockResolvedValueOnce(okResult());
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expectNotFound();
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
     getCookieStatementPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expectNotFound();
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
       COOKIE_STATEMENT_LOG.PAGE_FETCH_FAILED,
       { error: MOCK_ERROR },

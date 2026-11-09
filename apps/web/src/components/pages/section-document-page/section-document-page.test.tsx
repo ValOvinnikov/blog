@@ -37,6 +37,11 @@ const setup = customRenderServerAsync(SectionDocumentPage, {
   slug: MOCK_SLUG,
 });
 
+const expectNotFound = async () => {
+  await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+  expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+};
+
 describe(`<${SectionDocumentPage.name}/>`, () => {
   beforeEach(() => {
     stubFakeIntersectionObserver();
@@ -49,38 +54,39 @@ describe(`<${SectionDocumentPage.name}/>`, () => {
     vi.unstubAllGlobals();
   });
 
-  it('loads the document of the given type and slug for the tenant', async () => {
-    await setup();
+  describe('when the page loads', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getSectionDocumentMock).toHaveBeenCalledWith(
-      MOCK_TYPE,
-      MOCK_SLUG,
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
-  });
+    it('loads the document of the given type and slug for the tenant', () => {
+      expect(getSectionDocumentMock).toHaveBeenCalledWith(
+        MOCK_TYPE,
+        MOCK_SLUG,
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
 
-  it('renders the title as the page heading', async () => {
-    await setup();
-    const heading = screen.getByRole('heading', { level: 1 });
+    it('renders the title as the page heading', () => {
+      const heading = screen.getByRole('heading', { level: 1 });
 
-    expect(heading).toHaveTextContent(MOCK_TITLE);
+      expect(heading).toHaveTextContent(MOCK_TITLE);
+    });
   });
 
   it('calls notFound() without logging when no published document matches', async () => {
     getSectionDocumentMock.mockResolvedValueOnce(okResult());
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expectNotFound();
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('logs and calls notFound() when the fetch fails', async () => {
     getSectionDocumentMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expectNotFound();
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith(
       SECTION_DOCUMENT_LOG.PAGE_FETCH_FAILED,
       { type: MOCK_TYPE, slug: MOCK_SLUG, error: MOCK_ERROR },

@@ -29,18 +29,22 @@ describe(`<${DocumentArticle.name}/>`, () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders the title as the page heading', () => {
-    setup();
-    const heading = screen.getByRole('heading', { level: 1 });
+  describe('with the default props', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    expect(heading).toHaveTextContent(MOCK_TITLE);
-  });
+    it('renders the title as the page heading', () => {
+      const heading = screen.getByRole('heading', { level: 1 });
 
-  it('renders the body with the contents rail at three or more H2s', () => {
-    setup();
-    const rail = screen.getByRole('navigation', { name: RAIL_NAME });
+      expect(heading).toHaveTextContent(MOCK_TITLE);
+    });
 
-    expect(rail).toBeVisible();
+    it('renders the body with the contents rail at three or more H2s', () => {
+      const rail = screen.getByRole('navigation', { name: RAIL_NAME });
+
+      expect(rail).toBeVisible();
+    });
   });
 
   it('renders the body without a rail below three H2s', () => {
