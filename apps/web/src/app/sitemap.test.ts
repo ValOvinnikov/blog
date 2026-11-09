@@ -86,6 +86,7 @@ const mockTranslationMap = (
   postIndexLanguages: [routing.defaultLocale],
   topicIndexLanguages: [routing.defaultLocale],
   tagIndexLanguages: [routing.defaultLocale],
+  cookieStatementLanguages: [],
   ...overrides,
 });
 
@@ -515,6 +516,7 @@ describe(sitemap, () => {
             postIndexLanguages: [EN],
             topicIndexLanguages: [NL],
             tagIndexLanguages: [],
+            cookieStatementLanguages: [],
           }),
         ),
       );

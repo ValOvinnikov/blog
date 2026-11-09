@@ -4,6 +4,7 @@ import {
   type TLocaleIsoCode,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import { CACHE_CONTROL } from '@web/constants/http';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockTenant } from '@web/testing/shared/tenant/fixtures';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
@@ -50,6 +51,7 @@ const translationMap = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  cookieStatementLanguages: [],
   groups: [
     [
       { documentType: MOCK_PAGE_TYPE, language: EN, slug: MOCK_PAGE_SLUG },
@@ -97,7 +99,9 @@ describe(GET, () => {
     const response = await switchTo(NL, MOCK_PAGE_PATH);
 
     expect(response.status).toBe(HTTP_STATUS.TEMPORARY_REDIRECT);
-    expect(response.headers.get('cache-control')).toBe('private, no-store');
+    expect(response.headers.get('cache-control')).toBe(
+      CACHE_CONTROL.PRIVATE_NO_STORE,
+    );
   });
 
   it("redirects to the language's home page when the page has no translation", async () => {

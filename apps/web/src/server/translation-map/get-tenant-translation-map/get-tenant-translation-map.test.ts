@@ -36,6 +36,7 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  cookieStatementLanguages: [],
 };
 
 const toCredentials = vi.mocked(queries.tenants.toTenantSanityCredentials);

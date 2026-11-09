@@ -40,6 +40,8 @@ const MOCK_POST_INDEX_EN_ID = faker.string.uuid();
 const MOCK_POST_INDEX_NL_ID = faker.string.uuid();
 const MOCK_TOPIC_INDEX_ID = faker.string.uuid();
 const MOCK_TAG_INDEX_DE_ID = faker.string.uuid();
+const MOCK_COOKIE_STATEMENT_EN_ID = faker.string.uuid();
+const MOCK_COOKIE_STATEMENT_NL_ID = faker.string.uuid();
 
 const MOCK_DATASET = [
   mockLandingPageDocument(MOCK_ABOUT_EN_PAGE_ID, EN, MOCK_ABOUT_SLUG),
@@ -127,6 +129,7 @@ describe(toTranslationMap, () => {
       postIndexLanguages: [],
       topicIndexLanguages: [],
       tagIndexLanguages: [],
+      cookieStatementLanguages: [],
     });
   });
 
@@ -161,6 +164,23 @@ describe(toTranslationMap, () => {
     expect(postIndexLanguages).toEqual([EN, NL]);
     expect(topicIndexLanguages).toEqual([EN]);
     expect(tagIndexLanguages).toEqual([DE]);
+  });
+
+  it('lists every language that has a cookie statement', async () => {
+    const { cookieStatementLanguages } = await buildMap([
+      {
+        _id: MOCK_COOKIE_STATEMENT_EN_ID,
+        _type: 'page_cookieStatement',
+        language: EN,
+      },
+      {
+        _id: MOCK_COOKIE_STATEMENT_NL_ID,
+        _type: 'page_cookieStatement',
+        language: NL,
+      },
+    ]);
+
+    expect(cookieStatementLanguages).toEqual([EN, NL]);
   });
 });
 

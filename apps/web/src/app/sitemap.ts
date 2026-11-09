@@ -212,6 +212,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         postIndexLanguages: [],
         topicIndexLanguages: [],
         tagIndexLanguages: [],
+        cookieStatementLanguages: [],
       };
   const translatedPageContext = {
     translationMap,
