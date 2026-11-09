@@ -43,7 +43,6 @@ export * from './oauth-provider';
 export * from './operator-alert';
 export * from './path';
 export * from './portable-text-block-type';
-export * from './portable-text-style';
 export * from './preset';
 export * from './price-period';
 export * from './redirect';

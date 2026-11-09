@@ -2904,46 +2904,6 @@
         "file": "packages/config/src/constants/portable-text-block-type.ts"
       }
     ],
-    "normal": [
-      {
-        "ref": "PORTABLE_TEXT_STYLE.NORMAL",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/portable-text-style.ts"
-      }
-    ],
-    "h2": [
-      {
-        "ref": "PORTABLE_TEXT_STYLE.H2",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/portable-text-style.ts"
-      }
-    ],
-    "h3": [
-      {
-        "ref": "PORTABLE_TEXT_STYLE.H3",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/portable-text-style.ts"
-      }
-    ],
-    "h4": [
-      {
-        "ref": "PORTABLE_TEXT_STYLE.H4",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/portable-text-style.ts"
-      }
-    ],
-    "blockquote": [
-      {
-        "ref": "PORTABLE_TEXT_STYLE.BLOCKQUOTE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/portable-text-style.ts"
-      }
-    ],
     "CONSOLE": [
       {
         "ref": "PRESET_ID.CONSOLE",

@@ -1,4 +1,3 @@
-import { PORTABLE_TEXT_STYLE } from '@blog/config/constants';
 import { linkRefSchema } from '@blog/studio/schema-types/objects/link-ref/link-ref';
 import {
   boldDecorator,
@@ -13,9 +12,12 @@ import {
   type BlockStyleDefinition,
 } from 'sanity';
 
-export const listedTextStyles: BlockStyleDefinition[] = [
-  { title: 'Normal', value: PORTABLE_TEXT_STYLE.NORMAL },
-];
+export const normalBlockStyle: BlockStyleDefinition = {
+  title: 'Normal',
+  value: 'normal',
+};
+
+export const listedTextStyles: BlockStyleDefinition[] = [normalBlockStyle];
 
 export const listedTextMarks: BlockMarksDefinition = {
   decorators: [
