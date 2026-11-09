@@ -4,6 +4,7 @@ import type { TRawLandingPage } from '@blog/service/features/pages/landing/adapt
 import type { TRawPostDetail } from '@blog/service/features/pages/post/adaptor/detail-page/transformer';
 import type { TRawBlogPage } from '@blog/service/features/pages/post-index/adaptor/index-page/transformer';
 import type { TRawSectionDocumentDetail } from '@blog/service/features/pages/section-document/adaptor/detail-page/transformer';
+import type { TRawSectionIndexPage } from '@blog/service/features/pages/section-index/adaptor/transformer';
 import type { TRawTagPage } from '@blog/service/features/pages/tag/adaptor/detail-page/transformer';
 import type { TRawTagIndexPage } from '@blog/service/features/pages/tag-index/adaptor/transformer';
 import type { TRawTopicPage } from '@blog/service/features/pages/topic/adaptor/detail-page/transformer';
@@ -395,6 +396,21 @@ export function mockRawSectionDocumentDetail(
     body: [],
     seo: mockRawSeo(),
     translations: [],
+    ...overrides,
+  };
+}
+
+export function mockRawSectionIndexPage(
+  overrides: Partial<TRawSectionIndexPage> = {},
+): TRawSectionIndexPage {
+  return {
+    _id: faker.string.uuid(),
+    headingBlock: mockRawHeadingBlock(faker.lorem.words(2)),
+    contentAlignment: null,
+    hero: mockRawHeroRef(),
+    modules: [mockRawContentRef(), mockRawCtaRef()],
+    seo: mockRawSeo(),
+    translations: [{ language: LOCALE_ISO_CODES.EN }],
     ...overrides,
   };
 }

@@ -129,6 +129,8 @@ const MOCK_TRANSLATION_MAP: TTranslationMap = {
   postIndexLanguages: [],
   topicIndexLanguages: [],
   tagIndexLanguages: [],
+  privacyIndexLanguages: [],
+  legalIndexLanguages: [],
   cookieStatementLanguages: [],
   groups: [
     [

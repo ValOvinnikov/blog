@@ -25,6 +25,8 @@ export function toTranslationMap(
     postIndexLanguages: toPageLanguages(raw.postIndexes, defaultLocale),
     topicIndexLanguages: toPageLanguages(raw.topicIndexes, defaultLocale),
     tagIndexLanguages: toPageLanguages(raw.tagIndexes, defaultLocale),
+    privacyIndexLanguages: toPageLanguages(raw.privacyIndexes, defaultLocale),
+    legalIndexLanguages: toPageLanguages(raw.legalIndexes, defaultLocale),
     cookieStatementLanguages: toPageLanguages(
       raw.cookieStatements,
       defaultLocale,
