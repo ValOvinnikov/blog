@@ -7,7 +7,11 @@ import {
 } from '@blog/config/constants';
 
 import { STARTER_COPY_BY_LOCALE } from './copy/starter-copy';
-import { buildStarterDocuments, toStarterSiteType } from './starter-content';
+import {
+  buildStarterCookieStatement,
+  buildStarterDocuments,
+  toStarterSiteType,
+} from './starter-content';
 import type { TStarterDocumentUnion } from './starter-document';
 
 type TStarterType = TStarterDocumentUnion['_type'];
@@ -145,6 +149,15 @@ describe(buildStarterDocuments, () => {
       );
 
       expect(new Set(ids).size).toBe(1);
+    },
+  );
+
+  it.each(LOCALES)(
+    'builds the %s cookie statement on its own exactly as the starter site seeds it',
+    (locale) => {
+      expect(buildStarterCookieStatement(locale)).toEqual(
+        findByType(build(SITE_TYPE.BLANK, locale), COOKIE_STATEMENT_TYPE),
+      );
     },
   );
 

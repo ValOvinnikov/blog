@@ -12,7 +12,7 @@ import { type TSeedContentDeps } from '@worker/steps/seed-content';
 import { type TVerifyTenantSeededContentDeps } from '@worker/steps/verify-seeded-content';
 import { listVercelProjectDomains } from '@worker/utils/vercel-client/vercel-client';
 
-function createClientWithTimeout(
+export function createClientWithTimeout(
   config: Parameters<typeof createClient>[0],
 ): ReturnType<typeof createClient> {
   return createClient({ ...config, timeout: SANITY_API_TIMEOUT_MS });
