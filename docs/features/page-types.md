@@ -38,7 +38,7 @@ epics: [1919, 2798]
 
 ## What it does
 
-Every public page of a tenant's site is a Sanity page document of one of eight fixed types: Home, Landing, Post, Post Index, Topic, Topic Index, Tag and Tag Index. Each page document carries its own heading, SEO and (where addressable) slug; all but Post point at a shared **template** document that holds the page's hero and ordered modules. Editors build pages in the Studio; the site renders each type at a fixed route. This page covers the shared shape plus Home and Post Index; Landing, Post and the taxonomy pages have their own pages.
+Every public page of a tenant's site is a Sanity page document of one of thirteen fixed types: Home, Landing, Post, Post Index, Topic, Topic Index, Tag, Tag Index, Privacy Index, Legal Index, Privacy Page, Legal Page and Cookie Statement. Each page document carries its own heading, SEO and (where addressable) slug; Home, Landing, Post Index and the taxonomy pages point at a shared **template** document that holds the page's hero and ordered modules. The privacy and legal pages and the cookie statement are covered in [Footer and legal pages](./footer-and-legal-pages.md). Editors build pages in the Studio; the site renders each type at a fixed route. This page covers the shared shape plus Home and Post Index; Landing, Post and the taxonomy pages have their own pages.
 
 ## Surfaces and routes
 
@@ -73,7 +73,7 @@ Every public page of a tenant's site is a Sanity page document of one of eight f
 
 ## Constraints and invariants
 
-- The eight types and their routes are fixed in code. `routes` and `pageHref` in `@blog/config` are the only place a page type maps to a URL; `RESERVED_SLUGS` lists the segments a top-level Landing slug may not use. It does not match the routes exactly: it reserves `category`, `tag`, `author` and `page`, which are not top-level routes, and omits the fixed `/bookmarks` and `/account` routes, so a top-level Landing page with either slug is hidden behind them.
+- The types and their routes are fixed in code. `routes` and `pageHref` in `@blog/config` are the only place a page type maps to a URL; `RESERVED_SLUGS` lists the segments a top-level Landing slug may not use. It does not match the routes exactly: it reserves `category`, `tag`, `author` and `page`, which are not top-level routes, and omits the fixed `/bookmarks` and `/account` routes, so a top-level Landing page with either slug is hidden behind them.
 - Home, Post Index, Topic Index and Tag Index allow one document per language (`validateOnePerLanguage`).
 - Slugged types (Post, Topic, Tag) require a slug unique within their type and language; Landing slugs are unique among siblings (see [landing-tree](./landing-tree.md)).
 - A page whose template differs from its default-language version's template gets a warning, not an error.
