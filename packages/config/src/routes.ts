@@ -7,6 +7,7 @@ import type {
 import {
   COOKIE_STATEMENT_SLUG,
   NEWSLETTER_RESULT_SLUGS,
+  type TLegalPageKind,
   type TLocaleIsoCode,
   type TNewsletterResult,
 } from '@blog/config/constants';
@@ -45,6 +46,7 @@ export const routes = {
   privacyDocument: (slug: string) => `/privacy/${slug}`,
   legalDocument: (slug: string) => `/legal/${slug}`,
   cookieStatement: () => routes.legalDocument(COOKIE_STATEMENT_SLUG),
+  legalPageByKind: (kind: TLegalPageKind) => `/api/legal-page/${kind}`,
   terms: () => '/terms',
   privacy: () => '/privacy',
   legal: () => '/legal',
