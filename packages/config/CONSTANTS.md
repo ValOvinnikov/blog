@@ -748,6 +748,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ## app:worker
 
+### `@worker/constants/cookie-statement` — `apps/worker/src/constants/cookie-statement.ts`
+
+- **COOKIE_STATEMENT_LOG**: `SEED_START_FAILED`=`"cookie_statement.seed_start_failed"`, `SEED_FAILED`=`"cookie_statement.seed_failed"`
+
 ### `@worker/constants/custom-domain` — `apps/worker/src/constants/custom-domain.ts`
 
 - **CUSTOM_DOMAIN_LOG**: `CONNECT_START_FAILED`=`"custom_domain.connect_start_failed"`, `DISCONNECT_START_FAILED`=`"custom_domain.disconnect_start_failed"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`

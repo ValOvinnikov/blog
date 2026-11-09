@@ -8268,6 +8268,22 @@
         "file": "apps/web/src/constants/tenant-write.ts"
       }
     ],
+    "cookie_statement.seed_start_failed": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.SEED_START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/cookie-statement",
+        "file": "apps/worker/src/constants/cookie-statement.ts"
+      }
+    ],
+    "cookie_statement.seed_failed": [
+      {
+        "ref": "COOKIE_STATEMENT_LOG.SEED_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/cookie-statement",
+        "file": "apps/worker/src/constants/cookie-statement.ts"
+      }
+    ],
     "custom_domain.connect_start_failed": [
       {
         "ref": "CUSTOM_DOMAIN_LOG.CONNECT_START_FAILED",
