@@ -103,7 +103,7 @@ describe(`<${LookForm.name}/>`, () => {
       name: RESET_TO_PRESET,
     });
     await user.click(resetToPresetButton);
-    await openLookRow(user, LOOK_ROW.SHAPE);
+    await openLookRow(user, LOOK_ROW.HEADER);
 
     const headerButtons = screen.getByRole('group', {
       name: `${LOOK_FORM.headerControlStyleLabel} ${LOOK_FORM.fieldUnsavedLabel}`,

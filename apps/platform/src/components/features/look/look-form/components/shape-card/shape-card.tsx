@@ -1,11 +1,9 @@
 import {
   CARD_STYLE,
   DENSITY,
-  HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
   type TCardStyle,
   type TDensity,
-  type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config';
 import { toOptions } from '@blog/utils/primitives';
@@ -26,14 +24,13 @@ export type TShapeCardProps = {
 
 export const ShapeCard = ({ summary }: TShapeCardProps) => {
   const {
-    values: { radiusScale, density, cardStyle, headerControlStyle },
+    values: { radiusScale, density, cardStyle },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
   const radiusScaleLock = useLookFieldLock('radiusScale');
   const densityLock = useLookFieldLock('density');
   const cardStyleLock = useLookFieldLock('cardStyle');
-  const headerControlStyleLock = useLookFieldLock('headerControlStyle');
   const { lockLine, hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.SHAPE],
   );
@@ -50,18 +47,9 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
     t(`cardStyleOptionLabel.${style}`),
   );
 
-  const headerControlStyleOptions = Object.values(HEADER_CONTROL_STYLE).map(
-    (style) => ({
-      value: style,
-      label: t(`headerControlStyleOptionLabel.${style}`),
-      description: t(`headerControlStyleOptionDescription.${style}`),
-    }),
-  );
-
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
   const cardStyleLabel = t('cardStyleLabel');
-  const headerControlStyleLabel = t('headerControlStyleLabel');
 
   return (
     <LookCard
@@ -126,28 +114,6 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
           isLocked={cardStyleLock.isLocked}
         />
         <PresetValueButton field="cardStyle" fieldLabel={cardStyleLabel} />
-      </LookField>
-
-      <LookField
-        field="headerControlStyle"
-        label={headerControlStyleLabel}
-        hint={t('headerControlStyleDescription')}
-        isGroup={true}
-        labelId={headerControlStyleLock.labelId}
-        growthBadgeId={headerControlStyleLock.growthBadgeId}
-      >
-        <SegmentedControl<THeaderControlStyle>
-          aria={headerControlStyleLock.aria}
-          options={headerControlStyleOptions}
-          value={headerControlStyle}
-          onChange={(style) => updateField('headerControlStyle', style)}
-          isDisabled={headerControlStyleLock.isDisabled}
-          isLocked={headerControlStyleLock.isLocked}
-        />
-        <PresetValueButton
-          field="headerControlStyle"
-          fieldLabel={headerControlStyleLabel}
-        />
       </LookField>
     </LookCard>
   );

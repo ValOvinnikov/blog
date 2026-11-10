@@ -60,7 +60,6 @@ export const buildLookRowSummaries = (
       t(`radiusScaleOptionLabel.${radiusScale}`),
       t(`densityOptionLabel.${density}`),
       t(`cardStyleOptionLabel.${cardStyle}`),
-      t(`headerControlStyleOptionLabel.${headerControlStyle}`),
     ]),
     [LOOK_ROW.BUTTONS]: join([
       t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
@@ -72,6 +71,7 @@ export const buildLookRowSummaries = (
       t(`headerLayoutOptionLabel.${headerLayout}`),
       t(`headerBarStyleOptionLabel.${headerBarStyle}`),
       t(`headerSubmenuStyleOptionLabel.${headerSubmenuStyle}`),
+      t(`headerControlStyleOptionLabel.${headerControlStyle}`),
       t(`accountButtonStyleOptionLabel.${accountButtonStyle}`),
     ]),
     [LOOK_ROW.FOOTER]: join([

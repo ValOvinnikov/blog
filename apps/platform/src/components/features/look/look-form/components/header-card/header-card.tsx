@@ -19,6 +19,7 @@ import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
+import { HeaderControlStyleField } from './components/header-control-style-field/header-control-style-field';
 import { PreviewDeviceNote } from './components/preview-device-note/preview-device-note';
 import { useSubmenuPreview } from './use-submenu-preview';
 
@@ -118,6 +119,8 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
           isLocked={barStyleLock.isLocked}
         />
       </LookField>
+
+      <HeaderControlStyleField />
 
       <AccountFields />
     </LookCard>
