@@ -1,4 +1,5 @@
 import { DEPTH } from '@blog/config';
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
@@ -54,4 +55,12 @@ const InteractiveDemo = () => {
 export const Interactive: TStory = {
   args: { value: DEPTH.READ },
   render: () => <InteractiveDemo />,
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  args: { value: DEPTH.READ },
+  render: (args) => (
+    <ButtonShapes>{() => <SegmentedControl {...args} />}</ButtonShapes>
+  ),
 };

@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const tagVariants = tv({
   base: [
     'inline-flex items-center',
-    'rounded-sm',
+    'rounded-button',
     'font-mono text-xs font-medium',
     'tracking-[.06em] uppercase whitespace-nowrap',
     'px-2 py-0.5',

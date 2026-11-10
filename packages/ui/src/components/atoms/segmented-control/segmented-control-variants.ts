@@ -4,11 +4,11 @@ export const segmentedControlVariants = tv({
   slots: {
     root: [
       'inline-flex items-center gap-0.5',
-      'rounded-sm border border-border bg-surface p-0.5',
+      'rounded-button border border-border bg-surface p-0.5',
     ],
     option: [
       'inline-flex items-center justify-center',
-      'rounded-sm px-3 py-1.5',
+      'rounded-button px-3 py-1.5',
       'font-mono text-xs font-medium uppercase tracking-eyebrow',
       'cursor-pointer transition-colors duration-base ease-smooth',
       'text-muted hover:text-text',

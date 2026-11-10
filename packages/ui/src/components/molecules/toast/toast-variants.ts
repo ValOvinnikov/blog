@@ -31,7 +31,7 @@ export const toastVariants = tv({
     actions: ['flex items-center gap-1.5'],
     action: [
       'inline-flex items-center gap-1',
-      'rounded-sm border border-border-strong px-2 py-1',
+      'rounded-button border border-border-strong px-2 py-1',
       'bg-surface text-subtle',
       'font-ui text-label',
       'transition-colors duration-base ease-smooth',

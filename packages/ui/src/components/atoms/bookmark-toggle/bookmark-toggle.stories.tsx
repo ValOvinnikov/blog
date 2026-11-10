@@ -1,3 +1,4 @@
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BookmarkToggle } from './bookmark-toggle';
@@ -25,4 +26,11 @@ export const Bookmarked: TStory = {
 
 export const Disabled: TStory = {
   args: { isDisabled: true },
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  render: (args) => (
+    <ButtonShapes>{() => <BookmarkToggle {...args} />}</ButtonShapes>
+  ),
 };

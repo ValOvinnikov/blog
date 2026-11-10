@@ -1,10 +1,12 @@
 import { isUndefined } from '@blog/utils/primitives';
 
 import {
+  BUTTON_SHAPE,
   CARD_STYLE,
   DENSITY,
   HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
+  type TButtonShape,
   type TCardStyle,
   type TDensity,
   type THeaderControlStyle,
@@ -148,6 +150,15 @@ export const HEADER_CONTROL_STYLE_DECLARATIONS: Record<
     '--header-control-border': 'transparent',
     '--header-control-fill': 'transparent',
   },
+};
+
+export const BUTTON_SHAPE_DECLARATIONS: Record<
+  TButtonShape,
+  TThemeDeclarations
+> = {
+  [BUTTON_SHAPE.SQUARE]: { '--radius-button': '0' },
+  [BUTTON_SHAPE.ROUNDED]: { '--radius-button': 'var(--radius-sm)' },
+  [BUTTON_SHAPE.PILL]: { '--radius-button': '9999px' },
 };
 
 /** A stop without its own `h` takes the tenant's hue. */
