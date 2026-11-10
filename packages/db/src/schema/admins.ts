@@ -1,23 +1,12 @@
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
-  type TAdminRole,
-  type TGrantedVia,
-} from '@blog/db/constants';
+import { ADMIN_ROLE, GRANTED_VIA } from '@blog/db/constants';
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { users } from './auth';
 import { CREATED_AT_COLUMN } from './columns';
 
-export const adminRoleEnum = pgEnum(
-  'admin_role',
-  Object.values(ADMIN_ROLE) as [TAdminRole, ...TAdminRole[]],
-);
+export const adminRoleEnum = pgEnum('admin_role', ADMIN_ROLE);
 
-export const grantedViaEnum = pgEnum(
-  'granted_via',
-  Object.values(GRANTED_VIA) as [TGrantedVia, ...TGrantedVia[]],
-);
+export const grantedViaEnum = pgEnum('granted_via', GRANTED_VIA);
 
 // Platform-level operator access — deliberately has no `tenantId`, unlike
 // `memberships`. `role` is stored even though every value currently gates

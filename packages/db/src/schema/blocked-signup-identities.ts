@@ -1,7 +1,4 @@
-import {
-  BLOCKED_IDENTITY_KIND,
-  type TBlockedIdentityKind,
-} from '@blog/db/constants';
+import { BLOCKED_IDENTITY_KIND } from '@blog/db/constants';
 import {
   pgEnum,
   pgTable,
@@ -16,10 +13,7 @@ import { CREATED_AT_COLUMN } from './columns';
 
 export const blockedIdentityKindEnum = pgEnum(
   'blocked_identity_kind',
-  Object.values(BLOCKED_IDENTITY_KIND) as [
-    TBlockedIdentityKind,
-    ...TBlockedIdentityKind[],
-  ],
+  BLOCKED_IDENTITY_KIND,
 );
 
 // An ADDRESS `value` is the SHA-256 hex of the normalised address, never the

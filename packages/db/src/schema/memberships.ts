@@ -1,4 +1,4 @@
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import {
   pgEnum,
   pgTable,
@@ -12,10 +12,7 @@ import { users } from './auth';
 import { CREATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
-export const membershipRoleEnum = pgEnum(
-  'membership_role',
-  Object.values(MEMBERSHIP_ROLE) as [TMembershipRole, ...TMembershipRole[]],
-);
+export const membershipRoleEnum = pgEnum('membership_role', MEMBERSHIP_ROLE);
 
 // Joins `users` x `tenants` — a user's role on a given tenant. A user may
 // hold at most one membership per tenant (unique on the pair), but many
