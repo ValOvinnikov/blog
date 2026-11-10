@@ -7,8 +7,9 @@ import type {
   Template_home,
   Template_postIndex,
 } from '@blog/config/sanity/generated/types';
+import { SITE_MESSAGES_BY_LOCALE } from '@blog/config/voice';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import { PRICE_PERIOD, type TLocaleIsoCode } from '@blog/config/constants';
 
 import type { TStarterCopy } from './copy/starter-copy';
 import { buildLegalPages } from './legal-pages';
@@ -18,10 +19,27 @@ import type {
   TStarterPage,
 } from './starter-document';
 import { STARTER_DOCUMENT_IDS } from './starter-document-ids';
-import { pageHeadingBlock, reference, seo } from './starter-fields';
+import {
+  localizedString,
+  pageHeadingBlock,
+  reference,
+  seo,
+} from './starter-fields';
 
 // TODO(#5684): seed the tenant's own currency once tenants record one.
 const DEFAULT_SITE_CURRENCY = 'USD';
+
+function pricePeriodWording(locale: TLocaleIsoCode) {
+  const { period } = SITE_MESSAGES_BY_LOCALE[locale].pricingModule;
+
+  return {
+    [PRICE_PERIOD.ONE_TIME]: localizedString(locale, period.ONE_TIME),
+    [PRICE_PERIOD.HOUR]: localizedString(locale, period.HOUR),
+    [PRICE_PERIOD.SESSION]: localizedString(locale, period.SESSION),
+    [PRICE_PERIOD.MONTH]: localizedString(locale, period.MONTH),
+    [PRICE_PERIOD.YEAR]: localizedString(locale, period.YEAR),
+  };
+}
 
 type TStarterTemplateLayout<TTemplate extends Template_home> = Pick<
   TTemplate,
@@ -62,6 +80,7 @@ export function buildBaseDocuments({
       _type: 'settings_site',
       title: 'Site Settings',
       currency: DEFAULT_SITE_CURRENCY,
+      pricePeriodSuffix: pricePeriodWording(locale),
     } satisfies TStarterDocument<Settings_site, 'title'>,
     {
       _id: STARTER_DOCUMENT_IDS.HOME_TEMPLATE,

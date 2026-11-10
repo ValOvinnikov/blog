@@ -1,8 +1,10 @@
+import { SITE_MESSAGES_BY_LOCALE } from '@blog/config/voice';
 import { faker } from '@faker-js/faker';
 
 import {
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
+  PRICE_PERIOD,
   SITE_TYPE,
 } from '@blog/config/constants';
 
@@ -355,6 +357,23 @@ describe(buildStarterDocuments, () => {
 
     expect(headingBlock.heading).toBe(STARTER_COPY_BY_LOCALE.NL.home.heading);
   });
+
+  it.each(LOCALES)(
+    'the %s Site Settings word each price period from that language catalogue',
+    (locale) => {
+      const { pricePeriodSuffix } = findByType(
+        build(SITE_TYPE.BLANK, locale),
+        'settings_site',
+      );
+      const { period } = SITE_MESSAGES_BY_LOCALE[locale].pricingModule;
+
+      for (const value of Object.values(PRICE_PERIOD)) {
+        expect(pricePeriodSuffix?.[value]).toEqual([
+          expect.objectContaining({ language: locale, value: period[value] }),
+        ]);
+      }
+    },
+  );
 
   it.each(LOCALES)(
     'every localized value in the %s Blog site is tagged with that locale',
