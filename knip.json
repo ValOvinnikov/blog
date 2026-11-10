@@ -40,17 +40,9 @@
       ]
     },
     "packages/service": {
-      // Reachable only through a string in vitest.config.ts's `resolve.alias`,
-      // which knip cannot follow. src/index.ts needs no entry of its own — it is
-      // already detected from package.json `exports`.
-      "entry": ["src/testing/server-only-stub.ts"],
       "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
     },
     "packages/db": {
-      // src/testing/server-only-stub.ts: same reason as packages/service
-      // above — reachable only through a string in vitest.config.ts's
-      // `resolve.alias`.
-      //
       // scripts/*.ts, scripts/*/run.ts: package.json `scripts` invokes each
       // via `tsx`, which knip's default mode already reaches — but
       // `--production` ignores the `scripts` field, so mark them production
@@ -59,22 +51,8 @@
       // scripts-field auto-detection, a glob doesn't. `scripts/*/run.ts`
       // never collides with a `run.test.ts` sibling; the `*.test.ts` files
       // `scripts/*.ts` also matches stay classified as tests regardless.
-      "entry": [
-        "src/testing/server-only-stub.ts",
-        "scripts/*.ts!",
-        "scripts/*/run.ts!"
-      ],
+      "entry": ["scripts/*.ts!", "scripts/*/run.ts!"],
       "project": ["**/*.{js,cjs,mjs,jsx,ts,cts,mts,tsx}!", "!src/testing/**!"]
-    },
-    "packages/auth": {
-      // Same reason as packages/service/packages/db above: reachable only
-      // through a string in vitest.config.ts's `resolve.alias`.
-      "entry": ["src/testing/server-only-stub.ts"]
-    },
-    "packages/email": {
-      // Same reason as packages/service/packages/db/packages/auth above:
-      // reachable only through a string in vitest.config.ts's `resolve.alias`.
-      "entry": ["src/testing/server-only-stub.ts"]
     },
     "apps/web": {
       // The test render wrapper (customRender + RTL re-exports) is a testing
