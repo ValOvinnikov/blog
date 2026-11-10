@@ -1,10 +1,18 @@
+import type { TOutcome } from '@blog/config/types';
+
 import { ACTION_OUTCOME, type TActionOutcome } from '@blog/config/constants';
 
+type TCanBe<
+  TResult extends TOutcome<string>,
+  TGuarded extends string,
+> = TGuarded extends TResult['outcome'] ? unknown : never;
+
 const isOutcome =
-  <TOutcome extends TActionOutcome>(outcome: TOutcome) =>
-  <TResult extends { outcome: TActionOutcome }>(
-    result: TResult,
-  ): result is Extract<TResult, { outcome: TOutcome }> =>
+  <TGuarded extends TActionOutcome>(outcome: TGuarded) =>
+  <TResult extends TOutcome<string>>(
+    result: TResult & TCanBe<TResult, TGuarded>,
+  ): result is Extract<TResult, TOutcome<TGuarded>> &
+    TCanBe<TResult, TGuarded> =>
     result.outcome === outcome;
 
 export const isOutcomeSuccess = isOutcome(ACTION_OUTCOME.SUCCESS);
