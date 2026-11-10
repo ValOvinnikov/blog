@@ -3,6 +3,12 @@
  */
 import { HTTP_METHOD } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import {
+  MAX_MESSAGE_LENGTH,
+  MAX_STACK_LENGTH,
+  MAX_USER_AGENT_LENGTH,
+} from '@web/constants/client-log';
+import { clientLogSchema } from '@web/server/client-log/client-log-schema/client-log-schema';
 
 import { reportClientError } from './report-client-error';
 
@@ -100,6 +106,21 @@ describe(reportClientError, () => {
 
       expect(sentDuringBurst).toBeLessThan(MOCK_BURST_SIZE);
       expect(sendBeacon).toHaveBeenCalledTimes(sentDuringBurst);
+    });
+
+    it('sends an over-long message, stack and user agent the endpoint accepts', async () => {
+      const error = new Error(faker.string.alpha(MAX_MESSAGE_LENGTH + 1));
+      error.stack = faker.string.alpha(MAX_STACK_LENGTH + 1);
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+        faker.string.alpha(MAX_USER_AGENT_LENGTH + 1),
+      );
+
+      report(MOCK_EVENT, error);
+
+      const [[, blob]] = sendBeacon.mock.calls as [[string, Blob]];
+      const result = clientLogSchema.safeParse(JSON.parse(await blob.text()));
+
+      expect(result.success).toBe(true);
     });
 
     it('includes the digest when one is passed', async () => {
