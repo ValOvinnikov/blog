@@ -20,6 +20,19 @@ const BOOKMARKS_LABEL = 'My bookmarks';
 const HUB_BOOKMARKS_LABEL = 'Bookmarks';
 const SETTINGS_DESCRIPTION = 'Name, sign-in methods, your data';
 
+const HUB_LINKS = {
+  bookmarks: {
+    href: BOOKMARKS_HREF,
+    label: HUB_BOOKMARKS_LABEL,
+    description: BOOKMARKS_DESCRIPTION,
+  },
+  settings: {
+    href: SETTINGS_HREF,
+    label: 'Settings',
+    description: SETTINGS_DESCRIPTION,
+  },
+};
+
 const InteractiveAccountPanel = (args: TAccountPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
 
@@ -115,18 +128,7 @@ export const Hub: TStory = {
   ),
   args: {
     appearance: ACCOUNT_PANEL_STYLE.HUB,
-    links: {
-      bookmarks: {
-        href: BOOKMARKS_HREF,
-        label: HUB_BOOKMARKS_LABEL,
-        description: BOOKMARKS_DESCRIPTION,
-      },
-      settings: {
-        href: SETTINGS_HREF,
-        label: 'Settings',
-        description: SETTINGS_DESCRIPTION,
-      },
-    },
+    links: HUB_LINKS,
   },
 };
 
@@ -134,10 +136,10 @@ export const HubCurrentAndFocusedTiles: TStory = {
   ...Hub,
   name: 'Hub, current tile with another tile focused',
   args: {
-    ...Hub.args,
+    appearance: ACCOUNT_PANEL_STYLE.HUB,
     links: {
-      ...Hub.args.links,
-      settings: { ...Hub.args.links.settings, isCurrent: true },
+      ...HUB_LINKS,
+      settings: { ...HUB_LINKS.settings, isCurrent: true },
     },
   },
   play: ({ canvasElement }) => {
