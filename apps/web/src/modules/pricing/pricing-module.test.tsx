@@ -1,4 +1,4 @@
-import { SITE_MESSAGES } from '@blog/config';
+import { PRICE_PERIOD, SITE_MESSAGES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
@@ -9,6 +9,7 @@ import {
   mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { PricingModule } from './pricing-module';
@@ -32,6 +33,7 @@ vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 faker.seed(13);
 
 const MOCK_PRICING_MODULE_ID = faker.string.uuid();
+const MOCK_MONTH_WORDING = 'a month';
 
 const setup = customRenderAsync(PricingModule, {
   id: MOCK_PRICING_MODULE_ID,
@@ -98,4 +100,32 @@ describe(`<${PricingModule.name}/>`, () => {
       expect(price).toBeVisible();
     },
   );
+
+  it("shows the site's wording for a period it sets", async () => {
+    vi.mocked(getSiteSettings).mockResolvedValueOnce(
+      okResult({
+        ...MOCK_SITE_SETTINGS,
+        pricePeriodWording: {
+          ...MOCK_SITE_SETTINGS.pricePeriodWording,
+          [PRICE_PERIOD.MONTH]: MOCK_MONTH_WORDING,
+        },
+      }),
+    );
+
+    await setup();
+
+    const period = screen.getByText(MOCK_MONTH_WORDING);
+
+    expect(period).toBeVisible();
+  });
+
+  it('shows the catalogue wording for a period the site leaves empty', async () => {
+    await setup();
+
+    const period = screen.getByText(
+      SITE_MESSAGES.pricingModule.period[PRICE_PERIOD.MONTH],
+    );
+
+    expect(period).toBeVisible();
+  });
 });
