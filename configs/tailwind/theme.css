@@ -388,8 +388,8 @@
   --scrim-neutral-mid: oklch(0.26 0.015 250 / 0.68);
   --scrim-neutral-weak: oklch(0.32 0.02 250 / 0.4);
 
-  --item-radius: 0;
-  --item-border-width: 0;
+  --item-radius: var(--radius-md);
+  --item-border-width: 0px;
   --item-accent-width: 2px;
   --item-accent-color: var(--brand-primary);
   --item-shadow: none;
@@ -604,15 +604,28 @@
   --divider: var(--border);
 }
 
+/* The accent bar is drawn over the left border's straight run, between the
+   corners, so it stays a straight bar on a rounded card; where it matches the
+   border (Outlined) it is invisible. */
 @utility item-card {
+  position: relative;
   border-style: solid;
   border-color: var(--border);
   border-width: var(--item-border-width);
-  border-left-width: var(--item-accent-width);
-  border-left-color: var(--item-accent-color);
   border-radius: var(--radius-item);
   background-color: var(--surface);
   box-shadow: var(--item-shadow);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: var(--radius-item);
+    bottom: var(--radius-item);
+    left: calc(-1 * var(--item-border-width));
+    width: var(--item-accent-width);
+    background-color: var(--item-accent-color);
+    pointer-events: none;
+  }
 }
 
 /* Toast timer/drain bar (#1140): the linear rate is applied per-instance via
