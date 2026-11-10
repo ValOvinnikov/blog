@@ -86,6 +86,9 @@ describe(`<${LookForm.name}/>`, () => {
         const floatingButton = screen.getByRole('button', {
           name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
         });
+        const softButton = screen.getByRole('button', {
+          name: LOOK_FORM.headerControlStyleOptionLabel.SOFT,
+        });
 
         expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
         expect(layoutSelect).toHaveAccessibleDescription(
@@ -93,6 +96,7 @@ describe(`<${LookForm.name}/>`, () => {
         );
         expect(dropdownButton).toBeDisabled();
         expect(floatingButton).toBeDisabled();
+        expect(softButton).toBeDisabled();
       });
 
       it('disables the Type and Shape controls', async () => {
@@ -117,9 +121,6 @@ describe(`<${LookForm.name}/>`, () => {
         const outlinedCardButton = within(cardStyleGroup).getByRole('button', {
           name: OUTLINED,
         });
-        const softButton = screen.getByRole('button', {
-          name: LOOK_FORM.headerControlStyleOptionLabel.SOFT,
-        });
 
         expect(headingFont).toHaveAttribute(DATA_DISABLED);
         expect(bodyFont).toHaveAccessibleDescription(
@@ -129,7 +130,6 @@ describe(`<${LookForm.name}/>`, () => {
         expect(extraLargeButton).toBeDisabled();
         expect(compactButton).toBeDisabled();
         expect(outlinedCardButton).toBeDisabled();
-        expect(softButton).toBeDisabled();
       });
     });
 

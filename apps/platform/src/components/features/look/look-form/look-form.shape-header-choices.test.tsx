@@ -14,10 +14,13 @@ import {
 } from '@platform/testing/look/look-form-fixtures';
 import {
   chooseOption,
+  chooseSegment,
+  lookRowTrigger,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import { UNSAVED_CHANGES } from '@platform/testing/render-in-settings-form';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -44,7 +47,7 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
-        row: LOOK_ROW.SHAPE,
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.headerControlStyleLabel,
         option: LOOK_FORM.headerControlStyleOptionLabel.SOFT,
         saved: { headerControlStyle: HEADER_CONTROL_STYLE.SOFT },
@@ -93,6 +96,26 @@ describe(`<${LookForm.name}/>`, () => {
       await chooseOption(user, select, option);
 
       await saveAndExpectLook(user, saved);
+    });
+
+    it('marks an unsaved header buttons change on the Header row, not on Shape', async () => {
+      await openLookRow(user, LOOK_ROW.HEADER);
+      await chooseSegment(
+        user,
+        LOOK_FORM.headerControlStyleLabel,
+        LOOK_FORM.headerControlStyleOptionLabel.PLAIN,
+      );
+
+      const headerDot = within(lookRowTrigger(LOOK_ROW.HEADER)).queryByRole(
+        'img',
+        { name: UNSAVED_CHANGES },
+      );
+      const shapeDot = within(lookRowTrigger(LOOK_ROW.SHAPE)).queryByRole(
+        'img',
+        { name: UNSAVED_CHANGES },
+      );
+      expect(headerDot).toBeInTheDocument();
+      expect(shapeDot).not.toBeInTheDocument();
     });
   });
 });

@@ -68,12 +68,6 @@ export const useLookDraftFields = () => {
         t(`cardStyleOptionLabel.${cardStyle}`),
     },
     {
-      id: 'headerControlStyle',
-      label: t('headerControlStyleLabel'),
-      display: ({ headerControlStyle }: TLookFormValues) =>
-        t(`headerControlStyleOptionLabel.${headerControlStyle}`),
-    },
-    {
       id: 'headerLayout',
       label: t('headerLayoutLabel'),
       display: ({ headerLayout }: TLookFormValues) =>
@@ -90,6 +84,12 @@ export const useLookDraftFields = () => {
       label: t('headerBarStyleLabel'),
       display: ({ headerBarStyle }: TLookFormValues) =>
         t(`headerBarStyleOptionLabel.${headerBarStyle}`),
+    },
+    {
+      id: 'headerControlStyle',
+      label: t('headerControlStyleLabel'),
+      display: ({ headerControlStyle }: TLookFormValues) =>
+        t(`headerControlStyleOptionLabel.${headerControlStyle}`),
     },
     ...accountDraftFields,
     {

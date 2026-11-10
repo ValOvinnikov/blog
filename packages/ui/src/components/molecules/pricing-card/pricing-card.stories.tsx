@@ -1,10 +1,15 @@
-import { CARD_STYLE, CARD_STYLE_DECLARATIONS } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { LinkButton } from '@blog/ui/components/molecules/link-button';
+import { CardStyles } from '@blog/ui/testing/card-styles';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { CSSProperties } from 'react';
 
 import { PricingCard } from './pricing-card';
+
+const STARTER_FEATURES = [
+  'Unlimited posts',
+  'Custom domain',
+  'Community support',
+];
 
 const meta = {
   title: 'Molecules/PricingCard',
@@ -19,9 +24,7 @@ const meta = {
           Everything you need to launch a personal blog.
         </PricingCard.Description>
         <PricingCard.Price amount="$19" period="per month" />
-        <PricingCard.Features
-          items={['Unlimited posts', 'Custom domain', 'Community support']}
-        />
+        <PricingCard.Features items={STARTER_FEATURES} />
         <PricingCard.Actions>
           <LinkButton href="/signup?plan=starter">Get started</LinkButton>
         </PricingCard.Actions>
@@ -34,17 +37,7 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 const renderInEachCardStyle: TStory['render'] = (args) => (
-  <div style={{ display: 'grid', gap: '1.5rem' }}>
-    {Object.values(CARD_STYLE).map((cardStyle) => (
-      <div
-        key={cardStyle}
-        style={CARD_STYLE_DECLARATIONS[cardStyle] as CSSProperties}
-      >
-        <p>{cardStyle}</p>
-        <PricingCard {...args} />
-      </div>
-    ))}
-  </div>
+  <CardStyles>{() => <PricingCard {...args} />}</CardStyles>
 );
 
 export const Default: TStory = { render: renderInEachCardStyle };
@@ -114,9 +107,7 @@ export const PromoWithCompareAt: TStory = {
           prefix="From"
         />
         <PricingCard.Extra>$90 billed yearly</PricingCard.Extra>
-        <PricingCard.Features
-          items={['Unlimited posts', 'Custom domain', 'Community support']}
-        />
+        <PricingCard.Features items={STARTER_FEATURES} />
         <PricingCard.Actions>
           <LinkButton href="/signup?plan=starter">Get started</LinkButton>
         </PricingCard.Actions>

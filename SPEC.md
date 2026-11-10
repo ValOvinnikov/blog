@@ -1521,12 +1521,9 @@ five `--radius*` tokens and `density` the nine layout `--spacing-*` tokens
 under `:root` only, the accent hue also sets the on-image and
 `--scrim-brand-*` tokens (`IMAGE_SCRIM_RAMP`) under `:root` only,
 and `cardStyle` sets the five `--item-*` tokens the `item-card` utility reads,
-also under `:root` only — `ACCENT_BAR` a square card with a 2px brand bar on
-the left, `OUTLINED` a hairline border all round at `--radius-md`.
-`ACCENT_BAR` stays square whatever `radiusScale` says: a 2px left border on a
-rounded corner bends into a hook at the larger steps, so only `OUTLINED` follows
-the Look's corner roundness, and under the default card style `radiusScale`
-reaches bounded cards and media frames but not item cards.
+also under `:root` only — `ACCENT_BAR` a borderless card with a 2px brand bar
+on the left, `OUTLINED` a hairline border all round; both at `--radius-md`, so
+`radiusScale` reaches item cards under either style.
 `MD`, `DEFAULT` and `ACCENT_BAR` reproduce `configs/tailwind/theme.css`'s
 static values, so a site with no saved look renders as the defaults; `density` does not touch
 Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius,
@@ -2938,11 +2935,11 @@ variant.
 token for what it is, so the Look's `radiusScale` and card style reach it
 without the component knowing either:
 
-| Role            | Utility         | Token                             | Used by                                                                         |
-| --------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------- |
-| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `CtaModule`, `NewsletterSignup` |
-| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                        |
-| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`)                          |
+| Role            | Utility         | Token                             | Used by                                                                          |
+| --------------- | --------------- | --------------------------------- | -------------------------------------------------------------------------------- |
+| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `CtaModule`, `NewsletterSignup`  |
+| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                         |
+| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, Hub tiles) |
 
 Controls and pills keep the plain steps (`rounded-sm`, `rounded-full`).
 `MediaFrame` takes a `shape` of `rect` (default, `rounded-media`) or `circle`
@@ -3038,7 +3035,9 @@ is the token for a border that genuinely is the sole indicator.
 
 ### Card style
 
-Item cards — `MediaCard`, `TaxonomyCard` and `QuoteCard` — paint their frame
+Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, the
+`PopoverMenu` tile (the account panel's Hub tiles) and the contact-form success
+card — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
 five inherited `--item-*` properties rather than fixed classes, and each pairs
 it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
@@ -3048,13 +3047,16 @@ the values site-wide on the Look page (`site_config.card_style`), and
 
 | Property              | `ACCENT_BAR` (default) | `OUTLINED`         |
 | --------------------- | ---------------------- | ------------------ |
-| `--item-radius`       | `0`                    | `var(--radius-md)` |
-| `--item-border-width` | `0`                    | `1px`              |
+| `--item-radius`       | `var(--radius-md)`     | `var(--radius-md)` |
+| `--item-border-width` | `0px`                  | `1px`              |
 | `--item-accent-width` | `2px`                  | `1px`              |
 | `--item-accent-color` | `var(--brand-primary)` | `var(--border)`    |
 | `--item-shadow`       | `none`                 | `none`             |
 
-`--radius-item` exposes `--item-radius` as `rounded-item`. `theme.css`'s
+`--radius-item` exposes `--item-radius` as `rounded-item`. The accent bar is an
+`::after` over the left border's straight run, between the corners, so it stays
+a straight bar on a rounded card; under `OUTLINED` it matches the border and
+does not show. `theme.css`'s
 static values are `ACCENT_BAR`'s, so a site with no saved look renders the
 accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s brand-muted tint
 on hover and focus-within under either style; the style changes only the frame.

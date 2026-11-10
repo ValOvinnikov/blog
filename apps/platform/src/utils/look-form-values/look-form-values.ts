@@ -12,16 +12,12 @@ export const CARD_FIELDS = {
   [LOOK_CARD.PRESET]: ['preset'],
   [LOOK_ROW.COLOUR]: ['accentHue', 'logoHue'],
   [LOOK_ROW.TYPE]: ['headingFont', 'bodyFont'],
-  [LOOK_ROW.SHAPE]: [
-    'radiusScale',
-    'density',
-    'cardStyle',
-    'headerControlStyle',
-  ],
+  [LOOK_ROW.SHAPE]: ['radiusScale', 'density', 'cardStyle'],
   [LOOK_ROW.HEADER]: [
     'headerLayout',
     'headerSubmenuStyle',
     'headerBarStyle',
+    'headerControlStyle',
     'accountButtonStyle',
     'accountPanelStyle',
     'accountPhonePlacement',

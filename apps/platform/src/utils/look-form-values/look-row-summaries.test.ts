@@ -63,9 +63,10 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent',
       [LOOK_ROW.BRAND]: 'Logo uploaded · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
-      [LOOK_ROW.SHAPE]: 'Medium · Default · Accent bar · Outlined',
+      [LOOK_ROW.SHAPE]: 'Medium · Default · Accent bar',
       [LOOK_ROW.BUTTONS]: 'Busy label · Braille',
-      [LOOK_ROW.HEADER]: 'Classic · Full width · Dropdown · Pill with label',
+      [LOOK_ROW.HEADER]:
+        'Classic · Full width · Dropdown · Outlined · Pill with label',
       [LOOK_ROW.FOOTER]:
         'Columns · Brand tint · Full width · Cookie link and button',
       [LOOK_ROW.LANGUAGE_SWITCHER]: 'Globe',
