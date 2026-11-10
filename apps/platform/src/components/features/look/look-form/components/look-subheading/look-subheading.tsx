@@ -2,6 +2,12 @@ import type { IWithChildren } from '@blog/config/react';
 
 import { lookSubheadingVariants } from './look-subheading-variants';
 
-export const LookSubheading = ({ children }: IWithChildren) => (
-  <p className={lookSubheadingVariants()}>{children}</p>
+export type TLookSubheadingProps = IWithChildren & {
+  id?: string;
+};
+
+export const LookSubheading = ({ id, children }: TLookSubheadingProps) => (
+  <p id={id} className={lookSubheadingVariants()}>
+    {children}
+  </p>
 );

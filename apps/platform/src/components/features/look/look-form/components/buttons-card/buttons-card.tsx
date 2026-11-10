@@ -10,7 +10,7 @@ import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
-import { LookSubheading } from '@platform/components/features/look/look-form/components/look-subheading';
+import { LookSubsection } from '@platform/components/features/look/look-form/components/look-subsection';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -85,49 +85,51 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
         <PresetValueButton field="buttonShape" fieldLabel={shapeLabel} />
       </LookField>
 
-      <LookSubheading>{t('buttonsWhileWorkingHeading')}</LookSubheading>
-
-      <LookField
-        field="busyButtonStyle"
-        label={t('busyButtonStyleLabel')}
-        hint={t('busyButtonStyleDescription')}
-        isGroup={true}
-        labelId={busyLock.labelId}
-        growthBadgeId={busyLock.growthBadgeId}
-      >
-        <SegmentedControl<TBusyButtonStyle>
-          aria={busyLock.aria}
-          options={busyOptions}
-          value={busyButtonStyle}
-          onChange={(style) => updateField('busyButtonStyle', style)}
-          lock={busyLock}
-        />
-      </LookField>
-
-      <LookField
-        field="spinnerStyle"
-        label={spinnerStyleLabel}
-        hint={t('spinnerStyleDescription')}
-        labelId={spinnerLock.labelId}
-        growthBadgeId={spinnerLock.growthBadgeId}
-      >
-        <OptionSelect
-          appearance={SELECT_APPEARANCE.COMPACT}
-          aria={spinnerLock.aria}
-          options={spinnerOptions}
-          value={spinnerStyle}
-          onChange={(style) => updateField('spinnerStyle', style)}
-          isDisabled={spinnerLock.isDisabled}
-          isLocked={spinnerLock.isLocked}
-        />
-        {busyButtonStyle === BUSY_BUTTON_STYLE.EDGE && (
-          <LockedReason icon={ICONS.INFO}>{t('spinnerEdgeNote')}</LockedReason>
-        )}
-        <PresetValueButton
+      <LookSubsection heading={t('buttonsWhileWorkingHeading')}>
+        {' '}
+        <LookField
+          field="busyButtonStyle"
+          label={t('busyButtonStyleLabel')}
+          hint={t('busyButtonStyleDescription')}
+          isGroup={true}
+          labelId={busyLock.labelId}
+          growthBadgeId={busyLock.growthBadgeId}
+        >
+          <SegmentedControl<TBusyButtonStyle>
+            aria={busyLock.aria}
+            options={busyOptions}
+            value={busyButtonStyle}
+            onChange={(style) => updateField('busyButtonStyle', style)}
+            lock={busyLock}
+          />
+        </LookField>
+        <LookField
           field="spinnerStyle"
-          fieldLabel={spinnerStyleLabel}
-        />
-      </LookField>
+          label={spinnerStyleLabel}
+          hint={t('spinnerStyleDescription')}
+          labelId={spinnerLock.labelId}
+          growthBadgeId={spinnerLock.growthBadgeId}
+        >
+          <OptionSelect
+            appearance={SELECT_APPEARANCE.COMPACT}
+            aria={spinnerLock.aria}
+            options={spinnerOptions}
+            value={spinnerStyle}
+            onChange={(style) => updateField('spinnerStyle', style)}
+            isDisabled={spinnerLock.isDisabled}
+            isLocked={spinnerLock.isLocked}
+          />
+          {busyButtonStyle === BUSY_BUTTON_STYLE.EDGE && (
+            <LockedReason icon={ICONS.INFO}>
+              {t('spinnerEdgeNote')}
+            </LockedReason>
+          )}
+          <PresetValueButton
+            field="spinnerStyle"
+            fieldLabel={spinnerStyleLabel}
+          />
+        </LookField>
+      </LookSubsection>
     </LookCard>
   );
 };
