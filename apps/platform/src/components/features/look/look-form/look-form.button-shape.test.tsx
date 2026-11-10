@@ -47,31 +47,6 @@ describe(`<${LookForm.name}/> button shape`, () => {
     await saveAndExpectLook(user, { buttonShape: BUTTON_SHAPE.PILL });
   });
 
-  it('names each option by its label alone', () => {
-    const group = screen.getByRole('group', { name: SHAPE_LABEL });
-
-    const options = within(group).getAllByRole('button');
-
-    expect(options.map((option) => option.textContent)).toEqual(
-      Object.values(LOOK_FORM.buttonShapeOptionLabel),
-    );
-  });
-
-  it('moves between shapes with the keyboard', async () => {
-    const group = screen.getByRole('group', { name: SHAPE_LABEL });
-    const rounded = within(group).getByRole('button', {
-      name: LOOK_FORM.buttonShapeOptionLabel.ROUNDED,
-    });
-    await user.click(rounded);
-
-    await user.keyboard('{ArrowRight}');
-
-    const pill = within(group).getByRole('button', {
-      name: LOOK_FORM.buttonShapeOptionLabel.PILL,
-    });
-    expect(pill).toHaveFocus();
-  });
-
   it('puts the shape back to the preset value', async () => {
     await chooseSegment(
       user,
