@@ -63,6 +63,8 @@ export const textLinkVariants = tv({
           'focus-visible:ring-0 focus-visible:ring-offset-0',
           // Important, or the unlayered forced-colours rule redraws the ring around the clamped title.
           'focus-visible:outline-none!',
+          // Lifts the ring above the item-card accent bar, which sits on the same left edge.
+          'focus-visible:before:z-1',
           'focus-visible:before:outline-2 focus-visible:before:-outline-offset-2',
           'focus-visible:before:outline-(--ring)',
           'forced-colors:focus-visible:before:outline-[Highlight]',

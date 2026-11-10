@@ -604,7 +604,8 @@
 
 /* The accent bar is drawn over the left border's straight run, between the
    corners, so it stays a straight bar on a rounded card; where it matches the
-   border (Outlined) it is invisible. */
+   border (Outlined) it is invisible. It is a border, not a background, because
+   forced colours repaint backgrounds with the page colour but keep borders. */
 @utility item-card {
   position: relative;
   border-style: solid;
@@ -620,8 +621,7 @@
     top: var(--radius-item);
     bottom: var(--radius-item);
     left: calc(-1 * var(--item-border-width));
-    width: var(--item-accent-width);
-    background-color: var(--item-accent-color);
+    border-left: var(--item-accent-width) solid var(--item-accent-color);
     pointer-events: none;
   }
 }
