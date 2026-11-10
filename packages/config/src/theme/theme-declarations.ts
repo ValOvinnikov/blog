@@ -115,7 +115,7 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
 };
 
 const BORDER_COLOR = 'var(--border)';
-const RADIUS_MD = 'var(--radius-md)';
+export const RADIUS_MD = 'var(--radius-md)';
 
 export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
   [CARD_STYLE.ACCENT_BAR]: {

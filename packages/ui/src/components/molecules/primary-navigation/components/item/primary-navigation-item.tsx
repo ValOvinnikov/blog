@@ -6,6 +6,7 @@ import {
   type TPrimaryNavigationSubmenuProps,
 } from '@blog/ui/components/molecules/primary-navigation/components/submenu/primary-navigation-submenu';
 import type { INavItem } from '@blog/ui/components/molecules/primary-navigation/primary-navigation';
+import { NAV_LINK } from '@blog/ui/lib/styling';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 
 export type TPrimaryNavigationItemProps = {
@@ -47,7 +48,7 @@ export const PrimaryNavigationItem = ({
       isCurrent={isActive}
       currentStyle="weight"
       target={target}
-      className={panel?.linkClassName}
+      className={panel ? panel.linkClassName : NAV_LINK}
     >
       {label}
     </TextLink>

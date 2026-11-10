@@ -1,5 +1,7 @@
 import { CONTRAST_ROLE, type TContrastRole } from '@blog/config/constants';
 
+import { HEADER_CONTRAST_PAIRS } from './header-contrast-pairs';
+
 export type TThemeToken = `--${string}`;
 
 export type TContrastPair = {
@@ -16,7 +18,6 @@ const BRAND_PRIMARY_MUTED = '--brand-primary-muted' satisfies TThemeToken;
 const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
 const TEXT = '--text' satisfies TThemeToken;
 const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
-const HEADER_CONTROL_FILL = '--header-control-fill' satisfies TThemeToken;
 
 const BANDS = [
   '--primary',
@@ -159,18 +160,7 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.DECORATIVE,
     followsAccentHue: true,
   },
-  HEADER_CONTROL_TEXT: {
-    foreground: TEXT,
-    surfaces: [HEADER_CONTROL_FILL],
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  HEADER_CONTROL_BRAND: {
-    foreground: BRAND_PRIMARY,
-    surfaces: [HEADER_CONTROL_FILL],
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
+  ...HEADER_CONTRAST_PAIRS,
   SELECTION: {
     foreground: BRAND_PRIMARY,
     surfaces: [BRAND_PRIMARY_MUTED],

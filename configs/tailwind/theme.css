@@ -389,6 +389,10 @@
 
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
+
+  --nav-link-fill: transparent;
+  --nav-link-decoration: none;
+  --nav-link-padding: 0;
 }
 
 .dark {
@@ -535,6 +539,16 @@
 /* Not a @theme token: those resolve on :root, and the default must follow the nearest --radius-sm (the platform Look preview re-declares it on its frame). */
 @utility rounded-button {
   border-radius: var(--radius-button, var(--radius-sm));
+}
+
+/* Falls back at the element, like rounded-button, so it follows the nearest --radius-sm. */
+@utility rounded-nav-link {
+  border-radius: var(--nav-link-radius, var(--radius-sm));
+}
+
+@utility nav-link-marked {
+  background-color: var(--nav-link-fill);
+  text-decoration-line: var(--nav-link-decoration);
 }
 
 @utility max-w-wide {

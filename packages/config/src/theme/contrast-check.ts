@@ -1,13 +1,14 @@
+import { hasLength } from '@blog/utils/primitives';
+
 import {
-  CARD_STYLE,
   COLOR_SCHEME,
   CONTRAST_ROLE_MIN,
-  HEADER_CONTROL_STYLE,
   HUE_MAX,
   HUE_MIN,
   type TCardStyle,
   type TColorScheme,
   type THeaderControlStyle,
+  type TNavLinkStyle,
 } from '@blog/config/constants';
 
 import {
@@ -15,11 +16,8 @@ import {
   type TContrastPairId,
   type TThemeToken,
 } from './contrast-pairs';
+import { findVaryingAxes, styleContextsFor } from './contrast-style-axes';
 import { measureContrast, tokenFollowsAccentHue } from './contrast-tokens';
-import {
-  CARD_STYLE_DECLARATIONS,
-  HEADER_CONTROL_STYLE_DECLARATIONS,
-} from './theme-declarations';
 
 export type TContrastFailure = {
   pair: TContrastPairId;
@@ -27,20 +25,11 @@ export type TContrastFailure = {
   scheme: TColorScheme;
   cardStyle?: TCardStyle;
   headerControlStyle?: THeaderControlStyle;
+  navLinkStyle?: TNavLinkStyle;
   hues: string;
 };
 
 const ALL_HUES = Array.from({ length: HUE_MAX - HUE_MIN }, (_, i) => i);
-const CARD_STYLE_TOKENS = new Set(
-  Object.values(CARD_STYLE).flatMap((style) =>
-    Object.keys(CARD_STYLE_DECLARATIONS[style]),
-  ),
-);
-const HEADER_CONTROL_STYLE_TOKENS = new Set(
-  Object.values(HEADER_CONTROL_STYLE).flatMap((style) =>
-    Object.keys(HEADER_CONTROL_STYLE_DECLARATIONS[style]),
-  ),
-);
 
 const formatHueRanges = (hues: readonly number[]): string =>
   hues
@@ -57,26 +46,10 @@ export const findContrastFailures = (): TContrastFailure[] =>
   Object.entries(CONTRAST_PAIRS).flatMap(([id, pair]) => {
     const { foreground, surfaces, role, followsAccentHue } = pair;
     const tokens = [foreground, ...surfaces];
-    const varies = tokens.some((token) => CARD_STYLE_TOKENS.has(token));
-    const variesByHeader = tokens.some((token) =>
-      HEADER_CONTROL_STYLE_TOKENS.has(token),
-    );
-    const cardStyles = varies
-      ? Object.values(CARD_STYLE)
-      : [CARD_STYLE.ACCENT_BAR];
-    const headerControlStyles = variesByHeader
-      ? Object.values(HEADER_CONTROL_STYLE)
-      : [HEADER_CONTROL_STYLE.OUTLINED];
-    const styleContexts = cardStyles.flatMap((cardStyle) =>
-      headerControlStyles.map((headerControlStyle) => ({
-        cardStyle,
-        headerControlStyle,
-      })),
-    );
+    const varyingAxes = findVaryingAxes(tokens);
 
     return Object.values(COLOR_SCHEME).flatMap((scheme) =>
-      styleContexts.flatMap((styles) => {
-        const { cardStyle, headerControlStyle } = styles;
+      styleContextsFor(varyingAxes).flatMap((styles) => {
         const context = { scheme, ...styles };
         const resolvedFollowsHue = tokens.some((token) =>
           tokenFollowsAccentHue(token, context),
@@ -84,6 +57,9 @@ export const findContrastFailures = (): TContrastFailure[] =>
         if (resolvedFollowsHue && !followsAccentHue) {
           throw new Error(`${id} moves with the accent hue under ${scheme}`);
         }
+        const varyingStyles = Object.fromEntries(
+          varyingAxes.map((key) => [key, styles[key]]),
+        );
 
         return surfaces.flatMap((surface) => {
           const failingHues = (followsAccentHue ? ALL_HUES : [0]).filter(
@@ -91,14 +67,13 @@ export const findContrastFailures = (): TContrastFailure[] =>
               measureContrast(foreground, surface, { ...context, hue }) <
               CONTRAST_ROLE_MIN[role],
           );
-          if (failingHues.length === 0) return [];
+          if (!hasLength(failingHues)) return [];
 
           return {
             pair: id as TContrastPairId,
             surface,
             scheme,
-            ...(varies && { cardStyle }),
-            ...(variesByHeader && { headerControlStyle }),
+            ...varyingStyles,
             hues: formatHueRanges(followsAccentHue ? failingHues : ALL_HUES),
           };
         });

@@ -174,6 +174,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **NEWSLETTER_VARIANT**: `FULL`, `COMPACT`
 - **POST_SOURCE**: `PINNED`, `NEWEST_FEATURED`
 
+### `@blog/config/constants` — `packages/config/src/constants/nav-link-style.ts`
+
+- **NAV_LINK_STYLE**: `PLAIN`, `UNDERLINE`, `SOFT`, `PILL`
+
 ### `@blog/config/constants` — `packages/config/src/constants/newsletter-result.ts`
 
 - **NEWSLETTER_RESULT**: `CONFIRMED`, `CONFIRM_INVALID`, `CONFIRM_UNAVAILABLE`, `CONFIRM_FAILED`, `UNSUBSCRIBED`, `UNSUBSCRIBE_INVALID`, `UNSUBSCRIBE_FAILED`

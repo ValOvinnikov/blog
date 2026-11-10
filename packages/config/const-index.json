@@ -12,6 +12,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/button-shape.ts"
+      },
+      {
+        "ref": "NAV_LINK_STYLE.PILL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
     "CIRCLE": [
@@ -1462,6 +1468,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/header-control-style.ts"
+      },
+      {
+        "ref": "NAV_LINK_STYLE.SOFT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
     "PLAIN": [
@@ -1470,6 +1482,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/header-control-style.ts"
+      },
+      {
+        "ref": "NAV_LINK_STYLE.PLAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/nav-link-style.ts"
       }
     ],
     "CLASSIC": [
@@ -2770,6 +2788,20 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/module.ts"
+      }
+    ],
+    "UNDERLINE": [
+      {
+        "ref": "NAV_LINK_STYLE.UNDERLINE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/nav-link-style.ts"
+      },
+      {
+        "ref": "VIEW_TABS_VARIANT.UNDERLINE",
+        "scope": "app:platform",
+        "from": "@platform/constants/view-tabs",
+        "file": "apps/platform/src/constants/view-tabs.ts"
       }
     ],
     "CONFIRMED": [
@@ -7521,14 +7553,6 @@
     "SEGMENTED": [
       {
         "ref": "VIEW_TABS_VARIANT.SEGMENTED",
-        "scope": "app:platform",
-        "from": "@platform/constants/view-tabs",
-        "file": "apps/platform/src/constants/view-tabs.ts"
-      }
-    ],
-    "UNDERLINE": [
-      {
-        "ref": "VIEW_TABS_VARIANT.UNDERLINE",
         "scope": "app:platform",
         "from": "@platform/constants/view-tabs",
         "file": "apps/platform/src/constants/view-tabs.ts"
