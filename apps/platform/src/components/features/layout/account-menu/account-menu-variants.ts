@@ -2,6 +2,7 @@ import { MENU_POPUP_FIT_WIDTH } from '@platform/components/shared/menu-surface';
 import { ACCOUNT_MENU_PLACEMENT } from '@platform/constants/account-menu';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 const SIDEBAR_TRIGGER = [
@@ -16,7 +17,7 @@ const EXPANDED_TRIGGER =
 
 export const accountMenuVariants = tv({
   slots: {
-    trigger: ['transition-colors duration-base ease-smooth'],
+    trigger: [COLOUR_TRANSITION_CLASSES],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameLine: [
       'truncate text-admin-13 leading-[18px] font-semibold text-admin-text',
