@@ -210,6 +210,7 @@ export { getPlatformSanityContext } from './sanity/client/client';
 export { getPlatformSanityWriteContext } from './sanity/write-client/write-client';
 export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
 export type { TFaqPageQuestion } from './shared/transformers/faq/resolve-faqs';
+export type { THeroPresentation } from './shared/transformers/hero/to-hero-presentation';
 export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
 export type { TModule } from './shared/transformers/module/to-module';
 export type { TPersonCard } from './shared/transformers/person/to-person-card';

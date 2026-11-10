@@ -1,7 +1,9 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
-import { MOCK_HERO_BLOG_MODULE_ID } from '@web/testing/modules/hero-blog/fixtures';
+import {
+  MOCK_HERO_BLOG_MODULE_ID,
+  mockHeroBlogData,
+} from '@web/testing/modules/hero-blog/fixtures';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
@@ -11,18 +13,7 @@ const MOCK_HEADING = faker.lorem.words(3);
 
 const setup = customRender(HeroBlogModuleView, {
   id: MOCK_HERO_BLOG_MODULE_ID,
-  hasPost: true,
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
-  eyebrow: undefined,
-  heading: MOCK_HEADING,
-  supportingText: undefined,
-  sanityImage: undefined,
-  ctaButtons: [],
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
-  layout: undefined,
+  module: mockHeroBlogData({ heading: MOCK_HEADING }),
 });
 
 describe(`<${HeroBlogModuleView.name}/>`, () => {

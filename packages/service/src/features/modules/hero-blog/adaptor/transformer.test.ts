@@ -49,7 +49,7 @@ describe(toHeroBlogModule, () => {
     const hero = toHeroBlogModule(raw);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-    expect(hero.variant).toBe(HERO_VARIANT.BANNER);
+    expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
   });
 
   it('reports no post, and derives no copy, image or buttons, without one', () => {
@@ -214,8 +214,8 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
-    expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
+    expect(hero.presentation.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
+    expect(hero.presentation.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
 
   it.each([
@@ -226,7 +226,7 @@ describe(toHeroBlogModule, () => {
 
     const hero = toHeroBlogModule(raw);
 
-    expect(hero.contentAlignment).toBe(expected);
+    expect(hero.presentation.contentAlignment).toBe(expected);
   });
 
   it('maps a fully-authored layout object', () => {

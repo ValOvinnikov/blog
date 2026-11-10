@@ -1,5 +1,6 @@
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { HERO_BLOG_LOG } from '@web/constants/hero-blog';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -35,7 +36,6 @@ const loggerErrorMock = vi.mocked(logger.error);
 
 const MOCK_POST_HEADING = faker.lorem.words(3);
 const MOCK_STALE_HEADING = faker.lorem.words(5);
-const POST_UNRESOLVED_EVENT = 'hero_blog_module.post_unresolved';
 
 const setup = customRenderAsync(HeroBlogModule, {
   id: MOCK_HERO_BLOG_MODULE_ID,
@@ -92,9 +92,12 @@ describe(`<${HeroBlogModule.name}/>`, () => {
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
-    expect(loggerErrorMock).toHaveBeenCalledWith(POST_UNRESOLVED_EVENT, {
-      id: MOCK_HERO_BLOG_MODULE_ID,
-    });
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      HERO_BLOG_LOG.POST_UNRESOLVED,
+      {
+        id: MOCK_HERO_BLOG_MODULE_ID,
+      },
+    );
   });
 
   it('renders nothing, unlogged, when the post lacks the request language', async () => {

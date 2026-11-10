@@ -1,41 +1,33 @@
 import type { THeroBlogModule } from '@blog/service';
-import { HeroModuleShell } from '@web/modules/hero-shared';
-import { useId } from 'react';
+import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
 
-export interface IHeroBlogModuleViewProps extends Extract<
-  THeroBlogModule,
-  { hasPost: true }
-> {
+export interface IHeroBlogModuleViewProps {
   id: string;
+  module: Extract<THeroBlogModule, { hasPost: true }>;
 }
 
 export const HeroBlogModuleView = ({
   id,
-  brandVariant,
-  variant,
-  eyebrow,
-  heading,
-  supportingText,
-  sanityImage,
-  ctaButtons,
-  contentPosition,
-  contentAlignment,
-  mediaOrder,
-  layout,
+  module,
 }: IHeroBlogModuleViewProps) => {
-  const titleId = useId();
+  const {
+    brandVariant,
+    presentation,
+    eyebrow,
+    heading,
+    supportingText,
+    sanityImage,
+    ctaButtons,
+    layout,
+  } = module;
 
   return (
     <HeroModuleShell
       brandVariant={brandVariant}
-      variant={variant}
+      presentation={presentation}
       eyebrow={eyebrow}
       title={heading}
-      titleId={titleId}
       excerpt={supportingText}
-      contentPosition={contentPosition}
-      contentAlignment={contentAlignment}
-      mediaOrder={mediaOrder}
       layout={layout}
       dataTestId={`hero-blog-module-${id}`}
       ctaButtons={ctaButtons}

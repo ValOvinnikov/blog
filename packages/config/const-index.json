@@ -7816,6 +7816,38 @@
         "file": "apps/web/src/constants/header-style.ts"
       }
     ],
+    "hero_blog_module.fetch_failed": [
+      {
+        "ref": "HERO_BLOG_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/hero-blog",
+        "file": "apps/web/src/constants/hero-blog.ts"
+      }
+    ],
+    "hero_blog_module.post_unresolved": [
+      {
+        "ref": "HERO_BLOG_LOG.POST_UNRESOLVED",
+        "scope": "app:web",
+        "from": "@web/constants/hero-blog",
+        "file": "apps/web/src/constants/hero-blog.ts"
+      }
+    ],
+    "hero_profile_module.fetch_failed": [
+      {
+        "ref": "HERO_PROFILE_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/hero-profile",
+        "file": "apps/web/src/constants/hero-profile.ts"
+      }
+    ],
+    "hero_statement_module.fetch_failed": [
+      {
+        "ref": "HERO_STATEMENT_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/hero-statement",
+        "file": "apps/web/src/constants/hero-statement.ts"
+      }
+    ],
     "private, no-store": [
       {
         "ref": "CACHE_CONTROL.PRIVATE_NO_STORE",

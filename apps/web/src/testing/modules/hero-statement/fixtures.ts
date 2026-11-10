@@ -1,7 +1,8 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { BRAND_VARIANT } from '@blog/config';
 import type { THeroStatementModule } from '@blog/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 
 const mockFaker = createMockFaker(61045);
 
@@ -13,14 +14,11 @@ export const mockHeroStatementModule = (
   overrides: Partial<THeroStatementModule> = {},
 ): THeroStatementModule => ({
   brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
   headingBlock: mockHeadingBlock({ heading: MOCK_HERO_STATEMENT_HEADING }),
   sanityImage: undefined,
   ctaButtons: [],
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
+  presentation: mockHeroPresentation(),
   layout: undefined,
   ...overrides,
 });

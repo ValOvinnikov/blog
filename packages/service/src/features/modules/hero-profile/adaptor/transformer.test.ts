@@ -58,7 +58,7 @@ describe(toHeroProfileModule, () => {
     const hero = toHeroProfileModule(raw);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-    expect(hero.variant).toBe(HERO_VARIANT.BANNER);
+    expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
     expect(hero.headingBlock).toEqual({
       heading: MOCK_PROFILE_HEADING,
       supportingText: undefined,
@@ -275,8 +275,8 @@ describe(toHeroProfileModule, () => {
 
     const hero = toHeroProfileModule(raw);
 
-    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
-    expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
+    expect(hero.presentation.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
+    expect(hero.presentation.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
 
   it('leaves mediaOrder undefined on Stacked, which has no order of its own', () => {
@@ -287,7 +287,7 @@ describe(toHeroProfileModule, () => {
 
     const hero = toHeroProfileModule(raw);
 
-    expect(hero.mediaOrder).toBeUndefined();
+    expect(hero.presentation.mediaOrder).toBeUndefined();
   });
 
   it('maps a fully-authored layout object', () => {

@@ -4,8 +4,11 @@ import {
   CTA_ACTION_VARIANT,
   HERO_VARIANT,
 } from '@blog/config';
+import type { THeroBlogModule } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockHeroBlogData } from '@web/testing/modules/hero-blog/fixtures';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 
 import { HeroBlogModuleView } from './hero-blog-module-view';
 
@@ -33,35 +36,27 @@ const secondaryButton = {
   },
 };
 
-const meta = {
-  title: 'Modules/HeroBlogModule',
-  component: HeroBlogModuleView,
-  tags: ['autodocs'],
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: Object.values(BRAND_VARIANT),
-    },
-    variant: {
-      control: 'select',
-      options: Object.values(HERO_VARIANT),
-    },
-  },
-  args: {
-    id: 'hero-blog-1',
-    hasPost: true,
+const storyModule = (
+  overrides: Partial<Extract<THeroBlogModule, { hasPost: true }>> = {},
+) =>
+  mockHeroBlogData({
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-    variant: HERO_VARIANT.SPLIT,
     eyebrow: 'Engineering',
     heading: 'Building a Design System from Scratch',
     supportingText:
       'A deep dive into Atomic Design principles, Tailwind CSS v4, and class-variance-authority — all working together in a portable component library.',
     sanityImage: mockSanityImage(),
     ctaButtons: [primaryButton],
-    contentPosition: undefined,
-    contentAlignment: undefined,
-    mediaOrder: undefined,
-    layout: undefined,
+    ...overrides,
+  });
+
+const meta = {
+  title: 'Modules/HeroBlogModule',
+  component: HeroBlogModuleView,
+  tags: ['autodocs'],
+  args: {
+    id: 'hero-blog-1',
+    module: storyModule(),
   },
 } satisfies Meta<typeof HeroBlogModuleView>;
 
@@ -72,29 +67,37 @@ export const Default: TStory = {};
 
 export const InlinePrimaryAction: TStory = {
   args: {
-    ctaButtons: [
-      {
-        ...primaryButton,
-        appearance: CTA_ACTION_APPEARANCE.INLINE,
-      },
-    ],
+    module: storyModule({
+      ctaButtons: [
+        {
+          ...primaryButton,
+          appearance: CTA_ACTION_APPEARANCE.INLINE,
+        },
+      ],
+    }),
   },
 };
 
 export const WithSecondaryAction: TStory = {
   args: {
-    ctaButtons: [primaryButton, secondaryButton],
+    module: storyModule({
+      ctaButtons: [primaryButton, secondaryButton],
+    }),
   },
 };
 
 export const Stacked: TStory = {
   args: {
-    variant: HERO_VARIANT.STACKED,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.STACKED }),
+    }),
   },
 };
 
 export const Banner: TStory = {
   args: {
-    variant: HERO_VARIANT.BANNER,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.BANNER }),
+    }),
   },
 };

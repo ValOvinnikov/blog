@@ -178,10 +178,6 @@ if (!result.ok) {
   `@web/modules/module-renderer`. A new module type gets its folder here plus
   an entry in the map of every page that allows it — never a
   `src/components/` component.
-  - `modules/hero-shared/` (`HeroModuleShell`) is not a module. The three
-    hero modules that import it are three domains, so under "Where a
-    component lives" it belongs in `components/shared/hero-module-shell/`;
-    it moves there when a diff touches it.
 - **Metadata builders**: `src/metadata/<name>/` (`post-metadata/`), one folder
   per builder with a co-located test and a barrel. The bare
   `metadata/to-metadata.ts` is drift: it gets a folder when a diff touches it.
