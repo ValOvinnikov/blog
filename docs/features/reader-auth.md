@@ -7,7 +7,9 @@ code:
   - packages/db/src/schema/auth.ts
   - apps/web/src/server/auth/**
   - apps/web/src/app/api/auth/**
-  - apps/web/src/components/shared/auth-menu/**
+  - apps/web/src/components/shared/site-header/components/auth-menu/**
+  - apps/web/src/components/shared/site-navigation/components/account-menu-group/**
+  - apps/web/src/components/shared/reader-account-panel/**
   - apps/web/src/hooks/use-oauth-error-param/**
   - packages/email/src/templates/tenant/magic-link-email/**
   - packages/email/src/templates/tenant/magic-link-invite-email/**
@@ -73,8 +75,9 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 - `packages/auth/src/events/consume-pending-invites-on-sign-in.ts`
 - `apps/web/src/server/auth/auth.ts` — lazy `NextAuth()`, `pages.error: '/'`
 - `apps/web/src/server/auth/site-oauth-credentials/site-oauth-credentials.ts` — the site's entitled credentials
-- `apps/web/src/components/shared/auth-menu/auth-menu.tsx`
-- `apps/web/src/components/shared/auth-menu/components/account-menu-group/account-menu-group.tsx` — the phone menu's account row
+- `apps/web/src/components/shared/site-header/components/auth-menu/auth-menu.tsx`
+- `apps/web/src/components/shared/site-navigation/components/account-menu-group/account-menu-group.tsx` — the phone menu's account row
+- `apps/web/src/components/shared/reader-account-panel/reader-account-panel.tsx` — the signed-in panel both use
 - `apps/web/src/components/shared/reader-sign-in-panel/use-sign-in-attempt.ts`
 - `apps/web/src/server/site-config/get-account-control/get-account-control.ts`
 - `apps/web/src/components/shared/site-header/site-header.tsx`
@@ -82,7 +85,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 ## Tests and stories
 
 - `packages/auth/src/**/*.test.ts` (config, providers, env, invite consumption).
-- `apps/web/src/components/shared/auth-menu/**/*.test.tsx`, `site-header.test.tsx`, `get-account-control.test.ts`, `use-oauth-error-param.test.ts`.
+- `apps/web/src/components/shared/site-header/components/auth-menu/auth-menu.test.tsx`, `site-header.test.tsx`, `get-account-control.test.ts`, `use-oauth-error-param.test.ts`.
 - `packages/email/src/templates/tenant/magic-link-*/**/*.test.ts`.
 - The `@blog/ui` stories `AccountTrigger`, `AccountPanel` and `SignInPanel` draw every variant and state; the composed header appears in `site-navigation.stories.tsx`, including the account in the phone menu.
 

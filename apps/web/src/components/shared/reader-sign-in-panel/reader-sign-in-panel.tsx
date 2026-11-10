@@ -6,30 +6,27 @@ import {
   ICONS,
   type IWithClassName,
   type TIconName,
-  type TMaybeNull,
 } from '@blog/config';
 import { SignInPanel } from '@blog/ui/components/molecules/sign-in-panel';
 import { useBusyStyle } from '@web/context/busy-style-provider';
+import type { TPopoverPanel } from '@web/hooks/use-popover';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef, type RefObject } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useSignInAttempt } from './use-sign-in-attempt';
 
 export type TReaderSignInPanelProps = IWithClassName & {
-  panelId: string;
-  isOpen: boolean;
-  panelRef: RefObject<TMaybeNull<HTMLDivElement>>;
+  panel: TPopoverPanel;
   oauthProviderIds: readonly TOAuthProviderId[];
 };
 
 export const ReaderSignInPanel = ({
-  panelId,
-  isOpen,
-  panelRef,
+  panel,
   oauthProviderIds,
   className,
 }: TReaderSignInPanelProps) => {
   const t = useTranslations('authMenu');
+  const { panelId, open: isOpen, panelRef } = panel;
   const { busyStyle, spinnerVariant } = useBusyStyle();
   const {
     status,

@@ -75,27 +75,23 @@ signals, and where hooks and helpers go, are `react-component-practices` →
 `AuthMenu` models the cut:
 
 ```
-auth-menu/
-  auth-menu.tsx           # dispatcher: Spinner | AccountMenu | SignInMenu
-  auth-menu-variants.ts   # `panel` (both menus) + `statusIndicator` (dispatcher only)
+site-header/components/auth-menu/
+  auth-menu.tsx           # dispatcher: AccountPlaceholder | AccountTriggers + ReaderAccountPanel | ReaderSignInPanel
+  auth-menu-variants.ts   # `panel` (both panels) + the placeholder's slots
+  use-signed-in-hint.ts   # beside its one caller, not in a `hooks/` folder
   components/
-    account-menu/
-      account-menu.tsx    # signed-in branch
-    sign-in-menu/
-      sign-in-menu.tsx    # signed-out branch, composes useEmailSignIn
+    account-placeholder/
+      account-placeholder.tsx   # loading branch
+    account-triggers/
+      account-triggers.tsx      # takes the popover as one `popover` prop
 ```
 
-Its leftovers predate the `react-component-practices` rules — don't copy
-them. A diff that touches one fixes it:
-
-- AuthMenu sits in `shared/` with a barrel, though only `site-header`
-  imports it → `site-header/components/auth-menu/` ("Where a component
-  lives").
-- `use-email-sign-in.ts` sits in a one-entry `hooks/` → beside
-  `sign-in-menu.tsx`.
-- The popover state reaches each menu as five forwarded props (`panelId`,
-  `isOpen`, `toggle`, `triggerRef`, `panelRef`) → one object typed from its
-  source ("Props").
+The one `usePopover()` result, panel id included, reaches the triggers as
+`popover` and each panel as `panel` (`TPopoverPanel`) — one object typed from
+its source ("Props"), never its fields forwarded one by one. The two panels
+live in `shared/` (`reader-account-panel/`, `reader-sign-in-panel/`) because
+the header menu, the navigation's account group and the account page all
+render them.
 
 Below the budget, don't split a component that has one render path and
 straightforward state.
