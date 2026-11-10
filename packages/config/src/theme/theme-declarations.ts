@@ -1,3 +1,5 @@
+import { isUndefined } from '@blog/utils/primitives';
+
 import {
   CARD_STYLE,
   DENSITY,
@@ -111,17 +113,18 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
 };
 
 const BORDER_COLOR = 'var(--border)';
+const RADIUS_MD = 'var(--radius-md)';
 
 export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
   [CARD_STYLE.ACCENT_BAR]: {
-    '--item-radius': '0',
-    '--item-border-width': '0',
+    '--item-radius': RADIUS_MD,
+    '--item-border-width': '0px',
     '--item-accent-width': '2px',
     '--item-accent-color': 'var(--brand-primary)',
     '--item-shadow': 'none',
   },
   [CARD_STYLE.OUTLINED]: {
-    '--item-radius': 'var(--radius-md)',
+    '--item-radius': RADIUS_MD,
     '--item-border-width': '1px',
     '--item-accent-width': '1px',
     '--item-accent-color': BORDER_COLOR,
@@ -155,7 +158,7 @@ export const formatOklchRamp = <TRamp extends TOklchRamp>(
   return Object.fromEntries(
     Object.entries(ramp).map(([property, { l, c, h, alpha }]) => [
       property,
-      alpha === undefined
+      isUndefined(alpha)
         ? `oklch(${l} ${c} ${h ?? hue})`
         : `oklch(${l} ${c} ${h ?? hue} / ${alpha})`,
     ]),
