@@ -2,6 +2,7 @@ import {
   isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
+  type TButtonShape,
   type TCardStyle,
   type TFontChoice,
   type THeaderControlStyle,
@@ -21,6 +22,7 @@ type TThemeTokensRow = {
   density: TDensity;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  buttonShape: TButtonShape;
 };
 
 export const toThemeTokens = (
@@ -31,6 +33,7 @@ export const toThemeTokens = (
     themeTokens: base,
     cardStyle,
     headerControlStyle,
+    buttonShape,
   } = PRESET_REGISTRY[preset];
 
   const requestedAccentHue = row?.accentHue ?? base.accentHue;
@@ -47,5 +50,6 @@ export const toThemeTokens = (
     density: row?.density ?? base.density,
     cardStyle: row?.cardStyle ?? cardStyle,
     headerControlStyle: row?.headerControlStyle ?? headerControlStyle,
+    buttonShape: row?.buttonShape ?? buttonShape,
   };
 };
