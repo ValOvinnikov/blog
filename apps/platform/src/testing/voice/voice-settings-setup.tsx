@@ -120,8 +120,8 @@ export const editVoiceHeadingAndSave = async (
   user: UserEvent,
   text: string,
 ) => {
-  const headingField = notFoundHeadingField();
-  await user.type(headingField, text);
+  await user.click(notFoundHeadingField());
+  await user.paste(text);
 
   const saveBar = screen.getByRole('region', { name: UNSAVED_CHANGES });
   const saveButton = within(saveBar).getByRole('button', {
