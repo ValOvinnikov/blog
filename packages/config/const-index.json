@@ -762,6 +762,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "SEGMENTED_OPTION_WIDTH.WIDE",
+        "scope": "app:platform",
+        "from": "@platform/constants/segmented-control",
+        "file": "apps/platform/src/constants/segmented-control.ts"
       }
     ],
     "ICON": [
@@ -6540,6 +6546,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "FIT": [
+      {
+        "ref": "SEGMENTED_OPTION_WIDTH.FIT",
+        "scope": "app:platform",
+        "from": "@platform/constants/segmented-control",
+        "file": "apps/platform/src/constants/segmented-control.ts"
       }
     ],
     "settings_features.plan_entitlement_rejected": [

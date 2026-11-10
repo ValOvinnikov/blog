@@ -1,10 +1,11 @@
 import { HEADER_CONTROL_STYLE, type THeaderControlStyle } from '@blog/config';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
-import { HeaderControlStyleGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { SEGMENTED_OPTION_WIDTH } from '@platform/constants/segmented-control';
 import { useTranslations } from 'next-intl';
 
 export const HeaderControlStyleField = () => {
@@ -19,7 +20,7 @@ export const HeaderControlStyleField = () => {
     value: style,
     label: t(`headerControlStyleOptionLabel.${style}`),
     description: t(`headerControlStyleOptionDescription.${style}`),
-    glyph: <HeaderControlStyleGlyph style={style} />,
+    glyph: <LookOptionGlyph field="headerControlStyle" value={style} />,
   }));
   const label = t('headerControlStyleLabel');
 
@@ -39,7 +40,7 @@ export const HeaderControlStyleField = () => {
         onChange={(style) => updateField('headerControlStyle', style)}
         isDisabled={lock.isDisabled}
         isLocked={lock.isLocked}
-        hasWideOptions={true}
+        optionWidth={SEGMENTED_OPTION_WIDTH.WIDE}
       />
       <PresetValueButton field="headerControlStyle" fieldLabel={label} />
     </LookField>

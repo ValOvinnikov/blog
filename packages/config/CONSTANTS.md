@@ -561,6 +561,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`
 
+### `@platform/constants/segmented-control` — `apps/platform/src/constants/segmented-control.ts`
+
+- **SEGMENTED_OPTION_WIDTH**: `FIT`, `WIDE`
+
 ### `@platform/constants/select-appearance` — `apps/platform/src/constants/select-appearance.ts`
 
 - **SELECT_APPEARANCE**: `COMPACT`

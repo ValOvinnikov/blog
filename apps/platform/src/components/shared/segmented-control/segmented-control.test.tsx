@@ -26,6 +26,7 @@ const MOCK_BADGE_ID = faker.string.alpha(8);
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_BADGE = faker.lorem.word();
 const MOCK_GLYPH_TEST_ID = faker.string.alpha(8);
+const MOCK_GLYPH_TEXT = faker.lorem.word();
 
 const MOCK_FIRST_OPTION = { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL };
 const MOCK_SECOND_OPTION = {
@@ -331,12 +332,14 @@ describe(`<${SegmentedControl.name}/>`, () => {
     });
   });
 
-  it('draws a glyph inside its option, leaving the option named by its label alone', () => {
+  it('hides a glyph inside its option, even one with text, so the label alone names it', () => {
     setup({
       options: [
         {
           ...MOCK_FIRST_OPTION,
-          glyph: <svg aria-hidden={true} data-testid={MOCK_GLYPH_TEST_ID} />,
+          glyph: (
+            <span data-testid={MOCK_GLYPH_TEST_ID}>{MOCK_GLYPH_TEXT}</span>
+          ),
         },
         MOCK_SECOND_OPTION,
       ],

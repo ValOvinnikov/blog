@@ -59,7 +59,7 @@ import X from '@platform/assets/icons/x.svg';
 import Zap from '@platform/assets/icons/zap.svg';
 import type { FC, SVGProps } from 'react';
 
-type TGlyph = FC<SVGProps<SVGSVGElement>>;
+export type TGlyph = FC<SVGProps<SVGSVGElement>>;
 
 export const ICON_REGISTRY = {
   [ICONS.ARROW]: Arrow,
