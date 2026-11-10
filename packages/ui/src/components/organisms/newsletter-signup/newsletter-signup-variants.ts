@@ -19,10 +19,8 @@ export const newsletterSignupVariants = tv({
     form: ['flex flex-col gap-3'],
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
-    label: ['font-mono text-copy text-text'],
     alert: [],
     errorAlert: [],
-    promptGroup: ['inline-flex shrink-0 items-center gap-1'],
   },
   variants: {
     variant: {
@@ -59,19 +57,16 @@ export const newsletterSignupVariants = tv({
       [CONTENT_ALIGNMENT.LEFT]: {
         pitchPane: ['items-start text-left'],
         trustCues: ['items-start', 'md:justify-start'],
-        promptGroup: ['max-sm:self-start'],
         root: ['sm:mr-auto sm:justify-start'],
       },
       [CONTENT_ALIGNMENT.CENTER]: {
         pitchPane: ['items-center text-center'],
         trustCues: ['items-center', 'md:justify-center'],
-        promptGroup: ['max-sm:self-center'],
         root: ['sm:mx-auto sm:justify-center'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         pitchPane: ['items-end text-right'],
         trustCues: ['items-end', 'md:justify-end'],
-        promptGroup: ['max-sm:self-end'],
         root: ['sm:ml-auto sm:justify-end'],
       },
     },

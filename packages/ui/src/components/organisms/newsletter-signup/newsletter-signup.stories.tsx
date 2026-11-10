@@ -1,4 +1,4 @@
-import { FORM_STATUS } from '@blog/config';
+import { makeNewsletterSignupForm } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -16,36 +16,23 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 /**
- * `NewsletterSignup` exposes two mutually-exclusive densities — `Full` (the
- * rich panel form) and `Compact` (the slim single-row strip) — shown
- * together here. See `Organisms/NewsletterSignup/Full` and
- * `Organisms/NewsletterSignup/Compact` for each density's own controls.
+ * One `NewsletterSignup.Form` placed in each density — `Full` (the rich panel)
+ * and `Compact` (the slim single-row strip). See
+ * `Organisms/NewsletterSignup/Full` and `Organisms/NewsletterSignup/Compact`
+ * for each density's own controls.
  */
 export const Overview: TStory = {
   render: () => (
     <div className="flex flex-col gap-8">
-      <NewsletterSignup.Full
-        email=""
-        onChange={() => {}}
-        onSubmit={() => {}}
-        status={FORM_STATUS.IDLE}
-        heading={faker.lorem.words(3)}
-        supportingText={faker.lorem.sentences(2)}
-        submitLabel={faker.lorem.word()}
-        emailAriaLabel={faker.lorem.words(2)}
-        placeholder={faker.internet.email()}
-      />
-      <NewsletterSignup.Compact
-        email=""
-        onChange={() => {}}
-        onSubmit={() => {}}
-        status={FORM_STATUS.IDLE}
-        heading={faker.lorem.words(3)}
-        prefix={<span aria-hidden="true">$</span>}
-        submitLabel={faker.lorem.word()}
-        emailAriaLabel={faker.lorem.words(2)}
-        placeholder={faker.internet.email()}
-      />
+      <NewsletterSignup.Full supportingText={faker.lorem.sentences(2)}>
+        {makeNewsletterSignupForm({ placeholder: faker.internet.email() })}
+      </NewsletterSignup.Full>
+      <NewsletterSignup.Compact>
+        {makeNewsletterSignupForm({
+          variant: 'compact',
+          placeholder: faker.internet.email(),
+        })}
+      </NewsletterSignup.Compact>
     </div>
   ),
 };

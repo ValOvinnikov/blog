@@ -1,35 +1,34 @@
 import { FORM_STATUS } from '@blog/config';
-import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { renderElement, screen } from '@blog/ui/testing/custom-render';
 import {
   MOCK_NEWSLETTER_BUSY_LABEL,
   MOCK_NEWSLETTER_EMAIL_LABEL,
   MOCK_NEWSLETTER_SUBMIT_LABEL,
-  mockNewsletterSignupArgs,
+  MOCK_NEWSLETTER_SUCCESS_MESSAGE,
+  makeNewsletterSignupForm,
 } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
 
-import { NewsletterSignupContent } from './newsletter-signup-content';
+import { NewsletterSignupForm } from './newsletter-signup-form';
 
 faker.seed(123);
 
-const PROMPT_TEST_ID = 'newsletter-signup-content-prompt';
+const PROMPT_TEST_ID = 'newsletter-signup-input-prompt';
 const ERROR_ICON_TEST_ID = 'alert-icon';
-const MOCK_ERROR_MESSAGE_ID = faker.string.uuid();
 const MOCK_ERROR_MESSAGE = faker.lorem.sentence();
 const MOCK_EMAIL = faker.internet.email();
 const MOCK_CHARACTER = faker.string.alpha(1);
+const DESCRIBED_BY_ATTRIBUTE = 'aria-describedby';
 
-const baseArgs = {
-  ...mockNewsletterSignupArgs(),
-  inputPrompt: <span data-testid={PROMPT_TEST_ID} aria-hidden="true" />,
-  variant: 'full' as const,
-};
+const setup = (...args: Parameters<typeof makeNewsletterSignupForm>) =>
+  renderElement(makeNewsletterSignupForm(...args));
 
-const setup = customRender(NewsletterSignupContent, baseArgs);
+const getEmailField = () =>
+  screen.getByRole('textbox', { name: MOCK_NEWSLETTER_EMAIL_LABEL });
 
-describe(`<${NewsletterSignupContent.name}/>`, () => {
+describe(`<${NewsletterSignupForm.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
@@ -42,21 +41,24 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('renders a labeled email field and submit button', () => {
-      const emailField = screen.getByRole('textbox', {
-        name: MOCK_NEWSLETTER_EMAIL_LABEL,
-      });
       const submitButton = screen.getByRole('button', {
         name: MOCK_NEWSLETTER_SUBMIT_LABEL,
       });
 
-      expect(emailField).toBeVisible();
+      expect(getEmailField()).toBeVisible();
       expect(submitButton).toBeVisible();
     });
 
-    it('renders inputPrompt as the field leading icon', () => {
+    it('renders the chevron icon as the email field prompt', () => {
       const prompt = screen.getByTestId(PROMPT_TEST_ID);
 
       expect(prompt).toBeVisible();
+    });
+
+    it('renders no success message', () => {
+      const message = screen.queryByText(MOCK_NEWSLETTER_SUCCESS_MESSAGE);
+
+      expect(message).not.toBeInTheDocument();
     });
   });
 
@@ -64,9 +66,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     const onChange = vi.fn();
     setup({ onChange });
 
-    const emailField = screen.getByRole('textbox', {
-      name: MOCK_NEWSLETTER_EMAIL_LABEL,
-    });
+    const emailField = getEmailField();
     await user.type(emailField, MOCK_CHARACTER);
 
     expect(onChange).toHaveBeenCalledWith(MOCK_CHARACTER);
@@ -87,11 +87,7 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     {
       name: 'pressing Enter in the field',
       submit: async (user: UserEvent) => {
-        const emailField = screen.getByRole('textbox', {
-          name: MOCK_NEWSLETTER_EMAIL_LABEL,
-        });
-
-        await user.type(emailField, '{Enter}');
+        await user.type(getEmailField(), '{Enter}');
       },
     },
   ])('calls onSubmit when $name', async ({ submit }) => {
@@ -112,14 +108,11 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('locks the field and marks the button busy', () => {
-      const emailField = screen.getByRole('textbox', {
-        name: MOCK_NEWSLETTER_EMAIL_LABEL,
-      });
       const button = screen.getByRole('button', {
         name: MOCK_NEWSLETTER_BUSY_LABEL,
       });
 
-      expect(emailField).toBeDisabled();
+      expect(getEmailField()).toBeDisabled();
       expect(button).toHaveAttribute('aria-busy', 'true');
     });
 
@@ -152,21 +145,14 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
 
   describe('with an error', () => {
     beforeEach(() => {
-      setup({
-        status: FORM_STATUS.ERROR,
-        errorMessage: MOCK_ERROR_MESSAGE,
-        errorMessageId: MOCK_ERROR_MESSAGE_ID,
-      });
+      setup({ status: FORM_STATUS.ERROR, errorMessage: MOCK_ERROR_MESSAGE });
     });
 
     it('surfaces the error message inline and marks the field invalid', () => {
       const message = screen.getByText(MOCK_ERROR_MESSAGE);
-      const emailField = screen.getByRole('textbox', {
-        name: MOCK_NEWSLETTER_EMAIL_LABEL,
-      });
 
       expect(message).toBeVisible();
-      expect(emailField).toHaveAttribute('aria-invalid', 'true');
+      expect(getEmailField()).toHaveAttribute('aria-invalid', 'true');
     });
 
     it('renders the error message without an icon', () => {
@@ -176,20 +162,13 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('describes the email field by the error message', () => {
-      const emailField = screen.getByRole('textbox', {
-        name: MOCK_NEWSLETTER_EMAIL_LABEL,
-      });
-
-      expect(emailField).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
+      expect(getEmailField()).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
     });
   });
 
   describe('without an error status', () => {
     beforeEach(() => {
-      setup({
-        errorMessage: MOCK_ERROR_MESSAGE,
-        errorMessageId: MOCK_ERROR_MESSAGE_ID,
-      });
+      setup({ errorMessage: MOCK_ERROR_MESSAGE });
     });
 
     it('renders no error message', () => {
@@ -199,11 +178,50 @@ describe(`<${NewsletterSignupContent.name}/>`, () => {
     });
 
     it('leaves the email field with no accessible description', () => {
-      const emailField = screen.getByRole('textbox', {
+      expect(getEmailField()).toHaveAccessibleDescription('');
+    });
+  });
+
+  it('describes each email field by its own error when two forms share a page', () => {
+    renderElement(
+      <>
+        {makeNewsletterSignupForm({
+          status: FORM_STATUS.ERROR,
+          errorMessage: MOCK_ERROR_MESSAGE,
+        })}
+        {makeNewsletterSignupForm({
+          status: FORM_STATUS.ERROR,
+          errorMessage: MOCK_ERROR_MESSAGE,
+        })}
+      </>,
+    );
+
+    const [firstField, secondField] = screen.getAllByRole('textbox', {
+      name: MOCK_NEWSLETTER_EMAIL_LABEL,
+    });
+
+    expect(firstField).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
+    expect(secondField).toHaveAccessibleDescription(MOCK_ERROR_MESSAGE);
+    expect(firstField?.getAttribute(DESCRIBED_BY_ATTRIBUTE)).not.toBe(
+      secondField?.getAttribute(DESCRIBED_BY_ATTRIBUTE),
+    );
+  });
+
+  describe('on success', () => {
+    beforeEach(() => {
+      setup({ status: FORM_STATUS.SUCCESS });
+    });
+
+    it('shows the success message in place of the field and button', () => {
+      const message = screen.getByText(MOCK_NEWSLETTER_SUCCESS_MESSAGE);
+      const emailField = screen.queryByRole('textbox', {
         name: MOCK_NEWSLETTER_EMAIL_LABEL,
       });
+      const button = screen.queryByRole('button');
 
-      expect(emailField).toHaveAccessibleDescription('');
+      expect(message).toBeVisible();
+      expect(emailField).not.toBeInTheDocument();
+      expect(button).not.toBeInTheDocument();
     });
   });
 });

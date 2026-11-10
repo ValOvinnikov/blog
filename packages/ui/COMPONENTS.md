@@ -483,12 +483,16 @@ Slots:
 
 ### NewsletterSignup — `components/organisms/newsletter-signup/newsletter-signup.tsx`
 
-A controlled subscribe form in two densities: `Full`, a pitch pane beside the form, and `Compact`, a single-row strip.
+A controlled subscribe form, placed in one of two densities: `Full`, a pitch pane beside the form, or `Compact`, a single-row strip.
 
 Compound component:
 
-- **NewsletterSignup.Full** — A panel that sets a heading, pitch and trust cues beside the subscribe form. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading?: string · headingId?: string · headingLevel?: THeadingLevel · supportingText?: string · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · busyLabel?: string · emailAriaLabel: string · placeholder?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] · busyStyle?: TButtonProps['busyStyle'] · spinnerVariant?: TSpinnerProps['variant'] _(extends IWithClassName, IWithDataTestId)_
-- **NewsletterSignup.Compact** — A single-row subscribe strip with an inline label in place of a heading. Props: email: string · onChange: (value: string) => void · onSubmit: () => void · status: TFormStatus · heading?: string · headingId?: string · prefix?: ReactNode · errorMessage?: string · errorMessageId?: string · successMessage?: string · submitLabel: string · busyLabel?: string · emailAriaLabel: string · placeholder?: string · align?: TNewsletterSignupVariants['align'] · busyStyle?: TButtonProps['busyStyle'] · spinnerVariant?: TSpinnerProps['variant'] _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Full** — A panel that sets a pitch and trust cues beside its `NewsletterSignup.Form`. Props: supportingText?: string · trustCues?: INewsletterSignupTrustCue[] · align?: TNewsletterSignupVariants['align'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Compact** — A single-row strip that holds its `NewsletterSignup.Form`. Props: align?: TNewsletterSignupVariants['align'] · children: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **NewsletterSignup.Form** — A controlled subscribe form that lays out its `Input`, `Submit` and `Status` parts, and gives way to the success message once subscribed. Props: onSubmit: () => void · children?: TCompoundChildren<typeof NewsletterSignupFormParts> _(extends Omit< TNewsletterSignupFormState, 'errorId' >)_
+- **NewsletterSignup.Input** — The email field of a `NewsletterSignup.Form`. Props: emailAriaLabel: string · placeholder?: string · state?: TNewsletterSignupFormState
+- **NewsletterSignup.Submit** — The submit button of a `NewsletterSignup.Form`, busy while it submits. Props: submitLabel: string · busyLabel: string · state?: TNewsletterSignupFormState
+- **NewsletterSignup.Status** — The outcome of a `NewsletterSignup.Form`: an inline error under the field, or the success message that replaces the form. Props: successMessage: string · errorMessage?: string · state?: TNewsletterSignupFormState
 
 ### Pagination — `components/organisms/pagination/pagination.tsx`
 

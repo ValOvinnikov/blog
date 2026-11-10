@@ -74,7 +74,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `packages/studio/src/schema-types/modules/newsletter/newsletter.ts`
 - `packages/service/src/features/modules/newsletter/adaptor/loader.ts`
 - `apps/web/src/modules/newsletter/newsletter-module.tsx`
-- `apps/web/src/components/shared/newsletter-form/newsletter-form.tsx`
+- `apps/web/src/modules/newsletter/components/newsletter-form/newsletter-form.tsx`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`
 - `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts` (built on `apps/web/src/server/rate-limit/public-write-guard/public-write-guard.ts`), `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`, `apps/web/src/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token.ts`
 - `apps/web/src/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions.ts`

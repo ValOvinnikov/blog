@@ -6,7 +6,7 @@ import { userEvent, within } from 'storybook/test';
 import { NewsletterForm } from './newsletter-form';
 
 const meta = {
-  title: 'Components/NewsletterForm',
+  title: 'Modules/NewsletterModule/NewsletterForm',
   component: NewsletterForm,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },

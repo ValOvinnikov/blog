@@ -1,17 +1,4 @@
-import {
-  ALERT_TYPE,
-  ICONS,
-  SIZE,
-  type IWithClassName,
-  type IWithDataTestId,
-  type TFormStatus,
-  FORM_STATUS,
-} from '@blog/config';
-import { Alert } from '@blog/ui/components/atoms/alert';
-import type { TButtonProps } from '@blog/ui/components/atoms/button';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
-import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
+import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
@@ -20,92 +7,22 @@ import type { ReactNode } from 'react';
 
 export type TNewsletterSignupCompactProps = IWithClassName &
   IWithDataTestId & {
-    email: string;
-    onChange: (value: string) => void;
-    onSubmit: () => void;
-    status: TFormStatus;
-    heading?: string;
-    headingId?: string;
-    prefix?: ReactNode;
-    errorMessage?: string;
-    errorMessageId?: string;
-    successMessage?: string;
-    submitLabel: string;
-    busyLabel?: string;
-    emailAriaLabel: string;
-    placeholder?: string;
     align?: TNewsletterSignupVariants['align'];
-    busyStyle?: TButtonProps['busyStyle'];
-    spinnerVariant?: TSpinnerProps['variant'];
+    children: ReactNode;
   };
 
-/** A single-row subscribe strip with an inline label in place of a heading. */
+/** A single-row strip that holds its `NewsletterSignup.Form`. */
 export const NewsletterSignupCompact = ({
-  email,
-  onChange,
-  onSubmit,
-  status,
-  heading,
-  headingId,
-  prefix,
-  errorMessage,
-  errorMessageId,
-  successMessage,
-  submitLabel,
-  busyLabel,
-  emailAriaLabel,
-  placeholder,
   align,
-  busyStyle,
-  spinnerVariant,
+  children,
   className,
   dataTestId,
 }: TNewsletterSignupCompactProps) => {
-  const isSuccess = status === FORM_STATUS.SUCCESS;
   const s = newsletterSignupVariants({ variant: 'compact', align });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
-      {(prefix || heading) && (
-        <span className={s.promptGroup()}>
-          {prefix}
-          {heading && (
-            <span id={headingId} className={s.label()}>
-              {heading}
-            </span>
-          )}
-        </span>
-      )}
-      {isSuccess ? (
-        <Alert
-          type={ALERT_TYPE.SUCCESS}
-          message={successMessage ?? ''}
-          className={s.alert()}
-        />
-      ) : (
-        <NewsletterSignupContent
-          email={email}
-          onChange={onChange}
-          onSubmit={onSubmit}
-          status={status}
-          errorMessage={errorMessage}
-          errorMessageId={errorMessageId}
-          submitLabel={submitLabel}
-          busyLabel={busyLabel}
-          emailAriaLabel={emailAriaLabel}
-          placeholder={placeholder}
-          inputPrompt={
-            <Icon
-              name={ICONS.CHEVRON_RIGHT}
-              size={SIZE.SM}
-              dataTestId="newsletter-signup-input-prompt"
-            />
-          }
-          variant="compact"
-          busyStyle={busyStyle}
-          spinnerVariant={spinnerVariant}
-        />
-      )}
+      {children}
     </div>
   );
 };
