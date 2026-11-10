@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT, NEWSLETTER_VARIANT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -24,14 +24,14 @@ export const newsletterSignupVariants = tv({
   },
   variants: {
     variant: {
-      full: {
+      [NEWSLETTER_VARIANT.FULL]: {
         root: ['w-full', '@container'],
         form: ['@md:flex-row @md:flex-wrap', '@3xl:flex-col @3xl:flex-nowrap'],
         field: ['@md:min-w-0 @md:flex-1', '@3xl:flex-none'],
         submit: ['w-full', '@md:w-auto @md:shrink-0', '@3xl:w-full'],
         errorAlert: ['@md:basis-full', '@3xl:basis-auto'],
       },
-      compact: {
+      [NEWSLETTER_VARIANT.COMPACT]: {
         root: [
           'flex w-full flex-col gap-2',
           'sm:w-fit sm:max-w-full sm:flex-row sm:flex-wrap sm:items-center',
@@ -72,7 +72,7 @@ export const newsletterSignupVariants = tv({
     },
   },
   defaultVariants: {
-    variant: 'full',
+    variant: NEWSLETTER_VARIANT.FULL,
     align: CONTENT_ALIGNMENT.LEFT,
     hasPitch: true,
   },

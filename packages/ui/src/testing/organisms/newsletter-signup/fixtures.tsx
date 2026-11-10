@@ -1,4 +1,4 @@
-import { FORM_STATUS } from '@blog/config';
+import { FORM_STATUS, NEWSLETTER_VARIANT } from '@blog/config';
 import type { TNewsletterSignupFormProps } from '@blog/ui/components/organisms/newsletter-signup/components/form/newsletter-signup-form';
 import type { TNewsletterSignupInputProps } from '@blog/ui/components/organisms/newsletter-signup/components/input/newsletter-signup-input';
 import type { TNewsletterSignupStatusProps } from '@blog/ui/components/organisms/newsletter-signup/components/status/newsletter-signup-status';
@@ -26,7 +26,7 @@ export const makeNewsletterSignupForm = ({
   onChange = () => {},
   onSubmit = () => {},
   status = FORM_STATUS.IDLE,
-  variant = 'full',
+  variant = NEWSLETTER_VARIANT.FULL,
   busyStyle,
   spinnerVariant,
   emailAriaLabel = MOCK_NEWSLETTER_EMAIL_LABEL,

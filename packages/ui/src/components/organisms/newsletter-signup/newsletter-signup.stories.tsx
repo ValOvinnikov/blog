@@ -1,3 +1,4 @@
+import { NEWSLETTER_VARIANT } from '@blog/config';
 import { makeNewsletterSignupForm } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -29,7 +30,7 @@ export const Overview: TStory = {
       </NewsletterSignup.Full>
       <NewsletterSignup.Compact>
         {makeNewsletterSignupForm({
-          variant: 'compact',
+          variant: NEWSLETTER_VARIANT.COMPACT,
           placeholder: faker.internet.email(),
         })}
       </NewsletterSignup.Compact>

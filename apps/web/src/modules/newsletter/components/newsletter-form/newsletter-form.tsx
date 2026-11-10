@@ -3,10 +3,12 @@
 import {
   ACTION_OUTCOME,
   ICONS,
+  NEWSLETTER_VARIANT,
   SIZE,
   type TContentAlignment,
   type TFormStatus,
   type TMaybeUndefined,
+  type TNewsletterVariant,
   FORM_STATUS,
 } from '@blog/config';
 import { isValidEmailAddress } from '@blog/email/validation';
@@ -35,7 +37,7 @@ const ERROR_MESSAGE_KEYS = {
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
 interface INewsletterFormProps {
-  variant: 'full' | 'compact';
+  variant: TNewsletterVariant;
   content?: string;
   trustCues?: string[];
   align?: TContentAlignment;
@@ -109,7 +111,7 @@ export const NewsletterForm = ({
     </NewsletterSignup.Form>
   );
 
-  if (variant === 'compact') {
+  if (variant === NEWSLETTER_VARIANT.COMPACT) {
     return (
       <NewsletterSignup.Compact align={align}>{form}</NewsletterSignup.Compact>
     );

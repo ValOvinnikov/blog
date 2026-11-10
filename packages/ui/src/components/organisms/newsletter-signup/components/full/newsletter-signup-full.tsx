@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  NEWSLETTER_VARIANT,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import { Panel } from '@blog/ui/components/molecules/panel';
 import {
   newsletterSignupVariants,
@@ -31,7 +35,11 @@ export const NewsletterSignupFull = ({
 }: TNewsletterSignupFullProps) => {
   const hasTrustCues = hasArrayGotItems(trustCues);
   const hasPitch = Boolean(supportingText || hasTrustCues);
-  const s = newsletterSignupVariants({ variant: 'full', align, hasPitch });
+  const s = newsletterSignupVariants({
+    variant: NEWSLETTER_VARIANT.FULL,
+    align,
+    hasPitch,
+  });
 
   return (
     <Panel className={s.root({ class: className })} dataTestId={dataTestId}>

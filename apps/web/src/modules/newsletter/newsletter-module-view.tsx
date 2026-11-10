@@ -43,7 +43,7 @@ export const NewsletterModuleView = ({
           variant="section"
         />
         <NewsletterForm
-          variant={isCompact ? 'compact' : 'full'}
+          variant={variant}
           content={content}
           trustCues={trustCues}
           align={contentAlignment}

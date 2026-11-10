@@ -1,4 +1,8 @@
-import { CONTENT_ALIGNMENT, FORM_STATUS } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  FORM_STATUS,
+  NEWSLETTER_VARIANT,
+} from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
@@ -23,7 +27,10 @@ const meta = {
     },
   },
   args: {
-    children: makeNewsletterSignupForm({ variant: 'compact', placeholder }),
+    children: makeNewsletterSignupForm({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+      placeholder,
+    }),
   },
 } satisfies Meta<typeof NewsletterSignup.Compact>;
 
@@ -35,7 +42,7 @@ export const Default: TStory = {};
 export const Submitting: TStory = {
   args: {
     children: makeNewsletterSignupForm({
-      variant: 'compact',
+      variant: NEWSLETTER_VARIANT.COMPACT,
       status: FORM_STATUS.SUBMITTING,
       email: faker.internet.email(),
     }),
@@ -48,7 +55,7 @@ export const SubmittingInEveryBusyStyle: TStory = {
       {BUSY_STYLES.map((busyStyle) => (
         <NewsletterSignup.Compact key={busyStyle} {...args}>
           {makeNewsletterSignupForm({
-            variant: 'compact',
+            variant: NEWSLETTER_VARIANT.COMPACT,
             email: faker.internet.email(),
             status: FORM_STATUS.SUBMITTING,
             busyStyle,
@@ -65,7 +72,7 @@ export const SubmittingInEverySpinnerStyle: TStory = {
       {SPINNER_VARIANTS.map((spinnerVariant) => (
         <NewsletterSignup.Compact key={spinnerVariant} {...args}>
           {makeNewsletterSignupForm({
-            variant: 'compact',
+            variant: NEWSLETTER_VARIANT.COMPACT,
             email: faker.internet.email(),
             status: FORM_STATUS.SUBMITTING,
             spinnerVariant,
@@ -79,7 +86,7 @@ export const SubmittingInEverySpinnerStyle: TStory = {
 export const Success: TStory = {
   args: {
     children: makeNewsletterSignupForm({
-      variant: 'compact',
+      variant: NEWSLETTER_VARIANT.COMPACT,
       status: FORM_STATUS.SUCCESS,
     }),
   },
@@ -88,7 +95,7 @@ export const Success: TStory = {
 export const Error: TStory = {
   args: {
     children: makeNewsletterSignupForm({
-      variant: 'compact',
+      variant: NEWSLETTER_VARIANT.COMPACT,
       status: FORM_STATUS.ERROR,
       email: faker.lorem.word(),
       errorMessage: faker.lorem.sentence(),

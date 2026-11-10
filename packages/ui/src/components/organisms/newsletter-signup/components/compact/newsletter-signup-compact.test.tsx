@@ -1,3 +1,4 @@
+import { NEWSLETTER_VARIANT } from '@blog/config';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import {
   MOCK_NEWSLETTER_EMAIL_LABEL,
@@ -7,7 +8,7 @@ import {
 import { NewsletterSignupCompact } from './newsletter-signup-compact';
 
 const setup = customRender(NewsletterSignupCompact, {
-  children: makeNewsletterSignupForm({ variant: 'compact' }),
+  children: makeNewsletterSignupForm({ variant: NEWSLETTER_VARIANT.COMPACT }),
 });
 
 describe(`<${NewsletterSignupCompact.name}/>`, () => {

@@ -1,4 +1,8 @@
-import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import {
+  NEWSLETTER_VARIANT,
+  type IWithClassName,
+  type IWithDataTestId,
+} from '@blog/config';
 import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
@@ -18,7 +22,10 @@ export const NewsletterSignupCompact = ({
   className,
   dataTestId,
 }: TNewsletterSignupCompactProps) => {
-  const s = newsletterSignupVariants({ variant: 'compact', align });
+  const s = newsletterSignupVariants({
+    variant: NEWSLETTER_VARIANT.COMPACT,
+    align,
+  });
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>
