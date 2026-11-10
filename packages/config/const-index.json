@@ -4566,6 +4566,30 @@
         "file": "apps/platform/src/constants/asset-upload.ts"
       }
     ],
+    "TABLE": [
+      {
+        "ref": "AVATAR_VARIANT.TABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "ACCOUNT": [
+      {
+        "ref": "AVATAR_VARIANT.ACCOUNT",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "SWITCHER": [
+      {
+        "ref": "AVATAR_VARIANT.SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
     "GHOST": [
       {
         "ref": "BUTTON_VARIANT.GHOST",

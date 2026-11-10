@@ -345,6 +345,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ASSET_UPLOAD_LAYOUT**: `FRAMED`, `BARE`
 
+### `@platform/constants/avatar` — `apps/platform/src/constants/avatar.ts`
+
+- **AVATAR_VARIANT**: `TABLE`, `ACCOUNT`, `SWITCHER`
+
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`

@@ -277,10 +277,6 @@
       "SUSPENDED": "Suspendu",
       "ARCHIVED": "Archivé"
     },
-    "plan": {
-      "FREE": "Free",
-      "GROWTH": "Growth"
-    },
     "manage": "Gérer",
     "manageAriaLabel": "Gérer {tenantName}"
   },
@@ -1278,8 +1274,6 @@
     "siteAddressLabel": "Adresse du site",
     "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
     "planLabel": "Formule",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "ownerEmailLabel": "E-mail du propriétaire",
     "ownerEmailHint": "La personne qui gérera ce locataire. Un compte existant obtient l'accès immédiatement ; une nouvelle adresse reçoit une invitation par e-mail pour se connecter.",
     "submitButton": "Lancer le provisionnement",
@@ -1439,8 +1433,6 @@
     "domainLabel": "Domaine principal",
     "ownerEmailLabel": "E-mail du propriétaire",
     "planLabel": "Formule",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "localeLabel": "Langue par défaut",
     "saveButton": "Enregistrer les modifications",
     "savingButton": "Enregistrement…",
@@ -1631,6 +1623,10 @@
     "FR": "Français",
     "DE": "Allemand",
     "ES": "Espagnol"
+  },
+  "planNames": {
+    "FREE": "Free",
+    "GROWTH": "Growth"
   },
   "languagesSettings": {
     "heading": "Langues",
