@@ -14,9 +14,8 @@ export default mergeConfig(
     test: {
       environment: 'node',
       pool: 'threads',
-      // Off so a worker restores PGlite once for every file it runs; the setup file, the preset's reset/restore flags and unstubGlobals undo the module, global and spy state a file leaves behind.
+      // Off so a worker restores PGlite once for every file it runs; the setup file, the preset's reset/restore/unstub flags undo the module, global and spy state a file leaves behind.
       isolate: false,
-      unstubGlobals: true,
       include: ['src/**/*.{test,spec}.ts', 'scripts/**/*.{test,spec}.ts'],
       globalSetup: ['./src/testing/global-setup.ts'],
       setupFiles: [

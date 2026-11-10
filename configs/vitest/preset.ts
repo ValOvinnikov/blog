@@ -25,6 +25,7 @@ const preset = defineConfig({
     css: false,
     mockReset: true,
     restoreMocks: true,
+    unstubGlobals: true,
     unstubEnvs: true,
     reporters: ['default', ['json', { outputFile: '.vitest/timings.json' }]],
     // Vitest's 5000ms default is crossed by real render-work tests (1.3-1.9s)
