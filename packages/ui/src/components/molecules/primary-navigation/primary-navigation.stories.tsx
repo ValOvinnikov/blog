@@ -1,11 +1,11 @@
 import {
   HEADER_SUBMENU_STYLE,
-  NAV_LINK_STYLE,
   NAV_LINK_STYLE_DECLARATIONS,
 } from '@blog/config';
+import { StyleVariants } from '@blog/ui/testing/style-variants';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type CSSProperties, useState } from 'react';
+import { useState } from 'react';
 
 import { PrimaryNavigation } from './primary-navigation';
 
@@ -190,18 +190,18 @@ export const WithSubmenus: TStory = {
 
 export const NavLinkStyles: TStory = {
   render: () => (
-    <div className="flex flex-col gap-8">
-      {Object.values(NAV_LINK_STYLE).map((navLinkStyle) => (
-        <div
-          key={navLinkStyle}
-          className="flex flex-col gap-3"
-          style={NAV_LINK_STYLE_DECLARATIONS[navLinkStyle] as CSSProperties}
-        >
-          <p>{navLinkStyle}</p>
+    <StyleVariants
+      declarations={NAV_LINK_STYLE_DECLARATIONS}
+      className="flex flex-col gap-8"
+      variantClassName="flex flex-col gap-3"
+    >
+      {() => (
+        <>
           <PrimaryNavigation links={linksWithSubItems} />
-        </div>
-      ))}
-    </div>
+          <PrimaryNavigation links={linksWithCurrentSubItem} />
+        </>
+      )}
+    </StyleVariants>
   ),
 };
 

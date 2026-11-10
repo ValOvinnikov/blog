@@ -1,3 +1,5 @@
+import { mapKeysToRecord, objectKeys } from '@blog/utils/primitives';
+
 import {
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
@@ -37,14 +39,14 @@ const STYLE_AXES: {
   },
 };
 
-const STYLE_AXIS_KEYS = Object.keys(STYLE_AXES) as TStyleAxisKey[];
+const STYLE_AXIS_KEYS = objectKeys(STYLE_AXES);
 
 const axisTokens = (axis: TStyleAxis<string>): Set<string> =>
   new Set(Object.values(axis.declarations).flatMap(Object.keys));
 
-const STYLE_AXIS_TOKENS = Object.fromEntries(
-  STYLE_AXIS_KEYS.map((key) => [key, axisTokens(STYLE_AXES[key])]),
-) as Record<TStyleAxisKey, Set<string>>;
+const STYLE_AXIS_TOKENS = mapKeysToRecord(STYLE_AXIS_KEYS, (key) =>
+  axisTokens(STYLE_AXES[key]),
+);
 
 export const findVaryingAxes = (
   tokens: readonly TThemeToken[],

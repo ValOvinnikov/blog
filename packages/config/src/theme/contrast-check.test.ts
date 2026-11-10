@@ -19,11 +19,16 @@ const MOCK_LIGHT_ACCENT_BAR = {
   hue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
 };
 
+const MOCK_TRANSPARENT_FILLS = {
+  ...MOCK_LIGHT_ACCENT_BAR,
+  headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+};
+
 const BRAND_PRIMARY_TOKEN = '--brand-primary';
 const TEXT_TOKEN = '--text';
-const HEADER_CONTROL_FILL_TOKEN = '--header-control-fill';
+const HEADER_CONTROL_FILL_TOKEN = '--header-control-fill' as const;
 const SECONDARY_TOKEN = '--secondary';
-const NAV_LINK_FILL_TOKEN = '--nav-link-fill';
+const NAV_LINK_FILL_TOKEN = '--nav-link-fill' as const;
 
 describe(findContrastFailures, () => {
   it('finds exactly the known failures across every hue, scheme and card style', () => {
@@ -56,13 +61,13 @@ describe(measureContrast, () => {
     ).toBe(measureContrast(TEXT_TOKEN, '--border', MOCK_LIGHT_ACCENT_BAR));
   });
 
-  it('measures a transparent header control against the page background', () => {
-    expect(
-      measureContrast(TEXT_TOKEN, HEADER_CONTROL_FILL_TOKEN, {
-        ...MOCK_LIGHT_ACCENT_BAR,
-        headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
-      }),
-    ).toBe(measureContrast(TEXT_TOKEN, '--primary', MOCK_LIGHT_ACCENT_BAR));
+  it.each([
+    ['header control', HEADER_CONTROL_FILL_TOKEN],
+    ['navigation link', NAV_LINK_FILL_TOKEN],
+  ])('measures a transparent %s against the page background', (_, fill) => {
+    expect(measureContrast(TEXT_TOKEN, fill, MOCK_TRANSPARENT_FILLS)).toBe(
+      measureContrast(TEXT_TOKEN, '--primary', MOCK_LIGHT_ACCENT_BAR),
+    );
   });
 
   it('resolves the navigation link fill from the navigation link style', () => {
@@ -78,12 +83,6 @@ describe(measureContrast, () => {
         MOCK_LIGHT_ACCENT_BAR,
       ),
     );
-  });
-
-  it('measures a plain navigation link against the page background', () => {
-    expect(
-      measureContrast(TEXT_TOKEN, NAV_LINK_FILL_TOKEN, MOCK_LIGHT_ACCENT_BAR),
-    ).toBe(measureContrast(TEXT_TOKEN, '--primary', MOCK_LIGHT_ACCENT_BAR));
   });
 
   it('measures the accent ramp at the hue it is given', () => {

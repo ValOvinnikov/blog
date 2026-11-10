@@ -13,6 +13,8 @@ import {
   type TRadiusScale,
 } from '@blog/config/constants';
 
+import { RADIUS_MD, RADIUS_PILL } from './radius-tokens';
+
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
 export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
@@ -115,7 +117,6 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
 };
 
 const BORDER_COLOR = 'var(--border)';
-export const RADIUS_MD = 'var(--radius-md)';
 
 export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
   [CARD_STYLE.ACCENT_BAR]: {
@@ -158,7 +159,7 @@ export const BUTTON_SHAPE_DECLARATIONS: Record<
 > = {
   [BUTTON_SHAPE.SQUARE]: { '--radius-button': '0' },
   [BUTTON_SHAPE.ROUNDED]: { '--radius-button': 'var(--radius-sm)' },
-  [BUTTON_SHAPE.PILL]: { '--radius-button': '9999px' },
+  [BUTTON_SHAPE.PILL]: { '--radius-button': RADIUS_PILL },
 };
 
 /** A stop without its own `h` takes the tenant's hue. */
