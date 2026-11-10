@@ -5,6 +5,7 @@ export const LOOK_ROW = {
   BRAND: 'BRAND',
   TYPE: 'TYPE',
   SHAPE: 'SHAPE',
+  CARDS: 'CARDS',
   BUTTONS: 'BUTTONS',
   HEADER: 'HEADER',
   FOOTER: 'FOOTER',

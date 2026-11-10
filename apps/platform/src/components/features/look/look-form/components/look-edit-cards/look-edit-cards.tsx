@@ -1,5 +1,6 @@
 import { BrandCard } from '@platform/components/features/look/look-form/components/brand-card';
 import { ButtonsCard } from '@platform/components/features/look/look-form/components/buttons-card';
+import { CardsCard } from '@platform/components/features/look/look-form/components/cards-card';
 import { ColourCard } from '@platform/components/features/look/look-form/components/colour-card';
 import { FooterCard } from '@platform/components/features/look/look-form/components/footer-card';
 import { HeaderCard } from '@platform/components/features/look/look-form/components/header-card';
@@ -49,6 +50,7 @@ export const LookEditCards = ({
         <BrandCard summary={summaries[LOOK_ROW.BRAND]} />
         <TypeCard summary={summaries[LOOK_ROW.TYPE]} />
         <ShapeCard summary={summaries[LOOK_ROW.SHAPE]} />
+        <CardsCard summary={summaries[LOOK_ROW.CARDS]} />
         <ButtonsCard summary={summaries[LOOK_ROW.BUTTONS]} />
       </LookGroup>
       <LookGroup

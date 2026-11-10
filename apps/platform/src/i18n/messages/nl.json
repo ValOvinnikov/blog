@@ -691,7 +691,8 @@
     "jumpIndexAriaLabel": "Look-onderdelen",
     "growthAddsColour": "Een eigen tint voor het logo",
     "growthAddsType": "Lettertypen voor koppen en lopende tekst",
-    "growthAddsShape": "Hoeken, ruimte en kaartstijl",
+    "growthAddsShape": "Hoeken en ruimte",
+    "growthAddsCards": "Kaartstijl",
     "growthAddsButtons": "Bezig-status en spinner",
     "growthAddsHeader": "Indeling, submenu’s, balk, headerknoppen en accountknoppen",
     "growthAddsFooter": "Indeling, achtergrond en vlak",
@@ -724,11 +725,11 @@
     "headingFontLabel": "Koplettertype",
     "bodyFontLabel": "Tekstlettertype",
     "radiusScaleLabel": "Afrondingsschaal",
-    "radiusScaleDescription": "Rondheid van hoeken op elk oppervlak.",
+    "radiusScaleDescription": "Rondt elke kaart, elk paneel, menu, elke tabel en afbeelding af.",
     "densityLabel": "Dichtheid",
     "densityDescription": "Witruimte en grootte van bedieningselementen.",
     "cardStyleLabel": "Kaartstijl",
-    "cardStyleDescription": "Hoe bericht-, onderwerp- en citaatkaarten op de hele site worden omlijst.",
+    "cardStyleDescription": "Omlijst elke inhoudskaart: berichten, onderwerpen, citaten, prijzen, veelgestelde vragen en call-to-actionblokken.",
     "radiusScaleOptionLabel": {
       "SM": "Klein",
       "MD": "Middel",
@@ -742,6 +743,10 @@
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accentbalk",
       "OUTLINED": "Omlijnd"
+    },
+    "cardStyleOptionDescription": {
+      "ACCENT_BAR": "Een balk in de merkkleur aan de linkerrand",
+      "OUTLINED": "Een dunne omlijning rondom"
     },
     "headerControlStyleLabel": "Headerknoppen",
     "headerControlStyleDescription": "De knoppen voor taal, thema, menu en Inloggen, op elk schermformaat.",
@@ -776,8 +781,10 @@
     "colourDescription": "Alleen de tint verandert, zodat tekst leesbaar blijft.",
     "typeHeading": "Lettertype",
     "typeDescription": "Elk lettertype wordt in zijn eigen stijl getoond.",
-    "shapeHeading": "Vorm",
-    "shapeDescription": "Hoeken, ruimte en hoe kaarten zijn omlijst.",
+    "shapeHeading": "Hoeken & ruimte",
+    "cardsHeading": "Kaarten",
+    "shapeDescription": "Hoe rond hoeken zijn en hoeveel ruimte er rond elementen zit, op de hele site.",
+    "cardsDescription": "Hoe inhoudskaarten op de hele site worden omlijst.",
     "headerHeading": "Koptekst",
     "headerDescription": "Hoe de bovenbalk van uw site is ingedeeld en hoe de submenu’s openen.",
     "headerLayoutLabel": "Indeling",
@@ -837,6 +844,7 @@
     },
     "spinnerStyleLabel": "Spinner",
     "spinnerStyleDescription": "De spinner op de knoppen en laadstatussen van uw site.",
+    "spinnerEdgeNote": "Bezige knoppen tonen in deze stijl geen spinner. Meldingen en laadstatussen gebruiken hem nog wel.",
     "spinnerStyleOptionLabel": {
       "BRAILLE": "Braille",
       "RING": "Ring",

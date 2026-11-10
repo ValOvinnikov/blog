@@ -63,7 +63,8 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent',
       [LOOK_ROW.BRAND]: 'Logo uploaded · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
-      [LOOK_ROW.SHAPE]: 'Medium · Default · Accent bar',
+      [LOOK_ROW.SHAPE]: 'Medium · Default',
+      [LOOK_ROW.CARDS]: 'Accent bar',
       [LOOK_ROW.BUTTONS]: 'Busy label · Braille',
       [LOOK_ROW.HEADER]:
         'Classic · Full width · Dropdown · Outlined · Pill with label',
@@ -93,7 +94,7 @@ describe(buildLookRowSummaries, () => {
     expect(summaries[LOOK_ROW.BRAND]).toBe('No logo · Favicon uploaded');
   });
 
-  it('names only the busy style while busy buttons draw a progress edge', () => {
+  it('still names the spinner while busy buttons draw a progress edge', () => {
     const values = {
       ...seedValues(),
       busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
@@ -101,7 +102,7 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.BUTTONS]).toBe('Progress edge');
+    expect(summaries[LOOK_ROW.BUTTONS]).toBe('Progress edge · Braille');
   });
 
   it.each([

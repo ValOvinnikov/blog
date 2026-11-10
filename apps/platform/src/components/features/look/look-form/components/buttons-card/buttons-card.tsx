@@ -14,9 +14,10 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
-import { hasBusySpinner } from '@platform/utils/has-busy-spinner/has-busy-spinner';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
+
+import { SpinnerEdgeNote } from './components/spinner-edge-note/spinner-edge-note';
 
 export type TButtonsCardProps = {
   summary: string;
@@ -70,29 +71,28 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
         />
       </LookField>
 
-      {hasBusySpinner(busyButtonStyle) && (
-        <LookField
+      <LookField
+        field="spinnerStyle"
+        label={spinnerStyleLabel}
+        hint={t('spinnerStyleDescription')}
+        labelId={spinnerLock.labelId}
+        growthBadgeId={spinnerLock.growthBadgeId}
+      >
+        <OptionSelect
+          appearance={SELECT_APPEARANCE.COMPACT}
+          aria={spinnerLock.aria}
+          options={spinnerOptions}
+          value={spinnerStyle}
+          onChange={(style) => updateField('spinnerStyle', style)}
+          isDisabled={spinnerLock.isDisabled}
+          isLocked={spinnerLock.isLocked}
+        />
+        {busyButtonStyle === BUSY_BUTTON_STYLE.EDGE && <SpinnerEdgeNote />}
+        <PresetValueButton
           field="spinnerStyle"
-          label={spinnerStyleLabel}
-          hint={t('spinnerStyleDescription')}
-          labelId={spinnerLock.labelId}
-          growthBadgeId={spinnerLock.growthBadgeId}
-        >
-          <OptionSelect
-            appearance={SELECT_APPEARANCE.COMPACT}
-            aria={spinnerLock.aria}
-            options={spinnerOptions}
-            value={spinnerStyle}
-            onChange={(style) => updateField('spinnerStyle', style)}
-            isDisabled={spinnerLock.isDisabled}
-            isLocked={spinnerLock.isLocked}
-          />
-          <PresetValueButton
-            field="spinnerStyle"
-            fieldLabel={spinnerStyleLabel}
-          />
-        </LookField>
-      )}
+          fieldLabel={spinnerStyleLabel}
+        />
+      </LookField>
     </LookCard>
   );
 };

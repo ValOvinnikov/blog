@@ -691,7 +691,8 @@
     "jumpIndexAriaLabel": "Secciones de Look",
     "growthAddsColour": "Un tono de logotipo propio",
     "growthAddsType": "Fuentes de títulos y de texto",
-    "growthAddsShape": "Esquinas, espaciado y estilo de las tarjetas",
+    "growthAddsShape": "Esquinas y espaciado",
+    "growthAddsCards": "Estilo de tarjeta",
     "growthAddsButtons": "Estado de carga e indicador de progreso",
     "growthAddsHeader": "Diseño, submenús, barra, botones de la cabecera y controles de cuenta",
     "growthAddsFooter": "Diseño, fondo y superficie",
@@ -724,11 +725,11 @@
     "headingFontLabel": "Fuente de títulos",
     "bodyFontLabel": "Fuente del texto",
     "radiusScaleLabel": "Escala de radio",
-    "radiusScaleDescription": "Redondeo de las esquinas en todas las superficies.",
+    "radiusScaleDescription": "Redondea cada tarjeta, panel, menú, tabla e imagen.",
     "densityLabel": "Densidad",
     "densityDescription": "Espaciado y tamaño de los controles.",
     "cardStyleLabel": "Estilo de tarjeta",
-    "cardStyleDescription": "Cómo se enmarcan las tarjetas de entradas, temas y citas en todo el sitio.",
+    "cardStyleDescription": "Enmarca cada tarjeta de contenido: entradas, temas, citas, precios, preguntas frecuentes y cuadros de llamada a la acción.",
     "radiusScaleOptionLabel": {
       "SM": "Pequeño",
       "MD": "Mediano",
@@ -742,6 +743,10 @@
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barra de acento",
       "OUTLINED": "Con contorno"
+    },
+    "cardStyleOptionDescription": {
+      "ACCENT_BAR": "Una barra del color de la marca en el borde izquierdo",
+      "OUTLINED": "Un contorno fino alrededor"
     },
     "headerControlStyleLabel": "Botones de la cabecera",
     "headerControlStyleDescription": "Los botones de idioma, tema, menú e Iniciar sesión, en cualquier tamaño de pantalla.",
@@ -776,8 +781,10 @@
     "colourDescription": "Solo cambia el tono, para que el texto siga siendo legible.",
     "typeHeading": "Tipografía",
     "typeDescription": "Cada fuente se muestra con su propio estilo.",
-    "shapeHeading": "Forma",
-    "shapeDescription": "Esquinas, espaciado y el marco de las tarjetas.",
+    "shapeHeading": "Esquinas y espaciado",
+    "cardsHeading": "Tarjetas",
+    "shapeDescription": "Lo redondeadas que son las esquinas y cuánto espacio rodea a los elementos en todo el sitio.",
+    "cardsDescription": "Cómo se enmarcan las tarjetas de contenido en todo el sitio.",
     "headerHeading": "Cabecera",
     "headerDescription": "Cómo se organiza la barra superior de su sitio y cómo se abren sus submenús.",
     "headerLayoutLabel": "Diseño",
@@ -837,6 +844,7 @@
     },
     "spinnerStyleLabel": "Indicador de carga",
     "spinnerStyleDescription": "El indicador de los botones y de los estados de carga de su sitio.",
+    "spinnerEdgeNote": "En este estilo, los botones ocupados no muestran indicador de carga. Los avisos y los estados de carga siguen usándolo.",
     "spinnerStyleOptionLabel": {
       "BRAILLE": "Braille",
       "RING": "Anillo",

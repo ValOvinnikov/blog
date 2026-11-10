@@ -1,8 +1,6 @@
 import {
-  CARD_STYLE,
   DENSITY,
   RADIUS_SCALE,
-  type TCardStyle,
   type TDensity,
   type TRadiusScale,
 } from '@blog/config';
@@ -24,13 +22,12 @@ export type TShapeCardProps = {
 
 export const ShapeCard = ({ summary }: TShapeCardProps) => {
   const {
-    values: { radiusScale, density, cardStyle },
+    values: { radiusScale, density },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
   const radiusScaleLock = useLookFieldLock('radiusScale');
   const densityLock = useLookFieldLock('density');
-  const cardStyleLock = useLookFieldLock('cardStyle');
   const { lockLine, hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.SHAPE],
   );
@@ -43,13 +40,8 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
     t(`densityOptionLabel.${option}`),
   );
 
-  const cardStyleOptions = toOptions(CARD_STYLE, (style) =>
-    t(`cardStyleOptionLabel.${style}`),
-  );
-
   const radiusScaleLabel = t('radiusScaleLabel');
   const densityLabel = t('densityLabel');
-  const cardStyleLabel = t('cardStyleLabel');
 
   return (
     <LookCard
@@ -95,25 +87,6 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
           isLocked={densityLock.isLocked}
         />
         <PresetValueButton field="density" fieldLabel={densityLabel} />
-      </LookField>
-
-      <LookField
-        field="cardStyle"
-        label={cardStyleLabel}
-        hint={t('cardStyleDescription')}
-        isGroup={true}
-        labelId={cardStyleLock.labelId}
-        growthBadgeId={cardStyleLock.growthBadgeId}
-      >
-        <SegmentedControl<TCardStyle>
-          aria={cardStyleLock.aria}
-          options={cardStyleOptions}
-          value={cardStyle}
-          onChange={(style) => updateField('cardStyle', style)}
-          isDisabled={cardStyleLock.isDisabled}
-          isLocked={cardStyleLock.isLocked}
-        />
-        <PresetValueButton field="cardStyle" fieldLabel={cardStyleLabel} />
       </LookField>
     </LookCard>
   );

@@ -5886,6 +5886,14 @@
         "file": "apps/platform/src/constants/look-row.ts"
       }
     ],
+    "CARDS": [
+      {
+        "ref": "LOOK_ROW.CARDS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-row",
+        "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
     "BUTTONS": [
       {
         "ref": "LOOK_ROW.BUTTONS",

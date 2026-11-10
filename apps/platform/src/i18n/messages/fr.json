@@ -691,7 +691,8 @@
     "jumpIndexAriaLabel": "Sections de Look",
     "growthAddsColour": "Une teinte de logo à part",
     "growthAddsType": "Polices des titres et du texte",
-    "growthAddsShape": "Coins, espacement et style des cartes",
+    "growthAddsShape": "Coins et espacement",
+    "growthAddsCards": "Style de carte",
     "growthAddsButtons": "État de chargement et indicateur de progression",
     "growthAddsHeader": "Mise en page, sous-menus, barre, boutons d'en-tête et commandes du compte",
     "growthAddsFooter": "Mise en page, arrière-plan et surface",
@@ -724,11 +725,11 @@
     "headingFontLabel": "Police des titres",
     "bodyFontLabel": "Police du texte",
     "radiusScaleLabel": "Échelle d'arrondi",
-    "radiusScaleDescription": "Arrondi des angles sur toutes les surfaces.",
+    "radiusScaleDescription": "Arrondit chaque carte, panneau, menu, tableau et image.",
     "densityLabel": "Densité",
     "densityDescription": "Espacement et taille des contrôles.",
     "cardStyleLabel": "Style de carte",
-    "cardStyleDescription": "Comment les cartes d'articles, de thèmes et de citations sont encadrées sur tout le site.",
+    "cardStyleDescription": "Encadre chaque carte de contenu : articles, thèmes, citations, tarifs, questions fréquentes et encadrés d'appel à l'action.",
     "radiusScaleOptionLabel": {
       "SM": "Petit",
       "MD": "Moyen",
@@ -742,6 +743,10 @@
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barre d'accent",
       "OUTLINED": "À contour"
+    },
+    "cardStyleOptionDescription": {
+      "ACCENT_BAR": "Une barre aux couleurs de la marque sur le bord gauche",
+      "OUTLINED": "Un contour fin tout autour"
     },
     "headerControlStyleLabel": "Boutons d'en-tête",
     "headerControlStyleDescription": "Les boutons de langue, de thème, de menu et Se connecter, sur toutes les tailles d'écran.",
@@ -776,8 +781,10 @@
     "colourDescription": "Seule la teinte change, pour que le texte reste lisible.",
     "typeHeading": "Typographie",
     "typeDescription": "Chaque police s'affiche dans son propre style.",
-    "shapeHeading": "Forme",
-    "shapeDescription": "Coins, espacement et encadrement des cartes.",
+    "shapeHeading": "Coins et espacement",
+    "cardsHeading": "Cartes",
+    "shapeDescription": "L'arrondi des coins et l'espace autour des éléments, sur tout le site.",
+    "cardsDescription": "Comment les cartes de contenu sont encadrées sur tout le site.",
     "headerHeading": "En-tête",
     "headerDescription": "Comment la barre du haut de votre site est organisée et comment ses sous-menus s’ouvrent.",
     "headerLayoutLabel": "Disposition",
@@ -837,6 +844,7 @@
     },
     "spinnerStyleLabel": "Indicateur de chargement",
     "spinnerStyleDescription": "L'indicateur sur les boutons et les états de chargement de votre site.",
+    "spinnerEdgeNote": "Dans ce style, les boutons occupés n'affichent pas d'indicateur. Les notifications et les états de chargement l'utilisent toujours.",
     "spinnerStyleOptionLabel": {
       "BRAILLE": "Braille",
       "RING": "Anneau",
