@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 import {
+  type TThemeDeclarations,
   type TThemeTokens,
   BUTTON_SHAPE,
   BUTTON_SHAPE_DECLARATIONS,
@@ -11,6 +12,8 @@ import {
   DENSITY_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
+  NAV_LINK_STYLE,
+  NAV_LINK_STYLE_DECLARATIONS,
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
@@ -75,6 +78,7 @@ const DARK_EXCLUDED_PREFIXES = [
   '--spacing-',
   '--item-',
   '--header-control-',
+  '--nav-link-',
   '--scrim-',
   '--on-image',
 ];
@@ -83,6 +87,14 @@ const splitModes = (css: string) => ({
   root: css.slice(0, css.indexOf(DARK_SELECTOR)),
   dark: css.slice(css.indexOf(DARK_SELECTOR)),
 });
+
+const missingDeclarations = (
+  css: string,
+  declarations: TThemeDeclarations,
+): string[] =>
+  Object.entries(declarations)
+    .map(([property, value]) => `${property}: ${value};`)
+    .filter((declaration) => !css.includes(declaration));
 
 const readPixels = (css: string, token: string): number =>
   Number(css.match(new RegExp(`${token}: (\\d+)px;`))?.[1]);
@@ -135,6 +147,12 @@ describe(buildThemeStyleBlock, () => {
         group: 'header control tokens',
         source: THEME_ROOT_BLOCK,
         names: 'header-control-[\\w-]+',
+        scope: 'root' as const,
+      },
+      {
+        group: 'navigation link tokens',
+        source: THEME_ROOT_BLOCK,
+        names: 'nav-link-[\\w-]+',
         scope: 'root' as const,
       },
     ])('reproduces the $group', ({ source, names, scope }) => {
@@ -234,11 +252,9 @@ describe(buildThemeStyleBlock, () => {
         buildThemeStyleBlock({ ...CONSOLE_TOKENS, cardStyle }),
       );
 
-      const missing = Object.entries(CARD_STYLE_DECLARATIONS[cardStyle])
-        .map(([property, value]) => `${property}: ${value};`)
-        .filter((declaration) => !root.includes(declaration));
-
-      expect(missing).toEqual([]);
+      expect(
+        missingDeclarations(root, CARD_STYLE_DECLARATIONS[cardStyle]),
+      ).toEqual([]);
     },
   );
 
@@ -259,13 +275,12 @@ describe(buildThemeStyleBlock, () => {
         buildThemeStyleBlock({ ...CONSOLE_TOKENS, headerControlStyle }),
       );
 
-      const missing = Object.entries(
-        HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
-      )
-        .map(([property, value]) => `${property}: ${value};`)
-        .filter((declaration) => !root.includes(declaration));
-
-      expect(missing).toEqual([]);
+      expect(
+        missingDeclarations(
+          root,
+          HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+        ),
+      ).toEqual([]);
     },
   );
 
@@ -286,11 +301,32 @@ describe(buildThemeStyleBlock, () => {
         buildThemeStyleBlock({ ...CONSOLE_TOKENS, buttonShape }),
       );
 
-      const missing = Object.entries(BUTTON_SHAPE_DECLARATIONS[buttonShape])
-        .map(([property, value]) => `${property}: ${value};`)
-        .filter((declaration) => !root.includes(declaration));
+      expect(
+        missingDeclarations(root, BUTTON_SHAPE_DECLARATIONS[buttonShape]),
+      ).toEqual([]);
+    },
+  );
 
-      expect(missing).toEqual([]);
+  it('defaults to the plain navigation link style', () => {
+    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+    const plainCss = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      navLinkStyle: NAV_LINK_STYLE.PLAIN,
+    });
+
+    expect(defaultCss).toBe(plainCss);
+  });
+
+  it.each(Object.values(NAV_LINK_STYLE))(
+    'writes the %s navigation link style into the :root block that sets the radius scale',
+    (navLinkStyle) => {
+      const { root } = splitModes(
+        buildThemeStyleBlock({ ...CONSOLE_TOKENS, navLinkStyle }),
+      );
+
+      expect(
+        missingDeclarations(root, NAV_LINK_STYLE_DECLARATIONS[navLinkStyle]),
+      ).toEqual([]);
     },
   );
 
