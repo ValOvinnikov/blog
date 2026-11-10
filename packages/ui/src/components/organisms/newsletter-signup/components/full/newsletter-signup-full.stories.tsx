@@ -2,8 +2,8 @@ import { FORM_STATUS, CONTENT_ALIGNMENT, ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
-import { HEADING_LEVELS } from '@blog/ui/lib/react';
 import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
+import { makeNewsletterSignupForm } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -21,6 +21,8 @@ const trustCues = [
   },
 ];
 
+const placeholder = faker.internet.email();
+
 const meta = {
   title: 'Organisms/NewsletterSignup/Full',
   component: NewsletterSignup.Full,
@@ -31,28 +33,10 @@ const meta = {
       control: 'select',
       options: objectKeys(newsletterSignupVariants.variants.align),
     },
-    status: {
-      control: 'select',
-      options: Object.values(FORM_STATUS),
-    },
-    headingLevel: {
-      control: 'select',
-      options: HEADING_LEVELS,
-    },
   },
   args: {
-    email: '',
-    onChange: () => {},
-    onSubmit: () => {},
-    status: FORM_STATUS.IDLE,
-    heading: faker.lorem.words(3),
-    headingId: 'newsletter-signup-full-heading',
     supportingText: faker.lorem.sentences(2),
-    submitLabel: faker.lorem.word(),
-    busyLabel: faker.lorem.words(2),
-    emailAriaLabel: faker.lorem.words(2),
-    placeholder: faker.internet.email(),
-    successMessage: faker.lorem.sentence(),
+    children: makeNewsletterSignupForm({ placeholder }),
   },
 } satisfies Meta<typeof NewsletterSignup.Full>;
 
@@ -62,20 +46,25 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Submitting: TStory = {
-  args: { status: FORM_STATUS.SUBMITTING, email: faker.internet.email() },
+  args: {
+    children: makeNewsletterSignupForm({
+      status: FORM_STATUS.SUBMITTING,
+      email: faker.internet.email(),
+    }),
+  },
 };
 
 export const SubmittingInEveryBusyStyle: TStory = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       {BUSY_STYLES.map((busyStyle) => (
-        <NewsletterSignup.Full
-          key={busyStyle}
-          {...args}
-          email={faker.internet.email()}
-          status={FORM_STATUS.SUBMITTING}
-          busyStyle={busyStyle}
-        />
+        <NewsletterSignup.Full key={busyStyle} {...args}>
+          {makeNewsletterSignupForm({
+            email: faker.internet.email(),
+            status: FORM_STATUS.SUBMITTING,
+            busyStyle,
+          })}
+        </NewsletterSignup.Full>
       ))}
     </div>
   ),
@@ -85,28 +74,29 @@ export const SubmittingInEverySpinnerStyle: TStory = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       {SPINNER_VARIANTS.map((spinnerVariant) => (
-        <NewsletterSignup.Full
-          key={spinnerVariant}
-          {...args}
-          email={faker.internet.email()}
-          status={FORM_STATUS.SUBMITTING}
-          spinnerVariant={spinnerVariant}
-        />
+        <NewsletterSignup.Full key={spinnerVariant} {...args}>
+          {makeNewsletterSignupForm({
+            email: faker.internet.email(),
+            status: FORM_STATUS.SUBMITTING,
+            spinnerVariant,
+          })}
+        </NewsletterSignup.Full>
       ))}
     </div>
   ),
 };
 
 export const Success: TStory = {
-  args: { status: FORM_STATUS.SUCCESS },
+  args: { children: makeNewsletterSignupForm({ status: FORM_STATUS.SUCCESS }) },
 };
 
 export const Error: TStory = {
   args: {
-    status: FORM_STATUS.ERROR,
-    email: faker.lorem.word(),
-    errorMessage: faker.lorem.sentence(),
-    errorMessageId: 'newsletter-signup-full-error',
+    children: makeNewsletterSignupForm({
+      status: FORM_STATUS.ERROR,
+      email: faker.lorem.word(),
+      errorMessage: faker.lorem.sentence(),
+    }),
   },
 };
 
@@ -114,12 +104,12 @@ export const WithTrustCues: TStory = {
   args: { trustCues },
 };
 
-export const WithoutHeading: TStory = {
-  args: { heading: undefined, supportingText: undefined, trustCues },
+export const WithoutSupportingText: TStory = {
+  args: { supportingText: undefined, trustCues },
 };
 
 export const FormOnly: TStory = {
-  args: { heading: undefined, supportingText: undefined },
+  args: { supportingText: undefined },
 };
 
 export const Centered: TStory = {

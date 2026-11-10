@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT, NEWSLETTER_VARIANT } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
@@ -19,21 +19,19 @@ export const newsletterSignupVariants = tv({
     form: ['flex flex-col gap-3'],
     field: [],
     submit: ['inline-flex items-center justify-center gap-2'],
-    label: ['font-mono text-copy text-text'],
     alert: [],
     errorAlert: [],
-    promptGroup: ['inline-flex shrink-0 items-center gap-1'],
   },
   variants: {
     variant: {
-      full: {
+      [NEWSLETTER_VARIANT.FULL]: {
         root: ['w-full', '@container'],
         form: ['@md:flex-row @md:flex-wrap', '@3xl:flex-col @3xl:flex-nowrap'],
         field: ['@md:min-w-0 @md:flex-1', '@3xl:flex-none'],
         submit: ['w-full', '@md:w-auto @md:shrink-0', '@3xl:w-full'],
         errorAlert: ['@md:basis-full', '@3xl:basis-auto'],
       },
-      compact: {
+      [NEWSLETTER_VARIANT.COMPACT]: {
         root: [
           'flex w-full flex-col gap-2',
           'sm:w-fit sm:max-w-full sm:flex-row sm:flex-wrap sm:items-center',
@@ -59,25 +57,22 @@ export const newsletterSignupVariants = tv({
       [CONTENT_ALIGNMENT.LEFT]: {
         pitchPane: ['items-start text-left'],
         trustCues: ['items-start', 'md:justify-start'],
-        promptGroup: ['max-sm:self-start'],
         root: ['sm:mr-auto sm:justify-start'],
       },
       [CONTENT_ALIGNMENT.CENTER]: {
         pitchPane: ['items-center text-center'],
         trustCues: ['items-center', 'md:justify-center'],
-        promptGroup: ['max-sm:self-center'],
         root: ['sm:mx-auto sm:justify-center'],
       },
       [CONTENT_ALIGNMENT.RIGHT]: {
         pitchPane: ['items-end text-right'],
         trustCues: ['items-end', 'md:justify-end'],
-        promptGroup: ['max-sm:self-end'],
         root: ['sm:ml-auto sm:justify-end'],
       },
     },
   },
   defaultVariants: {
-    variant: 'full',
+    variant: NEWSLETTER_VARIANT.FULL,
     align: CONTENT_ALIGNMENT.LEFT,
     hasPitch: true,
   },

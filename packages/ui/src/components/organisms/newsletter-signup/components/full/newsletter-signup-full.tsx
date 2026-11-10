@@ -1,24 +1,14 @@
 import {
-  ALERT_TYPE,
-  ICONS,
-  SIZE,
+  NEWSLETTER_VARIANT,
   type IWithClassName,
   type IWithDataTestId,
-  type TFormStatus,
-  FORM_STATUS,
 } from '@blog/config';
-import { Alert } from '@blog/ui/components/atoms/alert';
-import type { TButtonProps } from '@blog/ui/components/atoms/button';
-import { Heading } from '@blog/ui/components/atoms/heading';
-import { Icon } from '@blog/ui/components/atoms/icon';
-import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
 import { Panel } from '@blog/ui/components/molecules/panel';
-import { NewsletterSignupContent } from '@blog/ui/components/organisms/newsletter-signup/components/content/newsletter-signup-content';
 import {
   newsletterSignupVariants,
   type TNewsletterSignupVariants,
 } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
-import type { THeadingLevel } from '@blog/ui/lib/react';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import type { ReactNode } from 'react';
 
 export interface INewsletterSignupTrustCue {
@@ -28,66 +18,34 @@ export interface INewsletterSignupTrustCue {
 
 export type TNewsletterSignupFullProps = IWithClassName &
   IWithDataTestId & {
-    email: string;
-    onChange: (value: string) => void;
-    onSubmit: () => void;
-    status: TFormStatus;
-    heading?: string;
-    headingId?: string;
-    headingLevel?: THeadingLevel;
     supportingText?: string;
-    errorMessage?: string;
-    errorMessageId?: string;
-    successMessage?: string;
-    submitLabel: string;
-    busyLabel?: string;
-    emailAriaLabel: string;
-    placeholder?: string;
     trustCues?: INewsletterSignupTrustCue[];
     align?: TNewsletterSignupVariants['align'];
-    busyStyle?: TButtonProps['busyStyle'];
-    spinnerVariant?: TSpinnerProps['variant'];
+    children: ReactNode;
   };
 
-/** A panel that sets a heading, pitch and trust cues beside the subscribe form. */
+/** A panel that sets a pitch and trust cues beside its `NewsletterSignup.Form`. */
 export const NewsletterSignupFull = ({
-  email,
-  onChange,
-  onSubmit,
-  status,
-  heading,
-  headingId,
-  headingLevel = 2,
   supportingText,
-  errorMessage,
-  errorMessageId,
-  successMessage,
-  submitLabel,
-  busyLabel,
-  emailAriaLabel,
-  placeholder,
   trustCues,
   align,
-  busyStyle,
-  spinnerVariant,
+  children,
   className,
   dataTestId,
 }: TNewsletterSignupFullProps) => {
-  const isSuccess = status === FORM_STATUS.SUCCESS;
-  const hasTrustCues = trustCues !== undefined && trustCues.length > 0;
-  const hasPitch = Boolean(heading || supportingText || hasTrustCues);
-  const s = newsletterSignupVariants({ variant: 'full', align, hasPitch });
+  const hasTrustCues = hasArrayGotItems(trustCues);
+  const hasPitch = Boolean(supportingText || hasTrustCues);
+  const s = newsletterSignupVariants({
+    variant: NEWSLETTER_VARIANT.FULL,
+    align,
+    hasPitch,
+  });
 
   return (
     <Panel className={s.root({ class: className })} dataTestId={dataTestId}>
       <Panel.Body className={s.body()}>
         {hasPitch && (
           <div className={s.pitchPane()}>
-            {heading && (
-              <Heading level={headingLevel} visual="card" id={headingId}>
-                {heading}
-              </Heading>
-            )}
             {supportingText && (
               <p className={s.supportingText()}>{supportingText}</p>
             )}
@@ -105,34 +63,7 @@ export const NewsletterSignupFull = ({
             )}
           </div>
         )}
-        <div className={s.formPane()}>
-          {isSuccess ? (
-            <Alert type={ALERT_TYPE.SUCCESS} message={successMessage ?? ''} />
-          ) : (
-            <NewsletterSignupContent
-              email={email}
-              onChange={onChange}
-              onSubmit={onSubmit}
-              status={status}
-              errorMessage={errorMessage}
-              errorMessageId={errorMessageId}
-              submitLabel={submitLabel}
-              busyLabel={busyLabel}
-              emailAriaLabel={emailAriaLabel}
-              placeholder={placeholder}
-              inputPrompt={
-                <Icon
-                  name={ICONS.CHEVRON_RIGHT}
-                  size={SIZE.SM}
-                  dataTestId="newsletter-signup-input-prompt"
-                />
-              }
-              variant="full"
-              busyStyle={busyStyle}
-              spinnerVariant={spinnerVariant}
-            />
-          )}
-        </div>
+        <div className={s.formPane()}>{children}</div>
       </Panel.Body>
     </Panel>
   );

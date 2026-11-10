@@ -1,9 +1,9 @@
 import { NEWSLETTER_VARIANT } from '@blog/config';
 import type { TNewsletterModule } from '@blog/service';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { NewsletterForm } from '@web/components/shared/newsletter-form';
 import { NewsletterSubscribedGate } from '@web/components/shared/newsletter-subscribed-gate';
 import { Section } from '@web/components/shared/section';
+import { NewsletterForm } from '@web/modules/newsletter/components/newsletter-form/newsletter-form';
 import { useId } from 'react';
 
 export interface INewsletterModuleViewProps extends TNewsletterModule {
@@ -43,7 +43,7 @@ export const NewsletterModuleView = ({
           variant="section"
         />
         <NewsletterForm
-          variant={isCompact ? 'compact' : 'full'}
+          variant={variant}
           content={content}
           trustCues={trustCues}
           align={contentAlignment}

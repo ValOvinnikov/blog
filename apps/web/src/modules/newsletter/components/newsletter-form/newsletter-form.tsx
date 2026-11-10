@@ -3,11 +3,12 @@
 import {
   ACTION_OUTCOME,
   ICONS,
-  type IWithClassName,
+  NEWSLETTER_VARIANT,
   SIZE,
   type TContentAlignment,
   type TFormStatus,
   type TMaybeUndefined,
+  type TNewsletterVariant,
   FORM_STATUS,
   isOutcomeSuccess,
 } from '@blog/config';
@@ -21,7 +22,7 @@ import {
   type TSubscribeResult,
 } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useState } from 'react';
 
 const ERROR_MESSAGE_KEYS = {
   [NEWSLETTER_OUTCOME.ALREADY_SUBSCRIBED]: 'errorAlreadySubscribed',
@@ -36,27 +37,25 @@ const ERROR_MESSAGE_KEYS = {
 
 const TRUST_CUE_ICONS = [ICONS.SHIELD_CHECK, ICONS.CLOSE];
 
-type TNewsletterFormProps = IWithClassName & {
-  variant: 'full' | 'compact';
+interface INewsletterFormProps {
+  variant: TNewsletterVariant;
   content?: string;
   trustCues?: string[];
   align?: TContentAlignment;
-};
+}
 
 export const NewsletterForm = ({
   variant,
   content,
   trustCues,
   align,
-  className,
-}: TNewsletterFormProps) => {
+}: INewsletterFormProps) => {
   const t = useTranslations('newsletterForm');
   const { busyStyle, spinnerVariant } = useBusyStyle();
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<TFormStatus>(FORM_STATUS.IDLE);
   const [errorMessage, setErrorMessage] =
     useState<TMaybeUndefined<string>>(undefined);
-  const errorMessageId = useId();
 
   const handleEmailChange = (value: string) => {
     setEmail(value);
@@ -88,26 +87,35 @@ export const NewsletterForm = ({
     setErrorMessage(t(ERROR_MESSAGE_KEYS[result.outcome]));
   };
 
-  const sharedProps = {
-    email,
-    onChange: handleEmailChange,
-    onSubmit: handleSubmit,
-    status,
-    errorMessage,
-    errorMessageId,
-    successMessage: t('successMessage'),
-    submitLabel: t('submitLabel'),
-    busyLabel: t('submittingLabel'),
-    busyStyle,
-    spinnerVariant,
-    emailAriaLabel: t('emailAriaLabel'),
-    placeholder: t('placeholder'),
-    align,
-    className,
-  };
+  const form = (
+    <NewsletterSignup.Form
+      email={email}
+      onChange={handleEmailChange}
+      onSubmit={handleSubmit}
+      status={status}
+      variant={variant}
+      busyStyle={busyStyle}
+      spinnerVariant={spinnerVariant}
+    >
+      <NewsletterSignup.Input
+        emailAriaLabel={t('emailAriaLabel')}
+        placeholder={t('placeholder')}
+      />
+      <NewsletterSignup.Submit
+        submitLabel={t('submitLabel')}
+        busyLabel={t('submittingLabel')}
+      />
+      <NewsletterSignup.Status
+        successMessage={t('successMessage')}
+        errorMessage={errorMessage}
+      />
+    </NewsletterSignup.Form>
+  );
 
-  if (variant === 'compact') {
-    return <NewsletterSignup.Compact {...sharedProps} />;
+  if (variant === NEWSLETTER_VARIANT.COMPACT) {
+    return (
+      <NewsletterSignup.Compact align={align}>{form}</NewsletterSignup.Compact>
+    );
   }
 
   const trustCueItems = trustCues?.map((label, index) => ({
@@ -122,9 +130,11 @@ export const NewsletterForm = ({
 
   return (
     <NewsletterSignup.Full
-      {...sharedProps}
       supportingText={content}
       trustCues={trustCueItems}
-    />
+      align={align}
+    >
+      {form}
+    </NewsletterSignup.Full>
   );
 };

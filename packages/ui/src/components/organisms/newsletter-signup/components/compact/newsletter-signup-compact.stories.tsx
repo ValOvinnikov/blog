@@ -1,12 +1,19 @@
-import { CONTENT_ALIGNMENT, FORM_STATUS } from '@blog/config';
+import {
+  CONTENT_ALIGNMENT,
+  FORM_STATUS,
+  NEWSLETTER_VARIANT,
+} from '@blog/config';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup';
 import { newsletterSignupVariants } from '@blog/ui/components/organisms/newsletter-signup/newsletter-signup-variants';
 import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
+import { makeNewsletterSignupForm } from '@blog/ui/testing/organisms/newsletter-signup/fixtures';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 faker.seed(123);
+
+const placeholder = faker.internet.email();
 
 const meta = {
   title: 'Organisms/NewsletterSignup/Compact',
@@ -14,30 +21,16 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
   argTypes: {
-    status: {
-      control: 'select',
-      options: Object.values(FORM_STATUS),
-    },
     align: {
       control: 'select',
       options: objectKeys(newsletterSignupVariants.variants.align),
     },
-    busyStyle: { control: 'select', options: BUSY_STYLES },
-    spinnerVariant: { control: 'select', options: SPINNER_VARIANTS },
   },
   args: {
-    email: '',
-    onChange: () => {},
-    onSubmit: () => {},
-    status: FORM_STATUS.IDLE,
-    heading: faker.lorem.words(2),
-    headingId: 'newsletter-signup-compact-heading',
-    prefix: <span aria-hidden="true">$</span>,
-    submitLabel: faker.lorem.word(),
-    busyLabel: faker.lorem.words(2),
-    emailAriaLabel: faker.lorem.words(2),
-    placeholder: faker.internet.email(),
-    successMessage: faker.lorem.sentence(),
+    children: makeNewsletterSignupForm({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+      placeholder,
+    }),
   },
 } satisfies Meta<typeof NewsletterSignup.Compact>;
 
@@ -47,20 +40,27 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Submitting: TStory = {
-  args: { status: FORM_STATUS.SUBMITTING, email: faker.internet.email() },
+  args: {
+    children: makeNewsletterSignupForm({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+      status: FORM_STATUS.SUBMITTING,
+      email: faker.internet.email(),
+    }),
+  },
 };
 
 export const SubmittingInEveryBusyStyle: TStory = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       {BUSY_STYLES.map((busyStyle) => (
-        <NewsletterSignup.Compact
-          key={busyStyle}
-          {...args}
-          email={faker.internet.email()}
-          status={FORM_STATUS.SUBMITTING}
-          busyStyle={busyStyle}
-        />
+        <NewsletterSignup.Compact key={busyStyle} {...args}>
+          {makeNewsletterSignupForm({
+            variant: NEWSLETTER_VARIANT.COMPACT,
+            email: faker.internet.email(),
+            status: FORM_STATUS.SUBMITTING,
+            busyStyle,
+          })}
+        </NewsletterSignup.Compact>
       ))}
     </div>
   ),
@@ -70,33 +70,37 @@ export const SubmittingInEverySpinnerStyle: TStory = {
   render: (args) => (
     <div className="flex flex-col gap-4">
       {SPINNER_VARIANTS.map((spinnerVariant) => (
-        <NewsletterSignup.Compact
-          key={spinnerVariant}
-          {...args}
-          email={faker.internet.email()}
-          status={FORM_STATUS.SUBMITTING}
-          spinnerVariant={spinnerVariant}
-        />
+        <NewsletterSignup.Compact key={spinnerVariant} {...args}>
+          {makeNewsletterSignupForm({
+            variant: NEWSLETTER_VARIANT.COMPACT,
+            email: faker.internet.email(),
+            status: FORM_STATUS.SUBMITTING,
+            spinnerVariant,
+          })}
+        </NewsletterSignup.Compact>
       ))}
     </div>
   ),
 };
 
 export const Success: TStory = {
-  args: { status: FORM_STATUS.SUCCESS },
+  args: {
+    children: makeNewsletterSignupForm({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+      status: FORM_STATUS.SUCCESS,
+    }),
+  },
 };
 
 export const Error: TStory = {
   args: {
-    status: FORM_STATUS.ERROR,
-    email: faker.lorem.word(),
-    errorMessage: faker.lorem.sentence(),
-    errorMessageId: 'newsletter-signup-compact-error',
+    children: makeNewsletterSignupForm({
+      variant: NEWSLETTER_VARIANT.COMPACT,
+      status: FORM_STATUS.ERROR,
+      email: faker.lorem.word(),
+      errorMessage: faker.lorem.sentence(),
+    }),
   },
-};
-
-export const WithoutPrefix: TStory = {
-  args: { prefix: undefined },
 };
 
 export const Centered: TStory = {
@@ -126,8 +130,4 @@ export const MobilePhone: TStory = {
       </div>
     ),
   ],
-};
-
-export const WithoutHeading: TStory = {
-  args: { heading: undefined, prefix: undefined },
 };

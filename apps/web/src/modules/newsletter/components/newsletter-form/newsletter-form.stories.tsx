@@ -1,4 +1,4 @@
-import { CONTENT_ALIGNMENT } from '@blog/config';
+import { CONTENT_ALIGNMENT, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
@@ -6,7 +6,7 @@ import { userEvent, within } from 'storybook/test';
 import { NewsletterForm } from './newsletter-form';
 
 const meta = {
-  title: 'Components/NewsletterForm',
+  title: 'Modules/NewsletterModule/NewsletterForm',
   component: NewsletterForm,
   tags: ['autodocs'],
   parameters: { layout: 'padded' },
@@ -17,7 +17,7 @@ const meta = {
     },
   },
   args: {
-    variant: 'full',
+    variant: NEWSLETTER_VARIANT.FULL,
     content: faker.lorem.sentences(2),
     trustCues: [faker.lorem.words(2), faker.lorem.words(3)],
   },
@@ -29,7 +29,7 @@ type TStory = StoryObj<typeof meta>;
 export const Full: TStory = {};
 
 export const Compact: TStory = {
-  args: { variant: 'compact' },
+  args: { variant: NEWSLETTER_VARIANT.COMPACT },
 };
 
 /**

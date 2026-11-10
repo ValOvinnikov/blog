@@ -147,12 +147,18 @@ link inside `MediaCard.Title`.
 ## Namespaced alternatives (no slot resolution)
 
 Some organisms export **mutually exclusive alternatives** that never render
-together — `NewsletterSignup.Full` / `.Compact`, two densities of one form. The
-export is a plain object literal (`{ Full: NewsletterSignupFull, Compact:
-NewsletterSignupCompact }`): no `Object.assign`, no `children` to resolve.
+together — `NewsletterSignup.Full` / `.Compact`, two densities around one form.
+The export is a plain object literal (`{ Full: NewsletterSignupFull, Compact:
+NewsletterSignupCompact, Form: NewsletterSignupForm, … }`): no
+`Object.assign`, and the alternatives resolve no slots.
 
-- Each alternative, and any partial they share (`components/content/`), gets
-  its own `components/<name>/` folder beside the root file.
+- What the alternatives share is a public part they each place, never a
+  private partial: `Full` and `Compact` take `NewsletterSignup.Form` as
+  `children` and keep only what they render around it. `Form` is itself a slot
+  compound (`Input`, `Submit`, `Status`, sat beside it on the namespace) that
+  resolves its parts with `mapCompoundSlots`.
+- Each alternative, and each part they share, gets its own
+  `components/<name>/` folder beside the root file.
 - A `tv()` the alternatives share on one `variant` axis stays a single root
   `newsletter-signup-variants.ts` — it has several consumers
   (`react-component-practices` § Styling files).
@@ -160,8 +166,10 @@ NewsletterSignupCompact }`): no `Object.assign`, no `children` to resolve.
   (`<NewsletterSignup.Full>`), so the barrel exports its props type and it
   gets its own story and test in its folder
   (`components/full/newsletter-signup-full.stories.tsx` + `.test.tsx`). The
-  root `.test.tsx` / `.stories.tsx` keep only what exercises the assembled
-  namespace (which alternative each key wires to, an overview of both); delete
-  them once nothing like that remains.
+  shared part's behaviour is tested once, in its own folder
+  (`components/form/newsletter-signup-form.test.tsx`), through a `make*`
+  builder in `src/testing/` that the alternatives' stories and tests also use.
+  The root `.test.tsx` / `.stories.tsx` keep only what exercises the assembled
+  namespace (an overview of both); delete them once nothing like that remains.
 - Slot compounds differ: a part only renders inside its root, so parts get no
   stories or tests of their own.

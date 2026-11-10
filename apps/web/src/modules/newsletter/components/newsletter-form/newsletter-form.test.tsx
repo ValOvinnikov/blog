@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, NEWSLETTER_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
@@ -20,7 +20,7 @@ vi.mock('@web/server/newsletter/newsletter-actions/newsletter-actions', () => ({
 }));
 
 const setup = customRender(NewsletterForm, {
-  variant: 'full' as const,
+  variant: NEWSLETTER_VARIANT.FULL,
 });
 
 faker.seed(6007);
@@ -177,8 +177,8 @@ describe(`<${NewsletterForm.name}/>`, () => {
   it('describes each form field by its own error when two forms share a page', async () => {
     renderElement(
       <>
-        <NewsletterForm variant="full" />
-        <NewsletterForm variant="full" />
+        <NewsletterForm variant={NEWSLETTER_VARIANT.FULL} />
+        <NewsletterForm variant={NEWSLETTER_VARIANT.FULL} />
       </>,
     );
 
@@ -223,7 +223,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
   });
 
   it('does not render the content text in the compact variant', () => {
-    setup({ variant: 'compact', content: MOCK_CONTENT });
+    setup({ variant: NEWSLETTER_VARIANT.COMPACT, content: MOCK_CONTENT });
 
     const contentText = screen.queryByText(MOCK_CONTENT);
 
@@ -255,7 +255,7 @@ describe(`<${NewsletterForm.name}/>`, () => {
 
   it('omits authored trust cues in the compact variant', () => {
     setup({
-      variant: 'compact',
+      variant: NEWSLETTER_VARIANT.COMPACT,
       trustCues: [MOCK_FIRST_TRUST_CUE, MOCK_SECOND_TRUST_CUE],
     });
 
