@@ -6,6 +6,7 @@ import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
 import { useTranslations } from 'next-intl';
 
 import { useAccountDraftFields } from './use-account-draft-fields';
+import { useButtonsDraftFields } from './use-buttons-draft-fields';
 import { useFooterDraftFields } from './use-footer-draft-fields';
 
 export const useLookDraftFields = () => {
@@ -13,6 +14,7 @@ export const useLookDraftFields = () => {
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
   const accountDraftFields = useAccountDraftFields();
+  const buttonsDraftFields = useButtonsDraftFields();
   const footerDraftFields = useFooterDraftFields();
   const displayBrandImage = ({ file }: TStagedImage) =>
     isUndefined(file) ? t('brandImageUnchanged') : t('brandImagePicked');
@@ -92,18 +94,7 @@ export const useLookDraftFields = () => {
         t(`headerControlStyleOptionLabel.${headerControlStyle}`),
     },
     ...accountDraftFields,
-    {
-      id: 'busyButtonStyle',
-      label: t('busyButtonStyleLabel'),
-      display: ({ busyButtonStyle }: TLookFormValues) =>
-        t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
-    },
-    {
-      id: 'spinnerStyle',
-      label: t('spinnerStyleLabel'),
-      display: ({ spinnerStyle }: TLookFormValues) =>
-        t(`spinnerStyleOptionLabel.${spinnerStyle}`),
-    },
+    ...buttonsDraftFields,
     ...footerDraftFields,
     {
       id: 'languageSwitcherStyle',

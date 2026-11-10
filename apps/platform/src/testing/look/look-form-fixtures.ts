@@ -58,6 +58,7 @@ export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     accountPhonePlacement: defaults.accountPhonePlacement,
     busyButtonStyle: defaults.busyButtonStyle,
     spinnerStyle: defaults.spinnerStyle,
+    buttonShape: defaults.buttonShape,
     footerLayout: defaults.footerLayout,
     footerBackground: defaults.footerBackground,
     footerSurface: defaults.footerSurface,

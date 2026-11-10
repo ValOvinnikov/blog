@@ -1,35 +1,12 @@
 'use server';
 
 import {
-  ACCOUNT_BUTTON_STYLE,
-  ACCOUNT_PANEL_STYLE,
-  ACCOUNT_PHONE_PLACEMENT,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  BRAND_VARIANT,
-  BUSY_BUTTON_STYLE,
-  CARD_STYLE,
-  COOKIE_SETTINGS_BUTTON,
-  DENSITY,
-  FONT_CHOICE,
-  FOOTER_LAYOUT,
-  FOOTER_SURFACE,
-  HEADER_BAR_STYLE,
-  HEADER_CONTROL_STYLE,
-  HEADER_LAYOUT,
-  HEADER_SUBMENU_STYLE,
-  HUE_MAX,
-  HUE_MIN,
-  isAccentHueAccessible,
-  LANGUAGE_SWITCHER_STYLE,
-  PRESET_ID,
-  RADIUS_SCALE,
-  SPINNER_STYLE,
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
 import { pickEntitledLook } from '@blog/db/utils/effective-look/effective-look';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -37,6 +14,10 @@ import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import {
+  updateLookInputSchema,
+  type TUpdateLookInput,
+} from '@platform/server/site-config/update-look-input-schema';
 import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -46,37 +27,7 @@ import {
   type TNotInPlanRefusal,
 } from '@platform/utils/plan-refusal/plan-refusal';
 import { listRefusedLookFields } from '@platform/utils/refused-look-fields/refused-look-fields';
-import { z } from 'zod';
 
-const hueSchema = z.number().int().min(HUE_MIN).max(HUE_MAX);
-
-const updateLookInputSchema = z.object({
-  preset: z.enum(PRESET_ID),
-  accentHue: hueSchema.refine(isAccentHueAccessible),
-  logoHue: hueSchema.nullable(),
-  headingFont: z.enum(FONT_CHOICE),
-  bodyFont: z.enum(FONT_CHOICE),
-  radiusScale: z.enum(RADIUS_SCALE),
-  density: z.enum(DENSITY),
-  languageSwitcherStyle: z.enum(LANGUAGE_SWITCHER_STYLE),
-  cardStyle: z.enum(CARD_STYLE),
-  headerControlStyle: z.enum(HEADER_CONTROL_STYLE),
-  headerLayout: z.enum(HEADER_LAYOUT),
-  headerSubmenuStyle: z.enum(HEADER_SUBMENU_STYLE),
-  headerBarStyle: z.enum(HEADER_BAR_STYLE),
-  accountButtonStyle: z.enum(ACCOUNT_BUTTON_STYLE),
-  accountPanelStyle: z.enum(ACCOUNT_PANEL_STYLE),
-  accountPhonePlacement: z.enum(ACCOUNT_PHONE_PLACEMENT),
-  busyButtonStyle: z.enum(BUSY_BUTTON_STYLE),
-  spinnerStyle: z.enum(SPINNER_STYLE),
-  footerLayout: z.enum(FOOTER_LAYOUT),
-  footerBackground: z.enum(BRAND_VARIANT),
-  footerSurface: z.enum(FOOTER_SURFACE),
-  cookieSettingsButton: z.enum(COOKIE_SETTINGS_BUTTON),
-  brandName: z.string().trim().max(BRAND_NAME_MAX_LENGTH),
-});
-
-export type TUpdateLookInput = z.input<typeof updateLookInputSchema>;
 export type TUpdateLookResult =
   | TActionResult<typeof ACTION_OUTCOME.SERVER_ERROR, keyof TUpdateLookInput>
   | TNotInPlanRefusal;

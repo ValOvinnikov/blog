@@ -834,7 +834,15 @@
       "MENU": "Dans le menu"
     },
     "buttonsHeading": "Boutons",
-    "buttonsDescription": "L'aspect des boutons pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
+    "buttonsDescription": "La forme des boutons, leur aspect pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
+    "buttonsWhileWorkingHeading": "Pendant le travail",
+    "buttonShapeLabel": "Forme",
+    "buttonShapeDescription": "Coins des boutons, des champs de formulaire et des étiquettes.",
+    "buttonShapeOptionLabel": {
+      "SQUARE": "Carrée",
+      "ROUNDED": "Arrondie",
+      "PILL": "Pilule"
+    },
     "busyButtonStyleLabel": "Pendant le traitement",
     "busyButtonStyleDescription": "Ce qu'un bouton affiche pendant un enregistrement ou un envoi. Il garde sa place et ses couleurs pleines.",
     "busyButtonStyleOptionLabel": {

@@ -834,7 +834,15 @@
       "MENU": "In the menu"
     },
     "buttonsHeading": "Buttons",
-    "buttonsDescription": "How buttons look while they work, and the spinner they show.",
+    "buttonsDescription": "How buttons are shaped, how they look while they work, and the spinner they show.",
+    "buttonsWhileWorkingHeading": "While working",
+    "buttonShapeLabel": "Shape",
+    "buttonShapeDescription": "Corners of buttons, form fields and tags.",
+    "buttonShapeOptionLabel": {
+      "SQUARE": "Square",
+      "ROUNDED": "Rounded",
+      "PILL": "Pill"
+    },
     "busyButtonStyleLabel": "While busy",
     "busyButtonStyleDescription": "What a button shows while it saves or sends. It keeps its place and stays full colour.",
     "busyButtonStyleOptionLabel": {

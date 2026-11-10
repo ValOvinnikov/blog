@@ -1,6 +1,7 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
@@ -10,6 +11,7 @@ import {
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
   RADIUS_DECLARATIONS,
+  type TButtonShape,
   type TCardStyle,
   type TDensity,
   type TFontChoice,
@@ -43,6 +45,7 @@ type TShapePreviewValues = {
   density: TDensity;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  buttonShape: TButtonShape;
 };
 
 const buildShapePreviewTokens = ({
@@ -50,12 +53,14 @@ const buildShapePreviewTokens = ({
   density,
   cardStyle,
   headerControlStyle,
+  buttonShape,
 }: TShapePreviewValues): TThemeDeclarations => {
   return {
     ...RADIUS_DECLARATIONS[radiusScale],
     ...DENSITY_DECLARATIONS[density],
     ...CARD_STYLE_DECLARATIONS[cardStyle],
     ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+    ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
     ...DERIVED_RADIUS_DECLARATIONS,
   };
 };

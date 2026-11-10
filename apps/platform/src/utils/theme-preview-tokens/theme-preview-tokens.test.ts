@@ -1,6 +1,8 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BUTTON_SHAPE,
+  BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   DENSITY,
   formatOklchRamp,
@@ -35,6 +37,7 @@ const MOCK_PREVIEW_VALUES: TThemePreviewValues = {
   density: DENSITY.COMPACT,
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  buttonShape: BUTTON_SHAPE.ROUNDED,
   accentHue: MOCK_ACCENT_HUE,
   logoHue: undefined,
 };
@@ -90,6 +93,18 @@ describe(buildThemePreviewStyle, () => {
       expect(style).toMatchObject(
         HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
       );
+    },
+  );
+
+  it.each(Object.values(BUTTON_SHAPE))(
+    'carries the %s button shape token onto the preview',
+    (buttonShape) => {
+      const style = buildThemePreviewStyle(
+        { ...MOCK_PREVIEW_VALUES, buttonShape },
+        false,
+      );
+
+      expect(style).toMatchObject(BUTTON_SHAPE_DECLARATIONS[buttonShape]);
     },
   );
 

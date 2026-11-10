@@ -107,6 +107,7 @@ export const useLookSave = ({
         accountPhonePlacement: vals.accountPhonePlacement,
         busyButtonStyle: vals.busyButtonStyle,
         spinnerStyle: vals.spinnerStyle,
+        buttonShape: vals.buttonShape,
         footerLayout: vals.footerLayout,
         footerBackground: vals.footerBackground,
         footerSurface: vals.footerSurface,

@@ -4,6 +4,7 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   COOKIE_SETTINGS_BUTTON,
   FONT_CHOICE,
   FOOTER_LAYOUT,
@@ -165,6 +166,7 @@ describe(switchPreset, () => {
       cardStyle: EDITORIAL.cardStyle,
       headerControlStyle: EDITORIAL.headerControlStyle,
       spinnerStyle: EDITORIAL.spinnerStyle,
+      buttonShape: EDITORIAL.buttonShape,
     });
   });
 
@@ -176,6 +178,17 @@ describe(switchPreset, () => {
 
     expect(switchPreset(PRESET_ID.EDITORIAL, current).spinnerStyle).toBe(
       SPINNER_STYLE.PULSE,
+    );
+  });
+
+  it('keeps a button shape the owner changed', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      buttonShape: BUTTON_SHAPE.PILL,
+    };
+
+    expect(switchPreset(PRESET_ID.EDITORIAL, current).buttonShape).toBe(
+      BUTTON_SHAPE.PILL,
     );
   });
 
@@ -234,5 +247,16 @@ describe(withPresetValue, () => {
       ...current,
       headingFont: CONSOLE.themeTokens.headingFont,
     });
+  });
+
+  it('resets a customised button shape to the preset value', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      buttonShape: BUTTON_SHAPE.PILL,
+    };
+
+    expect(withPresetValue('buttonShape', current).buttonShape).toBe(
+      CONSOLE.buttonShape,
+    );
   });
 });

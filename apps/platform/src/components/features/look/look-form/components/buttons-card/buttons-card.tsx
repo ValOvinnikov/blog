@@ -1,12 +1,16 @@
 import {
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   ICONS,
   SPINNER_STYLE,
   type TBusyButtonStyle,
+  type TButtonShape,
 } from '@blog/config';
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { LookSubheading } from '@platform/components/features/look/look-form/components/look-subheading';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -25,15 +29,22 @@ export type TButtonsCardProps = {
 
 export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
   const {
-    values: { busyButtonStyle, spinnerStyle },
+    values: { buttonShape, busyButtonStyle, spinnerStyle },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
+  const shapeLock = useLookFieldLock('buttonShape');
   const busyLock = useLookFieldLock('busyButtonStyle');
   const spinnerLock = useLookFieldLock('spinnerStyle');
   const { lockLine, hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.BUTTONS],
   );
+
+  const shapeOptions = Object.values(BUTTON_SHAPE).map((shape) => ({
+    value: shape,
+    label: t(`buttonShapeOptionLabel.${shape}`),
+    glyph: <LookOptionGlyph field="buttonShape" value={shape} />,
+  }));
 
   const busyOptions = toOptions(BUSY_BUTTON_STYLE, (style) =>
     t(`busyButtonStyleOptionLabel.${style}`),
@@ -43,6 +54,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     t(`spinnerStyleOptionLabel.${style}`),
   );
 
+  const shapeLabel = t('buttonShapeLabel');
   const spinnerStyleLabel = t('spinnerStyleLabel');
 
   return (
@@ -53,6 +65,27 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       lockLine={lockLine}
       hasGrowthBadge={hasGrowthBadge}
     >
+      <LookField
+        field="buttonShape"
+        label={shapeLabel}
+        hint={t('buttonShapeDescription')}
+        isGroup={true}
+        labelId={shapeLock.labelId}
+        growthBadgeId={shapeLock.growthBadgeId}
+      >
+        <SegmentedControl<TButtonShape>
+          aria={shapeLock.aria}
+          options={shapeOptions}
+          value={buttonShape}
+          onChange={(shape) => updateField('buttonShape', shape)}
+          isDisabled={shapeLock.isDisabled}
+          isLocked={shapeLock.isLocked}
+        />
+        <PresetValueButton field="buttonShape" fieldLabel={shapeLabel} />
+      </LookField>
+
+      <LookSubheading>{t('buttonsWhileWorkingHeading')}</LookSubheading>
+
       <LookField
         field="busyButtonStyle"
         label={t('busyButtonStyleLabel')}

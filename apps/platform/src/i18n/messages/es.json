@@ -834,7 +834,15 @@
       "MENU": "En el menú"
     },
     "buttonsHeading": "Botones",
-    "buttonsDescription": "Cómo se ven los botones mientras trabajan y el indicador de carga que muestran.",
+    "buttonsDescription": "Qué forma tienen los botones, cómo se ven mientras trabajan y el indicador de carga que muestran.",
+    "buttonsWhileWorkingHeading": "Mientras trabaja",
+    "buttonShapeLabel": "Forma",
+    "buttonShapeDescription": "Esquinas de los botones, los campos de formulario y las etiquetas.",
+    "buttonShapeOptionLabel": {
+      "SQUARE": "Cuadrada",
+      "ROUNDED": "Redondeada",
+      "PILL": "Píldora"
+    },
     "busyButtonStyleLabel": "Mientras trabaja",
     "busyButtonStyleDescription": "Qué muestra un botón mientras guarda o envía. Conserva su sitio y su color completo.",
     "busyButtonStyleOptionLabel": {

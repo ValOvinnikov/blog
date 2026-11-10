@@ -7,6 +7,7 @@ import {
   type TAccountPhonePlacement,
   type TBrandVariant,
   type TBusyButtonStyle,
+  type TButtonShape,
   type TCardStyle,
   type TCookieSettingsButton,
   type TDensity,
@@ -25,6 +26,7 @@ import {
 } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
+import { toLookFormValues } from '@platform/utils/to-look-form-values/to-look-form-values';
 
 export type TLookFormValues = {
   preset: TPresetId;
@@ -44,6 +46,7 @@ export type TLookFormValues = {
   accountPhonePlacement: TAccountPhonePlacement;
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
+  buttonShape: TButtonShape;
   footerLayout: TFooterLayout;
   footerBackground: TBrandVariant;
   footerSurface: TFooterSurface;
@@ -73,6 +76,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
+    buttonShape,
     footerLayout,
     footerBackground,
     footerSurface,
@@ -97,6 +101,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     accountPhonePlacement,
     busyButtonStyle,
     spinnerStyle,
+    buttonShape,
     footerLayout,
     footerBackground,
     footerSurface,
@@ -105,38 +110,6 @@ export const defaultLookFormValues = (): TLookFormValues => {
     brandName: '',
     logo: { url: undefined },
     favicon: { url: undefined },
-  };
-};
-
-export const toLookFormValues = (
-  siteConfig: TSiteConfigResult,
-): TLookFormValues => {
-  return {
-    preset: siteConfig.preset,
-    accentHue: siteConfig.accentHue,
-    logoHue: siteConfig.logoHue,
-    headingFont: siteConfig.headingFont,
-    bodyFont: siteConfig.bodyFont,
-    radiusScale: siteConfig.radiusScale,
-    density: siteConfig.density,
-    cardStyle: siteConfig.cardStyle,
-    headerControlStyle: siteConfig.headerControlStyle,
-    headerLayout: siteConfig.headerLayout,
-    headerSubmenuStyle: siteConfig.headerSubmenuStyle,
-    headerBarStyle: siteConfig.headerBarStyle,
-    accountButtonStyle: siteConfig.accountButtonStyle,
-    accountPanelStyle: siteConfig.accountPanelStyle,
-    accountPhonePlacement: siteConfig.accountPhonePlacement,
-    busyButtonStyle: siteConfig.busyButtonStyle,
-    spinnerStyle: siteConfig.spinnerStyle,
-    footerLayout: siteConfig.footerLayout,
-    footerBackground: siteConfig.footerBackground,
-    footerSurface: siteConfig.footerSurface,
-    cookieSettingsButton: siteConfig.cookieSettingsButton,
-    languageSwitcherStyle: siteConfig.languageSwitcherStyle,
-    brandName: siteConfig.brandName ?? '',
-    logo: { url: siteConfig.logoAssetUrl },
-    favicon: { url: siteConfig.faviconAssetUrl },
   };
 };
 

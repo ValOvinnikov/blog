@@ -27,8 +27,11 @@ export const segmentedControlVariants = tv({
   variants: {
     hasGlyphs: {
       true: {
+        root: [
+          'max-lg:auto-cols-fr max-lg:grid-flow-col max-lg:grid-cols-none',
+        ],
         option: [
-          'min-h-[60px] flex-col justify-center gap-1 px-1.5 text-center',
+          'min-h-[60px] flex-col justify-center gap-1 px-1.5 text-center leading-admin-14',
           'lg:h-auto lg:min-h-[52px] lg:min-w-14 lg:gap-[3px] lg:px-2.5 lg:py-1.5',
         ],
       },

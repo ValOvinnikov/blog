@@ -6,6 +6,7 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   BRAND_VARIANT,
+  BUTTON_SHAPE,
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
@@ -52,7 +53,8 @@ import {
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
-import { updateLookAction, type TUpdateLookInput } from './update-look-action';
+import { updateLookAction } from './update-look-action';
+import type { TUpdateLookInput } from './update-look-input-schema';
 
 faker.seed(5998);
 
@@ -114,6 +116,7 @@ const VALID_INPUT: TUpdateLookInput = {
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
   busyButtonStyle: BUSY_BUTTON_STYLE.EDGE,
   spinnerStyle: SPINNER_STYLE.DOTS,
+  buttonShape: BUTTON_SHAPE.PILL,
   footerLayout: FOOTER_LAYOUT.CENTRED,
   footerBackground: BRAND_VARIANT.SECONDARY,
   footerSurface: FOOTER_SURFACE.CARD,

@@ -834,7 +834,15 @@
       "MENU": "In het menu"
     },
     "buttonsHeading": "Knoppen",
-    "buttonsDescription": "Hoe knoppen eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
+    "buttonsDescription": "Hoe knoppen zijn gevormd, hoe ze eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
+    "buttonsWhileWorkingHeading": "Tijdens het werk",
+    "buttonShapeLabel": "Vorm",
+    "buttonShapeDescription": "Hoeken van knoppen, formuliervelden en labels.",
+    "buttonShapeOptionLabel": {
+      "SQUARE": "Vierkant",
+      "ROUNDED": "Afgerond",
+      "PILL": "Pil"
+    },
     "busyButtonStyleLabel": "Tijdens het werken",
     "busyButtonStyleDescription": "Wat een knop toont tijdens opslaan of verzenden. Hij behoudt zijn plek en blijft in volle kleur.",
     "busyButtonStyleOptionLabel": {
