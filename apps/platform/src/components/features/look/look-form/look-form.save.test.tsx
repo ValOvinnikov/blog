@@ -141,7 +141,7 @@ describe(`<${LookForm.name}/>`, () => {
     await screen.findByText(ALL_CHANGES_SAVED);
   });
 
-  it('shows the failure in the save bar and keeps the change unsaved when the save fails', async () => {
+  it('keeps the change unsaved and shows the failure in the save bar on a failed save', async () => {
     vi.mocked(updateLookAction).mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.SERVER_ERROR,
     });
