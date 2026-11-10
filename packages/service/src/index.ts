@@ -14,7 +14,6 @@ import { createCtaModuleService } from './features/modules/cta';
 import { createFaqModuleService } from './features/modules/faq';
 import { createFeatureHighlightsModuleService } from './features/modules/feature-highlights';
 import { createFeatureListModuleService } from './features/modules/feature-list';
-import { createHeroModuleService } from './features/modules/hero';
 import { createHeroBlogModuleService } from './features/modules/hero-blog';
 import { createHeroProfileModuleService } from './features/modules/hero-profile';
 import { createHeroStatementModuleService } from './features/modules/hero-statement';
@@ -63,7 +62,6 @@ export const service = {
     tagIndex: createTagIndexService(),
   },
   modules: {
-    hero: createHeroModuleService(),
     heroBlog: createHeroBlogModuleService(),
     heroStatement: createHeroStatementModuleService(),
     heroProfile: createHeroProfileModuleService(),
@@ -137,7 +135,6 @@ export type {
   TFeatureListItem,
   TFeatureListModule,
 } from './features/modules/feature-list';
-export type { THeroModule } from './features/modules/hero';
 export type {
   THeroBlogButton,
   THeroBlogModule,
@@ -209,7 +206,6 @@ export { getPlatformSanityWriteContext } from './sanity/write-client/write-clien
 export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
 export type { TFaqPageQuestion } from './shared/transformers/faq/resolve-faqs';
 export type { THeroPresentation } from './shared/transformers/hero/to-hero-presentation';
-export type { THeroPrimaryAction } from './shared/transformers/hero/to-hero-primary-action';
 export type { TModule } from './shared/transformers/module/to-module';
 export type { TPersonCard } from './shared/transformers/person/to-person-card';
 export type {
