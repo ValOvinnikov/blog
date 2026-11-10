@@ -5,10 +5,12 @@ import {
   type TLocaleIsoCode,
   type TMaybeUndefined,
 } from '@blog/config';
+import { hasLength, isString } from '@blog/utils/primitives';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { createTranslator } from 'next-intl';
 
 import '@testing-library/jest-dom/vitest';
+import './vitest-jsdom-stand-ins';
 
 import messages from './i18n/messages/en.json';
 
@@ -17,7 +19,7 @@ type TGetTranslationsArg = TMaybeUndefined<
 >;
 
 const toNamespace = (arg: TGetTranslationsArg): TMaybeUndefined<string> =>
-  typeof arg === 'string' ? arg : arg?.namespace;
+  isString(arg) ? arg : arg?.namespace;
 
 // createTranslator's const-generic namespace rejects the runtime string one.
 type TRawLooseTranslator = TLooseTranslator & {
@@ -90,7 +92,7 @@ console.error = (...args: unknown[]) => {
 
 afterEach(() => {
   const warnings = actWarnings.splice(0);
-  if (warnings.length > 0) {
+  if (hasLength(warnings)) {
     throw new Error(`React reported an act() warning:\n${warnings.join('\n')}`);
   }
 });
@@ -107,30 +109,6 @@ beforeEach(() => {
   if (typeof window !== 'undefined') window.localStorage.clear();
 });
 
-// Base UI's floating components call these, and jsdom implements none of them.
-if (typeof Element !== 'undefined') {
-  if (!Element.prototype.hasPointerCapture) {
-    Element.prototype.hasPointerCapture = () => false;
-  }
-  if (!Element.prototype.setPointerCapture) {
-    Element.prototype.setPointerCapture = () => {};
-  }
-  if (!Element.prototype.releasePointerCapture) {
-    Element.prototype.releasePointerCapture = () => {};
-  }
-  if (!Element.prototype.scrollIntoView) {
-    Element.prototype.scrollIntoView = () => {};
-  }
-}
-if (typeof globalThis.ResizeObserver === 'undefined') {
-  class NoopResizeObserver implements ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  }
-  vi.stubGlobal('ResizeObserver', NoopResizeObserver);
-}
-
 // next/font/local relies on a Next build transform Vitest does not run.
 vi.mock('next/font/local', () => ({
   default: ({ src }: { src: { path: string }[] }) => {
@@ -140,15 +118,4 @@ vi.mock('next/font/local', () => ({
       style: { fontFamily: `mock-${fontName}-font-family` },
     };
   },
-}));
-
-vi.stubGlobal('matchMedia', (query: string): MediaQueryList => ({
-  matches: false,
-  media: query,
-  onchange: null,
-  addListener() {},
-  removeListener() {},
-  addEventListener() {},
-  removeEventListener() {},
-  dispatchEvent: () => false,
 }));

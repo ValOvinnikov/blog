@@ -1,3 +1,5 @@
+import type { TOutcome } from '@blog/config/types';
+
 import { ACTION_OUTCOME, type TActionOutcome } from '@blog/config/constants';
 
 import {
@@ -8,6 +10,7 @@ import {
   isOutcomeUnavailable,
 } from './is-outcome';
 
+const MOCK_FEATURE_OUTCOME = 'ALREADY_DONE';
 const MOCK_FIELD_ERRORS = { email: { reason: 'EMAIL_INVALID' } };
 
 type TResult =
@@ -19,6 +22,10 @@ type TResult =
   | { outcome: typeof ACTION_OUTCOME.SERVER_ERROR };
 
 const resultOf = (outcome: TActionOutcome) => ({ outcome });
+
+const featureResult = (): TResult | TOutcome<typeof MOCK_FEATURE_OUTCOME> => ({
+  outcome: MOCK_FEATURE_OUTCOME,
+});
 
 describe.each([
   [isOutcomeSuccess, ACTION_OUTCOME.SUCCESS],
@@ -49,5 +56,15 @@ describe(isOutcomeInvalid, () => {
     const fieldErrors = isOutcomeInvalid(result) ? result.fieldErrors : {};
 
     expect(fieldErrors).toEqual(MOCK_FIELD_ERRORS);
+  });
+});
+
+describe(isOutcomeSuccess, () => {
+  it('narrows a result that adds its own outcomes', () => {
+    const result = featureResult();
+
+    const outcome = isOutcomeSuccess(result) ? undefined : result.outcome;
+
+    expect(outcome).toBe(MOCK_FEATURE_OUTCOME);
   });
 });

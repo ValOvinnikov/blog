@@ -30,8 +30,6 @@ itself stays.
 - `apps/web/src/components/shared/bookmark-button/bookmark-button.tsx` — SUCCESS, UNAVAILABLE
 - `apps/web/src/components/shared/delete-account-control/delete-account-control.tsx` — SUCCESS
 - `apps/web/src/components/shared/display-name-control/display-name-control.tsx` — SUCCESS
-- `apps/web/src/components/shared/newsletter-form/newsletter-form.tsx` — SUCCESS
-- `apps/web/src/modules/newsletter/components/newsletter-form/newsletter-form.tsx` — SUCCESS
 - `apps/web/src/components/shared/newsletter-subscription-control/newsletter-subscription-control.tsx` — SUCCESS, UNAVAILABLE
 - `apps/web/src/components/shared/provider-link-control/provider-link-control.tsx` — SUCCESS
 - `apps/web/src/modules/contact-form/hooks/use-contact-form/use-contact-form.ts` — INVALID, SUCCESS

@@ -10,6 +10,7 @@ import {
   type TMaybeUndefined,
   type TNewsletterVariant,
   FORM_STATUS,
+  isOutcomeSuccess,
 } from '@blog/config';
 import { isValidEmailAddress } from '@blog/email/validation';
 import { Icon } from '@blog/ui/components/atoms/icon';
@@ -77,7 +78,7 @@ export const NewsletterForm = ({
 
     const result = await subscribeToNewsletterAction(email);
 
-    if (result.outcome === ACTION_OUTCOME.SUCCESS) {
+    if (isOutcomeSuccess(result)) {
       setStatus(FORM_STATUS.SUCCESS);
       return;
     }
