@@ -941,6 +941,7 @@
     "faqFirstQuestion": "Wie oft erscheint etwas Neues?",
     "faqFirstAnswer": "Fast jeden Freitag eine neue Ausgabe, und eine zusätzliche, wenn die Springfluten etwas zutage fördern.",
     "faqSecondQuestion": "Darf ich die Gezeitentabellen weiterverwenden?",
+    "faqSecondAnswer": "Ja, für deine eigenen Fahrten; bitte nenne das Hafenamt, das sie herausgibt.",
     "formFieldLabel": "E-Mail-Adresse",
     "formFieldPlaceholder": "du@example.com",
     "quoteText": "Das Meer führt seinen eigenen Kalender; die Tabellen raten nur.",

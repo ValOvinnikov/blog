@@ -941,6 +941,7 @@
     "faqFirstQuestion": "À quel rythme publiez-vous ?",
     "faqFirstAnswer": "Une nouvelle lettre presque tous les vendredis, et une de plus quand les grandes marées révèlent quelque chose.",
     "faqSecondQuestion": "Puis-je réutiliser les tables des marées ?",
+    "faqSecondAnswer": "Oui, pour vos propres sorties ; merci de citer la capitainerie qui les publie.",
     "formFieldLabel": "Adresse e-mail",
     "formFieldPlaceholder": "vous@example.com",
     "quoteText": "La mer tient son propre calendrier ; les tables ne font que le deviner.",

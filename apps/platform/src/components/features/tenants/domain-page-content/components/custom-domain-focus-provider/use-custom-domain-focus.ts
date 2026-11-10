@@ -1,5 +1,5 @@
 import type { TMaybeNull } from '@blog/config';
-import { noop } from '@blog/utils';
+import { noop } from '@blog/utils/primitives';
 import { createContext, useContext } from 'react';
 
 export type TCustomDomainFocus = {

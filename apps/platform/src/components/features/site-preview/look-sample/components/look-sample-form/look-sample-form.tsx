@@ -1,7 +1,7 @@
 import { SIZE } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { TextInput } from '@blog/ui/components/atoms/text-input';
-import { noop } from '@blog/utils';
+import { noop } from '@blog/utils/primitives';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 

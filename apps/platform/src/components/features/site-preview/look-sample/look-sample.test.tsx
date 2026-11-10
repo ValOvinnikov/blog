@@ -39,6 +39,7 @@ import {
 } from '@platform/constants/sample-part';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_CURRENT, ARIA_EXPANDED } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -58,7 +59,6 @@ import { LookSample, type TLookSampleProps } from './look-sample';
 faker.seed(5994);
 
 const SUBSCRIBE = 'Subscribe';
-const ARIA_EXPANDED = 'aria-expanded';
 const SIGN_IN = 'Sign in';
 const MENU = 'Menu';
 const POSTS = 'Posts';
@@ -159,7 +159,7 @@ describe(`<${LookSample.name}/>`, () => {
       setup();
     });
 
-    it('shows the tenant name and a Subscribe button in the hero, the form and the call to action', () => {
+    it('shows the tenant name and three Subscribe buttons', () => {
       const tenantNames = screen.getAllByText(MOCK_TENANT_NAME);
       const subscribeButtons = screen.getAllByRole('button', {
         name: SUBSCRIBE,
@@ -305,7 +305,7 @@ describe(`<${LookSample.name}/>`, () => {
         name: LANGUAGE_ENGLISH,
       });
 
-      expect(current).toHaveAttribute('aria-current', 'page');
+      expect(current).toHaveAttribute(ARIA_CURRENT, 'page');
       expect(current).toHaveTextContent(ENGLISH);
       expect(englishLink).not.toBeInTheDocument();
       expect(frenchLink).toHaveTextContent(FRENCH_CODE);

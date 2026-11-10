@@ -941,6 +941,7 @@
     "faqFirstQuestion": "How often do you publish?",
     "faqFirstAnswer": "A new dispatch most Fridays, and an extra one when the spring tides turn something up.",
     "faqSecondQuestion": "Can I reuse the tide charts?",
+    "faqSecondAnswer": "Yes, for your own trips; please credit the harbour office that publishes them.",
     "formFieldLabel": "Email address",
     "formFieldPlaceholder": "you@example.com",
     "quoteText": "The sea keeps its own calendar; the charts only guess at it.",
