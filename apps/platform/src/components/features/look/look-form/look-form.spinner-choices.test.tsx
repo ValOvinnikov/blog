@@ -57,7 +57,7 @@ describe(`<${LookForm.name}/> spinner`, () => {
       );
     });
 
-    it('keeps the spinner and its value while busy buttons draw a progress edge, and says what still uses it', async () => {
+    it('keeps the spinner and notes its use under a progress edge', async () => {
       await chooseSegment(
         user,
         LOOK_FORM.busyButtonStyleLabel,
