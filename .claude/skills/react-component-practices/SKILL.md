@@ -82,13 +82,20 @@ A domain is a module, a feature, a page, or a layout or app route.
 ### The ceiling
 
 - **7 props in `apps/platform`; 10 in `packages/ui` and `apps/web`.** Count
-  every member of the props type: optional ones, `children`, `className`, and
-  the members the `IWithClassName`/`IWithDataTestId` mixins add.
+  every member of the props type: optional ones, `children`, `className`,
+  `dataTestId`, and every inherited member — what an interface gains by
+  extending a service view-model or a mixin such as `IWithClassName` or
+  `IWithDataTestId`.
 - Exempt, and only these: the native-attribute primitives `Button`,
   `IconButton`, `TextInput` and `TextLink` in `@blog/ui`, and `Button` and
   `TextInput` in `apps/platform`.
 - A component at the ceiling takes no new prop until it is restructured — in
   the same PR or one before it.
+- **The `reviewer` enforces it.** For every component whose file a diff
+  touches, it counts all of that component's props, not only the ones the
+  diff adds. Over the ceiling is a blocking finding even when the diff adds
+  no prop, stating the count and the step below that fits. The exempt
+  primitives get no finding.
 - Over the ceiling, or about to be, use the first step that fits:
   1. **Drop.** Derived one-to-one from another prop (a label from `kind`,
      `isRejected` from `value`) → derive it inside. Filled the same way by
