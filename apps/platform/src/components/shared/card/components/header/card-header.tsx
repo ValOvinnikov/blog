@@ -13,6 +13,7 @@ export type TCardHeaderProps = {
   titleRef?: Ref<HTMLHeadingElement>;
   titleTabIndex?: number;
   titleId?: string;
+  isDanger?: boolean;
   className?: string;
 };
 
@@ -24,10 +25,16 @@ export const CardHeader = ({
   titleRef,
   titleTabIndex,
   titleId,
+  isDanger = false,
   className,
 }: TCardHeaderProps) => {
-  const { header, headerTitleGroup, headerDescription, headerActions } =
-    cardVariants();
+  const {
+    header,
+    headerTitleGroup,
+    headerTitle,
+    headerDescription,
+    headerActions,
+  } = cardVariants({ isDanger });
 
   return (
     <div className={header({ class: className })}>
@@ -38,6 +45,7 @@ export const CardHeader = ({
           size="cardTitle"
           ref={titleRef}
           tabIndex={titleTabIndex}
+          className={headerTitle()}
         >
           {title}
         </Heading>

@@ -27,9 +27,7 @@ export const AccountSignIn = ({
         {heading}
       </Heading>
       <ReaderSignInPanel
-        panelId={panelId}
-        isOpen={true}
-        panelRef={panelRef}
+        panel={{ panelId, open: true, panelRef }}
         oauthProviderIds={oauthProviderIds}
         className={s.signIn()}
       />

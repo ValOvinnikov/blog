@@ -4,14 +4,13 @@ import {
   routes,
   type IWithClassName,
   type TAccountPanelStyle,
-  type TMaybeNull,
 } from '@blog/config';
 import { AccountPanel } from '@blog/ui/components/molecules/account-panel';
 import { SmartLink } from '@web/components/shared/smart-link';
+import type { TPopoverPanel } from '@web/hooks/use-popover';
 import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
-import type { RefObject } from 'react';
 
 export interface IReaderAccountUser {
   name: string;
@@ -24,9 +23,7 @@ export type TReaderAccountPanelProps = IWithClassName & {
   user: IReaderAccountUser;
   onImageError: () => void;
   hasBookmarks: boolean;
-  panelId: string;
-  isOpen: boolean;
-  panelRef?: RefObject<TMaybeNull<HTMLDivElement>>;
+  panel: TPopoverPanel;
 };
 
 export const ReaderAccountPanel = ({
@@ -34,12 +31,11 @@ export const ReaderAccountPanel = ({
   user,
   onImageError,
   hasBookmarks,
-  panelId,
-  isOpen,
-  panelRef,
+  panel,
   className,
 }: TReaderAccountPanelProps) => {
   const t = useTranslations('authMenu');
+  const { panelId, open, panelRef } = panel;
 
   return (
     <AccountPanel
@@ -49,7 +45,11 @@ export const ReaderAccountPanel = ({
       onImageError={onImageError}
       linkAs={SmartLink}
       className={className}
-      panel={{ id: panelId, isOpen, ariaLabel: t('accountMenuAriaLabel') }}
+      panel={{
+        id: panelId,
+        isOpen: open,
+        ariaLabel: t('accountMenuAriaLabel'),
+      }}
       links={{
         ...(hasBookmarks && {
           bookmarks: {

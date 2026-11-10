@@ -4,9 +4,11 @@ import {
   mockLocalizedValue,
   mockReference,
 } from '@blog/studio/testing/mock-documents';
-import { MOCK_VALIDATION_MESSAGE } from '@blog/studio/testing/mock-validation-context';
+import {
+  MOCK_VALIDATION_MESSAGE,
+  mockValidationContext,
+} from '@blog/studio/testing/mock-validation-context';
 import { faker } from '@faker-js/faker';
-import type { ValidationContext } from 'sanity';
 
 faker.seed(6020);
 
@@ -14,9 +16,6 @@ const { EN } = LOCALE_ISO_CODES;
 
 const MOCK_ASSET = mockReference(faker.string.uuid());
 const MOCK_ALT = faker.lorem.sentence();
-
-const contextWithImage = (parent?: { asset?: unknown }): ValidationContext =>
-  ({ parent }) as unknown as ValidationContext;
 
 describe(validateImageAltFilled, () => {
   const validate = validateImageAltFilled(MOCK_VALIDATION_MESSAGE);
@@ -44,6 +43,8 @@ describe(validateImageAltFilled, () => {
   ])('%s', (_description, altText, image, expected) => {
     const alt = [mockLocalizedValue(EN, altText)];
 
-    expect(validate(alt, contextWithImage(image))).toBe(expected);
+    expect(validate(alt, mockValidationContext({ parent: image }))).toBe(
+      expected,
+    );
   });
 });

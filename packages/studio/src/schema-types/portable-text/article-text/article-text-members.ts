@@ -25,23 +25,26 @@ import {
   type BlockStyleDefinition,
 } from 'sanity';
 
-const subheadingAndQuoteStyles: BlockStyleDefinition[] = [
-  { title: 'H3', value: H3_AS_CONST },
-  { title: 'H4', value: H4_AS_CONST },
-  { title: 'Quote', value: BLOCKQUOTE_AS_CONST },
-];
+const h4Style: BlockStyleDefinition = { title: 'H4', value: H4_AS_CONST };
+
+const quoteStyle: BlockStyleDefinition = {
+  title: 'Quote',
+  value: BLOCKQUOTE_AS_CONST,
+};
 
 // Excludes H1 so the body never competes with the post/page title's own heading.
 export const articleTextStyles: BlockStyleDefinition[] = [
   normalBlockStyle,
   { title: 'H2', value: H2_AS_CONST },
-  ...subheadingAndQuoteStyles,
+  { title: 'H3', value: H3_AS_CONST },
+  h4Style,
+  quoteStyle,
 ];
 
-// H3 and below only, so the contents rail built from H2s stays accurate.
 export const expandableSectionTextStyles: BlockStyleDefinition[] = [
   normalBlockStyle,
-  ...subheadingAndQuoteStyles,
+  h4Style,
+  quoteStyle,
 ];
 
 export const articleTextMarks: BlockMarksDefinition = {

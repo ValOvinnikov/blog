@@ -3,29 +3,24 @@ import {
   type ISanityImage,
   type IWithDataTestId,
   type TBrandVariant,
-  type TContentAlignment,
-  type THeroVariant,
   type TLayout,
   type TMaybeUndefined,
-  type TMediaOrder,
 } from '@blog/config';
-import type { TCtaButton } from '@blog/service';
+import type { TCtaButton, THeroPresentation } from '@blog/service';
 import { Hero, type THeroProps } from '@blog/ui/components/organisms/hero';
+import { hasLength } from '@blog/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { Section } from '@web/components/shared/section';
 import { resolveHeroLayout } from '@web/utils/resolve-hero-layout';
+import { useId } from 'react';
 
 export interface IHeroModuleShellProps extends IWithDataTestId {
   brandVariant: TBrandVariant;
-  variant: THeroVariant;
+  presentation: THeroPresentation;
   eyebrow: TMaybeUndefined<string>;
   title: string;
-  titleId: string;
   excerpt: TMaybeUndefined<string>;
-  contentPosition: TMaybeUndefined<TContentAlignment>;
-  contentAlignment: TMaybeUndefined<TContentAlignment>;
-  mediaOrder: TMaybeUndefined<TMediaOrder>;
   layout: TMaybeUndefined<TLayout>;
   ctaButtons: TCtaButton[];
   sanityImage: TMaybeUndefined<ISanityImage>;
@@ -34,20 +29,19 @@ export interface IHeroModuleShellProps extends IWithDataTestId {
 
 export const HeroModuleShell = ({
   brandVariant,
-  variant,
+  presentation,
   eyebrow,
   title,
-  titleId,
   excerpt,
-  contentPosition,
-  contentAlignment,
-  mediaOrder,
   layout,
   dataTestId,
   ctaButtons,
   sanityImage,
   children,
 }: IHeroModuleShellProps) => {
+  const titleId = useId();
+  const { variant, contentPosition, contentAlignment, mediaOrder } =
+    presentation;
   const isBanner = variant === HERO_VARIANT.BANNER;
   const {
     sectionBrandVariant,
@@ -56,7 +50,7 @@ export const HeroModuleShell = ({
     heroSpacingBottom,
   } = resolveHeroLayout({ variant, brandVariant, layout });
   const heroChildren = [
-    ctaButtons.length > 0 && (
+    hasLength(ctaButtons) && (
       <Hero.Cta>
         <ActionGroup actions={ctaButtons} isOnDark={isBanner} />
       </Hero.Cta>

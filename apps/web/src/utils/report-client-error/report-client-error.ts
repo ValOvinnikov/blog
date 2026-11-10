@@ -1,18 +1,16 @@
+import type { TMaybeUndefined } from '@blog/config';
+import { HTTP_METHOD } from '@blog/config/constants';
+import { isString } from '@blog/utils/primitives';
+import {
+  MAX_MESSAGE_LENGTH,
+  MAX_STACK_LENGTH,
+  MAX_USER_AGENT_LENGTH,
+} from '@web/constants/client-log';
+
 const CLIENT_LOG_ENDPOINT = '/api/client-log';
 
-// Kept in sync by hand with `@web/server/client-log/client-log-schema/client-log-schema`'s
-// caps — a client module can't import that server-only file without pulling
-// it into the browser bundle, so the two live as separately-documented
-// literals rather than a shared constant.
-const MAX_MESSAGE_LENGTH = 500;
-const MAX_STACK_LENGTH = 1000;
 const MAX_STACK_LINES = 20;
-const MAX_USER_AGENT_LENGTH = 300;
-
-// Hard stop after this many reports in one page load — the circuit breaker
-// that protects the endpoint from an error-boundary render loop hammering
-// it. Module-scoped state, so it resets on every full page load/navigation
-// and is shared across every `reportClientError` caller on the page.
+// Circuit breaker against an error-boundary render loop; resets on each full page load.
 const MAX_REPORTS_PER_PAGE_LOAD = 5;
 
 const seenFingerprints = new Set<string>();
@@ -31,10 +29,7 @@ const resolveMessage = (error: unknown): string => {
   return error instanceof Error ? error.message : String(error);
 };
 
-// Strips anything from a `?` onward on every line — source-map/asset URLs
-// inside a stack frequently carry cache-busting or session query strings
-// that must never leave the browser, and truncates to a bounded size so one
-// giant stack can't itself blow the endpoint's payload cap.
+// Asset URLs in a stack can carry session query strings that must never leave the browser.
 const sanitizeStack = (stack: string): string => {
   return stack
     .split('\n')
@@ -44,7 +39,7 @@ const sanitizeStack = (stack: string): string => {
     .slice(0, MAX_STACK_LENGTH);
 };
 
-const resolveUrl = (): string | undefined => {
+const resolveUrl = (): TMaybeUndefined<string> => {
   if (typeof window === 'undefined') return undefined;
 
   return window.location.pathname;
@@ -61,24 +56,16 @@ const send = (payload: TClientLogPayload): void => {
 
   if (typeof fetch !== 'function') return;
 
-  // Fire-and-forget: nothing downstream reads the response, and a failed
-  // report must never surface as an unhandled rejection in the very error
-  // path it's trying to report on.
+  // A failed report must never surface as an unhandled rejection in the error path it reports on.
   fetch(CLIENT_LOG_ENDPOINT, {
-    method: 'POST',
+    method: HTTP_METHOD.POST,
     headers: { 'Content-Type': 'application/json' },
     body,
     keepalive: true,
   }).catch(() => {});
 };
 
-/**
- * The browser-side counterpart to the shared `logger` — call it alongside
- * (never instead of) `logger.error`/`logger.warn` at a client catch site or
- * error-boundary mount to also report the failure to `/api/client-log`.
- * Deduplicates by `event`+message fingerprint and hard-stops after
- * `MAX_REPORTS_PER_PAGE_LOAD` reports, both scoped to the current page load.
- */
+/** Reports a browser failure to `/api/client-log` — call it alongside the shared `logger`, never instead of it. */
 export const reportClientError = (
   event: string,
   error: unknown,
@@ -95,7 +82,7 @@ export const reportClientError = (
   reportCount += 1;
 
   const stack =
-    error instanceof Error && typeof error.stack === 'string'
+    error instanceof Error && isString(error.stack)
       ? sanitizeStack(error.stack)
       : undefined;
   const url = resolveUrl();

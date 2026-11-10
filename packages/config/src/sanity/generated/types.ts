@@ -636,7 +636,7 @@ export type ExpandableSectionText = Array<
         _type: 'span';
         _key: string;
       }>;
-      style?: 'normal' | 'h3' | 'h4' | 'blockquote';
+      style?: 'normal' | 'h4' | 'blockquote';
       listItem?: 'bullet' | 'number';
       markDefs?: Array<
         | ({

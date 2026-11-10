@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { FAQ_LOG } from '@web/constants/faq';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -13,13 +14,13 @@ export const FaqModule = async ({ id }: IFaqModuleProps) => {
   const result = await service.modules.faq.v1.getFaqModule(id, sanityContext);
 
   if (!result.ok) {
-    logger.error('faq_module.fetch_failed', { id, error: result.error });
+    logger.error(FAQ_LOG.MODULE_FETCH_FAILED, { id, error: result.error });
     return null;
   }
 
   return (
     <FaqModuleView
-      {...result.data}
+      module={result.data}
       titleId={`faq-${id}`}
       dataTestId={`faq-module-${id}`}
     />

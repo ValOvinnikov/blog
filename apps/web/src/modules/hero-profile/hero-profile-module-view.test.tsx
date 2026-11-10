@@ -19,6 +19,7 @@ import {
 } from '@web/testing/modules/hero-profile/fixtures';
 import { MOCK_TEAM_MEMBER_INITIALS } from '@web/testing/modules/team/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 import { mockPortableTextBlock } from '@web/testing/shared/portable-text/fixtures';
 import { mockSocialProfile } from '@web/testing/shared/social-profile/fixtures';
 
@@ -39,7 +40,7 @@ const MOCK_SOCIAL_LINKS = [mockSocialProfile()];
 
 const setup = customRender(HeroProfileModuleView, {
   id: MOCK_HERO_PROFILE_MODULE_ID,
-  ...mockHeroProfileModule(),
+  module: mockHeroProfileModule(),
 });
 
 describe(`<${HeroProfileModuleView.name}/>`, () => {
@@ -76,7 +77,12 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders the photo sized for an avatar on Stacked', () => {
-    setup({ variant: HERO_VARIANT.STACKED, sanityImage: MOCK_SANITY_IMAGE });
+    setup({
+      module: mockHeroProfileModule({
+        presentation: mockHeroPresentation({ variant: HERO_VARIANT.STACKED }),
+        sanityImage: MOCK_SANITY_IMAGE,
+      }),
+    });
 
     const image = screen.getByRole('img', { name: MOCK_SANITY_IMAGE.alt });
 
@@ -84,7 +90,12 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders the photo as a square portrait on Split', () => {
-    setup({ variant: HERO_VARIANT.SPLIT, sanityImage: MOCK_SANITY_IMAGE });
+    setup({
+      module: mockHeroProfileModule({
+        presentation: mockHeroPresentation({ variant: HERO_VARIANT.SPLIT }),
+        sanityImage: MOCK_SANITY_IMAGE,
+      }),
+    });
 
     const image = screen.getByRole('img', { name: MOCK_SANITY_IMAGE.alt });
     const imageSource = image.getAttribute('src');
@@ -93,7 +104,12 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders the photo as a decorative, prioritized backdrop on Banner', () => {
-    setup({ variant: HERO_VARIANT.BANNER, sanityImage: MOCK_SANITY_IMAGE });
+    setup({
+      module: mockHeroProfileModule({
+        presentation: mockHeroPresentation({ variant: HERO_VARIANT.BANNER }),
+        sanityImage: MOCK_SANITY_IMAGE,
+      }),
+    });
 
     const namedImage = screen.queryByRole('img');
     const backdrop = screen.getByRole('presentation');
@@ -105,7 +121,12 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('shows author-name initials on a photo-less Stacked', () => {
-    setup({ variant: HERO_VARIANT.STACKED, sanityImage: undefined });
+    setup({
+      module: mockHeroProfileModule({
+        presentation: mockHeroPresentation({ variant: HERO_VARIANT.STACKED }),
+        sanityImage: undefined,
+      }),
+    });
 
     const image = screen.queryByRole('img');
     const authorInitials = screen.getByText(MOCK_TEAM_MEMBER_INITIALS);
@@ -121,7 +142,12 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   it.each([HERO_VARIANT.SPLIT, HERO_VARIANT.BANNER])(
     'renders no media on %s when no image resolves',
     (variant) => {
-      setup({ variant, sanityImage: undefined });
+      setup({
+        module: mockHeroProfileModule({
+          presentation: mockHeroPresentation({ variant }),
+          sanityImage: undefined,
+        }),
+      });
 
       const image = screen.queryByRole('img');
       const media = screen.queryByTestId('hero-media');
@@ -132,7 +158,12 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   );
 
   it('announces the name with no initials tile on a photo-less Split', () => {
-    setup({ variant: HERO_VARIANT.SPLIT, sanityImage: undefined });
+    setup({
+      module: mockHeroProfileModule({
+        presentation: mockHeroPresentation({ variant: HERO_VARIANT.SPLIT }),
+        sanityImage: undefined,
+      }),
+    });
 
     const image = screen.queryByRole('img');
     const initials = screen.queryByText(MOCK_TEAM_MEMBER_INITIALS);
@@ -144,7 +175,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders no social list without social links', () => {
-    setup({ socialLinks: [] });
+    setup({ module: mockHeroProfileModule({ socialLinks: [] }) });
 
     const list = screen.queryByRole('list');
 
@@ -152,7 +183,9 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders the resolved social profiles as a labelled list of links', () => {
-    setup({ socialLinks: MOCK_SOCIAL_LINKS });
+    setup({
+      module: mockHeroProfileModule({ socialLinks: MOCK_SOCIAL_LINKS }),
+    });
 
     const list = screen.getByRole('list', {
       name: SITE_MESSAGES.socialLinks.listAriaLabel,
@@ -166,7 +199,7 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
   });
 
   it('renders no bio when none is authored', () => {
-    setup({ bio: undefined });
+    setup({ module: mockHeroProfileModule({ bio: undefined }) });
 
     const bioText = screen.queryByText(MOCK_BIO_TEXT);
 
@@ -175,12 +208,14 @@ describe(`<${HeroProfileModuleView.name}/>`, () => {
 
   it('renders the bio after the supporting text and before the actions', () => {
     setup({
-      headingBlock: mockHeadingBlock({
-        heading: MOCK_HERO_PROFILE_HEADING,
-        supportingText: MOCK_SUPPORTING_TEXT,
+      module: mockHeroProfileModule({
+        headingBlock: mockHeadingBlock({
+          heading: MOCK_HERO_PROFILE_HEADING,
+          supportingText: MOCK_SUPPORTING_TEXT,
+        }),
+        bio: MOCK_BIO,
+        ctaButtons: MOCK_CTA_ACTIONS,
       }),
-      bio: MOCK_BIO,
-      ctaButtons: MOCK_CTA_ACTIONS,
     });
 
     const supportingText = screen.getByText(MOCK_SUPPORTING_TEXT);

@@ -1,38 +1,33 @@
 import type { THeroStatementModule } from '@blog/service';
-import { HeroModuleShell } from '@web/modules/hero-shared';
-import { useId } from 'react';
+import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
 
-export interface IHeroStatementModuleViewProps extends THeroStatementModule {
+export interface IHeroStatementModuleViewProps {
   id: string;
+  module: THeroStatementModule;
 }
 
 export const HeroStatementModuleView = ({
   id,
-  brandVariant,
-  variant,
-  eyebrow,
-  headingBlock,
-  sanityImage,
-  ctaButtons,
-  contentPosition,
-  contentAlignment,
-  mediaOrder,
-  layout,
+  module,
 }: IHeroStatementModuleViewProps) => {
-  const titleId = useId();
+  const {
+    brandVariant,
+    presentation,
+    eyebrow,
+    headingBlock,
+    sanityImage,
+    ctaButtons,
+    layout,
+  } = module;
   const { heading, supportingText } = headingBlock;
 
   return (
     <HeroModuleShell
       brandVariant={brandVariant}
-      variant={variant}
+      presentation={presentation}
       eyebrow={eyebrow}
       title={heading}
-      titleId={titleId}
       excerpt={supportingText}
-      contentPosition={contentPosition}
-      contentAlignment={contentAlignment}
-      mediaOrder={mediaOrder}
       layout={layout}
       dataTestId={`hero-statement-module-${id}`}
       ctaButtons={ctaButtons}

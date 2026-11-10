@@ -36,7 +36,7 @@ describe(toHeroStatementModule, () => {
     const hero = toHeroStatementModule(raw);
 
     expect(hero.brandVariant).toBe(BRAND_VARIANT.BRAND_PRIMARY);
-    expect(hero.variant).toBe(HERO_VARIANT.BANNER);
+    expect(hero.presentation.variant).toBe(HERO_VARIANT.BANNER);
     expect(hero.headingBlock).toEqual({
       heading: MOCK_STATEMENT_HEADING,
       supportingText: undefined,
@@ -99,8 +99,8 @@ describe(toHeroStatementModule, () => {
 
     const hero = toHeroStatementModule(raw);
 
-    expect(hero.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
-    expect(hero.mediaOrder).toBe(MEDIA_ORDER.FIRST);
+    expect(hero.presentation.contentPosition).toBe(CONTENT_ALIGNMENT.RIGHT);
+    expect(hero.presentation.mediaOrder).toBe(MEDIA_ORDER.FIRST);
   });
 
   it.each([
@@ -111,7 +111,7 @@ describe(toHeroStatementModule, () => {
 
     const hero = toHeroStatementModule(raw);
 
-    expect(hero.contentAlignment).toBe(expected);
+    expect(hero.presentation.contentAlignment).toBe(expected);
   });
 
   it('maps a fully-authored layout object', () => {

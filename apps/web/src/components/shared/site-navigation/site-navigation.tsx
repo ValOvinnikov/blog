@@ -7,10 +7,6 @@ import {
   PrimaryNavigation,
 } from '@blog/ui/components/molecules/primary-navigation';
 import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
-import {
-  AccountMenuGroup,
-  type TAccountMenuGroupProps,
-} from '@web/components/shared/auth-menu';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { SESSION_STATUS } from '@web/constants/session';
 import { HeaderOverlayParent } from '@web/context/header-overlay-provider';
@@ -20,6 +16,10 @@ import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, useId, type ReactNode } from 'react';
 
+import {
+  AccountMenuGroup,
+  type TAccountMenuGroupProps,
+} from './components/account-menu-group/account-menu-group';
 import { siteNavigationVariants } from './site-navigation-variants';
 
 type TSiteNavigationProps = {

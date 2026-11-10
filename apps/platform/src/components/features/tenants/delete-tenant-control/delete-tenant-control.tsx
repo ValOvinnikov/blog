@@ -24,16 +24,11 @@ export const DeleteTenantControl = ({ tenant }: TDeleteTenantControlProps) => {
     'deleteFailed',
   );
   const { id, name } = tenant;
-
-  const { cardBorder, cardHeader, cardTitle, content } =
-    deleteTenantControlVariants();
+  const { content } = deleteTenantControlVariants();
 
   return (
-    <Card className={cardBorder()}>
-      <Card.Header
-        title={<span className={cardTitle()}>{t('archivedCardTitle')}</span>}
-        className={cardHeader()}
-      />
+    <Card isDanger={true}>
+      <Card.Header title={t('archivedCardTitle')} />
       <Card.Body>
         <div className={content()}>
           <Text variant="muted">{t('deleteDescription')}</Text>

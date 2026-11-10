@@ -1,32 +1,27 @@
-import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import { BRAND_VARIANT } from '@blog/config';
 import type { THeroBlogModule } from '@blog/service';
 import { createMockFaker } from '@web/testing/mock-faker';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 
 const mockFaker = createMockFaker(61049);
 
-type THeroBlogDataBase = Omit<
-  Extract<THeroBlogModule, { hasPost: true }>,
-  'hasPost' | 'heading'
->;
+type TResolvedHeroBlogModule = Extract<THeroBlogModule, { hasPost: true }>;
+
+type THeroBlogDataBase = Omit<TResolvedHeroBlogModule, 'hasPost' | 'heading'>;
 
 const heroBlogDataBase: THeroBlogDataBase = {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
   eyebrow: undefined,
   supportingText: undefined,
   sanityImage: undefined,
   ctaButtons: [],
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
+  presentation: mockHeroPresentation(),
   layout: undefined,
 };
 
 export const mockHeroBlogData = (
-  overrides: Partial<
-    Omit<Extract<THeroBlogModule, { hasPost: true }>, 'hasPost'>
-  > = {},
-): THeroBlogModule => ({
+  overrides: Partial<Omit<TResolvedHeroBlogModule, 'hasPost'>> = {},
+): TResolvedHeroBlogModule => ({
   ...heroBlogDataBase,
   hasPost: true,
   heading: 'Welcome',

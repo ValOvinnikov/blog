@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { HERO_STATEMENT_LOG } from '@web/constants/hero-statement';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -18,12 +19,12 @@ export const HeroStatementModule = async ({
   );
 
   if (!result.ok) {
-    logger.error('hero_statement_module.fetch_failed', {
+    logger.error(HERO_STATEMENT_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });
     return null;
   }
 
-  return <HeroStatementModuleView id={id} {...result.data} />;
+  return <HeroStatementModuleView id={id} module={result.data} />;
 };

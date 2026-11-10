@@ -1,4 +1,4 @@
-import { objectKeys, toOptions, toTitleCase } from './objects';
+import { mapKeysToRecord, objectKeys, toOptions, toTitleCase } from './objects';
 
 describe(objectKeys, () => {
   it("returns the object's keys", () => {
@@ -35,5 +35,18 @@ describe(toOptions, () => {
       { value: 'CARD', label: 'label-CARD' },
       { value: 'HUB', label: 'label-HUB' },
     ]);
+  });
+});
+
+describe(mapKeysToRecord, () => {
+  it('builds one entry per key from its value', () => {
+    expect(mapKeysToRecord(['A', 'B'], (key) => `value-${key}`)).toEqual({
+      A: 'value-A',
+      B: 'value-B',
+    });
+  });
+
+  it('returns {} for no keys', () => {
+    expect(mapKeysToRecord([], (key) => key)).toEqual({});
   });
 });

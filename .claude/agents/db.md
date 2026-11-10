@@ -210,7 +210,11 @@ tool).
   foreign-key constraints are the generated ones — never mock the query
   builder. Wire it with a bare `vi.mock('@blog/db/client')`, which picks up
   the shared `src/__mocks__/client.ts`, and `useQueryTestDb()`
-  (`@blog/db/testing/query-test-db`); never write a client mock factory. Seed rows with the `insertTest*` builders
+  (`@blog/db/testing/query-test-db`); never write a client mock factory. A
+  test needing one tenant per test takes it from `useTestTenant(db)`
+  (`@blog/db/testing/test-tenant`), which inserts it before each test and
+  deletes `tenants` after; a file still seeding its tenant by hand converts
+  when touched. Seed other rows with the `insertTest*` builders
   (`@blog/db/testing/fixtures`), and clear the tables a file writes in
   `afterEach`.
 - Arrangement, fixture builders and shared `vi.mock` factories:

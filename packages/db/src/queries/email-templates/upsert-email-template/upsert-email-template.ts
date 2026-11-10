@@ -1,7 +1,9 @@
-import type {
-  TEmailTemplateType,
-  TLocaleIsoCode,
+import {
+  SUBJECT_MAX,
+  type TEmailTemplateType,
+  type TLocaleIsoCode,
 } from '@blog/config/constants';
+import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
   emailTemplateLogos,
@@ -9,6 +11,7 @@ import {
   type TEmailTemplateBlock,
 } from '@blog/db/schema/email-templates';
 import { tenants } from '@blog/db/schema/tenants';
+import { hasLength, isNull, isUndefined } from '@blog/utils/primitives';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
 
@@ -16,8 +19,6 @@ import {
   getEmailTemplate,
   type TEmailTemplateResult,
 } from '../get-email-template';
-
-const SUBJECT_MAX = 200;
 
 const portableTextBlockSchema = z
   .object({ _type: z.string(), _key: z.string() })
@@ -44,8 +45,8 @@ function presentCopyFields(
 ): TEmailTemplateCopyWritable {
   const fields: TEmailTemplateCopyWritable = {};
 
-  if (parsed.subject !== undefined) fields.subject = parsed.subject;
-  if (parsed.body !== undefined) {
+  if (!isUndefined(parsed.subject)) fields.subject = parsed.subject;
+  if (!isUndefined(parsed.body)) {
     fields.body = parsed.body as TEmailTemplateBlock[] | null;
   }
 
@@ -96,11 +97,11 @@ async function writeCopy(
 async function writeLogo(
   tenantId: string,
   templateType: TEmailTemplateType,
-  logoAssetUrl: string | null,
+  logoAssetUrl: TMaybeNull<string>,
 ): Promise<void> {
   const db = getDb();
 
-  if (logoAssetUrl === null) {
+  if (isNull(logoAssetUrl)) {
     await db
       .delete(emailTemplateLogos)
       .where(
@@ -133,10 +134,10 @@ export async function upsertEmailTemplate(
   const copyFields = presentCopyFields(parsed);
   const targetLocale = locale ?? (await resolveTenantLocale(tenantId));
 
-  if (Object.keys(copyFields).length > 0) {
+  if (hasLength(Object.keys(copyFields))) {
     await writeCopy(tenantId, templateType, targetLocale, copyFields);
   }
-  if (parsed.logoAssetUrl !== undefined) {
+  if (!isUndefined(parsed.logoAssetUrl)) {
     await writeLogo(tenantId, templateType, parsed.logoAssetUrl);
   }
 

@@ -5,8 +5,9 @@ import {
   validateLandingSlug,
 } from '@blog/studio/schema-types/validation/validate-landing-slug/validate-landing-slug';
 import { mockLandingPage } from '@blog/studio/testing/mock-documents';
+import { mockValidationContext } from '@blog/studio/testing/mock-validation-context';
 import { faker } from '@faker-js/faker';
-import type { SlugValue, ValidationContext } from 'sanity';
+import type { SlugValue } from 'sanity';
 
 faker.seed(6028);
 
@@ -19,9 +20,9 @@ const MOCK_PARENT_ID = faker.string.uuid();
 const mockSlug = (current: string): SlugValue => ({ _type: 'slug', current });
 
 const contextForPage = (parent?: string) =>
-  ({
+  mockValidationContext({
     document: mockLandingPage({ _id: faker.string.uuid(), parent }),
-  }) as unknown as ValidationContext;
+  });
 
 describe(validateLandingSlug, () => {
   it.each([

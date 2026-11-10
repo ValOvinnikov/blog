@@ -1,3 +1,7 @@
+import {
+  SEO_OG_DESCRIPTION_MAX_LENGTH,
+  SEO_OG_TITLE_MAX_LENGTH,
+} from '@blog/config/constants';
 import { imageWithAltSchema } from '@blog/studio/schema-types/objects/image-with-alt/image-with-alt';
 import { defineField, defineType } from 'sanity';
 
@@ -14,7 +18,7 @@ export const openGraphSchema = defineType({
       type: 'string',
       description:
         'Title shown when shared on social media. Omitted entirely when empty.',
-      validation: (rule) => rule.max(70),
+      validation: (rule) => rule.max(SEO_OG_TITLE_MAX_LENGTH),
     }),
     defineField({
       name: 'ogDescription',
@@ -23,7 +27,7 @@ export const openGraphSchema = defineType({
       description:
         'Description shown when shared on social media. Omitted entirely when empty.',
       rows: 3,
-      validation: (rule) => rule.max(200),
+      validation: (rule) => rule.max(SEO_OG_DESCRIPTION_MAX_LENGTH),
     }),
     defineField({
       name: 'ogImage',

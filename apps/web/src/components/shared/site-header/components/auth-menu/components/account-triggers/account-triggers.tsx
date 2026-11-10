@@ -9,7 +9,8 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
-import type { IReaderAccountUser } from '@web/components/shared/auth-menu/components/reader-account-panel/reader-account-panel';
+import type { IReaderAccountUser } from '@web/components/shared/reader-account-panel';
+import type { TUsePopoverResult } from '@web/hooks/use-popover';
 import { useTranslations } from 'next-intl';
 import type { MouseEvent, RefObject } from 'react';
 
@@ -19,24 +20,20 @@ export type TAccountTriggersProps = IWithClassName & {
   accountControl: Pick<IAccountControl, 'buttonStyle' | 'phonePlacement'>;
   user: TMaybeUndefined<IReaderAccountUser>;
   onImageError?: () => void;
-  isOpen: boolean;
-  panelId: string;
-  triggerRef?: RefObject<TMaybeNull<HTMLButtonElement>>;
-  onToggle?: () => void;
+  popover: Pick<TUsePopoverResult, 'open' | 'panelId'> &
+    Partial<Pick<TUsePopoverResult, 'triggerRef' | 'toggle'>>;
 };
 
 export const AccountTriggers = ({
   accountControl,
   user,
   onImageError,
-  isOpen,
-  panelId,
-  triggerRef,
-  onToggle,
+  popover,
   className,
 }: TAccountTriggersProps) => {
   const t = useTranslations('authMenu');
   const { buttonStyle, phonePlacement } = accountControl;
+  const { open, panelId, triggerRef, toggle } = popover;
   const isInPhoneBar = phonePlacement === ACCOUNT_PHONE_PLACEMENT.BAR;
   const hasPhoneCircle =
     isInPhoneBar && buttonStyle === ACCOUNT_BUTTON_STYLE.PILL;
@@ -48,7 +45,7 @@ export const AccountTriggers = ({
     if (triggerRef) {
       triggerRef.current = event.currentTarget;
     }
-    onToggle?.();
+    toggle?.();
   };
 
   const renderTrigger = (
@@ -62,7 +59,7 @@ export const AccountTriggers = ({
       labels={{ signIn: t('signIn'), account: t('accountHeading') }}
       user={user}
       onImageError={onImageError}
-      isOpen={isOpen}
+      isOpen={open}
       panelId={panelId}
       onClick={handleClick}
       className={triggerClassName}

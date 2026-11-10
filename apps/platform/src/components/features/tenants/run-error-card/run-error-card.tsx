@@ -27,22 +27,15 @@ export const RunErrorCard = ({
   technicalDetailsLabel,
   headingLevel = 2,
 }: TRunErrorCardProps) => {
-  const {
-    cardBorder,
-    cardHeader,
-    cardTitle,
-    titleIcon,
-    content,
-    details,
-    detailsText,
-  } = runErrorCardVariants();
+  const { title, titleIcon, content, details, detailsText } =
+    runErrorCardVariants();
 
   return (
     <div role="alert">
-      <Card className={cardBorder()}>
+      <Card isDanger={true}>
         <Card.Header
           title={
-            <span className={cardTitle()}>
+            <span className={title()}>
               <Icon
                 name={ICONS.WARNING}
                 size={ICON_SIZE.XL}
@@ -52,7 +45,6 @@ export const RunErrorCard = ({
             </span>
           }
           headingLevel={headingLevel}
-          className={cardHeader()}
         />
         <Card.Body>
           <div className={content()}>

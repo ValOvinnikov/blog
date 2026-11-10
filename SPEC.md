@@ -968,8 +968,8 @@ It is allowed in `page_home.modules[]` and `page_landing.modules[]` only.
 figure, takes the avatar from 80 to 112 pixels and caps the measure in `ch`.
 That cap reads tighter than its number suggests: the spotlight quote renders at
 `text-prose-h4`, never smaller than body copy, and `ch` is font-relative, so the
-same character count is physically wider here than in running text once the
-heading grows past the 18px body size.
+same character count is physically wider here than in running text, because
+the heading size is larger than the 16px body size.
 
 **Grid columns are derived from the item count, not authored** — 2→2, 3→3, 4→2,
 5→3, 6→3, 7→3, 8→2 — capped at three rather than the feature grid's four,
@@ -1411,7 +1411,13 @@ still styled the same way as every other module — no exception — wraps it in
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
 plus an optional `titleId` (the module's heading element id, when it has
-one). `Section` always renders a real `<section>`; its outer element owns
+one). A module view renders that band and its module heading through
+`ModuleSection` (`apps/web/src/components/shared/module-section`), which takes
+the module's `brandVariant`, `layout`, `headingBlock` and `contentAlignment`
+as one `module` prop, and its actions row through `ModuleActions`
+(`components/shared/module-actions`), which renders nothing when there are no
+buttons; a view not yet converted composes `Section` and `ModuleHeading`
+directly. `Section` always renders a real `<section>`; its outer element owns
 the full-bleed background (driven by `brandVariant`) and vertical spacing as
 responsive padding (not margin, so stacked `Section`s tile edge-to-edge; the
 `spacingTop`/`spacingBottom` scale steps down at each Tailwind breakpoint,
@@ -2568,6 +2574,11 @@ Full checklist:
   [`docs/context/ci-automation.md`](./docs/context/ci-automation.md).
 - Hooks: husky + lint-staged (report-only eslint + prettier on staged files;
   a lint error blocks the commit, nothing is rewritten beyond formatting).
+- File size budgets (`CLAUDE.md` "File size budgets") are a local gate, never
+  a CI job: `pnpm check:file-size` runs at commit through lint-staged and in
+  `pnpm verify`, holding every over-budget file at its count in
+  `scripts/file-size-baseline.json` so it can only shrink. The `reviewer`
+  blocks the same growth when the local check was skipped.
 - Conventional commits; one concern per PR.
 
 ## 12. Delivery process

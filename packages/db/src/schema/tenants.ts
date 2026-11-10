@@ -1,9 +1,7 @@
 import {
   LOCALE_ISO_CODES,
   SITE_TYPE,
-  type TLocaleIsoCode,
   type TSanityLoginProvider,
-  type TSiteType,
 } from '@blog/config/constants';
 import {
   TENANT_PLAN,
@@ -12,11 +10,9 @@ import {
   type TSuspensionReason,
   type TElevateTenantOwnerOutcome,
   type TSanityProjectRole,
-  type TTenantPlan,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
-  type TTenantStatus,
   type TWorkerProvisioningStep,
 } from '@blog/db/constants';
 import { sql } from 'drizzle-orm';
@@ -33,25 +29,13 @@ import {
 
 import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
 
-export const tenantPlanEnum = pgEnum(
-  'tenant_plan',
-  Object.values(TENANT_PLAN) as [TTenantPlan, ...TTenantPlan[]],
-);
+export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);
 
-export const localeCodeEnum = pgEnum(
-  'locale_code',
-  Object.values(LOCALE_ISO_CODES) as [TLocaleIsoCode, ...TLocaleIsoCode[]],
-);
+export const localeCodeEnum = pgEnum('locale_code', LOCALE_ISO_CODES);
 
-export const tenantStatusEnum = pgEnum(
-  'tenant_status',
-  Object.values(TENANT_STATUS) as [TTenantStatus, ...TTenantStatus[]],
-);
+export const tenantStatusEnum = pgEnum('tenant_status', TENANT_STATUS);
 
-export const siteTypeEnum = pgEnum(
-  'site_type',
-  Object.values(SITE_TYPE) as [TSiteType, ...TSiteType[]],
-);
+export const siteTypeEnum = pgEnum('site_type', SITE_TYPE);
 
 export type TProvisioningStepState = {
   status: TTenantProvisioningStepStatus;

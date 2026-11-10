@@ -65,6 +65,12 @@ Map each changed file to its layer, then walk the skill's spec and
 feature-doc sync item and §1–7 over the diff. Boundary and type violations
 are blocking.
 
+§5's prop-ceiling count is part of this pass, for every component whose file
+the diff touches — not only those whose props the diff changes. A review that
+has not counted them cannot return `APPROVE`: a component over its ceiling goes
+under **Blocking** with its count, and the counts at or under it go in one
+line under **Non-blocking** ("no components touched" when there are none).
+
 ### Pass 3 — General
 
 What a contract check won't catch: the skill's "How to run a review here"

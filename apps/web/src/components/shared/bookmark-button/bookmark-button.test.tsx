@@ -3,7 +3,7 @@ import { OAUTH_PROVIDER } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
-import { AuthMenu } from '@web/components/shared/auth-menu';
+import { AuthMenu } from '@web/components/shared/site-header/components/auth-menu/auth-menu';
 import { BOOKMARK_LOG } from '@web/constants/bookmark';
 import { SESSION_STATUS } from '@web/constants/session';
 import { ToastProvider } from '@web/context/toast-provider';

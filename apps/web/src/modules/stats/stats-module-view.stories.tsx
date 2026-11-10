@@ -4,8 +4,8 @@ import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
   MOCK_STAT_ITEMS,
   mockStatItem,
+  mockStatsModule,
 } from '@web/testing/modules/stats/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
 import { StatsModuleView } from './stats-module-view';
 
@@ -55,24 +55,8 @@ const meta = {
   component: StatsModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: Object.values(BRAND_VARIANT),
-    },
-    contentAlignment: {
-      control: 'select',
-      options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-    },
-  },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockHeadingBlock({ heading: 'By the numbers' }),
-    stats: stats.slice(0, 2),
-    footnote: undefined,
-    ctaButtons: [],
-    contentAlignment: undefined,
-    layout: undefined,
+    module: mockStatsModule({ stats: stats.slice(0, 2) }),
     titleId: 'stats-title',
     dataTestId: 'stats-module-stats-1',
   },
@@ -84,85 +68,88 @@ type TStory = StoryObj<typeof meta>;
 export const TwoFigures: TStory = {};
 
 export const FourFigures: TStory = {
-  args: { stats },
+  args: { module: mockStatsModule({ stats }) },
 };
 
 export const FiveFigures: TStory = {
-  args: {
-    stats: [...stats, fasterIndexingStat],
-  },
+  args: { module: mockStatsModule({ stats: [...stats, fasterIndexingStat] }) },
 };
 
 export const SixFigures: TStory = {
   args: {
-    stats: [
-      ...stats,
-      fasterIndexingStat,
-      mockStatItem({ id: 'stat-6', value: 'Top 10', label: 'Industry rank' }),
-    ],
+    module: mockStatsModule({
+      stats: [
+        ...stats,
+        fasterIndexingStat,
+        mockStatItem({ id: 'stat-6', value: 'Top 10', label: 'Industry rank' }),
+      ],
+    }),
   },
 };
 
 export const WithFootnote: TStory = {
-  args: {
-    stats,
-    footnote: FOOTNOTE,
-  },
+  args: { module: mockStatsModule({ stats, footnote: FOOTNOTE }) },
 };
 
 export const WithActions: TStory = {
-  args: {
-    stats,
-    ctaButtons: MOCK_CTA_ACTIONS,
-  },
+  args: { module: mockStatsModule({ stats, ctaButtons: MOCK_CTA_ACTIONS }) },
 };
 
 export const CenterAligned: TStory = {
   args: {
-    stats,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    module: mockStatsModule({
+      stats,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
   },
 };
 
 export const LeftAlignedWithFootnote: TStory = {
   args: {
-    stats,
-    footnote: FOOTNOTE,
-    contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    module: mockStatsModule({
+      stats,
+      footnote: FOOTNOTE,
+      contentAlignment: CONTENT_ALIGNMENT.LEFT,
+    }),
   },
 };
 
 export const CenterAlignedWithFootnote: TStory = {
   args: {
-    stats,
-    footnote: FOOTNOTE,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    module: mockStatsModule({
+      stats,
+      footnote: FOOTNOTE,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
   },
 };
 
 export const Secondary: TStory = {
   args: {
-    stats,
-    brandVariant: BRAND_VARIANT.SECONDARY,
+    module: mockStatsModule({ stats, brandVariant: BRAND_VARIANT.SECONDARY }),
   },
 };
 
 export const BrandPrimary: TStory = {
   args: {
-    stats,
-    brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    module: mockStatsModule({
+      stats,
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    }),
   },
 };
 
 export const EightCharacterValues: TStory = {
-  args: { stats: eightCharacterStats },
+  args: { module: mockStatsModule({ stats: eightCharacterStats }) },
 };
 
 export const SidebarColumn: TStory = {
   globals: { viewport: 'desktop' },
   args: {
-    stats: statsWithDescriptions,
-    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    module: mockStatsModule({
+      stats: statsWithDescriptions,
+      contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    }),
   },
   decorators: [
     (Story) => (
@@ -176,8 +163,10 @@ export const SidebarColumn: TStory = {
 export const SidebarColumnBrandPrimary: TStory = {
   globals: SidebarColumn.globals,
   args: {
-    stats: stats.slice(0, 3),
-    brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    module: mockStatsModule({
+      stats: stats.slice(0, 3),
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+    }),
   },
   decorators: SidebarColumn.decorators,
 };
@@ -189,7 +178,7 @@ export const Tablet: TStory = {
 
 export const Phone: TStory = {
   globals: { viewport: 'mobile' },
-  args: { stats },
+  args: FourFigures.args,
 };
 
 export const PhoneEightCharacterValues: TStory = {
