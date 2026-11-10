@@ -416,9 +416,18 @@ Variants: wrapped: (boolean)
 
 ### CtaModule — `components/organisms/cta-module/cta-module.tsx`
 
-Page-builder organism rendering a call-to-action in one of three layouts.
-Props: variant: TCtaVariant · tone: TBrandVariant · eyebrow?: string · heading: string · headingId?: string · supportingText?: string · content?: ReactNode · image?: ReactNode · actions?: ReactNode · footnote?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · isWrapped?: TCtaModuleVariants['wrapped'] · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale _(extends IWithClassName, IWithDataTestId)_
-Variants: variant: CTA_VARIANT.BANNER|CTA_VARIANT.SPLIT|CTA_VARIANT.CALLOUT · tone: BRAND_VARIANT.PRIMARY|BRAND_VARIANT.SECONDARY|BRAND_VARIANT.BRAND_PRIMARY · position: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · alignment: CONTENT_ALIGNMENT.LEFT|CONTENT_ALIGNMENT.CENTER|CONTENT_ALIGNMENT.RIGHT · mobileMediaOrder: MEDIA_ORDER.FIRST|MEDIA_ORDER.LAST · wrapped: (boolean)
+A page-builder call-to-action in three layouts — `Split`, `Banner` and `Callout` — each filled through the `Eyebrow`, `Text`, `Actions`, `Footnote` and `Media` slots.
+
+Compound component:
+
+- **CtaModule.Split** — A call-to-action card with its copy beside its image. Props: tone: TBrandVariant · heading: string · headingId?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · mobileMediaOrder?: TMediaOrder · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Banner** — A full-bleed call-to-action band with its copy over a photo. Props: tone: TBrandVariant · heading: string · headingId?: string · contentPosition?: TContentAlignment · contentAlignment?: TContentAlignment · spacingTop?: TSpacingScale · spacingBottom?: TSpacingScale · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Callout** — A call-to-action card with its image above its copy. Props: tone: TBrandVariant · heading: string · headingId?: string · contentAlignment?: TContentAlignment · children?: TCompoundChildren<typeof CtaModuleSlotParts> _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Eyebrow** — The label slot above a `CtaModule` heading. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Text** — The copy slot under a `CtaModule` heading: a plain supporting line, then rich content set as prose. Props: supportingText?: string · children?: ReactNode _(extends IWithClassName)_
+- **CtaModule.Actions** — The row a `CtaModule` lays its buttons and links out in. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Footnote** — The fine-print slot under a `CtaModule`'s actions. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **CtaModule.Media** — The image slot of a `CtaModule`; framed at 16:9 in a card, unframed behind a banner's copy. Props: isFramed?: boolean · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 ### Dialog — `components/organisms/dialog/dialog.tsx`
 

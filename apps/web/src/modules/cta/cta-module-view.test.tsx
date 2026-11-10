@@ -1,3 +1,4 @@
+import { CTA_VARIANT } from '@blog/config';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_ACTIONS,
@@ -18,7 +19,7 @@ const INSTANCE_COUNT = 2;
 
 const setup = customRender(CtaModuleView, {
   id: MOCK_CTA_MODULE_ID,
-  ...MOCK_CTA_MODULE,
+  module: MOCK_CTA_MODULE,
 });
 
 describe(`<${CtaModuleView.name}/>`, () => {
@@ -67,7 +68,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
   });
 
   it('renders the authored actions as links, in order', () => {
-    setup({ ctaButtons: MOCK_CTA_ACTIONS });
+    setup({ module: mockCtaModuleData({ ctaButtons: MOCK_CTA_ACTIONS }) });
 
     const [primaryLink, secondaryLink, ...otherLinks] =
       screen.getAllByRole('link');
@@ -80,7 +81,7 @@ describe(`<${CtaModuleView.name}/>`, () => {
   });
 
   it('renders the optional rich-text content', () => {
-    setup({ content: MOCK_CTA_CONTENT });
+    setup({ module: mockCtaModuleData({ content: MOCK_CTA_CONTENT }) });
 
     const trialText = screen.getByText('14-day trial');
     const listItems = screen.getAllByRole('listitem');
@@ -88,4 +89,18 @@ describe(`<${CtaModuleView.name}/>`, () => {
     expect(trialText).toBeVisible();
     expect(listItems).toHaveLength(2);
   });
+
+  it.each(Object.values(CTA_VARIANT))(
+    'renders the %s layout under its heading',
+    (variant) => {
+      setup({ module: mockCtaModuleData({ variant }) });
+
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_CTA_HEADING,
+      });
+
+      expect(heading).toBeVisible();
+    },
+  );
 });
