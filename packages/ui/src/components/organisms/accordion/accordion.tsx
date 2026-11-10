@@ -16,17 +16,20 @@ const AccordionParts = {
 
 export type TAccordionProps = IWithClassName &
   IWithDataTestId & {
+    defaultValue?: string[];
     children?: ReactNode;
   };
 
 /** A list of disclosure rows; any number can be open at once. */
 const AccordionRoot = ({
+  defaultValue,
   children,
   className,
   dataTestId,
 }: TAccordionProps) => (
   <BaseAccordion.Root
     multiple={true}
+    defaultValue={defaultValue}
     className={accordionVariants({ class: className })}
     data-testid={dataTestId}
   >

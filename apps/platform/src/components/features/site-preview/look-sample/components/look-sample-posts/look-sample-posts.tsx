@@ -1,5 +1,6 @@
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { MediaCard } from '@blog/ui/components/molecules/media-card';
+import { LookSamplePostImage } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/components/look-sample-post-image/look-sample-post-image';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -21,6 +22,9 @@ export const LookSamplePosts = () => {
       </Heading>
       <div className={cards()}>
         <MediaCard isInteractive={true} excerpt={t('firstCardExcerpt')}>
+          <MediaCard.Media>
+            <LookSamplePostImage />
+          </MediaCard.Media>
           <MediaCard.Meta
             dateValue={FIRST_POST_DATE}
             dateLabel={t('firstCardDate')}
@@ -31,6 +35,9 @@ export const LookSamplePosts = () => {
           </MediaCard.Title>
         </MediaCard>
         <MediaCard isInteractive={false} excerpt={t('secondCardExcerpt')}>
+          <MediaCard.Media>
+            <LookSamplePostImage />
+          </MediaCard.Media>
           <MediaCard.Meta
             dateValue={SECOND_POST_DATE}
             dateLabel={t('secondCardDate')}

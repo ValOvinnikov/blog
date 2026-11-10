@@ -502,6 +502,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_ROW**: `COLOUR`, `BRAND`, `TYPE`, `SHAPE`, `CARDS`, `BUTTONS`, `HEADER`, `FOOTER`, `LANGUAGE_SWITCHER`
 
+### `@platform/constants/look-sample` — `apps/platform/src/constants/look-sample.ts`
+
+- **LOOK_SAMPLE_FAQ_ITEM**: `FIRST`, `SECOND`
+
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
 - **MEDIA_QUERY**: `LG_UP`=`"(width >= 64rem)"`, `PREFERS_DARK`=`"(prefers-color-scheme: dark)"`, `COARSE_POINTER`=`"(pointer: coarse)"`, `REDUCED_MOTION`=`"(prefers-reduced-motion: reduce)"`

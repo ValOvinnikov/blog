@@ -58,6 +58,7 @@ import { LookSample, type TLookSampleProps } from './look-sample';
 faker.seed(5994);
 
 const SUBSCRIBE = 'Subscribe';
+const ARIA_EXPANDED = 'aria-expanded';
 const SIGN_IN = 'Sign in';
 const MENU = 'Menu';
 const POSTS = 'Posts';
@@ -86,6 +87,17 @@ const {
   readTimeChip: READ_TIME,
   firstCardDate: FIRST_CARD_DATE,
   secondCardDate: SECOND_CARD_DATE,
+  faqHeading: QUESTIONS,
+  faqFirstQuestion: FIRST_QUESTION,
+  faqFirstAnswer: FIRST_ANSWER,
+  faqSecondQuestion: SECOND_QUESTION,
+  formFieldLabel: EMAIL_ADDRESS,
+  formFieldPlaceholder: EMAIL_PLACEHOLDER,
+  quoteText: QUOTE_TEXT,
+  quoteName: QUOTE_NAME,
+  quoteRole: QUOTE_ROLE,
+  ctaHeading: CTA_HEADING,
+  ctaText: CTA_TEXT,
 } = messages.lookPreview;
 
 const MOCK_BUSY: IBusyStyle = {
@@ -147,12 +159,14 @@ describe(`<${LookSample.name}/>`, () => {
       setup();
     });
 
-    it('shows the tenant name and a Subscribe button', () => {
+    it('shows the tenant name and a Subscribe button in the hero, the form and the call to action', () => {
       const tenantNames = screen.getAllByText(MOCK_TENANT_NAME);
-      const subscribeButton = screen.getByRole('button', { name: SUBSCRIBE });
+      const subscribeButtons = screen.getAllByRole('button', {
+        name: SUBSCRIBE,
+      });
 
       expect(tenantNames.length).toBeGreaterThan(0);
-      expect(subscribeButton).toBeVisible();
+      expect(subscribeButtons).toHaveLength(3);
     });
 
     it('keeps the sample out of the tab order and the page outline', () => {
@@ -206,6 +220,46 @@ describe(`<${LookSample.name}/>`, () => {
       readTimes.forEach((readTime) => {
         expect(latestPosts).toContainElement(readTime);
       });
+    });
+
+    it('asks two questions under Questions, answering the first', () => {
+      const questions = within(screen.getByRole('region', { name: QUESTIONS }));
+      const firstQuestion = questions.getByRole('button', {
+        name: FIRST_QUESTION,
+      });
+      const secondQuestion = questions.getByRole('button', {
+        name: SECOND_QUESTION,
+      });
+      const firstAnswer = questions.getByText(FIRST_ANSWER);
+
+      expect(firstQuestion).toHaveAttribute(ARIA_EXPANDED, 'true');
+      expect(secondQuestion).toHaveAttribute(ARIA_EXPANDED, 'false');
+      expect(firstAnswer).toBeVisible();
+    });
+
+    it('labels the email field and suggests an address', () => {
+      const field = screen.getByRole('textbox', { name: EMAIL_ADDRESS });
+
+      expect(field).toHaveAttribute('placeholder', EMAIL_PLACEHOLDER);
+    });
+
+    it('quotes the harbour pilot by name and role', () => {
+      const quote = screen.getByRole('figure');
+
+      expect(quote).toHaveTextContent(QUOTE_TEXT);
+      expect(quote).toHaveTextContent(QUOTE_NAME);
+      expect(quote).toHaveTextContent(QUOTE_ROLE);
+    });
+
+    it('shows the call to action with its supporting line', () => {
+      const ctaHeading = screen.getByRole('heading', {
+        level: 2,
+        name: CTA_HEADING,
+      });
+      const ctaText = screen.getByText(CTA_TEXT);
+
+      expect(ctaHeading).toBeVisible();
+      expect(ctaText).toBeVisible();
     });
 
     it('marks the header and the footer as sample parts', () => {
@@ -285,12 +339,14 @@ describe(`<${LookSample.name}/>`, () => {
       },
     });
 
-    const button = screen.getByRole('button', { name: SUBSCRIBE });
+    const buttons = screen.getAllByRole('button', { name: SUBSCRIBE });
 
-    const brandPrimary =
-      getComputedStyle(button).getPropertyValue('--brand-primary');
+    buttons.forEach((button) => {
+      const brandPrimary =
+        getComputedStyle(button).getPropertyValue('--brand-primary');
 
-    expect(brandPrimary).toBe(MOCK_DARK_ACCENT);
+      expect(brandPrimary).toBe(MOCK_DARK_ACCENT);
+    });
   });
 
   it('renders the uploaded logo in both headers and the footer', () => {
@@ -353,7 +409,7 @@ describe(`<${LookSample.name}/>`, () => {
         name: ACCOUNT_MENU,
       });
 
-      expect(accountButton).toHaveAttribute('aria-expanded', 'true');
+      expect(accountButton).toHaveAttribute(ARIA_EXPANDED, 'true');
       expect(accountMenu).toBeVisible();
       expect(accountMenu).toHaveTextContent(SIGN_OUT);
     });
