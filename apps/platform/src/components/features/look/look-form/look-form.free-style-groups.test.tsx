@@ -61,6 +61,12 @@ describe(`<${LookForm.name}/>`, () => {
       },
       {
         row: LOOK_ROW.BUTTONS,
+        group: LOOK_FORM.buttonShapeLabel,
+        current: LOOK_FORM.buttonShapeOptionLabel.ROUNDED,
+        other: LOOK_FORM.buttonShapeOptionLabel.PILL,
+      },
+      {
+        row: LOOK_ROW.BUTTONS,
         group: LOOK_FORM.busyButtonStyleLabel,
         current: LOOK_FORM.busyButtonStyleOptionLabel.LABEL,
         other: LOOK_FORM.busyButtonStyleOptionLabel.EDGE,

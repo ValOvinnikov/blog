@@ -1,11 +1,16 @@
 import {
+  BUTTON_SHAPE,
   DENSITY,
   HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
+  type TButtonShape,
   type TDensity,
   type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config';
+import ButtonShapePill from '@platform/assets/look-glyphs/button-shape-pill.svg';
+import ButtonShapeRounded from '@platform/assets/look-glyphs/button-shape-rounded.svg';
+import ButtonShapeSquare from '@platform/assets/look-glyphs/button-shape-square.svg';
 import DensityCompact from '@platform/assets/look-glyphs/density-compact.svg';
 import DensityDefault from '@platform/assets/look-glyphs/density-default.svg';
 import HeaderControlStyleOutlined from '@platform/assets/look-glyphs/header-control-style-outlined.svg';
@@ -21,6 +26,7 @@ type TLookOptionGlyphValues = {
   radiusScale: TRadiusScale;
   density: TDensity;
   headerControlStyle: THeaderControlStyle;
+  buttonShape: TButtonShape;
 };
 
 type TLookOptionGlyphRegistry = {
@@ -45,6 +51,11 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
     [HEADER_CONTROL_STYLE.OUTLINED]: HeaderControlStyleOutlined,
     [HEADER_CONTROL_STYLE.SOFT]: HeaderControlStyleSoft,
     [HEADER_CONTROL_STYLE.PLAIN]: HeaderControlStylePlain,
+  },
+  buttonShape: {
+    [BUTTON_SHAPE.SQUARE]: ButtonShapeSquare,
+    [BUTTON_SHAPE.ROUNDED]: ButtonShapeRounded,
+    [BUTTON_SHAPE.PILL]: ButtonShapePill,
   },
 };
 

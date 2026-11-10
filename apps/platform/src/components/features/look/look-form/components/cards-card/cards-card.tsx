@@ -53,8 +53,7 @@ export const CardsCard = ({ summary }: TCardsCardProps) => {
           options={options}
           value={cardStyle}
           onChange={(style) => updateField('cardStyle', style)}
-          isDisabled={lock.isDisabled}
-          isLocked={lock.isLocked}
+          lock={lock}
         />
         <PresetValueButton field="cardStyle" fieldLabel={label} />
       </LookField>

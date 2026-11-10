@@ -96,8 +96,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
               updateField('headerSubmenuStyle', style);
               markChanged();
             }}
-            isDisabled={submenuStyleLock.isDisabled}
-            isLocked={submenuStyleLock.isLocked}
+            lock={submenuStyleLock}
           />
         </LookField>
       </div>
@@ -115,8 +114,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
           options={barStyleOptions}
           value={headerBarStyle}
           onChange={(style) => updateField('headerBarStyle', style)}
-          isDisabled={barStyleLock.isDisabled}
-          isLocked={barStyleLock.isLocked}
+          lock={barStyleLock}
         />
       </LookField>
 

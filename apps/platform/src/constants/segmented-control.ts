@@ -1,8 +1,9 @@
 import type { TValueOf } from '@blog/config/utils';
 
-export const SEGMENTED_OPTION_WIDTH = {
+export const SEGMENTED_LAYOUT = {
   FIT: 'FIT',
   WIDE: 'WIDE',
+  SINGLE_ROW: 'SINGLE_ROW',
 } as const;
 
-export type TSegmentedOptionWidth = TValueOf<typeof SEGMENTED_OPTION_WIDTH>;
+export type TSegmentedLayout = TValueOf<typeof SEGMENTED_LAYOUT>;

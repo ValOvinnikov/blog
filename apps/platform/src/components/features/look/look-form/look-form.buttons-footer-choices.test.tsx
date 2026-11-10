@@ -1,6 +1,7 @@
 import {
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
@@ -41,6 +42,12 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it.each([
+      {
+        row: LOOK_ROW.BUTTONS,
+        group: LOOK_FORM.buttonShapeLabel,
+        option: LOOK_FORM.buttonShapeOptionLabel.PILL,
+        saved: { buttonShape: BUTTON_SHAPE.PILL },
+      },
       {
         row: LOOK_ROW.BUTTONS,
         group: LOOK_FORM.busyButtonStyleLabel,

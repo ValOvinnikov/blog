@@ -2,6 +2,7 @@ import {
   ACCOUNT_BUTTON_STYLE,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
@@ -44,6 +45,7 @@ const seedValues = () => ({
   density: DENSITY.DEFAULT,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  buttonShape: BUTTON_SHAPE.ROUNDED,
   busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
   spinnerStyle: SPINNER_STYLE.BRAILLE,
   headerLayout: HEADER_LAYOUT.CLASSIC,
@@ -65,7 +67,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
       [LOOK_ROW.SHAPE]: 'Medium · Default',
       [LOOK_ROW.CARDS]: 'Accent bar',
-      [LOOK_ROW.BUTTONS]: 'Busy label · Braille',
+      [LOOK_ROW.BUTTONS]: 'Rounded · Busy label · Braille',
       [LOOK_ROW.HEADER]:
         'Classic · Full width · Dropdown · Outlined · Pill with label',
       [LOOK_ROW.FOOTER]:
@@ -102,7 +104,20 @@ describe(buildLookRowSummaries, () => {
 
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
-    expect(summaries[LOOK_ROW.BUTTONS]).toBe('Progress edge · Braille');
+    expect(summaries[LOOK_ROW.BUTTONS]).toBe(
+      'Rounded · Progress edge · Braille',
+    );
+  });
+
+  it.each([
+    [BUTTON_SHAPE.SQUARE, 'Square'],
+    [BUTTON_SHAPE.PILL, 'Pill'],
+  ])('leads the Buttons row with the %s shape', (buttonShape, reads) => {
+    const values = { ...seedValues(), buttonShape };
+
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
+
+    expect(summaries[LOOK_ROW.BUTTONS]).toBe(`${reads} · Busy label · Braille`);
   });
 
   it.each([

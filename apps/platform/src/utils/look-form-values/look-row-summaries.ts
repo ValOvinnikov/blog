@@ -23,6 +23,7 @@ export const buildLookRowSummaries = (
     density,
     cardStyle,
     headerControlStyle,
+    buttonShape,
     busyButtonStyle,
     spinnerStyle,
     headerLayout,
@@ -61,6 +62,7 @@ export const buildLookRowSummaries = (
     ]),
     [LOOK_ROW.CARDS]: t(`cardStyleOptionLabel.${cardStyle}`),
     [LOOK_ROW.BUTTONS]: join([
+      t(`buttonShapeOptionLabel.${buttonShape}`),
       t(`busyButtonStyleOptionLabel.${busyButtonStyle}`),
       t(`spinnerStyleOptionLabel.${spinnerStyle}`),
     ]),

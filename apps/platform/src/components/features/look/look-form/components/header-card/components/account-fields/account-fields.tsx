@@ -48,8 +48,7 @@ export const AccountFields = () => {
           options={buttonOptions}
           value={accountButtonStyle}
           onChange={(style) => updateField('accountButtonStyle', style)}
-          isDisabled={buttonLock.isDisabled}
-          isLocked={buttonLock.isLocked}
+          lock={buttonLock}
         />
       </LookField>
 
@@ -66,8 +65,7 @@ export const AccountFields = () => {
           options={panelOptions}
           value={accountPanelStyle}
           onChange={(style) => updateField('accountPanelStyle', style)}
-          isDisabled={panelLock.isDisabled}
-          isLocked={panelLock.isLocked}
+          lock={panelLock}
         />
       </LookField>
 
@@ -86,8 +84,7 @@ export const AccountFields = () => {
           onChange={(placement) =>
             updateField('accountPhonePlacement', placement)
           }
-          isDisabled={placementLock.isDisabled}
-          isLocked={placementLock.isLocked}
+          lock={placementLock}
         />
       </LookField>
     </>

@@ -4,6 +4,7 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   COOKIE_SETTINGS_BUTTON,
   FONT_CHOICE,
   FOOTER_LAYOUT,
@@ -168,26 +169,14 @@ describe(switchPreset, () => {
     });
   });
 
-  it('keeps a spinner the owner changed', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      spinnerStyle: SPINNER_STYLE.PULSE,
-    };
+  it.each([
+    { field: 'spinnerStyle', value: SPINNER_STYLE.PULSE },
+    { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
+    { field: 'accentHue', value: CONSOLE.themeTokens.accentHue + 1 },
+  ] as const)('keeps a $field the owner changed', ({ field, value }) => {
+    const current = { ...defaultLookFormValues(), [field]: value };
 
-    expect(switchPreset(PRESET_ID.EDITORIAL, current).spinnerStyle).toBe(
-      SPINNER_STYLE.PULSE,
-    );
-  });
-
-  it('keeps a customised accent hue', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      accentHue: CONSOLE.themeTokens.accentHue + 1,
-    };
-
-    expect(switchPreset(PRESET_ID.EDITORIAL, current).accentHue).toBe(
-      CONSOLE.themeTokens.accentHue + 1,
-    );
+    expect(switchPreset(PRESET_ID.EDITORIAL, current)[field]).toBe(value);
   });
 
   it('keeps a set logo hue', () => {
@@ -234,5 +223,16 @@ describe(withPresetValue, () => {
       ...current,
       headingFont: CONSOLE.themeTokens.headingFont,
     });
+  });
+
+  it('resets a customised button shape to the preset value', () => {
+    const current = {
+      ...defaultLookFormValues(),
+      buttonShape: BUTTON_SHAPE.PILL,
+    };
+
+    expect(withPresetValue('buttonShape', current).buttonShape).toBe(
+      CONSOLE.buttonShape,
+    );
   });
 });

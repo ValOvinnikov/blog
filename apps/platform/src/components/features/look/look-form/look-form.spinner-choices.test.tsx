@@ -1,7 +1,7 @@
 import { SPINNER_STYLE } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
-import { screen } from '@platform/testing/custom-render';
+import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { SPINNER_LABEL } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -36,6 +36,21 @@ describe(`<${LookForm.name}/> spinner`, () => {
     user = userEvent.setup();
     setupLookForm();
     await openLookRow(user, LOOK_ROW.BUTTONS);
+  });
+
+  it('groups the busy style and spinner fields under the While working heading', () => {
+    const group = screen.getByRole('group', {
+      name: LOOK_FORM.buttonsWhileWorkingHeading,
+    });
+
+    const busyField = within(group).getByRole('group', {
+      name: LOOK_FORM.busyButtonStyleLabel,
+    });
+    const spinnerField = within(group).getByRole('combobox', {
+      name: SPINNER_LABEL,
+    });
+    expect(busyField).toBeInTheDocument();
+    expect(spinnerField).toBeInTheDocument();
   });
 
   it('saves the chosen spinner', async () => {

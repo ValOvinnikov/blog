@@ -92,8 +92,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
           options={layoutOptions}
           value={footerLayout}
           onChange={(layout) => updateField('footerLayout', layout)}
-          isDisabled={layoutLock.isDisabled}
-          isLocked={layoutLock.isLocked}
+          lock={layoutLock}
         />
       </LookField>
 
@@ -110,8 +109,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
           options={backgroundOptions}
           value={footerBackground}
           onChange={(background) => updateField('footerBackground', background)}
-          isDisabled={backgroundLock.isDisabled}
-          isLocked={backgroundLock.isLocked}
+          lock={backgroundLock}
         />
       </LookField>
 
@@ -128,8 +126,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
           options={surfaceOptions}
           value={footerSurface}
           onChange={(surface) => updateField('footerSurface', surface)}
-          isDisabled={surfaceLock.isDisabled}
-          isLocked={surfaceLock.isLocked}
+          lock={surfaceLock}
         />
       </LookField>
 
@@ -144,7 +141,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
           options={cookieButtonOptions}
           value={cookieSettingsButton}
           onChange={(reach) => updateField('cookieSettingsButton', reach)}
-          isDisabled={isArchived || !hasCookieBanner}
+          lock={{ isDisabled: isArchived || !hasCookieBanner }}
         />
         {!hasCookieBanner && (
           <p id={bannerOffNoteId} className={textVariants({ variant: 'hint' })}>

@@ -1,0 +1,63 @@
+import { faker } from '@faker-js/faker';
+import {
+  MOCK_FAVICON_URL,
+  MOCK_LOGO_URL,
+  mockSiteConfig,
+} from '@platform/testing/site-config/fixtures';
+
+import { toLookFormValues } from './to-look-form-values';
+
+faker.seed(6006);
+
+const MOCK_BRAND_NAME = faker.company.name();
+
+const MOCK_SITE_CONFIG = mockSiteConfig({
+  logoHue: faker.number.int({ min: 0, max: 360 }),
+  brandName: MOCK_BRAND_NAME,
+  logoAssetUrl: MOCK_LOGO_URL,
+  faviconAssetUrl: MOCK_FAVICON_URL,
+});
+
+describe(toLookFormValues, () => {
+  it('carries every stored column through unchanged', () => {
+    const values = toLookFormValues(MOCK_SITE_CONFIG);
+
+    expect(values).toEqual({
+      preset: MOCK_SITE_CONFIG.preset,
+      accentHue: MOCK_SITE_CONFIG.accentHue,
+      logoHue: MOCK_SITE_CONFIG.logoHue,
+      headingFont: MOCK_SITE_CONFIG.headingFont,
+      bodyFont: MOCK_SITE_CONFIG.bodyFont,
+      radiusScale: MOCK_SITE_CONFIG.radiusScale,
+      density: MOCK_SITE_CONFIG.density,
+      languageSwitcherStyle: MOCK_SITE_CONFIG.languageSwitcherStyle,
+      cardStyle: MOCK_SITE_CONFIG.cardStyle,
+      headerControlStyle: MOCK_SITE_CONFIG.headerControlStyle,
+      headerLayout: MOCK_SITE_CONFIG.headerLayout,
+      headerSubmenuStyle: MOCK_SITE_CONFIG.headerSubmenuStyle,
+      headerBarStyle: MOCK_SITE_CONFIG.headerBarStyle,
+      accountButtonStyle: MOCK_SITE_CONFIG.accountButtonStyle,
+      accountPanelStyle: MOCK_SITE_CONFIG.accountPanelStyle,
+      accountPhonePlacement: MOCK_SITE_CONFIG.accountPhonePlacement,
+      busyButtonStyle: MOCK_SITE_CONFIG.busyButtonStyle,
+      spinnerStyle: MOCK_SITE_CONFIG.spinnerStyle,
+      buttonShape: MOCK_SITE_CONFIG.buttonShape,
+      footerLayout: MOCK_SITE_CONFIG.footerLayout,
+      footerBackground: MOCK_SITE_CONFIG.footerBackground,
+      footerSurface: MOCK_SITE_CONFIG.footerSurface,
+      cookieSettingsButton: MOCK_SITE_CONFIG.cookieSettingsButton,
+      brandName: MOCK_BRAND_NAME,
+      logo: { url: MOCK_LOGO_URL },
+      favicon: { url: MOCK_FAVICON_URL },
+    });
+  });
+
+  it('reads an unset brand name as a blank field', () => {
+    const values = toLookFormValues({
+      ...MOCK_SITE_CONFIG,
+      brandName: undefined,
+    });
+
+    expect(values.brandName).toBe('');
+  });
+});

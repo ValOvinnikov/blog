@@ -830,7 +830,15 @@
       "MENU": "Im Menü"
     },
     "buttonsHeading": "Schaltflächen",
-    "buttonsDescription": "Wie Schaltflächen aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
+    "buttonsDescription": "Wie Schaltflächen geformt sind, wie sie aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
+    "buttonsWhileWorkingHeading": "Während der Arbeit",
+    "buttonShapeLabel": "Form",
+    "buttonShapeDescription": "Ecken von Schaltflächen, Formularfeldern und Tags.",
+    "buttonShapeOptionLabel": {
+      "SQUARE": "Eckig",
+      "ROUNDED": "Abgerundet",
+      "PILL": "Pille"
+    },
     "busyButtonStyleLabel": "Bei Beschäftigung",
     "busyButtonStyleDescription": "Was eine Schaltfläche beim Speichern oder Senden zeigt. Sie behält ihren Platz und bleibt in voller Farbe.",
     "busyButtonStyleOptionLabel": {

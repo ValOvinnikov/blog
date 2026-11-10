@@ -1,6 +1,8 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BUTTON_SHAPE,
+  BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   DENSITY,
   formatOklchRamp,
@@ -35,6 +37,7 @@ const MOCK_PREVIEW_VALUES: TThemePreviewValues = {
   density: DENSITY.COMPACT,
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  buttonShape: BUTTON_SHAPE.ROUNDED,
   accentHue: MOCK_ACCENT_HUE,
   logoHue: undefined,
 };
@@ -79,17 +82,26 @@ describe(accentHueGradient, () => {
 });
 
 describe(buildThemePreviewStyle, () => {
-  it.each(Object.values(HEADER_CONTROL_STYLE))(
-    'carries the %s header control tokens onto the preview',
-    (headerControlStyle) => {
+  it.each([
+    ...Object.values(HEADER_CONTROL_STYLE).map((value) => ({
+      label: `${value} header control`,
+      values: { headerControlStyle: value },
+      declarations: HEADER_CONTROL_STYLE_DECLARATIONS[value],
+    })),
+    ...Object.values(BUTTON_SHAPE).map((value) => ({
+      label: `${value} button shape`,
+      values: { buttonShape: value },
+      declarations: BUTTON_SHAPE_DECLARATIONS[value],
+    })),
+  ])(
+    'carries the $label tokens onto the preview',
+    ({ values, declarations }) => {
       const style = buildThemePreviewStyle(
-        { ...MOCK_PREVIEW_VALUES, headerControlStyle },
+        { ...MOCK_PREVIEW_VALUES, ...values },
         false,
       );
 
-      expect(style).toMatchObject(
-        HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
-      );
+      expect(style).toMatchObject(declarations);
     },
   );
 
