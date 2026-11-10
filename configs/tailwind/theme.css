@@ -391,6 +391,7 @@
   --header-control-fill: var(--surface);
 
   --nav-link-fill: transparent;
+  --nav-link-outline: transparent;
   --nav-link-decoration: none;
   --nav-link-padding-x: 0px;
   --nav-link-padding-y: 0px;
@@ -549,13 +550,18 @@
 
 @utility nav-link-marked {
   background-color: var(--nav-link-fill);
-  text-decoration-line: var(--nav-link-decoration);
+  outline: 1px solid var(--nav-link-outline);
+  outline-offset: -1px;
 
-  /* Forced colours drop the fill, so hover, open and current keep an outline instead. */
+  /* Forced colours drop the fill and a transparent outline, so hover, open and current show this one instead. */
   @media (forced-colors: active) {
-    outline: 1px solid CanvasText;
+    outline-color: CanvasText;
     outline-offset: 1px;
   }
+}
+
+@utility nav-link-current {
+  text-decoration-line: var(--nav-link-decoration);
 }
 
 @utility max-w-wide {
