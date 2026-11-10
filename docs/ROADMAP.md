@@ -4,13 +4,13 @@ The order the open epics ship in, from today to selling sites through the
 marketing page. Status lives on the project board and in each epic's sub-issue
 list; this page holds only the order, the decisions still open, and why. Written
 2026-10-14 from a platform inspection; restructured 2026-10-31 around a single
-launch; refreshed 2026-11-08.
+launch; refreshed 2026-11-10.
 
 ## One launch
 
 There are no numbered releases (owner, 2026-10-31). The platform launches
 publicly once, when a tenant can buy the Growth plan: Stripe billing in #4840
-is the gate. Everything on the marketing site, the legal pages, the backups and
+is the gate. Everything on the marketing site, the legal pages, the restore drills and
 the production stand-up ships before that launch, in the order below.
 
 At launch production is replaced, not upgraded (2026-10-27,
@@ -45,7 +45,7 @@ old production project (`web-prod` v0.3.0, Sanity `7fuqzuyl`) is retired.
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **#4840** | Self-serve signup on the worker: `/sign-in`, `/signup`, the `/onboarding` wizard and **Create site**; reserved subdomains and `*.<domain>`; TRIAL / PAST_DUE, tenant deletion and the abandoned-tenant sweep; site templates (#2798), the signup blocklist (#5649) and per-tenant revalidate secrets (#5719). Then **Stripe** billing (Order 5), test mode first: a 14-day trial with no card, the webhook in `apps/platform`, Upgrade through Embedded Checkout, a Billing page with our own receipt emails, a 14-day downgrade grace with emails on days 0, 7 and 13, and live prices by country on the marketing pricing page. Tickets #6872–#6884; the Growth note's "Ask about Growth" lands with #6877. |
 | **#5047** | Plans and entitlements. Free = the 13 blog modules; Growth adds testimonial, team, logoWall, stats, pricing, featureList, featureHighlights and timeline. On a downgrade gated modules stop rendering and nothing is deleted. Seats (#5055) and the Free AI quota (#5056) wait on owner decisions; a super admin granting one tenant a feature outside its plan is #6779.                                                                                                                                                                                                                                                                                                                                     |
-| **#5085** | Launch readiness: legal pages and links (#5086 → #5087 → #3726 → #5088 → #5089, then #5090's final text), newsletter guards, encrypted backups to a private Cloudflare R2 bucket (#5094 → #5095 → #5096), production error shipping and uptime checks (#5349), and Lighthouse on the marketing pages (#5097, after the apex cutover).                                                                                                                                                                                                                                                                                                                                                                         |
+| **#5085** | Launch readiness: legal pages and links (#5086 → #5087 → #3726 → #5088 → #5089, then #5090's final text), newsletter guards, rehearsed restores of the Neon point-in-time window and of the encrypted tenant exports each release takes before migrating (#5096; daily backups, #5095, are deferred), production error shipping and uptime checks (#5349), and Lighthouse on the marketing pages (#5097, after the apex cutover).                                                                                                                                                                                                                                                                             |
 | **#4979** | The two apps stay separate: language, sign-in and sessions per app. Left: its manual test.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | **#4987** | Accessible text and colour on the public site, guarded by a brand-matrix CI job.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
@@ -114,7 +114,6 @@ module presets (#2803).
 - **Prices**: Growth's amount and currencies (set in Stripe, no code
   change), banded by subscriber count or not, and whether to sell the
   newsletter before sending exists.
-- **Where the daily backup runs** (#5095): GitHub Actions now, or the worker.
 - **Vendor plans**: Resend Pro timing. Vercel is on paid Pro.
 - **Support channel and status page** tooling.
 
@@ -128,6 +127,12 @@ module presets (#2803).
   about $10 a month, that serves the Customer Portal and Stripe's hosted pages
   from `billing.<domain>` instead of a stripe.com address. One DNS record and
   a Stripe setting, no code; it can be switched on any time after launch.
+- **Daily backups** (owner, 2026-11-10, #5095): a daily schedule may not
+  be needed, and the tenant-token key should not be copied into another
+  GitHub Environment. Until then the database relies on Neon's point-in-time
+  restore, and tenant content on each release's pre-migration exports. A
+  second Sanity dataset as a snapshot was dropped: copying one server-side is
+  Enterprise-only.
 - **After the launch, for billing** (owner, 2026-11-08): a platform page for
   creating Stripe campaigns (coupons and promotion codes, never prices), and
   tenants selling their own plans through Stripe Connect.
