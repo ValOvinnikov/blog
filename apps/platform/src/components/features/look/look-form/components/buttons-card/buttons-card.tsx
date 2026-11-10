@@ -86,7 +86,6 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       </LookField>
 
       <LookSubsection heading={t('buttonsWhileWorkingHeading')}>
-        {' '}
         <LookField
           field="busyButtonStyle"
           label={t('busyButtonStyleLabel')}
