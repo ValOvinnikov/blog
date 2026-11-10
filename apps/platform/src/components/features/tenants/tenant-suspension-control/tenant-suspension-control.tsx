@@ -16,11 +16,11 @@ import {
   suspendTenantAction,
 } from '@platform/server/tenants/tenant-suspension-actions';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { cardBodyStackClasses } from '@platform/utils/card-body-stack-classes/card-body-stack-classes';
 import { useTenantLifecycleAction } from '@platform/utils/use-tenant-lifecycle-action/use-tenant-lifecycle-action';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 
-import { tenantSuspensionControlVariants } from './tenant-suspension-control-variants';
 import { useSuspensionForm } from './use-suspension-form';
 
 export type TTenantSuspensionControlProps = {
@@ -62,44 +62,40 @@ export const TenantSuspensionControl = ({
     return suspendTenant(id, suspensionCase, ownerEmailBlock);
   };
 
-  const { content } = tenantSuspensionControlVariants();
-
   return (
     <Card>
       <Card.Header title={t('cardTitle')} />
-      <Card.Body>
-        <div className={content()}>
-          <Text variant="muted">{t(`${copyKey}.description`)}</Text>
+      <Card.Body className={cardBodyStackClasses()}>
+        <Text variant="muted">{t(`${copyKey}.description`)}</Text>
 
-          {isSuspended && suspension && (
-            <SuspensionCaseDetails suspension={suspension} />
-          )}
+        {isSuspended && suspension && (
+          <SuspensionCaseDetails suspension={suspension} />
+        )}
 
-          <ConfirmDialog
-            tone={isSuspended ? BUTTON_VARIANT.PRIMARY : BUTTON_VARIANT.DANGER}
-            onConfirm={confirm}
-            onConfirmed={() => router.refresh()}
-            onOpenChange={reset}
+        <ConfirmDialog
+          tone={isSuspended ? BUTTON_VARIANT.PRIMARY : BUTTON_VARIANT.DANGER}
+          onConfirm={confirm}
+          onConfirmed={() => router.refresh()}
+          onOpenChange={reset}
+        >
+          <ConfirmDialog.Trigger>
+            {t(`${copyKey}.triggerButton`)}
+          </ConfirmDialog.Trigger>
+          <ConfirmDialog.Content
+            title={t(`${copyKey}.dialogTitle`, { name })}
+            description={t(`${copyKey}.dialogDescription`)}
+            confirmButtonLabel={t(`${copyKey}.confirmButton`)}
+            confirmingButtonLabel={t(`${copyKey}.confirmingButton`)}
+            isConfirmDisabled={!isSuspended && !isComplete}
           >
-            <ConfirmDialog.Trigger>
-              {t(`${copyKey}.triggerButton`)}
-            </ConfirmDialog.Trigger>
-            <ConfirmDialog.Content
-              title={t(`${copyKey}.dialogTitle`, { name })}
-              description={t(`${copyKey}.dialogDescription`)}
-              confirmButtonLabel={t(`${copyKey}.confirmButton`)}
-              confirmingButtonLabel={t(`${copyKey}.confirmingButton`)}
-              isConfirmDisabled={!isSuspended && !isComplete}
-            >
-              {!isSuspended && (
-                <>
-                  <SuspensionCaseFields {...caseFields} />
-                  <BlockOwnerFields {...blockFields} />
-                </>
-              )}
-            </ConfirmDialog.Content>
-          </ConfirmDialog>
-        </div>
+            {!isSuspended && (
+              <>
+                <SuspensionCaseFields {...caseFields} />
+                <BlockOwnerFields {...blockFields} />
+              </>
+            )}
+          </ConfirmDialog.Content>
+        </ConfirmDialog>
       </Card.Body>
     </Card>
   );
