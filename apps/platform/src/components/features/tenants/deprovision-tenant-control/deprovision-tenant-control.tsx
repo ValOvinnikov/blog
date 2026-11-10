@@ -27,16 +27,11 @@ export const DeprovisionTenantControl = ({
     'deprovisionFailed',
   );
   const { id, name } = tenant;
-
-  const { cardBorder, cardHeader, cardTitle, content } =
-    deprovisionTenantControlVariants();
+  const { content } = deprovisionTenantControlVariants();
 
   return (
-    <Card className={cardBorder()}>
-      <Card.Header
-        title={<span className={cardTitle()}>{t('cardTitle')}</span>}
-        className={cardHeader()}
-      />
+    <Card isDanger={true}>
+      <Card.Header title={t('cardTitle')} />
       <Card.Body>
         <div className={content()}>
           <Text variant="muted">{t('description')}</Text>

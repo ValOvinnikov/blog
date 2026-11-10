@@ -2,9 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const runErrorCardVariants = tv({
   slots: {
-    cardBorder: ['border-admin-bad/30'],
-    cardHeader: ['border-admin-bad/20'],
-    cardTitle: ['flex items-center gap-2 text-admin-bad'],
+    title: ['flex items-center gap-2'],
     titleIcon: ['flex-none'],
     content: ['flex flex-col gap-3'],
     details: ['mt-1'],
