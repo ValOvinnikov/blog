@@ -19,26 +19,7 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
-  type TAccountButtonStyle,
-  type TAccountPanelStyle,
-  type TAccountPhonePlacement,
-  type TBrandVariant,
-  type TBusyButtonStyle,
-  type TCardStyle,
-  type TCookieSettingsButton,
-  type TDensity,
-  type TFontChoice,
-  type TFooterLayout,
-  type TFooterSurface,
-  type THeaderBarStyle,
-  type THeaderControlStyle,
-  type THeaderLayout,
-  type THeaderSubmenuStyle,
-  type TLanguageSwitcherStyle,
   type TLocaleIsoCode,
-  type TPresetId,
-  type TRadiusScale,
-  type TSpinnerStyle,
 } from '@blog/config/constants';
 import {
   integer,
@@ -53,120 +34,66 @@ import {
 import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
 import { tenants } from './tenants';
 
-export const presetIdEnum = pgEnum(
-  'preset_id',
-  Object.values(PRESET_ID) as [TPresetId, ...TPresetId[]],
-);
+export const presetIdEnum = pgEnum('preset_id', PRESET_ID);
 
-export const fontChoiceEnum = pgEnum(
-  'font_choice',
-  Object.values(FONT_CHOICE) as [TFontChoice, ...TFontChoice[]],
-);
+export const fontChoiceEnum = pgEnum('font_choice', FONT_CHOICE);
 
-export const radiusScaleEnum = pgEnum(
-  'radius_scale',
-  Object.values(RADIUS_SCALE) as [TRadiusScale, ...TRadiusScale[]],
-);
+export const radiusScaleEnum = pgEnum('radius_scale', RADIUS_SCALE);
 
-export const densityEnum = pgEnum(
-  'density',
-  Object.values(DENSITY) as [TDensity, ...TDensity[]],
-);
+export const densityEnum = pgEnum('density', DENSITY);
 
 export const languageSwitcherStyleEnum = pgEnum(
   'language_switcher_style',
-  Object.values(LANGUAGE_SWITCHER_STYLE) as [
-    TLanguageSwitcherStyle,
-    ...TLanguageSwitcherStyle[],
-  ],
+  LANGUAGE_SWITCHER_STYLE,
 );
 
-export const cardStyleEnum = pgEnum(
-  'card_style',
-  Object.values(CARD_STYLE) as [TCardStyle, ...TCardStyle[]],
-);
+export const cardStyleEnum = pgEnum('card_style', CARD_STYLE);
 
 export const headerControlStyleEnum = pgEnum(
   'header_control_style',
-  Object.values(HEADER_CONTROL_STYLE) as [
-    THeaderControlStyle,
-    ...THeaderControlStyle[],
-  ],
+  HEADER_CONTROL_STYLE,
 );
 
 export const accountButtonStyleEnum = pgEnum(
   'account_button_style',
-  Object.values(ACCOUNT_BUTTON_STYLE) as [
-    TAccountButtonStyle,
-    ...TAccountButtonStyle[],
-  ],
+  ACCOUNT_BUTTON_STYLE,
 );
 
 export const accountPanelStyleEnum = pgEnum(
   'account_panel_style',
-  Object.values(ACCOUNT_PANEL_STYLE) as [
-    TAccountPanelStyle,
-    ...TAccountPanelStyle[],
-  ],
+  ACCOUNT_PANEL_STYLE,
 );
 
 export const accountPhonePlacementEnum = pgEnum(
   'account_phone_placement',
-  Object.values(ACCOUNT_PHONE_PLACEMENT) as [
-    TAccountPhonePlacement,
-    ...TAccountPhonePlacement[],
-  ],
+  ACCOUNT_PHONE_PLACEMENT,
 );
 
 export const busyButtonStyleEnum = pgEnum(
   'busy_button_style',
-  Object.values(BUSY_BUTTON_STYLE) as [TBusyButtonStyle, ...TBusyButtonStyle[]],
+  BUSY_BUTTON_STYLE,
 );
 
-export const spinnerStyleEnum = pgEnum(
-  'spinner_style',
-  Object.values(SPINNER_STYLE) as [TSpinnerStyle, ...TSpinnerStyle[]],
-);
+export const spinnerStyleEnum = pgEnum('spinner_style', SPINNER_STYLE);
 
-export const headerLayoutEnum = pgEnum(
-  'header_layout',
-  Object.values(HEADER_LAYOUT) as [THeaderLayout, ...THeaderLayout[]],
-);
+export const headerLayoutEnum = pgEnum('header_layout', HEADER_LAYOUT);
 
 export const headerSubmenuStyleEnum = pgEnum(
   'header_submenu_style',
-  Object.values(HEADER_SUBMENU_STYLE) as [
-    THeaderSubmenuStyle,
-    ...THeaderSubmenuStyle[],
-  ],
+  HEADER_SUBMENU_STYLE,
 );
 
-export const headerBarStyleEnum = pgEnum(
-  'header_bar_style',
-  Object.values(HEADER_BAR_STYLE) as [THeaderBarStyle, ...THeaderBarStyle[]],
-);
+export const headerBarStyleEnum = pgEnum('header_bar_style', HEADER_BAR_STYLE);
 
-export const footerLayoutEnum = pgEnum(
-  'footer_layout',
-  Object.values(FOOTER_LAYOUT) as [TFooterLayout, ...TFooterLayout[]],
-);
+export const footerLayoutEnum = pgEnum('footer_layout', FOOTER_LAYOUT);
 
-export const footerBackgroundEnum = pgEnum(
-  'footer_background',
-  Object.values(BRAND_VARIANT) as [TBrandVariant, ...TBrandVariant[]],
-);
+export const footerBackgroundEnum = pgEnum('footer_background', BRAND_VARIANT);
 
-export const footerSurfaceEnum = pgEnum(
-  'footer_surface',
-  Object.values(FOOTER_SURFACE) as [TFooterSurface, ...TFooterSurface[]],
-);
+export const footerSurfaceEnum = pgEnum('footer_surface', FOOTER_SURFACE);
 
 export const cookieSettingsButtonEnum = pgEnum(
   'cookie_settings_button',
-  Object.values(COOKIE_SETTINGS_BUTTON) as [
-    TCookieSettingsButton,
-    ...TCookieSettingsButton[],
-  ],
+  COOKIE_SETTINGS_BUTTON,
 );
 
 export type TVoiceOverrideValue = string | TVoicePortableText;

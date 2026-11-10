@@ -92,7 +92,6 @@ const firstSentence = (flat) => {
 const stripNamePrefix = (purpose, name) =>
   purpose.replace(new RegExp(`^${name}\\b\\s*[—–-]\\s*`), '');
 
-// First sentence of a node's JSDoc, whitespace-collapsed.
 const jsDocPurpose = (node) => {
   for (const doc of ts.getJSDocCommentsAndTags(node)) {
     if (!ts.isJSDoc(doc) || !doc.comment) continue;
@@ -172,8 +171,6 @@ export const findOwnPropsType = (sf, name) => {
 
 const truncate = (s, max) => (s.length > max ? `${s.slice(0, max - 1)}…` : s);
 
-// Walk a props type into its own property members and the named types it
-// composes (interface `extends`, or the type-references in a `A & B & C` alias).
 const collectType = (typeNode, sf, members, refs) => {
   if (ts.isTypeLiteralNode(typeNode)) {
     members.push(...typeNode.members);
@@ -194,7 +191,6 @@ export const extractProps = (typeNode, sf) => {
   } else if (ts.isTypeAliasDeclaration(typeNode)) {
     collectType(typeNode.type, sf, members, refs);
   } else {
-    // a raw TypeNode — an inline param annotation like `: ComponentProps<'div'>`
     collectType(typeNode, sf, members, refs);
   }
 
@@ -210,8 +206,46 @@ export const extractProps = (typeNode, sf) => {
   return { props, extendsList: [...new Set(refs)] };
 };
 
-// Variant groups → option keys from a `tv({ variants: { … } })` call.
-const extractVariants = (file, sf) => {
+const optionKeys = (obj, sf) =>
+  obj.properties
+    .map((opt) => opt.name?.getText(sf))
+    .filter(Boolean)
+    .map((k) => k.replace(/^\[|\]$/g, '').replace(/^['"]|['"]$/g, ''));
+
+const findExportedObject = (file, name, seen = new Set()) => {
+  if (!file || seen.has(file)) return null;
+  seen.add(file);
+  const sf = parse(file);
+  const local = findLocalObject(sf, name);
+  if (local) return { obj: local, sf };
+  for (const stmt of sf.statements) {
+    if (
+      !ts.isExportDeclaration(stmt) ||
+      !stmt.moduleSpecifier ||
+      !stmt.exportClause ||
+      !ts.isNamedExports(stmt.exportClause)
+    )
+      continue;
+    const el = stmt.exportClause.elements.find((e) => e.name.text === name);
+    if (!el) continue;
+    const target = resolveModule(file, stmt.moduleSpecifier.text);
+    return findExportedObject(target, el.propertyName?.text ?? name, seen);
+  }
+  return null;
+};
+
+const resolveGroupObject = (initializer, sf, file) => {
+  const expr = unwrap(initializer);
+  if (ts.isObjectLiteralExpression(expr)) return { obj: expr, sf };
+  if (!ts.isIdentifier(expr)) return null;
+  const local = findLocalObject(sf, expr.text);
+  if (local) return { obj: local, sf };
+  const binding = namedImports(sf).find((i) => i.local === expr.text);
+  if (!binding) return null;
+  return findExportedObject(resolveModule(file, binding.spec), binding.name);
+};
+
+export const extractVariants = (file, sf) => {
   let tvArg = null;
   const visit = (node) => {
     if (
@@ -238,16 +272,11 @@ const extractVariants = (file, sf) => {
 
   const groups = [];
   for (const group of variantsProp.initializer.properties) {
-    if (
-      !ts.isPropertyAssignment(group) ||
-      !ts.isObjectLiteralExpression(group.initializer)
-    )
-      continue;
+    if (!ts.isPropertyAssignment(group)) continue;
+    const resolved = resolveGroupObject(group.initializer, sf, file);
+    if (!resolved) continue;
     const groupName = group.name.getText(sf);
-    const keys = group.initializer.properties
-      .map((opt) => opt.name?.getText(sf))
-      .filter(Boolean)
-      .map((k) => k.replace(/^\[|\]$/g, '').replace(/^['"]|['"]$/g, ''));
+    const keys = optionKeys(resolved.obj, resolved.sf);
     if (keys.length === 0) continue;
     const isBoolean =
       keys.length <= 2 && keys.every((k) => k === 'true' || k === 'false');
@@ -256,20 +285,21 @@ const extractVariants = (file, sf) => {
   return groups;
 };
 
-// localName -> module specifier, for following a compound component's members
-// back to the files that declare them.
-const buildImportMap = (sf) => {
-  const map = {};
-  for (const stmt of sf.statements) {
-    if (!ts.isImportDeclaration(stmt)) continue;
-    const bindings = stmt.importClause?.namedBindings;
-    if (bindings && ts.isNamedImports(bindings)) {
-      const mod = stmt.moduleSpecifier.text;
-      for (const el of bindings.elements) map[el.name.text] = mod;
-    }
-  }
-  return map;
-};
+const namedImports = (sf) =>
+  sf.statements.flatMap((stmt) => {
+    const bindings = ts.isImportDeclaration(stmt)
+      ? stmt.importClause?.namedBindings
+      : null;
+    if (!bindings || !ts.isNamedImports(bindings)) return [];
+    return bindings.elements.map((el) => ({
+      local: el.name.text,
+      name: el.propertyName?.text ?? el.name.text,
+      spec: stmt.moduleSpecifier.text,
+    }));
+  });
+
+const buildImportMap = (sf) =>
+  Object.fromEntries(namedImports(sf).map(({ local, spec }) => [local, spec]));
 
 // Resolve a relative import, or a `@blog/ui[/subpath]` self-alias, to a source
 // file. Prefers the eponymous `dir/dir-name.tsx` (the component file, with its
@@ -294,7 +324,6 @@ const resolveModule = (fromFile, spec) => {
   );
 };
 
-// Purpose + props + variants for one component `name` declared in `sf`/`file`.
 // The type annotation on a component's first parameter, for components that
 // type props inline (`({ … }: SomeType)`) instead of via a named `IXProps`.
 const componentParamType = (node) => {
@@ -360,7 +389,6 @@ const unwrap = (expr) => {
   return expr;
 };
 
-// The object-literal initializer of a local `const name = { … }`, if any.
 const findLocalObject = (sf, name) => {
   for (const stmt of sf.statements) {
     if (!ts.isVariableStatement(stmt)) continue;
@@ -586,9 +614,6 @@ const buildLayers = () => {
   return { layers, skipped };
 };
 
-// Structural completeness: a component folder that produced no entry, or a
-// compound slot whose import the parser couldn't follow, is a silent gap the
-// manifest would otherwise hide. Returns human-readable issue strings.
 const structuralIssues = (layers, skipped) => {
   const issues = skipped.map((s) => `${s.dir} — ${s.reason}`);
   for (const { entries } of layers) {
@@ -621,8 +646,6 @@ const render = (layers) => {
   return `${out.join('\n')}\n`;
 };
 
-// Every exported component and every compound member/slot must carry a JSDoc
-// description. Returns the accessor names that don't.
 const missingDescriptions = (layers) => {
   const missing = [];
   for (const { entries } of layers) {
@@ -651,8 +674,6 @@ const stagedTouchesUi = () => {
   );
 };
 
-// All guards in a single parse (structure + descriptions, plus drift when
-// asked). Returns human-readable problem blocks; empty means all clear.
 const collectProblems = (layers, skipped, { checkDrift }) => {
   const problems = [];
   const struct = structuralIssues(layers, skipped);

@@ -5,6 +5,11 @@ import {
   LOCALE_ISO_CODES,
   PORTABLE_TEXT_BLOCK_TYPE,
   PRICE_PERIOD,
+  SEO_META_DESCRIPTION_MAX_LENGTH,
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+  SEO_OG_DESCRIPTION_MAX_LENGTH,
+  SEO_OG_TITLE_MAX_LENGTH,
   SITE_TYPE,
 } from '@blog/config/constants';
 
@@ -394,11 +399,19 @@ describe(buildStarterDocuments, () => {
       );
 
       for (const { metaTitle = '', metaDescription = '', openGraph } of seos) {
-        expect(metaTitle.length).toBeGreaterThanOrEqual(30);
-        expect(metaTitle.length).toBeLessThanOrEqual(60);
-        expect(metaDescription.length).toBeLessThanOrEqual(160);
-        expect(openGraph?.ogTitle?.length).toBeLessThanOrEqual(70);
-        expect(openGraph?.ogDescription?.length).toBeLessThanOrEqual(200);
+        expect(metaTitle.length).toBeGreaterThanOrEqual(
+          SEO_META_TITLE_MIN_LENGTH,
+        );
+        expect(metaTitle.length).toBeLessThanOrEqual(SEO_META_TITLE_MAX_LENGTH);
+        expect(metaDescription.length).toBeLessThanOrEqual(
+          SEO_META_DESCRIPTION_MAX_LENGTH,
+        );
+        expect(openGraph?.ogTitle?.length).toBeLessThanOrEqual(
+          SEO_OG_TITLE_MAX_LENGTH,
+        );
+        expect(openGraph?.ogDescription?.length).toBeLessThanOrEqual(
+          SEO_OG_DESCRIPTION_MAX_LENGTH,
+        );
       }
     },
   );

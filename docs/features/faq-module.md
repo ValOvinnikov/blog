@@ -49,7 +49,7 @@ A section of the questions a visitor asks before getting in touch, each a disclo
 - `questions` is `required()`, `unique()`, `min(2)` and `max(20)`, each its own rule chain with its own message. The view renders whatever it is handed, with no empty-list guard.
 - An FAQ Item must have a question and an answer in the default language.
 - Each question's `question` and `answer` are projected `.notNull()`: a question missing both its request-language and default-language value fails the module's query, so the module renders nothing and `faq_module.fetch_failed` is logged; the page still renders.
-- The disclosure is `@blog/ui`'s `Accordion` on Base UI: every row starts closed, any number may be open, and a closed panel stays in the DOM (`hiddenUntilFound`) so find-in-page still matches answer text.
+- The disclosure is `@blog/ui`'s `Accordion` on Base UI: every row starts closed, any number may be open, and a closed panel stays in the DOM (`hiddenUntilFound`) so find-in-page still matches answer text. Each row is its own item card (`item-card`), stacked with a gap, so the rows follow the Look's card style, radius and density.
 - The questions sit in a column capped at `max-w-post`; `contentAlignment` aligns the heading, the column and the actions together (Center centres the column).
 - The `FAQPage` JSON-LD covers every FAQ module on the page, deduplicated by `block_faq` id, skipping any question whose question or plain-text answer is empty; with no questions it renders nothing. One page never emits two `FAQPage` blocks.
 

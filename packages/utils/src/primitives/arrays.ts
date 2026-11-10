@@ -9,3 +9,8 @@ export const hasLength = <T extends { readonly length: number }>(
 export const hasArrayGotMultipleItems = <T>(
   items: readonly T[] | undefined,
 ): items is readonly [T, T, ...T[]] => items !== undefined && items.length > 1;
+
+export const isOneOf = <T extends string>(
+  values: readonly T[],
+  value: unknown,
+): value is T => values.some((candidate) => candidate === value);

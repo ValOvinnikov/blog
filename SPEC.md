@@ -968,8 +968,8 @@ It is allowed in `page_home.modules[]` and `page_landing.modules[]` only.
 figure, takes the avatar from 80 to 112 pixels and caps the measure in `ch`.
 That cap reads tighter than its number suggests: the spotlight quote renders at
 `text-prose-h4`, never smaller than body copy, and `ch` is font-relative, so the
-same character count is physically wider here than in running text once the
-heading grows past the 18px body size.
+same character count is physically wider here than in running text, because
+the heading size is larger than the 16px body size.
 
 **Grid columns are derived from the item count, not authored** — 2→2, 3→3, 4→2,
 5→3, 6→3, 7→3, 8→2 — capped at three rather than the feature grid's four,
@@ -2571,6 +2571,11 @@ Full checklist:
   [`docs/context/ci-automation.md`](./docs/context/ci-automation.md).
 - Hooks: husky + lint-staged (report-only eslint + prettier on staged files;
   a lint error blocks the commit, nothing is rewritten beyond formatting).
+- File size budgets (`CLAUDE.md` "File size budgets") are a local gate, never
+  a CI job: `pnpm check:file-size` runs at commit through lint-staged and in
+  `pnpm verify`, holding every over-budget file at its count in
+  `scripts/file-size-baseline.json` so it can only shrink. The `reviewer`
+  blocks the same growth when the local check was skipped.
 - Conventional commits; one concern per PR.
 
 ## 12. Delivery process
@@ -2938,11 +2943,11 @@ variant.
 token for what it is, so the Look's `radiusScale` and card style reach it
 without the component knowing either:
 
-| Role            | Utility         | Token                             | Used by                                                                                               |
-| --------------- | --------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                    |
-| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                              |
-| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, Hub tiles, the `CtaModule` box) |
+| Role            | Utility         | Token                             | Used by                                                                                                                  |
+| --------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                                       |
+| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                                                 |
+| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, `Accordion` items, Hub tiles, the `CtaModule` box) |
 
 Controls and pills keep the plain steps (`rounded-sm`, `rounded-full`).
 `MediaFrame` takes a `shape` of `rect` (default, `rounded-media`) or `circle`
@@ -3038,8 +3043,8 @@ is the token for a border that genuinely is the sole indicator.
 
 ### Card style
 
-Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, the
-`PopoverMenu` tile (the account panel's Hub tiles), the contact-form success
+Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, each
+`Accordion` item, the `PopoverMenu` tile (the account panel's Hub tiles), the contact-form success
 card and the `CtaModule` CALLOUT and SPLIT box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
 five inherited `--item-*` properties rather than fixed classes, and each pairs

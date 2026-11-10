@@ -1,3 +1,5 @@
+import { isOneOf } from '@blog/utils/primitives';
+
 import type { TValueOf } from '@blog/config/utils';
 
 export const LEGAL_PAGE_KIND = {
@@ -11,7 +13,7 @@ export const LEGAL_PAGE_KIND = {
 export type TLegalPageKind = TValueOf<typeof LEGAL_PAGE_KIND>;
 
 export const isLegalPageKind = (value: string): value is TLegalPageKind =>
-  (Object.values(LEGAL_PAGE_KIND) as string[]).includes(value);
+  isOneOf(Object.values(LEGAL_PAGE_KIND), value);
 
 export const PRIVACY_DOCUMENT_KINDS = [
   LEGAL_PAGE_KIND.PRIVACY_POLICY,

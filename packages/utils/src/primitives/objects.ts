@@ -1,6 +1,12 @@
 export const objectKeys = <T extends object>(obj: T): Array<keyof T> =>
   Object.keys(obj) as Array<keyof T>;
 
+export const mapKeysToRecord = <K extends PropertyKey, V>(
+  keys: readonly K[],
+  toValue: (key: K) => V,
+): Record<K, V> =>
+  Object.fromEntries(keys.map((key) => [key, toValue(key)])) as Record<K, V>;
+
 /** Assumes SCREAMING_SNAKE_CASE input (this repo's UPPERCASE const-value convention). */
 export const toTitleCase = (value: string): string =>
   value

@@ -5,7 +5,7 @@ import {
 } from '@blog/config';
 import type { TAuthoredEmailTemplateCopy } from '@blog/db/queries/email-templates';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { isUndefined } from '@blog/utils/primitives';
+import { isUndefined, mapKeysToRecord } from '@blog/utils/primitives';
 import { EMAIL_LOGO_KIND } from '@platform/constants/email-logo';
 import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
@@ -59,11 +59,6 @@ type TBuildEmailDraftInput = {
   liveLocales: TLocaleIsoCode[];
 };
 
-const mapTemplateTypes = <T>(build: (type: TEmailTemplateType) => T) =>
-  Object.fromEntries(
-    EMAIL_TEMPLATE_TYPES.map((type) => [type, build(type)]),
-  ) as Record<TEmailTemplateType, T>;
-
 export const buildEmailDraft = ({
   sender,
   senderLogoUrl,
@@ -73,7 +68,8 @@ export const buildEmailDraft = ({
 }: TBuildEmailDraftInput): TEmailDraft => ({
   sender,
   senderLogo: { url: senderLogoUrl },
-  copies: mapTemplateTypes(
+  copies: mapKeysToRecord(
+    EMAIL_TEMPLATE_TYPES,
     (templateType) =>
       Object.fromEntries(
         liveLocales.map((locale) => {
@@ -88,7 +84,7 @@ export const buildEmailDraft = ({
         }),
       ) as Record<TLocaleIsoCode, TEmailCopyDraft>,
   ),
-  templateLogos: mapTemplateTypes((templateType) => ({
+  templateLogos: mapKeysToRecord(EMAIL_TEMPLATE_TYPES, (templateType) => ({
     url: templateLogoUrls[templateType],
   })),
 });

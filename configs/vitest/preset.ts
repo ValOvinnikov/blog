@@ -10,9 +10,15 @@ const FAKER_EN_ALIAS = {
   replacement: '@faker-js/faker/locale/en',
 };
 
+// server-only throws outside a react-server bundle; stub it to a no-op for tests — the real guard still runs at build time.
+const SERVER_ONLY_STUB_ALIAS = {
+  find: /^server-only$/,
+  replacement: fileURLToPath(new URL('./server-only-stub.ts', import.meta.url)),
+};
+
 const preset = defineConfig({
   plugins: [react()],
-  resolve: { alias: [FAKER_EN_ALIAS] },
+  resolve: { alias: [FAKER_EN_ALIAS, SERVER_ONLY_STUB_ALIAS] },
   test: {
     globals: true,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
@@ -40,12 +46,6 @@ export const blogPackageAlias = (pkg: string, importMetaUrl: string) => ({
 
 type TAliasEntry = ReturnType<typeof blogPackageAlias>;
 
-// server-only throws outside a react-server bundle; stub it to a no-op for tests — the real guard still runs at build time.
-const SERVER_ONLY_STUB_ALIAS = {
-  find: /^server-only$/,
-  replacement: fileURLToPath(new URL('./server-only-stub.ts', import.meta.url)),
-};
-
 // vmThreads' CommonJS loader cannot require() ESM, which react-syntax-highlighter's CJS entry does with refractor.
 const VM_SYNTAX_HIGHLIGHTER_ESM_ALIAS = {
   find: /^react-syntax-highlighter$/,
@@ -71,7 +71,7 @@ export function createVitestConfig(overrides: TNextAppVitestOverrides) {
     preset,
     defineConfig({
       resolve: {
-        alias: [...overrides.resolve.alias, SERVER_ONLY_STUB_ALIAS],
+        alias: overrides.resolve.alias,
       },
       // @blog/ui ships raw .svg imports from source, so both apps' tests need the same SVGR handling as its own Vitest config.
       plugins: [

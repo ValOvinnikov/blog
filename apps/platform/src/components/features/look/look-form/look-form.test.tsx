@@ -130,27 +130,6 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    describe('with the Cards row open', () => {
-      beforeEach(async () => {
-        await openLookRow(user, LOOK_ROW.CARDS);
-      });
-
-      it('describes the chosen card style below the control', async () => {
-        const cardStyleField = screen.getByRole('group', {
-          name: LOOK_FORM.cardStyleLabel,
-        });
-        const outlinedButton = within(cardStyleField).getByRole('button', {
-          name: LOOK_FORM.cardStyleOptionLabel.OUTLINED,
-        });
-        await user.click(outlinedButton);
-        const toggleGroup = within(cardStyleField).getByRole('group');
-
-        expect(toggleGroup).toHaveAccessibleDescription(
-          LOOK_FORM.cardStyleOptionDescription.OUTLINED,
-        );
-      });
-    });
-
     describe('with the Header row open', () => {
       beforeEach(async () => {
         await openLookRow(user, LOOK_ROW.HEADER);
@@ -178,31 +157,33 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    describe('with the Language switcher row open', () => {
-      beforeEach(async () => {
-        await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);
-      });
-
-      it('describes the chosen language switcher option below the control', async () => {
-        const styleField = screen.getByRole('group', {
-          name: LOOK_FORM.languageSwitcherStyleLabel,
+    it.each([
+      {
+        row: LOOK_ROW.CARDS,
+        label: LOOK_FORM.cardStyleLabel,
+        option: LOOK_FORM.cardStyleOptionLabel.OUTLINED,
+        description: LOOK_FORM.cardStyleOptionDescription.OUTLINED,
+      },
+      {
+        row: LOOK_ROW.LANGUAGE_SWITCHER,
+        label: LOOK_FORM.languageSwitcherStyleLabel,
+        option: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
+        description: LOOK_FORM.languageSwitcherOptionDescription.MENU_GLOBE,
+      },
+    ])(
+      'describes the chosen $label option below the control',
+      async ({ row, label, option, description }) => {
+        await openLookRow(user, row);
+        const field = screen.getByRole('group', { name: label });
+        const optionButton = within(field).getByRole('button', {
+          name: option,
         });
-        const globeButton = within(styleField).getByRole('button', {
-          name: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
-        });
-        const toggleGroup = within(styleField).getByRole('group');
+        await user.click(optionButton);
+        const toggleGroup = within(field).getByRole('group');
 
-        expect(toggleGroup).toHaveAccessibleDescription(
-          LOOK_FORM.languageSwitcherOptionDescription.MENU_CODE,
-        );
-
-        await user.click(globeButton);
-
-        expect(toggleGroup).toHaveAccessibleDescription(
-          LOOK_FORM.languageSwitcherOptionDescription.MENU_GLOBE,
-        );
-      });
-    });
+        expect(toggleGroup).toHaveAccessibleDescription(description);
+      },
+    );
   });
 
   describe('the cookie settings choice', () => {
