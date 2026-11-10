@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { ARIA_CURRENT } from '@blog/ui/testing/aria';
+import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
@@ -13,7 +13,6 @@ const MOCK_LABEL = faker.lorem.words(3);
 const MOCK_HREF = `/${faker.lorem.slug()}`;
 const MOCK_ARIA_LABEL = faker.lorem.words(2);
 const TEXT_LINK_TEST_ID = 'text-link';
-const ARIA_CURRENT_PAGE = 'page';
 
 const setup = customRender(TextLink, { href: MOCK_HREF, children: MOCK_LABEL });
 

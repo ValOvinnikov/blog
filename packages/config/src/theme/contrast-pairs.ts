@@ -171,7 +171,7 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
-  SELECTION: {
+  BRAND_PRIMARY_ON_TINT: {
     foreground: BRAND_PRIMARY,
     surfaces: [BRAND_PRIMARY_MUTED],
     role: CONTRAST_ROLE.TEXT,

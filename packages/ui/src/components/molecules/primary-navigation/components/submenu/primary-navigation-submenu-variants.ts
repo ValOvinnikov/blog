@@ -19,7 +19,7 @@ export const primaryNavigationSubmenuVariants = tv({
     ],
     chevron: ['transition-transform group-has-[+:popover-open]:rotate-180'],
     panel: [
-      'border border-border bg-surface text-text shadow-float',
+      'border border-border bg-surface surface-popover text-text shadow-float',
       'font-display text-copy',
       'open:block',
     ],

@@ -26,6 +26,7 @@ export interface IAccountPanelLink {
   href: string;
   label: string;
   description: string;
+  isCurrent?: boolean;
 }
 
 export interface IAccountPanelLinks {
@@ -115,6 +116,7 @@ export const AccountPanel = ({
               label={link.label}
               description={link.description}
               icon={icon}
+              isCurrent={link.isCurrent}
               linkAs={linkAs}
             />
           ) : (
@@ -122,6 +124,7 @@ export const AccountPanel = ({
               key={link.href}
               as={linkAs}
               href={link.href}
+              aria-current={link.isCurrent ? 'page' : undefined}
               icon={<Icon name={icon} size={SIZE.SM} />}
             >
               {link.label}

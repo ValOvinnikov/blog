@@ -1,4 +1,5 @@
 import { ACCOUNT_PANEL_STYLE } from '@blog/config';
+import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@blog/ui/testing/aria';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent from '@testing-library/user-event';
@@ -137,3 +138,28 @@ describe(`<${AccountPanel.name}/> link descriptions`, () => {
     },
   );
 });
+
+describe.each(Object.values(ACCOUNT_PANEL_STYLE))(
+  `<${AccountPanel.name}/> as %s on the account settings page`,
+  (appearance) => {
+    it('announces only the settings link as the current page', () => {
+      setup({
+        appearance,
+        links: {
+          bookmarks: MOCK_BOOKMARKS,
+          settings: { ...MOCK_SETTINGS, isCurrent: true },
+        },
+      });
+
+      const bookmarks = screen.getByRole('menuitem', {
+        name: MOCK_BOOKMARKS.label,
+      });
+      const settings = screen.getByRole('menuitem', {
+        name: MOCK_SETTINGS.label,
+      });
+
+      expect(settings).toHaveAttribute(ARIA_CURRENT, ARIA_CURRENT_PAGE);
+      expect(bookmarks).not.toHaveAttribute(ARIA_CURRENT);
+    });
+  },
+);
