@@ -79,6 +79,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
     it.each([
       LOOK_ROW.TYPE,
       LOOK_ROW.SHAPE,
+      LOOK_ROW.CARDS,
       LOOK_ROW.BUTTONS,
       LOOK_ROW.HEADER,
       LOOK_ROW.LANGUAGE_SWITCHER,

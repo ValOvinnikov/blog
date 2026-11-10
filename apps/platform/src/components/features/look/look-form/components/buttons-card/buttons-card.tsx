@@ -1,5 +1,6 @@
 import {
   BUSY_BUTTON_STYLE,
+  ICONS,
   SPINNER_STYLE,
   type TBusyButtonStyle,
 } from '@blog/config';
@@ -10,14 +11,13 @@ import { PresetValueButton } from '@platform/components/features/look/look-form/
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
-
-import { SpinnerEdgeNote } from './components/spinner-edge-note/spinner-edge-note';
 
 export type TButtonsCardProps = {
   summary: string;
@@ -87,7 +87,9 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
           isDisabled={spinnerLock.isDisabled}
           isLocked={spinnerLock.isLocked}
         />
-        {busyButtonStyle === BUSY_BUTTON_STYLE.EDGE && <SpinnerEdgeNote />}
+        {busyButtonStyle === BUSY_BUTTON_STYLE.EDGE && (
+          <LockedReason icon={ICONS.INFO}>{t('spinnerEdgeNote')}</LockedReason>
+        )}
         <PresetValueButton
           field="spinnerStyle"
           fieldLabel={spinnerStyleLabel}

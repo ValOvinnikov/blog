@@ -46,6 +46,7 @@ describe(`<${LookForm.name}/>`, () => {
     it.each([
       LOOK_ROW.COLOUR,
       LOOK_ROW.SHAPE,
+      LOOK_ROW.CARDS,
       LOOK_ROW.BUTTONS,
       LOOK_ROW.HEADER,
       LOOK_ROW.FOOTER,
