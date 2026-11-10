@@ -12,6 +12,7 @@ export {
   LINK_UNDERLINE_AT_REST,
   LINK_UNDERLINE_EMPHASIS,
 } from './link-underline';
+export { MENU_ROW } from './menu-row';
 export { BRAND_PILL } from './pill';
 export { POPOVER_SURFACE } from './popover-surface';
 export { tv } from './tv';

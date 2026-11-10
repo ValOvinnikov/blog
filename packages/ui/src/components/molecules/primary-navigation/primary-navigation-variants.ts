@@ -1,11 +1,10 @@
 import { HEADER_LAYOUT } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
+import { MENU_ROW, tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
 export const PANEL_LINK = [
-  'flex min-h-11 w-full items-center',
-  'rounded-md px-3 py-2',
-  'hover:bg-surface-2',
+  'flex min-h-11 w-full items-center px-3 py-2',
+  ...MENU_ROW,
 ];
 
 export const primaryNavigationVariants = tv({

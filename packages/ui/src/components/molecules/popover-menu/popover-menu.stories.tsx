@@ -94,6 +94,42 @@ export const Copied: TStory = {
   },
 };
 
+export const CurrentItem: TStory = {
+  args: {
+    children: (
+      <>
+        <PopoverMenu.Trigger
+          ariaLabel="Choose language"
+          isOpen={true}
+          panelId="popover-menu-panel-current"
+        >
+          <Icon name={ICONS.GLOBE} size={SIZE.SM} />
+        </PopoverMenu.Trigger>
+        <PopoverMenu.Panel
+          id="popover-menu-panel-current"
+          isOpen={true}
+          ariaLabel="Languages"
+        >
+          <PopoverMenu.Item
+            as="a"
+            href="#en"
+            aria-current="page"
+            icon={<Icon name={ICONS.CHECK} size={SIZE.SM} />}
+          >
+            English
+          </PopoverMenu.Item>
+          <PopoverMenu.Item as="a" href="#de">
+            Deutsch
+          </PopoverMenu.Item>
+          <PopoverMenu.Item as="a" href="#fr">
+            Français
+          </PopoverMenu.Item>
+        </PopoverMenu.Panel>
+      </>
+    ),
+  },
+};
+
 export const Closed: TStory = {
   args: {
     children: (
