@@ -20,7 +20,7 @@ export type TPolledValueOptions<TValue> = {
   onError?: () => void;
 };
 
-export type TPolledValue<TValue> = {
+type TPolledValue<TValue> = {
   value: TValue;
   setValue: Dispatch<SetStateAction<TValue>>;
   restart: () => void;
