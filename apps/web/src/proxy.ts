@@ -1,195 +1,41 @@
-import {
-  HTTP_METHOD,
-  HTTP_STATUS,
-  type TLocaleIsoCode,
-  type TMaybeUndefined,
-} from '@blog/config';
+import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import { PROXY_LOG } from '@web/constants/proxy';
-import { getTenantTranslationMap } from '@web/server/translation-map/get-tenant-translation-map/get-tenant-translation-map';
-import { findTranslatedPath } from '@web/utils/find-translated-path';
-import { isCrawler } from '@web/utils/is-crawler';
-import { isTenantShapedPathSegment } from '@web/utils/is-tenant-shaped-path-segment';
-import { readRememberedLanguage } from '@web/utils/language-cookie';
-import { logger } from '@web/utils/logger/logger';
-import { matchAcceptLanguage } from '@web/utils/match-accept-language';
-import { privateRedirect } from '@web/utils/private-redirect';
-import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
-import { NextResponse, type NextRequest } from 'next/server';
-import createMiddleware from 'next-intl/middleware';
-
-import {
-  buildTenantRouting,
-  localeForPrefix,
-  SINGLE_LANGUAGE_ROUTING,
-} from './i18n/routing';
+import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
+import { getIntlMiddleware } from '@web/server/proxy/get-intl-middleware/get-intl-middleware';
+import { prependTenantSegment } from '@web/server/proxy/prepend-tenant-segment/prepend-tenant-segment';
+import { redirectSwitchedOffLocale } from '@web/server/proxy/redirect-switched-off-locale/redirect-switched-off-locale';
+import { redirectToPreferredTranslation } from '@web/server/proxy/redirect-to-preferred-translation/redirect-to-preferred-translation';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
-} from './server/tenant/constants/constants';
-import { operatorSuspendedPage } from './server/tenant/operator-suspension/operator-suspended-page';
-import { isOperatorSuspended } from './server/tenant/operator-suspension/operator-suspension';
-import { passThroughUnlessOperatorSuspended } from './server/tenant/operator-suspension/pass-through-unless-operator-suspended';
-import { isSuspensionExemptPagePath } from './server/tenant/operator-suspension/suspension-exempt-page-path';
+} from '@web/server/tenant/constants/constants';
+import { operatorSuspendedPage } from '@web/server/tenant/operator-suspension/operator-suspended-page';
+import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
+import { passThroughUnlessOperatorSuspended } from '@web/server/tenant/operator-suspension/pass-through-unless-operator-suspended';
+import { isSuspensionExemptPagePath } from '@web/server/tenant/operator-suspension/suspension-exempt-page-path';
 import {
   resolveTenantRouting,
   type TTenantRouting,
-} from './server/tenant/resolve-tenant/resolve-tenant';
-import { isProductionEnvironment } from './utils/is-production-environment';
-
-const intlMiddlewares = new Map<string, ReturnType<typeof createMiddleware>>();
-
-const getIntlMiddleware = (
-  defaultLocale: TLocaleIsoCode,
-  liveLocales: readonly TLocaleIsoCode[],
-) => {
-  const key = [defaultLocale, ...liveLocales].join(',');
-  const cached = intlMiddlewares.get(key);
-  if (cached) {
-    return cached;
-  }
-
-  const middleware = createMiddleware(
-    buildTenantRouting(defaultLocale, liveLocales),
-  );
-  intlMiddlewares.set(key, middleware);
-  return middleware;
-};
-
-// A prefix for a supported language the tenant doesn't serve (switched off
-// by a downgrade) redirects to the same path in the default language.
-const redirectSwitchedOffLocale = (
-  request: NextRequest,
-  firstSegment: string,
-  liveLocales: readonly TLocaleIsoCode[],
-): NextResponse | undefined => {
-  const prefixedLocale = localeForPrefix(firstSegment);
-  if (!prefixedLocale || liveLocales.includes(prefixedLocale)) {
-    return undefined;
-  }
-
-  const target = request.nextUrl.clone();
-  target.pathname =
-    request.nextUrl.pathname.slice(firstSegment.length + 1) || '/';
-  return NextResponse.redirect(target);
-};
-
-const DETECTABLE_METHODS = new Set<string>([HTTP_METHOD.GET, HTTP_METHOD.HEAD]);
-
-const redirectToPreferredTranslation = async (
-  request: NextRequest,
-  firstSegment: string,
-  tenantRouting: TMaybeUndefined<TTenantRouting>,
-): Promise<TMaybeUndefined<NextResponse>> => {
-  if (
-    !tenantRouting ||
-    tenantRouting.liveLocales.length < 2 ||
-    !DETECTABLE_METHODS.has(request.method) ||
-    localeForPrefix(firstSegment) ||
-    isCrawler(request.headers.get('user-agent'))
-  ) {
-    return undefined;
-  }
-
-  const { tenant, defaultLocale, liveLocales } = tenantRouting;
-  const preferredLocale =
-    readRememberedLanguage(request.cookies, liveLocales) ??
-    matchAcceptLanguage(request.headers.get('accept-language'), liveLocales);
-  if (!preferredLocale || preferredLocale === defaultLocale) {
-    return undefined;
-  }
-
-  const translationMap = await getTenantTranslationMap(tenant);
-  const translatedPath =
-    translationMap &&
-    findTranslatedPath({
-      translationMap,
-      pathname: request.nextUrl.pathname,
-      fromLocale: defaultLocale,
-      toLocale: preferredLocale,
-      defaultLocale,
-    });
-  if (!translatedPath) {
-    return undefined;
-  }
-
-  const target = request.nextUrl.clone();
-  target.pathname = translatedPath;
-  return privateRedirect(target);
-};
+} from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { getDecodedFirstPathSegment } from '@web/utils/get-decoded-first-path-segment';
+import { isProductionEnvironment } from '@web/utils/is-production-environment';
+import { isTenantShapedPathSegment } from '@web/utils/is-tenant-shaped-path-segment';
+import { logger } from '@web/utils/logger/logger';
+import { siteUnavailableStatus } from '@web/utils/site-unavailable-response';
+import { NextResponse, type NextRequest } from 'next/server';
 
 const DOTTED_PATH_PATTERN = /\./;
 const FEED_PATH_PATTERN = /\/rss\.xml$/;
 const SUSPENSION_GATED_PATH_PATTERN = /^\/(?:api\/|sitemap\.xml$)/;
 
-/**
- * Decodes only the first path segment, after splitting on `/` — decoding
- * the whole pathname first would let an encoded `%2f` forge a synthetic
- * separator. `undefined` means the segment couldn't be decoded, refused the
- * same as a tenant-shaped one: a segment we can't decode is one we can't
- * vouch for.
- */
-const getDecodedFirstPathSegment = (pathname: string): string | undefined => {
-  const raw = pathname.split('/').find((segment) => segment.length > 0) ?? '';
-  try {
-    return decodeURIComponent(raw);
-  } catch {
-    return undefined;
-  }
-};
-
-/**
- * Prepends the tenant segment to next-intl's own already-resolved rewrite
- * target (or the original request, when next-intl didn't need to rewrite),
- * forwarding every header its middleware pass set — including
- * `X-NEXT-INTL-LOCALE` — rather than re-deriving them.
- */
-const prependTenantSegment = (
-  intlResponse: NextResponse,
-  tenantId: string,
-  request: NextRequest,
-): NextResponse => {
-  if (!intlResponse.ok) {
-    return intlResponse;
-  }
-
-  const rewriteTarget = intlResponse.headers.get('x-middleware-rewrite');
-  const targetUrl = new URL(rewriteTarget ?? request.url);
-  targetUrl.pathname = `/${tenantId}${targetUrl.pathname}`;
-
-  return NextResponse.rewrite(targetUrl, { headers: intlResponse.headers });
-};
-
-/**
- * Refuses any request whose first path segment is already tenant-shaped,
- * then passes paths with a dot in a non-final segment through unrewritten;
- * RSS feeds are routed per language like pages. Only past both
- * checks does it resolve the tenant from the request's `Host` header and
- * hand off to next-intl's own middleware, mutating `request.headers` in
- * place (rather than building a fresh `NextResponse.next({request:{headers}})`)
- * so next-intl's own internal request-header clone — built from this same
- * `request` object — carries `TENANT_ID_HEADER` through to whatever
- * response (rewrite/redirect) it produces; the dotted-path branch above has
- * no next-intl clone to ride along on, so it forwards the mutated headers
- * explicitly instead.
- *
- * `TENANT_ID_HEADER` is always deleted first, before the conditional `.set`
- * — a client-supplied `x-tenant-id` on the incoming request must never
- * survive resolution failing (0 or 2+ tenant rows outside production, or an
- * unmatched host that already 404'd in production), or it would be forwarded
- * verbatim to every downstream reader of this header as a spoofed tenant.
- *
- * A thrown lookup (Neon unreachable, credentials rotated, …) is distinct
- * from an ordinary unmatched host: it is caught, logged once, and fails
- * closed with a 503 before next-intl or any route handler runs, rather than
- * falling through to any default or previously-resolved tenant.
- */
 export default async function proxy(
   request: NextRequest,
 ): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const firstSegment = getDecodedFirstPathSegment(pathname);
 
-  if (firstSegment === undefined || isTenantShapedPathSegment(firstSegment)) {
+  if (isUndefined(firstSegment) || isTenantShapedPathSegment(firstSegment)) {
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
@@ -204,11 +50,12 @@ export default async function proxy(
 
   const host = request.headers.get('host');
 
-  let tenantRouting: TTenantRouting | undefined;
+  let tenantRouting: TMaybeUndefined<TTenantRouting>;
   try {
     tenantRouting = await resolveTenantRouting(host);
   } catch (error) {
     logger.error(PROXY_LOG.TENANT_LOOKUP_FAILED, { host, error });
+    // Fail closed: a thrown lookup must never fall through to a default tenant.
     return new NextResponse(null, { status: HTTP_STATUS.SERVICE_UNAVAILABLE });
   }
 
@@ -228,6 +75,7 @@ export default async function proxy(
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
+  // Delete before setting, so a client-forged `x-tenant-id` never survives an unresolved tenant.
   request.headers.delete(TENANT_ID_HEADER);
   if (tenantId) {
     request.headers.set(TENANT_ID_HEADER, tenantId);
