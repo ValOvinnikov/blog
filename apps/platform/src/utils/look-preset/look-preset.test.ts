@@ -166,41 +166,17 @@ describe(switchPreset, () => {
       cardStyle: EDITORIAL.cardStyle,
       headerControlStyle: EDITORIAL.headerControlStyle,
       spinnerStyle: EDITORIAL.spinnerStyle,
-      buttonShape: EDITORIAL.buttonShape,
     });
   });
 
-  it('keeps a spinner the owner changed', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      spinnerStyle: SPINNER_STYLE.PULSE,
-    };
+  it.each([
+    { field: 'spinnerStyle', value: SPINNER_STYLE.PULSE },
+    { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
+    { field: 'accentHue', value: CONSOLE.themeTokens.accentHue + 1 },
+  ] as const)('keeps a $field the owner changed', ({ field, value }) => {
+    const current = { ...defaultLookFormValues(), [field]: value };
 
-    expect(switchPreset(PRESET_ID.EDITORIAL, current).spinnerStyle).toBe(
-      SPINNER_STYLE.PULSE,
-    );
-  });
-
-  it('keeps a button shape the owner changed', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      buttonShape: BUTTON_SHAPE.PILL,
-    };
-
-    expect(switchPreset(PRESET_ID.EDITORIAL, current).buttonShape).toBe(
-      BUTTON_SHAPE.PILL,
-    );
-  });
-
-  it('keeps a customised accent hue', () => {
-    const current = {
-      ...defaultLookFormValues(),
-      accentHue: CONSOLE.themeTokens.accentHue + 1,
-    };
-
-    expect(switchPreset(PRESET_ID.EDITORIAL, current).accentHue).toBe(
-      CONSOLE.themeTokens.accentHue + 1,
-    );
+    expect(switchPreset(PRESET_ID.EDITORIAL, current)[field]).toBe(value);
   });
 
   it('keeps a set logo hue', () => {

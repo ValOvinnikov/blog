@@ -82,29 +82,26 @@ describe(accentHueGradient, () => {
 });
 
 describe(buildThemePreviewStyle, () => {
-  it.each(Object.values(HEADER_CONTROL_STYLE))(
-    'carries the %s header control tokens onto the preview',
-    (headerControlStyle) => {
+  it.each([
+    ...Object.values(HEADER_CONTROL_STYLE).map((value) => ({
+      label: `${value} header control`,
+      values: { headerControlStyle: value },
+      declarations: HEADER_CONTROL_STYLE_DECLARATIONS[value],
+    })),
+    ...Object.values(BUTTON_SHAPE).map((value) => ({
+      label: `${value} button shape`,
+      values: { buttonShape: value },
+      declarations: BUTTON_SHAPE_DECLARATIONS[value],
+    })),
+  ])(
+    'carries the $label tokens onto the preview',
+    ({ values, declarations }) => {
       const style = buildThemePreviewStyle(
-        { ...MOCK_PREVIEW_VALUES, headerControlStyle },
+        { ...MOCK_PREVIEW_VALUES, ...values },
         false,
       );
 
-      expect(style).toMatchObject(
-        HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
-      );
-    },
-  );
-
-  it.each(Object.values(BUTTON_SHAPE))(
-    'carries the %s button shape token onto the preview',
-    (buttonShape) => {
-      const style = buildThemePreviewStyle(
-        { ...MOCK_PREVIEW_VALUES, buttonShape },
-        false,
-      );
-
-      expect(style).toMatchObject(BUTTON_SHAPE_DECLARATIONS[buttonShape]);
+      expect(style).toMatchObject(declarations);
     },
   );
 

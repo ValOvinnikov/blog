@@ -3,6 +3,7 @@
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import type { TControlAria } from '@blog/config';
+import type { IWithClassName } from '@blog/config/types';
 import {
   SEGMENTED_LAYOUT,
   type TSegmentedLayout,
@@ -26,14 +27,13 @@ type TSegmentedControlLock = {
   isLocked?: boolean;
 };
 
-export type TSegmentedControlProps<TValue extends string> = {
+export type TSegmentedControlProps<TValue extends string> = IWithClassName & {
   options: TSegmentedControlOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
   aria?: TControlAria;
   lock?: TSegmentedControlLock;
   layout?: TSegmentedLayout;
-  className?: string;
 };
 
 export const SegmentedControl = <TValue extends string>({
