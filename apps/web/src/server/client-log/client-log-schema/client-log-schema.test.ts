@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker';
+import {
+  MAX_MESSAGE_LENGTH,
+  MAX_STACK_LENGTH,
+} from '@web/constants/client-log';
 
 import { clientLogSchema, sanitizeClientLogPayload } from './client-log-schema';
 
 faker.seed(6010);
-
-const MESSAGE_MAX_LENGTH = 500;
-const STACK_MAX_LENGTH = 1000;
 
 const MOCK_EVENT = `${faker.lorem.word()}.${faker.lorem.word()}`;
 const MOCK_MESSAGE = faker.lorem.sentence();
@@ -40,12 +41,12 @@ describe('clientLogSchema', () => {
     ['an event name with no namespace dot', { event: faker.lorem.word() }],
     [
       'a message over the max length',
-      { message: faker.string.alpha(MESSAGE_MAX_LENGTH + 1) },
+      { message: faker.string.alpha(MAX_MESSAGE_LENGTH + 1) },
     ],
     ['an empty message', { message: '' }],
     [
       'a stack over the max length',
-      { stack: faker.string.alpha(STACK_MAX_LENGTH + 1) },
+      { stack: faker.string.alpha(MAX_STACK_LENGTH + 1) },
     ],
   ])('rejects %s', (_label, override) => {
     const result = clientLogSchema.safeParse({
