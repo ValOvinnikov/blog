@@ -169,8 +169,9 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
 - `POST /api/internal/contrast-result` — machine-only, Bearer
   `CONTRAST_RESULT_SECRET`. Records the posted result as the SHA's contrast
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
-  refreshes it, a `PASS` resolves it, which is what the candidate reader's
-  contrast status then reports for that SHA.
+  refreshes it, a `PASS` resolves it and every other open contrast failure,
+  and the SHA's own row is what the candidate reader's contrast status then
+  reports for that SHA.
 - The contrast-due banner at the top of every `(operator)` page, for
   SUPERADMINs only, when the candidate's contrast status is `DUE`
   (`isContrastDue`). It reads the candidate without the migration summary,

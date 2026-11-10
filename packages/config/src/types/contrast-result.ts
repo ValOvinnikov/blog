@@ -6,4 +6,5 @@ export type TContrastResultBody = {
   failureCount: number;
   runUrl: string;
   tag?: string;
+  supersededBy?: string;
 };

@@ -6,14 +6,17 @@ import {
 } from '@blog/config/constants';
 import type { TContrastResultBody } from '@blog/config/types';
 import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedupe-key';
+import { getContrastFinding } from '@blog/db/queries/findings/get-contrast-finding';
 import { listOpenFindings } from '@blog/db/queries/findings/list-open-findings';
 import * as schema from '@blog/db/schema';
 import {
   MOCK_FINDING_LATER_AT,
   MOCK_FINDING_NOW,
   mockContrastResult,
+  mockOpenFindingInput,
   mockPassingContrastResult,
   mockReleaseTag,
+  openTestFinding,
 } from '@blog/db/testing/findings/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
@@ -116,5 +119,50 @@ describe(recordContrastResult, () => {
 
     const rows = await db().select().from(schema.findings);
     expect(rows).toHaveLength(2);
+  });
+
+  it('resolves every older open failure when another SHA passes', async () => {
+    const olderRuns = [failingRun, mockContrastResult()];
+    const olderFailures = await Promise.all(
+      olderRuns.map(recordContrastResult),
+    );
+    vi.setSystemTime(MOCK_FINDING_LATER_AT);
+
+    await recordContrastResult(passingRun);
+
+    const superseded = await Promise.all(
+      olderRuns.map(({ sha }) => getContrastFinding(sha)),
+    );
+    expect(superseded).toEqual(
+      olderFailures.map((failed, index) => ({
+        ...failed,
+        status: FINDING_STATUS.RESOLVED,
+        details: { ...olderRuns[index], supersededBy: passingRun.sha },
+        resolvedAt: MOCK_FINDING_LATER_AT,
+      })),
+    );
+    expect(await listOpenFindings()).toEqual([]);
+  });
+
+  it('leaves other open failures and resolved findings as they were when a SHA fails', async () => {
+    const earlierPass = await recordContrastResult(passingRun);
+    const earlierFailure = await recordContrastResult(mockContrastResult());
+
+    const failed = await recordContrastResult(failingRun);
+
+    const openFindings = await listOpenFindings();
+    expect(await getContrastFinding(passingRun.sha)).toEqual(earlierPass);
+    expect(openFindings.map(({ id }) => id).sort()).toEqual(
+      [earlierFailure.id, failed.id].sort(),
+    );
+  });
+
+  it('leaves findings from other sources open when a SHA passes', async () => {
+    const otherFinding = await openTestFinding(mockOpenFindingInput());
+
+    await recordContrastResult(passingRun);
+
+    const openFindings = await listOpenFindings();
+    expect(openFindings.map(({ id }) => id)).toEqual([otherFinding.id]);
   });
 });

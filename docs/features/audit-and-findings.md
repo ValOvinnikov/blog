@@ -179,7 +179,12 @@ Nothing is configurable. Only admins (any role) see either record.
   row. A failing run is OPEN and CRITICAL; a passing run is stored RESOLVED,
   so it is the SHA's result without being listed as open. A re-run refreshes
   that row (status, `resolvedAt`, `lastSeenAt`, `details`), so a pass closes
-  a failure and a later failure reopens it. `getContrastFinding` reads a
+  a failure and a later failure reopens it. A pass for any SHA also
+  resolves every other open contrast finding, keeping its `lastSeenAt` and
+  adding the passing SHA to `details` as `supersededBy`, so `/findings`
+  stops listing failures a newer commit has fixed; a failure leaves other
+  rows alone. That is a second statement, not a transaction (`neon-http` has
+  none), and the next pass retries it. `getContrastFinding` reads a
   SHA's row in any status; `getLatestPassingContrastSha` returns the SHA of
   the RESOLVED row with the newest `lastSeenAt`, or `undefined`.
   `tagContrastFinding` adds the release tag to `details`, and a re-run
