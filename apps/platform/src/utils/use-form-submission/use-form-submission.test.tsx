@@ -13,6 +13,7 @@ const MOCK_INITIAL_NAME = faker.person.fullName();
 const MOCK_EDITED_NAME = faker.person.fullName();
 const SUCCESS_RESULT: TResult = { outcome: ACTION_OUTCOME.SUCCESS };
 const SERVER_ERROR_RESULT: TResult = { outcome: ACTION_OUTCOME.SERVER_ERROR };
+const MOCK_SUBMIT_ERROR = new Error(faker.lorem.words());
 
 const setup = (
   onSubmit: (values: TValues) => Promise<TResult>,
@@ -67,9 +68,14 @@ describe(useFormSubmission, () => {
   it.each([
     [
       'resolves with an error outcome',
-      vi.fn().mockResolvedValue(SERVER_ERROR_RESULT),
+      vi.fn(async (): Promise<TResult> => SERVER_ERROR_RESULT),
     ],
-    ['throws', vi.fn().mockRejectedValue(new Error(faker.lorem.words()))],
+    [
+      'throws',
+      vi.fn(async (): Promise<TResult> => {
+        throw MOCK_SUBMIT_ERROR;
+      }),
+    ],
   ])(
     'reports an error and skips onSuccess when the submit %s',
     async (_, onSubmit) => {
