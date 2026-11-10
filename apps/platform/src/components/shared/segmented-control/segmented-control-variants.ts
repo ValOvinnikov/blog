@@ -23,6 +23,19 @@ export const segmentedControlVariants = tv({
     ],
   },
   variants: {
+    hasWideOptions: {
+      true: { option: ['lg:w-[94px]'] },
+      false: {},
+    },
+    hasGlyphs: {
+      true: {
+        option: [
+          'min-h-[60px] flex-col justify-center gap-1 px-1.5 text-center',
+          'lg:h-[52px] lg:min-w-14 lg:gap-[3px] lg:px-2.5',
+        ],
+      },
+      false: {},
+    },
     isLocked: {
       true: {
         root: ['lg:border-admin-control-line-locked'],
@@ -44,7 +57,20 @@ export const segmentedControlVariants = tv({
       },
     },
   },
+  compoundVariants: [
+    {
+      isLocked: false,
+      hasGlyphs: true,
+      class: {
+        option: [
+          'lg:hover:not-data-[pressed]:bg-admin-hover lg:hover:not-data-[pressed]:text-admin-text',
+        ],
+      },
+    },
+  ],
   defaultVariants: {
     isLocked: false,
+    hasGlyphs: false,
+    hasWideOptions: false,
   },
 });

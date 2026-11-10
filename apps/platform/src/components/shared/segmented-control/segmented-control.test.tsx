@@ -3,6 +3,7 @@ import {
   customRender,
   renderWithIntl,
   screen,
+  within,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -24,6 +25,7 @@ const MOCK_LABEL_ID = faker.string.alpha(8);
 const MOCK_BADGE_ID = faker.string.alpha(8);
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_BADGE = faker.lorem.word();
+const MOCK_GLYPH_TEST_ID = faker.string.alpha(8);
 
 const MOCK_FIRST_OPTION = { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL };
 const MOCK_SECOND_OPTION = {
@@ -327,6 +329,24 @@ describe(`<${SegmentedControl.name}/>`, () => {
       expect(onChange).not.toHaveBeenCalled();
       expect(firstOption).not.toBePressed();
     });
+  });
+
+  it('draws a glyph inside its option, leaving the option named by its label alone', () => {
+    setup({
+      options: [
+        {
+          ...MOCK_FIRST_OPTION,
+          glyph: <svg aria-hidden={true} data-testid={MOCK_GLYPH_TEST_ID} />,
+        },
+        MOCK_SECOND_OPTION,
+      ],
+    });
+
+    const firstOption = screen.getByRole('button', { name: MOCK_FIRST_LABEL });
+    const glyph = within(firstOption).getByTestId(MOCK_GLYPH_TEST_ID);
+
+    expect(firstOption).toHaveAccessibleName(MOCK_FIRST_LABEL);
+    expect(glyph).toBeInTheDocument();
   });
 
   it('renders a single option', () => {
