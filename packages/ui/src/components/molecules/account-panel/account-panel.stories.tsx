@@ -17,6 +17,7 @@ const BOOKMARKS_HREF = '#bookmarks';
 const SETTINGS_HREF = '#settings';
 const BOOKMARKS_DESCRIPTION = 'Posts you saved to read later';
 const BOOKMARKS_LABEL = 'My bookmarks';
+const HUB_BOOKMARKS_LABEL = 'Bookmarks';
 const SETTINGS_DESCRIPTION = 'Name, sign-in methods, your data';
 
 const InteractiveAccountPanel = (args: TAccountPanelProps) => {
@@ -117,7 +118,7 @@ export const Hub: TStory = {
     links: {
       bookmarks: {
         href: BOOKMARKS_HREF,
-        label: 'Bookmarks',
+        label: HUB_BOOKMARKS_LABEL,
         description: BOOKMARKS_DESCRIPTION,
       },
       settings: {
@@ -126,6 +127,23 @@ export const Hub: TStory = {
         description: SETTINGS_DESCRIPTION,
       },
     },
+  },
+};
+
+export const HubCurrentAndFocusedTiles: TStory = {
+  ...Hub,
+  name: 'Hub, current tile with another tile focused',
+  args: {
+    ...Hub.args,
+    links: {
+      ...Hub.args.links,
+      settings: { ...Hub.args.links.settings, isCurrent: true },
+    },
+  },
+  play: ({ canvasElement }) => {
+    within(canvasElement)
+      .getAllByRole('menuitem', { name: HUB_BOOKMARKS_LABEL })[0]
+      ?.focus();
   },
 };
 
