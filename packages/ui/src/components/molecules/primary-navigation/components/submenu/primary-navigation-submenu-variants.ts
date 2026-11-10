@@ -3,6 +3,8 @@ import {
   BELOW_HEADER,
   FOCUS_RING,
   MENU_ROW,
+  NAV_LINK,
+  NAV_LINK_CURRENT,
   TRANSITION_COLORS,
   tv,
 } from '@blog/ui/lib/styling';
@@ -11,11 +13,12 @@ import type { VariantProps } from 'tailwind-variants';
 export const primaryNavigationSubmenuVariants = tv({
   slots: {
     trigger: [
-      'group inline-flex cursor-pointer items-center gap-x-1 rounded-sm',
+      'group inline-flex cursor-pointer items-center gap-x-1',
+      NAV_LINK,
       'font-mono text-meta',
       TRANSITION_COLORS,
       FOCUS_RING,
-      'has-[+:popover-open]:text-brand-primary',
+      'has-[+:popover-open]:nav-link-marked has-[+:popover-open]:text-brand-primary',
     ],
     chevron: ['transition-transform group-has-[+:popover-open]:rotate-180'],
     panel: [
@@ -31,7 +34,7 @@ export const primaryNavigationSubmenuVariants = tv({
   },
   variants: {
     isActive: {
-      true: { trigger: ['font-semibold text-brand-primary'] },
+      true: { trigger: ['font-semibold text-brand-primary', NAV_LINK_CURRENT] },
       false: { trigger: ['text-muted hover:text-text'] },
     },
     submenuStyle: {
@@ -40,7 +43,7 @@ export const primaryNavigationSubmenuVariants = tv({
           'w-65 rounded-card p-2',
           'supports-[anchor-name:--a]:inset-auto supports-[anchor-name:--a]:m-0',
           'supports-[anchor-name:--a]:top-[anchor(bottom)] supports-[anchor-name:--a]:left-[anchor(left)]',
-          'supports-[anchor-name:--a]:mt-5 supports-[anchor-name:--a]:-ml-3',
+          'supports-[anchor-name:--a]:mt-[calc(1.25rem-var(--nav-link-padding-y,0px))] supports-[anchor-name:--a]:ml-[calc(var(--nav-link-padding-x,0px)-0.75rem)]',
           'supports-[anchor-name:--a]:[position-try-fallbacks:flip-inline]',
         ],
       },

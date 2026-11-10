@@ -2,6 +2,7 @@ import {
   CARD_STYLE,
   COLOR_SCHEME,
   HEADER_CONTROL_STYLE,
+  NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
 } from '@blog/config/constants';
@@ -14,12 +15,20 @@ const MOCK_LIGHT_ACCENT_BAR = {
   scheme: COLOR_SCHEME.LIGHT,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  navLinkStyle: NAV_LINK_STYLE.PLAIN,
   hue: PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue,
 };
 
+const MOCK_TRANSPARENT_FILLS = {
+  ...MOCK_LIGHT_ACCENT_BAR,
+  headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+};
+
 const BRAND_PRIMARY_TOKEN = '--brand-primary';
-const HEADER_CONTROL_FILL_TOKEN = '--header-control-fill';
+const TEXT_TOKEN = '--text';
+const HEADER_CONTROL_FILL_TOKEN = '--header-control-fill' as const;
 const SECONDARY_TOKEN = '--secondary';
+const NAV_LINK_FILL_TOKEN = '--nav-link-fill' as const;
 
 describe(findContrastFailures, () => {
   it('finds exactly the known failures across every hue, scheme and card style', () => {
@@ -45,20 +54,35 @@ describe(measureContrast, () => {
 
   it('resolves the header control fill from the header control style', () => {
     expect(
-      measureContrast('--text', HEADER_CONTROL_FILL_TOKEN, {
+      measureContrast(TEXT_TOKEN, HEADER_CONTROL_FILL_TOKEN, {
         ...MOCK_LIGHT_ACCENT_BAR,
         headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
       }),
-    ).toBe(measureContrast('--text', '--border', MOCK_LIGHT_ACCENT_BAR));
+    ).toBe(measureContrast(TEXT_TOKEN, '--border', MOCK_LIGHT_ACCENT_BAR));
   });
 
-  it('measures a transparent header control against the page background', () => {
+  it.each([
+    ['header control', HEADER_CONTROL_FILL_TOKEN],
+    ['navigation link', NAV_LINK_FILL_TOKEN],
+  ])('measures a transparent %s against the page background', (_, fill) => {
+    expect(measureContrast(TEXT_TOKEN, fill, MOCK_TRANSPARENT_FILLS)).toBe(
+      measureContrast(TEXT_TOKEN, '--primary', MOCK_LIGHT_ACCENT_BAR),
+    );
+  });
+
+  it('resolves the navigation link fill from the navigation link style', () => {
     expect(
-      measureContrast('--text', HEADER_CONTROL_FILL_TOKEN, {
+      measureContrast(BRAND_PRIMARY_TOKEN, NAV_LINK_FILL_TOKEN, {
         ...MOCK_LIGHT_ACCENT_BAR,
-        headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+        navLinkStyle: NAV_LINK_STYLE.SOFT,
       }),
-    ).toBe(measureContrast('--text', '--primary', MOCK_LIGHT_ACCENT_BAR));
+    ).toBe(
+      measureContrast(
+        BRAND_PRIMARY_TOKEN,
+        '--brand-primary-muted',
+        MOCK_LIGHT_ACCENT_BAR,
+      ),
+    );
   });
 
   it('measures the accent ramp at the hue it is given', () => {

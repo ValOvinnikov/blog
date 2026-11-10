@@ -1,13 +1,17 @@
+import type { TMaybeUndefined } from '@blog/config/types';
 import { renderedContrastRatio, type TOklchColor } from '@blog/utils/color';
+import { isUndefined } from '@blog/utils/primitives';
 
 import {
   COLOR_SCHEME,
   type TCardStyle,
   type TColorScheme,
   type THeaderControlStyle,
+  type TNavLinkStyle,
 } from '@blog/config/constants';
 
 import type { TThemeToken } from './contrast-pairs';
+import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
@@ -26,11 +30,15 @@ import {
   STATUS_RAMP_LIGHT,
 } from './theme-ramps';
 
-export type TContrastContext = {
-  scheme: TColorScheme;
-  hue: number;
+export type TContrastStyles = {
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  navLinkStyle: TNavLinkStyle;
+};
+
+export type TContrastContext = TContrastStyles & {
+  scheme: TColorScheme;
+  hue: number;
 };
 
 const SCHEME_RAMPS: Record<TColorScheme, TOklchRamp> = {
@@ -52,29 +60,44 @@ const SCHEME_RAMPS: Record<TColorScheme, TOklchRamp> = {
   },
 };
 
+const BRAND_PRIMARY: TThemeToken = '--brand-primary';
+
 const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
-  '--ring': '--brand-primary',
-  '--info': '--brand-primary',
+  '--ring': BRAND_PRIMARY,
+  '--info': BRAND_PRIMARY,
   '--code-fg': '--text',
   '--code-comment': '--text-muted',
   '--field-boundary': '--border-emphasis',
 };
 
-// A transparent header control shows the header's own band.
+const TRANSPARENT = 'transparent';
+
+// A transparent header control or navigation link shows the header's own band.
 const TRANSPARENT_SURFACE: TThemeToken = '--primary';
 
 // A scrim is tested over the brightest photo it can sit on, the worst case for light copy.
 const PHOTO_BACKDROP: TOklchColor = { l: 1, c: 0, h: 0 };
 
+const styleValueOf = (
+  token: TThemeToken,
+  { cardStyle, headerControlStyle, navLinkStyle }: TContrastStyles,
+): TMaybeUndefined<string> =>
+  CARD_STYLE_DECLARATIONS[cardStyle][token] ??
+  HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle][token] ??
+  NAV_LINK_STYLE_DECLARATIONS[navLinkStyle][token];
+
+export const isTransparentToken = (
+  token: TThemeToken,
+  styles: TContrastStyles,
+): boolean => styleValueOf(token, styles) === TRANSPARENT;
+
 const resolveStop = (
   token: TThemeToken,
   context: Omit<TContrastContext, 'hue'>,
 ): TOklchRamp[TThemeToken] => {
-  const { scheme, cardStyle, headerControlStyle } = context;
-  const styleValue =
-    CARD_STYLE_DECLARATIONS[cardStyle][token] ??
-    HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle][token];
-  if (styleValue === 'transparent') {
+  const { scheme } = context;
+  const styleValue = styleValueOf(token, context);
+  if (styleValue === TRANSPARENT) {
     return resolveStop(TRANSPARENT_SURFACE, context);
   }
   const alias =
@@ -101,14 +124,13 @@ export const measureContrast = (
   context: TContrastContext,
 ): number => {
   const surfaceColor = resolveColor(surface, context);
-  const backdrop =
-    surfaceColor.alpha === undefined
-      ? [surfaceColor]
-      : [PHOTO_BACKDROP, surfaceColor];
+  const backdrop = isUndefined(surfaceColor.alpha)
+    ? [surfaceColor]
+    : [PHOTO_BACKDROP, surfaceColor];
   return renderedContrastRatio(resolveColor(foreground, context), backdrop);
 };
 
 export const tokenFollowsAccentHue = (
   token: TThemeToken,
   context: Omit<TContrastContext, 'hue'>,
-): boolean => resolveStop(token, context).h === undefined;
+): boolean => isUndefined(resolveStop(token, context).h);

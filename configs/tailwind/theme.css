@@ -389,6 +389,12 @@
 
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
+
+  --nav-link-fill: transparent;
+  --nav-link-outline: transparent;
+  --nav-link-decoration: none;
+  --nav-link-padding-x: 0px;
+  --nav-link-padding-y: 0px;
 }
 
 .dark {
@@ -535,6 +541,27 @@
 /* Not a @theme token: those resolve on :root, and the default must follow the nearest --radius-sm (the platform Look preview re-declares it on its frame). */
 @utility rounded-button {
   border-radius: var(--radius-button, var(--radius-sm));
+}
+
+/* Falls back at the element, like rounded-button, so it follows the nearest --radius-sm. */
+@utility rounded-nav-link {
+  border-radius: var(--nav-link-radius, var(--radius-sm));
+}
+
+@utility nav-link-marked {
+  background-color: var(--nav-link-fill);
+  outline: 1px solid var(--nav-link-outline);
+  outline-offset: -1px;
+
+  /* Forced colours drop the fill and a transparent outline, so hover, open and current show this one instead. */
+  @media (forced-colors: active) {
+    outline-color: CanvasText;
+    outline-offset: 1px;
+  }
+}
+
+@utility nav-link-current {
+  text-decoration-line: var(--nav-link-decoration);
 }
 
 @utility max-w-wide {

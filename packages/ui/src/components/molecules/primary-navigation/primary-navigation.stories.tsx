@@ -1,4 +1,8 @@
-import { HEADER_SUBMENU_STYLE } from '@blog/config';
+import {
+  HEADER_SUBMENU_STYLE,
+  NAV_LINK_STYLE_DECLARATIONS,
+} from '@blog/config';
+import { StyleVariants } from '@blog/ui/testing/style-variants';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -182,6 +186,23 @@ export const MobileInteractive: TStory = {
 
 export const WithSubmenus: TStory = {
   args: { links: linksWithSubItems },
+};
+
+export const NavLinkStyles: TStory = {
+  render: () => (
+    <StyleVariants
+      declarations={NAV_LINK_STYLE_DECLARATIONS}
+      className="flex flex-col gap-8"
+      variantClassName="flex flex-col gap-3"
+    >
+      {() => (
+        <>
+          <PrimaryNavigation links={linksWithSubItems} />
+          <PrimaryNavigation links={linksWithCurrentSubItem} />
+        </>
+      )}
+    </StyleVariants>
+  ),
 };
 
 export const WithCurrentSubmenuItem: TStory = {
