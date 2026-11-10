@@ -10,7 +10,7 @@ export const expandableSectionTextSchema = defineType({
   title: 'Expandable Section Text',
   type: 'array',
   description:
-    'The content of an expandable section — article text whose headings stay below the page’s own sections, so its contents list stays accurate.',
+    'The content of an expandable section — article text whose headings are H4 only, so they sit below the section’s own title.',
   of: [
     defineArrayMember({
       type: 'block',
