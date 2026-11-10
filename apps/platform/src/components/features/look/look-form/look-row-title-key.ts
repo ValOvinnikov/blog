@@ -5,6 +5,7 @@ export const LOOK_ROW_TITLE_KEY = {
   [LOOK_ROW.BRAND]: 'brandHeading',
   [LOOK_ROW.TYPE]: 'typeHeading',
   [LOOK_ROW.SHAPE]: 'shapeHeading',
+  [LOOK_ROW.CARDS]: 'cardsHeading',
   [LOOK_ROW.BUTTONS]: 'buttonsHeading',
   [LOOK_ROW.HEADER]: 'headerHeading',
   [LOOK_ROW.FOOTER]: 'footerHeading',

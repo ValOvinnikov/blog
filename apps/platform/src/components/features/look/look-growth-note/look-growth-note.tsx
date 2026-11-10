@@ -16,6 +16,7 @@ const GROWTH_ROWS = [
   { row: LOOK_ROW.COLOUR, descriptionKey: 'growthAddsColour' },
   { row: LOOK_ROW.TYPE, descriptionKey: 'growthAddsType' },
   { row: LOOK_ROW.SHAPE, descriptionKey: 'growthAddsShape' },
+  { row: LOOK_ROW.CARDS, descriptionKey: 'growthAddsCards' },
   { row: LOOK_ROW.BUTTONS, descriptionKey: 'growthAddsButtons' },
   { row: LOOK_ROW.HEADER, descriptionKey: 'growthAddsHeader' },
   { row: LOOK_ROW.FOOTER, descriptionKey: 'growthAddsFooter' },

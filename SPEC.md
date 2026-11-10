@@ -1533,8 +1533,8 @@ density and card-style values live in `@blog/config`'s theme declaration tables;
 surface, which also carries the `dark` class so the tenant's dark ramp wins
 over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
-Look page's Shape card sets the card style (Accent bar or Outlined)
-beside radius and density; picking a preset re-seeds it from
+Look page's Cards card sets the card style (Accent bar or Outlined),
+apart from radius and density in Corners & spacing; picking a preset re-seeds it from
 `PRESET_REGISTRY`'s `cardStyle`, and the preview's linked and static cards show
 it before saving. The
 Look form and `updateLookAction` both refuse an accent hue

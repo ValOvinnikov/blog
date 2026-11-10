@@ -55,6 +55,7 @@ describe(`<${LookForm.name}/>`, () => {
         LOOK_FORM.brandHeading,
         LOOK_FORM.typeHeading,
         LOOK_FORM.shapeHeading,
+        LOOK_FORM.cardsHeading,
         LOOK_FORM.buttonsHeading,
         LOOK_FORM.sitePartsGroupHeading,
         LOOK_FORM.headerHeading,

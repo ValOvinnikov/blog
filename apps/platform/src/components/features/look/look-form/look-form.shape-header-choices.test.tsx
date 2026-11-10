@@ -53,7 +53,7 @@ describe(`<${LookForm.name}/>`, () => {
         saved: { headerControlStyle: HEADER_CONTROL_STYLE.SOFT },
       },
       {
-        row: LOOK_ROW.SHAPE,
+        row: LOOK_ROW.CARDS,
         group: LOOK_FORM.cardStyleLabel,
         option: OUTLINED,
         saved: { cardStyle: CARD_STYLE.OUTLINED },

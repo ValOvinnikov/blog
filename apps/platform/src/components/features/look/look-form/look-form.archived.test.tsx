@@ -99,7 +99,7 @@ describe(`<${LookForm.name}/>`, () => {
         expect(softButton).toBeDisabled();
       });
 
-      it('disables the Type and Shape controls', async () => {
+      it('disables the Type, Corners & spacing and Cards controls', async () => {
         await openLookRow(user, LOOK_ROW.TYPE);
         const headingFont = screen.getByRole('combobox', {
           name: LOOK_FORM.headingFontLabel,
@@ -115,6 +115,7 @@ describe(`<${LookForm.name}/>`, () => {
           name: EXTRA_LARGE,
         });
         const compactButton = screen.getByRole('button', { name: COMPACT });
+        await openLookRow(user, LOOK_ROW.CARDS);
         const cardStyleGroup = screen.getByRole('group', {
           name: LOOK_FORM.cardStyleLabel,
         });

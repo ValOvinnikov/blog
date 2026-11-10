@@ -691,7 +691,8 @@
     "jumpIndexAriaLabel": "Look-Abschnitte",
     "growthAddsColour": "Ein eigener Logo-Farbton",
     "growthAddsType": "Überschrift- und Fließtextschriften",
-    "growthAddsShape": "Ecken, Abstände und Kartenstil",
+    "growthAddsShape": "Ecken und Abstände",
+    "growthAddsCards": "Kartenstil",
     "growthAddsButtons": "Ladezustand und Spinner",
     "growthAddsHeader": "Layout, Untermenüs, Leiste, Header-Schaltflächen und Kontosteuerung",
     "growthAddsFooter": "Layout, Hintergrund und Fläche",
@@ -724,11 +725,11 @@
     "headingFontLabel": "Überschriftenschrift",
     "bodyFontLabel": "Fließtextschrift",
     "radiusScaleLabel": "Eckenradius",
-    "radiusScaleDescription": "Rundung der Ecken auf allen Flächen.",
+    "radiusScaleDescription": "Rundet jede Karte, jedes Panel, Menü, jede Tabelle und jedes Bild.",
     "densityLabel": "Dichte",
     "densityDescription": "Abstände und Größe der Bedienelemente.",
     "cardStyleLabel": "Kartenstil",
-    "cardStyleDescription": "Wie Beitrags-, Themen- und Zitatkarten auf der ganzen Website gerahmt sind.",
+    "cardStyleDescription": "Rahmt jede Inhaltskarte: Beiträge, Themen, Zitate, Preise, FAQ-Einträge und Call-to-Action-Boxen.",
     "radiusScaleOptionLabel": {
       "SM": "Klein",
       "MD": "Mittel",
@@ -742,6 +743,10 @@
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Akzentleiste",
       "OUTLINED": "Umrandet"
+    },
+    "cardStyleOptionDescription": {
+      "ACCENT_BAR": "Eine Leiste in Markenfarbe am linken Rand",
+      "OUTLINED": "Ein dünner Rahmen rundherum"
     },
     "headerControlStyleLabel": "Header-Schaltflächen",
     "headerControlStyleDescription": "Die Schaltflächen für Sprache, Design, Menü und Anmelden, auf jeder Bildschirmgröße.",
@@ -776,8 +781,10 @@
     "colourDescription": "Nur der Farbton ändert sich, damit Text lesbar bleibt.",
     "typeHeading": "Schrift",
     "typeDescription": "Jede Schrift wird in ihrem eigenen Schnitt gezeigt.",
-    "shapeHeading": "Form",
-    "shapeDescription": "Ecken, Abstände und wie Karten gerahmt sind.",
+    "shapeHeading": "Ecken & Abstände",
+    "cardsHeading": "Karten",
+    "shapeDescription": "Wie rund Ecken sind und wie viel Raum die Elemente auf der ganzen Website umgibt.",
+    "cardsDescription": "Wie Inhaltskarten auf der ganzen Website gerahmt sind.",
     "headerHeading": "Header",
     "headerDescription": "Wie die obere Leiste Ihrer Website aufgebaut ist und wie sich ihre Untermenüs öffnen.",
     "headerLayoutLabel": "Layout",
@@ -837,6 +844,7 @@
     },
     "spinnerStyleLabel": "Spinner",
     "spinnerStyleDescription": "Der Spinner auf den Schaltflächen und Ladezuständen Ihrer Website.",
+    "spinnerEdgeNote": "Beschäftigte Schaltflächen zeigen in diesem Stil keinen Spinner. Toasts und Ladezustände nutzen ihn weiterhin.",
     "spinnerStyleOptionLabel": {
       "BRAILLE": "Braille",
       "RING": "Ring",

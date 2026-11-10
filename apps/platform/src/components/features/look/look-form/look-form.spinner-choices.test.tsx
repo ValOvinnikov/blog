@@ -28,7 +28,6 @@ const USE_PRESET_SPINNER = makeEnTranslator('lookForm')(
   { field: SPINNER_LABEL },
 );
 const UNSAVED_SPINNER = `${SPINNER_LABEL} ${LOOK_FORM.fieldUnsavedLabel}`;
-const UNSAVED_BUSY_STYLE = `${LOOK_FORM.busyButtonStyleLabel} ${LOOK_FORM.fieldUnsavedLabel}`;
 
 describe(`<${LookForm.name}/> spinner`, () => {
   let user: UserEvent;
@@ -58,25 +57,23 @@ describe(`<${LookForm.name}/> spinner`, () => {
       );
     });
 
-    it('hides the spinner while busy buttons draw a progress edge and brings it back with its value', async () => {
+    it('keeps the spinner and its value while busy buttons draw a progress edge, and says what still uses it', async () => {
       await chooseSegment(
         user,
         LOOK_FORM.busyButtonStyleLabel,
         LOOK_FORM.busyButtonStyleOptionLabel.EDGE,
       );
-      const hiddenSpinner = screen.queryByRole('combobox', {
-        name: UNSAVED_SPINNER,
-      });
-      expect(hiddenSpinner).not.toBeInTheDocument();
-
-      await chooseSegment(
-        user,
-        UNSAVED_BUSY_STYLE,
-        LOOK_FORM.busyButtonStyleOptionLabel.KEPT,
-      );
 
       const spinner = screen.getByRole('combobox', { name: UNSAVED_SPINNER });
+      const edgeNote = screen.getByText(LOOK_FORM.spinnerEdgeNote);
       expect(spinner).toHaveTextContent(LOOK_FORM.spinnerStyleOptionLabel.DOTS);
+      expect(edgeNote).toBeVisible();
+    });
+
+    it('shows no progress edge note while busy buttons keep their label', () => {
+      const edgeNote = screen.queryByText(LOOK_FORM.spinnerEdgeNote);
+
+      expect(edgeNote).not.toBeInTheDocument();
     });
 
     it("puts the spinner back to the preset's", async () => {

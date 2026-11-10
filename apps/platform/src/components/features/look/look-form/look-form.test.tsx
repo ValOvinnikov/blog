@@ -31,6 +31,7 @@ const ROW_TITLES_IN_ORDER = [
   LOOK_FORM.brandHeading,
   LOOK_FORM.typeHeading,
   LOOK_FORM.shapeHeading,
+  LOOK_FORM.cardsHeading,
   LOOK_FORM.buttonsHeading,
   LOOK_FORM.headerHeading,
   LOOK_FORM.footerHeading,
@@ -113,7 +114,7 @@ describe(`<${LookForm.name}/>`, () => {
       });
     });
 
-    describe('with the Shape row open', () => {
+    describe('with the Corners & spacing row open', () => {
       beforeEach(async () => {
         await openLookRow(user, LOOK_ROW.SHAPE);
       });
@@ -125,6 +126,27 @@ describe(`<${LookForm.name}/>`, () => {
 
         expect(radiusGroup).toHaveAccessibleDescription(
           LOOK_FORM.radiusScaleDescription,
+        );
+      });
+    });
+
+    describe('with the Cards row open', () => {
+      beforeEach(async () => {
+        await openLookRow(user, LOOK_ROW.CARDS);
+      });
+
+      it('describes the chosen card style below the control', async () => {
+        const cardStyleField = screen.getByRole('group', {
+          name: LOOK_FORM.cardStyleLabel,
+        });
+        const outlinedButton = within(cardStyleField).getByRole('button', {
+          name: LOOK_FORM.cardStyleOptionLabel.OUTLINED,
+        });
+        await user.click(outlinedButton);
+        const toggleGroup = within(cardStyleField).getByRole('group');
+
+        expect(toggleGroup).toHaveAccessibleDescription(
+          LOOK_FORM.cardStyleOptionDescription.OUTLINED,
         );
       });
     });

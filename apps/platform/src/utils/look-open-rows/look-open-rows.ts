@@ -6,6 +6,7 @@ export const STYLE_ROWS = [
   LOOK_ROW.BRAND,
   LOOK_ROW.TYPE,
   LOOK_ROW.SHAPE,
+  LOOK_ROW.CARDS,
   LOOK_ROW.BUTTONS,
 ] as const satisfies readonly TLookRow[];
 

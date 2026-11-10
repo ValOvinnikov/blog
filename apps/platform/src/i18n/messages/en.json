@@ -691,7 +691,8 @@
     "jumpIndexAriaLabel": "Look sections",
     "growthAddsColour": "A logo hue of its own",
     "growthAddsType": "Heading and body fonts",
-    "growthAddsShape": "Corners, spacing and card style",
+    "growthAddsShape": "Corners and spacing",
+    "growthAddsCards": "Card style",
     "growthAddsButtons": "Busy state and spinner",
     "growthAddsHeader": "Layout, sub-menus, bar, header buttons and account controls",
     "growthAddsFooter": "Layout, background and surface",
@@ -724,11 +725,11 @@
     "headingFontLabel": "Heading font",
     "bodyFontLabel": "Body font",
     "radiusScaleLabel": "Radius scale",
-    "radiusScaleDescription": "Corner roundness across every surface.",
+    "radiusScaleDescription": "Rounds every card, panel, menu, table and image.",
     "densityLabel": "Density",
     "densityDescription": "Spacing and control size.",
     "cardStyleLabel": "Card style",
-    "cardStyleDescription": "How post, topic and quote cards are framed across the site.",
+    "cardStyleDescription": "Frames every content card: posts, topics, quotes, pricing, FAQ items and call-to-action boxes.",
     "radiusScaleOptionLabel": {
       "SM": "Small",
       "MD": "Medium",
@@ -742,6 +743,10 @@
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accent bar",
       "OUTLINED": "Outlined"
+    },
+    "cardStyleOptionDescription": {
+      "ACCENT_BAR": "A brand-coloured bar on the left edge",
+      "OUTLINED": "A thin outline all round"
     },
     "headerControlStyleLabel": "Header buttons",
     "headerControlStyleDescription": "The language, theme, menu and Sign in buttons, at every screen size.",
@@ -776,8 +781,10 @@
     "colourDescription": "Only the hue changes, so text stays readable.",
     "typeHeading": "Type",
     "typeDescription": "Each font is shown in its own face.",
-    "shapeHeading": "Shape",
-    "shapeDescription": "Corners, spacing and how cards are framed.",
+    "shapeHeading": "Corners & spacing",
+    "cardsHeading": "Cards",
+    "shapeDescription": "How round corners are and how much space surrounds things, across the site.",
+    "cardsDescription": "How content cards are framed across the site.",
     "headerHeading": "Header",
     "headerDescription": "How the top bar of your site is arranged and how its sub-menus open.",
     "headerLayoutLabel": "Layout",
@@ -837,6 +844,7 @@
     },
     "spinnerStyleLabel": "Spinner",
     "spinnerStyleDescription": "The spinner on your site's buttons and loading states.",
+    "spinnerEdgeNote": "Busy buttons draw no spinner in this style. Toasts and loading states still use it.",
     "spinnerStyleOptionLabel": {
       "BRAILLE": "Braille",
       "RING": "Ring",
