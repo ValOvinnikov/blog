@@ -1,2 +1,2 @@
-export type { IToastAction, TToastProps } from './toast';
+export type { IToast, IToastAction, TToastPhase, TToastProps } from './toast';
 export { Toast } from './toast';

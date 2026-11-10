@@ -3,7 +3,7 @@ import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { Toast } from './toast';
+import { Toast, type IToast, type TToastProps } from './toast';
 
 faker.seed(123);
 
@@ -19,14 +19,23 @@ const MOCK_ACTION_LABEL = faker.word.verb();
 const MOCK_KEY_HINT = faker.lorem.word();
 const MOCK_DURATION_MS = faker.number.int({ min: 1000, max: 9000 });
 
-const setup = customRender(Toast, {
+const MOCK_TOAST: IToast = {
   type: TOAST_TYPE.SUCCESS,
   title: MOCK_TITLE,
   message: MOCK_MESSAGE,
+  phase: 'visible',
+};
+
+const render = customRender(Toast, {
+  toast: MOCK_TOAST,
   dismissLabel: MOCK_DISMISS_LABEL,
   onDismiss: vi.fn(),
-  phase: 'visible',
 });
+
+const setup = (
+  toastOverrides?: Partial<IToast>,
+  propOverrides?: Partial<TToastProps>,
+) => render({ toast: { ...MOCK_TOAST, ...toastOverrides }, ...propOverrides });
 
 describe(`<${Toast.name}/>`, () => {
   let user: UserEvent;
@@ -89,7 +98,7 @@ describe(`<${Toast.name}/>`, () => {
 
   it('calls onDismiss when the dismiss button is clicked', async () => {
     const onDismiss = vi.fn();
-    setup({ onDismiss });
+    setup({}, { onDismiss });
 
     const dismissButton = screen.getByRole('button', {
       name: MOCK_DISMISS_LABEL,
@@ -134,7 +143,7 @@ describe(`<${Toast.name}/>`, () => {
   });
 
   it('renders a timer bar when durationMs is set', () => {
-    setup({ durationMs: MOCK_DURATION_MS, dataTestId: TOAST_TEST_ID });
+    setup({ durationMs: MOCK_DURATION_MS }, { dataTestId: TOAST_TEST_ID });
 
     const timer = screen.getByTestId(TOAST_TIMER_TEST_ID);
 
@@ -142,7 +151,7 @@ describe(`<${Toast.name}/>`, () => {
   });
 
   it('renders no timer bar for a sticky toast', () => {
-    setup({ durationMs: undefined, dataTestId: TOAST_TEST_ID });
+    setup({ durationMs: undefined }, { dataTestId: TOAST_TEST_ID });
 
     const timer = screen.queryByTestId(TOAST_TIMER_TEST_ID);
 

@@ -1,7 +1,8 @@
 import { TOAST_TYPE, type TToastType } from '@blog/config';
 import { faker } from '@faker-js/faker';
 
-import { createToastStore, type IToastPayload } from './toast-store';
+import type { IToastPayload } from './toast-record';
+import { createToastStore } from './toast-store';
 
 faker.seed(6012);
 
