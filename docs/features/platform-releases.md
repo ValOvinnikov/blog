@@ -171,7 +171,11 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   finding through `queries.findings.recordContrastResult`: a `FAIL` opens or
   refreshes it, a `PASS` resolves it and every other open contrast failure,
   and the SHA's own row is what the candidate reader's contrast status then
-  reports for that SHA.
+  reports for that SHA. A failure another SHA's pass resolved is cleared from
+  `/findings` and carries `supersededBy`, but is not a pass:
+  `getContrastFinding` reports `hasPassed` only for a row whose own run
+  passed, and `getLatestPassingContrastSha` returns only such a SHA. The
+  SHA's own later run drops `supersededBy`.
 - The contrast-due banner at the top of every `(operator)` page, for
   SUPERADMINs only, when the candidate's contrast status is `DUE`
   (`isContrastDue`). It reads the candidate without the migration summary,
