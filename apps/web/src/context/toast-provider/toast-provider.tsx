@@ -96,8 +96,10 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
     }
   }, [state.visible, store]);
 
+  const hasToasts = hasLength(state.visible);
+
   useEffect(() => {
-    if (!hasLength(state.visible)) return;
+    if (!hasToasts) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
@@ -108,7 +110,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [state.visible.length, store, rowPause]);
+  }, [hasToasts, store, rowPause]);
 
   return (
     <ToastContext.Provider value={toast}>
