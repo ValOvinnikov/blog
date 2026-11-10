@@ -1,3 +1,4 @@
+import { CardStyles } from '@blog/ui/testing/card-styles';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within } from 'storybook/test';
@@ -14,17 +15,22 @@ const eightItems = Array.from({ length: 8 }, () => ({
   answer: faker.lorem.paragraph(),
 }));
 
+type TItem = { question: string; answer: string };
+
+const renderItems = (items: TItem[]) =>
+  items.map((item) => (
+    <Accordion.Item key={item.question}>
+      <Accordion.Trigger>{item.question}</Accordion.Trigger>
+      <Accordion.Panel>{item.answer}</Accordion.Panel>
+    </Accordion.Item>
+  ));
+
 const meta = {
   title: 'Organisms/Accordion',
   component: Accordion,
   tags: ['autodocs'],
   args: {
-    children: threeItems.map((item) => (
-      <Accordion.Item key={item.question}>
-        <Accordion.Trigger>{item.question}</Accordion.Trigger>
-        <Accordion.Panel>{item.answer}</Accordion.Panel>
-      </Accordion.Item>
-    )),
+    children: renderItems(threeItems),
   },
 } satisfies Meta<typeof Accordion>;
 
@@ -33,14 +39,13 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
+export const InEachCardStyle: TStory = {
+  render: (args) => <CardStyles>{() => <Accordion {...args} />}</CardStyles>,
+};
+
 export const EightItems: TStory = {
   args: {
-    children: eightItems.map((item) => (
-      <Accordion.Item key={item.question}>
-        <Accordion.Trigger>{item.question}</Accordion.Trigger>
-        <Accordion.Panel>{item.answer}</Accordion.Panel>
-      </Accordion.Item>
-    )),
+    children: renderItems(eightItems),
   },
 };
 
@@ -65,14 +70,7 @@ export const WithRichContent: TStory = {
 
 const OnSecondary = () => (
   <div className="bg-secondary surface-secondary" style={{ padding: '1.5rem' }}>
-    <Accordion>
-      {threeItems.map((item) => (
-        <Accordion.Item key={item.question}>
-          <Accordion.Trigger>{item.question}</Accordion.Trigger>
-          <Accordion.Panel>{item.answer}</Accordion.Panel>
-        </Accordion.Item>
-      ))}
-    </Accordion>
+    <Accordion>{renderItems(threeItems)}</Accordion>
   </div>
 );
 
@@ -90,14 +88,7 @@ const OnBrandPrimary = () => (
     className="bg-brand-primary-muted surface-brand-primary"
     style={{ padding: '1.5rem' }}
   >
-    <Accordion>
-      {threeItems.map((item) => (
-        <Accordion.Item key={item.question}>
-          <Accordion.Trigger>{item.question}</Accordion.Trigger>
-          <Accordion.Panel>{item.answer}</Accordion.Panel>
-        </Accordion.Item>
-      ))}
-    </Accordion>
+    <Accordion>{renderItems(threeItems)}</Accordion>
   </div>
 );
 
