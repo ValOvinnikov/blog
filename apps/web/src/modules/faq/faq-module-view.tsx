@@ -1,46 +1,28 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { TFaqModule } from '@blog/service';
 import { Accordion } from '@blog/ui/components/organisms/accordion';
-import { ActionGroup } from '@web/components/shared/action-group';
-import { ModuleHeading } from '@web/components/shared/module-heading';
+import { ModuleActions } from '@web/components/shared/module-actions';
+import { ModuleSection } from '@web/components/shared/module-section';
 import { PortableText } from '@web/components/shared/portable-text';
-import { Section } from '@web/components/shared/section';
-import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
 
 import { faqModuleViewVariants } from './faq-module-view-variants';
 
-export interface IFaqModuleViewProps extends TFaqModule {
+export interface IFaqModuleViewProps extends IWithDataTestId {
+  module: TFaqModule;
   titleId: string;
-  dataTestId: string;
 }
 
 export const FaqModuleView = ({
-  brandVariant,
-  headingBlock,
-  questions,
-  ctaButtons,
-  contentAlignment,
-  layout,
+  module,
   titleId,
   dataTestId,
 }: IFaqModuleViewProps) => {
+  const { questions, ctaButtons, contentAlignment } = module;
   const s = faqModuleViewVariants({ align: contentAlignment });
-  const actions = moduleGridActionsVariants({ align: contentAlignment });
 
   return (
-    <Section
-      brandVariant={brandVariant}
-      layout={layout}
-      titleId={titleId}
-      dataTestId={dataTestId}
-    >
+    <ModuleSection module={module} titleId={titleId} dataTestId={dataTestId}>
       <div className={s.wrapper()}>
-        <ModuleHeading
-          headingBlock={headingBlock}
-          id={titleId}
-          level={2}
-          align={contentAlignment}
-          variant="section"
-        />
         <Accordion dataTestId={`${dataTestId}-accordion`}>
           {questions.map((question) => (
             <Accordion.Item key={question.id}>
@@ -51,12 +33,8 @@ export const FaqModuleView = ({
             </Accordion.Item>
           ))}
         </Accordion>
-        {ctaButtons.length > 0 && (
-          <div className={actions.actions()}>
-            <ActionGroup actions={ctaButtons} />
-          </div>
-        )}
+        <ModuleActions actions={ctaButtons} align={contentAlignment} />
       </div>
-    </Section>
+    </ModuleSection>
   );
 };

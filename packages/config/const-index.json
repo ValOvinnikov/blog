@@ -7776,6 +7776,14 @@
         "file": "apps/web/src/constants/cookie-statement.ts"
       }
     ],
+    "faq_module.fetch_failed": [
+      {
+        "ref": "FAQ_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/faq",
+        "file": "apps/web/src/constants/faq.ts"
+      }
+    ],
     "footer.layout_fetch_failed": [
       {
         "ref": "FOOTER_LOG.CONTENT_FETCH_FAILED",
@@ -8334,6 +8342,14 @@
         "scope": "app:web",
         "from": "@web/constants/sitemap",
         "file": "apps/web/src/constants/sitemap.ts"
+      }
+    ],
+    "stats_module.fetch_failed": [
+      {
+        "ref": "STATS_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/stats",
+        "file": "apps/web/src/constants/stats.ts"
       }
     ],
     "tenant_email_identity.tenant_row_not_found": [

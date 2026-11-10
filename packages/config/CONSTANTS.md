@@ -679,6 +679,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **COOKIE_STATEMENT_LOG**: `PAGE_FETCH_FAILED`=`"cookie_statement_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"cookie_statement_metadata.fetch_failed"`
 
+### `@web/constants/faq` — `apps/web/src/constants/faq.ts`
+
+- **FAQ_LOG**: `MODULE_FETCH_FAILED`=`"faq_module.fetch_failed"`
+
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`
@@ -753,6 +757,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/sitemap` — `apps/web/src/constants/sitemap.ts`
 
 - **SITEMAP_LOG**: `SITE_URL_MISSING`=`"sitemap.site_url_missing"`, `POST_PARAMS_FETCH_FAILED`=`"sitemap.post_params_fetch_failed"`, `TOPIC_PARAMS_FETCH_FAILED`=`"sitemap.topic_params_fetch_failed"`, `TAG_PARAMS_FETCH_FAILED`=`"sitemap.tag_params_fetch_failed"`, `TOPIC_PAGINATION_PARAMS_FETCH_FAILED`=`"sitemap.topic_pagination_params_fetch_failed"`, `TAG_PAGINATION_PARAMS_FETCH_FAILED`=`"sitemap.tag_pagination_params_fetch_failed"`, `BLOG_PAGE_PARAMS_FETCH_FAILED`=`"sitemap.blog_page_params_fetch_failed"`, `LANDING_PAGE_SLUGS_FETCH_FAILED`=`"sitemap.landing_page_slugs_fetch_failed"`, `PRIVACY_DOCUMENT_PARAMS_FETCH_FAILED`=`"sitemap.privacy_document_params_fetch_failed"`, `LEGAL_DOCUMENT_PARAMS_FETCH_FAILED`=`"sitemap.legal_document_params_fetch_failed"`, `TRANSLATION_MAP_FETCH_FAILED`=`"sitemap.translation_map_fetch_failed"`
+
+### `@web/constants/stats` — `apps/web/src/constants/stats.ts`
+
+- **STATS_LOG**: `MODULE_FETCH_FAILED`=`"stats_module.fetch_failed"`
 
 ### `@web/constants/tenant-email-identity` — `apps/web/src/constants/tenant-email-identity.ts`
 

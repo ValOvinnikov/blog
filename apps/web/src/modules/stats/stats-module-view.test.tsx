@@ -20,7 +20,7 @@ const MOCK_TITLE_ID = faker.string.uuid();
 const MOCK_DATA_TEST_ID = faker.string.uuid();
 
 const setup = customRender(StatsModuleView, {
-  ...mockStatsModule(),
+  module: mockStatsModule(),
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });
@@ -63,7 +63,7 @@ describe(`<${StatsModuleView.name}/>`, () => {
   });
 
   it('renders the footnote when set', () => {
-    setup({ footnote: MOCK_FOOTNOTE });
+    setup({ module: mockStatsModule({ footnote: MOCK_FOOTNOTE }) });
 
     const footnote = screen.getByText(MOCK_FOOTNOTE);
 
@@ -71,7 +71,7 @@ describe(`<${StatsModuleView.name}/>`, () => {
   });
 
   it('renders the resolved cta buttons when present', () => {
-    setup({ ctaButtons: MOCK_CTA_ACTIONS });
+    setup({ module: mockStatsModule({ ctaButtons: MOCK_CTA_ACTIONS }) });
 
     const action = screen.getByRole('link', {
       name: MOCK_CTA_PRIMARY_ACTION.link.label,

@@ -1,5 +1,6 @@
-import { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
-import type { TFaqQuestion } from '@blog/service';
+import { BRAND_VARIANT, PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
+import type { TFaqModule, TFaqQuestion } from '@blog/service';
+import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   mockPortableTextBlock,
   mockPortableTextSpan,
@@ -51,3 +52,15 @@ export const MOCK_FAQ_ANSWER_WITH_LIST_AND_LINK: TFaqQuestion['answer'] = [
     },
   ),
 ];
+
+export const mockFaqModule = (
+  overrides: Partial<TFaqModule> = {},
+): TFaqModule => ({
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockHeadingBlock({ heading: 'Frequently asked questions' }),
+  questions: [],
+  ctaButtons: [],
+  contentAlignment: undefined,
+  layout: undefined,
+  ...overrides,
+});
