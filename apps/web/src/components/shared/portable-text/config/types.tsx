@@ -107,17 +107,19 @@ export const makeExpandableSectionTypeComponent = (
   }: {
     value: TResolvedExpandableSectionBlock;
   }) => (
-    <Accordion>
-      <Accordion.Item>
-        <Accordion.Trigger>{value.title}</Accordion.Trigger>
-        <Accordion.Panel>
-          <PortableTextRoot
-            value={value.body ?? []}
-            components={baseComponents}
-          />
-        </Accordion.Panel>
-      </Accordion.Item>
-    </Accordion>
+    <div {...{ [FULL_BLEED_DATA_ATTR]: '' }} className={s.expandableSection()}>
+      <Accordion>
+        <Accordion.Item>
+          <Accordion.Trigger>{value.title}</Accordion.Trigger>
+          <Accordion.Panel>
+            <PortableTextRoot
+              value={value.body ?? []}
+              components={baseComponents}
+            />
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
+    </div>
   );
 
   return ExpandableSectionType;
