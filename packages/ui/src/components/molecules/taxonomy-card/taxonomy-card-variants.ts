@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const taxonomyCardVariants = tv({
   slots: {
     root: [
-      '@container/card relative flex h-full flex-col gap-2',
+      '@container/card relative isolate flex h-full flex-col gap-2',
       'item-card surface-card',
       'px-card-x py-card-y',
     ],
