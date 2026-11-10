@@ -15,6 +15,7 @@ import {
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { STATIC_SANITY_IMAGE_BASE_URL } from '@web/testing/providers';
 import {
+  mockExpandableSectionBlock,
   mockPortableTextBlock,
   mockPortableTextSpan,
   mockTableBlock,
@@ -36,10 +37,6 @@ type TBlock = TPortableTextBody[number];
 type TAsideBlock = Extract<
   TBlock,
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.ASIDE }
->;
-type TExpandableSectionBlock = Extract<
-  TBlock,
-  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
 type TBodyImageBlock = Extract<
   TBlock,
@@ -97,17 +94,8 @@ const mockAsideBlock = (
   body,
 });
 
-const mockExpandableSectionBlock = (
-  body: TExpandableSectionBlock['body'],
-): TExpandableSectionBlock => ({
-  _type: PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION,
-  _key: 'section-1',
-  title: MOCK_SECTION_TITLE,
-  body,
-});
-
 const mockSectionWithBody = () =>
-  mockExpandableSectionBlock([
+  mockExpandableSectionBlock(MOCK_SECTION_TITLE, [
     mockPortableTextBlock(
       [
         mockPortableTextSpan(MOCK_SECTION_BODY_TEXT, ['strong']),
@@ -579,7 +567,7 @@ describe(`<${PortableText.name}/>`, () => {
     const user = userEvent.setup();
     setup({
       value: [
-        mockExpandableSectionBlock([
+        mockExpandableSectionBlock(MOCK_SECTION_TITLE, [
           mockAsideBlock(
             [mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)],
             ASIDE_KIND.WHY_NOT,

@@ -152,6 +152,21 @@ export const mockTableBlock = (
   rows,
 });
 
+type TExpandableSectionBlock = Extract<
+  TPortableTextBody[number],
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
+>;
+
+export const mockExpandableSectionBlock = (
+  title: string,
+  body: TExpandableSectionBlock['body'],
+): TExpandableSectionBlock => ({
+  _type: PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION,
+  _key: nextKey(PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION),
+  title,
+  body,
+});
+
 const MOCK_WIDE_TABLE_CELLS = [
   ['Plan', 'Monthly price', 'Included seats', 'Custom domain', 'Support'],
   ['Free', '£0', '1 editor', 'Not included', 'Community forum'],
@@ -169,6 +184,11 @@ export const MOCK_WIDE_TABLE_DEMO: TPortableTextBody = [
     ),
     1,
   ),
+  mockExpandableSectionBlock('How seats are counted', [
+    mockPortableTextBlock(
+      'An expandable section spans the same width as the table above it.',
+    ),
+  ]),
   mockPortableTextBlock(
     'A paragraph after the table, back at the regular text measure.',
   ),
