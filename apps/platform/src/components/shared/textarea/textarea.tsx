@@ -2,15 +2,17 @@
 
 import { Field } from '@base-ui/react/field';
 import { useFormFieldControl } from '@platform/components/shared/form-field';
-
-import { textareaVariants, type TTextareaVariants } from './textarea-variants';
+import {
+  textInputVariants,
+  type TTextInputVariants,
+} from '@platform/components/shared/text-input/text-input-variants';
 
 export type TTextareaProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   rows?: number;
-  isReadOnly?: TTextareaVariants['isReadOnly'];
+  isReadOnly?: TTextInputVariants['isReadOnly'];
   className?: string;
 };
 
@@ -34,7 +36,11 @@ export const Textarea = ({
       onValueChange={(nextValue) => onChange(nextValue)}
       aria-describedby={describedBy}
       className={({ disabled }) =>
-        textareaVariants({ isDisabled: disabled, isReadOnly, class: className })
+        textInputVariants({
+          isDisabled: disabled,
+          isReadOnly,
+          class: className,
+        })
       }
     />
   );
