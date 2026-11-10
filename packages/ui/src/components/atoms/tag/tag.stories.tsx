@@ -1,3 +1,4 @@
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
@@ -34,4 +35,18 @@ export const AsLink: TStory = {
     as: 'a',
     href: '/topics/architecture',
   },
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  render: () => (
+    <ButtonShapes>
+      {() => (
+        <>
+          <Tag variant="default">react</Tag>
+          <Tag variant="accent">architecture</Tag>
+        </>
+      )}
+    </ButtonShapes>
+  ),
 };

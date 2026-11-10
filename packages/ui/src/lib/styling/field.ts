@@ -1,5 +1,5 @@
 export const FIELD_CONTROL = [
-  'w-full rounded-sm border bg-surface px-3 py-2',
+  'w-full rounded-button border bg-surface px-3 py-2',
   'font-mono text-copy text-text placeholder:text-subtle',
   'transition-colors duration-base ease-smooth',
   'border-field-boundary',

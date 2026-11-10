@@ -10,7 +10,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const iconButtonVariants = tv({
   base: [
     'inline-grid size-[22px] place-items-center',
-    'rounded-sm border border-transparent bg-transparent p-0',
+    'rounded-button border border-transparent bg-transparent p-0',
     'text-muted',
     TRANSITION_COLORS,
     'hover:border-border-emphasis hover:bg-surface-2 hover:text-text',
@@ -25,7 +25,7 @@ export const iconButtonVariants = tv({
     variant: {
       bordered: [
         'size-auto min-h-0 whitespace-nowrap',
-        'rounded-sm border border-border-strong bg-surface px-3 py-1.5',
+        'rounded-button border border-border-strong bg-surface px-3 py-1.5',
         'font-mono font-normal text-label text-text',
         TRANSITION_COLORS,
         'hover:border-brand-primary hover:text-brand-primary',

@@ -1,5 +1,6 @@
 import { SIZE } from '@blog/config';
 import { BUSY_STYLES, SPINNER_VARIANTS } from '@blog/ui/testing/busy-styles';
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import { ReducedMotion } from '@blog/ui/testing/reduced-motion';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -195,4 +196,33 @@ export const BusyFocused: TStory = {
     const canvas = within(canvasElement);
     canvas.getByRole('button').focus();
   },
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  render: () => (
+    <ButtonShapes>
+      {() => (
+        <>
+          {BUTTON_VARIANTS.map((variant) => (
+            <Button key={variant} variant={variant}>
+              Publish
+            </Button>
+          ))}
+          <Button size={SIZE.SM}>Tag</Button>
+          <Button size={SIZE.LG}>Get started</Button>
+          {BUSY_STYLES.map((busyStyle) => (
+            <Button
+              key={busyStyle}
+              busyStyle={busyStyle}
+              busyLabel="Sending…"
+              isBusy={true}
+            >
+              Send
+            </Button>
+          ))}
+        </>
+      )}
+    </ButtonShapes>
+  ),
 };

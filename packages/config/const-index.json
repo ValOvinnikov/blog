@@ -6,6 +6,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/account-control.ts"
+      },
+      {
+        "ref": "BUTTON_SHAPE.PILL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/button-shape.ts"
       }
     ],
     "CIRCLE": [
@@ -658,6 +664,28 @@
         "file": "packages/config/src/constants/busy-button.ts"
       }
     ],
+    "SQUARE": [
+      {
+        "ref": "BUTTON_SHAPE.SQUARE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/button-shape.ts"
+      },
+      {
+        "ref": "CARD_IMAGE_SHAPE.SQUARE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-image-shape.ts"
+      }
+    ],
+    "ROUNDED": [
+      {
+        "ref": "BUTTON_SHAPE.ROUNDED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/button-shape.ts"
+      }
+    ],
     "READER_ACCOUNTS": [
       {
         "ref": "CAPABILITY.READER_ACCOUNTS",
@@ -734,14 +762,6 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
-      }
-    ],
-    "SQUARE": [
-      {
-        "ref": "CARD_IMAGE_SHAPE.SQUARE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/card-image-shape.ts"
       }
     ],
     "ICON": [

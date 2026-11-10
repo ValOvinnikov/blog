@@ -4,7 +4,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const statusBadgeVariants = tv({
   base: [
     'inline-flex items-center',
-    'rounded-sm border',
+    'rounded-button border',
     'px-2 py-0.5',
     'font-mono text-label font-medium uppercase tracking-label',
   ],

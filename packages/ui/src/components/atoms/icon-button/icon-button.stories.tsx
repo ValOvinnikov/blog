@@ -1,8 +1,16 @@
-import { BRAND_VARIANT, ICONS, SIZE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  HEADER_CONTROL_STYLE,
+  HEADER_CONTROL_STYLE_DECLARATIONS,
+  ICONS,
+  SIZE,
+} from '@blog/config';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { CSSProperties } from 'react';
 import { within } from 'storybook/test';
 
 import { IconButton } from './icon-button';
@@ -31,6 +39,8 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+const NEXT_SLIDE = 'Next slide';
+
 // Hover the rendered button in the canvas to check the hover affordance —
 // the `border-emphasis` ring clears WCAG 1.4.11's 3:1 non-text minimum
 // against `bg` on its own in both themes (see icon-button-variants.ts),
@@ -51,7 +61,7 @@ export const Disabled: TStory = {
 export const FocusableWhenDisabled: TStory = {
   args: {
     variant: 'control',
-    ariaLabel: 'Next slide',
+    ariaLabel: NEXT_SLIDE,
     children: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />,
     isDisabled: true,
     isFocusableWhenDisabled: true,
@@ -112,26 +122,16 @@ export const CircleRestyledByTokens: TStory = {
   name: 'Circle — restyled by the header-control tokens',
   render: () => (
     <div style={{ display: 'flex', gap: '1rem' }}>
-      <div
-        style={{
-          ['--header-control-border' as string]: 'transparent',
-          ['--header-control-fill' as string]: 'var(--border)',
-        }}
-      >
-        <IconButton variant="circle" ariaLabel="Soft" title="Soft">
-          <Icon name={ICONS.MENU} size={SIZE.MD} />
-        </IconButton>
-      </div>
-      <div
-        style={{
-          ['--header-control-border' as string]: 'transparent',
-          ['--header-control-fill' as string]: 'transparent',
-        }}
-      >
-        <IconButton variant="circle" ariaLabel="Plain" title="Plain">
-          <Icon name={ICONS.MENU} size={SIZE.MD} />
-        </IconButton>
-      </div>
+      {[HEADER_CONTROL_STYLE.SOFT, HEADER_CONTROL_STYLE.PLAIN].map((style) => (
+        <div
+          key={style}
+          style={HEADER_CONTROL_STYLE_DECLARATIONS[style] as CSSProperties}
+        >
+          <IconButton variant="circle" ariaLabel={style} title={style}>
+            <Icon name={ICONS.MENU} size={SIZE.MD} />
+          </IconButton>
+        </div>
+      ))}
     </div>
   ),
 };
@@ -139,7 +139,7 @@ export const CircleRestyledByTokens: TStory = {
 export const Control: TStory = {
   args: {
     variant: 'control',
-    ariaLabel: 'Next slide',
+    ariaLabel: NEXT_SLIDE,
     children: <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />,
   },
 };
@@ -159,8 +159,8 @@ export const ControlOnGrounds: TStory = {
         <IconButton
           variant="control"
           tone={BRAND_VARIANT.PRIMARY}
-          ariaLabel="Next slide"
-          title="Next slide"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
         </IconButton>
@@ -172,8 +172,8 @@ export const ControlOnGrounds: TStory = {
         <IconButton
           variant="control"
           tone={BRAND_VARIANT.SECONDARY}
-          ariaLabel="Next slide"
-          title="Next slide"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
         </IconButton>
@@ -185,8 +185,8 @@ export const ControlOnGrounds: TStory = {
         <IconButton
           variant="control"
           tone={BRAND_VARIANT.BRAND_PRIMARY}
-          ariaLabel="Next slide"
-          title="Next slide"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
         </IconButton>
@@ -195,7 +195,7 @@ export const ControlOnGrounds: TStory = {
   ),
   play: ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const buttons = canvas.getAllByRole('button', { name: 'Next slide' });
+    const buttons = canvas.getAllByRole('button', { name: NEXT_SLIDE });
     buttons[buttons.length - 1]?.focus();
   },
 };
@@ -212,8 +212,8 @@ export const ControlDisabledOnGrounds: TStory = {
         <IconButton
           variant="control"
           tone={BRAND_VARIANT.PRIMARY}
-          ariaLabel="Next slide"
-          title="Next slide"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
           isDisabled={true}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
@@ -226,8 +226,8 @@ export const ControlDisabledOnGrounds: TStory = {
         <IconButton
           variant="control"
           tone={BRAND_VARIANT.SECONDARY}
-          ariaLabel="Next slide"
-          title="Next slide"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
           isDisabled={true}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
@@ -240,13 +240,27 @@ export const ControlDisabledOnGrounds: TStory = {
         <IconButton
           variant="control"
           tone={BRAND_VARIANT.BRAND_PRIMARY}
-          ariaLabel="Next slide"
-          title="Next slide"
+          ariaLabel={NEXT_SLIDE}
+          title={NEXT_SLIDE}
           isDisabled={true}
         >
           <Icon name={ICONS.CHEVRON_RIGHT} size={SIZE.SM} />
         </IconButton>
       </div>
     </div>
+  ),
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  render: (args) => (
+    <ButtonShapes>
+      {() => (
+        <>
+          <IconButton {...args} />
+          <IconButton {...args} {...Bordered.args} />
+        </>
+      )}
+    </ButtonShapes>
   ),
 };

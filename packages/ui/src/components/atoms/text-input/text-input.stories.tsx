@@ -1,10 +1,14 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import { SurfaceBands } from '@blog/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
 import { TextInput } from './text-input';
+
+const EMAIL = 'you@example.com';
+const EMAIL_LABEL = 'Email address';
 
 const meta = {
   title: 'Atoms/TextInput',
@@ -13,8 +17,8 @@ const meta = {
   args: {
     value: '',
     onChange: () => {},
-    ariaLabel: 'Email address',
-    placeholder: 'you@example.com',
+    ariaLabel: EMAIL_LABEL,
+    placeholder: EMAIL,
   },
 } satisfies Meta<typeof TextInput>;
 
@@ -48,7 +52,7 @@ export const Invalid: TStory = {
 };
 
 export const Disabled: TStory = {
-  args: { value: 'you@example.com', isDisabled: true },
+  args: { value: EMAIL, isDisabled: true },
 };
 
 /** An empty disabled field still shows its placeholder, dimmed relative to an active field's. */
@@ -61,7 +65,7 @@ export const OnBands: TStory = {
     <SurfaceBands>
       <TextInput {...args} />
       <TextInput {...args} isInvalid={true} value="not-an-email" />
-      <TextInput {...args} isDisabled={true} value="you@example.com" />
+      <TextInput {...args} isDisabled={true} value={EMAIL} />
     </SurfaceBands>
   ),
 };
@@ -73,8 +77,8 @@ const InteractiveDemo = () => {
     <TextInput
       value={value}
       onChange={setValue}
-      ariaLabel="Email address"
-      placeholder="you@example.com"
+      ariaLabel={EMAIL_LABEL}
+      placeholder={EMAIL}
       leadingIcon="›"
     />
   );
@@ -82,4 +86,11 @@ const InteractiveDemo = () => {
 
 export const Interactive: TStory = {
   render: () => <InteractiveDemo />,
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  render: (args) => (
+    <ButtonShapes>{() => <TextInput {...args} />}</ButtonShapes>
+  ),
 };
