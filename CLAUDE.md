@@ -644,7 +644,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   tests and stories. A diff that touches an over-budget file extracts the part
   it changes — not the whole file, and never as a sweep. Where the extracted
   part goes in a React workspace: `react-component-practices` § Size and
-  splitting.
+  splitting. `pnpm check:file-size` holds the budgets as a ratchet, at commit
+  (lint-staged) and in `pnpm verify`, locally only: a file over budget must
+  sit in `scripts/file-size-baseline.json` at its exact count, so it can only
+  shrink, and `--update` lowers an entry once it does. A new exemption is
+  added here and to `scripts/check-file-size.mjs` together.
 - **Function style is decided per layer kind, and enforced by ESLint per
   workspace.** React layers export _values_ — a component is a const holding a
   function — so they use **arrow-function consts**
@@ -871,6 +875,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
   `lint`, `test`, the warn-only `check:test-budget` (it names any test file
   over its time budget but never fails locally; CI's Test job enforces it),
+  the local-only file-size ratchet `check:file-size` ("File size budgets"),
   `knip`, the seven gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
   `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,

@@ -2568,6 +2568,11 @@ Full checklist:
   [`docs/context/ci-automation.md`](./docs/context/ci-automation.md).
 - Hooks: husky + lint-staged (report-only eslint + prettier on staged files;
   a lint error blocks the commit, nothing is rewritten beyond formatting).
+- File size budgets (`CLAUDE.md` "File size budgets") are a local gate, never
+  a CI job: `pnpm check:file-size` runs at commit through lint-staged and in
+  `pnpm verify`, holding every over-budget file at its count in
+  `scripts/file-size-baseline.json` so it can only shrink. The `reviewer`
+  blocks the same growth when the local check was skipped.
 - Conventional commits; one concern per PR.
 
 ## 12. Delivery process
