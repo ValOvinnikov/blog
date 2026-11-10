@@ -1,19 +1,13 @@
-// Fixture-based tests for gen-ui-index's props-resolution helpers.
-//
-// `pnpm gen:ui-index:check` already fails if the generator regresses, but only
-// incidentally: it holds solely while the real component tree happens to
-// contain a component exercising each shape. These tests pin the behaviour
-// against inline sources instead, so a refactor in packages/ui can't silently
-// remove the coverage.
-//
-// Run with `pnpm gen:ui-index:test` (node's built-in runner — see the PR for
-// why these aren't a Vitest project).
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { after, describe, it } from 'node:test';
 
 import {
   describeComponent,
   extractProps,
+  extractVariants,
   findOwnPropsType,
   findPropsType,
   parseSource,
@@ -189,5 +183,92 @@ describe('describeComponent OwnProps fallback', () => {
 
     assert.deepEqual(props, []);
     assert.deepEqual(extendsList, ['TPolymorphicProps<C, TSomethingElse>']);
+  });
+});
+
+describe('extractVariants', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'gen-ui-index-'));
+  after(() => rmSync(dir, { recursive: true, force: true }));
+
+  const writeFixture = (name, source) => {
+    const file = join(dir, name);
+    writeFileSync(file, source);
+    return file;
+  };
+  const variantsOf = (name, source) => {
+    const file = writeFixture(name, source);
+    return extractVariants(file, parseSource(file, source));
+  };
+
+  writeFixture(
+    'recipes.ts',
+    `export const ALIGNMENT = { start: 'text-left', center: 'text-center' } as const;`,
+  );
+  writeFixture(
+    'index.ts',
+    `export { ALIGNMENT as SHARED_ALIGNMENT } from './recipes';`,
+  );
+
+  it('lists the keys of an inline object group', () => {
+    assert.deepEqual(
+      variantsOf(
+        'inline-variants.ts',
+        `export const v = tv({ variants: { size: { sm: '', lg: '' } } });`,
+      ),
+      ['size: sm|lg'],
+    );
+  });
+
+  it('lists the keys of a group naming an object declared in the same file', () => {
+    assert.deepEqual(
+      variantsOf(
+        'local-variants.ts',
+        `
+          const ALIGNMENT = { start: '', end: '' } satisfies Record<string, string>;
+          export const v = tv({ variants: { contentAlignment: ALIGNMENT } });
+        `,
+      ),
+      ['contentAlignment: start|end'],
+    );
+  });
+
+  it('lists the keys of a group naming an imported object', () => {
+    assert.deepEqual(
+      variantsOf(
+        'imported-variants.ts',
+        `
+          import { ALIGNMENT } from './recipes';
+          export const v = tv({ variants: { contentAlignment: ALIGNMENT } });
+        `,
+      ),
+      ['contentAlignment: start|center'],
+    );
+  });
+
+  it('follows a renamed re-export through a barrel', () => {
+    assert.deepEqual(
+      variantsOf(
+        'barrel-variants.ts',
+        `
+          import { SHARED_ALIGNMENT as ALIGN } from './index';
+          export const v = tv({ variants: { contentAlignment: ALIGN } });
+        `,
+      ),
+      ['contentAlignment: start|center'],
+    );
+  });
+
+  it('skips a group naming something that is not an object', () => {
+    assert.deepEqual(
+      variantsOf(
+        'unresolved-variants.ts',
+        `
+          import { CARD_GAP } from './missing';
+          const RING = 'ring-2';
+          export const v = tv({ variants: { gap: CARD_GAP, ring: RING } });
+        `,
+      ),
+      [],
+    );
   });
 });
