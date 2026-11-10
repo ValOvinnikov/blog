@@ -3,6 +3,8 @@ import { createRequire } from 'node:module';
 
 import {
   type TThemeTokens,
+  BUTTON_SHAPE,
+  BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   CARD_STYLE_DECLARATIONS,
   DENSITY,
@@ -260,6 +262,31 @@ describe(buildThemeStyleBlock, () => {
       const missing = Object.entries(
         HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
       )
+        .map(([property, value]) => `${property}: ${value};`)
+        .filter((declaration) => !root.includes(declaration));
+
+      expect(missing).toEqual([]);
+    },
+  );
+
+  it('defaults to the rounded button shape', () => {
+    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+    const roundedCss = buildThemeStyleBlock({
+      ...CONSOLE_TOKENS,
+      buttonShape: BUTTON_SHAPE.ROUNDED,
+    });
+
+    expect(defaultCss).toBe(roundedCss);
+  });
+
+  it.each(Object.values(BUTTON_SHAPE))(
+    'writes the %s button shape into the :root block that sets the radius scale',
+    (buttonShape) => {
+      const { root } = splitModes(
+        buildThemeStyleBlock({ ...CONSOLE_TOKENS, buttonShape }),
+      );
+
+      const missing = Object.entries(BUTTON_SHAPE_DECLARATIONS[buttonShape])
         .map(([property, value]) => `${property}: ${value};`)
         .filter((declaration) => !root.includes(declaration));
 

@@ -91,6 +91,7 @@ export async function upsertSiteConfig(
       accountPhonePlacement: presetBundle.accountPhonePlacement,
       busyButtonStyle: presetBundle.busyButtonStyle,
       spinnerStyle: presetBundle.spinnerStyle,
+      buttonShape: presetBundle.buttonShape,
       headerLayout: presetBundle.headerLayout,
       headerSubmenuStyle: presetBundle.headerSubmenuStyle,
       headerBarStyle: presetBundle.headerBarStyle,

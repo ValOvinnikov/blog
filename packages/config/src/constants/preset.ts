@@ -99,6 +99,7 @@ export type TThemeTokens = {
   density: TDensity;
   cardStyle?: TCardStyle;
   headerControlStyle?: THeaderControlStyle;
+  buttonShape?: TButtonShape;
 };
 
 export type TPresetBundle = {

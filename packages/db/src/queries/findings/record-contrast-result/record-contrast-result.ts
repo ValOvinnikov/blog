@@ -11,6 +11,8 @@ import { buildContrastDedupeKey } from '@blog/db/queries/findings/contrast-dedup
 import { findings, type TFinding } from '@blog/db/schema/findings';
 import { and, eq, ne, sql } from 'drizzle-orm';
 
+const SUPERSEDED_BY_KEY = 'supersededBy';
+
 // A passing run is stored RESOLVED rather than skipped, so "green for this
 // SHA" stays readable; a re-run refreshes the SHA's one row, keeping any tag.
 // A pass also resolves every other open contrast failure, as its own statement
@@ -36,7 +38,7 @@ export async function recordContrastResult(
       status,
       resolvedAt,
       lastSeenAt: now,
-      details: sql`coalesce(${findings.details}, '{}'::jsonb) || ${JSON.stringify(result)}::jsonb`,
+      details: sql`(coalesce(${findings.details}, '{}'::jsonb) - ${SUPERSEDED_BY_KEY}::text) || ${JSON.stringify(result)}::jsonb`,
     })
     .where(eq(findings.dedupeKey, dedupeKey))
     .returning();
@@ -78,7 +80,7 @@ async function resolveSupersededContrastFindings(
     .set({
       status: FINDING_STATUS.RESOLVED,
       resolvedAt,
-      details: sql`coalesce(${findings.details}, '{}'::jsonb) || jsonb_build_object('supersededBy', ${supersededBy}::text)`,
+      details: sql`coalesce(${findings.details}, '{}'::jsonb) || jsonb_build_object(${SUPERSEDED_BY_KEY}::text, ${supersededBy}::text)`,
     })
     .where(
       and(

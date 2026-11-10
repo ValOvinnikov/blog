@@ -9,6 +9,7 @@ import { hasLength } from '@blog/utils/primitives';
 import { createClient } from '@sanity/client';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
+import { assertHomeMetaTitleLength } from '@worker/utils/home-meta-title-length/home-meta-title-length';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
 import {
   retryWithBackoff,
@@ -59,10 +60,6 @@ async function readWithGrantPropagationRetry<T>(
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
-
-// Mirrors `seoSchema`'s bounds in `packages/studio`, which the worker cannot import.
-const SEO_META_TITLE_MIN_LENGTH = 30;
-const SEO_META_TITLE_MAX_LENGTH = 60;
 
 type THomePageParseFields = TMaybeNull<{
   headingBlock: TMaybeNull<{ heading?: TMaybeNull<string> }>;
@@ -176,15 +173,7 @@ export async function verifyTenantSeededContent(
     );
   }
 
-  const metaTitleLength = homePage.seo.metaTitle.length;
-  if (
-    metaTitleLength < SEO_META_TITLE_MIN_LENGTH ||
-    metaTitleLength > SEO_META_TITLE_MAX_LENGTH
-  ) {
-    throw new Error(
-      `verifyTenantSeededContent: tenant "${tenant.id}"'s "page_home" has a seo.metaTitle of ${metaTitleLength} characters, outside the ${SEO_META_TITLE_MIN_LENGTH}-${SEO_META_TITLE_MAX_LENGTH} bound the SEO schema requires — re-run the "Seed content" step.`,
-    );
-  }
+  assertHomeMetaTitleLength(tenant.id, homePage.seo.metaTitle);
 
   const managementToken = await requireTenantManagementToken(tenant.id);
   const webhooks = await readWithGrantPropagationRetry<TSanityWebhook[]>(

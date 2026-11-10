@@ -1,10 +1,7 @@
-import {
-  FINDING_KIND,
-  FINDING_SOURCE,
-  FINDING_STATUS,
-} from '@blog/config/constants';
+import { FINDING_KIND, FINDING_SOURCE } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
+import { contrastHasPassed } from '@blog/db/queries/findings/contrast-has-passed';
 import { findings } from '@blog/db/schema/findings';
 import { and, desc, eq, sql } from 'drizzle-orm';
 
@@ -20,7 +17,7 @@ export async function getLatestPassingContrastSha(): Promise<
       and(
         eq(findings.source, FINDING_SOURCE.CONTRAST_CHECK),
         eq(findings.kind, FINDING_KIND.CONTRAST_REGRESSION),
-        eq(findings.status, FINDING_STATUS.RESOLVED),
+        contrastHasPassed,
       ),
     )
     .orderBy(desc(findings.lastSeenAt))
