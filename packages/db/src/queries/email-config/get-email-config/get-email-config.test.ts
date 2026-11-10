@@ -1,33 +1,26 @@
 import * as schema from '@blog/db/schema';
 import { MOCK_EMAIL_CONFIG } from '@blog/db/testing/email-config/fixtures';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { useTestTenant } from '@blog/db/testing/test-tenant';
 
 import { getEmailConfig } from './get-email-config';
 
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-
-afterEach(async () => {
-  await db().delete(schema.emailConfig);
-  await db().delete(schema.tenants);
-});
+const tenant = useTestTenant(db);
 
 describe(getEmailConfig, () => {
-  let tenantId: string;
-
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
   it('returns undefined when the tenant has no email config row', async () => {
+    const { id: tenantId } = tenant();
+
     const result = await getEmailConfig(tenantId);
 
     expect(result).toBeUndefined();
   });
 
   it('maps null columns to undefined', async () => {
+    const { id: tenantId } = tenant();
     await db().insert(schema.emailConfig).values({ tenantId });
 
     const result = await getEmailConfig(tenantId);
@@ -43,6 +36,7 @@ describe(getEmailConfig, () => {
   });
 
   it('returns every set field', async () => {
+    const { id: tenantId } = tenant();
     await db()
       .insert(schema.emailConfig)
       .values({ tenantId, ...MOCK_EMAIL_CONFIG });
