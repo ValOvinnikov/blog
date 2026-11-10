@@ -16,6 +16,7 @@ export * from './contrast';
 export * from './cta';
 export * from './depth';
 export * from './display-mode';
+export * from './email-field-limits';
 export * from './email-template';
 export * from './error';
 export * from './finding';

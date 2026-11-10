@@ -1,10 +1,13 @@
-import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  FOOTER_ADDRESS_MAX,
+  SENDER_NAME_MAX,
+  SUBJECT_MAX,
+} from '@blog/config';
 import { sanitizeHref } from '@blog/email/html';
+import { isNull, isString } from '@blog/utils/primitives';
 import { z } from 'zod';
 
-const SUBJECT_MAX = 200;
-const SENDER_NAME_MAX = 100;
-const FOOTER_ADDRESS_MAX = 300;
 // Each lets a display name pose as, or split off, a second address in the From header.
 // eslint-disable-next-line no-control-regex
 const SENDER_NAME_FORBIDDEN_PATTERN = /[<>",;@\u0000-\u001f\u007f]/;
@@ -33,10 +36,10 @@ const hasOnlySafeLinkHrefs = (
       : [];
 
     return markDefs.every((markDef) => {
-      if (typeof markDef !== 'object' || markDef === null) return true;
+      if (typeof markDef !== 'object' || isNull(markDef)) return true;
       const { _type, href } = markDef as TLooseMarkDef;
       if (_type !== 'link') return true;
-      return typeof href === 'string' && sanitizeHref(href) !== null;
+      return isString(href) && !isNull(sanitizeHref(href));
     });
   });
 };
