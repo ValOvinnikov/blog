@@ -12,6 +12,7 @@ import { SegmentedControl } from '@platform/components/shared/segmented-control'
 import { Spinner } from '@platform/components/shared/spinner';
 import { TextInput } from '@platform/components/shared/text-input';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { usePlanOptions } from '@platform/utils/use-plan-options/use-plan-options';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -40,6 +41,7 @@ export type TTenantDetailsFormProps = {
 export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
   const t = useTranslations('tenantDetailsForm');
   const fieldErrorText = useTenantFieldErrorText();
+  const planOptions = usePlanOptions();
   const [values, setValues] = useState<TFormValues>(INITIAL_VALUES);
   const {
     fieldErrors,
@@ -64,11 +66,6 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
   };
 
   const handleSubmit = () => submit(values);
-
-  const planOptions = [
-    { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
-    { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
-  ];
 
   const pendingLabel = ownerInviteConfirmation
     ? t('submittingInviteButton')

@@ -16,7 +16,7 @@ export type TYourSiteCardProps = {
 
 export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
   const t = useTranslations('ownerHomePage');
-  const tTenantsTable = useTranslations('tenantsTable');
+  const tPlan = useTranslations('planNames');
   const tLanguage = useTranslations('languageNames');
   const { body, band, footer, icon, hint } = yourSiteCardVariants();
 
@@ -37,7 +37,7 @@ export const YourSiteCard = ({ tenant }: TYourSiteCardProps) => {
           </BandCell>
           <BandCell label={t('planLabel')}>
             <StatusBadge tone="plan" hasDot={false}>
-              {tTenantsTable(`plan.${tenant.plan}`)}
+              {tPlan(tenant.plan)}
             </StatusBadge>
           </BandCell>
           <BandCell label={t('localeLabel')}>

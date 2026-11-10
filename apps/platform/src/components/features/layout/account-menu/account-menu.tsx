@@ -12,6 +12,7 @@ import {
   ACCOUNT_MENU_PLACEMENT,
   type TAccountMenuPlacement,
 } from '@platform/constants/account-menu';
+import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { MENU_RADIO_GROUP_SIZE } from '@platform/constants/menu-radio-group';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { signOutAction } from '@platform/server/auth/sign-out-action';
@@ -95,7 +96,11 @@ export const AccountMenu = ({ account }: TAccountMenuProps) => {
   return (
     <NestableMenuRoot onOpenChangeComplete={handleOpenChangeComplete}>
       <NestableMenuTrigger className={trigger()} {...railProps}>
-        <Avatar name={name ?? ''} email={email} variant="account" />
+        <Avatar
+          name={name ?? ''}
+          email={email}
+          variant={AVATAR_VARIANT.ACCOUNT}
+        />
         {placement !== ACCOUNT_MENU_PLACEMENT.RAIL && (
           <>
             <span className={meta()}>

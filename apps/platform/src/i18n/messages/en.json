@@ -277,10 +277,6 @@
       "SUSPENDED": "Suspended",
       "ARCHIVED": "Archived"
     },
-    "plan": {
-      "FREE": "Free",
-      "GROWTH": "Growth"
-    },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"
   },
@@ -1278,8 +1274,6 @@
     "siteAddressLabel": "Site address",
     "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
     "planLabel": "Plan",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "ownerEmailLabel": "Owner email",
     "ownerEmailHint": "The person who'll manage this tenant. An existing account gets access immediately; a new address gets an email invite to sign in.",
     "submitButton": "Begin provisioning",
@@ -1439,8 +1433,6 @@
     "domainLabel": "Primary domain",
     "ownerEmailLabel": "Owner email",
     "planLabel": "Plan",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "localeLabel": "Default language",
     "saveButton": "Save changes",
     "savingButton": "Saving…",
@@ -1631,6 +1623,10 @@
     "FR": "French",
     "DE": "German",
     "ES": "Spanish"
+  },
+  "planNames": {
+    "FREE": "Free",
+    "GROWTH": "Growth"
   },
   "languagesSettings": {
     "heading": "Languages",

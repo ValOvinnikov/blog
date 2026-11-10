@@ -277,10 +277,6 @@
       "SUSPENDED": "Opgeschort",
       "ARCHIVED": "Gearchiveerd"
     },
-    "plan": {
-      "FREE": "Free",
-      "GROWTH": "Growth"
-    },
     "manage": "Beheren",
     "manageAriaLabel": "{tenantName} beheren"
   },
@@ -1278,8 +1274,6 @@
     "siteAddressLabel": "Adres van de site",
     "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
     "planLabel": "Abonnement",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "ownerEmailLabel": "E-mailadres eigenaar",
     "ownerEmailHint": "De persoon die deze tenant beheert. Een bestaand account krijgt direct toegang; een nieuw adres ontvangt een uitnodiging per e-mail om in te loggen.",
     "submitButton": "Inrichting starten",
@@ -1439,8 +1433,6 @@
     "domainLabel": "Primair domein",
     "ownerEmailLabel": "E-mailadres eigenaar",
     "planLabel": "Abonnement",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "localeLabel": "Standaardtaal",
     "saveButton": "Wijzigingen opslaan",
     "savingButton": "Opslaan…",
@@ -1631,6 +1623,10 @@
     "FR": "Frans",
     "DE": "Duits",
     "ES": "Spaans"
+  },
+  "planNames": {
+    "FREE": "Free",
+    "GROWTH": "Growth"
   },
   "languagesSettings": {
     "heading": "Talen",

@@ -1,4 +1,5 @@
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import type { TTenantPickerItem } from '@platform/server/tenants/to-tenant-picker-items';
@@ -71,7 +72,9 @@ const overflowViewportWhileUnfiltered = () =>
   vi
     .spyOn(document.documentElement, 'scrollHeight', 'get')
     .mockImplementation(() =>
-      screen.queryAllByRole('link').length > 1 ? MOCK_OVERFLOWING_HEIGHT : 0,
+      hasArrayGotMultipleItems(screen.queryAllByRole('link'))
+        ? MOCK_OVERFLOWING_HEIGHT
+        : 0,
     );
 
 const overflowViewport = () =>
@@ -119,7 +122,7 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       const domain = within(tenantLink).getByText(MOCK_TENANT_DOMAIN);
       const role = within(tenantLink).getByText(messages.roleLabel.OWNER);
       const plan = within(tenantLink).getByText(
-        messages.tenantsTable.plan.GROWTH,
+        messages.planNames[TENANT_PLAN.GROWTH],
       );
 
       expect(domain).toBeVisible();
@@ -133,7 +136,7 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       });
 
       const plan = within(otherTenantLink).getByText(
-        messages.tenantsTable.plan.FREE,
+        messages.planNames[TENANT_PLAN.FREE],
       );
       const role = within(otherTenantLink).queryByText(
         messages.roleLabel.OWNER,
