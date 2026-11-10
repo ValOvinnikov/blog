@@ -7,7 +7,7 @@ import {
   type TFormStatus,
   type TMaybeUndefined,
 } from '@blog/config';
-import { isValidEmail } from '@web/utils/is-valid-email';
+import { isValidEmailAddress } from '@blog/email/validation';
 import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
@@ -65,7 +65,7 @@ export const useSignInAttempt = (isOpen: boolean) => {
   const submitEmail = async () => {
     setIsSendLimited(false);
 
-    if (!isValidEmail(email)) {
+    if (!isValidEmailAddress(email.trim())) {
       setIsEmailInvalid(true);
       setStatus(FORM_STATUS.ERROR);
       return;

@@ -9,6 +9,7 @@ import {
   type TOutcome,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { isValidEmailAddress } from '@blog/email/validation';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   FIELD_ERROR,
@@ -20,7 +21,6 @@ import { markNewsletterSubscribed } from '@web/server/newsletter/newsletter-subs
 import { isSubscribeAttemptRefused } from '@web/server/newsletter/subscribe-guard/subscribe-guard';
 import { isCapabilityEnabledForTenant } from '@web/server/settings-features/is-capability-enabled/is-capability-enabled';
 import { resolveWritableTenant } from '@web/server/tenant/write-gate/write-gate';
-import { isValidEmail } from '@web/utils/is-valid-email';
 import { logger } from '@web/utils/logger/logger';
 
 type TSubscribeRefusal =
@@ -38,7 +38,7 @@ const UNAVAILABLE = toOutcome(ACTION_OUTCOME.UNAVAILABLE);
 export const subscribeToNewsletterAction = async (
   email: string,
 ): Promise<TSubscribeResult> => {
-  if (!isValidEmail(email)) {
+  if (!isValidEmailAddress(email.trim())) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrors: { email: { reason: FIELD_ERROR.INVALID } },
