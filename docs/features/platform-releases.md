@@ -46,7 +46,8 @@ The candidate is `main`'s HEAD measured against the greatest `vX.Y.Z` tag:
   that the applied journal does not hold yet. A tenant whose own ledger lags
   further behind is not read, so its figure is a lower bound. A truncated file
   list marks every count as a minimum (`isLowerBound`);
-- the contrast status: `GREEN` or `FAILED` from the stored result for HEAD,
+- the contrast status: `GREEN` when HEAD's own contrast run passed and
+  `FAILED` when it failed, even once a later commit's pass resolved it,
   `RUNNING` while a `contrast.yml` run for HEAD is in progress, `DUE` when the
   candidate touches a rendering path and one changed since the last green run
   (or none has ever passed), and `NONE` otherwise.

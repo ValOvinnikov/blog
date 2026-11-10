@@ -157,13 +157,29 @@ describe(getReleaseCandidate, () => {
   });
 
   it.each([
-    [FINDING_STATUS.RESOLVED, CONTRAST_STATUS.GREEN],
-    [FINDING_STATUS.OPEN, CONTRAST_STATUS.FAILED],
+    {
+      outcome: 'passed',
+      status: FINDING_STATUS.RESOLVED,
+      hasPassed: true,
+      expected: CONTRAST_STATUS.GREEN,
+    },
+    {
+      outcome: 'failed',
+      status: FINDING_STATUS.OPEN,
+      hasPassed: false,
+      expected: CONTRAST_STATUS.FAILED,
+    },
+    {
+      outcome: 'failed and was superseded by a later pass',
+      status: FINDING_STATUS.RESOLVED,
+      hasPassed: false,
+      expected: CONTRAST_STATUS.FAILED,
+    },
   ])(
-    'reports a HEAD contrast finding that is %s as %s',
-    async (findingStatus, expected) => {
+    'reports a HEAD contrast check that $outcome as $expected',
+    async ({ status, hasPassed, expected }) => {
       compare(MOCK_RELEASE_LAST_TAG, [MOCK_RENDERING_FILE]);
-      getContrastFindingMock.mockResolvedValue({ status: findingStatus });
+      getContrastFindingMock.mockResolvedValue({ status, hasPassed });
 
       expect((await candidate()).contrastStatus).toBe(expected);
     },

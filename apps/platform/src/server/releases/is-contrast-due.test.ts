@@ -77,6 +77,7 @@ describe(isContrastDue, () => {
     it('is not due when HEAD already has a passing run', async () => {
       getContrastFindingMock.mockResolvedValue({
         status: FINDING_STATUS.RESOLVED,
+        hasPassed: true,
       });
 
       expect(await isContrastDue()).toBe(false);
