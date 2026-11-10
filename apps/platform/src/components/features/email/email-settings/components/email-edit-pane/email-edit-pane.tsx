@@ -1,7 +1,10 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config';
-import { EmailSenderEditor } from '@platform/components/features/email/email-sender-editor';
+import {
+  EmailSenderEditor,
+  type TEmailSenderEditorProps,
+} from '@platform/components/features/email/email-sender-editor';
 import { EmailTemplateEditor } from '@platform/components/features/email/email-template-editor';
 import type { TSenderFieldErrors } from '@platform/server/email-config/update-email-config-action';
 import {
@@ -16,27 +19,22 @@ import { resolveFallbackCopy } from '@platform/utils/email-fallback-copy/email-f
 import { useTranslations } from 'next-intl';
 
 type TEmailEditPaneProps = {
-  item: TEmailPageItem;
-  locale: TLocaleIsoCode;
+  selection: { item: TEmailPageItem; locale: TLocaleIsoCode };
   defaultLocale: TLocaleIsoCode;
-  draft: TEmailDraft;
-  saved: TEmailDraft;
-  revision: number;
-  senderFieldIds: { senderName: string; contactRecipient: string };
-  senderFieldErrors?: TSenderFieldErrors;
+  draft: { values: TEmailDraft; saved: TEmailDraft; revision: number };
+  senderFields: {
+    ids: TEmailSenderEditorProps['fieldIds'];
+    errors?: TSenderFieldErrors;
+  };
   onSenderChange: (sender: TEmailSenderDraft) => void;
   onDraftChange: (update: (draft: TEmailDraft) => TEmailDraft) => void;
 };
 
 export const EmailEditPane = ({
-  item,
-  locale,
+  selection: { item, locale },
   defaultLocale,
-  draft,
-  saved,
-  revision,
-  senderFieldIds,
-  senderFieldErrors,
+  draft: { values: draft, saved, revision },
+  senderFields,
   onSenderChange,
   onDraftChange,
 }: TEmailEditPaneProps) => {
@@ -51,8 +49,8 @@ export const EmailEditPane = ({
         onLogoStage={(logo) =>
           onDraftChange((prev) => withLogo(prev, EMAIL_SENDER_ITEM, logo))
         }
-        fieldIds={senderFieldIds}
-        fieldErrors={senderFieldErrors}
+        fieldIds={senderFields.ids}
+        fieldErrors={senderFields.errors}
       />
     );
   }
