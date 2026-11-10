@@ -4,8 +4,7 @@ import {
   CTA_VARIANT,
   MEDIA_ORDER,
 } from '@blog/config';
-import { tv } from '@blog/ui/lib/styling';
-import type { VariantProps } from 'tailwind-variants';
+import { type bannerVariants, tv } from '@blog/ui/lib/styling';
 
 const CARD = [
   'mx-auto w-full max-w-4xl',
@@ -16,7 +15,7 @@ const CARD = [
 
 export const ctaModuleVariants = tv({
   slots: {
-    root: ['relative isolate flex flex-col overflow-hidden'],
+    root: ['relative isolate mt-0 flex flex-col overflow-hidden'],
     eyebrow: ['mb-3'],
     group: ['max-w-measure', 'text-prose'],
     heading: ['m-0'],
@@ -80,9 +79,6 @@ export const ctaModuleVariants = tv({
       [MEDIA_ORDER.FIRST]: { media: ['order-first md:order-none'] },
       [MEDIA_ORDER.LAST]: {},
     },
-    wrapped: {
-      true: { root: ['mt-0'] },
-    },
   },
   compoundVariants: [
     {
@@ -121,4 +117,5 @@ export const ctaModuleVariants = tv({
   },
 });
 
-export type TCtaModuleVariants = VariantProps<typeof ctaModuleVariants>;
+export type TCtaModuleStyles = ReturnType<typeof ctaModuleVariants>;
+export type TCtaModuleBannerStyles = ReturnType<typeof bannerVariants>;

@@ -3,6 +3,7 @@ import { Settings } from 'lucide-react';
 import { defineField, defineType } from 'sanity';
 
 import { currencyOptionList } from './currency-options';
+import { pricePeriodWordingField } from './price-period-wording-field';
 
 export const siteSettingsSchema = defineType({
   name: 'settings_site',
@@ -30,5 +31,6 @@ export const siteSettingsSchema = defineType({
       },
       validation: (rule) => rule.required(),
     }),
+    pricePeriodWordingField,
   ],
 });

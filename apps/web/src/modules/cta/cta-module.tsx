@@ -20,5 +20,5 @@ export const CtaModule = async ({ id }: ICtaModuleProps) => {
     return null;
   }
 
-  return <CtaModuleView id={id} {...result.data} />;
+  return <CtaModuleView id={id} module={result.data} />;
 };

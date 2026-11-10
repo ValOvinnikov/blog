@@ -25,7 +25,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 
 ## Surfaces and routes
 
-- **Studio** — `module_pricing` ("Pricing") under Modules → **Conversion**, beside CTA and Newsletter. The currency is set once in **Site Settings** (`settings_site.currency`).
+- **Studio** — `module_pricing` ("Pricing") under Modules → **Conversion**, beside CTA and Newsletter. The currency is set once in **Site Settings** (`settings_site.currency`), beside the collapsed **Price Period Wording** (`settings_site.pricePeriodSuffix`).
 - **Public site** — on the home page (`/`) and landing pages (`/[...slug]`) (`template_home`, `template_landing`).
 - No platform surface.
 
@@ -34,16 +34,17 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - **`module_pricing`** — `title`, `brandVariant`, `headingBlock`, `tiers[]` (`pricingTier`), `footnote` (per language), `ctaButtons`, `contentAlignment` (Left or Center), `layout` (`wideLayout`).
 - **`pricingTier`** — `name`, `description`, `priceLabel`, `highlightLabel` and `footnote` (each per-language one line), `prices[]` (`pricingPrice`), `features[]` (`pricingFeature`: one per-language `text`; the list itself is shared by every language), `ctaButtons`.
 - **`pricingPrice`** — `period` (`PRICE_PERIOD`: `ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`), `amount` (number, ≥ 0, two decimals), `compareAtAmount` (optional, struck through), `isStartingAt` (shows "From").
+- **`settings_site.pricePeriodSuffix`** — one per-language one-line string per `PRICE_PERIOD`, the editor's wording for that period after a price; any may be left empty. A tenant created from starter content gets the `pricingModule.period.*` catalogue wording in its starter language. Nothing reads it yet: the site still shows the catalogue wording.
 - **Service** — `getPricingModule` returns `TPricingModule`. The transformer reads feature `text` through `getLocalizedField` (request language, falling back to the default language) and drops a feature with text in neither, trims `highlightLabel` (blank means not highlighted) and reads `isStartingAt` as false when unset.
 - **Web** — `PricingModule` also reads Site Settings for the currency and the `pricingModule.*` catalogue for "Free", "From", "Regular price", the period suffixes and the tab labels. `toPricingPanels` turns tiers into one panel, or a Monthly and a Yearly panel, of formatted cards.
 - **Caching** — the module query is tagged `modules:pricing`, `module:<id>`, `link`, `homePage` and `page_landing`; Site Settings carries its own tags ([rendering-and-caching](./rendering-and-caching.md)).
 
 ## Configuration
 
-- Editors (Studio) author tiers and prices; the currency is a required Site Settings field.
+- Editors (Studio) author tiers and prices; the currency is a required Site Settings field, and the price period wording an optional one.
 - The `pricingModule.*` strings are fixed (`VOICE_FIXED_KEYS`), translated per site language, not tenant-editable ([voice](./voice.md)).
 - Not plan-gated or capability-gated today ([plans-and-entitlements](./plans-and-entitlements.md)).
-- Look reach: the accent hue colours the highlighted tier and the badge; radius, card style and fonts apply through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Each tier is an item card: square with the brand bar on its left under Accent bar, outlined and following the radius scale under Outlined. The highlighted tier adds a brand-colour border on all sides and the card shadow in both styles.
+- Look reach: the accent hue colours the highlighted tier and the badge; radius, card style and fonts apply through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Each tier is an item card following the radius scale: borderless with a straight brand bar on its left under Accent bar, outlined under Outlined. The highlighted tier adds a brand-colour border on all sides and the card shadow in both styles.
 
 ## Constraints and invariants
 
@@ -66,7 +67,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 
 - `packages/studio/src/schema-types/modules/pricing/pricing.ts`
 - `packages/studio/src/schema-types/objects/pricing-tier/pricing-tier.ts`, `pricing-price/pricing-price.ts`, `pricing-feature/pricing-feature.ts`
-- `packages/studio/src/schema-types/documents/settings/site-settings/site-settings.ts` (`currency`)
+- `packages/studio/src/schema-types/documents/settings/site-settings/site-settings.ts` (`currency`), `price-period-wording-field.ts` (`pricePeriodSuffix`)
 - `packages/service/src/features/modules/pricing/adaptor/query.ts`, `loader.ts`, `transformer.ts`, `types.ts`
 - `packages/ui/src/components/molecules/pricing-card/pricing-card.tsx`
 - `apps/web/src/modules/pricing/pricing-module.tsx`, `pricing-module-view.tsx`
@@ -75,6 +76,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 
 ## Tests and stories
 
+- Config: `starter-content.test.ts` (the seeded period wording).
 - Studio: `validate-pricing-{compare-at-above-amount,price-periods-unique,single-highlighted-tier,tier-price-label-required}.test.ts`.
 - Service: `features/modules/pricing/adaptor/{loader,query,transformer}.test.ts`.
 - UI: `pricing-card.test.tsx`, `pricing-card.stories.tsx`, `pricing-card-grid.stories.tsx`.
@@ -85,4 +87,4 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - #5047 — epic: plans and entitlements. Proposes Pricing as a Growth module.
 - #4840 — epic: platform front door (cross-reference, not an epic of this module). Its pricing page renders from `PLAN_REGISTRY` plus a price source, not from CMS-authored tiers.
 - #5028 — epic: text roles. #5036 gives pricing amounts and footnotes one shared style; #5039 moves the module footnote onto the footnote role.
-- #4022 — feature ticket: an editor-chosen, per-language price period suffix in Site Settings, replacing the `pricingModule.period.*` catalogue strings.
+- #4022 — epic: an editor-chosen, per-language price period wording in Site Settings, with the `pricingModule.period.*` catalogue strings as the fallback.

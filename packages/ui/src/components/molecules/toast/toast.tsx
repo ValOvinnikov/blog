@@ -10,6 +10,7 @@ import {
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { IconButton } from '@blog/ui/components/atoms/icon-button';
 import { Spinner, type TSpinnerProps } from '@blog/ui/components/atoms/spinner';
+import { isUndefined } from '@blog/utils/primitives';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { toastVariants, type TToastVariants } from './toast-variants';
@@ -20,20 +21,26 @@ export interface IToastAction {
   keyHint?: string;
 }
 
+export type TToastPhase = NonNullable<TToastVariants['phase']>;
+
+export interface IToast {
+  type: TToastType;
+  isLoading?: boolean;
+  title?: ReactNode;
+  message: ReactNode;
+  time?: string;
+  action?: IToastAction;
+  paused?: boolean;
+  durationMs?: number;
+  phase: TToastPhase;
+}
+
 export type TToastProps = IWithClassName &
   IWithDataTestId & {
-    type: TToastType;
-    isLoading?: boolean;
+    toast: IToast;
     spinnerVariant?: TSpinnerProps['variant'];
-    title?: ReactNode;
-    message: ReactNode;
-    time?: string;
-    action?: IToastAction;
     dismissLabel: string;
-    isPaused?: boolean;
-    durationMs?: number;
     onDismiss: () => void;
-    phase: NonNullable<TToastVariants['phase']>;
   };
 
 const TOAST_TYPE_ICON: Record<TToastType, TIconName> = {
@@ -53,29 +60,27 @@ const TOAST_ANNOUNCEMENT: Record<
   [TOAST_TYPE.ERROR]: { role: 'alert', live: 'assertive' },
 };
 
-/** A single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth). */
+/** A compact, transient notification reporting the result of an action, with an optional follow-up action and auto-dismiss timer. */
 export const Toast = ({
-  type,
-  isLoading = false,
+  toast,
   spinnerVariant,
-  title,
-  message,
-  time,
-  action,
   dismissLabel,
-  isPaused = false,
-  durationMs,
   onDismiss,
-  phase,
   className,
   dataTestId,
 }: TToastProps) => {
-  const s = toastVariants({
+  const {
     type,
+    isLoading = false,
+    title,
+    message,
+    time,
+    action,
+    paused = false,
+    durationMs,
     phase,
-    hasTime: Boolean(time),
-    paused: isPaused,
-  });
+  } = toast;
+  const s = toastVariants({ type, phase, hasTime: Boolean(time), paused });
   const { role, live } = TOAST_ANNOUNCEMENT[type];
 
   const typeIcon = isLoading ? (
@@ -136,7 +141,7 @@ export const Toast = ({
         </div>
         {actionButton && <div className={s.actions()}>{actionButton}</div>}
       </div>
-      {durationMs !== undefined && (
+      {!isUndefined(durationMs) && (
         <div
           className={s.timer()}
           style={

@@ -1,16 +1,18 @@
-import { TOAST_TYPE, type TToastType } from '@blog/config';
-import type { IToastAction } from '@blog/ui/components/molecules/toast';
-import type { ReactNode } from 'react';
+import {
+  TOAST_TYPE,
+  type TMaybeUndefined,
+  type TToastType,
+} from '@blog/config';
+import { isString, isUndefined } from '@blog/utils/primitives';
+
+import {
+  toPayloadFields,
+  type IToastPayload,
+  type IToastRecord,
+} from './toast-record';
 
 /** Visible-slot cap — a 5th toast evicts the oldest non-error toast. */
 const TOAST_QUEUE_CAP = 4;
-
-/** Default auto-dismiss life per type, in ms — `undefined` = sticky. */
-const TOAST_DEFAULT_LIFE_MS: Partial<Record<TToastType, number>> = {
-  [TOAST_TYPE.SUCCESS]: 3600,
-  [TOAST_TYPE.INFO]: 3600,
-  [TOAST_TYPE.WARNING]: 5000,
-};
 
 /** Grace period before a pending `toast.promise` shows a `loading` toast. */
 const TOAST_PROMISE_GRACE_MS = 400;
@@ -21,39 +23,12 @@ const TOAST_MERGE_WINDOW_MS = 1000;
 /** Exit-animation fallback before a `leaving` toast is actually removed. */
 const TOAST_EXIT_ANIMATION_MS = 360;
 
-export interface IToastPayload {
-  title?: ReactNode;
-  message: ReactNode;
-  time?: string;
-  action?: IToastAction;
-  durationMs?: number;
-  coalesceKey?: string;
-}
-
 type TToastPromiseMessage<T> = IToastPayload | ((value: T) => IToastPayload);
 
 export interface IToastPromiseMessages<T> {
   loading: Pick<IToastPayload, 'title' | 'message'>;
   success: TToastPromiseMessage<T>;
   error: TToastPromiseMessage<unknown>;
-}
-
-type TToastPhase = 'entering' | 'visible' | 'leaving';
-
-export interface IToastRecord {
-  id: string;
-  type: TToastType;
-  isLoading?: boolean;
-  title?: ReactNode;
-  message: ReactNode;
-  time?: string;
-  action?: IToastAction;
-  durationMs?: number;
-  coalesceKey?: string;
-  phase: TToastPhase;
-  paused: boolean;
-  count?: number;
-  createdAt: number;
 }
 
 export interface IToastQueueState {
@@ -80,13 +55,6 @@ const resolvePayload = <T>(
 const isMergeableType = (type: TToastType) =>
   type === TOAST_TYPE.SUCCESS || type === TOAST_TYPE.INFO;
 
-/**
- * No React, no DOM/rAF — `ToastProvider` subscribes to it via
- * `useSyncExternalStore` and separately owns the enter-transition's
- * double-`requestAnimationFrame` paint timing (a rendering, not a queueing,
- * concern) by calling `markEntered` once the browser has painted the
- * off-screen start state.
- */
 export const createToastStore = () => {
   let state: IToastQueueState = EMPTY_STATE;
   const listeners = new Set<() => void>();
@@ -118,7 +86,7 @@ export const createToastStore = () => {
 
   const clearRemovalTimer = (id: string) => {
     const timeoutId = removalTimers.get(id);
-    if (timeoutId !== undefined) {
+    if (!isUndefined(timeoutId)) {
       clearTimeout(timeoutId);
       removalTimers.delete(id);
     }
@@ -144,8 +112,8 @@ export const createToastStore = () => {
     }
   };
 
-  const startTimer = (id: string, durationMs: number | undefined) => {
-    if (durationMs === undefined) return;
+  const startTimer = (id: string, durationMs: TMaybeUndefined<number>) => {
+    if (isUndefined(durationMs)) return;
 
     const timeoutId = setTimeout(() => leave(id), durationMs);
     timers.set(id, {
@@ -155,7 +123,7 @@ export const createToastStore = () => {
     });
   };
 
-  const restartTimer = (id: string, durationMs: number | undefined) => {
+  const restartTimer = (id: string, durationMs: TMaybeUndefined<number>) => {
     clearTimer(id);
     if (isVisible(id)) startTimer(id, durationMs);
   };
@@ -230,12 +198,7 @@ export const createToastStore = () => {
     now: number,
   ): IToastRecord => ({
     id: generateId(),
-    type,
-    title: payload.title,
-    message: payload.message,
-    time: payload.time,
-    action: payload.action,
-    durationMs: payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
+    ...toPayloadFields(type, payload),
     coalesceKey: payload.coalesceKey,
     phase: 'entering',
     paused: false,
@@ -251,7 +214,7 @@ export const createToastStore = () => {
     payload: IToastPayload,
     now: number,
   ) => {
-    if (typeof payload.message !== 'string') return undefined;
+    if (!isString(payload.message)) return undefined;
 
     const matches = (t: IToastRecord) =>
       t.type === type &&
@@ -268,22 +231,15 @@ export const createToastStore = () => {
     if (payload.coalesceKey) {
       const existing = findByCoalesceKey(payload.coalesceKey);
       if (existing) {
+        const fields = toPayloadFields(type, payload);
         patchRecord(existing.id, () => ({
           ...existing,
-          type,
-          title: payload.title,
-          message: payload.message,
-          time: payload.time,
-          action: payload.action,
-          durationMs: payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
+          ...fields,
           count: undefined,
           paused: false,
           createdAt: now,
         }));
-        restartTimer(
-          existing.id,
-          payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type],
-        );
+        restartTimer(existing.id, fields.durationMs);
         return existing.id;
       }
     }
@@ -295,12 +251,6 @@ export const createToastStore = () => {
         patchRecord(existing.id, () => ({
           ...existing,
           count: nextCount,
-          // A repeat within the merge window is a fresh "same thing
-          // happened again" signal — like the coalesce-key branch above,
-          // it un-pauses and re-arms a full-duration timer rather than
-          // leaving a stale `paused: true` record with a new timer that
-          // continued hovering can no longer stop (`pause()` no-ops once
-          // already paused).
           paused: false,
           createdAt: now,
         }));
@@ -400,22 +350,17 @@ export const createToastStore = () => {
 
       if (!findAny(id)) return;
 
-      const nextDurationMs = payload.durationMs ?? TOAST_DEFAULT_LIFE_MS[type];
+      const fields = toPayloadFields(type, payload);
       clearTimer(id);
       patchRecord(id, (r) => ({
         ...r,
-        type,
+        ...fields,
         isLoading: false,
-        title: payload.title,
-        message: payload.message,
-        time: payload.time,
-        action: payload.action,
-        durationMs: nextDurationMs,
         paused: false,
         createdAt: Date.now(),
       }));
 
-      if (isVisible(id)) startTimer(id, nextDurationMs);
+      if (isVisible(id)) startTimer(id, fields.durationMs);
     };
 
     promiseInput.then(
