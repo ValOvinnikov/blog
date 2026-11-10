@@ -42,8 +42,8 @@ function and never sees GROQ or a `SanityDocument`.
   projections shared across features), `transformers/` (raw-to-view-model
   mappers, one per file, including `build-image-url.ts`), `filters/` (shared
   GROQ filter predicates).
-- `src/testing/` — fixtures and test helpers (`mock-run-query.ts`,
-  `server-only-stub.ts`) mirroring the `features/` domain tree, used by
+- `src/testing/` — fixtures and test helpers (`mock-run-query.ts`)
+  mirroring the `features/` domain tree, used by
   co-located loader/transformer tests.
 - `src/utils/env/` — the validated environment schema (`NEXT_PUBLIC_SANITY_PROJECT_ID`,
   `NEXT_PUBLIC_SANITY_DATASET`, `SANITY_API_READ_TOKEN`, `SANITY_API_WRITE_TOKEN`).
