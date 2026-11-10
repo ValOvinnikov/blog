@@ -1,9 +1,10 @@
+import {
+  SEO_META_DESCRIPTION_MAX_LENGTH,
+  SEO_META_TITLE_MAX_LENGTH,
+  SEO_META_TITLE_MIN_LENGTH,
+} from '@blog/config/constants';
 import { openGraphSchema } from '@blog/studio/schema-types/objects/open-graph/open-graph';
 import { defineField, defineType } from 'sanity';
-
-/** Must stay in sync with the backfill migration's own copy of these bounds. */
-const SEO_META_TITLE_MIN_LENGTH = 30;
-const SEO_META_TITLE_MAX_LENGTH = 60;
 
 export const seoSchema = defineType({
   name: 'seo',
@@ -32,7 +33,7 @@ export const seoSchema = defineType({
       rows: 3,
       description:
         'The summary shown beneath the title in search results — aim for a full sentence or two so it reads well; a single word or fragment displays poorly. Left empty, no summary is shown there.',
-      validation: (rule) => rule.max(160),
+      validation: (rule) => rule.max(SEO_META_DESCRIPTION_MAX_LENGTH),
     }),
     defineField({
       name: 'openGraph',
