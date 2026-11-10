@@ -2935,11 +2935,11 @@ variant.
 token for what it is, so the Look's `radiusScale` and card style reach it
 without the component knowing either:
 
-| Role            | Utility         | Token                             | Used by                                                                          |
-| --------------- | --------------- | --------------------------------- | -------------------------------------------------------------------------------- |
-| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `CtaModule`, `NewsletterSignup`  |
-| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                         |
-| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, Hub tiles) |
+| Role            | Utility         | Token                             | Used by                                                                                               |
+| --------------- | --------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                    |
+| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                              |
+| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, Hub tiles, the `CtaModule` box) |
 
 Controls and pills keep the plain steps (`rounded-sm`, `rounded-full`).
 `MediaFrame` takes a `shape` of `rect` (default, `rounded-media`) or `circle`
@@ -3007,7 +3007,7 @@ ring offset could match.
 
 **Elevation is two tokens** (`shadow-card` also carries a heavier `.dark`
 value; `shadow-float` has one value for both modes). `shadow-card` marks a
-raised card — `Panel`, the highlighted `PricingCard` and the `CtaModule` card —
+raised card — `Panel` and the highlighted `PricingCard` —
 and `shadow-float` marks chrome floating above the page, the `Toast` and the
 `PopoverMenu` panel. A static item card carries no shadow (`--item-shadow` is
 `none` under both card styles); a surface's frame, not its depth, is what bounds
@@ -3036,8 +3036,8 @@ is the token for a border that genuinely is the sole indicator.
 ### Card style
 
 Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, the
-`PopoverMenu` tile (the account panel's Hub tiles) and the contact-form success
-card — paint their frame
+`PopoverMenu` tile (the account panel's Hub tiles), the contact-form success
+card and the `CtaModule` CALLOUT and SPLIT box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
 five inherited `--item-*` properties rather than fixed classes, and each pairs
 it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
@@ -3060,3 +3060,6 @@ does not show. `theme.css`'s
 static values are `ACCENT_BAR`'s, so a site with no saved look renders the
 accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s brand-muted tint
 on hover and focus-within under either style; the style changes only the frame.
+The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
+`surface-*` retarget) overrides the utility's `--surface` fill, so a card style
+frames the band surface and never paints it.

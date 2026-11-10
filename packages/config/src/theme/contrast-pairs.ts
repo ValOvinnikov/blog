@@ -9,30 +9,39 @@ export type TContrastPair = {
   followsAccentHue: boolean;
 };
 
+const PRIMARY_SUBTLE = '--primary-subtle' satisfies TThemeToken;
+const SECONDARY = '--secondary' satisfies TThemeToken;
+const SURFACE_2 = '--surface-2' satisfies TThemeToken;
+const BRAND_PRIMARY_MUTED = '--brand-primary-muted' satisfies TThemeToken;
+const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
+const TEXT = '--text' satisfies TThemeToken;
+const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
+const HEADER_CONTROL_FILL = '--header-control-fill' satisfies TThemeToken;
+
 const BANDS = [
   '--primary',
-  '--primary-subtle',
-  '--secondary',
+  PRIMARY_SUBTLE,
+  SECONDARY,
   '--surface',
-  '--surface-2',
-  '--brand-primary-muted',
+  SURFACE_2,
+  BRAND_PRIMARY_MUTED,
 ] as const satisfies readonly TThemeToken[];
 
 const TEXT_SURFACES = [
   ...BANDS,
-  '--error-muted',
+  ERROR_MUTED,
 ] as const satisfies readonly TThemeToken[];
 
 const FIELD_SURFACES = [
   '--primary',
-  '--primary-subtle',
+  PRIMARY_SUBTLE,
   '--surface',
 ] as const satisfies readonly TThemeToken[];
 
 const TINTED_FIELD_SURFACES = [
   '--surface',
-  '--secondary',
-  '--brand-primary-muted',
+  SECONDARY,
+  BRAND_PRIMARY_MUTED,
 ] as const satisfies readonly TThemeToken[];
 
 const SCRIM_STOPS_UNDER_COPY = [
@@ -43,13 +52,13 @@ const SCRIM_STOPS_UNDER_COPY = [
 ] as const satisfies readonly TThemeToken[];
 
 const CODE_SURFACES = [
-  '--surface-2',
-  '--brand-primary-muted',
+  SURFACE_2,
+  BRAND_PRIMARY_MUTED,
 ] as const satisfies readonly TThemeToken[];
 
 export const CONTRAST_PAIRS = {
   TEXT: {
-    foreground: '--text',
+    foreground: TEXT,
     surfaces: TEXT_SURFACES,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
@@ -61,7 +70,7 @@ export const CONTRAST_PAIRS = {
     followsAccentHue: true,
   },
   BRAND_PRIMARY: {
-    foreground: '--brand-primary',
+    foreground: BRAND_PRIMARY,
     surfaces: BANDS,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
@@ -92,7 +101,7 @@ export const CONTRAST_PAIRS = {
   },
   ERROR: {
     foreground: '--error',
-    surfaces: ['--error-muted'],
+    surfaces: [ERROR_MUTED],
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: false,
   },
@@ -140,25 +149,31 @@ export const CONTRAST_PAIRS = {
   },
   ITEM_ACCENT: {
     foreground: '--item-accent-color',
-    surfaces: ['--primary', '--primary-subtle', '--secondary', '--surface'],
+    surfaces: [
+      '--primary',
+      PRIMARY_SUBTLE,
+      SECONDARY,
+      '--surface',
+      BRAND_PRIMARY_MUTED,
+    ],
     role: CONTRAST_ROLE.DECORATIVE,
     followsAccentHue: true,
   },
   HEADER_CONTROL_TEXT: {
-    foreground: '--text',
-    surfaces: ['--header-control-fill'],
+    foreground: TEXT,
+    surfaces: [HEADER_CONTROL_FILL],
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
   HEADER_CONTROL_BRAND: {
-    foreground: '--brand-primary',
-    surfaces: ['--header-control-fill'],
+    foreground: BRAND_PRIMARY,
+    surfaces: [HEADER_CONTROL_FILL],
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
   SELECTION: {
-    foreground: '--brand-primary',
-    surfaces: ['--brand-primary-muted'],
+    foreground: BRAND_PRIMARY,
+    surfaces: [BRAND_PRIMARY_MUTED],
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
