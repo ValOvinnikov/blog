@@ -1,10 +1,11 @@
 import { ACTION_OUTCOME, routes, SITE_MESSAGES } from '@blog/config';
+import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { stubRouterRefresh } from '@web/testing/shared/router/stub-router-refresh';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
-import { useRouter } from 'next/navigation';
 
 import { ProviderLinkControl } from './provider-link-control';
 
@@ -18,22 +19,13 @@ const { routerRefreshMock, signInMock, unlinkProviderActionMock } = vi.hoisted(
   }),
 );
 
-vi.mocked(useRouter).mockReturnValue({
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: routerRefreshMock,
-} as unknown as ReturnType<typeof useRouter>);
-
 vi.mock('next-auth/react', () => ({ signIn: signInMock }));
 
 vi.mock('@web/server/account/identity-actions/identity-actions', () => ({
   unlinkProviderAction: unlinkProviderActionMock,
 }));
 
-const PROVIDER = 'github';
+const PROVIDER = OAUTH_PROVIDER.GITHUB;
 const {
   linkButton: LINK_LABEL,
   unlinkButton: UNLINK_LABEL,
@@ -51,9 +43,7 @@ describe(`<${ProviderLinkControl.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
-    routerRefreshMock.mockReset();
-    signInMock.mockReset();
-    unlinkProviderActionMock.mockReset();
+    stubRouterRefresh(routerRefreshMock);
     user = userEvent.setup();
   });
 

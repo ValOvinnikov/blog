@@ -35,11 +35,10 @@ export default mergeConfig(
     },
     test: {
       environment: 'node',
-      // Off so files share a worker's already-imported `sanity`; the setup file and the unstub/restore flags undo the module, global and spy state a file leaves behind.
+      // Off so files share a worker's already-imported `sanity`; the setup file, the preset's reset/restore flags and unstubGlobals undo the module, global and spy state a file leaves behind.
       isolate: false,
       setupFiles: [RESET_FILE_STATE_SETUP],
       unstubGlobals: true,
-      restoreMocks: true,
       projects: [
         {
           extends: true,

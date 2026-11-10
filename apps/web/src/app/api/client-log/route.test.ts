@@ -7,16 +7,11 @@ import { logger } from '@web/utils/logger/logger';
 
 import { POST } from './route';
 
-const { createRateLimiterSpy } = vi.hoisted(() => ({
-  createRateLimiterSpy: vi.fn(),
-}));
-
 vi.mock(
   '@web/server/rate-limit/rate-limiter/rate-limiter',
   async (importOriginal) => {
     const actual = await importOriginal<typeof TRateLimiterModule>();
-    createRateLimiterSpy.mockImplementation(actual.createRateLimiter);
-    return { createRateLimiter: createRateLimiterSpy };
+    return { createRateLimiter: vi.fn(actual.createRateLimiter) };
   },
 );
 
@@ -77,15 +72,16 @@ describe(POST, () => {
 
   it('builds no rate limiter until the first request, and then only one', async () => {
     vi.resetModules();
-    createRateLimiterSpy.mockClear();
     const { POST: freshPost } = await import('./route');
+    const { createRateLimiter } =
+      await import('@web/server/rate-limit/rate-limiter/rate-limiter');
 
-    expect(createRateLimiterSpy).not.toHaveBeenCalled();
+    expect(createRateLimiter).not.toHaveBeenCalled();
 
     await freshPost(jsonRequest());
     await freshPost(jsonRequest());
 
-    expect(createRateLimiterSpy).toHaveBeenCalledTimes(1);
+    expect(createRateLimiter).toHaveBeenCalledTimes(1);
   });
 
   it('accepts a valid payload and logs it with source: client', async () => {

@@ -82,7 +82,7 @@ const draftFor = (
   onRestore,
 });
 
-const baseSave = vi.fn().mockResolvedValue(true);
+const baseSave = vi.fn(async () => true);
 
 const formFor = (
   overrides: Partial<TSettingsForm<TValues>> = {},
@@ -600,10 +600,6 @@ describe(`<${SettingsFormShell.name}/>`, () => {
   });
 
   describe('draft recovery', () => {
-    afterEach(() => {
-      vi.restoreAllMocks();
-    });
-
     const leaveWithUnsavedChanges = (values: TValues = MOCK_EDITED_VALUES) => {
       const { unmount } = renderShell({
         changeCount: 1,

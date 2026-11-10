@@ -3,8 +3,8 @@ import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { customRender, screen } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { stubRouterRefresh } from '@web/testing/shared/router/stub-router-refresh';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
-import { useRouter } from 'next/navigation';
 
 import { DisplayNameControl } from './display-name-control';
 
@@ -14,15 +14,6 @@ const { routerRefreshMock, updateDisplayNameActionMock } = vi.hoisted(() => ({
   routerRefreshMock: vi.fn(),
   updateDisplayNameActionMock: vi.fn(),
 }));
-
-vi.mocked(useRouter).mockReturnValue({
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: routerRefreshMock,
-} as unknown as ReturnType<typeof useRouter>);
 
 vi.mock('@web/server/account/identity-actions/identity-actions', () => ({
   updateDisplayNameAction: updateDisplayNameActionMock,
@@ -52,8 +43,7 @@ describe(`<${DisplayNameControl.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
-    routerRefreshMock.mockReset();
-    updateDisplayNameActionMock.mockReset();
+    stubRouterRefresh(routerRefreshMock);
     user = userEvent.setup();
     setup();
   });

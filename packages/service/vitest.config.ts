@@ -13,7 +13,6 @@ export default mergeConfig(
     test: {
       environment: 'node',
       pool: 'vmThreads',
-      mockReset: true,
       include: ['src/**/*.{test,spec}.ts'],
       env: {
         NEXT_PUBLIC_SANITY_PROJECT_ID: 'test-project',
