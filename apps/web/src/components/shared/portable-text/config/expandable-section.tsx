@@ -1,0 +1,47 @@
+import type { PORTABLE_TEXT_BLOCK_TYPE } from '@blog/config';
+import type { TPortableTextBody } from '@blog/service';
+import { headingVariants } from '@blog/ui/components/atoms/heading/heading-variants';
+import { Accordion } from '@blog/ui/components/organisms/accordion';
+import {
+  PortableText as PortableTextRoot,
+  type PortableTextReactComponents,
+} from '@portabletext/react';
+import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';
+
+import { FULL_BLEED_DATA_ATTR } from './full-bleed';
+
+const s = portableTextVariants();
+const expandableSectionTitle = headingVariants({ visual: 'prose-h3' });
+
+type TResolvedExpandableSectionBlock = Extract<
+  TPortableTextBody[number],
+  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
+>;
+
+export const makeExpandableSectionTypeComponent = (
+  baseComponents: PortableTextReactComponents,
+) => {
+  const ExpandableSectionType = ({
+    value,
+  }: {
+    value: TResolvedExpandableSectionBlock;
+  }) => (
+    <div {...{ [FULL_BLEED_DATA_ATTR]: '' }} className={s.expandableSection()}>
+      <Accordion>
+        <Accordion.Item>
+          <Accordion.Trigger className={expandableSectionTitle}>
+            {value.title}
+          </Accordion.Trigger>
+          <Accordion.Panel>
+            <PortableTextRoot
+              value={value.body ?? []}
+              components={baseComponents}
+            />
+          </Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>
+    </div>
+  );
+
+  return ExpandableSectionType;
+};
