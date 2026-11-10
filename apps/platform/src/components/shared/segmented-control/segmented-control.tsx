@@ -29,6 +29,7 @@ export type TSegmentedControlProps<TValue extends string> = {
   isDisabled?: boolean;
   isLocked?: boolean;
   optionWidth?: TSegmentedOptionWidth;
+  isSingleRow?: boolean;
   className?: string;
 };
 
@@ -40,6 +41,7 @@ export const SegmentedControl = <TValue extends string>({
   isDisabled = false,
   isLocked = false,
   optionWidth = SEGMENTED_OPTION_WIDTH.FIT,
+  isSingleRow = false,
   className,
 }: TSegmentedControlProps<TValue>) => {
   const descriptionId = useId();
@@ -59,6 +61,7 @@ export const SegmentedControl = <TValue extends string>({
   } = segmentedControlVariants({
     isLocked: isLocked || isDisabled,
     hasGlyphs,
+    isSingleRow,
     optionWidth,
   });
 

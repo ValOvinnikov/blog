@@ -80,6 +80,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
           onChange={(shape) => updateField('buttonShape', shape)}
           isDisabled={shapeLock.isDisabled}
           isLocked={shapeLock.isLocked}
+          isSingleRow={true}
         />
         <PresetValueButton field="buttonShape" fieldLabel={shapeLabel} />
       </LookField>
