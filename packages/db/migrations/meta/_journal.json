@@ -64,6 +64,13 @@
       "when": 1793981253742,
       "tag": "0008_add_tenant_oauth_callback_domain",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1794315284804,
+      "tag": "0009_add_site_config_button_shape",
+      "breakpoints": true
     }
   ]
 }

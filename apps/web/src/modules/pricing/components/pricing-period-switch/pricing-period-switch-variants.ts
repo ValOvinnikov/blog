@@ -4,7 +4,6 @@ import { tv } from '@blog/ui/lib/styling';
 export const pricingPeriodSwitchVariants = tv({
   slots: {
     control: ['mb-6 flex'],
-    switch: ['rounded-full', '*:rounded-full'],
   },
   variants: {
     align: {

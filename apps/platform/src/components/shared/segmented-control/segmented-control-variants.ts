@@ -1,4 +1,5 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { SEGMENTED_OPTION_WIDTH } from '@platform/constants/segmented-control';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -18,11 +19,25 @@ export const segmentedControlVariants = tv({
       'disabled:cursor-not-allowed',
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
+    glyph: ['flex'],
     selectedDescription: [
       'm-0 text-admin-12-5 leading-admin-18 text-admin-muted empty:hidden',
     ],
   },
   variants: {
+    hasGlyphs: {
+      true: {
+        option: [
+          'min-h-[60px] flex-col justify-center gap-1 px-1.5 text-center',
+          'lg:h-auto lg:min-h-[52px] lg:min-w-14 lg:gap-[3px] lg:px-2.5 lg:py-1.5',
+        ],
+      },
+      false: {},
+    },
+    optionWidth: {
+      [SEGMENTED_OPTION_WIDTH.FIT]: {},
+      [SEGMENTED_OPTION_WIDTH.WIDE]: { option: ['lg:min-w-[94px]'] },
+    },
     isLocked: {
       true: {
         root: ['lg:border-admin-control-line-locked'],
@@ -44,7 +59,20 @@ export const segmentedControlVariants = tv({
       },
     },
   },
+  compoundVariants: [
+    {
+      isLocked: false,
+      hasGlyphs: true,
+      class: {
+        option: [
+          'lg:hover:not-data-[pressed]:bg-admin-hover lg:hover:not-data-[pressed]:text-admin-text',
+        ],
+      },
+    },
+  ],
   defaultVariants: {
     isLocked: false,
+    hasGlyphs: false,
+    optionWidth: SEGMENTED_OPTION_WIDTH.FIT,
   },
 });

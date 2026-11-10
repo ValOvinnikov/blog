@@ -1,6 +1,8 @@
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
+  BUTTON_SHAPE,
+  BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
@@ -33,6 +35,7 @@ export const buildThemeStyleBlock = ({
   density,
   cardStyle = CARD_STYLE.ACCENT_BAR,
   headerControlStyle = HEADER_CONTROL_STYLE.OUTLINED,
+  buttonShape = BUTTON_SHAPE.ROUNDED,
 }: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
@@ -42,6 +45,7 @@ export const buildThemeStyleBlock = ({
       ...formatOklchRamp(LOGO_RAMP_LIGHT, resolvedLogoHue),
       ...formatOklchRamp(IMAGE_SCRIM_RAMP, accentHue),
       ...RADIUS_DECLARATIONS[radiusScale],
+      ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
       ...DENSITY_DECLARATIONS[density],
       ...CARD_STYLE_DECLARATIONS[cardStyle],
       ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],

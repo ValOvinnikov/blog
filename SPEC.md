@@ -3080,3 +3080,14 @@ on hover and focus-within under either style; the style changes only the frame.
 The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
 `surface-*` retarget) overrides the utility's `--surface` fill, so a card style
 frames the band surface and never paints it.
+
+**Button shape** is one inherited property, `--radius-button`, read by the
+`rounded-button` utility on every button-like control (buttons, fields, tags,
+status badges, segmented controls). The tenant stores it on the Look
+(`site_config.button_shape`: `SQUARE`, `ROUNDED` default, `PILL`; a Growth
+field, so a `FREE` site renders its preset's Rounded), and
+`buildThemeStyleBlock` always declares `BUTTON_SHAPE_DECLARATIONS` under
+`:root`, in the same block as the radius scale: Rounded is `var(--radius-sm)`,
+which resolves on the element that declares it, so it follows the radius scale
+only when declared beside it. A component never overrides the shape with its
+own `rounded-*` class.

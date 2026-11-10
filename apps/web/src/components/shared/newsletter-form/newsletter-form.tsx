@@ -10,6 +10,7 @@ import {
   type TMaybeUndefined,
   FORM_STATUS,
 } from '@blog/config';
+import { isValidEmailAddress } from '@blog/email/validation';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { NewsletterSignup } from '@blog/ui/components/organisms/newsletter-signup';
 import { NEWSLETTER_OUTCOME } from '@web/constants/newsletter';
@@ -18,7 +19,6 @@ import {
   subscribeToNewsletterAction,
   type TSubscribeResult,
 } from '@web/server/newsletter/newsletter-actions/newsletter-actions';
-import { isValidEmail } from '@web/utils/is-valid-email';
 import { useTranslations } from 'next-intl';
 import { useId, useState } from 'react';
 
@@ -67,7 +67,7 @@ export const NewsletterForm = ({
   };
 
   const handleSubmit = async () => {
-    if (!isValidEmail(email)) {
+    if (!isValidEmailAddress(email.trim())) {
       setStatus(FORM_STATUS.ERROR);
       setErrorMessage(t('errorInvalid'));
       return;

@@ -5,6 +5,7 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
@@ -76,6 +77,8 @@ export const busyButtonStyleEnum = pgEnum(
 
 export const spinnerStyleEnum = pgEnum('spinner_style', SPINNER_STYLE);
 
+export const buttonShapeEnum = pgEnum('button_shape', BUTTON_SHAPE);
+
 export const headerLayoutEnum = pgEnum('header_layout', HEADER_LAYOUT);
 
 export const headerSubmenuStyleEnum = pgEnum(
@@ -142,6 +145,9 @@ export const siteConfig = pgTable('site_config', {
   spinnerStyle: spinnerStyleEnum('spinner_style')
     .notNull()
     .default(SPINNER_STYLE.BRAILLE),
+  buttonShape: buttonShapeEnum('button_shape')
+    .notNull()
+    .default(BUTTON_SHAPE.ROUNDED),
   headerLayout: headerLayoutEnum('header_layout')
     .notNull()
     .default(HEADER_LAYOUT.CLASSIC),
