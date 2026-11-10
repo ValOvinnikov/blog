@@ -3,7 +3,7 @@ import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
-import { act, renderHook } from '@platform/testing/custom-render';
+import { act, fireEvent, renderHook } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { useDomainStatusPoll } from './use-domain-status-poll';
@@ -130,6 +130,7 @@ describe(useDomainStatusPoll, () => {
     expect(getDomainVerificationStatusActionMock).not.toHaveBeenCalled();
 
     visibility.mockReturnValue('visible');
+    fireEvent(document, new Event('visibilitychange'));
     await advance(DOMAIN_POLL_INTERVAL_MS);
     expect(getDomainVerificationStatusActionMock).toHaveBeenCalledOnce();
   });
