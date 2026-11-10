@@ -127,6 +127,12 @@ describe(`<${LookForm.name}/>`, () => {
           LOOK_FORM.radiusScaleDescription,
         );
       });
+    });
+
+    describe('with the Header row open', () => {
+      beforeEach(async () => {
+        await openLookRow(user, LOOK_ROW.HEADER);
+      });
 
       it('shows only labels in the header buttons tiles and describes the chosen one below', async () => {
         const headerButtonsField = screen.getByRole('group', {
