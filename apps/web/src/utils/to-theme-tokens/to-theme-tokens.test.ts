@@ -1,4 +1,5 @@
 import {
+  BUTTON_SHAPE,
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
   PRESET_ID,
@@ -21,6 +22,7 @@ const CONSOLE_ROW = {
   ...CONSOLE.themeTokens,
   cardStyle: CONSOLE.cardStyle,
   headerControlStyle: CONSOLE.headerControlStyle,
+  buttonShape: CONSOLE.buttonShape,
 };
 
 const EDITORIAL_ROW = {
@@ -28,6 +30,7 @@ const EDITORIAL_ROW = {
   ...EDITORIAL.themeTokens,
   cardStyle: EDITORIAL.cardStyle,
   headerControlStyle: EDITORIAL.headerControlStyle,
+  buttonShape: EDITORIAL.buttonShape,
 };
 
 describe(toThemeTokens, () => {
@@ -39,6 +42,7 @@ describe(toThemeTokens, () => {
       logoHue: CONSOLE.themeTokens.accentHue,
       cardStyle: CONSOLE.cardStyle,
       headerControlStyle: CONSOLE.headerControlStyle,
+      buttonShape: CONSOLE.buttonShape,
     });
   });
 
@@ -50,6 +54,7 @@ describe(toThemeTokens, () => {
       logoHue: EDITORIAL.themeTokens.accentHue,
       cardStyle: EDITORIAL.cardStyle,
       headerControlStyle: EDITORIAL.headerControlStyle,
+      buttonShape: EDITORIAL.buttonShape,
     });
   });
 
@@ -69,6 +74,15 @@ describe(toThemeTokens, () => {
     });
 
     expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.SOFT);
+  });
+
+  it("keeps the row's button shape over its preset's", () => {
+    const result = toThemeTokens({
+      ...CONSOLE_ROW,
+      buttonShape: BUTTON_SHAPE.PILL,
+    });
+
+    expect(result.buttonShape).toBe(BUTTON_SHAPE.PILL);
   });
 
   it('resolves the accent hue and the logo hue independently', () => {

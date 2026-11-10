@@ -15,6 +15,7 @@ const {
   themeTokens: EDITORIAL_TOKENS,
   cardStyle,
   headerControlStyle,
+  buttonShape,
 } = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 
@@ -27,6 +28,7 @@ const MOCK_SITE_CONFIG_ROW = {
   density: EDITORIAL_TOKENS.density,
   cardStyle,
   headerControlStyle,
+  buttonShape,
 };
 
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
