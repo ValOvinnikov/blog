@@ -3,7 +3,7 @@ import { tv } from '@blog/ui/lib/styling';
 export const tableVariants = tv({
   slots: {
     region: [
-      'w-full overflow-x-auto overscroll-x-contain',
+      'w-full overflow-x-auto overscroll-x-contain rounded-card',
       '[--scroll-shadow:color-mix(in_oklch,var(--color-text)_20%,transparent)]',
       '[background-image:linear-gradient(to_right,var(--color-ambient)_40%,transparent),linear-gradient(to_left,var(--color-ambient)_40%,transparent),linear-gradient(to_right,var(--scroll-shadow),transparent),linear-gradient(to_left,var(--scroll-shadow),transparent)]',
       '[background-position:left_center,right_center,left_center,right_center]',
@@ -12,7 +12,8 @@ export const tableVariants = tv({
       'bg-no-repeat',
     ],
     table: [
-      'w-full border-collapse',
+      'w-full border-separate border-spacing-0',
+      'rounded-card border border-divider',
       'text-left text-base leading-normal text-text',
     ],
   },

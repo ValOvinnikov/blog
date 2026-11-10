@@ -45,6 +45,11 @@ const brandNameInput = () =>
 
 const previewHeader = () => screen.getByTestId(SAMPLE_HEADER_TEST_ID);
 
+const enterBrandName = async (user: UserEvent, value: string) => {
+  await user.click(brandNameInput());
+  await user.paste(value);
+};
+
 describe(`<${LookForm.name}/>`, () => {
   let user: UserEvent;
 
@@ -63,15 +68,15 @@ describe(`<${LookForm.name}/>`, () => {
       expect(previewHeader()).toHaveTextContent(MOCK_TENANT_NAME);
     });
 
-    it('previews the brand name as the owner types it', async () => {
-      await user.type(brandNameInput(), MOCK_BRAND_NAME);
+    it('previews the brand name as the owner enters it', async () => {
+      await enterBrandName(user, MOCK_BRAND_NAME);
 
       expect(previewHeader()).toHaveTextContent(MOCK_BRAND_NAME);
       expect(previewHeader()).not.toHaveTextContent(MOCK_TENANT_NAME);
     });
 
     it('marks the field with an unsaved dot once it differs from the saved name', async () => {
-      await user.type(brandNameInput(), MOCK_BRAND_NAME);
+      await enterBrandName(user, MOCK_BRAND_NAME);
 
       const unsavedInput = screen.getByRole('textbox', {
         name: UNSAVED_BRAND_NAME,
@@ -80,15 +85,14 @@ describe(`<${LookForm.name}/>`, () => {
     });
 
     it('saves the brand name with the rest of the Look', async () => {
-      await user.type(brandNameInput(), MOCK_BRAND_NAME);
+      await enterBrandName(user, MOCK_BRAND_NAME);
 
       await saveAndExpectLook(user, { brandName: MOCK_BRAND_NAME });
     });
 
-    describe('after typing a name over the limit', () => {
+    describe('after entering a name over the limit', () => {
       beforeEach(async () => {
-        await user.click(brandNameInput());
-        await user.paste(TOO_LONG_BRAND_NAME);
+        await enterBrandName(user, TOO_LONG_BRAND_NAME);
       });
 
       it('shows a field error', () => {

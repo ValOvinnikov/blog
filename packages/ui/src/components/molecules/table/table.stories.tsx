@@ -1,5 +1,11 @@
+import {
+  RADIUS_DECLARATIONS,
+  RADIUS_SCALE,
+  type TRadiusScale,
+} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
+import type { CSSProperties } from 'react';
 
 import { Table } from './table';
 
@@ -40,6 +46,7 @@ const sparseRows = createRows(
   4,
   () => faker.helpers.maybe(shortCell, { probability: 0.4 }) ?? '',
 );
+const secondHeaderRow = createColumns(columns.length);
 
 const renderHeaderRow = (headings: TTableStoryCell[]) => (
   <Table.Row>
@@ -73,6 +80,19 @@ const atPhoneWidth: Decorator = (Story) => (
     <Story />
   </div>
 );
+
+const atRadiusScale = (radiusScale: TRadiusScale): Decorator => {
+  const radii = RADIUS_DECLARATIONS[radiusScale];
+  const style = { ...radii, '--radius-card': radii['--radius-md'] };
+
+  const AtRadiusScale: Decorator = (Story) => (
+    <div style={style as CSSProperties}>
+      <Story />
+    </div>
+  );
+
+  return AtRadiusScale;
+};
 
 const meta = {
   title: 'Molecules/Table',
@@ -164,6 +184,38 @@ export const EmptyCellsAtPhoneWidth: TStory = {
 export const LongContentAtPhoneWidth: TStory = {
   ...LongContent,
   decorators: [atPhoneWidth],
+};
+
+export const SmallRadius: TStory = {
+  ...Default,
+  decorators: [atRadiusScale(RADIUS_SCALE.SM)],
+};
+
+export const ExtraLargeRadius: TStory = {
+  ...Default,
+  decorators: [atRadiusScale(RADIUS_SCALE.XL)],
+};
+
+export const HeaderRowsOnlyAtExtraLargeRadius: TStory = {
+  args: {
+    children: [
+      <Table.Head key="head">
+        {renderHeaderRow(columns)}
+        {renderHeaderRow(secondHeaderRow)}
+      </Table.Head>,
+    ],
+  },
+  decorators: [atRadiusScale(RADIUS_SCALE.XL)],
+};
+
+export const WideTableAtPhoneWidthAtExtraLargeRadius: TStory = {
+  ...WideTableAtPhoneWidth,
+  decorators: [atPhoneWidth, atRadiusScale(RADIUS_SCALE.XL)],
+};
+
+export const ExtraLargeRadiusInDarkMode: TStory = {
+  ...ExtraLargeRadius,
+  globals: { theme: 'dark' },
 };
 
 export const DefaultInDarkMode: TStory = {
