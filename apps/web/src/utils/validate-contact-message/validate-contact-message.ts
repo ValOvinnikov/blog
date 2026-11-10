@@ -1,10 +1,11 @@
 import type { TFieldErrors } from '@blog/config';
+import { isValidEmailAddress } from '@blog/email/validation';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import { hasLength } from '@blog/utils/primitives';
 import {
   FIELD_ERROR,
   type TFieldErrorReason,
 } from '@web/constants/field-error';
-import { isValidEmail } from '@web/utils/is-valid-email';
 
 const NAME_MAX_LENGTH = 100;
 const MESSAGE_MIN_LENGTH = 10;
@@ -34,7 +35,7 @@ export const validateContactMessage = (
   if (name.length < 1 || name.length > NAME_MAX_LENGTH) {
     fieldErrors.name = { reason: FIELD_ERROR.INVALID };
   }
-  if (!isValidEmail(email)) {
+  if (!isValidEmailAddress(email)) {
     fieldErrors.email = { reason: FIELD_ERROR.INVALID };
   }
   if (
@@ -44,7 +45,7 @@ export const validateContactMessage = (
     fieldErrors.message = { reason: FIELD_ERROR.INVALID };
   }
 
-  return Object.keys(fieldErrors).length > 0
+  return hasLength(Object.keys(fieldErrors))
     ? errorResult(fieldErrors)
     : okResult({ name, email, message });
 };
