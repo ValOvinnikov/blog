@@ -43,7 +43,7 @@ The same "Actions" building block — `ctaButtons`, rendered by `ActionGroup` �
 ## Configuration
 
 - **Editors** author every field in Studio. Text, image alt and footnote are per language.
-- **Look** reaches the card through tokens (radius, card padding, shadow, fonts, accent, density's band spacing); Voice does not reach CTA copy.
+- **Look** reaches the module through tokens (card padding, fonts, accent, density's band spacing). Card style frames the Callout and Split box like every item card — outline, accent bar, shadow and corners (which follow the radius scale) — while its background stays the band variant's Plain, Shaded or Brand tint; Banner has no box. Voice does not reach CTA copy.
 - **Plans:** not gated; every plan can place it.
 
 ## Constraints and invariants

@@ -6,6 +6,7 @@ import {
   SPACING_SCALE,
 } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
+import { CardStyles } from '@blog/ui/testing/card-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -28,8 +29,6 @@ const brightPhoto = (
   />
 );
 
-// Stub — this package never constructs a link/button; the web layer would
-// pass its own `ActionGroup` output here.
 const PrimaryAndSecondary = (
   <>
     <Button variant="primary">Start reading</Button>
@@ -178,6 +177,29 @@ export const SplitMobileMediaFirst: TStory = {
     ...SplitDefault.args,
     mobileMediaOrder: MEDIA_ORDER.FIRST,
   },
+};
+
+export const CalloutByCardStyle: TStory = {
+  args: { image: undefined },
+  render: (args) => (
+    <CardStyles>
+      {(cardStyle) =>
+        objectKeys(ctaModuleVariants.variants.tone).map((tone) => (
+          <CtaModule
+            key={tone}
+            {...args}
+            tone={tone}
+            headingId={`cta-module-heading-${cardStyle}-${tone}`}
+          />
+        ))
+      }
+    </CardStyles>
+  ),
+};
+
+export const SplitByCardStyle: TStory = {
+  args: { ...SplitDefault.args },
+  render: CalloutByCardStyle.render,
 };
 
 export const BannerDefault: TStory = {
