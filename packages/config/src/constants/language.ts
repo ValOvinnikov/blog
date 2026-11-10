@@ -1,3 +1,5 @@
+import { isOneOf } from '@blog/utils/primitives';
+
 import type { TValueOf } from '@blog/config/utils';
 
 export const LOCALE_ISO_CODES = {
@@ -11,7 +13,7 @@ export const LOCALE_ISO_CODES = {
 export type TLocaleIsoCode = TValueOf<typeof LOCALE_ISO_CODES>;
 
 export const isLocaleIsoCode = (value: string): value is TLocaleIsoCode =>
-  (Object.values(LOCALE_ISO_CODES) as string[]).includes(value);
+  isOneOf(Object.values(LOCALE_ISO_CODES), value);
 
 export const LOCALE_BCP47_TAGS = {
   EN: 'en',

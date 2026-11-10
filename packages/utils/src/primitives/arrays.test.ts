@@ -2,6 +2,7 @@ import {
   hasArrayGotItems,
   hasArrayGotMultipleItems,
   hasLength,
+  isOneOf,
 } from './arrays';
 
 const REJECTS = 'rejects %j';
@@ -38,4 +39,19 @@ describe(hasLength, () => {
   it.each([[[]], [''], [undefined]])(REJECTS, (value) => {
     expect(hasLength(value)).toBe(false);
   });
+});
+
+describe(isOneOf, () => {
+  const FRUITS = ['APPLE', 'PEAR'] as const;
+
+  it('accepts a listed value', () => {
+    expect(isOneOf(FRUITS, 'PEAR')).toBe(true);
+  });
+
+  it.each([['PLUM'], ['apple'], [''], [1], [null], [undefined]])(
+    REJECTS,
+    (value) => {
+      expect(isOneOf(FRUITS, value)).toBe(false);
+    },
+  );
 });
