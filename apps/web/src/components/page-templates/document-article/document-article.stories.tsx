@@ -50,3 +50,7 @@ export const WithoutHeadingBlock: TStory = {
 export const Mobile: TStory = {
   globals: { viewport: 'mobile' },
 };
+
+export const Tablet: TStory = {
+  globals: { viewport: 'tablet' },
+};
