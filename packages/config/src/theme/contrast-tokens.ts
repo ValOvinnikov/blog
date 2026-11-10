@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config/types';
 import { renderedContrastRatio, type TOklchColor } from '@blog/utils/color';
 import { isUndefined } from '@blog/utils/primitives';
 
@@ -69,22 +70,34 @@ const TOKEN_ALIASES: Record<TThemeToken, TThemeToken> = {
   '--field-boundary': '--border-emphasis',
 };
 
+const TRANSPARENT = 'transparent';
+
 // A transparent header control or navigation link shows the header's own band.
 const TRANSPARENT_SURFACE: TThemeToken = '--primary';
 
 // A scrim is tested over the brightest photo it can sit on, the worst case for light copy.
 const PHOTO_BACKDROP: TOklchColor = { l: 1, c: 0, h: 0 };
 
+const styleValueOf = (
+  token: TThemeToken,
+  { cardStyle, headerControlStyle, navLinkStyle }: TContrastStyles,
+): TMaybeUndefined<string> =>
+  CARD_STYLE_DECLARATIONS[cardStyle][token] ??
+  HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle][token] ??
+  NAV_LINK_STYLE_DECLARATIONS[navLinkStyle][token];
+
+export const isTransparentToken = (
+  token: TThemeToken,
+  styles: TContrastStyles,
+): boolean => styleValueOf(token, styles) === TRANSPARENT;
+
 const resolveStop = (
   token: TThemeToken,
   context: Omit<TContrastContext, 'hue'>,
 ): TOklchRamp[TThemeToken] => {
-  const { scheme, cardStyle, headerControlStyle, navLinkStyle } = context;
-  const styleValue =
-    CARD_STYLE_DECLARATIONS[cardStyle][token] ??
-    HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle][token] ??
-    NAV_LINK_STYLE_DECLARATIONS[navLinkStyle][token];
-  if (styleValue === 'transparent') {
+  const { scheme } = context;
+  const styleValue = styleValueOf(token, context);
+  if (styleValue === TRANSPARENT) {
     return resolveStop(TRANSPARENT_SURFACE, context);
   }
   const alias =

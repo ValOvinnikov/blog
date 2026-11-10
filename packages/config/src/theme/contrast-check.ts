@@ -17,7 +17,11 @@ import {
   type TThemeToken,
 } from './contrast-pairs';
 import { findVaryingAxes, styleContextsFor } from './contrast-style-axes';
-import { measureContrast, tokenFollowsAccentHue } from './contrast-tokens';
+import {
+  isTransparentToken,
+  measureContrast,
+  tokenFollowsAccentHue,
+} from './contrast-tokens';
 
 export type TContrastFailure = {
   pair: TContrastPairId;
@@ -50,6 +54,7 @@ export const findContrastFailures = (): TContrastFailure[] =>
 
     return Object.values(COLOR_SCHEME).flatMap((scheme) =>
       styleContextsFor(varyingAxes).flatMap((styles) => {
+        if (isTransparentToken(foreground, styles)) return [];
         const context = { scheme, ...styles };
         const resolvedFollowsHue = tokens.some((token) =>
           tokenFollowsAccentHue(token, context),

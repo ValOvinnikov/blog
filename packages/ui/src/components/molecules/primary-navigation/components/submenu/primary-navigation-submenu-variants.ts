@@ -43,7 +43,7 @@ export const primaryNavigationSubmenuVariants = tv({
           'w-65 rounded-card p-2',
           'supports-[anchor-name:--a]:inset-auto supports-[anchor-name:--a]:m-0',
           'supports-[anchor-name:--a]:top-[anchor(bottom)] supports-[anchor-name:--a]:left-[anchor(left)]',
-          'supports-[anchor-name:--a]:mt-5 supports-[anchor-name:--a]:ml-[calc(var(--nav-link-padding-x,0px)-0.75rem)]',
+          'supports-[anchor-name:--a]:mt-[calc(1.25rem-var(--nav-link-padding-y,0px))] supports-[anchor-name:--a]:ml-[calc(var(--nav-link-padding-x,0px)-0.75rem)]',
           'supports-[anchor-name:--a]:[position-try-fallbacks:flip-inline]',
         ],
       },

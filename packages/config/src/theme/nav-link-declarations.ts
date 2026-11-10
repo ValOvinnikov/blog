@@ -38,7 +38,7 @@ export const NAV_LINK_STYLE_DECLARATIONS: Record<
   [NAV_LINK_STYLE.PILL]: {
     ...PADDED,
     '--nav-link-fill': TRANSPARENT,
-    '--nav-link-outline': 'currentColor',
+    '--nav-link-outline': 'var(--brand-primary)',
     '--nav-link-radius': RADIUS_PILL,
   },
 };
