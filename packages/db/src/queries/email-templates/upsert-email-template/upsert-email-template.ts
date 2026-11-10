@@ -3,22 +3,21 @@ import {
   type TEmailTemplateType,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import {
-  emailTemplateLogos,
+  getEmailTemplate,
+  type TEmailTemplateResult,
+} from '@blog/db/queries/email-templates/get-email-template';
+import {
   emailTemplates,
   type TEmailTemplateBlock,
 } from '@blog/db/schema/email-templates';
 import { tenants } from '@blog/db/schema/tenants';
-import { hasLength, isNull, isUndefined } from '@blog/utils/primitives';
-import { and, eq } from 'drizzle-orm';
+import { hasLength, isUndefined } from '@blog/utils/primitives';
+import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
-import {
-  getEmailTemplate,
-  type TEmailTemplateResult,
-} from '../get-email-template';
+import { writeEmailTemplateLogo } from './write-email-template-logo';
 
 const portableTextBlockSchema = z
   .object({ _type: z.string(), _key: z.string() })
@@ -94,34 +93,6 @@ async function writeCopy(
   }
 }
 
-async function writeLogo(
-  tenantId: string,
-  templateType: TEmailTemplateType,
-  logoAssetUrl: TMaybeNull<string>,
-): Promise<void> {
-  const db = getDb();
-
-  if (isNull(logoAssetUrl)) {
-    await db
-      .delete(emailTemplateLogos)
-      .where(
-        and(
-          eq(emailTemplateLogos.tenantId, tenantId),
-          eq(emailTemplateLogos.templateType, templateType),
-        ),
-      );
-    return;
-  }
-
-  await db
-    .insert(emailTemplateLogos)
-    .values({ tenantId, templateType, logoAssetUrl })
-    .onConflictDoUpdate({
-      target: [emailTemplateLogos.tenantId, emailTemplateLogos.templateType],
-      set: { logoAssetUrl, updatedAt: new Date() },
-    });
-}
-
 // The logo is the same in every language, so `locale` scopes only the
 // subject and body.
 export async function upsertEmailTemplate(
@@ -138,7 +109,7 @@ export async function upsertEmailTemplate(
     await writeCopy(tenantId, templateType, targetLocale, copyFields);
   }
   if (!isUndefined(parsed.logoAssetUrl)) {
-    await writeLogo(tenantId, templateType, parsed.logoAssetUrl);
+    await writeEmailTemplateLogo(tenantId, templateType, parsed.logoAssetUrl);
   }
 
   return getEmailTemplate(tenantId, templateType, targetLocale);
