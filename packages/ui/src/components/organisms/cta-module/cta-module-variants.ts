@@ -9,7 +9,7 @@ import type { VariantProps } from 'tailwind-variants';
 
 const CARD = [
   'mx-auto w-full max-w-4xl',
-  'rounded-card border border-border shadow-card',
+  'item-card',
   'px-[calc(var(--spacing-card-x)*1.5)] sm:px-[calc(var(--spacing-card-x)*2)]',
   'py-[calc(var(--spacing-card-y)*16/7)] sm:py-[calc(var(--spacing-card-y)*20/7)]',
 ];

@@ -18,12 +18,12 @@ export const popoverMenuItemVariants = tv({
   variants: {
     variant: {
       bordered: [
-        'justify-start rounded-sm border border-border-strong bg-surface px-3.5 py-2',
+        'justify-start rounded-button border border-border-strong bg-surface px-3.5 py-2',
         'font-mono text-label text-text',
         'hover:border-brand-primary hover:bg-surface hover:text-brand-primary',
       ],
       outlined: [
-        'justify-center rounded-sm border border-border-strong bg-transparent',
+        'justify-center rounded-button border border-border-strong bg-transparent',
         'font-medium',
         'hover:border-brand-primary hover:bg-transparent',
       ],

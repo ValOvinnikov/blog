@@ -6,6 +6,7 @@ export * from './auth-app';
 export * from './aside';
 export * from './brand-tagline';
 export * from './busy-button';
+export * from './button-shape';
 export * from './cache';
 export * from './capability';
 export * from './card-image-shape';

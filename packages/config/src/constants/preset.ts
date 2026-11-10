@@ -14,6 +14,7 @@ import {
   type TBusyButtonStyle,
   type TSpinnerStyle,
 } from './busy-button';
+import { BUTTON_SHAPE, type TButtonShape } from './button-shape';
 import { type TCapability, CAPABILITY } from './capability';
 import { type TCardStyle, CARD_STYLE } from './card-style';
 import {
@@ -109,6 +110,7 @@ export type TPresetBundle = {
   accountPhonePlacement: TAccountPhonePlacement;
   busyButtonStyle: TBusyButtonStyle;
   spinnerStyle: TSpinnerStyle;
+  buttonShape: TButtonShape;
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
@@ -135,6 +137,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
     busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
     spinnerStyle: SPINNER_STYLE.BRAILLE,
+    buttonShape: BUTTON_SHAPE.ROUNDED,
     headerLayout: HEADER_LAYOUT.CLASSIC,
     headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
     headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
@@ -168,6 +171,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
     busyButtonStyle: BUSY_BUTTON_STYLE.LABEL,
     spinnerStyle: SPINNER_STYLE.RING,
+    buttonShape: BUTTON_SHAPE.ROUNDED,
     headerLayout: HEADER_LAYOUT.CLASSIC,
     headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
     headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,

@@ -5,7 +5,7 @@ export const bookmarkToggleVariants = tv({
   slots: {
     root: [
       'inline-flex min-h-11 items-center gap-[0.7ch] sm:min-h-0',
-      'rounded-sm border border-border-strong bg-surface px-[0.8rem] py-2',
+      'rounded-button border border-border-strong bg-surface px-[0.8rem] py-2',
       'font-mono text-card-copy text-muted transition-colors duration-base ease-smooth',
       'cursor-pointer',
       'hover:border-brand-primary hover:text-brand-primary',

@@ -43,6 +43,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **BUSY_BUTTON_STYLE**: `LABEL`, `KEPT`, `EDGE`
 - **SPINNER_STYLE**: `BRAILLE`, `RING`, `DOTS`, `PULSE`
 
+### `@blog/config/constants` — `packages/config/src/constants/button-shape.ts`
+
+- **BUTTON_SHAPE**: `SQUARE`, `ROUNDED`, `PILL`
+
 ### `@blog/config/constants` — `packages/config/src/constants/capability.ts`
 
 - **CAPABILITY**: `READER_ACCOUNTS`, `COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`

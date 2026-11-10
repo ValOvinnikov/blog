@@ -4,7 +4,7 @@ export const signInPanelProviderVariants = tv({
   slots: {
     root: [
       'flex min-h-11 w-full items-center gap-2.5 px-3.5 text-left',
-      'rounded-sm border border-border-strong bg-surface',
+      'rounded-button border border-border-strong bg-surface',
       'font-display text-sm font-medium text-text',
       TRANSITION_COLORS,
       'cursor-pointer hover:border-brand-primary hover:text-brand-primary',

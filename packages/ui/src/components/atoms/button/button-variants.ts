@@ -10,7 +10,7 @@ import type { VariantProps } from 'tailwind-variants';
 export const buttonVariants = tv({
   base: [
     'inline-flex min-h-9 items-center justify-center',
-    'rounded-sm border',
+    'rounded-button border',
     'font-display font-medium',
     TRANSITION_COLORS,
     'relative cursor-pointer aria-busy:cursor-progress',
