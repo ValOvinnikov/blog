@@ -5,9 +5,9 @@ import { toLiveLanguagePages } from '@web/utils/to-live-language-pages';
 import { toLocalizedPathname } from '@web/utils/to-localized-pathname';
 import type { MetadataRoute } from 'next';
 
-type TTranslatedPage = { slug: string; language: TLocaleIsoCode };
+export type TTranslatedPage = { slug: string; language: TLocaleIsoCode };
 
-type TTranslatedSitemapContext = {
+export type TTranslatedSitemapContext = {
   translationMap: TTranslationMap;
   liveLocales: readonly TLocaleIsoCode[];
   defaultLocale: TLocaleIsoCode;
