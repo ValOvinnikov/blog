@@ -5,7 +5,7 @@ import { CardStyles } from '@blog/ui/testing/card-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
-import { fn } from 'storybook/test';
+import { fn, within } from 'storybook/test';
 
 import { AccountPanel, type TAccountPanelProps } from './account-panel';
 import { accountPanelVariants } from './account-panel-variants';
@@ -16,6 +16,7 @@ const READER = { name: 'Sam Reader', email: 'sam@example.com' };
 const BOOKMARKS_HREF = '#bookmarks';
 const SETTINGS_HREF = '#settings';
 const BOOKMARKS_DESCRIPTION = 'Posts you saved to read later';
+const BOOKMARKS_LABEL = 'My bookmarks';
 const SETTINGS_DESCRIPTION = 'Name, sign-in methods, your data';
 
 const InteractiveAccountPanel = (args: TAccountPanelProps) => {
@@ -60,7 +61,7 @@ const meta = {
     links: {
       bookmarks: {
         href: BOOKMARKS_HREF,
-        label: 'My bookmarks',
+        label: BOOKMARKS_LABEL,
         description: BOOKMARKS_DESCRIPTION,
       },
       settings: {
@@ -80,6 +81,21 @@ export default meta;
 type TStory = StoryObj<typeof meta>;
 
 export const Card: TStory = {};
+
+export const CurrentAndFocusedRows: TStory = {
+  name: 'Current row, with another row focused',
+  args: {
+    links: {
+      ...meta.args.links,
+      settings: { ...meta.args.links.settings, isCurrent: true },
+    },
+  },
+  play: ({ canvasElement }) => {
+    within(canvasElement)
+      .getByRole('menuitem', { name: BOOKMARKS_LABEL })
+      .focus();
+  },
+};
 
 export const Profile: TStory = {
   args: { appearance: ACCOUNT_PANEL_STYLE.PROFILE },

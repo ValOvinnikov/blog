@@ -8,6 +8,7 @@ import {
 import { AccountPanel } from '@blog/ui/components/molecules/account-panel';
 import { SmartLink } from '@web/components/shared/smart-link';
 import type { TPopoverPanel } from '@web/hooks/use-popover';
+import { usePublicPathname } from '@web/hooks/use-public-pathname';
 import { encodeClearedSignedInHint } from '@web/utils/signed-in-hint-cookie';
 import { signOut } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
@@ -36,6 +37,9 @@ export const ReaderAccountPanel = ({
 }: TReaderAccountPanelProps) => {
   const t = useTranslations('authMenu');
   const { panelId, open, panelRef } = panel;
+  const pathname = usePublicPathname();
+  const bookmarksHref = routes.bookmarks();
+  const settingsHref = routes.account();
 
   return (
     <AccountPanel
@@ -53,15 +57,17 @@ export const ReaderAccountPanel = ({
       links={{
         ...(hasBookmarks && {
           bookmarks: {
-            href: routes.bookmarks(),
+            href: bookmarksHref,
             label: t('myBookmarks'),
             description: t('myBookmarksDescription'),
+            isCurrent: pathname === bookmarksHref,
           },
         }),
         settings: {
-          href: routes.account(),
+          href: settingsHref,
           label: t('accountSettings'),
           description: t('accountSettingsDescription'),
+          isCurrent: pathname === settingsHref,
         },
       }}
       signOut={{

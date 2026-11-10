@@ -22,6 +22,7 @@ import type {
 } from './header-layout';
 import type { TBrandVariant } from './layout';
 import type { TNavLinkStyle } from './nav-link-style';
+import type { TThemeTokens } from './theme-tokens';
 
 export const PRESET_ID = {
   CONSOLE: 'CONSOLE',
@@ -73,18 +74,6 @@ export type TLanguageSwitcherStyle = TValueOf<typeof LANGUAGE_SWITCHER_STYLE>;
 
 export const HUE_MIN = 0;
 export const HUE_MAX = 360;
-
-export type TThemeTokens = {
-  accentHue: number;
-  logoHue?: number;
-  headingFont: TFontChoice;
-  bodyFont: TFontChoice;
-  radiusScale: TRadiusScale;
-  density: TDensity;
-  cardStyle?: TCardStyle;
-  headerControlStyle?: THeaderControlStyle;
-  buttonShape?: TButtonShape;
-};
 
 export type TPresetBundle = {
   themeTokens: TThemeTokens;

@@ -1,5 +1,3 @@
-// Public surface of the data layer. web imports `service` — never the raw client.
-
 import { createSkimService } from './features/editorial/skim';
 import { createModulesService } from './features/entities/modules';
 import { createPostsService } from './features/entities/posts';

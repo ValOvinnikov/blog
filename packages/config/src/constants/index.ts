@@ -65,5 +65,6 @@ export * from './taxonomy';
 export * from './tenant-sort';
 export * from './tenant-write-refusal';
 export * from './terms';
+export * from './theme-tokens';
 export * from './timeline';
 export * from './toast';

@@ -616,6 +616,14 @@
   --divider: var(--border);
 }
 
+/* Unsets a band's mixed --tint, so menu rows tint with --brand-primary-muted on
+   the panel's own --surface wherever the menu opens. */
+@utility surface-popover {
+  --ambient: var(--surface);
+  --divider: var(--border);
+  --tint: initial;
+}
+
 /* The accent bar is drawn over the left border's straight run, between the
    corners, so it stays a straight bar on a rounded card; where it matches the
    border (Outlined) it is invisible. It is a border, not a background, because
