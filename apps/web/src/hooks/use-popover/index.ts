@@ -1,1 +1,5 @@
-export { usePopover } from './use-popover';
+export {
+  usePopover,
+  type TPopoverPanel,
+  type TUsePopoverResult,
+} from './use-popover';

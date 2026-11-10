@@ -2,7 +2,6 @@ import { getEnabledOAuthProviderIds } from '@blog/auth/utils/oauth-providers/oau
 import { ACCOUNT_PHONE_PLACEMENT, CAPABILITY } from '@blog/config';
 import { service } from '@blog/service';
 import { Header } from '@blog/ui/components/organisms/header';
-import { AuthMenu } from '@web/components/shared/auth-menu';
 import { BrandLockupLink } from '@web/components/shared/brand-lockup-link';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
 import { SiteNavigation } from '@web/components/shared/site-navigation';
@@ -22,6 +21,7 @@ import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-s
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { logger } from '@web/utils/logger/logger';
 
+import { AuthMenu } from './components/auth-menu/auth-menu';
 import { StickyHeaderFrame } from './components/sticky-header-frame/sticky-header-frame';
 
 export const SiteHeader = async () => {

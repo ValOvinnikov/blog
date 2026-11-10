@@ -1,7 +1,7 @@
 'use client';
 
 import { useDismissibleMenu } from '@web/hooks/use-dismissible-menu';
-import { useCallback, useRef } from 'react';
+import { useCallback, useId, useRef } from 'react';
 
 export type TUsePopoverOptions = {
   trapFocus?: boolean;
@@ -9,15 +9,12 @@ export type TUsePopoverOptions = {
   overlayId?: string;
 };
 
-/**
- * `close` is exposed alongside `toggle` for dismissing the panel from an
- * action inside it that isn't itself a focus-out (e.g. a link click).
- */
 export const usePopover = ({
   trapFocus,
   closeOnFocusOut,
   overlayId,
 }: TUsePopoverOptions = {}) => {
+  const panelId = useId();
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -32,5 +29,12 @@ export const usePopover = ({
     overlayId,
   });
 
-  return { open, toggle, close, triggerRef, panelRef };
+  return { open, toggle, close, panelId, triggerRef, panelRef };
 };
+
+export type TUsePopoverResult = ReturnType<typeof usePopover>;
+
+export type TPopoverPanel = Pick<
+  TUsePopoverResult,
+  'panelId' | 'open' | 'panelRef'
+>;

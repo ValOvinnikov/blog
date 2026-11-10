@@ -1,6 +1,6 @@
 import type { IAccountControl } from '@blog/config';
-import { authMenuVariants } from '@web/components/shared/auth-menu/auth-menu-variants';
-import { AccountTriggers } from '@web/components/shared/auth-menu/components/account-triggers/account-triggers';
+import { authMenuVariants } from '@web/components/shared/site-header/components/auth-menu/auth-menu-variants';
+import { AccountTriggers } from '@web/components/shared/site-header/components/auth-menu/components/account-triggers/account-triggers';
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
@@ -25,8 +25,7 @@ export const AccountPlaceholder = ({
         <AccountTriggers
           accountControl={accountControl}
           user={undefined}
-          isOpen={false}
-          panelId={panelId}
+          popover={{ open: false, panelId }}
           className={emptyOutline()}
         />
       </span>

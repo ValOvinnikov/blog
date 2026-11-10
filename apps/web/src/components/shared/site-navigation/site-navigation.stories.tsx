@@ -8,8 +8,8 @@ import {
 } from '@blog/config';
 import { OAUTH_PROVIDER } from '@blog/config/constants';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { AuthMenu } from '@web/components/shared/auth-menu';
 import { LanguageSwitcher } from '@web/components/shared/language-switcher';
+import { AuthMenu } from '@web/components/shared/site-header/components/auth-menu/auth-menu';
 import { ThemeToggleButton } from '@web/components/shared/theme-toggle-button';
 import { HeaderOverlayProvider } from '@web/context/header-overlay-provider';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';

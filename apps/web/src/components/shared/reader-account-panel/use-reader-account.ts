@@ -1,11 +1,12 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
-import type { IReaderAccountUser } from '@web/components/shared/auth-menu/components/reader-account-panel/reader-account-panel';
 import { SESSION_STATUS } from '@web/constants/session';
 import { toSessionUsername } from '@web/utils/to-session-username';
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
+
+import type { IReaderAccountUser } from './reader-account-panel';
 
 export const useReaderAccount = () => {
   const { status, data } = useSession();

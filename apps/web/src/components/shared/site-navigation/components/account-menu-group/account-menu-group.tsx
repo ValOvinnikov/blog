@@ -3,8 +3,10 @@
 import type { TOAuthProviderId } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { ICONS, SIZE, type TAccountPanelStyle } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
-import { ReaderAccountPanel } from '@web/components/shared/auth-menu/components/reader-account-panel/reader-account-panel';
-import { useReaderAccount } from '@web/components/shared/auth-menu/hooks/use-reader-account';
+import {
+  ReaderAccountPanel,
+  useReaderAccount,
+} from '@web/components/shared/reader-account-panel';
 import { ReaderSignInPanel } from '@web/components/shared/reader-sign-in-panel';
 import { SESSION_STATUS } from '@web/constants/session';
 import { useOverlayOpenState } from '@web/hooks/use-overlay-open-state';
@@ -34,6 +36,7 @@ export const AccountMenuGroup = ({
     overlayId: panelId,
   });
   const { group, row, glyph, chevron, panel } = accountMenuGroupVariants();
+  const panelState = { panelId, open: isExpanded, panelRef };
 
   if (status === SESSION_STATUS.LOADING) {
     return null;
@@ -57,16 +60,12 @@ export const AccountMenuGroup = ({
           user={user}
           onImageError={onImageError}
           hasBookmarks={hasBookmarks}
-          panelId={panelId}
-          isOpen={isExpanded}
-          panelRef={panelRef}
+          panel={panelState}
           className={panel()}
         />
       ) : (
         <ReaderSignInPanel
-          panelId={panelId}
-          isOpen={isExpanded}
-          panelRef={panelRef}
+          panel={panelState}
           oauthProviderIds={oauthProviderIds}
           className={panel()}
         />
