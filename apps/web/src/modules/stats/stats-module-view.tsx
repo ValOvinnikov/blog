@@ -1,3 +1,4 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { TStatsModule } from '@blog/service';
 import { Text } from '@blog/ui/components/atoms/text';
 import { ModuleActions } from '@web/components/shared/module-actions';
@@ -5,10 +6,9 @@ import { ModuleSection } from '@web/components/shared/module-section';
 
 import { statsModuleViewVariants } from './stats-module-view-variants';
 
-export interface IStatsModuleViewProps {
+export interface IStatsModuleViewProps extends IWithDataTestId {
   module: TStatsModule;
   titleId: string;
-  dataTestId: string;
 }
 
 export const StatsModuleView = ({

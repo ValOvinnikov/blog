@@ -1,3 +1,4 @@
+import type { IWithDataTestId } from '@blog/config';
 import type { TFaqModule } from '@blog/service';
 import { Accordion } from '@blog/ui/components/organisms/accordion';
 import { ModuleActions } from '@web/components/shared/module-actions';
@@ -6,10 +7,9 @@ import { PortableText } from '@web/components/shared/portable-text';
 
 import { faqModuleViewVariants } from './faq-module-view-variants';
 
-export interface IFaqModuleViewProps {
+export interface IFaqModuleViewProps extends IWithDataTestId {
   module: TFaqModule;
   titleId: string;
-  dataTestId: string;
 }
 
 export const FaqModuleView = ({
