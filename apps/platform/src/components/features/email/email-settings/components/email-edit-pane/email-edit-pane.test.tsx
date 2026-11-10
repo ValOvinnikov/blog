@@ -27,13 +27,10 @@ const onSenderChange = vi.fn();
 const onDraftChange = vi.fn();
 
 const setup = customRenderInSettingsForm(EmailEditPane, {
-  item: EMAIL_SENDER_ITEM,
-  locale: EN,
+  selection: { item: EMAIL_SENDER_ITEM, locale: EN },
   defaultLocale: EN,
-  draft: MOCK_DRAFT,
-  saved: MOCK_DRAFT,
-  revision: 0,
-  senderFieldIds: MOCK_SENDER_FIELD_IDS,
+  draft: { values: MOCK_DRAFT, saved: MOCK_DRAFT, revision: 0 },
+  senderFields: { ids: MOCK_SENDER_FIELD_IDS },
   onSenderChange,
   onDraftChange,
 });
@@ -60,7 +57,7 @@ describe(`<${EmailEditPane.name}/>`, () => {
   });
 
   it("edits a template's copy in the chosen language", async () => {
-    setup({ item: MAGIC_LINK, locale: FR });
+    setup({ selection: { item: MAGIC_LINK, locale: FR } });
 
     const subjectInput = screen.getByLabelText(FRENCH_SUBJECT_LABEL);
     await user.type(subjectInput, MOCK_TYPED_CHARACTER);

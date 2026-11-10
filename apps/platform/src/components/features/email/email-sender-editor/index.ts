@@ -1,1 +1,4 @@
-export { EmailSenderEditor } from './email-sender-editor';
+export {
+  EmailSenderEditor,
+  type TEmailSenderEditorProps,
+} from './email-sender-editor';

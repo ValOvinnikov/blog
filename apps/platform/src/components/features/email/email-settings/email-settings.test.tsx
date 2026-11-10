@@ -33,6 +33,7 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { EMAIL_SENDER_ITEM } from '@platform/utils/email-draft/email-draft';
 import type { UserEvent } from '@testing-library/user-event';
@@ -166,7 +167,9 @@ describe(`<${EmailSettings.name}/>`, () => {
   });
 
   it('is read-only for an archived tenant', () => {
-    setupEmailSettings({ archivedAt: MOCK_ARCHIVED_AT });
+    setupEmailSettings({
+      tenant: mockTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+    });
 
     expectArchivedOffersNoSave();
     const senderNameInput = screen.getByLabelText(SENDER_NAME);
