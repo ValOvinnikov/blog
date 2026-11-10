@@ -1,4 +1,5 @@
 export * from './accent-hue-guard';
+export * from './card-style-declarations';
 export * from './contrast-check';
 export * from './contrast-pairs';
 export * from './contrast-tokens';

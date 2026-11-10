@@ -10,12 +10,12 @@ import {
   type TNavLinkStyle,
 } from '@blog/config/constants';
 
+import { CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';
 import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
 import {
   ACCENT_RAMP_DARK,
   ACCENT_RAMP_LIGHT,
-  CARD_STYLE_DECLARATIONS,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   IMAGE_SCRIM_RAMP,
   type TOklchRamp,

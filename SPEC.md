@@ -1532,7 +1532,7 @@ five `--radius*` tokens and `density` the nine layout `--spacing-*` tokens
 (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, `band`)
 under `:root` only, the accent hue also sets the on-image and
 `--scrim-brand-*` tokens (`IMAGE_SCRIM_RAMP`) under `:root` only,
-and `cardStyle` sets the five `--item-*` tokens the `item-card` utility reads,
+and `cardStyle` sets the seven `--item-*` tokens the `item-card` utility reads,
 also under `:root` only — `ACCENT_BAR` a borderless card with a 2px brand bar
 on the left, `OUTLINED` a hairline border all round; both at `--radius-md`, so
 `radiusScale` reaches item cards under either style.
@@ -3057,19 +3057,31 @@ Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, each
 contact-form success card and the `CtaModule.Callout` and `CtaModule.Split`
 box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
-five inherited `--item-*` properties rather than fixed classes, and each pairs
+seven inherited `--item-*` properties rather than fixed classes, and each pairs
 it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
 the values site-wide on the Look page (`site_config.card_style`), and
 `buildThemeStyleBlock` declares them under `:root` from `@blog/config`'s
 `CARD_STYLE_DECLARATIONS`:
 
-| Property              | `ACCENT_BAR` (default) | `OUTLINED`         |
-| --------------------- | ---------------------- | ------------------ |
-| `--item-radius`       | `var(--radius-md)`     | `var(--radius-md)` |
-| `--item-border-width` | `0px`                  | `1px`              |
-| `--item-accent-width` | `2px`                  | `1px`              |
-| `--item-accent-color` | `var(--brand-primary)` | `var(--border)`    |
-| `--item-shadow`       | `none`                 | `none`             |
+| Property               | `ACCENT_BAR` (default) | `OUTLINED`         |
+| ---------------------- | ---------------------- | ------------------ |
+| `--item-radius`        | `var(--radius-md)`     | `var(--radius-md)` |
+| `--item-border-width`  | `0px`                  | `1px`              |
+| `--item-accent-width`  | `2px`                  | `1px`              |
+| `--item-accent-color`  | `var(--brand-primary)` | `var(--border)`    |
+| `--item-shadow`        | `none`                 | `none`             |
+| `--item-fill-mix`      | `0%`                   | `0%`               |
+| `--item-divider-width` | `0px`                  | `0px`              |
+
+The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
+band owns `--item-fill`, the tint a filled card takes on it
+(`surface-secondary` → `--brand-primary-muted`, `surface-brand-primary` →
+`--tint`, the page ground's fallback `--brand-primary-muted`, unset by
+`surface-popover`); card style sets only the mix, because a `var()` inside a
+custom property resolves where it is declared, so a colour declared on `:root`
+would ignore the band. Every `Accordion` item but the first draws a top border
+at the wider of `--item-divider-width` and `--item-border-width`, so a style
+with no frame still separates its items.
 
 `--radius-item` exposes `--item-radius` as `rounded-item`. The accent bar is an
 `::after` over the left border's straight run, between the corners, so it stays

@@ -1,4 +1,7 @@
-import { CardStyles } from '@blog/ui/testing/card-styles';
+import {
+  CardStyles,
+  FilledAndUnframedOnEachBand,
+} from '@blog/ui/testing/card-styles';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { within } from 'storybook/test';
@@ -41,6 +44,17 @@ export const Default: TStory = {};
 
 export const InEachCardStyle: TStory = {
   render: (args) => <CardStyles>{() => <Accordion {...args} />}</CardStyles>,
+};
+
+export const FilledAndUnframed: TStory = {
+  name: 'Filled and unframed, on each band',
+  render: (args) => (
+    <FilledAndUnframedOnEachBand>
+      <div style={{ flex: 1 }}>
+        <Accordion {...args} />
+      </div>
+    </FilledAndUnframedOnEachBand>
+  ),
 };
 
 export const EightItems: TStory = {

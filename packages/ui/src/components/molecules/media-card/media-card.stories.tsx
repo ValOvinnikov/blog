@@ -5,6 +5,7 @@ import {
   BrandBand,
   focusLastLink,
 } from '@blog/ui/testing/brand-bands';
+import { FilledAndUnframedOnEachBand } from '@blog/ui/testing/card-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -513,6 +514,21 @@ export const OnSecondaryBand = restingAndFocusedOn(BRAND_VARIANT.SECONDARY);
 export const OnBrandPrimaryBand = restingAndFocusedOn(
   BRAND_VARIANT.BRAND_PRIMARY,
 );
+
+export const FilledAndUnframed: TStory = {
+  name: 'Filled and unframed, on each band',
+  args: IconMedia.args,
+  render: (args) => (
+    <FilledAndUnframedOnEachBand>
+      <div style={{ width: 280 }}>
+        <MediaCard {...args} />
+      </div>
+      <div style={{ width: 280 }}>
+        <MediaCard {...args} isInteractive={false} />
+      </div>
+    </FilledAndUnframedOnEachBand>
+  ),
+};
 
 export const Static: TStory = {
   args: {
