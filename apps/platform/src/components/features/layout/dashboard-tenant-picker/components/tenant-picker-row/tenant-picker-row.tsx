@@ -14,7 +14,7 @@ export type TTenantPickerRowProps = {
 export const TenantPickerRow = ({ tenant }: TTenantPickerRowProps) => {
   const t = useTranslations('dashboardTenantPicker');
   const tRole = useTranslations('roleLabel');
-  const tTenants = useTranslations('tenantsTable');
+  const tPlan = useTranslations('planNames');
   const { id, name, primaryDomain, isArchived, role, plan } = tenant;
   const {
     row,
@@ -57,7 +57,7 @@ export const TenantPickerRow = ({ tenant }: TTenantPickerRowProps) => {
                 </span>
               </>
             )}
-            <span>{tTenants(`plan.${plan}`)}</span>
+            <span>{tPlan(plan)}</span>
           </span>
           <Icon name={ICONS.CHEVRON_RIGHT} className={chevron()} />
         </>

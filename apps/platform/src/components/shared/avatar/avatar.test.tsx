@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { Avatar } from './avatar';
@@ -15,7 +16,10 @@ const MOCK_EMAIL = faker.internet.email({ firstName: MOCK_LAST_NAME });
 const MOCK_INITIALS =
   `${MOCK_FIRST_NAME.charAt(0)}${MOCK_LAST_NAME.charAt(0)}`.toUpperCase();
 
-const setup = customRender(Avatar, { name: MOCK_FULL_NAME, variant: 'table' });
+const setup = customRender(Avatar, {
+  name: MOCK_FULL_NAME,
+  variant: AVATAR_VARIANT.TABLE,
+});
 
 describe(`<${Avatar.name}/>`, () => {
   it.each([

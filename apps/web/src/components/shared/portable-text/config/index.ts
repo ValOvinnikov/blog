@@ -8,13 +8,13 @@ import {
 
 import { blockComponents } from './block';
 import { CookieList } from './cookie-list';
+import { makeExpandableSectionTypeComponent } from './expandable-section';
 import { listComponents } from './list';
 import { markComponents } from './marks';
 import {
   bodyImageTypeComponent,
   codeTypeComponent,
   makeAsideTypeComponent,
-  makeExpandableSectionTypeComponent,
   makeTableTypeComponent,
   type TAsideKindLabels,
 } from './types';

@@ -14,7 +14,6 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'node',
-      mockReset: true,
       include: ['src/**/*.{test,spec}.ts'],
       env: {
         // env.ts validates at import time; SKIP_ENV_VALIDATION lets tests

@@ -70,7 +70,7 @@ describe(`<${LookForm.name}/> spinner`, () => {
       expect(edgeNote).toBeVisible();
     });
 
-    it('shows no progress edge note while busy buttons keep their label', () => {
+    it('shows no progress edge note for the default busy button style', () => {
       const edgeNote = screen.queryByText(LOOK_FORM.spinnerEdgeNote);
 
       expect(edgeNote).not.toBeInTheDocument();

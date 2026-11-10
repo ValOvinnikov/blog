@@ -277,10 +277,6 @@
       "SUSPENDED": "Gesperrt",
       "ARCHIVED": "Archiviert"
     },
-    "plan": {
-      "FREE": "Free",
-      "GROWTH": "Growth"
-    },
     "manage": "Verwalten",
     "manageAriaLabel": "{tenantName} verwalten"
   },
@@ -1278,8 +1274,6 @@
     "siteAddressLabel": "Adresse der Website",
     "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
     "planLabel": "Tarif",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "ownerEmailLabel": "E-Mail des Inhabers",
     "ownerEmailHint": "Die Person, die diesen Mandanten verwaltet. Ein bestehendes Konto erhält sofort Zugriff; eine neue Adresse erhält eine Einladung per E-Mail zur Anmeldung.",
     "submitButton": "Bereitstellung starten",
@@ -1439,8 +1433,6 @@
     "domainLabel": "Primäre Domain",
     "ownerEmailLabel": "E-Mail des Inhabers",
     "planLabel": "Tarif",
-    "planOptionFree": "Free",
-    "planOptionGrowth": "Growth",
     "localeLabel": "Standardsprache",
     "saveButton": "Änderungen speichern",
     "savingButton": "Wird gespeichert…",
@@ -1631,6 +1623,10 @@
     "FR": "Französisch",
     "DE": "Deutsch",
     "ES": "Spanisch"
+  },
+  "planNames": {
+    "FREE": "Free",
+    "GROWTH": "Growth"
   },
   "languagesSettings": {
     "heading": "Sprachen",

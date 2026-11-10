@@ -9,6 +9,7 @@ import {
 } from '@platform/components/shared/data-table-shell';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { formatDate } from '@platform/utils/format-date/format-date';
@@ -46,6 +47,7 @@ export const TenantsTable = ({
 }: TTenantsTableProps) => {
   const t = useTranslations('tenantsTable');
   const tView = useTranslations('tenantsView');
+  const tPlan = useTranslations('planNames');
   const locale = useLocale();
   const { navigate } = useTenantsListNavigation(listQuery);
   const [sort, setOptimisticSort] = useOptimistic(listQuery.sort);
@@ -84,7 +86,7 @@ export const TenantsTable = ({
         <DataTableShell.Row key={tenant.id}>
           <DataTableShell.Cell>
             <div className={tname()}>
-              <Avatar name={tenant.name} variant="table" />
+              <Avatar name={tenant.name} variant={AVATAR_VARIANT.TABLE} />
               <div>
                 <div className={name()}>{tenant.name}</div>
                 <div className={domain()}>{tenant.primaryDomain}</div>
@@ -93,7 +95,7 @@ export const TenantsTable = ({
           </DataTableShell.Cell>
           <DataTableShell.Cell>
             <StatusBadge tone="plan" hasDot={false}>
-              {t(`plan.${tenant.plan}`)}
+              {tPlan(tenant.plan)}
             </StatusBadge>
           </DataTableShell.Cell>
           <DataTableShell.Cell>

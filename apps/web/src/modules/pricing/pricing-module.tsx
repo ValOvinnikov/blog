@@ -1,5 +1,6 @@
 import { PRICE_PERIOD } from '@blog/config';
 import { service } from '@blog/service';
+import { PRICING_LOG } from '@web/constants/pricing';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
@@ -21,11 +22,11 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
   ]);
 
   if (!result.ok) {
-    logger.error('pricing_module.fetch_failed', { id, error: result.error });
+    logger.error(PRICING_LOG.MODULE_FETCH_FAILED, { id, error: result.error });
     return null;
   }
   if (!settingsResult.ok) {
-    logger.error('pricing_module.site_settings_failed', {
+    logger.error(PRICING_LOG.SITE_SETTINGS_FAILED, {
       id,
       error: settingsResult.error,
     });
@@ -33,20 +34,26 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
   }
 
   const { tiers, ...pricingModule } = result.data;
+  const { currency, pricePeriodWording } = settingsResult.data;
   const panels = toPricingPanels({
     tiers,
     locale,
-    currency: settingsResult.data.currency,
+    currency,
     labels: {
       free: t('free'),
       compareAtLabel: t('compareAtLabel'),
       from: t('from'),
       periods: {
-        [PRICE_PERIOD.ONE_TIME]: t('period.ONE_TIME'),
-        [PRICE_PERIOD.HOUR]: t('period.HOUR'),
-        [PRICE_PERIOD.SESSION]: t('period.SESSION'),
-        [PRICE_PERIOD.MONTH]: t('period.MONTH'),
-        [PRICE_PERIOD.YEAR]: t('period.YEAR'),
+        [PRICE_PERIOD.ONE_TIME]:
+          pricePeriodWording[PRICE_PERIOD.ONE_TIME] ?? t('period.ONE_TIME'),
+        [PRICE_PERIOD.HOUR]:
+          pricePeriodWording[PRICE_PERIOD.HOUR] ?? t('period.HOUR'),
+        [PRICE_PERIOD.SESSION]:
+          pricePeriodWording[PRICE_PERIOD.SESSION] ?? t('period.SESSION'),
+        [PRICE_PERIOD.MONTH]:
+          pricePeriodWording[PRICE_PERIOD.MONTH] ?? t('period.MONTH'),
+        [PRICE_PERIOD.YEAR]:
+          pricePeriodWording[PRICE_PERIOD.YEAR] ?? t('period.YEAR'),
       },
     },
   });

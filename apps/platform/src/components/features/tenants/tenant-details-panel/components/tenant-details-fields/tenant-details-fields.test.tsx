@@ -23,14 +23,15 @@ import {
   type TTenantDetailsFieldsProps,
 } from './tenant-details-fields';
 
-const { tenantDetailsPanel, tenantFieldErrors, languageNames } = messages;
+const { tenantDetailsPanel, tenantFieldErrors, languageNames, planNames } =
+  messages;
 const t = makeEnTranslator();
 
 const ARIA_PRESSED = 'aria-pressed';
 const NAME_LABEL = tenantDetailsPanel.nameLabel;
 const PLAN_LABEL = tenantDetailsPanel.planLabel;
-const FREE_LABEL = tenantDetailsPanel.planOptionFree;
-const GROWTH_LABEL = tenantDetailsPanel.planOptionGrowth;
+const FREE_LABEL = planNames[TENANT_PLAN.FREE];
+const GROWTH_LABEL = planNames[TENANT_PLAN.GROWTH];
 const ENGLISH_LABEL = languageNames[LOCALE_ISO_CODES.EN];
 const DUTCH_LABEL = languageNames[LOCALE_ISO_CODES.NL];
 const MOCK_TYPED_CHARACTER = 'x';

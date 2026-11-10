@@ -9,7 +9,6 @@ import {
 import type { TPortableTextBody } from '@blog/service';
 import { ImageWithCaption } from '@blog/ui/components/molecules/image-with-caption';
 import { Table } from '@blog/ui/components/molecules/table';
-import { Accordion } from '@blog/ui/components/organisms/accordion';
 import { hasLength } from '@blog/utils/primitives';
 import {
   PortableText as PortableTextRoot,
@@ -30,11 +29,6 @@ export type TAsideKindLabels = Partial<Record<TAsideKind, string>>;
 type TResolvedAsideBlock = Extract<
   TPortableTextBody[number],
   { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.ASIDE }
->;
-
-type TResolvedExpandableSectionBlock = Extract<
-  TPortableTextBody[number],
-  { _type: typeof PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION }
 >;
 
 type TResolvedTableBlock = Extract<
@@ -97,32 +91,6 @@ export const makeAsideTypeComponent = (
   };
 
   return AsideType;
-};
-
-export const makeExpandableSectionTypeComponent = (
-  baseComponents: PortableTextReactComponents,
-) => {
-  const ExpandableSectionType = ({
-    value,
-  }: {
-    value: TResolvedExpandableSectionBlock;
-  }) => (
-    <div {...{ [FULL_BLEED_DATA_ATTR]: '' }} className={s.expandableSection()}>
-      <Accordion>
-        <Accordion.Item>
-          <Accordion.Trigger>{value.title}</Accordion.Trigger>
-          <Accordion.Panel>
-            <PortableTextRoot
-              value={value.body ?? []}
-              components={baseComponents}
-            />
-          </Accordion.Panel>
-        </Accordion.Item>
-      </Accordion>
-    </div>
-  );
-
-  return ExpandableSectionType;
 };
 
 export const makeTableTypeComponent = (

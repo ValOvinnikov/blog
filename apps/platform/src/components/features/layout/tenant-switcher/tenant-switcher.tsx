@@ -8,6 +8,7 @@ import { menuSurfaceVariants } from '@platform/components/shared/menu-surface';
 import { NestableMenuRoot } from '@platform/components/shared/nestable-menu-root';
 import { NestableMenuTrigger } from '@platform/components/shared/nestable-menu-trigger';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { AVATAR_VARIANT } from '@platform/constants/avatar';
 import { useIsNestedMenu } from '@platform/context/nested-menu-provider';
 import { Link } from '@platform/i18n/navigation';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -55,7 +56,7 @@ export const TenantSwitcher = ({
   return (
     <NestableMenuRoot>
       <NestableMenuTrigger className={trigger()} title={active.name}>
-        <Avatar name={active.name} variant="switcher" />
+        <Avatar name={active.name} variant={AVATAR_VARIANT.SWITCHER} />
         <span className={meta()}>
           <span className={nameRow()}>
             <span className={name()}>{active.name}</span>

@@ -34,15 +34,15 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - **`module_pricing`** — `title`, `brandVariant`, `headingBlock`, `tiers[]` (`pricingTier`), `footnote` (per language), `ctaButtons`, `contentAlignment` (Left or Center), `layout` (`wideLayout`).
 - **`pricingTier`** — `name`, `description`, `priceLabel`, `highlightLabel` and `footnote` (each per-language one line), `prices[]` (`pricingPrice`), `features[]` (`pricingFeature`: one per-language `text`; the list itself is shared by every language), `ctaButtons`.
 - **`pricingPrice`** — `period` (`PRICE_PERIOD`: `ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`), `amount` (number, ≥ 0, two decimals), `compareAtAmount` (optional, struck through), `isStartingAt` (shows "From").
-- **`settings_site.pricePeriodSuffix`** — one per-language one-line string per `PRICE_PERIOD`, the editor's wording for that period after a price; any may be left empty. A tenant created from starter content gets the `pricingModule.period.*` catalogue wording in its starter language. Nothing reads it yet: the site still shows the catalogue wording.
-- **Service** — `getPricingModule` returns `TPricingModule`. The transformer reads feature `text` through `getLocalizedField` (request language, falling back to the default language) and drops a feature with text in neither, trims `highlightLabel` (blank means not highlighted) and reads `isStartingAt` as false when unset.
-- **Web** — `PricingModule` also reads Site Settings for the currency and the `pricingModule.*` catalogue for "Free", "From", "Regular price", the period suffixes and the tab labels. `toPricingPanels` turns tiers into one panel, or a Monthly and a Yearly panel, of formatted cards.
+- **`settings_site.pricePeriodSuffix`** — one per-language one-line string per `PRICE_PERIOD`, the editor's wording for that period after a price; any may be left empty. A tenant created from starter content gets the `pricingModule.period.*` catalogue wording in its starter language.
+- **Service** — `getSiteSettings` returns `pricePeriodWording`, each period's wording in the request language, falling back to the default language, else `undefined`. `getPricingModule` returns `TPricingModule`. The transformer reads feature `text` through `getLocalizedField` (request language, falling back to the default language) and drops a feature with text in neither, trims `highlightLabel` (blank means not highlighted) and reads `isStartingAt` as false when unset.
+- **Web** — `PricingModule` also reads Site Settings for the currency and the `pricingModule.*` catalogue for "Free", "From", "Regular price" and the tab labels. Each period reads the site's `pricePeriodWording`, falling back to the `pricingModule.period.*` catalogue wording in the reader's language. `toPricingPanels` turns tiers into one panel, or a Monthly and a Yearly panel, of formatted cards.
 - **Caching** — the module query is tagged `modules:pricing`, `module:<id>`, `link`, `homePage` and `page_landing`; Site Settings carries its own tags ([rendering-and-caching](./rendering-and-caching.md)).
 
 ## Configuration
 
 - Editors (Studio) author tiers and prices; the currency is a required Site Settings field, and the price period wording an optional one.
-- The `pricingModule.*` strings are fixed (`VOICE_FIXED_KEYS`), translated per site language, not tenant-editable ([voice](./voice.md)).
+- The `pricingModule.*` strings are fixed (`period.*` is the fallback for a period the site leaves empty) (`VOICE_FIXED_KEYS`), translated per site language, not tenant-editable ([voice](./voice.md)).
 - Not plan-gated or capability-gated today ([plans-and-entitlements](./plans-and-entitlements.md)).
 - Look reach: the accent hue colours the highlighted tier and the badge; radius, card style and fonts apply through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Each tier is an item card following the radius scale: borderless with a straight brand bar on its left under Accent bar, outlined under Outlined. The highlighted tier adds a brand-colour border on all sides and the card shadow in both styles.
 
@@ -55,7 +55,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - The switch appears only when at least one tier has a `MONTH` price and at least one has a `YEAR` price; it opens on Monthly. On each tab a tier headlines that period's price and lists its non-recurring prices (one-time, hour, session) as extras; a tier with no price for the tab headlines its first price. Without the switch, each tier headlines its first price and lists the rest as extras.
 - Both panels are server-rendered; the client `PricingPeriodSwitch` (a `SegmentedControl`) only toggles `hidden`.
 - Each panel's `PricingCard`s sit in `@blog/ui`'s `PricingCardGrid`, with `columns` set to the tier count. It lines up prices, feature lists and actions row by row across tiers. Its columns step on the width of its own container, not the viewport, so tiers beside a sidebar keep a readable width. Stacked tiers are centred at a capped width.
-- A failed module or Site Settings fetch logs (`pricing_module.fetch_failed` / `pricing_module.site_settings_failed`) and renders nothing.
+- A failed module or Site Settings fetch logs (`PRICING_LOG` in `apps/web/src/constants/pricing.ts`) and renders nothing.
 
 ## Dependencies
 
@@ -68,6 +68,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - `packages/studio/src/schema-types/modules/pricing/pricing.ts`
 - `packages/studio/src/schema-types/objects/pricing-tier/pricing-tier.ts`, `pricing-price/pricing-price.ts`, `pricing-feature/pricing-feature.ts`
 - `packages/studio/src/schema-types/documents/settings/site-settings/site-settings.ts` (`currency`), `price-period-wording-field.ts` (`pricePeriodSuffix`)
+- `packages/service/src/features/global/site-settings/adaptor/query.ts`, `transformer.ts` (`pricePeriodWording`)
 - `packages/service/src/features/modules/pricing/adaptor/query.ts`, `loader.ts`, `transformer.ts`, `types.ts`
 - `packages/ui/src/components/molecules/pricing-card/pricing-card.tsx`
 - `apps/web/src/modules/pricing/pricing-module.tsx`, `pricing-module-view.tsx`
@@ -78,7 +79,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 
 - Config: `starter-content.test.ts` (the seeded period wording).
 - Studio: `validate-pricing-{compare-at-above-amount,price-periods-unique,single-highlighted-tier,tier-price-label-required}.test.ts`.
-- Service: `features/modules/pricing/adaptor/{loader,query,transformer}.test.ts`.
+- Service: `features/modules/pricing/adaptor/{loader,query,transformer}.test.ts`, `features/global/site-settings/adaptor/loader.test.ts` (the period wording).
 - UI: `pricing-card.test.tsx`, `pricing-card.stories.tsx`, `pricing-card-grid.stories.tsx`.
 - Web: `pricing-module.test.tsx`, `pricing-module-view.test.tsx`, `pricing-period-switch.test.tsx`, `to-pricing-panels.test.ts`, `format-price-amount.test.ts`; fixtures in `apps/web/src/testing/modules/pricing/fixtures.ts`; story `pricing-module-view.stories.tsx`.
 

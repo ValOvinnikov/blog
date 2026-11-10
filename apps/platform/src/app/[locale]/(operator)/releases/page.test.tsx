@@ -37,7 +37,7 @@ vi.mock('@blog/db', async () => ({
       getLatestPassingContrastSha: vi.fn(),
     },
     tenants: {
-      listActiveTenants: vi.fn().mockResolvedValue([]),
+      listActiveTenants: vi.fn(async () => []),
     },
   },
 }));

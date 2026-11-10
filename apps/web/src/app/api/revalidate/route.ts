@@ -1,28 +1,20 @@
-import type { TMaybeUndefined } from '@blog/config';
 import { HTTP_STATUS } from '@blog/config/constants';
-import { queries } from '@blog/db';
-import type { TTenantSanityContext } from '@blog/service';
-import { errorResult, type TResult } from '@blog/utils';
+import { hasLength } from '@blog/utils/primitives';
 import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
-  FETCH_FAILED_REASON,
   REVALIDATE_LOG,
   TENANT_LOOKUP_FAILED_MESSAGE,
-  TENANT_UNRESOLVED_REASON,
-  UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
-import {
-  deriveRevalidatePaths,
-  isDerivableRevalidateType,
-  POST_TYPE,
-} from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
-import { recordTenantActivity } from '@web/server/revalidate/record-tenant-activity/record-tenant-activity';
-import { resolveReferencingModuleTags } from '@web/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags';
+import { buildRevalidatedTags } from '@web/server/revalidate/build-revalidated-tags/build-revalidated-tags';
+import { isRevalidateWebhookBody } from '@web/server/revalidate/is-revalidate-webhook-body/is-revalidate-webhook-body';
+import { loadTenantSanityCredentials } from '@web/server/revalidate/load-tenant-sanity-credentials/load-tenant-sanity-credentials';
+import { purgeRevalidatedCache } from '@web/server/revalidate/purge-revalidated-cache/purge-revalidated-cache';
+import { removeDeletedPostBookmarks } from '@web/server/revalidate/remove-deleted-post-bookmarks/remove-deleted-post-bookmarks';
+import { resolveWebhookTenant } from '@web/server/revalidate/resolve-webhook-tenant/resolve-webhook-tenant';
 import { verifyRevalidateSignature } from '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
-import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
@@ -34,44 +26,7 @@ export const SANITY_PROJECT_ID_HEADER = 'sanity-project-id';
 // Unpublish arrives as 'delete' too: it deletes the published document and spawns a draft.
 export const SANITY_OPERATION_HEADER = 'sanity-operation';
 
-const DELETE_OPERATION = 'delete';
 const MALFORMED_BODY_MESSAGE = 'Malformed request body.';
-
-interface IRevalidateWebhookBody {
-  _type: string;
-  _id: string;
-  slug?: string;
-}
-
-const isRevalidateWebhookBody = (
-  value: unknown,
-): value is IRevalidateWebhookBody => {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    typeof (value as Record<string, unknown>)['_type'] === 'string' &&
-    typeof (value as Record<string, unknown>)['_id'] === 'string'
-  );
-};
-
-const resolveDerivedRevalidatePaths = async (
-  type: string,
-  id: string,
-  tenantId: TMaybeUndefined<string>,
-  tenant: TMaybeUndefined<TTenantSanityContext>,
-): Promise<TResult<string[], string>> => {
-  if (!tenantId) {
-    return errorResult(TENANT_UNRESOLVED_REASON);
-  }
-  if (!isDerivableRevalidateType(type)) {
-    return errorResult(UNSUPPORTED_TYPE_REASON);
-  }
-  if (!tenant) {
-    return errorResult(FETCH_FAILED_REASON);
-  }
-
-  return deriveRevalidatePaths({ type, id, tenantId, tenant });
-};
 
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SANITY_REVALIDATE_SECRET;
@@ -117,10 +72,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   try {
     parsedBody = JSON.parse(rawBody);
   } catch {
-    return NextResponse.json(
-      { message: MALFORMED_BODY_MESSAGE },
-      { status: HTTP_STATUS.BAD_REQUEST },
-    );
+    parsedBody = undefined;
   }
 
   if (!isRevalidateWebhookBody(parsedBody)) {
@@ -131,128 +83,40 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const { _type: type, _id: id } = parsedBody;
-
   const tenantId = verified.data;
 
-  if (tenantId) {
-    let tenant;
-    try {
-      tenant = await queries.tenants.getTenantById(tenantId);
-    } catch (error) {
-      logger.error(REVALIDATE_LOG.TENANT_BY_ID_LOOKUP_FAILED, {
-        tenantId,
-        error,
-      });
-      return NextResponse.json(
-        { message: TENANT_LOOKUP_FAILED_MESSAGE },
-        { status: HTTP_STATUS.BAD_GATEWAY },
-      );
-    }
-    if (!tenant) {
-      logger.warn(REVALIDATE_LOG.TENANT_ARCHIVED, {
-        tenantProjectId,
-        tenantId,
-      });
-      return NextResponse.json(
-        { message: 'Tenant is archived; event ignored.' },
-        { status: HTTP_STATUS.OK },
-      );
-    }
-
-    await recordTenantActivity(tenantId, new Date());
+  const tenantRefusal = await resolveWebhookTenant(tenantId, tenantProjectId);
+  if (tenantRefusal) {
+    return tenantRefusal;
   }
 
   const baseTags = getRevalidateTagsForType(type, id);
+  const tenantSanity =
+    tenantId && hasLength(baseTags)
+      ? await loadTenantSanityCredentials({ type, id, tenantId })
+      : undefined;
 
-  // Fetched once — the module lookup and the path derivation both need it, and fetching twice would report one failure as two.
-  let tenantSanity;
-  if (tenantId && baseTags.length > 0) {
-    try {
-      tenantSanity = await queries.tenants.getTenantSanityCredentials(tenantId);
-      if (!tenantSanity) {
-        logger.error(REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_MISSING, {
-          type,
-          id,
-          tenantId,
-        });
-      }
-    } catch (error) {
-      logger.error(REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_FETCH_THREW, {
-        type,
-        id,
-        tenantId,
-        error,
-      });
-    }
-  }
-
-  const moduleTags =
-    tenantId && tenantSanity
-      ? await resolveReferencingModuleTags({
-          type,
-          id,
-          tenantId,
-          tenant: tenantSanity,
-        })
-      : [];
-
-  const allTags = [...baseTags, ...moduleTags];
-  const revalidated = tenantProjectId
-    ? [...allTags, ...allTags.map((tag) => `t:${tenantProjectId}:${tag}`)]
-    : allTags;
-
-  for (const tag of revalidated) {
-    // `{ expire: 0 }` forces immediate expiration — the next request blocks
-    // and renders fresh. The profile shorthand ('max' etc.) is a *stale
-    // window*: it keeps serving old content while revalidating in the
-    // background, which for a publish webhook means updates never appear.
-    revalidateTag(tag, { expire: 0 });
-  }
-
-  // Tag expiry alone does not invalidate prerendered route entries on
-  // Vercel, so a path purge is required alongside the tag purge above.
-  // `revalidatePath` only matches a fully resolved path (`/<tenantId>/EN/
-  // blog/x`) — the bracketed route pattern (`'/', 'layout'`) matches every
-  // tenant's request, never one tenant's alone.
-  const pathPurged = revalidated.length > 0;
-  if (pathPurged) {
-    const derived = await resolveDerivedRevalidatePaths(
-      type,
-      id,
-      tenantId,
-      tenantSanity,
-    );
-    if (derived.ok) {
-      for (const path of derived.data) {
-        revalidatePath(path);
-      }
-    } else {
-      logger.warn(REVALIDATE_LOG.PATH_PURGE_FALLBACK, {
-        type,
-        id,
-        tenantId,
-        reason: derived.error,
-      });
-      revalidatePath('/', 'layout');
-    }
-  }
-
-  let bookmarksRemoved = 0;
-  const operation = request.headers.get(SANITY_OPERATION_HEADER);
-  if (operation === DELETE_OPERATION && type === POST_TYPE && tenantId) {
-    try {
-      bookmarksRemoved = await queries.bookmarks.removeBookmarksForPost(
-        tenantId,
-        id,
-      );
-    } catch (error) {
-      logger.error(REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED, {
-        type,
-        id,
-        error,
-      });
-    }
-  }
+  const revalidated = await buildRevalidatedTags({
+    baseTags,
+    type,
+    id,
+    tenantId,
+    tenantProjectId,
+    tenantSanity,
+  });
+  const pathPurged = await purgeRevalidatedCache({
+    tags: revalidated,
+    type,
+    id,
+    tenantId,
+    tenant: tenantSanity,
+  });
+  const bookmarksRemoved = await removeDeletedPostBookmarks({
+    operation: request.headers.get(SANITY_OPERATION_HEADER),
+    type,
+    id,
+    tenantId,
+  });
 
   return NextResponse.json(
     { revalidated, pathPurged, type, id, bookmarksRemoved },
