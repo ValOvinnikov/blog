@@ -492,7 +492,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/look-row` — `apps/platform/src/constants/look-row.ts`
 
-- **LOOK_ROW**: `COLOUR`, `BRAND`, `TYPE`, `SHAPE`, `BUTTONS`, `HEADER`, `FOOTER`, `LANGUAGE_SWITCHER`
+- **LOOK_ROW**: `COLOUR`, `BRAND`, `TYPE`, `SHAPE`, `CARDS`, `BUTTONS`, `HEADER`, `FOOTER`, `LANGUAGE_SWITCHER`
 
 ### `@platform/constants/media-query` — `apps/platform/src/constants/media-query.ts`
 
