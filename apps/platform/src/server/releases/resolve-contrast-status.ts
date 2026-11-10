@@ -1,4 +1,4 @@
-import { FINDING_STATUS, RELEASE_CHANGE } from '@blog/config';
+import { RELEASE_CHANGE } from '@blog/config';
 import { queries } from '@blog/db';
 import { okResult } from '@blog/utils';
 import {
@@ -31,8 +31,9 @@ export const resolveContrastStatus = async ({
   );
   if (!finding.ok) return finding;
   if (finding.data) {
-    const isGreen = finding.data.status === FINDING_STATUS.RESOLVED;
-    return okResult(isGreen ? CONTRAST_STATUS.GREEN : CONTRAST_STATUS.FAILED);
+    return okResult(
+      finding.data.hasPassed ? CONTRAST_STATUS.GREEN : CONTRAST_STATUS.FAILED,
+    );
   }
 
   const active = await isWorkflowRunActive(CONTRAST_WORKFLOW_FILE, headSha);
