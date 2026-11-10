@@ -1,8 +1,9 @@
 'use client';
 
-import { TOAST_TYPE } from '@blog/config';
+import { TOAST_TYPE, type TMaybeNull } from '@blog/config';
 import { Toast } from '@blog/ui/components/molecules/toast';
 import { ToastViewport } from '@blog/ui/components/organisms/toast-viewport';
+import { hasLength } from '@blog/utils/primitives';
 import { useBusyStyle } from '@web/context/busy-style-provider';
 import { useTranslations } from 'next-intl';
 import {
@@ -17,11 +18,8 @@ import {
 } from 'react';
 
 import { toastProviderVariants } from './toast-provider-variants';
-import {
-  createToastStore,
-  type IToastPayload,
-  type IToastPromiseMessages,
-} from './toast-store';
+import type { IToastPayload } from './toast-record';
+import { createToastStore, type IToastPromiseMessages } from './toast-store';
 import { useToastRowPause } from './use-toast-row-pause';
 
 interface IUseToast {
@@ -44,18 +42,7 @@ export interface IToastProviderProps {
 
 const s = toastProviderVariants();
 
-/**
- * Subscribed via `useSyncExternalStore`, so this renders an always-empty
- * queue on the server and never ships a toast in the static HTML.
- *
- * @example
- * <ToastProvider>
- *   <App />
- * </ToastProvider>
- */
 export const ToastProvider = ({ children }: IToastProviderProps) => {
-  // Lazy `useState` initializer (not `useRef`) — a stable, once-per-mount
-  // store instance that's safe to read during render, unlike a ref.
   const [store] = useState(() => createToastStore());
   const t = useTranslations('toastProvider');
   const { spinnerVariant } = useBusyStyle();
@@ -83,9 +70,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
   const rowPause = useToastRowPause(store.actions.pause, store.actions.resume);
   const scheduledEnterIds = useRef(new Set<string>());
 
-  // Double-rAF before flipping `entering` -> `visible` so the browser paints
-  // the off-screen start state first (no first-frame jump) — a rendering
-  // concern the store itself stays free of.
+  // Double rAF: the browser must paint the off-screen start state before `visible`, or the first frame jumps.
   useEffect(() => {
     const currentIds = new Set(state.visible.map((record) => record.id));
 
@@ -112,7 +97,7 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
   }, [state.visible, store]);
 
   useEffect(() => {
-    if (state.visible.length === 0) return;
+    if (!hasLength(state.visible)) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
@@ -144,36 +129,28 @@ export const ToastProvider = ({ children }: IToastProviderProps) => {
               rowPause.handleBlur(
                 record.id,
                 event.currentTarget,
-                event.relatedTarget as Node | null,
+                event.relatedTarget as TMaybeNull<Node>,
               )
             }
           >
             <Toast
-              type={record.type}
-              isLoading={record.isLoading}
-              spinnerVariant={spinnerVariant}
-              title={record.title}
-              message={
-                record.count && record.count > 1
-                  ? `${record.message}${t('mergeCountSuffix', { count: record.count })}`
-                  : record.message
-              }
-              time={record.time}
-              action={
-                record.action && {
-                  label: record.action.label,
-                  keyHint: record.action.keyHint,
+              toast={{
+                ...record,
+                message:
+                  record.count && record.count > 1
+                    ? `${record.message}${t('mergeCountSuffix', { count: record.count })}`
+                    : record.message,
+                action: record.action && {
+                  ...record.action,
                   onAct: () => {
                     record.action?.onAct();
                     store.actions.dismiss(record.id);
                   },
-                }
-              }
+                },
+              }}
+              spinnerVariant={spinnerVariant}
               dismissLabel={t('dismissLabel')}
-              isPaused={record.paused}
-              durationMs={record.durationMs}
               onDismiss={() => store.actions.dismiss(record.id)}
-              phase={record.phase}
               dataTestId={`toast-${record.id}`}
             />
           </div>

@@ -363,8 +363,8 @@ Slots:
 
 ### Toast — `components/molecules/toast/toast.tsx`
 
-A single compact notification confirming or reporting the result of an engagement action (bookmark, rating, comment, subscription, auth).
-Props: type: TToastType · isLoading?: boolean · spinnerVariant?: TSpinnerProps['variant'] · title?: ReactNode · message: ReactNode · time?: string · action?: IToastAction · dismissLabel: string · isPaused?: boolean · durationMs?: number · onDismiss: () => void · phase: NonNullable<TToastVariants['phase']> _(extends IWithClassName, IWithDataTestId)_
+A compact, transient notification reporting the result of an action, with an optional follow-up action and auto-dismiss timer.
+Props: toast: IToast · spinnerVariant?: TSpinnerProps['variant'] · dismissLabel: string · onDismiss: () => void _(extends IWithClassName, IWithDataTestId)_
 Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE.ERROR · phase: entering|visible|leaving · hasTime: (boolean) · paused: (boolean)
 
 ## Organisms

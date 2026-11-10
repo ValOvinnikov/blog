@@ -2,6 +2,7 @@ import {
   ACCOUNT_BUTTON_STYLE,
   FORM_STATUS,
   ICONS,
+  OAUTH_PROVIDER,
   TOAST_TYPE,
 } from '@blog/config';
 import { AccountTrigger } from '@blog/ui/components/molecules/account-trigger';
@@ -53,7 +54,10 @@ const meta = {
     ),
   ],
   argTypes: {
-    pendingProviderId: { control: 'select', options: ['github', 'google'] },
+    pendingProviderId: {
+      control: 'select',
+      options: [OAUTH_PROVIDER.GITHUB, OAUTH_PROVIDER.GOOGLE],
+    },
     busyStyle: { control: 'select', options: BUSY_STYLES },
     spinnerVariant: { control: 'select', options: SPINNER_VARIANTS },
   },
@@ -77,14 +81,14 @@ const meta = {
     },
     providers: [
       {
-        id: 'github',
+        id: OAUTH_PROVIDER.GITHUB,
         icon: ICONS.GITHUB,
         label: 'Continue with GitHub',
         pendingLabel: 'Taking you to GitHub…',
         onSelect: fn(),
       },
       {
-        id: 'google',
+        id: OAUTH_PROVIDER.GOOGLE,
         icon: ICONS.GOOGLE,
         label: 'Continue with Google',
         pendingLabel: 'Taking you to Google…',
@@ -109,7 +113,7 @@ type TStory = StoryObj<typeof meta>;
 export const Open: TStory = {};
 
 export const ProviderPressed: TStory = {
-  args: { pendingProviderId: 'github' },
+  args: { pendingProviderId: OAUTH_PROVIDER.GITHUB },
 };
 
 export const Sending: TStory = {
@@ -167,7 +171,7 @@ export const ProviderPressedInEverySpinnerStyle: TStory = {
         <SignInPanel
           key={spinnerVariant}
           {...args}
-          pendingProviderId="github"
+          pendingProviderId={OAUTH_PROVIDER.GITHUB}
           spinnerVariant={spinnerVariant}
         />
       ))}
@@ -221,12 +225,14 @@ export const BackAfterFailedSignIn: TStory = {
         panelId={PANEL_ID}
       />
       <Toast
-        type={TOAST_TYPE.ERROR}
-        message="Sign-in failed. Please try again."
-        action={{ label: 'Try again', onAct: fn() }}
+        toast={{
+          type: TOAST_TYPE.ERROR,
+          message: 'Sign-in failed. Please try again.',
+          action: { label: 'Try again', onAct: fn() },
+          phase: 'visible',
+        }}
         dismissLabel="Dismiss"
         onDismiss={fn()}
-        phase="visible"
       />
     </div>
   ),

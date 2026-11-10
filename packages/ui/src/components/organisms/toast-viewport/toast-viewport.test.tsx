@@ -30,20 +30,24 @@ describe(`<${ToastViewport.name}/>`, () => {
       children: (
         <>
           <Toast
-            type={TOAST_TYPE.SUCCESS}
-            title={MOCK_FIRST_TITLE}
-            message={MOCK_FIRST_MESSAGE}
+            toast={{
+              type: TOAST_TYPE.SUCCESS,
+              title: MOCK_FIRST_TITLE,
+              message: MOCK_FIRST_MESSAGE,
+              phase: 'visible',
+            }}
             dismissLabel={MOCK_DISMISS_LABEL}
             onDismiss={vi.fn()}
-            phase="visible"
           />
           <Toast
-            type={TOAST_TYPE.INFO}
-            title={MOCK_SECOND_TITLE}
-            message={MOCK_SECOND_MESSAGE}
+            toast={{
+              type: TOAST_TYPE.INFO,
+              title: MOCK_SECOND_TITLE,
+              message: MOCK_SECOND_MESSAGE,
+              phase: 'visible',
+            }}
             dismissLabel={MOCK_DISMISS_LABEL}
             onDismiss={vi.fn()}
-            phase="visible"
           />
         </>
       ),

@@ -4,36 +4,37 @@ import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Toast } from './toast';
-import { toastVariants } from './toast-variants';
+import { Toast, type IToast } from './toast';
+
+const SUCCESS_TOAST: IToast = {
+  type: TOAST_TYPE.SUCCESS,
+  title: 'Saved',
+  message: 'Added to your bookmarks.',
+  time: 'just now',
+  phase: 'visible',
+  durationMs: 3600,
+};
+
+const UNDO_ACTION: IToast['action'] = {
+  label: 'undo',
+  onAct: () => {},
+  keyHint: '⌘Z',
+};
 
 const meta = {
   title: 'Molecules/Toast',
   component: Toast,
   tags: ['autodocs'],
   argTypes: {
-    type: {
-      control: 'select',
-      options: objectKeys(toastVariants.variants.type),
-    },
-    phase: {
-      control: 'select',
-      options: objectKeys(toastVariants.variants.phase),
-    },
     spinnerVariant: {
       control: 'select',
       options: objectKeys(spinnerVariants.variants.variant),
     },
   },
   args: {
-    type: TOAST_TYPE.SUCCESS,
-    title: 'Saved',
-    message: 'Added to your bookmarks.',
-    time: 'just now',
+    toast: SUCCESS_TOAST,
     dismissLabel: 'Dismiss notification',
     onDismiss: () => {},
-    phase: 'visible',
-    durationMs: 3600,
   },
 } satisfies Meta<typeof Toast>;
 
@@ -44,39 +45,51 @@ export const Success: TStory = {};
 
 export const Info: TStory = {
   args: {
-    type: TOAST_TYPE.INFO,
-    title: 'Removed',
-    message: 'Removed from your bookmarks.',
+    toast: {
+      ...SUCCESS_TOAST,
+      type: TOAST_TYPE.INFO,
+      title: 'Removed',
+      message: 'Removed from your bookmarks.',
+    },
   },
 };
 
 export const Warning: TStory = {
   args: {
-    type: TOAST_TYPE.WARNING,
-    title: 'Queued',
-    message: 'Comment posted — awaiting review.',
-    durationMs: 5000,
+    toast: {
+      ...SUCCESS_TOAST,
+      type: TOAST_TYPE.WARNING,
+      title: 'Queued',
+      message: 'Comment posted — awaiting review.',
+      durationMs: 5000,
+    },
   },
 };
 
 export const Error: TStory = {
   args: {
-    type: TOAST_TYPE.ERROR,
-    title: 'Failed',
-    message: "Couldn't save — retry?",
-    durationMs: undefined,
-    action: { label: 'retry', onAct: () => {}, keyHint: 'R' },
+    toast: {
+      ...SUCCESS_TOAST,
+      type: TOAST_TYPE.ERROR,
+      title: 'Failed',
+      message: "Couldn't save — retry?",
+      durationMs: undefined,
+      action: { label: 'retry', onAct: () => {}, keyHint: 'R' },
+    },
   },
 };
 
 export const Loading: TStory = {
   args: {
-    type: TOAST_TYPE.INFO,
-    isLoading: true,
-    title: 'Saving',
-    message: 'Hang on a moment…',
-    time: undefined,
-    durationMs: undefined,
+    toast: {
+      ...SUCCESS_TOAST,
+      type: TOAST_TYPE.INFO,
+      isLoading: true,
+      title: 'Saving',
+      message: 'Hang on a moment…',
+      time: undefined,
+      durationMs: undefined,
+    },
   },
 };
 
@@ -93,32 +106,29 @@ export const LoadingInEverySpinnerStyle: TStory = {
 
 export const WithAction: TStory = {
   args: {
-    action: { label: 'undo', onAct: () => {}, keyHint: '⌘Z' },
+    toast: { ...SUCCESS_TOAST, action: UNDO_ACTION },
   },
 };
 
 export const Paused: TStory = {
   args: {
-    action: { label: 'undo', onAct: () => {}, keyHint: '⌘Z' },
-    isPaused: true,
+    toast: { ...SUCCESS_TOAST, action: UNDO_ACTION, paused: true },
   },
 };
 
 export const MessageOnly: TStory = {
   args: {
-    title: undefined,
-    message: 'Removed from bookmarks.',
+    toast: {
+      ...SUCCESS_TOAST,
+      title: undefined,
+      message: 'Removed from bookmarks.',
+    },
   },
 };
 
 const ReducedMotionDemo = () => (
   <>
-    {/*
-      Storybook has no built-in way to emulate the OS-level
-      `prefers-reduced-motion: reduce` media query, so this scoped override
-      reproduces the same rules the component's own `motion-reduce:`
-      utilities apply, for documentation purposes only.
-    */}
+    {/* Storybook cannot emulate `prefers-reduced-motion`, so this mirrors the component's `motion-reduce:` rules. */}
     <style>{`
       [data-testid="toast-reduced-motion"] {
         transition: opacity var(--duration-base) linear !important;
@@ -129,14 +139,9 @@ const ReducedMotionDemo = () => (
       }
     `}</style>
     <Toast
-      type={TOAST_TYPE.SUCCESS}
-      title="Saved"
-      message="Added to your bookmarks."
-      time="just now"
+      toast={{ ...SUCCESS_TOAST, phase: 'entering' }}
       dismissLabel="Dismiss notification"
       onDismiss={() => {}}
-      phase="entering"
-      durationMs={3600}
       dataTestId="toast-reduced-motion"
     />
   </>
