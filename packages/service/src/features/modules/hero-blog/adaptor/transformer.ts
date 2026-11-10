@@ -12,6 +12,7 @@ import {
   toPostCard,
   type TPostCard,
 } from '@blog/service/shared/transformers/post/to-post-card';
+import { isUndefined } from '@blog/utils/primitives';
 import type { InferResultType } from 'groqd';
 
 import type { heroBlogModuleQuery } from './query';
@@ -62,23 +63,19 @@ function toHeroBlogButtons(
   return [
     toPrimaryButton(raw, post),
     toSecondaryButton(raw.secondaryAction),
-  ].filter((button): button is THeroBlogButton => button !== undefined);
+  ].filter((button): button is THeroBlogButton => !isUndefined(button));
 }
 
 export function toHeroBlogModule(raw: TRawHeroBlogModule): THeroBlogModule {
   const post = raw.post ? toPostCard(raw.post) : undefined;
-  const { contentPosition, mediaOrder } = toHeroPresentation(raw);
 
   const base: THeroBlogModuleBase = {
     brandVariant: raw.brandVariant,
-    variant: raw.variant,
     eyebrow: raw.eyebrow ?? post?.topic?.title,
     supportingText: post?.excerpt,
     sanityImage: toImage(raw, post),
     ctaButtons: toHeroBlogButtons(raw, post),
-    contentPosition,
-    contentAlignment: raw.contentAlignment ?? undefined,
-    mediaOrder,
+    presentation: toHeroPresentation(raw),
     layout: toLayout(raw.layout),
   };
 

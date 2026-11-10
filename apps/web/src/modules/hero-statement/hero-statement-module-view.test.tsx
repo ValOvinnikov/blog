@@ -9,7 +9,7 @@ import { HeroStatementModuleView } from './hero-statement-module-view';
 
 const setup = customRender(HeroStatementModuleView, {
   id: MOCK_HERO_STATEMENT_MODULE_ID,
-  ...mockHeroStatementModule(),
+  module: mockHeroStatementModule(),
 });
 
 describe(`<${HeroStatementModuleView.name}/>`, () => {

@@ -2,11 +2,11 @@ import { HERO_VARIANT } from '@blog/config';
 import type { THeroProfileModule } from '@blog/service';
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Hero } from '@blog/ui/components/organisms/hero';
+import { hasLength } from '@blog/utils/primitives';
+import { HeroModuleShell } from '@web/components/shared/hero-module-shell';
 import { PortableText } from '@web/components/shared/portable-text';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SocialLinks } from '@web/components/shared/social-links';
-import { HeroModuleShell } from '@web/modules/hero-shared';
-import { useId } from 'react';
 
 import {
   heroProfileAvatarFallbackVariants,
@@ -15,41 +15,38 @@ import {
   heroProfilePortraitVariants,
 } from './hero-profile-module-view-variants';
 
-export interface IHeroProfileModuleViewProps extends THeroProfileModule {
+export interface IHeroProfileModuleViewProps {
   id: string;
+  module: THeroProfileModule;
 }
 
 export const HeroProfileModuleView = ({
   id,
-  brandVariant,
-  variant,
-  eyebrow,
-  headingBlock,
-  avatarName,
-  sanityImage,
-  bio,
-  socialLinks,
-  ctaButtons,
-  contentPosition,
-  contentAlignment,
-  mediaOrder,
-  layout,
+  module,
 }: IHeroProfileModuleViewProps) => {
-  const titleId = useId();
+  const {
+    brandVariant,
+    presentation,
+    eyebrow,
+    headingBlock,
+    avatarName,
+    sanityImage,
+    bio,
+    socialLinks,
+    ctaButtons,
+    layout,
+  } = module;
+  const { variant } = presentation;
   const { heading, supportingText } = headingBlock;
   const isBanner = variant === HERO_VARIANT.BANNER;
 
   return (
     <HeroModuleShell
       brandVariant={brandVariant}
-      variant={variant}
+      presentation={presentation}
       eyebrow={eyebrow}
       title={heading}
-      titleId={titleId}
       excerpt={supportingText}
-      contentPosition={contentPosition}
-      contentAlignment={contentAlignment}
-      mediaOrder={mediaOrder}
       layout={layout}
       dataTestId={`hero-profile-module-${id}`}
       ctaButtons={ctaButtons}
@@ -106,13 +103,13 @@ export const HeroProfileModuleView = ({
         </Hero.Media>
       )}
 
-      {bio && bio.length > 0 && (
+      {bio && hasLength(bio) && (
         <Hero.Body>
           <PortableText value={bio} />
         </Hero.Body>
       )}
 
-      {socialLinks.length > 0 && (
+      {hasLength(socialLinks) && (
         <Hero.Social>
           <SocialLinks
             profiles={socialLinks}

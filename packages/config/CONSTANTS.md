@@ -691,6 +691,18 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **HEADER_STYLE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"header_style.site_config_fetch_failed"`
 
+### `@web/constants/hero-blog` — `apps/web/src/constants/hero-blog.ts`
+
+- **HERO_BLOG_LOG**: `MODULE_FETCH_FAILED`=`"hero_blog_module.fetch_failed"`, `POST_UNRESOLVED`=`"hero_blog_module.post_unresolved"`
+
+### `@web/constants/hero-profile` — `apps/web/src/constants/hero-profile.ts`
+
+- **HERO_PROFILE_LOG**: `MODULE_FETCH_FAILED`=`"hero_profile_module.fetch_failed"`
+
+### `@web/constants/hero-statement` — `apps/web/src/constants/hero-statement.ts`
+
+- **HERO_STATEMENT_LOG**: `MODULE_FETCH_FAILED`=`"hero_statement_module.fetch_failed"`
+
 ### `@web/constants/http` — `apps/web/src/constants/http.ts`
 
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`

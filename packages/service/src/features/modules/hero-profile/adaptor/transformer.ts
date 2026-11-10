@@ -47,16 +47,8 @@ function toBio(raw: TRawHeroProfileModule): THeroProfileModule['bio'] {
 export function toHeroProfileModule(
   raw: TRawHeroProfileModule,
 ): THeroProfileModule {
-  // module_heroProfile has no mediaOrderStacked field — Stacked never authors
-  // a custom order, so toHeroPresentation always resolves it to undefined.
-  const { contentPosition, mediaOrder } = toHeroPresentation({
-    ...raw,
-    mediaOrderStacked: null,
-  });
-
   return {
     brandVariant: raw.brandVariant,
-    variant: raw.variant,
     headingBlock: toHeadingBlock(raw.headingBlock),
     eyebrow: toEyebrow(raw),
     avatarName: raw.author.name,
@@ -64,9 +56,8 @@ export function toHeroProfileModule(
     bio: toBio(raw),
     socialLinks: toSocialLinks(raw),
     ctaButtons: toCtaButtons(raw.ctaButtons),
-    contentPosition,
-    contentAlignment: raw.contentAlignment ?? undefined,
-    mediaOrder,
+    // module_heroProfile has no mediaOrderStacked field, so Stacked keeps the default order.
+    presentation: toHeroPresentation({ ...raw, mediaOrderStacked: null }),
     layout: toLayout(raw.layout),
   };
 }

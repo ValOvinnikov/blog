@@ -14,6 +14,7 @@ function mockRawHeroPresentation(
     contentPositionBanner: CONTENT_ALIGNMENT.CENTER,
     mediaOrderSplit: MEDIA_ORDER.FIRST,
     mediaOrderStacked: MEDIA_ORDER.LAST,
+    contentAlignment: null,
     ...overrides,
   };
 }

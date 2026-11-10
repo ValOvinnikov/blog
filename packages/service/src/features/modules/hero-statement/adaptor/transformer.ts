@@ -15,18 +15,13 @@ export type TRawHeroStatementModule = InferResultType<
 export function toHeroStatementModule(
   raw: TRawHeroStatementModule,
 ): THeroStatementModule {
-  const { contentPosition, mediaOrder } = toHeroPresentation(raw);
-
   return {
     brandVariant: raw.brandVariant,
-    variant: raw.variant,
     headingBlock: toHeadingBlock(raw.headingBlock),
     eyebrow: raw.eyebrow ?? undefined,
     sanityImage: toSanityImage(raw.image),
     ctaButtons: toCtaButtons(raw.ctaButtons),
-    contentPosition,
-    contentAlignment: raw.contentAlignment ?? undefined,
-    mediaOrder,
+    presentation: toHeroPresentation(raw),
     layout: toLayout(raw.layout),
   };
 }

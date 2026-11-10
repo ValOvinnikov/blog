@@ -6,6 +6,7 @@ import {
   MOCK_CTA_SECONDARY_ACTION,
 } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 
 import { HeroModuleShell } from './hero-module-shell';
 
@@ -13,19 +14,14 @@ faker.seed(6011);
 
 const MOCK_SANITY_IMAGE = mockSanityImage();
 const MOCK_TITLE = faker.company.catchPhrase();
-const MOCK_TITLE_ID = faker.lorem.slug();
 const MOCK_SLOT_CONTENT = faker.lorem.sentence();
 
 const setup = customRender(HeroModuleShell, {
   brandVariant: BRAND_VARIANT.PRIMARY,
-  variant: HERO_VARIANT.SPLIT,
+  presentation: mockHeroPresentation(),
   eyebrow: undefined,
   title: MOCK_TITLE,
-  titleId: MOCK_TITLE_ID,
   excerpt: undefined,
-  contentPosition: undefined,
-  contentAlignment: undefined,
-  mediaOrder: undefined,
   layout: undefined,
   ctaButtons: [],
   sanityImage: undefined,
@@ -46,8 +42,7 @@ describe(`<${HeroModuleShell.name}/>`, () => {
       const section = screen.getByRole('region', { name: MOCK_TITLE });
 
       expect(heading).toBeVisible();
-      expect(heading).toHaveAttribute('id', MOCK_TITLE_ID);
-      expect(section).toHaveAttribute('aria-labelledby', MOCK_TITLE_ID);
+      expect(section).toBeVisible();
     });
 
     it('renders its children', () => {
@@ -103,7 +98,10 @@ describe(`<${HeroModuleShell.name}/>`, () => {
   });
 
   it('renders the hero image as a decorative backdrop on Banner', () => {
-    setup({ variant: HERO_VARIANT.BANNER, sanityImage: MOCK_SANITY_IMAGE });
+    setup({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.BANNER }),
+      sanityImage: MOCK_SANITY_IMAGE,
+    });
 
     const namedImage = screen.queryByRole('img');
     const backdrop = screen.getByRole('presentation');

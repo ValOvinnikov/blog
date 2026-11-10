@@ -1,29 +1,19 @@
 import { BRAND_VARIANT, HERO_VARIANT } from '@blog/config';
+import type { THeroStatementModule } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockHeroStatementModule } from '@web/testing/modules/hero-statement/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 
 import { HeroStatementModuleView } from './hero-statement-module-view';
 
-const meta = {
-  title: 'Modules/HeroStatementModule',
-  component: HeroStatementModuleView,
-  tags: ['autodocs'],
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: Object.values(BRAND_VARIANT),
-    },
-    variant: {
-      control: 'select',
-      options: Object.values(HERO_VARIANT),
-    },
-  },
-  args: {
-    id: 'hero-statement-1',
+const storyModule = (
+  overrides: Partial<THeroStatementModule> = {},
+): THeroStatementModule =>
+  mockHeroStatementModule({
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-    variant: HERO_VARIANT.SPLIT,
     eyebrow: 'Now shipping',
     headingBlock: mockHeadingBlock({
       heading: 'Build faster, ship sooner',
@@ -32,10 +22,16 @@ const meta = {
     }),
     sanityImage: mockSanityImage(),
     ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
-    contentPosition: undefined,
-    contentAlignment: undefined,
-    mediaOrder: undefined,
-    layout: undefined,
+    ...overrides,
+  });
+
+const meta = {
+  title: 'Modules/HeroStatementModule',
+  component: HeroStatementModuleView,
+  tags: ['autodocs'],
+  args: {
+    id: 'hero-statement-1',
+    module: storyModule(),
   },
 } satisfies Meta<typeof HeroStatementModuleView>;
 
@@ -46,25 +42,33 @@ export const Default: TStory = {};
 
 export const NoActions: TStory = {
   args: {
-    ctaButtons: [],
+    module: storyModule({
+      ctaButtons: [],
+    }),
   },
 };
 
 export const TwoActions: TStory = {
   args: {
-    ctaButtons: MOCK_CTA_ACTIONS,
+    module: storyModule({
+      ctaButtons: MOCK_CTA_ACTIONS,
+    }),
   },
 };
 
 export const Stacked: TStory = {
   args: {
-    variant: HERO_VARIANT.STACKED,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.STACKED }),
+    }),
   },
 };
 
 export const Banner: TStory = {
   args: {
-    variant: HERO_VARIANT.BANNER,
-    ctaButtons: MOCK_CTA_ACTIONS,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.BANNER }),
+      ctaButtons: MOCK_CTA_ACTIONS,
+    }),
   },
 };

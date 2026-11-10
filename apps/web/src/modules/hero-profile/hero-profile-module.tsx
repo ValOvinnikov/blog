@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { HERO_PROFILE_LOG } from '@web/constants/hero-profile';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -16,12 +17,12 @@ export const HeroProfileModule = async ({ id }: IHeroProfileModuleProps) => {
   );
 
   if (!result.ok) {
-    logger.error('hero_profile_module.fetch_failed', {
+    logger.error(HERO_PROFILE_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });
     return null;
   }
 
-  return <HeroProfileModuleView id={id} {...result.data} />;
+  return <HeroProfileModuleView id={id} module={result.data} />;
 };

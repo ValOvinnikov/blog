@@ -4,10 +4,13 @@ import {
   PORTABLE_TEXT_BLOCK_TYPE,
   SOCIAL_PLATFORMS,
 } from '@blog/config';
+import type { THeroProfileModule } from '@blog/service';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
+import { mockHeroProfileModule } from '@web/testing/modules/hero-profile/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { mockHeroPresentation } from '@web/testing/shared/hero-presentation/fixtures';
 import {
   mockPortableTextBlock,
   mockPortableTextSpan,
@@ -62,24 +65,12 @@ const socialLinks = [
   },
 ];
 
-const meta = {
-  title: 'Modules/HeroProfileModule',
-  component: HeroProfileModuleView,
-  tags: ['autodocs'],
-  argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: Object.values(BRAND_VARIANT),
-    },
-    variant: {
-      control: 'select',
-      options: Object.values(HERO_VARIANT),
-    },
-  },
-  args: {
-    id: 'hero-profile-1',
+const storyModule = (
+  overrides: Partial<THeroProfileModule> = {},
+): THeroProfileModule =>
+  mockHeroProfileModule({
     brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-    variant: HERO_VARIANT.STACKED,
+    presentation: mockHeroPresentation({ variant: HERO_VARIANT.STACKED }),
     eyebrow: 'Product designer',
     headingBlock: mockHeadingBlock({
       heading: "Hi, I'm Jane",
@@ -91,10 +82,16 @@ const meta = {
     bio: bioDemo,
     socialLinks,
     ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
-    contentPosition: undefined,
-    contentAlignment: undefined,
-    mediaOrder: undefined,
-    layout: undefined,
+    ...overrides,
+  });
+
+const meta = {
+  title: 'Modules/HeroProfileModule',
+  component: HeroProfileModuleView,
+  tags: ['autodocs'],
+  args: {
+    id: 'hero-profile-1',
+    module: storyModule(),
   },
 } satisfies Meta<typeof HeroProfileModuleView>;
 
@@ -105,45 +102,59 @@ export const Stacked: TStory = {};
 
 export const StackedNoPhoto: TStory = {
   args: {
-    sanityImage: undefined,
+    module: storyModule({
+      sanityImage: undefined,
+    }),
   },
 };
 
 export const Split: TStory = {
   args: {
-    variant: HERO_VARIANT.SPLIT,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.SPLIT }),
+    }),
   },
 };
 
 export const SplitNoPhoto: TStory = {
   args: {
-    variant: HERO_VARIANT.SPLIT,
-    sanityImage: undefined,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.SPLIT }),
+      sanityImage: undefined,
+    }),
   },
 };
 
 export const Banner: TStory = {
   args: {
-    variant: HERO_VARIANT.BANNER,
-    ctaButtons: MOCK_CTA_ACTIONS,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.BANNER }),
+      ctaButtons: MOCK_CTA_ACTIONS,
+    }),
   },
 };
 
 export const BannerNoPhoto: TStory = {
   args: {
-    variant: HERO_VARIANT.BANNER,
-    sanityImage: undefined,
+    module: storyModule({
+      presentation: mockHeroPresentation({ variant: HERO_VARIANT.BANNER }),
+      sanityImage: undefined,
+    }),
   },
 };
 
 export const NoSocialLinks: TStory = {
   args: {
-    socialLinks: [],
+    module: storyModule({
+      socialLinks: [],
+    }),
   },
 };
 
 export const NoBio: TStory = {
   args: {
-    bio: undefined,
+    module: storyModule({
+      bio: undefined,
+    }),
   },
 };

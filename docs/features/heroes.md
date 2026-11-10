@@ -62,7 +62,7 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 ## Entry points
 
 - `apps/web/src/modules/module-renderer.tsx` — `renderHeroModule`
-- `apps/web/src/modules/hero-shared/hero-module-shell.tsx`
+- `apps/web/src/components/shared/hero-module-shell/hero-module-shell.tsx`
 - `apps/web/src/modules/hero-blog/hero-blog-module.tsx`, `hero-statement/hero-statement-module.tsx`, `hero-profile/hero-profile-module-view.tsx`
 - `apps/web/src/utils/resolve-hero-layout/resolve-hero-layout.ts`
 - `packages/studio/src/schema-types/fields/hero-field/hero-field.ts`

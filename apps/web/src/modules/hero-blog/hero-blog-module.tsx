@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { HERO_BLOG_LOG } from '@web/constants/hero-blog';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -16,7 +17,7 @@ export const HeroBlogModule = async ({ id }: IHeroBlogModuleProps) => {
   );
 
   if (!result.ok) {
-    logger.error('hero_blog_module.fetch_failed', {
+    logger.error(HERO_BLOG_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });
@@ -27,10 +28,10 @@ export const HeroBlogModule = async ({ id }: IHeroBlogModuleProps) => {
 
   if (!data.hasPost) {
     if (!data.isPostUntranslated) {
-      logger.error('hero_blog_module.post_unresolved', { id });
+      logger.error(HERO_BLOG_LOG.POST_UNRESOLVED, { id });
     }
     return null;
   }
 
-  return <HeroBlogModuleView id={id} {...data} />;
+  return <HeroBlogModuleView id={id} module={data} />;
 };
