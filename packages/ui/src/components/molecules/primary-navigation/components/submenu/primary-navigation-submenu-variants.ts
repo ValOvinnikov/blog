@@ -2,6 +2,7 @@ import { HEADER_SUBMENU_STYLE } from '@blog/config';
 import {
   BELOW_HEADER,
   FOCUS_RING,
+  MENU_ROW,
   TRANSITION_COLORS,
   tv,
 } from '@blog/ui/lib/styling';
@@ -26,10 +27,7 @@ export const primaryNavigationSubmenuVariants = tv({
     lead: ['font-semibold'],
     separator: ['mx-1 my-1.5 border-t border-border'],
     rest: ['flex flex-col'],
-    item: [
-      'flex items-center justify-between gap-2.5',
-      'rounded-md px-3 py-2 hover:bg-surface-2',
-    ],
+    item: ['flex items-center justify-between gap-2.5 px-3 py-2', ...MENU_ROW],
   },
   variants: {
     isActive: {
@@ -55,7 +53,7 @@ export const primaryNavigationSubmenuVariants = tv({
         lead: ['self-start justify-start gap-2 text-lg'],
         separator: ['hidden'],
         rest: ['block columns-3 gap-x-8'],
-        item: ['break-inside-avoid px-0 py-1.5 hover:bg-transparent'],
+        item: ['-mx-3 break-inside-avoid py-1.5'],
       },
     },
   },

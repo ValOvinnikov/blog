@@ -1,3 +1,4 @@
+import { HEADER_SUBMENU_STYLE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -10,15 +11,29 @@ const links = [
   { href: '/contact', label: faker.lorem.words(2) },
 ];
 
-const linksWithSubItems = [
-  ...links,
+const GUIDES_HREF = '/guides';
+const GUIDES_LABEL = 'Guides';
+
+const guides = {
+  href: GUIDES_HREF,
+  label: GUIDES_LABEL,
+  subItems: [
+    { href: GUIDES_HREF, label: GUIDES_LABEL },
+    { href: `${GUIDES_HREF}/getting-started`, label: 'Getting started' },
+    { href: `${GUIDES_HREF}/deployment`, label: 'Deployment' },
+  ],
+};
+
+const linksWithSubItems = [...links, guides];
+
+const linksWithCurrentSubItem = [
+  ...links.slice(1),
   {
-    href: '/guides',
-    label: 'Guides',
+    ...guides,
+    isActive: true,
     subItems: [
-      { href: '/guides', label: 'Guides' },
-      { href: '/guides/getting-started', label: 'Getting started' },
-      { href: '/guides/deployment', label: 'Deployment' },
+      ...guides.subItems,
+      { href: `${GUIDES_HREF}/theming`, label: 'Theming', isActive: true },
     ],
   },
 ];
@@ -167,6 +182,25 @@ export const MobileInteractive: TStory = {
 
 export const WithSubmenus: TStory = {
   args: { links: linksWithSubItems },
+};
+
+export const WithCurrentSubmenuItem: TStory = {
+  args: { links: linksWithCurrentSubItem },
+};
+
+export const WithCurrentWidePanelItem: TStory = {
+  args: {
+    links: linksWithCurrentSubItem,
+    submenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
+  },
+};
+
+export const MobileOpenWithCurrentSubmenuItem: TStory = {
+  globals: { viewport: 'phone' },
+  args: {
+    links: linksWithCurrentSubItem,
+    mobileToggle: openToggle,
+  },
 };
 
 export const MobileOpenWithSubmenus: TStory = {

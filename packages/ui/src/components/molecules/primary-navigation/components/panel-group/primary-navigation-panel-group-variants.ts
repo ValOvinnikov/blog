@@ -1,5 +1,5 @@
 import { PANEL_LINK } from '@blog/ui/components/molecules/primary-navigation/primary-navigation-variants';
-import { FOCUS_RING, TRANSITION_COLORS, tv } from '@blog/ui/lib/styling';
+import { tv } from '@blog/ui/lib/styling';
 
 export const primaryNavigationPanelGroupVariants = tv({
   slots: {
@@ -8,10 +8,8 @@ export const primaryNavigationPanelGroupVariants = tv({
       ...PANEL_LINK,
       'cursor-pointer list-none justify-between',
       'font-mono text-meta text-muted',
-      'hover:text-text group-open:bg-surface-2',
+      'group-open:bg-surface-2',
       '[&::-webkit-details-marker]:hidden',
-      TRANSITION_COLORS,
-      FOCUS_RING,
     ],
     chevron: ['transition-transform group-open:rotate-180'],
     items: ['flex flex-col gap-1 pt-1'],
