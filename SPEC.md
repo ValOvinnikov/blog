@@ -2949,11 +2949,11 @@ variant.
 token for what it is, so the Look's `radiusScale` and card style reach it
 without the component knowing either:
 
-| Role            | Utility         | Token                             | Used by                                                                                                                  |
-| --------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                                       |
-| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                                                 |
-| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, `Accordion` items, Hub tiles, the `CtaModule` box) |
+| Role            | Utility         | Token                             | Used by                                                                                                                                                 |
+| --------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                                                                                     |
+| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                                                                                |
+| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, `Accordion` items, Hub tiles, the contact-form success card, the `CtaModule` box) |
 
 Controls and pills keep the plain steps (`rounded-sm`, `rounded-full`).
 `MediaFrame` takes a `shape` of `rect` (default, `rounded-media`) or `circle`
@@ -3071,7 +3071,9 @@ the values site-wide on the Look page (`site_config.card_style`), and
 `--radius-item` exposes `--item-radius` as `rounded-item`. The accent bar is an
 `::after` over the left border's straight run, between the corners, so it stays
 a straight bar on a rounded card; under `OUTLINED` it matches the border and
-does not show. `theme.css`'s
+does not show. It is drawn as a border, so forced colours keep it as a
+system-colour line, and a focused stretched card link lifts its ring above it.
+`theme.css`'s
 static values are `ACCENT_BAR`'s, so a site with no saved look renders the
 accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s brand-muted tint
 on hover and focus-within under either style; the style changes only the frame.
