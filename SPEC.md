@@ -1325,8 +1325,11 @@ existing documents were backfilled with `USD` by a content migration, and a newl
 provisioned tenant's Site Settings is seeded with `USD`.
 `settings_site.pricePeriodSuffix` holds one optional per-language string per
 `PRICE_PERIOD`; starter content seeds it from the `pricingModule.period.*`
-catalogue in the starter's language, and the site does not read it yet.
-`service.global.siteSettings.v1` projects it non-null.
+catalogue in the starter's language. `service.global.siteSettings.v1` projects
+the currency non-null and each period's wording as `pricePeriodWording`, in the
+request's language, then the default language, else `undefined`; a period with
+none falls back to the `pricingModule.period.*` catalogue in the reader's
+language.
 `service.modules.pricing.v1.getPricingModule` returns `TPricingModule`, whose
 tiers keep their prices in authored order and expose `highlightLabel` trimmed,
 or `undefined` when empty. The view model has no `isHighlighted`; a consumer
