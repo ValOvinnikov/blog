@@ -1,2 +1,6 @@
-export type { TCtaModuleProps } from './cta-module';
+export type {
+  TCtaModuleBannerProps,
+  TCtaModuleCalloutProps,
+  TCtaModuleSplitProps,
+} from './cta-module';
 export { CtaModule } from './cta-module';

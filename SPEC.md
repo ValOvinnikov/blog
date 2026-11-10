@@ -1442,18 +1442,20 @@ module overrides it.
 
 `module_cta` is the one deliberate exception to "passing `brandVariant`
 straight through", because it authors the two tones separately:
-`cta-module-view.tsx` gives `Section` the authored `bandTone` as the
-full-bleed band, and passes `brandVariant` to `CtaModule` as its own `tone`
-— the card's fill (Split/Callout) or overlay-scrim tint (Banner), painted
-by `CtaModule` itself rather than by `Section`. For `BANNER`, `CtaModule`
-additionally breaks out of `Section`'s
+`cta-module-view.tsx` takes the module whole and renders the part for its
+variant — `CtaModule.Split`, `CtaModule.Callout` or `CtaModule.Banner`. It
+gives `Section` the authored `bandTone` as the full-bleed band, and passes
+`brandVariant` to the part as its own `tone` — the card's fill
+(`CtaModule.Split`/`CtaModule.Callout`) or overlay-scrim tint
+(`CtaModule.Banner`), painted by the part itself rather than by `Section`.
+For `BANNER`, `CtaModule.Banner` additionally breaks out of `Section`'s
 always-constrained inner `<div>` (no `containerWidth` option removes its
 max-width) via a CSS technique independent of `Section`'s own padding
 values, rendering genuinely full-bleed — which is why `bandTone` is hidden
 for that variant; `SPLIT`/`CALLOUT` stay bounded,
 rounded cards inside `Section`'s inner container like every other module's
 organism. `Section` itself is unmodified either way — what differs is only
-how `CtaModule` uses the space `Section` gives it.
+how each `CtaModule` part uses the space `Section` gives it.
 
 **`Hero`'s Banner carries the same scrim contract**, for the same reason:
 its image is a full-bleed background, so the copy needs a floor under it.
@@ -1468,8 +1470,8 @@ gradients never fade to weak — and switches titles and running text alike
 to `text-on-image` (85% white fails 4.5:1 over the brand mid stop). `SPLIT` and `STACKED` ignore `tone` entirely.
 Both organisms compose one `bannerVariants` recipe
 (`packages/ui/src/lib/styling/banner.ts`), which owns the breakout, the
-scrims, the band padding and the min-height, so `Hero` and `CtaModule`
-cannot drift apart. The gradients read `--scrim-brand-*` and
+scrims, the band padding and the min-height, so `Hero` and
+`CtaModule.Banner` cannot drift apart. The gradients read `--scrim-brand-*` and
 `--scrim-neutral-*`: the brand scrim takes the tenant's accent hue at fixed
 lightness and chroma (emitted by the theme block below), while the neutral
 scrim stays hue-free. A scrim darkens the photo in either mode, so neither
@@ -1488,10 +1490,8 @@ all: a band that stops at `Section`'s inner container is a card, not a band.
 to the viewport inside any horizontally symmetric container — `Section`'s
 inner `<div>` is `mx-auto` with equal `px-gutter` on both sides, so the
 percentage offset and the translate cancel at every width, and nothing
-overflows. It does **not** carry `CtaModule`'s accompanying
-`mx-0`/`border-0`/`shadow-none`: those cancel base classes `CtaModule` sets
-on itself, and `Hero`'s root has none of them, so copying them across would
-add three dead classes. What both share and neither solves is `100vw` on a
+overflows. `CtaModule.Banner` takes the same breakout from
+`bannerVariants`, with nothing of its own beside it. What both share and neither solves is `100vw` on a
 platform whose scrollbar takes layout space; that is tracked against both
 organisms together rather than fixed in one.
 
@@ -2977,7 +2977,7 @@ applied by whatever element paints the background:
 
 - `apps/web`'s `Section`, per `brandVariant`.
 - `@blog/ui` organisms that paint their own flat background behind focusable
-  children — `CtaModule` (SPLIT and CALLOUT) and `Footer`.
+  children — `CtaModule.Split`, `CtaModule.Callout` and `Footer`.
 
 Two more utilities cover the item-level fills inside a band:
 
@@ -3002,7 +3002,7 @@ divider and field boundary, for a card whose own focus fill it is
 (`TaxonomyCard`).
 
 A surface painted with an image or a scrim rather than a flat token colour
-(`Hero` BANNER, `CtaModule` BANNER) sets neither: there is no single colour a
+(`Hero` BANNER, `CtaModule.Banner`) sets neither: there is no single colour a
 ring offset could match.
 
 **Elevation is two tokens** (`shadow-card` also carries a heavier `.dark`
@@ -3037,7 +3037,7 @@ is the token for a border that genuinely is the sole indicator.
 
 Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, the
 `PopoverMenu` tile (the account panel's Hub tiles), the contact-form success
-card and the `CtaModule` CALLOUT and SPLIT box — paint their frame
+card and the `CtaModule.Callout` and `CtaModule.Split` box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
 five inherited `--item-*` properties rather than fixed classes, and each pairs
 it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
