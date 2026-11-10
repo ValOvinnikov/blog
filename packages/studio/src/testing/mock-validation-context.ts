@@ -1,22 +1,36 @@
 import { mockGroqFetch } from '@blog/studio/testing/mock-groq-fetch';
-import type { ValidationContext } from 'sanity';
+import type { Path, ValidationContext } from 'sanity';
+
+type TMockValidationContextFields = {
+  document?: unknown;
+  parent?: unknown;
+  path?: Path;
+  type?: unknown;
+  getClient?: (options: { apiVersion: string }) => unknown;
+};
+
+export const mockValidationContext = <
+  TContext extends ValidationContext = ValidationContext,
+>(
+  fields: TMockValidationContextFields = {},
+) => fields as unknown as TContext;
 
 type TMockGroqValidationContextOptions = {
   fetchError?: Error;
-} & Record<string, unknown>;
+} & Omit<TMockValidationContextFields, 'getClient'>;
 
 export const mockGroqValidationContext = <
   TContext extends ValidationContext = ValidationContext,
 >(
   dataset: unknown[],
-  { fetchError, ...context }: TMockGroqValidationContextOptions = {},
+  { fetchError, ...fields }: TMockGroqValidationContextOptions = {},
 ) =>
-  ({
-    ...context,
+  mockValidationContext<TContext>({
+    ...fields,
     getClient: () => ({
       withConfig: () => ({ fetch: mockGroqFetch(dataset, fetchError) }),
     }),
-  }) as unknown as TContext;
+  });
 
 export type TMockFetchContext = {
   context: ValidationContext;
@@ -46,7 +60,7 @@ export const mockFetchContext = (
     },
   });
 
-  const context = { getClient, document } as unknown as ValidationContext;
+  const context = mockValidationContext({ getClient, document });
 
   return { context, fetchCalls, withConfigCalls };
 };
