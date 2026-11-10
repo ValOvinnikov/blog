@@ -1,3 +1,4 @@
+export { ALIGN_JUSTIFY } from './align-justify';
 export { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
 export { bannerVariants } from './banner';
 export { CARD_GAP, CARD_GUTTER_OFFSET, CARD_GUTTER_START } from './card-gap';
