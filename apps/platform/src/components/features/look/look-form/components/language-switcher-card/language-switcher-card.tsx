@@ -30,8 +30,7 @@ export const LanguageSwitcherCard = ({
     isLocked: isPlanLocked,
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const { isDisabled, isLocked, aria, labelId, growthBadgeId } =
-    useLookFieldLock(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
+  const lock = useLookFieldLock(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
   const { hasGrowthBadge } = useLookRowLock(
     CARD_FIELDS[LOOK_ROW.LANGUAGE_SWITCHER],
   );
@@ -62,16 +61,15 @@ export const LanguageSwitcherCard = ({
           label={t('languageSwitcherStyleLabel')}
           hint={isStylePlanLocked ? description : undefined}
           isGroup={true}
-          labelId={labelId}
-          growthBadgeId={growthBadgeId}
+          labelId={lock.labelId}
+          growthBadgeId={lock.growthBadgeId}
         >
           <SegmentedControl<TLanguageSwitcherStyle>
-            aria={aria}
+            aria={lock.aria}
             options={languageSwitcherOptions}
             value={languageSwitcherStyle}
             onChange={(style) => updateField('languageSwitcherStyle', style)}
-            isDisabled={isDisabled}
-            isLocked={isLocked}
+            lock={lock}
           />
         </LookField>
       ) : (

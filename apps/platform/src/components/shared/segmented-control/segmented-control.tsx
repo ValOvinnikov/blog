@@ -4,8 +4,8 @@ import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import type { TControlAria } from '@blog/config';
 import {
-  SEGMENTED_OPTION_WIDTH,
-  type TSegmentedOptionWidth,
+  SEGMENTED_LAYOUT,
+  type TSegmentedLayout,
 } from '@platform/constants/segmented-control';
 import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { singleSelectToggleGroupProps } from '@platform/utils/single-select-toggle-group/single-select-toggle-group';
@@ -21,15 +21,18 @@ type TSegmentedControlOption<TValue extends string> = {
   glyph?: ReactNode;
 };
 
+type TSegmentedControlLock = {
+  isDisabled?: boolean;
+  isLocked?: boolean;
+};
+
 export type TSegmentedControlProps<TValue extends string> = {
   options: TSegmentedControlOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
   aria?: TControlAria;
-  isDisabled?: boolean;
-  isLocked?: boolean;
-  optionWidth?: TSegmentedOptionWidth;
-  isSingleRow?: boolean;
+  lock?: TSegmentedControlLock;
+  layout?: TSegmentedLayout;
   className?: string;
 };
 
@@ -38,13 +41,12 @@ export const SegmentedControl = <TValue extends string>({
   value,
   onChange,
   aria = {},
-  isDisabled = false,
-  isLocked = false,
-  optionWidth = SEGMENTED_OPTION_WIDTH.FIT,
-  isSingleRow = false,
+  lock = {},
+  layout = SEGMENTED_LAYOUT.FIT,
   className,
 }: TSegmentedControlProps<TValue>) => {
   const descriptionId = useId();
+  const { isDisabled = false, isLocked = false } = lock;
   const { label: ariaLabel, labelledBy, describedBy } = aria;
   const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked);
   const hasDescriptions = options.some(({ description }) => description);
@@ -61,8 +63,7 @@ export const SegmentedControl = <TValue extends string>({
   } = segmentedControlVariants({
     isLocked: isLocked || isDisabled,
     hasGlyphs,
-    isSingleRow,
-    optionWidth,
+    layout,
   });
 
   const group = (

@@ -68,8 +68,7 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
           options={radiusOptions}
           value={radiusScale}
           onChange={(scale) => updateField('radiusScale', scale)}
-          isDisabled={radiusScaleLock.isDisabled}
-          isLocked={radiusScaleLock.isLocked}
+          lock={radiusScaleLock}
         />
         <PresetValueButton field="radiusScale" fieldLabel={radiusScaleLabel} />
       </LookField>
@@ -87,8 +86,7 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
           options={densityOptions}
           value={density}
           onChange={(option) => updateField('density', option)}
-          isDisabled={densityLock.isDisabled}
-          isLocked={densityLock.isLocked}
+          lock={densityLock}
         />
         <PresetValueButton field="density" fieldLabel={densityLabel} />
       </LookField>

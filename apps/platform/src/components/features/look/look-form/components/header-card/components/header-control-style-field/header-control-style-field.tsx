@@ -5,7 +5,7 @@ import { PresetValueButton } from '@platform/components/features/look/look-form/
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import { SEGMENTED_OPTION_WIDTH } from '@platform/constants/segmented-control';
+import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { useTranslations } from 'next-intl';
 
 export const HeaderControlStyleField = () => {
@@ -38,9 +38,8 @@ export const HeaderControlStyleField = () => {
         options={options}
         value={headerControlStyle}
         onChange={(style) => updateField('headerControlStyle', style)}
-        isDisabled={lock.isDisabled}
-        isLocked={lock.isLocked}
-        optionWidth={SEGMENTED_OPTION_WIDTH.WIDE}
+        lock={lock}
+        layout={SEGMENTED_LAYOUT.WIDE}
       />
       <PresetValueButton field="headerControlStyle" fieldLabel={label} />
     </LookField>

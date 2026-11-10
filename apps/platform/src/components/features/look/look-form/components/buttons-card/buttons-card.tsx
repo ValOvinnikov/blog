@@ -19,6 +19,7 @@ import { LockedReason } from '@platform/components/shared/locked-reason';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
@@ -78,9 +79,8 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
           options={shapeOptions}
           value={buttonShape}
           onChange={(shape) => updateField('buttonShape', shape)}
-          isDisabled={shapeLock.isDisabled}
-          isLocked={shapeLock.isLocked}
-          isSingleRow={true}
+          lock={shapeLock}
+          layout={SEGMENTED_LAYOUT.SINGLE_ROW}
         />
         <PresetValueButton field="buttonShape" fieldLabel={shapeLabel} />
       </LookField>
@@ -100,8 +100,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
           options={busyOptions}
           value={busyButtonStyle}
           onChange={(style) => updateField('busyButtonStyle', style)}
-          isDisabled={busyLock.isDisabled}
-          isLocked={busyLock.isLocked}
+          lock={busyLock}
         />
       </LookField>
 

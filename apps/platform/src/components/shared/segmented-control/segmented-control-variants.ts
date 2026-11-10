@@ -1,5 +1,5 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { SEGMENTED_OPTION_WIDTH } from '@platform/constants/segmented-control';
+import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -34,17 +34,14 @@ export const segmentedControlVariants = tv({
       },
       false: {},
     },
-    isSingleRow: {
-      true: {
+    layout: {
+      [SEGMENTED_LAYOUT.FIT]: {},
+      [SEGMENTED_LAYOUT.WIDE]: { option: ['lg:min-w-[94px]'] },
+      [SEGMENTED_LAYOUT.SINGLE_ROW]: {
         root: [
           'max-lg:auto-cols-fr max-lg:grid-flow-col max-lg:grid-cols-none',
         ],
       },
-      false: {},
-    },
-    optionWidth: {
-      [SEGMENTED_OPTION_WIDTH.FIT]: {},
-      [SEGMENTED_OPTION_WIDTH.WIDE]: { option: ['lg:min-w-[94px]'] },
     },
     isLocked: {
       true: {
@@ -81,7 +78,6 @@ export const segmentedControlVariants = tv({
   defaultVariants: {
     isLocked: false,
     hasGlyphs: false,
-    isSingleRow: false,
-    optionWidth: SEGMENTED_OPTION_WIDTH.FIT,
+    layout: SEGMENTED_LAYOUT.FIT,
   },
 });

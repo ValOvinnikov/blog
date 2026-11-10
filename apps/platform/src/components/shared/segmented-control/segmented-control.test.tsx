@@ -225,7 +225,7 @@ describe(`<${SegmentedControl.name}/>`, () => {
 
     beforeEach(() => {
       onChange = vi.fn();
-      setup({ onChange, isDisabled: true });
+      setup({ onChange, lock: { isDisabled: true } });
     });
 
     it('disables every option', () => {
@@ -267,7 +267,7 @@ describe(`<${SegmentedControl.name}/>`, () => {
             options={[MOCK_FIRST_OPTION, MOCK_SECOND_OPTION]}
             value={MOCK_SECOND_VALUE}
             onChange={onChange}
-            isLocked={true}
+            lock={{ isLocked: true }}
           />
         </div>,
       );
