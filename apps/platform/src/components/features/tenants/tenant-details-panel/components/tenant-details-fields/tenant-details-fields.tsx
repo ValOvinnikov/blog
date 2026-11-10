@@ -1,7 +1,6 @@
 'use client';
 
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { toOptions } from '@blog/utils/primitives';
 import { LockableSegmentedField } from '@platform/components/features/tenants/tenant-details-panel/components/lockable-segmented-field';
 import type {
@@ -11,6 +10,7 @@ import type {
 import { FormField } from '@platform/components/shared/form-field';
 import { TextInput } from '@platform/components/shared/text-input';
 import type { TTenantFieldLocks } from '@platform/utils/tenant-field-locks/tenant-field-locks';
+import { usePlanOptions } from '@platform/utils/use-plan-options/use-plan-options';
 import { useTenantFieldErrorText } from '@platform/utils/use-tenant-field-error-text/use-tenant-field-error-text';
 import { useTranslations } from 'next-intl';
 
@@ -45,10 +45,7 @@ export const TenantDetailsFields = ({
   const lockReasonText = useLockReasonText();
   const { wideField } = tenantDetailsFieldsVariants();
 
-  const planOptions = [
-    { value: TENANT_PLAN.FREE, label: t('planOptionFree') },
-    { value: TENANT_PLAN.GROWTH, label: t('planOptionGrowth') },
-  ];
+  const planOptions = usePlanOptions();
 
   const localeOptions = toOptions(LOCALE_ISO_CODES, (locale) =>
     tLanguage(locale),

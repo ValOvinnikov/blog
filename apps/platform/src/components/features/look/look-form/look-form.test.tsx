@@ -161,25 +161,31 @@ describe(`<${LookForm.name}/>`, () => {
       {
         row: LOOK_ROW.CARDS,
         label: LOOK_FORM.cardStyleLabel,
+        initialDescription: LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR,
         option: LOOK_FORM.cardStyleOptionLabel.OUTLINED,
         description: LOOK_FORM.cardStyleOptionDescription.OUTLINED,
       },
       {
         row: LOOK_ROW.LANGUAGE_SWITCHER,
         label: LOOK_FORM.languageSwitcherStyleLabel,
+        initialDescription:
+          LOOK_FORM.languageSwitcherOptionDescription.MENU_CODE,
         option: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
         description: LOOK_FORM.languageSwitcherOptionDescription.MENU_GLOBE,
       },
     ])(
       'describes the chosen $label option below the control',
-      async ({ row, label, option, description }) => {
+      async ({ row, label, initialDescription, option, description }) => {
         await openLookRow(user, row);
         const field = screen.getByRole('group', { name: label });
         const optionButton = within(field).getByRole('button', {
           name: option,
         });
-        await user.click(optionButton);
         const toggleGroup = within(field).getByRole('group');
+
+        expect(toggleGroup).toHaveAccessibleDescription(initialDescription);
+
+        await user.click(optionButton);
 
         expect(toggleGroup).toHaveAccessibleDescription(description);
       },

@@ -11,6 +11,7 @@ type TAccountPanelTileProps = {
   label: string;
   description: string;
   icon: TIconName;
+  isCurrent?: boolean;
   linkAs: TAnchorElementType;
 };
 
@@ -20,6 +21,7 @@ export const AccountPanelTile = ({
   label,
   description,
   icon,
+  isCurrent,
   linkAs,
 }: TAccountPanelTileProps) => {
   const descriptionId = useId();
@@ -30,6 +32,7 @@ export const AccountPanelTile = ({
       as={linkAs}
       href={href}
       variant="tile"
+      aria-current={isCurrent ? 'page' : undefined}
       aria-describedby={descriptionId}
       icon={<Icon name={icon} size={SIZE.MD} className={s.icon()} />}
     >

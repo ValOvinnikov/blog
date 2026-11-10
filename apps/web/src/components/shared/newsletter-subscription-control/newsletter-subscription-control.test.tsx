@@ -3,8 +3,8 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NEWSLETTER_SUBSCRIPTION_ACTION } from '@web/constants/newsletter';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 import { withToastProvider } from '@web/testing/providers';
+import { stubRouterRefresh } from '@web/testing/shared/router/stub-router-refresh';
 import { findToastStatus } from '@web/testing/shared/toast/find-toast-status';
-import { useRouter } from 'next/navigation';
 
 import { NewsletterSubscriptionControl } from './newsletter-subscription-control';
 
@@ -24,15 +24,6 @@ vi.mock(
 );
 
 const routerRefreshMock = vi.fn();
-
-vi.mocked(useRouter).mockReturnValue({
-  push: vi.fn(),
-  replace: vi.fn(),
-  prefetch: vi.fn(),
-  back: vi.fn(),
-  forward: vi.fn(),
-  refresh: routerRefreshMock,
-} as unknown as ReturnType<typeof useRouter>);
 
 const RESEND_BUTTON_NAME = 'Resend confirmation';
 
@@ -63,6 +54,7 @@ describe(`<${NewsletterSubscriptionControl.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
+    stubRouterRefresh(routerRefreshMock);
     user = userEvent.setup();
   });
 

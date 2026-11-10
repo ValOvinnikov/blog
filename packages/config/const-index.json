@@ -4566,6 +4566,30 @@
         "file": "apps/platform/src/constants/asset-upload.ts"
       }
     ],
+    "TABLE": [
+      {
+        "ref": "AVATAR_VARIANT.TABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "ACCOUNT": [
+      {
+        "ref": "AVATAR_VARIANT.ACCOUNT",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
+    "SWITCHER": [
+      {
+        "ref": "AVATAR_VARIANT.SWITCHER",
+        "scope": "app:platform",
+        "from": "@platform/constants/avatar",
+        "file": "apps/platform/src/constants/avatar.ts"
+      }
+    ],
     "GHOST": [
       {
         "ref": "BUTTON_VARIANT.GHOST",
@@ -8020,6 +8044,22 @@
         "scope": "app:web",
         "from": "@web/constants/newsletter",
         "file": "apps/web/src/constants/newsletter.ts"
+      }
+    ],
+    "pricing_module.fetch_failed": [
+      {
+        "ref": "PRICING_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
+      }
+    ],
+    "pricing_module.site_settings_failed": [
+      {
+        "ref": "PRICING_LOG.SITE_SETTINGS_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/pricing",
+        "file": "apps/web/src/constants/pricing.ts"
       }
     ],
     "proxy.tenant_lookup_failed": [

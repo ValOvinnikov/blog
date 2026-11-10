@@ -21,6 +21,7 @@ export const TenantPageHeader = ({
 }: TTenantPageHeaderProps) => {
   const { name, status, plan, primaryDomain } = tenant;
   const tTenantsTable = useTranslations('tenantsTable');
+  const tPlan = useTranslations('planNames');
   const t = useTranslations('tenantOverviewPage');
 
   return (
@@ -34,7 +35,7 @@ export const TenantPageHeader = ({
           </StatusBadge>
           {hasPlanBadge && (
             <StatusBadge tone="plan" hasDot={false}>
-              {tTenantsTable(`plan.${plan}`)}
+              {tPlan(plan)}
             </StatusBadge>
           )}
         </>

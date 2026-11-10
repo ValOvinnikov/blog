@@ -20,7 +20,7 @@ import { TenantDetailsForm } from './tenant-details-form';
 
 faker.seed(5994);
 
-const { tenantDetailsForm, tenantFieldErrors } = en;
+const { tenantDetailsForm, tenantFieldErrors, planNames } = en;
 const t = makeEnTranslator('tenantDetailsForm');
 
 const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
@@ -143,7 +143,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
   it('defaults the plan to Free', () => {
     const freeButton = screen.getByRole('button', {
-      name: tenantDetailsForm.planOptionFree,
+      name: planNames[TENANT_PLAN.FREE],
     });
 
     expect(freeButton).toHaveAttribute('aria-pressed', 'true');
@@ -151,7 +151,7 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
 
   it('submits the entered values with the chosen plan', async () => {
     const growthButton = screen.getByRole('button', {
-      name: tenantDetailsForm.planOptionGrowth,
+      name: planNames[TENANT_PLAN.GROWTH],
     });
 
     await fillForm();

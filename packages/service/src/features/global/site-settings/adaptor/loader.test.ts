@@ -1,4 +1,4 @@
-import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
+import { PRICE_PERIOD, SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRawSiteSettings } from '@blog/service/testing/global/fixtures';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
@@ -10,6 +10,7 @@ import { siteSettingsQuery } from './query';
 vi.mock('@blog/service/sanity/query/query');
 
 const MOCK_CURRENCY = 'EUR';
+const MOCK_MONTH_WORDING = 'per month';
 const MOCK_TENANT = mockTenant();
 
 describe(getSiteSettings, () => {
@@ -31,6 +32,42 @@ describe(getSiteSettings, () => {
     const result = await getSiteSettings(MOCK_TENANT);
 
     expect(result.currency).toBe(MOCK_CURRENCY);
+  });
+
+  it('returns the wording of each period the site sets', async () => {
+    mockRun.mockResolvedValueOnce(
+      mockRawSiteSettings({
+        pricePeriodSuffix: {
+          ONE_TIME: null,
+          HOUR: null,
+          SESSION: null,
+          MONTH: MOCK_MONTH_WORDING,
+          YEAR: null,
+        },
+      }),
+    );
+
+    const result = await getSiteSettings(MOCK_TENANT);
+
+    expect(result.pricePeriodWording).toEqual({
+      [PRICE_PERIOD.ONE_TIME]: undefined,
+      [PRICE_PERIOD.HOUR]: undefined,
+      [PRICE_PERIOD.SESSION]: undefined,
+      [PRICE_PERIOD.MONTH]: MOCK_MONTH_WORDING,
+      [PRICE_PERIOD.YEAR]: undefined,
+    });
+  });
+
+  it('returns no period wording when the site sets none', async () => {
+    const result = await getSiteSettings(MOCK_TENANT);
+
+    expect(Object.values(result.pricePeriodWording)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]);
   });
 
   it('threads tenant context into runQuery and scopes the tags to it', async () => {

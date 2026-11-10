@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PROVISIONING_STEP } from '@blog/db';
+import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import {
@@ -70,6 +70,7 @@ const {
   tenantDetailsPanel,
   tenantFieldErrors,
   languageNames,
+  planNames,
   navSections,
   leavePageDialog,
 } = messages;
@@ -84,7 +85,7 @@ const RESEND_INVITE_LABEL = tenantDetailsPanel.resendStudioInvite;
 const UNSENT_INVITE_NOTICE = tenantDetailsPanel.studioInviteUnsentNotice;
 const TENANTS_LABEL = navSections.tenants;
 const ENGLISH_LABEL = languageNames[LOCALE_ISO_CODES.EN];
-const FREE_LABEL = tenantDetailsPanel.planOptionFree;
+const FREE_LABEL = planNames[TENANT_PLAN.FREE];
 const MOCK_UNSAVED_DOMAIN = faker.internet.domainName();
 const MOCK_UNSAVED_NAME = faker.company.name();
 const MOCK_EDITED_NAME = faker.company.name();

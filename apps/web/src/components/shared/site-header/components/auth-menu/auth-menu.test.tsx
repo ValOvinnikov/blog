@@ -4,12 +4,15 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   HTTP_STATUS,
   MAGIC_LINK_SIGN_IN_CODE,
+  routes,
   SITE_MESSAGES,
 } from '@blog/config';
 import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { ARIA_CURRENT, ARIA_CURRENT_PAGE } from '@blog/ui/testing/aria';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { SESSION_STATUS } from '@web/constants/session';
+import { usePathname } from '@web/i18n/navigation';
 import { act, customRender, screen, within } from '@web/testing/custom-render';
 import { MOCK_ACCOUNT_CONTROL } from '@web/testing/shared/account-control/fixtures';
 import {
@@ -28,6 +31,8 @@ const { useSessionMock, signInMock, signOutMock } = vi.hoisted(() => ({
   signOutMock: vi.fn(),
 }));
 
+vi.mock('@web/i18n/navigation');
+
 vi.mock('next-auth/react', () => ({
   useSession: useSessionMock,
   signIn: signInMock,
@@ -40,6 +45,7 @@ const {
   accountMenuAriaLabel: ACCOUNT_MENU_LABEL,
   signOut: SIGN_OUT_LABEL,
   accountSettings: ACCOUNT_SETTINGS_LABEL,
+  myBookmarks: BOOKMARKS_LABEL,
   continueWithGithub: GITHUB_BUTTON,
   continueWithGoogle: GOOGLE_BUTTON,
   continuingWithGithub: GITHUB_PENDING,
@@ -142,6 +148,7 @@ describe(`<${AuthMenu.name}/>`, () => {
     useSessionMock.mockReset();
     signInMock.mockReset();
     signOutMock.mockReset();
+    vi.mocked(usePathname).mockReset();
     setLocationSearch('');
     document.cookie = `${SIGNED_IN_HINT_COOKIE_NAME}=; Max-Age=0; Path=/`;
   });
@@ -551,6 +558,24 @@ describe(`<${AuthMenu.name}/>`, () => {
       const email = within(panel).getByText(MOCK_EMAIL);
 
       expect(email).toBeVisible();
+    });
+
+    it('announces the row for the page the reader is on as the current page', async () => {
+      vi.mocked(usePathname).mockReturnValue(routes.account());
+      setup();
+      const trigger = screen.getByRole('button', { name: ACCOUNT_LABEL });
+      await user.click(trigger);
+
+      const panel = screen.getByRole('menu', { name: ACCOUNT_MENU_LABEL });
+      const settings = within(panel).getByRole('menuitem', {
+        name: ACCOUNT_SETTINGS_LABEL,
+      });
+      const bookmarks = within(panel).getByRole('menuitem', {
+        name: BOOKMARKS_LABEL,
+      });
+
+      expect(settings).toHaveAttribute(ARIA_CURRENT, ARIA_CURRENT_PAGE);
+      expect(bookmarks).not.toHaveAttribute(ARIA_CURRENT);
     });
 
     it('describes each tile in the Hub panel', async () => {

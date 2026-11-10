@@ -11,10 +11,6 @@ import {
 import { isUndefined } from '@blog/utils/primitives';
 import { useCustomDomainFocus } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-focus-provider/use-custom-domain-focus';
 import {
-  usePolledValue,
-  type TPolledValueOptions,
-} from '@platform/components/features/tenants/live-domain-card';
-import {
   CUSTOM_DOMAIN_CONNECT_REJECTIONS,
   CUSTOM_DOMAIN_FIELD_ERROR,
   CUSTOM_DOMAIN_REFUSAL,
@@ -31,6 +27,10 @@ import {
   CUSTOM_DOMAIN_REFUSAL_KEYS,
 } from '@platform/utils/custom-domain-keys/custom-domain-keys';
 import { settleAction } from '@platform/utils/settle-action/settle-action';
+import {
+  usePolledValue,
+  type TPolledValueOptions,
+} from '@platform/utils/use-polled-value/use-polled-value';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
@@ -44,7 +44,7 @@ const isStillWaiting = (result: TVerifyCustomDomainResult) =>
 
 const VERIFY_POLL_OPTIONS: TPolledValueOptions<TPolledVerify> = {
   ...CUSTOM_DOMAIN_VERIFY_POLL,
-  isFinal: (result) => !isUndefined(result) && !isStillWaiting(result),
+  isActive: (result) => isUndefined(result) || isStillWaiting(result),
 };
 
 const connectRejectionOf = (
@@ -70,7 +70,7 @@ export const useVerifyCustomDomain = (tenantId: string) => {
   const router = useRouter();
   const { requestFocus } = useCustomDomainFocus();
   const [isPending, startTransition] = useTransition();
-  const polled = usePolledValue<TPolledVerify>(
+  const { value: polled } = usePolledValue<TPolledVerify>(
     tenantId,
     undefined,
     verifyCustomDomainAction,

@@ -9,7 +9,7 @@ export const accordionTriggerVariants = tv({
       'font-display text-lg font-medium text-text',
       'transition-colors duration-base ease-smooth',
       'hover:text-brand-primary',
-      'rounded-sm focus-visible:outline-none',
+      'rounded-sm focus-visible:relative focus-visible:z-1 focus-visible:outline-none',
       'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-primary',
     ],
     chevron: [

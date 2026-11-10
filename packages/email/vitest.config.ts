@@ -11,7 +11,6 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: 'node',
-      mockReset: true,
       env: {
         // env.ts validates at import time; SKIP_ENV_VALIDATION lets tests
         // import the env module without a real RESEND_API_KEY set.

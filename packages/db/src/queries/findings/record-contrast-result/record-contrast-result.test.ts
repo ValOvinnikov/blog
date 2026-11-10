@@ -139,9 +139,21 @@ describe(recordContrastResult, () => {
         status: FINDING_STATUS.RESOLVED,
         details: { ...olderRuns[index], supersededBy: passingRun.sha },
         resolvedAt: MOCK_FINDING_LATER_AT,
+        hasPassed: false,
       })),
     );
     expect(await listOpenFindings()).toEqual([]);
+  });
+
+  it('drops the superseding SHA once a superseded SHA passes its own run', async () => {
+    const ownPass = mockPassingContrastResult({ sha: failingRun.sha });
+    await recordContrastResult(failingRun);
+    await recordContrastResult(passingRun);
+    vi.setSystemTime(MOCK_FINDING_LATER_AT);
+
+    const passed = await recordContrastResult(ownPass);
+
+    expect(passed.details).toEqual(ownPass);
   });
 
   it('leaves other open failures and resolved findings as they were when a SHA fails', async () => {
@@ -151,7 +163,10 @@ describe(recordContrastResult, () => {
     const failed = await recordContrastResult(failingRun);
 
     const openFindings = await listOpenFindings();
-    expect(await getContrastFinding(passingRun.sha)).toEqual(earlierPass);
+    expect(await getContrastFinding(passingRun.sha)).toEqual({
+      ...earlierPass,
+      hasPassed: true,
+    });
     expect(openFindings.map(({ id }) => id).sort()).toEqual(
       [earlierFailure.id, failed.id].sort(),
     );

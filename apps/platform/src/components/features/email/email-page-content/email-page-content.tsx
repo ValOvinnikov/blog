@@ -11,13 +11,14 @@ export type TEmailPageContentProps = {
 };
 
 export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
+  const { id, name, locale, deprovisionedAt } = tenant;
   const [siteConfig, emailConfig, templateLogoUrls, authored, { membership }] =
     await Promise.all([
-      queries.siteConfig.getSiteConfig(tenant.id),
-      queries.emailConfig.getEmailConfig(tenant.id),
-      queries.emailTemplates.listEmailTemplateLogoUrls(tenant.id),
-      queries.emailTemplates.listAuthoredEmailTemplates(tenant.id),
-      requireTenantMembership(tenant.id),
+      queries.siteConfig.getSiteConfig(id),
+      queries.emailConfig.getEmailConfig(id),
+      queries.emailTemplates.listEmailTemplateLogoUrls(id),
+      queries.emailTemplates.listAuthoredEmailTemplates(id),
+      requireTenantMembership(id),
     ]);
 
   const liveLocales = queries.tenants.selectLiveLocales(tenant);
@@ -39,14 +40,12 @@ export const EmailPageContent = async ({ tenant }: TEmailPageContentProps) => {
 
   return (
     <EmailSettings
-      tenantId={tenant.id}
+      tenant={{ id, locale, deprovisionedAt }}
       initialDraft={initialDraft}
-      defaultLocale={tenant.locale}
       liveLocales={liveLocales}
       brand={toTenantEmailBrand(siteConfig)}
-      brandName={siteConfig?.brandName ?? tenant.name}
+      brandName={siteConfig?.brandName ?? name}
       savedAt={emailConfig?.updatedAt}
-      archivedAt={tenant.deprovisionedAt ?? undefined}
     />
   );
 };

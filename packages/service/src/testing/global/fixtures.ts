@@ -7,6 +7,7 @@ export function mockRawSiteSettings(
 ): TRawSiteSettings {
   return {
     currency: 'USD',
+    pricePeriodSuffix: null,
     ...overrides,
   };
 }
