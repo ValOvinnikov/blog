@@ -54,7 +54,7 @@ class NoopIntersectionObserver implements IntersectionObserver {
   }
 }
 
-vi.stubGlobal('IntersectionObserver', NoopIntersectionObserver);
+globalThis.IntersectionObserver = NoopIntersectionObserver;
 
 class NoopResizeObserver implements ResizeObserver {
   observe() {}
@@ -62,9 +62,9 @@ class NoopResizeObserver implements ResizeObserver {
   disconnect() {}
 }
 
-vi.stubGlobal('ResizeObserver', NoopResizeObserver);
+globalThis.ResizeObserver = NoopResizeObserver;
 
-vi.stubGlobal('matchMedia', (query: string): MediaQueryList => ({
+globalThis.matchMedia = (query: string): MediaQueryList => ({
   matches: false,
   media: query,
   onchange: null,
@@ -73,7 +73,7 @@ vi.stubGlobal('matchMedia', (query: string): MediaQueryList => ({
   addEventListener() {},
   removeEventListener() {},
   dispatchEvent: () => false,
-}));
+});
 
 // jsdom lays nothing out, so Embla would measure every slide at 0px and never
 // show its controls: give carousel slides a width that overflows the track.
