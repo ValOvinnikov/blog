@@ -700,7 +700,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   its vocabulary grows as surfaces become auditable, and `audit_events` stores
   both as plain text so a new action needs no schema change — don't relocate
   them. Where a const _does_ back a `pgEnum`, it and its column move together:
-  `Object.values(…)` builds the enum's value list, so reordering the const
+  `pgEnum` takes the const object and builds the enum's value list from its
+  key order, so reordering the const
   silently reorders a Postgres enum — confirm with `db:generate` that no
   migration appears.
 
