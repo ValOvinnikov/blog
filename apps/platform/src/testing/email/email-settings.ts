@@ -25,8 +25,8 @@ import { selectFile } from '@platform/testing/select-file';
 import { MOCK_STAGED_LOGO_BLOB_URL } from '@platform/testing/site-config/fixtures';
 import { MOCK_TENANT_EMAIL_BRAND } from '@platform/testing/tenant-email-brand';
 import {
-  MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import {
   EMAIL_SENDER_ITEM,
@@ -66,9 +66,8 @@ export const updateEmailConfigActionMock = vi.mocked(updateEmailConfigAction);
 export const uploadEmailLogoActionMock = vi.mocked(uploadEmailLogoAction);
 
 export const setupEmailSettings = customRender(EmailSettings, {
-  tenantId: MOCK_TENANT_ID,
+  tenant: mockTenant(),
   initialDraft: MOCK_INITIAL_DRAFT,
-  defaultLocale: EN,
   liveLocales: MOCK_EMAIL_DRAFT_LIVE_LOCALES,
   brand: MOCK_TENANT_EMAIL_BRAND,
   brandName: MOCK_TENANT_NAME,

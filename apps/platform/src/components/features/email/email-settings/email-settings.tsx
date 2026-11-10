@@ -1,10 +1,7 @@
 'use client';
 
-import {
-  portableTextToPlainText,
-  type TLocaleIsoCode,
-  FORM_STATUS,
-} from '@blog/config';
+import { type TLocaleIsoCode, FORM_STATUS } from '@blog/config';
+import type { TTenant } from '@blog/db/schema/tenants';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { EmailPreview } from '@platform/components/features/email/email-preview';
@@ -17,7 +14,6 @@ import { useViewTabs, ViewTabs } from '@platform/components/shared/view-tabs';
 import { useToast } from '@platform/context/toast-provider';
 import {
   EMAIL_SENDER_ITEM,
-  EMAIL_TEMPLATE_TYPES,
   type TEmailDraft,
   type TEmailPageItem,
 } from '@platform/utils/email-draft/email-draft';
@@ -26,41 +22,37 @@ import {
   countEmailDraftChanges,
   countLanguageChanges,
   countSharedChanges,
-  resolveItemStatus,
 } from '@platform/utils/email-draft-changes/email-draft-changes';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
 import { emailSettingsVariants } from './email-settings-variants';
+import { useEmailCopyDraftFields } from './use-email-copy-draft-fields';
 import { useEmailDraft } from './use-email-draft';
+import { useEmailItems } from './use-email-items';
 import { useEmailPreview } from './use-email-preview';
 import { useSenderFields } from './use-sender-fields';
 
 export type TEmailSettingsProps = {
-  tenantId: string;
+  tenant: Pick<TTenant, 'id' | 'locale' | 'deprovisionedAt'>;
   initialDraft: TEmailDraft;
-  defaultLocale: TLocaleIsoCode;
   liveLocales: TLocaleIsoCode[];
   brand: TTenantEmailBrand;
   brandName: string;
   savedAt?: Date;
-  archivedAt?: Date;
 };
 
 export const EmailSettings = ({
-  tenantId,
+  tenant,
   initialDraft,
-  defaultLocale,
   liveLocales,
   brand,
   brandName,
   savedAt,
-  archivedAt,
 }: TEmailSettingsProps) => {
+  const { id: tenantId, locale: defaultLocale, deprovisionedAt } = tenant;
   const t = useTranslations('emailForm');
-  const tStatus = useTranslations('fieldStatus');
-  const tTemplate = useTranslations('emailTemplateEditor');
   const tLanguage = useTranslations('languageNames');
   const tPreview = useTranslations('emailPreview');
   const toast = useToast();
@@ -77,36 +69,7 @@ export const EmailSettings = ({
     tabsProps.onChange('edit');
   };
 
-  const copyDraftFields = EMAIL_TEMPLATE_TYPES.flatMap((templateType) =>
-    liveLocales.flatMap((locale) => {
-      const template = tTemplate(`templateTypeLabel.${templateType}`);
-      const language = tLanguage(locale);
-      return [
-        {
-          id: `${templateType}.${locale}.subject`,
-          label: t('draftFieldLabel', {
-            template,
-            field: tTemplate('subjectLabel', { language }),
-          }),
-          display: (values: TEmailDraft) =>
-            values.copies[templateType][locale].subject,
-        },
-        {
-          id: `${templateType}.${locale}.body`,
-          label: t('draftFieldLabel', {
-            template,
-            field: tTemplate('bodyLabel', { language }),
-          }),
-          display: (values: TEmailDraft) =>
-            portableTextToPlainText(
-              values.copies[templateType][locale].body as Parameters<
-                typeof portableTextToPlainText
-              >[0],
-            ),
-        },
-      ];
-    }),
-  );
+  const copyDraftFields = useEmailCopyDraftFields(liveLocales);
 
   const bumpRevision = () => setRevision((current) => current + 1);
 
@@ -122,7 +85,7 @@ export const EmailSettings = ({
     tenantId,
     initialDraft,
     liveLocales,
-    archivedAt,
+    archivedAt: deprovisionedAt ?? undefined,
     senderFieldIds,
     revealSenderName,
     onSaved: () => {
@@ -186,23 +149,7 @@ export const EmailSettings = ({
     if (item !== EMAIL_SENDER_ITEM) setPreviewTemplate(item);
   };
 
-  const items = [EMAIL_SENDER_ITEM, ...EMAIL_TEMPLATE_TYPES].map((item) => {
-    const itemStatus = resolveItemStatus(saved, draft, item, selectedLocale);
-    return {
-      value: item,
-      label:
-        item === EMAIL_SENDER_ITEM
-          ? t('senderItemLabel')
-          : tTemplate(`templateTypeLabel.${item}`),
-      group: item === EMAIL_SENDER_ITEM ? undefined : t('templateGroupLabel'),
-      description:
-        item === EMAIL_SENDER_ITEM
-          ? t('senderItemDescription')
-          : tTemplate(`templateTypeDescription.${item}`),
-      status: itemStatus,
-      statusLabel: tStatus(itemStatus),
-    };
-  });
+  const items = useEmailItems({ saved, draft, locale: selectedLocale });
 
   return (
     <SettingsFormShell
@@ -242,14 +189,10 @@ export const EmailSettings = ({
         <ViewTabs {...tabsProps} />
         <div {...panelProps('edit')} className={editPane()}>
           <EmailEditPane
-            item={selectedItem}
-            locale={selectedLocale}
+            selection={{ item: selectedItem, locale: selectedLocale }}
             defaultLocale={defaultLocale}
-            draft={draft}
-            saved={saved}
-            revision={revision}
-            senderFieldIds={senderFieldIds}
-            senderFieldErrors={senderFieldErrors}
+            draft={{ values: draft, saved, revision }}
+            senderFields={{ ids: senderFieldIds, errors: senderFieldErrors }}
             onSenderChange={(sender) => {
               setSenderFieldErrors({});
               setDraft((prev) => ({ ...prev, sender }));
