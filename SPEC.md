@@ -2935,11 +2935,11 @@ variant.
 token for what it is, so the Look's `radiusScale` and card style reach it
 without the component knowing either:
 
-| Role            | Utility         | Token                             | Used by                                                                                               |
-| --------------- | --------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                    |
-| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                              |
-| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, Hub tiles, the `CtaModule` box) |
+| Role            | Utility         | Token                             | Used by                                                                                                                  |
+| --------------- | --------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| bounded card    | `rounded-card`  | `--radius-card` → `--radius-md`   | `Panel`, `PricingCard`, `Toast`, `PopoverMenu`, `NewsletterSignup`                                                       |
+| media frame     | `rounded-media` | `--radius-media` → `--radius-lg`  | `MediaFrame`, `LogoTile`                                                                                                 |
+| house item card | `rounded-item`  | `--radius-item` → `--item-radius` | `item-card` (`MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, `Accordion` items, Hub tiles, the `CtaModule` box) |
 
 Controls and pills keep the plain steps (`rounded-sm`, `rounded-full`).
 `MediaFrame` takes a `shape` of `rect` (default, `rounded-media`) or `circle`
@@ -3035,8 +3035,8 @@ is the token for a border that genuinely is the sole indicator.
 
 ### Card style
 
-Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, the
-`PopoverMenu` tile (the account panel's Hub tiles), the contact-form success
+Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, each
+`Accordion` item, the `PopoverMenu` tile (the account panel's Hub tiles), the contact-form success
 card and the `CtaModule` CALLOUT and SPLIT box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
 five inherited `--item-*` properties rather than fixed classes, and each pairs
