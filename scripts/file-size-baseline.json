@@ -1,6 +1,5 @@
 {
   "apps/platform/src/app/api/internal/operator-alert/route.ts": 130,
-  "apps/platform/src/components/features/email/email-settings/email-settings.tsx": 212,
   "apps/platform/src/components/features/email/email-settings/use-email-draft.ts": 138,
   "apps/platform/src/components/features/languages/languages-settings/languages-settings.tsx": 191,
   "apps/platform/src/components/features/look/look-form/use-look-draft-fields.ts": 128,
