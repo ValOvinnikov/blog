@@ -1411,7 +1411,13 @@ still styled the same way as every other module — no exception — wraps it in
 `Section` component (`apps/web/src/components/shared/section`, relocated
 from `packages/ui`), passing `brandVariant` and `layout` straight through,
 plus an optional `titleId` (the module's heading element id, when it has
-one). `Section` always renders a real `<section>`; its outer element owns
+one). A module view renders that band and its module heading through
+`ModuleSection` (`apps/web/src/components/shared/module-section`), which takes
+the module's `brandVariant`, `layout`, `headingBlock` and `contentAlignment`
+as one `module` prop, and its actions row through `ModuleActions`
+(`components/shared/module-actions`), which renders nothing when there are no
+buttons; a view not yet converted composes `Section` and `ModuleHeading`
+directly. `Section` always renders a real `<section>`; its outer element owns
 the full-bleed background (driven by `brandVariant`) and vertical spacing as
 responsive padding (not margin, so stacked `Section`s tile edge-to-edge; the
 `spacingTop`/`spacingBottom` scale steps down at each Tailwind breakpoint,

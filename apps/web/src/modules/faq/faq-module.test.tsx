@@ -1,11 +1,11 @@
-import { BRAND_VARIANT } from '@blog/config';
-import type { TFaqModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
-import { mockFaqQuestion } from '@web/testing/modules/faq/fixtures';
+import {
+  mockFaqModule,
+  mockFaqQuestion,
+} from '@web/testing/modules/faq/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 
 import { FaqModule } from './faq-module';
@@ -31,16 +31,6 @@ faker.seed(31);
 const MOCK_FAQ_MODULE_ID = faker.string.uuid();
 const MOCK_FIRST_QUESTION = faker.lorem.sentence();
 const MOCK_SECOND_QUESTION = faker.lorem.sentence();
-
-const mockFaqModule = (overrides: Partial<TFaqModule> = {}): TFaqModule => ({
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock(),
-  questions: [],
-  ctaButtons: [],
-  contentAlignment: undefined,
-  layout: undefined,
-  ...overrides,
-});
 
 const setup = customRenderAsync(FaqModule, {
   id: MOCK_FAQ_MODULE_ID,

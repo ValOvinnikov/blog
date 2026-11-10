@@ -1,4 +1,5 @@
 import { service } from '@blog/service';
+import { STATS_LOG } from '@web/constants/stats';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
 
@@ -16,12 +17,12 @@ export const StatsModule = async ({ id }: IStatsModuleProps) => {
   );
 
   if (!result.ok) {
-    logger.error('stats_module.fetch_failed', { id, error: result.error });
+    logger.error(STATS_LOG.MODULE_FETCH_FAILED, { id, error: result.error });
     return null;
   }
   return (
     <StatsModuleView
-      {...result.data}
+      module={result.data}
       titleId={`stats-${id}`}
       dataTestId={`stats-module-${id}`}
     />
