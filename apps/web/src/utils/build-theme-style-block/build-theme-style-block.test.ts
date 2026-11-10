@@ -88,6 +88,41 @@ const splitModes = (css: string) => ({
   dark: css.slice(css.indexOf(DARK_SELECTOR)),
 });
 
+const STYLE_AXES: {
+  field: keyof TThemeTokens;
+  defaultValue: string;
+  declarations: Record<string, TThemeDeclarations>;
+}[] = [
+  {
+    field: 'cardStyle',
+    defaultValue: CARD_STYLE.ACCENT_BAR,
+    declarations: CARD_STYLE_DECLARATIONS,
+  },
+  {
+    field: 'headerControlStyle',
+    defaultValue: HEADER_CONTROL_STYLE.OUTLINED,
+    declarations: HEADER_CONTROL_STYLE_DECLARATIONS,
+  },
+  {
+    field: 'buttonShape',
+    defaultValue: BUTTON_SHAPE.ROUNDED,
+    declarations: BUTTON_SHAPE_DECLARATIONS,
+  },
+  {
+    field: 'navLinkStyle',
+    defaultValue: NAV_LINK_STYLE.PLAIN,
+    declarations: NAV_LINK_STYLE_DECLARATIONS,
+  },
+];
+
+const STYLE_VALUES = STYLE_AXES.flatMap(({ field, declarations }) =>
+  Object.entries(declarations).map(([value, valueDeclarations]) => ({
+    field,
+    value,
+    declarations: valueDeclarations,
+  })),
+);
+
 const missingDeclarations = (
   css: string,
   declarations: TThemeDeclarations,
@@ -235,98 +270,27 @@ describe(buildThemeStyleBlock, () => {
     expect(css).not.toContain('--scrim-neutral');
   });
 
-  it('defaults to the accent-bar card style', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const accentBarCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      cardStyle: CARD_STYLE.ACCENT_BAR,
-    });
+  it.each(STYLE_AXES)(
+    'defaults $field to $defaultValue',
+    ({ field, defaultValue }) => {
+      const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+      const explicitCss = buildThemeStyleBlock({
+        ...CONSOLE_TOKENS,
+        [field]: defaultValue,
+      });
 
-    expect(defaultCss).toBe(accentBarCss);
-  });
-
-  it.each(Object.values(CARD_STYLE))(
-    'writes the %s card declarations into :root',
-    (cardStyle) => {
-      const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, cardStyle }),
-      );
-
-      expect(
-        missingDeclarations(root, CARD_STYLE_DECLARATIONS[cardStyle]),
-      ).toEqual([]);
+      expect(defaultCss).toBe(explicitCss);
     },
   );
 
-  it('defaults to the outlined header control style', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const outlinedCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
-    });
-
-    expect(defaultCss).toBe(outlinedCss);
-  });
-
-  it.each(Object.values(HEADER_CONTROL_STYLE))(
-    'writes the %s header control declarations into :root',
-    (headerControlStyle) => {
+  it.each(STYLE_VALUES)(
+    'writes $field $value into the :root block',
+    ({ field, value, declarations }) => {
       const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, headerControlStyle }),
+        buildThemeStyleBlock({ ...CONSOLE_TOKENS, [field]: value }),
       );
 
-      expect(
-        missingDeclarations(
-          root,
-          HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
-        ),
-      ).toEqual([]);
-    },
-  );
-
-  it('defaults to the rounded button shape', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const roundedCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      buttonShape: BUTTON_SHAPE.ROUNDED,
-    });
-
-    expect(defaultCss).toBe(roundedCss);
-  });
-
-  it.each(Object.values(BUTTON_SHAPE))(
-    'writes the %s button shape into the :root block that sets the radius scale',
-    (buttonShape) => {
-      const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, buttonShape }),
-      );
-
-      expect(
-        missingDeclarations(root, BUTTON_SHAPE_DECLARATIONS[buttonShape]),
-      ).toEqual([]);
-    },
-  );
-
-  it('defaults to the plain navigation link style', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const plainCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      navLinkStyle: NAV_LINK_STYLE.PLAIN,
-    });
-
-    expect(defaultCss).toBe(plainCss);
-  });
-
-  it.each(Object.values(NAV_LINK_STYLE))(
-    'writes the %s navigation link style into the :root block that sets the radius scale',
-    (navLinkStyle) => {
-      const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, navLinkStyle }),
-      );
-
-      expect(
-        missingDeclarations(root, NAV_LINK_STYLE_DECLARATIONS[navLinkStyle]),
-      ).toEqual([]);
+      expect(missingDeclarations(root, declarations)).toEqual([]);
     },
   );
 

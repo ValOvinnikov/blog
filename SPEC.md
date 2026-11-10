@@ -3095,11 +3095,12 @@ which resolves on the element that declares it, so it follows the radius scale
 only when declared beside it. A component never overrides the shape with its
 own `rounded-*` class.
 
-**Navigation links** style first-level header links only, through five
+**Navigation links** style first-level header links only, through six
 inherited `--nav-link-*` properties that only `NAV_LINK` reads, so footer
 links, language codes, sub-menu items and phone-menu rows never change. The
 tenant stores the style on the Look (`site_config.nav_link_style`: `PLAIN`
 default, `UNDERLINE`, `SOFT`, `PILL`; a Growth field, so a `FREE` site renders
 its preset's Plain), and `buildThemeStyleBlock` always declares
 `NAV_LINK_STYLE_DECLARATIONS` under `:root`, beside the radius scale that its
-`--nav-link-radius` resolves against. `theme.css`'s static values are Plain's.
+`--nav-link-radius` resolves against. `theme.css` declares Plain's other five
+static values; the radius falls back to `var(--radius-sm)` at the element.
