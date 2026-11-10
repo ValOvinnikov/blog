@@ -1,4 +1,8 @@
-import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  LOCALE_ISO_CODES,
+  SUBJECT_MAX,
+} from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
@@ -20,7 +24,7 @@ vi.mock('@blog/db/client');
 
 faker.seed(61014);
 
-const MOCK_OVERLONG_SUBJECT = faker.string.alpha(201);
+const MOCK_OVERLONG_SUBJECT = faker.string.alpha(SUBJECT_MAX + 1);
 const MOCK_MALFORMED_BLOCK = { text: faker.lorem.sentence() };
 
 const db = useQueryTestDb();

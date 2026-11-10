@@ -1,14 +1,13 @@
+import { FOOTER_ADDRESS_MAX, SENDER_NAME_MAX } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { emailConfig } from '@blog/db/schema/email-config';
+import { isUndefined } from '@blog/utils/primitives';
 import { z } from 'zod';
 
 import {
   toEmailConfigResult,
   type TEmailConfigResult,
 } from '../get-email-config';
-
-const SENDER_NAME_MAX = 100;
-const FOOTER_ADDRESS_MAX = 300;
 
 // A field absent from the input is left untouched on `UPDATE` (and falls
 // back to no value on the first `INSERT` for a tenant) — each field saves
@@ -46,16 +45,16 @@ function presentFields(
 ): TEmailConfigWritable {
   const fields: TEmailConfigWritable = {};
 
-  if (parsed.logoAssetUrl !== undefined)
+  if (!isUndefined(parsed.logoAssetUrl))
     fields.logoAssetUrl = parsed.logoAssetUrl;
-  if (parsed.senderName !== undefined) fields.senderName = parsed.senderName;
-  if (parsed.replyToAddress !== undefined) {
+  if (!isUndefined(parsed.senderName)) fields.senderName = parsed.senderName;
+  if (!isUndefined(parsed.replyToAddress)) {
     fields.replyToAddress = parsed.replyToAddress;
   }
-  if (parsed.footerPostalAddress !== undefined) {
+  if (!isUndefined(parsed.footerPostalAddress)) {
     fields.footerPostalAddress = parsed.footerPostalAddress;
   }
-  if (parsed.contactRecipient !== undefined) {
+  if (!isUndefined(parsed.contactRecipient)) {
     fields.contactRecipient = parsed.contactRecipient;
   }
 
