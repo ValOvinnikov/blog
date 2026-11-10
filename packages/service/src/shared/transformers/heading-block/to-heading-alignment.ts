@@ -1,9 +1,11 @@
-import { CONTENT_ALIGNMENT, type TContentAlignmentOf } from '@blog/config';
-
-export type THeadingAlignment = TContentAlignmentOf<'LEFT' | 'CENTER'>;
+import {
+  CONTENT_ALIGNMENT,
+  type THeadingAlignment,
+  type TMaybeNull,
+} from '@blog/config';
 
 export function toHeadingAlignment(
-  raw: THeadingAlignment | null,
+  raw: TMaybeNull<THeadingAlignment>,
 ): THeadingAlignment {
   return raw ?? CONTENT_ALIGNMENT.LEFT;
 }
