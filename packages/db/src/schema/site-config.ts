@@ -5,6 +5,7 @@ import {
   ACCOUNT_PHONE_PLACEMENT,
   BRAND_VARIANT,
   BUSY_BUTTON_STYLE,
+  BUTTON_SHAPE,
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
@@ -24,6 +25,7 @@ import {
   type TAccountPhonePlacement,
   type TBrandVariant,
   type TBusyButtonStyle,
+  type TButtonShape,
   type TCardStyle,
   type TCookieSettingsButton,
   type TDensity,
@@ -128,6 +130,11 @@ export const spinnerStyleEnum = pgEnum(
   Object.values(SPINNER_STYLE) as [TSpinnerStyle, ...TSpinnerStyle[]],
 );
 
+export const buttonShapeEnum = pgEnum(
+  'button_shape',
+  Object.values(BUTTON_SHAPE) as [TButtonShape, ...TButtonShape[]],
+);
+
 export const headerLayoutEnum = pgEnum(
   'header_layout',
   Object.values(HEADER_LAYOUT) as [THeaderLayout, ...THeaderLayout[]],
@@ -215,6 +222,9 @@ export const siteConfig = pgTable('site_config', {
   spinnerStyle: spinnerStyleEnum('spinner_style')
     .notNull()
     .default(SPINNER_STYLE.BRAILLE),
+  buttonShape: buttonShapeEnum('button_shape')
+    .notNull()
+    .default(BUTTON_SHAPE.ROUNDED),
   headerLayout: headerLayoutEnum('header_layout')
     .notNull()
     .default(HEADER_LAYOUT.CLASSIC),

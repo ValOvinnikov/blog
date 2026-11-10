@@ -18,6 +18,7 @@ export const LOOK_FIELD = {
   ACCOUNT_PHONE_PLACEMENT: 'accountPhonePlacement',
   BUSY_BUTTON_STYLE: 'busyButtonStyle',
   SPINNER_STYLE: 'spinnerStyle',
+  BUTTON_SHAPE: 'buttonShape',
   HEADER_LAYOUT: 'headerLayout',
   HEADER_SUBMENU_STYLE: 'headerSubmenuStyle',
   HEADER_BAR_STYLE: 'headerBarStyle',
