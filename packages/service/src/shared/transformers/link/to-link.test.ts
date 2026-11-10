@@ -11,13 +11,8 @@ import {
   MOCK_ABOUT_HREF,
   MOCK_ABOUT_SLUG,
 } from '@blog/service/testing/shared/translated-pages-dataset';
-import { faker } from '@faker-js/faker';
 
 import { toLink, type TRawLink } from './to-link';
-
-faker.seed(6021);
-
-const MOCK_ACCESSIBLE_LABEL = faker.lorem.sentence();
 
 function mockRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
   return {
@@ -27,7 +22,6 @@ function mockRawLink(overrides: Partial<TRawLink> = {}): TRawLink {
     internalReference: null,
     openInNewTab: null,
     platform: null,
-    accessibleLabel: null,
     ...overrides,
   };
 }
@@ -37,14 +31,6 @@ describe(toLink, () => {
     const result = toLink(mockRawLink());
 
     expect(result).toEqual(mockLinkView());
-  });
-
-  it('labels the link for assistive tech with its accessible label', () => {
-    const result = toLink(
-      mockRawLink({ accessibleLabel: MOCK_ACCESSIBLE_LABEL }),
-    );
-
-    expect(result).toEqual(mockLinkView({ ariaLabel: MOCK_ACCESSIBLE_LABEL }));
   });
 
   it('opens external links in a new tab when flagged', () => {

@@ -3,6 +3,7 @@ import {
   LINK_TYPE,
   type ILink,
   type TMaybeUndefined,
+  type TNullable,
 } from '@blog/config';
 import type { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
 import type { InferFragmentType } from 'groqd';
@@ -10,7 +11,7 @@ import type { InferFragmentType } from 'groqd';
 export type TRawLinkDocument = InferFragmentType<typeof linkDocumentFragment>;
 
 export function toLinkDocument(
-  raw: TRawLinkDocument | null | undefined,
+  raw: TNullable<TRawLinkDocument>,
 ): TMaybeUndefined<ILink> {
   if (!raw?.label) return undefined;
 
@@ -30,6 +31,5 @@ export function toLinkDocument(
         ? '_blank'
         : undefined,
     platform: undefined,
-    ariaLabel: undefined,
   };
 }

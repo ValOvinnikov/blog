@@ -4,7 +4,6 @@ import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
-  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
 } from '@web/testing/modules/cta/fixtures';
 
 import { ActionGroup } from './action-group';
@@ -43,21 +42,14 @@ describe(`<${ActionGroup.name}/>`, () => {
       expect(otherLinks).toHaveLength(0);
     });
 
-    it('forwards the authored ariaLabel as the link accessible name', () => {
-      const link = screen.getByRole('link', {
-        name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
-      });
+    it.each([MOCK_CTA_PRIMARY_ACTION, MOCK_CTA_SECONDARY_ACTION])(
+      'names the $link.label link by its label',
+      ({ link: { label } }) => {
+        const link = screen.getByRole('link', { name: label });
 
-      expect(link).toBeVisible();
-    });
-
-    it('falls back to the label as the accessible name without an ariaLabel', () => {
-      const link = screen.getByRole('link', {
-        name: MOCK_CTA_PRIMARY_ACTION.link.label,
-      });
-
-      expect(link).toBeVisible();
-    });
+        expect(link).toBeVisible();
+      },
+    );
   });
 
   describe('with a hiddenLabelSuffix', () => {

@@ -169,7 +169,6 @@ export function mockLinkView(overrides: Partial<ILink> = {}): ILink {
     href: MOCK_EXTERNAL_URL,
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
     ...overrides,
   };
 }

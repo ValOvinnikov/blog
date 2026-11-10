@@ -35,7 +35,6 @@ describe('inlineLinkFragment', () => {
       internalReference: { _type: 'page_post', slug: MOCK_POST_SLUG },
       openInNewTab: null,
       platform: null,
-      accessibleLabel: null,
     };
 
     const link = inlineLinkDocQuery.parse(raw);
@@ -82,7 +81,6 @@ describe('inlineLinkFragment', () => {
       },
       openInNewTab: null,
       platform: null,
-      accessibleLabel: null,
     });
   });
 

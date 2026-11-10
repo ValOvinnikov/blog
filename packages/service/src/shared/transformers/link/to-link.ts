@@ -52,6 +52,5 @@ export function toLink(raw: TNullable<TRawLink>): TMaybeUndefined<ILink> {
         ? '_blank'
         : undefined,
     platform: raw.platform ?? undefined,
-    ariaLabel: raw.accessibleLabel ?? undefined,
   };
 }

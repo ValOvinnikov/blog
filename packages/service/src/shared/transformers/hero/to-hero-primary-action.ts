@@ -2,31 +2,24 @@ import {
   routes,
   type ILink,
   type TCtaActionAppearance,
+  type TMaybeNull,
   type TMaybeUndefined,
+  type TNullable,
 } from '@blog/config';
 import type { TPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 
 const DEFAULT_PRIMARY_ACTION_LABEL = 'Read more';
 
-/**
- * The hero's primary CTA has no `ariaLabel` — unlike `ILink`, whose
- * `ariaLabel` targets assistive tech only. Lighthouse's SEO `link-text`
- * audit reads the link's visible text content, not `aria-label`, so a
- * descriptive suffix for the generic fallback label must be rendered as
- * real (if visually hidden) text. `hiddenLabelSuffix` carries that text;
- * the web layer renders it as an `sr-only` span appended to `label`.
- */
-export type THeroPrimaryAction = Omit<ILink, 'ariaLabel'> & {
+// Lighthouse's `link-text` audit ignores `aria-label`, so the suffix renders as sr-only text.
+export type THeroPrimaryAction = ILink & {
   hiddenLabelSuffix: TMaybeUndefined<string>;
-  // Absent for `module_hero`, which has no appearance field at all —
-  // only `module_heroBlog` ever passes one through.
   appearance: TMaybeUndefined<TCtaActionAppearance>;
 };
 
 export function toHeroPrimaryAction(
-  label: string | null | undefined,
-  post: TPostCard | undefined,
-  appearance?: TCtaActionAppearance | null,
+  label: TNullable<string>,
+  post: TMaybeUndefined<TPostCard>,
+  appearance?: TMaybeNull<TCtaActionAppearance>,
 ): TMaybeUndefined<THeroPrimaryAction> {
   if (!post) return undefined;
 

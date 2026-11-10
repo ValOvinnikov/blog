@@ -101,7 +101,6 @@ export const FeatureListCard = ({
           <MediaCard.Link
             href={item.link.href}
             target={item.link.target}
-            ariaLabel={item.link.ariaLabel}
             as={SmartLink}
           >
             {heading}

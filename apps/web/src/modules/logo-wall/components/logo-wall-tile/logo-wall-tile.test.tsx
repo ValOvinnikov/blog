@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import {
@@ -10,9 +9,6 @@ import { LogoWallTile } from './logo-wall-tile';
 
 vi.mock('@web/i18n/navigation');
 
-faker.seed(6011);
-
-const MOCK_LINK_ARIA_LABEL = faker.lorem.sentence();
 const MOCK_ASPECT_RATIO = 2400 / 1260;
 const LOGO_TEST_ID = 'logo-wall-tile-logo';
 const LOGO_ASPECT_PROPERTY = '--logo-aspect';
@@ -43,25 +39,12 @@ describe(`<${LogoWallTile.name}/>`, () => {
     });
   });
 
-  it('names the link by its aria label override when one is set', () => {
-    setup({
-      logo: mockLogoItem({
-        link: { ...MOCK_LOGO_LINK, ariaLabel: MOCK_LINK_ARIA_LABEL },
-      }),
-    });
-
-    const link = screen.getByRole('link', {
-      name: MOCK_LINK_ARIA_LABEL,
-    });
-    expect(link).toHaveAttribute('href', MOCK_LOGO_LINK.href);
-  });
-
   describe('with a linked logo', () => {
     beforeEach(() => {
       setup({ logo: mockLogoItem({ link: MOCK_LOGO_LINK }) });
     });
 
-    it('names the link by the company when it has no aria label override', () => {
+    it('names the link by the company', () => {
       const link = screen.getByRole('link', { name: MOCK_LOGO.name });
       expect(link).toHaveAttribute('href', MOCK_LOGO_LINK.href);
     });

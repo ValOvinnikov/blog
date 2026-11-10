@@ -37,7 +37,7 @@ const toButtonVariant = (
 };
 
 const toIsReversedOnDark = (
-  isOnDark: boolean | undefined,
+  isOnDark: TMaybeUndefined<boolean>,
   variant: TActionButtonVariant,
 ): boolean => Boolean(isOnDark) && variant !== 'primary';
 
@@ -52,7 +52,6 @@ export const ActionGroup = ({ actions, isOnDark }: IActionGroupProps) => (
           as={SmartLink}
           href={action.link.href}
           target={action.link.target}
-          aria-label={action.link.ariaLabel}
           variant={variant}
           className={actionGroupVariants({
             isOnDark: toIsReversedOnDark(isOnDark, variant),

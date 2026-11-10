@@ -15,9 +15,6 @@ import {
 
 const mockFaker = createMockFaker(61050);
 
-export const MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL =
-  'Learn more about our subscription plans';
-
 export const MOCK_CTA_PRIMARY_ACTION: TCtaButton = {
   variant: CTA_ACTION_VARIANT.PRIMARY,
   appearance: CTA_ACTION_APPEARANCE.CONTAINED,
@@ -26,7 +23,6 @@ export const MOCK_CTA_PRIMARY_ACTION: TCtaButton = {
     href: '/blog',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 };
 
@@ -38,7 +34,6 @@ export const MOCK_CTA_SECONDARY_ACTION: TCtaButton = {
     href: '/about-us',
     target: undefined,
     platform: undefined,
-    ariaLabel: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
   },
 };
 

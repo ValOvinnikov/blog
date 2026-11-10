@@ -10,7 +10,7 @@ code:
   - packages/service/src/shared/fragments/link/**
   - packages/service/src/shared/transformers/link/**
   - apps/web/src/components/shared/smart-link/**
-epics: [3215, 3600, 3663]
+epics: [3215, 3600]
 ---
 
 # Links
@@ -28,8 +28,8 @@ A link is authored once, as a `link` document — a label per language and exact
 ## Data
 
 - **`link` document:** `title` (Studio-only), `label` (`internationalizedArrayString`), `linkType` (`INTERNAL` or `EXTERNAL` from `LINK_TYPE`, initial `INTERNAL`), `internalReference` (a reference to one of `LINK_PAGE_TYPES`: `page_home`, `page_landing`, `page_post`, `page_postIndex`, `page_topic`, `page_topicIndex`, `page_tag`, `page_tagIndex`), `url` (`internationalizedArrayString`), `openInNewTab` (initial `false`, shown for external links only).
-- **Domain shape:** `ILink` (`@blog/config`) — `label`, `href`, `target`, `platform`, `ariaLabel`.
-- **Resolution** (`linkDocumentFragment` → `toLinkDocument`): `label` and `url` take the request language, else the default language. An internal reference follows `translation.metadata` to the target's translation in the request language, else in the default language, else the referenced page itself; `pageHref(type, slug)` (`@blog/config` `routes.ts`) turns it into a path, with a landing page's nested path built by `PAGE_PATH_EXPRESSION`. `target` is `_blank` only for an external link with `openInNewTab`. This path never sets `platform` or `ariaLabel`.
+- **Domain shape:** `ILink` (`@blog/config`) — `label`, `href`, `target`, `platform`.
+- **Resolution** (`linkDocumentFragment` → `toLinkDocument`): `label` and `url` take the request language, else the default language. An internal reference follows `translation.metadata` to the target's translation in the request language, else in the default language, else the referenced page itself; `pageHref(type, slug)` (`@blog/config` `routes.ts`) turns it into a path, with a landing page's nested path built by `PAGE_PATH_EXPRESSION`. `target` is `_blank` only for an external link with `openInNewTab`. This path never sets `platform`.
 - **Legacy:** `inlineLink`, an object holding its own label and destination, survives only as `module_hero.secondaryAction`, resolved by `inlineLinkFragment` → `toLink`.
 - **Cache:** every loader that projects link documents lists `link` and the page types in its `isr(...)` tags; the publish webhook maps `link` → `link`, and also purges the `module:<id>` tag of any module that references a changed document directly or through a `link` document.
 
@@ -46,7 +46,7 @@ A link is authored once, as a `link` document — a label per language and exact
 - No label, or no href (a slugged page without a slug, an unroutable landing page, a dangling reference), yields no link: navigation items, social profiles, CTA buttons and cards drop it, and a body-text annotation renders its text unlinked.
 - Prose offers no paste-a-URL annotation: the only annotation is `linkRef`. In prose the visible text is the annotated span; everywhere else it is the link's label.
 - An internal link never 404s for language reasons: it goes to the reader's translation when one exists, else to the default-language page.
-- Accessible names come from the link's content (its label, or the card or logo it wraps); a social link's comes from its platform via the catalog. `ILink.ariaLabel` is never populated on the `link` document path.
+- Accessible names come from the link's content (its label, or the card or logo it wraps); a social link's comes from its platform via the catalog.
 - `SmartLink` is the only in-app link component: it renders next-intl's `Link`, which adds the current language's prefix to internal paths, falls back to `next/link` for protocol-relative `//host` hrefs, and adds `rel="noopener noreferrer"` to `target="_blank"`.
 
 ## Dependencies
@@ -79,6 +79,5 @@ A link is authored once, as a `link` document — a label per language and exact
 
 ## Related
 
-- #3663 — remove the unused `ILink.ariaLabel`.
 - #3215 — delete `inlineLink` once `module_hero` is retired (blocked by #2813).
 - #3600 — decide purge coverage for author- and post-mediated hero link targets.

@@ -20,7 +20,6 @@ const primaryButton = {
     href: '/blog/building-a-design-system',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 };
 
@@ -32,7 +31,6 @@ const secondaryButton = {
     href: '/blog',
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 };
 

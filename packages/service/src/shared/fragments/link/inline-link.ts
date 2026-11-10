@@ -24,5 +24,4 @@ export const inlineLinkFragment = q
       .nullable(true),
     openInNewTab: sub.field('openInNewTab').nullable(true),
     platform: sub.field('platform').nullable(true),
-    accessibleLabel: sub.field('accessibleLabel').nullable(true),
   }));

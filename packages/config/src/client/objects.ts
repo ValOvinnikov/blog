@@ -37,7 +37,6 @@ export interface ILink {
   href: string;
   target: TMaybeUndefined<'_blank'>;
   platform: TMaybeUndefined<TSocialPlatform>;
-  ariaLabel: TMaybeUndefined<string>;
 }
 
 export interface IBodyImageBlock {
