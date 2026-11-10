@@ -32,7 +32,6 @@
   "apps/platform/src/utils/voice-draft/voice-draft.ts": 164,
   "apps/platform/src/vitest-setup.ts": 135,
   "apps/web/src/app/api/generate-skim/route.ts": 151,
-  "apps/web/src/app/api/revalidate/route.ts": 235,
   "apps/web/src/app/sitemap.ts": 315,
   "apps/web/src/context/depth-provider/depth-provider.tsx": 151,
   "apps/web/src/context/toast-provider/toast-provider.tsx": 172,
