@@ -17,7 +17,21 @@ const BOOKMARKS_HREF = '#bookmarks';
 const SETTINGS_HREF = '#settings';
 const BOOKMARKS_DESCRIPTION = 'Posts you saved to read later';
 const BOOKMARKS_LABEL = 'My bookmarks';
+const HUB_BOOKMARKS_LABEL = 'Bookmarks';
 const SETTINGS_DESCRIPTION = 'Name, sign-in methods, your data';
+
+const HUB_LINKS = {
+  bookmarks: {
+    href: BOOKMARKS_HREF,
+    label: HUB_BOOKMARKS_LABEL,
+    description: BOOKMARKS_DESCRIPTION,
+  },
+  settings: {
+    href: SETTINGS_HREF,
+    label: 'Settings',
+    description: SETTINGS_DESCRIPTION,
+  },
+};
 
 const InteractiveAccountPanel = (args: TAccountPanelProps) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -114,18 +128,24 @@ export const Hub: TStory = {
   ),
   args: {
     appearance: ACCOUNT_PANEL_STYLE.HUB,
+    links: HUB_LINKS,
+  },
+};
+
+export const HubCurrentAndFocusedTiles: TStory = {
+  ...Hub,
+  name: 'Hub, current tile with another tile focused',
+  args: {
+    appearance: ACCOUNT_PANEL_STYLE.HUB,
     links: {
-      bookmarks: {
-        href: BOOKMARKS_HREF,
-        label: 'Bookmarks',
-        description: BOOKMARKS_DESCRIPTION,
-      },
-      settings: {
-        href: SETTINGS_HREF,
-        label: 'Settings',
-        description: SETTINGS_DESCRIPTION,
-      },
+      ...HUB_LINKS,
+      settings: { ...HUB_LINKS.settings, isCurrent: true },
     },
+  },
+  play: ({ canvasElement }) => {
+    within(canvasElement)
+      .getAllByRole('menuitem', { name: HUB_BOOKMARKS_LABEL })[0]
+      ?.focus();
   },
 };
 
