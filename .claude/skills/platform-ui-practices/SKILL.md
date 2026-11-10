@@ -220,8 +220,8 @@ from `useSettingsFormState()`:
   `StatusBadge`, a 12px muted count, an `sm` `Button`, a `SegmentedControl`.
 - Padding comes from the parts (header `px-[18px] py-3.5`, body `p-[18px]`);
   don't re-pad `Card.Body`.
-- A failure card (a failed run, a danger zone) is a `Card` with an
-  `admin-bad`-tinted border and title, as `DeprovisionTenantControl`'s is.
+- A failure card (a failed run, a danger zone) is a `Card isDanger`, which
+  tints its border and title with `admin-bad`; never rebuild that tint by hand.
 - On an editing page with columns, the list, the editor and the preview are each
   their own `Card`. Voice is the exception: each surface's preview sits inside
   its surface card.

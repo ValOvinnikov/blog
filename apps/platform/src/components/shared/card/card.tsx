@@ -30,6 +30,7 @@ type TCardProps = {
   id?: string;
   children?: TCompoundChildren<typeof CardParts>;
   className?: string;
+  isDanger?: boolean;
   'aria-labelledby'?: string;
 };
 
@@ -37,9 +38,10 @@ const CardRoot = ({
   id,
   children,
   className,
+  isDanger = false,
   'aria-labelledby': ariaLabelledBy,
 }: TCardProps) => {
-  const { root } = cardVariants();
+  const { root } = cardVariants({ isDanger });
   const generatedTitleId = useId();
   const { slots, unmatched } = mapCompoundSlots(children, CardParts);
   const Header = slots.Header as TMaybeUndefined<
@@ -56,7 +58,7 @@ const CardRoot = ({
       aria-labelledby={labelledBy}
       className={root({ class: className })}
     >
-      {Header && cloneElement(Header, { titleId })}
+      {Header && cloneElement(Header, { titleId, isDanger })}
       {slots.Body}
       {slots.Footer}
       {unmatched.map((node, i) => (

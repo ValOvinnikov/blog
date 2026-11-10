@@ -12,6 +12,7 @@ export const cardVariants = tv({
       'rounded-t-admin border-b border-admin-line bg-admin-surface-head px-admin-card py-3',
     ],
     headerTitleGroup: ['min-w-0'],
+    headerTitle: [],
     headerDescription: [
       'mt-0.5 block text-admin-12-5 leading-admin-18 text-admin-muted',
     ],
@@ -29,8 +30,17 @@ export const cardVariants = tv({
       true: { footer: ['flex-wrap'] },
       false: {},
     },
+    isDanger: {
+      true: {
+        root: ['border-admin-bad/30'],
+        header: ['border-admin-bad/20'],
+        headerTitle: ['text-admin-bad'],
+      },
+      false: {},
+    },
   },
   defaultVariants: {
     hasFooterError: false,
+    isDanger: false,
   },
 });
