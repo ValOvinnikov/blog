@@ -24,36 +24,30 @@ describing the old shape.
 
 ## 0. Mechanical pass (blocking — run the commands, don't eyeball)
 
-Run each over the **full diff** (`git diff origin/main...HEAD`, plus `git diff`
-if the tree is dirty). Every hit is a blocking finding unless allowed below.
+**First, `pnpm check:diff-hygiene`.** It holds every check with no judgement
+in it, over the files changed since the merge-base with `origin/main` plus
+untracked files, and prints `file:line` for each hit: a bare `console.*` where
+`no-console` applies, `debugger`, `.only`/`.skip`, conflict markers, a
+committed `.env*`, an `eslint-disable` without a `-- reason` or a bare
+`@ts-ignore`/`@ts-expect-error`/`@ts-nocheck`, a log event name typed at the
+call instead of read from its `<DOMAIN>_LOG` const, and an `it` title over 80
+characters. Any comment in a touched test file is `check:touched-lint`'s
+(`blog-touched/no-failing-comment`). Both are in `pnpm verify` and pre-push,
+so the implementing session has already seen them pass; any hit is blocking.
+
+The checks below need a reader. Run each over the **full diff**
+(`git diff origin/main...HEAD`, plus `git diff` if the tree is dirty) and read
+every hit; a confirmed one is blocking unless allowed below.
 
 ```bash
 BASE=origin/main
 D() { git diff "$BASE"...HEAD; git diff; }
 
-# Bare console.* and debugger. Exempt: files outside no-console's .ts/.tsx
-# scope (root scripts/** and packages/studio/scripts/**, all .mjs), tests, and
-# the per-workspace preset exemptions CLAUDE.md → "No bare console.*" lists.
-D | grep -nE '^\+.*console\.(log|info|debug|trace|warn|error)'
-D | grep -nE '^\+.*\bdebugger\b'
-
-# A log event name typed at the call instead of read from the domain's
-# <DOMAIN>_LOG const (CLAUDE.md → "No bare console.*").
-D | grep -nE "^\+.*logger\.(error|warn|info|debug)\(\s*['\"\`]"
-
-# Focused/skipped tests
-D | grep -nE '^\+.*\.(only|skip)\('
-
-# New suppressions need a stated justification
-D | grep -nE '^\+.*(eslint-disable|@ts-ignore|@ts-expect-error|@ts-nocheck)'
-
-# Leftovers and conflict markers
+# Leftovers: a TODO/FIXME may cite an open issue (CLAUDE.md comments rule).
 D | grep -nE '^\+.*(TODO|FIXME|XXX|HACK)'
-D | grep -nE '^(<<<<<<<|>>>>>>>)'
 
-# Secrets / env files
+# Secrets. Read each hit — fixtures carry fakes.
 D | grep -nE '^\+.*(_TOKEN|_SECRET|API_KEY)\s*[:=]'
-git diff "$BASE"...HEAD --name-only | grep -E '^\.env'
 
 # A real Sanity project id pasted into a fixture via a copied Access API error.
 # Read each hit — the id may be an intentional fake. Deliberately narrow: a
@@ -85,12 +79,9 @@ D | awk '/^\+\+\+ b\//{f=substr($0,7)} f ~ /\.test\.tsx?$/{print f}' | sort -u |
 D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /(module-renderer|\/src\/app\/.*)\.test/{print FNR": "$0}'
 D | grep -nE '^\+.*mock\.calls'
 
-# Added or edited test titles over 80 characters (testing-practices → Conventions).
-D | grep -nE "^\+[[:space:]]*it(\.each\(.*\))?\([[:space:]]*['\"\`][^'\"\`]{81,}"
-
-# Comments (CLAUDE.md → "Comments default to zero"): a `Name — does X` doc
-# block, a doc block of three or more lines, a `//` inside a body. Read each
-# hit — the one-line gotcha the rule allows is not a finding.
+# Comments outside test files (CLAUDE.md → "Comments default to zero"): a
+# `Name — does X` doc block, a doc block of three or more lines, a `//` inside
+# a body. Read each hit — the one-line gotcha the rule allows is not a finding.
 D | grep -nE '^\+[[:space:]]*\* [A-Z][A-Za-z0-9]+ — '
 D | awk '/^\+[[:space:]]*\/\*\*/{n=0;b=1;next} b&&/^\+[[:space:]]*\*\//{b=0;if(n>=3)print FNR": doc block of "n" lines";next} b&&/^\+/{n++}'
 D | grep -nE '^\+ {4,}// '
@@ -100,10 +91,6 @@ D | grep -nE '^\+ {4,}// '
 # findings.
 ( git diff "$BASE"...HEAD --name-only --diff-filter=d; git diff --name-only --diff-filter=d ) \
   | grep -E '\.test\.tsx?$' | sort -u | xargs -r wc -l | awk '$2 != "total" && $1 > 500'
-
-# Any comment in a test file (testing-practices "What not to test" → "No
-# comments in a test file").
-D | awk '/^\+\+\+ b\//{t=($0 ~ /\.test\.tsx?$/)} t&&/^\+[[:space:]]*(\/\/|\/\*\*|\*[[:space:]])/{print FNR": "$0}'
 
 # A fixed fake value not named MOCK_<THING> in a test file, testing/ or
 # __mocks__/ (testing-practices → "Fixture naming").
@@ -122,14 +109,12 @@ for f in $( (git diff "$BASE"...HEAD --name-only --diff-filter=AM; git diff --na
     done
 done
 
-# Clones across every workspace the diff touches (~5s); read the hits that
-# involve a changed file. A clone the diff creates — helper, component, hook,
-# test fake, fixture, repeated arrangement — is blocking; one whose copies were
-# all on main already is filed.
-WS=$( (git diff "$BASE"...HEAD --name-only; git diff --name-only) | grep -E '\.(ts|tsx)$' | cut -d/ -f1-2 | sort -u )
-[ -n "$WS" ] && pnpm dlx jscpd@4 --min-tokens 60 --min-lines 8 \
-  --ignore '**/node_modules/**,**/generated/**,**/.next/**' --reporters console $WS 2>/dev/null \
-  | grep -A2 'Clone found'
+# Clones across every workspace the diff touches (a few seconds), printed only
+# where one side is a touched file. Exits non-zero when jscpd is missing or
+# fails — never an empty pass. A clone the diff creates — helper, component,
+# hook, test fake, fixture, repeated arrangement — is blocking; one whose
+# copies were all on main already is filed.
+pnpm check:clones
 ```
 
 Also scan by eye for commented-out code, which grep can't catch reliably. Hits
@@ -345,7 +330,8 @@ Pre-commit reviews go to the `reviewer` subagent (`.claude/agents/reviewer.md`)
 self-review, someone else's PR) runs the same three passes, in order; a hit in
 an early pass does not skip a later one:
 
-1. **Mechanical (§0).** Run the commands; every hit is blocking.
+1. **Mechanical (§0).** Run `pnpm check:diff-hygiene`, then the commands
+   that need a reader; every confirmed hit is blocking.
 2. **Contract (the sync item and §1–7).** Map each changed file to its layer and walk the
    checklist, boundary and type findings first.
 3. **General** — what a contract check won't catch:

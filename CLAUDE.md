@@ -889,7 +889,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
   `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,
   `gen:migration-ids:check`)
-  and the local-only diff check `check:touched-lint`, so it stops at the first failure and mirrors every required or gating CI check that has a local
+  and the local-only diff checks `check:diff-hygiene` (the judgement-free
+  half of `code-review-practices` §0) and `check:touched-lint`, so it stops at the first failure and mirrors every required or gating CI check that has a local
   equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
   part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
   it locally only when diagnosing an actual CI build failure
@@ -1401,13 +1402,28 @@ worktree/scratchpad tooling — replaces exactly three things; everything else,
 including quality gates, conventional commits and the push/PR approval gates,
 still applies:
 
-- **Delegation is relaxed:** implement directly, reading the owning layer's
-  `.claude/agents/<layer>.md` first; step 4's `reviewer` dispatch becomes a
-  self-review against the `code-review-practices` checklist before committing.
+- **Delegation is relaxed:** implement directly, following the checklist
+  below; step 4's `reviewer` dispatch becomes the self-review in it.
 - **Board writes** (steps 1 and 7) are replaced by the evidence protocol below.
 - **The `job:<session-name>` PR label** does not apply and has no substitute —
   it tells concurrent local jobs apart, and a cloud session has no job id and
   no `gh`. Never reach for an MCP or REST equivalent.
+
+**The solo-session checklist** — the one list a cloud session follows, the
+`@claude` runner included, in order:
+
+1. Read the owning layer's `.claude/agents/<layer>.md` and the skills it
+   names, then every file you will change and its folder ("Examine before you
+   change").
+2. Search for what already exists before adding anything ("Reuse before you
+   create").
+3. Implement, fixing the mechanical drift in every file you touch.
+4. `pnpm verify` — it runs `pnpm check:diff-hygiene`; run that alone after any
+   later edit.
+5. Self-review the full diff against `code-review-practices`, all three
+   passes, §0's reader commands and `pnpm check:clones` included.
+6. Commit, push, and open a draft PR whose body carries one **Examined** and
+   one **Reuse** line, as an implementing agent's report would.
 
 **Cloud sessions never write the project board — they leave evidence it can be
 inferred from.** Projects v2 is GraphQL-only, and cloud sessions have no `gh`

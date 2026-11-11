@@ -13,7 +13,10 @@
   // runtime for any workspace's Prettier invocation (apps/web is the only
   // config that imports it); nothing in source imports it directly, so
   // knip's root-level import graph can't see the usage.
-  "ignoreDependencies": ["prettier-plugin-tailwindcss"],
+  //
+  // jscpd: spawned by path from scripts/check-clones.mjs, which knip cannot
+  // trace to the dependency.
+  "ignoreDependencies": ["prettier-plugin-tailwindcss", "jscpd"],
   // `sanity` is invoked via `pnpm exec sanity` in
   // `validate-tenant-documents`'s CLI wrapper, resolved from
   // `packages/studio`'s devDependency, not `packages/db`'s own — same

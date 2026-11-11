@@ -185,9 +185,13 @@ contracts:
     `type-check`/`lint`/`test` result rather than re-running it. Not
     dispatched for a docs-only diff — those get the orchestrator's inline
     identifier check instead (`CLAUDE.md`, delivery gate step 4). Its
-    mechanical pass (`code-review-practices` §0) greps added lines for
-    tests that restate their source, runs `jscpd` over the touched
-    workspaces, and — since 2026-09-19 — greps for the comments agents
+    mechanical pass (`code-review-practices` §0) opens with
+    `pnpm check:diff-hygiene` — the judgement-free checks, also in
+    `pnpm verify` and pre-push, so a hit costs the implementing session a
+    re-run rather than a review round (#7118) — then greps added lines for
+    tests that restate their source, runs `pnpm check:clones` (`jscpd`, a
+    pinned root devDependency that fails loudly when missing, printing only
+    clones with a touched side) over the touched workspaces, and — since 2026-09-19 — greps for the comments agents
     produce most: a doc block opening `Name — does X`, a doc block of three
     or more lines, a `//` inside a function body, and any comment at all in
     a `*.test.ts(x)` file. Each hit is blocking; "the siblings have the same
@@ -202,7 +206,14 @@ XModuleView` block that the rule already forbade and no review had
     asserts is blocking (`code-review-practices` §6, #5793). A merge from `origin/main` after either `verify-runner` or
     `reviewer` has already run invalidates both, same as any other new
     change — re-run verify and re-dispatch `reviewer`
-    (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). This is
+    (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). A fix
+    round is a re-review: the dispatch opens `Re-review of <sha>` with the
+    prior blocking findings, and the reviewer confirms each one and reads
+    only the files changed since `<sha>` (`a11y-reviewer` and `seo-auditor`
+    take the same mode); a merge from `origin/main` in that range needs a
+    full review. Every reviewer prompt also carries the issue number, the
+    ticket's Copy and Cost lines and each agent's Examined and Reuse
+    sections verbatim (`develop-feature` §6). This is
     what #3144 shipped without: it verified green, merged `main` in
     afterward, and CI's Test job failed a minute later on a schema type that
     had landed on `main` in between.
@@ -486,7 +497,12 @@ file` are all denied alike) — an earlier version only handled the
     checks (#1797) are the deliberate exception: those shapes have no single
     allow-list prefix to mirror (`sed -i` vs. `sed -n`, `cmd > file` vs.
     `cmd > /dev/null`), so they get their own narrow, targeted detection
-    functions instead of a prefix-list entry. `read-only-agent-guard.test.sh`
+    functions instead of a prefix-list entry. So do two command families whose
+    reading forms an agent needs: `git branch` creating, renaming, copying,
+    deleting or tracking a branch (a bare name counts as creating one unless
+    a listing flag such as `--list` or `--contains` makes it a filter), and
+    any `pnpm` call passing `--update` (`check:file-size --update` rewrites
+    its baseline). `read-only-agent-guard.test.sh`
     pins the deny/allow matrix (including the bypasses found across #425's
     review rounds and the in-place/redirection cases added for #1797); run it
     directly or via CI (see [`docs/context/ci-automation.md`](./ci-automation.md)).
@@ -775,6 +791,16 @@ file` are all denied alike) — an earlier version only handled the
     it never writes a file its worktree is always unchanged and the harness
     auto-removes it, so it never reaches §8's cleanup list. Its own file
     documents this so the line isn't dropped as pointless.
+  - **The read-only reviewers take a checkout path instead.** `reviewer`,
+    `a11y-reviewer`, `seo-auditor` and `explore` would review or search
+    committed `HEAD` alone in a worktree of their own, missing the
+    uncommitted changes and still approving — a silent scope cut worse than
+    the loud refusal. So each runs under `verify-runner`'s dispatch contract
+    (#2637): the prompt names the absolute path of the checkout, the first
+    command is `cd <path>` and every later one carries the same `cd … &&`,
+    and the report opens with `pwd` and `git rev-parse HEAD`, which
+    `develop-feature` §6 checks against the orchestrator's own `HEAD`.
+    `ci-watcher` needs neither, since it only calls GitHub about a named PR.
   - **§8 teardown is exit-then-clean.** `git worktree remove` and
     `git -C <other worktree> …` are both refused from inside, and a session
     cannot remove its own worktree while standing in it. Once the branch is
