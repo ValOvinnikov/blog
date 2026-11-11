@@ -4,14 +4,17 @@ The order the open epics ship in, from today to selling sites through the
 marketing page. Status lives on the project board and in each epic's sub-issue
 list; this page holds only the order, the decisions still open, and why. Written
 2026-10-14 from a platform inspection; restructured 2026-10-31 around a single
-launch; refreshed 2026-11-10.
+launch; refreshed 2026-11-10; launch scope, plans and prices settled
+2026-11-11 after a competitor review.
 
 ## One launch
 
 There are no numbered releases (owner, 2026-10-31). The platform launches
-publicly once, when a tenant can buy the Growth plan: Stripe billing in #4840
-is the gate. Everything on the marketing site, the legal pages, the restore drills and
-the production stand-up ships before that launch, in the order below.
+publicly once, when a tenant can buy the Starter or the Growth plan and a
+Growth site can email its posts to subscribers: Stripe billing in #4840 and
+newsletter sending in #4083 are the gates. Everything on the marketing site,
+the legal pages, the restore drills and the production stand-up ships before
+that launch, in the order below.
 
 At launch production is replaced, not upgraded (2026-10-27,
 `docs/superpowers/specs/2026-10-27-deploy-first-migrations-design.md`): both
@@ -44,10 +47,35 @@ old production project (`web-prod` v0.3.0, Sanity `7fuqzuyl`) is retired.
 | Epic      | What it delivers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **#4840** | Self-serve signup on the worker: `/sign-in`, `/signup`, the `/onboarding` wizard and **Create site**; reserved subdomains and `*.<domain>`; TRIAL / PAST_DUE, tenant deletion and the abandoned-tenant sweep; site templates (#2798), the signup blocklist (#5649) and per-tenant revalidate secrets (#5719). Then **Stripe** billing (Order 5), test mode first: a 14-day trial with no card, the webhook in `apps/platform`, Upgrade through Embedded Checkout, a Billing page with our own receipt emails, a 14-day downgrade grace with emails on days 0, 7 and 13, and live prices by country on the marketing pricing page. Tickets #6872–#6884; the Growth note's "Ask about Growth" lands with #6877. |
-| **#5047** | Plans and entitlements. Free = the 13 blog modules; Growth adds testimonial, team, logoWall, stats, pricing, featureList, featureHighlights and timeline. On a downgrade gated modules stop rendering and nothing is deleted. Seats (#5055) and the Free AI quota (#5056) wait on owner decisions; a super admin granting one tenant a feature outside its plan is #6779.                                                                                                                                                                                                                                                                                                                                     |
+| **#5047** | Plans and entitlements. Free = the 13 blog modules; Growth adds testimonial, team, logoWall, stats, pricing, featureList, featureHighlights and timeline. On a downgrade gated modules stop rendering and nothing is deleted. Seats (#5055) and the AI quota (#5056) are decided under "Plans and prices", which also adds the Starter plan; a super admin granting one tenant a feature outside its plan is #6779.                                                                                                                                                                                                                                                                                           |
 | **#5085** | Launch readiness: legal pages and links (#5086 → #5087 → #3726 → #5088 → #5089, then #5090's final text), newsletter guards, rehearsed restores of the Neon point-in-time window and of the encrypted tenant exports each release takes before migrating (#5096; daily backups, #5095, are deferred), production error shipping and uptime checks (#5349), and Lighthouse on the marketing pages (#5097, after the apex cutover).                                                                                                                                                                                                                                                                             |
 | **#4979** | The two apps stay separate: language, sign-in and sessions per app. Left: its manual test.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | **#4987** | Accessible text and colour on the public site, guarded by a brand-matrix CI job.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+
+### Added to the launch (owner, 2026-11-11)
+
+Decided after comparing the product with Ghost, beehiiv, Substack, Kit,
+WordPress.com, Squarespace, Wix, Webflow and Framer. No ticket is cut for any
+row yet; the epics named are the nearest existing ones and their bodies still
+describe the older scope.
+
+| Item                      | What it delivers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Newsletter (#4083)**    | A published post is emailed once to confirmed subscribers, by a "Send to subscribers" switch on the post, on by default. The email carries the title, cover, takeaways, an excerpt and a link, never the full body. A per-site setting turns sending off for owners who use their own tool. A Subscribers page lists, counts, removes and exports. Per-tenant caps, bounce and complaint tracking and an automatic pause ship with it, as does a "Send me a test" action. Standalone issues, scheduling, digests and segments are out. It starts first: a new sending domain needs weeks at low volume. |
+| **Three plans (#5047)**   | Free, Starter and Growth, as under "Plans and prices" below, with subscriber bands on Growth and the AI allowances.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| **Team (#5151, #5055)**   | A minimal Team page: invite an editor by email, list members, remove one. Growth has 3 seats. It needs a design first.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Draft preview (#1036)** | A Preview action in the Studio opens the draft on the real site behind a signed link. A side-by-side preview is later.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| **Video embeds (#2788)**  | YouTube and Vimeo only, loaded after the visitor allows external media. Calendars and maps wait for a client to ask.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **Own analytics**         | A field for the owner's Google Analytics or Plausible ID replaces today's Analytics switch, which loads numbers only the operator can read. Google Analytics loads after consent. It stays once the built-in stats page exists.                                                                                                                                                                                                                                                                                                                                                                         |
+| **First run**             | The first dashboard view leads with the live site (provisioning takes about 10 seconds), a short checklist, Google first on `/signup`, and the wizard's last step explains the Sanity invite. Signing owners into the Studio ourselves is closed: Sanity's third-party login is deprecated and Enterprise-only.                                                                                                                                                                                                                                                                                         |
+| **Coming soon rows**      | A row on a paid plan either works or is absent. Comments (#1040) are hidden until built; ratings (#1041) are dropped.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Takeaways model**       | Generation moves from `claude-haiku-4-5` to `claude-haiku-5-5`, a tenth of the price. The new model rejects the temperature the call sends today.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+
+Owner tasks before the first payment: register for the EU's One Stop Shop VAT
+scheme for non-EU sellers (no EU company is needed; confirm with an
+accountant), open an API account with its own budget for the product's model
+calls (a Claude subscription does not cover them), and confirm Resend's
+current prices before the subscriber bands are fixed in Stripe.
 
 Production's first content is copied from the `marketing.dev` and `demo.dev`
 tenants: launch needs a dev→prod Sanity dataset copy and a way to carry their
@@ -63,6 +91,43 @@ testimonial and embed should carry real logos, quotes and a demo video.
 
 Site types: v1 Blog, Portfolio, Personal, Docs and Blank; v2 Business and
 Product.
+
+## Plans and prices
+
+Decided 2026-11-11. Amounts live only in Stripe (#5066); this table is the
+decision, not a second source.
+
+|                                    | Free                          | Starter                   | Growth         |
+| ---------------------------------- | ----------------------------- | ------------------------- | -------------- |
+| Monthly                            | $0                            | $6                        | $19            |
+| Yearly, per month                  | $0                            | $5                        | $15            |
+| Address                            | Subdomain                     | Own domain                | Own domain     |
+| "Powered by" mark                  | Shown                         | Removed                   | Removed        |
+| Languages                          | 1                             | 1                         | 3              |
+| Modules                            | Blog set                      | Blog set and contact form | All            |
+| Look                               | Preset, accent, logo, favicon | As Free                   | Everything     |
+| Own analytics                      | No                            | Yes                       | Yes            |
+| Newsletter                         | No                            | No                        | Yes            |
+| Reader accounts and bookmarks      | No                            | No                        | Yes            |
+| Seats                              | 1                             | 1                         | 3              |
+| Own Google and GitHub sign-in apps | No                            | No                        | Yes            |
+| Takeaways a month                  | 5 posts                       | 20 posts                  | 100 posts      |
+| Translation drafts a month         | None                          | None                      | 60, once built |
+| Preview link, video embeds         | Yes                           | Yes                       | Yes            |
+
+Growth includes 1,000 confirmed subscribers. Above that it adds, per month:
+$12 to 2,500, $25 to 5,000, $50 to 10,000 and $110 to 25,000; beyond that the
+owner talks to us. Only confirmed subscribers count. A site that passes its
+band gets an email and a grace period and moves up at its next billing date.
+Each band includes about six sends per subscriber a month.
+
+- **Currencies:** dollars, euros and pounds ($19, €19, £16; $6, €6, £5).
+  Regional discounts come after launch as Stripe coupons, never as a second
+  price list.
+- **Tax:** Stripe with Stripe Tax, no merchant of record. Prices include tax
+  in the EU and UK and add it in the US.
+- **Yearly** is two months free. The 14-day trial with no card stands.
+- The contact form moves out of the Growth module pack so Starter can hold it.
 
 ## The admin redesign
 
@@ -85,16 +150,39 @@ of them also deletes `2026-10-30-admin-redesign-resolutions.md`.
 
 ## After the launch
 
-| Epic      | What it delivers                                                                                                                                                                                  |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **#5028** | Text roles: one `TEXT_ROLE` registry, so the same role looks identical in every module.                                                                                                           |
-| **#5016** | Skins: a palette tier and a role tier on `[data-skin]`, generated from `SKIN_REGISTRY`.                                                                                                           |
-| **#5067** | Per-tenant module styles: more Look settings, then per-module overrides, then plan-gated named variants.                                                                                          |
-| **#5106** | Convention infrastructure: shared types, helpers, recipes, test fakes, and file-size and prop-ceiling gates.                                                                                      |
-| **#5134** | Component structure: long prop lists and oversized files fixed at their source.                                                                                                                   |
-| **#5150** | Docs: retire the design docs and SPEC.md sections the feature catalogue now covers, and add a feature-docs check.                                                                                 |
-| **#5197** | Retire the legacy hero. Also ready to pull: comments #1040, ratings #1041, location #2792, price-period wording #4022, post-module image shape #3245, semantic search #1045, the Team page #5151. |
-| **#4083** | Newsletter sending and per-tenant email limits.                                                                                                                                                   |
+First, in this order (owner, 2026-11-11; no tickets cut except where named):
+
+1. Keyword search on `/search`. The semantic design (#1045) comes later, for
+   large sites.
+2. A built-in stats page: views per post, top posts, referrers, subscriber
+   growth and sends.
+3. AI translation drafts: a post written once gets a draft in the site's
+   other languages.
+4. AI starter copy in onboarding, from one sentence about the site.
+5. The Business and Product site types.
+6. Editor helpers (SEO description, alt text, title), one at a time.
+7. Regional discounts as Stripe coupons.
+8. AI-search controls: an `llms.txt` and crawler rules per site.
+9. A webhook for contact-form leads.
+
+When a client asks, or once signups show who the audience is: an import skill
+the owner runs locally (WordPress and Substack first; a script copies body
+text, the model only maps and reports), reader payments (until then an owner
+links their own payment page from a Call to Action), comments (#1040),
+calendar and map embeds, semantic search, and standalone newsletter issues
+and digests.
+
+Unchanged, behind those:
+
+| Epic      | What it delivers                                                                                                       |
+| --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **#5028** | Text roles: one `TEXT_ROLE` registry, so the same role looks identical in every module.                                |
+| **#5016** | Skins: a palette tier and a role tier on `[data-skin]`, generated from `SKIN_REGISTRY`.                                |
+| **#5067** | Per-tenant module styles: more Look settings, then per-module overrides, then plan-gated named variants.               |
+| **#5106** | Convention infrastructure: shared types, helpers, recipes, test fakes, and file-size and prop-ceiling gates.           |
+| **#5134** | Component structure: long prop lists and oversized files fixed at their source.                                        |
+| **#5150** | Docs: retire the design docs and SPEC.md sections the feature catalogue now covers, and add a feature-docs check.      |
+| **#5197** | Retire the legacy hero. Also ready to pull: location #2792, price-period wording #4022, post-module image shape #3245. |
 
 ## Ideas
 
@@ -102,19 +190,17 @@ Filed as `prio:someday` idea epics under #5150's sweep of the old backlog:
 visibility windows on modules, popular posts by bookmarks, series, a hero
 search field, generated hero art, light/dark image pairs, living posts,
 constellation home, reader lenses and a fine-tuned voice model. Also: continue
-reading (#2799), live subscriber count (#2801), draft preview (#1036) and
-module presets (#2803).
+reading (#2799), live subscriber count (#2801) and module presets (#2803).
 
 ## Open decisions
 
-- **Plans (#5047):** Growth's seat count, the Free AI-takeaway quota, and
-  whether the Subscribers page stays on Free.
 - **Domain:** the admin is `platform.<domain>`, but the domain itself is not
   chosen. It doesn't block development.
-- **Prices**: Growth's amount and currencies (set in Stripe, no code
-  change), banded by subscriber count or not, and whether to sell the
-  newsletter before sending exists.
-- **Vendor plans**: Resend Pro timing. Vercel is on paid Pro.
+- **Translation model:** Sonnet or Haiku for translation drafts, settled by
+  testing both on real posts. Sonnet costs about $0.05 a post and language,
+  Haiku about $0.002.
+- **Vendor plans**: Resend Pro timing, now tied to the newsletter. Vercel is
+  on paid Pro.
 - **Support channel and status page** tooling.
 
 ## Deferred
@@ -135,4 +221,6 @@ module presets (#2803).
   Enterprise-only.
 - **After the launch, for billing** (owner, 2026-11-08): a platform page for
   creating Stripe campaigns (coupons and promotion codes, never prices), and
-  tenants selling their own plans through Stripe Connect.
+  tenants selling their own plans through Stripe Connect. Reader payments
+  are revisited once signups show whether writers are the audience (owner,
+  2026-11-11); if built, we take no percentage.
