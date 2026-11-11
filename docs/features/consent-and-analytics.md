@@ -26,7 +26,7 @@ epics: [3774, 3726, 5037, 5029]
 
 ## What it does
 
-A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, and nothing on the site consumes it yet; analytics is not gated on consent.
+A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, which gates every embed (videos, maps, booking widgets) until the reader allows it; analytics is not gated on consent.
 
 ## Surfaces and routes
 
@@ -51,7 +51,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan) and `ANALYTICS` (`GROWTH` only). Both preset defaults are off.
 - **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` is required as well; analytics loads only when the env flag and the capability both allow it.
-- **Voice** — none; banner, dialog, module and footer-link copy are fixed keys (`consent.*`).
+- **Voice** — none; banner, dialog, module, footer-link and embed-placeholder copy are fixed keys (`consent.*`). The placeholder's allow label and scope note are `consent.placeholder.allowLabel` and `consent.placeholder.scopeNote`; its settings action reuses `consent.footerSettingsLabel`.
 - **Look** — the banner, dialog and placeholder are `@blog/ui` molecules and follow the site's Look. Look › Footer › Cookie settings (Footer link default · Floating button · Both, every plan; stored as `COOKIE_SETTINGS_BUTTON` `HIDDEN` · `ONLY` · `SHOWN`) picks which controls reopen the dialog, read through `getFooterStyle`; `resolveCookieSettingsControls` turns the choice and the capability into the footer link and the floating button.
 
 ## Constraints and invariants

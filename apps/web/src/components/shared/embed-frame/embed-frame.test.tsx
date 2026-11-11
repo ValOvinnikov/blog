@@ -1,5 +1,8 @@
+import { SITE_MESSAGES } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { EMBED_PROVIDER_NAME } from '@web/constants/embed';
+import { useConsentStore } from '@web/hooks/use-consent-store';
 import { renderElement, screen, within } from '@web/testing/custom-render';
 import { MOCK_CAL_EMBED, mockEmbed } from '@web/testing/modules/embed/fixtures';
 import { AppProviders } from '@web/testing/providers';
@@ -17,17 +20,26 @@ import { renderToString } from 'react-dom/server';
 
 import { EmbedFrame } from './embed-frame';
 
-const ALLOW_BUTTON_NAME = 'Allow external media';
+faker.seed(3774);
+
+const ALLOW_BUTTON_NAME = SITE_MESSAGES.consent.placeholder.allowLabel;
 const FORMS_SANDBOX_TOKEN = 'allow-forms';
-const MOCK_CAPTION = 'A short caption';
+const MOCK_CAPTION = faker.lorem.sentence();
+const MOCK_WITHDRAW_BUTTON_NAME = faker.lorem.words(2);
 
 const MOCK_EMBED = mockEmbed({ caption: MOCK_CAPTION });
+
+const WithdrawButton = () => {
+  const { rejectAll } = useConsentStore();
+  return <button onClick={rejectAll}>{MOCK_WITHDRAW_BUTTON_NAME}</button>;
+};
 
 const frames = (
   <>
     <EmbedFrame embed={MOCK_EMBED} />
     <EmbedFrame embed={MOCK_CAL_EMBED} />
     <PreferencesState />
+    <WithdrawButton />
   </>
 );
 
@@ -65,20 +77,6 @@ describe(`<${EmbedFrame.name}/>`, () => {
       expect(caption).toBeVisible();
     });
 
-    it('swaps in every player on the page once allowed, without a reload', async () => {
-      const [allowButton] = screen.getAllByRole('button', {
-        name: ALLOW_BUTTON_NAME,
-      });
-
-      await user.click(allowButton as HTMLElement);
-
-      const player = screen.getByTitle(MOCK_EMBED.title);
-      const booking = screen.getByTitle(MOCK_CAL_EMBED.title);
-      expect(player).toHaveAttribute('src', MOCK_EMBED.embedUrl);
-      expect(booking).toHaveAttribute('src', MOCK_CAL_EMBED.embedUrl);
-      expect(readGrantedConsent()).toHaveLength(1);
-    });
-
     it('opens the cookie settings from the placeholder', async () => {
       const [settingsButton] = screen.getAllByRole('button', {
         name: COOKIE_SETTINGS_BUTTON_NAME,
@@ -89,6 +87,30 @@ describe(`<${EmbedFrame.name}/>`, () => {
       const openState = screen.getByText(PREFERENCES_OPEN_TEXT);
       expect(openState).toBeVisible();
     });
+
+    describe('when Allow is pressed', () => {
+      beforeEach(async () => {
+        const [allowButton] = screen.getAllByRole('button', {
+          name: ALLOW_BUTTON_NAME,
+        });
+        await user.click(allowButton as HTMLElement);
+      });
+
+      it('swaps in every player on the page without a reload', () => {
+        const booking = screen.getByTitle(MOCK_CAL_EMBED.title);
+        const player = screen.getByTitle(MOCK_EMBED.title);
+
+        expect(player).toHaveAttribute('src', MOCK_EMBED.embedUrl);
+        expect(booking).toHaveAttribute('src', MOCK_CAL_EMBED.embedUrl);
+        expect(readGrantedConsent()).toHaveLength(1);
+      });
+
+      it('moves focus to the player that replaced the pressed button', () => {
+        const player = screen.getByTitle(MOCK_EMBED.title);
+
+        expect(player).toHaveFocus();
+      });
+    });
   });
 
   describe('once external media is allowed', () => {
@@ -97,14 +119,18 @@ describe(`<${EmbedFrame.name}/>`, () => {
     });
 
     describe('on load', () => {
+      let user: UserEvent;
+
       beforeEach(() => {
+        user = userEvent.setup();
         renderElement(frames);
       });
 
-      it('shows the player', () => {
+      it('shows the player without moving focus to it', () => {
         const player = screen.getByTitle(MOCK_EMBED.title);
 
         expect(player).toHaveAttribute('src', MOCK_EMBED.embedUrl);
+        expect(player).not.toHaveFocus();
       });
 
       it('lets only the booking embed submit forms', () => {
@@ -116,9 +142,20 @@ describe(`<${EmbedFrame.name}/>`, () => {
           FORMS_SANDBOX_TOKEN,
         );
       });
+
+      it('removes the player once consent is withdrawn', async () => {
+        const withdrawButton = screen.getByRole('button', {
+          name: MOCK_WITHDRAW_BUTTON_NAME,
+        });
+
+        await user.click(withdrawButton);
+
+        const player = screen.queryByTitle(MOCK_EMBED.title);
+        expect(player).not.toBeInTheDocument();
+      });
     });
 
-    it('puts no provider URL in the server-rendered markup', () => {
+    it('renders no provider iframe on the server, before consent is read', () => {
       const html = renderToString(<AppProviders>{frames}</AppProviders>);
 
       expect(html).not.toContain(MOCK_EMBED.embedUrl);

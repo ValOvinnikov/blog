@@ -31,7 +31,6 @@ const setup = customRenderAsync(EmbedModule, { id: MOCK_EMBED_MODULE_ID });
 
 describe(`<${EmbedModule.name}/>`, () => {
   beforeEach(() => {
-    getEmbedModuleMock.mockReset();
     getEmbedModuleMock.mockResolvedValue(okResult(MOCK_EMBED_MODULE));
   });
 

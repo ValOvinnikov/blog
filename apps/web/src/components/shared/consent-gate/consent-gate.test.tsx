@@ -1,4 +1,5 @@
 import { CONSENT_CATEGORY } from '@blog/config';
+import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { useConsent } from '@web/hooks/use-consent';
 import { renderElement, screen } from '@web/testing/custom-render';
@@ -11,14 +12,16 @@ import { renderToString } from 'react-dom/server';
 
 import { ConsentGate } from './consent-gate';
 
-const MOCK_FALLBACK_TEXT = 'Fallback';
-const MOCK_PENDING_TEXT = 'Pending';
-const MOCK_CONTENT_TEXT = 'Gated content';
-const GRANT_BUTTON_NAME = 'Grant';
+faker.seed(3774);
+
+const MOCK_FALLBACK_TEXT = faker.lorem.sentence();
+const MOCK_PENDING_TEXT = faker.lorem.sentence();
+const MOCK_CONTENT_TEXT = faker.lorem.sentence();
+const MOCK_GRANT_BUTTON_NAME = faker.lorem.words(2);
 
 const GrantButton = () => {
   const { grant } = useConsent(CONSENT_CATEGORY.EXTERNAL_MEDIA);
-  return <button onClick={grant}>{GRANT_BUTTON_NAME}</button>;
+  return <button onClick={grant}>{MOCK_GRANT_BUTTON_NAME}</button>;
 };
 
 const gate = (
@@ -55,7 +58,7 @@ describe(`<${ConsentGate.name}/>`, () => {
 
     it('swaps the fallback for the content without a reload once granted', async () => {
       const grantButton = screen.getByRole('button', {
-        name: GRANT_BUTTON_NAME,
+        name: MOCK_GRANT_BUTTON_NAME,
       });
 
       await user.click(grantButton);
