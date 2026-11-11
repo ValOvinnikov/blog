@@ -333,9 +333,6 @@ variant-locked sibling, detailed with `module_heroBlog` below), and
 so changing where a link points is a single edit that every consumer picks
 up.
 
-The one shape still holding a destination inline is `inlineLink`, registered
-but used by no schema type until #3215 deletes it.
-
 **Body-text links are annotations, not stored hrefs.** `richText`, `proseText`
 and `inlineText` each declare `marks.annotations` explicitly as `linkRef`,
 and `@blog/service` dereferences it while projecting the block. Because the

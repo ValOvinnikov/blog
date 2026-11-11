@@ -13,7 +13,7 @@ code:
   - packages/service/src/features/modules/hero*/**
   - packages/service/src/shared/transformers/hero/**
   - packages/ui/src/components/organisms/hero/**
-epics: [5016, 5028, 2813, 3430, 3215, 3600, 3527]
+epics: [5016, 5028, 2813, 3430, 3600, 3527]
 ---
 
 # Heroes
@@ -78,7 +78,6 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 
 ## Related
 
-- #3215 — delete the unused `inlineLink` object.
 - #3600 — decide whether author- and post-mediated link targets need precise purging, which would let Blog and Profile drop their page-type tags.
 - #5016 — epic: one-entry skins. The Banner recipe renders `data-skin`, and `isOnDark` and tone props go.
 - #5028 — epic: text roles. #5033 gives Hero one eyebrow, intro and footnote style.
