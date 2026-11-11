@@ -81,7 +81,9 @@ URLs carry no locale prefix (next-intl `localePrefix: 'never'`).
   24px from `md`, in this order: the heading (tenant name, status pill, "Your
   site at a glance…" and Open site, with no plan pill; the operator Overview
   keeps its plan pill), the archived notice (archived tenants only), the site
-  setup card (while setup is incomplete or failed), the Your site band, the
+  setup card (while setup is incomplete or failed), the Get started card (the
+  real owner only, once setup is READY, until all four first-run steps are
+  done; `platform-sign-in-and-onboarding.md` → "First run"), the Your site band, the
   Domain and Owner pair, then Make it yours. Your site is a full-width card
   whose header holds only the title; under it one row of four label-over-value
   cells (Name, Public domain, Plan, Language) in 3:3:2:2 widths, and below

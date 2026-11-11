@@ -4158,6 +4158,12 @@
         "file": "packages/db/src/constants/site-config-saved-at.ts"
       },
       {
+        "ref": "GET_STARTED_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      },
+      {
         "ref": "ONBOARDING_STEP.LOOK",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -4176,6 +4182,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/site-config-saved-at.ts"
+      },
+      {
+        "ref": "GET_STARTED_STEP.VOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
       },
       {
         "ref": "SETTINGS_FORM_STACK.VOICE",
@@ -5920,6 +5932,22 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "EDITOR_INVITE": [
+      {
+        "ref": "GET_STARTED_STEP.EDITOR_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      }
+    ],
+    "FIRST_POST": [
+      {
+        "ref": "GET_STARTED_STEP.FIRST_POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      }
+    ],
     "GITHUB_ERROR": [
       {
         "ref": "GITHUB_FAILURE.GITHUB_ERROR",
@@ -7401,6 +7429,14 @@
     "site_config.revalidate_skipped": [
       {
         "ref": "SITE_CONFIG_LOG.REVALIDATE_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "site_config.saved_at_stamp_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/site-config",
         "file": "apps/platform/src/constants/site-config.ts"

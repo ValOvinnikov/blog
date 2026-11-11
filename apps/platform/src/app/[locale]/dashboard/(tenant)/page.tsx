@@ -2,6 +2,7 @@ import { queries } from '@blog/db';
 import { OwnerHomeView } from '@platform/components/features/tenants/owner-home-view';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
+import { getStartedFor } from '@platform/server/onboarding/get-started-for';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { siteSetupFor } from '@platform/server/provisioning/site-setup-for';
@@ -20,7 +21,10 @@ export default async function DashboardOverviewPage() {
   const domainVerificationStatus = getDomainVerificationStatus(
     tenant.primaryDomain,
   );
-  const owner = await queries.memberships.getTenantOwnerMembership(tenant.id);
+  const [owner, getStarted] = await Promise.all([
+    queries.memberships.getTenantOwnerMembership(tenant.id),
+    getStartedFor(tenant, membership),
+  ]);
 
   return (
     <OwnerHomeView
@@ -28,6 +32,7 @@ export default async function DashboardOverviewPage() {
       domainVerificationStatus={domainVerificationStatus}
       owner={owner}
       siteSetup={siteSetupFor(tenant, membership, admin)}
+      getStarted={getStarted}
     />
   );
 }

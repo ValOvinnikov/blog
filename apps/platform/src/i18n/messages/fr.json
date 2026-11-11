@@ -106,7 +106,8 @@
     "back": "Retour",
     "continue": "Continuer",
     "edit": "Modifier",
-    "editField": "Modifier {field}"
+    "editField": "Modifier {field}",
+    "editorInviteNote": "Vous recevrez un e-mail de Sanity, notre éditeur. Acceptez-le avec le compte utilisé pour vous inscrire."
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuer avec GitHub",
@@ -379,6 +380,31 @@
     "siteSetupNotStartedContactDescription": "Nous n'avons pas pu lancer la configuration de votre site. Demandez à votre contact plateforme de la lancer.",
     "siteSetupStart": "Lancer la configuration",
     "siteSetupStarting": "Lancement…"
+  },
+  "getStartedCard": {
+    "title": "Premiers pas",
+    "supportingText": "Quatre étapes vers un site qui vous ressemble",
+    "doneCount": "{done} sur {total} terminées",
+    "liveTitle": "Votre site est en ligne",
+    "copyAddress": "Copier l’adresse",
+    "openSite": "Ouvrir le site",
+    "stepDone": "{step} : terminé",
+    "stepNotDone": "{step} : à faire",
+    "stepTitle": {
+      "LOOK": "Choisir une apparence",
+      "VOICE": "Définir votre voix",
+      "EDITOR_INVITE": "Accepter l’invitation à l’éditeur",
+      "FIRST_POST": "Écrire votre premier article"
+    },
+    "lookDescription": "Couleurs, polices et votre logo",
+    "voiceDescription": "Les textes de votre site",
+    "editorInviteDescription": "Nous l’avons envoyée depuis Sanity, notre éditeur. Acceptez-la avec le compte utilisé pour vous inscrire.",
+    "firstPostLocked": "Disponible une fois l’invitation à l’éditeur acceptée",
+    "firstPostActivating": "Disponible dès que votre accès à l’éditeur est prêt, en général en une minute",
+    "firstPostReady": "Votre éditeur est prêt",
+    "openLook": "Ouvrir Apparence",
+    "openVoice": "Ouvrir Voix",
+    "openStudio": "Ouvrir Studio"
   },
   "provisioningBanner": {
     "readyTitle": "Provisionné",
