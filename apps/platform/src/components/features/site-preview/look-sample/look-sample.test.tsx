@@ -21,6 +21,7 @@ import {
   SAMPLE_SPINNER_VARIANT_ATTRIBUTE,
 } from '@platform/constants/sample-busy';
 import {
+  SAMPLE_FOOTER_LAYOUT_ATTRIBUTE,
   SAMPLE_FOOTER_PART_TEST_ID,
   SAMPLE_FOOTER_TEST_ID,
 } from '@platform/constants/sample-footer';
@@ -370,12 +371,24 @@ describe(`<${LookSample.name}/>`, () => {
     expect(themeToggle).toBeVisible();
   });
 
-  it('shows no Sign in when the site has no reader accounts', () => {
-    setup({ hasReaderAccounts: false });
+  describe('without reader accounts', () => {
+    beforeEach(() => {
+      setup({ hasReaderAccounts: false });
+    });
 
-    const signInButton = screen.queryByRole('button', { name: SIGN_IN });
+    it('shows no Sign in', () => {
+      const signInButton = screen.queryByRole('button', { name: SIGN_IN });
 
-    expect(signInButton).not.toBeInTheDocument();
+      expect(signInButton).not.toBeInTheDocument();
+    });
+
+    it('keeps the bar to the brand and the menu button', () => {
+      const menuButton = withinBar().getByRole('button', { name: MENU });
+      const signInButton = withinBar().queryByRole('button', { name: SIGN_IN });
+
+      expect(menuButton).toBeVisible();
+      expect(signInButton).not.toBeInTheDocument();
+    });
   });
 
   describe('account', () => {
@@ -442,15 +455,6 @@ describe(`<${LookSample.name}/>`, () => {
       expect(barMenu).toBeVisible();
       expect(fullSignIn).toBeVisible();
     });
-  });
-
-  it('keeps the bar to the brand and the menu button without reader accounts', () => {
-    setup({ hasReaderAccounts: false });
-    const menuButton = withinBar().getByRole('button', { name: MENU });
-    const signInButton = withinBar().queryByRole('button', { name: SIGN_IN });
-
-    expect(menuButton).toBeVisible();
-    expect(signInButton).not.toBeInTheDocument();
   });
 
   it('shows a menu pill with the current code for menu with code', () => {
@@ -610,7 +614,10 @@ describe(`<${LookSample.name}/>`, () => {
       const footer = screen.getByTestId(SAMPLE_FOOTER_TEST_ID);
       const archiveLink = screen.queryByRole('link', { name: ARCHIVE });
 
-      expect(footer).toHaveAttribute('data-layout', FOOTER_LAYOUT.COMPACT);
+      expect(footer).toHaveAttribute(
+        SAMPLE_FOOTER_LAYOUT_ATTRIBUTE,
+        FOOTER_LAYOUT.COMPACT,
+      );
       expect(archiveLink).not.toBeInTheDocument();
     });
   });
