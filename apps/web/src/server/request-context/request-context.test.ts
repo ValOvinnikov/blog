@@ -1,8 +1,13 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import {
+  NEXT_NAVIGATION_ERROR,
+  SANITY_PERSPECTIVE,
+} from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
+import { DRAFT_PREVIEW_MARKER } from '@web/server/draft-preview/constants/constants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
@@ -28,8 +33,10 @@ const {
   getTenantByIdMock,
   toTenantSanityCredentialsMock,
   selectLiveLocalesMock,
+  hasDraftPreviewTokenMock,
   mockEnv,
 } = vi.hoisted(() => ({
+  hasDraftPreviewTokenMock: vi.fn(),
   getTenantByIdMock: vi.fn(),
   toTenantSanityCredentialsMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
@@ -50,10 +57,12 @@ vi.mock('@blog/service', () => ({
   getPlatformSanityContext: () => MOCK_PLATFORM_CONTEXT,
 }));
 vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
+vi.mock(
+  '@web/server/draft-preview/has-draft-preview-token/has-draft-preview-token',
+  () => ({ hasDraftPreviewToken: hasDraftPreviewTokenMock }),
+);
 
 const DEVELOPMENT_DATASET = 'development';
-const NOT_FOUND_TENANT_LOAD_FAILED_EVENT =
-  'request_context.not_found_tenant_load_failed';
 const NO_TENANT_ENTERED = 'with no tenant entered';
 
 const MOCK_UNSERVED_LOCALE = faker.string.alpha(8);
@@ -79,6 +88,8 @@ const MOCK_SERVABLE_TENANT = mockTenant({
   provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
 });
 
+const MOCK_DRAFT_TENANT_SEGMENT = `${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}`;
+
 const params = (tenant: string, locale: string) =>
   Promise.resolve({ tenant, locale });
 
@@ -91,9 +102,12 @@ const loadRequestContext = async (): Promise<typeof TModule> => {
 const enterAndRead = async (
   tenant: string,
   locale: string,
+  acceptsDraftPreview = false,
 ): Promise<TRequestContext> => {
   const requestContext = await loadRequestContext();
-  await requestContext.enterRequestContext(params(tenant, locale));
+  await requestContext.enterRequestContext(params(tenant, locale), {
+    acceptsDraftPreview,
+  });
   return requestContext.getRequestContext();
 };
 
@@ -145,6 +159,7 @@ describe('request-context', () => {
       defaultLocale: LOCALE_ISO_CODES.EN,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       isOperatorSuspended: false,
+      isDraftPreview: false,
     });
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(MOCK_SERVABLE_TENANT);
   });
@@ -239,6 +254,7 @@ describe('request-context', () => {
         defaultLocale: undefined,
         liveLocales: undefined,
         isOperatorSuspended: false,
+        isDraftPreview: false,
       });
       expect(getTenantByIdMock).not.toHaveBeenCalled();
     });
@@ -275,6 +291,62 @@ describe('request-context', () => {
         ...MOCK_PLATFORM_CONTEXT,
         locale: LOCALE_ISO_CODES.EN,
       });
+    });
+  });
+
+  it('never checks for a preview token on a plain tenant segment', async () => {
+    await enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN, true);
+
+    expect(hasDraftPreviewTokenMock).not.toHaveBeenCalled();
+  });
+
+  describe('with a draft preview tenant segment', () => {
+    beforeEach(() => {
+      hasDraftPreviewTokenMock.mockResolvedValue(true);
+    });
+
+    it('throws a 404 on a route that does not accept a draft, without checking a token', async () => {
+      await expect(
+        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+      expect(hasDraftPreviewTokenMock).not.toHaveBeenCalled();
+    });
+
+    it("reads the tenant's own project through the drafts perspective", async () => {
+      const { tenantId, sanityContext, isDraftPreview } = await enterAndRead(
+        MOCK_DRAFT_TENANT_SEGMENT,
+        LOCALE_ISO_CODES.EN,
+        true,
+      );
+
+      expect({ tenantId, sanityContext, isDraftPreview }).toEqual({
+        tenantId: MOCK_TENANT_ID,
+        sanityContext: {
+          ...MOCK_TENANT_CREDENTIALS,
+          locale: LOCALE_ISO_CODES.EN,
+          perspective: SANITY_PERSPECTIVE.DRAFTS,
+        },
+        isDraftPreview: true,
+      });
+      expect(hasDraftPreviewTokenMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('throws a 404 without a verified token for the tenant', async () => {
+      hasDraftPreviewTokenMock.mockResolvedValue(false);
+
+      await expect(
+        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN, true),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+      expect(getTenantByIdMock).not.toHaveBeenCalled();
+    });
+
+    it('throws a 404 outside production for a tenant without credentials', async () => {
+      toTenantSanityCredentialsMock.mockReturnValue(undefined);
+      setMockEnv({ NEXT_PUBLIC_SANITY_DATASET: DEVELOPMENT_DATASET });
+
+      await expect(
+        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN, true),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
   });
 
@@ -376,7 +448,7 @@ describe('request-context', () => {
       });
       const { logger } = await import('@web/utils/logger/logger');
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        NOT_FOUND_TENANT_LOAD_FAILED_EVENT,
+        REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED,
         { error },
       );
     });

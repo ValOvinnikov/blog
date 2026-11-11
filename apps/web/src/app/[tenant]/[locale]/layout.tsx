@@ -25,7 +25,7 @@ type TGenerateMetadataProps = {
 export async function generateMetadata({
   params,
 }: TGenerateMetadataProps): Promise<Metadata> {
-  await enterRequestContext(params);
+  await enterRequestContext(params, { acceptsDraftPreview: true });
   const requestContext = await getRequestContext();
   const brandName = await getBrandName(requestContext);
 
@@ -52,7 +52,7 @@ type TProps = {
 };
 
 export default async function LocaleLayout({ children, params }: TProps) {
-  await enterRequestContext(params);
+  await enterRequestContext(params, { acceptsDraftPreview: true });
   const { tenantId, locale, isOperatorSuspended } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const themeTokens = await getThemeTokens(tenant);

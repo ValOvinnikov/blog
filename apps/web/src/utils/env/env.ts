@@ -60,6 +60,9 @@ export const env = createEnv({
     // Without it no confirmation email can be sent; changing it breaks every unsubscribe link already sent.
     // @env-optional
     NEWSLETTER_UNSUBSCRIBE_KEY: z.string().min(1).optional(),
+    // Absent, every preview link is ignored and the published page is served.
+    // @env-optional
+    PREVIEW_LINK_SECRET: z.string().min(32).optional(),
     // @env-optional
     PRODUCT_NAME: z.string().trim().min(1).optional(),
     // @env-optional
@@ -90,6 +93,7 @@ export const env = createEnv({
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
     NEWSLETTER_UNSUBSCRIBE_KEY: process.env.NEWSLETTER_UNSUBSCRIBE_KEY,
+    PREVIEW_LINK_SECRET: process.env.PREVIEW_LINK_SECRET,
     PRODUCT_NAME: process.env.PRODUCT_NAME,
     MARKETING_SITE_URL: process.env.MARKETING_SITE_URL,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,

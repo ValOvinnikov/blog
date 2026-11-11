@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    "./preset": "./preset.ts"
+    "./preset": "./preset.ts",
+    "./security-headers": "./security-headers.ts"
   },
   "scripts": {
     "lint": "eslint ."

@@ -8412,6 +8412,14 @@
         "file": "apps/web/src/constants/http.ts"
       }
     ],
+    "noindex": [
+      {
+        "ref": "ROBOTS_DIRECTIVE.NOINDEX",
+        "scope": "app:web",
+        "from": "@web/constants/http",
+        "file": "apps/web/src/constants/http.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",
@@ -8586,6 +8594,14 @@
         "scope": "app:web",
         "from": "@web/constants/proxy",
         "file": "apps/web/src/constants/proxy.ts"
+      }
+    ],
+    "request_context.not_found_tenant_load_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
       }
     ],
     "revalidate_site_config.secret_missing": [

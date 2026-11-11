@@ -769,6 +769,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/http` — `apps/web/src/constants/http.ts`
 
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
+- **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
 ### `@web/constants/module-renderer` — `apps/web/src/constants/module-renderer.ts`
 
@@ -795,6 +796,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 
 - **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`
+
+### `@web/constants/request-context` — `apps/web/src/constants/request-context.ts`
+
+- **REQUEST_CONTEXT_LOG**: `NOT_FOUND_TENANT_LOAD_FAILED`=`"request_context.not_found_tenant_load_failed"`
 
 ### `@web/constants/request` — `apps/web/src/constants/request.ts`
 
