@@ -3536,11 +3536,12 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                 without one it collapses to one column.
               </p>
               <p>
-                <strong>A hero arrives through its page's own
-                <code>hero</code> reference</strong>, never through the
-                page-builder <code>modules[]</code> array:
-                <code>renderHeroModule</code> renders the page's one hero
-                kind, and no page's <code>modules[]</code> accepts a
+                <strong
+                  >A hero arrives through its page's own
+                  <code>hero</code> reference</strong
+                >, never through the page-builder <code>modules[]</code> array:
+                <code>renderHeroModule</code> renders the page's one hero kind,
+                and no page's <code>modules[]</code> accepts a
                 <code>module_hero*</code> type. Posts have no hero.
               </p>
               <p>
@@ -4156,9 +4157,10 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <h3>HomePageTemplate</h3>
               <p>
                 Places header, HomeHero, LatestPosts, and footer. Owns
-                page-level padding and ordering. Lives in <code>apps/web</code>
-                — it composes <code>@blog/ui</code> organisms, it is not part
-                of <code>@blog/ui</code>.
+                page-level padding and ordering. Lives in
+                <code>apps/web</code> — it composes
+                <code>@blog/ui</code> organisms, it is not part of
+                <code>@blog/ui</code>.
               </p>
               <p>
                 <code><HomePageTemplate /></code>
@@ -4402,9 +4404,9 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
               <h3>PostPageTemplate</h3>
               <p>
                 Places header and article content inside a narrower reading
-                column. Owns route-level width. Lives in <code>apps/web</code>
-                — it composes <code>@blog/ui</code> organisms, it is not part
-                of <code>@blog/ui</code>.
+                column. Owns route-level width. Lives in <code>apps/web</code> —
+                it composes <code>@blog/ui</code> organisms, it is not part of
+                <code>@blog/ui</code>.
               </p>
               <p>
                 <code><PostPageTemplate /></code>
