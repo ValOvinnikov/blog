@@ -179,7 +179,7 @@ describe(updateLookAction, () => {
         await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
       });
 
-      it('writes only the preset, accent hue, cookie settings button and brand name, leaving every Growth-only field stored as it is', () => {
+      it('writes only the fields Free includes, leaving Growth-only fields as stored', () => {
         expect(upsertSiteConfigMock).toHaveBeenCalledWith(
           MOCK_TENANT_ID,
           FREE_WRITTEN_INPUT,
