@@ -1,10 +1,11 @@
 import type { TMaybeJsonDates, TMaybeNull } from '@blog/config';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isNull } from '@blog/utils/primitives';
 
 const toDate = (value: Date | string): Date => new Date(value);
 
 const toMaybeDate = (value: TMaybeNull<Date | string>): TMaybeNull<Date> =>
-  value === null ? null : new Date(value);
+  isNull(value) ? null : new Date(value);
 
 export const reviveCachedTenant = (
   tenant: TMaybeJsonDates<TTenant>,
@@ -23,6 +24,7 @@ export const reviveCachedTenant = (
   suspendedAt: toMaybeDate(tenant.suspendedAt),
   deletionNotifiedAt: toMaybeDate(tenant.deletionNotifiedAt),
   contentMigrationFailedAt: toMaybeDate(tenant.contentMigrationFailedAt),
+  firstPostPublishedAt: toMaybeDate(tenant.firstPostPublishedAt),
   createdAt: toDate(tenant.createdAt),
   updatedAt: toDate(tenant.updatedAt),
 });

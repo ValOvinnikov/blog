@@ -106,6 +106,13 @@
       "when": 1794407175288,
       "tag": "0014_add_tenant_status_trial_past_due",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794412518528,
+      "tag": "0015_colorful_greymalkin",
+      "breakpoints": true
     }
   ]
 }

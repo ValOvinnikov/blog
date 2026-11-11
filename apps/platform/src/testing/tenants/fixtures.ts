@@ -15,6 +15,7 @@ import type {
   TTenantDeprovisioningState,
   TTenantProvisioningState,
 } from '@blog/db/schema/tenants';
+import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import { faker } from '@faker-js/faker';
 import {
   toClientTenant,
@@ -186,15 +187,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     siteType: null,
     siteTemplateVersion: null,
     selfServeOwnerEmailIndex: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    ownerInviteHeadsUpSentAt: null,
-    ownerInviteNudgeSentAt: null,
-    ownerSiteReadySentAt: null,
+    ...MOCK_NO_OWNER_ACCESS,
     unsentReinviteFormerOwnerEmailEncrypted: null,
     lastActivityAt: MOCK_TENANT_CREATED_AT,
     inactivityWarnedAt: null,
@@ -202,6 +195,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => {
     deletionNotifiedAt: null,
     suspensionReason: null,
     contentMigrationFailedAt: null,
+    firstPostPublishedAt: null,
     lastNotifiedOwnerElevationOutcome: null,
     seededAt: null,
     webhookCreatedAt: null,

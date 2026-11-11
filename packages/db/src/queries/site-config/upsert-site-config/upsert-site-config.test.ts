@@ -31,7 +31,6 @@ import {
 import { BRAND_NAME_MAX_LENGTH } from '@blog/db/constants';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   DEFAULT_CONTROL_STYLES,
@@ -40,6 +39,7 @@ import {
   MOCK_SITE_CONFIG_FIELDS,
 } from '@blog/db/testing/site-config/fixtures';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { useTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
 
 import {
@@ -340,16 +340,13 @@ function mockRichText(
   ];
 }
 
-afterEach(async () => {
-  await db().delete(schema.siteConfig);
-  await db().delete(schema.tenants);
-});
+const tenant = useTestTenant(db);
 
 describe(upsertSiteConfig, () => {
   let tenantId: string;
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
+  beforeEach(() => {
+    ({ id: tenantId } = tenant());
   });
 
   function save(overrides: Partial<TUpdateSiteConfigInput> = {}) {
@@ -372,6 +369,7 @@ describe(upsertSiteConfig, () => {
       brandName: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
+      lookSavedAt: undefined,
       voiceOverrides: {},
     });
   });
