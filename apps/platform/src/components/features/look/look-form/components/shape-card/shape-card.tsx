@@ -1,7 +1,7 @@
 import { DENSITY, RADIUS_SCALE } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
@@ -37,14 +37,14 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
       lockLine={lockLine}
       hasGrowthBadge={hasGrowthBadge}
     >
-      <LookChoiceField
+      <LookPresetChoiceField
         field="radiusScale"
         label={t('radiusScaleLabel')}
         hint={t('radiusScaleDescription')}
         options={radiusOptions}
       />
 
-      <LookChoiceField
+      <LookPresetChoiceField
         field="density"
         label={t('densityLabel')}
         hint={t('densityDescription')}

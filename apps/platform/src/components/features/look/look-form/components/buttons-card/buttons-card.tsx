@@ -7,9 +7,9 @@ import {
 } from '@blog/config';
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { LookSubsection } from '@platform/components/features/look/look-form/components/look-subsection';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
@@ -64,7 +64,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       lockLine={lockLine}
       hasGrowthBadge={hasGrowthBadge}
     >
-      <LookChoiceField
+      <LookPresetChoiceField
         field="buttonShape"
         label={t('buttonShapeLabel')}
         hint={t('buttonShapeDescription')}

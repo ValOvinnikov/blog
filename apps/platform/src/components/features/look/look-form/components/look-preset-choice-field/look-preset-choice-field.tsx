@@ -10,13 +10,15 @@ import type { TSegmentedLayout } from '@platform/constants/segmented-control';
 import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import type { TPresetSeededField } from '@platform/utils/look-preset/look-preset';
 
-type TLookChoiceFieldKey = {
+type TLookPresetChoiceFieldKey = {
   [TKey in TPresetSeededField]: TLookFormValues[TKey] extends string
     ? TKey
     : never;
 }[TPresetSeededField];
 
-export type TLookChoiceFieldProps<TField extends TLookChoiceFieldKey> = {
+export type TLookPresetChoiceFieldProps<
+  TField extends TLookPresetChoiceFieldKey,
+> = {
   field: TField;
   label: string;
   hint: string;
@@ -24,13 +26,15 @@ export type TLookChoiceFieldProps<TField extends TLookChoiceFieldKey> = {
   layout?: TSegmentedLayout;
 };
 
-export const LookChoiceField = <TField extends TLookChoiceFieldKey>({
+export const LookPresetChoiceField = <
+  TField extends TLookPresetChoiceFieldKey,
+>({
   field,
   label,
   hint,
   options,
   layout,
-}: TLookChoiceFieldProps<TField>) => {
+}: TLookPresetChoiceFieldProps<TField>) => {
   const { values, updateField } = useLookForm();
   const lock = useLookFieldLock(field);
 

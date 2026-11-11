@@ -1,6 +1,6 @@
 import { CARD_STYLE } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
+import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
@@ -30,7 +30,7 @@ export const CardsCard = ({ summary }: TCardsCardProps) => {
       lockLine={lockLine}
       hasGrowthBadge={hasGrowthBadge}
     >
-      <LookChoiceField
+      <LookPresetChoiceField
         field="cardStyle"
         label={t('cardStyleLabel')}
         hint={t('cardStyleDescription')}
