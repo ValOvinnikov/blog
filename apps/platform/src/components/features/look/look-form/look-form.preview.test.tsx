@@ -140,6 +140,19 @@ describe(`<${LookForm.name}/>`, () => {
           FOOTER_LAYOUT.CENTRED,
         );
       });
+
+      it('previews the chosen navigation link style before saving', async () => {
+        await chooseSegment(
+          user,
+          LOOK_FORM.navLinkStyleLabel,
+          LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
+        );
+
+        const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
+        expect(sampleTokens).toHaveStyle({
+          '--nav-link-decoration': 'underline',
+        });
+      });
     });
 
     it('shows the chosen busy style and spinner on the preview busy button', async () => {
