@@ -20,6 +20,7 @@ import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
 import { HeaderControlStyleField } from './components/header-control-style-field/header-control-style-field';
+import { NavLinkStyleField } from './components/nav-link-style-field/nav-link-style-field';
 import { PreviewDeviceNote } from './components/preview-device-note/preview-device-note';
 import { useSubmenuPreview } from './use-submenu-preview';
 
@@ -117,6 +118,8 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
           lock={barStyleLock}
         />
       </LookField>
+
+      <NavLinkStyleField />
 
       <HeaderControlStyleField />
 

@@ -10,6 +10,7 @@ import {
   HUE_MIN,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
+  NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_DECLARATIONS,
   type TButtonShape,
   type TCardStyle,
@@ -17,6 +18,7 @@ import {
   type TFontChoice,
   type THeaderControlStyle,
   type TMaybeUndefined,
+  type TNavLinkStyle,
   type TRadiusScale,
   type TThemeDeclarations,
 } from '@blog/config';
@@ -46,6 +48,7 @@ type TShapePreviewValues = {
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
   buttonShape: TButtonShape;
+  navLinkStyle: TNavLinkStyle;
 };
 
 const buildShapePreviewTokens = ({
@@ -54,6 +57,7 @@ const buildShapePreviewTokens = ({
   cardStyle,
   headerControlStyle,
   buttonShape,
+  navLinkStyle,
 }: TShapePreviewValues): TThemeDeclarations => {
   return {
     ...RADIUS_DECLARATIONS[radiusScale],
@@ -61,6 +65,7 @@ const buildShapePreviewTokens = ({
     ...CARD_STYLE_DECLARATIONS[cardStyle],
     ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
     ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
+    ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
     ...DERIVED_RADIUS_DECLARATIONS,
   };
 };
