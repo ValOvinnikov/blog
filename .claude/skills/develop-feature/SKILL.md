@@ -46,7 +46,9 @@ approvals, never bundled.
   window. Read or grep inline only to verify a file already named by the user,
   the issue, a prior `explore` or this step. Prior-session context is no
   exemption — memory goes stale — and a suspicion about where the answer lives
-  is the hypothesis to hand `explore`, not to check yourself.
+  is the hypothesis to hand `explore`, not to check yourself. Its prompt names
+  the absolute path of the checkout to search, under the same dispatch
+  contract as the reviewers in step 6.
 - **Ask `explore` for the nearest existing sibling** — the schema, loader,
   component, view or migration most like what is being built — as a path plus
   one line on how it differs. It goes into every layer brief (step 3, item 6);
@@ -251,10 +253,25 @@ owning agent, then re-dispatch. Never proceed on red.
 
 **Run `git fetch origin` before dispatching any reviewer** (`reviewer`,
 `a11y-reviewer`, `seo-auditor`) — a worktree session's local `main` goes
-stale, and the read-only guard denies them `git fetch`. Every prompt names the
-base as `origin/main`, never bare `main`, and states the expected file count
-(`git diff origin/main...HEAD --name-only | wc -l`, plus dirty working-tree
-files) so the reviewer can flag a mismatch.
+stale, and the read-only guard denies them `git fetch`.
+
+**Every reviewer prompt carries:**
+
+1. **The checkout.** The absolute path of the checkout under review; the
+   agent's first command is `cd <path>` and every later one carries the same
+   `cd … &&`. None of them is worktree-isolated — their own worktree would
+   miss the uncommitted changes — so without the path they run in the shared
+   checkout, where a worktree-isolated session's harness refuses them.
+2. **The base and count.** The base as `origin/main`, never bare `main`, and
+   the expected file count (`git diff origin/main...HEAD --name-only | wc -l`,
+   plus dirty working-tree files) so the reviewer can flag a mismatch.
+3. **The ticket.** The issue number, its **Copy** and **Cost** lines, and each
+   implementing agent's **Examined** and **Reuse** sections, verbatim — never
+   summarised, since §7's Reuse, drift, cost and Voice items are checked
+   against them.
+
+Each report opens with `pwd` and `git rev-parse HEAD`. **Reject a report whose
+SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
 
 - **`reviewer`** (`.claude/agents/reviewer.md`) over the full diff
   (`origin/main...HEAD` + working tree); it applies `code-review-practices`.
@@ -272,6 +289,13 @@ files) so the reviewer can flag a mismatch.
   passes (`APPROVE` / `PASS`). One reviewer's pass does not excuse another's
   blocking result. A review that never ran is itself blocking — a small diff
   or green checks do not substitute.
+- **A fix round is a re-review.** Open the re-dispatch with
+  `Re-review of <sha>` — the `HEAD` the previous report named — followed by
+  that report's blocking findings, plus the three items above — except that
+  the count is now `git diff <sha> --name-only | wc -l` plus untracked files.
+  The reviewer confirms each finding and reads only the files changed since
+  `<sha>`. A merge from `origin/main` since `<sha>` needs a full review
+  instead.
 - **Non-blocking findings don't gate the PR, but never leave one only in a
   chat summary.** Each one worth doing is fixed on this branch by the owning
   agent when it is the same layer and small, or else filed through
@@ -748,3 +772,20 @@ carries `isolation: worktree`").
   `.github/workflows/` CI config.
 - `frontend-design:frontend-design` for visual design work in `packages/ui`
   or `apps/web`.
+
+## What `pnpm verify` runs
+
+- Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
+  `lint`, `test`, the warn-only `check:test-budget` (it names any test file
+  over its time budget but never fails locally; CI's Test job enforces it),
+  the local-only file-size ratchet `check:file-size` (`CLAUDE.md` "File size budgets"),
+  `knip`, the seven gating scripts (`check:client-graph`,
+  `check:revalidate-tags-sync`, `check:turbo-env-sync`,
+  `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,
+  `gen:migration-ids:check`)
+  and the local-only diff checks `check:diff-hygiene` (the judgement-free
+  half of `code-review-practices` §0) and `check:touched-lint`, so it stops at the first failure and mirrors every required or gating CI check that has a local
+  equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
+  part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
+  it locally only when diagnosing an actual CI build failure
+  (`open-pull-request` Gate 5a).

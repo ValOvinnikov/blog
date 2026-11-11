@@ -231,18 +231,6 @@ assembly, `pnpm typegen` and orchestration. Dispatches run in the background
 and completion arrives as a notification — never poll. Details:
 `develop-feature` § "Use the scoped agents"; solo cloud: "Solo-session mode".
 
-## The `@blog/ui` component index
-
-`packages/ui/COMPONENTS.md` is a generated index of every `@blog/ui` component
-— its purpose, props, and compound slots (`Header.Brand`, `PostCard.Media`, …)
-— produced by `scripts/gen-ui-index.mjs`. **Consult it before deciding a feature
-needs a new UI component:** it's the cheapest way to spot one to reuse or
-extend, and the `explore`, `ui` and `web` agents are pointed at it for the same
-reason. The pre-commit hook regenerates it on staged `packages/ui` changes, and
-`pnpm gen:ui-index:check` guards it in CI — drift, description coverage (every
-exported component/slot documented) and structural completeness (no component
-silently unindexed). Never hand-edit it; fix the source and regenerate.
-
 ## Use the skills
 
 - `develop-feature` at the start of any non-trivial task; § "Skills by
@@ -251,7 +239,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - `react-component-practices` when writing or changing any React component in
   `packages/ui`, `apps/web` or `apps/platform` — the shared rules the layer
   skills below build on.
-- `ui-library-practices` when touching `packages/ui`.
+- `ui-library-practices` when touching `packages/ui`; its § "The `@blog/ui`
+  component index" (`packages/ui/COMPONENTS.md`, generated) is checked before
+  deciding a feature needs a new UI component.
 - `web-component-practices` when building or editing an interactive component in
   `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
   with client state.
@@ -543,19 +533,10 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   tenant-editable (`VOICE_FIELDS`) or fixed (`VOICE_FIXED_KEYS`) is the user's
   decision; a layer agent that adds one reports it under **Voice candidates**.
   Classification guidance: `develop-feature` § "Check for Voice candidates".
-- Verify with `pnpm verify` from root — one `&&` chain over `type-check`,
-  `lint`, `test`, the warn-only `check:test-budget` (it names any test file
-  over its time budget but never fails locally; CI's Test job enforces it),
-  the local-only file-size ratchet `check:file-size` ("File size budgets"),
-  `knip`, the seven gating scripts (`check:client-graph`,
-  `check:revalidate-tags-sync`, `check:turbo-env-sync`,
-  `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,
-  `gen:migration-ids:check`)
-  and the local-only diff check `check:touched-lint`, so it stops at the first failure and mirrors every required or gating CI check that has a local
-  equivalent (`docs/context/ci-automation.md` maps them). `pnpm build` is not
-  part of the local loop — CI's `ci.yml` `build` job gates every PR; reproduce
-  it locally only when diagnosing an actual CI build failure
-  (`open-pull-request` Gate 5a).
+- **Verify with `pnpm verify` from root** — it stops at the first failure and
+  mirrors every required or gating CI check that has a local equivalent;
+  `pnpm build` is not part of the local loop. What it chains:
+  `develop-feature` § "What `pnpm verify` runs".
 - **Commits and PRs.** Conventional commits (commitlint runs in
   `.husky/commit-msg`; types include this repo's `tooling`), one concern per
   PR, a PR body capped at 12 lines and 1200 characters, `Closes #<n>` only on
@@ -657,13 +638,28 @@ worktree/scratchpad tooling — replaces exactly three things; everything else,
 including quality gates, conventional commits and the push/PR approval gates,
 still applies:
 
-- **Delegation is relaxed:** implement directly, reading the owning layer's
-  `.claude/agents/<layer>.md` first; delivery-gate step 4's `reviewer` dispatch becomes a
-  self-review against the `code-review-practices` checklist before committing.
+- **Delegation is relaxed:** implement directly, following the checklist
+  below; delivery-gate step 4's `reviewer` dispatch becomes the self-review in it.
 - **Board writes** (delivery-gate steps 1 and 7) are replaced by the evidence protocol below.
 - **The `job:<session-name>` PR label** does not apply and has no substitute —
   it tells concurrent local jobs apart, and a cloud session has no job id and
   no `gh`. Never reach for an MCP or REST equivalent.
+
+**The solo-session checklist** — the one list a cloud session follows, the
+`@claude` runner included, in order:
+
+1. Read the owning layer's `.claude/agents/<layer>.md` and the skills it
+   names, then every file you will change and its folder ("Examine before you
+   change").
+2. Search for what already exists before adding anything ("Reuse before you
+   create").
+3. Implement, fixing the mechanical drift in every file you touch.
+4. `pnpm verify` — it runs `pnpm check:diff-hygiene`; run that alone after any
+   later edit.
+5. Self-review the full diff against `code-review-practices`, all three
+   passes, §0's reader commands and `pnpm check:clones` included.
+6. Commit, push, and open a draft PR whose body carries one **Examined** and
+   one **Reuse** line, as an implementing agent's report would.
 
 **Cloud sessions never write the project board** — they leave evidence it is
 inferred from: a comment on the issue at start, a branch named for the issue,
