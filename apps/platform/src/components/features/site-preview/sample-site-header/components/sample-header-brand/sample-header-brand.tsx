@@ -23,7 +23,7 @@ export const SampleHeaderBrand = ({
   });
 
   return (
-    <div className={root()} data-part={SAMPLE_PART.SITE_BRAND}>
+    <div className={root()} data-part={SAMPLE_PART.BRAND}>
       <BrandMark size={SIZE.SM} title={name} src={logoSrc} className={mark()} />
       <span className={label()}>{name}</span>
     </div>

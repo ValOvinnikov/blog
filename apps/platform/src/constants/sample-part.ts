@@ -1,16 +1,17 @@
 import type { TValueOf } from '@blog/config/utils';
 
+// Lowercase because the values are `data-part` markup and the selectors that find it.
 export const SAMPLE_PART = {
   HEADER: 'header',
   FOOTER: 'footer',
-  SITE_BRAND: 'site-brand',
+  BRAND: 'brand',
   POST_CARD: 'post-card',
   POST_IMAGE: 'post-image',
   FAQ_ITEM: 'faq-item',
   FORM_FIELD: 'form-field',
   QUOTE_CARD: 'quote-card',
   CTA_BOX: 'cta-box',
-  ACTION_BUTTON: 'action-button',
+  BUTTON: 'button',
   BUSY_BUTTON: 'busy-button',
 } as const;
 export type TSamplePart = TValueOf<typeof SAMPLE_PART>;

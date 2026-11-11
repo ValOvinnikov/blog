@@ -79,12 +79,12 @@ export const LookSample = ({
             {t('samplePara')}
           </Text>
           <div className={actionsRow()}>
-            <SamplePart part={SAMPLE_PART.ACTION_BUTTON}>
+            <SamplePart part={SAMPLE_PART.BUTTON}>
               <Button type="button" size={SIZE.SM}>
                 {t('subscribeButton')}
               </Button>
             </SamplePart>
-            <SamplePart part={SAMPLE_PART.ACTION_BUTTON}>
+            <SamplePart part={SAMPLE_PART.BUTTON}>
               <Button type="button" variant="ghost" size={SIZE.SM}>
                 {t('readMoreButton')}
               </Button>

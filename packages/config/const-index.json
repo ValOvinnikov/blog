@@ -6626,9 +6626,9 @@
         "file": "apps/platform/src/constants/sample-part.ts"
       }
     ],
-    "site-brand": [
+    "brand": [
       {
-        "ref": "SAMPLE_PART.SITE_BRAND",
+        "ref": "SAMPLE_PART.BRAND",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"
@@ -6682,9 +6682,9 @@
         "file": "apps/platform/src/constants/sample-part.ts"
       }
     ],
-    "action-button": [
+    "button": [
       {
-        "ref": "SAMPLE_PART.ACTION_BUTTON",
+        "ref": "SAMPLE_PART.BUTTON",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"

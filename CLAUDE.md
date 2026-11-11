@@ -726,7 +726,8 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   vocabulary an outside standard spells — a value compared with an env read
   (`process.env.NODE_ENV === 'production'`), an env read's bracket key
   (`process.env['X']`), a `stubEnv` argument, a protocol attribute's
-  value (`sameSite: 'strict'`; for `target`, only `'_blank'`), and a
+  value (`sameSite: 'strict'`; for `target`, only `'_blank'`; for `type`,
+  only `'button'`, `'submit'` and `'reset'`), and a
   Testing Library role query's role
   (`getByRole('button')`); a
   match in the other app is reported, never shared. Lint enforces both on

@@ -50,7 +50,7 @@ export const SampleSiteFooter = ({
         dataTestId={SAMPLE_FOOTER_TEST_ID}
       >
         <Footer.Logo>
-          <SamplePart part={SAMPLE_PART.SITE_BRAND}>
+          <SamplePart part={SAMPLE_PART.BRAND}>
             <BrandMark size={SIZE.SM} title={name} src={logoSrc} />
           </SamplePart>
         </Footer.Logo>

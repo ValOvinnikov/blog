@@ -571,7 +571,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
 
-- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`, `SITE_BRAND`=`"site-brand"`, `POST_CARD`=`"post-card"`, `POST_IMAGE`=`"post-image"`, `FAQ_ITEM`=`"faq-item"`, `FORM_FIELD`=`"form-field"`, `QUOTE_CARD`=`"quote-card"`, `CTA_BOX`=`"cta-box"`, `ACTION_BUTTON`=`"action-button"`, `BUSY_BUTTON`=`"busy-button"`
+- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`, `BRAND`=`"brand"`, `POST_CARD`=`"post-card"`, `POST_IMAGE`=`"post-image"`, `FAQ_ITEM`=`"faq-item"`, `FORM_FIELD`=`"form-field"`, `QUOTE_CARD`=`"quote-card"`, `CTA_BOX`=`"cta-box"`, `BUTTON`=`"button"`, `BUSY_BUTTON`=`"busy-button"`
 
 ### `@platform/constants/segmented-control` — `apps/platform/src/constants/segmented-control.ts`
 
