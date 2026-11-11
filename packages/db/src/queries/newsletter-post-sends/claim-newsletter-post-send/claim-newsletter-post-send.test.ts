@@ -1,19 +1,17 @@
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
+import {
+  MOCK_OTHER_POST_ID,
+  MOCK_POST_ID,
+} from '@blog/db/testing/newsletter-post-sends/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { useTestTenant } from '@blog/db/testing/test-tenant';
 import { isNull } from '@blog/utils/primitives';
-import { faker } from '@faker-js/faker';
 
 import { claimNewsletterPostSend } from './claim-newsletter-post-send';
 
 vi.mock('@blog/db/client');
-
-faker.seed(7158);
-
-const MOCK_POST_ID = faker.string.uuid();
-const MOCK_OTHER_POST_ID = faker.string.uuid();
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);

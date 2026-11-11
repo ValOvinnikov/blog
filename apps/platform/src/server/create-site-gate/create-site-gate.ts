@@ -1,5 +1,7 @@
 import 'server-only';
 
+import { DAY_MS } from '@blog/db/constants';
+import { utcDay } from '@blog/utils/date';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { alertSelfServeLimit } from '@platform/server/create-site-gate/alert-self-serve-limit';
 import { createRateLimitStore } from '@platform/server/rate-limit/create-rate-limit-store';
@@ -8,17 +10,13 @@ import { logger } from '@platform/utils/logger/logger';
 export const MAX_SITES_PER_IP_PER_DAY = 3;
 export const MAX_SELF_SERVE_SITES_PER_DAY = 50;
 
-const DAY_MS = 24 * 60 * 60_000;
-
 const store = createRateLimitStore();
-
-const toUtcDay = (now: Date): string => now.toISOString().slice(0, 10);
 
 export const takeCreateSiteSlot = async (
   clientKey: string,
   now = new Date(),
 ): Promise<boolean> => {
-  const day = toUtcDay(now);
+  const day = utcDay(now);
 
   const ipCount = await store.increment(
     `create-site:ip:${day}:${clientKey}`,

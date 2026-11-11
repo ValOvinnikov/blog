@@ -24,4 +24,5 @@ CREATE TABLE "newsletter_post_sends" (
 ALTER TABLE "email_config" ADD COLUMN "email_new_posts" boolean DEFAULT true NOT NULL;--> statement-breakpoint
 ALTER TABLE "email_delivery_outcome_counts" ADD CONSTRAINT "email_delivery_outcome_counts_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "email_send_counts" ADD CONSTRAINT "email_send_counts_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "newsletter_post_sends" ADD CONSTRAINT "newsletter_post_sends_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;
+ALTER TABLE "newsletter_post_sends" ADD CONSTRAINT "newsletter_post_sends_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "subscribers_tenant_status_id_idx" ON "subscribers" USING btree ("tenant_id","status","id");

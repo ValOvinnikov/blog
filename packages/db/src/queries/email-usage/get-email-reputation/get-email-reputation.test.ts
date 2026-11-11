@@ -11,17 +11,17 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { utcDayDaysBefore } from '@blog/db/utils/utc-day/utc-day';
+import { utcDayDaysBefore } from '@blog/utils/date';
 
 import { getEmailReputation } from './get-email-reputation';
 
 vi.mock('@blog/db/client');
 
-const OLDEST_DAY_IN_WINDOW = utcDayDaysBefore(
+const MOCK_OLDEST_DAY_IN_WINDOW = utcDayDaysBefore(
   MOCK_NOW,
   EMAIL_REPUTATION_WINDOW_DAYS - 1,
 );
-const DAY_BEFORE_WINDOW = utcDayDaysBefore(
+const MOCK_DAY_BEFORE_WINDOW = utcDayDaysBefore(
   MOCK_NOW,
   EMAIL_REPUTATION_WINDOW_DAYS,
 );
@@ -63,7 +63,7 @@ describe(getEmailReputation, () => {
       db(),
       tenantId,
       EMAIL_DELIVERY_OUTCOME.DELIVERED,
-      OLDEST_DAY_IN_WINDOW,
+      MOCK_OLDEST_DAY_IN_WINDOW,
       15,
     );
     await insertTestEmailDeliveryOutcomeCount(
@@ -77,7 +77,7 @@ describe(getEmailReputation, () => {
       db(),
       tenantId,
       EMAIL_DELIVERY_OUTCOME.COMPLAINED,
-      OLDEST_DAY_IN_WINDOW,
+      MOCK_OLDEST_DAY_IN_WINDOW,
       2,
     );
 
@@ -96,7 +96,7 @@ describe(getEmailReputation, () => {
       db(),
       tenantId,
       EMAIL_DELIVERY_OUTCOME.BOUNCED,
-      DAY_BEFORE_WINDOW,
+      MOCK_DAY_BEFORE_WINDOW,
       9,
     );
     await insertTestEmailDeliveryOutcomeCount(

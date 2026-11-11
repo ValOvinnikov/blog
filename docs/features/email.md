@@ -11,6 +11,7 @@ code:
   - packages/db/src/queries/email-usage/**
   - packages/db/src/schema/email-usage.ts
   - packages/db/src/constants/email-usage.ts
+  - packages/db/src/constants/email-config.ts
   - packages/config/src/constants/email-type.ts
   - packages/db/src/constants/email-template-defaults.ts
   - packages/config/src/constants/email-template.ts

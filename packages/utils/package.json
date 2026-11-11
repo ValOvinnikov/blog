@@ -9,6 +9,7 @@
     "./client-key": "./src/client-key/index.ts",
     "./color": "./src/color/index.ts",
     "./csv": "./src/csv/index.ts",
+    "./date": "./src/date/index.ts",
     "./encryption": "./src/encryption/index.ts",
     "./enqueue-signature": "./src/enqueue-signature/index.ts",
     "./hash": "./src/hash/index.ts",

@@ -9,5 +9,3 @@ export const EMAIL_DELIVERY_OUTCOME = {
 export type TEmailDeliveryOutcome = TValueOf<typeof EMAIL_DELIVERY_OUTCOME>;
 
 export const EMAIL_REPUTATION_WINDOW_DAYS = 7;
-
-export const EMAIL_NEW_POSTS_DEFAULT = true;

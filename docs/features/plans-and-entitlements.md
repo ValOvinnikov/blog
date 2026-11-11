@@ -48,6 +48,7 @@ Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator se
 - `tenants.plan` — required, the `tenant_plan` pgEnum built from `TENANT_PLAN`.
 - `PLAN_REGISTRY` (`@blog/db/constants`) — `FREE`: `CONSENT_BANNER`. `STARTER`: `CONSENT_BANNER` and `CONTACT_FORM`. `GROWTH`: all eight `CAPABILITY` keys (`READER_ACCOUNTS`, `COMMENTS`, `RATINGS`, `BOOKMARKS`, `NEWSLETTER`, `ANALYTICS`, `CONSENT_BANNER`, `CONTACT_FORM`). Ratings is Growth only because rating needs sign-in.
 - `PLAN_LOCALE_LIMIT` — languages per plan including the default: `FREE` 1, `STARTER` 1, `GROWTH` 3.
+- `PLAN_MONTHLY_SENDS_PER_SUBSCRIBER` and `SUBSCRIBER_BAND_CEILINGS` (1,000, 2,500, 5,000, 10,000, 25,000) — the monthly newsletter allowance: `FREE` 0, `STARTER` 0, `GROWTH` 6 × the ceiling of the band the active-subscriber count falls in, or 6 × the count above 25,000. `monthlySendAllowance(plan, activeSubscriberCount)` applies it.
 - `PLAN_ENTITLEMENTS` (`@blog/db/constants`) — one record per plan. `lookFields` lists the `site_config` Look columns (`LOOK_FIELDS`) the plan may set: `FREE` and `STARTER` the preset, accent hue, logo, favicon and Cookie settings button; `GROWTH` every Look column. `modulePacks` lists the module packs the plan entitles: `FREE` `CORE`; `STARTER` `CORE` and `STARTER`; `GROWTH` all three. `hasPoweredByMark` says whether the site's footer carries the "Powered by" mark: `FREE` yes, `STARTER` and `GROWTH` no (see [footer-and-legal-pages](./footer-and-legal-pages.md)). `hasCustomDomain` says whether the owner may connect their own domain and make it the main address: `FREE` no, `STARTER` and `GROWTH` yes; the Domain page's card and the connect, verify and make-main actions read it, and none compares against a plan name. `hasOwnOAuthApps` says whether the site signs readers in through its own Google and GitHub apps when it has saved credentials for them: `FREE` and `STARTER` no, `GROWTH` yes (see [reader-auth](./reader-auth.md)). The epic's later entitlements join this record as fields of their own.
 - `tenant_oauth_credentials` — one row per tenant and provider: `client_id`, the secret encrypted under `TENANT_OAUTH_ENCRYPTION_KEY`, and nullable `callback_domain`, the main address the owner last registered (null reads as the current one). Saving a card, or "I've added it", sets it to the current main address.
 - `settings_features` — one row per tenant (unique `tenant_id`, cascade delete), eight `NOT NULL` boolean toggles. Provisioning writes no row; an absent row resolves to the tenant's current preset's `featureDefaults` (both presets: bookmarks and contact form on; reader accounts, comments, ratings, newsletter, analytics and consent banner off). The column defaults match.
@@ -94,7 +95,8 @@ Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator se
 
 ## Entry points
 
-- `packages/db/src/constants/tenant.ts` — `TENANT_PLAN`, `PLAN_REGISTRY`, `PLAN_LOCALE_LIMIT`, `PLAN_ENTITLEMENTS`
+- `packages/db/src/constants/tenant.ts` — `TENANT_PLAN`, `PLAN_REGISTRY`, `PLAN_LOCALE_LIMIT`, `PLAN_MONTHLY_SENDS_PER_SUBSCRIBER`, `SUBSCRIBER_BAND_CEILINGS`, `PLAN_ENTITLEMENTS`
+- `packages/db/src/utils/monthly-send-allowance/monthly-send-allowance.ts` — `monthlySendAllowance`
 - `packages/db/src/utils/effective-look/effective-look.ts` — `toEffectiveLook`, `pickEntitledLook`, `isLookFieldEntitled`
 - `apps/web/src/server/settings-features/is-capability-enabled/is-capability-enabled.ts`
 - `apps/web/src/server/settings-features/is-reader-account-enabled/is-reader-account-enabled.ts`

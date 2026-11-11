@@ -8,7 +8,7 @@ import {
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { useTestTenant } from '@blog/db/testing/test-tenant';
-import { utcMonthStartDay } from '@blog/db/utils/utc-day/utc-day';
+import { utcMonthStartDay } from '@blog/utils/date';
 
 import { countEmailSendsThisMonth } from './count-email-sends-this-month';
 

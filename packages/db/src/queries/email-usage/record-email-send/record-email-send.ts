@@ -1,7 +1,7 @@
 import type { TEmailType } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { emailSendCounts } from '@blog/db/schema/email-usage';
-import { utcDay } from '@blog/db/utils/utc-day/utc-day';
+import { utcDay } from '@blog/utils/date';
 import { sql } from 'drizzle-orm';
 
 export async function recordEmailSend(

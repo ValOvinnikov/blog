@@ -1,7 +1,7 @@
 import { getDb } from '@blog/db/client';
 import type { TEmailDeliveryOutcome } from '@blog/db/constants';
 import { emailDeliveryOutcomeCounts } from '@blog/db/schema/email-usage';
-import { utcDay } from '@blog/db/utils/utc-day/utc-day';
+import { utcDay } from '@blog/utils/date';
 import { sql } from 'drizzle-orm';
 
 export async function recordEmailDeliveryOutcome(

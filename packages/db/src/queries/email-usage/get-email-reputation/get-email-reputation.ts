@@ -5,7 +5,7 @@ import {
   type TEmailDeliveryOutcome,
 } from '@blog/db/constants';
 import { emailDeliveryOutcomeCounts } from '@blog/db/schema/email-usage';
-import { utcDayDaysBefore } from '@blog/db/utils/utc-day/utc-day';
+import { utcDayDaysBefore } from '@blog/utils/date';
 import { and, eq, gte, sql } from 'drizzle-orm';
 
 export interface IEmailReputation {

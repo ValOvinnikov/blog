@@ -1,5 +1,5 @@
 {
-  "id": "e2f5ea60-2943-4e0d-b0e4-b998138ee9ba",
+  "id": "2ce183db-aae1-4b80-b778-6d33b4ff13bf",
   "prevId": "ec6f0df3-75c1-4140-80b7-4272a378f1e7",
   "version": "7",
   "dialect": "postgresql",
@@ -1912,6 +1912,33 @@
             },
             {
               "expression": "email_index",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "subscribers_tenant_status_id_idx": {
+          "name": "subscribers_tenant_status_id_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
