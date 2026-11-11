@@ -2,9 +2,8 @@ import { readFileSync } from 'node:fs';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
+import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './accent-ramps';
 import {
-  ACCENT_RAMP_DARK,
-  ACCENT_RAMP_LIGHT,
   formatOklchRamp,
   IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,

@@ -33,7 +33,7 @@ A grid or carousel of feature cards that summarises a set of capabilities or off
 ## Configuration
 
 - **Editors** write Feature Cards under Blocks → Cards and assemble them in Features modules.
-- **Look** reaches the cards through tokens: card style (`ACCENT_BAR` or `OUTLINED`), radius, card padding and gap from density, fonts, accent. Voice does not reach card copy; the carousel's region and previous/next labels are fixed catalog strings (`carousel` namespace).
+- **Look** reaches the cards through tokens: card style (`ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED` or `PLAIN`), radius, card padding and gap from density, fonts, accent. Voice does not reach card copy; the carousel's region and previous/next labels are fixed catalog strings (`carousel` namespace).
 - **Plans:** not gated.
 
 ## Constraints and invariants

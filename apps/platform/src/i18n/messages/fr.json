@@ -738,11 +738,17 @@
     },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barre d'accent",
-      "OUTLINED": "À contour"
+      "OUTLINED": "À contour",
+      "FILLED": "Rempli",
+      "RAISED": "Surélevé",
+      "PLAIN": "Simple"
     },
     "cardStyleOptionDescription": {
       "ACCENT_BAR": "Une barre aux couleurs de la marque sur le bord gauche",
-      "OUTLINED": "Un contour fin tout autour"
+      "OUTLINED": "Un contour fin tout autour",
+      "FILLED": "Un fond teinté, sans contour",
+      "RAISED": "Un contour fin avec une ombre douce",
+      "PLAIN": "Sans cadre ; l’espacement sépare les cartes"
     },
     "headerControlStyleLabel": "Boutons d'en-tête",
     "headerControlStyleDescription": "Les boutons de langue, de thème, de menu et Se connecter, sur toutes les tailles d'écran.",

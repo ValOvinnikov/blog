@@ -2,12 +2,9 @@ import { oklchToHex, renderedContrastRatio } from '@blog/utils/color';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
+import { ACCENT_RAMP_LIGHT } from './accent-ramps';
 import { resolveTenantEmailBrand } from './resolve-tenant-email-brand';
-import {
-  ACCENT_RAMP_LIGHT,
-  LOGO_RAMP_LIGHT,
-  type TOklchStop,
-} from './theme-declarations';
+import { LOGO_RAMP_LIGHT, type TOklchStop } from './theme-declarations';
 
 vi.mock(import('@blog/utils/color'), async (importOriginal) => {
   const actual = await importOriginal();

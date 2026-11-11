@@ -738,11 +738,17 @@
     },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Akzentleiste",
-      "OUTLINED": "Umrandet"
+      "OUTLINED": "Umrandet",
+      "FILLED": "Gefüllt",
+      "RAISED": "Erhöht",
+      "PLAIN": "Schlicht"
     },
     "cardStyleOptionDescription": {
       "ACCENT_BAR": "Eine Leiste in Markenfarbe am linken Rand",
-      "OUTLINED": "Ein dünner Rahmen rundherum"
+      "OUTLINED": "Ein dünner Rahmen rundherum",
+      "FILLED": "Ein getönter Hintergrund ohne Rahmen",
+      "RAISED": "Ein dünner Rahmen mit sanftem Schatten",
+      "PLAIN": "Kein Rahmen; Abstände trennen die Karten"
     },
     "headerControlStyleLabel": "Header-Schaltflächen",
     "headerControlStyleDescription": "Die Schaltflächen für Sprache, Design, Menü und Anmelden, auf jeder Bildschirmgröße.",

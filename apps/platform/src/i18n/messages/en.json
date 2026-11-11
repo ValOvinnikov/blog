@@ -738,11 +738,17 @@
     },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accent bar",
-      "OUTLINED": "Outlined"
+      "OUTLINED": "Outlined",
+      "FILLED": "Filled",
+      "RAISED": "Raised",
+      "PLAIN": "Plain"
     },
     "cardStyleOptionDescription": {
       "ACCENT_BAR": "A brand-coloured bar on the left edge",
-      "OUTLINED": "A thin outline all round"
+      "OUTLINED": "A thin outline all round",
+      "FILLED": "A tinted background, no outline",
+      "RAISED": "A thin outline with a soft shadow",
+      "PLAIN": "No frame; spacing separates the cards"
     },
     "headerControlStyleLabel": "Header buttons",
     "headerControlStyleDescription": "The language, theme, menu and Sign in buttons, at every screen size.",

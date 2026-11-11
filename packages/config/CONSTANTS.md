@@ -57,7 +57,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/card-style.ts`
 
-- **CARD_STYLE**: `ACCENT_BAR`, `OUTLINED`
+- **CARD_STYLE**: `ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED`, `PLAIN`
 
 ### `@blog/config/constants` — `packages/config/src/constants/consent-category.ts`
 
