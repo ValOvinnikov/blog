@@ -35,5 +35,11 @@ export const useHeaderDraftFields = () => {
       display: ({ headerControlStyle }: TLookFormValues) =>
         t(`headerControlStyleOptionLabel.${headerControlStyle}`),
     },
+    {
+      id: 'headerControlShape',
+      label: t('headerControlShapeLabel'),
+      display: ({ headerControlShape }: TLookFormValues) =>
+        t(`headerControlShapeOptionLabel.${headerControlShape}`),
+    },
   ];
 };

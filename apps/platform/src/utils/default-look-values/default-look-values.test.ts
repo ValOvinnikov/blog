@@ -3,13 +3,8 @@ import {
   PRESET_ID,
   PRESET_REGISTRY,
 } from '@blog/config';
-import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
-import { toLookFormValues } from '@platform/utils/to-look-form-values/to-look-form-values';
 
-import {
-  defaultLookFormValues,
-  lookFormValuesOrDefaults,
-} from './default-look-values';
+import { defaultLookFormValues } from './default-look-values';
 
 describe(defaultLookFormValues, () => {
   it('follows the Console preset, leaving the logo hue unset', () => {
@@ -17,6 +12,7 @@ describe(defaultLookFormValues, () => {
       themeTokens,
       cardStyle,
       headerControlStyle,
+      headerControlShape,
       headerLayout,
       headerSubmenuStyle,
       headerBarStyle,
@@ -45,6 +41,7 @@ describe(defaultLookFormValues, () => {
       density: themeTokens.density,
       cardStyle,
       headerControlStyle,
+      headerControlShape,
       headerLayout,
       headerSubmenuStyle,
       headerBarStyle,
@@ -64,20 +61,5 @@ describe(defaultLookFormValues, () => {
       logo: { url: undefined },
       favicon: { url: undefined },
     });
-  });
-});
-
-describe(lookFormValuesOrDefaults, () => {
-  it('falls back to the defaults when there is no saved row', () => {
-    const values = lookFormValuesOrDefaults(undefined);
-
-    expect(values).toEqual(defaultLookFormValues());
-  });
-
-  it('reads the saved row when there is one', () => {
-    const siteConfig = mockSiteConfig();
-    const values = lookFormValuesOrDefaults(siteConfig);
-
-    expect(values).toEqual(toLookFormValues(siteConfig));
   });
 });

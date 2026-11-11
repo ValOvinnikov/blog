@@ -20,6 +20,7 @@ export const CARD_FIELDS = {
     'headerBarStyle',
     'navLinkStyle',
     'headerControlStyle',
+    'headerControlShape',
     'accountButtonStyle',
     'accountPanelStyle',
     'accountPhonePlacement',

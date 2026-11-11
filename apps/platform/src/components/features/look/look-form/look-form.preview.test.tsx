@@ -2,6 +2,8 @@ import {
   BUSY_BUTTON_STYLE,
   FOOTER_LAYOUT,
   HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
+  HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_LAYOUT,
   SPINNER_STYLE,
 } from '@blog/config';
@@ -172,6 +174,19 @@ describe(`<${LookForm.name}/>`, () => {
         expect(sampleTokens).toHaveStyle({
           '--nav-link-decoration': 'underline',
         });
+      });
+
+      it('previews the chosen header buttons shape before saving', async () => {
+        await chooseSegment(
+          user,
+          LOOK_FORM.headerControlShapeLabel,
+          LOOK_FORM.headerControlShapeOptionLabel.SQUARE,
+        );
+
+        const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
+        expect(sampleTokens).toHaveStyle(
+          HEADER_CONTROL_SHAPE_DECLARATIONS[HEADER_CONTROL_SHAPE.SQUARE],
+        );
       });
     });
 

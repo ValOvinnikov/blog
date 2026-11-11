@@ -4,8 +4,12 @@ import {
   MOCK_LOGO_URL,
   mockSiteConfig,
 } from '@platform/testing/site-config/fixtures';
+import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
-import { toLookFormValues } from './to-look-form-values';
+import {
+  lookFormValuesOrDefaults,
+  toLookFormValues,
+} from './to-look-form-values';
 
 faker.seed(6006);
 
@@ -33,6 +37,7 @@ describe(toLookFormValues, () => {
       languageSwitcherStyle: MOCK_SITE_CONFIG.languageSwitcherStyle,
       cardStyle: MOCK_SITE_CONFIG.cardStyle,
       headerControlStyle: MOCK_SITE_CONFIG.headerControlStyle,
+      headerControlShape: MOCK_SITE_CONFIG.headerControlShape,
       headerLayout: MOCK_SITE_CONFIG.headerLayout,
       headerSubmenuStyle: MOCK_SITE_CONFIG.headerSubmenuStyle,
       headerBarStyle: MOCK_SITE_CONFIG.headerBarStyle,
@@ -60,5 +65,19 @@ describe(toLookFormValues, () => {
     });
 
     expect(values.brandName).toBe('');
+  });
+});
+
+describe(lookFormValuesOrDefaults, () => {
+  it('falls back to the defaults when there is no saved row', () => {
+    const values = lookFormValuesOrDefaults(undefined);
+
+    expect(values).toEqual(defaultLookFormValues());
+  });
+
+  it('reads the saved row when there is one', () => {
+    const values = lookFormValuesOrDefaults(MOCK_SITE_CONFIG);
+
+    expect(values).toEqual(toLookFormValues(MOCK_SITE_CONFIG));
   });
 });

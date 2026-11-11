@@ -765,6 +765,18 @@
       "SOFT": "A grey fill, no outline",
       "PLAIN": "No outline until hovered"
     },
+    "headerControlShapeLabel": "Header buttons shape",
+    "headerControlShapeDescription": "The outline shape of the language, theme, menu and account buttons.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Round",
+      "ROUNDED": "Rounded",
+      "SQUARE": "Square"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Fully round, as circles and pills",
+      "ROUNDED": "Corners follow the site's Corners setting",
+      "SQUARE": "Square corners"
+    },
     "languageSwitcherLabel": "Language switcher",
     "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "How the language switcher looks on desktop, in the header and footer.",

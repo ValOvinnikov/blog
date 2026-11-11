@@ -1,10 +1,12 @@
 import {
   BUTTON_SHAPE,
   DENSITY,
+  HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
   type TButtonShape,
   type TDensity,
+  type THeaderControlShape,
   type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config';
@@ -13,6 +15,9 @@ import ButtonShapeRounded from '@platform/assets/look-glyphs/button-shape-rounde
 import ButtonShapeSquare from '@platform/assets/look-glyphs/button-shape-square.svg';
 import DensityCompact from '@platform/assets/look-glyphs/density-compact.svg';
 import DensityDefault from '@platform/assets/look-glyphs/density-default.svg';
+import HeaderControlShapeRound from '@platform/assets/look-glyphs/header-control-shape-round.svg';
+import HeaderControlShapeRounded from '@platform/assets/look-glyphs/header-control-shape-rounded.svg';
+import HeaderControlShapeSquare from '@platform/assets/look-glyphs/header-control-shape-square.svg';
 import HeaderControlStyleOutlined from '@platform/assets/look-glyphs/header-control-style-outlined.svg';
 import HeaderControlStylePlain from '@platform/assets/look-glyphs/header-control-style-plain.svg';
 import HeaderControlStyleSoft from '@platform/assets/look-glyphs/header-control-style-soft.svg';
@@ -27,6 +32,7 @@ type TLookOptionGlyphValues = {
   radiusScale: TRadiusScale;
   density: TDensity;
   headerControlStyle: THeaderControlStyle;
+  headerControlShape: THeaderControlShape;
   buttonShape: TButtonShape;
 };
 
@@ -53,6 +59,11 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
     [HEADER_CONTROL_STYLE.OUTLINED]: HeaderControlStyleOutlined,
     [HEADER_CONTROL_STYLE.SOFT]: HeaderControlStyleSoft,
     [HEADER_CONTROL_STYLE.PLAIN]: HeaderControlStylePlain,
+  },
+  headerControlShape: {
+    [HEADER_CONTROL_SHAPE.ROUND]: HeaderControlShapeRound,
+    [HEADER_CONTROL_SHAPE.ROUNDED]: HeaderControlShapeRounded,
+    [HEADER_CONTROL_SHAPE.SQUARE]: HeaderControlShapeSquare,
   },
   buttonShape: {
     [BUTTON_SHAPE.SQUARE]: ButtonShapeSquare,

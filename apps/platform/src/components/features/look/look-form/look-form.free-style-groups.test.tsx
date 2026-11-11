@@ -51,6 +51,12 @@ describe(`<${LookForm.name}/>`, () => {
       },
       {
         row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.headerControlShapeLabel,
+        current: LOOK_FORM.headerControlShapeOptionLabel.ROUND,
+        other: LOOK_FORM.headerControlShapeOptionLabel.SQUARE,
+      },
+      {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountButtonStyleLabel,
         current: LOOK_FORM.accountButtonStyleOptionLabel.PILL,
         other: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,
