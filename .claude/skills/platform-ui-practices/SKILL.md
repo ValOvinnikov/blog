@@ -415,7 +415,7 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
 
 ## Data loading
 
-apps/platform runs the Next 16.3 App Router on React 19.2 with `cacheComponents`
+apps/platform runs the Next 16 App Router on React 19 with `cacheComponents`
 turned off, so `'use cache'`, `cacheLife` and PPR are not available here. The
 tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 `useTransition`/`startTransition`, `useOptimistic`, Server Actions

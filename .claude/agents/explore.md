@@ -75,7 +75,7 @@ SPEC.md      architecture core — layer contracts, data flow, cross-cutting rul
   already a const for X" here.
 - `apps/web/src/app/` — routes: public pages under `[tenant]/[locale]/`;
   `api/`, `sitemap.ts`, `robots.ts` at the root.
-- `apps/web/src/modules/module-renderer.tsx:38` — `renderModules`, the module
+- `apps/web/src/modules/module-renderer.tsx:42` — `renderModules`, the module
   dispatch; each module-composed page adds an
   `apps/web/src/components/pages/*/*-module-renderer.tsx`.
 
@@ -115,7 +115,7 @@ Copy this shape exactly:
 >   per-tag route to mirror.
 > - `apps/web/src/app/[tenant]/[locale]/topics/[slug]/` — no `rss.xml/`
 >   subdirectory.
-> - `packages/config/src/routes.ts:37` — `tagRssFeed` has no topic counterpart.
+> - `packages/config/src/routes.ts:55` — `tagRssFeed` has no topic counterpart.
 > - `packages/service/src/features/entities/posts/adaptor/tag-scoped-published/loader.ts:13`
 >   — `getPublishedPostsByTag`, the query the tag feed uses;
 >   `entities/posts/adaptor/` has no topic sibling.

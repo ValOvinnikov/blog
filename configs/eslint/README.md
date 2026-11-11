@@ -119,6 +119,20 @@
   "Name the element, then use the name". Known gap: a query nested deeper
   than a direct argument (inside an object literal) is not reported.
 
+- `prefer-before-each.js` — reports, in a test file, (a) the same first
+  statement opening two or more `it`/`test` cases directly inside one
+  `describe` or at file level, (b) `userEvent.setup()` inside a case, and
+  (c) three or more `render`/`renderElement`/`renderWithIntl` calls in one
+  file with identical arguments. Registered in the `blog-test` plugin and
+  enabled only in the `BLOG_LINT_TOUCHED=1` test-file block. Co-located
+  `prefer-before-each.test.js`. Per `testing-practices` → "Repeated
+  arrangement goes in beforeEach". It does not catch: a longer run of
+  statements shared beyond the first, a run repeated later in the cases, the
+  same arrangement written differently (an
+  argument order swapped, a variable renamed), an `it.each` or an
+  expression-bodied case, a `setup(…)` helper repeated across `describe`s, or
+  `userEvent.setup()` in a helper called from a case.
+
 - `eslint-plugin-testing-library` — registered in `base.js`'s
   `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,
   with exactly three rules as `error` (no `recommended` preset):

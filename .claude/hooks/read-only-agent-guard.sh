@@ -78,6 +78,8 @@ DENY_PREFIXES=(
   "pnpm typegen"
   "pnpm format"
   "npx sanity"
+  "drizzle-kit"
+  "npx drizzle-kit"
   "gh project item-add"
   "gh project item-edit"
 )

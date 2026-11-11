@@ -13,23 +13,35 @@
 #   exit 2 — block; stderr is fed back to the agent
 set -u
 
-root="${CLAUDE_PROJECT_DIR:-$PWD}"
-[ -L "$root/node_modules" ] || exit 0 # private/real tree: installs are fine
-
 payload=$(cat)
 
-command=$(printf '%s' "$payload" | node -e '
+read_field() {
+	printf '%s' "$payload" | node -e '
   let s = "";
   process.stdin.on("data", (c) => (s += c));
   process.stdin.on("end", () => {
     try {
       const j = JSON.parse(s);
-      process.stdout.write(j.tool_input?.command ?? "");
+      const v = process.argv[1] === "cwd" ? j.cwd : j.tool_input?.command;
+      process.stdout.write(v ?? "");
     } catch {
-      /* malformed payload -> empty command -> allow */
+      /* malformed payload -> empty field */
     }
   });
-')
+' "$1"
+}
+
+# CLAUDE_PROJECT_DIR is the primary checkout even when the session works in a
+# worktree, so the payload's cwd decides which tree's node_modules is checked.
+cwd=$(read_field cwd)
+if [ -n "$cwd" ]; then
+	root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null) || root=$cwd
+else
+	root="${CLAUDE_PROJECT_DIR:-$PWD}"
+fi
+[ -L "$root/node_modules" ] || exit 0 # private/real tree: installs are fine
+
+command=$(read_field command)
 
 case "$command" in
 *pnpm*) ;;

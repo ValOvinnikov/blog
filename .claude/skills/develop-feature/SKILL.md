@@ -201,7 +201,8 @@ step 3, and `test-writer` never touches it.
 - Dispatch **`test-writer`** (`.claude/agents/test-writer.md`) with the step 3
   handoff plus a diff summary and the new exports, components and types each
   layer produced. It applies `testing-practices`, is confined to
-  `*.test.ts(x)` by `test-writer-scope-guard.sh`, and returns a test that
+  `*.test.ts(x)`, `src/testing/` and `__mocks__/` by
+  `test-writer-scope-guard.sh`, and returns a test that
   needs a product change as a finding for you to route to the owning agent.
 - Tests run once per layer when implementation is complete, not after each
   file.

@@ -329,7 +329,10 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   of two or more `it`s in one `describe`, whatever it calls; a run of act or
   assert statements written out twice; and the same `render(<X …/>)` prop bag
   three or more times in one file. That the existing file already repeats it
-  is no exemption in a file the diff touches.
+  is no exemption in a file the diff touches. `blog-test/prefer-before-each`
+  reports the first statement repeated, `userEvent.setup()` inside a case and
+  the repeated `render` in any test file you edit; the longer run and the
+  repeated act or assert run are still the reviewer's to catch.
 
   ```tsx
   const setup = customRender(PostShare, defaultProps);

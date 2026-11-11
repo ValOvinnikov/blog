@@ -8,8 +8,8 @@ prop inference, or renders an anchor anywhere in its tree.
 
 A Level 2 component keeps `TPolymorphicProps<C, OwnProps>` and its `...rest`
 spread because the forwarded props belong to an element the caller chooses
-(SKILL.md § Closed prop types). The reasoning never extends to a component
-that renders a fixed element: "consumers might want `aria-*`" is a reason to
+(`react-component-practices` § Props → Contract). The reasoning never extends
+to a component that renders a fixed element: "consumers might want `aria-*`" is a reason to
 name the prop, not to reopen the surface. `Eyebrow` (`atoms/eyebrow`) picks
 its own element — `<p>`, or a `linkAs` link when `href` is set — so it is
 closed like any other atom.
