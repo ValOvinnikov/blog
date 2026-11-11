@@ -3536,18 +3536,12 @@ shared: { react: { singleton: <span class="keyword">true</span> } }</pre>
                 without one it collapses to one column.
               </p>
               <p>
-                <strong>Current usage is home-only</strong>, despite the
-                generalized contract: the home route composes
-                <code>HeroModule</code> directly as a dedicated
-                <code>hero</code> prop on <code>HomePageTemplate</code>, not
-                through the generic page-builder <code>modules[]</code> →
-                <code>ModuleRenderer</code> pipeline — the CMS schema doesn't
-                allow a <code>module_hero</code> entry in any page's
-                <code>modules[]</code> array (generic pages allow only
-                content/cta; the home page allows only postList/cta), and
-                <code>MODULE_MAP</code> excludes <code>module_hero</code> for
-                that reason. Post-detail and other page-builder pages don't
-                render <code>Hero</code> today.
+                <strong>A hero arrives through its page's own
+                <code>hero</code> reference</strong>, never through the
+                page-builder <code>modules[]</code> array:
+                <code>renderHeroModule</code> renders the page's one hero
+                kind, and no page's <code>modules[]</code> accepts a
+                <code>module_hero*</code> type. Posts have no hero.
               </p>
               <p>
                 <code

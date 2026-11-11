@@ -211,11 +211,9 @@ type TSlotModuleType =
 ```
 
 `THeroModuleType` is the same template-literal `Extract` that already derives
-`TModuleType` from the generated Sanity types, one level down. Today it
-resolves to `'module_hero'`; after M9 it is `'module_hero' |
-'module_heroBlog' | 'module_heroStatement' | 'module_heroProfile'`, and the
-legacy `module_hero` drops out of the union the day its schema is deleted
-(the retirement ticket, #2813).
+`TModuleType` from the generated Sanity types, one level down. After M9 it is
+`'module_heroBlog' | 'module_heroStatement' | 'module_heroProfile'`, and a
+kind drops out of the union the day its schema is deleted.
 
 `TSlotModuleType` names every module that renders _only_ through a page's
 dedicated slot, never `modules[]`, so `MODULE_MAP` is typed
@@ -332,7 +330,7 @@ fails that gate:
   no consumer before the helper exists.
 
 `defineHeroFields()` lands with its first consumer, `module_heroBlog`, not in
-Phase 0 — a helper with no caller fails `knip`, and `module_hero` is not
+Phase 0 — a helper with no caller fails `knip`, and the legacy hero is not
 retrofitted because it is being retired.
 
 ### The `@blog/ui` organism
@@ -378,8 +376,7 @@ each later module that gains a fallback heading.
 
 None. Every change is additive: new optional fields, widened `to:` and
 `allow` lists, a renamed const whose stored values do not change.
-`module_hero` documents keep working until #2813 migrates each tenant's
-home page onto `module_heroBlog` and deletes the schema.
+Legacy hero documents keep working until #2813 deletes the schema.
 
 ### Phase 0 scope, per layer
 
@@ -403,12 +400,12 @@ home page onto `module_heroBlog` and deletes the schema.
 **Acceptance:** `page_home.hero` and every other page's optional `hero`
 accept the family; adding a `module_hero*` schema without a `HERO_MAP` entry
 or a `HERO_SCHEMA_TYPES` entry fails `type-check`/`test`; every existing
-page renders unchanged while no hero is set on it and `module_hero` is the
+page renders unchanged while no hero is set on it and the legacy hero is the
 family's only member.
 
 ## `module_heroBlog` — the featured-post hero, rebuilt
 
-**Goal:** the blog member of the hero family, replacing `module_hero` in
+**Goal:** the blog member of the hero family, replacing the legacy hero in
 function without replacing it in the dataset. It ships beside the old type
 with **no migration**; the old one keeps rendering until every production
 tenant's page points at a `module_heroBlog`, and a separate chore then
@@ -420,7 +417,7 @@ model and every validation state:
 
 ### What it fixes
 
-| Today on `module_hero`                         | Rebuilt                              | Why                                                                                     |
+| Today on the legacy hero                       | Rebuilt                              | Why                                                                                     |
 | ---------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------- |
 | `heroEyebrowMode` + `heroEyebrow`              | `eyebrow`                            | Two fields and a radio to express "use the post's topic", which is the default anyway   |
 | `heroTitleMode` + `heroTitle`                  | `heading`                            | Same. `title` is unavailable: `titleField()` owns it as the module's editor-facing name |
@@ -548,7 +545,7 @@ type THeroBlogModule = {
 };
 ```
 
-`THeroPrimaryAction` carries over unchanged from `module_hero`, including
+`THeroPrimaryAction` carries over unchanged from the legacy hero, including
 `hiddenLabelSuffix`: when the editor leaves the label empty, the generic
 "Read more" is followed by the post's own title as visually hidden text,
 because Lighthouse's link-text audit reads visible text and not `aria-label`.
@@ -570,7 +567,8 @@ later hero kind rather than just this one.
 
 - New in `@blog/config`: `HERO_POST_SOURCE = { PINNED, NEWEST_FEATURED }` and
   `HERO_IMAGE_SOURCE = { POST, CUSTOM, NONE }`.
-- **`HERO_FIELD_MODE` does not shrink in this epic.** `module_hero` still
+- **The legacy hero's field-mode const does not shrink in this epic.** The
+  legacy hero still
   reads all six of its values, and the whole premise is that it keeps
   rendering unmigrated. It is deleted with that schema in #2813, not narrowed
   here.
@@ -579,16 +577,15 @@ later hero kind rather than just this one.
 
 `module_heroBlog` joins `HERO_SCHEMA_TYPES`, so every page's hero slot
 accepts it with no per-page change, and it gets a desk entry in the modules
-group. Starter content seeds a `module_heroBlog` rather than a `module_hero`
+group. Starter content seeds a `module_heroBlog` rather than a legacy hero
 (#2812), so new tenants never author on the type that is being retired.
 
 ### Migration
 
 None for this epic — a new type and new fields only. The retirement chore
-(#2813) is where migration happens: per tenant, create a `module_heroBlog`
-carrying the old document's values, repoint `page_home.hero`, then delete the
-`module_hero` document, in that order and as separate steps, because a Sanity
-`_type` is immutable.
+(#2813) deletes the legacy hero's schema without a migration either: until
+launch no content migrations are written, and starter content holds no legacy
+hero document.
 
 ## `module_heroStatement` — the marketing hero
 
@@ -832,7 +829,7 @@ reason `module_postFeatured` shipped its three data layers together.
 - Rich text in the heading or the supporting text.
 - A `headingLevel` option.
 - A statement hero seeded by starter content (that is #2798's template).
-- Retiring `module_hero` (#2813) or touching `module_heroBlog`'s fields.
+- Retiring the legacy hero (#2813) or touching `module_heroBlog`'s fields.
 
 **Acceptance:** an editor can author a marketing home page whose hero has no
 post behind it; the heading is the page's only `<h1>`; zero, one and two
@@ -1764,7 +1761,7 @@ async "none in the dataset" check runs against `getDraftsClient(context)`,
 as `module_heroBlog`'s does.
 
 `page_post.featured`'s description — "Pin this post to the featured slot on
-the home page" — describes `module_hero`, which is being retired. It
+the home page" — describes the legacy hero, which is being retired. It
 becomes "Marks this post for the Newest featured source of the blog hero
 and the featured spotlight."
 
@@ -2574,18 +2571,18 @@ point; the graph stays acyclic.
   media frame on every card when images are on, so a post without one keeps
   the row aligned; one web helper sizes the image, lazy and never `priority`
   (2026-09-07, #2816).
-- **`module_heroBlog` replaces `module_hero` by addition, not migration** —
+- **`module_heroBlog` replaces the legacy hero by addition, not migration** —
   mode pairs become optional overrides whose Studio placeholder shows the
   derived value; the newest-featured fallback becomes an explicit
   `postSource` choice with an error when nothing resolves; the two per-render
-  queries collapse into one `select()` projection; `HERO_FIELD_MODE` shrinks
+  queries collapse into one `select()` projection; the legacy field-mode const shrinks
   only when the old schema is deleted (2026-09-07, #2802).
 - **The hero is a family, not one generalised module** — membership is the
   `module_hero*` naming convention, derived into `THeroModuleType`; one
   `defineHeroFields()` tail (variant, brand variant, image, position,
   alignment, media order, actions, layout) shared by every kind;
   `page_home.hero` required, every other page's `hero` optional and
-  replacing that page's default header when set; `module_hero`
+  replacing that page's default header when set; the legacy hero
   retired by content migration once `module_heroBlog` replaces it
   (2026-09-07, #2791).
 - **The taxonomy list is one type with an authored `taxonomy`, not a

@@ -85,16 +85,16 @@ of them also deletes `2026-10-30-admin-redesign-resolutions.md`.
 
 ## After the launch
 
-| Epic      | What it delivers                                                                                                                                                                                |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **#5028** | Text roles: one `TEXT_ROLE` registry, so the same role looks identical in every module.                                                                                                         |
-| **#5016** | Skins: a palette tier and a role tier on `[data-skin]`, generated from `SKIN_REGISTRY`.                                                                                                         |
-| **#5067** | Per-tenant module styles: more Look settings, then per-module overrides, then plan-gated named variants.                                                                                        |
-| **#5106** | Convention infrastructure: shared types, helpers, recipes, test fakes, and file-size and prop-ceiling gates.                                                                                    |
-| **#5134** | Component structure: long prop lists and oversized files fixed at their source.                                                                                                                 |
-| **#5150** | Docs: retire the design docs and SPEC.md sections the feature catalogue now covers, and add a feature-docs check.                                                                               |
-| **#5197** | Retire `module_hero`. Also ready to pull: comments #1040, ratings #1041, location #2792, price-period wording #4022, post-module image shape #3245, semantic search #1045, the Team page #5151. |
-| **#4083** | Newsletter sending and per-tenant email limits.                                                                                                                                                 |
+| Epic      | What it delivers                                                                                                                                                                                  |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **#5028** | Text roles: one `TEXT_ROLE` registry, so the same role looks identical in every module.                                                                                                           |
+| **#5016** | Skins: a palette tier and a role tier on `[data-skin]`, generated from `SKIN_REGISTRY`.                                                                                                           |
+| **#5067** | Per-tenant module styles: more Look settings, then per-module overrides, then plan-gated named variants.                                                                                          |
+| **#5106** | Convention infrastructure: shared types, helpers, recipes, test fakes, and file-size and prop-ceiling gates.                                                                                      |
+| **#5134** | Component structure: long prop lists and oversized files fixed at their source.                                                                                                                   |
+| **#5150** | Docs: retire the design docs and SPEC.md sections the feature catalogue now covers, and add a feature-docs check.                                                                                 |
+| **#5197** | Retire the legacy hero. Also ready to pull: comments #1040, ratings #1041, location #2792, price-period wording #4022, post-module image shape #3245, semantic search #1045, the Team page #5151. |
+| **#4083** | Newsletter sending and per-tenant email limits.                                                                                                                                                   |
 
 ## Ideas
 
