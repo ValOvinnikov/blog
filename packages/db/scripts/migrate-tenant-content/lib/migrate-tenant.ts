@@ -1,6 +1,5 @@
 import { join } from 'node:path';
 
-import { TENANT_STATUS } from '@blog/db/constants';
 import {
   clearTenantContentMigrationFailure,
   getTenantSanityWriteCredentials,
@@ -8,6 +7,7 @@ import {
   type TTenantSanityWriteCredentials,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
 import { sanitizeLogMessage } from '@blog/insight';
 
 import { isTenantMigrationLedgerEmpty } from './read-tenant-migration-ledger';
@@ -78,10 +78,7 @@ export async function migrateTenant(
     return;
   }
 
-  if (
-    credentials.status !== TENANT_STATUS.ACTIVE ||
-    credentials.deprovisionedAt
-  ) {
+  if (!isTenantWritable(credentials)) {
     summary.skipped += 1;
     console.log(
       `migrate-tenant-content: skipping tenant "${tenant.id}" — status="${credentials.status}" deprovisionedAt=${credentials.deprovisionedAt ? credentials.deprovisionedAt.toISOString() : 'null'}`,

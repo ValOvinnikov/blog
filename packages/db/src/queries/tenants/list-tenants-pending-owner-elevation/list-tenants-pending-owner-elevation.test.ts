@@ -1,4 +1,8 @@
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
+import {
+  WRITABLE_TENANT_STATUSES,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -15,15 +19,19 @@ afterEach(async () => {
 });
 
 describe(listTenantsPendingOwnerElevation, () => {
-  it('includes an ACTIVE, READY tenant', async () => {
-    const tenant = await insertTestTenant(db(), {
-      provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    });
+  it.each(WRITABLE_TENANT_STATUSES)(
+    'includes a %s, READY tenant',
+    async (status) => {
+      const tenant = await insertTestTenant(db(), {
+        status,
+        provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
+      });
 
-    const result = await listTenantsPendingOwnerElevation();
+      const result = await listTenantsPendingOwnerElevation();
 
-    expect(result).toEqual([tenant]);
-  });
+      expect(result).toEqual([tenant]);
+    },
+  );
 
   it.each([
     [

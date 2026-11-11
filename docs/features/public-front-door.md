@@ -53,7 +53,7 @@ Decided, not built:
 
 ## Data
 
-Today: `tenants.status` is `ACTIVE`, `SUSPENDED` or `ARCHIVED`; `tenants.plan` is `FREE` or `GROWTH`; no price exists in code. Planned:
+Today: `tenants.status` is `ACTIVE`, `TRIAL`, `PAST_DUE`, `SUSPENDED` or `ARCHIVED`, and TRIAL and PAST_DUE are served and writable like ACTIVE; `tenants.plan` is `FREE` or `GROWTH`; no price exists in code. Planned:
 
 - `TENANT_STATUS` gains `TRIAL` and `PAST_DUE` (a pgEnum migration).
 - `tenants.site_type` and `site_template_version`; `SITE_TYPE` lives in `@blog/config`, since the starter-content builders read it.
