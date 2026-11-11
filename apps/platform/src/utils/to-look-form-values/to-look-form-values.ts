@@ -17,6 +17,7 @@ export const toLookFormValues = (
     headerLayout: siteConfig.headerLayout,
     headerSubmenuStyle: siteConfig.headerSubmenuStyle,
     headerBarStyle: siteConfig.headerBarStyle,
+    navLinkStyle: siteConfig.navLinkStyle,
     accountButtonStyle: siteConfig.accountButtonStyle,
     accountPanelStyle: siteConfig.accountPanelStyle,
     accountPhonePlacement: siteConfig.accountPhonePlacement,

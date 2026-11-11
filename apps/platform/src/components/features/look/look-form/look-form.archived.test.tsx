@@ -86,8 +86,14 @@ describe(`<${LookForm.name}/>`, () => {
         const floatingButton = screen.getByRole('button', {
           name: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
         });
-        const softButton = screen.getByRole('button', {
+        const headerButtonsGroup = screen.getByRole('group', {
+          name: LOOK_FORM.headerControlStyleLabel,
+        });
+        const softButton = within(headerButtonsGroup).getByRole('button', {
           name: LOOK_FORM.headerControlStyleOptionLabel.SOFT,
+        });
+        const underlineButton = screen.getByRole('button', {
+          name: LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
         });
 
         expect(layoutSelect).toHaveAttribute(DATA_DISABLED);
@@ -97,6 +103,7 @@ describe(`<${LookForm.name}/>`, () => {
         expect(dropdownButton).toBeDisabled();
         expect(floatingButton).toBeDisabled();
         expect(softButton).toBeDisabled();
+        expect(underlineButton).toBeDisabled();
       });
 
       it('disables the Type, Corners & spacing and Cards controls', async () => {

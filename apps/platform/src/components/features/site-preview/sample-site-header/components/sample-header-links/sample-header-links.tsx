@@ -18,8 +18,9 @@ export const SampleHeaderLinks = ({
   className,
 }: TSampleHeaderLinksProps) => {
   const t = useTranslations('lookPreview');
-  const { root, submenu, trigger } = sampleHeaderLinksVariants({
+  const { root, link, submenu, trigger } = sampleHeaderLinksVariants({
     submenuStyle,
+    isSubmenuOpen,
   });
 
   return (
@@ -29,10 +30,11 @@ export const SampleHeaderLinks = ({
         href="#"
         isCurrent={true}
         currentStyle="weight"
+        className={link()}
       >
         {t('navPosts')}
       </TextLink>
-      <TextLink appearance="nav" href="#">
+      <TextLink appearance="nav" href="#" className={link()}>
         {t('navAbout')}
       </TextLink>
       <div className={submenu()}>

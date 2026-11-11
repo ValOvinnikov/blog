@@ -8,11 +8,13 @@ import { useTranslations } from 'next-intl';
 import { useAccountDraftFields } from './use-account-draft-fields';
 import { useButtonsDraftFields } from './use-buttons-draft-fields';
 import { useFooterDraftFields } from './use-footer-draft-fields';
+import { useHeaderDraftFields } from './use-header-draft-fields';
 
 export const useLookDraftFields = () => {
   const t = useTranslations('lookForm');
   const tPreset = useTranslations('presetPicker');
   const tHue = useTranslations('logoHueField');
+  const headerDraftFields = useHeaderDraftFields();
   const accountDraftFields = useAccountDraftFields();
   const buttonsDraftFields = useButtonsDraftFields();
   const footerDraftFields = useFooterDraftFields();
@@ -69,30 +71,7 @@ export const useLookDraftFields = () => {
       display: ({ cardStyle }: TLookFormValues) =>
         t(`cardStyleOptionLabel.${cardStyle}`),
     },
-    {
-      id: 'headerLayout',
-      label: t('headerLayoutLabel'),
-      display: ({ headerLayout }: TLookFormValues) =>
-        t(`headerLayoutOptionLabel.${headerLayout}`),
-    },
-    {
-      id: 'headerSubmenuStyle',
-      label: t('headerSubmenuStyleLabel'),
-      display: ({ headerSubmenuStyle }: TLookFormValues) =>
-        t(`headerSubmenuStyleOptionLabel.${headerSubmenuStyle}`),
-    },
-    {
-      id: 'headerBarStyle',
-      label: t('headerBarStyleLabel'),
-      display: ({ headerBarStyle }: TLookFormValues) =>
-        t(`headerBarStyleOptionLabel.${headerBarStyle}`),
-    },
-    {
-      id: 'headerControlStyle',
-      label: t('headerControlStyleLabel'),
-      display: ({ headerControlStyle }: TLookFormValues) =>
-        t(`headerControlStyleOptionLabel.${headerControlStyle}`),
-    },
+    ...headerDraftFields,
     ...accountDraftFields,
     ...buttonsDraftFields,
     ...footerDraftFields,

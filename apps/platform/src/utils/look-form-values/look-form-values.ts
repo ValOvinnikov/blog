@@ -18,6 +18,7 @@ export const CARD_FIELDS = {
     'headerLayout',
     'headerSubmenuStyle',
     'headerBarStyle',
+    'navLinkStyle',
     'headerControlStyle',
     'accountButtonStyle',
     'accountPanelStyle',
