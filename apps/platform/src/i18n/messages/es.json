@@ -894,7 +894,7 @@
     "buttonsDescription": "Qué forma tienen los botones, cómo se ven mientras trabajan y el indicador de carga que muestran.",
     "buttonsWhileWorkingHeading": "Mientras trabaja",
     "buttonShapeLabel": "Forma",
-    "buttonShapeDescription": "Esquinas de los botones, los campos de formulario y las etiquetas.",
+    "buttonShapeDescription": "Esquinas de los botones y las etiquetas.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Cuadrada",
       "ROUNDED": "Redondeada",

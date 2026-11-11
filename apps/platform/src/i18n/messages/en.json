@@ -894,7 +894,7 @@
     "buttonsDescription": "How buttons are shaped, how they look while they work, and the spinner they show.",
     "buttonsWhileWorkingHeading": "While working",
     "buttonShapeLabel": "Shape",
-    "buttonShapeDescription": "Corners of buttons, form fields and tags.",
+    "buttonShapeDescription": "Corners of buttons and tags.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Square",
       "ROUNDED": "Rounded",
