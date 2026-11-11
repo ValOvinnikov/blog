@@ -8,8 +8,6 @@ import {
   BUTTON_SHAPE,
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
-  DENSITY,
-  FONT_CHOICE,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_BAR_STYLE,
@@ -17,15 +15,13 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
-  PRESET_ID,
-  RADIUS_SCALE,
+  NAV_LINK_STYLE,
   SPINNER_STYLE,
   type TLocaleIsoCode,
 } from '@blog/config/constants';
 import {
   integer,
   jsonb,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -33,71 +29,30 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import {
+  accountButtonStyleEnum,
+  accountPanelStyleEnum,
+  accountPhonePlacementEnum,
+  busyButtonStyleEnum,
+  buttonShapeEnum,
+  cardStyleEnum,
+  cookieSettingsButtonEnum,
+  densityEnum,
+  fontChoiceEnum,
+  footerBackgroundEnum,
+  footerLayoutEnum,
+  footerSurfaceEnum,
+  headerBarStyleEnum,
+  headerControlStyleEnum,
+  headerLayoutEnum,
+  headerSubmenuStyleEnum,
+  languageSwitcherStyleEnum,
+  navLinkStyleEnum,
+  presetIdEnum,
+  radiusScaleEnum,
+  spinnerStyleEnum,
+} from './site-config-enums';
 import { tenants } from './tenants';
-
-export const presetIdEnum = pgEnum('preset_id', PRESET_ID);
-
-export const fontChoiceEnum = pgEnum('font_choice', FONT_CHOICE);
-
-export const radiusScaleEnum = pgEnum('radius_scale', RADIUS_SCALE);
-
-export const densityEnum = pgEnum('density', DENSITY);
-
-export const languageSwitcherStyleEnum = pgEnum(
-  'language_switcher_style',
-  LANGUAGE_SWITCHER_STYLE,
-);
-
-export const cardStyleEnum = pgEnum('card_style', CARD_STYLE);
-
-export const headerControlStyleEnum = pgEnum(
-  'header_control_style',
-  HEADER_CONTROL_STYLE,
-);
-
-export const accountButtonStyleEnum = pgEnum(
-  'account_button_style',
-  ACCOUNT_BUTTON_STYLE,
-);
-
-export const accountPanelStyleEnum = pgEnum(
-  'account_panel_style',
-  ACCOUNT_PANEL_STYLE,
-);
-
-export const accountPhonePlacementEnum = pgEnum(
-  'account_phone_placement',
-  ACCOUNT_PHONE_PLACEMENT,
-);
-
-export const busyButtonStyleEnum = pgEnum(
-  'busy_button_style',
-  BUSY_BUTTON_STYLE,
-);
-
-export const spinnerStyleEnum = pgEnum('spinner_style', SPINNER_STYLE);
-
-export const buttonShapeEnum = pgEnum('button_shape', BUTTON_SHAPE);
-
-export const headerLayoutEnum = pgEnum('header_layout', HEADER_LAYOUT);
-
-export const headerSubmenuStyleEnum = pgEnum(
-  'header_submenu_style',
-  HEADER_SUBMENU_STYLE,
-);
-
-export const headerBarStyleEnum = pgEnum('header_bar_style', HEADER_BAR_STYLE);
-
-export const footerLayoutEnum = pgEnum('footer_layout', FOOTER_LAYOUT);
-
-export const footerBackgroundEnum = pgEnum('footer_background', BRAND_VARIANT);
-
-export const footerSurfaceEnum = pgEnum('footer_surface', FOOTER_SURFACE);
-
-export const cookieSettingsButtonEnum = pgEnum(
-  'cookie_settings_button',
-  COOKIE_SETTINGS_BUTTON,
-);
 
 export type TVoiceOverrideValue = string | TVoicePortableText;
 
@@ -157,6 +112,9 @@ export const siteConfig = pgTable('site_config', {
   headerBarStyle: headerBarStyleEnum('header_bar_style')
     .notNull()
     .default(HEADER_BAR_STYLE.FULL_WIDTH),
+  navLinkStyle: navLinkStyleEnum('nav_link_style')
+    .notNull()
+    .default(NAV_LINK_STYLE.PLAIN),
   footerLayout: footerLayoutEnum('footer_layout')
     .notNull()
     .default(FOOTER_LAYOUT.COLUMNS),

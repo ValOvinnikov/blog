@@ -6,6 +6,7 @@ import {
   type TCardStyle,
   type TFontChoice,
   type THeaderControlStyle,
+  type TNavLinkStyle,
   type TPresetId,
   type TRadiusScale,
   type TDensity,
@@ -23,6 +24,7 @@ type TThemeTokensRow = {
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
   buttonShape: TButtonShape;
+  navLinkStyle: TNavLinkStyle;
 };
 
 export const toThemeTokens = (
@@ -34,6 +36,7 @@ export const toThemeTokens = (
     cardStyle,
     headerControlStyle,
     buttonShape,
+    navLinkStyle,
   } = PRESET_REGISTRY[preset];
 
   const requestedAccentHue = row?.accentHue ?? base.accentHue;
@@ -51,5 +54,6 @@ export const toThemeTokens = (
     cardStyle: row?.cardStyle ?? cardStyle,
     headerControlStyle: row?.headerControlStyle ?? headerControlStyle,
     buttonShape: row?.buttonShape ?? buttonShape,
+    navLinkStyle: row?.navLinkStyle ?? navLinkStyle,
   };
 };

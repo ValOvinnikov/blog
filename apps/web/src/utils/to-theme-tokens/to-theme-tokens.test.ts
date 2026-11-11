@@ -2,6 +2,7 @@ import {
   BUTTON_SHAPE,
   CARD_STYLE,
   HEADER_CONTROL_STYLE,
+  NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
 } from '@blog/config';
@@ -23,6 +24,7 @@ const CONSOLE_ROW = {
   cardStyle: CONSOLE.cardStyle,
   headerControlStyle: CONSOLE.headerControlStyle,
   buttonShape: CONSOLE.buttonShape,
+  navLinkStyle: CONSOLE.navLinkStyle,
 };
 
 const EDITORIAL_ROW = {
@@ -31,6 +33,7 @@ const EDITORIAL_ROW = {
   cardStyle: EDITORIAL.cardStyle,
   headerControlStyle: EDITORIAL.headerControlStyle,
   buttonShape: EDITORIAL.buttonShape,
+  navLinkStyle: EDITORIAL.navLinkStyle,
 };
 
 describe(toThemeTokens, () => {
@@ -43,6 +46,7 @@ describe(toThemeTokens, () => {
       cardStyle: CONSOLE.cardStyle,
       headerControlStyle: CONSOLE.headerControlStyle,
       buttonShape: CONSOLE.buttonShape,
+      navLinkStyle: CONSOLE.navLinkStyle,
     });
   });
 
@@ -55,35 +59,23 @@ describe(toThemeTokens, () => {
       cardStyle: EDITORIAL.cardStyle,
       headerControlStyle: EDITORIAL.headerControlStyle,
       buttonShape: EDITORIAL.buttonShape,
+      navLinkStyle: EDITORIAL.navLinkStyle,
     });
   });
 
-  it("keeps the row's card style over its preset's", () => {
-    const result = toThemeTokens({
-      ...CONSOLE_ROW,
-      cardStyle: CARD_STYLE.OUTLINED,
-    });
+  it.each([
+    { field: 'cardStyle', value: CARD_STYLE.OUTLINED },
+    { field: 'headerControlStyle', value: HEADER_CONTROL_STYLE.SOFT },
+    { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
+    { field: 'navLinkStyle', value: NAV_LINK_STYLE.UNDERLINE },
+  ] as const)(
+    "keeps the row's $field over its preset's",
+    ({ field, value }) => {
+      const result = toThemeTokens({ ...CONSOLE_ROW, [field]: value });
 
-    expect(result.cardStyle).toBe(CARD_STYLE.OUTLINED);
-  });
-
-  it("keeps the row's header control style over its preset's", () => {
-    const result = toThemeTokens({
-      ...CONSOLE_ROW,
-      headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
-    });
-
-    expect(result.headerControlStyle).toBe(HEADER_CONTROL_STYLE.SOFT);
-  });
-
-  it("keeps the row's button shape over its preset's", () => {
-    const result = toThemeTokens({
-      ...CONSOLE_ROW,
-      buttonShape: BUTTON_SHAPE.PILL,
-    });
-
-    expect(result.buttonShape).toBe(BUTTON_SHAPE.PILL);
-  });
+      expect(result[field]).toBe(value);
+    },
+  );
 
   it('resolves the accent hue and the logo hue independently', () => {
     const result = toThemeTokens({

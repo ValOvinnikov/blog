@@ -22,6 +22,7 @@ export const LOOK_FIELD = {
   HEADER_LAYOUT: 'headerLayout',
   HEADER_SUBMENU_STYLE: 'headerSubmenuStyle',
   HEADER_BAR_STYLE: 'headerBarStyle',
+  NAV_LINK_STYLE: 'navLinkStyle',
   FOOTER_LAYOUT: 'footerLayout',
   FOOTER_BACKGROUND: 'footerBackground',
   FOOTER_SURFACE: 'footerSurface',
