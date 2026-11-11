@@ -593,7 +593,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   standard to match. **When you touch a file, delete the comments in it that
   fail the test — do not shorten them**; trimming is only for a comment that
   earns its place but runs long. Converging file by file is the steady-state
-  mechanism, and it never collides with an open PR.
+  mechanism, and it never collides with an open PR. On touched `.ts`/`.tsx`
+  files the `no-failing-comment` lint rule reports the mechanical cases — a
+  doc block of more than one sentence, a `Name — does X` comment, a multi-line comment inside
+  a function body, any comment in a test file — in the post-edit hook,
+  lint-staged and `pnpm check:touched-lint`; the rest is the reviewer's.
 
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool
@@ -641,14 +645,16 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - **File size budgets, in non-blank lines:** a component `.tsx` 150, a hook
   120, any other `.ts` 120. Exempt: `*-variants` files, registries and
   catalogs (`icon-registry.ts`), Studio schema definitions, generated files,
-  tests and stories. A diff that touches an over-budget file extracts the part
-  it changes — not the whole file, and never as a sweep. Where the extracted
-  part goes in a React workspace: `react-component-practices` § Size and
-  splitting. `pnpm check:file-size` holds the budgets as a ratchet, at commit
-  (lint-staged) and in `pnpm verify`, locally only: a file over budget must
-  sit in `scripts/file-size-baseline.json` at its exact count, so it can only
-  shrink, and `--update` lowers an entry once it does. A new exemption is
-  added here and to `scripts/check-file-size.mjs` together.
+  tests and stories. A file over budget sits in
+  `scripts/file-size-baseline.json` at its exact count and never grows, and a
+  diff that edits one extracts the part it changes — not the whole file, and
+  never as a sweep — so the file ends below its entry on the merge-base;
+  `--update` then lowers (or, for a moved file, moves) the entry.
+  `pnpm check:file-size` is the rule, run locally only: on the edited file by
+  the post-edit hook and lint-staged, and over the whole branch in
+  `pnpm verify` and pre-push. Where the extracted part goes in a React
+  workspace: `react-component-practices` § Size and splitting. A new exemption
+  is added here and to `scripts/check-file-size.mjs` together.
 - **Function style is decided per layer kind, and enforced by ESLint per
   workspace.** React layers export _values_ — a component is a const holding a
   function — so they use **arrow-function consts**

@@ -386,10 +386,12 @@ file` are all denied alike) — an earlier version only handled the
     directory cannot be found" line out of the feedback. It sets
     `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
     (`prefer-shared-constant`, `no-duplicate-string`,
-    `blog-test/no-nested-query`, `blog-test/prefer-before-each`) that
+    `no-failing-comment`, `blog-test/no-nested-query`,
+    `blog-test/prefer-before-each`) that
     repo-wide
     `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
-    same way. When ESLint exits fatally in a directory that has an
+    same way. After ESLint it runs `scripts/check-file-size.mjs` on the file
+    (named-file mode) and feeds a size-budget breach back the same way. When ESLint exits fatally in a directory that has an
     `eslint.config.*` (the workspace's, or the root one the walk falls back
     to) — the config failed to load, typically a checkout installed before a
     plugin the shared config imports — the hook tells the agent, with
