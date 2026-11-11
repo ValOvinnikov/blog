@@ -86,6 +86,7 @@ export async function upsertSiteConfig(
       density,
       cardStyle: presetBundle.cardStyle,
       headerControlStyle: presetBundle.headerControlStyle,
+      headerControlShape: presetBundle.headerControlShape,
       accountButtonStyle: presetBundle.accountButtonStyle,
       accountPanelStyle: presetBundle.accountPanelStyle,
       accountPhonePlacement: presetBundle.accountPhonePlacement,

@@ -8,7 +8,7 @@ const MOCK_DOCUMENT_ID = faker.string.uuid();
 const MOCK_UNKNOWN_TYPE = faker.lorem.word();
 
 describe(getRevalidateTagsForType, () => {
-  it.each(['module_hero', 'module_postList', 'module_newsletter'])(
+  it.each(['module_heroBlog', 'module_postList', 'module_newsletter'])(
     'ends the tags of %s with the per-document tag',
     (type) => {
       const tags = getRevalidateTagsForType(type, MOCK_DOCUMENT_ID);

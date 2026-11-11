@@ -68,6 +68,7 @@ export const tv = createTV({
               'button',
               'nav-link',
               'header-control',
+              'header-control-inner',
             ],
           },
         ],

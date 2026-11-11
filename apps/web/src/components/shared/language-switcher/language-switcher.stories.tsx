@@ -1,4 +1,5 @@
 import { LANGUAGE_SWITCHER_STYLE, LOCALE_ISO_CODES } from '@blog/config';
+import { HeaderControlShapes } from '@blog/ui/testing/header-control-shapes';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { userEvent, within } from 'storybook/test';
 
@@ -41,6 +42,15 @@ export const HeaderMenuGlobe: TStory = {
 
 export const HeaderCodes: TStory = {
   args: { switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES, currentLocale: NL },
+};
+
+export const HeaderCodesShapes: TStory = {
+  args: { switcherStyle: LANGUAGE_SWITCHER_STYLE.CODES, currentLocale: NL },
+  render: (args) => (
+    <HeaderControlShapes>
+      {() => <LanguageSwitcher {...args} />}
+    </HeaderControlShapes>
+  ),
 };
 
 export const FooterMenuCode: TStory = {

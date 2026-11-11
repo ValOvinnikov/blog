@@ -53,7 +53,7 @@ const moduleMap = {
 };
 
 const heroMap = {
-  module_hero: StubHeroModule,
+  module_heroBlog: StubHeroModule,
 };
 
 const MOCK_CTA_ID = faker.string.uuid();
@@ -83,7 +83,7 @@ beforeEach(() => {
 });
 
 const setupHero = customRenderAsync(renderHeroModule, {
-  hero: { id: MOCK_HERO_ID, type: 'module_hero' },
+  hero: { id: MOCK_HERO_ID, type: 'module_heroBlog' },
   map: heroMap,
 });
 

@@ -44,7 +44,7 @@ Studio from one deployment.
   `settings_footer`).
   `page_postIndex` is the post-index singleton.
 - `src/schema-types/modules/` — reusable page modules (`module_content`,
-  `module_cta`, `module_hero`, `module_heroBlog`, `module_newsletter`,
+  `module_cta`, `module_heroBlog`, `module_newsletter`,
   `module_postFeatured`, `module_postLatest`, `module_postList`,
   `module_postRelated`, `module_taxonomyList`)
 - `src/schema-types/objects/` — shared object types (`linkRef`, `ctaButton`,

@@ -30,7 +30,7 @@ A link is authored once, as a `link` document — a label per language and exact
 - **`link` document:** `title` (Studio-only), `label` (`internationalizedArrayString`), `linkType` (`INTERNAL` or `EXTERNAL` from `LINK_TYPE`, initial `INTERNAL`), `internalReference` (a reference to one of `LINK_PAGE_TYPES`: `page_home`, `page_landing`, `page_post`, `page_postIndex`, `page_topic`, `page_topicIndex`, `page_tag`, `page_tagIndex`), `url` (`internationalizedArrayString`), `openInNewTab` (initial `false`, shown for external links only).
 - **Domain shape:** `ILink` (`@blog/config`) — `label`, `href`, `target`, `platform`.
 - **Resolution** (`linkDocumentFragment` → `toLinkDocument`): `label` and `url` take the request language, else the default language. An internal reference follows `translation.metadata` to the target's translation in the request language, else in the default language, else the referenced page itself; `pageHref(type, slug)` (`@blog/config` `routes.ts`) turns it into a path, with a landing page's nested path built by `PAGE_PATH_EXPRESSION`. `target` is `_blank` only for an external link with `openInNewTab`. This path never sets `platform`.
-- **Legacy:** `inlineLink`, an object holding its own label and destination, survives only as `module_hero.secondaryAction` in the schema; no service fragment or transformer reads it.
+- **Legacy:** `inlineLink`, an object holding its own label and destination, is still registered in the schema, but no schema type uses it and no service fragment or transformer reads it.
 - **Cache:** every loader that projects link documents lists `link` and the page types in its `isr(...)` tags; the publish webhook maps `link` → `link`, and also purges the `module:<id>` tag of any module that references a changed document directly or through a `link` document.
 
 ## Configuration
@@ -79,5 +79,5 @@ A link is authored once, as a `link` document — a label per language and exact
 
 ## Related
 
-- #3215 — delete `inlineLink` once `module_hero` is retired (blocked by #2813).
+- #3215 — delete the unused `inlineLink` object.
 - #3600 — decide purge coverage for author- and post-mediated hero link targets.

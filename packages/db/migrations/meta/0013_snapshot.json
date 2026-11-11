@@ -1,5 +1,5 @@
 {
-  "id": "3274ac3b-1638-485b-bb4d-04cbae5d21fa",
+  "id": "17e15de8-e618-4576-87ba-81d7420b8540",
   "prevId": "a35e35cb-4242-4cd0-97b9-b1910e27b9a0",
   "version": "7",
   "dialect": "postgresql",
@@ -1487,6 +1487,41 @@
           "notNull": true,
           "default": "'OUTLINED'"
         },
+        "header_control_shape": {
+          "name": "header_control_shape",
+          "type": "header_control_shape",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'ROUND'"
+        },
+        "header_layout": {
+          "name": "header_layout",
+          "type": "header_layout",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'CLASSIC'"
+        },
+        "header_submenu_style": {
+          "name": "header_submenu_style",
+          "type": "header_submenu_style",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'DROPDOWN'"
+        },
+        "header_bar_style": {
+          "name": "header_bar_style",
+          "type": "header_bar_style",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'FULL_WIDTH'"
+        },
+        "nav_link_style": {
+          "name": "nav_link_style",
+          "type": "nav_link_style",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'PLAIN'"
+        },
         "account_button_style": {
           "name": "account_button_style",
           "type": "account_button_style",
@@ -1528,34 +1563,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'ROUNDED'"
-        },
-        "header_layout": {
-          "name": "header_layout",
-          "type": "header_layout",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'CLASSIC'"
-        },
-        "header_submenu_style": {
-          "name": "header_submenu_style",
-          "type": "header_submenu_style",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'DROPDOWN'"
-        },
-        "header_bar_style": {
-          "name": "header_bar_style",
-          "type": "header_bar_style",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'FULL_WIDTH'"
-        },
-        "nav_link_style": {
-          "name": "nav_link_style",
-          "type": "nav_link_style",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'PLAIN'"
         },
         "footer_layout": {
           "name": "footer_layout",
@@ -2412,6 +2419,11 @@
       "schema": "public",
       "values": ["FULL_WIDTH", "FLOATING"]
     },
+    "public.header_control_shape": {
+      "name": "header_control_shape",
+      "schema": "public",
+      "values": ["ROUND", "ROUNDED", "SQUARE"]
+    },
     "public.header_control_style": {
       "name": "header_control_style",
       "schema": "public",
@@ -2485,7 +2497,7 @@
     "public.tenant_status": {
       "name": "tenant_status",
       "schema": "public",
-      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED", "TRIAL", "PAST_DUE"]
+      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED"]
     }
   },
   "schemas": {},

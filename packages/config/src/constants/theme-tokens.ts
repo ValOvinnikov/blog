@@ -1,5 +1,6 @@
 import type { TButtonShape } from './button-shape';
 import type { TCardStyle } from './card-style';
+import type { THeaderControlShape } from './header-control-shape';
 import type { THeaderControlStyle } from './header-control-style';
 import type { TNavLinkStyle } from './nav-link-style';
 import type { TDensity, TFontChoice, TRadiusScale } from './preset';
@@ -13,6 +14,7 @@ export type TThemeTokens = {
   density: TDensity;
   cardStyle?: TCardStyle;
   headerControlStyle?: THeaderControlStyle;
+  headerControlShape?: THeaderControlShape;
   buttonShape?: TButtonShape;
   navLinkStyle?: TNavLinkStyle;
 };

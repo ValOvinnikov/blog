@@ -173,7 +173,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/module.ts`
 
-- **HERO_FIELD_MODE**: `CUSTOM`, `NONE`, `POST_TOPIC`, `POST_TITLE`, `POST_EXCERPT`, `POST_IMAGE`
 - **HERO_VARIANT**: `SPLIT`, `STACKED`, `BANNER`
 - **NEWSLETTER_VARIANT**: `FULL`, `COMPACT`
 - **POST_SOURCE**: `PINNED`, `NEWEST_FEATURED`
@@ -817,6 +816,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/tenant-write` — `apps/web/src/constants/tenant-write.ts`
 
 - **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`
+
+### `@web/constants/theme-tokens` — `apps/web/src/constants/theme-tokens.ts`
+
+- **THEME_TOKENS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"theme_tokens.site_config_fetch_failed"`
 
 ## app:worker
 

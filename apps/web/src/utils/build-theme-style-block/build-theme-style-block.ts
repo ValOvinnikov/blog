@@ -7,6 +7,8 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
+  HEADER_CONTROL_SHAPE,
+  HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   IMAGE_SCRIM_RAMP,
@@ -37,6 +39,7 @@ export const buildThemeStyleBlock = ({
   density,
   cardStyle = CARD_STYLE.ACCENT_BAR,
   headerControlStyle = HEADER_CONTROL_STYLE.OUTLINED,
+  headerControlShape = HEADER_CONTROL_SHAPE.ROUND,
   buttonShape = BUTTON_SHAPE.ROUNDED,
   navLinkStyle = NAV_LINK_STYLE.PLAIN,
 }: TThemeTokens): string => {
@@ -52,6 +55,7 @@ export const buildThemeStyleBlock = ({
       ...DENSITY_DECLARATIONS[density],
       ...CARD_STYLE_DECLARATIONS[cardStyle],
       ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+      ...HEADER_CONTROL_SHAPE_DECLARATIONS[headerControlShape],
       ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
     })}
 }

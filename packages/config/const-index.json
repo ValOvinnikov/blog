@@ -2474,12 +2474,6 @@
         "file": "packages/config/src/constants/layout.ts"
       },
       {
-        "ref": "HERO_FIELD_MODE.NONE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      },
-      {
         "ref": "RADIUS_SCALE.NONE",
         "scope": "config",
         "from": "@blog/config/constants",
@@ -2778,46 +2772,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
-      }
-    ],
-    "CUSTOM": [
-      {
-        "ref": "HERO_FIELD_MODE.CUSTOM",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_TOPIC": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_TOPIC",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_TITLE": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_TITLE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_EXCERPT": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_EXCERPT",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_IMAGE": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_IMAGE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
       }
     ],
     "STACKED": [
@@ -8704,6 +8658,14 @@
         "scope": "app:web",
         "from": "@web/constants/tenant-write",
         "file": "apps/web/src/constants/tenant-write.ts"
+      }
+    ],
+    "theme_tokens.site_config_fetch_failed": [
+      {
+        "ref": "THEME_TOKENS_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/theme-tokens",
+        "file": "apps/web/src/constants/theme-tokens.ts"
       }
     ],
     "cookie_statement.seed_start_failed": [
