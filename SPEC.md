@@ -982,8 +982,9 @@ tolerating its absence.** `service.modules.testimonial.v1.getTestimonialModule`
 projects `testimonials` with `.notNull()`, which the schema's `required()` makes
 safe. That is not a page-level risk: the loader is wrapped in `safeAsync`, so a
 parse failure returns a failed result and the module renders nothing rather than
-404ing the page, and the Sanity client pins `perspective: 'published'`, so a
-draft with the field still unset is never queried.
+404ing the page. Public reads use the `published` perspective, so a draft with
+the field still unset is queried only by a draft preview read, where the module
+renders nothing until the field is filled.
 
 **A logo is an inline object, not a document — one of the two places the
 `block_*` pattern is deliberately not followed, `module_stats` below being the

@@ -2,6 +2,7 @@ import type {
   AllSanitySchemaTypes,
   internalGroqTypeReferenceTo,
 } from '@blog/config';
+import { SANITY_PERSPECTIVE } from '@blog/config/constants';
 import {
   getClient,
   type TTenantSanityContext,
@@ -25,9 +26,12 @@ export type TSlugQueryParams = { slug: string };
 
 export type TModuleQueryParams = { id: string } & TLocaleQueryParams;
 
-type TNextFetchOptions = {
+type TFetchCacheOptions = {
   next?: { revalidate?: number | false; tags?: string[] };
   cache?: 'no-store';
+};
+
+type TNextFetchOptions = TFetchCacheOptions & {
   tenant: TTenantSanityContext;
 };
 
@@ -42,6 +46,17 @@ type TParametersOption<TParameters> = unknown extends TParameters
     ? { parameters?: TCallerParameters<TParameters> }
     : { parameters: TCallerParameters<TParameters> };
 
+// A draft read must never land in the shared Data Cache, where a published visitor could be served it.
+function toFetchOptions(
+  { perspective }: TTenantSanityContext,
+  { next, cache }: TFetchCacheOptions,
+) {
+  if (perspective === SANITY_PERSPECTIVE.DRAFTS) {
+    return { perspective, cache: 'no-store' as const };
+  }
+  return cache ? { cache } : next ? { next } : undefined;
+}
+
 export async function runQuery<TResult, TQueryConfig extends QueryConfig>(
   builder: IGroqBuilder<TResult, TQueryConfig>,
   options: TNextFetchOptions & TParametersOption<TQueryConfig['parameters']>,
@@ -50,7 +65,7 @@ export async function runQuery<TResult, TQueryConfig extends QueryConfig>(
   const raw: unknown = await getClient(tenant).fetch(
     builder.query,
     { ...buildLocaleQueryParams(tenant), ...parameters },
-    cache ? { cache } : next ? { next } : undefined,
+    toFetchOptions(tenant, { next, cache }),
   );
   return builder.parse(raw);
 }

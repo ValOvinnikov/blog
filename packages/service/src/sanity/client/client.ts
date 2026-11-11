@@ -1,6 +1,10 @@
 import 'server-only';
 
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import {
+  SANITY_PERSPECTIVE,
+  type TLocaleIsoCode,
+  type TSanityPerspective,
+} from '@blog/config/constants';
 import {
   createProjectCache,
   type TSanityProjectRef,
@@ -14,6 +18,7 @@ export type TTenantSanityContext = TSanityProjectRef & {
   token: string;
   locale?: TLocaleIsoCode;
   defaultLocale?: TLocaleIsoCode;
+  perspective?: TSanityPerspective;
 };
 
 export type TTokenScopedClient = {
@@ -42,7 +47,7 @@ export function getClient(tenant: TTenantSanityContext): TSanityClient {
         apiVersion: API_VERSION,
         useCdn: USE_CDN,
         token: tenant.token,
-        perspective: 'published',
+        perspective: SANITY_PERSPECTIVE.PUBLISHED,
       }),
       token: tenant.token,
     }),

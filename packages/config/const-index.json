@@ -3306,6 +3306,22 @@
         "file": "packages/config/src/constants/sanity-document-action.ts"
       }
     ],
+    "published": [
+      {
+        "ref": "SANITY_PERSPECTIVE.PUBLISHED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-perspective.ts"
+      }
+    ],
+    "drafts": [
+      {
+        "ref": "SANITY_PERSPECTIVE.DRAFTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-perspective.ts"
+      }
+    ],
     "ALREADY_GONE": [
       {
         "ref": "SANITY_PROJECT_DELETE_OUTCOME.ALREADY_GONE",
