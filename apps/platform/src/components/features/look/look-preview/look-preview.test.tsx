@@ -6,6 +6,7 @@ import {
   LOCALE_ISO_CODES,
   RADIUS_SCALE,
 } from '@blog/config';
+import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import {
   LookFormProvider,
   type TLookFormContext,
@@ -36,7 +37,10 @@ import {
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
-import { followLine } from '@platform/testing/look/look-follow';
+import {
+  followLine,
+  stubMeasuredSample,
+} from '@platform/testing/look/look-follow';
 import { CONSOLE } from '@platform/testing/look/look-form-fixtures';
 import {
   stubChangingMediaQueries,
@@ -50,7 +54,10 @@ import {
   defaultLookFormValues,
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
-import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
+import {
+  toLookFollowTarget,
+  type TLookFollowTarget,
+} from '@platform/utils/look-follow-target/look-follow-target';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
@@ -63,10 +70,7 @@ const FOOTER_TARGET: TLookFollowTarget = {
   row: LOOK_ROW.FOOTER,
 };
 const LOOK_FULLSCREEN = messages.lookFullscreen;
-const STYLE_TARGET: TLookFollowTarget = {
-  kind: LOOK_FOLLOW_TARGET.STYLE,
-  row: LOOK_ROW.TYPE,
-};
+const STYLE_TARGET = toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false);
 const FREE_SAMPLE_NOTE = followLine('freeSample', {
   preset: CONSOLE,
 });
@@ -323,25 +327,70 @@ describe(`<${LookPreview.name}/>`, () => {
       expect(toolbarFollow).toBePressed();
     });
 
-    it('outlines the followed part with its name', () => {
-      renderPreview({ followTarget: FOOTER_TARGET });
+    describe('with the sample measured', () => {
+      let restoreResizeObserver: () => void;
+      const outlines = () =>
+        screen.queryAllByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
 
-      const outline = screen.getByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
+      beforeEach(() => {
+        restoreResizeObserver = stubMeasuredSample();
+      });
 
-      expect(outline).toHaveTextContent(messages.lookForm.footerHeading);
-    });
+      afterEach(() => {
+        restoreResizeObserver();
+        vi.restoreAllMocks();
+      });
 
-    it('drops the outline and says so once Follow is turned off', async () => {
-      renderPreview({ followTarget: FOOTER_TARGET });
+      it('outlines the followed part with its name', () => {
+        renderPreview({ followTarget: FOOTER_TARGET });
 
-      await user.click(followButton());
+        const [outline] = outlines();
 
-      const outline = screen.queryByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
-      const offNote = screen.getByText(LOOK_FOLLOW.off);
+        expect(outline).toHaveTextContent(messages.lookForm.footerHeading);
+      });
 
-      expect(followButton()).not.toBePressed();
-      expect(outline).not.toBeInTheDocument();
-      expect(offNote).toBeVisible();
+      it('drops the outline and says so once Follow is turned off', async () => {
+        renderPreview({ followTarget: FOOTER_TARGET });
+
+        await user.click(followButton());
+
+        const offNote = screen.getByText(LOOK_FOLLOW.off);
+
+        expect(followButton()).not.toBePressed();
+        expect(outlines()).toHaveLength(0);
+        expect(offNote).toBeVisible();
+      });
+
+      it.each([
+        { row: LOOK_ROW.CARDS, partCount: 6 },
+        { row: LOOK_ROW.SHAPE, partCount: 8 },
+        { row: LOOK_ROW.BUTTONS, partCount: 6 },
+      ])(
+        'outlines all $partCount sample parts $row changes under one tag',
+        ({ row, partCount }) => {
+          renderPreview({
+            followTarget: toLookFollowTarget([row], row, false),
+          });
+
+          const tags = screen.getAllByTestId(LOOK_FOLLOW_TEST_ID.TAG);
+          const cardName = messages.lookForm[LOOK_ROW_TITLE_KEY[row]];
+
+          expect(outlines()).toHaveLength(partCount);
+          expect(tags).toHaveLength(1);
+          expect(outlines()[0]).toHaveTextContent(cardName);
+        },
+      );
+
+      it.each([LOOK_ROW.COLOUR, LOOK_ROW.TYPE])(
+        'outlines nothing while %s is open',
+        (row) => {
+          renderPreview({
+            followTarget: toLookFollowTarget([row], row, false),
+          });
+
+          expect(outlines()).toHaveLength(0);
+        },
+      );
     });
   });
 

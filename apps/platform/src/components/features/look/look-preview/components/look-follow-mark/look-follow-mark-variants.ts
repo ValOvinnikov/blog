@@ -2,6 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFollowMarkVariants = tv({
   slots: {
+    root: ['contents'],
     mark: [
       'pointer-events-none absolute outline-admin-follow-mark outline-solid',
     ],

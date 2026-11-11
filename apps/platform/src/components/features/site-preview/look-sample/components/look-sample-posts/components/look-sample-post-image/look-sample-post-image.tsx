@@ -1,3 +1,5 @@
+import { SAMPLE_PART } from '@platform/constants/sample-part';
+
 import { lookSamplePostImageVariants } from './look-sample-post-image-variants';
 
 export const LookSamplePostImage = () => {
@@ -13,6 +15,7 @@ export const LookSamplePostImage = () => {
       strokeLinecap="round"
       aria-hidden="true"
       className={root()}
+      data-part={SAMPLE_PART.POST_IMAGE}
     >
       <path d="M-10 100 C 30 80, 60 80, 100 100 S 170 120, 210 100 S 280 80, 330 100" />
       <path

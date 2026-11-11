@@ -5914,6 +5914,14 @@
         "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
+    "look-follow-tag": [
+      {
+        "ref": "LOOK_FOLLOW_TEST_ID.TAG",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
     "SITE_PARTS": [
       {
         "ref": "LOOK_GROUP.SITE_PARTS",
@@ -6613,6 +6621,78 @@
     "footer": [
       {
         "ref": "SAMPLE_PART.FOOTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "site-brand": [
+      {
+        "ref": "SAMPLE_PART.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "post-card": [
+      {
+        "ref": "SAMPLE_PART.POST_CARD",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "post-image": [
+      {
+        "ref": "SAMPLE_PART.POST_IMAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "faq-item": [
+      {
+        "ref": "SAMPLE_PART.FAQ_ITEM",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "form-field": [
+      {
+        "ref": "SAMPLE_PART.FORM_FIELD",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "quote-card": [
+      {
+        "ref": "SAMPLE_PART.QUOTE_CARD",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "cta-box": [
+      {
+        "ref": "SAMPLE_PART.CTA_BOX",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "action-button": [
+      {
+        "ref": "SAMPLE_PART.BUTTON",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "busy-button": [
+      {
+        "ref": "SAMPLE_PART.BUSY_BUTTON",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"
@@ -8839,6 +8919,12 @@
       },
       {
         "ref": "LOOK_FOLLOW_MARK.TAG_RADIUS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_MARK.OUTLINE_OFFSET",
         "scope": "app:platform",
         "from": "@platform/constants/look-follow",
         "file": "apps/platform/src/constants/look-follow.ts"

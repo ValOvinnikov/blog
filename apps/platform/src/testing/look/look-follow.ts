@@ -5,6 +5,7 @@ import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import { PREVIEW_FRAME_STATUS_TEST_ID } from '@platform/constants/preview';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
+import { stubResizeObserver } from '@platform/testing/resize-observer';
 import { createTranslator } from 'next-intl';
 
 const tFollow = createTranslator({
@@ -19,6 +20,17 @@ export const followLine = (
   key: TFollowLineKey,
   values: Record<string, string | number> = {},
 ) => tFollow.markup(key, { ...values, strong: (chunks: string) => chunks });
+
+const MEASURED_EDGE = 40;
+const MEASURED_SIZE = { width: MEASURED_EDGE, height: MEASURED_EDGE };
+
+export const stubMeasuredSample = () => {
+  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
+    new DOMRect(0, 0, MEASURED_EDGE, MEASURED_EDGE),
+  );
+
+  return stubResizeObserver(() => MEASURED_SIZE);
+};
 
 type TFakeFrameOptions = {
   top?: number;
@@ -47,7 +59,7 @@ export const makeFakeFrame = ({
 export const mockLookFollow = (
   overrides: Partial<TLookFollow> = {},
 ): TLookFollow => ({
-  row: undefined,
+  outline: undefined,
   isOn: true,
   isPaused: false,
   isFollowing: false,

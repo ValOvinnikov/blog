@@ -12,6 +12,10 @@ import {
   followStatusText,
   mockLookFollow,
 } from '@platform/testing/look/look-follow';
+import {
+  toLookFollowOutline,
+  toLookFollowTarget,
+} from '@platform/utils/look-follow-target/look-follow-target';
 import userEvent from '@testing-library/user-event';
 
 import { LookFollowStatus } from './look-follow-status';
@@ -24,13 +28,20 @@ const FOOTER_TARGET = {
   kind: LOOK_FOLLOW_TARGET.PART,
   row: LOOK_ROW.FOOTER,
 } as const;
+const FOOTER_OUTLINE = toLookFollowOutline(FOOTER_TARGET);
+const CARDS_TARGET = toLookFollowTarget(
+  [LOOK_ROW.CARDS],
+  LOOK_ROW.CARDS,
+  false,
+);
+const CARDS_OUTLINE = toLookFollowOutline(CARDS_TARGET);
 const AT_END: TLookFollowSettled = {
   outcome: LOOK_FOLLOW_OUTCOME.AT_END,
   overflow: 0,
 };
 
 const followingFooter = (settled = AT_END) =>
-  mockLookFollow({ row: LOOK_ROW.FOOTER, isFollowing: true, settled });
+  mockLookFollow({ outline: FOOTER_OUTLINE, isFollowing: true, settled });
 
 const setup = customRender(LookFollowStatus, {
   follow: mockLookFollow(),
@@ -63,12 +74,39 @@ describe(`<${LookFollowStatus.name}/>`, () => {
     expect(followStatusText()).toBe(LOOK_FOLLOW.allOpen);
   });
 
-  it('explains that a Style card holds the frame still', () => {
-    setup({ target: { kind: LOOK_FOLLOW_TARGET.STYLE, row: LOOK_ROW.TYPE } });
+  it('explains that a whole-page Style card holds the frame still', () => {
+    setup({
+      target: toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false),
+    });
 
     const line = followLine('styleCard', { card: LOOK_FORM.typeHeading });
 
     expect(followStatusText()).toBe(line);
+  });
+
+  it('names the Style card whose reach is outlined', () => {
+    setup({
+      target: CARDS_TARGET,
+      follow: mockLookFollow({ outline: CARDS_OUTLINE, isFollowing: true }),
+    });
+
+    const line = followLine('styleOutlined', { card: LOOK_FORM.cardsHeading });
+
+    expect(followStatusText()).toBe(line);
+  });
+
+  it('offers a way back to an outlined Style card once paused', () => {
+    setup({
+      target: CARDS_TARGET,
+      follow: mockLookFollow({ outline: CARDS_OUTLINE, isPaused: true }),
+    });
+
+    const backButton = screen.getByRole('button', {
+      name: followLine('backTo', { part: LOOK_FORM.cardsHeading }),
+    });
+
+    expect(followStatusText()).toBe(LOOK_FOLLOW.paused);
+    expect(backButton).toBeVisible();
   });
 
   it('states the desktop overflow once a nearly fitting sample settles', () => {
@@ -106,7 +144,7 @@ describe(`<${LookFollowStatus.name}/>`, () => {
   it('shows the short line while the follow scroll is settling', () => {
     setup({
       target: FOOTER_TARGET,
-      follow: mockLookFollow({ row: LOOK_ROW.FOOTER, isFollowing: true }),
+      follow: mockLookFollow({ outline: FOOTER_OUTLINE, isFollowing: true }),
     });
 
     expect(followStatusText()).toBe(followLine('short', { part: FOOTER }));
@@ -146,7 +184,7 @@ describe(`<${LookFollowStatus.name}/>`, () => {
   });
 
   it('offers a way back to the part once paused', async () => {
-    const follow = mockLookFollow({ row: LOOK_ROW.FOOTER, isPaused: true });
+    const follow = mockLookFollow({ outline: FOOTER_OUTLINE, isPaused: true });
     setup({ target: FOOTER_TARGET, follow });
 
     const backButton = screen.getByRole('button', {
@@ -161,7 +199,7 @@ describe(`<${LookFollowStatus.name}/>`, () => {
   it('drops the reader note while the way back shows', () => {
     setup({
       target: FOOTER_TARGET,
-      follow: mockLookFollow({ row: LOOK_ROW.FOOTER, isPaused: true }),
+      follow: mockLookFollow({ outline: FOOTER_OUTLINE, isPaused: true }),
       readerNote: READER_NOTE,
     });
 
@@ -171,7 +209,7 @@ describe(`<${LookFollowStatus.name}/>`, () => {
   it('says following is off with no way back but the toggle', () => {
     setup({
       target: FOOTER_TARGET,
-      follow: mockLookFollow({ row: LOOK_ROW.FOOTER, isOn: false }),
+      follow: mockLookFollow({ outline: FOOTER_OUTLINE, isOn: false }),
     });
 
     const button = screen.queryByRole('button');
