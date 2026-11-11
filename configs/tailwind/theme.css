@@ -581,6 +581,16 @@
   }
 }
 
+/* A transparent outline at rest, so a colour transition never fades the marked outline in from the text colour. */
+@utility nav-link-frame {
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+
+  @media (forced-colors: active) {
+    outline-style: none;
+  }
+}
+
 @utility nav-link-current {
   text-decoration-line: var(--nav-link-decoration);
 }
