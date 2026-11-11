@@ -529,12 +529,25 @@ export type Module_postList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   pageSize?: number;
   showImages?: boolean;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+  columns?: 'TWO' | 'THREE' | 'FOUR';
+};
+
+export type WideLayout = {
+  _type: 'wideLayout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type ExpandableSectionText = Array<
@@ -932,15 +945,6 @@ export type PageHeadingBlock = {
   _type: 'pageHeadingBlock';
   heading?: string;
   supportingText?: string;
-};
-
-export type WideLayout = {
-  _type: 'wideLayout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
 };
 
 export type HeroLayout = {
@@ -2673,6 +2677,7 @@ export type AllSanitySchemaTypes =
   | Module_postFeatured
   | Module_postLatest
   | Module_postList
+  | WideLayout
   | ExpandableSectionText
   | ListedText
   | ParagraphText
@@ -2708,7 +2713,6 @@ export type AllSanitySchemaTypes =
   | BodyImage
   | ImageWithAlt
   | PageHeadingBlock
-  | WideLayout
   | HeroLayout
   | MigrationState
   | Settings_footer

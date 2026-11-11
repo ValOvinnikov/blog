@@ -1,4 +1,8 @@
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import {
+  appearanceFieldGroups,
+  appearanceFields,
+} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -15,21 +19,26 @@ export const postListSchema = defineType({
   description:
     "The paginated archive of posts for the page it sits on — all of them, or only the ones in that page's topic or tag.",
   icon: List,
-  fields: [
-    titleField(),
-    brandVariantField(),
-    moduleHeadingBlockField(),
-    defineField({
-      name: 'pageSize',
-      title: 'Page Size',
-      type: 'number',
-      description: 'Posts shown per page of the archive.',
-      validation: (rule) => rule.required().integer().min(1).max(24),
-    }),
-    showImagesField({ subject: 'post' }),
-    ...alignmentFields([]),
-    wideLayoutField,
-  ],
+  groups: appearanceFieldGroups,
+  fields: appearanceFields({
+    content: [
+      titleField(),
+      moduleHeadingBlockField(),
+      defineField({
+        name: 'pageSize',
+        title: 'Page Size',
+        type: 'number',
+        description: 'Posts shown per page of the archive.',
+        validation: (rule) => rule.required().integer().min(1).max(24),
+      }),
+      showImagesField({ subject: 'post' }),
+    ],
+    appearance: [
+      brandVariantField(),
+      ...alignmentFields([], { title: 'Heading Alignment' }),
+      wideLayoutField,
+    ],
+  }),
   preview: {
     select: {
       title: 'title',

@@ -1590,6 +1590,30 @@
         "file": "packages/config/src/constants/form-status.ts"
       }
     ],
+    "TWO": [
+      {
+        "ref": "GRID_COLUMNS.TWO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/grid-columns.ts"
+      }
+    ],
+    "THREE": [
+      {
+        "ref": "GRID_COLUMNS.THREE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/grid-columns.ts"
+      }
+    ],
+    "FOUR": [
+      {
+        "ref": "GRID_COLUMNS.FOUR",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/grid-columns.ts"
+      }
+    ],
     "ROUND": [
       {
         "ref": "HEADER_CONTROL_SHAPE.ROUND",
