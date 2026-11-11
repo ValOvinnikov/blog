@@ -8,6 +8,7 @@ import { faker } from '@faker-js/faker';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
+import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -45,10 +46,12 @@ const failedTenant = mockClientTenant({
 
 const notStartedTenant = mockClientTenant();
 
-const setup = customRender(SiteSetupCard, {
-  tenant: failedTenant,
-  canRetry: true,
-});
+const MOCK_SITE_SETUP: TSiteSetup = { tenant: failedTenant, canRetry: true };
+
+const renderCard = customRender(SiteSetupCard, { siteSetup: MOCK_SITE_SETUP });
+
+const setup = (overrides: Partial<TSiteSetup> = {}) =>
+  renderCard({ siteSetup: { ...MOCK_SITE_SETUP, ...overrides } });
 
 const YOUR_SITES_SETUP_STOPPED = "Your site's setup stopped";
 const COULDNT_RESTART_SETUP_TRY = "Couldn't restart the setup — try again.";

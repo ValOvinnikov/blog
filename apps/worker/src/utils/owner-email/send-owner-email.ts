@@ -5,7 +5,7 @@ import {
   releaseTenantOwnerEmail,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
 import {
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
@@ -28,6 +28,7 @@ export async function sendOwnerEmailOnce(
     claimedAt = await claimTenantOwnerEmail(tenant.id, email);
     if (!claimedAt) return;
     await sendEmail({
+      account: EMAIL_ACCOUNT.PLATFORM,
       to: ownerEmail,
       from: ownerEmailFromAddress(),
       ...buildOwnerEmailMessage(target, email),

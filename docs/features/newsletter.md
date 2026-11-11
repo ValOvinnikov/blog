@@ -76,7 +76,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 - Layers: `studio`, `service`, `ui` (`NewsletterSignup`), `web`, `db`, `email`, `platform`, `config` (`NEWSLETTER_VARIANT`, `CAPABILITY`, `NEWSLETTER_RESULT`).
 - Features: [module-system](./module-system.md), [plans-and-entitlements](./plans-and-entitlements.md), [email](./email.md), [reader-account](./reader-account.md), [languages](./languages.md), [rendering-and-caching](./rendering-and-caching.md).
-- Env: `NEWSLETTER_FROM_ADDRESS`, `NEWSLETTER_UNSUBSCRIBE_KEY` (signs unsubscribe links; no confirmation email can be sent without it, and changing it breaks every link already sent), `RESEND_API_KEY`, `DATABASE_URL`, `KV_REST_API_URL` and `KV_REST_API_TOKEN` (shared rate-limit store).
+- Env: `NEWSLETTER_FROM_ADDRESS`, `NEWSLETTER_UNSUBSCRIBE_KEY` (signs unsubscribe links; no confirmation email can be sent without it, and changing it breaks every link already sent), `RESEND_TENANT_API_KEY`, `DATABASE_URL`, `KV_REST_API_URL` and `KV_REST_API_TOKEN` (shared rate-limit store).
 
 ## Entry points
 

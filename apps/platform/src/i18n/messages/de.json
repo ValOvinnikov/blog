@@ -106,7 +106,8 @@
     "back": "Zurück",
     "continue": "Weiter",
     "edit": "Bearbeiten",
-    "editField": "{field} bearbeiten"
+    "editField": "{field} bearbeiten",
+    "editorInviteNote": "Sie erhalten eine E-Mail von Sanity, unserem Editor. Nehmen Sie die Einladung mit dem Konto an, mit dem Sie sich registriert haben."
   },
   "providerSignInButton": {
     "continueWithGithub": "Weiter mit GitHub",
@@ -261,7 +262,7 @@
   },
   "emailAlertsBanner": {
     "title": "E-Mail-Benachrichtigungen nicht eingerichtet",
-    "description": "RESEND_API_KEY ist nicht gesetzt, daher erhalten Operatoren keine E-Mail, wenn ein Mandant Aufmerksamkeit benötigt — prüfen Sie diese Seite manuell."
+    "description": "RESEND_PLATFORM_API_KEY ist nicht gesetzt, daher erhalten Operatoren keine E-Mail, wenn ein Mandant Aufmerksamkeit benötigt — prüfen Sie diese Seite manuell."
   },
   "tenantsTable": {
     "empty": "Noch keine Mandanten.",
@@ -379,6 +380,31 @@
     "siteSetupNotStartedContactDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Bitten Sie Ihren Plattform-Kontakt, sie zu starten.",
     "siteSetupStart": "Einrichtung starten",
     "siteSetupStarting": "Wird gestartet…"
+  },
+  "getStartedCard": {
+    "title": "Erste Schritte",
+    "supportingText": "Vier Schritte zu einer Website, die ganz Ihnen gehört",
+    "doneCount": "{done} von {total} erledigt",
+    "liveTitle": "Ihre Website ist online",
+    "copyAddress": "Adresse kopieren",
+    "openSite": "Website öffnen",
+    "stepDone": "{step}: erledigt",
+    "stepNotDone": "{step}: nicht erledigt",
+    "stepTitle": {
+      "LOOK": "Erscheinungsbild wählen",
+      "VOICE": "Tonalität festlegen",
+      "EDITOR_INVITE": "Editor-Einladung annehmen",
+      "FIRST_POST": "Ersten Beitrag schreiben"
+    },
+    "lookDescription": "Farben, Schriften und Ihr Logo",
+    "voiceDescription": "Die Texte Ihrer Website",
+    "editorInviteDescription": "Wir haben sie Ihnen von Sanity, unserem Editor, geschickt. Nehmen Sie sie mit dem Konto an, mit dem Sie sich registriert haben.",
+    "firstPostLocked": "Verfügbar, sobald Sie die Editor-Einladung angenommen haben",
+    "firstPostActivating": "Verfügbar, sobald Ihr Editor-Zugang eingerichtet ist – meist innerhalb einer Minute",
+    "firstPostReady": "Ihr Editor ist bereit",
+    "openLook": "Erscheinungsbild öffnen",
+    "openVoice": "Tonalität öffnen",
+    "openStudio": "Studio öffnen"
   },
   "provisioningBanner": {
     "readyTitle": "Bereitgestellt",

@@ -8,7 +8,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
@@ -83,6 +83,7 @@ export const sendTestEmailAction = async (
     ]);
 
     await sendEmail({
+      account: EMAIL_ACCOUNT.PLATFORM,
       to,
       from: applyTenantSenderName(
         resolveOperatorAlertFromAddress(),

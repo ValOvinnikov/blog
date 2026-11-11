@@ -7,6 +7,7 @@ import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import {
   buildDocumentValidationAlertEmail,
   buildOwnerElevationAlertEmail,
+  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { faker } from '@faker-js/faker';
@@ -142,33 +143,6 @@ describe(POST, () => {
     expect(sendEmailMock).not.toHaveBeenCalled();
   });
 
-  it('sends the owner-elevation alert to every superadmin', async () => {
-    listSuperadminEmailsMock.mockResolvedValueOnce([
-      MOCK_SUPERADMIN_EMAIL,
-      MOCK_OTHER_SUPERADMIN_EMAIL,
-    ]);
-
-    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
-
-    expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(sendEmailMock.mock.calls).toEqual([
-      [
-        {
-          to: MOCK_SUPERADMIN_EMAIL,
-          from: MOCK_FROM_ADDRESS,
-          ...OWNER_ELEVATION_EMAIL,
-        },
-      ],
-      [
-        {
-          to: MOCK_OTHER_SUPERADMIN_EMAIL,
-          from: MOCK_FROM_ADDRESS,
-          ...OWNER_ELEVATION_EMAIL,
-        },
-      ],
-    ]);
-  });
-
   it('returns 200 and sends nothing when there are no superadmins', async () => {
     listSuperadminEmailsMock.mockResolvedValueOnce([]);
 
@@ -190,6 +164,7 @@ describe(POST, () => {
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(sendEmailMock).toHaveBeenCalledWith({
+      account: EMAIL_ACCOUNT.PLATFORM,
       to: MOCK_SUPERADMIN_EMAIL,
       from: MOCK_FROM_ADDRESS,
       ...buildDocumentValidationAlertEmail({
@@ -201,27 +176,56 @@ describe(POST, () => {
     });
   });
 
-  it('logs a failed send and still sends to the other recipient', async () => {
-    listSuperadminEmailsMock.mockResolvedValueOnce([
-      MOCK_SUPERADMIN_EMAIL,
-      MOCK_OTHER_SUPERADMIN_EMAIL,
-    ]);
-    sendEmailMock.mockRejectedValueOnce(MOCK_SEND_ERROR);
+  describe('with two superadmins', () => {
+    beforeEach(() => {
+      listSuperadminEmailsMock.mockResolvedValueOnce([
+        MOCK_SUPERADMIN_EMAIL,
+        MOCK_OTHER_SUPERADMIN_EMAIL,
+      ]);
+    });
 
-    const response = await POST(postRequest(OWNER_ELEVATION_BODY));
-    const responseBody = await response.json();
-    const recipients = sendEmailMock.mock.calls.map(([{ to }]) => to);
+    it('sends the owner-elevation alert to every superadmin', async () => {
+      const response = await POST(postRequest(OWNER_ELEVATION_BODY));
 
-    expect(recipients).toEqual([
-      MOCK_SUPERADMIN_EMAIL,
-      MOCK_OTHER_SUPERADMIN_EMAIL,
-    ]);
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      OPERATOR_ALERT_LOG.SEND_FAILED,
-      SEND_FAILED_CONTEXT,
-    );
-    expect(response.status).toBe(MULTI_STATUS);
-    expect(responseBody).toEqual({ sent: 1, failed: 1 });
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(sendEmailMock.mock.calls).toEqual([
+        [
+          {
+            account: EMAIL_ACCOUNT.PLATFORM,
+            to: MOCK_SUPERADMIN_EMAIL,
+            from: MOCK_FROM_ADDRESS,
+            ...OWNER_ELEVATION_EMAIL,
+          },
+        ],
+        [
+          {
+            account: EMAIL_ACCOUNT.PLATFORM,
+            to: MOCK_OTHER_SUPERADMIN_EMAIL,
+            from: MOCK_FROM_ADDRESS,
+            ...OWNER_ELEVATION_EMAIL,
+          },
+        ],
+      ]);
+    });
+
+    it('logs a failed send and still sends to the other recipient', async () => {
+      sendEmailMock.mockRejectedValueOnce(MOCK_SEND_ERROR);
+
+      const response = await POST(postRequest(OWNER_ELEVATION_BODY));
+      const responseBody = await response.json();
+      const recipients = sendEmailMock.mock.calls.map(([{ to }]) => to);
+
+      expect(recipients).toEqual([
+        MOCK_SUPERADMIN_EMAIL,
+        MOCK_OTHER_SUPERADMIN_EMAIL,
+      ]);
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        OPERATOR_ALERT_LOG.SEND_FAILED,
+        SEND_FAILED_CONTEXT,
+      );
+      expect(response.status).toBe(MULTI_STATUS);
+      expect(responseBody).toEqual({ sent: 1, failed: 1 });
+    });
   });
 
   it('logs every failure and returns 502 when every send fails', async () => {

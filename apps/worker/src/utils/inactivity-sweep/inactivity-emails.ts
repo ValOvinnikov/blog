@@ -5,6 +5,7 @@ import {
   buildInactivityWarningAlertEmail,
   buildOwnerDeletionNoticeEmail,
   buildOwnerInactivityWarningEmail,
+  EMAIL_ACCOUNT,
   PLATFORM_EMAIL_BRAND_NAME,
   sendEmail,
 } from '@blog/email';
@@ -59,6 +60,7 @@ export async function sendOwnerInactivityEmail(
 
   try {
     await sendEmail({
+      account: EMAIL_ACCOUNT.PLATFORM,
       to: ownerEmail,
       from: ownerEmailFromAddress(),
       ...message,

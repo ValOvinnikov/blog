@@ -16,6 +16,9 @@ code:
   - apps/web/src/server/settings-features/get-tenant-plan/**
   - apps/web/src/server/settings-features/get-effective-settings-features/**
   - apps/platform/src/server/site-config/revalidate-site-config.ts
+  - apps/web/src/server/draft-preview/**
+  - packages/utils/src/preview-token/**
+  - apps/web/src/app/[tenant]/[locale]/~preview/**
   - scripts/check-revalidate-tags-sync.mjs
 epics: []
 ---
@@ -26,12 +29,15 @@ epics: []
 
 Public pages are rendered on their first request per tenant, language and path, then served from Next's Full Route Cache. Sanity reads and tenant-config reads sit in the Data Cache under tags. Publishing in the Studio fires a signed webhook that expires the affected tags and paths immediately; a Look, Voice or Features save in the platform calls a second endpoint that does the same for that tenant's config. Time-based expiry bounds how long a missed purge can stay visible.
 
+A member can see an unpublished draft on the tenant's real site through a signed preview token in the address. That one request renders uncached through Sanity's `drafts` perspective; no cookie is set and Next's Draft Mode is never used.
+
 ## Surfaces and routes
 
 - `POST /api/revalidate` — Sanity publish/unpublish/delete webhook (signature-verified).
 - `POST /api/revalidate-site-config` — called by `apps/platform` after a Look save or brand-image upload or clear, a Voice, Features, tenant-details or languages save (Bearer secret, optional `{ tenantId }` body).
 - Every content route under `apps/web/src/app/[tenant]/[locale]/` declares `export const revalidate = 21600`, and every route with a dynamic segment (`[...slug]`, `blog/[slug]`, `blog/page/[page]`, and the topic and tag slug and pagination routes) declares an empty `generateStaticParams`, so none of them is prerendered at build and each path is cached on first request. The `[tenant]/[locale]` layout's `generateStaticParams` returns the default locale only.
 - `account`, `bookmarks` and `newsletter/unsubscribe` are `force-dynamic` and never cached across readers.
+- `[tenant]/[locale]/~preview/blog/[slug]` and `[tenant]/[locale]/~preview/[...slug]` — the draft render of a post and a landing page, `force-dynamic`. Reached only by the proxy's rewrite of a request carrying a verified `?preview=<token>`; the `[tenant]` segment is then `<tenantId>~preview`.
 
 ## Data
 
@@ -58,12 +64,16 @@ Public pages are rendered on their first request per tenant, language and path, 
 - A renamed slug leaves the old URL's page cached until the route backstop expires it. A scheduled post appears only as caches expire; nothing purges when its date passes.
 - `/api/revalidate-site-config` always purges the whole site layout as well as the tenant's tags; with no `tenantId` it purges every tenant's tags.
 - `revalidateTag` needs the Node.js runtime; both routes declare `runtime = 'nodejs'`.
+- **Draft preview never touches a shared cache.** A preview token is `<base64url claims>.<HMAC-SHA256>` under `PREVIEW_LINK_SECRET`, with claims `{ tenantId, path, expiresAt }` (epoch ms), signed and read by `@blog/utils/preview-token`; a token whose expiry lies more than `PREVIEW_TOKEN_MAX_AGE_MS` (one hour) plus a minute's clock skew ahead is refused. `proxy.ts` accepts it only when the tenant matches the host's and the path matches the request's, then rewrites to the `~preview` route and passes the token to the render in `x-preview-token` (stripped from every incoming request). Any other token is ignored and the published page is served. Every path carrying the `~preview` marker (or `%7Epreview`) runs through the proxy and is answered 404, so no outside request addresses a draft route, and a marked `[tenant]` segment on any route but the draft routes and their shared layout is a 404 without reading a header. The render re-verifies the token's tenant before it reads anything; it reads the tenant's own credentials with the `drafts` perspective, which `runQuery` sends `cache: 'no-store'`, and never the platform fallback. The published routes read no cookie and no header, so they stay cached as before.
+- **Framing.** `next.config` leaves `Content-Security-Policy`, `Referrer-Policy` and `X-Frame-Options` to the proxy on any request carrying `?preview`, and the proxy matcher routes every such request through the proxy. A verified preview gets `frame-ancestors <PLATFORM_APP_URL origin>`, `Cache-Control: private, no-store`, `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex`; an unverified one gets `frame-ancestors 'none'` and `X-Frame-Options: DENY`. Every response without the parameter keeps the site-wide headers.
+- **Why not Draft Mode.** Next's Draft Mode cookie value is the deployment's `previewModeId`, the same value that, sent as `x-prerender-revalidate`, triggers an on-demand rebuild (`next/dist/server/api-utils/index.js`, Next 16.4). One cookie would unlock every tenant's drafts and every tenant's cache.
+- Only posts and landing pages have a draft route; a token for any other path renders a 404 inside the frame.
 
 ## Dependencies
 
 - Layers: `service` (`isr`, loaders), `web` (routes, webhook), `db` (tenant lookup by Sanity project id, config reads), `platform` (calls the config endpoint), `config` (TTL constants).
 - Features: [multi-tenancy](./multi-tenancy.md), [posts](./posts.md), [module-system](./module-system.md), [bookmarks](./bookmarks.md), [languages](./languages.md), [seo-and-feeds](./seo-and-feeds.md).
-- Env vars: `SANITY_REVALIDATE_SECRET` (web), `SITE_CONFIG_REVALIDATE_SECRET` (web and platform, identical), `WEB_APP_URL` (platform), `SANITY_LIVE_CONTENT` (service, development only). A missing secret makes its route return 500.
+- Env vars: `PREVIEW_LINK_SECRET` (web; absent, every preview token is ignored), `PLATFORM_APP_URL` (web; absent, a preview cannot be framed), `SANITY_REVALIDATE_SECRET` (web), `SITE_CONFIG_REVALIDATE_SECRET` (web and platform, identical), `WEB_APP_URL` (platform), `SANITY_LIVE_CONTENT` (service, development only). A missing secret makes its route return 500.
 
 ## Entry points
 
@@ -74,12 +84,14 @@ Public pages are rendered on their first request per tenant, language and path, 
 - `apps/web/src/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags.ts`
 - `packages/service/src/sanity/query/isr.ts`
 - `packages/config/src/constants/cache.ts`
+- `packages/utils/src/preview-token/preview-token.ts`
 - `apps/platform/src/server/site-config/revalidate-site-config.ts`
 
 ## Tests and stories
 
-- Web: `app/api/revalidate/route.test.ts`, `app/api/revalidate-site-config/route.test.ts`, `revalidate-tags.test.ts`, `tenant-cache-tags.test.ts`, `derive-revalidate-paths.test.ts`, `resolve-referencing-module-tags.test.ts`, `build-post-publish-paths.test.ts`, `get-site-config.test.ts`, `get-tenant-plan.test.ts`, `get-effective-settings-features.test.ts`; each route's `page.test.tsx` asserts its `revalidate` literal.
+- Web: `app/api/revalidate/route.test.ts`, `app/api/revalidate-site-config/route.test.ts`, `revalidate-tags.test.ts`, `tenant-cache-tags.test.ts`, `derive-revalidate-paths.test.ts`, `resolve-referencing-module-tags.test.ts`, `build-post-publish-paths.test.ts`, `get-site-config.test.ts`, `get-tenant-plan.test.ts`, `get-effective-settings-features.test.ts`, `has-draft-preview-token.test.ts`, `enter-draft-preview.test.ts`, and the draft preview cases in `proxy.test.ts` and `request-context.test.ts`; each route's `page.test.tsx` asserts its `revalidate` literal.
 - Service: `packages/service/src/sanity/query/isr.test.ts`.
+- Utils: `packages/utils/src/preview-token/preview-token.test.ts`.
 - Scripts: `scripts/check-revalidate-tags-sync.test.mjs`.
 - No stories.
 

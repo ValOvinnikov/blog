@@ -309,6 +309,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **ADMIN_ROLE**: `SUPERADMIN`, `ADMIN`, `MODERATOR`
 - **GRANTED_VIA**: `BREAK_GLASS`, `PROMOTION`
 
+### `@blog/db/constants` — `packages/db/src/constants/billing.ts`
+
+- **STRIPE_PRICE_LOOKUP_KEY**: `STARTER_MONTHLY`, `STARTER_YEARLY`, `GROWTH_MONTHLY`, `GROWTH_YEARLY`, `GROWTH_BAND_2500`, `GROWTH_BAND_5000`, `GROWTH_BAND_10000`, `GROWTH_BAND_25000`
+- **STRIPE_EVENT_RECORD_OUTCOME**: `RECORDED`, `ALREADY_HANDLED`
+
 ### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
@@ -484,6 +489,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_2`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`
 
+### `@platform/constants/get-started` — `apps/platform/src/constants/get-started.ts`
+
+- **GET_STARTED_STEP**: `LOOK`, `VOICE`, `EDITOR_INVITE`, `FIRST_POST`
+
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`
@@ -656,7 +665,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/site-config` — `apps/platform/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
+- **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SAVED_AT_STAMP_FAILED`=`"site_config.saved_at_stamp_failed"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
 
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 
@@ -777,6 +786,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/http` — `apps/web/src/constants/http.ts`
 
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
+- **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
 ### `@web/constants/module-renderer` — `apps/web/src/constants/module-renderer.ts`
 
@@ -803,6 +813,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 
 - **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`
+
+### `@web/constants/request-context` — `apps/web/src/constants/request-context.ts`
+
+- **REQUEST_CONTEXT_LOG**: `NOT_FOUND_TENANT_LOAD_FAILED`=`"request_context.not_found_tenant_load_failed"`
 
 ### `@web/constants/request` — `apps/web/src/constants/request.ts`
 

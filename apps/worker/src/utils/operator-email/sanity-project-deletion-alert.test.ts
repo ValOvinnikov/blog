@@ -1,5 +1,5 @@
 import { listSuperadminEmails } from '@blog/db/queries/admins';
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import {
   DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
   DEPROVISIONING_ALERT_SEND_FAILED_EVENT,
@@ -39,6 +39,7 @@ describe(alertOperatorsToDeleteSanityProject, () => {
 
     const [email] = vi.mocked(sendEmail).mock.calls.map(([input]) => input);
     expect(sentTo()).toEqual(MOCK_SUPERADMIN_EMAILS);
+    expect(email?.account).toBe(EMAIL_ACCOUNT.PLATFORM);
     expect(email?.from).toBe(DEFAULT_OPERATOR_ALERT_FROM_ADDRESS);
     expect(email?.html).toContain(
       `href="${SANITY_MANAGE_PROJECT_URL}${MOCK_SANITY_PROJECT_ID}"`,

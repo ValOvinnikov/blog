@@ -7,6 +7,7 @@ import {
   buildOwnerSuspensionEmail,
   buildOwnerSuspensionLiftedEmail,
   PLATFORM_EMAIL_BRAND_NAME,
+  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { TENANT_LOG } from '@platform/constants/tenant';
@@ -80,7 +81,13 @@ const sendSuspensionEmail = async (
           action,
         });
 
-  await sendEmail({ to: ownerEmail, from, replyTo, ...message });
+  await sendEmail({
+    account: EMAIL_ACCOUNT.PLATFORM,
+    to: ownerEmail,
+    from,
+    replyTo,
+    ...message,
+  });
 };
 
 export const notifyOwnerOfSuspension = async (

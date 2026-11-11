@@ -3,7 +3,6 @@ import {
   TENANT_PLAN,
   TENANT_STATUS,
   type TDeprovisioningStep,
-  type TSuspensionReason,
   type TElevateTenantOwnerOutcome,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
@@ -23,6 +22,8 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { tenantBillingColumns } from './tenant-billing-columns';
+import { tenantInactivityColumns } from './tenant-inactivity-columns';
 import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
 
 export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);
@@ -121,11 +122,8 @@ export const tenants = pgTable(
     unsentReinviteFormerOwnerEmailEncrypted: text(
       'unsent_reinvite_former_owner_email_encrypted',
     ),
-    lastActivityAt: timestamp('last_activity_at').notNull().defaultNow(),
-    inactivityWarnedAt: timestamp('inactivity_warned_at'),
-    suspendedAt: timestamp('suspended_at'),
-    deletionNotifiedAt: timestamp('deletion_notified_at'),
-    suspensionReason: text('suspension_reason').$type<TSuspensionReason>(),
+    ...tenantInactivityColumns,
+    ...tenantBillingColumns,
     contentMigrationFailedAt: timestamp('content_migration_failed_at', {
       mode: 'date',
     }),

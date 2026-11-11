@@ -1,14 +1,13 @@
 import { createEnv } from '@t3-oss/env-core';
 import { z } from 'zod';
 
-// Single validated entry point for this package's environment. Optional —
-// absent means `sendEmail` throws at call time rather than at import time,
-// the same feature-flag-by-absence stance as every existing consumer's own
-// copy of RESEND_API_KEY.
+// Optional so a missing key fails its own account's sends at call time, never the import.
 export const env = createEnv({
   server: {
     // @env-required: development, production
-    RESEND_API_KEY: z.string().min(1).optional(),
+    RESEND_PLATFORM_API_KEY: z.string().min(1).optional(),
+    // @env-required: development, production
+    RESEND_TENANT_API_KEY: z.string().min(1).optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

@@ -17,3 +17,5 @@ export const EMBED_ORIGIN = {
   CAL: 'https://cal.com',
   GOOGLE_MAPS: 'https://www.google.com',
 } as const satisfies Record<TEmbedProvider, string>;
+
+export const EMBED_ORIGINS: readonly string[] = Object.values(EMBED_ORIGIN);

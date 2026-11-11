@@ -18,6 +18,7 @@ import {
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
   buildSiteEmailTag,
+  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { hasLength } from '@blog/utils/primitives';
@@ -85,6 +86,7 @@ export async function sendMagicLinkEmail({
       });
 
   await sendEmail({
+    account: isSentByPlatform ? EMAIL_ACCOUNT.PLATFORM : EMAIL_ACCOUNT.TENANT,
     to: identifier,
     from: applyTenantSenderName(
       from,

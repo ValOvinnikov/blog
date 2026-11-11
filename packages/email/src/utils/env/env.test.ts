@@ -1,6 +1,14 @@
-import { MOCK_RESEND_API_KEY } from '@blog/email/testing/email-fixtures';
+import {
+  MOCK_RESEND_PLATFORM_API_KEY,
+  MOCK_RESEND_TENANT_API_KEY,
+} from '@blog/email/testing/email-fixtures';
 
 type TEnv = (typeof import('./env'))['env'];
+
+const API_KEY_VARS = [
+  ['RESEND_PLATFORM_API_KEY', MOCK_RESEND_PLATFORM_API_KEY],
+  ['RESEND_TENANT_API_KEY', MOCK_RESEND_TENANT_API_KEY],
+] as const;
 
 async function importFreshEnv(): Promise<TEnv> {
   vi.resetModules();
@@ -17,22 +25,24 @@ describe('env', () => {
     vi.unstubAllEnvs();
   });
 
-  it('exposes a valid RESEND_API_KEY', async () => {
-    vi.stubEnv('RESEND_API_KEY', MOCK_RESEND_API_KEY);
+  it.each(API_KEY_VARS)('exposes a valid %s', async (name, value) => {
+    vi.stubEnv(name, value);
 
     const freshEnv = await importFreshEnv();
 
-    expect(freshEnv.RESEND_API_KEY).toBe(MOCK_RESEND_API_KEY);
+    expect(freshEnv[name]).toBe(value);
   });
 
-  it.each([
-    ['an absent', undefined],
-    ['an empty', ''],
-  ])('leaves RESEND_API_KEY undefined for %s value', async (_name, value) => {
-    vi.stubEnv('RESEND_API_KEY', value);
+  describe.each(API_KEY_VARS)('%s', (name) => {
+    it.each([
+      ['an absent', undefined],
+      ['an empty', ''],
+    ])('is undefined for %s value', async (_label, value) => {
+      vi.stubEnv(name, value);
 
-    const freshEnv = await importFreshEnv();
+      const freshEnv = await importFreshEnv();
 
-    expect(freshEnv.RESEND_API_KEY).toBeUndefined();
+      expect(freshEnv[name]).toBeUndefined();
+    });
   });
 });

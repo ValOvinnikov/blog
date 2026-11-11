@@ -4,7 +4,7 @@ import {
 } from '@blog/config/constants';
 
 import { atLeastSmall } from './radius-declarations';
-import { RADIUS_PILL } from './radius-tokens';
+import { RADIUS_NONE, RADIUS_PILL } from './radius-tokens';
 import type { TThemeDeclarations } from './theme-declarations';
 
 export const HEADER_CONTROL_SHAPE_DECLARATIONS: Record<
@@ -15,5 +15,5 @@ export const HEADER_CONTROL_SHAPE_DECLARATIONS: Record<
   [HEADER_CONTROL_SHAPE.ROUNDED]: {
     '--radius-header-control': atLeastSmall('--radius-md'),
   },
-  [HEADER_CONTROL_SHAPE.SQUARE]: { '--radius-header-control': '0' },
+  [HEADER_CONTROL_SHAPE.SQUARE]: { '--radius-header-control': RADIUS_NONE },
 };

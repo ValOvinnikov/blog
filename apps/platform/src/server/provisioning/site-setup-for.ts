@@ -10,7 +10,7 @@ import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 
-type TSiteSetup = {
+export type TSiteSetup = {
   tenant: ReturnType<typeof toClientTenant>;
   canRetry: boolean;
 };

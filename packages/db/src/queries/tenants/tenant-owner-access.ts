@@ -1,5 +1,5 @@
 import type { TSanityLoginProvider } from '@blog/config/constants';
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined, TNullableRow } from '@blog/config/types';
 import type { TSanityProjectRole, TTenantOwnerEmail } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 
@@ -27,14 +27,8 @@ export const tenantOwnerAccessColumns = {
   siteReadySentAt: tenants.ownerSiteReadySentAt,
 };
 
-type TTenantOwnerAccessRow = {
-  [K in keyof TTenantOwnerAccess]: TMaybeNull<
-    Exclude<TTenantOwnerAccess[K], undefined>
-  >;
-};
-
 export function toTenantOwnerAccess(
-  row: TTenantOwnerAccessRow,
+  row: TNullableRow<TTenantOwnerAccess>,
 ): TTenantOwnerAccess {
   return {
     sanityInviteId: row.sanityInviteId ?? undefined,

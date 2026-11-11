@@ -1,17 +1,14 @@
 import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
-import {
-  getPlatformSanityContext,
-  type TTenantSanityContext,
-} from '@blog/service';
+import type { TTenantSanityContext } from '@blog/service';
+import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { routing } from '@web/i18n/routing';
-import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
+import { hasDraftPreviewToken } from '@web/server/draft-preview/has-draft-preview-token/has-draft-preview-token';
+import { parseTenantSegment } from '@web/server/draft-preview/parse-tenant-segment/parse-tenant-segment';
+import { toSanityContext } from '@web/server/request-context/to-sanity-context/to-sanity-context';
 import { isOperatorSuspended } from '@web/server/tenant/operator-suspension/operator-suspension';
-import {
-  isPlatformFallbackAllowed,
-  isTenantServable,
-} from '@web/server/tenant/resolve-tenant/resolve-tenant';
+import { isTenantServable } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { toTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { isValidTenantId } from '@web/utils/is-tenant-shaped-path-segment';
 import { logger } from '@web/utils/logger/logger';
@@ -29,6 +26,7 @@ export type TRequestContext = {
   defaultLocale: TMaybeUndefined<TLocaleIsoCode>;
   liveLocales: TMaybeUndefined<TLocaleIsoCode[]>;
   isOperatorSuspended: boolean;
+  isDraftPreview: boolean;
 };
 
 export type TNotFoundContext = {
@@ -58,8 +56,6 @@ const getStore = cache((): TRequestContextStore => {
   return { requestedRoute, recordRequestedRoute };
 });
 
-// Archived and deprovisioned rows included: credentials and locales never
-// filtered on them, and the base URL applies its own servability gate.
 const loadTenantRow = async (
   tenantId: TMaybeUndefined<string>,
 ): Promise<TMaybeUndefined<TTenant>> =>
@@ -72,21 +68,6 @@ const loadTenantRowOnce = (
   tenantId: TMaybeUndefined<string>,
 ): Promise<TMaybeUndefined<TTenant>> =>
   (store.tenantRow ??= loadTenantRow(tenantId));
-
-const toSanityContext = (
-  tenantId: TMaybeUndefined<string>,
-  row: TMaybeUndefined<TTenant>,
-): TTenantSanityContext => {
-  if (!tenantId) return getPlatformSanityContext();
-
-  const credentials = row && queries.tenants.toTenantSanityCredentials(row);
-  if (credentials) return credentials;
-
-  if (!isPlatformFallbackAllowed()) {
-    notFound();
-  }
-  return getPlatformSanityContext();
-};
 
 const toMetadataBase = (
   row: TMaybeUndefined<TTenant>,
@@ -101,32 +82,43 @@ const buildRequestContext = async (
   store: TRequestContextStore,
   tenantId: TMaybeUndefined<string>,
   locale: TLocaleIsoCode,
+  isDraftPreview: boolean,
 ): Promise<TRequestContext> => {
+  if (isDraftPreview && !(tenantId && (await hasDraftPreviewToken(tenantId)))) {
+    notFound();
+  }
   const row = await loadTenantRowOnce(store, tenantId);
 
   return {
     tenantId,
     tenantName: row?.name,
     locale,
-    sanityContext: { ...toSanityContext(tenantId, row), locale },
+    sanityContext: {
+      ...toSanityContext(tenantId, row, isDraftPreview),
+      locale,
+    },
     metadataBase: toMetadataBase(row),
     defaultLocale: row?.locale,
     liveLocales: row && queries.tenants.selectLiveLocales(row),
     isOperatorSuspended: Boolean(row && isOperatorSuspended(row)),
+    isDraftPreview,
   };
 };
 
-/** Must run first in every `[tenant]/[locale]` layout, page and `generateMetadata`. */
+/** Must run first in every `[tenant]/[locale]` layout, page and `generateMetadata`; only the shared layout and the draft routes accept a draft preview segment. */
 export const enterRequestContext = async (
   params: Promise<TRouteParams>,
+  { acceptsDraftPreview = false }: { acceptsDraftPreview?: boolean } = {},
 ): Promise<void> => {
   const { tenant, locale } = await params;
-  const tenantId =
-    tenant === UNRESOLVED_TENANT_PLACEHOLDER ? undefined : tenant;
+  const { tenantId, isDraftPreview } = parseTenantSegment(tenant);
   const store = getStore();
   store.recordRequestedRoute({ tenantId, locale });
 
   if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  if (isDraftPreview && !acceptsDraftPreview) {
     notFound();
   }
 
@@ -138,7 +130,12 @@ export const enterRequestContext = async (
     }
   } else {
     store.entry = { tenantId, locale };
-    store.context = buildRequestContext(store, tenantId, locale);
+    store.context = buildRequestContext(
+      store,
+      tenantId,
+      locale,
+      isDraftPreview,
+    );
   }
 
   setRequestLocale(locale);
@@ -162,7 +159,7 @@ const loadTenantRowForNotFound = async (
   try {
     return await loadTenantRowOnce(store, tenantId);
   } catch (error) {
-    logger.error('request_context.not_found_tenant_load_failed', { error });
+    logger.error(REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED, { error });
     return undefined;
   }
 };
@@ -181,11 +178,6 @@ const buildNotFoundContext = async (
   return { tenantId, locale: servedLocale };
 };
 
-/**
- * Next renders both `not-found.tsx` boundaries alongside the
- * `[tenant]/[locale]` layout on every request, so this waits for that layout
- * to enter the route rather than reading the store before it has.
- */
 export const getNotFoundContext = (): Promise<TNotFoundContext> => {
   const store = getStore();
   return (store.notFoundContext ??= buildNotFoundContext(store));

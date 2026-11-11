@@ -67,5 +67,10 @@ export {
   type TTenantEmailIdentity,
 } from './templates/tenant';
 export { buildSiteEmailTag, SITE_EMAIL_TAG_NAME, type TEmailTag } from './tags';
-export { sendEmail, type TSendEmailInput } from './transport/send-email';
+export { EMAIL_ACCOUNT, type TEmailAccount } from './transport/email-account';
+export {
+  isEmailAccountConfigured,
+  sendEmail,
+  type TSendEmailInput,
+} from './transport/send-email';
 export { isValidEmailAddress } from './validation';

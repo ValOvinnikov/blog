@@ -7,11 +7,10 @@ import { ELEVATE_TENANT_OWNER_OUTCOME, queries } from '@blog/db';
 import {
   buildDocumentValidationAlertEmail,
   buildOwnerElevationAlertEmail,
-  sendEmail,
 } from '@blog/email';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { OPERATOR_ALERT_LOG } from '@platform/constants/operator-alert';
-import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { sendOperatorAlertEmail } from '@platform/server/email/send-operator-alert-email';
 import { hasBearerSecret } from '@platform/server/internal-api/has-bearer-secret';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -95,7 +94,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({ sent: 0 }, { status: HTTP_STATUS.OK });
   }
 
-  const { subject, html } =
+  const email =
     parsed.data.kind === OPERATOR_ALERT_KIND.OWNER_ELEVATION
       ? buildOwnerElevationAlertEmail({
           tenantName: tenant.name,
@@ -109,21 +108,13 @@ export async function POST(request: Request): Promise<NextResponse> {
           isCritical: parsed.data.isCritical,
         });
 
-  const fromAddress = resolveOperatorAlertFromAddress();
+  const failures = await sendOperatorAlertEmail(recipients, email);
 
-  const results = await Promise.allSettled(
-    recipients.map((to) => sendEmail({ to, from: fromAddress, subject, html })),
-  );
-
-  const failures = results.filter(
-    (result): result is PromiseRejectedResult => result.status === 'rejected',
-  );
-
-  failures.forEach((failure) => {
+  failures.forEach((reason) => {
     logger.error(OPERATOR_ALERT_LOG.SEND_FAILED, {
       tenantId: tenant.id,
       kind: parsed.data.kind,
-      ...toLoggableError(failure.reason),
+      ...toLoggableError(reason),
     });
   });
 

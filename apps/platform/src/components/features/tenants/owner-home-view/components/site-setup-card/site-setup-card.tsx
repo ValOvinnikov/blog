@@ -6,12 +6,13 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP_STATUS,
 } from '@blog/db/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import { RunStepsCard } from '@platform/components/features/tenants/run-steps-card';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
-import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import { useProvisioningPoll } from '@platform/utils/use-provisioning-poll/use-provisioning-poll';
 import { useRefreshOnSettle } from '@platform/utils/use-refresh-on-settle/use-refresh-on-settle';
 import { useTranslations } from 'next-intl';
@@ -19,11 +20,11 @@ import { useTranslations } from 'next-intl';
 import { siteSetupCardVariants } from './site-setup-card-variants';
 
 export type TSiteSetupCardProps = {
-  tenant: TClientTenant;
-  canRetry: boolean;
+  siteSetup: TSiteSetup;
 };
 
-export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
+export const SiteSetupCard = ({ siteSetup }: TSiteSetupCardProps) => {
+  const { tenant, canRetry } = siteSetup;
   const t = useTranslations('ownerHomePage');
   const tSteps = useTranslations('provisioningStatusView');
   const {
@@ -48,7 +49,7 @@ export const SiteSetupCard = ({ tenant, canRetry }: TSiteSetupCardProps) => {
     updatedAt: stepUpdatedAt[index],
   }));
   const isRetryFailed =
-    dispatchNotice !== undefined &&
+    !isUndefined(dispatchNotice) &&
     dispatchNotice !== TENANT_REFUSAL.ALREADY_IN_PROGRESS;
   const isNotStarted =
     allIdle && provisioningStatus === TENANT_PROVISIONING_STATUS.PENDING;

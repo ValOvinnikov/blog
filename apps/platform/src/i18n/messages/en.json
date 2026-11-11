@@ -106,7 +106,8 @@
     "back": "Back",
     "continue": "Continue",
     "edit": "Edit",
-    "editField": "Edit {field}"
+    "editField": "Edit {field}",
+    "editorInviteNote": "One email will come from Sanity, our editor. Accept it with the account you signed up with."
   },
   "providerSignInButton": {
     "continueWithGithub": "Continue with GitHub",
@@ -261,7 +262,7 @@
   },
   "emailAlertsBanner": {
     "title": "Email alerts not configured",
-    "description": "RESEND_API_KEY isn't set, so operators won't be emailed when a tenant needs attention — check this page manually."
+    "description": "RESEND_PLATFORM_API_KEY isn't set, so operators won't be emailed when a tenant needs attention — check this page manually."
   },
   "tenantsTable": {
     "empty": "No tenants yet.",
@@ -379,6 +380,31 @@
     "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
     "siteSetupStart": "Start setup",
     "siteSetupStarting": "Starting…"
+  },
+  "getStartedCard": {
+    "title": "Get started",
+    "supportingText": "Four steps to a site that's yours",
+    "doneCount": "{done} of {total} done",
+    "liveTitle": "Your site is live",
+    "copyAddress": "Copy address",
+    "openSite": "Open site",
+    "stepDone": "{step}: done",
+    "stepNotDone": "{step}: not done",
+    "stepTitle": {
+      "LOOK": "Pick a look",
+      "VOICE": "Set your voice",
+      "EDITOR_INVITE": "Accept your editor invite",
+      "FIRST_POST": "Write your first post"
+    },
+    "lookDescription": "Colours, fonts and your logo",
+    "voiceDescription": "The words your site uses",
+    "editorInviteDescription": "We emailed it from Sanity, our editor. Accept it with the account you signed up with.",
+    "firstPostLocked": "Opens once your editor invite is accepted",
+    "firstPostActivating": "Opens once your editor access is set up, usually within a minute",
+    "firstPostReady": "Your editor is ready",
+    "openLook": "Open Look",
+    "openVoice": "Open Voice",
+    "openStudio": "Open Studio"
   },
   "provisioningBanner": {
     "readyTitle": "Provisioned",

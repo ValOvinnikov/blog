@@ -1,3 +1,4 @@
+import { ButtonShapes } from '@blog/ui/testing/button-shapes';
 import { SurfaceBands } from '@blog/ui/testing/surface-bands';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
@@ -65,4 +66,9 @@ const InteractiveDemo = () => {
 
 export const Interactive: TStory = {
   render: () => <InteractiveDemo />,
+};
+
+export const ButtonShapesRow: TStory = {
+  name: 'Button shapes',
+  render: (args) => <ButtonShapes>{() => <Textarea {...args} />}</ButtonShapes>,
 };

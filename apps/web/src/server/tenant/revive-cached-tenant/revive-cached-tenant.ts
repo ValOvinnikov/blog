@@ -25,6 +25,11 @@ export const reviveCachedTenant = (
   deletionNotifiedAt: toMaybeDate(tenant.deletionNotifiedAt),
   contentMigrationFailedAt: toMaybeDate(tenant.contentMigrationFailedAt),
   firstPostPublishedAt: toMaybeDate(tenant.firstPostPublishedAt),
+  trialEndsAt: toMaybeDate(tenant.trialEndsAt),
+  downgradeGraceStartedAt: toMaybeDate(tenant.downgradeGraceStartedAt),
+  graceStartedEmailSentAt: toMaybeDate(tenant.graceStartedEmailSentAt),
+  graceHalfwayEmailSentAt: toMaybeDate(tenant.graceHalfwayEmailSentAt),
+  graceEndingEmailSentAt: toMaybeDate(tenant.graceEndingEmailSentAt),
   createdAt: toDate(tenant.createdAt),
   updatedAt: toDate(tenant.updatedAt),
 });

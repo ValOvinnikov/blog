@@ -3972,6 +3972,92 @@
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
+    "STARTER_MONTHLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "STARTER_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_MONTHLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_2500": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_5000": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_10000": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_25000": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "RECORDED": [
+      {
+        "ref": "STRIPE_EVENT_RECORD_OUTCOME.RECORDED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      },
+      {
+        "ref": "DATA_REQUEST_MATCH_COLUMN.RECORDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
+    "ALREADY_HANDLED": [
+      {
+        "ref": "STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
     "ADDRESS": [
       {
         "ref": "BLOCKED_IDENTITY_KIND.ADDRESS",
@@ -4072,6 +4158,12 @@
         "file": "packages/db/src/constants/site-config-saved-at.ts"
       },
       {
+        "ref": "GET_STARTED_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      },
+      {
         "ref": "ONBOARDING_STEP.LOOK",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -4090,6 +4182,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/site-config-saved-at.ts"
+      },
+      {
+        "ref": "GET_STARTED_STEP.VOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
       },
       {
         "ref": "SETTINGS_FORM_STACK.VOICE",
@@ -5446,14 +5544,6 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
-    "RECORDED": [
-      {
-        "ref": "DATA_REQUEST_MATCH_COLUMN.RECORDED",
-        "scope": "app:platform",
-        "from": "@platform/constants/data-request",
-        "file": "apps/platform/src/constants/data-request.ts"
-      }
-    ],
     "JSON": [
       {
         "ref": "DATA_REQUEST_EXPORT_FORMAT.JSON",
@@ -5840,6 +5930,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/focus-ring",
         "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "EDITOR_INVITE": [
+      {
+        "ref": "GET_STARTED_STEP.EDITOR_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      }
+    ],
+    "FIRST_POST": [
+      {
+        "ref": "GET_STARTED_STEP.FIRST_POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
       }
     ],
     "GITHUB_ERROR": [
@@ -7328,6 +7434,14 @@
         "file": "apps/platform/src/constants/site-config.ts"
       }
     ],
+    "site_config.saved_at_stamp_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
     "site_config.svg_sanitize_failed": [
       {
         "ref": "SITE_CONFIG_LOG.SVG_SANITIZE_FAILED",
@@ -8428,6 +8542,14 @@
         "file": "apps/web/src/constants/http.ts"
       }
     ],
+    "noindex": [
+      {
+        "ref": "ROBOTS_DIRECTIVE.NOINDEX",
+        "scope": "app:web",
+        "from": "@web/constants/http",
+        "file": "apps/web/src/constants/http.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",
@@ -8602,6 +8724,14 @@
         "scope": "app:web",
         "from": "@web/constants/proxy",
         "file": "apps/web/src/constants/proxy.ts"
+      }
+    ],
+    "request_context.not_found_tenant_load_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
       }
     ],
     "revalidate_site_config.secret_missing": [

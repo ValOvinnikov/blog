@@ -19,6 +19,7 @@ code:
   - apps/web/src/modules/embed/**
   - apps/web/src/constants/embed.ts
   - apps/web/next.config.ts
+  - apps/web/src/config/content-security-policy.ts
 epics: [2788, 3771, 3772, 3773, 3774, 3775, 3776, 3777, 3778]
 ---
 
@@ -56,7 +57,7 @@ Editors place a video, a booking calendar or a map on a page as its own section,
 - **Ratios by provider:** video providers `video` (16:9); Shorts `vertical` (9:16, a `MediaFrame` ratio; a Short's frame is centred and capped at about 320px); Google Maps `classic` (4:3); Cal.com `portrait` (3:4).
 - **Consent first.** `EmbedFrame` (`apps/web/src/components/shared/embed-frame/`) is a server-rendered `<figure>`; its client `EmbedGate` gates the iframe on External media through the shared `ConsentGate`, with `ConsentPlaceholder` as the fallback and the caption as its `<figcaption>`. Allowing grants the whole category, so every embed on the page loads at once, without a reload. While consent is unknown — the server render included — it renders a neutral `MediaFrame` of the right ratio, so no iframe is rendered and no request goes to the provider before consent. The guarantee is that narrower one: the provider URL may travel in the page's React Server Components payload, which issues no request. Pressing Allow moves focus to the player that replaced the button; a player shown on load never takes focus. Withdrawing consent removes every player.
 - **Iframe hardening:** `loading="lazy"`, `referrerpolicy="strict-origin-when-cross-origin"`, `sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"` (plus `allow-forms` for Cal.com), `allow` limited to `fullscreen; encrypted-media` for video. No autoplay.
-- **CSP.** `apps/web`'s policy has a `frame-src` of exactly the five provider origins, read from `EMBED_ORIGIN` in `@blog/config` — the same const the parser builds its embed URLs from, so the two cannot drift. `next.config.ts` imports `@blog/config/constants/embed` directly, because Next's config transpiler cannot resolve the constants barrel's aliased imports.
+- **CSP.** `apps/web`'s policy has a `frame-src` of exactly the five provider origins: `buildContentSecurityPolicy` (`apps/web/src/config/content-security-policy.ts`) takes them as `EMBED_ORIGINS`, derived from the `EMBED_ORIGIN` const the parser builds from, so the two cannot drift. Both the site-wide header in `next.config.ts` and the draft-preview headers pass it. `next.config.ts` imports `@blog/config/constants/embed` directly, because Next's config transpiler cannot resolve the constants barrel's aliased imports.
 - **Width.** The module's width is `layout.containerWidth`; a new module starts at Narrow, which caps the figure at `max-w-measure` at `text-prose` size — the post column's width and the module heading's — and an editor can widen it, when the figure fills the section. There is no `size` field. The frame follows the module's alignment (centred alongside a centred heading). A module whose embed no longer parses renders nothing.
 - Video structured data, autoplay, playlists and several embeds per module are out of scope.
 

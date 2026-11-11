@@ -4,6 +4,7 @@ import { queries } from '@blog/db';
 import {
   buildNewsletterConfirmationEmail,
   buildSiteEmailTag,
+  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { recordEmailSendSafely } from '@web/server/email-usage/record-email-send-safely/record-email-send-safely';
@@ -58,6 +59,7 @@ const sendConfirmationEmail = async (
   });
 
   await sendEmail({
+    account: EMAIL_ACCOUNT.TENANT,
     to: email,
     from: fromAddress,
     subject,

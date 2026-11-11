@@ -13,7 +13,7 @@ export default mergeConfig(
       environment: 'node',
       env: {
         // env.ts validates at import time; SKIP_ENV_VALIDATION lets tests
-        // import the env module without a real RESEND_API_KEY set.
+        // import the env module without real Resend API keys set.
         SKIP_ENV_VALIDATION: 'true',
       },
     },

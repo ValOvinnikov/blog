@@ -4,6 +4,8 @@ import { dirname, join, resolve } from 'node:path';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+import { buildFramingHeaders } from './security-headers';
+
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 // Turbopack silently fails to resolve through the node_modules symlink agent worktrees use (.husky/post-checkout), so anchor at its realpath instead.
@@ -16,22 +18,10 @@ const turbopackRoot = (() => {
   }
 })();
 
-const buildSecurityHeaders = (contentSecurityPolicy: string) => [
-  {
-    key: 'Content-Security-Policy',
-    value: contentSecurityPolicy,
-  },
+const TRANSPORT_HEADERS = [
   {
     key: 'X-Content-Type-Options',
     value: 'nosniff',
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY',
   },
   {
     key: 'Strict-Transport-Security',
@@ -43,15 +33,39 @@ const buildSecurityHeaders = (contentSecurityPolicy: string) => [
   },
 ];
 
+const ALL_PATHS = '/:path*';
+
+const buildSecurityHeaderRules = (
+  contentSecurityPolicy: string,
+  proxyOwnsFramingForQueryParam: string | undefined,
+) => {
+  const framingHeaders = buildFramingHeaders(contentSecurityPolicy);
+  if (!proxyOwnsFramingForQueryParam) {
+    return [
+      { source: ALL_PATHS, headers: [...framingHeaders, ...TRANSPORT_HEADERS] },
+    ];
+  }
+  return [
+    { source: ALL_PATHS, headers: TRANSPORT_HEADERS },
+    {
+      source: ALL_PATHS,
+      missing: [{ type: 'query' as const, key: proxyOwnsFramingForQueryParam }],
+      headers: framingHeaders,
+    },
+  ];
+};
+
 export type TNextConfigOverrides = Pick<
   NextConfig,
   'transpilePackages' | 'serverExternalPackages' | 'images' | 'experimental'
 > & {
   contentSecurityPolicy: string;
+  proxyOwnsFramingForQueryParam?: string;
 };
 
 export function createNextConfig(overrides: TNextConfigOverrides): NextConfig {
-  const { contentSecurityPolicy, ...appConfig } = overrides;
+  const { contentSecurityPolicy, proxyOwnsFramingForQueryParam, ...appConfig } =
+    overrides;
 
   const config: NextConfig = {
     ...appConfig,
@@ -88,12 +102,10 @@ export function createNextConfig(overrides: TNextConfigOverrides): NextConfig {
       },
     },
     async headers() {
-      return [
-        {
-          source: '/:path*',
-          headers: buildSecurityHeaders(contentSecurityPolicy),
-        },
-      ];
+      return buildSecurityHeaderRules(
+        contentSecurityPolicy,
+        proxyOwnsFramingForQueryParam,
+      );
     },
   };
 
