@@ -15,6 +15,7 @@ import {
 
 faker.seed(123);
 
+const ARIA_DISABLED = 'aria-disabled';
 const VALUE_FALSE_TITLE = 'its value is false';
 const VALUE_MISSING_TITLE = 'its value is missing';
 const MOCK_SAVE_LABEL = faker.lorem.words(2);
@@ -64,12 +65,12 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       },
     );
 
-    it('shows an unlocked category enabled', () => {
+    it('shows an unlocked category without aria-disabled', () => {
       const mediaSwitch = screen.getByRole('switch', {
         name: MOCK_MEDIA_CATEGORY.label,
       });
 
-      expect(mediaSwitch).toBeEnabled();
+      expect(mediaSwitch).not.toHaveAttribute(ARIA_DISABLED);
     });
   });
 
@@ -118,7 +119,7 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       });
 
       expect(necessarySwitch).toBeChecked();
-      expect(necessarySwitch).toHaveAttribute('aria-disabled', 'true');
+      expect(necessarySwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     },
   );
 

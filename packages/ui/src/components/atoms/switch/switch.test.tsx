@@ -80,6 +80,7 @@ describe(`<${Switch.name}/>`, () => {
       await user.keyboard(' ');
 
       expect(control).toHaveFocus();
+      expect(control).toBeChecked();
       expect(onChange).not.toHaveBeenCalled();
     });
   });
