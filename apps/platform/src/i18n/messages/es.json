@@ -816,6 +816,20 @@
       "FULL_WIDTH": "Ancho completo",
       "FLOATING": "Flotante"
     },
+    "navLinkStyleLabel": "Enlaces de navegación",
+    "navLinkStyleDescription": "Cómo se ven los enlaces del menú principal. Los enlaces del pie de página no cambian.",
+    "navLinkStyleOptionLabel": {
+      "PLAIN": "Simple",
+      "UNDERLINE": "Subrayado",
+      "SOFT": "Suave",
+      "PILL": "Píldora"
+    },
+    "navLinkStyleOptionDescription": {
+      "PLAIN": "Solo texto; el color cambia al pasar el cursor",
+      "UNDERLINE": "La página actual aparece subrayada",
+      "SOFT": "Un fondo tintado al pasar el cursor y en la página actual",
+      "PILL": "Un contorno redondeado al pasar el cursor y en la página actual"
+    },
     "accountButtonStyleLabel": "Botón de la cuenta",
     "accountButtonStyleDescription": "El botón con el que los lectores inician sesión y abren su cuenta, en pantallas anchas. Los teléfonos siguen el ajuste «En teléfonos, la cuenta va» más abajo.",
     "accountButtonStyleOptionLabel": {

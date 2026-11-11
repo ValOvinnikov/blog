@@ -9,6 +9,7 @@ export type TPresetSeededField =
   | 'density'
   | 'cardStyle'
   | 'headerControlStyle'
+  | 'navLinkStyle'
   | 'spinnerStyle'
   | 'buttonShape';
 
@@ -19,6 +20,7 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     themeTokens: { accentHue, headingFont, bodyFont, radiusScale, density },
     cardStyle,
     headerControlStyle,
+    navLinkStyle,
     spinnerStyle,
     buttonShape,
   } = PRESET_REGISTRY[preset];
@@ -31,6 +33,7 @@ const presetSeededValues = (preset: TPresetId): TPresetSeededValues => {
     density,
     cardStyle,
     headerControlStyle,
+    navLinkStyle,
     spinnerStyle,
     buttonShape,
   };
@@ -73,6 +76,7 @@ export const switchPreset = (
     density: keepCustomised('density'),
     cardStyle: keepCustomised('cardStyle'),
     headerControlStyle: keepCustomised('headerControlStyle'),
+    navLinkStyle: keepCustomised('navLinkStyle'),
     spinnerStyle: keepCustomised('spinnerStyle'),
     buttonShape: keepCustomised('buttonShape'),
   };

@@ -102,6 +102,7 @@ export const useLookSave = ({
         headerLayout: vals.headerLayout,
         headerSubmenuStyle: vals.headerSubmenuStyle,
         headerBarStyle: vals.headerBarStyle,
+        navLinkStyle: vals.navLinkStyle,
         accountButtonStyle: vals.accountButtonStyle,
         accountPanelStyle: vals.accountPanelStyle,
         accountPhonePlacement: vals.accountPhonePlacement,

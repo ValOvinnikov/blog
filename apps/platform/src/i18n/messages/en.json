@@ -816,6 +816,20 @@
       "FULL_WIDTH": "Full width",
       "FLOATING": "Floating"
     },
+    "navLinkStyleLabel": "Navigation links",
+    "navLinkStyleDescription": "How the top-level menu links look. Footer links are not affected.",
+    "navLinkStyleOptionLabel": {
+      "PLAIN": "Plain",
+      "UNDERLINE": "Underline",
+      "SOFT": "Soft",
+      "PILL": "Pill"
+    },
+    "navLinkStyleOptionDescription": {
+      "PLAIN": "Text only; the colour changes on hover",
+      "UNDERLINE": "The current page is underlined",
+      "SOFT": "A tinted background on hover and on the current page",
+      "PILL": "A rounded outline on hover and on the current page"
+    },
     "accountButtonStyleLabel": "Account button",
     "accountButtonStyleDescription": "The control readers sign in with and open their account from, on wide screens. Phones follow the “On phones, the account sits” setting below.",
     "accountButtonStyleOptionLabel": {

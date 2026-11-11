@@ -816,6 +816,20 @@
       "FULL_WIDTH": "Pleine largeur",
       "FLOATING": "Flottante"
     },
+    "navLinkStyleLabel": "Liens de navigation",
+    "navLinkStyleDescription": "L'apparence des liens du menu principal. Les liens du pied de page ne changent pas.",
+    "navLinkStyleOptionLabel": {
+      "PLAIN": "Simple",
+      "UNDERLINE": "Souligné",
+      "SOFT": "Doux",
+      "PILL": "Pilule"
+    },
+    "navLinkStyleOptionDescription": {
+      "PLAIN": "Texte seul ; la couleur change au survol",
+      "UNDERLINE": "La page actuelle est soulignée",
+      "SOFT": "Un fond teinté au survol et sur la page actuelle",
+      "PILL": "Un contour arrondi au survol et sur la page actuelle"
+    },
     "accountButtonStyleLabel": "Bouton du compte",
     "accountButtonStyleDescription": "Le bouton avec lequel les lecteurs se connectent et ouvrent leur compte, sur grand écran. Les téléphones suivent le réglage « Sur téléphone, le compte se trouve » plus bas.",
     "accountButtonStyleOptionLabel": {

@@ -15,6 +15,7 @@ import {
   HUE_MAX,
   HUE_MIN,
   LANGUAGE_SWITCHER_STYLE,
+  NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
@@ -172,6 +173,7 @@ describe(switchPreset, () => {
   it.each([
     { field: 'spinnerStyle', value: SPINNER_STYLE.PULSE },
     { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
+    { field: 'navLinkStyle', value: NAV_LINK_STYLE.PILL },
     { field: 'accentHue', value: CONSOLE.themeTokens.accentHue + 1 },
   ] as const)('keeps a $field the owner changed', ({ field, value }) => {
     const current = { ...defaultLookFormValues(), [field]: value };
