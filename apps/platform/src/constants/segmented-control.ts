@@ -7,3 +7,10 @@ export const SEGMENTED_LAYOUT = {
 } as const;
 
 export type TSegmentedLayout = TValueOf<typeof SEGMENTED_LAYOUT>;
+
+export const SEGMENTED_RADIO_LAYOUT = {
+  TRACK: 'TRACK',
+  TILES: 'TILES',
+} as const;
+
+export type TSegmentedRadioLayout = TValueOf<typeof SEGMENTED_RADIO_LAYOUT>;

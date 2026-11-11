@@ -159,13 +159,6 @@ describe(`<${LookForm.name}/>`, () => {
 
     it.each([
       {
-        row: LOOK_ROW.CARDS,
-        label: LOOK_FORM.cardStyleLabel,
-        initialDescription: LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR,
-        option: LOOK_FORM.cardStyleOptionLabel.OUTLINED,
-        description: LOOK_FORM.cardStyleOptionDescription.OUTLINED,
-      },
-      {
         row: LOOK_ROW.LANGUAGE_SWITCHER,
         label: LOOK_FORM.languageSwitcherStyleLabel,
         initialDescription:
@@ -197,6 +190,27 @@ describe(`<${LookForm.name}/>`, () => {
         expect(toggleGroup).toHaveAccessibleDescription(description);
       },
     );
+
+    it('describes the Card style tiles by the chosen option below them', async () => {
+      await openLookRow(user, LOOK_ROW.CARDS);
+      const tiles = screen.getByRole('radiogroup', {
+        name: LOOK_FORM.cardStyleLabel,
+      });
+      const outlinedTile = within(tiles).getByRole('radio', {
+        name: LOOK_FORM.cardStyleOptionLabel.OUTLINED,
+      });
+
+      expect(tiles).toHaveAccessibleDescription(
+        `${LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR} ${LOOK_FORM.cardStyleDescription}`,
+      );
+
+      await user.click(outlinedTile);
+
+      expect(outlinedTile).toBeChecked();
+      expect(tiles).toHaveAccessibleDescription(
+        `${LOOK_FORM.cardStyleOptionDescription.OUTLINED} ${LOOK_FORM.cardStyleDescription}`,
+      );
+    });
   });
 
   describe('the cookie settings choice', () => {

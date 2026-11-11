@@ -580,6 +580,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/segmented-control` — `apps/platform/src/constants/segmented-control.ts`
 
 - **SEGMENTED_LAYOUT**: `FIT`, `WIDE`, `SINGLE_ROW`
+- **SEGMENTED_RADIO_LAYOUT**: `TRACK`, `TILES`
 
 ### `@platform/constants/select-appearance` — `apps/platform/src/constants/select-appearance.ts`
 

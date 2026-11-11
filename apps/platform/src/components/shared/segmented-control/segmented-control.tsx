@@ -8,12 +8,13 @@ import {
   SEGMENTED_LAYOUT,
   type TSegmentedLayout,
 } from '@platform/constants/segmented-control';
-import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { singleSelectToggleGroupProps } from '@platform/utils/single-select-toggle-group/single-select-toggle-group';
-import { useId, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
+import { SelectedDescription } from './components/selected-description/selected-description';
 import { segmentedControlVariants } from './segmented-control-variants';
 import { useLockedArrowFocus } from './use-locked-arrow-focus';
+import { useSelectedDescription } from './use-selected-description';
 
 type TSegmentedControlOption<TValue extends string> = {
   value: TValue;
@@ -22,7 +23,7 @@ type TSegmentedControlOption<TValue extends string> = {
   glyph?: ReactNode;
 };
 
-type TSegmentedControlLock = {
+export type TSegmentedControlLock = {
   isDisabled?: boolean;
   isLocked?: boolean;
 };
@@ -45,21 +46,18 @@ export const SegmentedControl = <TValue extends string>({
   layout = SEGMENTED_LAYOUT.FIT,
   className,
 }: TSegmentedControlProps<TValue>) => {
-  const descriptionId = useId();
   const { isDisabled = false, isLocked = false } = lock;
   const { label: ariaLabel, labelledBy, describedBy } = aria;
   const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked);
   const hasDescriptions = options.some(({ description }) => description);
   const hasGlyphs = options.some(({ glyph }) => glyph);
-  const selectedDescription = options.find(
-    ({ value: optionValue }) => optionValue === value,
-  )?.description;
+  const { descriptionId, description, groupDescribedBy } =
+    useSelectedDescription(options, value, describedBy);
   const {
     wrapper,
     root,
     option,
     glyph: glyphSlot,
-    selectedDescription: descriptionSlot,
   } = segmentedControlVariants({
     isLocked: isLocked || isDisabled,
     hasGlyphs,
@@ -72,10 +70,7 @@ export const SegmentedControl = <TValue extends string>({
       disabled={isDisabled}
       aria-label={ariaLabel}
       aria-labelledby={labelledBy}
-      aria-describedby={joinIds(
-        describedBy,
-        selectedDescription && descriptionId,
-      )}
+      aria-describedby={groupDescribedBy}
       onKeyDown={onKeyDown}
       className={root({ class: hasDescriptions ? undefined : className })}
     >
@@ -105,9 +100,7 @@ export const SegmentedControl = <TValue extends string>({
   return (
     <div className={wrapper({ class: className })}>
       {group}
-      <p id={descriptionId} aria-live="polite" className={descriptionSlot()}>
-        {selectedDescription}
-      </p>
+      <SelectedDescription id={descriptionId} description={description} />
     </div>
   );
 };

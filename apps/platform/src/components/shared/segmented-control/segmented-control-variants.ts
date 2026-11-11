@@ -20,9 +20,6 @@ export const segmentedControlVariants = tv({
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
     glyph: ['flex'],
-    selectedDescription: [
-      'm-0 text-admin-12-5 leading-admin-18 text-admin-muted empty:hidden',
-    ],
   },
   variants: {
     hasGlyphs: {

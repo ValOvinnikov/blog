@@ -6762,6 +6762,22 @@
         "file": "apps/platform/src/constants/segmented-control.ts"
       }
     ],
+    "TRACK": [
+      {
+        "ref": "SEGMENTED_RADIO_LAYOUT.TRACK",
+        "scope": "app:platform",
+        "from": "@platform/constants/segmented-control",
+        "file": "apps/platform/src/constants/segmented-control.ts"
+      }
+    ],
+    "TILES": [
+      {
+        "ref": "SEGMENTED_RADIO_LAYOUT.TILES",
+        "scope": "app:platform",
+        "from": "@platform/constants/segmented-control",
+        "file": "apps/platform/src/constants/segmented-control.ts"
+      }
+    ],
     "settings_features.plan_entitlement_rejected": [
       {
         "ref": "SETTINGS_FEATURES_LOG.PLAN_ENTITLEMENT_REJECTED",

@@ -60,6 +60,8 @@
   --admin-hover: #e2e5ea;
   --admin-note-line: rgba(79, 70, 229, 0.3);
   --admin-control-line-locked: #c5cad3;
+  --admin-glyph-accent: #0d6466;
+  --admin-glyph-fill: #d5ebea;
   --admin-frame-dot: #d5d9e0;
   --admin-frame-track: rgba(18, 20, 26, 0.08);
   --admin-frame-thumb: #5b6472;
@@ -75,6 +77,7 @@
   --admin-shadow-bar: 0 2px 8px rgba(16, 24, 40, 0.08);
   --admin-shadow-dock: 0 -2px 8px rgba(16, 24, 40, 0.06);
   --admin-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.08);
+  --admin-shadow-glyph: 0 2px 5px rgba(16, 24, 40, 0.22);
   --admin-shadow-thumb: 0 1px 3px rgba(16, 24, 40, 0.25);
   --admin-thumb-line: rgba(16, 24, 40, 0.12);
   --admin-preview-column-line: transparent;
@@ -154,6 +157,8 @@
   --admin-hover: #22262f;
   --admin-note-line: rgba(165, 180, 252, 0.3);
   --admin-control-line-locked: #424956;
+  --admin-glyph-accent: #4fb3ad;
+  --admin-glyph-fill: #1d3a3b;
   --admin-frame-dot: #3a404b;
   --admin-fade-end: rgba(15, 17, 21, 0);
   --admin-fade-end-surface: rgba(23, 26, 32, 0);
@@ -165,6 +170,7 @@
   --admin-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
   --admin-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
   --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --admin-shadow-glyph: 0 2px 5px rgba(0, 0, 0, 0.6);
   --admin-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
   --admin-thumb-line: #0f1115;
   --admin-preview-column-line: #2b303a;
@@ -225,6 +231,8 @@
     --admin-hover: #22262f;
     --admin-note-line: rgba(165, 180, 252, 0.3);
     --admin-control-line-locked: #424956;
+    --admin-glyph-accent: #4fb3ad;
+    --admin-glyph-fill: #1d3a3b;
     --admin-frame-dot: #3a404b;
     --admin-fade-end: rgba(15, 17, 21, 0);
     --admin-fade-end-surface: rgba(23, 26, 32, 0);
@@ -236,6 +244,7 @@
     --admin-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
     --admin-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
     --admin-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --admin-shadow-glyph: 0 2px 5px rgba(0, 0, 0, 0.6);
     --admin-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
     --admin-thumb-line: #0f1115;
     --admin-preview-column-line: #2b303a;
@@ -304,6 +313,8 @@
   --color-admin-hover: var(--admin-hover);
   --color-admin-note-line: var(--admin-note-line);
   --color-admin-control-line-locked: var(--admin-control-line-locked);
+  --color-admin-glyph-accent: var(--admin-glyph-accent);
+  --color-admin-glyph-fill: var(--admin-glyph-fill);
   --color-admin-frame-dot: var(--admin-frame-dot);
   --color-admin-frame-track: var(--admin-frame-track);
   --color-admin-frame-thumb: var(--admin-frame-thumb);
@@ -389,6 +400,7 @@
   --shadow-admin-bar: var(--admin-shadow-bar);
   --shadow-admin-dock: var(--admin-shadow-dock);
   --shadow-admin-xs: var(--admin-shadow-xs);
+  --shadow-admin-glyph: var(--admin-shadow-glyph);
   --shadow-admin-thumb: var(--admin-shadow-thumb);
   --shadow-admin-choice-ring: 0 0 0 3px var(--admin-brand-weak);
 }
