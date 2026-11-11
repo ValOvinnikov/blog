@@ -2834,7 +2834,10 @@ error to the locale error boundary (`app/[tenant]/[locale]/error.tsx`);
 `data: undefined` calls `notFound()` with no log. `guardPageLoaderResult`
 (`apps/web`) applies both for every page component, and the Post List and
 Taxonomy List modules follow the same rule. A misconfigured document is a 500
-too.
+too. That one server line is the caller's own event (`landing_page.fetch_failed`
+and the like), carrying its context: the error is rethrown marked with
+`markErrorLogged`, so `onRequestError`'s `request.unhandled_error` skips it,
+while a render error nobody logged still gets that line.
 
 **A consumer that treats `ok` as a proxy for "the document exists" is a
 migration hazard.** When a loader moves from throwing to returning `undefined`,

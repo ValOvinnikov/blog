@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TResult } from '@blog/utils';
+import { markErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
 import { notFound } from 'next/navigation';
 
@@ -14,7 +15,7 @@ export const guardPageLoaderResult = <T>(
 ): T => {
   if (!result.ok) {
     logger.error(logEventName, { ...context, error: result.error });
-    throw result.error;
+    throw markErrorLogged(result.error);
   }
 
   if (!result.data) {

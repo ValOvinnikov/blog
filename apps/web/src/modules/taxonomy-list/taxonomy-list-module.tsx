@@ -4,6 +4,7 @@ import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { TAXONOMY_LIST_LOG } from '@web/constants/taxonomy-list';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
+import { markErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 
@@ -28,7 +29,7 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
       id,
       error: result.error,
     });
-    throw result.error;
+    throw markErrorLogged(result.error);
   }
 
   const {

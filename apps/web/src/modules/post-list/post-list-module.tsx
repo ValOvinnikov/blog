@@ -6,6 +6,7 @@ import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { fillVoicePlaceholders } from '@web/utils/fill-voice-placeholders';
+import { markErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
@@ -66,7 +67,7 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
       page: resolvedPage,
       error: result.error,
     });
-    throw result.error;
+    throw markErrorLogged(result.error);
   }
 
   const {

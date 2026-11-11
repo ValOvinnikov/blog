@@ -19,6 +19,7 @@ code:
   - apps/web/src/metadata/not-found-metadata/**
   - apps/web/src/utils/resolve-not-found-messages/**
   - apps/web/src/utils/guard-page-loader-result/**
+  - apps/web/src/utils/logged-error/**
   - apps/platform/src/app/global-error.tsx
   - apps/platform/src/app/[locale]/error.tsx
   - apps/platform/src/app/[locale]/not-found.tsx
@@ -59,7 +60,7 @@ A reader who hits a missing page sees the tenant's own 404 in its theme and lang
 
 ## Constraints and invariants
 
-- **A loader failure is a 500; a missing document is a 404.** `guardPageLoaderResult` logs a failed `service.pages.*` result once and rethrows its error to `[tenant]/[locale]/error.tsx`, so a crawler retries rather than de-indexes; a loader that matched no document calls `notFound()` silently. The Post List and Taxonomy List modules do the same for their own fetch. A document that exists but is misconfigured (a required module slot unset) fails the same way.
+- **A loader failure is a 500; a missing document is a 404.** `guardPageLoaderResult` logs a failed `service.pages.*` result once under the page's own event and rethrows its error, marked as logged so `onRequestError` adds no second `request.unhandled_error` line, to `[tenant]/[locale]/error.tsx`, so a crawler retries rather than de-indexes; a loader that matched no document calls `notFound()` silently. The Post List and Taxonomy List modules do the same for their own fetch. A document that exists but is misconfigured (a required module slot unset) fails the same way.
 - Paginated archives: a non-numeric or non-canonical page segment 404s; `/page/1` permanently redirects (308) to the unpaginated URL.
 - A not-found boundary must never call `headers()`; `global-not-found` and `global-error` never wait on a tenant.
 - `GlobalErrorPage` cannot use the catalogue, Voice or `SmartLink` (it sits above every provider) and links home with a plain anchor.
