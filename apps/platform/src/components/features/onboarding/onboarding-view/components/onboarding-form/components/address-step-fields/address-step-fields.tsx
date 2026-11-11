@@ -1,10 +1,8 @@
 'use client';
 
-import { LOCALE_ISO_CODES, type TMaybeUndefined } from '@blog/config';
-import { toOptions } from '@blog/utils/primitives';
+import type { TMaybeUndefined } from '@blog/config';
 import { SiteAddressField } from '@platform/components/features/onboarding/onboarding-view/components/onboarding-form/components/address-step-fields/components/site-address-field';
-import { FormField } from '@platform/components/shared/form-field';
-import { OptionSelect } from '@platform/components/shared/option-select';
+import { FormLocaleSelect } from '@platform/components/shared/form-locale-select';
 import { FIELD_APPEARANCE } from '@platform/constants/field-appearance';
 import type {
   TCreateSiteFieldError,
@@ -26,7 +24,6 @@ export const AddressStepFields = ({
   onFieldChange,
 }: TAddressStepFieldsProps) => {
   const t = useTranslations('onboardingForm');
-  const tLanguage = useTranslations('languageNames');
 
   return (
     <>
@@ -36,18 +33,13 @@ export const AddressStepFields = ({
         rootDomain={rootDomain}
         error={addressError}
       />
-      <FormField
+      <FormLocaleSelect
         label={t('languageLabel')}
         hint={t('languageHint')}
-        control={{ appearance: FIELD_APPEARANCE.WIZARD }}
-      >
-        <OptionSelect
-          options={toOptions(LOCALE_ISO_CODES, (locale) => tLanguage(locale))}
-          value={values.locale}
-          onChange={(locale) => onFieldChange({ locale })}
-          appearance={FIELD_APPEARANCE.WIZARD}
-        />
-      </FormField>
+        value={values.locale}
+        onChange={(locale) => onFieldChange({ locale })}
+        appearance={FIELD_APPEARANCE.WIZARD}
+      />
     </>
   );
 };

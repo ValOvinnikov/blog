@@ -69,7 +69,7 @@ The run then verifies all of it. The admin polls each step's progress and offers
 
 - **Operator pages (any `admins` row):**
   - `/tenants` lists tenants, with an archived toggle.
-  - `/tenants/new` is the add-tenant wizard.
+  - `/tenants/new` is the add-tenant wizard. It asks for the tenant's name, site address, default language (the platform's default preselected, offered as onboarding's Address step offers it), plan and owner email; the action refuses an unsupported language with a field error. The default language is the one its starter content and Site Settings start in.
   - `/tenants/{id}` shows an overview with a provisioning banner. Its Domain card has the title and a DNS link in its header, then rows for Status (the verification pill), Public domain and, when Vercel reported a status, Last checked.
   - `/tenants/{id}/provisioning` shows each step's status and the run. Until the workflow starts the run, it says the run is queued and counts the wait. A step that finishes between two polls is still shown Running before it settles.
   - `/tenants/{id}/domain` shows a Your domain card with live Vercel verification. Until the domain verifies it shows the address and lists the DNS records to add, each name and value with a copy button; once verified it shows the address with a Visit site link, its status, when it was last checked, whether it is a platform address (under `TENANT_ROOT_DOMAIN`) or a custom domain, and that HTTPS is active.

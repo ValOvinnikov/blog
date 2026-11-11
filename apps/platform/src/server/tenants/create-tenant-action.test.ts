@@ -49,6 +49,7 @@ const MOCK_EXISTING_TENANT_ID = faker.string.uuid();
 const MOCK_AUDIT_EVENT_ID = faker.string.uuid();
 const MOCK_OTHER_OWNER_EMAIL = faker.internet.email();
 const MOCK_INVALID_OWNER_INVITE_TOKEN = faker.string.alphanumeric(32);
+const MOCK_UNSUPPORTED_LOCALE = faker.string.alpha({ length: 5 });
 const MOCK_DRAFT_INSERT_ERROR = new Error(faker.lorem.sentence());
 const MOCK_AUDIT_WRITE_ERROR = new Error(faker.lorem.sentence());
 const PROVISIONING_PATH = adminRoutes.tenantProvisioning(MOCK_TENANT_ID);
@@ -114,6 +115,7 @@ const loggerWarnMock = vi.mocked(logger.warn);
 const validInput = {
   name: MOCK_TENANT_NAME,
   slug: MOCK_TENANT_SLUG,
+  locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
   ownerEmail: MOCK_OWNER_EMAIL,
 };
@@ -172,6 +174,34 @@ describe(createTenantAction, () => {
       expect(createTenantDraftMock).not.toHaveBeenCalled();
     },
   );
+
+  it('refuses an unsupported language with a field error before any lookup', async () => {
+    const result = await createTenantAction({
+      ...validInput,
+      locale: MOCK_UNSUPPORTED_LOCALE,
+    });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {
+        locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED },
+      },
+    });
+    expect(findUserByEmailMock).not.toHaveBeenCalled();
+    expect(createTenantDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('creates the tenant in the chosen default language', async () => {
+    await expect(
+      createTenantAction({ ...validInput, locale: LOCALE_ISO_CODES.NL }),
+    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+
+    expect(createTenantDraftMock).toHaveBeenCalledWith({
+      ...MOCK_TENANT_DRAFT_FIELDS,
+      locale: LOCALE_ISO_CODES.NL,
+      owner: { type: 'user', userId: MOCK_OWNER_USER_ID },
+    });
+  });
 
   it('logs and returns a server error when no tenant root domain is configured', async () => {
     Object.assign(env, { TENANT_ROOT_DOMAIN: undefined });

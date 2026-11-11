@@ -1314,6 +1314,8 @@
     "nameLabel": "Tenant name",
     "siteAddressLabel": "Site address",
     "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
+    "localeLabel": "Default language",
+    "localeHint": "The language the site's starter content and settings start in. The owner can add more later.",
     "planLabel": "Plan",
     "ownerEmailLabel": "Owner email",
     "ownerEmailHint": "The person who'll manage this tenant. An existing account gets access immediately; a new address gets an email invite to sign in.",

@@ -1314,6 +1314,8 @@
     "nameLabel": "Mandantenname",
     "siteAddressLabel": "Adresse der Website",
     "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
+    "localeLabel": "Standardsprache",
+    "localeHint": "Die Sprache, in der Startinhalte und Einstellungen der Website beginnen. Der Inhaber kann später weitere hinzufügen.",
     "planLabel": "Tarif",
     "ownerEmailLabel": "E-Mail des Inhabers",
     "ownerEmailHint": "Die Person, die diesen Mandanten verwaltet. Ein bestehendes Konto erhält sofort Zugriff; eine neue Adresse erhält eine Einladung per E-Mail zur Anmeldung.",
