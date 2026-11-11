@@ -23,6 +23,7 @@ export * from './finding';
 export * from './footer-fine-print';
 export * from './footer-layout';
 export * from './form-status';
+export * from './header-control-shape';
 export * from './header-control-style';
 export * from './header-layout';
 export * from './html-tag';

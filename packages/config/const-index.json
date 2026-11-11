@@ -682,6 +682,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
+      },
+      {
+        "ref": "HEADER_CONTROL_SHAPE.SQUARE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
     "ROUNDED": [
@@ -690,6 +696,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/button-shape.ts"
+      },
+      {
+        "ref": "HEADER_CONTROL_SHAPE.ROUNDED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
     "READER_ACCOUNTS": [
@@ -1460,6 +1472,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/form-status.ts"
+      }
+    ],
+    "ROUND": [
+      {
+        "ref": "HEADER_CONTROL_SHAPE.ROUND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
     "SOFT": [

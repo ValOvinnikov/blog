@@ -135,6 +135,7 @@
   --radius-card: var(--radius-md);
   --radius-media: var(--radius-lg);
   --radius-item: var(--item-radius);
+  --radius-header-control: 9999px;
 
   /* Layout */
   --container-content: 72rem;
