@@ -8,6 +8,10 @@ const MOCK_TENANT = mockServableTenant({
   suspendedAt: new Date(),
   contentMigrationFailedAt: new Date(),
   trialEndsAt: new Date(),
+  downgradeGraceStartedAt: new Date(),
+  graceStartedEmailSentAt: new Date(),
+  graceHalfwayEmailSentAt: new Date(),
+  graceEndingEmailSentAt: new Date(),
 });
 
 describe(reviveCachedTenant, () => {

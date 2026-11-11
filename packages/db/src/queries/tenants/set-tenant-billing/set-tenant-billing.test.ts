@@ -1,4 +1,5 @@
 import { ERROR_CODE } from '@blog/config/constants';
+import { TENANT_PLAN } from '@blog/db/constants';
 import { getTenantBilling } from '@blog/db/queries/tenants/get-tenant-billing';
 import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import * as schema from '@blog/db/schema';
@@ -6,6 +7,7 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mockTenantBilling } from '@blog/db/testing/tenants/billing';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { eq } from 'drizzle-orm';
 
 import { setTenantBilling } from './set-tenant-billing';
 
@@ -38,9 +40,7 @@ describe(setTenantBilling, () => {
     });
 
     it('keeps fields the input leaves out', async () => {
-      const { graceEndingEmailSentAt } = mockTenantBilling({
-        graceEndingEmailSentAt: billing.graceHalfwayEmailSentAt,
-      });
+      const { graceHalfwayEmailSentAt: graceEndingEmailSentAt } = billing;
 
       const result = await setTenantBilling(id, { graceEndingEmailSentAt });
 
@@ -64,6 +64,18 @@ describe(setTenantBilling, () => {
         graceStartedEmailSentAt: undefined,
         graceHalfwayEmailSentAt: undefined,
       });
+    });
+
+    it('writes no field outside billing when given a wider object', async () => {
+      const wider = { ...billing, plan: TENANT_PLAN.GROWTH };
+
+      await setTenantBilling(id, wider);
+
+      const [stored] = await db()
+        .select({ plan: schema.tenants.plan })
+        .from(schema.tenants)
+        .where(eq(schema.tenants.id, id));
+      expect(stored).toEqual({ plan: TENANT_PLAN.FREE });
     });
 
     it('leaves every billing field untouched given an empty input', async () => {

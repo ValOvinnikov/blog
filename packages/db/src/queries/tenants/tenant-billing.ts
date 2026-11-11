@@ -1,4 +1,4 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined, TNullableRow } from '@blog/config/types';
 import { tenants } from '@blog/db/schema/tenants';
 
 export type TTenantBilling = {
@@ -23,13 +23,9 @@ export const tenantBillingColumns = {
   graceEndingEmailSentAt: tenants.graceEndingEmailSentAt,
 };
 
-type TTenantBillingRow = {
-  [K in keyof TTenantBilling]: TMaybeNull<
-    Exclude<TTenantBilling[K], undefined>
-  >;
-};
-
-export function toTenantBilling(row: TTenantBillingRow): TTenantBilling {
+export function toTenantBilling(
+  row: TNullableRow<TTenantBilling>,
+): TTenantBilling {
   return {
     stripeCustomerId: row.stripeCustomerId ?? undefined,
     stripeSubscriptionId: row.stripeSubscriptionId ?? undefined,

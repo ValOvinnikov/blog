@@ -1,5 +1,5 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
+import type { TNullablePatch } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { getTenantBilling } from '@blog/db/queries/tenants/get-tenant-billing';
 import {
@@ -12,12 +12,7 @@ import { errorResult, okResult, type TResult } from '@blog/utils';
 import { isUndefined } from '@blog/utils/primitives';
 import { eq } from 'drizzle-orm';
 
-// A field left out keeps its stored value; `null` clears it.
-export type TSetTenantBillingInput = {
-  [K in keyof TTenantBilling]?: TMaybeNull<
-    Exclude<TTenantBilling[K], undefined>
-  >;
-};
+export type TSetTenantBillingInput = TNullablePatch<TTenantBilling>;
 
 export async function setTenantBilling(
   tenantId: string,
@@ -31,7 +26,16 @@ export async function setTenantBilling(
 
   const [row] = await getDb()
     .update(tenants)
-    .set(input)
+    .set({
+      stripeCustomerId: input.stripeCustomerId,
+      stripeSubscriptionId: input.stripeSubscriptionId,
+      stripePromotionCode: input.stripePromotionCode,
+      trialEndsAt: input.trialEndsAt,
+      downgradeGraceStartedAt: input.downgradeGraceStartedAt,
+      graceStartedEmailSentAt: input.graceStartedEmailSentAt,
+      graceHalfwayEmailSentAt: input.graceHalfwayEmailSentAt,
+      graceEndingEmailSentAt: input.graceEndingEmailSentAt,
+    })
     .where(eq(tenants.id, tenantId))
     .returning(tenantBillingColumns);
 

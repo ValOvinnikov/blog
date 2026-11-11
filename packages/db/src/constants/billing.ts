@@ -22,16 +22,18 @@ export type TStripePriceLookupKey = TValueOf<typeof STRIPE_PRICE_LOOKUP_KEY>;
 
 export type TSubscriberBandCeiling = (typeof SUBSCRIBER_BAND_CEILINGS)[number];
 
+export type TPaidSubscriberBandCeiling = Exclude<
+  TSubscriberBandCeiling,
+  (typeof SUBSCRIBER_BAND_CEILINGS)[0]
+>;
+
 export type TPlanPriceLookupKeys = {
   monthly: TStripePriceLookupKey;
   yearly: TStripePriceLookupKey;
-  subscriberBands: Partial<
-    Record<TSubscriberBandCeiling, TStripePriceLookupKey>
-  >;
+  subscriberBands?: Record<TPaidSubscriberBandCeiling, TStripePriceLookupKey>;
 };
 
-// Lookup keys, not Price ids: a key names the same Price in Stripe's test and
-// live modes, and moves to a new Price when an amount changes.
+// Stripe lookup keys, never Price ids: one key names the same Price in test and live mode.
 export const PLAN_PRICE_LOOKUP_KEYS: Record<
   TTenantPlan,
   TMaybeNull<TPlanPriceLookupKeys>
@@ -40,7 +42,6 @@ export const PLAN_PRICE_LOOKUP_KEYS: Record<
   [TENANT_PLAN.STARTER]: {
     monthly: STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
     yearly: STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY,
-    subscriberBands: {},
   },
   [TENANT_PLAN.GROWTH]: {
     monthly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
