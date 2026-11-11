@@ -10,6 +10,7 @@ import {
 } from '@blog/db/constants';
 import type { TNavItemStatusTone } from '@platform/components/features/layout/nav-item-content';
 import type { TStatusBadgeProps } from '@platform/components/shared/status-badge';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -29,60 +30,60 @@ import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email
 type TBadgeTone = NonNullable<TStatusBadgeProps['tone']>;
 
 const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
-  [TENANT_STATUS.ACTIVE]: 'ok',
-  [TENANT_STATUS.SUSPENDED]: 'warn',
-  [TENANT_STATUS.ARCHIVED]: 'neutral',
-  [TENANT_STATUS.TRIAL]: 'ok',
-  [TENANT_STATUS.PAST_DUE]: 'warn',
+  [TENANT_STATUS.ACTIVE]: BADGE_TONE.OK,
+  [TENANT_STATUS.SUSPENDED]: BADGE_TONE.WARN,
+  [TENANT_STATUS.ARCHIVED]: BADGE_TONE.NEUTRAL,
+  [TENANT_STATUS.TRIAL]: BADGE_TONE.OK,
+  [TENANT_STATUS.PAST_DUE]: BADGE_TONE.WARN,
 };
 
 const PROVISIONING_STEP_TONE: Record<
   TTenantProvisioningStepStatus,
   TBadgeTone
 > = {
-  [TENANT_PROVISIONING_STEP_STATUS.IDLE]: 'neutral',
-  [TENANT_PROVISIONING_STEP_STATUS.RUNNING]: 'warn',
-  [TENANT_PROVISIONING_STEP_STATUS.DONE]: 'ok',
-  [TENANT_PROVISIONING_STEP_STATUS.FAILED]: 'bad',
+  [TENANT_PROVISIONING_STEP_STATUS.IDLE]: BADGE_TONE.NEUTRAL,
+  [TENANT_PROVISIONING_STEP_STATUS.RUNNING]: BADGE_TONE.WARN,
+  [TENANT_PROVISIONING_STEP_STATUS.DONE]: BADGE_TONE.OK,
+  [TENANT_PROVISIONING_STEP_STATUS.FAILED]: BADGE_TONE.BAD,
 };
 
 const DOMAIN_VERIFICATION_TONE: Record<TDomainVerificationStatus, TBadgeTone> =
   {
-    [DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED]: 'neutral',
-    [DOMAIN_VERIFICATION_STATUS.NOT_ADDED]: 'neutral',
-    [DOMAIN_VERIFICATION_STATUS.PENDING]: 'warn',
-    [DOMAIN_VERIFICATION_STATUS.VERIFIED]: 'ok',
-    [DOMAIN_VERIFICATION_STATUS.ERROR]: 'warn',
+    [DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED]: BADGE_TONE.NEUTRAL,
+    [DOMAIN_VERIFICATION_STATUS.NOT_ADDED]: BADGE_TONE.NEUTRAL,
+    [DOMAIN_VERIFICATION_STATUS.PENDING]: BADGE_TONE.WARN,
+    [DOMAIN_VERIFICATION_STATUS.VERIFIED]: BADGE_TONE.OK,
+    [DOMAIN_VERIFICATION_STATUS.ERROR]: BADGE_TONE.WARN,
   };
 
 const CONTRAST_STATUS_TONE: Record<TContrastStatus, TBadgeTone> = {
-  [CONTRAST_STATUS.GREEN]: 'ok',
-  [CONTRAST_STATUS.FAILED]: 'bad',
-  [CONTRAST_STATUS.RUNNING]: 'brand',
-  [CONTRAST_STATUS.DUE]: 'warn',
-  [CONTRAST_STATUS.NONE]: 'neutral',
+  [CONTRAST_STATUS.GREEN]: BADGE_TONE.OK,
+  [CONTRAST_STATUS.FAILED]: BADGE_TONE.BAD,
+  [CONTRAST_STATUS.RUNNING]: BADGE_TONE.BRAND,
+  [CONTRAST_STATUS.DUE]: BADGE_TONE.WARN,
+  [CONTRAST_STATUS.NONE]: BADGE_TONE.NEUTRAL,
 };
 
 const RELEASE_RUN_STATUS_TONE: Record<TReleaseRunStatus, TBadgeTone> = {
-  [RELEASE_RUN_STATUS.DISPATCHED]: 'neutral',
-  [RELEASE_RUN_STATUS.RUNNING]: 'brand',
-  [RELEASE_RUN_STATUS.SUCCEEDED]: 'ok',
-  [RELEASE_RUN_STATUS.FAILED]: 'bad',
+  [RELEASE_RUN_STATUS.DISPATCHED]: BADGE_TONE.NEUTRAL,
+  [RELEASE_RUN_STATUS.RUNNING]: BADGE_TONE.BRAND,
+  [RELEASE_RUN_STATUS.SUCCEEDED]: BADGE_TONE.OK,
+  [RELEASE_RUN_STATUS.FAILED]: BADGE_TONE.BAD,
 };
 
 const OWNER_STUDIO_ACCESS_TONE: Record<
   TPendingOwnerStudioAccess,
   TNavItemStatusTone
 > = {
-  [OWNER_STUDIO_ACCESS.INVITE_SENT]: 'warn',
-  [OWNER_STUDIO_ACCESS.ACTIVATING]: 'brand',
-  [OWNER_STUDIO_ACCESS.STALLED]: 'bad',
+  [OWNER_STUDIO_ACCESS.INVITE_SENT]: BADGE_TONE.WARN,
+  [OWNER_STUDIO_ACCESS.ACTIVATING]: BADGE_TONE.BRAND,
+  [OWNER_STUDIO_ACCESS.STALLED]: BADGE_TONE.BAD,
 };
 
 const FINDING_SEVERITY_TONE: Record<TFindingSeverity, TBadgeTone> = {
-  [FINDING_SEVERITY.INFO]: 'neutral',
-  [FINDING_SEVERITY.WARNING]: 'warn',
-  [FINDING_SEVERITY.CRITICAL]: 'bad',
+  [FINDING_SEVERITY.INFO]: BADGE_TONE.NEUTRAL,
+  [FINDING_SEVERITY.WARNING]: BADGE_TONE.WARN,
+  [FINDING_SEVERITY.CRITICAL]: BADGE_TONE.BAD,
 };
 
 // The `sanity documents validate` CLI's own marker levels — distinct from
@@ -93,15 +94,15 @@ const SANITY_VALIDATION_MARKER_TONE: Record<
   TSanityValidationMarkerLevel,
   TBadgeTone
 > = {
-  error: 'bad',
-  warning: 'warn',
-  info: 'neutral',
+  error: BADGE_TONE.BAD,
+  warning: BADGE_TONE.WARN,
+  info: BADGE_TONE.NEUTRAL,
 };
 
 const FIELD_STATUS_TONE: Record<TEmailItemStatus, TBadgeTone> = {
-  default: 'neutral',
-  customised: 'plan',
-  unsaved: 'warn',
+  default: BADGE_TONE.NEUTRAL,
+  customised: BADGE_TONE.PLAN,
+  unsaved: BADGE_TONE.WARN,
 };
 
 export const tenantStatusTone = (status: TTenantStatus) =>

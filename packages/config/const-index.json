@@ -4692,6 +4692,60 @@
         "file": "apps/platform/src/constants/avatar.ts"
       }
     ],
+    "ok": [
+      {
+        "ref": "BADGE_TONE.OK",
+        "scope": "app:platform",
+        "from": "@platform/constants/badge-tone",
+        "file": "apps/platform/src/constants/badge-tone.ts"
+      }
+    ],
+    "warn": [
+      {
+        "ref": "BADGE_TONE.WARN",
+        "scope": "app:platform",
+        "from": "@platform/constants/badge-tone",
+        "file": "apps/platform/src/constants/badge-tone.ts"
+      }
+    ],
+    "bad": [
+      {
+        "ref": "BADGE_TONE.BAD",
+        "scope": "app:platform",
+        "from": "@platform/constants/badge-tone",
+        "file": "apps/platform/src/constants/badge-tone.ts"
+      }
+    ],
+    "neutral": [
+      {
+        "ref": "BADGE_TONE.NEUTRAL",
+        "scope": "app:platform",
+        "from": "@platform/constants/badge-tone",
+        "file": "apps/platform/src/constants/badge-tone.ts"
+      }
+    ],
+    "brand": [
+      {
+        "ref": "BADGE_TONE.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/badge-tone",
+        "file": "apps/platform/src/constants/badge-tone.ts"
+      },
+      {
+        "ref": "SAMPLE_PART.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "plan": [
+      {
+        "ref": "BADGE_TONE.PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/badge-tone",
+        "file": "apps/platform/src/constants/badge-tone.ts"
+      }
+    ],
     "GHOST": [
       {
         "ref": "BUTTON_VARIANT.GHOST",
@@ -6685,14 +6739,6 @@
     "footer": [
       {
         "ref": "SAMPLE_PART.FOOTER",
-        "scope": "app:platform",
-        "from": "@platform/constants/sample-part",
-        "file": "apps/platform/src/constants/sample-part.ts"
-      }
-    ],
-    "brand": [
-      {
-        "ref": "SAMPLE_PART.BRAND",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"

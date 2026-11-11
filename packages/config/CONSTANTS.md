@@ -357,6 +357,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **AVATAR_VARIANT**: `TABLE`, `ACCOUNT`, `SWITCHER`
 
+### `@platform/constants/badge-tone` — `apps/platform/src/constants/badge-tone.ts`
+
+- **BADGE_TONE**: `OK`=`"ok"`, `WARN`=`"warn"`, `BAD`=`"bad"`, `NEUTRAL`=`"neutral"`, `BRAND`=`"brand"`, `PLAN`=`"plan"`
+
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`
