@@ -22,8 +22,10 @@ import {
   callArgs,
   type TMockStructureNode,
 } from '@blog/studio/testing/structure/mock-structure-node';
+import { mockStructureSchema } from '@blog/studio/testing/structure/mock-structure-schema';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
-import { House, List } from 'lucide-react';
+import { House } from 'lucide-react';
 import { getDraftId } from 'sanity';
 
 import { buildSections, type TStructureSection } from './build-section';
@@ -41,34 +43,31 @@ const { EN, NL, DE } = LOCALE_ISO_CODES;
 const EVERY_LOCALE = Object.values(LOCALE_ISO_CODES);
 const LIVE_LOCALES = [NL, EN, DE];
 
-const mockSchema = () => ({
-  name: faker.string.alpha(12),
-  title: faker.lorem.words(2),
-  icon: List,
-});
-
 const mockSection = (
   overrides: Partial<TStructureSection> = {},
 ): TStructureSection => ({
   title: faker.lorem.word(),
   id: faker.string.alpha(10),
   icon: House,
-  groups: [{ items: [{ schema: mockSchema() }] }],
+  groups: [{ items: [{ schema: mockStructureSchema() }] }],
   ...overrides,
 });
 
-const MOCK_LIST_ITEM: TGroupItem = { schema: mockSchema() };
-const MOCK_OTHER_LIST_ITEM: TGroupItem = { schema: mockSchema() };
+const MOCK_LIST_ITEM: TGroupItem = { schema: mockStructureSchema() };
+const MOCK_OTHER_LIST_ITEM: TGroupItem = { schema: mockStructureSchema() };
 const MOCK_SINGLETON_ITEM: TGroupItem = {
-  schema: mockSchema(),
+  schema: mockStructureSchema(),
   mode: 'singleton',
 };
 const [MOCK_GROUP_TITLE, MOCK_OTHER_GROUP_TITLE] = [
   faker.lorem.words(2),
   faker.lorem.words(2),
 ];
-const MOCK_LANDING_SCHEMA = { ...mockSchema(), name: PAGE_LANDING_TYPE };
-const MOCK_HOME_SCHEMA = { ...mockSchema(), name: PAGE_HOME_TYPE };
+const MOCK_LANDING_SCHEMA = {
+  ...mockStructureSchema(),
+  name: PAGE_LANDING_TYPE,
+};
+const MOCK_HOME_SCHEMA = { ...mockStructureSchema(), name: PAGE_HOME_TYPE };
 
 const MOCK_EN_PAGE = mockLandingPage({
   _id: faker.string.uuid(),
@@ -494,10 +493,9 @@ describe(buildSections, () => {
       locale: TLocaleIsoCode,
     ) => {
       const entry = buildHomeEntry(dataset, locales);
-      const opener =
-        locales.length > 1
-          ? itemsOf(childOf(entry))[locales.indexOf(locale)]!
-          : entry;
+      const opener = hasArrayGotMultipleItems(locales)
+        ? itemsOf(childOf(entry))[locales.indexOf(locale)]!
+        : entry;
       const resolver = callArgs(
         opener,
         'child',
