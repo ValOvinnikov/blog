@@ -832,7 +832,7 @@
       "FLOATING": "Flotante"
     },
     "navLinkStyleLabel": "Enlaces de navegación",
-    "navLinkStyleDescription": "Cómo se ven los enlaces del menú principal. Los enlaces del pie de página no cambian.",
+    "navLinkStyleDescription": "Cómo marca el menú la página en la que estás y el enlace bajo el puntero. Los enlaces del pie de página no cambian.",
     "navLinkStyleGlyphWord": "Enlace",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Sencillo",

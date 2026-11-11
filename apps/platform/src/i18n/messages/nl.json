@@ -832,7 +832,7 @@
       "FLOATING": "Zwevend"
     },
     "navLinkStyleLabel": "Navigatielinks",
-    "navLinkStyleDescription": "Hoe de links in het hoofdmenu eruitzien. Links in de voettekst veranderen niet.",
+    "navLinkStyleDescription": "Hoe het menu de pagina waarop je bent en de link onder de aanwijzer markeert. Links in de voettekst veranderen niet.",
     "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Kaal",

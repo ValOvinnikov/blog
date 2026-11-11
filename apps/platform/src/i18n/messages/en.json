@@ -832,7 +832,7 @@
       "FLOATING": "Floating"
     },
     "navLinkStyleLabel": "Navigation links",
-    "navLinkStyleDescription": "How the top-level menu links look. Footer links are not affected.",
+    "navLinkStyleDescription": "How the menu marks the page you're on and the link under the pointer. Footer links are not affected.",
     "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Plain",
