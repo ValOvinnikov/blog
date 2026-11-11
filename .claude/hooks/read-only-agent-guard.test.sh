@@ -58,6 +58,15 @@ check 'git --git-dir=/tmp/x commit -m "x"' deny "git --git-dir=... commit"
 check 'git add .' deny "git add"
 check 'git switch main' deny "git switch"
 check 'git fetch origin' deny "git fetch"
+check 'git branch -m feat/1-x' deny "git branch -m"
+check 'git -C "a dir" branch -D old' deny 'git -C "a dir" branch -D'
+check 'git branch --delete old' deny "git branch --delete"
+check 'git branch' allow "git branch (listing)"
+check 'git branch --show-current' allow "git branch --show-current"
+check 'pnpm check:file-size --update' deny "pnpm check:file-size --update"
+check 'pnpm check:diff-hygiene' allow "pnpm check:diff-hygiene"
+check 'pnpm check:clones' allow "pnpm check:clones"
+check 'pnpm verify' allow "pnpm verify"
 check 'git pull' deny "git pull"
 
 # --- deny: other write-shaped prefixes from the allow-list mirror ---

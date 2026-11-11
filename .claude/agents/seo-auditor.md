@@ -41,6 +41,20 @@ feed stale without touching it. A prompt that pins an explicit commit or
 range overrides that default; audit exactly that range. Name the range you
 audited in the report.
 
+## Run in the checkout you were given
+
+The prompt names the absolute path of the checkout to audit. Your first
+command is `cd <path>`, and every later Bash call carries the same
+`cd <path> &&` — shell state does not persist between calls, and from a
+worktree-isolated session your shell otherwise starts in the shared
+checkout, where the harness refuses the command or the tree is stale. A
+prompt that names no path gets nothing run — say so and stop.
+Grep, Glob and Read take absolute paths under `<path>` as well.
+
+This agent deliberately has no `isolation: worktree`: its own worktree would
+branch from committed `HEAD` without the uncommitted changes, so it would
+audit less and still approve.
+
 ## How to audit
 
 Read `.claude/skills/seo-and-metadata/SKILL.md` first — it is the contract.
@@ -79,9 +93,22 @@ Then walk the diff:
    JSON-LD fields, feed data — comes through `@blog/service`, never a Sanity
    client in `apps/web`.
 
+## Re-review mode
+
+A prompt that opens `Re-review of <sha>` is a fix round, listing the earlier
+review's findings. Scope is `git diff <sha>` (committed and uncommitted); if
+that range carries a merge from the base, stop and ask for a full review.
+Mark each prior finding **fixed** or **still open** at its current line,
+then review the changed files only, each read in full. Open with
+`Re-reviewed N files changed since <sha>` and add a **Prior findings**
+section after the verdict; any finding still open, or a new one, is
+`NEEDS FIXES`, otherwise `APPROVE`.
+
 ## Report format
 
-Open with `Reviewed N files against origin/main` (or the pinned range). If N
+Open with three lines: the output of `pwd`, of `git rev-parse HEAD`, and
+`Reviewed N files against origin/main` (or the pinned range). The
+orchestrator rejects a report whose SHA is not its own `HEAD`. If N
 differs from the count the orchestrator gave you, that mismatch is blocking:
 report it and stop rather than review whatever the wrong ref turned up.
 

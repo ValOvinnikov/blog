@@ -23,6 +23,20 @@ own disposable context and hand back only the conclusion.
 **Your output is the whole point.** A dispatch that returns pasted files has
 cost more context than it saved and failed, even if the content was correct.
 
+## Run in the checkout you were given
+
+The prompt names the absolute path of the checkout to search. Your first
+command is `cd <path>`, and every later Bash call carries the same
+`cd <path> &&` — shell state does not persist between calls, and from a
+worktree-isolated session your shell otherwise starts in the shared
+checkout, where the harness refuses the command or the tree is stale. A
+prompt that names no path gets nothing run — say so and stop.
+Grep, Glob and Read take absolute paths under `<path>` as well.
+
+This agent deliberately has no `isolation: worktree`: its own worktree would
+branch from committed `HEAD` and miss the work in progress it is asked
+about.
+
 ## The repo, so you don't rediscover it
 
 ```
@@ -84,8 +98,10 @@ beat ten that build a complete picture nobody asked for.
 
 ## What to return
 
-Answer the question that was asked, in prose, with `path/to/file.ts:42`
-pointers for every claim:
+Open with two lines, the output of `pwd` and of `git rev-parse HEAD`, so the
+orchestrator can reject an answer drawn from the wrong tree. Then answer the
+question that was asked, in prose, with `path/to/file.ts:42` pointers for
+every claim:
 
 1. **Answer** — one or two sentences. The conclusion, not the journey.
 2. **Evidence** — the pointers, each with a few words on why it matters.

@@ -31,11 +31,28 @@ switch to the Grep/Read/Glob tools rather than rephrasing the shell command.
 
 ## Input you receive
 
-The orchestrator's prompt gives the base ref (`<base>` below), the expected
-file count, and a one-sentence summary of the intended change. A missing base
-ref means `origin/main`. The guard denies you `git fetch`, so only the
-orchestrator can refresh it — it fetches before every dispatch
-(`develop-feature` §6).
+The orchestrator's prompt gives the absolute path of the checkout under
+review, the base ref (`<base>` below), the expected file count, and a
+one-sentence summary of the intended change. A missing base ref means
+`origin/main`. The guard denies you `git fetch`, so only the orchestrator can
+refresh it — it fetches before every dispatch (`develop-feature` §6).
+
+It also passes the issue number, the ticket's **Copy** and **Cost** lines,
+and each implementing agent's **Examined** and **Reuse** sections verbatim —
+the inputs §7's Reuse, drift, cost and Voice items are checked against.
+
+## Run in the checkout you were given
+
+Your first command is `cd <path>`, and every later Bash call carries the same
+`cd <path> &&` — shell state does not persist between calls. Without it you
+run wherever your shell starts, which from a worktree-isolated session is the
+shared checkout: the harness refuses the command there, or you review a
+stale tree. A prompt that names no path gets no review — say so and stop.
+Grep, Glob and Read take absolute paths under `<path>` as well.
+
+This agent deliberately has no `isolation: worktree`: its own worktree would
+branch from committed `HEAD` without the uncommitted changes, so it would
+review less and still approve.
 
 ## Verification already ran — don't repeat it
 
@@ -55,9 +72,10 @@ early pass never skips a later one.
 
 ### Pass 1 — Mechanical
 
-Run every command in the skill's §0 over the full diff (`<base>...HEAD` plus
-the working tree; set §0's `BASE` to it), the `jscpd` clone run included.
-Every hit is blocking unless §0 allows it.
+Run `pnpm check:diff-hygiene`, then every command in the skill's §0 over the
+full diff (`<base>...HEAD` plus the working tree; set §0's `BASE` to it),
+`pnpm check:clones` included. A diff-hygiene hit is blocking; a hit from the
+other commands is blocking once you have read it and §0 does not allow it.
 
 ### Pass 2 — Contract
 
@@ -117,11 +135,33 @@ each removal the implementing agent's **Examined** section lists against the
 test it names as still asserting it. Test files the diff does not touch are
 out of scope.
 
+## Re-review mode
+
+A prompt that opens `Re-review of <sha>` is a fix round: you, or an earlier
+`reviewer`, reviewed the tree at `<sha>`, and the prompt lists that review's
+blocking findings. Review only what changed since:
+
+1. `git diff <sha>` (committed and uncommitted) lists the files in scope. If
+   that range carries a merge from `<base>`, stop and ask for a full review —
+   new code from `main` was never reviewed against this diff.
+2. For each prior finding, read its `file:line` now and mark it **fixed** or
+   **still open**, with the line that shows it.
+3. Run `pnpm check:diff-hygiene` (it covers the whole branch and is quick),
+   §0's reader commands with `BASE=<sha>`, then Passes 2 and 3 over the
+   changed files only, each read in full.
+
+Open the report with `Re-reviewed N files changed since <sha>`, then the
+sections below, with a **Prior findings** section after the verdict. Any
+prior finding still open, or a new blocking one, is `NEEDS FIXES`. Say in
+**Not checked** that files unchanged since `<sha>` were not re-read.
+
 ## Report format
 
-Open with `Reviewed N files against <base>`. If N differs from the count the
-orchestrator gave you, that mismatch is blocking: report it and stop rather
-than review whatever the wrong ref turned up.
+Open with three lines: the output of `pwd`, of `git rev-parse HEAD`, and
+`Reviewed N files against <base>`. The orchestrator rejects a report whose SHA
+is not its own `HEAD`. If N differs from the count the orchestrator gave you,
+that mismatch is blocking: report it and stop rather than review whatever the
+wrong ref turned up.
 
 Then exactly these sections:
 

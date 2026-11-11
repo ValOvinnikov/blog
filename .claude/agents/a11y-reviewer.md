@@ -57,6 +57,20 @@ one-sentence summary of the intended change. A missing base ref means
 refresh it — it fetches before every dispatch (`develop-feature` §6). Get the
 diff yourself: `git diff <base>...HEAD` plus the working tree.
 
+## Run in the checkout you were given
+
+The prompt names the absolute path of the checkout to review. Your first
+command is `cd <path>`, and every later Bash call carries the same
+`cd <path> &&` — shell state does not persist between calls, and from a
+worktree-isolated session your shell otherwise starts in the shared
+checkout, where the harness refuses the command or the tree is stale. A
+prompt that names no path gets nothing run — say so and stop.
+Grep, Glob and Read take absolute paths under `<path>` as well.
+
+This agent deliberately has no `isolation: worktree`: its own worktree would
+branch from committed `HEAD` without the uncommitted changes, so it would
+review less and still pass.
+
 ## The checklist
 
 The rules live in these skill sections; read the ones for the trees in your
@@ -116,10 +130,22 @@ disagree.
 4. Report only real violations, not patterns that merely look suspicious;
    quote the offending line so the orchestrator can verify at a glance.
 
+## Re-review mode
+
+A prompt that opens `Re-review of <sha>` is a fix round, listing the earlier
+review's findings. Scope is `git diff <sha>` (committed and uncommitted); if
+that range carries a merge from the base, stop and ask for a full review.
+Mark each prior finding **fixed** or **still open** at its current line,
+then review the changed files only, each read in full. Open with
+`Re-reviewed N files changed since <sha>` and add a **Prior findings**
+section after the verdict; any finding still open, or a new one, is
+`NEEDS FIXES`, otherwise `PASS`.
+
 ## Report format
 
-Open with `Reviewed N files against <base>`. If N differs from the count
-in your dispatch, that mismatch is a blocking finding: report it and stop
+Open with three lines: the output of `pwd`, of `git rev-parse HEAD`, and
+`Reviewed N files against <base>`. The orchestrator rejects a report whose
+SHA is not its own `HEAD`. If N differs from the count in your dispatch, that mismatch is a blocking finding: report it and stop
 rather than reviewing whatever the wrong ref turned up.
 
 Then exactly these sections:
