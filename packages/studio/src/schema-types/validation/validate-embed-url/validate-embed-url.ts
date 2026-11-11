@@ -8,4 +8,4 @@ export const validateEmbedUrl = (
 ): string | true =>
   !value || parseEmbedUrl(value)
     ? true
-    : `${toHost(value) ?? 'This link'} can't be embedded. Use a link from YouTube, Vimeo, Loom, Cal.com or Google Maps.`;
+    : `${toHost(value) || 'This link'} can't be embedded. Use a link from YouTube, Vimeo, Loom, Cal.com or Google Maps.`;

@@ -1176,38 +1176,6 @@
         "file": "packages/config/src/constants/embed.ts"
       }
     ],
-    "video": [
-      {
-        "ref": "EMBED_RATIO.VIDEO",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/embed.ts"
-      }
-    ],
-    "vertical": [
-      {
-        "ref": "EMBED_RATIO.VERTICAL",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/embed.ts"
-      }
-    ],
-    "classic": [
-      {
-        "ref": "EMBED_RATIO.CLASSIC",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/embed.ts"
-      }
-    ],
-    "portrait": [
-      {
-        "ref": "EMBED_RATIO.PORTRAIT",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/embed.ts"
-      }
-    ],
     "DB_NOT_FOUND": [
       {
         "ref": "ERROR_CODE.DB_NOT_FOUND",
@@ -2820,6 +2788,38 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
+      }
+    ],
+    "video": [
+      {
+        "ref": "MEDIA_RATIO.VIDEO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "vertical": [
+      {
+        "ref": "MEDIA_RATIO.VERTICAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "classic": [
+      {
+        "ref": "MEDIA_RATIO.CLASSIC",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "portrait": [
+      {
+        "ref": "MEDIA_RATIO.PORTRAIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
       }
     ],
     "CORE": [

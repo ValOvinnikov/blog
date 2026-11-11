@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 
-import { EMBED_PROVIDER, EMBED_RATIO } from '@blog/config/constants';
+import { EMBED_PROVIDER, MEDIA_RATIO } from '@blog/config/constants';
 
 import { parseEmbedUrl } from './parse-embed-url';
 
@@ -17,7 +17,7 @@ const MOCK_YOUTUBE_EMBED = `https://www.youtube-nocookie.com/embed/${MOCK_YOUTUB
 const youtubeVideo = (embedUrl: string) => ({
   provider: EMBED_PROVIDER.YOUTUBE,
   embedUrl,
-  ratio: EMBED_RATIO.VIDEO,
+  ratio: MEDIA_RATIO.VIDEO,
 });
 
 describe('parseEmbedUrl', () => {
@@ -51,7 +51,7 @@ describe('parseEmbedUrl', () => {
     ).toEqual({
       provider: EMBED_PROVIDER.YOUTUBE,
       embedUrl: MOCK_YOUTUBE_EMBED,
-      ratio: EMBED_RATIO.VERTICAL,
+      ratio: MEDIA_RATIO.VERTICAL,
     });
   });
 
@@ -59,7 +59,7 @@ describe('parseEmbedUrl', () => {
     expect(parseEmbedUrl(`https://vimeo.com/${MOCK_VIMEO_ID}`)).toEqual({
       provider: EMBED_PROVIDER.VIMEO,
       embedUrl: `https://player.vimeo.com/video/${MOCK_VIMEO_ID}`,
-      ratio: EMBED_RATIO.VIDEO,
+      ratio: MEDIA_RATIO.VIDEO,
     });
   });
 
@@ -68,7 +68,7 @@ describe('parseEmbedUrl', () => {
       {
         provider: EMBED_PROVIDER.LOOM,
         embedUrl: `https://www.loom.com/embed/${MOCK_LOOM_ID}`,
-        ratio: EMBED_RATIO.VIDEO,
+        ratio: MEDIA_RATIO.VIDEO,
       },
     );
   });
@@ -81,7 +81,7 @@ describe('parseEmbedUrl', () => {
     ).toEqual({
       provider: EMBED_PROVIDER.CAL,
       embedUrl: `https://cal.com/${MOCK_CAL_USER}/${MOCK_CAL_EVENT}?embed=true`,
-      ratio: EMBED_RATIO.PORTRAIT,
+      ratio: MEDIA_RATIO.PORTRAIT,
     });
   });
 
@@ -91,7 +91,7 @@ describe('parseEmbedUrl', () => {
     expect(parseEmbedUrl(embedUrl)).toEqual({
       provider: EMBED_PROVIDER.GOOGLE_MAPS,
       embedUrl,
-      ratio: EMBED_RATIO.CLASSIC,
+      ratio: MEDIA_RATIO.CLASSIC,
     });
   });
 
@@ -106,6 +106,10 @@ describe('parseEmbedUrl', () => {
     'https://cal.com/',
     'https://www.google.com/maps/place/London',
     `https://maps.app.goo.gl/${MOCK_MAPS_PB}`,
+    `https://youtube.com.evil.com/watch?v=${MOCK_YOUTUBE_ID}`,
+    `https://evil.com/youtube.com/watch?v=${MOCK_YOUTUBE_ID}`,
+    `https://youtube.com@evil.com/watch?v=${MOCK_YOUTUBE_ID}`,
+    'javascript:alert(1)',
   ])('rejects %s', (url) => {
     expect(parseEmbedUrl(url)).toBeUndefined();
   });

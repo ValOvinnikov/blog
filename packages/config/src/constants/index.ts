@@ -38,6 +38,7 @@ export * from './layout';
 export * from './legal-page-kind';
 export * from './link';
 export * from './magic-link-refusal';
+export * from './media-ratio';
 export * from './module';
 export * from './module-pack';
 export * from './nav-link-style';

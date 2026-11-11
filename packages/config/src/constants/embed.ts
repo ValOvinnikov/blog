@@ -9,13 +9,3 @@ export const EMBED_PROVIDER = {
 } as const;
 
 export type TEmbedProvider = TValueOf<typeof EMBED_PROVIDER>;
-
-// Lowercase because the values are MediaFrame's ratio variant names.
-export const EMBED_RATIO = {
-  VIDEO: 'video',
-  VERTICAL: 'vertical',
-  CLASSIC: 'classic',
-  PORTRAIT: 'portrait',
-} as const;
-
-export type TEmbedRatio = TValueOf<typeof EMBED_RATIO>;

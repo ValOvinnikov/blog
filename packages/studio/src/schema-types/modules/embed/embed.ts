@@ -2,7 +2,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
-import { embedSchema as embedObjectSchema } from '@blog/studio/schema-types/objects/embed/embed';
+import { embedObjectSchema } from '@blog/studio/schema-types/objects/embed/embed';
 import { layoutField } from '@blog/studio/schema-types/objects/layout/layout-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
@@ -38,7 +38,15 @@ export const embedSchema = defineType({
       brandVariant: 'brandVariant',
       embedTitle: 'embed.title',
     },
-    prepare({ title, brandVariant, embedTitle }) {
+    prepare({
+      title,
+      brandVariant,
+      embedTitle,
+    }: {
+      title?: string;
+      brandVariant?: string;
+      embedTitle?: unknown;
+    }) {
       return {
         title: title ?? 'Unknown',
         subtitle: moduleSubtitle(

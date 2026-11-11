@@ -10,7 +10,7 @@ import {
   ctaSecondaryButtonSchema,
 } from './cta-button/cta-button';
 import { ctaLayoutSchema } from './cta-layout/cta-layout';
-import { embedSchema } from './embed/embed';
+import { embedObjectSchema } from './embed/embed';
 import { expandableSectionSchema } from './expandable-section/expandable-section';
 import { featureHighlightSchema } from './feature-highlight/feature-highlight';
 import { footerLinkGroupSchema } from './footer-link-group/footer-link-group';
@@ -71,5 +71,5 @@ export const objects = [
   pricingFeatureSchema,
   pricingTierSchema,
   newsletterTrustCueSchema,
-  embedSchema,
+  embedObjectSchema,
 ];

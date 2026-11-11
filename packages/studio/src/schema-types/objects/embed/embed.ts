@@ -5,7 +5,7 @@ import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validat
 import { SquarePlay } from 'lucide-react';
 import { defineType } from 'sanity';
 
-export const embedSchema = defineType({
+export const embedObjectSchema = defineType({
   name: 'embed',
   title: 'Embed',
   type: 'object',

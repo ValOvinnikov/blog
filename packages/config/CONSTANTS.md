@@ -89,7 +89,6 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/embed.ts`
 
 - **EMBED_PROVIDER**: `YOUTUBE`, `VIMEO`, `LOOM`, `CAL`, `GOOGLE_MAPS`
-- **EMBED_RATIO**: `VIDEO`=`"video"`, `VERTICAL`=`"vertical"`, `CLASSIC`=`"classic"`, `PORTRAIT`=`"portrait"`
 
 ### `@blog/config/constants` — `packages/config/src/constants/error.ts`
 
@@ -171,6 +170,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **MAGIC_LINK_REFUSAL**: `BLOCKED`, `NETWORK_LIMIT`, `ADDRESS_LIMIT`, `CHECK_FAILED`
 - **MAGIC_LINK_SIGN_IN_CODE**: `SEND_LIMITED`
+
+### `@blog/config/constants` — `packages/config/src/constants/media-ratio.ts`
+
+- **MEDIA_RATIO**: `VIDEO`=`"video"`, `VERTICAL`=`"vertical"`, `CLASSIC`=`"classic"`, `PORTRAIT`=`"portrait"`
 
 ### `@blog/config/constants` — `packages/config/src/constants/module-pack.ts`
 

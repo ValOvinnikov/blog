@@ -1,7 +1,9 @@
-import type { TMaybeUndefined, TParsedEmbed } from '@blog/config/types';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { hasLength } from '@blog/utils/primitives';
 
-import { EMBED_PROVIDER, EMBED_RATIO } from '@blog/config/constants';
+import { EMBED_PROVIDER, MEDIA_RATIO } from '@blog/config/constants';
+
+import type { TEmbedParser } from './embed-parser';
 
 const YOUTUBE_EMBED_ORIGIN = 'https://www.youtube-nocookie.com/embed/';
 const YOUTUBE_ID = /^[\w-]{11}$/;
@@ -45,11 +47,7 @@ const toYoutubeVideo = (
   return first === 'shorts' ? { id: second, isShort: true } : undefined;
 };
 
-export const parseYoutubeEmbed = (
-  host: string,
-  url: URL,
-  segments: string[],
-): TMaybeUndefined<TParsedEmbed> => {
+export const parseYoutubeEmbed: TEmbedParser = (host, url, segments) => {
   const video = toYoutubeVideo(host, url, segments);
 
   if (!video?.id || !YOUTUBE_ID.test(video.id)) {
@@ -66,6 +64,6 @@ export const parseYoutubeEmbed = (
   return {
     provider: EMBED_PROVIDER.YOUTUBE,
     embedUrl: embedUrl.href,
-    ratio: video.isShort ? EMBED_RATIO.VERTICAL : EMBED_RATIO.VIDEO,
+    ratio: video.isShort ? MEDIA_RATIO.VERTICAL : MEDIA_RATIO.VIDEO,
   };
 };
