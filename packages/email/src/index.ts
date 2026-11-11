@@ -66,9 +66,6 @@ export {
   type TContactNotificationEmailContent,
   type TTenantEmailIdentity,
 } from './templates/tenant';
-export {
-  sendEmail,
-  type TEmailTag,
-  type TSendEmailInput,
-} from './transport/send-email';
+export { buildSiteEmailTag, SITE_EMAIL_TAG_NAME, type TEmailTag } from './tags';
+export { sendEmail, type TSendEmailInput } from './transport/send-email';
 export { isValidEmailAddress } from './validation';

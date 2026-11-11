@@ -12,7 +12,7 @@ export {
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
 } from './newsletter-confirmation/newsletter-confirmation';
-export { LIST_UNSUBSCRIBE_ONE_CLICK } from './list-unsubscribe-headers/list-unsubscribe-headers';
+export { LIST_UNSUBSCRIBE_ONE_CLICK } from './unsubscribe/unsubscribe';
 export {
   buildPostEmail,
   type TPostEmailInput,

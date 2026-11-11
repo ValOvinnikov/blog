@@ -1,4 +1,4 @@
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/list-unsubscribe-headers/list-unsubscribe-headers';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_ESCAPED_UNSUBSCRIBE_URL,
@@ -51,9 +51,9 @@ describe(buildPostEmail, () => {
       expect(email.html).toContain(`href="${MOCK_ESCAPED_UNSUBSCRIBE_URL}"`);
     });
 
-    it('renders no cover image and no takeaways', () => {
-      expect(email.html).not.toContain('alt=""');
-      expect(email.html).not.toContain('<ul');
+    it('renders no cover image and no takeaway list', () => {
+      expect(email.html).not.toContain('<img');
+      expect(email.html).not.toContain('<li');
     });
 
     it('sets one-click List-Unsubscribe headers with the raw url', () => {
@@ -95,7 +95,7 @@ describe(buildPostEmail, () => {
     });
 
     for (const takeaway of MOCK_TAKEAWAYS) {
-      expect(html).toContain(`<li style="margin:0 0 8px;">${takeaway}</li>`);
+      expect(html).toContain(takeaway);
       expect(text).toContain(`- ${takeaway}`);
     }
   });

@@ -7,7 +7,10 @@ import {
   serializePortableText,
   type TPortableTextContent,
 } from '@blog/email/portable-text';
-import { buildListUnsubscribeHeaders } from '@blog/email/templates/tenant/list-unsubscribe-headers/list-unsubscribe-headers';
+import {
+  buildListUnsubscribeHeaders,
+  buildUnsubscribeAction,
+} from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 
 export type TNewsletterConfirmationEmailInput = {
   subject: string;
@@ -47,10 +50,7 @@ export function buildNewsletterConfirmationEmail({
       },
       brand,
     ),
-    renderEmailAction(
-      { label: 'Unsubscribe', url: unsubscribeUrl, variant: 'link' },
-      brand,
-    ),
+    renderEmailAction(buildUnsubscribeAction(unsubscribeUrl), brand),
   ].join('');
 
   return {

@@ -1,6 +1,6 @@
 import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
 import type { TPortableTextContent } from '@blog/email/portable-text';
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/list-unsubscribe-headers/list-unsubscribe-headers';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_ESCAPED_UNSUBSCRIBE_URL,
   MOCK_LOGO_URL,

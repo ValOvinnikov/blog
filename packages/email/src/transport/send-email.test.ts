@@ -1,4 +1,5 @@
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/list-unsubscribe-headers/list-unsubscribe-headers';
+import { buildSiteEmailTag } from '@blog/email/tags';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_BODY_HTML,
   MOCK_EMAIL_ADDRESS,
@@ -100,7 +101,7 @@ describe(sendEmail, () => {
     ],
     ['the plain-text alternative', { text: faker.lorem.sentence() }],
     ['a replyTo address', { replyTo: MOCK_EMAIL_ADDRESS }],
-    ['tags', { tags: [{ name: 'site', value: MOCK_TENANT_ID }] }],
+    ['tags', { tags: [buildSiteEmailTag(MOCK_TENANT_ID)] }],
   ])('forwards %s to the Resend client', async (_name, extra) => {
     await send({ ...MOCK_EMAIL, ...extra });
 

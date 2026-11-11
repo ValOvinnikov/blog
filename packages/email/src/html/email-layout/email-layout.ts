@@ -1,3 +1,8 @@
+import {
+  FONT_STACK,
+  SHELL_PADDING_PX,
+  SHELL_WIDTH_PX,
+} from '@blog/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeImageUrl } from '@blog/email/html/sanitize-image-url/sanitize-image-url';
 import { hasLength } from '@blog/utils/primitives';
@@ -35,9 +40,6 @@ export type TRenderEmailShellInput = {
 
 const CELL_ROW_END = '</td></tr>';
 
-export const FONT_STACK =
-  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
-
 // Every rule is an inline style or table attribute: many mail clients strip `<style>` and ignore flexbox/grid.
 export function renderEmailShell({
   palette,
@@ -67,9 +69,9 @@ export function renderEmailShell({
     preheader,
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${palette.surface2};">`,
     '<tr><td align="center" style="padding:32px 16px;">',
-    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${palette.surface};border:1px solid ${palette.border};border-radius:8px;">`,
+    `<table role="presentation" width="${SHELL_WIDTH_PX}" cellpadding="0" cellspacing="0" style="max-width:${SHELL_WIDTH_PX}px;width:100%;background-color:${palette.surface};border:1px solid ${palette.border};border-radius:8px;">`,
     identity ? buildHeader(palette, identity) : '',
-    `<tr><td style="padding:32px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
+    `<tr><td style="padding:${SHELL_PADDING_PX}px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
     bodyHtml,
     CELL_ROW_END,
     lockedHtml

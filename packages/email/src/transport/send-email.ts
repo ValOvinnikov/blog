@@ -1,15 +1,11 @@
 import 'server-only';
 
+import type { TEmailTag } from '@blog/email/tags';
 import { env } from '@blog/email/utils/env/env';
 import { isUndefined } from '@blog/utils/primitives';
 import { Resend } from 'resend';
 
 import { isValidEmailAddress } from '@blog/email/validation';
-
-export type TEmailTag = {
-  name: string;
-  value: string;
-};
 
 export type TSendEmailInput = {
   to: string;

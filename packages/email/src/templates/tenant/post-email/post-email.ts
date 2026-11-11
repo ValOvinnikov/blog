@@ -2,7 +2,10 @@ import {
   renderEmailAction,
   type TEmailAction,
 } from '@blog/email/html/email-action/email-action';
-import { FONT_STACK } from '@blog/email/html/email-layout/email-layout';
+import {
+  FONT_STACK,
+  SHELL_CONTENT_WIDTH_PX,
+} from '@blog/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeImageUrl } from '@blog/email/html/sanitize-image-url/sanitize-image-url';
 import {
@@ -10,7 +13,10 @@ import {
   type TTenantEmailBrand,
 } from '@blog/email/html/tenant-shell/tenant-shell';
 import { buildPlainTextBody } from '@blog/email/plain-text/plain-text-body';
-import { buildListUnsubscribeHeaders } from '@blog/email/templates/tenant/list-unsubscribe-headers/list-unsubscribe-headers';
+import {
+  buildListUnsubscribeHeaders,
+  buildUnsubscribeAction,
+} from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import { hasLength } from '@blog/utils/primitives';
 
 export type TPostEmailInput = {
@@ -38,8 +44,8 @@ function renderCoverImage(coverImageUrl?: string): string {
   const safeUrl = coverImageUrl ? sanitizeImageUrl(coverImageUrl) : null;
   if (!safeUrl) return '';
 
-  // Outlook ignores max-width on images, so the width attribute holds the 536px content column.
-  return `<img src="${escapeHtml(safeUrl)}" width="536" alt="" style="display:block;width:100%;max-width:536px;height:auto;margin:0 0 24px;border:0;border-radius:6px;" />`;
+  // Outlook ignores max-width on images, so the width attribute holds the content column.
+  return `<img src="${escapeHtml(safeUrl)}" width="${SHELL_CONTENT_WIDTH_PX}" alt="" style="display:block;width:100%;max-width:${SHELL_CONTENT_WIDTH_PX}px;height:auto;margin:0 0 24px;border:0;border-radius:6px;" />`;
 }
 
 function renderTakeaways(
@@ -75,11 +81,7 @@ export function buildPostEmail({
     url: postUrl,
     variant: 'button',
   };
-  const unsubscribeAction: TEmailAction = {
-    label: 'Unsubscribe',
-    url: unsubscribeUrl,
-    variant: 'link',
-  };
+  const unsubscribeAction = buildUnsubscribeAction(unsubscribeUrl);
   const footerLine = `You are receiving this because you subscribed to ${brandName}.`;
 
   const bodyHtml = [
