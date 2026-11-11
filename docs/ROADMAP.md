@@ -119,9 +119,19 @@ decision, not a second source.
 
 Growth includes 1,000 confirmed subscribers. Above that it adds, per month:
 $12 to 2,500, $25 to 5,000, $50 to 10,000 and $110 to 25,000; beyond that the
-owner talks to us. Only confirmed subscribers count. A site that passes its
-band gets an email and a grace period and moves up at its next billing date.
-Each band includes about six sends per subscriber a month.
+owner talks to us. Only confirmed subscribers count. Each band includes about
+six sends per subscriber a month.
+
+A site has two limits, its subscribers and its sends in a month. At 80% of
+either the owner is emailed and the Subscribers page offers two choices: move
+to the next band, or do nothing. A band changes only on the owner's click,
+when Stripe charges the difference for the rest of the current period, a month
+or a year. Without a click, sending pauses at the limit: posts still publish,
+readers can still subscribe, and a skipped post is never sent later by itself.
+A bill is never raised without a click. Moving down a band happens at renewal.
+
+The trial belongs to the site, with no per-account limit; a person holds one
+Free or trial site at a time (#6874).
 
 - **Currencies:** dollars, euros and pounds ($19, €19, £16; $6, €6, £5).
   Regional discounts come after launch as Stripe coupons, never as a second
