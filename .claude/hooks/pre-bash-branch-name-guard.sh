@@ -44,7 +44,10 @@ process.stdin.on("end", async () => {
   };
 
   const destinations = [];
-  for (const segment of command.split(/&&|\|\||[;&|\n]/)) {
+  const unredirected = command
+    .replace(/\d*[<>]+&\d+/g, " ")
+    .replace(/\d*[<>]+\s*[^\s;&|]+/g, " ");
+  for (const segment of unredirected.split(/&&|\|\||[;&|\n]/)) {
     const words = segment.trim().split(/\s+/).filter(Boolean);
     let i = 0;
     if (words[i] === "env") i += 1;

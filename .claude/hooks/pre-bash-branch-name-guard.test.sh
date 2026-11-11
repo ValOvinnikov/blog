@@ -37,6 +37,7 @@ on_branch claude/optimistic-noether-isuljn
 block 'git push'
 block 'git push -u origin HEAD'
 block 'git push -u origin claude/optimistic-noether-isuljn'
+block 'git push -u origin HEAD 2>&1 | tail -15'
 block 'git fetch origin && git push origin HEAD'
 block "git -C $repo push"
 block 'GIT_SSH_COMMAND=x git push'
@@ -68,6 +69,9 @@ allow 'git push -o skip-ci origin'
 allow 'GIT_SSH_COMMAND=x git push'
 allow 'git push -u origin HEAD'
 block 'git push origin HEAD:claude/eager-wozniak-gsbpiz'
+allow 'git push -u origin HEAD 2>&1 | tail -15'
+allow 'git push origin HEAD > push.log 2>&1'
+allow 'git push origin HEAD 2> /dev/null'
 
 on_branch tooling/branch-name-push-guard
 block 'git push -u origin HEAD'
