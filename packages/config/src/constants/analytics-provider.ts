@@ -6,3 +6,5 @@ export const ANALYTICS_PROVIDER = {
 } as const;
 
 export type TAnalyticsProvider = TValueOf<typeof ANALYTICS_PROVIDER>;
+
+export const GOOGLE_ANALYTICS_ID_PATTERN = /^G-[A-Z0-9]+$/;

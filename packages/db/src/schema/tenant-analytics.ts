@@ -12,5 +12,3 @@ export const tenantAnalytics = pgTable('tenant_analytics', {
   analyticsId: text('analytics_id').notNull(),
   ...timestampColumns,
 });
-
-export type TTenantAnalyticsRow = typeof tenantAnalytics.$inferSelect;
