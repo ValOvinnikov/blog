@@ -37,6 +37,7 @@ import {
 } from '@blog/db/constants';
 import {
   buildSiteEmailTag,
+  EMAIL_ACCOUNT,
   escapeHtml,
   PLATFORM_EMAIL_BRAND_NAME,
   type TSendEmailInput,
@@ -81,6 +82,11 @@ const DEFAULT_ENVELOPE = {
   to: MOCK_READER_EMAIL,
   from: MOCK_FROM_ADDRESS,
   subject: MAGIC_LINK_DEFAULTS.subject,
+};
+const SITE_ENVELOPE = { ...DEFAULT_ENVELOPE, account: EMAIL_ACCOUNT.TENANT };
+const PLATFORM_ENVELOPE = {
+  ...DEFAULT_ENVELOPE,
+  account: EMAIL_ACCOUNT.PLATFORM,
 };
 
 const mockAuthoredBlock = (
@@ -286,7 +292,7 @@ describe(buildMagicLinkProvider, () => {
 
     it('delivers the sign-in link from the configured address', () => {
       const { html, ...envelope } = sentEmail();
-      expect(envelope).toEqual(DEFAULT_ENVELOPE);
+      expect(envelope).toEqual(SITE_ENVELOPE);
       expect(html).toContain(SITE_LINK_HREF);
     });
 
@@ -367,7 +373,7 @@ describe(buildMagicLinkProvider, () => {
     await sendVerificationRequestFor(buildPlatformProvider());
 
     const { html, ...envelope } = sentEmail();
-    expect(envelope).toEqual(DEFAULT_ENVELOPE);
+    expect(envelope).toEqual(PLATFORM_ENVELOPE);
     expect(html).toContain(SITE_LINK_HREF);
   });
 
@@ -407,7 +413,7 @@ describe(buildMagicLinkProvider, () => {
       await sendVerificationRequestFor(provider);
 
       const { html, ...envelope } = sentEmail();
-      expect(envelope).toEqual(DEFAULT_ENVELOPE);
+      expect(envelope).toEqual(SITE_ENVELOPE);
       expect(html).not.toContain(COPYRIGHT_MARK);
     },
   );
@@ -474,6 +480,23 @@ describe(buildMagicLinkProvider, () => {
         sendVerificationRequestFor(provider),
       ).resolves.toBeUndefined();
     });
+
+    it.each([
+      ['a site', EMAIL_ACCOUNT.TENANT, () => provider, SITE_CALLBACK_URL],
+      [
+        'a platform',
+        EMAIL_ACCOUNT.PLATFORM,
+        buildPlatformProvider,
+        PLATFORM_CALLBACK_URL,
+      ],
+    ])(
+      'sends %s sign-in through the %s account',
+      async (_, account, buildProvider, url) => {
+        await sendVerificationRequestFor(buildProvider(), { url });
+
+        expect(sentEmail().account).toBe(account);
+      },
+    );
 
     it('neither tags nor counts a platform sign-in', async () => {
       await sendVerificationRequestFor(buildPlatformProvider(), {

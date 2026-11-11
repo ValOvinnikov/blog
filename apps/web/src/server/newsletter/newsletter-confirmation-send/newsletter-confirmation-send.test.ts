@@ -8,6 +8,7 @@ import {
 } from '@blog/config';
 import {
   buildSiteEmailTag,
+  EMAIL_ACCOUNT,
   escapeHtml,
   LIST_UNSUBSCRIBE_ONE_CLICK,
 } from '@blog/email';
@@ -112,8 +113,9 @@ describe(sendNewsletterConfirmation, () => {
     });
 
     it('emails the subscriber a confirm link and their own unsubscribe link', () => {
-      const { to, subject, replyTo, headers, html } = sentEmail();
-      expect({ to, subject, replyTo, headers }).toEqual({
+      const { account, to, subject, replyTo, headers, html } = sentEmail();
+      expect({ account, to, subject, replyTo, headers }).toEqual({
+        account: EMAIL_ACCOUNT.TENANT,
         to: MOCK_SUBSCRIBER.email,
         subject: MOCK_AUTHORED_SUBJECT,
         replyTo: MOCK_REPLY_TO,

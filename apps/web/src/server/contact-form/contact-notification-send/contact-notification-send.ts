@@ -1,5 +1,9 @@
 import { queries } from '@blog/db';
-import { buildContactNotificationEmail, sendEmail } from '@blog/email';
+import {
+  buildContactNotificationEmail,
+  EMAIL_ACCOUNT,
+  sendEmail,
+} from '@blog/email';
 import { resolveNewsletterFromAddress } from '@web/server/newsletter/newsletter-from-address/newsletter-from-address';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
 import { env } from '@web/utils/env/env';
@@ -48,6 +52,7 @@ export const sendContactNotification = async ({
   });
 
   await sendEmail({
+    account: EMAIL_ACCOUNT.TENANT,
     to: recipient,
     from: resolveNewsletterFromAddress(env.NEWSLETTER_FROM_ADDRESS),
     subject,

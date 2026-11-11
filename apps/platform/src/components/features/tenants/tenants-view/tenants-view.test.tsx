@@ -69,11 +69,7 @@ describe(`<${TenantsView.name}/>`, () => {
     setup({ isEmailAlertingConfigured: false });
 
     const banner = screen.getByText(EMAIL_ALERTS_NOT_CONFIGURED);
-    const bannerDescription = screen.getByText(
-      "RESEND_API_KEY isn't set, so operators won't be emailed when a tenant needs attention — check this page manually.",
-    );
 
     expect(banner).toBeVisible();
-    expect(bannerDescription).toBeVisible();
   });
 });

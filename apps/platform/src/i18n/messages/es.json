@@ -261,7 +261,7 @@
   },
   "emailAlertsBanner": {
     "title": "Alertas por correo electrónico sin configurar",
-    "description": "RESEND_API_KEY no está definida, por lo que los operadores no recibirán un correo cuando un cliente requiera atención: revise esta página manualmente."
+    "description": "RESEND_PLATFORM_API_KEY no está definida, por lo que los operadores no recibirán un correo cuando un cliente requiera atención: revise esta página manualmente."
   },
   "tenantsTable": {
     "empty": "Todavía no hay clientes.",

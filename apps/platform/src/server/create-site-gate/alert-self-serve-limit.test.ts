@@ -1,4 +1,4 @@
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -19,7 +19,8 @@ vi.mock('@blog/db', async () => ({
   queries: { admins: { listSuperadminEmails } },
 }));
 
-vi.mock('@blog/email', () => ({
+vi.mock('@blog/email', async (importOriginal) => ({
+  ...(await importOriginal()),
   buildSelfServeLimitAlertEmail: () => MOCK_ALERT_EMAIL,
   sendEmail: vi.fn(),
 }));
@@ -53,6 +54,10 @@ describe(alertSelfServeLimit, () => {
     await alertSelfServeLimit(MOCK_DAY, MOCK_DAILY_LIMIT);
 
     const sentEmails = vi.mocked(sendEmail).mock.calls.map(([input]) => input);
+    expect(sentEmails.map(({ account }) => account)).toEqual([
+      EMAIL_ACCOUNT.PLATFORM,
+      EMAIL_ACCOUNT.PLATFORM,
+    ]);
     expect(sentEmails.map(({ to }) => to)).toEqual([
       MOCK_OPERATOR_EMAIL,
       MOCK_SECOND_OPERATOR_EMAIL,

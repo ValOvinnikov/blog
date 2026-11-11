@@ -261,7 +261,7 @@
   },
   "emailAlertsBanner": {
     "title": "Alertes par e-mail non configurées",
-    "description": "RESEND_API_KEY n'est pas défini : les opérateurs ne recevront pas d'e-mail lorsqu'un locataire nécessite une intervention — consultez cette page manuellement."
+    "description": "RESEND_PLATFORM_API_KEY n'est pas défini : les opérateurs ne recevront pas d'e-mail lorsqu'un locataire nécessite une intervention — consultez cette page manuellement."
   },
   "tenantsTable": {
     "empty": "Aucun locataire pour le moment.",

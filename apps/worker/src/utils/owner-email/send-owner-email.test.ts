@@ -4,7 +4,7 @@ import {
   claimTenantOwnerEmail,
   releaseTenantOwnerEmail,
 } from '@blog/db/queries/tenants';
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import {
   DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
   OWNER_EMAIL_RELEASE_FAILED_EVENT,
@@ -72,6 +72,7 @@ describe(sendOwnerEmailOnce, () => {
     const emails = sentEmails();
     const [email] = emails;
     expect(emails).toHaveLength(1);
+    expect(email?.account).toBe(EMAIL_ACCOUNT.PLATFORM);
     expect(email?.to).toBe(MOCK_OWNER_EMAIL);
     expect(email?.from).toBe(DEFAULT_OWNER_EMAIL_FROM_ADDRESS);
   });

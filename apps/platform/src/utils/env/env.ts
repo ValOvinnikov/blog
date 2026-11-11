@@ -10,9 +10,6 @@ import { z } from 'zod';
 
 export const env = createEnv({
   server: {
-    // Read here only for the tenants list's "email alerts not configured" banner; `@blog/email` sends with its own copy.
-    // @env-required: development, production
-    RESEND_API_KEY: z.string().min(1).optional(),
     // Optional so a missing Blob store surfaces as an upload error, not an import-time crash.
     // @env-optional
     BLOB_READ_WRITE_TOKEN: z.string().min(1).optional(),
@@ -92,7 +89,6 @@ export const env = createEnv({
       .optional(),
   },
   runtimeEnv: {
-    RESEND_API_KEY: process.env.RESEND_API_KEY,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     WEB_APP_URL: process.env.WEB_APP_URL,
     PLATFORM_APP_BASE_URL: process.env.PLATFORM_APP_BASE_URL,

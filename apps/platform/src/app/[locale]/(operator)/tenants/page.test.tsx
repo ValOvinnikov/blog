@@ -1,4 +1,5 @@
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
+import { EMAIL_ACCOUNT, isEmailAccountConfigured } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -8,7 +9,6 @@ import {
   MOCK_TENANT_SLUG,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
-import { env } from '@platform/utils/env/env';
 import { DEFAULT_TENANTS_SORT } from '@platform/utils/tenants-list-query/tenants-list-query';
 
 import TenantsPage from './page';
@@ -24,11 +24,10 @@ vi.mock('@blog/db', async () => ({
   queries: { tenants: { listTenants: listTenantsMock } },
 }));
 
-vi.mock('@platform/utils/env/env');
-
-const envMock: Partial<Record<keyof typeof env, string>> = env;
-
-const MOCK_RESEND_API_KEY = `re_${faker.string.alphanumeric(24)}`;
+vi.mock('@blog/email', async (importOriginal) => ({
+  ...(await importOriginal()),
+  isEmailAccountConfigured: vi.fn(),
+}));
 
 const setup = customRenderAsync(TenantsPage, {
   searchParams: Promise.resolve({}),
@@ -37,7 +36,7 @@ const setup = customRenderAsync(TenantsPage, {
 describe(`<${TenantsPage.name}/>`, () => {
   beforeEach(() => {
     listTenantsMock.mockReset().mockResolvedValue([]);
-    envMock.RESEND_API_KEY = MOCK_RESEND_API_KEY;
+    vi.mocked(isEmailAccountConfigured).mockReturnValue(true);
   });
 
   it('lists the tenants it reads', async () => {
@@ -88,13 +87,17 @@ describe(`<${TenantsPage.name}/>`, () => {
   it('hides the email-alerts banner when Resend is configured', async () => {
     await setup();
 
+    expect(isEmailAccountConfigured).toHaveBeenCalledWith(
+      EMAIL_ACCOUNT.PLATFORM,
+    );
+
     const banner = screen.queryByText(messages.emailAlertsBanner.title);
 
     expect(banner).not.toBeInTheDocument();
   });
 
   it('shows the email-alerts banner when Resend is not configured', async () => {
-    envMock.RESEND_API_KEY = undefined;
+    vi.mocked(isEmailAccountConfigured).mockReturnValue(false);
 
     await setup();
 
