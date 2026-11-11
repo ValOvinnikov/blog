@@ -16,6 +16,9 @@ code:
   - packages/db/src/constants/email-template-defaults.ts
   - packages/config/src/constants/email-template.ts
   - packages/auth/src/providers/magic-link/**
+  - apps/web/src/app/api/email-delivery-events/**
+  - apps/web/src/server/email-usage/**
+  - apps/web/src/constants/email-usage.ts
   - apps/web/src/utils/resolve-tenant-email-identity/**
   - apps/web/src/utils/to-tenant-email-brand/**
   - apps/platform/src/components/features/email/**
@@ -37,13 +40,15 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 
 - Platform: **Email** page at `/dashboard/email` (owner) and `/tenants/<id>/email` (operator); the owner page is plan-gated, the operator page is reachable on every plan.
 - Senders: the Auth.js magic-link provider in `@blog/auth` (sign-in and invite), `apps/web` newsletter actions (confirmation), `apps/platform` `POST /api/internal/operator-alert` (operator alerts), `apps/worker`'s deprovisioning run (the archived Sanity project email) and the Email page's **Send test to me**.
+- Webhook: `POST /api/email-delivery-events` on `apps/web` receives Resend's delivered, bounced and complained events.
 - No Studio surface.
 
 ## Data
 
 - `email_config` (one row per tenant): `logo_asset_url`, `sender_name`, `reply_to_address`, `footer_postal_address`, `email_new_posts` (on by default; a tenant with no row reads it as on through `getEmailNewPosts`).
-- `email_send_counts` (tenant × UTC day × `EMAIL_TYPE`): `count`, one upsert per email sent through `queries.emailUsage.recordEmailSend`. `EMAIL_TYPE` (`@blog/config`): `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`. `countEmailSendsThisMonth` sums one type since the first of the UTC month.
-- `email_delivery_outcome_counts` (tenant × UTC day × `EMAIL_DELIVERY_OUTCOME`): `count`, one upsert per delivery event through `recordEmailDeliveryOutcome`. `EMAIL_DELIVERY_OUTCOME` (`@blog/db`): `DELIVERED`, `BOUNCED`, `COMPLAINED`. `getEmailReputation` reads the last 7 UTC days (`EMAIL_REPUTATION_WINDOW_DAYS`, today included): `resolvedCount` is delivered plus bounced, and the bounce and complaint rates are taken against it (0 when it is 0). Nothing writes these counts yet, and neither table holds platform-bucket mail.
+- `email_send_counts` (tenant × UTC day × `EMAIL_TYPE`): `count`, one upsert per email sent through `queries.emailUsage.recordEmailSend`. The reader sign-in (`@blog/auth`, a site's own host only) and the newsletter confirmation (`apps/web`) each record one after the send succeeds. `EMAIL_TYPE` (`@blog/config`): `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`. `countEmailSendsThisMonth` sums one type since the first of the UTC month.
+- `email_delivery_outcome_counts` (tenant × UTC day × `EMAIL_DELIVERY_OUTCOME`): `count`, one upsert per new delivery event through `recordEmailDeliveryOutcome(eventId, tenantId, outcome)`.
+- `email_delivery_events` (one row per Resend event id): `tenant_id`, `received_at`. `recordEmailDeliveryOutcome` stores the id and adds to the count in one statement, and does neither when the id is already stored, so a retried event is counted once; it returns whether it counted, or `DB_NOT_FOUND` for a tenant that does not exist. `EMAIL_DELIVERY_OUTCOME` (`@blog/db`): `DELIVERED`, `BOUNCED`, `COMPLAINED`. `getEmailReputation` reads the last 7 UTC days (`EMAIL_REPUTATION_WINDOW_DAYS`, today included): `resolvedCount` is delivered plus bounced, and the bounce and complaint rates are taken against it (0 when it is 0). Neither count table holds platform-bucket mail (operator and tenant-admin sign-ins, invites, alerts).
 - `email_templates` (tenant × template type × language): `subject`, `body` (Portable Text in `jsonb`), both nullable.
 - `email_template_logos` (tenant × template type): per-template logo override, the same in every language.
 - `EMAIL_TEMPLATE_TYPE`: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`. Product default copy per language is `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE` in `@blog/db`.
@@ -70,6 +75,8 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 - The newsletter confirmation and the post email carry `List-Unsubscribe` and one-click `List-Unsubscribe-Post` headers (`buildListUnsubscribeHeaders`; an unsubscribe URL that is not `https`, which RFC 8058 one-click requires, sends neither header) and the same Unsubscribe link (`buildUnsubscribeAction`); the confirmation's links carry the subscriber's language.
 - The post email's title, excerpt and takeaways are escaped and shown as text; a cover image URL that is not `http(s)` is dropped. Its subject and URLs come resolved from the caller.
 - Owner, inactivity and post templates return a plain-text alternative beside the HTML — the same paragraphs, then the action as `label: url` — which `sendEmail` forwards as `text`.
+- **Counting never costs a send** — a send count is written after the send, and a failed count never fails the sign-in or the confirmation. `@blog/auth`, which never logs, hands a failed sign-in count to the app's `onSendCountFailed` handler (beside `onSendRefused` in the handlers `buildAuthConfig` takes); `apps/web` logs it, and its own failed confirmation count, as `email_usage.send_count_failed`.
+- **Delivery webhook** — the route verifies Resend's signature (`svix-id`, `svix-timestamp`, `svix-signature`, checked with `standardwebhooks` against `RESEND_WEBHOOK_SECRET`) before reading anything; an invalid one is refused with 401 and logged, and writes nothing. A verified delivered, bounced or complained event is counted against the site in its `site` tag, keyed by the `svix-id` event id. An event with no site tag (platform mail) is acknowledged with 200, unrecorded and unlogged; a site tag that is not a site id is acknowledged with 200 and warned once as `email_usage.webhook_site_tag_invalid`; an event of an expected type in an unexpected shape is acknowledged and warned once (`email_usage.webhook_event_malformed`); an event naming a site this database does not hold (a deleted one) is acknowledged and warned once (`email_usage.webhook_site_unknown`) — `recordEmailDeliveryOutcome` returns `DB_NOT_FOUND` on the foreign-key violation; any other event type is acknowledged and ignored; any other failed write answers 500 so Resend retries. Without the secret the route answers 500.
 - `sendEmail` forwards `tags` so a delivery event can be traced to the site that sent it; `buildSiteEmailTag(siteId)` builds the site tag under `SITE_EMAIL_TAG_NAME`. Callers must pass names and values of ASCII letters, digits, `_` and `-`, at most 256 characters; Resend rejects anything else, so `sendEmail` throws. It strips line breaks from the subject, throws on a malformed reply-to and on any Resend error; a missing `RESEND_API_KEY` throws at send time, not import time.
 - Settings lookups for a send degrade to defaults one by one; a failed brand lookup sends with the product default palette rather than not at all.
 - `@blog/email` never logs, never resolves tenants and never fetches content; callers pass resolved copy, brand and URLs. It depends only on `@blog/utils`.
@@ -79,7 +86,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 
 - Layers: `email`, `db`, `auth`, `web`, `platform`, `config`.
 - Features: [reader-auth](./reader-auth.md), [platform-sign-in-and-onboarding](./platform-sign-in-and-onboarding.md), [tenant-access](./tenant-access.md), [newsletter](./newsletter.md), [operator-alerts](./operator-alerts.md), [look](./look.md), [languages](./languages.md), [plans-and-entitlements](./plans-and-entitlements.md).
-- Env vars: `RESEND_API_KEY`, `MAGIC_LINK_FROM_ADDRESS`, `NEWSLETTER_FROM_ADDRESS`, `OPERATOR_ALERT_FROM_ADDRESS` (each From falls back to a `resend.dev` address, which Resend delivers only to the account owner, so every one must be set to a verified domain on each project that sends it — `docs/DEPLOY.md`), `OPERATOR_ALERT_SECRET`, `BLOB_READ_WRITE_TOKEN` (platform, logo uploads).
+- Env vars: `RESEND_WEBHOOK_SECRET` (web; the signing secret of the Resend webhook pointed at `/api/email-delivery-events`), `RESEND_API_KEY`, `MAGIC_LINK_FROM_ADDRESS`, `NEWSLETTER_FROM_ADDRESS`, `OPERATOR_ALERT_FROM_ADDRESS` (each From falls back to a `resend.dev` address, which Resend delivers only to the account owner, so every one must be set to a verified domain on each project that sends it — `docs/DEPLOY.md`), `OPERATOR_ALERT_SECRET`, `BLOB_READ_WRITE_TOKEN` (platform, logo uploads).
 
 ## Entry points
 
@@ -88,6 +95,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 - `packages/email/src/templates/tenant/**`, `packages/email/src/templates/operator/**`, `packages/email/src/templates/owner/**`
 - `packages/email/src/portable-text/serialize-portable-text.ts`
 - `packages/auth/src/providers/magic-link/magic-link-provider/magic-link-provider.ts`, `resolve-magic-link-email-settings/resolve-magic-link-email-settings.ts`
+- `apps/web/src/app/api/email-delivery-events/route.ts`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`, `apps/web/src/utils/resolve-tenant-email-identity/resolve-tenant-email-identity.ts`
 - `apps/platform/src/components/features/email/email-settings/email-settings.tsx`, `apps/platform/src/server/email/send-test-email-action.ts`
 
@@ -95,6 +103,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 
 - Email: a `*.test.ts` beside every shell, template, serializer, validator and the transport; `client-safe-entrypoints.test.ts` guards that the `html`, `templates/tenant` and `validation` entrypoints stay importable in client code.
 - Auth: tests under `packages/auth/src/providers/magic-link/**`.
+- Web: `app/api/email-delivery-events/route.test.ts` signs real webhook requests; the newsletter confirmation's tag and count are covered in `newsletter-confirmation-send.test.ts`.
 - Platform: tests beside each `features/email/**` component and `server/email*/**` action.
 - No stories.
 
