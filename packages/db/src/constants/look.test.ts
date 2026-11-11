@@ -7,6 +7,8 @@ const NON_LOOK_COLUMNS = [
   'id',
   'tenantId',
   'voiceOverridesByLocale',
+  'lookSavedAt',
+  'voiceSavedAt',
   'createdAt',
   'updatedAt',
 ];

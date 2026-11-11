@@ -43,6 +43,7 @@ export * from './set-tenant-sanity-write-token-and-seeded-at';
 export * from './set-tenant-site-template-version';
 export * from './set-tenant-suspension';
 export * from './set-tenant-webhook-created-at';
+export * from './stamp-tenant-first-post-published';
 export * from './stamp-tenant-inactivity-stage';
 export * from './start-deprovisioning-run';
 export * from './start-provisioning-run';

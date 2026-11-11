@@ -6,6 +6,7 @@ export * from './lead';
 export * from './look';
 export * from './membership';
 export * from './retention';
+export * from './site-config-saved-at';
 export * from './subscriber';
 export * from './tenant';
 export * from './tenant-deprovisioning';

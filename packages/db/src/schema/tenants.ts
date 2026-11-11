@@ -1,15 +1,10 @@
-import {
-  LOCALE_ISO_CODES,
-  SITE_TYPE,
-  type TSanityLoginProvider,
-} from '@blog/config/constants';
+import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
 import {
   TENANT_PLAN,
   TENANT_STATUS,
   type TDeprovisioningStep,
   type TSuspensionReason,
   type TElevateTenantOwnerOutcome,
-  type TSanityProjectRole,
   type TTenantProvisioningStatus,
   type TTenantProvisioningStep,
   type TTenantProvisioningStepStatus,
@@ -28,6 +23,7 @@ import {
 } from 'drizzle-orm/pg-core';
 
 import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
 
 export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);
 
@@ -121,19 +117,7 @@ export const tenants = pgTable(
     siteType: siteTypeEnum('site_type'),
     siteTemplateVersion: integer('site_template_version'),
     selfServeOwnerEmailIndex: text('self_serve_owner_email_index'),
-    ownerSanityInviteId: text('owner_sanity_invite_id'),
-    ownerInviteSentAt: timestamp('owner_invite_sent_at', { mode: 'date' }),
-    ownerInviteAcceptedAt: timestamp('owner_invite_accepted_at', {
-      mode: 'date',
-    }),
-    ownerSanityUserId: text('owner_sanity_user_id'),
-    ownerLoginProvider: text(
-      'owner_login_provider',
-    ).$type<TSanityLoginProvider>(),
-    ownerSanityRole: text('owner_sanity_role').$type<TSanityProjectRole>(),
-    ownerInviteHeadsUpSentAt: timestamp('owner_invite_heads_up_sent_at'),
-    ownerInviteNudgeSentAt: timestamp('owner_invite_nudge_sent_at'),
-    ownerSiteReadySentAt: timestamp('owner_site_ready_sent_at'),
+    ...tenantOwnerAccessColumns,
     unsentReinviteFormerOwnerEmailEncrypted: text(
       'unsent_reinvite_former_owner_email_encrypted',
     ),
@@ -143,6 +127,9 @@ export const tenants = pgTable(
     deletionNotifiedAt: timestamp('deletion_notified_at'),
     suspensionReason: text('suspension_reason').$type<TSuspensionReason>(),
     contentMigrationFailedAt: timestamp('content_migration_failed_at', {
+      mode: 'date',
+    }),
+    firstPostPublishedAt: timestamp('first_post_published_at', {
       mode: 'date',
     }),
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })

@@ -111,6 +111,8 @@ export const siteConfig = pgTable('site_config', {
     .$type<TVoiceOverridesByLocale>()
     .notNull()
     .default({}),
+  lookSavedAt: timestamp('look_saved_at', { mode: 'date' }),
+  voiceSavedAt: timestamp('voice_saved_at', { mode: 'date' }),
   createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
     .notNull()
     .defaultNow(),

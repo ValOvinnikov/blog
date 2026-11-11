@@ -7,6 +7,7 @@ import {
   MOCK_NOT_FOUND_HEADING,
   MOCK_SITE_CONFIG_FIELDS,
 } from '@blog/db/testing/site-config/fixtures';
+import { useTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
 
 import { getSiteConfig } from './get-site-config';
@@ -16,19 +17,17 @@ faker.seed(6022);
 vi.mock('@blog/db/client');
 
 const MOCK_EN_NOT_FOUND_HEADING = faker.lorem.words(3);
+const MOCK_LOOK_SAVED_AT = faker.date.past();
 
 const db = useQueryTestDb();
 
-afterEach(async () => {
-  await db().delete(schema.siteConfig);
-  await db().delete(schema.tenants);
-});
+const tenant = useTestTenant(db);
 
 describe(getSiteConfig, () => {
   let tenantId: string;
 
-  beforeEach(async () => {
-    ({ id: tenantId } = await insertTestTenant(db()));
+  beforeEach(() => {
+    ({ id: tenantId } = tenant());
   });
 
   it('returns undefined when the tenant has no config row', async () => {
@@ -52,6 +51,8 @@ describe(getSiteConfig, () => {
       brandName: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
+      lookSavedAt: undefined,
+      voiceSavedAt: undefined,
       voiceOverrides: {},
     });
   });
@@ -91,7 +92,23 @@ describe(getSiteConfig, () => {
       brandName: undefined,
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
+      lookSavedAt: undefined,
+      voiceSavedAt: undefined,
       voiceOverrides: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
     });
+  });
+
+  it('returns when the Look was last saved', async () => {
+    await db()
+      .insert(schema.siteConfig)
+      .values({
+        tenantId,
+        ...MOCK_SITE_CONFIG_FIELDS,
+        lookSavedAt: MOCK_LOOK_SAVED_AT,
+      });
+
+    const result = await getSiteConfig(tenantId);
+
+    expect(result?.lookSavedAt).toEqual(MOCK_LOOK_SAVED_AT);
   });
 });

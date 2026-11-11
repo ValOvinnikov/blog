@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import type { TTenantSanityContext } from '@blog/service';
 import type { TRequestContext } from '@web/server/request-context/request-context';
 import { createMockFaker } from '@web/testing/mock-faker';
@@ -61,15 +62,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   siteType: null,
   siteTemplateVersion: null,
   selfServeOwnerEmailIndex: null,
-  ownerSanityInviteId: null,
-  ownerInviteSentAt: null,
-  ownerInviteAcceptedAt: null,
-  ownerSanityUserId: null,
-  ownerLoginProvider: null,
-  ownerSanityRole: null,
-  ownerInviteHeadsUpSentAt: null,
-  ownerInviteNudgeSentAt: null,
-  ownerSiteReadySentAt: null,
+  ...MOCK_NO_OWNER_ACCESS,
   unsentReinviteFormerOwnerEmailEncrypted: null,
   lastActivityAt: MOCK_TENANT_CREATED_AT,
   inactivityWarnedAt: null,
@@ -77,6 +70,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   deletionNotifiedAt: null,
   suspensionReason: null,
   contentMigrationFailedAt: null,
+  firstPostPublishedAt: null,
   createdAt: MOCK_TENANT_CREATED_AT,
   updatedAt: MOCK_TENANT_CREATED_AT,
   ...overrides,
