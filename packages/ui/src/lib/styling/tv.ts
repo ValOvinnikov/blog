@@ -59,7 +59,18 @@ export const tv = createTV({
           },
         ],
         tracking: [{ tracking: TRACKING_TOKENS }],
-        rounded: [{ rounded: ['card', 'media', 'item', 'button', 'nav-link'] }],
+        rounded: [
+          {
+            rounded: [
+              'card',
+              'media',
+              'item',
+              'button',
+              'nav-link',
+              'header-control',
+            ],
+          },
+        ],
         shadow: [{ shadow: ['card', 'float'] }],
         p: [{ p: SPACING_TOKENS }],
         px: [{ px: SPACING_TOKENS }],

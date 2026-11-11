@@ -111,6 +111,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FORM_STATUS**: `IDLE`, `SUBMITTING`, `SUCCESS`, `ERROR`
 
+### `@blog/config/constants` — `packages/config/src/constants/header-control-shape.ts`
+
+- **HEADER_CONTROL_SHAPE**: `ROUND`, `ROUNDED`, `SQUARE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/header-control-style.ts`
 
 - **HEADER_CONTROL_STYLE**: `OUTLINED`, `SOFT`, `PLAIN`
