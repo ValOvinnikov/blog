@@ -35,8 +35,8 @@ graph is acyclic
   data: Auth.js users and sessions, tenants and their domains, memberships and
   invites, admins, site config, feature toggles, email config and templates,
   subscribers, bookmarks, contact-form leads, magic-link send counters, email
-  send and delivery-outcome counts, newsletter post-send claims, audit
-  events and findings (comments and ratings are planned; no tables exist yet). It never imports React or `@blog/service`
+  send and delivery-outcome counts, newsletter post-send claims, Stripe
+  billing state and handled Stripe webhook event ids, audit events and findings (comments and ratings are planned; no tables exist yet). It never imports React or `@blog/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
   by the three apps (`web`, `platform`, `worker`) and `@blog/auth`**, which
   binds the Auth.js adapter to its tables. It imports no Sanity SDK, and its `src/` never imports

@@ -1,18 +1,12 @@
-import {
-  LOCALE_ISO_CODES,
-  SANITY_LOGIN_PROVIDER,
-} from '@blog/config/constants';
+import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   DEPROVISIONING_STEP,
-  SANITY_PROJECT_ROLE,
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
-import type { TTenantOwnerAccess } from '@blog/db/queries/tenants/tenant-owner-access';
-import type * as schema from '@blog/db/schema';
 import type {
   TTenant,
   TTenantDeprovisioningState,
@@ -20,6 +14,7 @@ import type {
 } from '@blog/db/schema/tenants';
 import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
 import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import type { TResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
@@ -57,41 +52,6 @@ export const MOCK_TENANT_VALUES = {
   plan: TENANT_PLAN.FREE,
 };
 
-export function mockTenantOwnerAccess(
-  overrides: Partial<TTenantOwnerAccess> = {},
-): TTenantOwnerAccess {
-  const inviteSentAt = faker.date.recent();
-
-  return {
-    sanityInviteId: faker.string.uuid(),
-    inviteSentAt,
-    inviteAcceptedAt: faker.date.soon({ refDate: inviteSentAt }),
-    sanityUserId: faker.string.alphanumeric(10),
-    loginProvider: SANITY_LOGIN_PROVIDER.GITHUB,
-    sanityRole: SANITY_PROJECT_ROLE.ADMINISTRATOR,
-    inviteHeadsUpSentAt: inviteSentAt,
-    inviteNudgeSentAt: faker.date.soon({ refDate: inviteSentAt }),
-    siteReadySentAt: faker.date.soon({ refDate: inviteSentAt }),
-    ...overrides,
-  };
-}
-
-export function toTenantOwnerAccessColumns(
-  access: Partial<TTenantOwnerAccess>,
-): Partial<typeof schema.tenants.$inferInsert> {
-  return {
-    ownerSanityInviteId: access.sanityInviteId,
-    ownerInviteSentAt: access.inviteSentAt,
-    ownerInviteAcceptedAt: access.inviteAcceptedAt,
-    ownerSanityUserId: access.sanityUserId,
-    ownerLoginProvider: access.loginProvider,
-    ownerSanityRole: access.sanityRole,
-    ownerInviteHeadsUpSentAt: access.inviteHeadsUpSentAt,
-    ownerInviteNudgeSentAt: access.inviteNudgeSentAt,
-    ownerSiteReadySentAt: access.siteReadySentAt,
-  };
-}
-
 export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
   const createdAt = faker.date.past();
 
@@ -127,6 +87,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     suspendedAt: null,
     deletionNotifiedAt: null,
     suspensionReason: null,
+    ...MOCK_NO_BILLING,
     contentMigrationFailedAt: null,
     firstPostPublishedAt: null,
     createdAt,

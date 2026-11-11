@@ -7,6 +7,7 @@ import { reviveCachedTenant } from './revive-cached-tenant';
 const MOCK_TENANT = mockServableTenant({
   suspendedAt: new Date(),
   contentMigrationFailedAt: new Date(),
+  trialEndsAt: new Date(),
 });
 
 describe(reviveCachedTenant, () => {
