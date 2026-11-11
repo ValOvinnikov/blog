@@ -21,7 +21,7 @@ epics: [2788, 3771, 3772, 3773, 3774, 3775, 3776, 3777, 3778]
 
 ## What it does
 
-Editors will place a video, a booking calendar or a map on a page as its own section, or inside a post between paragraphs. The site never loads the third party until the visitor allows External media; until then a placeholder of the right shape stands in. The parser, the Studio `embed` object and `module_embed` exist; nothing renders an embed on the site yet. The consent half it depends on is built: the External media category, the consent store and hooks, and the `ConsentPlaceholder` component.
+Editors will place a video, a booking calendar or a map on a page as its own section, or inside a post between paragraphs. The site never loads the third party until the visitor allows External media; until then a placeholder of the right shape stands in. The parser, the Studio `embed` object, `module_embed` and its service loader exist; nothing renders an embed on the site yet. The consent half it depends on is built: the External media category, the consent store and hooks, and the `ConsentPlaceholder` component.
 
 ## Surfaces and routes
 
@@ -34,8 +34,8 @@ Editors will place a video, a booking calendar or a map on a page as its own sec
 - **`embed` object** (`embedObjectSchema`): **URL** (`embedUrlField()`: required, http(s), accepted only when `parseEmbedUrl` accepts it; otherwise "`<host>` can't be embedded. Use a link from YouTube, Vimeo, Loom, Cal.com or Google Maps."), **Title** (localised, required in the default language; the iframe `title` and the placeholder heading), **Caption** (localised, optional; a `<figcaption>`).
 - **`module_embed`**: `title`, `brandVariant`, the required `headingBlock`, `embed` (required), `ctaButtons`, `contentAlignment` (Left/Center) and `layout`, whose container width starts at Narrow. One embed per module.
 - The planned post-body block keeps plain-field Title and Caption, because a post is one language per document, and reuses `embedUrlField()`.
-- Planned service view model: `{ title, caption?, provider, embedUrl, ratio }`.
-- Content is Sanity-only; no Neon data. Caching follows the module and post loaders' tags.
+- Service view model (`TEmbedModule`, `service.modules.embed.v1.getEmbedModule`): `brandVariant`, `headingBlock`, `embed`, `ctaButtons`, `contentAlignment` and `layout`, where `embed` is `TEmbed` — `{ title, caption, provider, embedUrl, ratio }`, the last three from `parseEmbedUrl` — or `undefined` when the stored URL no longer parses. The post-body block's projection is planned.
+- Content is Sanity-only; no Neon data. The module loader tags `modules:embed`, `module:<id>` and the CTA link-target tags; the post body follows the post loader's tags.
 
 ## Configuration
 
@@ -68,6 +68,7 @@ What exists today:
 - `packages/config/src/embed/parse-embed-url.ts` (`parseEmbedUrl`), `youtube-embed.ts`
 - `packages/config/src/constants/embed.ts` (`EMBED_PROVIDER`), `media-ratio.ts` (`MEDIA_RATIO`), `packages/config/src/types/embed.ts` (`TParsedEmbed`)
 - `packages/studio/src/schema-types/objects/embed/embed.ts`, `modules/embed/embed.ts`, `fields/embed-url-field/embed-url-field.ts`, `validation/validate-embed-url/validate-embed-url.ts`
+- `packages/service/src/features/modules/embed/` (`getEmbedModule`, `toEmbedModule`)
 - `packages/config/src/constants/consent-category.ts` (`EXTERNAL_MEDIA`)
 - `packages/ui/src/components/molecules/consent-placeholder/consent-placeholder.tsx`
 - `packages/ui/src/components/atoms/media-frame/media-frame-variants.ts`
@@ -76,7 +77,7 @@ What exists today:
 
 ## Tests and stories
 
-`consent-placeholder.test.tsx` and `consent-placeholder.stories.tsx` in `@blog/ui`; `use-consent.test.tsx` and `use-consent-store.test.tsx` in `apps/web`; `parse-embed-url.test.ts` in `@blog/config` and `validate-embed-url.test.ts` in `@blog/studio`.
+`consent-placeholder.test.tsx` and `consent-placeholder.stories.tsx` in `@blog/ui`; `use-consent.test.tsx` and `use-consent-store.test.tsx` in `apps/web`; `parse-embed-url.test.ts` in `@blog/config`; `validate-embed-url.test.ts` in `@blog/studio`; the embed module's `query`, `transformer` and `loader` tests in `@blog/service`.
 
 ## Related
 
