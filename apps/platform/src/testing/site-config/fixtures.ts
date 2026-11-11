@@ -81,6 +81,7 @@ export const mockSiteConfig = (
   voiceOverridesByLocale: {},
   voiceOverrides: {},
   lookSavedAt: undefined,
+  voiceSavedAt: undefined,
   createdAt: MOCK_SITE_CONFIG_UPDATED_AT,
   updatedAt: MOCK_SITE_CONFIG_UPDATED_AT,
   ...overrides,

@@ -12,13 +12,19 @@ import { eq } from 'drizzle-orm';
 // Nullable columns are mapped to `undefined` so callers never reason about two "absent" representations.
 export type TSiteConfigResult = Omit<
   TSiteConfig,
-  'logoHue' | 'brandName' | 'logoAssetUrl' | 'faviconAssetUrl' | 'lookSavedAt'
+  | 'logoHue'
+  | 'brandName'
+  | 'logoAssetUrl'
+  | 'faviconAssetUrl'
+  | 'lookSavedAt'
+  | 'voiceSavedAt'
 > & {
   logoHue: TMaybeUndefined<number>;
   brandName: TMaybeUndefined<string>;
   logoAssetUrl: TMaybeUndefined<string>;
   faviconAssetUrl: TMaybeUndefined<string>;
   lookSavedAt: TMaybeUndefined<Date>;
+  voiceSavedAt: TMaybeUndefined<Date>;
   /** @deprecated The default locale's slice of `voiceOverridesByLocale`, kept until every caller reads per language. */
   voiceOverrides: TVoiceOverrides;
 };
@@ -34,6 +40,7 @@ export function toSiteConfigResult(
     logoAssetUrl: row.logoAssetUrl ?? undefined,
     faviconAssetUrl: row.faviconAssetUrl ?? undefined,
     lookSavedAt: row.lookSavedAt ?? undefined,
+    voiceSavedAt: row.voiceSavedAt ?? undefined,
     voiceOverrides: row.voiceOverridesByLocale[defaultLocale] ?? {},
   };
 }

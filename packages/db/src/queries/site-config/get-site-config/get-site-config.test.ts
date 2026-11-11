@@ -52,6 +52,7 @@ describe(getSiteConfig, () => {
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       lookSavedAt: undefined,
+      voiceSavedAt: undefined,
       voiceOverrides: {},
     });
   });
@@ -92,6 +93,7 @@ describe(getSiteConfig, () => {
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       lookSavedAt: undefined,
+      voiceSavedAt: undefined,
       voiceOverrides: { notFoundHeading: MOCK_NOT_FOUND_HEADING },
     });
   });

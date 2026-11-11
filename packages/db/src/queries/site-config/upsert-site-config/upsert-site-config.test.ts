@@ -370,6 +370,7 @@ describe(upsertSiteConfig, () => {
       logoAssetUrl: undefined,
       faviconAssetUrl: undefined,
       lookSavedAt: undefined,
+      voiceSavedAt: undefined,
       voiceOverrides: {},
     });
   });
