@@ -296,11 +296,16 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 - A selected item shows a 3:1 marker (`border-admin-brand`, a bar), not a
   `bg-admin-brand-weak` fill alone, and announces itself as pressed, checked or
   selected.
-- Focus is `Button`'s ring (`focus-visible:ring-2`,
-  `focus-visible:ring-admin-brand`, `focus-visible:ring-offset-2`, with
-  `outline-hidden`); on the dark sidebar `ring-admin-side-accent` with
-  `ring-offset-admin-side`. A text field turns its border `admin-brand`.
+- Focus is `focusRingClasses(ground)`
+  (`@platform/utils/focus-ring-classes/focus-ring-classes`), the ring
+  `Button` draws: pass the `FOCUS_RING_GROUND` (`@platform/constants/focus-ring`)
+  the control sits on, so the offset matches its surface;
+  `insetFocusRingClasses` where a clipping parent would cut the ring off.
+  Never hand-write a `focus-visible:ring-*` or `focus-visible:shadow-*` list.
   `outline-admin-brand-weak` (1.12:1) is not a focus indicator.
+- A colour transition is `COLOUR_TRANSITION_CLASSES`
+  (`@platform/utils/transition-classes/transition-classes`), never
+  `transition-colors` with its own duration.
 
 ## Spacing, radius, elevation
 
@@ -610,7 +615,7 @@ of them:
 | A `div` with `rounded-admin border p-[18px] shadow-admin`                                                        | `<Card>` with `Card.Header` and `Card.Body`                                                                                       |
 | A `calc()` or offset worked out from another element's size, or a size another component writes                  | That element's token or a shared const (→ `react-component-practices` § Sizes)                                                    |
 | A paragraph opening `Card.Body` that says what the card is for                                                   | `Card.Header` `supportingText`                                                                                                    |
-| A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card` with a bad header                                                                             |
+| A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card isDanger`                                                                                      |
 | A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                               |
 | `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                             |
 | `hint={<span className="text-admin-11-5 …">…</span>}`                                                            | `hint={t('…')}`                                                                                                                   |
@@ -622,7 +627,7 @@ of them:
 | `border-admin-line` on a text field, select, track or radio                                                      | `border-admin-control-line`                                                                                                       |
 | `text-admin-faint` on text someone has to read                                                                   | `text-admin-muted`                                                                                                                |
 | `text-indigo-800`, a hex, any raw palette colour                                                                 | An `admin-*` token                                                                                                                |
-| `outline-admin-brand-weak` as the only focus cue                                                                 | `Button`'s `focus-visible:ring-2` ring with offset                                                                                |
+| `outline-admin-brand-weak` as the only focus cue                                                                 | `focusRingClasses(ground)`, the ring `Button` draws                                                                               |
 | `gap-[18px]` or `gap-5` between cards, `gap-5` or `mb-[18px]` between fields                                     | `gap-6` between cards, `gap-4` on the fields' parent                                                                              |
 | `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin` or `rounded-admin-control`                                                                                        |
 | `font-sans`, `font-ui` or an inline `fontFamily` on admin chrome                                                 | Nothing; the font is set once on `<body>`                                                                                         |
