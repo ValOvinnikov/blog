@@ -55,6 +55,13 @@ describe(getMissingRequirement, () => {
       typeName: CONTACT_FORM_MODULE_TYPE,
       enabledCapabilities: [],
       entitledModulePacks: CORE_ONLY,
+      expected: { modulePack: MODULE_PACK.STARTER },
+    },
+    {
+      behaviour: 'returns the growth pack a growth module needs on starter',
+      typeName: 'module_pricing',
+      enabledCapabilities: undefined,
+      entitledModulePacks: [MODULE_PACK.CORE, MODULE_PACK.STARTER],
       expected: { modulePack: MODULE_PACK.GROWTH },
     },
     {

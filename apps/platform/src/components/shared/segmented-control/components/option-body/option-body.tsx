@@ -1,11 +1,19 @@
+import type { ReactNode } from 'react';
+
 type TOptionBodyIds = { labelId: string; descriptionId: string };
+
+type TOptionBodyClassNames = {
+  label: string;
+  description: string;
+  glyph: string;
+};
 
 type TOptionBodyProps = {
   ids: TOptionBodyIds;
   label: string;
-  description: string;
-  labelClassName: string;
-  descriptionClassName: string;
+  description?: string;
+  glyph?: ReactNode;
+  classNames: TOptionBodyClassNames;
 };
 
 export const optionBodyIds = (
@@ -20,15 +28,22 @@ export const OptionBody = ({
   ids: { labelId, descriptionId },
   label,
   description,
-  labelClassName,
-  descriptionClassName,
+  glyph,
+  classNames,
 }: TOptionBodyProps) => (
   <>
-    <span id={labelId} className={labelClassName}>
+    {glyph && (
+      <span aria-hidden={true} className={classNames.glyph}>
+        {glyph}
+      </span>
+    )}
+    <span id={labelId} className={classNames.label}>
       {label}
     </span>
-    <span id={descriptionId} className={descriptionClassName}>
-      {description}
-    </span>
+    {description && (
+      <span id={descriptionId} className={classNames.description}>
+        {description}
+      </span>
+    )}
   </>
 );

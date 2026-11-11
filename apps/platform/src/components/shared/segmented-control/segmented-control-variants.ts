@@ -10,7 +10,7 @@ export const segmentedControlVariants = tv({
       'grid w-full grid-cols-2 gap-[6px]',
       'lg:inline-flex lg:w-auto lg:flex-wrap lg:items-center lg:gap-[2px] lg:self-start',
       'lg:rounded-admin-control lg:border lg:bg-admin-bg lg:p-[2px]',
-      'data-[disabled]:opacity-[.55]',
+      'data-[disabled]:opacity-(--admin-locked-fade)',
     ],
     option: [
       'flex min-h-11 items-center justify-start rounded-admin-control border px-3 text-left',
@@ -20,9 +20,6 @@ export const segmentedControlVariants = tv({
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
     glyph: ['flex'],
-    selectedDescription: [
-      'm-0 text-admin-12-5 leading-admin-18 text-admin-muted empty:hidden',
-    ],
   },
   variants: {
     hasGlyphs: {

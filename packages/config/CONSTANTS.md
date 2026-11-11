@@ -177,7 +177,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/module-pack.ts`
 
-- **MODULE_PACK**: `CORE`, `GROWTH`
+- **MODULE_PACK**: `CORE`, `STARTER`, `GROWTH`
 
 ### `@blog/config/constants` — `packages/config/src/constants/module.ts`
 
@@ -339,7 +339,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/tenant.ts`
 
 - **TENANT_STATUS**: `ACTIVE`, `SUSPENDED`, `ARCHIVED`, `TRIAL`, `PAST_DUE`
-- **TENANT_PLAN**: `FREE`, `GROWTH`
+- **TENANT_PLAN**: `FREE`, `STARTER`, `GROWTH`
 - **TENANT_DETAILS_UPDATE_OUTCOME**: `UPDATED`, `DOMAIN_TAKEN`, `DOMAIN_LOCKED`, `DOMAIN_INVALID`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_EMAIL_TAKEN`, `OWNS_FREE_TENANT`
 
 ## app:platform
@@ -591,6 +591,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/segmented-control` — `apps/platform/src/constants/segmented-control.ts`
 
 - **SEGMENTED_LAYOUT**: `FIT`, `WIDE`, `SINGLE_ROW`
+- **SEGMENTED_RADIO_LAYOUT**: `TRACK`, `TILES`
 
 ### `@platform/constants/select-appearance` — `apps/platform/src/constants/select-appearance.ts`
 

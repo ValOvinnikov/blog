@@ -126,7 +126,7 @@ describe(`<${LookForm.name}/>`, () => {
         const cardStyleGroup = screen.getByRole('group', {
           name: LOOK_FORM.cardStyleLabel,
         });
-        const outlinedCardButton = within(cardStyleGroup).getByRole('button', {
+        const outlinedCardTile = within(cardStyleGroup).getByRole('radio', {
           name: OUTLINED,
         });
 
@@ -137,7 +137,7 @@ describe(`<${LookForm.name}/>`, () => {
         expect(smallButton).toBeDisabled();
         expect(extraLargeButton).toBeDisabled();
         expect(compactButton).toBeDisabled();
-        expect(outlinedCardButton).toBeDisabled();
+        expect(outlinedCardTile).toHaveAttribute(ARIA_DISABLED, 'true');
       });
     });
 

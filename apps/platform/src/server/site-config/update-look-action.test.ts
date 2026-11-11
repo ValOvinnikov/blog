@@ -15,6 +15,7 @@ import {
   FOOTER_SURFACE,
   BUSY_BUTTON_STYLE,
   HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -109,6 +110,7 @@ const VALID_INPUT: TUpdateLookInput = {
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_GLOBE,
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.SOFT,
+  headerControlShape: HEADER_CONTROL_SHAPE.ROUNDED,
   headerLayout: HEADER_LAYOUT.TWO_ROWS,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.WIDE_PANEL,
   headerBarStyle: HEADER_BAR_STYLE.FLOATING,
@@ -124,6 +126,14 @@ const VALID_INPUT: TUpdateLookInput = {
   footerSurface: FOOTER_SURFACE.CARD,
   cookieSettingsButton: COOKIE_SETTINGS_BUTTON.SHOWN,
   brandName: MOCK_BRAND_NAME,
+};
+
+const { preset, accentHue, cookieSettingsButton, brandName } = VALID_INPUT;
+const FREE_WRITTEN_INPUT = {
+  preset,
+  accentHue,
+  cookieSettingsButton,
+  brandName,
 };
 
 const onPlan = (plan: TTenantPlan) =>
@@ -164,17 +174,22 @@ describe(updateLookAction, () => {
       onPlan(TENANT_PLAN.FREE);
     });
 
-    it('writes only the preset, accent hue, cookie settings button and brand name, leaving every Growth-only field stored as it is', async () => {
-      const { preset, accentHue, cookieSettingsButton, brandName } =
-        VALID_INPUT;
+    describe('saving every field', () => {
+      beforeEach(async () => {
+        await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+      });
 
-      await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+      it('writes only the fields Free includes, leaving Growth-only fields as stored', () => {
+        expect(upsertSiteConfigMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          FREE_WRITTEN_INPUT,
+        );
+      });
 
-      expect(upsertSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        preset,
-        accentHue,
-        cookieSettingsButton,
-        brandName,
+      it('audits only what it wrote', () => {
+        expect(insertAuditEventMock).toHaveBeenCalledWith(
+          expect.objectContaining({ details: FREE_WRITTEN_INPUT }),
+        );
       });
     });
 
@@ -219,19 +234,6 @@ describe(updateLookAction, () => {
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
     });
-
-    it('audits only what it wrote', async () => {
-      const { preset, accentHue, cookieSettingsButton, brandName } =
-        VALID_INPUT;
-
-      await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
-
-      expect(insertAuditEventMock).toHaveBeenCalledWith(
-        expect.objectContaining({
-          details: { preset, accentHue, cookieSettingsButton, brandName },
-        }),
-      );
-    });
   });
 
   it('clears the brand name when it is saved blank', async () => {
@@ -256,10 +258,24 @@ describe(updateLookAction, () => {
     expect(upsertSiteConfigMock).not.toHaveBeenCalled();
   });
 
-  it('revalidates the site config after a successful save', async () => {
-    await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+  describe('after a successful save', () => {
+    beforeEach(async () => {
+      await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+    });
 
-    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    it('revalidates the site config', () => {
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('records a SETTINGS_UPDATED audit event on the site config by the operator', () => {
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+        targetId: MOCK_TENANT_ID,
+        details: VALID_INPUT,
+      });
+    });
   });
 
   it('rejects an out-of-range hue before reaching the tenant gate', async () => {
@@ -365,18 +381,6 @@ describe(updateLookAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('records a SETTINGS_UPDATED audit event on the site config by the operator', async () => {
-    await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
-
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: MOCK_TENANT_ID,
-      details: VALID_INPUT,
-    });
   });
 
   it('still succeeds when the audit write fails, and logs the failure', async () => {

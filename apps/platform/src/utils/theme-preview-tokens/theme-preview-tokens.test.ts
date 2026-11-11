@@ -6,6 +6,8 @@ import {
   CARD_STYLE,
   DENSITY,
   formatOklchRamp,
+  HEADER_CONTROL_SHAPE,
+  HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   HUE_MAX,
@@ -39,6 +41,7 @@ const MOCK_PREVIEW_VALUES: TThemePreviewValues = {
   density: DENSITY.COMPACT,
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+  headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
   buttonShape: BUTTON_SHAPE.ROUNDED,
   navLinkStyle: NAV_LINK_STYLE.PLAIN,
   accentHue: MOCK_ACCENT_HUE,
@@ -90,6 +93,11 @@ describe(buildThemePreviewStyle, () => {
       label: `${value} header control`,
       values: { headerControlStyle: value },
       declarations: HEADER_CONTROL_STYLE_DECLARATIONS[value],
+    })),
+    ...Object.values(HEADER_CONTROL_SHAPE).map((value) => ({
+      label: `${value} header control shape`,
+      values: { headerControlShape: value },
+      declarations: HEADER_CONTROL_SHAPE_DECLARATIONS[value],
     })),
     ...Object.values(BUTTON_SHAPE).map((value) => ({
       label: `${value} button shape`,

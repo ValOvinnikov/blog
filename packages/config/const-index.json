@@ -2830,6 +2830,20 @@
         "file": "packages/config/src/constants/module-pack.ts"
       }
     ],
+    "STARTER": [
+      {
+        "ref": "MODULE_PACK.STARTER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module-pack.ts"
+      },
+      {
+        "ref": "TENANT_PLAN.STARTER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
     "GROWTH": [
       {
         "ref": "MODULE_PACK.GROWTH",
@@ -6843,6 +6857,22 @@
     "SINGLE_ROW": [
       {
         "ref": "SEGMENTED_LAYOUT.SINGLE_ROW",
+        "scope": "app:platform",
+        "from": "@platform/constants/segmented-control",
+        "file": "apps/platform/src/constants/segmented-control.ts"
+      }
+    ],
+    "TRACK": [
+      {
+        "ref": "SEGMENTED_RADIO_LAYOUT.TRACK",
+        "scope": "app:platform",
+        "from": "@platform/constants/segmented-control",
+        "file": "apps/platform/src/constants/segmented-control.ts"
+      }
+    ],
+    "TILES": [
+      {
+        "ref": "SEGMENTED_RADIO_LAYOUT.TILES",
         "scope": "app:platform",
         "from": "@platform/constants/segmented-control",
         "file": "apps/platform/src/constants/segmented-control.ts"

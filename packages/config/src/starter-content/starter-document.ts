@@ -72,7 +72,13 @@ export type TStarterModule<
 
 export type TStarterPost = TStarterDocument<
   Page_post,
-  'title' | 'slug' | 'headingBlock' | 'author' | 'publishedAt' | 'seo'
+  | 'title'
+  | 'slug'
+  | 'headingBlock'
+  | 'author'
+  | 'publishedAt'
+  | 'sendToSubscribers'
+  | 'seo'
 >;
 
 export type TStarterDocumentUnion =

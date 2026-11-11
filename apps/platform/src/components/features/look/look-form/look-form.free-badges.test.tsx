@@ -3,6 +3,7 @@ import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import {
   EDITORIAL,
   GROWTH,
@@ -17,6 +18,7 @@ import {
 import {
   setupArchived,
   setupLookForm,
+  withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -42,7 +44,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
 
   it('offers no Reset to preset on Free, even with an accent hue off the preset', () => {
     setupLookForm({
-      plan: TENANT_PLAN.FREE,
+      ...withLookTenant({ plan: TENANT_PLAN.FREE }),
       initialValues: {
         ...defaultLookFormValues(),
         accentHue: MOCK_SAVED_ACCENT_HUE,
@@ -61,7 +63,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
     { site: 'a Growth site', setup: () => setupLookForm() },
     {
       site: 'an archived Free site',
-      setup: () => setupArchived({ plan: TENANT_PLAN.FREE }),
+      setup: () => setupArchived(withLookTenant({ plan: TENANT_PLAN.FREE })),
     },
   ])('shows no Growth badge on $site', ({ setup }) => {
     setup();
@@ -73,7 +75,7 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm({ plan: TENANT_PLAN.FREE });
+      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
     });
 
     it.each([
@@ -110,7 +112,9 @@ describe(`<${LookForm.name}/> Growth badges on Free`, () => {
 
     it('never shows the old Growth plan lock wording', () => {
       const oldLock = screen.queryByText(
-        messages.featuresSettings.planLockedBadge,
+        makeEnTranslator('featuresSettings')('planLockedBadge', {
+          plan: TENANT_PLAN.GROWTH,
+        }),
       );
 
       expect(oldLock).not.toBeInTheDocument();

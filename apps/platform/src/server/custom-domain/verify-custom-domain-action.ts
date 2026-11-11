@@ -8,7 +8,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
@@ -46,7 +46,7 @@ export const verifyCustomDomainAction = async (
   const { id, plan, deprovisionedAt } = tenant;
 
   if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
-  if (plan !== TENANT_PLAN.GROWTH) {
+  if (!PLAN_ENTITLEMENTS[plan].hasCustomDomain) {
     return refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN);
   }
 

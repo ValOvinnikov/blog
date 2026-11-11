@@ -5,7 +5,7 @@ export const sampleLanguageSwitcherVariants = tv({
   slots: {
     codeList: [HEADER_CONTROL_FRAME, 'flex items-center gap-0.5 p-[5px]'],
     codeLink: [
-      'h-6 min-w-6 justify-center rounded-full px-1.5 pb-0 text-label no-underline',
+      'h-6 min-w-6 justify-center rounded-header-control-inner px-1.5 pb-0 text-label no-underline',
     ],
     codeLabel: ['sr-only'],
     trigger: [

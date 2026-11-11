@@ -66,7 +66,7 @@
     "nameLabel": "Nom du site",
     "nameHint": "Affiché dans l’en-tête de votre site et dans les onglets du navigateur.",
     "siteAddressLabel": "Adresse du site",
-    "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
+    "siteAddressHint": "Lettres, chiffres et traits d’union. Avec les offres Starter et Growth, vous pouvez connecter votre propre domaine.",
     "siteAddressChecking": "Vérification de l’adresse…",
     "siteAddressAvailable": "{address} est à vous",
     "siteAddressUnverified": "Nous n’avons pas pu vérifier cette adresse pour le moment. Vous pouvez continuer : nous la vérifierons à nouveau lors de la création du site.",
@@ -490,7 +490,7 @@
       "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Langues supplémentaires : aucune} other {Langues supplémentaires : {languages}}}",
       "SUSPENSION_REASON": "Motif : {category}",
       "SUSPENSION_REFERENCE": "Référence : {reference}",
-      "PLAN": "Formule : {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "PLAN": "Formule : {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "SIGN_IN_PROVIDER": "Fournisseur de connexion : {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secret client remplacé"
     }
@@ -527,7 +527,7 @@
     "ownDomain": {
       "title": "Utiliser mon propre domaine",
       "supportingText": "Publiez votre site à une adresse qui vous appartient. Votre adresse actuelle continue de fonctionner.",
-      "upgradePrompt": "Utiliser votre propre domaine est inclus dans l’offre Growth.",
+      "upgradePrompt": "Utiliser votre propre domaine est inclus dans les offres Starter et Growth.",
       "ownerOnly": "Seul le propriétaire du site peut connecter un domaine.",
       "archivedState": "Ce site est archivé, son domaine ne peut pas être modifié.",
       "domainLabel": "Domaine",
@@ -551,7 +551,7 @@
       "refusal": {
         "notFound": "Ce site est introuvable.",
         "archived": "Ce site est archivé, son domaine ne peut pas être modifié.",
-        "notOnPlan": "Utiliser votre propre domaine est inclus dans l’offre Growth.",
+        "notOnPlan": "Utiliser votre propre domaine est inclus dans les offres Starter et Growth.",
         "notProvisioned": "Ce site n’est pas encore configuré. Réessayez une fois la configuration terminée.",
         "alreadyConnected": "Ce site a déjà son propre domaine.",
         "notCustomDomain": "Ce domaine ne peut pas être retiré.",
@@ -694,7 +694,7 @@
     "growthAddsButtons": "État de chargement et indicateur de progression",
     "growthAddsHeader": "Mise en page, sous-menus, barre, boutons d'en-tête et commandes du compte",
     "growthAddsFooter": "Mise en page, arrière-plan et surface",
-    "growthAddsClosing": "Growth ajoute aussi d'autres langues (avec le choix du style du sélecteur de langue), un domaine personnalisé et d'autres fonctionnalités du site.",
+    "growthAddsClosing": "Growth ajoute aussi d'autres langues (avec le choix du style du sélecteur de langue) et d'autres fonctionnalités du site.",
     "jumpIndexUnsaved": ", modifications non enregistrées",
     "expandAll": "Tout déplier",
     "collapseAll": "Tout replier",
@@ -765,13 +765,25 @@
       "SOFT": "Un fond gris, sans contour",
       "PLAIN": "Aucun contour avant le survol"
     },
+    "headerControlShapeLabel": "Forme des boutons d'en-tête",
+    "headerControlShapeDescription": "La forme du contour des boutons de langue, de thème, de menu et de compte.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Ronde",
+      "ROUNDED": "Arrondie",
+      "SQUARE": "Carrée"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Entièrement ronde, en cercles et pilules",
+      "ROUNDED": "Les coins suivent le réglage Coins du site",
+      "SQUARE": "Coins carrés"
+    },
     "languageSwitcherLabel": "Sélecteur de langue",
     "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
     "languageSwitcherFreeDescription": "Votre formule publie une seule langue. Passez à une formule supérieure pour ajouter des langues et choisir un style de sélecteur.",
     "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
-    "lockLineTypeFonts": "Avec Free, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
+    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -910,7 +922,7 @@
       "SHOWN": "Les deux"
     },
     "cookieSettingsButtonBannerOff": "La bannière des cookies est désactivée, les lecteurs ne voient donc ni le lien ni le bouton. Activez la bannière dans Fonctionnalités pour choisir.",
-    "footerPoweredByNote": "Les sites gratuits affichent « Propulsé par {productName} » à la fin du pied de page. Il disparaît avec la formule Growth.",
+    "footerPoweredByNote": "Les sites gratuits affichent « Propulsé par {productName} » à la fin du pied de page. Il disparaît avec les formules Starter et Growth.",
     "brandHeading": "Marque",
     "brandImagePicked": "Nouvelle image, pas encore importée",
     "brandImageUnchanged": "Aucune nouvelle image",
@@ -1028,7 +1040,7 @@
     "idle": "Ouvrez une carte des Parties du site et le cadre défile jusqu’à elle.",
     "off": "Le suivi est désactivé. Le cadre reste où vous le laissez.",
     "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle.",
-    "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles qu'un site Free publie."
+    "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles que cette formule publie."
   },
   "lookFullscreen": {
     "open": "Ouvrir l’aperçu en plein écran",
@@ -1317,7 +1329,7 @@
     "description": "La partie rapide. Tout le reste s'exécute automatiquement, et chaque étape peut être reprise en cas d'échec.",
     "nameLabel": "Nom du locataire",
     "siteAddressLabel": "Adresse du site",
-    "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
+    "siteAddressHint": "Lettres, chiffres et traits d’union. Avec les offres Starter et Growth, vous pouvez connecter votre propre domaine.",
     "localeLabel": "Langue par défaut",
     "localeHint": "La langue dans laquelle démarrent le contenu initial et les réglages du site.",
     "planLabel": "Formule",
@@ -1625,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Fonctionnalités",
-    "description": "Activez ou désactivez les fonctionnalités de votre site. Les options verrouillées nécessitent la formule Growth.",
+    "description": "Activez ou désactivez les fonctionnalités de votre site. Une option verrouillée indique la formule qui l'inclut.",
     "alertSuccess": "Fonctionnalités enregistrées.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
-    "planLockedBadge": "Formule Growth",
+    "planLockedBadge": "{plan, select, FREE {Formule Free} STARTER {Formule Starter} other {Formule Growth}}",
     "comingSoonBadge": "Bientôt",
     "switchOn": "Activé",
     "switchOff": "Désactivé",
@@ -1673,6 +1685,7 @@
   },
   "planNames": {
     "FREE": "Free",
+    "STARTER": "Starter",
     "GROWTH": "Growth"
   },
   "languagesSettings": {
@@ -1703,7 +1716,7 @@
     "fieldsNeedAttention": "{count, plural, one {# champ à vérifier} other {# champs à vérifier}}",
     "goToFirstField": "Aller au premier",
     "notSaved": "Non enregistré",
-    "notInPlan": "Votre site est sur la formule {plan, select, FREE {Free} GROWTH {Growth} other {actuelle}}, qui n'inclut pas {items} : rien n'a été enregistré.",
+    "notInPlan": "Votre site est sur la formule {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actuelle}}, qui n'inclut pas {items} : rien n'a été enregistré.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Annuler les modifications",
     "save": "Enregistrer les modifications",
@@ -1742,7 +1755,7 @@
     "title": "Messages reçus",
     "description": "Messages envoyés via le formulaire de contact de votre site, les plus récents en premier. Chaque message vous a aussi été envoyé par e-mail à sa réception.",
     "downgradedTitle": "Formulaire de contact non inclus dans votre offre",
-    "downgradedDescription": "Le formulaire de contact est une fonctionnalité Growth : plus aucun nouveau message n'arrive. Les messages déjà reçus sont conservés ici et vous pouvez toujours en supprimer."
+    "downgradedDescription": "Le formulaire de contact est inclus dans les formules Starter et Growth : plus aucun nouveau message n'arrive. Les messages déjà reçus sont conservés ici et vous pouvez toujours en supprimer."
   },
   "leadsInbox": {
     "listLabel": "Messages",
@@ -2073,12 +2086,19 @@
       "options": "Les options Growth sont maintenant disponibles sur votre site : plus de langues, tous les réglages d’Apparence, des modules de page supplémentaires et des fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
       "kept": "Si vous avez déjà utilisé Growth, vos choix précédents sont de retour, tels que vous les aviez laissés."
     },
+    "STARTER": {
+      "subject": "Votre site est passé à l’offre Starter",
+      "previewText": "{siteName} peut désormais utiliser les options Starter.",
+      "changed": "{siteName} est désormais sur l’offre Starter.",
+      "options": "Avec Starter, votre site peut utiliser son propre domaine et le formulaire de contact, et son pied de page n’affiche pas la mention « Propulsé par ». Les langues supplémentaires, tous les réglages d’Apparence et les autres modules de page sont inclus dans Growth.",
+      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés, et ce qui vient de Growth revient tel que vous l’aviez laissé si vous passez à Growth."
+    },
     "FREE": {
       "subject": "Votre site est passé à l’offre Free",
-      "previewText": "Les options Growth sont désactivées sur {siteName}.",
+      "previewText": "Les options des offres payantes sont désactivées sur {siteName}.",
       "changed": "{siteName} est désormais sur l’offre Free.",
-      "options": "Les options Growth sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page Growth et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
-      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à Growth."
+      "options": "Les options des offres payantes sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page payants et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
+      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à une offre payante."
     }
   },
   "suspensionCategory": {

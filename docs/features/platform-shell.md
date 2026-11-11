@@ -210,7 +210,7 @@ site, never at the top of the step.
 - On `/dashboard`, the plan decides which items appear (`planPageAccess`, see
   [plans-and-entitlements](./plans-and-entitlements.md)): Languages needs more
   than one plan locale, Email a mail-sending capability, and the inert "Coming
-  soon" rows Subscribers NEWSLETTER, Comments COMMENTS, Team any plan but FREE.
+  soon" rows Subscribers NEWSLETTER, Comments COMMENTS, Team `GROWTH` only.
   Their "Coming soon" pill is `neutral` with no dot, at the row's right edge,
   in the sidebar and the phone Menu alike; Leads' unread count is a `brand`
   pill with no dot.

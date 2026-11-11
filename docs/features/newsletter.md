@@ -4,6 +4,7 @@ status: partial
 layers: [studio, service, ui, web, db, email, platform]
 code:
   - packages/studio/src/schema-types/modules/newsletter/**
+  - packages/studio/src/schema-types/documents/pages/post/post.ts
   - packages/studio/src/schema-types/objects/newsletter-trust-cue/**
   - packages/service/src/features/modules/newsletter/**
   - packages/ui/src/components/organisms/newsletter-signup/**
@@ -28,6 +29,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 ## Surfaces and routes
 
+- **Studio** — each post's "Send to Subscribers" switch (`sendToSubscribers`), beside Published At: on for a new post, off on every starter post. Nothing reads it yet; it marks the post to be emailed once, on its first publish, and never on a later edit.
 - **Studio** — `module_newsletter` ("Newsletter Signup"): title, brand variant, variant (Full or Compact), heading block, copy, up to two trust cues, alignment, layout. Pickers relabel it "(off in Features)" and its documents warn while the capability is off.
 - **Public site** — the module on any page with a module list. Full shows copy and trust cues in a panel; Compact drops the supporting text, copy and trust cues.
 - `GET /api/newsletter/confirm?token=&lang=` — confirms, then redirects (303) to the result page.
@@ -39,7 +41,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 ## Data
 
-- Sanity: `module_newsletter` documents; trust cues are `newsletterTrustCue` objects (localized `text`, max 40 characters). Loaded through `service.modules.newsletter.v1.getNewsletter`, ISR-tagged `modules:newsletter` and `module:<id>`.
+- Sanity: `page_post.sendToSubscribers` (boolean, optional; initial value `true`). `module_newsletter` documents; trust cues are `newsletterTrustCue` objects (localized `text`, max 40 characters). Loaded through `service.modules.newsletter.v1.getNewsletter`, ISR-tagged `modules:newsletter` and `module:<id>`.
 - Neon `subscribers`: `id`, `tenant_id` (cascade), `email` (normalized), `status` `SUBSCRIBER_STATUS` (`PENDING` | `ACTIVE`, from `@blog/db/constants`), `confirmation_token_hash` (unique SHA-256 hex of the emailed confirm token; the raw token is never stored), `unsubscribe_token_hash` (unique SHA-256 hex of the random unsubscribe token emailed before links were signed; nothing writes it now, it only lets those earlier links keep working), `subscribed_at`, `confirmed_at`, `confirmation_sent_at` (the last confirmation send, claimed atomically). The address is stored only encrypted (`email_encrypted`, `PERSONAL_DATA_ENCRYPTION_KEY`), with two keyed HMACs under `PERSONAL_DATA_INDEX_KEY`: `email_index` ignores case and any `+tag`, and `email_exact_index` keeps the `+tag`. Unique (`tenant_id`, `email_exact_index`), so `a+x@d` and `a@d` stay separate subscriptions; a row written before that column existed has none and is not covered by the rule. Every read uses those: a signup finds its row through the index, then keeps only the row whose decrypted address equals the submitted one ignoring case, and emails that address; and the account section and `/account` actions find a reader's row through the index of their decrypted account email, then keep only the row whose decrypted address equals it ignoring case, so an account never reaches a `+tag` sibling's subscription; a resent confirmation goes to that row's address. No user FK: a signed-out reader can subscribe.
 - Unsubscribing deletes the row. Deprovisioning a tenant purges its subscribers. `queries.retention.deletePendingSubscribersPastRetention(now, limit)` deletes up to `limit` pending subscribers whose last confirmation email (or, if none was sent, their signup) is more than 30 days before `now`, and returns how many it deleted; active subscribers are never touched. The worker's daily inactivity sweep runs it (see tenant-provisioning.md).
 - Cookie `newsletter_unsubscribe_token` (one hour, `SameSite=Strict`, httpOnly, `Path=/api/newsletter/unsubscribe`) carries the token from the unsubscribe link to the confirm `POST`; without it the confirm lands on the invalid-link page.
@@ -47,7 +49,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 
 ## Configuration
 
-- **Editor (Studio)** — the module's content, variant, trust cues, alignment and layout, and where it is placed.
+- **Editor (Studio)** — whether a post is sent to subscribers; the module's content, variant, trust cues, alignment and layout, and where it is placed.
 - **Owner or operator (platform)** — the `NEWSLETTER` toggle, `GROWTH` only and locked off as Coming soon; the confirmation email's subject, body, logo, sender name, reply-to and postal footer on the Email page (see [email](./email.md)).
 - **Voice** — the confirm and unsubscribe result-page and confirmation-page copy is fixed (`newsletterConfirm.*`, `newsletterUnsubscribe.*`), as is the form copy, including the rate-limit message (`newsletterForm.errorRateLimited`).
 

@@ -5,6 +5,7 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
   formatOklchRamp,
+  HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   HUE_MAX,
   HUE_MIN,
@@ -16,6 +17,7 @@ import {
   type TCardStyle,
   type TDensity,
   type TFontChoice,
+  type THeaderControlShape,
   type THeaderControlStyle,
   type TMaybeUndefined,
   type TNavLinkStyle,
@@ -47,6 +49,7 @@ type TShapePreviewValues = {
   density: TDensity;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  headerControlShape: THeaderControlShape;
   buttonShape: TButtonShape;
   navLinkStyle: TNavLinkStyle;
 };
@@ -56,6 +59,7 @@ const buildShapePreviewTokens = ({
   density,
   cardStyle,
   headerControlStyle,
+  headerControlShape,
   buttonShape,
   navLinkStyle,
 }: TShapePreviewValues): TThemeDeclarations => {
@@ -64,6 +68,7 @@ const buildShapePreviewTokens = ({
     ...DENSITY_DECLARATIONS[density],
     ...CARD_STYLE_DECLARATIONS[cardStyle],
     ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+    ...HEADER_CONTROL_SHAPE_DECLARATIONS[headerControlShape],
     ...BUTTON_SHAPE_DECLARATIONS[buttonShape],
     ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
     ...DERIVED_RADIUS_DECLARATIONS,

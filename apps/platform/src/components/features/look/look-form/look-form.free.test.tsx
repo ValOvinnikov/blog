@@ -11,7 +11,10 @@ import {
   GROWTH_BADGE_TEXT,
 } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupLookForm,
+  withLookTenant,
+} from '@platform/testing/look/look-form-setup';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -40,7 +43,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm({ plan: TENANT_PLAN.FREE });
+      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
     });
 
     it.each([

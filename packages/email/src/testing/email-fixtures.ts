@@ -39,3 +39,7 @@ export const OPERATOR_BRAND_NAME = 'Tenant Alerts';
 export const DOCTYPE = '<!doctype html>';
 export const PREHEADER_STYLE = 'display:none';
 export const COPYRIGHT_ENTITY = '&copy;';
+export const MOCK_UNSUBSCRIBE_URL =
+  'https://example.com/api/newsletter/unsubscribe?token=abc&ref=email';
+export const MOCK_ESCAPED_UNSUBSCRIBE_URL =
+  'https://example.com/api/newsletter/unsubscribe?token=abc&amp;ref=email';
