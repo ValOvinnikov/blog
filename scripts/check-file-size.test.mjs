@@ -130,7 +130,98 @@ describe('findProblems', () => {
   });
 });
 
+describe('findProblems on a branch', () => {
+  const MOVED = 'apps/web/src/context/toast/toast-store.ts';
+  const baselined = { [MODULE]: BASELINED_LINES };
+  const branch = (touched) => ({
+    ...FULL_TREE,
+    touched: new Map(touched),
+    baseBaseline: baselined,
+  });
+
+  it('fails a touched baselined file that did not shrink, saying to extract', () => {
+    const problems = findProblems(
+      measureOne(MODULE, BASELINED_LINES),
+      baselined,
+      branch([[MODULE, MODULE]]),
+    );
+    assert.equal(problems.length, 1);
+    assert.match(
+      problems[0],
+      /^apps\/web\/.* budget of 120 .* without shrinking it .*Extract the part you changed/,
+    );
+  });
+
+  it('passes a touched baselined file that shrank and lowered its entry', () => {
+    const shrunk = BASELINED_LINES - 1;
+    assert.deepEqual(
+      findProblems(
+        measureOne(MODULE, shrunk),
+        { [MODULE]: shrunk },
+        branch([[MODULE, MODULE]]),
+      ),
+      [],
+    );
+  });
+
+  it('passes an untouched baselined file at its recorded count', () => {
+    assert.deepEqual(
+      findProblems(measureOne(MODULE, BASELINED_LINES), baselined, branch([])),
+      [],
+    );
+  });
+
+  it('ignores a touched file absent from the base baseline', () => {
+    const lines = BUDGET.MODULE + 1;
+    assert.deepEqual(
+      findProblems(
+        measureOne(MODULE, lines),
+        { [MODULE]: lines },
+        {
+          ...FULL_TREE,
+          touched: new Map([[MODULE, MODULE]]),
+          baseBaseline: {},
+        },
+      ),
+      [],
+    );
+  });
+
+  it('judges an edited moved file against its old path on the base branch', () => {
+    const problems = findProblems(
+      measureOne(MOVED, BASELINED_LINES),
+      { [MOVED]: BASELINED_LINES },
+      branch([[MOVED, MODULE]]),
+    );
+    assert.equal(problems.length, 1);
+    assert.match(problems[0], /without shrinking it/);
+  });
+
+  it('asks to move the entry of a moved baselined file', () => {
+    const problems = findProblems(
+      measureOne(MOVED, BASELINED_LINES),
+      baselined,
+      { ...FULL_TREE, moves: new Map([[MODULE, MOVED]]) },
+    );
+    assert.equal(problems.length, 1);
+    assert.match(problems[0], /moved to .* --update/);
+  });
+});
+
 describe('ratchetBaseline', () => {
+  it("carries a moved file's entry to its new path", () => {
+    const moved = 'apps/web/src/context/toast/toast-store.ts';
+    const measured = measureOne(moved, BASELINED_LINES);
+    const options = { ...FULL_TREE, moves: new Map([[MODULE, moved]]) };
+    const next = ratchetBaseline(
+      measured,
+      { [MODULE]: BASELINED_LINES },
+      options,
+    );
+    assert.deepEqual(next, { [moved]: BASELINED_LINES });
+    assert.deepEqual(findProblems(measured, next, options), []);
+  });
+
   it('lowers a shrunk entry so the check passes afterwards', () => {
     const measured = measureOne(MODULE, BASELINED_LINES - 10);
     const next = ratchetBaseline(

@@ -562,13 +562,14 @@ neither Storybook.
 
 Root `pnpm verify` is one `&&` chain over every required or gating CI check
 that has a local equivalent, in this order: `type-check`, `lint`, `test`,
-`check:test-budget`, `knip`, `check:client-graph`, `check:revalidate-tags-sync`,
+`check:test-budget`, `check:file-size`, `knip`, `check:client-graph`, `check:revalidate-tags-sync`,
 `check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`,
 `gen:const-index:check`, `gen:migration-ids:check`, `check:touched-lint`. The
 chain stops at the first failure, so a red step is reported once rather than
 buried under later output. It is the sequence `develop-feature` §5 hands to
 `verify-runner`, the `## Verify` line of every issue body, and — minus
-`test`, to keep a push fast — the `.husky/pre-push` hook (the non-test tail
+`test` and the warn-only `check:test-budget`, to keep a push fast — the
+`.husky/pre-push` hook (the non-test tail
 measured 13s on one machine against a warm Turbo cache, well under the
 threshold at which it would have stayed out).
 
@@ -588,7 +589,8 @@ threshold at which it would have stayed out).
 | **UI index** (gating)               | `pnpm gen:ui-index:check` — in `pnpm verify`. CI also runs the generator's own fixture tests in Verify's Script helper tests step; those only change when `scripts/gen-ui-index.mjs` does.                                                                                                                                                               |
 | **Const index** (gating)            | `pnpm gen:const-index:check` — in `pnpm verify`. Regenerate with `pnpm gen:const-index` after adding or changing a key/value const.                                                                                                                                                                                                                      |
 | **Migration id list** (gating)      | `pnpm gen:migration-ids:check` — in `pnpm verify`. Regenerate with `pnpm gen:migration-ids` after adding, renaming or removing a migration folder.                                                                                                                                                                                                       |
-| Touched-file lint (local only)      | `pnpm check:touched-lint` — in `pnpm verify`; no CI step. Lints the `.ts`/`.tsx` files changed since the merge-base with `origin/main` with `BLOG_LINT_TOUCHED=1`, which adds `prefer-shared-constant` and `no-duplicate-string`.                                                                                                                        |
+| Touched-file lint (local only)      | `pnpm check:touched-lint` — in `pnpm verify`; no CI step. Lints the `.ts`/`.tsx` files changed since the merge-base with `origin/main` with `BLOG_LINT_TOUCHED=1`, which adds the `blog-touched` rules (`configs/eslint/README.md`). With no merge-base it fails and names the `git fetch` to run.                                                       |
+| File size (local only)              | `pnpm check:file-size` — in `pnpm verify` and `.husky/pre-push`; no CI step. Holds `CLAUDE.md`'s "File size budgets" as a ratchet over `scripts/file-size-baseline.json`, and fails a baselined file the branch edits without shrinking it below its entry on the merge-base. With no merge-base it fails like the touched-file lint.                    |
 | **Build** (via CI)                  | No routine mirror — `pnpm build` is CI-only by `CLAUDE.md`'s rule; run it locally only to reproduce an actual CI build failure (`open-pull-request` Gate 5a).                                                                                                                                                                                            |
 | **Workflow security** (required)    | Zizmor and actionlint have no local script. When the diff touches `.claude/hooks/**` or `scripts/*.sh`, run the shellcheck + guard-test block in `develop-feature` §5 by hand.                                                                                                                                                                           |
 | **Migrations** (via CI)             | None — needs the dataset. `pnpm migrate:dry` in `packages/studio` is the nearest rehearsal, and it also targets a live dataset.                                                                                                                                                                                                                          |

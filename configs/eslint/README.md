@@ -98,7 +98,17 @@
   types, and files outside `apps/*` and `packages/*`. Co-located
   `prefer-utils-primitive.test.js`.
 
-  All three are registered in `base.js` under the `blog-touched` namespace, at
+- `no-failing-comment.js` — reports the comments `CLAUDE.md` "Comments
+  default to zero" bans that can be told apart mechanically: a doc block
+  spanning more than one line, a `Name — does X` comment, a multi-line comment
+  inside a function body, and any comment in a test file. A comment starting
+  with `TODO:`, `FIXME:`, `eslint-disable`/`eslint-enable`, `@ts-expect-error`,
+  `@vitest-environment`, `prettier-ignore` or a `/// <reference` directive is
+  allowed. A one-line doc comment and a one-line tuned-value note pass; whether
+  one earns its place is the reviewer's call. Co-located
+  `no-failing-comment.test.js`.
+
+  All four are registered in `base.js` under the `blog-touched` namespace, at
   threshold 2 for `no-duplicate-string`, and only when `BLOG_LINT_TOUCHED=1` —
   set by `.claude/hooks/post-edit-lint.sh`, `.husky/pre-commit` (lint-staged) and
   `pnpm check:touched-lint`. Repo-wide `pnpm lint` never sets it, so a file

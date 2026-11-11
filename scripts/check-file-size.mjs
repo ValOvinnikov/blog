@@ -1,6 +1,7 @@
 // Holds CLAUDE.md's file size budgets as a ratchet: a file over budget must be
 // in the baseline at its exact non-blank line count, so it can only shrink.
-// `--update` lowers or removes baseline entries and never raises or adds one.
+// `--update` lowers, moves or removes baseline entries and never raises or adds one.
+// A full-tree run also fails a baselined file the branch edits without shrinking.
 import {
   existsSync,
   readdirSync,
@@ -11,6 +12,13 @@ import {
 } from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import {
+  listTouchedChanges,
+  missingBaseMessage,
+  readAtBase,
+  resolveBase,
+} from './touched-files.mjs';
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -64,12 +72,47 @@ export const measure = (files, readText) =>
       ...classify(file),
     }));
 
-export const findProblems = (measured, baseline, { checkMissing }) => {
+export const carryMoves = (baseline, moves = new Map()) => {
+  const carried = { ...baseline };
+  const moved = [];
+  for (const [from, to] of moves) {
+    if (carried[from] !== undefined && carried[to] === undefined) {
+      carried[to] = carried[from];
+      delete carried[from];
+      moved.push([from, to]);
+    }
+  }
+  return { carried, moved };
+};
+
+const touchedProblem = (
+  { file, lines, kind, budget },
+  baseBaseline,
+  touched,
+) => {
+  if (!touched?.has(file)) return undefined;
+  const before = baseBaseline[touched.get(file)];
+  if (before === undefined || lines < before) return undefined;
+  return `${file} is over its ${kind} budget of ${budget} and this branch edits it without shrinking it (${lines} non-blank lines, ${before} on the base branch). Extract the part you changed into its own file (CLAUDE.md "File size budgets"), then run \`pnpm check:file-size --update\`.`;
+};
+
+export const findProblems = (
+  measured,
+  baseline,
+  { checkMissing, moves, touched, baseBaseline = {} },
+) => {
   const problems = [];
   const seen = new Set();
-  for (const { file, lines, kind, budget } of measured) {
+  const { carried, moved } = carryMoves(baseline, moves);
+  for (const [from, to] of moved)
+    problems.push(
+      `${from} moved to ${to}; run \`pnpm check:file-size --update\` to move its entry in ${BASELINE_PATH}.`,
+    );
+  for (const entry of measured) {
+    const { file, lines, kind, budget } = entry;
     seen.add(file);
-    const recorded = baseline[file];
+    const recorded = carried[file];
+    const touchedUnshrunk = touchedProblem(entry, baseBaseline, touched);
     if (recorded === undefined) {
       if (lines > budget)
         problems.push(
@@ -79,6 +122,8 @@ export const findProblems = (measured, baseline, { checkMissing }) => {
       problems.push(
         `${file} grew to ${lines} non-blank lines from its baseline of ${recorded}; the ${kind} budget is ${budget}. Extract the part you changed instead of adding to it.`,
       );
+    } else if (touchedUnshrunk) {
+      problems.push(touchedUnshrunk);
     } else if (lines < recorded) {
       problems.push(
         `${file} shrank to ${lines} non-blank lines from its baseline of ${recorded}; run \`pnpm check:file-size --update\` to lower its entry.`,
@@ -86,7 +131,7 @@ export const findProblems = (measured, baseline, { checkMissing }) => {
     }
   }
   if (checkMissing) {
-    for (const file of Object.keys(baseline)) {
+    for (const file of Object.keys(carried)) {
       if (!seen.has(file))
         problems.push(
           `${file} is in ${BASELINE_PATH} but is gone or no longer budgeted; run \`pnpm check:file-size --update\` to remove its entry.`,
@@ -96,10 +141,15 @@ export const findProblems = (measured, baseline, { checkMissing }) => {
   return problems;
 };
 
-export const ratchetBaseline = (measured, baseline, { checkMissing }) => {
+export const ratchetBaseline = (
+  measured,
+  baseline,
+  { checkMissing, moves },
+) => {
   const byFile = new Map(measured.map((entry) => [entry.file, entry]));
   const next = {};
-  for (const [file, recorded] of Object.entries(baseline)) {
+  const { carried } = carryMoves(baseline, moves);
+  for (const [file, recorded] of Object.entries(carried)) {
     const entry = byFile.get(file);
     if (!entry) {
       if (!checkMissing) next[file] = recorded;
@@ -143,11 +193,28 @@ const toRepoPath = (arg) =>
 const readBaseline = () =>
   JSON.parse(readFileSync(join(repoRoot, BASELINE_PATH), 'utf8'));
 
+const readBranchChanges = () => {
+  const base = resolveBase();
+  if (!base) return undefined;
+  const baseText = readAtBase(base, BASELINE_PATH);
+  return {
+    ...listTouchedChanges(base),
+    baseBaseline: baseText === undefined ? {} : JSON.parse(baseText),
+  };
+};
+
 const main = () => {
   const args = process.argv.slice(2);
   const update = args.includes(UPDATE_FLAG);
   const named = args.filter((arg) => arg !== UPDATE_FLAG).map(toRepoPath);
   const checkMissing = named.length === 0;
+  const branch = checkMissing ? readBranchChanges() : {};
+  if (!branch) {
+    console.error(`error: ${missingBaseMessage()}`);
+    process.exitCode = 1;
+    return;
+  }
+  const options = { checkMissing, ...branch };
   const files = (checkMissing ? listAllFiles() : named).filter((file) =>
     existsSync(join(repoRoot, file)),
   );
@@ -155,7 +222,7 @@ const main = () => {
     readFileSync(join(repoRoot, file), 'utf8'),
   );
   const baseline = update
-    ? ratchetBaseline(measured, readBaseline(), { checkMissing })
+    ? ratchetBaseline(measured, readBaseline(), options)
     : readBaseline();
 
   if (update) {
@@ -168,7 +235,7 @@ const main = () => {
     );
   }
 
-  const problems = findProblems(measured, baseline, { checkMissing });
+  const problems = findProblems(measured, baseline, options);
   if (problems.length === 0) {
     console.log(
       `File size: ${measured.length} files within budget or baseline.`,

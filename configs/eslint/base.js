@@ -9,6 +9,7 @@ import tseslint from 'typescript-eslint';
 
 import { noClassAssertionsRule } from './no-class-assertions.js';
 import { noDuplicateStringRule } from './no-duplicate-string.js';
+import { noFailingCommentRule } from './no-failing-comment.js';
 import { noNestedQueryRule } from './no-nested-query.js';
 import { noNodeAccessRule } from './no-node-access.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
@@ -28,6 +29,7 @@ const touchedFilePlugins = {
       rules: {
         'prefer-shared-constant': preferSharedConstantRule,
         'no-duplicate-string': noDuplicateStringRule,
+        'no-failing-comment': noFailingCommentRule,
         'prefer-utils-primitive': preferUtilsPrimitiveRule,
       },
     },
@@ -40,6 +42,7 @@ const touchedFileRules = {
   rules: {
     'blog-touched/prefer-shared-constant': 'error',
     'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
+    'blog-touched/no-failing-comment': 'error',
     'blog-touched/prefer-utils-primitive': 'error',
   },
 };

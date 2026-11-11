@@ -1,15 +1,17 @@
 #!/bin/sh
-# PostToolUse hook: lint the TypeScript file an agent just edited/wrote so
-# lint failures — including the layer-boundary no-restricted-imports rules —
-# surface in the same turn instead of at commit time (lint-staged/pre-push).
+# PostToolUse hook: lint and size-check the TypeScript file an agent just
+# edited/wrote so lint failures — including the layer-boundary
+# no-restricted-imports rules — and file size budget breaches surface in the
+# same turn instead of at commit time (lint-staged/pre-push).
 # Runs via post-edit.sh, after post-edit-prettier.sh has formatted the file.
 #
 # Contract (Claude Code hooks):
 #   stdin  — JSON payload; the edited file is .tool_input.file_path
 #   exit 0 — silent success (also: non-TS file, missing file, no eslint,
 #            ESLint fatal error where no eslint.config.* resolves)
-#   exit 2 — stderr is fed back to the agent as feedback (lint problems, or
-#            ESLint failing to load a config that exists); report-only, no --fix
+#   exit 2 — stderr is fed back to the agent as feedback (lint or size
+#            problems, or ESLint failing to load a config that exists);
+#            report-only, no --fix
 set -u
 
 payload=$(cat)
@@ -59,23 +61,30 @@ done
 cd "$workspace_dir" || exit 0
 
 # BLOG_LINT_TOUCHED switches on the rules that apply only to files being
-# changed (prefer-shared-constant, no-duplicate-string).
+# changed (the blog-touched rules in configs/eslint/base.js).
 output=$(BLOG_LINT_TOUCHED=1 "$eslint" --no-warn-ignored "$file_path" 2>&1)
 status=$?
 
 # ESLint exits 0 clean, 1 on lint problems, >=2 fatal. A fatal exit beside an
 # eslint.config.* means the config failed to load (often a stale install), so
 # every edit would go unlinted unless the agent is told.
+feedback=0
+
 if [ "$status" -eq 1 ]; then
   printf '%s\n' "$output" >&2
-  exit 2
-fi
-
-if [ "$status" -ge 2 ] && ls ./eslint.config.* >/dev/null 2>&1; then
+  feedback=1
+elif [ "$status" -ge 2 ] && ls ./eslint.config.* >/dev/null 2>&1; then
   first_error=$(printf '%s\n' "$output" | grep -m1 -i 'error' || printf '%s\n' "$output" | head -n 1)
   printf 'ESLint could not load its config, so %s was not linted:\n  %s\nRun pnpm install in %s, then re-save the file.\n' \
     "$file_path" "$first_error" "$project_dir" >&2
-  exit 2
+  feedback=1
 fi
 
+size_check="$project_dir/scripts/check-file-size.mjs"
+if [ -f "$size_check" ] && ! size_output=$(node "$size_check" "$file_path" 2>&1); then
+  printf '%s\n' "$size_output" >&2
+  feedback=1
+fi
+
+[ "$feedback" -eq 0 ] || exit 2
 exit 0

@@ -37,6 +37,18 @@ fi
 EOF
 chmod +x "$project/node_modules/.bin/prettier" "$project/node_modules/.bin/eslint"
 
+mkdir -p "$project/scripts"
+cat > "$project/scripts/check-file-size.mjs" <<'EOF'
+import { appendFileSync, readFileSync } from 'node:fs';
+const file = process.argv[2];
+appendFileSync(process.env.CALLS, `size file=${file}\n`);
+if (readFileSync(file, 'utf8').includes('OVER_BUDGET')) {
+  console.error(`error: ${file} has 151 non-blank lines; the component budget is 150.`);
+  process.exit(1);
+}
+console.log('File size: 1 files within budget or baseline.');
+EOF
+
 dirty="$project/apps/web/src/dirty.ts"
 clean="$project/apps/web/src/clean.ts"
 outside="$project/packages/utils/src/no-config.ts"
@@ -49,6 +61,8 @@ load_fail="$project/apps/web/src/load-fail.ts"
 load_fail_outside="$project/packages/utils/src/load-fail.ts"
 printf "// LOAD_FAIL\n" > "$load_fail"
 printf "// LOAD_FAIL\n" > "$load_fail_outside"
+over_budget="$project/apps/web/src/over-budget.ts"
+printf "// OVER_BUDGET\n" > "$over_budget"
 
 payload_for() {
   printf '{"tool_input":{"file_path":"%s"}}' "$1"
@@ -84,32 +98,44 @@ cd "$project" || exit 1
 run_hook "$(payload_for "$dirty")"
 expect "lint problems reach the agent: prettier first, eslint from the workspace" 2 \
   "prettier cwd=$project file=$dirty
-eslint cwd=$project/apps/web file=$dirty" "no-console"
+eslint cwd=$project/apps/web file=$dirty
+size file=$dirty" "no-console"
 
 run_hook "$(payload_for "$clean")"
 expect "clean file is formatted and linted silently" 0 \
   "prettier cwd=$project file=$clean
-eslint cwd=$project/apps/web file=$clean" ""
+eslint cwd=$project/apps/web file=$clean
+size file=$clean" ""
 
 run_hook "$(payload_for "$outside")"
 expect "file with no workspace config lints from the project root" 2 \
   "prettier cwd=$project file=$outside
-eslint cwd=$project file=$outside" "no-console"
+eslint cwd=$project file=$outside
+size file=$outside" "no-console"
 
 run_hook "$(payload_for "$load_fail")"
 expect "ESLint failing to load inside a workspace reaches the agent" 2 \
   "prettier cwd=$project file=$load_fail
-eslint cwd=$project/apps/web file=$load_fail" "Run pnpm install in $project"
+eslint cwd=$project/apps/web file=$load_fail
+size file=$load_fail" "Run pnpm install in $project"
 
 run_hook "$(payload_for "$load_fail")"
 expect "the load failure names the error ESLint printed" 2 \
   "prettier cwd=$project file=$load_fail
-eslint cwd=$project/apps/web file=$load_fail" "ERR_MODULE_NOT_FOUND"
+eslint cwd=$project/apps/web file=$load_fail
+size file=$load_fail" "ERR_MODULE_NOT_FOUND"
 
 run_hook "$(payload_for "$load_fail_outside")"
 expect "ESLint failing where no config resolves stays silent" 0 \
   "prettier cwd=$project file=$load_fail_outside
-eslint cwd=$project file=$load_fail_outside" ""
+eslint cwd=$project file=$load_fail_outside
+size file=$load_fail_outside" ""
+
+run_hook "$(payload_for "$over_budget")"
+expect "a file over its size budget reaches the agent after a clean lint" 2 \
+  "prettier cwd=$project file=$over_budget
+eslint cwd=$project/apps/web file=$over_budget
+size file=$over_budget" "component budget is 150"
 
 run_hook "$(payload_for "$markdown")"
 expect "non-TS file is formatted but not linted" 0 \
@@ -124,26 +150,30 @@ expect "malformed payload is a silent no-op" 0 "" ""
 run_hook "$(payload_for "apps/web/src/dirty.ts")"
 expect "relative path resolves against the cwd" 2 \
   "prettier cwd=$project file=$dirty
-eslint cwd=$project/apps/web file=$dirty" "no-console"
+eslint cwd=$project/apps/web file=$dirty
+size file=$dirty" "no-console"
 
 cd "$project/apps" || exit 1
 run_hook "$(payload_for "web/src/dirty.ts")"
 expect "relative path from a cwd below the project dir is absolutised for both tools" 2 \
   "prettier cwd=$project file=$dirty
-eslint cwd=$project/apps/web file=$dirty" "no-console"
+eslint cwd=$project/apps/web file=$dirty
+size file=$dirty" "no-console"
 cd "$project" || exit 1
 
 unset CLAUDE_PROJECT_DIR
 run_hook "$(payload_for "$dirty")"
 expect "CLAUDE_PROJECT_DIR unset falls back to the git toplevel" 2 \
   "prettier cwd=$project file=$dirty
-eslint cwd=$project/apps/web file=$dirty" "no-console"
+eslint cwd=$project/apps/web file=$dirty
+size file=$dirty" "no-console"
 
 cd / || exit 1
 run_hook "$(payload_for "$dirty")"
 expect "fallback is anchored on the file, not the cwd" 2 \
   "prettier cwd=$project file=$dirty
-eslint cwd=$project/apps/web file=$dirty" "no-console"
+eslint cwd=$project/apps/web file=$dirty
+size file=$dirty" "no-console"
 cd "$project" || exit 1
 
 export CLAUDE_PROJECT_DIR="$project"
