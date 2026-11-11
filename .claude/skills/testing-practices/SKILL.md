@@ -112,7 +112,10 @@ not to test", and treats "nothing to add" as a complete outcome.
 ## Per-package setup
 
 The shared preset is `@blog/vitest-config/preset` (`configs/vitest/preset.ts`):
-globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
+globals, `src/**/*.{test,spec}.{ts,tsx}`, and `mockReset`, `restoreMocks`,
+`unstubGlobals` and `unstubEnvs` for every workspace — so a test never writes
+its own `vi.restoreAllMocks()`, `vi.unstubAllGlobals()`, `vi.unstubAllEnvs()`
+or a `mockReset()` that only returns a fake to its default.
 
 - **`apps/web`, `apps/platform`** — `createVitestConfig({ resolve: { alias } })`
   from the preset: jsdom, `src/vitest-setup.ts`, `server-only` stubbed. It
@@ -132,11 +135,10 @@ globals, `src/**/*.{test,spec}.{ts,tsx}`, `clearMocks`.
   with `isolate: false`, which its setup's explicit `cleanup()` makes safe.
 - **`packages/service`** and **`apps/worker`** run on `vmThreads`, which
   keeps each file's `vi.mock`s while importing the SDKs once per worker; **`packages/db`** on `threads`,
-  with `unstubEnvs: true`, query tests getting their database from
-  `useQueryTestDb()` and the shared `src/__mocks__/client.ts`.
+  query tests getting their database from `useQueryTestDb()` and the shared
+  `src/__mocks__/client.ts`.
   Its worker restores one PGlite and truncates every table before each file.
-- **Every other package** runs in `node`; `service`, `db`, `auth` and `email`
-  also set `mockReset: true`.
+- **Every other package** runs in `node`.
 - **`packages/studio`** and **`packages/db`** run with `isolate: false` and
   the shared `RESET_FILE_STATE_SETUP` (`@blog/vitest-config/preset`), which
   calls `vi.resetModules()` and, after each file, unstubs envs and globals,
@@ -622,20 +624,25 @@ tenant)`) is fine: that call is the contract with the outside.
     `__mocks__/` file** in the change that would write the third copy; until
     then an inline factory is fine. db's `@blog/db/client` already has one
     (`src/__mocks__/client.ts`, which `useQueryTestDb()` points at the
-    worker's PGlite instance). Service's `@blog/service/sanity/query/query` is
-    far past three copies, so the next test that needs it extracts it
-    instead of writing another — a partial mock, because every loader
-    needs the real `q` builder, so its `__mocks__/query.ts` spreads
-    `vi.importActual(…)` and replaces only `runQuery`; `mockRun`
-    (`@blog/service/testing/mock-run-query`) stays the typed handle.
+    worker's PGlite instance), and a db test that needs a tenant row calls
+    `useTestTenant(db)` (`@blog/db/testing/test-tenant`), which inserts it
+    before each test and deletes it after — never a hand-written
+    `insertTestTenant` and cleanup pair. Service's `@blog/service/sanity/query/query`
+    has `src/sanity/query/__mocks__/query.ts` — a partial mock, because every
+    loader needs the real `q` builder, so it spreads `vi.importActual(…)` and
+    replaces only `runQuery`; `mockRun`
+    (`@blog/service/testing/mock-run-query`) is the typed handle.
+  - **A Studio validator's context comes from `mockValidationContext`**
+    (`@blog/studio/testing/mock-validation-context`), built from the fields
+    the validator reads; `mockGroqValidationContext` adds a fake GROQ client.
+    Never cast a hand-built object to `ValidationContext`.
   - **Never restate a `__mocks__` default in `beforeEach`** —
     `mockResolvedValue(MOCK_REQUEST_CONTEXT)`, the default auth session.
     Override only what the case changes.
-  - **Override with the `Once` form, or call `vi.mocked(fn).mockReset()` in
-    `beforeEach`** — it restores the `vi.fn(impl)` default; never re-set the
-    default value. The preset's `clearMocks` clears calls but keeps an
-    implementation a previous test set; `service`, `db`, `auth` and `email`
-    set `mockReset: true`, which does the reset before every test.
+  - **Override with the `Once` form or a plain override in the case** — the
+    preset's `mockReset` restores every `vi.fn(impl)` default before each
+    test, so never re-set the default value and never write a `mockReset()`
+    in `beforeEach`.
 
 ## What not to test
 

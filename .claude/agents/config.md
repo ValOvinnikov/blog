@@ -142,12 +142,18 @@ Add a missing one there rather than locally.
 
 - `TMaybeUndefined<T>` for `T | undefined`, `TMaybeNull<T>` for `T | null`,
   `TNullable<T>` for `T | null | undefined` — in a prop, a return type, a
-  `useState` or a `createContext` alike. `TMaybeUndefined` lives in
-  `types/index.ts`; `TMaybeNull` and `TNullable` join it there.
+  `useState` or a `createContext` alike. All three live in `types/index.ts`.
 - `TValueOf<typeof C>` (`@blog/config/utils`) for a const's union — never
   `(typeof C)[keyof typeof C]`.
+- `TByLocale<V>` for a value per locale, `TPartialByLocale<V>` where a locale
+  may be missing — never `Record<TLocaleIsoCode, V>` by hand.
 - `IWithClassName`, `IWithDataTestId`, `ILocalizedParams`,
-  `ITenantLocalizedParams`.
+  `ITenantLocalizedParams`, `ITenantLocalizedSlugParams`, `ITenantIdParams`
+  (`types/index.ts`).
+- `TActionResult` (`types/action-result.ts`) for a Server Action or route
+  result, read through the outcome guards (CLAUDE.md → "Read an action result
+  through its outcome guards").
+- `THeadingAlignment` (`constants/layout.ts`) for a heading's alignment.
 - Exempt: the generated Sanity types, and `@blog/utils`, `@blog/insight` and
   `@blog/email`, which sit below `@blog/config` and cannot import it.
 - A raw form already in the repo converts when its file is touched, never as
@@ -164,8 +170,18 @@ the change that would create it". What the helper needs decides its folder:
   names it: `src/utils/<name>/` in the apps, `db`, `auth` and `email`;
   `shared/<kind>/<domain>/` in `service`; grouped by kind in `studio`;
   `src/lib/` in `ui`.
+- `@blog/utils/primitives` already holds these — use them, never the cast:
+  - `isOneOf(values, value)` (`arrays.ts`) narrows a string to one of a
+    const's values, never `values.includes(x as T)`;
+  - `mapKeysToRecord(keys, fn)` (`objects.ts`) builds a record from a key
+    list, never `as Record<K, V>`;
+  - `objectKeys(x)` (`objects.ts`), never `Object.keys(x) as`.
 - A one-line idiom never gets a helper: `?? []`, `.length > 0`,
-  `?? undefined`, `?? ''`.
+  `?? undefined`, `?? ''`, `!value?.trim()`, `value?.trim() || undefined`,
+  `parts.filter(Boolean).join(' ') || undefined`.
+- Two helpers are deliberately absent: no `isPresent`, because TypeScript
+  infers the narrowing from `.filter((x) => x !== null)`; no `toEnumValues`,
+  because `pgEnum` and `z.enum` take the const object itself.
 
 ### Constants
 
