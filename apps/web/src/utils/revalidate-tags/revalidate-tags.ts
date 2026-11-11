@@ -1,25 +1,8 @@
 import type { AllSanitySchemaTypes, TModuleType } from '@blog/config';
 
-/** Every document/object `_type` string the generated schema defines. */
 type TSanityType = Extract<AllSanitySchemaTypes, { _type: string }>['_type'];
 
-/**
- * Every non-module document `_type` that at least one `@blog/service` loader's
- * `isr(...)` call actually depends on. Kept in sync by hand against
- * `packages/service/src` — required (like `TModuleType`) so a removed or
- * typo'd entry fails `type-check` instead of silently purging nothing.
- *
- * The opposite mistake — a brand-new `isr(...)` tag with no matching value
- * below — is caught separately by `pnpm check:revalidate-tags-sync`
- * (`scripts/check-revalidate-tags-sync.mjs`), which extracts every tag
- * literal passed to `isr(...)` across `packages/service/src` and fails if
- * one is absent from this map's value union.
- *
- * `settings_voice` is deliberately excluded: audited via
- * `grep -rln "voice" packages/service/src` (excluding tests) with zero hits —
- * it's Sanity Studio-only config, read by nothing that caches, so it
- * correctly has no entry below.
- */
+/** Every non-module document `_type` that a `@blog/service` loader's `isr(...)` tags depend on. */
 type TCachedDocumentType =
   | 'page_tag'
   | 'page_topic'
@@ -56,22 +39,7 @@ type TCachedDocumentType =
   | 'block_testimonial'
   | 'block_faq';
 
-/**
- * Base ISR tags to revalidate per Sanity document `_type`, for the revalidation
- * webhook. Module types additionally purge a per-document `module:<id>` tag
- * (appended in the resolver).
- *
- * The `satisfies` clause requires both `TModuleType` and `TCachedDocumentType`
- * (`Record<TModuleType | TCachedDocumentType, …>`), so a schema addition to
- * either union without a matching entry here fails `type-check` —
- * regardless of whether any page's own module map ever renders that module
- * type.
- * Every other document/object `_type` stays `Partial`, since it legitimately
- * purges nothing. The tag strings themselves are the literals passed to
- * `isr(...)` in `@blog/service` loaders (a few predate a `{group}_{name}`
- * rename, e.g. the `page_home` document invalidates the `homePage` tag) —
- * keep them in sync with `packages/service/src`.
- */
+/** Base ISR tags the revalidation webhook purges, per Sanity document `_type`. */
 const REVALIDATE_TAGS = {
   person: ['author', 'posts', 'modules:team'],
   blog_topic: ['topic', 'topics', 'posts'],
@@ -101,7 +69,6 @@ const REVALIDATE_TAGS = {
   page_legalIndex: ['page_legalIndex'],
   page_legalDocument: ['page_legalDocument'],
   page_cookieStatement: ['page_cookieStatement'],
-  module_hero: ['modules:hero'],
   module_heroBlog: ['modules:heroBlog'],
   module_heroProfile: ['modules:heroProfile'],
   module_heroStatement: ['modules:heroStatement'],
@@ -137,22 +104,11 @@ const REVALIDATE_TAGS = {
 > &
   Partial<Record<TSanityType, readonly string[]>>;
 
-/**
- * Resolves the ISR tags affected by a change to a document of the given
- * `_type`. Unknown types resolve to an empty list.
- *
- * The `Object.hasOwn` guard means the user-controlled `type` (from the webhook
- * body) can only ever hit a registered own key — never fall through to an
- * `Object.prototype` member — and the value read is plain data, never an
- * invoked function (CodeQL `js/unvalidated-dynamic-method-call`).
- *
- * @example
- * getRevalidateTagsForType('page_post', 'page_post-123') // ['page_post', 'posts', 'author', 'topic', 'tag']
- */
 export const getRevalidateTagsForType = (
   type: string,
   id: string,
 ): string[] => {
+  // `type` comes from the webhook body, so never read an `Object.prototype` key.
   if (!Object.hasOwn(REVALIDATE_TAGS, type)) return [];
 
   const tags: string[] = [

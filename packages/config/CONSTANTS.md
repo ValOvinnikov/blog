@@ -173,7 +173,6 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/module.ts`
 
-- **HERO_FIELD_MODE**: `CUSTOM`, `NONE`, `POST_TOPIC`, `POST_TITLE`, `POST_EXCERPT`, `POST_IMAGE`
 - **HERO_VARIANT**: `SPLIT`, `STACKED`, `BANNER`
 - **NEWSLETTER_VARIANT**: `FULL`, `COMPACT`
 - **POST_SOURCE**: `PINNED`, `NEWEST_FEATURED`

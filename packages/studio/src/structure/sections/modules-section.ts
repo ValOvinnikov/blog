@@ -1,4 +1,3 @@
-import { heroSchema } from '@blog/studio/schema-types/modules/hero/hero';
 import { heroBlogSchema } from '@blog/studio/schema-types/modules/hero-blog/hero-blog';
 import { heroProfileSchema } from '@blog/studio/schema-types/modules/hero-profile/hero-profile';
 import { heroStatementSchema } from '@blog/studio/schema-types/modules/hero-statement/hero-statement';
@@ -17,7 +16,6 @@ export const modulesSection: TStructureSection = {
         { schema: heroBlogSchema },
         { schema: heroStatementSchema },
         { schema: heroProfileSchema },
-        { schema: heroSchema },
       ],
     },
     ...moduleKinds.map(({ title, modules }) => ({

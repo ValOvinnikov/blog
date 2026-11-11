@@ -83,8 +83,8 @@ apps/web
   under `packages/service/src/features/modules/<type>/`, with its own GROQ,
   transformer, and `T | undefined` view-model (`THeroModule`,
   `TPostListModule`, `TContentModule`, `TCtaModule`). `module_postList` fetches
-  its own posts (the newest `limit`); `module_hero` resolves its own
-  custom-vs-fallback fields (see [`content-model.md`](./content-model.md)).
+  its own posts (the newest `limit`) (see
+  [`content-model.md`](./content-model.md)).
 - **Service also has a scoped write path, `service.editorial.*`** (e.g.
   `service.editorial.skim.v1`, added for the choose-your-depth reading
   pipeline, #957) — separate from the read-only flow described above.

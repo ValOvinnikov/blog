@@ -34,7 +34,7 @@ vi.mock('@web/modules/post-related/post-related-module', () => ({
 }));
 
 const MOCK_POST_ID = faker.string.uuid();
-const MOCK_UNKNOWN_MODULE_TYPE = 'module_hero';
+const MOCK_UNKNOWN_MODULE_TYPE = 'module_heroBlog';
 
 const setup = customRender(BlogPostModuleRenderer, {
   modules: [] as TModule<TPagePostType>[],
@@ -67,7 +67,7 @@ describe(`<${BlogPostModuleRenderer.name}/>`, () => {
   it('warns once and renders nothing for a module outside the allow-list', () => {
     const unknownModule = mockModule(MOCK_UNKNOWN_MODULE_TYPE);
 
-    // @ts-expect-error -- module_hero is not in the post page allow-list
+    // @ts-expect-error -- module_heroBlog is not in the post page allow-list
     setup({ modules: [unknownModule] });
 
     const unknownModuleText = screen.queryByText(unknownModule.id);

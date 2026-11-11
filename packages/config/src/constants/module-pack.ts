@@ -1,4 +1,5 @@
 import type { TMaybeNull } from '@blog/config/types';
+import { isNull } from '@blog/utils/primitives';
 
 import type { TValueOf } from '@blog/config/utils';
 
@@ -12,7 +13,6 @@ export const MODULE_PACK = {
 export type TModulePack = TValueOf<typeof MODULE_PACK>;
 
 export const MODULE_PACK_BY_TYPE = {
-  module_hero: MODULE_PACK.CORE,
   module_heroBlog: MODULE_PACK.CORE,
   module_heroStatement: MODULE_PACK.CORE,
   module_heroProfile: MODULE_PACK.CORE,
@@ -50,5 +50,5 @@ export const isModuleTypeEntitled = (
 ): boolean => {
   const pack = getModulePack(type);
 
-  return pack !== null && entitledPacks.includes(pack);
+  return !isNull(pack) && entitledPacks.includes(pack);
 };

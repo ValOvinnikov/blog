@@ -40,7 +40,7 @@ const dataset = [
   },
   {
     _id: MOCK_VIA_LINK_MODULE_ID,
-    _type: 'module_hero',
+    _type: 'module_heroBlog',
     link: mockReference(MOCK_LINK_TO_POST_ID),
   },
   {

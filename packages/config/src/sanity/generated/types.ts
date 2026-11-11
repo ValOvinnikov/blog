@@ -511,123 +511,6 @@ export type Module_postList = {
   layout?: WideLayout;
 };
 
-export type Module_hero = {
-  _id: string;
-  _type: 'module_hero';
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
-  featuredPost?: Page_postReference;
-  heroEyebrowMode?: 'POST_TOPIC' | 'CUSTOM';
-  heroEyebrow?: string;
-  heroTitleMode?: 'POST_TITLE' | 'CUSTOM';
-  heroTitle?: string;
-  heroSubtitleMode?: 'POST_EXCERPT' | 'CUSTOM';
-  heroSubtitle?: string;
-  heroImageMode?: 'POST_IMAGE' | 'CUSTOM' | 'NONE';
-  heroImage?: ImageWithAlt;
-  primaryActionLabel?: string;
-  secondaryAction?: InlineLink;
-  layout?: HeroLayout;
-};
-
-export type Blog_topicReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_topic';
-};
-
-export type Page_landingReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_landing';
-};
-
-export type Page_postIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_postIndex';
-};
-
-export type Page_privacyIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_privacyIndex';
-};
-
-export type Page_privacyDocumentReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
-};
-
-export type Page_legalIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
-};
-
-export type Page_legalDocumentReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_legalDocument';
-};
-
-export type Page_cookieStatementReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
-};
-
-export type InlineLink = {
-  _type: 'inlineLink';
-  label?: string;
-  accessibleLabel?: string;
-  linkType?: 'INTERNAL' | 'EXTERNAL';
-  internalReference?:
-    | Page_postReference
-    | Blog_topicReference
-    | Page_landingReference
-    | Page_postIndexReference
-    | Page_privacyIndexReference
-    | Page_privacyDocumentReference
-    | Page_legalIndexReference
-    | Page_legalDocumentReference
-    | Page_cookieStatementReference;
-  url?: string;
-  openInNewTab?: boolean;
-  platform?:
-    | 'X'
-    | 'GITHUB'
-    | 'LINKEDIN'
-    | 'YOUTUBE'
-    | 'INSTAGRAM'
-    | 'MASTODON'
-    | 'BLUESKY'
-    | 'FACEBOOK'
-    | 'THREADS'
-    | 'RSS';
-};
-
-export type ImageWithAlt = {
-  _type: 'imageWithAlt';
-  asset?: SanityImageAssetReference;
-  media?: unknown;
-  hotspot?: SanityImageHotspot;
-  crop?: SanityImageCrop;
-  alt?: string;
-};
-
 export type ExpandableSectionText = Array<
   | {
       children?: Array<{
@@ -994,6 +877,92 @@ export type LinkRef = {
   link?: LinkReference;
 };
 
+export type Blog_topicReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_topic';
+};
+
+export type Page_landingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_landing';
+};
+
+export type Page_postIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_postIndex';
+};
+
+export type Page_privacyIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_privacyIndex';
+};
+
+export type Page_privacyDocumentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
+};
+
+export type Page_legalIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
+};
+
+export type Page_legalDocumentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalDocument';
+};
+
+export type Page_cookieStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
+};
+
+export type InlineLink = {
+  _type: 'inlineLink';
+  label?: string;
+  accessibleLabel?: string;
+  linkType?: 'INTERNAL' | 'EXTERNAL';
+  internalReference?:
+    | Page_postReference
+    | Blog_topicReference
+    | Page_landingReference
+    | Page_postIndexReference
+    | Page_privacyIndexReference
+    | Page_privacyDocumentReference
+    | Page_legalIndexReference
+    | Page_legalDocumentReference
+    | Page_cookieStatementReference;
+  url?: string;
+  openInNewTab?: boolean;
+  platform?:
+    | 'X'
+    | 'GITHUB'
+    | 'LINKEDIN'
+    | 'YOUTUBE'
+    | 'INSTAGRAM'
+    | 'MASTODON'
+    | 'BLUESKY'
+    | 'FACEBOOK'
+    | 'THREADS'
+    | 'RSS';
+};
+
 export type Aside = {
   _type: 'aside';
   kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
@@ -1008,6 +977,15 @@ export type BodyImage = {
   crop?: SanityImageCrop;
   alt?: string;
   layout?: 'INLINE' | 'FULL_BLEED' | 'FLOAT_LEFT' | 'FLOAT_RIGHT';
+};
+
+export type ImageWithAlt = {
+  _type: 'imageWithAlt';
+  asset?: SanityImageAssetReference;
+  media?: unknown;
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
 };
 
 export type PageHeadingBlock = {
@@ -2677,17 +2655,6 @@ export type AllSanitySchemaTypes =
   | Module_postFeatured
   | Module_postLatest
   | Module_postList
-  | Module_hero
-  | Blog_topicReference
-  | Page_landingReference
-  | Page_postIndexReference
-  | Page_privacyIndexReference
-  | Page_privacyDocumentReference
-  | Page_legalIndexReference
-  | Page_legalDocumentReference
-  | Page_cookieStatementReference
-  | InlineLink
-  | ImageWithAlt
   | ExpandableSectionText
   | ListedText
   | ParagraphText
@@ -2719,8 +2686,18 @@ export type AllSanitySchemaTypes =
   | CookieList
   | CookiePreferencesLink
   | LinkRef
+  | Blog_topicReference
+  | Page_landingReference
+  | Page_postIndexReference
+  | Page_privacyIndexReference
+  | Page_privacyDocumentReference
+  | Page_legalIndexReference
+  | Page_legalDocumentReference
+  | Page_cookieStatementReference
+  | InlineLink
   | Aside
   | BodyImage
+  | ImageWithAlt
   | PageHeadingBlock
   | WideLayout
   | HeroLayout
