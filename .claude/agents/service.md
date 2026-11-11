@@ -125,7 +125,7 @@ one slice (`./query`, `./types`).
 - **Never add try/catch in a loader.** `safeAsync` in `application/service.ts`
   converts throws to `{ ok: false, error }`, so web sees three outcomes: data
   (render), `undefined` data (ordinary 404, no log), `ok: false` (genuine
-  failure — log at `error`, then 404).
+  failure — log at `error`, then throw to the error boundary, a 500).
 - **Web must check the data, not just `ok`** — flag it in your report when a
   loader starts returning `undefined`. `type-check` cannot catch a consumer
   that still reads `ok` as "the document exists" (a sitemap once advertised a

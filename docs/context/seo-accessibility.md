@@ -25,7 +25,7 @@
   would leave a page with no SEO block at all passing validation. The
   runtime half is enforced in the query: the `seo` projection and
   `metaTitle` are `.notNull()`, so a document missing either fails to parse
-  and the route logs and 404s through the shared page-loader guard;
+  and the route logs and answers 500 through the shared page-loader guard;
   `resolveSeo` carries no guard and throws nothing of its own. Every other
   field is optional and **omitted** when
   unauthored, so an absent `ogImageUrl` emits no `og:image` and no twitter

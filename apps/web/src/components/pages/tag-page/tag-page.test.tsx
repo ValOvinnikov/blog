@@ -1,5 +1,4 @@
 import { SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTagDetailPage } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
@@ -24,7 +23,6 @@ import {
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 
 import { TagPage } from './tag-page';
 
@@ -127,12 +125,11 @@ describe(`<${TagPage.name}/>`, () => {
     });
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getTagPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith('tag_page.fetch_failed', {
       slug: MOCK_TAG_SLUG,
       error: MOCK_ERROR,
@@ -150,9 +147,7 @@ describe(`<${TagPage.name}/>`, () => {
       });
       getPostListMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-      await expect(setup({ page })).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
+      await expect(setup({ page })).rejects.toBe(MOCK_ERROR);
 
       expect(getPostListMock).toHaveBeenCalledWith(
         MOCK_POST_LIST_ID,

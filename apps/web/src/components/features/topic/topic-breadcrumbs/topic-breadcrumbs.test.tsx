@@ -7,7 +7,7 @@ import {
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testNoJsonLdWithoutBaseUrl,
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
@@ -52,7 +52,7 @@ describe(`<${TopicBreadcrumbs.name}/>`, () => {
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getTopicPageMock, setup });
-  testNotFoundOnFetchFailure({
+  testThrowsOnFetchFailure({
     pageLoaderMock: getTopicPageMock,
     setup,
     eventFragment: 'topic_breadcrumbs.fetch_failed',

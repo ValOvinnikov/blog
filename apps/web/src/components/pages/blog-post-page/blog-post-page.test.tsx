@@ -155,12 +155,11 @@ describe(`<${BlogPostPage.name}/>`, () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getPostMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith('blog_post_page.fetch_failed', {
       slug: MOCK_POST_DETAIL.slug,
       error: MOCK_ERROR,

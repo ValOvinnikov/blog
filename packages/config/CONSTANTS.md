@@ -741,6 +741,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
 - **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `GATE_STATUS_FETCH_FAILED`=`"newsletter.gate_status_fetch_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
 
+### `@web/constants/post-list` — `apps/web/src/constants/post-list.ts`
+
+- **POST_LIST_LOG**: `MODULE_FETCH_FAILED`=`"post_list_module.fetch_failed"`
+
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
 - **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`
@@ -793,6 +797,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/stats` — `apps/web/src/constants/stats.ts`
 
 - **STATS_LOG**: `MODULE_FETCH_FAILED`=`"stats_module.fetch_failed"`
+
+### `@web/constants/taxonomy-list` — `apps/web/src/constants/taxonomy-list.ts`
+
+- **TAXONOMY_LIST_LOG**: `MODULE_FETCH_FAILED`=`"taxonomy_list_module.fetch_failed"`
 
 ### `@web/constants/tenant-email-identity` — `apps/web/src/constants/tenant-email-identity.ts`
 
