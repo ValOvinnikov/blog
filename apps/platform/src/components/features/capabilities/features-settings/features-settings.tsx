@@ -15,6 +15,7 @@ import {
 } from '@platform/server/settings-features/update-features-action';
 import {
   CAPABILITY_TOGGLES,
+  SHOWN_CAPABILITY_TOGGLES,
   type TSettingsFeaturesValues,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { useRouter } from 'next/navigation';
@@ -102,7 +103,7 @@ export const FeaturesSettings = ({
       <Card>
         <Card.Header title={t('capabilitiesHeading')} />
         <Card.Body>
-          {CAPABILITY_TOGGLES.map((toggle) => {
+          {SHOWN_CAPABILITY_TOGGLES.map((toggle) => {
             const { capability, field, parentField } = toggle;
 
             return (

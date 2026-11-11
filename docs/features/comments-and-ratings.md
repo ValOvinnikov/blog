@@ -16,13 +16,13 @@ epics: [1040, 1041]
 
 ## What it does
 
-Signed-in readers will be able to leave threaded comments on a post and give it a 1–5 rating, one per reader per post. New comments wait for moderation before they show. Neither feature exists on the public site today: only the capability switches, the plan entitlement and a "Coming soon" admin entry are in place. Switching them on renders no comment or rating UI, though `COMMENTS` already opens the reader account surfaces (see Constraints).
+Signed-in readers will be able to leave threaded comments on a post and give it a 1–5 rating, one per reader per post. New comments wait for moderation before they show. Neither feature exists on the public site today: only the stored toggles and the plan entitlement are in place, and the admin shows neither. Switching them on renders no comment or rating UI, though `COMMENTS` already opens the reader account surfaces (see Constraints).
 
 ## Surfaces and routes
 
 - **Public site** — nothing yet. The planned shape is an engagement island on the post page, mounted as a client component so the article itself stays statically rendered.
-- **Platform, Features page** — `/dashboard/features` and `/tenants/{id}/features` show Comments and Ratings as read-only "Coming soon" rows with no switch.
-- **Platform, sidebar** — a Comments entry with a "Coming soon" badge and no page, shown when the plan holds `COMMENTS` (operators always see it).
+- **Platform, Features page** — `/dashboard/features` and `/tenants/{id}/features` show no Comments or Ratings row on any plan; the save always writes both off. Ratings are dropped; Comments are hidden until built.
+- **Platform, sidebar** — no Comments entry.
 - **Studio** — nothing. Neither capability maps to a module type, so the "(off in Features)" relabel never applies to them.
 
 ## Data
@@ -39,7 +39,7 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 - **Plan** — `PLAN_REGISTRY` gives `COMMENTS` and `RATINGS` to `GROWTH` only: both make readers sign in, and comments carry moderation cost.
 - **Reader accounts** — both sit under the `READER_ACCOUNTS` switch on Features and stop applying while it is off.
 - **Owner or operator** — no one can switch either on: `isComingSoon` in `CAPABILITY_TOGGLES` renders the row read-only and every save, an operator's included, writes both off whatever the payload says. Shipping either feature means dropping that flag.
-- **Platform pages** — `planPageAccess` opens Comments and counts `COMMENTS` toward the Email page; the Comments page does not exist yet (its sidebar entry has no link).
+- **Platform pages** — `planPageAccess` counts `COMMENTS` toward the Email page; there is no Comments page.
 - **Voice** — no copy exists. New public strings get classified Voice or fixed when the work is planned.
 
 ## Constraints and invariants

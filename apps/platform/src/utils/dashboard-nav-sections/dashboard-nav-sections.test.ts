@@ -63,28 +63,24 @@ describe(dashboardNavSections, () => {
     );
   });
 
-  it.each([
-    'languages',
-    'email',
-    'leads',
-    'subscribers',
-    'comments',
-    'team',
-  ] as const)('shows %s only when the plan can use it', (page) => {
-    const withPage = configurationOfDashboard({
-      ...NO_PLAN_PAGE,
-      [page]: true,
-    });
-    const withoutPage = configurationOfDashboard({
-      ...EVERY_PLAN_PAGE,
-      [page]: false,
-    });
+  it.each(['languages', 'email', 'leads', 'subscribers', 'team'] as const)(
+    'shows %s only when the plan can use it',
+    (page) => {
+      const withPage = configurationOfDashboard({
+        ...NO_PLAN_PAGE,
+        [page]: true,
+      });
+      const withoutPage = configurationOfDashboard({
+        ...EVERY_PLAN_PAGE,
+        [page]: false,
+      });
 
-    expect(labelsOf(withPage)).toContain(t(page));
-    expect(labelsOf(withoutPage)).not.toContain(t(page));
-  });
+      expect(labelsOf(withPage)).toContain(t(page));
+      expect(labelsOf(withoutPage)).not.toContain(t(page));
+    },
+  );
 
-  it('badges only Subscribers, Comments and Team as coming soon', () => {
+  it('badges only Subscribers and Team as coming soon', () => {
     const badged = configurationOfDashboard().items.filter(
       (item) => item.badge,
     );

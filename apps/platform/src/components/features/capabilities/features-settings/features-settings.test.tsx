@@ -123,10 +123,10 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(switches).toHaveLength(5);
     });
 
-    it('badges exactly the three unfinished capabilities "Coming soon"', () => {
+    it('badges only Newsletter "Coming soon"', () => {
       const badges = screen.getAllByText(comingSoonBadge);
 
-      expect(badges).toHaveLength(3);
+      expect(badges).toHaveLength(1);
     });
 
     it('nests the Capabilities heading directly under the page heading', () => {
@@ -237,6 +237,23 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
   });
 
+  it.each([
+    ['every', ALL_ENTITLED],
+    ['some', PARTIAL_ENTITLEMENT],
+    ['no', []],
+  ])(
+    'shows no Comments or Ratings row with %s capabilities entitled',
+    (_, entitledCapabilities) => {
+      setup({ entitledCapabilities });
+
+      const comments = screen.queryByText(toggleLabel[CAPABILITY.COMMENTS]);
+      const ratings = screen.queryByText(toggleLabel[CAPABILITY.RATINGS]);
+
+      expect(comments).not.toBeInTheDocument();
+      expect(ratings).not.toBeInTheDocument();
+    },
+  );
+
   describe('with only some capabilities entitled', () => {
     let bookmarksSwitch: HTMLElement;
     let analyticsSwitch: HTMLElement;
@@ -247,20 +264,14 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       analyticsSwitch = screen.getByRole('switch', { name: ANALYTICS_LABEL });
     });
 
-    it.each([
-      toggleLabel[CAPABILITY.COMMENTS],
-      toggleLabel[CAPABILITY.RATINGS],
-      toggleLabel[CAPABILITY.NEWSLETTER],
-    ])(
-      'shows %s as "Coming soon" with no toggle, whatever the plan',
-      (label) => {
-        const row = screen.getByText(label);
-        const toggle = screen.queryByRole('switch', { name: label });
+    it('shows Newsletter as "Coming soon" with no toggle, whatever the plan', () => {
+      const label = toggleLabel[CAPABILITY.NEWSLETTER];
+      const row = screen.getByText(label);
+      const toggle = screen.queryByRole('switch', { name: label });
 
-        expect(row).toBeVisible();
-        expect(toggle).not.toBeInTheDocument();
-      },
-    );
+      expect(row).toBeVisible();
+      expect(toggle).not.toBeInTheDocument();
+    });
 
     it('shows an out-of-plan toggle disabled and badged, never hidden', () => {
       const consentSwitch = screen.getByRole('switch', {
