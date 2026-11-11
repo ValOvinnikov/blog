@@ -8228,6 +8228,14 @@
         "file": "apps/web/src/constants/cookie-statement.ts"
       }
     ],
+    "cta_module.fetch_failed": [
+      {
+        "ref": "CTA_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/cta",
+        "file": "apps/web/src/constants/cta.ts"
+      }
+    ],
     "svix-id": [
       {
         "ref": "RESEND_WEBHOOK_HEADER.ID",
