@@ -144,6 +144,8 @@ one slice (`./query`, `./types`).
 - **`index.ts`** — `export { createXService } from './application/service'`
   plus the public view-model types from `adaptor/**/types.ts` or
   `application/types.ts`.
+  A module feature's public types reach `src/index.ts` through
+  `features/modules/types.ts`, not a line of their own there.
 - **Params slices** enumerate a content type's routable paths for `apps/web`'s
   `app/sitemap.ts` and the revalidate webhook's path derivation — not for
   `generateStaticParams`, which returns `[]` (content routes render on

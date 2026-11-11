@@ -62,3 +62,17 @@ export function createLocalizedFieldResolver(
   return (entries: unknown[], locale: string): Promise<unknown> =>
     evaluateGroqInLocale(query, [toDocument(entries)], locale);
 }
+
+export async function evaluateModuleQuery<TResult>(
+  query: { query: string; parse: (data: unknown) => TResult },
+  dataset: unknown[],
+  { id, locale }: { id: string; locale: string },
+): Promise<TResult> {
+  const raw = await evaluateGroqExpression(query.query, dataset, undefined, {
+    id,
+    locale,
+    defaultLocale: LOCALE_ISO_CODES.EN,
+  });
+
+  return query.parse(raw);
+}

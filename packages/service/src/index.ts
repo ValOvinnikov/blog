@@ -11,6 +11,7 @@ import { createContactFormModuleService } from './features/modules/contact-form'
 import { createContentModuleService } from './features/modules/content';
 import { createCookieSettingsModuleService } from './features/modules/cookie-settings';
 import { createCtaModuleService } from './features/modules/cta';
+import { createEmbedModuleService } from './features/modules/embed';
 import { createFaqModuleService } from './features/modules/faq';
 import { createFeatureHighlightsModuleService } from './features/modules/feature-highlights';
 import { createFeatureListModuleService } from './features/modules/feature-list';
@@ -72,6 +73,7 @@ export const service = {
     sectionPages: createSectionPagesModuleService(),
     content: createContentModuleService(),
     cta: createCtaModuleService(),
+    embed: createEmbedModuleService(),
     contactForm: createContactFormModuleService(),
     cookieSettings: createCookieSettingsModuleService(),
     newsletter: createNewsletterModuleService(),
@@ -118,54 +120,7 @@ export type {
   TTranslationGroup,
   TTranslationMap,
 } from './features/global/translation-map';
-export type {
-  TSectionPageCard,
-  TSectionPagesModule,
-} from './features/modules/section-pages';
-export type { TContactFormModule } from './features/modules/contact-form';
-export type { TContentModule } from './features/modules/content';
-export type { TCookieSettingsModule } from './features/modules/cookie-settings';
-export type { TCtaModule } from './features/modules/cta';
-export type { TFaqModule, TFaqQuestion } from './features/modules/faq';
-export type {
-  TFeatureHighlightItem,
-  TFeatureHighlightsModule,
-} from './features/modules/feature-highlights';
-export type {
-  TFeatureListItem,
-  TFeatureListModule,
-} from './features/modules/feature-list';
-export type {
-  THeroBlogButton,
-  THeroBlogModule,
-} from './features/modules/hero-blog';
-export type { THeroProfileModule } from './features/modules/hero-profile';
-export type { THeroStatementModule } from './features/modules/hero-statement';
-export type { TLogoItem, TLogoWallModule } from './features/modules/logo-wall';
-export type { TNewsletterModule } from './features/modules/newsletter';
-export type { TPostFeaturedModule } from './features/modules/post-featured';
-export type { TPostLatestModule } from './features/modules/post-latest';
-export type { TPostListModule } from './features/modules/post-list';
-export type { TPostRelatedModule } from './features/modules/post-related';
-export type { TStatItem, TStatsModule } from './features/modules/stats';
-export type {
-  TPricingModule,
-  TPricingPrice,
-  TPricingTier,
-} from './features/modules/pricing';
-export type {
-  TTaxonomyEntry,
-  TTaxonomyListModule,
-} from './features/modules/taxonomy-list';
-export type { TTeamMember, TTeamModule } from './features/modules/team';
-export type {
-  TTestimonialItem,
-  TTestimonialModule,
-} from './features/modules/testimonial';
-export type {
-  TTimelineItem,
-  TTimelineModule,
-} from './features/modules/timeline';
+export type * from './features/modules/types';
 export type { TCookieStatementPage } from './features/pages/cookie-statement';
 export type { THomePage } from './features/pages/home';
 export type {
