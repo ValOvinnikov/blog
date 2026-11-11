@@ -581,13 +581,15 @@
   }
 }
 
-/* A transparent outline at rest, so a colour transition never fades the marked outline in from the text colour. */
-@utility nav-link-frame {
-  outline: 1px solid transparent;
-  outline-offset: -1px;
+/* Below `@layer utilities`, so any `nav-link-marked`, variant or not, overrides this transparent rest outline. */
+@layer components {
+  .nav-link-frame {
+    outline: 1px solid transparent;
+    outline-offset: -1px;
 
-  @media (forced-colors: active) {
-    outline-style: none;
+    @media (forced-colors: active) {
+      outline-style: none;
+    }
   }
 }
 
