@@ -1,9 +1,10 @@
 import { LOOK_CARD } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
-import { LOOK_ROW } from '@platform/constants/look-row';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
+import { mockOpenRowTarget } from '@platform/testing/look/look-follow';
 import { LOOK_ROWS } from '@platform/utils/look-open-rows/look-open-rows';
 
-import { toLookFollowTarget } from './look-follow-target';
+import { toLookFollowOutline, toLookFollowTarget } from './look-follow-target';
 
 const IDLE = { kind: LOOK_FOLLOW_TARGET.IDLE };
 
@@ -39,10 +40,27 @@ describe(toLookFollowTarget, () => {
     ).toEqual({ kind: LOOK_FOLLOW_TARGET.PART, row: LOOK_ROW.HEADER });
   });
 
-  it('holds the frame still for an open Style card', () => {
+  it('follows an open Style card with nothing to outline for a whole-page card', () => {
     expect(toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false)).toEqual({
       kind: LOOK_FOLLOW_TARGET.STYLE,
       row: LOOK_ROW.TYPE,
+      parts: [],
     });
+  });
+});
+
+describe(toLookFollowOutline, () => {
+  const openOnly = (row: TLookRow) =>
+    toLookFollowOutline(mockOpenRowTarget(row));
+
+  it.each([LOOK_ROW.COLOUR, LOOK_ROW.TYPE])(
+    'outlines nothing for %s, which changes the whole page',
+    (row) => {
+      expect(openOnly(row)).toBeUndefined();
+    },
+  );
+
+  it('outlines nothing while nothing is followed', () => {
+    expect(toLookFollowOutline(IDLE)).toBeUndefined();
   });
 });

@@ -186,6 +186,11 @@ export const LongContentAtPhoneWidth: TStory = {
   decorators: [atPhoneWidth],
 };
 
+export const NoRadius: TStory = {
+  ...Default,
+  decorators: [atRadiusScale(RADIUS_SCALE.NONE)],
+};
+
 export const SmallRadius: TStory = {
   ...Default,
   decorators: [atRadiusScale(RADIUS_SCALE.SM)],

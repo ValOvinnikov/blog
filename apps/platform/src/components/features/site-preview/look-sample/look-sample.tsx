@@ -8,6 +8,7 @@ import { LookSampleForm } from '@platform/components/features/site-preview/look-
 import { LookSamplePosts } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/look-sample-posts';
 import { LookSampleQuote } from '@platform/components/features/site-preview/look-sample/components/look-sample-quote/look-sample-quote';
 import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
+import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import { SampleSiteFooter } from '@platform/components/features/site-preview/sample-site-footer';
 import {
   SampleSiteHeader,
@@ -15,6 +16,7 @@ import {
 } from '@platform/components/features/site-preview/sample-site-header';
 import { SiteThemeFrame } from '@platform/components/features/site-preview/site-theme-frame';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 import type { TSampleFooterStyle } from '@platform/utils/sample-footer-style/sample-footer-style';
 import type { TSampleHeaderStyle } from '@platform/utils/sample-header-style/sample-header-style';
 import type { TSitePreviewTheme } from '@platform/utils/theme-preview-tokens/theme-preview-tokens';
@@ -77,12 +79,16 @@ export const LookSample = ({
             {t('samplePara')}
           </Text>
           <div className={actionsRow()}>
-            <Button type="button" size={SIZE.SM}>
-              {t('subscribeButton')}
-            </Button>
-            <Button type="button" variant="ghost" size={SIZE.SM}>
-              {t('readMoreButton')}
-            </Button>
+            <SamplePart part={SAMPLE_PART.BUTTON}>
+              <Button type="button" size={SIZE.SM}>
+                {t('subscribeButton')}
+              </Button>
+            </SamplePart>
+            <SamplePart part={SAMPLE_PART.BUTTON}>
+              <Button type="button" variant="ghost" size={SIZE.SM}>
+                {t('readMoreButton')}
+              </Button>
+            </SamplePart>
             <SampleBusyButton busy={busy} />
           </div>
         </div>
