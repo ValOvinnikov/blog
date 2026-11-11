@@ -12,6 +12,7 @@ export const mediaFrameVariants = tv({
       square: ['aspect-square'],
       portrait: ['aspect-[3/4]'],
       classic: ['aspect-[4/3]'],
+      vertical: ['aspect-[9/16]'],
     },
     shape: {
       rect: ['rounded-media'],
