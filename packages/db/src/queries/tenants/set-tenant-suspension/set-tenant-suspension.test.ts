@@ -46,6 +46,8 @@ afterEach(async () => {
 describe(setTenantSuspension, () => {
   it.each([
     [TENANT_STATUS.ACTIVE, TENANT_STATUS.SUSPENDED],
+    [TENANT_STATUS.TRIAL, TENANT_STATUS.SUSPENDED],
+    [TENANT_STATUS.PAST_DUE, TENANT_STATUS.SUSPENDED],
     [TENANT_STATUS.SUSPENDED, TENANT_STATUS.ACTIVE],
   ])('moves a %s tenant to %s', async (from, to) => {
     const tenantId = await insertTenant(from);

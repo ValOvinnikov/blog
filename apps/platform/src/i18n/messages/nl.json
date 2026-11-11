@@ -275,7 +275,9 @@
     "status": {
       "ACTIVE": "Actief",
       "SUSPENDED": "Opgeschort",
-      "ARCHIVED": "Gearchiveerd"
+      "ARCHIVED": "Gearchiveerd",
+      "TRIAL": "Proefperiode",
+      "PAST_DUE": "Betaling achterstallig"
     },
     "manage": "Beheren",
     "manageAriaLabel": "{tenantName} beheren"
@@ -1316,6 +1318,8 @@
     "nameLabel": "Tenantnaam",
     "siteAddressLabel": "Adres van de site",
     "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
+    "localeLabel": "Standaardtaal",
+    "localeHint": "De taal waarin de startinhoud en instellingen van de site beginnen.",
     "planLabel": "Abonnement",
     "ownerEmailLabel": "E-mailadres eigenaar",
     "ownerEmailHint": "De persoon die deze tenant beheert. Een bestaand account krijgt direct toegang; een nieuw adres ontvangt een uitnodiging per e-mail om in te loggen.",

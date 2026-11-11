@@ -275,7 +275,9 @@
     "status": {
       "ACTIVE": "Actif",
       "SUSPENDED": "Suspendu",
-      "ARCHIVED": "Archivé"
+      "ARCHIVED": "Archivé",
+      "TRIAL": "Essai",
+      "PAST_DUE": "Paiement en retard"
     },
     "manage": "Gérer",
     "manageAriaLabel": "Gérer {tenantName}"
@@ -1316,6 +1318,8 @@
     "nameLabel": "Nom du locataire",
     "siteAddressLabel": "Adresse du site",
     "siteAddressHint": "Lettres, chiffres et traits d’union. Avec l’offre Growth, vous pouvez connecter votre propre domaine.",
+    "localeLabel": "Langue par défaut",
+    "localeHint": "La langue dans laquelle démarrent le contenu initial et les réglages du site.",
     "planLabel": "Formule",
     "ownerEmailLabel": "E-mail du propriétaire",
     "ownerEmailHint": "La personne qui gérera ce locataire. Un compte existant obtient l'accès immédiatement ; une nouvelle adresse reçoit une invitation par e-mail pour se connecter.",

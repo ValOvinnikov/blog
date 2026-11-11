@@ -15,11 +15,7 @@ import {
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
-import {
-  isRequestTenantActive,
-  isTenantActive,
-  resolveWritableTenant,
-} from './write-gate';
+import { isRequestTenantActive, resolveWritableTenant } from './write-gate';
 
 faker.seed(5776);
 
@@ -33,24 +29,8 @@ vi.mock('@blog/db', async () => ({
 
 const MOCK_SITE = faker.lorem.slug();
 
-const MOCK_DEPROVISIONED_AT = faker.date.between({
-  from: '2024-01-01',
-  to: '2025-01-01',
-});
-
-const MOCK_ACTIVE_ROW: [boolean, string, TTenant] = [
-  true,
-  'an active tenant',
-  mockTenant(),
-];
-const MOCK_SUSPENDED_ROW: [boolean, string, TTenant] = [
-  false,
-  'a suspended tenant',
-  MOCK_SUSPENDED_TENANT,
-];
-
 describe(resolveWritableTenant, () => {
-  it('returns the tenant id for an active tenant', async () => {
+  it('returns the tenant id for a writable tenant', async () => {
     await expect(resolveWritableTenant(MOCK_SITE)).resolves.toEqual(
       okResult(MOCK_TENANT_ID),
     );
@@ -89,29 +69,10 @@ describe(resolveWritableTenant, () => {
   });
 });
 
-describe(isTenantActive, () => {
-  it.each<[boolean, string, TTenant]>([
-    MOCK_ACTIVE_ROW,
-    MOCK_SUSPENDED_ROW,
-    [
-      false,
-      'an archived tenant',
-      mockTenant({ status: TENANT_STATUS.ARCHIVED }),
-    ],
-    [
-      false,
-      'a deprovisioned tenant still marked active',
-      mockTenant({ deprovisionedAt: MOCK_DEPROVISIONED_AT }),
-    ],
-  ])('returns %s for %s', (expected, _, tenant) => {
-    expect(isTenantActive(tenant)).toBe(expected);
-  });
-});
-
 describe(isRequestTenantActive, () => {
   it.each<[boolean, string, TMaybeUndefined<TTenant>]>([
-    MOCK_ACTIVE_ROW,
-    MOCK_SUSPENDED_ROW,
+    [true, 'an active tenant', mockTenant()],
+    [false, 'a suspended tenant', MOCK_SUSPENDED_TENANT],
     [false, 'no resolved tenant', undefined],
   ])('is %s when the request resolves %s', async (expected, _, tenant) => {
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(tenant);

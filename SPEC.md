@@ -1579,7 +1579,7 @@ credentials behind but no content fails closed instead of serving a broken
 site. That last requirement is production-scoped because local and dev tenant
 rows predate provisioning tracking and legitimately carry no status; a null
 status is refused in production, never waved through. **Writes** are refused for any tenant
-that is not ACTIVE (`isTenantActive()`), so a tenant SUSPENDED for INACTIVITY
+whose status is not writable — ACTIVE, TRIAL or PAST_DUE (`isTenantActive()`), so a tenant SUSPENDED for INACTIVITY
 stays readable while nothing new lands against it. A tenant an OPERATOR
 suspended is offline instead: `proxy.ts` answers its pages with a neutral 503
 unavailable page marked `noindex`, and its feeds, sitemap and site API routes
@@ -2168,7 +2168,7 @@ projects, so a content migration must reach every tenant's project, not just
 the console one. `migrate:deploy` targets a single project (and stays that way,
 so `migrate:dry`/`migrate:run` remain usable by hand); the fan-out across
 tenants is `packages/db/scripts/migrate-tenant-content/`, which enumerates
-`status = ACTIVE`, non-deprovisioned tenants and drives the single-project path
+writable-status (ACTIVE, TRIAL or PAST_DUE), non-deprovisioned tenants and drives the single-project path
 once per tenant using **that tenant's own persisted write token** — never an
 organisation-scoped credential, so a leaked token reaches exactly one tenant.
 The `migrationState` ledger is per dataset, which makes the fan-out idempotent,

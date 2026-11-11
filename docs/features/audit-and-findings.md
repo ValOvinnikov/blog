@@ -198,7 +198,7 @@ Nothing is configurable. Only admins (any role) see either record.
 - The document-validation sweep is advisory: it exits 1 on a systemic error
   or a `--tenant-id` with nothing to check, never on invalid documents. It
   runs on manual dispatch and after each successful provisioning run (its
-  weekly cron is commented out), skipping non-ACTIVE or deprovisioned tenants.
+  weekly cron is commented out), skipping deprovisioned tenants and any whose status is not ACTIVE, TRIAL or PAST_DUE.
 - Deprovisioning keeps `findings` and `audit_events`. Deleting an archived
   tenant cascades its findings away; its audit rows remain.
 

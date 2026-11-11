@@ -1,9 +1,9 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import en from '@platform/i18n/messages/en.json';
-import type { TCreateTenantInput } from '@platform/server/tenants/create-tenant-action';
+import type { TCreateTenantInput } from '@platform/server/tenants/create-tenant-input';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -20,7 +20,8 @@ import { TenantDetailsForm } from './tenant-details-form';
 
 faker.seed(5994);
 
-const { tenantDetailsForm, tenantFieldErrors, planNames } = en;
+const { tenantDetailsForm, tenantFieldErrors, planNames, languageNames } = en;
+const { EN, NL } = LOCALE_ISO_CODES;
 const t = makeEnTranslator('tenantDetailsForm');
 
 const MOCK_CONFIRMATION_TOKEN = faker.string.uuid();
@@ -50,6 +51,7 @@ const setup = customRender(TenantDetailsForm, {
 const submittedValues = (overrides: Partial<TCreateTenantInput> = {}) => ({
   name: MOCK_TENANT_NAME,
   slug: MOCK_TENANT_SLUG,
+  locale: EN,
   plan: TENANT_PLAN.FREE,
   ownerEmail: MOCK_OWNER_EMAIL,
   ...overrides,
@@ -86,6 +88,8 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     screen.getByRole('textbox', { name: tenantDetailsForm.siteAddressLabel });
   const getOwnerEmailInput = () =>
     screen.getByRole('textbox', { name: OWNER_EMAIL_LABEL });
+  const getLanguageSelect = () =>
+    screen.getByRole('combobox', { name: tenantDetailsForm.localeLabel });
 
   const fillForm = async (ownerEmail = MOCK_OWNER_EMAIL) => {
     await user.type(getNameInput(), MOCK_TENANT_NAME);
@@ -128,9 +132,11 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
       name: tenantDetailsForm.planLabel,
     });
     const ownerEmailInput = getOwnerEmailInput();
+    const languageSelect = getLanguageSelect();
 
     expect(nameInput).toBeVisible();
     expect(siteAddressInput).toBeVisible();
+    expect(languageSelect).toBeVisible();
     expect(planGroup).toBeVisible();
     expect(ownerEmailInput).toBeVisible();
   });
@@ -163,40 +169,67 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     );
   });
 
-  it('shows a taken site address error beside the field', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
-    });
+  it("defaults the language to the platform's default language", () => {
+    const languageSelect = getLanguageSelect();
 
-    await fillForm();
-    await clickBeginProvisioning();
-
-    const slugError = await screen.findByText(tenantFieldErrors.slugTaken);
-
-    expect(slugError).toBeVisible();
+    expect(languageSelect).toHaveTextContent(languageNames[EN]);
   });
 
-  it('marks a field with a returned error invalid and describes it by that error', async () => {
-    createTenantActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {
-        ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
-      },
-    });
-
+  it('submits the chosen default language', async () => {
     await fillForm();
+    await user.click(getLanguageSelect());
+    const dutch = await screen.findByRole('option', {
+      name: languageNames[NL],
+    });
+    await user.click(dutch);
     await clickBeginProvisioning();
 
-    const fieldError = await screen.findByText(tenantFieldErrors.emailInvalid);
-    const ownerEmailInput = getOwnerEmailInput();
-
-    expect(fieldError).toBeVisible();
-    expect(ownerEmailInput).toBeInvalid();
-    expect(ownerEmailInput).toHaveAccessibleDescription(
-      `${tenantDetailsForm.ownerEmailHint} ${tenantFieldErrors.emailInvalid}`,
+    expect(createTenantActionMock).toHaveBeenCalledWith(
+      submittedValues({ locale: NL }),
     );
   });
+
+  it.each([
+    {
+      field: 'site address',
+      fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
+      errorText: tenantFieldErrors.slugTaken,
+      getControl: () => getSiteAddressInput(),
+    },
+    {
+      field: 'language',
+      fieldErrors: {
+        locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED },
+      },
+      errorText: tenantFieldErrors.localeUnsupported,
+      getControl: () => getLanguageSelect(),
+    },
+    {
+      field: 'owner email',
+      fieldErrors: { ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
+      errorText: tenantFieldErrors.emailInvalid,
+      getControl: () => getOwnerEmailInput(),
+    },
+  ])(
+    'marks the $field invalid and describes it by its returned error',
+    async ({ fieldErrors, errorText, getControl }) => {
+      createTenantActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors,
+      });
+
+      await fillForm();
+      await clickBeginProvisioning();
+
+      await screen.findByText(errorText);
+      const control = getControl();
+
+      expect(control).toBeInvalid();
+      expect(control).toHaveAccessibleDescription(
+        expect.stringContaining(errorText),
+      );
+    },
+  );
 
   it('shows a failed create beside its button and keeps the entered values', async () => {
     createTenantActionMock.mockResolvedValue({
