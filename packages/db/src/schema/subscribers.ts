@@ -63,6 +63,11 @@ export const subscribers = pgTable(
       subscriber.tenantId,
       subscriber.emailIndex,
     ),
+    index('subscribers_tenant_status_id_idx').on(
+      subscriber.tenantId,
+      subscriber.status,
+      subscriber.id,
+    ),
   ],
 );
 

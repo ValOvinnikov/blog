@@ -1,4 +1,5 @@
 import { EMAIL_TEMPLATE_TYPE } from '@blog/config';
+import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
 import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates/get-email-template/get-email-template';
 import type { TSendEmailInput } from '@blog/email';
@@ -30,6 +31,7 @@ export const mockEmailConfig = (
   replyToAddress: undefined,
   footerPostalAddress: undefined,
   contactRecipient: undefined,
+  emailNewPosts: EMAIL_NEW_POSTS_DEFAULT,
   createdAt: MOCK_EMAIL_CONFIG_CREATED_AT,
   updatedAt: MOCK_EMAIL_CONFIG_CREATED_AT,
   ...overrides,

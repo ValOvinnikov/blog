@@ -1,5 +1,9 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import {
+  EMAIL_NEW_POSTS_DEFAULT,
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+} from '@blog/db/constants';
 import type { TEmailConfig } from '@blog/db/schema/email-config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';
@@ -18,7 +22,7 @@ import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { EmailPageContent } from './email-page-content';
 
@@ -94,6 +98,7 @@ const mockEmailConfig = (
   replyToAddress: faker.internet.email(),
   footerPostalAddress: faker.location.streetAddress(),
   contactRecipient: null,
+  emailNewPosts: EMAIL_NEW_POSTS_DEFAULT,
   createdAt: MOCK_CONFIG_DATE,
   updatedAt: MOCK_CONFIG_DATE,
   ...overrides,
@@ -122,7 +127,10 @@ describe(`<${EmailPageContent.name}/>`, () => {
   });
 
   describe('with the default tenant', () => {
+    let user: UserEvent;
+
     beforeEach(async () => {
+      user = userEvent.setup();
       await setup();
     });
 
@@ -151,7 +159,6 @@ describe(`<${EmailPageContent.name}/>`, () => {
     });
 
     it("shows each template's authored copy in the tenant's default language", async () => {
-      const user = userEvent.setup();
       const editingCombobox = screen.getByRole('combobox', {
         name: en.emailForm.editingLabel,
       });

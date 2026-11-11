@@ -86,6 +86,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_TEMPLATE_TYPE**: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`
 
+### `@blog/config/constants` — `packages/config/src/constants/email-type.ts`
+
+- **EMAIL_TYPE**: `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/embed.ts`
 
 - **EMBED_PROVIDER**: `YOUTUBE`, `VIMEO`, `LOOM`, `CAL`, `GOOGLE_MAPS`
@@ -304,6 +308,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
+
+### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
+
+- **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
 
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
