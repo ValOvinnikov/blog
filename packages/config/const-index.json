@@ -1124,6 +1124,58 @@
         "file": "packages/config/src/constants/email-template.ts"
       }
     ],
+    "YOUTUBE": [
+      {
+        "ref": "EMBED_PROVIDER.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      },
+      {
+        "ref": "ICONS.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "VIMEO": [
+      {
+        "ref": "EMBED_PROVIDER.VIMEO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
+    "LOOM": [
+      {
+        "ref": "EMBED_PROVIDER.LOOM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
+    "CAL": [
+      {
+        "ref": "EMBED_PROVIDER.CAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
+    "GOOGLE_MAPS": [
+      {
+        "ref": "EMBED_PROVIDER.GOOGLE_MAPS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
     "DB_NOT_FOUND": [
       {
         "ref": "ERROR_CODE.DB_NOT_FOUND",
@@ -1789,20 +1841,6 @@
       },
       {
         "ref": "SOCIAL_PLATFORMS.FACEBOOK",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/link.ts"
-      }
-    ],
-    "YOUTUBE": [
-      {
-        "ref": "ICONS.YOUTUBE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/icon.ts"
-      },
-      {
-        "ref": "SOCIAL_PLATFORMS.YOUTUBE",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/link.ts"
@@ -2750,6 +2788,38 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/magic-link-refusal.ts"
+      }
+    ],
+    "video": [
+      {
+        "ref": "MEDIA_RATIO.VIDEO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "vertical": [
+      {
+        "ref": "MEDIA_RATIO.VERTICAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "classic": [
+      {
+        "ref": "MEDIA_RATIO.CLASSIC",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "portrait": [
+      {
+        "ref": "MEDIA_RATIO.PORTRAIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
       }
     ],
     "CORE": [
