@@ -275,7 +275,9 @@
     "status": {
       "ACTIVE": "Actief",
       "SUSPENDED": "Opgeschort",
-      "ARCHIVED": "Gearchiveerd"
+      "ARCHIVED": "Gearchiveerd",
+      "TRIAL": "Proefperiode",
+      "PAST_DUE": "Betaling achterstallig"
     },
     "manage": "Beheren",
     "manageAriaLabel": "{tenantName} beheren"

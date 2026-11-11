@@ -3,6 +3,7 @@ import { getDb } from '@blog/db/client';
 import {
   SUSPENSION_REASON,
   TENANT_STATUS,
+  WRITABLE_TENANT_STATUSES,
   type TSuspensionStatus,
 } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
@@ -34,7 +35,7 @@ export async function setTenantSuspension(
       and(
         eq(tenants.id, tenantId),
         inArray(tenants.status, [
-          TENANT_STATUS.ACTIVE,
+          ...WRITABLE_TENANT_STATUSES,
           TENANT_STATUS.SUSPENDED,
         ]),
         isNull(tenants.deprovisionedAt),

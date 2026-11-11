@@ -1,7 +1,7 @@
 import { TENANT_WRITE_REFUSAL, type TTenantWriteRefusal } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { errorResult, okResult, type TResult } from '@blog/utils';
+import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
+import { errorResult, isUndefined, okResult, type TResult } from '@blog/utils';
 import { TENANT_WRITE_LOG } from '@web/constants/tenant-write';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -9,7 +9,7 @@ import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-
 import { logger } from '@web/utils/logger/logger';
 
 export const isTenantActive = (tenant: TTenant): boolean =>
-  tenant.status === TENANT_STATUS.ACTIVE && !tenant.deprovisionedAt;
+  isTenantWritable(tenant);
 
 /** Server actions run outside the `[tenant]/[locale]` layout, so they gate with `resolveWritableTenant` instead. */
 export const isRequestTenantActive = async (): Promise<boolean> => {
@@ -17,7 +17,7 @@ export const isRequestTenantActive = async (): Promise<boolean> => {
   const tenant = await resolveRequestTenant(
     tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
   );
-  return tenant !== undefined && isTenantActive(tenant);
+  return !isUndefined(tenant) && isTenantActive(tenant);
 };
 
 export const resolveWritableTenant = async (
