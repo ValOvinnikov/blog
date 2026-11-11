@@ -18,6 +18,7 @@ import { ConsentPreferencesDialog } from './consent-preferences-dialog';
 const DIALOG_NAME = 'Cookie settings';
 const EXTERNAL_MEDIA_SWITCH_NAME = 'External media';
 const SAVE_BUTTON_NAME = 'Save';
+const CLOSE_BUTTON_NAME = 'Close';
 
 describe(`<${ConsentPreferencesDialog.name}/>`, () => {
   let user: UserEvent;
@@ -55,9 +56,14 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
   });
 
   describe('when preferences are opened', () => {
+    let externalMediaSwitch: HTMLElement;
+
     beforeEach(async () => {
       renderDialogWithOpener();
       await openPreferences();
+      externalMediaSwitch = screen.getByRole('switch', {
+        name: EXTERNAL_MEDIA_SWITCH_NAME,
+      });
     });
 
     it('opens as a dialog', () => {
@@ -70,21 +76,14 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
       const necessarySwitch = screen.getByRole('switch', { name: 'Necessary' });
 
       expect(necessarySwitch).toBeChecked();
-      expect(necessarySwitch).toBeDisabled();
+      expect(necessarySwitch).toHaveAttribute('aria-disabled', 'true');
     });
 
     it('shows external media off until it has been granted', () => {
-      const externalMediaSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
-      });
-
       expect(externalMediaSwitch).not.toBeChecked();
     });
 
     it('saves the chosen categories and closes', async () => {
-      const externalMediaSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
-      });
       const saveButton = screen.getByRole('button', { name: SAVE_BUTTON_NAME });
 
       await user.click(externalMediaSwitch);
@@ -95,56 +94,50 @@ describe(`<${ConsentPreferencesDialog.name}/>`, () => {
       expect(dialog).not.toBeInTheDocument();
     });
 
-    it('closes without saving from the close button', async () => {
-      const externalMediaSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
+    describe('after a change is discarded with the close button', () => {
+      beforeEach(async () => {
+        const closeButton = screen.getByRole('button', {
+          name: CLOSE_BUTTON_NAME,
+        });
+        await user.click(externalMediaSwitch);
+        await user.click(closeButton);
       });
-      const closeButton = screen.getByRole('button', { name: 'Close' });
 
-      await user.click(externalMediaSwitch);
-      await user.click(closeButton);
+      it('closes without saving', () => {
+        const dialog = screen.queryByRole('dialog');
 
-      const dialog = screen.queryByRole('dialog');
-      expect(dialog).not.toBeInTheDocument();
-      expect(readGrantedConsent()).toBeUndefined();
-    });
-
-    it('reopens with the stored choice after a discarded change', async () => {
-      const externalMediaSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
+        expect(dialog).not.toBeInTheDocument();
+        expect(readGrantedConsent()).toBeUndefined();
       });
-      const closeButton = screen.getByRole('button', { name: 'Close' });
-      await user.click(externalMediaSwitch);
-      await user.click(closeButton);
 
-      await openPreferences();
+      it('reopens with the stored choice', async () => {
+        await openPreferences();
 
-      const reopenedSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
+        const reopenedSwitch = screen.getByRole('switch', {
+          name: EXTERNAL_MEDIA_SWITCH_NAME,
+        });
+        expect(reopenedSwitch).not.toBeChecked();
       });
-      expect(reopenedSwitch).not.toBeChecked();
     });
   });
 
   describe('when external media was already granted', () => {
+    let externalMediaSwitch: HTMLElement;
+
     beforeEach(async () => {
       grantConsent();
       renderDialogWithOpener();
       await openPreferences();
+      externalMediaSwitch = screen.getByRole('switch', {
+        name: EXTERNAL_MEDIA_SWITCH_NAME,
+      });
     });
 
     it('shows external media on', () => {
-      const externalMediaSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
-      });
-
       expect(externalMediaSwitch).toBeChecked();
     });
 
     it('saves a withdrawn category as declined', async () => {
-      const externalMediaSwitch = screen.getByRole('switch', {
-        name: EXTERNAL_MEDIA_SWITCH_NAME,
-      });
       const saveButton = screen.getByRole('button', { name: SAVE_BUTTON_NAME });
 
       await user.click(externalMediaSwitch);

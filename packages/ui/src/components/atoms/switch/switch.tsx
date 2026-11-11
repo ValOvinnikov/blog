@@ -25,6 +25,7 @@ export const Switch = ({
   'aria-describedby': ariaDescribedby,
 }: TSwitchProps) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (isLocked) return;
     onChange(event.target.checked);
   };
 
@@ -36,7 +37,7 @@ export const Switch = ({
         aria-labelledby={ariaLabelledby}
         aria-describedby={ariaDescribedby}
         checked={isChecked}
-        disabled={isLocked}
+        aria-disabled={isLocked || undefined}
         onChange={handleChange}
         data-testid={dataTestId}
         className={s.input()}

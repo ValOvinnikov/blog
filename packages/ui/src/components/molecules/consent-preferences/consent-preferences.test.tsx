@@ -109,7 +109,7 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     },
     { values: {}, title: VALUE_MISSING_TITLE },
   ])(
-    'shows a locked category checked and disabled when $title',
+    'shows a locked category checked and aria-disabled when $title',
     ({ values }) => {
       setup({ values });
 
@@ -118,7 +118,7 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       });
 
       expect(necessarySwitch).toBeChecked();
-      expect(necessarySwitch).toBeDisabled();
+      expect(necessarySwitch).toHaveAttribute('aria-disabled', 'true');
     },
   );
 
@@ -158,16 +158,6 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       );
     });
 
-    it('reports a change when an unlocked switch is toggled by keyboard', async () => {
-      await user.tab();
-      await user.keyboard(' ');
-
-      expect(onCategoryChange).toHaveBeenCalledWith(
-        MOCK_MEDIA_CATEGORY.id,
-        true,
-      );
-    });
-
     it('calls onSave when Save is clicked', async () => {
       const saveButton = screen.getByRole('button', { name: MOCK_SAVE_LABEL });
 
@@ -176,16 +166,53 @@ describe(`<${ConsentPreferences.name}/>`, () => {
       expect(onSave).toHaveBeenCalledTimes(1);
     });
 
-    it('calls onSave when Save is activated by keyboard', async () => {
-      await user.tab();
-      await user.tab();
-      await user.keyboard('{Enter}');
+    describe('by keyboard', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
 
-      expect(onSave).toHaveBeenCalledTimes(1);
+      it('reaches the locked switch and ignores Space', async () => {
+        const necessarySwitch = screen.getByRole('switch', {
+          name: MOCK_NECESSARY_CATEGORY.label,
+        });
+
+        await user.keyboard(' ');
+
+        expect(necessarySwitch).toHaveFocus();
+        expect(onCategoryChange).not.toHaveBeenCalled();
+      });
+
+      describe('past the locked switch', () => {
+        beforeEach(async () => {
+          await user.tab();
+        });
+
+        it('reports a change when an unlocked switch is toggled', async () => {
+          await user.keyboard(' ');
+
+          expect(onCategoryChange).toHaveBeenCalledWith(
+            MOCK_MEDIA_CATEGORY.id,
+            true,
+          );
+        });
+
+        it('calls onSave when Save is activated', async () => {
+          await user.tab();
+          await user.keyboard('{Enter}');
+
+          expect(onSave).toHaveBeenCalledTimes(1);
+        });
+      });
     });
   });
 
   describe('with a Close action', () => {
+    let user: UserEvent;
+
+    beforeEach(() => {
+      user = userEvent.setup();
+    });
+
     it('renders no Close action when none is supplied', () => {
       setup();
 
@@ -195,7 +222,6 @@ describe(`<${ConsentPreferences.name}/>`, () => {
     });
 
     it('calls onClose when Close is clicked', async () => {
-      const user = userEvent.setup();
       const onClose = vi.fn();
       setup({ closeLabel: MOCK_CLOSE_LABEL, onClose });
 
