@@ -8,7 +8,7 @@ import type {
   TRadiusScale,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
+import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 
 export type TSiteConfigThemeAndAssets = {
   preset: TPresetId;

@@ -1,11 +1,11 @@
 export const DISABLED_AFFORDANCE_CLASSES = [
   'data-[disabled]:cursor-not-allowed',
-  'data-[disabled]:opacity-[.55]',
+  'data-[disabled]:opacity-(--admin-locked-fade)',
 ];
 
 export const HAS_DISABLED_DESCENDANT_AFFORDANCE_CLASSES = [
   'has-[[data-disabled]]:cursor-not-allowed',
-  'has-[[data-disabled]]:opacity-[.55]',
+  'has-[[data-disabled]]:opacity-(--admin-locked-fade)',
 ];
 
 export const DISABLED_READONLY_SURFACE_CLASSES =

@@ -3,7 +3,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
-import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
+import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import { getTranslations } from 'next-intl/server';
 
@@ -23,6 +23,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
     density,
     cardStyle,
     headerControlStyle,
+    headerControlShape,
     buttonShape,
     navLinkStyle,
   } = lookFormValuesOrDefaults(config);
@@ -54,6 +55,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
           density,
           cardStyle,
           headerControlStyle,
+          headerControlShape,
           buttonShape,
           navLinkStyle,
         }}

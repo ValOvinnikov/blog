@@ -31,7 +31,7 @@ const hexTokensOf = (selector: string) =>
   new Map(
     [
       ...blockOf(selector).matchAll(
-        /--admin-([a-z0-9-]+):\s*(#[0-9a-f]{6});/gi,
+        /--(admin-[a-z0-9-]+):\s*(#[0-9a-f]{6});/gi,
       ),
     ].map(([, name, hex]) => [name, hex]),
   );
@@ -43,47 +43,51 @@ const colourIn =
   (tokens: ReturnType<typeof hexTokensOf>) => (token: string) => {
     if (token === WHITE) return { l: 1, c: 0, h: 0 };
     const hex = tokens.get(token);
-    if (!hex) throw new Error(`--admin-${token} has no hex value`);
+    if (!hex) throw new Error(`--${token} has no hex value`);
 
     return hexToOklch(hex);
   };
 
 const TOKEN = {
-  BAD: 'bad',
-  BAD_LINE: 'bad-line',
-  BAD_WEAK: 'bad-weak',
-  BG: 'bg',
-  BRAND: 'brand',
-  BRAND_HOVER: 'brand-hover',
-  BRAND_INK: 'brand-ink',
-  BRAND_STRONG: 'brand-strong',
-  BRAND_WEAK: 'brand-weak',
-  CONTROL_LINE: 'control-line',
-  CONTROL_LINE_TINT: 'control-line-tint',
-  HOVER: 'hover',
-  MUTED: 'muted',
-  OK: 'ok',
-  OK_WEAK: 'ok-weak',
-  ON_BRAND_INK: 'on-brand-ink',
-  PILL_NEUTRAL: 'pill-neutral',
-  PILL_NEUTRAL_POPOVER: 'pill-neutral-popover',
-  POPOVER: 'popover',
-  POPOVER_HOVER: 'popover-hover',
-  SEGMENT_ON: 'segment-on',
-  SIDE: 'side',
-  SIDE_ACCENT: 'side-accent',
-  SIDE_FIELD_LINE: 'side-field-line',
-  SIDE_MUTED: 'side-muted',
-  SIDE_RAISED: 'side-raised',
-  SIDE_TEXT: 'side-text',
-  SURFACE: 'surface',
-  SURFACE_2: 'surface-2',
-  SURFACE_HEAD: 'surface-head',
-  TEXT: 'text',
-  TEXT_STRONG: 'text-strong',
-  THEME_TRACK: 'theme-track',
-  WARN: 'warn',
-  WARN_WEAK: 'warn-weak',
+  BAD: 'admin-bad',
+  BAD_LINE: 'admin-bad-line',
+  BAD_WEAK: 'admin-bad-weak',
+  BG: 'admin-bg',
+  BRAND: 'admin-brand',
+  BRAND_HOVER: 'admin-brand-hover',
+  BRAND_INK: 'admin-brand-ink',
+  BRAND_STRONG: 'admin-brand-strong',
+  BRAND_WEAK: 'admin-brand-weak',
+  CONTROL_LINE: 'admin-control-line',
+  CONTROL_LINE_TINT: 'admin-control-line-tint',
+  GLYPH_ACCENT: 'admin-glyph-accent',
+  GLYPH_FILL: 'admin-glyph-fill',
+  GLYPH_LINE_SOFT: 'admin-glyph-line-soft',
+  GLYPH_RAISED: 'admin-glyph-raised',
+  HOVER: 'admin-hover',
+  MUTED: 'admin-muted',
+  OK: 'admin-ok',
+  OK_WEAK: 'admin-ok-weak',
+  ON_BRAND_INK: 'admin-on-brand-ink',
+  PILL_NEUTRAL: 'admin-pill-neutral',
+  PILL_NEUTRAL_POPOVER: 'admin-pill-neutral-popover',
+  POPOVER: 'admin-popover',
+  POPOVER_HOVER: 'admin-popover-hover',
+  SEGMENT_ON: 'admin-segment-on',
+  SIDE: 'admin-side',
+  SIDE_ACCENT: 'admin-side-accent',
+  SIDE_FIELD_LINE: 'admin-side-field-line',
+  SIDE_MUTED: 'admin-side-muted',
+  SIDE_RAISED: 'admin-side-raised',
+  SIDE_TEXT: 'admin-side-text',
+  SURFACE: 'admin-surface',
+  SURFACE_2: 'admin-surface-2',
+  SURFACE_HEAD: 'admin-surface-head',
+  TEXT: 'admin-text',
+  TEXT_STRONG: 'admin-text-strong',
+  THEME_TRACK: 'admin-theme-track',
+  WARN: 'admin-warn',
+  WARN_WEAK: 'admin-warn-weak',
 } as const;
 
 type TPair = readonly [string, string, string, number];
@@ -174,6 +178,31 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Success edge and icon on toast', TOKEN.OK, TOKEN.POPOVER, BOUNDARY],
   ['Warning edge and icon on toast', TOKEN.WARN, TOKEN.POPOVER, BOUNDARY],
   ['Error edge and icon on toast', TOKEN.BAD, TOKEN.POPOVER, BOUNDARY],
+  [
+    'Card style accent bar on tile',
+    TOKEN.GLYPH_ACCENT,
+    TOKEN.SURFACE,
+    BOUNDARY,
+  ],
+  ['Card style text line on fill', TOKEN.MUTED, TOKEN.GLYPH_FILL, BOUNDARY],
+  [
+    'Card style short line on fill',
+    TOKEN.GLYPH_LINE_SOFT,
+    TOKEN.GLYPH_FILL,
+    BOUNDARY,
+  ],
+  [
+    'Card style short line on tile',
+    TOKEN.GLYPH_LINE_SOFT,
+    TOKEN.SURFACE,
+    BOUNDARY,
+  ],
+  [
+    'Card style short line on raised card',
+    TOKEN.GLYPH_LINE_SOFT,
+    TOKEN.GLYPH_RAISED,
+    BOUNDARY,
+  ],
 ];
 
 const LIGHT_PAIRS: readonly TPair[] = [

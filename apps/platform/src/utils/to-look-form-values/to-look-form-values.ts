@@ -1,5 +1,9 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
-import type { TLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import {
+  defaultLookFormValues,
+  type TLookFormValues,
+} from '@platform/utils/default-look-values/default-look-values';
 
 export const toLookFormValues = (
   siteConfig: TSiteConfigResult,
@@ -14,6 +18,7 @@ export const toLookFormValues = (
     density: siteConfig.density,
     cardStyle: siteConfig.cardStyle,
     headerControlStyle: siteConfig.headerControlStyle,
+    headerControlShape: siteConfig.headerControlShape,
     headerLayout: siteConfig.headerLayout,
     headerSubmenuStyle: siteConfig.headerSubmenuStyle,
     headerBarStyle: siteConfig.headerBarStyle,
@@ -34,3 +39,8 @@ export const toLookFormValues = (
     favicon: { url: siteConfig.faviconAssetUrl },
   };
 };
+
+export const lookFormValuesOrDefaults = (
+  siteConfig: TMaybeUndefined<TSiteConfigResult>,
+): TLookFormValues =>
+  siteConfig ? toLookFormValues(siteConfig) : defaultLookFormValues();

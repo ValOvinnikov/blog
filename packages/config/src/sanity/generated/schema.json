@@ -9942,6 +9942,13 @@
         },
         "optional": true
       },
+      "sendToSubscribers": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "postTakeaways": {
         "type": "objectAttribute",
         "value": {

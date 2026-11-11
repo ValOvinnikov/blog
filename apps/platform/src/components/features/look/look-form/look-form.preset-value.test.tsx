@@ -44,6 +44,12 @@ describe(`<${LookForm.name}/> Use preset value`, () => {
       chosen: LOOK_FORM.navLinkStyleOptionLabel.PILL,
       preset: LOOK_FORM.navLinkStyleOptionLabel.PLAIN,
     },
+    {
+      row: LOOK_ROW.HEADER,
+      label: LOOK_FORM.headerControlShapeLabel,
+      chosen: LOOK_FORM.headerControlShapeOptionLabel.ROUNDED,
+      preset: LOOK_FORM.headerControlShapeOptionLabel.ROUND,
+    },
   ])(
     'puts $label back to the preset value',
     async ({ row, label, chosen, preset }) => {

@@ -19,7 +19,6 @@ import {
   type TUpdateLookInput,
 } from '@platform/server/site-config/update-look-input-schema';
 import { blankToNull } from '@platform/utils/blank-to-null/blank-to-null';
-import { lookFormValuesOrDefaults } from '@platform/utils/default-look-values/default-look-values';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import {
@@ -27,6 +26,7 @@ import {
   type TNotInPlanRefusal,
 } from '@platform/utils/plan-refusal/plan-refusal';
 import { listRefusedLookFields } from '@platform/utils/refused-look-fields/refused-look-fields';
+import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 
 export type TUpdateLookResult =
   | TActionResult<typeof ACTION_OUTCOME.SERVER_ERROR, keyof TUpdateLookInput>

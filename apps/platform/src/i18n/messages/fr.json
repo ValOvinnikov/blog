@@ -765,6 +765,18 @@
       "SOFT": "Un fond gris, sans contour",
       "PLAIN": "Aucun contour avant le survol"
     },
+    "headerControlShapeLabel": "Forme des boutons d'en-tête",
+    "headerControlShapeDescription": "La forme du contour des boutons de langue, de thème, de menu et de compte.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Ronde",
+      "ROUNDED": "Arrondie",
+      "SQUARE": "Carrée"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Entièrement ronde, en cercles et pilules",
+      "ROUNDED": "Les coins suivent le réglage Coins du site",
+      "SQUARE": "Coins carrés"
+    },
     "languageSwitcherLabel": "Sélecteur de langue",
     "languageSwitcherStyleLabel": "Style",
     "languageSwitcherDescription": "L'apparence du sélecteur de langue sur ordinateur, dans l'en-tête et le pied de page.",

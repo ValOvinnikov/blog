@@ -19,6 +19,7 @@ import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
 import { AccountFields } from './components/account-fields/account-fields';
+import { HeaderControlShapeField } from './components/header-control-shape-field/header-control-shape-field';
 import { HeaderControlStyleField } from './components/header-control-style-field/header-control-style-field';
 import { NavLinkStyleField } from './components/nav-link-style-field/nav-link-style-field';
 import { PreviewDeviceNote } from './components/preview-device-note/preview-device-note';
@@ -122,6 +123,8 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
       <NavLinkStyleField />
 
       <HeaderControlStyleField />
+
+      <HeaderControlShapeField />
 
       <AccountFields />
     </LookCard>

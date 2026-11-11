@@ -765,6 +765,18 @@
       "SOFT": "Un relleno gris, sin contorno",
       "PLAIN": "Sin contorno hasta pasar el cursor"
     },
+    "headerControlShapeLabel": "Forma de los botones de la cabecera",
+    "headerControlShapeDescription": "La forma del contorno de los botones de idioma, tema, menú y cuenta.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Redonda",
+      "ROUNDED": "Redondeada",
+      "SQUARE": "Cuadrada"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Totalmente redonda, como círculos y píldoras",
+      "ROUNDED": "Las esquinas siguen el ajuste de Esquinas del sitio",
+      "SQUARE": "Esquinas rectas"
+    },
     "languageSwitcherLabel": "Selector de idioma",
     "languageSwitcherStyleLabel": "Estilo",
     "languageSwitcherDescription": "Cómo se ve el selector de idioma en escritorio, en el encabezado y el pie de página.",

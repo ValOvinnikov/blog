@@ -10,6 +10,7 @@ import {
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   HUE_MAX,
@@ -174,6 +175,7 @@ describe(switchPreset, () => {
     { field: 'spinnerStyle', value: SPINNER_STYLE.PULSE },
     { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
     { field: 'navLinkStyle', value: NAV_LINK_STYLE.PILL },
+    { field: 'headerControlShape', value: HEADER_CONTROL_SHAPE.SQUARE },
     { field: 'accentHue', value: CONSOLE.themeTokens.accentHue + 1 },
   ] as const)('keeps a $field the owner changed', ({ field, value }) => {
     const current = { ...defaultLookFormValues(), [field]: value };

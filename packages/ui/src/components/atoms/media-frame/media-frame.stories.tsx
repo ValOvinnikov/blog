@@ -56,6 +56,10 @@ export const Classic: TStory = {
   args: { ratio: 'classic', className: 'w-96' },
 };
 
+export const Vertical: TStory = {
+  args: { ratio: 'vertical', className: 'w-48' },
+};
+
 export const Circle: TStory = {
   args: { ratio: 'square', shape: 'circle', className: 'w-48' },
 };
