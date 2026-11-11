@@ -2089,6 +2089,11 @@ stores `email_exact_index`, the `accountEmailIndex` of the address, and is
 unique on it per tenant, so `name+tag@domain` and `name@domain` stay separate
 rows.
 
+**Preview links are signed with their own secret.** `PREVIEW_LINK_SECRET`,
+identical in `apps/web` and `apps/platform`, signs the draft-preview link
+(§9). It is never derived from a tenant's webhook secret, which Sanity also
+holds and the revalidate flow rotates.
+
 **Rate limits are shared across instances.** `apps/web` keeps every rate
 limiter's counts in Upstash Redis (`KV_REST_API_URL`/`KV_REST_API_TOKEN`), so a
 client's allowance holds whichever serverless instance serves it. Callers build
@@ -2208,6 +2213,23 @@ deliberately bypassed; i18n runs through `next-intl` with an `as-needed`
 language prefix (none for the default language) and a single `SmartLink` for
 all in-app navigation. Content localization is described under Localization
 below.
+
+**Draft preview bypasses every cache for the one browser that asked.** An
+editor opens a draft through `GET /api/preview?token=…` on the tenant's own
+host. The token is `<base64url payload>.<base64url HMAC-SHA256>` under
+`PREVIEW_LINK_SECRET`, over `{ tenantId, path, exp }` (`exp` in epoch
+milliseconds); the route refuses it (403, logged as `preview.link_refused`)
+when the signature fails, `exp` has passed, `tenantId` is not the host's
+tenant or `path` is not a path on this site, and otherwise enables Next's
+Draft Mode and redirects to `path`. `GET /api/preview/exit?path=…` disables it
+and returns to that path. The request context reads `draftMode()` and, only
+when it holds the tenant's own credentials, sets the `drafts` perspective on
+its Sanity context — the platform fallback context never reads drafts — so
+`runQuery` reads with that perspective and `cache: 'no-store'`, and the layout
+shows a fixed-copy preview banner with the exit link. With the Draft Mode
+cookie, Next skips the Full Route Cache for that request; every other visitor
+keeps the cached published page, and reading `draftMode()` leaves the content
+routes ISR.
 
 **Every CMS page but the post renders through one skeleton.** `PageShell`
 (`apps/web/src/components/page-templates/page-shell`) is a compound component

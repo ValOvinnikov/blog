@@ -1,3 +1,5 @@
+import { COOKIE_LIST_FIXED_KEYS } from './cookie-list-fixed-keys';
+
 /**
  * Every `site-messages.en.json` key that stays fixed rather than
  * tenant-editable; the coverage test fails on a catalog key that is on
@@ -5,6 +7,8 @@
  */
 export const VOICE_FIXED_KEYS = [
   'breadcrumbs.ariaLabel',
+  'previewBanner.message',
+  'previewBanner.exitLabel',
   'localeErrorPage.announcement',
   'siteUnavailable.heading',
   'siteUnavailable.text',
@@ -236,35 +240,6 @@ export const VOICE_FIXED_KEYS = [
   'consent.categories.externalMedia.label',
   'consent.categories.externalMedia.description',
   'consent.footerSettingsLabel',
-  'cookieList.ariaLabel',
-  'cookieList.intro',
-  'cookieList.columns.name',
-  'cookieList.columns.purpose',
-  'cookieList.columns.duration',
-  'cookieList.cookies.CONSENT.purpose',
-  'cookieList.cookies.CONSENT.duration',
-  'cookieList.cookies.LANGUAGE.purpose',
-  'cookieList.cookies.LANGUAGE.duration',
-  'cookieList.cookies.SESSION.purpose',
-  'cookieList.cookies.SESSION.duration',
-  'cookieList.cookies.CSRF.purpose',
-  'cookieList.cookies.CSRF.duration',
-  'cookieList.cookies.SIGN_IN_RETURN.purpose',
-  'cookieList.cookies.SIGN_IN_RETURN.duration',
-  'cookieList.cookies.OAUTH_VERIFIER.purpose',
-  'cookieList.cookies.OAUTH_VERIFIER.duration',
-  'cookieList.cookies.OAUTH_STATE.purpose',
-  'cookieList.cookies.OAUTH_STATE.duration',
-  'cookieList.cookies.SIGNED_IN_HINT.purpose',
-  'cookieList.cookies.SIGNED_IN_HINT.duration',
-  'cookieList.cookies.NEWSLETTER_SUBSCRIBED.purpose',
-  'cookieList.cookies.NEWSLETTER_SUBSCRIBED.duration',
-  'cookieList.cookies.NEWSLETTER_UNSUBSCRIBE_TOKEN.purpose',
-  'cookieList.cookies.NEWSLETTER_UNSUBSCRIBE_TOKEN.duration',
-  'cookieList.cookies.READING_DEPTH.purpose',
-  'cookieList.cookies.READING_DEPTH.duration',
-  'cookieList.cookies.THEME.purpose',
-  'cookieList.cookies.THEME.duration',
-  'cookieList.analyticsNote',
+  ...COOKIE_LIST_FIXED_KEYS,
   'table.regionLabel',
 ] as const;

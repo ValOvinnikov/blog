@@ -6,6 +6,7 @@ import {
   RADIUS_SCALE,
 } from '@blog/config';
 import { SiteProviders } from '@web/components/features/layout/site-providers';
+import { PreviewBanner } from '@web/components/features/preview/preview-banner';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
 import { SiteHeader } from '@web/components/shared/site-header';
@@ -175,12 +176,32 @@ describe(`<${LocaleLayout.name}/>`, () => {
 
   it('composes providers around header, content and footer, with analytics', async () => {
     const { providers, analytics, pageChildren } = await renderComposition();
-    const [header, , footer] = pageChildren;
+    const [, header, , footer] = pageChildren;
 
     expect(providers?.type).toBe(SiteProviders);
     expect(analytics?.type).toBe(SiteAnalytics);
     expect(header?.type).toBe(SiteHeader);
     expect(footer?.type).toBe(SiteFooter);
+  });
+
+  it('shows the preview banner above the header in a draft preview', async () => {
+    getRequestContextMock.mockResolvedValueOnce({
+      ...MOCK_REQUEST_CONTEXT,
+      isDraftPreview: true,
+    });
+
+    const { pageChildren } = await renderComposition();
+    const [banner, header] = pageChildren;
+
+    expect(banner?.type).toBe(PreviewBanner);
+    expect(header?.type).toBe(SiteHeader);
+  });
+
+  it('leaves the preview banner out for a visitor', async () => {
+    const { pageChildren } = await renderComposition();
+    const types = pageChildren.map((child) => child?.type);
+
+    expect(types).not.toContain(PreviewBanner);
   });
 
   it('leaves out the site header and footer on an operator-suspended site', async () => {

@@ -51,6 +51,8 @@ export const routes = {
   legal: () => '/legal',
   switchLanguage: (to: string, from: string) =>
     `/api/switch-language?${new URLSearchParams({ to, from }).toString()}`,
+  previewExit: (path: string) =>
+    `/api/preview/exit?${new URLSearchParams({ path }).toString()}`,
   rssFeed: () => '/rss.xml',
   tagRssFeed: (slug: string) => `${routes.tag(slug)}/rss.xml`,
 } as const;

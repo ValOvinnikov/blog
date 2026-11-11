@@ -15,6 +15,9 @@ export const env = createEnv({
     // Absent, `/api/revalidate-site-config` answers 500 instead of revalidating.
     // @env-required: development, production
     SITE_CONFIG_REVALIDATE_SECRET: z.string().min(1).optional(),
+    // Absent, `/api/preview` answers 500 instead of opening a draft.
+    // @env-optional
+    PREVIEW_LINK_SECRET: z.string().min(1).optional(),
     // @env-optional
     INTERNAL_PAGES_SECRET: z.string().min(1).optional(),
     // With this and SANITY_GENERATE_SECRET absent, `/api/generate-skim` answers 503.
@@ -71,6 +74,7 @@ export const env = createEnv({
   runtimeEnv: {
     SANITY_REVALIDATE_SECRET: process.env.SANITY_REVALIDATE_SECRET,
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
+    PREVIEW_LINK_SECRET: process.env.PREVIEW_LINK_SECRET,
     INTERNAL_PAGES_SECRET: process.env.INTERNAL_PAGES_SECRET,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,

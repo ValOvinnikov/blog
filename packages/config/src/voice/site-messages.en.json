@@ -397,5 +397,9 @@
   },
   "table": {
     "regionLabel": "Table"
+  },
+  "previewBanner": {
+    "message": "You're viewing a draft. Visitors still see the published page.",
+    "exitLabel": "Exit preview"
   }
 }

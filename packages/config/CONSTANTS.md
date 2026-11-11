@@ -781,6 +781,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **POST_LIST_LOG**: `MODULE_FETCH_FAILED`=`"post_list_module.fetch_failed"`
 
+### `@web/constants/preview` — `apps/web/src/constants/preview.ts`
+
+- **PREVIEW_LOG**: `SECRET_MISSING`=`"preview.secret_missing"`, `LINK_REFUSED`=`"preview.link_refused"`
+- **PREVIEW_LINK_REFUSAL**: `MALFORMED`, `EXPIRED`, `OTHER_TENANT`, `OUTSIDE_SITE`
+
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
 - **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`
@@ -788,6 +793,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 
 - **PROXY_LOG**: `TENANT_LOOKUP_FAILED`=`"proxy.tenant_lookup_failed"`
+
+### `@web/constants/request-context` — `apps/web/src/constants/request-context.ts`
+
+- **REQUEST_CONTEXT_LOG**: `NOT_FOUND_TENANT_LOAD_FAILED`=`"request_context.not_found_tenant_load_failed"`
 
 ### `@web/constants/request` — `apps/web/src/constants/request.ts`
 

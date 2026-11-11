@@ -1,16 +1,7 @@
 import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
+import { toInSitePathname } from '@web/utils/to-in-site-pathname';
 
 type TSwitchLanguageRequest = { to: TLocaleIsoCode; from: string };
-
-const SITE_ORIGIN_PROBE = 'https://site.invalid';
-
-const toInSitePathname = (from: string | null): TMaybeUndefined<string> => {
-  if (!from?.startsWith('/')) {
-    return undefined;
-  }
-  const url = new URL(from, SITE_ORIGIN_PROBE);
-  return url.origin === SITE_ORIGIN_PROBE ? url.pathname : undefined;
-};
 
 export const parseSwitchLanguageRequest = (
   searchParams: URLSearchParams,

@@ -1,10 +1,15 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
+import {
+  NEXT_NAVIGATION_ERROR,
+  SANITY_PERSPECTIVE,
+} from '@blog/config/constants';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
+import { mockDraftMode } from '@web/testing/server/preview/preview';
 import { withMemoizingReactCache } from '@web/testing/shared/react-cache/memoizing-react-cache';
 import {
   MOCK_TENANT_BASE_URL,
@@ -28,11 +33,13 @@ const {
   getTenantByIdMock,
   toTenantSanityCredentialsMock,
   selectLiveLocalesMock,
+  draftModeMock,
   mockEnv,
 } = vi.hoisted(() => ({
   getTenantByIdMock: vi.fn(),
   toTenantSanityCredentialsMock: vi.fn(),
   selectLiveLocalesMock: vi.fn(),
+  draftModeMock: vi.fn(),
   mockEnv: {},
 }));
 
@@ -50,10 +57,9 @@ vi.mock('@blog/service', () => ({
   getPlatformSanityContext: () => MOCK_PLATFORM_CONTEXT,
 }));
 vi.mock('@web/utils/env/env', () => ({ env: mockEnv }));
+vi.mock('next/headers', () => ({ draftMode: draftModeMock }));
 
 const DEVELOPMENT_DATASET = 'development';
-const NOT_FOUND_TENANT_LOAD_FAILED_EVENT =
-  'request_context.not_found_tenant_load_failed';
 const NO_TENANT_ENTERED = 'with no tenant entered';
 
 const MOCK_UNSERVED_LOCALE = faker.string.alpha(8);
@@ -119,6 +125,7 @@ describe('request-context', () => {
       LOCALE_ISO_CODES.EN,
       LOCALE_ISO_CODES.NL,
     ]);
+    draftModeMock.mockResolvedValue(mockDraftMode());
     setMockEnv({
       NEXT_PUBLIC_SANITY_DATASET: PRODUCTION_DATASET,
       NEXT_PUBLIC_SITE_URL: MOCK_TENANT_BASE_URL,
@@ -145,6 +152,7 @@ describe('request-context', () => {
       defaultLocale: LOCALE_ISO_CODES.EN,
       liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
       isOperatorSuspended: false,
+      isDraftPreview: false,
     });
     expect(selectLiveLocalesMock).toHaveBeenCalledWith(MOCK_SERVABLE_TENANT);
   });
@@ -162,6 +170,42 @@ describe('request-context', () => {
     );
 
     expect(isOperatorSuspended).toBe(true);
+  });
+
+  describe('in Draft Mode', () => {
+    beforeEach(() => {
+      draftModeMock.mockResolvedValue(mockDraftMode(true));
+    });
+
+    it("reads the tenant's drafts with its own token", async () => {
+      const { sanityContext, isDraftPreview } = await enterAndRead(
+        MOCK_TENANT_ID,
+        LOCALE_ISO_CODES.EN,
+      );
+
+      expect(sanityContext).toEqual({
+        ...MOCK_TENANT_CREDENTIALS,
+        locale: LOCALE_ISO_CODES.EN,
+        perspective: SANITY_PERSPECTIVE.DRAFTS,
+      });
+      expect(isDraftPreview).toBe(true);
+    });
+
+    it('never reads drafts through the platform fallback', async () => {
+      toTenantSanityCredentialsMock.mockReturnValue(undefined);
+      setMockEnv({ NEXT_PUBLIC_SANITY_DATASET: DEVELOPMENT_DATASET });
+
+      const { sanityContext, isDraftPreview } = await enterAndRead(
+        MOCK_TENANT_ID,
+        LOCALE_ISO_CODES.EN,
+      );
+
+      expect(sanityContext).toEqual({
+        ...MOCK_PLATFORM_CONTEXT,
+        locale: LOCALE_ISO_CODES.EN,
+      });
+      expect(isDraftPreview).toBe(false);
+    });
   });
 
   it('sets the next-intl request locale', async () => {
@@ -239,6 +283,7 @@ describe('request-context', () => {
         defaultLocale: undefined,
         liveLocales: undefined,
         isOperatorSuspended: false,
+        isDraftPreview: false,
       });
       expect(getTenantByIdMock).not.toHaveBeenCalled();
     });
@@ -376,7 +421,7 @@ describe('request-context', () => {
       });
       const { logger } = await import('@web/utils/logger/logger');
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        NOT_FOUND_TENANT_LOAD_FAILED_EVENT,
+        REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED,
         { error },
       );
     });

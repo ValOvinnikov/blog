@@ -397,5 +397,9 @@
   },
   "table": {
     "regionLabel": "Tableau"
+  },
+  "previewBanner": {
+    "message": "Vous consultez un brouillon. Les visiteurs voient toujours la page publiée.",
+    "exitLabel": "Quitter l'aperçu"
   }
 }

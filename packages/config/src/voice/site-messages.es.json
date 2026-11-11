@@ -397,5 +397,9 @@
   },
   "table": {
     "regionLabel": "Tabla"
+  },
+  "previewBanner": {
+    "message": "Estás viendo un borrador. Los visitantes siguen viendo la página publicada.",
+    "exitLabel": "Salir de la vista previa"
   }
 }

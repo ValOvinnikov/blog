@@ -1,5 +1,6 @@
 import { type ITenantLocalizedParams, LOCALE_BCP47_TAGS } from '@blog/config';
 import { SiteProviders } from '@web/components/features/layout/site-providers';
+import { PreviewBanner } from '@web/components/features/preview/preview-banner';
 import { DocumentShell } from '@web/components/shared/document-shell';
 import { SiteAnalytics } from '@web/components/shared/site-analytics';
 import { SiteFooter } from '@web/components/shared/site-footer';
@@ -53,7 +54,13 @@ type TProps = {
 
 export default async function LocaleLayout({ children, params }: TProps) {
   await enterRequestContext(params);
-  const { tenantId, locale, isOperatorSuspended } = await getRequestContext();
+  const {
+    tenantId,
+    locale,
+    defaultLocale = routing.defaultLocale,
+    isOperatorSuspended,
+    isDraftPreview,
+  } = await getRequestContext();
   const tenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const themeTokens = await getThemeTokens(tenant);
 
@@ -64,6 +71,9 @@ export default async function LocaleLayout({ children, params }: TProps) {
       <ThemeScope themeTokens={themeTokens}>
         <SiteProviders>
           <div className={s.root()}>
+            {isDraftPreview && (
+              <PreviewBanner locale={locale} defaultLocale={defaultLocale} />
+            )}
             {!isOperatorSuspended && <SiteHeader />}
             <div className={s.content()}>{children}</div>
             {!isOperatorSuspended && <SiteFooter />}

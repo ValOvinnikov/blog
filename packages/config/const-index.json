@@ -8432,6 +8432,54 @@
         "file": "apps/web/src/constants/post-list.ts"
       }
     ],
+    "preview.secret_missing": [
+      {
+        "ref": "PREVIEW_LOG.SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/preview",
+        "file": "apps/web/src/constants/preview.ts"
+      }
+    ],
+    "preview.link_refused": [
+      {
+        "ref": "PREVIEW_LOG.LINK_REFUSED",
+        "scope": "app:web",
+        "from": "@web/constants/preview",
+        "file": "apps/web/src/constants/preview.ts"
+      }
+    ],
+    "MALFORMED": [
+      {
+        "ref": "PREVIEW_LINK_REFUSAL.MALFORMED",
+        "scope": "app:web",
+        "from": "@web/constants/preview",
+        "file": "apps/web/src/constants/preview.ts"
+      }
+    ],
+    "EXPIRED": [
+      {
+        "ref": "PREVIEW_LINK_REFUSAL.EXPIRED",
+        "scope": "app:web",
+        "from": "@web/constants/preview",
+        "file": "apps/web/src/constants/preview.ts"
+      }
+    ],
+    "OTHER_TENANT": [
+      {
+        "ref": "PREVIEW_LINK_REFUSAL.OTHER_TENANT",
+        "scope": "app:web",
+        "from": "@web/constants/preview",
+        "file": "apps/web/src/constants/preview.ts"
+      }
+    ],
+    "OUTSIDE_SITE": [
+      {
+        "ref": "PREVIEW_LINK_REFUSAL.OUTSIDE_SITE",
+        "scope": "app:web",
+        "from": "@web/constants/preview",
+        "file": "apps/web/src/constants/preview.ts"
+      }
+    ],
     "pricing_module.fetch_failed": [
       {
         "ref": "PRICING_LOG.MODULE_FETCH_FAILED",
@@ -8454,6 +8502,14 @@
         "scope": "app:web",
         "from": "@web/constants/proxy",
         "file": "apps/web/src/constants/proxy.ts"
+      }
+    ],
+    "request_context.not_found_tenant_load_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
       }
     ],
     "revalidate_site_config.secret_missing": [

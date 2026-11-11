@@ -397,5 +397,9 @@
   },
   "table": {
     "regionLabel": "Tabel"
+  },
+  "previewBanner": {
+    "message": "Je bekijkt een concept. Bezoekers zien nog steeds de gepubliceerde pagina.",
+    "exitLabel": "Voorbeeld sluiten"
   }
 }

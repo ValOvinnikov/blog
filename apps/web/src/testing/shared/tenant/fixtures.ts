@@ -35,6 +35,7 @@ export const MOCK_REQUEST_CONTEXT: TRequestContext = {
   defaultLocale: LOCALE_ISO_CODES.EN,
   liveLocales: [LOCALE_ISO_CODES.EN],
   isOperatorSuspended: false,
+  isDraftPreview: false,
 };
 
 export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
