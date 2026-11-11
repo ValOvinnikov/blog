@@ -1021,6 +1021,7 @@
     "backTo": "Volver a {part}",
     "topOfPage": "Principio de la página",
     "styleCard": "<strong>{card}</strong> cambia toda la página, así que el marco se queda donde está.",
+    "styleOutlined": "Resaltado: lo que cambia <strong>{card}</strong>.",
     "idle": "Abre una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
     "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
     "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",

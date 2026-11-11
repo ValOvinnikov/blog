@@ -363,7 +363,7 @@ describe(`<${PreviewFrame.name}/>`, () => {
     });
   });
 
-  it('shows the status text with its trailing action', () => {
+  it('announces the status text politely, beside its trailing action', () => {
     setup({
       children: (
         <PreviewFrame.Status
@@ -379,7 +379,8 @@ describe(`<${PreviewFrame.name}/>`, () => {
 
     const status = screen.getByText(MOCK_STATUS);
 
-    expect(status).toBeVisible();
+    expect(status).toHaveRole('status');
+    expect(status).not.toContainElement(action);
     expect(action).toBeVisible();
   });
 

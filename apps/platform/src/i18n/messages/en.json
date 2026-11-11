@@ -1021,6 +1021,7 @@
     "backTo": "Back to {part}",
     "topOfPage": "Top of page",
     "styleCard": "<strong>{card}</strong> changes the whole page, so the frame stays where it is.",
+    "styleOutlined": "Outlined: what <strong>{card}</strong> changes.",
     "idle": "Open a Site parts card and the frame scrolls to it.",
     "off": "Following is off. The frame stays where you leave it.",
     "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it.",
