@@ -303,7 +303,7 @@ describe('the real repo files', () => {
     const { required, optional } = collectClassification(ENV_FILES);
     const optionalNames = new Set(optional.map(({ name }) => name));
 
-    assert.equal(required.size, 10);
+    assert.equal(required.size, 11);
     for (const name of [
       'NEXT_PUBLIC_SITE_URL',
       'LOKI_PUSH_URL',
