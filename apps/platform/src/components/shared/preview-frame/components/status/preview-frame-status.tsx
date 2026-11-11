@@ -29,7 +29,11 @@ export const PreviewFrameStatus = ({
       <span className={statusIcon()}>
         <Icon name={icon} size={ICON_SIZE.MD} strokeWidth={2} />
       </span>
-      <span className={statusText()} data-testid={PREVIEW_FRAME_STATUS_TEST_ID}>
+      <span
+        role="status"
+        className={statusText()}
+        data-testid={PREVIEW_FRAME_STATUS_TEST_ID}
+      >
         {children}
       </span>
       {action && <span className={statusAction()}>{action}</span>}

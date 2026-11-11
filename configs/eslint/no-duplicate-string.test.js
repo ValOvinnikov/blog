@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import tseslint from 'typescript-eslint';
 
 import { noDuplicateStringRule } from './no-duplicate-string.js';
 
@@ -49,6 +50,15 @@ ruleTester.run('no-duplicate-string', noDuplicateStringRule, {
     {
       code: "const a = { target: '_blank' }; const b = { target: '_blank' };",
       options,
+    },
+    {
+      code: 'const a = <x sameSite="strict-mode" />; const b = <x sameSite="strict-mode" />;',
+      options,
+    },
+    {
+      code: "type TA = TProps['tenant-workspace']; type TB = 'tenant-workspace' | 'other';",
+      options,
+      languageOptions: { parser: tseslint.parser },
     },
   ],
   invalid: [

@@ -258,6 +258,9 @@ needed); stop and wait for explicit user approval at the push and PR gates.**
 dispatch are replaced as `CLAUDE.md` "Solo-session mode" describes — every other step,
 including both approval gates, is unchanged.)
 
+The steps are the gates above, numbered for citation: steps 1–2 are Gate 0,
+3–4 Gate 1, 5 Gate 2, 6 Gate 3, 7 Gates 4–5a, and step 8 follows Gate 3.
+
 1. Set issue → In Progress on the board
 2. Checkout branch from `main`, named by
    `pnpm -s branch:name <n> "<issue title>"` (`<type>/<n>-<slug>`; any other
@@ -295,11 +298,11 @@ including both approval gates, is unchanged.)
    tellable apart in the PR list: the session's slugified **name**, never its
    id (`job:static-generation`, not `job:ab922b91`), skipped silently in a
    foreground session and never applied in a cloud one (mechanics, including a
-   renamed session: `open-pull-request` Gate 5). The label identifies the job,
+   renamed session: Gate 5 above). The label identifies the job,
    not the author — PRs are always opened by the orchestrator, never a
    subagent. CI skips drafts; the owner marks the PR ready at final review,
    and only then dispatch `ci-watcher` (background) to watch CI to completion,
-   and diagnose and fix any failure it reports (`open-pull-request` Gate 5a) —
+   and diagnose and fix any failure it reports (Gate 5a above) —
    a fix push still needs its own fresh push-approval ask, same as any push.
 
 8. **Remove the subagent worktrees you created** (no gate — just do it;
@@ -362,12 +365,12 @@ retelling of the report.
   `Closes #<n>`. No code blocks, no per-file or per-function enumeration, no
   design-rationale sections, and **no test-plan checklist** — the gates already
   require the checks to pass and CI re-runs them, so a hand-ticked copy proves
-  nothing. Full contract: `open-pull-request` § "PR body template".
+  nothing. Full contract: "PR body template" above.
 - **Per-layer PRs are required** (`develop-feature` "Planning work — mandatory, not advisory" governs). **Only the completing PR includes `Closes #<n>`** — earlier layer
   PRs reference the issue without an adjacent closing keyword, because GitHub
   auto-closes on the literal substring regardless of tense. Exact wording rule
   and the board-Status gotcha when an issue is auto-closed early:
-  `open-pull-request` § "Scope: prefer per-layer PRs" and "PR body template".
+  "Scope: prefer per-layer PRs" and "PR body template" above.
 - **Stacked PRs — only when the user asks, and then use `gh stack`.** The
   orchestrator never opens a stack on its own initiative. When the user says
   to, use the installed `github/gh-stack` extension (`init` / `add` / `submit`
@@ -383,7 +386,7 @@ retelling of the report.
   is stackable only if restructured expand/contract (add the new field, migrate
   consumers above it, delete the old field last); otherwise it stays one PR.
   Full mechanics — required-check triggers, collapsing a stack:
-  `open-pull-request` § "Stacked PRs".
+  `stacked-prs.md` (beside this file).
 
 ## Cloud sessions never write the project board
 
