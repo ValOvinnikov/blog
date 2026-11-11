@@ -19,7 +19,10 @@ import {
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
 import { saveAndExpectLook } from '@platform/testing/look/look-form-save';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupLookForm,
+  withLookTenant,
+} from '@platform/testing/look/look-form-setup';
 import { UPLOAD_LOGO } from '@platform/testing/site-config/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -42,7 +45,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm({ plan: TENANT_PLAN.FREE });
+      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
     });
 
     it('keeps a locked option focusable at its value and ignores a click', async () => {

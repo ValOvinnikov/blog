@@ -1,6 +1,9 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { LookForm } from '@platform/components/features/look/look-form/look-form';
+import {
+  LookForm,
+  type TLookFormTenant,
+} from '@platform/components/features/look/look-form/look-form';
 import { customRender } from '@platform/testing/custom-render';
 import { MOCK_LOGO_URL } from '@platform/testing/site-config/fixtures';
 import {
@@ -11,12 +14,20 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
 
-export const setupLookForm = customRender(LookForm, {
-  tenantId: MOCK_TENANT_ID,
-  tenantName: MOCK_TENANT_NAME,
+const MOCK_LOOK_TENANT: TLookFormTenant = {
+  id: MOCK_TENANT_ID,
+  name: MOCK_TENANT_NAME,
   siteHost: MOCK_TENANT_DOMAIN,
-  initialValues: defaultLookFormValues(),
   plan: TENANT_PLAN.GROWTH,
+};
+
+export const withLookTenant = (overrides: Partial<TLookFormTenant>) => ({
+  tenant: { ...MOCK_LOOK_TENANT, ...overrides },
+});
+
+export const setupLookForm = customRender(LookForm, {
+  tenant: MOCK_LOOK_TENANT,
+  initialValues: defaultLookFormValues(),
   isOperator: false,
   liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR],
   hasReaderAccounts: true,
@@ -30,4 +41,8 @@ export const setupWithSavedLogo = () =>
 
 export const setupArchived = (
   overrides: Parameters<typeof setupLookForm>[0] = {},
-) => setupLookForm({ archivedAt: MOCK_ARCHIVED_AT, ...overrides });
+) =>
+  setupLookForm({
+    ...overrides,
+    ...withLookTenant({ archivedAt: MOCK_ARCHIVED_AT, ...overrides.tenant }),
+  });

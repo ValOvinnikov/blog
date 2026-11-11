@@ -1846,7 +1846,7 @@ posture, not a "match legacy behavior" default). Two gating layers stack on top 
 most-restrictive-wins: env-locked secrets (unchanged, pre-existing —
 `AUTH_*`, `ANTHROPIC_API_KEY`, `SANITY_REVALIDATE_SECRET`, …) and
 `@blog/db`'s `PLAN_REGISTRY` (`Record<TTenantPlan, TCapability[]>` — `FREE`
-entitles `consentBanner`; `GROWTH` entitles all eight:
+entitles `consentBanner`; `STARTER` adds `contactForm`; `GROWTH` entitles all eight:
 `readerAccounts`/`comments`/`ratings`/`bookmarks`/`newsletter`/`analytics`/
 `consentBanner`/`contactForm`).
 `readerAccounts`, and the `comments`, `ratings` and `bookmarks` nested under
@@ -1929,15 +1929,15 @@ costs convenience, never compliance.
 flagged `isComingSoon` in `apps/platform`'s `CAPABILITY_TOGGLES`. The Features
 tab renders it as a read-only "Coming soon" row with no switch, loads it off,
 and the save action writes it off whatever the payload says, so the row cannot
-be bypassed by a crafted request. Plan-locked toggles keep their "Growth plan"
-lock. Shipping one of these features is a matter of dropping its flag.
+be bypassed by a crafted request. A plan-locked toggle keeps its lock, badged with the cheapest plan that
+holds it. Shipping one of these features is a matter of dropping its flag.
 
 **Plan-aware navigation.** `apps/platform`'s `planPageAccess(plan)` derives
 which plan-gated pages a tenant can use: Languages when `PLAN_LOCALE_LIMIT`
 allows a language beyond the default; Email when `PLAN_REGISTRY` holds any of
-`bookmarks`/`comments`/`newsletter` (the capabilities that make the site send
-email); Subscribers with `newsletter`; Comments with `comments`; Team on any
-plan but `FREE`. The tenant's own `/dashboard` sidebar omits what the plan
+`bookmarks`/`comments`/`newsletter`/`contactForm` (the capabilities that make
+the site send email); Subscribers with `newsletter`; Comments with `comments`;
+Team on `GROWTH` only. The tenant's own `/dashboard` sidebar omits what the plan
 cannot use, and a gated dashboard page answers 404 for such a tenant. The
 operator's `/tenants/{id}` view ignores the plan and shows every entry and
 page, so a downgraded tenant's data stays reachable. Roadmap entries with no
@@ -1988,11 +1988,11 @@ than showing a false warning. Because it is read on each Studio load,
 turning a feature on clears the warning on the next load. The same warning
 covers module packs: given an optional `entitlements.modulePacks`, a module
 type outside them (`MODULE_PACK_BY_TYPE` in `@blog/config`) shows as
-unavailable in pickers (disabled with a "Growth" badge, and otherwise as a
+unavailable in pickers (disabled with its pack's plan badge, "Starter" or "Growth", and otherwise as a
 site with every pack sees it, in the modules field's own "Add item…" menu — a
 copy of Sanity's insert menu passed as the array input's `arrayFunctions` on
-every plan, so Free and Growth share one picker, since Sanity's has no disabled
-row; locked, titled "— Growth plan" and listed last in Sanity's per-row insert
+every plan, so every plan shares one picker, since Sanity's has no disabled
+row; locked, titled "— Starter plan" or "— Growth plan" and listed last in Sanity's per-row insert
 menus), offers no document to pick, can't be created new,
 and warns on its documents
 and on page references; the plan message wins over the capability one.

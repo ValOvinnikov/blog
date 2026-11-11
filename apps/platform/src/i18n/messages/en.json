@@ -66,7 +66,7 @@
     "nameLabel": "Site name",
     "nameHint": "Shown in your site’s header and in browser tabs.",
     "siteAddressLabel": "Site address",
-    "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
+    "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Starter and Growth plans.",
     "siteAddressChecking": "Checking the address…",
     "siteAddressAvailable": "{address} is yours",
     "siteAddressUnverified": "We couldn’t check this address right now. You can continue — we’ll check it again when you create the site.",
@@ -490,7 +490,7 @@
       "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Additional languages: none} other {Additional languages: {languages}}}",
       "SUSPENSION_REASON": "Reason: {category}",
       "SUSPENSION_REFERENCE": "Reference: {reference}",
-      "PLAN": "Plan: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "SIGN_IN_PROVIDER": "Sign-in provider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Client secret replaced"
     }
@@ -527,7 +527,7 @@
     "ownDomain": {
       "title": "Use my own domain",
       "supportingText": "Serve your site from an address you own. Your current address keeps working.",
-      "upgradePrompt": "Using your own domain comes with the Growth plan.",
+      "upgradePrompt": "Using your own domain comes with the Starter and Growth plans.",
       "ownerOnly": "Only the site owner can connect a domain.",
       "archivedState": "This site is archived, so its domain can't be changed.",
       "domainLabel": "Domain",
@@ -551,7 +551,7 @@
       "refusal": {
         "notFound": "This site couldn't be found.",
         "archived": "This site is archived, so its domain can't be changed.",
-        "notOnPlan": "Using your own domain comes with the Growth plan.",
+        "notOnPlan": "Using your own domain comes with the Starter and Growth plans.",
         "notProvisioned": "This site isn't set up yet. Try again once setup finishes.",
         "alreadyConnected": "This site already has its own domain.",
         "notCustomDomain": "This domain can't be removed.",
@@ -694,7 +694,7 @@
     "growthAddsButtons": "Busy state and spinner",
     "growthAddsHeader": "Layout, sub-menus, bar, header buttons and account controls",
     "growthAddsFooter": "Layout, background and surface",
-    "growthAddsClosing": "Growth also adds more languages (with a choice of language switcher style), your own domain and more site features.",
+    "growthAddsClosing": "Growth also adds more languages (with a choice of language switcher style) and more site features.",
     "jumpIndexUnsaved": ", unsaved changes",
     "expandAll": "Expand all",
     "collapseAll": "Collapse all",
@@ -783,7 +783,7 @@
     "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
     "languageSwitcherFreeDescription": "Your plan publishes one language. Upgrade to add languages and choose a switcher style.",
     "lockLineGrowthFields": "Fields marked Growth keep the {preset} preset's value.",
-    "lockLineTypeFonts": "On Free, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
+    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -922,7 +922,7 @@
       "SHOWN": "Both"
     },
     "cookieSettingsButtonBannerOff": "The cookie banner is off, so readers see neither the link nor the button. Turn the banner on in Features to choose.",
-    "footerPoweredByNote": "Free sites show “Powered by {productName}” at the end of the footer. It goes with the Growth plan.",
+    "footerPoweredByNote": "Free sites show “Powered by {productName}” at the end of the footer. It goes with the Starter and Growth plans.",
     "brandHeading": "Brand",
     "brandImagePicked": "New image, not uploaded yet",
     "brandImageUnchanged": "No new image",
@@ -1040,7 +1040,7 @@
     "idle": "Open a Site parts card and the frame scrolls to it.",
     "off": "Following is off. The frame stays where you leave it.",
     "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it.",
-    "freeSample": "The sample uses the {preset} preset's values, the ones a Free site publishes."
+    "freeSample": "The sample uses the {preset} preset's values, the ones this plan publishes."
   },
   "lookFullscreen": {
     "open": "Open preview full screen",
@@ -1329,7 +1329,7 @@
     "description": "The fast part. Everything after this runs automatically, each step resumable on failure.",
     "nameLabel": "Tenant name",
     "siteAddressLabel": "Site address",
-    "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Growth plan.",
+    "siteAddressHint": "Letters, numbers and hyphens. You can connect your own domain on the Starter and Growth plans.",
     "localeLabel": "Default language",
     "localeHint": "The language the site's starter content and settings start in.",
     "planLabel": "Plan",
@@ -1637,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Features",
-    "description": "Turn your site's features on or off. Locked toggles require the Growth plan.",
+    "description": "Turn your site's features on or off. A locked toggle names the plan that includes it.",
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
-    "planLockedBadge": "Growth plan",
+    "planLockedBadge": "{plan, select, FREE {Free plan} STARTER {Starter plan} other {Growth plan}}",
     "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
@@ -1685,6 +1685,7 @@
   },
   "planNames": {
     "FREE": "Free",
+    "STARTER": "Starter",
     "GROWTH": "Growth"
   },
   "languagesSettings": {
@@ -1715,7 +1716,7 @@
     "fieldsNeedAttention": "{count, plural, one {# field needs attention} other {# fields need attention}}",
     "goToFirstField": "Go to the first one",
     "notSaved": "Not saved",
-    "notInPlan": "Your site is on the {plan, select, FREE {Free} GROWTH {Growth} other {current}} plan, which doesn't include {items}, so nothing was saved.",
+    "notInPlan": "Your site is on the {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {current}} plan, which doesn't include {items}, so nothing was saved.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Discard",
     "save": "Save changes",
@@ -1754,7 +1755,7 @@
     "title": "Leads",
     "description": "Messages sent through your site's contact form, newest first. Each message was also emailed to you when it arrived.",
     "downgradedTitle": "Contact form not included in your plan",
-    "downgradedDescription": "The contact form is a Growth feature, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
+    "downgradedDescription": "The contact form comes with the Starter and Growth plans, so new messages no longer arrive. The messages you already received are kept here, and you can still delete any of them."
   },
   "leadsInbox": {
     "listLabel": "Messages",
@@ -2085,12 +2086,19 @@
       "options": "Growth options are now available on your site: more languages, every Look setting, extra page modules, and features such as the contact form, bookmarks and analytics.",
       "kept": "If you used Growth before, your earlier choices are back as you left them."
     },
+    "STARTER": {
+      "subject": "Your site is now on the Starter plan",
+      "previewText": "{siteName} can now use the Starter options.",
+      "changed": "{siteName} is now on the Starter plan.",
+      "options": "On Starter your site can use its own domain and the contact form, and its footer has no “Powered by” mark. More languages, every Look setting and the other page modules come with Growth.",
+      "kept": "Nothing is deleted. Your content and settings are kept, and anything from Growth is back as you left it if you move to Growth."
+    },
     "FREE": {
       "subject": "Your site is now on the Free plan",
-      "previewText": "Growth options are switched off on {siteName}.",
+      "previewText": "Paid-plan options are switched off on {siteName}.",
       "changed": "{siteName} is now on the Free plan.",
-      "options": "Growth options are switched off on your site: extra languages, the Growth Look settings, Growth page modules, and features such as the contact form, bookmarks and analytics.",
-      "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to Growth again."
+      "options": "Paid-plan options are switched off on your site: extra languages, the Growth Look settings, paid page modules, and features such as the contact form, bookmarks and analytics.",
+      "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
     }
   },
   "suspensionCategory": {

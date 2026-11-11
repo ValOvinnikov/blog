@@ -1,7 +1,6 @@
 import { isAccentHueAccessible, type TPresetId } from '@blog/config';
 import {
   LOOK_FIELDS,
-  TENANT_PLAN,
   type TLookField,
   type TTenantPlan,
 } from '@blog/db/constants';
@@ -53,17 +52,18 @@ export const buildLookFormContext = ({
   const hasFieldChanged = (field: keyof TLookFormValues) =>
     isFieldChanged(field, values, savedValues);
   const isLocked = (field: TLookField) => !isLookFieldEntitled(field, plan);
+  const hasLockedFields = LOOK_FIELDS.some(isLocked);
 
   return {
     ...rest,
     values,
     isLocked,
-    hasLockedFields: LOOK_FIELDS.some(isLocked),
+    hasLockedFields,
     hasCardChanges: (card: TLookCard) =>
       CARD_FIELDS[card].some(hasFieldChanged),
     hasFieldChanged,
     canResetToPreset:
-      plan !== TENANT_PLAN.FREE &&
+      !hasLockedFields &&
       countChanges(values, applyPresetDefaults(values.preset, values)) > 0,
     isAccentHueRejected: !isAccentHueAccessible(values.accentHue),
     isBrandNameTooLong: isBrandNameTooLong(values.brandName),

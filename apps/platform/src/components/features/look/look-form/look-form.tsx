@@ -1,7 +1,8 @@
 'use client';
 
 import type { TLocaleIsoCode } from '@blog/config';
-import { LOOK_FIELD, TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { LOOK_FIELD } from '@blog/db/constants';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 import { LookEditCards } from '@platform/components/features/look/look-form/components/look-edit-cards';
 import { LookFormProvider } from '@platform/components/features/look/look-form-provider';
@@ -29,18 +30,19 @@ import { useLookFormState } from './use-look-form-state';
 import { useLookOpenRows } from './use-look-open-rows';
 import { useLookUnsavedCards } from './use-look-unsaved-cards';
 
-export type TLookFormProps = {
-  tenantId: string;
-  tenantName: string;
+export type TLookFormTenant = Pick<TTenant, 'id' | 'name' | 'plan'> & {
   siteHost: string;
+  archivedAt?: Date;
+};
+
+export type TLookFormProps = {
+  tenant: TLookFormTenant;
   initialValues: TLookFormValues;
-  plan: TTenantPlan;
   isOperator: boolean;
   liveLocales: readonly TLocaleIsoCode[];
   hasReaderAccounts: boolean;
   hasCookieBanner: boolean;
   savedAt?: Date;
-  archivedAt?: Date;
 };
 
 const SHELL_LAYOUT = {
@@ -50,18 +52,15 @@ const SHELL_LAYOUT = {
 };
 
 export const LookForm = ({
-  tenantId,
-  tenantName,
-  siteHost,
+  tenant,
   initialValues,
-  plan,
   isOperator,
   liveLocales,
   hasReaderAccounts,
   hasCookieBanner,
   savedAt,
-  archivedAt,
 }: TLookFormProps) => {
+  const { id: tenantId, name: tenantName, siteHost, plan, archivedAt } = tenant;
   const layoutRef = useRef<HTMLDivElement>(null);
   const layoutWidth = useElementSize(layoutRef)?.width;
   const { view, hasTabPanels, tabsProps, panelProps } = useViewTabs({
@@ -123,7 +122,7 @@ export const LookForm = ({
                 sitePartsGroup={groupProps(SITE_PARTS_ROWS)}
                 hasCookieBanner={hasCookieBanner}
                 hasMultipleLanguages={hasMultipleLanguages}
-                hasGrowthNote={plan === TENANT_PLAN.FREE && !isOperator}
+                hasGrowthNote={lookForm.hasLockedFields && !isOperator}
                 onSelectCard={jumpIndex.onSelectCard}
                 summaries={buildLookRowSummaries(lookForm.values, t, {
                   hasMultipleLanguages:

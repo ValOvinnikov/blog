@@ -34,14 +34,17 @@ export const LookPageContent = async ({
       productName={toPoweredByProductName(tenant.plan, env.PRODUCT_NAME)}
     >
       <LookForm
-        tenantId={tenant.id}
-        tenantName={tenant.name}
-        siteHost={tenant.primaryDomain}
+        tenant={{
+          id: tenant.id,
+          name: tenant.name,
+          siteHost: tenant.primaryDomain,
+          plan: tenant.plan,
+          archivedAt: tenant.deprovisionedAt ?? undefined,
+        }}
         initialValues={toEffectiveLook(
           lookFormValuesOrDefaults(siteConfig),
           tenant.plan,
         )}
-        plan={tenant.plan}
         isOperator={isOperatorView({ admin, membership })}
         liveLocales={liveLocales}
         hasReaderAccounts={enabledCapabilities.includes(
@@ -51,7 +54,6 @@ export const LookPageContent = async ({
           CAPABILITY.CONSENT_BANNER,
         )}
         savedAt={siteConfig?.updatedAt}
-        archivedAt={tenant.deprovisionedAt ?? undefined}
       />
     </PoweredByMarkProvider>
   );

@@ -29,6 +29,7 @@ export type TSuspensionStatus =
 
 export const TENANT_PLAN = {
   FREE: 'FREE',
+  STARTER: 'STARTER',
   GROWTH: 'GROWTH',
 } as const;
 
@@ -48,6 +49,7 @@ export const TENANT_DETAILS_UPDATE_OUTCOME = {
 // The ceiling a tenant's own `settings_features` toggles can never exceed.
 export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
   [TENANT_PLAN.FREE]: [CAPABILITY.CONSENT_BANNER],
+  [TENANT_PLAN.STARTER]: [CAPABILITY.CONSENT_BANNER, CAPABILITY.CONTACT_FORM],
   [TENANT_PLAN.GROWTH]: [
     CAPABILITY.READER_ACCOUNTS,
     CAPABILITY.COMMENTS,
@@ -63,6 +65,7 @@ export const PLAN_REGISTRY: Record<TTenantPlan, TCapability[]> = {
 // Includes the default locale.
 export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
   [TENANT_PLAN.FREE]: 1,
+  [TENANT_PLAN.STARTER]: 1,
   [TENANT_PLAN.GROWTH]: 3,
 };
 
@@ -70,27 +73,39 @@ export type TPlanEntitlements = {
   lookFields: readonly TLookField[];
   modulePacks: readonly TModulePack[];
   hasPoweredByMark: boolean;
+  hasCustomDomain: boolean;
   hasOwnOAuthApps: boolean;
 };
 
+const BASE_LOOK_FIELDS: readonly TLookField[] = [
+  LOOK_FIELD.PRESET,
+  LOOK_FIELD.ACCENT_HUE,
+  LOOK_FIELD.BRAND_NAME,
+  LOOK_FIELD.LOGO_ASSET_URL,
+  LOOK_FIELD.FAVICON_ASSET_URL,
+  LOOK_FIELD.COOKIE_SETTINGS_BUTTON,
+];
+
 export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.FREE]: {
-    lookFields: [
-      LOOK_FIELD.PRESET,
-      LOOK_FIELD.ACCENT_HUE,
-      LOOK_FIELD.BRAND_NAME,
-      LOOK_FIELD.LOGO_ASSET_URL,
-      LOOK_FIELD.FAVICON_ASSET_URL,
-      LOOK_FIELD.COOKIE_SETTINGS_BUTTON,
-    ],
+    lookFields: BASE_LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE],
     hasPoweredByMark: true,
+    hasCustomDomain: false,
+    hasOwnOAuthApps: false,
+  },
+  [TENANT_PLAN.STARTER]: {
+    lookFields: BASE_LOOK_FIELDS,
+    modulePacks: [MODULE_PACK.CORE, MODULE_PACK.STARTER],
+    hasPoweredByMark: false,
+    hasCustomDomain: true,
     hasOwnOAuthApps: false,
   },
   [TENANT_PLAN.GROWTH]: {
     lookFields: LOOK_FIELDS,
-    modulePacks: [MODULE_PACK.CORE, MODULE_PACK.GROWTH],
+    modulePacks: [MODULE_PACK.CORE, MODULE_PACK.STARTER, MODULE_PACK.GROWTH],
     hasPoweredByMark: false,
+    hasCustomDomain: true,
     hasOwnOAuthApps: true,
   },
 };

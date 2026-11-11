@@ -66,7 +66,7 @@
     "nameLabel": "Nombre del sitio",
     "nameHint": "Se muestra en la cabecera de tu sitio y en las pestañas del navegador.",
     "siteAddressLabel": "Dirección del sitio",
-    "siteAddressHint": "Letras, números y guiones. Con el plan Growth puedes conectar tu propio dominio.",
+    "siteAddressHint": "Letras, números y guiones. Con los planes Starter y Growth puedes conectar tu propio dominio.",
     "siteAddressChecking": "Comprobando la dirección…",
     "siteAddressAvailable": "{address} es tuya",
     "siteAddressUnverified": "No hemos podido comprobar esta dirección ahora mismo. Puedes continuar: la volveremos a comprobar cuando crees el sitio.",
@@ -490,7 +490,7 @@
       "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Idiomas adicionales: ninguno} other {Idiomas adicionales: {languages}}}",
       "SUSPENSION_REASON": "Motivo: {category}",
       "SUSPENSION_REFERENCE": "Referencia: {reference}",
-      "PLAN": "Plan: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "PLAN": "Plan: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "SIGN_IN_PROVIDER": "Proveedor de inicio de sesión: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Secreto de cliente sustituido"
     }
@@ -527,7 +527,7 @@
     "ownDomain": {
       "title": "Usar mi propio dominio",
       "supportingText": "Publica tu sitio en una dirección que te pertenece. Tu dirección actual sigue funcionando.",
-      "upgradePrompt": "Usar tu propio dominio viene con el plan Growth.",
+      "upgradePrompt": "Usar tu propio dominio viene con los planes Starter y Growth.",
       "ownerOnly": "Solo el propietario del sitio puede conectar un dominio.",
       "archivedState": "Este sitio está archivado, así que no se puede cambiar su dominio.",
       "domainLabel": "Dominio",
@@ -551,7 +551,7 @@
       "refusal": {
         "notFound": "No se encontró este sitio.",
         "archived": "Este sitio está archivado, así que no se puede cambiar su dominio.",
-        "notOnPlan": "Usar tu propio dominio viene con el plan Growth.",
+        "notOnPlan": "Usar tu propio dominio viene con los planes Starter y Growth.",
         "notProvisioned": "Este sitio aún no está configurado. Inténtalo de nuevo cuando termine la configuración.",
         "alreadyConnected": "Este sitio ya tiene su propio dominio.",
         "notCustomDomain": "Este dominio no se puede quitar.",
@@ -694,7 +694,7 @@
     "growthAddsButtons": "Estado de carga e indicador de progreso",
     "growthAddsHeader": "Diseño, submenús, barra, botones de la cabecera y controles de cuenta",
     "growthAddsFooter": "Diseño, fondo y superficie",
-    "growthAddsClosing": "Growth también añade más idiomas (con elección del estilo del selector de idioma), un dominio propio y más funciones para el sitio.",
+    "growthAddsClosing": "Growth también añade más idiomas (con elección del estilo del selector de idioma) y más funciones para el sitio.",
     "jumpIndexUnsaved": ", cambios sin guardar",
     "expandAll": "Desplegar todo",
     "collapseAll": "Plegar todo",
@@ -783,7 +783,7 @@
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
     "languageSwitcherFreeDescription": "Tu plan publica un idioma. Mejora el plan para añadir idiomas y elegir un estilo de selector.",
     "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
-    "lockLineTypeFonts": "En Free, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
+    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Código",
       "MENU_GLOBE": "Globo",
@@ -922,7 +922,7 @@
       "SHOWN": "Ambos"
     },
     "cookieSettingsButtonBannerOff": "El banner de cookies está desactivado, así que los lectores no ven ni el enlace ni el botón. Activa el banner en Funciones para elegir.",
-    "footerPoweredByNote": "Los sitios gratuitos muestran «Con la tecnología de {productName}» al final del pie de página. Desaparece con el plan Growth.",
+    "footerPoweredByNote": "Los sitios gratuitos muestran «Con la tecnología de {productName}» al final del pie de página. Desaparece con los planes Starter y Growth.",
     "brandHeading": "Marca",
     "brandImagePicked": "Imagen nueva, aún sin subir",
     "brandImageUnchanged": "Ninguna imagen nueva",
@@ -1040,7 +1040,7 @@
     "idle": "Abre una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
     "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
     "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
-    "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica un sitio Free."
+    "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica este plan."
   },
   "lookFullscreen": {
     "open": "Abrir la vista previa a pantalla completa",
@@ -1329,7 +1329,7 @@
     "description": "La parte rápida. Todo lo que sigue se ejecuta automáticamente, y cada paso puede reanudarse si falla.",
     "nameLabel": "Nombre del cliente",
     "siteAddressLabel": "Dirección del sitio",
-    "siteAddressHint": "Letras, números y guiones. Con el plan Growth puedes conectar tu propio dominio.",
+    "siteAddressHint": "Letras, números y guiones. Con los planes Starter y Growth puedes conectar tu propio dominio.",
     "localeLabel": "Idioma predeterminado",
     "localeHint": "El idioma en el que empiezan el contenido inicial y los ajustes del sitio.",
     "planLabel": "Plan",
@@ -1637,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Funciones",
-    "description": "Active o desactive las funciones de su sitio. Las opciones bloqueadas requieren el plan Growth.",
+    "description": "Active o desactive las funciones de su sitio. Una opción bloqueada indica el plan que la incluye.",
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
-    "planLockedBadge": "Plan Growth",
+    "planLockedBadge": "{plan, select, FREE {Plan Free} STARTER {Plan Starter} other {Plan Growth}}",
     "comingSoonBadge": "Próximamente",
     "switchOn": "Activado",
     "switchOff": "Desactivado",
@@ -1685,6 +1685,7 @@
   },
   "planNames": {
     "FREE": "Free",
+    "STARTER": "Starter",
     "GROWTH": "Growth"
   },
   "languagesSettings": {
@@ -1715,7 +1716,7 @@
     "fieldsNeedAttention": "{count, plural, one {# campo requiere atención} other {# campos requieren atención}}",
     "goToFirstField": "Ir al primero",
     "notSaved": "No guardado",
-    "notInPlan": "Su sitio está en el plan {plan, select, FREE {Free} GROWTH {Growth} other {actual}}, que no incluye {items}, así que no se ha guardado nada.",
+    "notInPlan": "Su sitio está en el plan {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {actual}}, que no incluye {items}, así que no se ha guardado nada.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Descartar",
     "save": "Guardar cambios",
@@ -1754,7 +1755,7 @@
     "title": "Contactos",
     "description": "Mensajes enviados a través del formulario de contacto de su sitio, los más recientes primero. Cada mensaje también se le envió por correo al recibirse.",
     "downgradedTitle": "El formulario de contacto no está incluido en su plan",
-    "downgradedDescription": "El formulario de contacto es una función de Growth, por lo que ya no llegan mensajes nuevos. Los mensajes ya recibidos se conservan aquí y puede seguir eliminando cualquiera de ellos."
+    "downgradedDescription": "El formulario de contacto viene con los planes Starter y Growth, por lo que ya no llegan mensajes nuevos. Los mensajes ya recibidos se conservan aquí y puede seguir eliminando cualquiera de ellos."
   },
   "leadsInbox": {
     "listLabel": "Mensajes",
@@ -2085,12 +2086,19 @@
       "options": "Las opciones de Growth ya están disponibles en tu sitio: más idiomas, todos los ajustes de Aspecto, módulos de página adicionales y funciones como el formulario de contacto, los marcadores y las estadísticas.",
       "kept": "Si ya usaste Growth antes, tus opciones anteriores vuelven tal como las dejaste."
     },
+    "STARTER": {
+      "subject": "Tu sitio ya está en el plan Starter",
+      "previewText": "{siteName} ya puede usar las opciones de Starter.",
+      "changed": "{siteName} ya está en el plan Starter.",
+      "options": "Con Starter tu sitio puede usar su propio dominio y el formulario de contacto, y su pie de página no muestra «Con la tecnología de». Más idiomas, todos los ajustes de Aspecto y los demás módulos de página vienen con Growth.",
+      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan, y lo de Growth vuelve tal como lo dejaste si cambias a Growth."
+    },
     "FREE": {
       "subject": "Tu sitio ya está en el plan Free",
-      "previewText": "Las opciones de Growth están desactivadas en {siteName}.",
+      "previewText": "Las opciones de los planes de pago están desactivadas en {siteName}.",
       "changed": "{siteName} ya está en el plan Free.",
-      "options": "Las opciones de Growth están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de Growth y funciones como el formulario de contacto, los marcadores y las estadísticas.",
-      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a Growth."
+      "options": "Las opciones de los planes de pago están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de pago y funciones como el formulario de contacto, los marcadores y las estadísticas.",
+      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
     }
   },
   "suspensionCategory": {

@@ -10,7 +10,10 @@ import {
   SPINNER_LABEL,
 } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupLookForm,
+  withLookTenant,
+} from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -34,7 +37,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm({ plan: TENANT_PLAN.FREE });
+      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
     });
     it.each([
       {
