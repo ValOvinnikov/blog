@@ -59,6 +59,7 @@ export * from './reserved-slug';
 export * from './reserved-subdomain';
 export * from './sanity-document-action';
 export * from './sanity-perspective';
+export * from './sanity-webhook-operation';
 export * from './sanity-project';
 export * from './seo';
 export * from './site-type';

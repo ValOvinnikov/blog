@@ -3326,6 +3326,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
+      },
+      {
+        "ref": "SANITY_WEBHOOK_OPERATION.DELETE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-webhook-operation.ts"
       }
     ],
     "published": [
@@ -3604,6 +3610,22 @@
         "scope": "app:worker",
         "from": "@worker/constants/provisioning",
         "file": "apps/worker/src/constants/provisioning.ts"
+      }
+    ],
+    "create": [
+      {
+        "ref": "SANITY_WEBHOOK_OPERATION.CREATE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-webhook-operation.ts"
+      }
+    ],
+    "update": [
+      {
+        "ref": "SANITY_WEBHOOK_OPERATION.UPDATE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-webhook-operation.ts"
       }
     ],
     "BLOG": [
@@ -4012,6 +4034,40 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "LOOK": [
+      {
+        "ref": "SITE_CONFIG_SAVED_AT.LOOK",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-config-saved-at.ts"
+      },
+      {
+        "ref": "ONBOARDING_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      },
+      {
+        "ref": "SETTINGS_FORM_STACK.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-form",
+        "file": "apps/platform/src/constants/settings-form.ts"
+      }
+    ],
+    "VOICE": [
+      {
+        "ref": "SITE_CONFIG_SAVED_AT.VOICE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/site-config-saved-at.ts"
+      },
+      {
+        "ref": "SETTINGS_FORM_STACK.VOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/settings-form",
+        "file": "apps/platform/src/constants/settings-form.ts"
       }
     ],
     "ACTIVE": [
@@ -6304,20 +6360,6 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
-    "LOOK": [
-      {
-        "ref": "ONBOARDING_STEP.LOOK",
-        "scope": "app:platform",
-        "from": "@platform/constants/onboarding",
-        "file": "apps/platform/src/constants/onboarding.ts"
-      },
-      {
-        "ref": "SETTINGS_FORM_STACK.LOOK",
-        "scope": "app:platform",
-        "from": "@platform/constants/settings-form",
-        "file": "apps/platform/src/constants/settings-form.ts"
-      }
-    ],
     "REVIEW": [
       {
         "ref": "ONBOARDING_STEP.REVIEW",
@@ -6962,14 +7004,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/settings-features",
         "file": "apps/platform/src/constants/settings-features.ts"
-      }
-    ],
-    "VOICE": [
-      {
-        "ref": "SETTINGS_FORM_STACK.VOICE",
-        "scope": "app:platform",
-        "from": "@platform/constants/settings-form",
-        "file": "apps/platform/src/constants/settings-form.ts"
       }
     ],
     "NOT_IN_PLAN": [
@@ -8561,6 +8595,14 @@
     "revalidate.bookmark_cleanup_failed": [
       {
         "ref": "REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.first_post_stamp_failed": [
+      {
+        "ref": "REVALIDATE_LOG.FIRST_POST_STAMP_FAILED",
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
