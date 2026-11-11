@@ -1,6 +1,6 @@
-import { boolean, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, uuid } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { timestampColumns } from './columns';
 import { tenants } from './tenants';
 
 // Column defaults mirror `PRESET_REGISTRY`'s `CONSOLE` `featureDefaults`; a
@@ -23,13 +23,7 @@ export const settingsFeatures = pgTable('settings_features', {
     .notNull()
     .default(false),
   contactFormEnabled: boolean('contact_form_enabled').notNull().default(true),
-  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  ...timestampColumns,
 });
 
 export type TSettingsFeatures = typeof settingsFeatures.$inferSelect;

@@ -274,6 +274,22 @@
         "file": "packages/config/src/constants/toast.ts"
       }
     ],
+    "GOOGLE_ANALYTICS": [
+      {
+        "ref": "ANALYTICS_PROVIDER.GOOGLE_ANALYTICS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/analytics-provider.ts"
+      }
+    ],
+    "PLAUSIBLE": [
+      {
+        "ref": "ANALYTICS_PROVIDER.PLAUSIBLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/analytics-provider.ts"
+      }
+    ],
     "WHY_NOT": [
       {
         "ref": "ASIDE_KIND.WHY_NOT",

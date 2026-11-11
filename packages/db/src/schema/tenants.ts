@@ -21,7 +21,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { timestampColumns } from './columns';
 import { tenantBillingColumns } from './tenant-billing-columns';
 import { tenantInactivityColumns } from './tenant-inactivity-columns';
 import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
@@ -130,13 +130,7 @@ export const tenants = pgTable(
     firstPostPublishedAt: timestamp('first_post_published_at', {
       mode: 'date',
     }),
-    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
+    ...timestampColumns,
   },
   (tenant) => [
     uniqueIndex(SELF_SERVE_FREE_OWNER_INDEX_NAME)
