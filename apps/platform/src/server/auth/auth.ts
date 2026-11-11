@@ -11,7 +11,7 @@ import { cache } from 'react';
 // Lazy so `getDb()` waits for the first request; at import it breaks the build, where `DATABASE_URL` is unset.
 const { handlers, auth, signIn, signOut } = NextAuth(() => ({
   ...withOwnerSignInActivity(
-    buildAuthConfig(AUTH_APP.PLATFORM, logMagicLinkRefusal),
+    buildAuthConfig(AUTH_APP.PLATFORM, { onSendRefused: logMagicLinkRefusal }),
   ),
   pages: { signIn: SIGN_IN_PATH, error: adminRoutes.signInError() },
 }));

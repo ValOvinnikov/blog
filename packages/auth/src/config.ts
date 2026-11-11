@@ -18,7 +18,7 @@ import {
   OAUTH_PROVIDER,
   type TAuthApp,
 } from '@blog/config/constants';
-import type { IMagicLinkSendRefusal } from '@blog/config/types';
+import type { IMagicLinkSendHandlers } from '@blog/config/types';
 import { getDb, schema } from '@blog/db';
 import type { TTenantOAuthCredentialsByProvider } from '@blog/db/queries/tenant-oauth-credentials/get-tenant-oauth-credentials/get-tenant-oauth-credentials';
 import { isUndefined } from '@blog/utils/primitives';
@@ -58,7 +58,7 @@ function buildOAuthProviders(
 
 export function buildAuthConfig(
   app: TAuthApp,
-  onMagicLinkSendRefused: (refusal: IMagicLinkSendRefusal) => void,
+  magicLinkHandlers: IMagicLinkSendHandlers,
   siteCredentials: TTenantOAuthCredentialsByProvider = {},
 ): NextAuthConfig {
   const adapter = DrizzleAdapter(getDb(), {
@@ -100,7 +100,7 @@ export function buildAuthConfig(
     }),
     providers: [
       ...buildOAuthProviders(siteCredentials),
-      buildMagicLinkProvider(app, onMagicLinkSendRefused),
+      buildMagicLinkProvider(app, magicLinkHandlers),
     ],
   };
 }

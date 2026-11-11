@@ -1,12 +1,18 @@
 import {
+  EMAIL_TYPE,
   LOCALE_ISO_CODES,
   PRESET_ID,
   resolveTenantEmailBrand,
   routes,
   type TLocaleIsoCode,
 } from '@blog/config';
-import { escapeHtml, LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email';
+import {
+  buildSiteEmailTag,
+  escapeHtml,
+  LIST_UNSUBSCRIBE_ONE_CLICK,
+} from '@blog/email';
 import { faker } from '@faker-js/faker';
+import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
 import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { setConfirmationEmailDefaults } from '@web/testing/server/newsletter/confirmation-email-defaults';
 import { confirmationEmailEdges } from '@web/testing/server/newsletter/confirmation-email-edges';
@@ -23,6 +29,7 @@ import {
   MOCK_TENANT_BASE_URL,
   MOCK_TENANT_ID,
 } from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 import { getLocale } from 'next-intl/server';
 
 import { sendNewsletterConfirmation } from './newsletter-confirmation-send';
@@ -33,6 +40,7 @@ const {
   claimConfirmationSend: claimConfirmationSendMock,
   releaseConfirmationSend: releaseConfirmationSendMock,
   commitConfirmationToken: commitConfirmationTokenMock,
+  recordEmailSend: recordEmailSendMock,
 } = confirmationEmailEdges;
 
 vi.mock('@blog/db', async () => ({
@@ -98,17 +106,51 @@ describe(sendNewsletterConfirmation, () => {
     });
   });
 
-  it('emails the subscriber a confirm link and their own unsubscribe link', async () => {
+  describe('once sent', () => {
+    beforeEach(async () => {
+      await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
+    });
+
+    it('emails the subscriber a confirm link and their own unsubscribe link', () => {
+      const { to, subject, replyTo, headers, html } = sentEmail();
+      expect({ to, subject, replyTo, headers }).toEqual({
+        to: MOCK_SUBSCRIBER.email,
+        subject: MOCK_AUTHORED_SUBJECT,
+        replyTo: MOCK_REPLY_TO,
+        headers: unsubscribeHeadersFor(),
+      });
+      expect(html).toContain(escapeHtml(confirmUrlFor()));
+    });
+
+    it('tags the send with the site and counts one confirmation for it', () => {
+      expect(sentEmail().tags).toEqual([buildSiteEmailTag(MOCK_TENANT_ID)]);
+      expect(recordEmailSendMock).toHaveBeenCalledExactlyOnceWith(
+        MOCK_TENANT_ID,
+        EMAIL_TYPE.NEWSLETTER_CONFIRMATION,
+      );
+    });
+
+    it("renders the tenant's own brand and name", () => {
+      const { html } = sentEmail();
+      expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+      expect(html).toContain(MOCK_BRAND.logo1);
+      expect(html).toContain(escapeHtml(MOCK_BRAND_NAME));
+    });
+  });
+
+  it('keeps the send and its new token when the count fails, and logs it', async () => {
+    recordEmailSendMock.mockRejectedValue(MOCK_ERROR);
+
     await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
 
-    const { to, subject, replyTo, headers, html } = sentEmail();
-    expect({ to, subject, replyTo, headers }).toEqual({
-      to: MOCK_SUBSCRIBER.email,
-      subject: MOCK_AUTHORED_SUBJECT,
-      replyTo: MOCK_REPLY_TO,
-      headers: unsubscribeHeadersFor(),
-    });
-    expect(html).toContain(escapeHtml(confirmUrlFor()));
+    expect(commitConfirmationTokenMock).toHaveBeenCalledOnce();
+    expect(releaseConfirmationSendMock).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      EMAIL_USAGE_LOG.SEND_COUNT_FAILED,
+      expect.objectContaining({ siteId: MOCK_TENANT_ID, error: MOCK_ERROR }),
+    );
   });
 
   it('stores the new confirm token only once the email is sent', async () => {
@@ -134,15 +176,6 @@ describe(sendNewsletterConfirmation, () => {
     const { headers, html } = sentEmail();
     expect(html).toContain(escapeHtml(confirmUrlFor(LOCALE_ISO_CODES.FR)));
     expect(headers).toEqual(unsubscribeHeadersFor(LOCALE_ISO_CODES.FR));
-  });
-
-  it("renders the tenant's own brand and name", async () => {
-    await sendNewsletterConfirmation(MOCK_TENANT_ID, MOCK_SUBSCRIBER);
-
-    const { html } = sentEmail();
-    expect(resolveTenantEmailIdentityMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(html).toContain(MOCK_BRAND.logo1);
-    expect(html).toContain(escapeHtml(MOCK_BRAND_NAME));
   });
 
   it('sends nothing while the last confirmation is inside its cooldown', async () => {

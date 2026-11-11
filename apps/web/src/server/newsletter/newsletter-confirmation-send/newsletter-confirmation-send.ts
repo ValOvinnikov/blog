@@ -1,6 +1,12 @@
 import { routes } from '@blog/config';
+import { EMAIL_TYPE } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { buildNewsletterConfirmationEmail, sendEmail } from '@blog/email';
+import {
+  buildNewsletterConfirmationEmail,
+  buildSiteEmailTag,
+  sendEmail,
+} from '@blog/email';
+import { recordEmailSendSafely } from '@web/server/email-usage/record-email-send-safely/record-email-send-safely';
 import { mintNewsletterUnsubscribeToken } from '@web/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token';
 import { resolveNewsletterEmailSettings } from '@web/server/newsletter/resolve-newsletter-email-settings/resolve-newsletter-email-settings';
 import { getSubscribedPageLocale } from '@web/server/newsletter/subscribed-page-locale/subscribed-page-locale';
@@ -58,7 +64,10 @@ const sendConfirmationEmail = async (
     html,
     headers,
     replyTo,
+    tags: [buildSiteEmailTag(tenantId)],
   });
+
+  await recordEmailSendSafely(tenantId, EMAIL_TYPE.NEWSLETTER_CONFIRMATION);
 };
 
 export const deliverNewsletterConfirmation = async (

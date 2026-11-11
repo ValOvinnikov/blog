@@ -6,7 +6,7 @@ import {
   TENANT_DOMAINS_DOMAIN_UNIQUE_NAME,
   type TTenantDomain,
 } from '@blog/db/schema/tenant-domains';
-import { uniqueViolationConstraint } from '@blog/db/utils/unique-violation/unique-violation';
+import { uniqueViolationConstraint } from '@blog/db/utils/constraint-violation/constraint-violation';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, sql } from 'drizzle-orm';
 
