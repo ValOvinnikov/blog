@@ -779,6 +779,8 @@ carries `isolation: worktree`").
   `lint`, `test`, the warn-only `check:test-budget` (it names any test file
   over its time budget but never fails locally; CI's Test job enforces it),
   the local-only file-size ratchet `check:file-size` (`CLAUDE.md` "File size budgets"),
+  the local-only `check:layer-contracts` (`SPEC.md` §4 and the `CLAUDE.md`
+  layer diagram against each `package.json`),
   `knip`, the seven gating scripts (`check:client-graph`,
   `check:revalidate-tags-sync`, `check:turbo-env-sync`,
   `check:migration-index`, `gen:ui-index:check`, `gen:const-index:check`,
