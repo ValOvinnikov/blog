@@ -1532,10 +1532,12 @@ five `--radius*` tokens and `density` the nine layout `--spacing-*` tokens
 (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, `band`)
 under `:root` only, the accent hue also sets the on-image and
 `--scrim-brand-*` tokens (`IMAGE_SCRIM_RAMP`) under `:root` only,
-and `cardStyle` sets the seven `--item-*` tokens the `item-card` utility reads,
-also under `:root` only — `ACCENT_BAR` a borderless card with a 2px brand bar
-on the left, `OUTLINED` a hairline border all round; both at `--radius-md`, so
-`radiusScale` reaches item cards under either style.
+and `cardStyle` sets the eleven `--item-*` tokens the `item-card` utility and
+`Accordion` read, also under `:root` only — `ACCENT_BAR` a borderless card with
+a 2px brand bar on the left, `OUTLINED` a hairline border all round, `FILLED`
+the band's tint with no outline, `RAISED` a hairline plus `--shadow-card`, and
+`PLAIN` no frame, fill or shadow; all at `--radius-md`, so `radiusScale`
+reaches item cards under every style.
 `MD`, `DEFAULT` and `ACCENT_BAR` reproduce `configs/tailwind/theme.css`'s
 static values, so a site with no saved look renders as the defaults; `density` does not touch
 Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius,
@@ -1545,7 +1547,8 @@ density and card-style values live in `@blog/config`'s theme declaration tables;
 surface, which also carries the `dark` class so the tenant's dark ramp wins
 over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
-Look page's Cards card sets the card style (Accent bar or Outlined),
+Look page's Cards card sets the card style (Accent bar, Outlined, Filled,
+Raised or Plain),
 apart from radius and density in Corners & spacing; picking a preset re-seeds it from
 `PRESET_REGISTRY`'s `cardStyle`, and the preview's linked and static cards show
 it before saving. The
@@ -3057,21 +3060,25 @@ Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, each
 contact-form success card and the `CtaModule.Callout` and `CtaModule.Split`
 box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
-seven inherited `--item-*` properties rather than fixed classes, and each pairs
+inherited `--item-*` properties rather than fixed classes, and each pairs
 it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
 the values site-wide on the Look page (`site_config.card_style`), and
 `buildThemeStyleBlock` declares them under `:root` from `@blog/config`'s
 `CARD_STYLE_DECLARATIONS`:
 
-| Property               | `ACCENT_BAR` (default) | `OUTLINED`         |
-| ---------------------- | ---------------------- | ------------------ |
-| `--item-radius`        | `var(--radius-md)`     | `var(--radius-md)` |
-| `--item-border-width`  | `0px`                  | `1px`              |
-| `--item-accent-width`  | `2px`                  | `1px`              |
-| `--item-accent-color`  | `var(--brand-primary)` | `var(--border)`    |
-| `--item-shadow`        | `none`                 | `none`             |
-| `--item-fill-mix`      | `0%`                   | `0%`               |
-| `--item-divider-width` | `0px`                  | `0px`              |
+| Property               | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`        | `RAISED`             | `PLAIN`         |
+| ---------------------- | ---------------------- | ------------------ | --------------- | -------------------- | --------------- |
+| `--item-radius`        | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | same            |
+| `--item-border-width`  | `0px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
+| `--item-accent-width`  | `2px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
+| `--item-accent-color`  | `var(--brand-primary)` | `var(--border)`    | `var(--border)` | `var(--border)`      | `var(--border)` |
+| `--item-shadow`        | `none`                 | `none`             | `none`          | `var(--shadow-card)` | `none`          |
+| `--item-fill-mix`      | `0%`                   | `0%`               | `100%`          | `0%`                 | `0%`            |
+| `--item-clear-mix`     | `0%`                   | `0%`               | `0%`            | `0%`                 | `100%`          |
+| `--item-hover-mix`     | `100%`                 | `100%`             | `50%`           | `100%`               | `100%`          |
+| `--item-divider-width` | `0px`                  | `0px`              | `0px`           | `0px`                | `1px`           |
+| `--item-stack-gap`     | `0.75rem`              | `0.75rem`          | `0.75rem`       | `0.75rem`            | `0px`           |
+| `--item-stack-radius`  | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | `0px`           |
 
 The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
 band owns `--item-fill`, the tint a filled card takes on it
@@ -3079,9 +3086,15 @@ band owns `--item-fill`, the tint a filled card takes on it
 `--tint`, the page ground's fallback `--brand-primary-muted`, unset by
 `surface-popover`); card style sets only the mix, because a `var()` inside a
 custom property resolves where it is declared, so a colour declared on `:root`
-would ignore the band. Every `Accordion` item but the first draws a top border
-at the wider of `--item-divider-width` and `--item-border-width`, so a style
-with no frame still separates its items.
+would ignore the band. That colour is then mixed toward `transparent` by
+`--item-clear-mix`, so `PLAIN` paints no background at all. An item card inside
+another item card takes `--item-fill` one step deeper (the band's tint mixed
+10% toward `--brand-primary`), so a filled card never matches its filled
+parent. Every `Accordion` item draws a top border, and the last a bottom
+border, at the wider of `--item-divider-width` and `--item-border-width`, so a
+style with no frame still draws lines above, between and below its items; the
+accordion stacks its items `--item-stack-gap` apart and rounds them at
+`--item-stack-radius`, both `0px` under `PLAIN`, so its dividers stay straight.
 
 `--radius-item` exposes `--item-radius` as `rounded-item`. The accent bar is an
 `::after` over the left border's straight run, between the corners, so it stays
@@ -3090,8 +3103,11 @@ does not show. It is drawn as a border, so forced colours keep it as a
 system-colour line, and a focused stretched card link lifts its ring above it.
 `theme.css`'s
 static values are `ACCENT_BAR`'s, so a site with no saved look renders the
-accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s brand-muted tint
-on hover and focus-within under either style; the style changes only the frame.
+accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s `bg-item-hover`
+on hover and focus-within: `--surface` mixed toward the band's tint by
+`--item-hover-mix`, the full tint under every style but `FILLED`, which rests on
+that tint and so hovers halfway back to `--surface` — lighter in light mode and
+darker in dark, so the hover never lowers text contrast.
 The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
 `surface-*` retarget) overrides the utility's `--surface` fill, so a card style
 frames the band surface and never paints it.

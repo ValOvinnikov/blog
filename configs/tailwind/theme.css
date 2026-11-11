@@ -68,6 +68,8 @@
   /* prettier-ignore */
   --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
   /* prettier-ignore */
+  --color-item-hover: color-mix(in oklch, var(--surface), var(--tint, var(--brand-primary-muted)) var(--item-hover-mix)); /* @role hovered or focused item card */
+  /* prettier-ignore */
   --color-media-fill: var(--media-fill, var(--surface-2)); /* @role icon media fill of the surface in scope */
   /* prettier-ignore */
   --color-brand-primary-contrast: var(--brand-primary-contrast); /* @role text on brand-primary-solid */
@@ -387,7 +389,11 @@
   --item-accent-color: var(--brand-primary);
   --item-shadow: none;
   --item-fill-mix: 0%;
+  --item-clear-mix: 0%;
+  --item-hover-mix: 100%;
   --item-divider-width: 0px;
+  --item-stack-gap: 0.75rem;
+  --item-stack-radius: var(--radius-md);
 
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
@@ -656,10 +662,24 @@
   border-radius: var(--radius-item);
   background-color: color-mix(
     in oklch,
-    var(--surface),
-    var(--item-fill, var(--brand-primary-muted)) var(--item-fill-mix)
+    color-mix(
+      in oklch,
+      var(--surface),
+      var(--item-fill, var(--brand-primary-muted)) var(--item-fill-mix)
+    ),
+    transparent var(--item-clear-mix)
   );
   box-shadow: var(--item-shadow);
+
+  /* A card inside a card takes one step deeper than the band's tint, so a
+     filled card never paints the same colour as its filled parent. */
+  & .item-card {
+    --item-fill: color-mix(
+      in oklch,
+      var(--tint, var(--brand-primary-muted)),
+      var(--brand-primary) 10%
+    );
+  }
 
   &::after {
     content: '';

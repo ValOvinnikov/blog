@@ -806,6 +806,42 @@
         "file": "packages/config/src/constants/header-control-style.ts"
       }
     ],
+    "FILLED": [
+      {
+        "ref": "CARD_STYLE.FILLED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-style.ts"
+      }
+    ],
+    "RAISED": [
+      {
+        "ref": "CARD_STYLE.RAISED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-style.ts"
+      }
+    ],
+    "PLAIN": [
+      {
+        "ref": "CARD_STYLE.PLAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/card-style.ts"
+      },
+      {
+        "ref": "HEADER_CONTROL_STYLE.PLAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-style.ts"
+      },
+      {
+        "ref": "NAV_LINK_STYLE.PLAIN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/nav-link-style.ts"
+      }
+    ],
     "NECESSARY": [
       {
         "ref": "CONSENT_CATEGORY.NECESSARY",
@@ -1471,20 +1507,6 @@
       },
       {
         "ref": "NAV_LINK_STYLE.SOFT",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/nav-link-style.ts"
-      }
-    ],
-    "PLAIN": [
-      {
-        "ref": "HEADER_CONTROL_STYLE.PLAIN",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/header-control-style.ts"
-      },
-      {
-        "ref": "NAV_LINK_STYLE.PLAIN",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/nav-link-style.ts"

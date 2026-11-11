@@ -738,11 +738,17 @@
     },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Accentbalk",
-      "OUTLINED": "Omlijnd"
+      "OUTLINED": "Omlijnd",
+      "FILLED": "Gevuld",
+      "RAISED": "Verhoogd",
+      "PLAIN": "Kaal"
     },
     "cardStyleOptionDescription": {
       "ACCENT_BAR": "Een balk in de merkkleur aan de linkerrand",
-      "OUTLINED": "Een dunne omlijning rondom"
+      "OUTLINED": "Een dunne omlijning rondom",
+      "FILLED": "Een getinte achtergrond, zonder omlijning",
+      "RAISED": "Een dunne omlijning met een zachte schaduw",
+      "PLAIN": "Geen kader; witruimte scheidt de kaarten"
     },
     "headerControlStyleLabel": "Headerknoppen",
     "headerControlStyleDescription": "De knoppen voor taal, thema, menu en Inloggen, op elk schermformaat.",

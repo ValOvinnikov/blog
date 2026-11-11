@@ -1,6 +1,6 @@
 import {
   CardStyles,
-  FilledAndUnframedOnEachBand,
+  FilledAndPlainOnEachBand,
 } from '@blog/ui/testing/card-styles';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -63,14 +63,14 @@ export const InEachCardStyle: TStory = {
   render: (args) => <CardStyles>{() => <Accordion {...args} />}</CardStyles>,
 };
 
-export const FilledAndUnframed: TStory = {
-  name: 'Filled and unframed, on each band',
+export const FilledAndPlain: TStory = {
+  name: 'Filled and plain, on each band',
   render: (args) => (
-    <FilledAndUnframedOnEachBand>
+    <FilledAndPlainOnEachBand>
       <div style={{ flex: 1 }}>
         <Accordion {...args} />
       </div>
-    </FilledAndUnframedOnEachBand>
+    </FilledAndPlainOnEachBand>
   ),
 };
 

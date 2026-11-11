@@ -11,6 +11,7 @@ import {
   type TRadiusScale,
 } from '@blog/config/constants';
 
+import { BORDER_COLOR } from './border-tokens';
 import { RADIUS_PILL } from './radius-tokens';
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
@@ -113,8 +114,6 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
     '--spacing-band': '0.75rem',
   },
 };
-
-const BORDER_COLOR = 'var(--border)';
 
 export const HEADER_CONTROL_STYLE_DECLARATIONS: Record<
   THeaderControlStyle,
