@@ -1316,6 +1316,8 @@
     "nameLabel": "Nombre del cliente",
     "siteAddressLabel": "Dirección del sitio",
     "siteAddressHint": "Letras, números y guiones. Con el plan Growth puedes conectar tu propio dominio.",
+    "localeLabel": "Idioma predeterminado",
+    "localeHint": "El idioma en el que empiezan el contenido inicial y los ajustes del sitio.",
     "planLabel": "Plan",
     "ownerEmailLabel": "Correo electrónico del propietario",
     "ownerEmailHint": "La persona que gestionará este cliente. Una cuenta existente obtiene acceso de inmediato; una dirección nueva recibe una invitación por correo para iniciar sesión.",

@@ -4,12 +4,11 @@ import {
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
-  DOMAIN_LABEL_PATTERN,
   type TActionResult,
   type TOutcome,
   type TReasonedFailure,
 } from '@blog/config';
-import { queries, TENANT_PLAN } from '@blog/db';
+import { queries } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';
 import {
@@ -17,47 +16,27 @@ import {
   TENANT_REFUSAL,
   TENANT_LOG,
 } from '@platform/constants/tenant';
-import { routing } from '@platform/i18n/routing';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { checkDomainAvailability } from '@platform/server/provisioning/check-domain-availability';
 import { startProvisioning } from '@platform/server/provisioning/start-provisioning';
 import { checkTenantSlug } from '@platform/server/tenants/check-tenant-slug';
 import {
+  createTenantInputSchema,
+  toCreateTenantFieldErrors,
+  type TCreateTenantInput,
+} from '@platform/server/tenants/create-tenant-input';
+import {
   createOwnerInviteToken,
   verifyOwnerInviteToken,
 } from '@platform/server/tenants/owner-invite-token';
 import { sendOwnerInviteEmail } from '@platform/server/tenants/send-owner-invite-email';
-import {
-  toTenantFieldErrors,
-  type TTenantDetailsFieldError,
-} from '@platform/server/tenants/tenant-field-error';
+import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
-
-const createTenantInputSchema = z.object({
-  name: z.string().trim().min(1),
-  slug: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .min(1, { abort: true })
-    .regex(DOMAIN_LABEL_PATTERN),
-  plan: z.enum(TENANT_PLAN),
-  ownerEmail: z.string().trim().toLowerCase().email(),
-  confirmOwnerInviteToken: z.string().optional(),
-});
-
-const toSlugFieldError = (issues: z.ZodError['issues']) =>
-  issues.some(({ path, code }) => path[0] === 'slug' && code === 'too_small')
-    ? TENANT_FIELD_ERROR.SLUG_REQUIRED
-    : TENANT_FIELD_ERROR.SLUG_INVALID;
-
-export type TCreateTenantInput = z.input<typeof createTenantInputSchema>;
 
 export type TOwnerInviteConfirmation = { email: string; token: string };
 
@@ -80,15 +59,7 @@ export const createTenantAction = async (
   if (!parsed.success) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: toTenantFieldErrors<keyof TCreateTenantInput>(
-        parsed.error.issues,
-        {
-          name: TENANT_FIELD_ERROR.NAME_REQUIRED,
-          slug: toSlugFieldError(parsed.error.issues),
-          plan: TENANT_FIELD_ERROR.PLAN_UNSUPPORTED,
-          ownerEmail: TENANT_FIELD_ERROR.EMAIL_INVALID,
-        },
-      ),
+      fieldErrors: toCreateTenantFieldErrors(parsed.error.issues),
     };
   }
 
@@ -98,7 +69,8 @@ export const createTenantAction = async (
     return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
   }
 
-  const { name, slug, plan, ownerEmail, confirmOwnerInviteToken } = parsed.data;
+  const { name, slug, locale, plan, ownerEmail, confirmOwnerInviteToken } =
+    parsed.data;
   const domain = `${slug}.${rootDomain}`;
 
   const owner = await queries.users.findUserByEmail(ownerEmail);
@@ -133,7 +105,7 @@ export const createTenantAction = async (
     const result = await queries.tenants.createTenantDraft({
       name,
       domain,
-      locale: routing.defaultLocale,
+      locale,
       plan,
       owner: owner
         ? { type: 'user', userId: owner.id }
