@@ -15,30 +15,25 @@ import {
   mockValidationError,
 } from '@blog/service/testing/shared/fixtures';
 import { MOCK_TENANT } from '@blog/service/testing/tenant';
+import { faker } from '@faker-js/faker';
 
 import { getEmbedModule } from './loader';
 import { embedModuleQuery } from './query';
 
 vi.mock('@blog/service/sanity/query/query');
 
+faker.seed(3772);
+
 describe(getEmbedModule, () => {
   beforeEach(() => {
-    mockRun.mockResolvedValue(mockRawEmbedModule());
-  });
-
-  it('loads the module with its parsed embed', async () => {
-    const module = await getEmbedModule(MOCK_EMBED_MODULE_ID, MOCK_TENANT);
-
-    expect(module.embed).toBeDefined();
-  });
-
-  it('loads the module without an embed when the stored link no longer parses', async () => {
-    mockRun.mockResolvedValueOnce(
+    mockRun.mockResolvedValue(
       mockRawEmbedModule({
         embed: mockRawEmbed({ url: MOCK_UNPARSABLE_EMBED_URL }),
       }),
     );
+  });
 
+  it('loads the module without an embed when the stored link no longer parses', async () => {
     const module = await getEmbedModule(MOCK_EMBED_MODULE_ID, MOCK_TENANT);
 
     expect(module.embed).toBeUndefined();

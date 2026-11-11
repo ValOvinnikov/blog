@@ -4,7 +4,7 @@ import {
   MOCK_VIMEO_URL,
   mockRawEmbedModule,
 } from '@blog/service/testing/modules/embed/fixtures';
-import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
+import { evaluateModuleQuery } from '@blog/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
   mockLocalizedStrings,
@@ -37,15 +37,11 @@ const MOCK_EMBED_DOCUMENT = {
   },
 };
 
-async function runEmbed(document: Record<string, unknown>, locale: string) {
-  const raw = await evaluateGroqExpression(
-    embedModuleQuery.query,
-    [document],
-    undefined,
-    { id: MOCK_EMBED_MODULE_ID, locale, defaultLocale: EN },
-  );
-
-  return embedModuleQuery.parse(raw);
+function runEmbed(document: Record<string, unknown>, locale: string) {
+  return evaluateModuleQuery(embedModuleQuery, [document], {
+    id: MOCK_EMBED_MODULE_ID,
+    locale,
+  });
 }
 
 describe('embedModuleQuery', () => {

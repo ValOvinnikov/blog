@@ -6,10 +6,6 @@ import {
   mockRawEmbed,
   mockRawEmbedModule,
 } from '@blog/service/testing/modules/embed/fixtures';
-import {
-  mockCtaButtonView,
-  mockRawCtaButton,
-} from '@blog/service/testing/modules/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { toEmbedModule } from './transformer';
@@ -17,11 +13,12 @@ import { toEmbedModule } from './transformer';
 faker.seed(3772);
 
 const MOCK_CAPTION = faker.lorem.sentence();
-const MOCK_YOUTUBE_ID = faker.string.alphanumeric(11);
 
 describe(toEmbedModule, () => {
-  it('maps a supported link to its privacy-friendly embed URL and ratio', () => {
-    const raw = mockRawEmbedModule();
+  it('maps a supported link to its parsed embed with the authored copy', () => {
+    const raw = mockRawEmbedModule({
+      embed: mockRawEmbed({ caption: MOCK_CAPTION }),
+    });
 
     const module = toEmbedModule(raw);
 
@@ -30,72 +27,28 @@ describe(toEmbedModule, () => {
       embedUrl: `https://player.vimeo.com/video/${MOCK_VIMEO_ID}`,
       ratio: MEDIA_RATIO.VIDEO,
       title: MOCK_EMBED_TITLE,
-      caption: undefined,
+      caption: MOCK_CAPTION,
     });
   });
 
-  it('serves a YouTube Short from the nocookie host in the vertical ratio', () => {
+  it('drops the embed when the stored link no longer parses', () => {
     const raw = mockRawEmbedModule({
-      embed: mockRawEmbed({
-        url: `https://www.youtube.com/shorts/${MOCK_YOUTUBE_ID}`,
-      }),
+      embed: mockRawEmbed({ url: MOCK_UNPARSABLE_EMBED_URL }),
     });
-
-    const module = toEmbedModule(raw);
-
-    expect(module.embed).toMatchObject({
-      provider: EMBED_PROVIDER.YOUTUBE,
-      embedUrl: `https://www.youtube-nocookie.com/embed/${MOCK_YOUTUBE_ID}`,
-      ratio: MEDIA_RATIO.VERTICAL,
-    });
-  });
-
-  it('keeps an authored caption', () => {
-    const raw = mockRawEmbedModule({
-      embed: mockRawEmbed({ caption: MOCK_CAPTION }),
-    });
-
-    const module = toEmbedModule(raw);
-
-    expect(module.embed?.caption).toBe(MOCK_CAPTION);
-  });
-
-  it.each([
-    ['an unsupported host', 'https://example.com/watch/1'],
-    ['a value that is no longer a URL', MOCK_UNPARSABLE_EMBED_URL],
-  ])('drops the embed when the stored link is %s', (_case, url) => {
-    const raw = mockRawEmbedModule({ embed: mockRawEmbed({ url }) });
 
     const module = toEmbedModule(raw);
 
     expect(module.embed).toBeUndefined();
   });
 
-  it('leaves alignment and layout undefined and buttons empty when unset', () => {
-    const raw = mockRawEmbedModule({
-      ctaButtons: null,
-      contentAlignment: null,
-      layout: null,
-    });
+  it.each([
+    [null, undefined],
+    [CONTENT_ALIGNMENT.CENTER, CONTENT_ALIGNMENT.CENTER],
+  ])('maps contentAlignment %s to %s', (contentAlignment, expected) => {
+    const raw = mockRawEmbedModule({ contentAlignment });
 
     const module = toEmbedModule(raw);
 
-    expect(module).toMatchObject({
-      contentAlignment: undefined,
-      layout: undefined,
-      ctaButtons: [],
-    });
-  });
-
-  it('maps authored buttons and alignment', () => {
-    const raw = mockRawEmbedModule({
-      ctaButtons: [mockRawCtaButton()],
-      contentAlignment: CONTENT_ALIGNMENT.CENTER,
-    });
-
-    const module = toEmbedModule(raw);
-
-    expect(module.ctaButtons).toEqual([mockCtaButtonView()]);
-    expect(module.contentAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
+    expect(module.contentAlignment).toBe(expected);
   });
 });

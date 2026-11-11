@@ -1,4 +1,3 @@
-export type { TSectionPageCard, TSectionPagesModule } from './section-pages';
 export type { TContactFormModule } from './contact-form';
 export type { TContentModule } from './content';
 export type { TCookieSettingsModule } from './cookie-settings';
@@ -19,8 +18,9 @@ export type { TPostFeaturedModule } from './post-featured';
 export type { TPostLatestModule } from './post-latest';
 export type { TPostListModule } from './post-list';
 export type { TPostRelatedModule } from './post-related';
-export type { TStatItem, TStatsModule } from './stats';
 export type { TPricingModule, TPricingPrice, TPricingTier } from './pricing';
+export type { TSectionPageCard, TSectionPagesModule } from './section-pages';
+export type { TStatItem, TStatsModule } from './stats';
 export type { TTaxonomyEntry, TTaxonomyListModule } from './taxonomy-list';
 export type { TTeamMember, TTeamModule } from './team';
 export type { TTestimonialItem, TTestimonialModule } from './testimonial';
