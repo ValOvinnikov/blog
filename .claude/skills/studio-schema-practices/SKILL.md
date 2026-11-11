@@ -141,7 +141,7 @@ such as a flag that changes behaviour while the field keeps its value.
 
 ## Migration quality
 
-**Until launch, write no content migration** (CLAUDE.md → "Until launch, no
+**Until launch, write no content migration** (`develop-feature` → "Migrations" → "Until launch, no
 content migrations"): a change to an existing shape updates
 `packages/config/src/starter-content/` instead. The rules below apply again
 after launch, under epic #6152.
@@ -198,3 +198,16 @@ Beyond `.claude/agents/studio.md` → "Definition of done":
   and why.
 - Every migration has its test and a target-state guard on each branch, and
   `migrate:list` loads it.
+
+## Typegen
+
+- After a schema change: `pnpm typegen`, then commit the regenerated files in
+  `packages/config/src/sanity/generated/`. Typegen can be non-deterministic —
+  re-run until the diff is minimal.
+- **Never hand-edit the generated types.**
+  `packages/config/src/sanity/generated/` is deny-listed for
+  Edit/MultiEdit/Write in `.claude/settings.json`. That is not an obstacle to
+  route around: a shell write (`echo >`, `sed -i`) is not blocked but is still
+  wrong — the next `pnpm typegen` silently undoes it and CI's typegen drift
+  guard catches it. If a generated type is wrong, the **schema** in
+  `packages/studio` is wrong — fix it there and regenerate.

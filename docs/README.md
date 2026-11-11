@@ -27,8 +27,7 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
   feature (what it does, surfaces, data, configuration, invariants, entry
   points), indexed by status and layers in `docs/features/README.md`. Every
   shipped feature has a page; a PR that changes a feature updates its page,
-  and one that adds a feature adds its page (`CLAUDE.md`'s "Feature docs"
-  bullet).
+  and one that adds a feature adds its page (the "Feature docs" bullet in `develop-feature` "Docs that ship with the change").
 - **`docs/ROADMAP.md`** — the order the open epics ship in, open decisions,
   and the release plan (Release 1 promote, Release 2 sell).
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
@@ -42,7 +41,7 @@ What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
 `superpowers:brainstorming`/`writing-plans` skills while a feature is being
 designed/built; see the directory listing for what's currently active. When
 one is done and when it is deleted — into its `docs/features/` page, not into
-`SPEC.md` — is `CLAUDE.md`'s "Design-doc retention" rule, including early
+`SPEC.md` — is the "Design-doc retention" rule in `develop-feature` "Docs that ship with the change", including early
 retirement into an epic body.
 
 - `superpowers/specs/2026-10-30-admin-shell-design.md` — the admin shell (SH1 sidebar, top bar, account and phone Menu).
@@ -60,8 +59,7 @@ here: done, historical, kept for the "why" (alternatives considered,
 tradeoffs) that `SPEC.md` doesn't restate. Each carries a banner pointing at
 the `SPEC.md` section that now describes the shipped behavior. **This bucket
 is closed — no new entries.** Design-doc retention changed 2026-07-27 from
-archive-on-ship to delete-on-ship (`CLAUDE.md`'s "Design-doc retention"
-rule); everything below predates that change and is kept as-is, but a doc
+archive-on-ship to delete-on-ship (the "Design-doc retention" rule, now in `develop-feature` "Docs that ship with the change"); everything below predates that change and is kept as-is, but a doc
 finishing today is deleted, not moved here. If something here disagrees with
 `SPEC.md`, `SPEC.md` wins.
 

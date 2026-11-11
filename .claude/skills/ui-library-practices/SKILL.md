@@ -23,7 +23,7 @@ load on demand: `polymorphic-and-as.md` (Level-2 `as`, anchor rules) and
 - **No app coupling.** No `next/*` imports. Framework specifics arrive through
   `as`/`linkAs`, `children` or a slot; default to plain elements.
 - Shapes come from `@blog/config`. No business logic.
-- **No `'use client'`** (CLAUDE.md → Conventions, which names the agreed
+- **No `'use client'`** (`react-component-practices` → "Server first, client at the leaf", which names the agreed
   client-only components). A component that calls a client-only hook — state,
   a ref, an effect, a third-party hook such as `useEmblaCarousel` — is
   client-only without the directive: its consumer renders it under its own

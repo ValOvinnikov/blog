@@ -59,7 +59,7 @@ Before writing any code:
   shape needs a migration plan surfaced to the user; an additive optional-only
   change needs none — say so. Until launch no content migration is written:
   the change updates `packages/config/src/starter-content/` instead
-  (CLAUDE.md → "Until launch, no content migrations").
+  (`develop-feature` → "Migrations" → "Until launch, no content migrations").
 
 ## The public surface and the client boundary
 

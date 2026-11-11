@@ -1,6 +1,6 @@
 # Removing subagent worktrees and scratchpads
 
-The procedure behind `develop-feature` §8. `CLAUDE.md` delivery gate step 8
+The procedure behind `develop-feature` §8. `open-pull-request` "Delivery gate sequence" step 8
 states the rules — your own dispatch record only, lock files, an isolated
 session exiting first, scratchpads by exact path.
 

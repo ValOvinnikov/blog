@@ -215,7 +215,7 @@ anything required is missing, don't invent it** — report the dispatch as
 incomplete in Step 5, naming the missing field.
 
 **Manual-test issues** (→ `develop-feature` §2 "Manual-test issue";
-template: `CLAUDE.md` "Issue body template") arrive in the same batch as
+template: `write-ticket` "Issue body template") arrive in the same batch as
 their implementation tickets, labelled `manual-test` plus the **same**
 `prio:*` as those tickets — a different one makes the dispatch incomplete.
 Under an epic it is a sub-issue (`parent=<epic>`); for a single ticket it has
@@ -478,7 +478,7 @@ orchestrator named it (Step 1b). Flag:
   `layer:config`); feature
   work gets its `layer:*`; bugs get `bug` plus their layer;
 - every open **issue** with zero or two-plus `prio:*` labels (exactly one is
-  required — `CLAUDE.md` "Ticket priority & triage").
+  required — `write-ticket` "Priority labels").
 
 ## Step 3b — parent/sub-issue completion
 

@@ -16,7 +16,7 @@ sections 0–7 by number (`reviewer.md`, `testing-practices`,
 numbering.
 
 **Spec and feature-doc sync (blocking).** The diff carries every doc update
-`CLAUDE.md` "Spec sync", "Feature docs" and "Docs sync" require, in the same
+`develop-feature` "Docs that ship with the change" requires, in the same
 PR: `SPEC.md` for an architecture-core change, the feature's
 `docs/features/<feature>.md` (created on first touch) for a behaviour change,
 and for a content-model change that page plus any `SPEC.md` §6 entry still
@@ -158,7 +158,7 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 - A schema change commits its `pnpm typegen` output and updates `service`. An
   existing-shape change carries a migration or rules one out explicitly; a
   `packages/db/src/schema` change carries its `db:generate` migration
-  (→ `CLAUDE.md` "Check for migrations", "Check for `db` (Neon/Drizzle)
+  (→ `develop-feature` "Migrations": "Check for migrations", "Check for `db` (Neon/Drizzle)
   migrations too").
 - No hand-written form of a type `@blog/config` exports, outside
   `@blog/utils`, `@blog/insight`, `@blog/email` and the generated Sanity types
@@ -330,14 +330,14 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 - **Running cost (flagged, not blocking).** Flag a diff that adds a cron,
   Workflow run, paid API call (Resend, Anthropic/AI Gateway, Sanity
   Management), Blob/KV use or hot-path database query when neither its ticket
-  nor its PR body states the cost (→ `CLAUDE.md` "Say what it touches before
+  nor its PR body states the cost (→ `develop-feature` "Say what it touches before
   starting", **Cost**).
 - **Voice candidates (listed, not blocking).** Under a "Voice candidates"
   heading, list every key the diff adds or rewords in
   `packages/config/src/voice/site-messages.*.json` with the list it landed on
   (`VOICE_FIELDS` or `VOICE_FIXED_KEYS`), and every new `@blog/ui` prop that
   renders visible text. The orchestrator checks each against the ticket's
-  classification (`CLAUDE.md` "Check for Voice candidates").
+  classification (`develop-feature` "Check for Voice candidates").
 
 ## How to run a review here
 

@@ -345,7 +345,7 @@ co-located test fails a key on neither. The catalog and both lists are the
 `config` agent's to write.
 
 **Which list a string joins is the user's call, settled in the plan — never
-yours** (CLAUDE.md → "Check for Voice candidates"):
+yours** (`develop-feature` → "Check for Voice candidates"):
 
 - Your dispatch names each key and its list.
 - Never hardcode a string the dispatch did not cover. Report it under

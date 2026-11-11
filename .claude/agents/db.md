@@ -144,7 +144,7 @@ to dev's existing rows, so a new `NOT NULL` column needs a default.
 3. **Apply to dev freely.** `pnpm --filter @blog/db db:migrate` against the
    development Neon branch needs no backup. `deploy-development.yml`'s
    `migrate-db` job also applies pending migrations on each dev deploy
-   (currently manual dispatch — CLAUDE.md → Deployment), ahead of
+   (currently manual dispatch — `open-pull-request` → "Deployment"), ahead of
    `deploy-web`/`deploy-platform`, and fails loudly if its host matches the repo
    Variable `PRODUCTION_DB_HOST`.
 4. **Production only through CI.** `deploy-production.yml`'s `migrate-db`
