@@ -429,7 +429,8 @@ file` are all denied alike) — an earlier version only handled the
     that skip the husky gates or rewrite pushed history: a literal
     `--no-verify`/`-n` on `commit`/`push`/`merge`, a literal
     `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, a leading
-    `HUSKY=0` assignment on `commit`/`push`/`merge`, and
+    `HUSKY=0` assignment (bare or after `env`) on `commit`/`push`/`merge`, a
+    literal `export HUSKY=0`, and
     `core.hooksPath` on `git config` — plus, since #3362, the literal
     destructive forms that have actually lost uncommitted agent work here:
     `git reset --hard`, `git clean -f`/`--force` (any short-flag cluster

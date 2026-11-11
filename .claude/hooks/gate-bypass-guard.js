@@ -17,7 +17,8 @@
 // bypass flag by habit, not an adversarial-proof sandbox (same posture as
 // .claude/hooks/read-only-agent-guard.sh). It catches only LITERAL,
 // unobfuscated forms: a real `--no-verify`/`-n`/`--force`/`-f` token passed
-// to `git`, a leading `HUSKY=0` assignment on `git commit|push|merge`,
+// to `git`, a leading `HUSKY=0` assignment (bare or after `env`) on
+// `git commit|push|merge`, a literal `export HUSKY=0`,
 // or `core.hooksPath` passed to `git config` as a write, not a
 // `--get`-style read (#454), plus the literal destructive forms that have
 // actually lost uncommitted agent work here (#3362): `git reset --hard`,
@@ -31,7 +32,8 @@
 //   - recursion into `bash -c "..."` / `eval "..."` string arguments
 //   - case-insensitive filesystem tricks (`GIT push --force`)
 //   - path-qualified binaries (`/usr/bin/git`)
-//   - wrapper commands (`sudo`/`env`/`xargs`/`command` before `git`)
+//   - wrapper commands (`sudo`/`xargs`/`command` before `git`, and `env`
+//     carrying its own flags such as `env -i HUSKY=0 git commit`)
 //   - clustered short flags (`-nm`, `-uf`, `-an`) — except on `clean`, above
 //   - quote-split flags — a backslash-escaped quote INSIDE a `$(...)`
 //     substitution (`$(echo \"abc\)\") --no-verify` — #454 round 2) opens a
@@ -303,9 +305,13 @@ const STASH_HINT =
 const ENV_ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
 
 function check(seg) {
-  const firstWord = seg.findIndex((t) => !ENV_ASSIGNMENT.test(t));
-  const assignments = firstWord === -1 ? seg : seg.slice(0, firstWord);
-  const g = gitSubcommand(firstWord === -1 ? [] : seg.slice(firstWord));
+  if (seg[0] === 'export' && seg.includes('HUSKY=0')) {
+    return 'export HUSKY=0 disables every husky hook for the rest of the shell (lint-staged, type-check, lint, commitlint).';
+  }
+  const words = seg[0] === 'env' ? seg.slice(1) : seg;
+  const firstWord = words.findIndex((t) => !ENV_ASSIGNMENT.test(t));
+  const assignments = firstWord === -1 ? words : words.slice(0, firstWord);
+  const g = gitSubcommand(firstWord === -1 ? [] : words.slice(firstWord));
   if (!g) {
     return null;
   }
@@ -394,7 +400,7 @@ process.stdin.on('end', () => {
   } catch {
     process.exit(0); // malformed payload -> allow
   }
-  if (!cmd.includes('git')) {
+  if (!cmd.includes('git') && !cmd.includes('HUSKY')) {
     process.exit(0);
   }
   for (const seg of segments(tokenize(cmd))) {

@@ -49,6 +49,9 @@ block 'HUSKY=0 git push origin main'
 block 'CI=1 HUSKY=0 git merge main'
 block 'git add -A && HUSKY=0 git commit -m "x"'
 block 'FOO=1 git push --force'
+block 'env HUSKY=0 git commit -m x'
+block 'export HUSKY=0'
+block 'export HUSKY=0 && git commit -m x'
 block 'git merge --no-verify main'
 block 'git push --force origin main'
 block 'git push -f'
@@ -150,6 +153,8 @@ allow 'git push -u origin feat/x'
 allow 'git push origin main'
 allow 'HUSKY=1 git commit -m "x"'
 allow 'HUSKY=0 git status'
+allow 'env FOO=1 git status'
+allow 'export HUSKY=1'
 allow 'git commit -m "never use HUSKY=0 git commit"'
 allow 'git status'
 allow 'git config user.name "Val"'
@@ -229,6 +234,7 @@ allow 'git -c core.hooksPath=/dev/null commit -m "x"' # transient config overrid
 allow 'GIT push --force origin main'                  # case-insensitive filesystem
 allow '/usr/bin/git push --force origin main'         # path-qualified binary
 allow 'sudo git push --force origin main'             # wrapper command
+allow 'env -i HUSKY=0 git commit -m x'                 # env with its own flags
 allow 'bash -c "git push --force"'                    # shell recursion
 # A backslash-escaped quote inside $(...), used to hide a flag, is the same
 # quote-splitting trick as `--no-ver"ify"` above — the plain top-level form
