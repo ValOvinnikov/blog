@@ -31,6 +31,18 @@ const isAllowed = (comment) => {
 
 const spansLines = (comment) => comment.loc.start.line !== comment.loc.end.line;
 
+const SENTENCE_BREAK = /[.!?]\s+(?=[A-Z`])/g;
+
+const sentenceCount = (comment) => {
+  const prose = textOf(comment)
+    .split('\n')
+    .filter((line) => !line.trimStart().startsWith('@'))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return prose === '' ? 0 : (prose.match(SENTENCE_BREAK)?.length ?? 0) + 1;
+};
+
 const isDocBlock = (comment) =>
   comment.type === 'Block' && comment.value.startsWith('*');
 
@@ -64,8 +76,8 @@ export const noFailingCommentRule = {
         'A test file carries no comments — its describe/it titles are the documentation (CLAUDE.md "Comments default to zero").',
       nameDoesX:
         'A "Name — does X" comment restates the name and signature; delete it (CLAUDE.md "Comments default to zero").',
-      multiLineDocBlock:
-        'A doc comment is one sentence on one line, saying what the export is for; delete or shorten it (CLAUDE.md "Comments default to zero").',
+      multiSentenceDocBlock:
+        'A doc comment is one sentence, saying what the export is for; delete or cut it to one (CLAUDE.md "Comments default to zero").',
       multiLineInFunction:
         'A multi-line comment inside a function body narrates the code; restructure or rename instead (CLAUDE.md "Comments default to zero").',
     },
@@ -99,8 +111,8 @@ export const noFailingCommentRule = {
           const loc = { start: first.loc.start, end: group.at(-1).loc.end };
           if (NAME_DOES_X.test(textOf(first))) {
             context.report({ loc, messageId: 'nameDoesX' });
-          } else if (isDocBlock(first) && spansLines(first)) {
-            context.report({ loc, messageId: 'multiLineDocBlock' });
+          } else if (isDocBlock(first) && sentenceCount(first) > 1) {
+            context.report({ loc, messageId: 'multiSentenceDocBlock' });
           } else if (
             (group.length > 1 || spansLines(first)) &&
             isInsideFunction(first)

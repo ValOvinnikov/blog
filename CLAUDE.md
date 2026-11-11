@@ -595,7 +595,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   earns its place but runs long. Converging file by file is the steady-state
   mechanism, and it never collides with an open PR. On touched `.ts`/`.tsx`
   files the `no-failing-comment` lint rule reports the mechanical cases — a
-  multi-line doc block, a `Name — does X` comment, a multi-line comment inside
+  doc block of more than one sentence, a `Name — does X` comment, a multi-line comment inside
   a function body, any comment in a test file — in the post-edit hook,
   lint-staged and `pnpm check:touched-lint`; the rest is the reviewer's.
 

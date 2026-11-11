@@ -24,8 +24,20 @@ export const resolveBase = () => {
   }
 };
 
-export const missingBaseMessage = () =>
-  `No merge-base between HEAD and ${baseRef()}, so the touched files are unknown. Run \`git fetch origin main\` (with \`--unshallow\` in a shallow clone) and retry.`;
+const isShallow = () => {
+  try {
+    return git(['rev-parse', '--is-shallow-repository']) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+export const missingBaseMessage = () => {
+  const fetch = isShallow()
+    ? 'git fetch --unshallow origin main'
+    : 'git fetch origin main';
+  return `No merge-base between HEAD and ${baseRef()}, so the touched files are unknown. Run \`${fetch}\` and retry.`;
+};
 
 export const readAtBase = (base, file) => {
   try {

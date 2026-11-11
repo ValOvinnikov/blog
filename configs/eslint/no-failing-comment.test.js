@@ -11,6 +11,12 @@ const TEST_FILE = 'src/a.test.ts';
 ruleTester.run('no-failing-comment', noFailingCommentRule, {
   valid: [
     {
+      code: '/**\n * Prefixes the tenant name to the sender, e.g. the magic-link\n * address, so a reader can tell which site sent it.\n */\nexport const x = 1;',
+    },
+    {
+      code: '/**\n * Resolves the tenant a request is for.\n * @param host The request host.\n */\nexport const x = 1;',
+    },
+    {
       code: '/** Resolves the tenant a request is for. */\nexport const x = 1;',
     },
     { code: '// Next requires a literal here.\nexport const revalidate = 60;' },
@@ -36,7 +42,11 @@ ruleTester.run('no-failing-comment', noFailingCommentRule, {
   invalid: [
     {
       code: '/**\n * Resolves the tenant.\n * Reads the host header.\n */\nexport const x = 1;',
-      errors: [{ messageId: 'multiLineDocBlock' }],
+      errors: [{ messageId: 'multiSentenceDocBlock' }],
+    },
+    {
+      code: '/** Resolves the tenant. Reads the host header. */\nexport const x = 1;',
+      errors: [{ messageId: 'multiSentenceDocBlock' }],
     },
     {
       code: '/** HeroModule — fetches the hero and renders it. */\nexport const HeroModule = 1;',

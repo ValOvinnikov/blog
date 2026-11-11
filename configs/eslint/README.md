@@ -100,11 +100,13 @@
 
 - `no-failing-comment.js` — reports the comments `CLAUDE.md` "Comments
   default to zero" bans that can be told apart mechanically: a doc block
-  spanning more than one line, a `Name — does X` comment, a multi-line comment
+  holding more than one sentence (line wrapping and `@` tag lines are ignored;
+  a full stop followed by a capital starts a new sentence), a `Name — does X`
+  comment, a multi-line comment
   inside a function body, and any comment in a test file. A comment starting
   with `TODO:`, `FIXME:`, `eslint-disable`/`eslint-enable`, `@ts-expect-error`,
   `@vitest-environment`, `prettier-ignore` or a `/// <reference` directive is
-  allowed. A one-line doc comment and a one-line tuned-value note pass; whether
+  allowed. A one-sentence doc comment and a one-line tuned-value note pass; whether
   one earns its place is the reviewer's call. Co-located
   `no-failing-comment.test.js`.
 

@@ -2,6 +2,7 @@
 // in the baseline at its exact non-blank line count, so it can only shrink.
 // `--update` lowers, moves or removes baseline entries and never raises or adds one.
 // A full-tree run also fails a baselined file the branch edits without shrinking.
+// `--edited` (the post-edit hook) skips the shrank report, so an extraction can finish before `--update`.
 import {
   existsSync,
   readdirSync,
@@ -24,6 +25,7 @@ const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 const BASELINE_PATH = 'scripts/file-size-baseline.json';
 const UPDATE_FLAG = '--update';
+const EDITED_FLAG = '--edited';
 const SCAN_ROOTS = ['apps/*/src', 'packages/*/src', 'packages/db/scripts'];
 
 export const BUDGET = { COMPONENT: 150, HOOK: 120, MODULE: 120 };
@@ -92,14 +94,18 @@ const touchedProblem = (
 ) => {
   if (!touched?.has(file)) return undefined;
   const before = baseBaseline[touched.get(file)];
-  if (before === undefined || lines < before) return undefined;
+  if (before === undefined)
+    return lines > budget
+      ? `${file} is over its ${kind} budget of ${budget} (${lines} non-blank lines) and is not in the base branch's ${BASELINE_PATH}, which only ever loses entries. Extract the part you changed into its own file (CLAUDE.md "File size budgets").`
+      : undefined;
+  if (lines < before) return undefined;
   return `${file} is over its ${kind} budget of ${budget} and this branch edits it without shrinking it (${lines} non-blank lines, ${before} on the base branch). Extract the part you changed into its own file (CLAUDE.md "File size budgets"), then run \`pnpm check:file-size --update\`.`;
 };
 
 export const findProblems = (
   measured,
   baseline,
-  { checkMissing, moves, touched, baseBaseline = {} },
+  { checkMissing, moves, touched, baseBaseline = {}, reportsShrink = true },
 ) => {
   const problems = [];
   const seen = new Set();
@@ -116,7 +122,7 @@ export const findProblems = (
     if (recorded === undefined) {
       if (lines > budget)
         problems.push(
-          `${file} has ${lines} non-blank lines; the ${kind} budget is ${budget}. Extract the part you changed.`,
+          `${file} has ${lines} non-blank lines; the ${kind} budget is ${budget}. Extract the part you changed. If you moved a baselined file, \`git mv\` it (or \`git add\` both paths) so the move is detected, then run \`pnpm check:file-size --update\`.`,
         );
     } else if (lines > recorded) {
       problems.push(
@@ -124,7 +130,7 @@ export const findProblems = (
       );
     } else if (touchedUnshrunk) {
       problems.push(touchedUnshrunk);
-    } else if (lines < recorded) {
+    } else if (lines < recorded && reportsShrink) {
       problems.push(
         `${file} shrank to ${lines} non-blank lines from its baseline of ${recorded}; run \`pnpm check:file-size --update\` to lower its entry.`,
       );
@@ -206,7 +212,10 @@ const readBranchChanges = () => {
 const main = () => {
   const args = process.argv.slice(2);
   const update = args.includes(UPDATE_FLAG);
-  const named = args.filter((arg) => arg !== UPDATE_FLAG).map(toRepoPath);
+  const reportsShrink = !args.includes(EDITED_FLAG);
+  const named = args
+    .filter((arg) => arg !== UPDATE_FLAG && arg !== EDITED_FLAG)
+    .map(toRepoPath);
   const checkMissing = named.length === 0;
   const branch = checkMissing ? readBranchChanges() : {};
   if (!branch) {
@@ -214,7 +223,7 @@ const main = () => {
     process.exitCode = 1;
     return;
   }
-  const options = { checkMissing, ...branch };
+  const options = { checkMissing, reportsShrink, ...branch };
   const files = (checkMissing ? listAllFiles() : named).filter((file) =>
     existsSync(join(repoRoot, file)),
   );

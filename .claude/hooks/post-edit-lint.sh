@@ -81,7 +81,7 @@ elif [ "$status" -ge 2 ] && ls ./eslint.config.* >/dev/null 2>&1; then
 fi
 
 size_check="$project_dir/scripts/check-file-size.mjs"
-if [ -f "$size_check" ] && ! size_output=$(node "$size_check" "$file_path" 2>&1); then
+if [ -f "$size_check" ] && ! size_output=$(node "$size_check" --edited "$file_path" 2>&1); then
   printf '%s\n' "$size_output" >&2
   feedback=1
 fi

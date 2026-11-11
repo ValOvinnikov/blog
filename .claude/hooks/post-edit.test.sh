@@ -40,8 +40,13 @@ chmod +x "$project/node_modules/.bin/prettier" "$project/node_modules/.bin/eslin
 mkdir -p "$project/scripts"
 cat > "$project/scripts/check-file-size.mjs" <<'EOF'
 import { appendFileSync, readFileSync } from 'node:fs';
-const file = process.argv[2];
+const edited = process.argv.includes('--edited');
+const file = process.argv.at(-1);
 appendFileSync(process.env.CALLS, `size file=${file}\n`);
+if (readFileSync(file, 'utf8').includes('SHRANK') && !edited) {
+  console.error(`error: ${file} shrank to 199 non-blank lines from its baseline of 200.`);
+  process.exit(1);
+}
 if (readFileSync(file, 'utf8').includes('OVER_BUDGET')) {
   console.error(`error: ${file} has 151 non-blank lines; the component budget is 150.`);
   process.exit(1);
@@ -63,6 +68,8 @@ printf "// LOAD_FAIL\n" > "$load_fail"
 printf "// LOAD_FAIL\n" > "$load_fail_outside"
 over_budget="$project/apps/web/src/over-budget.ts"
 printf "// OVER_BUDGET\n" > "$over_budget"
+shrank="$project/apps/web/src/shrank.ts"
+printf "// SHRANK\n" > "$shrank"
 
 payload_for() {
   printf '{"tool_input":{"file_path":"%s"}}' "$1"
@@ -136,6 +143,12 @@ expect "a file over its size budget reaches the agent after a clean lint" 2 \
   "prettier cwd=$project file=$over_budget
 eslint cwd=$project/apps/web file=$over_budget
 size file=$over_budget" "component budget is 150"
+
+run_hook "$(payload_for "$shrank")"
+expect "shrinking a baselined file mid-extraction is not blocked" 0 \
+  "prettier cwd=$project file=$shrank
+eslint cwd=$project/apps/web file=$shrank
+size file=$shrank" ""
 
 run_hook "$(payload_for "$markdown")"
 expect "non-TS file is formatted but not linted" 0 \

@@ -13,6 +13,7 @@ const COMPONENT = 'apps/web/src/components/card/card.tsx';
 const HOOK = 'apps/web/src/hooks/use-thing/use-thing.ts';
 const MODULE = 'apps/web/src/context/toast-provider/toast-store.ts';
 const DB_SCRIPT = 'packages/db/scripts/seed-tenant.ts';
+const MOVED = 'apps/web/src/context/toast/toast-store.ts';
 const BASELINED_LINES = 384;
 const FULL_TREE = { checkMissing: true };
 const NAMED_FILES = { checkMissing: false };
@@ -131,7 +132,6 @@ describe('findProblems', () => {
 });
 
 describe('findProblems on a branch', () => {
-  const MOVED = 'apps/web/src/context/toast/toast-store.ts';
   const baselined = { [MODULE]: BASELINED_LINES };
   const branch = (touched) => ({
     ...FULL_TREE,
@@ -171,12 +171,22 @@ describe('findProblems on a branch', () => {
     );
   });
 
-  it('ignores a touched file absent from the base baseline', () => {
+  it('fails a touched over-budget file hand-added to the baseline', () => {
     const lines = BUDGET.MODULE + 1;
+    const problems = findProblems(
+      measureOne(MODULE, lines),
+      { [MODULE]: lines },
+      { ...FULL_TREE, touched: new Map([[MODULE, MODULE]]), baseBaseline: {} },
+    );
+    assert.equal(problems.length, 1);
+    assert.match(problems[0], /not in the base branch's/);
+  });
+
+  it('ignores a touched within-budget file absent from the base baseline', () => {
     assert.deepEqual(
       findProblems(
-        measureOne(MODULE, lines),
-        { [MODULE]: lines },
+        measureOne(MODULE, BUDGET.MODULE),
+        {},
         {
           ...FULL_TREE,
           touched: new Map([[MODULE, MODULE]]),
@@ -185,6 +195,34 @@ describe('findProblems on a branch', () => {
       ),
       [],
     );
+  });
+
+  it('leaves out the shrank report for an edited file mid-extraction', () => {
+    assert.deepEqual(
+      findProblems(measureOne(MODULE, BASELINED_LINES - 1), baselined, {
+        ...NAMED_FILES,
+        reportsShrink: false,
+      }),
+      [],
+    );
+  });
+
+  it('still fails an edited file that grew', () => {
+    const problems = findProblems(
+      measureOne(MODULE, BASELINED_LINES + 1),
+      baselined,
+      { ...NAMED_FILES, reportsShrink: false },
+    );
+    assert.match(problems[0], /grew to/);
+  });
+
+  it('suggests git mv for a moved file git does not know about', () => {
+    const problems = findProblems(
+      measureOne(MOVED, BUDGET.MODULE + 1),
+      {},
+      FULL_TREE,
+    );
+    assert.match(problems[0], /git mv/);
   });
 
   it('judges an edited moved file against its old path on the base branch', () => {
@@ -210,15 +248,14 @@ describe('findProblems on a branch', () => {
 
 describe('ratchetBaseline', () => {
   it("carries a moved file's entry to its new path", () => {
-    const moved = 'apps/web/src/context/toast/toast-store.ts';
-    const measured = measureOne(moved, BASELINED_LINES);
-    const options = { ...FULL_TREE, moves: new Map([[MODULE, moved]]) };
+    const measured = measureOne(MOVED, BASELINED_LINES);
+    const options = { ...FULL_TREE, moves: new Map([[MODULE, MOVED]]) };
     const next = ratchetBaseline(
       measured,
       { [MODULE]: BASELINED_LINES },
       options,
     );
-    assert.deepEqual(next, { [moved]: BASELINED_LINES });
+    assert.deepEqual(next, { [MOVED]: BASELINED_LINES });
     assert.deepEqual(findProblems(measured, next, options), []);
   });
 
