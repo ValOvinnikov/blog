@@ -1,5 +1,6 @@
 import {
   CARD_STYLE,
+  CARD_STYLE_LABEL,
   DENSITY,
   GRID_COLUMNS,
   RADIUS_SCALE,
@@ -35,13 +36,10 @@ const sectionStyleFields = [
     title: 'Card Style',
     description:
       "The frame around each card in this section. Leave on Site default to follow the site's look.",
-    tiles: [
-      { title: 'Accent bar', value: CARD_STYLE.ACCENT_BAR },
-      { title: 'Outlined', value: CARD_STYLE.OUTLINED },
-      { title: 'Filled', value: CARD_STYLE.FILLED },
-      { title: 'Raised', value: CARD_STYLE.RAISED },
-      { title: 'Plain', value: CARD_STYLE.PLAIN },
-    ],
+    tiles: Object.values(CARD_STYLE).map((value) => ({
+      title: CARD_STYLE_LABEL[value],
+      value,
+    })),
     emptyTitle: SITE_DEFAULT,
     Picture: CardStylePicture,
   }),

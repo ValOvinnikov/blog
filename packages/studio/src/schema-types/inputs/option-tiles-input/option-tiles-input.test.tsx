@@ -13,6 +13,9 @@ faker.seed(6981);
 const EMPTY_TITLE = faker.lorem.words(2);
 const FIRST = { title: faker.lorem.words(2), value: faker.string.alpha(8) };
 const SECOND = { title: faker.lorem.words(3), value: faker.string.alpha(9) };
+const FIELD_TITLE = faker.lorem.words(2);
+const FIELD_DESCRIPTION = faker.lorem.sentence();
+const DESCRIPTION_ID = faker.string.alpha(7);
 
 const OptionTilesInput = createOptionTilesInput({
   tiles: [FIRST, SECOND],
@@ -33,12 +36,17 @@ const renderInput = ({
     value,
     readOnly,
     onChange,
-    elementProps: { id: faker.string.alpha(6) },
+    schemaType: { title: FIELD_TITLE },
+    elementProps: {
+      id: faker.string.alpha(6),
+      'aria-describedby': DESCRIPTION_ID,
+    },
   } as unknown as StringInputProps;
 
   render(
     <ThemeProvider theme={buildTheme()}>
       <OptionTilesInput {...props} />
+      <p id={DESCRIPTION_ID}>{FIELD_DESCRIPTION}</p>
     </ThemeProvider>,
   );
 };
@@ -103,6 +111,17 @@ describe(`<${OptionTilesInput.name}/>`, () => {
 
       expect(onChange).toHaveBeenCalledWith(unset());
     });
+  });
+
+  it('names and describes the group after the field', () => {
+    renderInput();
+
+    const group = screen.getByRole('radiogroup', {
+      name: FIELD_TITLE,
+      description: FIELD_DESCRIPTION,
+    });
+
+    expect(group).toBeDefined();
   });
 
   it('disables every tile when the field is read-only', () => {

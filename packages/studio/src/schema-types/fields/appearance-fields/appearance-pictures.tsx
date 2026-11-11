@@ -8,14 +8,15 @@ import {
   type TGridColumns,
   type TRadiusScale,
 } from '@blog/config/constants';
-import type { IWithChildren } from '@blog/config/react';
-import type { ReactNode, SVGProps } from 'react';
+import {
+  FRAME_HEIGHT,
+  FRAME_INSET,
+  FRAME_WIDTH,
+  FrameRect,
+  PictureFrame,
+} from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
+import type { ReactNode } from 'react';
 
-const WIDTH = 40;
-const HEIGHT = 28;
-const INSET = 4;
-const FRAME_WIDTH = WIDTH - INSET * 2;
-const FRAME_HEIGHT = HEIGHT - INSET * 2;
 const FAINT = 0.25;
 
 const CORNER_RADIUS: Record<TRadiusScale, number> = {
@@ -38,18 +39,6 @@ const COLUMN_COUNT: Record<TGridColumns, number> = {
   [GRID_COLUMNS.FOUR]: 4,
 };
 
-const PictureFrame = ({ children }: IWithChildren) => (
-  <svg
-    width={WIDTH}
-    height={HEIGHT}
-    viewBox={`0 0 ${String(WIDTH)} ${String(HEIGHT)}`}
-    fill="currentColor"
-    aria-hidden={true}
-  >
-    {children}
-  </svg>
-);
-
 const TextLines = () => (
   <>
     <rect x={11} y={10} width={20} height={2} />
@@ -57,23 +46,11 @@ const TextLines = () => (
   </>
 );
 
-const FrameRect = (props: SVGProps<SVGRectElement>) => (
-  <rect
-    x={INSET}
-    y={INSET}
-    width={FRAME_WIDTH}
-    height={FRAME_HEIGHT}
-    fill="none"
-    stroke="currentColor"
-    {...props}
-  />
-);
-
 const CARD_FRAME = {
   [CARD_STYLE.ACCENT_BAR]: (
     <>
       <FrameRect />
-      <rect x={INSET} y={INSET} width={3} height={FRAME_HEIGHT} />
+      <rect x={FRAME_INSET} y={FRAME_INSET} width={3} height={FRAME_HEIGHT} />
     </>
   ),
   [CARD_STYLE.OUTLINED]: <FrameRect />,
@@ -83,8 +60,8 @@ const CARD_FRAME = {
   [CARD_STYLE.RAISED]: (
     <>
       <FrameRect
-        x={INSET + 2}
-        y={INSET + 3}
+        x={FRAME_INSET + 2}
+        y={FRAME_INSET + 3}
         fill="currentColor"
         stroke="none"
         opacity={FAINT}
@@ -116,8 +93,8 @@ export const DensityPicture = ({ value }: { value: TDensity }) => {
       {[0, 1, 2].map((row) => (
         <rect
           key={row}
-          x={INSET}
-          y={INSET + row * (2 + gap)}
+          x={FRAME_INSET}
+          y={FRAME_INSET + row * (2 + gap)}
           width={FRAME_WIDTH}
           height={2}
         />
@@ -136,8 +113,8 @@ export const ColumnsPicture = ({ value }: { value: TGridColumns }) => {
       {Array.from({ length: count }, (_, column) => (
         <rect
           key={column}
-          x={INSET + column * (columnWidth + gap)}
-          y={INSET}
+          x={FRAME_INSET + column * (columnWidth + gap)}
+          y={FRAME_INSET}
           width={columnWidth}
           height={FRAME_HEIGHT}
           opacity={FAINT}

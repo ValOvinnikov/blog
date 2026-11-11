@@ -4,6 +4,8 @@ import { Card, Flex, Grid, Stack, Text } from '@sanity/ui';
 import type { ComponentType, ReactNode } from 'react';
 import { set, type StringInputProps, unset } from 'sanity';
 
+import { FrameRect, PictureFrame } from './picture-frame';
+
 export type TOptionTile<T extends string> = {
   title: string;
   value: T;
@@ -15,8 +17,12 @@ type TOptionTilesInputOptions<T extends string> = {
   Picture: ComponentType<{ value: T }>;
 };
 
-type TTileProps = {
+type TTileProps = Pick<
+  StringInputProps['elementProps'],
+  'onFocus' | 'onBlur'
+> & {
   title: string;
+  tileRef?: StringInputProps['elementProps']['ref'];
   isSelected: boolean;
   isReadOnly: boolean;
   onSelect: () => void;
@@ -28,18 +34,9 @@ const GRID_STYLE = {
 };
 
 const EmptyPicture = () => (
-  <svg width={40} height={28} viewBox="0 0 40 28" aria-hidden={true}>
-    <rect
-      x={4}
-      y={4}
-      width={32}
-      height={20}
-      rx={3}
-      fill="none"
-      stroke="currentColor"
-      strokeDasharray="3 2"
-    />
-  </svg>
+  <PictureFrame>
+    <FrameRect rx={3} strokeDasharray="3 2" />
+  </PictureFrame>
 );
 
 const Tile = ({
@@ -48,8 +45,12 @@ const Tile = ({
   isReadOnly,
   onSelect,
   picture,
+  tileRef,
+  onFocus,
+  onBlur,
 }: TTileProps) => (
   <Card
+    ref={tileRef}
     as="button"
     type="button"
     role="radio"
@@ -60,6 +61,8 @@ const Tile = ({
     radius={2}
     padding={2}
     onClick={onSelect}
+    onFocus={onFocus}
+    onBlur={onBlur}
   >
     <Stack gap={2}>
       <Flex justify="center">{picture}</Flex>
@@ -79,18 +82,36 @@ export const createOptionTilesInput = <T extends string>({
     value,
     onChange,
     readOnly = false,
-    elementProps: { id },
+    schemaType: { title },
+    elementProps: {
+      id,
+      ref,
+      onFocus,
+      onBlur,
+      'aria-describedby': ariaDescribedBy,
+    },
   }: StringInputProps) {
+    const focusProps = { onFocus, onBlur };
+
     const select = (next: TMaybeUndefined<T>) =>
       onChange(isUndefined(next) ? unset() : set(next));
 
     return (
-      <Grid id={id} role="radiogroup" gap={2} style={GRID_STYLE}>
+      <Grid
+        id={id}
+        role="radiogroup"
+        aria-label={title}
+        aria-describedby={ariaDescribedBy}
+        gap={2}
+        style={GRID_STYLE}
+      >
         <Tile
           title={emptyTitle}
           isSelected={isUndefined(value)}
           isReadOnly={readOnly}
           onSelect={() => select(undefined)}
+          tileRef={isUndefined(value) ? ref : undefined}
+          {...focusProps}
           picture={<EmptyPicture />}
         />
         {tiles.map((tile) => (
@@ -100,6 +121,8 @@ export const createOptionTilesInput = <T extends string>({
             isSelected={value === tile.value}
             isReadOnly={readOnly}
             onSelect={() => select(tile.value)}
+            tileRef={value === tile.value ? ref : undefined}
+            {...focusProps}
             picture={<Picture value={tile.value} />}
           />
         ))}
