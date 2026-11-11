@@ -3,7 +3,7 @@ import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -49,7 +49,7 @@ describe(`<${PostIndexBreadcrumbs.name}/>`, () => {
     path: routes.blogIndex(),
   });
   testNotFoundWithoutLog({ pageLoaderMock: getPostIndexPageMock, setup });
-  testNotFoundOnFetchFailure({
+  testThrowsOnFetchFailure({
     pageLoaderMock: getPostIndexPageMock,
     setup,
     eventFragment: 'post_index_breadcrumbs.fetch_failed',

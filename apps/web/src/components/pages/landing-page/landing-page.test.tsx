@@ -29,7 +29,6 @@ import {
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 
 import { LandingPage } from './landing-page';
 
@@ -132,12 +131,10 @@ describe(`<${LandingPage.name}/>`, () => {
     });
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
-
-    expect(vi.mocked(notFound)).toHaveBeenCalled();
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
     expect(logger.error).toHaveBeenCalledWith('landing_page.fetch_failed', {
       path: MOCK_LANDING_PATH,
       error: MOCK_ERROR,

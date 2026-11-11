@@ -1,10 +1,11 @@
 import { routes, TAXONOMY_KIND } from '@blog/config';
 import { service } from '@blog/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
+import { TAXONOMY_LIST_LOG } from '@web/constants/taxonomy-list';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
+import { markErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
 import {
@@ -24,11 +25,11 @@ export const TaxonomyListModule = async ({ id }: ITaxonomyListModuleProps) => {
   );
 
   if (!result.ok) {
-    logger.error('taxonomy_list_module.fetch_failed', {
+    logger.error(TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });
-    notFound();
+    throw markErrorLogged(result.error);
   }
 
   const {

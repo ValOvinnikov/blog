@@ -417,9 +417,22 @@ file` are all denied alike) — an earlier version only handled the
     dependency-mutating pnpm commands inside a shared-deps agent worktree
     (see below) before pnpm can write anything.
   - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
-    `git push` of a session's generated `claude/<words>-<id>` branch and
-    prints the rename command. `claude/issue-<n>-…` passes. Without an
-    issue number in the name, `board-auto-sync.yml` cannot move the ticket.
+    a `git push` that creates a branch off the pattern in
+    `scripts/branch-name.mjs` (`<type>/<n>-<slug>`, plus `main`,
+    `dependabot/…` and the `@claude` Action's
+    `claude/issue-<n>-<YYYYMMDD>-<HHMM>`) — generated `claude/…` names
+    included — and prints the
+    `git branch -m "$(pnpm -s branch:name <n> "<title>")"` command. A branch
+    `git ls-remote` already finds on the remote passes, so open PRs keep
+    pushing; an ls-remote error still checks the name. `.husky/pre-push`
+    applies the same check to the refs a push actually sends, counting a ref
+    as new when its remote sha is all zeros, which covers pushes the hook
+    cannot parse. Without an issue number in the name, `board-auto-sync.yml`
+    cannot move the ticket.
+  - `session-start-cloud.sh` — `SessionStart` hook that runs only when
+    `CLAUDE_CODE_REMOTE=true`: it runs `pnpm install --frozen-lockfile` when
+    `node_modules` is absent and prints the rename command when the current
+    branch is off the pattern. Its `timeout: 600` covers a cold install.
   - `gate-bypass-guard.sh` — `PreToolUse` hook, wired **globally** in
     `.claude/settings.json` (every agent's `Bash` calls, not one agent's —
     bypass commands could come from any context, including the

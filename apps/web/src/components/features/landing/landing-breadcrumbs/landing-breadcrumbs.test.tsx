@@ -13,7 +13,7 @@ import {
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testNoJsonLdWithoutBaseUrl,
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { MOCK_TENANT_NAME } from '@web/testing/shared/tenant/fixtures';
@@ -49,7 +49,7 @@ describe(`<${LandingBreadcrumbs.name}/>`, () => {
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getLandingPageMock, setup });
-  testNotFoundOnFetchFailure({
+  testThrowsOnFetchFailure({
     pageLoaderMock: getLandingPageMock,
     setup,
     eventFragment: 'landing_breadcrumbs.fetch_failed',

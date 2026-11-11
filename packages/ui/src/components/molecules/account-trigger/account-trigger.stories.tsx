@@ -1,4 +1,5 @@
 import { ACCOUNT_BUTTON_STYLE } from '@blog/config';
+import { HeaderControlShapes } from '@blog/ui/testing/header-control-shapes';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
@@ -66,5 +67,25 @@ export const SameWidthAcrossStates: TStory = {
       <AccountTrigger {...args} labels={SPANISH_LABELS} />
       <AccountTrigger {...args} labels={SPANISH_LABELS} user={SIGNED_IN_USER} />
     </div>
+  ),
+};
+
+export const HeaderControlShapesRow: TStory = {
+  name: 'Header-control shapes',
+  render: (args) => (
+    <HeaderControlShapes>
+      {() => (
+        <>
+          <AccountTrigger {...args} />
+          <AccountTrigger {...args} user={SIGNED_IN_USER} />
+          <AccountTrigger {...args} appearance={ACCOUNT_BUTTON_STYLE.CIRCLE} />
+          <AccountTrigger
+            {...args}
+            appearance={ACCOUNT_BUTTON_STYLE.CIRCLE}
+            user={SIGNED_IN_USER}
+          />
+        </>
+      )}
+    </HeaderControlShapes>
   ),
 };
