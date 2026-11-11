@@ -372,11 +372,11 @@ Variants: type: TOAST_TYPE.SUCCESS|TOAST_TYPE.INFO|TOAST_TYPE.WARNING|TOAST_TYPE
 ### Accordion — `components/organisms/accordion/accordion.tsx`
 
 A list of disclosure rows; any number can be open at once.
-Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+Props: defaultValue?: string[] · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 
 Slots:
 
-- **Accordion.Item** — One disclosure row in an `Accordion`, pairing an `Accordion.Trigger` with its `Accordion.Panel`. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
+- **Accordion.Item** — One disclosure row in an `Accordion`, pairing an `Accordion.Trigger` with its `Accordion.Panel`. Props: value?: string · children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Accordion.Trigger** — Toggles an `Accordion.Item`'s panel open and closed. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 - **Accordion.Panel** — Stays in the DOM while closed, so browser find-in-page can still match text inside it. Props: children?: ReactNode _(extends IWithClassName, IWithDataTestId)_
 

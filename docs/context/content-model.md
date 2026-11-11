@@ -40,9 +40,9 @@ any other module; what differs is that a hero arrives through the page's own
 **Fifteen are live** — schema, service adaptor and renderer all present. One is
 not, and should not be described as working:
 
-| Type          | State                                                                                                                                                                                                             |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module_hero` | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and its surviving `service.modules.hero.v1` loader has no caller. Replaced by `module_heroBlog`. |
+| Type          | State                                                                                                                                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `module_hero` | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and no service loader reads it. Replaced by `module_heroBlog`. |
 
 ### What every module carries
 

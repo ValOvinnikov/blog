@@ -16,6 +16,7 @@ const {
   cardStyle,
   headerControlStyle,
   buttonShape,
+  navLinkStyle,
 } = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 
@@ -29,6 +30,7 @@ const MOCK_SITE_CONFIG_ROW = {
   cardStyle,
   headerControlStyle,
   buttonShape,
+  navLinkStyle,
 };
 
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({

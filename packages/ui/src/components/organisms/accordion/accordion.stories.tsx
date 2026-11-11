@@ -39,6 +39,23 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
+const openItem: TItem = {
+  question: faker.lorem.sentence(),
+  answer: faker.lorem.paragraph(),
+};
+
+export const FirstItemOpen: TStory = {
+  args: {
+    defaultValue: [openItem.question],
+    children: [openItem, ...threeItems].map((item) => (
+      <Accordion.Item key={item.question} value={item.question}>
+        <Accordion.Trigger>{item.question}</Accordion.Trigger>
+        <Accordion.Panel>{item.answer}</Accordion.Panel>
+      </Accordion.Item>
+    )),
+  },
+};
+
 export const InEachCardStyle: TStory = {
   render: (args) => <CardStyles>{() => <Accordion {...args} />}</CardStyles>,
 };

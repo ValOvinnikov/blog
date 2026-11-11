@@ -1,4 +1,5 @@
 import type { TMaybeNull } from '@blog/config';
+import { noop } from '@blog/utils/primitives';
 import {
   ACCORDION_VARIANT,
   type TAccordionVariant,
@@ -16,7 +17,7 @@ export const AccordionContext = createContext<TAccordionContext>({
   variant: ACCORDION_VARIANT.LIST,
   isList: false,
   openValues: [],
-  registerButton: () => {},
+  registerButton: noop,
 });
 
 export const AccordionItemValueContext = createContext('');

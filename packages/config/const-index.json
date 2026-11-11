@@ -2608,6 +2608,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/layout.ts"
+      },
+      {
+        "ref": "LOOK_SAMPLE_FAQ_ITEM.FIRST",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-sample",
+        "file": "apps/platform/src/constants/look-sample.ts"
       }
     ],
     "PRIVACY_POLICY": [
@@ -5986,6 +5992,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-row",
         "file": "apps/platform/src/constants/look-row.ts"
+      }
+    ],
+    "SECOND": [
+      {
+        "ref": "LOOK_SAMPLE_FAQ_ITEM.SECOND",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-sample",
+        "file": "apps/platform/src/constants/look-sample.ts"
       }
     ],
     "(width >= 64rem)": [
