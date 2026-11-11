@@ -150,9 +150,9 @@ The taxonomy, in this order (rows marked _planned_ have no module yet):
 | ---------- | -------------------------------------- | ------------------------------------------------------------------------------ |
 | Heroes     | open a page                            | `module_hero*` — the `hero` slot's family, never placeable in `modules[]`      |
 | Projects   | show the work                          | _planned_ — project listings fed by project queries                            |
-| Explainers | explain an offer, a story or a process | content, feature list, feature highlights, timeline, FAQ, section pages        |
+| Explainers | explain an offer, a story or a process | content, feature list, feature highlights, timeline, FAQ, section pages, embed |
 | Proof      | back up a claim                        | testimonials, team, logo wall, stats                                           |
-| Media      | show images or video                   | _planned_ — gallery, embed                                                     |
+| Media      | show images or video                   | _planned_ — gallery                                                            |
 | Conversion | get the visitor to act                 | call to action, newsletter, pricing; contact form _planned_                    |
 | Posts      | show the writing                       | `module_post*`, `module_taxonomy*` — listings fed by post and taxonomy queries |
 

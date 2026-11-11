@@ -15,6 +15,38 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: ../config/src/sanity/generated/schema.json
+export type Module_embed = {
+  _id: string;
+  _type: 'module_embed';
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  headingBlock?: ModuleHeadingBlock;
+  embed?: Embed;
+  ctaButtons?: Array<
+    {
+      _key: string;
+    } & CtaButton
+  >;
+  contentAlignment?: 'LEFT' | 'CENTER';
+  layout?: Layout;
+};
+
+export type Embed = {
+  _type: 'embed';
+  url?: string;
+  title?: InternationalizedArrayString;
+  caption?: InternationalizedArrayString;
+};
+
+export type ModuleHeadingBlock = {
+  _type: 'moduleHeadingBlock';
+  heading?: InternationalizedArrayString;
+  supportingText?: InternationalizedArrayText;
+};
+
 export type Module_sectionPages = {
   _id: string;
   _type: 'module_sectionPages';
@@ -26,12 +58,6 @@ export type Module_sectionPages = {
   headingBlock?: ModuleHeadingBlock;
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
-};
-
-export type ModuleHeadingBlock = {
-  _type: 'moduleHeadingBlock';
-  heading?: InternationalizedArrayString;
-  supportingText?: InternationalizedArrayText;
 };
 
 export type Module_pricing = {
@@ -1452,6 +1478,13 @@ export type Module_contentReference = {
   [internalGroqTypeReferenceTo]?: 'module_content';
 };
 
+export type Module_embedReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'module_embed';
+};
+
 export type Module_faqReference = {
   _ref: string;
   _type: 'reference';
@@ -1579,6 +1612,9 @@ export type Template_home = {
     | ({
         _key: string;
       } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_embedReference)
     | ({
         _key: string;
       } & Module_faqReference)
@@ -1844,6 +1880,9 @@ export type Template_legalIndex = {
       } & Module_contentReference)
     | ({
         _key: string;
+      } & Module_embedReference)
+    | ({
+        _key: string;
       } & Module_faqReference)
     | ({
         _key: string;
@@ -1948,6 +1987,9 @@ export type Template_privacyIndex = {
     | ({
         _key: string;
       } & Module_contentReference)
+    | ({
+        _key: string;
+      } & Module_embedReference)
     | ({
         _key: string;
       } & Module_faqReference)
@@ -2354,6 +2396,9 @@ export type Template_landing = {
       } & Module_contentReference)
     | ({
         _key: string;
+      } & Module_embedReference)
+    | ({
+        _key: string;
       } & Module_faqReference)
     | ({
         _key: string;
@@ -2591,8 +2636,10 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Module_sectionPages
+  | Module_embed
+  | Embed
   | ModuleHeadingBlock
+  | Module_sectionPages
   | Module_pricing
   | InternationalizedArrayString
   | Module_cookieSettings
@@ -2696,6 +2743,7 @@ export type AllSanitySchemaTypes =
   | Module_heroProfileReference
   | Module_heroStatementReference
   | Module_contentReference
+  | Module_embedReference
   | Module_faqReference
   | Module_featureHighlightsReference
   | Module_featureListReference

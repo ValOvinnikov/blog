@@ -4,6 +4,7 @@ import { contactFormSchema } from './contact-form/contact-form';
 import { contentSchema } from './content/content';
 import { cookieSettingsSchema } from './cookie-settings/cookie-settings';
 import { ctaSchema } from './cta/cta';
+import { embedSchema } from './embed/embed';
 import { faqSchema } from './faq/faq';
 import { featureHighlightsSchema } from './feature-highlights/feature-highlights';
 import { featureListSchema } from './feature-list/feature-list';
@@ -48,4 +49,5 @@ export const modules = [
   cookieSettingsSchema,
   pricingSchema,
   sectionPagesSchema,
+  embedSchema,
 ].map((schema) => ({ ...schema, icon: textSizedIcon(schema.icon) }));

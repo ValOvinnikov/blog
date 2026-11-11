@@ -23,6 +23,7 @@ export const MODULE_PACK_BY_TYPE = {
   module_taxonomyList: MODULE_PACK.CORE,
   module_content: MODULE_PACK.CORE,
   module_faq: MODULE_PACK.CORE,
+  module_embed: MODULE_PACK.CORE,
   module_sectionPages: MODULE_PACK.CORE,
   module_cta: MODULE_PACK.CORE,
   module_newsletter: MODULE_PACK.CORE,
