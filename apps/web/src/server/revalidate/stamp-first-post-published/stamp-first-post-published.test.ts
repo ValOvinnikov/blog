@@ -1,7 +1,7 @@
+import { SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   REVALIDATE_LOG,
-  SANITY_WEBHOOK_OPERATION,
   STARTER_DOCUMENT_ID_PREFIX,
 } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';

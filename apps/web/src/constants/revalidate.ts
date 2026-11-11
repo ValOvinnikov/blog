@@ -36,9 +36,3 @@ export const REVALIDATE_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;
 export const SIGNATURE_REFUSED_REASON = 'signature_refused';
 
 export const STARTER_DOCUMENT_ID_PREFIX = 'starter.';
-
-export const SANITY_WEBHOOK_OPERATION = {
-  CREATE: 'create',
-  UPDATE: 'update',
-  DELETE: 'delete',
-} as const;

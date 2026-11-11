@@ -1,4 +1,8 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  SANITY_WEBHOOK_OPERATION,
+} from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
@@ -7,7 +11,6 @@ import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
   REVALIDATE_LOG,
-  SANITY_WEBHOOK_OPERATION,
   SIGNATURE_REFUSED_REASON,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,

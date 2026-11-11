@@ -14,20 +14,26 @@ const tenant = useTestTenant(db);
 useFrozenClock();
 
 describe(stampSiteConfigSavedAt, () => {
-  it.each(Object.values(SITE_CONFIG_SAVED_AT))(
-    'stamps %s, leaving every other column untouched',
-    async (column) => {
+  it.each([
+    { savedAt: SITE_CONFIG_SAVED_AT.LOOK, stamped: { lookSavedAt: MOCK_NOW } },
+    {
+      savedAt: SITE_CONFIG_SAVED_AT.VOICE,
+      stamped: { voiceSavedAt: MOCK_NOW },
+    },
+  ])(
+    'stamps $savedAt, leaving every other column untouched',
+    async ({ savedAt, stamped }) => {
       const [before] = await db()
         .insert(schema.siteConfig)
         .values({ tenantId: tenant().id, ...MOCK_SITE_CONFIG_FIELDS })
         .returning();
 
-      await stampSiteConfigSavedAt(tenant().id, column);
+      await stampSiteConfigSavedAt(tenant().id, savedAt);
 
       const [row] = await db().select().from(schema.siteConfig);
       expect(row).toEqual({
         ...before,
-        [column]: MOCK_NOW,
+        ...stamped,
         updatedAt: MOCK_NOW,
       });
     },
