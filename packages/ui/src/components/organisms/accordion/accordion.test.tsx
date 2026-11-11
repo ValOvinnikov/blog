@@ -84,3 +84,33 @@ describe(`<${Accordion.name}/>`, () => {
     expect(secondPanel).toBeVisible();
   });
 });
+
+describe(`<${Accordion.name}/> with a default value`, () => {
+  it('opens only the items named in its default value', () => {
+    const openValue = faker.string.uuid();
+    renderElement(
+      <Accordion defaultValue={[openValue]}>
+        <Accordion.Item value={openValue}>
+          <Accordion.Trigger>{MOCK_FIRST_ITEM.label}</Accordion.Trigger>
+          <Accordion.Panel>{MOCK_FIRST_ITEM.content}</Accordion.Panel>
+        </Accordion.Item>
+        <Accordion.Item value={faker.string.uuid()}>
+          <Accordion.Trigger>{MOCK_SECOND_ITEM.label}</Accordion.Trigger>
+          <Accordion.Panel>{MOCK_SECOND_ITEM.content}</Accordion.Panel>
+        </Accordion.Item>
+      </Accordion>,
+    );
+
+    const openTrigger = screen.getByRole('button', {
+      name: MOCK_FIRST_ITEM.label,
+    });
+    const closedTrigger = screen.getByRole('button', {
+      name: MOCK_SECOND_ITEM.label,
+    });
+    const openPanel = screen.getByText(MOCK_FIRST_ITEM.content);
+
+    expect(openTrigger).toHaveAttribute(ARIA_EXPANDED, 'true');
+    expect(openPanel).toBeVisible();
+    expect(closedTrigger).toHaveAttribute(ARIA_EXPANDED, 'false');
+  });
+});

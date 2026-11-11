@@ -2,7 +2,11 @@ import { type IBusyStyle, SIZE, type TLocaleIsoCode } from '@blog/config';
 import { Button } from '@blog/ui/components/atoms/button';
 import { Heading } from '@blog/ui/components/atoms/heading';
 import { Text } from '@blog/ui/components/atoms/text';
+import { LookSampleCta } from '@platform/components/features/site-preview/look-sample/components/look-sample-cta/look-sample-cta';
+import { LookSampleFaq } from '@platform/components/features/site-preview/look-sample/components/look-sample-faq/look-sample-faq';
+import { LookSampleForm } from '@platform/components/features/site-preview/look-sample/components/look-sample-form/look-sample-form';
 import { LookSamplePosts } from '@platform/components/features/site-preview/look-sample/components/look-sample-posts/look-sample-posts';
+import { LookSampleQuote } from '@platform/components/features/site-preview/look-sample/components/look-sample-quote/look-sample-quote';
 import { SampleBusyButton } from '@platform/components/features/site-preview/sample-busy-button';
 import { SampleSiteFooter } from '@platform/components/features/site-preview/sample-site-footer';
 import {
@@ -83,6 +87,10 @@ export const LookSample = ({
           </div>
         </div>
         <LookSamplePosts />
+        <LookSampleFaq />
+        <LookSampleForm />
+        <LookSampleQuote />
+        <LookSampleCta />
       </div>
       <SampleSiteFooter brand={brand} footer={footer} />
     </SiteThemeFrame>
