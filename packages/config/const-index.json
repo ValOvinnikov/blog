@@ -1122,6 +1122,80 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/email-template.ts"
+      },
+      {
+        "ref": "EMAIL_TYPE.NEWSLETTER_CONFIRMATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      }
+    ],
+    "SIGN_IN": [
+      {
+        "ref": "EMAIL_TYPE.SIGN_IN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      }
+    ],
+    "NEWSLETTER_ISSUE": [
+      {
+        "ref": "EMAIL_TYPE.NEWSLETTER_ISSUE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      }
+    ],
+    "YOUTUBE": [
+      {
+        "ref": "EMBED_PROVIDER.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      },
+      {
+        "ref": "ICONS.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "SOCIAL_PLATFORMS.YOUTUBE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/link.ts"
+      }
+    ],
+    "VIMEO": [
+      {
+        "ref": "EMBED_PROVIDER.VIMEO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
+    "LOOM": [
+      {
+        "ref": "EMBED_PROVIDER.LOOM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
+    "CAL": [
+      {
+        "ref": "EMBED_PROVIDER.CAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
+      }
+    ],
+    "GOOGLE_MAPS": [
+      {
+        "ref": "EMBED_PROVIDER.GOOGLE_MAPS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/embed.ts"
       }
     ],
     "DB_NOT_FOUND": [
@@ -1789,20 +1863,6 @@
       },
       {
         "ref": "SOCIAL_PLATFORMS.FACEBOOK",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/link.ts"
-      }
-    ],
-    "YOUTUBE": [
-      {
-        "ref": "ICONS.YOUTUBE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/icon.ts"
-      },
-      {
-        "ref": "SOCIAL_PLATFORMS.YOUTUBE",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/link.ts"
@@ -2752,6 +2812,38 @@
         "file": "packages/config/src/constants/magic-link-refusal.ts"
       }
     ],
+    "video": [
+      {
+        "ref": "MEDIA_RATIO.VIDEO",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "vertical": [
+      {
+        "ref": "MEDIA_RATIO.VERTICAL",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "classic": [
+      {
+        "ref": "MEDIA_RATIO.CLASSIC",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
+    "portrait": [
+      {
+        "ref": "MEDIA_RATIO.PORTRAIT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/media-ratio.ts"
+      }
+    ],
     "CORE": [
       {
         "ref": "MODULE_PACK.CORE",
@@ -3234,6 +3326,22 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
+      }
+    ],
+    "published": [
+      {
+        "ref": "SANITY_PERSPECTIVE.PUBLISHED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-perspective.ts"
+      }
+    ],
+    "drafts": [
+      {
+        "ref": "SANITY_PERSPECTIVE.DRAFTS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/sanity-perspective.ts"
       }
     ],
     "ALREADY_GONE": [
@@ -3850,6 +3958,30 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
+      }
+    ],
+    "DELIVERED": [
+      {
+        "ref": "EMAIL_DELIVERY_OUTCOME.DELIVERED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "BOUNCED": [
+      {
+        "ref": "EMAIL_DELIVERY_OUTCOME.BOUNCED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "COMPLAINED": [
+      {
+        "ref": "EMAIL_DELIVERY_OUTCOME.COMPLAINED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
     "OWNER": [

@@ -20,6 +20,7 @@ import type {
 } from '@blog/db/schema/tenants';
 import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
+import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import type { TResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 
@@ -119,15 +120,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     siteType: null,
     siteTemplateVersion: null,
     selfServeOwnerEmailIndex: null,
-    ownerSanityInviteId: null,
-    ownerInviteSentAt: null,
-    ownerInviteAcceptedAt: null,
-    ownerSanityUserId: null,
-    ownerLoginProvider: null,
-    ownerSanityRole: null,
-    ownerInviteHeadsUpSentAt: null,
-    ownerInviteNudgeSentAt: null,
-    ownerSiteReadySentAt: null,
+    ...MOCK_NO_OWNER_ACCESS,
     unsentReinviteFormerOwnerEmailEncrypted: null,
     lastActivityAt: createdAt,
     inactivityWarnedAt: null,
@@ -135,6 +128,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     deletionNotifiedAt: null,
     suspensionReason: null,
     contentMigrationFailedAt: null,
+    firstPostPublishedAt: null,
     createdAt,
     updatedAt: createdAt,
     ...overrides,

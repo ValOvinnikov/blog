@@ -11,3 +11,5 @@ export * from './delete-subscribers-for-tenant';
 export * from './claim-confirmation-send';
 export * from './commit-confirmation-token';
 export * from './release-confirmation-send';
+export * from './list-active-subscribers';
+export * from './count-active-subscribers';

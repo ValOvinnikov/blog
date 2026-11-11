@@ -66,6 +66,8 @@ export const mockSiteConfig = (
   faviconAssetUrl: undefined,
   voiceOverridesByLocale: {},
   voiceOverrides: {},
+  lookSavedAt: undefined,
+  voiceSavedAt: undefined,
   createdAt: MOCK_SITE_CONFIG_CREATED_AT,
   updatedAt: MOCK_SITE_CONFIG_CREATED_AT,
   ...overrides,

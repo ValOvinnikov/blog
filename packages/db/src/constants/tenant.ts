@@ -69,6 +69,16 @@ export const PLAN_LOCALE_LIMIT: Record<TTenantPlan, number> = {
   [TENANT_PLAN.GROWTH]: 3,
 };
 
+export const PLAN_MONTHLY_SENDS_PER_SUBSCRIBER: Record<TTenantPlan, number> = {
+  [TENANT_PLAN.FREE]: 0,
+  [TENANT_PLAN.STARTER]: 0,
+  [TENANT_PLAN.GROWTH]: 6,
+};
+
+export const SUBSCRIBER_BAND_CEILINGS = [
+  1_000, 2_500, 5_000, 10_000, 25_000,
+] as const;
+
 export type TPlanEntitlements = {
   lookFields: readonly TLookField[];
   modulePacks: readonly TModulePack[];

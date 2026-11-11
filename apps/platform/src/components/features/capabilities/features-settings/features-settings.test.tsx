@@ -37,14 +37,14 @@ vi.mock('@platform/server/settings-features/update-features-action', () => ({
 const updateFeaturesActionMock = vi.mocked(updateFeaturesAction);
 
 const ALL_ENTITLED = Object.values(CAPABILITY);
-const PARTIAL_ENTITLEMENT = [
+const MOCK_PARTIAL_ENTITLEMENT = [
   CAPABILITY.READER_ACCOUNTS,
   CAPABILITY.COMMENTS,
   CAPABILITY.RATINGS,
   CAPABILITY.BOOKMARKS,
 ];
 
-const INITIAL_VALUES = mockSettingsFeaturesValues({
+const MOCK_INITIAL_VALUES = mockSettingsFeaturesValues({
   readerAccountsEnabled: true,
   commentsEnabled: true,
   ratingsEnabled: true,
@@ -86,7 +86,7 @@ const toggleAnalyticsAndSave = async (user: UserEvent) => {
 const setup = customRender(FeaturesSettings, {
   tenantId: MOCK_TENANT_ID,
   entitledCapabilities: ALL_ENTITLED,
-  initialValues: INITIAL_VALUES,
+  initialValues: MOCK_INITIAL_VALUES,
 });
 
 describe(`<${FeaturesSettings.name}/>`, () => {
@@ -123,10 +123,10 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(switches).toHaveLength(5);
     });
 
-    it('badges exactly the three unfinished capabilities "Coming soon"', () => {
+    it('badges only Newsletter "Coming soon"', () => {
       const badges = screen.getAllByText(comingSoonBadge);
 
-      expect(badges).toHaveLength(3);
+      expect(badges).toHaveLength(1);
     });
 
     it('nests the Capabilities heading directly under the page heading', () => {
@@ -166,7 +166,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         await user.click(saveButton);
 
         expect(updateFeaturesActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-          ...INITIAL_VALUES,
+          ...MOCK_INITIAL_VALUES,
           bookmarksEnabled: false,
         });
       });
@@ -237,32 +237,43 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     });
   });
 
+  it.each([
+    ['every', ALL_ENTITLED],
+    ['some', MOCK_PARTIAL_ENTITLEMENT],
+    ['no', []],
+  ])(
+    'shows no Comments or Ratings row with %s capabilities entitled',
+    (_, entitledCapabilities) => {
+      setup({ entitledCapabilities });
+
+      const comments = screen.queryByText(toggleLabel[CAPABILITY.COMMENTS]);
+      const ratings = screen.queryByText(toggleLabel[CAPABILITY.RATINGS]);
+
+      expect(comments).not.toBeInTheDocument();
+      expect(ratings).not.toBeInTheDocument();
+    },
+  );
+
   describe('with only some capabilities entitled', () => {
     let bookmarksSwitch: HTMLElement;
     let analyticsSwitch: HTMLElement;
 
     beforeEach(() => {
-      setup({ entitledCapabilities: PARTIAL_ENTITLEMENT });
+      setup({ entitledCapabilities: MOCK_PARTIAL_ENTITLEMENT });
       bookmarksSwitch = screen.getByRole('switch', { name: BOOKMARKS_LABEL });
       analyticsSwitch = screen.getByRole('switch', { name: ANALYTICS_LABEL });
     });
 
-    it.each([
-      toggleLabel[CAPABILITY.COMMENTS],
-      toggleLabel[CAPABILITY.RATINGS],
-      toggleLabel[CAPABILITY.NEWSLETTER],
-    ])(
-      'shows %s as "Coming soon" with no toggle, whatever the plan',
-      (label) => {
-        const row = screen.getByText(label);
-        const toggle = screen.queryByRole('switch', { name: label });
+    it('shows Newsletter as "Coming soon" with no toggle, whatever the plan', () => {
+      const label = toggleLabel[CAPABILITY.NEWSLETTER];
+      const row = screen.getByText(label);
+      const toggle = screen.queryByRole('switch', { name: label });
 
-        expect(row).toBeVisible();
-        expect(toggle).not.toBeInTheDocument();
-      },
-    );
+      expect(row).toBeVisible();
+      expect(toggle).not.toBeInTheDocument();
+    });
 
-    it('shows an out-of-plan toggle disabled and badged, never hidden', () => {
+    it('shows an out-of-plan toggle disabled, never hidden', () => {
       const consentSwitch = screen.getByRole('switch', {
         name: toggleLabel[CAPABILITY.CONSENT_BANNER],
       });
@@ -276,22 +287,15 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(bookmarksSwitch).toBeEnabled();
     });
 
-    it.each([
-      [CAPABILITY.CONSENT_BANNER, TENANT_PLAN.FREE],
-      [CAPABILITY.CONTACT_FORM, TENANT_PLAN.STARTER],
-      [CAPABILITY.ANALYTICS, TENANT_PLAN.GROWTH],
-    ])(
-      'badges locked %s with the cheapest plan holding it',
-      (capability, plan) => {
-        const toggle = screen.getByRole('switch', {
-          name: toggleLabel[capability],
-        });
+    it('badges a locked toggle with the cheapest plan holding it', () => {
+      const contactFormSwitch = screen.getByRole('switch', {
+        name: CONTACT_FORM_LABEL,
+      });
 
-        expect(toggle).toHaveAccessibleDescription(
-          `${toggleDescription[capability]} ${planLockedBadge(plan)}`,
-        );
-      },
-    );
+      expect(contactFormSwitch).toHaveAccessibleDescription(
+        `${toggleDescription[CAPABILITY.CONTACT_FORM]} ${planLockedBadge(TENANT_PLAN.STARTER)}`,
+      );
+    });
 
     it('adds the plan lock to the description of a locked toggle only', () => {
       expect(analyticsSwitch).toHaveAccessibleDescription(
