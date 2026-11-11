@@ -118,7 +118,9 @@ automatic pipeline; this skill is how the right ones get used in the right order
 ## Planning work — mandatory, not advisory
 
 One PR per main workspace and per adopting surface, in dependency order, each
-merged before the next starts; stack only when the user says to. Put the split
+merged before the next starts. Combine layers only when the earlier PR would
+not merge green on `main` alone (a rename every consumer reads); stack only
+when the user says to. Put the split
 and what it touches to the user before the first dispatch. **If anything
 blocks, ask and wait**; never absorb new scope silently. Full rules:
 `develop-feature` § "Planning work — mandatory, not advisory".
@@ -228,10 +230,8 @@ order, for the whole lifecycle — first draft, review fix and one-line tweak
 alike. The orchestrator's own hands touch only governance docs (`CLAUDE.md`,
 `.claude/**`, `SPEC.md`, `README.md`, `docs/**`), scratchpad → branch
 assembly, `pnpm typegen` and orchestration. Dispatches run in the background
-and completion arrives as a notification — never poll. Dispatch order, the
-two synchronous exceptions and the known failure modes: `develop-feature` §
-"Use the scoped agents"; a solo cloud session follows "Solo-session mode"
-below.
+and completion arrives as a notification — never poll. Details:
+`develop-feature` § "Use the scoped agents"; solo cloud: "Solo-session mode".
 
 ## The `@blog/ui` component index
 
@@ -557,6 +557,12 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   PR, a PR body capped at 12 lines and 1200 characters, `Closes #<n>` only on
   the completing PR, and a stack only when the user asks. Full rules:
   `open-pull-request` § "PR conventions".
+- **A rule added to a skill or agent guide for one app covers the other
+  too.** `apps/web` and `apps/platform` share every convention unless the guide
+  names a reason one of them differs (platform has no `modules/`, no page
+  builder, no SEO surface). When a rule lands in `web.md`, check
+  `platform-app.md` states the same thing, and the reverse. The same goes for a
+  shared skill whose examples name only one app.
 - **Docs move with the code.** Architecture changes update `SPEC.md`, feature
   behaviour its `docs/features/` page, CI and agent tooling
   `docs/context/`; a finished design doc is deleted once its shape is in the
@@ -566,10 +572,15 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 
 ## Reporting to the user
 
-The outcome first, then at most a handful of lines; never restate a
-subagent's report or recite verification statistics. Bloat rules and the epic
-status table (the answer to a merged epic PR or "where are we on #<n>?"):
-the `report-epic-status` skill.
+The outcome first, then at most a handful of lines (roughly 8 for a routine
+update). Never include a retelling of a subagent's report (give the
+conclusion), verification statistics ("green" unless something failed),
+abandoned paths or internal reasoning, self-assessment or blame, unchanged
+state (board status and remaining lists only when they change), or an
+unrelated ask bundled into a status update (hold it or ask it alone).
+
+The full rules and the epic status table (the answer to a merged epic PR or
+"where are we on #<n>?"): the `report-epic-status` skill.
 
 ### Asking the user a question
 
@@ -627,15 +638,13 @@ an inline identifier check instead), commit, then **ask to push**, and only
 after it, separately, **ask to open the PR** as a draft. Committing is free;
 push and PR each need fresh, explicit approval, and broad instructions ("go
 ahead", "keep going") never grant them. Steps, board reconciliation and
-worktree cleanup: `open-pull-request` § "Delivery gate sequence (mandatory —
-never skip or bundle)".
+worktree cleanup: `open-pull-request` § "Delivery gate sequence".
 
 ## Ticket priority & triage
 
 Creating an issue always goes through `board-keeper`, never `gh issue create`.
-Every open issue carries exactly one `prio:*` label, and work is pulled from
-`prio:now`, then the active epic's `prio:next`. Templates, the body check,
-priority definitions and `cloud-ok`: the `write-ticket` skill.
+Every open issue carries exactly one `prio:*` label; work is pulled from
+`prio:now`, then the active epic's `prio:next`. The rest: `write-ticket`.
 
 **Findings found mid-work get fixed in the current work, not ticketed** —
 routed to the owning layer agent, in the same branch. Filing one instead:
@@ -658,13 +667,17 @@ still applies:
 
 **Cloud sessions never write the project board** — they leave evidence it is
 inferred from: a comment on the issue at start, a branch named for the issue,
-a draft PR. The protocol: `open-pull-request` § "Cloud sessions never write
+a draft PR. **Rename a generated branch before the first push**:
+`claude/<words>-<id>` carries no issue number, so it becomes
+`<type>/<n>-<slug>` (`git branch -m feat/3952-team-single-member`);
+`claude/issue-<n>-…` already carries one and stays. The protocol: `open-pull-request` § "Cloud sessions never write
 the project board".
 
 ## Deployment
 
 **Automatic deployments are temporarily OFF**: never report a merged PR as
-deployed. Deploying is human-gated (`open-pull-request` § "Deployment").
+deployed. A stale dev site is not a bug, and a merged Sanity or Drizzle
+migration is not live on dev until someone dispatches a deploy. Deploying is human-gated (`open-pull-request` § "Deployment").
 
 ## Don't
 
