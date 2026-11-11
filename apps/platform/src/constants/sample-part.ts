@@ -1,6 +1,6 @@
 import type { TValueOf } from '@blog/config/utils';
 
-// The spec's part selectors (`[data-part=post-card]`) fix these values to lowercase.
+// `data-part` attribute values, kept lowercase like the markup they tag.
 export const SAMPLE_PART = {
   HEADER: 'header',
   FOOTER: 'footer',
@@ -17,3 +17,4 @@ export const SAMPLE_PART = {
 export type TSamplePart = TValueOf<typeof SAMPLE_PART>;
 
 export const SAMPLE_PART_ATTRIBUTE = 'data-part';
+export const SAMPLE_PART_ITEMS_ATTRIBUTE = 'data-part-items';

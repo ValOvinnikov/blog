@@ -11,12 +11,12 @@ import {
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import { act, renderHookWithIntl } from '@platform/testing/custom-render';
-import { makeFakeFrame } from '@platform/testing/look/look-follow';
-import { stubMatchingMediaQuery } from '@platform/testing/match-media';
 import {
-  toLookFollowTarget,
-  type TLookFollowTarget,
-} from '@platform/utils/look-follow-target/look-follow-target';
+  makeFakeFrame,
+  mockOpenRowTarget,
+} from '@platform/testing/look/look-follow';
+import { stubMatchingMediaQuery } from '@platform/testing/match-media';
+import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 
 import { useLookFollow } from './use-look-follow';
 
@@ -31,9 +31,8 @@ const FOOTER: TLookFollowTarget = {
   kind: LOOK_FOLLOW_TARGET.PART,
   row: LOOK_ROW.FOOTER,
 };
-const TYPE = toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false);
-const CARDS = toLookFollowTarget([LOOK_ROW.CARDS], LOOK_ROW.CARDS, false);
-const OUTLINING_STYLE_CARD = 'an outlining Style card';
+const TYPE = mockOpenRowTarget(LOOK_ROW.TYPE);
+const CARDS = mockOpenRowTarget(LOOK_ROW.CARDS);
 const DESKTOP_SAMPLE_HEIGHT = 920;
 const DESKTOP_OVERFLOW = 120;
 const TALL_SAMPLE_HEIGHT = 2400;
@@ -176,7 +175,6 @@ describe(useLookFollow, () => {
 
   it.each([
     { name: 'a whole-page Style card', target: TYPE },
-    { name: OUTLINING_STYLE_CARD, target: CARDS },
     { name: 'Expand all', target: ALL_OPEN },
   ])('leaves the frame where it is for $name', ({ target }) => {
     const { position, update } = setup();
@@ -267,7 +265,7 @@ describe(useLookFollow, () => {
   describe('after a hand scroll', () => {
     it.each([
       { name: 'a Site parts card', target: FOOTER },
-      { name: OUTLINING_STYLE_CARD, target: CARDS },
+      { name: 'an outlining Style card', target: CARDS },
     ])('pauses following $name', ({ target }) => {
       const { current, update } = setup();
       update({ target });

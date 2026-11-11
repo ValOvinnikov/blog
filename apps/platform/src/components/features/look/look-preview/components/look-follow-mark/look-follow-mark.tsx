@@ -24,11 +24,13 @@ export const LookFollowMark = ({
   const t = useTranslations('lookForm');
   const rootRef = useRef<HTMLDivElement>(null);
   const boxes = usePartBoxes(rootRef, parts, scale);
-  const tagHeight = LOOK_FOLLOW_MARK.TAG_HEIGHT / scale;
-  const isTagBelow = !!boxes[0] && boxes[0].top < tagHeight;
-  const { root, mark, tag } = lookFollowMarkVariants({ isTagBelow });
+  const [first] = boxes;
   const outlineWidth = LOOK_FOLLOW_MARK.OUTLINE_WIDTH / scale;
   const outlineOffset = LOOK_FOLLOW_MARK.OUTLINE_OFFSET / scale;
+  const tagHeight = LOOK_FOLLOW_MARK.TAG_HEIGHT / scale;
+  const ringOutset = first?.isInset ? 0 : outlineOffset + outlineWidth;
+  const isTagBelow = !!first && first.top < tagHeight + ringOutset;
+  const { root, mark, tag } = lookFollowMarkVariants({ isTagBelow });
   const radius = `${LOOK_FOLLOW_MARK.TAG_RADIUS / scale}px`;
 
   return (
@@ -36,6 +38,7 @@ export const LookFollowMark = ({
       {boxes.map(({ key, isInset, ...box }, index) => (
         <div
           key={key}
+          aria-hidden="true"
           className={mark()}
           style={{
             ...box,
@@ -50,6 +53,8 @@ export const LookFollowMark = ({
               style={{
                 fontSize: LOOK_FOLLOW_MARK.TAG_FONT_SIZE / scale,
                 height: tagHeight,
+                left: -ringOutset,
+                [isTagBelow ? 'marginTop' : 'marginBottom']: ringOutset,
                 paddingInline: LOOK_FOLLOW_MARK.TAG_PADDING_X / scale,
                 borderRadius: isTagBelow
                   ? `0 0 ${radius} ${radius}`

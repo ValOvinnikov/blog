@@ -4,6 +4,7 @@ import { DEVICE_FRAME_VIEWPORT_ATTRIBUTE } from '@platform/constants/device-fram
 import {
   SAMPLE_PART,
   SAMPLE_PART_ATTRIBUTE,
+  SAMPLE_PART_ITEMS_ATTRIBUTE,
   type TSamplePart,
 } from '@platform/constants/sample-part';
 import { useEffect, useState, type RefObject } from 'react';
@@ -41,17 +42,25 @@ const edgeCornersRadius = (
     : `0 0 ${radius} ${radius}`;
 };
 
-const hasRoundedCorner = (element: Element) =>
-  parseFloat(getComputedStyle(element).borderTopLeftRadius) > 0 ||
-  parseFloat(getComputedStyle(element).borderBottomRightRadius) > 0;
+const SHAPE_SEARCH_DEPTH = 3;
 
-// A `SamplePart` wrapper has no corners of its own; the shape it outlines is its child's.
+const hasRoundedCorner = (element: Element) => {
+  const { borderTopLeftRadius, borderBottomRightRadius } =
+    getComputedStyle(element);
+  return (
+    parseFloat(borderTopLeftRadius) > 0 ||
+    parseFloat(borderBottomRightRadius) > 0
+  );
+};
+
+// A `SamplePart` wrapper has no corners of its own; the shape it outlines sits a few levels inside.
 const shapeRadius = (element: Element) => {
-  const shaped =
-    hasRoundedCorner(element) || !element.firstElementChild
-      ? element
-      : element.firstElementChild;
-  return getComputedStyle(shaped).borderRadius || '0';
+  let shaped: TMaybeNull<Element> = element;
+  for (let depth = 0; shaped && depth <= SHAPE_SEARCH_DEPTH; depth += 1) {
+    if (hasRoundedCorner(shaped)) return getComputedStyle(shaped).borderRadius;
+    shaped = shaped.firstElementChild;
+  }
+  return '0';
 };
 
 const toPartBox = (
@@ -79,16 +88,21 @@ const toPartBox = (
   };
 };
 
+// A list marked as a whole wraps its own list element, whose children are the items.
+const toPartSelector = (part: TSamplePart) =>
+  `[${SAMPLE_PART_ATTRIBUTE}="${part}"], [${SAMPLE_PART_ITEMS_ATTRIBUTE}="${part}"] > * > *`;
+
+const toMeasuredKey = (selector: string, scale: number) =>
+  `${selector}|${scale}`;
+
 export const usePartBoxes = (
   markRef: RefObject<TMaybeNull<HTMLElement>>,
   parts: readonly TSamplePart[],
   scale: number,
 ) => {
   const [measured, setMeasured] = useState<TMaybeUndefined<TMeasuredBoxes>>();
-  const selector = parts
-    .map((part) => `[${SAMPLE_PART_ATTRIBUTE}="${part}"]`)
-    .join(',');
-  const measuredFor = `${selector}|${scale}`;
+  const selector = parts.map(toPartSelector).join(',');
+  const measuredFor = toMeasuredKey(selector, scale);
 
   useEffect(() => {
     const content = markRef.current?.parentElement;
@@ -97,7 +111,7 @@ export const usePartBoxes = (
 
     const observer = new ResizeObserver(() => {
       setMeasured({
-        measuredFor,
+        measuredFor: toMeasuredKey(selector, scale),
         boxes: elements.flatMap(
           (element, index) => toPartBox(content, element, index, scale) ?? [],
         ),
@@ -107,7 +121,7 @@ export const usePartBoxes = (
     elements.forEach((element) => observer.observe(element));
 
     return () => observer.disconnect();
-  }, [markRef, selector, scale, measuredFor]);
+  }, [markRef, selector, scale]);
 
   return measured?.measuredFor === measuredFor ? measured.boxes : [];
 };

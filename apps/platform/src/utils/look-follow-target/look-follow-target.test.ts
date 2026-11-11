@@ -2,6 +2,7 @@ import { LOOK_CARD } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { SAMPLE_PART } from '@platform/constants/sample-part';
+import { mockOpenRowTarget } from '@platform/testing/look/look-follow';
 import { LOOK_ROWS } from '@platform/utils/look-open-rows/look-open-rows';
 
 import { toLookFollowOutline, toLookFollowTarget } from './look-follow-target';
@@ -51,7 +52,7 @@ describe(toLookFollowTarget, () => {
 
 describe(toLookFollowOutline, () => {
   const openOnly = (row: TLookRow) =>
-    toLookFollowOutline(toLookFollowTarget([row], row, false));
+    toLookFollowOutline(mockOpenRowTarget(row));
 
   it('outlines the header for the Language switcher card', () => {
     expect(openOnly(LOOK_ROW.LANGUAGE_SWITCHER)).toEqual({

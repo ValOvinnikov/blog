@@ -2,10 +2,12 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
+import type { TLookRow } from '@platform/constants/look-row';
 import { PREVIEW_FRAME_STATUS_TEST_ID } from '@platform/constants/preview';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
+import { toLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import { createTranslator } from 'next-intl';
 
 const tFollow = createTranslator({
@@ -21,16 +23,26 @@ export const followLine = (
   values: Record<string, string | number> = {},
 ) => tFollow.markup(key, { ...values, strong: (chunks: string) => chunks });
 
-const MEASURED_EDGE = 40;
-const MEASURED_SIZE = { width: MEASURED_EDGE, height: MEASURED_EDGE };
+const MOCK_MEASURED_EDGE = 40;
+const MOCK_MEASURED_SIZE = {
+  width: MOCK_MEASURED_EDGE,
+  height: MOCK_MEASURED_EDGE,
+};
 
 export const stubMeasuredSample = () => {
-  vi.spyOn(Element.prototype, 'getBoundingClientRect').mockReturnValue(
-    new DOMRect(0, 0, MEASURED_EDGE, MEASURED_EDGE),
-  );
+  const rectSpy = vi
+    .spyOn(Element.prototype, 'getBoundingClientRect')
+    .mockReturnValue(new DOMRect(0, 0, MOCK_MEASURED_EDGE, MOCK_MEASURED_EDGE));
+  const restoreResizeObserver = stubResizeObserver(() => MOCK_MEASURED_SIZE);
 
-  return stubResizeObserver(() => MEASURED_SIZE);
+  return () => {
+    restoreResizeObserver();
+    rectSpy.mockRestore();
+  };
 };
+
+export const mockOpenRowTarget = (row: TLookRow) =>
+  toLookFollowTarget([row], row, false);
 
 type TFakeFrameOptions = {
   top?: number;

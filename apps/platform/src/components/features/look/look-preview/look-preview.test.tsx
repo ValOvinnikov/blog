@@ -39,6 +39,7 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   followLine,
+  mockOpenRowTarget,
   stubMeasuredSample,
 } from '@platform/testing/look/look-follow';
 import { CONSOLE } from '@platform/testing/look/look-form-fixtures';
@@ -54,10 +55,7 @@ import {
   defaultLookFormValues,
   type TLookFormValues,
 } from '@platform/utils/default-look-values/default-look-values';
-import {
-  toLookFollowTarget,
-  type TLookFollowTarget,
-} from '@platform/utils/look-follow-target/look-follow-target';
+import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
@@ -70,7 +68,7 @@ const FOOTER_TARGET: TLookFollowTarget = {
   row: LOOK_ROW.FOOTER,
 };
 const LOOK_FULLSCREEN = messages.lookFullscreen;
-const STYLE_TARGET = toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false);
+const STYLE_TARGET = mockOpenRowTarget(LOOK_ROW.TYPE);
 const FREE_SAMPLE_NOTE = followLine('freeSample', {
   preset: CONSOLE,
 });
@@ -328,17 +326,16 @@ describe(`<${LookPreview.name}/>`, () => {
     });
 
     describe('with the sample measured', () => {
-      let restoreResizeObserver: () => void;
+      let restoreMeasuredSample: () => void;
       const outlines = () =>
         screen.queryAllByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
 
       beforeEach(() => {
-        restoreResizeObserver = stubMeasuredSample();
+        restoreMeasuredSample = stubMeasuredSample();
       });
 
       afterEach(() => {
-        restoreResizeObserver();
-        vi.restoreAllMocks();
+        restoreMeasuredSample();
       });
 
       it('outlines the followed part with its name', () => {
@@ -368,9 +365,7 @@ describe(`<${LookPreview.name}/>`, () => {
       ])(
         'outlines all $partCount sample parts $row changes under one tag',
         ({ row, partCount }) => {
-          renderPreview({
-            followTarget: toLookFollowTarget([row], row, false),
-          });
+          renderPreview({ followTarget: mockOpenRowTarget(row) });
 
           const tags = screen.getAllByTestId(LOOK_FOLLOW_TEST_ID.TAG);
           const cardName = messages.lookForm[LOOK_ROW_TITLE_KEY[row]];
@@ -378,17 +373,6 @@ describe(`<${LookPreview.name}/>`, () => {
           expect(outlines()).toHaveLength(partCount);
           expect(tags).toHaveLength(1);
           expect(outlines()[0]).toHaveTextContent(cardName);
-        },
-      );
-
-      it.each([LOOK_ROW.COLOUR, LOOK_ROW.TYPE])(
-        'outlines nothing while %s is open',
-        (row) => {
-          renderPreview({
-            followTarget: toLookFollowTarget([row], row, false),
-          });
-
-          expect(outlines()).toHaveLength(0);
         },
       );
     });

@@ -11,11 +11,9 @@ import {
   followLine,
   followStatusText,
   mockLookFollow,
+  mockOpenRowTarget,
 } from '@platform/testing/look/look-follow';
-import {
-  toLookFollowOutline,
-  toLookFollowTarget,
-} from '@platform/utils/look-follow-target/look-follow-target';
+import { toLookFollowOutline } from '@platform/utils/look-follow-target/look-follow-target';
 import userEvent from '@testing-library/user-event';
 
 import { LookFollowStatus } from './look-follow-status';
@@ -29,11 +27,7 @@ const FOOTER_TARGET = {
   row: LOOK_ROW.FOOTER,
 } as const;
 const FOOTER_OUTLINE = toLookFollowOutline(FOOTER_TARGET);
-const CARDS_TARGET = toLookFollowTarget(
-  [LOOK_ROW.CARDS],
-  LOOK_ROW.CARDS,
-  false,
-);
+const CARDS_TARGET = mockOpenRowTarget(LOOK_ROW.CARDS);
 const CARDS_OUTLINE = toLookFollowOutline(CARDS_TARGET);
 const AT_END: TLookFollowSettled = {
   outcome: LOOK_FOLLOW_OUTCOME.AT_END,
@@ -76,7 +70,7 @@ describe(`<${LookFollowStatus.name}/>`, () => {
 
   it('explains that a whole-page Style card holds the frame still', () => {
     setup({
-      target: toLookFollowTarget([LOOK_ROW.TYPE], LOOK_ROW.TYPE, false),
+      target: mockOpenRowTarget(LOOK_ROW.TYPE),
     });
 
     const line = followLine('styleCard', { card: LOOK_FORM.typeHeading });

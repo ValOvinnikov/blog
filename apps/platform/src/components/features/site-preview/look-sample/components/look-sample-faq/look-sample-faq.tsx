@@ -10,20 +10,18 @@ export const LookSampleFaq = () => {
 
   return (
     <LookSampleSection heading={t('faqHeading')}>
-      <Accordion defaultValue={[LOOK_SAMPLE_FAQ_ITEM.FIRST]}>
-        <SamplePart part={SAMPLE_PART.FAQ_ITEM}>
+      <SamplePart part={SAMPLE_PART.FAQ_ITEM} isEachListItem={true}>
+        <Accordion defaultValue={[LOOK_SAMPLE_FAQ_ITEM.FIRST]}>
           <Accordion.Item value={LOOK_SAMPLE_FAQ_ITEM.FIRST}>
             <Accordion.Trigger>{t('faqFirstQuestion')}</Accordion.Trigger>
             <Accordion.Panel>{t('faqFirstAnswer')}</Accordion.Panel>
           </Accordion.Item>
-        </SamplePart>
-        <SamplePart part={SAMPLE_PART.FAQ_ITEM}>
           <Accordion.Item value={LOOK_SAMPLE_FAQ_ITEM.SECOND}>
             <Accordion.Trigger>{t('faqSecondQuestion')}</Accordion.Trigger>
             <Accordion.Panel>{t('faqSecondAnswer')}</Accordion.Panel>
           </Accordion.Item>
-        </SamplePart>
-      </Accordion>
+        </Accordion>
+      </SamplePart>
     </LookSampleSection>
   );
 };

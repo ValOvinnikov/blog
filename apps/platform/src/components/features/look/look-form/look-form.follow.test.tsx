@@ -30,17 +30,17 @@ const outline = () => screen.queryByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
 
 describe(`<${LookForm.name}/> follow`, () => {
   let user: UserEvent;
-  let restoreResizeObserver: () => void;
+  let restoreMeasuredSample: () => void;
 
   beforeEach(() => {
     user = userEvent.setup();
     stubLgUpWindow();
-    restoreResizeObserver = stubMeasuredSample();
+    restoreMeasuredSample = stubMeasuredSample();
     setupLookForm();
   });
 
   afterEach(() => {
-    restoreResizeObserver();
+    restoreMeasuredSample();
     vi.restoreAllMocks();
   });
 
