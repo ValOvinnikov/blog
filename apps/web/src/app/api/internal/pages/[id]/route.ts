@@ -1,8 +1,4 @@
-import {
-  HTTP_STATUS,
-  LOCALE_ISO_CODES,
-  type THttpStatus,
-} from '@blog/config/constants';
+import { HTTP_STATUS, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { service } from '@blog/service';
 import { isUndefined } from '@blog/utils/primitives';
@@ -11,6 +7,7 @@ import {
   INTERNAL_PAGES_TITLE_FETCH_FAILED_EVENT,
 } from '@web/constants/internal-pages';
 import { readSignedRequestBody } from '@web/server/signed-request/read-signed-request-body/read-signed-request-body';
+import { respondEmpty } from '@web/utils/empty-response/empty-response';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import { NextResponse } from 'next/server';
@@ -22,9 +19,6 @@ const requestBodySchema = z.object({
 });
 
 type TProps = { params: Promise<{ id: string }> };
-
-const respondEmpty = (status: THttpStatus): NextResponse =>
-  new NextResponse(null, { status });
 
 const parseRequestBody = (rawBody: string) => {
   try {

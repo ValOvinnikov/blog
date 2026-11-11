@@ -7,6 +7,7 @@ import {
   RESEND_DELIVERY_EVENT_TYPE,
   RESEND_WEBHOOK_HEADER,
 } from '@web/constants/email-usage';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { Webhook } from 'standardwebhooks';
@@ -34,13 +35,12 @@ const buildSecret = (): string =>
 const MOCK_SECRET = buildSecret();
 const MOCK_OTHER_SECRET = buildSecret();
 const MOCK_EVENT_ID = `msg_${faker.string.alphanumeric(24)}`;
-const MOCK_ERROR = new Error(faker.lorem.sentence());
 const MOCK_ROUTE_URL = `${faker.internet.url({ appendSlash: false })}/api/email-delivery-events`;
-const SITE_TAGS = { [SITE_EMAIL_TAG_NAME]: MOCK_TENANT_ID };
+const MOCK_SITE_TAGS = { [SITE_EMAIL_TAG_NAME]: MOCK_TENANT_ID };
 
 const eventBody = (
   type: string = RESEND_DELIVERY_EVENT_TYPE.DELIVERED,
-  tags: Record<string, string> = SITE_TAGS,
+  tags: Record<string, string> = MOCK_SITE_TAGS,
 ): string =>
   JSON.stringify({
     type,
@@ -155,6 +155,21 @@ describe(POST, () => {
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     expect(recordEmailDeliveryOutcomeMock).not.toHaveBeenCalled();
+  });
+
+  it('acknowledges a delivery event of an unexpected shape, warning once', async () => {
+    const rawBody = JSON.stringify({
+      type: RESEND_DELIVERY_EVENT_TYPE.BOUNCED,
+    });
+
+    const response = await POST(signedRequest(rawBody));
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(recordEmailDeliveryOutcomeMock).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      EMAIL_USAGE_LOG.WEBHOOK_EVENT_MALFORMED,
+      { eventId: MOCK_EVENT_ID },
+    );
   });
 
   it('logs and fails when the outcome cannot be recorded, so Resend retries', async () => {

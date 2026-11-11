@@ -1,18 +1,17 @@
-import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
+import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { isUndefined } from '@blog/utils/primitives';
 import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
 import {
+  isDeliveryOutcomeEvent,
   parseDeliveryEvent,
   toSiteId,
 } from '@web/server/email-usage/parse-delivery-event/parse-delivery-event';
 import { verifyResendWebhook } from '@web/server/email-usage/verify-resend-webhook/verify-resend-webhook';
+import { respondEmpty } from '@web/utils/empty-response/empty-response';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
-import { NextResponse } from 'next/server';
-
-const respondEmpty = (status: THttpStatus): NextResponse =>
-  new NextResponse(null, { status });
+import type { NextResponse } from 'next/server';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.RESEND_WEBHOOK_SECRET;
@@ -32,8 +31,13 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const { eventId, payload } = verified;
+  if (!isDeliveryOutcomeEvent(payload)) return respondEmpty(HTTP_STATUS.OK);
+
   const event = parseDeliveryEvent(payload);
-  if (isUndefined(event)) return respondEmpty(HTTP_STATUS.OK);
+  if (isUndefined(event)) {
+    logger.warn(EMAIL_USAGE_LOG.WEBHOOK_EVENT_MALFORMED, { eventId });
+    return respondEmpty(HTTP_STATUS.OK);
+  }
 
   const { outcome, siteTag } = event;
   if (isUndefined(siteTag)) return respondEmpty(HTTP_STATUS.OK);

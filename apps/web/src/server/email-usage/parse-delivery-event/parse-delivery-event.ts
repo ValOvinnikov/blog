@@ -13,8 +13,11 @@ const OUTCOME_BY_EVENT_TYPE = {
   [RESEND_DELIVERY_EVENT_TYPE.COMPLAINED]: EMAIL_DELIVERY_OUTCOME.COMPLAINED,
 } as const;
 
-const deliveryEventSchema = z.object({
+const deliveryEventTypeSchema = z.object({
   type: z.enum(RESEND_DELIVERY_EVENT_TYPE),
+});
+
+const deliveryEventSchema = deliveryEventTypeSchema.extend({
   data: z.object({
     tags: z.record(z.string(), z.string()).optional(),
   }),
@@ -24,6 +27,9 @@ export interface IDeliveryEvent {
   outcome: TEmailDeliveryOutcome;
   siteTag: TMaybeUndefined<string>;
 }
+
+export const isDeliveryOutcomeEvent = (payload: unknown): boolean =>
+  deliveryEventTypeSchema.safeParse(payload).success;
 
 export const parseDeliveryEvent = (
   payload: unknown,

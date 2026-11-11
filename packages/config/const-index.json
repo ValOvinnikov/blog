@@ -8264,6 +8264,14 @@
         "file": "apps/web/src/constants/email-usage.ts"
       }
     ],
+    "email_usage.webhook_event_malformed": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_EVENT_MALFORMED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
     "email_usage.webhook_site_tag_invalid": [
       {
         "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_INVALID",
