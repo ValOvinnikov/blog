@@ -5,6 +5,7 @@ import {
   type TButtonShape,
   type TCardStyle,
   type TFontChoice,
+  type THeaderControlShape,
   type THeaderControlStyle,
   type TNavLinkStyle,
   type TPresetId,
@@ -23,6 +24,7 @@ type TThemeTokensRow = {
   density: TDensity;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  headerControlShape: THeaderControlShape;
   buttonShape: TButtonShape;
   navLinkStyle: TNavLinkStyle;
 };
@@ -35,6 +37,7 @@ export const toThemeTokens = (
     themeTokens: base,
     cardStyle,
     headerControlStyle,
+    headerControlShape,
     buttonShape,
     navLinkStyle,
   } = PRESET_REGISTRY[preset];
@@ -53,6 +56,7 @@ export const toThemeTokens = (
     density: row?.density ?? base.density,
     cardStyle: row?.cardStyle ?? cardStyle,
     headerControlStyle: row?.headerControlStyle ?? headerControlStyle,
+    headerControlShape: row?.headerControlShape ?? headerControlShape,
     buttonShape: row?.buttonShape ?? buttonShape,
     navLinkStyle: row?.navLinkStyle ?? navLinkStyle,
   };

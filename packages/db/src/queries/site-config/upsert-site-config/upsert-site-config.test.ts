@@ -17,6 +17,7 @@ import {
   DENSITY,
   FONT_CHOICE,
   HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -116,6 +117,7 @@ const STYLE_FIELDS = [
   { field: 'languageSwitcherStyle', value: LANGUAGE_SWITCHER_STYLE.CODES },
   { field: 'cardStyle', value: CARD_STYLE.OUTLINED },
   { field: 'headerControlStyle', value: HEADER_CONTROL_STYLE.SOFT },
+  { field: 'headerControlShape', value: HEADER_CONTROL_SHAPE.SQUARE },
   { field: 'accountButtonStyle', value: ACCOUNT_BUTTON_STYLE.CIRCLE },
   { field: 'accountPanelStyle', value: ACCOUNT_PANEL_STYLE.HUB },
   { field: 'accountPhonePlacement', value: ACCOUNT_PHONE_PLACEMENT.MENU },
@@ -171,6 +173,13 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
     {
       headerControlStyle:
         MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerControlStyle'],
+    },
+  ],
+  [
+    'an unknown header control shape',
+    {
+      headerControlShape:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headerControlShape'],
     },
   ],
   [
@@ -426,28 +435,33 @@ describe(upsertSiteConfig, () => {
       });
     });
 
-    it('keeps the stored hue, fonts, corners and density when a save omits them', async () => {
-      await save();
-
-      const result = expectOk(
-        await upsertSiteConfig(tenantId, { preset: PRESET_ID.EDITORIAL }),
-      );
-
-      expect(result).toMatchObject({
-        accentHue: MOCK_ACCENT_HUE,
-        headingFont: FONT_CHOICE.SPACE_GROTESK,
-        bodyFont: FONT_CHOICE.NEWSREADER,
-        radiusScale: RADIUS_SCALE.MD,
-        density: DENSITY.DEFAULT,
+    describe('after a first save', () => {
+      beforeEach(async () => {
+        await save();
       });
-    });
 
-    it('keeps the card style across a preset change when a save omits it', async () => {
-      await save();
+      it('keeps the stored hue, fonts, corners and density when a save omits them', async () => {
+        const result = expectOk(
+          await upsertSiteConfig(tenantId, { preset: PRESET_ID.EDITORIAL }),
+        );
 
-      const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
+        expect(result).toMatchObject({
+          accentHue: MOCK_ACCENT_HUE,
+          headingFont: FONT_CHOICE.SPACE_GROTESK,
+          bodyFont: FONT_CHOICE.NEWSREADER,
+          radiusScale: RADIUS_SCALE.MD,
+          density: DENSITY.DEFAULT,
+        });
+      });
 
-      expect(result.cardStyle).toBe(CARD_STYLE.ACCENT_BAR);
+      it('keeps the card and control styles across a preset change when a save omits them', async () => {
+        const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
+
+        expect(result).toMatchObject({
+          cardStyle: CARD_STYLE.ACCENT_BAR,
+          ...DEFAULT_CONTROL_STYLES,
+        });
+      });
     });
 
     it.each([
@@ -470,14 +484,6 @@ describe(upsertSiteConfig, () => {
         expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
       },
     );
-
-    it('keeps the default control styles across a preset change', async () => {
-      await save();
-
-      const result = expectOk(await save({ preset: PRESET_ID.EDITORIAL }));
-
-      expect(result).toMatchObject(DEFAULT_CONTROL_STYLES);
-    });
   });
 
   describe('voice field caps', () => {
@@ -784,20 +790,24 @@ describe(upsertSiteConfig, () => {
   });
 
   describe('partial updates', () => {
-    it('keeps voice overrides when a later save omits them', async () => {
-      await saveVoice({ notFoundHeading: MOCK_HEADING });
+    describe('with a stored voice override', () => {
+      beforeEach(async () => {
+        await saveVoice({ notFoundHeading: MOCK_HEADING });
+      });
 
-      const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
+      it('keeps voice overrides when a later save omits them', async () => {
+        const result = expectOk(await save({ accentHue: CHANGED_ACCENT_HUE }));
 
-      expect(result.voiceOverrides).toEqual({ notFoundHeading: MOCK_HEADING });
-    });
+        expect(result.voiceOverrides).toEqual({
+          notFoundHeading: MOCK_HEADING,
+        });
+      });
 
-    it('clears a language voice overrides when saved with {}', async () => {
-      await saveVoice({ notFoundHeading: MOCK_HEADING });
+      it('clears a language voice overrides when saved with {}', async () => {
+        const result = expectOk(await saveVoice({}));
 
-      const result = expectOk(await saveVoice({}));
-
-      expect(result.voiceOverrides).toEqual({});
+        expect(result.voiceOverrides).toEqual({});
+      });
     });
 
     it.each([...STYLE_FIELDS, ...OPTIONAL_COLUMNS])(

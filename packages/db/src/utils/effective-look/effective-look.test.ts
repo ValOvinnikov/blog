@@ -12,6 +12,7 @@ import {
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -50,6 +51,7 @@ const STORED_LOOK: TLook = {
   languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
   cardStyle: CARD_STYLE.ACCENT_BAR,
   headerControlStyle: HEADER_CONTROL_STYLE.PLAIN,
+  headerControlShape: HEADER_CONTROL_SHAPE.SQUARE,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.CIRCLE,
   accountPanelStyle: ACCOUNT_PANEL_STYLE.HUB,
   accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
@@ -88,6 +90,7 @@ describe(toEffectiveLook, () => {
       languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.MENU_CODE,
       cardStyle: CARD_STYLE.OUTLINED,
       headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+      headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
       accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
       accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
       accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
@@ -126,6 +129,7 @@ describe(isLookFieldEntitled, () => {
     ['headingFont', TENANT_PLAN.FREE, false],
     ['cookieSettingsButton', TENANT_PLAN.FREE, true],
     ['footerLayout', TENANT_PLAN.FREE, false],
+    ['headerControlShape', TENANT_PLAN.FREE, false],
     ['headingFont', TENANT_PLAN.GROWTH, true],
   ] as const)('reports %s on %s as %s', (field, plan, expected) => {
     expect(isLookFieldEntitled(field, plan)).toBe(expected);

@@ -13,6 +13,7 @@ export const LOOK_FIELD = {
   LANGUAGE_SWITCHER_STYLE: 'languageSwitcherStyle',
   CARD_STYLE: 'cardStyle',
   HEADER_CONTROL_STYLE: 'headerControlStyle',
+  HEADER_CONTROL_SHAPE: 'headerControlShape',
   ACCOUNT_BUTTON_STYLE: 'accountButtonStyle',
   ACCOUNT_PANEL_STYLE: 'accountPanelStyle',
   ACCOUNT_PHONE_PLACEMENT: 'accountPhonePlacement',

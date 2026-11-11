@@ -1,0 +1,2 @@
+CREATE TYPE "public"."header_control_shape" AS ENUM('ROUND', 'ROUNDED', 'SQUARE');--> statement-breakpoint
+ALTER TABLE "site_config" ADD COLUMN "header_control_shape" "header_control_shape" DEFAULT 'ROUND' NOT NULL;

@@ -1,6 +1,7 @@
 import {
   BUTTON_SHAPE,
   CARD_STYLE,
+  HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   NAV_LINK_STYLE,
   PRESET_ID,
@@ -23,6 +24,7 @@ const CONSOLE_ROW = {
   ...CONSOLE.themeTokens,
   cardStyle: CONSOLE.cardStyle,
   headerControlStyle: CONSOLE.headerControlStyle,
+  headerControlShape: CONSOLE.headerControlShape,
   buttonShape: CONSOLE.buttonShape,
   navLinkStyle: CONSOLE.navLinkStyle,
 };
@@ -32,6 +34,7 @@ const EDITORIAL_ROW = {
   ...EDITORIAL.themeTokens,
   cardStyle: EDITORIAL.cardStyle,
   headerControlStyle: EDITORIAL.headerControlStyle,
+  headerControlShape: EDITORIAL.headerControlShape,
   buttonShape: EDITORIAL.buttonShape,
   navLinkStyle: EDITORIAL.navLinkStyle,
 };
@@ -45,6 +48,7 @@ describe(toThemeTokens, () => {
       logoHue: CONSOLE.themeTokens.accentHue,
       cardStyle: CONSOLE.cardStyle,
       headerControlStyle: CONSOLE.headerControlStyle,
+      headerControlShape: CONSOLE.headerControlShape,
       buttonShape: CONSOLE.buttonShape,
       navLinkStyle: CONSOLE.navLinkStyle,
     });
@@ -58,6 +62,7 @@ describe(toThemeTokens, () => {
       logoHue: EDITORIAL.themeTokens.accentHue,
       cardStyle: EDITORIAL.cardStyle,
       headerControlStyle: EDITORIAL.headerControlStyle,
+      headerControlShape: EDITORIAL.headerControlShape,
       buttonShape: EDITORIAL.buttonShape,
       navLinkStyle: EDITORIAL.navLinkStyle,
     });
@@ -66,6 +71,7 @@ describe(toThemeTokens, () => {
   it.each([
     { field: 'cardStyle', value: CARD_STYLE.OUTLINED },
     { field: 'headerControlStyle', value: HEADER_CONTROL_STYLE.SOFT },
+    { field: 'headerControlShape', value: HEADER_CONTROL_SHAPE.SQUARE },
     { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
     { field: 'navLinkStyle', value: NAV_LINK_STYLE.UNDERLINE },
   ] as const)(

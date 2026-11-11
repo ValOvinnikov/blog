@@ -11,7 +11,7 @@ import { useConsentStore } from '@web/hooks/use-consent-store';
 import { useTranslations } from 'next-intl';
 
 const floatingCookieSettingsButtonVariants = tv({
-  base: ['fixed bottom-6 left-6 z-20', 'bg-surface shadow-float'],
+  base: ['fixed bottom-6 left-6 z-20', 'rounded-full bg-surface shadow-float'],
 });
 
 export const FloatingCookieSettingsButton = () => {

@@ -10,6 +10,8 @@ import {
   CARD_STYLE_DECLARATIONS,
   DENSITY,
   DENSITY_DECLARATIONS,
+  HEADER_CONTROL_SHAPE,
+  HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   NAV_LINK_STYLE,
@@ -104,6 +106,11 @@ const STYLE_AXES: {
     declarations: HEADER_CONTROL_STYLE_DECLARATIONS,
   },
   {
+    field: 'headerControlShape',
+    defaultValue: HEADER_CONTROL_SHAPE.ROUND,
+    declarations: HEADER_CONTROL_SHAPE_DECLARATIONS,
+  },
+  {
     field: 'buttonShape',
     defaultValue: BUTTON_SHAPE.ROUNDED,
     declarations: BUTTON_SHAPE_DECLARATIONS,
@@ -146,10 +153,20 @@ const declarationsMatchingAny = (source: string, names: string): string[] =>
   source.match(new RegExp(`--(${names}): [^;]+;`, 'g')) ?? [];
 
 describe(buildThemeStyleBlock, () => {
-  it('renders :root before .dark', () => {
-    const css = buildThemeStyleBlock(CONSOLE_TOKENS);
+  describe('with the Console tokens', () => {
+    let css: string;
 
-    expect(css.indexOf(':root')).toBeLessThan(css.indexOf(DARK_SELECTOR));
+    beforeEach(() => {
+      css = buildThemeStyleBlock(CONSOLE_TOKENS);
+    });
+
+    it('renders :root before .dark', () => {
+      expect(css.indexOf(':root')).toBeLessThan(css.indexOf(DARK_SELECTOR));
+    });
+
+    it('leaves the neutral scrim to the static theme', () => {
+      expect(css).not.toContain('--scrim-neutral');
+    });
   });
 
   describe('against the static theme.css defaults', () => {
@@ -262,12 +279,6 @@ describe(buildThemeStyleBlock, () => {
     expect(readHue(css, '--scrim-brand-strong')).toBe(MOCK_ACCENT_HUE);
     expect(readHue(css, '--scrim-brand-mid')).toBe(MOCK_ACCENT_HUE);
     expect(readHue(css, '--scrim-brand-weak')).toBe(MOCK_ACCENT_HUE);
-  });
-
-  it('leaves the neutral scrim to the static theme', () => {
-    const css = buildThemeStyleBlock(CONSOLE_TOKENS);
-
-    expect(css).not.toContain('--scrim-neutral');
   });
 
   it.each(STYLE_AXES)(
