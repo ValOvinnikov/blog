@@ -33,7 +33,6 @@ const DENSITY_GAP: Record<TDensity, number> = {
 };
 
 const COLUMN_COUNT: Record<TGridColumns, number> = {
-  [GRID_COLUMNS.AUTO]: 1,
   [GRID_COLUMNS.TWO]: 2,
   [GRID_COLUMNS.THREE]: 3,
   [GRID_COLUMNS.FOUR]: 4,

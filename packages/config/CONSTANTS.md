@@ -121,7 +121,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/grid-columns.ts`
 
-- **GRID_COLUMNS**: `AUTO`, `TWO`, `THREE`, `FOUR`
+- **GRID_COLUMNS**: `TWO`, `THREE`, `FOUR`
 
 ### `@blog/config/constants` — `packages/config/src/constants/header-control-shape.ts`
 

@@ -1590,14 +1590,6 @@
         "file": "packages/config/src/constants/form-status.ts"
       }
     ],
-    "AUTO": [
-      {
-        "ref": "GRID_COLUMNS.AUTO",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/grid-columns.ts"
-      }
-    ],
     "TWO": [
       {
         "ref": "GRID_COLUMNS.TWO",
