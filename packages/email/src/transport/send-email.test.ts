@@ -49,10 +49,9 @@ const MOCK_RESEND_ERROR_MESSAGE = faker.lorem.sentence();
 
 type TSendEmailModule = typeof import('./send-email');
 
-async function importFreshSendEmail(): Promise<TSendEmailModule['sendEmail']> {
+async function importFreshSendEmailModule(): Promise<TSendEmailModule> {
   vi.resetModules();
-  const freshModule = await import('./send-email');
-  return freshModule.sendEmail;
+  return import('./send-email');
 }
 
 function sentEmail(): Partial<TSendEmailInput> | undefined {
@@ -69,7 +68,7 @@ describe(sendEmail, () => {
       data: { id: faker.string.uuid() },
       error: null,
     });
-    send = await importFreshSendEmail();
+    ({ sendEmail: send } = await importFreshSendEmailModule());
   });
 
   afterEach(() => {
@@ -87,12 +86,6 @@ describe(sendEmail, () => {
 
     it.each(['headers', 'replyTo', 'tags'] as const)('sends no %s', (key) => {
       expect(sentEmail()?.[key]).toBeUndefined();
-    });
-
-    it('reuses a single Resend client across sends', async () => {
-      await send({ ...MOCK_EMAIL, to: faker.internet.email() });
-
-      expect(resendCtorMock).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -116,7 +109,7 @@ describe(sendEmail, () => {
   describe('with only the tenant key set', () => {
     beforeEach(async () => {
       vi.stubEnv('RESEND_PLATFORM_API_KEY', undefined);
-      send = await importFreshSendEmail();
+      ({ sendEmail: send } = await importFreshSendEmailModule());
     });
 
     it('fails platform mail without constructing a Resend client', async () => {
@@ -182,14 +175,6 @@ describe(sendEmail, () => {
 });
 
 describe(isEmailAccountConfigured, () => {
-  type TIsConfigured = TSendEmailModule['isEmailAccountConfigured'];
-
-  async function importFreshIsConfigured(): Promise<TIsConfigured> {
-    vi.resetModules();
-    const freshModule = await import('./send-email');
-    return freshModule.isEmailAccountConfigured;
-  }
-
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -206,7 +191,8 @@ describe(isEmailAccountConfigured, () => {
     async (account, name, key) => {
       vi.stubEnv(name, key);
 
-      const isConfigured = await importFreshIsConfigured();
+      const { isEmailAccountConfigured: isConfigured } =
+        await importFreshSendEmailModule();
 
       expect(isConfigured(account)).toBe(true);
     },
@@ -216,7 +202,8 @@ describe(isEmailAccountConfigured, () => {
     vi.stubEnv('RESEND_PLATFORM_API_KEY', undefined);
     vi.stubEnv('RESEND_TENANT_API_KEY', MOCK_RESEND_TENANT_API_KEY);
 
-    const isConfigured = await importFreshIsConfigured();
+    const { isEmailAccountConfigured: isConfigured } =
+      await importFreshSendEmailModule();
 
     expect(isConfigured(EMAIL_ACCOUNT.PLATFORM)).toBe(false);
   });

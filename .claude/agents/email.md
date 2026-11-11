@@ -44,10 +44,10 @@ don't apply here.
 - **Side-effecting in exactly one place.** `transport/send-email.ts` is the
   only I/O — Resend, `server-only`, and one key per `EMAIL_ACCOUNT`
   (`RESEND_PLATFORM_API_KEY`, `RESEND_TENANT_API_KEY`) through
-  `src/utils/env/env.ts`. Every send names its account. Template building and escaping stay pure. Every
-  subpath in `package.json` `exports` other than `.` is client-safe;
-  `client-safe-entrypoints.test.ts` fails if one reaches `server-only`,
-  `resend` or `utils/env`.
+  `src/utils/env/env.ts`. Every send names its account. Template building
+  and escaping stay pure. Every subpath in `package.json` `exports` other
+  than `.` is client-safe; `client-safe-entrypoints.test.ts` fails if one
+  reaches `server-only`, `resend` or `utils/env`.
 - **Never log, never fetch content, never resolve tenants.** A failure
   reaches the caller, which logs it once; callers pass resolved copy, URLs,
   brand and recipient, so you stay usable from an Auth.js callback with no

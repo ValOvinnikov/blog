@@ -121,8 +121,8 @@ the email in the platform's own look, and sends it.
     `RESEND_PLATFORM_API_KEY`.
   - CI (GitHub Environment): `OPERATOR_ALERT_SECRET` (byte-identical to the
     platform's), `PLATFORM_APP_BASE_URL`.
-  - Worker: `OPERATOR_ALERT_FROM_ADDRESS`, `RESEND_PLATFORM_API_KEY` for the archived
-    Sanity project email.
+  - Worker: `OPERATOR_ALERT_FROM_ADDRESS`, `RESEND_PLATFORM_API_KEY` for the
+    archived Sanity project email.
 
 ## Entry points
 
