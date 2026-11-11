@@ -2,21 +2,9 @@ import {
   CARD_STYLE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
-  LANGUAGE_SWITCHER_STYLE,
-  LOCALE_ISO_CODES,
-  RADIUS_DECLARATIONS,
   RADIUS_SCALE,
 } from '@blog/config';
-import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
-import {
-  LookFormProvider,
-  type TLookFormContext,
-} from '@platform/components/features/look/look-form-provider';
 import { DEVICE_FRAME_TEST_ID } from '@platform/constants/device-frame';
-import {
-  LOOK_FOLLOW_TARGET,
-  LOOK_FOLLOW_TEST_ID,
-} from '@platform/constants/look-follow';
 import { LOOK_FULLSCREEN as LOOK_FULLSCREEN_LIMIT } from '@platform/constants/look-fullscreen';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
@@ -25,40 +13,29 @@ import {
   PREVIEW_DEVICE,
   PREVIEW_DEVICE_WIDTH,
   PREVIEW_FRAME_STATUS_TEST_ID,
-  type TPreviewDevice,
 } from '@platform/constants/preview';
 import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
-import { SAMPLE_PART_ATTRIBUTE } from '@platform/constants/sample-part';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_PRESSED } from '@platform/testing/aria';
-import {
-  act,
-  renderWithIntl,
-  screen,
-  waitFor,
-  within,
-} from '@platform/testing/custom-render';
+import { act, screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
+  CARD_RADIUS_TOKEN,
+  FOOTER_TARGET,
   followLine,
   mockOpenRowTarget,
-  stubMeasuredDesktopSample,
 } from '@platform/testing/look/look-follow';
 import { CONSOLE } from '@platform/testing/look/look-form-fixtures';
+import {
+  renderPreview,
+  setPreviewDevice,
+} from '@platform/testing/look/look-preview-render';
 import {
   stubChangingMediaQueries,
   stubLgUpWindow,
 } from '@platform/testing/match-media';
-import {
-  MOCK_TENANT_DOMAIN,
-  MOCK_TENANT_NAME,
-} from '@platform/testing/tenants/fixtures';
-import {
-  defaultLookFormValues,
-  type TLookFormValues,
-} from '@platform/utils/default-look-values/default-look-values';
-import type { TLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
+import { MOCK_TENANT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookPreview } from './look-preview';
@@ -66,10 +43,6 @@ import { LookPreview } from './look-preview';
 const MOCK_ACCENT_HUE = 28;
 const LOOK_PREVIEW = messages.lookPreview;
 const LOOK_FOLLOW = messages.lookFollow;
-const FOOTER_TARGET: TLookFollowTarget = {
-  kind: LOOK_FOLLOW_TARGET.PART,
-  row: LOOK_ROW.FOOTER,
-};
 const LOOK_FULLSCREEN = messages.lookFullscreen;
 const STYLE_TARGET = mockOpenRowTarget(LOOK_ROW.TYPE);
 const FREE_SAMPLE_NOTE = followLine('freeSample', {
@@ -81,96 +54,6 @@ const DESKTOP = tDevicePreview('deviceDesktop');
 const DESKTOP_WIDTH = PREVIEW_DEVICE_WIDTH[PREVIEW_DEVICE.DESKTOP];
 const DARK = messages.previewModeControl.modeDark;
 const LIVE_PREVIEW = messages.previewModeControl.livePreviewHeading;
-const CARD_RADIUS_TOKEN = '--radius-md';
-const XL_CARD_RADIUS = RADIUS_DECLARATIONS[RADIUS_SCALE.XL][CARD_RADIUS_TOKEN];
-
-const stubPartCornersFromTokens = () => {
-  const computedStyle = window.getComputedStyle.bind(window);
-  vi.spyOn(window, 'getComputedStyle').mockImplementation(
-    (element, pseudoElement) => {
-      const tokens = screen
-        .queryAllByTestId(LOOK_SAMPLE_TOKENS_TEST_ID)
-        .find((root) => root.contains(element));
-      if (!tokens || !element.hasAttribute(SAMPLE_PART_ATTRIBUTE)) {
-        return computedStyle(element, pseudoElement);
-      }
-      const radius = tokens.style.getPropertyValue(CARD_RADIUS_TOKEN);
-      return {
-        borderRadius: radius,
-        borderTopLeftRadius: radius,
-        borderBottomRightRadius: radius,
-      } as CSSStyleDeclaration;
-    },
-  );
-};
-
-type TRenderPreviewOptions = {
-  values?: Partial<TLookFormValues>;
-  previewDevice?: TPreviewDevice;
-  hasReaderAccounts?: boolean;
-  hasCookieBanner?: boolean;
-  followTarget?: TLookFollowTarget;
-  hasLockedFields?: boolean;
-};
-
-const setPreviewDevice = vi.fn();
-
-const lookPreview = ({
-  values = {},
-  previewDevice = PREVIEW_DEVICE.DESKTOP,
-  hasReaderAccounts = true,
-  hasCookieBanner = true,
-  followTarget = { kind: LOOK_FOLLOW_TARGET.IDLE },
-  hasLockedFields = false,
-}: TRenderPreviewOptions = {}) => {
-  const lookForm: TLookFormContext = {
-    tenantName: MOCK_TENANT_NAME,
-    values: {
-      ...defaultLookFormValues(),
-      languageSwitcherStyle: LANGUAGE_SWITCHER_STYLE.CODES,
-      ...values,
-    },
-    updateField: vi.fn(),
-    isLocked: () => false,
-    hasLockedFields,
-    hasCardChanges: () => false,
-    hasFieldChanged: () => false,
-    canResetToPreset: false,
-    isAccentHueRejected: false,
-    accentHueFieldId: 'accent-hue',
-    isBrandNameTooLong: false,
-    brandNameFieldId: 'brand-name',
-    shownBrandName: MOCK_TENANT_NAME,
-    repickKinds: [],
-    brandAssetFieldIds: { logo: 'logo', favicon: 'favicon' },
-    brandImageError: undefined,
-    changePreset: vi.fn(),
-    isPresetValue: () => true,
-    resetFieldToPreset: vi.fn(),
-    resetToPreset: vi.fn(),
-    isSubmenuPreviewOpen: false,
-    setIsSubmenuPreviewOpen: vi.fn(),
-    previewDevice,
-    setPreviewDevice,
-  };
-
-  return (
-    <LookFormProvider value={lookForm}>
-      <LookPreview
-        liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
-        hasReaderAccounts={hasReaderAccounts}
-        hasCookieBanner={hasCookieBanner}
-        siteHost={MOCK_TENANT_DOMAIN}
-        followTarget={followTarget}
-        isShown={true}
-        isScrollingWithPage={false}
-      />
-    </LookFormProvider>
-  );
-};
-
-const renderPreview = (options: TRenderPreviewOptions = {}) =>
-  renderWithIntl(lookPreview(options));
 
 describe(`<${LookPreview.name}/>`, () => {
   let user: UserEvent;
@@ -327,103 +210,6 @@ describe(`<${LookPreview.name}/>`, () => {
 
       expect(cookieSettingsLink()).not.toBeInTheDocument();
       expect(cookieButton()).not.toBeInTheDocument();
-    });
-  });
-
-  describe('follow', () => {
-    const followButton = () =>
-      screen.getByRole('button', { name: LOOK_FOLLOW.followToggle });
-    const toolbar = () => screen.getByRole('toolbar');
-
-    it('presses Follow beside the readout, outside the toolbar, on the phone tab', () => {
-      renderPreview();
-
-      expect(followButton()).toBePressed();
-      expect(toolbar()).not.toContainElement(followButton());
-    });
-
-    it('puts Follow inside the toolbar from lg', () => {
-      stubLgUpWindow();
-      renderPreview();
-
-      const toolbarFollow = within(toolbar()).getByRole('button', {
-        name: LOOK_FOLLOW.followToggle,
-      });
-
-      expect(toolbarFollow).toBePressed();
-    });
-
-    describe('with the sample measured', () => {
-      let restoreMeasuredSample: () => void;
-      const outlines = () =>
-        screen.queryAllByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
-
-      beforeEach(() => {
-        restoreMeasuredSample = stubMeasuredDesktopSample();
-      });
-
-      afterEach(() => {
-        restoreMeasuredSample();
-      });
-
-      it('outlines the followed part with its name', () => {
-        renderPreview({ followTarget: FOOTER_TARGET });
-
-        const [outline] = outlines();
-
-        expect(outline).toHaveTextContent(messages.lookForm.footerHeading);
-      });
-
-      it('drops the outline and says so once Follow is turned off', async () => {
-        renderPreview({ followTarget: FOOTER_TARGET });
-
-        await user.click(followButton());
-
-        const offNote = screen.getByText(LOOK_FOLLOW.off);
-
-        expect(followButton()).not.toBePressed();
-        expect(outlines()).toHaveLength(0);
-        expect(offNote).toBeVisible();
-      });
-
-      it.each([
-        { row: LOOK_ROW.CARDS, partCount: 6 },
-        { row: LOOK_ROW.SHAPE, partCount: 8 },
-        { row: LOOK_ROW.BUTTONS, partCount: 6 },
-        { row: LOOK_ROW.BRAND, partCount: 2 },
-      ])(
-        'outlines all $partCount sample parts $row changes under one tag',
-        ({ row, partCount }) => {
-          renderPreview({ followTarget: mockOpenRowTarget(row) });
-
-          const tags = screen.getAllByTestId(LOOK_FOLLOW_TEST_ID.TAG);
-          const cardName = messages.lookForm[LOOK_ROW_TITLE_KEY[row]];
-
-          expect(outlines()).toHaveLength(partCount);
-          expect(tags).toHaveLength(1);
-          expect(outlines()[0]).toHaveTextContent(cardName);
-        },
-      );
-
-      it('re-rounds the outlines when the corners change', async () => {
-        stubPartCornersFromTokens();
-        const target = mockOpenRowTarget(LOOK_ROW.SHAPE);
-        const { rerender } = renderPreview({
-          values: { radiusScale: RADIUS_SCALE.MD },
-          followTarget: target,
-        });
-
-        rerender(
-          lookPreview({
-            values: { radiusScale: RADIUS_SCALE.XL },
-            followTarget: target,
-          }),
-        );
-
-        await waitFor(() => {
-          expect(outlines()[0]).toHaveStyle({ borderRadius: XL_CARD_RADIUS });
-        });
-      });
     });
   });
 

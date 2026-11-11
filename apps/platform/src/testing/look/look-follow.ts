@@ -2,13 +2,17 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
-import type { TLookRow } from '@platform/constants/look-row';
+import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { PREVIEW_FRAME_STATUS_TEST_ID } from '@platform/constants/preview';
 import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
-import { toLookFollowTarget } from '@platform/utils/look-follow-target/look-follow-target';
+import {
+  type TLookFollowTarget,
+  toLookFollowTarget,
+} from '@platform/utils/look-follow-target/look-follow-target';
 import { createTranslator } from 'next-intl';
 
 const tFollow = createTranslator({
@@ -48,6 +52,13 @@ export const stubMeasuredDesktopSample = () => {
     rectSpy.mockRestore();
   };
 };
+
+export const FOOTER_TARGET: TLookFollowTarget = {
+  kind: LOOK_FOLLOW_TARGET.PART,
+  row: LOOK_ROW.FOOTER,
+};
+
+export const CARD_RADIUS_TOKEN = '--radius-md';
 
 export const mockOpenRowTarget = (row: TLookRow) =>
   toLookFollowTarget([row], row, false);
