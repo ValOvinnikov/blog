@@ -8,10 +8,10 @@ import {
   type TButtonShape,
   type TDensity,
   type THeaderControlStyle,
-  type TRadiusScale,
 } from '@blog/config/constants';
 
 import { BORDER_COLOR } from './border-tokens';
+import { RADIUS_DECLARATIONS } from './radius-declarations';
 import { RADIUS_PILL } from './radius-tokens';
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
@@ -40,37 +40,6 @@ export const IMAGE_SCRIM_RAMP = {
   '--scrim-brand-mid': { l: 0.35, c: 0.12, alpha: 0.72 },
   '--scrim-brand-weak': { l: 0.45, c: 0.14, alpha: 0.4 },
 } as const satisfies TOklchRamp;
-
-export const RADIUS_DECLARATIONS: Record<TRadiusScale, TThemeDeclarations> = {
-  [RADIUS_SCALE.SM]: {
-    '--radius-sm': '2px',
-    '--radius': '4px',
-    '--radius-md': '4px',
-    '--radius-lg': '6px',
-    '--radius-xl': '8px',
-  },
-  [RADIUS_SCALE.MD]: {
-    '--radius-sm': '4px',
-    '--radius': '8px',
-    '--radius-md': '8px',
-    '--radius-lg': '12px',
-    '--radius-xl': '16px',
-  },
-  [RADIUS_SCALE.LG]: {
-    '--radius-sm': '6px',
-    '--radius': '12px',
-    '--radius-md': '12px',
-    '--radius-lg': '18px',
-    '--radius-xl': '24px',
-  },
-  [RADIUS_SCALE.XL]: {
-    '--radius-sm': '8px',
-    '--radius': '16px',
-    '--radius-md': '16px',
-    '--radius-lg': '24px',
-    '--radius-xl': '32px',
-  },
-};
 
 export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
   [DENSITY.DEFAULT]: {
@@ -120,7 +89,10 @@ export const BUTTON_SHAPE_DECLARATIONS: Record<
   TThemeDeclarations
 > = {
   [BUTTON_SHAPE.SQUARE]: { '--radius-button': '0' },
-  [BUTTON_SHAPE.ROUNDED]: { '--radius-button': 'var(--radius-sm)' },
+  // Floored at Small, so None squares cards without turning Rounded into Square.
+  [BUTTON_SHAPE.ROUNDED]: {
+    '--radius-button': `max(var(--radius-sm), ${RADIUS_DECLARATIONS[RADIUS_SCALE.SM]['--radius-sm']})`,
+  },
   [BUTTON_SHAPE.PILL]: { '--radius-button': RADIUS_PILL },
 };
 

@@ -18,6 +18,7 @@ import HeaderControlStylePlain from '@platform/assets/look-glyphs/header-control
 import HeaderControlStyleSoft from '@platform/assets/look-glyphs/header-control-style-soft.svg';
 import RadiusScaleLg from '@platform/assets/look-glyphs/radius-scale-lg.svg';
 import RadiusScaleMd from '@platform/assets/look-glyphs/radius-scale-md.svg';
+import RadiusScaleNone from '@platform/assets/look-glyphs/radius-scale-none.svg';
 import RadiusScaleSm from '@platform/assets/look-glyphs/radius-scale-sm.svg';
 import RadiusScaleXl from '@platform/assets/look-glyphs/radius-scale-xl.svg';
 import type { TGlyph } from '@platform/components/shared/icon';
@@ -38,6 +39,7 @@ type TLookOptionGlyphRegistry = {
 
 export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
   radiusScale: {
+    [RADIUS_SCALE.NONE]: RadiusScaleNone,
     [RADIUS_SCALE.SM]: RadiusScaleSm,
     [RADIUS_SCALE.MD]: RadiusScaleMd,
     [RADIUS_SCALE.LG]: RadiusScaleLg,

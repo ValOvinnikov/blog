@@ -2480,6 +2480,12 @@
         "file": "packages/config/src/constants/module.ts"
       },
       {
+        "ref": "RADIUS_SCALE.NONE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/preset.ts"
+      },
+      {
         "ref": "CONTRAST_STATUS.NONE",
         "scope": "app:platform",
         "from": "@platform/constants/release",
