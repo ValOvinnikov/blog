@@ -1,11 +1,20 @@
-import { BRAND_VARIANT, ICONS, SIZE, type TBrandVariant } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CARD_STYLE,
+  ICONS,
+  SIZE,
+  type TBrandVariant,
+} from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import {
   BRAND_BAND_LABELS,
   BrandBand,
   focusLastLink,
 } from '@blog/ui/testing/brand-bands';
-import { FilledAndPlainOnEachBand } from '@blog/ui/testing/card-styles';
+import {
+  FilledAndPlainOnEachBand,
+  InCardStyle,
+} from '@blog/ui/testing/card-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -512,6 +521,36 @@ export const OnPrimaryBand = restingAndFocusedOn(BRAND_VARIANT.PRIMARY);
 export const OnSecondaryBand = restingAndFocusedOn(BRAND_VARIANT.SECONDARY);
 
 export const OnBrandPrimaryBand = restingAndFocusedOn(
+  BRAND_VARIANT.BRAND_PRIMARY,
+);
+
+const filledNestedAndFocusedOn = (tone: TBrandVariant): TStory => ({
+  name: `Filled on a ${BRAND_BAND_LABELS[tone]} band — nested, and focused`,
+  args: IconMedia.args,
+  render: (args) => (
+    <InCardStyle cardStyle={CARD_STYLE.FILLED}>
+      <BrandBand tone={tone}>
+        <div className="item-card" style={{ width: 320, padding: 16 }}>
+          <MediaCard {...args} isInteractive={false} />
+        </div>
+        <div style={{ width: 280 }}>
+          <MediaCard {...args} />
+        </div>
+      </BrandBand>
+    </InCardStyle>
+  ),
+  play: focusLastLink,
+});
+
+export const FilledOnPrimaryBand = filledNestedAndFocusedOn(
+  BRAND_VARIANT.PRIMARY,
+);
+
+export const FilledOnSecondaryBand = filledNestedAndFocusedOn(
+  BRAND_VARIANT.SECONDARY,
+);
+
+export const FilledOnBrandPrimaryBand = filledNestedAndFocusedOn(
   BRAND_VARIANT.BRAND_PRIMARY,
 );
 

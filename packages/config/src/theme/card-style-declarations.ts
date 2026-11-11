@@ -16,7 +16,7 @@ const FRAMED_BASE = {
   '--item-shadow': NONE,
   '--item-fill-mix': NONE_OF,
   '--item-clear-mix': NONE_OF,
-  '--item-hover-mix': ALL_OF,
+  '--item-card-hover-mix': NONE_OF,
   '--item-divider-width': NO_WIDTH,
   '--item-stack-gap': STACK_GAP,
   '--item-stack-radius': RADIUS_MD,
@@ -42,12 +42,11 @@ export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
     '--item-accent-color': 'var(--brand-primary)',
   },
   [CARD_STYLE.OUTLINED]: { ...FRAMED_BASE, ...OUTLINE },
-  // Hovering a filled card mixes back towards --surface, so it never lowers text contrast.
   [CARD_STYLE.FILLED]: {
     ...FRAMED_BASE,
     ...NO_OUTLINE,
     '--item-fill-mix': ALL_OF,
-    '--item-hover-mix': '50%',
+    '--item-card-hover-mix': ALL_OF,
   },
   [CARD_STYLE.RAISED]: {
     ...FRAMED_BASE,

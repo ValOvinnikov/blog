@@ -3027,11 +3027,12 @@ ring offset could match.
 
 **Elevation is two tokens** (`shadow-card` also carries a heavier `.dark`
 value; `shadow-float` has one value for both modes). `shadow-card` marks a
-raised card — `Panel` and the highlighted `PricingCard` —
+raised card — `Panel`, the highlighted `PricingCard` and every item card under
+`RAISED` —
 and `shadow-float` marks chrome floating above the page, the `Toast` and the
-`PopoverMenu` panel. A static item card carries no shadow (`--item-shadow` is
-`none` under both card styles); a surface's frame, not its depth, is what bounds
-it.
+`PopoverMenu` panel. A static item card carries `shadow-card` only under the
+`RAISED` card style (`--item-shadow` is `none` under the other four); a
+surface's frame, not its depth, is what bounds it.
 
 **No props and no context.** Everything stays server-renderable, dark mode
 follows automatically because the defaults are references rather than literals
@@ -3066,31 +3067,33 @@ the values site-wide on the Look page (`site_config.card_style`), and
 `buildThemeStyleBlock` declares them under `:root` from `@blog/config`'s
 `CARD_STYLE_DECLARATIONS`:
 
-| Property               | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`        | `RAISED`             | `PLAIN`         |
-| ---------------------- | ---------------------- | ------------------ | --------------- | -------------------- | --------------- |
-| `--item-radius`        | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | same            |
-| `--item-border-width`  | `0px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
-| `--item-accent-width`  | `2px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
-| `--item-accent-color`  | `var(--brand-primary)` | `var(--border)`    | `var(--border)` | `var(--border)`      | `var(--border)` |
-| `--item-shadow`        | `none`                 | `none`             | `none`          | `var(--shadow-card)` | `none`          |
-| `--item-fill-mix`      | `0%`                   | `0%`               | `100%`          | `0%`                 | `0%`            |
-| `--item-clear-mix`     | `0%`                   | `0%`               | `0%`            | `0%`                 | `100%`          |
-| `--item-hover-mix`     | `100%`                 | `100%`             | `50%`           | `100%`               | `100%`          |
-| `--item-divider-width` | `0px`                  | `0px`              | `0px`           | `0px`                | `1px`           |
-| `--item-stack-gap`     | `0.75rem`              | `0.75rem`          | `0.75rem`       | `0.75rem`            | `0px`           |
-| `--item-stack-radius`  | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | `0px`           |
+| Property                | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`        | `RAISED`             | `PLAIN`         |
+| ----------------------- | ---------------------- | ------------------ | --------------- | -------------------- | --------------- |
+| `--item-radius`         | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | same            |
+| `--item-border-width`   | `0px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
+| `--item-accent-width`   | `2px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
+| `--item-accent-color`   | `var(--brand-primary)` | `var(--border)`    | `var(--border)` | `var(--border)`      | `var(--border)` |
+| `--item-shadow`         | `none`                 | `none`             | `none`          | `var(--shadow-card)` | `none`          |
+| `--item-fill-mix`       | `0%`                   | `0%`               | `100%`          | `0%`                 | `0%`            |
+| `--item-clear-mix`      | `0%`                   | `0%`               | `0%`            | `0%`                 | `100%`          |
+| `--item-card-hover-mix` | `0%`                   | `0%`               | `100%`          | `0%`                 | `0%`            |
+| `--item-divider-width`  | `0px`                  | `0px`              | `0px`           | `0px`                | `1px`           |
+| `--item-stack-gap`      | `0.75rem`              | `0.75rem`          | `0.75rem`       | `0.75rem`            | `0px`           |
+| `--item-stack-radius`   | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | `0px`           |
 
 The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
-band owns `--item-fill`, the tint a filled card takes on it
-(`surface-secondary` → `--brand-primary-muted`, `surface-brand-primary` →
-`--tint`, the page ground's fallback `--brand-primary-muted`, unset by
+band owns `--item-fill`, the tint a filled card takes on it, and
+`--item-nested-fill`, the fill of a card inside a card, each a single ramp
+token the contrast guard measures text against (`surface-secondary` →
+`--brand-primary-muted` / `--brand-primary-wash`, `surface-brand-primary` →
+`--brand-primary-wash` / `--surface`, the page ground's fallbacks
+`--brand-primary-muted` / `--brand-primary-wash`, both unset by
 `surface-popover`); card style sets only the mix, because a `var()` inside a
 custom property resolves where it is declared, so a colour declared on `:root`
 would ignore the band. That colour is then mixed toward `transparent` by
 `--item-clear-mix`, so `PLAIN` paints no background at all. An item card inside
-another item card takes `--item-fill` one step deeper (the band's tint mixed
-10% toward `--brand-primary`), so a filled card never matches its filled
-parent. Every `Accordion` item draws a top border, and the last a bottom
+another item card takes `--item-nested-fill` as its `--item-fill`, so a filled
+card never matches its filled parent. Every `Accordion` item draws a top border, and the last a bottom
 border, at the wider of `--item-divider-width` and `--item-border-width`, so a
 style with no frame still draws lines above, between and below its items; the
 accordion stacks its items `--item-stack-gap` apart and rounds them at
@@ -3104,10 +3107,10 @@ system-colour line, and a focused stretched card link lifts its ring above it.
 `theme.css`'s
 static values are `ACCENT_BAR`'s, so a site with no saved look renders the
 accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s `bg-item-hover`
-on hover and focus-within: `--surface` mixed toward the band's tint by
-`--item-hover-mix`, the full tint under every style but `FILLED`, which rests on
-that tint and so hovers halfway back to `--surface` — lighter in light mode and
-darker in dark, so the hover never lowers text contrast.
+on hover and focus-within: the band's tint under every style but `FILLED`,
+which rests on a tint and so hovers to the band's `--item-nested-fill`
+(`--item-card-hover-mix: 100%`, which only `item-card` reads, so a
+non-card such as `LogoTile` keeps the tint).
 The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
 `surface-*` retarget) overrides the utility's `--surface` fill, so a card style
 frames the band surface and never paints it.

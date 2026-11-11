@@ -6,7 +6,7 @@ import {
   type TCardStyle,
 } from '@blog/config';
 import type { IWithChildren } from '@blog/config/react';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { BrandBand } from './brand-bands';
 import { StyleVariants } from './style-variants';
@@ -18,6 +18,23 @@ const FILLED_AND_PLAIN_DECLARATIONS = {
   [CARD_STYLE.FILLED]: CARD_STYLE_DECLARATIONS[CARD_STYLE.FILLED],
   [CARD_STYLE.PLAIN]: CARD_STYLE_DECLARATIONS[CARD_STYLE.PLAIN],
 };
+
+type TInCardStyleProps = IWithChildren & {
+  cardStyle: TCardStyle;
+};
+
+export const InCardStyle = ({ cardStyle, children }: TInCardStyleProps) => (
+  <div
+    style={
+      {
+        ...CARD_STYLE_DECLARATIONS[cardStyle],
+        ...DERIVED_ITEM_RADIUS,
+      } as CSSProperties
+    }
+  >
+    {children}
+  </div>
+);
 
 type TCardStylesProps = IWithClassName & {
   children: (cardStyle: TCardStyle) => ReactNode;

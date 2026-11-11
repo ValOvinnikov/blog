@@ -20,24 +20,6 @@ export type TOklchStop = { l: number; c: number; h?: number; alpha?: number };
 
 export type TOklchRamp = Record<`--${string}`, TOklchStop>;
 
-export const ACCENT_RAMP_LIGHT = {
-  '--brand-primary': { l: 0.45, c: 0.17 },
-  '--brand-primary-hover': { l: 0.39, c: 0.17 },
-  '--brand-primary-muted': { l: 0.95, c: 0.03 },
-  '--brand-primary-contrast': { l: 0.99, c: 0, h: 0 },
-  '--brand-primary-solid': { l: 0.51, c: 0.17 },
-  '--brand-primary-solid-hover': { l: 0.45, c: 0.17 },
-} as const satisfies TOklchRamp;
-
-export const ACCENT_RAMP_DARK = {
-  '--brand-primary': { l: 0.7, c: 0.16 },
-  '--brand-primary-hover': { l: 0.76, c: 0.16 },
-  '--brand-primary-muted': { l: 0.3, c: 0.06 },
-  '--brand-primary-contrast': { l: 0.16, c: 0.006, h: 250 },
-  '--brand-primary-solid': { l: 0.7, c: 0.16 },
-  '--brand-primary-solid-hover': { l: 0.76, c: 0.16 },
-} as const satisfies TOklchRamp;
-
 export const LOGO_RAMP_LIGHT = {
   '--logo-1': { l: 0.52, c: 0.17 },
   '--logo-2': { l: 0.63, c: 0.16 },

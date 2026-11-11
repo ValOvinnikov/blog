@@ -68,7 +68,7 @@
   /* prettier-ignore */
   --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
   /* prettier-ignore */
-  --color-item-hover: color-mix(in oklch, var(--surface), var(--tint, var(--brand-primary-muted)) var(--item-hover-mix)); /* @role hovered or focused item card */
+  --color-item-hover: color-mix(in oklch, var(--tint, var(--brand-primary-muted)), var(--item-nested-fill, var(--brand-primary-wash)) var(--item-hover-mix, 0%)); /* @role hovered or focused item card */
   /* prettier-ignore */
   --color-media-fill: var(--media-fill, var(--surface-2)); /* @role icon media fill of the surface in scope */
   /* prettier-ignore */
@@ -302,6 +302,7 @@
   --brand-primary: oklch(0.45 0.17 250);
   --brand-primary-hover: oklch(0.39 0.17 250);
   --brand-primary-muted: oklch(0.95 0.03 250);
+  --brand-primary-wash: oklch(0.975 0.015 250);
   --brand-primary-contrast: oklch(0.99 0 0);
   --brand-primary-solid: oklch(0.51 0.17 250);
   --brand-primary-solid-hover: oklch(0.45 0.17 250);
@@ -390,7 +391,7 @@
   --item-shadow: none;
   --item-fill-mix: 0%;
   --item-clear-mix: 0%;
-  --item-hover-mix: 100%;
+  --item-card-hover-mix: 0%;
   --item-divider-width: 0px;
   --item-stack-gap: 0.75rem;
   --item-stack-radius: var(--radius-md);
@@ -425,6 +426,7 @@
   --brand-primary: oklch(0.7 0.16 250);
   --brand-primary-hover: oklch(0.76 0.16 250);
   --brand-primary-muted: oklch(0.3 0.06 250);
+  --brand-primary-wash: oklch(0.25 0.04 250);
   /* Near-black (not white): the dark-mode primary button is now a bright,
      vivid brand-primary fill (matching --brand-primary) with near-black label
      text, which reads as the intended "bright brand-primary button" look and
@@ -600,6 +602,7 @@
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
   --item-fill: var(--brand-primary-muted);
+  --item-nested-fill: var(--brand-primary-wash);
 }
 
 /* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
@@ -614,7 +617,8 @@
     var(--brand-primary) 10%
   );
   --media-fill: var(--tint);
-  --item-fill: var(--tint);
+  --item-fill: var(--brand-primary-wash);
+  --item-nested-fill: var(--surface);
 }
 
 @utility surface-tint {
@@ -639,21 +643,23 @@
   --divider: var(--border);
 }
 
-/* Unsets a band's mixed --tint and --item-fill, so menu rows and tiles tint with
+/* Unsets a band's mixed --tint and item fills, so menu rows and tiles tint with
    --brand-primary-muted on the panel's own --surface wherever the menu opens. */
 @utility surface-popover {
   --ambient: var(--surface);
   --divider: var(--border);
   --tint: initial;
   --item-fill: initial;
+  --item-nested-fill: initial;
 }
 
 /* The accent bar is drawn over the left border's straight run, between the
    corners, so it stays a straight bar on a rounded card; where it matches the
    border (Outlined) it is invisible. It is a border, not a background, because
    forced colours repaint backgrounds with the page colour but keep borders.
-   Bands own --item-fill and card styles set only --item-fill-mix: a var() in a
-   custom property resolves where declared, so a :root fill would ignore bands. */
+   Bands own --item-fill and --item-nested-fill, each a single ramp token the
+   contrast guard measures, and card styles set only mixes: a var() in a custom
+   property resolves where declared, so a :root fill would ignore bands. */
 @utility item-card {
   position: relative;
   border-style: solid;
@@ -670,15 +676,10 @@
     transparent var(--item-clear-mix)
   );
   box-shadow: var(--item-shadow);
+  --item-hover-mix: var(--item-card-hover-mix);
 
-  /* A card inside a card takes one step deeper than the band's tint, so a
-     filled card never paints the same colour as its filled parent. */
   & .item-card {
-    --item-fill: color-mix(
-      in oklch,
-      var(--tint, var(--brand-primary-muted)),
-      var(--brand-primary) 10%
-    );
+    --item-fill: var(--item-nested-fill, var(--brand-primary-wash));
   }
 
   &::after {

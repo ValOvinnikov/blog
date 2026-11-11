@@ -1,6 +1,6 @@
 import { renderedContrastRatio, WCAG_AA_CONTRAST_MIN } from '@blog/utils/color';
 
-import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './theme-declarations';
+import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './accent-ramps';
 import { NEUTRAL_RAMP_DARK, NEUTRAL_RAMP_LIGHT } from './theme-ramps';
 
 export const isAccentHueAccessible = (hue: number): boolean => {
