@@ -1656,7 +1656,7 @@
       "CONTACT_FORM": "Contactformulier"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Laat lezers inloggen op je site. Bladwijzers, reacties en beoordelingen hebben dit nodig.",
+      "READER_ACCOUNTS": "Laat lezers inloggen op je site. Bladwijzers hebben dit nodig.",
       "COMMENTS": "Laat lezers reageren op berichten.",
       "RATINGS": "Laat lezers berichten beoordelen.",
       "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",

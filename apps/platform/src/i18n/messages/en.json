@@ -1656,7 +1656,7 @@
       "CONTACT_FORM": "Contact form"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Let readers sign in to your site. Bookmarks, comments and ratings need it.",
+      "READER_ACCOUNTS": "Let readers sign in to your site. Bookmarks need it.",
       "COMMENTS": "Let readers leave comments on posts.",
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",

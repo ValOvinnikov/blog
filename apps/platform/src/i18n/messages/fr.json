@@ -1656,7 +1656,7 @@
       "CONTACT_FORM": "Formulaire de contact"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Permettre aux lecteurs de se connecter à votre site. Les favoris, les commentaires et les notes en ont besoin.",
+      "READER_ACCOUNTS": "Permettre aux lecteurs de se connecter à votre site. Les favoris en ont besoin.",
       "COMMENTS": "Permettre aux lecteurs de commenter les articles.",
       "RATINGS": "Permettre aux lecteurs de noter les articles.",
       "BOOKMARKS": "Permettre aux lecteurs d'enregistrer des articles pour plus tard.",
