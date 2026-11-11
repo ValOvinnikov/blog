@@ -832,7 +832,7 @@
       "FLOATING": "Schwebend"
     },
     "navLinkStyleLabel": "Navigationslinks",
-    "navLinkStyleDescription": "Wie die Links der obersten Menüebene aussehen. Links in der Fußzeile bleiben unverändert.",
+    "navLinkStyleDescription": "Wie das Menü die aktuelle Seite und den Link unter dem Mauszeiger hervorhebt. Links in der Fußzeile bleiben unverändert.",
     "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Schlicht",

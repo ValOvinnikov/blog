@@ -4,6 +4,7 @@ import { titleField } from '@blog/studio/schema-types/fields/title-field/title-f
 import { contactFormSchema } from '@blog/studio/schema-types/modules/contact-form/contact-form';
 import { contentSchema } from '@blog/studio/schema-types/modules/content/content';
 import { cookieSettingsSchema } from '@blog/studio/schema-types/modules/cookie-settings/cookie-settings';
+import { embedSchema } from '@blog/studio/schema-types/modules/embed/embed';
 import { faqSchema } from '@blog/studio/schema-types/modules/faq/faq';
 import { featureHighlightsSchema } from '@blog/studio/schema-types/modules/feature-highlights/feature-highlights';
 import { featureListSchema } from '@blog/studio/schema-types/modules/feature-list/feature-list';
@@ -54,6 +55,7 @@ export const homeTemplateSchema = defineType({
         statsSchema.name,
         timelineSchema.name,
         faqSchema.name,
+        embedSchema.name,
         pricingSchema.name,
         contactFormSchema.name,
         cookieSettingsSchema.name,

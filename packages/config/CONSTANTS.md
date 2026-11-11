@@ -90,6 +90,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_TYPE**: `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
 
+### `@blog/config/constants` — `packages/config/src/constants/embed.ts`
+
+- **EMBED_PROVIDER**: `YOUTUBE`, `VIMEO`, `LOOM`, `CAL`, `GOOGLE_MAPS`
+
 ### `@blog/config/constants` — `packages/config/src/constants/error.ts`
 
 - **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`
@@ -170,6 +174,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **MAGIC_LINK_REFUSAL**: `BLOCKED`, `NETWORK_LIMIT`, `ADDRESS_LIMIT`, `CHECK_FAILED`
 - **MAGIC_LINK_SIGN_IN_CODE**: `SEND_LIMITED`
+
+### `@blog/config/constants` — `packages/config/src/constants/media-ratio.ts`
+
+- **MEDIA_RATIO**: `VIDEO`=`"video"`, `VERTICAL`=`"vertical"`, `CLASSIC`=`"classic"`, `PORTRAIT`=`"portrait"`
 
 ### `@blog/config/constants` — `packages/config/src/constants/module-pack.ts`
 

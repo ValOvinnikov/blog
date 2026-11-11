@@ -92,6 +92,7 @@ const REVALIDATE_TAGS = {
   module_timeline: ['modules:timeline'],
   module_pricing: ['modules:pricing'],
   module_sectionPages: ['modules:sectionPages'],
+  module_embed: ['modules:embed'],
   link: ['link'],
   redirect: ['redirect'],
   'translation.metadata': ['translation.metadata'],
