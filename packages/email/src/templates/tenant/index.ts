@@ -9,10 +9,15 @@ export {
 } from './magic-link-invite-email/magic-link-invite-email';
 export {
   buildNewsletterConfirmationEmail,
-  LIST_UNSUBSCRIBE_ONE_CLICK,
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
 } from './newsletter-confirmation/newsletter-confirmation';
+export { LIST_UNSUBSCRIBE_ONE_CLICK } from './list-unsubscribe-headers/list-unsubscribe-headers';
+export {
+  buildPostEmail,
+  type TPostEmailInput,
+  type TPostEmailContent,
+} from './post-email/post-email';
 export {
   buildContactNotificationEmail,
   type TContactNotificationEmailInput,

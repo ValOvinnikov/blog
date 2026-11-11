@@ -58,10 +58,17 @@ export {
   LIST_UNSUBSCRIBE_ONE_CLICK,
   type TNewsletterConfirmationEmailInput,
   type TNewsletterConfirmationEmailContent,
+  buildPostEmail,
+  type TPostEmailInput,
+  type TPostEmailContent,
   buildContactNotificationEmail,
   type TContactNotificationEmailInput,
   type TContactNotificationEmailContent,
   type TTenantEmailIdentity,
 } from './templates/tenant';
-export { sendEmail, type TSendEmailInput } from './transport/send-email';
+export {
+  sendEmail,
+  type TEmailTag,
+  type TSendEmailInput,
+} from './transport/send-email';
 export { isValidEmailAddress } from './validation';
