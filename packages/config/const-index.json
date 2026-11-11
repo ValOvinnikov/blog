@@ -8498,6 +8498,38 @@
         "file": "apps/web/src/constants/http.ts"
       }
     ],
+    "internal_pages.secret_missing": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "internal_pages.tenant_lookup_failed": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "internal_pages.title_fetch_failed": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.TITLE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "internal_pages.path_fetch_failed": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.PATH_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",

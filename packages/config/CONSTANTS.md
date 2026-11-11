@@ -776,6 +776,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
 - **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
+### `@web/constants/internal-pages` — `apps/web/src/constants/internal-pages.ts`
+
+- **INTERNAL_PAGES_LOG**: `SECRET_MISSING`=`"internal_pages.secret_missing"`, `TENANT_LOOKUP_FAILED`=`"internal_pages.tenant_lookup_failed"`, `TITLE_FETCH_FAILED`=`"internal_pages.title_fetch_failed"`, `PATH_FETCH_FAILED`=`"internal_pages.path_fetch_failed"`
+
 ### `@web/constants/module-renderer` — `apps/web/src/constants/module-renderer.ts`
 
 - **MODULE_RENDERER_LOG**: `UNKNOWN_MODULE_TYPE`=`"module_renderer.unknown_module_type"`, `UNKNOWN_HERO_TYPE`=`"hero_slot.unknown_hero_type"`, `PLAN_FETCH_FAILED`=`"module_renderer.plan_fetch_failed"`

@@ -2242,8 +2242,12 @@ else serves the published page. No cookie is set and there is no exit route
 or banner. The preview response may be framed by `PLATFORM_APP_URL`'s origin
 only; every other response refuses framing. Next's Draft Mode is ruled out
 because its cookie holds the deployment-wide `previewModeId`, the same value
-that authorises an on-demand rebuild of any tenant's pages. Detail:
-`docs/features/rendering-and-caching.md`.
+that authorises an on-demand rebuild of any tenant's pages. The path a
+preview signs comes from `apps/web`: `POST /api/internal/pages/{documentId}/path`,
+signed like the title route above under `INTERNAL_PAGES_SECRET`, reads a post
+or landing page through the `drafts` perspective (a never-published draft
+included) and answers its percent-encoded public path, with the locale prefix
+the site serves. Detail: `docs/features/rendering-and-caching.md`.
 
 ### Localization
 
