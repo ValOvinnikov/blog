@@ -762,6 +762,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/http` — `apps/web/src/constants/http.ts`
 
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
+- **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
 ### `@web/constants/module-renderer` — `apps/web/src/constants/module-renderer.ts`
 

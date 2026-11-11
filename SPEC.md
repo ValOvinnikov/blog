@@ -2229,6 +2229,21 @@ heading requirement stays a Studio field rule (§6) rather than
 something the shell silently papers over. The post page is the one page that
 does not use it.
 
+**Draft preview is a signed token, never Draft Mode.** A request whose
+address carries `?preview=<token>` — an HMAC over `{ tenantId, path,
+expiresAt }` under `PREVIEW_LINK_SECRET` — is checked in `apps/web`'s
+`proxy.ts`: the tenant must match the host's and the path the request's.
+A valid token rewrites that one request to a `force-dynamic` draft route
+(`[tenant]/[locale]/~preview/…`) whose render re-verifies it, reads the
+tenant's own Sanity project through the `drafts` perspective with
+`cache: 'no-store'`, and never falls back to the platform project. Anything
+else serves the published page. No cookie is set and there is no exit route
+or banner. The preview response may be framed by `PLATFORM_APP_URL`'s origin
+only; every other response refuses framing. Next's Draft Mode is ruled out
+because its cookie holds the deployment-wide `previewModeId`, the same value
+that authorises an on-demand rebuild of any tenant's pages. Detail:
+`docs/features/rendering-and-caching.md`.
+
 ### Localization
 
 A tenant's site is published in one or more languages: the same pages, posts

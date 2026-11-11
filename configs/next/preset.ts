@@ -16,14 +16,10 @@ const turbopackRoot = (() => {
   }
 })();
 
-const buildSecurityHeaders = (contentSecurityPolicy: string) => [
+const buildFramingHeaders = (contentSecurityPolicy: string) => [
   {
     key: 'Content-Security-Policy',
     value: contentSecurityPolicy,
-  },
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
   },
   {
     key: 'Referrer-Policy',
@@ -32,6 +28,13 @@ const buildSecurityHeaders = (contentSecurityPolicy: string) => [
   {
     key: 'X-Frame-Options',
     value: 'DENY',
+  },
+];
+
+const TRANSPORT_HEADERS = [
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
   },
   {
     key: 'Strict-Transport-Security',
@@ -43,15 +46,39 @@ const buildSecurityHeaders = (contentSecurityPolicy: string) => [
   },
 ];
 
+const ALL_PATHS = '/:path*';
+
+const buildSecurityHeaderRules = (
+  contentSecurityPolicy: string,
+  proxyOwnsFramingForQueryParam: string | undefined,
+) => {
+  const framingHeaders = buildFramingHeaders(contentSecurityPolicy);
+  if (!proxyOwnsFramingForQueryParam) {
+    return [
+      { source: ALL_PATHS, headers: [...framingHeaders, ...TRANSPORT_HEADERS] },
+    ];
+  }
+  return [
+    { source: ALL_PATHS, headers: TRANSPORT_HEADERS },
+    {
+      source: ALL_PATHS,
+      missing: [{ type: 'query' as const, key: proxyOwnsFramingForQueryParam }],
+      headers: framingHeaders,
+    },
+  ];
+};
+
 export type TNextConfigOverrides = Pick<
   NextConfig,
   'transpilePackages' | 'serverExternalPackages' | 'images' | 'experimental'
 > & {
   contentSecurityPolicy: string;
+  proxyOwnsFramingForQueryParam?: string;
 };
 
 export function createNextConfig(overrides: TNextConfigOverrides): NextConfig {
-  const { contentSecurityPolicy, ...appConfig } = overrides;
+  const { contentSecurityPolicy, proxyOwnsFramingForQueryParam, ...appConfig } =
+    overrides;
 
   const config: NextConfig = {
     ...appConfig,
@@ -88,12 +115,10 @@ export function createNextConfig(overrides: TNextConfigOverrides): NextConfig {
       },
     },
     async headers() {
-      return [
-        {
-          source: '/:path*',
-          headers: buildSecurityHeaders(contentSecurityPolicy),
-        },
-      ];
+      return buildSecurityHeaderRules(
+        contentSecurityPolicy,
+        proxyOwnsFramingForQueryParam,
+      );
     },
   };
 

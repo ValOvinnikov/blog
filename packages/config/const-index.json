@@ -8280,6 +8280,14 @@
         "file": "apps/web/src/constants/http.ts"
       }
     ],
+    "noindex": [
+      {
+        "ref": "ROBOTS_DIRECTIVE.NOINDEX",
+        "scope": "app:web",
+        "from": "@web/constants/http",
+        "file": "apps/web/src/constants/http.ts"
+      }
+    ],
     "module_renderer.unknown_module_type": [
       {
         "ref": "MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE",

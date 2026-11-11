@@ -4,15 +4,13 @@ import {
   SITE_MESSAGES_BY_LOCALE,
   type TLocaleIsoCode,
 } from '@blog/config';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
 import { escapeXml } from '@web/utils/escape-xml';
 import { NextResponse } from 'next/server';
 
-const NOINDEX = 'noindex';
-
 const UNAVAILABLE_HEADERS = {
   'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE,
-  'X-Robots-Tag': NOINDEX,
+  'X-Robots-Tag': ROBOTS_DIRECTIVE.NOINDEX,
 };
 
 const PAGE_STYLE =
@@ -34,7 +32,7 @@ export const siteUnavailablePage = (
   const accountLink = accountHref
     ? `<a href="${escapeXml(accountHref)}">${escapeXml(manageAccount)}</a>`
     : '';
-  const html = `<!doctype html><html lang="${LOCALE_BCP47_TAGS[locale]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="${NOINDEX}"><title>${title}</title><style>${PAGE_STYLE}</style></head><body><main><h1>${title}</h1><p>${escapeXml(text)}</p>${accountLink}</main></body></html>`;
+  const html = `<!doctype html><html lang="${LOCALE_BCP47_TAGS[locale]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="${ROBOTS_DIRECTIVE.NOINDEX}"><title>${title}</title><style>${PAGE_STYLE}</style></head><body><main><h1>${title}</h1><p>${escapeXml(text)}</p>${accountLink}</main></body></html>`;
 
   return new NextResponse(html, {
     status: HTTP_STATUS.SERVICE_UNAVAILABLE,

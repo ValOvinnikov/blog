@@ -10,8 +10,17 @@ import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import type { TTranslationMap } from '@blog/service';
 import { faker } from '@faker-js/faker';
-import { CACHE_CONTROL } from '@web/constants/http';
+import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
 import { PROXY_LOG } from '@web/constants/proxy';
+import {
+  DRAFT_PREVIEW_MARKER,
+  PREVIEW_TOKEN_HEADER,
+  PREVIEW_TOKEN_QUERY_PARAM,
+} from '@web/server/draft-preview/constants/constants';
+import {
+  mintPreviewToken,
+  type TPreviewTokenClaims,
+} from '@web/server/draft-preview/preview-token/preview-token';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
@@ -46,7 +55,11 @@ const {
   resolveUncachedTenantMock: vi.fn(),
   getTenantTranslationMapMock: vi.fn(),
   intlMock: vi.fn(),
-  env: { NEXT_PUBLIC_SANITY_DATASET: 'development' },
+  env: {
+    NEXT_PUBLIC_SANITY_DATASET: 'development',
+    PREVIEW_LINK_SECRET: 'preview-link-secret',
+    PLATFORM_APP_URL: 'https://platform.example.test/dashboard',
+  },
 }));
 
 vi.mock('next-intl/middleware', () => ({
@@ -103,6 +116,19 @@ const NEWSLETTER_UNSUBSCRIBE_API_PATH = routes.newsletterUnsubscribeSubmit();
 const SITE_UNAVAILABLE_HEADING = {
   EN: SITE_MESSAGES_BY_LOCALE.EN.siteUnavailable.heading,
   NL: SITE_MESSAGES_BY_LOCALE.NL.siteUnavailable.heading,
+};
+const FORWARDED_PREVIEW_TOKEN_HEADER = `x-middleware-request-${PREVIEW_TOKEN_HEADER}`;
+const MOCK_PLATFORM_ORIGIN = 'https://platform.example.test';
+const FRAME_OPTIONS_HEADER = 'x-frame-options';
+const CSP_HEADER = 'content-security-policy';
+const REFERRER_POLICY_HEADER = 'referrer-policy';
+const CACHE_CONTROL_HEADER = 'cache-control';
+const ROBOTS_TAG_HEADER = 'x-robots-tag';
+const REVALIDATE_API_PATH = '/api/revalidate';
+const MOCK_PREVIEW_CLAIMS: TPreviewTokenClaims = {
+  tenantId: MOCK_TENANT_ID,
+  path: BLOG_POST_PATH,
+  expiresAt: Date.now() + 60_000,
 };
 const MANAGE_ACCOUNT_LABEL = {
   EN: SITE_MESSAGES_BY_LOCALE.EN.siteUnavailable.manageAccount,
@@ -278,12 +304,26 @@ describe('proxy matcher for an operator-suspended site', () => {
     '/api/auth/session',
     '/api/auth/signin/email',
     '/api/auth/callback/email',
-    '/api/revalidate',
+    REVALIDATE_API_PATH,
     '/api/revalidate-site-config',
     '/api/client-log',
   ])('bypasses the proxy for %s', (path) => {
     expect(matches(path)).toBe(false);
   });
+});
+
+describe('proxy matcher for a preview token', () => {
+  it.each([DOTTED_SEGMENT_PATH, REVALIDATE_API_PATH, ROBOTS_PATH])(
+    'runs the proxy for %s when it carries a preview token',
+    (path) => {
+      expect(
+        unstable_doesMiddlewareMatch({
+          config,
+          url: `${MOCK_TENANT_BASE_URL}${path}?${PREVIEW_TOKEN_QUERY_PARAM}=x`,
+        }),
+      ).toBe(true);
+    },
+  );
 });
 
 describe(proxy, () => {
@@ -295,6 +335,104 @@ describe(proxy, () => {
     intlMock.mockReset();
     intlMock.mockImplementation(rewriteToDefaultLocale);
     useProductionDataset(false);
+  });
+
+  describe('draft preview', () => {
+    const withToken = (
+      pathname: string,
+      claims: Partial<TPreviewTokenClaims> = {},
+    ) =>
+      `${pathname}?${PREVIEW_TOKEN_QUERY_PARAM}=${mintPreviewToken({
+        ...MOCK_PREVIEW_CLAIMS,
+        ...claims,
+      })}`;
+
+    describe('with a valid token for this tenant and path', () => {
+      it('routes the request to the draft render without the token in its address', async () => {
+        const response = await visit(withToken(BLOG_POST_PATH));
+
+        expect(response.headers.get(REWRITE_HEADER)).toBe(
+          `${MOCK_TENANT_BASE_URL}/${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}/${EN}/${DRAFT_PREVIEW_MARKER}${BLOG_POST_PATH}`,
+        );
+      });
+
+      it('hands the verified token to the render', async () => {
+        const path = withToken(BLOG_POST_PATH);
+
+        const response = await visit(path);
+
+        expect(response.headers.get(FORWARDED_PREVIEW_TOKEN_HEADER)).toBe(
+          new URLSearchParams(path.split('?')[1]).get(
+            PREVIEW_TOKEN_QUERY_PARAM,
+          ),
+        );
+      });
+
+      it('lets only the platform frame it and keeps it out of caches and indexes', async () => {
+        const { headers } = await visit(withToken(BLOG_POST_PATH));
+
+        expect(headers.get(CSP_HEADER)).toContain(
+          `frame-ancestors ${MOCK_PLATFORM_ORIGIN};`,
+        );
+        expect(headers.get(FRAME_OPTIONS_HEADER)).toBeNull();
+        expect(headers.get(CACHE_CONTROL_HEADER)).toBe(
+          CACHE_CONTROL.PRIVATE_NO_STORE,
+        );
+        expect(headers.get(REFERRER_POLICY_HEADER)).toBe('no-referrer');
+        expect(headers.get(ROBOTS_TAG_HEADER)).toBe(ROBOTS_DIRECTIVE.NOINDEX);
+      });
+    });
+
+    describe.each([
+      ['an expired', { expiresAt: Date.now() - 1 }],
+      ["another tenant's", { tenantId: MOCK_SPOOFED_TENANT_ID }],
+      ["another path's", { path: `${BLOG_POST_PATH}-other` }],
+    ])('with %s token', (_label, claims) => {
+      it('serves the published page without the token in its address', async () => {
+        const response = await visit(withToken(BLOG_POST_PATH, claims));
+
+        expect(response.headers.get(REWRITE_HEADER)).toBe(
+          rewrittenTo(BLOG_POST_PATH),
+        );
+        expect(response.headers.get(FORWARDED_PREVIEW_TOKEN_HEADER)).toBeNull();
+      });
+
+      it('refuses to be framed', async () => {
+        const { headers } = await visit(withToken(BLOG_POST_PATH, claims));
+
+        expect(headers.get(CSP_HEADER)).toContain("frame-ancestors 'none';");
+        expect(headers.get(FRAME_OPTIONS_HEADER)).toBe('DENY');
+      });
+    });
+
+    it('serves the published page for a tampered token', async () => {
+      const response = await visit(`${withToken(BLOG_POST_PATH)}tampered`);
+
+      expect(response.headers.get(FORWARDED_PREVIEW_TOKEN_HEADER)).toBeNull();
+      expect(response.headers.get(FRAME_OPTIONS_HEADER)).toBe('DENY');
+    });
+
+    it('drops a client-supplied preview header from a request without a token', async () => {
+      const response = await visit(BLOG_POST_PATH, {
+        headers: {
+          [PREVIEW_TOKEN_HEADER]: mintPreviewToken(MOCK_PREVIEW_CLAIMS),
+        },
+      });
+
+      expect(response.headers.get(FORWARDED_PREVIEW_TOKEN_HEADER)).toBeNull();
+    });
+
+    it('refuses to frame a passed-through path carrying a token', async () => {
+      const { headers } = await visit(withToken(DOTTED_SEGMENT_PATH));
+
+      expect(headers.get(FRAME_OPTIONS_HEADER)).toBe('DENY');
+    });
+
+    it('leaves the framing headers to next.config without a token', async () => {
+      const { headers } = await visit(BLOG_POST_PATH);
+
+      expect(headers.get(CSP_HEADER)).toBeNull();
+    });
   });
 
   describe('request guard', () => {
@@ -499,7 +637,9 @@ describe(proxy, () => {
       const response = await visit(BLOG_POST_PATH);
 
       expect(response.status).toBe(HTTP_STATUS.SERVICE_UNAVAILABLE);
-      expect(response.headers.get('x-robots-tag')).toBe('noindex');
+      expect(response.headers.get(ROBOTS_TAG_HEADER)).toBe(
+        ROBOTS_DIRECTIVE.NOINDEX,
+      );
       expect(response.headers.get(REWRITE_HEADER)).toBeNull();
       expect(intlMock).not.toHaveBeenCalled();
       expect(await response.text()).toContain(SITE_UNAVAILABLE_HEADING.EN);
@@ -703,7 +843,7 @@ describe(proxy, () => {
         headers: { 'accept-language': ACCEPT_DUTCH },
       });
 
-      expect(response.headers.get('cache-control')).toBe(
+      expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
         CACHE_CONTROL.PRIVATE_NO_STORE,
       );
     });

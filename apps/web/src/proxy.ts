@@ -2,10 +2,13 @@ import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { PROXY_LOG } from '@web/constants/proxy';
 import { SINGLE_LANGUAGE_ROUTING } from '@web/i18n/routing';
+import { applyPreviewResponseHeaders } from '@web/server/draft-preview/apply-preview-response-headers/apply-preview-response-headers';
+import { PREVIEW_TOKEN_HEADER } from '@web/server/draft-preview/constants/constants';
 import { getIntlMiddleware } from '@web/server/proxy/get-intl-middleware/get-intl-middleware';
 import { prependTenantSegment } from '@web/server/proxy/prepend-tenant-segment/prepend-tenant-segment';
 import { redirectSwitchedOffLocale } from '@web/server/proxy/redirect-switched-off-locale/redirect-switched-off-locale';
 import { redirectToPreferredTranslation } from '@web/server/proxy/redirect-to-preferred-translation/redirect-to-preferred-translation';
+import { setRoutingRequestHeaders } from '@web/server/proxy/set-routing-request-headers/set-routing-request-headers';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
@@ -29,9 +32,7 @@ const DOTTED_PATH_PATTERN = /\./;
 const FEED_PATH_PATTERN = /\/rss\.xml$/;
 const SUSPENSION_GATED_PATH_PATTERN = /^\/(?:api\/|sitemap\.xml$)/;
 
-export default async function proxy(
-  request: NextRequest,
-): Promise<NextResponse> {
+const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
   const { pathname } = request.nextUrl;
   const firstSegment = getDecodedFirstPathSegment(pathname);
 
@@ -75,11 +76,7 @@ export default async function proxy(
     return new NextResponse(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
-  // Delete before setting, so a client-forged `x-tenant-id` never survives an unresolved tenant.
-  request.headers.delete(TENANT_ID_HEADER);
-  if (tenantId) {
-    request.headers.set(TENANT_ID_HEADER, tenantId);
-  }
+  const isDraftPreview = setRoutingRequestHeaders(request, tenantId);
 
   const { defaultLocale, liveLocales } =
     tenantRouting ?? SINGLE_LANGUAGE_ROUTING;
@@ -108,18 +105,28 @@ export default async function proxy(
     intlResponse,
     tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
     request,
+    isDraftPreview,
   );
+};
+
+export default async function proxy(
+  request: NextRequest,
+): Promise<NextResponse> {
+  request.headers.delete(PREVIEW_TOKEN_HEADER);
+  return applyPreviewResponseHeaders(request, await routeRequest(request));
 }
 
 export const config = {
   // The UUID is BotID's fixed path prefix, which the tenant-shaped guard would otherwise 404.
   // A dotted final segment skips the proxy unless it is a feed, or the `.rsc` suffix Next matches RSC requests with.
-  // Every entry after the first reaches the proxy only so an operator-suspended site can answer it with 503; newsletter unsubscribe, sign-in and account export stay reachable.
+  // The middle entries reach the proxy only so an operator-suspended site can answer them with 503; newsletter unsubscribe, sign-in and account export stay reachable.
+  // The last sends every request carrying a preview token here, so none escapes the framing headers `next.config` leaves to the proxy; Next requires its key as a literal, not `PREVIEW_TOKEN_QUERY_PARAM`.
   matcher: [
     '/((?!api|_next|_vercel|icon|\\.well-known|149e9513-01fa-4fb0-aad4-566afd725d1b|(?:.*/)?(?!rss\\.xml$|[^/]*\\.rsc$)[^/]*\\.[^/]*$).*)',
     '/sitemap.xml',
     '/api/newsletter/confirm',
     '/api/switch-language',
     '/api/generate-skim',
+    { source: '/:path*', has: [{ type: 'query', key: 'preview' }] },
   ],
 };
