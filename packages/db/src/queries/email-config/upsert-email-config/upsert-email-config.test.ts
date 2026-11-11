@@ -45,6 +45,16 @@ describe(upsertEmailConfig, () => {
     });
   });
 
+  it('turns emailing new posts off and leaves it off on a later save', async () => {
+    await upsertEmailConfig(tenantId, { emailNewPosts: false });
+
+    const result = await upsertEmailConfig(tenantId, {
+      senderName: MOCK_EMAIL_CONFIG.senderName,
+    });
+
+    expect(result.emailNewPosts).toBe(false);
+  });
+
   it('updates the existing row, leaving one row per tenant', async () => {
     await upsertEmailConfig(tenantId, {
       senderName: MOCK_EMAIL_CONFIG.senderName,

@@ -8,6 +8,10 @@ code:
   - packages/db/src/schema/email-templates.ts
   - packages/db/src/queries/email-config/**
   - packages/db/src/queries/email-templates/**
+  - packages/db/src/queries/email-usage/**
+  - packages/db/src/schema/email-usage.ts
+  - packages/db/src/constants/email-usage.ts
+  - packages/config/src/constants/email-type.ts
   - packages/db/src/constants/email-template-defaults.ts
   - packages/config/src/constants/email-template.ts
   - packages/auth/src/providers/magic-link/**
@@ -36,7 +40,9 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 
 ## Data
 
-- `email_config` (one row per tenant): `logo_asset_url`, `sender_name`, `reply_to_address`, `footer_postal_address`.
+- `email_config` (one row per tenant): `logo_asset_url`, `sender_name`, `reply_to_address`, `footer_postal_address`, `email_new_posts` (on by default; a tenant with no row reads it as on through `getEmailNewPosts`).
+- `email_send_counts` (tenant × UTC day × `EMAIL_TYPE`): `count`, one upsert per email sent through `queries.emailUsage.recordEmailSend`. `EMAIL_TYPE` (`@blog/config`): `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`. `countEmailSendsThisMonth` sums one type since the first of the UTC month.
+- `email_delivery_outcome_counts` (tenant × UTC day × `EMAIL_DELIVERY_OUTCOME`): `count`, one upsert per delivery event through `recordEmailDeliveryOutcome`. `EMAIL_DELIVERY_OUTCOME` (`@blog/db`): `DELIVERED`, `BOUNCED`, `COMPLAINED`. `getEmailReputation` reads the last 7 UTC days (`EMAIL_REPUTATION_WINDOW_DAYS`, today included): `resolvedCount` is delivered plus bounced, and the bounce and complaint rates are taken against it (0 when it is 0). Nothing writes these counts yet, and neither table holds platform-bucket mail.
 - `email_templates` (tenant × template type × language): `subject`, `body` (Portable Text in `jsonb`), both nullable.
 - `email_template_logos` (tenant × template type): per-template logo override, the same in every language.
 - `EMAIL_TEMPLATE_TYPE`: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`. Product default copy per language is `EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE` in `@blog/db`.

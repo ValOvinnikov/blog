@@ -9,11 +9,6 @@ import {
   type TEmailConfigResult,
 } from '../get-email-config';
 
-// A field absent from the input is left untouched on `UPDATE` (and falls
-// back to no value on the first `INSERT` for a tenant) — each field saves
-// independently. An explicit `null` clears a previously-set value; that is
-// distinct from omission, which `undefined` alone can't express once a
-// value has already been set.
 export const updateEmailConfigInputSchema = z.object({
   logoAssetUrl: z.string().trim().url().nullable().optional(),
   senderName: z
@@ -32,6 +27,7 @@ export const updateEmailConfigInputSchema = z.object({
     .nullable()
     .optional(),
   contactRecipient: z.string().trim().email().nullable().optional(),
+  emailNewPosts: z.boolean().optional(),
 });
 
 export type TUpdateEmailConfigInput = z.input<
@@ -56,6 +52,9 @@ function presentFields(
   }
   if (!isUndefined(parsed.contactRecipient)) {
     fields.contactRecipient = parsed.contactRecipient;
+  }
+  if (!isUndefined(parsed.emailNewPosts)) {
+    fields.emailNewPosts = parsed.emailNewPosts;
   }
 
   return fields;

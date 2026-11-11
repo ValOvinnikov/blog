@@ -18,6 +18,7 @@ export * from './depth';
 export * from './display-mode';
 export * from './email-field-limits';
 export * from './email-template';
+export * from './email-type';
 export * from './error';
 export * from './finding';
 export * from './footer-fine-print';

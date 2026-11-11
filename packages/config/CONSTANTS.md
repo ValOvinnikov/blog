@@ -86,6 +86,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **EMAIL_TEMPLATE_TYPE**: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`
 
+### `@blog/config/constants` — `packages/config/src/constants/email-type.ts`
+
+- **EMAIL_TYPE**: `SIGN_IN`, `NEWSLETTER_CONFIRMATION`, `NEWSLETTER_ISSUE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/error.ts`
 
 - **ERROR_CODE**: `DB_NOT_FOUND`, `DB_DUPLICATE_DOMAIN`, `DB_LAST_LINKED_METHOD`, `DB_HOLDS_PLATFORM_ROLE`, `DB_ALREADY_PROVISIONING`, `DB_INVALID_DOMAIN`, `DB_INVALID_EMAIL`, `DB_LOCALE_LIMIT_EXCEEDED`, `DB_DEFAULT_LOCALE_REPEATED`, `DB_ALREADY_OWNS_FREE_TENANT`, `DB_DOMAIN_CLAIM_EXISTS`
@@ -292,6 +296,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
+
+### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
+
+- **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
 
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 

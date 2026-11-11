@@ -1122,6 +1122,28 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/email-template.ts"
+      },
+      {
+        "ref": "EMAIL_TYPE.NEWSLETTER_CONFIRMATION",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      }
+    ],
+    "SIGN_IN": [
+      {
+        "ref": "EMAIL_TYPE.SIGN_IN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
+      }
+    ],
+    "NEWSLETTER_ISSUE": [
+      {
+        "ref": "EMAIL_TYPE.NEWSLETTER_ISSUE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-type.ts"
       }
     ],
     "DB_NOT_FOUND": [
@@ -3850,6 +3872,30 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
+      }
+    ],
+    "DELIVERED": [
+      {
+        "ref": "EMAIL_DELIVERY_OUTCOME.DELIVERED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "BOUNCED": [
+      {
+        "ref": "EMAIL_DELIVERY_OUTCOME.BOUNCED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "COMPLAINED": [
+      {
+        "ref": "EMAIL_DELIVERY_OUTCOME.COMPLAINED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
     "OWNER": [

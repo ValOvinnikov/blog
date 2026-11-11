@@ -2,6 +2,7 @@ export * from './admin';
 export * from './audit-event';
 export * from './blocked-signup-identity';
 export * from './email-template-defaults';
+export * from './email-usage';
 export * from './lead';
 export * from './look';
 export * from './membership';
