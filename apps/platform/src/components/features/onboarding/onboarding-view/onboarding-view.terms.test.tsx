@@ -1,11 +1,11 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { SIGN_UP_FIELD_ERROR } from '@platform/constants/sign-up';
 import { screen } from '@platform/testing/custom-render';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   clickCreate,
   createSiteMock,
   MOCK_ACCEPTANCE,
-  reachReview,
   returnToReviewAfterEditingName,
   setup,
   stepHeading,

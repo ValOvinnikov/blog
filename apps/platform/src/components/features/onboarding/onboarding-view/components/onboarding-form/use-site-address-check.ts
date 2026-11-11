@@ -2,15 +2,13 @@
 
 import type { TMaybeUndefined } from '@blog/config';
 import {
+  SITE_ADDRESS_CHECK_DELAY_MS,
   SITE_ADDRESS_STATUS,
   type TSiteAddressStatus,
 } from '@platform/constants/onboarding';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import type { TTenantSlugError } from '@platform/server/tenants/check-tenant-slug';
 import { useEffect, useState } from 'react';
-
-// Long enough that typing an address runs one check, not one per keystroke.
-const SITE_ADDRESS_CHECK_DELAY_MS = 400;
 
 type TCheckedSlug = {
   slug: string;

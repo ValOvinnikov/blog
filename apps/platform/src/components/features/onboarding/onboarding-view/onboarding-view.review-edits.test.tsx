@@ -3,6 +3,7 @@ import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { screen } from '@platform/testing/custom-render';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   acceptAndCreate,
   ADDRESS_TAKEN,
@@ -10,7 +11,6 @@ import {
   editFromReview,
   expectProgressAt,
   MOCK_ADDRESS_FIELD,
-  reachReview,
   returnToReviewAfterEditingName,
   setup,
   SITE_ADDRESS_LABEL,

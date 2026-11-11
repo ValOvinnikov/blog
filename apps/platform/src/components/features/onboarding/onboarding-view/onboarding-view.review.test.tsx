@@ -1,5 +1,6 @@
 import { ONBOARDING_STEP } from '@platform/constants/onboarding';
 import { screen, within } from '@platform/testing/custom-render';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   acceptAndCreate,
   createSiteMock,
@@ -9,7 +10,6 @@ import {
   MOCK_CREATE,
   MOCK_CREATE_SITE_INPUT,
   MOCK_SITE_ADDRESS,
-  reachReview,
   setup,
   SITE_TYPES,
   STEPS,

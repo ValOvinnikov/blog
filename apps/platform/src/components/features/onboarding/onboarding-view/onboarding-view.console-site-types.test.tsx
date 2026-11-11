@@ -1,8 +1,8 @@
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   createAfterChangingSiteType,
   createSiteMock,
   MOCK_CONSOLE_LOOK,
-  reachReview,
   setup,
   SITE_TYPES,
 } from '@platform/testing/onboarding/onboarding-view';

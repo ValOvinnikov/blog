@@ -2,6 +2,7 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { SIGN_UP_REFUSAL } from '@platform/constants/sign-up';
 import { screen } from '@platform/testing/custom-render';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   acceptAndCreate,
   createSiteMock,
@@ -12,7 +13,6 @@ import {
   MOCK_SITE_ADDRESS,
   RAIL_TIER,
   RAIL_TIER_TITLE,
-  reachReview,
   renderInTier,
   TRY_AGAIN_LATER,
 } from '@platform/testing/onboarding/onboarding-view';

@@ -1,4 +1,5 @@
 import { SITE_TYPE } from '@blog/config';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   acceptAndCreate,
   changeSiteTypeFromReview,
@@ -7,7 +8,6 @@ import {
   MOCK_CREATE_SITE_INPUT,
   MOCK_EDITORIAL_LOOK,
   pickSiteType,
-  reachReview,
   setup,
   SITE_TYPES,
 } from '@platform/testing/onboarding/onboarding-view';

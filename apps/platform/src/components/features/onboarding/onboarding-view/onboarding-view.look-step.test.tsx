@@ -2,11 +2,11 @@ import { PRESET_ID } from '@blog/config';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import { ARIA_VALUENOW } from '@platform/testing/aria';
 import { screen } from '@platform/testing/custom-render';
+import { completeAddressStep } from '@platform/testing/onboarding/address-step';
 import {
   ACCENT_LABEL,
   acceptAndCreate,
   clickContinue,
-  completeAddressStep,
   completeSiteStep,
   CONSOLE_PRESET,
   createAfterChangingSiteType,

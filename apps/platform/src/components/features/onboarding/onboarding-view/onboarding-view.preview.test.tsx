@@ -6,6 +6,7 @@ import {
 import { ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   changeSiteTypeFromReview,
   clickBack,
@@ -15,7 +16,6 @@ import {
   MOCK_LIVE_PREVIEW,
   RAIL_TIER,
   RAIL_TIER_TITLE,
-  reachReview,
   renderInTier,
   SITE_TYPES,
 } from '@platform/testing/onboarding/onboarding-view';
