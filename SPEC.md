@@ -3136,8 +3136,9 @@ The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
 frames the band surface and never paints it.
 
 **Button shape** is one inherited property, `--radius-button`, read by the
-`rounded-button` utility on every button-like control (buttons, fields, tags,
-status badges, segmented controls). The tenant stores it on the Look
+`rounded-button` utility on every button-like control (buttons, tags, status
+badges, segmented controls); form fields are not button-like and take the
+radius scale's `rounded-sm`. The tenant stores it on the Look
 (`site_config.button_shape`: `SQUARE`, `ROUNDED` default, `PILL`; a Growth
 field, so a `FREE` site renders its preset's Rounded), and
 `buildThemeStyleBlock` always declares `BUTTON_SHAPE_DECLARATIONS` under
