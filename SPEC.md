@@ -3159,8 +3159,9 @@ static values; the radius falls back to `var(--radius-sm)` at the element.
 
 **Header buttons shape** sets the corners of every header control — the
 language switcher's trigger and codes pill (and the current-language chip
-inside it), the theme toggle, the menu button and the account button —
-through one inherited property, `--radius-header-control`, read by the
+inside it, whose `rounded-header-control-inner` corner is the frame's radius
+less the 3px gap, never below 0), the theme toggle, the menu button and the
+account button — through one inherited property, `--radius-header-control`, read by the
 `rounded-header-control` utility in `HEADER_CONTROL_FRAME`. The tenant stores
 it on the Look (`site_config.header_control_shape`: `ROUND` default,
 `ROUNDED`, `SQUARE`; a Growth field, so a `FREE` site renders its preset's

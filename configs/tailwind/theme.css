@@ -564,6 +564,11 @@
   border-radius: var(--radius-header-control, 9999px);
 }
 
+/* 3px is the board's gap between a header control's frame and a chip inside it. */
+@utility rounded-header-control-inner {
+  border-radius: max(0px, calc(var(--radius-header-control, 9999px) - 3px));
+}
+
 @utility nav-link-marked {
   background-color: var(--nav-link-fill);
   outline: 1px solid var(--nav-link-outline);
