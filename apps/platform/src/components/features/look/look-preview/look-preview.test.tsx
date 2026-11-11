@@ -93,33 +93,33 @@ describe(`<${LookPreview.name}/>`, () => {
     expect(sampleTokens).toHaveStyle(tokens);
   });
 
-  it('hands a picked device to the Look form', async () => {
-    renderPreview();
-
-    const tabletButton = screen.getByRole('button', { name: TABLET });
-    await user.click(tabletButton);
-
-    expect(setPreviewDevice).toHaveBeenCalledWith(PREVIEW_DEVICE.TABLET);
-  });
-
-  it('shows the site host in the desktop browser bar', () => {
-    renderPreview();
-
-    const browserBar = screen.getByTestId(DEVICE_FRAME_TEST_ID.BROWSER_BAR);
-
-    expect(browserBar).toHaveTextContent(MOCK_TENANT_DOMAIN);
-  });
-
-  it('offers the reader switch when reader accounts are on', () => {
-    renderPreview();
-
-    const readerGroup = screen.getByRole('group', {
-      name: LOOK_PREVIEW.readerStateAriaLabel,
+  describe('with the default preview', () => {
+    beforeEach(() => {
+      renderPreview();
     });
-    const statusText = screen.getByTestId(PREVIEW_FRAME_STATUS_TEST_ID);
 
-    expect(readerGroup).toBeVisible();
-    expect(statusText).not.toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
+    it('hands a picked device to the Look form', async () => {
+      const tabletButton = screen.getByRole('button', { name: TABLET });
+      await user.click(tabletButton);
+
+      expect(setPreviewDevice).toHaveBeenCalledWith(PREVIEW_DEVICE.TABLET);
+    });
+
+    it('shows the site host in the desktop browser bar', () => {
+      const browserBar = screen.getByTestId(DEVICE_FRAME_TEST_ID.BROWSER_BAR);
+
+      expect(browserBar).toHaveTextContent(MOCK_TENANT_DOMAIN);
+    });
+
+    it('offers the reader switch when reader accounts are on', () => {
+      const readerGroup = screen.getByRole('group', {
+        name: LOOK_PREVIEW.readerStateAriaLabel,
+      });
+      const statusText = screen.getByTestId(PREVIEW_FRAME_STATUS_TEST_ID);
+
+      expect(readerGroup).toBeVisible();
+      expect(statusText).not.toHaveTextContent(LOOK_PREVIEW.readerAccountsOff);
+    });
   });
 
   it('explains the missing reader switch when reader accounts are off', () => {
@@ -225,27 +225,30 @@ describe(`<${LookPreview.name}/>`, () => {
     const readoutText = (key: string) =>
       tDevicePreview(key, { width: DESKTOP_WIDTH, percent: 100 });
 
-    it('puts Open preview full screen with Follow, outside the toolbar, on the phone tab', () => {
-      renderPreview();
-
-      const toolbar = screen.getByRole('toolbar');
-      const follow = screen.getByRole('button', {
-        name: LOOK_FOLLOW.followToggle,
+    describe('with the preview rendered', () => {
+      beforeEach(() => {
+        renderPreview();
       });
 
-      expect(toolbar).not.toContainElement(openButton());
-      expect(toolbar).not.toContainElement(follow);
-    });
+      it('puts Open preview full screen with Follow, outside the toolbar, on the phone tab', () => {
+        const toolbar = screen.getByRole('toolbar');
+        const follow = screen.getByRole('button', {
+          name: LOOK_FOLLOW.followToggle,
+        });
 
-    it('reads the short readout below lg', async () => {
-      renderPreview();
-      await user.click(openButton());
+        expect(toolbar).not.toContainElement(openButton());
+        expect(toolbar).not.toContainElement(follow);
+      });
 
-      const readout = within(dialog()).getByText(
-        readoutText('readoutPhoneTab'),
-      );
+      it('reads the short readout below lg', async () => {
+        await user.click(openButton());
 
-      expect(readout).toHaveRole('status');
+        const readout = within(dialog()).getByText(
+          readoutText('readoutPhoneTab'),
+        );
+
+        expect(readout).toHaveRole('status');
+      });
     });
 
     it('returns focus to Open preview full screen after the window crosses lg', async () => {

@@ -114,30 +114,73 @@ describe(useLookFollow, () => {
     });
   });
 
-  it('reports the end of the page for a tall phone sample', () => {
-    const { current, update } = setup({ device: PREVIEW_DEVICE.PHONE });
+  describe('on a phone sample', () => {
+    let current: ReturnType<typeof setup>['current'];
+    let update: ReturnType<typeof setup>['update'];
 
-    update({ target: FOOTER });
+    beforeEach(() => {
+      ({ current, update } = setup({ device: PREVIEW_DEVICE.PHONE }));
+      update({ target: FOOTER });
+    });
 
-    expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_END);
+    it('reports the end of the page for a tall sample', () => {
+      expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_END);
+    });
+
+    it('keeps the settled line through a change of scale', () => {
+      update({ scale: RESIZED_SCALE });
+
+      expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_END);
+    });
   });
 
-  it('leaves a frame already at the header where it is', () => {
-    const { current, scrollTo, update } = setup();
+  describe('on the default frame', () => {
+    let current: ReturnType<typeof setup>['current'];
+    let scrollTo: ReturnType<typeof setup>['scrollTo'];
+    let update: ReturnType<typeof setup>['update'];
 
-    update({ target: HEADER });
+    beforeEach(() => {
+      ({ current, scrollTo, update } = setup());
+    });
 
-    expect(scrollTo).not.toHaveBeenCalled();
-    expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.IN_VIEW);
+    it('leaves a frame already at the header where it is', () => {
+      update({ target: HEADER });
+
+      expect(scrollTo).not.toHaveBeenCalled();
+      expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.IN_VIEW);
+    });
+
+    it('follows an outlining Style card without scrolling the frame', () => {
+      update({ target: CARDS });
+
+      expect(current().isFollowing).toBe(true);
+      expect(current().outline?.row).toBe(LOOK_ROW.CARDS);
+      expect(scrollTo).not.toHaveBeenCalled();
+    });
   });
 
-  it('scrolls back to the top when the header follows the footer', () => {
-    const { current, update } = setup();
+  describe('on a frame with nothing yet followed', () => {
+    let current: ReturnType<typeof setup>['current'];
+    let update: ReturnType<typeof setup>['update'];
 
-    update({ target: FOOTER });
-    update({ target: HEADER });
+    beforeEach(() => {
+      ({ current, update } = setup());
+    });
 
-    expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_TOP);
+    it('scrolls back to the top when the header follows the footer', () => {
+      update({ target: FOOTER });
+      update({ target: HEADER });
+
+      expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_TOP);
+    });
+
+    it('never pauses on a hand scroll while nothing is followed', () => {
+      update({ target: TYPE });
+
+      act(() => current().onHandScroll());
+
+      expect(current().isPaused).toBe(false);
+    });
   });
 
   it('only outlines when the sample fits the device screen', () => {
@@ -183,15 +226,6 @@ describe(useLookFollow, () => {
     update({ target });
 
     expect(position.top).toBe(MAX_TOP);
-  });
-
-  it('keeps the settled line through a change of scale', () => {
-    const { current, update } = setup({ device: PREVIEW_DEVICE.PHONE });
-    update({ target: FOOTER });
-
-    update({ scale: RESIZED_SCALE });
-
-    expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_END);
   });
 
   describe('on the Preview tab', () => {
@@ -252,16 +286,6 @@ describe(useLookFollow, () => {
     });
   });
 
-  it('follows an outlining Style card without scrolling the frame', () => {
-    const { current, scrollTo, update } = setup();
-
-    update({ target: CARDS });
-
-    expect(current().isFollowing).toBe(true);
-    expect(current().outline?.row).toBe(LOOK_ROW.CARDS);
-    expect(scrollTo).not.toHaveBeenCalled();
-  });
-
   describe('after a hand scroll', () => {
     it.each([
       { name: 'a Site parts card', target: FOOTER },
@@ -298,15 +322,6 @@ describe(useLookFollow, () => {
       expect(position.top).toBe(MAX_TOP);
       expect(current().settled?.outcome).toBe(LOOK_FOLLOW_OUTCOME.AT_END);
     });
-  });
-
-  it('never pauses on a hand scroll while nothing is followed', () => {
-    const { current, update } = setup();
-    update({ target: TYPE });
-
-    act(() => current().onHandScroll());
-
-    expect(current().isPaused).toBe(false);
   });
 
   it('keeps the frame still while following is off', () => {

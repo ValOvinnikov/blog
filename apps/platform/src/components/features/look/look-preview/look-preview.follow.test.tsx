@@ -89,24 +89,26 @@ describe(`<${LookPreview.name}/> follow`, () => {
       restoreMeasuredSample();
     });
 
-    it('outlines the followed part with its name', () => {
-      renderPreview({ followTarget: FOOTER_TARGET });
+    describe('with the footer followed', () => {
+      beforeEach(() => {
+        renderPreview({ followTarget: FOOTER_TARGET });
+      });
 
-      const [outline] = outlines();
+      it('outlines the followed part with its name', () => {
+        const [outline] = outlines();
 
-      expect(outline).toHaveTextContent(messages.lookForm.footerHeading);
-    });
+        expect(outline).toHaveTextContent(messages.lookForm.footerHeading);
+      });
 
-    it('drops the outline and says so once Follow is turned off', async () => {
-      renderPreview({ followTarget: FOOTER_TARGET });
+      it('drops the outline and says so once Follow is turned off', async () => {
+        await user.click(followButton());
 
-      await user.click(followButton());
+        const offNote = screen.getByText(LOOK_FOLLOW.off);
 
-      const offNote = screen.getByText(LOOK_FOLLOW.off);
-
-      expect(followButton()).not.toBePressed();
-      expect(outlines()).toHaveLength(0);
-      expect(offNote).toBeVisible();
+        expect(followButton()).not.toBePressed();
+        expect(outlines()).toHaveLength(0);
+        expect(offNote).toBeVisible();
+      });
     });
 
     it.each([
