@@ -135,7 +135,6 @@
   --radius-card: var(--radius-md);
   --radius-media: var(--radius-lg);
   --radius-item: var(--item-radius);
-  --radius-header-control: 9999px;
 
   /* Layout */
   --container-content: 72rem;
@@ -549,6 +548,10 @@
 /* Falls back at the element, like rounded-button, so it follows the nearest --radius-sm. */
 @utility rounded-nav-link {
   border-radius: var(--nav-link-radius, var(--radius-sm));
+}
+
+@utility rounded-header-control {
+  border-radius: var(--radius-header-control, 9999px);
 }
 
 @utility nav-link-marked {
