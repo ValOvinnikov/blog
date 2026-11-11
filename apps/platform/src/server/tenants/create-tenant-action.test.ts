@@ -178,7 +178,7 @@ describe(createTenantAction, () => {
   it('refuses an unsupported language with a field error before any lookup', async () => {
     const result = await createTenantAction({
       ...validInput,
-      locale: MOCK_UNSUPPORTED_LOCALE,
+      locale: MOCK_UNSUPPORTED_LOCALE as never,
     });
 
     expect(result).toEqual({
