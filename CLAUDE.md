@@ -1117,7 +1117,9 @@ dispatch are replaced as "Solo-session mode" describes — every other step,
 including both approval gates, is unchanged.)
 
 1. Set issue → In Progress on the board
-2. Checkout branch from `main`
+2. Checkout branch from `main`, named by
+   `pnpm -s branch:name <n> "<issue title>"` (`<type>/<n>-<slug>`; any other
+   name is refused at push)
 3. Do the work + run quality gates — merge `origin/main` in before verify
    (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
@@ -1406,13 +1408,12 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
 
 - **Starting:** comment on the issue ("starting work in a cloud session"), then
   rename the branch before the first push. A web/remote session starts on a
-  generated name like `claude/optimistic-noether-isuljn`, which carries no
-  issue number; rename it to `<type>/<n>-<slug>`, the slug from the ticket
-  title (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
-  may have a single member"). A pushed branch with that name is the In
-  Progress signal. The GitHub Actions `@claude` path can't rename:
-  `claude-code-action` generates `claude/issue-<n>-<timestamp>`, which
-  `board-keeper.md` Step 2 also reads as In Progress.
+  generated name like `claude/optimistic-noether-isuljn` or
+  `claude/issue-<n>-<id>`; rename it with
+  `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`, which the
+  `SessionStart` hook prints when the branch is off the pattern. A pushed
+  branch with that name is the In Progress signal. Any other name is refused
+  at push and fails the PR's `branch-name` check.
 - **In review:** open the PR as a draft with the issue reference
   (`Closes #n` on the completing PR only) — an open PR, draft or not, is the
   Code Review signal, and the owner marks it ready at final review. On the
