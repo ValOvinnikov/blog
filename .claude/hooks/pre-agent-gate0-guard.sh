@@ -7,9 +7,7 @@
 # happens on a single *action* — dispatching a layer agent. In practice Gate 0
 # gets run when the orchestrator consciously enters "shipping an issue" mode
 # and gets skipped when a dispatch emerges from conversational momentum
-# (decision → spec → tickets → dispatch). CLAUDE.md already carries two
-# emphatic prose warnings about structurally identical traps; a third had no
-# reason to work better.
+# (decision → spec → tickets → dispatch).
 #
 # Deliberately narrow, for the same reason `read-only-agent-guard.sh` is:
 # a guard that fires on honest work gets disabled, and then protects nothing.

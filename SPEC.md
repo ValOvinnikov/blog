@@ -3167,6 +3167,7 @@ it on the Look (`site_config.header_control_shape`: `ROUND` default,
 `ROUNDED`, `SQUARE`; a Growth field, so a `FREE` site renders its preset's
 Round), and `buildThemeStyleBlock` always declares
 `HEADER_CONTROL_SHAPE_DECLARATIONS` under `:root`, beside the radius scale:
-Rounded is `var(--radius-md)`, so it follows Corners. It combines freely with
+Rounded is `var(--radius-md)` floored at Small, so it follows Corners and
+stays distinct from Square under None. It combines freely with
 the header buttons style. The floating cookie-settings button borrows the
 header control recipe but is not a header control, so it stays round.

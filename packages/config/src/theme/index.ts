@@ -6,6 +6,7 @@ export * from './contrast-pairs';
 export * from './contrast-tokens';
 export * from './header-control-shape-declarations';
 export * from './nav-link-declarations';
+export * from './radius-declarations';
 export * from './resolve-tenant-email-brand';
 export * from './theme-declarations';
 export * from './theme-ramps';

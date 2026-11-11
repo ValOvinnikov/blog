@@ -6,6 +6,7 @@ import type { TPreviewDevice } from '@platform/constants/preview';
 import {
   LOOK_FOLLOW_SCROLL,
   toLookFollowKey,
+  toLookFollowOutline,
   type TLookFollowTarget,
 } from '@platform/utils/look-follow-target/look-follow-target';
 import { useMotionScrollBehavior } from '@platform/utils/use-motion-scroll-behavior/use-motion-scroll-behavior';
@@ -42,14 +43,15 @@ export const useLookFollow = ({
     setIsPaused(false);
   }
 
-  const row = target.kind === LOOK_FOLLOW_TARGET.PART ? target.row : undefined;
-  const scrollTarget = row
-    ? LOOK_FOLLOW_SCROLL[row]
-    : target.kind === LOOK_FOLLOW_TARGET.IDLE
-      ? DEVICE_FRAME_SCROLL_TARGET.TOP
-      : undefined;
+  const outline = toLookFollowOutline(target);
+  const scrollTarget =
+    target.kind === LOOK_FOLLOW_TARGET.PART
+      ? LOOK_FOLLOW_SCROLL[target.row]
+      : target.kind === LOOK_FOLLOW_TARGET.IDLE
+        ? DEVICE_FRAME_SCROLL_TARGET.TOP
+        : undefined;
   const isActive = isOn && !isPaused;
-  const isFollowing = isActive && !!row;
+  const isFollowing = isActive && !!outline;
   const layoutKey = `${device}|${isShown}|${scale}`;
   const settledKey = `${targetKey}|${device}|${request}`;
 
@@ -91,7 +93,7 @@ export const useLookFollow = ({
       : undefined;
 
   const follow = {
-    row,
+    outline,
     isOn,
     isPaused,
     isFollowing,

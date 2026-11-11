@@ -38,10 +38,10 @@ export const LookFollowStatus = ({
 }: TLookFollowStatusProps) => {
   const t = useTranslations('lookFollow');
   const tForm = useTranslations('lookForm');
-  const { isOn, isPaused, isFollowing, row, settled, resume, scrollToTop } =
+  const { isOn, isPaused, isFollowing, outline, settled, resume, scrollToTop } =
     follow;
   const { action, topIcon } = lookFollowStatusVariants();
-  const part = row ? tForm(LOOK_ROW_TITLE_KEY[row]) : '';
+  const part = outline ? tForm(LOOK_ROW_TITLE_KEY[outline.row]) : '';
 
   const isTopOfPageShown =
     isFollowing &&

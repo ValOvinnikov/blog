@@ -1,5 +1,5 @@
 {
-  "id": "c908df29-6f83-4184-85d1-0abd0825e268",
+  "id": "a35e35cb-4242-4cd0-97b9-b1910e27b9a0",
   "prevId": "4d5fb2c7-8d95-4587-ba20-f1a063117f54",
   "version": "7",
   "dialect": "postgresql",
@@ -1487,13 +1487,6 @@
           "notNull": true,
           "default": "'OUTLINED'"
         },
-        "header_control_shape": {
-          "name": "header_control_shape",
-          "type": "header_control_shape",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'ROUND'"
-        },
         "account_button_style": {
           "name": "account_button_style",
           "type": "account_button_style",
@@ -2419,11 +2412,6 @@
       "schema": "public",
       "values": ["FULL_WIDTH", "FLOATING"]
     },
-    "public.header_control_shape": {
-      "name": "header_control_shape",
-      "schema": "public",
-      "values": ["ROUND", "ROUNDED", "SQUARE"]
-    },
     "public.header_control_style": {
       "name": "header_control_style",
       "schema": "public",
@@ -2464,7 +2452,7 @@
     "public.radius_scale": {
       "name": "radius_scale",
       "schema": "public",
-      "values": ["SM", "MD", "LG", "XL"]
+      "values": ["NONE", "SM", "MD", "LG", "XL"]
     },
     "public.spinner_style": {
       "name": "spinner_style",

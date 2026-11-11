@@ -2,7 +2,7 @@
 
 Guidance for working in this repo. `SPEC.md` is the architecture core — layer
 contracts, data flow, cross-cutting rules — and `docs/features/<feature>.md` is
-the per-feature reference ("Feature docs" under Conventions). Open work lives on
+the per-feature reference ("Docs move with the code" under Conventions). Open work lives on
 the project board ("Ticket priority & triage"); `docs/ROADMAP.md` is the order
 the open epics ship in. `docs/archive/` is frozen history — never read it for
 current behaviour; when it disagrees with `SPEC.md`, the spec wins.
@@ -227,8 +227,9 @@ Layer work is delegated to its subagent in `.claude/agents/`, in dependency
 order, for the whole lifecycle — first draft, review fix and one-line tweak
 alike. The orchestrator's own hands touch only governance docs (`CLAUDE.md`,
 `.claude/**`, `SPEC.md`, `README.md`, `docs/**`), scratchpad → branch
-assembly, `pnpm typegen` and orchestration. Dispatches run in the background
-and completion arrives as a notification — never poll. Details:
+assembly, `pnpm typegen` and orchestration. Dispatches run in the background,
+except the Gate 0 `board-keeper` dispatch and the board write after
+`gh pr create`, and completion arrives as a notification — never poll. Details:
 `develop-feature` § "Use the scoped agents"; solo cloud: "Solo-session mode".
 
 ## Use the skills
@@ -464,7 +465,8 @@ and completion arrives as a notification — never poll. Details:
   vocabulary an outside standard spells — a value compared with an env read
   (`process.env.NODE_ENV === 'production'`), an env read's bracket key
   (`process.env['X']`), a `stubEnv` argument, a protocol attribute's
-  value (`sameSite: 'strict'`; for `target`, only `'_blank'`), and a
+  value (`sameSite: 'strict'`; for `target`, only `'_blank'`; for `type`,
+  only `'button'`, `'submit'` and `'reset'`), and a
   Testing Library role query's role
   (`getByRole('button')`); a
   match in the other app is reported, never shared. Lint enforces both on

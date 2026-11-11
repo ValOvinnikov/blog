@@ -5,54 +5,68 @@ import {
   LOOK_FOLLOW_MARK,
   LOOK_FOLLOW_TEST_ID,
 } from '@platform/constants/look-follow';
-import { SAMPLE_PART } from '@platform/constants/sample-part';
-import {
-  LOOK_FOLLOW_PART,
-  type TSitePartsRow,
-} from '@platform/utils/look-follow-target/look-follow-target';
+import type { TLookFollowOutline } from '@platform/utils/look-follow-target/look-follow-target';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
 import { lookFollowMarkVariants } from './look-follow-mark-variants';
-import { usePartBox } from './use-part-box';
+import { usePartBoxes } from './use-part-boxes';
 
 export type TLookFollowMarkProps = {
-  row: TSitePartsRow;
+  outline: TLookFollowOutline;
   scale: number;
 };
 
-export const LookFollowMark = ({ row, scale }: TLookFollowMarkProps) => {
+export const LookFollowMark = ({
+  outline: { row, parts },
+  scale,
+}: TLookFollowMarkProps) => {
   const t = useTranslations('lookForm');
-  const part = LOOK_FOLLOW_PART[row];
-  const markRef = useRef<HTMLDivElement>(null);
-  const box = usePartBox(markRef, part, scale);
-  const isTagBelow = part === SAMPLE_PART.HEADER;
-  const { mark, tag } = lookFollowMarkVariants({ isTagBelow });
+  const rootRef = useRef<HTMLDivElement>(null);
+  const boxes = usePartBoxes(rootRef, parts, scale);
+  const [first] = boxes;
   const outlineWidth = LOOK_FOLLOW_MARK.OUTLINE_WIDTH / scale;
+  const outlineOffset = LOOK_FOLLOW_MARK.OUTLINE_OFFSET / scale;
+  const tagHeight = LOOK_FOLLOW_MARK.TAG_HEIGHT / scale;
+  const ringOutset = first?.isInset ? 0 : outlineOffset + outlineWidth;
+  const isTagBelow = !!first && first.top < tagHeight + ringOutset;
+  const { root, mark, tag } = lookFollowMarkVariants({ isTagBelow });
   const radius = `${LOOK_FOLLOW_MARK.TAG_RADIUS / scale}px`;
 
   return (
-    <div
-      ref={markRef}
-      aria-hidden="true"
-      hidden={!box}
-      className={mark()}
-      style={{ ...box, outlineWidth, outlineOffset: -outlineWidth }}
-      data-testid={LOOK_FOLLOW_TEST_ID.OUTLINE}
-    >
-      <span
-        className={tag()}
-        style={{
-          fontSize: LOOK_FOLLOW_MARK.TAG_FONT_SIZE / scale,
-          height: LOOK_FOLLOW_MARK.TAG_HEIGHT / scale,
-          paddingInline: LOOK_FOLLOW_MARK.TAG_PADDING_X / scale,
-          borderRadius: isTagBelow
-            ? `0 0 ${radius} ${radius}`
-            : `${radius} ${radius} 0 0`,
-        }}
-      >
-        {t(LOOK_ROW_TITLE_KEY[row])}
-      </span>
+    <div ref={rootRef} className={root()}>
+      {boxes.map(({ key, isInset, ...box }, index) => (
+        <div
+          key={key}
+          aria-hidden="true"
+          className={mark()}
+          style={{
+            ...box,
+            outlineWidth,
+            outlineOffset: isInset ? -outlineWidth : outlineOffset,
+          }}
+          data-testid={LOOK_FOLLOW_TEST_ID.OUTLINE}
+        >
+          {index === 0 && (
+            <span
+              className={tag()}
+              style={{
+                fontSize: LOOK_FOLLOW_MARK.TAG_FONT_SIZE / scale,
+                height: tagHeight,
+                left: -ringOutset,
+                [isTagBelow ? 'marginTop' : 'marginBottom']: ringOutset,
+                paddingInline: LOOK_FOLLOW_MARK.TAG_PADDING_X / scale,
+                borderRadius: isTagBelow
+                  ? `0 0 ${radius} ${radius}`
+                  : `${radius} ${radius} 0 0`,
+              }}
+              data-testid={LOOK_FOLLOW_TEST_ID.TAG}
+            >
+              {t(LOOK_ROW_TITLE_KEY[row])}
+            </span>
+          )}
+        </div>
+      ))}
     </div>
   );
 };
