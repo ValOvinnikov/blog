@@ -23,7 +23,7 @@ export type TLookFollowSentenceProps = {
 const strong = (chunks: ReactNode) => <strong>{chunks}</strong>;
 
 export const LookFollowSentence = ({
-  follow: { isOn, isPaused, row, settled },
+  follow: { isOn, isPaused, outline, settled },
   target,
   device,
   isShortLine,
@@ -31,7 +31,8 @@ export const LookFollowSentence = ({
 }: TLookFollowSentenceProps) => {
   const t = useTranslations('lookFollow');
   const tForm = useTranslations('lookForm');
-  const values = { part: row ? tForm(LOOK_ROW_TITLE_KEY[row]) : '', strong };
+  const part = outline ? tForm(LOOK_ROW_TITLE_KEY[outline.row]) : '';
+  const values = { part, strong };
 
   if (!isOn) return t('off');
   if (
@@ -41,10 +42,11 @@ export const LookFollowSentence = ({
     return t('idle');
   }
   if (target.kind === LOOK_FOLLOW_TARGET.ALL_OPEN) return t('allOpen');
+  if (isPaused) return t('paused');
   if (target.kind === LOOK_FOLLOW_TARGET.STYLE) {
     return (
       <>
-        {t.rich('styleCard', {
+        {t.rich(outline ? 'styleOutlined' : 'styleCard', {
           card: tForm(LOOK_ROW_TITLE_KEY[target.row]),
           strong,
         })}
@@ -52,7 +54,6 @@ export const LookFollowSentence = ({
       </>
     );
   }
-  if (isPaused) return t('paused');
   if (isShortLine || !settled) return t.rich('short', values);
   switch (settled.outcome) {
     case LOOK_FOLLOW_OUTCOME.NEARLY_FITS:

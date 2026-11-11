@@ -280,6 +280,12 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
 - **Import `tv` from `@blog/ui/lib/styling`**, never from `tailwind-variants`
   — the wrapper registers this project's tokens with `tailwind-merge`. Pass
   `className` as `class: className` in the call; never wrap it in `cn()`.
+- **Build from the shared recipes in `@blog/ui/lib/styling`; never retype
+  their classes.** `FOCUS_RING` is the focus indicator and
+  `TRANSITION_COLORS` the colour transition (`interaction.ts`);
+  `ALIGN_JUSTIFY` maps each `CONTENT_ALIGNMENT` value to its `justify-*`
+  class (`align-justify.ts`). Check the barrel (`lib/styling/index.ts`) for
+  the rest before writing a class list another component already has.
 - **One `tv({ slots: {...} })` per multi-element component** — every styled
   element (root plus each inner span or wrapper) is a key in one `slots`
   object, never one `tv()` export per element. Genuinely independent elements

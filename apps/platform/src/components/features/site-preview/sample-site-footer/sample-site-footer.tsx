@@ -4,6 +4,7 @@ import { Icon } from '@blog/ui/components/atoms/icon';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { Footer } from '@blog/ui/components/organisms/footer';
 import { isUndefined } from '@blog/utils/primitives';
+import { SamplePart } from '@platform/components/features/site-preview/sample-part';
 import type { TSampleSiteHeaderProps } from '@platform/components/features/site-preview/sample-site-header';
 import {
   SAMPLE_FOOTER_PART_TEST_ID,
@@ -49,7 +50,9 @@ export const SampleSiteFooter = ({
         dataTestId={SAMPLE_FOOTER_TEST_ID}
       >
         <Footer.Logo>
-          <BrandMark size={SIZE.SM} title={name} src={logoSrc} />
+          <SamplePart part={SAMPLE_PART.BRAND}>
+            <BrandMark size={SIZE.SM} title={name} src={logoSrc} />
+          </SamplePart>
         </Footer.Logo>
         <Footer.About>{t('footerAbout')}</Footer.About>
         <Footer.Groups ariaLabel={t('footerGroupsAriaLabel')}>

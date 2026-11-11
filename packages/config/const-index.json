@@ -2474,10 +2474,10 @@
         "file": "packages/config/src/constants/layout.ts"
       },
       {
-        "ref": "HERO_FIELD_MODE.NONE",
+        "ref": "RADIUS_SCALE.NONE",
         "scope": "config",
         "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
+        "file": "packages/config/src/constants/preset.ts"
       },
       {
         "ref": "CONTRAST_STATUS.NONE",
@@ -2772,46 +2772,6 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
-      }
-    ],
-    "CUSTOM": [
-      {
-        "ref": "HERO_FIELD_MODE.CUSTOM",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_TOPIC": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_TOPIC",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_TITLE": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_TITLE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_EXCERPT": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_EXCERPT",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
-      }
-    ],
-    "POST_IMAGE": [
-      {
-        "ref": "HERO_FIELD_MODE.POST_IMAGE",
-        "scope": "config",
-        "from": "@blog/config/constants",
-        "file": "packages/config/src/constants/module.ts"
       }
     ],
     "STACKED": [
@@ -5956,6 +5916,14 @@
         "file": "apps/platform/src/constants/look-follow.ts"
       }
     ],
+    "look-follow-tag": [
+      {
+        "ref": "LOOK_FOLLOW_TEST_ID.TAG",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
     "SITE_PARTS": [
       {
         "ref": "LOOK_GROUP.SITE_PARTS",
@@ -6655,6 +6623,78 @@
     "footer": [
       {
         "ref": "SAMPLE_PART.FOOTER",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "brand": [
+      {
+        "ref": "SAMPLE_PART.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "post-card": [
+      {
+        "ref": "SAMPLE_PART.POST_CARD",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "post-image": [
+      {
+        "ref": "SAMPLE_PART.POST_IMAGE",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "faq-item": [
+      {
+        "ref": "SAMPLE_PART.FAQ_ITEM",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "form-field": [
+      {
+        "ref": "SAMPLE_PART.FORM_FIELD",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "quote-card": [
+      {
+        "ref": "SAMPLE_PART.QUOTE_CARD",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "cta-box": [
+      {
+        "ref": "SAMPLE_PART.CTA_BOX",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "button": [
+      {
+        "ref": "SAMPLE_PART.BUTTON",
+        "scope": "app:platform",
+        "from": "@platform/constants/sample-part",
+        "file": "apps/platform/src/constants/sample-part.ts"
+      }
+    ],
+    "busy-button": [
+      {
+        "ref": "SAMPLE_PART.BUSY_BUTTON",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"
@@ -8897,6 +8937,12 @@
       },
       {
         "ref": "LOOK_FOLLOW_MARK.TAG_RADIUS",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
+      {
+        "ref": "LOOK_FOLLOW_MARK.OUTLINE_OFFSET",
         "scope": "app:platform",
         "from": "@platform/constants/look-follow",
         "file": "apps/platform/src/constants/look-follow.ts"

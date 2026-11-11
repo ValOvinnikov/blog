@@ -24,6 +24,7 @@ export const LOOK_FOLLOW_MARK = {
   TAG_HEIGHT: 20,
   TAG_PADDING_X: 7,
   TAG_RADIUS: 3,
+  OUTLINE_OFFSET: 3,
 } as const;
 
 export const LOOK_FOLLOW_LIMIT = {
@@ -36,4 +37,5 @@ export const LOOK_FOLLOW_LIMIT = {
 
 export const LOOK_FOLLOW_TEST_ID = {
   OUTLINE: 'look-follow-outline',
+  TAG: 'look-follow-tag',
 } as const;

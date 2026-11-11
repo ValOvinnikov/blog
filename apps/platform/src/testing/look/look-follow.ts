@@ -2,9 +2,17 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import type { TLookFollow } from '@platform/components/features/look/look-preview/use-look-follow';
 import type { TDeviceFrameHandle } from '@platform/components/shared/device-frame';
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
+import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
+import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { PREVIEW_FRAME_STATUS_TEST_ID } from '@platform/constants/preview';
+import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
+import { stubResizeObserver } from '@platform/testing/resize-observer';
+import {
+  type TLookFollowTarget,
+  toLookFollowTarget,
+} from '@platform/utils/look-follow-target/look-follow-target';
 import { createTranslator } from 'next-intl';
 
 const tFollow = createTranslator({
@@ -19,6 +27,41 @@ export const followLine = (
   key: TFollowLineKey,
   values: Record<string, string | number> = {},
 ) => tFollow.markup(key, { ...values, strong: (chunks: string) => chunks });
+
+const MOCK_MEASURED_EDGE = 40;
+const MOCK_MEASURED_SIZE = {
+  width: MOCK_MEASURED_EDGE,
+  height: MOCK_MEASURED_EDGE,
+};
+
+export const stubMeasuredDesktopSample = () => {
+  const rectSpy = vi
+    .spyOn(Element.prototype, 'getBoundingClientRect')
+    .mockImplementation(function (this: Element) {
+      const isHiddenOnDesktop = screen
+        .queryAllByTestId(SAMPLE_HEADER_BAR_TEST_ID)
+        .some((bar) => bar.contains(this));
+      return isHiddenOnDesktop
+        ? new DOMRect()
+        : new DOMRect(0, 0, MOCK_MEASURED_EDGE, MOCK_MEASURED_EDGE);
+    });
+  const restoreResizeObserver = stubResizeObserver(() => MOCK_MEASURED_SIZE);
+
+  return () => {
+    restoreResizeObserver();
+    rectSpy.mockRestore();
+  };
+};
+
+export const FOOTER_TARGET: TLookFollowTarget = {
+  kind: LOOK_FOLLOW_TARGET.PART,
+  row: LOOK_ROW.FOOTER,
+};
+
+export const CARD_RADIUS_TOKEN = '--radius-md';
+
+export const mockOpenRowTarget = (row: TLookRow) =>
+  toLookFollowTarget([row], row, false);
 
 type TFakeFrameOptions = {
   top?: number;
@@ -47,7 +90,7 @@ export const makeFakeFrame = ({
 export const mockLookFollow = (
   overrides: Partial<TLookFollow> = {},
 ): TLookFollow => ({
-  row: undefined,
+  outline: undefined,
   isOn: true,
   isPaused: false,
   isFollowing: false,

@@ -23,7 +23,7 @@ const MOCK_DATASET = [
     _type: 'module_postList',
     pageSize: MOCK_POST_LIST_B_PAGE_SIZE,
   },
-  { _id: MOCK_HERO_ID, _type: 'module_hero' },
+  { _id: MOCK_HERO_ID, _type: 'module_heroBlog' },
 ];
 
 async function pageSizeFor(moduleIds: string[]) {

@@ -71,14 +71,19 @@
   in that app. Exempt: import and `vi.mock` paths, directives, property keys,
   HTML attribute names passed to `getAttribute`/`toHaveAttribute` and their
   siblings,
-  `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, a
-  value compared with an env read, the const files themselves, and
-  `0`/`1`/`-1` and the single space `' '`. Co-located
-  `prefer-shared-constant.test.js`.
+  `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, the
+  standard vocabulary below, the const files themselves, and `0`/`1`/`-1` and
+  the single space `' '`. Co-located `prefer-shared-constant.test.js`.
+- `literal-vocabulary.js` — `isStandardVocabulary`, the literals an outside
+  standard spells, which both rules above and below skip: a value compared
+  with an env read, a `stubEnv` argument, a Testing Library role query's role
+  (`getByRole('button')`), a protocol-attribute value in an object property or
+  a JSX attribute (any `sameSite`, `target="_blank"`,
+  `type="button"`/`"submit"`/`"reset"`), and a TypeScript literal type
+  (`TProps['brand']`, `'a' | 'b'`). Tested through both rules' suites.
 - `no-duplicate-string.js` — `eslint-plugin-sonarjs`'s `no-duplicate-string`
-  with Tailwind class strings (the same positions as above) skipped, plus a
-  value compared with an env read, a `stubEnv` argument and a protocol-attribute
-  value (`sameSite`). That vocabulary lives in `literal-vocabulary.js`. Sonar
+  with Tailwind class strings (the same positions as above) and
+  `isStandardVocabulary` skipped. Sonar
   still ignores strings under 10 characters and strings with no separator.
   Co-located `no-duplicate-string.test.js`.
 

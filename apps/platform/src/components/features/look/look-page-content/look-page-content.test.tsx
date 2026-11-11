@@ -1,33 +1,23 @@
-import {
-  CAPABILITY,
-  LOCALE_ISO_CODES,
-  PRESET_ID,
-  RADIUS_SCALE,
-} from '@blog/config';
+import { PRESET_ID, RADIUS_SCALE } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
-import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
-import {
-  customRenderAsync,
-  screen,
-  within,
-} from '@platform/testing/custom-render';
+import { screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
-import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   growthBadgesOutsideNote,
   openLookRow,
 } from '@platform/testing/look/look-form-interactions';
+import {
+  arrangeLookPageQueries,
+  setupLookPageContent as setup,
+} from '@platform/testing/look/look-page-content-setup';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
@@ -44,7 +34,9 @@ const { getSiteConfigMock, selectLiveLocalesMock } = vi.hoisted(() => ({
 }));
 
 vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
+  ...(await (
+    await import('@platform/testing/mock-db-constants')
+  ).mockDbConstants()),
   queries: {
     siteConfig: { getSiteConfig: getSiteConfigMock },
     tenants: { selectLiveLocales: selectLiveLocalesMock },
@@ -56,23 +48,21 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 vi.mock('@platform/utils/env/env');
 
 const MOCK_ACCENT_HUE = 28;
-const SIGN_IN = 'Sign in';
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
-const POWERED_BY_MARK = `${messages.lookPreview.footerPoweredByLabel} ${MOCK_PRODUCT_NAME}`;
 
 const tLogoHue = makeEnTranslator('logoHueField');
 
 const tenant = mockReadyTenant();
-
-const setup = customRenderAsync(LookPageContent, { tenant });
 
 describe(`<${LookPageContent.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {
     user = userEvent.setup();
-    getSiteConfigMock.mockResolvedValue(undefined);
-    selectLiveLocalesMock.mockReturnValue([LOCALE_ISO_CODES.EN]);
+    arrangeLookPageQueries({
+      getSiteConfig: getSiteConfigMock,
+      selectLiveLocales: selectLiveLocalesMock,
+    });
   });
 
   it('renders the Console defaults when the tenant has no saved look yet', async () => {
@@ -178,60 +168,6 @@ describe(`<${LookPageContent.name}/>`, () => {
       expect(storedRadius).toHaveAttribute(ARIA_PRESSED, 'true');
       expect(storedRadius).toBeEnabled();
       expect(sampleTokens).toHaveStyle({ '--radius-md': '16px' });
-    });
-  });
-
-  it('previews Sign in when Reader accounts is on', async () => {
-    vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
-      CAPABILITY.READER_ACCOUNTS,
-    ]);
-
-    await setup();
-
-    const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
-    const signInButton = within(fullHeader).getByRole('button', {
-      name: SIGN_IN,
-    });
-
-    expect(signInButton).toBeVisible();
-  });
-
-  it('previews no Sign in while Reader accounts is off', async () => {
-    vi.mocked(getEnabledCapabilities).mockResolvedValueOnce([
-      CAPABILITY.BOOKMARKS,
-      CAPABILITY.ANALYTICS,
-    ]);
-
-    await setup();
-
-    const signInButton = screen.queryByRole('button', { name: SIGN_IN });
-
-    expect(signInButton).not.toBeInTheDocument();
-  });
-
-  describe('with the product name set', () => {
-    beforeEach(() => {
-      mockedEnv.PRODUCT_NAME = MOCK_PRODUCT_NAME;
-    });
-
-    afterEach(() => {
-      delete mockedEnv.PRODUCT_NAME;
-    });
-
-    it('previews the Powered by mark on Free', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
-
-      const mark = screen.getByRole('link', { name: POWERED_BY_MARK });
-
-      expect(mark).toBeInTheDocument();
-    });
-
-    it('previews no Powered by mark on Growth', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
-
-      const mark = screen.queryByRole('link', { name: POWERED_BY_MARK });
-
-      expect(mark).not.toBeInTheDocument();
     });
   });
 

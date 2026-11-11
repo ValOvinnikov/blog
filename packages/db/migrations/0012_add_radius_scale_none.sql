@@ -1,0 +1,1 @@
+ALTER TYPE "public"."radius_scale" ADD VALUE 'NONE' BEFORE 'SM';

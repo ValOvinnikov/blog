@@ -20,12 +20,12 @@ epics: [5016, 5028, 2813, 3430, 3215, 3600, 3527]
 
 ## What it does
 
-A hero is the optional opening band of a page. It replaces the page's own heading and owns the page's `<h1>`. Editors pick one of three kinds: a **Blog Hero** built around one post (pinned, or the newest marked Featured), a **Statement Hero** with a headline, a supporting line, up to two actions and an image they write themselves, and a **Profile Hero** that introduces a person from the People list. Each lays out as Split (image beside the copy), Stacked (image above or below) or Banner (image as a full-bleed background).
+A hero is the optional opening band of a page. It replaces the page's own heading and owns the page's `<h1>`. Editors pick one of three kinds: a **Blog Hero** built around one post (pinned, or the newest marked Featured), a **Statement Hero** with a headline, a supporting line, up to two actions and an image they write themselves, and a **Profile Hero** that introduces a person from the People list. Each lays out as Split (image beside the copy), Stacked (image above or below) or Banner (image as a full-bleed background, with the copy held to the page column).
 
 ## Surfaces and routes
 
-- **Studio** — Modules → Heroes lists Blog Hero (`module_heroBlog`), Statement Hero (`module_heroStatement`), Profile Hero (`module_heroProfile`) and the deprecated Hero (`module_hero`). A template's **Hero** field is a single reference.
-- **Which pages accept which hero** — `template_home` and `template_landing`: Blog, Statement, Profile. `template_postIndex`, `template_topic`, `template_tag`, `template_topicIndex`, `template_tagIndex`: Blog only. Posts have no hero. No template accepts `module_hero`.
+- **Studio** — Modules → Heroes lists Blog Hero (`module_heroBlog`), Statement Hero (`module_heroStatement`) and Profile Hero (`module_heroProfile`). A template's **Hero** field is a single reference.
+- **Which pages accept which hero** — `template_home` and `template_landing`: Blog, Statement, Profile. `template_postIndex`, `template_topic`, `template_tag`, `template_topicIndex`, `template_tagIndex`: Blog only. Posts have no hero.
 - **Public site** — the top of `/`, landing pages, `/blog`, `/topics`, `/topics/[slug]`, `/tags`, `/tags/[slug]` and their paginated pages. On a landing page the hero is the layout's top block, above the section navigation.
 
 ## Data
@@ -34,7 +34,6 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 - **Blog Hero** — `postSource` (`NEWEST_FEATURED` default, or `PINNED` + `post`), optional localized `image` (falls back to the post's hero image), optional `eyebrow` (falls back to the post's topic), `primaryActionLabel` (required in the default language, under 40 characters) and `primaryActionAppearance` (default Contained), optional `secondaryAction`. Heading and supporting text are the post's title and excerpt.
 - **Statement Hero** — `headingBlock` (required heading, optional supporting text), optional `eyebrow`, `image` (required for Split and Banner), `ctaButtons` (0–2).
 - **Profile Hero** — `headingBlock`, required `author` (`person`), `showRole` (on: the author's role is the eyebrow and the `eyebrow` field hides), `eyebrow`, optional `image`, `ctaButtons`, `showSocialLinks`, `showBio` (all toggles default on).
-- **Deprecated `module_hero`** — still registered in the schema with its own mode-pair fields; no service loader reads it and nothing renders it.
 - **Caching** — `modules:<kind>` + `module:<id>` and the tags of what each reads: Blog adds `posts`, `author`, `link`, `topic` and every page-type tag; Profile adds `author`, `link`, `homePage` and `page_landing` only; Statement adds `link` only.
 
 ## Configuration
@@ -44,7 +43,7 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 
 ## Constraints and invariants
 
-- Hero membership is the `module_hero` name prefix: `THeroModuleType` and `isHeroModuleType` derive from it, and `toHeroSlot` throws if a template's hero is any other type.
+- Hero membership is the `module_hero*` name prefix: `THeroModuleType` and `isHeroModuleType` derive from it, and `toHeroSlot` throws if a template's hero is any other type.
 - A page renders exactly one `<h1>`. `renderHeroModule` calls the hero component directly; when it returns nothing (no post resolved, a failed fetch, an unknown type) the page renders its `PageHeading` instead.
 - Blog Hero: the pinned post resolves to its translation in the request language; an untranslated pin renders nothing quietly, any other missing post renders nothing and logs `hero_blog_module.post_unresolved`. The Studio blocks publishing Newest featured when no published post is Featured, and warns when a pinned post lacks a translation. The primary action always links to the resolved post.
 - Profile Hero image precedence is per variant: Stacked and Split use the module image, else the author's photo; Banner uses the module image or none. Without a photo, Stacked shows initials, Split renders no media and keeps the author's name for assistive technology, Banner shows its scrim band alone. Nothing renders the author's name as copy.
@@ -74,12 +73,12 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 ## Tests and stories
 
 - Web: `hero-*-module.test.tsx`, `hero-*-module-view.test.tsx`, `hero-module-shell.test.tsx`, `resolve-hero-layout.test.ts`, and the hero cases in `testing/shared/module-renderer-contract` used by every page renderer test.
-- Service: `features/modules/hero*/**/*.test.ts`, `to-hero-presentation.test.ts`, `to-hero-primary-action.test.ts`, `to-module.test.ts`. Studio: `validate-pinned-post-translated.test.ts`, `validate-newest-featured-has-candidate.test.ts`. UI: `hero.test.tsx`.
+- Service: `features/modules/hero*/**/*.test.ts`, `to-hero-presentation.test.ts`, `to-module.test.ts`. Studio: `validate-pinned-post-translated.test.ts`, `validate-newest-featured-has-candidate.test.ts`. UI: `hero.test.tsx`.
 - Stories: `hero-blog-module-view.stories.tsx`, `hero-statement-module-view.stories.tsx`, `hero-profile-module-view.stories.tsx`, `packages/ui/src/components/organisms/hero/hero.stories.tsx`.
 
 ## Related
 
-- #2813 — retire `module_hero` once Blog Hero replaces it on production; #3430 retires its uncalled service feature; #3215 deletes `inlineLink` afterwards.
+- #3215 — delete the unused `inlineLink` object.
 - #3600 — decide whether author- and post-mediated link targets need precise purging, which would let Blog and Profile drop their page-type tags.
 - #5016 — epic: one-entry skins. The Banner recipe renders `data-skin`, and `isOnDark` and tone props go.
 - #5028 — epic: text roles. #5033 gives Hero one eyebrow, intro and footnote style.
