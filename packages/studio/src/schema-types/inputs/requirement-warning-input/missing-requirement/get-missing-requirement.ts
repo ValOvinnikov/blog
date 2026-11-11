@@ -34,6 +34,7 @@ const CAPABILITY_LABEL: Readonly<Record<TCapability, string>> = {
 
 export const MODULE_PACK_LABEL: Readonly<Record<TModulePack, string>> = {
   [MODULE_PACK.CORE]: 'Core',
+  [MODULE_PACK.STARTER]: 'Starter',
   [MODULE_PACK.GROWTH]: 'Growth',
 };
 

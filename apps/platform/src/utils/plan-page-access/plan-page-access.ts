@@ -35,6 +35,6 @@ export const planPageAccess = (plan: TTenantPlan): TPlanPageAccess => {
     leads: capabilities.includes(CAPABILITY.CONTACT_FORM),
     subscribers: capabilities.includes(CAPABILITY.NEWSLETTER),
     comments: capabilities.includes(CAPABILITY.COMMENTS),
-    team: plan !== TENANT_PLAN.FREE,
+    team: plan === TENANT_PLAN.GROWTH,
   };
 };

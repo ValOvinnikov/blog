@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
@@ -37,7 +37,7 @@ export const CustomDomainCard = ({
   const t = useTranslations('tenantDomainPage.ownDomain');
   const { id, plan, deprovisionedAt, primaryDomain } = tenant;
   const isArchived = Boolean(deprovisionedAt);
-  const isGrowth = plan === TENANT_PLAN.GROWTH;
+  const { hasCustomDomain } = PLAN_ENTITLEMENTS[plan];
   const domain = customDomain ?? (isPrimaryCustom ? primaryDomain : null);
   const shown = domain && {
     domain,
@@ -46,10 +46,11 @@ export const CustomDomainCard = ({
       : primaryProjectDomain,
   };
   const canAct = canManage && !isArchived;
-  const canConnect = !shown && !claim && canManage && !isArchived && isGrowth;
+  const canConnect =
+    !shown && !claim && canManage && !isArchived && hasCustomDomain;
   let noticeKey: 'archivedState' | 'ownerOnly' | 'upgradePrompt' =
     'upgradePrompt';
-  if (isGrowth) noticeKey = 'ownerOnly';
+  if (hasCustomDomain) noticeKey = 'ownerOnly';
   if (isArchived) noticeKey = 'archivedState';
 
   return (
@@ -74,7 +75,7 @@ export const CustomDomainCard = ({
                   domain={shown.domain}
                   projectDomain={shown.projectDomain}
                   isMainAddress={isPrimaryCustom}
-                  canMakeMain={isGrowth}
+                  canMakeMain={hasCustomDomain}
                 />
               )
             }

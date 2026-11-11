@@ -66,7 +66,7 @@
     "nameLabel": "Name der Website",
     "nameHint": "Wird im Kopfbereich deiner Website und in Browser-Tabs angezeigt.",
     "siteAddressLabel": "Adresse der Website",
-    "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
+    "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. In den Tarifen Starter und Growth kannst du deine eigene Domain verbinden.",
     "siteAddressChecking": "Adresse wird geprüft…",
     "siteAddressAvailable": "{address} gehört dir",
     "siteAddressUnverified": "Wir konnten diese Adresse gerade nicht prüfen. Du kannst fortfahren – wir prüfen sie erneut, wenn du die Website erstellst.",
@@ -490,7 +490,7 @@
       "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Zusätzliche Sprachen: keine} other {Zusätzliche Sprachen: {languages}}}",
       "SUSPENSION_REASON": "Grund: {category}",
       "SUSPENSION_REFERENCE": "Referenz: {reference}",
-      "PLAN": "Tarif: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "PLAN": "Tarif: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "SIGN_IN_PROVIDER": "Anmeldeanbieter: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Client-Geheimnis ersetzt"
     }
@@ -527,7 +527,7 @@
     "ownDomain": {
       "title": "Eigene Domain verwenden",
       "supportingText": "Veröffentliche deine Website unter einer Adresse, die dir gehört. Deine aktuelle Adresse funktioniert weiter.",
-      "upgradePrompt": "Eine eigene Domain gehört zum Growth-Tarif.",
+      "upgradePrompt": "Eine eigene Domain gehört zu den Tarifen Starter und Growth.",
       "ownerOnly": "Nur die Inhaberin oder der Inhaber der Website kann eine Domain verbinden.",
       "archivedState": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
       "domainLabel": "Domain",
@@ -551,7 +551,7 @@
       "refusal": {
         "notFound": "Diese Website wurde nicht gefunden.",
         "archived": "Diese Website ist archiviert, ihre Domain kann nicht geändert werden.",
-        "notOnPlan": "Eine eigene Domain gehört zum Growth-Tarif.",
+        "notOnPlan": "Eine eigene Domain gehört zu den Tarifen Starter und Growth.",
         "notProvisioned": "Diese Website ist noch nicht eingerichtet. Versuche es nach der Einrichtung erneut.",
         "alreadyConnected": "Diese Website hat bereits eine eigene Domain.",
         "notCustomDomain": "Diese Domain kann nicht entfernt werden.",
@@ -694,7 +694,7 @@
     "growthAddsButtons": "Ladezustand und Spinner",
     "growthAddsHeader": "Layout, Untermenüs, Leiste, Header-Schaltflächen und Kontosteuerung",
     "growthAddsFooter": "Layout, Hintergrund und Fläche",
-    "growthAddsClosing": "Mit Growth kommen außerdem weitere Sprachen (mit Auswahl des Sprachumschalter-Stils), eine eigene Domain und weitere Website-Funktionen hinzu.",
+    "growthAddsClosing": "Mit Growth kommen außerdem weitere Sprachen (mit Auswahl des Sprachumschalter-Stils) und weitere Website-Funktionen hinzu.",
     "jumpIndexUnsaved": ", ungespeicherte Änderungen",
     "expandAll": "Alle aufklappen",
     "collapseAll": "Alle zuklappen",
@@ -910,7 +910,7 @@
       "SHOWN": "Beides"
     },
     "cookieSettingsButtonBannerOff": "Das Cookie-Banner ist aus, daher sehen Leser weder den Link noch die Schaltfläche. Schalten Sie das Banner unter Funktionen ein, um zu wählen.",
-    "footerPoweredByNote": "Kostenlose Websites zeigen „Bereitgestellt von {productName}“ am Ende des Footers. Mit dem Growth-Tarif entfällt der Hinweis.",
+    "footerPoweredByNote": "Kostenlose Websites zeigen „Bereitgestellt von {productName}“ am Ende des Footers. Mit den Tarifen Starter und Growth entfällt der Hinweis.",
     "brandHeading": "Marke",
     "brandImagePicked": "Neues Bild, noch nicht hochgeladen",
     "brandImageUnchanged": "Kein neues Bild",
@@ -1317,7 +1317,7 @@
     "description": "Der schnelle Teil. Alles danach läuft automatisch, und jeder Schritt lässt sich nach einem Fehler fortsetzen.",
     "nameLabel": "Mandantenname",
     "siteAddressLabel": "Adresse der Website",
-    "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. Im Growth-Tarif kannst du deine eigene Domain verbinden.",
+    "siteAddressHint": "Buchstaben, Ziffern und Bindestriche. In den Tarifen Starter und Growth kannst du deine eigene Domain verbinden.",
     "localeLabel": "Standardsprache",
     "localeHint": "Die Sprache, in der Startinhalte und Einstellungen der Website beginnen.",
     "planLabel": "Tarif",
@@ -1673,6 +1673,7 @@
   },
   "planNames": {
     "FREE": "Free",
+    "STARTER": "Starter",
     "GROWTH": "Growth"
   },
   "languagesSettings": {
@@ -1703,7 +1704,7 @@
     "fieldsNeedAttention": "{count, plural, one {# Feld braucht Aufmerksamkeit} other {# Felder brauchen Aufmerksamkeit}}",
     "goToFirstField": "Zum ersten Feld",
     "notSaved": "Nicht gespeichert",
-    "notInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} GROWTH {Growth} other {aktuellen}}, der {items} nicht enthält. Es wurde nichts gespeichert.",
+    "notInPlan": "Ihre Website nutzt den Tarif {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {aktuellen}}, der {items} nicht enthält. Es wurde nichts gespeichert.",
     "shortcut": "⌘S / Strg+S",
     "discard": "Verwerfen",
     "save": "Änderungen speichern",
@@ -1742,7 +1743,7 @@
     "title": "Anfragen",
     "description": "Nachrichten aus dem Kontaktformular Ihrer Website, die neuesten zuerst. Jede Nachricht wurde bei Eingang auch per E-Mail an Sie gesendet.",
     "downgradedTitle": "Kontaktformular nicht im Tarif enthalten",
-    "downgradedDescription": "Das Kontaktformular ist eine Growth-Funktion, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
+    "downgradedDescription": "Das Kontaktformular gehört zu den Tarifen Starter und Growth, daher kommen keine neuen Nachrichten mehr an. Bereits eingegangene Nachrichten bleiben hier erhalten, und Sie können jede davon weiterhin löschen."
   },
   "leadsInbox": {
     "listLabel": "Nachrichten",
@@ -2073,12 +2074,19 @@
       "options": "Die Growth-Optionen sind jetzt auf deiner Website verfügbar: mehr Sprachen, alle Einstellungen für das Erscheinungsbild, zusätzliche Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
       "kept": "Wenn du Growth schon einmal genutzt hast, sind deine früheren Einstellungen wieder so da, wie du sie hinterlassen hast."
     },
+    "STARTER": {
+      "subject": "Deine Website ist jetzt im Starter-Tarif",
+      "previewText": "{siteName} kann jetzt die Starter-Optionen nutzen.",
+      "changed": "{siteName} ist jetzt im Starter-Tarif.",
+      "options": "Mit Starter kann deine Website ihre eigene Domain und das Kontaktformular nutzen, und der Footer zeigt keinen „Bereitgestellt von“-Hinweis. Growth-Optionen wie weitere Sprachen, alle Einstellungen für das Erscheinungsbild und die übrigen Growth-Seitenmodule sind ausgeschaltet.",
+      "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten, und alles aus Growth kommt zurück, wenn du zu Growth wechselst."
+    },
     "FREE": {
       "subject": "Deine Website ist jetzt im Free-Tarif",
-      "previewText": "Die Growth-Optionen sind auf {siteName} ausgeschaltet.",
+      "previewText": "Die Optionen der kostenpflichtigen Tarife sind auf {siteName} ausgeschaltet.",
       "changed": "{siteName} ist jetzt im Free-Tarif.",
-      "options": "Die Growth-Optionen sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, Growth-Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
-      "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu Growth wechselst."
+      "options": "Die Optionen der kostenpflichtigen Tarife sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, kostenpflichtige Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
+      "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu einem kostenpflichtigen Tarif wechselst."
     }
   },
   "suspensionCategory": {

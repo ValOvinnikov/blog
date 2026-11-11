@@ -355,6 +355,19 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       });
     });
 
+    it('offers it on a Starter site', async () => {
+      await renderCard({
+        customDomain: MOCK_CUSTOM_DOMAIN,
+        tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.STARTER },
+      });
+
+      const makeMainButton = await screen.findByRole('button', {
+        name: makeMain.trigger,
+      });
+
+      expect(makeMainButton).toBeVisible();
+    });
+
     it.each([
       {
         scenario: 'nobody who cannot manage the site',

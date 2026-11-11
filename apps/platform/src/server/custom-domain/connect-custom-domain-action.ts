@@ -2,7 +2,7 @@
 
 import { ACTION_OUTCOME, ERROR_CODE, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CUSTOM_DOMAIN_FIELD_ERROR,
@@ -56,7 +56,7 @@ export const connectCustomDomainAction = async (
   const { id, plan, deprovisionedAt, sanityProjectId, primaryDomain } = tenant;
 
   if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
-  if (plan !== TENANT_PLAN.GROWTH) {
+  if (!PLAN_ENTITLEMENTS[plan].hasCustomDomain) {
     return refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN);
   }
   if (!sanityProjectId) return refused(CUSTOM_DOMAIN_REFUSAL.NOT_PROVISIONED);

@@ -7,6 +7,7 @@ import type { TModuleType } from './module';
 
 export const MODULE_PACK = {
   CORE: 'CORE',
+  STARTER: 'STARTER',
   GROWTH: 'GROWTH',
 } as const;
 
@@ -35,7 +36,7 @@ export const MODULE_PACK_BY_TYPE = {
   module_featureList: MODULE_PACK.GROWTH,
   module_featureHighlights: MODULE_PACK.GROWTH,
   module_timeline: MODULE_PACK.GROWTH,
-  module_contactForm: MODULE_PACK.GROWTH,
+  module_contactForm: MODULE_PACK.STARTER,
 } as const satisfies Record<TModuleType, TModulePack>;
 
 const isModuleType = (type: string): type is TModuleType =>

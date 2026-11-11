@@ -2760,6 +2760,20 @@
         "file": "packages/config/src/constants/module-pack.ts"
       }
     ],
+    "STARTER": [
+      {
+        "ref": "MODULE_PACK.STARTER",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/module-pack.ts"
+      },
+      {
+        "ref": "TENANT_PLAN.STARTER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
     "GROWTH": [
       {
         "ref": "MODULE_PACK.GROWTH",

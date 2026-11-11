@@ -102,6 +102,18 @@ describe(connectCustomDomainAction, () => {
     expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
   });
 
+  it('records a claim for a Starter tenant', async () => {
+    asTenant({ plan: TENANT_PLAN.STARTER });
+
+    const result = await connect();
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(customDomainClaims.createCustomDomainClaim).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_CUSTOM_DOMAIN,
+    );
+  });
+
   it('reports input that is not a full domain without saving it', async () => {
     const result = await connect({
       domain: 'not a domain',

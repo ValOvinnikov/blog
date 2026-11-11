@@ -29,6 +29,10 @@ describe(planPageAccess, () => {
       CAPABILITY.RATINGS,
       CAPABILITY.CONSENT_BANNER,
     ];
+    registry[TENANT_PLAN.STARTER] = [
+      CAPABILITY.CONSENT_BANNER,
+      CAPABILITY.CONTACT_FORM,
+    ];
     registry[TENANT_PLAN.GROWTH] = [
       CAPABILITY.COMMENTS,
       CAPABILITY.RATINGS,
@@ -47,6 +51,19 @@ describe(planPageAccess, () => {
       languages: false,
       email: false,
       leads: false,
+      subscribers: false,
+      comments: false,
+      team: false,
+    });
+  });
+
+  it('gives a STARTER tenant the email and leads pages, without languages or team', () => {
+    const access = planPageAccess(TENANT_PLAN.STARTER);
+
+    expect(access).toEqual({
+      languages: false,
+      email: true,
+      leads: true,
       subscribers: false,
       comments: false,
       team: false,
