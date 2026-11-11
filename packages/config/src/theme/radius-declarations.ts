@@ -39,3 +39,6 @@ export const RADIUS_DECLARATIONS: Record<TRadiusScale, TThemeDeclarations> = {
     '--radius-xl': '32px',
   },
 };
+
+export const atLeastSmall = (role: `--radius-${string}`): string =>
+  `max(var(${role}), ${RADIUS_DECLARATIONS[RADIUS_SCALE.SM][role]})`;

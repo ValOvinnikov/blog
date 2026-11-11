@@ -80,6 +80,8 @@ const meta = {
 export default meta;
 type TStory = StoryObj<typeof meta>;
 
+export const NoRadius: TStory = { args: { radiusScale: RADIUS_SCALE.NONE } };
+
 export const SmallRadius: TStory = { args: { radiusScale: RADIUS_SCALE.SM } };
 
 export const MediumRadius: TStory = { args: { radiusScale: RADIUS_SCALE.MD } };

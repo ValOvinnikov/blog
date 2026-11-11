@@ -4,14 +4,13 @@ import {
   BUTTON_SHAPE,
   DENSITY,
   HEADER_CONTROL_STYLE,
-  RADIUS_SCALE,
   type TButtonShape,
   type TDensity,
   type THeaderControlStyle,
 } from '@blog/config/constants';
 
 import { BORDER_COLOR } from './border-tokens';
-import { RADIUS_DECLARATIONS } from './radius-declarations';
+import { atLeastSmall } from './radius-declarations';
 import { RADIUS_PILL } from './radius-tokens';
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
@@ -89,10 +88,7 @@ export const BUTTON_SHAPE_DECLARATIONS: Record<
   TThemeDeclarations
 > = {
   [BUTTON_SHAPE.SQUARE]: { '--radius-button': '0' },
-  // Floored at Small, so None squares cards without turning Rounded into Square.
-  [BUTTON_SHAPE.ROUNDED]: {
-    '--radius-button': `max(var(--radius-sm), ${RADIUS_DECLARATIONS[RADIUS_SCALE.SM]['--radius-sm']})`,
-  },
+  [BUTTON_SHAPE.ROUNDED]: { '--radius-button': atLeastSmall('--radius-sm') },
   [BUTTON_SHAPE.PILL]: { '--radius-button': RADIUS_PILL },
 };
 
