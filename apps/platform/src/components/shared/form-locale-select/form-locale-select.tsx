@@ -27,12 +27,7 @@ export const FormLocaleSelect = ({
   const tLanguage = useTranslations('languageNames');
 
   return (
-    <FormField
-      label={label}
-      hint={hint}
-      error={error}
-      control={{ appearance }}
-    >
+    <FormField label={label} hint={hint} error={error} control={{ appearance }}>
       <OptionSelect
         options={toOptions(LOCALE_ISO_CODES, (locale) => tLanguage(locale))}
         value={value}
