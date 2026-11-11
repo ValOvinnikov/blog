@@ -48,20 +48,18 @@ export const segmentedRadioGroupVariants = tv({
         ],
       },
       [SEGMENTED_RADIO_LAYOUT.TILES]: {
-        root: ['flex flex-col gap-1.5'],
-        track: ['grid grid-cols-2 gap-2 sm:grid-cols-5'],
+        root: ['@container flex flex-col gap-1.5'],
+        track: ['grid grid-cols-2 gap-2 @sm:grid-cols-5'],
         option: [
-          'relative flex min-w-0 flex-col items-center gap-1.5 rounded-admin-control bg-admin-surface',
-          'px-1 pt-3.5 pb-[7px] text-center text-admin-12 leading-4 font-medium',
-          'max-sm:min-h-14 max-sm:flex-row max-sm:justify-start max-sm:gap-2.5 max-sm:px-2.5 max-sm:py-2',
-          'max-sm:text-left max-sm:text-admin-13-5 max-sm:leading-admin-18',
+          'relative flex min-h-14 min-w-0 items-center justify-start gap-2.5 rounded-admin-control bg-admin-surface',
+          'px-2.5 py-2 text-left text-admin-13-5 leading-admin-18 font-medium',
+          '@sm:min-h-0 @sm:flex-col @sm:justify-normal @sm:gap-1.5 @sm:px-1 @sm:pt-3.5 @sm:pb-1.75',
+          '@sm:text-center @sm:text-admin-12 @sm:leading-4',
           COLOUR_TRANSITION_CLASSES,
           focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
         optionLabel: ['block min-w-0 break-words'],
-        check: [
-          'absolute top-[3px] right-[3px] flex max-sm:top-1.5 max-sm:right-1.5',
-        ],
+        check: ['absolute top-1.5 right-1.5 flex @sm:top-0.75 @sm:right-0.75'],
       },
     },
     isSelected: {
@@ -95,7 +93,7 @@ export const segmentedRadioGroupVariants = tv({
       class: {
         option: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-admin-control-line hover:border-admin-muted hover:bg-admin-surface-2',
+          'border-admin-control-line hover:border-admin-muted hover:bg-admin-hover',
         ],
       },
     },
@@ -104,7 +102,7 @@ export const segmentedRadioGroupVariants = tv({
       isLocked: true,
       class: {
         option: [...UNSELECTED_CHOICE_CLASSES, 'cursor-not-allowed'],
-        glyph: ['opacity-[.55]'],
+        glyph: ['opacity-(--admin-locked-fade)'],
         check: ['text-admin-muted'],
       },
     },

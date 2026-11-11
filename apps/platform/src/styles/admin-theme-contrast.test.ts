@@ -62,6 +62,8 @@ const TOKEN = {
   CONTROL_LINE_TINT: 'admin-control-line-tint',
   GLYPH_ACCENT: 'admin-glyph-accent',
   GLYPH_FILL: 'admin-glyph-fill',
+  GLYPH_LINE_SOFT: 'admin-glyph-line-soft',
+  GLYPH_RAISED: 'admin-glyph-raised',
   HOVER: 'admin-hover',
   MUTED: 'admin-muted',
   OK: 'admin-ok',
@@ -183,6 +185,24 @@ const SHARED_PAIRS: readonly TPair[] = [
     BOUNDARY,
   ],
   ['Card style text line on fill', TOKEN.MUTED, TOKEN.GLYPH_FILL, BOUNDARY],
+  [
+    'Card style short line on fill',
+    TOKEN.GLYPH_LINE_SOFT,
+    TOKEN.GLYPH_FILL,
+    BOUNDARY,
+  ],
+  [
+    'Card style short line on tile',
+    TOKEN.GLYPH_LINE_SOFT,
+    TOKEN.SURFACE,
+    BOUNDARY,
+  ],
+  [
+    'Card style short line on raised card',
+    TOKEN.GLYPH_LINE_SOFT,
+    TOKEN.GLYPH_RAISED,
+    BOUNDARY,
+  ],
 ];
 
 const LIGHT_PAIRS: readonly TPair[] = [

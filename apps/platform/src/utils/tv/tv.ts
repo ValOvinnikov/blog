@@ -2,7 +2,7 @@ import { createTV } from 'tailwind-variants';
 
 import { SHADOW_TOKENS } from './shadow-tokens';
 
-// Keep these lists in sync with the custom tokens in `theme.css` and `admin-theme.css`, or `tailwind-merge` misclassifies or drops them.
+// Keep these lists and `SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `admin-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
   'display',
   'hero',

@@ -61,7 +61,10 @@
   --admin-note-line: rgba(79, 70, 229, 0.3);
   --admin-control-line-locked: #c5cad3;
   --admin-glyph-accent: #0d6466;
-  --admin-glyph-fill: #d5ebea;
+  --admin-glyph-fill: #b3dad7;
+  --admin-glyph-line-soft: #6b7484;
+  --admin-glyph-raised: #ffffff;
+  --admin-locked-fade: 0.55;
   --admin-frame-dot: #d5d9e0;
   --admin-frame-track: rgba(18, 20, 26, 0.08);
   --admin-frame-thumb: #5b6472;
@@ -158,7 +161,9 @@
   --admin-note-line: rgba(165, 180, 252, 0.3);
   --admin-control-line-locked: #424956;
   --admin-glyph-accent: #4fb3ad;
-  --admin-glyph-fill: #1d3a3b;
+  --admin-glyph-fill: #24504f;
+  --admin-glyph-line-soft: #8f99a8;
+  --admin-glyph-raised: #323945;
   --admin-frame-dot: #3a404b;
   --admin-fade-end: rgba(15, 17, 21, 0);
   --admin-fade-end-surface: rgba(23, 26, 32, 0);
@@ -232,7 +237,9 @@
     --admin-note-line: rgba(165, 180, 252, 0.3);
     --admin-control-line-locked: #424956;
     --admin-glyph-accent: #4fb3ad;
-    --admin-glyph-fill: #1d3a3b;
+    --admin-glyph-fill: #24504f;
+    --admin-glyph-line-soft: #8f99a8;
+    --admin-glyph-raised: #323945;
     --admin-frame-dot: #3a404b;
     --admin-fade-end: rgba(15, 17, 21, 0);
     --admin-fade-end-surface: rgba(23, 26, 32, 0);
@@ -315,6 +322,8 @@
   --color-admin-control-line-locked: var(--admin-control-line-locked);
   --color-admin-glyph-accent: var(--admin-glyph-accent);
   --color-admin-glyph-fill: var(--admin-glyph-fill);
+  --color-admin-glyph-line-soft: var(--admin-glyph-line-soft);
+  --color-admin-glyph-raised: var(--admin-glyph-raised);
   --color-admin-frame-dot: var(--admin-frame-dot);
   --color-admin-frame-track: var(--admin-frame-track);
   --color-admin-frame-thumb: var(--admin-frame-thumb);

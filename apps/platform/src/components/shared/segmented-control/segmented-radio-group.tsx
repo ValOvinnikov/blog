@@ -63,7 +63,9 @@ export const SegmentedRadioGroup = <TValue extends string>({
       selectedIndex,
       fadeWidth: SEGMENTED_FADE_WIDTH_PX,
     });
-  const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked);
+  const { setOptionRef, onKeyDown } = useLockedArrowFocus(isLocked, {
+    hasVerticalArrows: true,
+  });
   const { descriptionId, description, groupDescribedBy } =
     useSelectedDescription(options, value, describedBy);
   const { root, track, fade, fadeStart, fadeEnd } = segmentedRadioGroupVariants(

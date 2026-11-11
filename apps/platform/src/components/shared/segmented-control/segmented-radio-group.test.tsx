@@ -4,7 +4,7 @@ import { SEGMENTED_RADIO_LAYOUT } from '@platform/constants/segmented-control';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import {
   customRender,
-  renderWithIntl,
+  isInaccessible,
   screen,
   within,
 } from '@platform/testing/custom-render';
@@ -211,7 +211,7 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
 
         expect(firstRadio).toHaveAccessibleName(MOCK_FIRST_LABEL);
         expect(firstRadio).not.toHaveAccessibleDescription();
-        expect(glyph).toBeInTheDocument();
+        expect(isInaccessible(glyph)).toBe(true);
         expect(inlineDescription).not.toBeInTheDocument();
       });
 
@@ -272,13 +272,7 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
 
         beforeEach(() => {
           onChange = vi.fn();
-          renderWithIntl(
-            <SegmentedRadioGroup
-              {...MOCK_TILE_PROPS}
-              onChange={onChange}
-              lock={lock}
-            />,
-          );
+          setupTiles({ onChange, lock });
         });
 
         it('announces every tile disabled while keeping the selected one checked', () => {
@@ -302,17 +296,23 @@ describe(`<${SegmentedRadioGroup.name}/>`, () => {
           expect(onChange).not.toHaveBeenCalled();
         });
 
-        it('moves focus with the arrow keys without changing the value', async () => {
-          await user.tab();
-          await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
-          const secondRadio = screen.getByRole('radio', {
-            name: MOCK_SECOND_LABEL,
-          });
+        it.each([
+          { key: USER_EVENT_KEY.ARROW_RIGHT, target: MOCK_SECOND_LABEL },
+          { key: USER_EVENT_KEY.ARROW_DOWN, target: MOCK_SECOND_LABEL },
+          { key: USER_EVENT_KEY.ARROW_LEFT, target: MOCK_THIRD_LABEL },
+          { key: USER_EVENT_KEY.ARROW_UP, target: MOCK_THIRD_LABEL },
+        ])(
+          'moves focus on $key without changing the value',
+          async ({ key, target }) => {
+            await user.tab();
+            await user.keyboard(key);
+            const targetRadio = screen.getByRole('radio', { name: target });
 
-          expect(secondRadio).toHaveFocus();
-          expect(secondRadio).not.toBeChecked();
-          expect(onChange).not.toHaveBeenCalled();
-        });
+            expect(targetRadio).toHaveFocus();
+            expect(targetRadio).not.toBeChecked();
+            expect(onChange).not.toHaveBeenCalled();
+          },
+        );
       },
     );
   });

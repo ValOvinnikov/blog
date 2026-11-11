@@ -4,17 +4,17 @@ import { tv } from '@platform/utils/tv/tv';
 export const cardStyleGlyphVariants = tv({
   slots: {
     card: [
-      'flex h-[30px] w-12 shrink-0 flex-col justify-center gap-[5px] rounded-admin-control px-[7px]',
+      'relative flex h-7.5 w-12 shrink-0 flex-col justify-center gap-1.25 rounded-admin-control px-1.75',
     ],
-    line: ['block h-[3px] rounded-full bg-admin-muted'],
-    shortLine: ['block h-[3px] w-[62%] rounded-full bg-admin-faint'],
+    bar: ['absolute inset-y-1 left-0 hidden w-0.75 bg-admin-glyph-accent'],
+    line: ['block h-0.75 rounded-full bg-admin-muted'],
+    shortLine: ['block h-0.75 w-[62%] rounded-full bg-admin-glyph-line-soft'],
   },
   variants: {
     cardStyle: {
       [CARD_STYLE.ACCENT_BAR]: {
-        card: [
-          'border border-l-[3px] border-admin-control-line-locked border-l-admin-glyph-accent bg-admin-surface',
-        ],
+        card: ['border border-admin-control-line-locked bg-admin-surface'],
+        bar: ['block'],
       },
       [CARD_STYLE.OUTLINED]: {
         card: ['border border-admin-control-line bg-admin-surface'],
@@ -22,7 +22,7 @@ export const cardStyleGlyphVariants = tv({
       [CARD_STYLE.FILLED]: { card: ['bg-admin-glyph-fill'] },
       [CARD_STYLE.RAISED]: {
         card: [
-          'border border-admin-control-line-locked bg-admin-surface shadow-admin-glyph',
+          'border border-admin-control-line-locked bg-admin-glyph-raised shadow-admin-glyph',
         ],
       },
       [CARD_STYLE.PLAIN]: {},

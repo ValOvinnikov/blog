@@ -7,10 +7,11 @@ export type TCardStyleGlyphProps = {
 };
 
 export const CardStyleGlyph = ({ cardStyle }: TCardStyleGlyphProps) => {
-  const { card, line, shortLine } = cardStyleGlyphVariants({ cardStyle });
+  const { card, bar, line, shortLine } = cardStyleGlyphVariants({ cardStyle });
 
   return (
     <span className={card()}>
+      <span className={bar()} />
       <span className={line()} />
       <span className={shortLine()} />
     </span>
