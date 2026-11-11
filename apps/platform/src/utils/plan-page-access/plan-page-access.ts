@@ -1,8 +1,8 @@
 import { CAPABILITY } from '@blog/config';
 import {
+  PLAN_ENTITLEMENTS,
   PLAN_LOCALE_LIMIT,
   PLAN_REGISTRY,
-  TENANT_PLAN,
   type TTenantPlan,
 } from '@blog/db/constants';
 
@@ -33,6 +33,6 @@ export const planPageAccess = (plan: TTenantPlan): TPlanPageAccess => {
     ),
     leads: capabilities.includes(CAPABILITY.CONTACT_FORM),
     subscribers: capabilities.includes(CAPABILITY.NEWSLETTER),
-    team: plan === TENANT_PLAN.GROWTH,
+    team: PLAN_ENTITLEMENTS[plan].seats > 1,
   };
 };
