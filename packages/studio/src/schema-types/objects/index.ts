@@ -15,7 +15,6 @@ import { featureHighlightSchema } from './feature-highlight/feature-highlight';
 import { footerLinkGroupSchema } from './footer-link-group/footer-link-group';
 import { heroLayoutSchema } from './hero-layout/hero-layout';
 import { imageWithAltSchema } from './image-with-alt/image-with-alt';
-import { inlineLinkSchema } from './inline-link/inline-link';
 import { layoutSchema } from './layout/layout';
 import { linkRefSchema } from './link-ref/link-ref';
 import { linkRefWithSubItemsSchema } from './link-ref-with-sub-items/link-ref-with-sub-items';
@@ -47,7 +46,6 @@ export const objects = [
   localizedImageWithAltSchema,
   bodyImageSchema,
   asideSchema,
-  inlineLinkSchema,
   linkRefSchema,
   cookiePreferencesLinkSchema,
   cookieListSchema,

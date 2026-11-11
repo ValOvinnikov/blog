@@ -22,12 +22,15 @@ import {
   SAMPLE_HEADER_TEST_ID,
 } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   COMPACT,
+  EDIT_TAB,
   EXTRA_LARGE,
   FOOTER_LAYOUT_LABEL,
   HEADER_LAYOUT_LABEL,
+  PREVIEW_TAB,
   SPINNER_LABEL,
 } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -59,6 +62,23 @@ describe(`<${LookForm.name}/>`, () => {
   describe('with the default values', () => {
     beforeEach(() => {
       setupLookForm();
+    });
+
+    it('switches between the Edit and Preview tabs', async () => {
+      const tabList = screen.getByRole('tablist', {
+        name: LOOK_FORM.viewTabsAriaLabel,
+      });
+      const editTab = within(tabList).getByRole('tab', { name: EDIT_TAB });
+      const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
+      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
+
+      await user.click(previewTab);
+
+      const previewPanel = screen.getByRole('tabpanel', { name: PREVIEW_TAB });
+      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
+      expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
+      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'false');
+      expect(previewPanel).toContainElement(sampleTokens);
     });
 
     describe('with the Shape row open', () => {

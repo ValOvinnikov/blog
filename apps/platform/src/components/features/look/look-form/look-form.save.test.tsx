@@ -29,6 +29,8 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
 
+vi.mock('@platform/components/features/look/look-preview');
+
 vi.mock('@platform/server/site-config/update-look-action');
 
 vi.mock('@platform/server/site-config/upload-brand-asset-action');

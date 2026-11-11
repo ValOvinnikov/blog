@@ -5,12 +5,14 @@ import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
+import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   ACCENT_HUE,
   EDITORIAL,
   EXTRA_LARGE,
   FOLLOW_ACCENT_HUE,
   GROWTH_BADGE_TEXT,
+  OUTLINED,
 } from '@platform/testing/look/look-form-fixtures';
 import {
   chooseEditorial,
@@ -58,6 +60,31 @@ describe(`<${LookForm.name}/>`, () => {
       expect(extraLargeButton).toBeEnabled();
       expect(extraLargeButton).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(extraLargeButton).toHaveAttribute(ARIA_PRESSED, 'false');
+    });
+
+    it('keeps the locked Card style tiles at the preset value while arrows move focus', async () => {
+      await openLookRow(user, LOOK_ROW.CARDS);
+      const tiles = screen.getByRole('radiogroup', {
+        name: `${LOOK_FORM.cardStyleLabel} ${GROWTH_BADGE_TEXT}`,
+      });
+      const accentBarTile = within(tiles).getByRole('radio', {
+        name: LOOK_FORM.cardStyleOptionLabel.ACCENT_BAR,
+      });
+      const outlinedTile = within(tiles).getByRole('radio', { name: OUTLINED });
+
+      const filledTile = within(tiles).getByRole('radio', {
+        name: LOOK_FORM.cardStyleOptionLabel.FILLED,
+      });
+
+      await user.click(outlinedTile);
+      await user.keyboard(USER_EVENT_KEY.ARROW_RIGHT);
+
+      expect(filledTile).toHaveFocus();
+      expect(accentBarTile).toBeChecked();
+      expect(outlinedTile).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(tiles).toHaveAccessibleDescription(
+        `${GROWTH_BADGE_TEXT} ${LOOK_FORM.cardStyleOptionDescription.ACCENT_BAR} ${LOOK_FORM.cardStyleDescription}`,
+      );
     });
 
     it('keeps the logo hue following the accent behind a locked switch', async () => {
