@@ -31,24 +31,26 @@ describe(`<${FormLocaleSelect.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('shows the chosen language by name and describes the select by its hint', () => {
-    setup();
+  describe('rendered', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const select = getSelect();
+    it('shows the chosen language by name and describes the select by its hint', () => {
+      const select = getSelect();
 
-    expect(select).toHaveTextContent(languageNames[EN]);
-    expect(select).toHaveAccessibleDescription(MOCK_HINT);
-  });
+      expect(select).toHaveTextContent(languageNames[EN]);
+      expect(select).toHaveAccessibleDescription(MOCK_HINT);
+    });
 
-  it('offers every supported language by name', async () => {
-    setup();
+    it('offers every supported language by name', async () => {
+      await user.click(getSelect());
+      const options = await screen.findAllByRole('option');
 
-    await user.click(getSelect());
-    const options = await screen.findAllByRole('option');
-
-    expect(options.map((option) => option.textContent)).toEqual(
-      Object.values(LOCALE_ISO_CODES).map((locale) => languageNames[locale]),
-    );
+      expect(options.map((option) => option.textContent)).toEqual(
+        Object.values(LOCALE_ISO_CODES).map((locale) => languageNames[locale]),
+      );
+    });
   });
 
   it('reports the language chosen from the list', async () => {

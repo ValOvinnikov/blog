@@ -261,55 +261,44 @@ describe(createTenantAction, () => {
       },
     );
 
-    it('invites the owner once the token verifies for the email', async () => {
-      await expect(
-        createTenantAction({
-          ...validInput,
-          confirmOwnerInviteToken: validOwnerInviteToken,
-        }),
-      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-      expect(createTenantDraftMock).toHaveBeenCalledWith({
-        ...MOCK_TENANT_DRAFT_FIELDS,
-        owner: { type: 'invite', email: MOCK_OWNER_EMAIL },
+    describe('once the token verifies for the email', () => {
+      beforeEach(async () => {
+        await expect(
+          createTenantAction({
+            ...validInput,
+            confirmOwnerInviteToken: validOwnerInviteToken,
+          }),
+        ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
       });
-      expect(sendOwnerInviteEmailMock).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        MOCK_OWNER_EMAIL,
-      );
-      expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-      expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
-    });
 
-    it('records an invited owner without their email address', async () => {
-      await expect(
-        createTenantAction({
-          ...validInput,
-          confirmOwnerInviteToken: validOwnerInviteToken,
-        }),
-      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+      it('invites the owner', () => {
+        expect(createTenantDraftMock).toHaveBeenCalledWith({
+          ...MOCK_TENANT_DRAFT_FIELDS,
+          owner: { type: 'invite', email: MOCK_OWNER_EMAIL },
+        });
+        expect(sendOwnerInviteEmailMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+          MOCK_OWNER_EMAIL,
+        );
+        expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+        expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
+      });
 
-      expect(insertAuditEventMock).toHaveBeenCalledWith({
-        actorId: MOCK_OPERATOR_ID,
-        action: AUDIT_ACTION.CREATED,
-        targetType: AUDIT_TARGET_TYPE.TENANT,
-        targetId: MOCK_TENANT_ID,
-        details: {
-          name: MOCK_TENANT_NAME,
-          domain: MOCK_TENANT_DOMAIN,
-          plan: TENANT_PLAN.FREE,
-          ownerUserId: null,
-        },
+      it('records an invited owner without their email address', () => {
+        expect(insertAuditEventMock).toHaveBeenCalledWith({
+          actorId: MOCK_OPERATOR_ID,
+          action: AUDIT_ACTION.CREATED,
+          targetType: AUDIT_TARGET_TYPE.TENANT,
+          targetId: MOCK_TENANT_ID,
+          details: {
+            name: MOCK_TENANT_NAME,
+            domain: MOCK_TENANT_DOMAIN,
+            plan: TENANT_PLAN.FREE,
+            ownerUserId: null,
+          },
+        });
       });
     });
-  });
-
-  it('never sends the owner-invite email on the found-owner path', async () => {
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
   });
 
   it('rejects a reserved site address', async () => {
@@ -402,13 +391,36 @@ describe(createTenantAction, () => {
     expect(loggerWarnMock).not.toHaveBeenCalled();
   });
 
-  it('starts provisioning, then redirects to the status page', async () => {
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
+  describe('once the tenant is created for a found owner', () => {
+    beforeEach(async () => {
+      await expect(createTenantAction(validInput)).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
+      );
+    });
 
-    expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
+    it('never sends the owner-invite email on the found-owner path', () => {
+      expect(sendOwnerInviteEmailMock).not.toHaveBeenCalled();
+    });
+
+    it('starts provisioning, then redirects to the status page', () => {
+      expect(startProvisioningMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
+    });
+
+    it('records a CREATED audit event for the new tenant, with the operator as actor', () => {
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.CREATED,
+        targetType: AUDIT_TARGET_TYPE.TENANT,
+        targetId: MOCK_TENANT_ID,
+        details: {
+          name: MOCK_TENANT_NAME,
+          domain: MOCK_TENANT_DOMAIN,
+          plan: TENANT_PLAN.FREE,
+          ownerUserId: MOCK_OWNER_USER_ID,
+        },
+      });
+    });
   });
 
   it.each([
@@ -430,25 +442,6 @@ describe(createTenantAction, () => {
       expect(redirect).toHaveBeenCalledWith(PROVISIONING_PATH);
     },
   );
-
-  it('records a CREATED audit event for the new tenant, with the operator as actor', async () => {
-    await expect(createTenantAction(validInput)).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
-    );
-
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.CREATED,
-      targetType: AUDIT_TARGET_TYPE.TENANT,
-      targetId: MOCK_TENANT_ID,
-      details: {
-        name: MOCK_TENANT_NAME,
-        domain: MOCK_TENANT_DOMAIN,
-        plan: TENANT_PLAN.FREE,
-        ownerUserId: MOCK_OWNER_USER_ID,
-      },
-    });
-  });
 
   it('still dispatches and redirects when the audit write fails, and logs it', async () => {
     insertAuditEventMock.mockRejectedValue(MOCK_AUDIT_WRITE_ERROR);
