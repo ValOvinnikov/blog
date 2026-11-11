@@ -28,7 +28,7 @@ if (sharesMainNodeModules) {
       '  rm node_modules   # removes only the symlink, not its target',
       '  pnpm install',
       '',
-      'See README.md § "Working with Claude Code".',
+      'See docs/context/claude-code.md.',
     ].join('\n'),
   );
   process.exit(1);

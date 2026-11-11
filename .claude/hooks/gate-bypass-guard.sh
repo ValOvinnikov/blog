@@ -4,9 +4,9 @@
 #
 # Exists only to keep the common case cheap: this hook is wired globally
 # (every agent's Bash calls, not just one agent's — see settings.json) and
-# node costs ~250ms to start. Payloads with no "git" anywhere (pnpm, ls,
-# grep, ...) are the overwhelming majority and exit here without spawning
-# anything.
+# node costs ~250ms to start. Payloads with neither "git" nor "HUSKY"
+# anywhere (pnpm, ls, grep, ...) are the overwhelming majority and exit here
+# without spawning anything.
 #
 # The prefilter is intentionally case-sensitive: case-insensitive filesystem
 # tricks (`GIT push --force`) are a documented, accepted gap in
@@ -25,7 +25,7 @@ set -u
 
 payload=$(cat)
 
-printf '%s' "$payload" | grep -q git || exit 0
+printf '%s' "$payload" | grep -qE 'git|HUSKY' || exit 0
 
 if ! command -v node >/dev/null 2>&1; then
 	echo "gate-bypass-guard: node not found; gate-bypass guard is INERT this session." >&2

@@ -416,7 +416,10 @@ file` are all denied alike) — an earlier version only handled the
 
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
-    (see below) before pnpm can write anything.
+    (see below) before pnpm can write anything. It checks the `node_modules`
+    of the git toplevel of the payload's `cwd`, falling back to
+    `$CLAUDE_PROJECT_DIR` only when the payload carries none —
+    `$CLAUDE_PROJECT_DIR` names the primary checkout even inside a worktree.
   - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
     a `git push` that creates a branch off the pattern in
     `scripts/branch-name.mjs` (`<type>/<n>-<slug>`, plus `main`,
@@ -440,7 +443,9 @@ file` are all denied alike) — an earlier version only handled the
     orchestrator). Blocks the plain, unobfuscated forms of `git` commands
     that skip the husky gates or rewrite pushed history: a literal
     `--no-verify`/`-n` on `commit`/`push`/`merge`, a literal
-    `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, and
+    `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, a leading
+    `HUSKY=0` assignment (bare or after `env`) on `commit`/`push`/`merge`, a
+    literal `export HUSKY=0`, and
     `core.hooksPath` on `git config` — plus, since #3362, the literal
     destructive forms that have actually lost uncommitted agent work here:
     `git reset --hard`, `git clean -f`/`--force` (any short-flag cluster
@@ -491,7 +496,7 @@ file` are all denied alike) — an earlier version only handled the
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email`) to implement an issue that
+    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`worker`/`auth`/`insight`/`email`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).
@@ -524,8 +529,8 @@ file` are all denied alike) — an earlier version only handled the
 
   - `subagent-stop-commit-guard.sh` — `SubagentStop` hook wired in
     `settings.json` with a `matcher` on the subagent type, restricted to the
-    ten layer agents
-    (`^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$`);
+    eleven layer agents
+    (`^(config|studio|service|ui|web|db|auth|platform-app|worker|email|insight)$`);
     the script re-checks the payload's `agent_type` against the same list,
     so a widened matcher can't silently widen the guard. Blocks a layer agent
     from ending its turn while its worktree has uncommitted work: when the
@@ -537,7 +542,7 @@ file` are all denied alike) — an earlier version only handled the
     work" step that closes every layer agent's Definition of done: the
     orchestrator lands an agent's work by merging its **commit**, so an agent
     that reports done with the files only on disk looks finished while its
-    branch still sits at the base (#2437–#2439 all ended that way).
+    branch still sits at the base.
 
     The agent-type scope is load-bearing, not tidiness: `test-writer` also
     runs with `isolation: worktree`, but `read-only-agent-guard.sh` denies it
