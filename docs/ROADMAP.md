@@ -69,6 +69,7 @@ describe the older scope.
 | **Own analytics**         | A field for the owner's Google Analytics or Plausible ID replaces today's Analytics switch, which loads numbers only the operator can read. Google Analytics loads after consent. It stays once the built-in stats page exists.                                                                                                                                                                                                                                                                                                                                                                         |
 | **First run**             | The first dashboard view leads with the live site (provisioning takes about 10 seconds), a short checklist, Google first on `/signup`, and the wizard's last step explains the Sanity invite. Signing owners into the Studio ourselves is closed: Sanity's third-party login is deprecated and Enterprise-only.                                                                                                                                                                                                                                                                                         |
 | **Coming soon rows**      | A row on a paid plan either works or is absent. Comments (#1040) are hidden until built; ratings (#1041) are dropped.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **Growth layers (#5714)** | A site that moves to Growth gets its type's Growth sections added at fixed slots, with placeholder images, so the paid modules arrive with an example. Applied at provisioning and on an upgrade, the Stripe one included; a downgrade removes nothing.                                                                                                                                                                                                                                                                                                                                                 |
 | **Takeaways model**       | Generation moves from `claude-haiku-4-5` to `claude-haiku-5-5`, a tenth of the price. The new model rejects the temperature the call sends today.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 Owner tasks before the first payment: register for the EU's One Stop Shop VAT
@@ -164,6 +165,12 @@ First, in this order (owner, 2026-11-11; no tickets cut except where named):
 7. Regional discounts as Stripe coupons.
 8. AI-search controls: an `llms.txt` and crawler rules per site.
 9. A webhook for contact-form leads.
+10. A gallery module: an image grid with a lightbox, the first new module.
+11. The project content type with its latest-projects cards and archive
+    (#1291).
+
+No other new module is needed for the launch: video embeds are the only one
+in its scope. The location module (#2792) ships with the Business site type.
 
 When a client asks, or once signups show who the audience is: an import skill
 the owner runs locally (WordPress and Substack first; a script copies body
