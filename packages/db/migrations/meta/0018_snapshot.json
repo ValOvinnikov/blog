@@ -1,5 +1,5 @@
 {
-  "id": "6a3af10d-3368-4b15-be53-98c31195266c",
+  "id": "cd05f81a-0874-4635-8954-2eb71ec6630d",
   "prevId": "2ce183db-aae1-4b80-b778-6d33b4ff13bf",
   "version": "7",
   "dialect": "postgresql",
@@ -849,6 +849,47 @@
           "columns": ["tenant_id", "template_type", "locale"]
         }
       },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.email_delivery_events": {
+      "name": "email_delivery_events",
+      "schema": "",
+      "columns": {
+        "event_id": {
+          "name": "event_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "received_at": {
+          "name": "received_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "email_delivery_events_tenant_id_tenants_id_fk": {
+          "name": "email_delivery_events_tenant_id_tenants_id_fk",
+          "tableFrom": "email_delivery_events",
+          "tableTo": "tenants",
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -1827,31 +1868,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.stripe_webhook_events": {
-      "name": "stripe_webhook_events",
-      "schema": "",
-      "columns": {
-        "event_id": {
-          "name": "event_id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "handled_at": {
-          "name": "handled_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.subscribers": {
       "name": "subscribers",
       "schema": "",
@@ -2497,54 +2513,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "stripe_customer_id": {
-          "name": "stripe_customer_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "stripe_subscription_id": {
-          "name": "stripe_subscription_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "stripe_promotion_code": {
-          "name": "stripe_promotion_code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "trial_ends_at": {
-          "name": "trial_ends_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "downgrade_grace_started_at": {
-          "name": "downgrade_grace_started_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "grace_started_email_sent_at": {
-          "name": "grace_started_email_sent_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "grace_halfway_email_sent_at": {
-          "name": "grace_halfway_email_sent_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "grace_ending_email_sent_at": {
-          "name": "grace_ending_email_sent_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "content_migration_failed_at": {
           "name": "content_migration_failed_at",
           "type": "timestamp",
@@ -2597,16 +2565,6 @@
           "name": "tenants_sanity_project_id_unique",
           "nullsNotDistinct": false,
           "columns": ["sanity_project_id"]
-        },
-        "tenants_stripe_customer_id_unique": {
-          "name": "tenants_stripe_customer_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["stripe_customer_id"]
-        },
-        "tenants_stripe_subscription_id_unique": {
-          "name": "tenants_stripe_subscription_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["stripe_subscription_id"]
         }
       },
       "policies": {},

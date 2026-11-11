@@ -28,6 +28,9 @@ export const env = createEnv({
     // Absent, Resend's shared testing sender is used.
     // @env-optional
     NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
+    // Absent, `/api/email-delivery-events` answers 500 and no delivery outcome is recorded.
+    // @env-optional
+    RESEND_WEBHOOK_SECRET: z.string().min(1).optional(),
     // Absent, links in owner emails are inert.
     // @env-optional
     PLATFORM_APP_URL: z.string().url().optional(),
@@ -76,6 +79,7 @@ export const env = createEnv({
     SANITY_GENERATE_SECRET: process.env.SANITY_GENERATE_SECRET,
     WEB_ANALYTICS_ENABLED: process.env.WEB_ANALYTICS_ENABLED,
     NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
+    RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET,
     PLATFORM_APP_URL: process.env.PLATFORM_APP_URL,
     KV_REST_API_URL: process.env.KV_REST_API_URL,
     KV_REST_API_TOKEN: process.env.KV_REST_API_TOKEN,

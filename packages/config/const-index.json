@@ -8306,6 +8306,110 @@
         "file": "apps/web/src/constants/cookie-statement.ts"
       }
     ],
+    "svix-id": [
+      {
+        "ref": "RESEND_WEBHOOK_HEADER.ID",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "svix-timestamp": [
+      {
+        "ref": "RESEND_WEBHOOK_HEADER.TIMESTAMP",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "svix-signature": [
+      {
+        "ref": "RESEND_WEBHOOK_HEADER.SIGNATURE",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email.delivered": [
+      {
+        "ref": "RESEND_DELIVERY_EVENT_TYPE.DELIVERED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email.bounced": [
+      {
+        "ref": "RESEND_DELIVERY_EVENT_TYPE.BOUNCED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email.complained": [
+      {
+        "ref": "RESEND_DELIVERY_EVENT_TYPE.COMPLAINED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.webhook_secret_missing": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.webhook_signature_invalid": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_SIGNATURE_INVALID",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.webhook_event_malformed": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_EVENT_MALFORMED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.webhook_site_unknown": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_UNKNOWN",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.webhook_site_tag_invalid": [
+      {
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_INVALID",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.delivery_outcome_record_failed": [
+      {
+        "ref": "EMAIL_USAGE_LOG.DELIVERY_OUTCOME_RECORD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "email_usage.send_count_failed": [
+      {
+        "ref": "EMAIL_USAGE_LOG.SEND_COUNT_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/email-usage",
+        "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
     "faq_module.fetch_failed": [
       {
         "ref": "FAQ_LOG.MODULE_FETCH_FAILED",

@@ -46,7 +46,7 @@ vi.mock('@blog/auth/events/record-signup-terms-on-sign-in', () => ({
 }));
 
 const MOCK_SIGNED_IN_USER = { id: MOCK_USER_ID, email: MOCK_EMAIL };
-const onMagicLinkSendRefused = vi.fn();
+const MAGIC_LINK_HANDLERS = { onSendRefused: vi.fn() };
 
 type TSessionCallbackParams = Parameters<
   NonNullable<NonNullable<NextAuthConfig['callbacks']>['session']>
@@ -114,14 +114,14 @@ describe(buildAuthConfig, () => {
   it.each([AUTH_APP.SITE, AUTH_APP.PLATFORM])(
     'scopes the sessions of a %s config to its app',
     (app) => {
-      const config = buildAuthConfig(app, onMagicLinkSendRefused);
+      const config = buildAuthConfig(app, MAGIC_LINK_HANDLERS);
 
       expect(config.adapter).not.toBe(drizzleAdapterStub);
     },
   );
 
   it("binds the Drizzle adapter to @blog/db's Auth.js tables", () => {
-    buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+    buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
 
     const [, tables] = vi.mocked(DrizzleAdapter).mock.calls[0] ?? [];
     expect(tables).toEqual({
@@ -135,58 +135,70 @@ describe(buildAuthConfig, () => {
   it('reads the secret from AUTH_SECRET', () => {
     vi.stubEnv('AUTH_SECRET', MOCK_AUTH_SECRET);
 
-    const config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+    const config = buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
 
     expect(config.secret).toBe(MOCK_AUTH_SECRET);
   });
 
   it('offers only the magic-link provider when no OAuth credentials are set', () => {
-    const config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+    const config = buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
 
     expect(providerIdsOf(config)).toEqual([MAGIC_LINK_PROVIDER_ID]);
   });
 
-  it('adds GitHub and Google ahead of the magic link when their credentials are set', () => {
-    vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
-    vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
-    vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
-    vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
+  describe('with GitHub credentials in the env', () => {
+    beforeEach(() => {
+      vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
+      vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
+    });
 
-    const config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+    it('adds GitHub and Google ahead of the magic link when their credentials are set', () => {
+      vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
+      vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
 
-    expect(providerIdsOf(config)).toEqual([
-      OAUTH_PROVIDER.GITHUB,
-      OAUTH_PROVIDER.GOOGLE,
-      MAGIC_LINK_PROVIDER_ID,
-    ]);
+      const config = buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
+
+      expect(providerIdsOf(config)).toEqual([
+        OAUTH_PROVIDER.GITHUB,
+        OAUTH_PROVIDER.GOOGLE,
+        MAGIC_LINK_PROVIDER_ID,
+      ]);
+    });
+
+    it('uses the env credentials and redirect proxy without site credentials', () => {
+      const options = oauthProviderOptionsOf(
+        buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS),
+        OAUTH_PROVIDER.GITHUB,
+      );
+
+      expect(options?.clientId).toBe(MOCK_GITHUB_ID);
+      expect(redirectProxyUrlOf(options)).toBe(MOCK_REDIRECT_PROXY_URL);
+    });
   });
 
   describe("with the site's own credentials", () => {
+    let config: NextAuthConfig;
+
     beforeEach(() => {
       vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
       vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
       vi.stubEnv('AUTH_GOOGLE_ID', MOCK_GOOGLE_ID);
       vi.stubEnv('AUTH_GOOGLE_SECRET', MOCK_GOOGLE_SECRET);
+      config = buildAuthConfig(
+        AUTH_APP.SITE,
+        MAGIC_LINK_HANDLERS,
+        MOCK_SITE_GITHUB_CREDENTIALS,
+      );
     });
 
     it("signs in with the site's credentials on its own callback", () => {
-      const config = buildAuthConfig(
-        AUTH_APP.SITE,
-        onMagicLinkSendRefused,
-        MOCK_SITE_GITHUB_CREDENTIALS,
-      );
       const options = oauthProviderOptionsOf(config, OAUTH_PROVIDER.GITHUB);
 
       expect(options?.clientId).toBe(MOCK_SITE_GITHUB_ID);
       expect(redirectProxyUrlOf(options)).toBeFalsy();
     });
 
-    it('keeps the env credentials and the redirect proxy for a provider the site has none for', () => {
-      const config = buildAuthConfig(
-        AUTH_APP.SITE,
-        onMagicLinkSendRefused,
-        MOCK_SITE_GITHUB_CREDENTIALS,
-      );
+    it('keeps the env credentials and redirect proxy for a provider the site lacks', () => {
       const options = oauthProviderOptionsOf(config, OAUTH_PROVIDER.GOOGLE);
 
       expect(options?.clientId).toBe(MOCK_GOOGLE_ID);
@@ -194,24 +206,11 @@ describe(buildAuthConfig, () => {
     });
   });
 
-  it('uses the env credentials and the redirect proxy when no site credentials are passed', () => {
-    vi.stubEnv('AUTH_GITHUB_ID', MOCK_GITHUB_ID);
-    vi.stubEnv('AUTH_GITHUB_SECRET', MOCK_GITHUB_SECRET);
-
-    const options = oauthProviderOptionsOf(
-      buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused),
-      OAUTH_PROVIDER.GITHUB,
-    );
-
-    expect(options?.clientId).toBe(MOCK_GITHUB_ID);
-    expect(redirectProxyUrlOf(options)).toBe(MOCK_REDIRECT_PROXY_URL);
-  });
-
   describe('for a site', () => {
     let config: NextAuthConfig;
 
     beforeEach(() => {
-      config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+      config = buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
     });
 
     it("keeps Auth.js's default cookie names outside production", () => {
@@ -251,7 +250,7 @@ describe(buildAuthConfig, () => {
     let config: NextAuthConfig;
 
     beforeEach(() => {
-      config = buildAuthConfig(AUTH_APP.PLATFORM, onMagicLinkSendRefused);
+      config = buildAuthConfig(AUTH_APP.PLATFORM, MAGIC_LINK_HANDLERS);
     });
 
     it('consumes pending invites and records signup terms on sign-in', async () => {
@@ -296,7 +295,7 @@ describe(buildAuthConfig, () => {
     });
 
     it("keeps Auth.js's default secure cookie names", () => {
-      const config = buildAuthConfig(AUTH_APP.SITE, onMagicLinkSendRefused);
+      const config = buildAuthConfig(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
 
       expect(config.useSecureCookies).toBe(true);
       expect(config.cookies?.sessionToken?.name).toBe(
@@ -314,7 +313,7 @@ describe(buildAuthConfig, () => {
     });
 
     it('keeps the secure cookie prefixes', () => {
-      const config = buildAuthConfig(AUTH_APP.PLATFORM, onMagicLinkSendRefused);
+      const config = buildAuthConfig(AUTH_APP.PLATFORM, MAGIC_LINK_HANDLERS);
 
       expect(config.useSecureCookies).toBe(true);
       expect(config.cookies?.sessionToken?.name).toMatch(/^__Secure-/);
