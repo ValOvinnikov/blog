@@ -230,6 +230,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SANITY_DOCUMENT_ACTION**: `PUBLISH`=`"publish"`, `DISCARD_CHANGES`=`"discardChanges"`, `UNPUBLISH`=`"unpublish"`, `DUPLICATE`=`"duplicate"`, `DELETE`=`"delete"`
 
+### `@blog/config/constants` — `packages/config/src/constants/sanity-perspective.ts`
+
+- **SANITY_PERSPECTIVE**: `PUBLISHED`=`"published"`, `DRAFTS`=`"drafts"`
+
 ### `@blog/config/constants` — `packages/config/src/constants/sanity-project.ts`
 
 - **SANITY_PROJECT_DELETE_OUTCOME**: `DELETED`, `ALREADY_GONE`, `BLOCKED_BY_BILLING_PERMISSION`

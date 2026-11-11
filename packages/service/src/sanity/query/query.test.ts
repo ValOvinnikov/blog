@@ -1,4 +1,8 @@
-import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import {
+  LOCALE_ISO_CODES,
+  SANITY_PERSPECTIVE,
+  type TLocaleIsoCode,
+} from '@blog/config/constants';
 import { MOCK_ABOUT_SLUG } from '@blog/service/testing/shared/translated-pages-dataset';
 import { mockTenant } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
@@ -11,6 +15,9 @@ faker.seed(6016);
 const MOCK_MISSING_SLUG = faker.lorem.slug();
 const SLUG_FILTER = 'slug.current == $slug';
 const NO_STORE = 'no-store';
+const MOCK_TAG = faker.lorem.word();
+const MOCK_REVALIDATE_SECONDS = faker.number.int({ min: 60, max: 3600 });
+const MOCK_NEXT = { revalidate: MOCK_REVALIDATE_SECONDS, tags: [MOCK_TAG] };
 
 const { mockFetch, getClientMock } = vi.hoisted(() => {
   const mockFetch = vi.fn();
@@ -86,6 +93,39 @@ describe(runQuery, () => {
     const [, , options] = mockFetch.mock.lastCall ?? [];
 
     expect(options).toEqual({ cache: NO_STORE });
+  });
+
+  it('forwards the Data Cache options for a published read', async () => {
+    await runQuery(query, { next: MOCK_NEXT, tenant: mockTenant() }).catch(
+      () => {},
+    );
+
+    const [, , options] = mockFetch.mock.lastCall ?? [];
+
+    expect(options).toEqual({ next: MOCK_NEXT });
+  });
+
+  describe('with a tenant that asks for drafts', () => {
+    const draftTenant = mockTenant({ perspective: SANITY_PERSPECTIVE.DRAFTS });
+
+    it('reads the drafts perspective uncached, dropping the Data Cache options', async () => {
+      await runQuery(query, { next: MOCK_NEXT, tenant: draftTenant }).catch(
+        () => {},
+      );
+
+      const [, , options] = mockFetch.mock.lastCall ?? [];
+
+      expect(options).toEqual({
+        perspective: SANITY_PERSPECTIVE.DRAFTS,
+        cache: NO_STORE,
+      });
+    });
+
+    it('reads through the client of the draft tenant', async () => {
+      await runQuery(query, { tenant: draftTenant }).catch(() => {});
+
+      expect(getClientMock).toHaveBeenCalledWith(draftTenant);
+    });
   });
 
   describe('with a query that declares a locale', () => {
