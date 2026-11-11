@@ -10,7 +10,7 @@ type TRouteParams = { tenant: string; locale: string };
 export const enterDraftPreview = async (
   params: Promise<TRouteParams>,
 ): Promise<void> => {
-  await enterRequestContext(params);
+  await enterRequestContext(params, { acceptsDraftPreview: true });
   const { isDraftPreview } = await getRequestContext();
   if (!isDraftPreview) {
     notFound();

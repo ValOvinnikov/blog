@@ -16,6 +16,7 @@
     "./merge": "./src/merge/index.ts",
     "./normalize-email-identity": "./src/normalize-email-identity/index.ts",
     "./pagination": "./src/pagination/index.ts",
+    "./preview-token": "./src/preview-token/index.ts",
     "./primitives": "./src/primitives/index.ts",
     "./reading-time": "./src/reading-time/index.ts",
     "./result": "./src/result/index.ts",

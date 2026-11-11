@@ -122,7 +122,9 @@ describe(generateMetadata, () => {
 
     await generateMetadata({ params });
 
-    expect(enterRequestContextMock).toHaveBeenCalledWith(params);
+    expect(enterRequestContextMock).toHaveBeenCalledWith(params, {
+      acceptsDraftPreview: true,
+    });
   });
 
   describe('without a brand name', () => {

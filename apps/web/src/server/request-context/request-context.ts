@@ -2,6 +2,7 @@ import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import type { TTenantSanityContext } from '@blog/service';
+import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { routing } from '@web/i18n/routing';
 import { hasDraftPreviewToken } from '@web/server/draft-preview/has-draft-preview-token/has-draft-preview-token';
 import { parseTenantSegment } from '@web/server/draft-preview/parse-tenant-segment/parse-tenant-segment';
@@ -55,8 +56,6 @@ const getStore = cache((): TRequestContextStore => {
   return { requestedRoute, recordRequestedRoute };
 });
 
-// Archived and deprovisioned rows included: credentials and locales never
-// filtered on them, and the base URL applies its own servability gate.
 const loadTenantRow = async (
   tenantId: TMaybeUndefined<string>,
 ): Promise<TMaybeUndefined<TTenant>> =>
@@ -106,9 +105,10 @@ const buildRequestContext = async (
   };
 };
 
-/** Must run first in every `[tenant]/[locale]` layout, page and `generateMetadata`. */
+/** Must run first in every `[tenant]/[locale]` layout, page and `generateMetadata`; only the shared layout and the draft routes accept a draft preview segment. */
 export const enterRequestContext = async (
   params: Promise<TRouteParams>,
+  { acceptsDraftPreview = false }: { acceptsDraftPreview?: boolean } = {},
 ): Promise<void> => {
   const { tenant, locale } = await params;
   const { tenantId, isDraftPreview } = parseTenantSegment(tenant);
@@ -116,6 +116,9 @@ export const enterRequestContext = async (
   store.recordRequestedRoute({ tenantId, locale });
 
   if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  if (isDraftPreview && !acceptsDraftPreview) {
     notFound();
   }
 
@@ -156,7 +159,7 @@ const loadTenantRowForNotFound = async (
   try {
     return await loadTenantRowOnce(store, tenantId);
   } catch (error) {
-    logger.error('request_context.not_found_tenant_load_failed', { error });
+    logger.error(REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED, { error });
     return undefined;
   }
 };
@@ -175,11 +178,6 @@ const buildNotFoundContext = async (
   return { tenantId, locale: servedLocale };
 };
 
-/**
- * Next renders both `not-found.tsx` boundaries alongside the
- * `[tenant]/[locale]` layout on every request, so this waits for that layout
- * to enter the route rather than reading the store before it has.
- */
 export const getNotFoundContext = (): Promise<TNotFoundContext> => {
   const store = getStore();
   return (store.notFoundContext ??= buildNotFoundContext(store));

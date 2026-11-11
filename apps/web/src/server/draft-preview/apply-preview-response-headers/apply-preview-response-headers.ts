@@ -1,3 +1,4 @@
+import { buildFramingHeaders } from '@blog/next-config/security-headers';
 import {
   buildContentSecurityPolicy,
   FRAME_ANCESTORS_NONE,
@@ -24,11 +25,12 @@ const buildDraftPreviewHeaders = (): Record<string, string> => ({
   'X-Robots-Tag': ROBOTS_DIRECTIVE.NOINDEX,
 });
 
-const buildRefusedPreviewHeaders = (): Record<string, string> => ({
-  'Content-Security-Policy': buildContentSecurityPolicy(FRAME_ANCESTORS_NONE),
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'X-Frame-Options': 'DENY',
-});
+const buildRefusedPreviewHeaders = (): Record<string, string> =>
+  Object.fromEntries(
+    buildFramingHeaders(buildContentSecurityPolicy(FRAME_ANCESTORS_NONE)).map(
+      ({ key, value }) => [key, value],
+    ),
+  );
 
 /** `next.config` leaves these headers to the proxy on any request carrying a preview token, verified or not. */
 export const applyPreviewResponseHeaders = (

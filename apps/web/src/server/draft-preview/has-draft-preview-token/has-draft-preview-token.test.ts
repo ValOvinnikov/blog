@@ -1,6 +1,6 @@
+import { signPreviewToken } from '@blog/utils/preview-token';
 import { faker } from '@faker-js/faker';
 import { PREVIEW_TOKEN_HEADER } from '@web/server/draft-preview/constants/constants';
-import { mintPreviewToken } from '@web/server/draft-preview/preview-token/preview-token';
 import { env } from '@web/utils/env/env';
 
 import { hasDraftPreviewToken } from './has-draft-preview-token';
@@ -13,20 +13,24 @@ vi.mock('@web/utils/env/env');
 faker.seed(7180);
 
 const MOCK_TENANT_ID = faker.string.uuid();
+const MOCK_SECRET = faker.string.alphanumeric(32);
 
 const sendHeaders = (entries: Record<string, string>): void => {
   headersMock.mockResolvedValue(new Headers(entries));
 };
 
 const mintFor = (tenantId: string): string =>
-  mintPreviewToken({
-    tenantId,
-    path: `/${faker.lorem.slug()}`,
-    expiresAt: Date.now() + 60_000,
-  });
+  signPreviewToken(
+    {
+      tenantId,
+      path: `/${faker.lorem.slug()}`,
+      expiresAt: Date.now() + 60_000,
+    },
+    MOCK_SECRET,
+  );
 
 beforeEach(() => {
-  Object.assign(env, { PREVIEW_LINK_SECRET: faker.string.alphanumeric(32) });
+  Object.assign(env, { PREVIEW_LINK_SECRET: MOCK_SECRET });
 });
 
 describe(hasDraftPreviewToken, () => {

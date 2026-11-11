@@ -17,6 +17,7 @@ code:
   - apps/web/src/server/settings-features/get-effective-settings-features/**
   - apps/platform/src/server/site-config/revalidate-site-config.ts
   - apps/web/src/server/draft-preview/**
+  - packages/utils/src/preview-token/**
   - apps/web/src/app/[tenant]/[locale]/~preview/**
   - scripts/check-revalidate-tags-sync.mjs
 epics: []
@@ -63,7 +64,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 - A renamed slug leaves the old URL's page cached until the route backstop expires it. A scheduled post appears only as caches expire; nothing purges when its date passes.
 - `/api/revalidate-site-config` always purges the whole site layout as well as the tenant's tags; with no `tenantId` it purges every tenant's tags.
 - `revalidateTag` needs the Node.js runtime; both routes declare `runtime = 'nodejs'`.
-- **Draft preview never touches a shared cache.** A preview token is `<base64url claims>.<HMAC-SHA256>` under `PREVIEW_LINK_SECRET`, with claims `{ tenantId, path, expiresAt }` (epoch ms). `proxy.ts` accepts it only when the tenant matches the host's and the path matches the request's, then rewrites to the `~preview` route and passes the token to the render in `x-preview-token` (stripped from every incoming request). Any other token is ignored and the published page is served. The render re-verifies the token's tenant before it reads anything, so a request that bypasses the proxy never reaches a draft; it reads the tenant's own credentials with the `drafts` perspective, which `runQuery` sends `cache: 'no-store'`, and never the platform fallback. The published routes read no cookie and no header, so they stay cached as before.
+- **Draft preview never touches a shared cache.** A preview token is `<base64url claims>.<HMAC-SHA256>` under `PREVIEW_LINK_SECRET`, with claims `{ tenantId, path, expiresAt }` (epoch ms), signed and read by `@blog/utils/preview-token`; a token whose expiry lies more than `PREVIEW_TOKEN_MAX_AGE_MS` (one hour) plus a minute's clock skew ahead is refused. `proxy.ts` accepts it only when the tenant matches the host's and the path matches the request's, then rewrites to the `~preview` route and passes the token to the render in `x-preview-token` (stripped from every incoming request). Any other token is ignored and the published page is served. Every path carrying the `~preview` marker (or `%7Epreview`) runs through the proxy and is answered 404, so no outside request addresses a draft route, and a marked `[tenant]` segment on any route but the draft routes and their shared layout is a 404 without reading a header. The render re-verifies the token's tenant before it reads anything; it reads the tenant's own credentials with the `drafts` perspective, which `runQuery` sends `cache: 'no-store'`, and never the platform fallback. The published routes read no cookie and no header, so they stay cached as before.
 - **Framing.** `next.config` leaves `Content-Security-Policy`, `Referrer-Policy` and `X-Frame-Options` to the proxy on any request carrying `?preview`, and the proxy matcher routes every such request through the proxy. A verified preview gets `frame-ancestors <PLATFORM_APP_URL origin>`, `Cache-Control: private, no-store`, `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex`; an unverified one gets `frame-ancestors 'none'` and `X-Frame-Options: DENY`. Every response without the parameter keeps the site-wide headers.
 - **Why not Draft Mode.** Next's Draft Mode cookie value is the deployment's `previewModeId`, the same value that, sent as `x-prerender-revalidate`, triggers an on-demand rebuild (`next/dist/server/api-utils/index.js`, Next 16.4). One cookie would unlock every tenant's drafts and every tenant's cache.
 - Only posts and landing pages have a draft route; a token for any other path renders a 404 inside the frame.
@@ -83,13 +84,14 @@ A member can see an unpublished draft on the tenant's real site through a signed
 - `apps/web/src/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags.ts`
 - `packages/service/src/sanity/query/isr.ts`
 - `packages/config/src/constants/cache.ts`
-- `apps/web/src/server/draft-preview/preview-token/preview-token.ts`
+- `packages/utils/src/preview-token/preview-token.ts`
 - `apps/platform/src/server/site-config/revalidate-site-config.ts`
 
 ## Tests and stories
 
-- Web: `app/api/revalidate/route.test.ts`, `app/api/revalidate-site-config/route.test.ts`, `revalidate-tags.test.ts`, `tenant-cache-tags.test.ts`, `derive-revalidate-paths.test.ts`, `resolve-referencing-module-tags.test.ts`, `build-post-publish-paths.test.ts`, `get-site-config.test.ts`, `get-tenant-plan.test.ts`, `get-effective-settings-features.test.ts`, `preview-token.test.ts`, `has-draft-preview-token.test.ts`, `enter-draft-preview.test.ts`, and the draft preview cases in `proxy.test.ts` and `request-context.test.ts`; each route's `page.test.tsx` asserts its `revalidate` literal.
+- Web: `app/api/revalidate/route.test.ts`, `app/api/revalidate-site-config/route.test.ts`, `revalidate-tags.test.ts`, `tenant-cache-tags.test.ts`, `derive-revalidate-paths.test.ts`, `resolve-referencing-module-tags.test.ts`, `build-post-publish-paths.test.ts`, `get-site-config.test.ts`, `get-tenant-plan.test.ts`, `get-effective-settings-features.test.ts`, `has-draft-preview-token.test.ts`, `enter-draft-preview.test.ts`, and the draft preview cases in `proxy.test.ts` and `request-context.test.ts`; each route's `page.test.tsx` asserts its `revalidate` literal.
 - Service: `packages/service/src/sanity/query/isr.test.ts`.
+- Utils: `packages/utils/src/preview-token/preview-token.test.ts`.
 - Scripts: `scripts/check-revalidate-tags-sync.test.mjs`.
 - No stories.
 

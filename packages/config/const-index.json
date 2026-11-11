@@ -8596,6 +8596,14 @@
         "file": "apps/web/src/constants/proxy.ts"
       }
     ],
+    "request_context.not_found_tenant_load_failed": [
+      {
+        "ref": "REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/request-context",
+        "file": "apps/web/src/constants/request-context.ts"
+      }
+    ],
     "revalidate_site_config.secret_missing": [
       {
         "ref": "REVALIDATE_SITE_CONFIG_LOG.SECRET_MISSING",

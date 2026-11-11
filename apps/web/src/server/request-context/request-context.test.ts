@@ -6,6 +6,7 @@ import {
 import { TENANT_PROVISIONING_STATUS } from '@blog/db';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { REQUEST_CONTEXT_LOG } from '@web/constants/request-context';
 import { DRAFT_PREVIEW_MARKER } from '@web/server/draft-preview/constants/constants';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import { setMockEnv } from '@web/testing/server/infra/set-mock-env';
@@ -62,8 +63,6 @@ vi.mock(
 );
 
 const DEVELOPMENT_DATASET = 'development';
-const NOT_FOUND_TENANT_LOAD_FAILED_EVENT =
-  'request_context.not_found_tenant_load_failed';
 const NO_TENANT_ENTERED = 'with no tenant entered';
 
 const MOCK_UNSERVED_LOCALE = faker.string.alpha(8);
@@ -103,9 +102,12 @@ const loadRequestContext = async (): Promise<typeof TModule> => {
 const enterAndRead = async (
   tenant: string,
   locale: string,
+  acceptsDraftPreview = false,
 ): Promise<TRequestContext> => {
   const requestContext = await loadRequestContext();
-  await requestContext.enterRequestContext(params(tenant, locale));
+  await requestContext.enterRequestContext(params(tenant, locale), {
+    acceptsDraftPreview,
+  });
   return requestContext.getRequestContext();
 };
 
@@ -292,15 +294,29 @@ describe('request-context', () => {
     });
   });
 
+  it('never checks for a preview token on a plain tenant segment', async () => {
+    await enterAndRead(MOCK_TENANT_ID, LOCALE_ISO_CODES.EN, true);
+
+    expect(hasDraftPreviewTokenMock).not.toHaveBeenCalled();
+  });
+
   describe('with a draft preview tenant segment', () => {
     beforeEach(() => {
       hasDraftPreviewTokenMock.mockResolvedValue(true);
+    });
+
+    it('throws a 404 on a route that does not accept a draft, without checking a token', async () => {
+      await expect(
+        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+      expect(hasDraftPreviewTokenMock).not.toHaveBeenCalled();
     });
 
     it("reads the tenant's own project through the drafts perspective", async () => {
       const { tenantId, sanityContext, isDraftPreview } = await enterAndRead(
         MOCK_DRAFT_TENANT_SEGMENT,
         LOCALE_ISO_CODES.EN,
+        true,
       );
 
       expect({ tenantId, sanityContext, isDraftPreview }).toEqual({
@@ -319,7 +335,7 @@ describe('request-context', () => {
       hasDraftPreviewTokenMock.mockResolvedValue(false);
 
       await expect(
-        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN),
+        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN, true),
       ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
       expect(getTenantByIdMock).not.toHaveBeenCalled();
     });
@@ -329,7 +345,7 @@ describe('request-context', () => {
       setMockEnv({ NEXT_PUBLIC_SANITY_DATASET: DEVELOPMENT_DATASET });
 
       await expect(
-        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN),
+        enterAndRead(MOCK_DRAFT_TENANT_SEGMENT, LOCALE_ISO_CODES.EN, true),
       ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
     });
   });
@@ -432,7 +448,7 @@ describe('request-context', () => {
       });
       const { logger } = await import('@web/utils/logger/logger');
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-        NOT_FOUND_TENANT_LOAD_FAILED_EVENT,
+        REQUEST_CONTEXT_LOG.NOT_FOUND_TENANT_LOAD_FAILED,
         { error },
       );
     });

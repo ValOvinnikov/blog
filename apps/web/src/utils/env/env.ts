@@ -62,7 +62,7 @@ export const env = createEnv({
     NEWSLETTER_UNSUBSCRIBE_KEY: z.string().min(1).optional(),
     // Absent, every preview link is ignored and the published page is served.
     // @env-optional
-    PREVIEW_LINK_SECRET: z.string().min(1).optional(),
+    PREVIEW_LINK_SECRET: z.string().min(32).optional(),
     // @env-optional
     PRODUCT_NAME: z.string().trim().min(1).optional(),
     // @env-optional

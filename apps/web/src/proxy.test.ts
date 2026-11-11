@@ -9,6 +9,10 @@ import {
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
 import type { TTranslationMap } from '@blog/service';
+import {
+  type IPreviewTokenClaims,
+  signPreviewToken,
+} from '@blog/utils/preview-token';
 import { faker } from '@faker-js/faker';
 import { CACHE_CONTROL, ROBOTS_DIRECTIVE } from '@web/constants/http';
 import { PROXY_LOG } from '@web/constants/proxy';
@@ -17,10 +21,6 @@ import {
   PREVIEW_TOKEN_HEADER,
   PREVIEW_TOKEN_QUERY_PARAM,
 } from '@web/server/draft-preview/constants/constants';
-import {
-  mintPreviewToken,
-  type TPreviewTokenClaims,
-} from '@web/server/draft-preview/preview-token/preview-token';
 import {
   TENANT_ID_HEADER,
   UNRESOLVED_TENANT_PLACEHOLDER,
@@ -57,7 +57,7 @@ const {
   intlMock: vi.fn(),
   env: {
     NEXT_PUBLIC_SANITY_DATASET: 'development',
-    PREVIEW_LINK_SECRET: 'preview-link-secret',
+    PREVIEW_LINK_SECRET: 'preview-link-secret-of-thirty-two-chars',
     PLATFORM_APP_URL: 'https://platform.example.test/dashboard',
   },
 }));
@@ -125,7 +125,7 @@ const REFERRER_POLICY_HEADER = 'referrer-policy';
 const CACHE_CONTROL_HEADER = 'cache-control';
 const ROBOTS_TAG_HEADER = 'x-robots-tag';
 const REVALIDATE_API_PATH = '/api/revalidate';
-const MOCK_PREVIEW_CLAIMS: TPreviewTokenClaims = {
+const MOCK_PREVIEW_CLAIMS: IPreviewTokenClaims = {
   tenantId: MOCK_TENANT_ID,
   path: BLOG_POST_PATH,
   expiresAt: Date.now() + 60_000,
@@ -313,6 +313,18 @@ describe('proxy matcher for an operator-suspended site', () => {
 });
 
 describe('proxy matcher for a preview token', () => {
+  it.each([
+    `/${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}/en/blog/a.b`,
+    '/en/%7Epreview/blog/a.b',
+  ])('runs the proxy for the dotted draft path %s', (path) => {
+    expect(
+      unstable_doesMiddlewareMatch({
+        config,
+        url: `${MOCK_TENANT_BASE_URL}${path}`,
+      }),
+    ).toBe(true);
+  });
+
   it.each([DOTTED_SEGMENT_PATH, REVALIDATE_API_PATH, ROBOTS_PATH])(
     'runs the proxy for %s when it carries a preview token',
     (path) => {
@@ -338,14 +350,26 @@ describe(proxy, () => {
   });
 
   describe('draft preview', () => {
+    it.each([
+      `/${DRAFT_PREVIEW_MARKER}${BLOG_POST_PATH}`,
+      `/${MOCK_TENANT_ID}${DRAFT_PREVIEW_MARKER}/en${BLOG_POST_PATH}`,
+      `/en/%7Epreview${BLOG_POST_PATH}`,
+      `/en/%7epreview${BLOG_POST_PATH}`,
+    ])('answers not found for the draft marker in %s', async (path) => {
+      const response = await visit(path);
+
+      expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
+      expect(resolveTenantRoutingMock).not.toHaveBeenCalled();
+    });
+
     const withToken = (
       pathname: string,
-      claims: Partial<TPreviewTokenClaims> = {},
+      claims: Partial<IPreviewTokenClaims> = {},
     ) =>
-      `${pathname}?${PREVIEW_TOKEN_QUERY_PARAM}=${mintPreviewToken({
-        ...MOCK_PREVIEW_CLAIMS,
-        ...claims,
-      })}`;
+      `${pathname}?${PREVIEW_TOKEN_QUERY_PARAM}=${signPreviewToken(
+        { ...MOCK_PREVIEW_CLAIMS, ...claims },
+        env.PREVIEW_LINK_SECRET,
+      )}`;
 
     describe('with a valid token for this tenant and path', () => {
       it('routes the request to the draft render without the token in its address', async () => {
@@ -415,7 +439,10 @@ describe(proxy, () => {
     it('drops a client-supplied preview header from a request without a token', async () => {
       const response = await visit(BLOG_POST_PATH, {
         headers: {
-          [PREVIEW_TOKEN_HEADER]: mintPreviewToken(MOCK_PREVIEW_CLAIMS),
+          [PREVIEW_TOKEN_HEADER]: signPreviewToken(
+            MOCK_PREVIEW_CLAIMS,
+            env.PREVIEW_LINK_SECRET,
+          ),
         },
       });
 

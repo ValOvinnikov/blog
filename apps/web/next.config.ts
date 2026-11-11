@@ -21,6 +21,7 @@ export default withBotId(
       '@blog/service',
       '@blog/config',
       '@blog/email',
+      '@blog/next-config',
     ],
     images: {
       // Next's static-image types declare `*.svg` as `any`, clashing with @blog/ui's typed SVGR declarations.

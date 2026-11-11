@@ -4,6 +4,8 @@ import { dirname, join, resolve } from 'node:path';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
+import { buildFramingHeaders } from './security-headers';
+
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 // Turbopack silently fails to resolve through the node_modules symlink agent worktrees use (.husky/post-checkout), so anchor at its realpath instead.
@@ -15,21 +17,6 @@ const turbopackRoot = (() => {
     return workspaceRoot;
   }
 })();
-
-const buildFramingHeaders = (contentSecurityPolicy: string) => [
-  {
-    key: 'Content-Security-Policy',
-    value: contentSecurityPolicy,
-  },
-  {
-    key: 'Referrer-Policy',
-    value: 'strict-origin-when-cross-origin',
-  },
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY',
-  },
-];
 
 const TRANSPORT_HEADERS = [
   {
