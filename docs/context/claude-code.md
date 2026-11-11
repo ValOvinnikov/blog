@@ -220,7 +220,8 @@ XModuleView` block that the rule already forbade and no review had
     layer agent's leftover attention at the end of its run. Scoped to test
     files by **enforcement** (#396) on both tool surfaces it has: a
     `PreToolUse` guard (`test-writer-scope-guard.sh`) denies any `Edit`/
-    `Write` outside `*.test.ts(x)`, and `permissionMode: dontAsk` +
+    `Write` outside `*.test.ts(x)`, `src/testing/` builders and `__mocks__/`
+    fakes, and `permissionMode: dontAsk` +
     `read-only-agent-guard.sh` (reused as-is from `reviewer`/`explore` below)
     denies the same write-shaped `Bash` commands — closing the `mv`/`cp`
     bypass that would otherwise move or overwrite a file outside the
@@ -385,7 +386,8 @@ file` are all denied alike) — an earlier version only handled the
     directory cannot be found" line out of the feedback. It sets
     `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
     (`prefer-shared-constant`, `no-duplicate-string`,
-    `blog-test/no-nested-query`) that repo-wide
+    `blog-test/no-nested-query`, `blog-test/prefer-before-each`) that
+    repo-wide
     `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
     same way. When ESLint exits fatally in a directory that has an
     `eslint.config.*` (the workspace's, or the root one the walk falls back
@@ -470,7 +472,8 @@ file` are all denied alike) — an earlier version only handled the
     directly or via CI (see [`docs/context/ci-automation.md`](./ci-automation.md)).
   - `test-writer-scope-guard.sh` — `PreToolUse` hook (wired in the
     `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose
-    target isn't `*.test.ts`/`*.test.tsx`, backing the test-file-only scoping
+    target isn't `*.test.ts(x)` or a `.ts`/`.tsx` file under `src/testing/`
+    or `__mocks__/` (a path with `..` is denied), backing the scoping
     described above.
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
@@ -593,8 +596,8 @@ file` are all denied alike) — an earlier version only handled the
     left by an earlier dispatch, removing an issue dependency.
     `board-keeper-graphql-guard.test.sh` pins the deny/allow matrix.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
-  `boolean-prop-prefix.js`, `no-class-assertions.js`, `no-nested-query.js`
-  and `text-input-textarea-accessible-name.js` are the repo's hand-written rules
+  `boolean-prop-prefix.js`, `no-class-assertions.js`, `no-nested-query.js`,
+  `prefer-before-each.js` and `text-input-textarea-accessible-name.js` are the repo's hand-written rules
   (each with a `create()` visitor). They sit alongside two `no-restricted-imports` helpers
   that are configuration rather than rules: `no-upstream-imports.js`, a
   flat-config preset blocking a base-of-the-graph package from importing
