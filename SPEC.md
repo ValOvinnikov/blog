@@ -1504,7 +1504,11 @@ to the viewport inside any horizontally symmetric container — `Section`'s
 inner `<div>` is `mx-auto` with equal `px-gutter` on both sides, so the
 percentage offset and the translate cancel at every width, and nothing
 overflows. `CtaModule.Banner` takes the same breakout from
-`bannerVariants`, with nothing of its own beside it. What both share and neither solves is `100vw` on a
+`bannerVariants`, with nothing of its own beside it. Only the band breaks
+out: its copy is held to the page column (`--container-page` less the
+gutters, the width `Section`'s `max-w-page` inner content takes), centred,
+so Left, Center and Right line up with the rest of the page on a wide
+window. What both share and neither solves is `100vw` on a
 platform whose scrollbar takes layout space; that is tracked against both
 organisms together rather than fixed in one.
 

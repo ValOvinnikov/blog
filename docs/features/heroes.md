@@ -20,7 +20,7 @@ epics: [5016, 5028, 2813, 3430, 3215, 3600, 3527]
 
 ## What it does
 
-A hero is the optional opening band of a page. It replaces the page's own heading and owns the page's `<h1>`. Editors pick one of three kinds: a **Blog Hero** built around one post (pinned, or the newest marked Featured), a **Statement Hero** with a headline, a supporting line, up to two actions and an image they write themselves, and a **Profile Hero** that introduces a person from the People list. Each lays out as Split (image beside the copy), Stacked (image above or below) or Banner (image as a full-bleed background).
+A hero is the optional opening band of a page. It replaces the page's own heading and owns the page's `<h1>`. Editors pick one of three kinds: a **Blog Hero** built around one post (pinned, or the newest marked Featured), a **Statement Hero** with a headline, a supporting line, up to two actions and an image they write themselves, and a **Profile Hero** that introduces a person from the People list. Each lays out as Split (image beside the copy), Stacked (image above or below) or Banner (image as a full-bleed background, with the copy held to the page column).
 
 ## Surfaces and routes
 
