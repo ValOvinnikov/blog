@@ -20,6 +20,11 @@ const added = (file, ...texts) => ({
 
 const checksOf = (files) => findViolations(files).map(({ check }) => check);
 
+const testCommentLines = (content) =>
+  findViolations([{ file: COMPONENT_TEST, added: [], content }]).map(
+    ({ line }) => line,
+  );
+
 describe('findViolations', () => {
   it('flags a bare console call in linted source', () => {
     assert.deepEqual(checksOf([added(COMPONENT, "console.log('x');")]), [
@@ -49,6 +54,13 @@ describe('findViolations', () => {
         ),
       ]),
       [CHECK.DEBUGGER, CHECK.FOCUSED_TEST, CHECK.LOG_EVENT_LITERAL],
+    );
+  });
+
+  it('leaves a conditional skip alone', () => {
+    assert.deepEqual(
+      checksOf([added(COMPONENT, "test.skip(count === 0, 'No posts');")]),
+      [],
     );
   });
 
@@ -129,19 +141,27 @@ describe('findViolations', () => {
       ' */',
       '// eslint-disable-next-line testing-library/no-node-access -- portal',
       '// arrange',
-      'const x = 1;',
+      'const x = 1; // trailing note',
       '/**',
       ' * docs',
       ' */',
       "it('works', () => {});",
     ].join('\n');
-    const violations = findViolations([
-      { file: COMPONENT_TEST, added: [], content },
-    ]);
-    assert.deepEqual(
-      violations.map(({ line }) => line),
-      [5, 7, 8, 9],
-    );
+    assert.deepEqual(testCommentLines(content), [5, 6, 7]);
+  });
+
+  it('ignores comment markers inside strings, templates and regexes', () => {
+    const content = [
+      'const css = `',
+      '  /* not a token line */',
+      '  // nor this ${value} here',
+      '  ${nested(`/* inner */`)}',
+      '`;',
+      "const url = 'https://example.com/a';",
+      'const pattern = /\\/\\/.*$/;',
+      'const ratio = total / count; // after division',
+    ].join('\n');
+    assert.deepEqual(testCommentLines(content), [8]);
   });
 
   it('skips generated files', () => {
@@ -169,6 +189,8 @@ describe('parseAddedLines', () => {
       '@@ -10 +12 @@',
       '-old',
       '+new',
+      '-old',
+      '+++ not a header inside a hunk',
       'diff --git a/gone.ts b/gone.ts',
       '--- a/gone.ts',
       '+++ /dev/null',
@@ -180,6 +202,7 @@ describe('parseAddedLines', () => {
         { line: 4, text: 'one' },
         { line: 5, text: 'two' },
         { line: 12, text: 'new' },
+        { line: 13, text: '++ not a header inside a hunk' },
       ],
     });
   });

@@ -10,6 +10,9 @@ import {
 } from './touched-files.mjs';
 
 const REPORT = 'jscpd-report.json';
+const MIN_TOKENS = '60';
+const MIN_LINES = '8';
+const IGNORED = '**/node_modules/**,**/generated/**,**/.next/**';
 
 const fail = (message) => {
   console.error(message);
@@ -23,11 +26,12 @@ const runJscpd = (jscpd, workspaces) => {
       jscpd,
       [
         '--min-tokens',
-        '60',
+        MIN_TOKENS,
         '--min-lines',
-        '8',
+        MIN_LINES,
         '--ignore',
-        '**/node_modules/**,**/generated/**,**/.next/**',
+        IGNORED,
+        '--gitignore',
         '--reporters',
         'json',
         '--output',

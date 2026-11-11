@@ -136,10 +136,12 @@ A prompt that opens `Re-review of <sha>` is a fix round, listing the earlier
 review's findings. Scope is `git diff <sha>` (committed and uncommitted); if
 that range carries a merge from the base, stop and ask for a full review.
 Mark each prior finding **fixed** or **still open** at its current line,
-then review the changed files only, each read in full. Open with
-`Re-reviewed N files changed since <sha>` and add a **Prior findings**
-section after the verdict; any finding still open, or a new one, is
-`NEEDS FIXES`, otherwise `PASS`.
+then review the changed files only, each read in full. Open with the `pwd`
+and `git rev-parse HEAD` lines, then `Re-reviewed N files changed since <sha>`,
+where N is compared with the count the re-dispatch gives
+(`git diff <sha> --name-only` plus untracked files) and a mismatch is
+blocking. Add a **Prior findings** section after the verdict; any finding
+still open, or a new blocking one, is `NEEDS FIXES`, otherwise `PASS`.
 
 ## Report format
 

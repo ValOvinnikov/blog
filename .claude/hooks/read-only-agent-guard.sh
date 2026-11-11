@@ -144,9 +144,9 @@ git_subcommand_denied() {
   return 1
 }
 
-# True if $1 is a `git branch` invocation that renames, copies, deletes or
-# re-points a branch — the allow-list admits `git branch -m` for cloud
-# sessions, while a bare `git branch` (listing) stays a read.
+# True if $1 is a `git branch` invocation that creates, renames, copies,
+# deletes or re-points a branch. Only listing is a read: a bare positional
+# argument names a new branch unless a listing flag turns it into a filter.
 git_branch_write_denied() {
   tokenize "$1"
   [ "${TOKENS[0]:-}" = "git" ] || return 1
@@ -159,20 +159,24 @@ git_branch_write_denied() {
     esac
   done
   [ "${TOKENS[$i]:-}" = "branch" ] || return 1
-  local t
+  local t listing=0 positional=0
   for t in "${TOKENS[@]:$((i + 1))}"; do
     case "$t" in
-    -m | -M | -c | -C | -d | -D | -f | -u | --move | --copy | --delete | --force | --set-upstream-to* | --unset-upstream | --edit-description)
+    -m | -M | -c | -C | -d | -D | -f | -u | -t | --move | --copy | --delete | --force | --track | --track=* | --no-track | --set-upstream-to* | --unset-upstream | --edit-description)
       return 0
       ;;
+    -l | --list | -a | --all | -r | --remotes | --contains | --contains=* | --no-contains | --no-contains=* | --merged | --merged=* | --no-merged | --no-merged=* | --points-at | --points-at=*)
+      listing=1
+      ;;
+    -*) ;;
+    *) positional=1 ;;
     esac
   done
-  return 1
+  [ "$positional" -eq 1 ] && [ "$listing" -eq 0 ]
 }
 
-# True if $1 is a `pnpm` invocation passing `--update` — the allow-listed
-# `pnpm check:*` scripts are reads except in that form, which rewrites a
-# baseline (`check:file-size --update`).
+# True if $1 is a `pnpm` invocation passing `--update`, the form of the
+# `check:*` scripts that rewrites a baseline (`check:file-size --update`).
 pnpm_update_denied() {
   tokenize "$1"
   [ "${TOKENS[0]:-}" = "pnpm" ] || return 1

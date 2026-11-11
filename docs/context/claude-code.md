@@ -475,12 +475,12 @@ file` are all denied alike) — an earlier version only handled the
     checks (#1797) are the deliberate exception: those shapes have no single
     allow-list prefix to mirror (`sed -i` vs. `sed -n`, `cmd > file` vs.
     `cmd > /dev/null`), so they get their own narrow, targeted detection
-    functions instead of a prefix-list entry. So do the writing forms of two
-    allow-list entries that are otherwise reads: `git branch` with a rename,
-    copy, delete or upstream flag (`git branch -m` is allowed for a cloud
-    session's branch rename), and any `pnpm` call passing `--update`
-    (`pnpm check:*` is allowed, but `check:file-size --update` rewrites its
-    baseline). `read-only-agent-guard.test.sh`
+    functions instead of a prefix-list entry. So do two command families whose
+    reading forms an agent needs: `git branch` creating, renaming, copying,
+    deleting or tracking a branch (a bare name counts as creating one unless
+    a listing flag such as `--list` or `--contains` makes it a filter), and
+    any `pnpm` call passing `--update` (`check:file-size --update` rewrites
+    its baseline). `read-only-agent-guard.test.sh`
     pins the deny/allow matrix (including the bypasses found across #425's
     review rounds and the in-place/redirection cases added for #1797); run it
     directly or via CI (see [`docs/context/ci-automation.md`](./ci-automation.md)).

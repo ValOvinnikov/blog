@@ -76,6 +76,9 @@ Run `pnpm check:diff-hygiene`, then every command in the skill's §0 over the
 full diff (`<base>...HEAD` plus the working tree; set §0's `BASE` to it),
 `pnpm check:clones` included. A diff-hygiene hit is blocking; a hit from the
 other commands is blocking once you have read it and §0 does not allow it.
+If either `pnpm check:*` command is denied, run §0's `pnpm dlx jscpd@4`
+fallback for clones and rely on `verify-runner`'s `pnpm verify`, which ran
+diff-hygiene; say so under **Not checked**.
 
 ### Pass 2 — Contract
 
@@ -150,7 +153,10 @@ blocking findings. Review only what changed since:
    §0's reader commands with `BASE=<sha>`, then Passes 2 and 3 over the
    changed files only, each read in full.
 
-Open the report with `Re-reviewed N files changed since <sha>`, then the
+Open the report with the `pwd` and `git rev-parse HEAD` lines, then
+`Re-reviewed N files changed since <sha>`; N is compared with the count the
+re-dispatch gives (`git diff <sha> --name-only` plus untracked files), and a
+mismatch is blocking as in a full review. Then the
 sections below, with a **Prior findings** section after the verdict. Any
 prior finding still open, or a new blocking one, is `NEEDS FIXES`. Say in
 **Not checked** that files unchanged since `<sha>` were not re-read.

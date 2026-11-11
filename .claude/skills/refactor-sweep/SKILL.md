@@ -21,7 +21,8 @@ touches; this sees the code nobody is touching.
    for `utils` and `configs/*`). Its scope, hard boundaries and conventions
    are the judgment bar: a finding that contradicts one is a misread, not a
    refactor.
-2. **Dispatch the `explore` subagent**, with findings only in that layer's
+2. **Dispatch the `explore` subagent** — its prompt names the absolute path
+   of the checkout to search (`.claude/agents/explore.md`) — with findings only in that layer's
    directories (`packages/<x>/src`, `apps/<x>/src`, or whatever else the
    agent file's scope names). It may read `@blog/utils`/`@blog/config`
    exports as reference, never another layer's implementation. Ask for

@@ -1,9 +1,9 @@
-// The judgement-free half of code-review-practices §0: every hit fails, so it
-// runs in `pnpm verify` and pre-push, before any reviewer is dispatched.
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import ts from 'typescript';
 
 import { repoRoot, resolveBase } from './touched-files.mjs';
 
@@ -59,7 +59,8 @@ const LINE_CHECKS = [
   {
     check: CHECK.FOCUSED_TEST,
     applies: (file) => SOURCE_FILE.test(file),
-    hit: (text) => /\b(it|test|describe|suite)\.(only|skip)\(/.test(text),
+    hit: (text) =>
+      /\b(it|test|describe|suite)\.(only|skip)\(\s*['"`]/.test(text),
   },
   {
     check: CHECK.CONFLICT_MARKER,
@@ -94,53 +95,83 @@ const LINE_CHECKS = [
   },
 ];
 
-const DIRECTIVE_COMMENT =
-  /^\s*(\/\/|\/\*)\s*(eslint-|@ts-|@vitest-|\/ <reference)/;
+const DIRECTIVE = /^(eslint-|@ts-|@vitest-|@jest-|\/ <reference)/;
 
-const isDirectiveBlock = (block) => {
-  const bodies = block
-    .map(({ text }) =>
-      text
-        .replace(/^\s*(\/\*+|\*\/|\*)?/, '')
-        .replace(/\*\/\s*$/, '')
-        .trim(),
-    )
+const isDirective = (comment) => {
+  const bodies = comment
+    .replace(/^\/\/|^\/\*+|\*\/$/g, '')
+    .split('\n')
+    .map((line) => line.replace(/^\s*\*?\s*/, '').trim())
     .filter(Boolean);
-  return (
-    bodies.length > 0 &&
-    bodies.every((body) => /^(@vitest-|@jest-|eslint-|@ts-)/.test(body))
-  );
+  return bodies.length > 0 && bodies.every((body) => DIRECTIVE.test(body));
 };
 
+const REGEX_CAN_FOLLOW = new Set([
+  ts.SyntaxKind.Identifier,
+  ts.SyntaxKind.NumericLiteral,
+  ts.SyntaxKind.StringLiteral,
+  ts.SyntaxKind.CloseParenToken,
+  ts.SyntaxKind.CloseBracketToken,
+  ts.SyntaxKind.CloseBraceToken,
+  ts.SyntaxKind.NoSubstitutionTemplateLiteral,
+  ts.SyntaxKind.TemplateTail,
+  ts.SyntaxKind.ThisKeyword,
+]);
+
 const findTestComments = (content) => {
+  const scanner = ts.createScanner(
+    ts.ScriptTarget.Latest,
+    false,
+    ts.LanguageVariant.JSX,
+    content,
+  );
+  const lineOf = (pos) => content.slice(0, pos).split('\n').length;
+  const templateDepths = [];
+  let braceDepth = 0;
+  let previous;
   const lines = [];
-  let block;
-  content.split('\n').forEach((text, index) => {
-    const trimmed = text.trim();
-    const line = { line: index + 1, text };
-    if (block) {
-      block.push(line);
-    } else if (DIRECTIVE_COMMENT.test(text)) {
-      return;
-    } else if (trimmed.startsWith('//')) {
-      lines.push(line.line);
-      return;
-    } else if (trimmed.startsWith('/*')) {
-      block = [line];
-    } else {
-      return;
+  for (
+    let kind = scanner.scan();
+    kind !== ts.SyntaxKind.EndOfFileToken;
+    kind = scanner.scan()
+  ) {
+    if (
+      kind === ts.SyntaxKind.SingleLineCommentTrivia ||
+      kind === ts.SyntaxKind.MultiLineCommentTrivia
+    ) {
+      if (!isDirective(scanner.getTokenText())) {
+        lines.push(lineOf(scanner.getTokenStart()));
+      }
+      continue;
     }
     if (
-      block.length > 1
-        ? trimmed.includes('*/')
-        : trimmed.slice(2).includes('*/')
+      kind === ts.SyntaxKind.WhitespaceTrivia ||
+      kind === ts.SyntaxKind.NewLineTrivia
     ) {
-      if (!isDirectiveBlock(block)) {
-        lines.push(...block.map(({ line: number }) => number));
-      }
-      block = undefined;
+      continue;
     }
-  });
+    if (
+      (kind === ts.SyntaxKind.SlashToken ||
+        kind === ts.SyntaxKind.SlashEqualsToken) &&
+      !REGEX_CAN_FOLLOW.has(previous)
+    ) {
+      kind = scanner.reScanSlashToken();
+    } else if (kind === ts.SyntaxKind.TemplateHead) {
+      templateDepths.push(braceDepth);
+    } else if (kind === ts.SyntaxKind.OpenBraceToken) {
+      braceDepth += 1;
+    } else if (kind === ts.SyntaxKind.CloseBraceToken) {
+      if (templateDepths.at(-1) === braceDepth) {
+        kind = scanner.reScanTemplateToken(false);
+        if (kind === ts.SyntaxKind.TemplateTail) {
+          templateDepths.pop();
+        }
+      } else {
+        braceDepth -= 1;
+      }
+    }
+    previous = kind;
+  }
   return lines;
 };
 
@@ -172,8 +203,13 @@ export const parseAddedLines = (diff) => {
   const byFile = new Map();
   let file;
   let next = 0;
+  let afterMinusHeader = false;
   for (const text of diff.split('\n')) {
-    if (text.startsWith('+++ ')) {
+    const isPlusHeader = afterMinusHeader && text.startsWith('+++ ');
+    afterMinusHeader = text.startsWith('--- ') && next === 0;
+    if (text.startsWith('diff --git ')) {
+      next = 0;
+    } else if (isPlusHeader) {
       file = text === '+++ /dev/null' ? undefined : text.slice(6);
       if (file) {
         byFile.set(file, byFile.get(file) ?? []);
@@ -197,7 +233,15 @@ const git = (args) =>
 
 const readTouchedFiles = (base) => {
   const byFile = parseAddedLines(
-    git(['diff', '-U0', '--no-color', '--no-ext-diff', base]),
+    git([
+      '-c',
+      'core.quotePath=false',
+      'diff',
+      '-U0',
+      '--no-color',
+      '--no-ext-diff',
+      base,
+    ]),
   );
   for (const file of git(['ls-files', '--others', '--exclude-standard'])
     .split('\n')

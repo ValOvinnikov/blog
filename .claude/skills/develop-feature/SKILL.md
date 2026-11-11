@@ -297,9 +297,11 @@ SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
   or green checks do not substitute.
 - **A fix round is a re-review.** Open the re-dispatch with
   `Re-review of <sha>` — the `HEAD` the previous report named — followed by
-  that report's blocking findings, plus the three items above. The reviewer
-  confirms each finding and reads only the files changed since `<sha>`. A
-  merge from `origin/main` since `<sha>` needs a full review instead.
+  that report's blocking findings, plus the three items above — except that
+  the count is now `git diff <sha> --name-only | wc -l` plus untracked files.
+  The reviewer confirms each finding and reads only the files changed since
+  `<sha>`. A merge from `origin/main` since `<sha>` needs a full review
+  instead.
 - **Non-blocking findings don't gate the PR, but never leave one only in a
   chat summary.** Each one worth doing is fixed on this branch by the owning
   agent when it is the same layer and small, or else filed through
