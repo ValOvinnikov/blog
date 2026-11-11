@@ -12,7 +12,6 @@ faker.seed(6011);
 
 const ICON_TEST_ID = 'feature-card-icon';
 const ICON_PANEL_TEST_ID = 'feature-card-icon-panel';
-const MOCK_LINK_ARIA_LABEL = faker.lorem.sentence();
 
 const MOCK_ITEM = mockFeatureListItem();
 
@@ -21,7 +20,6 @@ const MOCK_FEATURE_LINK = {
   href: faker.internet.url(),
   target: undefined,
   platform: undefined,
-  ariaLabel: undefined,
 };
 
 const setup = customRender(FeatureListCard, {
@@ -119,25 +117,5 @@ describe(`<${FeatureListCard.name}/>`, () => {
       name: MOCK_ITEM.headingBlock.heading,
     });
     expect(link).toHaveAttribute('href', MOCK_FEATURE_LINK.href);
-  });
-
-  it('names the link by its aria label override when one is set', () => {
-    setup({
-      item: mockFeatureListItem({
-        link: {
-          ...MOCK_FEATURE_LINK,
-          ariaLabel: MOCK_LINK_ARIA_LABEL,
-        },
-      }),
-    });
-
-    const link = screen.getByRole('link', {
-      name: MOCK_LINK_ARIA_LABEL,
-    });
-    const headingLink = screen.queryByRole('link', {
-      name: MOCK_ITEM.headingBlock.heading,
-    });
-    expect(link).toHaveAttribute('href', MOCK_FEATURE_LINK.href);
-    expect(headingLink).not.toBeInTheDocument();
   });
 });

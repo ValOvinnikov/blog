@@ -22,7 +22,6 @@ const MOCK_NEW_TAB_LINK = {
   href: faker.internet.url(),
   target: '_blank',
   platform: undefined,
-  ariaLabel: undefined,
 } as const;
 
 const setup = customRender(TestimonialCard, {

@@ -63,7 +63,7 @@
   "packages/service/src/index.ts": 219,
   "packages/service/src/testing/modules/fixtures.ts": 762,
   "packages/service/src/testing/pages/fixtures.ts": 395,
-  "packages/service/src/testing/shared/fixtures.ts": 215,
+  "packages/service/src/testing/shared/fixtures.ts": 214,
   "packages/studio/src/schema-types/inputs/localization-notice-input/localization-notice-input.tsx": 152,
   "packages/studio/src/studio-config.ts": 200,
   "packages/ui/src/components/organisms/hero/hero.tsx": 184,

@@ -10,7 +10,6 @@ import {
   MOCK_CTA_ACTIONS,
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
-  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
 } from '@web/testing/modules/cta/fixtures';
 import {
   MOCK_TEAM_HEADING,
@@ -149,7 +148,7 @@ describe(`<${TeamModuleView.name}/>`, () => {
       name: MOCK_CTA_PRIMARY_ACTION.link.label,
     });
     const secondaryLink = screen.getByRole('link', {
-      name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+      name: MOCK_CTA_SECONDARY_ACTION.link.label,
     });
 
     expect(primaryLink).toHaveAttribute(

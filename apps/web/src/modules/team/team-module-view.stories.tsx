@@ -57,7 +57,6 @@ const socialLinks = [
       href: 'https://github.com/example',
       target: '_blank' as const,
       platform: undefined,
-      ariaLabel: undefined,
     },
   },
   {
@@ -67,7 +66,6 @@ const socialLinks = [
       href: 'https://www.linkedin.com/in/example',
       target: '_blank' as const,
       platform: undefined,
-      ariaLabel: undefined,
     },
   },
 ];

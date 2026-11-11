@@ -11,7 +11,6 @@ const mockNavLink = (label: string, href: string): ILink => ({
   href,
   target: undefined,
   platform: undefined,
-  ariaLabel: undefined,
 });
 
 export const MOCK_HOME_LINK = mockNavLink(HOME_LABEL!, routes.home());

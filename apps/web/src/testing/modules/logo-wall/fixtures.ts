@@ -30,5 +30,4 @@ export const MOCK_LOGO_LINK: ILink = {
   href: mockFaker.internet.url(),
   target: undefined,
   platform: undefined,
-  ariaLabel: undefined,
 };

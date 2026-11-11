@@ -19,7 +19,6 @@ const logos = [
       href: 'https://cascade.example.com',
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     },
   }),
   mockLogoItem({ id: 'logo-5', name: 'Meridian Group' }),
@@ -137,7 +136,6 @@ const linkedLogos = logos.map((logo) => ({
     href: `https://example.com/${logo.id}`,
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
   },
 }));
 

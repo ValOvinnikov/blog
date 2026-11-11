@@ -17,7 +17,6 @@ const testimonials = [
       href: '/case-studies/acme',
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     },
   }),
   mockTestimonialItem({

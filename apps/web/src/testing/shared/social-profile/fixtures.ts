@@ -23,7 +23,6 @@ export const mockSocialProfile = ({
     href: faker.internet.url(),
     target: undefined,
     platform: undefined,
-    ariaLabel: undefined,
     ...link,
   },
   ...overrides,

@@ -27,7 +27,6 @@ const items = [
       href: '/features/speed',
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     },
   }),
   mockFeatureListItem({

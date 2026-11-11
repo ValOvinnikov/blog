@@ -26,15 +26,15 @@ export type TRawHeroBlogModule = InferResultType<typeof heroBlogModuleQuery>;
 
 function toImage(
   raw: TRawHeroBlogModule,
-  post: TPostCard | undefined,
+  post: TMaybeUndefined<TPostCard>,
 ): TMaybeUndefined<ISanityImage> {
   return toSanityImage(raw.image) ?? post?.heroImage;
 }
 
 function toPrimaryButton(
   raw: TRawHeroBlogModule,
-  post: TPostCard | undefined,
-): THeroBlogButton | undefined {
+  post: TMaybeUndefined<TPostCard>,
+): TMaybeUndefined<THeroBlogButton> {
   if (!post) return undefined;
 
   return {
@@ -45,20 +45,19 @@ function toPrimaryButton(
       href: routes.post(post.slug),
       target: undefined,
       platform: undefined,
-      ariaLabel: undefined,
     },
   };
 }
 
 function toSecondaryButton(
   raw: TRawHeroBlogModule['secondaryAction'],
-): THeroBlogButton | undefined {
+): TMaybeUndefined<THeroBlogButton> {
   return raw ? toCtaButton(raw) : undefined;
 }
 
 function toHeroBlogButtons(
   raw: TRawHeroBlogModule,
-  post: TPostCard | undefined,
+  post: TMaybeUndefined<TPostCard>,
 ): THeroBlogButton[] {
   return [
     toPrimaryButton(raw, post),

@@ -3,7 +3,6 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
-  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
 } from '@web/testing/modules/cta/fixtures';
 import { onDarkDecorators } from '@web/testing/shared/on-dark/decorators';
 
@@ -18,8 +17,7 @@ const longAction = {
   ...MOCK_CTA_SECONDARY_ACTION,
   link: {
     ...MOCK_CTA_SECONDARY_ACTION.link,
-    label: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
-    ariaLabel: undefined,
+    label: 'Learn more about our subscription plans',
   },
 };
 

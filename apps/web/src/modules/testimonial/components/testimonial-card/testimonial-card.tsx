@@ -64,11 +64,7 @@ export const TestimonialCard = ({
       </QuoteCard.Avatar>
       <QuoteCard.Name>
         {item.link ? (
-          <SmartLink
-            href={item.link.href}
-            target={item.link.target}
-            aria-label={item.link.ariaLabel}
-          >
+          <SmartLink href={item.link.href} target={item.link.target}>
             {item.name}
           </SmartLink>
         ) : (

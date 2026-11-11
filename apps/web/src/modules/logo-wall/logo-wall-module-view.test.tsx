@@ -4,7 +4,6 @@ import { customRender, screen } from '@web/testing/custom-render';
 import {
   MOCK_CTA_PRIMARY_ACTION,
   MOCK_CTA_SECONDARY_ACTION,
-  MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
   MOCK_CTA_ACTIONS,
 } from '@web/testing/modules/cta/fixtures';
 import {
@@ -88,7 +87,7 @@ describe(`<${LogoWallModuleView.name}/>`, () => {
       name: MOCK_CTA_PRIMARY_ACTION.link.label,
     });
     const secondaryLink = screen.getByRole('link', {
-      name: MOCK_CTA_SECONDARY_ACTION_ARIA_LABEL,
+      name: MOCK_CTA_SECONDARY_ACTION.link.label,
     });
     expect(primaryLink).toHaveAttribute(
       'href',

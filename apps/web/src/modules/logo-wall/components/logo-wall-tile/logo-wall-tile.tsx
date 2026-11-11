@@ -1,6 +1,7 @@
 import type { ISanityImage, TMaybeUndefined } from '@blog/config';
 import type { TLogoItem } from '@blog/service';
 import { LogoTile } from '@blog/ui/components/molecules/logo-tile';
+import { isUndefined } from '@blog/utils/primitives';
 import { SanityImage } from '@web/components/shared/sanity-image';
 import { SmartLink } from '@web/components/shared/smart-link';
 
@@ -14,7 +15,7 @@ export interface ILogoWallTileProps {
 const toAspectRatio = (image: ISanityImage): TMaybeUndefined<number> => {
   const rawAspectRatio = image.dimensions?.aspectRatio;
 
-  return rawAspectRatio !== undefined &&
+  return !isUndefined(rawAspectRatio) &&
     Number.isFinite(rawAspectRatio) &&
     rawAspectRatio > 0
     ? rawAspectRatio
@@ -53,7 +54,7 @@ export const LogoWallTile = ({ logo }: ILogoWallTileProps) => {
         <LogoTile.Link
           href={link.href}
           target={link.target}
-          ariaLabel={link.ariaLabel ?? name}
+          ariaLabel={name}
           as={SmartLink}
         />
       )}
