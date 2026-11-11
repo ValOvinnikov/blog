@@ -54,7 +54,7 @@
   "packages/db/src/testing/fixtures.ts": 174,
   "packages/db/src/testing/tenants/fixtures.ts": 164,
   "packages/db/src/utils/sanity-management-client/sanity-api-request.ts": 125,
-  "packages/email/src/html/email-layout/email-layout.ts": 132,
+  "packages/email/src/html/email-layout/email-layout.ts": 124,
   "packages/email/src/portable-text/serialize-portable-text.ts": 131,
   "packages/service/src/index.ts": 219,
   "packages/service/src/testing/modules/fixtures.ts": 762,

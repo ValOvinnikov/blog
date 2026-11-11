@@ -1,5 +1,11 @@
+import {
+  FONT_STACK,
+  SHELL_PADDING_PX,
+  SHELL_WIDTH_PX,
+} from '@blog/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import { sanitizeHref } from '@blog/utils';
+import { sanitizeImageUrl } from '@blog/email/html/sanitize-image-url/sanitize-image-url';
+import { hasLength } from '@blog/utils/primitives';
 
 type TEmailPalette = {
   surface: string;
@@ -32,15 +38,9 @@ export type TRenderEmailShellInput = {
   footerPostalAddress?: string;
 };
 
-export const FONT_STACK =
-  "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+const CELL_ROW_END = '</td></tr>';
 
-/**
- * Inlined for the mail clients that strip `<style>` tags and don't support
- * flexbox/grid, so every rule below is a table cell attribute or an inline
- * `style`, not a stylesheet. Without an identity the header and copyright
- * line are omitted rather than filled with a guessed name.
- */
+// Every rule is an inline style or table attribute: many mail clients strip `<style>` and ignore flexbox/grid.
 export function renderEmailShell({
   palette,
   title,
@@ -52,11 +52,9 @@ export function renderEmailShell({
   footerPostalAddress,
 }: TRenderEmailShellInput): string {
   const lockedHtml = `${structuralHtml ?? ''}${actionHtml ?? ''}`;
+  // Inbox preview text has no HTML tag; clients show the first visible text, so it hides in a zero-height div.
   const preheader = previewText
-    ? // Inbox preview text has no dedicated HTML tag — clients fall back to
-      // the first visible text, so a hidden, zero-height span is the
-      // standard way to control what shows next to the subject line.
-      `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(previewText)}</div>`
+    ? `<div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(previewText)}</div>`
     : '';
 
   return [
@@ -71,26 +69,21 @@ export function renderEmailShell({
     preheader,
     `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${palette.surface2};">`,
     '<tr><td align="center" style="padding:32px 16px;">',
-    `<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:${palette.surface};border:1px solid ${palette.border};border-radius:8px;">`,
+    `<table role="presentation" width="${SHELL_WIDTH_PX}" cellpadding="0" cellspacing="0" style="max-width:${SHELL_WIDTH_PX}px;width:100%;background-color:${palette.surface};border:1px solid ${palette.border};border-radius:8px;">`,
     identity ? buildHeader(palette, identity) : '',
-    `<tr><td style="padding:32px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
+    `<tr><td style="padding:${SHELL_PADDING_PX}px;color:${palette.text};font-family:${FONT_STACK};font-size:16px;line-height:1.5;">`,
     bodyHtml,
-    '</td></tr>',
+    CELL_ROW_END,
     lockedHtml
       ? `<tr><td style="padding:0 32px 32px;">${lockedHtml}</td></tr>`
       : '',
     buildFooter(palette, identity?.brandName, footerPostalAddress),
     '</table>',
-    '</td></tr>',
+    CELL_ROW_END,
     '</table>',
     '</body>',
     '</html>',
   ].join('');
-}
-
-function sanitizeLogoImageUrl(logoImageUrl: string): string | null {
-  const sanitized = sanitizeHref(logoImageUrl);
-  return sanitized && !sanitized.startsWith('mailto:') ? sanitized : null;
 }
 
 function buildHeader(
@@ -98,9 +91,7 @@ function buildHeader(
   { brandName, markPalette, logoImageUrl }: TEmailShellIdentity,
 ): string {
   const escapedBrandName = escapeHtml(brandName);
-  const sanitizedLogoUrl = logoImageUrl
-    ? sanitizeLogoImageUrl(logoImageUrl)
-    : null;
+  const sanitizedLogoUrl = logoImageUrl ? sanitizeImageUrl(logoImageUrl) : null;
 
   const mark = sanitizedLogoUrl
     ? `<img src="${escapeHtml(sanitizedLogoUrl)}" width="32" height="32" alt="${escapedBrandName} logo" style="display:block;width:32px;height:32px;border:0;" />`
@@ -120,7 +111,7 @@ function buildHeader(
     '</td>',
     `<td style="font-family:${FONT_STACK};font-size:18px;font-weight:700;color:${palette.text};">${escapedBrandName}</td>`,
     '</tr></table>',
-    '</td></tr>',
+    CELL_ROW_END,
   ].join('');
 }
 
@@ -136,11 +127,11 @@ function buildFooter(
     footerPostalAddress ? escapeHtml(footerPostalAddress) : '',
   ].filter(Boolean);
 
-  if (lines.length === 0) return '';
+  if (!hasLength(lines)) return '';
 
   return [
     `<tr><td style="padding:24px 32px;border-top:1px solid ${palette.border};color:${palette.textMuted};font-family:${FONT_STACK};font-size:12px;line-height:1.5;">`,
     lines.join('<br />'),
-    '</td></tr>',
+    CELL_ROW_END,
   ].join('');
 }

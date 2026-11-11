@@ -1,4 +1,4 @@
-import { FONT_STACK } from '@blog/email/html/email-layout/email-layout';
+import { FONT_STACK } from '@blog/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeHref } from '@blog/utils';
 
@@ -14,12 +14,7 @@ export type TEmailActionBrand = {
   brandPrimaryContrast: string;
 };
 
-/**
- * Renders the one interactive element a transactional email carries — a
- * sign-in button, an invite-accept button, an unsubscribe link — in the
- * given brand's colours. Callers build this independently of the authored
- * body, so no authored content can remove or replace it.
- */
+/** The locked action rendered outside the authored body, so authored content cannot remove or replace it. */
 export function renderEmailAction(
   action: TEmailAction,
   brand: TEmailActionBrand,
