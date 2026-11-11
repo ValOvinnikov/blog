@@ -1,5 +1,6 @@
 import { ONBOARDING_SCROLL_AREA_TEST_ID } from '@platform/constants/onboarding';
 import { act, screen } from '@platform/testing/custom-render';
+import { reachReview } from '@platform/testing/onboarding/address-step';
 import {
   completeSiteStep,
   FULL_TIER,
@@ -12,7 +13,6 @@ import {
   MOCK_NAME_FIELD,
   RAIL_TIER,
   RAIL_TIER_TITLE,
-  reachReview,
   renderInTier,
 } from '@platform/testing/onboarding/onboarding-view';
 import userEvent, { type UserEvent } from '@testing-library/user-event';

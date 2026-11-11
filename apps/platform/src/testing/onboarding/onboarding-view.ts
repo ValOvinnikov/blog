@@ -159,25 +159,6 @@ export const completeSiteStep = async (user: UserEvent) => {
   await clickContinue(user);
 };
 
-export const typeAddress = async (user: UserEvent) => {
-  const addressField = screen.getByRole('textbox', MOCK_ADDRESS_FIELD);
-  await user.click(addressField);
-  await user.paste(MOCK_TENANT_SLUG);
-  return addressField;
-};
-
-export const completeAddressStep = async (user: UserEvent) => {
-  await typeAddress(user);
-  await screen.findByText(MOCK_ADDRESS_AVAILABLE);
-  await clickContinue(user);
-};
-
-export const reachReview = async (user: UserEvent) => {
-  await completeSiteStep(user);
-  await completeAddressStep(user);
-  await clickContinue(user);
-};
-
 export const clickBack = async (user: UserEvent) => {
   const backButton = screen.getByRole('button', MOCK_BACK);
   await user.click(backButton);

@@ -48,3 +48,6 @@ export const ONBOARDING_PREVIEW = {
 } as const;
 
 export const ONBOARDING_SCROLL_AREA_TEST_ID = 'onboarding-scroll-area';
+
+// Long enough that typing an address runs one check, not one per keystroke.
+export const SITE_ADDRESS_CHECK_DELAY_MS = 400;

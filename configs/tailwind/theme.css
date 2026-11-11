@@ -581,6 +581,18 @@
   }
 }
 
+/* Below `@layer utilities`, so any `nav-link-marked`, variant or not, overrides this transparent rest outline. */
+@layer components {
+  .nav-link-frame {
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+
+    @media (forced-colors: active) {
+      outline-style: none;
+    }
+  }
+}
+
 @utility nav-link-current {
   text-decoration-line: var(--nav-link-decoration);
 }

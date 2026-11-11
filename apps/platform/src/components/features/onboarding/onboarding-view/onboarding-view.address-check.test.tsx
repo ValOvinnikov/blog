@@ -2,6 +2,10 @@ import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { checkSiteAddressAction } from '@platform/server/onboarding/check-site-address-action';
 import { act, screen } from '@platform/testing/custom-render';
 import {
+  ADDRESS_CHECK_TIMEOUT,
+  typeAddress,
+} from '@platform/testing/onboarding/address-step';
+import {
   ADDRESS_CHECKING,
   ADDRESS_TAKEN,
   ADDRESS_UNVERIFIED,
@@ -18,7 +22,6 @@ import {
   SITE_ADDRESS_LABEL,
   stepHeading,
   STEPS,
-  typeAddress,
 } from '@platform/testing/onboarding/onboarding-view';
 import {
   MOCK_TENANT_ROOT_DOMAIN,
@@ -60,7 +63,11 @@ describe(`<${OnboardingView.name}/>`, () => {
       });
 
       it('says the address is free once it has been checked', async () => {
-        const available = await screen.findByText(MOCK_ADDRESS_AVAILABLE);
+        const available = await screen.findByText(
+          MOCK_ADDRESS_AVAILABLE,
+          {},
+          ADDRESS_CHECK_TIMEOUT,
+        );
 
         expect(available).toBeVisible();
         expect(checkSiteAddressMock).toHaveBeenLastCalledWith(MOCK_TENANT_SLUG);
