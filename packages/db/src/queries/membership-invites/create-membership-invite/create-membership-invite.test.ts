@@ -1,4 +1,8 @@
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import {
+  MEMBERSHIP_INVITE_OUTCOME,
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
 import {
@@ -28,10 +32,8 @@ vi.mock('@blog/db/client');
 
 faker.seed(6022);
 
-const OUTCOME_CREATED = 'created';
-const OUTCOME_ALREADY_PENDING = 'already-pending';
-const OUTCOME_ALREADY_CONSUMED = 'already-consumed';
-const OUTCOME_SEAT_LIMIT = 'seat-limit';
+const { CREATED, ALREADY_PENDING, ALREADY_CONSUMED, SEAT_LIMIT } =
+  MEMBERSHIP_INVITE_OUTCOME;
 const GROWTH_SEATS = 3;
 
 const db = useQueryTestDb();
@@ -59,7 +61,7 @@ describe(createMembershipInvite, () => {
     const invite = inviteOf(result);
 
     const rows = await db().select().from(schema.membershipInvites);
-    expect(result.outcome).toBe(OUTCOME_CREATED);
+    expect(result.outcome).toBe(CREATED);
     expect(rows).toEqual([invite]);
     expect(invite).toEqual({
       id: invite.id,
@@ -107,7 +109,7 @@ describe(createMembershipInvite, () => {
 
         const rows = await db().select().from(schema.membershipInvites);
         expect(second).toEqual({
-          outcome: OUTCOME_ALREADY_PENDING,
+          outcome: ALREADY_PENDING,
           invite: first,
         });
         expect(rows).toEqual([first]);
@@ -126,7 +128,7 @@ describe(createMembershipInvite, () => {
         MEMBERSHIP_ROLE.OWNER,
       );
 
-      expect(second.outcome).toBe(OUTCOME_ALREADY_CONSUMED);
+      expect(second.outcome).toBe(ALREADY_CONSUMED);
     });
   });
 
@@ -171,7 +173,7 @@ describe(createMembershipInvite, () => {
 
       const result = await inviteNew(tenantId);
 
-      expect(result).toEqual({ outcome: OUTCOME_SEAT_LIMIT });
+      expect(result).toEqual({ outcome: SEAT_LIMIT });
       expect(await inviteRows(tenantId)).toEqual([]);
     });
 
@@ -180,7 +182,7 @@ describe(createMembershipInvite, () => {
 
       const result = await inviteNew(tenantId);
 
-      expect(result.outcome).toBe(OUTCOME_SEAT_LIMIT);
+      expect(result.outcome).toBe(SEAT_LIMIT);
       expect(await inviteRows(tenantId)).toHaveLength(1);
     });
 
@@ -200,7 +202,7 @@ describe(createMembershipInvite, () => {
       );
 
       expect(second).toEqual({
-        outcome: OUTCOME_ALREADY_PENDING,
+        outcome: ALREADY_PENDING,
         invite: first,
       });
     });
@@ -221,8 +223,8 @@ describe(createMembershipInvite, () => {
         }
 
         expect(outcomes).toEqual([
-          ...Array<string>(GROWTH_SEATS).fill(OUTCOME_CREATED),
-          OUTCOME_SEAT_LIMIT,
+          ...Array<string>(GROWTH_SEATS).fill(CREATED),
+          SEAT_LIMIT,
         ]);
         expect(await inviteRows(growthTenantId)).toHaveLength(GROWTH_SEATS);
       });
@@ -237,8 +239,8 @@ describe(createMembershipInvite, () => {
         const second = await inviteNew(growthTenantId);
         const third = await inviteNew(growthTenantId);
 
-        expect(second.outcome).toBe(OUTCOME_CREATED);
-        expect(third.outcome).toBe(OUTCOME_CREATED);
+        expect(second.outcome).toBe(CREATED);
+        expect(third.outcome).toBe(CREATED);
       });
 
       it('keeps every invite after a downgrade and refuses the next', async () => {
@@ -251,7 +253,7 @@ describe(createMembershipInvite, () => {
 
         const result = await inviteNew(growthTenantId);
 
-        expect(result.outcome).toBe(OUTCOME_SEAT_LIMIT);
+        expect(result.outcome).toBe(SEAT_LIMIT);
         expect(await inviteRows(growthTenantId)).toHaveLength(2);
       });
     });

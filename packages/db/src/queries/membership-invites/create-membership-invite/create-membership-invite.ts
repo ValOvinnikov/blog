@@ -1,5 +1,9 @@
 import { getDb } from '@blog/db/client';
-import { PLAN_ENTITLEMENTS, type TMembershipRole } from '@blog/db/constants';
+import {
+  MEMBERSHIP_INVITE_OUTCOME,
+  PLAN_ENTITLEMENTS,
+  type TMembershipRole,
+} from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import {
   CREATED_AT_COLUMN,
@@ -16,10 +20,14 @@ import { tenants } from '@blog/db/schema/tenants';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 
 export type TCreateMembershipInviteResult =
-  | { outcome: 'created'; invite: TMembershipInvite }
-  | { outcome: 'already-pending'; invite: TMembershipInvite }
-  | { outcome: 'already-consumed'; invite: TMembershipInvite }
-  | { outcome: 'seat-limit' };
+  | {
+      outcome:
+        | typeof MEMBERSHIP_INVITE_OUTCOME.CREATED
+        | typeof MEMBERSHIP_INVITE_OUTCOME.ALREADY_PENDING
+        | typeof MEMBERSHIP_INVITE_OUTCOME.ALREADY_CONSUMED;
+      invite: TMembershipInvite;
+    }
+  | { outcome: typeof MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT };
 
 async function findInvite(
   tenantId: string,
@@ -38,7 +46,9 @@ async function findInvite(
   if (!existing) return undefined;
 
   return {
-    outcome: existing.consumedAt ? 'already-consumed' : 'already-pending',
+    outcome: existing.consumedAt
+      ? MEMBERSHIP_INVITE_OUTCOME.ALREADY_CONSUMED
+      : MEMBERSHIP_INVITE_OUTCOME.ALREADY_PENDING,
     invite: existing,
   };
 }
@@ -106,10 +116,12 @@ export async function createMembershipInvite(
     .returning();
 
   if (inserted) {
-    return { outcome: 'created', invite: inserted };
+    return { outcome: MEMBERSHIP_INVITE_OUTCOME.CREATED, invite: inserted };
   }
 
   return (
-    (await findInvite(tenantId, emailExactIndex)) ?? { outcome: 'seat-limit' }
+    (await findInvite(tenantId, emailExactIndex)) ?? {
+      outcome: MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT,
+    }
   );
 }

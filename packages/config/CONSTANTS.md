@@ -320,6 +320,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
+- **MEMBERSHIP_INVITE_OUTCOME**: `CREATED`, `ALREADY_PENDING`, `ALREADY_CONSUMED`, `SEAT_LIMIT`
 
 ### `@blog/db/constants` — `packages/db/src/constants/site-config-saved-at.ts`
 
