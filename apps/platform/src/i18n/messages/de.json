@@ -894,7 +894,7 @@
     "buttonsDescription": "Wie Schaltflächen geformt sind, wie sie aussehen, während sie arbeiten, und welchen Spinner sie zeigen.",
     "buttonsWhileWorkingHeading": "Während der Arbeit",
     "buttonShapeLabel": "Form",
-    "buttonShapeDescription": "Ecken von Schaltflächen, Formularfeldern und Tags.",
+    "buttonShapeDescription": "Ecken von Schaltflächen und Tags.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Eckig",
       "ROUNDED": "Abgerundet",

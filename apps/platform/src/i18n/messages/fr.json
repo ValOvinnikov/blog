@@ -894,7 +894,7 @@
     "buttonsDescription": "La forme des boutons, leur aspect pendant qu'ils travaillent, et l'indicateur de chargement qu'ils affichent.",
     "buttonsWhileWorkingHeading": "Pendant le travail",
     "buttonShapeLabel": "Forme",
-    "buttonShapeDescription": "Coins des boutons, des champs de formulaire et des étiquettes.",
+    "buttonShapeDescription": "Coins des boutons et des étiquettes.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Carrée",
       "ROUNDED": "Arrondie",

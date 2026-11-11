@@ -894,7 +894,7 @@
     "buttonsDescription": "Hoe knoppen zijn gevormd, hoe ze eruitzien terwijl ze bezig zijn, en welke spinner ze tonen.",
     "buttonsWhileWorkingHeading": "Tijdens het werk",
     "buttonShapeLabel": "Vorm",
-    "buttonShapeDescription": "Hoeken van knoppen, formuliervelden en labels.",
+    "buttonShapeDescription": "Hoeken van knoppen en labels.",
     "buttonShapeOptionLabel": {
       "SQUARE": "Vierkant",
       "ROUNDED": "Afgerond",
