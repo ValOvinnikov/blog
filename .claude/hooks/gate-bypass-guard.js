@@ -17,7 +17,8 @@
 // bypass flag by habit, not an adversarial-proof sandbox (same posture as
 // .claude/hooks/read-only-agent-guard.sh). It catches only LITERAL,
 // unobfuscated forms: a real `--no-verify`/`-n`/`--force`/`-f` token passed
-// to `git`, or `core.hooksPath` passed to `git config` as a write, not a
+// to `git`, a leading `HUSKY=0` assignment on `git commit|push|merge`,
+// or `core.hooksPath` passed to `git config` as a write, not a
 // `--get`-style read (#454), plus the literal destructive forms that have
 // actually lost uncommitted agent work here (#3362): `git reset --hard`,
 // `git clean -f` (in any short-flag cluster — `-fd`/`-fdx`/`-df` IS the
@@ -299,8 +300,12 @@ function gitSubcommand(seg) {
 const STASH_HINT =
   'Commit first, or set the work aside with `git stash push -u -m <tag>` and restore it with `git stash apply <sha>`.';
 
+const ENV_ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
+
 function check(seg) {
-  const g = gitSubcommand(seg);
+  const firstWord = seg.findIndex((t) => !ENV_ASSIGNMENT.test(t));
+  const assignments = firstWord === -1 ? seg : seg.slice(0, firstWord);
+  const g = gitSubcommand(firstWord === -1 ? [] : seg.slice(firstWord));
   if (!g) {
     return null;
   }
@@ -309,6 +314,12 @@ function check(seg) {
 
   if (['commit', 'push', 'merge'].includes(sub) && has('--no-verify')) {
     return '--no-verify skips the husky pre-commit/pre-push gates (lint-staged, type-check, lint).';
+  }
+  if (
+    ['commit', 'push', 'merge'].includes(sub) &&
+    assignments.includes('HUSKY=0')
+  ) {
+    return 'HUSKY=0 disables every husky hook for this command (lint-staged, type-check, lint, commitlint).';
   }
   // -n is --no-verify only for `commit`: it means --dry-run for `push` and
   // --no-stat for `merge` (and --dry-run for `clean`, an unrelated

@@ -107,10 +107,10 @@ const result = await queries.bookmarks.addBookmark(tenantId, userId, postId);
 if (!result.ok) {
   if (result.error === ERROR_CODE.DB_NOT_FOUND) {
     logger.warn(BOOKMARK_LOG.ADD_ROW_VANISHED, { postId });
-    return { ok: false };
+    return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
   }
   logger.error(BOOKMARK_LOG.ADD_FAILED, { postId, error: result.error });
-  return { ok: false };
+  return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 }
 ```
 
