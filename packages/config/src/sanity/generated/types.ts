@@ -1714,6 +1714,7 @@ export type Page_post = {
       } & Module_taxonomyListReference)
   >;
   publishedAt?: string;
+  sendToSubscribers?: boolean;
   postTakeaways?: PostTakeaways;
   seo?: Seo;
 };
