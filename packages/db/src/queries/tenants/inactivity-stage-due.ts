@@ -3,14 +3,24 @@ import {
   DAY_MS,
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
+  SERVED_TENANT_STATUSES,
   SUSPENSION_REASON,
   TENANT_STATUS,
   type TInactivityStage,
 } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
-import { and, eq, isNotNull, isNull, lte, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  eq,
+  inArray,
+  isNotNull,
+  isNull,
+  lte,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 
-const isActive = eq(tenants.status, TENANT_STATUS.ACTIVE);
+const isServed = inArray(tenants.status, SERVED_TENANT_STATUSES);
 
 const isSuspendedForInactivity = and(
   eq(tenants.status, TENANT_STATUS.SUSPENDED),
@@ -26,11 +36,11 @@ const hasNoDeprovisioningRunSinceNotice = sql`coalesce(
 
 const stageCondition: Record<TInactivityStage, TMaybeUndefined<SQL>> = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: and(
-    isActive,
+    isServed,
     isNull(tenants.inactivityWarnedAt),
   ),
   [INACTIVITY_STAGE.SUSPENSION]: and(
-    isActive,
+    isServed,
     isNotNull(tenants.inactivityWarnedAt),
   ),
   [INACTIVITY_STAGE.DELETION_NOTICE]: and(

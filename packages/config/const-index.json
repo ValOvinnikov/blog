@@ -4396,6 +4396,22 @@
         "file": "packages/db/src/constants/tenant.ts"
       }
     ],
+    "TRIAL": [
+      {
+        "ref": "TENANT_STATUS.TRIAL",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
+    "PAST_DUE": [
+      {
+        "ref": "TENANT_STATUS.PAST_DUE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/tenant.ts"
+      }
+    ],
     "FREE": [
       {
         "ref": "TENANT_PLAN.FREE",

@@ -1,5 +1,5 @@
 import { TENANT_WRITE_REFUSAL, type TMaybeUndefined } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { SERVED_TENANT_STATUSES, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
@@ -15,11 +15,7 @@ import {
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
-import {
-  isRequestTenantActive,
-  isTenantActive,
-  resolveWritableTenant,
-} from './write-gate';
+import { isRequestTenantActive, resolveWritableTenant } from './write-gate';
 
 faker.seed(5776);
 
@@ -33,11 +29,6 @@ vi.mock('@blog/db', async () => ({
 
 const MOCK_SITE = faker.lorem.slug();
 
-const MOCK_DEPROVISIONED_AT = faker.date.between({
-  from: '2024-01-01',
-  to: '2025-01-01',
-});
-
 const MOCK_ACTIVE_ROW: [boolean, string, TTenant] = [
   true,
   'an active tenant',
@@ -50,11 +41,18 @@ const MOCK_SUSPENDED_ROW: [boolean, string, TTenant] = [
 ];
 
 describe(resolveWritableTenant, () => {
-  it('returns the tenant id for an active tenant', async () => {
-    await expect(resolveWritableTenant(MOCK_SITE)).resolves.toEqual(
-      okResult(MOCK_TENANT_ID),
-    );
-  });
+  it.each(SERVED_TENANT_STATUSES)(
+    'returns the tenant id for a %s tenant',
+    async (status) => {
+      vi.mocked(resolveRequestTenant).mockResolvedValueOnce(
+        mockTenant({ status }),
+      );
+
+      await expect(resolveWritableTenant(MOCK_SITE)).resolves.toEqual(
+        okResult(MOCK_TENANT_ID),
+      );
+    },
+  );
 
   it.each([TENANT_STATUS.SUSPENDED, TENANT_STATUS.ARCHIVED])(
     'refuses a %s tenant as inactive without logging',
@@ -86,25 +84,6 @@ describe(resolveWritableTenant, () => {
     await resolveWritableTenant(MOCK_SITE);
 
     expect(resolveRequestTenant).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe(isTenantActive, () => {
-  it.each<[boolean, string, TTenant]>([
-    MOCK_ACTIVE_ROW,
-    MOCK_SUSPENDED_ROW,
-    [
-      false,
-      'an archived tenant',
-      mockTenant({ status: TENANT_STATUS.ARCHIVED }),
-    ],
-    [
-      false,
-      'a deprovisioned tenant still marked active',
-      mockTenant({ deprovisionedAt: MOCK_DEPROVISIONED_AT }),
-    ],
-  ])('returns %s for %s', (expected, _, tenant) => {
-    expect(isTenantActive(tenant)).toBe(expected);
   });
 });
 

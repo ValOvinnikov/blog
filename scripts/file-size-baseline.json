@@ -48,7 +48,7 @@
   "packages/db/scripts/deprovision-tenant/run.ts": 246,
   "packages/db/scripts/recheck-tenant-owners/run.ts": 133,
   "packages/db/scripts/seed-tenant.ts": 222,
-  "packages/db/scripts/validate-tenant-documents/run.ts": 225,
+  "packages/db/scripts/validate-tenant-documents/run.ts": 208,
   "packages/db/src/constants/email-template-defaults.ts": 138,
   "packages/db/src/queries/site-config/upsert-site-config/validate-voice-field.ts": 127,
   "packages/db/src/queries/tenants/update-tenant-details/owner-email-change.ts": 149,

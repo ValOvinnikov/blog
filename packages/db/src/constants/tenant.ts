@@ -12,9 +12,17 @@ export const TENANT_STATUS = {
   ACTIVE: 'ACTIVE',
   SUSPENDED: 'SUSPENDED',
   ARCHIVED: 'ARCHIVED',
+  TRIAL: 'TRIAL',
+  PAST_DUE: 'PAST_DUE',
 } as const;
 
 export type TTenantStatus = TValueOf<typeof TENANT_STATUS>;
+
+export const SERVED_TENANT_STATUSES = [
+  TENANT_STATUS.ACTIVE,
+  TENANT_STATUS.TRIAL,
+  TENANT_STATUS.PAST_DUE,
+] as const satisfies readonly TTenantStatus[];
 
 export type TSuspensionStatus =
   typeof TENANT_STATUS.ACTIVE | typeof TENANT_STATUS.SUSPENDED;

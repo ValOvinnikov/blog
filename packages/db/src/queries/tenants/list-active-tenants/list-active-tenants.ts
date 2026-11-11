@@ -1,11 +1,8 @@
 import { getDb } from '@blog/db/client';
-import { TENANT_STATUS } from '@blog/db/constants';
+import { SERVED_TENANT_STATUSES } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, inArray, isNull } from 'drizzle-orm';
 
-/**
- * Lists tenants with `status` ACTIVE that have never been deprovisioned.
- */
 export async function listActiveTenants(): Promise<TTenant[]> {
   const db = getDb();
 
@@ -14,7 +11,7 @@ export async function listActiveTenants(): Promise<TTenant[]> {
     .from(tenants)
     .where(
       and(
-        eq(tenants.status, TENANT_STATUS.ACTIVE),
+        inArray(tenants.status, SERVED_TENANT_STATUSES),
         isNull(tenants.deprovisionedAt),
       ),
     );

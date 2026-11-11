@@ -32,6 +32,8 @@ const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
   [TENANT_STATUS.ACTIVE]: 'ok',
   [TENANT_STATUS.SUSPENDED]: 'warn',
   [TENANT_STATUS.ARCHIVED]: 'neutral',
+  [TENANT_STATUS.TRIAL]: 'ok',
+  [TENANT_STATUS.PAST_DUE]: 'warn',
 };
 
 const PROVISIONING_STEP_TONE: Record<

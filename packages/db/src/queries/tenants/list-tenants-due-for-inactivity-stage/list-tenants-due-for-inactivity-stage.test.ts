@@ -1,6 +1,7 @@
 import {
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
+  SERVED_TENANT_STATUSES,
   TENANT_STATUS,
   type TInactivityStage,
   type TStampedInactivityStage,
@@ -93,6 +94,23 @@ describe(listTenantsDueForInactivityStage, () => {
       expect(due).toEqual([]);
     });
   });
+
+  it.each(SERVED_TENANT_STATUSES)(
+    'returns a %s tenant at the suspension warning stage',
+    async (status) => {
+      const tenant = await insertTestTenant(db(), {
+        status,
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+      });
+
+      const due = await dueIds(
+        INACTIVITY_STAGE.SUSPENSION_WARNING,
+        MOCK_DAY_23,
+      );
+
+      expect(due).toEqual([tenant.id]);
+    },
+  );
 
   it.each(Object.values(INACTIVITY_STAGE))(
     'never returns an archived tenant at the %s stage',

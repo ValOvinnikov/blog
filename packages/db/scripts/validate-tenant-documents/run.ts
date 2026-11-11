@@ -1,19 +1,4 @@
-/**
- * Document-validation sweep entrypoint — runs `sanity documents validate`
- * against every in-scope tenant's own Sanity project/dataset (its existing
- * read token, env-overridden per invocation — see
- * `lib/run-sanity-documents-validate.ts`), persisting drift as `findings`
- * rows via `db.queries.findings` and reporting an operator alert to the
- * platform the first time a tenant newly transitions into a failing state.
- *
- * Invoked only by `.github/workflows/validate-tenant-documents.yml` — the
- * weekly scheduled sweep (every in-scope tenant) or a `workflow_dispatch`
- * (optionally scoped to one tenant via `--tenant-id=<uuid>`) — never run by hand against a shared/production
- * tenant registry outside that workflow.
- *
- * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build.
- */
+// Run only by `.github/workflows/validate-tenant-documents.yml`, never by hand against a shared or production tenant registry.
 import { pathToFileURL } from 'node:url';
 
 import {
@@ -23,7 +8,6 @@ import {
   FINDING_STATUS,
   type TFindingSeverity,
 } from '@blog/config/constants';
-import { TENANT_STATUS } from '@blog/db/constants';
 import {
   listFindingsForTenant,
   openFinding,
@@ -35,7 +19,9 @@ import {
   listActiveTenants,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { isTenantServed } from '@blog/db/utils/is-tenant-served/is-tenant-served';
 import { sanitizeLogMessage } from '@blog/insight';
+import { hasLength } from '@blog/utils/primitives';
 
 import { notifyOperatorsOfDocumentValidationFailure } from './lib/notify-operators';
 import {
@@ -107,10 +93,7 @@ async function validateOne(
     return;
   }
 
-  if (
-    credentials.status !== TENANT_STATUS.ACTIVE ||
-    credentials.deprovisionedAt
-  ) {
+  if (!isTenantServed(credentials)) {
     summary.skipped += 1;
     console.log(
       `validate-tenant-documents: skipping tenant "${tenant.id}" — status="${credentials.status}" deprovisionedAt=${credentials.deprovisionedAt ? credentials.deprovisionedAt.toISOString() : 'null'}`,
@@ -133,7 +116,7 @@ async function validateOne(
     return;
   }
 
-  if (results.length === 0) {
+  if (!hasLength(results)) {
     summary.clean += 1;
     await resolveOpenFindingIfAny(tenant);
     return;
