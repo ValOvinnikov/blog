@@ -55,11 +55,10 @@ Before writing any code:
   shape it should produce. Stored-value constants (`LINK_TYPE`) come from
   `@blog/config` (`constants/`).
 - **Until launch, a changed shape updates starter content, not a migration**
-  (CLAUDE.md → "Until launch, no content migrations"). A change to an existing
+  (`develop-feature` → "Migrations" → "Until launch, no content migrations"). A change to an existing
   shape updates `packages/config/src/starter-content/` — a `config` dispatch,
   so name it in your report — and you write no content migration; an additive
-  optional-only change needs neither — say so. CLAUDE.md → "Check for
-  migrations" and `migrations/README.md` apply from launch.
+  optional-only change needs neither — say so. `develop-feature` → "Migrations" → "Check for migrations — from launch" and `migrations/README.md` apply from launch.
 
 ## The public surface and the client boundary
 
@@ -233,7 +232,7 @@ tool) before writing or changing any test.
   `no-tests-needed`: `testing-practices` → "What to test" / "What not to
   test". Shared fakes live in `src/testing/`.
 - **A bugfix's failing regression test comes first, written by you**
-  (CLAUDE.md → `superpowers:test-driven-development`); new-feature coverage
+  (`superpowers:test-driven-development`); new-feature coverage
   comes from `test-writer` afterwards. A bug inside a schema's own rule gets
   none — unless the fix moves that rule into `schema-types/validation/`, where
   it is tested like any validator.

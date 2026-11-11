@@ -184,7 +184,7 @@ contracts:
     enforces the ceiling. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it. Not
     dispatched for a docs-only diff — those get the orchestrator's inline
-    identifier check instead (`CLAUDE.md`, delivery gate step 4). Its
+    identifier check instead (`open-pull-request` "Delivery gate sequence" step 4). Its
     mechanical pass (`code-review-practices` §0) opens with
     `pnpm check:diff-hygiene` — the judgement-free checks, also in
     `pnpm verify` and pre-push, so a hit costs the implementing session a
@@ -259,8 +259,7 @@ XModuleView` block that the rule already forbade and no review had
     in-flight branch → In Progress, merged PR → issue Done, a completed
     parent issue whose sub-issues all trace to merged PRs → Done, every
     open issue/PR carries at least one label, every open issue carries
-    exactly one `prio:*` label per `CLAUDE.md`'s "Ticket priority & triage"
-    section — a creation dispatch without one is rejected as incomplete,
+    exactly one `prio:*` label per `write-ticket` "Priority labels" — a creation dispatch without one is rejected as incomplete,
     and a sweep flags open issues carrying zero or two-plus `prio:*`
     labels). Also propagates parent/epic
     status both ways: a parent still `Todo` moves to In Progress the moment
@@ -834,7 +833,7 @@ file` are all denied alike) — an earlier version only handled the
     files, so it only fills the gaps).
 
 - **Skills** (`.claude/skills/`):
-  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. The worktree and scratchpad removal procedure is the on-demand `worktree-cleanup.md` beside it, read only at §8. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (CLAUDE.md "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and a **Cost** line: every new cron, Workflow run, paid API call, Blob/KV use or hot-path query with its volume and free-allowance fit, or "none". Every ticket's `## Scope` names its `Feature doc:`, plus a `Cost:` line when it adds one of those.
+  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. It also holds the orchestrator rules `CLAUDE.md` only points at — "Planning work — mandatory, not advisory", "Mid-task decisions", "Use the scoped agents" (dispatch order, background dispatch), "Migrations", "Check for Voice candidates", "Docs that ship with the change", "Skills by task" and "What `pnpm verify` runs" — so layer agents do not load them with every dispatch. The worktree and scratchpad removal procedure is the on-demand `worktree-cleanup.md` beside it, read only at §8. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (`develop-feature` "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and a **Cost** line: every new cron, Workflow run, paid API call, Blob/KV use or hot-path query with its volume and free-allowance fit, or "none". Every ticket's `## Scope` names its `Feature doc:`, plus a `Cost:` line when it adds one of those.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app`: server-first, where a component lives (`shared/` only for one imported by two domains), the props contract with its ceiling (7 in `apps/platform`, 10 in `packages/ui` and `apps/web`) and the drop → group → slot → hook → context ladder (the `reviewer` blocks a touched component over it), derived state, provider hooks that throw outside their provider, styling files (a component's `tv()` in a sibling `*-variants.ts`, repeated styles kept in the workspace that renders them, a `lib/styling/` recipe only once a second `packages/ui` component imports it), sizes (a size derived from another element reads its token, an arbitrary value written twice becomes a token or const, a calculation names its terms), size and splitting, no unmeasured memo, accessible by construction.
@@ -854,7 +853,9 @@ file` are all denied alike) — an earlier version only handled the
     touch (a `tv()` still in a `.tsx`, a single-domain `shared/`
     component, file size alone, a raw type form, a missing feature page) are
     never swept. No fixed cadence — run whenever asked, naming the layer.
-  - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
+    - `write-ticket` — creating an issue through `board-keeper`, the body check against the skills, the sub-issue, epic and manual-test templates, the `prio:*` labels and the `cloud-ok` criteria.
+  - `report-epic-status` — the chat-message budget and the one-table epic status format.
+  - `open-pull-request` — branch → work → PR with human-gated push/PR steps; it also holds the full "Delivery gate sequence", "PR conventions", the cloud-session board-evidence protocol and "Deployment".
     Two on-demand files sit beside it: `stacked-prs.md` (the `gh stack`
     mechanics, read once the user asks for a stack) and `job-label.md` (the
     Gate 5 label commands). The completing PR's body links its manual-test issue without a closing
@@ -881,13 +882,12 @@ file` are all denied alike) — an earlier version only handled the
   adopted 2026-10-14:
   - Where a component lives, props (ceiling and ladder), styling files,
     size and splitting → `react-component-practices`.
-  - File size budgets, feature docs (`docs/features/<feature>.md`), spec
-    sync and design-doc retention → `CLAUDE.md` Conventions.
+  - File size budgets → `CLAUDE.md` Conventions; feature docs (`docs/features/<feature>.md`), spec sync and design-doc retention → `develop-feature` "Docs that ship with the change".
   - Shared types, helpers and constants → `.claude/agents/config.md`.
   - Test setup — render wrappers, `beforeEach`/setup helpers, `__mocks__/`,
     fixture builders → `testing-practices`.
   - Manual-test issues → `develop-feature` §2; the issue template is in
-    `CLAUDE.md` "Issue body template".
+    `write-ticket` "Issue body template".
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
   the generated Sanity types (`packages/config/src/sanity/generated/`, regenerate
@@ -946,7 +946,7 @@ file` are all denied alike) — an earlier version only handled the
   `gh pr create --base <branch>`, mainly for `sync`, which restacks the
   branches above a PR once it merges. A stack is opened only when the user
   asks for one — the default for a multi-layer feature is one layer's PR
-  merged before the next layer starts (`CLAUDE.md` → "One layer at a time",
+  merged before the next layer starts (`develop-feature` → "One layer at a time",
   adopted 2026-09-21). Stacking makes a per-layer split viable
   for the PRs _above_ the bottom one, since those target their predecessor
   rather than `main`. The bottom PR still targets `main` and still inherits

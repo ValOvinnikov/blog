@@ -19,20 +19,19 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
 
 - Never reverse an arrow. Build order is `studio → service → ui → web`,
   skipping untouched layers; a new stored-value constant is a `config`
-  dispatch first. One PR per layer, merged before the next starts → CLAUDE.md
-  "One layer at a time".
-- The plan carries Copy and Manual test (CLAUDE.md "Say what it touches before
+  dispatch first. One PR per layer, merged before the next starts → `develop-feature` "One layer at a time — merged before the next starts".
+- The plan carries Copy and Manual test (`develop-feature` "Say what it touches before
   starting"). The content-model change updates or creates its `docs/features/`
-  page (CLAUDE.md "Feature docs"), plus any `SPEC.md` §6 entry for that shape
+  page (`develop-feature` "Docs that ship with the change"), plus any `SPEC.md` §6 entry for that shape
   ("Spec sync").
 
 ## 1. Schema + typegen — `packages/studio` · `studio`
 
 - **Starter content first, not a migration.** Until launch no content
-  migration is written (CLAUDE.md "Until launch, no content migrations"): a
+  migration is written (`develop-feature` "Migrations" → "Until launch, no content migrations"): a
   changed existing shape updates `packages/config/src/starter-content/` so a
   new tenant starts at the current shape; additive optional-only needs nothing
-  — say so. CLAUDE.md "Check for migrations" takes over at launch.
+  — say so. `develop-feature` "Migrations" → "Check for migrations — from launch" takes over at launch.
 - Conventions → `.claude/agents/studio.md`, `studio-schema-practices`. Most
   often missed: registering the type in its group's `index.ts`, and its desk
   entry — a `{ schema }` in `src/structure/sections/<section>-section.ts` for a

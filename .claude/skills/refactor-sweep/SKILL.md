@@ -58,7 +58,7 @@ touches; this sees the code nobody is touching.
      (`react-component-practices` § Where a component lives), file size
      alone (CLAUDE.md → "File size budgets"), a raw type form `@blog/config`
      already names (`.claude/agents/config.md` → "Types"), a feature with no
-     `docs/features/` page (CLAUDE.md → "Feature docs").
+     `docs/features/` page (`develop-feature` → "Docs that ship with the change").
 
 3. **Dedup and sanity-check** the raw findings: merge near-duplicates, drop
    anything that needs a judgment call only a human should make.
@@ -72,7 +72,7 @@ touches; this sees the code nobody is touching.
      restructuring, anything needing its own review — get an issue each.
 
    Each title names the concrete problem (conventional-commit style).
-   Bodies follow CLAUDE.md → "Issue body template", carry the `file:line`
+   Bodies follow `write-ticket` → "Issue body template", carry the `file:line`
    evidence and a proposed direction, and pass "Read the body against the
    skills" before dispatch. Labels: `refactor`, `layer:<agent>` (the owning
    agent's name — `layer:config` for `utils`, `layer:platform-app`), and

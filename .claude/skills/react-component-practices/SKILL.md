@@ -16,7 +16,7 @@ and `platform-app.md` (`apps/platform`). Component tests follow
 - A component is a Server Component until it needs a hook, a browser API or
   an event handler. Then `'use client'` goes on the smallest component that
   needs it — never on a page, a layout or a section that only renders
-  children (`packages/ui` never carries it: CLAUDE.md → Conventions).
+  children (`packages/ui` never carries it: the `'use client'` bullet below).
 - A view gets its data as props. Fetching happens in an async Server
   Component — a page composition, a web `*-module.tsx`, a layout shell such
   as the site header, a platform section (`platform-ui-practices` → "Data
@@ -25,6 +25,18 @@ and `platform-app.md` (`apps/platform`). Component tests follow
   `@blog/db` query or `fetch()` (a type or constant import is fine). Data it
   loads on demand comes through a Server Action (`platform-ui-practices` →
   "Data loading"). No component reads `process.env`.
+- `'use client'` never in `@blog/ui` (it stays pure and prop-driven). Two
+  components there, `Carousel` and `Dialog`, are nonetheless client-only —
+  they own client hooks (`useEmblaCarousel`, Base UI's dialog) — and carry no
+  directive: the consumer declares the boundary, the way `sanity-image`'s
+  `SanityImage` works. The one package that may carry it is `@blog/studio`,
+  whose mount component is irreducibly client-side; that exception is scoped
+  to that component and does not license the directive anywhere else in
+  `packages/*`. In `apps/web` it IS the right
+  tool — add it at the _leaf boundary_ that genuinely needs the client: React
+  hooks (`useState`/`useEffect`), browser APIs, event handlers, or wrapping a
+  third-party component that uses hooks internally (e.g. the `sanity-image`
+  wrapper). Keep it as low in the tree as possible, not on whole pages.
 
 ## Where a component lives
 

@@ -397,8 +397,7 @@ The Voice page edits the site copy registered in `@blog/config`'s
 - Rich values render through `site-preview/voice-rich-text/`, which handles
   exactly `VOICE_PORTABLE_TEXT_SCHEMA`'s marks; never import `apps/web`'s
   Portable Text renderer.
-- Which strings are editable is the user's call (CLAUDE.md → "Check for Voice
-  candidates"). This app's own UI copy is never Voice.
+- Which strings are editable is the user's call (`develop-feature` → "Check for Voice candidates"). This app's own UI copy is never Voice.
 
 ## Indexing
 

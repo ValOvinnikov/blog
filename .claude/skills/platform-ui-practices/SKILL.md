@@ -539,7 +539,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 - A Desktop/Mobile preview toggle is offered only where it changes what renders;
   an email's Desktop preview is a real 600px frame.
 - Check in a browser at the manual-test matrix's 390, 820 and 1280px
-  (CLAUDE.md → "Issue body template"), plus 1024px where `lg` columns start,
+  (`write-ticket` → "Issue body template"), plus 1024px where `lg` columns start,
   with the sidebar open and collapsed, in more than one locale.
 
 ## Headings and landmarks

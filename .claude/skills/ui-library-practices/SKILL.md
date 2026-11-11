@@ -23,7 +23,7 @@ load on demand: `polymorphic-and-as.md` (Level-2 `as`, anchor rules) and
 - **No app coupling.** No `next/*` imports. Framework specifics arrive through
   `as`/`linkAs`, `children` or a slot; default to plain elements.
 - Shapes come from `@blog/config`. No business logic.
-- **No `'use client'`** (CLAUDE.md → Conventions, which names the agreed
+- **No `'use client'`** (`react-component-practices` → "Server first, client at the leaf", which names the agreed
   client-only components). A component that calls a client-only hook — state,
   a ref, an effect, a third-party hook such as `useEmblaCarousel` — is
   client-only without the directive: its consumer renders it under its own
@@ -376,3 +376,15 @@ Primitives API, folder layout, the `Header` example and the slot/media rules →
 - [ ] The component's `index.ts` exports only the component and its props
       type — never the variants.
 - [ ] Stories alongside (`ui-storybook`); `pnpm verify` green.
+
+## The `@blog/ui` component index
+
+`packages/ui/COMPONENTS.md` is a generated index of every `@blog/ui` component
+— its purpose, props, and compound slots (`Header.Brand`, `PostCard.Media`, …)
+— produced by `scripts/gen-ui-index.mjs`. **Consult it before deciding a feature
+needs a new UI component:** it's the cheapest way to spot one to reuse or
+extend, and the `explore`, `ui` and `web` agents are pointed at it for the same
+reason. The pre-commit hook regenerates it on staged `packages/ui` changes, and
+`pnpm gen:ui-index:check` guards it in CI — drift, description coverage (every
+exported component/slot documented) and structural completeness (no component
+silently unindexed). Never hand-edit it; fix the source and regenerate.
