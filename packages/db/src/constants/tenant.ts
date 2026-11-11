@@ -18,7 +18,7 @@ export const TENANT_STATUS = {
 
 export type TTenantStatus = TValueOf<typeof TENANT_STATUS>;
 
-export const SERVED_TENANT_STATUSES = [
+export const WRITABLE_TENANT_STATUSES = [
   TENANT_STATUS.ACTIVE,
   TENANT_STATUS.TRIAL,
   TENANT_STATUS.PAST_DUE,

@@ -45,8 +45,8 @@ One `@blog/studio` schema serves many Sanity projects: the platform's own consol
   - Each dataset keeps its own ledger, so development and production track separately, and so does every tenant.
   - A freshly provisioned tenant's ledger is written by the seed step ([Site templates](site-templates.md)), every migration marked applied.
 - **Migration id list.** `STUDIO_MIGRATION_IDS` in `@blog/config` is generated from the folders in `packages/studio/migrations/`, in run order, by `pnpm gen:migration-ids`. `apps/worker` reads it, since it cannot import `@blog/studio`.
-- **Tenant selection.** `listActiveTenants` returns tenants whose `status` is served (ACTIVE, TRIAL or PAST_DUE) with a null `deprovisionedAt`. A single-tenant run uses `getTenantById`.
-- **Credentials.** `getTenantSanityWriteCredentials` decrypts the tenant's own `sanityWriteTokenEncrypted` for each run. A tenant with no write token, or one whose status is not served (ACTIVE, TRIAL or PAST_DUE), is counted as skipped.
+- **Tenant selection.** `listActiveTenants` returns tenants whose `status` is writable (ACTIVE, TRIAL or PAST_DUE) with a null `deprovisionedAt`. A single-tenant run uses `getTenantById`.
+- **Credentials.** `getTenantSanityWriteCredentials` decrypts the tenant's own `sanityWriteTokenEncrypted` for each run. A tenant with no write token, or one whose status is not writable (ACTIVE, TRIAL or PAST_DUE), is counted as skipped.
 - **Failure record.** `tenants.content_migration_failed_at` holds when the tenant's last content migration failed. A failed deploy, export or ledger read sets it with `recordTenantContentMigrationFailure`. The tenant's next successful deploy or backfill, in a full or single-tenant run, clears it with `clearTenantContentMigrationFailure`. A skipped tenant, or one outside the run, keeps its value. If writing the record fails, the run still counts the original failure and exits 1.
 - **No caching.** Migrations write straight to Content Lake. Published changes reach the site through the normal revalidation webhook ([rendering and caching](./rendering-and-caching.md)).
 

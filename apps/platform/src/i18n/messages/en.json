@@ -275,7 +275,9 @@
     "status": {
       "ACTIVE": "Active",
       "SUSPENDED": "Suspended",
-      "ARCHIVED": "Archived"
+      "ARCHIVED": "Archived",
+      "TRIAL": "Trial",
+      "PAST_DUE": "Past due"
     },
     "manage": "Manage",
     "manageAriaLabel": "Manage {tenantName}"

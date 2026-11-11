@@ -275,7 +275,9 @@
     "status": {
       "ACTIVE": "Actif",
       "SUSPENDED": "Suspendu",
-      "ARCHIVED": "Archivé"
+      "ARCHIVED": "Archivé",
+      "TRIAL": "Essai",
+      "PAST_DUE": "Paiement en retard"
     },
     "manage": "Gérer",
     "manageAriaLabel": "Gérer {tenantName}"

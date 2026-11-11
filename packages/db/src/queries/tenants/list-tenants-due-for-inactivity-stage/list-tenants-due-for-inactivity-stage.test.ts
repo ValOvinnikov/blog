@@ -1,7 +1,7 @@
 import {
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
-  SERVED_TENANT_STATUSES,
+  WRITABLE_TENANT_STATUSES,
   TENANT_STATUS,
   type TInactivityStage,
   type TStampedInactivityStage,
@@ -95,7 +95,7 @@ describe(listTenantsDueForInactivityStage, () => {
     });
   });
 
-  it.each(SERVED_TENANT_STATUSES)(
+  it.each(WRITABLE_TENANT_STATUSES)(
     'returns a %s tenant at the suspension warning stage',
     async (status) => {
       const tenant = await insertTestTenant(db(), {

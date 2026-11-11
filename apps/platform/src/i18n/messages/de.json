@@ -275,7 +275,9 @@
     "status": {
       "ACTIVE": "Aktiv",
       "SUSPENDED": "Gesperrt",
-      "ARCHIVED": "Archiviert"
+      "ARCHIVED": "Archiviert",
+      "TRIAL": "Testphase",
+      "PAST_DUE": "Zahlung überfällig"
     },
     "manage": "Verwalten",
     "manageAriaLabel": "{tenantName} verwalten"

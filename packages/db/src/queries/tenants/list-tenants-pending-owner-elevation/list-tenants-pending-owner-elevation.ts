@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import {
-  SERVED_TENANT_STATUSES,
+  WRITABLE_TENANT_STATUSES,
   TENANT_PROVISIONING_STATUS,
 } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
@@ -15,7 +15,7 @@ export async function listTenantsPendingOwnerElevation(): Promise<TTenant[]> {
     .from(tenants)
     .where(
       and(
-        inArray(tenants.status, SERVED_TENANT_STATUSES),
+        inArray(tenants.status, WRITABLE_TENANT_STATUSES),
         eq(tenants.provisioningStatus, TENANT_PROVISIONING_STATUS.READY),
       ),
     );

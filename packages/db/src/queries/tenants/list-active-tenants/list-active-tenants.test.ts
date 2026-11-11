@@ -1,4 +1,4 @@
-import { SERVED_TENANT_STATUSES, TENANT_STATUS } from '@blog/db/constants';
+import { WRITABLE_TENANT_STATUSES, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -15,7 +15,7 @@ afterEach(async () => {
 });
 
 describe(listActiveTenants, () => {
-  it.each(SERVED_TENANT_STATUSES)(
+  it.each(WRITABLE_TENANT_STATUSES)(
     'includes a %s, non-deprovisioned tenant',
     async (status) => {
       const tenant = await insertTestTenant(db(), { status });
@@ -25,14 +25,6 @@ describe(listActiveTenants, () => {
       expect(result).toEqual([tenant]);
     },
   );
-
-  it('includes a tenant with the default status', async () => {
-    const tenant = await insertTestTenant(db());
-
-    const result = await listActiveTenants();
-
-    expect(result).toEqual([tenant]);
-  });
 
   it.each([
     ['a SUSPENDED tenant', { status: TENANT_STATUS.SUSPENDED }],

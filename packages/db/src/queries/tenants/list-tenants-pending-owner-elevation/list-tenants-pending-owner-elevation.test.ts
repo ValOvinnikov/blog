@@ -1,5 +1,5 @@
 import {
-  SERVED_TENANT_STATUSES,
+  WRITABLE_TENANT_STATUSES,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
@@ -19,7 +19,7 @@ afterEach(async () => {
 });
 
 describe(listTenantsPendingOwnerElevation, () => {
-  it.each(SERVED_TENANT_STATUSES)(
+  it.each(WRITABLE_TENANT_STATUSES)(
     'includes a %s, READY tenant',
     async (status) => {
       const tenant = await insertTestTenant(db(), {

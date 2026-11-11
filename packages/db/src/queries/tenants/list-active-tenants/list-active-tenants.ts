@@ -1,5 +1,5 @@
 import { getDb } from '@blog/db/client';
-import { SERVED_TENANT_STATUSES } from '@blog/db/constants';
+import { WRITABLE_TENANT_STATUSES } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { and, inArray, isNull } from 'drizzle-orm';
 
@@ -11,7 +11,7 @@ export async function listActiveTenants(): Promise<TTenant[]> {
     .from(tenants)
     .where(
       and(
-        inArray(tenants.status, SERVED_TENANT_STATUSES),
+        inArray(tenants.status, WRITABLE_TENANT_STATUSES),
         isNull(tenants.deprovisionedAt),
       ),
     );
