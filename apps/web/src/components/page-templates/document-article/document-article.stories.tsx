@@ -1,10 +1,8 @@
 import { CONTENT_ALIGNMENT } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
-import {
-  MOCK_RICH_TEXT_DEMO,
-  MOCK_WIDE_TABLE_DEMO,
-} from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_RICH_TEXT_DEMO } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_WIDE_TABLE_DEMO } from '@web/testing/shared/portable-text/wide-table-fixtures';
 
 import { DocumentArticle } from './document-article';
 

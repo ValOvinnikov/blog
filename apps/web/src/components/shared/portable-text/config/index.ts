@@ -50,15 +50,16 @@ const makeArticleTextComponents = (
   },
 });
 
-const makeSectionTypeComponent = (aside: PortableTextTypeComponent) =>
-  makeExpandableSectionTypeComponent(
-    mergeComponents(defaultComponents, makeArticleTextComponents(aside)),
-  );
-
-const makeTypeOverrides = (aside: PortableTextTypeComponent) => ({
+const makeTypeOverrides = (
+  aside: PortableTextTypeComponent,
+  isSectionFullBleed: boolean,
+) => ({
   aside,
   [PORTABLE_TEXT_BLOCK_TYPE.EXPANDABLE_SECTION]:
-    makeSectionTypeComponent(aside),
+    makeExpandableSectionTypeComponent(
+      mergeComponents(defaultComponents, makeArticleTextComponents(aside)),
+      isSectionFullBleed,
+    ),
 });
 
 const defaultAside = makeAsideTypeComponent(baseForAsideRecursion);
@@ -68,15 +69,17 @@ export const baseComponents = mergeComponents(defaultComponents, {
   ...articleTextComponents,
   types: {
     ...articleTextComponents.types,
-    ...makeTypeOverrides(defaultAside),
+    ...makeTypeOverrides(defaultAside, true),
   },
 });
 
-export const createAsideOverride = (
+// A post's expandable section keeps the text measure; elsewhere it widens like a table.
+export const createPostBodyOverride = (
   asideKindLabels?: TAsideKindLabels,
 ): PortableTextComponents => ({
   types: makeTypeOverrides(
     makeAsideTypeComponent(baseForAsideRecursion, asideKindLabels),
+    false,
   ),
 });
 
