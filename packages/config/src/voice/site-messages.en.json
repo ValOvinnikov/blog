@@ -333,6 +333,10 @@
         "description": "Content from third-party providers, such as videos and maps, which may set their own cookies."
       }
     },
+    "placeholder": {
+      "allowLabel": "Allow external media",
+      "scopeNote": "Applies to every video, map and booking widget on this site."
+    },
     "footerSettingsLabel": "Cookie settings"
   },
   "cookieList": {

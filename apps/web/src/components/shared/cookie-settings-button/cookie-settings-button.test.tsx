@@ -1,6 +1,7 @@
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { renderElement, screen } from '@web/testing/custom-render';
 import {
+  COOKIE_SETTINGS_BUTTON_NAME,
   PREFERENCES_CLOSED_TEXT,
   PREFERENCES_OPEN_TEXT,
   PreferencesState,
@@ -8,10 +9,9 @@ import {
 
 import { CookieSettingsButton } from './cookie-settings-button';
 
-const BUTTON_NAME = 'Cookie settings';
-
 describe(`<${CookieSettingsButton.name}/>`, () => {
   let user: UserEvent;
+  let settingsButton: HTMLElement;
 
   beforeEach(() => {
     user = userEvent.setup();
@@ -21,16 +21,16 @@ describe(`<${CookieSettingsButton.name}/>`, () => {
         <PreferencesState />
       </>,
     );
+    settingsButton = screen.getByRole('button', {
+      name: COOKIE_SETTINGS_BUTTON_NAME,
+    });
   });
 
   it('is always available, whatever the consent state', () => {
-    const settingsButton = screen.getByRole('button', { name: BUTTON_NAME });
-
     expect(settingsButton).toBeVisible();
   });
 
   it('opens the preferences when pressed', async () => {
-    const settingsButton = screen.getByRole('button', { name: BUTTON_NAME });
     const closedState = screen.getByText(PREFERENCES_CLOSED_TEXT);
     expect(closedState).toBeVisible();
 

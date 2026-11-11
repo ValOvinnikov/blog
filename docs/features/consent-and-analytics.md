@@ -26,7 +26,7 @@ epics: [3774, 3726, 5037, 5029]
 
 ## What it does
 
-A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, and nothing on the site consumes it yet; analytics is not gated on consent.
+A site can show a cookie consent banner that lets the reader accept all, reject all or open settings, and a "Cookie settings" footer link, a floating button or both — the owner's choice on Look — reopen the preferences dialog at any time. An editor can also place a Cookie settings module on the home or a landing page (a privacy page, say), where the reader changes the choice inline. The banner links to the site's cookie statement, which lists every cookie the site sets and can reopen the preferences from its text. The reader's choice is a first-party cookie read on the client. Separately, a site can load Vercel Web Analytics and Speed Insights. The consent machinery has one optional category, external media, which gates every embed (videos, maps, booking widgets) until the reader allows it; analytics is not gated on consent.
 
 ## Surfaces and routes
 
@@ -51,7 +51,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 - **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan) and `ANALYTICS` (`GROWTH` only). Both preset defaults are off.
 - **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` is required as well; analytics loads only when the env flag and the capability both allow it.
-- **Voice** — none; banner, dialog, module and footer-link copy are fixed keys (`consent.*`).
+- **Voice** — none; banner, dialog, module, footer-link and embed-placeholder copy are fixed keys (`consent.*`). The placeholder's allow label and scope note are `consent.placeholder.allowLabel` and `consent.placeholder.scopeNote`; its settings action reuses `consent.footerSettingsLabel`.
 - **Look** — the banner, dialog and placeholder are `@blog/ui` molecules and follow the site's Look. Look › Footer › Cookie settings (Footer link default · Floating button · Both, every plan; stored as `COOKIE_SETTINGS_BUTTON` `HIDDEN` · `ONLY` · `SHOWN`) picks which controls reopen the dialog, read through `getFooterStyle`; `resolveCookieSettingsControls` turns the choice and the capability into the footer link and the floating button.
 
 ## Constraints and invariants
@@ -62,14 +62,14 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - Every store instance re-reads the cookie on save through one listener set, so the banner, the dialog, the module and any consent-gated component update together.
 - The dialog and the module share `useConsentPreferencesForm`: one category list, and switches that start from the saved choice and re-derive on every save from any surface (keyed on `saveRevision`, not the cookie value), discarding unsaved changes.
 - The module renders no switches while the store is `UNKNOWN`, so Save can never write an empty choice over a granted one before the cookie is read.
-- `ConsentPlaceholder` (ui) and `useConsent` exist for content behind the external-media category; no web component uses them yet.
+- `ConsentGate` (`apps/web/src/components/shared/consent-gate/`) gates content on one category: it renders its `pending` node while the store is `UNKNOWN` (so the server render never holds the gated content), its `fallback` while the category is unanswered or denied, and its children once granted. The embed module is its first consumer, with `ConsentPlaceholder` as the fallback.
 - Vercel Analytics and Speed Insights load regardless of the reader's consent choice.
 - A capability switched off hides the banner, the footer link and the floating button, whatever Look's choice; a Cookie settings module on a page still renders. With it on, at least one of the link and the button shows.
 
 ## Dependencies
 
 - Layers: `config` (categories, `CAPABILITY`), `ui` (`ConsentBanner`, `ConsentPreferences`, `ConsentPlaceholder`, `Dialog`), `web`.
-- Features: [plans-and-entitlements](./plans-and-entitlements.md), [footer-and-legal-pages](./footer-and-legal-pages.md), [rich-text](./rich-text.md), [embed-module](./embed-module.md) (the intended external-media consumer), [rendering-and-caching](./rendering-and-caching.md).
+- Features: [plans-and-entitlements](./plans-and-entitlements.md), [footer-and-legal-pages](./footer-and-legal-pages.md), [rich-text](./rich-text.md), [embed-module](./embed-module.md) (the first external-media consumer), [rendering-and-caching](./rendering-and-caching.md).
 - Packages: `@vercel/analytics`, `@vercel/speed-insights`.
 - Env: `WEB_ANALYTICS_ENABLED`.
 
@@ -78,6 +78,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - `apps/web/src/utils/consent-cookie/consent-cookie.ts` — `encodeConsent`, `decodeConsent`
 - `apps/web/src/hooks/use-consent-store/use-consent-store.ts`
 - `apps/web/src/hooks/use-consent/use-consent.ts`
+- `apps/web/src/components/shared/consent-gate/consent-gate.tsx`
 - `apps/web/src/components/features/layout/site-providers/components/consent-banner-slot/consent-banner-slot.tsx`
 - `apps/web/src/components/shared/consent-preferences-dialog/consent-preferences-dialog.tsx`
 - `apps/web/src/hooks/use-consent-preferences-form/use-consent-preferences-form.ts`
@@ -91,13 +92,13 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 ## Tests and stories
 
-- `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
+- `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-gate.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
 - `packages/ui/src/components/molecules/consent-*/**/*.test.tsx`.
 - Stories: `consent-banner.stories.tsx`, `consent-preferences.stories.tsx`, `consent-placeholder.stories.tsx` (ui); `cookie-settings-module-view.stories.tsx` (web).
 
 ## Related
 
-- #3774 — render `module_embed` behind the consent gate (the first external-media consumer).
+- #3774 — render `module_embed` behind the consent gate; adds `ConsentGate`.
 - #3726 — the footer shows the privacy-policy link and the footer links.
 - #5037 — the banner, dialog and setting-row headings take text roles.
 - #6088 — the Cookie settings module (epic #6082).

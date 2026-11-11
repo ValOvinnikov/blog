@@ -333,6 +333,10 @@
         "description": "Inhalte von Drittanbietern, etwa Videos und Karten, die möglicherweise eigene Cookies setzen."
       }
     },
+    "placeholder": {
+      "allowLabel": "Externe Medien erlauben",
+      "scopeNote": "Gilt für jedes Video, jede Karte und jedes Buchungs-Widget auf dieser Website."
+    },
     "footerSettingsLabel": "Cookie-Einstellungen"
   },
   "cookieList": {

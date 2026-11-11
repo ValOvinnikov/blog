@@ -1,11 +1,14 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import { hasLength } from '@blog/utils/primitives';
 
-import { EMBED_PROVIDER, MEDIA_RATIO } from '@blog/config/constants';
+import {
+  EMBED_ORIGIN,
+  EMBED_PROVIDER,
+  MEDIA_RATIO,
+} from '@blog/config/constants';
 
 import type { TEmbedParser } from './embed-parser';
 
-const YOUTUBE_EMBED_ORIGIN = 'https://www.youtube-nocookie.com/embed/';
 const YOUTUBE_ID = /^[\w-]{11}$/;
 const START_TIME = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/;
 const SECONDS_PER_MINUTE = 60;
@@ -54,7 +57,7 @@ export const parseYoutubeEmbed: TEmbedParser = (host, url, segments) => {
     return undefined;
   }
 
-  const embedUrl = new URL(`${YOUTUBE_EMBED_ORIGIN}${video.id}`);
+  const embedUrl = new URL(`${EMBED_ORIGIN.YOUTUBE}/embed/${video.id}`);
   const start = toStartSeconds(url.searchParams.get('t') ?? undefined);
 
   if (start) {
