@@ -3,7 +3,7 @@ import { okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync } from '@web/testing/custom-render';
 import {
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -46,7 +46,7 @@ describe(`<${TagIndexBreadcrumbs.name}/>`, () => {
     path: routes.tags(),
   });
   testNotFoundWithoutLog({ pageLoaderMock: getTagIndexPageMock, setup });
-  testNotFoundOnFetchFailure({
+  testThrowsOnFetchFailure({
     pageLoaderMock: getTagIndexPageMock,
     setup,
     eventFragment: 'tag_index_breadcrumbs.fetch_failed',

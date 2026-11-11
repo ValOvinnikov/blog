@@ -1,6 +1,7 @@
 import { routes, TAXONOMY_KIND, type TTaxonomyKind } from '@blog/config';
 import { service } from '@blog/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
+import { POST_LIST_LOG } from '@web/constants/post-list';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
@@ -60,12 +61,12 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
   ]);
 
   if (!result.ok) {
-    logger.error('post_list_module.fetch_failed', {
+    logger.error(POST_LIST_LOG.MODULE_FETCH_FAILED, {
       id,
       page: resolvedPage,
       error: result.error,
     });
-    notFound();
+    throw result.error;
   }
 
   const {
