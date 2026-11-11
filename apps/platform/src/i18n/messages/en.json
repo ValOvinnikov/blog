@@ -727,6 +727,7 @@
     "cardStyleLabel": "Card style",
     "cardStyleDescription": "Frames every content card: posts, topics, quotes, pricing, FAQ items and call-to-action boxes.",
     "radiusScaleOptionLabel": {
+      "NONE": "None",
       "SM": "Small",
       "MD": "Medium",
       "LG": "Large",

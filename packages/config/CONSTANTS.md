@@ -210,7 +210,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **PRESET_ID**: `CONSOLE`, `EDITORIAL`
 - **FONT_CHOICE**: `SPACE_GROTESK`, `NEWSREADER`, `JETBRAINS_MONO`, `FRAUNCES`, `INTER`
-- **RADIUS_SCALE**: `SM`, `MD`, `LG`, `XL`
+- **RADIUS_SCALE**: `NONE`, `SM`, `MD`, `LG`, `XL`
 - **DENSITY**: `DEFAULT`, `COMPACT`
 - **LANGUAGE_SWITCHER_STYLE**: `MENU_CODE`, `MENU_GLOBE`, `CODES`
 

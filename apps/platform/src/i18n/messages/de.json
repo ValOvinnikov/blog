@@ -727,6 +727,7 @@
     "cardStyleLabel": "Kartenstil",
     "cardStyleDescription": "Rahmt jede Inhaltskarte: Beiträge, Themen, Zitate, Preise, FAQ-Einträge und Call-to-Action-Boxen.",
     "radiusScaleOptionLabel": {
+      "NONE": "Keiner",
       "SM": "Klein",
       "MD": "Mittel",
       "LG": "Groß",

@@ -727,6 +727,7 @@
     "cardStyleLabel": "Estilo de tarjeta",
     "cardStyleDescription": "Enmarca cada tarjeta de contenido: entradas, temas, citas, precios, preguntas frecuentes y cuadros de llamada a la acción.",
     "radiusScaleOptionLabel": {
+      "NONE": "Ninguno",
       "SM": "Pequeño",
       "MD": "Mediano",
       "LG": "Grande",

@@ -727,6 +727,7 @@
     "cardStyleLabel": "Kaartstijl",
     "cardStyleDescription": "Omlijst elke inhoudskaart: berichten, onderwerpen, citaten, prijzen, veelgestelde vragen en call-to-actionblokken.",
     "radiusScaleOptionLabel": {
+      "NONE": "Geen",
       "SM": "Klein",
       "MD": "Middel",
       "LG": "Groot",

@@ -727,6 +727,7 @@
     "cardStyleLabel": "Style de carte",
     "cardStyleDescription": "Encadre chaque carte de contenu : articles, thèmes, citations, tarifs, questions fréquentes et encadrés d'appel à l'action.",
     "radiusScaleOptionLabel": {
+      "NONE": "Aucun",
       "SM": "Petit",
       "MD": "Moyen",
       "LG": "Grand",
