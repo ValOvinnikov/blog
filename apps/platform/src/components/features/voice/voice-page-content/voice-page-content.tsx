@@ -24,6 +24,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
     cardStyle,
     headerControlStyle,
     buttonShape,
+    navLinkStyle,
   } = lookFormValuesOrDefaults(config);
   const listSamplesByLocale = Object.fromEntries(
     await Promise.all(
@@ -54,6 +55,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
           cardStyle,
           headerControlStyle,
           buttonShape,
+          navLinkStyle,
         }}
         savedAt={config?.updatedAt}
         archivedAt={tenant.deprovisionedAt ?? undefined}

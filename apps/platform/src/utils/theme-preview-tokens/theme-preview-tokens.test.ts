@@ -12,6 +12,8 @@ import {
   HUE_MIN,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
+  NAV_LINK_STYLE,
+  NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_SCALE,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
@@ -38,6 +40,7 @@ const MOCK_PREVIEW_VALUES: TThemePreviewValues = {
   cardStyle: CARD_STYLE.OUTLINED,
   headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
   buttonShape: BUTTON_SHAPE.ROUNDED,
+  navLinkStyle: NAV_LINK_STYLE.PLAIN,
   accentHue: MOCK_ACCENT_HUE,
   logoHue: undefined,
 };
@@ -92,6 +95,11 @@ describe(buildThemePreviewStyle, () => {
       label: `${value} button shape`,
       values: { buttonShape: value },
       declarations: BUTTON_SHAPE_DECLARATIONS[value],
+    })),
+    ...Object.values(NAV_LINK_STYLE).map((value) => ({
+      label: `${value} navigation link`,
+      values: { navLinkStyle: value },
+      declarations: NAV_LINK_STYLE_DECLARATIONS[value],
     })),
   ])(
     'carries the $label tokens onto the preview',

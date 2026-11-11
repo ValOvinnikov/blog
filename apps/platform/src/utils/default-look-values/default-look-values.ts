@@ -20,6 +20,7 @@ import {
   type THeaderSubmenuStyle,
   type TLanguageSwitcherStyle,
   type TMaybeUndefined,
+  type TNavLinkStyle,
   type TPresetId,
   type TSpinnerStyle,
   type TRadiusScale,
@@ -41,6 +42,7 @@ export type TLookFormValues = {
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
+  navLinkStyle: TNavLinkStyle;
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;
@@ -71,6 +73,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    navLinkStyle,
     accountButtonStyle,
     accountPanelStyle,
     accountPhonePlacement,
@@ -96,6 +99,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
+    navLinkStyle,
     accountButtonStyle,
     accountPanelStyle,
     accountPhonePlacement,
