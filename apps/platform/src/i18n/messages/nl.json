@@ -222,7 +222,6 @@
     "studio": "Studio",
     "email": "E-mail",
     "subscribers": "Abonnees",
-    "comments": "Reacties",
     "team": "Team",
     "provisioning": "Inrichting",
     "dangerZone": "Gevarenzone",
@@ -366,7 +365,7 @@
     "voiceTileTitle": "Toon",
     "voiceTileDescription": "De woorden die uw site gebruikt",
     "featuresTileTitle": "Functies",
-    "featuresTileDescription": "Reacties, bladwijzers, nieuwsbrief",
+    "featuresTileDescription": "Bladwijzers, nieuwsbrief, analyse",
     "siteSetupCardTitle": "Je site wordt ingericht",
     "siteSetupFailedTitle": "Het inrichten van je site is gestopt",
     "siteSetupFailedDescription": "Bij een van de stappen ging iets mis. Probeer het opnieuw; wat al is ingericht, blijft behouden.",
@@ -1657,7 +1656,7 @@
       "CONTACT_FORM": "Contactformulier"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Laat lezers inloggen op je site. Bladwijzers, reacties en beoordelingen hebben dit nodig.",
+      "READER_ACCOUNTS": "Laat lezers inloggen op je site. Bladwijzers hebben dit nodig.",
       "COMMENTS": "Laat lezers reageren op berichten.",
       "RATINGS": "Laat lezers berichten beoordelen.",
       "BOOKMARKS": "Laat lezers berichten bewaren om later te lezen.",

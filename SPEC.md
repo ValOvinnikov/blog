@@ -982,8 +982,9 @@ tolerating its absence.** `service.modules.testimonial.v1.getTestimonialModule`
 projects `testimonials` with `.notNull()`, which the schema's `required()` makes
 safe. That is not a page-level risk: the loader is wrapped in `safeAsync`, so a
 parse failure returns a failed result and the module renders nothing rather than
-404ing the page, and the Sanity client pins `perspective: 'published'`, so a
-draft with the field still unset is never queried.
+404ing the page. Public reads use the `published` perspective, so a draft with
+the field still unset is queried only by a draft preview read, where the module
+renders nothing until the field is filled.
 
 **A logo is an inline object, not a document — one of the two places the
 `block_*` pattern is deliberately not followed, `module_stats` below being the
@@ -1926,23 +1927,25 @@ costs convenience, never compliance.
 **"Coming soon" capabilities.** A capability that is not finished end to end
 — today `comments` and `ratings` (no public-site implementation) and
 `newsletter` (readers can subscribe, but no tenant can send an issue yet) — is
-flagged `isComingSoon` in `apps/platform`'s `CAPABILITY_TOGGLES`. The Features
-tab renders it as a read-only "Coming soon" row with no switch, loads it off,
-and the save action writes it off whatever the payload says, so the row cannot
-be bypassed by a crafted request. A plan-locked toggle keeps its lock, badged with the cheapest plan that
-holds it. Shipping one of these features is a matter of dropping its flag.
+flagged `isComingSoon` in `apps/platform`'s `CAPABILITY_TOGGLES`. The save
+action writes it off whatever the payload says, so it cannot be switched on by
+a crafted request. The Features tab renders `newsletter` as a read-only "Coming
+soon" row with no switch; `comments` and `ratings` are on `HIDDEN_CAPABILITIES`
+and have no row at all — a paid-plan row either works or is absent. A
+plan-locked toggle keeps its lock, badged with the cheapest plan that holds it.
+Shipping one of these features means dropping its flag and, for `comments`,
+taking it off `HIDDEN_CAPABILITIES`.
 
 **Plan-aware navigation.** `apps/platform`'s `planPageAccess(plan)` derives
 which plan-gated pages a tenant can use: Languages when `PLAN_LOCALE_LIMIT`
 allows a language beyond the default; Email when `PLAN_REGISTRY` holds any of
 `bookmarks`/`comments`/`newsletter`/`contactForm` (the capabilities that make
-the site send email); Subscribers with `newsletter`; Comments with `comments`;
-Team on `GROWTH` only. The tenant's own `/dashboard` sidebar omits what the plan
+the site send email); Subscribers with `newsletter`; Team on `GROWTH` only. The tenant's own `/dashboard` sidebar omits what the plan
 cannot use, and a gated dashboard page answers 404 for such a tenant. The
 operator's `/tenants/{id}` view ignores the plan and shows every entry and
 page, so a downgraded tenant's data stays reachable. Roadmap entries with no
-page yet (Subscribers, Comments, Team) render as non-interactive "Coming soon"
-items in both views; no entry carries a progress badge.
+page yet (Subscribers, Team) render as non-interactive "Coming soon"
+items in both views; Comments has no entry until it is built; no entry carries a progress badge.
 
 **Email templates per language.** Each template's subject and body are
 stored per language (`email_templates`, keyed by tenant, template type and

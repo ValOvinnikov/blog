@@ -6,7 +6,6 @@ code:
   - packages/config/src/constants/capability.ts
   - packages/db/src/schema/settings-features.ts
   - apps/platform/src/utils/settings-features-fields/settings-features-fields.ts
-  - apps/platform/src/utils/nav-sections/nav-sections.ts
   - apps/platform/src/utils/plan-page-access/plan-page-access.ts
   - apps/web/src/server/settings-features/is-reader-account-enabled/**
 epics: [1040, 1041]
@@ -16,13 +15,13 @@ epics: [1040, 1041]
 
 ## What it does
 
-Signed-in readers will be able to leave threaded comments on a post and give it a 1–5 rating, one per reader per post. New comments wait for moderation before they show. Neither feature exists on the public site today: only the capability switches, the plan entitlement and a "Coming soon" admin entry are in place. Switching them on renders no comment or rating UI, though `COMMENTS` already opens the reader account surfaces (see Constraints).
+Signed-in readers will be able to leave threaded comments on a post and give it a 1–5 rating, one per reader per post. New comments wait for moderation before they show. Neither feature exists on the public site today: only the stored toggles and the plan entitlement are in place, and the admin shows neither. Switching them on renders no comment or rating UI, though `COMMENTS` already opens the reader account surfaces (see Constraints).
 
 ## Surfaces and routes
 
 - **Public site** — nothing yet. The planned shape is an engagement island on the post page, mounted as a client component so the article itself stays statically rendered.
-- **Platform, Features page** — `/dashboard/features` and `/tenants/{id}/features` show Comments and Ratings as read-only "Coming soon" rows with no switch.
-- **Platform, sidebar** — a Comments entry with a "Coming soon" badge and no page, shown when the plan holds `COMMENTS` (operators always see it).
+- **Platform, Features page** — `/dashboard/features` and `/tenants/{id}/features` show no Comments or Ratings row on any plan; the save always writes both off. Ratings are dropped; Comments are hidden until built.
+- **Platform, sidebar** — no Comments entry.
 - **Studio** — nothing. Neither capability maps to a module type, so the "(off in Features)" relabel never applies to them.
 
 ## Data
@@ -38,8 +37,8 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 
 - **Plan** — `PLAN_REGISTRY` gives `COMMENTS` and `RATINGS` to `GROWTH` only: both make readers sign in, and comments carry moderation cost.
 - **Reader accounts** — both sit under the `READER_ACCOUNTS` switch on Features and stop applying while it is off.
-- **Owner or operator** — no one can switch either on: `isComingSoon` in `CAPABILITY_TOGGLES` renders the row read-only and every save, an operator's included, writes both off whatever the payload says. Shipping either feature means dropping that flag.
-- **Platform pages** — `planPageAccess` opens Comments and counts `COMMENTS` toward the Email page; the Comments page does not exist yet (its sidebar entry has no link).
+- **Owner or operator** — no one can see or switch either: `HIDDEN_CAPABILITIES` leaves both out of `SHOWN_CAPABILITY_TOGGLES`, and `isComingSoon` in `CAPABILITY_TOGGLES` makes every save, an operator's included, write both off whatever the payload says. Shipping Comments means taking it off `HIDDEN_CAPABILITIES` and dropping that flag.
+- **Platform pages** — `planPageAccess` counts `COMMENTS` toward the Email page; there is no Comments page.
 - **Voice** — no copy exists. New public strings get classified Voice or fixed when the work is planned.
 
 ## Constraints and invariants
@@ -49,7 +48,7 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 - One rating per user per post, enforced by the database, not the app.
 - The post page stays statically generated; only the island is dynamic.
 - Account export and deletion must cover both tables when they ship. A deleted reader's comments are tombstoned, not cascade-deleted, so a thread keeps its shape.
-- Both capabilities are on `COMING_SOON_CAPABILITIES` (`@blog/config`), the one list both apps read; taking a capability off it is the deliberate step that ships it. The platform's Features save writes every listed capability off, and `apps/web` leaves listed capabilities out of `isReaderAccountEnabled`. A tenant with no `settings_features` row still falls back to its preset's defaults, so a `GROWTH` tenant resolves both capabilities on and a `FREE` tenant resolves `RATINGS` on; that is harmless only because no render site exists, so a comment or rating island must not ship while its capability is still on the list.
+- Both capabilities are on `COMING_SOON_CAPABILITIES` (`@blog/config`), the list both apps read, and on the platform's own `HIDDEN_CAPABILITIES`, which keeps their Features rows out; taking a capability off both is the deliberate step that ships it. The platform's Features save writes every `COMING_SOON_CAPABILITIES` entry off, and `apps/web` leaves listed capabilities out of `isReaderAccountEnabled`. A tenant with no `settings_features` row still falls back to its preset's defaults, so a `GROWTH` tenant resolves both capabilities on and a `FREE` tenant resolves `RATINGS` on; that is harmless only because no render site exists, so a comment or rating island must not ship while its capability is still on the list.
 - Comments and Ratings are nested under Reader accounts: once built, each applies only while `READER_ACCOUNTS` is on too (`isReaderAccountFeatureEnabled`). Neither decides whether a site offers sign-in.
 
 ## Dependencies
@@ -64,12 +63,11 @@ Signed-in readers will be able to leave threaded comments on a post and give it 
 - `packages/db/src/constants/tenant.ts` (`PLAN_REGISTRY`)
 - `packages/db/src/schema/settings-features.ts`
 - `apps/platform/src/utils/settings-features-fields/settings-features-fields.ts`
-- `apps/platform/src/utils/nav-sections/nav-sections.ts`
 - `apps/web/src/server/settings-features/is-reader-account-enabled/is-reader-account-enabled.ts`
 
 ## Tests and stories
 
-No feature tests or stories exist. The capability wiring is covered by `settings-features-fields.test.ts`, `nav-sections.test.ts`, `plan-page-access.test.ts` (platform) and `is-reader-account-enabled.test.ts`, `to-effective-settings-features.test.ts` (web).
+No feature tests or stories exist. The capability wiring is covered by `settings-features-fields.test.ts`, `features-settings.test.tsx`, `plan-page-access.test.ts` (platform) and `is-reader-account-enabled.test.ts`, `to-effective-settings-features.test.ts` (web).
 
 ## Related
 

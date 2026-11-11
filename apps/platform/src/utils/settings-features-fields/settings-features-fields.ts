@@ -51,6 +51,15 @@ export const CAPABILITY_TOGGLES: TCapabilityToggle[] = Object.values(
   parentField: PARENT_FIELDS[capability],
 }));
 
+const HIDDEN_CAPABILITIES: TCapability[] = [
+  CAPABILITY.COMMENTS,
+  CAPABILITY.RATINGS,
+];
+
+export const SHOWN_CAPABILITY_TOGGLES = CAPABILITY_TOGGLES.filter(
+  ({ capability }) => !HIDDEN_CAPABILITIES.includes(capability),
+);
+
 export const featureDefaultsToValues = (
   defaults: Record<TCapability, boolean>,
 ): TSettingsFeaturesValues => {

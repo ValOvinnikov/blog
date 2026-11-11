@@ -222,7 +222,6 @@
     "studio": "Studio",
     "email": "E-Mail",
     "subscribers": "Abonnenten",
-    "comments": "Kommentare",
     "team": "Team",
     "provisioning": "Bereitstellung",
     "dangerZone": "Gefahrenzone",
@@ -366,7 +365,7 @@
     "voiceTileTitle": "Tonalität",
     "voiceTileDescription": "Die Formulierungen Ihrer Website",
     "featuresTileTitle": "Funktionen",
-    "featuresTileDescription": "Kommentare, Lesezeichen, Newsletter",
+    "featuresTileDescription": "Lesezeichen, Newsletter, Analytics",
     "siteSetupCardTitle": "Ihre Website wird eingerichtet",
     "siteSetupFailedTitle": "Die Einrichtung Ihrer Website wurde angehalten",
     "siteSetupFailedDescription": "Bei einem der Schritte ist ein Problem aufgetreten. Versuchen Sie es erneut – bereits Eingerichtetes bleibt erhalten.",
@@ -1657,7 +1656,7 @@
       "CONTACT_FORM": "Kontaktformular"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Leser können sich auf Ihrer Website anmelden. Lesezeichen, Kommentare und Bewertungen setzen das voraus.",
+      "READER_ACCOUNTS": "Leser können sich auf Ihrer Website anmelden. Lesezeichen setzen das voraus.",
       "COMMENTS": "Leser können Beiträge kommentieren.",
       "RATINGS": "Leser können Beiträge bewerten.",
       "BOOKMARKS": "Leser können Beiträge für später merken.",

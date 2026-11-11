@@ -44,7 +44,7 @@ A signed-in reader manages their own account at `/account`: edit the display nam
 ## Configuration
 
 - **Owner or operator (platform Features)** — `READER_ACCOUNTS` alone decides whether a site has reader accounts (`isReaderAccountEnabled`). It is off in both presets and in the column default, so a site offers sign-in only once its owner turns it on. Bookmarks, Comments and Ratings apply only while it is on (`isReaderAccountFeatureEnabled`); Newsletter does not depend on it. `READER_ACCOUNTS` is in `GROWTH` only, so a `FREE` site has no reader accounts.
-- **Platform Features page** — Reader accounts (`READER_ACCOUNTS`) is the main switch, with Bookmarks, Comments and Ratings under it. While it is off in the form, an info note tells the owner that nobody new can sign in and that readers already signed in keep their account page, to download or delete their data, until their session ends. Turning it on hides the note. The platform Look preview and the public site both follow the switch.
+- **Platform Features page** — Reader accounts (`READER_ACCOUNTS`) is the main switch, with Bookmarks under it; Comments and Ratings have no row. While it is off in the form, an info note tells the owner that nobody new can sign in and that readers already signed in keep their account page, to download or delete their data, until their session ends. Turning it on hides the note. The platform Look preview and the public site both follow the switch.
 - **Voice** — none; account copy is fixed (`accountPage.*`).
 - **Look** — the page renders through `@blog/ui` primitives (`Panel`, `SettingRow`) and follows the site's Look.
 

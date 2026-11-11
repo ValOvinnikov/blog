@@ -222,7 +222,6 @@
     "studio": "Studio",
     "email": "Correo electrónico",
     "subscribers": "Suscriptores",
-    "comments": "Comentarios",
     "team": "Equipo",
     "provisioning": "Aprovisionamiento",
     "dangerZone": "Zona de peligro",
@@ -366,7 +365,7 @@
     "voiceTileTitle": "Voz",
     "voiceTileDescription": "Los textos que usa su sitio",
     "featuresTileTitle": "Funciones",
-    "featuresTileDescription": "Comentarios, guardados, boletín",
+    "featuresTileDescription": "Guardados, boletín, analítica",
     "siteSetupCardTitle": "Configurando tu sitio",
     "siteSetupFailedTitle": "La configuración de tu sitio se ha detenido",
     "siteSetupFailedDescription": "Uno de los pasos ha tenido un problema. Vuelve a intentarlo: no se pierde nada de lo ya configurado.",
@@ -1657,7 +1656,7 @@
       "CONTACT_FORM": "Formulario de contacto"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Permite a los lectores iniciar sesión en su sitio. Guardados, comentarios y valoraciones lo necesitan.",
+      "READER_ACCOUNTS": "Permite a los lectores iniciar sesión en su sitio. Los guardados lo necesitan.",
       "COMMENTS": "Permite a los lectores comentar los artículos.",
       "RATINGS": "Permite a los lectores valorar los artículos.",
       "BOOKMARKS": "Permite a los lectores guardar artículos para leerlos más tarde.",

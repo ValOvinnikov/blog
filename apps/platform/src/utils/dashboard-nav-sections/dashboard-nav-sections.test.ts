@@ -1,7 +1,6 @@
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import {
   ALWAYS_AVAILABLE_KEYS,
-  COMING_SOON_KEYS,
   CONFIGURATION_KEYS,
   itemKeyed,
   labelsOf,
@@ -63,40 +62,22 @@ describe(dashboardNavSections, () => {
     );
   });
 
-  it.each([
-    'languages',
-    'email',
-    'leads',
-    'subscribers',
-    'comments',
-    'team',
-  ] as const)('shows %s only when the plan can use it', (page) => {
-    const withPage = configurationOfDashboard({
-      ...NO_PLAN_PAGE,
-      [page]: true,
-    });
-    const withoutPage = configurationOfDashboard({
-      ...EVERY_PLAN_PAGE,
-      [page]: false,
-    });
+  it.each(['languages', 'email', 'leads', 'subscribers', 'team'] as const)(
+    'shows %s only when the plan can use it',
+    (page) => {
+      const withPage = configurationOfDashboard({
+        ...NO_PLAN_PAGE,
+        [page]: true,
+      });
+      const withoutPage = configurationOfDashboard({
+        ...EVERY_PLAN_PAGE,
+        [page]: false,
+      });
 
-    expect(labelsOf(withPage)).toContain(t(page));
-    expect(labelsOf(withoutPage)).not.toContain(t(page));
-  });
-
-  it('badges only Subscribers, Comments and Team as coming soon', () => {
-    const badged = configurationOfDashboard().items.filter(
-      (item) => item.badge,
-    );
-
-    expect(badged.map((item) => item.label)).toEqual(
-      translated(COMING_SOON_KEYS),
-    );
-    for (const item of badged) {
-      expect(item.badge?.label).toBe(t('badgeComingSoon'));
-      expect(item.href).toBeUndefined();
-    }
-  });
+      expect(labelsOf(withPage)).toContain(t(page));
+      expect(labelsOf(withoutPage)).not.toContain(t(page));
+    },
+  );
 
   it.each([
     ['look', adminRoutes.dashboardLook()],

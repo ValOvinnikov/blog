@@ -9,7 +9,6 @@ export const NO_PLAN_PAGE: TPlanPageAccess = {
   email: false,
   leads: false,
   subscribers: false,
-  comments: false,
   team: false,
 };
 
@@ -23,10 +22,9 @@ export const CONFIGURATION_KEYS = [
   'signIn',
   'email',
   'subscribers',
-  'comments',
   'team',
 ];
-export const COMING_SOON_KEYS = ['subscribers', 'comments', 'team'];
+export const COMING_SOON_KEYS = ['subscribers', 'team'];
 export const ALWAYS_AVAILABLE_KEYS = [
   'look',
   'voice',

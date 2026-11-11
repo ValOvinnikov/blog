@@ -222,7 +222,6 @@
     "studio": "Studio",
     "email": "Email",
     "subscribers": "Subscribers",
-    "comments": "Comments",
     "team": "Team",
     "provisioning": "Provisioning",
     "dangerZone": "Danger zone",
@@ -366,7 +365,7 @@
     "voiceTileTitle": "Voice",
     "voiceTileDescription": "The words your site uses",
     "featuresTileTitle": "Features",
-    "featuresTileDescription": "Comments, bookmarks, newsletter",
+    "featuresTileDescription": "Bookmarks, newsletter, analytics",
     "siteSetupCardTitle": "Setting up your site",
     "siteSetupFailedTitle": "Your site's setup stopped",
     "siteSetupFailedDescription": "One of the steps hit a problem. Try again — nothing already set up is lost.",
@@ -1657,7 +1656,7 @@
       "CONTACT_FORM": "Contact form"
     },
     "toggleDescription": {
-      "READER_ACCOUNTS": "Let readers sign in to your site. Bookmarks, comments and ratings need it.",
+      "READER_ACCOUNTS": "Let readers sign in to your site. Bookmarks need it.",
       "COMMENTS": "Let readers leave comments on posts.",
       "RATINGS": "Let readers rate posts.",
       "BOOKMARKS": "Let readers save posts to read later.",

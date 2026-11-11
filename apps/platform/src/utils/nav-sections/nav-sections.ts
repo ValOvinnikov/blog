@@ -5,6 +5,7 @@ import type {
   TSidebarNavItem,
   TSidebarNavSection,
 } from '@platform/components/features/layout/sidebar';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import type {
@@ -76,14 +77,14 @@ export const configurationNavItems = (
 ): TSidebarNavItem[] => {
   const comingSoon = {
     label: t('badgeComingSoon'),
-    tone: 'neutral',
+    tone: BADGE_TONE.NEUTRAL,
     hasDot: false,
   } as const;
   const unreadLeads =
     unreadLeadsCount > 0
       ? ({
           label: t('badgeUnreadLeads', { count: unreadLeadsCount }),
-          tone: 'brand',
+          tone: BADGE_TONE.BRAND,
           hasDot: false,
         } as const)
       : undefined;
@@ -119,11 +120,6 @@ export const configurationNavItems = (
       icon: ICONS.MENU_ROWS,
       badge: comingSoon,
     }),
-    ...ifAccessible('comments', {
-      label: t('comments'),
-      icon: ICONS.COMMENT,
-      badge: comingSoon,
-    }),
     ...ifAccessible('team', {
       label: t('team'),
       icon: ICONS.USERS,
@@ -137,7 +133,6 @@ export const EVERY_PLAN_PAGE: TPlanPageAccess = {
   email: true,
   leads: true,
   subscribers: true,
-  comments: true,
   team: true,
 };
 
@@ -149,7 +144,7 @@ export const tenantNavSections = (
 ): TSidebarNavSection[] => {
   const platform = {
     label: t('badgePlatform'),
-    tone: 'neutral',
+    tone: BADGE_TONE.NEUTRAL,
     hasDot: false,
   } as const;
   const hrefs: TTenantNavHrefs = {
