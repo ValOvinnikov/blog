@@ -46,7 +46,7 @@ A tenant's site is published in one or more languages from a curated list — En
 
 ## Data
 
-- **Neon:** `tenants.locale` (the default, `locale_code` enum), `tenants.additional_locales` (enum array, default `[]`), `tenants.plan`. `PLAN_LOCALE_LIMIT` (`@blog/db`) counts the default: `FREE` 1, `GROWTH` 3. `selectLiveLocales` returns the default plus the first `limit − 1` stored additional languages, in stored order.
+- **Neon:** `tenants.locale` (the default, `locale_code` enum), `tenants.additional_locales` (enum array, default `[]`), `tenants.plan`. `PLAN_LOCALE_LIMIT` (`@blog/db`) counts the default: `FREE` 1, `STARTER` 1, `GROWTH` 3. `selectLiveLocales` returns the default plus the first `limit − 1` stored additional languages, in stored order.
 - **Config:** `LOCALE_ISO_CODES` (`EN`, `NL`, `FR`, `DE`, `ES` — the stored and internal codes), `LOCALE_BCP47_TAGS` (URL prefixes and `<html lang>`), `LOCALE_OPEN_GRAPH_TAGS`, `LOCALE_NATIVE_LABEL`.
 - **Sanity, document level** (`@sanity/document-internationalization`): a `language` field plus `translation.metadata` documents on `page_home`, `page_postIndex`, `page_topicIndex`, `page_tagIndex` (at most one per language) and `page_landing`, `page_post`, `page_topic`, `page_tag`. Each translation has its own slug, SEO and publish state; pages share their `template_*` across languages.
 - **Sanity, field level** (`sanity-plugin-internationalized-array`): `internationalizedArray*` values for strings, text and the three Portable Text types.

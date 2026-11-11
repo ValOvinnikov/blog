@@ -4,13 +4,10 @@ import { ALERT_TYPE, FORM_STATUS, type TCapability } from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
-import { SettingRow } from '@platform/components/shared/setting-row';
 import {
   SettingsFormShell,
   useSettingsForm,
 } from '@platform/components/shared/settings-form-shell';
-import { StatusBadge } from '@platform/components/shared/status-badge';
-import { Switch } from '@platform/components/shared/switch';
 import { useToast } from '@platform/context/toast-provider';
 import {
   updateFeaturesAction,
@@ -22,6 +19,8 @@ import {
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+
+import { CapabilityToggleRow } from './components/capability-toggle-row';
 
 const countChanges = (
   a: TSettingsFeaturesValues,
@@ -103,54 +102,22 @@ export const FeaturesSettings = ({
       <Card>
         <Card.Header title={t('capabilitiesHeading')} />
         <Card.Body>
-          {CAPABILITY_TOGGLES.map(
-            ({ capability, field, isComingSoon, parentField }) => {
-              const isLocked = !entitledCapabilities.includes(capability);
-              const isNested = !isUndefined(parentField);
-              const isParentOff = isNested && !values[parentField];
-              const label = t(`toggleLabel.${capability}`);
-              const description = t(`toggleDescription.${capability}`);
+          {CAPABILITY_TOGGLES.map((toggle) => {
+            const { capability, field, parentField } = toggle;
 
-              if (isComingSoon) {
-                return (
-                  <SettingRow
-                    key={capability}
-                    label={label}
-                    description={description}
-                    isNested={isNested}
-                  >
-                    <StatusBadge hasDot={false}>
-                      {t('comingSoonBadge')}
-                    </StatusBadge>
-                  </SettingRow>
-                );
-              }
-
-              return (
-                <SettingRow
-                  key={capability}
-                  label={label}
-                  description={description}
-                  isNested={isNested}
-                  isLocked={isLocked}
-                  lockedReason={isLocked ? t('planLockedBadge') : undefined}
-                >
-                  <Switch
-                    aria={{
-                      label,
-                      describedBy: isArchived ? archivedNoticeId : undefined,
-                    }}
-                    isChecked={values[field]}
-                    onCheckedChange={(checked) => handleToggle(field, checked)}
-                    isDisabled={
-                      isLocked || isParentOff || isPending || isArchived
-                    }
-                    labels={{ on: t('switchOn'), off: t('switchOff') }}
-                  />
-                </SettingRow>
-              );
-            },
-          )}
+            return (
+              <CapabilityToggleRow
+                key={capability}
+                toggle={toggle}
+                isEntitled={entitledCapabilities.includes(capability)}
+                isChecked={values[field]}
+                isParentOff={!isUndefined(parentField) && !values[parentField]}
+                isFormLocked={isPending || isArchived}
+                describedBy={isArchived ? archivedNoticeId : undefined}
+                onCheckedChange={(checked) => handleToggle(field, checked)}
+              />
+            );
+          })}
         </Card.Body>
       </Card>
     </SettingsFormShell>

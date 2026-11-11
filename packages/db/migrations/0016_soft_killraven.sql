@@ -1,1 +1,0 @@
-ALTER TABLE "site_config" ADD COLUMN "voice_saved_at" timestamp;

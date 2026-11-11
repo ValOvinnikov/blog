@@ -1,4 +1,8 @@
-import { BUTTON_SHAPE, NAV_LINK_STYLE } from '@blog/config';
+import {
+  BUTTON_SHAPE,
+  HEADER_CONTROL_SHAPE,
+  NAV_LINK_STYLE,
+} from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { renderHookWithIntl } from '@platform/testing/custom-render';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
@@ -20,6 +24,12 @@ describe(useLookDraftFields, () => {
       value: NAV_LINK_STYLE.UNDERLINE,
       label: LOOK_FORM.navLinkStyleLabel,
       reads: LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
+    },
+    {
+      id: 'headerControlShape',
+      value: HEADER_CONTROL_SHAPE.SQUARE,
+      label: LOOK_FORM.headerControlShapeLabel,
+      reads: LOOK_FORM.headerControlShapeOptionLabel.SQUARE,
     },
   ] as const)(
     'names the $id field and reads the chosen value back',

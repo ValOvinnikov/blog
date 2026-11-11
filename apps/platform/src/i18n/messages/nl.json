@@ -66,7 +66,7 @@
     "nameLabel": "Naam van de site",
     "nameHint": "Staat in de kop van je site en in browsertabbladen.",
     "siteAddressLabel": "Adres van de site",
-    "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
+    "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Starter- of Growth-abonnement kun je je eigen domein koppelen.",
     "siteAddressChecking": "Adres controleren…",
     "siteAddressAvailable": "{address} is van jou",
     "siteAddressUnverified": "We konden dit adres nu niet controleren. Je kunt doorgaan – we controleren het opnieuw wanneer je de site aanmaakt.",
@@ -490,7 +490,7 @@
       "ADDITIONAL_LANGUAGES": "{count, plural, =0 {Extra talen: geen} other {Extra talen: {languages}}}",
       "SUSPENSION_REASON": "Reden: {category}",
       "SUSPENSION_REFERENCE": "Referentie: {reference}",
-      "PLAN": "Abonnement: {plan, select, FREE {Free} GROWTH {Growth} other {{plan}}}",
+      "PLAN": "Abonnement: {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {{plan}}}",
       "SIGN_IN_PROVIDER": "Aanmeldprovider: {provider, select, google {Google} github {GitHub} other {{provider}}}",
       "CLIENT_SECRET_REPLACED": "Clientgeheim vervangen"
     }
@@ -527,7 +527,7 @@
     "ownDomain": {
       "title": "Mijn eigen domein gebruiken",
       "supportingText": "Toon je site op een adres dat van jou is. Je huidige adres blijft werken.",
-      "upgradePrompt": "Een eigen domein hoort bij het Growth-abonnement.",
+      "upgradePrompt": "Een eigen domein hoort bij het Starter- en Growth-abonnement.",
       "ownerOnly": "Alleen de eigenaar van de site kan een domein koppelen.",
       "archivedState": "Deze site is gearchiveerd, dus het domein kan niet worden gewijzigd.",
       "domainLabel": "Domein",
@@ -551,7 +551,7 @@
       "refusal": {
         "notFound": "Deze site is niet gevonden.",
         "archived": "Deze site is gearchiveerd, dus het domein kan niet worden gewijzigd.",
-        "notOnPlan": "Een eigen domein hoort bij het Growth-abonnement.",
+        "notOnPlan": "Een eigen domein hoort bij het Starter- en Growth-abonnement.",
         "notProvisioned": "Deze site is nog niet ingericht. Probeer het opnieuw zodra de inrichting klaar is.",
         "alreadyConnected": "Deze site heeft al een eigen domein.",
         "notCustomDomain": "Dit domein kan niet worden verwijderd.",
@@ -694,7 +694,7 @@
     "growthAddsButtons": "Bezig-status en spinner",
     "growthAddsHeader": "Indeling, submenu’s, balk, headerknoppen en accountknoppen",
     "growthAddsFooter": "Indeling, achtergrond en vlak",
-    "growthAddsClosing": "Growth voegt ook meer talen toe (met keuze uit taalwisselaarstijlen), een eigen domein en meer sitefuncties.",
+    "growthAddsClosing": "Growth voegt ook meer talen toe (met keuze uit taalwisselaarstijlen) en meer sitefuncties.",
     "jumpIndexUnsaved": ", niet-opgeslagen wijzigingen",
     "expandAll": "Alles uitklappen",
     "collapseAll": "Alles inklappen",
@@ -765,13 +765,25 @@
       "SOFT": "Een grijze vulling, geen rand",
       "PLAIN": "Geen rand tot je eroverheen beweegt"
     },
+    "headerControlShapeLabel": "Vorm van headerknoppen",
+    "headerControlShapeDescription": "De omtrekvorm van de knoppen voor taal, thema, menu en account.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Rond",
+      "ROUNDED": "Afgerond",
+      "SQUARE": "Vierkant"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Helemaal rond, als cirkels en pillen",
+      "ROUNDED": "Hoeken volgen de instelling Hoeken van de site",
+      "SQUARE": "Vierkante hoeken"
+    },
     "languageSwitcherLabel": "Taalkeuze",
     "languageSwitcherStyleLabel": "Stijl",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
     "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkeuze te kiezen.",
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
-    "lockLineTypeFonts": "Op Free houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
+    "lockLineTypeFonts": "Met dit abonnement houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Wereldbol",
@@ -910,7 +922,7 @@
       "SHOWN": "Beide"
     },
     "cookieSettingsButtonBannerOff": "De cookiebanner staat uit, dus lezers zien de link noch de knop. Zet de banner aan bij Functies om te kiezen.",
-    "footerPoweredByNote": "Gratis sites tonen ‘Mogelijk gemaakt door {productName}’ aan het einde van de footer. Met het Growth-abonnement verdwijnt dit.",
+    "footerPoweredByNote": "Gratis sites tonen ‘Mogelijk gemaakt door {productName}’ aan het einde van de footer. Met het Starter- of Growth-abonnement verdwijnt dit.",
     "brandHeading": "Merk",
     "brandImagePicked": "Nieuwe afbeelding, nog niet geüpload",
     "brandImageUnchanged": "Geen nieuwe afbeelding",
@@ -1028,7 +1040,7 @@
     "idle": "Open een kaart bij Sitedelen en het kader scrolt ernaartoe.",
     "off": "Volgen staat uit. Het kader blijft waar je het laat.",
     "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe.",
-    "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die een Free-site publiceert."
+    "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die dit abonnement publiceert."
   },
   "lookFullscreen": {
     "open": "Voorbeeld op volledig scherm openen",
@@ -1317,7 +1329,7 @@
     "description": "Het snelle deel. Alles hierna verloopt automatisch, en elke stap kan na een fout worden hervat.",
     "nameLabel": "Tenantnaam",
     "siteAddressLabel": "Adres van de site",
-    "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Growth-abonnement kun je je eigen domein koppelen.",
+    "siteAddressHint": "Letters, cijfers en koppeltekens. Met het Starter- of Growth-abonnement kun je je eigen domein koppelen.",
     "localeLabel": "Standaardtaal",
     "localeHint": "De taal waarin de startinhoud en instellingen van de site beginnen.",
     "planLabel": "Abonnement",
@@ -1625,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Functies",
-    "description": "Zet de functies van je site aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",
+    "description": "Zet de functies van je site aan of uit. Bij een vergrendelde schakelaar staat het abonnement dat hem bevat.",
     "alertSuccess": "Functies opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
-    "planLockedBadge": "Growth-abonnement",
+    "planLockedBadge": "{plan, select, FREE {Free-abonnement} STARTER {Starter-abonnement} other {Growth-abonnement}}",
     "comingSoonBadge": "Binnenkort",
     "switchOn": "Aan",
     "switchOff": "Uit",
@@ -1673,6 +1685,7 @@
   },
   "planNames": {
     "FREE": "Free",
+    "STARTER": "Starter",
     "GROWTH": "Growth"
   },
   "languagesSettings": {
@@ -1703,7 +1716,7 @@
     "fieldsNeedAttention": "{count, plural, one {# veld vraagt aandacht} other {# velden vragen aandacht}}",
     "goToFirstField": "Naar het eerste veld",
     "notSaved": "Niet opgeslagen",
-    "notInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} GROWTH {Growth} other {huidige}}, dat {items} niet bevat. Er is niets opgeslagen.",
+    "notInPlan": "Uw site gebruikt het abonnement {plan, select, FREE {Free} STARTER {Starter} GROWTH {Growth} other {huidige}}, dat {items} niet bevat. Er is niets opgeslagen.",
     "shortcut": "⌘S / Ctrl+S",
     "discard": "Verwerpen",
     "save": "Wijzigingen opslaan",
@@ -1742,7 +1755,7 @@
     "title": "Berichten",
     "description": "Berichten via het contactformulier van je site, de nieuwste eerst. Elk bericht is bij binnenkomst ook naar jou gemaild.",
     "downgradedTitle": "Contactformulier niet inbegrepen in je abonnement",
-    "downgradedDescription": "Het contactformulier is een Growth-functie, dus er komen geen nieuwe berichten meer binnen. De berichten die je al hebt ontvangen blijven hier bewaard en je kunt ze nog steeds verwijderen."
+    "downgradedDescription": "Het contactformulier hoort bij het Starter- en Growth-abonnement, dus er komen geen nieuwe berichten meer binnen. De berichten die je al hebt ontvangen blijven hier bewaard en je kunt ze nog steeds verwijderen."
   },
   "leadsInbox": {
     "listLabel": "Berichten",
@@ -2073,12 +2086,19 @@
       "options": "De Growth-opties zijn nu beschikbaar op je site: meer talen, alle instellingen voor Uiterlijk, extra paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
       "kept": "Als je Growth eerder hebt gebruikt, zijn je eerdere keuzes terug zoals je ze achterliet."
     },
+    "STARTER": {
+      "subject": "Je site staat nu op het Starter-plan",
+      "previewText": "{siteName} kan nu de Starter-opties gebruiken.",
+      "changed": "{siteName} staat nu op het Starter-plan.",
+      "options": "Met Starter kan je site een eigen domein en het contactformulier gebruiken, en de footer toont geen ‘Mogelijk gemaakt door’. Meer talen, alle instellingen voor Uiterlijk en de andere paginamodules horen bij Growth.",
+      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard, en alles uit Growth is terug zoals je het achterliet als je overstapt naar Growth."
+    },
     "FREE": {
       "subject": "Je site staat nu op het Free-plan",
-      "previewText": "De Growth-opties staan uit op {siteName}.",
+      "previewText": "De opties van de betaalde plannen staan uit op {siteName}.",
       "changed": "{siteName} staat nu op het Free-plan.",
-      "options": "De Growth-opties staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, Growth-paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
-      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar Growth."
+      "options": "De opties van de betaalde plannen staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, betaalde paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
+      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar een betaald plan."
     }
   },
   "suspensionCategory": {

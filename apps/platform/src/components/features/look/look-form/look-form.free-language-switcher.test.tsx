@@ -16,6 +16,7 @@ import {
 import {
   setupArchived,
   setupLookForm,
+  withLookTenant,
 } from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -45,7 +46,10 @@ describe(`<${LookForm.name}/>`, () => {
     },
   ])('on Free with $languages', ({ liveLocales }) => {
     beforeEach(() => {
-      setupLookForm({ plan: TENANT_PLAN.FREE, liveLocales });
+      setupLookForm({
+        ...withLookTenant({ plan: TENANT_PLAN.FREE }),
+        liveLocales,
+      });
     });
 
     it('folds to the published style and One language, with a Growth badge', () => {
@@ -91,7 +95,7 @@ describe(`<${LookForm.name}/>`, () => {
 
   it('keeps the Free message and a disabled style, unbadged, on an archived Free site', async () => {
     setupArchived({
-      plan: TENANT_PLAN.FREE,
+      ...withLookTenant({ plan: TENANT_PLAN.FREE }),
       liveLocales: [LOCALE_ISO_CODES.EN],
     });
     await openLookRow(user, LOOK_ROW.LANGUAGE_SWITCHER);

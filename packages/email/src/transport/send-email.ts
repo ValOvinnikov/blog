@@ -1,6 +1,8 @@
 import 'server-only';
 
+import type { TEmailTag } from '@blog/email/tags';
 import { env } from '@blog/email/utils/env/env';
+import { isUndefined } from '@blog/utils/primitives';
 import { Resend } from 'resend';
 
 import { isValidEmailAddress } from '@blog/email/validation';
@@ -13,6 +15,7 @@ export type TSendEmailInput = {
   text?: string;
   headers?: Record<string, string>;
   replyTo?: string;
+  tags?: TEmailTag[];
 };
 
 /** Strips line breaks from a subject so authored copy can never inject a mail header. */
@@ -36,8 +39,9 @@ export async function sendEmail({
   text,
   headers,
   replyTo,
+  tags,
 }: TSendEmailInput): Promise<void> {
-  if (replyTo !== undefined && !isValidEmailAddress(replyTo)) {
+  if (!isUndefined(replyTo) && !isValidEmailAddress(replyTo)) {
     throw new Error('sendEmail received a malformed replyTo address');
   }
 
@@ -49,6 +53,7 @@ export async function sendEmail({
     text,
     headers,
     replyTo,
+    tags,
   });
 
   if (error) {

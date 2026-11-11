@@ -1,10 +1,12 @@
-import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/newsletter-confirmation/newsletter-confirmation';
+import { buildSiteEmailTag } from '@blog/email/tags';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
   MOCK_BODY_HTML,
   MOCK_EMAIL_ADDRESS,
   MOCK_EMAIL_SUBJECT,
   MOCK_INVALID_EMAIL_ADDRESS,
   MOCK_RESEND_API_KEY,
+  MOCK_TENANT_ID,
   MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
 import { faker } from '@faker-js/faker';
@@ -63,10 +65,28 @@ describe(sendEmail, () => {
     vi.unstubAllEnvs();
   });
 
-  it('sends the given email through the Resend client', async () => {
-    await send(MOCK_EMAIL);
+  describe('for an email with no optional fields', () => {
+    beforeEach(async () => {
+      await send(MOCK_EMAIL);
+    });
 
-    expect(sendMock).toHaveBeenCalledWith(MOCK_EMAIL);
+    it('sends the given email through the Resend client', () => {
+      expect(sendMock).toHaveBeenCalledWith(MOCK_EMAIL);
+    });
+
+    it.each(['headers', 'replyTo', 'tags'] as const)('sends no %s', (key) => {
+      expect(sentEmail()?.[key]).toBeUndefined();
+    });
+
+    it('constructs the Resend client with the configured API key', () => {
+      expect(resendCtorMock).toHaveBeenCalledWith(MOCK_RESEND_API_KEY);
+    });
+
+    it('reuses a single Resend client across sends', async () => {
+      await send({ ...MOCK_EMAIL, to: faker.internet.email() });
+
+      expect(resendCtorMock).toHaveBeenCalledTimes(1);
+    });
   });
 
   it.each<[string, Partial<TSendEmailInput>]>([
@@ -81,32 +101,11 @@ describe(sendEmail, () => {
     ],
     ['the plain-text alternative', { text: faker.lorem.sentence() }],
     ['a replyTo address', { replyTo: MOCK_EMAIL_ADDRESS }],
+    ['tags', { tags: [buildSiteEmailTag(MOCK_TENANT_ID)] }],
   ])('forwards %s to the Resend client', async (_name, extra) => {
     await send({ ...MOCK_EMAIL, ...extra });
 
     expect(sendMock).toHaveBeenCalledWith({ ...MOCK_EMAIL, ...extra });
-  });
-
-  it.each(['headers', 'replyTo'] as const)(
-    'sends no %s when none are supplied',
-    async (key) => {
-      await send(MOCK_EMAIL);
-
-      expect(sentEmail()?.[key]).toBeUndefined();
-    },
-  );
-
-  it('constructs the Resend client with the configured API key', async () => {
-    await send(MOCK_EMAIL);
-
-    expect(resendCtorMock).toHaveBeenCalledWith(MOCK_RESEND_API_KEY);
-  });
-
-  it('reuses a single Resend client across sends', async () => {
-    await send(MOCK_EMAIL);
-    await send({ ...MOCK_EMAIL, to: faker.internet.email() });
-
-    expect(resendCtorMock).toHaveBeenCalledTimes(1);
   });
 
   it('rejects a malformed replyTo address without calling Resend', async () => {

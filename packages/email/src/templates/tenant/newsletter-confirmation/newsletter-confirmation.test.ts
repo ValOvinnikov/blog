@@ -1,31 +1,26 @@
 import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
 import type { TPortableTextContent } from '@blog/email/portable-text';
+import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
+  MOCK_ESCAPED_UNSUBSCRIBE_URL,
   MOCK_LOGO_URL,
   MOCK_POSTAL_ADDRESS,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
+  MOCK_UNSUBSCRIBE_URL,
   MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
 import { mockPortableTextBody } from '@blog/email/testing/portable-text-fixtures';
 import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
 import { faker } from '@faker-js/faker';
 
-import {
-  buildNewsletterConfirmationEmail,
-  LIST_UNSUBSCRIBE_ONE_CLICK,
-} from './newsletter-confirmation';
+import { buildNewsletterConfirmationEmail } from './newsletter-confirmation';
 
 faker.seed(6026);
 
 const MOCK_SUBJECT = faker.lorem.sentence();
 const MOCK_BODY_TEXT = faker.lorem.sentence();
 const MOCK_CONFIRMATION_URL = `${MOCK_URL}/api/newsletter/confirm?token=${faker.string.alphanumeric(12)}`;
-const MOCK_UNSUBSCRIBE_URL = `${MOCK_URL}/api/newsletter/unsubscribe?token=${faker.string.alphanumeric(12)}&ref=email`;
-const MOCK_ESCAPED_UNSUBSCRIBE_URL = MOCK_UNSUBSCRIBE_URL.replace(
-  /&/g,
-  '&amp;',
-);
 const MOCK_ATTACKER_HOST = 'evil.example';
 const MOCK_SOLID_COLOUR = faker.color.rgb();
 const MOCK_CONTRAST_COLOUR = faker.color.rgb();

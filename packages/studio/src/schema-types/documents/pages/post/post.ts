@@ -100,6 +100,14 @@ export const postPageSchema = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'sendToSubscribers',
+      title: 'Send to Subscribers',
+      type: 'boolean',
+      description:
+        'Emails this post to newsletter subscribers once, when it is first published. Editing and republishing it never sends it again.',
+      initialValue: true,
+    }),
+    defineField({
       name: 'postTakeaways',
       title: 'Takeaways',
       type: postTakeawaysSchema.name,

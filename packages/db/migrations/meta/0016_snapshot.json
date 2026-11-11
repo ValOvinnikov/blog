@@ -1,6 +1,6 @@
 {
-  "id": "f7c26c6c-e583-452f-a33e-ffa9f466191b",
-  "prevId": "37c4d94e-b27a-419b-ace1-29b97095789a",
+  "id": "ec6f0df3-75c1-4140-80b7-4272a378f1e7",
+  "prevId": "e3729580-442d-4aa8-8baa-4f8d2af79752",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2510,7 +2510,7 @@
     "public.tenant_plan": {
       "name": "tenant_plan",
       "schema": "public",
-      "values": ["FREE", "GROWTH"]
+      "values": ["FREE", "STARTER", "GROWTH"]
     },
     "public.tenant_status": {
       "name": "tenant_status",

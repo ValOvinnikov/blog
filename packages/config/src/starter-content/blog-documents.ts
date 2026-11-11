@@ -81,6 +81,7 @@ export function buildBlogDocuments({
       author: reference(ids.BLOG_AUTHOR),
       topic: reference(ids.BLOG_TOPIC),
       publishedAt,
+      sendToSubscribers: false,
       seo: seo(welcomePost.metaTitle, welcomePost.metaDescription),
     } satisfies TStarterPost,
     internalLink(

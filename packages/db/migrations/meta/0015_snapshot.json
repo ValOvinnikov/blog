@@ -1,5 +1,5 @@
 {
-  "id": "37c4d94e-b27a-419b-ace1-29b97095789a",
+  "id": "e3729580-442d-4aa8-8baa-4f8d2af79752",
   "prevId": "e2e84b7c-c7c9-446b-8291-198f5ce5e065",
   "version": "7",
   "dialect": "postgresql",
@@ -1617,12 +1617,6 @@
           "notNull": true,
           "default": "'{}'::jsonb"
         },
-        "look_saved_at": {
-          "name": "look_saved_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2286,12 +2280,6 @@
           "primaryKey": false,
           "notNull": false
         },
-        "first_post_published_at": {
-          "name": "first_post_published_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2504,7 +2492,7 @@
     "public.tenant_plan": {
       "name": "tenant_plan",
       "schema": "public",
-      "values": ["FREE", "GROWTH"]
+      "values": ["FREE", "STARTER", "GROWTH"]
     },
     "public.tenant_status": {
       "name": "tenant_status",

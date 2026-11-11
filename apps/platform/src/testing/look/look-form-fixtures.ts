@@ -50,6 +50,7 @@ export const savedLookValues = (overrides: Partial<TLookFormValues> = {}) => {
     density: defaults.density,
     cardStyle: defaults.cardStyle,
     headerControlStyle: defaults.headerControlStyle,
+    headerControlShape: defaults.headerControlShape,
     headerLayout: defaults.headerLayout,
     headerSubmenuStyle: defaults.headerSubmenuStyle,
     headerBarStyle: defaults.headerBarStyle,
