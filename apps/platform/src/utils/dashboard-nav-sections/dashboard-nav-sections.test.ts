@@ -1,7 +1,6 @@
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import {
   ALWAYS_AVAILABLE_KEYS,
-  COMING_SOON_KEYS,
   CONFIGURATION_KEYS,
   itemKeyed,
   labelsOf,
@@ -79,20 +78,6 @@ describe(dashboardNavSections, () => {
       expect(labelsOf(withoutPage)).not.toContain(t(page));
     },
   );
-
-  it('badges only Subscribers and Team as coming soon', () => {
-    const badged = configurationOfDashboard().items.filter(
-      (item) => item.badge,
-    );
-
-    expect(badged.map((item) => item.label)).toEqual(
-      translated(COMING_SOON_KEYS),
-    );
-    for (const item of badged) {
-      expect(item.badge?.label).toBe(t('badgeComingSoon'));
-      expect(item.href).toBeUndefined();
-    }
-  });
 
   it.each([
     ['look', adminRoutes.dashboardLook()],

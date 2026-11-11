@@ -365,7 +365,7 @@
     "voiceTileTitle": "Voice",
     "voiceTileDescription": "The words your site uses",
     "featuresTileTitle": "Features",
-    "featuresTileDescription": "Comments, bookmarks, newsletter",
+    "featuresTileDescription": "Bookmarks, newsletter, analytics",
     "siteSetupCardTitle": "Setting up your site",
     "siteSetupFailedTitle": "Your site's setup stopped",
     "siteSetupFailedDescription": "One of the steps hit a problem. Try again — nothing already set up is lost.",
