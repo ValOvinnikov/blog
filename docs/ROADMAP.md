@@ -118,8 +118,12 @@ decision, not a second source.
 | Preview link, embed module         | Yes                           | Yes                       | Yes            |
 
 Growth includes 1,000 confirmed subscribers. Above that it adds, per month:
-$12 to 2,500, $25 to 5,000, $50 to 10,000 and $110 to 25,000; beyond that the
-owner talks to us. Only confirmed subscribers count. Each band includes about
+$15 to 2,500, $35 to 5,000, $70 to 10,000 and $160 to 25,000; beyond that the
+owner talks to us. Yearly, each band is ten times its monthly amount. A band
+is priced at about one and a half times its worst-case email cost (the full
+allowance at Resend's entry rate), so it also covers Stripe's fee, tax-included
+prices and the send run; re-check it against Resend's confirmed prices before
+the amounts go into Stripe (#7165). Only confirmed subscribers count. Each band includes about
 six sends per subscriber a month.
 
 A site has two limits, its subscribers and its sends in a month. At 80% of
