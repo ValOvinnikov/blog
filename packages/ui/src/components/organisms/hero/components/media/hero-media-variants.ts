@@ -10,6 +10,7 @@ export const heroMediaVariants = tv({
       square: [],
       portrait: [],
       classic: [],
+      vertical: [],
     },
     variant: {
       [HERO_VARIANT.SPLIT]: {},

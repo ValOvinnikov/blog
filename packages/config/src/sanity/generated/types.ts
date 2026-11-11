@@ -877,92 +877,6 @@ export type LinkRef = {
   link?: LinkReference;
 };
 
-export type Blog_topicReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'blog_topic';
-};
-
-export type Page_landingReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_landing';
-};
-
-export type Page_postIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_postIndex';
-};
-
-export type Page_privacyIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_privacyIndex';
-};
-
-export type Page_privacyDocumentReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
-};
-
-export type Page_legalIndexReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
-};
-
-export type Page_legalDocumentReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_legalDocument';
-};
-
-export type Page_cookieStatementReference = {
-  _ref: string;
-  _type: 'reference';
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
-};
-
-export type InlineLink = {
-  _type: 'inlineLink';
-  label?: string;
-  accessibleLabel?: string;
-  linkType?: 'INTERNAL' | 'EXTERNAL';
-  internalReference?:
-    | Page_postReference
-    | Blog_topicReference
-    | Page_landingReference
-    | Page_postIndexReference
-    | Page_privacyIndexReference
-    | Page_privacyDocumentReference
-    | Page_legalIndexReference
-    | Page_legalDocumentReference
-    | Page_cookieStatementReference;
-  url?: string;
-  openInNewTab?: boolean;
-  platform?:
-    | 'X'
-    | 'GITHUB'
-    | 'LINKEDIN'
-    | 'YOUTUBE'
-    | 'INSTAGRAM'
-    | 'MASTODON'
-    | 'BLUESKY'
-    | 'FACEBOOK'
-    | 'THREADS'
-    | 'RSS';
-};
-
 export type Aside = {
   _type: 'aside';
   kind?: 'WHY_NOT' | 'DIGRESSION' | 'CONTEXT';
@@ -1393,6 +1307,13 @@ export type Page_homeReference = {
   [internalGroqTypeReferenceTo]?: 'page_home';
 };
 
+export type Page_postIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_postIndex';
+};
+
 export type Page_topicIndexReference = {
   _ref: string;
   _type: 'reference';
@@ -1407,6 +1328,34 @@ export type Page_tagIndexReference = {
   [internalGroqTypeReferenceTo]?: 'page_tagIndex';
 };
 
+export type Page_privacyIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_privacyIndex';
+};
+
+export type Page_legalIndexReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalIndex';
+};
+
+export type Page_cookieStatementReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_cookieStatement';
+};
+
+export type Page_landingReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_landing';
+};
+
 export type Page_topicReference = {
   _ref: string;
   _type: 'reference';
@@ -1419,6 +1368,20 @@ export type Page_tagReference = {
   _type: 'reference';
   _weak?: boolean;
   [internalGroqTypeReferenceTo]?: 'page_tag';
+};
+
+export type Page_privacyDocumentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_privacyDocument';
+};
+
+export type Page_legalDocumentReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'page_legalDocument';
 };
 
 export type InternationalizedArrayReferenceValue = {
@@ -1691,6 +1654,13 @@ export type Module_heroBlog = {
   layout?: HeroLayout;
 };
 
+export type Blog_topicReference = {
+  _ref: string;
+  _type: 'reference';
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: 'blog_topic';
+};
+
 export type Blog_tagReference = {
   _ref: string;
   _type: 'reference';
@@ -1744,6 +1714,7 @@ export type Page_post = {
       } & Module_taxonomyListReference)
   >;
   publishedAt?: string;
+  sendToSubscribers?: boolean;
   postTakeaways?: PostTakeaways;
   seo?: Seo;
 };
@@ -2686,15 +2657,6 @@ export type AllSanitySchemaTypes =
   | CookieList
   | CookiePreferencesLink
   | LinkRef
-  | Blog_topicReference
-  | Page_landingReference
-  | Page_postIndexReference
-  | Page_privacyIndexReference
-  | Page_privacyDocumentReference
-  | Page_legalIndexReference
-  | Page_legalDocumentReference
-  | Page_cookieStatementReference
-  | InlineLink
   | Aside
   | BodyImage
   | ImageWithAlt
@@ -2717,10 +2679,17 @@ export type AllSanitySchemaTypes =
   | TranslationMetadata
   | InternationalizedArrayReference
   | Page_homeReference
+  | Page_postIndexReference
   | Page_topicIndexReference
   | Page_tagIndexReference
+  | Page_privacyIndexReference
+  | Page_legalIndexReference
+  | Page_cookieStatementReference
+  | Page_landingReference
   | Page_topicReference
   | Page_tagReference
+  | Page_privacyDocumentReference
+  | Page_legalDocumentReference
   | InternationalizedArrayReferenceValue
   | Template_homeReference
   | Page_home
@@ -2746,6 +2715,7 @@ export type AllSanitySchemaTypes =
   | Module_taxonomyListReference
   | Template_home
   | Module_heroBlog
+  | Blog_topicReference
   | Blog_tagReference
   | Module_postRelatedReference
   | Page_post

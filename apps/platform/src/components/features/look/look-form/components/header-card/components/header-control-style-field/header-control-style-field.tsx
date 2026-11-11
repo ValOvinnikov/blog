@@ -1,20 +1,11 @@
-import { HEADER_CONTROL_STYLE, type THeaderControlStyle } from '@blog/config';
-import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { HEADER_CONTROL_STYLE } from '@blog/config';
 import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
-import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
-import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
-import { useLookForm } from '@platform/components/features/look/look-form-provider';
-import { SegmentedControl } from '@platform/components/shared/segmented-control';
+import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { useTranslations } from 'next-intl';
 
 export const HeaderControlStyleField = () => {
-  const {
-    values: { headerControlStyle },
-    updateField,
-  } = useLookForm();
   const t = useTranslations('lookForm');
-  const lock = useLookFieldLock('headerControlStyle');
 
   const options = Object.values(HEADER_CONTROL_STYLE).map((style) => ({
     value: style,
@@ -22,26 +13,14 @@ export const HeaderControlStyleField = () => {
     description: t(`headerControlStyleOptionDescription.${style}`),
     glyph: <LookOptionGlyph field="headerControlStyle" value={style} />,
   }));
-  const label = t('headerControlStyleLabel');
 
   return (
-    <LookField
+    <LookPresetChoiceField
       field="headerControlStyle"
-      label={label}
+      label={t('headerControlStyleLabel')}
       hint={t('headerControlStyleDescription')}
-      isGroup={true}
-      labelId={lock.labelId}
-      growthBadgeId={lock.growthBadgeId}
-    >
-      <SegmentedControl<THeaderControlStyle>
-        aria={lock.aria}
-        options={options}
-        value={headerControlStyle}
-        onChange={(style) => updateField('headerControlStyle', style)}
-        lock={lock}
-        layout={SEGMENTED_LAYOUT.WIDE}
-      />
-      <PresetValueButton field="headerControlStyle" fieldLabel={label} />
-    </LookField>
+      options={options}
+      layout={SEGMENTED_LAYOUT.WIDE}
+    />
   );
 };

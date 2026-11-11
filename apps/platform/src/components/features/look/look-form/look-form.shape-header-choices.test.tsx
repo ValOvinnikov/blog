@@ -54,12 +54,6 @@ describe(`<${LookForm.name}/>`, () => {
         saved: { headerControlStyle: HEADER_CONTROL_STYLE.SOFT },
       },
       {
-        row: LOOK_ROW.CARDS,
-        group: LOOK_FORM.cardStyleLabel,
-        option: OUTLINED,
-        saved: { cardStyle: CARD_STYLE.OUTLINED },
-      },
-      {
         row: LOOK_ROW.HEADER,
         group: LOOK_FORM.headerSubmenuStyleLabel,
         option: LOOK_FORM.headerSubmenuStyleOptionLabel.WIDE_PANEL,
@@ -90,6 +84,14 @@ describe(`<${LookForm.name}/>`, () => {
         await saveAndExpectLook(user, saved);
       },
     );
+
+    it('saves the chosen Card style tile', async () => {
+      await openLookRow(user, LOOK_ROW.CARDS);
+      const outlinedTile = screen.getByRole('radio', { name: OUTLINED });
+      await user.click(outlinedTile);
+
+      await saveAndExpectLook(user, { cardStyle: CARD_STYLE.OUTLINED });
+    });
 
     it.each([
       {

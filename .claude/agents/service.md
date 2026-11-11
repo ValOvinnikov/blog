@@ -170,7 +170,7 @@ one slice (`./query`, `./types`).
   local, non-exported fragment.
 - **Naming in `shared/`:**
   - **R1** — a fragment file is named for the Sanity `_type` it projects (a
-    `link.ts` projecting `inlineLink` is the failure this prevents).
+    `link.ts` projecting `linkRef` is the failure this prevents).
   - **R2** — the directory states the kind, and every export carries its kind
     suffix: `*Fragment`, `*_EXPRESSION` paired with `*Parser`, `*_FILTER`,
     `to*` / `resolve*`.
