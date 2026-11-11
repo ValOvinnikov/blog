@@ -9,7 +9,7 @@ import {
   type TAuthApp,
   type TMagicLinkRefusal,
 } from '@blog/config/constants';
-import type { IMagicLinkSendRefusal } from '@blog/config/types';
+import type { IMagicLinkSendHandlers } from '@blog/config/types';
 import type { EmailConfig } from 'next-auth/providers/email';
 
 // Above a typical lookup-and-Resend round trip, so a refused send is not measurably faster than a real one.
@@ -24,7 +24,7 @@ const SEND_LIMIT_REFUSALS: ReadonlySet<TMagicLinkRefusal> = new Set([
 
 export function buildMagicLinkProvider(
   app: TAuthApp,
-  onSendRefused: (refusal: IMagicLinkSendRefusal) => void,
+  { onSendRefused, onSendCountFailed }: IMagicLinkSendHandlers,
 ): EmailConfig {
   const from = resolveMagicLinkFromAddress(env.MAGIC_LINK_FROM_ADDRESS);
 
@@ -45,7 +45,13 @@ export function buildMagicLinkProvider(
           return;
         }
 
-        await sendMagicLinkEmail({ app, from, identifier, url });
+        await sendMagicLinkEmail({
+          app,
+          from,
+          identifier,
+          url,
+          onSendCountFailed,
+        });
       }),
   };
 }

@@ -12,6 +12,7 @@ export const confirmationEmailEdges = {
   getEmailConfig: vi.fn(),
   getEmailTemplate: vi.fn(),
   sendEmail: vi.fn(),
+  recordEmailSend: vi.fn(),
   resolveTenantEmailIdentity: vi.fn(),
 };
 
@@ -26,4 +27,5 @@ export const confirmationEmailQueries = (
   },
   emailConfig: { getEmailConfig: confirmationEmailEdges.getEmailConfig },
   emailTemplates: { getEmailTemplate: confirmationEmailEdges.getEmailTemplate },
+  emailUsage: { recordEmailSend: confirmationEmailEdges.recordEmailSend },
 });

@@ -90,7 +90,8 @@ test); a folder of two or fewer stays flat, and the third module splits all.
   page as a real send and a block is never confirmed; a send over a limit
   throws `MagicLinkSendLimitedError`, whose `code` both apps' sign-in UIs
   read to say try again later. The refusal goes to the app's
-  `onMagicLinkSendRefused` handler, because this package never logs and the
+  `onSendRefused` handler, and a failed reader sign-in send count to its
+  `onSendCountFailed` handler, because this package never logs and the
   app does.
 - **Sign-in events** — `events.signIn` (`consumePendingInvitesOnSignIn`,
   `recordSignupTermsOnSignIn`),

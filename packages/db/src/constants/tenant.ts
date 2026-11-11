@@ -85,6 +85,7 @@ export type TPlanEntitlements = {
   hasPoweredByMark: boolean;
   hasCustomDomain: boolean;
   hasOwnOAuthApps: boolean;
+  seats: number;
 };
 
 const BASE_LOOK_FIELDS: readonly TLookField[] = [
@@ -103,6 +104,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     hasPoweredByMark: true,
     hasCustomDomain: false,
     hasOwnOAuthApps: false,
+    seats: 1,
   },
   [TENANT_PLAN.STARTER]: {
     lookFields: BASE_LOOK_FIELDS,
@@ -110,6 +112,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     hasPoweredByMark: false,
     hasCustomDomain: true,
     hasOwnOAuthApps: false,
+    seats: 1,
   },
   [TENANT_PLAN.GROWTH]: {
     lookFields: LOOK_FIELDS,
@@ -117,5 +120,6 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     hasPoweredByMark: false,
     hasCustomDomain: true,
     hasOwnOAuthApps: true,
+    seats: 3,
   },
 };

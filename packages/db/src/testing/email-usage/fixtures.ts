@@ -7,6 +7,11 @@ import { utcDay, utcDayDaysBefore } from '@blog/utils/date';
 
 export const MOCK_TODAY = utcDay(MOCK_NOW);
 export const MOCK_LAST_MONTH_DAY = utcDayDaysBefore(MOCK_NOW, 31);
+export const MOCK_DELIVERY_EVENT_IDS = [
+  'evt_first',
+  'evt_second',
+  'evt_third',
+] as const;
 
 export async function readEmailSendCounts(
   db: TTestDb,

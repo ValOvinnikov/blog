@@ -1,7 +1,22 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import {
+  MEMBERSHIP_INVITE_OUTCOME,
+  MEMBERSHIP_ROLE,
+  TENANT_PLAN,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestTenant, MOCK_INVITE_EMAIL } from '@blog/db/testing/fixtures';
-import { MOCK_INVITE_CONSUMED_AT } from '@blog/db/testing/membership-invites/fixtures';
+import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
+import {
+  insertTestTenant,
+  insertTestUser,
+  MOCK_INVITE_EMAIL,
+} from '@blog/db/testing/fixtures';
+import {
+  deleteSeatRows,
+  inviteOf,
+  MOCK_INVITE_CONSUMED_AT,
+  mockMembershipInvite,
+} from '@blog/db/testing/membership-invites/fixtures';
+import { mockMembership } from '@blog/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
   mockAccountEmailIndex,
@@ -18,15 +33,14 @@ vi.mock('@blog/db/client');
 
 faker.seed(6022);
 
-const OUTCOME_CREATED = 'created';
-const OUTCOME_ALREADY_PENDING = 'already-pending';
-const OUTCOME_ALREADY_CONSUMED = 'already-consumed';
+const { CREATED, ALREADY_PENDING, ALREADY_CONSUMED, SEAT_LIMIT } =
+  MEMBERSHIP_INVITE_OUTCOME;
+const GROWTH_SEATS = 3;
 
 const db = useQueryTestDb();
 
 afterEach(async () => {
-  await db().delete(schema.membershipInvites);
-  await db().delete(schema.tenants);
+  await deleteSeatRows(db());
 });
 
 describe(createMembershipInvite, () => {
@@ -37,14 +51,15 @@ describe(createMembershipInvite, () => {
   });
 
   it('inserts a new pending invite, normalizing the email', async () => {
-    const { outcome, invite } = await createMembershipInvite(
+    const result = await createMembershipInvite(
       tenantId,
       MOCK_INVITE_EMAIL.toUpperCase(),
       MEMBERSHIP_ROLE.OWNER,
     );
+    const invite = inviteOf(result);
 
     const rows = await db().select().from(schema.membershipInvites);
-    expect(outcome).toBe(OUTCOME_CREATED);
+    expect(result.outcome).toBe(CREATED);
     expect(rows).toEqual([invite]);
     expect(invite).toEqual({
       id: invite.id,
@@ -62,13 +77,15 @@ describe(createMembershipInvite, () => {
   });
 
   describe('with a pending invite', () => {
-    let first: Awaited<ReturnType<typeof createMembershipInvite>>;
+    let first: TMembershipInvite;
 
     beforeEach(async () => {
-      first = await createMembershipInvite(
-        tenantId,
-        MOCK_INVITE_EMAIL,
-        MEMBERSHIP_ROLE.OWNER,
+      first = inviteOf(
+        await createMembershipInvite(
+          tenantId,
+          MOCK_INVITE_EMAIL,
+          MEMBERSHIP_ROLE.OWNER,
+        ),
       );
     });
 
@@ -89,9 +106,11 @@ describe(createMembershipInvite, () => {
         );
 
         const rows = await db().select().from(schema.membershipInvites);
-        expect(second.outcome).toBe(OUTCOME_ALREADY_PENDING);
-        expect(second.invite).toEqual(first.invite);
-        expect(rows).toEqual([first.invite]);
+        expect(second).toEqual({
+          outcome: ALREADY_PENDING,
+          invite: first,
+        });
+        expect(rows).toEqual([first]);
       },
     );
 
@@ -99,7 +118,7 @@ describe(createMembershipInvite, () => {
       await db()
         .update(schema.membershipInvites)
         .set({ consumedAt: MOCK_INVITE_CONSUMED_AT })
-        .where(eq(schema.membershipInvites.id, first.invite.id));
+        .where(eq(schema.membershipInvites.id, first.id));
 
       const second = await createMembershipInvite(
         tenantId,
@@ -107,7 +126,7 @@ describe(createMembershipInvite, () => {
         MEMBERSHIP_ROLE.OWNER,
       );
 
-      expect(second.outcome).toBe(OUTCOME_ALREADY_CONSUMED);
+      expect(second.outcome).toBe(ALREADY_CONSUMED);
     });
   });
 
@@ -128,6 +147,93 @@ describe(createMembershipInvite, () => {
 
     const rows = await db().select().from(schema.membershipInvites);
     expect(rows).toHaveLength(2);
+  });
+
+  describe('seat limit', () => {
+    function inviteNew(onTenantId: string) {
+      return createMembershipInvite(
+        onTenantId,
+        faker.internet.email(),
+        MEMBERSHIP_ROLE.EDITOR,
+      );
+    }
+
+    function inviteRows(onTenantId: string) {
+      return db()
+        .select()
+        .from(schema.membershipInvites)
+        .where(eq(schema.membershipInvites.tenantId, onTenantId));
+    }
+
+    it('refuses a FREE tenant an invite beyond its owner and writes nothing', async () => {
+      const { id: userId } = await insertTestUser(db());
+      await mockMembership(db(), { userId, tenantId });
+
+      const result = await inviteNew(tenantId);
+
+      expect(result).toEqual({ outcome: SEAT_LIMIT });
+      expect(await inviteRows(tenantId)).toEqual([]);
+    });
+
+    it('counts a pending invite as a taken seat', async () => {
+      await mockMembershipInvite(db(), tenantId);
+
+      const result = await inviteNew(tenantId);
+
+      expect(result.outcome).toBe(SEAT_LIMIT);
+      expect(await inviteRows(tenantId)).toHaveLength(1);
+    });
+
+    describe('on a GROWTH tenant', () => {
+      let growthTenantId: string;
+
+      beforeEach(async () => {
+        ({ id: growthTenantId } = await insertTestTenant(db(), {
+          plan: TENANT_PLAN.GROWTH,
+        }));
+      });
+
+      it('invites up to its seats and refuses the next', async () => {
+        const outcomes = [];
+        for (let seat = 0; seat <= GROWTH_SEATS; seat++) {
+          outcomes.push((await inviteNew(growthTenantId)).outcome);
+        }
+
+        expect(outcomes).toEqual([
+          ...Array<string>(GROWTH_SEATS).fill(CREATED),
+          SEAT_LIMIT,
+        ]);
+        expect(await inviteRows(growthTenantId)).toHaveLength(GROWTH_SEATS);
+      });
+
+      it('does not count a consumed invite beside the membership it became', async () => {
+        const { id: userId } = await insertTestUser(db());
+        await mockMembership(db(), { userId, tenantId: growthTenantId });
+        await mockMembershipInvite(db(), growthTenantId, {
+          consumedAt: MOCK_INVITE_CONSUMED_AT,
+        });
+
+        const second = await inviteNew(growthTenantId);
+        const third = await inviteNew(growthTenantId);
+
+        expect(second.outcome).toBe(CREATED);
+        expect(third.outcome).toBe(CREATED);
+      });
+
+      it('keeps every invite after a downgrade and refuses the next', async () => {
+        await inviteNew(growthTenantId);
+        await inviteNew(growthTenantId);
+        await db()
+          .update(schema.tenants)
+          .set({ plan: TENANT_PLAN.FREE })
+          .where(eq(schema.tenants.id, growthTenantId));
+
+        const result = await inviteNew(growthTenantId);
+
+        expect(result.outcome).toBe(SEAT_LIMIT);
+        expect(await inviteRows(growthTenantId)).toHaveLength(2);
+      });
+    });
   });
 
   it('rejects an invite for a tenant that does not exist', async () => {

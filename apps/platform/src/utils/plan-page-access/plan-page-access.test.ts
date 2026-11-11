@@ -8,9 +8,14 @@ const { registry } = vi.hoisted(() => ({
   registry: {} as Record<string, TCapability[]>,
 }));
 
+const { entitlements } = vi.hoisted(() => ({
+  entitlements: {} as Record<string, { seats: number }>,
+}));
+
 vi.mock('@blog/db/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof DbConstants>()),
   PLAN_REGISTRY: registry,
+  PLAN_ENTITLEMENTS: entitlements,
 }));
 
 const withFreeCapabilities = (capabilities: TCapability[]) => {
@@ -24,6 +29,9 @@ const CAPABILITY_GATED_PAGES: { page: TPlanPage; capability: TCapability }[] = [
 
 describe(planPageAccess, () => {
   beforeEach(() => {
+    entitlements[TENANT_PLAN.FREE] = { seats: 1 };
+    entitlements[TENANT_PLAN.STARTER] = { seats: 1 };
+    entitlements[TENANT_PLAN.GROWTH] = { seats: 3 };
     registry[TENANT_PLAN.FREE] = [
       CAPABILITY.RATINGS,
       CAPABILITY.CONSENT_BANNER,
@@ -120,6 +128,22 @@ describe(planPageAccess, () => {
     const { languages, team } = planPageAccess(TENANT_PLAN.FREE);
 
     expect(languages).toBe(false);
+    expect(team).toBe(false);
+  });
+
+  it('opens Team on any plan with more than one seat', () => {
+    entitlements[TENANT_PLAN.FREE] = { seats: 2 };
+
+    const { team } = planPageAccess(TENANT_PLAN.FREE);
+
+    expect(team).toBe(true);
+  });
+
+  it('keeps Team closed on a one-seat plan', () => {
+    entitlements[TENANT_PLAN.GROWTH] = { seats: 1 };
+
+    const { team } = planPageAccess(TENANT_PLAN.GROWTH);
+
     expect(team).toBe(false);
   });
 });

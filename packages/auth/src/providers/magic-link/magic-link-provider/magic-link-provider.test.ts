@@ -25,6 +25,7 @@ import { resolveTenantEmailBrand } from '@blog/config';
 import {
   AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
+  EMAIL_TYPE,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   MAGIC_LINK_REFUSAL,
@@ -35,6 +36,7 @@ import {
   EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE,
 } from '@blog/db/constants';
 import {
+  buildSiteEmailTag,
   escapeHtml,
   PLATFORM_EMAIL_BRAND_NAME,
   type TSendEmailInput,
@@ -115,6 +117,8 @@ const {
   findMagicLinkSendRefusalMock,
   withMinimumDurationMock,
   onSendRefusedMock,
+  onSendCountFailedMock,
+  recordEmailSendMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
   listTenantsByIdsMock: vi.fn(),
@@ -126,6 +130,8 @@ const {
   findMagicLinkSendRefusalMock: vi.fn(),
   withMinimumDurationMock: vi.fn(),
   onSendRefusedMock: vi.fn(),
+  onSendCountFailedMock: vi.fn(),
+  recordEmailSendMock: vi.fn(),
 }));
 
 vi.mock(
@@ -152,6 +158,7 @@ vi.mock('@blog/db', async () => ({
     siteConfig: { getSiteConfig: getSiteConfigMock },
     emailConfig: { getEmailConfig: getEmailConfigMock },
     emailTemplates: { getEmailTemplate: getEmailTemplateMock },
+    emailUsage: { recordEmailSend: recordEmailSendMock },
   },
 }));
 
@@ -187,8 +194,13 @@ function sentEmail(): TSendEmailInput {
   return email;
 }
 
+const MAGIC_LINK_HANDLERS = {
+  onSendRefused: onSendRefusedMock,
+  onSendCountFailed: onSendCountFailedMock,
+};
+
 const buildPlatformProvider = () =>
-  buildMagicLinkProvider(AUTH_APP.PLATFORM, onSendRefusedMock);
+  buildMagicLinkProvider(AUTH_APP.PLATFORM, MAGIC_LINK_HANDLERS);
 
 const withPendingInvite = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) => {
   findPendingInviteByEmailMock.mockResolvedValue([mockPendingInvite()]);
@@ -205,11 +217,12 @@ describe(buildMagicLinkProvider, () => {
     getEmailConfigMock.mockResolvedValue(undefined);
     getEmailTemplateMock.mockResolvedValue(mockEmailTemplate());
     sendEmailMock.mockResolvedValue(undefined);
+    recordEmailSendMock.mockResolvedValue(undefined);
     findMagicLinkSendRefusalMock.mockResolvedValue(undefined);
     withMinimumDurationMock.mockImplementation(
       (_minimumMs: number, task: () => Promise<unknown>) => task(),
     );
-    provider = buildMagicLinkProvider(AUTH_APP.SITE, onSendRefusedMock);
+    provider = buildMagicLinkProvider(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
   });
 
   afterEach(() => {
@@ -225,29 +238,61 @@ describe(buildMagicLinkProvider, () => {
   });
 
   describe('when the send check blocks the request', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       findMagicLinkSendRefusalMock.mockResolvedValue(BLOCKED_REFUSAL);
+      await sendVerificationRequestFor(provider);
     });
 
-    it('sends nothing', async () => {
-      await sendVerificationRequestFor(provider);
-
+    it('sends nothing', () => {
       expect(sendEmailMock).not.toHaveBeenCalled();
     });
 
-    it("hands the refusal to the app's handler", async () => {
-      await sendVerificationRequestFor(provider);
-
+    it("hands the refusal to the app's handler", () => {
       expect(onSendRefusedMock).toHaveBeenCalledExactlyOnceWith(
         BLOCKED_REFUSAL,
       );
     });
   });
 
-  it('reports no refusal for a link it sends', async () => {
-    await sendVerificationRequestFor(provider);
+  describe('once a link is sent on a host with no site', () => {
+    beforeEach(async () => {
+      await sendVerificationRequestFor(provider);
+    });
 
-    expect(onSendRefusedMock).not.toHaveBeenCalled();
+    it('reports no refusal for a link it sends', () => {
+      expect(onSendRefusedMock).not.toHaveBeenCalled();
+    });
+
+    it('holds a refused request to the same minimum duration as a real send', async () => {
+      findMagicLinkSendRefusalMock.mockResolvedValue(BLOCKED_REFUSAL);
+      await sendVerificationRequestFor(provider);
+
+      const [sentFloorMs, refusedFloorMs] =
+        withMinimumDurationMock.mock.calls.map(([minimumMs]) => minimumMs);
+      expect(refusedFloorMs).toBe(sentFloorMs);
+      expect(refusedFloorMs).toBeGreaterThan(0);
+    });
+
+    it('checks the requested address before sending', () => {
+      const [address, request] =
+        findMagicLinkSendRefusalMock.mock.calls[0] ?? [];
+      expect(address).toBe(MOCK_READER_EMAIL);
+      expect(request).toBeInstanceOf(Request);
+    });
+
+    it('counts no send', () => {
+      expect(recordEmailSendMock).not.toHaveBeenCalled();
+    });
+
+    it('delivers the sign-in link from the configured address', () => {
+      const { html, ...envelope } = sentEmail();
+      expect(envelope).toEqual(DEFAULT_ENVELOPE);
+      expect(html).toContain(SITE_LINK_HREF);
+    });
+
+    it("never sends a site's sign-in email in the platform layout", () => {
+      expect(sentEmail().html).not.toContain(PLATFORM_EMAIL_BRAND_NAME);
+    });
   });
 
   it.each([MAGIC_LINK_REFUSAL.BLOCKED, MAGIC_LINK_REFUSAL.CHECK_FAILED])(
@@ -281,62 +326,37 @@ describe(buildMagicLinkProvider, () => {
     expect(onSendRefusedMock).toHaveBeenCalledExactlyOnceWith(LIMIT_REFUSAL);
   });
 
-  it('holds a refused request to the same minimum duration as a real send', async () => {
-    await sendVerificationRequestFor(provider);
-    findMagicLinkSendRefusalMock.mockResolvedValue(BLOCKED_REFUSAL);
-    await sendVerificationRequestFor(provider);
-
-    const [sentFloorMs, refusedFloorMs] =
-      withMinimumDurationMock.mock.calls.map(([minimumMs]) => minimumMs);
-    expect(refusedFloorMs).toBe(sentFloorMs);
-    expect(refusedFloorMs).toBeGreaterThan(0);
-  });
-
-  it('checks the requested address before sending', async () => {
-    await sendVerificationRequestFor(provider);
-
-    const [address, request] = findMagicLinkSendRefusalMock.mock.calls[0] ?? [];
-    expect(address).toBe(MOCK_READER_EMAIL);
-    expect(request).toBeInstanceOf(Request);
-  });
-
-  it('delivers the sign-in link from the configured address', async () => {
-    await sendVerificationRequestFor(provider);
-
-    const { html, ...envelope } = sentEmail();
-    expect(envelope).toEqual(DEFAULT_ENVELOPE);
-    expect(html).toContain(SITE_LINK_HREF);
-  });
-
-  it('sends invite copy to a platform address with a pending invite', async () => {
-    withPendingInvite();
-
-    await sendVerificationRequestFor(buildPlatformProvider(), {
-      identifier: MOCK_INVITED_EMAIL,
+  describe('with a pending invite', () => {
+    beforeEach(() => {
+      withPendingInvite();
     });
 
-    const { to, from, subject, html } = sentEmail();
-    expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
-      MOCK_INVITED_EMAIL,
-    );
-    expect([to, from, subject]).toEqual([
-      MOCK_INVITED_EMAIL,
-      MOCK_FROM_ADDRESS,
-      TENANT_INVITE_DEFAULTS.subject,
-    ]);
-    expect(html).toContain(MOCK_TENANT_NAME);
-  });
+    it('sends invite copy to a platform address', async () => {
+      await sendVerificationRequestFor(buildPlatformProvider(), {
+        identifier: MOCK_INVITED_EMAIL,
+      });
 
-  it("sends a site's own sign-in email to an address with a pending invite", async () => {
-    withPendingInvite();
-
-    await sendVerificationRequestFor(provider, {
-      identifier: MOCK_INVITED_EMAIL,
+      const { to, from, subject, html } = sentEmail();
+      expect(findPendingInviteByEmailMock).toHaveBeenCalledWith(
+        MOCK_INVITED_EMAIL,
+      );
+      expect([to, from, subject]).toEqual([
+        MOCK_INVITED_EMAIL,
+        MOCK_FROM_ADDRESS,
+        TENANT_INVITE_DEFAULTS.subject,
+      ]);
+      expect(html).toContain(MOCK_TENANT_NAME);
     });
 
-    const { subject, html } = sentEmail();
-    expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
-    expect(html).not.toContain(MOCK_TENANT_NAME);
+    it("sends a site's own sign-in email", async () => {
+      await sendVerificationRequestFor(provider, {
+        identifier: MOCK_INVITED_EMAIL,
+      });
+
+      const { subject, html } = sentEmail();
+      expect(subject).toBe(MAGIC_LINK_DEFAULTS.subject);
+      expect(html).not.toContain(MOCK_TENANT_NAME);
+    });
   });
 
   it('falls back to the generic copy when the invite lookup throws', async () => {
@@ -369,12 +389,6 @@ describe(buildMagicLinkProvider, () => {
       expect(html).toContain(PLATFORM_LAYOUT_MARK);
     },
   );
-
-  it("never sends a site's sign-in email in the platform layout", async () => {
-    await sendVerificationRequestFor(provider);
-
-    expect(sentEmail().html).not.toContain(PLATFORM_EMAIL_BRAND_NAME);
-  });
 
   it.each([
     ['resolves to no tenant', () => {}],
@@ -435,11 +449,58 @@ describe(buildMagicLinkProvider, () => {
       getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG);
     });
 
-    it("brands the sign-in email with the resolved tenant's hue", async () => {
-      await sendVerificationRequestFor(provider);
+    it("delivers the link and hands a failed count to the app's handler", async () => {
+      const countError = new Error(MOCK_DB_ERROR_MESSAGE);
+      recordEmailSendMock.mockRejectedValue(countError);
 
-      const { logo1 } = resolveTenantEmailBrand(MOCK_SITE_CONFIG);
-      expect(sentEmail().html).toContain(logo1);
+      await expect(
+        sendVerificationRequestFor(provider),
+      ).resolves.toBeUndefined();
+      expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(onSendCountFailedMock).toHaveBeenCalledExactlyOnceWith({
+        siteId: MOCK_TENANT_ID,
+        emailType: EMAIL_TYPE.SIGN_IN,
+        error: countError,
+      });
+    });
+
+    it('still resolves when the failure handler itself throws', async () => {
+      recordEmailSendMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
+      onSendCountFailedMock.mockImplementation(() => {
+        throw new Error(MOCK_DB_ERROR_MESSAGE);
+      });
+
+      await expect(
+        sendVerificationRequestFor(provider),
+      ).resolves.toBeUndefined();
+    });
+
+    it('neither tags nor counts a platform sign-in', async () => {
+      await sendVerificationRequestFor(buildPlatformProvider(), {
+        url: PLATFORM_CALLBACK_URL,
+      });
+
+      expect(sentEmail().tags).toBeUndefined();
+      expect(recordEmailSendMock).not.toHaveBeenCalled();
+    });
+
+    describe('once a link is sent', () => {
+      beforeEach(async () => {
+        await sendVerificationRequestFor(provider);
+      });
+
+      it('tags the send with the site and counts one sign-in for it', () => {
+        expect(sentEmail().tags).toEqual([buildSiteEmailTag(MOCK_TENANT_ID)]);
+        expect(recordEmailSendMock).toHaveBeenCalledExactlyOnceWith(
+          MOCK_TENANT_ID,
+          EMAIL_TYPE.SIGN_IN,
+        );
+      });
+
+      it("brands the sign-in email with the resolved tenant's hue", () => {
+        const { logo1 } = resolveTenantEmailBrand(MOCK_SITE_CONFIG);
+        expect(sentEmail().html).toContain(logo1);
+      });
     });
 
     it("applies the tenant's sender name and reply-to address", async () => {

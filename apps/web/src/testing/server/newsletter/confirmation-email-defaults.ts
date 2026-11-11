@@ -22,6 +22,7 @@ export const setConfirmationEmailDefaults = ({
   },
 }: IConfirmationEmailDefaults) => {
   confirmationEmailEdges.sendEmail.mockResolvedValue(undefined);
+  confirmationEmailEdges.recordEmailSend.mockResolvedValue(undefined);
   confirmationEmailEdges.resolveTenantEmailIdentity.mockResolvedValue({
     brand,
     brandName,
