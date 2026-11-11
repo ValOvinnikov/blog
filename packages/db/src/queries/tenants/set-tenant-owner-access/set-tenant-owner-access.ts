@@ -1,5 +1,5 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
-import type { TMaybeNull } from '@blog/config/types';
+import type { TNullablePatch } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { getTenantOwnerAccess } from '@blog/db/queries/tenants/get-tenant-owner-access';
 import {
@@ -9,20 +9,16 @@ import {
 } from '@blog/db/queries/tenants/tenant-owner-access';
 import { tenants } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
+import { isUndefined } from '@blog/utils/primitives';
 import { eq } from 'drizzle-orm';
 
-// A field left out keeps its stored value; `null` clears it.
-export type TSetTenantOwnerAccessInput = {
-  [K in keyof TTenantOwnerAccess]?: TMaybeNull<
-    Exclude<TTenantOwnerAccess[K], undefined>
-  >;
-};
+export type TSetTenantOwnerAccessInput = TNullablePatch<TTenantOwnerAccess>;
 
 export async function setTenantOwnerAccess(
   tenantId: string,
   input: TSetTenantOwnerAccessInput,
 ): Promise<TResult<TTenantOwnerAccess, TErrorCode>> {
-  if (Object.values(input).every((value) => value === undefined)) {
+  if (Object.values(input).every(isUndefined)) {
     const ownerAccess = await getTenantOwnerAccess(tenantId);
 
     return ownerAccess

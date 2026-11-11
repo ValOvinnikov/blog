@@ -1,6 +1,7 @@
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
 import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import { createMockFaker } from '@worker/testing/mock-faker';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
@@ -51,6 +52,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     suspendedAt: null,
     deletionNotifiedAt: null,
     suspensionReason: null,
+    ...MOCK_NO_BILLING,
     contentMigrationFailedAt: null,
     firstPostPublishedAt: null,
     createdAt: new Date(0),

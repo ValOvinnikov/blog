@@ -309,6 +309,11 @@ Every key/value const an agent should reuse before writing a literal. The
 - **ADMIN_ROLE**: `SUPERADMIN`, `ADMIN`, `MODERATOR`
 - **GRANTED_VIA**: `BREAK_GLASS`, `PROMOTION`
 
+### `@blog/db/constants` — `packages/db/src/constants/billing.ts`
+
+- **STRIPE_PRICE_LOOKUP_KEY**: `STARTER_MONTHLY`, `STARTER_YEARLY`, `GROWTH_MONTHLY`, `GROWTH_YEARLY`, `GROWTH_BAND_2500`, `GROWTH_BAND_5000`, `GROWTH_BAND_10000`, `GROWTH_BAND_25000`
+- **STRIPE_EVENT_RECORD_OUTCOME**: `RECORDED`, `ALREADY_HANDLED`
+
 ### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`

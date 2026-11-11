@@ -5,11 +5,11 @@ import type { TTenantOwnerAccess } from '@blog/db/queries/tenants/tenant-owner-a
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import {
-  MOCK_MISSING_TENANT_ID,
   mockTenantOwnerAccess,
   toTenantOwnerAccessColumns,
-} from '@blog/db/testing/tenants/fixtures';
+} from '@blog/db/testing/tenants/owner-access';
 
 import { setTenantOwnerAccess } from './set-tenant-owner-access';
 

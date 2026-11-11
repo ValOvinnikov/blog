@@ -24,6 +24,13 @@ export type TMaybeJsonDates<T> = {
       : T[K];
 };
 
+export type TNullableRow<T> = {
+  [K in keyof T]: TMaybeNull<Exclude<T[K], undefined>>;
+};
+
+/** A partial update where a key left out keeps its stored value and `null` clears it. */
+export type TNullablePatch<T> = Partial<TNullableRow<T>>;
+
 export type TByLocale<V> = Record<TLocaleIsoCode, V>;
 
 export type TPartialByLocale<V> = Partial<TByLocale<V>>;
