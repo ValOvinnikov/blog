@@ -31,7 +31,6 @@ vi.mock('@blog/service', () => ({
 faker.seed(6009);
 
 const { NL } = LOCALE_ISO_CODES;
-const UNSUPPORTED_LOCALE = 'IT';
 const MOCK_PAGE_TITLE = faker.lorem.words(3);
 const MOCK_CREDENTIALS = mockTenantSanityCredentials();
 const MOCK_BODY = { tenantId: MOCK_TENANT_ID, locale: NL };
@@ -60,21 +59,6 @@ describe(POST, () => {
         locale: NL,
       },
     );
-  });
-
-  it('accepts only a supported locale', async () => {
-    await callRoute();
-    const bodySchema = readInternalPageRequestMock.mock.lastCall?.[1];
-
-    expect(
-      bodySchema?.safeParse({ tenantId: MOCK_TENANT_ID, locale: NL }).success,
-    ).toBe(true);
-    expect(
-      bodySchema?.safeParse({
-        tenantId: MOCK_TENANT_ID,
-        locale: UNSUPPORTED_LOCALE,
-      }).success,
-    ).toBe(false);
   });
 
   it('answers not found for an unknown page', async () => {

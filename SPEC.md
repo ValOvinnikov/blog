@@ -2246,8 +2246,10 @@ that authorises an on-demand rebuild of any tenant's pages. The path a
 preview signs comes from `apps/web`: `POST /api/internal/pages/{documentId}/path`,
 signed like the title route above under `INTERNAL_PAGES_SECRET`, reads a post
 or landing page through the `drafts` perspective (a never-published draft
-included) and answers its percent-encoded public path, with the locale prefix
-the site serves. Detail: `docs/features/rendering-and-caching.md`.
+included, its id given bare or as `drafts.<id>`) and answers its
+percent-encoded public path, with the locale prefix the site serves, for the
+platform to frame exactly as returned; a draft in a language the tenant has
+not switched on answers 409. Detail: `docs/features/rendering-and-caching.md`.
 
 ### Localization
 

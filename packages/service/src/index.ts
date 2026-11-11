@@ -79,23 +79,8 @@ export const service = {
 };
 
 export type { TPostBody, TSaveSkimDraftInput } from './features/editorial/skim';
-export type { TFeedPost, TPostById } from './features/entities/posts';
-export type { TTagsList, TTagWithPostCount } from './features/entities/tags';
-export type {
-  TTopicsList,
-  TTopicWithPostCount,
-} from './features/entities/topics';
-export type { TFooter } from './features/global/footer';
-export type {
-  TNavigation,
-  TNavigationItem,
-} from './features/global/navigation';
-export type { TSiteSettings } from './features/global/site-settings';
-export type {
-  TTranslationEntry,
-  TTranslationGroup,
-  TTranslationMap,
-} from './features/global/translation-map';
+export type * from './features/entities/types';
+export type * from './features/global/types';
 export type * from './features/modules/types';
 export type * from './features/pages/types';
 export type { TPageTranslation } from './shared/localization/page-translations/to-page-translations';

@@ -41,6 +41,15 @@ describe(getDraftPagePath, () => {
     });
   });
 
+  it('reads a draft id as the published id the drafts perspective returns', async () => {
+    await getDraftPagePath(`drafts.${MOCK_POST_ID}`, tenant);
+
+    expect(mockRun).toHaveBeenCalledExactlyOnceWith(draftPagePathQuery, {
+      tenant: { ...tenant, perspective: SANITY_PERSPECTIVE.DRAFTS },
+      parameters: { id: MOCK_POST_ID },
+    });
+  });
+
   it('returns undefined when no page matches', async () => {
     mockRun.mockResolvedValueOnce(null);
 

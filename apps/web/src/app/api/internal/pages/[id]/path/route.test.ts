@@ -13,8 +13,13 @@ import { logger } from '@web/utils/logger/logger';
 
 import { POST } from './route';
 
-const { getDraftPagePathMock } = vi.hoisted(() => ({
+const { getDraftPagePathMock, isLiveLocaleMock } = vi.hoisted(() => ({
   getDraftPagePathMock: vi.fn(),
+  isLiveLocaleMock: vi.fn(),
+}));
+
+vi.mock('@web/server/internal-pages/is-live-locale/is-live-locale', () => ({
+  isLiveLocale: isLiveLocaleMock,
 }));
 
 vi.mock(
@@ -37,6 +42,7 @@ const callRoute = () =>
 
 describe(POST, () => {
   beforeEach(() => {
+    isLiveLocaleMock.mockResolvedValue(true);
     getDraftPagePathMock.mockResolvedValue({
       ok: true,
       data: { href: MOCK_HREF, locale: MOCK_CREDENTIALS.defaultLocale },
@@ -58,6 +64,26 @@ describe(POST, () => {
     getDraftPagePathMock.mockResolvedValue({ ok: true, data: undefined });
 
     expect((await callRoute()).status).toBe(HTTP_STATUS.NOT_FOUND);
+  });
+
+  it("answers conflict for a draft in a language the tenant's site does not serve yet", async () => {
+    isLiveLocaleMock.mockResolvedValue(false);
+
+    expect((await callRoute()).status).toBe(HTTP_STATUS.CONFLICT);
+    expect(isLiveLocaleMock).toHaveBeenCalledExactlyOnceWith(
+      MOCK_TENANT_ID,
+      MOCK_CREDENTIALS.defaultLocale,
+    );
+  });
+
+  it('logs and fails when the live languages cannot be read', async () => {
+    isLiveLocaleMock.mockRejectedValue(MOCK_ERROR);
+
+    expect((await callRoute()).status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(logger.error).toHaveBeenCalledWith(
+      INTERNAL_PAGES_LOG.TENANT_LOOKUP_FAILED,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
+    );
   });
 
   it('logs and fails when the path read fails', async () => {

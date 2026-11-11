@@ -2,6 +2,7 @@ import { HTTP_STATUS } from '@blog/config/constants';
 import { service } from '@blog/service';
 import { isUndefined } from '@blog/utils/primitives';
 import { INTERNAL_PAGES_LOG } from '@web/constants/internal-pages';
+import { isLiveLocale } from '@web/server/internal-pages/is-live-locale/is-live-locale';
 import {
   respondToInternalPageRequest,
   type TInternalPageRouteContext,
@@ -37,6 +38,20 @@ export async function POST(
       }
       if (isUndefined(result.data)) {
         return respondEmpty(HTTP_STATUS.NOT_FOUND);
+      }
+
+      let isLive;
+      try {
+        isLive = await isLiveLocale(tenantId, result.data.locale);
+      } catch (error) {
+        logger.error(INTERNAL_PAGES_LOG.TENANT_LOOKUP_FAILED, {
+          tenantId,
+          error,
+        });
+        return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+      }
+      if (!isLive) {
+        return respondEmpty(HTTP_STATUS.CONFLICT);
       }
 
       return NextResponse.json({

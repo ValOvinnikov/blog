@@ -1,5 +1,6 @@
 import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import type { TTenantSanityCredentials } from '@blog/db/queries/tenants/get-tenant-sanity-credentials/get-tenant-sanity-credentials';
 import { isUndefined } from '@blog/utils/primitives';
 import { INTERNAL_PAGES_LOG } from '@web/constants/internal-pages';
 import { readSignedRequestBody } from '@web/server/signed-request/read-signed-request-body/read-signed-request-body';
@@ -8,10 +9,6 @@ import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import type { NextResponse } from 'next/server';
 import type { z } from 'zod';
-
-export type TTenantSanityCredentials = NonNullable<
-  Awaited<ReturnType<typeof queries.tenants.getTenantSanityCredentials>>
->;
 
 type TInternalPageRequest<TBody> =
   { refusal: NextResponse } | { body: TBody; tenant: TTenantSanityCredentials };
