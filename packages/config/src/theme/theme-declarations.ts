@@ -11,7 +11,7 @@ import {
 
 import { BORDER_COLOR } from './border-tokens';
 import { atLeastSmall } from './radius-declarations';
-import { RADIUS_PILL } from './radius-tokens';
+import { RADIUS_NONE, RADIUS_PILL } from './radius-tokens';
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
@@ -87,7 +87,7 @@ export const BUTTON_SHAPE_DECLARATIONS: Record<
   TButtonShape,
   TThemeDeclarations
 > = {
-  [BUTTON_SHAPE.SQUARE]: { '--radius-button': '0' },
+  [BUTTON_SHAPE.SQUARE]: { '--radius-button': RADIUS_NONE },
   [BUTTON_SHAPE.ROUNDED]: { '--radius-button': atLeastSmall('--radius-sm') },
   [BUTTON_SHAPE.PILL]: { '--radius-button': RADIUS_PILL },
 };
