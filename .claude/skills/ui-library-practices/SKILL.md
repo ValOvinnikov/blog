@@ -148,6 +148,12 @@ src/components/molecules/media-card/
   get `aria-label` + `title` (see Icons). General markup rules:
   `react-component-practices` § Accessible by construction.
 
+- **A disabled state picks `aria-disabled` or native `disabled` per
+  control** — `react-component-practices` § Accessible by construction.
+  `IconButton`'s `isFocusableWhenDisabled` is the library's form for a lock
+  with a reason, used by `Carousel`'s arrows at either end; `TextInput`,
+  `Button`, `BookmarkToggle` and `Switch` offer only native `disabled` today.
+
 ## Using `@blog/config`
 
 - **`SIZE` keys every size variant** — computed keys in `tv()` maps,
