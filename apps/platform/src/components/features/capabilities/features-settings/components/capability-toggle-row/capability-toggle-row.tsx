@@ -10,8 +10,8 @@ export type TCapabilityToggleRowProps = {
   toggle: TCapabilityToggle;
   isEntitled: boolean;
   isChecked: boolean;
-  isParentOff: boolean;
-  isFormLocked: boolean;
+  isDisabled: boolean;
+  isArchived: boolean;
   describedBy?: string;
   onCheckedChange: (checked: boolean) => void;
 };
@@ -20,8 +20,8 @@ export const CapabilityToggleRow = ({
   toggle,
   isEntitled,
   isChecked,
-  isParentOff,
-  isFormLocked,
+  isDisabled,
+  isArchived,
   describedBy,
   onCheckedChange,
 }: TCapabilityToggleRowProps) => {
@@ -30,6 +30,7 @@ export const CapabilityToggleRow = ({
   const isNested = !isUndefined(parentField);
   const label = t(`toggleLabel.${capability}`);
   const description = t(`toggleDescription.${capability}`);
+  const isLocked = !isEntitled || isArchived;
 
   if (isComingSoon) {
     return (
@@ -55,7 +56,8 @@ export const CapabilityToggleRow = ({
         aria={{ label, describedBy }}
         isChecked={isChecked}
         onCheckedChange={onCheckedChange}
-        isDisabled={!isEntitled || isParentOff || isFormLocked}
+        isDisabled={!isLocked && isDisabled}
+        isLocked={isLocked}
         labels={{ on: t('switchOn'), off: t('switchOff') }}
       />
     </SettingRow>

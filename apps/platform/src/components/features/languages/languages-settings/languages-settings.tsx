@@ -8,12 +8,10 @@ import {
 } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Card } from '@platform/components/shared/card';
-import { SettingRow } from '@platform/components/shared/setting-row';
 import {
   SettingsFormShell,
   useSettingsForm,
 } from '@platform/components/shared/settings-form-shell';
-import { Switch } from '@platform/components/shared/switch';
 import { Text } from '@platform/components/shared/text';
 import { useToast } from '@platform/context/toast-provider';
 import {
@@ -25,6 +23,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
+import { LanguageToggleRow } from './components/language-toggle-row';
 import { languagesSettingsVariants } from './languages-settings-variants';
 
 const SUPPORTED_LOCALES = Object.values(LOCALE_ISO_CODES);
@@ -165,34 +164,28 @@ export const LanguagesSettings = ({
             (locale) => {
               const isLive = values.includes(locale);
               const isStored = savedLocales.includes(locale);
-              const isLocked = isLive
+              const isOverAllowance = isLive
                 ? isOverLimit
                 : isAtLimit || (isOverLimit && !isStored);
-              const label = tLanguage(locale);
 
               return (
-                <SettingRow
+                <LanguageToggleRow
                   key={locale}
-                  label={label}
+                  aria={{
+                    label: tLanguage(locale),
+                    describedBy: isArchived ? archivedNoticeId : undefined,
+                  }}
                   description={
                     isOverLimit && isStored && !isLive
                       ? t('keptBadge')
                       : undefined
                   }
-                  isLocked={isLocked}
-                  lockedReason={lockedReason}
-                >
-                  <Switch
-                    aria={{
-                      label,
-                      describedBy: isArchived ? archivedNoticeId : undefined,
-                    }}
-                    isChecked={isLive}
-                    onCheckedChange={(checked) => handleToggle(locale, checked)}
-                    isDisabled={isLocked || isPending || isArchived}
-                    labels={{ on: t('switchOn'), off: t('switchOff') }}
-                  />
-                </SettingRow>
+                  isChecked={isLive}
+                  isLocked={isOverAllowance || isArchived}
+                  lockedReason={isOverAllowance ? lockedReason : undefined}
+                  isDisabled={isPending}
+                  onCheckedChange={(checked) => handleToggle(locale, checked)}
+                />
               );
             },
           )}

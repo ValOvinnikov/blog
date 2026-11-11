@@ -1,6 +1,7 @@
 import { CAPABILITY, type TPresetId } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -89,8 +90,8 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
         name: toggleLabel[CAPABILITY.CONSENT_BANNER],
       });
 
-      expect(analyticsSwitch).toBeDisabled();
-      expect(bookmarksSwitch).toBeDisabled();
+      expect(analyticsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(consentSwitch).toBeEnabled();
     });
 
@@ -106,7 +107,7 @@ describe(`<${FeaturesPageContent.name}/>`, () => {
       });
 
       expect(analyticsSwitch).not.toBeChecked();
-      expect(analyticsSwitch).toBeDisabled();
+      expect(analyticsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     });
   });
 
