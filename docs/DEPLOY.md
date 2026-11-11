@@ -867,24 +867,27 @@ Create **two** (the route `/api/revalidate` already exists):
 
 ### 5a. Resend — delivery-event webhook · Resend → Webhooks → Add webhook
 
-Create one per web project, so each site's delivered, bounced and complained
-mail is counted against it:
+Dev and production never share a Resend account. Dev uses the one existing
+account. Production uses two, created just before release: a platform account
+and a tenant-mail account. Only the account that sends site mail gets this
+webhook, so a site's delivered, bounced and complained mail is counted against
+it; the production platform account gets none, and platform mail outcomes are
+not recorded.
 
-| Field    | dev webhook                                              | prod webhook                                             |
+| Field    | dev webhook (the dev account)                            | prod webhook (the tenant-mail account)                   |
 | -------- | -------------------------------------------------------- | -------------------------------------------------------- |
 | Endpoint | `https://<DEV_WEB_URL>/api/email-delivery-events`        | `https://<PRD_WEB_URL>/api/email-delivery-events`        |
 | Events   | `email.delivered` · `email.bounced` · `email.complained` | `email.delivered` · `email.bounced` · `email.complained` |
 
 Copy each webhook's **Signing secret** (`whsec_…`) into its web project's
-`RESEND_WEBHOOK_SECRET`. Until it is set, the route answers 500 and Resend
-retries, so no outcome is recorded.
+`RESEND_WEBHOOK_SECRET` — one secret per environment. Until it is set, the
+route answers 500 and Resend retries, so no outcome is recorded. On dev the one
+account also sends platform mail, which carries no site tag; the route
+acknowledges those events and records nothing.
 
-Dev and prod send through the one Resend account behind `RESEND_API_KEY`,
-and a Resend webhook receives every event the account sends, so each
-endpoint also sees the other environment's mail. Its site is not in that
-environment's database, so the route answers 200 and warns once
-(`email_usage.webhook_site_unknown`) instead of recording it; separate
-Resend accounts per environment would remove those warnings.
+The split of `RESEND_API_KEY` into `RESEND_PLATFORM_API_KEY` and
+`RESEND_TENANT_API_KEY`, which points each kind of mail at its account, follows
+in #7237.
 
 ### 6. Sanity — CORS origins · API → CORS origins
 
