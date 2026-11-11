@@ -284,6 +284,25 @@ Overridden here:
   twice. A suffix on a `useId` base (`` `${id}-hint` ``) is fine. When another
   component needs the id (an in-page `#id` link), generate it in their common
   owner and pass it down.
+- **A control locked for a reason stays reachable.** Native `disabled`
+  takes a control out of the Tab order, so a keyboard or screen-reader user
+  never reaches it and never hears why it is off. Choose per control:
+  - **Locked with an explanation** — a plan or limit lock, a carousel arrow
+    at its end, anything with a reason the user can read — sets
+    `aria-disabled="true"` and stays focusable. The component ignores
+    activation itself (no `onClick`, or an early return in the change
+    handler), and the reason reaches the control through `aria-describedby`.
+  - **Nothing to explain** — a submit button while the form is invalid or
+    saving — uses native `disabled` and leaves the Tab order.
+
+  A component offers the first as its own prop beside `isDisabled`, never by
+  changing what `isDisabled` means: `isLocked` on the platform's `Switch`,
+  `SegmentedControl` and `Select`, `isAriaDisabled` on its `Button`, and
+  `isFocusableWhenDisabled` on `@blog/ui`'s `IconButton`. A busy `Button` is
+  `aria-disabled`, never `disabled`, so focus stays on it while it works.
+  VoiceOver reads an `aria-disabled` control as dimmed, followed by its
+  description.
+
 - Layer rules: `ui-library-practices` → "Accessibility rules",
   `platform-app.md` → "Base UI is the behaviour layer",
   `platform-ui-practices` → "Forms and settings".

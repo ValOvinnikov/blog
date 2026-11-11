@@ -102,16 +102,20 @@ from `useSettingsFormState()`:
   lockedReason={lockReason}
 >
   <Switch
+    aria={{ label, describedBy: archivedDescribedBy }}
     isChecked={values[field]}
     onCheckedChange={(checked) => handleToggle(field, checked)}
-    isDisabled={lockReason !== undefined || isPending || isArchived}
-    ariaLabel={label}
+    isLocked={lockReason !== undefined}
+    isDisabled={isPending || isArchived}
     labels={{ on: t('switchOn'), off: t('switchOff') }}
-    aria-describedby={archivedDescribedBy}
   />
 </SettingRow>
 ```
 
+- A lock with a reason goes to the control's `isLocked`, which keeps it in
+  the Tab order as `aria-disabled`; `isDisabled` is for a state with nothing
+  to explain (→ `react-component-practices` § Accessible by construction).
+  A `Button` blocked for a reason takes `isAriaDisabled`.
 - `lockReason` is `undefined` or the translated reason the switch can't be
   used, set for every cause other than saving or archiving (not on the plan, the
   plan's limit reached, another setting off), each with its own key: no row is
@@ -618,6 +622,7 @@ of them:
 | ``aria-describedby={`${id}-error`}`` beside `FormField`, or ids threaded past `SettingRow`                       | Nothing at the call site; `Field` links them                                                                                      |
 | `<Alert>` inside a field for its validation error                                                                | `FormField` `error`                                                                                                               |
 | A switch blocked by the plan or a limit with no `lockedReason`                                                   | `isLocked` + a reason for every lock (settings-fields recipe)                                                                     |
+| A plan or limit lock passed to `isDisabled`                                                                      | The control's `isLocked` (`isAriaDisabled` on `Button`), so it stays in the Tab order                                             |
 | Half a fix in a primitive (the colour but not the size)                                                          | Fix every class its rule names, or leave it for its own change                                                                    |
 | `border-admin-line` on a text field, select, track or radio                                                      | `border-admin-control-line`                                                                                                       |
 | `text-admin-faint` on text someone has to read                                                                   | `text-admin-muted`                                                                                                                |
