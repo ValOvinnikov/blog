@@ -1,3 +1,4 @@
+import { CONTAINER_WIDTH } from '@blog/config/constants';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
@@ -30,7 +31,10 @@ export const embedSchema = defineType({
     }),
     ctaButtonsField(),
     ...alignmentFields([], { hasActions: true, alignsItems: true }),
-    layoutField,
+    {
+      ...layoutField,
+      initialValue: { containerWidth: CONTAINER_WIDTH.NARROW },
+    },
   ],
   preview: {
     select: {

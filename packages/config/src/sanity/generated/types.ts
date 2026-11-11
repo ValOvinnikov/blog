@@ -34,6 +34,15 @@ export type Module_embed = {
   layout?: Layout;
 };
 
+export type Layout = {
+  _type: 'layout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
+};
+
 export type Embed = {
   _type: 'embed';
   url?: string;
@@ -394,15 +403,6 @@ export type Module_logoWall = {
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: Layout;
-};
-
-export type Layout = {
-  _type: 'layout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'NARROW' | 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
 };
 
 export type Module_featureHighlights = {
@@ -2637,6 +2637,7 @@ export type Geopoint = {
 
 export type AllSanitySchemaTypes =
   | Module_embed
+  | Layout
   | Embed
   | ModuleHeadingBlock
   | Module_sectionPages
@@ -2663,7 +2664,6 @@ export type AllSanitySchemaTypes =
   | Block_testimonialReference
   | Module_testimonial
   | Module_logoWall
-  | Layout
   | Module_featureHighlights
   | Block_featureReference
   | Module_featureList

@@ -32,7 +32,7 @@ Editors will place a video, a booking calendar or a map on a page as its own sec
 ## Data
 
 - **`embed` object** (`embedObjectSchema`): **URL** (`embedUrlField()`: required, http(s), accepted only when `parseEmbedUrl` accepts it; otherwise "`<host>` can't be embedded. Use a link from YouTube, Vimeo, Loom, Cal.com or Google Maps."), **Title** (localised, required in the default language; the iframe `title` and the placeholder heading), **Caption** (localised, optional; a `<figcaption>`).
-- **`module_embed`**: `title`, `brandVariant`, the required `headingBlock`, `embed` (required), `ctaButtons`, `contentAlignment` (Left/Center) and `layout`. One embed per module.
+- **`module_embed`**: `title`, `brandVariant`, the required `headingBlock`, `embed` (required), `ctaButtons`, `contentAlignment` (Left/Center) and `layout`, whose container width starts at Narrow. One embed per module.
 - The planned post-body block keeps plain-field Title and Caption, because a post is one language per document, and reuses `embedUrlField()`.
 - Planned service view model: `{ title, caption?, provider, embedUrl, ratio }`.
 - Content is Sanity-only; no Neon data. Caching follows the module and post loaders' tags.
@@ -52,7 +52,7 @@ Editors will place a video, a booking calendar or a map on a page as its own sec
 - **Consent first.** An `EmbedFrame` in `apps/web` gates the iframe on External media through a shared `ConsentGate` (`apps/web/src/components/shared/consent-gate/`), which does not exist yet and arrives with the web module step, with `ConsentPlaceholder` as the fallback. Allowing grants the whole category, so every embed on the page loads at once. While consent is unknown it renders a neutral box of the right ratio, and no provider URL appears in the static HTML.
 - **Iframe hardening:** `loading="lazy"`, `referrerpolicy="strict-origin-when-cross-origin"`, `sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"` (plus `allow-forms` for Cal.com), `allow` limited to `fullscreen; encrypted-media` for video. No autoplay.
 - **CSP.** `apps/web`'s policy has no `frame-src`, so `default-src 'self'` blocks every third-party frame today; it must gain exactly the five provider origins.
-- **Width.** Not decided: the epic describes a module `size` (Text width, about 580px, by default, or Wide); the ticket uses `layout.containerWidth` with Narrow as the text measure. The module ships with `layout` and no starting width until the decision lands in #2788. The frame follows the module's alignment. In the post body an embed always takes the column width. Shorts stay a centred frame of about 320px.
+- **Width.** The module's width is `layout.containerWidth`; a new module starts at Narrow (the text measure, about 580px), and an editor can widen it. There is no `size` field. The frame follows the module's alignment.
 - Video structured data, autoplay, playlists and several embeds per module are out of scope.
 
 ## Dependencies
