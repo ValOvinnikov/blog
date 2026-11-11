@@ -31,7 +31,7 @@ export const LookSampleForm = () => {
             placeholder={t('formFieldPlaceholder')}
           />
         </SamplePart>
-        <SamplePart part={SAMPLE_PART.BUTTON}>
+        <SamplePart part={SAMPLE_PART.ACTION_BUTTON}>
           <Button type="button" size={SIZE.SM}>
             {t('subscribeButton')}
           </Button>

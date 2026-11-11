@@ -5,7 +5,7 @@ import { screen } from '@platform/testing/custom-render';
 import {
   followLine,
   followStatusText,
-  stubMeasuredSample,
+  stubMeasuredDesktopSample,
 } from '@platform/testing/look/look-follow';
 import {
   lookRowTrigger,
@@ -35,7 +35,7 @@ describe(`<${LookForm.name}/> follow`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     stubLgUpWindow();
-    restoreMeasuredSample = stubMeasuredSample();
+    restoreMeasuredSample = stubMeasuredDesktopSample();
     setupLookForm();
   });
 

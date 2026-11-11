@@ -6628,7 +6628,7 @@
     ],
     "site-brand": [
       {
-        "ref": "SAMPLE_PART.BRAND",
+        "ref": "SAMPLE_PART.SITE_BRAND",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"
@@ -6684,7 +6684,7 @@
     ],
     "action-button": [
       {
-        "ref": "SAMPLE_PART.BUTTON",
+        "ref": "SAMPLE_PART.ACTION_BUTTON",
         "scope": "app:platform",
         "from": "@platform/constants/sample-part",
         "file": "apps/platform/src/constants/sample-part.ts"

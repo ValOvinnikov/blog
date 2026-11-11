@@ -105,22 +105,31 @@ export const usePartBoxes = (
   const measuredFor = toMeasuredKey(selector, scale);
 
   useEffect(() => {
-    const content = markRef.current?.parentElement;
-    if (!content) return;
+    const mark = markRef.current;
+    const content = mark?.parentElement;
+    if (!mark || !content) return;
     const elements = [...content.querySelectorAll(selector)];
-
-    const observer = new ResizeObserver(() => {
+    const measure = () =>
       setMeasured({
         measuredFor: toMeasuredKey(selector, scale),
         boxes: elements.flatMap(
           (element, index) => toPartBox(content, element, index, scale) ?? [],
         ),
       });
-    });
-    observer.observe(content);
-    elements.forEach((element) => observer.observe(element));
 
-    return () => observer.disconnect();
+    const resize = new ResizeObserver(measure);
+    resize.observe(content);
+    elements.forEach((element) => resize.observe(element));
+
+    const restyle = new MutationObserver((records) => {
+      if (records.some(({ target }) => !mark.contains(target))) measure();
+    });
+    restyle.observe(content, { subtree: true, attributeFilter: ['style'] });
+
+    return () => {
+      resize.disconnect();
+      restyle.disconnect();
+    };
   }, [markRef, selector, scale]);
 
   return measured?.measuredFor === measuredFor ? measured.boxes : [];

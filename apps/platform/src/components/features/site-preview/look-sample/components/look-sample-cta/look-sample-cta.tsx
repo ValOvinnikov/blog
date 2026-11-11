@@ -13,7 +13,7 @@ export const LookSampleCta = () => {
       <CtaModule.Callout tone={BRAND_VARIANT.PRIMARY} heading={t('ctaHeading')}>
         <CtaModule.Text supportingText={t('ctaText')} />
         <CtaModule.Actions>
-          <SamplePart part={SAMPLE_PART.BUTTON}>
+          <SamplePart part={SAMPLE_PART.ACTION_BUTTON}>
             <Button type="button" size={SIZE.SM}>
               {t('subscribeButton')}
             </Button>

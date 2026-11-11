@@ -1,17 +1,16 @@
 import type { TValueOf } from '@blog/config/utils';
 
-// `data-part` attribute values, kept lowercase like the markup they tag.
 export const SAMPLE_PART = {
   HEADER: 'header',
   FOOTER: 'footer',
-  BRAND: 'site-brand',
+  SITE_BRAND: 'site-brand',
   POST_CARD: 'post-card',
   POST_IMAGE: 'post-image',
   FAQ_ITEM: 'faq-item',
   FORM_FIELD: 'form-field',
   QUOTE_CARD: 'quote-card',
   CTA_BOX: 'cta-box',
-  BUTTON: 'action-button',
+  ACTION_BUTTON: 'action-button',
   BUSY_BUTTON: 'busy-button',
 } as const;
 export type TSamplePart = TValueOf<typeof SAMPLE_PART>;

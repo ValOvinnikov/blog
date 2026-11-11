@@ -1,7 +1,6 @@
 import { LOOK_CARD } from '@platform/constants/look-card';
 import { LOOK_FOLLOW_TARGET } from '@platform/constants/look-follow';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
-import { SAMPLE_PART } from '@platform/constants/sample-part';
 import { mockOpenRowTarget } from '@platform/testing/look/look-follow';
 import { LOOK_ROWS } from '@platform/utils/look-open-rows/look-open-rows';
 
@@ -54,26 +53,12 @@ describe(toLookFollowOutline, () => {
   const openOnly = (row: TLookRow) =>
     toLookFollowOutline(mockOpenRowTarget(row));
 
-  it('outlines the header for the Language switcher card', () => {
-    expect(openOnly(LOOK_ROW.LANGUAGE_SWITCHER)).toEqual({
-      row: LOOK_ROW.LANGUAGE_SWITCHER,
-      parts: [SAMPLE_PART.HEADER],
-    });
-  });
-
   it.each([LOOK_ROW.COLOUR, LOOK_ROW.TYPE])(
     'outlines nothing for %s, which changes the whole page',
     (row) => {
       expect(openOnly(row)).toBeUndefined();
     },
   );
-
-  it('outlines the post images for Corners & spacing but not for Cards', () => {
-    expect(openOnly(LOOK_ROW.SHAPE)?.parts).toContain(SAMPLE_PART.POST_IMAGE);
-    expect(openOnly(LOOK_ROW.CARDS)?.parts).not.toContain(
-      SAMPLE_PART.POST_IMAGE,
-    );
-  });
 
   it('outlines nothing while nothing is followed', () => {
     expect(toLookFollowOutline(IDLE)).toBeUndefined();

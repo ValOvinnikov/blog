@@ -4,6 +4,7 @@ import type { TDeviceFrameHandle } from '@platform/components/shared/device-fram
 import { DEVICE_FRAME_SCROLL_TARGET } from '@platform/constants/device-frame';
 import type { TLookRow } from '@platform/constants/look-row';
 import { PREVIEW_FRAME_STATUS_TEST_ID } from '@platform/constants/preview';
+import { SAMPLE_HEADER_BAR_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { screen } from '@platform/testing/custom-render';
 import { stubResizeObserver } from '@platform/testing/resize-observer';
@@ -29,10 +30,17 @@ const MOCK_MEASURED_SIZE = {
   height: MOCK_MEASURED_EDGE,
 };
 
-export const stubMeasuredSample = () => {
+export const stubMeasuredDesktopSample = () => {
   const rectSpy = vi
     .spyOn(Element.prototype, 'getBoundingClientRect')
-    .mockReturnValue(new DOMRect(0, 0, MOCK_MEASURED_EDGE, MOCK_MEASURED_EDGE));
+    .mockImplementation(function (this: Element) {
+      const isHiddenOnDesktop = screen
+        .queryAllByTestId(SAMPLE_HEADER_BAR_TEST_ID)
+        .some((bar) => bar.contains(this));
+      return isHiddenOnDesktop
+        ? new DOMRect()
+        : new DOMRect(0, 0, MOCK_MEASURED_EDGE, MOCK_MEASURED_EDGE);
+    });
   const restoreResizeObserver = stubResizeObserver(() => MOCK_MEASURED_SIZE);
 
   return () => {

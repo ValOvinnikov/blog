@@ -4,6 +4,7 @@ import {
   DENSITY,
   LANGUAGE_SWITCHER_STYLE,
   LOCALE_ISO_CODES,
+  RADIUS_DECLARATIONS,
   RADIUS_SCALE,
 } from '@blog/config';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
@@ -27,12 +28,14 @@ import {
   type TPreviewDevice,
 } from '@platform/constants/preview';
 import { SAMPLE_COOKIE_BUTTON_TEST_ID } from '@platform/constants/sample-footer';
+import { SAMPLE_PART_ATTRIBUTE } from '@platform/constants/sample-part';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_PRESSED } from '@platform/testing/aria';
 import {
   act,
   renderWithIntl,
   screen,
+  waitFor,
   within,
 } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -40,7 +43,7 @@ import { USER_EVENT_KEY } from '@platform/testing/keyboard';
 import {
   followLine,
   mockOpenRowTarget,
-  stubMeasuredSample,
+  stubMeasuredDesktopSample,
 } from '@platform/testing/look/look-follow';
 import { CONSOLE } from '@platform/testing/look/look-form-fixtures';
 import {
@@ -78,6 +81,28 @@ const DESKTOP = tDevicePreview('deviceDesktop');
 const DESKTOP_WIDTH = PREVIEW_DEVICE_WIDTH[PREVIEW_DEVICE.DESKTOP];
 const DARK = messages.previewModeControl.modeDark;
 const LIVE_PREVIEW = messages.previewModeControl.livePreviewHeading;
+const CARD_RADIUS_TOKEN = '--radius-md';
+const XL_CARD_RADIUS = RADIUS_DECLARATIONS[RADIUS_SCALE.XL][CARD_RADIUS_TOKEN];
+
+const stubPartCornersFromTokens = () => {
+  const computedStyle = window.getComputedStyle.bind(window);
+  vi.spyOn(window, 'getComputedStyle').mockImplementation(
+    (element, pseudoElement) => {
+      const tokens = screen
+        .queryAllByTestId(LOOK_SAMPLE_TOKENS_TEST_ID)
+        .find((root) => root.contains(element));
+      if (!tokens || !element.hasAttribute(SAMPLE_PART_ATTRIBUTE)) {
+        return computedStyle(element, pseudoElement);
+      }
+      const radius = tokens.style.getPropertyValue(CARD_RADIUS_TOKEN);
+      return {
+        borderRadius: radius,
+        borderTopLeftRadius: radius,
+        borderBottomRightRadius: radius,
+      } as CSSStyleDeclaration;
+    },
+  );
+};
 
 type TRenderPreviewOptions = {
   values?: Partial<TLookFormValues>;
@@ -90,7 +115,7 @@ type TRenderPreviewOptions = {
 
 const setPreviewDevice = vi.fn();
 
-const renderPreview = ({
+const lookPreview = ({
   values = {},
   previewDevice = PREVIEW_DEVICE.DESKTOP,
   hasReaderAccounts = true,
@@ -129,7 +154,7 @@ const renderPreview = ({
     setPreviewDevice,
   };
 
-  return renderWithIntl(
+  return (
     <LookFormProvider value={lookForm}>
       <LookPreview
         liveLocales={[LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.FR]}
@@ -140,9 +165,12 @@ const renderPreview = ({
         isShown={true}
         isScrollingWithPage={false}
       />
-    </LookFormProvider>,
+    </LookFormProvider>
   );
 };
+
+const renderPreview = (options: TRenderPreviewOptions = {}) =>
+  renderWithIntl(lookPreview(options));
 
 describe(`<${LookPreview.name}/>`, () => {
   let user: UserEvent;
@@ -331,7 +359,7 @@ describe(`<${LookPreview.name}/>`, () => {
         screen.queryAllByTestId(LOOK_FOLLOW_TEST_ID.OUTLINE);
 
       beforeEach(() => {
-        restoreMeasuredSample = stubMeasuredSample();
+        restoreMeasuredSample = stubMeasuredDesktopSample();
       });
 
       afterEach(() => {
@@ -362,6 +390,7 @@ describe(`<${LookPreview.name}/>`, () => {
         { row: LOOK_ROW.CARDS, partCount: 6 },
         { row: LOOK_ROW.SHAPE, partCount: 8 },
         { row: LOOK_ROW.BUTTONS, partCount: 6 },
+        { row: LOOK_ROW.BRAND, partCount: 2 },
       ])(
         'outlines all $partCount sample parts $row changes under one tag',
         ({ row, partCount }) => {
@@ -375,6 +404,26 @@ describe(`<${LookPreview.name}/>`, () => {
           expect(outlines()[0]).toHaveTextContent(cardName);
         },
       );
+
+      it('re-rounds the outlines when the corners change', async () => {
+        stubPartCornersFromTokens();
+        const target = mockOpenRowTarget(LOOK_ROW.SHAPE);
+        const { rerender } = renderPreview({
+          values: { radiusScale: RADIUS_SCALE.MD },
+          followTarget: target,
+        });
+
+        rerender(
+          lookPreview({
+            values: { radiusScale: RADIUS_SCALE.XL },
+            followTarget: target,
+          }),
+        );
+
+        await waitFor(() => {
+          expect(outlines()[0]).toHaveStyle({ borderRadius: XL_CARD_RADIUS });
+        });
+      });
     });
   });
 
