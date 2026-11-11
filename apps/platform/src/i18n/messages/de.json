@@ -812,6 +812,7 @@
     },
     "navLinkStyleLabel": "Navigationslinks",
     "navLinkStyleDescription": "Wie die Links der obersten Menüebene aussehen. Links in der Fußzeile bleiben unverändert.",
+    "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Schlicht",
       "UNDERLINE": "Unterstrichen",

@@ -812,6 +812,7 @@
     },
     "navLinkStyleLabel": "Liens de navigation",
     "navLinkStyleDescription": "L'apparence des liens du menu principal. Les liens du pied de page ne changent pas.",
+    "navLinkStyleGlyphWord": "Lien",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Simple",
       "UNDERLINE": "Souligné",

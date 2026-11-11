@@ -812,6 +812,7 @@
     },
     "navLinkStyleLabel": "Navigatielinks",
     "navLinkStyleDescription": "Hoe de links in het hoofdmenu eruitzien. Links in de voettekst veranderen niet.",
+    "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Kaal",
       "UNDERLINE": "Onderstreept",
