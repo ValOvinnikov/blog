@@ -2,13 +2,18 @@ import { Prose } from '@blog/ui/components/atoms/prose';
 import { Article } from '@blog/ui/components/organisms/article';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
-import { PortableText } from '@web/components/shared/portable-text';
+import {
+  createPostBodyOverride,
+  PortableText,
+} from '@web/components/shared/portable-text';
 import { MOCK_CONTENTS_RAIL_BODY } from '@web/testing/shared/contents-rail/fixtures';
 import { MOCK_FULL_BLEED_IMAGE_DEMO } from '@web/testing/shared/portable-text/fixtures';
+import { MOCK_WIDE_TABLE_DEMO } from '@web/testing/shared/portable-text/wide-table-fixtures';
 
 import { postArticleVariants } from './post-article-variants';
 
 const s = postArticleVariants();
+const postBodyComponents = createPostBodyOverride();
 
 const meta = {
   title: 'Features/Post/PostArticleBody',
@@ -18,7 +23,7 @@ const meta = {
       <Article.Body className={s.body()}>
         <ContentsRailLayout body={body}>
           <Prose className={s.prose()}>
-            <PortableText value={body} />
+            <PortableText value={body} components={postBodyComponents} />
           </Prose>
         </ContentsRailLayout>
       </Article.Body>
@@ -34,4 +39,12 @@ export const FullBleedImage: TStory = {};
 
 export const FullBleedImageWithContentsRail: TStory = {
   args: { body: [...MOCK_CONTENTS_RAIL_BODY, ...MOCK_FULL_BLEED_IMAGE_DEMO] },
+};
+
+export const WideTableAndExpandableSection: TStory = {
+  args: { body: MOCK_WIDE_TABLE_DEMO },
+};
+
+export const WideTableAndExpandableSectionWithContentsRail: TStory = {
+  args: { body: [...MOCK_CONTENTS_RAIL_BODY, ...MOCK_WIDE_TABLE_DEMO] },
 };
