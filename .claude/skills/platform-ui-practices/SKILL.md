@@ -98,15 +98,15 @@ from `useSettingsFormState()`:
 <SettingRow
   label={label}
   description={description}
-  isLocked={lockReason !== undefined}
+  isLocked={!isUndefined(lockReason)}
   lockedReason={lockReason}
 >
   <Switch
     aria={{ label, describedBy: archivedDescribedBy }}
     isChecked={values[field]}
     onCheckedChange={(checked) => handleToggle(field, checked)}
-    isLocked={lockReason !== undefined || isArchived}
-    isDisabled={isPending && lockReason === undefined && !isArchived}
+    isLocked={!isUndefined(lockReason) || isArchived}
+    isDisabled={isPending && isUndefined(lockReason) && !isArchived}
     labels={{ on: t('switchOn'), off: t('switchOff') }}
   />
 </SettingRow>
