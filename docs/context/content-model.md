@@ -36,13 +36,8 @@ any other module; what differs is that a hero arrives through the page's own
 
 ## Module documents
 
-`packages/studio/src/schema-types/modules/`. Sixteen `module_*` types exist.
-**Fifteen are live** — schema, service adaptor and renderer all present. One is
-not, and should not be described as working:
-
-| Type          | State                                                                                                                                                                           |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `module_hero` | Deprecated in-schema ("Superseded by the Blog Hero module"). No page's hero slot offers it, no renderer keys it, and no service loader reads it. Replaced by `module_heroBlog`. |
+`packages/studio/src/schema-types/modules/`. Twenty-three `module_*` types
+exist, and every one is live — schema, service adaptor and renderer all present.
 
 ### What every module carries
 
@@ -606,7 +601,7 @@ immediately after `titleField` in each schema's `fields` array (see
   export** (`{localName}Schema`) — never `export default defineType`.
 - Enum-ish stored values come from `@blog/config` constants — **both key and
   value UPPERCASE** (`LINK_TYPE.INTERNAL === 'INTERNAL'`,
-  `HERO_FIELD_MODE.CUSTOM === 'CUSTOM'`), `as const`; schema `options.list` and
+  `CARD_IMAGE_SHAPE.SQUARE === 'SQUARE'`), `as const`; schema `options.list` and
   migrations use the same constant.
 - Singletons enforced through desk structure; Studio also groups a top-level
   **Modules** section with one browsable list per module type (Heroes, Post

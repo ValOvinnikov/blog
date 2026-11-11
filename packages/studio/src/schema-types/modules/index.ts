@@ -7,7 +7,6 @@ import { ctaSchema } from './cta/cta';
 import { faqSchema } from './faq/faq';
 import { featureHighlightsSchema } from './feature-highlights/feature-highlights';
 import { featureListSchema } from './feature-list/feature-list';
-import { heroSchema } from './hero/hero';
 import { heroBlogSchema } from './hero-blog/hero-blog';
 import { heroProfileSchema } from './hero-profile/hero-profile';
 import { heroStatementSchema } from './hero-statement/hero-statement';
@@ -26,7 +25,6 @@ import { testimonialSchema } from './testimonial/testimonial';
 import { timelineSchema } from './timeline/timeline';
 
 export const modules = [
-  heroSchema,
   heroBlogSchema,
   heroStatementSchema,
   heroProfileSchema,

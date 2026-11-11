@@ -333,9 +333,8 @@ variant-locked sibling, detailed with `module_heroBlog` below), and
 so changing where a link points is a single edit that every consumer picks
 up.
 
-The one shape still holding a destination inline is `inlineLink`, surviving
-solely as `module_hero.secondaryAction`'s type until #2813 retires that
-module.
+The one shape still holding a destination inline is `inlineLink`, registered
+but used by no schema type until #3215 deletes it.
 
 **Body-text links are annotations, not stored hrefs.** `richText`, `proseText`
 and `inlineText` each declare `marks.annotations` explicitly as `linkRef`,
@@ -394,7 +393,7 @@ offers: `layout` (every width, Narrow to Full) for single-column modules,
 `wideLayout` (Wide and Full) for card grids, `heroLayout` (no width — a hero's
 grid manages its own) for heroes, and `ctaLayout` (every width, with width and
 dividers hidden on a Banner) for `module_cta`.
-Every `module_*` except `module_content`, `module_hero` and `module_heroBlog`
+Every `module_*` except `module_content` and `module_heroBlog`
 (`module_team` included), and every page document (home, landing, post,
 post index, topic, tag and the taxonomy index pages), additionally carries a
 `headingBlock` field (`heading` and `supportingText`
@@ -443,7 +442,7 @@ sibling `contentAlignment` (titled Heading Alignment, Left/Center only), and
 the page loaders return it as `headingAlignment`, defaulting to Left.
 
 **`contentAlignment` offers Left and Center unless a copy block sits against
-media.** Every module except `module_content` and `module_hero` carries it,
+media.** Every module except `module_content` carries it,
 titled Content Alignment and starting on Left. `alignmentFields()` defaults
 the option list to `LEFT`/`CENTER`, so every grid, list, column and carousel
 module gets two values without asking. Only the heroes, `module_cta` and
@@ -486,8 +485,6 @@ ignore it: their article header is not a `PageHeading`.
 `module_content` has no `headingBlock` —
 its rich-text `body` supplies any in-content headings, so a separate
 structured heading field would just be a second way to do the same thing.
-`module_hero` has no `headingBlock` either — its heading fields are its
-own dedicated schema, unrelated to this shared shape.
 
 **The hero family.** A hero is any module whose schema `name` starts with
 `module_hero`; membership is that naming convention and nothing else.
@@ -507,14 +504,11 @@ does, so the registry is no longer what a page's `hero` `to:` points at.
 `page_postIndex`,
 `page_tag`, `page_topic`, `page_tagIndex` and `page_topicIndex` accept Blog
 only — a statement hero belongs on a marketing page, not an archive.
-`page_post` has no `hero` field at all. The deprecated `module_hero` is
-named by no page: its schema stays registered in `modules` until #2813
-retires it, but no picker offers it. Narrowing a page is what turns a
+`page_post` has no `hero` field at all. Narrowing a page is what turns a
 surplus entry in its `apps/web` module map from dead code into a
 `type-check` error.
 
-Four kinds are registered. **`module_hero`** is the original, kept until
-#2813 retires it. **`module_heroBlog`** is the featured-post hero: its
+Three kinds are registered. **`module_heroBlog`** is the featured-post hero: its
 copy and primary action derive from a post, its image is an optional
 override falling back to that post's, and publish is blocked when no post
 resolves. It authors no heading or supporting text of its

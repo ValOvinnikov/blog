@@ -123,7 +123,7 @@ shared component, parameterized by each schema's route prefix (`/topics/`,
 `/tags/`, `/blog/`, `/`), rather than four near-duplicate ones.
 
 Every "required slot" above is a **reference to a standalone `module_*`
-document**, exactly as `page_home.hero` already references a `module_hero`.
+document**, exactly as `page_home.hero` already references a hero module.
 Modules remain their own documents; only the way a page points at them changes.
 
 ### Two post-list modules, one per mode
@@ -199,11 +199,11 @@ touched in one place: `scripts/provision-tenant/steps/starter-content.ts`.
 Two stored, category-named values were deliberately left behind and tracked in
 #1835: the `categoryEmpty` voice override (a key inside `site_config`'s
 `voice_overrides` JSONB column, plus a field on the dead Sanity `settings_voice`
-schema) and `HERO_FIELD_MODE.POST_CATEGORY` (stored in `module_hero`
+schema) and the legacy hero's `POST_CATEGORY` field mode (stored in its
 documents). **Both were renamed in #1835** — to `topicEmpty` and `POST_TOPIC`
 respectively — so nothing category-named remains stored.
 
-Only one of them needed a content migration in the end. `module_hero`
+Only one of them needed a content migration in the end. Legacy hero
 documents genuinely carried `'POST_CATEGORY'` and were patched. The
 `categoryEmpty` side needed a Postgres JSONB rekey migration for
 `site_config`, but **no** Sanity migration: `settings_voice` has no read path
@@ -327,7 +327,7 @@ July 2026 "clean datasets" assumption is stale — there is a
 content existed by then.
 
 Production contents: 12 `blog_post`, 15 `blog_tag`, 1 `blog_category`,
-1 `blog_author`, `page_home` + `page_blog`, 1 `module_hero`,
+1 `blog_author`, `page_home` + `page_blog`, 1 legacy hero,
 1 `module_postList`, 4 settings singletons, 15 image assets.
 
 Scripted `sanity/migrate` transforms, following the repo's standard workflow —
@@ -474,12 +474,12 @@ genuinely does not compile.
 1. **A `_type` rename** reds `type-check` in every downstream package until all
    of them land. Epic 1 is therefore a single PR.
 2. **Introducing any new `module_*` type** reds `apps/web`. `MODULE_MAP` is
-   typed `Record<Exclude<TModuleType, 'module_hero'>, …>` and is deliberately
+   typed over `TModuleType` minus the legacy hero and is deliberately
    exhaustive — its own doc comment states that "adding a module type without
    registering it here is a compile error". The moment the cms schema lands and
    typegen widens `TModuleType`, `apps/web` stops compiling. So the cms schema
    PR and the `apps/web` registration PR for a new module must land **together**
-   (epic 5). Note that `module_taxonomyList` follows the `module_hero`
+   (epic 5). Note that `module_taxonomyList` follows the legacy hero's
    precedent — rendered via a dedicated slot, never through `ModuleRenderer` —
    so its registration is an addition to that `Exclude`, not a new `MODULE_MAP`
    entry. Either way the same PR must carry it.
@@ -487,7 +487,7 @@ genuinely does not compile.
    The split moves `module_postList` the **other** way. It is a live
    `MODULE_MAP` key today because pre-split it could sit in `modules[]`; once
    it only ever occupies the required `postList` field it follows the
-   `module_hero` precedent and must be **removed** from `MODULE_MAP` and added
+   legacy hero's precedent and must be **removed** from `MODULE_MAP` and added
    to that `Exclude`. Its replacement in `modules[]`, `module_postLatest`, is
    the new `MODULE_MAP` entry. Both edits land in the same PR as the schema.
 

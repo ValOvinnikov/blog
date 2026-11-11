@@ -113,9 +113,9 @@ delete the old in a separate migration — so get it right at creation.
   token** (`module_postList`, `module_taxonomyList`); a purely authored module
   takes a bare role name (`module_content`, `module_cta`, `module_stats`).
   Never invent a subject prefix for a module that reads no subject.
-- **No family member may hold the bare family name.** `module_hero` is the
-  counter-example, retiring under #2813 because nothing can tell "the original
-  hero" from "any hero".
+- **No family member may hold the bare family name.** A type named
+  `module_hero` could not be told apart from "any hero", since the family is
+  the `module_hero*` prefix.
 
 **`title:` is human-facing: one name, everywhere.** Singular, Title Case,
 plain English word order, no parentheses or abbreviations: `Blog Hero` (not

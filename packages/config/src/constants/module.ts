@@ -12,17 +12,6 @@ export type THeroModuleType = Extract<TModuleType, `module_hero${string}`>;
 export const isHeroModuleType = (type: string): type is THeroModuleType =>
   type.startsWith('module_hero');
 
-export const HERO_FIELD_MODE = {
-  CUSTOM: 'CUSTOM',
-  NONE: 'NONE',
-  POST_TOPIC: 'POST_TOPIC',
-  POST_TITLE: 'POST_TITLE',
-  POST_EXCERPT: 'POST_EXCERPT',
-  POST_IMAGE: 'POST_IMAGE',
-} as const;
-
-export type THeroFieldMode = TValueOf<typeof HERO_FIELD_MODE>;
-
 export const HERO_VARIANT = {
   SPLIT: 'SPLIT',
   STACKED: 'STACKED',
