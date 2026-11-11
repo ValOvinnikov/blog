@@ -8264,9 +8264,9 @@
         "file": "apps/web/src/constants/email-usage.ts"
       }
     ],
-    "email_usage.webhook_site_tag_missing": [
+    "email_usage.webhook_site_tag_invalid": [
       {
-        "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_MISSING",
+        "ref": "EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_INVALID",
         "scope": "app:web",
         "from": "@web/constants/email-usage",
         "file": "apps/web/src/constants/email-usage.ts"

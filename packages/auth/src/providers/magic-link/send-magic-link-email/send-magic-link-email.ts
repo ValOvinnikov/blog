@@ -7,11 +7,13 @@ import { recordSignInSendSafely } from '@blog/auth/providers/magic-link/record-s
 import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveRecipientLocale } from '@blog/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
 import { resolveTenantEmailIdentity } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
+import type { TMaybeUndefined } from '@blog/config';
 import {
   AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
   type TAuthApp,
 } from '@blog/config/constants';
+import type { IMagicLinkSendHandlers } from '@blog/config/types';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
 import {
   buildInviteMagicLinkEmail,
@@ -26,6 +28,9 @@ type TMagicLinkEmailRequest = {
   from: string;
   identifier: string;
   url: string;
+  onSendCountFailed: TMaybeUndefined<
+    IMagicLinkSendHandlers['onSendCountFailed']
+  >;
 };
 
 export async function sendMagicLinkEmail({
@@ -33,6 +38,7 @@ export async function sendMagicLinkEmail({
   from,
   identifier,
   url,
+  onSendCountFailed,
 }: TMagicLinkEmailRequest): Promise<void> {
   const { host } = new URL(url);
   const isSentByPlatform = app === AUTH_APP.PLATFORM;
@@ -93,7 +99,9 @@ export async function sendMagicLinkEmail({
     tags: readerSiteId ? [buildSiteEmailTag(readerSiteId)] : undefined,
   });
 
-  if (readerSiteId) await recordSignInSendSafely(readerSiteId);
+  if (readerSiteId) {
+    await recordSignInSendSafely(readerSiteId, onSendCountFailed);
+  }
 }
 
 async function findPendingInviteTenantsOrNone(

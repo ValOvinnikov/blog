@@ -3,6 +3,7 @@ import type { TLocaleIsoCode, TSortDirection } from '@blog/config/constants';
 export * from './action-result';
 export * from './contrast-result';
 export * from './embed';
+export * from './email-send-count-failure';
 export * from './magic-link-send-refusal';
 export * from './oauth-credentials';
 export * from './outcome';

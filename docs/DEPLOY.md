@@ -299,11 +299,12 @@ Email senders — reader sign-in links and newsletter confirmations go out
 from `apps/web` itself, so the web projects need their own sender keys,
 Production scope like the rest:
 
-| Key                       | `web-dev` / `web-prod` value                     |
-| ------------------------- | ------------------------------------------------ |
-| `RESEND_API_KEY`          | the Resend API key                               |
-| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <sign-in@mail.{your-hosting}>`    |
-| `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>` |
+| Key                       | `web-dev` / `web-prod` value                                  |
+| ------------------------- | ------------------------------------------------------------- |
+| `RESEND_API_KEY`          | the Resend API key                                            |
+| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <sign-in@mail.{your-hosting}>`                 |
+| `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>`              |
+| `RESEND_WEBHOOK_SECRET`   | the signing secret of that project's Resend webhook (step 5a) |
 
 > **Set every `*_FROM_ADDRESS` to an address on a domain verified in
 > Resend.** Unset, each falls back to a `resend.dev` sender, and Resend
@@ -863,6 +864,20 @@ Create **two** (the route `/api/revalidate` already exists):
 | API version | `v2021-03-25` (or later)               | `v2021-03-25` (or later)               |
 | Projection  | `{_type, _id, "slug": slug.current}`   | `{_type, _id, "slug": slug.current}`   |
 | Secret      | `<DEV_REVALIDATE_SECRET>`              | `<PRD_REVALIDATE_SECRET>`              |
+
+### 5a. Resend — delivery-event webhook · Resend → Webhooks → Add webhook
+
+Create one per web project, so each site's delivered, bounced and complained
+mail is counted against it:
+
+| Field    | dev webhook                                              | prod webhook                                             |
+| -------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| Endpoint | `https://<DEV_WEB_URL>/api/email-delivery-events`        | `https://<PRD_WEB_URL>/api/email-delivery-events`        |
+| Events   | `email.delivered` · `email.bounced` · `email.complained` | `email.delivered` · `email.bounced` · `email.complained` |
+
+Copy each webhook's **Signing secret** (`whsec_…`) into its web project's
+`RESEND_WEBHOOK_SECRET`. Until it is set, the route answers 500 and Resend
+retries, so no outcome is recorded.
 
 ### 6. Sanity — CORS origins · API → CORS origins
 

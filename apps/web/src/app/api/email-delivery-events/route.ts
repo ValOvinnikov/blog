@@ -2,7 +2,10 @@ import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { isUndefined } from '@blog/utils/primitives';
 import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
-import { parseDeliveryEvent } from '@web/server/email-usage/parse-delivery-event/parse-delivery-event';
+import {
+  parseDeliveryEvent,
+  toSiteId,
+} from '@web/server/email-usage/parse-delivery-event/parse-delivery-event';
 import { verifyResendWebhook } from '@web/server/email-usage/verify-resend-webhook/verify-resend-webhook';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -32,10 +35,13 @@ export async function POST(request: Request): Promise<NextResponse> {
   const event = parseDeliveryEvent(payload);
   if (isUndefined(event)) return respondEmpty(HTTP_STATUS.OK);
 
-  const { outcome, siteId } = event;
+  const { outcome, siteTag } = event;
+  if (isUndefined(siteTag)) return respondEmpty(HTTP_STATUS.OK);
+
+  const siteId = toSiteId(siteTag);
   if (isUndefined(siteId)) {
-    logger.warn(EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_MISSING, { eventId, outcome });
-    return respondEmpty(HTTP_STATUS.BAD_REQUEST);
+    logger.warn(EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_INVALID, { eventId, outcome });
+    return respondEmpty(HTTP_STATUS.OK);
   }
 
   try {

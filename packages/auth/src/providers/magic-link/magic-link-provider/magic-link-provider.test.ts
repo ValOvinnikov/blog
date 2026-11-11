@@ -117,6 +117,7 @@ const {
   findMagicLinkSendRefusalMock,
   withMinimumDurationMock,
   onSendRefusedMock,
+  onSendCountFailedMock,
   recordEmailSendMock,
 } = vi.hoisted(() => ({
   findPendingInviteByEmailMock: vi.fn(),
@@ -129,6 +130,7 @@ const {
   findMagicLinkSendRefusalMock: vi.fn(),
   withMinimumDurationMock: vi.fn(),
   onSendRefusedMock: vi.fn(),
+  onSendCountFailedMock: vi.fn(),
   recordEmailSendMock: vi.fn(),
 }));
 
@@ -192,8 +194,13 @@ function sentEmail(): TSendEmailInput {
   return email;
 }
 
+const MAGIC_LINK_HANDLERS = {
+  onSendRefused: onSendRefusedMock,
+  onSendCountFailed: onSendCountFailedMock,
+};
+
 const buildPlatformProvider = () =>
-  buildMagicLinkProvider(AUTH_APP.PLATFORM, onSendRefusedMock);
+  buildMagicLinkProvider(AUTH_APP.PLATFORM, MAGIC_LINK_HANDLERS);
 
 const withPendingInvite = (locale: TLocaleIsoCode = LOCALE_ISO_CODES.EN) => {
   findPendingInviteByEmailMock.mockResolvedValue([mockPendingInvite()]);
@@ -215,7 +222,7 @@ describe(buildMagicLinkProvider, () => {
     withMinimumDurationMock.mockImplementation(
       (_minimumMs: number, task: () => Promise<unknown>) => task(),
     );
-    provider = buildMagicLinkProvider(AUTH_APP.SITE, onSendRefusedMock);
+    provider = buildMagicLinkProvider(AUTH_APP.SITE, MAGIC_LINK_HANDLERS);
   });
 
   afterEach(() => {
@@ -442,13 +449,19 @@ describe(buildMagicLinkProvider, () => {
       getSiteConfigMock.mockResolvedValue(MOCK_SITE_CONFIG);
     });
 
-    it('still delivers the link when the count fails', async () => {
-      recordEmailSendMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
+    it("delivers the link and hands a failed count to the app's handler", async () => {
+      const countError = new Error(MOCK_DB_ERROR_MESSAGE);
+      recordEmailSendMock.mockRejectedValue(countError);
 
       await expect(
         sendVerificationRequestFor(provider),
       ).resolves.toBeUndefined();
       expect(sendEmailMock).toHaveBeenCalledOnce();
+      expect(onSendCountFailedMock).toHaveBeenCalledExactlyOnceWith({
+        siteId: MOCK_TENANT_ID,
+        emailType: EMAIL_TYPE.SIGN_IN,
+        error: countError,
+      });
     });
 
     it('neither tags nor counts a platform sign-in', async () => {

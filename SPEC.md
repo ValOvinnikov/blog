@@ -117,8 +117,9 @@ reading, page canvas elevation) are documented in full in
   session strategy). The magic-link provider (`sendVerificationRequest`)
   lives in `@blog/auth`, which builds its email through `@blog/email`'s
   per-template builders and sends through its transport directly —
-  `buildAuthConfig(app, onMagicLinkSendRefused, siteCredentials?)` takes the
-  calling app, a callback that logs a refused magic-link send, and, from
+  `buildAuthConfig(app, { onSendRefused, onSendCountFailed? }, siteCredentials?)`
+  takes the calling app, callbacks that log a refused magic-link send and a
+  failed reader sign-in send count, and, from
   `apps/web` only, the site's own Google and GitHub credentials, and neither
   app carries a send transport of its own. A provider given site credentials
   uses them with the redirect proxy off, so the provider calls back on the

@@ -299,7 +299,7 @@ Free site.
   names no account, so it reveals nothing about whether one exists. Every
   request, refused or sent, takes at least `MAGIC_LINK_RESPONSE_FLOOR_MS`.
 - Each refusal reaches the app through `buildAuthConfig`'s
-  `onMagicLinkSendRefused` handler, which logs one `auth.sign_in_link_refused`
+  `onSendRefused` handler, which logs one `auth.sign_in_link_refused`
   warn line with its `MAGIC_LINK_REFUSAL` reason. A failed check adds only
   the error's name and its Postgres `cause.code`, never a message or detail,
   which can embed a counter key or the address. The line never carries the

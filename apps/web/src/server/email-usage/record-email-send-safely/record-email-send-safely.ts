@@ -1,7 +1,6 @@
 import type { TEmailType } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { EMAIL_USAGE_LOG } from '@web/constants/email-usage';
-import { logger } from '@web/utils/logger/logger';
+import { logEmailSendCountFailure } from '@web/server/email-usage/log-email-send-count-failure/log-email-send-count-failure';
 
 export const recordEmailSendSafely = async (
   siteId: string,
@@ -10,10 +9,6 @@ export const recordEmailSendSafely = async (
   try {
     await queries.emailUsage.recordEmailSend(siteId, emailType);
   } catch (error) {
-    logger.warn(EMAIL_USAGE_LOG.SEND_COUNT_FAILED, {
-      siteId,
-      emailType,
-      error,
-    });
+    logEmailSendCountFailure({ siteId, emailType, error });
   }
 };

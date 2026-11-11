@@ -129,16 +129,23 @@ describe(POST, () => {
     },
   );
 
-  it.each([
-    ['no tags', {}],
-    ['a site tag that is not a site id', { [SITE_EMAIL_TAG_NAME]: 'x' }],
-  ])('refuses and logs an event with %s', async (_case, tags) => {
-    const response = await POST(signedRequest(eventBody(undefined, tags)));
+  it('acknowledges an untagged event without recording or logging it', async () => {
+    const response = await POST(signedRequest(eventBody(undefined, {})));
 
-    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(response.status).toBe(HTTP_STATUS.OK);
     expect(recordEmailDeliveryOutcomeMock).not.toHaveBeenCalled();
-    expect(logger.warn).toHaveBeenCalledWith(
-      EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_MISSING,
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('acknowledges an event whose site tag is not a site id, warning once', async () => {
+    const response = await POST(
+      signedRequest(eventBody(undefined, { [SITE_EMAIL_TAG_NAME]: 'x' })),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(recordEmailDeliveryOutcomeMock).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      EMAIL_USAGE_LOG.WEBHOOK_SITE_TAG_INVALID,
       expect.objectContaining({ eventId: MOCK_EVENT_ID }),
     );
   });

@@ -22,7 +22,7 @@ const deliveryEventSchema = z.object({
 
 export interface IDeliveryEvent {
   outcome: TEmailDeliveryOutcome;
-  siteId: TMaybeUndefined<string>;
+  siteTag: TMaybeUndefined<string>;
 }
 
 export const parseDeliveryEvent = (
@@ -32,10 +32,12 @@ export const parseDeliveryEvent = (
   if (!parsed.success) return undefined;
 
   const { type, data } = parsed.data;
-  const siteTag = data.tags?.[SITE_EMAIL_TAG_NAME];
 
   return {
     outcome: OUTCOME_BY_EVENT_TYPE[type],
-    siteId: z.uuid().safeParse(siteTag).data,
+    siteTag: data.tags?.[SITE_EMAIL_TAG_NAME],
   };
 };
+
+export const toSiteId = (siteTag: string): TMaybeUndefined<string> =>
+  z.uuid().safeParse(siteTag).data;
