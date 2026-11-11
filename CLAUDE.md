@@ -15,14 +15,15 @@ content; a Next.js 16 App Router site renders it; types flow end-to-end.
 ## Layer contracts (do not violate)
 
 ```
-web → ui, service, db, auth, config, utils   service → config, utils (no React)
-platform → db, auth, config, utils, studio   studio → config, utils (typegen source)
-ui → config, utils (no Sanity/fetch)        configs/* → consumed by all
-db → config, utils (no React/Sanity)        auth → db, config, email
-config → utils (OKLCH maths behind the shared contrast guard)
-insight → nothing (base of graph, like utils)
-email → utils (sits low; the apps and auth consume it)
+web → ui, service, db, auth, config, utils, insight, email
+platform → db, auth, config, utils, insight, email, studio
 worker → db, config, utils, insight, email, @sanity/client (imported by nothing)
+service → config, utils (no React)          studio → config, utils (typegen source)
+ui → config, utils (no Sanity/fetch)        configs/* → consumed by all
+db → config, utils (no React/Sanity)        auth → db, config, utils, email
+config → utils (OKLCH maths behind the shared contrast guard)
+email → utils (sits low; the apps and auth consume it)
+insight → nothing (base of graph)           utils → nothing (base of graph)
 graph is acyclic
 ```
 
@@ -53,8 +54,8 @@ graph is acyclic
   `buildAuthConfig(app)`, and each app names its own cookies and reads another
   app's session as no session. See `.claude/agents/auth.md`.
 - `apps/platform` is a separate Next.js app (its own deployment and domain) for
-  the operator/tenant admin panel — it consumes `db`, `auth`, `config`, `utils`
-  and `@blog/studio`, and **never Sanity or `@blog/service` directly**: it
+  the operator/tenant admin panel — it consumes `db`, `auth`, `config`, `utils`,
+  `insight`, `email` and `@blog/studio`, and **never Sanity or `@blog/service` directly**: it
   reaches the Studio only through `@blog/studio`'s mount component, and ESLint
   `no-restricted-imports` bans `sanity`, `next-sanity`, `@sanity/*`, `groqd`
   and `@blog/service` there. It owns its presentational primitives (Text, Card,
