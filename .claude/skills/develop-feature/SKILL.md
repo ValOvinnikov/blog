@@ -79,8 +79,9 @@ approvals, never bundled.
   before writing the plan.
 - Order the steps by dependency and never reverse it:
   `config → studio → typegen → service → ui → web`, and
-  `config → db → auth → platform-app` on the platform side. Drop the layers
-  that don't change.
+  `config → db → auth → platform-app` on the platform side, and
+  `config → db → worker` for provisioning runs. Drop the layers that don't
+  change.
 - Mark the unaffected layers; their agents are not invoked. Note which agent
   owns each step.
 - **Put the split to the user before the first dispatch**, carrying every
@@ -153,13 +154,14 @@ intervening typegen commit). Mechanism: `docs/context/claude-code.md`
 | Components                                                   | `ui`           | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
 | Routes / metadata / feeds                                    | `web`          | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
 | Admin-panel routes, Server Actions, Base UI forms            | `platform-app` | `platform-ui-practices`, `testing-practices`                                        |
+| Provisioning Workflow runs (`apps/worker`)                   | `worker`       | `testing-practices`                                                                 |
 | Structured logging (`createLogger`, log sanitization)        | `insight`      | `testing-practices`                                                                 |
 | Email shell, `escapeHtml`, `sendEmail` transport             | `email`        | `testing-practices`                                                                 |
 
 For any React component, `ui`, `web` and `platform-app` apply
 `react-component-practices` before their layer skill. `studio` may run
 typegen in its worktree to check its schema; the authoritative run is yours,
-in §5. `db`, `auth`, `platform-app`, `insight` and `email` are not steps in
+in §5. `db`, `auth`, `platform-app`, `worker`, `insight` and `email` are not steps in
 the Sanity chain; when each is dispatched is in `CLAUDE.md` "Use the scoped
 agents". Each agent's model is set in its definition file — don't override it
 unless the user asks.
@@ -202,7 +204,9 @@ step 3, and `test-writer` never touches it.
 - Tests run once per layer when implementation is complete, not after each
   file.
 - New routes or metadata: sanity-check `sitemap` and RSS.
-- Land `test-writer`'s commit too before step 5.
+- `test-writer` cannot commit: copy each test file its report lists onto the
+  branch by path, delete the ones it lists for deletion, and commit them
+  before step 5.
 - **The fail-without-the-fix check is yours** — `test-writer` cannot revert
   product code. For each regression test covering a specific fix:
   `git checkout <parent-sha> -- <product file>` (never the test file;
@@ -239,26 +243,11 @@ client-graph, turbo-env and UI-index failures reached CI unseen. There is no
 local `build` either — reproduce a CI build failure only to diagnose it
 (`open-pull-request` Gate 5a).
 
-**A hook or script diff** (`.claude/hooks/**`, `scripts/*.sh`) also runs the
-shellcheck and guard-test steps of `.github/workflows/workflow-security.yml`
-locally before commit — that file is the source of truth if this list drifts:
-
-```
-shellcheck .claude/hooks/*.sh scripts/*.sh
-bash .claude/hooks/read-only-agent-guard.test.sh
-sh .claude/hooks/gate-bypass-guard.test.sh
-sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
-sh .claude/hooks/pre-bash-branch-name-guard.test.sh
-bash .claude/hooks/test-writer-scope-guard.test.sh
-bash .claude/hooks/pre-agent-gate0-guard.test.sh
-bash .claude/hooks/post-edit.test.sh
-bash .claude/hooks/subagent-stop-commit-guard.test.sh
-bash .claude/hooks/layer-scope-guard.test.sh
-bash .claude/hooks/board-keeper-graphql-guard.test.sh
-sh scripts/vercel-ignore-affected.test.sh
-```
-
-Such a diff is not docs-only, so it still gets `reviewer` in step 6.
+**A hook or script diff** (`.claude/hooks/**`, `scripts/*.sh`) also runs,
+locally before commit, the commands of the `Shellcheck .claude/hooks and
+scripts` and `Guard tests` steps in `.github/workflows/workflow-security.yml` — read them from that
+file, the one list CI runs. Such a diff is not docs-only, so it still gets
+`reviewer` in step 6.
 
 Every check passes before step 6. `verify-runner` only reports the failing
 command and trimmed output; diagnose it yourself or route the fix to the
@@ -316,7 +305,8 @@ After the PR merges, dispatch `board-keeper` with `"after merge of #<n>"`
 
 `CLAUDE.md` delivery gate step 8 states the rules — your own dispatch record
 only, lock files, an isolated session exiting first, scratchpads by exact
-path. This section is the procedure and its checks.
+path. This section is when; the procedure and its checks are in
+`worktree-cleanup.md`.
 
 **When:**
 
@@ -327,98 +317,15 @@ path. This section is the procedure and its checks.
   `git worktree remove` does not.
 - **The session's own feature worktree** — from the push (Gate 3), not the
   PR, but keep it until CI is green, since a Gate 5a fix is made there.
+- **Scratchpad transfer buffers (`.claude/scratchpad*/`)** — in the same pass,
+  never before the push.
 
-Nothing else removes them — a `worktree-agent-*` branch is never pushed, so
-the harness never sweeps it — and a subagent cannot remove the worktree it
-stands in.
-
-### First: is this session itself inside a worktree?
-
-If you ran `EnterWorktree` (every background job does), exit it as `CLAUDE.md`
-step 8 says — `ExitWorktree` with `action: "keep"`, because `remove` would
-also delete the branch and the removal below is the checked path. The
-isolation guard that refuses `git -C <other worktree>` and
-`git worktree remove` from inside is a different guard from the lock file; no
-workaround (a wrapper script, a `cd` that hides the target, disabling the
-sandbox) is in bounds.
-
-### The checks
-
-For each worktree on your own list:
-
-```bash
-name=$(basename <worktree>)
-lock=$(git rev-parse --git-common-dir)/worktrees/$name/locked
-[ -f "$lock" ] && echo "OWNED BY: $(cat "$lock")"  # -> skip, not yours
-git fetch origin                                  # stale refs answer the wrong question
-branch=$(git -C <worktree> branch --show-current)
-git -C <worktree> status --porcelain              # must be EMPTY
-git cherry <target> "$branch"                     # must print no '+' lines
-git worktree remove <worktree>                    # never --force
-```
-
-- **Remove only when all three pass** — unlocked, clean, landed.
-- A lock names its owner and pid: another job, or one of your own unfinished
-  subagents. `fatal: cannot remove a locked working tree` is the guard
-  working — skip the path and don't retry it.
-- **Until the PR merges, `<target>` is the `feat/` branch, not
-  `origin/main`** — the work is unmerged, so against `origin/main` everything
-  looks unlanded. Before the push it is your local `<feat-branch>`
-  (layer-agent worktrees only); after the push it is `origin/<feat-branch>`,
-  which also proves the work reached the remote.
-- **Use `git cherry`, not `git rev-list --count`** — rev-list counts SHAs, so
-  a squash- or rebase-merged branch still looks ahead.
-- A dirty `status` is uncommitted work that exists nowhere else: leave the
-  worktree and tell the user what is in it.
-- Removal keeps the branch, which is what makes it safe.
-- A worktree whose root `node_modules` is a real directory, not a symlink
-  (created before #410, or given a private tree for a dependency change),
-  deletes slowly. Remove those one at a time with a generous timeout. An
-  interrupted removal leaves a half-deleted worktree that needs `--force` —
-  the flag's one legitimate use: on a worktree you own and were already
-  removing, never `-f -f` on a locked one.
-- `git worktree prune` is safe (it drops metadata for directories already
-  gone); a loop over `git worktree list` is not.
-- Leftovers from earlier sessions are a separate, explicitly requested
-  cleanup — then the same three checks, one path at a time, still skipping
-  every locked one.
-
-### After the PR merged
-
-The same three checks with `<target>` = `origin/main` — GitHub deletes the
-`feat/` branch on merge, so `origin/<feat-branch>` no longer resolves.
-
-- **A "removing will discard N commits" refusal is usually false.** The
-  `ExitWorktree`/cleanup guard counts against your local `main`, which does
-  not move when a PR merges on GitHub. Don't answer it with
-  `discard_changes: true` on reflex; settle it:
-
-  ```bash
-  git fetch origin
-  git merge-base --is-ancestor <branch> origin/main && echo MERGED || echo NOT-MERGED
-  ```
-
-  `MERGED` → discarding loses nothing. `NOT-MERGED` → the guard is right;
-  keep the worktree and tell the user what is in it.
-
-- **Fix the cause:** once the working tree is clean,
-  `git merge --ff-only origin/main` syncs local `main` and the guard stops
-  firing on merged branches.
-
-### Scratchpad transfer buffers
-
-An agent's `.claude/scratchpad*/` export is a transfer buffer, not a record.
-Once the work is pushed, git holds it — delete the buffer in the same pass.
-
-- **Not before the push.** Until then the export can be the only surviving
-  copy, because idle agent worktrees are torn down with their uncommitted
-  files.
-- **Exact paths from your dispatch record, one at a time — never a
-  wildcard.** A scratchpad has no lock file, so `rm -rf` on another job's
-  buffer succeeds silently. Issue-keyed names are not ownership either: one
-  issue collects variants across sessions (`1786/`, `1786-tests/`).
-- Leftovers from earlier sessions are a separate, explicitly requested
-  cleanup that first confirms no live job is still writing to them.
+**Read `worktree-cleanup.md` (beside this file) before removing anything** —
+the three checks every removal must pass (unlocked, clean, landed), the
+`<target>` to check against before and after the merge, exiting your own
+worktree first, and deleting scratchpads by exact path. Never a wildcard or a
+loop over `git worktree list`, and `--force` only for the interrupted-removal
+case that file describes.
 
 ## 9. Deploy — never yours to run
 
