@@ -1,6 +1,7 @@
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
 import messages from '@platform/i18n/messages/en.json';
 import { updateTenantLanguagesAction } from '@platform/server/tenants/update-tenant-languages-action';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { customRender, screen, waitFor } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
@@ -80,8 +81,8 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         name: languageNames[DE],
       });
 
-      expect(germanSwitch).toBeDisabled();
-      expect(dutchSwitch).toBeEnabled();
+      expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(dutchSwitch).not.toHaveAttribute(ARIA_DISABLED);
     });
 
     it('saves the chosen additional languages', async () => {
@@ -120,7 +121,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
     const germanSwitch = screen.getByRole(SWITCH, { name: languageNames[DE] });
     const reasons = screen.getAllByText(languagesSettings.atLimitLockedReason);
 
-    expect(germanSwitch).toBeDisabled();
+    expect(germanSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     expect(reasons).toHaveLength(2);
   });
 
@@ -148,7 +149,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
 
     expect(upgradeNotice).toBeVisible();
     for (const toggle of toggles) {
-      expect(toggle).toBeDisabled();
+      expect(toggle).toHaveAttribute(ARIA_DISABLED, 'true');
     }
   });
 
@@ -191,8 +192,8 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         languagesSettings.overLimitLockedReason,
       );
 
-      expect(dutchSwitch).toBeDisabled();
-      expect(frenchSwitch).toBeDisabled();
+      expect(dutchSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(frenchSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(reasons).toHaveLength(4);
     });
 
@@ -201,7 +202,7 @@ describe(`<${LanguagesSettings.name}/>`, () => {
         name: languageNames[ES],
       });
 
-      expect(spanishSwitch).toBeDisabled();
+      expect(spanishSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
     });
   });
 

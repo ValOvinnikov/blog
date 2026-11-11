@@ -98,15 +98,15 @@ from `useSettingsFormState()`:
 <SettingRow
   label={label}
   description={description}
-  isLocked={lockReason !== undefined}
+  isLocked={!isUndefined(lockReason)}
   lockedReason={lockReason}
 >
   <Switch
     aria={{ label, describedBy: archivedDescribedBy }}
     isChecked={values[field]}
     onCheckedChange={(checked) => handleToggle(field, checked)}
-    isLocked={lockReason !== undefined}
-    isDisabled={isPending || isArchived}
+    isLocked={!isUndefined(lockReason) || isArchived}
+    isDisabled={isPending && isUndefined(lockReason) && !isArchived}
     labels={{ on: t('switchOn'), off: t('switchOff') }}
   />
 </SettingRow>
@@ -119,7 +119,9 @@ from `useSettingsFormState()`:
 - `lockReason` is `undefined` or the translated reason the switch can't be
   used, set for every cause other than saving or archiving (not on the plan, the
   plan's limit reached, another setting off), each with its own key: no row is
-  blocked without one.
+  blocked without one. An archived site locks every switch too — the archived
+  notice, through `archivedDescribedBy`, is its reason — and native `disabled`
+  is never set alongside a lock, which would drop it from the Tab order.
 
 ### A table
 

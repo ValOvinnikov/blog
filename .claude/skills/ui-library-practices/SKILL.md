@@ -150,9 +150,10 @@ src/components/molecules/media-card/
 
 - **A disabled state picks `aria-disabled` or native `disabled` per
   control** — `react-component-practices` § Accessible by construction.
-  `IconButton`'s `isFocusableWhenDisabled` is the library's form for a lock
-  with a reason, used by `Carousel`'s arrows at either end; `TextInput`,
-  `Button`, `BookmarkToggle` and `Switch` offer only native `disabled` today.
+  `IconButton`'s `isFocusableWhenDisabled` and `Switch`'s `isLocked` are the
+  library's forms for a lock with a reason, used by `Carousel`'s arrows at
+  either end; `TextInput`, `Button` and `BookmarkToggle` offer only native
+  `disabled` today.
 
 ## Using `@blog/config`
 

@@ -1,7 +1,7 @@
 {
   "apps/platform/src/app/api/internal/operator-alert/route.ts": 130,
   "apps/platform/src/components/features/email/email-settings/use-email-draft.ts": 138,
-  "apps/platform/src/components/features/languages/languages-settings/languages-settings.tsx": 191,
+  "apps/platform/src/components/features/languages/languages-settings/languages-settings.tsx": 184,
   "apps/platform/src/components/features/look/look-form/use-look-form-state.ts": 132,
   "apps/platform/src/components/features/tenants/domain-page-content/components/custom-domain-claim-actions/use-verify-custom-domain.ts": 129,
   "apps/platform/src/components/features/voice/voice-settings/use-voice-draft.ts": 153,

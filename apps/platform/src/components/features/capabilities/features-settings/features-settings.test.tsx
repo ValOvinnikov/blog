@@ -5,6 +5,7 @@ import {
   updateFeaturesAction,
   type TUpdateFeaturesResult,
 } from '@platform/server/settings-features/update-features-action';
+import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';
 import {
   customRender,
@@ -273,7 +274,7 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(toggle).not.toBeInTheDocument();
     });
 
-    it('shows an out-of-plan toggle disabled, never hidden', () => {
+    it('shows an out-of-plan toggle locked, never hidden', () => {
       const consentSwitch = screen.getByRole('switch', {
         name: toggleLabel[CAPABILITY.CONSENT_BANNER],
       });
@@ -281,10 +282,19 @@ describe(`<${FeaturesSettings.name}/>`, () => {
         name: CONTACT_FORM_LABEL,
       });
 
-      expect(analyticsSwitch).toBeDisabled();
-      expect(consentSwitch).toBeDisabled();
-      expect(contactFormSwitch).toBeDisabled();
-      expect(bookmarksSwitch).toBeEnabled();
+      expect(analyticsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(consentSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(contactFormSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+      expect(bookmarksSwitch).not.toHaveAttribute(ARIA_DISABLED);
+    });
+
+    it('keeps an out-of-plan toggle focusable but unchangeable', async () => {
+      await user.click(analyticsSwitch);
+      await user.keyboard(' ');
+
+      expect(analyticsSwitch).toHaveFocus();
+      expect(analyticsSwitch).toBeEnabled();
+      expect(analyticsSwitch).not.toBeChecked();
     });
 
     it('badges a locked toggle with the cheapest plan holding it', () => {
@@ -456,8 +466,8 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       name: BOOKMARKS_LABEL,
     });
 
-    expect(readerAccountsSwitch).toBeDisabled();
-    expect(bookmarksSwitch).toBeDisabled();
+    expect(readerAccountsSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
+    expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
   });
 
   describe('for an archived tenant', () => {
@@ -469,12 +479,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expectArchivedOffersNoSave();
     });
 
-    it('disables every capability toggle, including entitled ones', async () => {
+    it('locks every capability toggle, including entitled ones', async () => {
       const bookmarksSwitch = screen.getByRole('switch', {
         name: BOOKMARKS_LABEL,
       });
 
-      expect(bookmarksSwitch).toBeDisabled();
+      expect(bookmarksSwitch).toBeEnabled();
+      expect(bookmarksSwitch).toHaveAttribute(ARIA_DISABLED, 'true');
       expect(bookmarksSwitch).toHaveAccessibleDescription(
         `${ARCHIVED_NOTICE_DESCRIPTION} ${toggleDescription[CAPABILITY.BOOKMARKS]}`,
       );

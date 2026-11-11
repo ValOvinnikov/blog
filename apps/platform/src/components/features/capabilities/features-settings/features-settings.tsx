@@ -38,7 +38,7 @@ export type TFeaturesSettingsProps = {
 };
 
 // A capability outside the plan is shown locked rather than hidden; the Server
-// Action re-checks entitlement, so the disabled switch is only a courtesy.
+// Action re-checks entitlement, so the locked switch is only a courtesy.
 export const FeaturesSettings = ({
   tenantId,
   entitledCapabilities,
@@ -112,8 +112,11 @@ export const FeaturesSettings = ({
                 toggle={toggle}
                 isEntitled={entitledCapabilities.includes(capability)}
                 isChecked={values[field]}
-                isParentOff={!isUndefined(parentField) && !values[parentField]}
-                isFormLocked={isPending || isArchived}
+                isDisabled={
+                  isPending ||
+                  (!isUndefined(parentField) && !values[parentField])
+                }
+                isArchived={isArchived}
                 describedBy={isArchived ? archivedNoticeId : undefined}
                 onCheckedChange={(checked) => handleToggle(field, checked)}
               />
