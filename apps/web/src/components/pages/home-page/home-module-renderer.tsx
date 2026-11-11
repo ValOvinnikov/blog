@@ -11,6 +11,7 @@ import { ContactFormModule } from '@web/modules/contact-form/contact-form-module
 import { ContentModule } from '@web/modules/content/content-module';
 import { CookieSettingsModule } from '@web/modules/cookie-settings/cookie-settings-module';
 import { CtaModule } from '@web/modules/cta/cta-module';
+import { EmbedModule } from '@web/modules/embed/embed-module';
 import { FaqModule } from '@web/modules/faq/faq-module';
 import { FeatureHighlightsModule } from '@web/modules/feature-highlights/feature-highlights-module';
 import { FeatureListModule } from '@web/modules/feature-list/feature-list-module';
@@ -55,6 +56,7 @@ const HOME_MAP: Partial<Record<TPageHomeType, TModuleComponent>> = {
   module_team: TeamModule,
   module_pricing: PricingModule,
   module_timeline: TimelineModule,
+  module_embed: EmbedModule,
 };
 
 export interface IHomeModuleRendererProps {

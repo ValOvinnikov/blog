@@ -22,7 +22,7 @@ import {
   mockTableRow,
 } from '@web/testing/shared/portable-text/fixtures';
 
-import { createAsideOverride } from './config';
+import { createPostBodyOverride } from './config';
 import { PortableText } from './portable-text';
 
 vi.mock('@web/i18n/navigation');
@@ -356,32 +356,32 @@ describe(`<${PortableText.name}/>`, () => {
   });
 
   describe('with a table', () => {
-    it('reads its header row cells as column headers', () => {
-      setup({ value: [mockTableWithHeaderRow()] });
-
-      const columnHeader = screen.getByRole('columnheader', {
-        name: MOCK_COLUMN_HEADING,
+    describe('with a header row', () => {
+      beforeEach(() => {
+        setup({ value: [mockTableWithHeaderRow()] });
       });
-      const cell = screen.getByRole('cell');
-      expect(columnHeader).toBeVisible();
-      expect(cell).toHaveTextContent(MOCK_CELL_TEXT);
-    });
 
-    it('renders formatting and links inside its cells', () => {
-      setup({ value: [mockTableWithHeaderRow()] });
+      it('reads its header row cells as column headers', () => {
+        const columnHeader = screen.getByRole('columnheader', {
+          name: MOCK_COLUMN_HEADING,
+        });
+        const cell = screen.getByRole('cell');
+        expect(columnHeader).toBeVisible();
+        expect(cell).toHaveTextContent(MOCK_CELL_TEXT);
+      });
 
-      const bold = screen.getByText(MOCK_CELL_TEXT, { selector: 'strong' });
-      const link = screen.getByRole('link', { name: MOCK_CELL_LINK_TEXT });
-      expect(bold).toBeVisible();
-      expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
-    });
+      it('renders formatting and links inside its cells', () => {
+        const bold = screen.getByText(MOCK_CELL_TEXT, { selector: 'strong' });
+        const link = screen.getByRole('link', { name: MOCK_CELL_LINK_TEXT });
+        expect(bold).toBeVisible();
+        expect(link).toHaveAttribute('href', MOCK_LINK_HREF);
+      });
 
-    it('names its scroll region with the fixed table label', () => {
-      setup({ value: [mockTableWithHeaderRow()] });
-
-      const region = screen.getByRole('region', { name: TABLE_REGION_NAME });
-      const columnHeader = screen.getByRole('columnheader');
-      expect(region).toContainElement(columnHeader);
+      it('names its scroll region with the fixed table label', () => {
+        const region = screen.getByRole('region', { name: TABLE_REGION_NAME });
+        const columnHeader = screen.getByRole('columnheader');
+        expect(region).toContainElement(columnHeader);
+      });
     });
 
     it('reads every row as data when it has no header rows', () => {
@@ -563,26 +563,33 @@ describe(`<${PortableText.name}/>`, () => {
     });
   });
 
-  it('labels an aside inside an expandable section from the caller override', async () => {
-    const user = userEvent.setup();
-    setup({
-      value: [
-        mockExpandableSectionBlock(MOCK_SECTION_TITLE, [
-          mockAsideBlock(
-            [mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)],
-            ASIDE_KIND.WHY_NOT,
-          ),
-        ]),
-      ],
-      components: createAsideOverride({
-        [ASIDE_KIND.WHY_NOT]: MOCK_SECTION_ASIDE_LABEL,
-      }),
+  describe('with an expandable section and a post body override', () => {
+    let user: UserEvent;
+
+    beforeEach(() => {
+      user = userEvent.setup();
     });
 
-    await user.click(getSectionTrigger());
+    it('labels an aside inside the section from the override', async () => {
+      setup({
+        value: [
+          mockExpandableSectionBlock(MOCK_SECTION_TITLE, [
+            mockAsideBlock(
+              [mockPortableTextBlock(MOCK_ASIDE_BODY_TEXT)],
+              ASIDE_KIND.WHY_NOT,
+            ),
+          ]),
+        ],
+        components: createPostBodyOverride({
+          [ASIDE_KIND.WHY_NOT]: MOCK_SECTION_ASIDE_LABEL,
+        }),
+      });
 
-    const label = screen.getByText(MOCK_SECTION_ASIDE_LABEL);
-    expect(label).toBeVisible();
+      await user.click(getSectionTrigger());
+
+      const label = screen.getByText(MOCK_SECTION_ASIDE_LABEL);
+      expect(label).toBeVisible();
+    });
   });
 
   it('keeps the default strong mark when a caller overrides the code mark', () => {

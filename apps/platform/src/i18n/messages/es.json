@@ -106,7 +106,8 @@
     "back": "Atrás",
     "continue": "Continuar",
     "edit": "Editar",
-    "editField": "Editar {field}"
+    "editField": "Editar {field}",
+    "editorInviteNote": "Recibirás un correo de Sanity, nuestro editor. Acéptalo con la cuenta con la que te registraste."
   },
   "providerSignInButton": {
     "continueWithGithub": "Continuar con GitHub",
@@ -379,6 +380,31 @@
     "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
     "siteSetupStart": "Iniciar configuración",
     "siteSetupStarting": "Iniciando…"
+  },
+  "getStartedCard": {
+    "title": "Primeros pasos",
+    "supportingText": "Cuatro pasos para un sitio que sea tuyo",
+    "doneCount": "{done} de {total} hechos",
+    "liveTitle": "Tu sitio está en línea",
+    "copyAddress": "Copiar dirección",
+    "openSite": "Abrir sitio",
+    "stepDone": "{step}: hecho",
+    "stepNotDone": "{step}: pendiente",
+    "stepTitle": {
+      "LOOK": "Elige un aspecto",
+      "VOICE": "Define tu voz",
+      "EDITOR_INVITE": "Acepta la invitación al editor",
+      "FIRST_POST": "Escribe tu primera entrada"
+    },
+    "lookDescription": "Colores, fuentes y tu logotipo",
+    "voiceDescription": "Los textos que usa tu sitio",
+    "editorInviteDescription": "Te la enviamos desde Sanity, nuestro editor. Acéptala con la cuenta con la que te registraste.",
+    "firstPostLocked": "Se abre cuando aceptes la invitación al editor",
+    "firstPostActivating": "Se abre cuando tu acceso al editor esté listo, normalmente en un minuto",
+    "firstPostReady": "Tu editor está listo",
+    "openLook": "Abrir Aspecto",
+    "openVoice": "Abrir Voz",
+    "openStudio": "Abrir Studio"
   },
   "provisioningBanner": {
     "readyTitle": "Aprovisionado",

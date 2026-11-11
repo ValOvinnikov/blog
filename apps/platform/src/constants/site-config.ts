@@ -10,6 +10,7 @@ export const SITE_CONFIG_LOG = {
   REVALIDATE_ERROR: 'site_config.revalidate_error',
   REVALIDATE_FAILED: 'site_config.revalidate_failed',
   REVALIDATE_SKIPPED: 'site_config.revalidate_skipped',
+  SAVED_AT_STAMP_FAILED: 'site_config.saved_at_stamp_failed',
   SVG_SANITIZE_FAILED: 'site_config.svg_sanitize_failed',
   VOICE_AUDIT_FAILED: 'site_config.voice_audit_failed',
   VOICE_SAVE_FAILED: 'site_config.voice_save_failed',

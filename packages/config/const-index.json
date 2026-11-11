@@ -4174,6 +4174,12 @@
         "file": "packages/db/src/constants/site-config-saved-at.ts"
       },
       {
+        "ref": "GET_STARTED_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      },
+      {
         "ref": "ONBOARDING_STEP.LOOK",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -4192,6 +4198,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/site-config-saved-at.ts"
+      },
+      {
+        "ref": "GET_STARTED_STEP.VOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
       },
       {
         "ref": "SETTINGS_FORM_STACK.VOICE",
@@ -5936,6 +5948,22 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "EDITOR_INVITE": [
+      {
+        "ref": "GET_STARTED_STEP.EDITOR_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      }
+    ],
+    "FIRST_POST": [
+      {
+        "ref": "GET_STARTED_STEP.FIRST_POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      }
+    ],
     "GITHUB_ERROR": [
       {
         "ref": "GITHUB_FAILURE.GITHUB_ERROR",
@@ -7422,6 +7450,14 @@
         "file": "apps/platform/src/constants/site-config.ts"
       }
     ],
+    "site_config.saved_at_stamp_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
     "site_config.svg_sanitize_failed": [
       {
         "ref": "SITE_CONFIG_LOG.SVG_SANITIZE_FAILED",
@@ -8322,6 +8358,14 @@
         "file": "apps/web/src/constants/cookie-statement.ts"
       }
     ],
+    "cta_module.fetch_failed": [
+      {
+        "ref": "CTA_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/cta",
+        "file": "apps/web/src/constants/cta.ts"
+      }
+    ],
     "svix-id": [
       {
         "ref": "RESEND_WEBHOOK_HEADER.ID",
@@ -8424,6 +8468,14 @@
         "scope": "app:web",
         "from": "@web/constants/email-usage",
         "file": "apps/web/src/constants/email-usage.ts"
+      }
+    ],
+    "embed_module.fetch_failed": [
+      {
+        "ref": "EMBED_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/embed",
+        "file": "apps/web/src/constants/embed.ts"
       }
     ],
     "faq_module.fetch_failed": [

@@ -10,7 +10,10 @@ const scriptSrc = isDev
 
 export const FRAME_ANCESTORS_NONE = "'none'";
 
-export const buildContentSecurityPolicy = (frameAncestors: string): string =>
+export const buildContentSecurityPolicy = (
+  frameAncestors: string,
+  frameSources: readonly string[],
+): string =>
   [
     "default-src 'self'",
     // Google has served profile photos from several lhN.googleusercontent.com subdomains, hence the wildcard.
@@ -20,6 +23,7 @@ export const buildContentSecurityPolicy = (frameAncestors: string): string =>
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
     `connect-src 'self' https://cdn.sanity.io ${VERCEL_SPEED_INSIGHTS_ORIGIN}`,
+    `frame-src ${frameSources.join(' ')}`,
     `frame-ancestors ${frameAncestors}`,
     "base-uri 'self'",
     "form-action 'self'",

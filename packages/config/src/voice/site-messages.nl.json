@@ -333,6 +333,10 @@
         "description": "Inhoud van externe aanbieders, zoals video's en kaarten, die mogelijk hun eigen cookies plaatsen."
       }
     },
+    "placeholder": {
+      "allowLabel": "Externe media toestaan",
+      "scopeNote": "Geldt voor elke video, kaart en boekingswidget op deze site."
+    },
     "footerSettingsLabel": "Cookie-instellingen"
   },
   "cookieList": {

@@ -493,6 +493,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_2`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`
 
+### `@platform/constants/get-started` — `apps/platform/src/constants/get-started.ts`
+
+- **GET_STARTED_STEP**: `LOOK`, `VOICE`, `EDITOR_INVITE`, `FIRST_POST`
+
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`
@@ -665,7 +669,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/site-config` — `apps/platform/src/constants/site-config.ts`
 
-- **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
+- **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SAVED_AT_STAMP_FAILED`=`"site_config.saved_at_stamp_failed"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
 
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 
@@ -741,11 +745,19 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **COOKIE_STATEMENT_LOG**: `PAGE_FETCH_FAILED`=`"cookie_statement_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"cookie_statement_metadata.fetch_failed"`
 
+### `@web/constants/cta` — `apps/web/src/constants/cta.ts`
+
+- **CTA_LOG**: `MODULE_FETCH_FAILED`=`"cta_module.fetch_failed"`
+
 ### `@web/constants/email-usage` — `apps/web/src/constants/email-usage.ts`
 
 - **RESEND_WEBHOOK_HEADER**: `ID`=`"svix-id"`, `TIMESTAMP`=`"svix-timestamp"`, `SIGNATURE`=`"svix-signature"`
 - **RESEND_DELIVERY_EVENT_TYPE**: `DELIVERED`=`"email.delivered"`, `BOUNCED`=`"email.bounced"`, `COMPLAINED`=`"email.complained"`
 - **EMAIL_USAGE_LOG**: `WEBHOOK_SECRET_MISSING`=`"email_usage.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"email_usage.webhook_signature_invalid"`, `WEBHOOK_EVENT_MALFORMED`=`"email_usage.webhook_event_malformed"`, `WEBHOOK_SITE_UNKNOWN`=`"email_usage.webhook_site_unknown"`, `WEBHOOK_SITE_TAG_INVALID`=`"email_usage.webhook_site_tag_invalid"`, `DELIVERY_OUTCOME_RECORD_FAILED`=`"email_usage.delivery_outcome_record_failed"`, `SEND_COUNT_FAILED`=`"email_usage.send_count_failed"`
+
+### `@web/constants/embed` — `apps/web/src/constants/embed.ts`
+
+- **EMBED_LOG**: `MODULE_FETCH_FAILED`=`"embed_module.fetch_failed"`
 
 ### `@web/constants/faq` — `apps/web/src/constants/faq.ts`
 

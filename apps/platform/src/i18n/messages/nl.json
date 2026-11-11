@@ -106,7 +106,8 @@
     "back": "Terug",
     "continue": "Doorgaan",
     "edit": "Bewerken",
-    "editField": "{field} bewerken"
+    "editField": "{field} bewerken",
+    "editorInviteNote": "Je krijgt één e-mail van Sanity, onze editor. Accepteer die met het account waarmee je je hebt aangemeld."
   },
   "providerSignInButton": {
     "continueWithGithub": "Doorgaan met GitHub",
@@ -379,6 +380,31 @@
     "siteSetupNotStartedContactDescription": "We konden het inrichten van je site niet starten. Vraag je platformcontactpersoon het te starten.",
     "siteSetupStart": "Inrichten starten",
     "siteSetupStarting": "Wordt gestart…"
+  },
+  "getStartedCard": {
+    "title": "Aan de slag",
+    "supportingText": "Vier stappen naar een site die helemaal van jou is",
+    "doneCount": "{done} van {total} klaar",
+    "liveTitle": "Je site is live",
+    "copyAddress": "Adres kopiëren",
+    "openSite": "Site openen",
+    "stepDone": "{step}: klaar",
+    "stepNotDone": "{step}: nog niet klaar",
+    "stepTitle": {
+      "LOOK": "Kies een uiterlijk",
+      "VOICE": "Stel je toon in",
+      "EDITOR_INVITE": "Accepteer je editor-uitnodiging",
+      "FIRST_POST": "Schrijf je eerste bericht"
+    },
+    "lookDescription": "Kleuren, lettertypen en je logo",
+    "voiceDescription": "De teksten die je site gebruikt",
+    "editorInviteDescription": "We hebben hem gemaild vanuit Sanity, onze editor. Accepteer hem met het account waarmee je je hebt aangemeld.",
+    "firstPostLocked": "Beschikbaar zodra je editor-uitnodiging is geaccepteerd",
+    "firstPostActivating": "Beschikbaar zodra je editortoegang is ingesteld, meestal binnen een minuut",
+    "firstPostReady": "Je editor is klaar",
+    "openLook": "Uiterlijk openen",
+    "openVoice": "Toon openen",
+    "openStudio": "Studio openen"
   },
   "provisioningBanner": {
     "readyTitle": "Ingericht",
