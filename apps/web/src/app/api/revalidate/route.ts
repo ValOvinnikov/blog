@@ -11,6 +11,7 @@ import { loadTenantSanityCredentials } from '@web/server/revalidate/load-tenant-
 import { purgeRevalidatedCache } from '@web/server/revalidate/purge-revalidated-cache/purge-revalidated-cache';
 import { removeDeletedPostBookmarks } from '@web/server/revalidate/remove-deleted-post-bookmarks/remove-deleted-post-bookmarks';
 import { resolveWebhookTenant } from '@web/server/revalidate/resolve-webhook-tenant/resolve-webhook-tenant';
+import { stampFirstPostPublished } from '@web/server/revalidate/stamp-first-post-published/stamp-first-post-published';
 import { verifyRevalidateSignature } from '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -111,12 +112,14 @@ export async function POST(request: Request): Promise<NextResponse> {
     tenantId,
     tenant: tenantSanity,
   });
+  const operation = request.headers.get(SANITY_OPERATION_HEADER);
   const bookmarksRemoved = await removeDeletedPostBookmarks({
-    operation: request.headers.get(SANITY_OPERATION_HEADER),
+    operation,
     type,
     id,
     tenantId,
   });
+  await stampFirstPostPublished({ operation, type, id, tenantId });
 
   return NextResponse.json(
     { revalidated, pathPurged, type, id, bookmarksRemoved },

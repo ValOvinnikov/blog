@@ -1,17 +1,20 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
   REVALIDATE_LOG,
+  SANITY_WEBHOOK_OPERATION,
   SIGNATURE_REFUSED_REASON,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
   UNSUPPORTED_TYPE_REASON,
 } from '@web/constants/revalidate';
 import type * as DeriveRevalidatePathsModule from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
+import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -39,6 +42,7 @@ const {
   deriveRevalidatePathsMock,
   resolveReferencingModuleTagsMock,
   recordTenantActivityMock,
+  stampFirstPostPublishedMock,
   envMock,
 } = vi.hoisted(() => ({
   verifyRevalidateSignatureMock: vi.fn(),
@@ -50,6 +54,7 @@ const {
   deriveRevalidatePathsMock: vi.fn(),
   resolveReferencingModuleTagsMock: vi.fn(),
   recordTenantActivityMock: vi.fn(),
+  stampFirstPostPublishedMock: vi.fn(),
   envMock: {} as { SANITY_REVALIDATE_SECRET?: string },
 }));
 
@@ -99,13 +104,16 @@ vi.mock(
   }),
 );
 
-const POST_DOCUMENT_TYPE = 'page_post';
+vi.mock(
+  '@web/server/revalidate/stamp-first-post-published/stamp-first-post-published',
+  () => ({
+    stampFirstPostPublished: stampFirstPostPublishedMock,
+  }),
+);
+
 const TOPIC_DOCUMENT_TYPE = 'page_topic';
 const AUTHOR_DOCUMENT_TYPE = 'person';
 const UNTAGGED_DOCUMENT_TYPE = 'settings_voice';
-const DELETE_OPERATION = 'delete';
-const UPDATE_OPERATION = 'update';
-const CREATE_OPERATION = 'create';
 const WHOLE_SITE_PURGE_ARGS = ['/', 'layout'];
 const EXPIRE_NOW = { expire: 0 };
 
@@ -128,7 +136,7 @@ const MOCK_TENANT_POST_PATH = `${MOCK_TENANT_HOME_PATH}/${faker.lorem.slug()}`;
 const MOCK_HERO_MODULE_TAG = `module:${faker.string.uuid()}`;
 const MOCK_CTA_MODULE_TAG = `module:${faker.string.uuid()}`;
 
-const POST_TAGS = getRevalidateTagsForType(POST_DOCUMENT_TYPE, MOCK_POST_ID);
+const POST_TAGS = getRevalidateTagsForType(POST_TYPE, MOCK_POST_ID);
 const TOPIC_TAGS = getRevalidateTagsForType(TOPIC_DOCUMENT_TYPE, MOCK_TOPIC_ID);
 
 const withTenantScope = (tags: string[]): string[] => [
@@ -145,7 +153,7 @@ const makeRequest = (
   extraHeaders?: Record<string, string>,
 ): Request => {
   const headers = new Headers(extraHeaders);
-  if (signature !== undefined) {
+  if (!isUndefined(signature)) {
     headers.set(SIGNATURE_HEADER_NAME, signature);
   }
   return new Request(MOCK_REVALIDATE_URL, {
@@ -165,10 +173,7 @@ const makeTenantRequest = (
   });
 
 const makePostRequest = (extraHeaders?: Record<string, string>): Request =>
-  makeTenantRequest(
-    { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID },
-    extraHeaders,
-  );
+  makeTenantRequest({ _type: POST_TYPE, _id: MOCK_POST_ID }, extraHeaders);
 
 describe(POST, () => {
   beforeEach(() => {
@@ -196,26 +201,38 @@ describe(POST, () => {
     vi.useRealTimers();
   });
 
-  it('revalidates the post tags and purges the whole site for a post webhook', async () => {
-    const request = makeRequest(
-      { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID },
-      MOCK_SIGNATURE,
-    );
-    const response = await POST(request);
-    const json = await response.json();
+  describe('without a resolved tenant', () => {
+    let response: Response;
 
-    expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(json).toEqual({
-      revalidated: POST_TAGS,
-      pathPurged: true,
-      type: POST_DOCUMENT_TYPE,
-      id: MOCK_POST_ID,
-      bookmarksRemoved: 0,
+    beforeEach(async () => {
+      response = await POST(
+        makeRequest({ _type: POST_TYPE, _id: MOCK_POST_ID }, MOCK_SIGNATURE),
+      );
     });
-    expect(revalidateTagMock.mock.calls).toEqual(
-      POST_TAGS.map((tag) => [tag, EXPIRE_NOW]),
-    );
-    expect(revalidatePathMock.mock.calls).toEqual([WHOLE_SITE_PURGE_ARGS]);
+
+    it('revalidates the post tags and purges the whole site for a post webhook', async () => {
+      const json = await response.json();
+
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(json).toEqual({
+        revalidated: POST_TAGS,
+        pathPurged: true,
+        type: POST_TYPE,
+        id: MOCK_POST_ID,
+        bookmarksRemoved: 0,
+      });
+      expect(revalidateTagMock.mock.calls).toEqual(
+        POST_TAGS.map((tag) => [tag, EXPIRE_NOW]),
+      );
+      expect(revalidatePathMock.mock.calls).toEqual([WHOLE_SITE_PURGE_ARGS]);
+    });
+
+    it('revalidates without recording activity', () => {
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(getTenantByIdMock).not.toHaveBeenCalled();
+      expect(recordTenantActivityMock).not.toHaveBeenCalled();
+      expect(purgedTags()).toEqual(POST_TAGS);
+    });
   });
 
   it('revalidates the bare and tenant-scoped tags when sanity-project-id is present', async () => {
@@ -226,7 +243,7 @@ describe(POST, () => {
   });
 
   it('verifies the raw body and signature against the project id and shared secret', async () => {
-    const body = { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID };
+    const body = { _type: POST_TYPE, _id: MOCK_POST_ID };
     const request = makeTenantRequest(body);
     await POST(request);
 
@@ -239,47 +256,52 @@ describe(POST, () => {
     });
   });
 
-  it("records the publishing tenant's activity", async () => {
-    verifyRevalidateSignatureMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
-
-    const request = makePostRequest();
-    const response = await POST(request);
-
-    expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(recordTenantActivityMock).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_NOW,
-    );
-  });
-
-  it('revalidates without recording activity when no tenant resolves', async () => {
-    const request = makeRequest(
-      { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID },
-      MOCK_SIGNATURE,
-    );
-    const response = await POST(request);
-
-    expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(getTenantByIdMock).not.toHaveBeenCalled();
-    expect(recordTenantActivityMock).not.toHaveBeenCalled();
-    expect(purgedTags()).toEqual(POST_TAGS);
-  });
-
-  it('ignores the event and revalidates nothing when the tenant is archived', async () => {
-    verifyRevalidateSignatureMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
-    getTenantByIdMock.mockResolvedValue(undefined);
-
-    const request = makePostRequest();
-    const response = await POST(request);
-
-    expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(logger.warn).toHaveBeenCalledWith(REVALIDATE_LOG.TENANT_ARCHIVED, {
-      tenantProjectId: MOCK_TENANT_PROJECT_ID,
-      tenantId: MOCK_TENANT_ID,
+  describe('with a resolved tenant', () => {
+    beforeEach(() => {
+      verifyRevalidateSignatureMock.mockResolvedValue(okResult(MOCK_TENANT_ID));
     });
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).not.toHaveBeenCalled();
-    expect(recordTenantActivityMock).not.toHaveBeenCalled();
+
+    it("records the publishing tenant's activity", async () => {
+      const request = makePostRequest();
+      const response = await POST(request);
+
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(recordTenantActivityMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_NOW,
+      );
+    });
+
+    it("hands the webhook's operation, document and tenant to the first-post stamp", async () => {
+      await POST(
+        makePostRequest({
+          [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.CREATE,
+        }),
+      );
+
+      expect(stampFirstPostPublishedMock).toHaveBeenCalledWith({
+        operation: SANITY_WEBHOOK_OPERATION.CREATE,
+        type: POST_TYPE,
+        id: MOCK_POST_ID,
+        tenantId: MOCK_TENANT_ID,
+      });
+    });
+
+    it('ignores the event and revalidates nothing when the tenant is archived', async () => {
+      getTenantByIdMock.mockResolvedValue(undefined);
+
+      const request = makePostRequest();
+      const response = await POST(request);
+
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(logger.warn).toHaveBeenCalledWith(REVALIDATE_LOG.TENANT_ARCHIVED, {
+        tenantProjectId: MOCK_TENANT_PROJECT_ID,
+        tenantId: MOCK_TENANT_ID,
+      });
+      expect(revalidateTagMock).not.toHaveBeenCalled();
+      expect(revalidatePathMock).not.toHaveBeenCalled();
+      expect(recordTenantActivityMock).not.toHaveBeenCalled();
+    });
   });
 
   it.each([
@@ -374,7 +396,7 @@ describe(POST, () => {
     delete envMock.SANITY_REVALIDATE_SECRET;
 
     const request = makeRequest(
-      { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID },
+      { _type: POST_TYPE, _id: MOCK_POST_ID },
       MOCK_SIGNATURE,
     );
     const response = await POST(request);
@@ -393,7 +415,7 @@ describe(POST, () => {
       removeBookmarksForPostMock.mockResolvedValue(3);
 
       const request = makePostRequest({
-        [SANITY_OPERATION_HEADER]: DELETE_OPERATION,
+        [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.DELETE,
       });
       const response = await POST(request);
       const json = await response.json();
@@ -409,21 +431,21 @@ describe(POST, () => {
     it.each([
       {
         case: 'an update to a post',
-        type: POST_DOCUMENT_TYPE,
+        type: POST_TYPE,
         id: MOCK_POST_ID,
-        operation: UPDATE_OPERATION,
+        operation: SANITY_WEBHOOK_OPERATION.UPDATE,
       },
       {
         case: 'a create of a post',
-        type: POST_DOCUMENT_TYPE,
+        type: POST_TYPE,
         id: MOCK_POST_ID,
-        operation: CREATE_OPERATION,
+        operation: SANITY_WEBHOOK_OPERATION.CREATE,
       },
       {
         case: 'a deleted document that is not a post',
         type: AUTHOR_DOCUMENT_TYPE,
         id: MOCK_AUTHOR_ID,
-        operation: DELETE_OPERATION,
+        operation: SANITY_WEBHOOK_OPERATION.DELETE,
       },
     ])(
       'does not clean up bookmarks for $case',
@@ -444,11 +466,11 @@ describe(POST, () => {
       verifyRevalidateSignatureMock.mockResolvedValue(okResult(undefined));
 
       const request = makeRequest(
-        { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID },
+        { _type: POST_TYPE, _id: MOCK_POST_ID },
         MOCK_SIGNATURE,
         {
           [SANITY_PROJECT_ID_HEADER]: MOCK_UNKNOWN_PROJECT_ID,
-          [SANITY_OPERATION_HEADER]: DELETE_OPERATION,
+          [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.DELETE,
         },
       );
       const response = await POST(request);
@@ -463,7 +485,7 @@ describe(POST, () => {
       removeBookmarksForPostMock.mockRejectedValue(MOCK_ERROR);
 
       const request = makePostRequest({
-        [SANITY_OPERATION_HEADER]: DELETE_OPERATION,
+        [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.DELETE,
       });
       const response = await POST(request);
       const json = await response.json();
@@ -472,13 +494,13 @@ describe(POST, () => {
       expect(json).toEqual({
         revalidated: withTenantScope(POST_TAGS),
         pathPurged: true,
-        type: POST_DOCUMENT_TYPE,
+        type: POST_TYPE,
         id: MOCK_POST_ID,
         bookmarksRemoved: 0,
       });
       expect(logger.error).toHaveBeenCalledWith(
         REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED,
-        { type: POST_DOCUMENT_TYPE, id: MOCK_POST_ID, error: MOCK_ERROR },
+        { type: POST_TYPE, id: MOCK_POST_ID, error: MOCK_ERROR },
       );
     });
   });
@@ -516,7 +538,7 @@ describe(POST, () => {
         },
         event: REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_MISSING,
         context: {
-          type: POST_DOCUMENT_TYPE,
+          type: POST_TYPE,
           id: MOCK_POST_ID,
           tenantId: MOCK_TENANT_ID,
         },
@@ -528,7 +550,7 @@ describe(POST, () => {
         },
         event: REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_FETCH_THREW,
         context: {
-          type: POST_DOCUMENT_TYPE,
+          type: POST_TYPE,
           id: MOCK_POST_ID,
           tenantId: MOCK_TENANT_ID,
           error: MOCK_ERROR,
@@ -548,7 +570,7 @@ describe(POST, () => {
         expect(logger.warn).toHaveBeenCalledWith(
           REVALIDATE_LOG.PATH_PURGE_FALLBACK,
           {
-            type: POST_DOCUMENT_TYPE,
+            type: POST_TYPE,
             id: MOCK_POST_ID,
             tenantId: MOCK_TENANT_ID,
             reason: FETCH_FAILED_REASON,
@@ -571,7 +593,7 @@ describe(POST, () => {
       expect(logger.warn).toHaveBeenCalledWith(
         REVALIDATE_LOG.PATH_PURGE_FALLBACK,
         {
-          type: POST_DOCUMENT_TYPE,
+          type: POST_TYPE,
           id: MOCK_POST_ID,
           tenantId: MOCK_TENANT_ID,
           reason: DOCUMENT_NOT_FOUND_REASON,
@@ -584,7 +606,7 @@ describe(POST, () => {
       verifyRevalidateSignatureMock.mockResolvedValue(okResult(undefined));
 
       const request = makeRequest(
-        { _type: POST_DOCUMENT_TYPE, _id: MOCK_POST_ID },
+        { _type: POST_TYPE, _id: MOCK_POST_ID },
         MOCK_SIGNATURE,
       );
       await POST(request);
@@ -592,7 +614,7 @@ describe(POST, () => {
       expect(logger.warn).toHaveBeenCalledWith(
         REVALIDATE_LOG.PATH_PURGE_FALLBACK,
         {
-          type: POST_DOCUMENT_TYPE,
+          type: POST_TYPE,
           id: MOCK_POST_ID,
           tenantId: undefined,
           reason: TENANT_UNRESOLVED_REASON,
@@ -601,35 +623,36 @@ describe(POST, () => {
       expect(revalidatePathMock).toHaveBeenCalledWith(...WHOLE_SITE_PURGE_ARGS);
     });
 
-    it('falls back to the whole-site purge and logs for a type it cannot derive', async () => {
-      const request = makeTenantRequest({
-        _type: AUTHOR_DOCUMENT_TYPE,
-        _id: MOCK_AUTHOR_ID,
+    describe('for a type it cannot derive', () => {
+      beforeEach(async () => {
+        await POST(
+          makeTenantRequest({
+            _type: AUTHOR_DOCUMENT_TYPE,
+            _id: MOCK_AUTHOR_ID,
+          }),
+        );
       });
-      await POST(request);
 
-      expect(logger.warn).toHaveBeenCalledWith(
-        REVALIDATE_LOG.PATH_PURGE_FALLBACK,
-        {
-          type: AUTHOR_DOCUMENT_TYPE,
-          id: MOCK_AUTHOR_ID,
-          tenantId: MOCK_TENANT_ID,
-          reason: UNSUPPORTED_TYPE_REASON,
-        },
-      );
-      expect(revalidatePathMock).toHaveBeenCalledWith(...WHOLE_SITE_PURGE_ARGS);
-    });
-
-    it('still resolves tenant credentials for a type it cannot derive', async () => {
-      const request = makeTenantRequest({
-        _type: AUTHOR_DOCUMENT_TYPE,
-        _id: MOCK_AUTHOR_ID,
+      it('falls back to the whole-site purge and logs', () => {
+        expect(logger.warn).toHaveBeenCalledWith(
+          REVALIDATE_LOG.PATH_PURGE_FALLBACK,
+          {
+            type: AUTHOR_DOCUMENT_TYPE,
+            id: MOCK_AUTHOR_ID,
+            tenantId: MOCK_TENANT_ID,
+            reason: UNSUPPORTED_TYPE_REASON,
+          },
+        );
+        expect(revalidatePathMock).toHaveBeenCalledWith(
+          ...WHOLE_SITE_PURGE_ARGS,
+        );
       });
-      await POST(request);
 
-      expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-      );
+      it('still resolves tenant credentials', () => {
+        expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith(
+          MOCK_TENANT_ID,
+        );
+      });
     });
   });
 
@@ -666,29 +689,25 @@ describe(POST, () => {
       );
     });
 
-    it('hands the published document and tenant context to the module lookup', async () => {
-      const request = makeTenantRequest({
-        _type: TOPIC_DOCUMENT_TYPE,
-        _id: MOCK_TOPIC_ID,
+    describe('when the lookup resolves nothing', () => {
+      beforeEach(async () => {
+        await POST(
+          makeTenantRequest({ _type: TOPIC_DOCUMENT_TYPE, _id: MOCK_TOPIC_ID }),
+        );
       });
-      await POST(request);
 
-      expect(resolveReferencingModuleTagsMock).toHaveBeenCalledWith({
-        type: TOPIC_DOCUMENT_TYPE,
-        id: MOCK_TOPIC_ID,
-        tenantId: MOCK_TENANT_ID,
-        tenant: MOCK_TENANT_SANITY_CONTEXT,
+      it('hands the published document and tenant context to the module lookup', () => {
+        expect(resolveReferencingModuleTagsMock).toHaveBeenCalledWith({
+          type: TOPIC_DOCUMENT_TYPE,
+          id: MOCK_TOPIC_ID,
+          tenantId: MOCK_TENANT_ID,
+          tenant: MOCK_TENANT_SANITY_CONTEXT,
+        });
       });
-    });
 
-    it("still purges the document's own tags when the lookup resolves nothing", async () => {
-      const request = makeTenantRequest({
-        _type: TOPIC_DOCUMENT_TYPE,
-        _id: MOCK_TOPIC_ID,
+      it("still purges the document's own tags", () => {
+        expect(purgedTags()).toEqual(withTenantScope(TOPIC_TAGS));
       });
-      await POST(request);
-
-      expect(purgedTags()).toEqual(withTenantScope(TOPIC_TAGS));
     });
 
     it('never runs the module lookup for a type that purges no tags of its own', async () => {

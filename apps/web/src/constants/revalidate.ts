@@ -18,6 +18,7 @@ export const REVALIDATE_LOG = {
   TOPIC_PARAMS_LOOKUP_FAILED: 'revalidate.topic_params_lookup_failed',
   TOPIC_PAGINATION_LOOKUP_FAILED: 'revalidate.topic_pagination_lookup_failed',
   BOOKMARK_CLEANUP_FAILED: 'revalidate.bookmark_cleanup_failed',
+  FIRST_POST_STAMP_FAILED: 'revalidate.first_post_stamp_failed',
 } as const;
 
 export const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
@@ -33,3 +34,11 @@ export const TENANT_UNRESOLVED_REASON = 'tenant_unresolved';
 export const REVALIDATE_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;
 
 export const SIGNATURE_REFUSED_REASON = 'signature_refused';
+
+export const STARTER_DOCUMENT_ID_PREFIX = 'starter.';
+
+export const SANITY_WEBHOOK_OPERATION = {
+  CREATE: 'create',
+  UPDATE: 'update',
+  DELETE: 'delete',
+} as const;

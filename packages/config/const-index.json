@@ -3234,6 +3234,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/sanity-document-action.ts"
+      },
+      {
+        "ref": "SANITY_WEBHOOK_OPERATION.DELETE",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
       }
     ],
     "ALREADY_GONE": [
@@ -8429,6 +8435,30 @@
     "revalidate.bookmark_cleanup_failed": [
       {
         "ref": "REVALIDATE_LOG.BOOKMARK_CLEANUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.first_post_stamp_failed": [
+      {
+        "ref": "REVALIDATE_LOG.FIRST_POST_STAMP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "create": [
+      {
+        "ref": "SANITY_WEBHOOK_OPERATION.CREATE",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "update": [
+      {
+        "ref": "SANITY_WEBHOOK_OPERATION.UPDATE",
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
