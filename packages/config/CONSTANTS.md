@@ -731,6 +731,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **COOKIE_STATEMENT_LOG**: `PAGE_FETCH_FAILED`=`"cookie_statement_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"cookie_statement_metadata.fetch_failed"`
 
+### `@web/constants/embed` — `apps/web/src/constants/embed.ts`
+
+- **EMBED_LOG**: `MODULE_FETCH_FAILED`=`"embed_module.fetch_failed"`
+
 ### `@web/constants/faq` — `apps/web/src/constants/faq.ts`
 
 - **FAQ_LOG**: `MODULE_FETCH_FAILED`=`"faq_module.fetch_failed"`

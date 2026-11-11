@@ -1,3 +1,5 @@
+// The constants barrel pulls in aliased runtime imports Next's config transpiler cannot resolve, so import the one file.
+import { EMBED_ORIGIN } from '@blog/config/constants/embed';
 import { createNextConfig } from '@blog/next-config/preset';
 import { withBotId } from 'botid/next/config';
 
@@ -20,6 +22,7 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "font-src 'self'",
   `connect-src 'self' https://cdn.sanity.io ${VERCEL_SPEED_INSIGHTS_ORIGIN}`,
+  `frame-src ${Object.values(EMBED_ORIGIN).join(' ')}`,
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",

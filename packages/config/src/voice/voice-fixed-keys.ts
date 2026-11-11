@@ -1,9 +1,12 @@
+import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
+
 /**
  * Every `site-messages.en.json` key that stays fixed rather than
  * tenant-editable; the coverage test fails on a catalog key that is on
  * neither this list nor `VOICE_FIELDS`.
  */
 export const VOICE_FIXED_KEYS = [
+  ...CONSENT_VOICE_FIXED_KEYS,
   'breadcrumbs.ariaLabel',
   'localeErrorPage.announcement',
   'siteUnavailable.heading',
@@ -15,7 +18,6 @@ export const VOICE_FIXED_KEYS = [
   'languageSwitcher.ariaLabel',
   'languageSwitcher.menuAriaLabel',
   'brandLockupLink.ariaLabel',
-  'consent.preferences.closeLabel',
   'socialLinks.linkAriaLabel',
   'socialLinks.listAriaLabel',
   'topicChipList.ariaLabel',
@@ -222,20 +224,6 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.identity.displayNameDescription',
   'accountPage.identity.saveButton',
   'accountPage.identity.savingLabel',
-  'consent.banner.heading',
-  'consent.banner.message',
-  'consent.banner.acceptLabel',
-  'consent.banner.rejectLabel',
-  'consent.banner.settingsLabel',
-  'consent.banner.policyLinkLabel',
-  'consent.preferences.heading',
-  'consent.preferences.saveLabel',
-  'consent.preferences.savedStatus',
-  'consent.categories.necessary.label',
-  'consent.categories.necessary.description',
-  'consent.categories.externalMedia.label',
-  'consent.categories.externalMedia.description',
-  'consent.footerSettingsLabel',
   'cookieList.ariaLabel',
   'cookieList.intro',
   'cookieList.columns.name',

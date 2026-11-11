@@ -333,6 +333,10 @@
         "description": "Contenido de proveedores externos, como vídeos y mapas, que pueden establecer sus propias cookies."
       }
     },
+    "placeholder": {
+      "allowLabel": "Permitir medios externos",
+      "scopeNote": "Se aplica a cada vídeo, mapa y widget de reservas de este sitio."
+    },
     "footerSettingsLabel": "Configuración de cookies"
   },
   "cookieList": {

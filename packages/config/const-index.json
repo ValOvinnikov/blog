@@ -8200,6 +8200,14 @@
         "file": "apps/web/src/constants/cookie-statement.ts"
       }
     ],
+    "embed_module.fetch_failed": [
+      {
+        "ref": "EMBED_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/embed",
+        "file": "apps/web/src/constants/embed.ts"
+      }
+    ],
     "faq_module.fetch_failed": [
       {
         "ref": "FAQ_LOG.MODULE_FETCH_FAILED",

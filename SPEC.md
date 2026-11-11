@@ -1907,7 +1907,13 @@ costs convenience, never compliance.
   value from `apps/web`'s `constants/consent.ts`. `ConsentPreferencesProvider`,
   mounted for every tenant through the locale layout's client providers, holds
   only the preferences dialog's open state (`isOpen`, `open`, `close`) and the
-  footer link and floating button it returns focus to.
+  footer link and floating button it returns focus to. Gated content renders
+  through `ConsentGate` (`components/shared/consent-gate/`): its `pending`
+  node while the status is `UNKNOWN`, so the server render never holds the
+  gated element, its `fallback` while unanswered or denied, and its children
+  once granted. The CSP's `frame-src` lists exactly the embed providers'
+  origins, read from `@blog/config`'s `EMBED_ORIGIN`, which the embed URL
+  parser also builds from.
 - _Banner._ Shown only when the tenant's `CONSENT_BANNER` capability is
   enabled and the status is `UNANSWERED`: a non-modal card with equal-weight
   Accept all / Reject all and a Settings action.
