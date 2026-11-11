@@ -1,14 +1,15 @@
 import { RADIUS_SCALE, type TRadiusScale } from '@blog/config/constants';
 
+import { RADIUS_NONE } from './radius-tokens';
 import type { TThemeDeclarations } from './theme-declarations';
 
 export const RADIUS_DECLARATIONS: Record<TRadiusScale, TThemeDeclarations> = {
   [RADIUS_SCALE.NONE]: {
-    '--radius-sm': '0',
-    '--radius': '0',
-    '--radius-md': '0',
-    '--radius-lg': '0',
-    '--radius-xl': '0',
+    '--radius-sm': RADIUS_NONE,
+    '--radius': RADIUS_NONE,
+    '--radius-md': RADIUS_NONE,
+    '--radius-lg': RADIUS_NONE,
+    '--radius-xl': RADIUS_NONE,
   },
   [RADIUS_SCALE.SM]: {
     '--radius-sm': '2px',
