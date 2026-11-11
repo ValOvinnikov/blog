@@ -386,6 +386,8 @@
   --item-accent-width: 2px;
   --item-accent-color: var(--brand-primary);
   --item-shadow: none;
+  --item-fill-mix: 0%;
+  --item-divider-width: 0px;
 
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
@@ -591,6 +593,7 @@
   --ambient: var(--secondary);
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
+  --item-fill: var(--brand-primary-muted);
 }
 
 /* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
@@ -605,6 +608,7 @@
     var(--brand-primary) 10%
   );
   --media-fill: var(--tint);
+  --item-fill: var(--tint);
 }
 
 @utility surface-tint {
@@ -629,25 +633,32 @@
   --divider: var(--border);
 }
 
-/* Unsets a band's mixed --tint, so menu rows tint with --brand-primary-muted on
-   the panel's own --surface wherever the menu opens. */
+/* Unsets a band's mixed --tint and --item-fill, so menu rows and tiles tint with
+   --brand-primary-muted on the panel's own --surface wherever the menu opens. */
 @utility surface-popover {
   --ambient: var(--surface);
   --divider: var(--border);
   --tint: initial;
+  --item-fill: initial;
 }
 
 /* The accent bar is drawn over the left border's straight run, between the
    corners, so it stays a straight bar on a rounded card; where it matches the
    border (Outlined) it is invisible. It is a border, not a background, because
-   forced colours repaint backgrounds with the page colour but keep borders. */
+   forced colours repaint backgrounds with the page colour but keep borders.
+   Bands own --item-fill and card styles set only --item-fill-mix: a var() in a
+   custom property resolves where declared, so a :root fill would ignore bands. */
 @utility item-card {
   position: relative;
   border-style: solid;
   border-color: var(--border);
   border-width: var(--item-border-width);
   border-radius: var(--radius-item);
-  background-color: var(--surface);
+  background-color: color-mix(
+    in oklch,
+    var(--surface),
+    var(--item-fill, var(--brand-primary-muted)) var(--item-fill-mix)
+  );
   box-shadow: var(--item-shadow);
 
   &::after {

@@ -2,18 +2,16 @@ import { isUndefined } from '@blog/utils/primitives';
 
 import {
   BUTTON_SHAPE,
-  CARD_STYLE,
   DENSITY,
   HEADER_CONTROL_STYLE,
   RADIUS_SCALE,
   type TButtonShape,
-  type TCardStyle,
   type TDensity,
   type THeaderControlStyle,
   type TRadiusScale,
 } from '@blog/config/constants';
 
-import { RADIUS_MD, RADIUS_PILL } from './radius-tokens';
+import { RADIUS_PILL } from './radius-tokens';
 
 export type TThemeDeclarations = Record<`--${string}`, string>;
 
@@ -117,23 +115,6 @@ export const DENSITY_DECLARATIONS: Record<TDensity, TThemeDeclarations> = {
 };
 
 const BORDER_COLOR = 'var(--border)';
-
-export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
-  [CARD_STYLE.ACCENT_BAR]: {
-    '--item-radius': RADIUS_MD,
-    '--item-border-width': '0px',
-    '--item-accent-width': '2px',
-    '--item-accent-color': 'var(--brand-primary)',
-    '--item-shadow': 'none',
-  },
-  [CARD_STYLE.OUTLINED]: {
-    '--item-radius': RADIUS_MD,
-    '--item-border-width': '1px',
-    '--item-accent-width': '1px',
-    '--item-accent-color': BORDER_COLOR,
-    '--item-shadow': 'none',
-  },
-};
 
 export const HEADER_CONTROL_STYLE_DECLARATIONS: Record<
   THeaderControlStyle,

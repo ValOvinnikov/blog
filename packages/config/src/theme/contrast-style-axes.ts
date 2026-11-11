@@ -6,11 +6,11 @@ import {
   NAV_LINK_STYLE,
 } from '@blog/config/constants';
 
+import { CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';
 import type { TContrastStyles } from './contrast-tokens';
 import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
 import {
-  CARD_STYLE_DECLARATIONS,
   HEADER_CONTROL_STYLE_DECLARATIONS,
   type TThemeDeclarations,
 } from './theme-declarations';
