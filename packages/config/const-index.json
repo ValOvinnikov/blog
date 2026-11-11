@@ -358,6 +358,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/tenant-sort.ts"
+      },
+      {
+        "ref": "MEMBERSHIP_INVITE_OUTCOME.CREATED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
       }
     ],
     "DEPROVISION_REQUESTED": [
@@ -3734,6 +3740,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
+      },
+      {
+        "ref": "MEMBERSHIP_INVITE_OUTCOME.ALREADY_PENDING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
       }
     ],
     "ALREADY_CONFIRMED": [
@@ -4031,6 +4043,22 @@
     "READER": [
       {
         "ref": "MEMBERSHIP_ROLE.READER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "ALREADY_CONSUMED": [
+      {
+        "ref": "MEMBERSHIP_INVITE_OUTCOME.ALREADY_CONSUMED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "SEAT_LIMIT": [
+      {
+        "ref": "MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/membership.ts"

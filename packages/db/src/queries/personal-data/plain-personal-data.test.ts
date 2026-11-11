@@ -17,6 +17,7 @@ import {
   MOCK_USER_EMAIL,
   MOCK_USER_NAME,
 } from '@blog/db/testing/fixtures';
+import { inviteOf } from '@blog/db/testing/membership-invites/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
@@ -76,10 +77,12 @@ describe('plain personal data', () => {
   it('is never written to a user by a write path that takes an email or name', async () => {
     const { id: tenantId } = await insertTestTenant(db());
     const { id: userId } = await insertTestReader(db(), MOCK_USER_EMAIL);
-    const { invite } = await createMembershipInvite(
-      tenantId,
-      MOCK_INVITE_EMAIL,
-      MEMBERSHIP_ROLE.OWNER,
+    const invite = inviteOf(
+      await createMembershipInvite(
+        tenantId,
+        MOCK_INVITE_EMAIL,
+        MEMBERSHIP_ROLE.OWNER,
+      ),
     );
 
     await updateDisplayName(userId, MOCK_USER_NAME);
