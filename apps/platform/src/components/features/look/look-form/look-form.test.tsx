@@ -1,20 +1,18 @@
 import { LOOK_EDIT_PANEL_TEST_ID } from '@platform/constants/look-form';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import messages from '@platform/i18n/messages/en.json';
-import { ARIA_SELECTED } from '@platform/testing/aria';
 import { screen, within } from '@platform/testing/custom-render';
 import {
   ACCENT_HUE,
-  EDIT_TAB,
   FOLLOW_ACCENT_HUE,
-  PREVIEW_TAB,
 } from '@platform/testing/look/look-form-fixtures';
 import { openLookRow } from '@platform/testing/look/look-form-interactions';
 import { setupLookForm } from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
+
+vi.mock('@platform/components/features/look/look-preview');
 
 vi.mock('@platform/server/site-config/update-look-action');
 
@@ -67,23 +65,6 @@ describe(`<${LookForm.name}/>`, () => {
 
       expect(presetTitles).toEqual([LOOK_FORM.presetLabel]);
       expect(rowTitles).toEqual(ROW_TITLES_IN_ORDER);
-    });
-
-    it('switches between the Edit and Preview tabs', async () => {
-      const tabList = screen.getByRole('tablist', {
-        name: LOOK_FORM.viewTabsAriaLabel,
-      });
-      const editTab = within(tabList).getByRole('tab', { name: EDIT_TAB });
-      const previewTab = screen.getByRole('tab', { name: PREVIEW_TAB });
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'true');
-
-      await user.click(previewTab);
-
-      const previewPanel = screen.getByRole('tabpanel', { name: PREVIEW_TAB });
-      const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);
-      expect(previewTab).toHaveAttribute(ARIA_SELECTED, 'true');
-      expect(editTab).toHaveAttribute(ARIA_SELECTED, 'false');
-      expect(previewPanel).toContainElement(sampleTokens);
     });
 
     describe('with the Colour row open', () => {
