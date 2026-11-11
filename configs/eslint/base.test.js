@@ -49,3 +49,20 @@ test('a reasoned no-node-access disable still suppresses a chained walk', () => 
     "import { screen } from '@testing-library/react';\n\n// eslint-disable-next-line testing-library/no-node-access -- structural claim\nconst id = screen.getByText('a').parentElement.id;\n";
   assert.ok(!ruleIdsFor(code).includes(NODE_ACCESS_RULE));
 });
+
+const REPEATED_OPENING =
+  "it('a', () => { vi.useFakeTimers(); });\nit('b', () => { vi.useFakeTimers(); });\n";
+const BEFORE_EACH_RULE = 'blog-test/prefer-before-each';
+
+test('cases opening with the same statement fail lint on a touched file', () => {
+  assert.ok(ruleIdsFor(REPEATED_OPENING).includes(BEFORE_EACH_RULE));
+});
+
+test('cases opening with the same statement pass lint on an untouched file', async () => {
+  process.env.BLOG_LINT_TOUCHED = '0';
+  const { default: untouchedConfig } = await import('./base.js?untouched');
+  const ruleIds = linter
+    .verify(REPEATED_OPENING, untouchedConfig, { filename: TEST_FILE })
+    .map(({ ruleId }) => ruleId);
+  assert.ok(!ruleIds.includes(BEFORE_EACH_RULE));
+});
