@@ -12,6 +12,8 @@ import {
   IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
+  NAV_LINK_STYLE,
+  NAV_LINK_STYLE_DECLARATIONS,
   RADIUS_DECLARATIONS,
   type TThemeDeclarations,
   type TThemeTokens,
@@ -36,6 +38,7 @@ export const buildThemeStyleBlock = ({
   cardStyle = CARD_STYLE.ACCENT_BAR,
   headerControlStyle = HEADER_CONTROL_STYLE.OUTLINED,
   buttonShape = BUTTON_SHAPE.ROUNDED,
+  navLinkStyle = NAV_LINK_STYLE.PLAIN,
 }: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
@@ -49,6 +52,7 @@ export const buildThemeStyleBlock = ({
       ...DENSITY_DECLARATIONS[density],
       ...CARD_STYLE_DECLARATIONS[cardStyle],
       ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
+      ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
     })}
 }
 .dark {

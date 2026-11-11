@@ -95,6 +95,7 @@ export async function upsertSiteConfig(
       headerLayout: presetBundle.headerLayout,
       headerSubmenuStyle: presetBundle.headerSubmenuStyle,
       headerBarStyle: presetBundle.headerBarStyle,
+      navLinkStyle: presetBundle.navLinkStyle,
       footerLayout: presetBundle.footerLayout,
       footerBackground: presetBundle.footerBackground,
       footerSurface: presetBundle.footerSurface,

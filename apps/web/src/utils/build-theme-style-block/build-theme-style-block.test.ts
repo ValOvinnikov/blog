@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
 import {
+  type TThemeDeclarations,
   type TThemeTokens,
   BUTTON_SHAPE,
   BUTTON_SHAPE_DECLARATIONS,
@@ -11,6 +12,8 @@ import {
   DENSITY_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
+  NAV_LINK_STYLE,
+  NAV_LINK_STYLE_DECLARATIONS,
   PRESET_ID,
   PRESET_REGISTRY,
   RADIUS_SCALE,
@@ -75,6 +78,7 @@ const DARK_EXCLUDED_PREFIXES = [
   '--spacing-',
   '--item-',
   '--header-control-',
+  '--nav-link-',
   '--scrim-',
   '--on-image',
 ];
@@ -83,6 +87,49 @@ const splitModes = (css: string) => ({
   root: css.slice(0, css.indexOf(DARK_SELECTOR)),
   dark: css.slice(css.indexOf(DARK_SELECTOR)),
 });
+
+const STYLE_AXES: {
+  field: keyof TThemeTokens;
+  defaultValue: string;
+  declarations: Record<string, TThemeDeclarations>;
+}[] = [
+  {
+    field: 'cardStyle',
+    defaultValue: CARD_STYLE.ACCENT_BAR,
+    declarations: CARD_STYLE_DECLARATIONS,
+  },
+  {
+    field: 'headerControlStyle',
+    defaultValue: HEADER_CONTROL_STYLE.OUTLINED,
+    declarations: HEADER_CONTROL_STYLE_DECLARATIONS,
+  },
+  {
+    field: 'buttonShape',
+    defaultValue: BUTTON_SHAPE.ROUNDED,
+    declarations: BUTTON_SHAPE_DECLARATIONS,
+  },
+  {
+    field: 'navLinkStyle',
+    defaultValue: NAV_LINK_STYLE.PLAIN,
+    declarations: NAV_LINK_STYLE_DECLARATIONS,
+  },
+];
+
+const STYLE_VALUES = STYLE_AXES.flatMap(({ field, declarations }) =>
+  Object.entries(declarations).map(([value, valueDeclarations]) => ({
+    field,
+    value,
+    declarations: valueDeclarations,
+  })),
+);
+
+const missingDeclarations = (
+  css: string,
+  declarations: TThemeDeclarations,
+): string[] =>
+  Object.entries(declarations)
+    .map(([property, value]) => `${property}: ${value};`)
+    .filter((declaration) => !css.includes(declaration));
 
 const readPixels = (css: string, token: string): number =>
   Number(css.match(new RegExp(`${token}: (\\d+)px;`))?.[1]);
@@ -135,6 +182,12 @@ describe(buildThemeStyleBlock, () => {
         group: 'header control tokens',
         source: THEME_ROOT_BLOCK,
         names: 'header-control-[\\w-]+',
+        scope: 'root' as const,
+      },
+      {
+        group: 'navigation link tokens',
+        source: THEME_ROOT_BLOCK,
+        names: 'nav-link-[\\w-]+',
         scope: 'root' as const,
       },
     ])('reproduces the $group', ({ source, names, scope }) => {
@@ -217,80 +270,27 @@ describe(buildThemeStyleBlock, () => {
     expect(css).not.toContain('--scrim-neutral');
   });
 
-  it('defaults to the accent-bar card style', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const accentBarCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      cardStyle: CARD_STYLE.ACCENT_BAR,
-    });
+  it.each(STYLE_AXES)(
+    'defaults $field to $defaultValue',
+    ({ field, defaultValue }) => {
+      const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
+      const explicitCss = buildThemeStyleBlock({
+        ...CONSOLE_TOKENS,
+        [field]: defaultValue,
+      });
 
-    expect(defaultCss).toBe(accentBarCss);
-  });
-
-  it.each(Object.values(CARD_STYLE))(
-    'writes the %s card declarations into :root',
-    (cardStyle) => {
-      const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, cardStyle }),
-      );
-
-      const missing = Object.entries(CARD_STYLE_DECLARATIONS[cardStyle])
-        .map(([property, value]) => `${property}: ${value};`)
-        .filter((declaration) => !root.includes(declaration));
-
-      expect(missing).toEqual([]);
+      expect(defaultCss).toBe(explicitCss);
     },
   );
 
-  it('defaults to the outlined header control style', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const outlinedCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
-    });
-
-    expect(defaultCss).toBe(outlinedCss);
-  });
-
-  it.each(Object.values(HEADER_CONTROL_STYLE))(
-    'writes the %s header control declarations into :root',
-    (headerControlStyle) => {
+  it.each(STYLE_VALUES)(
+    'writes $field $value into the :root block',
+    ({ field, value, declarations }) => {
       const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, headerControlStyle }),
+        buildThemeStyleBlock({ ...CONSOLE_TOKENS, [field]: value }),
       );
 
-      const missing = Object.entries(
-        HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
-      )
-        .map(([property, value]) => `${property}: ${value};`)
-        .filter((declaration) => !root.includes(declaration));
-
-      expect(missing).toEqual([]);
-    },
-  );
-
-  it('defaults to the rounded button shape', () => {
-    const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-    const roundedCss = buildThemeStyleBlock({
-      ...CONSOLE_TOKENS,
-      buttonShape: BUTTON_SHAPE.ROUNDED,
-    });
-
-    expect(defaultCss).toBe(roundedCss);
-  });
-
-  it.each(Object.values(BUTTON_SHAPE))(
-    'writes the %s button shape into the :root block that sets the radius scale',
-    (buttonShape) => {
-      const { root } = splitModes(
-        buildThemeStyleBlock({ ...CONSOLE_TOKENS, buttonShape }),
-      );
-
-      const missing = Object.entries(BUTTON_SHAPE_DECLARATIONS[buttonShape])
-        .map(([property, value]) => `${property}: ${value};`)
-        .filter((declaration) => !root.includes(declaration));
-
-      expect(missing).toEqual([]);
+      expect(missingDeclarations(root, declarations)).toEqual([]);
     },
   );
 

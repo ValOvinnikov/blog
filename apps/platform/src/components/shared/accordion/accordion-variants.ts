@@ -4,6 +4,7 @@ import {
   focusRingClasses,
   insetFocusRingClasses,
 } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const accordionVariants = tv({
@@ -13,7 +14,8 @@ export const accordionVariants = tv({
     header: ['m-0'],
     trigger: [
       'group/accordion-trigger flex w-full cursor-pointer items-center text-left',
-      'transition-colors duration-base ease-smooth hover:bg-admin-surface-2',
+      COLOUR_TRANSITION_CLASSES,
+      'hover:bg-admin-surface-2',
     ],
     chevron: [
       'shrink-0 text-admin-muted',

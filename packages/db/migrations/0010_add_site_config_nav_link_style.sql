@@ -1,0 +1,2 @@
+CREATE TYPE "public"."nav_link_style" AS ENUM('PLAIN', 'UNDERLINE', 'SOFT', 'PILL');--> statement-breakpoint
+ALTER TABLE "site_config" ADD COLUMN "nav_link_style" "nav_link_style" DEFAULT 'PLAIN' NOT NULL;

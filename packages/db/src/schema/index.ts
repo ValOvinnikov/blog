@@ -13,6 +13,7 @@ export * from './membership-invites';
 export * from './memberships';
 export * from './settings-features';
 export * from './site-config';
+export * from './site-config-enums';
 export * from './subscribers';
 export * from './tenant-domains';
 export * from './tenant-oauth-credentials';

@@ -30,6 +30,7 @@ export const popoverMenuItemVariants = tv({
       tile: [
         'flex-col items-start gap-1.5 item-card rounded-item p-3',
         'hover:bg-surface-2',
+        'aria-[current=page]:bg-tint aria-[current=page]:outline-2 aria-[current=page]:-outline-offset-2 aria-[current=page]:outline-brand-primary aria-[current=page]:outline-solid',
       ],
     },
   },

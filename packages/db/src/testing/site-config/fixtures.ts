@@ -15,6 +15,7 @@ import {
   HEADER_SUBMENU_STYLE,
   HUE_MAX,
   HUE_MIN,
+  NAV_LINK_STYLE,
   PRESET_ID,
   RADIUS_SCALE,
 } from '@blog/config/constants';
@@ -50,6 +51,7 @@ export const DEFAULT_CONTROL_STYLES = {
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+  navLinkStyle: NAV_LINK_STYLE.PLAIN,
   footerLayout: FOOTER_LAYOUT.COLUMNS,
   footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
   footerSurface: FOOTER_SURFACE.FULL_WIDTH,

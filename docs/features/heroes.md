@@ -34,7 +34,7 @@ A hero is the optional opening band of a page. It replaces the page's own headin
 - **Blog Hero** — `postSource` (`NEWEST_FEATURED` default, or `PINNED` + `post`), optional localized `image` (falls back to the post's hero image), optional `eyebrow` (falls back to the post's topic), `primaryActionLabel` (required in the default language, under 40 characters) and `primaryActionAppearance` (default Contained), optional `secondaryAction`. Heading and supporting text are the post's title and excerpt.
 - **Statement Hero** — `headingBlock` (required heading, optional supporting text), optional `eyebrow`, `image` (required for Split and Banner), `ctaButtons` (0–2).
 - **Profile Hero** — `headingBlock`, required `author` (`person`), `showRole` (on: the author's role is the eyebrow and the `eyebrow` field hides), `eyebrow`, optional `image`, `ctaButtons`, `showSocialLinks`, `showBio` (all toggles default on).
-- **Deprecated `module_hero`** — still registered with its own mode-pair fields and a `service.modules.hero` feature; nothing renders it.
+- **Deprecated `module_hero`** — still registered in the schema with its own mode-pair fields; no service loader reads it and nothing renders it.
 - **Caching** — `modules:<kind>` + `module:<id>` and the tags of what each reads: Blog adds `posts`, `author`, `link`, `topic` and every page-type tag; Profile adds `author`, `link`, `homePage` and `page_landing` only; Statement adds `link` only.
 
 ## Configuration

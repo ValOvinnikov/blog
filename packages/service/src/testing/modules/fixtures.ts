@@ -6,7 +6,6 @@ import {
   CTA_ACTION_VARIANT,
   CTA_VARIANT,
   DISPLAY_MODE,
-  HERO_FIELD_MODE,
   HERO_VARIANT,
   ICONS,
   LINK_TYPE,
@@ -27,7 +26,6 @@ import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/t
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
 import type { TRawFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/transformer';
 import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
-import type { TRawHeroModule } from '@blog/service/features/modules/hero/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-profile/adaptor/transformer';
 import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
@@ -70,7 +68,6 @@ import { mockLocalizedHeadingBlock } from '@blog/service/testing/shared/localize
 export const MOCK_MODULE_ID = 'module-1';
 export const MOCK_HERO_EYEBROW = 'Field notes';
 export const MOCK_HERO_IMAGE_ALT = 'Custom alt';
-export const MOCK_FEATURED_POST_ID = 'featured-ref';
 export const MOCK_CONTENT_MODULE_ID = 'content-1';
 export const MOCK_COOKIE_SETTINGS_MODULE_ID = 'cookie-settings-1';
 export const MOCK_CTA_MODULE_ID = 'cta-1';
@@ -150,27 +147,6 @@ type TRawTeamMember = TRawTeamModule['members'][number];
 type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
 type TRawTimelineItemBody = NonNullable<TRawTimelineItem['body']>[number];
-
-export function mockRawHeroModule(
-  overrides: Partial<TRawHeroModule> = {},
-): TRawHeroModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    featuredPost: null,
-    heroEyebrowMode: HERO_FIELD_MODE.POST_TOPIC,
-    heroEyebrow: null,
-    heroTitleMode: HERO_FIELD_MODE.POST_TITLE,
-    heroTitle: null,
-    heroSubtitleMode: HERO_FIELD_MODE.POST_EXCERPT,
-    heroSubtitle: null,
-    heroImageMode: HERO_FIELD_MODE.POST_IMAGE,
-    heroImageAsset: null,
-    primaryActionLabel: null,
-    secondaryAction: null,
-    layout: null,
-    ...overrides,
-  };
-}
 
 export function mockRawHeroBlogModule(
   overrides: Partial<TRawHeroBlogModule> = {},
