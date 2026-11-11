@@ -51,7 +51,6 @@
   "packages/db/src/queries/site-config/upsert-site-config/validate-voice-field.ts": 127,
   "packages/db/src/queries/tenants/update-tenant-details/owner-email-change.ts": 149,
   "packages/db/src/queries/tenants/update-tenant-details/update-tenant-details.ts": 204,
-  "packages/db/src/schema/site-config.ts": 140,
   "packages/db/src/schema/tenants.ts": 151,
   "packages/db/src/testing/fixtures.ts": 174,
   "packages/db/src/testing/tenants/fixtures.ts": 164,

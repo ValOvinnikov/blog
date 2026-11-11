@@ -12,6 +12,7 @@ import {
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   HEADER_BAR_STYLE,
+  HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
@@ -41,6 +42,11 @@ export const cardStyleEnum = pgEnum('card_style', CARD_STYLE);
 export const headerControlStyleEnum = pgEnum(
   'header_control_style',
   HEADER_CONTROL_STYLE,
+);
+
+export const headerControlShapeEnum = pgEnum(
+  'header_control_shape',
+  HEADER_CONTROL_SHAPE,
 );
 
 export const accountButtonStyleEnum = pgEnum(

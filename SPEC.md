@@ -3154,3 +3154,18 @@ its preset's Plain), and `buildThemeStyleBlock` always declares
 `NAV_LINK_STYLE_DECLARATIONS` under `:root`, beside the radius scale that its
 `--nav-link-radius` resolves against. `theme.css` declares Plain's other five
 static values; the radius falls back to `var(--radius-sm)` at the element.
+
+**Header buttons shape** sets the corners of every header control — the
+language switcher's trigger and codes pill (and the current-language chip
+inside it, whose `rounded-header-control-inner` corner is the frame's radius
+less the 3px gap, never below 0), the theme toggle, the menu button and the
+account button — through one inherited property, `--radius-header-control`, read by the
+`rounded-header-control` utility in `HEADER_CONTROL_FRAME`. The tenant stores
+it on the Look (`site_config.header_control_shape`: `ROUND` default,
+`ROUNDED`, `SQUARE`; a Growth field, so a `FREE` site renders its preset's
+Round), and `buildThemeStyleBlock` always declares
+`HEADER_CONTROL_SHAPE_DECLARATIONS` under `:root`, beside the radius scale:
+Rounded is `var(--radius-md)` floored at Small, so it follows Corners and
+stays distinct from Square under None. It combines freely with
+the header buttons style. The floating cookie-settings button borrows the
+header control recipe but is not a header control, so it stays round.

@@ -8598,6 +8598,14 @@
         "file": "apps/web/src/constants/tenant-write.ts"
       }
     ],
+    "theme_tokens.site_config_fetch_failed": [
+      {
+        "ref": "THEME_TOKENS_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/theme-tokens",
+        "file": "apps/web/src/constants/theme-tokens.ts"
+      }
+    ],
     "cookie_statement.seed_start_failed": [
       {
         "ref": "COOKIE_STATEMENT_LOG.SEED_START_FAILED",
