@@ -832,7 +832,7 @@
       "FLOATING": "Flottante"
     },
     "navLinkStyleLabel": "Liens de navigation",
-    "navLinkStyleDescription": "L'apparence des liens du menu principal. Les liens du pied de page ne changent pas.",
+    "navLinkStyleDescription": "Comment le menu signale la page où vous êtes et le lien sous le pointeur. Les liens du pied de page ne changent pas.",
     "navLinkStyleGlyphWord": "Lien",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Simple",
