@@ -173,6 +173,13 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.languageSwitcherOptionLabel.MENU_GLOBE,
         description: LOOK_FORM.languageSwitcherOptionDescription.MENU_GLOBE,
       },
+      {
+        row: LOOK_ROW.HEADER,
+        label: LOOK_FORM.navLinkStyleLabel,
+        initialDescription: LOOK_FORM.navLinkStyleOptionDescription.PLAIN,
+        option: LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
+        description: LOOK_FORM.navLinkStyleOptionDescription.UNDERLINE,
+      },
     ])(
       'describes the chosen $label option below the control',
       async ({ row, label, initialDescription, option, description }) => {

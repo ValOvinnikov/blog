@@ -4,8 +4,12 @@ import { navLinkStyleGlyphVariants } from './nav-link-style-glyph-variants';
 
 export type TNavLinkStyleGlyphProps = {
   linkStyle: TNavLinkStyle;
+  word: string;
 };
 
-export const NavLinkStyleGlyph = ({ linkStyle }: TNavLinkStyleGlyphProps) => (
-  <span className={navLinkStyleGlyphVariants({ linkStyle })}>Link</span>
+export const NavLinkStyleGlyph = ({
+  linkStyle,
+  word,
+}: TNavLinkStyleGlyphProps) => (
+  <span className={navLinkStyleGlyphVariants({ linkStyle })}>{word}</span>
 );
