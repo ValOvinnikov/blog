@@ -1,6 +1,7 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { ERROR_CODE, HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { EMAIL_DELIVERY_OUTCOME } from '@blog/db/constants';
 import { SITE_EMAIL_TAG_NAME } from '@blog/email';
+import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   EMAIL_USAGE_LOG,
@@ -73,7 +74,7 @@ const signedRequest = (
 describe(POST, () => {
   beforeEach(() => {
     envMock.RESEND_WEBHOOK_SECRET = MOCK_SECRET;
-    recordEmailDeliveryOutcomeMock.mockResolvedValue(true);
+    recordEmailDeliveryOutcomeMock.mockResolvedValue(okResult(true));
   });
 
   it.each([
@@ -169,6 +170,20 @@ describe(POST, () => {
     expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
       EMAIL_USAGE_LOG.WEBHOOK_EVENT_MALFORMED,
       { eventId: MOCK_EVENT_ID },
+    );
+  });
+
+  it('acknowledges an event for a site this database does not hold, warning once', async () => {
+    recordEmailDeliveryOutcomeMock.mockResolvedValue(
+      errorResult(ERROR_CODE.DB_NOT_FOUND),
+    );
+
+    const response = await POST(signedRequest(eventBody()));
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(logger.warn).toHaveBeenCalledExactlyOnceWith(
+      EMAIL_USAGE_LOG.WEBHOOK_SITE_UNKNOWN,
+      { eventId: MOCK_EVENT_ID, siteId: MOCK_TENANT_ID },
     );
   });
 

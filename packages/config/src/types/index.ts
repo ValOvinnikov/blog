@@ -4,7 +4,7 @@ export * from './action-result';
 export * from './contrast-result';
 export * from './embed';
 export * from './email-send-count-failure';
-export * from './magic-link-send-refusal';
+export * from './magic-link-send';
 export * from './oauth-credentials';
 export * from './outcome';
 export * from './page-module';

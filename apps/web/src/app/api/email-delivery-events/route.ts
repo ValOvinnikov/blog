@@ -48,8 +48,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     return respondEmpty(HTTP_STATUS.OK);
   }
 
+  let result;
   try {
-    await queries.emailUsage.recordEmailDeliveryOutcome(
+    result = await queries.emailUsage.recordEmailDeliveryOutcome(
       eventId,
       siteId,
       outcome,
@@ -62,6 +63,10 @@ export async function POST(request: Request): Promise<NextResponse> {
       error,
     });
     return respondEmpty(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+  }
+
+  if (!result.ok) {
+    logger.warn(EMAIL_USAGE_LOG.WEBHOOK_SITE_UNKNOWN, { eventId, siteId });
   }
 
   return respondEmpty(HTTP_STATUS.OK);

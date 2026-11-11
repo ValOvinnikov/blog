@@ -1,6 +1,6 @@
-import type { IEmailSendCountFailure } from '@blog/config/types/email-send-count-failure';
-
 import type { TMagicLinkRefusal } from '@blog/config/constants';
+
+import type { IEmailSendCountFailure } from './email-send-count-failure';
 
 export interface IMagicLinkSendRefusal {
   reason: TMagicLinkRefusal;

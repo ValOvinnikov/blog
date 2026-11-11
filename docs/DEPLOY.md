@@ -879,6 +879,13 @@ Copy each webhook's **Signing secret** (`whsec_…`) into its web project's
 `RESEND_WEBHOOK_SECRET`. Until it is set, the route answers 500 and Resend
 retries, so no outcome is recorded.
 
+Dev and prod send through the one Resend account behind `RESEND_API_KEY`,
+and a Resend webhook receives every event the account sends, so each
+endpoint also sees the other environment's mail. Its site is not in that
+environment's database, so the route answers 200 and warns once
+(`email_usage.webhook_site_unknown`) instead of recording it; separate
+Resend accounts per environment would remove those warnings.
+
 ### 6. Sanity — CORS origins · API → CORS origins
 
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).

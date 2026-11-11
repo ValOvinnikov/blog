@@ -7,7 +7,6 @@ import { recordSignInSendSafely } from '@blog/auth/providers/magic-link/record-s
 import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
 import { resolveRecipientLocale } from '@blog/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
 import { resolveTenantEmailIdentity } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
-import type { TMaybeUndefined } from '@blog/config';
 import {
   AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
@@ -28,9 +27,7 @@ type TMagicLinkEmailRequest = {
   from: string;
   identifier: string;
   url: string;
-  onSendCountFailed: TMaybeUndefined<
-    IMagicLinkSendHandlers['onSendCountFailed']
-  >;
+  onSendCountFailed: IMagicLinkSendHandlers['onSendCountFailed'];
 };
 
 export async function sendMagicLinkEmail({

@@ -464,6 +464,17 @@ describe(buildMagicLinkProvider, () => {
       });
     });
 
+    it('still resolves when the failure handler itself throws', async () => {
+      recordEmailSendMock.mockRejectedValue(new Error(MOCK_DB_ERROR_MESSAGE));
+      onSendCountFailedMock.mockImplementation(() => {
+        throw new Error(MOCK_DB_ERROR_MESSAGE);
+      });
+
+      await expect(
+        sendVerificationRequestFor(provider),
+      ).resolves.toBeUndefined();
+    });
+
     it('neither tags nor counts a platform sign-in', async () => {
       await sendVerificationRequestFor(buildPlatformProvider(), {
         url: PLATFORM_CALLBACK_URL,

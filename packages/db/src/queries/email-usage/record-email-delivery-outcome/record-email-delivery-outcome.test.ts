@@ -1,3 +1,4 @@
+import { ERROR_CODE } from '@blog/config/constants';
 import { EMAIL_DELIVERY_OUTCOME } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
@@ -9,10 +10,14 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { useTestTenant } from '@blog/db/testing/test-tenant';
+import { errorResult, okResult } from '@blog/utils';
+import { faker } from '@faker-js/faker';
 
 import { recordEmailDeliveryOutcome } from './record-email-delivery-outcome';
 
 vi.mock('@blog/db/client');
+
+faker.seed(7161);
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);
@@ -82,7 +87,7 @@ describe(recordEmailDeliveryOutcome, () => {
       EMAIL_DELIVERY_OUTCOME.BOUNCED,
     );
 
-    expect([first, repeat]).toEqual([true, false]);
+    expect([first, repeat]).toEqual([okResult(true), okResult(false)]);
     const rows = await readEmailDeliveryOutcomeCounts(db());
     expect(rows.map(({ count }) => count)).toEqual([1]);
   });
@@ -103,5 +108,16 @@ describe(recordEmailDeliveryOutcome, () => {
 
     const rows = await readEmailDeliveryOutcomeCounts(db());
     expect(rows.map(({ count }) => count)).toEqual([1, 1]);
+  });
+
+  it('reports a site this database does not hold as not found, storing nothing', async () => {
+    const result = await recordEmailDeliveryOutcome(
+      FIRST_EVENT_ID,
+      faker.string.uuid(),
+      EMAIL_DELIVERY_OUTCOME.DELIVERED,
+    );
+
+    expect(result).toEqual(errorResult(ERROR_CODE.DB_NOT_FOUND));
+    expect(await readEmailDeliveryOutcomeCounts(db())).toEqual([]);
   });
 });
