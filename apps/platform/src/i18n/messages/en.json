@@ -783,7 +783,7 @@
     "languageSwitcherSingleLanguage": "Add another language in Languages settings to choose a style.",
     "languageSwitcherFreeDescription": "Your plan publishes one language. Upgrade to add languages and choose a switcher style.",
     "lockLineGrowthFields": "Fields marked Growth keep the {preset} preset's value.",
-    "lockLineTypeFonts": "On Free, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
+    "lockLineTypeFonts": "On this plan, Type keeps the {preset} preset's fonts. Picking another preset changes them.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -1040,7 +1040,7 @@
     "idle": "Open a Site parts card and the frame scrolls to it.",
     "off": "Following is off. The frame stays where you leave it.",
     "allOpen": "Every card is open. Focus a Site parts card and the frame scrolls to it.",
-    "freeSample": "The sample uses the {preset} preset's values, the ones a Free site publishes."
+    "freeSample": "The sample uses the {preset} preset's values, the ones this plan publishes."
   },
   "lookFullscreen": {
     "open": "Open preview full screen",
@@ -1637,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Features",
-    "description": "Turn your site's features on or off. Locked toggles require the Growth plan.",
+    "description": "Turn your site's features on or off. A locked toggle names the plan that includes it.",
     "alertSuccess": "Features saved.",
     "alertError": "Couldn't save — try again.",
-    "planLockedBadge": "Growth plan",
+    "planLockedBadge": "{plan, select, FREE {Free plan} STARTER {Starter plan} other {Growth plan}}",
     "comingSoonBadge": "Coming soon",
     "switchOn": "On",
     "switchOff": "Off",
@@ -2090,8 +2090,8 @@
       "subject": "Your site is now on the Starter plan",
       "previewText": "{siteName} can now use the Starter options.",
       "changed": "{siteName} is now on the Starter plan.",
-      "options": "On Starter your site can use its own domain and the contact form, and its footer has no “Powered by” mark. Growth options such as more languages, every Look setting and the other Growth page modules are switched off.",
-      "kept": "Nothing is deleted. Your content and settings are kept, and anything from Growth comes back if you move to Growth."
+      "options": "On Starter your site can use its own domain and the contact form, and its footer has no “Powered by” mark. More languages, every Look setting and the other page modules come with Growth.",
+      "kept": "Nothing is deleted. Your content and settings are kept, and anything from Growth is back as you left it if you move to Growth."
     },
     "FREE": {
       "subject": "Your site is now on the Free plan",

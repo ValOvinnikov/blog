@@ -783,7 +783,7 @@
     "languageSwitcherSingleLanguage": "Voeg eerst een andere taal toe bij Talen om een stijl te kiezen.",
     "languageSwitcherFreeDescription": "Je abonnement publiceert één taal. Upgrade om talen toe te voegen en een stijl voor de taalkeuze te kiezen.",
     "lockLineGrowthFields": "Velden met Growth houden de waarde van de voorinstelling {preset}.",
-    "lockLineTypeFonts": "Op Free houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
+    "lockLineTypeFonts": "Met dit abonnement houdt Lettertype de lettertypen van de voorinstelling {preset}. Een andere voorinstelling kiezen verandert ze.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Wereldbol",
@@ -1040,7 +1040,7 @@
     "idle": "Open een kaart bij Sitedelen en het kader scrolt ernaartoe.",
     "off": "Volgen staat uit. Het kader blijft waar je het laat.",
     "allOpen": "Alle kaarten zijn open. Focus een kaart bij Sitedelen en het kader scrolt ernaartoe.",
-    "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die een Free-site publiceert."
+    "freeSample": "Het voorbeeld gebruikt de waarden van de voorinstelling {preset}, die dit abonnement publiceert."
   },
   "lookFullscreen": {
     "open": "Voorbeeld op volledig scherm openen",
@@ -1637,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Functies",
-    "description": "Zet de functies van je site aan of uit. Vergrendelde schakelaars vereisen het Growth-abonnement.",
+    "description": "Zet de functies van je site aan of uit. Bij een vergrendelde schakelaar staat het abonnement dat hem bevat.",
     "alertSuccess": "Functies opgeslagen.",
     "alertError": "Opslaan mislukt. Probeer het opnieuw.",
-    "planLockedBadge": "Growth-abonnement",
+    "planLockedBadge": "{plan, select, FREE {Free-abonnement} STARTER {Starter-abonnement} other {Growth-abonnement}}",
     "comingSoonBadge": "Binnenkort",
     "switchOn": "Aan",
     "switchOff": "Uit",
@@ -2090,8 +2090,8 @@
       "subject": "Je site staat nu op het Starter-plan",
       "previewText": "{siteName} kan nu de Starter-opties gebruiken.",
       "changed": "{siteName} staat nu op het Starter-plan.",
-      "options": "Met Starter kan je site een eigen domein en het contactformulier gebruiken, en de footer toont geen ‘Mogelijk gemaakt door’ meer. Growth-opties zoals meer talen, alle instellingen voor Uiterlijk en de andere Growth-paginamodules staan uit.",
-      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard, en alles uit Growth komt terug als je overstapt naar Growth."
+      "options": "Met Starter kan je site een eigen domein en het contactformulier gebruiken, en de footer toont geen ‘Mogelijk gemaakt door’. Meer talen, alle instellingen voor Uiterlijk en de andere paginamodules horen bij Growth.",
+      "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard, en alles uit Growth is terug zoals je het achterliet als je overstapt naar Growth."
     },
     "FREE": {
       "subject": "Je site staat nu op het Free-plan",

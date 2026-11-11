@@ -783,7 +783,7 @@
     "languageSwitcherSingleLanguage": "Añade otro idioma en Idiomas para elegir un estilo.",
     "languageSwitcherFreeDescription": "Tu plan publica un idioma. Mejora el plan para añadir idiomas y elegir un estilo de selector.",
     "lockLineGrowthFields": "Los campos marcados con Growth mantienen el valor del ajuste predefinido {preset}.",
-    "lockLineTypeFonts": "En Free, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
+    "lockLineTypeFonts": "Con este plan, Tipografía mantiene las fuentes del ajuste predefinido {preset}. Elegir otro ajuste predefinido las cambia.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Código",
       "MENU_GLOBE": "Globo",
@@ -1040,7 +1040,7 @@
     "idle": "Abre una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
     "off": "El seguimiento está desactivado. El marco se queda donde lo dejes.",
     "allOpen": "Todas las tarjetas están abiertas. Enfoca una tarjeta de Partes del sitio y el marco se desplazará hasta ella.",
-    "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica un sitio Free."
+    "freeSample": "La muestra usa los valores del ajuste predefinido {preset}, los que publica este plan."
   },
   "lookFullscreen": {
     "open": "Abrir la vista previa a pantalla completa",
@@ -1637,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Funciones",
-    "description": "Active o desactive las funciones de su sitio. Las opciones bloqueadas requieren el plan Growth.",
+    "description": "Active o desactive las funciones de su sitio. Una opción bloqueada indica el plan que la incluye.",
     "alertSuccess": "Funciones guardadas.",
     "alertError": "No se pudo guardar. Vuelva a intentarlo.",
-    "planLockedBadge": "Plan Growth",
+    "planLockedBadge": "{plan, select, FREE {Plan Free} STARTER {Plan Starter} other {Plan Growth}}",
     "comingSoonBadge": "Próximamente",
     "switchOn": "Activado",
     "switchOff": "Desactivado",
@@ -2090,8 +2090,8 @@
       "subject": "Tu sitio ya está en el plan Starter",
       "previewText": "{siteName} ya puede usar las opciones de Starter.",
       "changed": "{siteName} ya está en el plan Starter.",
-      "options": "Con Starter tu sitio puede usar su propio dominio y el formulario de contacto, y su pie de página ya no muestra «Con la tecnología de». Las opciones de Growth, como más idiomas, todos los ajustes de Aspecto y los demás módulos de página de Growth, están desactivadas.",
-      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan, y todo lo de Growth vuelve si cambias a Growth."
+      "options": "Con Starter tu sitio puede usar su propio dominio y el formulario de contacto, y su pie de página no muestra «Con la tecnología de». Más idiomas, todos los ajustes de Aspecto y los demás módulos de página vienen con Growth.",
+      "kept": "No se borra nada. Tu contenido y tus ajustes se conservan, y lo de Growth vuelve tal como lo dejaste si cambias a Growth."
     },
     "FREE": {
       "subject": "Tu sitio ya está en el plan Free",

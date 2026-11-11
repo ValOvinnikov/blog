@@ -49,7 +49,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 
 ## Configuration
 
-- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in `FREE` and `GROWTH`) and `ANALYTICS` (`GROWTH` only). Both preset defaults are off.
+- **Owner or operator (platform Features)** — `CONSENT_BANNER` (in every plan) and `ANALYTICS` (`GROWTH` only). Both preset defaults are off.
 - **Operator (env)** — `WEB_ANALYTICS_ENABLED=true` is required as well; analytics loads only when the env flag and the capability both allow it.
 - **Voice** — none; banner, dialog, module and footer-link copy are fixed keys (`consent.*`).
 - **Look** — the banner, dialog and placeholder are `@blog/ui` molecules and follow the site's Look. Look › Footer › Cookie settings (Footer link default · Floating button · Both, every plan; stored as `COOKIE_SETTINGS_BUTTON` `HIDDEN` · `ONLY` · `SHOWN`) picks which controls reopen the dialog, read through `getFooterStyle`; `resolveCookieSettingsControls` turns the choice and the capability into the footer link and the floating button.

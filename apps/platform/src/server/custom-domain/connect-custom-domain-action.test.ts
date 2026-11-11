@@ -90,29 +90,22 @@ describe(connectCustomDomainAction, () => {
     expect(customDomainClaims.createCustomDomainClaim).not.toHaveBeenCalled();
   });
 
-  it('records a claim for the normalised domain without contacting the worker', async () => {
-    const result = await connect();
+  it.each([TENANT_PLAN.STARTER, TENANT_PLAN.GROWTH])(
+    'records a claim for the normalised domain on %s without contacting the worker',
+    async (plan) => {
+      asTenant({ plan });
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(customDomainClaims.createCustomDomainClaim).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_CUSTOM_DOMAIN,
-    );
-    expect(enqueueWorkerRequest).not.toHaveBeenCalled();
-    expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
-  });
+      const result = await connect();
 
-  it('records a claim for a Starter tenant', async () => {
-    asTenant({ plan: TENANT_PLAN.STARTER });
-
-    const result = await connect();
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(customDomainClaims.createCustomDomainClaim).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_CUSTOM_DOMAIN,
-    );
-  });
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(customDomainClaims.createCustomDomainClaim).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_CUSTOM_DOMAIN,
+      );
+      expect(enqueueWorkerRequest).not.toHaveBeenCalled();
+      expect(tenantDomains.addTenantDomain).not.toHaveBeenCalled();
+    },
+  );
 
   it('reports input that is not a full domain without saving it', async () => {
     const result = await connect({

@@ -77,7 +77,7 @@ export type TPlanEntitlements = {
   hasOwnOAuthApps: boolean;
 };
 
-const FREE_LOOK_FIELDS: readonly TLookField[] = [
+const BASE_LOOK_FIELDS: readonly TLookField[] = [
   LOOK_FIELD.PRESET,
   LOOK_FIELD.ACCENT_HUE,
   LOOK_FIELD.BRAND_NAME,
@@ -88,14 +88,14 @@ const FREE_LOOK_FIELDS: readonly TLookField[] = [
 
 export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
   [TENANT_PLAN.FREE]: {
-    lookFields: FREE_LOOK_FIELDS,
+    lookFields: BASE_LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE],
     hasPoweredByMark: true,
     hasCustomDomain: false,
     hasOwnOAuthApps: false,
   },
   [TENANT_PLAN.STARTER]: {
-    lookFields: FREE_LOOK_FIELDS,
+    lookFields: BASE_LOOK_FIELDS,
     modulePacks: [MODULE_PACK.CORE, MODULE_PACK.STARTER],
     hasPoweredByMark: false,
     hasCustomDomain: true,

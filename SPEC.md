@@ -1929,8 +1929,8 @@ costs convenience, never compliance.
 flagged `isComingSoon` in `apps/platform`'s `CAPABILITY_TOGGLES`. The Features
 tab renders it as a read-only "Coming soon" row with no switch, loads it off,
 and the save action writes it off whatever the payload says, so the row cannot
-be bypassed by a crafted request. Plan-locked toggles keep their "Growth plan"
-lock. Shipping one of these features is a matter of dropping its flag.
+be bypassed by a crafted request. A plan-locked toggle keeps its lock, badged with the cheapest plan that
+holds it. Shipping one of these features is a matter of dropping its flag.
 
 **Plan-aware navigation.** `apps/platform`'s `planPageAccess(plan)` derives
 which plan-gated pages a tenant can use: Languages when `PLAN_LOCALE_LIMIT`

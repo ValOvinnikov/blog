@@ -783,7 +783,7 @@
     "languageSwitcherSingleLanguage": "Ajoutez une autre langue dans Langues pour choisir un style.",
     "languageSwitcherFreeDescription": "Votre formule publie une seule langue. Passez à une formule supérieure pour ajouter des langues et choisir un style de sélecteur.",
     "lockLineGrowthFields": "Les champs marqués Growth gardent la valeur du préréglage {preset}.",
-    "lockLineTypeFonts": "Avec Free, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
+    "lockLineTypeFonts": "Avec cette formule, Typographie garde les polices du préréglage {preset}. Choisir un autre préréglage les change.",
     "languageSwitcherOptionLabel": {
       "MENU_CODE": "Code",
       "MENU_GLOBE": "Globe",
@@ -1040,7 +1040,7 @@
     "idle": "Ouvrez une carte des Parties du site et le cadre défile jusqu’à elle.",
     "off": "Le suivi est désactivé. Le cadre reste où vous le laissez.",
     "allOpen": "Toutes les cartes sont ouvertes. Placez le focus sur une carte des Parties du site et le cadre défile jusqu’à elle.",
-    "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles qu'un site Free publie."
+    "freeSample": "L'aperçu utilise les valeurs du préréglage {preset}, celles que cette formule publie."
   },
   "lookFullscreen": {
     "open": "Ouvrir l’aperçu en plein écran",
@@ -1637,10 +1637,10 @@
   },
   "featuresSettings": {
     "heading": "Fonctionnalités",
-    "description": "Activez ou désactivez les fonctionnalités de votre site. Les options verrouillées nécessitent la formule Growth.",
+    "description": "Activez ou désactivez les fonctionnalités de votre site. Une option verrouillée indique la formule qui l'inclut.",
     "alertSuccess": "Fonctionnalités enregistrées.",
     "alertError": "Impossible d'enregistrer — veuillez réessayer.",
-    "planLockedBadge": "Formule Growth",
+    "planLockedBadge": "{plan, select, FREE {Formule Free} STARTER {Formule Starter} other {Formule Growth}}",
     "comingSoonBadge": "Bientôt",
     "switchOn": "Activé",
     "switchOff": "Désactivé",
@@ -2090,8 +2090,8 @@
       "subject": "Votre site est passé à l’offre Starter",
       "previewText": "{siteName} peut désormais utiliser les options Starter.",
       "changed": "{siteName} est désormais sur l’offre Starter.",
-      "options": "Avec Starter, votre site peut utiliser son propre domaine et le formulaire de contact, et son pied de page n’affiche plus la mention « Propulsé par ». Les options Growth, comme les langues supplémentaires, tous les réglages d’Apparence et les autres modules de page Growth, sont désactivées.",
-      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés, et tout ce qui vient de Growth reviendra si vous passez à Growth."
+      "options": "Avec Starter, votre site peut utiliser son propre domaine et le formulaire de contact, et son pied de page n’affiche pas la mention « Propulsé par ». Les langues supplémentaires, tous les réglages d’Apparence et les autres modules de page sont inclus dans Growth.",
+      "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés, et ce qui vient de Growth revient tel que vous l’aviez laissé si vous passez à Growth."
     },
     "FREE": {
       "subject": "Votre site est passé à l’offre Free",

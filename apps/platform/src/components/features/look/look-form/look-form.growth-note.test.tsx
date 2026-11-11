@@ -4,7 +4,10 @@ import messages from '@platform/i18n/messages/en.json';
 import { ARIA_EXPANDED } from '@platform/testing/aria';
 import { screen, waitFor, within } from '@platform/testing/custom-render';
 import { lookRowTrigger } from '@platform/testing/look/look-form-interactions';
-import { setupLookForm } from '@platform/testing/look/look-form-setup';
+import {
+  setupLookForm,
+  withLookTenant,
+} from '@platform/testing/look/look-form-setup';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { LookForm } from './look-form';
@@ -33,7 +36,7 @@ describe(`<${LookForm.name}/> Growth note`, () => {
 
   describe('on Free', () => {
     beforeEach(() => {
-      setupLookForm({ plan: TENANT_PLAN.FREE });
+      setupLookForm(withLookTenant({ plan: TENANT_PLAN.FREE }));
     });
 
     it('puts the note above the preset strip, folded', () => {
@@ -87,7 +90,7 @@ describe(`<${LookForm.name}/> Growth note`, () => {
   });
 
   it('shows no note on Growth', () => {
-    setupLookForm({ plan: TENANT_PLAN.GROWTH });
+    setupLookForm(withLookTenant({ plan: TENANT_PLAN.GROWTH }));
 
     const title = screen.queryByText(GROWTH_NOTE.title);
 

@@ -1,4 +1,5 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
 import {
   updateFeaturesAction,
@@ -55,7 +56,6 @@ const {
   heading,
   capabilitiesHeading,
   comingSoonBadge,
-  planLockedBadge,
   alertSuccess,
   alertError,
   readerAccountNote,
@@ -68,6 +68,8 @@ const BOOKMARKS_LABEL = toggleLabel[CAPABILITY.BOOKMARKS];
 const ANALYTICS_LABEL = toggleLabel[CAPABILITY.ANALYTICS];
 const CONTACT_FORM_LABEL = toggleLabel[CAPABILITY.CONTACT_FORM];
 const { saveBar } = messages;
+const planLockedBadge = (plan: TTenantPlan) =>
+  makeEnTranslator('featuresSettings')('planLockedBadge', { plan });
 const RESTORE_ONE_CHANGE = makeEnTranslator('draftRecovery')('restore', {
   count: 1,
 });
@@ -100,17 +102,16 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   describe('with every capability entitled', () => {
+    let bookmarksSwitch: HTMLElement;
+    let analyticsSwitch: HTMLElement;
+
     beforeEach(() => {
       setup();
+      bookmarksSwitch = screen.getByRole('switch', { name: BOOKMARKS_LABEL });
+      analyticsSwitch = screen.getByRole('switch', { name: ANALYTICS_LABEL });
     });
 
     it('renders one toggle per built capability, reflecting the initial values', () => {
-      const bookmarksSwitch = screen.getByRole('switch', {
-        name: BOOKMARKS_LABEL,
-      });
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: ANALYTICS_LABEL,
-      });
       const contactFormSwitch = screen.getByRole('switch', {
         name: CONTACT_FORM_LABEL,
       });
@@ -142,16 +143,6 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(sectionHeading).toBeVisible();
     });
 
-    it('toggles an entitled capability on click', async () => {
-      const bookmarksSwitch = screen.getByRole('switch', {
-        name: BOOKMARKS_LABEL,
-      });
-
-      await user.click(bookmarksSwitch);
-
-      expect(bookmarksSwitch).not.toBeChecked();
-    });
-
     it('offers no Save while the values are unchanged', () => {
       const saveButton = screen.queryByRole('button', { name: SAVE_CHANGES });
       const allSaved = screen.queryByText(ALL_CHANGES_SAVED);
@@ -160,72 +151,66 @@ describe(`<${FeaturesSettings.name}/>`, () => {
       expect(allSaved).not.toBeInTheDocument();
     });
 
-    it('counts an unsaved toggle and withdraws Save once it is toggled back', async () => {
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: ANALYTICS_LABEL,
+    describe('after toggling Bookmarks', () => {
+      beforeEach(async () => {
+        await user.click(bookmarksSwitch);
       });
 
-      await user.click(analyticsSwitch);
-
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-      const unsavedRegion = screen.getByRole('region', {
-        name: UNSAVED_CHANGES,
+      it('shows it switched off', () => {
+        expect(bookmarksSwitch).not.toBeChecked();
       });
 
-      expect(saveButton).toBeVisible();
-      expect(unsavedRegion).toHaveTextContent(ONE_UNSAVED_CHANGE);
+      it('saves the current toggle state', async () => {
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
 
-      await user.click(analyticsSwitch);
+        await user.click(saveButton);
 
-      const withdrawnSaveButton = screen.queryByRole('button', {
-        name: SAVE_CHANGES,
+        expect(updateFeaturesActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+          ...INITIAL_VALUES,
+          bookmarksEnabled: false,
+        });
       });
-
-      expect(withdrawnSaveButton).not.toBeInTheDocument();
     });
 
-    it('restores the saved toggles on Discard', async () => {
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: ANALYTICS_LABEL,
+    describe('after toggling Analytics', () => {
+      beforeEach(async () => {
+        await user.click(analyticsSwitch);
       });
 
-      await user.click(analyticsSwitch);
+      it('counts an unsaved toggle and withdraws Save once it is toggled back', async () => {
+        const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
+        const unsavedRegion = screen.getByRole('region', {
+          name: UNSAVED_CHANGES,
+        });
 
-      const discardButton = screen.getByRole('button', {
-        name: saveBar.discard,
+        expect(saveButton).toBeVisible();
+        expect(unsavedRegion).toHaveTextContent(ONE_UNSAVED_CHANGE);
+
+        await user.click(analyticsSwitch);
+
+        const withdrawnSaveButton = screen.queryByRole('button', {
+          name: SAVE_CHANGES,
+        });
+
+        expect(withdrawnSaveButton).not.toBeInTheDocument();
       });
 
-      await user.click(discardButton);
+      it('restores the saved toggles on Discard', async () => {
+        const discardButton = screen.getByRole('button', {
+          name: saveBar.discard,
+        });
 
-      const allSaved = screen.queryByText(ALL_CHANGES_SAVED);
+        await user.click(discardButton);
 
-      expect(analyticsSwitch).not.toBeChecked();
-      expect(allSaved).not.toBeInTheDocument();
-    });
+        const allSaved = screen.queryByText(ALL_CHANGES_SAVED);
 
-    it('saves the current toggle state', async () => {
-      const bookmarksSwitch = screen.getByRole('switch', {
-        name: BOOKMARKS_LABEL,
-      });
-
-      await user.click(bookmarksSwitch);
-
-      const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
-
-      await user.click(saveButton);
-
-      expect(updateFeaturesActionMock).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        ...INITIAL_VALUES,
-        bookmarksEnabled: false,
+        expect(analyticsSwitch).not.toBeChecked();
+        expect(allSaved).not.toBeInTheDocument();
       });
     });
 
     describe('after toggling Analytics and saving', () => {
       beforeEach(async () => {
-        const analyticsSwitch = screen.getByRole('switch', {
-          name: ANALYTICS_LABEL,
-        });
-
         await user.click(analyticsSwitch);
 
         const saveButton = screen.getByRole('button', { name: SAVE_CHANGES });
@@ -253,8 +238,13 @@ describe(`<${FeaturesSettings.name}/>`, () => {
   });
 
   describe('with only some capabilities entitled', () => {
+    let bookmarksSwitch: HTMLElement;
+    let analyticsSwitch: HTMLElement;
+
     beforeEach(() => {
       setup({ entitledCapabilities: PARTIAL_ENTITLEMENT });
+      bookmarksSwitch = screen.getByRole('switch', { name: BOOKMARKS_LABEL });
+      analyticsSwitch = screen.getByRole('switch', { name: ANALYTICS_LABEL });
     });
 
     it.each([
@@ -273,37 +263,39 @@ describe(`<${FeaturesSettings.name}/>`, () => {
     );
 
     it('shows an out-of-plan toggle disabled and badged, never hidden', () => {
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: ANALYTICS_LABEL,
-      });
       const consentSwitch = screen.getByRole('switch', {
         name: toggleLabel[CAPABILITY.CONSENT_BANNER],
       });
       const contactFormSwitch = screen.getByRole('switch', {
         name: CONTACT_FORM_LABEL,
       });
-      const bookmarksSwitch = screen.getByRole('switch', {
-        name: BOOKMARKS_LABEL,
-      });
-      const planBadges = screen.getAllByText(planLockedBadge);
 
       expect(analyticsSwitch).toBeDisabled();
       expect(consentSwitch).toBeDisabled();
       expect(contactFormSwitch).toBeDisabled();
       expect(bookmarksSwitch).toBeEnabled();
-      expect(planBadges).toHaveLength(3);
     });
 
-    it('adds the plan lock to the description of a locked toggle only', () => {
-      const analyticsSwitch = screen.getByRole('switch', {
-        name: ANALYTICS_LABEL,
-      });
-      const bookmarksSwitch = screen.getByRole('switch', {
-        name: BOOKMARKS_LABEL,
-      });
+    it.each([
+      [CAPABILITY.CONSENT_BANNER, TENANT_PLAN.FREE],
+      [CAPABILITY.CONTACT_FORM, TENANT_PLAN.STARTER],
+      [CAPABILITY.ANALYTICS, TENANT_PLAN.GROWTH],
+    ])(
+      'badges locked %s with the cheapest plan holding it',
+      (capability, plan) => {
+        const toggle = screen.getByRole('switch', {
+          name: toggleLabel[capability],
+        });
 
+        expect(toggle).toHaveAccessibleDescription(
+          `${toggleDescription[capability]} ${planLockedBadge(plan)}`,
+        );
+      },
+    );
+
+    it('adds the plan lock to the description of a locked toggle only', () => {
       expect(analyticsSwitch).toHaveAccessibleDescription(
-        `${toggleDescription[CAPABILITY.ANALYTICS]} ${planLockedBadge}`,
+        `${toggleDescription[CAPABILITY.ANALYTICS]} ${planLockedBadge(TENANT_PLAN.GROWTH)}`,
       );
       expect(bookmarksSwitch).toHaveAccessibleDescription(
         toggleDescription[CAPABILITY.BOOKMARKS],
