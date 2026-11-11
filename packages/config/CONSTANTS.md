@@ -731,6 +731,12 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **COOKIE_STATEMENT_LOG**: `PAGE_FETCH_FAILED`=`"cookie_statement_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"cookie_statement_metadata.fetch_failed"`
 
+### `@web/constants/email-usage` — `apps/web/src/constants/email-usage.ts`
+
+- **RESEND_WEBHOOK_HEADER**: `ID`=`"svix-id"`, `TIMESTAMP`=`"svix-timestamp"`, `SIGNATURE`=`"svix-signature"`
+- **RESEND_DELIVERY_EVENT_TYPE**: `DELIVERED`=`"email.delivered"`, `BOUNCED`=`"email.bounced"`, `COMPLAINED`=`"email.complained"`
+- **EMAIL_USAGE_LOG**: `WEBHOOK_SECRET_MISSING`=`"email_usage.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"email_usage.webhook_signature_invalid"`, `WEBHOOK_SITE_TAG_MISSING`=`"email_usage.webhook_site_tag_missing"`, `DELIVERY_OUTCOME_RECORD_FAILED`=`"email_usage.delivery_outcome_record_failed"`, `SEND_COUNT_FAILED`=`"email_usage.send_count_failed"`
+
 ### `@web/constants/faq` — `apps/web/src/constants/faq.ts`
 
 - **FAQ_LOG**: `MODULE_FETCH_FAILED`=`"faq_module.fetch_failed"`

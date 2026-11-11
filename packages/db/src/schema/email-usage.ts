@@ -9,6 +9,7 @@ import {
   pgTable,
   primaryKey,
   text,
+  timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
 
@@ -54,3 +55,13 @@ export const emailDeliveryOutcomeCounts = pgTable(
 
 export type TEmailDeliveryOutcomeCount =
   typeof emailDeliveryOutcomeCounts.$inferSelect;
+
+export const emailDeliveryEvents = pgTable('email_delivery_events', {
+  eventId: text('event_id').primaryKey(),
+  tenantId: uuid('tenant_id')
+    .notNull()
+    .references(() => tenants.id, { onDelete: 'cascade' }),
+  receivedAt: timestamp('received_at', { mode: 'date' }).notNull(),
+});
+
+export type TEmailDeliveryEvent = typeof emailDeliveryEvents.$inferSelect;

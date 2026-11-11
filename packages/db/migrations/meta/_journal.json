@@ -127,6 +127,13 @@
       "when": 1794419045004,
       "tag": "0017_add_email_usage_and_newsletter_post_sends",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794421773487,
+      "tag": "0018_add_email_delivery_events",
+      "breakpoints": true
     }
   ]
 }

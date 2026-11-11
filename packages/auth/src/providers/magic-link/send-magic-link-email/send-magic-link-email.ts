@@ -3,26 +3,23 @@ import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
 } from '@blog/auth/providers/magic-link/find-pending-invite-tenants/find-pending-invite-tenants';
-import { readRecipientLocale } from '@blog/auth/providers/magic-link/read-recipient-locale/read-recipient-locale';
+import { recordSignInSendSafely } from '@blog/auth/providers/magic-link/record-sign-in-send-safely/record-sign-in-send-safely';
 import { resolveMagicLinkEmailSettings } from '@blog/auth/providers/magic-link/resolve-magic-link-email-settings/resolve-magic-link-email-settings';
-import {
-  resolveTenantEmailIdentity,
-  type TResolvedTenantEmailIdentity,
-} from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
-import type { TMaybeUndefined } from '@blog/config';
+import { resolveRecipientLocale } from '@blog/auth/providers/magic-link/resolve-recipient-locale/resolve-recipient-locale';
+import { resolveTenantEmailIdentity } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
 import {
   AUTH_APP,
   EMAIL_TEMPLATE_TYPE,
-  LOCALE_ISO_CODES,
   type TAuthApp,
-  type TLocaleIsoCode,
 } from '@blog/config/constants';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
 import {
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
+  buildSiteEmailTag,
   sendEmail,
 } from '@blog/email';
+import { hasLength } from '@blog/utils/primitives';
 
 type TMagicLinkEmailRequest = {
   app: TAuthApp;
@@ -44,7 +41,8 @@ export async function sendMagicLinkEmail({
     : [];
   const tenantNames = inviteTenants.map(({ name }) => name);
   const tenantIdentity = await resolveTenantEmailIdentity(host);
-  const isInvite = tenantNames.length > 0;
+  const readerSiteId = isSentByPlatform ? undefined : tenantIdentity?.tenantId;
+  const isInvite = hasLength(tenantNames);
   const templateType = isInvite
     ? EMAIL_TEMPLATE_TYPE.TENANT_INVITE
     : EMAIL_TEMPLATE_TYPE.MAGIC_LINK;
@@ -92,7 +90,10 @@ export async function sendMagicLinkEmail({
     subject,
     html,
     replyTo: emailSettings?.replyTo,
+    tags: readerSiteId ? [buildSiteEmailTag(readerSiteId)] : undefined,
   });
+
+  if (readerSiteId) await recordSignInSendSafely(readerSiteId);
 }
 
 async function findPendingInviteTenantsOrNone(
@@ -104,23 +105,4 @@ async function findPendingInviteTenantsOrNone(
     // A failed lookup must not block delivery: it degrades to the generic copy.
     return [];
   }
-}
-
-// With no tenant behind the host, an invite is written in the invited
-// tenant's default language, and a platform admin's own sign-in stays in
-// English.
-function resolveRecipientLocale(
-  url: string,
-  tenantIdentity: TMaybeUndefined<TResolvedTenantEmailIdentity>,
-  inviteTenants: TPendingInviteTenant[],
-): TLocaleIsoCode {
-  if (tenantIdentity) {
-    return readRecipientLocale(
-      url,
-      tenantIdentity.liveLocales,
-      tenantIdentity.defaultLocale,
-    );
-  }
-
-  return inviteTenants[0]?.locale ?? LOCALE_ISO_CODES.EN;
 }
