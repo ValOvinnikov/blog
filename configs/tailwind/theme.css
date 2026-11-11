@@ -292,6 +292,7 @@
      `surface-brand-primary` ancestor (below) changes them for everything
      inside it, with no per-component prop. */
   --ambient: var(--primary);
+  --backdrop: var(--primary);
   --divider: var(--border);
   /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
      --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
@@ -392,6 +393,7 @@
   --item-fill-mix: 0%;
   --item-clear-mix: 0%;
   --item-card-hover-mix: 0%;
+  --item-card-hover-edge: transparent;
   --item-divider-width: 0px;
   --item-stack-gap: 0.75rem;
   --item-stack-radius: var(--radius-md);
@@ -599,6 +601,7 @@
    resolve against that background instead of the page default. */
 @utility surface-secondary {
   --ambient: var(--secondary);
+  --backdrop: var(--secondary);
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
   --item-fill: var(--brand-primary-muted);
@@ -609,6 +612,7 @@
    brand-primary-hover text on it holds ≥5.86:1 / ≥5.11:1 across hues. */
 @utility surface-brand-primary {
   --ambient: var(--brand-primary-muted);
+  --backdrop: var(--brand-primary-muted);
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
   --tint: color-mix(
@@ -623,6 +627,7 @@
 
 @utility surface-tint {
   --ambient: var(--tint, var(--brand-primary-muted));
+  --backdrop: var(--tint, var(--brand-primary-muted));
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
 }
@@ -635,6 +640,7 @@
    wcagContrastRatio (packages/utils/src/color/oklch.ts). */
 @utility surface-nested {
   --ambient: var(--surface-2);
+  --backdrop: var(--surface-2);
   --divider: var(--border-strong);
 }
 
@@ -647,6 +653,7 @@
    --brand-primary-muted on the panel's own --surface wherever the menu opens. */
 @utility surface-popover {
   --ambient: var(--surface);
+  --backdrop: var(--surface);
   --divider: var(--border);
   --tint: initial;
   --item-fill: initial;
@@ -677,9 +684,20 @@
   );
   box-shadow: var(--item-shadow);
   --item-hover-mix: var(--item-card-hover-mix);
+  --item-hover-edge: var(--item-card-hover-edge);
 
   & .item-card {
     --item-fill: var(--item-nested-fill, var(--brand-primary-wash));
+  }
+
+  /* Bands publish --backdrop beside --ambient; a var(--ambient) copy would
+     cycle with the --ambient this rule sets. */
+  &.surface-card {
+    --ambient: color-mix(
+      in oklch,
+      var(--surface),
+      var(--backdrop) var(--item-clear-mix)
+    );
   }
 
   &::after {

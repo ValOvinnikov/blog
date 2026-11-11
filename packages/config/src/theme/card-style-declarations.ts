@@ -17,6 +17,7 @@ const FRAMED_BASE = {
   '--item-fill-mix': NONE_OF,
   '--item-clear-mix': NONE_OF,
   '--item-card-hover-mix': NONE_OF,
+  '--item-card-hover-edge': 'transparent',
   '--item-divider-width': NO_WIDTH,
   '--item-stack-gap': STACK_GAP,
   '--item-stack-radius': RADIUS_MD,
@@ -47,6 +48,7 @@ export const CARD_STYLE_DECLARATIONS: Record<TCardStyle, TThemeDeclarations> = {
     ...NO_OUTLINE,
     '--item-fill-mix': ALL_OF,
     '--item-card-hover-mix': ALL_OF,
+    '--item-card-hover-edge': 'var(--border-strong)',
   },
   [CARD_STYLE.RAISED]: {
     ...FRAMED_BASE,

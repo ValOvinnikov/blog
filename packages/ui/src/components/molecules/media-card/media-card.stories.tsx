@@ -554,6 +554,18 @@ export const FilledOnBrandPrimaryBand = filledNestedAndFocusedOn(
   BRAND_VARIANT.BRAND_PRIMARY,
 );
 
+const inDark = (story: TStory): TStory => ({
+  ...story,
+  name: `${story.name} (dark)`,
+  globals: { theme: 'dark' },
+});
+
+export const FilledOnPrimaryBandDark = inDark(FilledOnPrimaryBand);
+
+export const FilledOnSecondaryBandDark = inDark(FilledOnSecondaryBand);
+
+export const FilledOnBrandPrimaryBandDark = inDark(FilledOnBrandPrimaryBand);
+
 export const FilledAndPlain: TStory = {
   name: 'Filled and plain, on each band',
   args: IconMedia.args,

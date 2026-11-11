@@ -1532,7 +1532,7 @@ five `--radius*` tokens and `density` the nine layout `--spacing-*` tokens
 (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, `band`)
 under `:root` only, the accent hue also sets the on-image and
 `--scrim-brand-*` tokens (`IMAGE_SCRIM_RAMP`) under `:root` only,
-and `cardStyle` sets the eleven `--item-*` tokens the `item-card` utility and
+and `cardStyle` sets the twelve `--item-*` tokens the `item-card` utility and
 `Accordion` read, also under `:root` only — `ACCENT_BAR` a borderless card with
 a 2px brand bar on the left, `OUTLINED` a hairline border all round, `FILLED`
 the band's tint with no outline, `RAISED` a hairline plus `--shadow-card`, and
@@ -3067,19 +3067,20 @@ the values site-wide on the Look page (`site_config.card_style`), and
 `buildThemeStyleBlock` declares them under `:root` from `@blog/config`'s
 `CARD_STYLE_DECLARATIONS`:
 
-| Property                | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`        | `RAISED`             | `PLAIN`         |
-| ----------------------- | ---------------------- | ------------------ | --------------- | -------------------- | --------------- |
-| `--item-radius`         | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | same            |
-| `--item-border-width`   | `0px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
-| `--item-accent-width`   | `2px`                  | `1px`              | `0px`           | `1px`                | `0px`           |
-| `--item-accent-color`   | `var(--brand-primary)` | `var(--border)`    | `var(--border)` | `var(--border)`      | `var(--border)` |
-| `--item-shadow`         | `none`                 | `none`             | `none`          | `var(--shadow-card)` | `none`          |
-| `--item-fill-mix`       | `0%`                   | `0%`               | `100%`          | `0%`                 | `0%`            |
-| `--item-clear-mix`      | `0%`                   | `0%`               | `0%`            | `0%`                 | `100%`          |
-| `--item-card-hover-mix` | `0%`                   | `0%`               | `100%`          | `0%`                 | `0%`            |
-| `--item-divider-width`  | `0px`                  | `0px`              | `0px`           | `0px`                | `1px`           |
-| `--item-stack-gap`      | `0.75rem`              | `0.75rem`          | `0.75rem`       | `0.75rem`            | `0px`           |
-| `--item-stack-radius`   | `var(--radius-md)`     | `var(--radius-md)` | same            | same                 | `0px`           |
+| Property                 | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`               | `RAISED`             | `PLAIN`         |
+| ------------------------ | ---------------------- | ------------------ | ---------------------- | -------------------- | --------------- |
+| `--item-radius`          | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | same            |
+| `--item-border-width`    | `0px`                  | `1px`              | `0px`                  | `1px`                | `0px`           |
+| `--item-accent-width`    | `2px`                  | `1px`              | `0px`                  | `1px`                | `0px`           |
+| `--item-accent-color`    | `var(--brand-primary)` | `var(--border)`    | `var(--border)`        | `var(--border)`      | `var(--border)` |
+| `--item-shadow`          | `none`                 | `none`             | `none`                 | `var(--shadow-card)` | `none`          |
+| `--item-fill-mix`        | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`            |
+| `--item-clear-mix`       | `0%`                   | `0%`               | `0%`                   | `0%`                 | `100%`          |
+| `--item-card-hover-mix`  | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`            |
+| `--item-card-hover-edge` | `transparent`          | `transparent`      | `var(--border-strong)` | `transparent`        | `transparent`   |
+| `--item-divider-width`   | `0px`                  | `0px`              | `0px`                  | `0px`                | `1px`           |
+| `--item-stack-gap`       | `0.75rem`              | `0.75rem`          | `0.75rem`              | `0.75rem`            | `0px`           |
+| `--item-stack-radius`    | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | `0px`           |
 
 The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
 band owns `--item-fill`, the tint a filled card takes on it, and
@@ -3110,7 +3111,13 @@ accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s `bg-item-hover`
 on hover and focus-within: the band's tint under every style but `FILLED`,
 which rests on a tint and so hovers to the band's `--item-nested-fill`
 (`--item-card-hover-mix: 100%`, which only `item-card` reads, so a
-non-card such as `LogoTile` keeps the tint).
+non-card such as `LogoTile` keeps the tint), and draws a 1px `--border-strong`
+outline on hover and focus-within (`--item-card-hover-edge`), so the card keeps
+an edge against every band. Under `PLAIN` an item card's `surface-card` keeps
+the band's `--backdrop` as its `--ambient` (every band utility publishes
+`--backdrop` beside `--ambient`), so ring offsets and covering fills inside a
+frameless card match the section behind it; the other styles and
+`surface-card` panels keep `--surface`.
 The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
 `surface-*` retarget) overrides the utility's `--surface` fill, so a card style
 frames the band surface and never paints it.
