@@ -1,9 +1,7 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-
-import ts from 'typescript';
 
 import { repoRoot, resolveBase } from './touched-files.mjs';
 
@@ -18,7 +16,6 @@ export const CHECK = {
   UNEXPLAINED_SUPPRESSION: 'suppression without a reason',
   LOG_EVENT_LITERAL:
     'log event name typed at the call (use the <DOMAIN>_LOG const)',
-  TEST_COMMENT: 'comment in a test file',
   LONG_TEST_TITLE: `test title over ${MAX_TEST_TITLE_LENGTH} characters`,
 };
 
@@ -44,12 +41,34 @@ const CONSOLE_EXEMPT = [
   /^packages\/insight\/src\//,
 ];
 
+const isInString = (text, index) => {
+  let quote;
+  for (let i = 0; i < index; i += 1) {
+    const char = text[i];
+    if (char === '\\') {
+      i += 1;
+    } else if (quote ? char === quote : `'"\``.includes(char)) {
+      quote = quote ? undefined : char;
+    }
+  }
+  return quote !== undefined;
+};
+
+const matchesInCode = (pattern, text) => {
+  const match = pattern.exec(text);
+  return match !== null && !isInString(text, match.index);
+};
+
+const SUPPRESSION_COMMENT =
+  /(^\s*|[;,)}\]]\s*)(\/\/|\/\*)\s*(eslint-disable\S*|@ts-(ignore|expect-error|nocheck)).*$/;
+
 const LINE_CHECKS = [
   {
     check: CHECK.CONSOLE,
     applies: (file) =>
       LINTED_FILE.test(file) && !CONSOLE_EXEMPT.some((re) => re.test(file)),
-    hit: (text) => /\bconsole\.(log|info|debug|trace|warn|error)\b/.test(text),
+    hit: (text) =>
+      matchesInCode(/\bconsole\.(log|info|debug|trace|warn|error)\b/, text),
   },
   {
     check: CHECK.DEBUGGER,
@@ -60,7 +79,7 @@ const LINE_CHECKS = [
     check: CHECK.FOCUSED_TEST,
     applies: (file) => SOURCE_FILE.test(file),
     hit: (text) =>
-      /\b(it|test|describe|suite)\.(only|skip)\(\s*['"`]/.test(text),
+      matchesInCode(/\b(it|test|describe|suite)\.(only|skip)\(\s*['"`]/, text),
   },
   {
     check: CHECK.CONFLICT_MARKER,
@@ -70,15 +89,21 @@ const LINE_CHECKS = [
   {
     check: CHECK.UNEXPLAINED_SUPPRESSION,
     applies: (file) => SOURCE_FILE.test(file),
-    hit: (text) =>
-      (/\beslint-disable(-next-line|-line)?\b/.test(text) &&
-        !/\beslint-disable(-next-line|-line)?\b.*\s--\s+\S/.test(text)) ||
-      /@ts-(ignore|expect-error|nocheck)\s*(\*\/)?\s*$/.test(text),
+    hit: (text) => {
+      const directive = SUPPRESSION_COMMENT.exec(text);
+      if (!directive) {
+        return false;
+      }
+      return directive[3].startsWith('eslint-')
+        ? !/\s--\s+\S/.test(directive[0])
+        : /@ts-[a-z-]+\s*(\*\/)?\s*$/.test(directive[0]);
+    },
   },
   {
     check: CHECK.LOG_EVENT_LITERAL,
     applies: (file) => SOURCE_FILE.test(file),
-    hit: (text) => /\blogger\.(error|warn|info|debug)\(\s*['"`]/.test(text),
+    hit: (text) =>
+      matchesInCode(/\blogger\.(error|warn|info|debug)\(\s*['"`]/, text),
   },
   {
     check: CHECK.LONG_TEST_TITLE,
@@ -95,86 +120,6 @@ const LINE_CHECKS = [
   },
 ];
 
-const DIRECTIVE = /^(eslint-|@ts-|@vitest-|@jest-|\/ <reference)/;
-
-const isDirective = (comment) => {
-  const bodies = comment
-    .replace(/^\/\/|^\/\*+|\*\/$/g, '')
-    .split('\n')
-    .map((line) => line.replace(/^\s*\*?\s*/, '').trim())
-    .filter(Boolean);
-  return bodies.length > 0 && bodies.every((body) => DIRECTIVE.test(body));
-};
-
-const REGEX_CAN_FOLLOW = new Set([
-  ts.SyntaxKind.Identifier,
-  ts.SyntaxKind.NumericLiteral,
-  ts.SyntaxKind.StringLiteral,
-  ts.SyntaxKind.CloseParenToken,
-  ts.SyntaxKind.CloseBracketToken,
-  ts.SyntaxKind.CloseBraceToken,
-  ts.SyntaxKind.NoSubstitutionTemplateLiteral,
-  ts.SyntaxKind.TemplateTail,
-  ts.SyntaxKind.ThisKeyword,
-]);
-
-const findTestComments = (content) => {
-  const scanner = ts.createScanner(
-    ts.ScriptTarget.Latest,
-    false,
-    ts.LanguageVariant.JSX,
-    content,
-  );
-  const lineOf = (pos) => content.slice(0, pos).split('\n').length;
-  const templateDepths = [];
-  let braceDepth = 0;
-  let previous;
-  const lines = [];
-  for (
-    let kind = scanner.scan();
-    kind !== ts.SyntaxKind.EndOfFileToken;
-    kind = scanner.scan()
-  ) {
-    if (
-      kind === ts.SyntaxKind.SingleLineCommentTrivia ||
-      kind === ts.SyntaxKind.MultiLineCommentTrivia
-    ) {
-      if (!isDirective(scanner.getTokenText())) {
-        lines.push(lineOf(scanner.getTokenStart()));
-      }
-      continue;
-    }
-    if (
-      kind === ts.SyntaxKind.WhitespaceTrivia ||
-      kind === ts.SyntaxKind.NewLineTrivia
-    ) {
-      continue;
-    }
-    if (
-      (kind === ts.SyntaxKind.SlashToken ||
-        kind === ts.SyntaxKind.SlashEqualsToken) &&
-      !REGEX_CAN_FOLLOW.has(previous)
-    ) {
-      kind = scanner.reScanSlashToken();
-    } else if (kind === ts.SyntaxKind.TemplateHead) {
-      templateDepths.push(braceDepth);
-    } else if (kind === ts.SyntaxKind.OpenBraceToken) {
-      braceDepth += 1;
-    } else if (kind === ts.SyntaxKind.CloseBraceToken) {
-      if (templateDepths.at(-1) === braceDepth) {
-        kind = scanner.reScanTemplateToken(false);
-        if (kind === ts.SyntaxKind.TemplateTail) {
-          templateDepths.pop();
-        }
-      } else {
-        braceDepth -= 1;
-      }
-    }
-    previous = kind;
-  }
-  return lines;
-};
-
 const isEnvFile = (file) => {
   const name = basename(file);
   return name.startsWith('.env') && name !== '.env.example';
@@ -183,20 +128,13 @@ const isEnvFile = (file) => {
 export const findViolations = (files) =>
   files
     .filter(({ file }) => !SELF.has(file) && !GENERATED.test(file))
-    .flatMap(({ file, added, content }) => [
+    .flatMap(({ file, added }) => [
       ...(isEnvFile(file) ? [{ file, line: 1, check: CHECK.ENV_FILE }] : []),
       ...added.flatMap(({ line, text }) =>
         LINE_CHECKS.filter(
           ({ applies, hit }) => applies(file) && hit(text),
         ).map(({ check }) => ({ file, line, check, text: text.trim() })),
       ),
-      ...(TEST_FILE.test(file) && content !== undefined
-        ? findTestComments(content).map((line) => ({
-            file,
-            line,
-            check: CHECK.TEST_COMMENT,
-          }))
-        : []),
     ]);
 
 export const parseAddedLines = (diff) => {
@@ -255,17 +193,7 @@ const readTouchedFiles = (base) => {
       })),
     );
   }
-  return [...byFile].map(([file, added]) => {
-    const path = join(repoRoot, file);
-    return {
-      file,
-      added,
-      content:
-        TEST_FILE.test(file) && existsSync(path)
-          ? readFileSync(path, 'utf8')
-          : undefined,
-    };
-  });
+  return [...byFile].map(([file, added]) => ({ file, added }));
 };
 
 const main = () => {

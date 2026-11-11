@@ -20,11 +20,6 @@ const added = (file, ...texts) => ({
 
 const checksOf = (files) => findViolations(files).map(({ check }) => check);
 
-const testCommentLines = (content) =>
-  findViolations([{ file: COMPONENT_TEST, added: [], content }]).map(
-    ({ line }) => line,
-  );
-
 describe('findViolations', () => {
   it('flags a bare console call in linted source', () => {
     assert.deepEqual(checksOf([added(COMPONENT, "console.log('x');")]), [
@@ -37,7 +32,7 @@ describe('findViolations', () => {
       checksOf([
         added(LOGGER_CORE, 'console.error(line);'),
         added(ROOT_SCRIPT, 'console.log(summary);'),
-        { ...added(COMPONENT_TEST, 'console.warn(x);'), content: '' },
+        added(COMPONENT_TEST, 'console.warn(x);'),
       ]),
       [],
     );
@@ -54,6 +49,19 @@ describe('findViolations', () => {
         ),
       ]),
       [CHECK.DEBUGGER, CHECK.FOCUSED_TEST, CHECK.LOG_EVENT_LITERAL],
+    );
+  });
+
+  it('ignores code patterns quoted inside a string', () => {
+    assert.deepEqual(
+      checksOf([
+        added(
+          COMPONENT,
+          `  code: "test.only('b', () => {}); console.log(1);",`,
+          "  code: `logger.error('x')`,",
+        ),
+      ]),
+      [],
     );
   });
 
@@ -103,6 +111,26 @@ describe('findViolations', () => {
     );
   });
 
+  it('ignores suppression words inside strings', () => {
+    assert.deepEqual(
+      checksOf([
+        added(
+          COMPONENT,
+          "  'eslint-disable',",
+          "  code: 'f();\\n  // eslint-disable-next-line no-console',",
+        ),
+      ]),
+      [],
+    );
+  });
+
+  it('flags a trailing suppression after code', () => {
+    assert.deepEqual(
+      checksOf([added(COMPONENT, 'run(); // eslint-disable-line no-console')]),
+      [CHECK.UNEXPLAINED_SUPPRESSION],
+    );
+  });
+
   it('accepts suppressions that give a reason', () => {
     assert.deepEqual(
       checksOf([
@@ -127,41 +155,10 @@ describe('findViolations', () => {
             `  it('${atLimit}', () => {});`,
             `  it.each([1])(\`${overLimit}\`, () => {});`,
           ),
-          content: '',
         },
       ]),
       [CHECK.LONG_TEST_TITLE],
     );
-  });
-
-  it('flags every comment in a touched test file but not directives', () => {
-    const content = [
-      '/**',
-      ' * @vitest-environment jsdom',
-      ' */',
-      '// eslint-disable-next-line testing-library/no-node-access -- portal',
-      '// arrange',
-      'const x = 1; // trailing note',
-      '/**',
-      ' * docs',
-      ' */',
-      "it('works', () => {});",
-    ].join('\n');
-    assert.deepEqual(testCommentLines(content), [5, 6, 7]);
-  });
-
-  it('ignores comment markers inside strings, templates and regexes', () => {
-    const content = [
-      'const css = `',
-      '  /* not a token line */',
-      '  // nor this ${value} here',
-      '  ${nested(`/* inner */`)}',
-      '`;',
-      "const url = 'https://example.com/a';",
-      'const pattern = /\\/\\/.*$/;',
-      'const ratio = total / count; // after division',
-    ].join('\n');
-    assert.deepEqual(testCommentLines(content), [8]);
   });
 
   it('skips generated files', () => {

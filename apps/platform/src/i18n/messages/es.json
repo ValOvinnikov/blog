@@ -812,8 +812,9 @@
     },
     "navLinkStyleLabel": "Enlaces de navegación",
     "navLinkStyleDescription": "Cómo se ven los enlaces del menú principal. Los enlaces del pie de página no cambian.",
+    "navLinkStyleGlyphWord": "Enlace",
     "navLinkStyleOptionLabel": {
-      "PLAIN": "Simple",
+      "PLAIN": "Sencillo",
       "UNDERLINE": "Subrayado",
       "SOFT": "Suave",
       "PILL": "Píldora"

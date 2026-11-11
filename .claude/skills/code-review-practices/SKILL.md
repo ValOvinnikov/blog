@@ -30,10 +30,10 @@ untracked files, and prints `file:line` for each hit: a bare `console.*` where
 `no-console` applies, `debugger`, `.only`/`.skip`, conflict markers, a
 committed `.env*`, an `eslint-disable` without a `-- reason` or a bare
 `@ts-ignore`/`@ts-expect-error`/`@ts-nocheck`, a log event name typed at the
-call instead of read from its `<DOMAIN>_LOG` const, any comment in a touched
-test file, and an `it` title over 80 characters. It is in `pnpm verify` and
-pre-push, so the implementing session has already seen it pass; any hit is
-blocking.
+call instead of read from its `<DOMAIN>_LOG` const, and an `it` title over 80
+characters. Any comment in a touched test file is `check:touched-lint`'s
+(`blog-touched/no-failing-comment`). Both are in `pnpm verify` and pre-push,
+so the implementing session has already seen them pass; any hit is blocking.
 
 The checks below need a reader. Run each over the **full diff**
 (`git diff origin/main...HEAD`, plus `git diff` if the tree is dirty) and read
@@ -200,11 +200,10 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   - props forwarded unchanged through two or more layers or hand-bundled
     into a local object, or a view-model spread and re-destructured →
     `react-component-practices` § Props.
-- **File size budgets (blocking).** A diff that adds lines to a file over its
-  budget (`CLAUDE.md` "File size budgets") without extracting the part it
-  changes, or adds a file over budget, is a blocking finding — even when
-  `pnpm check:file-size` passed or was skipped (`--no-verify`). Where the
-  extracted part goes → `react-component-practices` § Size and splitting.
+- **File size budgets (blocking).** A diff that breaks `CLAUDE.md` "File size
+  budgets" is a blocking finding, even when `pnpm check:file-size` was
+  skipped (`--no-verify`). Where the extracted part goes →
+  `react-component-practices` § Size and splitting.
 - **Prop ceiling (blocking on every touched component).** For each component
   whose file the diff touches, count all of its props — inherited members
   included — against its workspace's ceiling, whether or not the diff adds

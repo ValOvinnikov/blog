@@ -812,17 +812,18 @@
     },
     "navLinkStyleLabel": "Navigatielinks",
     "navLinkStyleDescription": "Hoe de links in het hoofdmenu eruitzien. Links in de voettekst veranderen niet.",
+    "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
-      "PLAIN": "Eenvoudig",
+      "PLAIN": "Kaal",
       "UNDERLINE": "Onderstreept",
       "SOFT": "Zacht",
       "PILL": "Pil"
     },
     "navLinkStyleOptionDescription": {
-      "PLAIN": "Alleen tekst; de kleur verandert bij aanwijzen",
+      "PLAIN": "Alleen tekst; de kleur verandert als je eroverheen beweegt",
       "UNDERLINE": "De huidige pagina is onderstreept",
-      "SOFT": "Een getinte achtergrond bij aanwijzen en op de huidige pagina",
-      "PILL": "Een afgeronde omlijning bij aanwijzen en op de huidige pagina"
+      "SOFT": "Een getinte achtergrond als je eroverheen beweegt en op de huidige pagina",
+      "PILL": "Een afgeronde omlijning als je eroverheen beweegt en op de huidige pagina"
     },
     "accountButtonStyleLabel": "Accountknop",
     "accountButtonStyleDescription": "De knop waarmee lezers inloggen en hun account openen, op brede schermen. Telefoons volgen de instelling ‘Op telefoons staat het account’ hieronder.",
