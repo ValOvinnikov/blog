@@ -184,10 +184,14 @@ contracts:
     enforces the ceiling. Trusts `verify-runner`'s already-passed
     `type-check`/`lint`/`test` result rather than re-running it. Not
     dispatched for a docs-only diff — those get the orchestrator's inline
-    identifier check instead (`CLAUDE.md`, delivery gate step 4). Its
-    mechanical pass (`code-review-practices` §0) greps added lines for
-    tests that restate their source, runs `jscpd` over the touched
-    workspaces, and — since 2026-09-19 — greps for the comments agents
+    identifier check instead (`open-pull-request` "Delivery gate sequence" step 4). Its
+    mechanical pass (`code-review-practices` §0) opens with
+    `pnpm check:diff-hygiene` — the judgement-free checks, also in
+    `pnpm verify` and pre-push, so a hit costs the implementing session a
+    re-run rather than a review round (#7118) — then greps added lines for
+    tests that restate their source, runs `pnpm check:clones` (`jscpd`, a
+    pinned root devDependency that fails loudly when missing, printing only
+    clones with a touched side) over the touched workspaces, and — since 2026-09-19 — greps for the comments agents
     produce most: a doc block opening `Name — does X`, a doc block of three
     or more lines, a `//` inside a function body, and any comment at all in
     a `*.test.ts(x)` file. Each hit is blocking; "the siblings have the same
@@ -202,7 +206,14 @@ XModuleView` block that the rule already forbade and no review had
     asserts is blocking (`code-review-practices` §6, #5793). A merge from `origin/main` after either `verify-runner` or
     `reviewer` has already run invalidates both, same as any other new
     change — re-run verify and re-dispatch `reviewer`
-    (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). This is
+    (`develop-feature` §5, `open-pull-request`'s ABSOLUTE RULES). A fix
+    round is a re-review: the dispatch opens `Re-review of <sha>` with the
+    prior blocking findings, and the reviewer confirms each one and reads
+    only the files changed since `<sha>` (`a11y-reviewer` and `seo-auditor`
+    take the same mode); a merge from `origin/main` in that range needs a
+    full review. Every reviewer prompt also carries the issue number, the
+    ticket's Copy and Cost lines and each agent's Examined and Reuse
+    sections verbatim (`develop-feature` §6). This is
     what #3144 shipped without: it verified green, merged `main` in
     afterward, and CI's Test job failed a minute later on a schema type that
     had landed on `main` in between.
@@ -220,7 +231,8 @@ XModuleView` block that the rule already forbade and no review had
     layer agent's leftover attention at the end of its run. Scoped to test
     files by **enforcement** (#396) on both tool surfaces it has: a
     `PreToolUse` guard (`test-writer-scope-guard.sh`) denies any `Edit`/
-    `Write` outside `*.test.ts(x)`, and `permissionMode: dontAsk` +
+    `Write` outside `*.test.ts(x)`, `src/testing/` builders and `__mocks__/`
+    fakes, and `permissionMode: dontAsk` +
     `read-only-agent-guard.sh` (reused as-is from `reviewer`/`explore` below)
     denies the same write-shaped `Bash` commands — closing the `mv`/`cp`
     bypass that would otherwise move or overwrite a file outside the
@@ -247,8 +259,7 @@ XModuleView` block that the rule already forbade and no review had
     in-flight branch → In Progress, merged PR → issue Done, a completed
     parent issue whose sub-issues all trace to merged PRs → Done, every
     open issue/PR carries at least one label, every open issue carries
-    exactly one `prio:*` label per `CLAUDE.md`'s "Ticket priority & triage"
-    section — a creation dispatch without one is rejected as incomplete,
+    exactly one `prio:*` label per `write-ticket` "Priority labels" — a creation dispatch without one is rejected as incomplete,
     and a sweep flags open issues carrying zero or two-plus `prio:*`
     labels). Also propagates parent/epic
     status both ways: a parent still `Todo` moves to In Progress the moment
@@ -385,9 +396,12 @@ file` are all denied alike) — an earlier version only handled the
     directory cannot be found" line out of the feedback. It sets
     `BLOG_LINT_TOUCHED=1`, which switches on the touched-file rules
     (`prefer-shared-constant`, `no-duplicate-string`,
-    `blog-test/no-nested-query`) that repo-wide
+    `no-failing-comment`, `blog-test/no-nested-query`,
+    `blog-test/prefer-before-each`) that
+    repo-wide
     `pnpm lint` leaves off; `.husky/pre-commit` sets it for lint-staged the
-    same way. When ESLint exits fatally in a directory that has an
+    same way. After ESLint it runs `scripts/check-file-size.mjs` on the file
+    (named-file mode) and feeds a size-budget breach back the same way. When ESLint exits fatally in a directory that has an
     `eslint.config.*` (the workspace's, or the root one the walk falls back
     to) — the config failed to load, typically a checkout installed before a
     plugin the shared config imports — the hook tells the agent, with
@@ -414,18 +428,36 @@ file` are all denied alike) — an earlier version only handled the
 
   - `pre-bash-worktree-install-guard.sh` — `PreToolUse` hook that blocks
     dependency-mutating pnpm commands inside a shared-deps agent worktree
-    (see below) before pnpm can write anything.
+    (see below) before pnpm can write anything. It checks the `node_modules`
+    of the git toplevel of the payload's `cwd`, falling back to
+    `$CLAUDE_PROJECT_DIR` only when the payload carries none —
+    `$CLAUDE_PROJECT_DIR` names the primary checkout even inside a worktree.
   - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
-    `git push` of a session's generated `claude/<words>-<id>` branch and
-    prints the rename command. `claude/issue-<n>-…` passes. Without an
-    issue number in the name, `board-auto-sync.yml` cannot move the ticket.
+    a `git push` that creates a branch off the pattern in
+    `scripts/branch-name.mjs` (`<type>/<n>-<slug>`, plus `main`,
+    `dependabot/…` and the `@claude` Action's
+    `claude/issue-<n>-<YYYYMMDD>-<HHMM>`) — generated `claude/…` names
+    included — and prints the
+    `git branch -m "$(pnpm -s branch:name <n> "<title>")"` command. A branch
+    `git ls-remote` already finds on the remote passes, so open PRs keep
+    pushing; an ls-remote error still checks the name. `.husky/pre-push`
+    applies the same check to the refs a push actually sends, counting a ref
+    as new when its remote sha is all zeros, which covers pushes the hook
+    cannot parse. Without an issue number in the name, `board-auto-sync.yml`
+    cannot move the ticket.
+  - `session-start-cloud.sh` — `SessionStart` hook that runs only when
+    `CLAUDE_CODE_REMOTE=true`: it runs `pnpm install --frozen-lockfile` when
+    `node_modules` is absent and prints the rename command when the current
+    branch is off the pattern. Its `timeout: 600` covers a cold install.
   - `gate-bypass-guard.sh` — `PreToolUse` hook, wired **globally** in
     `.claude/settings.json` (every agent's `Bash` calls, not one agent's —
     bypass commands could come from any context, including the
     orchestrator). Blocks the plain, unobfuscated forms of `git` commands
     that skip the husky gates or rewrite pushed history: a literal
     `--no-verify`/`-n` on `commit`/`push`/`merge`, a literal
-    `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, and
+    `--force`/`-f`/`--force-with-lease`/`+refspec` on `push`, a leading
+    `HUSKY=0` assignment (bare or after `env`) on `commit`/`push`/`merge`, a
+    literal `export HUSKY=0`, and
     `core.hooksPath` on `git config` — plus, since #3362, the literal
     destructive forms that have actually lost uncommitted agent work here:
     `git reset --hard`, `git clean -f`/`--force` (any short-flag cluster
@@ -464,18 +496,24 @@ file` are all denied alike) — an earlier version only handled the
     checks (#1797) are the deliberate exception: those shapes have no single
     allow-list prefix to mirror (`sed -i` vs. `sed -n`, `cmd > file` vs.
     `cmd > /dev/null`), so they get their own narrow, targeted detection
-    functions instead of a prefix-list entry. `read-only-agent-guard.test.sh`
+    functions instead of a prefix-list entry. So do two command families whose
+    reading forms an agent needs: `git branch` creating, renaming, copying,
+    deleting or tracking a branch (a bare name counts as creating one unless
+    a listing flag such as `--list` or `--contains` makes it a filter), and
+    any `pnpm` call passing `--update` (`check:file-size --update` rewrites
+    its baseline). `read-only-agent-guard.test.sh`
     pins the deny/allow matrix (including the bypasses found across #425's
     review rounds and the in-place/redirection cases added for #1797); run it
     directly or via CI (see [`docs/context/ci-automation.md`](./ci-automation.md)).
   - `test-writer-scope-guard.sh` — `PreToolUse` hook (wired in the
     `test-writer` agent frontmatter) that denies any `Edit`/`Write` whose
-    target isn't `*.test.ts`/`*.test.tsx`, backing the test-file-only scoping
+    target isn't `*.test.ts(x)` or a `.ts`/`.tsx` file under `src/testing/`
+    or `__mocks__/` (a path with `..` is denied), backing the scoping
     described above.
   - `pre-agent-gate0-guard.sh` — `PreToolUse` hook on the **`Agent` tool**
     (wired in `settings.json`, not in agent frontmatter, since it must see
     dispatches before any agent starts). Denies dispatching a **layer agent**
-    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`auth`/`insight`/`email`) to implement an issue that
+    (`config`/`studio`/`service`/`ui`/`web`/`db`/`platform-app`/`worker`/`auth`/`insight`/`email`) to implement an issue that
     isn't `In Progress` on the board — i.e. Gate 0 was skipped. The deny
     message names the fix (dispatch `board-keeper` with
     `"starting work on #<n>"`).
@@ -508,8 +546,8 @@ file` are all denied alike) — an earlier version only handled the
 
   - `subagent-stop-commit-guard.sh` — `SubagentStop` hook wired in
     `settings.json` with a `matcher` on the subagent type, restricted to the
-    ten layer agents
-    (`^(config|studio|service|ui|web|db|auth|platform-app|email|insight)$`);
+    eleven layer agents
+    (`^(config|studio|service|ui|web|db|auth|platform-app|worker|email|insight)$`);
     the script re-checks the payload's `agent_type` against the same list,
     so a widened matcher can't silently widen the guard. Blocks a layer agent
     from ending its turn while its worktree has uncommitted work: when the
@@ -521,7 +559,7 @@ file` are all denied alike) — an earlier version only handled the
     work" step that closes every layer agent's Definition of done: the
     orchestrator lands an agent's work by merging its **commit**, so an agent
     that reports done with the files only on disk looks finished while its
-    branch still sits at the base (#2437–#2439 all ended that way).
+    branch still sits at the base.
 
     The agent-type scope is load-bearing, not tidiness: `test-writer` also
     runs with `isolation: worktree`, but `read-only-agent-guard.sh` denies it
@@ -593,8 +631,8 @@ file` are all denied alike) — an earlier version only handled the
     left by an earlier dispatch, removing an issue dependency.
     `board-keeper-graphql-guard.test.sh` pins the deny/allow matrix.
 - **Repo-specific ESLint rules** (`configs/eslint/`) — `no-prop-spread.js`,
-  `boolean-prop-prefix.js`, `no-class-assertions.js`, `no-nested-query.js`
-  and `text-input-textarea-accessible-name.js` are the repo's hand-written rules
+  `boolean-prop-prefix.js`, `no-class-assertions.js`, `no-nested-query.js`,
+  `prefer-before-each.js` and `text-input-textarea-accessible-name.js` are the repo's hand-written rules
   (each with a `create()` visitor). They sit alongside two `no-restricted-imports` helpers
   that are configuration rather than rules: `no-upstream-imports.js`, a
   flat-config preset blocking a base-of-the-graph package from importing
@@ -752,6 +790,16 @@ file` are all denied alike) — an earlier version only handled the
     it never writes a file its worktree is always unchanged and the harness
     auto-removes it, so it never reaches §8's cleanup list. Its own file
     documents this so the line isn't dropped as pointless.
+  - **The read-only reviewers take a checkout path instead.** `reviewer`,
+    `a11y-reviewer`, `seo-auditor` and `explore` would review or search
+    committed `HEAD` alone in a worktree of their own, missing the
+    uncommitted changes and still approving — a silent scope cut worse than
+    the loud refusal. So each runs under `verify-runner`'s dispatch contract
+    (#2637): the prompt names the absolute path of the checkout, the first
+    command is `cd <path>` and every later one carries the same `cd … &&`,
+    and the report opens with `pwd` and `git rev-parse HEAD`, which
+    `develop-feature` §6 checks against the orchestrator's own `HEAD`.
+    `ci-watcher` needs neither, since it only calls GitHub about a named PR.
   - **§8 teardown is exit-then-clean.** `git worktree remove` and
     `git -C <other worktree> …` are both refused from inside, and a session
     cannot remove its own worktree while standing in it. Once the branch is
@@ -785,7 +833,7 @@ file` are all denied alike) — an earlier version only handled the
     files, so it only fills the gaps).
 
 - **Skills** (`.claude/skills/`):
-  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. The worktree and scratchpad removal procedure is the on-demand `worktree-cleanup.md` beside it, read only at §8. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (CLAUDE.md "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and a **Cost** line: every new cron, Workflow run, paid API call, Blob/KV use or hot-path query with its volume and free-allowance fit, or "none". Every ticket's `## Scope` names its `Feature doc:`, plus a `Cost:` line when it adds one of those.
+  - `develop-feature` — the lifecycle playbook (investigate → delegate per layer → test → review → commit → remove the subagent worktrees); start here for non-trivial work. It also holds the orchestrator rules `CLAUDE.md` only points at — "Planning work — mandatory, not advisory", "Mid-task decisions", "Use the scoped agents" (dispatch order, background dispatch), "Migrations", "Check for Voice candidates", "Docs that ship with the change", "Skills by task" and "What `pnpm verify` runs" — so layer agents do not load them with every dispatch. The worktree and scratchpad removal procedure is the on-demand `worktree-cleanup.md` beside it, read only at §8. Its Voice check lists every new or reworded public-site string, including the copy a new `@blog/ui` text prop will carry, as the plan's **Copy** line. The user settles whether each one is tenant-editable. The `web` and `ui` agents report unclassified strings under **Voice candidates**, and the reviewer lists them (`develop-feature` "Check for Voice candidates"). Its plan also carries a **Manual test** line: a change to what a page shows or how it behaves files a manual-test issue with its tickets (§2 "Manual-test issue"), and a **Cost** line: every new cron, Workflow run, paid API call, Blob/KV use or hot-path query with its volume and free-allowance fit, or "none". Every ticket's `## Scope` names its `Feature doc:`, plus a `Cost:` line when it adds one of those.
   - `add-content-type` — end-to-end recipe spanning all layers (schema → types → service → ui → web).
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app`: server-first, where a component lives (`shared/` only for one imported by two domains), the props contract with its ceiling (7 in `apps/platform`, 10 in `packages/ui` and `apps/web`) and the drop → group → slot → hook → context ladder (the `reviewer` blocks a touched component over it), derived state, provider hooks that throw outside their provider, styling files (a component's `tv()` in a sibling `*-variants.ts`, repeated styles kept in the workspace that renders them, a `lib/styling/` recipe only once a second `packages/ui` component imports it), sizes (a size derived from another element reads its token, an arbitrary value written twice becomes a token or const, a calculation names its terms), size and splitting, no unmeasured memo, accessible by construction.
@@ -805,7 +853,9 @@ file` are all denied alike) — an earlier version only handled the
     touch (a `tv()` still in a `.tsx`, a single-domain `shared/`
     component, file size alone, a raw type form, a missing feature page) are
     never swept. No fixed cadence — run whenever asked, naming the layer.
-  - `open-pull-request` — branch → work → PR with human-gated push/PR steps.
+    - `write-ticket` — creating an issue through `board-keeper`, the body check against the skills, the sub-issue, epic and manual-test templates, the `prio:*` labels and the `cloud-ok` criteria.
+  - `report-epic-status` — the chat-message budget and the one-table epic status format.
+  - `open-pull-request` — branch → work → PR with human-gated push/PR steps; it also holds the full "Delivery gate sequence", "PR conventions", the cloud-session board-evidence protocol and "Deployment".
     Two on-demand files sit beside it: `stacked-prs.md` (the `gh stack`
     mechanics, read once the user asks for a stack) and `job-label.md` (the
     Gate 5 label commands). The completing PR's body links its manual-test issue without a closing
@@ -832,13 +882,12 @@ file` are all denied alike) — an earlier version only handled the
   adopted 2026-10-14:
   - Where a component lives, props (ceiling and ladder), styling files,
     size and splitting → `react-component-practices`.
-  - File size budgets, feature docs (`docs/features/<feature>.md`), spec
-    sync and design-doc retention → `CLAUDE.md` Conventions.
+  - File size budgets → `CLAUDE.md` Conventions; feature docs (`docs/features/<feature>.md`), spec sync and design-doc retention → `develop-feature` "Docs that ship with the change".
   - Shared types, helpers and constants → `.claude/agents/config.md`.
   - Test setup — render wrappers, `beforeEach`/setup helpers, `__mocks__/`,
     fixture builders → `testing-practices`.
   - Manual-test issues → `develop-feature` §2; the issue template is in
-    `CLAUDE.md` "Issue body template".
+    `write-ticket` "Issue body template".
 - **Settings** (`.claude/settings.json`) — permission allowlist for the standard
   pnpm/turbo/sanity/git/gh commands and hook wiring; deploys and hand-edits to
   the generated Sanity types (`packages/config/src/sanity/generated/`, regenerate
@@ -897,7 +946,7 @@ file` are all denied alike) — an earlier version only handled the
   `gh pr create --base <branch>`, mainly for `sync`, which restacks the
   branches above a PR once it merges. A stack is opened only when the user
   asks for one — the default for a multi-layer feature is one layer's PR
-  merged before the next layer starts (`CLAUDE.md` → "One layer at a time",
+  merged before the next layer starts (`develop-feature` → "One layer at a time",
   adopted 2026-09-21). Stacking makes a per-layer split viable
   for the PRs _above_ the bottom one, since those target their predecessor
   rather than `main`. The bottom PR still targets `main` and still inherits

@@ -1,7 +1,7 @@
 # Stacked PRs — `gh stack` mechanics
 
 Read only once the user has asked for a stack. Viability (the bottom PR green
-on `main` alone, or expand/contract, or one PR) is `CLAUDE.md` "Stacked PRs".
+on `main` alone, or expand/contract, or one PR) is `SKILL.md` "PR conventions" → "Stacked PRs".
 Independent pieces never stack: each gets its own branch off `main`. Use the
 installed `github/gh-stack` extension, never hand-rolled
 `gh pr create --base <branch>`:

@@ -74,6 +74,7 @@ jobs:
           sh .claude/hooks/gate-bypass-guard.test.sh
           sh .claude/hooks/pre-bash-worktree-install-guard.test.sh
           sh .claude/hooks/pre-bash-branch-name-guard.test.sh
+          sh .claude/hooks/session-start-cloud.test.sh
           bash .claude/hooks/test-writer-scope-guard.test.sh
           bash .claude/hooks/pre-agent-gate0-guard.test.sh
           bash .claude/hooks/post-edit.test.sh

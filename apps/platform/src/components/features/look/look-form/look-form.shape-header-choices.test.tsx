@@ -4,6 +4,7 @@ import {
   HEADER_CONTROL_STYLE,
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
+  NAV_LINK_STYLE,
 } from '@blog/config';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
@@ -69,6 +70,12 @@ describe(`<${LookForm.name}/>`, () => {
         group: LOOK_FORM.headerBarStyleLabel,
         option: LOOK_FORM.headerBarStyleOptionLabel.FLOATING,
         saved: { headerBarStyle: HEADER_BAR_STYLE.FLOATING },
+      },
+      {
+        row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.navLinkStyleLabel,
+        option: LOOK_FORM.navLinkStyleOptionLabel.SOFT,
+        saved: { navLinkStyle: NAV_LINK_STYLE.SOFT },
       },
     ])(
       'saves the chosen $group style',

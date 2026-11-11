@@ -1,11 +1,20 @@
-import { BRAND_VARIANT, ICONS, SIZE, type TBrandVariant } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CARD_STYLE,
+  ICONS,
+  SIZE,
+  type TBrandVariant,
+} from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import {
   BRAND_BAND_LABELS,
   BrandBand,
   focusLastLink,
 } from '@blog/ui/testing/brand-bands';
-import { FilledAndUnframedOnEachBand } from '@blog/ui/testing/card-styles';
+import {
+  FilledAndPlainOnEachBand,
+  InCardStyle,
+} from '@blog/ui/testing/card-styles';
 import { objectKeys } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import type { Meta, StoryObj } from '@storybook/react-vite';
@@ -515,18 +524,60 @@ export const OnBrandPrimaryBand = restingAndFocusedOn(
   BRAND_VARIANT.BRAND_PRIMARY,
 );
 
-export const FilledAndUnframed: TStory = {
-  name: 'Filled and unframed, on each band',
+const filledNestedAndFocusedOn = (tone: TBrandVariant): TStory => ({
+  name: `Filled on a ${BRAND_BAND_LABELS[tone]} band — nested, and focused`,
   args: IconMedia.args,
   render: (args) => (
-    <FilledAndUnframedOnEachBand>
+    <InCardStyle cardStyle={CARD_STYLE.FILLED}>
+      <BrandBand tone={tone}>
+        <div className="item-card" style={{ width: 320, padding: 16 }}>
+          <MediaCard {...args} isInteractive={false} />
+        </div>
+        <div style={{ width: 280 }}>
+          <MediaCard {...args} />
+        </div>
+      </BrandBand>
+    </InCardStyle>
+  ),
+  play: focusLastLink,
+});
+
+export const FilledOnPrimaryBand = filledNestedAndFocusedOn(
+  BRAND_VARIANT.PRIMARY,
+);
+
+export const FilledOnSecondaryBand = filledNestedAndFocusedOn(
+  BRAND_VARIANT.SECONDARY,
+);
+
+export const FilledOnBrandPrimaryBand = filledNestedAndFocusedOn(
+  BRAND_VARIANT.BRAND_PRIMARY,
+);
+
+const inDark = (story: TStory): TStory => ({
+  ...story,
+  name: `${story.name} (dark)`,
+  globals: { theme: 'dark' },
+});
+
+export const FilledOnPrimaryBandDark = inDark(FilledOnPrimaryBand);
+
+export const FilledOnSecondaryBandDark = inDark(FilledOnSecondaryBand);
+
+export const FilledOnBrandPrimaryBandDark = inDark(FilledOnBrandPrimaryBand);
+
+export const FilledAndPlain: TStory = {
+  name: 'Filled and plain, on each band',
+  args: IconMedia.args,
+  render: (args) => (
+    <FilledAndPlainOnEachBand>
       <div style={{ width: 280 }}>
         <MediaCard {...args} />
       </div>
       <div style={{ width: 280 }}>
         <MediaCard {...args} isInteractive={false} />
       </div>
-    </FilledAndUnframedOnEachBand>
+    </FilledAndPlainOnEachBand>
   ),
 };
 

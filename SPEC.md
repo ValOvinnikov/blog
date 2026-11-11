@@ -417,7 +417,8 @@ editor-hostile.
 **Schema-required is not the same as present in stored data**, and the
 service layer draws that line deliberately. `required()` blocks the next
 publish; it never backfills what is already stored. So a `.notNull()` in a
-GROQ projection — which throws and 404s the page rather than degrading — is
+GROQ projection — which throws and fails the page with a 500 rather than
+degrading — is
 applied only where the data was _already_ guaranteed when it was written.
 `module_postLatest`/`module_postFeatured`/`module_postRelated` became
 required only after documents existed without a heading, so projecting
@@ -727,7 +728,7 @@ fragment asserts `.notNull()` only over what it projects:
 
 Where the parse throws is the query layer's business and ends there.
 `safeAsync` turns the throw into `{ ok: false }`, and the consequence is
-whatever the caller decides — 404 the page, drop the failing module and
+whatever the caller decides — fail the page with a 500, drop the failing module and
 render the rest, or degrade to an empty but valid response. The query is
 neutral between them, and no single rule predicts which a given caller
 picks. Several currently decide without logging, which is tracked
@@ -1532,10 +1533,12 @@ five `--radius*` tokens and `density` the nine layout `--spacing-*` tokens
 (`gutter`, `section`, `page-y`, `site-x/y`, `card-x/y`, `card-gap`, `band`)
 under `:root` only, the accent hue also sets the on-image and
 `--scrim-brand-*` tokens (`IMAGE_SCRIM_RAMP`) under `:root` only,
-and `cardStyle` sets the seven `--item-*` tokens the `item-card` utility reads,
-also under `:root` only — `ACCENT_BAR` a borderless card with a 2px brand bar
-on the left, `OUTLINED` a hairline border all round; both at `--radius-md`, so
-`radiusScale` reaches item cards under either style.
+and `cardStyle` sets the twelve `--item-*` tokens the `item-card` utility and
+`Accordion` read, also under `:root` only — `ACCENT_BAR` a borderless card with
+a 2px brand bar on the left, `OUTLINED` a hairline border all round, `FILLED`
+the band's tint with no outline, `RAISED` a hairline plus `--shadow-card`, and
+`PLAIN` no frame, fill or shadow; all at `--radius-md`, so `radiusScale`
+reaches item cards under every style.
 `MD`, `DEFAULT` and `ACCENT_BAR` reproduce `configs/tailwind/theme.css`'s
 static values, so a site with no saved look renders as the defaults; `density` does not touch
 Tailwind's base `--spacing`, so control sizes stay fixed. The ramp, radius,
@@ -1545,7 +1548,8 @@ density and card-style values live in `@blog/config`'s theme declaration tables;
 surface, which also carries the `dark` class so the tenant's dark ramp wins
 over `theme.css`'s static `.dark` values. `apps/web`'s
 `buildThemeStyleBlock` reads the same tables. The
-Look page's Cards card sets the card style (Accent bar or Outlined),
+Look page's Cards card sets the card style (Accent bar, Outlined, Filled,
+Raised or Plain),
 apart from radius and density in Corners & spacing; picking a preset re-seeds it from
 `PRESET_REGISTRY`'s `cardStyle`, and the preview's linked and static cards show
 it before saving. The
@@ -2542,7 +2546,7 @@ never hidden behind a closed disclosure.
 
 The runtime half is enforced in the query, not the transformer: the `seo`
 projection and `metaTitle` are both `.notNull()`, so a document missing
-either fails to parse and the route logs and 404s through the shared
+either fails to parse and the route logs and answers 500 through the shared
 page-loader guard, exactly like any other required field. `resolveSeo`
 carries no guard and throws nothing of its own. Studio validation never runs
 on writes made through the Sanity client, so the query is what actually
@@ -2590,7 +2594,7 @@ Full checklist:
 ## 12. Delivery process
 
 Work is tracked on the GitHub project board ("Blog Build"). Every issue follows
-the gate sequence (also in `CLAUDE.md` — the operational source of truth):
+the gate sequence (in full in the `open-pull-request` skill — the operational source of truth):
 
 1. Board → In Progress → branch from `main` → work + quality gates.
 2. **Commit, push, and PR are three separate human-approved gates.**
@@ -2825,6 +2829,19 @@ throws, still surfaces as `ok: false`, and still logs. The rule underneath is
 unchanged: a stale link is the reader's whole truth and needs no line; a broken
 page is not.
 
+**A failed load answers 500; only a missing document answers 404.** To a
+crawler a 404 reads as "gone" and risks de-indexing a healthy page over a
+transient Sanity fault, while a 500 reads as "try again". So the app logs an
+`ok: false` page or module load once, with request context, and rethrows its
+error to the locale error boundary (`app/[tenant]/[locale]/error.tsx`);
+`data: undefined` calls `notFound()` with no log. `guardPageLoaderResult`
+(`apps/web`) applies both for every page component, and the Post List and
+Taxonomy List modules follow the same rule. A misconfigured document is a 500
+too. That one server line is the caller's own event (`landing_page.fetch_failed`
+and the like), carrying its context: the error is rethrown marked with
+`markErrorLogged`, so `onRequestError`'s `request.unhandled_error` skips it,
+while a render error nobody logged still gets that line.
+
 **A consumer that treats `ok` as a proxy for "the document exists" is a
 migration hazard.** When a loader moves from throwing to returning `undefined`,
 every `result.ok`-only check silently flips meaning, and `type-check` cannot
@@ -3024,11 +3041,12 @@ ring offset could match.
 
 **Elevation is two tokens** (`shadow-card` also carries a heavier `.dark`
 value; `shadow-float` has one value for both modes). `shadow-card` marks a
-raised card — `Panel` and the highlighted `PricingCard` —
+raised card — `Panel`, the highlighted `PricingCard` and every item card under
+`RAISED` —
 and `shadow-float` marks chrome floating above the page, the `Toast` and the
-`PopoverMenu` panel. A static item card carries no shadow (`--item-shadow` is
-`none` under both card styles); a surface's frame, not its depth, is what bounds
-it.
+`PopoverMenu` panel. A static item card carries `shadow-card` only under the
+`RAISED` card style (`--item-shadow` is `none` under the other four); a
+surface's frame, not its depth, is what bounds it.
 
 **No props and no context.** Everything stays server-renderable, dark mode
 follows automatically because the defaults are references rather than literals
@@ -3057,31 +3075,44 @@ Item cards — `MediaCard`, `TaxonomyCard`, `QuoteCard`, `PricingCard`, each
 contact-form success card and the `CtaModule.Callout` and `CtaModule.Split`
 box — paint their frame
 through one `item-card` utility in `configs/tailwind/theme.css`, which reads
-seven inherited `--item-*` properties rather than fixed classes, and each pairs
+inherited `--item-*` properties rather than fixed classes, and each pairs
 it with `surface-card`, which retargets `--ambient` to `--surface`. The tenant picks
 the values site-wide on the Look page (`site_config.card_style`), and
 `buildThemeStyleBlock` declares them under `:root` from `@blog/config`'s
 `CARD_STYLE_DECLARATIONS`:
 
-| Property               | `ACCENT_BAR` (default) | `OUTLINED`         |
-| ---------------------- | ---------------------- | ------------------ |
-| `--item-radius`        | `var(--radius-md)`     | `var(--radius-md)` |
-| `--item-border-width`  | `0px`                  | `1px`              |
-| `--item-accent-width`  | `2px`                  | `1px`              |
-| `--item-accent-color`  | `var(--brand-primary)` | `var(--border)`    |
-| `--item-shadow`        | `none`                 | `none`             |
-| `--item-fill-mix`      | `0%`                   | `0%`               |
-| `--item-divider-width` | `0px`                  | `0px`              |
+| Property                 | `ACCENT_BAR` (default) | `OUTLINED`         | `FILLED`               | `RAISED`             | `PLAIN`         |
+| ------------------------ | ---------------------- | ------------------ | ---------------------- | -------------------- | --------------- |
+| `--item-radius`          | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | same            |
+| `--item-border-width`    | `0px`                  | `1px`              | `0px`                  | `1px`                | `0px`           |
+| `--item-accent-width`    | `2px`                  | `1px`              | `0px`                  | `1px`                | `0px`           |
+| `--item-accent-color`    | `var(--brand-primary)` | `var(--border)`    | `var(--border)`        | `var(--border)`      | `var(--border)` |
+| `--item-shadow`          | `none`                 | `none`             | `none`                 | `var(--shadow-card)` | `none`          |
+| `--item-fill-mix`        | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`            |
+| `--item-clear-mix`       | `0%`                   | `0%`               | `0%`                   | `0%`                 | `100%`          |
+| `--item-card-hover-mix`  | `0%`                   | `0%`               | `100%`                 | `0%`                 | `0%`            |
+| `--item-card-hover-edge` | `transparent`          | `transparent`      | `var(--border-strong)` | `transparent`        | `transparent`   |
+| `--item-divider-width`   | `0px`                  | `0px`              | `0px`                  | `0px`                | `1px`           |
+| `--item-stack-gap`       | `0.75rem`              | `0.75rem`          | `0.75rem`              | `0.75rem`            | `0px`           |
+| `--item-stack-radius`    | `var(--radius-md)`     | `var(--radius-md)` | same                   | same                 | `0px`           |
 
 The fill is `--surface` mixed toward `--item-fill` by `--item-fill-mix`. A
-band owns `--item-fill`, the tint a filled card takes on it
-(`surface-secondary` → `--brand-primary-muted`, `surface-brand-primary` →
-`--tint`, the page ground's fallback `--brand-primary-muted`, unset by
+band owns `--item-fill`, the tint a filled card takes on it, and
+`--item-nested-fill`, the fill of a card inside a card, each a single ramp
+token the contrast guard measures text against (`surface-secondary` →
+`--brand-primary-muted` / `--brand-primary-wash`, `surface-brand-primary` →
+`--brand-primary-wash` / `--surface`, the page ground's fallbacks
+`--brand-primary-muted` / `--brand-primary-wash`, both unset by
 `surface-popover`); card style sets only the mix, because a `var()` inside a
 custom property resolves where it is declared, so a colour declared on `:root`
-would ignore the band. Every `Accordion` item but the first draws a top border
-at the wider of `--item-divider-width` and `--item-border-width`, so a style
-with no frame still separates its items.
+would ignore the band. That colour is then mixed toward `transparent` by
+`--item-clear-mix`, so `PLAIN` paints no background at all. An item card inside
+another item card takes `--item-nested-fill` as its `--item-fill`, so a filled
+card never matches its filled parent. Every `Accordion` item draws a top border, and the last a bottom
+border, at the wider of `--item-divider-width` and `--item-border-width`, so a
+style with no frame still draws lines above, between and below its items; the
+accordion stacks its items `--item-stack-gap` apart and rounds them at
+`--item-stack-radius`, both `0px` under `PLAIN`, so its dividers stay straight.
 
 `--radius-item` exposes `--item-radius` as `rounded-item`. The accent bar is an
 `::after` over the left border's straight run, between the corners, so it stays
@@ -3090,8 +3121,17 @@ does not show. It is drawn as a border, so forced colours keep it as a
 system-colour line, and a focused stretched card link lifts its ring above it.
 `theme.css`'s
 static values are `ACCENT_BAR`'s, so a site with no saved look renders the
-accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s brand-muted tint
-on hover and focus-within under either style; the style changes only the frame.
+accent bar. An interactive card adds `INTERACTIVE_ITEM_CARD`'s `bg-item-hover`
+on hover and focus-within: the band's tint under every style but `FILLED`,
+which rests on a tint and so hovers to the band's `--item-nested-fill`
+(`--item-card-hover-mix: 100%`, which only `item-card` reads, so a
+non-card such as `LogoTile` keeps the tint), and draws a 1px `--border-strong`
+outline on hover and focus-within (`--item-card-hover-edge`), so the card keeps
+an edge against every band. Under `PLAIN` an item card's `surface-card` keeps
+the band's `--backdrop` as its `--ambient` (every band utility publishes
+`--backdrop` beside `--ambient`), so ring offsets and covering fills inside a
+frameless card match the section behind it; the other styles and
+`surface-card` panels keep `--surface`.
 The `CtaModule` box takes no `surface-card`: its band variant's `bg-*` (and
 `surface-*` retarget) overrides the utility's `--surface` fill, so a card style
 frames the band surface and never paints it.

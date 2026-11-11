@@ -9,9 +9,11 @@ import tseslint from 'typescript-eslint';
 
 import { noClassAssertionsRule } from './no-class-assertions.js';
 import { noDuplicateStringRule } from './no-duplicate-string.js';
+import { noFailingCommentRule } from './no-failing-comment.js';
 import { noNestedQueryRule } from './no-nested-query.js';
 import { noNodeAccessRule } from './no-node-access.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
+import { preferBeforeEachRule } from './prefer-before-each.js';
 import { preferSharedConstantRule } from './prefer-shared-constant.js';
 import { preferUtilsPrimitiveRule } from './prefer-utils-primitive.js';
 
@@ -28,6 +30,7 @@ const touchedFilePlugins = {
       rules: {
         'prefer-shared-constant': preferSharedConstantRule,
         'no-duplicate-string': noDuplicateStringRule,
+        'no-failing-comment': noFailingCommentRule,
         'prefer-utils-primitive': preferUtilsPrimitiveRule,
       },
     },
@@ -40,6 +43,7 @@ const touchedFileRules = {
   rules: {
     'blog-touched/prefer-shared-constant': 'error',
     'blog-touched/no-duplicate-string': ['error', { threshold: 2 }],
+    'blog-touched/no-failing-comment': 'error',
     'blog-touched/prefer-utils-primitive': 'error',
   },
 };
@@ -54,6 +58,7 @@ const touchedTestFileRules = {
   plugins: { vitest },
   rules: {
     'blog-test/no-nested-query': 'error',
+    'blog-test/prefer-before-each': 'error',
     'vitest/valid-title': [
       'error',
       {
@@ -148,6 +153,7 @@ export default [
         rules: {
           'no-class-assertions': noClassAssertionsRule,
           'no-nested-query': noNestedQueryRule,
+          'prefer-before-each': preferBeforeEachRule,
         },
       },
       'testing-library': {

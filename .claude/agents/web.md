@@ -52,13 +52,14 @@ Before writing code:
   props into `ui`.
 - **Check `result.ok` after every service call** — service functions return
   `Promise<TResult<T>>` via `safeAsync`; never read `result.data` before the
-  check. Critical data (page content, post detail) → `notFound()` or render
-  nothing. Optional/global data (site settings in a layout) → log and fall
+  check. Critical data (page content, post detail) → log and throw to the
+  error boundary (a 500), or render nothing. Optional/global data (site settings in a layout) → log and fall
   back, or return early when no fallback exists.
 - **A page-document loader needs the data checked too.** It returns
   `TMaybeUndefined<TViewModel>`, so "no document matched that slug" arrives as
   `ok: true` with `data: undefined`. The branch is three-way: `!ok` → log at
-  `error`, then `notFound()`; `ok && !data` → `notFound()` with **no log** (a
+  `error`, then throw to the error boundary (a 500, which a crawler retries
+  where a 404 reads as gone); `ok && !data` → `notFound()` with **no log** (a
   stale link explains itself, `SPEC.md` §17); otherwise destructure and
   render. A rendering consumer gets all three from `guardPageLoaderResult`
   (`@web/utils/guard-page-loader-result`). **A non-rendering consumer —
@@ -107,10 +108,10 @@ const result = await queries.bookmarks.addBookmark(tenantId, userId, postId);
 if (!result.ok) {
   if (result.error === ERROR_CODE.DB_NOT_FOUND) {
     logger.warn(BOOKMARK_LOG.ADD_ROW_VANISHED, { postId });
-    return { ok: false };
+    return toOutcome(ACTION_OUTCOME.UNAVAILABLE);
   }
   logger.error(BOOKMARK_LOG.ADD_FAILED, { postId, error: result.error });
-  return { ok: false };
+  return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 }
 ```
 
@@ -345,7 +346,7 @@ co-located test fails a key on neither. The catalog and both lists are the
 `config` agent's to write.
 
 **Which list a string joins is the user's call, settled in the plan — never
-yours** (CLAUDE.md → "Check for Voice candidates"):
+yours** (`develop-feature` → "Check for Voice candidates"):
 
 - Your dispatch names each key and its list.
 - Never hardcode a string the dispatch did not cover. Report it under

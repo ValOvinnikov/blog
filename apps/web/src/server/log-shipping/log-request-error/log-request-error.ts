@@ -1,4 +1,5 @@
 import { REQUEST_LOG } from '@web/constants/request';
+import { isErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
 import type { Instrumentation } from 'next';
 
@@ -7,6 +8,10 @@ export const logRequestError: Instrumentation.onRequestError = (
   request,
   context,
 ) => {
+  if (isErrorLogged(error)) {
+    return;
+  }
+
   logger.error(REQUEST_LOG.UNHANDLED_ERROR, {
     error,
     routePath: context.routePath,

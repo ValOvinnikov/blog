@@ -68,6 +68,8 @@
   /* prettier-ignore */
   --color-tint: var(--tint, var(--brand-primary-muted)); /* @role brand tint of the surface in scope */
   /* prettier-ignore */
+  --color-item-hover: color-mix(in oklch, var(--tint, var(--brand-primary-muted)), var(--item-nested-fill, var(--brand-primary-wash)) var(--item-hover-mix, 0%)); /* @role hovered or focused item card */
+  /* prettier-ignore */
   --color-media-fill: var(--media-fill, var(--surface-2)); /* @role icon media fill of the surface in scope */
   /* prettier-ignore */
   --color-brand-primary-contrast: var(--brand-primary-contrast); /* @role text on brand-primary-solid */
@@ -290,6 +292,7 @@
      `surface-brand-primary` ancestor (below) changes them for everything
      inside it, with no per-component prop. */
   --ambient: var(--primary);
+  --backdrop: var(--primary);
   --divider: var(--border);
   /* 3:1 (WCAG 1.4.11) against --surface and against --secondary or
      --brand-primary-muted at every accent hue, where --border-emphasis falls short. */
@@ -300,6 +303,7 @@
   --brand-primary: oklch(0.45 0.17 250);
   --brand-primary-hover: oklch(0.39 0.17 250);
   --brand-primary-muted: oklch(0.95 0.03 250);
+  --brand-primary-wash: oklch(0.975 0.015 250);
   --brand-primary-contrast: oklch(0.99 0 0);
   --brand-primary-solid: oklch(0.51 0.17 250);
   --brand-primary-solid-hover: oklch(0.45 0.17 250);
@@ -387,7 +391,12 @@
   --item-accent-color: var(--brand-primary);
   --item-shadow: none;
   --item-fill-mix: 0%;
+  --item-clear-mix: 0%;
+  --item-card-hover-mix: 0%;
+  --item-card-hover-edge: transparent;
   --item-divider-width: 0px;
+  --item-stack-gap: 0.75rem;
+  --item-stack-radius: var(--radius-md);
 
   --header-control-border: var(--border-strong);
   --header-control-fill: var(--surface);
@@ -419,6 +428,7 @@
   --brand-primary: oklch(0.7 0.16 250);
   --brand-primary-hover: oklch(0.76 0.16 250);
   --brand-primary-muted: oklch(0.3 0.06 250);
+  --brand-primary-wash: oklch(0.25 0.04 250);
   /* Near-black (not white): the dark-mode primary button is now a bright,
      vivid brand-primary fill (matching --brand-primary) with near-black label
      text, which reads as the intended "bright brand-primary button" look and
@@ -550,6 +560,10 @@
   border-radius: var(--nav-link-radius, var(--radius-sm));
 }
 
+@utility rounded-header-control {
+  border-radius: var(--radius-header-control, 9999px);
+}
+
 @utility nav-link-marked {
   background-color: var(--nav-link-fill);
   outline: 1px solid var(--nav-link-outline);
@@ -591,15 +605,18 @@
    resolve against that background instead of the page default. */
 @utility surface-secondary {
   --ambient: var(--secondary);
+  --backdrop: var(--secondary);
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
   --item-fill: var(--brand-primary-muted);
+  --item-nested-fill: var(--brand-primary-wash);
 }
 
 /* 10% lifts --tint off the band by ~1.13:1 light / ~1.16:1 dark while
    brand-primary-hover text on it holds ≥5.86:1 / ≥5.11:1 across hues. */
 @utility surface-brand-primary {
   --ambient: var(--brand-primary-muted);
+  --backdrop: var(--brand-primary-muted);
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
   --tint: color-mix(
@@ -608,11 +625,13 @@
     var(--brand-primary) 10%
   );
   --media-fill: var(--tint);
-  --item-fill: var(--tint);
+  --item-fill: var(--brand-primary-wash);
+  --item-nested-fill: var(--surface);
 }
 
 @utility surface-tint {
   --ambient: var(--tint, var(--brand-primary-muted));
+  --backdrop: var(--tint, var(--brand-primary-muted));
   --divider: var(--border-strong);
   --field-boundary: var(--field-boundary-tinted);
 }
@@ -625,6 +644,7 @@
    wcagContrastRatio (packages/utils/src/color/oklch.ts). */
 @utility surface-nested {
   --ambient: var(--surface-2);
+  --backdrop: var(--surface-2);
   --divider: var(--border-strong);
 }
 
@@ -633,21 +653,24 @@
   --divider: var(--border);
 }
 
-/* Unsets a band's mixed --tint and --item-fill, so menu rows and tiles tint with
+/* Unsets a band's mixed --tint and item fills, so menu rows and tiles tint with
    --brand-primary-muted on the panel's own --surface wherever the menu opens. */
 @utility surface-popover {
   --ambient: var(--surface);
+  --backdrop: var(--surface);
   --divider: var(--border);
   --tint: initial;
   --item-fill: initial;
+  --item-nested-fill: initial;
 }
 
 /* The accent bar is drawn over the left border's straight run, between the
    corners, so it stays a straight bar on a rounded card; where it matches the
    border (Outlined) it is invisible. It is a border, not a background, because
    forced colours repaint backgrounds with the page colour but keep borders.
-   Bands own --item-fill and card styles set only --item-fill-mix: a var() in a
-   custom property resolves where declared, so a :root fill would ignore bands. */
+   Bands own --item-fill and --item-nested-fill, each a single ramp token the
+   contrast guard measures, and card styles set only mixes: a var() in a custom
+   property resolves where declared, so a :root fill would ignore bands. */
 @utility item-card {
   position: relative;
   border-style: solid;
@@ -656,10 +679,30 @@
   border-radius: var(--radius-item);
   background-color: color-mix(
     in oklch,
-    var(--surface),
-    var(--item-fill, var(--brand-primary-muted)) var(--item-fill-mix)
+    color-mix(
+      in oklch,
+      var(--surface),
+      var(--item-fill, var(--brand-primary-muted)) var(--item-fill-mix)
+    ),
+    transparent var(--item-clear-mix)
   );
   box-shadow: var(--item-shadow);
+  --item-hover-mix: var(--item-card-hover-mix);
+  --item-hover-edge: var(--item-card-hover-edge);
+
+  & .item-card {
+    --item-fill: var(--item-nested-fill, var(--brand-primary-wash));
+  }
+
+  /* Bands publish --backdrop beside --ambient; a var(--ambient) copy would
+     cycle with the --ambient this rule sets. */
+  &.surface-card {
+    --ambient: color-mix(
+      in oklch,
+      var(--surface),
+      var(--backdrop) var(--item-clear-mix)
+    );
+  }
 
   &::after {
     content: '';

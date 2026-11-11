@@ -1,5 +1,20 @@
 import { CONTRAST_ROLE, type TContrastRole } from '@blog/config/constants';
 
+import {
+  BANDS,
+  BRAND_PRIMARY,
+  BRAND_PRIMARY_MUTED,
+  CODE_SURFACES,
+  ERROR_MUTED,
+  FIELD_SURFACES,
+  FILLED_ITEM_SURFACES,
+  PRIMARY_SUBTLE,
+  SCRIM_STOPS_UNDER_COPY,
+  SECONDARY,
+  TEXT,
+  TEXT_SURFACES,
+  TINTED_FIELD_SURFACES,
+} from './contrast-surfaces';
 import { HEADER_CONTRAST_PAIRS } from './header-contrast-pairs';
 
 export type TThemeToken = `--${string}`;
@@ -10,52 +25,6 @@ export type TContrastPair = {
   role: TContrastRole;
   followsAccentHue: boolean;
 };
-
-const PRIMARY_SUBTLE = '--primary-subtle' satisfies TThemeToken;
-const SECONDARY = '--secondary' satisfies TThemeToken;
-const SURFACE_2 = '--surface-2' satisfies TThemeToken;
-const BRAND_PRIMARY_MUTED = '--brand-primary-muted' satisfies TThemeToken;
-const ERROR_MUTED = '--error-muted' satisfies TThemeToken;
-const TEXT = '--text' satisfies TThemeToken;
-const BRAND_PRIMARY = '--brand-primary' satisfies TThemeToken;
-
-const BANDS = [
-  '--primary',
-  PRIMARY_SUBTLE,
-  SECONDARY,
-  '--surface',
-  SURFACE_2,
-  BRAND_PRIMARY_MUTED,
-] as const satisfies readonly TThemeToken[];
-
-const TEXT_SURFACES = [
-  ...BANDS,
-  ERROR_MUTED,
-] as const satisfies readonly TThemeToken[];
-
-const FIELD_SURFACES = [
-  '--primary',
-  PRIMARY_SUBTLE,
-  '--surface',
-] as const satisfies readonly TThemeToken[];
-
-const TINTED_FIELD_SURFACES = [
-  '--surface',
-  SECONDARY,
-  BRAND_PRIMARY_MUTED,
-] as const satisfies readonly TThemeToken[];
-
-const SCRIM_STOPS_UNDER_COPY = [
-  '--scrim-brand-strong',
-  '--scrim-brand-mid',
-  '--scrim-neutral-strong',
-  '--scrim-neutral-mid',
-] as const satisfies readonly TThemeToken[];
-
-const CODE_SURFACES = [
-  SURFACE_2,
-  BRAND_PRIMARY_MUTED,
-] as const satisfies readonly TThemeToken[];
 
 export const CONTRAST_PAIRS = {
   TEXT: {
@@ -72,13 +41,13 @@ export const CONTRAST_PAIRS = {
   },
   BRAND_PRIMARY: {
     foreground: BRAND_PRIMARY,
-    surfaces: BANDS,
+    surfaces: FILLED_ITEM_SURFACES,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
   BRAND_PRIMARY_HOVER: {
     foreground: '--brand-primary-hover',
-    surfaces: BANDS,
+    surfaces: FILLED_ITEM_SURFACES,
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },

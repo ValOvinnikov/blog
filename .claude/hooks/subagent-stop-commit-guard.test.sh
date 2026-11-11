@@ -108,6 +108,7 @@ check_json_cwd "$agent_nested/packages/ui" block "cwd nested inside the worktree
 echo "Agent type, dirty agent worktree:"
 check_agent_type ui "$agent_dirty" block "layer agent (ui) blocks"
 check_agent_type platform-app "$agent_untracked" block "layer agent (platform-app) blocks"
+check_agent_type worker "$agent_dirty" block "layer agent (worker) blocks"
 check_agent_type test-writer "$agent_dirty" pass "test-writer passes — it cannot commit"
 check_agent_type reviewer "$agent_dirty" pass "reviewer passes"
 check_agent_type "plugin:some-plugin:ui" "$agent_dirty" pass "plugin-scoped name is not a layer agent"

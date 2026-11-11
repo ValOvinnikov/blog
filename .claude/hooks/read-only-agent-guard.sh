@@ -78,6 +78,8 @@ DENY_PREFIXES=(
   "pnpm typegen"
   "pnpm format"
   "npx sanity"
+  "drizzle-kit"
+  "npx drizzle-kit"
   "gh project item-add"
   "gh project item-edit"
 )
@@ -140,6 +142,49 @@ git_subcommand_denied() {
       return 1
       ;;
     esac
+  done
+  return 1
+}
+
+# True if $1 is a `git branch` invocation that creates, renames, copies,
+# deletes or re-points a branch. Only listing is a read: a bare positional
+# argument names a new branch unless a listing flag turns it into a filter.
+git_branch_write_denied() {
+  tokenize "$1"
+  [ "${TOKENS[0]:-}" = "git" ] || return 1
+  local i=1
+  while [ "$i" -lt "${#TOKENS[@]}" ]; do
+    case "${TOKENS[$i]}" in
+    -C | -c) i=$((i + 2)) ;;
+    -*) i=$((i + 1)) ;;
+    *) break ;;
+    esac
+  done
+  [ "${TOKENS[$i]:-}" = "branch" ] || return 1
+  local t listing=0 positional=0
+  for t in "${TOKENS[@]:$((i + 1))}"; do
+    case "$t" in
+    -m | -M | -c | -C | -d | -D | -f | -u | -t | --move | --copy | --delete | --force | --track | --track=* | --no-track | --set-upstream-to* | --unset-upstream | --edit-description)
+      return 0
+      ;;
+    -l | --list | -a | --all | -r | --remotes | --contains | --contains=* | --no-contains | --no-contains=* | --merged | --merged=* | --no-merged | --no-merged=* | --points-at | --points-at=*)
+      listing=1
+      ;;
+    -*) ;;
+    *) positional=1 ;;
+    esac
+  done
+  [ "$positional" -eq 1 ] && [ "$listing" -eq 0 ]
+}
+
+# True if $1 is a `pnpm` invocation passing `--update`, the form of the
+# `check:*` scripts that rewrites a baseline (`check:file-size --update`).
+pnpm_update_denied() {
+  tokenize "$1"
+  [ "${TOKENS[0]:-}" = "pnpm" ] || return 1
+  local t
+  for t in "${TOKENS[@]}"; do
+    [ "$t" = "--update" ] && return 0
   done
   return 1
 }
@@ -280,6 +325,12 @@ while IFS= read -r segment; do
 
   if git_subcommand_denied "$segment"; then
     deny "$GUARD_LABEL: this git command mutates the working tree, repo, or board state. Report the change you wanted to make instead of applying it; for searching, prefer the Grep/Read tools."
+  fi
+  if git_branch_write_denied "$segment"; then
+    deny "$GUARD_LABEL: this git branch command renames, copies or deletes a branch. Report the change you wanted to make instead of applying it."
+  fi
+  if pnpm_update_denied "$segment"; then
+    deny "$GUARD_LABEL: '--update' rewrites a checked-in baseline. Run the check without it and report the result instead."
   fi
   if pnpm_exec_denied "$segment"; then
     deny "$GUARD_LABEL: 'pnpm exec'/'--filter ... exec' runs an arbitrary command and can mutate the tree. Report the change you wanted to make instead of applying it."

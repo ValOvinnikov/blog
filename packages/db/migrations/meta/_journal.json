@@ -78,6 +78,13 @@
       "when": 1794339413684,
       "tag": "0010_add_site_config_nav_link_style",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794387221705,
+      "tag": "0011_add_card_style_filled_raised_plain",
+      "breakpoints": true
     }
   ]
 }

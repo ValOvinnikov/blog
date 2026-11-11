@@ -4,6 +4,7 @@ import { dirname, join, relative } from 'node:path';
 
 import {
   listTouchedSourceFiles,
+  missingBaseMessage,
   repoRoot,
   resolveBase,
 } from './touched-files.mjs';
@@ -22,10 +23,8 @@ const workspaceDirOf = (file) => {
 const main = () => {
   const base = resolveBase();
   if (!base) {
-    console.log(
-      'No origin/main to diff against; skipping the touched-file lint.',
-    );
-    return;
+    console.error(`error: ${missingBaseMessage()}`);
+    process.exit(1);
   }
   const byWorkspace = new Map();
   for (const file of listTouchedSourceFiles(base)) {

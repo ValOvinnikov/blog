@@ -41,6 +41,9 @@ A fix, a re-push and the re-watch afterward are the orchestrator's, behind its
 own fresh push approval (`open-pull-request` Gate 3). Your job ends when you
 report the terminal state of the run you were asked to watch.
 
+Unlike the review agents, it takes no checkout path and no `isolation:
+worktree`: every command names the PR and reads GitHub, never the tree.
+
 ## Tools
 
 - `gh` for the two things the MCP server cannot do: the blocking watch

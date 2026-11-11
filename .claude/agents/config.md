@@ -66,7 +66,7 @@ new upstream here means auditing every consumer's `paths` and vitest alias.
   `VOICE_FIXED_KEYS`. The catalog and both lists are yours to write, but
   which list a string joins is the user's decision: take it from the ticket's
   Copy line, and report a string with no decision under **Voice candidates**
-  instead of choosing (CLAUDE.md → "Check for Voice candidates").
+  instead of choosing (`develop-feature` → "Check for Voice candidates").
 - `react/` — `TPolymorphicProps<C, OwnProps>` (`polymorphic.ts`) and
   `IWithChildren` (`with-children.ts`), reachable only through the
   `@blog/config/react` subpath (`react/index.ts`) so the barrel stays
@@ -74,7 +74,7 @@ new upstream here means auditing every consumer's `paths` and vitest alias.
   own `exports` subpath when it is a distinct concern.
 - `sanity/generated/` — the `studio` agent's typegen output
   (`pnpm --filter @blog/studio typegen`): confirm a regeneration landed, never
-  edit it, by tool or shell (CLAUDE.md → "Never hand-edit the generated
+  edit it, by tool or shell (`studio-schema-practices` → "Typegen" → "Never hand-edit the generated
   types"). A wrong generated type is a `studio` schema fix.
 
 `package.json` `exports` declares four subpaths: `.` (the `src/index.ts`

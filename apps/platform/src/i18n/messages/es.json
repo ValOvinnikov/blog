@@ -738,11 +738,17 @@
     },
     "cardStyleOptionLabel": {
       "ACCENT_BAR": "Barra de acento",
-      "OUTLINED": "Con contorno"
+      "OUTLINED": "Con contorno",
+      "FILLED": "Relleno",
+      "RAISED": "Elevado",
+      "PLAIN": "Simple"
     },
     "cardStyleOptionDescription": {
       "ACCENT_BAR": "Una barra del color de la marca en el borde izquierdo",
-      "OUTLINED": "Un contorno fino alrededor"
+      "OUTLINED": "Un contorno fino alrededor",
+      "FILLED": "Un fondo tintado, sin contorno",
+      "RAISED": "Un contorno fino con una sombra suave",
+      "PLAIN": "Sin marco; el espacio separa las tarjetas"
     },
     "headerControlStyleLabel": "Botones de la cabecera",
     "headerControlStyleDescription": "Los botones de idioma, tema, menú e Iniciar sesión, en cualquier tamaño de pantalla.",
@@ -812,8 +818,9 @@
     },
     "navLinkStyleLabel": "Enlaces de navegación",
     "navLinkStyleDescription": "Cómo se ven los enlaces del menú principal. Los enlaces del pie de página no cambian.",
+    "navLinkStyleGlyphWord": "Enlace",
     "navLinkStyleOptionLabel": {
-      "PLAIN": "Simple",
+      "PLAIN": "Sencillo",
       "UNDERLINE": "Subrayado",
       "SOFT": "Suave",
       "PILL": "Píldora"

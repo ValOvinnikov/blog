@@ -134,8 +134,7 @@ with uncommitted changes from ending its turn.
   will carry on the site, and whether that reads as page-level prose or
   interface copy — "none" when there is none. `@blog/ui` owns no copy, but its
   props decide whether the copy can become a Voice field; the orchestrator
-  settles that with the user before `web` wires it (CLAUDE.md → "Check for
-  Voice candidates").
+  settles that with the user before `web` wires it (`develop-feature` → "Check for Voice candidates").
 - **Open questions:** anything similar that already existed where extending
   versus adding alongside was not obvious — never settle that quietly.
 
