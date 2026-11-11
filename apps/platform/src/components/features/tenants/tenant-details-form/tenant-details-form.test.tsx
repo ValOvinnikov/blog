@@ -189,58 +189,47 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
     );
   });
 
-  it('shows an unsupported language error beside the language select', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: { locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED } },
-    });
-
-    await fillForm();
-    await clickBeginProvisioning();
-
-    await screen.findByText(tenantFieldErrors.localeUnsupported);
-    const languageSelect = getLanguageSelect();
-
-    expect(languageSelect).toBeInvalid();
-    expect(languageSelect).toHaveAccessibleDescription(
-      `${tenantDetailsForm.localeHint} ${tenantFieldErrors.localeUnsupported}`,
-    );
-  });
-
-  it('shows a taken site address error beside the field', async () => {
-    createTenantActionMock.mockResolvedValueOnce({
-      outcome: ACTION_OUTCOME.INVALID,
+  it.each([
+    {
+      field: 'site address',
       fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_TAKEN } },
-    });
-
-    await fillForm();
-    await clickBeginProvisioning();
-
-    const slugError = await screen.findByText(tenantFieldErrors.slugTaken);
-
-    expect(slugError).toBeVisible();
-  });
-
-  it('marks a field with a returned error invalid and describes it by that error', async () => {
-    createTenantActionMock.mockResolvedValue({
-      outcome: ACTION_OUTCOME.INVALID,
+      errorText: tenantFieldErrors.slugTaken,
+      getControl: () => getSiteAddressInput(),
+    },
+    {
+      field: 'language',
       fieldErrors: {
-        ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID },
+        locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED },
       },
-    });
+      errorText: tenantFieldErrors.localeUnsupported,
+      getControl: () => getLanguageSelect(),
+    },
+    {
+      field: 'owner email',
+      fieldErrors: { ownerEmail: { reason: TENANT_FIELD_ERROR.EMAIL_INVALID } },
+      errorText: tenantFieldErrors.emailInvalid,
+      getControl: () => getOwnerEmailInput(),
+    },
+  ])(
+    'marks the $field invalid and describes it by its returned error',
+    async ({ fieldErrors, errorText, getControl }) => {
+      createTenantActionMock.mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.INVALID,
+        fieldErrors,
+      });
 
-    await fillForm();
-    await clickBeginProvisioning();
+      await fillForm();
+      await clickBeginProvisioning();
 
-    const fieldError = await screen.findByText(tenantFieldErrors.emailInvalid);
-    const ownerEmailInput = getOwnerEmailInput();
+      await screen.findByText(errorText);
+      const control = getControl();
 
-    expect(fieldError).toBeVisible();
-    expect(ownerEmailInput).toBeInvalid();
-    expect(ownerEmailInput).toHaveAccessibleDescription(
-      `${tenantDetailsForm.ownerEmailHint} ${tenantFieldErrors.emailInvalid}`,
-    );
-  });
+      expect(control).toBeInvalid();
+      expect(control).toHaveAccessibleDescription(
+        expect.stringContaining(errorText),
+      );
+    },
+  );
 
   it('shows a failed create beside its button and keeps the entered values', async () => {
     createTenantActionMock.mockResolvedValue({

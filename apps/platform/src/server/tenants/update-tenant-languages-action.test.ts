@@ -24,6 +24,7 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-locale';
 import { logger } from '@platform/utils/logger/logger';
 import type { Session } from 'next-auth';
 
@@ -47,7 +48,6 @@ vi.mock('@blog/db', () => ({
 faker.seed(5997);
 
 const MOCK_SESSION_EXPIRES = '2099-01-01T00:00:00.000Z';
-const MOCK_UNSUPPORTED_LOCALE = faker.string.alpha(2);
 const MOCK_SAVE_ERROR = new Error(faker.lorem.sentence());
 
 const setTenantAdditionalLocalesMock = vi.mocked(

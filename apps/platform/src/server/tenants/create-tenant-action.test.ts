@@ -27,13 +27,14 @@ import {
 } from '@platform/testing/admins/operator';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
-  MOCK_TENANT_ID,
+  MOCK_OWNER_EMAIL,
   MOCK_TENANT_DOMAIN,
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
   MOCK_TENANT_ROOT_DOMAIN,
   MOCK_TENANT_SLUG,
-  MOCK_OWNER_EMAIL,
-  MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
+import { MOCK_UNSUPPORTED_LOCALE } from '@platform/testing/tenants/unsupported-locale';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -49,7 +50,6 @@ const MOCK_EXISTING_TENANT_ID = faker.string.uuid();
 const MOCK_AUDIT_EVENT_ID = faker.string.uuid();
 const MOCK_OTHER_OWNER_EMAIL = faker.internet.email();
 const MOCK_INVALID_OWNER_INVITE_TOKEN = faker.string.alphanumeric(32);
-const MOCK_UNSUPPORTED_LOCALE = faker.string.alpha({ length: 5 });
 const MOCK_DRAFT_INSERT_ERROR = new Error(faker.lorem.sentence());
 const MOCK_AUDIT_WRITE_ERROR = new Error(faker.lorem.sentence());
 const PROVISIONING_PATH = adminRoutes.tenantProvisioning(MOCK_TENANT_ID);
@@ -60,6 +60,8 @@ const MOCK_TENANT_DRAFT_FIELDS = {
   locale: LOCALE_ISO_CODES.EN,
   plan: TENANT_PLAN.FREE,
 };
+
+const FOUND_OWNER = { type: 'user', userId: MOCK_OWNER_USER_ID } as const;
 
 const validOwnerInviteToken = createOwnerInviteToken(MOCK_OWNER_EMAIL);
 
@@ -148,19 +150,30 @@ describe(createTenantAction, () => {
     Object.assign(env, { TENANT_ROOT_DOMAIN: MOCK_TENANT_ROOT_DOMAIN });
   });
 
-  it('returns field errors for an invalid site address without a lookup', async () => {
-    const result = await createTenantAction({
-      ...validInput,
-      slug: MOCK_TENANT_DOMAIN,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
+  it.each([
+    {
+      scenario: 'an invalid site address',
+      input: { slug: MOCK_TENANT_DOMAIN },
       fieldErrors: { slug: { reason: TENANT_FIELD_ERROR.SLUG_INVALID } },
-    });
-    expect(findUserByEmailMock).not.toHaveBeenCalled();
-    expect(createTenantDraftMock).not.toHaveBeenCalled();
-  });
+    },
+    {
+      scenario: 'an unsupported language',
+      input: { locale: MOCK_UNSUPPORTED_LOCALE },
+      fieldErrors: {
+        locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED },
+      },
+    },
+  ])(
+    'refuses $scenario with a field error before any lookup',
+    async ({ input, fieldErrors }) => {
+      // @ts-expect-error -- a Server Action is callable with any language
+      const result = await createTenantAction({ ...validInput, ...input });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.INVALID, fieldErrors });
+      expect(findUserByEmailMock).not.toHaveBeenCalled();
+      expect(createTenantDraftMock).not.toHaveBeenCalled();
+    },
+  );
 
   it.each(['', '   '])(
     'returns a required error for an empty site address %j',
@@ -175,34 +188,6 @@ describe(createTenantAction, () => {
     },
   );
 
-  it('refuses an unsupported language with a field error before any lookup', async () => {
-    const result = await createTenantAction({
-      ...validInput,
-      locale: MOCK_UNSUPPORTED_LOCALE as never,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: {
-        locale: { reason: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED },
-      },
-    });
-    expect(findUserByEmailMock).not.toHaveBeenCalled();
-    expect(createTenantDraftMock).not.toHaveBeenCalled();
-  });
-
-  it('creates the tenant in the chosen default language', async () => {
-    await expect(
-      createTenantAction({ ...validInput, locale: LOCALE_ISO_CODES.NL }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
-
-    expect(createTenantDraftMock).toHaveBeenCalledWith({
-      ...MOCK_TENANT_DRAFT_FIELDS,
-      locale: LOCALE_ISO_CODES.NL,
-      owner: { type: 'user', userId: MOCK_OWNER_USER_ID },
-    });
-  });
-
   it('logs and returns a server error when no tenant root domain is configured', async () => {
     Object.assign(env, { TENANT_ROOT_DOMAIN: undefined });
 
@@ -215,20 +200,25 @@ describe(createTenantAction, () => {
     expect(createTenantDraftMock).not.toHaveBeenCalled();
   });
 
-  it('creates the tenant for the found owner at the site address under the root', async () => {
-    await expect(
-      createTenantAction({
-        ...validInput,
-        slug: ` ${MOCK_TENANT_SLUG.toUpperCase()} `,
-      }),
-    ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+  it.each(Object.values(LOCALE_ISO_CODES))(
+    'creates the tenant in %s for the found owner at the site address under the root',
+    async (locale) => {
+      await expect(
+        createTenantAction({
+          ...validInput,
+          slug: ` ${MOCK_TENANT_SLUG.toUpperCase()} `,
+          locale,
+        }),
+      ).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
 
-    expect(findUserByEmailMock).toHaveBeenCalledWith(MOCK_OWNER_EMAIL);
-    expect(createTenantDraftMock).toHaveBeenCalledWith({
-      ...MOCK_TENANT_DRAFT_FIELDS,
-      owner: { type: 'user', userId: MOCK_OWNER_USER_ID },
-    });
-  });
+      expect(findUserByEmailMock).toHaveBeenCalledWith(MOCK_OWNER_EMAIL);
+      expect(createTenantDraftMock).toHaveBeenCalledWith({
+        ...MOCK_TENANT_DRAFT_FIELDS,
+        locale,
+        owner: FOUND_OWNER,
+      });
+    },
+  );
 
   describe('when the owner email matches no user', () => {
     beforeEach(() => {
@@ -358,38 +348,39 @@ describe(createTenantAction, () => {
     },
   );
 
-  it('returns a server error and logs it when saving the draft throws', async () => {
-    createTenantDraftMock.mockRejectedValue(MOCK_DRAFT_INSERT_ERROR);
+  it.each([
+    {
+      failure: 'throws',
+      mockFailure: () =>
+        createTenantDraftMock.mockRejectedValue(MOCK_DRAFT_INSERT_ERROR),
+      logContext: { errorName: MOCK_DRAFT_INSERT_ERROR.name },
+    },
+    {
+      failure: 'fails',
+      mockFailure: () =>
+        createTenantDraftMock.mockResolvedValue(
+          errorResult(ERROR_CODE.DB_NOT_FOUND),
+        ),
+      logContext: { error: ERROR_CODE.DB_NOT_FOUND },
+    },
+  ])(
+    'returns a server error and logs it when saving the draft $failure',
+    async ({ mockFailure, logContext }) => {
+      mockFailure();
 
-    const result = await createTenantAction(validInput);
+      const result = await createTenantAction(validInput);
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_LOG.CREATE_DRAFT_FAILED,
-      { domain: MOCK_TENANT_DOMAIN, errorName: MOCK_DRAFT_INSERT_ERROR.name },
-    );
-  });
-
-  it('returns a server error and logs it when saving the draft fails', async () => {
-    createTenantDraftMock.mockResolvedValue(
-      errorResult(ERROR_CODE.DB_NOT_FOUND),
-    );
-
-    const result = await createTenantAction(validInput);
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(startProvisioningMock).not.toHaveBeenCalled();
-    expect(insertAuditEventMock).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      TENANT_LOG.CREATE_DRAFT_FAILED,
-      { domain: MOCK_TENANT_DOMAIN, error: ERROR_CODE.DB_NOT_FOUND },
-    );
-    expect(loggerWarnMock).not.toHaveBeenCalled();
-  });
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(startProvisioningMock).not.toHaveBeenCalled();
+      expect(insertAuditEventMock).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
+      expect(loggerErrorMock).toHaveBeenCalledWith(
+        TENANT_LOG.CREATE_DRAFT_FAILED,
+        { domain: MOCK_TENANT_DOMAIN, ...logContext },
+      );
+      expect(loggerWarnMock).not.toHaveBeenCalled();
+    },
+  );
 
   describe('once the tenant is created for a found owner', () => {
     beforeEach(async () => {
