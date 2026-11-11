@@ -14,6 +14,7 @@ import {
   HEADER_LAYOUT,
   HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
+  NAV_LINK_STYLE,
   RADIUS_SCALE,
   SPINNER_STYLE,
 } from '@blog/config';
@@ -51,6 +52,7 @@ const seedValues = () => ({
   headerLayout: HEADER_LAYOUT.CLASSIC,
   headerSubmenuStyle: HEADER_SUBMENU_STYLE.DROPDOWN,
   headerBarStyle: HEADER_BAR_STYLE.FULL_WIDTH,
+  navLinkStyle: NAV_LINK_STYLE.PLAIN,
   accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
   footerLayout: FOOTER_LAYOUT.COLUMNS,
   footerBackground: BRAND_VARIANT.BRAND_PRIMARY,
@@ -69,7 +71,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.CARDS]: 'Accent bar',
       [LOOK_ROW.BUTTONS]: 'Rounded · Busy label · Braille',
       [LOOK_ROW.HEADER]:
-        'Classic · Full width · Dropdown · Outlined · Pill with label',
+        'Classic · Full width · Dropdown · Plain · Outlined · Pill with label',
       [LOOK_ROW.FOOTER]:
         'Columns · Brand tint · Full width · Cookie link and button',
       [LOOK_ROW.LANGUAGE_SWITCHER]: 'Globe',
@@ -118,6 +120,16 @@ describe(buildLookRowSummaries, () => {
     const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
 
     expect(summaries[LOOK_ROW.BUTTONS]).toBe(`${reads} · Busy label · Braille`);
+  });
+
+  it('puts the navigation link style after the sub-menu style', () => {
+    const values = { ...seedValues(), navLinkStyle: NAV_LINK_STYLE.UNDERLINE };
+
+    const summaries = buildLookRowSummaries(values, t, MULTIPLE_LANGUAGES);
+
+    expect(summaries[LOOK_ROW.HEADER]).toBe(
+      'Classic · Full width · Dropdown · Underline · Outlined · Pill with label',
+    );
   });
 
   it.each([

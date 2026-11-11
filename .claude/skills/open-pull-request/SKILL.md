@@ -17,59 +17,20 @@ printed. Issues and PRs share one counter, so the two are almost never equal.
 
 ## Scope: prefer per-layer PRs
 
-One PR per layer, in dependency order, each merged before the next layer's
-work starts on a branch cut from the `main` that contains it. Keep it one PR
-only when a partial merge would red `main` (e.g. a shared `_type` or generated
-type rename). Rules of record: `CLAUDE.md` "Split by workspace, always" and
-"One layer at a time — merged before the next starts".
+One PR per layer, merged before the next starts — `CLAUDE.md` "Split by
+workspace, always" and "One layer at a time — merged before the next starts".
 
 In a split, **only the completing PR carries `Closes #<n>`** — the wording
 rule and the auto-close traps are under "PR body template" below.
 
 ### Stacked PRs — only on the user's say-so, then `gh stack`
 
-A stack is the user's call, never the orchestrator's. Viability (the bottom PR
-green on `main` alone, or expand/contract, or one PR) is `CLAUDE.md` "Stacked
-PRs". Independent pieces never stack: each gets its own branch off `main`.
-Use the installed `github/gh-stack` extension, never hand-rolled
-`gh pr create --base <branch>`:
-
-```bash
-gh stack init                 # start a stack targeting main
-gh stack init b1 b2 b3        # or adopt existing branches as a stack
-gh stack add <branch>         # add a branch on top of the current stack
-gh stack view                 # see the current stack
-gh stack push                 # force-push every stack branch        — Gate 3
-gh stack submit --open        # push all, create/update the PRs      — Gates 3 + 4
-gh stack sync                 # fetch, restack, force-push all       — Gate 3
-```
-
-- **`push`, `sync` and `submit` all push** every stack branch with
-  `--force-with-lease`, so each run needs its own fresh Gate 3 approval;
-  `submit` also opens PRs, so it needs Gate 4 too. Run `sync` after every
-  lower PR merges — the step most often forgotten — but ask first.
-- **Never run `gh stack merge`** — merging is the human's.
-- **`submit` from an agent's shell is non-interactive**: it skips its editor,
-  uses auto-generated titles and no body, and opens drafts — keep them drafts
-  (never `--open`), as Gate 4 does. Then run
-  `gh pr edit <pr> --title "…" --body "…"` on each new PR per "PR body
-  template", and Gate 5 for each.
-
-**Every stacked PR runs the full required suite** because the two workflows
-behind the required checks — `ci.yml` and `workflow-security.yml` — declare a
-bare `pull_request:`
-trigger. Never add a `branches:` filter to one: a required check that never
-starts leaves the PR `BLOCKED` forever instead of failing it (`ci.yml`'s
-header). The check list: `docs/context/ci-automation.md`.
-
-**Collapsing a stack after the fact:**
-
-1. Retarget the _top_ PR, which already holds every commit:
-   `gh pr edit <top> --base main`.
-2. Close the others as superseded, and move every stacked issue's
-   `Closes #<n>` onto the survivor.
-3. Ask to push (Gate 3), then run `gh pr update-branch <top>` to merge
-   `main` into the survivor.
+A stack is the user's call, never the orchestrator's. Once they ask for one,
+**read `stacked-prs.md` (beside this file) first** — the `gh stack` commands,
+what a non-interactive `submit` leaves to fix, and collapsing a stack. Three
+rules hold without it: every `gh stack` command that pushes needs its own
+Gate 3 approval (and `submit` Gate 4 too), never run `gh stack merge`, and
+never hand-roll a stack with `gh pr create --base <branch>`.
 
 ## ABSOLUTE RULES — never violate
 
@@ -169,35 +130,12 @@ gh pr create --draft --base main --head <type>/<n>-<short-slug> \
    synchronous dispatch and also the "after PR" reconciliation of `CLAUDE.md`
    "Board reconciliation" — don't dispatch it twice.
 2. **Tag the PR with this job's label**, so concurrent background jobs' PRs
-   are tellable apart in the PR list:
-
-   ```
-   JOB=$(basename "$CLAUDE_JOB_DIR")
-   NAME=$(jq -r '.name // empty' "$CLAUDE_JOB_DIR/state.json")
-   SLUG=$(printf '%s' "${NAME:-$JOB}" | tr '[:upper:]' '[:lower:]' | tr -cs 'a-z0-9' '-' \
-     | sed 's/^-*//; s/-*$//')
-
-   PREV=$(gh label list --limit 200 --json name,description \
-     --jq ".[] | select(.description == \"$JOB\") | .name")
-
-   if [ -n "$PREV" ] && [ "$PREV" != "job:$SLUG" ]; then
-     gh label edit "$PREV" --name "job:$SLUG"
-   elif [ -z "$PREV" ]; then
-     gh label create "job:$SLUG" --color D4D8DC --description "$JOB"
-   fi
-   gh pr edit <pr> --add-label "job:$SLUG"
-   ```
-
-   - **Skip silently when `$CLAUDE_JOB_DIR` is unset** — a foreground session
-     has no job and nothing to disambiguate. A missing chip is not a failure.
-   - **The chip shows the session's name** (`job:static-generation`); the job
-     id is only the label's description, the lookup key that survives a
-     rename. An unnamed job falls back to the id.
-   - **A renamed session renames its label** with `gh label edit --name`,
-     which updates every PR already carrying it. Never mint a second label,
-     and never use `--force` — it keys on the name, the wrong key.
-   - `board-keeper` deletes the label once no open PR carries it, on its
-     `"after merge of #<n>"` trigger.
+   are tellable apart in the PR list. **Skip silently when `$CLAUDE_JOB_DIR`
+   is unset** — a foreground session has no job and nothing to disambiguate,
+   and a missing chip is not a failure. When it is set, run the commands in
+   `job-label.md` (beside this file): the label is the session's slugified
+   name (the id only for an unnamed job), and a renamed session renames its label rather than
+   minting a second one.
 
 3. **Report the PR URL** only once the board write is confirmed, and hold any
    "done"/"shipped" framing until Gate 5a reports — say "Draft PR open, board
