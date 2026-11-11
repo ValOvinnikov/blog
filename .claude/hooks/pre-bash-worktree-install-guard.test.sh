@@ -1,5 +1,5 @@
 #!/bin/sh
-# Regression tests for pre-bash-worktree-install-guard.sh — #459.
+# Regression tests for pre-bash-worktree-install-guard.sh.
 #
 # The guard is a hand-written regex tokenizer for "is `pnpm <mutating verb>`
 # at command position" — the same class of parsing logic that took three
@@ -164,6 +164,36 @@ if [ "$got" != 0 ]; then
 	printf 'FAIL want=0 got=%s  pnpm install (real node_modules dir, guard should be inert)\n' "$got"
 	fails=$((fails + 1))
 fi
+
+# --- the payload's cwd decides, not CLAUDE_PROJECT_DIR ----------------------
+cwd_expect() {
+	want=$1
+	project_dir=$2
+	cwd=$3
+	label=$4
+	payload=$(jq -n --arg cwd "$cwd" '{cwd: $cwd, tool_input: {command: "pnpm install"}}')
+	printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$project_dir" sh "$guard" >/dev/null 2>&1
+	got=$?
+	if [ "$got" != "$want" ]; then
+		printf 'FAIL want=%s got=%s  %s\n' "$want" "$got" "$label"
+		fails=$((fails + 1))
+	fi
+}
+
+primary=$(mktemp -d)
+mkdir "$primary/node_modules"
+shared_wt=$(mktemp -d)
+git -C "$shared_wt" init -q
+ln -s "$primary/node_modules" "$shared_wt/node_modules"
+mkdir -p "$shared_wt/apps/web"
+private_wt=$(mktemp -d)
+git -C "$private_wt" init -q
+mkdir "$private_wt/node_modules"
+
+cwd_expect 2 "$primary" "$shared_wt" "shared-deps worktree blocks although CLAUDE_PROJECT_DIR is the primary checkout"
+cwd_expect 2 "$primary" "$shared_wt/apps/web" "cwd nested inside a shared-deps worktree blocks"
+cwd_expect 0 "$scratch" "$private_wt" "private worktree allows although CLAUDE_PROJECT_DIR has a symlinked tree"
+rm -rf "$primary" "$shared_wt" "$private_wt"
 
 if [ "$fails" -eq 0 ]; then
 	echo "pre-bash-worktree-install-guard: all cases pass"

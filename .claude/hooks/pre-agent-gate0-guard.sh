@@ -41,7 +41,7 @@ subagent=$(printf '%s' "$input" | jq -r '.tool_input.subagent_type // empty' 2>/
 # The agents that own repo source files (CLAUDE.md's layer map). Only these
 # implement issues; everything else is review, discovery, or orchestration.
 case "$subagent" in
-config | studio | service | ui | web | db | platform-app | auth | insight | email) ;;
+config | studio | service | ui | web | db | platform-app | worker | auth | insight | email) ;;
 *) exit 0 ;;
 esac
 
@@ -128,7 +128,7 @@ jq -n --arg issue "$issue" --arg status "$status" --arg agent "$subagent" '{
     permissionDecisionReason: (
       "Gate 0 not run: issue #" + $issue + " is \"" + $status +
       "\" on the board, not \"In Progress\", but this dispatch implements it with the `" + $agent + "` agent.\n\n" +
-      "Dispatch board-keeper first (synchronously — this is one of the three documented exceptions to background dispatch):\n" +
+      "Dispatch board-keeper first (synchronously — this is one of the two documented exceptions to background dispatch):\n" +
       "    \"starting work on #" + $issue + "\"\n\n" +
       "It sets the issue to In Progress and promotes a Todo parent epic in the same dispatch. Batch sibling issues into one dispatch (\"starting work on #1, #2\") rather than one per issue. Then re-run this dispatch.\n\n" +
       "If this dispatch is not implementing #" + $issue + " (e.g. it is remediation on already-in-flight work), reword the prompt so it does not say \"Implement issue #" + $issue + "\"."

@@ -1,3 +1,4 @@
+import { errorResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { REQUEST_LOG } from '@web/constants/request';
 import {
@@ -6,6 +7,7 @@ import {
   mockErrorContext,
   mockErrorRequest,
 } from '@web/testing/server/request-errors/fixtures';
+import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { logger } from '@web/utils/logger/logger';
 
 import { logRequestError } from './log-request-error';
@@ -13,6 +15,7 @@ import { logRequestError } from './log-request-error';
 faker.seed(6010);
 
 const MOCK_ROUTE_PATH = `/api/${faker.lorem.word()}/callback`;
+const MOCK_LOG_EVENT = `${faker.lorem.word()}.${faker.lorem.word()}`;
 const MOCK_QUERY_STRING = `?code=${faker.string.alphanumeric(8)}&token=${faker.string.alphanumeric(16)}`;
 
 describe(logRequestError, () => {
@@ -41,5 +44,22 @@ describe(logRequestError, () => {
 
     const [, context] = vi.mocked(logger.error).mock.calls[0] ?? [];
     expect(context?.path).toBe(MOCK_ROUTE_PATH);
+  });
+
+  it('logs a failed page load once, through the guard, not again here', async () => {
+    const result = errorResult(new Error(MOCK_RENDER_ERROR_MESSAGE));
+    let thrown: unknown;
+    try {
+      guardPageLoaderResult(result, MOCK_LOG_EVENT);
+    } catch (error) {
+      thrown = error;
+    }
+
+    await logRequestError(thrown, mockErrorRequest(), mockErrorContext());
+
+    expect(logger.error).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledWith(MOCK_LOG_EVENT, {
+      error: result.error,
+    });
   });
 });

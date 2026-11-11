@@ -1,5 +1,4 @@
 import { SITE_MESSAGES } from '@blog/config';
-import { NEXT_NAVIGATION_ERROR } from '@blog/config/constants';
 import { service, type TTopicDetailPage } from '@blog/service';
 import { ARIA_CURRENT } from '@blog/ui/testing/aria';
 import { errorResult, okResult } from '@blog/utils';
@@ -28,7 +27,6 @@ import {
   mockTopicWithPostCount,
 } from '@web/testing/shared/topic/fixtures';
 import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 
 import { TopicPage } from './topic-page';
 
@@ -155,12 +153,11 @@ describe(`<${TopicPage.name}/>`, () => {
     });
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getTopicPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith('topic_page.fetch_failed', {
       slug: MOCK_TOPIC_SLUG,
       error: MOCK_ERROR,
@@ -178,9 +175,7 @@ describe(`<${TopicPage.name}/>`, () => {
       });
       getPostListMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-      await expect(setup({ page })).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
+      await expect(setup({ page })).rejects.toBe(MOCK_ERROR);
 
       expect(getPostListMock).toHaveBeenCalledWith(
         MOCK_POST_LIST_ID,

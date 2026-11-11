@@ -70,8 +70,8 @@ apps/web
 - The contract `apps/web` sees is therefore three-way: `ok: true` with data
   (render), `ok: true` with `undefined` data (ordinary 404 — **no log**, per
   [`SPEC.md` §17](../../SPEC.md)), `ok: false` (genuine failure — log at
-  `error`, then 404). Web owns the failure decision (`notFound()`, fallback,
-  or early return).
+  `error`, then throw to the error boundary, a 500). Web owns the failure
+  decision (throw, fallback, or early return).
 - **Check the data, not just `ok`.** For a nullable loader, `result.ok` alone
   no longer means "the document exists", and `type-check` cannot catch a
   consumer that still assumes it does — `.ok` stays a valid boolean access

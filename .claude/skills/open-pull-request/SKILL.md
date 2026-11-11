@@ -65,17 +65,21 @@ Committing is free; stop at Gates 3 and 4 and wait for the user.
 
    ```
    git fetch origin
-   git switch --no-track -c <type>/<n>-<short-slug> origin/main
+   git switch --no-track -c "$(pnpm -s branch:name <n> "<issue title>")" origin/main
    ```
 
-   A session already on a generated `claude/<words>-<id>` branch renames it
-   instead: `git rebase origin/main`, then
-   `git branch -m <type>/<n>-<short-slug>`.
+   A session already on a generated `claude/…` branch renames it instead:
+   `git rebase origin/main`, then
+   `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`.
 
-   `<type>` is a commitlint type (`feat`, `fix`, `tooling`, `docs`, `chore`,
-   …). `board-keeper` and `board-auto-sync.yml` read the issue from that
-   shape; a generated `claude/<words>-<id>` name is refused at push by
-   `.claude/hooks/pre-bash-branch-name-guard.sh`.
+   `scripts/branch-name.mjs` holds the one pattern, `<type>/<n>-<slug>` with
+   a commitlint type; `main`, `dependabot/…` and the `@claude` Action's
+   `claude/issue-<n>-<YYYYMMDD>-<HHMM>` are the only other names allowed.
+   `board-keeper` and `board-auto-sync.yml` read the issue from that shape.
+   Creating a branch under any other name is refused at push by
+   `.claude/hooks/pre-bash-branch-name-guard.sh` and `.husky/pre-push`, and
+   fails `board-auto-sync.yml`'s `branch-name` check on the PR. A branch
+   already on the remote keeps pushing, so open PRs are unaffected.
 
    **Worktree-delegated work:** when layer subagents run in their own
    worktrees (`develop-feature` §3) and this session is the shared main
@@ -255,7 +259,9 @@ dispatch are replaced as `CLAUDE.md` "Solo-session mode" describes — every oth
 including both approval gates, is unchanged.)
 
 1. Set issue → In Progress on the board
-2. Checkout branch from `main`
+2. Checkout branch from `main`, named by
+   `pnpm -s branch:name <n> "<issue title>"` (`<type>/<n>-<slug>`; any other
+   name is refused at push)
 3. Do the work + run quality gates — merge `origin/main` in before verify
    (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
@@ -388,13 +394,13 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
 
 - **Starting:** comment on the issue ("starting work in a cloud session"), then
   rename the branch before the first push. A web/remote session starts on a
-  generated name like `claude/optimistic-noether-isuljn`, which carries no
-  issue number; rename it to `<type>/<n>-<slug>`, the slug from the ticket
-  title (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
-  may have a single member"). A pushed branch with that name is the In
-  Progress signal. The GitHub Actions `@claude` path can't rename:
-  `claude-code-action` generates `claude/issue-<n>-<timestamp>`, which
-  `board-keeper.md` Step 2 also reads as In Progress.
+  generated name like `claude/optimistic-noether-isuljn` or
+  `claude/issue-<n>-<id>`; rename it with
+  `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`, which the
+  `SessionStart` hook prints when the branch is off the pattern. A pushed
+  branch with that name is the In Progress signal. Creating a branch under any
+  other name is refused at push and fails the PR's `branch-name` check; a
+  branch already on the remote keeps pushing.
 - **In review:** open the PR as a draft with the issue reference
   (`Closes #n` on the completing PR only) — an open PR, draft or not, is the
   Code Review signal, and the owner marks it ready at final review. On the

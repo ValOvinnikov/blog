@@ -215,11 +215,10 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   - props forwarded unchanged through two or more layers or hand-bundled
     into a local object, or a view-model spread and re-destructured →
     `react-component-practices` § Props.
-- **File size budgets (blocking).** A diff that adds lines to a file over its
-  budget (`CLAUDE.md` "File size budgets") without extracting the part it
-  changes, or adds a file over budget, is a blocking finding — even when
-  `pnpm check:file-size` passed or was skipped (`--no-verify`). Where the
-  extracted part goes → `react-component-practices` § Size and splitting.
+- **File size budgets (blocking).** A diff that breaks `CLAUDE.md` "File size
+  budgets" is a blocking finding, even when `pnpm check:file-size` was
+  skipped (`--no-verify`). Where the extracted part goes →
+  `react-component-practices` § Size and splitting.
 - **Prop ceiling (blocking on every touched component).** For each component
   whose file the diff touches, count all of its props — inherited members
   included — against its workspace's ceiling, whether or not the diff adds

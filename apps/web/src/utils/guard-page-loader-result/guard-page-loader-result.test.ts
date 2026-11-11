@@ -22,20 +22,21 @@ describe(guardPageLoaderResult, () => {
     expect(notFound).not.toHaveBeenCalled();
   });
 
-  it('logs the event with its context, then responds not found, on a failure', () => {
+  it('logs the event with its context, then rethrows the error, on a failure', () => {
     expect(() =>
       guardPageLoaderResult(
         errorResult(MOCK_ERROR),
         MOCK_LOG_EVENT,
         MOCK_CONTEXT,
       ),
-    ).toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    ).toThrow(MOCK_ERROR);
 
+    expect(logger.error).toHaveBeenCalledOnce();
     expect(logger.error).toHaveBeenCalledWith(MOCK_LOG_EVENT, {
       ...MOCK_CONTEXT,
       error: MOCK_ERROR,
     });
-    expect(notFound).toHaveBeenCalledTimes(1);
+    expect(notFound).not.toHaveBeenCalled();
   });
 
   it('responds not found without logging when ok but no document matched', () => {

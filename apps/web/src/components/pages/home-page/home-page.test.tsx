@@ -80,14 +80,11 @@ describe(`<${HomePage.name}/>`, () => {
   });
 
   describe('when the page cannot be rendered', () => {
-    it('calls notFound() and logs when the fetch fails', async () => {
+    it('logs and throws to the error boundary when the fetch fails', async () => {
       getHomePageMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-      await expect(setup()).rejects.toThrow(
-        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-      );
+      await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-      expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
         'home_page.fetch_failed',
         { error: MOCK_ERROR },

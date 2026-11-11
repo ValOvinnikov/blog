@@ -120,10 +120,9 @@ automatic pipeline; this skill is how the right ones get used in the right order
 One PR per main workspace and per adopting surface, in dependency order, each
 merged before the next starts. Combine layers only when the earlier PR would
 not merge green on `main` alone (a rename every consumer reads); stack only
-when the user says to. Put the split
-and what it touches to the user before the first dispatch. **If anything
-blocks, ask and wait**; never absorb new scope silently. Full rules:
-`develop-feature` § "Planning work — mandatory, not advisory".
+when the user says to. Put the split and what it touches to the user before
+the first dispatch. **If anything blocks, ask and wait**; never absorb new
+scope silently. Full rules: `develop-feature` § "Planning work".
 
 ## Reuse before you create
 
@@ -217,8 +216,7 @@ silently.
 
 ## Mid-task decisions land in the ticket/spec before work continues
 
-A decision settled in chat is not real until the governing issue body or spec
-states it — write it there before more work. **Never silently resolve an
+A decision settled in chat is real only once the issue body or spec states it. **Never silently resolve an
 ambiguity:** "the issue said X but I did Y" goes to the user before commit.
 Full sequence: `develop-feature` § "Mid-task decisions land in the
 ticket/spec before work continues".
@@ -337,7 +335,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   standard to match. **When you touch a file, delete the comments in it that
   fail the test — do not shorten them**; trimming is only for a comment that
   earns its place but runs long. Converging file by file is the steady-state
-  mechanism, and it never collides with an open PR.
+  mechanism, and it never collides with an open PR. On touched `.ts`/`.tsx`
+  files the `no-failing-comment` lint rule reports the mechanical cases — a
+  doc block of more than one sentence, a `Name — does X` comment, a multi-line comment inside
+  a function body, any comment in a test file — in the post-edit hook,
+  lint-staged and `pnpm check:touched-lint`; the rest is the reviewer's.
 
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool
@@ -385,14 +387,16 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - **File size budgets, in non-blank lines:** a component `.tsx` 150, a hook
   120, any other `.ts` 120. Exempt: `*-variants` files, registries and
   catalogs (`icon-registry.ts`), Studio schema definitions, generated files,
-  tests and stories. A diff that touches an over-budget file extracts the part
-  it changes — not the whole file, and never as a sweep. Where the extracted
-  part goes in a React workspace: `react-component-practices` § Size and
-  splitting. `pnpm check:file-size` holds the budgets as a ratchet, at commit
-  (lint-staged) and in `pnpm verify`, locally only: a file over budget must
-  sit in `scripts/file-size-baseline.json` at its exact count, so it can only
-  shrink, and `--update` lowers an entry once it does. A new exemption is
-  added here and to `scripts/check-file-size.mjs` together.
+  tests and stories. A file over budget sits in
+  `scripts/file-size-baseline.json` at its exact count and never grows, and a
+  diff that edits one extracts the part it changes — not the whole file, and
+  never as a sweep — so the file ends below its entry on the merge-base;
+  `--update` then lowers (or, for a moved file, moves) the entry.
+  `pnpm check:file-size` is the rule, run locally only: on the edited file by
+  the post-edit hook and lint-staged, and over the whole branch in
+  `pnpm verify` and pre-push. Where the extracted part goes in a React
+  workspace: `react-component-practices` § Size and splitting. A new exemption
+  is added here and to `scripts/check-file-size.mjs` together.
 - **Function style is decided per layer kind, and enforced by ESLint per
   workspace.** React layers export _values_ — a component is a const holding a
   function — so they use **arrow-function consts**
@@ -566,8 +570,7 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - **Docs move with the code.** Architecture changes update `SPEC.md`, feature
   behaviour its `docs/features/` page, CI and agent tooling
   `docs/context/`; a finished design doc is deleted once its shape is in the
-  feature page. Edit-time Prettier + lint feedback comes from
-  `.claude/hooks/post-edit.sh`. Full rules: `develop-feature` § "Docs that
+  feature page. Full rules: `develop-feature` § "Docs that
   ship with the change".
 
 ## Reporting to the user
@@ -577,9 +580,8 @@ update). Never include a retelling of a subagent's report (give the
 conclusion), verification statistics ("green" unless something failed),
 abandoned paths or internal reasoning, self-assessment or blame, unchanged
 state (board status and remaining lists only when they change), or an
-unrelated ask bundled into a status update (hold it or ask it alone).
-
-The full rules and the epic status table (the answer to a merged epic PR or
+unrelated ask bundled into a status update (hold it or ask it alone). The
+full rules and the epic status table (the answer to a merged epic PR or
 "where are we on #<n>?"): the `report-epic-status` skill.
 
 ### Asking the user a question
@@ -646,10 +648,8 @@ Creating an issue always goes through `board-keeper`, never `gh issue create`.
 Every open issue carries exactly one `prio:*` label; work is pulled from
 `prio:now`, then the active epic's `prio:next`. The rest: `write-ticket`.
 
-**Findings found mid-work get fixed in the current work, not ticketed** —
-routed to the owning layer agent, in the same branch. Filing one instead:
-`write-ticket` § "Findings found mid-work get fixed in the current work, not
-ticketed".
+**Findings found mid-work get fixed in the current work, not ticketed** — by
+the owning layer agent, in the same branch (`write-ticket` has the exception).
 
 **Solo-session mode.** A single cloud session — a Claude Code web/remote
 session (`board-keeper.md`'s preflight), with no parallel local jobs and no
@@ -667,10 +667,10 @@ still applies:
 
 **Cloud sessions never write the project board** — they leave evidence it is
 inferred from: a comment on the issue at start, a branch named for the issue,
-a draft PR. **Rename a generated branch before the first push**:
-`claude/<words>-<id>` carries no issue number, so it becomes
-`<type>/<n>-<slug>` (`git branch -m feat/3952-team-single-member`);
-`claude/issue-<n>-…` already carries one and stays. The protocol: `open-pull-request` § "Cloud sessions never write
+a draft PR. **Rename a generated branch before the first push** —
+`claude/<words>-<id>` or `claude/issue-<n>-<id>` — with
+`git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`; a new branch
+under any other name is refused at push. The protocol: `open-pull-request` § "Cloud sessions never write
 the project board".
 
 ## Deployment

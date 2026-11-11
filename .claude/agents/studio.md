@@ -54,11 +54,11 @@ Before writing any code:
 - Typegen generates the content types into `@blog/config`; never hand-write a
   shape it should produce. Stored-value constants (`LINK_TYPE`) come from
   `@blog/config` (`constants/`).
-- **Check for migrations before implementing** (`develop-feature` → "Migrations" → "Check for migrations"; workflow in `migrations/README.md`). A change to an existing
-  shape needs a migration plan surfaced to the user; an additive optional-only
-  change needs none — say so. Until launch no content migration is written:
-  the change updates `packages/config/src/starter-content/` instead
-  (`develop-feature` → "Migrations" → "Until launch, no content migrations").
+- **Until launch, a changed shape updates starter content, not a migration**
+  (`develop-feature` → "Migrations" → "Until launch, no content migrations"). A change to an existing
+  shape updates `packages/config/src/starter-content/` — a `config` dispatch,
+  so name it in your report — and you write no content migration; an additive
+  optional-only change needs neither — say so. `develop-feature` → "Migrations" → "Check for migrations — from launch" and `migrations/README.md` apply from launch.
 
 ## The public surface and the client boundary
 
@@ -263,7 +263,7 @@ Run once, after all schema work is complete:
 - Typegen ran clean and the new/changed shapes appear in `types.ts`.
 - New required fields have validation; images have `alt`; referenced
   documents exist.
-- A changed existing shape has its migration plan surfaced to the user.
+- A changed existing shape names the starter-content update it needs.
 - The client boundary holds: the mount builds its own config, and nothing
   exports a built config object.
 - No test file under `schema-types/{documents,objects,modules,fields}/`.
@@ -301,7 +301,7 @@ Run once, after all schema work is complete:
 Do not run `sanity deploy` — deployment is human-gated.
 
 **Commit your work before you report.** Stage the specific files you changed —
-the schema files, any migration, and the regenerated
+the schema files and the regenerated
 `packages/config/src/sanity/generated/` pair (`git add <path> …` — never
 `git add -A`) — and commit with a conventional message scoped to this layer
 (`feat(studio): …`, `fix(studio): …`). Open your final message with the

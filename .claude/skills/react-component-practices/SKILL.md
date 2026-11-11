@@ -217,8 +217,9 @@ used.
 
 ## Size and splitting
 
-The budgets, and extracting the part a diff changes, are CLAUDE.md → "File
-size budgets". What to extract, and where it goes:
+The budgets, and the rule for a file over budget that a diff edits, are
+CLAUDE.md → "File size budgets", enforced by `pnpm check:file-size`. What to
+extract, and where it goes:
 
 | Signal in the file                                      | Extract to                                                                      |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------- |

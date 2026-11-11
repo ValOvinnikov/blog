@@ -56,7 +56,7 @@ Every public page emits the title, description, canonical, Open Graph and Twitte
 ## Constraints and invariants
 
 - **Authored-only SEO** — an unauthored description, OG title, OG description or OG image is omitted, never inherited from another field, the layout or a site default. A new fallback is a product decision, not an implementation choice.
-- A page document missing `seo` or `metaTitle` fails to parse and the route 404s through the page-loader guard; Studio validation is the editing experience, the query is the guarantee.
+- A page document missing `seo` or `metaTitle` fails to parse and the route answers 500 through the page-loader guard; Studio validation is the editing experience, the query is the guarantee.
 - The document's own `title` never reaches metadata.
 - Twitter card is `summary_large_image` only when an OG image is authored, else `summary`.
 - Canonicals are self-referencing, language-prefixed per the `as-needed` scheme, including paginated pages.
