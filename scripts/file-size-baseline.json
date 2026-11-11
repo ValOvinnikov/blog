@@ -19,7 +19,7 @@
   "apps/platform/src/utils/device-frame-scale/device-frame-scale.ts": 157,
   "apps/platform/src/utils/email-draft-changes/email-draft-changes.ts": 129,
   "apps/platform/src/utils/env/env.ts": 128,
-  "apps/platform/src/utils/nav-sections/nav-sections.ts": 206,
+  "apps/platform/src/utils/nav-sections/nav-sections.ts": 201,
   "apps/platform/src/utils/voice-draft/voice-draft.ts": 164,
   "apps/web/src/app/api/generate-skim/route.ts": 151,
   "apps/web/src/context/depth-provider/depth-provider.tsx": 151,

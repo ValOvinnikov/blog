@@ -136,7 +136,7 @@ describe(tenantNavSections, () => {
     expect(item?.href).toBe(href);
   });
 
-  it('marks only Subscribers, Comments and Team as unlinked coming soon, with no dot', () => {
+  it('marks only Subscribers and Team as unlinked coming soon, with no dot', () => {
     const badged = configuration.items.filter((item) => item.badge);
 
     expect(badged.map((item) => item.label)).toEqual(
@@ -178,17 +178,19 @@ describe(tenantNavSections, () => {
 });
 
 describe(navLabelForPathname, () => {
-  it('finds the item whose href is the pathname', () => {
-    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
+  let sections: TSidebarNavSection[];
 
+  beforeEach(() => {
+    sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
+  });
+
+  it('finds the item whose href is the pathname', () => {
     const label = navLabelForPathname(sections, adminRoutes.dashboardLook());
 
     expect(label).toBe(t('look'));
   });
 
   it('finds the Studio item for a path below the Studio segment', () => {
-    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
-
     const label = navLabelForPathname(
       sections,
       `${adminRoutes.dashboardStudio()}/${STUDIO_SEGMENT}`,
@@ -198,8 +200,6 @@ describe(navLabelForPathname, () => {
   });
 
   it('finds nothing for a path no item links to', () => {
-    const sections = dashboardNavSections(t, EVERY_PLAN_PAGE);
-
     const label = navLabelForPathname(sections, '/nowhere');
 
     expect(label).toBeUndefined();

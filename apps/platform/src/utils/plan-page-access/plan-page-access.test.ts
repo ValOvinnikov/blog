@@ -20,7 +20,6 @@ const withFreeCapabilities = (capabilities: TCapability[]) => {
 const CAPABILITY_GATED_PAGES: { page: TPlanPage; capability: TCapability }[] = [
   { page: 'leads', capability: CAPABILITY.CONTACT_FORM },
   { page: 'subscribers', capability: CAPABILITY.NEWSLETTER },
-  { page: 'comments', capability: CAPABILITY.COMMENTS },
 ];
 
 describe(planPageAccess, () => {
@@ -52,7 +51,6 @@ describe(planPageAccess, () => {
       email: false,
       leads: false,
       subscribers: false,
-      comments: false,
       team: false,
     });
   });
@@ -65,7 +63,6 @@ describe(planPageAccess, () => {
       email: true,
       leads: true,
       subscribers: false,
-      comments: false,
       team: false,
     });
   });
@@ -78,7 +75,6 @@ describe(planPageAccess, () => {
       email: true,
       leads: true,
       subscribers: true,
-      comments: true,
       team: true,
     });
   });
