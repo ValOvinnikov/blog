@@ -333,7 +333,7 @@ Free site.
   level; Deep Analysis is a paid option billed per check, to reconsider at
   public launch.
 - Env: `AUTH_SECRET`, `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`,
-  `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_API_KEY`,
+  `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `RESEND_PLATFORM_API_KEY`,
   `MAGIC_LINK_FROM_ADDRESS`, `KV_REST_API_URL`/`KV_REST_API_TOKEN` (the
   Create site gate's counts), `OPERATOR_ALERT_FROM_ADDRESS`.
 

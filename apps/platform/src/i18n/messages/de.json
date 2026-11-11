@@ -261,7 +261,7 @@
   },
   "emailAlertsBanner": {
     "title": "E-Mail-Benachrichtigungen nicht eingerichtet",
-    "description": "RESEND_API_KEY ist nicht gesetzt, daher erhalten Operatoren keine E-Mail, wenn ein Mandant Aufmerksamkeit benötigt — prüfen Sie diese Seite manuell."
+    "description": "RESEND_PLATFORM_API_KEY ist nicht gesetzt, daher erhalten Operatoren keine E-Mail, wenn ein Mandant Aufmerksamkeit benötigt — prüfen Sie diese Seite manuell."
   },
   "tenantsTable": {
     "empty": "Noch keine Mandanten.",

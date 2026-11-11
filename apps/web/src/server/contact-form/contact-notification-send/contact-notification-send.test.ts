@@ -1,5 +1,5 @@
 import { queries } from '@blog/db';
-import { sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import type * as TEmail from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';
@@ -58,24 +58,29 @@ describe(sendContactNotification, () => {
     vi.mocked(queries.emailConfig.getEmailConfig).mockResolvedValue(undefined);
   });
 
-  it('emails the recipient with Reply-To set to the visitor', async () => {
-    await sendContactNotification(MOCK_LEAD);
+  describe('once sent', () => {
+    beforeEach(async () => {
+      await sendContactNotification(MOCK_LEAD);
+    });
 
-    const { to, from, replyTo, subject } = firstSentEmail(vi.mocked(sendEmail));
-    expect(to).toBe(MOCK_RECIPIENT);
-    expect(from).toBe(MOCK_FROM_ADDRESS);
-    expect(replyTo).toBe(MOCK_LEAD.email);
-    expect(subject).toContain(MOCK_LEAD.name);
-  });
+    it('emails the recipient with Reply-To set to the visitor', () => {
+      const { account, to, from, replyTo, subject } = firstSentEmail(
+        vi.mocked(sendEmail),
+      );
+      expect(account).toBe(EMAIL_ACCOUNT.TENANT);
+      expect(to).toBe(MOCK_RECIPIENT);
+      expect(from).toBe(MOCK_FROM_ADDRESS);
+      expect(replyTo).toBe(MOCK_LEAD.email);
+      expect(subject).toContain(MOCK_LEAD.name);
+    });
 
-  it('links the page the message came from and the leads list', async () => {
-    await sendContactNotification(MOCK_LEAD);
-
-    const { html } = firstSentEmail(vi.mocked(sendEmail));
-    expect(html).toContain(
-      `href="${MOCK_TENANT_BASE_URL}${MOCK_LEAD.sourcePath}"`,
-    );
-    expect(html).toContain(`href="${MOCK_PLATFORM_URL}/dashboard/leads"`);
+    it('links the page the message came from and the leads list', () => {
+      const { html } = firstSentEmail(vi.mocked(sendEmail));
+      expect(html).toContain(
+        `href="${MOCK_TENANT_BASE_URL}${MOCK_LEAD.sourcePath}"`,
+      );
+      expect(html).toContain(`href="${MOCK_PLATFORM_URL}/dashboard/leads"`);
+    });
   });
 
   it('sends with an inert leads link and warns when the admin URL is unset', async () => {

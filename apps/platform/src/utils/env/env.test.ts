@@ -1,5 +1,6 @@
 import { KEY_ENCODING } from '@blog/utils/encryption';
 import { MOCK_ENCRYPTION_KEY } from '@blog/utils/encryption/encryption-fixtures';
+import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import {
   MOCK_WEB_APP_URL,
@@ -8,7 +9,6 @@ import {
 
 faker.seed(1);
 
-const MOCK_RESEND_KEY = faker.string.alphanumeric(24);
 const MOCK_GITHUB_REPO = `${faker.lorem.word()}/${faker.lorem.word()}`;
 const MOCK_WORKER_URL = faker.internet.url();
 const MOCK_BLOB_TOKEN = faker.string.alphanumeric(24);
@@ -22,7 +22,6 @@ const MOCK_INVALID_URL = faker.lorem.word();
 const SHORT_KEY = Buffer.alloc(16).toString(KEY_ENCODING);
 
 const OPTIONAL_VALID_VALUE = {
-  RESEND_API_KEY: MOCK_RESEND_KEY,
   BLOB_READ_WRITE_TOKEN: MOCK_BLOB_TOKEN,
   WEB_APP_URL: MOCK_WEB_APP_URL,
   SITE_CONFIG_REVALIDATE_SECRET: MOCK_REVALIDATE_SECRET,
@@ -61,7 +60,7 @@ const originalEnv = Object.fromEntries(
 const restoreEnv = (): void => {
   for (const key of ENV_KEYS) {
     const value = originalEnv[key];
-    if (value === undefined) {
+    if (isUndefined(value)) {
       delete process.env[key];
     } else {
       process.env[key] = value;
@@ -146,7 +145,7 @@ describe('env', () => {
 
   it('skips validation entirely when SKIP_ENV_VALIDATION is set', async () => {
     process.env['SKIP_ENV_VALIDATION'] = 'true';
-    delete process.env['RESEND_API_KEY'];
+    delete process.env['AUTH_SECRET'];
 
     await expect(importEnvOnServer()).resolves.toBeDefined();
   });

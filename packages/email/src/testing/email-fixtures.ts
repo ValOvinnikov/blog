@@ -27,7 +27,8 @@ export const MOCK_EMAIL_ACTION = {
 };
 export const MOCK_EMAIL_ADDRESS = 'editor@example.com';
 export const MOCK_INVALID_EMAIL_ADDRESS = 'not-an-email';
-export const MOCK_RESEND_API_KEY = 'test-resend-key';
+export const MOCK_RESEND_PLATFORM_API_KEY = 'test-resend-platform-key';
+export const MOCK_RESEND_TENANT_API_KEY = 'test-resend-tenant-key';
 export const MOCK_MAGIC_LINK_URL =
   'https://example.com/api/auth/callback/email?token=abc';
 export const MOCK_PLATFORM_MAGIC_LINK_URL =

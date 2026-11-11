@@ -65,7 +65,7 @@ A reader signs in to a public site from a popover in the header, with GitHub, Go
 
 - Layers: `auth` (config, providers), `db` (adapter tables, invites, email settings), `email` (templates, Resend transport), `config` (locales, template types), `web`.
 - Features: [reader-account](./reader-account.md), [bookmarks](./bookmarks.md), [email](./email.md), [tenant-access](./tenant-access.md) (invites), [languages](./languages.md), [plans-and-entitlements](./plans-and-entitlements.md).
-- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `AUTH_REDIRECT_PROXY_URL` (web only, unset locally), `TENANT_OAUTH_ENCRYPTION_KEY` (web reads a site's own client secrets under it), `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `RESEND_API_KEY`, `DATABASE_URL`.
+- Env: `AUTH_SECRET` (required), `AUTH_GITHUB_ID`/`AUTH_GITHUB_SECRET`, `AUTH_GOOGLE_ID`/`AUTH_GOOGLE_SECRET`, `AUTH_REDIRECT_PROXY_URL` (web only, unset locally), `TENANT_OAUTH_ENCRYPTION_KEY` (web reads a site's own client secrets under it), `MAGIC_LINK_FROM_ADDRESS` (falls back to Resend's testing sender), `RESEND_TENANT_API_KEY` (web), `RESEND_PLATFORM_API_KEY` (platform), `DATABASE_URL`.
 
 ## Entry points
 

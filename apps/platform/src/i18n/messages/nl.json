@@ -261,7 +261,7 @@
   },
   "emailAlertsBanner": {
     "title": "E-mailmeldingen niet geconfigureerd",
-    "description": "RESEND_API_KEY is niet ingesteld, dus operators krijgen geen e-mail wanneer een tenant aandacht nodig heeft — controleer deze pagina handmatig."
+    "description": "RESEND_PLATFORM_API_KEY is niet ingesteld, dus operators krijgen geen e-mail wanneer een tenant aandacht nodig heeft — controleer deze pagina handmatig."
   },
   "tenantsTable": {
     "empty": "Nog geen tenants.",

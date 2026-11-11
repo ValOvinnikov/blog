@@ -301,7 +301,7 @@ Production scope like the rest:
 
 | Key                       | `web-dev` / `web-prod` value                                  |
 | ------------------------- | ------------------------------------------------------------- |
-| `RESEND_API_KEY`          | the Resend API key                                            |
+| `RESEND_TENANT_API_KEY`   | the tenant-mail Resend account's API key                      |
 | `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <sign-in@mail.{your-hosting}>`                 |
 | `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>`              |
 | `RESEND_WEBHOOK_SECRET`   | the signing secret of that project's Resend webhook (step 5a) |
@@ -473,7 +473,7 @@ not fully functional until they are set:
 | `AUTH_GITHUB_ID` / `_SECRET`       | GitHub sign-in (`@blog/auth`)                                                       |
 | `AUTH_GOOGLE_ID` / `_SECRET`       | Google sign-in (`@blog/auth`)                                                       |
 | `MAGIC_LINK_FROM_ADDRESS`          | magic-link sender, on a Resend-verified domain (see the web note)                   |
-| `RESEND_API_KEY`                   | delivers the magic-link email (`apps/platform`'s own `sendEmail`)                   |
+| `RESEND_PLATFORM_API_KEY`          | the platform Resend account's key: sign-in, invites, alerts, owner emails           |
 | `BLOB_READ_WRITE_TOKEN`            | Look tab's logo/favicon uploads (`@vercel/blob`)                                    |
 | `WEB_APP_URL`                      | `apps/web` origin the Look/Voice saves call to revalidate its cache                 |
 | `SITE_CONFIG_REVALIDATE_SECRET`    | bearer token for that call — byte-identical to `apps/web`'s own                     |
@@ -885,9 +885,17 @@ route answers 500 and Resend retries, so no outcome is recorded. On dev the one
 account also sends platform mail, which carries no site tag; the route
 acknowledges those events and records nothing.
 
-The split of `RESEND_API_KEY` into `RESEND_PLATFORM_API_KEY` and
-`RESEND_TENANT_API_KEY`, which points each kind of mail at its account, follows
-in #7237.
+Each kind of mail goes through its own key: `RESEND_PLATFORM_API_KEY` on the
+platform and worker projects (sign-in, invites, operator alerts, owner emails)
+and `RESEND_TENANT_API_KEY` on the web projects (reader sign-in, newsletter,
+contact-form leads, posts). On dev both hold the one dev account's key; in
+production each holds its own account's key. Every sender address must be on a
+domain verified in the account that sends it: on the platform and worker
+projects, `MAGIC_LINK_FROM_ADDRESS`, `OPERATOR_ALERT_FROM_ADDRESS` and
+`OWNER_EMAIL_FROM_ADDRESS` in the platform account; on the web projects,
+`MAGIC_LINK_FROM_ADDRESS` and `NEWSLETTER_FROM_ADDRESS` in the tenant-mail
+account. Both keys are also GitHub Environment secrets on `development` and
+`production`, which the required-env CI check verifies.
 
 ### 6. Sanity — CORS origins · API → CORS origins
 

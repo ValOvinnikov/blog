@@ -1,8 +1,8 @@
 import { queries } from '@blog/db';
+import { EMAIL_ACCOUNT, isEmailAccountConfigured } from '@blog/email';
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
-import { env } from '@platform/utils/env/env';
 import {
   parseTenantsListQuery,
   type TTenantsListSearchParams,
@@ -31,7 +31,9 @@ export default async function TenantsPage({ searchParams }: TProps) {
     <TenantsView
       tenants={tenants.map(toClientTenant)}
       listQuery={listQuery}
-      isEmailAlertingConfigured={!!env.RESEND_API_KEY}
+      isEmailAlertingConfigured={isEmailAccountConfigured(
+        EMAIL_ACCOUNT.PLATFORM,
+      )}
     />
   );
 }

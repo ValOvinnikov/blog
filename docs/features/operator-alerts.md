@@ -40,7 +40,8 @@ the email in the platform's own look, and sends it.
 - The email links nowhere directly; its copy points the operator to the
   tenant's provisioning page or detail page in the platform.
 - `/tenants` shows an "Email alerts not configured" warning when
-  `RESEND_API_KEY` is unset, so operators know to check the page by hand.
+  `RESEND_PLATFORM_API_KEY` is unset, so operators know to check the page by
+  hand.
 
 ## Data
 
@@ -117,10 +118,10 @@ the email in the platform's own look, and sends it.
   [tenant-access](./tenant-access.md).
 - Env:
   - Platform: `OPERATOR_ALERT_SECRET`, `OPERATOR_ALERT_FROM_ADDRESS`,
-    `RESEND_API_KEY`.
+    `RESEND_PLATFORM_API_KEY`.
   - CI (GitHub Environment): `OPERATOR_ALERT_SECRET` (byte-identical to the
     platform's), `PLATFORM_APP_BASE_URL`.
-  - Worker: `OPERATOR_ALERT_FROM_ADDRESS`, `RESEND_API_KEY` for the archived
+  - Worker: `OPERATOR_ALERT_FROM_ADDRESS`, `RESEND_PLATFORM_API_KEY` for the archived
     Sanity project email.
 
 ## Entry points

@@ -3,6 +3,7 @@ import 'server-only';
 import { queries, type TTenantPlan } from '@blog/db';
 import {
   buildOwnerPlanChangeEmail,
+  EMAIL_ACCOUNT,
   PLATFORM_EMAIL_BRAND_NAME,
   sendEmail,
 } from '@blog/email';
@@ -56,7 +57,12 @@ const sendPlanChangeEmail = async (
     },
   });
 
-  await sendEmail({ to: ownerEmail, from, ...message });
+  await sendEmail({
+    account: EMAIL_ACCOUNT.PLATFORM,
+    to: ownerEmail,
+    from,
+    ...message,
+  });
 };
 
 export const notifyOwnerOfPlanChange = async (

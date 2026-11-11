@@ -1,6 +1,10 @@
 import 'server-only';
 
 import type { TEmailTag } from '@blog/email/tags';
+import {
+  EMAIL_ACCOUNT,
+  type TEmailAccount,
+} from '@blog/email/transport/email-account';
 import { env } from '@blog/email/utils/env/env';
 import { isUndefined } from '@blog/utils/primitives';
 import { Resend } from 'resend';
@@ -8,6 +12,7 @@ import { Resend } from 'resend';
 import { isValidEmailAddress } from '@blog/email/validation';
 
 export type TSendEmailInput = {
+  account: TEmailAccount;
   to: string;
   from: string;
   subject: string;
@@ -23,15 +28,35 @@ function sanitizeEmailSubject(subject: string): string {
   return subject.replace(/[\r\n]+/g, ' ');
 }
 
-let resendClient: Resend | undefined;
+function readApiKey(account: TEmailAccount): string | undefined {
+  return account === EMAIL_ACCOUNT.PLATFORM
+    ? env.RESEND_PLATFORM_API_KEY
+    : env.RESEND_TENANT_API_KEY;
+}
 
-function getResendClient(): Resend {
-  resendClient ??= new Resend(env.RESEND_API_KEY);
+export function isEmailAccountConfigured(account: TEmailAccount): boolean {
+  return !isUndefined(readApiKey(account));
+}
 
-  return resendClient;
+const resendClients = new Map<TEmailAccount, Resend>();
+
+function getResendClient(account: TEmailAccount): Resend {
+  const cached = resendClients.get(account);
+  if (cached) return cached;
+
+  const apiKey = readApiKey(account);
+  // Resend's constructor falls back to process.env.RESEND_API_KEY, so a missing key must throw here.
+  if (isUndefined(apiKey)) {
+    throw new Error(`No Resend API key is set for the ${account} account`);
+  }
+  const client = new Resend(apiKey);
+  resendClients.set(account, client);
+
+  return client;
 }
 
 export async function sendEmail({
+  account,
   to,
   from,
   subject,
@@ -45,7 +70,7 @@ export async function sendEmail({
     throw new Error('sendEmail received a malformed replyTo address');
   }
 
-  const { error } = await getResendClient().emails.send({
+  const { error } = await getResendClient(account).emails.send({
     to,
     from,
     subject: sanitizeEmailSubject(subject),

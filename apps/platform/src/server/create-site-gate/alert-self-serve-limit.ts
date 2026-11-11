@@ -1,10 +1,10 @@
 import 'server-only';
 
 import { queries } from '@blog/db';
-import { buildSelfServeLimitAlertEmail, sendEmail } from '@blog/email';
+import { buildSelfServeLimitAlertEmail } from '@blog/email';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
-import { resolveOperatorAlertFromAddress } from '@platform/server/email/resolve-operator-alert-from-address';
+import { sendOperatorAlertEmail } from '@platform/server/email/send-operator-alert-email';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -19,21 +19,16 @@ export const alertSelfServeLimit = async (
       return;
     }
 
-    const { subject, html } = buildSelfServeLimitAlertEmail({
-      day,
-      dailyLimit,
-    });
-    const from = resolveOperatorAlertFromAddress();
-    await Promise.all(
-      recipients.map((to) =>
-        sendEmail({ to, from, subject, html }).catch((error: unknown) => {
-          logger.error(CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED, {
-            day,
-            ...toLoggableError(error),
-          });
-        }),
-      ),
+    const failures = await sendOperatorAlertEmail(
+      recipients,
+      buildSelfServeLimitAlertEmail({ day, dailyLimit }),
     );
+    failures.forEach((reason) => {
+      logger.error(CREATE_SITE_GATE_LOG.ALERT_SEND_FAILED, {
+        day,
+        ...toLoggableError(reason),
+      });
+    });
   } catch (error) {
     logger.error(CREATE_SITE_GATE_LOG.ALERT_FAILED, {
       day,
