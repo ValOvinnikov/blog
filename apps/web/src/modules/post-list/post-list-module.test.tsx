@@ -6,6 +6,7 @@ import {
 } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { POST_LIST_LOG } from '@web/constants/post-list';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -102,16 +103,13 @@ describe(`<${PostListModule.name}/>`, () => {
     getPostListMock.mockResolvedValue(okResult(mockPostListModuleData()));
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getPostListMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-    await expect(setup({ context: { page: 2 } })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(setup({ context: { page: 2 } })).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'post_list_module.fetch_failed',
+      POST_LIST_LOG.MODULE_FETCH_FAILED,
       { id: MOCK_POST_LIST_ID, page: 2, error: MOCK_ERROR },
     );
   });

@@ -85,5 +85,4 @@ A post is an article written in the Studio: a heading and lead, an optional hero
 ## Related
 
 - #2682 — verify the tenant-scoped path purge against a real running site.
-- #1880 — decide whether a loader failure should 404 or 500.
 - #3600 — coverage for link targets reached through a post's author.

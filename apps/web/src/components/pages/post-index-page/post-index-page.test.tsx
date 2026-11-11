@@ -131,12 +131,11 @@ describe(`<${PostIndexPage.name}/>`, () => {
     });
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getIndexPageMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(logger.error).toHaveBeenCalledWith('post_index_page.fetch_failed', {
       error: MOCK_ERROR,
     });
@@ -165,9 +164,7 @@ describe(`<${PostIndexPage.name}/>`, () => {
     );
     getPostListMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expect(setup({ page: MOCK_PAGE_NUMBER })).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
+    await expect(setup({ page: MOCK_PAGE_NUMBER })).rejects.toBe(MOCK_ERROR);
 
     expect(getPostListMock).toHaveBeenCalledWith(
       MOCK_POST_LIST_ID,

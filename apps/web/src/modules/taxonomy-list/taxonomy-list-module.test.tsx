@@ -1,7 +1,6 @@
 import {
   BRAND_VARIANT,
   LOCALE_ISO_CODES,
-  NEXT_NAVIGATION_ERROR,
   routes,
   SITE_MESSAGES,
   TAXONOMY_KIND,
@@ -10,6 +9,7 @@ import {
 import type { TTaxonomyEntry, TTaxonomyListModule } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { TAXONOMY_LIST_LOG } from '@web/constants/taxonomy-list';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import {
@@ -25,7 +25,6 @@ import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures'
 import { mockTopic } from '@web/testing/shared/topic/fixtures';
 import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
-import { notFound } from 'next/navigation';
 import { createTranslator } from 'next-intl';
 
 import { TaxonomyListModule } from './taxonomy-list-module';
@@ -272,14 +271,13 @@ describe(`<${TaxonomyListModule.name}/>`, () => {
     expect(link).toHaveAttribute('href', routes.blogIndex());
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getTaxonomyListMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
-      'taxonomy_list_module.fetch_failed',
+      TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED,
       { id: MOCK_TAXONOMY_LIST_ID, error: MOCK_ERROR },
     );
   });

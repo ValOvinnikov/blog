@@ -95,10 +95,10 @@ describe(`<${SectionDocumentPage.name}/>`, () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('logs and calls notFound() when the fetch fails', async () => {
+  it('logs and throws to the error boundary when the fetch fails', async () => {
     getSectionDocumentMock.mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
-    await expectNotFound();
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
     expect(logger.error).toHaveBeenCalledWith(
       SECTION_DOCUMENT_LOG.PAGE_FETCH_FAILED,
