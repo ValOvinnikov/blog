@@ -13,6 +13,7 @@ import { noFailingCommentRule } from './no-failing-comment.js';
 import { noNestedQueryRule } from './no-nested-query.js';
 import { noNodeAccessRule } from './no-node-access.js';
 import { noVitestGlobalsImportPath } from './no-vitest-globals-import.js';
+import { preferBeforeEachRule } from './prefer-before-each.js';
 import { preferSharedConstantRule } from './prefer-shared-constant.js';
 import { preferUtilsPrimitiveRule } from './prefer-utils-primitive.js';
 
@@ -57,6 +58,7 @@ const touchedTestFileRules = {
   plugins: { vitest },
   rules: {
     'blog-test/no-nested-query': 'error',
+    'blog-test/prefer-before-each': 'error',
     'vitest/valid-title': [
       'error',
       {
@@ -151,6 +153,7 @@ export default [
         rules: {
           'no-class-assertions': noClassAssertionsRule,
           'no-nested-query': noNestedQueryRule,
+          'prefer-before-each': preferBeforeEachRule,
         },
       },
       'testing-library': {

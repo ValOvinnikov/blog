@@ -71,6 +71,8 @@ check 'pnpm create vite' deny "pnpm create"
 check 'pnpm typegen' deny "pnpm typegen"
 check 'pnpm format' deny "pnpm format"
 check 'npx sanity deploy' deny "npx sanity"
+check 'drizzle-kit migrate' deny "drizzle-kit"
+check 'npx drizzle-kit push' deny "npx drizzle-kit"
 check 'gh project item-add 1 --url x' deny "gh project item-add"
 check 'gh project item-edit 1 --field-id x' deny "gh project item-edit"
 

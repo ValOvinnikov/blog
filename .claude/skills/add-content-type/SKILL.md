@@ -28,9 +28,11 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
 
 ## 1. Schema + typegen — `packages/studio` · `studio`
 
-- **Migration check first** → CLAUDE.md "Check for migrations": an existing
-  shape changing needs a plan put to the user; additive optional-only needs
-  none — say so.
+- **Starter content first, not a migration.** Until launch no content
+  migration is written (CLAUDE.md "Until launch, no content migrations"): a
+  changed existing shape updates `packages/config/src/starter-content/` so a
+  new tenant starts at the current shape; additive optional-only needs nothing
+  — say so. CLAUDE.md "Check for migrations" takes over at launch.
 - Conventions → `.claude/agents/studio.md`, `studio-schema-practices`. Most
   often missed: registering the type in its group's `index.ts`, and its desk
   entry — a `{ schema }` in `src/structure/sections/<section>-section.ts` for a
@@ -44,7 +46,11 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
   module types → `SPEC.md` §6, `docs/context/content-model.md`), and — when a
   template's `modulesField({ extend })` or `heroField({ allow })` (or
   `page_post`'s `modulesField`) admits it — that page's assertion in
-  `packages/config/src/types/page-module.test.ts`.
+  `packages/config/src/types/page-module.test.ts`. The `studio` agent cannot
+  write either file, so the one branch runs, in order: the `studio` dispatch
+  (schema), the orchestrator's `pnpm typegen`, a `config` dispatch (the
+  `page-module.test.ts` assertion, when one is owed), a `web` dispatch (the
+  `REVALIDATE_TAGS` key), and only then `verify-runner`.
 - When the schema is done, `pnpm --filter @blog/studio typegen` once, re-run
   until the diff is minimal, and commit
   `packages/config/src/sanity/generated/` with it.
@@ -102,8 +108,8 @@ metadata or feed.
 ## Boundary checklist
 
 - [ ] Type from typegen, generated files committed; nothing hand-written.
-- [ ] Existing-shape change has a migration plan (dry-run → backup →
-      human-gated run).
+- [ ] Existing-shape change updates the starter content (after launch: a
+      migration plan, dry-run → backup → human-gated run).
 - [ ] Every new `module_*` and cached document `_type` has its
       `REVALIDATE_TAGS` key (a document: its `TCachedDocumentType` entry too).
 - [ ] `service` has no React; `ui` has no `service`/`sanity`/`fetch`/`next/*`;

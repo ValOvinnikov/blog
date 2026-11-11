@@ -561,18 +561,21 @@ neither Storybook.
 ## Local mirror of the required checks: `pnpm verify`
 
 Root `pnpm verify` is one `&&` chain over every required or gating CI check
-that has a local equivalent, in this order: `type-check`, `lint`, `test`,
-`check:test-budget`, `check:file-size`, `knip`, `check:client-graph`, `check:revalidate-tags-sync`,
-`check:turbo-env-sync`, `check:migration-index`, `gen:ui-index:check`,
-`gen:const-index:check`, `gen:migration-ids:check`, `check:touched-lint`. The
-chain stops at the first failure, so a red step is reported once rather than
-buried under later output. It is the sequence `develop-feature` §5 hands to
-`verify-runner`, the `## Verify` line of every issue body, and — minus
-`test` and the warn-only `check:test-budget`, to keep a push fast — the
-`.husky/pre-push` hook (the non-test tail
-measured 13s on one machine against a warm Turbo cache, well under the
-threshold at which it would have stayed out). Before that chain, `.husky/pre-push` refuses
-a push that creates a branch off the pattern in `scripts/branch-name.mjs`.
+that has a local equivalent, cheapest first: `check:file-size`,
+`check:revalidate-tags-sync`, `check:turbo-env-sync`, `check:migration-index`,
+`gen:ui-index:check`, `gen:const-index:check`, `gen:migration-ids:check`,
+`check:touched-lint` (about a second each), then `check:client-graph`,
+`type-check`, `lint`, `knip`, `test` and `check:test-budget`, which reads the
+report `test` writes. The chain stops at the first failure, so a red step is
+reported once rather than buried under later output, and a drift a sub-second
+check would catch never waits behind the full test run. It is the sequence
+`develop-feature` §5 hands to `verify-runner`, the `## Verify` line of every
+issue body, and — minus `test` and `check:test-budget`, to keep a push
+fast — the `.husky/pre-push` hook (the non-test tail measured 13s
+on one machine against a warm Turbo cache, well under the threshold at which
+it would have stayed out). Before that chain,
+`.husky/pre-push` refuses a push that creates a branch off the pattern in
+`scripts/branch-name.mjs`.
 
 | CI check                            | Local mirror                                                                                                                                                                                                                                                                                                                                             |
 | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

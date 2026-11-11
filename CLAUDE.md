@@ -824,7 +824,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
     form of epic #6152
     (`docs/superpowers/specs/2026-10-27-deploy-first-migrations-design.md`).
 
-- **Check for migrations.** Content is live in the `production` dataset, so any
+- **Check for migrations — from launch.** Suspended until then by the rule
+  above; until launch, a changed shape updates the starter content instead.
+  Content is live in the `production` dataset, so any
   change that alters an _existing_ shape — renaming/removing/moving a field,
   renaming a `_type`, restructuring a document — orphans data unless existing
   documents are migrated. Before implementing, decide: does this need a data

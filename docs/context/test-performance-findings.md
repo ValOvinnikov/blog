@@ -60,10 +60,11 @@ Measured from Vitest's per-file results (durations include hooks):
 | query tests (`useQueryTestDb`, one PGlite per file) | 140   | 51% (681s)         |
 | `createTestDb()` direct, client test, pure units    | 53    | 2%                 |
 
-- **Migration-replay tests** call `new PGlite()` for every `it()`. That runs a
-  full `initdb` (2.5s alone, ~7–8s under parallel load) and then replays every
-  migration (0.23s for all 58). There were 3 such files and 16 migrations in
-  August; there are now 14 files and 58 migrations.
+- **Migration-replay tests** called `new PGlite()` for every `it()`: a full
+  `initdb` (2.5s alone, ~7–8s under parallel load), then a replay of every
+  migration (0.23s for all 58). They have since been deleted along with the
+  content migrations they replayed, so their 47% share no longer applies; the
+  row stays as the baseline the rest of this section was measured against.
 - **Query test files** pay a fixed ~4.5s each under load (fitted over 114
   files: 4.49s per file + 0.078s per test). That is the PGlite boot plus the
   snapshot restore. The test bodies and their `afterEach` DELETEs total about
@@ -239,9 +240,6 @@ needed a product change. Also found:
   `apps/platform/src/i18n/__mocks__/navigation.ts`.
 - **"Invalid environment variables"** lines are expected output of negative env
   tests.
-- **`FakeIntersectionObserver` is declared twice** in `apps/web`:
-  `back-to-top-button.test.tsx` and `use-active-heading-id.test.tsx`, and the
-  first wraps each trigger in its own `act()`.
 
 ## Orchestration
 
@@ -262,11 +260,11 @@ needed a product change. Also found:
   all green in normal and `--sequence.shuffle` runs. `isolate: false` fails
   files in both, and enabling `deps.optimizer.ssr` gains nothing.
 - **`apps/worker` and `packages/auth`**: `isolate: false` is unsafe for the
-  same `vi.mock` reason. Their import time comes from the tests themselves:
-  `importOriginal` spreads of the db tenants barrel in
-  `fake-tenants-queries.ts` (18 files), the real `workflow` package loaded
-  through `importOriginal` (10 files), and `config.test.ts` importing the whole
-  `@blog/db` barrel up to 4 times.
+  same `vi.mock` reason. Their import time came from the tests themselves:
+  `importOriginal` spreads of the db tenants barrel (since removed with
+  `fake-tenants-queries.ts`), the real `workflow` package loaded through
+  `importOriginal`, and `config.test.ts` importing the whole `@blog/db` barrel
+  up to 4 times.
 - **`isolate: false` candidates** (no or few module mocks, unmeasured):
   `packages/utils` and `packages/email`.
 - **`packages/studio` runs with `isolate: false` (adopted).** A setup file
@@ -283,9 +281,8 @@ Kept here rather than ticketed, because the gain is unmeasured and small, or a
 decision comes first:
 
 - **Trim `apps/worker` and `packages/auth` test imports** — about 48s of suite
-  time between them. Stop spreading `importOriginal()` in
-  `fake-tenants-queries.ts`, replace the real `workflow` package in tests with
-  a light shim that re-exports its error classes, turn db automocks into
+  time between them, measured before `fake-tenants-queries.ts` was removed.
+  Replace the real `workflow` package in tests with a light shim that re-exports its error classes, turn db automocks into
   factories, and mock `@blog/db` in auth's `config.test.ts`. Measure with
   `--experimental.importDurations.print` first.
 - **`isolate: false` for `packages/utils` and `packages/email`** — none or
