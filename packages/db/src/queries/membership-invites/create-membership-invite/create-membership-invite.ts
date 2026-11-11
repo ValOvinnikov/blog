@@ -1,23 +1,23 @@
 import { getDb } from '@blog/db/client';
 import {
   MEMBERSHIP_INVITE_OUTCOME,
-  PLAN_ENTITLEMENTS,
   type TMembershipRole,
 } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import {
-  CREATED_AT_COLUMN,
-  EMAIL_ENCRYPTED_COLUMN,
-  EMAIL_EXACT_INDEX_COLUMN,
-  EMAIL_INDEX_COLUMN,
-} from '@blog/db/schema/columns';
-import {
   membershipInvites,
   type TMembershipInvite,
 } from '@blog/db/schema/membership-invites';
-import { memberships } from '@blog/db/schema/memberships';
 import { tenants } from '@blog/db/schema/tenants';
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
+
+import { castTo, columnDefault } from './insert-select-columns';
+import {
+  membershipsCount,
+  pendingInvitesCount,
+  planSeats,
+  releaseInvitePastSeatLimit,
+} from './seat-limit';
 
 export type TCreateMembershipInviteResult =
   | {
@@ -62,53 +62,40 @@ export async function createMembershipInvite(
   role: TMembershipRole,
 ): Promise<TCreateMembershipInviteResult> {
   const db = getDb();
-  const emailColumns = inviteEmailColumns(email);
-  const { emailExactIndex } = emailColumns;
+  const { emailEncrypted, emailIndex, emailExactIndex } =
+    inviteEmailColumns(email);
 
   const existing = await findInvite(tenantId, emailExactIndex);
 
   if (existing) return existing;
-
-  const [tenant] = await db
-    .select({ plan: tenants.plan })
-    .from(tenants)
-    .where(eq(tenants.id, tenantId));
-
-  if (!tenant) {
-    throw new Error(`createMembershipInvite: tenant "${tenantId}" not found.`);
-  }
-
-  const seatsTaken = sql<number>`(
-    (select count(*) from ${memberships} where ${eq(memberships.tenantId, tenantId)})
-    + (select count(*) from ${membershipInvites}
-       where ${and(eq(membershipInvites.tenantId, tenantId), isNull(membershipInvites.consumedAt))})
-  )`;
 
   const [inserted] = await db
     .insert(membershipInvites)
     .select(
       db
         .select({
-          id: sql<string>`gen_random_uuid()`.as('id'),
-          tenantId: sql<string>`${tenantId}::uuid`.as('tenant_id'),
-          emailEncrypted: sql<string>`${emailColumns.emailEncrypted}`.as(
-            EMAIL_ENCRYPTED_COLUMN,
+          id: columnDefault(membershipInvites.id),
+          tenantId: sql<string>`${tenants.id}`.as(
+            membershipInvites.tenantId.name,
           ),
-          emailIndex: sql<string>`${emailColumns.emailIndex}`.as(
-            EMAIL_INDEX_COLUMN,
+          emailEncrypted: sql<string>`${emailEncrypted}`.as(
+            membershipInvites.emailEncrypted.name,
+          ),
+          emailIndex: sql<string>`${emailIndex}`.as(
+            membershipInvites.emailIndex.name,
           ),
           emailExactIndex: sql<string>`${emailExactIndex}`.as(
-            EMAIL_EXACT_INDEX_COLUMN,
+            membershipInvites.emailExactIndex.name,
           ),
-          role: sql<TMembershipRole>`${role}::membership_role`.as('role'),
-          createdAt: sql<Date>`now()`.as(CREATED_AT_COLUMN),
-          consumedAt: sql<null>`null::timestamp`.as('consumed_at'),
+          role: castTo(membershipInvites.role, sql`${role}`),
+          createdAt: columnDefault(membershipInvites.createdAt),
+          consumedAt: castTo(membershipInvites.consumedAt, sql`null`),
         })
         .from(tenants)
         .where(
           and(
             eq(tenants.id, tenantId),
-            sql`${seatsTaken} < ${PLAN_ENTITLEMENTS[tenant.plan].seats}`,
+            sql`${membershipsCount(tenantId)} + ${pendingInvitesCount(tenantId)} < ${planSeats()}`,
           ),
         ),
     )
@@ -116,12 +103,23 @@ export async function createMembershipInvite(
     .returning();
 
   if (inserted) {
-    return { outcome: MEMBERSHIP_INVITE_OUTCOME.CREATED, invite: inserted };
+    return (await releaseInvitePastSeatLimit(inserted.id))
+      ? { outcome: MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT }
+      : { outcome: MEMBERSHIP_INVITE_OUTCOME.CREATED, invite: inserted };
   }
 
-  return (
-    (await findInvite(tenantId, emailExactIndex)) ?? {
-      outcome: MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT,
-    }
-  );
+  const raced = await findInvite(tenantId, emailExactIndex);
+
+  if (raced) return raced;
+
+  const [tenant] = await db
+    .select({ id: tenants.id })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+
+  if (!tenant) {
+    throw new Error(`createMembershipInvite: tenant "${tenantId}" not found.`);
+  }
+
+  return { outcome: MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT };
 }

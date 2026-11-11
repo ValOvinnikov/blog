@@ -44,3 +44,10 @@ export function inviteOf(
 
   return result.invite;
 }
+
+export async function deleteSeatRows(db: TTestDb): Promise<void> {
+  await db.delete(schema.membershipInvites);
+  await db.delete(schema.memberships);
+  await db.delete(schema.tenants);
+  await db.delete(schema.users);
+}

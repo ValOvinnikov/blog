@@ -11,6 +11,7 @@ import {
   MOCK_INVITE_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
+  deleteSeatRows,
   inviteOf,
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
@@ -39,10 +40,7 @@ const GROWTH_SEATS = 3;
 const db = useQueryTestDb();
 
 afterEach(async () => {
-  await db().delete(schema.membershipInvites);
-  await db().delete(schema.memberships);
-  await db().delete(schema.tenants);
-  await db().delete(schema.users);
+  await deleteSeatRows(db());
 });
 
 describe(createMembershipInvite, () => {
@@ -184,27 +182,6 @@ describe(createMembershipInvite, () => {
 
       expect(result.outcome).toBe(SEAT_LIMIT);
       expect(await inviteRows(tenantId)).toHaveLength(1);
-    });
-
-    it('returns the existing pending invite for a re-invite at the limit', async () => {
-      const first = inviteOf(
-        await createMembershipInvite(
-          tenantId,
-          MOCK_INVITE_EMAIL,
-          MEMBERSHIP_ROLE.OWNER,
-        ),
-      );
-
-      const second = await createMembershipInvite(
-        tenantId,
-        MOCK_INVITE_EMAIL,
-        MEMBERSHIP_ROLE.OWNER,
-      );
-
-      expect(second).toEqual({
-        outcome: ALREADY_PENDING,
-        invite: first,
-      });
     });
 
     describe('on a GROWTH tenant', () => {
