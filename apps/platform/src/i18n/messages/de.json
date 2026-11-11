@@ -765,6 +765,18 @@
       "SOFT": "Eine graue Füllung, kein Rahmen",
       "PLAIN": "Kein Rahmen bis zum Überfahren"
     },
+    "headerControlShapeLabel": "Form der Header-Schaltflächen",
+    "headerControlShapeDescription": "Die Umrissform der Schaltflächen für Sprache, Design, Menü und Konto.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Rund",
+      "ROUNDED": "Abgerundet",
+      "SQUARE": "Eckig"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Ganz rund, als Kreise und Pillen",
+      "ROUNDED": "Ecken folgen der Ecken-Einstellung der Website",
+      "SQUARE": "Eckige Ecken"
+    },
     "languageSwitcherLabel": "Sprachauswahl",
     "languageSwitcherStyleLabel": "Stil",
     "languageSwitcherDescription": "Wie die Sprachauswahl auf dem Desktop in Kopf- und Fußzeile aussieht.",

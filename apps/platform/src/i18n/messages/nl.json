@@ -765,6 +765,18 @@
       "SOFT": "Een grijze vulling, geen rand",
       "PLAIN": "Geen rand tot je eroverheen beweegt"
     },
+    "headerControlShapeLabel": "Vorm van headerknoppen",
+    "headerControlShapeDescription": "De omtrekvorm van de knoppen voor taal, thema, menu en account.",
+    "headerControlShapeOptionLabel": {
+      "ROUND": "Rond",
+      "ROUNDED": "Afgerond",
+      "SQUARE": "Vierkant"
+    },
+    "headerControlShapeOptionDescription": {
+      "ROUND": "Helemaal rond, als cirkels en pillen",
+      "ROUNDED": "Hoeken volgen de instelling Hoeken van de site",
+      "SQUARE": "Vierkante hoeken"
+    },
     "languageSwitcherLabel": "Taalkeuze",
     "languageSwitcherStyleLabel": "Stijl",
     "languageSwitcherDescription": "Hoe de taalkeuze er op desktop uitziet, in de header en footer.",

@@ -22,6 +22,7 @@ import {
   persistStagedImage,
   type TStagedImage,
 } from '@platform/utils/staged-image/staged-image';
+import { toUpdateLookInput } from '@platform/utils/to-update-look-input/to-update-look-input';
 import { useAfterSave } from '@platform/utils/use-after-save/use-after-save';
 import type { TUploadErrorState } from '@platform/utils/use-upload-error-text/use-upload-error-text';
 import { useState } from 'react';
@@ -89,33 +90,7 @@ export const useLookSave = ({
         savedImages[kind] = result.data;
       }
 
-      const result = await updateLookAction(tenantId, {
-        preset: vals.preset,
-        accentHue: vals.accentHue,
-        logoHue: vals.logoHue ?? null,
-        headingFont: vals.headingFont,
-        bodyFont: vals.bodyFont,
-        radiusScale: vals.radiusScale,
-        density: vals.density,
-        cardStyle: vals.cardStyle,
-        headerControlStyle: vals.headerControlStyle,
-        headerLayout: vals.headerLayout,
-        headerSubmenuStyle: vals.headerSubmenuStyle,
-        headerBarStyle: vals.headerBarStyle,
-        navLinkStyle: vals.navLinkStyle,
-        accountButtonStyle: vals.accountButtonStyle,
-        accountPanelStyle: vals.accountPanelStyle,
-        accountPhonePlacement: vals.accountPhonePlacement,
-        busyButtonStyle: vals.busyButtonStyle,
-        spinnerStyle: vals.spinnerStyle,
-        buttonShape: vals.buttonShape,
-        footerLayout: vals.footerLayout,
-        footerBackground: vals.footerBackground,
-        footerSurface: vals.footerSurface,
-        cookieSettingsButton: vals.cookieSettingsButton,
-        languageSwitcherStyle: vals.languageSwitcherStyle,
-        brandName: vals.brandName,
-      });
+      const result = await updateLookAction(tenantId, toUpdateLookInput(vals));
       finish(result.outcome);
       return result;
     },

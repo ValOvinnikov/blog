@@ -4,10 +4,10 @@ import {
   ICONS,
   SPINNER_STYLE,
   type TBusyButtonStyle,
-  type TButtonShape,
 } from '@blog/config';
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
+import { LookChoiceField } from '@platform/components/features/look/look-form/components/look-choice-field';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookSubsection } from '@platform/components/features/look/look-form/components/look-subsection';
@@ -30,11 +30,10 @@ export type TButtonsCardProps = {
 
 export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
   const {
-    values: { buttonShape, busyButtonStyle, spinnerStyle },
+    values: { busyButtonStyle, spinnerStyle },
     updateField,
   } = useLookForm();
   const t = useTranslations('lookForm');
-  const shapeLock = useLookFieldLock('buttonShape');
   const busyLock = useLookFieldLock('busyButtonStyle');
   const spinnerLock = useLookFieldLock('spinnerStyle');
   const { lockLine, hasGrowthBadge } = useLookRowLock(
@@ -55,7 +54,6 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     t(`spinnerStyleOptionLabel.${style}`),
   );
 
-  const shapeLabel = t('buttonShapeLabel');
   const spinnerStyleLabel = t('spinnerStyleLabel');
 
   return (
@@ -66,24 +64,13 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
       lockLine={lockLine}
       hasGrowthBadge={hasGrowthBadge}
     >
-      <LookField
+      <LookChoiceField
         field="buttonShape"
-        label={shapeLabel}
+        label={t('buttonShapeLabel')}
         hint={t('buttonShapeDescription')}
-        isGroup={true}
-        labelId={shapeLock.labelId}
-        growthBadgeId={shapeLock.growthBadgeId}
-      >
-        <SegmentedControl<TButtonShape>
-          aria={shapeLock.aria}
-          options={shapeOptions}
-          value={buttonShape}
-          onChange={(shape) => updateField('buttonShape', shape)}
-          lock={shapeLock}
-          layout={SEGMENTED_LAYOUT.SINGLE_ROW}
-        />
-        <PresetValueButton field="buttonShape" fieldLabel={shapeLabel} />
-      </LookField>
+        options={shapeOptions}
+        layout={SEGMENTED_LAYOUT.SINGLE_ROW}
+      />
 
       <LookSubsection heading={t('buttonsWhileWorkingHeading')}>
         <LookField

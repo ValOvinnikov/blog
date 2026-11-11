@@ -180,6 +180,13 @@ describe(`<${LookForm.name}/>`, () => {
         option: LOOK_FORM.navLinkStyleOptionLabel.UNDERLINE,
         description: LOOK_FORM.navLinkStyleOptionDescription.UNDERLINE,
       },
+      {
+        row: LOOK_ROW.HEADER,
+        label: LOOK_FORM.headerControlShapeLabel,
+        initialDescription: LOOK_FORM.headerControlShapeOptionDescription.ROUND,
+        option: LOOK_FORM.headerControlShapeOptionLabel.SQUARE,
+        description: LOOK_FORM.headerControlShapeOptionDescription.SQUARE,
+      },
     ])(
       'describes the chosen $label option below the control',
       async ({ row, label, initialDescription, option, description }) => {

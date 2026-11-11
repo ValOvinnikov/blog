@@ -15,6 +15,7 @@ import {
   type TFooterLayout,
   type TFooterSurface,
   type THeaderBarStyle,
+  type THeaderControlShape,
   type THeaderControlStyle,
   type THeaderLayout,
   type THeaderSubmenuStyle,
@@ -25,9 +26,7 @@ import {
   type TSpinnerStyle,
   type TRadiusScale,
 } from '@blog/config';
-import type { TSiteConfigResult } from '@blog/db/queries/site-config';
 import type { TStagedImage } from '@platform/utils/staged-image/staged-image';
-import { toLookFormValues } from '@platform/utils/to-look-form-values/to-look-form-values';
 
 export type TLookFormValues = {
   preset: TPresetId;
@@ -39,6 +38,7 @@ export type TLookFormValues = {
   density: TDensity;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  headerControlShape: THeaderControlShape;
   headerLayout: THeaderLayout;
   headerSubmenuStyle: THeaderSubmenuStyle;
   headerBarStyle: THeaderBarStyle;
@@ -70,6 +70,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     themeTokens: consoleTokens,
     cardStyle,
     headerControlStyle,
+    headerControlShape,
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
@@ -96,6 +97,7 @@ export const defaultLookFormValues = (): TLookFormValues => {
     density: consoleTokens.density,
     cardStyle,
     headerControlStyle,
+    headerControlShape,
     headerLayout,
     headerSubmenuStyle,
     headerBarStyle,
@@ -116,8 +118,3 @@ export const defaultLookFormValues = (): TLookFormValues => {
     favicon: { url: undefined },
   };
 };
-
-export const lookFormValuesOrDefaults = (
-  siteConfig: TMaybeUndefined<TSiteConfigResult>,
-): TLookFormValues =>
-  siteConfig ? toLookFormValues(siteConfig) : defaultLookFormValues();
