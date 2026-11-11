@@ -400,6 +400,7 @@
     "voiceDescription": "Los textos que usa tu sitio",
     "editorInviteDescription": "Te la enviamos desde Sanity, nuestro editor. Acéptala con la cuenta con la que te registraste.",
     "firstPostLocked": "Se abre cuando aceptes la invitación al editor",
+    "firstPostActivating": "Se abre cuando tu acceso al editor esté listo, normalmente en un minuto",
     "firstPostReady": "Tu editor está listo",
     "openLook": "Abrir Aspecto",
     "openVoice": "Abrir Voz",

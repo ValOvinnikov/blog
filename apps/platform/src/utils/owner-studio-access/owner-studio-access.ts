@@ -10,8 +10,7 @@ import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
-import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
+import { isRealTenantOwner } from '@platform/server/auth/is-real-tenant-owner';
 
 type TOwnerAccessTenant = Pick<
   TTenant,
@@ -66,10 +65,7 @@ export const ownerStudioAccessFor = (
   membership: TMembership,
   now: Date = new Date(),
 ): TMaybeUndefined<TOwnerStudioAccess> => {
-  const isRealOwner =
-    isTenantOwner(membership) && !isVirtualAdminMembership(membership);
-
-  return isRealOwner && tenant.ownerInviteSentAt
+  return isRealTenantOwner(membership) && tenant.ownerInviteSentAt
     ? accessStateOf(tenant, now)
     : undefined;
 };

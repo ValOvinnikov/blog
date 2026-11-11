@@ -399,6 +399,26 @@ describe(updateLookAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
+  it('succeeds, revalidates and audits when the stamp fails, logging it once', async () => {
+    const stampError = new Error(MOCK_DB_ERROR_MESSAGE);
+    stampSiteConfigSavedAtMock.mockRejectedValue(stampError);
+
+    const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(insertAuditEventMock).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        savedAt: SITE_CONFIG_SAVED_AT.LOOK,
+        errorName: stampError.name,
+      },
+    );
+  });
+
   it('still succeeds when the audit write fails, and logs the failure', async () => {
     const auditError = new Error(MOCK_DB_ERROR_MESSAGE);
     insertAuditEventMock.mockRejectedValue(auditError);

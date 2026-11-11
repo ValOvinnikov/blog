@@ -8,10 +8,16 @@ import { ProviderSignInButton } from './components/provider-sign-in-button';
 import { signInOptionsVariants } from './sign-in-options-variants';
 
 // Google leads: an owner signed up with Google accepts the Sanity editor invite with the same account in one click.
-const PROVIDER_ORDER = [
+const PROVIDER_PRIORITY: readonly TOAuthProviderId[] = [
   OAUTH_PROVIDER.GOOGLE,
   OAUTH_PROVIDER.GITHUB,
-] as const satisfies readonly TOAuthProviderId[];
+];
+
+const priorityOf = (id: TOAuthProviderId) => {
+  const index = PROVIDER_PRIORITY.indexOf(id);
+
+  return index === -1 ? PROVIDER_PRIORITY.length : index;
+};
 
 export type TSignInOptionsProps = {
   providerIds: readonly TOAuthProviderId[];
@@ -26,8 +32,8 @@ export const SignInOptions = ({
 }: TSignInOptionsProps) => {
   const t = useTranslations('signInOptions');
   const { root, providers, divider } = signInOptionsVariants();
-  const orderedProviderIds = PROVIDER_ORDER.filter((id) =>
-    providerIds.includes(id),
+  const orderedProviderIds = providerIds.toSorted(
+    (a, b) => priorityOf(a) - priorityOf(b),
   );
 
   return (

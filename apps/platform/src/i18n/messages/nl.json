@@ -400,6 +400,7 @@
     "voiceDescription": "De teksten die je site gebruikt",
     "editorInviteDescription": "We hebben hem gemaild vanuit Sanity, onze editor. Accepteer hem met het account waarmee je je hebt aangemeld.",
     "firstPostLocked": "Beschikbaar zodra je editor-uitnodiging is geaccepteerd",
+    "firstPostActivating": "Beschikbaar zodra je editortoegang is ingesteld, meestal binnen een minuut",
     "firstPostReady": "Je editor is klaar",
     "openLook": "Uiterlijk openen",
     "openVoice": "Toon openen",

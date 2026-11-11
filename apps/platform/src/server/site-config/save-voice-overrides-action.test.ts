@@ -149,6 +149,29 @@ describe(saveVoiceOverridesAction, () => {
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
+  it('succeeds, revalidates and audits when the stamp fails, logging it once', async () => {
+    const stampError = new Error(MOCK_DB_ERROR_MESSAGE);
+    stampSiteConfigSavedAtMock.mockRejectedValue(stampError);
+
+    const result = await saveVoiceOverridesAction(
+      MOCK_TENANT_ID,
+      overridesByLocale,
+    );
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(insertAuditEventMock).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        savedAt: SITE_CONFIG_SAVED_AT.VOICE,
+        errorName: stampError.name,
+      },
+    );
+  });
+
   it('returns the rejected fields per language without revalidating', async () => {
     const fieldErrorsByLocale = {
       [LOCALE_ISO_CODES.DE]: {

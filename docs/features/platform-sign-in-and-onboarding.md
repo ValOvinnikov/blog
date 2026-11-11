@@ -217,8 +217,10 @@ Free site.
   an archived tenant — and is gone once all four steps are done; it has no
   dismiss. Its header counts "N of 4 done" (the steps only). The body leads
   with "Your site is live": the main address in mono, Copy address (the
-  shared `CopyButton`) and a primary Open site, which drop under the text on
-  a phone with Open site full width. Then an ordered checklist, each row
+  shared `CopyButton`, icon-only at every width with its accessible name) and
+  a primary Open site, which drop under the text on a phone with Open site
+  full width. The steps describe the site's state, not who acted: an
+  operator saving Look or Voice ticks them too. Then an ordered checklist, each row
   announced as done or not done, a done row showing its title only:
   - **Pick a look** — done once `site_config.look_saved_at` is set, which the
     Look save stamps (the wizard's preset does not count); links to Look.
@@ -232,7 +234,13 @@ Free site.
   - **Write your first post** — done once `tenants.first_post_published_at`
     is set, which `apps/web`'s revalidate webhook stamps for the first
     published non-starter post. Greyed with no link until the owner's Studio
-    access is READY, then links to the Studio.
+    access is READY — "opens once your editor invite is accepted" before
+    then, or "once your editor access is set up" between acceptance and
+    READY — then links to the Studio.
+
+  The Look and Voice saves stamp after revalidating, best-effort
+  (`stampSavedAt`): a failed stamp is logged as
+  `site_config.saved_at_stamp_failed` and never fails the save.
 
 ## Data
 

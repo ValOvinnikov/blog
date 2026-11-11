@@ -15,6 +15,7 @@ import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
+import { stampSavedAt } from '@platform/server/site-config/stamp-saved-at';
 import {
   updateLookInputSchema,
   type TUpdateLookInput,
@@ -66,11 +67,8 @@ export const updateLookAction = async (
       ),
     };
     await queries.siteConfig.upsertSiteConfig(tenant.id, look);
-    await queries.siteConfig.stampSiteConfigSavedAt(
-      tenant.id,
-      SITE_CONFIG_SAVED_AT.LOOK,
-    );
     await revalidateSiteConfig(tenant.id);
+    await stampSavedAt(tenant.id, SITE_CONFIG_SAVED_AT.LOOK);
     await recordAuditEvent({
       logEvent: SITE_CONFIG_LOG.LOOK_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,

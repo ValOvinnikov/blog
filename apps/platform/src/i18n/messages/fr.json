@@ -400,6 +400,7 @@
     "voiceDescription": "Les textes de votre site",
     "editorInviteDescription": "Nous l’avons envoyée depuis Sanity, notre éditeur. Acceptez-la avec le compte utilisé pour vous inscrire.",
     "firstPostLocked": "Disponible une fois l’invitation à l’éditeur acceptée",
+    "firstPostActivating": "Disponible dès que votre accès à l’éditeur est prêt, en général en une minute",
     "firstPostReady": "Votre éditeur est prêt",
     "openLook": "Ouvrir Apparence",
     "openVoice": "Ouvrir Voix",

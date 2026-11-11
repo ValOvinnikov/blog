@@ -1,4 +1,4 @@
-import { OwnerAccessActions } from '@platform/components/features/studio/owner-access-actions';
+import { OwnerAccessActions } from '@platform/components/shared/owner-access-actions';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import type { TPendingOwnerStudioAccess } from '@platform/constants/owner-studio-access';
 import { ownerStudioAccessTone } from '@platform/utils/status-tone/status-tone';

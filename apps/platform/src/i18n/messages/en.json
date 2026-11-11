@@ -400,6 +400,7 @@
     "voiceDescription": "The words your site uses",
     "editorInviteDescription": "We emailed it from Sanity, our editor. Accept it with the account you signed up with.",
     "firstPostLocked": "Opens once your editor invite is accepted",
+    "firstPostActivating": "Opens once your editor access is set up, usually within a minute",
     "firstPostReady": "Your editor is ready",
     "openLook": "Open Look",
     "openVoice": "Open Voice",

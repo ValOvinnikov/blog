@@ -7328,6 +7328,14 @@
         "file": "apps/platform/src/constants/site-config.ts"
       }
     ],
+    "site_config.saved_at_stamp_failed": [
+      {
+        "ref": "SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/site-config",
+        "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
     "site_config.svg_sanitize_failed": [
       {
         "ref": "SITE_CONFIG_LOG.SVG_SANITIZE_FAILED",

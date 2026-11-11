@@ -19,6 +19,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { getSiteConfigOrDefaults } from '@platform/server/site-config/site-config-or-defaults';
+import { stampSavedAt } from '@platform/server/site-config/stamp-saved-at';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -62,11 +63,8 @@ export const saveVoiceOverridesAction = async (
       };
     }
 
-    await queries.siteConfig.stampSiteConfigSavedAt(
-      tenant.id,
-      SITE_CONFIG_SAVED_AT.VOICE,
-    );
     await revalidateSiteConfig(tenant.id);
+    await stampSavedAt(tenant.id, SITE_CONFIG_SAVED_AT.VOICE);
     await recordAuditEvent({
       logEvent: SITE_CONFIG_LOG.VOICE_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,

@@ -14,8 +14,7 @@ import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
-import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
+import { isRealTenantOwner } from '@platform/server/auth/is-real-tenant-owner';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 
 export type TGetStarted = {
@@ -28,10 +27,8 @@ export type TGetStarted = {
 const isFirstRunViewer = (tenant: TTenant, membership: TMembership) =>
   tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY &&
   !tenant.deprovisionedAt &&
-  isTenantOwner(membership) &&
-  !isVirtualAdminMembership(membership);
+  isRealTenantOwner(membership);
 
-/** The owner's first-run checklist on the Overview, until every step is done. */
 export const getStartedFor = async (
   tenant: TTenant,
   membership: TMembership,

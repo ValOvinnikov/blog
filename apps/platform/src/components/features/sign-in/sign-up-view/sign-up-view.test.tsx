@@ -2,7 +2,12 @@ import { OAUTH_PROVIDER_IDS } from '@blog/auth/utils/oauth-providers/oauth-provi
 import { ACTION_OUTCOME } from '@blog/config';
 import { sendSignInLinkAction } from '@platform/server/auth/send-sign-in-link-action';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
-import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
+import {
+  MOCK_GITHUB_BUTTON,
+  MOCK_GOOGLE_BUTTON,
+  MOCK_PROVIDER_BUTTONS,
+  MOCK_SIGN_IN_EMAIL,
+} from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { MOCK_TENANT_ROOT_DOMAIN } from '@platform/testing/tenants/fixtures';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
@@ -21,9 +26,6 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
 
 const [GITHUB_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
 const MOCK_LEGAL_PAGE_URLS = toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN);
-const GITHUB_BUTTON = { name: 'Continue with GitHub' };
-const GOOGLE_BUTTON = { name: 'Continue with Google' };
-const PROVIDER_BUTTONS = { name: /^Continue with / };
 const EMAIL_FIELD = { name: 'Email address' };
 
 const setup = customRender(SignUpView, {
@@ -48,7 +50,7 @@ describe(`<${SignUpView.name}/>`, () => {
         level: 1,
         name: 'Create an account',
       });
-      const github = screen.getByRole('button', GITHUB_BUTTON);
+      const github = screen.getByRole('button', MOCK_GITHUB_BUTTON);
       const email = screen.getByRole('textbox', EMAIL_FIELD);
       const checkbox = screen.queryByRole('checkbox');
 
@@ -59,9 +61,9 @@ describe(`<${SignUpView.name}/>`, () => {
     });
 
     it('offers Google first', () => {
-      const [first] = screen.getAllByRole('button', PROVIDER_BUTTONS);
+      const [first] = screen.getAllByRole('button', MOCK_PROVIDER_BUTTONS);
 
-      expect(first).toHaveAccessibleName(GOOGLE_BUTTON.name);
+      expect(first).toHaveAccessibleName(MOCK_GOOGLE_BUTTON.name);
     });
 
     it('links the terms and privacy policy the visitor agrees to', () => {
@@ -83,7 +85,7 @@ describe(`<${SignUpView.name}/>`, () => {
     });
 
     it('starts a provider sign-up that lands home', async () => {
-      const github = screen.getByRole('button', GITHUB_BUTTON);
+      const github = screen.getByRole('button', MOCK_GITHUB_BUTTON);
 
       await user.click(github);
 

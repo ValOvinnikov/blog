@@ -1,6 +1,6 @@
 import { ALERT_TYPE } from '@blog/config';
-import { OwnerAccessActions } from '@platform/components/features/studio/owner-access-actions';
 import { Alert } from '@platform/components/shared/alert';
+import { OwnerAccessActions } from '@platform/components/shared/owner-access-actions';
 import { PageHeader } from '@platform/components/shared/page-header';
 import {
   OWNER_STUDIO_ACCESS,

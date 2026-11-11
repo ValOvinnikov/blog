@@ -1,5 +1,6 @@
 import { GET_STARTED_STEP } from '@platform/constants/get-started';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
+import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import { customRender, screen, within } from '@platform/testing/custom-render';
 import {
   MOCK_TENANT_DOMAIN,
@@ -18,19 +19,26 @@ vi.mock('@platform/server/owner-access/resend-owner-invite-action', () => ({
   resendOwnerInviteAction: vi.fn(),
 }));
 
-const noneDone = {
+const MOCK_NONE_DONE = {
   [GET_STARTED_STEP.LOOK]: false,
   [GET_STARTED_STEP.VOICE]: false,
   [GET_STARTED_STEP.EDITOR_INVITE]: false,
   [GET_STARTED_STEP.FIRST_POST]: false,
 };
 
-const setup = customRender(GetStartedCard, {
+const MOCK_GET_STARTED: TGetStarted = {
   tenantId: MOCK_TENANT_ID,
   siteAddress: MOCK_TENANT_DOMAIN,
-  doneSteps: noneDone,
+  doneSteps: MOCK_NONE_DONE,
   studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
+};
+
+const renderCard = customRender(GetStartedCard, {
+  getStarted: MOCK_GET_STARTED,
 });
+
+const setup = (overrides: Partial<TGetStarted> = {}) =>
+  renderCard({ getStarted: { ...MOCK_GET_STARTED, ...overrides } });
 
 const OPEN_STUDIO = { name: 'Open Studio' };
 const CHECK_NOW = { name: 'Check now' };
@@ -104,9 +112,24 @@ describe(`<${GetStartedCard.name}/>`, () => {
     expect(checkNow).toBeVisible();
   });
 
+  it('says the Studio is being set up once the invite is accepted', () => {
+    setup({
+      doneSteps: { ...MOCK_NONE_DONE, [GET_STARTED_STEP.EDITOR_INVITE]: true },
+      studioAccess: OWNER_STUDIO_ACCESS.ACTIVATING,
+    });
+
+    const activating = screen.getByText(
+      'Opens once your editor access is set up, usually within a minute',
+    );
+    const openStudio = screen.queryByRole('link', OPEN_STUDIO);
+
+    expect(activating).toBeVisible();
+    expect(openStudio).not.toBeInTheDocument();
+  });
+
   it('opens the Studio once the editor is ready', () => {
     setup({
-      doneSteps: { ...noneDone, [GET_STARTED_STEP.EDITOR_INVITE]: true },
+      doneSteps: { ...MOCK_NONE_DONE, [GET_STARTED_STEP.EDITOR_INVITE]: true },
       studioAccess: OWNER_STUDIO_ACCESS.READY,
     });
 
@@ -120,7 +143,7 @@ describe(`<${GetStartedCard.name}/>`, () => {
   it('shows a done step as its title only, announced as done', () => {
     setup({
       doneSteps: {
-        ...noneDone,
+        ...MOCK_NONE_DONE,
         [GET_STARTED_STEP.LOOK]: true,
         [GET_STARTED_STEP.VOICE]: true,
         [GET_STARTED_STEP.EDITOR_INVITE]: true,

@@ -27,17 +27,21 @@ type TChecklistStep = {
   actions?: ReactNode;
 };
 
-export type TGetStartedCardProps = TGetStarted;
+export type TGetStartedCardProps = {
+  getStarted: TGetStarted;
+};
 
-export const GetStartedCard = ({
-  tenantId,
-  siteAddress,
-  doneSteps,
-  studioAccess,
-}: TGetStartedCardProps) => {
+export const GetStartedCard = ({ getStarted }: TGetStartedCardProps) => {
+  const { tenantId, siteAddress, doneSteps, studioAccess } = getStarted;
   const t = useTranslations('getStartedCard');
   const { body, list } = getStartedCardVariants();
   const isEditorReady = studioAccess === OWNER_STUDIO_ACCESS.READY;
+  const isInviteDone = doneSteps[GET_STARTED_STEP.EDITOR_INVITE];
+  const firstPostDescriptionKey = isEditorReady
+    ? 'firstPostReady'
+    : isInviteDone
+      ? 'firstPostActivating'
+      : 'firstPostLocked';
   const doneCount = Object.values(doneSteps).filter(Boolean).length;
   const stepTotal = Object.keys(doneSteps).length;
 
@@ -69,7 +73,7 @@ export const GetStartedCard = ({
     },
     {
       step: GET_STARTED_STEP.FIRST_POST,
-      description: t(isEditorReady ? 'firstPostReady' : 'firstPostLocked'),
+      description: t(firstPostDescriptionKey),
       isLocked: !isEditorReady,
       actions: isEditorReady && (
         <LinkButton {...STEP_LINK} href={adminRoutes.dashboardStudio()}>
