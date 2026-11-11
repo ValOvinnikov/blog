@@ -22,6 +22,8 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
 const [GITHUB_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
 const MOCK_LEGAL_PAGE_URLS = toLegalPageUrls(MOCK_TENANT_ROOT_DOMAIN);
 const GITHUB_BUTTON = { name: 'Continue with GitHub' };
+const GOOGLE_BUTTON = { name: 'Continue with Google' };
+const PROVIDER_BUTTONS = { name: /^Continue with / };
 const EMAIL_FIELD = { name: 'Email address' };
 
 const setup = customRender(SignUpView, {
@@ -54,6 +56,12 @@ describe(`<${SignUpView.name}/>`, () => {
       expect(github).toBeVisible();
       expect(email).toBeVisible();
       expect(checkbox).not.toBeInTheDocument();
+    });
+
+    it('offers Google first', () => {
+      const [first] = screen.getAllByRole('button', PROVIDER_BUTTONS);
+
+      expect(first).toHaveAccessibleName(GOOGLE_BUTTON.name);
     });
 
     it('links the terms and privacy policy the visitor agrees to', () => {

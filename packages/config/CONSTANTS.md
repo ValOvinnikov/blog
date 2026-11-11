@@ -483,6 +483,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_2`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`
 
+### `@platform/constants/get-started` — `apps/platform/src/constants/get-started.ts`
+
+- **GET_STARTED_STEP**: `LOOK`, `VOICE`, `EDITOR_INVITE`, `FIRST_POST`
+
 ### `@platform/constants/github` — `apps/platform/src/constants/github.ts`
 
 - **GITHUB_FAILURE**: `GITHUB_ERROR`

@@ -18,6 +18,7 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
 const [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
 const MOCK_GITHUB_BUTTON = { name: 'Continue with GitHub' };
 const MOCK_GOOGLE_BUTTON = { name: 'Continue with Google' };
+const PROVIDER_BUTTONS = { name: /^Continue with / };
 
 const setup = customRender(SignInView, {
   providerIds: OAUTH_PROVIDER_IDS,
@@ -50,6 +51,12 @@ describe(`<${SignInView.name}/>`, () => {
       expect(github).toBeVisible();
       expect(google).toBeVisible();
       expect(email).toBeVisible();
+    });
+
+    it('offers Google first', () => {
+      const [first] = screen.getAllByRole('button', PROVIDER_BUTTONS);
+
+      expect(first).toHaveAccessibleName(MOCK_GOOGLE_BUTTON.name);
     });
 
     it('points a new visitor at sign-up', () => {

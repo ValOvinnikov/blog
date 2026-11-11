@@ -1,4 +1,5 @@
 import { ALERT_TYPE } from '@blog/config';
+import { OwnerAccessActions } from '@platform/components/features/studio/owner-access-actions';
 import { Alert } from '@platform/components/shared/alert';
 import { PageHeader } from '@platform/components/shared/page-header';
 import {
@@ -7,7 +8,6 @@ import {
 } from '@platform/constants/owner-studio-access';
 import { useTranslations } from 'next-intl';
 
-import { OwnerAccessActions } from './components/owner-access-actions/owner-access-actions';
 import { ownerStudioAccessViewVariants } from './owner-studio-access-view-variants';
 
 export type TOwnerStudioAccessViewProps = {

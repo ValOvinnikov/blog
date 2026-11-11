@@ -4044,6 +4044,12 @@
         "file": "packages/db/src/constants/site-config-saved-at.ts"
       },
       {
+        "ref": "GET_STARTED_STEP.LOOK",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      },
+      {
         "ref": "ONBOARDING_STEP.LOOK",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -4062,6 +4068,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/site-config-saved-at.ts"
+      },
+      {
+        "ref": "GET_STARTED_STEP.VOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
       },
       {
         "ref": "SETTINGS_FORM_STACK.VOICE",
@@ -5812,6 +5824,22 @@
         "scope": "app:platform",
         "from": "@platform/constants/focus-ring",
         "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "EDITOR_INVITE": [
+      {
+        "ref": "GET_STARTED_STEP.EDITOR_INVITE",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
+      }
+    ],
+    "FIRST_POST": [
+      {
+        "ref": "GET_STARTED_STEP.FIRST_POST",
+        "scope": "app:platform",
+        "from": "@platform/constants/get-started",
+        "file": "apps/platform/src/constants/get-started.ts"
       }
     ],
     "GITHUB_ERROR": [

@@ -3,6 +3,8 @@ import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
+import { GET_STARTED_STEP } from '@platform/constants/get-started';
+import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import {
   customRenderAsync,
   screen,
@@ -42,6 +44,8 @@ const defaultProps: TOwnerHomeViewProps = {
 const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
   <OwnerHomeView {...props} />
 );
+
+const GET_STARTED_HEADING = { level: 2, name: 'Get started' } as const;
 
 const setup = customRenderAsync(OwnerHomeViewElement, defaultProps);
 
@@ -110,6 +114,34 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       expect(recentActivityHeading).not.toBeInTheDocument();
       expect(openStudioLink).not.toBeInTheDocument();
     });
+  });
+
+  it('shows the Get started card when first-run steps are left', async () => {
+    await setup({
+      getStarted: {
+        tenantId: tenant.id,
+        siteAddress: MOCK_CUSTOM_DOMAIN,
+        doneSteps: {
+          [GET_STARTED_STEP.LOOK]: true,
+          [GET_STARTED_STEP.VOICE]: true,
+          [GET_STARTED_STEP.EDITOR_INVITE]: true,
+          [GET_STARTED_STEP.FIRST_POST]: false,
+        },
+        studioAccess: OWNER_STUDIO_ACCESS.READY,
+      },
+    });
+
+    const getStarted = screen.getByRole('heading', GET_STARTED_HEADING);
+
+    expect(getStarted).toBeVisible();
+  });
+
+  it('shows no Get started card without first-run steps', async () => {
+    await setup();
+
+    const getStarted = screen.queryByRole('heading', GET_STARTED_HEADING);
+
+    expect(getStarted).not.toBeInTheDocument();
   });
 
   it('shows the archived notice when the tenant has been deprovisioned', async () => {

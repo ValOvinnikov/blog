@@ -7,6 +7,7 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
+import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
 import { pickEntitledLook } from '@blog/db/utils/effective-look/effective-look';
 import { hasArrayGotItems } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -65,6 +66,10 @@ export const updateLookAction = async (
       ),
     };
     await queries.siteConfig.upsertSiteConfig(tenant.id, look);
+    await queries.siteConfig.stampSiteConfigSavedAt(
+      tenant.id,
+      SITE_CONFIG_SAVED_AT.LOOK,
+    );
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: SITE_CONFIG_LOG.LOOK_AUDIT_FAILED,

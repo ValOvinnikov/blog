@@ -6,6 +6,7 @@ import {
   VOICE_FIELD_ERROR,
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
@@ -29,8 +30,13 @@ import { saveVoiceOverridesAction } from './save-voice-overrides-action';
 
 faker.seed(5998);
 
-const { upsertSiteConfigMock, insertAuditEventMock } = vi.hoisted(() => ({
+const {
+  upsertSiteConfigMock,
+  stampSiteConfigSavedAtMock,
+  insertAuditEventMock,
+} = vi.hoisted(() => ({
   upsertSiteConfigMock: vi.fn(),
+  stampSiteConfigSavedAtMock: vi.fn(),
   insertAuditEventMock: vi.fn(),
 }));
 
@@ -44,7 +50,10 @@ vi.mock('@platform/server/site-config/site-config-or-defaults');
 
 vi.mock('@blog/db', () => ({
   queries: {
-    siteConfig: { upsertSiteConfig: upsertSiteConfigMock },
+    siteConfig: {
+      upsertSiteConfig: upsertSiteConfigMock,
+      stampSiteConfigSavedAt: stampSiteConfigSavedAtMock,
+    },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
 }));
@@ -71,14 +80,8 @@ describe(saveVoiceOverridesAction, () => {
     vi.mocked(getSiteConfigOrDefaults).mockReset();
     upsertSiteConfigMock.mockReset();
     upsertSiteConfigMock.mockResolvedValue(okResult());
+    stampSiteConfigSavedAtMock.mockReset();
     insertAuditEventMock.mockReset();
-  });
-
-  it('resolves the tenant from the checked membership, never a bare client id', async () => {
-    await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
-
-    expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(getSiteConfigOrDefaults).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
   it('keeps the saved preset and writes no other Look column', async () => {
@@ -166,29 +169,46 @@ describe(saveVoiceOverridesAction, () => {
       outcome: ACTION_OUTCOME.INVALID,
       fieldErrorsByLocale,
     });
+    expect(stampSiteConfigSavedAtMock).not.toHaveBeenCalled();
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
   });
 
-  it('succeeds and revalidates the tenant on a successful save', async () => {
-    const result = await saveVoiceOverridesAction(
-      MOCK_TENANT_ID,
-      overridesByLocale,
-    );
+  describe('after a successful save', () => {
+    let result: Awaited<ReturnType<typeof saveVoiceOverridesAction>>;
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
-  });
+    beforeEach(async () => {
+      result = await saveVoiceOverridesAction(
+        MOCK_TENANT_ID,
+        overridesByLocale,
+      );
+    });
 
-  it('records a SETTINGS_UPDATED audit event on the site config after a confirmed save', async () => {
-    await saveVoiceOverridesAction(MOCK_TENANT_ID, overridesByLocale);
+    it('resolves the tenant from the checked membership, never a bare client id', () => {
+      expect(requireTenantMembership).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(getSiteConfigOrDefaults).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
 
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
-      targetId: MOCK_TENANT_ID,
-      details: { voiceOverridesByLocale: overridesByLocale },
+    it('succeeds and revalidates the tenant', () => {
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('stamps when the Voice was saved', () => {
+      expect(stampSiteConfigSavedAtMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        SITE_CONFIG_SAVED_AT.VOICE,
+      );
+    });
+
+    it('records a SETTINGS_UPDATED audit event on the site config', () => {
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SITE_CONFIG,
+        targetId: MOCK_TENANT_ID,
+        details: { voiceOverridesByLocale: overridesByLocale },
+      });
     });
   });
 });

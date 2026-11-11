@@ -11,6 +11,7 @@ import {
 } from '@blog/config';
 import { LOCALE_ISO_CODES } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { SITE_CONFIG_SAVED_AT } from '@blog/db/constants';
 import type { TVoiceOverridesByLocaleInput } from '@blog/db/queries/site-config';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { SITE_CONFIG_LOG } from '@platform/constants/site-config';
@@ -61,6 +62,10 @@ export const saveVoiceOverridesAction = async (
       };
     }
 
+    await queries.siteConfig.stampSiteConfigSavedAt(
+      tenant.id,
+      SITE_CONFIG_SAVED_AT.VOICE,
+    );
     await revalidateSiteConfig(tenant.id);
     await recordAuditEvent({
       logEvent: SITE_CONFIG_LOG.VOICE_AUDIT_FAILED,

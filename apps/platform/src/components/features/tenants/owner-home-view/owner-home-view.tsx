@@ -10,6 +10,10 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
+import {
+  GetStartedCard,
+  type TGetStartedCardProps,
+} from './components/get-started-card/get-started-card';
 import { MakeItYoursCard } from './components/make-it-yours-card/make-it-yours-card';
 import {
   SiteSetupCard,
@@ -24,6 +28,7 @@ export type TOwnerHomeViewProps = {
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
   siteSetup?: TSiteSetupCardProps;
+  getStarted?: TGetStartedCardProps;
 };
 
 export const OwnerHomeView = ({
@@ -31,6 +36,7 @@ export const OwnerHomeView = ({
   domainVerificationStatus,
   owner,
   siteSetup,
+  getStarted,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, pair } = ownerHomeViewVariants();
@@ -48,6 +54,8 @@ export const OwnerHomeView = ({
       )}
 
       {siteSetup && <SiteSetupCard {...siteSetup} />}
+
+      {getStarted && <GetStartedCard {...getStarted} />}
 
       <YourSiteCard tenant={tenant} />
 
