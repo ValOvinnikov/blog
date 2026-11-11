@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 # SubagentStop guard — a layer agent may not end its turn with uncommitted
-# work in its worktree (#3354).
+# work in its worktree.
 #
 # Every layer agent carries `isolation: worktree`, and the orchestrator lands
 # its work by merging the agent's *commit* onto the feature branch. An agent
 # that reports done with the files only on disk looks finished (its report
 # lists the files, its verify passed) while `git log` on its branch still sits
-# at the base — memory records three consecutive dispatches (#2437–#2439)
-# ending that way. The Definition-of-done prose in each agent file asks for
+# at the base. The Definition-of-done prose in each agent file asks for
 # the commit; this hook is the enforcement.
 #
 # Deliberately narrow, on two axes:
 #
-#   - Only the ten layer agents. The settings.json `matcher` already limits
+#   - Only the eleven layer agents. The settings.json `matcher` already limits
 #     which stops reach this script, and the payload's `agent_type` is checked
 #     again here so a widened matcher can't silently widen the guard.
 #     `test-writer` is the case that makes this load-bearing: it also runs
@@ -29,7 +28,7 @@
 # the sibling guards.
 set -u
 
-LAYER_AGENTS="config studio service ui web db auth platform-app email insight"
+LAYER_AGENTS="config studio service ui web db auth platform-app worker email insight"
 
 input=$(cat)
 

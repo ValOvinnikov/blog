@@ -4,6 +4,7 @@ export * from './card-style-declarations';
 export * from './contrast-check';
 export * from './contrast-pairs';
 export * from './contrast-tokens';
+export * from './header-control-shape-declarations';
 export * from './nav-link-declarations';
 export * from './resolve-tenant-email-brand';
 export * from './theme-declarations';

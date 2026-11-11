@@ -14,13 +14,56 @@ const git = (args) =>
 
 const lines = (output) => output.split('\n').filter(Boolean);
 
+const baseRef = () => process.env.TOUCHED_BASE_REF ?? 'origin/main';
+
 export const resolveBase = () => {
-  const baseRef = process.env.TOUCHED_BASE_REF ?? 'origin/main';
   try {
-    return git(['merge-base', 'HEAD', baseRef]);
+    return git(['merge-base', 'HEAD', baseRef()]);
   } catch {
     return undefined;
   }
+};
+
+const isShallow = () => {
+  try {
+    return git(['rev-parse', '--is-shallow-repository']) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+export const missingBaseMessage = () => {
+  const fetch = isShallow()
+    ? 'git fetch --unshallow origin main'
+    : 'git fetch origin main';
+  return `No merge-base between HEAD and ${baseRef()}, so the touched files are unknown. Run \`${fetch}\` and retry.`;
+};
+
+export const readAtBase = (base, file) => {
+  try {
+    return git(['show', `${base}:${file}`]);
+  } catch {
+    return undefined;
+  }
+};
+
+const PURE_MOVE = 'R100';
+
+export const listTouchedChanges = (base) => {
+  const touched = new Map();
+  const moves = new Map();
+  for (const line of lines(
+    git(['diff', '--name-status', '-M', '--diff-filter=AMR', base]),
+  )) {
+    const [status, from, to] = line.split('\t');
+    if (status.startsWith('R')) {
+      moves.set(from, to);
+      if (status !== PURE_MOVE) touched.set(to, from);
+    } else {
+      touched.set(from, from);
+    }
+  }
+  return { touched, moves };
 };
 
 export const listTouchedSourceFiles = (base) =>

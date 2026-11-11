@@ -417,7 +417,8 @@ editor-hostile.
 **Schema-required is not the same as present in stored data**, and the
 service layer draws that line deliberately. `required()` blocks the next
 publish; it never backfills what is already stored. So a `.notNull()` in a
-GROQ projection — which throws and 404s the page rather than degrading — is
+GROQ projection — which throws and fails the page with a 500 rather than
+degrading — is
 applied only where the data was _already_ guaranteed when it was written.
 `module_postLatest`/`module_postFeatured`/`module_postRelated` became
 required only after documents existed without a heading, so projecting
@@ -727,7 +728,7 @@ fragment asserts `.notNull()` only over what it projects:
 
 Where the parse throws is the query layer's business and ends there.
 `safeAsync` turns the throw into `{ ok: false }`, and the consequence is
-whatever the caller decides — 404 the page, drop the failing module and
+whatever the caller decides — fail the page with a 500, drop the failing module and
 render the rest, or degrade to an empty but valid response. The query is
 neutral between them, and no single rule predicts which a given caller
 picks. Several currently decide without logging, which is tracked
@@ -2545,7 +2546,7 @@ never hidden behind a closed disclosure.
 
 The runtime half is enforced in the query, not the transformer: the `seo`
 projection and `metaTitle` are both `.notNull()`, so a document missing
-either fails to parse and the route logs and 404s through the shared
+either fails to parse and the route logs and answers 500 through the shared
 page-loader guard, exactly like any other required field. `resolveSeo`
 carries no guard and throws nothing of its own. Studio validation never runs
 on writes made through the Sanity client, so the query is what actually
@@ -2827,6 +2828,19 @@ that exists but is misconfigured — a required module slot left unset — still
 throws, still surfaces as `ok: false`, and still logs. The rule underneath is
 unchanged: a stale link is the reader's whole truth and needs no line; a broken
 page is not.
+
+**A failed load answers 500; only a missing document answers 404.** To a
+crawler a 404 reads as "gone" and risks de-indexing a healthy page over a
+transient Sanity fault, while a 500 reads as "try again". So the app logs an
+`ok: false` page or module load once, with request context, and rethrows its
+error to the locale error boundary (`app/[tenant]/[locale]/error.tsx`);
+`data: undefined` calls `notFound()` with no log. `guardPageLoaderResult`
+(`apps/web`) applies both for every page component, and the Post List and
+Taxonomy List modules follow the same rule. A misconfigured document is a 500
+too. That one server line is the caller's own event (`landing_page.fetch_failed`
+and the like), carrying its context: the error is rethrown marked with
+`markErrorLogged`, so `onRequestError`'s `request.unhandled_error` skips it,
+while a render error nobody logged still gets that line.
 
 **A consumer that treats `ok` as a proxy for "the document exists" is a
 migration hazard.** When a loader moves from throwing to returning `undefined`,

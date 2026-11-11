@@ -682,6 +682,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/card-image-shape.ts"
+      },
+      {
+        "ref": "HEADER_CONTROL_SHAPE.SQUARE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
     "ROUNDED": [
@@ -690,6 +696,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/button-shape.ts"
+      },
+      {
+        "ref": "HEADER_CONTROL_SHAPE.ROUNDED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
     "READER_ACCOUNTS": [
@@ -1496,6 +1508,14 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/form-status.ts"
+      }
+    ],
+    "ROUND": [
+      {
+        "ref": "HEADER_CONTROL_SHAPE.ROUND",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/header-control-shape.ts"
       }
     ],
     "SOFT": [
@@ -8106,6 +8126,14 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "post_list_module.fetch_failed": [
+      {
+        "ref": "POST_LIST_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-list",
+        "file": "apps/web/src/constants/post-list.ts"
+      }
+    ],
     "pricing_module.fetch_failed": [
       {
         "ref": "PRICING_LOG.MODULE_FETCH_FAILED",
@@ -8504,6 +8532,14 @@
         "scope": "app:web",
         "from": "@web/constants/stats",
         "file": "apps/web/src/constants/stats.ts"
+      }
+    ],
+    "taxonomy_list_module.fetch_failed": [
+      {
+        "ref": "TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/taxonomy-list",
+        "file": "apps/web/src/constants/taxonomy-list.ts"
       }
     ],
     "tenant_email_identity.tenant_row_not_found": [

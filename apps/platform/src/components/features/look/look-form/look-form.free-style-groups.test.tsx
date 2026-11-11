@@ -43,6 +43,12 @@ describe(`<${LookForm.name}/>`, () => {
       },
       {
         row: LOOK_ROW.HEADER,
+        group: LOOK_FORM.navLinkStyleLabel,
+        current: LOOK_FORM.navLinkStyleOptionLabel.PLAIN,
+        other: LOOK_FORM.navLinkStyleOptionLabel.PILL,
+      },
+      {
+        row: LOOK_ROW.HEADER,
         group: LOOK_FORM.accountButtonStyleLabel,
         current: LOOK_FORM.accountButtonStyleOptionLabel.PILL,
         other: LOOK_FORM.accountButtonStyleOptionLabel.CIRCLE,

@@ -45,7 +45,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 ## Constraints and invariants
 
 - Lists read `publishedPostsInLocale`: `page_post` in the request language with `publishedAt` in the past, newest first. A pinned Featured post resolves to its translation in the request language and drops out when it has none.
-- Latest Posts, Featured Posts and Related Reading render nothing when they have no posts or their fetch fails. Post List renders its empty state when there are no posts, and answers 404 when its fetch fails or the requested page is past the last one.
+- Latest Posts, Featured Posts and Related Reading render nothing when they have no posts or their fetch fails. Post List renders its empty state when there are no posts, answers 404 when the requested page is past the last one, and a 500 through the error boundary when its fetch fails.
 - Post List scope comes from page context, never from the module: on a topic or tag page it lists posts referencing that term (`references($termId)`); on the blog index it lists every post. Its pagination links build from `routes.blogIndex`, `routes.topic(slug, page)` or `routes.tag(slug, page)`.
 - Paginated routes' static params read the `pageSize` of the first Post List on the page's template.
 - Related Reading needs the post's id from page context, and logs `post_related_module.missing_post_context` and renders nothing without it. It ranks posts sharing a tag with the current post by shared-tag count then recency (candidate pool capped at 24), then backfills from the same topic (pool of twice the limit). The current post is never included. Columns follow `toModuleGridColumns`.

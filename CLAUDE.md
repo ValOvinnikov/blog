@@ -593,7 +593,11 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
   standard to match. **When you touch a file, delete the comments in it that
   fail the test — do not shorten them**; trimming is only for a comment that
   earns its place but runs long. Converging file by file is the steady-state
-  mechanism, and it never collides with an open PR.
+  mechanism, and it never collides with an open PR. On touched `.ts`/`.tsx`
+  files the `no-failing-comment` lint rule reports the mechanical cases — a
+  doc block of more than one sentence, a `Name — does X` comment, a multi-line comment inside
+  a function body, any comment in a test file — in the post-edit hook,
+  lint-staged and `pnpm check:touched-lint`; the rest is the reviewer's.
 
 - All workspace source files live under `src/` within each package/app.
   Exceptions: root-level config files required by their tool
@@ -641,14 +645,16 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
 - **File size budgets, in non-blank lines:** a component `.tsx` 150, a hook
   120, any other `.ts` 120. Exempt: `*-variants` files, registries and
   catalogs (`icon-registry.ts`), Studio schema definitions, generated files,
-  tests and stories. A diff that touches an over-budget file extracts the part
-  it changes — not the whole file, and never as a sweep. Where the extracted
-  part goes in a React workspace: `react-component-practices` § Size and
-  splitting. `pnpm check:file-size` holds the budgets as a ratchet, at commit
-  (lint-staged) and in `pnpm verify`, locally only: a file over budget must
-  sit in `scripts/file-size-baseline.json` at its exact count, so it can only
-  shrink, and `--update` lowers an entry once it does. A new exemption is
-  added here and to `scripts/check-file-size.mjs` together.
+  tests and stories. A file over budget sits in
+  `scripts/file-size-baseline.json` at its exact count and never grows, and a
+  diff that edits one extracts the part it changes — not the whole file, and
+  never as a sweep — so the file ends below its entry on the merge-base;
+  `--update` then lowers (or, for a moved file, moves) the entry.
+  `pnpm check:file-size` is the rule, run locally only: on the edited file by
+  the post-edit hook and lint-staged, and over the whole branch in
+  `pnpm verify` and pre-push. Where the extracted part goes in a React
+  workspace: `react-component-practices` § Size and splitting. A new exemption
+  is added here and to `scripts/check-file-size.mjs` together.
 - **Function style is decided per layer kind, and enforced by ESLint per
   workspace.** React layers export _values_ — a component is a const holding a
   function — so they use **arrow-function consts**
@@ -818,7 +824,9 @@ silently unindexed). Never hand-edit it; fix the source and regenerate.
     form of epic #6152
     (`docs/superpowers/specs/2026-10-27-deploy-first-migrations-design.md`).
 
-- **Check for migrations.** Content is live in the `production` dataset, so any
+- **Check for migrations — from launch.** Suspended until then by the rule
+  above; until launch, a changed shape updates the starter content instead.
+  Content is live in the `production` dataset, so any
   change that alters an _existing_ shape — renaming/removing/moving a field,
   renaming a `_type`, restructuring a document — orphans data unless existing
   documents are migrated. Before implementing, decide: does this need a data
@@ -1117,7 +1125,9 @@ dispatch are replaced as "Solo-session mode" describes — every other step,
 including both approval gates, is unchanged.)
 
 1. Set issue → In Progress on the board
-2. Checkout branch from `main`
+2. Checkout branch from `main`, named by
+   `pnpm -s branch:name <n> "<issue title>"` (`<type>/<n>-<slug>`; any other
+   name is refused at push)
 3. Do the work + run quality gates — merge `origin/main` in before verify
    (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
@@ -1406,13 +1416,13 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
 
 - **Starting:** comment on the issue ("starting work in a cloud session"), then
   rename the branch before the first push. A web/remote session starts on a
-  generated name like `claude/optimistic-noether-isuljn`, which carries no
-  issue number; rename it to `<type>/<n>-<slug>`, the slug from the ticket
-  title (`git branch -m feat/3952-team-single-member` for "feat(studio): a Team
-  may have a single member"). A pushed branch with that name is the In
-  Progress signal. The GitHub Actions `@claude` path can't rename:
-  `claude-code-action` generates `claude/issue-<n>-<timestamp>`, which
-  `board-keeper.md` Step 2 also reads as In Progress.
+  generated name like `claude/optimistic-noether-isuljn` or
+  `claude/issue-<n>-<id>`; rename it with
+  `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`, which the
+  `SessionStart` hook prints when the branch is off the pattern. A pushed
+  branch with that name is the In Progress signal. Creating a branch under any
+  other name is refused at push and fails the PR's `branch-name` check; a
+  branch already on the remote keeps pushing.
 - **In review:** open the PR as a draft with the issue reference
   (`Closes #n` on the completing PR only) — an open PR, draft or not, is the
   Code Review signal, and the owner marks it ready at final review. On the

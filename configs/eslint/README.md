@@ -98,7 +98,19 @@
   types, and files outside `apps/*` and `packages/*`. Co-located
   `prefer-utils-primitive.test.js`.
 
-  All three are registered in `base.js` under the `blog-touched` namespace, at
+- `no-failing-comment.js` — reports the comments `CLAUDE.md` "Comments
+  default to zero" bans that can be told apart mechanically: a doc block
+  holding more than one sentence (line wrapping and `@` tag lines are ignored;
+  a full stop followed by a capital starts a new sentence), a `Name — does X`
+  comment, a multi-line comment
+  inside a function body, and any comment in a test file. A comment starting
+  with `TODO:`, `FIXME:`, `eslint-disable`/`eslint-enable`, `@ts-expect-error`,
+  `@vitest-environment`, `prettier-ignore` or a `/// <reference` directive is
+  allowed. A one-sentence doc comment and a one-line tuned-value note pass; whether
+  one earns its place is the reviewer's call. Co-located
+  `no-failing-comment.test.js`.
+
+  All four are registered in `base.js` under the `blog-touched` namespace, at
   threshold 2 for `no-duplicate-string`, and only when `BLOG_LINT_TOUCHED=1` —
   set by `.claude/hooks/post-edit-lint.sh`, `.husky/pre-commit` (lint-staged) and
   `pnpm check:touched-lint`. Repo-wide `pnpm lint` never sets it, so a file
@@ -118,6 +130,20 @@
   backlog. Co-located `no-nested-query.test.js`. Per `testing-practices` →
   "Name the element, then use the name". Known gap: a query nested deeper
   than a direct argument (inside an object literal) is not reported.
+
+- `prefer-before-each.js` — reports, in a test file, (a) the same first
+  statement opening two or more `it`/`test` cases directly inside one
+  `describe` or at file level, (b) `userEvent.setup()` inside a case, and
+  (c) three or more `render`/`renderElement`/`renderWithIntl` calls in one
+  file with identical arguments. Registered in the `blog-test` plugin and
+  enabled only in the `BLOG_LINT_TOUCHED=1` test-file block. Co-located
+  `prefer-before-each.test.js`. Per `testing-practices` → "Repeated
+  arrangement goes in beforeEach". It does not catch: a longer run of
+  statements shared beyond the first, a run repeated later in the cases, the
+  same arrangement written differently (an
+  argument order swapped, a variable renamed), an `it.each` or an
+  expression-bodied case, a `setup(…)` helper repeated across `describe`s, or
+  `userEvent.setup()` in a helper called from a case.
 
 - `eslint-plugin-testing-library` — registered in `base.js`'s
   `**/*.test.{ts,tsx}` override alongside `blog-test/no-class-assertions`,

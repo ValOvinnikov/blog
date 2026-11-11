@@ -15,12 +15,13 @@ export const NavLinkStyleField = () => {
   } = useLookForm();
   const t = useTranslations('lookForm');
   const lock = useLookFieldLock('navLinkStyle');
+  const glyphWord = t('navLinkStyleGlyphWord');
 
   const options = Object.values(NAV_LINK_STYLE).map((style) => ({
     value: style,
     label: t(`navLinkStyleOptionLabel.${style}`),
     description: t(`navLinkStyleOptionDescription.${style}`),
-    glyph: <NavLinkStyleGlyph linkStyle={style} />,
+    glyph: <NavLinkStyleGlyph linkStyle={style} word={glyphWord} />,
   }));
   const label = t('navLinkStyleLabel');
 

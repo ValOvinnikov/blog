@@ -560,6 +560,10 @@
   border-radius: var(--nav-link-radius, var(--radius-sm));
 }
 
+@utility rounded-header-control {
+  border-radius: var(--radius-header-control, 9999px);
+}
+
 @utility nav-link-marked {
   background-color: var(--nav-link-fill);
   outline: 1px solid var(--nav-link-outline);

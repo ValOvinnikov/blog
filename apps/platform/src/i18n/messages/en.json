@@ -818,6 +818,7 @@
     },
     "navLinkStyleLabel": "Navigation links",
     "navLinkStyleDescription": "How the top-level menu links look. Footer links are not affected.",
+    "navLinkStyleGlyphWord": "Link",
     "navLinkStyleOptionLabel": {
       "PLAIN": "Plain",
       "UNDERLINE": "Underline",

@@ -68,17 +68,21 @@ Committing is free; stop at Gates 3 and 4 and wait for the user.
 
    ```
    git fetch origin
-   git switch --no-track -c <type>/<n>-<short-slug> origin/main
+   git switch --no-track -c "$(pnpm -s branch:name <n> "<issue title>")" origin/main
    ```
 
-   A session already on a generated `claude/<words>-<id>` branch renames it
-   instead: `git rebase origin/main`, then
-   `git branch -m <type>/<n>-<short-slug>`.
+   A session already on a generated `claude/…` branch renames it instead:
+   `git rebase origin/main`, then
+   `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`.
 
-   `<type>` is a commitlint type (`feat`, `fix`, `tooling`, `docs`, `chore`,
-   …). `board-keeper` and `board-auto-sync.yml` read the issue from that
-   shape; a generated `claude/<words>-<id>` name is refused at push by
-   `.claude/hooks/pre-bash-branch-name-guard.sh`.
+   `scripts/branch-name.mjs` holds the one pattern, `<type>/<n>-<slug>` with
+   a commitlint type; `main`, `dependabot/…` and the `@claude` Action's
+   `claude/issue-<n>-<YYYYMMDD>-<HHMM>` are the only other names allowed.
+   `board-keeper` and `board-auto-sync.yml` read the issue from that shape.
+   Creating a branch under any other name is refused at push by
+   `.claude/hooks/pre-bash-branch-name-guard.sh` and `.husky/pre-push`, and
+   fails `board-auto-sync.yml`'s `branch-name` check on the PR. A branch
+   already on the remote keeps pushing, so open PRs are unaffected.
 
    **Worktree-delegated work:** when layer subagents run in their own
    worktrees (`develop-feature` §3) and this session is the shared main
