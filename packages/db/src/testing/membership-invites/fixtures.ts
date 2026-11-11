@@ -1,4 +1,5 @@
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import type { TCreateMembershipInviteResult } from '@blog/db/queries/membership-invites/create-membership-invite';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
 import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
@@ -32,4 +33,14 @@ export async function mockMembershipInvite(
   }
 
   return invite;
+}
+
+export function inviteOf(
+  result: TCreateMembershipInviteResult,
+): TMembershipInvite {
+  if (!('invite' in result)) {
+    throw new Error(`inviteOf: the invite was refused (${result.outcome}).`);
+  }
+
+  return result.invite;
 }
