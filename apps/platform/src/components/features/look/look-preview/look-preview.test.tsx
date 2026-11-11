@@ -227,7 +227,7 @@ describe(`<${LookPreview.name}/>`, () => {
     { target: STYLE_TARGET, hasLockedFields: false },
     { target: FOOTER_TARGET, hasLockedFields: true },
   ])(
-    'leaves the Free sample note off a $target.row line when locked fields are $hasLockedFields',
+    'leaves the Free note off a $target.row line, locked fields $hasLockedFields',
     ({ target, hasLockedFields }) => {
       renderPreview({ followTarget: target, hasLockedFields });
 
@@ -250,7 +250,7 @@ describe(`<${LookPreview.name}/>`, () => {
   it('re-derives the accent tokens for the dark preview mode', async () => {
     renderPreview({ values: { accentHue: MOCK_ACCENT_HUE } });
 
-    const darkButton = screen.getByRole('button', { name: 'Dark' });
+    const darkButton = screen.getByRole('button', { name: DARK });
     await user.click(darkButton);
 
     const sampleTokens = screen.getByTestId(LOOK_SAMPLE_TOKENS_TEST_ID);

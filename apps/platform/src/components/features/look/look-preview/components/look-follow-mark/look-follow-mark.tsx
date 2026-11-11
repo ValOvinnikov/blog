@@ -34,7 +34,7 @@ export const LookFollowMark = ({
   const radius = `${LOOK_FOLLOW_MARK.TAG_RADIUS / scale}px`;
 
   return (
-    <div ref={rootRef} aria-hidden="true" className={root()}>
+    <div ref={rootRef} className={root()}>
       {boxes.map(({ key, isInset, ...box }, index) => (
         <div
           key={key}

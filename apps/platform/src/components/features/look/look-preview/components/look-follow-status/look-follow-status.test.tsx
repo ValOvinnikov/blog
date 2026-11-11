@@ -89,20 +89,6 @@ describe(`<${LookFollowStatus.name}/>`, () => {
     expect(followStatusText()).toBe(line);
   });
 
-  it('offers a way back to an outlined Style card once paused', () => {
-    setup({
-      target: CARDS_TARGET,
-      follow: mockLookFollow({ outline: CARDS_OUTLINE, isPaused: true }),
-    });
-
-    const backButton = screen.getByRole('button', {
-      name: followLine('backTo', { part: LOOK_FORM.cardsHeading }),
-    });
-
-    expect(followStatusText()).toBe(LOOK_FOLLOW.paused);
-    expect(backButton).toBeVisible();
-  });
-
   it('states the desktop overflow once a nearly fitting sample settles', () => {
     setup({
       target: FOOTER_TARGET,
@@ -177,18 +163,28 @@ describe(`<${LookFollowStatus.name}/>`, () => {
     expect(topOfPageButton()).not.toBeInTheDocument();
   });
 
-  it('offers a way back to the part once paused', async () => {
-    const follow = mockLookFollow({ outline: FOOTER_OUTLINE, isPaused: true });
-    setup({ target: FOOTER_TARGET, follow });
+  it.each([
+    { target: FOOTER_TARGET, outline: FOOTER_OUTLINE, part: FOOTER },
+    {
+      target: CARDS_TARGET,
+      outline: CARDS_OUTLINE,
+      part: LOOK_FORM.cardsHeading,
+    },
+  ])(
+    'offers a way back to $part once paused',
+    async ({ target, outline, part }) => {
+      const follow = mockLookFollow({ outline, isPaused: true });
+      setup({ target, follow });
 
-    const backButton = screen.getByRole('button', {
-      name: followLine('backTo', { part: FOOTER }),
-    });
-    await userEvent.click(backButton);
+      const backButton = screen.getByRole('button', {
+        name: followLine('backTo', { part }),
+      });
+      await userEvent.click(backButton);
 
-    expect(followStatusText()).toBe(LOOK_FOLLOW.paused);
-    expect(follow.resume).toHaveBeenCalled();
-  });
+      expect(followStatusText()).toBe(LOOK_FOLLOW.paused);
+      expect(follow.resume).toHaveBeenCalled();
+    },
+  );
 
   it('drops the reader note while the way back shows', () => {
     setup({
