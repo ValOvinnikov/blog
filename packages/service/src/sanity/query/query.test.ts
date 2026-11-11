@@ -95,10 +95,14 @@ describe(runQuery, () => {
     expect(options).toEqual({ cache: NO_STORE });
   });
 
-  it('forwards the Data Cache options for a published read', async () => {
-    await runQuery(query, { next: MOCK_NEXT, tenant: mockTenant() }).catch(
-      () => {},
-    );
+  it.each([
+    { case: 'no perspective', tenant: mockTenant() },
+    {
+      case: 'the published perspective',
+      tenant: mockTenant({ perspective: SANITY_PERSPECTIVE.PUBLISHED }),
+    },
+  ])('forwards the Data Cache options for $case', async ({ tenant }) => {
+    await runQuery(query, { next: MOCK_NEXT, tenant }).catch(() => {});
 
     const [, , options] = mockFetch.mock.lastCall ?? [];
 
@@ -119,12 +123,6 @@ describe(runQuery, () => {
         perspective: SANITY_PERSPECTIVE.DRAFTS,
         cache: NO_STORE,
       });
-    });
-
-    it('reads through the client of the draft tenant', async () => {
-      await runQuery(query, { tenant: draftTenant }).catch(() => {});
-
-      expect(getClientMock).toHaveBeenCalledWith(draftTenant);
     });
   });
 
