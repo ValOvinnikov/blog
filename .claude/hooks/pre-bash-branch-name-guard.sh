@@ -1,6 +1,8 @@
 #!/bin/sh
-# PreToolUse(Bash) hook: refuse `git push` to a branch outside the one
-# branch-name pattern, which scripts/branch-name.mjs defines.
+# PreToolUse(Bash) hook: refuse `git push` that creates a branch outside the
+# one branch-name pattern, which scripts/branch-name.mjs defines. A branch
+# `git ls-remote` already finds on the remote passes; an ls-remote error
+# still checks the name.
 #
 # Contract (Claude Code hooks):
 #   stdin  — JSON payload; the command is .tool_input.command
@@ -66,9 +68,10 @@ process.stdin.on("end", async () => {
     const positional = rest.filter(
       (w, j) => !w.startsWith("-") && !valueFlags.includes(rest[j - 1]),
     );
+    const remote = positional[0] ?? "origin";
     const refspecs = positional.slice(1);
     if (refspecs.length === 0) {
-      destinations.push(currentBranch(dir));
+      destinations.push({ branch: currentBranch(dir), dir, remote });
       continue;
     }
     for (const spec of refspecs) {
@@ -76,17 +79,31 @@ process.stdin.on("end", async () => {
       if (dst !== undefined && (src === "" || dst === "")) continue;
       const target = dst ?? src;
       if (target.startsWith("refs/tags/")) continue;
-      destinations.push(target === "HEAD" ? currentBranch(dir) : target.replace(/^refs\/heads\//, ""));
+      const branch = target === "HEAD" ? currentBranch(dir) : target.replace(/^refs\/heads\//, "");
+      destinations.push({ branch, dir, remote });
     }
   }
 
   const { isAllowedBranch, renameHint } = await import(
     pathToFileURL(process.env.BRANCH_NAME_SCRIPT).href
   );
-  const refused = destinations.filter((b) => b !== "" && !isAllowedBranch(b));
+  const existsOnRemote = ({ branch, dir, remote }) => {
+    try {
+      execFileSync("git", ["-C", dir, "ls-remote", "--exit-code", "--heads", remote, branch], {
+        stdio: "ignore",
+        timeout: 15000,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const refused = destinations.filter(
+    (d) => d.branch !== "" && !isAllowedBranch(d.branch) && !existsOnRemote(d),
+  );
   if (refused.length === 0) process.exit(0);
 
-  process.stderr.write("Blocked: " + renameHint(refused[0]));
+  process.stderr.write("Blocked: " + renameHint(refused[0].branch));
   process.exit(2);
 });
 '

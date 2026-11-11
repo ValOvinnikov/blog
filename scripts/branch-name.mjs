@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 import commitlintConfig from '../commitlint.config.mjs';
@@ -8,7 +9,8 @@ export const BRANCH_NAME_PATTERN = new RegExp(
   `^(${BRANCH_TYPES.join('|')})/[1-9][0-9]*-[a-z0-9]+(-[a-z0-9]+)*$`,
 );
 
-const EXEMPT_BRANCH_PATTERN = /^(main|dependabot\/.+)$/;
+const EXEMPT_BRANCH_PATTERN =
+  /^(main|dependabot\/.+|claude\/issue-[1-9][0-9]*-[0-9]{8}-[0-9]{4})$/;
 const SLUG_WORD_LIMIT = 6;
 const TITLE_PATTERN = /^([a-z]+)(\([^)]*\))?!?:\s*(.+)$/;
 
@@ -53,17 +55,38 @@ export const renameHint = (name) => {
   );
 };
 
+const NULL_SHA = /^0+$/;
+const BRANCH_REF_PREFIX = 'refs/heads/';
+
+export const branchesCreatedByPush = (prePushInput) =>
+  prePushInput
+    .split('\n')
+    .map((line) => line.trim().split(/\s+/))
+    .filter(
+      ([, localSha, remoteRef, remoteSha]) =>
+        remoteRef?.startsWith(BRANCH_REF_PREFIX) &&
+        !NULL_SHA.test(localSha) &&
+        NULL_SHA.test(remoteSha ?? ''),
+    )
+    .map(([, , remoteRef]) => remoteRef.slice(BRANCH_REF_PREFIX.length));
+
+const check = (names) => {
+  const rejected = names.filter((name) => !isAllowedBranch(name));
+  rejected.forEach((name) => process.stderr.write(renameHint(name)));
+  return rejected.length === 0 ? 0 : 1;
+};
+
 const run = (args) => {
-  if (args[0] === '--check') {
-    const rejected = args.slice(1).filter((name) => !isAllowedBranch(name));
-    rejected.forEach((name) => process.stderr.write(renameHint(name)));
-    return rejected.length === 0 ? 0 : 1;
+  if (args[0] === '--check') return check(args.slice(1));
+  if (args[0] === '--check-pre-push') {
+    return check(branchesCreatedByPush(readFileSync(0, 'utf8')));
   }
   const [issueNumber, title] = args;
   if (issueNumber === undefined || title === undefined) {
     process.stderr.write(
       'Usage: pnpm branch:name <n> "<title>"\n' +
-        '       pnpm branch:name --check <branch>...\n',
+        '       pnpm branch:name --check <branch>...\n' +
+        '       node scripts/branch-name.mjs --check-pre-push < <pre-push stdin>\n',
     );
     return 1;
   }

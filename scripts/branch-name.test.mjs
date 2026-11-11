@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { branchName, isAllowedBranch, renameHint } from './branch-name.mjs';
+import {
+  branchName,
+  branchesCreatedByPush,
+  isAllowedBranch,
+  renameHint,
+} from './branch-name.mjs';
 
 const ISSUE = 3952;
 const TITLE = 'feat(studio): a Team may have a single member';
@@ -42,12 +47,13 @@ describe('branchName', () => {
 });
 
 describe('isAllowedBranch', () => {
-  it('accepts ticket branches, main and dependabot', () => {
+  it('accepts ticket branches, main, dependabot and the @claude Action shape', () => {
     for (const name of [
       TICKET_BRANCH,
       'tooling/7115-x',
       'main',
       'dependabot/npm_and_yarn/next-16.1.0',
+      'claude/issue-3949-20260930-1428',
     ]) {
       assert.ok(isAllowedBranch(name), name);
     }
@@ -56,6 +62,7 @@ describe('isAllowedBranch', () => {
   it('refuses generated, ticketless and malformed names', () => {
     for (const name of [
       GENERATED_BRANCH,
+      'claude/issue-3949-20260930-14281',
       'claude/optimistic-noether-isuljn',
       'tooling/branch-name-push-guard',
       'feature/12-x',
@@ -79,5 +86,39 @@ describe('renameHint', () => {
 
   it('falls back to a placeholder when the name has no number', () => {
     assert.match(renameHint('claude/eager-wozniak'), /branch:name <n> /);
+  });
+});
+
+describe('branchesCreatedByPush', () => {
+  const SHA = 'a'.repeat(40);
+  const NULL = '0'.repeat(40);
+  const line = (localSha, remoteRef, remoteSha) =>
+    `refs/heads/x ${localSha} ${remoteRef} ${remoteSha}`;
+
+  it('returns a branch the push creates on the remote', () => {
+    assert.deepEqual(
+      branchesCreatedByPush(line(SHA, `refs/heads/${GENERATED_BRANCH}`, NULL)),
+      [GENERATED_BRANCH],
+    );
+  });
+
+  it('skips a branch that already exists on the remote', () => {
+    assert.deepEqual(
+      branchesCreatedByPush(line(SHA, `refs/heads/${GENERATED_BRANCH}`, SHA)),
+      [],
+    );
+  });
+
+  it('skips deletions and tags', () => {
+    assert.deepEqual(
+      branchesCreatedByPush(
+        [
+          line(NULL, `refs/heads/${GENERATED_BRANCH}`, SHA),
+          line(SHA, 'refs/tags/v1.2.3', NULL),
+          '',
+        ].join('\n'),
+      ),
+      [],
+    );
   });
 });

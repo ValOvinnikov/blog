@@ -13,6 +13,9 @@ repo=$(mktemp -d) || exit 1
 trap 'rm -rf "$repo"' EXIT
 git -C "$repo" init -q -b main
 git -C "$repo" -c user.name=t -c user.email=t@example.com commit -q --allow-empty -m init
+git init -q --bare "$repo/.origin.git"
+git -C "$repo" remote add origin "$repo/.origin.git"
+git -C "$repo" push -q origin main:claude/issue-7015-o0wc5t
 
 on_branch() {
 	git -C "$repo" switch -q -C "$1"
@@ -56,10 +59,20 @@ allow 'git commit -m "then git push it"'
 allow 'git status'
 allow 'echo push'
 
+on_branch claude/issue-7015-o0wc5t
+allow 'git push'
+allow 'git push origin HEAD'
+block 'git push origin HEAD:claude/issue-7016-n2ecx3'
+allow 'git push nowhere HEAD:feat/7016-x'
+block 'git push nowhere HEAD:claude/issue-7015-o0wc5t'
+
 on_branch claude/vercel-react-best-practices-7c35f1
 block 'git push -u origin HEAD'
 
 on_branch claude/issue-3949-20260930-1428
+allow 'git push -u origin HEAD'
+
+on_branch claude/issue-3949-a1b2c3
 block 'git push -u origin HEAD'
 allow 'git push origin HEAD:feat/3949-team-single-member'
 

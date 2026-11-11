@@ -76,11 +76,13 @@ Committing is free; stop at Gates 3 and 4 and wait for the user.
    `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`.
 
    `scripts/branch-name.mjs` holds the one pattern, `<type>/<n>-<slug>` with
-   a commitlint type; `main` and `dependabot/…` are the only other names
-   allowed. `board-keeper` and `board-auto-sync.yml` read the issue from that
-   shape. Any other name is refused at push by
+   a commitlint type; `main`, `dependabot/…` and the `@claude` Action's
+   `claude/issue-<n>-<YYYYMMDD>-<HHMM>` are the only other names allowed.
+   `board-keeper` and `board-auto-sync.yml` read the issue from that shape.
+   Creating a branch under any other name is refused at push by
    `.claude/hooks/pre-bash-branch-name-guard.sh` and `.husky/pre-push`, and
-   fails `board-auto-sync.yml`'s `branch-name` check on the PR.
+   fails `board-auto-sync.yml`'s `branch-name` check on the PR. A branch
+   already on the remote keeps pushing, so open PRs are unaffected.
 
    **Worktree-delegated work:** when layer subagents run in their own
    worktrees (`develop-feature` §3) and this session is the shared main

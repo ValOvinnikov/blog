@@ -1412,8 +1412,9 @@ Signal status the way the board tooling reads it (`board-keeper.md` Step 3):
   `claude/issue-<n>-<id>`; rename it with
   `git branch -m "$(pnpm -s branch:name <n> "<issue title>")"`, which the
   `SessionStart` hook prints when the branch is off the pattern. A pushed
-  branch with that name is the In Progress signal. Any other name is refused
-  at push and fails the PR's `branch-name` check.
+  branch with that name is the In Progress signal. Creating a branch under any
+  other name is refused at push and fails the PR's `branch-name` check; a
+  branch already on the remote keeps pushing.
 - **In review:** open the PR as a draft with the issue reference
   (`Closes #n` on the completing PR only) — an open PR, draft or not, is the
   Code Review signal, and the owner marks it ready at final review. On the
