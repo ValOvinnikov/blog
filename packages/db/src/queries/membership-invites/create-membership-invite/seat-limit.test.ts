@@ -48,22 +48,22 @@ describe(releaseInvitePastSeatLimit, () => {
       }));
     });
 
-    it('removes the later invite', async () => {
+    it('removes the newer invite', async () => {
       const released = await releaseInvitePastSeatLimit(laterId);
 
       expect(released).toBe(true);
       expect(await inviteIds()).toEqual([earlierId]);
     });
 
-    it('keeps the earlier invite', async () => {
+    it('removes the older invite too, whatever its rank', async () => {
       const released = await releaseInvitePastSeatLimit(earlierId);
 
-      expect(released).toBe(false);
-      expect(await inviteIds()).toHaveLength(2);
+      expect(released).toBe(true);
+      expect(await inviteIds()).toEqual([laterId]);
     });
   });
 
-  it('counts a membership ahead of every pending invite', async () => {
+  it('counts a membership as a taken seat', async () => {
     const { id: userId } = await insertTestUser(db());
     await mockMembership(db(), { userId, tenantId });
     const { id: inviteId } = await mockMembershipInvite(db(), tenantId);

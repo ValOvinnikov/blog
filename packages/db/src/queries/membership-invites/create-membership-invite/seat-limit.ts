@@ -25,12 +25,12 @@ export function pendingInvitesCount(tenantId: string): SQL<number> {
 }
 
 // Two concurrent invites can both pass the insert's count, so each re-counts
-// in its own statement once committed; pending invites rank by creation, then
-// id, and the one ranked past the plan's seats removes itself.
+// in a fresh statement and removes itself while the tenant is over its seats;
+// a race may refuse both, never keep both.
 export async function releaseInvitePastSeatLimit(
   inviteId: string,
 ): Promise<boolean> {
-  const ranked = alias(membershipInvites, 'ranked');
+  const pending = alias(membershipInvites, 'pending');
 
   const released = await getDb()
     .delete(membershipInvites)
@@ -38,9 +38,8 @@ export async function releaseInvitePastSeatLimit(
       and(
         eq(membershipInvites.id, inviteId),
         sql`${membershipsCount(membershipInvites.tenantId)}
-          + (select count(*) from ${membershipInvites} ${ranked}
-             where ${and(eq(ranked.tenantId, membershipInvites.tenantId), isNull(ranked.consumedAt))}
-             and (${ranked.createdAt}, ${ranked.id}) <= (${membershipInvites.createdAt}, ${membershipInvites.id}))
+          + (select count(*) from ${membershipInvites} ${pending}
+             where ${and(eq(pending.tenantId, membershipInvites.tenantId), isNull(pending.consumedAt))})
           > (select ${planSeats()} from ${tenants} where ${eq(tenants.id, membershipInvites.tenantId)})`,
       ),
     )
