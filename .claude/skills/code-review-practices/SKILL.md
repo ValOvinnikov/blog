@@ -115,12 +115,6 @@ done
 # hook, test fake, fixture, repeated arrangement — is blocking; one whose
 # copies were all on main already is filed.
 pnpm check:clones
-# Fallback while `pnpm check:clones` is not on the settings allow-list and is
-# denied: the same scan, unfiltered — read the hits that involve a changed file.
-WS=$( (git diff "$BASE"...HEAD --name-only; git diff --name-only) | grep -E '\.(ts|tsx)$' | cut -d/ -f1-2 | sort -u )
-[ -n "$WS" ] && pnpm dlx jscpd@4 --min-tokens 60 --min-lines 8 \
-  --ignore '**/node_modules/**,**/generated/**,**/.next/**' --reporters console $WS \
-  | grep -A2 'Clone found'
 ```
 
 Also scan by eye for commented-out code, which grep can't catch reliably. Hits

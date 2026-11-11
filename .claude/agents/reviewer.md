@@ -76,9 +76,6 @@ Run `pnpm check:diff-hygiene`, then every command in the skill's §0 over the
 full diff (`<base>...HEAD` plus the working tree; set §0's `BASE` to it),
 `pnpm check:clones` included. A diff-hygiene hit is blocking; a hit from the
 other commands is blocking once you have read it and §0 does not allow it.
-If either `pnpm check:*` command is denied, run §0's `pnpm dlx jscpd@4`
-fallback for clones and rely on `verify-runner`'s `pnpm verify`, which ran
-diff-hygiene; say so under **Not checked**.
 
 ### Pass 2 — Contract
 
