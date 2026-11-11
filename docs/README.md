@@ -1,7 +1,6 @@
 # Docs index
 
-What lives where, and which docs are live vs. historical. See `CLAUDE.md`'s
-"Design-doc retention" bullet for the rule this index enforces.
+What lives where, and which docs are live vs. historical. See the "Design-doc retention" bullet in `develop-feature` "Docs that ship with the change" for the rule this index enforces.
 
 ## Durable references (always current)
 

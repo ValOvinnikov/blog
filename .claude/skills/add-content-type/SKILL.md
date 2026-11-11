@@ -19,8 +19,7 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
 
 - Never reverse an arrow. Build order is `studio → service → ui → web`,
   skipping untouched layers; a new stored-value constant is a `config`
-  dispatch first. One PR per layer, merged before the next starts → CLAUDE.md
-  "One layer at a time".
+  dispatch first. One PR per layer, merged before the next starts → `develop-feature` "One layer at a time — merged before the next starts".
 - The plan carries Copy and Manual test (`develop-feature` "Say what it touches before
   starting"). The content-model change updates or creates its `docs/features/`
   page (`develop-feature` "Docs that ship with the change"), plus any `SPEC.md` §6 entry for that shape

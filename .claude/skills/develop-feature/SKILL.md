@@ -103,8 +103,7 @@ ships with a manual-test issue.
 - **Create it with the implementation tickets**, in the same `board-keeper`
   dispatch: a sub-issue of the epic, or linked from the single ticket.
   Labels: `manual-test` plus the same `prio:*` label as the work.
-- **Write the body from the manual-test template** in `CLAUDE.md` "Issue
-  body template".
+- **Write the body from the manual-test template** in `write-ticket` "Issue body template".
 - **The completing PR body links it without a closing keyword** (→
   `open-pull-request` "PR body template"). It closes only after the owner has
   run it.

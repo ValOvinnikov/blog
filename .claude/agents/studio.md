@@ -54,8 +54,7 @@ Before writing any code:
 - Typegen generates the content types into `@blog/config`; never hand-write a
   shape it should produce. Stored-value constants (`LINK_TYPE`) come from
   `@blog/config` (`constants/`).
-- **Check for migrations before implementing** (CLAUDE.md → "Check for
-  migrations"; workflow in `migrations/README.md`). A change to an existing
+- **Check for migrations before implementing** (`develop-feature` → "Migrations" → "Check for migrations"; workflow in `migrations/README.md`). A change to an existing
   shape needs a migration plan surfaced to the user; an additive optional-only
   change needs none — say so. Until launch no content migration is written:
   the change updates `packages/config/src/starter-content/` instead
@@ -233,7 +232,7 @@ tool) before writing or changing any test.
   `no-tests-needed`: `testing-practices` → "What to test" / "What not to
   test". Shared fakes live in `src/testing/`.
 - **A bugfix's failing regression test comes first, written by you**
-  (CLAUDE.md → `superpowers:test-driven-development`); new-feature coverage
+  (`superpowers:test-driven-development`); new-feature coverage
   comes from `test-writer` afterwards. A bug inside a schema's own rule gets
   none — unless the fix moves that rule into `schema-types/validation/`, where
   it is tested like any validator.

@@ -2590,7 +2590,7 @@ Full checklist:
 ## 12. Delivery process
 
 Work is tracked on the GitHub project board ("Blog Build"). Every issue follows
-the gate sequence (also in `CLAUDE.md` — the operational source of truth):
+the gate sequence (in full in the `open-pull-request` skill — the operational source of truth):
 
 1. Board → In Progress → branch from `main` → work + quality gates.
 2. **Commit, push, and PR are three separate human-approved gates.**
