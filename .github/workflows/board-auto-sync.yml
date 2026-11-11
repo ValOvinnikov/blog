@@ -5,7 +5,10 @@ name: Board Auto-Sync
 # "Ticket priority & triage" cloud-session protocol). Forward-only, mirroring
 # the safe-transition rule board-keeper.md's Step 4 applies by hand.
 #
-# The branch-name regex below is the same two-shape alternation
+# `branch-name` fails any PR whose head ref is off the pattern in
+# scripts/branch-name.mjs; it is ungated, since it only reads the ref.
+#
+# The issue-number regexes below are the same two-shape alternation
 # board-keeper.md's Step 2 grep uses (`<type>/<n>-<slug>` and the GitHub
 # Actions cloud shape `claude/issue-<n>-<timestamp>`) — diff the two if this
 # workflow's detection is ever suspected of drifting from board-keeper's.
@@ -27,6 +30,21 @@ permissions:
   pull-requests: read
 
 jobs:
+  branch-name:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Check the head branch name
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: node scripts/branch-name.mjs --check "$HEAD_REF"
+
   branch-created:
     if: github.event_name == 'create' && github.event.ref_type == 'branch' && (github.actor == 'ValOvinnikov' || github.event.sender.login == 'claude[bot]')
     runs-on: ubuntu-latest

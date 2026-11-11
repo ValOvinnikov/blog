@@ -1,8 +1,8 @@
 #!/bin/sh
-# PreToolUse(Bash) hook: refuse `git push` of a session's generated branch
-# name (`claude/<words>-<id>`). board-auto-sync reads the issue number from
-# the branch name, so a generated name leaves the ticket unmoved on the board.
-# `claude/issue-<n>-…` is the GitHub `@claude` runner's own shape and passes.
+# PreToolUse(Bash) hook: refuse `git push` that creates a branch outside the
+# one branch-name pattern, which scripts/branch-name.mjs defines. A branch
+# `git ls-remote` already finds on the remote passes; an ls-remote error
+# still checks the name.
 #
 # Contract (Claude Code hooks):
 #   stdin  — JSON payload; the command is .tool_input.command
@@ -17,12 +17,16 @@ case "$payload" in
 *) exit 0 ;;
 esac
 
+BRANCH_NAME_SCRIPT="$(cd "$(dirname "$0")/../../scripts" && pwd)/branch-name.mjs"
+export BRANCH_NAME_SCRIPT
+
 printf '%s' "$payload" | node -e '
 const { execFileSync } = require("node:child_process");
+const { pathToFileURL } = require("node:url");
 
 let s = "";
 process.stdin.on("data", (c) => (s += c));
-process.stdin.on("end", () => {
+process.stdin.on("end", async () => {
   let command = "";
   try {
     command = JSON.parse(s).tool_input?.command ?? "";
@@ -42,7 +46,10 @@ process.stdin.on("end", () => {
   };
 
   const destinations = [];
-  for (const segment of command.split(/&&|\|\||[;&|\n]/)) {
+  const unredirected = command
+    .replace(/\d*[<>]+&\d+/g, " ")
+    .replace(/\d*[<>]+\s*[^\s;&|]+/g, " ");
+  for (const segment of unredirected.split(/&&|\|\||[;&|\n]/)) {
     const words = segment.trim().split(/\s+/).filter(Boolean);
     let i = 0;
     if (words[i] === "env") i += 1;
@@ -61,31 +68,42 @@ process.stdin.on("end", () => {
     const positional = rest.filter(
       (w, j) => !w.startsWith("-") && !valueFlags.includes(rest[j - 1]),
     );
+    const remote = positional[0] ?? "origin";
     const refspecs = positional.slice(1);
     if (refspecs.length === 0) {
-      destinations.push(currentBranch(dir));
+      destinations.push({ branch: currentBranch(dir), dir, remote });
       continue;
     }
     for (const spec of refspecs) {
       const [src, dst] = spec.replace(/^\+/, "").split(":");
       if (dst !== undefined && (src === "" || dst === "")) continue;
       const target = dst ?? src;
-      destinations.push(target === "HEAD" ? currentBranch(dir) : target.replace(/^refs\/heads\//, ""));
+      if (target.startsWith("refs/tags/")) continue;
+      const branch = target === "HEAD" ? currentBranch(dir) : target.replace(/^refs\/heads\//, "");
+      destinations.push({ branch, dir, remote });
     }
   }
 
-  const generated = destinations.filter(
-    (b) => b.startsWith("claude/") && !/^claude\/issue-\d+-/.test(b),
+  const { isAllowedBranch, renameHint } = await import(
+    pathToFileURL(process.env.BRANCH_NAME_SCRIPT).href
   );
-  if (generated.length === 0) process.exit(0);
+  const existsOnRemote = ({ branch, dir, remote }) => {
+    try {
+      execFileSync("git", ["-C", dir, "ls-remote", "--exit-code", "--heads", remote, branch], {
+        stdio: "ignore",
+        timeout: 15000,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const refused = destinations.filter(
+    (d) => d.branch !== "" && !isAllowedBranch(d.branch) && !existsOnRemote(d),
+  );
+  if (refused.length === 0) process.exit(0);
 
-  process.stderr.write(
-    "Blocked: \"" + generated[0] + "\" is a generated branch name. It carries no issue\n" +
-      "number, so board-auto-sync cannot move the ticket, and the name says\n" +
-      "nothing about the work. Rename it from the ticket title, then push:\n" +
-      "  git branch -m <type>/<n>-<words-from-title>   e.g. feat/3952-team-single-member\n" +
-      "  git branch -m <type>/<short-slug>             when there is no ticket\n",
-  );
+  process.stderr.write("Blocked: " + renameHint(refused[0].branch));
   process.exit(2);
 });
 '

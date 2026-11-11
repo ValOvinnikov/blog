@@ -8,6 +8,7 @@ import {
 import { Avatar } from '@blog/ui/components/atoms/avatar';
 import { Icon } from '@blog/ui/components/atoms/icon';
 import { ButtonShapes } from '@blog/ui/testing/button-shapes';
+import { HeaderControlShapes } from '@blog/ui/testing/header-control-shapes';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
@@ -133,6 +134,19 @@ export const CircleRestyledByTokens: TStory = {
         </div>
       ))}
     </div>
+  ),
+};
+
+export const CircleHeaderControlShapes: TStory = {
+  name: 'Circle — header-control shapes',
+  render: () => (
+    <HeaderControlShapes>
+      {(shape) => (
+        <IconButton variant="circle" ariaLabel={shape} title={shape}>
+          <Icon name={ICONS.MENU} size={SIZE.MD} />
+        </IconButton>
+      )}
+    </HeaderControlShapes>
   ),
 };
 

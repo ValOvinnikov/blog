@@ -62,6 +62,12 @@ check 'packages/ui/src/atoms/Button.test.tsx' allow "ui component .test.tsx"
 check 'packages/service/src/queries/post.test.ts' allow "service .test.ts"
 check 'apps/web/src/app/page.test.tsx' allow "web route .test.tsx"
 
+# --- allow: shared test builders and fakes ---------------------------------
+check 'packages/ui/src/testing/post-card-props.ts' allow "ui src/testing builder .ts"
+check 'apps/web/src/testing/custom-render.tsx' allow "web src/testing helper .tsx"
+check 'packages/service/src/__mocks__/client.ts' allow "service __mocks__ fake .ts"
+check 'apps/platform/src/components/__mocks__/nav.tsx' allow "nested __mocks__ fake .tsx"
+
 # --- deny: product code, one per layer --------------------------------------
 check 'packages/ui/src/atoms/Button.tsx' deny "ui product .tsx"
 check 'packages/service/src/queries/post.ts' deny "service product .ts"
@@ -72,6 +78,11 @@ check 'packages/ui/src/atoms/Button.test.tsx.bak' deny "trailing .bak after .tes
 check 'packages/ui/src/atoms/test.tsx' deny "literal filename test.tsx, no .test. suffix"
 check 'packages/ui/src/atoms/Button.TEST.TSX' deny "case mismatch — suffix check is case-sensitive"
 check 'packages/ui/src/atoms/Button.testx.tsx' deny "near-miss suffix, not .test.tsx"
+check 'packages/ui/src/testing/README.md' deny "non-TS file under src/testing"
+check 'packages/service/src/__mocks__/data.json' deny "non-TS file under __mocks__"
+check 'packages/ui/src/testing-utils/helper.ts' deny "lookalike folder, not src/testing"
+check 'apps/web/src/testing/../app/page.tsx' deny "parent traversal out of src/testing"
+check 'apps/web/src/__mocks__/../app/page.tsx' deny "parent traversal out of __mocks__"
 
 # --- allow: no file_path to inspect stays out of the way --------------------
 check '' allow "empty file_path"

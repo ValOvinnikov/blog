@@ -8,7 +8,7 @@ import {
   testBreadcrumbsJsonLdTrail,
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { MOCK_TENANT_NAME } from '@web/testing/shared/tenant/fixtures';
@@ -56,7 +56,7 @@ describe(`<${PostBreadcrumbs.name}/>`, () => {
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getPostPageMock, setup });
-  testNotFoundOnFetchFailure({ pageLoaderMock: getPostPageMock, setup });
+  testThrowsOnFetchFailure({ pageLoaderMock: getPostPageMock, setup });
   testBreadcrumbsTrail({
     pageLoaderMock: getPostPageMock,
     setup,

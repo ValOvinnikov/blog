@@ -12,6 +12,7 @@ import {
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
 } from './footer-layout';
+import { HEADER_CONTROL_SHAPE } from './header-control-shape';
 import { HEADER_CONTROL_STYLE } from './header-control-style';
 import {
   HEADER_BAR_STYLE,
@@ -40,6 +41,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     },
     cardStyle: CARD_STYLE.ACCENT_BAR,
     headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+    headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
     accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
     accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,
@@ -75,6 +77,7 @@ export const PRESET_REGISTRY: Record<TPresetId, TPresetBundle> = {
     },
     cardStyle: CARD_STYLE.OUTLINED,
     headerControlStyle: HEADER_CONTROL_STYLE.OUTLINED,
+    headerControlShape: HEADER_CONTROL_SHAPE.ROUND,
     accountButtonStyle: ACCOUNT_BUTTON_STYLE.PILL,
     accountPanelStyle: ACCOUNT_PANEL_STYLE.CARD,
     accountPhonePlacement: ACCOUNT_PHONE_PLACEMENT.BAR,

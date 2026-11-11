@@ -6,7 +6,7 @@ import {
   testBreadcrumbsTrail,
   testForwardsArgsToLoader,
   testNoJsonLdWithoutBaseUrl,
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { mockSeo } from '@web/testing/shared/seo/fixtures';
@@ -44,7 +44,7 @@ describe(`<${TagBreadcrumbs.name}/>`, () => {
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getTagPageMock, setup });
-  testNotFoundOnFetchFailure({
+  testThrowsOnFetchFailure({
     pageLoaderMock: getTagPageMock,
     setup,
     eventFragment: 'tag_breadcrumbs.fetch_failed',

@@ -5,7 +5,7 @@ import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { MOCK_POST_DETAIL } from '@web/testing/pages/blog-post-page/fixtures';
 import {
   testForwardsArgsToLoader,
-  testNotFoundOnFetchFailure,
+  testThrowsOnFetchFailure,
   testNotFoundWithoutLog,
 } from '@web/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract';
 import { MOCK_BLOG_POSTING_JSON_LD_FRAGMENT } from '@web/testing/shared/json-ld/fixtures';
@@ -33,7 +33,7 @@ describe(`<${BlogPostingSchema.name}/>`, () => {
   });
 
   testNotFoundWithoutLog({ pageLoaderMock: getPostPageMock, setup });
-  testNotFoundOnFetchFailure({ pageLoaderMock: getPostPageMock, setup });
+  testThrowsOnFetchFailure({ pageLoaderMock: getPostPageMock, setup });
 
   describe('when the post exists', () => {
     beforeEach(() => {

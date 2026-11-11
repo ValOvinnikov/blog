@@ -79,7 +79,7 @@ Every public page of a tenant's site is a Sanity page document of one of thirtee
 - A page whose template differs from its default-language version's template gets a warning, not an error.
 - When a template sets a hero, the hero owns the page's `<h1>` and the page's own heading block is not rendered; with no hero, `PageHeading` renders the heading block. The heading block is still required, because posts, cards, breadcrumbs and section navigation read it.
 - A module type absent from a page's renderer map is skipped with a `module_renderer.unknown_module_type` warning.
-- A missing Home, Post Index, Topic Index or Tag Index in a non-default language redirects to the site root. Every other missing document, and every loader failure, returns a 404 (`guardPageLoaderResult`).
+- A missing Home, Post Index, Topic Index or Tag Index in a non-default language redirects to the site root. Every other missing document returns a 404, and a loader failure a 500 through the error boundary (`guardPageLoaderResult`).
 - `/blog/page/1` and `/{archive}/{slug}/page/1` 308 to the unnumbered URL; a non-numeric page number 404s.
 - Content routes render on first request: `generateStaticParams` returns an empty list.
 
@@ -112,4 +112,3 @@ Every public page of a tenant's site is a Sanity page document of one of thirtee
 - #1919 — module and page-type portfolio (new page types land here).
 - #1291 — portfolio content type and a `/work` surface.
 - #2798 — site templates that seed page and template documents at tenant creation.
-- #1880 — decide whether a loader failure should 404 or 500.

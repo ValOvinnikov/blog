@@ -1,7 +1,7 @@
 import { FOCUS_RING, TRANSITION_COLORS } from './interaction';
 
 export const HEADER_CONTROL_FRAME =
-  'rounded-full border border-header-control bg-header-control-fill';
+  'rounded-header-control border border-header-control bg-header-control-fill';
 
 export const HEADER_CONTROL = [
   HEADER_CONTROL_FRAME,

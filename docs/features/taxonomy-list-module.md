@@ -42,7 +42,7 @@ The Taxonomy List shows a browsable grid of topics or tags, each card carrying t
 - The Studio rejects a topic index template or page whose Taxonomy List lists tags, and the reverse, reporting on the offending Modules entry (`validateTaxonomyListReferencesMatchKind`; on the `page_topicIndex`/`page_tagIndex` document it also checks the deprecated `taxonomyList` field).
 - Sorting: alphabetical by title in the query; Most Posts sorts by count, then title. The limit applies after sorting.
 - A term with no archive page in the request language is dropped from the grid.
-- A failed fetch answers 404 (`notFound()`), unlike most modules, which render nothing.
+- A failed fetch is logged and thrown to the error boundary (a 500), unlike most modules, which render nothing.
 - The view composes `TaxonomyCard` directly rather than the post `MediaCardItem`; `TaxonomyCard.Posts` renders only when latest posts are on and the term has any.
 
 ## Dependencies

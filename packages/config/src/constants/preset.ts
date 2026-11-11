@@ -14,6 +14,7 @@ import type {
   TFooterLayout,
   TFooterSurface,
 } from './footer-layout';
+import type { THeaderControlShape } from './header-control-shape';
 import type { THeaderControlStyle } from './header-control-style';
 import type {
   THeaderBarStyle,
@@ -79,6 +80,7 @@ export type TPresetBundle = {
   themeTokens: TThemeTokens;
   cardStyle: TCardStyle;
   headerControlStyle: THeaderControlStyle;
+  headerControlShape: THeaderControlShape;
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;

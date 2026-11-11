@@ -52,7 +52,7 @@ export const testNotFoundWithoutLog = ({
   });
 };
 
-export const testNotFoundOnFetchFailure = ({
+export const testThrowsOnFetchFailure = ({
   pageLoaderMock,
   setup,
   eventFragment,
@@ -61,12 +61,12 @@ export const testNotFoundOnFetchFailure = ({
   eventFragment?: string;
   logContext?: Record<string, unknown>;
 }) => {
-  it('calls notFound() when the fetch fails', async () => {
+  it('throws to the error boundary when the fetch fails', async () => {
     pageLoaderMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-    await expect(setup()).rejects.toThrow(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND);
+    await expect(setup()).rejects.toBe(MOCK_ERROR);
 
-    expect(vi.mocked(notFound)).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(notFound)).not.toHaveBeenCalled();
     if (eventFragment) {
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(eventFragment, {
         ...logContext,

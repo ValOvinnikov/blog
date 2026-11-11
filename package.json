@@ -42,6 +42,8 @@
     "check:client-graph:test": "node --test scripts/check-client-graph.test.mjs",
     "check:required-env": "node scripts/check-required-env.mjs",
     "check:required-env:test": "node --test scripts/check-required-env.test.mjs",
+    "branch:name": "node scripts/branch-name.mjs",
+    "branch:name:test": "node --test scripts/branch-name.test.mjs",
     "knip": "knip",
     "format": "turbo run format",
     "prepare": "husky"
