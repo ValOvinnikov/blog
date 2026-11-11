@@ -1,6 +1,8 @@
 import { createTV } from 'tailwind-variants';
 
-// Keep these lists in sync with the custom tokens in `theme.css` and `admin-theme.css`, or `tailwind-merge` misclassifies or drops them.
+import { SHADOW_TOKENS } from './shadow-tokens';
+
+// Keep these lists and `SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `admin-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
   'display',
   'hero',
@@ -80,18 +82,6 @@ const RADIUS_TOKENS = [
   'admin-22',
 ];
 
-const SHADOW_TOKENS = [
-  'admin',
-  'admin-lg',
-  'admin-frame',
-  'admin-sheet',
-  'admin-index',
-  'admin-unsaved',
-  'admin-bar',
-  'admin-dock',
-  'admin-xs',
-];
-
 const LEADING_TOKENS = [
   'admin-1-4',
   'admin-1-45',
@@ -102,7 +92,7 @@ const LEADING_TOKENS = [
 
 const FONT_WEIGHT_TOKENS = ['admin-650'];
 
-/** Project-configured `tv`. Import this instead of `tv` from `tailwind-variants`. */
+/** Import this instead of `tv` from `tailwind-variants`. */
 export const tv = createTV({
   twMergeConfig: {
     extend: {
