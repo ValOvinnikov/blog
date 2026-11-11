@@ -884,6 +884,13 @@ file` are all denied alike) — an earlier version only handled the
     size and splitting → `react-component-practices`.
   - File size budgets → `CLAUDE.md` Conventions; feature docs (`docs/features/<feature>.md`), spec sync and design-doc retention → `develop-feature` "Docs that ship with the change".
   - Shared types, helpers and constants → `.claude/agents/config.md`.
+    Since 2026-11-11 the guides name the code-convention pieces by their
+    owning guide: the shared types and `@blog/utils` primitives (with the
+    helpers deliberately not built) in `config.md`; the preset's reset
+    flags, service's `query` mock, `useTestTenant` and
+    `mockValidationContext` in `testing-practices`; the
+    `lib/styling` recipes in `ui-library-practices`; the admin focus-ring
+    and transition classes and `Card isDanger` in `platform-ui-practices`.
   - Test setup — render wrappers, `beforeEach`/setup helpers, `__mocks__/`,
     fixture builders → `testing-practices`.
   - Manual-test issues → `develop-feature` §2; the issue template is in

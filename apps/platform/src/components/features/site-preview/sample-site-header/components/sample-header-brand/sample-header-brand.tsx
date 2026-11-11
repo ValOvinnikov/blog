@@ -1,5 +1,6 @@
 import { SIZE, type TMaybeUndefined } from '@blog/config';
 import { BrandMark } from '@blog/ui/components/atoms/brand-mark';
+import { SAMPLE_PART } from '@platform/constants/sample-part';
 
 import { sampleHeaderBrandVariants } from './sample-header-brand-variants';
 
@@ -22,7 +23,7 @@ export const SampleHeaderBrand = ({
   });
 
   return (
-    <div className={root()}>
+    <div className={root()} data-part={SAMPLE_PART.BRAND}>
       <BrandMark size={SIZE.SM} title={name} src={logoSrc} className={mark()} />
       <span className={label()}>{name}</span>
     </div>

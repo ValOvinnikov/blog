@@ -1,6 +1,7 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, SPACING_SCALE } from '@blog/config';
 
 import { BAND_SPACING_BOTTOM, BAND_SPACING_TOP } from './band-spacing';
+import { BANNER_LAYOUT, BANNER_POSITION } from './banner-layout';
 import { FULL_BLEED, MEDIA_MAX_WIDTH } from './full-bleed';
 import {
   BRAND_SCRIM_CENTER,
@@ -20,12 +21,12 @@ import { tv } from './tv';
 
 const NEUTRAL_TONES = [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY];
 
-/** The IMAGE_SCRIM surface: the tone's full-bleed band, sized and padded by the band ladder, optionally carrying a photo under a scrim. */
+/** The IMAGE_SCRIM surface: the tone's full-bleed band with its copy held to the page column, optionally carrying a photo under a scrim. */
 export const bannerVariants = tv({
   slots: {
     root: [
       ...FULL_BLEED,
-      'isolate flex flex-col justify-center overflow-hidden rounded-none',
+      ...BANNER_LAYOUT,
       'min-h-[calc(var(--banner-top)+var(--banner-bottom))] px-gutter',
     ],
     media: [
@@ -54,11 +55,7 @@ export const bannerVariants = tv({
         text: ['text-on-image-muted'],
       },
     },
-    position: {
-      [CONTENT_ALIGNMENT.LEFT]: { root: ['items-center sm:items-start'] },
-      [CONTENT_ALIGNMENT.CENTER]: { root: ['items-center'] },
-      [CONTENT_ALIGNMENT.RIGHT]: { root: ['items-center sm:items-end'] },
-    },
+    position: BANNER_POSITION,
     // A banner keeps a gutter-sized floor at NONE so its copy never meets the photo's edge.
     spacingTop: {
       [SPACING_SCALE.NONE]: {

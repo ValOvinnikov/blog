@@ -133,8 +133,8 @@ export const LookPreview = ({
             onHandScroll={follow.onHandScroll}
           >
             {sample}
-            {follow.isFollowing && follow.row && (
-              <LookFollowMark row={follow.row} scale={scale} />
+            {follow.isFollowing && follow.outline && (
+              <LookFollowMark outline={follow.outline} scale={scale} />
             )}
           </DeviceFrame>
         </PreviewFrame.Stage>

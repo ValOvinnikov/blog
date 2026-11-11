@@ -43,6 +43,7 @@ export const FONT_CHOICE = {
 export type TFontChoice = TValueOf<typeof FONT_CHOICE>;
 
 export const RADIUS_SCALE = {
+  NONE: 'NONE',
   SM: 'SM',
   MD: 'MD',
   LG: 'LG',
@@ -52,6 +53,7 @@ export const RADIUS_SCALE = {
 export type TRadiusScale = TValueOf<typeof RADIUS_SCALE>;
 
 export const RADIUS_SCALE_LABEL: Record<TRadiusScale, string> = {
+  [RADIUS_SCALE.NONE]: 'None',
   [RADIUS_SCALE.SM]: 'Small',
   [RADIUS_SCALE.MD]: 'Medium',
   [RADIUS_SCALE.LG]: 'Large',

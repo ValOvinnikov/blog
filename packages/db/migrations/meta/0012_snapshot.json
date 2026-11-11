@@ -1,5 +1,5 @@
 {
-  "id": "03e19587-7f52-479a-a928-a9403bdc8ad3",
+  "id": "a35e35cb-4242-4cd0-97b9-b1910e27b9a0",
   "prevId": "4d5fb2c7-8d95-4587-ba20-f1a063117f54",
   "version": "7",
   "dialect": "postgresql",
@@ -2452,7 +2452,7 @@
     "public.radius_scale": {
       "name": "radius_scale",
       "schema": "public",
-      "values": ["SM", "MD", "LG", "XL"]
+      "values": ["NONE", "SM", "MD", "LG", "XL"]
     },
     "public.spinner_style": {
       "name": "spinner_style",
@@ -2485,7 +2485,7 @@
     "public.tenant_status": {
       "name": "tenant_status",
       "schema": "public",
-      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED", "TRIAL", "PAST_DUE"]
+      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED"]
     }
   },
   "schemas": {},

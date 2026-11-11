@@ -1,4 +1,5 @@
 import { RuleTester } from 'eslint';
+import tseslint from 'typescript-eslint';
 
 import { createPreferSharedConstantRule } from './prefer-shared-constant.js';
 
@@ -27,6 +28,9 @@ const index = {
       },
     ],
     ' ': [configEntry('KEY.SPACE')],
+    button: [configEntry('PART.BUTTON')],
+    _blank: [configEntry('LINK_TARGET.BLANK')],
+    brand: [configEntry('SLOT.BRAND')],
     LIGHT: [
       {
         ref: 'PREVIEW_MODE.LIGHT',
@@ -60,6 +64,14 @@ const NOT_FOUND = {
     consts: 'HTTP_STATUS.NOT_FOUND (@blog/config/constants)',
   },
 };
+const BUTTON = {
+  messageId: 'preferSharedConstant',
+  data: {
+    value: "'button'",
+    consts: 'PART.BUTTON (@blog/config/constants)',
+  },
+};
+const typescript = { parser: tseslint.parser };
 const INTERNAL = {
   messageId: 'preferSharedConstant',
   data: {
@@ -105,6 +117,27 @@ ruleTester.run('prefer-shared-constant', rule, {
       code: 'export const isMissing = (code) => code === 404;',
       filename: '/repo/packages/config/src/constants/x.ts',
     },
+    {
+      code: "screen.getByRole('button'); within(x).findAllByRole('button');",
+      filename: WEB_TEST,
+    },
+    { code: "vi.stubEnv('MODE', 'button');", filename: WEB_TEST },
+    {
+      code: 'const el = <button type="button" />; const s = <button type="submit" />;',
+      filename: WEB_SOURCE,
+    },
+    { code: 'const el = <a target="_blank" />;', filename: WEB_SOURCE },
+    { code: "const link = { target: '_blank' };", filename: WEB_SOURCE },
+    {
+      code: "type TBrand = TProps['brand'];",
+      filename: WEB_SOURCE,
+      languageOptions: typescript,
+    },
+    {
+      code: "type TPart = 'button' | 'brand';",
+      filename: WEB_SOURCE,
+      languageOptions: typescript,
+    },
   ],
   invalid: [
     {
@@ -145,6 +178,21 @@ ruleTester.run('prefer-shared-constant', rule, {
     },
     {
       code: 'const el = <Link type="INTERNAL" />;',
+      filename: WEB_SOURCE,
+      errors: [INTERNAL],
+    },
+    {
+      code: "const part = 'button';",
+      filename: WEB_SOURCE,
+      errors: [BUTTON],
+    },
+    {
+      code: 'const el = <div data-part="button" />;',
+      filename: WEB_SOURCE,
+      errors: [BUTTON],
+    },
+    {
+      code: 'const el = <input type="INTERNAL" />;',
       filename: WEB_SOURCE,
       errors: [INTERNAL],
     },

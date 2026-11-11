@@ -210,7 +210,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **PRESET_ID**: `CONSOLE`, `EDITORIAL`
 - **FONT_CHOICE**: `SPACE_GROTESK`, `NEWSREADER`, `JETBRAINS_MONO`, `FRAUNCES`, `INTER`
-- **RADIUS_SCALE**: `SM`, `MD`, `LG`, `XL`
+- **RADIUS_SCALE**: `NONE`, `SM`, `MD`, `LG`, `XL`
 - **DENSITY**: `DEFAULT`, `COMPACT`
 - **LANGUAGE_SWITCHER_STYLE**: `MENU_CODE`, `MENU_GLOBE`, `CODES`
 
@@ -486,9 +486,9 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **LOOK_FOLLOW_TARGET**: `IDLE`, `UNEDITED`, `ALL_OPEN`, `STYLE`, `PART`
 - **LOOK_FOLLOW_OUTCOME**: `IN_VIEW`, `FITS`, `AT_TOP`, `AT_END`, `NEARLY_FITS`
-- **LOOK_FOLLOW_MARK**: `OUTLINE_WIDTH`=`2`, `TAG_FONT_SIZE`=`11`, `TAG_HEIGHT`=`20`, `TAG_PADDING_X`=`7`, `TAG_RADIUS`=`3`
+- **LOOK_FOLLOW_MARK**: `OUTLINE_WIDTH`=`2`, `TAG_FONT_SIZE`=`11`, `TAG_HEIGHT`=`20`, `TAG_PADDING_X`=`7`, `TAG_RADIUS`=`3`, `OUTLINE_OFFSET`=`3`
 - **LOOK_FOLLOW_LIMIT**: `OVERFLOW_STEP`=`10`, `NEARLY_FITS_SCREENS`=`2`, `SCROLL_TOLERANCE`=`1`, `SETTLE_STILL_FRAMES`=`3`, `SETTLE_TIMEOUT_MS`=`1500`
-- **LOOK_FOLLOW_TEST_ID**: `OUTLINE`=`"look-follow-outline"`
+- **LOOK_FOLLOW_TEST_ID**: `OUTLINE`=`"look-follow-outline"`, `TAG`=`"look-follow-tag"`
 
 ### `@platform/constants/look-fullscreen` — `apps/platform/src/constants/look-fullscreen.ts`
 
@@ -575,7 +575,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/sample-part` — `apps/platform/src/constants/sample-part.ts`
 
-- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`
+- **SAMPLE_PART**: `HEADER`=`"header"`, `FOOTER`=`"footer"`, `BRAND`=`"brand"`, `POST_CARD`=`"post-card"`, `POST_IMAGE`=`"post-image"`, `FAQ_ITEM`=`"faq-item"`, `FORM_FIELD`=`"form-field"`, `QUOTE_CARD`=`"quote-card"`, `CTA_BOX`=`"cta-box"`, `BUTTON`=`"button"`, `BUSY_BUTTON`=`"busy-button"`
 
 ### `@platform/constants/segmented-control` — `apps/platform/src/constants/segmented-control.ts`
 
