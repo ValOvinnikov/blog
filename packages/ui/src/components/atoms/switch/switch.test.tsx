@@ -34,39 +34,54 @@ describe(`<${Switch.name}/>`, () => {
     expect(control).toBeChecked();
   });
 
-  it('calls onChange with the next value when clicked', async () => {
-    setup({ onChange });
+  describe('when unlocked', () => {
+    beforeEach(() => {
+      setup({ onChange });
+    });
 
-    const control = screen.getByRole('switch');
-    await user.click(control);
+    it('calls onChange with the next value when clicked', async () => {
+      const control = screen.getByRole('switch');
+      await user.click(control);
 
-    expect(onChange).toHaveBeenCalledWith(true);
+      expect(onChange).toHaveBeenCalledWith(true);
+    });
+
+    it('calls onChange when activated by keyboard', async () => {
+      await user.tab();
+      await user.keyboard(' ');
+
+      expect(onChange).toHaveBeenCalledWith(true);
+    });
   });
 
-  it('calls onChange when activated by keyboard', async () => {
-    setup({ onChange });
+  describe('when locked', () => {
+    let control: HTMLElement;
 
-    await user.tab();
-    await user.keyboard(' ');
+    beforeEach(() => {
+      setup({ isChecked: true, isLocked: true, onChange });
+      control = screen.getByRole('switch');
+    });
 
-    expect(onChange).toHaveBeenCalledWith(true);
-  });
+    it('stays checked and aria-disabled', () => {
+      expect(control).toBeChecked();
+      expect(control).toBeEnabled();
+      expect(control).toHaveAttribute('aria-disabled', 'true');
+    });
 
-  it('renders a locked switch as checked and disabled', () => {
-    setup({ isChecked: true, isLocked: true });
+    it('does not call onChange when clicked', async () => {
+      await user.click(control);
 
-    const control = screen.getByRole('switch');
+      expect(onChange).not.toHaveBeenCalled();
+      expect(control).toBeChecked();
+    });
 
-    expect(control).toBeChecked();
-    expect(control).toBeDisabled();
-  });
+    it('is reached by Tab and ignores Space', async () => {
+      await user.tab();
+      await user.keyboard(' ');
 
-  it('does not call onChange when a locked switch is clicked', async () => {
-    setup({ isChecked: true, isLocked: true, onChange });
-
-    const control = screen.getByRole('switch');
-    await user.click(control);
-
-    expect(onChange).not.toHaveBeenCalled();
+      expect(control).toHaveFocus();
+      expect(control).toBeChecked();
+      expect(onChange).not.toHaveBeenCalled();
+    });
   });
 });
