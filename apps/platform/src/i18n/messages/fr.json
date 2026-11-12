@@ -2005,7 +2005,7 @@
     "pausedSince": "Les nouveaux articles ne sont pas envoyés aux abonnés. En pause depuis le <time>{date}</time>.",
     "openDialogButton": "Lever la pause",
     "dialogTitle": "Lever la pause de la newsletter ?",
-    "dialogDescription": "Les nouveaux articles sont de nouveau envoyés aux abonnés. Si les taux de délivrabilité restent trop élevés, le prochain envoi remet la newsletter en pause.",
+    "dialogDescription": "Les nouveaux articles sont de nouveau envoyés aux abonnés. Si les taux de rebond ou de plainte restent trop élevés, le prochain envoi remet la newsletter en pause.",
     "confirmButton": "Lever la pause",
     "confirmingButton": "Levée en cours…",
     "alreadyCleared": "La pause a déjà été levée.",

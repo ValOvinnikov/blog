@@ -2005,7 +2005,7 @@
     "pausedSince": "Nieuwe berichten worden niet naar abonnees gemaild. Gepauzeerd sinds <time>{date}</time>.",
     "openDialogButton": "Pauze opheffen",
     "dialogTitle": "Nieuwsbriefpauze opheffen?",
-    "dialogDescription": "Nieuwe berichten worden weer naar abonnees gemaild. Zijn de afleverpercentages nog te hoog, dan pauzeert de volgende verzending de nieuwsbrief opnieuw.",
+    "dialogDescription": "Nieuwe berichten worden weer naar abonnees gemaild. Zijn de bounce- of klachtpercentages nog te hoog, dan pauzeert de volgende verzending de nieuwsbrief opnieuw.",
     "confirmButton": "Pauze opheffen",
     "confirmingButton": "Bezig met opheffen…",
     "alreadyCleared": "De pauze was al opgeheven.",

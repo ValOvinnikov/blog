@@ -17,11 +17,14 @@ import { NewsletterPauseCard } from './newsletter-pause-card';
 vi.mock('@platform/server/newsletter-pause/clear-newsletter-pause-action');
 
 const { newsletterPauseCard } = messages;
+const OPEN_DIALOG_BUTTON = { name: newsletterPauseCard.openDialogButton };
 const CONFIRM_BUTTON = { name: newsletterPauseCard.confirmButton };
+const DIALOG = { name: newsletterPauseCard.dialogTitle };
 
 const setup = customRender(NewsletterPauseCard, {
   tenantId: MOCK_TENANT_ID,
   pausedAt: MOCK_NEWSLETTER_PAUSED_AT,
+  canClear: true,
 });
 
 describe(`<${NewsletterPauseCard.name}/>`, () => {
@@ -31,10 +34,11 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
   beforeEach(() => {
     user = userEvent.setup();
     refresh = mockRouterRefresh();
-    setup();
   });
 
   it('shows that the newsletter is paused and since when', () => {
+    setup();
+
     const heading = screen.getByRole('heading', {
       name: newsletterPauseCard.title,
     });
@@ -48,18 +52,25 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
     );
   });
 
+  it('offers no clear action to an admin who cannot clear the pause', () => {
+    setup({ canClear: false });
+
+    const openDialog = screen.queryByRole('button', OPEN_DIALOG_BUTTON);
+    const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
+
+    expect(openDialog).not.toBeInTheDocument();
+    expect(pausedOn).toBeVisible();
+  });
+
   describe('with the clear dialog open', () => {
     beforeEach(async () => {
-      const openDialog = screen.getByRole('button', {
-        name: newsletterPauseCard.openDialogButton,
-      });
+      setup();
+      const openDialog = screen.getByRole('button', OPEN_DIALOG_BUTTON);
       await user.click(openDialog);
     });
 
     it('clears the pause only after the operator confirms, then refreshes', async () => {
-      const dialog = await screen.findByRole('alertdialog', {
-        name: newsletterPauseCard.dialogTitle,
-      });
+      const dialog = await screen.findByRole('alertdialog', DIALOG);
 
       expect(dialog).toBeVisible();
       expect(clearNewsletterPauseAction).not.toHaveBeenCalled();
@@ -71,36 +82,38 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       expect(refresh).toHaveBeenCalledTimes(1);
     });
 
-    it.each([
-      {
-        failure: 'a pause already cleared',
-        result: {
-          outcome: ACTION_OUTCOME.REFUSED,
-          reason: NEWSLETTER_PAUSE_REFUSAL.NOT_PAUSED,
-        },
-        message: newsletterPauseCard.alreadyCleared,
-      },
-      {
-        failure: 'a failed clear',
-        result: { outcome: ACTION_OUTCOME.SERVER_ERROR },
-        message: newsletterPauseCard.clearFailed,
-      },
-    ] as const)(
-      'keeps the dialog open with the error for $failure',
-      async ({ result, message }) => {
-        vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce(result);
+    it('keeps the dialog open with the error for a failed clear', async () => {
+      vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.SERVER_ERROR,
+      });
 
-        const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
-        await user.click(confirm);
+      const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+      await user.click(confirm);
 
-        const error = await screen.findByText(message);
+      const error = await screen.findByText(newsletterPauseCard.clearFailed);
+      const dialog = screen.getByRole('alertdialog', DIALOG);
 
-        expect(error).toBeVisible();
-        expect(refresh).not.toHaveBeenCalled();
-      },
-    );
+      expect(error).toBeVisible();
+      expect(dialog).toBeVisible();
+      expect(refresh).not.toHaveBeenCalled();
+    });
 
-    it('shows the failure when the request never reaches the server', async () => {
+    it('says the pause was already cleared and refreshes the page', async () => {
+      vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: NEWSLETTER_PAUSE_REFUSAL.NOT_PAUSED,
+      });
+
+      const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+      await user.click(confirm);
+
+      const error = await screen.findByText(newsletterPauseCard.alreadyCleared);
+
+      expect(error).toBeVisible();
+      expect(refresh).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps the dialog open with the error when the request never reaches the server', async () => {
       vi.mocked(clearNewsletterPauseAction).mockRejectedValueOnce(
         MOCK_UNREACHED_REQUEST,
       );
@@ -109,8 +122,10 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       await user.click(confirm);
 
       const error = await screen.findByText(newsletterPauseCard.clearFailed);
+      const dialog = screen.getByRole('alertdialog', DIALOG);
 
       expect(error).toBeVisible();
+      expect(dialog).toBeVisible();
       expect(refresh).not.toHaveBeenCalled();
     });
   });

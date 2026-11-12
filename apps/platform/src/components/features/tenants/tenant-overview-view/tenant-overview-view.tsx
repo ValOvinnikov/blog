@@ -10,7 +10,8 @@ import { NewsletterPauseCard } from '@platform/components/features/tenants/newsl
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { PlatformTenantNotice } from '@platform/components/features/tenants/platform-tenant-notice';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
-import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
+import { TenantOverviewFocusProvider } from '@platform/components/features/tenants/tenant-overview-focus-provider';
+import { TenantOverviewHeader } from '@platform/components/features/tenants/tenant-overview-header';
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
@@ -39,6 +40,8 @@ export const TenantOverviewView = async ({
     status,
     deprovisionedAt,
     unsentReinviteFormerOwnerEmailEncrypted,
+    name,
+    plan,
   } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
@@ -66,51 +69,60 @@ export const TenantOverviewView = async ({
   const { root, cardsGrid, cardsColumn } = tenantOverviewViewVariants();
 
   return (
-    <div className={root()}>
-      <TenantPageHeader tenant={tenant} />
+    <TenantOverviewFocusProvider>
+      <div className={root()}>
+        <TenantOverviewHeader tenant={{ name, status, plan, primaryDomain }} />
 
-      <TenantProvisioningSection
-        tenant={clientTenant}
-        owner={owner}
-        isPrimaryCustom={isCustomDomain(primaryDomain, env.TENANT_ROOT_DOMAIN)}
-        isStudioReinviteUnsent={
-          !isNull(unsentReinviteFormerOwnerEmailEncrypted)
-        }
-      />
-
-      <FindingsCard tenantId={id} findings={findings} />
-
-      <div className={cardsGrid()}>
-        <div className={cardsColumn()}>
-          <Suspense fallback={<DomainCardSkeleton />}>
-            <LiveDomainCard
-              tenant={clientTenant}
-              domainVerificationStatus={domainVerificationStatus}
-              dnsHref={adminRoutes.tenantDomain(id)}
-            />
-          </Suspense>
-          <OwnerCard owner={owner} />
-          {!isUndefined(newsletterPausedAt) && (
-            <NewsletterPauseCard tenantId={id} pausedAt={newsletterPausedAt} />
+        <TenantProvisioningSection
+          tenant={clientTenant}
+          owner={owner}
+          isPrimaryCustom={isCustomDomain(
+            primaryDomain,
+            env.TENANT_ROOT_DOMAIN,
           )}
-          {canChangeSuspension &&
-            (isSuspensionControlShown ? (
-              <TenantSuspensionControl
+          isStudioReinviteUnsent={
+            !isNull(unsentReinviteFormerOwnerEmailEncrypted)
+          }
+        />
+
+        <FindingsCard tenantId={id} findings={findings} />
+
+        <div className={cardsGrid()}>
+          <div className={cardsColumn()}>
+            <Suspense fallback={<DomainCardSkeleton />}>
+              <LiveDomainCard
                 tenant={clientTenant}
-                suspension={suspension}
+                domainVerificationStatus={domainVerificationStatus}
+                dnsHref={adminRoutes.tenantDomain(id)}
               />
-            ) : (
-              <PlatformTenantNotice />
-            ))}
-        </div>
-        <div className={cardsColumn()}>
-          <ContentWorkspaceCard tenant={clientTenant} />
-          <RecentActivityCard
-            events={auditEvents}
-            viewAllHref={adminRoutes.tenantActivity(id)}
-          />
+            </Suspense>
+            <OwnerCard owner={owner} />
+            {!isUndefined(newsletterPausedAt) && (
+              <NewsletterPauseCard
+                tenantId={id}
+                pausedAt={newsletterPausedAt}
+                canClear={isSuperAdmin(admin)}
+              />
+            )}
+            {canChangeSuspension &&
+              (isSuspensionControlShown ? (
+                <TenantSuspensionControl
+                  tenant={clientTenant}
+                  suspension={suspension}
+                />
+              ) : (
+                <PlatformTenantNotice />
+              ))}
+          </div>
+          <div className={cardsColumn()}>
+            <ContentWorkspaceCard tenant={clientTenant} />
+            <RecentActivityCard
+              events={auditEvents}
+              viewAllHref={adminRoutes.tenantActivity(id)}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </TenantOverviewFocusProvider>
   );
 };

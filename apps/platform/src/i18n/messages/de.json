@@ -2005,7 +2005,7 @@
     "pausedSince": "Neue Beiträge werden nicht an Abonnenten gesendet. Pausiert seit <time>{date}</time>.",
     "openDialogButton": "Pause aufheben",
     "dialogTitle": "Newsletter-Pause aufheben?",
-    "dialogDescription": "Neue Beiträge werden wieder an Abonnenten gesendet. Sind die Zustellraten weiterhin zu hoch, pausiert der nächste Versand den Newsletter erneut.",
+    "dialogDescription": "Neue Beiträge werden wieder an Abonnenten gesendet. Sind die Bounce- oder Beschwerderaten weiterhin zu hoch, pausiert der nächste Versand den Newsletter erneut.",
     "confirmButton": "Pause aufheben",
     "confirmingButton": "Wird aufgehoben…",
     "alreadyCleared": "Die Pause wurde bereits aufgehoben.",

@@ -7,11 +7,13 @@ import { useLocale, useTranslations } from 'next-intl';
 export type TNewsletterPauseCardProps = {
   tenantId: string;
   pausedAt: Date;
+  canClear: boolean;
 };
 
 export const NewsletterPauseCard = ({
   tenantId,
   pausedAt,
+  canClear,
 }: TNewsletterPauseCardProps) => {
   const t = useTranslations('newsletterPauseCard');
   const locale = useLocale();
@@ -20,7 +22,9 @@ export const NewsletterPauseCard = ({
     <Card>
       <Card.Header
         title={t('title')}
-        actions={<ClearNewsletterPauseControl tenantId={tenantId} />}
+        actions={
+          canClear && <ClearNewsletterPauseControl tenantId={tenantId} />
+        }
       />
       <Card.Body>
         <Text>

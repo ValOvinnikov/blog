@@ -30,6 +30,7 @@ import {
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
+import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   ARCHIVED_NOTICE_DESCRIPTION,
   ARCHIVED_NOTICE_TEXT,
@@ -56,6 +57,7 @@ import {
   mockJoinedOwner,
 } from '@platform/testing/tenants/fixtures';
 import { STEP_POLL_INTERVAL_MS } from '@platform/utils/use-deprovisioning-poll/use-deprovisioning-poll';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TenantOverviewView } from './tenant-overview-view';
 
@@ -204,25 +206,67 @@ describe(`<${TenantOverviewView.name}/>`, () => {
 
   describe('newsletter pause', () => {
     const PAUSE_HEADING = { name: en.newsletterPauseCard.title };
-
-    it('shows a paused newsletter and the date it was paused', async () => {
-      getNewsletterPausedAtMock.mockResolvedValue(MOCK_NEWSLETTER_PAUSED_AT);
-
-      await setup();
-
-      const pauseHeading = screen.getByRole('heading', PAUSE_HEADING);
-      const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
-
-      expect(pauseHeading).toBeVisible();
-      expect(pausedOn).toBeVisible();
-    });
+    const CLEAR_PAUSE_BUTTON = {
+      name: en.newsletterPauseCard.openDialogButton,
+    };
 
     it('shows no newsletter pause for a site that is not paused', async () => {
-      await setup({ tenant: mockTenant() });
+      await setup();
 
       const pauseHeading = screen.queryByRole('heading', PAUSE_HEADING);
 
       expect(pauseHeading).not.toBeInTheDocument();
+    });
+
+    describe('on a paused site', () => {
+      let user: UserEvent;
+
+      beforeEach(() => {
+        user = userEvent.setup();
+        getNewsletterPausedAtMock.mockResolvedValue(MOCK_NEWSLETTER_PAUSED_AT);
+      });
+
+      it('shows the pause and its date', async () => {
+        await setup();
+
+        const pauseHeading = screen.getByRole('heading', PAUSE_HEADING);
+        const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
+
+        expect(pauseHeading).toBeVisible();
+        expect(pausedOn).toBeVisible();
+      });
+
+      it('moves focus to the page heading once a super admin clears the pause', async () => {
+        const refresh = mockRouterRefresh();
+        await setup();
+
+        const openDialog = screen.getByRole('button', CLEAR_PAUSE_BUTTON);
+        await user.click(openDialog);
+        const confirm = await screen.findByRole('button', {
+          name: en.newsletterPauseCard.confirmButton,
+        });
+        await user.click(confirm);
+
+        const pageHeading = screen.getByRole('heading', { level: 1 });
+
+        expect(pageHeading).toHaveFocus();
+        expect(refresh).toHaveBeenCalledTimes(1);
+      });
+
+      it('shows a moderator the pause without the clear action', async () => {
+        requireAdminMock.mockResolvedValue({
+          id: MOCK_ADMIN_ID,
+          role: ADMIN_ROLE.MODERATOR,
+        });
+
+        await setup();
+
+        const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
+        const clearPause = screen.queryByRole('button', CLEAR_PAUSE_BUTTON);
+
+        expect(pausedOn).toBeVisible();
+        expect(clearPause).not.toBeInTheDocument();
+      });
     });
   });
 
@@ -274,8 +318,9 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(saveButton).toBeDisabled();
   });
 
-  it('locks the domain once it is connected and a later step failed', async () => {
-    await setup({
+  it.each([
+    {
+      lock: 'once it is connected and a later step failed',
       tenant: mockTenant({
         provisioningSteps: {
           ...mockDoneProvisioningSteps(),
@@ -285,7 +330,16 @@ describe(`<${TenantOverviewView.name}/>`, () => {
           },
         },
       }),
-    });
+      reason:
+        'Locked — the "Connect domain" step has already completed and used this value.',
+    },
+    {
+      lock: 'while the main address is the custom domain',
+      tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+      reason: en.tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
+    },
+  ])('locks the domain field $lock', async ({ tenant, reason }) => {
+    await setup({ tenant });
 
     const domainInput = screen.getByRole('textbox', {
       name: PRIMARY_DOMAIN_LABEL,
@@ -293,24 +347,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     const nameInput = screen.getByRole('textbox', { name: 'Name' });
 
     expect(domainInput).toBeDisabled();
-    expect(domainInput).toHaveAccessibleDescription(
-      'Locked — the "Connect domain" step has already completed and used this value.',
-    );
-    expect(nameInput).not.toBeDisabled();
-  });
-
-  it('locks the domain field while the main address is the custom domain', async () => {
-    await setup({ tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }) });
-
-    const domainInput = screen.getByRole('textbox', {
-      name: PRIMARY_DOMAIN_LABEL,
-    });
-    const nameInput = screen.getByRole('textbox', { name: 'Name' });
-
-    expect(domainInput).toBeDisabled();
-    expect(domainInput).toHaveAccessibleDescription(
-      en.tenantDetailsPanel.fieldLockedReasonCustomMainDomain,
-    );
+    expect(domainInput).toHaveAccessibleDescription(reason);
     expect(nameInput).not.toBeDisabled();
   });
 

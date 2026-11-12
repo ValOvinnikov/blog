@@ -2005,7 +2005,7 @@
     "pausedSince": "Las nuevas entradas no se envían a los suscriptores. En pausa desde <time>{date}</time>.",
     "openDialogButton": "Quitar pausa",
     "dialogTitle": "¿Quitar la pausa del boletín?",
-    "dialogDescription": "Las nuevas entradas vuelven a enviarse a los suscriptores. Si las tasas de entrega siguen siendo demasiado altas, el próximo envío vuelve a pausar el boletín.",
+    "dialogDescription": "Las nuevas entradas vuelven a enviarse a los suscriptores. Si las tasas de rebote o de quejas siguen siendo demasiado altas, el próximo envío vuelve a pausar el boletín.",
     "confirmButton": "Quitar pausa",
     "confirmingButton": "Quitando…",
     "alreadyCleared": "La pausa ya se había quitado.",

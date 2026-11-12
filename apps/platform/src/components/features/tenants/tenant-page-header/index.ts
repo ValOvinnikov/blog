@@ -1,1 +1,4 @@
-export { TenantPageHeader } from './tenant-page-header';
+export {
+  TenantPageHeader,
+  type TTenantPageHeaderProps,
+} from './tenant-page-header';
