@@ -54,7 +54,7 @@ const isInString = (text, index) => {
   return quote !== undefined;
 };
 
-const matchesInCode = (pattern, text) => {
+export const matchesInCode = (pattern, text) => {
   const match = pattern.exec(text);
   return match !== null && !isInString(text, match.index);
 };

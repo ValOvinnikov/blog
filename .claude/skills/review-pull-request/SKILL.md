@@ -68,9 +68,11 @@ checkout's. Run `pnpm check:file-size` in the worktree as a probe:
   symlink). Let it finish before running anything else there.
 - **The install is blocked** (`pre-bash-worktree-install-guard.sh`) — your
   own session is a shared-deps worktree, and the guard reads your session's
-  directory, not the command's. Do not work around it: ask the user to bring
-  the primary checkout up to date (`git pull` and `pnpm install` there), then
-  probe again.
+  directory, not the command's. Do not work around it. Ask the user to run
+  that same install in the review worktree from their own terminal, giving
+  them the full command with the worktree's absolute path, then probe again.
+  It is the only fix when the PR changes `pnpm-lock.yaml`, and it never
+  touches the primary checkout: `rm` drops the symlink first.
 
 ## 3. Run the scripts yourself
 

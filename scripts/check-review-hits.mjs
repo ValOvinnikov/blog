@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import {
   GENERATED,
   isFile,
+  matchesInCode,
   readTouchedFiles,
   SOURCE_FILE,
   TEST_FILE,
@@ -40,12 +41,19 @@ const FIXTURE_FILE =
   /(\.test\.tsx?|\/testing\/.*\.tsx?|\/__mocks__\/.*\.tsx?)$/;
 const RENDERER_OR_ROUTE_TEST = /(module-renderer|\/src\/app\/.*)\.test/;
 const DIRECTIVE = /(eslint-disable|@ts-(ignore|expect-error|nocheck))/;
-const SECRET_NAME = '(_TOKEN|_SECRET|_KEY)[A-Z0-9_]*';
-const SECRET_VALUE = '[A-Za-z0-9_+/=.-]{12,}';
+const SECRET_NAME = '(_TOKEN|_SECRET|_KEY)\\b';
+const SECRET_VALUE = '([A-Za-z0-9_+/=.-]{12,})';
 const QUOTED_SECRET = new RegExp(
   `${SECRET_NAME}['"]?\\s*[:=]\\s*['"\`]${SECRET_VALUE}`,
 );
 const BARE_SECRET = new RegExp(`${SECRET_NAME}\\s*[:=]\\s*${SECRET_VALUE}`);
+const CONST_VALUE = /^[A-Z][A-Z0-9_]*$/;
+
+// A generated secret carries digits; vocabulary and copy do not.
+const looksGenerated = (value) =>
+  value !== undefined && /[0-9]/.test(value) && !CONST_VALUE.test(value);
+
+const TRAILING_COMMENT = /\s\/\/|\{\/\*/;
 
 const LINE_HITS = [
   {
@@ -56,12 +64,13 @@ const LINE_HITS = [
   {
     hit: HIT.SECRET,
     applies: () => true,
-    matches: (text) => QUOTED_SECRET.test(text),
+    matches: (text) => looksGenerated(QUOTED_SECRET.exec(text)?.[2]),
   },
   {
     hit: HIT.SECRET,
     applies: (file) => !SOURCE_FILE.test(file),
-    matches: (text) => BARE_SECRET.test(text) && !QUOTED_SECRET.test(text),
+    matches: (text) =>
+      !QUOTED_SECRET.test(text) && looksGenerated(BARE_SECRET.exec(text)?.[2]),
   },
   {
     hit: HIT.SANITY_PROJECT_ID,
@@ -99,7 +108,9 @@ const LINE_HITS = [
     hit: HIT.COMMENT,
     applies: (file) => SOURCE_FILE.test(file) && !TEST_FILE.test(file),
     matches: (text) =>
-      /(^\s*(\/\/|\/\*|\*(?!\/))|\s\/\/\s)/.test(text) && !DIRECTIVE.test(text),
+      (/^\s*(\/\/|\/\*|\*(?!\/))/.test(text) ||
+        matchesInCode(TRAILING_COMMENT, text)) &&
+      !DIRECTIVE.test(text),
   },
   {
     hit: HIT.UNNAMED_FIXTURE,

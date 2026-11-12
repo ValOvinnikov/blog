@@ -37,7 +37,8 @@ so the implementing session has already seen them pass; any hit is blocking.
 
 **Then `pnpm check:review-hits`** — the checks that need a reader, over the
 same files (`TOUCHED_BASE_REF=<sha>` narrows it to a fix round). It exits
-zero whatever it finds, and non-zero only when it cannot find a merge-base:
+zero whatever it finds, and non-zero only when git fails or finds no
+merge-base:
 read every hit, and a confirmed one is blocking unless its row
 allows it.
 

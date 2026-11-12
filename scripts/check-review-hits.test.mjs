@@ -55,6 +55,9 @@ describe('findReviewHits', () => {
           'RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET,',
           'envMock.INTERNAL_PAGES_SECRET = MOCK_OTHER_SECRET;',
           'const MOCK_SECRET = faker.string.alphanumeric(32);',
+          "PERSIST_TOKEN: 'PERSIST_TOKEN',",
+          "const DEPTH_STORAGE_KEY = 'reading-depth-total';",
+          "const PREVIEW_TOKEN_HEADER = 'x-preview-token-v2';",
         ),
       ]),
       [HIT.SECRET],
@@ -79,12 +82,14 @@ describe('findReviewHits', () => {
         added(
           COMPONENT,
           '  // tuned for the 390px viewport',
-          'const gap = 12; // tuned',
+          'const gap = 12; //tuned',
+          '      {/* spacer */}',
           "const url = 'https://example.com';",
+          "const separator = 'a // b';",
         ),
         added(COMPONENT_TEST, '// arrange'),
       ]),
-      [HIT.COMMENT, HIT.COMMENT],
+      [HIT.COMMENT, HIT.COMMENT, HIT.COMMENT],
     );
   });
 

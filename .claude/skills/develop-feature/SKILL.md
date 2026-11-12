@@ -295,8 +295,9 @@ SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
   `apps/web/src/app`. One diff can need both; neither substitutes for
   `reviewer` or for the other.
 - **Fix every blocking finding** through the owning agent, re-run step 5, and
-  re-dispatch the reviewer that raised it until every dispatched reviewer
-  passes (`APPROVE` / `PASS`). One reviewer's pass does not excuse another's
+  re-dispatch every reviewer this diff was given — the fix is code none of
+  them has seen, and it voids an earlier `APPROVE` — until each one passes
+  (`APPROVE` / `PASS`). One reviewer's pass does not excuse another's
   blocking result. A review that never ran is itself blocking — a small diff
   or green checks do not substitute.
 - **A fix round is a re-review.** Open the re-dispatch with
