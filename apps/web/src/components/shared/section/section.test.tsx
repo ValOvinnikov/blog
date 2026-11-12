@@ -1,6 +1,7 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, RADIUS_DECLARATIONS, RADIUS_SCALE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
+import { MOCK_SECTION_LOOK } from '@web/testing/shared/section-appearance/fixtures';
 
 import { Section } from './section';
 
@@ -21,20 +22,39 @@ const setup = customRender(Section, {
   ),
 });
 
+const RADIUS_TOKEN = '--radius-md';
+
 describe(`<${Section.name}/>`, () => {
-  beforeEach(() => {
-    setup();
+  describe('with default props', () => {
+    beforeEach(() => {
+      setup();
+    });
+
+    it('renders its children', () => {
+      const content = screen.getByText(MOCK_CONTENT);
+
+      expect(content).toBeVisible();
+    });
+
+    it('is a region named by the heading its titleId points at', () => {
+      const region = screen.getByRole('region', { name: MOCK_HEADING });
+
+      expect(region).toBeVisible();
+    });
   });
 
-  it('renders its children', () => {
-    const content = screen.getByText(MOCK_CONTENT);
+  it('scopes its style overrides to the region', () => {
+    setup({
+      appearance: {
+        overrides: { radiusScale: RADIUS_SCALE.XL },
+        look: MOCK_SECTION_LOOK,
+      },
+    });
 
-    expect(content).toBeVisible();
-  });
-
-  it('is a region named by the heading its titleId points at', () => {
     const region = screen.getByRole('region', { name: MOCK_HEADING });
 
-    expect(region).toBeVisible();
+    expect(region.style.getPropertyValue(RADIUS_TOKEN)).toBe(
+      RADIUS_DECLARATIONS[RADIUS_SCALE.XL][RADIUS_TOKEN],
+    );
   });
 });

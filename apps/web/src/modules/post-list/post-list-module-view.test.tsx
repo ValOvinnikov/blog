@@ -26,10 +26,9 @@ const MOCK_ARCHIVE_SLUG = faker.lorem.slug(2);
 const post = mockPostListItem();
 
 const setup = customRender(PostListModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   items: [post],
-  layout: undefined,
   contentAlignment: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,

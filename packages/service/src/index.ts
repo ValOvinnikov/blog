@@ -95,6 +95,7 @@ export type { TCtaButton } from './shared/transformers/cta/to-cta-button';
 export type { TFaqPageQuestion } from './shared/transformers/faq/resolve-faqs';
 export type { THeroPresentation } from './shared/transformers/hero/to-hero-presentation';
 export type { TModule } from './shared/transformers/module/to-module';
+export type { TModuleAppearance } from './shared/transformers/module/to-module-appearance';
 export type { TPersonCard } from './shared/transformers/person/to-person-card';
 export type {
   TPostCard,
