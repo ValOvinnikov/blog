@@ -2,6 +2,11 @@ import {
   renderEmailAction,
   type TEmailAction,
 } from '@blog/email/html/email-action/email-action';
+import {
+  detailsAsPlainText,
+  renderEmailDetails,
+  type TEmailDetail,
+} from '@blog/email/html/email-details/email-details';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import { buildPlatformShell } from '@blog/email/html/platform-shell/platform-shell';
@@ -12,6 +17,7 @@ export type TOwnerEmailInput = {
   subject: string;
   previewText?: string;
   paragraphs: string[];
+  details?: TEmailDetail[];
   action?: TEmailAction;
 };
 
@@ -26,11 +32,15 @@ export function buildOwnerEmail({
   subject,
   previewText,
   paragraphs,
+  details,
   action,
 }: TOwnerEmailInput): TOwnerEmail {
-  const bodyHtml = paragraphs
+  const paragraphsHtml = paragraphs
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join('');
+  const bodyHtml = details
+    ? paragraphsHtml + renderEmailDetails(details)
+    : paragraphsHtml;
 
   return {
     subject,
@@ -43,6 +53,9 @@ export function buildOwnerEmail({
         ? renderEmailAction(action, PLATFORM_EMAIL_BRAND)
         : undefined,
     }),
-    text: buildPlainTextBody(paragraphs, action),
+    text: buildPlainTextBody(
+      details ? [...paragraphs, detailsAsPlainText(details)] : paragraphs,
+      action,
+    ),
   };
 }

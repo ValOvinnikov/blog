@@ -1,4 +1,5 @@
 import type { TEmailAction } from '@blog/email/html/email-action/email-action';
+import type { TEmailDetail } from '@blog/email/html/email-details/email-details';
 import type { TOwnerEmailInput } from '@blog/email/templates/owner/owner-email/owner-email';
 import {
   MOCK_EMAIL_ACTION,
@@ -15,3 +16,8 @@ export const MOCK_OWNER_EMAIL_INPUT: TOwnerEmailInput & {
   paragraphs: [MOCK_UNSAFE_MARKUP],
   action: MOCK_EMAIL_ACTION,
 };
+
+export const MOCK_EMAIL_DETAILS: TEmailDetail[] = [
+  { label: 'Amount', value: '$29.00' },
+  { label: 'Plan', value: 'Growth' },
+];

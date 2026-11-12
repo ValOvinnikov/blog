@@ -11,6 +11,7 @@ import {
   MOCK_UNSAFE_MARKUP,
   MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
+import { MOCK_EMAIL_DETAILS } from '@blog/email/testing/owner-email';
 import { faker } from '@faker-js/faker';
 
 import { buildOwnerEmail } from './owner-email';
@@ -71,6 +72,34 @@ describe(buildOwnerEmail, () => {
     it('names the brand and the current year in the copyright line', () => {
       expect(email.html).toContain(
         `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${MOCK_PLATFORM_BRAND_NAME}`,
+      );
+    });
+  });
+
+  describe('with details', () => {
+    let email: ReturnType<typeof buildOwnerEmail>;
+
+    beforeEach(() => {
+      email = buildOwnerEmail({
+        brandName: MOCK_PLATFORM_BRAND_NAME,
+        subject: MOCK_EMAIL_SUBJECT,
+        paragraphs: [MOCK_PARAGRAPH],
+        details: MOCK_EMAIL_DETAILS,
+        action: MOCK_EMAIL_ACTION,
+      });
+    });
+
+    it('renders the details table after the paragraphs', () => {
+      expect(email.html).toContain(`<p>${MOCK_PARAGRAPH}</p><table`);
+    });
+
+    it('carries the details between the copy and the action as plain text', () => {
+      const detailLines = MOCK_EMAIL_DETAILS.map(
+        ({ label, value }) => `${label}: ${value}`,
+      ).join('\n');
+
+      expect(email.text).toBe(
+        `${MOCK_PARAGRAPH}\n\n${detailLines}\n\n${MOCK_EMAIL_ACTION.label}: ${MOCK_EMAIL_ACTION.url}`,
       );
     });
   });
