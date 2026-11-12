@@ -162,6 +162,13 @@
       "when": 1794494077278,
       "tag": "0022_curly_vulcan",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1794498424755,
+      "tag": "0023_tricky_bucky",
+      "breakpoints": true
     }
   ]
 }

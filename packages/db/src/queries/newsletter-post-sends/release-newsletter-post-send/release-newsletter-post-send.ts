@@ -1,6 +1,6 @@
 import { getDb } from '@blog/db/client';
 import { newsletterPostSends } from '@blog/db/schema/newsletter-post-sends';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 export async function releaseNewsletterPostSend(
   tenantId: string,
@@ -14,6 +14,7 @@ export async function releaseNewsletterPostSend(
         eq(newsletterPostSends.tenantId, tenantId),
         eq(newsletterPostSends.postId, postId),
         eq(newsletterPostSends.claimedAt, claimedAt),
+        isNull(newsletterPostSends.outcome),
       ),
     );
 }

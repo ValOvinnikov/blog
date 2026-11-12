@@ -1,5 +1,5 @@
 import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
-import { boolean, pgTable, text, uuid } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';
 import { tenants } from './tenants';
@@ -18,6 +18,7 @@ export const emailConfig = pgTable('email_config', {
   emailNewPosts: boolean('email_new_posts')
     .notNull()
     .default(EMAIL_NEW_POSTS_DEFAULT),
+  newsletterPausedAt: timestamp('newsletter_paused_at', { mode: 'date' }),
   ...timestampColumns,
 });
 
