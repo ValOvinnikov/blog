@@ -1,6 +1,7 @@
 import type { TOutcome } from '@blog/config';
 import type { TOAuthProvider } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
+import { ROW_LOCK } from '@blog/db/constants';
 import { accounts, users } from '@blog/db/schema/auth';
 import { hasLength } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
@@ -31,7 +32,7 @@ export async function unlinkProvider(
         .select({ provider: accounts.provider })
         .from(accounts)
         .where(eq(accounts.userId, userId))
-        .for('update'),
+        .for(ROW_LOCK.UPDATE),
     );
 
   const deletedRows = await db

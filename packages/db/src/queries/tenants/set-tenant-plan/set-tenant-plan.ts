@@ -1,5 +1,6 @@
 import { getDb } from '@blog/db/client';
 import {
+  ROW_LOCK,
   TENANT_PLAN_WRITE_OUTCOME,
   type TTenantPlan,
   type TTenantStatus,
@@ -17,6 +18,7 @@ export type TTenantPlanAndStatus = {
 export type TTenantPlanWrite =
   | ({
       outcome: typeof TENANT_PLAN_WRITE_OUTCOME.WRITTEN;
+      previousPlan: TTenantPlan;
     } & TTenantPlanAndStatus)
   | {
       outcome: typeof TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE;
@@ -29,16 +31,31 @@ export async function setTenantPlan(
   { plan, status }: TTenantPlanAndStatus,
 ): Promise<TTenantPlanWrite> {
   const db = getDb();
+  const previous = db
+    .$with('previous')
+    .as(
+      db
+        .select({ previousId: tenants.id, previousPlan: tenants.plan })
+        .from(tenants)
+        .where(eq(tenants.id, tenantId))
+        .for(ROW_LOCK.UPDATE),
+    );
   const [row] = await db
+    .with(previous)
     .update(tenants)
     .set({ ...planChangeFields(plan, status), status })
+    .from(previous)
     .where(
       and(
-        eq(tenants.id, tenantId),
+        eq(tenants.id, previous.previousId),
         inArray(tenants.status, WRITABLE_TENANT_STATUSES),
       ),
     )
-    .returning({ plan: tenants.plan, status: tenants.status });
+    .returning({
+      plan: tenants.plan,
+      status: tenants.status,
+      previousPlan: previous.previousPlan,
+    });
 
   if (row) {
     return { outcome: TENANT_PLAN_WRITE_OUTCOME.WRITTEN, ...row };

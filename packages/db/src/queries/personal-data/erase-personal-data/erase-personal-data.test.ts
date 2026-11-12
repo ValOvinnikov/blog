@@ -1,6 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { isSignupBlocked } from '@blog/db/queries/blocked-signup-identities/is-signup-blocked';
+import { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
 import {
   getUnsentStudioReinviteEmail,
   setUnsentStudioReinvite,
@@ -20,6 +21,7 @@ import {
   insertTestPersonalDataRows,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { readSelfServeIndex } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 
@@ -46,6 +48,7 @@ const SITE_RECORDS = {
   leads: 1,
   membershipInvites: 1,
   unsentStudioReinvites: 0,
+  selfServeOwnerSites: 0,
 };
 const ONE_OF_EACH = { ...SITE_RECORDS, readerAccounts: 1 };
 const NONE = {
@@ -53,6 +56,7 @@ const NONE = {
   leads: 0,
   membershipInvites: 0,
   unsentStudioReinvites: 0,
+  selfServeOwnerSites: 0,
   readerAccounts: 0,
 };
 
@@ -115,41 +119,12 @@ describe(erasePersonalData, () => {
     );
   });
 
-  it('revokes every session of the erased reader account', async () => {
-    const readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-    await db().insert(schema.sessions).values({
-      sessionToken: MOCK_SESSION_TOKEN,
-      userId: readerId,
-      expires: MOCK_SESSION_EXPIRES,
+  it("clears the mailbox's self-serve owner key, keeping another address's", async () => {
+    const { id: ownedTenantId } = await insertTestTenant(db(), {
+      selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
     });
-
-    await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
-
-    const sessions = await db().select().from(schema.sessions);
-    expect(sessions).toEqual([]);
-  });
-
-  it('leaves the reader account alone when it is out of scope', async () => {
-    const readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-
-    const result = await erasePersonalData(
-      MOCK_SUBSCRIBER_EMAIL,
-      WITHOUT_READER_ACCOUNT,
-    );
-
-    expect(result).toEqual(
-      erasure(MOCK_SUBSCRIBER_EMAIL, { ...SITE_RECORDS, readerAccounts: 0 }),
-    );
-    const keptReaderId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-    expect(keptReaderId).toBe(readerId);
-  });
-
-  it("refuses to delete a site owner's account but still erases the site records", async () => {
-    const readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-    await db().insert(schema.memberships).values({
-      tenantId,
-      userId: readerId,
-      role: MEMBERSHIP_ROLE.OWNER,
+    const { id: otherTenantId } = await insertTestTenant(db(), {
+      selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_INVITE_EMAIL),
     });
 
     const result = await erasePersonalData(
@@ -158,19 +133,86 @@ describe(erasePersonalData, () => {
     );
 
     expect(result).toEqual(
-      erasure(
-        MOCK_SUBSCRIBER_EMAIL,
-        { ...SITE_RECORDS, readerAccounts: 0 },
-        true,
-      ),
+      erasure(MOCK_SUBSCRIBER_EMAIL, {
+        ...ONE_OF_EACH,
+        selfServeOwnerSites: 1,
+      }),
     );
-    const keptReaderId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
-    expect(keptReaderId).toBe(readerId);
+    expect(await readSelfServeIndex(db(), ownedTenantId)).toBeNull();
+    expect(await readSelfServeIndex(db(), otherTenantId)).toBe(
+      testPersonalEmailIndex(MOCK_INVITE_EMAIL),
+    );
+  });
+
+  describe('with a reader account for the mailbox', () => {
+    let readerId: string;
+
+    beforeEach(async () => {
+      readerId = await getTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+    });
+
+    it('revokes every session of the erased reader account', async () => {
+      await db().insert(schema.sessions).values({
+        sessionToken: MOCK_SESSION_TOKEN,
+        userId: readerId,
+        expires: MOCK_SESSION_EXPIRES,
+      });
+
+      await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
+
+      const sessions = await db().select().from(schema.sessions);
+      expect(sessions).toEqual([]);
+    });
+
+    it('leaves the reader account alone when it is out of scope', async () => {
+      const result = await erasePersonalData(
+        MOCK_SUBSCRIBER_EMAIL,
+        WITHOUT_READER_ACCOUNT,
+      );
+
+      expect(result).toEqual(
+        erasure(MOCK_SUBSCRIBER_EMAIL, { ...SITE_RECORDS, readerAccounts: 0 }),
+      );
+      const keptReaderId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+      expect(keptReaderId).toBe(readerId);
+    });
+
+    it("refuses to delete a site owner's account but still erases the site records", async () => {
+      await db().insert(schema.memberships).values({
+        tenantId,
+        userId: readerId,
+        role: MEMBERSHIP_ROLE.OWNER,
+      });
+
+      const result = await erasePersonalData(
+        MOCK_SUBSCRIBER_EMAIL,
+        WITH_READER_ACCOUNT,
+      );
+
+      expect(result).toEqual(
+        erasure(
+          MOCK_SUBSCRIBER_EMAIL,
+          { ...SITE_RECORDS, readerAccounts: 0 },
+          true,
+        ),
+      );
+      const keptReaderId = await findTestReaderId(db(), MOCK_SUBSCRIBER_EMAIL);
+      expect(keptReaderId).toBe(readerId);
+    });
   });
 
   describe('once the mailbox has been erased', () => {
     beforeEach(async () => {
+      await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+      });
       await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
+    });
+
+    it('frees the Free-or-trial slot the address held through a self-serve site', async () => {
+      const result = await ownsFreeTenant(MOCK_SUBSCRIBER_EMAIL);
+
+      expect(result).toEqual(okResult(false));
     });
 
     it("keeps everyone else's rows", async () => {

@@ -9,6 +9,11 @@ import {
 } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
+import {
+  MOCK_RADIUS_OVERRIDE_SECTION,
+  MOCK_RADIUS_OVERRIDE_VALUE,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostLatestModuleView } from './post-latest-module-view';
 
@@ -23,10 +28,9 @@ const CAROUSEL_LABEL = `${MOCK_POST_LIST_HEADING} carousel`;
 const MOCK_POST_ITEM = mockPostListItem({ id: faker.string.uuid() });
 
 const setup = customRender(PostLatestModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   items: [MOCK_POST_ITEM],
-  layout: undefined,
   contentAlignment: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
@@ -82,6 +86,24 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       expect(carousel).not.toBeInTheDocument();
     });
   });
+
+  it.each([DISPLAY_MODE.GRID, DISPLAY_MODE.CAROUSEL])(
+    'scopes its style overrides to its section in %s mode',
+    (displayMode) => {
+      setup({
+        displayMode,
+        section: MOCK_RADIUS_OVERRIDE_SECTION,
+      });
+
+      const section = screen.getByRole('region', {
+        name: MOCK_POST_LIST_HEADING,
+      });
+
+      expect(section.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        MOCK_RADIUS_OVERRIDE_VALUE,
+      );
+    },
+  );
 
   it('renders a media region for each item when images are enabled', () => {
     setup({

@@ -1,5 +1,8 @@
 import { service } from '@blog/service';
+import { hasLength } from '@blog/utils/primitives';
+import { POST_LATEST_LOG } from '@web/constants/post-latest';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { toPostListItems } from '@web/utils/to-post-list-items';
@@ -11,14 +14,14 @@ export interface IPostLatestModuleProps {
 }
 
 export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.postLatest.v1.getPostLatest(
     id,
     sanityContext,
   );
 
   if (!result.ok) {
-    logger.error('post_latest_module.fetch_failed', {
+    logger.error(POST_LATEST_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });
@@ -33,6 +36,10 @@ export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
     contentAlignment,
     showImages,
     displayMode,
+    cardStyle,
+    radiusScale,
+    density,
+    columns,
   } = result.data;
 
   const items = await toPostListItems(
@@ -40,14 +47,20 @@ export const PostLatestModule = async ({ id }: IPostLatestModuleProps) => {
     showImages ? renderPostCardImage : undefined,
   );
 
-  if (items.length === 0) return null;
+  if (!hasLength(items)) return null;
+
+  const appearance = await getSectionAppearance(tenantId, {
+    cardStyle,
+    radiusScale,
+    density,
+  });
 
   return (
     <PostLatestModuleView
-      brandVariant={brandVariant}
+      section={{ brandVariant, layout, appearance }}
       headingBlock={headingBlock}
       items={items}
-      layout={layout}
+      columns={columns}
       contentAlignment={contentAlignment}
       hasImages={showImages}
       displayMode={displayMode}

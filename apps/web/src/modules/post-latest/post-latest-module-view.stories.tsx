@@ -1,7 +1,13 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  GRID_COLUMNS,
+} from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostLatestModuleView } from './post-latest-module-view';
 
@@ -29,9 +35,9 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
+    columns: {
       control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      options: [GRID_COLUMNS.TWO, GRID_COLUMNS.THREE, GRID_COLUMNS.FOUR],
     },
     contentAlignment: {
       control: 'select',
@@ -43,10 +49,9 @@ const meta = {
     },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Latest posts' }),
     items,
-    layout: undefined,
     contentAlignment: undefined,
     titleId: 'latest-posts-title',
     dataTestId: 'post-latest-module-post-latest-1',
@@ -60,7 +65,15 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
+};
+
+export const TwoColumns: TStory = {
+  args: { columns: GRID_COLUMNS.TWO },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
 };
 
 export const CenterAligned: TStory = {
@@ -105,4 +118,16 @@ export const CarouselFitsCenter: TStory = {
     contentAlignment: CONTENT_ALIGNMENT.CENTER,
     items: carouselItems.slice(0, 2),
   },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    items: carouselItems,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const FourColumns: TStory = {
+  args: { columns: GRID_COLUMNS.FOUR, items: carouselItems.slice(0, 4) },
 };

@@ -8,13 +8,13 @@ import {
 import { queries } from '@blog/db';
 import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { countPersonalDataMatches } from '@platform/server/data-requests/count-personal-data-matches';
 import {
   runDataRequest,
   type TDataRequestFailure,
   type TDataRequestInput,
 } from '@platform/server/data-requests/run-data-request';
 import {
-  countPersonalDataMatches,
   toDataRequestMatches,
   type TDataRequestMatch,
 } from '@platform/server/data-requests/to-data-request-matches';

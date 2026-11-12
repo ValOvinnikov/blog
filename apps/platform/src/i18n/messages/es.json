@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Datos personales borrados",
       "OAUTH_APP_SAVED": "App de inicio de sesión guardada",
       "OAUTH_APP_REPLACED": "App de inicio de sesión sustituida",
-      "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada"
+      "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada",
+      "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada"
     },
     "detail": {
       "field": {
@@ -1999,6 +2000,17 @@
     "alreadyRemoved": "Este bloqueo ya se había quitado.",
     "removalFailed": "No se pudo quitar el bloqueo. Inténtelo de nuevo."
   },
+  "newsletterPauseCard": {
+    "title": "Boletín en pausa",
+    "pausedSince": "Las nuevas entradas no se envían a los suscriptores. En pausa desde <time>{date}</time>.",
+    "openDialogButton": "Quitar pausa",
+    "dialogTitle": "¿Quitar la pausa del boletín?",
+    "dialogDescription": "Las nuevas entradas vuelven a enviarse a los suscriptores. Si las tasas de rebote o de quejas siguen siendo demasiado altas, el próximo envío vuelve a pausar el boletín.",
+    "confirmButton": "Quitar pausa",
+    "confirmingButton": "Quitando…",
+    "alreadyCleared": "La pausa ya se había quitado.",
+    "clearFailed": "No se pudo quitar la pausa. Inténtalo de nuevo."
+  },
   "addBlockedDomainCard": {
     "title": "Bloquear un dominio",
     "supportingText": "Se rechaza a todo el que tenga una dirección de correo de este dominio.",
@@ -2019,7 +2031,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Buscar los datos de una persona",
-    "supportingText": "Busca en suscriptores, mensajes de contacto, invitaciones, bloqueos de registro y eventos de auditoría de todos los sitios.",
+    "supportingText": "Busca en suscriptores, mensajes de contacto, invitaciones, invitaciones a Studio no enviadas, propietarios de sitios de autoservicio, bloqueos de registro y eventos de auditoría de todos los sitios.",
     "emailLabel": "Correo electrónico",
     "emailHint": "Encuentra el mismo buzón con cualquier combinación de mayúsculas y con cualquier +etiqueta.",
     "emailPlaceholder": "nombre@example.com",
@@ -2043,7 +2055,7 @@
   "dataRequestEraseDialog": {
     "erase": "Borrar",
     "title": "¿Borrar los datos de esta persona?",
-    "description": "Borra sus suscripciones, mensajes de contacto e invitaciones en todos los sitios. No se puede deshacer.",
+    "description": "Borra sus suscripciones, mensajes de contacto e invitaciones en todos los sitios, elimina las invitaciones a Studio no enviadas y borra la clave de propietario de autoservicio que tiene su dirección. No se puede deshacer.",
     "confirm": "Borrar datos",
     "erasing": "Borrando…",
     "includesReaderAccount": "Borrar también la cuenta de lector",
@@ -2087,6 +2099,7 @@
     "LEAD": "Mensaje de contacto",
     "INVITE": "Invitación",
     "STUDIO_REINVITE": "Invitación a Studio no enviada",
+    "SELF_SERVE_OWNER": "Propietario de un sitio de autoservicio",
     "SIGNUP_BLOCK": "Bloqueo de registro",
     "AUDIT_EVENT": "Evento de auditoría",
     "READER_ACCOUNT": "Cuenta de lector",
@@ -2126,6 +2139,15 @@
       "options": "Las opciones de los planes de pago están desactivadas en tu sitio: idiomas adicionales, los ajustes de Aspecto de Growth, los módulos de página de pago y funciones como el formulario de contacto, los marcadores y las estadísticas.",
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
     }
+  },
+  "ownerReceiptEmail": {
+    "subject": "Tu recibo de pago de {siteName}",
+    "previewText": "Hemos recibido {amount} por {siteName}.",
+    "thanks": "Gracias. Hemos recibido tu pago por {siteName}.",
+    "amountLabel": "Importe pagado",
+    "dateLabel": "Fecha",
+    "planLabel": "Plan",
+    "actionLabel": "Ver tu factura"
   },
   "suspensionCategory": {
     "ABUSE": "Abuso",
