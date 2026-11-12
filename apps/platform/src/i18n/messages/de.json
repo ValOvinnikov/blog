@@ -2126,6 +2126,15 @@
       "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu einem kostenpflichtigen Tarif wechselst."
     }
   },
+  "ownerReceiptEmail": {
+    "subject": "Ihre Zahlungsbestätigung für {siteName}",
+    "previewText": "Wir haben {amount} für {siteName} erhalten.",
+    "thanks": "Vielen Dank. Wir haben Ihre Zahlung für {siteName} erhalten.",
+    "amountLabel": "Gezahlter Betrag",
+    "dateLabel": "Datum",
+    "planLabel": "Tarif",
+    "actionLabel": "Rechnung herunterladen (PDF)"
+  },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",
     "ILLEGAL_CONTENT": "Rechtswidrige Inhalte",

@@ -2126,6 +2126,15 @@
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à une offre payante."
     }
   },
+  "ownerReceiptEmail": {
+    "subject": "Votre reçu de paiement pour {siteName}",
+    "previewText": "Nous avons reçu {amount} pour {siteName}.",
+    "thanks": "Merci. Nous avons bien reçu votre paiement pour {siteName}.",
+    "amountLabel": "Montant payé",
+    "dateLabel": "Date",
+    "planLabel": "Formule",
+    "actionLabel": "Télécharger la facture (PDF)"
+  },
   "suspensionCategory": {
     "ABUSE": "Abus",
     "ILLEGAL_CONTENT": "Contenu illicite",

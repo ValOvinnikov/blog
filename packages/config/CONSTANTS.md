@@ -404,6 +404,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BADGE_TONE**: `OK`=`"ok"`, `WARN`=`"warn"`, `BAD`=`"bad"`, `NEUTRAL`=`"neutral"`, `BRAND`=`"brand"`, `PLAN`=`"plan"`
 
+### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
+
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`
+- **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`
+- **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`, `INCOMPLETE_EXPIRED`=`"incomplete_expired"`
+- **BILLING_GRACE**: `START`, `END`, `KEEP`
+
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`

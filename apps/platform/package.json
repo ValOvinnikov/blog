@@ -41,6 +41,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "server-only": "^0.0.1",
+    "stripe": "^23.1.0",
     "tailwind-variants": "^3.3.1",
     "tldts": "^7.4.18",
     "zod": "catalog:"

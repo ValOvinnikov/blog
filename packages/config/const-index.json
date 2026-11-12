@@ -5144,6 +5144,204 @@
         "file": "apps/platform/src/constants/badge-tone.ts"
       }
     ],
+    "billing.webhook_secret_missing": [
+      {
+        "ref": "BILLING_LOG.WEBHOOK_SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.webhook_signature_invalid": [
+      {
+        "ref": "BILLING_LOG.WEBHOOK_SIGNATURE_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.webhook_handler_failed": [
+      {
+        "ref": "BILLING_LOG.WEBHOOK_HANDLER_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.tenant_not_found": [
+      {
+        "ref": "BILLING_LOG.TENANT_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.tenant_conflict": [
+      {
+        "ref": "BILLING_LOG.TENANT_CONFLICT",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.tenant_not_writable": [
+      {
+        "ref": "BILLING_LOG.TENANT_NOT_WRITABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.price_unknown": [
+      {
+        "ref": "BILLING_LOG.PRICE_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.receipt_unconfigured": [
+      {
+        "ref": "BILLING_LOG.RECEIPT_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.receipt_owner_missing": [
+      {
+        "ref": "BILLING_LOG.RECEIPT_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.receipt_failed": [
+      {
+        "ref": "BILLING_LOG.RECEIPT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "customer.subscription.created": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "customer.subscription.updated": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_UPDATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "customer.subscription.deleted": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_DELETED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "invoice.paid": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "invoice.payment_failed": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "active": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "trialing": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.TRIALING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "past_due": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.PAST_DUE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "canceled": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.CANCELED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "unpaid": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.UNPAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "incomplete_expired": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "START": [
+      {
+        "ref": "BILLING_GRACE.START",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "END": [
+      {
+        "ref": "BILLING_GRACE.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "KEEP": [
+      {
+        "ref": "BILLING_GRACE.KEEP",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "GHOST": [
       {
         "ref": "BUTTON_VARIANT.GHOST",
@@ -5719,14 +5917,6 @@
     "TOP": [
       {
         "ref": "DEVICE_FRAME_SCROLL_TARGET.TOP",
-        "scope": "app:platform",
-        "from": "@platform/constants/device-frame",
-        "file": "apps/platform/src/constants/device-frame.ts"
-      }
-    ],
-    "END": [
-      {
-        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
