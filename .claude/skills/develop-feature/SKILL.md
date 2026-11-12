@@ -758,6 +758,8 @@ carries `isolation: worktree`").
 - `add-content-type` when a change spans more than one workspace.
 - `code-review-practices` before every commit — applied by the `reviewer`
   subagent at gate step 4.
+- `review-pull-request` when an open PR needs review before merge — a cloud
+  session's PR always does; a PR from this lifecycle already passed step 6.
 - `refactor-sweep` for an on-demand, layer-scoped cleanup audit (duplication,
   dead code, convention drift) — run when asked, naming the layer; it files
   findings as issues rather than editing.

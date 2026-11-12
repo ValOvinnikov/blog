@@ -330,9 +330,10 @@ Pre-commit reviews go to the `reviewer` subagent (`.claude/agents/reviewer.md`)
 than styling, copy, stories or docs, to `correctness-reviewer`
 (`.claude/agents/correctness-reviewer.md`) alongside it, which takes step 3's
 security, performance and correctness items and the ticket's acceptance
-criteria (→ `develop-feature` §6). A manual review (a solo session's
-self-review, someone else's PR) runs the same three passes, in order; a hit in
-an early pass does not skip a later one:
+criteria (→ `develop-feature` §6). An open PR gets the same two agents
+through `review-pull-request`; a cloud session runs no review of its own. A
+manual review runs the same three passes, in order; a hit in an early pass
+does not skip a later one:
 
 1. **Mechanical (§0).** Run `pnpm check:diff-hygiene`, then the commands
    that need a reader; every confirmed hit is blocking.

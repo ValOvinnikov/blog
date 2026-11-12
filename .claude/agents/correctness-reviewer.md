@@ -82,6 +82,15 @@ Never pad the report: no findings is a complete outcome.
 A test that would still pass with the fix reverted, or that never reaches the
 branch it names, is a finding here; how a test is written is `reviewer`'s.
 
+## PR review mode
+
+A prompt that opens `PR review of #<n>` reviews an open pull request
+(`review-pull-request`): the checkout is a detached worktree at the PR's
+head, whose SHA the prompt names and `git rev-parse HEAD` must equal, and
+`pnpm verify` runs in a parallel `verify-runner` dispatch or already ran in
+CI. Both passes run as written. A draft PR is the expected state, never a
+finding.
+
 ## Re-review mode
 
 A prompt that opens `Re-review of <sha>` lists a prior review's blocking

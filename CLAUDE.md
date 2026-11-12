@@ -238,6 +238,8 @@ except the Gate 0 `board-keeper` dispatch and the board write after
 
 - `develop-feature` at the start of any non-trivial task; § "Skills by
   task" lists the orchestration, `superpowers:*` and `vercel:*` skills.
+- `review-pull-request` when an open PR needs review before merge — every
+  cloud session's PR does.
 - `studio-schema-practices` when touching `packages/studio` schemas or migrations.
 - `react-component-practices` when writing or changing any React component in
   `packages/ui`, `apps/web` or `apps/platform` — the shared rules the layer
@@ -643,7 +645,8 @@ including quality gates, conventional commits and the push/PR approval gates,
 still applies:
 
 - **Delegation is relaxed:** implement directly, following the checklist
-  below; delivery-gate step 4's `reviewer` dispatch becomes the self-review in it.
+  below; delivery-gate step 4's `reviewer` dispatch is replaced by the
+  orchestrator's review of the open PR (`review-pull-request`).
 - **Board writes** (delivery-gate steps 1 and 7) are replaced by the evidence protocol below.
 - **The `job:<session-name>` PR label** does not apply and has no substitute —
   it tells concurrent local jobs apart, and a cloud session has no job id and
@@ -660,8 +663,9 @@ still applies:
 3. Implement, fixing the mechanical drift in every file you touch.
 4. `pnpm verify` — it runs `pnpm check:diff-hygiene`; run that alone after any
    later edit.
-5. Self-review the full diff against `code-review-practices`, all three
-   passes, §0's reader commands and `pnpm check:clones` included.
+5. `pnpm check:clones` — the one mechanical check `pnpm verify` does not
+   chain. No self-review: the PR is reviewed in a fresh context once it is
+   open.
 6. Commit, push, and open a draft PR whose body carries one **Examined** and
    one **Reuse** line, as an implementing agent's report would.
 

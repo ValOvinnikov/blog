@@ -135,6 +135,20 @@ each removal the implementing agent's **Examined** section lists against the
 test it names as still asserting it. Test files the diff does not touch are
 out of scope.
 
+## PR review mode
+
+A prompt that opens `PR review of #<n>` reviews an open pull request
+(`review-pull-request`). It is a full review with three differences:
+
+- The checkout is a detached worktree at the PR's head. `git rev-parse HEAD`
+  must equal the head SHA the prompt names; a mismatch is blocking.
+- The **Examined** and **Reuse** sections come from the PR body. A PR body
+  missing either is the §6 Reuse finding.
+- `pnpm verify` runs in a parallel `verify-runner` dispatch or already ran in
+  CI. Do not wait for it or repeat it.
+
+A draft PR is the expected state, never a finding.
+
 ## Re-review mode
 
 A prompt that opens `Re-review of <sha>` is a fix round: you, or an earlier
