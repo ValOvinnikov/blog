@@ -17,7 +17,7 @@ export async function setTenantPlan(
 ): Promise<TResult<TTenantPlanAndStatus, TErrorCode>> {
   const [row] = await getDb()
     .update(tenants)
-    .set({ ...planChangeFields(plan), status })
+    .set({ ...planChangeFields(plan, status), status })
     .where(eq(tenants.id, tenantId))
     .returning({ plan: tenants.plan, status: tenants.status });
 

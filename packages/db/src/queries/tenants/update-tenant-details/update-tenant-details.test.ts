@@ -50,6 +50,7 @@ import {
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
 import { and, eq } from 'drizzle-orm';
 
@@ -691,6 +692,23 @@ describe(updateTenantDetails, () => {
 
       expect(unwrapUpdated(upgraded).selfServeOwnerEmailIndex).toBeNull();
       expect(unwrapUpdated(downgraded).plan).toBe(TENANT_PLAN.FREE);
+    });
+
+    it("keeps a trial's Free-or-trial slot when its details are saved", async () => {
+      await patchTestTenant(db(), tenantId, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
+        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      });
+
+      const saved = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.GROWTH,
+      });
+
+      expect(unwrapUpdated(saved).selfServeOwnerEmailIndex).toBe(
+        MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      );
     });
 
     it('refuses a provisioned tenant moving to FREE when its owner already has a Free site', async () => {

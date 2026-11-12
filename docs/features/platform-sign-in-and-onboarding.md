@@ -288,7 +288,8 @@ site as a 14-day Growth trial, with no card.
   non-archived rows that are FREE or TRIAL, so two simultaneous submits can't both succeed.
   Operator-created tenants leave it null. Any write that moves a tenant to a
   paid plan clears the key in the same statement (`planChangeFields`, used by
-  `updateTenantDetails` and `setTenantPlan`), so the rule is checked only when
+  `updateTenantDetails` and `setTenantPlan`); a site still in TRIAL keeps it,
+  although its plan is GROWTH, so the rule is checked only when
   a site is created: a site that was once paid can drop back to FREE beside
   its owner's other Free or trial site, and an owner who once paid can hold two. While
   the key is set, the index guards every write, not only Create site:

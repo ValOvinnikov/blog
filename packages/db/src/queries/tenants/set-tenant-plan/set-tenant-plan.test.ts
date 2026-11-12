@@ -82,6 +82,23 @@ describe(setTenantPlan, () => {
     });
   });
 
+  it('keeps a trial in the Free-or-trial slot while it stays in TRIAL', async () => {
+    const { id } = await insertTestTenant(db(), {
+      plan: TENANT_PLAN.GROWTH,
+      status: TENANT_STATUS.TRIAL,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+    });
+
+    await setTenantPlan(id, {
+      plan: TENANT_PLAN.GROWTH,
+      status: TENANT_STATUS.TRIAL,
+    });
+
+    expect(await readSelfServeIndex(id)).toBe(
+      MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+    );
+  });
+
   it('returns not-found for a tenant id that does not exist', async () => {
     const result = await setTenantPlan(MOCK_MISSING_TENANT_ID, {
       plan: TENANT_PLAN.GROWTH,

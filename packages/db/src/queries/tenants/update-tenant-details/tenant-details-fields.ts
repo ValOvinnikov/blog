@@ -1,5 +1,5 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan, TTenantStatus } from '@blog/db/constants';
 import {
   planChangeFields,
   type TPlanChangeFields,
@@ -41,12 +41,13 @@ export function changesProvisionedTenantDetails(
 
 export function tenantDetailsWrite(
   details: TTenantDetailsFields,
+  status: TTenantStatus,
   clearsUnsentReinvite: boolean,
 ): TTenantDetailsFields &
   TPlanChangeFields & { unsentReinviteFormerOwnerEmailEncrypted?: null } {
   return {
     ...details,
-    ...planChangeFields(details.plan),
+    ...planChangeFields(details.plan, status),
     ...(clearsUnsentReinvite && {
       unsentReinviteFormerOwnerEmailEncrypted: null,
     }),
