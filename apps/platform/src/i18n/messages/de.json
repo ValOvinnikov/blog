@@ -2133,7 +2133,7 @@
     "amountLabel": "Gezahlter Betrag",
     "dateLabel": "Datum",
     "planLabel": "Tarif",
-    "actionLabel": "Rechnung herunterladen (PDF)"
+    "actionLabel": "Rechnung ansehen"
   },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",

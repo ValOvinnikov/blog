@@ -1,7 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
-import type * as BlogEmail from '@blog/email';
 import { BILLING_LOG } from '@platform/constants/billing';
 import enMessages from '@platform/i18n/messages/en.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
@@ -11,8 +10,12 @@ import {
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_OWNER_EMAIL_FROM_ADDRESS } from '@platform/testing/owner-email/fixtures';
+import {
+  getTenantByIdMock,
+  getTenantOwnerEmailMock,
+  mockOwnerEmailDb,
+} from '@platform/testing/owner-email/mock-owner-email-db';
 import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
@@ -24,28 +27,16 @@ import type Stripe from 'stripe';
 
 import { sendPaymentReceipt } from './send-payment-receipt';
 
-const { getTenantByIdMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
-  getTenantByIdMock: vi.fn(),
-  getTenantOwnerEmailMock: vi.fn(),
-}));
-
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: {
-    tenants: { getTenantById: getTenantByIdMock },
-    memberships: { getTenantOwnerEmail: getTenantOwnerEmailMock },
-  },
-}));
+vi.mock('@blog/db', () => mockOwnerEmailDb());
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof BlogEmail>()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email');
 
-const retrieveInvoiceMock = vi.fn();
-const stripe = {
+const { retrieveInvoiceMock } = vi.hoisted(() => ({
+  retrieveInvoiceMock: vi.fn(),
+}));
+const MOCK_STRIPE = {
   invoices: { retrieve: retrieveInvoiceMock },
 } as unknown as Stripe;
 
@@ -54,7 +45,7 @@ const sentEmail = () => sendEmailMock.mock.calls[0]?.[0];
 
 const sendReceipt = () =>
   sendPaymentReceipt(
-    stripe,
+    MOCK_STRIPE,
     MOCK_STRIPE_INVOICE_ID,
     MOCK_TENANT_ID,
     TENANT_PLAN.GROWTH,
@@ -63,11 +54,9 @@ const sendReceipt = () =>
 describe(sendPaymentReceipt, () => {
   beforeEach(() => {
     mockedEnv.OWNER_EMAIL_FROM_ADDRESS = MOCK_OWNER_EMAIL_FROM_ADDRESS;
-    getTenantByIdMock.mockReset().mockResolvedValue(mockTenant());
-    getTenantOwnerEmailMock.mockReset().mockResolvedValue(MOCK_OWNER_EMAIL);
-    retrieveInvoiceMock.mockReset().mockResolvedValue(mockStripeInvoice());
-    sendEmailMock.mockReset().mockResolvedValue(undefined);
-    vi.mocked(logger.warn).mockReset();
+    getTenantByIdMock.mockResolvedValue(mockTenant());
+    getTenantOwnerEmailMock.mockResolvedValue(MOCK_OWNER_EMAIL);
+    retrieveInvoiceMock.mockResolvedValue(mockStripeInvoice());
   });
 
   describe('a paid invoice', () => {

@@ -5,7 +5,6 @@ export const stripeEnv = createEnv({
   server: {
     // @env-required: production
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
-    // The signing secret of the Stripe webhook endpoint pointed at `/api/stripe/webhook`.
     // @env-required: production
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
   },

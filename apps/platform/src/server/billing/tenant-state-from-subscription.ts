@@ -2,6 +2,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import {
   TENANT_PLAN,
   TENANT_STATUS,
+  type TTenantPlan,
   type TTenantStatus,
 } from '@blog/db/constants';
 import {
@@ -19,6 +20,7 @@ export type TSubscriptionTenantState = TSubscribedPlan & {
 export const tenantStateFromSubscription = (
   subscriptionStatus: string,
   subscribed: TSubscribedPlan,
+  currentPlan: TTenantPlan,
 ): TMaybeUndefined<TSubscriptionTenantState> => {
   switch (subscriptionStatus) {
     case STRIPE_SUBSCRIPTION_STATUS.ACTIVE:
@@ -36,12 +38,14 @@ export const tenantStateFromSubscription = (
       };
     case STRIPE_SUBSCRIPTION_STATUS.CANCELED:
     case STRIPE_SUBSCRIPTION_STATUS.UNPAID:
-    case STRIPE_SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED:
       return {
         plan: TENANT_PLAN.FREE,
         subscriberBandCeiling: null,
         status: TENANT_STATUS.ACTIVE,
-        grace: BILLING_GRACE.START,
+        grace:
+          currentPlan === TENANT_PLAN.FREE
+            ? BILLING_GRACE.KEEP
+            : BILLING_GRACE.START,
       };
     default:
       return undefined;

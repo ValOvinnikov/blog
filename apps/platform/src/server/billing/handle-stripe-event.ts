@@ -1,30 +1,28 @@
 import 'server-only';
 
-import { queries, STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db';
+import {
+  queries,
+  STRIPE_EVENT_RECORD_OUTCOME,
+  type TTenantPlan,
+} from '@blog/db';
 import { BILLING_LOG, STRIPE_EVENT_TYPE } from '@platform/constants/billing';
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import { subscriptionIdFromEvent } from '@platform/server/billing/subscription-id-from-event';
-import {
-  syncStripeSubscription,
-  type TSyncedSubscription,
-} from '@platform/server/billing/sync-stripe-subscription';
+import { syncStripeSubscription } from '@platform/server/billing/sync-stripe-subscription';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { after } from 'next/server';
 import type Stripe from 'stripe';
 
-const runFollowUps = async (
+const sendReceiptOrLog = async (
   stripe: Stripe,
-  event: Stripe.Event,
-  { tenantId, fromPlan, toPlan }: TSyncedSubscription,
+  event: Stripe.InvoicePaidEvent,
+  tenantId: string,
+  plan: TTenantPlan,
 ): Promise<void> => {
-  if (fromPlan !== toPlan) {
-    await onTenantPlanChange(tenantId, fromPlan, toPlan);
-  }
-  if (event.type !== STRIPE_EVENT_TYPE.INVOICE_PAID) return;
   try {
-    await sendPaymentReceipt(stripe, event.data.object.id, tenantId, toPlan);
+    await sendPaymentReceipt(stripe, event.data.object.id, tenantId, plan);
   } catch (error) {
     logger.error(BILLING_LOG.RECEIPT_FAILED, {
       tenantId,
@@ -42,10 +40,20 @@ export const handleStripeEvent = async (
   if (!subscriptionId) return;
 
   const synced = await syncStripeSubscription(stripe, subscriptionId);
+  if (synced && synced.fromPlan !== synced.toPlan) {
+    const { tenantId, fromPlan, toPlan } = synced;
+    after(() => onTenantPlanChange(tenantId, fromPlan, toPlan));
+  }
+
   const recorded = await queries.stripeWebhookEvents.recordStripeEvent(
     event.id,
   );
-  if (recorded !== STRIPE_EVENT_RECORD_OUTCOME.RECORDED || !synced) return;
-
-  after(() => runFollowUps(stripe, event, synced));
+  if (
+    synced &&
+    recorded === STRIPE_EVENT_RECORD_OUTCOME.RECORDED &&
+    event.type === STRIPE_EVENT_TYPE.INVOICE_PAID
+  ) {
+    const { tenantId, toPlan } = synced;
+    after(() => sendReceiptOrLog(stripe, event, tenantId, toPlan));
+  }
 };

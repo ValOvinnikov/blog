@@ -8,7 +8,10 @@ import {
   PLATFORM_EMAIL_BRAND_NAME,
   sendEmail,
 } from '@blog/email';
-import { BILLING_LOG } from '@platform/constants/billing';
+import {
+  BILLING_LOG,
+  MILLISECONDS_PER_SECOND,
+} from '@platform/constants/billing';
 import { env } from '@platform/utils/env/env';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { logger } from '@platform/utils/logger/logger';
@@ -16,7 +19,6 @@ import { getTranslations } from 'next-intl/server';
 import type Stripe from 'stripe';
 
 const MINOR_UNITS_PER_MAJOR = 100;
-const MILLISECONDS_PER_SECOND = 1000;
 
 export const sendPaymentReceipt = async (
   stripe: Stripe,

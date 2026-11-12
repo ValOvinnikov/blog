@@ -1,6 +1,7 @@
 import { STRIPE_EVENT_TYPE } from '@platform/constants/billing';
 import {
   MOCK_STRIPE_SUBSCRIPTION_ID,
+  MOCK_UNHANDLED_EVENT_TYPE,
   mockStripeEvent,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
@@ -38,7 +39,7 @@ describe(subscriptionIdFromEvent, () => {
 
   it('ignores an event type it does not handle', () => {
     expect(
-      subscriptionIdFromEvent(mockStripeEvent('customer.created')),
+      subscriptionIdFromEvent(mockStripeEvent(MOCK_UNHANDLED_EVENT_TYPE)),
     ).toBeUndefined();
   });
 });

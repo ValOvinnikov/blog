@@ -1,15 +1,16 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import {
   BILLING_LOG,
   STRIPE_SIGNATURE_HEADER,
 } from '@platform/constants/billing';
 import { handleStripeEvent } from '@platform/server/billing/handle-stripe-event';
 import {
-  MOCK_STRIPE_EVENT_ID,
   MOCK_STRIPE_SECRET_KEY,
   MOCK_STRIPE_WEBHOOK_SECRET,
   mockStripeEvent,
 } from '@platform/testing/billing/fixtures';
+import { createMockFaker } from '@platform/testing/mock-faker';
 import { logger } from '@platform/utils/logger/logger';
 import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
 import Stripe from 'stripe';
@@ -21,28 +22,32 @@ vi.mock('@platform/server/billing/handle-stripe-event', () => ({
   handleStripeEvent: vi.fn(),
 }));
 
+const MOCK_ENDPOINT = createMockFaker(6876).internet.url();
+const MOCK_SIGNER = new Stripe(MOCK_STRIPE_SECRET_KEY);
+const MOCK_PAYLOAD = JSON.stringify(mockStripeEvent());
+
 const mockedStripeEnv: Partial<Record<keyof typeof stripeEnv, string>> =
   stripeEnv;
-const signer = new Stripe(MOCK_STRIPE_SECRET_KEY);
-const payload = JSON.stringify(mockStripeEvent());
 
 const webhookRequest = (signature?: string): Request =>
-  new Request('https://platform.example.com/api/stripe/webhook', {
+  new Request(MOCK_ENDPOINT, {
     method: HTTP_METHOD.POST,
-    body: payload,
+    body: MOCK_PAYLOAD,
     headers: signature ? { [STRIPE_SIGNATURE_HEADER]: signature } : {},
   });
 
 const signedRequest = (secret = MOCK_STRIPE_WEBHOOK_SECRET): Request =>
-  webhookRequest(signer.webhooks.generateTestHeaderString({ payload, secret }));
+  webhookRequest(
+    MOCK_SIGNER.webhooks.generateTestHeaderString({
+      payload: MOCK_PAYLOAD,
+      secret,
+    }),
+  );
 
 describe(POST, () => {
   beforeEach(() => {
     mockedStripeEnv.STRIPE_SECRET_KEY = MOCK_STRIPE_SECRET_KEY;
     mockedStripeEnv.STRIPE_WEBHOOK_SECRET = MOCK_STRIPE_WEBHOOK_SECRET;
-    vi.mocked(handleStripeEvent).mockReset().mockResolvedValue(undefined);
-    vi.mocked(logger.error).mockReset();
-    vi.mocked(logger.warn).mockReset();
   });
 
   it('handles a correctly signed event and answers 200', async () => {

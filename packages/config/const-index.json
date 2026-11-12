@@ -3684,6 +3684,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/sanity-webhook-operation.ts"
+      },
+      {
+        "ref": "ROW_LOCK.UPDATE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/row-lock.ts"
       }
     ],
     "BLOG": [
@@ -5200,6 +5206,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.subscription_superseded": [
+      {
+        "ref": "BILLING_LOG.SUBSCRIPTION_SUPERSEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.receipt_unconfigured": [
       {
         "ref": "BILLING_LOG.RECEIPT_UNCONFIGURED",
@@ -5299,14 +5313,6 @@
     "unpaid": [
       {
         "ref": "STRIPE_SUBSCRIPTION_STATUS.UNPAID",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "incomplete_expired": [
-      {
-        "ref": "STRIPE_SUBSCRIPTION_STATUS.INCOMPLETE_EXPIRED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"

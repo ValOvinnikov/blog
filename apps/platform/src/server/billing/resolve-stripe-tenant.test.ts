@@ -30,13 +30,13 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const NOT_FOUND = { outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND };
+const MOCK_NOT_FOUND_LOOKUP = {
+  outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND,
+};
 
 describe(resolveStripeTenant, () => {
   beforeEach(() => {
-    getTenantIdByStripeIdsMock.mockReset();
-    getTenantByIdMock.mockReset().mockResolvedValue(mockTenant());
-    vi.mocked(logger.error).mockReset();
+    getTenantByIdMock.mockResolvedValue(mockTenant());
   });
 
   it('finds the tenant by its stored Stripe ids', async () => {
@@ -78,7 +78,7 @@ describe(resolveStripeTenant, () => {
 
   describe('with no stored ids', () => {
     beforeEach(() => {
-      getTenantIdByStripeIdsMock.mockResolvedValue(NOT_FOUND);
+      getTenantIdByStripeIdsMock.mockResolvedValue(MOCK_NOT_FOUND_LOOKUP);
     });
 
     it("falls back to the subscription's tenant metadata", async () => {

@@ -5,7 +5,6 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import { sendEmail } from '@blog/email';
-import type * as BlogEmail from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
@@ -36,10 +35,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof BlogEmail>()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email');
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/auth/auth');
@@ -107,18 +103,6 @@ describe(sendTestEmailAction, () => {
     expect(email?.html).toContain(MOCK_BODY_TEXT);
   });
 
-  it('refuses without sending once the admin hits the limit', async () => {
-    signInNewAdmin();
-
-    const results = [];
-    for (let send = 0; send <= MOCK_TEST_EMAIL_SENDS_PER_WINDOW; send += 1) {
-      results.push(await sendTestEmailAction(MOCK_TENANT_ID, INPUT));
-    }
-
-    expect(results.at(-1)).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
-    expect(sendEmail).toHaveBeenCalledTimes(MOCK_TEST_EMAIL_SENDS_PER_WINDOW);
-  });
-
   it('rejects a blank subject without reaching the tenant gate', async () => {
     const result = await sendTestEmailAction(MOCK_TENANT_ID, {
       ...INPUT,
@@ -148,18 +132,33 @@ describe(sendTestEmailAction, () => {
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
-  it('reports and logs a failed send without throwing', async () => {
-    signInNewAdmin();
-    const sendError = new Error(faker.lorem.sentence());
-    vi.mocked(sendEmail).mockRejectedValue(sendError);
+  describe('with a signed-in admin', () => {
+    beforeEach(() => {
+      signInNewAdmin();
+    });
 
-    const result = await sendTestEmailAction(MOCK_TENANT_ID, INPUT);
+    it('refuses without sending once the admin hits the limit', async () => {
+      const results = [];
+      for (let send = 0; send <= MOCK_TEST_EMAIL_SENDS_PER_WINDOW; send += 1) {
+        results.push(await sendTestEmailAction(MOCK_TENANT_ID, INPUT));
+      }
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(EMAIL_TEST_LOG.SEND_FAILED, {
-      tenantId: MOCK_TENANT_ID,
-      templateType: INPUT.templateType,
-      errorName: sendError.name,
+      expect(results.at(-1)).toEqual({ outcome: ACTION_OUTCOME.RATE_LIMITED });
+      expect(sendEmail).toHaveBeenCalledTimes(MOCK_TEST_EMAIL_SENDS_PER_WINDOW);
+    });
+
+    it('reports and logs a failed send without throwing', async () => {
+      const sendError = new Error(faker.lorem.sentence());
+      vi.mocked(sendEmail).mockRejectedValue(sendError);
+
+      const result = await sendTestEmailAction(MOCK_TENANT_ID, INPUT);
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(logger.error).toHaveBeenCalledWith(EMAIL_TEST_LOG.SEND_FAILED, {
+        tenantId: MOCK_TENANT_ID,
+        templateType: INPUT.templateType,
+        errorName: sendError.name,
+      });
     });
   });
 

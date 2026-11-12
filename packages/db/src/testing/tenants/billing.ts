@@ -19,6 +19,18 @@ export const MOCK_NO_BILLING = {
   graceEndingEmailSentAt: null,
 } as const satisfies Partial<TTenant>;
 
+export const MOCK_EMPTY_TENANT_BILLING: TTenantBilling = {
+  stripeCustomerId: undefined,
+  stripeSubscriptionId: undefined,
+  stripePromotionCode: undefined,
+  subscriberBandCeiling: undefined,
+  trialEndsAt: undefined,
+  downgradeGraceStartedAt: undefined,
+  graceStartedEmailSentAt: undefined,
+  graceHalfwayEmailSentAt: undefined,
+  graceEndingEmailSentAt: undefined,
+};
+
 export const MOCK_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_OTHER_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
 

@@ -1,9 +1,17 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import { queries, TENANT_PLAN_WRITE_OUTCOME, type TTenantPlan } from '@blog/db';
+import {
+  queries,
+  TENANT_PLAN_WRITE_OUTCOME,
+  type TTenantPlan,
+  WRITABLE_TENANT_STATUSES,
+} from '@blog/db';
 import { isString } from '@blog/utils/primitives';
-import { BILLING_LOG } from '@platform/constants/billing';
+import {
+  BILLING_LOG,
+  STRIPE_LIVE_SUBSCRIPTION_STATUSES,
+} from '@platform/constants/billing';
 import { graceBillingFields } from '@platform/server/billing/grace-billing-fields';
 import { planFromPriceKeys } from '@platform/server/billing/plan-from-price-keys';
 import { resolveStripeTenant } from '@platform/server/billing/resolve-stripe-tenant';
@@ -30,6 +38,14 @@ const promotionCodeOf = (
     .map((code) => (code && !isString(code) ? code.code : undefined))
     .find(Boolean);
 
+const isSupersededBy = (
+  storedSubscriptionId: TMaybeUndefined<string>,
+  { id, status }: Stripe.Subscription,
+): boolean =>
+  !!storedSubscriptionId &&
+  storedSubscriptionId !== id &&
+  !STRIPE_LIVE_SUBSCRIPTION_STATUSES.includes(status);
+
 export const syncStripeSubscription = async (
   stripe: Stripe,
   subscriptionId: string,
@@ -49,29 +65,35 @@ export const syncStripeSubscription = async (
     return undefined;
   }
 
-  const state = tenantStateFromSubscription(subscription.status, subscribed);
-  if (!state) return undefined;
-
   const [tenant, billing] = await Promise.all([
     queries.tenants.getTenantById(tenantId),
     queries.tenants.getTenantBilling(tenantId),
   ]);
   if (!tenant || !billing) return undefined;
 
-  const { plan, status, subscriberBandCeiling, grace } = state;
-  const write = await queries.tenants.setTenantPlan(tenantId, {
-    plan,
-    status,
-  });
-  if (write.outcome !== TENANT_PLAN_WRITE_OUTCOME.WRITTEN) {
-    logger.warn(BILLING_LOG.TENANT_NOT_WRITABLE, {
+  if (isSupersededBy(billing.stripeSubscriptionId, subscription)) {
+    logger.warn(BILLING_LOG.SUBSCRIPTION_SUPERSEDED, {
       tenantId,
       subscriptionId,
-      outcome: write.outcome,
+      storedSubscriptionId: billing.stripeSubscriptionId,
     });
     return undefined;
   }
 
+  const state = tenantStateFromSubscription(
+    subscription.status,
+    subscribed,
+    tenant.plan,
+  );
+  if (!state) return undefined;
+
+  const notWritable = { tenantId, subscriptionId, status: tenant.status };
+  if (!WRITABLE_TENANT_STATUSES.some((status) => status === tenant.status)) {
+    logger.warn(BILLING_LOG.TENANT_NOT_WRITABLE, notWritable);
+    return undefined;
+  }
+
+  const { plan, status, subscriberBandCeiling, grace } = state;
   const billingWrite = await queries.tenants.setTenantBilling(tenantId, {
     stripeCustomerId: customerId,
     stripeSubscriptionId: subscriptionId,
@@ -86,5 +108,14 @@ export const syncStripeSubscription = async (
     );
   }
 
-  return { tenantId, fromPlan: tenant.plan, toPlan: plan };
+  const write = await queries.tenants.setTenantPlan(tenantId, {
+    plan,
+    status,
+  });
+  if (write.outcome !== TENANT_PLAN_WRITE_OUTCOME.WRITTEN) {
+    logger.warn(BILLING_LOG.TENANT_NOT_WRITABLE, notWritable);
+    return undefined;
+  }
+
+  return { tenantId, fromPlan: write.previousPlan, toPlan: write.plan };
 };

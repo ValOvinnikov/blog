@@ -1,10 +1,13 @@
 import { STRIPE_EVENT_RECORD_OUTCOME, TENANT_PLAN } from '@blog/db/constants';
+import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import { BILLING_LOG, STRIPE_EVENT_TYPE } from '@platform/constants/billing';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import {
-  MOCK_STRIPE_EVENT_ID,
+  MOCK_GROWTH_UPGRADE,
+  MOCK_STRIPE_CLIENT,
   MOCK_STRIPE_INVOICE_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
+  MOCK_UNHANDLED_EVENT_TYPE,
   mockStripeEvent,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
@@ -44,31 +47,20 @@ vi.mock('@platform/server/tenants/on-tenant-plan-change', () => ({
   onTenantPlanChange: vi.fn(),
 }));
 
-const stripe = {} as Stripe;
-const UPGRADE = {
-  tenantId: MOCK_TENANT_ID,
-  fromPlan: TENANT_PLAN.FREE,
-  toPlan: TENANT_PLAN.GROWTH,
-};
-
 const invoicePaidEvent = () =>
   mockStripeEvent(STRIPE_EVENT_TYPE.INVOICE_PAID, mockStripeInvoice());
 
 const handle = async (event: Stripe.Event) => {
-  await handleStripeEvent(stripe, event);
+  await handleStripeEvent(MOCK_STRIPE_CLIENT, event);
   await Promise.all(afterWork.splice(0));
 };
 
 describe(handleStripeEvent, () => {
   beforeEach(() => {
-    vi.mocked(syncStripeSubscription).mockReset().mockResolvedValue(UPGRADE);
-    recordStripeEventMock
-      .mockReset()
-      .mockResolvedValue(STRIPE_EVENT_RECORD_OUTCOME.RECORDED);
-    vi.mocked(sendPaymentReceipt).mockReset().mockResolvedValue(undefined);
-    vi.mocked(onTenantPlanChange).mockReset().mockResolvedValue(undefined);
-    vi.mocked(after).mockClear();
-    vi.mocked(logger.error).mockReset();
+    vi.mocked(syncStripeSubscription).mockResolvedValue(MOCK_GROWTH_UPGRADE);
+    recordStripeEventMock.mockResolvedValue(
+      STRIPE_EVENT_RECORD_OUTCOME.RECORDED,
+    );
   });
 
   describe('a paid invoice delivered for the first time', () => {
@@ -78,7 +70,7 @@ describe(handleStripeEvent, () => {
 
     it('syncs its subscription, then records the event', () => {
       expect(syncStripeSubscription).toHaveBeenCalledWith(
-        stripe,
+        MOCK_STRIPE_CLIENT,
         MOCK_STRIPE_SUBSCRIPTION_ID,
       );
       expect(recordStripeEventMock).toHaveBeenCalledWith(MOCK_STRIPE_EVENT_ID);
@@ -98,7 +90,7 @@ describe(handleStripeEvent, () => {
     it('sends one receipt', () => {
       expect(sendPaymentReceipt).toHaveBeenCalledOnce();
       expect(sendPaymentReceipt).toHaveBeenCalledWith(
-        stripe,
+        MOCK_STRIPE_CLIENT,
         MOCK_STRIPE_INVOICE_ID,
         MOCK_TENANT_ID,
         TENANT_PLAN.GROWTH,
@@ -106,27 +98,35 @@ describe(handleStripeEvent, () => {
     });
   });
 
-  it('sends no receipt and no plan email for an event already handled', async () => {
-    recordStripeEventMock.mockResolvedValue(
-      STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED,
-    );
+  describe('an event already recorded', () => {
+    beforeEach(() => {
+      recordStripeEventMock.mockResolvedValue(
+        STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED,
+      );
+    });
 
-    await handle(invoicePaidEvent());
+    it('sends no second receipt', async () => {
+      await handle(invoicePaidEvent());
 
-    expect(after).not.toHaveBeenCalled();
-    expect(sendPaymentReceipt).not.toHaveBeenCalled();
+      expect(sendPaymentReceipt).not.toHaveBeenCalled();
+    });
+
+    it('still runs the plan-change step its own write made', async () => {
+      await handle(mockStripeEvent());
+
+      expect(onTenantPlanChange).toHaveBeenCalledOnce();
+    });
   });
 
-  it('runs no plan-change step when the plan stays the same', async () => {
+  it('runs no plan-change step when its write changed no plan', async () => {
     vi.mocked(syncStripeSubscription).mockResolvedValue({
-      ...UPGRADE,
+      ...MOCK_GROWTH_UPGRADE,
       fromPlan: TENANT_PLAN.GROWTH,
     });
 
     await handle(mockStripeEvent());
 
     expect(onTenantPlanChange).not.toHaveBeenCalled();
-    expect(sendPaymentReceipt).not.toHaveBeenCalled();
   });
 
   it('records the event but follows up on nothing when no tenant was written', async () => {
@@ -146,7 +146,7 @@ describe(handleStripeEvent, () => {
   });
 
   it('ignores an event type it does not handle', async () => {
-    await handle(mockStripeEvent('customer.created'));
+    await handle(mockStripeEvent(MOCK_UNHANDLED_EVENT_TYPE));
 
     expect(syncStripeSubscription).not.toHaveBeenCalled();
     expect(recordStripeEventMock).not.toHaveBeenCalled();
