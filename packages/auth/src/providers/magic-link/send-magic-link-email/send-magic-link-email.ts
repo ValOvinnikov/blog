@@ -1,4 +1,3 @@
-import { applyTenantSenderName } from '@blog/auth/providers/magic-link/apply-tenant-sender-name/apply-tenant-sender-name';
 import {
   findPendingInviteTenants,
   type TPendingInviteTenant,
@@ -15,6 +14,7 @@ import {
 import type { IMagicLinkSendHandlers } from '@blog/config/types';
 import { EMAIL_TEMPLATE_DEFAULT_COPY_BY_LOCALE } from '@blog/db/constants';
 import {
+  applyTenantSenderName,
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
   buildSiteEmailTag,

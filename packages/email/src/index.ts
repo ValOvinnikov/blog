@@ -75,6 +75,7 @@ export {
   type TContactNotificationEmailContent,
   type TTenantEmailIdentity,
 } from './templates/tenant';
+export { applyTenantSenderName } from './sender-name';
 export { buildSiteEmailTag, SITE_EMAIL_TAG_NAME, type TEmailTag } from './tags';
 export { EMAIL_ACCOUNT, type TEmailAccount } from './transport/email-account';
 export {
