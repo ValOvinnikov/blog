@@ -1,7 +1,10 @@
 import { BRAND_VARIANT, RADIUS_DECLARATIONS, RADIUS_SCALE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
-import { MOCK_SECTION_LOOK } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_SCOPED_RADIUS_TOKEN,
+  MOCK_SECTION_LOOK,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { Section } from './section';
 
@@ -21,8 +24,6 @@ const setup = customRender(Section, {
     </>
   ),
 });
-
-const RADIUS_TOKEN = '--radius-md';
 
 describe(`<${Section.name}/>`, () => {
   describe('with default props', () => {
@@ -53,8 +54,8 @@ describe(`<${Section.name}/>`, () => {
 
     const region = screen.getByRole('region', { name: MOCK_HEADING });
 
-    expect(region.style.getPropertyValue(RADIUS_TOKEN)).toBe(
-      RADIUS_DECLARATIONS[RADIUS_SCALE.XL][RADIUS_TOKEN],
+    expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+      RADIUS_DECLARATIONS[RADIUS_SCALE.XL][MOCK_SCOPED_RADIUS_TOKEN],
     );
   });
 });

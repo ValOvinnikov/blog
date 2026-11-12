@@ -20,3 +20,5 @@ export const MOCK_NO_SECTION_STYLE_OVERRIDES: TSectionStyleOverrides = {
 };
 
 export const MOCK_STALE_OPTION = 'RETIRED';
+
+export const MOCK_SCOPED_RADIUS_TOKEN = '--radius-md';

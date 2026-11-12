@@ -49,7 +49,7 @@ describe(getSectionAppearance, () => {
   });
 
   it('drops the overrides on a Free site', async () => {
-    vi.mocked(getEffectivePlan).mockResolvedValue(TENANT_PLAN.FREE);
+    vi.mocked(getEffectivePlan).mockResolvedValueOnce(TENANT_PLAN.FREE);
 
     const { overrides } = await getSectionAppearance(
       MOCK_TENANT_ID,
