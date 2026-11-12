@@ -8,6 +8,7 @@ import {
   type IEmailReputation,
 } from '@blog/db/queries/email-usage';
 import { NEWSLETTER_SEND_PACE } from '@worker/constants/newsletter-send';
+import { MOCK_PLATFORM_APP_BASE_URL } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-email';
@@ -20,7 +21,6 @@ vi.mock('@worker/utils/env/env');
 vi.mock('@worker/utils/operator-email/send-operator-email');
 
 const MOCK_TENANT = mockTenant();
-const MOCK_PLATFORM_URL = 'https://admin.example.com';
 const { WARN, SLOW, STOP } = EMAIL_REPUTATION_LEVEL;
 const BOUNCE = EMAIL_REPUTATION_THRESHOLDS.bounceRate;
 
@@ -30,7 +30,7 @@ function reputationOf(bounceRate: number): IEmailReputation {
 
 describe(readReputationPace, () => {
   beforeEach(() => {
-    mockEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_URL;
+    mockEnv.PLATFORM_APP_BASE_URL = MOCK_PLATFORM_APP_BASE_URL;
   });
 
   it('sends normally and alerts nobody while the rates are healthy', async () => {

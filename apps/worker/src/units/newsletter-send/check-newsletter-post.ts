@@ -1,7 +1,9 @@
+import { getNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends';
 import {
   getTenantById,
   getTenantSanityCredentials,
 } from '@blog/db/queries/tenants';
+import { isUndefined } from '@blog/utils/primitives';
 import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_SCHEDULE_RECHECK_MS,
@@ -16,17 +18,36 @@ import {
 export type TNewsletterPostCheck =
   | { state: typeof NEWSLETTER_POST_STATE.READY; post: TNewsletterPost }
   | { state: typeof NEWSLETTER_POST_STATE.SCHEDULED; waitMs: number }
-  | { state: typeof NEWSLETTER_POST_STATE.CANCELLED };
+  | { state: typeof NEWSLETTER_POST_STATE.CANCELLED }
+  | { state: typeof NEWSLETTER_POST_STATE.UNCLAIMED };
 
 const CANCELLED: TNewsletterPostCheck = {
   state: NEWSLETTER_POST_STATE.CANCELLED,
 };
 
+async function isClaimStillOpen(
+  tenantId: string,
+  postId: string,
+  claimedAt: string,
+): Promise<boolean> {
+  const claim = await getNewsletterPostSend(tenantId, postId);
+  return (
+    !!claim &&
+    isUndefined(claim.outcome) &&
+    claim.claimedAt.getTime() === Date.parse(claimedAt)
+  );
+}
+
 export async function checkNewsletterPost(
   tenantId: string,
   postId: string,
+  claimedAt: string,
 ): Promise<TNewsletterPostCheck> {
   'use step';
+
+  if (!(await isClaimStillOpen(tenantId, postId, claimedAt))) {
+    return { state: NEWSLETTER_POST_STATE.UNCLAIMED };
+  }
 
   const tenant = await getTenantById(tenantId);
   if (!tenant || !(await isSiteSendingPosts(tenant))) return CANCELLED;

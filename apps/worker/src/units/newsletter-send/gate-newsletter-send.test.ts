@@ -67,26 +67,28 @@ describe(gateNewsletterSend, () => {
     expect(sendOwnerNewsletterNotice).not.toHaveBeenCalled();
   });
 
-  it('refuses to start, and logs, when tenant mail has no key', async () => {
-    vi.mocked(isEmailAccountConfigured).mockReturnValue(false);
+  it.each([
+    [
+      'tenant mail has no key',
+      NEWSLETTER_SEND_LOG.NO_TENANT_MAIL_KEY,
+      () => vi.mocked(isEmailAccountConfigured).mockReturnValue(false),
+    ],
+    [
+      'there is no unsubscribe key',
+      NEWSLETTER_SEND_LOG.NO_UNSUBSCRIBE_KEY,
+      () => {
+        mockEnv.NEWSLETTER_UNSUBSCRIBE_KEY = undefined;
+      },
+    ],
+  ])('refuses to start, and logs, when %s', async (_, event, arrange) => {
+    arrange();
 
     await expect(runGate()).resolves.toEqual({
       gate: NEWSLETTER_SEND_GATE.NOT_CONFIGURED,
     });
-    expect(logger.error).toHaveBeenCalledWith(
-      NEWSLETTER_SEND_LOG.NOT_CONFIGURED,
-      {
-        tenantId: MOCK_TENANT_ID,
-        postId: MOCK_POST_ID,
-      },
-    );
-  });
-
-  it('refuses to start without the unsubscribe key', async () => {
-    mockEnv.NEWSLETTER_UNSUBSCRIBE_KEY = undefined;
-
-    await expect(runGate()).resolves.toEqual({
-      gate: NEWSLETTER_SEND_GATE.NOT_CONFIGURED,
+    expect(logger.error).toHaveBeenCalledWith(event, {
+      tenantId: MOCK_TENANT_ID,
+      postId: MOCK_POST_ID,
     });
   });
 

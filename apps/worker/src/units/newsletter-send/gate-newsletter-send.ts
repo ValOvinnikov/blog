@@ -44,11 +44,12 @@ export async function gateNewsletterSend(
 ): Promise<TNewsletterSendGateResult> {
   'use step';
 
-  if (
-    !isEmailAccountConfigured(EMAIL_ACCOUNT.TENANT) ||
-    !env.NEWSLETTER_UNSUBSCRIBE_KEY
-  ) {
-    logger.error(NEWSLETTER_SEND_LOG.NOT_CONFIGURED, { tenantId, postId });
+  if (!isEmailAccountConfigured(EMAIL_ACCOUNT.TENANT)) {
+    logger.error(NEWSLETTER_SEND_LOG.NO_TENANT_MAIL_KEY, { tenantId, postId });
+    return { gate: NEWSLETTER_SEND_GATE.NOT_CONFIGURED };
+  }
+  if (!env.NEWSLETTER_UNSUBSCRIBE_KEY) {
+    logger.error(NEWSLETTER_SEND_LOG.NO_UNSUBSCRIBE_KEY, { tenantId, postId });
     return { gate: NEWSLETTER_SEND_GATE.NOT_CONFIGURED };
   }
 

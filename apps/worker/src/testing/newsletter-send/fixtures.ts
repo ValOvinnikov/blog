@@ -48,6 +48,8 @@ export function mockNewsletterPage(
     pace: NEWSLETTER_SEND_PACE.NORMAL,
     lastId: MOCK_SUBSCRIBER_IDS.at(-1),
     isLastPage: true,
+    sentCount: MOCK_SUBSCRIBER_IDS.length,
+    unreadableCount: 0,
     ...overrides,
   };
 }

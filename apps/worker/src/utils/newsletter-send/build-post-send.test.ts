@@ -18,6 +18,7 @@ import {
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@worker/testing/tenant/fixtures';
 import type { TNewsletterSendContext } from '@worker/utils/newsletter-send/newsletter-send-context';
 
@@ -29,7 +30,7 @@ const MOCK_CONTEXT: TNewsletterSendContext = {
   locale: LOCALE_ISO_CODES.NL,
   from: MOCK_NEWSLETTER_FROM_ADDRESS,
   replyTo: undefined,
-  brandName: 'Acme',
+  brandName: mockTenant().name,
   logoImageUrl: undefined,
   footerPostalAddress: undefined,
   unsubscribeKey: MOCK_UNSUBSCRIBE_KEY,

@@ -106,6 +106,10 @@ default to zero".
   so a run that sleeps for days keeps running old code after every fix. Bound
   a polling run to minutes and let a scheduled sweep, which always runs the
   current deployment, start the next one.
+  The one exception is the newsletter post send (`sendNewsletterPost`), which
+  sleeps until a post's publish date, possibly months away: it keeps the code
+  of the deploy that started it, re-checks the post and the site at least
+  daily, and holds a hook named for its claim so only one run sends a post.
 - **Owner Studio access polls in short runs** — at most 30 one-minute checks
   with `sleep()` between them, never a busy loop, ending early at a grant,
   STALLED or a failed check. The hourly owner-access sweep makes one check

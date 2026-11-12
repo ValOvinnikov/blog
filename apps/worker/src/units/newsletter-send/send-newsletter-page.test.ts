@@ -1,14 +1,13 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
 import { NEWSLETTER_SKIP_REASON } from '@blog/db/constants';
 import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
-import { recordEmailSend } from '@blog/db/queries/email-usage';
 import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
 import { listActiveSubscribers } from '@blog/db/queries/subscribers';
 import { getTenantById } from '@blog/db/queries/tenants';
-import { sendEmail } from '@blog/email';
+import { SendEmailError, sendEmail } from '@blog/email';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
+  NEWSLETTER_SEND_PAGE_SIZE,
 } from '@worker/constants/newsletter-send';
 import {
   MOCK_NEWSLETTER_POST,
@@ -35,7 +34,6 @@ import {
 
 vi.mock('node:timers/promises');
 vi.mock('@blog/db/queries/email-config');
-vi.mock('@blog/db/queries/email-usage');
 vi.mock('@blog/db/queries/newsletter-post-sends');
 vi.mock('@blog/db/queries/subscribers');
 vi.mock('@blog/db/queries/tenants');
@@ -56,8 +54,17 @@ const MOCK_INPUT: TNewsletterPageInput = {
   postId: MOCK_POST_ID,
   post: MOCK_NEWSLETTER_POST,
   afterId: undefined,
-  pageSize: MOCK_SUBSCRIBERS.length,
 };
+const MOCK_RATE_LIMITED = new SendEmailError(
+  MOCK_RESEND_DOWN,
+  429,
+  'rate_limit_exceeded',
+);
+const MOCK_REJECTED_ADDRESS = new SendEmailError(
+  MOCK_RESEND_DOWN,
+  422,
+  'validation_error',
+);
 
 describe(sendNewsletterPage, () => {
   beforeEach(() => {
@@ -74,7 +81,7 @@ describe(sendNewsletterPage, () => {
     );
   });
 
-  it('emails and counts each subscriber on the page once', async () => {
+  it('emails each subscriber on the page once and reports how many it sent', async () => {
     const result = await sendNewsletterPage(MOCK_INPUT);
 
     expect(vi.mocked(sendEmail).mock.calls.map(([input]) => input.to)).toEqual(
@@ -90,15 +97,12 @@ describe(sendNewsletterPage, () => {
         email: FIRST?.email,
       },
     );
-    expect(recordEmailSend).toHaveBeenCalledTimes(MOCK_SUBSCRIBERS.length);
-    expect(recordEmailSend).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      EMAIL_TYPE.NEWSLETTER_ISSUE,
-    );
     expect(result).toEqual({
       pace: NEWSLETTER_SEND_PACE.NORMAL,
       lastId: MOCK_SUBSCRIBERS.at(-1)?.id,
-      isLastPage: false,
+      isLastPage: true,
+      sentCount: MOCK_SUBSCRIBERS.length,
+      unreadableCount: 0,
     });
   });
 
@@ -107,36 +111,34 @@ describe(sendNewsletterPage, () => {
 
     expect(listActiveSubscribers).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      MOCK_SUBSCRIBERS.length,
+      NEWSLETTER_SEND_PAGE_SIZE,
       FIRST?.id,
     );
   });
 
-  it('reports the last page when fewer subscribers remain than a page holds', async () => {
-    vi.mocked(listActiveSubscribers).mockResolvedValue([]);
+  it('reports more to come after a full page', async () => {
+    vi.mocked(listActiveSubscribers).mockResolvedValue(
+      Array.from({ length: NEWSLETTER_SEND_PAGE_SIZE }, (_, index) => ({
+        id: String(index),
+        email: FIRST?.email,
+      })),
+    );
 
-    await expect(
-      sendNewsletterPage({ ...MOCK_INPUT, afterId: FIRST?.id }),
-    ).resolves.toEqual({
-      pace: NEWSLETTER_SEND_PACE.NORMAL,
-      lastId: FIRST?.id,
-      isLastPage: true,
-    });
+    const { isLastPage } = await sendNewsletterPage(MOCK_INPUT);
+
+    expect(isLastPage).toBe(false);
   });
 
-  it('skips and logs a subscriber whose address cannot be read, and sends the rest', async () => {
+  it('counts a subscriber whose address cannot be read, and sends the rest', async () => {
     vi.mocked(listActiveSubscribers).mockResolvedValue([
-      { id: FIRST!.id, email: undefined },
-      SECOND!,
+      { id: FIRST?.id ?? '', email: undefined },
+      SECOND ?? { id: '', email: undefined },
     ]);
 
-    await sendNewsletterPage(MOCK_INPUT);
+    const result = await sendNewsletterPage(MOCK_INPUT);
 
-    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
-      NEWSLETTER_SEND_LOG.SUBSCRIBER_UNREADABLE,
-      { tenantId: MOCK_TENANT_ID, subscriberId: FIRST?.id },
-    );
     expect(sendEmail).toHaveBeenCalledExactlyOnceWith({ to: SECOND?.email });
+    expect(result).toMatchObject({ sentCount: 1, unreadableCount: 1 });
   });
 
   it('fails the run, logging once, when no address on a page can be read', async () => {
@@ -156,19 +158,25 @@ describe(sendNewsletterPage, () => {
     );
   });
 
-  it('logs a failed send, does not count it, and carries on', async () => {
-    vi.mocked(sendEmail).mockRejectedValueOnce(new Error(MOCK_RESEND_DOWN));
+  it('throws on a send Resend may accept later, so the page is retried', async () => {
+    vi.mocked(sendEmail).mockRejectedValueOnce(MOCK_RATE_LIMITED);
 
-    await sendNewsletterPage(MOCK_INPUT);
+    await expect(sendNewsletterPage(MOCK_INPUT)).rejects.toBe(
+      MOCK_RATE_LIMITED,
+    );
+  });
 
-    expect(logger.error).toHaveBeenCalledWith(NEWSLETTER_SEND_LOG.SEND_FAILED, {
-      tenantId: MOCK_TENANT_ID,
-      postId: MOCK_POST_ID,
-      subscriberId: FIRST?.id,
-      error: MOCK_RESEND_DOWN,
-    });
+  it('logs and skips a send that can never succeed, and carries on', async () => {
+    vi.mocked(sendEmail).mockRejectedValueOnce(MOCK_REJECTED_ADDRESS);
+
+    const { sentCount } = await sendNewsletterPage(MOCK_INPUT);
+
+    expect(logger.error).toHaveBeenCalledWith(
+      NEWSLETTER_SEND_LOG.SEND_FAILED,
+      expect.objectContaining({ subscriberId: FIRST?.id }),
+    );
     expect(sendEmail).toHaveBeenCalledTimes(MOCK_SUBSCRIBERS.length);
-    expect(recordEmailSend).toHaveBeenCalledTimes(MOCK_SUBSCRIBERS.length - 1);
+    expect(sentCount).toBe(MOCK_SUBSCRIBERS.length - 1);
   });
 
   it('sends nothing more and records the skip once the reputation gate stops the site', async () => {
@@ -210,7 +218,7 @@ describe(sendNewsletterPage, () => {
     expect(result.pace).toBe(NEWSLETTER_SEND_PACE.STOPPED);
   });
 
-  it('does not alert the operator about a warning mid-run', async () => {
+  it('does not alert the operator mid-run', async () => {
     await sendNewsletterPage(MOCK_INPUT);
 
     expect(readReputationPace).toHaveBeenCalledWith(expect.anything(), {

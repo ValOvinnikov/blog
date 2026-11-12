@@ -3,9 +3,7 @@ import {
   NEWSLETTER_SCHEDULE_RECHECK_MS,
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_PACE,
-  NEWSLETTER_SEND_PAGE_SIZE,
   NEWSLETTER_SLOW_PAUSE_MS,
-  NEWSLETTER_SLOW_SENDS_PER_HOUR,
 } from '@worker/constants/newsletter-send';
 import {
   MOCK_CLAIMED_AT,
@@ -14,15 +12,18 @@ import {
   MOCK_SUBSCRIBER_IDS,
   mockNewsletterPage,
 } from '@worker/testing/newsletter-send/fixtures';
+import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { checkNewsletterPost } from '@worker/units/newsletter-send/check-newsletter-post';
 import { gateNewsletterSend } from '@worker/units/newsletter-send/gate-newsletter-send';
 import { sendNewsletterPage } from '@worker/units/newsletter-send/send-newsletter-page';
 import {
   completeNewsletterSend,
+  recordNewsletterSends,
   releaseNewsletterSendClaim,
+  reportNewsletterSendFailed,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
-import { sleep } from 'workflow';
+import { createHook, type Hook, sleep } from 'workflow';
 
 import { sendNewsletterPost } from './send-newsletter-post';
 
@@ -32,19 +33,35 @@ vi.mock('@worker/units/newsletter-send/send-newsletter-page');
 vi.mock('@worker/units/newsletter-send/settle-newsletter-send');
 vi.mock('workflow');
 
-const READY = {
+const MOCK_READY = {
   state: NEWSLETTER_POST_STATE.READY,
   post: MOCK_NEWSLETTER_POST,
 } as const;
-const [FIRST_ID] = MOCK_SUBSCRIBER_IDS;
+const [MOCK_FIRST_ID] = MOCK_SUBSCRIBER_IDS;
+const MOCK_MORE_TO_COME = mockNewsletterPage({
+  lastId: MOCK_FIRST_ID,
+  isLastPage: false,
+});
+
+function fakeRunHook(hasConflict = false) {
+  const hook = {
+    getConflict: vi.fn(async () => (hasConflict ? ({} as never) : null)),
+    dispose: vi.fn(),
+  };
+  vi.mocked(createHook).mockReturnValue(hook as unknown as Hook<null>);
+  return hook;
+}
 
 function runSend() {
   return sendNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);
 }
 
 describe(sendNewsletterPost, () => {
+  let hook: ReturnType<typeof fakeRunHook>;
+
   beforeEach(() => {
-    vi.mocked(checkNewsletterPost).mockResolvedValue(READY);
+    hook = fakeRunHook();
+    vi.mocked(checkNewsletterPost).mockResolvedValue(MOCK_READY);
     vi.mocked(gateNewsletterSend).mockResolvedValue({
       gate: NEWSLETTER_SEND_GATE.SEND,
       pace: NEWSLETTER_SEND_PACE.NORMAL,
@@ -54,20 +71,63 @@ describe(sendNewsletterPost, () => {
   });
 
   it('pages on from where the last page ended, then records the post as sent', async () => {
-    vi.mocked(sendNewsletterPage).mockResolvedValueOnce(
-      mockNewsletterPage({ lastId: FIRST_ID, isLastPage: false }),
-    );
+    vi.mocked(sendNewsletterPage).mockResolvedValueOnce(MOCK_MORE_TO_COME);
 
     await runSend();
 
     expect(
       vi.mocked(sendNewsletterPage).mock.calls.map(([page]) => page.afterId),
-    ).toEqual([undefined, FIRST_ID]);
+    ).toEqual([undefined, MOCK_FIRST_ID]);
     expect(completeNewsletterSend).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
       MOCK_POST_ID,
+      0,
     );
     expect(sleep).not.toHaveBeenCalled();
+    expect(hook.dispose).toHaveBeenCalled();
+  });
+
+  it('counts each page’s sends in its own step', async () => {
+    await runSend();
+
+    expect(recordNewsletterSends).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_SUBSCRIBER_IDS.length,
+    );
+  });
+
+  it('carries the unreadable addresses of every page to the end of the run', async () => {
+    vi.mocked(sendNewsletterPage)
+      .mockResolvedValueOnce({ ...MOCK_MORE_TO_COME, unreadableCount: 2 })
+      .mockResolvedValueOnce(mockNewsletterPage({ unreadableCount: 1 }));
+
+    await runSend();
+
+    expect(completeNewsletterSend).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      3,
+    );
+  });
+
+  it('ends at once when another run already holds this claim', async () => {
+    hook = fakeRunHook(true);
+
+    await runSend();
+
+    expect(checkNewsletterPost).not.toHaveBeenCalled();
+    expect(hook.dispose).toHaveBeenCalled();
+  });
+
+  it('ends without releasing anything when the claim is no longer this run’s', async () => {
+    vi.mocked(checkNewsletterPost).mockResolvedValue({
+      state: NEWSLETTER_POST_STATE.UNCLAIMED,
+    });
+
+    await runSend();
+
+    expect(releaseNewsletterSendClaim).not.toHaveBeenCalled();
+    expect(gateNewsletterSend).not.toHaveBeenCalled();
   });
 
   it('sleeps until a scheduled post is due and checks it again before sending', async () => {
@@ -76,12 +136,17 @@ describe(sendNewsletterPost, () => {
         state: NEWSLETTER_POST_STATE.SCHEDULED,
         waitMs: NEWSLETTER_SCHEDULE_RECHECK_MS,
       })
-      .mockResolvedValueOnce(READY);
+      .mockResolvedValueOnce(MOCK_READY);
 
     await runSend();
 
     expect(sleep).toHaveBeenCalledWith(NEWSLETTER_SCHEDULE_RECHECK_MS);
-    expect(checkNewsletterPost).toHaveBeenCalledTimes(2);
+    expect(checkNewsletterPost).toHaveBeenNthCalledWith(
+      2,
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      MOCK_CLAIMED_AT,
+    );
     expect(completeNewsletterSend).toHaveBeenCalled();
   });
 
@@ -97,7 +162,6 @@ describe(sendNewsletterPost, () => {
       MOCK_POST_ID,
       MOCK_CLAIMED_AT,
     );
-    expect(gateNewsletterSend).not.toHaveBeenCalled();
     expect(sendNewsletterPage).not.toHaveBeenCalled();
   });
 
@@ -126,9 +190,7 @@ describe(sendNewsletterPost, () => {
 
   it('ends without recording a send when the gate stops it partway', async () => {
     vi.mocked(sendNewsletterPage)
-      .mockResolvedValueOnce(
-        mockNewsletterPage({ lastId: FIRST_ID, isLastPage: false }),
-      )
+      .mockResolvedValueOnce(MOCK_MORE_TO_COME)
       .mockResolvedValueOnce(
         mockNewsletterPage({ pace: NEWSLETTER_SEND_PACE.STOPPED }),
       );
@@ -139,40 +201,32 @@ describe(sendNewsletterPost, () => {
     expect(completeNewsletterSend).not.toHaveBeenCalled();
   });
 
-  it('sends a small page an hour while the site is slowed', async () => {
-    vi.mocked(gateNewsletterSend).mockResolvedValue({
-      gate: NEWSLETTER_SEND_GATE.SEND,
-      pace: NEWSLETTER_SEND_PACE.SLOW,
-    });
+  it('waits an hour between pages while the site is slowed', async () => {
     vi.mocked(sendNewsletterPage)
-      .mockResolvedValueOnce(
-        mockNewsletterPage({
-          pace: NEWSLETTER_SEND_PACE.SLOW,
-          lastId: FIRST_ID,
-          isLastPage: false,
-        }),
-      )
+      .mockResolvedValueOnce({
+        ...MOCK_MORE_TO_COME,
+        pace: NEWSLETTER_SEND_PACE.SLOW,
+      })
       .mockResolvedValueOnce(mockNewsletterPage());
 
     await runSend();
 
-    expect(
-      vi.mocked(sendNewsletterPage).mock.calls.map(([page]) => page.pageSize),
-    ).toEqual([NEWSLETTER_SLOW_SENDS_PER_HOUR, NEWSLETTER_SLOW_SENDS_PER_HOUR]);
-    expect(sleep).toHaveBeenCalledWith(NEWSLETTER_SLOW_PAUSE_MS);
+    expect(sleep).toHaveBeenCalledExactlyOnceWith(NEWSLETTER_SLOW_PAUSE_MS);
   });
 
-  it('returns to full pages once the site is no longer slowed', async () => {
-    vi.mocked(sendNewsletterPage)
-      .mockResolvedValueOnce(
-        mockNewsletterPage({ lastId: FIRST_ID, isLastPage: false }),
-      )
-      .mockResolvedValueOnce(mockNewsletterPage());
+  it('reports a run that fails for good, leaving its claim unsettled', async () => {
+    vi.mocked(sendNewsletterPage).mockRejectedValue(
+      new Error(MOCK_WORKFLOW_CRASH),
+    );
 
-    await runSend();
-
-    expect(
-      vi.mocked(sendNewsletterPage).mock.calls.map(([page]) => page.pageSize),
-    ).toEqual([NEWSLETTER_SEND_PAGE_SIZE, NEWSLETTER_SEND_PAGE_SIZE]);
+    await expect(runSend()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
+    expect(reportNewsletterSendFailed).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      MOCK_WORKFLOW_CRASH,
+    );
+    expect(releaseNewsletterSendClaim).not.toHaveBeenCalled();
+    expect(completeNewsletterSend).not.toHaveBeenCalled();
+    expect(hook.dispose).toHaveBeenCalled();
   });
 });

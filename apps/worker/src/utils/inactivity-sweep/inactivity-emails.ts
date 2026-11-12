@@ -18,10 +18,8 @@ import {
   ownerEmailFromAddress,
   tenantSiteUrl,
 } from '@worker/utils/owner-email/owner-email-context';
-import {
-  OWNER_INACTIVITY_EMAIL_COPY,
-  type TOwnerInactivityEmail,
-} from '@worker/utils/owner-email/owner-inactivity-email-copy';
+import type { TOwnerInactivityEmail } from '@worker/utils/owner-email/owner-email-copy-types';
+import { OWNER_INACTIVITY_EMAIL_COPY } from '@worker/utils/owner-email/owner-inactivity-email-copy';
 
 import { formatInactivityDate } from './inactivity-dates';
 import type { TInactivitySweepEnv } from './inactivity-sweep-env';

@@ -924,9 +924,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/newsletter-send` — `apps/worker/src/constants/newsletter-send.ts`
 
-- **NEWSLETTER_SEND_LOG**: `START_FAILED`=`"newsletter_send.start_failed"`, `NOT_CONFIGURED`=`"newsletter_send.not_configured"`, `SUBSCRIBER_UNREADABLE`=`"newsletter_send.subscriber_unreadable"`, `PAGE_UNREADABLE`=`"newsletter_send.page_unreadable"`, `SEND_FAILED`=`"newsletter_send.send_failed"`, `OWNER_EMAIL_FAILED`=`"newsletter_send.owner_email_failed"`, `OWNER_EMAIL_MISSING`=`"newsletter_send.owner_email_missing"`, `ALERT_NO_RECIPIENTS`=`"newsletter_send.alert_no_recipients"`, `ALERT_FAILED`=`"newsletter_send.alert_failed"`
-- **NEWSLETTER_POST_STATE**: `READY`, `SCHEDULED`, `CANCELLED`
+- **NEWSLETTER_SEND_LOG**: `START_FAILED`=`"newsletter_send.start_failed"`, `NO_TENANT_MAIL_KEY`=`"newsletter_send.no_tenant_mail_key"`, `NO_UNSUBSCRIBE_KEY`=`"newsletter_send.no_unsubscribe_key"`, `NO_PLATFORM_URL`=`"newsletter_send.no_platform_url"`, `SUBSCRIBERS_UNREADABLE`=`"newsletter_send.subscribers_unreadable"`, `PAGE_UNREADABLE`=`"newsletter_send.page_unreadable"`, `SEND_FAILED`=`"newsletter_send.send_failed"`, `OWNER_EMAIL_FAILED`=`"newsletter_send.owner_email_failed"`, `OWNER_EMAIL_MISSING`=`"newsletter_send.owner_email_missing"`, `ALERT_NO_RECIPIENTS`=`"newsletter_send.alert_no_recipients"`, `ALERT_FAILED`=`"newsletter_send.alert_failed"`, `RUN_FAILED`=`"newsletter_send.run_failed"`
+- **NEWSLETTER_POST_STATE**: `READY`, `SCHEDULED`, `CANCELLED`, `UNCLAIMED`
 - **NEWSLETTER_SEND_PACE**: `NORMAL`, `SLOW`, `STOPPED`
+- **NEWSLETTER_SUBSCRIBER_SEND**: `SENT`, `UNREADABLE`, `REJECTED`
 - **NEWSLETTER_SEND_GATE**: `SEND`, `SKIPPED`, `NOT_CONFIGURED`
 
 ### `@worker/constants/owner-access` — `apps/worker/src/constants/owner-access.ts`

@@ -30,7 +30,7 @@ async function alertReputation(
 ): Promise<void> {
   const adminUrl = env.PLATFORM_APP_BASE_URL;
   if (!adminUrl) {
-    logger.error(NEWSLETTER_SEND_LOG.NOT_CONFIGURED, { tenantId });
+    logger.error(NEWSLETTER_SEND_LOG.NO_PLATFORM_URL, { tenantId });
     return;
   }
 

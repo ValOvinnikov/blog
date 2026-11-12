@@ -1,10 +1,12 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
-import { recordEmailSend } from '@blog/db/queries/email-usage';
 import type { IActiveSubscriber } from '@blog/db/queries/subscribers';
-import { sendEmail } from '@blog/email';
+import { isRetryableSendError, sendEmail } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
 import { hasLength } from '@blog/utils/primitives';
-import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
+import {
+  NEWSLETTER_SEND_LOG,
+  NEWSLETTER_SUBSCRIBER_SEND,
+  type TNewsletterSubscriberSend,
+} from '@worker/constants/newsletter-send';
 import type { TNewsletterPageInput } from '@worker/units/newsletter-send/send-newsletter-page';
 import { logger } from '@worker/utils/logger/logger';
 import { buildPostSend } from '@worker/utils/newsletter-send/build-post-send';
@@ -31,27 +33,22 @@ export async function sendToSubscriber(
   { tenantId, postId, post }: TNewsletterPageInput,
   context: TNewsletterSendContext,
   { id: subscriberId, email }: IActiveSubscriber,
-): Promise<void> {
-  if (!email) {
-    logger.error(NEWSLETTER_SEND_LOG.SUBSCRIBER_UNREADABLE, {
-      tenantId,
-      subscriberId,
-    });
-    return;
-  }
+): Promise<TNewsletterSubscriberSend> {
+  if (!email) return NEWSLETTER_SUBSCRIBER_SEND.UNREADABLE;
 
   try {
     await sendEmail(
       buildPostSend(context, post, { tenantId, postId, subscriberId, email }),
     );
+    return NEWSLETTER_SUBSCRIBER_SEND.SENT;
   } catch (error) {
+    if (isRetryableSendError(error)) throw error;
     logger.error(NEWSLETTER_SEND_LOG.SEND_FAILED, {
       tenantId,
       postId,
       subscriberId,
       error: sanitizeLogMessage(error),
     });
-    return;
+    return NEWSLETTER_SUBSCRIBER_SEND.REJECTED;
   }
-  await recordEmailSend(tenantId, EMAIL_TYPE.NEWSLETTER_ISSUE);
 }

@@ -4,52 +4,62 @@ import {
 } from '@blog/db/constants';
 import { mockNewsletterLimits } from '@worker/testing/newsletter-send/fixtures';
 
-import { nearLimitNotices, newsletterSkipReason } from './newsletter-limits';
+import {
+  nearLimitNotices,
+  newsletterSkipReason,
+  sentAfterThisPost,
+} from './newsletter-limits';
+
+const { SUBSCRIBER_BAND_NEAR, MONTHLY_ALLOWANCE_NEAR } =
+  NEWSLETTER_LIMIT_NOTICE_KIND;
 
 describe(newsletterSkipReason, () => {
-  it('allows a send that fits the band and the rest of the month’s allowance', () => {
+  it.each([
+    ['allows a send within the band and allowance', 1_000, 5_000, undefined],
+    [
+      'skips a site with more subscribers than its band',
+      1_001,
+      0,
+      NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND,
+    ],
+    [
+      'skips a send that would pass the allowance',
+      500,
+      5_501,
+      NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE,
+    ],
+  ])('%s', (_, activeCount, sentThisMonth, reason) => {
     expect(
       newsletterSkipReason(
-        mockNewsletterLimits({ activeCount: 1_000, sentThisMonth: 5_000 }),
+        mockNewsletterLimits({ activeCount, sentThisMonth }),
       ),
-    ).toBeUndefined();
-  });
-
-  it('skips a site with more subscribers than its band', () => {
-    expect(
-      newsletterSkipReason(mockNewsletterLimits({ activeCount: 1_001 })),
-    ).toBe(NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND);
-  });
-
-  it('skips a send that would pass the month’s allowance', () => {
-    expect(
-      newsletterSkipReason(
-        mockNewsletterLimits({ activeCount: 500, sentThisMonth: 5_501 }),
-      ),
-    ).toBe(NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE);
+    ).toBe(reason);
   });
 });
 
 describe(nearLimitNotices, () => {
-  it('owes no notice below 80% of either limit', () => {
+  it.each([
+    ['owes none below 80% of either limit', 799, 0, []],
+    ['owes a band notice from 80% of the band', 800, 0, [SUBSCRIBER_BAND_NEAR]],
+    [
+      'owes an allowance notice once this send reaches 80% of it',
+      100,
+      4_700,
+      [MONTHLY_ALLOWANCE_NEAR],
+    ],
+  ])('%s', (_, activeCount, sentThisMonth, notices) => {
     expect(
-      nearLimitNotices(
-        mockNewsletterLimits({ activeCount: 799, sentThisMonth: 0 }),
-      ),
-    ).toEqual([]);
+      nearLimitNotices(mockNewsletterLimits({ activeCount, sentThisMonth })),
+    ).toEqual(notices);
   });
+});
 
-  it('owes a band notice from 80% of the band', () => {
+describe(sentAfterThisPost, () => {
+  it('adds this post’s sends to the month’s', () => {
     expect(
-      nearLimitNotices(mockNewsletterLimits({ activeCount: 800 })),
-    ).toEqual([NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR]);
-  });
-
-  it('owes an allowance notice once this send reaches 80% of the allowance', () => {
-    expect(
-      nearLimitNotices(
-        mockNewsletterLimits({ activeCount: 100, sentThisMonth: 4_700 }),
+      sentAfterThisPost(
+        mockNewsletterLimits({ activeCount: 300, sentThisMonth: 1_200 }),
       ),
-    ).toEqual([NEWSLETTER_LIMIT_NOTICE_KIND.MONTHLY_ALLOWANCE_NEAR]);
+    ).toBe(1_500);
   });
 });

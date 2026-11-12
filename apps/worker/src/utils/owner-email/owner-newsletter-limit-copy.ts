@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@blog/db/constants';
-import type { TOwnerNewsletterText } from '@worker/utils/newsletter-send/owner-newsletter-copy-input';
+import type { TOwnerNewsletterText } from '@worker/utils/owner-email/owner-newsletter-copy-input';
 
 type TOwnerNewsletterLimitCopy = {
   [NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR]: TOwnerNewsletterText;
@@ -12,10 +12,15 @@ const { SUBSCRIBER_BAND_NEAR, MONTHLY_ALLOWANCE_NEAR } =
 
 export const OWNER_NEWSLETTER_LIMIT_COPY = {
   [LOCALE_ISO_CODES.EN]: {
-    [SUBSCRIBER_BAND_NEAR]: ({ siteName, activeCount, bandCeiling }) => ({
+    [SUBSCRIBER_BAND_NEAR]: ({
+      siteName,
+      activeCount,
+      bandCeiling,
+      nearPercent,
+    }) => ({
       subject: `${siteName} is close to its subscriber limit`,
       paragraphs: [
-        `${siteName} has ${activeCount} confirmed subscribers, over 80% of the ${bandCeiling} its plan includes.`,
+        `${siteName} has ${activeCount} confirmed subscribers, over ${nearPercent} of the ${bandCeiling} its plan includes.`,
         `Above ${bandCeiling}, new posts are no longer emailed until the plan moves to a larger subscriber band.`,
       ],
     }),
@@ -28,10 +33,15 @@ export const OWNER_NEWSLETTER_LIMIT_COPY = {
     }),
   },
   [LOCALE_ISO_CODES.NL]: {
-    [SUBSCRIBER_BAND_NEAR]: ({ siteName, activeCount, bandCeiling }) => ({
+    [SUBSCRIBER_BAND_NEAR]: ({
+      siteName,
+      activeCount,
+      bandCeiling,
+      nearPercent,
+    }) => ({
       subject: `${siteName} nadert de abonneelimiet`,
       paragraphs: [
-        `${siteName} heeft ${activeCount} bevestigde abonnees, meer dan 80% van de ${bandCeiling} die het abonnement omvat.`,
+        `${siteName} heeft ${activeCount} bevestigde abonnees, meer dan ${nearPercent} van de ${bandCeiling} die het abonnement omvat.`,
         `Boven de ${bandCeiling} worden nieuwe berichten niet meer gemaild totdat het abonnement naar een grotere abonneeschijf gaat.`,
       ],
     }),
@@ -44,10 +54,15 @@ export const OWNER_NEWSLETTER_LIMIT_COPY = {
     }),
   },
   [LOCALE_ISO_CODES.FR]: {
-    [SUBSCRIBER_BAND_NEAR]: ({ siteName, activeCount, bandCeiling }) => ({
+    [SUBSCRIBER_BAND_NEAR]: ({
+      siteName,
+      activeCount,
+      bandCeiling,
+      nearPercent,
+    }) => ({
       subject: `${siteName} approche de sa limite d’abonnés`,
       paragraphs: [
-        `${siteName} compte ${activeCount} abonnés confirmés, plus de 80 % des ${bandCeiling} inclus dans son offre.`,
+        `${siteName} compte ${activeCount} abonnés confirmés, plus de ${nearPercent} des ${bandCeiling} inclus dans son offre.`,
         `Au-delà de ${bandCeiling}, les nouveaux articles ne sont plus envoyés par e-mail tant que l’offre ne passe pas à une tranche d’abonnés supérieure.`,
       ],
     }),
@@ -60,10 +75,15 @@ export const OWNER_NEWSLETTER_LIMIT_COPY = {
     }),
   },
   [LOCALE_ISO_CODES.DE]: {
-    [SUBSCRIBER_BAND_NEAR]: ({ siteName, activeCount, bandCeiling }) => ({
+    [SUBSCRIBER_BAND_NEAR]: ({
+      siteName,
+      activeCount,
+      bandCeiling,
+      nearPercent,
+    }) => ({
       subject: `${siteName} erreicht bald sein Abonnentenlimit`,
       paragraphs: [
-        `${siteName} hat ${activeCount} bestätigte Abonnenten, mehr als 80 % der ${bandCeiling}, die der Tarif umfasst.`,
+        `${siteName} hat ${activeCount} bestätigte Abonnenten, mehr als ${nearPercent} der ${bandCeiling}, die der Tarif umfasst.`,
         `Über ${bandCeiling} werden neue Beiträge nicht mehr per E-Mail versendet, bis der Tarif in eine größere Abonnentenstufe wechselt.`,
       ],
     }),
@@ -76,10 +96,15 @@ export const OWNER_NEWSLETTER_LIMIT_COPY = {
     }),
   },
   [LOCALE_ISO_CODES.ES]: {
-    [SUBSCRIBER_BAND_NEAR]: ({ siteName, activeCount, bandCeiling }) => ({
+    [SUBSCRIBER_BAND_NEAR]: ({
+      siteName,
+      activeCount,
+      bandCeiling,
+      nearPercent,
+    }) => ({
       subject: `${siteName} está cerca de su límite de suscriptores`,
       paragraphs: [
-        `${siteName} tiene ${activeCount} suscriptores confirmados, más del 80 % de los ${bandCeiling} que incluye su plan.`,
+        `${siteName} tiene ${activeCount} suscriptores confirmados, más del ${nearPercent} de los ${bandCeiling} que incluye su plan.`,
         `Por encima de ${bandCeiling}, las nuevas entradas dejan de enviarse por correo hasta que el plan pase a un tramo de suscriptores mayor.`,
       ],
     }),

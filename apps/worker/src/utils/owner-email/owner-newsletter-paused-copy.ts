@@ -1,6 +1,6 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import { NEWSLETTER_LIMIT_NOTICE_KIND } from '@blog/db/constants';
-import type { TOwnerNewsletterText } from '@worker/utils/newsletter-send/owner-newsletter-copy-input';
+import type { TOwnerNewsletterText } from '@worker/utils/owner-email/owner-newsletter-copy-input';
 
 type TOwnerNewsletterPausedCopy = {
   [NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED]: TOwnerNewsletterText;

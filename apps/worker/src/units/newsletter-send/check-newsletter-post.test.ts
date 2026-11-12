@@ -1,5 +1,10 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_STATUS,
+  NEWSLETTER_POST_SEND_OUTCOME,
+} from '@blog/db/constants';
 import { getEmailNewPosts } from '@blog/db/queries/email-config';
+import { getNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends';
 import {
   getSettingsFeatures,
   type TSettingsFeaturesResult,
@@ -14,6 +19,7 @@ import {
   NEWSLETTER_SCHEDULE_RECHECK_MS,
 } from '@worker/constants/newsletter-send';
 import {
+  MOCK_CLAIMED_AT,
   MOCK_NEWSLETTER_POST,
   MOCK_POST_ID,
 } from '@worker/testing/newsletter-send/fixtures';
@@ -23,6 +29,7 @@ import { readNewsletterPost } from '@worker/utils/newsletter-send/read-newslette
 import { checkNewsletterPost } from './check-newsletter-post';
 
 vi.mock('@blog/db/queries/email-config');
+vi.mock('@blog/db/queries/newsletter-post-sends');
 vi.mock('@blog/db/queries/settings-features');
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
@@ -30,10 +37,10 @@ vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 const MOCK_NOW = new Date('2031-05-15T12:00:00Z');
 const MOCK_CREDENTIALS = {} as TTenantSanityCredentials;
 const CANCELLED = { state: NEWSLETTER_POST_STATE.CANCELLED };
-const ONE_HOUR_MS = 60 * 60_000;
+const MOCK_ONE_HOUR_MS = 60 * 60_000;
 
 function runCheck() {
-  return checkNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID);
+  return checkNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);
 }
 
 describe(checkNewsletterPost, () => {
@@ -48,6 +55,11 @@ describe(checkNewsletterPost, () => {
     vi.mocked(getEmailNewPosts).mockResolvedValue(true);
     vi.mocked(getTenantSanityCredentials).mockResolvedValue(MOCK_CREDENTIALS);
     vi.mocked(readNewsletterPost).mockResolvedValue(MOCK_NEWSLETTER_POST);
+    vi.mocked(getNewsletterPostSend).mockResolvedValue({
+      claimedAt: new Date(MOCK_CLAIMED_AT),
+      outcome: undefined,
+      skipReason: undefined,
+    });
   });
 
   afterEach(() => {
@@ -68,12 +80,14 @@ describe(checkNewsletterPost, () => {
   it('waits until a post dated in the future is due', async () => {
     vi.mocked(readNewsletterPost).mockResolvedValue({
       ...MOCK_NEWSLETTER_POST,
-      publishedAt: new Date(MOCK_NOW.getTime() + ONE_HOUR_MS).toISOString(),
+      publishedAt: new Date(
+        MOCK_NOW.getTime() + MOCK_ONE_HOUR_MS,
+      ).toISOString(),
     });
 
     await expect(runCheck()).resolves.toEqual({
       state: NEWSLETTER_POST_STATE.SCHEDULED,
-      waitMs: ONE_HOUR_MS,
+      waitMs: MOCK_ONE_HOUR_MS,
     });
   });
 
@@ -134,6 +148,33 @@ describe(checkNewsletterPost, () => {
     arrange();
 
     await expect(runCheck()).resolves.toEqual(CANCELLED);
+    expect(readNewsletterPost).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['no claim at all', undefined],
+    [
+      'a newer claim',
+      {
+        claimedAt: new Date(Date.parse(MOCK_CLAIMED_AT) + MOCK_ONE_HOUR_MS),
+        outcome: undefined,
+        skipReason: undefined,
+      },
+    ],
+    [
+      'a claim that already has an outcome',
+      {
+        claimedAt: new Date(MOCK_CLAIMED_AT),
+        outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
+        skipReason: undefined,
+      },
+    ],
+  ])('ends a run started for %s, reading nothing else', async (_, claim) => {
+    vi.mocked(getNewsletterPostSend).mockResolvedValue(claim);
+
+    await expect(runCheck()).resolves.toEqual({
+      state: NEWSLETTER_POST_STATE.UNCLAIMED,
+    });
     expect(readNewsletterPost).not.toHaveBeenCalled();
   });
 });

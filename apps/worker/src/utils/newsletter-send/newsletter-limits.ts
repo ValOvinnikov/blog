@@ -14,7 +14,7 @@ export type TNewsletterLimits = {
   sentThisMonth: number;
 };
 
-function sentAfterThisPost({
+export function sentAfterThisPost({
   activeCount,
   sentThisMonth,
 }: TNewsletterLimits): number {
