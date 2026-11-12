@@ -48,8 +48,12 @@ passed.
 
 ```bash
 git fetch origin <baseRefName> pull/<n>/head
-git worktree add --detach <primary checkout>/.claude/worktrees/review-pr-<n> <headRefOid>
+git worktree add --detach <primary checkout>/.claude/worktrees/review-pr-<n>-<short sha> <headRefOid>
 ```
+
+The path carries the head's short SHA, so each head a review looks at gets a
+worktree of its own: none is ever moved or re-used, and each is linked to
+the dependencies as they are when it is added.
 
 The reviewers read whole files and run scripts, so they need the tree, not
 the diff. The base is fetched with the head: a cloud session merges the base
@@ -84,22 +88,28 @@ PR is marked ready, so a red PR cannot merge. A failed check in
 the draft state, never a finding.
 
 **A check that could not start is not a failed check.** A failed check
-prints its findings. `jscpd is not installed`, a module-resolution error from
-eslint, or `check-touched-lint` exiting non-zero with nothing after its
-`Linting N touched file(s)` line means the tool was not there to run. The
-worktree's dependencies are the primary checkout's, linked when the worktree
-was added, so which fix applies depends on where the gap is:
+prints its findings. Two things look like a failure and are not the PR's:
 
-- **The PR itself adds a workspace or changes dependencies** (its diff
-  touches `pnpm-lock.yaml` or adds a `package.json`) — nothing on `main` can
-  supply what only the PR has. Leave that check out, and name it under
-  **Not checked** in the report: the opening session's `pnpm verify` is the
-  only run it gets.
-- **Otherwise the primary checkout is behind** — ask the user to run
-  `git pull` and `pnpm install` there, then remove the review worktree, add
-  it again (step 2) and re-run step 3: the links are copied only when a
-  worktree is added. The same pull gives sessions the current agents and
-  skills.
+- **`error: No merge-base …`** — the base ref is missing. Run step 2's fetch
+  and the command again.
+- **The tool was not there to run** — `jscpd is not installed`, a
+  module-resolution error from eslint, or `check-touched-lint` exiting
+  non-zero with nothing printed after any of its `Linting N touched file(s)`
+  lines. The worktree's dependencies are the primary checkout's, linked when
+  the worktree was added, so the fix depends on where the gap is:
+  - **The PR itself adds a workspace or changes dependencies** (its diff
+    touches `pnpm-lock.yaml` or adds a `package.json`) — nothing on `main`
+    can supply what only the PR has.
+  - **Otherwise the primary checkout is behind** — ask the user to run
+    `git pull` and `pnpm install` there, then add a second worktree for the
+    same head at a new path (`…-<short sha>-2`) and run the command in it:
+    the links are copied only when a worktree is added. The same pull gives
+    sessions the current agents and skills.
+
+**Every check ends in a result or a note.** One that still cannot start —
+the PR's own dependency, or a second worktree that fares no better — is left
+out and named under **Not checked** in the report: the opening session's
+`pnpm verify` is the only run it got.
 
 ## 4. Dispatch — one message, all in the background
 
@@ -162,16 +172,17 @@ checklist line on the spot.
 
 ## 7. Fix round
 
-When the branch has new commits, fetch the base and the head again, move the
-worktree (`git -C <worktree> checkout --detach <new sha>`), re-run step 3 and
-re-dispatch every reviewer from step 4, each prompt opening
+When the branch has new commits, repeat step 2 for the new head — its own
+worktree, never the old one moved — run step 3 there and re-dispatch every
+reviewer from step 4 on the new path, each prompt opening
 `Re-review of <old sha>` with the findings posted. A reviewer that approved
 is included: the fix commits are code it has not seen. A merge from the base in that range needs a full
 review instead.
 
-## 8. Remove the worktree
+## 8. Remove the worktrees
 
-Once the PR merges or closes: `git worktree remove <worktree>`. It is
+Once the PR merges or closes: `git worktree remove <worktree>` for each
+`review-pr-<n>-*` this review added. Each is
 detached and holds nothing of its own; one that was given its own install
 before this skill stopped doing so deletes slowly and needs a generous
 timeout. From a session that is itself inside a
