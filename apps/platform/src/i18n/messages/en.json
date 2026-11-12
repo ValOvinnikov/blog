@@ -2127,6 +2127,15 @@
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
     }
   },
+  "ownerReceiptEmail": {
+    "subject": "Your payment receipt for {siteName}",
+    "previewText": "We received {amount} for {siteName}.",
+    "thanks": "Thank you. We received your payment for {siteName}.",
+    "amountLabel": "Amount paid",
+    "dateLabel": "Date",
+    "planLabel": "Plan",
+    "actionLabel": "View your invoice"
+  },
   "suspensionCategory": {
     "ABUSE": "Abuse",
     "ILLEGAL_CONTENT": "Illegal content",

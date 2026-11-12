@@ -2127,6 +2127,15 @@
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar een betaald plan."
     }
   },
+  "ownerReceiptEmail": {
+    "subject": "Je betalingsbewijs voor {siteName}",
+    "previewText": "We hebben {amount} ontvangen voor {siteName}.",
+    "thanks": "Bedankt. We hebben je betaling voor {siteName} ontvangen.",
+    "amountLabel": "Betaald bedrag",
+    "dateLabel": "Datum",
+    "planLabel": "Abonnement",
+    "actionLabel": "Je factuur bekijken"
+  },
   "suspensionCategory": {
     "ABUSE": "Misbruik",
     "ILLEGAL_CONTENT": "Illegale inhoud",

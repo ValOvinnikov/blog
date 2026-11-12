@@ -2127,6 +2127,15 @@
       "kept": "No se borra nada. Tu contenido y tus ajustes se conservan y vuelven si cambias de nuevo a un plan de pago."
     }
   },
+  "ownerReceiptEmail": {
+    "subject": "Tu recibo de pago de {siteName}",
+    "previewText": "Hemos recibido {amount} por {siteName}.",
+    "thanks": "Gracias. Hemos recibido tu pago por {siteName}.",
+    "amountLabel": "Importe pagado",
+    "dateLabel": "Fecha",
+    "planLabel": "Plan",
+    "actionLabel": "Ver tu factura"
+  },
   "suspensionCategory": {
     "ABUSE": "Abuso",
     "ILLEGAL_CONTENT": "Contenido ilegal",

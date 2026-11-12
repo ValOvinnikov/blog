@@ -1,7 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
-import type * as BlogEmail from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import enMessages from '@platform/i18n/messages/en.json';
@@ -43,10 +42,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof BlogEmail>()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email');
 
 const MOCK_REPLY_TO_ADDRESS = faker.internet.email();
 const TENANT = mockTenant();
