@@ -34,6 +34,8 @@
     "check:touched-lint": "node scripts/check-touched-lint.mjs",
     "check:diff-hygiene": "node scripts/check-diff-hygiene.mjs",
     "check:diff-hygiene:test": "node --test scripts/check-diff-hygiene.test.mjs",
+    "check:review-hits": "node scripts/check-review-hits.mjs",
+    "check:review-hits:test": "node --test scripts/check-review-hits.test.mjs",
     "check:clones": "node scripts/check-clones.mjs",
     "check:turbo-env-sync": "node scripts/check-turbo-env-sync.mjs",
     "check:turbo-env-sync:test": "node --test scripts/check-turbo-env-sync.test.mjs",

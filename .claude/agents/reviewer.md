@@ -72,10 +72,9 @@ early pass never skips a later one.
 
 ### Pass 1 — Mechanical
 
-Run `pnpm check:diff-hygiene`, then every command in the skill's §0 over the
-full diff (`<base>...HEAD` plus the working tree; set §0's `BASE` to it),
-`pnpm check:clones` included. A diff-hygiene hit is blocking; a hit from the
-other commands is blocking once you have read it and §0 does not allow it.
+Run the skill's §0: `pnpm check:diff-hygiene`, `pnpm check:review-hits` and
+`pnpm check:clones`. A diff-hygiene hit is blocking; a hit from the other two
+is blocking once you have read it and §0's table does not allow it.
 
 ### Pass 2 — Contract
 
@@ -83,20 +82,25 @@ Map each changed file to its layer, then walk the skill's spec and
 feature-doc sync item and §1–7 over the diff. Boundary and type violations
 are blocking.
 
-§5's prop-ceiling count is part of this pass, for every component whose file
-the diff touches — not only those whose props the diff changes. A review that
-has not counted them cannot return `APPROVE`: a component over its ceiling goes
-under **Blocking** with its count, and the counts at or under it go in one
-line under **Non-blocking** ("no components touched" when there are none).
+Two of its items need the whole file, not the hunks, and a review that
+skipped either cannot return `APPROVE`:
+
+- **§5's prop ceiling.** Report the count for every component whose file the
+  diff touches: over the ceiling under **Blocking**, the rest in one line
+  under **Non-blocking** ("no components touched" when there are none).
+- **§6's test pruning.** Read every test file the diff creates or edits in
+  full, starting with the ones §0 names as over 500 lines, and cross-check
+  each removal the implementing agent's **Examined** section lists against
+  the test it names as still asserting it.
 
 ### Pass 3 — General
 
 What a contract check won't catch: the skill's "How to run a review here"
-step 3 (security, performance, correctness, maintainability), plus an
-unchecked `result.ok`, a webhook or API route missing its secret or signature
-check, over-fetching, dead code the change leaves behind (an unreachable
-branch, a prop or helper nothing reads any more), and a comment or doc the
-change made false.
+step 3. `correctness-reviewer` owns its security, performance and correctness
+items and the ticket's acceptance criteria, in a parallel dispatch — run only
+the maintainability items, and say under **Not checked** that the rest was
+left to it. When the prompt says `correctness-reviewer` was not dispatched (a
+diff that only changes styling, copy or stories), run all of step 3 yourself.
 
 ## Duplication is checked against the repo, not against the diff
 
@@ -124,16 +128,23 @@ it ships. Make the search a deliberate step:
 - Code that is coincidentally similar, or that sharing would couple when it
   should stay independent, is not a duplicate — say so rather than flag it.
 
-## Touched test files are pruned
+## PR review mode
 
-Every test file the diff creates or edits is read in full against
-`testing-practices` → "When you touch a test file", starting with the ones
-§0's over-500-lines scan names. A duplicate test, a case another unit with
-its own test file owns, an untabled set of input/output repeats, or a removed
-test whose behaviour no remaining test asserts is blocking (§6). Cross-check
-each removal the implementing agent's **Examined** section lists against the
-test it names as still asserting it. Test files the diff does not touch are
-out of scope.
+A prompt that opens `PR review of #<n>` reviews an open pull request
+(`review-pull-request`). It is a full review with three differences:
+
+- The checkout is a detached worktree at the PR's head. `git rev-parse HEAD`
+  must equal the head SHA the prompt names; a mismatch is blocking.
+- The **Examined** and **Reuse** sections come from the PR body. A PR body
+  missing either is the §6 Reuse finding.
+- The orchestrator runs `pnpm verify` and `pnpm check:clones` itself, or CI
+  already ran verify. Do not wait for either or repeat them, and run §0's
+  other scripts as `node scripts/<name>.mjs`, in a re-review too — a
+  sandboxed subagent cannot write in the review worktree, so `pnpm` fails
+  there. Prefix them with the `TOUCHED_BASE_REF` the prompt gives when the
+  PR's base is not `main`.
+
+A draft PR is the expected state, never a finding.
 
 ## Re-review mode
 
@@ -147,8 +158,8 @@ blocking findings. Review only what changed since:
 2. For each prior finding, read its `file:line` now and mark it **fixed** or
    **still open**, with the line that shows it.
 3. Run `pnpm check:diff-hygiene` (it covers the whole branch and is quick),
-   §0's reader commands with `BASE=<sha>`, then Passes 2 and 3 over the
-   changed files only, each read in full.
+   `TOUCHED_BASE_REF=<sha> pnpm check:review-hits`, then Passes 2 and 3 over
+   the changed files only, each read in full.
 
 Open the report with the `pwd` and `git rev-parse HEAD` lines, then
 `Re-reviewed N files changed since <sha>`; N is compared with the count the

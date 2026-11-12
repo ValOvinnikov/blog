@@ -35,91 +35,36 @@ characters. Any comment in a touched test file is `check:touched-lint`'s
 (`blog-touched/no-failing-comment`). Both are in `pnpm verify` and pre-push,
 so the implementing session has already seen them pass; any hit is blocking.
 
-The checks below need a reader. Run each over the **full diff**
-(`git diff origin/main...HEAD`, plus `git diff` if the tree is dirty) and read
-every hit; a confirmed one is blocking unless allowed below.
+**Then `pnpm check:review-hits`** — the checks that need a reader, over the
+same files (`TOUCHED_BASE_REF=<sha>` narrows it to a fix round). It exits
+zero whatever it finds, and non-zero only when git fails or finds no
+merge-base:
+read every hit, and a confirmed one is blocking unless its row
+allows it.
 
-```bash
-BASE=origin/main
-D() { git diff "$BASE"...HEAD; git diff; }
+| Hit                              | Blocking when                                                                                                                                                  |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TODO/FIXME left in               | it cites no open issue (`CLAUDE.md` comments rule)                                                                                                             |
+| possible secret                  | the value is real — fixtures carry fakes                                                                                                                       |
+| possible real Sanity project id  | the id is not an intentional fake                                                                                                                              |
+| lint or type suppression         | the rule it silences is one this checklist enforces — a raw DOM query, a nested query, a class assertion — or its reason does not hold                         |
+| test may restate its source      | the expected value is copied from the file under test (`testing-practices` "What not to test")                                                                 |
+| `vi.mock` of our own component   | always — it is allowed only in a `*-module-renderer.test.tsx` or a route test under `src/app/`, which the script skips (`testing-practices` "What to fake")    |
+| reads `mock.calls`               | it reads a faked component's props; an edge fake's arguments are fine                                                                                          |
+| comment added outside a test     | it fails `CLAUDE.md` "Comments default to zero" — the one-line gotcha passes                                                                                   |
+| fixed fake value not `MOCK_`     | always, in what the diff adds (`testing-practices` "Fixture naming")                                                                                           |
+| touched test file over 500 lines | never by itself — read the file first for the §6 pruning findings                                                                                              |
+| fake value already in `testing/` | the value stands for the same fake thing (`testing-practices` "Check `testing/` for a builder")                                                                |
+| value already in another file    | both uses mean the same thing — it becomes a const in this diff (`CLAUDE.md` "Reuse a const"); a coincidence, or vocabulary an outside standard spells, passes |
+| new const restates an existing   | the two consts name the same vocabulary; a match in the other app, or in a storage layer's own const, is reported and not merged                               |
 
-# Leftovers: a TODO/FIXME may cite an open issue (CLAUDE.md comments rule).
-D | grep -nE '^\+.*(TODO|FIXME|XXX|HACK)'
+**Then `pnpm check:clones`** — clones across every workspace the diff touches,
+printed only where one side is a touched file. It exits non-zero when jscpd
+is missing or fails, never an empty pass. A clone the diff creates — helper,
+component, hook, test fake, fixture, repeated arrangement — is blocking; one
+whose copies were all on `main` already is filed.
 
-# Secrets. Read each hit — fixtures carry fakes.
-D | grep -nE '^\+.*(_TOKEN|_SECRET|API_KEY)\s*[:=]'
-
-# A real Sanity project id pasted into a fixture via a copied Access API error.
-# Read each hit — the id may be an intentional fake. Deliberately narrow: a
-# general id-shaped pattern flags every mock id, hash and slug.
-D | grep -nE '^\+.*/access/project/[a-z0-9]{8}/'
-
-# Tests that restate their source (testing-practices → "What not to test").
-# The grep narrows; judge by eye.
-D | grep -nE '^\+.*(fields\.map\(\(f\) => f\.name\)|typeof [^)]*\)\.toBe\(.function.\)|\.name\)\.toBe\()'
-
-# Tests that bypass Testing Library (testing-practices "Writing a component
-# test" → "Never drop to a raw DOM query"). Lint fails all of these, so a
-# hit means a suppression was added.
-D | grep -nE '^\+.*(toHaveClass|\.className|\.classList|container\.querySelector|document\.querySelector|baseElement\.querySelector|\.(parentElement|parentNode|firstChild|lastChild|children|childNodes|nextSibling|previousSibling)\b)'
-D | grep -nE '^\+.*const \{[^}]*(getBy|queryBy|findBy|getAllBy|queryAllBy|findAllBy)[^}]*\} = render'
-
-# A query nested in expect or an interaction (testing-practices "Writing a
-# component test" → "Name the element"). Run over every test file the diff
-# touches, not only the added lines: a touched file is converted whole. The
-# touched-file rule blog-test/no-nested-query fails these, so a hit means a
-# suppression was added.
-D | awk '/^\+\+\+ b\//{f=substr($0,7)} f ~ /\.test\.tsx?$/{print f}' | sort -u | xargs -r grep -nE '(expect|user\.[a-zA-Z]+|fireEvent\.[a-zA-Z]+)\((await )?(screen|within\()|(expect|user\.[a-zA-Z]+|fireEvent\.[a-zA-Z]+)\($' 2>/dev/null
-
-# Faking our own components, or reading a fake's arguments (testing-practices
-# → "What to fake"). A vi.mock of our own component is allowed only in a
-# *-module-renderer.test.tsx or a route file's test under src/app/. A
-# mock.calls hit is blocking only when it reads a faked component's props
-# outside those files — reading an edge fake's arguments is fine.
-D | awk '/^\+\+\+ b\//{f=$0} /^\+vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/ && f !~ /(module-renderer|\/src\/app\/.*)\.test/{print FNR": "$0}'
-D | grep -nE '^\+.*mock\.calls'
-
-# Comments outside test files (CLAUDE.md → "Comments default to zero"): a
-# `Name — does X` doc block, a doc block of three or more lines, a `//` inside
-# a body. Read each hit — the one-line gotcha the rule allows is not a finding.
-D | grep -nE '^\+[[:space:]]*\* [A-Z][A-Za-z0-9]+ — '
-D | awk '/^\+[[:space:]]*\/\*\*/{n=0;b=1;next} b&&/^\+[[:space:]]*\*\//{b=0;if(n>=3)print FNR": doc block of "n" lines";next} b&&/^\+/{n++}'
-D | grep -nE '^\+ {4,}// '
-
-# Touched test files over 500 lines (testing-practices → "When you touch a
-# test file"). Not blocking by itself: read each hit first for the §6 pruning
-# findings.
-( git diff "$BASE"...HEAD --name-only --diff-filter=d; git diff --name-only --diff-filter=d ) \
-  | grep -E '\.test\.tsx?$' | sort -u | xargs -r wc -l | awk '$2 != "total" && $1 > 500'
-
-# A fixed fake value not named MOCK_<THING> in a test file, testing/ or
-# __mocks__/ (testing-practices → "Fixture naming").
-D | awk '/^\+\+\+ b\//{t=($0 ~ /(\.test\.tsx?|\/testing\/.*\.tsx?|\/__mocks__\/.*\.tsx?)$/)} t&&/^\+(export )?const [A-Za-z_][A-Za-z0-9_]* = (\047|"|`|\[|\{|-?[0-9]|faker\.)/&&!/^\+(export )?const (MOCK_|mock)/{print FNR": "$0}'
-
-# A fake value a test adds that the workspace's testing/ or __mocks__/ already
-# holds (testing-practices → "Check `testing/` for a builder"). Read each hit: it
-# is blocking when the value stands for the same fake thing.
-for f in $( (git diff "$BASE"...HEAD --name-only --diff-filter=AM; git diff --name-only --diff-filter=AM) | grep -E '\.test\.tsx?$' | sort -u); do
-  ws=$(printf '%s' "$f" | cut -d/ -f1-2)
-  { git diff "$BASE"...HEAD -- "$f"; git diff -- "$f"; } | grep -E '^\+[^+]' \
-    | grep -vE '^\+\s*(import |\} from |vi\.mock\()|ByRole\(|stubEnv|process\.env' \
-    | grep -oE "'[^' ]{4,}'" | sort -u | while read -r lit; do
-      hit=$(git grep -l -F -e "$lit" -- "$ws/src/testing" ":(glob)$ws/src/**/__mocks__/**" | head -1)
-      [ -n "$hit" ] && echo "$f: $lit is already in $hit"
-    done
-done
-
-# Clones across every workspace the diff touches (a few seconds), printed only
-# where one side is a touched file. Exits non-zero when jscpd is missing or
-# fails — never an empty pass. A clone the diff creates — helper, component,
-# hook, test fake, fixture, repeated arrangement — is blocking; one whose
-# copies were all on main already is filed.
-pnpm check:clones
-```
-
-Also scan by eye for commented-out code, which grep can't catch reliably. Hits
-inside documentation code fences (this skill quoting its own patterns) are not
-findings.
+Also scan by eye for commented-out code, which no pattern catches reliably.
 
 ## 1. Layer boundaries (blocking)
 
@@ -263,19 +208,16 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   (→ `CLAUDE.md` "Reuse before you create"). A missing or empty one, or an
   entry that says "none found" for a value §0's fixture scan finds in
   `testing/` or `__mocks__/`, is a finding.
-- A `screen` or `within` query nested inside `expect(…)`, `user.*(…)` or
-  `fireEvent.*(…)` in any test file the diff creates or touches is
-  **blocking** — the element is a named `const` first, and a touched file is
-  converted whole (→ `testing-practices` "Name the element, then use the
-  name"; `blog-test/no-nested-query` fails it on touched files). Hits
-  ending in `($` need a look: a multi-line call wrapping a query is the same
-  finding, one wrapping a mock or a const is not.
 - A bug fix has a regression test that failed before the fix.
 - Suite labels: a component takes ``describe(`<${Component.name}/>`, …)``,
   anything else the bare symbol. The common miss is a bare symbol on a
   component. Flag it in files the diff creates or touches
   (→ `testing-practices` Conventions).
-- `pnpm test` green.
+
+A rule a lint rule or script already fails has no line here: a nested query,
+a raw DOM query, a comment in a test file, a retyped const value. When a
+check starts enforcing a rule, the change that adds it deletes the rule's
+line from this checklist.
 
 ## 7. Hygiene
 
@@ -300,9 +242,12 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
   const that duplicates the values of an existing one are findings — in tests
   as in source (→ `CLAUDE.md` "Reuse a const; never retype its value").
   `pnpm verify`'s touched-file lint catches a retyped const value and a
-  value repeated within one file, but not a value repeated across files or a
-  new const restating an existing one: search for each, and compare each new
-  const against the index. A const the diff adds or changes without a
+  value repeated within one file. §0's `check:review-hits` lists a string
+  value the diff writes that another source file of the workspace already
+  holds, and a new const whose values an existing const covers — read each.
+  It does not see numbers, a string with a space in it, a template literal,
+  a Studio or Drizzle schema file, a repeat in another workspace, or a
+  repeat between two files not yet tracked: search for those. A const the diff adds or changes without a
   regenerated `CONSTANTS.md` fails `gen:const-index:check`.
 - **Comments (blocking).** Read every comment the diff adds or touches, not
   only the grep hits, against `CLAUDE.md` "Comments default to zero". A
@@ -326,23 +271,32 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 ## How to run a review here
 
 Pre-commit reviews go to the `reviewer` subagent (`.claude/agents/reviewer.md`)
-— a fresh context with no author bias. A manual review (a solo session's
-self-review, someone else's PR) runs the same three passes, in order; a hit in
-an early pass does not skip a later one:
+— a fresh context with no author bias — and, for every diff that changes more
+than styling, copy, stories or docs, to `correctness-reviewer`
+(`.claude/agents/correctness-reviewer.md`) alongside it, which takes step 3's
+security, performance and correctness items and the ticket's acceptance
+criteria (→ `develop-feature` §6). An open PR gets the same two agents
+through `review-pull-request`; a cloud session runs no review of its own. A
+manual review runs the same three passes, in order; a hit in an early pass
+does not skip a later one:
 
-1. **Mechanical (§0).** Run `pnpm check:diff-hygiene`, then the commands
-   that need a reader; every confirmed hit is blocking.
+1. **Mechanical (§0).** Run `pnpm check:diff-hygiene`, then
+   `pnpm check:review-hits` and `pnpm check:clones`; every confirmed hit is
+   blocking.
 2. **Contract (the sync item and §1–7).** Map each changed file to its layer and walk the
    checklist, boundary and type findings first.
 3. **General** — what a contract check won't catch:
    - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe
-     deserialization.
+     deserialization, a webhook or API route missing its secret or signature
+     check.
    - **Performance:** N+1 queries, O(n²) in hot paths, unbounded
-     loops/queries, resource leaks.
+     loops/queries, resource leaks, over-fetching.
    - **Correctness:** empty/null/overflow, race conditions, error handling and
-     propagation, off-by-one, migration idempotency (a re-run never
-     overwrites or loses data).
-   - **Maintainability:** naming, single responsibility, test coverage, and
+     propagation, an unchecked `result.ok`, off-by-one, migration idempotency
+     (a re-run never overwrites or loses data).
+   - **Maintainability:** naming, single responsibility, test coverage, dead
+     code the change leaves behind (an unreachable branch, a prop or helper
+     nothing reads any more), a comment or doc the change made false, and
      duplication checked against the **repo**, not the diff — a confirmed
      duplicate is blocking (→ `reviewer.md` "Duplication is checked against
      the repo, not against the diff").

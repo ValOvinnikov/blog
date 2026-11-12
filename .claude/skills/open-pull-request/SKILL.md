@@ -268,8 +268,10 @@ The steps are the gates above, numbered for citation: steps 1–2 are Gate 0,
 3. Do the work + run quality gates — merge `origin/main` in before verify
    (`develop-feature` §5).
 4. **Dispatch the `reviewer` subagent** (`.claude/agents/reviewer.md`) over the
-   full diff — fix blocking findings and re-dispatch until it returns
-   `APPROVE`. Never **push** without an `APPROVE` on the diff as it stands; new
+   full diff, with `correctness-reviewer` and the other reviewers
+   `develop-feature` §6 calls for — fix blocking findings and re-dispatch
+   until every one of them returns `APPROVE`. Never **push** without an
+   `APPROVE` from each on the diff as it stands; new
    changes invalidate a prior `APPROVE`, including a later merge from
    `origin/main`.
 
