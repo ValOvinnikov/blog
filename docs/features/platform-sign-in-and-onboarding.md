@@ -210,6 +210,12 @@ site as a 14-day Growth trial, with no card.
   with every value kept. Success redirects to
   `/dashboard`, whose site setup card follows provisioning.
 
+- **Trial on `/dashboard`.** While the site is in TRIAL with a
+  `trial_ends_at`, the owner's Overview shows an info `Alert` under the header
+  (`TrialNotice`, `ownerHomePage.trialTitle` / `trialDescription`): the plan,
+  the date the trial ends, that no card is needed, and that the site then
+  moves to Free. It has no Upgrade action until the Checkout page exists.
+
 - **First run on `/dashboard`.** Once provisioning is READY, the owner's
   Overview shows a "Get started" card after the site setup card and before
   "Your site" (`getStartedFor`, `GetStartedCard`). It is for the tenant's

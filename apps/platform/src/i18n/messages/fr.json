@@ -81,7 +81,7 @@
     "creating": "Création de votre site…",
     "failureTitle": "Nous n’avons pas pu créer votre site",
     "failures": {
-      "alreadyOwnsFreeSite": "Vous avez déjà un site gratuit. Chaque personne peut en avoir un.",
+      "alreadyOwnsFreeSite": "Vous avez déjà un site gratuit ou en essai. Chaque personne peut en avoir un à la fois.",
       "tryAgainLater": "Réessayez plus tard.",
       "serverError": "Une erreur s’est produite. Réessayez."
     },
@@ -353,6 +353,8 @@
   },
   "ownerHomePage": {
     "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",
+    "trialTitle": "Essai {plan}",
+    "trialDescription": "Votre site dispose de toutes les fonctionnalités {plan} jusqu'au {date}. Aucune carte n'est nécessaire ; à la fin de l'essai, le site passe à {freePlan}.",
     "yourSiteCardTitle": "Votre site",
     "nameLabel": "Nom",
     "publicDomainLabel": "Domaine public",

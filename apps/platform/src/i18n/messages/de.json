@@ -81,7 +81,7 @@
     "creating": "Deine Website wird erstellt…",
     "failureTitle": "Wir konnten deine Website nicht erstellen",
     "failures": {
-      "alreadyOwnsFreeSite": "Du hast bereits eine kostenlose Website. Jede Person kann eine haben.",
+      "alreadyOwnsFreeSite": "Du hast bereits eine kostenlose Website oder eine Website in der Testphase. Jede Person kann jeweils eine haben.",
       "tryAgainLater": "Versuche es später erneut.",
       "serverError": "Etwas ist schiefgelaufen. Versuche es erneut."
     },
@@ -353,6 +353,8 @@
   },
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",
+    "trialTitle": "{plan}-Testphase",
+    "trialDescription": "Deine Website hat bis {date} alle {plan}-Funktionen. Du brauchst keine Karte; nach der Testphase wechselt die Website zu {freePlan}.",
     "yourSiteCardTitle": "Ihre Website",
     "nameLabel": "Name",
     "publicDomainLabel": "Öffentliche Domain",

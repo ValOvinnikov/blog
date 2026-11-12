@@ -1,4 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
+import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
@@ -16,6 +17,7 @@ import { GetStartedCard } from './components/get-started-card/get-started-card';
 import { MakeItYoursCard } from './components/make-it-yours-card/make-it-yours-card';
 import { SiteSetupCard } from './components/site-setup-card/site-setup-card';
 import { StreamedDomainCard } from './components/streamed-domain-card/streamed-domain-card';
+import { TrialNotice } from './components/trial-notice/trial-notice';
 import { YourSiteCard } from './components/your-site-card/your-site-card';
 import { ownerHomeViewVariants } from './owner-home-view-variants';
 
@@ -47,6 +49,10 @@ export const OwnerHomeView = ({
 
       {tenant.deprovisionedAt && (
         <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+      )}
+
+      {tenant.status === TENANT_STATUS.TRIAL && tenant.trialEndsAt && (
+        <TrialNotice plan={tenant.plan} trialEndsAt={tenant.trialEndsAt} />
       )}
 
       {siteSetup && <SiteSetupCard siteSetup={siteSetup} />}

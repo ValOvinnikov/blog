@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -45,6 +45,9 @@ const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
   <OwnerHomeView {...props} />
 );
 
+const MOCK_TRIAL_ENDS_AT = new Date('2026-11-26T09:00:00.000Z');
+const TRIAL_TITLE = 'Growth trial';
+
 const GET_STARTED_HEADING = { level: 2, name: 'Get started' } as const;
 
 const setup = customRenderAsync(OwnerHomeViewElement, defaultProps);
@@ -53,6 +56,12 @@ describe(`<${OwnerHomeView.name}/>`, () => {
   describe('for a live tenant', () => {
     beforeEach(async () => {
       await setup();
+    });
+
+    it('shows no trial notice', () => {
+      const title = screen.queryByText(TRIAL_TITLE);
+
+      expect(title).not.toBeInTheDocument();
     });
 
     it("shows the tenant's name and status without a plan pill, and an Open site link", () => {
@@ -155,6 +164,26 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
 
     expect(archivedNotice).toBeVisible();
+  });
+
+  describe('for a site on a trial', () => {
+    beforeEach(async () => {
+      await setup({
+        tenant: {
+          ...tenant,
+          status: TENANT_STATUS.TRIAL,
+          trialEndsAt: MOCK_TRIAL_ENDS_AT,
+        },
+      });
+    });
+
+    it('says the site is on a Growth trial and when it ends', () => {
+      const title = screen.getByText(TRIAL_TITLE);
+      const endDate = screen.getByText(/until Nov 26, 2026/);
+
+      expect(title).toBeVisible();
+      expect(endDate).toBeVisible();
+    });
   });
 
   describe('with a pending domain', () => {

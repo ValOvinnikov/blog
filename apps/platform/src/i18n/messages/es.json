@@ -81,7 +81,7 @@
     "creating": "Creando tu sitio…",
     "failureTitle": "No hemos podido crear tu sitio",
     "failures": {
-      "alreadyOwnsFreeSite": "Ya tienes un sitio gratuito. Cada persona puede tener uno.",
+      "alreadyOwnsFreeSite": "Ya tienes un sitio gratuito o en prueba. Cada persona puede tener uno a la vez.",
       "tryAgainLater": "Vuelve a intentarlo más tarde.",
       "serverError": "Algo ha salido mal. Vuelve a intentarlo."
     },
@@ -353,6 +353,8 @@
   },
   "ownerHomePage": {
     "description": "Su sitio de un vistazo. Todo lo que aparece aquí está en vivo.",
+    "trialTitle": "Prueba de {plan}",
+    "trialDescription": "Tu sitio tiene todas las funciones de {plan} hasta el {date}. No necesitas tarjeta; cuando termine la prueba, el sitio pasa a {freePlan}.",
     "yourSiteCardTitle": "Su sitio",
     "nameLabel": "Nombre",
     "publicDomainLabel": "Dominio público",
