@@ -47,6 +47,7 @@ const ACTIVITY_ICON = {
   [AUDIT_ACTION.OAUTH_APP_SAVED]: ICONS.LOCK,
   [AUDIT_ACTION.OAUTH_APP_REPLACED]: ICONS.LOCK,
   [AUDIT_ACTION.OAUTH_APP_REMOVED]: ICONS.CLOSE,
+  [AUDIT_ACTION.NEWSLETTER_PAUSE_CLEARED]: ICONS.MAIL,
 } as const satisfies Record<TAuditAction, TRegisteredIconName>;
 
 export const ActivityList = ({ events }: TActivityListProps) => {

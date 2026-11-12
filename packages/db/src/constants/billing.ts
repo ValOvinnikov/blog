@@ -2,7 +2,7 @@ import type { TMaybeNull } from '@blog/config/types';
 import type { TValueOf } from '@blog/config/utils';
 
 import {
-  type SUBSCRIBER_BAND_CEILINGS,
+  SUBSCRIBER_BAND_CEILINGS,
   TENANT_PLAN,
   type TTenantPlan,
 } from './tenant';
@@ -32,6 +32,16 @@ export type TPaidSubscriberBandCeiling = Exclude<
   TSubscriberBandCeiling,
   (typeof SUBSCRIBER_BAND_CEILINGS)[0]
 >;
+
+function isPaidSubscriberBandCeiling(
+  ceiling: TSubscriberBandCeiling,
+): ceiling is TPaidSubscriberBandCeiling {
+  return ceiling !== SUBSCRIBER_BAND_CEILINGS[0];
+}
+
+export const PAID_SUBSCRIBER_BAND_CEILINGS = SUBSCRIBER_BAND_CEILINGS.filter(
+  isPaidSubscriberBandCeiling,
+);
 
 export type TIntervalPriceLookupKeys = {
   monthly: TStripePriceLookupKey;

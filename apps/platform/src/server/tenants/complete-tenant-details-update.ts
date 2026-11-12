@@ -20,7 +20,7 @@ import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import type { TOwnerAccessRequestResult } from '@platform/server/owner-access/request-owner-access';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { changedTenantDetailsFields } from '@platform/server/tenants/changed-tenant-details-fields';
-import { notifyOwnerOfPlanChange } from '@platform/server/tenants/notify-owner-of-plan-change';
+import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import { reinviteChangedOwner } from '@platform/server/tenants/reinvite-changed-owner';
 import { after } from 'next/server';
 
@@ -64,9 +64,7 @@ export const completeTenantDetailsUpdate = async (
   previousTenant: TTenant,
 ): Promise<TTenantDetailsSaved> => {
   await revalidateSiteConfig(tenantId);
-  after(() =>
-    notifyOwnerOfPlanChange(tenantId, previousTenant.plan, tenant.plan),
-  );
+  after(() => onTenantPlanChange(tenantId, previousTenant.plan, tenant.plan));
   const studioReinvite = await reinviteIfOwnerChanged(
     tenant,
     ownerEmail,

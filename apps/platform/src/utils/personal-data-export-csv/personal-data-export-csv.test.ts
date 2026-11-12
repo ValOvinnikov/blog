@@ -20,6 +20,7 @@ const mockEmptyPersonalDataExport = () => ({
   leads: [],
   membershipInvites: [],
   unsentStudioReinvites: [],
+  selfServeOwnerSites: [],
   readerAccount: undefined,
   blockedSignupIdentities: [],
   auditEvents: [],
@@ -28,14 +29,14 @@ const mockEmptyPersonalDataExport = () => ({
 describe(toPersonalDataExportCsv, () => {
   describe('with every kind of record stored', () => {
     let csv: string;
+    let rows: string[];
 
     beforeEach(() => {
       csv = toPersonalDataExportCsv(mockPersonalDataExport());
+      [, ...rows] = toRows(csv);
     });
 
     it('writes one row per exported record, each kind named', () => {
-      const [, ...rows] = toRows(csv);
-
       const kinds = rows.map((row) => row.split(',')[KIND_COLUMN_INDEX]);
 
       expect(kinds).toEqual([
@@ -43,6 +44,7 @@ describe(toPersonalDataExportCsv, () => {
         DATA_REQUEST_MATCH_KIND.LEAD,
         DATA_REQUEST_MATCH_KIND.INVITE,
         DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE,
+        DATA_REQUEST_MATCH_KIND.SELF_SERVE_OWNER,
         DATA_REQUEST_MATCH_KIND.READER_ACCOUNT,
         DATA_REQUEST_MATCH_KIND.BOOKMARK,
         DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK,
@@ -51,7 +53,6 @@ describe(toPersonalDataExportCsv, () => {
     });
 
     it('starts every row with its time, the searched email and the operator', () => {
-      const [, ...rows] = toRows(csv);
       const leading = `${MOCK_EXPORT_GENERATED_AT.toISOString()},${MOCK_DATA_REQUEST_EMAIL},${mockAdmin().userId},`;
 
       const startsWithLeading = rows.map((row) => row.startsWith(leading));

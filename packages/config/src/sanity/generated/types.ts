@@ -491,7 +491,6 @@ export type Module_postFeatured = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   postSource?: 'PINNED' | 'NEWEST_FEATURED';
   posts?: Array<
@@ -501,9 +500,22 @@ export type Module_postFeatured = {
   >;
   limit?: number;
   showImages?: boolean;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+};
+
+export type WideLayout = {
+  _type: 'wideLayout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type Module_postLatest = {
@@ -524,15 +536,6 @@ export type Module_postLatest = {
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
   columns?: 'TWO' | 'THREE' | 'FOUR';
-};
-
-export type WideLayout = {
-  _type: 'wideLayout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
 };
 
 export type Module_postList = {
@@ -2679,8 +2682,8 @@ export type AllSanitySchemaTypes =
   | Module_postRelated
   | Page_postReference
   | Module_postFeatured
-  | Module_postLatest
   | WideLayout
+  | Module_postLatest
   | Module_postList
   | ExpandableSectionText
   | ListedText

@@ -40,10 +40,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email');
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const sendEmailMock = vi.mocked(sendEmail);

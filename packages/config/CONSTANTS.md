@@ -32,7 +32,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/audit.ts`
 
 - **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -344,6 +344,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **NEWSLETTER_SKIP_REASON**: `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `REPUTATION_STOP`, `SITE_PAUSED`
 - **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`
 
+### `@blog/db/constants` — `packages/db/src/constants/row-lock.ts`
+
+- **ROW_LOCK**: `UPDATE`=`"update"`
+
 ### `@blog/db/constants` — `packages/db/src/constants/site-config-saved-at.ts`
 
 - **SITE_CONFIG_SAVED_AT**: `LOOK`, `VOICE`
@@ -411,6 +415,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BADGE_TONE**: `OK`=`"ok"`, `WARN`=`"warn"`, `BAD`=`"bad"`, `NEUTRAL`=`"neutral"`, `BRAND`=`"brand"`, `PLAN`=`"plan"`
 
+### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
+
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`
+- **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`
+- **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
+- **BILLING_GRACE**: `START`, `END`, `KEEP`
+
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`
@@ -447,7 +458,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
-- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
+- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SELF_SERVE_OWNER`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
 - **DATA_REQUEST_KIND_FILTER**: `ALL`
 - **DATA_REQUEST_MATCH_COLUMN**: `KIND`, `SITE`, `EMAIL`, `RECORDED`
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
@@ -575,6 +586,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 
 - **MENU_RADIO_GROUP_SIZE**: `DESKTOP`, `TOUCH`
+
+### `@platform/constants/newsletter-pause` — `apps/platform/src/constants/newsletter-pause.ts`
+
+- **NEWSLETTER_PAUSE_REFUSAL**: `NOT_PAUSED`
+- **NEWSLETTER_PAUSE_LOG**: `CLEAR_AUDIT_FAILED`=`"newsletter_pause.clear_audit_failed"`, `CLEAR_FAILED`=`"newsletter_pause.clear_failed"`
 
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 
@@ -822,6 +838,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **NEWSLETTER_OUTCOME**: `ALREADY_SUBSCRIBED`
 - **NEWSLETTER_SUBSCRIPTION_ACTION**: `UNSUBSCRIBE`, `RESEND`
 - **NEWSLETTER_LOG**: `MODULE_FETCH_FAILED`=`"newsletter_module.fetch_failed"`, `SUBSCRIBE_FAILED`=`"newsletter.subscribe_failed"`, `SUBSCRIBE_TENANT_NOT_ACTIVE`=`"newsletter.subscribe_tenant_not_active"`, `SUBSCRIBE_CAPABILITY_DISABLED`=`"newsletter.subscribe_capability_disabled"`, `SUBSCRIBED_COOKIE_SET_FAILED`=`"newsletter.subscribed_cookie_set_failed"`, `SUBSCRIBED_COOKIE_CLEAR_FAILED`=`"newsletter.subscribed_cookie_clear_failed"`, `GATE_STATUS_FETCH_FAILED`=`"newsletter.gate_status_fetch_failed"`, `UNSUBSCRIBE_FAILED`=`"newsletter.unsubscribe_failed"`, `UNSUBSCRIBE_TENANT_UNRESOLVED`=`"newsletter.unsubscribe_tenant_unresolved"`, `CONFIRMATION_RESEND_FAILED`=`"newsletter.confirmation_resend_failed"`, `RESEND_CONFIRMATION_TENANT_NOT_ACTIVE`=`"newsletter.resend_confirmation_tenant_not_active"`
+
+### `@web/constants/post-latest` — `apps/web/src/constants/post-latest.ts`
+
+- **POST_LATEST_LOG**: `MODULE_FETCH_FAILED`=`"post_latest_module.fetch_failed"`
 
 ### `@web/constants/post-list` — `apps/web/src/constants/post-list.ts`
 

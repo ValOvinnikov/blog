@@ -1,17 +1,20 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
-import type * as BlogEmail from '@blog/email';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import enMessages from '@platform/i18n/messages/en.json';
 import nlMessages from '@platform/i18n/messages/nl.json';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_OWNER_EMAIL_FROM_ADDRESS,
   MOCK_OWNER_EMAIL_SEND_ERROR,
   MOCK_PLATFORM_APP_BASE_URL,
 } from '@platform/testing/owner-email/fixtures';
+import {
+  getTenantByIdMock,
+  getTenantOwnerEmailMock,
+  mockOwnerEmailDb,
+} from '@platform/testing/owner-email/mock-owner-email-db';
 import {
   mockTenant,
   MOCK_INVITED_OWNER_EMAIL,
@@ -24,25 +27,11 @@ import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { notifyOwnerOfPlanChange } from './notify-owner-of-plan-change';
 
-const { getTenantByIdMock, getTenantOwnerEmailMock } = vi.hoisted(() => ({
-  getTenantByIdMock: vi.fn(),
-  getTenantOwnerEmailMock: vi.fn(),
-}));
-
 vi.mock('@platform/utils/env/env');
 
-vi.mock('@blog/db', async () => ({
-  ...(await mockDbConstants()),
-  queries: {
-    tenants: { getTenantById: getTenantByIdMock },
-    memberships: { getTenantOwnerEmail: getTenantOwnerEmailMock },
-  },
-}));
+vi.mock('@blog/db', () => mockOwnerEmailDb());
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal<typeof BlogEmail>()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email');
 
 const sendEmailMock = vi.mocked(sendEmail);
 

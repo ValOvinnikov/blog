@@ -34,7 +34,10 @@ const APPEARANCE_GROUP = {
 
 export const appearanceFieldGroups = [CONTENT_GROUP, APPEARANCE_GROUP];
 
-const sectionStyleFields = (columnsHidden?: StringDefinition['hidden']) => [
+const sectionStyleFields = (
+  hasColumns: boolean,
+  columnsHidden?: StringDefinition['hidden'],
+) => [
   tileField({
     name: 'cardStyle',
     title: 'Card Style',
@@ -71,25 +74,30 @@ const sectionStyleFields = (columnsHidden?: StringDefinition['hidden']) => [
     emptyTitle: SITE_DEFAULT,
     Picture: DensityPicture,
   }),
-  tileField({
-    name: 'columns',
-    title: 'Columns',
-    description:
-      "How many cards sit side by side on wide screens. Leave on Auto to keep the section's usual grid.",
-    tiles: [
-      { title: 'Two', value: GRID_COLUMNS.TWO },
-      { title: 'Three', value: GRID_COLUMNS.THREE },
-      { title: 'Four', value: GRID_COLUMNS.FOUR },
-    ],
-    emptyTitle: 'Auto',
-    Picture: ColumnsPicture,
-    hidden: columnsHidden,
-  }),
+  ...(hasColumns
+    ? [
+        tileField({
+          name: 'columns',
+          title: 'Columns',
+          description:
+            "How many cards sit side by side on wide screens. Leave on Auto to keep the section's usual grid.",
+          tiles: [
+            { title: 'Two', value: GRID_COLUMNS.TWO },
+            { title: 'Three', value: GRID_COLUMNS.THREE },
+            { title: 'Four', value: GRID_COLUMNS.FOUR },
+          ],
+          emptyTitle: 'Auto',
+          Picture: ColumnsPicture,
+          hidden: columnsHidden,
+        }),
+      ]
+    : []),
 ];
 
 type TAppearanceFieldsOptions = {
   content: readonly FieldDefinition[];
   appearance: readonly FieldDefinition[];
+  hasColumns?: boolean;
   columnsHidden?: StringDefinition['hidden'];
 };
 
@@ -100,10 +108,11 @@ const inGroup =
 export const appearanceFields = ({
   content,
   appearance,
+  hasColumns = true,
   columnsHidden,
 }: TAppearanceFieldsOptions) => [
   ...content.map(inGroup(CONTENT_GROUP)),
-  ...[...appearance, ...sectionStyleFields(columnsHidden)].map(
+  ...[...appearance, ...sectionStyleFields(hasColumns, columnsHidden)].map(
     inGroup(APPEARANCE_GROUP),
   ),
 ];

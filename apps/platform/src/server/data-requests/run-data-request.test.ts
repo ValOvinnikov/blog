@@ -5,17 +5,17 @@ import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { firstRecordedAuditEvent } from '@platform/testing/audit-events/recorded-audit-event';
+import { MOCK_ONE_OF_EACH_MATCH_COUNT } from '@platform/testing/data-requests/counts';
 import {
   MOCK_DATA_REQUEST_EMAIL,
   MOCK_DATA_REQUEST_EMAIL_INDEX,
   mockPersonalDataMatches,
   MOCK_NOT_AN_EMAIL,
-  MOCK_ONE_OF_EACH_MATCH_COUNT,
 } from '@platform/testing/data-requests/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
+import { countPersonalDataMatches } from './count-personal-data-matches';
 import { runDataRequest } from './run-data-request';
-import { countPersonalDataMatches } from './to-data-request-matches';
 
 faker.seed(5998);
 

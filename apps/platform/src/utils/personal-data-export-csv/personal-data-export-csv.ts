@@ -1,6 +1,7 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TPersonalDataReaderAccount } from '@blog/db/queries/personal-data/reader-account-personal-data';
 import { toCsv, type TCsvCell } from '@blog/utils/csv';
+import { isNull, isString } from '@blog/utils/primitives';
 import {
   DATA_REQUEST_MATCH_KIND,
   type TDataRequestMatchKind,
@@ -25,9 +26,9 @@ const KIND_COLUMN = 'kind';
 
 const toCell = (value: unknown): TCsvCell => {
   if (value instanceof Date) return value.toISOString();
-  if (typeof value === 'object' && value !== null) return JSON.stringify(value);
+  if (typeof value === 'object' && !isNull(value)) return JSON.stringify(value);
   if (
-    typeof value === 'string' ||
+    isString(value) ||
     typeof value === 'number' ||
     typeof value === 'boolean'
   ) {
@@ -59,6 +60,7 @@ const toExportRecords = ({
   leads,
   membershipInvites,
   unsentStudioReinvites,
+  selfServeOwnerSites,
   readerAccount,
   blockedSignupIdentities,
   auditEvents,
@@ -68,6 +70,7 @@ const toExportRecords = ({
     ...withKind(DATA_REQUEST_MATCH_KIND.LEAD, leads),
     ...withKind(DATA_REQUEST_MATCH_KIND.INVITE, membershipInvites),
     ...withKind(DATA_REQUEST_MATCH_KIND.STUDIO_REINVITE, unsentStudioReinvites),
+    ...withKind(DATA_REQUEST_MATCH_KIND.SELF_SERVE_OWNER, selfServeOwnerSites),
     ...toReaderAccountRecords(readerAccount),
     ...withKind(DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK, blockedSignupIdentities),
     ...withKind(DATA_REQUEST_MATCH_KIND.AUDIT_EVENT, auditEvents),

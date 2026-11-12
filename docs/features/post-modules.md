@@ -30,7 +30,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 ## Data
 
 - **Shared fields** — `title`, `brandVariant`, required `headingBlock`, `showImages` (default on), `contentAlignment` (Left/Center), `layout` (`wideLayout`: spacing, Wide/Full width, dividers).
-- **Latest Posts** — `limit` (required, 1–12), `displayMode` (Grid/Carousel).
+- **Latest Posts** — `limit` (required, 1–12), `displayMode` (Grid/Carousel). Appearance: the same section overrides and `columns` as Post List; `columns` applies in Grid only, and a carousel ignores it.
 - **Featured Posts** — `postSource` (`PINNED` default, or `NEWEST_FEATURED`), `posts` (pinned, published only, unique, 1–3, in display order), `limit` (Newest featured only, 1–3, default 3), `displayMode`.
 - **Post List** — `pageSize` (required, 1–24). Always a grid. Appearance: `cardStyle`, `radiusScale` (Corners) and `density` section overrides, and `columns` (Auto, 2, 3, 4; Auto keeps three), via `moduleAppearanceFragment`.
 - **Related Reading** — `limit` (required, 1–6, default 3). Always a grid.
@@ -41,7 +41,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 
 - Editors place and configure the modules in the Studio. No plan or capability gate.
 - Voice: the Post List's empty state is the tenant-editable `blogListEmpty`, `topicEmpty` or `tagEmpty` message ([voice](./voice.md)). Pagination labels come from the fixed `pagination` and page catalogues.
-- Look: card style, radius and density restyle the cards ([look](./look.md)). On Growth, Post List's section overrides win over the Look for its own band ([module-system](./module-system.md)).
+- Look: card style, radius and density restyle the cards ([look](./look.md)). On Growth, Post List's and Latest Posts' section overrides win over the Look for their own band, in Grid and Carousel alike; on Free they have no effect ([module-system](./module-system.md)).
 
 ## Constraints and invariants
 

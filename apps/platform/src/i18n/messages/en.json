@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Personal data erased",
       "OAUTH_APP_SAVED": "Sign-in app saved",
       "OAUTH_APP_REPLACED": "Sign-in app replaced",
-      "OAUTH_APP_REMOVED": "Sign-in app removed"
+      "OAUTH_APP_REMOVED": "Sign-in app removed",
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared"
     },
     "detail": {
       "field": {
@@ -1999,6 +2000,17 @@
     "alreadyRemoved": "This block was already removed.",
     "removalFailed": "Couldn't remove the block — try again."
   },
+  "newsletterPauseCard": {
+    "title": "Newsletter paused",
+    "pausedSince": "New posts aren't emailed to subscribers. Paused since <time>{date}</time>.",
+    "openDialogButton": "Clear pause",
+    "dialogTitle": "Clear the newsletter pause?",
+    "dialogDescription": "New posts are emailed to subscribers again. If bounce or complaint rates are still too high, the next send pauses the newsletter again.",
+    "confirmButton": "Clear pause",
+    "confirmingButton": "Clearing…",
+    "alreadyCleared": "The pause was already cleared.",
+    "clearFailed": "Couldn't clear the pause — try again."
+  },
   "addBlockedDomainCard": {
     "title": "Block a domain",
     "supportingText": "Everyone with an email address on this domain is refused.",
@@ -2019,7 +2031,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Find a person's data",
-    "supportingText": "Searches subscribers, contact messages, invites, sign-up blocks and audit events on every site.",
+    "supportingText": "Searches subscribers, contact messages, invites, unsent Studio invites, self-serve site owners, sign-up blocks and audit events on every site.",
     "emailLabel": "Email address",
     "emailHint": "Matches the same mailbox in any letter case and with any +tag.",
     "emailPlaceholder": "name@example.com",
@@ -2043,7 +2055,7 @@
   "dataRequestEraseDialog": {
     "erase": "Erase",
     "title": "Erase this person's data?",
-    "description": "Deletes their subscriptions, contact messages and invites on every site. This can't be undone.",
+    "description": "Deletes their subscriptions, contact messages and invites on every site, clears unsent Studio invites and clears the self-serve owner key their address holds. This can't be undone.",
     "confirm": "Erase data",
     "erasing": "Erasing…",
     "includesReaderAccount": "Also delete the reader account",
@@ -2087,6 +2099,7 @@
     "LEAD": "Contact message",
     "INVITE": "Invite",
     "STUDIO_REINVITE": "Unsent Studio invite",
+    "SELF_SERVE_OWNER": "Self-serve site owner",
     "SIGNUP_BLOCK": "Sign-up block",
     "AUDIT_EVENT": "Audit event",
     "READER_ACCOUNT": "Reader account",
@@ -2126,6 +2139,15 @@
       "options": "Paid-plan options are switched off on your site: extra languages, the Growth Look settings, paid page modules, and features such as the contact form, bookmarks and analytics.",
       "kept": "Nothing is deleted. Your content and settings are kept, and they come back if you move to a paid plan again."
     }
+  },
+  "ownerReceiptEmail": {
+    "subject": "Your payment receipt for {siteName}",
+    "previewText": "We received {amount} for {siteName}.",
+    "thanks": "Thank you. We received your payment for {siteName}.",
+    "amountLabel": "Amount paid",
+    "dateLabel": "Date",
+    "planLabel": "Plan",
+    "actionLabel": "View your invoice"
   },
   "suspensionCategory": {
     "ABUSE": "Abuse",

@@ -1,8 +1,4 @@
-import {
-  SUBSCRIBER_BAND_CEILINGS,
-  type TPaidSubscriberBandCeiling,
-  type TSubscriberBandCeiling,
-} from '@blog/db/constants';
+import { PAID_SUBSCRIBER_BAND_CEILINGS } from '@blog/db/constants';
 import type { TStripeIds } from '@blog/db/queries/tenants/get-tenant-id-by-stripe-ids';
 import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -10,15 +6,6 @@ import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
 
 const billingFaker = createMockFaker(6873);
-
-function isPaidBandCeiling(
-  ceiling: TSubscriberBandCeiling,
-): ceiling is TPaidSubscriberBandCeiling {
-  return ceiling !== SUBSCRIBER_BAND_CEILINGS[0];
-}
-
-const PAID_SUBSCRIBER_BAND_CEILINGS =
-  SUBSCRIBER_BAND_CEILINGS.filter(isPaidBandCeiling);
 
 export const MOCK_NO_BILLING = {
   stripeCustomerId: null,
@@ -31,6 +18,18 @@ export const MOCK_NO_BILLING = {
   graceHalfwayEmailSentAt: null,
   graceEndingEmailSentAt: null,
 } as const satisfies Partial<TTenant>;
+
+export const MOCK_EMPTY_TENANT_BILLING: TTenantBilling = {
+  stripeCustomerId: undefined,
+  stripeSubscriptionId: undefined,
+  stripePromotionCode: undefined,
+  subscriberBandCeiling: undefined,
+  trialEndsAt: undefined,
+  downgradeGraceStartedAt: undefined,
+  graceStartedEmailSentAt: undefined,
+  graceHalfwayEmailSentAt: undefined,
+  graceEndingEmailSentAt: undefined,
+};
 
 export const MOCK_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_OTHER_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
