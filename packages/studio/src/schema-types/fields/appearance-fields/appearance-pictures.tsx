@@ -9,15 +9,16 @@ import {
   type TRadiusScale,
 } from '@blog/config/constants';
 import {
+  FAINT,
   FRAME_HEIGHT,
+  FRAME_GAP,
   FRAME_INSET,
   FRAME_WIDTH,
   FrameRect,
   PictureFrame,
+  TEXT_LINE_HEIGHT,
 } from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
 import type { ReactNode } from 'react';
-
-const FAINT = 0.25;
 
 const CORNER_RADIUS: Record<TRadiusScale, number> = {
   [RADIUS_SCALE.NONE]: 0,
@@ -40,8 +41,8 @@ const COLUMN_COUNT: Record<TGridColumns, number> = {
 
 const TextLines = () => (
   <>
-    <rect x={11} y={10} width={20} height={2} />
-    <rect x={11} y={15} width={14} height={2} />
+    <rect x={11} y={10} width={20} height={TEXT_LINE_HEIGHT} />
+    <rect x={11} y={15} width={14} height={TEXT_LINE_HEIGHT} />
   </>
 );
 
@@ -93,9 +94,9 @@ export const DensityPicture = ({ value }: { value: TDensity }) => {
         <rect
           key={row}
           x={FRAME_INSET}
-          y={FRAME_INSET + row * (2 + gap)}
+          y={FRAME_INSET + row * (TEXT_LINE_HEIGHT + gap)}
           width={FRAME_WIDTH}
-          height={2}
+          height={TEXT_LINE_HEIGHT}
         />
       ))}
     </PictureFrame>
@@ -104,15 +105,14 @@ export const DensityPicture = ({ value }: { value: TDensity }) => {
 
 export const ColumnsPicture = ({ value }: { value: TGridColumns }) => {
   const count = COLUMN_COUNT[value];
-  const gap = 2;
-  const columnWidth = (FRAME_WIDTH - gap * (count - 1)) / count;
+  const columnWidth = (FRAME_WIDTH - FRAME_GAP * (count - 1)) / count;
 
   return (
     <PictureFrame>
       {Array.from({ length: count }, (_, column) => (
         <rect
           key={column}
-          x={FRAME_INSET + column * (columnWidth + gap)}
+          x={FRAME_INSET + column * (columnWidth + FRAME_GAP)}
           y={FRAME_INSET}
           width={columnWidth}
           height={FRAME_HEIGHT}

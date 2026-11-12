@@ -6,6 +6,7 @@ import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef, type RefObject } from 'react';
 import { set, type StringInputProps, unset } from 'sanity';
 
 faker.seed(6981);
@@ -23,14 +24,23 @@ const OptionTilesInput = createOptionTilesInput({
   Picture: () => null,
 });
 
+const OptionTilesInputWithoutEmpty = createOptionTilesInput({
+  tiles: [FIRST, SECOND],
+  Picture: () => null,
+});
+
 const onChange = vi.fn();
 
 const renderInput = ({
   value,
   readOnly = false,
+  Input = OptionTilesInput,
+  ref,
 }: {
   value?: string;
   readOnly?: boolean;
+  Input?: typeof OptionTilesInput;
+  ref?: RefObject<HTMLButtonElement | null>;
 } = {}) => {
   const props = {
     value,
@@ -39,13 +49,14 @@ const renderInput = ({
     schemaType: { title: FIELD_TITLE },
     elementProps: {
       id: faker.string.alpha(6),
+      ref,
       'aria-describedby': DESCRIPTION_ID,
     },
   } as unknown as StringInputProps;
 
   render(
     <ThemeProvider theme={buildTheme()}>
-      <OptionTilesInput {...props} />
+      <Input {...props} />
       <p id={DESCRIPTION_ID}>{FIELD_DESCRIPTION}</p>
     </ThemeProvider>,
   );
@@ -110,6 +121,24 @@ describe(`<${OptionTilesInput.name}/>`, () => {
       fireEvent.click(emptyTile);
 
       expect(onChange).toHaveBeenCalledWith(unset());
+    });
+  });
+
+  describe('when the field has no empty state', () => {
+    it('offers only the options, in order', () => {
+      renderInput({ Input: OptionTilesInputWithoutEmpty });
+
+      const tiles = screen.getAllByRole('radio');
+
+      expect(tiles).toEqual([tile(FIRST.title), tile(SECOND.title)]);
+    });
+
+    it('hands the field focus to the first option while nothing is stored', () => {
+      const ref = createRef<HTMLButtonElement>();
+
+      renderInput({ Input: OptionTilesInputWithoutEmpty, ref });
+
+      expect(ref.current).toBe(tile(FIRST.title));
     });
   });
 
