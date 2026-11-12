@@ -79,6 +79,9 @@ page (#5090). The page serves either answer.
     owner-email change whose re-invite failed — see
     [tenant access](./tenant-access.md)). The column has no lookup index, so
     each stored value is decrypted and compared;
+  - the self-serve sites that address owns, whose
+    `tenants.self_serve_owner_email_index` is that index, each with its id,
+    name and creation time (shown as a "Self-serve site owner" record);
   - `blocked_signup_identities` ADDRESS entries whose `value` is that index;
   - the reader account whose address is exactly the one given
     (`findUserByEmail`, which keeps a `+tag`): its profile, its linked sign-in methods
@@ -88,7 +91,9 @@ page (#5090). The page serves either answer.
     own.
 - `queries.personalData.erasePersonalData(email, { includesReaderAccount })`
   deletes the matched subscribers, leads and invites, clears the matched
-  unsent Studio re-invites and, when asked, the
+  unsent Studio re-invites, sets the matched sites'
+  `self_serve_owner_email_index` to null (so the address can create a Free or
+  trial site again) and, when asked, the
   reader account through `deleteAccount`: its sessions (so it is signed out
   everywhere), linked sign-ins and bookmarks cascade. It returns how many of
   each it deleted and whether the account was refused. Audit events hold no

@@ -15,48 +15,54 @@ export async function findSitePersonalData(
 ): Promise<TSitePersonalData> {
   const db = getDb();
 
-  const [subscriberRows, leadRows, inviteRows] = await Promise.all([
-    db
-      .select({
-        ...siteColumns,
-        id: subscribers.id,
-        emailEncrypted: subscribers.emailEncrypted,
-        status: subscribers.status,
-        subscribedAt: subscribers.subscribedAt,
-        confirmedAt: subscribers.confirmedAt,
-      })
-      .from(subscribers)
-      .innerJoin(tenants, eq(tenants.id, subscribers.tenantId))
-      .where(eq(subscribers.emailIndex, emailIndex))
-      .orderBy(asc(tenants.name), asc(subscribers.subscribedAt)),
-    db
-      .select({
-        ...siteColumns,
-        id: leads.id,
-        nameEncrypted: leads.nameEncrypted,
-        emailEncrypted: leads.emailEncrypted,
-        messageEncrypted: leads.messageEncrypted,
-        sourcePath: leads.sourcePath,
-        createdAt: leads.createdAt,
-      })
-      .from(leads)
-      .innerJoin(tenants, eq(tenants.id, leads.tenantId))
-      .where(eq(leads.emailIndex, emailIndex))
-      .orderBy(asc(tenants.name), asc(leads.createdAt)),
-    db
-      .select({
-        ...siteColumns,
-        id: membershipInvites.id,
-        emailEncrypted: membershipInvites.emailEncrypted,
-        role: membershipInvites.role,
-        createdAt: membershipInvites.createdAt,
-        consumedAt: membershipInvites.consumedAt,
-      })
-      .from(membershipInvites)
-      .innerJoin(tenants, eq(tenants.id, membershipInvites.tenantId))
-      .where(eq(membershipInvites.emailIndex, emailIndex))
-      .orderBy(asc(tenants.name), asc(membershipInvites.createdAt)),
-  ]);
+  const [subscriberRows, leadRows, inviteRows, selfServeOwnerSites] =
+    await Promise.all([
+      db
+        .select({
+          ...siteColumns,
+          id: subscribers.id,
+          emailEncrypted: subscribers.emailEncrypted,
+          status: subscribers.status,
+          subscribedAt: subscribers.subscribedAt,
+          confirmedAt: subscribers.confirmedAt,
+        })
+        .from(subscribers)
+        .innerJoin(tenants, eq(tenants.id, subscribers.tenantId))
+        .where(eq(subscribers.emailIndex, emailIndex))
+        .orderBy(asc(tenants.name), asc(subscribers.subscribedAt)),
+      db
+        .select({
+          ...siteColumns,
+          id: leads.id,
+          nameEncrypted: leads.nameEncrypted,
+          emailEncrypted: leads.emailEncrypted,
+          messageEncrypted: leads.messageEncrypted,
+          sourcePath: leads.sourcePath,
+          createdAt: leads.createdAt,
+        })
+        .from(leads)
+        .innerJoin(tenants, eq(tenants.id, leads.tenantId))
+        .where(eq(leads.emailIndex, emailIndex))
+        .orderBy(asc(tenants.name), asc(leads.createdAt)),
+      db
+        .select({
+          ...siteColumns,
+          id: membershipInvites.id,
+          emailEncrypted: membershipInvites.emailEncrypted,
+          role: membershipInvites.role,
+          createdAt: membershipInvites.createdAt,
+          consumedAt: membershipInvites.consumedAt,
+        })
+        .from(membershipInvites)
+        .innerJoin(tenants, eq(tenants.id, membershipInvites.tenantId))
+        .where(eq(membershipInvites.emailIndex, emailIndex))
+        .orderBy(asc(tenants.name), asc(membershipInvites.createdAt)),
+      db
+        .select({ ...siteColumns, createdAt: tenants.createdAt })
+        .from(tenants)
+        .where(eq(tenants.selfServeOwnerEmailIndex, emailIndex))
+        .orderBy(asc(tenants.name)),
+    ]);
 
   return {
     subscribers: subscriberRows.map(
@@ -79,5 +85,6 @@ export async function findSitePersonalData(
         consumedAt: consumedAt ?? undefined,
       }),
     ),
+    selfServeOwnerSites,
   };
 }

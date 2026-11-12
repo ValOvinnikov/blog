@@ -2086,6 +2086,7 @@
     "LEAD": "Contact message",
     "INVITE": "Invite",
     "STUDIO_REINVITE": "Unsent Studio invite",
+    "SELF_SERVE_OWNER": "Self-serve site owner",
     "SIGNUP_BLOCK": "Sign-up block",
     "AUDIT_EVENT": "Audit event",
     "READER_ACCOUNT": "Reader account",

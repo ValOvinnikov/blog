@@ -31,8 +31,13 @@ type TPersonalDataInvite = TPersonalDataSite & {
   consumedAt: TMaybeUndefined<Date>;
 };
 
+type TPersonalDataSelfServeOwnerSite = TPersonalDataSite & {
+  createdAt: Date;
+};
+
 export type TSitePersonalData = {
   subscribers: TPersonalDataSubscriber[];
   leads: TPersonalDataLead[];
   membershipInvites: TPersonalDataInvite[];
+  selfServeOwnerSites: TPersonalDataSelfServeOwnerSite[];
 };

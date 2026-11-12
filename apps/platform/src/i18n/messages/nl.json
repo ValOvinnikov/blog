@@ -2086,6 +2086,7 @@
     "LEAD": "Contactbericht",
     "INVITE": "Uitnodiging",
     "STUDIO_REINVITE": "Niet-verstuurde Studio-uitnodiging",
+    "SELF_SERVE_OWNER": "Eigenaar van een selfservice-site",
     "SIGNUP_BLOCK": "Aanmeldblokkade",
     "AUDIT_EVENT": "Auditgebeurtenis",
     "READER_ACCOUNT": "Lezersaccount",

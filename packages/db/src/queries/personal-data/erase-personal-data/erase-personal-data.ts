@@ -7,6 +7,7 @@ import { findUserByEmail } from '@blog/db/queries/users/find-user-by-email';
 import { leads } from '@blog/db/schema/leads';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import { subscribers } from '@blog/db/schema/subscribers';
+import { tenants } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -15,6 +16,7 @@ export type TPersonalDataCounts = {
   leads: number;
   membershipInvites: number;
   unsentStudioReinvites: number;
+  selfServeOwnerSites: number;
   readerAccounts: number;
 };
 
@@ -54,6 +56,7 @@ export async function erasePersonalData(
     erasedLeads,
     erasedInvites,
     erasedReinvites,
+    erasedOwnerKeys,
     erasedAccounts,
   ] = await Promise.all([
     db
@@ -69,6 +72,11 @@ export async function erasePersonalData(
       .where(eq(membershipInvites.emailIndex, emailIndex))
       .returning({ id: membershipInvites.id }),
     eraseUnsentStudioReinvites(email),
+    db
+      .update(tenants)
+      .set({ selfServeOwnerEmailIndex: null })
+      .where(eq(tenants.selfServeOwnerEmailIndex, emailIndex))
+      .returning({ id: tenants.id }),
     includesReaderAccount ? eraseReaderAccount(email.trim()) : okResult(0),
   ]);
 
@@ -84,6 +92,7 @@ export async function erasePersonalData(
       leads: erasedLeads.length,
       membershipInvites: erasedInvites.length,
       unsentStudioReinvites: erasedReinvites,
+      selfServeOwnerSites: erasedOwnerKeys.length,
       readerAccounts: erasedAccounts.ok ? erasedAccounts.data : 0,
     },
     isReaderAccountRefused,

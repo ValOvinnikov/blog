@@ -2086,6 +2086,7 @@
     "LEAD": "Message de contact",
     "INVITE": "Invitation",
     "STUDIO_REINVITE": "Invitation Studio non envoyée",
+    "SELF_SERVE_OWNER": "Propriétaire d’un site en libre-service",
     "SIGNUP_BLOCK": "Blocage d’inscription",
     "AUDIT_EVENT": "Événement d’audit",
     "READER_ACCOUNT": "Compte lecteur",

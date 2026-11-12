@@ -4,12 +4,12 @@ import { ACTION_OUTCOME, AUDIT_ACTION } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TPersonalDataMatches } from '@blog/db/queries/personal-data/find-personal-data';
 import { requireSuperAdmin } from '@platform/server/auth/require-super-admin';
+import { countPersonalDataMatches } from '@platform/server/data-requests/count-personal-data-matches';
 import {
   runDataRequest,
   type TDataRequestFailure,
   type TDataRequestInput,
 } from '@platform/server/data-requests/run-data-request';
-import { countPersonalDataMatches } from '@platform/server/data-requests/to-data-request-matches';
 
 export type TPersonalDataExportHeader = {
   generatedAt: string;
@@ -41,6 +41,7 @@ export const exportPersonalDataAction = async (
     leads,
     membershipInvites,
     unsentStudioReinvites,
+    selfServeOwnerSites,
     readerAccount,
     blockedSignupIdentities,
     auditEvents,
@@ -56,6 +57,7 @@ export const exportPersonalDataAction = async (
       leads,
       membershipInvites,
       unsentStudioReinvites,
+      selfServeOwnerSites,
       readerAccount,
       blockedSignupIdentities,
       auditEvents,
