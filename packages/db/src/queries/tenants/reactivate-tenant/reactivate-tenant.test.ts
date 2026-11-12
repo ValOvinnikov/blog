@@ -1,5 +1,10 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
+import {
+  SUSPENSION_REASON,
+  TENANT_PROVISIONING_STATUS,
+  TENANT_STATUS,
+} from '@blog/db/constants';
+import { wakeTenantFromInactivity } from '@blog/db/queries/tenants/wake-tenant-from-inactivity';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
@@ -7,6 +12,7 @@ import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_DEPROVISIONED_AT,
+  MOCK_IDLE_DEPROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
 } from '@blog/db/testing/tenants/fixtures';
 import {
@@ -14,6 +20,7 @@ import {
   pickResumedFields,
 } from '@blog/db/testing/tenants/resume';
 import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { errorResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
@@ -77,6 +84,23 @@ describe(reactivateTenant, () => {
       expect(rows).toEqual([unchanged]);
     },
   );
+
+  it('lets a reactivated tenant wake from a later inactivity suspension', async () => {
+    const tenant = await insertTestTenant(db(), {
+      status: TENANT_STATUS.ARCHIVED,
+      deprovisionedAt: MOCK_DEPROVISIONED_AT,
+      deprovisioningSteps: MOCK_IDLE_DEPROVISIONING_STEPS,
+    });
+    await reactivateTenant(tenant.id);
+    await patchTestTenant(db(), tenant.id, {
+      status: TENANT_STATUS.SUSPENDED,
+      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+    });
+
+    const woken = await wakeTenantFromInactivity(tenant.id);
+
+    expect(woken?.status).toBe(TENANT_STATUS.ACTIVE);
+  });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {
     const result = await reactivateTenant(MOCK_MISSING_TENANT_ID);

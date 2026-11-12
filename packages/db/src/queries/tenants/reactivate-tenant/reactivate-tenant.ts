@@ -8,6 +8,8 @@ import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
 // `deprovisionedAt` is only ever set on an archived row, so clearing it unconditionally leaves a suspended tenant as it was.
+const isArchived = sql`${tenants.status} = ${TENANT_STATUS.ARCHIVED}`;
+
 export async function reactivateTenant(
   tenantId: string,
 ): Promise<TResult<TTenant, TErrorCode>> {
@@ -18,9 +20,8 @@ export async function reactivateTenant(
       .update(tenants)
       .set({
         deprovisionedAt: null,
-        ...resumedTenantFields(
-          sql`${tenants.status} = ${TENANT_STATUS.ARCHIVED}`,
-        ),
+        deprovisioningSteps: sql`case when ${isArchived} then null else ${tenants.deprovisioningSteps} end`,
+        ...resumedTenantFields(isArchived),
       })
       .where(eq(tenants.id, tenantId))
       .returning();

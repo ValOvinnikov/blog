@@ -24,7 +24,12 @@ export function useTestTenant(
 export async function patchTestTenant(
   db: TTestDb,
   tenantId: string,
-  patch: Partial<Pick<TTenant, 'plan' | 'status' | 'selfServeOwnerEmailIndex'>>,
+  patch: Partial<
+    Pick<
+      TTenant,
+      'plan' | 'status' | 'selfServeOwnerEmailIndex' | 'suspensionReason'
+    >
+  >,
 ): Promise<void> {
   await db
     .update(schema.tenants)
