@@ -753,6 +753,7 @@
     "densityDescription": "Abstände und Größe der Bedienelemente.",
     "cardStyleLabel": "Kartenstil",
     "cardStyleDescription": "Rahmt jede Inhaltskarte: Beiträge, Themen, Zitate, Preise, FAQ-Einträge und Call-to-Action-Boxen.",
+    "cardStyleSectionNote": "Ein einzelner Abschnitt kann einen anderen Kartenstil verwenden. Lege ihn am Abschnitt in Studio fest.",
     "radiusScaleOptionLabel": {
       "NONE": "Keiner",
       "SM": "Klein",
