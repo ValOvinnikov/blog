@@ -428,6 +428,8 @@ jobs:
           REQUIRED_ENV_PRESENT_VERCEL_TEAM_ID: ${{ vars.VERCEL_TEAM_ID != '' }}
           REQUIRED_ENV_PRESENT_VERCEL_PROJECT_ID_WEB: ${{ vars.VERCEL_PROJECT_ID_WEB != '' }}
           REQUIRED_ENV_PRESENT_TENANT_ROOT_DOMAIN: ${{ vars.TENANT_ROOT_DOMAIN != '' }}
+          REQUIRED_ENV_PRESENT_STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY != '' }}
+          REQUIRED_ENV_PRESENT_STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET != '' }}
         run: pnpm check:required-env
 
   migrations:
