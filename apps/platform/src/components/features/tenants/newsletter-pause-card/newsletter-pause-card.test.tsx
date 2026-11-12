@@ -82,21 +82,37 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
       expect(refresh).toHaveBeenCalledTimes(1);
     });
 
-    it('keeps the dialog open with the error for a failed clear', async () => {
-      vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce({
-        outcome: ACTION_OUTCOME.SERVER_ERROR,
-      });
+    it.each([
+      {
+        failure: 'a failed clear',
+        fail: () =>
+          vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce({
+            outcome: ACTION_OUTCOME.SERVER_ERROR,
+          }),
+      },
+      {
+        failure: 'a request that never reaches the server',
+        fail: () =>
+          vi
+            .mocked(clearNewsletterPauseAction)
+            .mockRejectedValueOnce(MOCK_UNREACHED_REQUEST),
+      },
+    ])(
+      'keeps the dialog open with the error for $failure',
+      async ({ fail }) => {
+        fail();
 
-      const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
-      await user.click(confirm);
+        const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
+        await user.click(confirm);
 
-      const error = await screen.findByText(newsletterPauseCard.clearFailed);
-      const dialog = screen.getByRole('alertdialog', DIALOG);
+        const error = await screen.findByText(newsletterPauseCard.clearFailed);
+        const dialog = screen.getByRole('alertdialog', DIALOG);
 
-      expect(error).toBeVisible();
-      expect(dialog).toBeVisible();
-      expect(refresh).not.toHaveBeenCalled();
-    });
+        expect(error).toBeVisible();
+        expect(dialog).toBeVisible();
+        expect(refresh).not.toHaveBeenCalled();
+      },
+    );
 
     it('says the pause was already cleared and refreshes the page', async () => {
       vi.mocked(clearNewsletterPauseAction).mockResolvedValueOnce({
@@ -111,22 +127,6 @@ describe(`<${NewsletterPauseCard.name}/>`, () => {
 
       expect(error).toBeVisible();
       expect(refresh).toHaveBeenCalledTimes(1);
-    });
-
-    it('keeps the dialog open with the error when the request never reaches the server', async () => {
-      vi.mocked(clearNewsletterPauseAction).mockRejectedValueOnce(
-        MOCK_UNREACHED_REQUEST,
-      );
-
-      const confirm = await screen.findByRole('button', CONFIRM_BUTTON);
-      await user.click(confirm);
-
-      const error = await screen.findByText(newsletterPauseCard.clearFailed);
-      const dialog = screen.getByRole('alertdialog', DIALOG);
-
-      expect(error).toBeVisible();
-      expect(dialog).toBeVisible();
-      expect(refresh).not.toHaveBeenCalled();
     });
   });
 });
