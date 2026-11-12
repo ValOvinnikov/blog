@@ -576,6 +576,14 @@
         "file": "packages/config/src/constants/audit.ts"
       }
     ],
+    "NEWSLETTER_PAUSE_CLEARED": [
+      {
+        "ref": "AUDIT_ACTION.NEWSLETTER_PAUSE_CLEARED",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/audit.ts"
+      }
+    ],
     "SITE": [
       {
         "ref": "AUTH_APP.SITE",
@@ -6696,6 +6704,30 @@
         "scope": "app:platform",
         "from": "@platform/constants/menu-radio-group",
         "file": "apps/platform/src/constants/menu-radio-group.ts"
+      }
+    ],
+    "NOT_PAUSED": [
+      {
+        "ref": "NEWSLETTER_PAUSE_REFUSAL.NOT_PAUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/newsletter-pause",
+        "file": "apps/platform/src/constants/newsletter-pause.ts"
+      }
+    ],
+    "newsletter_pause.clear_audit_failed": [
+      {
+        "ref": "NEWSLETTER_PAUSE_LOG.CLEAR_AUDIT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/newsletter-pause",
+        "file": "apps/platform/src/constants/newsletter-pause.ts"
+      }
+    ],
+    "newsletter_pause.clear_failed": [
+      {
+        "ref": "NEWSLETTER_PAUSE_LOG.CLEAR_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/newsletter-pause",
+        "file": "apps/platform/src/constants/newsletter-pause.ts"
       }
     ],
     "CHECKING": [

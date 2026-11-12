@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Personal data erased",
       "OAUTH_APP_SAVED": "Sign-in app saved",
       "OAUTH_APP_REPLACED": "Sign-in app replaced",
-      "OAUTH_APP_REMOVED": "Sign-in app removed"
+      "OAUTH_APP_REMOVED": "Sign-in app removed",
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter pause cleared"
     },
     "detail": {
       "field": {
@@ -1998,6 +1999,17 @@
     "openDialogButton": "Remove",
     "alreadyRemoved": "This block was already removed.",
     "removalFailed": "Couldn't remove the block — try again."
+  },
+  "newsletterPauseCard": {
+    "title": "Newsletter paused",
+    "pausedSince": "New posts aren't emailed to subscribers. Paused since <time>{date}</time>.",
+    "openDialogButton": "Clear pause",
+    "dialogTitle": "Clear the newsletter pause?",
+    "dialogDescription": "New posts are emailed to subscribers again. If delivery rates are still too high, the next send pauses the newsletter again.",
+    "confirmButton": "Clear pause",
+    "confirmingButton": "Clearing…",
+    "alreadyCleared": "The pause was already cleared.",
+    "clearFailed": "Couldn't clear the pause — try again."
   },
   "addBlockedDomainCard": {
     "title": "Block a domain",

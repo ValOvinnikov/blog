@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Données personnelles effacées",
       "OAUTH_APP_SAVED": "Application de connexion enregistrée",
       "OAUTH_APP_REPLACED": "Application de connexion remplacée",
-      "OAUTH_APP_REMOVED": "Application de connexion supprimée"
+      "OAUTH_APP_REMOVED": "Application de connexion supprimée",
+      "NEWSLETTER_PAUSE_CLEARED": "Pause de la newsletter levée"
     },
     "detail": {
       "field": {
@@ -1998,6 +1999,17 @@
     "openDialogButton": "Retirer",
     "alreadyRemoved": "Ce blocage a déjà été retiré.",
     "removalFailed": "Impossible de retirer le blocage — réessayez."
+  },
+  "newsletterPauseCard": {
+    "title": "Newsletter en pause",
+    "pausedSince": "Les nouveaux articles ne sont pas envoyés aux abonnés. En pause depuis le <time>{date}</time>.",
+    "openDialogButton": "Lever la pause",
+    "dialogTitle": "Lever la pause de la newsletter ?",
+    "dialogDescription": "Les nouveaux articles sont de nouveau envoyés aux abonnés. Si les taux de délivrabilité restent trop élevés, le prochain envoi remet la newsletter en pause.",
+    "confirmButton": "Lever la pause",
+    "confirmingButton": "Levée en cours…",
+    "alreadyCleared": "La pause a déjà été levée.",
+    "clearFailed": "Impossible de lever la pause — réessayez."
   },
   "addBlockedDomainCard": {
     "title": "Bloquer un domaine",

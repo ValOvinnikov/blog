@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Datos personales borrados",
       "OAUTH_APP_SAVED": "App de inicio de sesión guardada",
       "OAUTH_APP_REPLACED": "App de inicio de sesión sustituida",
-      "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada"
+      "OAUTH_APP_REMOVED": "App de inicio de sesión eliminada",
+      "NEWSLETTER_PAUSE_CLEARED": "Pausa del boletín retirada"
     },
     "detail": {
       "field": {
@@ -1998,6 +1999,17 @@
     "openDialogButton": "Quitar",
     "alreadyRemoved": "Este bloqueo ya se había quitado.",
     "removalFailed": "No se pudo quitar el bloqueo. Inténtelo de nuevo."
+  },
+  "newsletterPauseCard": {
+    "title": "Boletín en pausa",
+    "pausedSince": "Las nuevas entradas no se envían a los suscriptores. En pausa desde <time>{date}</time>.",
+    "openDialogButton": "Quitar pausa",
+    "dialogTitle": "¿Quitar la pausa del boletín?",
+    "dialogDescription": "Las nuevas entradas vuelven a enviarse a los suscriptores. Si las tasas de entrega siguen siendo demasiado altas, el próximo envío vuelve a pausar el boletín.",
+    "confirmButton": "Quitar pausa",
+    "confirmingButton": "Quitando…",
+    "alreadyCleared": "La pausa ya se había quitado.",
+    "clearFailed": "No se pudo quitar la pausa. Inténtalo de nuevo."
   },
   "addBlockedDomainCard": {
     "title": "Bloquear un dominio",

@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Persoonsgegevens gewist",
       "OAUTH_APP_SAVED": "Inlog-app opgeslagen",
       "OAUTH_APP_REPLACED": "Inlog-app vervangen",
-      "OAUTH_APP_REMOVED": "Inlog-app verwijderd"
+      "OAUTH_APP_REMOVED": "Inlog-app verwijderd",
+      "NEWSLETTER_PAUSE_CLEARED": "Nieuwsbriefpauze opgeheven"
     },
     "detail": {
       "field": {
@@ -1998,6 +1999,17 @@
     "openDialogButton": "Verwijderen",
     "alreadyRemoved": "Deze blokkade was al verwijderd.",
     "removalFailed": "De blokkade kon niet worden verwijderd — probeer het opnieuw."
+  },
+  "newsletterPauseCard": {
+    "title": "Nieuwsbrief gepauzeerd",
+    "pausedSince": "Nieuwe berichten worden niet naar abonnees gemaild. Gepauzeerd sinds <time>{date}</time>.",
+    "openDialogButton": "Pauze opheffen",
+    "dialogTitle": "Nieuwsbriefpauze opheffen?",
+    "dialogDescription": "Nieuwe berichten worden weer naar abonnees gemaild. Zijn de afleverpercentages nog te hoog, dan pauzeert de volgende verzending de nieuwsbrief opnieuw.",
+    "confirmButton": "Pauze opheffen",
+    "confirmingButton": "Bezig met opheffen…",
+    "alreadyCleared": "De pauze was al opgeheven.",
+    "clearFailed": "Pauze opheffen mislukt — probeer het opnieuw."
   },
   "addBlockedDomainCard": {
     "title": "Een domein blokkeren",

@@ -23,6 +23,10 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
+import {
+  MOCK_NEWSLETTER_PAUSED_AT,
+  MOCK_NEWSLETTER_PAUSED_ON_TEXT,
+} from '@platform/testing/email/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockFinding } from '@platform/testing/findings/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
@@ -67,12 +71,14 @@ const {
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
   requireAdminMock,
+  getNewsletterPausedAtMock,
 } = vi.hoisted(() => ({
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
   requireAdminMock: vi.fn(),
+  getNewsletterPausedAtMock: vi.fn(),
 }));
 
 vi.mock('@blog/db', async () => ({
@@ -81,6 +87,7 @@ vi.mock('@blog/db', async () => ({
     memberships: { getTenantOwnerMembership: getTenantOwnerMembershipMock },
     auditEvents: { listAuditEventsForTarget: listAuditEventsForTargetMock },
     findings: { listFindingsForTenant: listFindingsForTenantMock },
+    emailConfig: { getNewsletterPausedAt: getNewsletterPausedAtMock },
   },
 }));
 
@@ -111,6 +118,8 @@ vi.mock(
 );
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
+
+vi.mock('@platform/server/newsletter-pause/clear-newsletter-pause-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
@@ -165,6 +174,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
     );
     resolveIsPlatformTenantMock.mockReset().mockResolvedValue(false);
+    getNewsletterPausedAtMock.mockReset().mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -190,6 +200,30 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     expect(heading).toBeVisible();
     expect(statusBadge).toBeVisible();
     expect(planBadge).toBeVisible();
+  });
+
+  describe('newsletter pause', () => {
+    const PAUSE_HEADING = { name: en.newsletterPauseCard.title };
+
+    it('shows a paused newsletter and the date it was paused', async () => {
+      getNewsletterPausedAtMock.mockResolvedValue(MOCK_NEWSLETTER_PAUSED_AT);
+
+      await setup();
+
+      const pauseHeading = screen.getByRole('heading', PAUSE_HEADING);
+      const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
+
+      expect(pauseHeading).toBeVisible();
+      expect(pausedOn).toBeVisible();
+    });
+
+    it('shows no newsletter pause for a site that is not paused', async () => {
+      await setup({ tenant: mockTenant() });
+
+      const pauseHeading = screen.queryByRole('heading', PAUSE_HEADING);
+
+      expect(pauseHeading).not.toBeInTheDocument();
+    });
   });
 
   it('shows the unsent Studio invite notice while a re-invite is owed', async () => {
@@ -489,55 +523,58 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       expect(suspendButton).not.toBeInTheDocument();
     });
 
-    it('offers no Suspend on the platform tenant, and says why', async () => {
-      resolveIsPlatformTenantMock.mockResolvedValue(true);
-
-      await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
-
-      const suspendButton = screen.queryByRole('button', {
-        name: SUSPEND_TENANT,
+    describe('on the platform tenant', () => {
+      beforeEach(() => {
+        resolveIsPlatformTenantMock.mockResolvedValue(true);
       });
-      const notice = screen.getByText(PLATFORM_TENANT_NOTICE_TEXT);
 
-      expect(suspendButton).not.toBeInTheDocument();
-      expect(notice).toBeVisible();
-    });
-
-    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-      'never reads the tenant hosts for a %s',
-      async (role) => {
-        requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
-
+      it('offers no Suspend, and says why', async () => {
         await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
 
-        expect(resolveIsPlatformTenantMock).not.toHaveBeenCalled();
-      },
-    );
+        const suspendButton = screen.queryByRole('button', {
+          name: SUSPEND_TENANT,
+        });
+        const notice = screen.getByText(PLATFORM_TENANT_NOTICE_TEXT);
 
-    it('still offers Reactivate on a suspended platform tenant', async () => {
-      resolveIsPlatformTenantMock.mockResolvedValue(true);
-
-      await setup({ tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }) });
-
-      const reactivateButton = screen.getByRole('button', {
-        name: REACTIVATE_TENANT_LABEL,
+        expect(suspendButton).not.toBeInTheDocument();
+        expect(notice).toBeVisible();
       });
-      expect(reactivateButton).toBeVisible();
-    });
 
-    it.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
-      'offers no Reactivate to a %s',
-      async (role) => {
-        requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
-
+      it('still offers Reactivate when suspended', async () => {
         await setup({
           tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }),
         });
 
-        const reactivateButton = screen.queryByRole('button', {
+        const reactivateButton = screen.getByRole('button', {
           name: REACTIVATE_TENANT_LABEL,
         });
-        expect(reactivateButton).not.toBeInTheDocument();
+        expect(reactivateButton).toBeVisible();
+      });
+    });
+
+    describe.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
+      'for a %s',
+      (role) => {
+        beforeEach(() => {
+          requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
+        });
+
+        it('never reads the tenant hosts', async () => {
+          await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
+
+          expect(resolveIsPlatformTenantMock).not.toHaveBeenCalled();
+        });
+
+        it('offers no Reactivate', async () => {
+          await setup({
+            tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }),
+          });
+
+          const reactivateButton = screen.queryByRole('button', {
+            name: REACTIVATE_TENANT_LABEL,
+          });
+          expect(reactivateButton).not.toBeInTheDocument();
+        });
       },
     );
 

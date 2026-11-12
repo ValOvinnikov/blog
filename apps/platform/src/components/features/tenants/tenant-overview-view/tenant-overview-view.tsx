@@ -1,11 +1,12 @@
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { isNull } from '@blog/utils/primitives';
+import { isNull, isUndefined } from '@blog/utils/primitives';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
+import { NewsletterPauseCard } from '@platform/components/features/tenants/newsletter-pause-card';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { PlatformTenantNotice } from '@platform/components/features/tenants/platform-tenant-notice';
 import { RecentActivityCard } from '@platform/components/features/tenants/recent-activity-card';
@@ -41,15 +42,19 @@ export const TenantOverviewView = async ({
   } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [admin, owner, auditEvents, findings, suspension] = await Promise.all([
-    requireAdmin(),
-    queries.memberships.getTenantOwnerMembership(id),
-    queries.auditEvents.listAuditEventsForTarget(AUDIT_TARGET_TYPE.TENANT, id, {
-      limit: 5,
-    }),
-    queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
-    loadOperatorSuspension(tenant),
-  ]);
+  const [admin, owner, auditEvents, findings, suspension, newsletterPausedAt] =
+    await Promise.all([
+      requireAdmin(),
+      queries.memberships.getTenantOwnerMembership(id),
+      queries.auditEvents.listAuditEventsForTarget(
+        AUDIT_TARGET_TYPE.TENANT,
+        id,
+        { limit: 5 },
+      ),
+      queries.findings.listFindingsForTenant(id, FINDING_STATUS.OPEN),
+      loadOperatorSuspension(tenant),
+      queries.emailConfig.getNewsletterPausedAt(id),
+    ]);
   const canChangeSuspension =
     isSuperAdmin(admin) &&
     !deprovisionedAt &&
@@ -85,6 +90,9 @@ export const TenantOverviewView = async ({
             />
           </Suspense>
           <OwnerCard owner={owner} />
+          {!isUndefined(newsletterPausedAt) && (
+            <NewsletterPauseCard tenantId={id} pausedAt={newsletterPausedAt} />
+          )}
           {canChangeSuspension &&
             (isSuspensionControlShown ? (
               <TenantSuspensionControl

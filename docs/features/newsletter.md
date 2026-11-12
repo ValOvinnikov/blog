@@ -41,6 +41,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `/[locale]/newsletter/[result]` — the confirm or unsubscribe outcome (`NEWSLETTER_RESULT`: confirmed, unsubscribed, or an invalid, failed or unavailable link) in the site's layout, theme and the link's language, with a link home; `noindex`.
 - `/[locale]/account` — the Newsletter section (see [reader-account](./reader-account.md)).
 - **Platform** — the Features toggle, the Email page's `NEWSLETTER_CONFIRMATION` template, and a "Coming soon" Subscribers sidebar entry with no page.
+- **Platform, operator** — a paused site's tenant overview (`/tenants/[tenantId]`) shows a "Newsletter paused" card with the date it was paused; an unpaused site shows none. Its "Clear pause" confirm calls `clearNewsletterPauseAction` (`apps/platform/src/server/newsletter-pause/`), which runs behind `requireTenantById` (any admin), refuses `NOT_PAUSED` for a site no longer paused, clears the pause, records `NEWSLETTER_PAUSE_CLEARED` against the tenant with the cleared `pausedAt`, and refreshes the page.
 
 ## Data
 
