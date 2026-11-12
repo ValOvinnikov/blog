@@ -23,14 +23,21 @@ const OptionTilesInput = createOptionTilesInput({
   Picture: () => null,
 });
 
+const OptionTilesInputWithoutEmpty = createOptionTilesInput({
+  tiles: [FIRST, SECOND],
+  Picture: () => null,
+});
+
 const onChange = vi.fn();
 
 const renderInput = ({
   value,
   readOnly = false,
+  Input = OptionTilesInput,
 }: {
   value?: string;
   readOnly?: boolean;
+  Input?: typeof OptionTilesInput;
 } = {}) => {
   const props = {
     value,
@@ -45,7 +52,7 @@ const renderInput = ({
 
   render(
     <ThemeProvider theme={buildTheme()}>
-      <OptionTilesInput {...props} />
+      <Input {...props} />
       <p id={DESCRIPTION_ID}>{FIELD_DESCRIPTION}</p>
     </ThemeProvider>,
   );
@@ -110,6 +117,27 @@ describe(`<${OptionTilesInput.name}/>`, () => {
       fireEvent.click(emptyTile);
 
       expect(onChange).toHaveBeenCalledWith(unset());
+    });
+  });
+
+  describe('when the field has no empty state', () => {
+    it('offers only the options, in order', () => {
+      renderInput({ Input: OptionTilesInputWithoutEmpty });
+
+      const tiles = screen.getAllByRole('radio');
+
+      expect(tiles).toEqual([tile(FIRST.title), tile(SECOND.title)]);
+    });
+
+    it('marks the stored option as chosen without an empty tile', () => {
+      renderInput({
+        Input: OptionTilesInputWithoutEmpty,
+        value: FIRST.value,
+      });
+
+      const chosen = checkedTile();
+
+      expect(chosen).toBe(tile(FIRST.title));
     });
   });
 

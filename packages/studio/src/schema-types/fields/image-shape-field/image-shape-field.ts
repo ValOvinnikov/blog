@@ -1,6 +1,7 @@
 import type { TCardImageShape } from '@blog/config/constants';
+import { ImageShapePicture } from '@blog/studio/schema-types/fields/image-shape-field/image-shape-picture';
+import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
 import { toTitleCase } from '@blog/utils/primitives';
-import { defineField } from 'sanity';
 
 type TImageShapeFieldOptions = {
   values: readonly TCardImageShape[];
@@ -13,15 +14,12 @@ export const imageShapeField = ({
   initialValue,
   subject,
 }: TImageShapeFieldOptions) =>
-  defineField({
+  tileField({
     name: 'imageShape',
     title: 'Image Shape',
-    type: 'string',
     description: `How each ${subject} is cropped.`,
-    options: {
-      layout: 'dropdown',
-      list: values.map((value) => ({ title: toTitleCase(value), value })),
-    },
+    tiles: values.map((value) => ({ title: toTitleCase(value), value })),
+    Picture: ImageShapePicture,
     initialValue,
     validation: (rule) => rule.required(),
   });

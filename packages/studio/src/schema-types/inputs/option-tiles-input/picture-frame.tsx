@@ -6,6 +6,8 @@ const HEIGHT = 28;
 export const FRAME_INSET = 4;
 export const FRAME_WIDTH = WIDTH - FRAME_INSET * 2;
 export const FRAME_HEIGHT = HEIGHT - FRAME_INSET * 2;
+export const FRAME_CENTER_X = WIDTH / 2;
+export const FAINT = 0.25;
 
 export const PictureFrame = ({ children }: IWithChildren) => (
   <svg

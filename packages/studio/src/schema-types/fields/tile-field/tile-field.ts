@@ -3,15 +3,17 @@ import {
   type TOptionTile,
 } from '@blog/studio/schema-types/inputs/option-tiles-input/option-tiles-input';
 import type { ComponentType } from 'react';
-import { defineField } from 'sanity';
+import { defineField, type StringDefinition } from 'sanity';
 
 type TTileField<T extends string> = {
   name: string;
   title: string;
   description: string;
   tiles: readonly TOptionTile<T>[];
-  emptyTitle: string;
+  emptyTitle?: string;
   Picture: ComponentType<{ value: T }>;
+  initialValue?: T;
+  validation?: StringDefinition['validation'];
 };
 
 export const tileField = <T extends string>({
@@ -21,6 +23,8 @@ export const tileField = <T extends string>({
   tiles,
   emptyTitle,
   Picture,
+  initialValue,
+  validation,
 }: TTileField<T>) =>
   defineField({
     name,
@@ -31,4 +35,6 @@ export const tileField = <T extends string>({
     components: {
       input: createOptionTilesInput({ tiles, emptyTitle, Picture }),
     },
+    initialValue,
+    validation,
   });

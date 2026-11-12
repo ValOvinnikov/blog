@@ -9,6 +9,7 @@ import {
   type TRadiusScale,
 } from '@blog/config/constants';
 import {
+  FAINT,
   FRAME_HEIGHT,
   FRAME_INSET,
   FRAME_WIDTH,
@@ -16,8 +17,6 @@ import {
   PictureFrame,
 } from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
 import type { ReactNode } from 'react';
-
-const FAINT = 0.25;
 
 const CORNER_RADIUS: Record<TRadiusScale, number> = {
   [RADIUS_SCALE.NONE]: 0,

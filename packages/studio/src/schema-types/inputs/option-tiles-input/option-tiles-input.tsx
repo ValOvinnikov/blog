@@ -13,7 +13,7 @@ export type TOptionTile<T extends string> = {
 
 type TOptionTilesInputOptions<T extends string> = {
   tiles: readonly TOptionTile<T>[];
-  emptyTitle: string;
+  emptyTitle?: string;
   Picture: ComponentType<{ value: T }>;
 };
 
@@ -96,6 +96,10 @@ export const createOptionTilesInput = <T extends string>({
     const select = (next: TMaybeUndefined<T>) =>
       onChange(isUndefined(next) ? unset() : set(next));
 
+    const isStored = tiles.some((tile) => tile.value === value);
+    const focusedValue =
+      isStored || !isUndefined(emptyTitle) ? value : tiles.at(0)?.value;
+
     return (
       <Grid
         id={id}
@@ -105,15 +109,17 @@ export const createOptionTilesInput = <T extends string>({
         gap={2}
         style={GRID_STYLE}
       >
-        <Tile
-          title={emptyTitle}
-          isSelected={isUndefined(value)}
-          isReadOnly={readOnly}
-          onSelect={() => select(undefined)}
-          tileRef={isUndefined(value) ? ref : undefined}
-          {...focusProps}
-          picture={<EmptyPicture />}
-        />
+        {!isUndefined(emptyTitle) && (
+          <Tile
+            title={emptyTitle}
+            isSelected={isUndefined(value)}
+            isReadOnly={readOnly}
+            onSelect={() => select(undefined)}
+            tileRef={isStored ? undefined : ref}
+            {...focusProps}
+            picture={<EmptyPicture />}
+          />
+        )}
         {tiles.map((tile) => (
           <Tile
             key={tile.value}
@@ -121,7 +127,7 @@ export const createOptionTilesInput = <T extends string>({
             isSelected={value === tile.value}
             isReadOnly={readOnly}
             onSelect={() => select(tile.value)}
-            tileRef={value === tile.value ? ref : undefined}
+            tileRef={focusedValue === tile.value ? ref : undefined}
             {...focusProps}
             picture={<Picture value={tile.value} />}
           />
