@@ -278,7 +278,9 @@ const findRepeatedValues = (files, indexed) =>
                 file,
                 line: added.find(
                   ({ text }) =>
-                    text.includes(`'${value}'`) || text.includes(`"${value}"`),
+                    !NOT_A_VALUE_LINE.test(text) &&
+                    (text.includes(`'${value}'`) ||
+                      text.includes(`"${value}"`)),
                 ).line,
                 hit: HIT.REPEATED_VALUE,
                 text: `'${value}' is also in ${holder}`,
