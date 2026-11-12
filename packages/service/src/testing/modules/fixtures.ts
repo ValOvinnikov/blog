@@ -33,7 +33,6 @@ import type { TRawLogoWallModule } from '@blog/service/features/modules/logo-wal
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
 import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostLatestModule } from '@blog/service/features/modules/post-latest/adaptor/transformer';
-import type { TRawPostListModule } from '@blog/service/features/modules/post-list/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
 import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawSectionPagesModule } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
@@ -218,20 +217,6 @@ export function mockRawHeroProfileModule(
     contentAlignment: null,
     mediaOrderSplit: null,
     layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawPostListModule(
-  overrides: Partial<TRawPostListModule> = {},
-): TRawPostListModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Latest'),
-    pageSize: 6,
-    layout: null,
-    contentAlignment: null,
-    showImages: true,
     ...overrides,
   };
 }

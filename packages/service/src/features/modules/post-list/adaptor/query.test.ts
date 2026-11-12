@@ -1,12 +1,18 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  CARD_STYLE,
+  DENSITY,
+  GRID_COLUMNS,
+  LOCALE_ISO_CODES,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_MODULE_ID,
   MOCK_POST_LIST_PAGE_SIZE,
   mockModuleDocument,
-  mockRawPostListModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostListModule } from '@blog/service/testing/modules/post-list/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { postListModuleQuery } from './query';
@@ -18,10 +24,10 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   pageSize: MOCK_POST_LIST_PAGE_SIZE,
 });
 
-async function runPostList(locale: string) {
+async function runPostList(locale: string, document = MOCK_MODULE_DOCUMENT) {
   const raw = await evaluateGroqExpression(
     postListModuleQuery.query,
-    [MOCK_MODULE_DOCUMENT],
+    [document],
     undefined,
     { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -50,6 +56,31 @@ describe('postListModuleQuery', () => {
     it('defaults showImages to true for a document authored without it', () => {
       expect(postList.showImages).toBe(true);
     });
+
+    it('reads no appearance overrides from a document authored without them', () => {
+      expect(postList).toMatchObject({
+        cardStyle: null,
+        radiusScale: null,
+        density: null,
+        columns: null,
+      });
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.TWO,
+    };
+
+    const postList = await runPostList(EN, {
+      ...MOCK_MODULE_DOCUMENT,
+      ...appearance,
+    });
+
+    expect(postList).toMatchObject(appearance);
   });
 
   it.each([

@@ -1,8 +1,11 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config/constants';
 import {
-  MOCK_RECENT_POSTS_HEADING,
-  mockRawPostListModule,
-} from '@blog/service/testing/modules/fixtures';
+  BRAND_VARIANT,
+  CARD_STYLE,
+  CONTENT_ALIGNMENT,
+  GRID_COLUMNS,
+} from '@blog/config/constants';
+import { MOCK_RECENT_POSTS_HEADING } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostListModule } from '@blog/service/testing/modules/post-list/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
@@ -34,6 +37,7 @@ describe(toPostListModule, () => {
     { contentAlignment: CONTENT_ALIGNMENT.CENTER },
     { showImages: true },
     { showImages: false },
+    { cardStyle: CARD_STYLE.FILLED, columns: GRID_COLUMNS.THREE },
   ])('keeps an authored %o', (authored) => {
     const module = toPostListModule(
       mockRawPostListModule(authored),

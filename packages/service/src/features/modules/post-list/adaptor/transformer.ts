@@ -1,5 +1,6 @@
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card';
 import type { InferResultType } from 'groqd';
 
@@ -29,6 +30,7 @@ export function toPostListModule(
     layout: toLayout(raw.layout),
     contentAlignment: raw.contentAlignment ?? undefined,
     showImages: raw.showImages,
+    ...toModuleAppearance(raw),
     currentPage: pagination.currentPage,
     totalPages: pagination.totalPages,
   };
