@@ -29,16 +29,12 @@ const toMatch = (
   recordedAt,
 });
 
-export type TPersonalDataMatchCounts = Record<
-  keyof Omit<TPersonalDataMatches, 'emailIndex'> | 'bookmarks',
-  number
->;
-
 export const toDataRequestMatches = ({
   subscribers,
   leads,
   membershipInvites,
   unsentStudioReinvites,
+  selfServeOwnerSites,
   readerAccount,
   blockedSignupIdentities,
   auditEvents,
@@ -65,6 +61,15 @@ export const toDataRequestMatches = ({
       tenantName,
       email,
       undefined,
+    ),
+  ),
+  ...selfServeOwnerSites.map(({ tenantId, tenantName, createdAt }) =>
+    toMatch(
+      DATA_REQUEST_MATCH_KIND.SELF_SERVE_OWNER,
+      tenantId,
+      tenantName,
+      undefined,
+      createdAt,
     ),
   ),
   ...(readerAccount
@@ -107,22 +112,3 @@ export const toDataRequestMatches = ({
     ),
   ),
 ];
-
-export const countPersonalDataMatches = ({
-  subscribers,
-  leads,
-  membershipInvites,
-  unsentStudioReinvites,
-  readerAccount,
-  blockedSignupIdentities,
-  auditEvents,
-}: TPersonalDataMatches): TPersonalDataMatchCounts => ({
-  subscribers: subscribers.length,
-  leads: leads.length,
-  membershipInvites: membershipInvites.length,
-  unsentStudioReinvites: unsentStudioReinvites.length,
-  readerAccount: readerAccount ? 1 : 0,
-  bookmarks: readerAccount?.bookmarks.length ?? 0,
-  blockedSignupIdentities: blockedSignupIdentities.length,
-  auditEvents: auditEvents.length,
-});

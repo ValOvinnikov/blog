@@ -2019,7 +2019,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Daten einer Person finden",
-    "supportingText": "Durchsucht Abonnenten, Kontaktnachrichten, Einladungen, Registrierungssperren und Audit-Ereignisse aller Websites.",
+    "supportingText": "Durchsucht Abonnenten, Kontaktnachrichten, Einladungen, nicht gesendete Studio-Einladungen, Inhaber von Self-Service-Websites, Registrierungssperren und Audit-Ereignisse aller Websites.",
     "emailLabel": "E-Mail-Adresse",
     "emailHint": "Findet dasselbe Postfach in jeder Groß- und Kleinschreibung und mit jedem +Tag.",
     "emailPlaceholder": "name@example.com",
@@ -2043,7 +2043,7 @@
   "dataRequestEraseDialog": {
     "erase": "Löschen",
     "title": "Daten dieser Person löschen?",
-    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites. Das lässt sich nicht rückgängig machen.",
+    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites, entfernt nicht gesendete Studio-Einladungen und entfernt den Self-Service-Inhaberschlüssel, den ihre Adresse hält. Das lässt sich nicht rückgängig machen.",
     "confirm": "Daten löschen",
     "erasing": "Wird gelöscht…",
     "includesReaderAccount": "Auch das Leserkonto löschen",
@@ -2087,6 +2087,7 @@
     "LEAD": "Kontaktnachricht",
     "INVITE": "Einladung",
     "STUDIO_REINVITE": "Nicht gesendete Studio-Einladung",
+    "SELF_SERVE_OWNER": "Inhaber einer Self-Service-Website",
     "SIGNUP_BLOCK": "Registrierungssperre",
     "AUDIT_EVENT": "Audit-Ereignis",
     "READER_ACCOUNT": "Leserkonto",

@@ -50,7 +50,8 @@ page (#5090). The page serves either answer.
   `searchedEmail` and `operatorId` (the operator's user id, never their
   email): the JSON as its first keys, the CSV as its first three columns on
   every row. The CSV is one table with a `kind` column (`SUBSCRIBER`, `LEAD`,
-  `INVITE`, `READER_ACCOUNT`, `BOOKMARK`, `SIGNUP_BLOCK`, `AUDIT_EVENT`) and
+  `INVITE`, `STUDIO_REINVITE`, `SELF_SERVE_OWNER`, `READER_ACCOUNT`, `BOOKMARK`,
+  `SIGNUP_BLOCK`, `AUDIT_EVENT`) and
   one column per field, empty where a kind has none; dates are ISO times and
   the sign-in methods a JSON object. It is UTF-8 with a byte-order mark, quotes
   cells per RFC 4180, and prefixes a text cell that starts with `=`, `+`, `-`
@@ -79,6 +80,9 @@ page (#5090). The page serves either answer.
     owner-email change whose re-invite failed — see
     [tenant access](./tenant-access.md)). The column has no lookup index, so
     each stored value is decrypted and compared;
+  - the self-serve sites that address owns, whose
+    `tenants.self_serve_owner_email_index` is that index, each with its id,
+    name and creation time (shown as a "Self-serve site owner" record);
   - `blocked_signup_identities` ADDRESS entries whose `value` is that index;
   - the reader account whose address is exactly the one given
     (`findUserByEmail`, which keeps a `+tag`): its profile, its linked sign-in methods
@@ -88,11 +92,17 @@ page (#5090). The page serves either answer.
     own.
 - `queries.personalData.erasePersonalData(email, { includesReaderAccount })`
   deletes the matched subscribers, leads and invites, clears the matched
-  unsent Studio re-invites and, when asked, the
+  unsent Studio re-invites, sets the matched sites'
+  `self_serve_owner_email_index` to null (so the address can create a Free or
+  trial site again) and, when asked, the
   reader account through `deleteAccount`: its sessions (so it is signed out
   everywhere), linked sign-ins and bookmarks cascade. It returns how many of
   each it deleted and whether the account was refused. Audit events hold no
-  email and keep their history, shown as a deleted account.
+  email and keep their history, shown as a deleted account. Erasing a live
+  site owner keeps their account, site and OWNER membership (the account is
+  refused with `DB_HOLDS_PLATFORM_ROLE`) but clears the site's key: on a
+  trial the address can open another trial, while on Free the OWNER
+  membership still blocks a second Free site.
 - Both return `TResult`, with `DB_INVALID_EMAIL` for a value that is not an
   email address. Both return the index, so the app can audit without the email.
 
