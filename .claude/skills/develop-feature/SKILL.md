@@ -252,7 +252,7 @@ owning agent, then re-dispatch. Never proceed on red.
 ## 6. Review (blocking — Gate 2 is not offered until this passes)
 
 **Run `git fetch origin` before dispatching any reviewer** (`reviewer`,
-`a11y-reviewer`, `seo-auditor`) — a worktree session's local `main` goes
+`correctness-reviewer`, `a11y-reviewer`, `seo-auditor`) — a worktree session's local `main` goes
 stale, and the read-only guard denies them `git fetch`.
 
 **Every reviewer prompt carries:**
@@ -268,7 +268,9 @@ stale, and the read-only guard denies them `git fetch`.
 3. **The ticket.** The issue number, its **Copy** and **Cost** lines, and each
    implementing agent's **Examined** and **Reuse** sections, verbatim — never
    summarised, since §7's Reuse, drift, cost and Voice items are checked
-   against them.
+   against them. `correctness-reviewer` takes the issue's acceptance
+   criteria verbatim instead, and `reviewer`'s prompt says whether
+   `correctness-reviewer` was dispatched.
 
 Each report opens with `pwd` and `git rev-parse HEAD`. **Reject a report whose
 SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
@@ -277,6 +279,14 @@ SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
   (`origin/main...HEAD` + working tree); it applies `code-review-practices`.
   A docs-only diff gets the inline identifier check instead (`CLAUDE.md`
   delivery gate step 4).
+- **`correctness-reviewer`** (`.claude/agents/correctness-reviewer.md`, Opus)
+  as well, in the same message as `reviewer`: it checks the diff against the
+  acceptance criteria and for security, performance and correctness defects,
+  and leaves conventions to `reviewer`. **Skip it when every changed file is
+  styling, copy, a story or a doc** — a `*-variants.ts` or `.css` file, a
+  `packages/config/src/voice/` catalog, a `*.stories.tsx`, a `.md` — and say
+  so in `reviewer`'s prompt, which then runs the general pass itself. One
+  file outside that list dispatches it.
 - **`a11y-reviewer`** as well when the diff touches `packages/ui`, `apps/web`
   or `apps/platform` components.
 - **`seo-auditor`** as well when the diff touches `apps/web` routes, metadata,
@@ -581,7 +591,8 @@ reason:
   that board write is confirmed.
 
 Every other dispatch — layer agents, `verify-runner` (including right before
-`reviewer`), `reviewer`, `a11y-reviewer`, `seo-auditor`, `ci-watcher`, … —
+`reviewer`), `reviewer`, `correctness-reviewer`, `a11y-reviewer`,
+`seo-auditor`, `ci-watcher`, … —
 runs in the background.
 
 **Known failure mode — `run_in_background: false` on anything else.** The

@@ -217,6 +217,15 @@ XModuleView` block that the rule already forbade and no review had
     what #3144 shipped without: it verified green, merged `main` in
     afterward, and CI's Test job failed a minute later on a schema type that
     had landed on `main` in between.
+  - `correctness-reviewer` — read-only review of the same diff on Opus,
+    dispatched alongside `reviewer`: it maps each of the issue's acceptance
+    criteria to the `file:line` that meets it, lists what the diff does
+    beyond them, and looks for security, performance and correctness defects,
+    each blocking finding stated as a failing scenario. It checks no
+    convention — `reviewer` (Sonnet) keeps `code-review-practices` §0–7 and
+    the maintainability items. Skipped when every changed file is styling,
+    copy, a story or a doc; `reviewer` then runs the general pass itself
+    (`develop-feature` §6).
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
     `react-component-practices` → "Accessible by construction" plus each
@@ -325,10 +334,11 @@ XModuleView` block that the rule already forbade and no review had
     output landing permanently in its context (paid again every turn until
     compaction) and blocked the session for the minutes CI took.
 
-  `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, `ci-watcher`, and
+  `reviewer`, `correctness-reviewer`, `a11y-reviewer`, `seo-auditor`,
+  `explore`, `ci-watcher`, and
   `verify-runner` are read-only by **enforcement**, not just prose (#425,
   #464, #466); `test-writer` reuses the same `Bash` guard although it isn't
-  fully read-only (#396). All seven run under `permissionMode: dontAsk`, plus
+  fully read-only (#396). All eight run under `permissionMode: dontAsk`, plus
   a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`) that denies the
   write-shaped commands the project allow-list would otherwise admit
   (`git commit` — including with leading global flags like `git -C dir
@@ -486,7 +496,7 @@ file` are all denied alike) — an earlier version only handled the
     legitimate-command bank; run it directly or via CI (see
     [`docs/context/ci-automation.md`](./ci-automation.md)).
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, `verify-runner`,
+    `correctness-reviewer`, `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, `verify-runner`,
     and `test-writer` agent frontmatter — `test-writer` sets a `GUARD_LABEL`
     env var on its hook command so the deny message names it correctly
     rather than calling it "read-only")
@@ -791,7 +801,7 @@ file` are all denied alike) — an earlier version only handled the
     auto-removes it, so it never reaches §8's cleanup list. Its own file
     documents this so the line isn't dropped as pointless.
   - **The read-only reviewers take a checkout path instead.** `reviewer`,
-    `a11y-reviewer`, `seo-auditor` and `explore` would review or search
+    `correctness-reviewer`, `a11y-reviewer`, `seo-auditor` and `explore` would review or search
     committed `HEAD` alone in a worktree of their own, missing the
     uncommitted changes and still approving — a silent scope cut worse than
     the loud refusal. So each runs under `verify-runner`'s dispatch contract

@@ -326,7 +326,11 @@ Map each changed file to its workspace and read its imports against `CLAUDE.md`
 ## How to run a review here
 
 Pre-commit reviews go to the `reviewer` subagent (`.claude/agents/reviewer.md`)
-— a fresh context with no author bias. A manual review (a solo session's
+— a fresh context with no author bias — and, for every diff that changes more
+than styling, copy, stories or docs, to `correctness-reviewer`
+(`.claude/agents/correctness-reviewer.md`) alongside it, which takes step 3's
+security, performance and correctness items and the ticket's acceptance
+criteria (→ `develop-feature` §6). A manual review (a solo session's
 self-review, someone else's PR) runs the same three passes, in order; a hit in
 an early pass does not skip a later one:
 
@@ -336,13 +340,16 @@ an early pass does not skip a later one:
    checklist, boundary and type findings first.
 3. **General** — what a contract check won't catch:
    - **Security:** injection/XSS/SSRF, auth/authz, secrets, unsafe
-     deserialization.
+     deserialization, a webhook or API route missing its secret or signature
+     check.
    - **Performance:** N+1 queries, O(n²) in hot paths, unbounded
-     loops/queries, resource leaks.
+     loops/queries, resource leaks, over-fetching.
    - **Correctness:** empty/null/overflow, race conditions, error handling and
-     propagation, off-by-one, migration idempotency (a re-run never
-     overwrites or loses data).
-   - **Maintainability:** naming, single responsibility, test coverage, and
+     propagation, an unchecked `result.ok`, off-by-one, migration idempotency
+     (a re-run never overwrites or loses data).
+   - **Maintainability:** naming, single responsibility, test coverage, dead
+     code the change leaves behind (an unreachable branch, a prop or helper
+     nothing reads any more), a comment or doc the change made false, and
      duplication checked against the **repo**, not the diff — a confirmed
      duplicate is blocking (→ `reviewer.md` "Duplication is checked against
      the repo, not against the diff").

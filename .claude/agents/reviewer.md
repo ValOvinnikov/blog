@@ -92,11 +92,11 @@ line under **Non-blocking** ("no components touched" when there are none).
 ### Pass 3 — General
 
 What a contract check won't catch: the skill's "How to run a review here"
-step 3 (security, performance, correctness, maintainability), plus an
-unchecked `result.ok`, a webhook or API route missing its secret or signature
-check, over-fetching, dead code the change leaves behind (an unreachable
-branch, a prop or helper nothing reads any more), and a comment or doc the
-change made false.
+step 3. `correctness-reviewer` owns its security, performance and correctness
+items and the ticket's acceptance criteria, in a parallel dispatch — run only
+the maintainability items, and say under **Not checked** that the rest was
+left to it. When the prompt says `correctness-reviewer` was not dispatched (a
+diff that only changes styling, copy or stories), run all of step 3 yourself.
 
 ## Duplication is checked against the repo, not against the diff
 
