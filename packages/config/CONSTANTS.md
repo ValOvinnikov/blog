@@ -922,6 +922,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **INACTIVITY_SWEEP_LOG**: `NOT_CONFIGURED`=`"inactivity_sweep.not_configured"`, `FAILED`=`"inactivity_sweep.failed"`, `STAGE_FAILED`=`"inactivity_sweep.stage_failed"`, `OWNER_MISSING`=`"inactivity_sweep.owner_missing"`, `PLATFORM_TENANT_SKIPPED`=`"inactivity_sweep.platform_tenant_skipped"`, `ALERT_NO_RECIPIENTS`=`"inactivity_sweep.alert_no_recipients"`, `EMAIL_SEND_FAILED`=`"inactivity_sweep.email_send_failed"`
 
+### `@worker/constants/newsletter-send` — `apps/worker/src/constants/newsletter-send.ts`
+
+- **NEWSLETTER_SEND_LOG**: `START_FAILED`=`"newsletter_send.start_failed"`, `NOT_CONFIGURED`=`"newsletter_send.not_configured"`, `SUBSCRIBER_UNREADABLE`=`"newsletter_send.subscriber_unreadable"`, `SEND_FAILED`=`"newsletter_send.send_failed"`, `OWNER_EMAIL_FAILED`=`"newsletter_send.owner_email_failed"`, `OWNER_EMAIL_MISSING`=`"newsletter_send.owner_email_missing"`, `ALERT_NO_RECIPIENTS`=`"newsletter_send.alert_no_recipients"`, `ALERT_FAILED`=`"newsletter_send.alert_failed"`
+- **NEWSLETTER_POST_STATE**: `READY`, `SCHEDULED`, `CANCELLED`
+- **NEWSLETTER_SEND_PACE**: `NORMAL`, `SLOW`, `STOPPED`
+- **NEWSLETTER_SEND_GATE**: `SEND`, `SKIPPED`, `NOT_CONFIGURED`
+
 ### `@worker/constants/owner-access` — `apps/worker/src/constants/owner-access.ts`
 
 - **OWNER_ACCESS_LOG**: `CHECK_FAILED`=`"owner_access.check_failed"`, `REPORT_FAILED`=`"owner_access.report_failed"`, `ACTIVITY_TOUCH_FAILED`=`"owner_access.activity_touch_failed"`, `INVITE_DELETE_FAILED`=`"owner_access.invite_delete_failed"`, `FINDING_OPEN_FAILED`=`"owner_access.finding_open_failed"`, `SWEEP_NOT_CONFIGURED`=`"owner_access.sweep_not_configured"`, `SWEEP_FAILED`=`"owner_access.sweep_failed"`, `SWEEP_TENANT_FAILED`=`"owner_access.sweep_tenant_failed"`
