@@ -4,7 +4,7 @@ import {
 } from '@blog/db/constants';
 import { claimNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends/claim-newsletter-post-send';
 import { getNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends/get-newsletter-post-send';
-import { releaseNewsletterPostSend } from '@blog/db/queries/newsletter-post-sends/release-newsletter-post-send';
+import { markNewsletterPostSent } from '@blog/db/queries/newsletter-post-sends/mark-newsletter-post-sent';
 import * as schema from '@blog/db/schema';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { MOCK_POST_ID } from '@blog/db/testing/newsletter-post-sends/fixtures';
@@ -34,8 +34,9 @@ describe(markNewsletterPostSkipped, () => {
   it.each(Object.values(NEWSLETTER_SKIP_REASON))(
     'records a claimed post as skipped for %s',
     async (skipReason) => {
-      await markNewsletterPostSkipped(tenantId, MOCK_POST_ID, skipReason);
-
+      expect(
+        await markNewsletterPostSkipped(tenantId, MOCK_POST_ID, skipReason),
+      ).toBe(true);
       expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual({
         claimedAt: MOCK_NOW,
         outcome: NEWSLETTER_POST_SEND_OUTCOME.SKIPPED,
@@ -44,14 +45,20 @@ describe(markNewsletterPostSkipped, () => {
     },
   );
 
-  it('keeps a skipped post claimed, so it is never sent again', async () => {
-    await markNewsletterPostSkipped(
-      tenantId,
-      MOCK_POST_ID,
-      NEWSLETTER_SKIP_REASON.SITE_PAUSED,
-    );
-    await releaseNewsletterPostSend(tenantId, MOCK_POST_ID, MOCK_NOW);
+  it('leaves a sent post sent', async () => {
+    await markNewsletterPostSent(tenantId, MOCK_POST_ID);
 
-    expect(await claimNewsletterPostSend(tenantId, MOCK_POST_ID)).toBeNull();
+    expect(
+      await markNewsletterPostSkipped(
+        tenantId,
+        MOCK_POST_ID,
+        NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
+      ),
+    ).toBe(false);
+    expect(await getNewsletterPostSend(tenantId, MOCK_POST_ID)).toEqual({
+      claimedAt: MOCK_NOW,
+      outcome: NEWSLETTER_POST_SEND_OUTCOME.SENT,
+      skipReason: undefined,
+    });
   });
 });

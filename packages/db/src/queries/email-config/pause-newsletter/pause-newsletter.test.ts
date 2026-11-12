@@ -1,3 +1,4 @@
+import { DAY_MS } from '@blog/db/constants';
 import { getNewsletterPausedAt } from '@blog/db/queries/email-config/get-newsletter-paused-at';
 import * as schema from '@blog/db/schema';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
@@ -8,7 +9,7 @@ import { pauseNewsletter } from './pause-newsletter';
 
 vi.mock('@blog/db/client');
 
-const MOCK_LATER = new Date(MOCK_NOW.getTime() + 60_000);
+const MOCK_LATER = new Date(MOCK_NOW.getTime() + DAY_MS);
 
 const db = useQueryTestDb();
 const tenant = useTestTenant(db);
