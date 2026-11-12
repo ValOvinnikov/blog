@@ -1,5 +1,8 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PLAN_WRITE_OUTCOME,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -44,8 +47,9 @@ describe(setTenantPlan, () => {
       });
 
       expect(result).toEqual({
-        ok: true,
-        data: { plan: TENANT_PLAN.GROWTH, status: TENANT_STATUS.PAST_DUE },
+        outcome: TENANT_PLAN_WRITE_OUTCOME.WRITTEN,
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.PAST_DUE,
       });
       expect(await readSelfServeIndex(tenantId)).toBeNull();
     });
@@ -76,8 +80,9 @@ describe(setTenantPlan, () => {
       });
 
       expect(result).toEqual({
-        ok: true,
-        data: { plan: TENANT_PLAN.FREE, status: TENANT_STATUS.ACTIVE },
+        outcome: TENANT_PLAN_WRITE_OUTCOME.WRITTEN,
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
       });
     });
   });
@@ -114,12 +119,37 @@ describe(setTenantPlan, () => {
     });
   });
 
-  it('returns not-found for a tenant id that does not exist', async () => {
+  it.each([TENANT_STATUS.ARCHIVED, TENANT_STATUS.SUSPENDED])(
+    'leaves a %s tenant unchanged and reports it not writable',
+    async (status) => {
+      const { id } = await insertTestTenant(db(), {
+        plan: TENANT_PLAN.FREE,
+        status,
+      });
+
+      const result = await setTenantPlan(id, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(result).toEqual({
+        outcome: TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE,
+        status,
+      });
+      const [row] = await db()
+        .select({ plan: tenants.plan, status: tenants.status })
+        .from(tenants)
+        .where(eq(tenants.id, id));
+      expect(row).toEqual({ plan: TENANT_PLAN.FREE, status });
+    },
+  );
+
+  it('reports not-found for a tenant id that does not exist', async () => {
     const result = await setTenantPlan(MOCK_MISSING_TENANT_ID, {
       plan: TENANT_PLAN.GROWTH,
       status: TENANT_STATUS.ACTIVE,
     });
 
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    expect(result).toEqual({ outcome: TENANT_PLAN_WRITE_OUTCOME.NOT_FOUND });
   });
 });

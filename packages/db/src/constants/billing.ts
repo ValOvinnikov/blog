@@ -97,3 +97,9 @@ export const STRIPE_TENANT_LOOKUP_OUTCOME = {
 export type TStripeTenantLookupOutcome = TValueOf<
   typeof STRIPE_TENANT_LOOKUP_OUTCOME
 >;
+
+export const TENANT_PLAN_WRITE_OUTCOME = {
+  WRITTEN: 'WRITTEN',
+  NOT_WRITABLE: 'NOT_WRITABLE',
+  NOT_FOUND: 'NOT_FOUND',
+} as const;
