@@ -60,20 +60,22 @@ reviewers stop on the mismatch.
 `post-checkout` symlinks the worktree's `node_modules` to the primary
 checkout's, and the review uses that tree as it is. **Never install in a
 review worktree**: an install runs the PR's own install scripts and pnpm
-settings unattended, and `pre-bash-worktree-install-guard.sh` blocks it.
+settings unattended. `pre-bash-worktree-install-guard.sh` blocks it only from
+a session that itself shares the primary checkout's `node_modules`; from any
+other session the rule is yours to keep.
 
 ## 3. Run the checks CI has no step for
 
-In the worktree, as one command, prefixed with
-`TOUCHED_BASE_REF=origin/<baseRefName>` when the base is not `main`:
+In the worktree, as one command:
 
 ```bash
-cd <worktree> && node scripts/check-file-size.mjs && node scripts/check-layer-contracts.mjs && node scripts/check-diff-hygiene.mjs && node scripts/check-touched-lint.mjs && node scripts/check-clones.mjs
+cd <worktree> && { export TOUCHED_BASE_REF=origin/<baseRefName>; for check in check-file-size check-layer-contracts check-diff-hygiene check-touched-lint check-clones; do node scripts/$check.mjs || echo "FAILED: $check"; done; }
 ```
 
 They take seconds. The first four are the part of `pnpm verify` that no CI
-job repeats; the fifth is the review's clone scan. A failing check is a
-blocking finding with its command.
+job repeats; the fifth is the review's clone scan. All five run whatever the
+earlier ones return, so one round reports every failure; each `FAILED` line
+is a blocking finding with its command and output.
 
 **Do not run `pnpm verify`, type-check, lint or the tests.** The session that
 opened the PR ran them, and CI runs them again as required checks once the
@@ -81,10 +83,23 @@ PR is marked ready, so a red PR cannot merge. A failed check in
 `statusCheckRollup` on the head SHA is a blocking finding; a skipped one is
 the draft state, never a finding.
 
-**A check that cannot start** — `jscpd is not installed`, a missing `eslint`
-— means the primary checkout's install is behind the PR. Ask the user to run
-`git pull` and `pnpm install` in the primary checkout, then run step 3 again.
-The same pull is what gives sessions the current agents and skills.
+**A check that could not start is not a failed check.** A failed check
+prints its findings. `jscpd is not installed`, a module-resolution error from
+eslint, or `check-touched-lint` exiting non-zero with nothing after its
+`Linting N touched file(s)` line means the tool was not there to run. The
+worktree's dependencies are the primary checkout's, linked when the worktree
+was added, so which fix applies depends on where the gap is:
+
+- **The PR itself adds a workspace or changes dependencies** (its diff
+  touches `pnpm-lock.yaml` or adds a `package.json`) — nothing on `main` can
+  supply what only the PR has. Leave that check out, and name it under
+  **Not checked** in the report: the opening session's `pnpm verify` is the
+  only run it gets.
+- **Otherwise the primary checkout is behind** — ask the user to run
+  `git pull` and `pnpm install` there, then remove the review worktree, add
+  it again (step 2) and re-run step 3: the links are copied only when a
+  worktree is added. The same pull gives sessions the current agents and
+  skills.
 
 ## 4. Dispatch — one message, all in the background
 
@@ -157,7 +172,9 @@ review instead.
 ## 8. Remove the worktree
 
 Once the PR merges or closes: `git worktree remove <worktree>`. It is
-detached and holds nothing of its own. From a session that is itself inside a
+detached and holds nothing of its own; one that was given its own install
+before this skill stopped doing so deletes slowly and needs a generous
+timeout. From a session that is itself inside a
 worktree the command is refused (`develop-feature/worktree-cleanup.md`) —
 leave it and tell the user the path.
 
