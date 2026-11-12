@@ -1,8 +1,12 @@
-import type { TMaybeNull } from '@blog/config';
+import type { TOutcome } from '@blog/config';
 import { getDb } from '@blog/db/client';
-import type { TTenantStatus } from '@blog/db/constants';
+import {
+  TENANT_DETAILS_UPDATE_OUTCOME,
+  type TTenantStatus,
+} from '@blog/db/constants';
 import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
+import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
 import { tenantDetailsWrite } from './tenant-details-fields';
@@ -13,11 +17,12 @@ type TTenantDetailsRowWrite = {
   clearsUnsentReinvite: boolean;
 };
 
-// Null when the write would give the owner a second Free-or-trial site.
 export async function writeTenantDetailsRow(
   tenantId: string,
   { details, status, clearsUnsentReinvite }: TTenantDetailsRowWrite,
-): Promise<TMaybeNull<TTenant>> {
+): Promise<
+  TTenant | TOutcome<typeof TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT>
+> {
   try {
     const [tenant] = await getDb()
       .update(tenants)
@@ -27,13 +32,15 @@ export async function writeTenantDetailsRow(
 
     if (!tenant) {
       throw new Error(
-        `updateTenantDetails: update for tenant "${tenantId}" returned no row.`,
+        `writeTenantDetailsRow: update for tenant "${tenantId}" returned no row.`,
       );
     }
 
     return tenant;
   } catch (error) {
-    if (isFreeOwnerViolation(error)) return null;
+    if (isFreeOwnerViolation(error)) {
+      return toOutcome(TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT);
+    }
     throw error;
   }
 }

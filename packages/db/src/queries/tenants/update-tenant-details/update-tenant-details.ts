@@ -153,7 +153,7 @@ export async function updateTenantDetails(
     status: existing.status,
     clearsUnsentReinvite: !isUndefined(ownerEmailChange),
   });
-  if (!tenant) return toOutcome(OUTCOME.OWNS_FREE_TENANT);
+  if ('outcome' in tenant) return tenant;
 
   async function restoreTenantRow(original: TTenant): Promise<void> {
     await db

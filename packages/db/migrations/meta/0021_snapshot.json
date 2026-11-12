@@ -1,5 +1,5 @@
 {
-  "id": "018da289-8fee-489a-8fe4-3e3d2ce7e9f7",
+  "id": "43981242-694b-4afd-bd4b-3228d9fa7f29",
   "prevId": "e8456e6f-7992-4904-99bd-2b07dc588304",
   "version": "7",
   "dialect": "postgresql",
@@ -2680,7 +2680,7 @@
             }
           ],
           "isUnique": true,
-          "where": "(\"tenants\".\"plan\" = 'FREE' or \"tenants\".\"status\" = 'TRIAL') and \"tenants\".\"status\" <> 'ARCHIVED'",
+          "where": "\"tenants\".\"self_serve_owner_email_index\" is not null and \"tenants\".\"status\" <> 'ARCHIVED'",
           "concurrently": false,
           "method": "btree",
           "with": {}

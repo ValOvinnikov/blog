@@ -1,6 +1,7 @@
 import {
   MEMBERSHIP_INVITE_OUTCOME,
   MEMBERSHIP_ROLE,
+  PLAN_ENTITLEMENTS,
   TENANT_PLAN,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
@@ -36,7 +37,7 @@ faker.seed(6022);
 
 const { CREATED, ALREADY_PENDING, ALREADY_CONSUMED, SEAT_LIMIT } =
   MEMBERSHIP_INVITE_OUTCOME;
-const GROWTH_SEATS = 3;
+const GROWTH_SEATS = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].seats;
 
 const db = useQueryTestDb();
 

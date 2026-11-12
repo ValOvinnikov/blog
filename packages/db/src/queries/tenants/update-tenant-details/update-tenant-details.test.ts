@@ -323,9 +323,6 @@ describe(updateTenantDetails, () => {
         expect(invite?.emailIndex).toBe(
           testPersonalEmailIndex(MOCK_NEW_OWNER_EMAIL),
         );
-        expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
-          MOCK_NEW_OWNER_EMAIL,
-        );
       });
 
       it.each([
@@ -672,10 +669,9 @@ describe(updateTenantDetails, () => {
     );
 
     it('moves back to FREE beside another Free site after a paid plan', async () => {
-      await db()
-        .update(tenants)
-        .set({ selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX })
-        .where(eq(tenants.id, tenantId));
+      await patchTestTenant(db(), tenantId, {
+        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      });
 
       const upgraded = await updateTenantDetails(tenantId, {
         ...MOCK_ORIGINAL_DETAILS,

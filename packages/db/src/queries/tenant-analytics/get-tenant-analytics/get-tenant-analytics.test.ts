@@ -20,7 +20,7 @@ describe(getTenantAnalytics, () => {
   it.each([TENANT_PLAN.STARTER, TENANT_PLAN.GROWTH])(
     'returns the saved provider and id on %s',
     async (plan) => {
-      await patchTestTenant(db(), tenant().id, { plan: plan });
+      await patchTestTenant(db(), tenant().id, { plan });
       await saveTenantAnalytics(tenant().id, MOCK_GOOGLE_ANALYTICS);
 
       expect(await getTenantAnalytics(tenant().id)).toEqual(
