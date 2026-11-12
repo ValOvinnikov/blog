@@ -31,37 +31,13 @@ import { createTaxonomyListModuleService } from './features/modules/taxonomy-lis
 import { createTeamModuleService } from './features/modules/team';
 import { createTestimonialModuleService } from './features/modules/testimonial';
 import { createTimelineModuleService } from './features/modules/timeline';
-import { createCookieStatementService } from './features/pages/cookie-statement';
-import { createHomeService } from './features/pages/home';
-import { createLandingPageService } from './features/pages/landing';
-import { createPageTitleService } from './features/pages/page-title';
-import { createPostService } from './features/pages/post';
-import { createBlogService } from './features/pages/post-index';
-import { createSectionDocumentService } from './features/pages/section-document';
-import { createSectionIndexService } from './features/pages/section-index';
-import { createTagService } from './features/pages/tag';
-import { createTagIndexService } from './features/pages/tag-index';
-import { createTopicService } from './features/pages/topic';
-import { createTopicIndexService } from './features/pages/topic-index';
+import { createPagesService } from './features/pages/service';
 
 export const service = {
   editorial: {
     skim: createSkimService(),
   },
-  pages: {
-    home: createHomeService(),
-    landing: createLandingPageService(),
-    pageTitle: createPageTitleService(),
-    blog: createBlogService(),
-    post: createPostService(),
-    sectionDocument: createSectionDocumentService(),
-    sectionIndex: createSectionIndexService(),
-    cookieStatement: createCookieStatementService(),
-    topic: createTopicService(),
-    topicIndex: createTopicIndexService(),
-    tag: createTagService(),
-    tagIndex: createTagIndexService(),
-  },
+  pages: createPagesService(),
   modules: {
     heroBlog: createHeroBlogModuleService(),
     heroStatement: createHeroStatementModuleService(),
@@ -103,54 +79,11 @@ export const service = {
 };
 
 export type { TPostBody, TSaveSkimDraftInput } from './features/editorial/skim';
-export type { TFeedPost, TPostById } from './features/entities/posts';
-export type { TTagsList, TTagWithPostCount } from './features/entities/tags';
-export type {
-  TTopicsList,
-  TTopicWithPostCount,
-} from './features/entities/topics';
-export type { TFooter } from './features/global/footer';
-export type {
-  TNavigation,
-  TNavigationItem,
-} from './features/global/navigation';
-export type { TSiteSettings } from './features/global/site-settings';
-export type {
-  TTranslationEntry,
-  TTranslationGroup,
-  TTranslationMap,
-} from './features/global/translation-map';
+export type * from './features/entities/types';
+export type * from './features/global/types';
 export type * from './features/modules/types';
-export type { TCookieStatementPage } from './features/pages/cookie-statement';
-export type { THomePage } from './features/pages/home';
-export type {
-  TLandingBreadcrumb,
-  TLandingPage,
-  TLandingRedirect,
-  TLandingSectionNavigation,
-  TLandingSectionPage,
-} from './features/pages/landing';
+export type * from './features/pages/types';
 export type { TPageTranslation } from './shared/localization/page-translations/to-page-translations';
-export type {
-  TPostDetail,
-  TPostDetailAuthor,
-  TPostTakeaways,
-} from './features/pages/post';
-export type { TBlogIndexPage } from './features/pages/post-index';
-export type {
-  TSectionDocumentDetail,
-  TSectionDocumentKind,
-  TSectionDocumentLink,
-  TSectionDocumentType,
-} from './features/pages/section-document';
-export type {
-  TSectionIndexPage,
-  TSectionIndexType,
-} from './features/pages/section-index';
-export type { TTagDetailPage } from './features/pages/tag';
-export type { TTagIndexPage } from './features/pages/tag-index';
-export type { TTopicDetailPage } from './features/pages/topic';
-export type { TTopicIndexPage } from './features/pages/topic-index';
 export { urlForImage, urlForSanityImage } from './sanity/image/image';
 export type { TImageTransformOptions } from './sanity/image/image';
 export type { TSanityProjectRef } from './sanity/project-cache/project-cache';

@@ -68,6 +68,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 - **Framing.** `next.config` leaves `Content-Security-Policy`, `Referrer-Policy` and `X-Frame-Options` to the proxy on any request carrying `?preview`, and the proxy matcher routes every such request through the proxy. A verified preview gets `frame-ancestors <PLATFORM_APP_URL origin>`, `Cache-Control: private, no-store`, `Referrer-Policy: no-referrer` and `X-Robots-Tag: noindex`; an unverified one gets `frame-ancestors 'none'` and `X-Frame-Options: DENY`. Every response without the parameter keeps the site-wide headers.
 - **Why not Draft Mode.** Next's Draft Mode cookie value is the deployment's `previewModeId`, the same value that, sent as `x-prerender-revalidate`, triggers an on-demand rebuild (`next/dist/server/api-utils/index.js`, Next 16.4). One cookie would unlock every tenant's drafts and every tenant's cache.
 - Only posts and landing pages have a draft route; a token for any other path renders a 404 inside the frame.
+- **The path a token signs.** `POST /api/internal/pages/{documentId}/path`, signed under `INTERNAL_PAGES_SECRET` like the title route, takes `{ tenantId }` and answers `{ path }` for a post or landing page read through the `drafts` perspective, uncached, so a never-published draft resolves and a renamed slug answers its draft path. The path is what the proxy compares against `request.nextUrl.pathname`: each segment percent-encoded, the locale prefix as the site serves it (none for the tenant's default language), no trailing slash, no query. Any other page type, an unknown id or a landing page whose parent chain is broken answers 404. A draft in a language the tenant has not switched on answers 409: the proxy would redirect its prefixed path to an unprefixed one the token no longer matches, so the platform explains that the language must be switched on before it can be previewed. The id may be the published id or its `drafts.` form. The caller puts the returned path into the frame's URL exactly as returned, never re-encoded or decoded: it percent-encodes the reserved characters (`: @ , + = & ; $`) a browser would leave raw, and the token's path must match the request's byte for byte.
 
 ## Dependencies
 
@@ -85,6 +86,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 - `packages/service/src/sanity/query/isr.ts`
 - `packages/config/src/constants/cache.ts`
 - `packages/utils/src/preview-token/preview-token.ts`
+- `apps/web/src/app/api/internal/pages/[id]/path/route.ts`
 - `apps/platform/src/server/site-config/revalidate-site-config.ts`
 
 ## Tests and stories
