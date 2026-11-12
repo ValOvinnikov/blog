@@ -450,6 +450,14 @@ file` are all denied alike) — an earlier version only handled the
     of the git toplevel of the payload's `cwd`, falling back to
     `$CLAUDE_PROJECT_DIR` only when the payload carries none —
     `$CLAUDE_PROJECT_DIR` names the primary checkout even inside a worktree.
+    One form is judged by its target instead (#7267): the exact one-line
+    `cd <absolute path> && pnpm install [--frozen-lockfile]` passes when the
+    target is a linked worktree whose `node_modules` is not a symlink — how
+    `review-pull-request` gives a review worktree its own tree from a
+    shared-deps session. Any other spelling, the primary checkout, and a
+    worktree still holding the symlink stay blocked. Its test suite stops
+    before any fixture or cleanup when `mktemp` fails, since an empty path
+    would aim its `rm -rf` at the current directory.
   - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
     a `git push` that creates a branch off the pattern in
     `scripts/branch-name.mjs` (`<type>/<n>-<slug>`, plus `main`,

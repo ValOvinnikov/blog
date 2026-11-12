@@ -62,17 +62,25 @@ checkout's. Run `pnpm check:file-size` in the worktree as a probe:
 
 - **It runs** — the primary checkout's install matches the PR's lockfile.
   Carry on.
-- **It stops at a refused install** — the primary checkout is behind. Give
-  the worktree its own install, which takes seconds:
-  `rm node_modules && pnpm install --frozen-lockfile` (`rm` removes only the
-  symlink). Let it finish before running anything else there.
-- **The install is blocked** (`pre-bash-worktree-install-guard.sh`) — your
-  own session is a shared-deps worktree, and the guard reads your session's
-  directory, not the command's. Do not work around it. Ask the user to run
-  that same install in the review worktree from their own terminal, giving
-  them the full command with the worktree's absolute path, then probe again.
-  It is the only fix when the PR changes `pnpm-lock.yaml`, and it never
-  touches the primary checkout: `rm` drops the symlink first.
+- **It stops at a refused install** — the primary checkout is behind, or the
+  PR changes `pnpm-lock.yaml`. Give the worktree its own install, which takes
+  seconds, as two separate commands with the worktree's absolute path:
+
+  ```bash
+  rm <worktree>/node_modules
+  cd <worktree> && pnpm install --frozen-lockfile
+  ```
+
+  `rm` removes only the symlink, so the primary checkout is never touched.
+  The second command is written exactly so:
+  `pre-bash-worktree-install-guard.sh` lets a session in a shared-deps
+  worktree install into another worktree only in that one-line form, and
+  only once the symlink is gone. Let it finish before running anything else
+  there.
+
+- **The guard still blocks that exact form** — the primary checkout holds an
+  older guard. Do not work around it: ask the user to run the two commands
+  in their own terminal, then probe again.
 
 ## 3. Run the scripts yourself
 
