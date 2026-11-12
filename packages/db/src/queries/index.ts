@@ -21,6 +21,7 @@ export * as settingsFeatures from './settings-features';
 export * as siteConfig from './site-config';
 export * as stripeWebhookEvents from './stripe-webhook-events';
 export * as subscribers from './subscribers';
+export * as tenantAnalytics from './tenant-analytics';
 export * as tenantDomains from './tenant-domains';
 export * as tenantOAuthCredentials from './tenant-oauth-credentials';
 export * as tenantSuspensions from './tenant-suspensions';

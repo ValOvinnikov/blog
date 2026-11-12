@@ -23,7 +23,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { timestampColumns } from './columns';
 import {
   accountButtonStyleEnum,
   accountPanelStyleEnum,
@@ -113,13 +113,7 @@ export const siteConfig = pgTable('site_config', {
     .default({}),
   lookSavedAt: timestamp('look_saved_at', { mode: 'date' }),
   voiceSavedAt: timestamp('voice_saved_at', { mode: 'date' }),
-  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  ...timestampColumns,
 });
 
 export type TSiteConfig = typeof siteConfig.$inferSelect;

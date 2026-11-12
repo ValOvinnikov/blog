@@ -1,9 +1,12 @@
 ---
 title: Consent and analytics
 status: partial
-layers: [config, studio, service, ui, web]
+layers: [config, db, studio, service, ui, web]
 code:
   - packages/config/src/constants/consent-category.ts
+  - packages/config/src/constants/analytics-provider.ts
+  - packages/db/src/schema/tenant-analytics.ts
+  - packages/db/src/queries/tenant-analytics/**
   - packages/ui/src/components/molecules/consent-banner/**
   - packages/ui/src/components/molecules/consent-preferences/**
   - packages/ui/src/components/molecules/consent-placeholder/**
@@ -45,7 +48,8 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - Cookie `consent`, value `1.<granted categories, comma-separated>` (version `1`; an empty list means rejected), 180 days, `Path=/`, `SameSite=Lax`, `Secure`. Written from the browser; no server reads it.
 - `useConsentStore` also reports a `saveRevision` that every `save` advances, even one that rewrites the same choice; `save` returns the new revision.
 - `useConsentStore` turns the cookie into `UNKNOWN` (server and first render), `UNANSWERED` (missing or invalid cookie) or `ANSWERED`; `useConsent(category)` answers `GRANTED` or `DENIED` per category and exposes `grant()`.
-- Sanity `module_cookieSettings`: `brandVariant`, optional `headingBlock`, `layout`. No Neon data. The capability flags come from `settings_features`, cached per tenant like every other capability.
+- Sanity `module_cookieSettings`: `brandVariant`, optional `headingBlock`, `layout`. The capability flags come from `settings_features`, cached per tenant like every other capability.
+- `tenant_analytics` (Neon): at most one row per tenant holding the owner's own analytics tool, `provider` (`ANALYTICS_PROVIDER` in `@blog/config`: `GOOGLE_ANALYTICS` or `PLAUSIBLE`) and `analytics_id` (a measurement id or a site domain); no row means none. `saveTenantAnalytics` stores or replaces it and `clearTenantAnalytics` removes it. The save is the only write path and checks the id per provider, because the site puts it into a script tag: Google Analytics must match `GOOGLE_ANALYTICS_ID_PATTERN` (`G-` then uppercase letters and digits), Plausible must be a bare domain (`DOMAIN_PATTERN`, lowercased); anything else throws. `getTenantAnalytics` owns the plan gate, reading `tenants.plan` itself: it returns the row only when the plan's `hasOwnAnalytics` allows (`STARTER`, `GROWTH`); on `FREE` it returns nothing and the row is kept. A caller never re-gates it on `getEffectivePlan`; when the read fails it throws and loads nothing. It hides a kept id after a downgrade, so a platform form showing that id needs an ungated read of its own. Nothing on the platform or the site reads or writes it yet.
 
 ## Configuration
 
@@ -64,6 +68,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - The module renders no switches while the store is `UNKNOWN`, so Save can never write an empty choice over a granted one before the cookie is read.
 - `ConsentGate` (`apps/web/src/components/shared/consent-gate/`) gates content on one category: it renders its `pending` node while the store is `UNKNOWN` (so the server render never holds the gated content), its `fallback` while the category is unanswered or denied, and its children once granted. The embed module is its first consumer, with `ConsentPlaceholder` as the fallback.
 - Vercel Analytics and Speed Insights load regardless of the reader's consent choice.
+- A tenant holds one analytics provider and id or none; a downgrade never deletes it.
 - A capability switched off hides the banner, the footer link and the floating button, whatever Look's choice; a Cookie settings module on a page still renders. With it on, at least one of the link and the button shows.
 
 ## Dependencies
@@ -76,6 +81,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 ## Entry points
 
 - `apps/web/src/utils/consent-cookie/consent-cookie.ts` — `encodeConsent`, `decodeConsent`
+- `packages/db/src/queries/tenant-analytics/` — `getTenantAnalytics`, `saveTenantAnalytics`, `clearTenantAnalytics`
 - `apps/web/src/hooks/use-consent-store/use-consent-store.ts`
 - `apps/web/src/hooks/use-consent/use-consent.ts`
 - `apps/web/src/components/shared/consent-gate/consent-gate.tsx`
@@ -93,6 +99,7 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 ## Tests and stories
 
 - `apps/web/src/utils/consent-cookie/consent-cookie.test.ts`, `use-consent.test.tsx`, `use-consent-store.test.tsx`, `consent-gate.test.tsx`, `consent-preferences-provider.test.tsx`, `consent-banner-slot.test.tsx`, `consent-preferences-dialog.test.tsx`, `cookie-settings-form.test.tsx`, `cookie-settings-module.test.tsx`, `cookie-settings-button.test.tsx`, `floating-cookie-settings-button.test.tsx`, `site-analytics.test.tsx`, `is-web-analytics-enabled.test.ts`.
+- `packages/db/src/queries/tenant-analytics/**/*.test.ts`.
 - `packages/ui/src/components/molecules/consent-*/**/*.test.tsx`.
 - Stories: `consent-banner.stories.tsx`, `consent-preferences.stories.tsx`, `consent-placeholder.stories.tsx` (ui); `cookie-settings-module-view.stories.tsx` (web).
 
@@ -104,4 +111,5 @@ A site can show a cookie consent banner that lets the reader accept all, reject 
 - #6088 — the Cookie settings module (epic #6082).
 - #5029 — the cookie-settings dialog title is dialog-size again (#5046 manual test).
 - #6505 — the banner's cookie-statement link, the cookie list and the cookie-preferences link.
+- #7150 — a tenant stores its analytics provider and id (epic #7149).
 - #6743 — owners choose the footer link, the floating button or both; with the banner off neither shows.

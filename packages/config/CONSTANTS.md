@@ -21,6 +21,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ALERT_TYPE**: `SUCCESS`, `WARNING`, `ERROR`, `INFO`
 
+### `@blog/config/constants` — `packages/config/src/constants/analytics-provider.ts`
+
+- **ANALYTICS_PROVIDER**: `GOOGLE_ANALYTICS`, `PLAUSIBLE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/aside.ts`
 
 - **ASIDE_KIND**: `WHY_NOT`, `DIGRESSION`, `CONTEXT`

@@ -1,7 +1,7 @@
 import { EMAIL_NEW_POSTS_DEFAULT } from '@blog/db/constants';
-import { boolean, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text, uuid } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { timestampColumns } from './columns';
 import { tenants } from './tenants';
 
 export const emailConfig = pgTable('email_config', {
@@ -18,13 +18,7 @@ export const emailConfig = pgTable('email_config', {
   emailNewPosts: boolean('email_new_posts')
     .notNull()
     .default(EMAIL_NEW_POSTS_DEFAULT),
-  createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
-    .notNull()
-    .defaultNow()
-    .$onUpdate(() => new Date()),
+  ...timestampColumns,
 });
 
 export type TEmailConfig = typeof emailConfig.$inferSelect;

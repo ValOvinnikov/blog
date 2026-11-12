@@ -5,6 +5,7 @@ import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { setTestTenantPlan } from '@blog/db/testing/test-tenant';
 import { eq } from 'drizzle-orm';
 
 import { getTenantLiveLocales } from './get-tenant-live-locales';
@@ -38,10 +39,7 @@ describe(getTenantLiveLocales, () => {
     });
 
     it('serves only what the plan allows after a downgrade, keeping the stored locales', async () => {
-      await db()
-        .update(tenants)
-        .set({ plan: TENANT_PLAN.FREE })
-        .where(eq(tenants.id, tenantId));
+      await setTestTenantPlan(db(), tenantId, TENANT_PLAN.FREE);
 
       const live = await getTenantLiveLocales(tenantId);
 
