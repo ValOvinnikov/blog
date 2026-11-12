@@ -867,7 +867,7 @@
     },
     "navLinkStyleOptionDescription": {
       "PLAIN": "Solo texto; el color cambia al pasar el cursor",
-      "UNDERLINE": "La página actual aparece subrayada",
+      "UNDERLINE": "La página actual y el enlace bajo el cursor aparecen subrayados",
       "SOFT": "Un fondo tintado al pasar el cursor y en la página actual",
       "PILL": "Un contorno redondeado al pasar el cursor y en la página actual"
     },
