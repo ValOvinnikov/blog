@@ -162,11 +162,18 @@ export const fixtureLiteralsOf = (added) => [
   ),
 ];
 
-const holderOf = (literal, pathspecs, except) => {
+const holderOf = (patterns, pathspecs, except) => {
   try {
     return execFileSync(
       'git',
-      ['grep', '-l', '-F', '-e', literal, '--', ...pathspecs],
+      [
+        'grep',
+        '-l',
+        '-F',
+        ...patterns.flatMap((pattern) => ['-e', pattern]),
+        '--',
+        ...pathspecs,
+      ],
       { cwd: repoRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] },
     )
       .split('\n')
@@ -182,10 +189,13 @@ const findExistingFixtures = (files) =>
     .flatMap(({ file, added }) => {
       const workspace = file.split('/').slice(0, 2).join('/');
       return fixtureLiteralsOf(added).flatMap((literal) => {
-        const holder = holderOf(literal, [
-          `${workspace}/src/testing`,
-          `:(glob)${workspace}/src/**/__mocks__/**`,
-        ]);
+        const holder = holderOf(
+          [literal],
+          [
+            `${workspace}/src/testing`,
+            `:(glob)${workspace}/src/**/__mocks__/**`,
+          ],
+        );
         return holder
           ? [
               {
@@ -201,9 +211,9 @@ const findExistingFixtures = (files) =>
 
 const VALUE_SOURCE = /^(apps|packages)\/[^/]+\/src\/.*\.tsx?$/;
 const NOT_VALUE_SOURCE =
-  /(\.(test|stories)\.tsx?|-variants\.ts|\/testing\/|\/__mocks__\/|\/schema\/)/;
+  /(\.(test|stories)\.tsx?|-variants\.ts|\/testing\/|\/__mocks__\/|\/schema(-types)?\/)/;
 const NOT_A_VALUE_LINE =
-  /^\s*(import |export .* from |\} from )|process\.env|_type|ByRole\(|\b(t|useTranslations|getTranslations)\(/;
+  /^\s*(import |export .* from |\} from )|process\.env|\b_type\b|ByRole\(|\b(t|useTranslations|getTranslations)\(/;
 const MIN_VALUE_LENGTH = 4;
 
 // Vocabulary an outside standard spells, which CLAUDE.md exempts from the const rule.
@@ -223,15 +233,17 @@ export const valueLiteralsOf = (added, indexed = {}) => [
   ...new Set(
     added
       .filter(({ text }) => !NOT_A_VALUE_LINE.test(text))
-      .flatMap(({ text }) => text.match(/'[A-Za-z0-9_.:/-]+'/g) ?? [])
-      .filter((literal) => {
-        const value = literal.slice(1, -1);
-        return (
+      .flatMap(({ text }) =>
+        [...text.matchAll(/(['"])([A-Za-z0-9_.:/-]+)\1/g)].map(
+          ([, , value]) => value,
+        ),
+      )
+      .filter(
+        (value) =>
           value.length >= MIN_VALUE_LENGTH &&
           !STANDARD_VOCABULARY.has(value) &&
-          !Object.hasOwn(indexed, value)
-        );
-      }),
+          !Object.hasOwn(indexed, value),
+      ),
   ),
 ];
 
@@ -242,9 +254,9 @@ const findRepeatedValues = (files, indexed) =>
     )
     .flatMap(({ file, added }) => {
       const workspace = file.split('/').slice(0, 2).join('/');
-      return valueLiteralsOf(added, indexed).flatMap((literal) => {
+      return valueLiteralsOf(added, indexed).flatMap((value) => {
         const holder = holderOf(
-          literal,
+          [`'${value}'`, `"${value}"`],
           [
             `${workspace}/src`,
             ':(exclude,glob)**/*.test.*',
@@ -256,9 +268,9 @@ const findRepeatedValues = (files, indexed) =>
           ? [
               {
                 file,
-                line: added.find(({ text }) => text.includes(literal)).line,
+                line: added.find(({ text }) => text.includes(value)).line,
                 hit: HIT.REPEATED_VALUE,
-                text: `${literal} is also in ${holder}`,
+                text: `'${value}' is also in ${holder}`,
               },
             ]
           : [];
@@ -273,9 +285,10 @@ const constsOf = (index) => {
   })) {
     for (const { ref, file } of refs) {
       const name = ref.split('.')[0];
-      const entry = consts.get(name) ?? { file, values: new Set() };
+      const key = `${file}#${name}`;
+      const entry = consts.get(key) ?? { name, file, values: new Set() };
       entry.values.add(value);
-      consts.set(name, entry);
+      consts.set(key, entry);
     }
   }
   return consts;
@@ -285,19 +298,19 @@ export const findRestatedConsts = (index, baseIndex) => {
   const consts = constsOf(index);
   const known = constsOf(baseIndex);
   return [...consts]
-    .filter(([name, { values }]) => !known.has(name) && values.size > 1)
-    .flatMap(([name, { file, values }]) => {
+    .filter(([key, { values }]) => !known.has(key) && values.size > 1)
+    .flatMap(([key, { name, file, values }]) => {
       const twin = [...consts].find(
         ([other, { values: theirs }]) =>
-          other !== name && [...values].every((value) => theirs.has(value)),
-      );
+          other !== key && [...values].every((value) => theirs.has(value)),
+      )?.[1];
       return twin
         ? [
             {
               file,
               line: 1,
               hit: HIT.RESTATED_CONST,
-              text: `${name} restates ${twin[0]} (${twin[1].file})`,
+              text: `${name} restates ${twin.name} (${twin.file})`,
             },
           ]
         : [];
@@ -307,7 +320,13 @@ export const findRestatedConsts = (index, baseIndex) => {
 const CONST_INDEX = 'packages/config/const-index.json';
 const EMPTY_INDEX = { strings: {}, numbers: {} };
 
-const readIndex = (text) => (text ? JSON.parse(text) : EMPTY_INDEX);
+const readIndex = (text) => {
+  try {
+    return text ? JSON.parse(text) : EMPTY_INDEX;
+  } catch {
+    return EMPTY_INDEX;
+  }
+};
 
 const withLineCount = (entry) => ({
   ...entry,

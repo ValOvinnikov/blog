@@ -245,8 +245,9 @@ line from this checklist.
   value repeated within one file. §0's `check:review-hits` lists a string
   value the diff writes that another source file of the workspace already
   holds, and a new const whose values an existing const covers — read each.
-  It does not see numbers, a string with a space in it, or a repeat in
-  another workspace: search for those. A const the diff adds or changes without a
+  It does not see numbers, a string with a space in it, a template literal,
+  a Studio or Drizzle schema file, a repeat in another workspace, or a
+  repeat between two files not yet tracked: search for those. A const the diff adds or changes without a
   regenerated `CONSTANTS.md` fails `gen:const-index:check`.
 - **Comments (blocking).** Read every comment the diff adds or touches, not
   only the grep hits, against `CLAUDE.md` "Comments default to zero". A

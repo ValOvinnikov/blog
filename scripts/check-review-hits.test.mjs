@@ -162,17 +162,22 @@ describe('valueLiteralsOf', () => {
           "const t = await getTranslations('heroProfile');",
           "const title = t('readMoreLabel');",
           "const id = 'p1';",
+          '<Card variant="primary-tone" />',
+          "const kinds = ['item_type', 'a.b:c/d'];",
+          "const doc = { _type: 'module_hero' };",
         ).added,
         { PILL: [] },
       ),
-      ["'hero-profile'"],
+      ['hero-profile', 'primary-tone', 'item_type', 'a.b:c/d'],
     );
   });
 });
 
-const ref = (name, key) => ({
+const CONFIG_CONSTANTS = 'packages/config/src/constants';
+
+const ref = (name, key, dir) => ({
   ref: `${name}.${key}`,
-  file: `packages/config/src/constants/${name.toLowerCase()}.ts`,
+  file: `${dir}/${name.toLowerCase()}.ts`,
 });
 
 const indexOf = (...consts) => ({
@@ -181,7 +186,7 @@ const indexOf = (...consts) => ({
       key,
       consts
         .filter(([, keys]) => keys.includes(key))
-        .map(([name]) => ref(name, key)),
+        .map(([name, , dir = CONFIG_CONSTANTS]) => ref(name, key, dir)),
     ]),
   ),
   numbers: {},
@@ -200,6 +205,30 @@ describe('findRestatedConsts', () => {
         [
           HIT.RESTATED_CONST,
           'CHIP_SHAPE restates BUTTON_SHAPE (packages/config/src/constants/button_shape.ts)',
+        ],
+      ],
+    );
+  });
+
+  it('reports a new const that shares its name with one in another workspace', () => {
+    const WEB_LOG = [
+      'SIGN_IN_LOG',
+      ['auth.sent', 'auth.failed'],
+      'apps/web/src/constants',
+    ];
+    assert.deepEqual(
+      findRestatedConsts(
+        indexOf(WEB_LOG, [
+          'SIGN_IN_LOG',
+          ['auth.sent', 'auth.failed'],
+          'apps/platform/src/constants',
+        ]),
+        indexOf(WEB_LOG),
+      ).map(({ file, text }) => [file, text]),
+      [
+        [
+          'apps/platform/src/constants/sign_in_log.ts',
+          'SIGN_IN_LOG restates SIGN_IN_LOG (apps/web/src/constants/sign_in_log.ts)',
         ],
       ],
     );
