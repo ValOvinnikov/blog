@@ -1,9 +1,7 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import {
-  MOCK_RECENT_POSTS_HEADING,
-  mockRawPostLatestModule,
-} from '@blog/service/testing/modules/fixtures';
+import { MOCK_RECENT_POSTS_HEADING } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostLatestModule } from '@blog/service/testing/modules/post-latest/fixtures';
 import {
   MOCK_POST_LATEST_MODULE_ID,
   mockRawPostCard,
@@ -26,6 +24,7 @@ import { faker } from '@faker-js/faker';
 import { getPostLatest } from './loader';
 import { postLatestModulePostsQuery } from './posts.query';
 import { postLatestModuleQuery } from './query';
+import type { TPostLatestModule } from './types';
 
 vi.mock('@blog/service/sanity/query/query');
 
@@ -42,7 +41,9 @@ describe(getPostLatest, () => {
   });
 
   describe('with a resolved module', () => {
-    beforeEach(() => {
+    let postLatest: TPostLatestModule;
+
+    beforeEach(async () => {
       mockRun
         .mockResolvedValueOnce(
           mockRawPostLatestModule({
@@ -51,21 +52,16 @@ describe(getPostLatest, () => {
           }),
         )
         .mockResolvedValueOnce([mockRawPostCard({ _id: MOCK_POST_CARD_ID })]);
+
+      postLatest = await getPostLatest(MOCK_POST_LATEST_MODULE_ID, MOCK_TENANT);
     });
 
-    it('maps the module and its posts', async () => {
-      const postLatest = await getPostLatest(
-        MOCK_POST_LATEST_MODULE_ID,
-        MOCK_TENANT,
-      );
-
+    it('maps the module and its posts', () => {
       expect(postLatest.headingBlock.heading).toBe(MOCK_RECENT_POSTS_HEADING);
       expect(postLatest.posts.map(({ id }) => id)).toEqual([MOCK_POST_CARD_ID]);
     });
 
-    it('fetches only as many posts as the module limit allows', async () => {
-      await getPostLatest(MOCK_POST_LATEST_MODULE_ID, MOCK_TENANT);
-
+    it('fetches only as many posts as the module limit allows', () => {
       const [postsQuery] = mockRun.mock.calls[1] ?? [];
 
       expect(postsQuery.query).toBe(
@@ -73,9 +69,7 @@ describe(getPostLatest, () => {
       );
     });
 
-    it('queries within the tenant and tags both queries to it', async () => {
-      await getPostLatest(MOCK_POST_LATEST_MODULE_ID, MOCK_TENANT);
-
+    it('queries within the tenant and tags both queries to it', () => {
       const [, postsOptions] = mockRun.mock.calls[1] ?? [];
 
       expect(mockRun).toHaveBeenNthCalledWith(1, postLatestModuleQuery, {

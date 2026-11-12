@@ -1,11 +1,18 @@
-import { DISPLAY_MODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  CARD_STYLE,
+  DENSITY,
+  DISPLAY_MODE,
+  GRID_COLUMNS,
+  LOCALE_ISO_CODES,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_MODULE_ID,
   mockModuleDocument,
-  mockRawPostLatestModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostLatestModule } from '@blog/service/testing/modules/post-latest/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 
 import { postLatestModuleQuery } from './query';
@@ -18,10 +25,10 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   limit: MOCK_LIMIT,
 });
 
-async function runPostLatest(locale: string) {
+async function runPostLatest(locale: string, document = MOCK_MODULE_DOCUMENT) {
   const raw = await evaluateGroqExpression(
     postLatestModuleQuery.query,
-    [MOCK_MODULE_DOCUMENT],
+    [document],
     undefined,
     { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -41,6 +48,33 @@ describe('postLatestModuleQuery', () => {
 
     expect(showImages).toBe(true);
     expect(displayMode).toBe(DISPLAY_MODE.GRID);
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const postLatest = await runPostLatest(EN);
+
+    expect(postLatest).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+      columns: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.TWO,
+    };
+
+    const postLatest = await runPostLatest(EN, {
+      ...MOCK_MODULE_DOCUMENT,
+      ...appearance,
+    });
+
+    expect(postLatest).toMatchObject(appearance);
   });
 
   it.each([
