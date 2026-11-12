@@ -11,6 +11,10 @@ import {
   MOCK_UNSAFE_MARKUP,
   MOCK_URL,
 } from '@blog/email/testing/email-fixtures';
+import {
+  MOCK_EMAIL_DETAILS,
+  MOCK_OWNER_EMAIL_INPUT,
+} from '@blog/email/testing/owner-email';
 import { faker } from '@faker-js/faker';
 
 import { buildOwnerEmail } from './owner-email';
@@ -20,6 +24,7 @@ faker.seed(6026);
 const MOCK_PARAGRAPH = faker.lorem.sentence();
 const MOCK_SECOND_PARAGRAPH = faker.lorem.sentence();
 const MOCK_PREVIEW_TEXT = faker.lorem.words(4);
+const MOCK_FIRST_DETAIL_VALUE = MOCK_EMAIL_DETAILS[0]?.value ?? '';
 
 describe(buildOwnerEmail, () => {
   describe('with copy and an action', () => {
@@ -73,6 +78,38 @@ describe(buildOwnerEmail, () => {
         `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${MOCK_PLATFORM_BRAND_NAME}`,
       );
     });
+  });
+
+  describe('with details', () => {
+    let email: ReturnType<typeof buildOwnerEmail>;
+
+    beforeEach(() => {
+      email = buildOwnerEmail({
+        ...MOCK_OWNER_EMAIL_INPUT,
+        details: MOCK_EMAIL_DETAILS,
+      });
+    });
+
+    it('renders the details table after the paragraphs', () => {
+      expect(email.html).toContain(
+        `<p>${MOCK_ESCAPED_UNSAFE_MARKUP}</p><table`,
+      );
+    });
+
+    it('carries the copy, then the details, then the action as plain text', () => {
+      const copyAt = email.text.indexOf(MOCK_UNSAFE_MARKUP);
+      const detailAt = email.text.indexOf(MOCK_FIRST_DETAIL_VALUE);
+      const actionAt = email.text.indexOf(MOCK_OWNER_EMAIL_INPUT.action.url);
+
+      expect(copyAt).toBeLessThan(detailAt);
+      expect(detailAt).toBeLessThan(actionAt);
+    });
+  });
+
+  it('renders an empty details list exactly as no details', () => {
+    expect(buildOwnerEmail({ ...MOCK_OWNER_EMAIL_INPUT, details: [] })).toEqual(
+      buildOwnerEmail(MOCK_OWNER_EMAIL_INPUT),
+    );
   });
 
   it('renders no action when none is given', () => {

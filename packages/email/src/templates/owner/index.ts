@@ -30,3 +30,7 @@ export {
   buildOwnerSuspensionLiftedEmail,
   type TOwnerSuspensionLiftedEmailInput,
 } from './owner-suspension-lifted/owner-suspension-lifted';
+export {
+  buildOwnerReceiptEmail,
+  type TOwnerReceiptEmailInput,
+} from './owner-receipt/owner-receipt';

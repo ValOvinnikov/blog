@@ -4,6 +4,7 @@ export {
   type TEmailAction,
   type TEmailActionBrand,
 } from './email-action/email-action';
+export type { TEmailDetail } from './email-details/email-details';
 export {
   buildOperatorShell,
   type TBuildOperatorShellInput,
