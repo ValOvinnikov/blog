@@ -1,3 +1,4 @@
+import { getDb } from '@blog/db/client';
 import { STRIPE_TENANT_LOOKUP_OUTCOME } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -105,15 +106,16 @@ describe(getTenantIdByStripeIds, () => {
       });
     });
 
-    it('is not found when no id is given', async () => {
+    it('is not found without querying when no id is given', async () => {
       const result = await getTenantIdByStripeIds({});
 
       expect(result).toEqual({
         outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND,
       });
+      expect(getDb).not.toHaveBeenCalled();
     });
 
-    it('is not found when both ids are empty strings', async () => {
+    it('is not found without querying when both ids are empty strings', async () => {
       const result = await getTenantIdByStripeIds({
         stripeCustomerId: '',
         stripeSubscriptionId: '',
@@ -122,6 +124,7 @@ describe(getTenantIdByStripeIds, () => {
       expect(result).toEqual({
         outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND,
       });
+      expect(getDb).not.toHaveBeenCalled();
     });
   });
 });

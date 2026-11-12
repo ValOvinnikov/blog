@@ -35,6 +35,7 @@ export * from './release-tenant-owner-email';
 export * from './set-tenant-additional-locales';
 export * from './set-tenant-billing';
 export * from './set-tenant-owner-access';
+export * from './set-tenant-plan';
 export * from './set-tenant-provisioning-status';
 export * from './set-tenant-revalidate-webhook-secret';
 export * from './set-tenant-primary-domain';
