@@ -15,10 +15,10 @@ const mockKey = (): string =>
 const MOCK_SUBSCRIBER_ID = faker.string.uuid();
 const MOCK_KEY = mockKey();
 
-const FORMAT_VECTOR_KEY = 'dW5zdWJzY3JpYmUtdG9rZW4tZm9ybWF0LXZlY3Rvci1rZXk=';
-const FORMAT_VECTOR_SUBSCRIBER_ID = '3f1c2a9e-7b4d-4e8a-9c21-5d6f0a1b2c3d';
-const FORMAT_VECTOR_TOKEN =
-  '3f1c2a9e-7b4d-4e8a-9c21-5d6f0a1b2c3d~zr61R2cUuQFhnx3qmwN98v7QKRHcnAJKgRzBX4npiqY';
+const MOCK_FORMAT_VECTOR_KEY =
+  'dW5zdWJzY3JpYmUtdG9rZW4tZm9ybWF0LXZlY3Rvci1rZXk=';
+const MOCK_FORMAT_VECTOR_SUBSCRIBER_ID = '3f1c2a9e-7b4d-4e8a-9c21-5d6f0a1b2c3d';
+const MOCK_FORMAT_VECTOR_TOKEN = `${MOCK_FORMAT_VECTOR_SUBSCRIBER_ID}~zr61R2cUuQFhnx3qmwN98v7QKRHcnAJKgRzBX4npiqY`;
 
 describe(signNewsletterUnsubscribeToken, () => {
   let token: string;
@@ -42,10 +42,10 @@ describe(signNewsletterUnsubscribeToken, () => {
   it('signs a token in the format links already sent carry', () => {
     expect(
       signNewsletterUnsubscribeToken(
-        FORMAT_VECTOR_SUBSCRIBER_ID,
-        FORMAT_VECTOR_KEY,
+        MOCK_FORMAT_VECTOR_SUBSCRIBER_ID,
+        MOCK_FORMAT_VECTOR_KEY,
       ),
-    ).toBe(FORMAT_VECTOR_TOKEN);
+    ).toBe(MOCK_FORMAT_VECTOR_TOKEN);
   });
 });
 
@@ -64,8 +64,11 @@ describe(verifyNewsletterUnsubscribeToken, () => {
 
   it('accepts a token from a link already sent', () => {
     expect(
-      verifyNewsletterUnsubscribeToken(FORMAT_VECTOR_TOKEN, FORMAT_VECTOR_KEY),
-    ).toBe(FORMAT_VECTOR_SUBSCRIBER_ID);
+      verifyNewsletterUnsubscribeToken(
+        MOCK_FORMAT_VECTOR_TOKEN,
+        MOCK_FORMAT_VECTOR_KEY,
+      ),
+    ).toBe(MOCK_FORMAT_VECTOR_SUBSCRIBER_ID);
   });
 
   it('rejects a token whose signature was made for another subscriber', () => {

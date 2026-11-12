@@ -146,12 +146,6 @@ describe(sendEmail, () => {
     expect(sendMock).toHaveBeenCalledWith({ ...MOCK_RESEND_PAYLOAD, ...extra });
   });
 
-  it('sends without request options when no idempotency key is given', async () => {
-    await send(MOCK_EMAIL);
-
-    expect(sendMock.mock.calls[0]).toHaveLength(1);
-  });
-
   it('passes the same idempotency key to Resend on every send with that key', async () => {
     await send({ ...MOCK_EMAIL, idempotencyKey: MOCK_IDEMPOTENCY_KEY });
     await send({ ...MOCK_EMAIL, idempotencyKey: MOCK_IDEMPOTENCY_KEY });

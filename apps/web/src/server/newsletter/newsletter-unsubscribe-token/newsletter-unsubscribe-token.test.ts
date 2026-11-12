@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import { KEY_ENCODING } from '@blog/utils/encryption';
 import { faker } from '@faker-js/faker';
 import { env } from '@web/utils/env/env';
@@ -16,7 +17,7 @@ const MOCK_KEY = Buffer.from(faker.string.alphanumeric(32)).toString(
   KEY_ENCODING,
 );
 
-const setKey = (key: string | undefined): void => {
+const setKey = (key: TMaybeUndefined<string>): void => {
   Object.assign(env, { NEWSLETTER_UNSUBSCRIBE_KEY: key });
 };
 
