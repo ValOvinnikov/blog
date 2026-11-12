@@ -54,20 +54,18 @@ const mockSubscriptionItem = (
   ({ price: { lookup_key: lookupKey } }) as Stripe.SubscriptionItem;
 
 export const mockStripeSubscription = ({
-  id = MOCK_STRIPE_SUBSCRIPTION_ID,
   status = STRIPE_SUBSCRIPTION_STATUS.ACTIVE,
   lookupKeys = [STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY],
   tenantId,
   promotionCode,
 }: {
-  id?: string;
   status?: string;
   lookupKeys?: TStripePriceLookupKey[];
   tenantId?: string;
   promotionCode?: string;
 } = {}): Stripe.Subscription =>
   ({
-    id,
+    id: MOCK_STRIPE_SUBSCRIPTION_ID,
     customer: MOCK_STRIPE_CUSTOMER_ID,
     status,
     metadata: tenantId ? { [STRIPE_TENANT_METADATA_KEY]: tenantId } : {},

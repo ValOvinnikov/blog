@@ -273,6 +273,11 @@ describe(syncStripeSubscription, () => {
     });
 
     expect(await sync()).toBeUndefined();
+    expect(logger.warn).toHaveBeenCalledWith(BILLING_LOG.TENANT_NOT_WRITABLE, {
+      tenantId: MOCK_TENANT_ID,
+      subscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+      status: TENANT_STATUS.ACTIVE,
+    });
   });
 
   it('throws before the plan write when the billing write fails, so Stripe retries', async () => {

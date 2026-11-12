@@ -7,7 +7,7 @@ import {
   type TTenantPlan,
   WRITABLE_TENANT_STATUSES,
 } from '@blog/db';
-import { isString } from '@blog/utils/primitives';
+import { isOneOf, isString } from '@blog/utils/primitives';
 import {
   BILLING_LOG,
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
@@ -44,7 +44,7 @@ const isSupersededBy = (
 ): boolean =>
   !!storedSubscriptionId &&
   storedSubscriptionId !== id &&
-  !STRIPE_LIVE_SUBSCRIPTION_STATUSES.includes(status);
+  !isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, status);
 
 export const syncStripeSubscription = async (
   stripe: Stripe,
@@ -88,7 +88,7 @@ export const syncStripeSubscription = async (
   if (!state) return undefined;
 
   const notWritable = { tenantId, subscriptionId, status: tenant.status };
-  if (!WRITABLE_TENANT_STATUSES.some((status) => status === tenant.status)) {
+  if (!isOneOf(WRITABLE_TENANT_STATUSES, tenant.status)) {
     logger.warn(BILLING_LOG.TENANT_NOT_WRITABLE, notWritable);
     return undefined;
   }
