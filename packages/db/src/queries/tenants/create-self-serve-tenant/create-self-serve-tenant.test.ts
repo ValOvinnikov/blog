@@ -40,6 +40,7 @@ import {
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -331,10 +332,7 @@ describe(createSelfServeTenant, () => {
       });
 
       it('frees the slot once the trial is archived', async () => {
-        await db()
-          .update(schema.tenants)
-          .set({ status: TENANT_STATUS.ARCHIVED })
-          .where(eq(schema.tenants.id, id));
+        await patchTestTenant(db(), id, { status: TENANT_STATUS.ARCHIVED });
 
         const second = await createSelfServeTenant({
           ...MOCK_INPUT,
@@ -351,10 +349,10 @@ describe(createSelfServeTenant, () => {
       });
 
       it('keeps the slot when the trial drops to Free', async () => {
-        await db()
-          .update(schema.tenants)
-          .set({ plan: TENANT_PLAN.FREE, status: TENANT_STATUS.ACTIVE })
-          .where(eq(schema.tenants.id, id));
+        await patchTestTenant(db(), id, {
+          plan: TENANT_PLAN.FREE,
+          status: TENANT_STATUS.ACTIVE,
+        });
 
         const second = await createSelfServeTenant({
           ...MOCK_INPUT,

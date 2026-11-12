@@ -24,7 +24,7 @@ import {
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { setTestTenantPlan } from '@blog/db/testing/test-tenant';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
@@ -224,7 +224,7 @@ describe(createMembershipInvite, () => {
       it('keeps every invite after a downgrade and refuses the next', async () => {
         await inviteNew(growthTenantId);
         await inviteNew(growthTenantId);
-        await setTestTenantPlan(db(), growthTenantId, TENANT_PLAN.FREE);
+        await patchTestTenant(db(), growthTenantId, { plan: TENANT_PLAN.FREE });
 
         const result = await inviteNew(growthTenantId);
 

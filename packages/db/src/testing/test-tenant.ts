@@ -1,4 +1,3 @@
-import type { TTenantPlan } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { eq } from 'drizzle-orm';
@@ -22,13 +21,13 @@ export function useTestTenant(
   return () => tenant;
 }
 
-export async function setTestTenantPlan(
+export async function patchTestTenant(
   db: TTestDb,
   tenantId: string,
-  plan: TTenantPlan,
+  patch: Partial<Pick<TTenant, 'plan' | 'status'>>,
 ): Promise<void> {
   await db
     .update(schema.tenants)
-    .set({ plan })
+    .set(patch)
     .where(eq(schema.tenants.id, tenantId));
 }

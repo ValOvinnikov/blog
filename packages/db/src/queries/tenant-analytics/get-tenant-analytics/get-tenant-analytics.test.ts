@@ -3,7 +3,7 @@ import { saveTenantAnalytics } from '@blog/db/queries/tenant-analytics/save-tena
 import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_GOOGLE_ANALYTICS } from '@blog/db/testing/tenant-analytics/fixtures';
-import { setTestTenantPlan, useTestTenant } from '@blog/db/testing/test-tenant';
+import { patchTestTenant, useTestTenant } from '@blog/db/testing/test-tenant';
 
 import { getTenantAnalytics } from './get-tenant-analytics';
 
@@ -20,7 +20,7 @@ describe(getTenantAnalytics, () => {
   it.each([TENANT_PLAN.STARTER, TENANT_PLAN.GROWTH])(
     'returns the saved provider and id on %s',
     async (plan) => {
-      await setTestTenantPlan(db(), tenant().id, plan);
+      await patchTestTenant(db(), tenant().id, { plan: plan });
       await saveTenantAnalytics(tenant().id, MOCK_GOOGLE_ANALYTICS);
 
       expect(await getTenantAnalytics(tenant().id)).toEqual(
@@ -31,7 +31,7 @@ describe(getTenantAnalytics, () => {
 
   it('returns nothing on Free and keeps the stored value', async () => {
     await saveTenantAnalytics(tenant().id, MOCK_GOOGLE_ANALYTICS);
-    await setTestTenantPlan(db(), tenant().id, TENANT_PLAN.FREE);
+    await patchTestTenant(db(), tenant().id, { plan: TENANT_PLAN.FREE });
 
     expect(await getTenantAnalytics(tenant().id)).toBeUndefined();
     expect(await db().select().from(tenantAnalytics)).toEqual([

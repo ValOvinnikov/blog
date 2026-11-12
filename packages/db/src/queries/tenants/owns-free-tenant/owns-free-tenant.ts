@@ -15,7 +15,6 @@ import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
 import { isUndefined } from '@blog/utils/primitives';
 import { and, eq, exists, ne, or } from 'drizzle-orm';
 
-// Free and trial sites share the one slot; an archived tenant frees it, suspended and failed ones keep it.
 export async function ownsFreeTenant(
   email: string,
 ): Promise<TResult<boolean, TErrorCode>> {
