@@ -1,9 +1,15 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { readTouchedFiles } from './check-diff-hygiene.mjs';
+import {
+  GENERATED,
+  isFile,
+  readTouchedFiles,
+  SOURCE_FILE,
+  TEST_FILE,
+} from './check-diff-hygiene.mjs';
 import { missingBaseMessage, repoRoot, resolveBase } from './touched-files.mjs';
 
 const MAX_TEST_FILE_LINES = 500;
@@ -30,16 +36,16 @@ const SELF = new Set([
   'scripts/check-review-hits.test.mjs',
 ]);
 
-const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
-const TEST_FILE = /\.test\.tsx?$/;
 const FIXTURE_FILE =
   /(\.test\.tsx?|\/testing\/.*\.tsx?|\/__mocks__\/.*\.tsx?)$/;
 const RENDERER_OR_ROUTE_TEST = /(module-renderer|\/src\/app\/.*)\.test/;
-const GENERATED = /(^|\/)sanity\/generated\//;
 const DIRECTIVE = /(eslint-disable|@ts-(ignore|expect-error|nocheck))/;
-const SECRET_ASSIGNMENT =
-  /(_TOKEN|_SECRET|API_KEY)\s*[:=]\s*['"`]?([A-Za-z0-9_-]{12,})['"`]?\s*[,;]?\s*$/;
-const CONST_REFERENCE = /^[A-Z][A-Z0-9_]*$/;
+const SECRET_NAME = '(_TOKEN|_SECRET|_KEY)[A-Z0-9_]*';
+const SECRET_VALUE = '[A-Za-z0-9_+/=.-]{12,}';
+const QUOTED_SECRET = new RegExp(
+  `${SECRET_NAME}['"]?\\s*[:=]\\s*['"\`]${SECRET_VALUE}`,
+);
+const BARE_SECRET = new RegExp(`${SECRET_NAME}\\s*[:=]\\s*${SECRET_VALUE}`);
 
 const LINE_HITS = [
   {
@@ -50,10 +56,12 @@ const LINE_HITS = [
   {
     hit: HIT.SECRET,
     applies: () => true,
-    matches: (text) => {
-      const value = SECRET_ASSIGNMENT.exec(text)?.[2];
-      return value !== undefined && !CONST_REFERENCE.test(value);
-    },
+    matches: (text) => QUOTED_SECRET.test(text),
+  },
+  {
+    hit: HIT.SECRET,
+    applies: (file) => !SOURCE_FILE.test(file),
+    matches: (text) => BARE_SECRET.test(text) && !QUOTED_SECRET.test(text),
   },
   {
     hit: HIT.SANITY_PROJECT_ID,
@@ -78,7 +86,7 @@ const LINE_HITS = [
     applies: (file) =>
       TEST_FILE.test(file) && !RENDERER_OR_ROUTE_TEST.test(file),
     matches: (text) =>
-      /^vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/.test(
+      /^\s*vi\.mock\(.(@web\/(components|modules)|@platform\/components|@blog\/ui)/.test(
         text,
       ),
   },
@@ -91,7 +99,7 @@ const LINE_HITS = [
     hit: HIT.COMMENT,
     applies: (file) => SOURCE_FILE.test(file) && !TEST_FILE.test(file),
     matches: (text) =>
-      /^\s*(\/\/|\/\*|\*(?!\/))/.test(text) && !DIRECTIVE.test(text),
+      /(^\s*(\/\/|\/\*|\*(?!\/))|\s\/\/\s)/.test(text) && !DIRECTIVE.test(text),
   },
   {
     hit: HIT.UNNAMED_FIXTURE,
@@ -177,15 +185,12 @@ const findExistingFixtures = (files) =>
       });
     });
 
-const withLineCount = (entry) => {
-  const path = join(repoRoot, entry.file);
-  return {
-    ...entry,
-    lineCount: existsSync(path)
-      ? readFileSync(path, 'utf8').split('\n').length
-      : 0,
-  };
-};
+const withLineCount = (entry) => ({
+  ...entry,
+  lineCount: isFile(entry.file)
+    ? readFileSync(join(repoRoot, entry.file), 'utf8').split('\n').length
+    : 0,
+});
 
 const main = () => {
   const base = resolveBase();

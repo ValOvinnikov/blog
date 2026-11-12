@@ -139,8 +139,10 @@ A prompt that opens `PR review of #<n>` reviews an open pull request
   missing either is the §6 Reuse finding.
 - The orchestrator runs `pnpm verify` and `pnpm check:clones` itself, or CI
   already ran verify. Do not wait for either or repeat them, and run §0's
-  other scripts as `node scripts/<name>.mjs` — a sandboxed subagent cannot
-  write in the review worktree, so `pnpm` fails there.
+  other scripts as `node scripts/<name>.mjs`, in a re-review too — a
+  sandboxed subagent cannot write in the review worktree, so `pnpm` fails
+  there. Prefix them with the `TOUCHED_BASE_REF` the prompt gives when the
+  PR's base is not `main`.
 
 A draft PR is the expected state, never a finding.
 

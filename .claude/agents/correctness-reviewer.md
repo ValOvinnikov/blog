@@ -45,8 +45,8 @@ Your first command is `cd <path>`, and every later Bash call carries the same
 `cd <path> &&`. Grep, Glob and Read take absolute paths under `<path>`. A
 prompt that names no path gets no review.
 
-`verify-runner` ran `pnpm verify` green before you were dispatched. Do not
-re-run the suite. One targeted command to settle a concrete doubt — a single
+`pnpm verify` ran green before you were dispatched, or in PR review mode is
+running beside you. Do not re-run the suite. One targeted command to settle a concrete doubt — a single
 test file, a `git log -S` — is fine.
 
 ## How to review

@@ -193,7 +193,7 @@ contracts:
     has to judge — leftovers, secret-shaped assignments, suppressions, tests
     that restate their source, fakes of our own components, comments outside
     test files, unnamed or duplicated fixtures, touched test files over 500
-    lines — grouped by kind, and always exits zero; it replaced a dozen grep
+    lines — grouped by kind, and exits zero whatever it finds; it replaced a dozen grep
     and awk commands the reviewer pasted by hand. Then `pnpm check:clones`
     (`jscpd`, a pinned root devDependency that fails loudly when missing,
     printing only clones with a touched side) over the touched workspaces.

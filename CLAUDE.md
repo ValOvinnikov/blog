@@ -622,8 +622,9 @@ outstanding. So until it is answered:
 ## Delivery gate sequence (mandatory — never skip or bundle)
 
 Every issue: board → In Progress, branch from `main`, the work plus
-`pnpm verify`, a `reviewer` `APPROVE` on the final diff (a docs-only diff gets
-an inline identifier check instead), commit, then **ask to push**, and only
+`pnpm verify`, an `APPROVE` on the final diff from `reviewer` and every other
+reviewer `develop-feature` §6 dispatches (a docs-only diff gets an inline
+identifier check instead), commit, then **ask to push**, and only
 after it, separately, **ask to open the PR** as a draft. Committing is free;
 push and PR each need fresh, explicit approval, and broad instructions ("go
 ahead", "keep going") never grant them. Steps, board reconciliation and

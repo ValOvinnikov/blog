@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync, realpathSync } from 'node:fs';
+import { readFileSync, realpathSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -25,10 +25,10 @@ const SELF = new Set([
   'scripts/check-diff-hygiene.test.mjs',
 ]);
 
-const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
+export const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
 const LINTED_FILE = /\.tsx?$/;
-const TEST_FILE = /\.test\.tsx?$/;
-const GENERATED = /(^|\/)sanity\/generated\//;
+export const TEST_FILE = /\.test\.tsx?$/;
+export const GENERATED = /(^|\/)sanity\/generated\//;
 
 // Mirrors the no-console exemptions in configs/eslint (base, db, insight, web, platform).
 const CONSOLE_EXEMPT = [
@@ -169,6 +169,9 @@ const git = (args) =>
     maxBuffer: 256 * 1024 * 1024,
   });
 
+export const isFile = (file) =>
+  statSync(join(repoRoot, file), { throwIfNoEntry: false })?.isFile() ?? false;
+
 export const readTouchedFiles = (base) => {
   const byFile = parseAddedLines(
     git([
@@ -181,9 +184,15 @@ export const readTouchedFiles = (base) => {
       base,
     ]),
   );
-  for (const file of git(['ls-files', '--others', '--exclude-standard'])
+  for (const file of git([
+    '-c',
+    'core.quotePath=false',
+    'ls-files',
+    '--others',
+    '--exclude-standard',
+  ])
     .split('\n')
-    .filter(Boolean)) {
+    .filter((name) => name && isFile(name))) {
     const text = readFileSync(join(repoRoot, file), 'utf8');
     byFile.set(
       file,

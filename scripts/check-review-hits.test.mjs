@@ -25,22 +25,36 @@ describe('findReviewHits', () => {
   it('reports a leftover marker in source and not in a doc', () => {
     assert.deepEqual(
       hitsOf([
-        added(COMPONENT, 'const x = 1; // TODO: remove'),
+        added(COMPONENT, "const label = 'TODO: remove';"),
         added(DOC, 'A TODO may cite an open issue.'),
       ]),
       [HIT.LEFTOVER],
     );
   });
 
-  it('reports a literal assigned to a secret-shaped name in any file', () => {
+  it('reports a quoted literal assigned to a secret-shaped name', () => {
     assert.deepEqual(
       hitsOf([
         added(
-          DOC,
-          'SANITY_API_TOKEN=sk1234567890abcdef',
-          'SANITY_API_TOKEN=',
+          COMPONENT,
+          "AUTH_SECRET='q8Zx3+/kLm9PqR2sT4uV6wXyZ0aBcDeF='",
+          "const SANITY_API_TOKEN = 'skAbCdEf123456789012'; // dev",
+          "STRIPE_SECRET_KEY: 'sk_live_51Habcdefghijk',",
+        ),
+      ]).filter((hit) => hit === HIT.SECRET),
+      [HIT.SECRET, HIT.SECRET, HIT.SECRET],
+    );
+  });
+
+  it('reports a bare secret value outside source and not an expression in it', () => {
+    assert.deepEqual(
+      hitsOf([
+        added(DOC, 'SANITY_API_TOKEN=sk1234567890abcdef', 'SANITY_API_TOKEN='),
+        added(
+          COMPONENT,
           'RESEND_WEBHOOK_SECRET: process.env.RESEND_WEBHOOK_SECRET,',
           'envMock.INTERNAL_PAGES_SECRET = MOCK_OTHER_SECRET;',
+          'const MOCK_SECRET = faker.string.alphanumeric(32);',
         ),
       ]),
       [HIT.SECRET],
@@ -62,15 +76,20 @@ describe('findReviewHits', () => {
   it('reports a comment in source and leaves a test file to lint', () => {
     assert.deepEqual(
       hitsOf([
-        added(COMPONENT, '  // tuned for the 390px viewport'),
+        added(
+          COMPONENT,
+          '  // tuned for the 390px viewport',
+          'const gap = 12; // tuned',
+          "const url = 'https://example.com';",
+        ),
         added(COMPONENT_TEST, '// arrange'),
       ]),
-      [HIT.COMMENT],
+      [HIT.COMMENT, HIT.COMMENT],
     );
   });
 
   it('allows a fake of our own component only in a renderer test', () => {
-    const fake = "vi.mock('@web/components/card', () => ({}));";
+    const fake = "  vi.mock('@web/components/card', () => ({}));";
     assert.deepEqual(
       hitsOf([added(COMPONENT_TEST, fake), added(RENDERER_TEST, fake)]),
       [HIT.OWN_COMPONENT_FAKE],

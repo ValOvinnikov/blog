@@ -41,8 +41,8 @@ sweep: it returns the same findings.
    reach GitHub:
 
    ```bash
-   gh issue list --state open --label refactor --label layer:<agent> --json number,title,body
-   gh pr list --state open --json number,files
+   gh issue list --state open --limit 200 --label refactor --label layer:<agent> --json number,title,body
+   gh pr list --state open --limit 200 --json number,files
    ```
 
    A file an open PR touches is out of this sweep. A problem an open issue

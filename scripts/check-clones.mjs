@@ -61,10 +61,21 @@ const printClones = (clones) => {
 
 const WORKSPACE_FLAG = '--workspace';
 
-const requestedWorkspaces = () =>
-  process.argv.flatMap((arg, index, args) =>
-    args[index - 1] === WORKSPACE_FLAG ? [arg] : [],
-  );
+const requestedWorkspaces = () => {
+  const args = process.argv.slice(2);
+  const requested = args.flatMap((arg, index) => {
+    if (arg.startsWith(`${WORKSPACE_FLAG}=`)) {
+      return [arg.slice(WORKSPACE_FLAG.length + 1)];
+    }
+    return arg === WORKSPACE_FLAG ? [args[index + 1] ?? ''] : [];
+  });
+  if (requested.some((dir) => dir === '' || dir.startsWith('--'))) {
+    fail(
+      `${WORKSPACE_FLAG} needs a directory, e.g. ${WORKSPACE_FLAG} apps/web.`,
+    );
+  }
+  return requested;
+};
 
 const main = () => {
   const jscpd = join(repoRoot, 'node_modules/.bin/jscpd');
