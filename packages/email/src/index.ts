@@ -30,6 +30,8 @@ export {
   type TSelfServeLimitAlertInput,
   buildArchivedSanityProjectAlertEmail,
   type TArchivedSanityProjectAlertInput,
+  buildNewsletterReputationAlertEmail,
+  type TNewsletterReputationAlertInput,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,
@@ -50,6 +52,10 @@ export {
   type TOwnerSuspensionEmailInput,
   buildOwnerSuspensionLiftedEmail,
   type TOwnerSuspensionLiftedEmailInput,
+  buildOwnerNewsletterPausedEmail,
+  type TOwnerNewsletterPausedEmailInput,
+  buildOwnerNewsletterLimitNearEmail,
+  type TOwnerNewsletterLimitNearEmailInput,
 } from './templates/owner';
 export {
   buildMagicLinkEmail,

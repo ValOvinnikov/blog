@@ -18,3 +18,7 @@ export {
   buildArchivedSanityProjectAlertEmail,
   type TArchivedSanityProjectAlertInput,
 } from './archived-sanity-project-alert/archived-sanity-project-alert';
+export {
+  buildNewsletterReputationAlertEmail,
+  type TNewsletterReputationAlertInput,
+} from './newsletter-reputation-alert/newsletter-reputation-alert';
