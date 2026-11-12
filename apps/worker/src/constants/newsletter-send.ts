@@ -36,7 +36,7 @@ export const NEWSLETTER_LIMIT_NEAR_RATIO = 0.8;
 export const NEWSLETTER_UNIT_MAX_RETRIES = 3;
 // Resend ignores an empty idempotency key and refuses one of 256 characters or more.
 export const RESEND_IDEMPOTENCY_KEY_MAX_LENGTH = 255;
-export const SUBSCRIBER_ID_LENGTH = 36;
+const SUBSCRIBER_ID_LENGTH = 36;
 export const NEWSLETTER_POST_ID_MAX_LENGTH =
   RESEND_IDEMPOTENCY_KEY_MAX_LENGTH - SUBSCRIBER_ID_LENGTH - 1;
 // Resend's shared testing sender, the fallback until a verified sending domain is configured.
