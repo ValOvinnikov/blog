@@ -34,6 +34,11 @@ export const NEWSLETTER_SEND_INTERVAL_MS = 500;
 export const NEWSLETTER_SCHEDULE_RECHECK_MS = 24 * 60 * 60_000;
 export const NEWSLETTER_LIMIT_NEAR_RATIO = 0.8;
 export const NEWSLETTER_UNIT_MAX_RETRIES = 3;
+// Resend ignores an empty idempotency key and refuses one of 256 characters or more.
+export const RESEND_IDEMPOTENCY_KEY_MAX_LENGTH = 255;
+export const SUBSCRIBER_ID_LENGTH = 36;
+export const NEWSLETTER_POST_ID_MAX_LENGTH =
+  RESEND_IDEMPOTENCY_KEY_MAX_LENGTH - SUBSCRIBER_ID_LENGTH - 1;
 // Resend's shared testing sender, the fallback until a verified sending domain is configured.
 export const DEFAULT_NEWSLETTER_FROM_ADDRESS =
   'Newsletter <onboarding@resend.dev>';

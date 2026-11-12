@@ -2,7 +2,10 @@ import { HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
+import {
+  NEWSLETTER_POST_ID_MAX_LENGTH,
+  NEWSLETTER_SEND_LOG,
+} from '@worker/constants/newsletter-send';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
@@ -15,7 +18,7 @@ import { start } from 'workflow/api';
 import { z } from 'zod';
 
 const postSendBodySchema = tenantRequestBodySchema.extend({
-  postId: z.string().min(1),
+  postId: z.string().min(1).max(NEWSLETTER_POST_ID_MAX_LENGTH),
   claimedAt: z.iso.datetime(),
 });
 

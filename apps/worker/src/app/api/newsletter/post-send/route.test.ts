@@ -1,7 +1,10 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
+import {
+  NEWSLETTER_POST_ID_MAX_LENGTH,
+  NEWSLETTER_SEND_LOG,
+} from '@worker/constants/newsletter-send';
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_FORGED_SECRET,
@@ -91,6 +94,7 @@ describe('POST /api/newsletter/post-send', () => {
     { tenantId: MOCK_TENANT_ID, claimedAt: MOCK_CLAIMED_AT },
     { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID },
     { ...MOCK_BODY, claimedAt: 'yesterday' },
+    { ...MOCK_BODY, postId: 'p'.repeat(NEWSLETTER_POST_ID_MAX_LENGTH + 1) },
   ])('refuses a malformed body %j', async (body) => {
     const response = await POST(postSendRequest(body));
 

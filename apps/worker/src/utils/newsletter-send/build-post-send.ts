@@ -6,6 +6,7 @@ import {
   type TSendEmailInput,
 } from '@blog/email';
 import { signNewsletterUnsubscribeToken } from '@blog/utils/newsletter-unsubscribe-token';
+import { RESEND_IDEMPOTENCY_KEY_MAX_LENGTH } from '@worker/constants/newsletter-send';
 import type { TNewsletterSendContext } from '@worker/utils/newsletter-send/newsletter-send-context';
 import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 
@@ -15,6 +16,21 @@ export type TPostSendTarget = {
   subscriberId: string;
   email: string;
 };
+
+export function postSendIdempotencyKey(
+  postId: string,
+  subscriberId: string,
+): string {
+  const key = `${postId}:${subscriberId}`;
+  if (
+    !postId ||
+    !subscriberId ||
+    key.length > RESEND_IDEMPOTENCY_KEY_MAX_LENGTH
+  ) {
+    throw new Error(`No usable idempotency key for post "${postId}".`);
+  }
+  return key;
+}
 
 export function buildPostSend(
   context: TNewsletterSendContext,
@@ -49,6 +65,6 @@ export function buildPostSend(
     text,
     headers,
     tags: [buildSiteEmailTag(tenantId)],
-    idempotencyKey: `newsletter-post/${tenantId}/${postId}/${subscriberId}`,
+    idempotencyKey: postSendIdempotencyKey(postId, subscriberId),
   };
 }

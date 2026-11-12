@@ -6,6 +6,7 @@ import {
 } from '@blog/config/constants';
 import { EMAIL_ACCOUNT, SITE_EMAIL_TAG_NAME } from '@blog/email';
 import { verifyNewsletterUnsubscribeToken } from '@blog/utils/newsletter-unsubscribe-token';
+import { RESEND_IDEMPOTENCY_KEY_MAX_LENGTH } from '@worker/constants/newsletter-send';
 import {
   MOCK_NEWSLETTER_FROM_ADDRESS,
   MOCK_NEWSLETTER_POST,
@@ -20,7 +21,7 @@ import {
 } from '@worker/testing/tenant/fixtures';
 import type { TNewsletterSendContext } from '@worker/utils/newsletter-send/newsletter-send-context';
 
-import { buildPostSend } from './build-post-send';
+import { buildPostSend, postSendIdempotencyKey } from './build-post-send';
 
 const MOCK_SITE_URL = `https://${MOCK_TENANT_DOMAIN}`;
 const MOCK_CONTEXT: TNewsletterSendContext = {
@@ -88,5 +89,25 @@ describe(buildPostSend, () => {
 
     expect(buildFor(SUBSCRIBER_ID).idempotencyKey).toBe(first);
     expect(buildFor(OTHER_SUBSCRIBER_ID).idempotencyKey).not.toBe(first);
+  });
+});
+
+describe(postSendIdempotencyKey, () => {
+  it('names the post and the subscriber', () => {
+    expect(postSendIdempotencyKey(MOCK_POST_ID, SUBSCRIBER_ID)).toBe(
+      `${MOCK_POST_ID}:${SUBSCRIBER_ID}`,
+    );
+  });
+
+  it.each([
+    ['an empty post id', '', SUBSCRIBER_ID],
+    ['an empty subscriber id', MOCK_POST_ID, ''],
+    [
+      'a key past Resend’s limit',
+      'p'.repeat(RESEND_IDEMPOTENCY_KEY_MAX_LENGTH),
+      SUBSCRIBER_ID,
+    ],
+  ])('refuses %s', (_, postId, subscriberId) => {
+    expect(() => postSendIdempotencyKey(postId, subscriberId)).toThrow();
   });
 });
