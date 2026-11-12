@@ -165,7 +165,8 @@ allow 'x=`pnpm install`'
 block '`pnpm install `'
 
 # --- must ALLOW: inert when node_modules is a real directory ---------------
-real_scratch=$(mktemp -d)
+real_scratch=$(mktemp -d) || real_scratch=
+require_dir "$real_scratch"
 mkdir "$real_scratch/node_modules"
 payload=$(jq -n --arg cmd 'pnpm install' '{tool_input: {command: $cmd}}')
 printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$real_scratch" sh "$guard" >/dev/null 2>&1
@@ -182,7 +183,8 @@ cwd_expect() {
 	project_dir=$2
 	cwd=$3
 	label=$4
-	payload=$(jq -n --arg cwd "$cwd" '{cwd: $cwd, tool_input: {command: "pnpm install"}}')
+	cmd=${5:-pnpm install}
+	payload=$(jq -n --arg cwd "$cwd" --arg cmd "$cmd" '{cwd: $cwd, tool_input: {command: $cmd}}')
 	printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$project_dir" sh "$guard" >/dev/null 2>&1
 	got=$?
 	if [ "$got" != "$want" ]; then
@@ -191,70 +193,27 @@ cwd_expect() {
 	fi
 }
 
-primary=$(mktemp -d)
+primary=$(mktemp -d) || primary=
+require_dir "$primary"
 mkdir "$primary/node_modules"
-shared_wt=$(mktemp -d)
+shared_wt=$(mktemp -d) || shared_wt=
+require_dir "$shared_wt"
 git -C "$shared_wt" init -q
 ln -s "$primary/node_modules" "$shared_wt/node_modules"
 mkdir -p "$shared_wt/apps/web"
-private_wt=$(mktemp -d)
+private_wt=$(mktemp -d) || private_wt=
+require_dir "$private_wt"
 git -C "$private_wt" init -q
 mkdir "$private_wt/node_modules"
 
 cwd_expect 2 "$primary" "$shared_wt" "shared-deps worktree blocks although CLAUDE_PROJECT_DIR is the primary checkout"
 cwd_expect 2 "$primary" "$shared_wt/apps/web" "cwd nested inside a shared-deps worktree blocks"
 cwd_expect 0 "$scratch" "$private_wt" "private worktree allows although CLAUDE_PROJECT_DIR has a symlinked tree"
+# The session's directory decides even when the command installs elsewhere:
+# an install in another tree runs that tree's own install scripts and pnpm
+# settings, which can point back at the primary checkout.
+cwd_expect 2 "$primary" "$shared_wt" "an install aimed at a private worktree still blocks from a shared-deps session" "cd $private_wt && pnpm install"
 rm -rf "$primary" "$shared_wt" "$private_wt"
-
-# --- an install aimed at another worktree is judged by that worktree --------
-# The session sits in a shared-deps worktree; only `cd <linked worktree whose
-# node_modules is not a symlink> && pnpm install [--frozen-lockfile]` passes.
-target_expect() {
-	want=$1
-	cmd=$2
-	label=$3
-	payload=$(jq -n --arg cwd "$session_wt" --arg cmd "$cmd" '{cwd: $cwd, tool_input: {command: $cmd}}')
-	printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$repo" sh "$guard" >/dev/null 2>&1
-	got=$?
-	if [ "$got" != "$want" ]; then
-		printf 'FAIL want=%s got=%s  %s\n' "$want" "$got" "$label"
-		fails=$((fails + 1))
-	fi
-}
-
-worktrees=$(mktemp -d) || worktrees=
-require_dir "$worktrees"
-worktrees=$(cd "$worktrees" && pwd -P)
-repo="$worktrees/repo"
-git init -q "$repo"
-git -C "$repo" -c user.name=t -c user.email=t@example.com commit -q --allow-empty -m init
-mkdir "$repo/node_modules"
-session_wt="$worktrees/session"
-review_wt="$worktrees/review"
-seeded_wt="$worktrees/seeded"
-git -C "$repo" worktree add -q --detach "$session_wt"
-git -C "$repo" worktree add -q --detach "$review_wt"
-git -C "$repo" worktree add -q --detach "$seeded_wt"
-ln -s "$repo/node_modules" "$session_wt/node_modules"
-ln -s "$repo/node_modules" "$seeded_wt/node_modules"
-mkdir -p "$review_wt/apps/web"
-
-target_expect 0 "cd $review_wt && pnpm install --frozen-lockfile" "install in a worktree with no symlink passes"
-target_expect 0 "cd $review_wt && pnpm install" "plain install in a worktree with no symlink passes"
-target_expect 0 "cd $review_wt/apps/web && pnpm i" "a directory nested in that worktree passes"
-target_expect 2 "cd $seeded_wt && pnpm install" "a worktree still holding the symlink blocks"
-target_expect 2 "cd $seeded_wt && rm node_modules && pnpm install" "removing the symlink in the same command blocks"
-target_expect 2 "cd $repo && pnpm install" "the primary checkout blocks"
-target_expect 2 "cd $session_wt && pnpm install" "the session's own shared worktree blocks"
-target_expect 2 "cd $review_wt && cd $seeded_wt && pnpm install" "a second cd blocks"
-target_expect 2 "cd $review_wt && pnpm -C $seeded_wt install" "a redirected install blocks"
-target_expect 2 "cd $review_wt && pnpm install --modules-dir $repo/node_modules" "any other install flag blocks"
-target_expect 2 "cd $review_wt && pnpm add lodash" "a dependency change blocks"
-target_expect 2 "cd ../review && pnpm install" "a relative target blocks"
-target_expect 2 "cd $worktrees && pnpm install" "a target outside any repository blocks"
-target_expect 2 "cd $review_wt && pnpm install
-cd $seeded_wt && pnpm install" "a second line blocks"
-rm -rf "$worktrees"
 
 if [ "$fails" -eq 0 ]; then
 	echo "pre-bash-worktree-install-guard: all cases pass"

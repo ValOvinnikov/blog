@@ -48,26 +48,6 @@ case "$command" in
 *) exit 0 ;;
 esac
 
-# An install aimed at another worktree is judged by that worktree, not by the
-# session's: a review worktree given its own tree (`rm node_modules` first,
-# as its own command) installs nothing through the shared symlink. Only the
-# exact one-line form `cd <absolute path> && pnpm install [--frozen-lockfile]`
-# is read this way; any other spelling falls through to the block below.
-target=$(printf '%s' "$command" |
-	sed -nE 's#^[[:space:]]*cd[[:space:]]+(/[A-Za-z0-9_./-]+)[[:space:]]*&&[[:space:]]*pnpm[[:space:]]+(install|i)([[:space:]]+--frozen-lockfile)?[[:space:]]*$#\1#p')
-if [ -n "$target" ] && [ "$(printf '%s' "$command" | wc -l)" -eq 0 ]; then
-	target_root=$(git -C "$target" rev-parse --show-toplevel 2>/dev/null) || target_root=
-	if [ -n "$target_root" ] && [ "$target_root" != "$root" ] && [ ! -L "$target_root/node_modules" ]; then
-		git_dir=$(git -C "$target_root" rev-parse --path-format=absolute --git-dir 2>/dev/null)
-		common_dir=$(git -C "$target_root" rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
-		# A linked worktree only: the primary checkout's own tree is the one
-		# this guard protects.
-		if [ -n "$git_dir" ] && [ "$git_dir" != "$common_dir" ]; then
-			exit 0
-		fi
-	fi
-fi
-
 # `pnpm` must sit at a command position (start of command, or after ; & | ( or
 # a backtick) so that commands merely *mentioning* an install — grep patterns,
 # commit messages, echo — pass. Flags before the subcommand are tolerated,

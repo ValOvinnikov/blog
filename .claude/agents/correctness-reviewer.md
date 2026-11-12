@@ -45,8 +45,9 @@ Your first command is `cd <path>`, and every later Bash call carries the same
 `cd <path> &&`. Grep, Glob and Read take absolute paths under `<path>`. A
 prompt that names no path gets no review.
 
-`pnpm verify` ran green before you were dispatched, or in PR review mode is
-running beside you. Do not re-run the suite. One targeted command to settle a concrete doubt — a single
+`pnpm verify` ran green before you were dispatched; on a PR, the session
+that opened it ran it and CI requires it before merge. Do not re-run the
+suite. One targeted command to settle a concrete doubt — a single
 test file, a `git log -S` — is fine.
 
 ## How to review
@@ -86,8 +87,9 @@ branch it names, is a finding here; how a test is written is `reviewer`'s.
 
 A prompt that opens `PR review of #<n>` reviews an open pull request
 (`review-pull-request`): the checkout is a detached worktree at the PR's
-head, whose SHA the prompt names and `git rev-parse HEAD` must equal, and
-the orchestrator runs `pnpm verify` itself or CI already ran it. The criteria
+head, whose SHA the prompt names and `git rev-parse HEAD` must equal. The
+worktree is never installed into, so a test you want to run to settle a
+doubt may not start; say so under **Not checked**. The criteria
 may be one slice of a multi-PR issue, which the prompt names; a criterion
 outside that slice is not yours to mark. Both passes run as written. A draft PR is the expected state, never a
 finding.

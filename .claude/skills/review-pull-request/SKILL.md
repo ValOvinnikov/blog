@@ -58,54 +58,44 @@ picks up the base's own files, the count no longer matches, and both
 reviewers stop on the mismatch.
 
 `post-checkout` symlinks the worktree's `node_modules` to the primary
-checkout's. Run `pnpm check:file-size` in the worktree as a probe:
+checkout's, and the review uses that tree as it is. **Never install in a
+review worktree**: an install runs the PR's own install scripts and pnpm
+settings unattended, and `pre-bash-worktree-install-guard.sh` blocks it.
 
-- **It runs** — the primary checkout's install matches the PR's lockfile.
-  Carry on.
-- **It stops at a refused install** — the primary checkout is behind, or the
-  PR changes `pnpm-lock.yaml`. Give the worktree its own install, which takes
-  seconds, as two separate commands with the worktree's absolute path:
+## 3. Run the checks CI has no step for
 
-  ```bash
-  rm <worktree>/node_modules
-  cd <worktree> && pnpm install --frozen-lockfile
-  ```
+In the worktree, as one command, prefixed with
+`TOUCHED_BASE_REF=origin/<baseRefName>` when the base is not `main`:
 
-  `rm` removes only the symlink, so the primary checkout is never touched.
-  The second command is written exactly so:
-  `pre-bash-worktree-install-guard.sh` lets a session in a shared-deps
-  worktree install into another worktree only in that one-line form, and
-  only once the symlink is gone. Let it finish before running anything else
-  there.
+```bash
+cd <worktree> && node scripts/check-file-size.mjs && node scripts/check-layer-contracts.mjs && node scripts/check-diff-hygiene.mjs && node scripts/check-touched-lint.mjs && node scripts/check-clones.mjs
+```
 
-- **The guard still blocks that exact form** — the primary checkout holds an
-  older guard. Do not work around it: ask the user to run the two commands
-  in their own terminal, then probe again.
+They take seconds. The first four are the part of `pnpm verify` that no CI
+job repeats; the fifth is the review's clone scan. A failing check is a
+blocking finding with its command.
 
-## 3. Run the scripts yourself
+**Do not run `pnpm verify`, type-check, lint or the tests.** The session that
+opened the PR ran them, and CI runs them again as required checks once the
+PR is marked ready, so a red PR cannot merge. A failed check in
+`statusCheckRollup` on the head SHA is a blocking finding; a skipped one is
+the draft state, never a finding.
 
-In the worktree, in the background: `pnpm verify`, then `pnpm check:clones`
-— one after the other, never at once. Skip `pnpm verify` when
-`statusCheckRollup` shows CI green on that head SHA; CI skips a draft, so for
-a cloud PR the session's own word is otherwise the only evidence it passed.
-
-These run in your own session, not in `verify-runner` or `reviewer`: a
-sandboxed subagent cannot write outside the session's checkout, so `pnpm`
-fails there before the script starts. A red result is a blocking finding with
-its failing command.
+**A check that cannot start** — `jscpd is not installed`, a missing `eslint`
+— means the primary checkout's install is behind the PR. Ask the user to run
+`git pull` and `pnpm install` in the primary checkout, then run step 3 again.
+The same pull is what gives sessions the current agents and skills.
 
 ## 4. Dispatch — one message, all in the background
 
-Dispatch while the scripts run. Every prompt opens `PR review of #<n>` and
-carries the worktree's absolute path, the head SHA, the base as
-`origin/<baseRefName>`, the changed-file count and a one-sentence summary of
-the change. A base other than `main` is also named as
-`TOUCHED_BASE_REF=origin/<baseRefName>` for the scripts.
+Every prompt opens `PR review of #<n>` and carries the worktree's absolute
+path, the head SHA, the base as `origin/<baseRefName>`, the changed-file
+count and a one-sentence summary of the change. A base other than `main` is
+also named as `TOUCHED_BASE_REF=origin/<baseRefName>` for the scripts.
 
 - **`reviewer`** with the issue number, its Copy and Cost lines, and the PR
-  body's Examined and Reuse lines verbatim. Its prompt says you are running
-  `pnpm verify` and `pnpm check:clones`, and that its other scripts run as
-  `node scripts/<name>.mjs`.
+  body's Examined and Reuse lines verbatim. Its prompt gives step 3's result
+  and says its own scripts run as `node scripts/<name>.mjs`.
 - **`correctness-reviewer`** with the issue number and its acceptance
   criteria verbatim — skipped under `develop-feature` §6's rule (every
   changed file is styling, copy, a story or a doc), in which case
@@ -158,9 +148,8 @@ checklist line on the spot.
 ## 7. Fix round
 
 When the branch has new commits, fetch the base and the head again, move the
-worktree (`git -C <worktree> checkout --detach <new sha>`), repeat step 2's
-probe — a fix that changes `pnpm-lock.yaml` needs the install again — re-run
-step 3 and re-dispatch every reviewer from step 4, each prompt opening
+worktree (`git -C <worktree> checkout --detach <new sha>`), re-run step 3 and
+re-dispatch every reviewer from step 4, each prompt opening
 `Re-review of <old sha>` with the findings posted. A reviewer that approved
 is included: the fix commits are code it has not seen. A merge from the base in that range needs a full
 review instead.
@@ -168,8 +157,7 @@ review instead.
 ## 8. Remove the worktree
 
 Once the PR merges or closes: `git worktree remove <worktree>`. It is
-detached and holds nothing of its own; its private `node_modules` makes the
-removal slow, so give it a generous timeout. From a session that is itself inside a
+detached and holds nothing of its own. From a session that is itself inside a
 worktree the command is refused (`develop-feature/worktree-cleanup.md`) —
 leave it and tell the user the path.
 

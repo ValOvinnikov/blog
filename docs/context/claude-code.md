@@ -450,12 +450,11 @@ file` are all denied alike) — an earlier version only handled the
     of the git toplevel of the payload's `cwd`, falling back to
     `$CLAUDE_PROJECT_DIR` only when the payload carries none —
     `$CLAUDE_PROJECT_DIR` names the primary checkout even inside a worktree.
-    One form is judged by its target instead (#7267): the exact one-line
-    `cd <absolute path> && pnpm install [--frozen-lockfile]` passes when the
-    target is a linked worktree whose `node_modules` is not a symlink — how
-    `review-pull-request` gives a review worktree its own tree from a
-    shared-deps session. Any other spelling, the primary checkout, and a
-    worktree still holding the symlink stay blocked. Its test suite stops
+    The session's directory decides even when the command installs elsewhere
+    (`cd <other worktree> && pnpm install`): judging by the target was tried
+    and dropped (#7267), because a `cd` through a symlink and `..` lands
+    somewhere the guard did not look, and an install in another tree runs
+    that tree's own install scripts and pnpm settings. Its test suite stops
     before any fixture or cleanup when `mktemp` fails, since an empty path
     would aim its `rm -rf` at the current directory.
   - `pre-bash-branch-name-guard.sh` — `PreToolUse` hook that refuses
@@ -872,9 +871,12 @@ file` are all denied alike) — an earlier version only handled the
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR, plus the spec and feature-doc sync item, converge-on-touch findings (placement, props, variants files), file-size growth as a blocking finding (since 2026-11-10, backing the local `pnpm check:file-size` ratchet when a commit skips it), a blocking prop-ceiling count on every touched component, a flag on a UI or behaviour diff with no manual-test issue, and a flag on a diff that adds a cron, workflow, paid API call or hot-path query with no stated cost.
   - `review-pull-request` — the orchestrator's review of an open PR, the only
     review a cloud session's diff gets: it checks the PR head out in a
-    detached worktree with its own install, runs `pnpm verify` (CI skips a
-    draft) and `pnpm check:clones` in its own session — a sandboxed subagent
-    cannot write in that worktree — and dispatches
+    detached worktree that shares the primary checkout's `node_modules` and
+    is never installed into, runs with `node` the four checks no CI job
+    repeats (file size, layer contracts, diff hygiene, touched-file lint)
+    plus the clone scan — seconds in all, where a full `pnpm verify` took
+    minutes, loaded the machine enough to fail unrelated tests, and repeated
+    what the cloud session ran and CI requires before merge — and dispatches
     `reviewer` and `correctness-reviewer` in PR mode with the issue's
     acceptance criteria and the PR body's Examined and Reuse lines, verifies
     each blocking finding, and posts one PR comment only when changes are
