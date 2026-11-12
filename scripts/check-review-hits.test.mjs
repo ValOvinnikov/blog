@@ -2,9 +2,11 @@ import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
 import {
+  findRestatedConsts,
   findReviewHits,
   fixtureLiteralsOf,
   HIT,
+  valueLiteralsOf,
 } from './check-review-hits.mjs';
 
 const COMPONENT = 'apps/web/src/components/card/card.tsx';
@@ -142,6 +144,79 @@ describe('fixtureLiteralsOf', () => {
         ).added,
       ),
       ["'hello-world'"],
+    );
+  });
+});
+
+describe('valueLiteralsOf', () => {
+  it('keeps value-shaped literals and drops imports, vocabulary and indexed values', () => {
+    assert.deepEqual(
+      valueLiteralsOf(
+        added(
+          COMPONENT,
+          "import { Card } from '@blog/ui/card';",
+          "const kind = 'hero-profile';",
+          "const type = 'button';",
+          "const shape = 'PILL';",
+          "const label = 'Read more';",
+          "const t = await getTranslations('heroProfile');",
+          "const title = t('readMoreLabel');",
+          "const id = 'p1';",
+        ).added,
+        { PILL: [] },
+      ),
+      ["'hero-profile'"],
+    );
+  });
+});
+
+const ref = (name, key) => ({
+  ref: `${name}.${key}`,
+  file: `packages/config/src/constants/${name.toLowerCase()}.ts`,
+});
+
+const indexOf = (...consts) => ({
+  strings: Object.fromEntries(
+    [...new Set(consts.flatMap(([, keys]) => keys))].map((key) => [
+      key,
+      consts
+        .filter(([, keys]) => keys.includes(key))
+        .map(([name]) => ref(name, key)),
+    ]),
+  ),
+  numbers: {},
+});
+
+describe('findRestatedConsts', () => {
+  const BUTTON_SHAPE = ['BUTTON_SHAPE', ['PILL', 'SQUARE', 'CIRCLE']];
+
+  it('reports a new const whose values an existing const already holds', () => {
+    assert.deepEqual(
+      findRestatedConsts(
+        indexOf(BUTTON_SHAPE, ['CHIP_SHAPE', ['PILL', 'SQUARE']]),
+        indexOf(BUTTON_SHAPE),
+      ).map(({ hit, text }) => [hit, text]),
+      [
+        [
+          HIT.RESTATED_CONST,
+          'CHIP_SHAPE restates BUTTON_SHAPE (packages/config/src/constants/button_shape.ts)',
+        ],
+      ],
+    );
+  });
+
+  it('leaves a const already on the base, a new value and a single shared value', () => {
+    assert.deepEqual(
+      findRestatedConsts(
+        indexOf(
+          BUTTON_SHAPE,
+          ['NAV_SHAPE', ['PILL', 'SQUARE']],
+          ['TAG_SHAPE', ['PILL', 'ROUNDED']],
+          ['BADGE_SHAPE', ['PILL']],
+        ),
+        indexOf(BUTTON_SHAPE, ['NAV_SHAPE', ['PILL', 'SQUARE']]),
+      ),
+      [],
     );
   });
 });

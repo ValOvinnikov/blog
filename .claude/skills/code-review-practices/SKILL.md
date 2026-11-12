@@ -42,19 +42,21 @@ merge-base:
 read every hit, and a confirmed one is blocking unless its row
 allows it.
 
-| Hit                              | Blocking when                                                                                                                                               |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TODO/FIXME left in               | it cites no open issue (`CLAUDE.md` comments rule)                                                                                                          |
-| possible secret                  | the value is real — fixtures carry fakes                                                                                                                    |
-| possible real Sanity project id  | the id is not an intentional fake                                                                                                                           |
-| lint or type suppression         | the rule it silences is one this checklist enforces — a raw DOM query, a nested query, a class assertion — or its reason does not hold                      |
-| test may restate its source      | the expected value is copied from the file under test (`testing-practices` "What not to test")                                                              |
-| `vi.mock` of our own component   | always — it is allowed only in a `*-module-renderer.test.tsx` or a route test under `src/app/`, which the script skips (`testing-practices` "What to fake") |
-| reads `mock.calls`               | it reads a faked component's props; an edge fake's arguments are fine                                                                                       |
-| comment added outside a test     | it fails `CLAUDE.md` "Comments default to zero" — the one-line gotcha passes                                                                                |
-| fixed fake value not `MOCK_`     | always, in what the diff adds (`testing-practices` "Fixture naming")                                                                                        |
-| touched test file over 500 lines | never by itself — read the file first for the §6 pruning findings                                                                                           |
-| fake value already in `testing/` | the value stands for the same fake thing (`testing-practices` "Check `testing/` for a builder")                                                             |
+| Hit                              | Blocking when                                                                                                                                                  |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TODO/FIXME left in               | it cites no open issue (`CLAUDE.md` comments rule)                                                                                                             |
+| possible secret                  | the value is real — fixtures carry fakes                                                                                                                       |
+| possible real Sanity project id  | the id is not an intentional fake                                                                                                                              |
+| lint or type suppression         | the rule it silences is one this checklist enforces — a raw DOM query, a nested query, a class assertion — or its reason does not hold                         |
+| test may restate its source      | the expected value is copied from the file under test (`testing-practices` "What not to test")                                                                 |
+| `vi.mock` of our own component   | always — it is allowed only in a `*-module-renderer.test.tsx` or a route test under `src/app/`, which the script skips (`testing-practices` "What to fake")    |
+| reads `mock.calls`               | it reads a faked component's props; an edge fake's arguments are fine                                                                                          |
+| comment added outside a test     | it fails `CLAUDE.md` "Comments default to zero" — the one-line gotcha passes                                                                                   |
+| fixed fake value not `MOCK_`     | always, in what the diff adds (`testing-practices` "Fixture naming")                                                                                           |
+| touched test file over 500 lines | never by itself — read the file first for the §6 pruning findings                                                                                              |
+| fake value already in `testing/` | the value stands for the same fake thing (`testing-practices` "Check `testing/` for a builder")                                                                |
+| value already in another file    | both uses mean the same thing — it becomes a const in this diff (`CLAUDE.md` "Reuse a const"); a coincidence, or vocabulary an outside standard spells, passes |
+| new const restates an existing   | the two consts name the same vocabulary; a match in the other app, or in a storage layer's own const, is reported and not merged                               |
 
 **Then `pnpm check:clones`** — clones across every workspace the diff touches,
 printed only where one side is a touched file. It exits non-zero when jscpd
@@ -240,9 +242,11 @@ line from this checklist.
   const that duplicates the values of an existing one are findings — in tests
   as in source (→ `CLAUDE.md` "Reuse a const; never retype its value").
   `pnpm verify`'s touched-file lint catches a retyped const value and a
-  value repeated within one file, but not a value repeated across files or a
-  new const restating an existing one: search for each, and compare each new
-  const against the index. A const the diff adds or changes without a
+  value repeated within one file. §0's `check:review-hits` lists a string
+  value the diff writes that another source file of the workspace already
+  holds, and a new const whose values an existing const covers — read each.
+  It does not see numbers, a string with a space in it, or a repeat in
+  another workspace: search for those. A const the diff adds or changes without a
   regenerated `CONSTANTS.md` fails `gen:const-index:check`.
 - **Comments (blocking).** Read every comment the diff adds or touches, not
   only the grep hits, against `CLAUDE.md` "Comments default to zero". A

@@ -192,7 +192,9 @@ contracts:
     `pnpm check:review-hits` (#7267), which prints every added line a reader
     has to judge — leftovers, secret-shaped assignments, suppressions, tests
     that restate their source, fakes of our own components, comments outside
-    test files, unnamed or duplicated fixtures, touched test files over 500
+    test files, unnamed or duplicated fixtures, a string value another source
+    file of the workspace already holds, a new const whose values an existing
+    one covers, touched test files over 500
     lines — grouped by kind, and exits zero whatever it finds (non-zero only when git
     fails or finds no merge-base); it replaced a dozen grep
     and awk commands the reviewer pasted by hand. Then `pnpm check:clones`
