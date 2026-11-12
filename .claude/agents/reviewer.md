@@ -72,10 +72,9 @@ early pass never skips a later one.
 
 ### Pass 1 — Mechanical
 
-Run `pnpm check:diff-hygiene`, then every command in the skill's §0 over the
-full diff (`<base>...HEAD` plus the working tree; set §0's `BASE` to it),
-`pnpm check:clones` included. A diff-hygiene hit is blocking; a hit from the
-other commands is blocking once you have read it and §0 does not allow it.
+Run the skill's §0: `pnpm check:diff-hygiene`, `pnpm check:review-hits` and
+`pnpm check:clones`. A diff-hygiene hit is blocking; a hit from the other two
+is blocking once you have read it and §0's table does not allow it.
 
 ### Pass 2 — Contract
 
@@ -83,11 +82,16 @@ Map each changed file to its layer, then walk the skill's spec and
 feature-doc sync item and §1–7 over the diff. Boundary and type violations
 are blocking.
 
-§5's prop-ceiling count is part of this pass, for every component whose file
-the diff touches — not only those whose props the diff changes. A review that
-has not counted them cannot return `APPROVE`: a component over its ceiling goes
-under **Blocking** with its count, and the counts at or under it go in one
-line under **Non-blocking** ("no components touched" when there are none).
+Two of its items need the whole file, not the hunks, and a review that
+skipped either cannot return `APPROVE`:
+
+- **§5's prop ceiling.** Report the count for every component whose file the
+  diff touches: over the ceiling under **Blocking**, the rest in one line
+  under **Non-blocking** ("no components touched" when there are none).
+- **§6's test pruning.** Read every test file the diff creates or edits in
+  full, starting with the ones §0 names as over 500 lines, and cross-check
+  each removal the implementing agent's **Examined** section lists against
+  the test it names as still asserting it.
 
 ### Pass 3 — General
 
@@ -124,17 +128,6 @@ it ships. Make the search a deliberate step:
 - Code that is coincidentally similar, or that sharing would couple when it
   should stay independent, is not a duplicate — say so rather than flag it.
 
-## Touched test files are pruned
-
-Every test file the diff creates or edits is read in full against
-`testing-practices` → "When you touch a test file", starting with the ones
-§0's over-500-lines scan names. A duplicate test, a case another unit with
-its own test file owns, an untabled set of input/output repeats, or a removed
-test whose behaviour no remaining test asserts is blocking (§6). Cross-check
-each removal the implementing agent's **Examined** section lists against the
-test it names as still asserting it. Test files the diff does not touch are
-out of scope.
-
 ## PR review mode
 
 A prompt that opens `PR review of #<n>` reviews an open pull request
@@ -163,8 +156,8 @@ blocking findings. Review only what changed since:
 2. For each prior finding, read its `file:line` now and mark it **fixed** or
    **still open**, with the line that shows it.
 3. Run `pnpm check:diff-hygiene` (it covers the whole branch and is quick),
-   §0's reader commands with `BASE=<sha>`, then Passes 2 and 3 over the
-   changed files only, each read in full.
+   `TOUCHED_BASE_REF=<sha> pnpm check:review-hits`, then Passes 2 and 3 over
+   the changed files only, each read in full.
 
 Open the report with the `pwd` and `git rev-parse HEAD` lines, then
 `Re-reviewed N files changed since <sha>`; N is compared with the count the

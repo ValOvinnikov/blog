@@ -617,6 +617,28 @@ Bash lands, so without it the dispatch makes zero board writes. Don't
 "simplify" the frontmatter by dropping it (`board-keeper.md` § "Why this agent
 carries `isolation: worktree`").
 
+## Carrying out a refactor ticket
+
+A `refactor` ticket changes how code is arranged and nothing about what it
+does. The lifecycle above applies, with four rules that keep that true:
+
+- **The tests are the proof, so they do not change with the code.** The
+  existing tests pass before the first edit and pass, unedited, after it. A
+  test that must change because a symbol moved changes its import and
+  nothing else. If the behaviour under the refactor has no test, the owning
+  agent writes one first, against the code as it stands, and commits it on
+  its own.
+- **One move per commit.** An extraction, a rename and a simplification are
+  three commits, each green, so a regression has one commit to be in.
+- **Every call site moves in the same change.** The old path is deleted, not
+  left re-exporting the new one, and `pnpm knip` stays clean.
+- **A behaviour change found on the way stops the work.** A bug the refactor
+  uncovers, or a caller relying on the quirk being removed, goes to the user
+  ("Mid-task decisions"); it is never fixed inside the refactor.
+
+`correctness-reviewer` gets the ticket's criteria plus one more: no
+observable behaviour changed.
+
 ## Migrations
 
 - **Until launch, no content migrations (decided 2026-10-27).** Production is
@@ -761,8 +783,9 @@ carries `isolation: worktree`").
 - `review-pull-request` when an open PR needs review before merge — a cloud
   session's PR always does; a PR from this lifecycle already passed step 6.
 - `refactor-sweep` for an on-demand, layer-scoped cleanup audit (duplication,
-  dead code, convention drift) — run when asked, naming the layer; it files
-  findings as issues rather than editing.
+  dead code, convention drift) — run when asked, naming the layer; it
+  proposes findings and files the approved ones as issues rather than
+  editing. A filed one is carried out under "Carrying out a refactor ticket".
 - `open-pull-request` when shipping an issue: branch → work → PR (push and PR
   are human-gated).
 - `superpowers:systematic-debugging` on any bug or failing test, before

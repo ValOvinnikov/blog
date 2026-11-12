@@ -169,7 +169,7 @@ const git = (args) =>
     maxBuffer: 256 * 1024 * 1024,
   });
 
-const readTouchedFiles = (base) => {
+export const readTouchedFiles = (base) => {
   const byFile = parseAddedLines(
     git([
       '-c',

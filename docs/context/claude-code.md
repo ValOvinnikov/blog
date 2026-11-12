@@ -188,15 +188,20 @@ contracts:
     mechanical pass (`code-review-practices` §0) opens with
     `pnpm check:diff-hygiene` — the judgement-free checks, also in
     `pnpm verify` and pre-push, so a hit costs the implementing session a
-    re-run rather than a review round (#7118) — then greps added lines for
-    tests that restate their source, runs `pnpm check:clones` (`jscpd`, a
-    pinned root devDependency that fails loudly when missing, printing only
-    clones with a touched side) over the touched workspaces, and — since 2026-09-19 — greps for the comments agents
-    produce most: a doc block opening `Name — does X`, a doc block of three
-    or more lines, a `//` inside a function body, and any comment at all in
-    a `*.test.ts(x)` file. Each hit is blocking; "the siblings have the same
+    re-run rather than a review round (#7118) — then runs
+    `pnpm check:review-hits` (#7267), which prints every added line a reader
+    has to judge — leftovers, secret-shaped assignments, suppressions, tests
+    that restate their source, fakes of our own components, comments outside
+    test files, unnamed or duplicated fixtures, touched test files over 500
+    lines — grouped by kind, and always exits zero; it replaced a dozen grep
+    and awk commands the reviewer pasted by hand. Then `pnpm check:clones`
+    (`jscpd`, a pinned root devDependency that fails loudly when missing,
+    printing only clones with a touched side) over the touched workspaces.
+    A rule that lint or a script already fails has no checklist line. Every
+    comment the diff adds outside a test file is a hit and is blocking unless
+    it passes the comment rule; "the siblings have the same
     block" is not a defence, because the siblings are the drift being
-    corrected. The greps were added after every module on `main` was found
+    corrected. The comment scan was added after every module on `main` was found
     carrying an identical `XModule — fetches module_x and hands it to
 XModuleView` block that the rule already forbade and no review had
     flagged. The same pass names each touched test file over 500 lines, and
@@ -866,7 +871,14 @@ file` are all denied alike) — an earlier version only handled the
     checklist carries no self-review for that reason — only
     `pnpm check:clones` after `pnpm verify`.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
-    dead code, convention drift); files findings as tracked issues, never
+    dead code, convention drift), offered when an epic closes, when a layer
+    has three filed duplication findings, and once per layer before launch.
+    It runs knip, `pnpm check:clones --workspace <dir>`, the touched-file
+    lint over the whole workspace and a churn count before any model, hands
+    that output to an `explore` scan on Sonnet, verifies every finding,
+    skips what open issues and open PRs already cover, ranks substantial
+    findings by churn with a cap of five, and proposes them to the user;
+    only approved findings are filed as tracked issues, and it never
     edits directly. Micro-findings batch into one per-layer umbrella issue
     per sweep instead of one issue each; every filed issue defaults to
     `prio:later` (`prio:someday` if speculative) and gets `cloud-ok` when it

@@ -116,6 +116,12 @@ the comment says the issue changed.
 - **Clean** — nothing is posted. Tell the user in chat: the PR number, clean,
   and each reviewer's **Not checked** line.
 
+**Log a miss.** A confirmed blocking finding that an earlier gate saw and
+passed — the session's `pnpm verify`, a previous review round, CI — gets one
+row in `docs/context/review-misses.md`, with the change that would have
+caught it. The row ships with the next tooling PR; it is never a reason to
+add a checklist line on the spot.
+
 ## 7. Fix round
 
 When the branch has new commits, fetch, move the worktree
