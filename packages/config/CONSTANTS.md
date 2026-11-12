@@ -21,6 +21,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **ALERT_TYPE**: `SUCCESS`, `WARNING`, `ERROR`, `INFO`
 
+### `@blog/config/constants` — `packages/config/src/constants/analytics-provider.ts`
+
+- **ANALYTICS_PROVIDER**: `GOOGLE_ANALYTICS`, `PLAUSIBLE`
+
 ### `@blog/config/constants` — `packages/config/src/constants/aside.ts`
 
 - **ASIDE_KIND**: `WHY_NOT`, `DIGRESSION`, `CONTEXT`
@@ -315,8 +319,9 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/db/constants` — `packages/db/src/constants/billing.ts`
 
-- **STRIPE_PRICE_LOOKUP_KEY**: `STARTER_MONTHLY`, `STARTER_YEARLY`, `GROWTH_MONTHLY`, `GROWTH_YEARLY`, `GROWTH_BAND_2500`, `GROWTH_BAND_5000`, `GROWTH_BAND_10000`, `GROWTH_BAND_25000`
+- **STRIPE_PRICE_LOOKUP_KEY**: `STARTER_MONTHLY`, `STARTER_YEARLY`, `GROWTH_MONTHLY`, `GROWTH_YEARLY`, `GROWTH_BAND_2500`, `GROWTH_BAND_5000`, `GROWTH_BAND_10000`, `GROWTH_BAND_25000`, `GROWTH_BAND_2500_YEARLY`, `GROWTH_BAND_5000_YEARLY`, `GROWTH_BAND_10000_YEARLY`, `GROWTH_BAND_25000_YEARLY`
 - **STRIPE_EVENT_RECORD_OUTCOME**: `RECORDED`, `ALREADY_HANDLED`
+- **STRIPE_TENANT_LOOKUP_OUTCOME**: `FOUND`, `NOT_FOUND`, `CONFLICT`
 
 ### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 

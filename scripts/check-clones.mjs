@@ -51,10 +51,47 @@ const runJscpd = (jscpd, workspaces) => {
   }
 };
 
+const printClones = (clones) => {
+  for (const { lines, firstFile, secondFile } of clones) {
+    console.log(
+      `${firstFile.name}:${firstFile.start}-${firstFile.end} ≈ ${secondFile.name}:${secondFile.start}-${secondFile.end} (${lines} lines)`,
+    );
+  }
+};
+
+const WORKSPACE_FLAG = '--workspace';
+
+const requestedWorkspaces = () => {
+  const args = process.argv.slice(2);
+  const requested = args.flatMap((arg, index) => {
+    if (arg.startsWith(`${WORKSPACE_FLAG}=`)) {
+      return [arg.slice(WORKSPACE_FLAG.length + 1)];
+    }
+    return arg === WORKSPACE_FLAG ? [args[index + 1] ?? ''] : [];
+  });
+  if (requested.some((dir) => dir === '' || dir.startsWith('--'))) {
+    fail(
+      `${WORKSPACE_FLAG} needs a directory, e.g. ${WORKSPACE_FLAG} apps/web.`,
+    );
+  }
+  return requested;
+};
+
 const main = () => {
   const jscpd = join(repoRoot, 'node_modules/.bin/jscpd');
   if (!existsSync(jscpd)) {
     fail('jscpd is not installed; run pnpm install first.');
+  }
+  const requested = requestedWorkspaces();
+  if (requested.length > 0) {
+    const missing = requested.filter((dir) => !existsSync(join(repoRoot, dir)));
+    if (missing.length > 0) {
+      fail(`No such workspace: ${missing.join(', ')}.`);
+    }
+    const clones = runJscpd(jscpd, requested);
+    printClones(clones);
+    console.log(`${clones.length} clone(s) in ${requested.join(', ')}.`);
+    return;
   }
   const base = resolveBase();
   if (!base) {
@@ -74,11 +111,7 @@ const main = () => {
     ({ firstFile, secondFile }) =>
       touched.has(firstFile.name) || touched.has(secondFile.name),
   );
-  for (const { lines, firstFile, secondFile } of clones) {
-    console.log(
-      `${firstFile.name}:${firstFile.start}-${firstFile.end} ≈ ${secondFile.name}:${secondFile.start}-${secondFile.end} (${lines} lines)`,
-    );
-  }
+  printClones(clones);
   console.log(
     `${clones.length} clone(s) involving a touched file across ${workspaces.join(', ')}.`,
   );

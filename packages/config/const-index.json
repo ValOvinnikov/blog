@@ -274,6 +274,22 @@
         "file": "packages/config/src/constants/toast.ts"
       }
     ],
+    "GOOGLE_ANALYTICS": [
+      {
+        "ref": "ANALYTICS_PROVIDER.GOOGLE_ANALYTICS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/analytics-provider.ts"
+      }
+    ],
+    "PLAUSIBLE": [
+      {
+        "ref": "ANALYTICS_PROVIDER.PLAUSIBLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/analytics-provider.ts"
+      }
+    ],
     "WHY_NOT": [
       {
         "ref": "ASIDE_KIND.WHY_NOT",
@@ -3612,6 +3628,12 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
+        "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      },
+      {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
         "scope": "app:platform",
         "from": "@platform/constants/lead",
@@ -4060,6 +4082,38 @@
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
+    "GROWTH_BAND_2500_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_5000_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_10000_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_25000_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
     "RECORDED": [
       {
         "ref": "STRIPE_EVENT_RECORD_OUTCOME.RECORDED",
@@ -4077,6 +4131,22 @@
     "ALREADY_HANDLED": [
       {
         "ref": "STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "FOUND": [
+      {
+        "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.FOUND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "CONFLICT": [
+      {
+        "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.CONFLICT",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/billing.ts"

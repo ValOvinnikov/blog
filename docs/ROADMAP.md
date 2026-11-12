@@ -71,6 +71,7 @@ build chain and what can start now are in each epic's Order.
 | **Coming soon rows**      | A row on a paid plan either works or is absent. Comments (#1040) are hidden until built; ratings (#1041) are dropped and closed. The Features page and sidebar change is #7147.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | **Growth layers (#5714)** | A site that moves to Growth gets its type's Growth sections added at fixed slots, with placeholder images, so the paid modules arrive with an example. Applied at provisioning and on an upgrade, the Stripe one included; a downgrade removes nothing.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | **Support (#7184)**       | A Help entry in the platform opens a short form whose message reaches a support address with the site, plan, account and page already attached. A help centre runs as a Docs site on the product itself. The marketing site's contact page stays for people who aren't customers yet. No chat widget or support tool until volume asks for one. Tickets #7184 to #7187, under #5085.                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| **Grants (#6779)**        | A super admin grants one site a feature outside its plan, with a record of who and why. The launch needs it for the marketing site, which publishes in all five languages while Growth allows three. Languages get no plan or band of their own: they cost little to serve and only five exist. Tickets #6780 to #6785.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | **Takeaways (#5056)**     | A monthly allowance per plan replaces unlimited generation. Generation moves from `claude-haiku-4-5` to `claude-haiku-5-5`, a tenth of the price. The new model rejects the temperature the call sends today.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 Owner tasks before the first payment: register for the EU's One Stop Shop VAT
@@ -118,10 +119,24 @@ decision, not a second source.
 | Preview link, embed module         | Yes                           | Yes                       | Yes            |
 
 Growth includes 1,000 confirmed subscribers. Above that it adds, per month:
-$12 to 2,500, $25 to 5,000, $50 to 10,000 and $110 to 25,000; beyond that the
-owner talks to us. Only confirmed subscribers count. A site that passes its
-band gets an email and a grace period and moves up at its next billing date.
-Each band includes about six sends per subscriber a month.
+$15 to 2,500, $35 to 5,000, $70 to 10,000 and $160 to 25,000; beyond that the
+owner talks to us. Yearly, each band is ten times its monthly amount. A band
+is priced at about one and a half times its worst-case email cost (the full
+allowance at Resend's entry rate), so it also covers Stripe's fee, tax-included
+prices and the send run; re-check it against Resend's confirmed prices before
+the amounts go into Stripe (#7165). Only confirmed subscribers count. Each band includes about
+six sends per subscriber a month.
+
+A site has two limits, its subscribers and its sends in a month. At 80% of
+either the owner is emailed and the Subscribers page offers two choices: move
+to the next band, or do nothing. A band changes only on the owner's click,
+when Stripe charges the difference for the rest of the current period, a month
+or a year. Without a click, sending pauses at the limit: posts still publish,
+readers can still subscribe, and a skipped post is never sent later by itself.
+A bill is never raised without a click. Moving down a band happens at renewal.
+
+The trial belongs to the site, with no per-account limit; a person holds one
+Free or trial site at a time (#6874).
 
 - **Currencies:** dollars, euros and pounds ($19, €19, £16; $6, €6, £5).
   Regional discounts come after launch as Stripe coupons, never as a second

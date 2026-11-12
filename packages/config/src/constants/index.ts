@@ -1,6 +1,7 @@
 export * from './account-control';
 export * from './action-outcome';
 export * from './alert';
+export * from './analytics-provider';
 export * from './audit';
 export * from './auth-app';
 export * from './aside';

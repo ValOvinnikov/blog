@@ -18,6 +18,7 @@ export * from './site-config';
 export * from './site-config-enums';
 export * from './stripe-webhook-events';
 export * from './subscribers';
+export * from './tenant-analytics';
 export * from './tenant-domains';
 export * from './tenant-oauth-credentials';
 export * from './tenant-suspensions';

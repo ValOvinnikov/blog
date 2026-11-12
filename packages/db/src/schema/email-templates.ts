@@ -1,14 +1,7 @@
 import type { TEmailTemplateType } from '@blog/config/constants';
-import {
-  jsonb,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp,
-  uuid,
-} from 'drizzle-orm/pg-core';
+import { jsonb, pgTable, primaryKey, text, uuid } from 'drizzle-orm/pg-core';
 
-import { CREATED_AT_COLUMN, UPDATED_AT_COLUMN } from './columns';
+import { timestampColumns } from './columns';
 import { localeCodeEnum, tenants } from './tenants';
 
 // A Portable Text block, typed loosely on purpose — this package never
@@ -34,13 +27,7 @@ export const emailTemplates = pgTable(
     locale: localeCodeEnum('locale').notNull(),
     subject: text('subject'),
     body: jsonb('body').$type<TEmailTemplateBlock[]>(),
-    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
+    ...timestampColumns,
   },
   (emailTemplate) => [
     primaryKey({
@@ -63,13 +50,7 @@ export const emailTemplateLogos = pgTable(
       .references(() => tenants.id, { onDelete: 'cascade' }),
     templateType: text('template_type').notNull().$type<TEmailTemplateType>(),
     logoAssetUrl: text('logo_asset_url').notNull(),
-    createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
-      .notNull()
-      .defaultNow(),
-    updatedAt: timestamp(UPDATED_AT_COLUMN, { mode: 'date' })
-      .notNull()
-      .defaultNow()
-      .$onUpdate(() => new Date()),
+    ...timestampColumns,
   },
   (emailTemplateLogo) => [
     primaryKey({

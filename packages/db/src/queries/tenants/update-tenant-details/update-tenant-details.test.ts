@@ -46,7 +46,7 @@ import {
 } from '@blog/db/testing/tenants/fixtures';
 import {
   MOCK_SELF_SERVE_DOMAIN,
-  MOCK_SELF_SERVE_OWNER_EMAIL,
+  MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
@@ -370,31 +370,34 @@ describe(updateTenantDetails, () => {
         },
       );
 
-      it("revokes unused sign-in links sent to the old address, keeping everyone else's", async () => {
-        await insertVerificationToken(MOCK_OWNER_EMAIL);
-        await insertVerificationToken(MOCK_MEMBER_EMAIL);
-
-        await updateTenantDetails(tenantId, {
-          ...MOCK_VALID_INPUT,
-          ownerEmail: MOCK_NEW_OWNER_EMAIL,
+      describe('with a sign-in link sent to the owner', () => {
+        beforeEach(async () => {
+          await insertVerificationToken(MOCK_OWNER_EMAIL);
         });
 
-        const identifiers = await readVerificationIdentifiers();
-        expect(identifiers).toEqual([MOCK_MEMBER_EMAIL]);
-      });
+        it("revokes unused sign-in links sent to the old address, keeping everyone else's", async () => {
+          await insertVerificationToken(MOCK_MEMBER_EMAIL);
 
-      it("keeps the old address's sign-in links when the owner email is unchanged", async () => {
-        await insertVerificationToken(MOCK_OWNER_EMAIL);
+          await updateTenantDetails(tenantId, {
+            ...MOCK_VALID_INPUT,
+            ownerEmail: MOCK_NEW_OWNER_EMAIL,
+          });
 
-        const result = await updateTenantDetails(tenantId, {
-          ...MOCK_VALID_INPUT,
-          ownerEmail: MOCK_OWNER_EMAIL,
+          const identifiers = await readVerificationIdentifiers();
+          expect(identifiers).toEqual([MOCK_MEMBER_EMAIL]);
         });
 
-        const { previousOwnerEmail } = unwrapUpdatedResult(result);
-        expect(previousOwnerEmail).toBeUndefined();
-        const identifiers = await readVerificationIdentifiers();
-        expect(identifiers).toEqual([MOCK_OWNER_EMAIL]);
+        it("keeps the old address's sign-in links when the owner email is unchanged", async () => {
+          const result = await updateTenantDetails(tenantId, {
+            ...MOCK_VALID_INPUT,
+            ownerEmail: MOCK_OWNER_EMAIL,
+          });
+
+          const { previousOwnerEmail } = unwrapUpdatedResult(result);
+          expect(previousOwnerEmail).toBeUndefined();
+          const identifiers = await readVerificationIdentifiers();
+          expect(identifiers).toEqual([MOCK_OWNER_EMAIL]);
+        });
       });
 
       it('returns owner-email-taken when the new email matches another invite', async () => {
@@ -668,15 +671,39 @@ describe(updateTenantDetails, () => {
       },
     );
 
-    it('refuses a provisioned tenant moving to FREE when its owner already has a Free site', async () => {
-      const selfServeOwnerEmailIndex = testPersonalEmailIndex(
-        MOCK_SELF_SERVE_OWNER_EMAIL,
-      );
+    it('moves back to FREE beside another Free site after a paid plan', async () => {
       await db()
         .update(tenants)
-        .set({ plan: TENANT_PLAN.GROWTH, selfServeOwnerEmailIndex })
+        .set({ selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX })
         .where(eq(tenants.id, tenantId));
-      await insertTestTenant(db(), { selfServeOwnerEmailIndex });
+
+      const upgraded = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.STARTER,
+      });
+      await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      });
+      const downgraded = await updateTenantDetails(tenantId, {
+        ...MOCK_ORIGINAL_DETAILS,
+        plan: TENANT_PLAN.FREE,
+      });
+
+      expect(unwrapUpdated(upgraded).selfServeOwnerEmailIndex).toBeNull();
+      expect(unwrapUpdated(downgraded).plan).toBe(TENANT_PLAN.FREE);
+    });
+
+    it('refuses a provisioned tenant moving to FREE when its owner already has a Free site', async () => {
+      await db()
+        .update(tenants)
+        .set({
+          plan: TENANT_PLAN.GROWTH,
+          selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+        })
+        .where(eq(tenants.id, tenantId));
+      await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      });
 
       const result = await updateTenantDetails(tenantId, {
         ...MOCK_ORIGINAL_DETAILS,
@@ -932,15 +959,17 @@ describe(updateTenantDetails, () => {
   });
 
   it('refuses a move to FREE that would give a person a second Free site', async () => {
-    const selfServeOwnerEmailIndex = testPersonalEmailIndex(
-      MOCK_SELF_SERVE_OWNER_EMAIL,
-    );
     const tenantId = await insertTenantWithDomain();
     await db()
       .update(tenants)
-      .set({ plan: TENANT_PLAN.GROWTH, selfServeOwnerEmailIndex })
+      .set({
+        plan: TENANT_PLAN.GROWTH,
+        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      })
       .where(eq(tenants.id, tenantId));
-    await insertTestTenant(db(), { selfServeOwnerEmailIndex });
+    await insertTestTenant(db(), {
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+    });
     const [before] = await db()
       .select()
       .from(tenants)
