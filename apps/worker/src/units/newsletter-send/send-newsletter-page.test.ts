@@ -1,5 +1,6 @@
 import { EMAIL_TYPE } from '@blog/config/constants';
 import { NEWSLETTER_SKIP_REASON } from '@blog/db/constants';
+import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
 import { recordEmailSend } from '@blog/db/queries/email-usage';
 import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
 import { listActiveSubscribers } from '@blog/db/queries/subscribers';
@@ -19,6 +20,7 @@ import { MOCK_RESEND_DOWN } from '@worker/testing/outage/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { buildPostSend } from '@worker/utils/newsletter-send/build-post-send';
+import { isSiteSendingPosts } from '@worker/utils/newsletter-send/is-site-sending-posts';
 import {
   loadNewsletterSendContext,
   type TNewsletterSendContext,
@@ -31,6 +33,7 @@ import {
 } from './send-newsletter-page';
 
 vi.mock('node:timers/promises');
+vi.mock('@blog/db/queries/email-config');
 vi.mock('@blog/db/queries/email-usage');
 vi.mock('@blog/db/queries/newsletter-post-sends');
 vi.mock('@blog/db/queries/subscribers');
@@ -38,6 +41,7 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/email/transport/send-email');
 vi.mock('@worker/utils/newsletter-send/build-post-send');
 vi.mock('@worker/utils/newsletter-send/newsletter-send-context');
+vi.mock('@worker/utils/newsletter-send/is-site-sending-posts');
 vi.mock('@worker/utils/newsletter-send/reputation-pace');
 
 const MOCK_CONTEXT = {} as TNewsletterSendContext;
@@ -57,6 +61,8 @@ const MOCK_INPUT: TNewsletterPageInput = {
 describe(sendNewsletterPage, () => {
   beforeEach(() => {
     vi.mocked(getTenantById).mockResolvedValue(mockTenant());
+    vi.mocked(getNewsletterPausedAt).mockResolvedValue(undefined);
+    vi.mocked(isSiteSendingPosts).mockResolvedValue(true);
     vi.mocked(readReputationPace).mockResolvedValue(
       NEWSLETTER_SEND_PACE.NORMAL,
     );
@@ -159,6 +165,29 @@ describe(sendNewsletterPage, () => {
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
+    );
+    expect(result.pace).toBe(NEWSLETTER_SEND_PACE.STOPPED);
+  });
+
+  it.each([
+    [
+      'an operator pauses the site',
+      () => vi.mocked(getNewsletterPausedAt).mockResolvedValue(new Date()),
+    ],
+    [
+      'the site stops sending posts',
+      () => vi.mocked(isSiteSendingPosts).mockResolvedValue(false),
+    ],
+  ])('sends nothing more once %s mid-run', async (_, arrange) => {
+    arrange();
+
+    const result = await sendNewsletterPage(MOCK_INPUT);
+
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(markNewsletterPostSkipped).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      NEWSLETTER_SKIP_REASON.SITE_PAUSED,
     );
     expect(result.pace).toBe(NEWSLETTER_SEND_PACE.STOPPED);
   });

@@ -3,6 +3,7 @@ import { setTimeout as wait } from 'node:timers/promises';
 import { EMAIL_TYPE } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { NEWSLETTER_SKIP_REASON } from '@blog/db/constants';
+import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
 import { recordEmailSend } from '@blog/db/queries/email-usage';
 import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
 import {
@@ -21,6 +22,7 @@ import {
 import { loadTenant } from '@worker/units/run-reported-step';
 import { logger } from '@worker/utils/logger/logger';
 import { buildPostSend } from '@worker/utils/newsletter-send/build-post-send';
+import { isSiteSendingPosts } from '@worker/utils/newsletter-send/is-site-sending-posts';
 import {
   loadNewsletterSendContext,
   type TNewsletterSendContext,
@@ -77,16 +79,32 @@ export async function sendNewsletterPage(
   'use step';
 
   const { tenantId, postId, afterId, pageSize } = input;
-  const pace = await readReputationPace(await loadTenant(tenantId), {
-    isWarningAlerted: false,
-  });
+  const stopped = {
+    pace: NEWSLETTER_SEND_PACE.STOPPED,
+    lastId: afterId,
+    isLastPage: true,
+  };
+  const tenant = await loadTenant(tenantId);
+  if (
+    (await getNewsletterPausedAt(tenantId)) ||
+    !(await isSiteSendingPosts(tenant))
+  ) {
+    await markNewsletterPostSkipped(
+      tenantId,
+      postId,
+      NEWSLETTER_SKIP_REASON.SITE_PAUSED,
+    );
+    return stopped;
+  }
+
+  const pace = await readReputationPace(tenant, { isWarningAlerted: false });
   if (pace === NEWSLETTER_SEND_PACE.STOPPED) {
     await markNewsletterPostSkipped(
       tenantId,
       postId,
       NEWSLETTER_SKIP_REASON.REPUTATION_STOP,
     );
-    return { pace, lastId: afterId, isLastPage: true };
+    return stopped;
   }
 
   const [context, subscribers] = await Promise.all([
