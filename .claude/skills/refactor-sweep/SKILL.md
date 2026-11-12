@@ -20,7 +20,8 @@ nobody is touching.
 Only when asked — but these are the moments to offer one:
 
 - **An epic closes** — on the layers it touched. The code has settled and no
-  open PR holds those files.
+  open PR holds those files. `report-epic-status` makes this offer under the
+  status table of the merge that closes the epic.
 - **A layer has collected three filed "already on `main`" duplication
   findings** from reviews (`reviewer.md` "Duplication is checked against the
   repo").

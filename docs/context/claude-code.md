@@ -890,7 +890,7 @@ file` are all denied alike) — an earlier version only handled the
     component, file size alone, a raw type form, a missing feature page) are
     never swept. No fixed cadence — run whenever asked, naming the layer.
     - `write-ticket` — creating an issue through `board-keeper`, the body check against the skills, the sub-issue, epic and manual-test templates, the `prio:*` labels and the `cloud-ok` criteria.
-  - `report-epic-status` — the chat-message budget and the one-table epic status format.
+  - `report-epic-status` — the chat-message budget and the one-table epic status format. When a merge closes an epic, the report ends with one offer to run `refactor-sweep` on the layers that epic touched; nothing runs without a yes.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps; it also holds the full "Delivery gate sequence", "PR conventions", the cloud-session board-evidence protocol and "Deployment".
     Two on-demand files sit beside it: `stacked-prs.md` (the `gh stack`
     mechanics, read once the user asks for a stack) and `job-label.md` (the
