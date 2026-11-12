@@ -85,3 +85,13 @@ export const STRIPE_EVENT_RECORD_OUTCOME = {
 export type TStripeEventRecordOutcome = TValueOf<
   typeof STRIPE_EVENT_RECORD_OUTCOME
 >;
+
+export const STRIPE_TENANT_LOOKUP_OUTCOME = {
+  FOUND: 'FOUND',
+  NOT_FOUND: 'NOT_FOUND',
+  CONFLICT: 'CONFLICT',
+} as const;
+
+export type TStripeTenantLookupOutcome = TValueOf<
+  typeof STRIPE_TENANT_LOOKUP_OUTCOME
+>;

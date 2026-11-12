@@ -1,3 +1,4 @@
+import { STRIPE_TENANT_LOOKUP_OUTCOME } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -12,7 +13,7 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
-let ids: TStripeIds;
+let ids: Required<TStripeIds>;
 
 beforeEach(() => {
   ids = mockStripeIds();
@@ -35,35 +36,92 @@ describe(getTenantIdByStripeIds, () => {
     it('is found when its subscription id is not stored yet', async () => {
       const result = await getTenantIdByStripeIds(ids);
 
-      expect(result).toBe(customerTenantId);
+      expect(result).toEqual({
+        outcome: STRIPE_TENANT_LOOKUP_OUTCOME.FOUND,
+        tenantId: customerTenantId,
+      });
     });
 
-    it('wins over another tenant carrying the subscription id', async () => {
-      await insertTestTenant(db(), {
+    it('is found by the customer id alone', async () => {
+      const result = await getTenantIdByStripeIds({
+        stripeCustomerId: ids.stripeCustomerId,
+      });
+
+      expect(result).toEqual({
+        outcome: STRIPE_TENANT_LOOKUP_OUTCOME.FOUND,
+        tenantId: customerTenantId,
+      });
+    });
+
+    it('conflicts with another tenant carrying the subscription id', async () => {
+      const { id: subscriptionTenantId } = await insertTestTenant(db(), {
         stripeSubscriptionId: ids.stripeSubscriptionId,
       });
 
       const result = await getTenantIdByStripeIds(ids);
 
-      expect(result).toBe(customerTenantId);
+      expect(result).toEqual({
+        outcome: STRIPE_TENANT_LOOKUP_OUTCOME.CONFLICT,
+        customerTenantId,
+        subscriptionTenantId,
+      });
     });
   });
 
-  it('finds the tenant by its subscription id when the customer id differs', async () => {
+  it('finds the tenant by its subscription id when no tenant carries the customer id', async () => {
     const { id } = await insertTestTenant(db(), {
       stripeSubscriptionId: ids.stripeSubscriptionId,
     });
 
     const result = await getTenantIdByStripeIds(ids);
 
-    expect(result).toBe(id);
+    expect(result).toEqual({
+      outcome: STRIPE_TENANT_LOOKUP_OUTCOME.FOUND,
+      tenantId: id,
+    });
   });
 
-  it('returns undefined when no tenant carries either id', async () => {
-    await insertTestTenant(db(), mockStripeIds());
+  it('finds one tenant carrying both ids', async () => {
+    const { id } = await insertTestTenant(db(), ids);
 
     const result = await getTenantIdByStripeIds(ids);
 
-    expect(result).toBeUndefined();
+    expect(result).toEqual({
+      outcome: STRIPE_TENANT_LOOKUP_OUTCOME.FOUND,
+      tenantId: id,
+    });
+  });
+
+  describe('with a stored tenant that matches neither id', () => {
+    beforeEach(async () => {
+      await insertTestTenant(db(), mockStripeIds());
+    });
+
+    it('is not found for ids no tenant carries', async () => {
+      const result = await getTenantIdByStripeIds(ids);
+
+      expect(result).toEqual({
+        outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND,
+      });
+    });
+
+    it('is not found when no id is given', async () => {
+      const result = await getTenantIdByStripeIds({});
+
+      expect(result).toEqual({
+        outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND,
+      });
+    });
+
+    it('is not found when both ids are empty strings', async () => {
+      const result = await getTenantIdByStripeIds({
+        stripeCustomerId: '',
+        stripeSubscriptionId: '',
+      });
+
+      expect(result).toEqual({
+        outcome: STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND,
+      });
+    });
   });
 });

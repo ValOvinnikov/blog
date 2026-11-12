@@ -20,7 +20,7 @@ export const MOCK_NO_BILLING = {
 export const MOCK_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_OTHER_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
 
-export function mockStripeIds(): TStripeIds {
+export function mockStripeIds(): Required<TStripeIds> {
   return {
     stripeCustomerId: `cus_${billingFaker.string.alphanumeric(14)}`,
     stripeSubscriptionId: `sub_${billingFaker.string.alphanumeric(24)}`,

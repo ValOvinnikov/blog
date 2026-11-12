@@ -3628,6 +3628,12 @@
         "file": "packages/config/src/constants/sanity-project.ts"
       },
       {
+        "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      },
+      {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
         "scope": "app:platform",
         "from": "@platform/constants/lead",
@@ -4125,6 +4131,22 @@
     "ALREADY_HANDLED": [
       {
         "ref": "STRIPE_EVENT_RECORD_OUTCOME.ALREADY_HANDLED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "FOUND": [
+      {
+        "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.FOUND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "CONFLICT": [
+      {
+        "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.CONFLICT",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/billing.ts"
