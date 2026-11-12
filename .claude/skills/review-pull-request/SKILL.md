@@ -170,24 +170,24 @@ caught it. Give the user the row in chat; it is committed with the next
 change to `.claude/` or `docs/context/`, and is never a reason to add a
 checklist line on the spot.
 
-## 7. Fix round
+## 7. Remove the worktree
 
-When the branch has new commits, repeat step 2 for the new head — its own
-worktree, never the old one moved — run step 3 there and re-dispatch every
-reviewer from step 4 on the new path, each prompt opening
-`Re-review of <old sha>` with the findings posted. A reviewer that approved
-is included: the fix commits are code it has not seen. A merge from the base in that range needs a full
-review instead.
+As soon as step 6's report is given, not when the PR merges:
+`git worktree remove <worktree>`, never `--force`, for every
+`review-pr-<n>-*` this round added. Each is detached and holds nothing of
+its own, and a fix round adds a new one. The sandbox allows writes only
+inside the session's own folder, so the command runs with the sandbox off,
+as step 2's `git worktree add` does. The user hears about a worktree only
+when the removal itself fails, with the path and git's error.
 
-## 8. Remove the worktrees
+## 8. Fix round
 
-Once the PR merges or closes: `git worktree remove <worktree>` for each
-`review-pr-<n>-*` this review added. Each is
-detached and holds nothing of its own; one that was given its own install
-before this skill stopped doing so deletes slowly and needs a generous
-timeout. From a session that is itself inside a
-worktree the command is refused (`develop-feature/worktree-cleanup.md`) —
-leave it and tell the user the path.
+When the branch has new commits, repeat step 2 for the new head, run step 3
+there and re-dispatch every reviewer from step 4 on the new path, each
+prompt opening `Re-review of <old sha>` with the findings posted. A reviewer
+that approved is included: the fix commits are code it has not seen. A merge
+from the base in that range needs a full review instead. Step 7 follows
+that round's report too.
 
 ## A PR that merged without this review
 
