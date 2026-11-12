@@ -36,7 +36,7 @@ epics: [4840, 2798, 4083, 3667]
 
 ## What it does
 
-Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator sets. The plan is a ceiling: it decides which reader-facing capabilities the site may switch on, how many languages it serves, and which tenant pages the owner sees in the platform. Inside that ceiling the owner switches each capability on or off on the Features page, and the site shows a capability only when both the plan and the toggle allow it. There is no billing, trial or self-serve plan change; the plan is a column an operator edits.
+Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator sets. The plan is a ceiling: it decides which reader-facing capabilities the site may switch on, how many languages it serves, and which tenant pages the owner sees in the platform. Inside that ceiling the owner switches each capability on or off on the Features page, and the site shows a capability only when both the plan and the toggle allow it. A site created through self-serve onboarding starts on `GROWTH` in status `TRIAL`, with `trial_ends_at` 14 days (`TRIAL_LENGTH_DAYS`) after creation and no Stripe subscription. There is no billing or self-serve plan change yet; otherwise the plan is a column an operator edits.
 
 ## Surfaces and routes
 
@@ -155,7 +155,7 @@ Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator se
 
 ## Related
 
-- #4840 — epic: platform front door. Stripe webhooks drive `plan`, `TRIAL` and `PAST_DUE` statuses, pricing rendered from `PLAN_REGISTRY` plus a price source, `FREE`-only self-serve signup.
+- #4840 — epic: platform front door. Stripe webhooks drive `plan`, `TRIAL` and `PAST_DUE` statuses, pricing rendered from `PLAN_REGISTRY` plus a price source, self-serve signup starting a Growth trial.
 - #2798 — epic: site templates, plan-layered (a Growth layer adds sections on upgrade).
 - #4083 — newsletter sending and per-plan email limits beside `PLAN_LOCALE_LIMIT`.
 - #3667 — `CONTACT_FORM` capability, `GROWTH` only.

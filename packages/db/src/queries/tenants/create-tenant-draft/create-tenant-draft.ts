@@ -1,6 +1,10 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, type TTenantPlan } from '@blog/db/constants';
+import {
+  MEMBERSHIP_ROLE,
+  TENANT_STATUS,
+  type TTenantPlan,
+} from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import { insertTenantWithDependents } from '@blog/db/queries/tenants/insert-tenant-with-dependents';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
@@ -37,6 +41,7 @@ export async function createTenantDraft(
       primaryDomain: input.domain,
       locale: normalizeLocaleCode(input.locale),
       plan: input.plan,
+      status: TENANT_STATUS.ACTIVE,
     },
     async ({ id: tenantId }) => {
       const ownerInsert =

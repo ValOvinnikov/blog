@@ -8,7 +8,6 @@ import {
   type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
-import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { deriveProvisioningState } from '@blog/db/utils/derive-provisioning-state/derive-provisioning-state';
@@ -28,8 +27,8 @@ import {
   changesProvisionedTenantDetails,
   restorableTenantFields,
   tenantDetailsFields,
-  tenantDetailsWrite,
 } from './tenant-details-fields';
+import { writeTenantDetailsRow } from './write-tenant-details-row';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -149,23 +148,12 @@ export async function updateTenantDetails(
     ownerEmailChange = found;
   }
 
-  let tenant: TMaybeUndefined<TTenant>;
-  try {
-    [tenant] = await db
-      .update(tenants)
-      .set(tenantDetailsWrite(details, !isUndefined(ownerEmailChange)))
-      .where(eq(tenants.id, tenantId))
-      .returning();
-  } catch (error) {
-    if (isFreeOwnerViolation(error)) return toOutcome(OUTCOME.OWNS_FREE_TENANT);
-    throw error;
-  }
-
-  if (!tenant) {
-    throw new Error(
-      `updateTenantDetails: update for tenant "${tenantId}" returned no row.`,
-    );
-  }
+  const tenant = await writeTenantDetailsRow(tenantId, {
+    details,
+    status: existing.status,
+    clearsUnsentReinvite: !isUndefined(ownerEmailChange),
+  });
+  if ('outcome' in tenant) return tenant;
 
   async function restoreTenantRow(original: TTenant): Promise<void> {
     await db

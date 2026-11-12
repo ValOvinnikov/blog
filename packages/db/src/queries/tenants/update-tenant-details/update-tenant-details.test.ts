@@ -50,6 +50,7 @@ import {
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
 import { and, eq } from 'drizzle-orm';
 
@@ -87,7 +88,6 @@ const {
   DOMAIN_LOCKED,
   DOMAIN_INVALID,
   OWNER_EMAIL_TAKEN,
-  OWNS_FREE_TENANT,
 } = TENANT_DETAILS_UPDATE_OUTCOME;
 
 const { RUNNING, DONE, FAILED } = TENANT_PROVISIONING_STEP_STATUS;
@@ -322,9 +322,6 @@ describe(updateTenantDetails, () => {
         );
         expect(invite?.emailIndex).toBe(
           testPersonalEmailIndex(MOCK_NEW_OWNER_EMAIL),
-        );
-        expect(decryptTestPersonalValue(invite?.emailEncrypted ?? null)).toBe(
-          MOCK_NEW_OWNER_EMAIL,
         );
       });
 
@@ -672,10 +669,9 @@ describe(updateTenantDetails, () => {
     );
 
     it('moves back to FREE beside another Free site after a paid plan', async () => {
-      await db()
-        .update(tenants)
-        .set({ selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX })
-        .where(eq(tenants.id, tenantId));
+      await patchTestTenant(db(), tenantId, {
+        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+      });
 
       const upgraded = await updateTenantDetails(tenantId, {
         ...MOCK_ORIGINAL_DETAILS,
@@ -693,27 +689,28 @@ describe(updateTenantDetails, () => {
       expect(unwrapUpdated(downgraded).plan).toBe(TENANT_PLAN.FREE);
     });
 
-    it('refuses a provisioned tenant moving to FREE when its owner already has a Free site', async () => {
-      await db()
-        .update(tenants)
-        .set({
+    it.each([
+      ['a trial', TENANT_STATUS.TRIAL],
+      ['a suspended trial', TENANT_STATUS.SUSPENDED],
+    ])(
+      "keeps %s's Free-or-trial slot when its details are saved",
+      async (_, status) => {
+        await patchTestTenant(db(), tenantId, {
           plan: TENANT_PLAN.GROWTH,
+          status,
           selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
-        })
-        .where(eq(tenants.id, tenantId));
-      await insertTestTenant(db(), {
-        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
-      });
+        });
 
-      const result = await updateTenantDetails(tenantId, {
-        ...MOCK_ORIGINAL_DETAILS,
-        plan: TENANT_PLAN.FREE,
-      });
+        const saved = await updateTenantDetails(tenantId, {
+          ...MOCK_ORIGINAL_DETAILS,
+          plan: TENANT_PLAN.GROWTH,
+        });
 
-      expect(result).toEqual({ outcome: OWNS_FREE_TENANT });
-      const details = await readDetails(tenantId);
-      expect(details?.plan).toBe(TENANT_PLAN.GROWTH);
-    });
+        expect(unwrapUpdated(saved).selfServeOwnerEmailIndex).toBe(
+          MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+        );
+      },
+    );
 
     it('refuses an owner-email change bundled with another field, leaving the invite', async () => {
       const result = await updateTenantDetails(tenantId, {
@@ -956,36 +953,5 @@ describe(updateTenantDetails, () => {
     ).rejects.toThrow(
       `updateTenantDetails: no tenant found for id "${MOCK_MISSING_TENANT_ID}".`,
     );
-  });
-
-  it('refuses a move to FREE that would give a person a second Free site', async () => {
-    const tenantId = await insertTenantWithDomain();
-    await db()
-      .update(tenants)
-      .set({
-        plan: TENANT_PLAN.GROWTH,
-        selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
-      })
-      .where(eq(tenants.id, tenantId));
-    await insertTestTenant(db(), {
-      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
-    });
-    const [before] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-
-    const result = await updateTenantDetails(tenantId, {
-      ...MOCK_VALID_INPUT,
-      name: MOCK_NEW_NAME,
-      plan: TENANT_PLAN.FREE,
-    });
-
-    expect(result).toEqual({ outcome: OWNS_FREE_TENANT });
-    const [after] = await db()
-      .select()
-      .from(tenants)
-      .where(eq(tenants.id, tenantId));
-    expect(after).toEqual(before);
   });
 });

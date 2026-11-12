@@ -6,17 +6,21 @@ import {
   PRESET_ID,
   SITE_TYPE,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
+  DAY_MS,
   MEMBERSHIP_ROLE,
   TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
+  TRIAL_LENGTH_DAYS,
 } from '@blog/db/constants';
 import type { insertAuditEvent } from '@blog/db/queries/audit-events/insert-audit-event';
 import type { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import type { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
 import { userPersonalColumns } from '@blog/db/queries/users/user-personal-data';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { MOCK_NOT_AN_ADDRESS } from '@blog/db/testing/blocked-signup-identities/fixtures';
 import { insertTestUser } from '@blog/db/testing/fixtures';
 import { testPersonalEmailIndex } from '@blog/db/testing/personal-data';
@@ -36,6 +40,7 @@ import {
   MOCK_SELF_SERVE_PADDED_DOMAIN,
   MOCK_SELF_SERVE_SCHEME_DOMAIN,
 } from '@blog/db/testing/tenants/self-serve-fixtures';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
@@ -182,15 +187,16 @@ describe(createSelfServeTenant, () => {
     await insertUser(MOCK_SELF_SERVE_OWNER_ID, MOCK_SELF_SERVE_OWNER_EMAIL);
   });
 
-  describe('for a person with no Free tenant', () => {
+  describe('for a person with no Free or trial site', () => {
     let tenantId: string;
+    let row: TMaybeUndefined<TTenant>;
 
     beforeEach(async () => {
       ({ id: tenantId } = unwrapOk(await createSelfServeTenant(MOCK_INPUT)));
+      [row] = await db().select().from(schema.tenants);
     });
 
-    it('inserts a PENDING Free tenant with the site type and no template version', async () => {
-      const [row] = await db().select().from(schema.tenants);
+    it('inserts a PENDING Growth trial with the site type and no template version', () => {
       const {
         name,
         primaryDomain,
@@ -217,12 +223,25 @@ describe(createSelfServeTenant, () => {
         name: MOCK_SELF_SERVE_NAME,
         primaryDomain: MOCK_SELF_SERVE_DOMAIN,
         locale: LOCALE_ISO_CODES.EN,
-        plan: TENANT_PLAN.FREE,
-        status: TENANT_STATUS.ACTIVE,
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.TRIAL,
         provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
         siteType: SITE_TYPE.PORTFOLIO,
         siteTemplateVersion: null,
         sanityProjectId: null,
+      });
+    });
+
+    it('ends the trial the trial length after creation, with no Stripe subscription', () => {
+      const { createdAt, trialEndsAt, stripeSubscriptionId } = row ?? {};
+
+      expect({
+        trialLength:
+          (trialEndsAt?.getTime() ?? 0) - (createdAt?.getTime() ?? 0),
+        stripeSubscriptionId,
+      }).toEqual({
+        trialLength: TRIAL_LENGTH_DAYS * DAY_MS,
+        stripeSubscriptionId: null,
       });
     });
 
@@ -288,7 +307,7 @@ describe(createSelfServeTenant, () => {
     });
   });
 
-  describe('the owner and the one-Free-tenant guard', () => {
+  describe('the owner and the one Free-or-trial site guard', () => {
     it('records the normalised owner address index on the tenant', async () => {
       const { selfServeOwnerEmailIndex } = unwrapOk(
         await createSelfServeTenant({
@@ -305,23 +324,58 @@ describe(createSelfServeTenant, () => {
       );
     });
 
-    it('frees the slot once the person Free tenant is archived', async () => {
-      const { id } = unwrapOk(await createSelfServeTenant(MOCK_INPUT));
-      await db()
-        .update(schema.tenants)
-        .set({ status: TENANT_STATUS.ARCHIVED })
-        .where(eq(schema.tenants.id, id));
+    describe('once the person holds a trial', () => {
+      let id: string;
 
-      const second = await createSelfServeTenant({
-        ...MOCK_INPUT,
-        domain: MOCK_SELF_SERVE_OTHER_DOMAIN,
+      beforeEach(async () => {
+        ({ id } = unwrapOk(await createSelfServeTenant(MOCK_INPUT)));
       });
 
-      const [secondTenant] = await db()
-        .select()
-        .from(schema.tenants)
-        .where(eq(schema.tenants.primaryDomain, MOCK_SELF_SERVE_OTHER_DOMAIN));
-      expect(second).toEqual(okResult(secondTenant));
+      it('frees the slot once the trial is archived', async () => {
+        await patchTestTenant(db(), id, { status: TENANT_STATUS.ARCHIVED });
+
+        const second = await createSelfServeTenant({
+          ...MOCK_INPUT,
+          domain: MOCK_SELF_SERVE_OTHER_DOMAIN,
+        });
+
+        const [secondTenant] = await db()
+          .select()
+          .from(schema.tenants)
+          .where(
+            eq(schema.tenants.primaryDomain, MOCK_SELF_SERVE_OTHER_DOMAIN),
+          );
+        expect(second).toEqual(okResult(secondTenant));
+      });
+
+      it('keeps the slot while the trial is suspended', async () => {
+        await patchTestTenant(db(), id, { status: TENANT_STATUS.SUSPENDED });
+
+        const second = await createSelfServeTenant({
+          ...MOCK_INPUT,
+          domain: MOCK_SELF_SERVE_OTHER_DOMAIN,
+        });
+
+        expect(second).toEqual(
+          errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT),
+        );
+      });
+
+      it('keeps the slot when the trial drops to Free', async () => {
+        await patchTestTenant(db(), id, {
+          plan: TENANT_PLAN.FREE,
+          status: TENANT_STATUS.ACTIVE,
+        });
+
+        const second = await createSelfServeTenant({
+          ...MOCK_INPUT,
+          domain: MOCK_SELF_SERVE_OTHER_DOMAIN,
+        });
+
+        expect(second).toEqual(
+          errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT),
+        );
+      });
     });
   });
 
@@ -374,7 +428,7 @@ describe(createSelfServeTenant, () => {
       ['a +tag variant of it', MOCK_SELF_SERVE_OWNER_TAGGED_EMAIL],
       ['a differently cased variant', MOCK_SELF_SERVE_OWNER_SHOUTED_EMAIL],
     ])(
-      'refuses a second Free tenant for %s and writes nothing',
+      'refuses a second site while the trial holds the slot, for %s, and writes nothing',
       async (_, email) => {
         await createSelfServeTenant(MOCK_INPUT);
 

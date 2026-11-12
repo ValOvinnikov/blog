@@ -9,7 +9,6 @@ import {
   type TTenantProvisioningStepStatus,
   type TWorkerProvisioningStep,
 } from '@blog/db/constants';
-import { sql } from 'drizzle-orm';
 import {
   integer,
   jsonb,
@@ -17,7 +16,6 @@ import {
   pgTable,
   text,
   timestamp,
-  uniqueIndex,
   uuid,
 } from 'drizzle-orm/pg-core';
 
@@ -25,6 +23,7 @@ import { timestampColumns } from './columns';
 import { tenantBillingColumns } from './tenant-billing-columns';
 import { tenantInactivityColumns } from './tenant-inactivity-columns';
 import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
+import { selfServeOwnerSlotIndex } from './tenant-self-serve-owner-index';
 
 export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);
 
@@ -75,9 +74,6 @@ export type TTenantDeprovisioningState = Record<
   TDeprovisioningStep,
   TDeprovisioningStepState
 > & { run?: TDeprovisioningRun };
-
-export const SELF_SERVE_FREE_OWNER_INDEX_NAME =
-  'tenants_self_serve_free_owner_idx';
 
 export const tenants = pgTable(
   'tenants',
@@ -132,13 +128,7 @@ export const tenants = pgTable(
     }),
     ...timestampColumns,
   },
-  (tenant) => [
-    uniqueIndex(SELF_SERVE_FREE_OWNER_INDEX_NAME)
-      .on(tenant.selfServeOwnerEmailIndex)
-      .where(
-        sql`${tenant.plan} = ${sql.raw(`'${TENANT_PLAN.FREE}'`)} and ${tenant.status} <> ${sql.raw(`'${TENANT_STATUS.ARCHIVED}'`)}`,
-      ),
-  ],
+  (tenant) => [selfServeOwnerSlotIndex(tenant)],
 );
 
 export type TTenant = typeof tenants.$inferSelect;

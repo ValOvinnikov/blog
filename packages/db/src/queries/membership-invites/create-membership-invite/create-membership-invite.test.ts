@@ -1,6 +1,7 @@
 import {
   MEMBERSHIP_INVITE_OUTCOME,
   MEMBERSHIP_ROLE,
+  PLAN_ENTITLEMENTS,
   TENANT_PLAN,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
@@ -24,7 +25,7 @@ import {
 } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { setTestTenantPlan } from '@blog/db/testing/test-tenant';
+import { patchTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
 
@@ -36,7 +37,7 @@ faker.seed(6022);
 
 const { CREATED, ALREADY_PENDING, ALREADY_CONSUMED, SEAT_LIMIT } =
   MEMBERSHIP_INVITE_OUTCOME;
-const GROWTH_SEATS = 3;
+const GROWTH_SEATS = PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].seats;
 
 const db = useQueryTestDb();
 
@@ -224,7 +225,7 @@ describe(createMembershipInvite, () => {
       it('keeps every invite after a downgrade and refuses the next', async () => {
         await inviteNew(growthTenantId);
         await inviteNew(growthTenantId);
-        await setTestTenantPlan(db(), growthTenantId, TENANT_PLAN.FREE);
+        await patchTestTenant(db(), growthTenantId, { plan: TENANT_PLAN.FREE });
 
         const result = await inviteNew(growthTenantId);
 

@@ -12,9 +12,9 @@ import { normalizeSignupEmail } from '@blog/db/utils/normalize-signup-identity/n
 import { requireEmailIndex } from '@blog/db/utils/personal-data/personal-data';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
+import { isUndefined } from '@blog/utils/primitives';
 import { and, eq, exists, ne, or } from 'drizzle-orm';
 
-// An archived tenant frees the slot; suspended and failed ones keep it.
 export async function ownsFreeTenant(
   email: string,
 ): Promise<TResult<boolean, TErrorCode>> {
@@ -41,18 +41,17 @@ export async function ownsFreeTenant(
     .from(tenants)
     .where(
       and(
-        eq(tenants.plan, TENANT_PLAN.FREE),
         ne(tenants.status, TENANT_STATUS.ARCHIVED),
         or(
           eq(
             tenants.selfServeOwnerEmailIndex,
             requireEmailIndex(address, personalDataIndex),
           ),
-          exists(ownedByAccount),
+          and(eq(tenants.plan, TENANT_PLAN.FREE), exists(ownedByAccount)),
         ),
       ),
     )
     .limit(1);
 
-  return okResult(match !== undefined);
+  return okResult(!isUndefined(match));
 }
