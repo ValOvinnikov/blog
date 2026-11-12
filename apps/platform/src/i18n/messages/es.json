@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Borrar",
     "title": "¿Borrar los datos de esta persona?",
-    "description": "Borra sus suscripciones, mensajes de contacto e invitaciones en todos los sitios, elimina las invitaciones a Studio no enviadas y libera el hueco de sitio gratuito o de prueba que ocupa su dirección. No se puede deshacer.",
+    "description": "Borra sus suscripciones, mensajes de contacto e invitaciones en todos los sitios, elimina las invitaciones a Studio no enviadas y borra la clave de propietario de autoservicio que tiene su dirección. No se puede deshacer.",
     "confirm": "Borrar datos",
     "erasing": "Borrando…",
     "includesReaderAccount": "Borrar también la cuenta de lector",

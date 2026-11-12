@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Erase",
     "title": "Erase this person's data?",
-    "description": "Deletes their subscriptions, contact messages and invites on every site, clears unsent Studio invites and frees the Free-or-trial site slot their address holds. This can't be undone.",
+    "description": "Deletes their subscriptions, contact messages and invites on every site, clears unsent Studio invites and clears the self-serve owner key their address holds. This can't be undone.",
     "confirm": "Erase data",
     "erasing": "Erasing…",
     "includesReaderAccount": "Also delete the reader account",

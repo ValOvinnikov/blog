@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Wissen",
     "title": "Gegevens van deze persoon wissen?",
-    "description": "Verwijdert hun abonnementen, contactberichten en uitnodigingen op elke site, wist niet-verstuurde Studio-uitnodigingen en geeft de plek voor een gratis site of proefperiode vrij die hun adres bezet. Dit kan niet ongedaan worden gemaakt.",
+    "description": "Verwijdert hun abonnementen, contactberichten en uitnodigingen op elke site, wist niet-verstuurde Studio-uitnodigingen en wist de selfservice-eigenaarssleutel die hun adres heeft. Dit kan niet ongedaan worden gemaakt.",
     "confirm": "Gegevens wissen",
     "erasing": "Bezig met wissen…",
     "includesReaderAccount": "Ook het lezersaccount verwijderen",

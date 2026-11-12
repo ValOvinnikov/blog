@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Löschen",
     "title": "Daten dieser Person löschen?",
-    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites, entfernt nicht gesendete Studio-Einladungen und gibt den Platz für eine kostenlose Website oder Testphase frei, den ihre Adresse belegt. Das lässt sich nicht rückgängig machen.",
+    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites, entfernt nicht gesendete Studio-Einladungen und entfernt den Self-Service-Inhaberschlüssel, den ihre Adresse hält. Das lässt sich nicht rückgängig machen.",
     "confirm": "Daten löschen",
     "erasing": "Wird gelöscht…",
     "includesReaderAccount": "Auch das Leserkonto löschen",

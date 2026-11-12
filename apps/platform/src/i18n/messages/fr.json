@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Effacer",
     "title": "Effacer les données de cette personne ?",
-    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites, efface les invitations Studio non envoyées et libère la place de site gratuit ou d’essai occupée par son adresse. Cette action est irréversible.",
+    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites, efface les invitations Studio non envoyées et efface la clé de propriétaire en libre-service associée à son adresse. Cette action est irréversible.",
     "confirm": "Effacer les données",
     "erasing": "Effacement…",
     "includesReaderAccount": "Supprimer aussi le compte lecteur",

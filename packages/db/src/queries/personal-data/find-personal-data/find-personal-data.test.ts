@@ -148,12 +148,12 @@ describe(findPersonalData, () => {
   });
 
   it('finds the audit events of the account with exactly that address', async () => {
-    const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
+    const { auditEvents } = unwrapOk(
+      await findPersonalData(MOCK_SUBSCRIBER_EMAIL),
+    );
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
     expect(
-      result.data.auditEvents.map(({ action, targetType, targetId }) => ({
+      auditEvents.map(({ action, targetType, targetId }) => ({
         action,
         targetType,
         targetId,
@@ -202,11 +202,10 @@ describe(findPersonalData, () => {
     });
 
     it('finds the reader account with providers, bookmarks and active sessions', async () => {
-      const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
+      const { readerAccount } = unwrapOk(
+        await findPersonalData(MOCK_SUBSCRIBER_EMAIL),
+      );
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) return;
-      const { readerAccount } = result.data;
       if (!readerAccount) throw new Error('Expected a reader account.');
       const { id, email, linkedProviders, activeSessionCount } = readerAccount;
       const bookmarks = readerAccount.bookmarks.map(
@@ -229,13 +228,11 @@ describe(findPersonalData, () => {
   it('finds an unsent Studio re-invite held for a +tag variant of the mailbox', async () => {
     await setUnsentStudioReinvite(tenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    const result = await findPersonalData(
-      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
+    const { unsentStudioReinvites } = unwrapOk(
+      await findPersonalData(taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL)),
     );
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.data.unsentStudioReinvites).toEqual([
+    expect(unsentStudioReinvites).toEqual([
       { tenantId, tenantName, email: MOCK_SUBSCRIBER_EMAIL },
     ]);
   });
