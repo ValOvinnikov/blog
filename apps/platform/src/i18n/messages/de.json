@@ -867,7 +867,7 @@
     },
     "navLinkStyleOptionDescription": {
       "PLAIN": "Nur Text; die Farbe ändert sich beim Überfahren",
-      "UNDERLINE": "Die aktuelle Seite ist unterstrichen",
+      "UNDERLINE": "Die aktuelle Seite und der Link unter dem Mauszeiger sind unterstrichen",
       "SOFT": "Ein getönter Hintergrund beim Überfahren und auf der aktuellen Seite",
       "PILL": "Ein abgerundeter Rahmen beim Überfahren und auf der aktuellen Seite"
     },

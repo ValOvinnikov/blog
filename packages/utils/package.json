@@ -20,6 +20,7 @@
     "./primitives": "./src/primitives/index.ts",
     "./reading-time": "./src/reading-time/index.ts",
     "./result": "./src/result/index.ts",
+    "./sanity-document-id": "./src/sanity-document-id/index.ts",
     "./to-outcome": "./src/to-outcome/index.ts",
     "./version": "./src/version/index.ts"
   },

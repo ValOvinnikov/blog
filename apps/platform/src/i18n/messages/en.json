@@ -867,7 +867,7 @@
     },
     "navLinkStyleOptionDescription": {
       "PLAIN": "Text only; the colour changes on hover",
-      "UNDERLINE": "The current page is underlined",
+      "UNDERLINE": "The current page and the link under the pointer are underlined",
       "SOFT": "A tinted background on hover and on the current page",
       "PILL": "A rounded outline on hover and on the current page"
     },

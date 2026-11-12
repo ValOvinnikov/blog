@@ -274,6 +274,22 @@
         "file": "packages/config/src/constants/toast.ts"
       }
     ],
+    "GOOGLE_ANALYTICS": [
+      {
+        "ref": "ANALYTICS_PROVIDER.GOOGLE_ANALYTICS",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/analytics-provider.ts"
+      }
+    ],
+    "PLAUSIBLE": [
+      {
+        "ref": "ANALYTICS_PROVIDER.PLAUSIBLE",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/analytics-provider.ts"
+      }
+    ],
     "WHY_NOT": [
       {
         "ref": "ASIDE_KIND.WHY_NOT",
@@ -8572,6 +8588,38 @@
         "scope": "app:web",
         "from": "@web/constants/http",
         "file": "apps/web/src/constants/http.ts"
+      }
+    ],
+    "internal_pages.secret_missing": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.SECRET_MISSING",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "internal_pages.tenant_lookup_failed": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "internal_pages.title_fetch_failed": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.TITLE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
+      }
+    ],
+    "internal_pages.path_fetch_failed": [
+      {
+        "ref": "INTERNAL_PAGES_LOG.PATH_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/internal-pages",
+        "file": "apps/web/src/constants/internal-pages.ts"
       }
     ],
     "module_renderer.unknown_module_type": [
