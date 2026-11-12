@@ -6,11 +6,10 @@ import {
   PortableText as PortableTextRoot,
   type PortableTextReactComponents,
 } from '@portabletext/react';
-import { portableTextVariants } from '@web/components/shared/portable-text/portable-text-variants';
 
+import { expandableSectionVariants } from './expandable-section-variants';
 import { FULL_BLEED_DATA_ATTR } from './full-bleed';
 
-const s = portableTextVariants();
 const expandableSectionTitle = headingVariants({ visual: 'prose-h3' });
 
 type TResolvedExpandableSectionBlock = Extract<
@@ -20,13 +19,19 @@ type TResolvedExpandableSectionBlock = Extract<
 
 export const makeExpandableSectionTypeComponent = (
   baseComponents: PortableTextReactComponents,
+  isFullBleed: boolean,
 ) => {
+  const fullBleedAttr = isFullBleed ? { [FULL_BLEED_DATA_ATTR]: '' } : {};
+
   const ExpandableSectionType = ({
     value,
   }: {
     value: TResolvedExpandableSectionBlock;
   }) => (
-    <div {...{ [FULL_BLEED_DATA_ATTR]: '' }} className={s.expandableSection()}>
+    <div
+      {...fullBleedAttr}
+      className={expandableSectionVariants({ isFullBleed })}
+    >
       <Accordion>
         <Accordion.Item>
           <Accordion.Trigger className={expandableSectionTitle}>

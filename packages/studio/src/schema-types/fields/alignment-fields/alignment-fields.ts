@@ -2,7 +2,7 @@ import {
   CONTENT_ALIGNMENT,
   type TContentAlignment,
 } from '@blog/config/constants';
-import { toTitleCase } from '@blog/utils/primitives';
+import { hasArrayGotMultipleItems, toTitleCase } from '@blog/utils/primitives';
 import { defineField, type StringDefinition } from 'sanity';
 
 type TAlignmentField = {
@@ -54,6 +54,7 @@ type TAlignmentFieldExtra = Omit<TAlignmentField, 'list'> & {
 };
 
 type TAlignmentFieldsOptions = {
+  title?: string;
   hasActions?: boolean;
   alignsItems?: boolean;
   alignsCarousel?: boolean;
@@ -63,7 +64,7 @@ type TAlignmentFieldsOptions = {
 };
 
 const joinAsList = (parts: readonly string[]) =>
-  parts.length > 1
+  hasArrayGotMultipleItems(parts)
     ? `${parts.slice(0, -1).join(', ')} and ${parts.at(-1) ?? ''}`
     : (parts[0] ?? '');
 
@@ -92,7 +93,7 @@ export const alignmentFields = (
 ) => [
   alignmentField({
     name: 'contentAlignment',
-    title: 'Content Alignment',
+    title: options.title ?? 'Content Alignment',
     description: contentAlignmentDescription(options),
     list: options.allow ?? LEFT_CENTER,
     initialValue: options.initialValue ?? CONTENT_ALIGNMENT.LEFT,

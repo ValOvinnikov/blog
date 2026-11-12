@@ -70,7 +70,10 @@ site as a 14-day Growth trial, with no card.
   visitor to sign-in.
 - A signed-in user opening `/sign-in` is sent on to its `callbackUrl`.
 - Providers come from `@blog/auth`: GitHub and Google when their credentials
-  are set, and the email magic link always.
+  are set, and the email magic link always. `SignInOptions` lists Google
+  first on both `/sign-in` and `/signup`: an owner who signs up with Google
+  (or GitHub) accepts the Sanity editor invite with the same account in one
+  click.
 - `/sign-in-error`: Auth.js's `pages.error`, public and in the panel's own
   styling. A `Verification` error (a magic link already used or expired) says
   so and links to sign-in for a new link; any other error gets a plain message
@@ -192,7 +195,8 @@ site as a 14-day Growth trial, with no card.
      text link (`BUTTON_VARIANT.LINK`), since it changes the step rather than
      navigating. Below the rows, the terms acceptance again in the 18px
      checkbox (`SIZE.LG`) (a magic link opened in another browser carries no
-     `/signup` cookie).
+     `/signup` cookie), then one sentence saying an email will come from
+     Sanity, the editor, to accept with the account used to sign up.
 
   Continue checks only the current step: the name must not be blank, and the
   address must be filled in and not known to be taken, reserved or invalid.
@@ -205,6 +209,38 @@ site as a 14-day Growth trial, with no card.
   error shows as one error `Alert` in the footer, above Back and Create site,
   with every value kept. Success redirects to
   `/dashboard`, whose site setup card follows provisioning.
+
+- **First run on `/dashboard`.** Once provisioning is READY, the owner's
+  Overview shows a "Get started" card after the site setup card and before
+  "Your site" (`getStartedFor`, `GetStartedCard`). It is for the tenant's
+  real OWNER only — never another member, an operator viewing the tenant or
+  an archived tenant — and is gone once all four steps are done; it has no
+  dismiss. Its header counts "N of 4 done" (the steps only). The body leads
+  with "Your site is live": the main address in mono, Copy address (the
+  shared `CopyButton`, icon-only at every width with its accessible name) and
+  a primary Open site, which drop under the text on a phone with Open site
+  full width. The steps describe the site's state, not who acted: an
+  operator saving Look or Voice ticks them too. Then an ordered checklist, each row
+  announced as done or not done, a done row showing its title only:
+  - **Pick a look** — done once `site_config.look_saved_at` is set, which the
+    Look save stamps (the wizard's preset does not count); links to Look.
+  - **Set your voice** — done once `site_config.voice_saved_at` is set,
+    stamped by the Voice save; links to Voice.
+  - **Accept your editor invite** — done once
+    `tenants.owner_invite_accepted_at` is set, or when the owner was never
+    invited (the Studio opens unconditionally). Until then it shows the
+    owner-access pill (Invite sent, Setting up…, Needs attention) with the
+    Studio page's Check now and Resend invite (`OwnerAccessActions`).
+  - **Write your first post** — done once `tenants.first_post_published_at`
+    is set, which `apps/web`'s revalidate webhook stamps for the first
+    published non-starter post. Greyed with no link until the owner's Studio
+    access is READY — "opens once your editor invite is accepted" before
+    then, or "once your editor access is set up" between acceptance and
+    READY — then links to the Studio.
+
+  The Look and Voice saves stamp after revalidating, best-effort
+  (`stampSavedAt`): a failed stamp is logged as
+  `site_config.saved_at_stamp_failed` and never fails the save.
 
 ## Data
 

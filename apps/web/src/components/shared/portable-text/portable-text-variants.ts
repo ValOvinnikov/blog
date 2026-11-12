@@ -13,6 +13,5 @@ export const portableTextVariants = tv({
     bulletList: ['list-disc space-y-1 pl-5'],
     numberList: ['list-decimal space-y-1 pl-5'],
     table: FULL_BLEED_TABLE,
-    expandableSection: FULL_BLEED_TABLE,
   },
 });

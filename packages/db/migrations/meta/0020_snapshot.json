@@ -1,5 +1,5 @@
 {
-  "id": "6926a494-d472-4f45-909f-4699a3f0fc6c",
+  "id": "e8456e6f-7992-4904-99bd-2b07dc588304",
   "prevId": "8a8e7a66-8c25-422c-af59-cdfb45837500",
   "version": "7",
   "dialect": "postgresql",
@@ -2049,6 +2049,61 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.tenant_analytics": {
+      "name": "tenant_analytics",
+      "schema": "",
+      "columns": {
+        "tenant_id": {
+          "name": "tenant_id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "analytics_id": {
+          "name": "analytics_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tenant_analytics_tenant_id_tenants_id_fk": {
+          "name": "tenant_analytics_tenant_id_tenants_id_fk",
+          "tableFrom": "tenant_analytics",
+          "tableTo": "tenants",
+          "columnsFrom": ["tenant_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.tenant_domains": {
       "name": "tenant_domains",
       "schema": "",
@@ -2625,7 +2680,7 @@
             }
           ],
           "isUnique": true,
-          "where": "(\"tenants\".\"plan\" = 'FREE' or \"tenants\".\"status\" = 'TRIAL') and \"tenants\".\"status\" <> 'ARCHIVED'",
+          "where": "\"tenants\".\"plan\" = 'FREE' and \"tenants\".\"status\" <> 'ARCHIVED'",
           "concurrently": false,
           "method": "btree",
           "with": {}

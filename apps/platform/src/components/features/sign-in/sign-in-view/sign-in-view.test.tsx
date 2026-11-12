@@ -1,6 +1,11 @@
 import { OAUTH_PROVIDER_IDS } from '@blog/auth/utils/oauth-providers/oauth-providers';
 import { SIGN_IN_ERROR } from '@platform/constants/sign-in';
 import { signInWithProviderAction } from '@platform/server/auth/sign-in-with-provider-action';
+import {
+  MOCK_GITHUB_BUTTON,
+  MOCK_GOOGLE_BUTTON,
+  MOCK_PROVIDER_BUTTONS,
+} from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -16,8 +21,6 @@ vi.mock('@platform/server/auth/send-sign-in-link-action', () => ({
 }));
 
 const [GITHUB_PROVIDER_ID, GOOGLE_PROVIDER_ID] = OAUTH_PROVIDER_IDS;
-const MOCK_GITHUB_BUTTON = { name: 'Continue with GitHub' };
-const MOCK_GOOGLE_BUTTON = { name: 'Continue with Google' };
 
 const setup = customRender(SignInView, {
   providerIds: OAUTH_PROVIDER_IDS,
@@ -50,6 +53,12 @@ describe(`<${SignInView.name}/>`, () => {
       expect(github).toBeVisible();
       expect(google).toBeVisible();
       expect(email).toBeVisible();
+    });
+
+    it('offers Google first', () => {
+      const [first] = screen.getAllByRole('button', MOCK_PROVIDER_BUTTONS);
+
+      expect(first).toHaveAccessibleName(MOCK_GOOGLE_BUTTON.name);
     });
 
     it('points a new visitor at sign-up', () => {

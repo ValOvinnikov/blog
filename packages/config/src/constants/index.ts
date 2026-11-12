@@ -1,6 +1,7 @@
 export * from './account-control';
 export * from './action-outcome';
 export * from './alert';
+export * from './analytics-provider';
 export * from './audit';
 export * from './auth-app';
 export * from './aside';
@@ -25,6 +26,7 @@ export * from './finding';
 export * from './footer-fine-print';
 export * from './footer-layout';
 export * from './form-status';
+export * from './grid-columns';
 export * from './header-control-shape';
 export * from './header-control-style';
 export * from './header-layout';

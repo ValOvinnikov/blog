@@ -1,28 +1,11 @@
 import type { PostTakeaways } from '@blog/config';
 import type { TTenantSanityContext } from '@blog/service/sanity/query/query';
 import { getWriteClient } from '@blog/service/sanity/write-client/write-client';
+import { toDraftId, toPublishedId } from '@blog/utils/sanity-document-id';
 
 import type { TSaveSkimDraftInput } from './types';
 
-const DRAFT_PREFIX = 'drafts.';
-
-function toDraftId(postId: string): string {
-  return postId.startsWith(DRAFT_PREFIX) ? postId : `${DRAFT_PREFIX}${postId}`;
-}
-
-function toPublishedId(postId: string): string {
-  return postId.startsWith(DRAFT_PREFIX)
-    ? postId.slice(DRAFT_PREFIX.length)
-    : postId;
-}
-
-/**
- * Patches `postTakeaways` onto a post's *draft* only — never the published
- * document — so generated takeaways always need human approval (a Studio
- * publish) before readers see them. Idempotent: re-running always targets the
- * same draft id and `.set()`s the whole object, so it only ever overwrites
- * that one field, never other draft content and never the published document.
- */
+/** Writes only to the draft, so generated takeaways need a Studio publish before readers see them. */
 export async function saveSkimDraft(
   { postId, takeaways, model }: TSaveSkimDraftInput,
   tenant: TTenantSanityContext,

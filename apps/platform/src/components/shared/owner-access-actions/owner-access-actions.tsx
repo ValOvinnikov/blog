@@ -15,16 +15,13 @@ import {
   settleAction,
   type TUnreachedAction,
 } from '@platform/utils/settle-action/settle-action';
-import { tv } from '@platform/utils/tv/tv';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useTransition } from 'react';
 
-const ACTION_BUTTON_DEFAULTS = { size: SIZE.SM } as const;
+import { ownerAccessActionsVariants } from './owner-access-actions-variants';
 
-const ownerAccessActionsVariants = tv({
-  base: ['flex flex-wrap gap-2'],
-});
+const ACTION_BUTTON_DEFAULTS = { size: SIZE.SM } as const;
 
 export type TOwnerAccessActionsProps = {
   tenantId: string;
