@@ -1,15 +1,8 @@
-import {
-  BRAND_VARIANT,
-  BUTTON_SHAPE,
-  CARD_STYLE,
-  CONTENT_ALIGNMENT,
-  DENSITY,
-  GRID_COLUMNS,
-  RADIUS_SCALE,
-} from '@blog/config';
+import { BRAND_VARIANT, CONTENT_ALIGNMENT, GRID_COLUMNS } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -81,22 +74,7 @@ export const FourColumns: TStory = {
 };
 
 export const OutlinedOnBrandTint: TStory = {
-  args: {
-    section: {
-      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-      appearance: {
-        overrides: {
-          cardStyle: CARD_STYLE.OUTLINED,
-          radiusScale: RADIUS_SCALE.XL,
-          density: DENSITY.COMPACT,
-        },
-        look: {
-          cardStyle: CARD_STYLE.ACCENT_BAR,
-          buttonShape: BUTTON_SHAPE.ROUNDED,
-        },
-      },
-    },
-  },
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
 };
 
 export const CenterAligned: TStory = {

@@ -9182,6 +9182,14 @@
         "file": "apps/web/src/constants/newsletter.ts"
       }
     ],
+    "post_latest_module.fetch_failed": [
+      {
+        "ref": "POST_LATEST_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-latest",
+        "file": "apps/web/src/constants/post-latest.ts"
+      }
+    ],
     "post_list_module.fetch_failed": [
       {
         "ref": "POST_LIST_LOG.MODULE_FETCH_FAILED",
