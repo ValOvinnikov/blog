@@ -74,7 +74,7 @@ describe(listActiveSubscribers, () => {
     expect(secondPage).toEqual(expected.slice(MOCK_PAGE_SIZE));
   });
 
-  it('lists a subscriber whose address cannot be decrypted with no address, and still reads the rest', async () => {
+  it('lists an undecryptable address as undefined and reads the rest', async () => {
     const [unreadableEmail = '', readableEmail = ''] = MOCK_ACTIVE_EMAILS;
     const unreadable = await insertTestSubscriber(
       db(),
