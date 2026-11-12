@@ -753,6 +753,7 @@
     "densityDescription": "Espacement et taille des contrôles.",
     "cardStyleLabel": "Style de carte",
     "cardStyleDescription": "Encadre chaque carte de contenu : articles, thèmes, citations, tarifs, questions fréquentes et encadrés d'appel à l'action.",
+    "cardStyleSectionNote": "Une section peut utiliser un autre style de carte. Définissez-le sur la section dans Studio.",
     "radiusScaleOptionLabel": {
       "NONE": "Aucun",
       "SM": "Petit",
@@ -761,7 +762,7 @@
       "XL": "Très grand"
     },
     "densityOptionLabel": {
-      "DEFAULT": "Par défaut",
+      "DEFAULT": "Confortable",
       "COMPACT": "Compacte"
     },
     "cardStyleOptionLabel": {

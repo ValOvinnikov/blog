@@ -1,6 +1,10 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import {
+  appearanceFieldGroups,
+  appearanceFields,
+} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
@@ -9,11 +13,21 @@ import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/modul
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Clock } from 'lucide-react';
-import { defineField, defineType, type ValidationContext } from 'sanity';
+import {
+  type ConditionalPropertyCallback,
+  defineField,
+  defineType,
+  type ValidationContext,
+} from 'sanity';
 
 type TPostLatestDocument = {
   limit?: number;
+  displayMode?: string;
 };
+
+const isCarousel: ConditionalPropertyCallback = ({ parent }) =>
+  (parent as TMaybeUndefined<TPostLatestDocument>)?.displayMode ===
+  DISPLAY_MODE.CAROUSEL;
 
 const validateCarouselHasEnoughPosts = (
   value: TMaybeUndefined<string>,
@@ -35,25 +49,31 @@ export const postLatestSchema = defineType({
   description:
     'A short list or carousel of the newest posts, used to surface recent content on any page.',
   icon: Clock,
-  fields: [
-    titleField(),
-    brandVariantField(),
-    moduleHeadingBlockField(),
-    defineField({
-      name: 'limit',
-      title: 'Limit',
-      type: 'number',
-      description: 'Maximum number of posts to show.',
-      validation: (rule) => rule.required().integer().min(1).max(12),
-    }),
-    showImagesField({ subject: 'post' }),
-    displayModeField({
-      validation: (rule) =>
-        rule.custom(validateCarouselHasEnoughPosts).warning(),
-    }),
-    ...alignmentFields([]),
-    wideLayoutField,
-  ],
+  groups: appearanceFieldGroups,
+  fields: appearanceFields({
+    content: [
+      titleField(),
+      moduleHeadingBlockField(),
+      defineField({
+        name: 'limit',
+        title: 'Limit',
+        type: 'number',
+        description: 'Maximum number of posts to show.',
+        validation: (rule) => rule.required().integer().min(1).max(12),
+      }),
+      showImagesField({ subject: 'post' }),
+    ],
+    appearance: [
+      brandVariantField(),
+      displayModeField({
+        validation: (rule) =>
+          rule.custom(validateCarouselHasEnoughPosts).warning(),
+      }),
+      ...alignmentFields([], { title: 'Heading Alignment' }),
+      wideLayoutField,
+    ],
+    columnsHidden: isCarousel,
+  }),
   preview: {
     select: {
       title: 'title',

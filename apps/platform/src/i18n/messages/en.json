@@ -753,6 +753,7 @@
     "densityDescription": "Spacing and control size.",
     "cardStyleLabel": "Card style",
     "cardStyleDescription": "Frames every content card: posts, topics, quotes, pricing, FAQ items and call-to-action boxes.",
+    "cardStyleSectionNote": "A single section can use a different card style. Set it on the section in Studio.",
     "radiusScaleOptionLabel": {
       "NONE": "None",
       "SM": "Small",
@@ -761,7 +762,7 @@
       "XL": "Extra large"
     },
     "densityOptionLabel": {
-      "DEFAULT": "Default",
+      "DEFAULT": "Comfortable",
       "COMPACT": "Compact"
     },
     "cardStyleOptionLabel": {

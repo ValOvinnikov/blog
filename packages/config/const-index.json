@@ -4226,6 +4226,38 @@
         "file": "packages/db/src/constants/email-usage.ts"
       }
     ],
+    "OK": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.OK",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "WARN": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.WARN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "SLOW": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.SLOW",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "STOP": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.STOP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
     "OWNER": [
       {
         "ref": "MEMBERSHIP_ROLE.OWNER",
@@ -4270,6 +4302,78 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "SENT": [
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SKIPPED": [
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "OVER_SUBSCRIBER_BAND": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "OVER_MONTHLY_ALLOWANCE": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "REPUTATION_STOP": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SITE_PAUSED": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SUBSCRIBER_BAND_NEAR": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "MONTHLY_ALLOWANCE_NEAR": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.MONTHLY_ALLOWANCE_NEAR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SENDING_PAUSED": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
     "LOOK": [
@@ -9252,6 +9356,14 @@
         "scope": "app:web",
         "from": "@web/constants/rss",
         "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "section_appearance.site_config_fetch_failed": [
+      {
+        "ref": "SECTION_APPEARANCE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-appearance",
+        "file": "apps/web/src/constants/section-appearance.ts"
       }
     ],
     "section_document_page.fetch_failed": [

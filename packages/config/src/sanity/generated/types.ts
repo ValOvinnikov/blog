@@ -513,13 +513,26 @@ export type Module_postLatest = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   limit?: number;
   showImages?: boolean;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   layout?: WideLayout;
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+  columns?: 'TWO' | 'THREE' | 'FOUR';
+};
+
+export type WideLayout = {
+  _type: 'wideLayout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type Module_postList = {
@@ -539,15 +552,6 @@ export type Module_postList = {
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
   columns?: 'TWO' | 'THREE' | 'FOUR';
-};
-
-export type WideLayout = {
-  _type: 'wideLayout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
 };
 
 export type ExpandableSectionText = Array<
@@ -2676,8 +2680,8 @@ export type AllSanitySchemaTypes =
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest
-  | Module_postList
   | WideLayout
+  | Module_postList
   | ExpandableSectionText
   | ListedText
   | ParagraphText

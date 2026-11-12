@@ -1,12 +1,12 @@
 import {
   BRAND_VARIANT,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
 } from '@blog/config/constants';
-import {
-  MOCK_RECENT_POSTS_HEADING,
-  mockRawPostLatestModule,
-} from '@blog/service/testing/modules/fixtures';
+import { MOCK_RECENT_POSTS_HEADING } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostLatestModule } from '@blog/service/testing/modules/post-latest/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_POST_ID,
@@ -41,6 +41,7 @@ describe(toPostLatestModule, () => {
     { showImages: true },
     { showImages: false },
     { displayMode: DISPLAY_MODE.CAROUSEL },
+    { cardStyle: CARD_STYLE.FILLED, columns: GRID_COLUMNS.THREE },
   ])('keeps an authored %o', (authored) => {
     const module = toPostLatestModule(
       mockRawPostLatestModule(authored),

@@ -67,7 +67,7 @@ describe(buildLookRowSummaries, () => {
       [LOOK_ROW.COLOUR]: 'Hue 192 · logo follows accent',
       [LOOK_ROW.BRAND]: 'Logo uploaded · No favicon',
       [LOOK_ROW.TYPE]: 'Fraunces · Inter',
-      [LOOK_ROW.SHAPE]: 'Medium · Default',
+      [LOOK_ROW.SHAPE]: 'Medium · Comfortable',
       [LOOK_ROW.CARDS]: 'Accent bar',
       [LOOK_ROW.BUTTONS]: 'Rounded · Busy label · Braille',
       [LOOK_ROW.HEADER]:

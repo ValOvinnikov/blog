@@ -753,6 +753,7 @@
     "densityDescription": "Witruimte en grootte van bedieningselementen.",
     "cardStyleLabel": "Kaartstijl",
     "cardStyleDescription": "Omlijst elke inhoudskaart: berichten, onderwerpen, citaten, prijzen, veelgestelde vragen en call-to-actionblokken.",
+    "cardStyleSectionNote": "Eén sectie kan een andere kaartstijl gebruiken. Stel die in bij de sectie in Studio.",
     "radiusScaleOptionLabel": {
       "NONE": "Geen",
       "SM": "Klein",
@@ -761,7 +762,7 @@
       "XL": "Extra groot"
     },
     "densityOptionLabel": {
-      "DEFAULT": "Standaard",
+      "DEFAULT": "Comfortabel",
       "COMPACT": "Compact"
     },
     "cardStyleOptionLabel": {

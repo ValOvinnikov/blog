@@ -7,6 +7,7 @@ import {
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_DEPROVISIONED_AT,
@@ -14,6 +15,10 @@ import {
   unwrapOk,
 } from '@blog/db/testing/tenants/fixtures';
 import { MOCK_LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
+import {
+  MOCK_RESUME_CASES,
+  pickResumedFields,
+} from '@blog/db/testing/tenants/resume';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSuspension } from './set-tenant-suspension';
@@ -21,6 +26,7 @@ import { setTenantSuspension } from './set-tenant-suspension';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock();
 
 async function insertTenant(
   status: TTenantStatus,
@@ -58,6 +64,22 @@ describe(setTenantSuspension, () => {
     expect(status).toBe(to);
     expect(storedStatus).toBe(to);
   });
+
+  it.each(MOCK_RESUME_CASES)(
+    'lifts the suspension of %s into its resumed plan, status and slot',
+    async (_, overrides, resumed) => {
+      const tenant = await insertTestTenant(db(), {
+        ...overrides,
+        status: TENANT_STATUS.SUSPENDED,
+      });
+
+      const lifted = unwrapOk(
+        await setTenantSuspension(tenant.id, TENANT_STATUS.ACTIVE),
+      );
+
+      expect(pickResumedFields(lifted)).toEqual(resumed);
+    },
+  );
 
   it('records an operator suspension over an inactivity one', async () => {
     const tenant = await insertTestTenant(db(), {

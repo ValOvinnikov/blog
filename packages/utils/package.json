@@ -14,6 +14,7 @@
     "./enqueue-signature": "./src/enqueue-signature/index.ts",
     "./hash": "./src/hash/index.ts",
     "./merge": "./src/merge/index.ts",
+    "./newsletter-unsubscribe-token": "./src/newsletter-unsubscribe-token/index.ts",
     "./normalize-email-identity": "./src/normalize-email-identity/index.ts",
     "./pagination": "./src/pagination/index.ts",
     "./preview-token": "./src/preview-token/index.ts",

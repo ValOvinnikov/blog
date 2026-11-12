@@ -9,6 +9,7 @@ import {
 } from '@blog/service/shared/expressions/module/show-images';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const postLatestModuleQuery = q
@@ -25,6 +26,7 @@ export const postLatestModuleQuery = q
     limit: sub.field('limit').notNull(),
     ...moduleWideLayoutFragment,
     ...moduleContentAlignmentLeftCenterFragment,
+    ...moduleAppearanceFragment,
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
   }))

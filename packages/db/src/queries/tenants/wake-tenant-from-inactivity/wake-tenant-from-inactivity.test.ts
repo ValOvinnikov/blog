@@ -11,6 +11,10 @@ import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_IDLE_DEPROVISIONING_STEPS } from '@blog/db/testing/tenants/fixtures';
 import { MOCK_LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
+import {
+  MOCK_RESUME_CASES,
+  pickResumedFields,
+} from '@blog/db/testing/tenants/resume';
 
 import { wakeTenantFromInactivity } from './wake-tenant-from-inactivity';
 
@@ -52,6 +56,17 @@ describe(wakeTenantFromInactivity, () => {
     expect(result).toEqual(woken);
     expect(rows).toEqual([woken]);
   });
+
+  it.each(MOCK_RESUME_CASES)(
+    'wakes %s into its resumed plan, status and slot',
+    async (_, overrides, resumed) => {
+      const tenant = await insertTenantSuspendedForInactivity(overrides);
+
+      const woken = await wakeTenantFromInactivity(tenant.id);
+
+      expect(woken && pickResumedFields(woken)).toEqual(resumed);
+    },
+  );
 
   it('wakes a tenant only once', async () => {
     const tenant = await insertTenantSuspendedForInactivity();

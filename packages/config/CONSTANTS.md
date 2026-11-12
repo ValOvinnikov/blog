@@ -331,11 +331,18 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
 
 - **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
+- **EMAIL_REPUTATION_LEVEL**: `OK`, `WARN`, `SLOW`, `STOP`
 
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
 - **MEMBERSHIP_INVITE_OUTCOME**: `CREATED`, `ALREADY_PENDING`, `ALREADY_CONSUMED`, `SEAT_LIMIT`
+
+### `@blog/db/constants` — `packages/db/src/constants/newsletter.ts`
+
+- **NEWSLETTER_POST_SEND_OUTCOME**: `SENT`, `SKIPPED`
+- **NEWSLETTER_SKIP_REASON**: `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `REPUTATION_STOP`, `SITE_PAUSED`
+- **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`
 
 ### `@blog/db/constants` — `packages/db/src/constants/row-lock.ts`
 
@@ -858,6 +865,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
 
 - **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
+
+### `@web/constants/section-appearance` — `apps/web/src/constants/section-appearance.ts`
+
+- **SECTION_APPEARANCE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"section_appearance.site_config_fetch_failed"`
 
 ### `@web/constants/section-document` — `apps/web/src/constants/section-document.ts`
 
