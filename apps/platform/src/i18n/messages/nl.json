@@ -867,7 +867,7 @@
     },
     "navLinkStyleOptionDescription": {
       "PLAIN": "Alleen tekst; de kleur verandert als je eroverheen beweegt",
-      "UNDERLINE": "De huidige pagina is onderstreept",
+      "UNDERLINE": "De huidige pagina en de link onder de aanwijzer zijn onderstreept",
       "SOFT": "Een getinte achtergrond als je eroverheen beweegt en op de huidige pagina",
       "PILL": "Een afgeronde omlijning als je eroverheen beweegt en op de huidige pagina"
     },

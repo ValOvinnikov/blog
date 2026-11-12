@@ -867,7 +867,7 @@
     },
     "navLinkStyleOptionDescription": {
       "PLAIN": "Texte seul ; la couleur change au survol",
-      "UNDERLINE": "La page actuelle est soulignée",
+      "UNDERLINE": "La page actuelle et le lien sous le pointeur sont soulignés",
       "SOFT": "Un fond teinté au survol et sur la page actuelle",
       "PILL": "Un contour arrondi au survol et sur la page actuelle"
     },
