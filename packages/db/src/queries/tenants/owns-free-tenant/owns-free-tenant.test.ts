@@ -124,6 +124,14 @@ describe(ownsFreeTenant, () => {
     expect(result).toEqual(OWNS_NONE);
   });
 
+  it('is true for a trial on a paid plan', async () => {
+    await seedMember({ plan: TENANT_PLAN.GROWTH, status: TENANT_STATUS.TRIAL });
+
+    const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
+
+    expect(result).toEqual(OWNS_ONE);
+  });
+
   it('is true for a suspended Free tenant', async () => {
     await seedMember({ status: TENANT_STATUS.SUSPENDED });
 
@@ -136,6 +144,11 @@ describe(ownsFreeTenant, () => {
     [
       'the Free tenant is archived',
       { status: TENANT_STATUS.ARCHIVED },
+      MEMBERSHIP_ROLE.OWNER,
+    ],
+    [
+      'the trial is archived',
+      { plan: TENANT_PLAN.GROWTH, status: TENANT_STATUS.ARCHIVED },
       MEMBERSHIP_ROLE.OWNER,
     ],
     [

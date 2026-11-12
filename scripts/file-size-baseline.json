@@ -50,7 +50,7 @@
   "packages/db/src/queries/site-config/upsert-site-config/validate-voice-field.ts": 127,
   "packages/db/src/queries/tenants/update-tenant-details/owner-email-change.ts": 149,
   "packages/db/src/queries/tenants/update-tenant-details/update-tenant-details.ts": 204,
-  "packages/db/src/schema/tenants.ts": 136,
+  "packages/db/src/schema/tenants.ts": 127,
   "packages/db/src/testing/fixtures.ts": 174,
   "packages/db/src/testing/tenants/fixtures.ts": 122,
   "packages/db/src/utils/sanity-management-client/sanity-api-request.ts": 125,

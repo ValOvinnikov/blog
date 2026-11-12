@@ -1,0 +1,2 @@
+DROP INDEX "tenants_self_serve_free_owner_idx";--> statement-breakpoint
+CREATE UNIQUE INDEX "tenants_self_serve_free_owner_idx" ON "tenants" USING btree ("self_serve_owner_email_index") WHERE ("tenants"."plan" = 'FREE' or "tenants"."status" = 'TRIAL') and "tenants"."status" <> 'ARCHIVED';

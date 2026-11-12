@@ -44,7 +44,7 @@ Every platform user, operator, owner or invited editor, signs in on one
 branded `/sign-in` page, and a prospect signs up on `/signup`, which offers
 the same sign-in methods and records the terms they agree to. A
 signed-in user with no workspace lands on `/onboarding`, which creates their
-Free site.
+site as a 14-day Growth trial, with no card.
 
 ## Surfaces and routes
 
@@ -213,14 +213,16 @@ Free site.
   pending `membership_invites` for the exact email, found through its keyed
   index, become `memberships`.
 - `@blog/db`'s `createSelfServeTenant`
-  writes a FREE tenant (status ACTIVE, provisioning PENDING, `site_type`),
+  writes a GROWTH tenant in status TRIAL (`trial_ends_at` `TRIAL_LENGTH_DAYS`,
+  14, after `created_at`; no Stripe customer or subscription; provisioning
+  PENDING, `site_type`),
   the OWNER membership, the `tenant_domains` row for `<slug>.<domain>`,
   `site_config` with the chosen preset and accent hue, `settings_features`
   and a `CREATED` / `TENANT` audit event with the owner as actor. `neon-http`
   has no transactions, so a failed dependent write deletes the tenant row and
   its FK cascades sweep the rest. It refuses an invalid domain or address, a
   taken domain (`DB_DUPLICATE_DOMAIN`, including a concurrent submit of the
-  same slug) and a person who already owns a Free tenant
+  same slug) and a person who already holds a Free or trial site
   (`DB_ALREADY_OWNS_FREE_TENANT`).
 - Create site (`createSiteAction`), in order: validate; check the address
   (`checkTenantSlug`) and `ownsFreeTenant` for the session's email, so a
@@ -232,9 +234,13 @@ Free site.
   `startProvisioning` and `/dashboard`, even when the enqueue failed, since
   the dashboard shows the run's state: a site still PENDING with every step
   idle gets a "setup hasn't started" notice with **Start setup**.
-- One Free tenant per person: `ownsFreeTenant(email)` is the pre-check. It
-  strips the `+tag` (`normalizeEmailIdentity`) and matches a FREE,
-  non-archived tenant whose `self_serve_owner_email_index` is that address's
+- One Free or trial site per person, at a time: Free and trial share one
+  slot. The trial belongs to the site, not the account, so archiving a site
+  frees the slot for a new trial; a per-account limit is added only if that
+  is abused. A trial that drops to Free keeps the slot it held, and one that
+  converts to a paid plan releases it. `ownsFreeTenant(email)` is the
+  pre-check. It strips the `+tag` (`normalizeEmailIdentity`) and matches a
+  non-archived tenant on FREE or in TRIAL whose `self_serve_owner_email_index` is that address's
   index — exactly what the database guard below compares, so the two never
   disagree for a self-served site — or which an OWNER membership ties to the
   account at the stripped address (operator-created Free sites). Accepted
@@ -243,7 +249,7 @@ Free site.
   keep it, and an unaccepted OWNER invite doesn't count. The database
   enforces it too: `createSelfServeTenant` stores the `+tag`-free hash in
   `tenants.self_serve_owner_email_index`, under a partial unique index over
-  FREE, non-archived rows, so two simultaneous submits can't both succeed.
+  non-archived rows that are FREE or TRIAL, so two simultaneous submits can't both succeed.
   Operator-created tenants leave it null. The index guards every write, not
   only Create site: reactivating an archived self-serve tenant
   (`reactivateTenant`, `DB_ALREADY_OWNS_FREE_TENANT`) or an operator setting
@@ -265,7 +271,8 @@ Free site.
 - Operator access is decided by an `admins` row after sign-in, never by a
   separate sign-in. The first admin is granted by hand with
   `pnpm --filter @blog/db db:seed-admin`.
-- v1 offers the FREE plan only, one Free tenant per user. Wizard,
+- Self-serve starts every site as a Growth trial, one Free or trial site per
+  user at a time. Wizard,
   card and email copy is fixed platform copy, not [Voice](./voice.md).
 - `takeCreateSiteSlot(clientKey)` allows
   at most `MAX_SITES_PER_IP_PER_DAY` (3) creates per IP and

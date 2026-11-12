@@ -7,22 +7,21 @@ import {
   type TSiteType,
 } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { insertAuditEvent } from '@blog/db/queries/audit-events/insert-audit-event';
 import { upsertSettingsFeatures } from '@blog/db/queries/settings-features/upsert-settings-features';
 import { insertSiteConfigIfMissing } from '@blog/db/queries/site-config/insert-site-config-if-missing';
 import { getTenantByDomain } from '@blog/db/queries/tenant-domains/get-tenant-by-domain';
 import { insertTenantWithDependents } from '@blog/db/queries/tenants/insert-tenant-with-dependents';
 import { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
+import { selfServeTrialValues } from '@blog/db/queries/tenants/self-serve-trial-values';
 import { memberships } from '@blog/db/schema/memberships';
 import {
   TENANT_DOMAINS_DOMAIN_UNIQUE_NAME,
   tenantDomains,
 } from '@blog/db/schema/tenant-domains';
-import {
-  SELF_SERVE_FREE_OWNER_INDEX_NAME,
-  type TTenant,
-} from '@blog/db/schema/tenants';
+import { SELF_SERVE_FREE_OWNER_INDEX_NAME } from '@blog/db/schema/tenant-self-serve-owner-index';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { uniqueViolationConstraint } from '@blog/db/utils/constraint-violation/constraint-violation';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
@@ -72,6 +71,7 @@ export async function createSelfServeTenant(
   }
 
   const db = getDb();
+  const trial = selfServeTrialValues(new Date());
 
   try {
     const tenant = await insertTenantWithDependents(
@@ -79,7 +79,7 @@ export async function createSelfServeTenant(
         name,
         primaryDomain: domain,
         locale: normalizeLocaleCode(locale),
-        plan: TENANT_PLAN.FREE,
+        ...trial,
         siteType,
         selfServeOwnerEmailIndex: requireEmailIndex(
           normalizedEmail.address,
@@ -106,7 +106,7 @@ export async function createSelfServeTenant(
           details: {
             name,
             domain,
-            plan: TENANT_PLAN.FREE,
+            plan: trial.plan,
             siteType,
             ownerUserId: owner.userId,
           },

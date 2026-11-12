@@ -1,4 +1,4 @@
-import { SELF_SERVE_FREE_OWNER_INDEX_NAME } from '@blog/db/schema/tenants';
+import { SELF_SERVE_FREE_OWNER_INDEX_NAME } from '@blog/db/schema/tenant-self-serve-owner-index';
 import { uniqueViolationConstraint } from '@blog/db/utils/constraint-violation/constraint-violation';
 
 export function isFreeOwnerViolation(error: unknown): boolean {

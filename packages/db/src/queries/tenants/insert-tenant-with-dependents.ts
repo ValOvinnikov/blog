@@ -3,7 +3,6 @@ import {
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
 import {
@@ -16,7 +15,7 @@ import { eq } from 'drizzle-orm';
 
 type TTenantDraftValues = Omit<
   typeof tenants.$inferInsert,
-  'status' | 'provisioningStatus' | 'provisioningSteps'
+  'provisioningStatus' | 'provisioningSteps'
 >;
 
 function buildIdleProvisioningSteps(): TTenantProvisioningState {
@@ -44,7 +43,6 @@ export async function insertTenantWithDependents(
     .insert(tenants)
     .values({
       ...values,
-      status: TENANT_STATUS.ACTIVE,
       provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
       provisioningSteps: buildIdleProvisioningSteps(),
     })

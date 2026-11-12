@@ -7,6 +7,8 @@ import {
   type TTenantPlan,
 } from './tenant';
 
+export const TRIAL_LENGTH_DAYS = 14;
+
 export const STRIPE_PRICE_LOOKUP_KEY = {
   STARTER_MONTHLY: 'STARTER_MONTHLY',
   STARTER_YEARLY: 'STARTER_YEARLY',
