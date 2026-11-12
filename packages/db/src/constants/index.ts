@@ -8,6 +8,7 @@ export * from './email-usage';
 export * from './lead';
 export * from './look';
 export * from './membership';
+export * from './newsletter';
 export * from './retention';
 export * from './site-config-saved-at';
 export * from './subscriber';

@@ -10,6 +10,7 @@ export type TEmailConfigResult = Omit<
   | 'replyToAddress'
   | 'footerPostalAddress'
   | 'contactRecipient'
+  | 'newsletterPausedAt'
 > & {
   logoAssetUrl: TMaybeUndefined<string>;
   senderName: TMaybeUndefined<string>;
@@ -18,20 +19,35 @@ export type TEmailConfigResult = Omit<
   contactRecipient: TMaybeUndefined<string>;
 };
 
-export function toEmailConfigResult(row: TEmailConfig): TEmailConfigResult {
+export function toEmailConfigResult({
+  id,
+  tenantId,
+  emailNewPosts,
+  createdAt,
+  updatedAt,
+  logoAssetUrl,
+  senderName,
+  replyToAddress,
+  footerPostalAddress,
+  contactRecipient,
+}: TEmailConfig): TEmailConfigResult {
   return {
-    ...row,
-    logoAssetUrl: row.logoAssetUrl ?? undefined,
-    senderName: row.senderName ?? undefined,
-    replyToAddress: row.replyToAddress ?? undefined,
-    footerPostalAddress: row.footerPostalAddress ?? undefined,
-    contactRecipient: row.contactRecipient ?? undefined,
+    id,
+    tenantId,
+    emailNewPosts,
+    createdAt,
+    updatedAt,
+    logoAssetUrl: logoAssetUrl ?? undefined,
+    senderName: senderName ?? undefined,
+    replyToAddress: replyToAddress ?? undefined,
+    footerPostalAddress: footerPostalAddress ?? undefined,
+    contactRecipient: contactRecipient ?? undefined,
   };
 }
 
 export async function getEmailConfig(
   tenantId: string,
-): Promise<TEmailConfigResult | undefined> {
+): Promise<TMaybeUndefined<TEmailConfigResult>> {
   const db = getDb();
 
   const [row] = await db

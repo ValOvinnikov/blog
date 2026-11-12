@@ -99,6 +99,7 @@ const mockEmailConfig = (
   footerPostalAddress: faker.location.streetAddress(),
   contactRecipient: null,
   emailNewPosts: EMAIL_NEW_POSTS_DEFAULT,
+  newsletterPausedAt: null,
   createdAt: MOCK_CONFIG_DATE,
   updatedAt: MOCK_CONFIG_DATE,
   ...overrides,
