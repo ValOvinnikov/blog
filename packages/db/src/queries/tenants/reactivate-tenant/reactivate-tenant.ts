@@ -2,14 +2,12 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
+import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq, sql } from 'drizzle-orm';
 
-// Reverses `archiveTenant`, but `status` only moves out of ARCHIVED — a
-// SUSPENDED tenant must stay SUSPENDED, so the reset is confined to a CASE
-// inside the same UPDATE. `deprovisionedAt` is unconditional: it is only
-// ever non-null on an archived row, so clearing it is a no-op elsewhere.
+// `deprovisionedAt` is only ever set on an archived row, so clearing it unconditionally leaves a suspended tenant as it was.
 export async function reactivateTenant(
   tenantId: string,
 ): Promise<TResult<TTenant, TErrorCode>> {
@@ -20,7 +18,9 @@ export async function reactivateTenant(
       .update(tenants)
       .set({
         deprovisionedAt: null,
-        status: sql`case when ${tenants.status} = ${TENANT_STATUS.ARCHIVED} then ${TENANT_STATUS.ACTIVE} else ${tenants.status} end`,
+        ...resumedTenantFields(
+          sql`${tenants.status} = ${TENANT_STATUS.ARCHIVED}`,
+        ),
       })
       .where(eq(tenants.id, tenantId))
       .returning();

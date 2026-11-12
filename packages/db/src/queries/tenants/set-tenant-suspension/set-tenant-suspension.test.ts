@@ -14,6 +14,10 @@ import {
   unwrapOk,
 } from '@blog/db/testing/tenants/fixtures';
 import { MOCK_LAST_ACTIVITY_AT } from '@blog/db/testing/tenants/inactivity';
+import {
+  MOCK_RESUME_CASES,
+  pickResumedFields,
+} from '@blog/db/testing/tenants/resume';
 import { eq } from 'drizzle-orm';
 
 import { setTenantSuspension } from './set-tenant-suspension';
@@ -58,6 +62,22 @@ describe(setTenantSuspension, () => {
     expect(status).toBe(to);
     expect(storedStatus).toBe(to);
   });
+
+  it.each(MOCK_RESUME_CASES)(
+    'lifts the suspension of %s into its resumed plan, status and slot',
+    async (_, overrides, resumed) => {
+      const tenant = await insertTestTenant(db(), {
+        ...overrides,
+        status: TENANT_STATUS.SUSPENDED,
+      });
+
+      const lifted = unwrapOk(
+        await setTenantSuspension(tenant.id, TENANT_STATUS.ACTIVE),
+      );
+
+      expect(pickResumedFields(lifted)).toEqual(resumed);
+    },
+  );
 
   it('records an operator suspension over an inactivity one', async () => {
     const tenant = await insertTestTenant(db(), {

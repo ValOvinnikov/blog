@@ -9,6 +9,10 @@ import {
   MOCK_DEPROVISIONED_AT,
   MOCK_MISSING_TENANT_ID,
 } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_RESUME_CASES,
+  pickResumedFields,
+} from '@blog/db/testing/tenants/resume';
 import { MOCK_SELF_SERVE_OWNER_EMAIL } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { errorResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
@@ -44,6 +48,21 @@ describe(reactivateTenant, () => {
     expect(result).toEqual({ ok: true, data: reactivated });
     expect(rows).toEqual([reactivated]);
   });
+
+  it.each(MOCK_RESUME_CASES)(
+    'reactivates %s from archive into its resumed plan, status and slot',
+    async (_, overrides, resumed) => {
+      const tenant = await insertTestTenant(db(), {
+        ...overrides,
+        status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: MOCK_DEPROVISIONED_AT,
+      });
+
+      const result = await reactivateTenant(tenant.id);
+
+      expect(result.ok && pickResumedFields(result.data)).toEqual(resumed);
+    },
+  );
 
   it.each([TENANT_STATUS.ACTIVE, TENANT_STATUS.SUSPENDED])(
     'leaves a %s tenant at that status and not deprovisioned',
