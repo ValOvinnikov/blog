@@ -9592,6 +9592,14 @@
         "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
+    "newsletter_send.page_unreadable": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.PAGE_UNREADABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
     "newsletter_send.send_failed": [
       {
         "ref": "NEWSLETTER_SEND_LOG.SEND_FAILED",

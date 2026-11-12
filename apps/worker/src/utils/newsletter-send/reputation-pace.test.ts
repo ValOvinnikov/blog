@@ -37,7 +37,7 @@ describe(readReputationPace, () => {
     vi.mocked(getEmailReputation).mockResolvedValue(reputationOf(0));
 
     await expect(
-      readReputationPace(MOCK_TENANT, { isWarningAlerted: true }),
+      readReputationPace(MOCK_TENANT, { isOperatorAlerted: true }),
     ).resolves.toBe(NEWSLETTER_SEND_PACE.NORMAL);
     expect(sendOperatorEmail).not.toHaveBeenCalled();
   });
@@ -51,14 +51,14 @@ describe(readReputationPace, () => {
 
     it('alerts the operator when asked to, and keeps sending', async () => {
       await expect(
-        readReputationPace(MOCK_TENANT, { isWarningAlerted: true }),
+        readReputationPace(MOCK_TENANT, { isOperatorAlerted: true }),
       ).resolves.toBe(NEWSLETTER_SEND_PACE.NORMAL);
       expect(sendOperatorEmail).toHaveBeenCalledOnce();
       expect(pauseNewsletter).not.toHaveBeenCalled();
     });
 
     it('does not repeat the warning when told not to', async () => {
-      await readReputationPace(MOCK_TENANT, { isWarningAlerted: false });
+      await readReputationPace(MOCK_TENANT, { isOperatorAlerted: false });
 
       expect(sendOperatorEmail).not.toHaveBeenCalled();
     });
@@ -68,7 +68,7 @@ describe(readReputationPace, () => {
     vi.mocked(getEmailReputation).mockResolvedValue(reputationOf(BOUNCE[SLOW]));
 
     await expect(
-      readReputationPace(MOCK_TENANT, { isWarningAlerted: true }),
+      readReputationPace(MOCK_TENANT, { isOperatorAlerted: true }),
     ).resolves.toBe(NEWSLETTER_SEND_PACE.SLOW);
   });
 
@@ -76,7 +76,7 @@ describe(readReputationPace, () => {
     vi.mocked(getEmailReputation).mockResolvedValue(reputationOf(BOUNCE[STOP]));
 
     await expect(
-      readReputationPace(MOCK_TENANT, { isWarningAlerted: false }),
+      readReputationPace(MOCK_TENANT, { isOperatorAlerted: false }),
     ).resolves.toBe(NEWSLETTER_SEND_PACE.STOPPED);
     expect(pauseNewsletter).toHaveBeenCalledWith(MOCK_TENANT_ID);
     expect(sendOperatorEmail).toHaveBeenCalledOnce();

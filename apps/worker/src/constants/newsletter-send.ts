@@ -4,6 +4,7 @@ export const NEWSLETTER_SEND_LOG = {
   START_FAILED: 'newsletter_send.start_failed',
   NOT_CONFIGURED: 'newsletter_send.not_configured',
   SUBSCRIBER_UNREADABLE: 'newsletter_send.subscriber_unreadable',
+  PAGE_UNREADABLE: 'newsletter_send.page_unreadable',
   SEND_FAILED: 'newsletter_send.send_failed',
   OWNER_EMAIL_FAILED: 'newsletter_send.owner_email_failed',
   OWNER_EMAIL_MISSING: 'newsletter_send.owner_email_missing',

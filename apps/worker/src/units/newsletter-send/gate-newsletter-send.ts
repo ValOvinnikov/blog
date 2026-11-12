@@ -57,7 +57,7 @@ export async function gateNewsletterSend(
     return skip(tenantId, postId, NEWSLETTER_SKIP_REASON.SITE_PAUSED);
   }
 
-  const pace = await readReputationPace(tenant, { isWarningAlerted: true });
+  const pace = await readReputationPace(tenant, { isOperatorAlerted: true });
   if (pace === NEWSLETTER_SEND_PACE.STOPPED) {
     return skip(tenantId, postId, NEWSLETTER_SKIP_REASON.REPUTATION_STOP);
   }

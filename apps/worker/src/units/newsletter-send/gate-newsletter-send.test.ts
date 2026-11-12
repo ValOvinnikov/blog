@@ -61,7 +61,7 @@ describe(gateNewsletterSend, () => {
       pace: NEWSLETTER_SEND_PACE.SLOW,
     });
     expect(readReputationPace).toHaveBeenCalledWith(MOCK_TENANT, {
-      isWarningAlerted: true,
+      isOperatorAlerted: true,
     });
     expect(markNewsletterPostSkipped).not.toHaveBeenCalled();
     expect(sendOwnerNewsletterNotice).not.toHaveBeenCalled();

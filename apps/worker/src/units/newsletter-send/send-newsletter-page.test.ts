@@ -26,6 +26,7 @@ import {
   type TNewsletterSendContext,
 } from '@worker/utils/newsletter-send/newsletter-send-context';
 import { readReputationPace } from '@worker/utils/newsletter-send/reputation-pace';
+import { FatalError } from 'workflow';
 
 import {
   sendNewsletterPage,
@@ -138,6 +139,23 @@ describe(sendNewsletterPage, () => {
     expect(sendEmail).toHaveBeenCalledExactlyOnceWith({ to: SECOND?.email });
   });
 
+  it('fails the run, logging once, when no address on a page can be read', async () => {
+    vi.mocked(listActiveSubscribers).mockResolvedValue(
+      MOCK_SUBSCRIBER_IDS.map((id) => ({ id, email: undefined })),
+    );
+
+    await expect(sendNewsletterPage(MOCK_INPUT)).rejects.toThrow(FatalError);
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledExactlyOnceWith(
+      NEWSLETTER_SEND_LOG.PAGE_UNREADABLE,
+      {
+        tenantId: MOCK_TENANT_ID,
+        postId: MOCK_POST_ID,
+        count: MOCK_SUBSCRIBER_IDS.length,
+      },
+    );
+  });
+
   it('logs a failed send, does not count it, and carries on', async () => {
     vi.mocked(sendEmail).mockRejectedValueOnce(new Error(MOCK_RESEND_DOWN));
 
@@ -196,7 +214,7 @@ describe(sendNewsletterPage, () => {
     await sendNewsletterPage(MOCK_INPUT);
 
     expect(readReputationPace).toHaveBeenCalledWith(expect.anything(), {
-      isWarningAlerted: false,
+      isOperatorAlerted: false,
     });
   });
 });

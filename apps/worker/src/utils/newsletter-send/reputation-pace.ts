@@ -9,7 +9,11 @@ import {
 } from '@blog/db/queries/email-usage';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { emailReputationLevel } from '@blog/db/utils/email-reputation-level/email-reputation-level';
-import { buildNewsletterReputationAlertEmail } from '@blog/email';
+import {
+  buildNewsletterReputationAlertEmail,
+  NEWSLETTER_REPUTATION_ALERT_LEVEL,
+  type TNewsletterReputationAlertLevel,
+} from '@blog/email';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
@@ -22,7 +26,7 @@ import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-em
 async function alertReputation(
   { id: tenantId, name: tenantName }: TTenant,
   reputation: IEmailReputation,
-  isSendingPaused: boolean,
+  level: TNewsletterReputationAlertLevel,
 ): Promise<void> {
   const adminUrl = env.PLATFORM_APP_BASE_URL;
   if (!adminUrl) {
@@ -37,7 +41,7 @@ async function alertReputation(
       tenantId,
       ...reputation,
       windowDays: EMAIL_REPUTATION_WINDOW_DAYS,
-      isSendingPaused,
+      level,
       adminUrl,
     }),
     {
@@ -49,19 +53,36 @@ async function alertReputation(
 
 export async function readReputationPace(
   tenant: TTenant,
-  { isWarningAlerted }: { isWarningAlerted: boolean },
+  { isOperatorAlerted }: { isOperatorAlerted: boolean },
 ): Promise<TNewsletterSendPace> {
   const reputation = await getEmailReputation(tenant.id);
 
   switch (emailReputationLevel(reputation)) {
     case EMAIL_REPUTATION_LEVEL.STOP:
       await pauseNewsletter(tenant.id);
-      await alertReputation(tenant, reputation, true);
+      await alertReputation(
+        tenant,
+        reputation,
+        NEWSLETTER_REPUTATION_ALERT_LEVEL.STOP,
+      );
       return NEWSLETTER_SEND_PACE.STOPPED;
     case EMAIL_REPUTATION_LEVEL.SLOW:
+      if (isOperatorAlerted) {
+        await alertReputation(
+          tenant,
+          reputation,
+          NEWSLETTER_REPUTATION_ALERT_LEVEL.SLOW,
+        );
+      }
       return NEWSLETTER_SEND_PACE.SLOW;
     case EMAIL_REPUTATION_LEVEL.WARN:
-      if (isWarningAlerted) await alertReputation(tenant, reputation, false);
+      if (isOperatorAlerted) {
+        await alertReputation(
+          tenant,
+          reputation,
+          NEWSLETTER_REPUTATION_ALERT_LEVEL.WARN,
+        );
+      }
       return NEWSLETTER_SEND_PACE.NORMAL;
     case EMAIL_REPUTATION_LEVEL.OK:
       return NEWSLETTER_SEND_PACE.NORMAL;
