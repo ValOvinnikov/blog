@@ -5,6 +5,7 @@ import {
   EMAIL_ACCOUNT,
   type TEmailAccount,
 } from '@blog/email/transport/email-account';
+import { SendEmailError } from '@blog/email/transport/send-email-error';
 import { env } from '@blog/email/utils/env/env';
 import { isUndefined } from '@blog/utils/primitives';
 import { Resend } from 'resend';
@@ -88,6 +89,6 @@ export async function sendEmail({
     : emails.send(payload, { idempotencyKey }));
 
   if (error) {
-    throw new Error(`Failed to send email via Resend: ${error.message}`);
+    throw new SendEmailError(error.message, error.statusCode, error.name);
   }
 }
