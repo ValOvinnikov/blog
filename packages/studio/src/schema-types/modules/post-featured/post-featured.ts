@@ -1,10 +1,11 @@
-import {
-  CONTENT_ALIGNMENT,
-  POST_SOURCE,
-  type TPostSource,
-} from '@blog/config/constants';
+import { POST_SOURCE, type TPostSource } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { PAGE_POST_TYPE } from '@blog/studio/schema-types/documents/pages/post/post-type';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import {
+  appearanceFieldGroups,
+  appearanceFields,
+} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
@@ -14,7 +15,7 @@ import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/modul
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { validateNewestFeaturedHasCandidate } from '@blog/studio/schema-types/validation/validate-newest-featured-has-candidate/validate-newest-featured-has-candidate';
-import { toTitleCase } from '@blog/utils/primitives';
+import { hasLength, toTitleCase } from '@blog/utils/primitives';
 import { Pin } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -39,88 +40,99 @@ export const postFeaturedSchema = defineType({
       description: 'Which posts this spotlight features.',
     },
   ],
-  fields: [
-    titleField(),
-    brandVariantField(),
-    moduleHeadingBlockField(),
-    defineField({
-      name: 'postSource',
-      title: 'Source',
-      type: 'string',
-      fieldset: POSTS_FIELDSET,
-      description:
-        'Specific posts you pin, or the newest posts marked Featured.',
-      options: {
-        layout: 'dropdown',
-        list: Object.values(POST_SOURCE).map((value) => ({
-          title: toTitleCase(value),
-          value,
-        })),
-      },
-      initialValue: POST_SOURCE.PINNED,
-      validation: (rule) =>
-        rule.required().custom(validateNewestFeaturedHasCandidate('spotlight')),
-    }),
-    defineField({
-      name: 'posts',
-      title: 'Pinned Posts',
-      type: 'array',
-      fieldset: POSTS_FIELDSET,
-      description: 'In display order — the first is the lead post.',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{ type: PAGE_POST_TYPE }],
-          options: { filter: publishedPostFilter },
-        }),
-      ],
-      hidden: ({ parent }) =>
-        (parent as TPostFeaturedDocument | undefined)?.postSource !==
-        POST_SOURCE.PINNED,
-      validation: (rule) => [
-        rule.unique().error('A post can only be pinned once.'),
-        rule.max(3).error('A spotlight holds at most three posts.'),
-        rule.custom((value, context) => {
-          const parent = context.parent as TPostFeaturedDocument | undefined;
+  groups: appearanceFieldGroups,
+  fields: appearanceFields({
+    content: [
+      titleField(),
+      moduleHeadingBlockField(),
+      defineField({
+        name: 'postSource',
+        title: 'Source',
+        type: 'string',
+        fieldset: POSTS_FIELDSET,
+        description:
+          'Specific posts you pin, or the newest posts marked Featured.',
+        options: {
+          layout: 'dropdown',
+          list: Object.values(POST_SOURCE).map((value) => ({
+            title: toTitleCase(value),
+            value,
+          })),
+        },
+        initialValue: POST_SOURCE.PINNED,
+        validation: (rule) =>
+          rule
+            .required()
+            .custom(validateNewestFeaturedHasCandidate('spotlight')),
+      }),
+      defineField({
+        name: 'posts',
+        title: 'Pinned Posts',
+        type: 'array',
+        fieldset: POSTS_FIELDSET,
+        description: 'In display order — the first is the lead post.',
+        of: [
+          defineArrayMember({
+            type: 'reference',
+            to: [{ type: PAGE_POST_TYPE }],
+            options: { filter: publishedPostFilter },
+          }),
+        ],
+        hidden: ({ parent }) =>
+          (parent as TMaybeUndefined<TPostFeaturedDocument>)?.postSource !==
+          POST_SOURCE.PINNED,
+        validation: (rule) => [
+          rule.unique().error('A post can only be pinned once.'),
+          rule.max(3).error('A spotlight holds at most three posts.'),
+          rule.custom((value, context) => {
+            const parent =
+              context.parent as TMaybeUndefined<TPostFeaturedDocument>;
 
-          return parent?.postSource === POST_SOURCE.PINNED &&
-            (!value || value.length === 0)
-            ? 'Pin at least one post, or switch the source to Newest featured.'
-            : true;
-        }),
-      ],
-    }),
-    defineField({
-      name: 'limit',
-      title: 'Limit',
-      type: 'number',
-      fieldset: POSTS_FIELDSET,
-      description: 'Maximum number of newest featured posts to show.',
-      initialValue: 3,
-      hidden: ({ parent }) =>
-        (parent as TPostFeaturedDocument | undefined)?.postSource !==
-        POST_SOURCE.NEWEST_FEATURED,
-      validation: (rule) =>
-        rule
-          .integer()
-          .min(1)
-          .max(3)
-          .custom((value, context) => {
-            const parent = context.parent as TPostFeaturedDocument | undefined;
-
-            return parent?.postSource === POST_SOURCE.NEWEST_FEATURED && !value
-              ? 'Limit is required, or switch the source to Pinned.'
+            return parent?.postSource === POST_SOURCE.PINNED &&
+              !hasLength(value)
+              ? 'Pin at least one post, or switch the source to Newest featured.'
               : true;
           }),
-    }),
-    showImagesField({ subject: 'post' }),
-    displayModeField(),
-    ...alignmentFields([], {
-      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-      alignsCarousel: true,
-    }),
-    wideLayoutField,
-  ],
+        ],
+      }),
+      defineField({
+        name: 'limit',
+        title: 'Limit',
+        type: 'number',
+        fieldset: POSTS_FIELDSET,
+        description: 'Maximum number of newest featured posts to show.',
+        initialValue: 3,
+        hidden: ({ parent }) =>
+          (parent as TMaybeUndefined<TPostFeaturedDocument>)?.postSource !==
+          POST_SOURCE.NEWEST_FEATURED,
+        validation: (rule) =>
+          rule
+            .integer()
+            .min(1)
+            .max(3)
+            .custom((value, context) => {
+              const parent =
+                context.parent as TMaybeUndefined<TPostFeaturedDocument>;
+
+              return parent?.postSource === POST_SOURCE.NEWEST_FEATURED &&
+                !value
+                ? 'Limit is required, or switch the source to Pinned.'
+                : true;
+            }),
+      }),
+      showImagesField({ subject: 'post' }),
+    ],
+    appearance: [
+      brandVariantField(),
+      displayModeField(),
+      ...alignmentFields([], {
+        title: 'Heading Alignment',
+        alignsCarousel: true,
+      }),
+      wideLayoutField,
+    ],
+    hasColumns: false,
+  }),
   preview: {
     select: {
       title: 'title',
