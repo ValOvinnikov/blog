@@ -5,10 +5,30 @@ import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-vio
 import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
-import { eq, sql } from 'drizzle-orm';
+import { eq, type SQL, sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 
-// `deprovisionedAt` is only ever set on an archived row, so clearing it unconditionally leaves a suspended tenant as it was.
 const isArchived = sql`${tenants.status} = ${TENANT_STATUS.ARCHIVED}`;
+
+function whenArchived(column: AnyPgColumn, value: SQL = sql`null`): SQL {
+  return sql`case when ${isArchived} then ${value} else ${column} end`;
+}
+
+function reactivatedFields(now: Date) {
+  return {
+    deprovisionedAt: whenArchived(tenants.deprovisionedAt),
+    deprovisioningSteps: whenArchived(tenants.deprovisioningSteps),
+    lastActivityAt: whenArchived(
+      tenants.lastActivityAt,
+      sql`${sql.param(now, tenants.lastActivityAt)}::timestamp`,
+    ),
+    inactivityWarnedAt: whenArchived(tenants.inactivityWarnedAt),
+    deletionNotifiedAt: whenArchived(tenants.deletionNotifiedAt),
+    suspendedAt: whenArchived(tenants.suspendedAt),
+    suspensionReason: whenArchived(tenants.suspensionReason),
+    ...resumedTenantFields({ isResuming: isArchived, now }),
+  };
+}
 
 export async function reactivateTenant(
   tenantId: string,
@@ -18,11 +38,7 @@ export async function reactivateTenant(
   try {
     const [tenant] = await db
       .update(tenants)
-      .set({
-        deprovisionedAt: null,
-        deprovisioningSteps: sql`case when ${isArchived} then null else ${tenants.deprovisioningSteps} end`,
-        ...resumedTenantFields(isArchived),
-      })
+      .set(reactivatedFields(new Date()))
       .where(eq(tenants.id, tenantId))
       .returning();
 

@@ -17,7 +17,14 @@ function suspensionStamp(status: TSuspensionStatus) {
         status: TENANT_STATUS.SUSPENDED,
         suspensionReason: SUSPENSION_REASON.OPERATOR,
       }
-    : { ...resumedTenantFields(), suspendedAt: null, suspensionReason: null };
+    : {
+        ...resumedTenantFields({
+          isResuming: eq(tenants.status, TENANT_STATUS.SUSPENDED),
+          now: new Date(),
+        }),
+        suspendedAt: null,
+        suspensionReason: null,
+      };
 }
 
 export async function setTenantSuspension(

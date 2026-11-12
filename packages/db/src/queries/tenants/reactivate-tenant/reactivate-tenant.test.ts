@@ -1,9 +1,12 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import {
+  INACTIVITY_STAGE,
   SUSPENSION_REASON,
+  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
+import { listTenantsDueForInactivityStage } from '@blog/db/queries/tenants/list-tenants-due-for-inactivity-stage';
 import { wakeTenantFromInactivity } from '@blog/db/queries/tenants/wake-tenant-from-inactivity';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
@@ -15,6 +18,10 @@ import {
   MOCK_IDLE_DEPROVISIONING_STEPS,
   MOCK_MISSING_TENANT_ID,
 } from '@blog/db/testing/tenants/fixtures';
+import {
+  daysAfterLastActivity,
+  MOCK_LAST_ACTIVITY_AT,
+} from '@blog/db/testing/tenants/inactivity';
 import {
   MOCK_RESUME_CASES,
   pickResumedFields,
@@ -100,6 +107,44 @@ describe(reactivateTenant, () => {
     const woken = await wakeTenantFromInactivity(tenant.id);
 
     expect(woken?.status).toBe(TENANT_STATUS.ACTIVE);
+  });
+
+  it.each([INACTIVITY_STAGE.SUSPENSION, INACTIVITY_STAGE.DEPROVISIONING])(
+    'restarts the inactivity lifecycle, so a tenant deleted for inactivity is not due for %s',
+    async (stage) => {
+      const tenant = await insertTestTenant(db(), {
+        status: TENANT_STATUS.ARCHIVED,
+        deprovisionedAt: MOCK_DEPROVISIONED_AT,
+        lastActivityAt: MOCK_LAST_ACTIVITY_AT,
+        inactivityWarnedAt: daysAfterLastActivity(23),
+        suspendedAt: daysAfterLastActivity(30),
+        suspensionReason: SUSPENSION_REASON.INACTIVITY,
+        deletionNotifiedAt: daysAfterLastActivity(50),
+        deprovisioningSteps: {
+          ...MOCK_IDLE_DEPROVISIONING_STEPS,
+          run: { startedAt: daysAfterLastActivity(60).toISOString() },
+        },
+      });
+
+      await reactivateTenant(tenant.id);
+
+      const due = await listTenantsDueForInactivityStage(stage, MOCK_NOW);
+      expect(due).toEqual([]);
+    },
+  );
+
+  it('leaves a suspended trial with recorded deletion steps exactly as it was', async () => {
+    const tenant = await insertTestTenant(db(), {
+      status: TENANT_STATUS.SUSPENDED,
+      plan: TENANT_PLAN.GROWTH,
+      trialEndsAt: MOCK_DEPROVISIONED_AT,
+      deprovisioningSteps: MOCK_IDLE_DEPROVISIONING_STEPS,
+    });
+    const unchanged = { ...tenant, updatedAt: MOCK_NOW };
+
+    const result = await reactivateTenant(tenant.id);
+
+    expect(result).toEqual({ ok: true, data: unchanged });
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

@@ -1,5 +1,7 @@
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
+import { createMockFaker } from '@blog/db/testing/mock-faker';
 import { mockStripeIds } from '@blog/db/testing/tenants/billing';
 import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@blog/db/testing/tenants/self-serve-fixtures';
 
@@ -8,9 +10,9 @@ type TResumedFields = Pick<
   'plan' | 'status' | 'selfServeOwnerEmailIndex'
 >;
 
-const MOCK_TRIAL_ENDS_LATER = new Date('2999-01-01T00:00:00.000Z');
-const MOCK_TRIAL_ENDED = new Date('2000-01-01T00:00:00.000Z');
-const key = MOCK_SELF_SERVE_OWNER_EMAIL_INDEX;
+const resumeFaker = createMockFaker(6874);
+const MOCK_TRIAL_ENDS_LATER = resumeFaker.date.soon({ refDate: MOCK_NOW });
+const MOCK_TRIAL_ENDED = resumeFaker.date.recent({ refDate: MOCK_NOW });
 
 export const MOCK_RESUME_CASES: [string, Partial<TTenant>, TResumedFields][] = [
   [
@@ -18,12 +20,12 @@ export const MOCK_RESUME_CASES: [string, Partial<TTenant>, TResumedFields][] = [
     {
       plan: TENANT_PLAN.GROWTH,
       trialEndsAt: MOCK_TRIAL_ENDS_LATER,
-      selfServeOwnerEmailIndex: key,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
     },
     {
       plan: TENANT_PLAN.GROWTH,
       status: TENANT_STATUS.TRIAL,
-      selfServeOwnerEmailIndex: key,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
     },
   ],
   [
@@ -31,12 +33,12 @@ export const MOCK_RESUME_CASES: [string, Partial<TTenant>, TResumedFields][] = [
     {
       plan: TENANT_PLAN.GROWTH,
       trialEndsAt: MOCK_TRIAL_ENDED,
-      selfServeOwnerEmailIndex: key,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
     },
     {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
-      selfServeOwnerEmailIndex: key,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
     },
   ],
   [
@@ -45,7 +47,7 @@ export const MOCK_RESUME_CASES: [string, Partial<TTenant>, TResumedFields][] = [
       plan: TENANT_PLAN.GROWTH,
       trialEndsAt: MOCK_TRIAL_ENDED,
       stripeSubscriptionId: mockStripeIds().stripeSubscriptionId,
-      selfServeOwnerEmailIndex: key,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
     },
     {
       plan: TENANT_PLAN.GROWTH,
@@ -55,11 +57,14 @@ export const MOCK_RESUME_CASES: [string, Partial<TTenant>, TResumedFields][] = [
   ],
   [
     'a Free site',
-    { plan: TENANT_PLAN.FREE, selfServeOwnerEmailIndex: key },
+    {
+      plan: TENANT_PLAN.FREE,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+    },
     {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.ACTIVE,
-      selfServeOwnerEmailIndex: key,
+      selfServeOwnerEmailIndex: MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
     },
   ],
 ];

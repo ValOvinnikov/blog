@@ -15,7 +15,7 @@ export async function wakeTenantFromInactivity(
   const [woken] = await getDb()
     .update(tenants)
     .set({
-      ...resumedTenantFields(),
+      ...resumedTenantFields({ isResuming: sql`true`, now: new Date() }),
       suspendedAt: null,
       suspensionReason: null,
     })

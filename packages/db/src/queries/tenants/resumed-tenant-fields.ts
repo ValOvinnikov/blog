@@ -4,15 +4,24 @@ import {
   tenants,
   tenantStatusEnum,
 } from '@blog/db/schema/tenants';
-import { type SQL, sql } from 'drizzle-orm';
+import { lte, type SQL, sql } from 'drizzle-orm';
 
 const isUnpaidTrial = sql`(${tenants.trialEndsAt} is not null and ${tenants.stripeSubscriptionId} is null)`;
-const hasTrialEnded = sql`${tenants.trialEndsAt} <= now()`;
 const statusType = sql.raw(tenantStatusEnum.enumName);
 const planType = sql.raw(tenantPlanEnum.enumName);
 
+type TResumedTenantFieldsInput = {
+  isResuming: SQL;
+  now: Date;
+};
+
 // A trial resumes as a trial (Free once it has ended) and a paid site gives up the Free-or-trial slot; rows where `isResuming` is false keep every field.
-export function resumedTenantFields(isResuming: SQL = sql`true`) {
+export function resumedTenantFields({
+  isResuming,
+  now,
+}: TResumedTenantFieldsInput) {
+  const hasTrialEnded = lte(tenants.trialEndsAt, now);
+
   return {
     status: sql`case when ${isResuming} then (case when ${isUnpaidTrial} and not ${hasTrialEnded} then ${TENANT_STATUS.TRIAL} else ${TENANT_STATUS.ACTIVE} end)::${statusType} else ${tenants.status} end`,
     plan: sql`case when ${isResuming} and ${isUnpaidTrial} and ${hasTrialEnded} then ${TENANT_PLAN.FREE}::${planType} else ${tenants.plan} end`,

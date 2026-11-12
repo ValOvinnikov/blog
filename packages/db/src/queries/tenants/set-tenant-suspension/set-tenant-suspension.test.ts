@@ -7,6 +7,7 @@ import {
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   MOCK_DEPROVISIONED_AT,
@@ -25,6 +26,7 @@ import { setTenantSuspension } from './set-tenant-suspension';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock();
 
 async function insertTenant(
   status: TTenantStatus,
