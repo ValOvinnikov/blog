@@ -4,10 +4,12 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { MOCK_CORRUPT_PERSONAL_VALUE } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_ACTIVE_SUBSCRIBER } from '@blog/db/testing/subscribers/fixtures';
 import { useTestTenant } from '@blog/db/testing/test-tenant';
 import { faker } from '@faker-js/faker';
+import { eq } from 'drizzle-orm';
 
 import { listActiveSubscribers } from './list-active-subscribers';
 
@@ -70,6 +72,39 @@ describe(listActiveSubscribers, () => {
 
     expect(firstPage).toEqual(expected.slice(0, MOCK_PAGE_SIZE));
     expect(secondPage).toEqual(expected.slice(MOCK_PAGE_SIZE));
+  });
+
+  it('lists an undecryptable address as undefined and reads the rest', async () => {
+    const [unreadableEmail = '', readableEmail = ''] = MOCK_ACTIVE_EMAILS;
+    const unreadable = await insertTestSubscriber(
+      db(),
+      tenantId,
+      unreadableEmail,
+      MOCK_ACTIVE_SUBSCRIBER,
+    );
+    const readable = await insertTestSubscriber(
+      db(),
+      tenantId,
+      readableEmail,
+      MOCK_ACTIVE_SUBSCRIBER,
+    );
+    await db()
+      .update(schema.subscribers)
+      .set({ emailEncrypted: MOCK_CORRUPT_PERSONAL_VALUE })
+      .where(eq(schema.subscribers.id, unreadable.id));
+
+    const page = await listActiveSubscribers(
+      tenantId,
+      MOCK_PAGE_SIZE,
+      undefined,
+    );
+
+    expect(page).toEqual(
+      expect.arrayContaining([
+        { id: unreadable.id, email: undefined },
+        { id: readable.id, email: readableEmail },
+      ]),
+    );
   });
 
   it('returns an empty page past the last subscriber', async () => {

@@ -1,6 +1,7 @@
 import { MOCK_USER_EMAIL } from '@blog/db/testing/fixtures';
 import {
   decryptTestPersonalValue,
+  MOCK_CORRUPT_PERSONAL_VALUE,
   mockAccountEmailIndex,
   testPersonalEmailIndex,
 } from '@blog/db/testing/personal-data';
@@ -9,6 +10,7 @@ import { accountEmailIndex, personalDataIndex } from '@blog/utils/encryption';
 import {
   decryptOptionalPersonalValue,
   decryptPersonalValue,
+  decryptPersonalValueOrUndefined,
   emailColumns,
   encryptPersonalValue,
   requireEmailIndex,
@@ -17,6 +19,8 @@ import {
 
 const ENCRYPTION_KEY_MISSING =
   'PERSONAL_DATA_ENCRYPTION_KEY is not configured.';
+
+const MOCK_UNKNOWN_VERSION_VALUE = 'v9:not-a-valid-payload';
 
 const INDEXERS = [
   {
@@ -49,6 +53,22 @@ describe('with both personal data keys configured', () => {
     expect(
       decryptOptionalPersonalValue(encryptPersonalValue(MOCK_USER_EMAIL)),
     ).toBe(MOCK_USER_EMAIL);
+  });
+
+  it('decrypts a value it encrypted when asked for an optional result', () => {
+    expect(
+      decryptPersonalValueOrUndefined(encryptPersonalValue(MOCK_USER_EMAIL)),
+    ).toBe(MOCK_USER_EMAIL);
+  });
+
+  it.each([
+    ['under an unknown key version', MOCK_UNKNOWN_VERSION_VALUE],
+    [
+      'with a corrupt payload under a known version',
+      MOCK_CORRUPT_PERSONAL_VALUE,
+    ],
+  ])('reads no value it cannot decrypt %s', (_, encrypted) => {
+    expect(decryptPersonalValueOrUndefined(encrypted)).toBeUndefined();
   });
 
   it('reads no optional value when none is stored', () => {
@@ -105,9 +125,25 @@ describe('with no personal data keys configured', () => {
     );
   });
 
+  it('refuses to decrypt even when asked for an optional result', () => {
+    expect(() => decryptPersonalValueOrUndefined(MOCK_USER_EMAIL)).toThrow(
+      ENCRYPTION_KEY_MISSING,
+    );
+  });
+
   it('refuses an index lookup', () => {
     expect(() => requireEmailIndex(MOCK_USER_EMAIL, personalDataIndex)).toThrow(
       'PERSONAL_DATA_INDEX_KEY is not configured.',
     );
+  });
+});
+
+describe('with a malformed personal data keyring', () => {
+  beforeEach(() => {
+    vi.stubEnv('PERSONAL_DATA_ENCRYPTION_KEY', 'not-a-keyring');
+  });
+
+  it('refuses an optional decrypt', () => {
+    expect(() => decryptPersonalValueOrUndefined(MOCK_USER_EMAIL)).toThrow();
   });
 });

@@ -13,6 +13,8 @@ import { isNull } from '@blog/utils/primitives';
 
 const TEST_KEYRING = `v1:${MOCK_ENCRYPTION_KEY}`;
 
+export const MOCK_CORRUPT_PERSONAL_VALUE = 'v1:not-a-valid-payload';
+
 export const TEST_PERSONAL_DATA_ENV = {
   PERSONAL_DATA_ENCRYPTION_KEY: TEST_KEYRING,
   PERSONAL_DATA_INDEX_KEY: MOCK_OTHER_ENCRYPTION_KEY,

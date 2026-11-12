@@ -1,4 +1,4 @@
-import type { TMaybeNull } from '@blog/config/types';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import { env } from '@blog/db/utils/env/env';
 import {
   accountEmailIndex,
@@ -22,6 +22,18 @@ export function encryptPersonalValue(value: string): string {
 
 export function decryptPersonalValue(encrypted: string): string {
   return decryptPersonalData(encrypted, requireEncryptionKeyring());
+}
+
+/** Undefined for a value the configured keyring cannot decrypt; an unset or malformed keyring throws. */
+export function decryptPersonalValueOrUndefined(
+  encrypted: string,
+): TMaybeUndefined<string> {
+  const keyring = requireEncryptionKeyring();
+  try {
+    return decryptPersonalData(encrypted, keyring);
+  } catch {
+    return undefined;
+  }
 }
 
 export function decryptOptionalPersonalValue(
