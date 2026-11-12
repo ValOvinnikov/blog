@@ -137,12 +137,14 @@ A prompt that opens `PR review of #<n>` reviews an open pull request
   must equal the head SHA the prompt names; a mismatch is blocking.
 - The **Examined** and **Reuse** sections come from the PR body. A PR body
   missing either is the §6 Reuse finding.
-- The orchestrator runs `pnpm verify` and `pnpm check:clones` itself, or CI
-  already ran verify. Do not wait for either or repeat them, and run §0's
+- `pnpm verify` is not run on a PR: the session that opened it ran it, CI
+  requires it before merge, and the orchestrator ran the checks CI has no
+  step for and the clone scan, whose result the prompt gives. Run §0's
   other scripts as `node scripts/<name>.mjs`, in a re-review too — a
   sandboxed subagent cannot write in the review worktree, so `pnpm` fails
-  there. Prefix them with the `TOUCHED_BASE_REF` the prompt gives when the
-  PR's base is not `main`.
+  there. When the PR's base is not `main`, set the `TOUCHED_BASE_REF` the
+  prompt gives directly before `node`, after the `cd` — written before the
+  `cd` it never reaches the script.
 
 A draft PR is the expected state, never a finding.
 

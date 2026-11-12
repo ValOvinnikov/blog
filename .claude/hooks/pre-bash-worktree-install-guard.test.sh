@@ -23,8 +23,19 @@ fails=0
 # at a scratch dir with a symlinked node_modules for every case below. A
 # companion case near the end proves the guard stays inert when
 # node_modules is a real directory (the primary checkout's shape).
-scratch=$(mktemp -d)
-target=$(mktemp -d)
+# An empty path from a failed mktemp would point every fixture, and the
+# cleanup's rm -rf, at the current directory.
+require_dir() {
+	if [ -z "$1" ] || [ ! -d "$1" ]; then
+		echo 'pre-bash-worktree-install-guard: mktemp failed; no fixture directory, nothing was run'
+		exit 1
+	fi
+}
+
+scratch=$(mktemp -d) || scratch=
+require_dir "$scratch"
+target=$(mktemp -d) || target=
+require_dir "$target"
 ln -s "$target" "$scratch/node_modules"
 export CLAUDE_PROJECT_DIR="$scratch"
 
@@ -154,7 +165,8 @@ allow 'x=`pnpm install`'
 block '`pnpm install `'
 
 # --- must ALLOW: inert when node_modules is a real directory ---------------
-real_scratch=$(mktemp -d)
+real_scratch=$(mktemp -d) || real_scratch=
+require_dir "$real_scratch"
 mkdir "$real_scratch/node_modules"
 payload=$(jq -n --arg cmd 'pnpm install' '{tool_input: {command: $cmd}}')
 printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$real_scratch" sh "$guard" >/dev/null 2>&1
@@ -171,7 +183,8 @@ cwd_expect() {
 	project_dir=$2
 	cwd=$3
 	label=$4
-	payload=$(jq -n --arg cwd "$cwd" '{cwd: $cwd, tool_input: {command: "pnpm install"}}')
+	cmd=${5:-pnpm install}
+	payload=$(jq -n --arg cwd "$cwd" --arg cmd "$cmd" '{cwd: $cwd, tool_input: {command: $cmd}}')
 	printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$project_dir" sh "$guard" >/dev/null 2>&1
 	got=$?
 	if [ "$got" != "$want" ]; then
@@ -180,19 +193,26 @@ cwd_expect() {
 	fi
 }
 
-primary=$(mktemp -d)
+primary=$(mktemp -d) || primary=
+require_dir "$primary"
 mkdir "$primary/node_modules"
-shared_wt=$(mktemp -d)
+shared_wt=$(mktemp -d) || shared_wt=
+require_dir "$shared_wt"
 git -C "$shared_wt" init -q
 ln -s "$primary/node_modules" "$shared_wt/node_modules"
 mkdir -p "$shared_wt/apps/web"
-private_wt=$(mktemp -d)
+private_wt=$(mktemp -d) || private_wt=
+require_dir "$private_wt"
 git -C "$private_wt" init -q
 mkdir "$private_wt/node_modules"
 
 cwd_expect 2 "$primary" "$shared_wt" "shared-deps worktree blocks although CLAUDE_PROJECT_DIR is the primary checkout"
 cwd_expect 2 "$primary" "$shared_wt/apps/web" "cwd nested inside a shared-deps worktree blocks"
 cwd_expect 0 "$scratch" "$private_wt" "private worktree allows although CLAUDE_PROJECT_DIR has a symlinked tree"
+# The session's directory decides even when the command installs elsewhere:
+# an install in another tree runs that tree's own install scripts and pnpm
+# settings, which can point back at the primary checkout.
+cwd_expect 2 "$primary" "$shared_wt" "an install aimed at a private worktree still blocks from a shared-deps session" "cd $private_wt && pnpm install"
 rm -rf "$primary" "$shared_wt" "$private_wt"
 
 if [ "$fails" -eq 0 ]; then
