@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readCssBlock, readRepoFile } from '@blog/config/testing/theme-css';
 
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config/constants';
 
@@ -22,20 +22,16 @@ import {
 
 const CONSOLE_HUE = PRESET_REGISTRY[PRESET_ID.CONSOLE].themeTokens.accentHue;
 
-const readRepoFile = (path: string): string =>
-  readFileSync(new URL(`../../../../${path}`, import.meta.url), 'utf8');
-
 const readOklchDeclarations = (
   css: string,
   selector: string,
 ): Record<string, string> => {
-  const flattened = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\s+/g, ' ');
-  const block = flattened.split(` ${selector} { `)[1]?.split(' }')[0] ?? '';
-
   return Object.fromEntries(
-    [...block.matchAll(/(--[\w-]+): oklch\( ?([^)]*?) ?\);/g)].map(
-      ([, property, value]) => [property, `oklch(${value})`],
-    ),
+    [
+      ...readCssBlock(css, selector).matchAll(
+        /(--[\w-]+): oklch\( ?([^)]*?) ?\);/g,
+      ),
+    ].map(([, property, value]) => [property, `oklch(${value})`]),
   );
 };
 
