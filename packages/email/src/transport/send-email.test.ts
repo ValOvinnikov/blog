@@ -47,6 +47,7 @@ const MOCK_EMAIL: TSendEmailInput = {
 };
 const MOCK_RESEND_ERROR_MESSAGE = faker.lorem.sentence();
 const MOCK_IDEMPOTENCY_KEY = faker.string.uuid();
+const MOCK_VALIDATION_STATUS = 422;
 
 type TSendEmailModule = typeof import('./send-email');
 
@@ -178,10 +179,20 @@ describe(sendEmail, () => {
   it('throws with the reason Resend gives for a failed send', async () => {
     sendMock.mockResolvedValueOnce({
       data: null,
-      error: { name: 'validation_error', message: MOCK_RESEND_ERROR_MESSAGE },
+      error: {
+        name: 'validation_error',
+        message: MOCK_RESEND_ERROR_MESSAGE,
+        statusCode: MOCK_VALIDATION_STATUS,
+      },
     });
 
-    await expect(send(MOCK_EMAIL)).rejects.toThrow(MOCK_RESEND_ERROR_MESSAGE);
+    const failure = send(MOCK_EMAIL);
+
+    await expect(failure).rejects.toThrow(MOCK_RESEND_ERROR_MESSAGE);
+    await expect(failure).rejects.toMatchObject({
+      statusCode: MOCK_VALIDATION_STATUS,
+      code: 'validation_error',
+    });
   });
 });
 

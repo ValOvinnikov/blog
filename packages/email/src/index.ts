@@ -85,4 +85,8 @@ export {
   sendEmail,
   type TSendEmailInput,
 } from './transport/send-email';
+export {
+  isRetryableSendError,
+  SendEmailError,
+} from './transport/send-email-error';
 export { isValidEmailAddress } from './validation';
