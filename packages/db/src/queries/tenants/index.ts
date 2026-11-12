@@ -13,6 +13,7 @@ export * from './get-tenant-billing';
 export * from './get-tenant-by-id';
 export * from './get-tenant-deprovisioning-status';
 export * from './get-tenant-id-by-sanity-project-id';
+export * from './get-tenant-id-by-stripe-ids';
 export * from './get-tenant-live-locales';
 export * from './get-tenant-locales';
 export * from './get-tenant-owner-access';

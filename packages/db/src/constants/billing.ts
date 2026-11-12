@@ -16,6 +16,10 @@ export const STRIPE_PRICE_LOOKUP_KEY = {
   GROWTH_BAND_5000: 'GROWTH_BAND_5000',
   GROWTH_BAND_10000: 'GROWTH_BAND_10000',
   GROWTH_BAND_25000: 'GROWTH_BAND_25000',
+  GROWTH_BAND_2500_YEARLY: 'GROWTH_BAND_2500_YEARLY',
+  GROWTH_BAND_5000_YEARLY: 'GROWTH_BAND_5000_YEARLY',
+  GROWTH_BAND_10000_YEARLY: 'GROWTH_BAND_10000_YEARLY',
+  GROWTH_BAND_25000_YEARLY: 'GROWTH_BAND_25000_YEARLY',
 } as const;
 
 export type TStripePriceLookupKey = TValueOf<typeof STRIPE_PRICE_LOOKUP_KEY>;
@@ -27,10 +31,16 @@ export type TPaidSubscriberBandCeiling = Exclude<
   (typeof SUBSCRIBER_BAND_CEILINGS)[0]
 >;
 
-export type TPlanPriceLookupKeys = {
+export type TIntervalPriceLookupKeys = {
   monthly: TStripePriceLookupKey;
   yearly: TStripePriceLookupKey;
-  subscriberBands?: Record<TPaidSubscriberBandCeiling, TStripePriceLookupKey>;
+};
+
+export type TPlanPriceLookupKeys = TIntervalPriceLookupKeys & {
+  subscriberBands?: Record<
+    TPaidSubscriberBandCeiling,
+    TIntervalPriceLookupKeys
+  >;
 };
 
 // Stripe lookup keys, never Price ids: one key names the same Price in test and live mode.
@@ -47,10 +57,22 @@ export const PLAN_PRICE_LOOKUP_KEYS: Record<
     monthly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
     yearly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
     subscriberBands: {
-      2_500: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500,
-      5_000: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000,
-      10_000: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000,
-      25_000: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000,
+      2_500: {
+        monthly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500,
+        yearly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY,
+      },
+      5_000: {
+        monthly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000,
+        yearly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000_YEARLY,
+      },
+      10_000: {
+        monthly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000,
+        yearly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000_YEARLY,
+      },
+      25_000: {
+        monthly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000,
+        yearly: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000_YEARLY,
+      },
     },
   },
 };

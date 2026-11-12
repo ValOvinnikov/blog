@@ -4036,6 +4036,38 @@
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
+    "GROWTH_BAND_2500_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_5000_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_5000_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_10000_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_10000_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GROWTH_BAND_25000_YEARLY": [
+      {
+        "ref": "STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_25000_YEARLY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
     "RECORDED": [
       {
         "ref": "STRIPE_EVENT_RECORD_OUTCOME.RECORDED",
