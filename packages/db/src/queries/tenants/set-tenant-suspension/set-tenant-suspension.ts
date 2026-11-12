@@ -6,21 +6,26 @@ import {
   WRITABLE_TENANT_STATUSES,
   type TSuspensionStatus,
 } from '@blog/db/constants';
+import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { and, eq, inArray, isNull } from 'drizzle-orm';
 
-const suspensionStamp: Record<TSuspensionStatus, Partial<TTenant>> = {
-  [TENANT_STATUS.SUSPENDED]: {
-    status: TENANT_STATUS.SUSPENDED,
-    suspensionReason: SUSPENSION_REASON.OPERATOR,
-  },
-  [TENANT_STATUS.ACTIVE]: {
-    status: TENANT_STATUS.ACTIVE,
-    suspendedAt: null,
-    suspensionReason: null,
-  },
-};
+function suspensionStamp(status: TSuspensionStatus) {
+  return status === TENANT_STATUS.SUSPENDED
+    ? {
+        status: TENANT_STATUS.SUSPENDED,
+        suspensionReason: SUSPENSION_REASON.OPERATOR,
+      }
+    : {
+        ...resumedTenantFields({
+          isResuming: eq(tenants.status, TENANT_STATUS.SUSPENDED),
+          now: new Date(),
+        }),
+        suspendedAt: null,
+        suspensionReason: null,
+      };
+}
 
 export async function setTenantSuspension(
   tenantId: string,
@@ -30,7 +35,7 @@ export async function setTenantSuspension(
 
   const [tenant] = await db
     .update(tenants)
-    .set(suspensionStamp[status])
+    .set(suspensionStamp(status))
     .where(
       and(
         eq(tenants.id, tenantId),

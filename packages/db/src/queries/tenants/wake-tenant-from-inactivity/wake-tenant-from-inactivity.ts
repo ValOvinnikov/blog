@@ -1,6 +1,7 @@
 import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { SUSPENSION_REASON, TENANT_STATUS } from '@blog/db/constants';
+import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { and, eq, isNull, sql } from 'drizzle-orm';
 
@@ -14,7 +15,7 @@ export async function wakeTenantFromInactivity(
   const [woken] = await getDb()
     .update(tenants)
     .set({
-      status: TENANT_STATUS.ACTIVE,
+      ...resumedTenantFields({ isResuming: sql`true`, now: new Date() }),
       suspendedAt: null,
       suspensionReason: null,
     })
