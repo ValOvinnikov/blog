@@ -1,4 +1,4 @@
-import type { TPaidSubscriberBandCeiling } from '@blog/db/constants/billing';
+import type { TPaidSubscriberBandCeiling } from '@blog/db/constants';
 import { integer, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const tenantBillingColumns = {

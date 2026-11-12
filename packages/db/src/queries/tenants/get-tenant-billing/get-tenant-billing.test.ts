@@ -24,6 +24,7 @@ describe(getTenantBilling, () => {
       stripeCustomerId: undefined,
       stripeSubscriptionId: undefined,
       stripePromotionCode: undefined,
+      subscriberBandCeiling: undefined,
       trialEndsAt: undefined,
       downgradeGraceStartedAt: undefined,
       graceStartedEmailSentAt: undefined,
