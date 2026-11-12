@@ -496,7 +496,8 @@
       "PERSONAL_DATA_ERASED": "Personenbezogene Daten gelöscht",
       "OAUTH_APP_SAVED": "Anmelde-App gespeichert",
       "OAUTH_APP_REPLACED": "Anmelde-App ersetzt",
-      "OAUTH_APP_REMOVED": "Anmelde-App entfernt"
+      "OAUTH_APP_REMOVED": "Anmelde-App entfernt",
+      "NEWSLETTER_PAUSE_CLEARED": "Newsletter-Pause aufgehoben"
     },
     "detail": {
       "field": {
@@ -1998,6 +1999,17 @@
     "openDialogButton": "Entfernen",
     "alreadyRemoved": "Diese Sperre wurde bereits entfernt.",
     "removalFailed": "Die Sperre konnte nicht entfernt werden – versuchen Sie es erneut."
+  },
+  "newsletterPauseCard": {
+    "title": "Newsletter pausiert",
+    "pausedSince": "Neue Beiträge werden nicht an Abonnenten gesendet. Pausiert seit <time>{date}</time>.",
+    "openDialogButton": "Pause aufheben",
+    "dialogTitle": "Newsletter-Pause aufheben?",
+    "dialogDescription": "Neue Beiträge werden wieder an Abonnenten gesendet. Sind die Bounce- oder Beschwerderaten weiterhin zu hoch, pausiert der nächste Versand den Newsletter erneut.",
+    "confirmButton": "Pause aufheben",
+    "confirmingButton": "Wird aufgehoben…",
+    "alreadyCleared": "Die Pause wurde bereits aufgehoben.",
+    "clearFailed": "Die Pause konnte nicht aufgehoben werden – bitte erneut versuchen."
   },
   "addBlockedDomainCard": {
     "title": "Domain sperren",

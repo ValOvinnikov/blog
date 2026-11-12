@@ -24,18 +24,33 @@ describe(clearNewsletterPause, () => {
     ({ id: tenantId } = tenant());
   });
 
-  it('clears a pause, so the site reads as not paused', async () => {
-    await pauseNewsletter(tenantId);
+  describe('a paused site', () => {
+    let pausedAt: Date;
 
-    await clearNewsletterPause(tenantId);
+    beforeEach(async () => {
+      pausedAt = await pauseNewsletter(tenantId);
+    });
 
-    expect(await getNewsletterPausedAt(tenantId)).toBeUndefined();
+    it('clears the pause and returns the time it was paused', async () => {
+      const clearedPausedAt = await clearNewsletterPause(tenantId);
+
+      expect(clearedPausedAt).toEqual(pausedAt);
+      expect(await getNewsletterPausedAt(tenantId)).toBeUndefined();
+    });
+
+    it('clears for only the first of two callers', async () => {
+      await clearNewsletterPause(tenantId);
+
+      const secondClear = await clearNewsletterPause(tenantId);
+
+      expect(secondClear).toBeUndefined();
+    });
   });
 
   it('does nothing for a site that was never paused', async () => {
-    await clearNewsletterPause(tenantId);
+    const clearedPausedAt = await clearNewsletterPause(tenantId);
 
-    expect(await getNewsletterPausedAt(tenantId)).toBeUndefined();
+    expect(clearedPausedAt).toBeUndefined();
     expect(await db().select().from(schema.emailConfig)).toEqual([]);
   });
 });

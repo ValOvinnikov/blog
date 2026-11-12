@@ -32,7 +32,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/audit.ts`
 
 - **AUDIT_TARGET_TYPE**: `TENANT`, `SITE_CONFIG`, `SETTINGS_FEATURES`, `RELEASE`, `BLOCKED_SIGNUP_IDENTITY`, `PERSONAL_DATA`
-- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`
+- **AUDIT_ACTION**: `CREATED`, `DEPROVISION_REQUESTED`, `DEPROVISIONED`, `REACTIVATED`, `SUSPENSION_APPLIED`, `SUSPENSION_LIFTED`, `PROVISIONED`, `PROVISIONING_FAILED`, `SETTINGS_UPDATED`, `DELETED`, `READER_DATA_PURGED`, `RELEASE_STARTED`, `RELEASE_OVERRIDE`, `CONTRAST_CHECK_STARTED`, `TENANT_MIGRATIONS_STARTED`, `SIGNUP_BLOCK_ADDED`, `SIGNUP_BLOCK_REMOVED`, `PERSONAL_DATA_LOOKED_UP`, `PERSONAL_DATA_EXPORTED`, `PERSONAL_DATA_ERASED`, `OAUTH_APP_SAVED`, `OAUTH_APP_REPLACED`, `OAUTH_APP_REMOVED`, `NEWSLETTER_PAUSE_CLEARED`
 
 ### `@blog/config/constants` — `packages/config/src/constants/auth-app.ts`
 
@@ -586,6 +586,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/menu-radio-group` — `apps/platform/src/constants/menu-radio-group.ts`
 
 - **MENU_RADIO_GROUP_SIZE**: `DESKTOP`, `TOUCH`
+
+### `@platform/constants/newsletter-pause` — `apps/platform/src/constants/newsletter-pause.ts`
+
+- **NEWSLETTER_PAUSE_REFUSAL**: `NOT_PAUSED`
+- **NEWSLETTER_PAUSE_LOG**: `CLEAR_AUDIT_FAILED`=`"newsletter_pause.clear_audit_failed"`, `CLEAR_FAILED`=`"newsletter_pause.clear_failed"`
 
 ### `@platform/constants/onboarding` — `apps/platform/src/constants/onboarding.ts`
 
