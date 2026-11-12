@@ -45,8 +45,8 @@ user asking where an epic stands ("epic status", "where are we on #2943?",
 when there was one and is dropped when there wasn't.
 
 **The report is exactly:** that sentence, then **one table** carrying every
-open ticket in the epic, grouped into three lanes by a band row. Nothing else —
-no board recap, no verification statistics, no retelling of the `board-keeper`
+open ticket in the epic, grouped into three lanes by a band row. Nothing else
+but the sweep offer below when the epic closes — no board recap, no verification statistics, no retelling of the `board-keeper`
 report. Before answering a status question, dispatch `board-keeper` first
 (`open-pull-request` "Board reconciliation") so the table is built from a reconciled board.
 
@@ -92,3 +92,21 @@ any background.
 **This table _is_ the progress table** the user asks for after each unit of
 work. Regenerate it live from `gh` every time — a pasted snapshot from an
 earlier turn is exactly the staleness it exists to prevent.
+
+### When the merge closes the epic
+
+**The one line allowed after the table: an offer to sweep.** When the table
+has no 🟡 or 🔵 row left — the merge closed the epic's last sub-issue — end
+the report with one question, carrying the ⬜ glyph:
+
+```
+⬜ Epic #2943 is closed. Run a refactor sweep on web and studio?
+```
+
+- **The layers are the table's `Scope` values**, each named once, minus any
+  layer another open epic or an open PR is still changing (`refactor-sweep`
+  "When to run").
+- **It is an offer, never a start.** On a yes, run `refactor-sweep` once per
+  named layer; without one, nothing runs and the offer is not repeated for
+  that epic.
+- No layer left to name, no line.

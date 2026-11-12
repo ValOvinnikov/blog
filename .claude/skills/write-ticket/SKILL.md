@@ -26,7 +26,7 @@ a sub-issue — asking the human for anything missing, since `board-keeper`
 cannot prompt. In the same pass, add `cloud-ok` when the ticket qualifies.
 
 **Read the body against the skills before dispatching it.** A ticket body is
-the whole brief for whoever executes it — a cloud session has no reviewer, and
+the whole brief for whoever executes it — a cloud session's work is reviewed only once its PR is open, and
 a layer agent's prompt is sourced from it — so anything it prescribes that a
 skill forbids ships exactly as written. Check every `## Scope` line and
 criterion against `testing-practices` → "What not to test" and `CLAUDE.md`

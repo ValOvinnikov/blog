@@ -100,8 +100,8 @@ studio (schema) ──typegen──► @blog/config ──► @blog/service ─�
 
 `develop-feature` §4–6: `test-writer` covers each layer's new code after
 implementation; the orchestrator runs `pnpm typegen`, then dispatches
-`verify-runner` with `pnpm verify`; `reviewer` (`code-review-practices`), plus
-`a11y-reviewer` for ui/web components and `seo-auditor` for a new route,
+`verify-runner` with `pnpm verify`; `reviewer` (`code-review-practices`) and
+`correctness-reviewer`, plus `a11y-reviewer` for ui/web components and `seo-auditor` for a new route,
 metadata or feed.
 
 ## Boundary checklist
