@@ -46,6 +46,7 @@ const MOCK_EMAIL: TSendEmailInput = {
   ...MOCK_RESEND_PAYLOAD,
 };
 const MOCK_RESEND_ERROR_MESSAGE = faker.lorem.sentence();
+const MOCK_IDEMPOTENCY_KEY = faker.string.uuid();
 
 type TSendEmailModule = typeof import('./send-email');
 
@@ -143,6 +144,22 @@ describe(sendEmail, () => {
     await send({ ...MOCK_EMAIL, ...extra });
 
     expect(sendMock).toHaveBeenCalledWith({ ...MOCK_RESEND_PAYLOAD, ...extra });
+  });
+
+  it('sends without request options when no idempotency key is given', async () => {
+    await send(MOCK_EMAIL);
+
+    expect(sendMock.mock.calls[0]).toHaveLength(1);
+  });
+
+  it('passes the same idempotency key to Resend on every send with that key', async () => {
+    await send({ ...MOCK_EMAIL, idempotencyKey: MOCK_IDEMPOTENCY_KEY });
+    await send({ ...MOCK_EMAIL, idempotencyKey: MOCK_IDEMPOTENCY_KEY });
+
+    expect(sendMock.mock.calls).toEqual([
+      [MOCK_RESEND_PAYLOAD, { idempotencyKey: MOCK_IDEMPOTENCY_KEY }],
+      [MOCK_RESEND_PAYLOAD, { idempotencyKey: MOCK_IDEMPOTENCY_KEY }],
+    ]);
   });
 
   it('rejects a malformed replyTo address without calling Resend', async () => {

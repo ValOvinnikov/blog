@@ -85,7 +85,7 @@ An editor places a Newsletter Signup module on a page; a reader enters an email 
 - `apps/web/src/modules/newsletter/newsletter-module.tsx`
 - `apps/web/src/modules/newsletter/components/newsletter-form/newsletter-form.tsx`
 - `apps/web/src/server/newsletter/newsletter-actions/newsletter-actions.ts`
-- `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts` (built on `apps/web/src/server/rate-limit/public-write-guard/public-write-guard.ts`), `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`, `apps/web/src/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token.ts`
+- `apps/web/src/server/newsletter/subscribe-guard/subscribe-guard.ts` (built on `apps/web/src/server/rate-limit/public-write-guard/public-write-guard.ts`), `apps/web/src/server/newsletter/newsletter-confirmation-send/newsletter-confirmation-send.ts`, `apps/web/src/server/newsletter/newsletter-unsubscribe-token/newsletter-unsubscribe-token.ts` (reads the key; signing and verifying live in `@blog/utils/newsletter-unsubscribe-token`, so any app holding the key can mint links)
 - `apps/web/src/server/newsletter/newsletter-subscription-actions/newsletter-subscription-actions.ts`
 - `apps/web/src/server/newsletter/reader-subscription-status/reader-subscription-status.ts`
 - `apps/web/src/app/api/newsletter/confirm/route.ts`, `apps/web/src/app/api/newsletter/unsubscribe/route.ts`, `apps/web/src/server/newsletter/newsletter-result-redirect/newsletter-result-redirect.ts`
