@@ -4,8 +4,8 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_POST_LIST_PAGE_SIZE,
   MOCK_RECENT_POSTS_HEADING,
-  mockRawPostListModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostListModule } from '@blog/service/testing/modules/post-list/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,

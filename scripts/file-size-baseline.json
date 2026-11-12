@@ -57,7 +57,7 @@
   "packages/email/src/html/email-layout/email-layout.ts": 124,
   "packages/email/src/portable-text/serialize-portable-text.ts": 131,
   "packages/service/src/index.ts": 174,
-  "packages/service/src/testing/modules/fixtures.ts": 762,
+  "packages/service/src/testing/modules/fixtures.ts": 748,
   "packages/service/src/testing/pages/fixtures.ts": 395,
   "packages/service/src/testing/shared/fixtures.ts": 214,
   "packages/studio/src/schema-types/inputs/localization-notice-input/localization-notice-input.tsx": 152,
