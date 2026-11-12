@@ -1,5 +1,9 @@
 import type { TLocaleIsoCode } from '@blog/config/constants';
 import type { TTenantPlan } from '@blog/db/constants';
+import {
+  planChangeFields,
+  type TPlanChangeFields,
+} from '@blog/db/queries/tenants/plan-change-fields';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 type TTenantDetailsFields = {
@@ -35,13 +39,31 @@ export function changesProvisionedTenantDetails(
   );
 }
 
+export function tenantDetailsWrite(
+  details: TTenantDetailsFields,
+  clearsUnsentReinvite: boolean,
+): TTenantDetailsFields &
+  TPlanChangeFields & { unsentReinviteFormerOwnerEmailEncrypted?: null } {
+  return {
+    ...details,
+    ...planChangeFields(details.plan),
+    ...(clearsUnsentReinvite && {
+      unsentReinviteFormerOwnerEmailEncrypted: null,
+    }),
+  };
+}
+
 export function restorableTenantFields(
   original: TTenant,
 ): TTenantDetailsFields &
-  Pick<TTenant, 'unsentReinviteFormerOwnerEmailEncrypted'> {
+  Pick<
+    TTenant,
+    'unsentReinviteFormerOwnerEmailEncrypted' | 'selfServeOwnerEmailIndex'
+  > {
   return {
     ...tenantDetailsFields(original),
     unsentReinviteFormerOwnerEmailEncrypted:
       original.unsentReinviteFormerOwnerEmailEncrypted,
+    selfServeOwnerEmailIndex: original.selfServeOwnerEmailIndex,
   };
 }

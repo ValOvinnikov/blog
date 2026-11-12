@@ -188,15 +188,23 @@ contracts:
     mechanical pass (`code-review-practices` §0) opens with
     `pnpm check:diff-hygiene` — the judgement-free checks, also in
     `pnpm verify` and pre-push, so a hit costs the implementing session a
-    re-run rather than a review round (#7118) — then greps added lines for
-    tests that restate their source, runs `pnpm check:clones` (`jscpd`, a
-    pinned root devDependency that fails loudly when missing, printing only
-    clones with a touched side) over the touched workspaces, and — since 2026-09-19 — greps for the comments agents
-    produce most: a doc block opening `Name — does X`, a doc block of three
-    or more lines, a `//` inside a function body, and any comment at all in
-    a `*.test.ts(x)` file. Each hit is blocking; "the siblings have the same
+    re-run rather than a review round (#7118) — then runs
+    `pnpm check:review-hits` (#7267), which prints every added line a reader
+    has to judge — leftovers, secret-shaped assignments, suppressions, tests
+    that restate their source, fakes of our own components, comments outside
+    test files, unnamed or duplicated fixtures, a string value another source
+    file of the workspace already holds, a new const whose values an existing
+    one covers, touched test files over 500
+    lines — grouped by kind, and exits zero whatever it finds (non-zero only when git
+    fails or finds no merge-base); it replaced a dozen grep
+    and awk commands the reviewer pasted by hand. Then `pnpm check:clones`
+    (`jscpd`, a pinned root devDependency that fails loudly when missing,
+    printing only clones with a touched side) over the touched workspaces.
+    A rule that lint or a script already fails has no checklist line. Every
+    comment the diff adds outside a test file is a hit and is blocking unless
+    it passes the comment rule; "the siblings have the same
     block" is not a defence, because the siblings are the drift being
-    corrected. The greps were added after every module on `main` was found
+    corrected. The comment scan was added after every module on `main` was found
     carrying an identical `XModule — fetches module_x and hands it to
 XModuleView` block that the rule already forbade and no review had
     flagged. The same pass names each touched test file over 500 lines, and
@@ -217,6 +225,15 @@ XModuleView` block that the rule already forbade and no review had
     what #3144 shipped without: it verified green, merged `main` in
     afterward, and CI's Test job failed a minute later on a schema type that
     had landed on `main` in between.
+  - `correctness-reviewer` — read-only review of the same diff on Opus,
+    dispatched alongside `reviewer`: it maps each of the issue's acceptance
+    criteria to the `file:line` that meets it, lists what the diff does
+    beyond them, and looks for security, performance and correctness defects,
+    each blocking finding stated as a failing scenario. It checks no
+    convention — `reviewer` (Sonnet) keeps `code-review-practices` §0–7 and
+    the maintainability items. Skipped when every changed file is styling,
+    copy, a story or a doc; `reviewer` then runs the general pass itself
+    (`develop-feature` §6).
   - `a11y-reviewer` — read-only accessibility audit of
     `packages/ui`/`apps/web`/`apps/platform` diffs against
     `react-component-practices` → "Accessible by construction" plus each
@@ -325,10 +342,11 @@ XModuleView` block that the rule already forbade and no review had
     output landing permanently in its context (paid again every turn until
     compaction) and blocked the session for the minutes CI took.
 
-  `reviewer`, `a11y-reviewer`, `seo-auditor`, `explore`, `ci-watcher`, and
+  `reviewer`, `correctness-reviewer`, `a11y-reviewer`, `seo-auditor`,
+  `explore`, `ci-watcher`, and
   `verify-runner` are read-only by **enforcement**, not just prose (#425,
   #464, #466); `test-writer` reuses the same `Bash` guard although it isn't
-  fully read-only (#396). All seven run under `permissionMode: dontAsk`, plus
+  fully read-only (#396). All eight run under `permissionMode: dontAsk`, plus
   a per-agent `PreToolUse` guard (`read-only-agent-guard.sh`) that denies the
   write-shaped commands the project allow-list would otherwise admit
   (`git commit` — including with leading global flags like `git -C dir
@@ -486,7 +504,7 @@ file` are all denied alike) — an earlier version only handled the
     legitimate-command bank; run it directly or via CI (see
     [`docs/context/ci-automation.md`](./ci-automation.md)).
   - `read-only-agent-guard.sh` — `PreToolUse` hook (wired in the `reviewer`,
-    `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, `verify-runner`,
+    `correctness-reviewer`, `a11y-reviewer`, `explore`, `seo-auditor`, `ci-watcher`, `verify-runner`,
     and `test-writer` agent frontmatter — `test-writer` sets a `GUARD_LABEL`
     env var on its hook command so the deny message names it correctly
     rather than calling it "read-only")
@@ -791,7 +809,7 @@ file` are all denied alike) — an earlier version only handled the
     auto-removes it, so it never reaches §8's cleanup list. Its own file
     documents this so the line isn't dropped as pointless.
   - **The read-only reviewers take a checkout path instead.** `reviewer`,
-    `a11y-reviewer`, `seo-auditor` and `explore` would review or search
+    `correctness-reviewer`, `a11y-reviewer`, `seo-auditor` and `explore` would review or search
     committed `HEAD` alone in a worktree of their own, missing the
     uncommitted changes and still approving — a silent scope cut worse than
     the loud refusal. So each runs under `verify-runner`'s dispatch contract
@@ -844,8 +862,26 @@ file` are all denied alike) — an earlier version only handled the
   - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory and judged by shape — any statement or run that opens two or more cases with the same arguments, whatever it calls, with a run shared by some cases moved into a nested `describe`; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, an exported fixture named `mock<Thing>` (builder) and every fixed fake value `MOCK_<THING>`, a test file's own consts included, with render and setup helpers exempt, made-up data from seeded `@faker-js/faker` where the workspace's `package.json` has it (and the user asked before it is added where it doesn't), never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call, a `within(…)` scope included), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), behaviour titles of 80 characters or fewer, a mandatory pruning pass over every touched test file (duplicates deleted, cases another unit owns moved to it, input/output repeats tabled, each removal reported with where its behaviour is still asserted), each workspace's Vitest pool (`threads` / `vmThreads`, and why `isolate: false` is only safe where files mock no modules), and act warnings — which fail the test in both apps — traced to their usual causes (a missing await, raw `element.focus()`, an async tree rendered without the awaited-`act` helper, a selector returning a fresh object), plus the settled edge cases: `@ts-expect-error -- reason` as an allowed directive, `container` only for an empty render, `act` only around a hook's `result.current` call or a file's one fake-timer advance helper, a query object `describe` cannot take named by its exact identifier with sub-behaviours as nested `describe`s, `user.keyboard` before `fireEvent`, a third thin-dispatcher exception for a Workflow orchestrator, `MOCK_` only for invented values, no real timers, and a cleanup ticket counting as touching the test files it names.
   - `seo-and-metadata` — per-route metadata, JSON-LD, sitemap/robots/RSS.
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR, plus the spec and feature-doc sync item, converge-on-touch findings (placement, props, variants files), file-size growth as a blocking finding (since 2026-11-10, backing the local `pnpm check:file-size` ratchet when a commit skips it), a blocking prop-ceiling count on every touched component, a flag on a UI or behaviour diff with no manual-test issue, and a flag on a diff that adds a cron, workflow, paid API call or hot-path query with no stated cost.
+  - `review-pull-request` — the orchestrator's review of an open PR, the only
+    review a cloud session's diff gets: it checks the PR head out in a
+    detached worktree with its own install, runs `pnpm verify` (CI skips a
+    draft) and `pnpm check:clones` in its own session — a sandboxed subagent
+    cannot write in that worktree — and dispatches
+    `reviewer` and `correctness-reviewer` in PR mode with the issue's
+    acceptance criteria and the PR body's Examined and Reuse lines, verifies
+    each blocking finding, and posts one PR comment only when changes are
+    required. A fix round is a re-review of what changed. The solo-session
+    checklist carries no self-review for that reason — only
+    `pnpm check:clones` after `pnpm verify`.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
-    dead code, convention drift); files findings as tracked issues, never
+    dead code, convention drift), offered when an epic closes, when a layer
+    has three filed duplication findings, and once per layer before launch.
+    It runs knip, `pnpm check:clones --workspace <dir>`, the touched-file
+    lint over the whole workspace and a churn count before any model, hands
+    that output to an `explore` scan on Sonnet, verifies every finding,
+    skips what open issues and open PRs already cover, ranks substantial
+    findings by churn with a cap of five, and proposes them to the user;
+    only approved findings are filed as tracked issues, and it never
     edits directly. Micro-findings batch into one per-layer umbrella issue
     per sweep instead of one issue each; every filed issue defaults to
     `prio:later` (`prio:someday` if speculative) and gets `cloud-ok` when it
@@ -854,7 +890,7 @@ file` are all denied alike) — an earlier version only handled the
     component, file size alone, a raw type form, a missing feature page) are
     never swept. No fixed cadence — run whenever asked, naming the layer.
     - `write-ticket` — creating an issue through `board-keeper`, the body check against the skills, the sub-issue, epic and manual-test templates, the `prio:*` labels and the `cloud-ok` criteria.
-  - `report-epic-status` — the chat-message budget and the one-table epic status format.
+  - `report-epic-status` — the chat-message budget and the one-table epic status format. When a merge closes an epic, the report ends with one offer to run `refactor-sweep` on the layers that epic touched; nothing runs without a yes.
   - `open-pull-request` — branch → work → PR with human-gated push/PR steps; it also holds the full "Delivery gate sequence", "PR conventions", the cloud-session board-evidence protocol and "Deployment".
     Two on-demand files sit beside it: `stacked-prs.md` (the `gh stack`
     mechanics, read once the user asks for a stack) and `job-label.md` (the

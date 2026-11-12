@@ -252,7 +252,7 @@ owning agent, then re-dispatch. Never proceed on red.
 ## 6. Review (blocking — Gate 2 is not offered until this passes)
 
 **Run `git fetch origin` before dispatching any reviewer** (`reviewer`,
-`a11y-reviewer`, `seo-auditor`) — a worktree session's local `main` goes
+`correctness-reviewer`, `a11y-reviewer`, `seo-auditor`) — a worktree session's local `main` goes
 stale, and the read-only guard denies them `git fetch`.
 
 **Every reviewer prompt carries:**
@@ -268,7 +268,9 @@ stale, and the read-only guard denies them `git fetch`.
 3. **The ticket.** The issue number, its **Copy** and **Cost** lines, and each
    implementing agent's **Examined** and **Reuse** sections, verbatim — never
    summarised, since §7's Reuse, drift, cost and Voice items are checked
-   against them.
+   against them. `correctness-reviewer` takes the issue's acceptance
+   criteria verbatim instead, and `reviewer`'s prompt says whether
+   `correctness-reviewer` was dispatched.
 
 Each report opens with `pwd` and `git rev-parse HEAD`. **Reject a report whose
 SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
@@ -277,6 +279,14 @@ SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
   (`origin/main...HEAD` + working tree); it applies `code-review-practices`.
   A docs-only diff gets the inline identifier check instead (`CLAUDE.md`
   delivery gate step 4).
+- **`correctness-reviewer`** (`.claude/agents/correctness-reviewer.md`, Opus)
+  as well, in the same message as `reviewer`: it checks the diff against the
+  acceptance criteria and for security, performance and correctness defects,
+  and leaves conventions to `reviewer`. **Skip it when every changed file is
+  styling, copy, a story or a doc** — a `*-variants.ts` or `.css` file, a
+  `packages/config/src/voice/` catalog, a `*.stories.tsx`, a `.md` — and say
+  so in `reviewer`'s prompt, which then runs the general pass itself. One
+  file outside that list dispatches it.
 - **`a11y-reviewer`** as well when the diff touches `packages/ui`, `apps/web`
   or `apps/platform` components.
 - **`seo-auditor`** as well when the diff touches `apps/web` routes, metadata,
@@ -285,8 +295,9 @@ SHA differs from your own `HEAD`**, or that names none, and re-dispatch.
   `apps/web/src/app`. One diff can need both; neither substitutes for
   `reviewer` or for the other.
 - **Fix every blocking finding** through the owning agent, re-run step 5, and
-  re-dispatch the reviewer that raised it until every dispatched reviewer
-  passes (`APPROVE` / `PASS`). One reviewer's pass does not excuse another's
+  re-dispatch every reviewer this diff was given — the fix is code none of
+  them has seen, and it voids an earlier `APPROVE` — until each one passes
+  (`APPROVE` / `PASS`). One reviewer's pass does not excuse another's
   blocking result. A review that never ran is itself blocking — a small diff
   or green checks do not substitute.
 - **A fix round is a re-review.** Open the re-dispatch with
@@ -581,7 +592,8 @@ reason:
   that board write is confirmed.
 
 Every other dispatch — layer agents, `verify-runner` (including right before
-`reviewer`), `reviewer`, `a11y-reviewer`, `seo-auditor`, `ci-watcher`, … —
+`reviewer`), `reviewer`, `correctness-reviewer`, `a11y-reviewer`,
+`seo-auditor`, `ci-watcher`, … —
 runs in the background.
 
 **Known failure mode — `run_in_background: false` on anything else.** The
@@ -605,6 +617,28 @@ resolves back to the shared checkout, which is where a non-isolated subagent's
 Bash lands, so without it the dispatch makes zero board writes. Don't
 "simplify" the frontmatter by dropping it (`board-keeper.md` § "Why this agent
 carries `isolation: worktree`").
+
+## Carrying out a refactor ticket
+
+A `refactor` ticket changes how code is arranged and nothing about what it
+does. The lifecycle above applies, with four rules that keep that true:
+
+- **The tests are the proof, so they do not change with the code.** The
+  existing tests pass before the first edit and pass, unedited, after it. A
+  test that must change because a symbol moved changes its import and
+  nothing else. If the behaviour under the refactor has no test, the owning
+  agent writes one first, against the code as it stands, and commits it on
+  its own.
+- **One move per commit.** An extraction, a rename and a simplification are
+  three commits, each green, so a regression has one commit to be in.
+- **Every call site moves in the same change.** The old path is deleted, not
+  left re-exporting the new one, and `pnpm knip` stays clean.
+- **A behaviour change found on the way stops the work.** A bug the refactor
+  uncovers, or a caller relying on the quirk being removed, goes to the user
+  ("Mid-task decisions"); it is never fixed inside the refactor.
+
+`correctness-reviewer` gets the ticket's criteria plus one more: no
+observable behaviour changed.
 
 ## Migrations
 
@@ -747,9 +781,12 @@ carries `isolation: worktree`").
 - `add-content-type` when a change spans more than one workspace.
 - `code-review-practices` before every commit — applied by the `reviewer`
   subagent at gate step 4.
+- `review-pull-request` when an open PR needs review before merge — a cloud
+  session's PR always does; a PR from this lifecycle already passed step 6.
 - `refactor-sweep` for an on-demand, layer-scoped cleanup audit (duplication,
-  dead code, convention drift) — run when asked, naming the layer; it files
-  findings as issues rather than editing.
+  dead code, convention drift) — run when asked, naming the layer; it
+  proposes findings and files the approved ones as issues rather than
+  editing. A filed one is carried out under "Carrying out a refactor ticket".
 - `open-pull-request` when shipping an issue: branch → work → PR (push and PR
   are human-gated).
 - `superpowers:systematic-debugging` on any bug or failing test, before

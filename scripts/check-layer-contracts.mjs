@@ -22,7 +22,7 @@ const SCOPE = '@blog/';
 export const readWorkspaces = (root = repoRoot) =>
   WORKSPACE_DIRS.flatMap((dir) =>
     readdirSync(join(root, dir), { withFileTypes: true })
-      .filter((entry) => entry.isDirectory())
+      .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
       .map((entry) => ({
         name: entry.name,
         pkg: JSON.parse(
