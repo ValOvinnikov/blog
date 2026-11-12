@@ -880,7 +880,8 @@ file` are all denied alike) — an earlier version only handled the
     `reviewer` and `correctness-reviewer` in PR mode with the issue's
     acceptance criteria and the PR body's Examined and Reuse lines, verifies
     each blocking finding, and posts one PR comment only when changes are
-    required. A fix round is a re-review of what changed. The solo-session
+    required. It removes the worktree itself as soon as the report is given.
+    A fix round is a re-review of what changed. The solo-session
     checklist carries no self-review for that reason — only
     `pnpm check:clones` after `pnpm verify`.
   - `refactor-sweep` — on-demand, layer-scoped cleanup audit (duplication,
