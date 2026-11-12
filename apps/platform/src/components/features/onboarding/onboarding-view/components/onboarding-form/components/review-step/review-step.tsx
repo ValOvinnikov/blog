@@ -5,6 +5,7 @@ import { AccentSwatch } from '@platform/components/shared/accent-swatch';
 import { Button } from '@platform/components/shared/button';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { PRESET_LABEL_KEY } from '@platform/components/shared/preset-picker';
+import { Text } from '@platform/components/shared/text';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import {
   ONBOARDING_STEP,
@@ -116,6 +117,7 @@ export const ReviewStep = ({
         }
         hasError={hasTermsError}
       />
+      <Text variant="supporting">{t('editorInviteNote')}</Text>
     </>
   );
 };

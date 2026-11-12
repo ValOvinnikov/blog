@@ -1,7 +1,11 @@
 import type { TMaybeUndefined, TParsedEmbed } from '@blog/config/types';
 import { hasLength } from '@blog/utils/primitives';
 
-import { EMBED_PROVIDER, MEDIA_RATIO } from '@blog/config/constants';
+import {
+  EMBED_ORIGIN,
+  EMBED_PROVIDER,
+  MEDIA_RATIO,
+} from '@blog/config/constants';
 
 import type { TEmbedParser } from './embed-parser';
 import { parseYoutubeEmbed } from './youtube-embed';
@@ -17,7 +21,7 @@ const parseVimeoEmbed: TEmbedParser = (host, _url, [id, ...rest]) =>
   host === 'vimeo.com' && id && VIMEO_ID.test(id) && !hasLength(rest)
     ? {
         provider: EMBED_PROVIDER.VIMEO,
-        embedUrl: `https://player.vimeo.com/video/${id}`,
+        embedUrl: `${EMBED_ORIGIN.VIMEO}/video/${id}`,
         ratio: MEDIA_RATIO.VIDEO,
       }
     : undefined;
@@ -30,7 +34,7 @@ const parseLoomEmbed: TEmbedParser = (host, _url, [kind, id, ...rest]) =>
   !hasLength(rest)
     ? {
         provider: EMBED_PROVIDER.LOOM,
-        embedUrl: `https://www.loom.com/embed/${id}`,
+        embedUrl: `${EMBED_ORIGIN.LOOM}/embed/${id}`,
         ratio: MEDIA_RATIO.VIDEO,
       }
     : undefined;
@@ -42,7 +46,7 @@ const parseCalEmbed: TEmbedParser = (host, _url, segments) =>
   segments.every((segment) => CAL_SEGMENT.test(segment))
     ? {
         provider: EMBED_PROVIDER.CAL,
-        embedUrl: `https://cal.com/${segments.join('/')}?embed=true`,
+        embedUrl: `${EMBED_ORIGIN.CAL}/${segments.join('/')}?embed=true`,
         ratio: MEDIA_RATIO.PORTRAIT,
       }
     : undefined;
@@ -53,7 +57,7 @@ const parseGoogleMapsEmbed: TEmbedParser = (host, url) =>
   url.searchParams.get('pb')
     ? {
         provider: EMBED_PROVIDER.GOOGLE_MAPS,
-        embedUrl: `https://www.google.com/maps/embed${url.search}`,
+        embedUrl: `${EMBED_ORIGIN.GOOGLE_MAPS}/maps/embed${url.search}`,
         ratio: MEDIA_RATIO.CLASSIC,
       }
     : undefined;

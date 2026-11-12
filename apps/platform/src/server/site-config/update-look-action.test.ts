@@ -32,6 +32,7 @@ import {
 } from '@blog/config';
 import {
   BRAND_NAME_MAX_LENGTH,
+  SITE_CONFIG_SAVED_AT,
   TENANT_PLAN,
   type TTenantPlan,
 } from '@blog/db/constants';
@@ -60,12 +61,17 @@ import type { TUpdateLookInput } from './update-look-input-schema';
 
 faker.seed(5998);
 
-const { getSiteConfigMock, upsertSiteConfigMock, insertAuditEventMock } =
-  vi.hoisted(() => ({
-    getSiteConfigMock: vi.fn(),
-    upsertSiteConfigMock: vi.fn(),
-    insertAuditEventMock: vi.fn(),
-  }));
+const {
+  getSiteConfigMock,
+  upsertSiteConfigMock,
+  stampSiteConfigSavedAtMock,
+  insertAuditEventMock,
+} = vi.hoisted(() => ({
+  getSiteConfigMock: vi.fn(),
+  upsertSiteConfigMock: vi.fn(),
+  stampSiteConfigSavedAtMock: vi.fn(),
+  insertAuditEventMock: vi.fn(),
+}));
 
 vi.mock('@blog/config', async (importOriginal) => ({
   ...(await importOriginal()),
@@ -83,6 +89,7 @@ vi.mock('@blog/db', () => ({
     siteConfig: {
       getSiteConfig: getSiteConfigMock,
       upsertSiteConfig: upsertSiteConfigMock,
+      stampSiteConfigSavedAt: stampSiteConfigSavedAtMock,
     },
     auditEvents: { insertAuditEvent: insertAuditEventMock },
   },
@@ -153,6 +160,7 @@ describe(updateLookAction, () => {
       mockSiteConfig({ ...VALID_INPUT, logoHue: undefined }),
     );
     upsertSiteConfigMock.mockReset();
+    stampSiteConfigSavedAtMock.mockReset();
     insertAuditEventMock.mockReset();
     vi.mocked(isAccentHueAccessible).mockReset();
     vi.mocked(isAccentHueAccessible).mockReturnValue(true);
@@ -267,6 +275,13 @@ describe(updateLookAction, () => {
       expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
     });
 
+    it('stamps when the Look was saved', () => {
+      expect(stampSiteConfigSavedAtMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        SITE_CONFIG_SAVED_AT.LOOK,
+      );
+    });
+
     it('records a SETTINGS_UPDATED audit event on the site config by the operator', () => {
       expect(insertAuditEventMock).toHaveBeenCalledWith({
         actorId: MOCK_OPERATOR_ID,
@@ -379,8 +394,29 @@ describe(updateLookAction, () => {
     const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+    expect(stampSiteConfigSavedAtMock).not.toHaveBeenCalled();
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
+  });
+
+  it('succeeds, revalidates and audits when the stamp fails, logging it once', async () => {
+    const stampError = new Error(MOCK_DB_ERROR_MESSAGE);
+    stampSiteConfigSavedAtMock.mockRejectedValue(stampError);
+
+    const result = await updateLookAction(MOCK_TENANT_ID, VALID_INPUT);
+
+    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(insertAuditEventMock).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledOnce();
+    expect(logger.error).toHaveBeenCalledWith(
+      SITE_CONFIG_LOG.SAVED_AT_STAMP_FAILED,
+      {
+        tenantId: MOCK_TENANT_ID,
+        savedAt: SITE_CONFIG_SAVED_AT.LOOK,
+        errorName: stampError.name,
+      },
+    );
   });
 
   it('still succeeds when the audit write fails, and logs the failure', async () => {

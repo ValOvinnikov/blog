@@ -9,3 +9,13 @@ export const EMBED_PROVIDER = {
 } as const;
 
 export type TEmbedProvider = TValueOf<typeof EMBED_PROVIDER>;
+
+export const EMBED_ORIGIN = {
+  YOUTUBE: 'https://www.youtube-nocookie.com',
+  VIMEO: 'https://player.vimeo.com',
+  LOOM: 'https://www.loom.com',
+  CAL: 'https://cal.com',
+  GOOGLE_MAPS: 'https://www.google.com',
+} as const satisfies Record<TEmbedProvider, string>;
+
+export const EMBED_ORIGINS: readonly string[] = Object.values(EMBED_ORIGIN);

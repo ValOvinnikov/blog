@@ -23,6 +23,7 @@ const {
   presetLabel: PRESET_LABEL,
   siteTypes: SITE_TYPES,
   edit: EDIT,
+  editorInviteNote: EDITOR_INVITE_NOTE,
 } = messages.onboardingForm;
 const { acceptTerms: ACCEPT_TERMS, termsNotAccepted: TERMS_NOT_ACCEPTED } =
   messages.termsAcceptance;
@@ -82,6 +83,12 @@ describe(`<${ReviewStep.name}/>`, () => {
         messages.presetPicker.editorial,
       ].map((value) => `${value}${EDIT}`),
     );
+  });
+
+  it('says one email will come from the editor, Sanity', () => {
+    const note = screen.getByText(EDITOR_INVITE_NOTE);
+
+    expect(note).toBeVisible();
   });
 
   it('names the accent swatch by its hue', () => {

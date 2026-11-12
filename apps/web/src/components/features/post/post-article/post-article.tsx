@@ -5,7 +5,7 @@ import { Article } from '@blog/ui/components/organisms/article';
 import { BookmarkButtonGate } from '@web/components/features/post/bookmark-button-gate';
 import { ContentsRailLayout } from '@web/components/shared/contents-rail-layout';
 import {
-  createAsideOverride,
+  createPostBodyOverride,
   PortableText,
 } from '@web/components/shared/portable-text';
 import { PostShareLinks } from '@web/components/shared/post-share-links';
@@ -93,7 +93,7 @@ export const PostArticle = async ({ slug }: TPostArticleProps) => {
   const footerTags = tags.flatMap(({ title: label, slug: tagSlug }) =>
     tagSlug ? [{ label, href: routes.tag(tagSlug) }] : [],
   );
-  const components = createAsideOverride(asideKindLabels);
+  const components = createPostBodyOverride(asideKindLabels);
 
   return (
     <Article>

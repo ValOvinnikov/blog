@@ -1,3 +1,4 @@
+import { EMBED_ORIGINS } from '@blog/config';
 import { buildFramingHeaders } from '@blog/next-config/security-headers';
 import {
   buildContentSecurityPolicy,
@@ -19,6 +20,7 @@ const toPlatformFrameAncestor = (): string =>
 const buildDraftPreviewHeaders = (): Record<string, string> => ({
   'Content-Security-Policy': buildContentSecurityPolicy(
     toPlatformFrameAncestor(),
+    EMBED_ORIGINS,
   ),
   'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE,
   'Referrer-Policy': 'no-referrer',
@@ -27,9 +29,9 @@ const buildDraftPreviewHeaders = (): Record<string, string> => ({
 
 const buildRefusedPreviewHeaders = (): Record<string, string> =>
   Object.fromEntries(
-    buildFramingHeaders(buildContentSecurityPolicy(FRAME_ANCESTORS_NONE)).map(
-      ({ key, value }) => [key, value],
-    ),
+    buildFramingHeaders(
+      buildContentSecurityPolicy(FRAME_ANCESTORS_NONE, EMBED_ORIGINS),
+    ).map(({ key, value }) => [key, value]),
   );
 
 /** `next.config` leaves these headers to the proxy on any request carrying a preview token, verified or not. */

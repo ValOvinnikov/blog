@@ -85,6 +85,7 @@ export type TPlanEntitlements = {
   hasPoweredByMark: boolean;
   hasCustomDomain: boolean;
   hasOwnOAuthApps: boolean;
+  hasOwnAnalytics: boolean;
   seats: number;
 };
 
@@ -104,6 +105,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     hasPoweredByMark: true,
     hasCustomDomain: false,
     hasOwnOAuthApps: false,
+    hasOwnAnalytics: false,
     seats: 1,
   },
   [TENANT_PLAN.STARTER]: {
@@ -112,6 +114,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     hasPoweredByMark: false,
     hasCustomDomain: true,
     hasOwnOAuthApps: false,
+    hasOwnAnalytics: true,
     seats: 1,
   },
   [TENANT_PLAN.GROWTH]: {
@@ -120,6 +123,7 @@ export const PLAN_ENTITLEMENTS: Record<TTenantPlan, TPlanEntitlements> = {
     hasPoweredByMark: false,
     hasCustomDomain: true,
     hasOwnOAuthApps: true,
+    hasOwnAnalytics: true,
     seats: 3,
   },
 };
