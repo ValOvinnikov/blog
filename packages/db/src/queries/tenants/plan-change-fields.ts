@@ -10,12 +10,17 @@ export type TPlanChangeFields = {
   selfServeOwnerEmailIndex?: null;
 };
 
-// A paid site gives up the Free-or-trial slot, so a later move back to Free never collides; a trial is on a paid plan but still holds it.
+const PAID_SITE_STATUSES: readonly TTenantStatus[] = [
+  TENANT_STATUS.ACTIVE,
+  TENANT_STATUS.PAST_DUE,
+];
+
+// Only a move to a paid, running site gives up the Free-or-trial slot; a trial or a suspended site keeps it.
 export function planChangeFields(
   plan: TTenantPlan,
   status: TTenantStatus,
 ): TPlanChangeFields {
-  return plan === TENANT_PLAN.FREE || status === TENANT_STATUS.TRIAL
-    ? { plan }
-    : { plan, selfServeOwnerEmailIndex: null };
+  return plan !== TENANT_PLAN.FREE && PAID_SITE_STATUSES.includes(status)
+    ? { plan, selfServeOwnerEmailIndex: null }
+    : { plan };
 }

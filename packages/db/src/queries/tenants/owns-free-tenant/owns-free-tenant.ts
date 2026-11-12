@@ -41,17 +41,13 @@ export async function ownsFreeTenant(
     .from(tenants)
     .where(
       and(
-        or(
-          eq(tenants.plan, TENANT_PLAN.FREE),
-          eq(tenants.status, TENANT_STATUS.TRIAL),
-        ),
         ne(tenants.status, TENANT_STATUS.ARCHIVED),
         or(
           eq(
             tenants.selfServeOwnerEmailIndex,
             requireEmailIndex(address, personalDataIndex),
           ),
-          exists(ownedByAccount),
+          and(eq(tenants.plan, TENANT_PLAN.FREE), exists(ownedByAccount)),
         ),
       ),
     )

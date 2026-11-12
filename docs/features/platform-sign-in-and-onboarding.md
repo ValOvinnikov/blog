@@ -271,35 +271,34 @@ site as a 14-day Growth trial, with no card.
   the dashboard shows the run's state: a site still PENDING with every step
   idle gets a "setup hasn't started" notice with **Start setup**.
 - One Free or trial site per person, at a time: Free and trial share one
-  slot. The trial belongs to the site, not the account, so archiving a site
-  frees the slot for a new trial; a per-account limit is added only if that
-  is abused. A trial that drops to Free keeps the slot it held, and one that
-  converts to a paid plan releases it. `ownsFreeTenant(email)` is the
+  slot, and a self-served site holds it for as long as it keeps its
+  `self_serve_owner_email_index`. The trial belongs to the site, not the
+  account, so archiving a site frees the slot for a new trial; a per-account
+  limit is added only if that is abused. `ownsFreeTenant(email)` is the
   pre-check. It strips the `+tag` (`normalizeEmailIdentity`) and matches a
-  non-archived tenant on FREE or in TRIAL whose `self_serve_owner_email_index` is that address's
-  index — exactly what the database guard below compares, so the two never
-  disagree for a self-served site — or which an OWNER membership ties to the
-  account at the stripped address (operator-created Free sites). Accepted
-  gap: an operator-created Free site owned by `name+1@…` does not block
-  `name+2@…`. An archived tenant frees the slot; suspended and failed ones
-  keep it, and an unaccepted OWNER invite doesn't count. The database
-  enforces it too: `createSelfServeTenant` stores the `+tag`-free hash in
-  `tenants.self_serve_owner_email_index`, under a partial unique index over
-  non-archived rows that are FREE or TRIAL, so two simultaneous submits can't both succeed.
-  Operator-created tenants leave it null. Any write that moves a tenant to a
-  paid plan clears the key in the same statement (`planChangeFields`, used by
-  `updateTenantDetails` and `setTenantPlan`); a site still in TRIAL keeps it,
-  although its plan is GROWTH, so the rule is checked only when
-  a site is created: a site that was once paid can drop back to FREE beside
-  its owner's other Free or trial site, and an owner who once paid can hold two. While
-  the key is set, the index guards every write, not only Create site:
-  reactivating an archived self-serve tenant (`reactivateTenant`,
-  `DB_ALREADY_OWNS_FREE_TENANT`) or an operator setting one back to FREE
-  (`updateTenantDetails`, shown in the tenant details form as a refusal alert,
-  with no audit event) is refused while its owner holds another. The rule binds self-serve sites only, and operators may override
-  it: Add tenant (`createTenantAction`) never checks it, and an operator may
-  move an operator-created site to FREE however many Free sites its owner
-  holds.
+  non-archived tenant whose `self_serve_owner_email_index` is that address's
+  index, whatever its plan or status — exactly what the database guard below
+  compares, so the two never disagree for a self-served site — or a
+  non-archived FREE tenant which an OWNER membership ties to the account at
+  the stripped address (operator-created Free sites). Accepted gap: an
+  operator-created Free site owned by `name+1@…` does not block `name+2@…`.
+  An archived tenant frees the slot; suspended and failed ones keep it, a
+  suspended trial included, and an unaccepted OWNER invite doesn't count. The
+  database enforces it too: `createSelfServeTenant` stores the `+tag`-free
+  hash in `tenants.self_serve_owner_email_index`, under a partial unique index
+  over keyed, non-archived rows, so two simultaneous submits can't both
+  succeed. Operator-created tenants leave it null. Only a move to a paid,
+  running site (a paid plan with status ACTIVE or PAST_DUE) clears the key, in
+  the same statement (`planChangeFields`, used by `updateTenantDetails` and
+  `setTenantPlan`); a trial or a suspended site keeps it. So the rule is
+  checked only when a site is created: a site that was once paid can drop
+  back to FREE beside its owner's other Free or trial site, and an owner who
+  once paid can hold two. Reactivating an archived self-serve tenant
+  (`reactivateTenant`, `DB_ALREADY_OWNS_FREE_TENANT`) is refused while its
+  owner holds another. The rule binds self-serve sites only, and operators
+  may override it: Add tenant (`createTenantAction`) never checks it, and an
+  operator may move an operator-created site to FREE however many Free sites
+  its owner holds.
 - A new user's first platform sign-in records `users.termsAcceptedAt`
   and `termsVersion` when the request carries the `SIGNUP_TERMS_COOKIE_NAME`
   cookie with the current `TERMS_VERSION` (both in `@blog/config`). Existing

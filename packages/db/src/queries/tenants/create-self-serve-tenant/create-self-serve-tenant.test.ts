@@ -348,6 +348,19 @@ describe(createSelfServeTenant, () => {
         expect(second).toEqual(okResult(secondTenant));
       });
 
+      it('keeps the slot while the trial is suspended', async () => {
+        await patchTestTenant(db(), id, { status: TENANT_STATUS.SUSPENDED });
+
+        const second = await createSelfServeTenant({
+          ...MOCK_INPUT,
+          domain: MOCK_SELF_SERVE_OTHER_DOMAIN,
+        });
+
+        expect(second).toEqual(
+          errorResult(ERROR_CODE.DB_ALREADY_OWNS_FREE_TENANT),
+        );
+      });
+
       it('keeps the slot when the trial drops to Free', async () => {
         await patchTestTenant(db(), id, {
           plan: TENANT_PLAN.FREE,

@@ -124,8 +124,17 @@ describe(ownsFreeTenant, () => {
     expect(result).toEqual(OWNS_NONE);
   });
 
-  it('is true for a trial on a paid plan', async () => {
-    await seedMember({ plan: TENANT_PLAN.GROWTH, status: TENANT_STATUS.TRIAL });
+  it.each([
+    ['a trial', TENANT_STATUS.TRIAL],
+    ['a suspended trial', TENANT_STATUS.SUSPENDED],
+  ])('is true for %s the person self-served', async (_, status) => {
+    await insertTestTenant(db(), {
+      plan: TENANT_PLAN.GROWTH,
+      status,
+      selfServeOwnerEmailIndex: testPersonalEmailIndex(
+        MOCK_SELF_SERVE_OWNER_EMAIL,
+      ),
+    });
 
     const result = await ownsFreeTenant(MOCK_SELF_SERVE_OWNER_EMAIL);
 
