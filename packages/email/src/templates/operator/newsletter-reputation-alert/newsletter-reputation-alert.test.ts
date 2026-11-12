@@ -6,18 +6,21 @@ import {
   MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
 
-import { buildNewsletterReputationAlertEmail } from './newsletter-reputation-alert';
+import {
+  buildNewsletterReputationAlertEmail,
+  NEWSLETTER_REPUTATION_ALERT_LEVEL,
+} from './newsletter-reputation-alert';
 
-const MOCK_RESOLVED_COUNT = 4812;
+const { WARN, SLOW, STOP } = NEWSLETTER_REPUTATION_ALERT_LEVEL;
 const MOCK_WINDOW_DAYS = 7;
 const MOCK_ALERT = {
   tenantName: MOCK_TENANT_NAME,
   tenantId: MOCK_TENANT_ID,
+  level: WARN,
   bounceRate: 0.0315,
-  complaintRate: 0.0006,
-  resolvedCount: MOCK_RESOLVED_COUNT,
+  complaintRate: 0.00056,
+  resolvedCount: 48_120,
   windowDays: MOCK_WINDOW_DAYS,
-  isSendingPaused: false,
   adminUrl: MOCK_SIGN_IN_URL,
 };
 
@@ -35,11 +38,11 @@ describe(buildNewsletterReputationAlertEmail, () => {
     });
 
     it.each(['html', 'text'] as const)(
-      'states both rates as percentages, the sample and the window in the %s body',
+      'states both rates, the grouped sample and the window in the %s body',
       (part) => {
         expect(email[part]).toContain('3.15%');
-        expect(email[part]).toContain('0.06%');
-        expect(email[part]).toContain(String(MOCK_RESOLVED_COUNT));
+        expect(email[part]).toContain('0.056%');
+        expect(email[part]).toContain('48,120');
         expect(email[part]).toContain(String(MOCK_WINDOW_DAYS));
       },
     );
@@ -50,15 +53,13 @@ describe(buildNewsletterReputationAlertEmail, () => {
     });
   });
 
-  it('gives a paused site a different subject from a warning', () => {
-    const warning = buildNewsletterReputationAlertEmail(MOCK_ALERT);
-    const paused = buildNewsletterReputationAlertEmail({
-      ...MOCK_ALERT,
-      isSendingPaused: true,
-    });
+  it('gives each level its own subject and body', () => {
+    const emails = [WARN, SLOW, STOP].map((level) =>
+      buildNewsletterReputationAlertEmail({ ...MOCK_ALERT, level }),
+    );
 
-    expect(paused.subject).not.toBe(warning.subject);
-    expect(paused.text).not.toBe(warning.text);
+    expect(new Set(emails.map(({ subject }) => subject)).size).toBe(3);
+    expect(new Set(emails.map(({ text }) => text)).size).toBe(3);
   });
 
   it('escapes every caller-supplied value in the HTML', () => {

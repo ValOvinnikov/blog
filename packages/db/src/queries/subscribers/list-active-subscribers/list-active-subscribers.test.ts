@@ -4,6 +4,7 @@ import {
   insertTestTenant,
   MOCK_SUBSCRIBER_EMAIL,
 } from '@blog/db/testing/fixtures';
+import { MOCK_CORRUPT_PERSONAL_VALUE } from '@blog/db/testing/personal-data';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_ACTIVE_SUBSCRIBER } from '@blog/db/testing/subscribers/fixtures';
 import { useTestTenant } from '@blog/db/testing/test-tenant';
@@ -20,7 +21,6 @@ const MOCK_PAGE_SIZE = 2;
 const MOCK_ACTIVE_EMAILS = Array.from({ length: 3 }, () =>
   faker.internet.email().toLowerCase(),
 );
-const MOCK_UNDECRYPTABLE_VALUE = 'not-an-encrypted-value';
 const MOCK_PENDING_EMAIL = faker.internet.email().toLowerCase();
 
 const db = useQueryTestDb();
@@ -90,7 +90,7 @@ describe(listActiveSubscribers, () => {
     );
     await db()
       .update(schema.subscribers)
-      .set({ emailEncrypted: MOCK_UNDECRYPTABLE_VALUE })
+      .set({ emailEncrypted: MOCK_CORRUPT_PERSONAL_VALUE })
       .where(eq(schema.subscribers.id, unreadable.id));
 
     const page = await listActiveSubscribers(
