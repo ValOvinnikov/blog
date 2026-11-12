@@ -7,12 +7,14 @@ import {
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type ISectionProps } from '@web/components/shared/section';
+import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 
-export interface IPostLatestModuleViewProps extends Omit<
+export interface IPostLatestModuleViewProps extends Pick<
   TPostLatestModule,
-  'posts' | 'showImages'
+  'headingBlock' | 'contentAlignment' | 'displayMode' | 'columns'
 > {
+  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
   items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
@@ -20,22 +22,24 @@ export interface IPostLatestModuleViewProps extends Omit<
 }
 
 export const PostLatestModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   items,
-  layout,
+  columns,
   titleId,
   dataTestId,
   contentAlignment,
   hasImages,
   displayMode,
 }: IPostLatestModuleViewProps) => {
+  const { brandVariant, layout, appearance } = section;
   const { heading } = headingBlock;
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -55,7 +59,7 @@ export const PostLatestModuleView = ({
           contentAlignment={contentAlignment}
         />
       ) : (
-        <CardGrid>
+        <CardGrid columns={toCardGridColumns(columns)}>
           {items.map((item) => (
             <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
