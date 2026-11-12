@@ -280,12 +280,16 @@ Free site.
   enforces it too: `createSelfServeTenant` stores the `+tag`-free hash in
   `tenants.self_serve_owner_email_index`, under a partial unique index over
   FREE, non-archived rows, so two simultaneous submits can't both succeed.
-  Operator-created tenants leave it null. The index guards every write, not
-  only Create site: reactivating an archived self-serve tenant
-  (`reactivateTenant`, `DB_ALREADY_OWNS_FREE_TENANT`) or an operator setting
-  one back to FREE (`updateTenantDetails`, shown in the tenant details form as
-  a refusal alert, with no audit event) is refused while its owner holds
-  another. The rule binds self-serve sites only, and operators may override
+  Operator-created tenants leave it null. Any write that moves a tenant to a
+  paid plan clears the key in the same statement (`planChangeFields`, used by
+  `updateTenantDetails` and `setTenantPlan`), so the rule is checked only when
+  a site is created: a site that was once paid can drop back to FREE beside
+  its owner's other Free site, and an owner who once paid can hold two. While
+  the key is set, the index guards every write, not only Create site:
+  reactivating an archived self-serve tenant (`reactivateTenant`,
+  `DB_ALREADY_OWNS_FREE_TENANT`) or an operator setting one back to FREE
+  (`updateTenantDetails`, shown in the tenant details form as a refusal alert,
+  with no audit event) is refused while its owner holds another. The rule binds self-serve sites only, and operators may override
   it: Add tenant (`createTenantAction`) never checks it, and an operator may
   move an operator-created site to FREE however many Free sites its owner
   holds.

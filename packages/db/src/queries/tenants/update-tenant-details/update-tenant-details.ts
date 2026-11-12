@@ -28,6 +28,7 @@ import {
   changesProvisionedTenantDetails,
   restorableTenantFields,
   tenantDetailsFields,
+  tenantDetailsWrite,
 } from './tenant-details-fields';
 
 export type TUpdateTenantDetailsInput = {
@@ -152,11 +153,7 @@ export async function updateTenantDetails(
   try {
     [tenant] = await db
       .update(tenants)
-      .set(
-        ownerEmailChange
-          ? { ...details, unsentReinviteFormerOwnerEmailEncrypted: null }
-          : details,
-      )
+      .set(tenantDetailsWrite(details, !isUndefined(ownerEmailChange)))
       .where(eq(tenants.id, tenantId))
       .returning();
   } catch (error) {
