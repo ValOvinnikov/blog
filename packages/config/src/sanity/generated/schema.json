@@ -3396,27 +3396,6 @@
         },
         "optional": true
       },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            },
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            }
-          ]
-        },
-        "optional": true
-      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
@@ -3439,114 +3418,6 @@
         },
         "optional": true
       },
-      "displayMode": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "GRID"
-            },
-            {
-              "type": "string",
-              "value": "CAROUSEL"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "contentAlignment": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "LEFT"
-            },
-            {
-              "type": "string",
-              "value": "CENTER"
-            }
-          ]
-        },
-        "optional": true
-      },
-      "layout": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "wideLayout"
-        },
-        "optional": true
-      }
-    }
-  },
-  {
-    "name": "module_postList",
-    "type": "document",
-    "attributes": {
-      "_id": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_type": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string",
-          "value": "module_postList"
-        }
-      },
-      "_createdAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_updatedAt": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "_rev": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        }
-      },
-      "title": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "headingBlock": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "inline",
-          "name": "moduleHeadingBlock"
-        },
-        "optional": true
-      },
-      "pageSize": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "number"
-        },
-        "optional": true
-      },
-      "showImages": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
-        },
-        "optional": true
-      },
       "brandVariant": {
         "type": "objectAttribute",
         "value": {
@@ -3563,6 +3434,23 @@
             {
               "type": "string",
               "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "displayMode": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "GRID"
+            },
+            {
+              "type": "string",
+              "value": "CAROUSEL"
             }
           ]
         },
@@ -3793,6 +3681,214 @@
           },
           "optional": true
         }
+      }
+    }
+  },
+  {
+    "name": "module_postList",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "module_postList"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "moduleHeadingBlock"
+        },
+        "optional": true
+      },
+      "pageSize": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "contentAlignment": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "LEFT"
+            },
+            {
+              "type": "string",
+              "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "layout": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "wideLayout"
+        },
+        "optional": true
+      },
+      "cardStyle": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "ACCENT_BAR"
+            },
+            {
+              "type": "string",
+              "value": "OUTLINED"
+            },
+            {
+              "type": "string",
+              "value": "FILLED"
+            },
+            {
+              "type": "string",
+              "value": "RAISED"
+            },
+            {
+              "type": "string",
+              "value": "PLAIN"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "radiusScale": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "NONE"
+            },
+            {
+              "type": "string",
+              "value": "SM"
+            },
+            {
+              "type": "string",
+              "value": "MD"
+            },
+            {
+              "type": "string",
+              "value": "LG"
+            },
+            {
+              "type": "string",
+              "value": "XL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "density": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "DEFAULT"
+            },
+            {
+              "type": "string",
+              "value": "COMPACT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "columns": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "TWO"
+            },
+            {
+              "type": "string",
+              "value": "THREE"
+            },
+            {
+              "type": "string",
+              "value": "FOUR"
+            }
+          ]
+        },
+        "optional": true
       }
     }
   },

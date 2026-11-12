@@ -14,6 +14,7 @@ type TTileField<T extends string> = {
   Picture: ComponentType<{ value: T }>;
   initialValue?: T;
   validation?: StringDefinition['validation'];
+  hidden?: StringDefinition['hidden'];
 };
 
 export const tileField = <T extends string>({
@@ -25,6 +26,7 @@ export const tileField = <T extends string>({
   Picture,
   initialValue,
   validation,
+  hidden,
 }: TTileField<T>) =>
   defineField({
     name,
@@ -37,4 +39,5 @@ export const tileField = <T extends string>({
     },
     initialValue,
     validation,
+    hidden,
   });
