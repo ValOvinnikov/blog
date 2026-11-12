@@ -1,10 +1,12 @@
-import { MOCK_EMAIL_ADDRESS } from '@blog/email/testing/email-fixtures';
+import {
+  MOCK_EMAIL_ADDRESS,
+  MOCK_PLATFORM_BRAND_NAME,
+  MOCK_TENANT_NAME,
+} from '@blog/email/testing/email-fixtures';
 
 import { applyTenantSenderName } from './apply-tenant-sender-name';
 
-const MOCK_FROM_EMAIL = MOCK_EMAIL_ADDRESS;
-const MOCK_FROM_ADDRESS = `Platform Mail <${MOCK_FROM_EMAIL}>`;
-const MOCK_SENDER_NAME = 'Northwind Journal';
+const MOCK_FROM_ADDRESS = `${MOCK_PLATFORM_BRAND_NAME} <${MOCK_EMAIL_ADDRESS}>`;
 const MOCK_COMMA_NAME = 'Acme, Inc.';
 
 const MOCK_INJECTED_SENDER_NAME =
@@ -22,28 +24,28 @@ describe(applyTenantSenderName, () => {
   });
 
   it('overrides the display name, keeping the configured address', () => {
-    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_SENDER_NAME)).toBe(
-      `"${MOCK_SENDER_NAME}" <${MOCK_FROM_EMAIL}>`,
+    expect(applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_TENANT_NAME)).toBe(
+      `"${MOCK_TENANT_NAME}" <${MOCK_EMAIL_ADDRESS}>`,
     );
   });
 
   it('keeps a comma inside the quoted display name', () => {
     expect(applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_COMMA_NAME)).toBe(
-      `"${MOCK_COMMA_NAME}" <${MOCK_FROM_EMAIL}>`,
+      `"${MOCK_COMMA_NAME}" <${MOCK_EMAIL_ADDRESS}>`,
     );
   });
 
   it('escapes quotes and backslashes so the name cannot close its quoted string', () => {
     expect(
       applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_QUOTE_SENDER_NAME),
-    ).toBe(`"Acme\\" evil@attacker.example \\\\" <${MOCK_FROM_EMAIL}>`);
+    ).toBe(`"Acme\\" evil@attacker.example \\\\" <${MOCK_EMAIL_ADDRESS}>`);
   });
 
   it('strips angle brackets and newlines from the sender name', () => {
     expect(
       applyTenantSenderName(MOCK_FROM_ADDRESS, MOCK_INJECTED_SENDER_NAME),
     ).toBe(
-      `"Acme evil@attacker.exampleBcc: victim@example.com" <${MOCK_FROM_EMAIL}>`,
+      `"Acme evil@attacker.exampleBcc: victim@example.com" <${MOCK_EMAIL_ADDRESS}>`,
     );
   });
 });
