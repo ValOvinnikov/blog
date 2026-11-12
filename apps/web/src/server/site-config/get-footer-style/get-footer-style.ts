@@ -1,21 +1,14 @@
-import { PRESET_ID, PRESET_REGISTRY, type IFooterStyle } from '@blog/config';
+import type { IFooterStyle } from '@blog/config';
 import { FOOTER_LOG } from '@web/constants/footer';
-import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
-import { logger } from '@web/utils/logger/logger';
+import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
 
 export const getFooterStyle = async (
   tenant?: string,
 ): Promise<IFooterStyle> => {
-  const result = await getSiteConfig(tenant);
-
-  if (!result.ok) {
-    logger.error(FOOTER_LOG.SITE_CONFIG_FETCH_FAILED, {
-      error: result.error,
-    });
-  }
-
-  const row = result.ok ? result.data : undefined;
-  const preset = PRESET_REGISTRY[row?.preset ?? PRESET_ID.CONSOLE];
+  const { row, preset } = await getSiteConfigWithPreset(
+    FOOTER_LOG.SITE_CONFIG_FETCH_FAILED,
+    tenant,
+  );
 
   return {
     layout: row?.footerLayout ?? preset.footerLayout,

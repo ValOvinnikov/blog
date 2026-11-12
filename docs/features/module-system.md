@@ -6,6 +6,9 @@ code:
   - apps/web/src/modules/module-renderer*.tsx
   - apps/web/src/testing/shared/module-renderer-contract/**
   - apps/web/src/components/shared/section/**
+  - apps/web/src/utils/build-section-scope-declarations/**
+  - apps/web/src/utils/gate-section-style-overrides/**
+  - apps/web/src/server/site-config/get-section-appearance/**
   - apps/web/src/components/shared/module-heading/**
   - apps/web/src/utils/to-module-grid-columns/**
   - packages/config/src/types/page-module*.ts
@@ -57,7 +60,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 
 - Editors (Studio) create module documents, set their fields, and order them in a template's Modules field. Every page accepts `module_cta` and `module_newsletter`; each template adds its own list in `modulesField({ extend })`. See [page-types](./page-types.md) for each template's list.
 - `module_cookieSettings` (Cookie Settings, Conversion group) is accepted by `template_home` and `template_landing` and carries only the shared fields, its heading optional. `service.modules.cookieSettings.v1.getCookieSettings` returns its background, optional heading and layout, but the web has no renderer for it yet, so a placed one renders nothing.
-- `module_newsletter` is the only capability-gated module: Studio flags it when the Newsletter capability is off, and the web module renders nothing ([newsletter](./newsletter.md), [plans-and-entitlements](./plans-and-entitlements.md)). No module is plan-gated.
+- `module_newsletter` is the only capability-gated module: Studio flags it when the Newsletter capability is off, and the web module renders nothing ([newsletter](./newsletter.md), [plans-and-entitlements](./plans-and-entitlements.md)). No module is plan-gated, but a module's section style overrides are: on any plan without the `cardStyle`, `radiusScale` or `density` Look field (today everything below Growth), web drops that override and the band renders the site Look.
 - Look reach: accent hue (the Brand tint band and every accent colour), card style, radius, fonts and density restyle every module through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Voice reaches only the empty states of the post list and taxonomy list ([voice](./voice.md)).
 
 ## Constraints and invariants
@@ -68,6 +71,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 - Modules receive only `id` and an optional page `context`: `post.id` (post page), `landingPage { id, path }` (landing page), `page` (current archive page), and `archive { id, kind, slug, name }` (topic/tag page). A module needing context it lacks logs a warning and renders nothing.
 - Every module renders inside `Section`: a full-bleed `<section aria-labelledby>` painted by `brandVariant`, padding (not margin) spacing so bands tile, and a centred inner container. Heading level is `h2` for modules; only a hero renders the `h1`.
 - A linked card (`MediaCard`, `TaxonomyCard`, `LogoTile`) is one stretched `TextLink` (`isStretched`): its `::before` covers the card, so a click anywhere on the card opens the link, and keyboard focus draws an inset `--ring` outline (Highlight in forced colours) around the whole card, never around the clamped title. Drawing it inset keeps a parent's `overflow-hidden`, such as a carousel viewport, from clipping it.
+- Section style overrides (card style, Corners, density; Post List first) render as token re-declarations in the `<section>`'s inline style, built by `buildSectionScopeDeclarations` from the same `@blog/config` maps the site's `:root` block uses. It is the one formatter for a nested token scope: it re-emits every chain `theme.css` derives on `:root` from an overridden input — the radius aliases (`DERIVED_RADIUS_DECLARATIONS`), the site's `--radius-button` and card style for Corners, `--radius-item` for card style, the band spacing steps (`DERIVED_SPACING_DECLARATIONS`) for density — and never a colour, so it composes with any band background. Precedence: section override > site Look > preset. A value the maps do not hold is ignored. `getSectionAppearance` gates the overrides by the effective plan and reads the site's card style and button shape.
 - `toModuleGridColumns` is the one rule for count-derived grid columns (2→2, 3→3, 4→4, 5→3, 6→3, 7→4, 8→4, 9→3, otherwise 4).
 - `REVALIDATE_TAGS` must have an entry for every `TModuleType` (enforced by `satisfies`), and `pnpm check:revalidate-tags-sync` fails when a loader's `isr()` tag is missing from it.
 - Studio module icons are wrapped by `textSizedIcon`; the desk's Heroes group is hardcoded in `modules-section.ts`, and every group after it comes from `moduleKinds`.
@@ -83,6 +87,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 - `apps/web/src/modules/module-renderer.tsx` — `renderModules`, `renderHeroModule`, `TModuleComponentProps`
 - `apps/web/src/components/pages/home-page/home-module-renderer.tsx` (and the seven sibling `*-module-renderer.tsx`)
 - `apps/web/src/components/shared/section/section.tsx`, `section-variants.ts`
+- `apps/web/src/utils/build-section-scope-declarations/build-section-scope-declarations.ts`, `apps/web/src/server/site-config/get-section-appearance/get-section-appearance.ts`
 - `apps/web/src/utils/revalidate-tags/revalidate-tags.ts`
 - `apps/web/src/server/revalidate/resolve-referencing-module-tags/resolve-referencing-module-tags.ts`
 - `packages/config/src/types/page-module.ts`, `packages/config/src/constants/module.ts`, `layout.ts`
@@ -93,7 +98,7 @@ Editors build a page out of modules: reusable Sanity documents (a hero, a post l
 
 ## Tests and stories
 
-- Web: `module-renderer.test.tsx`, every `*-module-renderer.test.tsx` (sharing `testing/shared/module-renderer-contract`), `section.test.tsx`, `module-heading.test.tsx`, `to-module-grid-columns.test.ts`, `revalidate-tags.test.ts`, `resolve-referencing-module-tags.test.ts`.
+- Web: `module-renderer.test.tsx`, every `*-module-renderer.test.tsx` (sharing `testing/shared/module-renderer-contract`), `section.test.tsx`, `build-section-scope-declarations.test.ts`, `gate-section-style-overrides.test.ts`, `get-section-appearance.test.ts`, `module-heading.test.tsx`, `to-module-grid-columns.test.ts`, `revalidate-tags.test.ts`, `resolve-referencing-module-tags.test.ts`.
 - Studio: `module-kinds.test.ts`. Service: `to-module.test.ts`, `to-layout.test.ts`, `features/entities/modules/**/*.test.ts`. Config: `page-module.test.ts`, `module.test.ts`.
 - Stories: `section.stories.tsx`, `module-heading.stories.tsx`, and a `*-module-view.stories.tsx` beside every web module.
 

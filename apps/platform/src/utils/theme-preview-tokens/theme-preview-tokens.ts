@@ -4,6 +4,7 @@ import {
   BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
+  DERIVED_RADIUS_DECLARATIONS,
   formatOklchRamp,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE_DECLARATIONS,
@@ -28,13 +29,6 @@ import { FONT_OPTIONS } from '@platform/config/fonts';
 import type { CSSProperties } from 'react';
 
 const HUE_GRADIENT_STEP = 20;
-
-// theme.css derives these in @theme, i.e. on :root, so they must be re-derived where the preview overrides their inputs.
-const DERIVED_RADIUS_DECLARATIONS: TThemeDeclarations = {
-  '--radius-card': 'var(--radius-md)',
-  '--radius-media': 'var(--radius-lg)',
-  '--radius-item': 'var(--item-radius)',
-};
 
 export const buildAccentPreviewTokens = (hue: number, isDark: boolean) => {
   return formatOklchRamp(isDark ? ACCENT_RAMP_DARK : ACCENT_RAMP_LIGHT, hue);

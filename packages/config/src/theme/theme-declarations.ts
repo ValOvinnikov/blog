@@ -92,6 +92,20 @@ export const BUTTON_SHAPE_DECLARATIONS: Record<
   [BUTTON_SHAPE.PILL]: { '--radius-button': RADIUS_PILL },
 };
 
+// theme.css derives these in @theme, i.e. on :root, so a nested scope overriding their inputs must re-declare them.
+export const DERIVED_RADIUS_DECLARATIONS: TThemeDeclarations = {
+  '--radius-card': 'var(--radius-md)',
+  '--radius-media': 'var(--radius-lg)',
+  '--radius-item': 'var(--item-radius)',
+};
+
+export const DERIVED_SPACING_DECLARATIONS: TThemeDeclarations = {
+  '--spacing-band-sm': 'calc(var(--spacing-band) * 1.5)',
+  '--spacing-band-md': 'calc(var(--spacing-band) * 3)',
+  '--spacing-band-lg': 'calc(var(--spacing-band) * 4)',
+  '--spacing-band-xl': 'calc(var(--spacing-band) * 6)',
+};
+
 /** A stop without its own `h` takes the tenant's hue. */
 export const formatOklchRamp = <TRamp extends TOklchRamp>(
   ramp: TRamp,

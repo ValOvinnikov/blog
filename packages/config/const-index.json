@@ -9058,6 +9058,14 @@
         "file": "apps/web/src/constants/rss.ts"
       }
     ],
+    "section_appearance.site_config_fetch_failed": [
+      {
+        "ref": "SECTION_APPEARANCE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-appearance",
+        "file": "apps/web/src/constants/section-appearance.ts"
+      }
+    ],
     "section_document_page.fetch_failed": [
       {
         "ref": "SECTION_DOCUMENT_LOG.PAGE_FETCH_FAILED",

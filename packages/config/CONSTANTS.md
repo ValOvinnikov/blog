@@ -848,6 +848,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
 
+### `@web/constants/section-appearance` — `apps/web/src/constants/section-appearance.ts`
+
+- **SECTION_APPEARANCE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"section_appearance.site_config_fetch_failed"`
+
 ### `@web/constants/section-document` — `apps/web/src/constants/section-document.ts`
 
 - **SECTION_DOCUMENT_LOG**: `PAGE_FETCH_FAILED`=`"section_document_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"section_document_metadata.fetch_failed"`, `BY_KIND_FETCH_FAILED`=`"section_document_by_kind.fetch_failed"`

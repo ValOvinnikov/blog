@@ -5,6 +5,7 @@ layers: [config, studio, service, ui, web]
 code:
   - apps/web/src/modules/post-*/**
   - apps/web/src/utils/to-post-list-items/**
+  - apps/web/src/utils/to-card-grid-columns/**
   - apps/web/src/utils/render-post-card-image/**
   - apps/web/src/utils/render-post-lead-image/**
   - packages/studio/src/schema-types/modules/post-*/**
@@ -31,7 +32,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 - **Shared fields** — `title`, `brandVariant`, required `headingBlock`, `showImages` (default on), `contentAlignment` (Left/Center), `layout` (`wideLayout`: spacing, Wide/Full width, dividers).
 - **Latest Posts** — `limit` (required, 1–12), `displayMode` (Grid/Carousel).
 - **Featured Posts** — `postSource` (`PINNED` default, or `NEWEST_FEATURED`), `posts` (pinned, published only, unique, 1–3, in display order), `limit` (Newest featured only, 1–3, default 3), `displayMode`.
-- **Post List** — `pageSize` (required, 1–24). Always a grid.
+- **Post List** — `pageSize` (required, 1–24). Always a grid. Appearance: `cardStyle`, `radiusScale` (Corners) and `density` section overrides, and `columns` (Auto, 2, 3, 4; Auto keeps three), via `moduleAppearanceFragment`.
 - **Related Reading** — `limit` (required, 1–6, default 3). Always a grid.
 - **Post cards** — `postCardFragment` via `toPostCard`; web turns them into `MediaCardItem` data with `toPostListItems`, adding a card image (or the larger lead image for the first Featured post) only when `showImages` is on. A post with no hero image gets no media slot, so its card lays out as imageless rather than showing an empty image box.
 - **Caching** — module query `modules:<kind>` + `module:<id>`; post queries `posts`, `author`, `topic` (+ `tag` for Post List and Related Reading). Fallback revalidate 3600s.
@@ -40,7 +41,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 
 - Editors place and configure the modules in the Studio. No plan or capability gate.
 - Voice: the Post List's empty state is the tenant-editable `blogListEmpty`, `topicEmpty` or `tagEmpty` message ([voice](./voice.md)). Pagination labels come from the fixed `pagination` and page catalogues.
-- Look: card style, radius and density restyle the cards ([look](./look.md)).
+- Look: card style, radius and density restyle the cards ([look](./look.md)). On Growth, Post List's section overrides win over the Look for its own band ([module-system](./module-system.md)).
 
 ## Constraints and invariants
 

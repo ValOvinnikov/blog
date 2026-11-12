@@ -1,13 +1,15 @@
 import type { TPostListModule } from '@blog/service';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { Pagination } from '@blog/ui/components/organisms/pagination';
+import { hasLength } from '@blog/utils/primitives';
 import {
   type IMediaCardData,
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type ISectionProps } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import type { ReactNode } from 'react';
 
 import { postListModuleViewVariants } from './post-list-module-view-variants';
@@ -21,10 +23,11 @@ export interface IPostListModulePagination {
   nextLabel: string;
 }
 
-export interface IPostListModuleViewProps extends Omit<
+export interface IPostListModuleViewProps extends Pick<
   TPostListModule,
-  'posts' | 'currentPage' | 'totalPages' | 'showImages'
+  'headingBlock' | 'contentAlignment' | 'columns'
 > {
+  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
   items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
@@ -34,10 +37,10 @@ export interface IPostListModuleViewProps extends Omit<
 }
 
 export const PostListModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   items,
-  layout,
+  columns,
   titleId,
   dataTestId,
   emptyMessage,
@@ -45,13 +48,14 @@ export const PostListModuleView = ({
   contentAlignment,
   hasImages,
 }: IPostListModuleViewProps) => {
-  const isEmpty = items.length === 0;
+  const isEmpty = !hasLength(items);
   const v = postListModuleViewVariants();
 
   return (
     <Section
-      brandVariant={brandVariant}
-      layout={layout}
+      brandVariant={section.brandVariant}
+      layout={section.layout}
+      appearance={section.appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -65,7 +69,7 @@ export const PostListModuleView = ({
       {isEmpty ? (
         <p className={v.emptyMessage()}>{emptyMessage}</p>
       ) : (
-        <CardGrid>
+        <CardGrid columns={toCardGridColumns(columns)}>
           {items.map((item) => (
             <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}
