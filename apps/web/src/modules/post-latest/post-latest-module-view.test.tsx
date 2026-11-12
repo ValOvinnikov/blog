@@ -1,9 +1,4 @@
-import {
-  BRAND_VARIANT,
-  DISPLAY_MODE,
-  RADIUS_DECLARATIONS,
-  RADIUS_SCALE,
-} from '@blog/config';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { MEDIA_CARD_MEDIA_TEST_ID } from '@web/constants/media-card';
 import { customRender, screen, within } from '@web/testing/custom-render';
@@ -15,8 +10,9 @@ import {
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_POST_IMAGE_TEST_ID } from '@web/testing/shared/post/fixtures';
 import {
+  MOCK_RADIUS_OVERRIDE_SECTION,
+  MOCK_RADIUS_OVERRIDE_VALUE,
   MOCK_SCOPED_RADIUS_TOKEN,
-  MOCK_SECTION_LOOK,
 } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostLatestModuleView } from './post-latest-module-view';
@@ -96,13 +92,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
     (displayMode) => {
       setup({
         displayMode,
-        section: {
-          brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
-          appearance: {
-            overrides: { radiusScale: RADIUS_SCALE.XL },
-            look: MOCK_SECTION_LOOK,
-          },
-        },
+        section: MOCK_RADIUS_OVERRIDE_SECTION,
       });
 
       const section = screen.getByRole('region', {
@@ -110,7 +100,7 @@ describe(`<${PostLatestModuleView.name}/>`, () => {
       });
 
       expect(section.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
-        RADIUS_DECLARATIONS[RADIUS_SCALE.XL][MOCK_SCOPED_RADIUS_TOKEN],
+        MOCK_RADIUS_OVERRIDE_VALUE,
       );
     },
   );
