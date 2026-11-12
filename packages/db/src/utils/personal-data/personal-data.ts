@@ -24,7 +24,7 @@ export function decryptPersonalValue(encrypted: string): string {
   return decryptPersonalData(encrypted, requireEncryptionKeyring());
 }
 
-/** Undefined for a value the keyring cannot decrypt; a missing keyring still throws. */
+/** Undefined for a value the configured keyring cannot decrypt; an unset or malformed keyring throws. */
 export function decryptPersonalValueOrUndefined(
   encrypted: string,
 ): TMaybeUndefined<string> {
