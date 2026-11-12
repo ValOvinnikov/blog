@@ -13,6 +13,7 @@
       "outputs": [".next/**", "!.next/cache/**", "dist/**"],
       "env": [
         "NODE_ENV",
+        "BUILD_DEPLOYMENT_ID",
         "NEXT_PUBLIC_SANITY_PROJECT_ID",
         "NEXT_PUBLIC_SANITY_DATASET",
         "SANITY_API_READ_TOKEN",
@@ -61,6 +62,8 @@
         "CRON_SECRET",
         "OPERATOR_ALERT_FROM_ADDRESS",
         "OWNER_EMAIL_FROM_ADDRESS",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
         "SUPPORT_REPLY_TO_ADDRESS",
         "PRODUCT_NAME",
         "MARKETING_SITE_URL",

@@ -1,11 +1,17 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  TENANT_PLAN,
+  TENANT_PLAN_WRITE_OUTCOME,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@blog/db/testing/tenants/self-serve-fixtures';
+import {
+  MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+  readSelfServeIndex,
+} from '@blog/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantPlan } from './set-tenant-plan';
@@ -13,14 +19,6 @@ import { setTenantPlan } from './set-tenant-plan';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-
-async function readSelfServeIndex(tenantId: string) {
-  const [row] = await db()
-    .select({ selfServeOwnerEmailIndex: tenants.selfServeOwnerEmailIndex })
-    .from(tenants)
-    .where(eq(tenants.id, tenantId));
-  return row?.selfServeOwnerEmailIndex;
-}
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -44,10 +42,24 @@ describe(setTenantPlan, () => {
       });
 
       expect(result).toEqual({
-        ok: true,
-        data: { plan: TENANT_PLAN.GROWTH, status: TENANT_STATUS.PAST_DUE },
+        outcome: TENANT_PLAN_WRITE_OUTCOME.WRITTEN,
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.PAST_DUE,
+        previousPlan: TENANT_PLAN.FREE,
       });
-      expect(await readSelfServeIndex(tenantId)).toBeNull();
+      expect(await readSelfServeIndex(db(), tenantId)).toBeNull();
+    });
+
+    it('reports the stored plan as the previous one when a write repeats it', async () => {
+      const write = {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.ACTIVE,
+      };
+      await setTenantPlan(tenantId, write);
+
+      const repeated = await setTenantPlan(tenantId, write);
+
+      expect(repeated).toMatchObject({ previousPlan: TENANT_PLAN.GROWTH });
     });
 
     it('keeps the Free-site key on a write that stays on FREE', async () => {
@@ -56,7 +68,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.ACTIVE,
       });
 
-      expect(await readSelfServeIndex(tenantId)).toBe(
+      expect(await readSelfServeIndex(db(), tenantId)).toBe(
         MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
       );
     });
@@ -76,8 +88,10 @@ describe(setTenantPlan, () => {
       });
 
       expect(result).toEqual({
-        ok: true,
-        data: { plan: TENANT_PLAN.FREE, status: TENANT_STATUS.ACTIVE },
+        outcome: TENANT_PLAN_WRITE_OUTCOME.WRITTEN,
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+        previousPlan: TENANT_PLAN.STARTER,
       });
     });
   });
@@ -99,7 +113,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.TRIAL,
       });
 
-      expect(await readSelfServeIndex(tenantId)).toBe(
+      expect(await readSelfServeIndex(db(), tenantId)).toBe(
         MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
       );
     });
@@ -110,16 +124,41 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.ACTIVE,
       });
 
-      expect(await readSelfServeIndex(tenantId)).toBeNull();
+      expect(await readSelfServeIndex(db(), tenantId)).toBeNull();
     });
   });
 
-  it('returns not-found for a tenant id that does not exist', async () => {
+  it.each([TENANT_STATUS.ARCHIVED, TENANT_STATUS.SUSPENDED])(
+    'leaves a %s tenant unchanged and reports it not writable',
+    async (status) => {
+      const { id } = await insertTestTenant(db(), {
+        plan: TENANT_PLAN.FREE,
+        status,
+      });
+
+      const result = await setTenantPlan(id, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(result).toEqual({
+        outcome: TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE,
+        status,
+      });
+      const [row] = await db()
+        .select({ plan: tenants.plan, status: tenants.status })
+        .from(tenants)
+        .where(eq(tenants.id, id));
+      expect(row).toEqual({ plan: TENANT_PLAN.FREE, status });
+    },
+  );
+
+  it('reports not-found for a tenant id that does not exist', async () => {
     const result = await setTenantPlan(MOCK_MISSING_TENANT_ID, {
       plan: TENANT_PLAN.GROWTH,
       status: TENANT_STATUS.ACTIVE,
     });
 
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    expect(result).toEqual({ outcome: TENANT_PLAN_WRITE_OUTCOME.NOT_FOUND });
   });
 });

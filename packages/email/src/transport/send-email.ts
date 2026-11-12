@@ -21,6 +21,7 @@ export type TSendEmailInput = {
   headers?: Record<string, string>;
   replyTo?: string;
   tags?: TEmailTag[];
+  idempotencyKey?: string;
 };
 
 /** Strips line breaks from a subject so authored copy can never inject a mail header. */
@@ -65,12 +66,13 @@ export async function sendEmail({
   headers,
   replyTo,
   tags,
+  idempotencyKey,
 }: TSendEmailInput): Promise<void> {
   if (!isUndefined(replyTo) && !isValidEmailAddress(replyTo)) {
     throw new Error('sendEmail received a malformed replyTo address');
   }
 
-  const { error } = await getResendClient(account).emails.send({
+  const payload = {
     to,
     from,
     subject: sanitizeEmailSubject(subject),
@@ -79,7 +81,11 @@ export async function sendEmail({
     headers,
     replyTo,
     tags,
-  });
+  };
+  const { emails } = getResendClient(account);
+  const { error } = await (isUndefined(idempotencyKey)
+    ? emails.send(payload)
+    : emails.send(payload, { idempotencyKey }));
 
   if (error) {
     throw new Error(`Failed to send email via Resend: ${error.message}`);

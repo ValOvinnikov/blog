@@ -7,7 +7,8 @@
 `preset.ts` — `createNextConfig(overrides)`, which wraps the pieces of
 `next.config.ts` that are identical across every app: the worktree-safe
 Turbopack root, the SVGR Turbopack rule, the non-CSP security headers, and
-the `next-intl` plugin wrapping. Each app passes only its own
+the `next-intl` plugin wrapping, and `deploymentId` from `BUILD_DEPLOYMENT_ID`
+when the deploy workflows set it. Each app passes only its own
 `transpilePackages`, `images`, `experimental`, and computed
 `contentSecurityPolicy`.
 

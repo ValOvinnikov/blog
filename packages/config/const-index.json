@@ -3634,6 +3634,12 @@
         "file": "packages/db/src/constants/billing.ts"
       },
       {
+        "ref": "TENANT_PLAN_WRITE_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      },
+      {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
         "scope": "app:platform",
         "from": "@platform/constants/lead",
@@ -3678,6 +3684,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/sanity-webhook-operation.ts"
+      },
+      {
+        "ref": "ROW_LOCK.UPDATE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/row-lock.ts"
       }
     ],
     "BLOG": [
@@ -4152,6 +4164,22 @@
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
+    "WRITTEN": [
+      {
+        "ref": "TENANT_PLAN_WRITE_OUTCOME.WRITTEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "NOT_WRITABLE": [
+      {
+        "ref": "TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
     "ADDRESS": [
       {
         "ref": "BLOCKED_IDENTITY_KIND.ADDRESS",
@@ -4193,6 +4221,38 @@
     "COMPLAINED": [
       {
         "ref": "EMAIL_DELIVERY_OUTCOME.COMPLAINED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "OK": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.OK",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "WARN": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.WARN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "SLOW": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.SLOW",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "STOP": [
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.STOP",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
@@ -4242,6 +4302,78 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/membership.ts"
+      }
+    ],
+    "SENT": [
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SENT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SKIPPED": [
+      {
+        "ref": "NEWSLETTER_POST_SEND_OUTCOME.SKIPPED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "OVER_SUBSCRIBER_BAND": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_SUBSCRIBER_BAND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "OVER_MONTHLY_ALLOWANCE": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.OVER_MONTHLY_ALLOWANCE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "REPUTATION_STOP": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.REPUTATION_STOP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SITE_PAUSED": [
+      {
+        "ref": "NEWSLETTER_SKIP_REASON.SITE_PAUSED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SUBSCRIBER_BAND_NEAR": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SUBSCRIBER_BAND_NEAR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "MONTHLY_ALLOWANCE_NEAR": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.MONTHLY_ALLOWANCE_NEAR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
+      }
+    ],
+    "SENDING_PAUSED": [
+      {
+        "ref": "NEWSLETTER_LIMIT_NOTICE_KIND.SENDING_PAUSED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/newsletter.ts"
       }
     ],
     "LOOK": [
@@ -5122,6 +5254,204 @@
         "file": "apps/platform/src/constants/badge-tone.ts"
       }
     ],
+    "billing.webhook_secret_missing": [
+      {
+        "ref": "BILLING_LOG.WEBHOOK_SECRET_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.webhook_signature_invalid": [
+      {
+        "ref": "BILLING_LOG.WEBHOOK_SIGNATURE_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.webhook_handler_failed": [
+      {
+        "ref": "BILLING_LOG.WEBHOOK_HANDLER_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.tenant_not_found": [
+      {
+        "ref": "BILLING_LOG.TENANT_NOT_FOUND",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.tenant_conflict": [
+      {
+        "ref": "BILLING_LOG.TENANT_CONFLICT",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.tenant_not_writable": [
+      {
+        "ref": "BILLING_LOG.TENANT_NOT_WRITABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.price_unknown": [
+      {
+        "ref": "BILLING_LOG.PRICE_UNKNOWN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.subscription_superseded": [
+      {
+        "ref": "BILLING_LOG.SUBSCRIPTION_SUPERSEDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.receipt_unconfigured": [
+      {
+        "ref": "BILLING_LOG.RECEIPT_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.receipt_owner_missing": [
+      {
+        "ref": "BILLING_LOG.RECEIPT_OWNER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.receipt_failed": [
+      {
+        "ref": "BILLING_LOG.RECEIPT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "customer.subscription.created": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "customer.subscription.updated": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_UPDATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "customer.subscription.deleted": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_DELETED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "invoice.paid": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "invoice.payment_failed": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "active": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "trialing": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.TRIALING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "past_due": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.PAST_DUE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "canceled": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.CANCELED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "unpaid": [
+      {
+        "ref": "STRIPE_SUBSCRIPTION_STATUS.UNPAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "START": [
+      {
+        "ref": "BILLING_GRACE.START",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "END": [
+      {
+        "ref": "BILLING_GRACE.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
+        "scope": "app:platform",
+        "from": "@platform/constants/device-frame",
+        "file": "apps/platform/src/constants/device-frame.ts"
+      }
+    ],
+    "KEEP": [
+      {
+        "ref": "BILLING_GRACE.KEEP",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "GHOST": [
       {
         "ref": "BUTTON_VARIANT.GHOST",
@@ -5584,6 +5914,14 @@
         "file": "apps/platform/src/constants/data-request.ts"
       }
     ],
+    "SELF_SERVE_OWNER": [
+      {
+        "ref": "DATA_REQUEST_MATCH_KIND.SELF_SERVE_OWNER",
+        "scope": "app:platform",
+        "from": "@platform/constants/data-request",
+        "file": "apps/platform/src/constants/data-request.ts"
+      }
+    ],
     "SIGNUP_BLOCK": [
       {
         "ref": "DATA_REQUEST_MATCH_KIND.SIGNUP_BLOCK",
@@ -5697,14 +6035,6 @@
     "TOP": [
       {
         "ref": "DEVICE_FRAME_SCROLL_TARGET.TOP",
-        "scope": "app:platform",
-        "from": "@platform/constants/device-frame",
-        "file": "apps/platform/src/constants/device-frame.ts"
-      }
-    ],
-    "END": [
-      {
-        "ref": "DEVICE_FRAME_SCROLL_TARGET.END",
         "scope": "app:platform",
         "from": "@platform/constants/device-frame",
         "file": "apps/platform/src/constants/device-frame.ts"
@@ -9034,6 +9364,14 @@
         "scope": "app:web",
         "from": "@web/constants/rss",
         "file": "apps/web/src/constants/rss.ts"
+      }
+    ],
+    "section_appearance.site_config_fetch_failed": [
+      {
+        "ref": "SECTION_APPEARANCE_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/section-appearance",
+        "file": "apps/web/src/constants/section-appearance.ts"
       }
     ],
     "section_document_page.fetch_failed": [

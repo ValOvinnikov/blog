@@ -67,8 +67,11 @@ export function createNextConfig(overrides: TNextConfigOverrides): NextConfig {
   const { contentSecurityPolicy, proxyOwnsFramingForQueryParam, ...appConfig } =
     overrides;
 
+  const deploymentId = process.env['BUILD_DEPLOYMENT_ID'];
+
   const config: NextConfig = {
     ...appConfig,
+    ...(deploymentId ? { deploymentId } : {}),
     turbopack: {
       root: turbopackRoot,
       rules: {

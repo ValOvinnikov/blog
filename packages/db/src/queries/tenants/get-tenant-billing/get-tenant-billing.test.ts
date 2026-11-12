@@ -1,8 +1,10 @@
-import * as schema from '@blog/db/schema';
-import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { mockTenantBilling } from '@blog/db/testing/tenants/billing';
+import {
+  MOCK_EMPTY_TENANT_BILLING,
+  mockTenantBilling,
+} from '@blog/db/testing/tenants/billing';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { useTestTenant } from '@blog/db/testing/test-tenant';
 
 import { getTenantBilling } from './get-tenant-billing';
 
@@ -10,35 +12,26 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
-afterEach(async () => {
-  await db().delete(schema.tenants);
-});
-
 describe(getTenantBilling, () => {
-  it('reads every field as undefined for a tenant with no billing recorded', async () => {
-    const { id } = await insertTestTenant(db());
+  describe('a tenant with no billing recorded', () => {
+    const tenant = useTestTenant(db);
 
-    const result = await getTenantBilling(id);
+    it('reads every field as undefined', async () => {
+      const result = await getTenantBilling(tenant().id);
 
-    expect(result).toEqual({
-      stripeCustomerId: undefined,
-      stripeSubscriptionId: undefined,
-      stripePromotionCode: undefined,
-      trialEndsAt: undefined,
-      downgradeGraceStartedAt: undefined,
-      graceStartedEmailSentAt: undefined,
-      graceHalfwayEmailSentAt: undefined,
-      graceEndingEmailSentAt: undefined,
+      expect(result).toEqual(MOCK_EMPTY_TENANT_BILLING);
     });
   });
 
-  it('reads the stored billing', async () => {
+  describe('a tenant with billing stored', () => {
     const billing = mockTenantBilling();
-    const { id } = await insertTestTenant(db(), billing);
+    const tenant = useTestTenant(db, billing);
 
-    const result = await getTenantBilling(id);
+    it('reads the stored billing', async () => {
+      const result = await getTenantBilling(tenant().id);
 
-    expect(result).toEqual(billing);
+      expect(result).toEqual(billing);
+    });
   });
 
   it('returns undefined for a tenant id that does not exist', async () => {

@@ -755,6 +755,7 @@
     "densityDescription": "Espacement et taille des contrôles.",
     "cardStyleLabel": "Style de carte",
     "cardStyleDescription": "Encadre chaque carte de contenu : articles, thèmes, citations, tarifs, questions fréquentes et encadrés d'appel à l'action.",
+    "cardStyleSectionNote": "Une section peut utiliser un autre style de carte. Définissez-le sur la section dans Studio.",
     "radiusScaleOptionLabel": {
       "NONE": "Aucun",
       "SM": "Petit",
@@ -763,7 +764,7 @@
       "XL": "Très grand"
     },
     "densityOptionLabel": {
-      "DEFAULT": "Par défaut",
+      "DEFAULT": "Confortable",
       "COMPACT": "Compacte"
     },
     "cardStyleOptionLabel": {
@@ -2020,7 +2021,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Retrouver les données d’une personne",
-    "supportingText": "Recherche parmi les abonnés, les messages de contact, les invitations, les blocages d’inscription et les événements d’audit de tous les sites.",
+    "supportingText": "Recherche parmi les abonnés, les messages de contact, les invitations, les invitations Studio non envoyées, les propriétaires de sites en libre-service, les blocages d’inscription et les événements d’audit de tous les sites.",
     "emailLabel": "Adresse e-mail",
     "emailHint": "Retrouve la même boîte aux lettres quelle que soit la casse et avec n’importe quel +tag.",
     "emailPlaceholder": "nom@example.com",
@@ -2044,7 +2045,7 @@
   "dataRequestEraseDialog": {
     "erase": "Effacer",
     "title": "Effacer les données de cette personne ?",
-    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites. Cette action est irréversible.",
+    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites, efface les invitations Studio non envoyées et efface la clé de propriétaire en libre-service associée à son adresse. Cette action est irréversible.",
     "confirm": "Effacer les données",
     "erasing": "Effacement…",
     "includesReaderAccount": "Supprimer aussi le compte lecteur",
@@ -2088,6 +2089,7 @@
     "LEAD": "Message de contact",
     "INVITE": "Invitation",
     "STUDIO_REINVITE": "Invitation Studio non envoyée",
+    "SELF_SERVE_OWNER": "Propriétaire d’un site en libre-service",
     "SIGNUP_BLOCK": "Blocage d’inscription",
     "AUDIT_EVENT": "Événement d’audit",
     "READER_ACCOUNT": "Compte lecteur",
@@ -2127,6 +2129,15 @@
       "options": "Les options des offres payantes sont désactivées sur votre site : langues supplémentaires, réglages d’Apparence Growth, modules de page payants et fonctionnalités comme le formulaire de contact, les favoris et les statistiques.",
       "kept": "Rien n’est supprimé. Votre contenu et vos réglages sont conservés et reviendront si vous repassez à une offre payante."
     }
+  },
+  "ownerReceiptEmail": {
+    "subject": "Votre reçu de paiement pour {siteName}",
+    "previewText": "Nous avons reçu {amount} pour {siteName}.",
+    "thanks": "Merci. Nous avons bien reçu votre paiement pour {siteName}.",
+    "amountLabel": "Montant payé",
+    "dateLabel": "Date",
+    "planLabel": "Formule",
+    "actionLabel": "Voir votre facture"
   },
   "suspensionCategory": {
     "ABUSE": "Abus",

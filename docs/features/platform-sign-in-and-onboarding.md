@@ -293,15 +293,18 @@ site as a 14-day Growth trial, with no card.
   database enforces it too: `createSelfServeTenant` stores the `+tag`-free
   hash in `tenants.self_serve_owner_email_index`, under a partial unique index
   over keyed, non-archived rows, so two simultaneous submits can't both
-  succeed. Operator-created tenants leave it null. Only a move to a paid,
-  running site (a paid plan with status ACTIVE or PAST_DUE) clears the key, in
-  the same statement (`planChangeFields`, used by `updateTenantDetails` and
-  `setTenantPlan`); a trial or a suspended site keeps it. So the rule is
-  checked only when a site is created: a site that was once paid can drop
+  succeed. Operator-created tenants leave it null. Only a paid, running
+  site gives the key up, in the same statement that makes it one: a move to a
+  paid plan with status ACTIVE or PAST_DUE (`planChangeFields`, used by
+  `updateTenantDetails` and `setTenantPlan`), or a paid site that is not an
+  unpaid trial resuming to ACTIVE from a lift, a wake or a reactivation
+  (`resumedTenantFields`). A trial or a suspended site keeps it. So the rule
+  is checked only when a site is created: a site that was once paid can drop
   back to FREE beside its owner's other Free or trial site, and an owner who
-  once paid can hold two. Reactivating an archived self-serve tenant
+  once paid can hold two. Reactivating an archived Free or unpaid-trial site
   (`reactivateTenant`, `DB_ALREADY_OWNS_FREE_TENANT`) is refused while its
-  owner holds another. The rule binds self-serve sites only, and operators
+  owner holds another; an archived paid site reactivates without its key, so
+  it is never refused. The rule binds self-serve sites only, and operators
   may override it: Add tenant (`createTenantAction`) never checks it, and an
   operator may move an operator-created site to FREE however many Free sites
   its owner holds.

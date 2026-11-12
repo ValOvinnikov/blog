@@ -1,4 +1,12 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  BUTTON_SHAPE,
+  CARD_STYLE,
+  CONTENT_ALIGNMENT,
+  DENSITY,
+  GRID_COLUMNS,
+  RADIUS_SCALE,
+} from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
@@ -29,9 +37,9 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
+    columns: {
       control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      options: [GRID_COLUMNS.TWO, GRID_COLUMNS.THREE, GRID_COLUMNS.FOUR],
     },
     contentAlignment: {
       control: 'select',
@@ -39,10 +47,9 @@ const meta = {
     },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Latest posts' }),
     items,
-    layout: undefined,
     contentAlignment: undefined,
     titleId: 'post-list-title',
     dataTestId: 'post-list-module-post-list-1',
@@ -56,7 +63,40 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
+};
+
+export const TwoColumns: TStory = {
+  args: { columns: GRID_COLUMNS.TWO },
+};
+
+export const FourColumns: TStory = {
+  args: {
+    columns: GRID_COLUMNS.FOUR,
+    items: [...items, ...items].map((item, index) => ({
+      ...item,
+      id: `post-${index + 1}`,
+    })),
+  },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: {
+    section: {
+      brandVariant: BRAND_VARIANT.BRAND_PRIMARY,
+      appearance: {
+        overrides: {
+          cardStyle: CARD_STYLE.OUTLINED,
+          radiusScale: RADIUS_SCALE.XL,
+          density: DENSITY.COMPACT,
+        },
+        look: {
+          cardStyle: CARD_STYLE.ACCENT_BAR,
+          buttonShape: BUTTON_SHAPE.ROUNDED,
+        },
+      },
+    },
+  },
 };
 
 export const CenterAligned: TStory = {

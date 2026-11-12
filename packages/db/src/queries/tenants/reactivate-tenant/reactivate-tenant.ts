@@ -2,14 +2,34 @@ import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
+import { resumedTenantFields } from '@blog/db/queries/tenants/resumed-tenant-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
-import { eq, sql } from 'drizzle-orm';
+import { eq, type SQL, sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 
-// Reverses `archiveTenant`, but `status` only moves out of ARCHIVED — a
-// SUSPENDED tenant must stay SUSPENDED, so the reset is confined to a CASE
-// inside the same UPDATE. `deprovisionedAt` is unconditional: it is only
-// ever non-null on an archived row, so clearing it is a no-op elsewhere.
+const isArchived = sql`${tenants.status} = ${TENANT_STATUS.ARCHIVED}`;
+
+function whenArchived(column: AnyPgColumn, value: SQL = sql`null`): SQL {
+  return sql`case when ${isArchived} then ${value} else ${column} end`;
+}
+
+function reactivatedFields(now: Date) {
+  return {
+    deprovisionedAt: whenArchived(tenants.deprovisionedAt),
+    deprovisioningSteps: whenArchived(tenants.deprovisioningSteps),
+    lastActivityAt: whenArchived(
+      tenants.lastActivityAt,
+      sql`${sql.param(now, tenants.lastActivityAt)}::timestamp`,
+    ),
+    inactivityWarnedAt: whenArchived(tenants.inactivityWarnedAt),
+    deletionNotifiedAt: whenArchived(tenants.deletionNotifiedAt),
+    suspendedAt: whenArchived(tenants.suspendedAt),
+    suspensionReason: whenArchived(tenants.suspensionReason),
+    ...resumedTenantFields({ isResuming: isArchived, now }),
+  };
+}
+
 export async function reactivateTenant(
   tenantId: string,
 ): Promise<TResult<TTenant, TErrorCode>> {
@@ -18,10 +38,7 @@ export async function reactivateTenant(
   try {
     const [tenant] = await db
       .update(tenants)
-      .set({
-        deprovisionedAt: null,
-        status: sql`case when ${tenants.status} = ${TENANT_STATUS.ARCHIVED} then ${TENANT_STATUS.ACTIVE} else ${tenants.status} end`,
-      })
+      .set(reactivatedFields(new Date()))
       .where(eq(tenants.id, tenantId))
       .returning();
 

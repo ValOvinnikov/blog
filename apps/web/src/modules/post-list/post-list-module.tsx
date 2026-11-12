@@ -4,6 +4,7 @@ import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { POST_LIST_LOG } from '@web/constants/post-list';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { fillVoicePlaceholders } from '@web/utils/fill-voice-placeholders';
 import { markErrorLogged } from '@web/utils/logged-error';
@@ -48,7 +49,7 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
   const resolvedPage = context?.page ?? 1;
   const archive = context?.archive;
 
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const [result, paginationT, scopedT, emptyRich] = await Promise.all([
     service.modules.postList.v1.getPostList(
       id,
@@ -79,16 +80,20 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
     totalPages,
     contentAlignment,
     showImages,
+    cardStyle,
+    radiusScale,
+    density,
+    columns,
   } = result.data;
 
   if (resolvedPage > totalPages) {
     notFound();
   }
 
-  const items = await toPostListItems(
-    posts,
-    showImages ? renderPostCardImage : undefined,
-  );
+  const [items, appearance] = await Promise.all([
+    toPostListItems(posts, showImages ? renderPostCardImage : undefined),
+    getSectionAppearance(tenantId, { cardStyle, radiusScale, density }),
+  ]);
 
   const scopedParams = archive ? { name: archive.name } : undefined;
   const createHref = archive
@@ -108,10 +113,10 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
 
   return (
     <PostListModuleView
-      brandVariant={brandVariant}
+      section={{ brandVariant, layout, appearance }}
       headingBlock={headingBlock}
       items={items}
-      layout={layout}
+      columns={columns}
       contentAlignment={contentAlignment}
       hasImages={showImages}
       titleId={titleId}

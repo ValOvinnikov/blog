@@ -1,28 +1,25 @@
 import type { IWithDataTestId, TBrandVariant, TLayout } from '@blog/config';
-import type { ReactNode } from 'react';
+import {
+  buildSectionScopeDeclarations,
+  type TSectionAppearance,
+} from '@web/utils/build-section-scope-declarations';
+import type { CSSProperties, ReactNode } from 'react';
 
 import { sectionVariants } from './section-variants';
 
 export interface ISectionProps extends IWithDataTestId {
   brandVariant: TBrandVariant;
   layout?: TLayout;
+  appearance?: TSectionAppearance;
   titleId?: string;
   children: ReactNode;
   className?: string;
 }
 
-/**
- * Full-bleed `<section>` background driven by `brandVariant`, vertical
- * spacing as padding (not margin) so stacked Sections tile edge-to-edge,
- * wrapping a constrained inner `<div>`. Module organisms compose into
- * `children` without rendering their own `<section>` landmark or outer
- * spacing. `titleId` is optional — a module with no unique heading (e.g.
- * `ContentModule`) renders the landmark without an `aria-labelledby` rather
- * than pointing at an element that never renders.
- */
 export const Section = ({
   brandVariant,
   layout,
+  appearance,
   titleId,
   children,
   className,
@@ -41,6 +38,10 @@ export const Section = ({
     <section
       aria-labelledby={titleId}
       className={s.root({ class: className })}
+      style={
+        appearance &&
+        (buildSectionScopeDeclarations(appearance) as CSSProperties)
+      }
       data-testid={dataTestId}
     >
       <div className={s.inner()}>{children}</div>

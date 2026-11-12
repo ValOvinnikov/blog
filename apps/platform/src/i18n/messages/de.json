@@ -755,6 +755,7 @@
     "densityDescription": "Abstände und Größe der Bedienelemente.",
     "cardStyleLabel": "Kartenstil",
     "cardStyleDescription": "Rahmt jede Inhaltskarte: Beiträge, Themen, Zitate, Preise, FAQ-Einträge und Call-to-Action-Boxen.",
+    "cardStyleSectionNote": "Ein einzelner Abschnitt kann einen anderen Kartenstil verwenden. Lege ihn am Abschnitt in Studio fest.",
     "radiusScaleOptionLabel": {
       "NONE": "Keiner",
       "SM": "Klein",
@@ -763,7 +764,7 @@
       "XL": "Sehr groß"
     },
     "densityOptionLabel": {
-      "DEFAULT": "Standard",
+      "DEFAULT": "Komfortabel",
       "COMPACT": "Kompakt"
     },
     "cardStyleOptionLabel": {
@@ -2020,7 +2021,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Daten einer Person finden",
-    "supportingText": "Durchsucht Abonnenten, Kontaktnachrichten, Einladungen, Registrierungssperren und Audit-Ereignisse aller Websites.",
+    "supportingText": "Durchsucht Abonnenten, Kontaktnachrichten, Einladungen, nicht gesendete Studio-Einladungen, Inhaber von Self-Service-Websites, Registrierungssperren und Audit-Ereignisse aller Websites.",
     "emailLabel": "E-Mail-Adresse",
     "emailHint": "Findet dasselbe Postfach in jeder Groß- und Kleinschreibung und mit jedem +Tag.",
     "emailPlaceholder": "name@example.com",
@@ -2044,7 +2045,7 @@
   "dataRequestEraseDialog": {
     "erase": "Löschen",
     "title": "Daten dieser Person löschen?",
-    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites. Das lässt sich nicht rückgängig machen.",
+    "description": "Löscht ihre Abonnements, Kontaktnachrichten und Einladungen auf allen Websites, entfernt nicht gesendete Studio-Einladungen und entfernt den Self-Service-Inhaberschlüssel, den ihre Adresse hält. Das lässt sich nicht rückgängig machen.",
     "confirm": "Daten löschen",
     "erasing": "Wird gelöscht…",
     "includesReaderAccount": "Auch das Leserkonto löschen",
@@ -2088,6 +2089,7 @@
     "LEAD": "Kontaktnachricht",
     "INVITE": "Einladung",
     "STUDIO_REINVITE": "Nicht gesendete Studio-Einladung",
+    "SELF_SERVE_OWNER": "Inhaber einer Self-Service-Website",
     "SIGNUP_BLOCK": "Registrierungssperre",
     "AUDIT_EVENT": "Audit-Ereignis",
     "READER_ACCOUNT": "Leserkonto",
@@ -2127,6 +2129,15 @@
       "options": "Die Optionen der kostenpflichtigen Tarife sind auf deiner Website ausgeschaltet: zusätzliche Sprachen, die Growth-Einstellungen für das Erscheinungsbild, kostenpflichtige Seitenmodule und Funktionen wie das Kontaktformular, Lesezeichen und Statistiken.",
       "kept": "Es wird nichts gelöscht. Deine Inhalte und Einstellungen bleiben erhalten und kommen zurück, wenn du wieder zu einem kostenpflichtigen Tarif wechselst."
     }
+  },
+  "ownerReceiptEmail": {
+    "subject": "Ihre Zahlungsbestätigung für {siteName}",
+    "previewText": "Wir haben {amount} für {siteName} erhalten.",
+    "thanks": "Vielen Dank. Wir haben Ihre Zahlung für {siteName} erhalten.",
+    "amountLabel": "Gezahlter Betrag",
+    "dateLabel": "Datum",
+    "planLabel": "Tarif",
+    "actionLabel": "Rechnung ansehen"
   },
   "suspensionCategory": {
     "ABUSE": "Missbrauch",

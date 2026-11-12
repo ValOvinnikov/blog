@@ -755,6 +755,7 @@
     "densityDescription": "Witruimte en grootte van bedieningselementen.",
     "cardStyleLabel": "Kaartstijl",
     "cardStyleDescription": "Omlijst elke inhoudskaart: berichten, onderwerpen, citaten, prijzen, veelgestelde vragen en call-to-actionblokken.",
+    "cardStyleSectionNote": "Eén sectie kan een andere kaartstijl gebruiken. Stel die in bij de sectie in Studio.",
     "radiusScaleOptionLabel": {
       "NONE": "Geen",
       "SM": "Klein",
@@ -763,7 +764,7 @@
       "XL": "Extra groot"
     },
     "densityOptionLabel": {
-      "DEFAULT": "Standaard",
+      "DEFAULT": "Comfortabel",
       "COMPACT": "Compact"
     },
     "cardStyleOptionLabel": {
@@ -2020,7 +2021,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Gegevens van een persoon zoeken",
-    "supportingText": "Doorzoekt abonnees, contactberichten, uitnodigingen, aanmeldblokkades en auditgebeurtenissen van alle sites.",
+    "supportingText": "Doorzoekt abonnees, contactberichten, uitnodigingen, niet-verstuurde Studio-uitnodigingen, eigenaren van selfservice-sites, aanmeldblokkades en auditgebeurtenissen van alle sites.",
     "emailLabel": "E-mailadres",
     "emailHint": "Vindt dezelfde mailbox in elke combinatie van hoofdletters en met elke +tag.",
     "emailPlaceholder": "naam@example.com",
@@ -2044,7 +2045,7 @@
   "dataRequestEraseDialog": {
     "erase": "Wissen",
     "title": "Gegevens van deze persoon wissen?",
-    "description": "Verwijdert hun abonnementen, contactberichten en uitnodigingen op elke site. Dit kan niet ongedaan worden gemaakt.",
+    "description": "Verwijdert hun abonnementen, contactberichten en uitnodigingen op elke site, wist niet-verstuurde Studio-uitnodigingen en wist de selfservice-eigenaarssleutel die hun adres heeft. Dit kan niet ongedaan worden gemaakt.",
     "confirm": "Gegevens wissen",
     "erasing": "Bezig met wissen…",
     "includesReaderAccount": "Ook het lezersaccount verwijderen",
@@ -2088,6 +2089,7 @@
     "LEAD": "Contactbericht",
     "INVITE": "Uitnodiging",
     "STUDIO_REINVITE": "Niet-verstuurde Studio-uitnodiging",
+    "SELF_SERVE_OWNER": "Eigenaar van een selfservice-site",
     "SIGNUP_BLOCK": "Aanmeldblokkade",
     "AUDIT_EVENT": "Auditgebeurtenis",
     "READER_ACCOUNT": "Lezersaccount",
@@ -2127,6 +2129,15 @@
       "options": "De opties van de betaalde plannen staan uit op je site: extra talen, de Growth-instellingen voor Uiterlijk, betaalde paginamodules en functies zoals het contactformulier, bladwijzers en statistieken.",
       "kept": "Er wordt niets verwijderd. Je inhoud en instellingen blijven bewaard en komen terug als je weer overstapt naar een betaald plan."
     }
+  },
+  "ownerReceiptEmail": {
+    "subject": "Je betalingsbewijs voor {siteName}",
+    "previewText": "We hebben {amount} ontvangen voor {siteName}.",
+    "thanks": "Bedankt. We hebben je betaling voor {siteName} ontvangen.",
+    "amountLabel": "Betaald bedrag",
+    "dateLabel": "Datum",
+    "planLabel": "Abonnement",
+    "actionLabel": "Je factuur bekijken"
   },
   "suspensionCategory": {
     "ABUSE": "Misbruik",

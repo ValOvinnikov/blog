@@ -29,6 +29,10 @@ const TURBO_JSON_FILE = join(repoRoot, 'turbo.json');
 
 const WEB_ENV_FILE = join(repoRoot, 'apps/web/src/utils/env/env.ts');
 const PLATFORM_ENV_FILE = join(repoRoot, 'apps/platform/src/utils/env/env.ts');
+const PLATFORM_STRIPE_ENV_FILE = join(
+  repoRoot,
+  'apps/platform/src/utils/stripe-env/stripe-env.ts',
+);
 const WORKER_ENV_FILE = join(repoRoot, 'apps/worker/src/utils/env/env.ts');
 const SERVICE_ENV_FILE = join(
   repoRoot,
@@ -115,7 +119,15 @@ export const APPS = [
     label: 'web',
     files: [WEB_ENV_FILE, SERVICE_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE],
   },
-  { label: 'platform', files: [PLATFORM_ENV_FILE, DB_ENV_FILE, AUTH_ENV_FILE] },
+  {
+    label: 'platform',
+    files: [
+      PLATFORM_ENV_FILE,
+      PLATFORM_STRIPE_ENV_FILE,
+      DB_ENV_FILE,
+      AUTH_ENV_FILE,
+    ],
+  },
   { label: 'worker', files: [WORKER_ENV_FILE, DB_ENV_FILE] },
 ];
 

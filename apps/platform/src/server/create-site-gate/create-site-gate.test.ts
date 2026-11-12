@@ -21,10 +21,7 @@ vi.mock('@blog/db', async () => ({
   queries: { admins: { listSuperadminEmails } },
 }));
 
-vi.mock('@blog/email', async (importOriginal) => ({
-  ...(await importOriginal()),
-  sendEmail: vi.fn(),
-}));
+vi.mock('@blog/email');
 
 const DAY_MS = 24 * 60 * 60_000;
 const MOCK_REFERENCE_DATE = new Date('2026-10-21T09:00:00Z');

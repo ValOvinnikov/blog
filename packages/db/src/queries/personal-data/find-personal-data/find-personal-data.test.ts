@@ -6,6 +6,7 @@ import {
 import { DAY_MS, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { setUnsentStudioReinvite } from '@blog/db/queries/tenants/unsent-studio-reinvite';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
 import {
   MOCK_BLOCK_REASON,
@@ -27,10 +28,14 @@ import {
   taggedMixedCaseAddress,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { unwrapOk } from '@blog/db/testing/tenants/fixtures';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 
-import { findPersonalData } from './find-personal-data';
+import {
+  findPersonalData,
+  type TPersonalDataMatches,
+} from './find-personal-data';
 
 vi.mock('@blog/db/client');
 
@@ -58,76 +63,97 @@ describe(findPersonalData, () => {
     await insertTestPersonalDataRows(db(), tenantId, MOCK_INVITE_EMAIL);
   });
 
-  it('finds every row held for the mailbox, decrypted and named by site', async () => {
-    const result = await findPersonalData(
-      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
-    );
+  describe('searching a +tag variant of the mailbox', () => {
+    let data: TPersonalDataMatches;
+    let ownedSite: TTenant;
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    const {
-      emailIndex,
-      subscribers,
-      leads,
-      membershipInvites,
-      blockedSignupIdentities,
-    } = result.data;
-    expect(emailIndex).toBe(testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL));
-    expect(
-      subscribers.map(({ tenantId, tenantName, email, confirmedAt }) => ({
-        tenantId,
-        tenantName,
-        email,
-        confirmedAt,
-      })),
-    ).toEqual([
-      {
-        tenantId,
-        tenantName,
-        email: MOCK_SUBSCRIBER_EMAIL,
-        confirmedAt: undefined,
-      },
-    ]);
-    expect(
-      leads.map(({ tenantName, name, email, message }) => ({
-        tenantName,
-        name,
-        email,
-        message,
-      })),
-    ).toEqual([
-      {
-        tenantName,
-        name: MOCK_PERSONAL_DATA_LEAD_NAME,
-        email: MOCK_SUBSCRIBER_EMAIL,
-        message: MOCK_PERSONAL_DATA_LEAD_MESSAGE,
-      },
-    ]);
-    expect(
-      membershipInvites.map(({ tenantName, email, role }) => ({
-        tenantName,
-        email,
-        role,
-      })),
-    ).toEqual([
-      {
-        tenantName,
-        email: MOCK_SUBSCRIBER_EMAIL,
-        role: MEMBERSHIP_ROLE.EDITOR,
-      },
-    ]);
-    expect(blockedSignupIdentities.map(({ reason }) => reason)).toEqual([
-      MOCK_BLOCK_REASON,
-    ]);
+    beforeEach(async () => {
+      ownedSite = await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+      });
+      data = unwrapOk(
+        await findPersonalData(taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL)),
+      );
+    });
+
+    it('finds the self-serve site the mailbox owns', () => {
+      const { id, name, createdAt } = ownedSite;
+
+      expect(data.selfServeOwnerSites).toEqual([
+        { tenantId: id, tenantName: name, createdAt },
+      ]);
+    });
+
+    it('finds every row held for the mailbox, decrypted and named by site', () => {
+      const {
+        emailIndex,
+        subscribers,
+        leads,
+        membershipInvites,
+        blockedSignupIdentities,
+      } = data;
+      expect(emailIndex).toBe(testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL));
+      expect(
+        subscribers.map(({ tenantId, tenantName, email, confirmedAt }) => ({
+          tenantId,
+          tenantName,
+          email,
+          confirmedAt,
+        })),
+      ).toEqual([
+        {
+          tenantId,
+          tenantName,
+          email: MOCK_SUBSCRIBER_EMAIL,
+          confirmedAt: undefined,
+        },
+      ]);
+      expect(
+        leads.map(({ tenantName, name, email, message }) => ({
+          tenantName,
+          name,
+          email,
+          message,
+        })),
+      ).toEqual([
+        {
+          tenantName,
+          name: MOCK_PERSONAL_DATA_LEAD_NAME,
+          email: MOCK_SUBSCRIBER_EMAIL,
+          message: MOCK_PERSONAL_DATA_LEAD_MESSAGE,
+        },
+      ]);
+      expect(
+        membershipInvites.map(({ tenantName, email, role }) => ({
+          tenantName,
+          email,
+          role,
+        })),
+      ).toEqual([
+        {
+          tenantName,
+          email: MOCK_SUBSCRIBER_EMAIL,
+          role: MEMBERSHIP_ROLE.EDITOR,
+        },
+      ]);
+      expect(blockedSignupIdentities.map(({ reason }) => reason)).toEqual([
+        MOCK_BLOCK_REASON,
+      ]);
+    });
+
+    it('finds no audit events for a +tag variant of the account address', () => {
+      expect(data.auditEvents).toEqual([]);
+      expect(data.readerAccount).toBeUndefined();
+    });
   });
 
   it('finds the audit events of the account with exactly that address', async () => {
-    const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
+    const { auditEvents } = unwrapOk(
+      await findPersonalData(MOCK_SUBSCRIBER_EMAIL),
+    );
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
     expect(
-      result.data.auditEvents.map(({ action, targetType, targetId }) => ({
+      auditEvents.map(({ action, targetType, targetId }) => ({
         action,
         targetType,
         targetId,
@@ -176,11 +202,10 @@ describe(findPersonalData, () => {
     });
 
     it('finds the reader account with providers, bookmarks and active sessions', async () => {
-      const result = await findPersonalData(MOCK_SUBSCRIBER_EMAIL);
+      const { readerAccount } = unwrapOk(
+        await findPersonalData(MOCK_SUBSCRIBER_EMAIL),
+      );
 
-      expect(result.ok).toBe(true);
-      if (!result.ok) return;
-      const { readerAccount } = result.data;
       if (!readerAccount) throw new Error('Expected a reader account.');
       const { id, email, linkedProviders, activeSessionCount } = readerAccount;
       const bookmarks = readerAccount.bookmarks.map(
@@ -200,27 +225,14 @@ describe(findPersonalData, () => {
     });
   });
 
-  it('finds no audit events for a +tag variant of the account address', async () => {
-    const result = await findPersonalData(
-      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
-    );
-
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.data.auditEvents).toEqual([]);
-    expect(result.data.readerAccount).toBeUndefined();
-  });
-
   it('finds an unsent Studio re-invite held for a +tag variant of the mailbox', async () => {
     await setUnsentStudioReinvite(tenantId, MOCK_SUBSCRIBER_EMAIL);
 
-    const result = await findPersonalData(
-      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
+    const { unsentStudioReinvites } = unwrapOk(
+      await findPersonalData(taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL)),
     );
 
-    expect(result.ok).toBe(true);
-    if (!result.ok) return;
-    expect(result.data.unsentStudioReinvites).toEqual([
+    expect(unsentStudioReinvites).toEqual([
       { tenantId, tenantName, email: MOCK_SUBSCRIBER_EMAIL },
     ]);
   });
@@ -235,6 +247,7 @@ describe(findPersonalData, () => {
         leads: [],
         membershipInvites: [],
         unsentStudioReinvites: [],
+        selfServeOwnerSites: [],
         readerAccount: undefined,
         blockedSignupIdentities: [],
         auditEvents: [],

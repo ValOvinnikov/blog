@@ -30,6 +30,7 @@ export async function setTenantBilling(
       stripeCustomerId: input.stripeCustomerId,
       stripeSubscriptionId: input.stripeSubscriptionId,
       stripePromotionCode: input.stripePromotionCode,
+      subscriberBandCeiling: input.subscriberBandCeiling,
       trialEndsAt: input.trialEndsAt,
       downgradeGraceStartedAt: input.downgradeGraceStartedAt,
       graceStartedEmailSentAt: input.graceStartedEmailSentAt,

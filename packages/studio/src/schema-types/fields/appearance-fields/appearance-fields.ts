@@ -13,7 +13,11 @@ import {
   DensityPicture,
 } from '@blog/studio/schema-types/fields/appearance-fields/appearance-pictures';
 import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
-import type { FieldDefinition, FieldGroupDefinition } from 'sanity';
+import type {
+  FieldDefinition,
+  FieldGroupDefinition,
+  StringDefinition,
+} from 'sanity';
 
 const SITE_DEFAULT = 'Site default';
 
@@ -30,7 +34,7 @@ const APPEARANCE_GROUP = {
 
 export const appearanceFieldGroups = [CONTENT_GROUP, APPEARANCE_GROUP];
 
-const sectionStyleFields = [
+const sectionStyleFields = (columnsHidden?: StringDefinition['hidden']) => [
   tileField({
     name: 'cardStyle',
     title: 'Card Style',
@@ -79,12 +83,14 @@ const sectionStyleFields = [
     ],
     emptyTitle: 'Auto',
     Picture: ColumnsPicture,
+    hidden: columnsHidden,
   }),
 ];
 
 type TAppearanceFieldsOptions = {
   content: readonly FieldDefinition[];
   appearance: readonly FieldDefinition[];
+  columnsHidden?: StringDefinition['hidden'];
 };
 
 const inGroup =
@@ -94,7 +100,10 @@ const inGroup =
 export const appearanceFields = ({
   content,
   appearance,
+  columnsHidden,
 }: TAppearanceFieldsOptions) => [
   ...content.map(inGroup(CONTENT_GROUP)),
-  ...[...appearance, ...sectionStyleFields].map(inGroup(APPEARANCE_GROUP)),
+  ...[...appearance, ...sectionStyleFields(columnsHidden)].map(
+    inGroup(APPEARANCE_GROUP),
+  ),
 ];

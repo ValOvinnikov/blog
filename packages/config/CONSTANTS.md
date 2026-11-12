@@ -322,6 +322,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **STRIPE_PRICE_LOOKUP_KEY**: `STARTER_MONTHLY`, `STARTER_YEARLY`, `GROWTH_MONTHLY`, `GROWTH_YEARLY`, `GROWTH_BAND_2500`, `GROWTH_BAND_5000`, `GROWTH_BAND_10000`, `GROWTH_BAND_25000`, `GROWTH_BAND_2500_YEARLY`, `GROWTH_BAND_5000_YEARLY`, `GROWTH_BAND_10000_YEARLY`, `GROWTH_BAND_25000_YEARLY`
 - **STRIPE_EVENT_RECORD_OUTCOME**: `RECORDED`, `ALREADY_HANDLED`
 - **STRIPE_TENANT_LOOKUP_OUTCOME**: `FOUND`, `NOT_FOUND`, `CONFLICT`
+- **TENANT_PLAN_WRITE_OUTCOME**: `WRITTEN`, `NOT_WRITABLE`, `NOT_FOUND`
 
 ### `@blog/db/constants` — `packages/db/src/constants/blocked-signup-identity.ts`
 
@@ -330,11 +331,22 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
 
 - **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
+- **EMAIL_REPUTATION_LEVEL**: `OK`, `WARN`, `SLOW`, `STOP`
 
 ### `@blog/db/constants` — `packages/db/src/constants/membership.ts`
 
 - **MEMBERSHIP_ROLE**: `OWNER`, `EDITOR`, `READER`
 - **MEMBERSHIP_INVITE_OUTCOME**: `CREATED`, `ALREADY_PENDING`, `ALREADY_CONSUMED`, `SEAT_LIMIT`
+
+### `@blog/db/constants` — `packages/db/src/constants/newsletter.ts`
+
+- **NEWSLETTER_POST_SEND_OUTCOME**: `SENT`, `SKIPPED`
+- **NEWSLETTER_SKIP_REASON**: `OVER_SUBSCRIBER_BAND`, `OVER_MONTHLY_ALLOWANCE`, `REPUTATION_STOP`, `SITE_PAUSED`
+- **NEWSLETTER_LIMIT_NOTICE_KIND**: `SUBSCRIBER_BAND_NEAR`, `MONTHLY_ALLOWANCE_NEAR`, `SENDING_PAUSED`
+
+### `@blog/db/constants` — `packages/db/src/constants/row-lock.ts`
+
+- **ROW_LOCK**: `UPDATE`=`"update"`
 
 ### `@blog/db/constants` — `packages/db/src/constants/site-config-saved-at.ts`
 
@@ -403,6 +415,13 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BADGE_TONE**: `OK`=`"ok"`, `WARN`=`"warn"`, `BAD`=`"bad"`, `NEUTRAL`=`"neutral"`, `BRAND`=`"brand"`, `PLAN`=`"plan"`
 
+### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
+
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`
+- **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`
+- **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
+- **BILLING_GRACE**: `START`, `END`, `KEEP`
+
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
 - **BUTTON_VARIANT**: `PRIMARY`, `SECONDARY`, `GHOST`, `DANGER`, `UNSTYLED`, `LINK`
@@ -439,7 +458,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/data-request` — `apps/platform/src/constants/data-request.ts`
 
-- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
+- **DATA_REQUEST_MATCH_KIND**: `SUBSCRIBER`, `LEAD`, `INVITE`, `STUDIO_REINVITE`, `SELF_SERVE_OWNER`, `SIGNUP_BLOCK`, `AUDIT_EVENT`, `READER_ACCOUNT`, `BOOKMARK`
 - **DATA_REQUEST_KIND_FILTER**: `ALL`
 - **DATA_REQUEST_MATCH_COLUMN**: `KIND`, `SITE`, `EMAIL`, `RECORDED`
 - **DATA_REQUEST_EXPORT_FORMAT**: `JSON`, `CSV`
@@ -846,6 +865,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
 
 - **RSS_LOG**: `POSTS_FETCH_FAILED`=`"rss.posts_fetch_failed"`, `INDEX_PAGE_FETCH_FAILED`=`"rss.index_page_fetch_failed"`, `NAVIGATION_FETCH_FAILED`=`"rss.navigation_fetch_failed"`
+
+### `@web/constants/section-appearance` — `apps/web/src/constants/section-appearance.ts`
+
+- **SECTION_APPEARANCE_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"section_appearance.site_config_fetch_failed"`
 
 ### `@web/constants/section-document` — `apps/web/src/constants/section-document.ts`
 

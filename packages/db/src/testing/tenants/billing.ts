@@ -1,3 +1,4 @@
+import { PAID_SUBSCRIBER_BAND_CEILINGS } from '@blog/db/constants';
 import type { TStripeIds } from '@blog/db/queries/tenants/get-tenant-id-by-stripe-ids';
 import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -10,12 +11,25 @@ export const MOCK_NO_BILLING = {
   stripeCustomerId: null,
   stripeSubscriptionId: null,
   stripePromotionCode: null,
+  subscriberBandCeiling: null,
   trialEndsAt: null,
   downgradeGraceStartedAt: null,
   graceStartedEmailSentAt: null,
   graceHalfwayEmailSentAt: null,
   graceEndingEmailSentAt: null,
 } as const satisfies Partial<TTenant>;
+
+export const MOCK_EMPTY_TENANT_BILLING: TTenantBilling = {
+  stripeCustomerId: undefined,
+  stripeSubscriptionId: undefined,
+  stripePromotionCode: undefined,
+  subscriberBandCeiling: undefined,
+  trialEndsAt: undefined,
+  downgradeGraceStartedAt: undefined,
+  graceStartedEmailSentAt: undefined,
+  graceHalfwayEmailSentAt: undefined,
+  graceEndingEmailSentAt: undefined,
+};
 
 export const MOCK_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_OTHER_STRIPE_EVENT_ID = `evt_${billingFaker.string.alphanumeric(24)}`;
@@ -35,6 +49,9 @@ export function mockTenantBilling(
   return {
     ...mockStripeIds(),
     stripePromotionCode: billingFaker.string.alphanumeric(8).toUpperCase(),
+    subscriberBandCeiling: billingFaker.helpers.arrayElement(
+      PAID_SUBSCRIBER_BAND_CEILINGS,
+    ),
     trialEndsAt: billingFaker.date.past({ refDate: graceStartedAt }),
     downgradeGraceStartedAt: graceStartedAt,
     graceStartedEmailSentAt: graceStartedAt,
