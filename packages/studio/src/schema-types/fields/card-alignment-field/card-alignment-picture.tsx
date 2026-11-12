@@ -9,14 +9,15 @@ import {
   FRAME_WIDTH,
   FrameRect,
   PictureFrame,
+  TEXT_LINE_HEIGHT,
 } from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
 
 const PADDING = 4;
 
 const CARD_ROWS = [
   { y: 8, width: 10, height: 5, opacity: FAINT },
-  { y: 16, width: 18, height: 2, opacity: 1 },
-  { y: 20, width: 12, height: 2, opacity: 1 },
+  { y: 16, width: 18, height: TEXT_LINE_HEIGHT, opacity: 1 },
+  { y: 20, width: 12, height: TEXT_LINE_HEIGHT, opacity: 1 },
 ];
 
 const rowX = (alignment: TContentAlignment, width: number) =>

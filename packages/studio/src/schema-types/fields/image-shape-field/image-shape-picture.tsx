@@ -5,13 +5,15 @@ import {
   FRAME_INSET,
   FRAME_WIDTH,
   PictureFrame,
+  TEXT_LINE_HEIGHT,
 } from '@blog/studio/schema-types/inputs/option-tiles-input/picture-frame';
 import type { ReactNode } from 'react';
 
 const IMAGE_SIZE = 12;
 const ICON_SIZE = 6;
 const CAPTION_WIDTH = 20;
-const CAPTION_Y = FRAME_INSET + IMAGE_SIZE + 4;
+const IMAGE_TO_CAPTION = 4;
+const CAPTION_Y = FRAME_INSET + IMAGE_SIZE + IMAGE_TO_CAPTION;
 
 const SHAPE = {
   [CARD_IMAGE_SHAPE.WIDE]: (
@@ -58,7 +60,7 @@ export const ImageShapePicture = ({ value }: { value: TCardImageShape }) => (
       x={FRAME_CENTER_X - CAPTION_WIDTH / 2}
       y={CAPTION_Y}
       width={CAPTION_WIDTH}
-      height={2}
+      height={TEXT_LINE_HEIGHT}
     />
   </PictureFrame>
 );

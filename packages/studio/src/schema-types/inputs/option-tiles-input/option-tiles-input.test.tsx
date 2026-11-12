@@ -6,6 +6,7 @@ import { faker } from '@faker-js/faker';
 import { ThemeProvider } from '@sanity/ui';
 import { buildTheme } from '@sanity/ui/theme';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { createRef, type RefObject } from 'react';
 import { set, type StringInputProps, unset } from 'sanity';
 
 faker.seed(6981);
@@ -34,10 +35,12 @@ const renderInput = ({
   value,
   readOnly = false,
   Input = OptionTilesInput,
+  ref,
 }: {
   value?: string;
   readOnly?: boolean;
   Input?: typeof OptionTilesInput;
+  ref?: RefObject<HTMLButtonElement | null>;
 } = {}) => {
   const props = {
     value,
@@ -46,6 +49,7 @@ const renderInput = ({
     schemaType: { title: FIELD_TITLE },
     elementProps: {
       id: faker.string.alpha(6),
+      ref,
       'aria-describedby': DESCRIPTION_ID,
     },
   } as unknown as StringInputProps;
@@ -129,15 +133,12 @@ describe(`<${OptionTilesInput.name}/>`, () => {
       expect(tiles).toEqual([tile(FIRST.title), tile(SECOND.title)]);
     });
 
-    it('marks the stored option as chosen without an empty tile', () => {
-      renderInput({
-        Input: OptionTilesInputWithoutEmpty,
-        value: FIRST.value,
-      });
+    it('hands the field focus to the first option while nothing is stored', () => {
+      const ref = createRef<HTMLButtonElement>();
 
-      const chosen = checkedTile();
+      renderInput({ Input: OptionTilesInputWithoutEmpty, ref });
 
-      expect(chosen).toBe(tile(FIRST.title));
+      expect(ref.current).toBe(tile(FIRST.title));
     });
   });
 
