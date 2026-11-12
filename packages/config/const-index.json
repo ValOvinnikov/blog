@@ -3634,6 +3634,12 @@
         "file": "packages/db/src/constants/billing.ts"
       },
       {
+        "ref": "TENANT_PLAN_WRITE_OUTCOME.NOT_FOUND",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      },
+      {
         "ref": "LEAD_REFUSAL.NOT_FOUND",
         "scope": "app:platform",
         "from": "@platform/constants/lead",
@@ -4147,6 +4153,22 @@
     "CONFLICT": [
       {
         "ref": "STRIPE_TENANT_LOOKUP_OUTCOME.CONFLICT",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "WRITTEN": [
+      {
+        "ref": "TENANT_PLAN_WRITE_OUTCOME.WRITTEN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "NOT_WRITABLE": [
+      {
+        "ref": "TENANT_PLAN_WRITE_OUTCOME.NOT_WRITABLE",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/billing.ts"

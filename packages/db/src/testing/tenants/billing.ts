@@ -1,3 +1,8 @@
+import {
+  SUBSCRIBER_BAND_CEILINGS,
+  type TPaidSubscriberBandCeiling,
+  type TSubscriberBandCeiling,
+} from '@blog/db/constants';
 import type { TStripeIds } from '@blog/db/queries/tenants/get-tenant-id-by-stripe-ids';
 import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -6,10 +11,20 @@ import { createMockFaker } from '@blog/db/testing/mock-faker';
 
 const billingFaker = createMockFaker(6873);
 
+function isPaidBandCeiling(
+  ceiling: TSubscriberBandCeiling,
+): ceiling is TPaidSubscriberBandCeiling {
+  return ceiling !== SUBSCRIBER_BAND_CEILINGS[0];
+}
+
+const PAID_SUBSCRIBER_BAND_CEILINGS =
+  SUBSCRIBER_BAND_CEILINGS.filter(isPaidBandCeiling);
+
 export const MOCK_NO_BILLING = {
   stripeCustomerId: null,
   stripeSubscriptionId: null,
   stripePromotionCode: null,
+  subscriberBandCeiling: null,
   trialEndsAt: null,
   downgradeGraceStartedAt: null,
   graceStartedEmailSentAt: null,
@@ -35,6 +50,9 @@ export function mockTenantBilling(
   return {
     ...mockStripeIds(),
     stripePromotionCode: billingFaker.string.alphanumeric(8).toUpperCase(),
+    subscriberBandCeiling: billingFaker.helpers.arrayElement(
+      PAID_SUBSCRIBER_BAND_CEILINGS,
+    ),
     trialEndsAt: billingFaker.date.past({ refDate: graceStartedAt }),
     downgradeGraceStartedAt: graceStartedAt,
     graceStartedEmailSentAt: graceStartedAt,
