@@ -1153,6 +1153,20 @@ stage`: `deploy --prebuilt --prod --skip-domain → request`; see "A deploy
    `PERSONAL_DATA_INDEX_KEY` fails there with the same format message.
    Production deploys the same way.
 
+   **Each web and platform build carries its own deployment id.** Skew
+   Protection reaches a prebuilt Next.js deploy only when the build sets a
+   `deploymentId`, so a tab opened before a deploy keeps calling the Server
+   Actions of the deployment that served it. Both workflows set
+   `BUILD_DEPLOYMENT_ID=gh-<run id>-<run attempt>` on web's and platform's
+   `vercel build`, and `configs/next/preset.ts` passes it to `deploymentId`.
+   Vercel rejects an id the project has already used, so the run attempt
+   keeps a rerun of the same commit unique; the id stays within Vercel's
+   limits (32 characters, letters, digits, `-` and `_`, no `dpl_` prefix).
+   Unset, as in a local build, no `deploymentId` is set. It needs Next.js
+   above 16.2.0-canary.15 and Vercel CLI above 50.3.3, and Skew Protection
+   switched on in each project's settings. The worker serves no pages and
+   builds without one.
+
    **A deploy goes live only after every app starts.** Each stage job ends
    in `scripts/vercel-deploy-checked.sh stage <app> <path>`. It deploys with
    `--skip-domain`, so the new deployment gets no domain yet, then requests
