@@ -63,7 +63,7 @@ Every email the product sends is built and sent by `@blog/email`. Tenant-facing 
 - Look reach: brand colours and logo marks follow the tenant's Look ([look](./look.md)). Email copy is not Voice.
 - Operator alert copy is fixed and never tenant-editable.
 - Owner onboarding copy (subject, preview text, paragraphs, action label and URL) is fixed transactional copy passed by the sender; it is not Voice and not an editable template. Every value is escaped, the action URL sanitised.
-- The owner payment receipt (`buildOwnerReceiptEmail`) is owner mail on the platform shell: the sender passes the copy, the amount, date and plan as pre-formatted `details` rows (rendered as a label-and-value table and as `label: value` lines in the plain text), and the invoice PDF link as its action. Any owner email may carry `details`; none is Voice or an editable template.
+- The owner payment receipt (`buildOwnerReceiptEmail`) is owner mail on the platform shell: the sender passes the copy, the amount, date and plan as pre-formatted `details` rows (rendered as a label-and-value table and as `label: value` lines in the plain text, a line break inside a label or value becoming a space; an empty list renders nothing), and the invoice PDF link as its action. Any owner email may carry `details`; none is Voice or an editable template.
 - The owner pause warning and deletion notice take their copy from the sender, like owner onboarding mail. The super admin's copy of the pause warning is fixed English held in `@blog/email`; the sender passes the tenant name and id, owner email, a pre-formatted pause date and the sign-in URL. Neither is Voice or an editable template.
 
 ## Constraints and invariants

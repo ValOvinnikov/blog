@@ -11,6 +11,7 @@ import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import { buildPlatformShell } from '@blog/email/html/platform-shell/platform-shell';
 import { buildPlainTextBody } from '@blog/email/plain-text/plain-text-body';
+import { hasLength } from '@blog/utils/primitives';
 
 export type TOwnerEmailInput = {
   brandName: string;
@@ -38,7 +39,8 @@ export function buildOwnerEmail({
   const paragraphsHtml = paragraphs
     .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
     .join('');
-  const bodyHtml = details
+  const hasDetails = hasLength(details);
+  const bodyHtml = hasDetails
     ? paragraphsHtml + renderEmailDetails(details)
     : paragraphsHtml;
 
@@ -54,7 +56,7 @@ export function buildOwnerEmail({
         : undefined,
     }),
     text: buildPlainTextBody(
-      details ? [...paragraphs, detailsAsPlainText(details)] : paragraphs,
+      hasDetails ? [...paragraphs, detailsAsPlainText(details)] : paragraphs,
       action,
     ),
   };

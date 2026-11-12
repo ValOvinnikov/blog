@@ -18,6 +18,12 @@ export function renderEmailDetails(details: TEmailDetail[]): string {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;">${rows}</table>`;
 }
 
+function asOneLine(text: string): string {
+  return text.replace(/\r?\n/g, ' ');
+}
+
 export function detailsAsPlainText(details: TEmailDetail[]): string {
-  return details.map(({ label, value }) => `${label}: ${value}`).join('\n');
+  return details
+    .map(({ label, value }) => `${asOneLine(label)}: ${asOneLine(value)}`)
+    .join('\n');
 }

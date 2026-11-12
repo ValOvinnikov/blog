@@ -7,6 +7,9 @@ import {
   MOCK_PLATFORM_BRAND_NAME,
   MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
+import { createMockFaker } from '@blog/email/testing/mock-faker';
+
+const ownerEmailFaker = createMockFaker(6876);
 
 export const MOCK_OWNER_EMAIL_INPUT: TOwnerEmailInput & {
   action: TEmailAction;
@@ -17,7 +20,14 @@ export const MOCK_OWNER_EMAIL_INPUT: TOwnerEmailInput & {
   action: MOCK_EMAIL_ACTION,
 };
 
+function mockEmailDetail(): TEmailDetail {
+  return {
+    label: ownerEmailFaker.lorem.word({ length: { min: 5, max: 10 } }),
+    value: ownerEmailFaker.commerce.price({ symbol: '$' }),
+  };
+}
+
 export const MOCK_EMAIL_DETAILS: TEmailDetail[] = [
-  { label: 'Amount', value: '$29.00' },
-  { label: 'Plan', value: 'Growth' },
+  mockEmailDetail(),
+  mockEmailDetail(),
 ];
