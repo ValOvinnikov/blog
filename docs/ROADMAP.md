@@ -158,12 +158,13 @@ of them also deletes `2026-10-30-admin-redesign-resolutions.md`.
 
 ## Alongside
 
-| Epic      | What it delivers                                                                                                                |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **#5251** | Tiered CI. Left: Lighthouse after a production deploy (#5264) and taking the repo private (#5269).                              |
-| **#5271** | Releases from the platform. Left: the commit-pinned Release button (#5502), the Deploy to dev action (#5282), and manual tests. |
-| **#5459** | Header controls are one round family, with a per-site style on the Look page. Left: its manual tests.                           |
-| **#6152** | Deploy first, then migrate: content migrations return after the launch in the expand/contract form.                             |
+| Epic      | What it delivers                                                                                                                                                                                                                                                                  |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **#5251** | Tiered CI. Left: Lighthouse after a production deploy (#5264) and taking the repo private (#5269).                                                                                                                                                                                |
+| **#5271** | Releases from the platform. Left: the commit-pinned Release button (#5502), the Deploy to dev action (#5282), and manual tests. Later: restoring one tenant from its pre-migration export into its second dataset (#7277).                                                        |
+| **#7273** | A page opened before a deploy still saves: each prebuilt deploy gets its own deployment id so Skew Protection applies (#7274, first), and a save from a page too old says so and offers a reload (#7275). Manual test #7276. Later: the same reload prompt in the Studio (#7279). |
+| **#5459** | Header controls are one round family, with a per-site style on the Look page. Left: its manual tests.                                                                                                                                                                             |
+| **#6152** | Deploy first, then migrate: content migrations return after the launch in the expand/contract form.                                                                                                                                                                               |
 
 ## After the launch
 
@@ -240,7 +241,8 @@ reading (#2799), live subscriber count (#2801) and module presets (#2803).
   GitHub Environment. Until then the database relies on Neon's point-in-time
   restore, and tenant content on each release's pre-migration exports. A
   second Sanity dataset as a snapshot was dropped: copying one server-side is
-  Enterprise-only.
+  Enterprise-only. Releases keep migrating in place; the second dataset is
+  only a restore target for one tenant (owner, 2026-11-12, #7277).
 - **After the launch, for billing** (owner, 2026-11-08): a platform page for
   creating Stripe campaigns (coupons and promotion codes, never prices), and
   tenants selling their own plans through Stripe Connect. Reader payments
