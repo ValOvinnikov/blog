@@ -856,7 +856,9 @@ file` are all denied alike) — an earlier version only handled the
   - `code-review-practices` — boundary/type/SEO/test checklist before a PR, plus the spec and feature-doc sync item, converge-on-touch findings (placement, props, variants files), file-size growth as a blocking finding (since 2026-11-10, backing the local `pnpm check:file-size` ratchet when a commit skips it), a blocking prop-ceiling count on every touched component, a flag on a UI or behaviour diff with no manual-test issue, and a flag on a diff that adds a cron, workflow, paid API call or hot-path query with no stated cost.
   - `review-pull-request` — the orchestrator's review of an open PR, the only
     review a cloud session's diff gets: it checks the PR head out in a
-    detached worktree, dispatches `verify-runner` (CI skips a draft),
+    detached worktree with its own install, runs `pnpm verify` (CI skips a
+    draft) and `pnpm check:clones` in its own session — a sandboxed subagent
+    cannot write in that worktree — and dispatches
     `reviewer` and `correctness-reviewer` in PR mode with the issue's
     acceptance criteria and the PR body's Examined and Reuse lines, verifies
     each blocking finding, and posts one PR comment only when changes are

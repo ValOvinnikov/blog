@@ -87,8 +87,9 @@ branch it names, is a finding here; how a test is written is `reviewer`'s.
 A prompt that opens `PR review of #<n>` reviews an open pull request
 (`review-pull-request`): the checkout is a detached worktree at the PR's
 head, whose SHA the prompt names and `git rev-parse HEAD` must equal, and
-`pnpm verify` runs in a parallel `verify-runner` dispatch or already ran in
-CI. Both passes run as written. A draft PR is the expected state, never a
+the orchestrator runs `pnpm verify` itself or CI already ran it. The criteria
+may be one slice of a multi-PR issue, which the prompt names; a criterion
+outside that slice is not yours to mark. Both passes run as written. A draft PR is the expected state, never a
 finding.
 
 ## Re-review mode
