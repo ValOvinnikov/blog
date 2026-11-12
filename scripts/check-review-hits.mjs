@@ -227,6 +227,10 @@ const STANDARD_VOCABULARY = new Set([
   'strict',
   'utf8',
   'utf-8',
+  'true',
+  'false',
+  'lazy',
+  'presentation',
 ]);
 
 export const valueLiteralsOf = (added, indexed = {}) => [
@@ -250,7 +254,10 @@ export const valueLiteralsOf = (added, indexed = {}) => [
 const findRepeatedValues = (files, indexed) =>
   files
     .filter(
-      ({ file }) => VALUE_SOURCE.test(file) && !NOT_VALUE_SOURCE.test(file),
+      ({ file }) =>
+        VALUE_SOURCE.test(file) &&
+        !NOT_VALUE_SOURCE.test(file) &&
+        !GENERATED.test(file),
     )
     .flatMap(({ file, added }) => {
       const workspace = file.split('/').slice(0, 2).join('/');
@@ -261,6 +268,7 @@ const findRepeatedValues = (files, indexed) =>
             `${workspace}/src`,
             ':(exclude,glob)**/*.test.*',
             ':(exclude,glob)**/*.stories.*',
+            ':(exclude,glob)**/*.json',
           ],
           file,
         );
@@ -268,7 +276,10 @@ const findRepeatedValues = (files, indexed) =>
           ? [
               {
                 file,
-                line: added.find(({ text }) => text.includes(value)).line,
+                line: added.find(
+                  ({ text }) =>
+                    text.includes(`'${value}'`) || text.includes(`"${value}"`),
+                ).line,
                 hit: HIT.REPEATED_VALUE,
                 text: `'${value}' is also in ${holder}`,
               },
