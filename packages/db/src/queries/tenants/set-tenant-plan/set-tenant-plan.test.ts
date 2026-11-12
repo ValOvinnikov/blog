@@ -8,7 +8,10 @@ import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
-import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@blog/db/testing/tenants/self-serve-fixtures';
+import {
+  MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
+  readSelfServeIndex,
+} from '@blog/db/testing/tenants/self-serve-fixtures';
 import { eq } from 'drizzle-orm';
 
 import { setTenantPlan } from './set-tenant-plan';
@@ -16,14 +19,6 @@ import { setTenantPlan } from './set-tenant-plan';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
-
-async function readSelfServeIndex(tenantId: string) {
-  const [row] = await db()
-    .select({ selfServeOwnerEmailIndex: tenants.selfServeOwnerEmailIndex })
-    .from(tenants)
-    .where(eq(tenants.id, tenantId));
-  return row?.selfServeOwnerEmailIndex;
-}
 
 afterEach(async () => {
   await db().delete(schema.tenants);
@@ -51,7 +46,7 @@ describe(setTenantPlan, () => {
         plan: TENANT_PLAN.GROWTH,
         status: TENANT_STATUS.PAST_DUE,
       });
-      expect(await readSelfServeIndex(tenantId)).toBeNull();
+      expect(await readSelfServeIndex(db(), tenantId)).toBeNull();
     });
 
     it('keeps the Free-site key on a write that stays on FREE', async () => {
@@ -60,7 +55,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.ACTIVE,
       });
 
-      expect(await readSelfServeIndex(tenantId)).toBe(
+      expect(await readSelfServeIndex(db(), tenantId)).toBe(
         MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
       );
     });
@@ -104,7 +99,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.TRIAL,
       });
 
-      expect(await readSelfServeIndex(tenantId)).toBe(
+      expect(await readSelfServeIndex(db(), tenantId)).toBe(
         MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
       );
     });
@@ -115,7 +110,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.ACTIVE,
       });
 
-      expect(await readSelfServeIndex(tenantId)).toBeNull();
+      expect(await readSelfServeIndex(db(), tenantId)).toBeNull();
     });
   });
 

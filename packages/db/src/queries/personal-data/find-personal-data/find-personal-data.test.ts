@@ -6,6 +6,7 @@ import {
 import { DAY_MS, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { setUnsentStudioReinvite } from '@blog/db/queries/tenants/unsent-studio-reinvite';
 import * as schema from '@blog/db/schema';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
 import {
   MOCK_BLOCK_REASON,
@@ -64,11 +65,23 @@ describe(findPersonalData, () => {
 
   describe('searching a +tag variant of the mailbox', () => {
     let data: TPersonalDataMatches;
+    let ownedSite: TTenant;
 
     beforeEach(async () => {
+      ownedSite = await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+      });
       data = unwrapOk(
         await findPersonalData(taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL)),
       );
+    });
+
+    it('finds the self-serve site the mailbox owns', () => {
+      const { id, name, createdAt } = ownedSite;
+
+      expect(data.selfServeOwnerSites).toEqual([
+        { tenantId: id, tenantName: name, createdAt },
+      ]);
     });
 
     it('finds every row held for the mailbox, decrypted and named by site', () => {
@@ -224,20 +237,6 @@ describe(findPersonalData, () => {
     if (!result.ok) return;
     expect(result.data.unsentStudioReinvites).toEqual([
       { tenantId, tenantName, email: MOCK_SUBSCRIBER_EMAIL },
-    ]);
-  });
-
-  it('finds the self-serve site a +tag variant of the mailbox owns', async () => {
-    const { id, name, createdAt } = await insertTestTenant(db(), {
-      selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
-    });
-
-    const result = await findPersonalData(
-      taggedMixedCaseAddress(MOCK_SUBSCRIBER_EMAIL),
-    );
-
-    expect(result.ok && result.data.selfServeOwnerSites).toEqual([
-      { tenantId: id, tenantName: name, createdAt },
     ]);
   });
 

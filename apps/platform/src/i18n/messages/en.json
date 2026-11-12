@@ -2018,7 +2018,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Find a person's data",
-    "supportingText": "Searches subscribers, contact messages, invites, sign-up blocks and audit events on every site.",
+    "supportingText": "Searches subscribers, contact messages, invites, unsent Studio invites, self-serve site owners, sign-up blocks and audit events on every site.",
     "emailLabel": "Email address",
     "emailHint": "Matches the same mailbox in any letter case and with any +tag.",
     "emailPlaceholder": "name@example.com",
@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Erase",
     "title": "Erase this person's data?",
-    "description": "Deletes their subscriptions, contact messages and invites on every site. This can't be undone.",
+    "description": "Deletes their subscriptions, contact messages and invites on every site, clears unsent Studio invites and frees the Free-or-trial site slot their address holds. This can't be undone.",
     "confirm": "Erase data",
     "erasing": "Erasing…",
     "includesReaderAccount": "Also delete the reader account",

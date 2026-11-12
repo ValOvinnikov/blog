@@ -2018,7 +2018,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Retrouver les données d’une personne",
-    "supportingText": "Recherche parmi les abonnés, les messages de contact, les invitations, les blocages d’inscription et les événements d’audit de tous les sites.",
+    "supportingText": "Recherche parmi les abonnés, les messages de contact, les invitations, les invitations Studio non envoyées, les propriétaires de sites en libre-service, les blocages d’inscription et les événements d’audit de tous les sites.",
     "emailLabel": "Adresse e-mail",
     "emailHint": "Retrouve la même boîte aux lettres quelle que soit la casse et avec n’importe quel +tag.",
     "emailPlaceholder": "nom@example.com",
@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Effacer",
     "title": "Effacer les données de cette personne ?",
-    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites. Cette action est irréversible.",
+    "description": "Supprime ses abonnements, messages de contact et invitations sur tous les sites, efface les invitations Studio non envoyées et libère la place de site gratuit ou d’essai occupée par son adresse. Cette action est irréversible.",
     "confirm": "Effacer les données",
     "erasing": "Effacement…",
     "includesReaderAccount": "Supprimer aussi le compte lecteur",

@@ -1,6 +1,7 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { isSignupBlocked } from '@blog/db/queries/blocked-signup-identities/is-signup-blocked';
+import { ownsFreeTenant } from '@blog/db/queries/tenants/owns-free-tenant';
 import {
   getUnsentStudioReinviteEmail,
   setUnsentStudioReinvite,
@@ -20,9 +21,9 @@ import {
   insertTestPersonalDataRows,
 } from '@blog/db/testing/personal-data-rows';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
+import { readSelfServeIndex } from '@blog/db/testing/tenants/self-serve-fixtures';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
-import { inArray } from 'drizzle-orm';
 
 import {
   erasePersonalData,
@@ -131,24 +132,15 @@ describe(erasePersonalData, () => {
       WITH_READER_ACCOUNT,
     );
 
-    const keys = await db()
-      .select({
-        id: schema.tenants.id,
-        key: schema.tenants.selfServeOwnerEmailIndex,
-      })
-      .from(schema.tenants)
-      .where(inArray(schema.tenants.id, [ownedTenantId, otherTenantId]));
     expect(result).toEqual(
       erasure(MOCK_SUBSCRIBER_EMAIL, {
         ...ONE_OF_EACH,
         selfServeOwnerSites: 1,
       }),
     );
-    expect(keys).toEqual(
-      expect.arrayContaining([
-        { id: ownedTenantId, key: null },
-        { id: otherTenantId, key: testPersonalEmailIndex(MOCK_INVITE_EMAIL) },
-      ]),
+    expect(await readSelfServeIndex(db(), ownedTenantId)).toBeNull();
+    expect(await readSelfServeIndex(db(), otherTenantId)).toBe(
+      testPersonalEmailIndex(MOCK_INVITE_EMAIL),
     );
   });
 
@@ -211,7 +203,16 @@ describe(erasePersonalData, () => {
 
   describe('once the mailbox has been erased', () => {
     beforeEach(async () => {
+      await insertTestTenant(db(), {
+        selfServeOwnerEmailIndex: testPersonalEmailIndex(MOCK_SUBSCRIBER_EMAIL),
+      });
       await erasePersonalData(MOCK_SUBSCRIBER_EMAIL, WITH_READER_ACCOUNT);
+    });
+
+    it('frees the Free-or-trial slot the address held through a self-serve site', async () => {
+      const result = await ownsFreeTenant(MOCK_SUBSCRIBER_EMAIL);
+
+      expect(result).toEqual(okResult(false));
     });
 
     it("keeps everyone else's rows", async () => {

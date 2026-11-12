@@ -2018,7 +2018,7 @@
   },
   "dataRequestSearchCard": {
     "title": "Gegevens van een persoon zoeken",
-    "supportingText": "Doorzoekt abonnees, contactberichten, uitnodigingen, aanmeldblokkades en auditgebeurtenissen van alle sites.",
+    "supportingText": "Doorzoekt abonnees, contactberichten, uitnodigingen, niet-verstuurde Studio-uitnodigingen, eigenaren van selfservice-sites, aanmeldblokkades en auditgebeurtenissen van alle sites.",
     "emailLabel": "E-mailadres",
     "emailHint": "Vindt dezelfde mailbox in elke combinatie van hoofdletters en met elke +tag.",
     "emailPlaceholder": "naam@example.com",
@@ -2042,7 +2042,7 @@
   "dataRequestEraseDialog": {
     "erase": "Wissen",
     "title": "Gegevens van deze persoon wissen?",
-    "description": "Verwijdert hun abonnementen, contactberichten en uitnodigingen op elke site. Dit kan niet ongedaan worden gemaakt.",
+    "description": "Verwijdert hun abonnementen, contactberichten en uitnodigingen op elke site, wist niet-verstuurde Studio-uitnodigingen en geeft de plek voor een gratis site of proefperiode vrij die hun adres bezet. Dit kan niet ongedaan worden gemaakt.",
     "confirm": "Gegevens wissen",
     "erasing": "Bezig met wissen…",
     "includesReaderAccount": "Ook het lezersaccount verwijderen",
