@@ -753,6 +753,7 @@
     "densityDescription": "Espaciado y tamaño de los controles.",
     "cardStyleLabel": "Estilo de tarjeta",
     "cardStyleDescription": "Enmarca cada tarjeta de contenido: entradas, temas, citas, precios, preguntas frecuentes y cuadros de llamada a la acción.",
+    "cardStyleSectionNote": "Una sección concreta puede usar otro estilo de tarjeta. Configúralo en la sección, en Studio.",
     "radiusScaleOptionLabel": {
       "NONE": "Ninguno",
       "SM": "Pequeño",

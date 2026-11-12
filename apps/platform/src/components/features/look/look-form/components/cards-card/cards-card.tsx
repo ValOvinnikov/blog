@@ -1,4 +1,4 @@
-import { CARD_STYLE, type TCardStyle } from '@blog/config';
+import { CARD_STYLE, ICONS, type TCardStyle } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { CardStyleGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
@@ -6,11 +6,15 @@ import { PresetValueButton } from '@platform/components/features/look/look-form/
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { LockedReason } from '@platform/components/shared/locked-reason';
 import { SegmentedRadioGroup } from '@platform/components/shared/segmented-control';
+import { ICON_SIZE } from '@platform/constants/icon';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import { SEGMENTED_RADIO_LAYOUT } from '@platform/constants/segmented-control';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
+
+import { cardsCardVariants } from './cards-card-variants';
 
 export type TCardsCardProps = {
   summary: string;
@@ -34,6 +38,7 @@ export const CardsCard = ({ summary }: TCardsCardProps) => {
     glyph: <CardStyleGlyph cardStyle={style} />,
   }));
   const label = t('cardStyleLabel');
+  const { sectionNote } = cardsCardVariants();
 
   return (
     <LookCard
@@ -63,6 +68,14 @@ export const CardsCard = ({ summary }: TCardsCardProps) => {
           lock={lock}
         />
         <PresetValueButton field="cardStyle" fieldLabel={label} />
+        <LockedReason
+          icon={ICONS.INFO}
+          iconSize={ICON_SIZE.XS}
+          isFieldDescription={false}
+          className={sectionNote()}
+        >
+          {t('cardStyleSectionNote')}
+        </LockedReason>
       </LookField>
     </LookCard>
   );
