@@ -3,7 +3,7 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_POST_RELATED_MODULE_ID,
   mockRawPostRelatedModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/post-related/fixtures';
 import { mockCacheTag } from '@blog/service/testing/sanity/query/cache-tags';
 import {
   MOCK_MISSING_ID,
