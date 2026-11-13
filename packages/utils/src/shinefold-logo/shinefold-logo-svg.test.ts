@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import {
   SHINEFOLD_LOGO,
   SHINEFOLD_LOGO_COLOR,
@@ -8,6 +10,22 @@ import { shinefoldLogoSvg } from './shinefold-logo-svg';
 
 const fillsOf = (svg: string) =>
   [...svg.matchAll(/fill="([^"]+)"/g)].map(([, fill]) => fill);
+
+const BRAND_FILE = {
+  [SHINEFOLD_LOGO_VARIANT.LIGHT]: 'shinefold-logo-light.svg',
+  [SHINEFOLD_LOGO_VARIANT.DARK]: 'shinefold-logo-dark.svg',
+  [SHINEFOLD_LOGO_VARIANT.MONO]: 'shinefold-logo-mono.svg',
+  [SHINEFOLD_LOGO_VARIANT.MARK]: 'shinefold-mark.svg',
+  [SHINEFOLD_LOGO_VARIANT.MARK_MONO]: 'shinefold-mark-mono.svg',
+} as const;
+
+const readBrandFile = (variant: keyof typeof BRAND_FILE) =>
+  readFileSync(
+    new URL(`../../../../docs/brand/${BRAND_FILE[variant]}`, import.meta.url),
+    'utf8',
+  )
+    .replace(/>\s+</g, '><')
+    .trim();
 
 const evenoddCount = (svg: string) => svg.match(/evenodd/g)?.length ?? 0;
 
@@ -22,6 +40,13 @@ describe('shinefoldLogoSvg', () => {
       expect(svg.match(/<path /g)).toHaveLength(
         SHINEFOLD_LOGO[variant].shapes.length,
       );
+    },
+  );
+
+  it.each(Object.values(SHINEFOLD_LOGO_VARIANT))(
+    'renders %s identically to its published brand file',
+    (variant) => {
+      expect(shinefoldLogoSvg(variant)).toBe(readBrandFile(variant));
     },
   );
 

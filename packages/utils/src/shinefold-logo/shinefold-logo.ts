@@ -51,7 +51,7 @@ const colorMarkShapes: readonly IShinefoldLogoShape[] = [
 const coloredLogoShapes = (ink: string): readonly IShinefoldLogoShape[] => [
   ...colorMarkShapes,
   { d: PATH.LETTERING, fill: ink },
-  { d: PATH.DISC, fill: ink },
+  { d: PATH.UNLIT_HALF, fill: ink },
   { d: PATH.LIT_HALF, fill: YELLOW },
 ];
 
