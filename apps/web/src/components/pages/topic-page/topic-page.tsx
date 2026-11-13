@@ -3,6 +3,7 @@ import { FaqPageSchema } from '@web/components/features/faq-page-schema';
 import { TopicBreadcrumbs } from '@web/components/features/topic/topic-breadcrumbs';
 import { TopicChips } from '@web/components/features/topic/topic-chips';
 import { PageShell } from '@web/components/page-templates/page-shell';
+import { TOPIC_LOG } from '@web/constants/topic';
 import { getTopicPage } from '@web/server/topic/get-topic-page/get-topic-page';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 
@@ -15,7 +16,7 @@ type TTopicPageProps = {
 
 export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
   const result = await getTopicPage(slug);
-  const pageData = guardPageLoaderResult(result, 'topic_page.fetch_failed', {
+  const pageData = guardPageLoaderResult(result, TOPIC_LOG.PAGE_FETCH_FAILED, {
     slug,
   });
   const { topic, headingBlock, headingAlignment, hero, modules, faqs } =
@@ -26,7 +27,7 @@ export const TopicPage = async ({ slug, page }: TTopicPageProps) => {
   return (
     <PageShell>
       <PageShell.Breadcrumbs>
-        <TopicBreadcrumbs slug={slug} />
+        <TopicBreadcrumbs slug={slug} isAbovePageHeading={!hero} />
       </PageShell.Breadcrumbs>
       <FaqPageSchema faqs={faqs} />
       <TopicModuleRenderer

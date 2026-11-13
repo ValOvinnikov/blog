@@ -9480,6 +9480,22 @@
         "file": "apps/web/src/constants/post-featured.ts"
       }
     ],
+    "post_index_page.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
+    "post_index_breadcrumbs.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
     "post_latest_module.fetch_failed": [
       {
         "ref": "POST_LATEST_LOG.MODULE_FETCH_FAILED",
@@ -9936,6 +9952,38 @@
         "file": "apps/web/src/constants/stats.ts"
       }
     ],
+    "tag_index_page.fetch_failed": [
+      {
+        "ref": "TAG_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag-index",
+        "file": "apps/web/src/constants/tag-index.ts"
+      }
+    ],
+    "tag_index_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TAG_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag-index",
+        "file": "apps/web/src/constants/tag-index.ts"
+      }
+    ],
+    "tag_page.fetch_failed": [
+      {
+        "ref": "TAG_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
+    "tag_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TAG_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
     "taxonomy_list_module.fetch_failed": [
       {
         "ref": "TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED",
@@ -9966,6 +10014,38 @@
         "scope": "app:web",
         "from": "@web/constants/theme-tokens",
         "file": "apps/web/src/constants/theme-tokens.ts"
+      }
+    ],
+    "topic_index_page.fetch_failed": [
+      {
+        "ref": "TOPIC_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic-index",
+        "file": "apps/web/src/constants/topic-index.ts"
+      }
+    ],
+    "topic_index_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TOPIC_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic-index",
+        "file": "apps/web/src/constants/topic-index.ts"
+      }
+    ],
+    "topic_page.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "topic_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
       }
     ],
     "cookie_statement.seed_start_failed": [

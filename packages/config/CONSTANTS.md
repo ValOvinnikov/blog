@@ -860,6 +860,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **POST_FEATURED_LOG**: `MODULE_FETCH_FAILED`=`"post_featured_module.fetch_failed"`
 
+### `@web/constants/post-index` — `apps/web/src/constants/post-index.ts`
+
+- **POST_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"post_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"post_index_breadcrumbs.fetch_failed"`
+
 ### `@web/constants/post-latest` — `apps/web/src/constants/post-latest.ts`
 
 - **POST_LATEST_LOG**: `MODULE_FETCH_FAILED`=`"post_latest_module.fetch_failed"`
@@ -933,6 +937,14 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **STATS_LOG**: `MODULE_FETCH_FAILED`=`"stats_module.fetch_failed"`
 
+### `@web/constants/tag-index` — `apps/web/src/constants/tag-index.ts`
+
+- **TAG_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"tag_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_index_breadcrumbs.fetch_failed"`
+
+### `@web/constants/tag` — `apps/web/src/constants/tag.ts`
+
+- **TAG_LOG**: `PAGE_FETCH_FAILED`=`"tag_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_breadcrumbs.fetch_failed"`
+
 ### `@web/constants/taxonomy-list` — `apps/web/src/constants/taxonomy-list.ts`
 
 - **TAXONOMY_LIST_LOG**: `MODULE_FETCH_FAILED`=`"taxonomy_list_module.fetch_failed"`
@@ -948,6 +960,14 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/theme-tokens` — `apps/web/src/constants/theme-tokens.ts`
 
 - **THEME_TOKENS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"theme_tokens.site_config_fetch_failed"`
+
+### `@web/constants/topic-index` — `apps/web/src/constants/topic-index.ts`
+
+- **TOPIC_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"topic_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_index_breadcrumbs.fetch_failed"`
+
+### `@web/constants/topic` — `apps/web/src/constants/topic.ts`
+
+- **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`
 
 ## app:worker
 

@@ -6,13 +6,20 @@ import {
 import { BreadcrumbBar } from '@web/components/shared/breadcrumb-bar';
 import { JsonLd } from '@web/components/shared/json-ld';
 import { SmartLink } from '@web/components/shared/smart-link';
+import { POST_INDEX_LOG } from '@web/constants/post-index';
 import { getPostIndexPage } from '@web/server/post-index/get-post-index-page/get-post-index-page';
 import { getHomeBreadcrumb } from '@web/server/site-settings/get-home-breadcrumb/get-home-breadcrumb';
 import { buildBreadcrumbListSchema } from '@web/utils/build-breadcrumb-list-schema';
 import { guardPageLoaderResult } from '@web/utils/guard-page-loader-result';
 import { getTranslations } from 'next-intl/server';
 
-export const PostIndexBreadcrumbs = async () => {
+type TPostIndexBreadcrumbsProps = {
+  isAbovePageHeading?: boolean;
+};
+
+export const PostIndexBreadcrumbs = async ({
+  isAbovePageHeading,
+}: TPostIndexBreadcrumbsProps) => {
   const [result, homeBreadcrumb, t] = await Promise.all([
     getPostIndexPage(),
     getHomeBreadcrumb(),
@@ -20,7 +27,7 @@ export const PostIndexBreadcrumbs = async () => {
   ]);
   const { headingBlock } = guardPageLoaderResult(
     result,
-    'post_index_breadcrumbs.fetch_failed',
+    POST_INDEX_LOG.BREADCRUMBS_FETCH_FAILED,
   );
 
   const breadcrumbTrail: IBreadcrumbItem[] = [
@@ -32,7 +39,7 @@ export const PostIndexBreadcrumbs = async () => {
   return (
     <>
       {breadcrumbListSchema && <JsonLd schema={breadcrumbListSchema} />}
-      <BreadcrumbBar>
+      <BreadcrumbBar isAbovePageHeading={isAbovePageHeading}>
         <Breadcrumbs
           items={breadcrumbTrail}
           ariaLabel={t('ariaLabel')}
