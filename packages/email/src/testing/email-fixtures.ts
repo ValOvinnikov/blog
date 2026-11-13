@@ -1,6 +1,7 @@
 export const MOCK_PLATFORM_BRAND_NAME = 'Quillstack';
 export const MOCK_SIGN_IN_URL = 'https://admin.example.com/sign-in';
 export const MOCK_TENANT_NAME = 'Northwind';
+export const MOCK_TENANT_INITIAL = 'N';
 export const MOCK_TENANT_ID = 'tenant_1';
 export const MOCK_UNSAFE_MARKUP = '<img src=x onerror=alert(1)>';
 export const MOCK_ESCAPED_UNSAFE_MARKUP = '&lt;img src=x onerror=alert(1)&gt;';
@@ -40,6 +41,8 @@ export const OPERATOR_BRAND_NAME = 'Tenant Alerts';
 export const DOCTYPE = '<!doctype html>';
 export const PREHEADER_STYLE = 'display:none';
 export const COPYRIGHT_ENTITY = '&copy;';
+export const INLINE_SVG = '<svg';
+export const BRAND_HEADER_DIVIDER = 'border-bottom';
 export const MOCK_UNSUBSCRIBE_URL =
   'https://example.com/api/newsletter/unsubscribe?token=abc&ref=email';
 export const MOCK_ESCAPED_UNSUBSCRIBE_URL =

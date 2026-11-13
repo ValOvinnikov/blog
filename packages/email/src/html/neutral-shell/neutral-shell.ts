@@ -1,8 +1,9 @@
 import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
+import { EMAIL_WHITE } from '@blog/email/html/email-metrics/email-metrics';
 import { oklchToHex } from '@blog/utils/color';
 
 export const NEUTRAL_EMAIL_PALETTE = {
-  surface: oklchToHex(1, 0, 0),
+  surface: EMAIL_WHITE,
   surface2: oklchToHex(0.975, 0, 0),
   border: oklchToHex(0.9, 0, 0),
   text: oklchToHex(0.2, 0, 0),

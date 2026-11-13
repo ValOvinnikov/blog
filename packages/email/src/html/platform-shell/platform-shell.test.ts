@@ -5,6 +5,7 @@ import {
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
+  INLINE_SVG,
   MOCK_BODY_HTML,
   MOCK_EMAIL_SUBJECT,
   MOCK_ESCAPED_SCRIPT_MARKUP,
@@ -61,7 +62,7 @@ describe(buildPlatformShell, () => {
     });
 
     it('draws no inline SVG and sets no brand name beside the logo', () => {
-      expect(html).not.toContain('<svg');
+      expect(html).not.toContain(INLINE_SVG);
       expect(html).not.toContain(`>${MOCK_PLATFORM_BRAND_NAME}</td>`);
     });
   });
