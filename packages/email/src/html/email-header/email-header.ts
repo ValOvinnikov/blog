@@ -26,7 +26,11 @@ type TEmailHeaderPalette = {
 export type TEmailHeaderLogo =
   | { markPalette: TEmailMarkPalette; logoImageUrl?: string }
   | { markImage: TEmailLogoImage }
-  | { fullLogoImage: TEmailLogoImage; groundColor: string };
+  | {
+      fullLogoImage: TEmailLogoImage;
+      groundColor: string;
+      altTextColor: string;
+    };
 
 const MARK_SIZE_PX = 32;
 
@@ -36,9 +40,9 @@ export function renderEmailHeader(
   logo: TEmailHeaderLogo,
 ): string {
   if ('fullLogoImage' in logo) {
-    const { fullLogoImage, groundColor } = logo;
-    // A fixed dark ground keeps the light lettering legible when a client's dark mode recolours backgrounds.
-    return `<tr><td bgcolor="${groundColor}" style="padding:24px 32px;background-color:${groundColor};border-radius:7px 7px 0 0;">${renderImage(fullLogoImage)}${CELL_ROW_END}`;
+    const { fullLogoImage, groundColor, altTextColor } = logo;
+    // A fixed dark ground keeps the light lettering legible when a client's dark mode recolours backgrounds; the text styles reach the alt text when images are blocked.
+    return `<tr><td bgcolor="${groundColor}" style="padding:24px 32px;background-color:${groundColor};border-radius:7px 7px 0 0;color:${altTextColor};font-family:${FONT_STACK};font-size:18px;font-weight:700;">${renderImage(fullLogoImage)}${CELL_ROW_END}`;
   }
 
   const mark =

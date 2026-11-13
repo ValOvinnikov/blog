@@ -30,6 +30,7 @@ export function buildPlatformShell({
       logo: {
         fullLogoImage: PLATFORM_EMAIL_FULL_LOGO,
         groundColor: PLATFORM_EMAIL_BRAND.brandPrimarySolid,
+        altTextColor: PLATFORM_EMAIL_BRAND.brandPrimaryContrast,
       },
     },
     previewText,
