@@ -11016,6 +11016,14 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "301": [
+      {
+        "ref": "HTTP_STATUS.MOVED_PERMANENTLY",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "303": [
       {
         "ref": "HTTP_STATUS.SEE_OTHER",

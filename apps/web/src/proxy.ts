@@ -9,6 +9,7 @@ import { getIntlMiddleware } from '@web/server/proxy/get-intl-middleware/get-int
 import { isUnroutablePath } from '@web/server/proxy/is-unroutable-path/is-unroutable-path';
 import { prependTenantSegment } from '@web/server/proxy/prepend-tenant-segment/prepend-tenant-segment';
 import { redirectSwitchedOffLocale } from '@web/server/proxy/redirect-switched-off-locale/redirect-switched-off-locale';
+import { redirectToMainAddress } from '@web/server/proxy/redirect-to-main-address/redirect-to-main-address';
 import { redirectToPreferredTranslation } from '@web/server/proxy/redirect-to-preferred-translation/redirect-to-preferred-translation';
 import { setRoutingRequestHeaders } from '@web/server/proxy/set-routing-request-headers/set-routing-request-headers';
 import {
@@ -83,13 +84,11 @@ const routeRequest = async (request: NextRequest): Promise<NextResponse> => {
   const { defaultLocale, liveLocales } =
     tenantRouting ?? SINGLE_LANGUAGE_ROUTING;
 
-  const switchedOffRedirect = redirectSwitchedOffLocale(
-    request,
-    firstSegment,
-    liveLocales,
-  );
-  if (switchedOffRedirect) {
-    return switchedOffRedirect;
+  const addressRedirect =
+    redirectToMainAddress(request, tenantRouting) ??
+    redirectSwitchedOffLocale(request, firstSegment, liveLocales);
+  if (addressRedirect) {
+    return addressRedirect;
   }
 
   const translationRedirect = await redirectToPreferredTranslation(

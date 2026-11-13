@@ -17,7 +17,10 @@ export type TTenantRouting = {
   tenantId: string;
   defaultLocale: TLocaleIsoCode;
   liveLocales: TLocaleIsoCode[];
+  isSecondaryHost: boolean;
 };
+
+type TResolvedHost = { tenant: TTenant; isOwnHost: boolean };
 
 export const isPlatformFallbackAllowed = (): boolean =>
   !isProductionEnvironment();
@@ -45,21 +48,27 @@ const resolveSoleTenant = async (): Promise<TMaybeUndefined<TTenant>> => {
   return tenant && isTenantServable(tenant) ? tenant : undefined;
 };
 
-// The proxy reads this, never the cached lookup: Next gives the proxy its own cache, which `revalidateTag` in a route handler never purges.
-export const resolveUncachedTenant = async (
+const resolveServableHost = async (
   host: TMaybeNull<string>,
-): Promise<TMaybeUndefined<TTenant>> => {
+): Promise<TMaybeUndefined<TResolvedHost>> => {
   const tenant = host
     ? await queries.tenantDomains.getTenantByDomain(host)
     : undefined;
   if (tenant) {
-    return isTenantServable(tenant) ? tenant : undefined;
+    return isTenantServable(tenant) ? { tenant, isOwnHost: true } : undefined;
   }
 
   if (!isPlatformFallbackAllowed()) return undefined;
 
-  return resolveSoleTenant();
+  const soleTenant = await resolveSoleTenant();
+  return soleTenant && { tenant: soleTenant, isOwnHost: false };
 };
+
+// The proxy reads this, never the cached lookup: Next gives the proxy its own cache, which `revalidateTag` in a route handler never purges.
+export const resolveUncachedTenant = async (
+  host: TMaybeNull<string>,
+): Promise<TMaybeUndefined<TTenant>> =>
+  (await resolveServableHost(host))?.tenant;
 
 class UnresolvedHostError extends Error {}
 
@@ -109,16 +118,19 @@ export const resolveTenantId = async (
 export const resolveTenantRouting = async (
   host: TMaybeNull<string>,
 ): Promise<TMaybeUndefined<TTenantRouting>> => {
-  const tenant = await resolveUncachedTenant(host);
+  const resolved = await resolveServableHost(host);
 
-  if (!tenant) {
+  if (!resolved) {
     return undefined;
   }
+
+  const { tenant, isOwnHost } = resolved;
 
   return {
     tenant,
     tenantId: tenant.id,
     defaultLocale: tenant.locale,
     liveLocales: queries.tenants.selectLiveLocales(tenant),
+    isSecondaryHost: isOwnHost && host !== tenant.primaryDomain,
   };
 };
