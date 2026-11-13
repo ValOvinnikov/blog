@@ -14,9 +14,6 @@ import { tenants } from './tenants';
 
 export const membershipRoleEnum = pgEnum('membership_role', MEMBERSHIP_ROLE);
 
-// Joins `users` x `tenants` — a user's role on a given tenant. A user may
-// hold at most one membership per tenant (unique on the pair), but many
-// memberships across tenants.
 export const memberships = pgTable(
   'memberships',
   {
@@ -31,6 +28,7 @@ export const memberships = pgTable(
     createdAt: timestamp(CREATED_AT_COLUMN, { mode: 'date' })
       .notNull()
       .defaultNow(),
+    lockedAt: timestamp('locked_at', { mode: 'date' }),
   },
   (membership) => [unique().on(membership.userId, membership.tenantId)],
 );

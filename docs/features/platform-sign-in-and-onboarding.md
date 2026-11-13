@@ -303,7 +303,7 @@ site as a 14-day Growth trial, with no card.
   site gives the key up, in the same statement that makes it one: a move to a
   paid plan with status ACTIVE or PAST_DUE (`planChangeFields`, used by
   `updateTenantDetails` and `setTenantPlan`), or a paid site that is not an
-  unpaid trial resuming to ACTIVE from a lift, a wake or a reactivation
+  unpaid trial resuming from a lift, a wake or a reactivation
   (`resumedTenantFields`). A trial or a suspended site keeps it. So the rule
   is checked only when a site is created: a site that was once paid can drop
   back to FREE beside its owner's other Free or trial site, and an owner who

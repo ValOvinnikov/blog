@@ -4,7 +4,6 @@ import {
 } from '@blog/db/constants';
 import { clearTenantProvisioningArtifacts } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { PROVISIONING_UNIT_MAX_RETRIES } from '@worker/constants/provisioning';
 import { archiveTenantRow } from '@worker/steps/deprovisioning/archive-tenant-row';
 import { archiveTenantSanityProject } from '@worker/steps/deprovisioning/archive-tenant-sanity-project';
@@ -16,6 +15,7 @@ import {
   type TDeprovisionEnv,
 } from '@worker/utils/deprovision-env/deprovision-env';
 import { DEPROVISIONING_STEP_REPORTER } from '@worker/utils/deprovisioning-report/deprovisioning-report';
+import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';
 
 import {
   loadTenant,
@@ -44,11 +44,7 @@ const DEPROVISIONING_STEP_RUNNERS: Record<
   [DEPROVISIONING_STEP.PURGE_READER_DATA]: ({ id }, _env, runId) =>
     purgeTenantReaderData(id, runId),
   [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: ({ id }, env) =>
-    requestTenantCacheInvalidation({
-      webAppUrl: env.webAppBaseUrl,
-      secret: env.siteConfigRevalidateSecret,
-      tenantId: id,
-    }),
+    invalidateSiteCache(id, env),
 };
 
 export async function runDeprovisioningStep(

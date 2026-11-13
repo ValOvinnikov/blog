@@ -1663,6 +1663,7 @@
     "notDeprovisioned": "This tenant is not deprovisioned.",
     "alreadyInProgress": "Provisioning is already running.",
     "notArchived": "This tenant must be archived before it can be deleted.",
+    "notSuspended": "This tenant is not suspended, so there is nothing to lift.",
     "platformTenant": "This is the platform's own site, so it can't be suspended or deleted.",
     "deprovisionFailed": "Couldn't start deprovisioning — try again.",
     "reactivateFailed": "Couldn't start reactivation — try again.",

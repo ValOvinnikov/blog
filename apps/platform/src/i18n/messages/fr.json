@@ -1663,6 +1663,7 @@
     "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
     "alreadyInProgress": "Le provisionnement est déjà en cours.",
     "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
+    "notSuspended": "Ce locataire n’est pas suspendu : il n’y a rien à lever.",
     "platformTenant": "Il s'agit du site de la plateforme elle-même : il ne peut être ni suspendu ni supprimé.",
     "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
     "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",

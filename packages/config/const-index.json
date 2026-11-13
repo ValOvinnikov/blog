@@ -4242,6 +4242,30 @@
         "file": "packages/db/src/constants/blocked-signup-identity.ts"
       }
     ],
+    "STARTED": [
+      {
+        "ref": "GRACE_EMAIL.STARTED",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "HALFWAY": [
+      {
+        "ref": "GRACE_EMAIL.HALFWAY",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "ENDING": [
+      {
+        "ref": "GRACE_EMAIL.ENDING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/downgrade-grace.ts"
+      }
+    ],
     "DELIVERED": [
       {
         "ref": "EMAIL_DELIVERY_OUTCOME.DELIVERED",
@@ -8320,6 +8344,14 @@
         "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
+    "NOT_SUSPENDED": [
+      {
+        "ref": "TENANT_REFUSAL.NOT_SUSPENDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "PLATFORM_TENANT": [
       {
         "ref": "TENANT_REFUSAL.PLATFORM_TENANT",
@@ -9942,6 +9974,70 @@
         "scope": "app:worker",
         "from": "@worker/constants/custom-domain",
         "file": "apps/worker/src/constants/custom-domain.ts"
+      }
+    ],
+    "downgrade_grace.failed": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "downgrade_grace.step_failed": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.STEP_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "downgrade_grace.owner_missing": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.OWNER_MISSING",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "downgrade_grace.subdomain_missing": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.SUBDOMAIN_MISSING",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "downgrade_grace.grace_end_failed": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.GRACE_END_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "downgrade_grace.email_send_failed": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.EMAIL_SEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "TRIAL_END": [
+      {
+        "ref": "DOWNGRADE_GRACE_STEP.TRIAL_END",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
+    "GRACE_END": [
+      {
+        "ref": "DOWNGRADE_GRACE_STEP.GRACE_END",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
       }
     ],
     "UNAUTHORIZED": [

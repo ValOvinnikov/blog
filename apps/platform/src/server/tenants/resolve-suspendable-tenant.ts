@@ -13,6 +13,7 @@ import { logger } from '@platform/utils/logger/logger';
 type TSuspendableTenantRefusal =
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ARCHIVED
+  | typeof TENANT_REFUSAL.NOT_SUSPENDED
   | typeof TENANT_REFUSAL.PLATFORM_TENANT;
 
 export type TResolveSuspendableTenantResult =
@@ -37,6 +38,12 @@ export const resolveSuspendableTenant = async (
   if (!tenant) return refused(TENANT_REFUSAL.NOT_FOUND);
   if (tenant.deprovisionedAt || tenant.status === TENANT_STATUS.ARCHIVED) {
     return refused(TENANT_REFUSAL.ARCHIVED);
+  }
+  if (
+    status === TENANT_STATUS.ACTIVE &&
+    tenant.status !== TENANT_STATUS.SUSPENDED
+  ) {
+    return refused(TENANT_REFUSAL.NOT_SUSPENDED);
   }
   if (
     status === TENANT_STATUS.SUSPENDED &&
