@@ -3,6 +3,7 @@ import { BILLING_LOG } from '@platform/constants/billing';
 import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -60,7 +61,7 @@ describe(readTenantSubscriptionPlan, () => {
     const { retrieveSubscription } = withPlanKey(
       STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
     );
-    retrieveSubscription.mockRejectedValue(new Error('network'));
+    retrieveSubscription.mockRejectedValue(MOCK_NETWORK_ERROR);
 
     const result = await read();
 

@@ -1,3 +1,4 @@
+import type { TMaybeNull } from '@blog/config';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   BILLING_INTERVAL,
@@ -30,6 +31,7 @@ import {
   mockStripeSubscription,
   type TMockStripeSubscription,
 } from '@platform/testing/billing/stripe-subscription';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import Stripe from 'stripe';
@@ -46,6 +48,7 @@ const MOCK_CARD_ERROR = new Stripe.errors.StripeCardError({
 const MOCK_INVALID_REQUEST = new Stripe.errors.StripeInvalidRequestError({
   message: 'invalid',
 });
+const MOCK_OTHER_SCHEDULE_ID = `${MOCK_SCHEDULE_ID}_other`;
 const IMMEDIATE_UPDATE = {
   proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
   payment_behavior: 'error_if_incomplete',
@@ -223,6 +226,37 @@ describe(changeSubscriptionPlan, () => {
       expect(client.releaseSchedule).not.toHaveBeenCalled();
     });
 
+    it('retries a failed release once without logging', async () => {
+      const { result, releaseSchedule } = await change(
+        PLANNED,
+        MOCK_GROWTH_MONTHLY_CHOICE,
+        (client) =>
+          client.releaseSchedule.mockRejectedValueOnce(MOCK_NETWORK_ERROR),
+      );
+
+      expect(result).toBe(PLAN_CHANGE_TIMING.NOW);
+      expect(releaseSchedule).toHaveBeenCalledTimes(2);
+      expect(vi.mocked(logger).error).not.toHaveBeenCalled();
+    });
+
+    it('reports the move up as made and logs a planned move that will not release', async () => {
+      const { result } = await change(
+        PLANNED,
+        MOCK_GROWTH_MONTHLY_CHOICE,
+        (client) =>
+          client.releaseSchedule.mockRejectedValue(MOCK_NETWORK_ERROR),
+      );
+
+      expect(result).toBe(PLAN_CHANGE_TIMING.NOW);
+      expect(vi.mocked(logger).error).toHaveBeenCalledExactlyOnceWith(
+        BILLING_LOG.PLAN_CHANGE_RELEASE_FAILED,
+        expect.objectContaining({
+          tenantId: MOCK_TENANT_ID,
+          scheduleId: MOCK_SCHEDULE_ID,
+        }),
+      );
+    });
+
     it('releases the planned move right before planning another', async () => {
       const { releaseSchedule, createSchedule } = await change(
         { ...PLANNED, lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY] },
@@ -281,6 +315,56 @@ describe(changeSubscriptionPlan, () => {
     expect(result).toBe(PLAN_CHANGE_TIMING.AT_RENEWAL);
     expect(releaseSchedule).toHaveBeenCalledExactlyOnceWith(MOCK_SCHEDULE_ID);
     expect(createSchedule).toHaveBeenCalledTimes(2);
+  });
+
+  it('releases a move down another tab planned while moving up', async () => {
+    const { releaseSchedule } = await change(
+      { lookupKeys: [STARTER_MONTHLY] },
+      MOCK_GROWTH_MONTHLY_CHOICE,
+      ({ updateSubscription }) =>
+        updateSubscription.mockResolvedValue(
+          mockStripeSubscription({
+            lookupKeys: [GROWTH_MONTHLY],
+            schedule: MOCK_SCHEDULE_ID,
+          }),
+        ),
+    );
+
+    expect(releaseSchedule).toHaveBeenCalledExactlyOnceWith(MOCK_SCHEDULE_ID);
+  });
+
+  describe('when another tab replaced the schedule mid-change', () => {
+    const replacedBy = (schedule: TMaybeNull<string>) =>
+      change(
+        { lookupKeys: [GROWTH_MONTHLY] },
+        MOCK_STARTER_MONTHLY_CHOICE,
+        ({ updateSchedule, retrieveSchedule, retrieveSubscription }) => {
+          updateSchedule.mockRejectedValue(MOCK_INVALID_REQUEST);
+          retrieveSchedule.mockResolvedValue({
+            released_at: MOCK_PERIOD_START,
+          });
+          retrieveSubscription
+            .mockResolvedValueOnce(
+              mockStripeSubscription({ lookupKeys: [GROWTH_MONTHLY] }),
+            )
+            .mockResolvedValueOnce(
+              mockStripeSubscription({
+                lookupKeys: [GROWTH_MONTHLY],
+                schedule,
+              }),
+            );
+        },
+      );
+
+    it('plans the move down without an error', async () => {
+      const { result } = await replacedBy(MOCK_OTHER_SCHEDULE_ID);
+
+      expect(result).toBe(PLAN_CHANGE_TIMING.AT_RENEWAL);
+    });
+
+    it('still fails when no change is left in place', async () => {
+      await expect(replacedBy(null)).rejects.toBe(MOCK_INVALID_REQUEST);
+    });
   });
 
   it('cancels a pending change when the current plan is chosen again', async () => {

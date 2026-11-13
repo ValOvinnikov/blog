@@ -7,6 +7,7 @@ import {
 import { faker } from '@faker-js/faker';
 import { LEAD_LOG } from '@platform/constants/lead';
 import { MOCK_WEB_APP_URL } from '@platform/testing/env/fixtures';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { env } from '@platform/utils/env/env';
 import { logger } from '@platform/utils/logger/logger';
@@ -24,7 +25,6 @@ const MOCK_SECRET = faker.string.alphanumeric(32);
 const MOCK_DOCUMENT_ID = faker.string.alphanumeric(12);
 const MOCK_PAGE_PATH = `/api/internal/pages/${MOCK_DOCUMENT_ID}`;
 const MOCK_PAGE_TITLE = faker.lorem.words(2);
-const MOCK_NETWORK_ERROR = new Error(faker.lorem.sentence());
 
 const fetchTitle = () =>
   fetchPageTitle({

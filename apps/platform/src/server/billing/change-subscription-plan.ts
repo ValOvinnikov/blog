@@ -12,6 +12,7 @@ import {
   type TPlanChangeTiming,
   type TPlanChoice,
 } from '@platform/constants/plan-change';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { planChangeTiming } from '@platform/utils/plan-change-timing/plan-change-timing';
 import type Stripe from 'stripe';
@@ -23,6 +24,7 @@ import {
   scheduleChangeAtRenewal,
   type TTargetPrices,
 } from './schedule-change-at-renewal';
+import { stripeIdOf } from './stripe-id';
 
 export type TPlanChangeResult =
   TPlanChangeTiming | typeof PLAN_CHANGE_REFUSAL.UNCHANGED | undefined;
@@ -67,6 +69,21 @@ const changeNow = (
   });
 };
 
+const releaseAfterChange = (
+  stripe: Stripe,
+  scheduleId: string,
+  tenantId: string,
+): Promise<void> =>
+  releaseSchedule(stripe, scheduleId)
+    .catch(() => releaseSchedule(stripe, scheduleId))
+    .catch((error: unknown) => {
+      logger.error(BILLING_LOG.PLAN_CHANGE_RELEASE_FAILED, {
+        tenantId,
+        scheduleId,
+        ...toLoggableError(error),
+      });
+    });
+
 export const changeSubscriptionPlan = async (
   stripe: Stripe,
   subscription: TSubscriptionPlan,
@@ -92,7 +109,8 @@ export const changeSubscriptionPlan = async (
     await scheduleChangeAtRenewal(stripe, subscription, prices, to.interval);
     return timing;
   }
-  await changeNow(stripe, subscription, prices);
-  if (scheduleId) await releaseSchedule(stripe, scheduleId);
+  const { schedule } = await changeNow(stripe, subscription, prices);
+  if (schedule)
+    await releaseAfterChange(stripe, stripeIdOf(schedule), tenantId);
   return timing;
 };

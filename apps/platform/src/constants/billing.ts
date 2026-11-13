@@ -24,6 +24,7 @@ export const BILLING_LOG = {
   PLAN_CHANGE_FAILED: 'billing.plan_change_failed',
   PLAN_CHANGE_PRICE_MISSING: 'billing.plan_change_price_missing',
   PLAN_CHANGE_LOAD_FAILED: 'billing.plan_change_load_failed',
+  PLAN_CHANGE_RELEASE_FAILED: 'billing.plan_change_release_failed',
   CATALOGUE_SYNCED: 'billing.catalogue_synced',
   CATALOGUE_SYNC_FAILED: 'billing.catalogue_sync_failed',
 } as const;
