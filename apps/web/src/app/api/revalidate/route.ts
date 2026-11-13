@@ -84,7 +84,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     );
   }
 
-  const { _type: type, _id: id } = parsedBody;
+  const { _type: type, _id: id, slug } = parsedBody;
   const tenantId = verified.data;
 
   const tenantRefusal = await resolveWebhookTenant(tenantId, tenantProjectId);
@@ -110,6 +110,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     tags: revalidated,
     type,
     id,
+    slug,
     tenantId,
     tenant: tenantSanity,
   });

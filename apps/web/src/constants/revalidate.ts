@@ -12,6 +12,7 @@ export const REVALIDATE_LOG = {
   REFERENCING_MODULES_LOOKUP_FAILED:
     'revalidate.referencing_modules_lookup_failed',
   POST_LOOKUP_FAILED: 'revalidate.post_lookup_failed',
+  TENANT_PAGE_LIST_LOOKUP_FAILED: 'revalidate.tenant_page_list_lookup_failed',
   BLOG_PAGINATION_LOOKUP_FAILED: 'revalidate.blog_pagination_lookup_failed',
   TAG_PARAMS_LOOKUP_FAILED: 'revalidate.tag_params_lookup_failed',
   TAG_PAGINATION_LOOKUP_FAILED: 'revalidate.tag_pagination_lookup_failed',
@@ -26,9 +27,9 @@ export const REVALIDATE_LOG = {
   NEWSLETTER_SEND_RELEASE_FAILED: 'revalidate.newsletter_send_release_failed',
 } as const;
 
-export const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
+export const WHOLE_SITE_PURGE_ARGS = ['/', 'layout'] as const;
 
-export const UNSUPPORTED_TYPE_REASON = 'unsupported_type';
+export const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';
 
 export const DOCUMENT_NOT_FOUND_REASON = 'document_not_found';
 

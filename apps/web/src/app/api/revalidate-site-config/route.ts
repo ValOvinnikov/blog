@@ -1,7 +1,10 @@
-import { HTTP_STATUS } from '@blog/config';
+import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import { isSecretMatch } from '@blog/utils';
+import { hasLength, isNull, isString } from '@blog/utils/primitives';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
+import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
+import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import {
@@ -10,7 +13,7 @@ import {
   buildTenantPlanCacheTag,
   TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
@@ -22,31 +25,23 @@ const buildTagsForTenant = (tenantId: string): string[] => [
   buildTenantPlanCacheTag(tenantId),
 ];
 
-const parseTenantId = async (request: Request): Promise<string | undefined> => {
+const parseTenantId = async (
+  request: Request,
+): Promise<TMaybeUndefined<string>> => {
   try {
     const body: unknown = await request.json();
-    if (
-      typeof body === 'object' &&
-      body !== null &&
-      'tenantId' in body &&
-      typeof (body as { tenantId: unknown }).tenantId === 'string' &&
-      (body as { tenantId: string }).tenantId.length > 0
-    ) {
-      return (body as { tenantId: string }).tenantId;
+    if (typeof body !== 'object' || isNull(body)) {
+      return undefined;
     }
+    const tenantId = (body as Record<string, unknown>)['tenantId'];
+    return isString(tenantId) && hasLength(tenantId) ? tenantId : undefined;
   } catch {
     return undefined;
   }
-  return undefined;
 };
 
-/**
- * Resolves the tenant ids to revalidate: just the given one, or — for a
- * caller that hasn't been updated to send one yet — every tenant, so an
- * omitted `tenantId` still revalidates rather than silently doing nothing.
- */
 const resolveTenantIdsToRevalidate = async (
-  requestedTenantId: string | undefined,
+  requestedTenantId: TMaybeUndefined<string>,
 ): Promise<string[]> => {
   if (requestedTenantId) return [requestedTenantId];
 
@@ -54,19 +49,6 @@ const resolveTenantIdsToRevalidate = async (
   return tenants.map((tenant) => tenant.id);
 };
 
-/**
- * On-demand revalidation endpoint for `apps/platform`'s Look/Voice/Features
- * saves — `@blog/db` writes there directly, with no wiring into this app's
- * cache, so without this call a save can take up to an hour to appear live
- * (see `@web/server/site-config/get-site-config/get-site-config`,
- * `@web/server/settings-features/get-effective-settings-features/get-effective-settings-features`,
- * `@web/server/settings-features/get-tenant-plan/get-tenant-plan`). Verified with a plain shared secret
- * (`Authorization: Bearer <SITE_CONFIG_REVALIDATE_SECRET>`), not a signed
- * payload — this is a trusted internal service-to-service call between the
- * two apps, not a public webhook. Accepts an optional JSON body
- * `{ tenantId }` to scope revalidation to the tenant that actually saved;
- * an empty/missing body revalidates every tenant.
- */
 export async function POST(request: Request): Promise<NextResponse> {
   const secret = env.SITE_CONFIG_REVALIDATE_SECRET;
   if (!secret) {
@@ -100,15 +82,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     revalidateTag(tag, { expire: 0 });
   }
 
-  // A Look/Voice/Features save changes every page a tenant renders (theme
-  // tokens, nav, feature flags), so there is no smaller path set that would
-  // be correct to purge instead — the whole-site purge here is deliberate,
-  // not an unfinished derivation, and is logged loudly rather than silent.
-  logger.warn(REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE, {
-    tenantIds,
-    requestedTenantId,
+  purgeDerivedPaths(await resolveTenantSitePaths(requestedTenantId), {
+    tenantId: requestedTenantId,
   });
-  revalidatePath('/', 'layout');
 
   return NextResponse.json(
     { revalidated: revalidatedTags, pathPurged: true },
