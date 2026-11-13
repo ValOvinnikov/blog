@@ -11,6 +11,7 @@ import {
 import { FEATURED_POST_FILTER } from '@blog/service/shared/expressions/post/featured-post';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { postCardFragment } from '@blog/service/shared/fragments/post/post';
 import type { TLocaleQueryParams } from '@blog/service/shared/localization/locale-query-params/locale-query-params';
@@ -57,6 +58,7 @@ export const postFeaturedModuleQuery = q
     limit: sub.field('limit').nullable(true),
     ...moduleWideLayoutFragment,
     ...moduleContentAlignmentLeftCenterFragment,
+    ...moduleAppearanceFragment,
     showImages: sub.raw(SHOW_IMAGES_EXPRESSION, showImagesParser),
     displayMode: sub.raw(DISPLAY_MODE_EXPRESSION, displayModeParser),
   }))

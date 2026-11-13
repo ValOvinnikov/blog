@@ -1,15 +1,18 @@
 import {
+  CARD_STYLE,
+  DENSITY,
   DISPLAY_MODE,
   LOCALE_ISO_CODES,
   POST_SOURCE,
+  RADIUS_SCALE,
 } from '@blog/config/constants';
 import { MOCK_TOPIC_ID } from '@blog/service/testing/entities/fixtures';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   mockModuleDocument,
-  mockRawPostFeaturedModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/post-featured/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { mockLocalizedStrings } from '@blog/service/testing/shared/localized';
@@ -46,10 +49,13 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   posts: [],
 });
 
-async function runPostFeatured(locale: string) {
+async function runPostFeatured(
+  locale: string,
+  document: Record<string, unknown> = MOCK_MODULE_DOCUMENT,
+) {
   const raw = await evaluateGroqExpression(
     postFeaturedModuleQuery.query,
-    [MOCK_MODULE_DOCUMENT],
+    [document],
     undefined,
     { id: MOCK_POST_FEATURED_ID, locale, defaultLocale: EN },
   );
@@ -69,6 +75,31 @@ describe('postFeaturedModuleQuery', () => {
 
     expect(showImages).toBe(true);
     expect(displayMode).toBe(DISPLAY_MODE.GRID);
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const postFeatured = await runPostFeatured(EN);
+
+    expect(postFeatured).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+    };
+
+    const postFeatured = await runPostFeatured(EN, {
+      ...MOCK_MODULE_DOCUMENT,
+      ...appearance,
+    });
+
+    expect(postFeatured).toMatchObject(appearance);
   });
 
   it('picks the heading in the visitor language', async () => {

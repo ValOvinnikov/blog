@@ -52,6 +52,10 @@ export const env = createEnv({
     // @env-optional
     OWNER_EMAIL_FROM_ADDRESS: z.string().min(1).optional(),
     // @env-optional
+    NEWSLETTER_FROM_ADDRESS: z.string().min(1).optional(),
+    // @env-optional
+    NEWSLETTER_UNSUBSCRIBE_KEY: z.string().min(1).optional(),
+    // @env-optional
     PERSONAL_DATA_ENCRYPTION_KEY: z
       .string()
       .refine(isPersonalDataKeyring, PERSONAL_DATA_KEYRING_FORMAT)
@@ -86,6 +90,8 @@ export const env = createEnv({
     CRON_SECRET: process.env.CRON_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
     OWNER_EMAIL_FROM_ADDRESS: process.env.OWNER_EMAIL_FROM_ADDRESS,
+    NEWSLETTER_FROM_ADDRESS: process.env.NEWSLETTER_FROM_ADDRESS,
+    NEWSLETTER_UNSUBSCRIBE_KEY: process.env.NEWSLETTER_UNSUBSCRIBE_KEY,
     PERSONAL_DATA_ENCRYPTION_KEY: process.env.PERSONAL_DATA_ENCRYPTION_KEY,
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
     LOKI_PUSH_URL: process.env.LOKI_PUSH_URL,

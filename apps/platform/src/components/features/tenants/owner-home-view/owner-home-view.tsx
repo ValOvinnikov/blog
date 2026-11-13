@@ -9,6 +9,7 @@ import type { TDomainVerificationStatus } from '@platform/constants/domain';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTrial } from '@platform/utils/trial-for/trial-for';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
@@ -16,6 +17,7 @@ import { GetStartedCard } from './components/get-started-card/get-started-card';
 import { MakeItYoursCard } from './components/make-it-yours-card/make-it-yours-card';
 import { SiteSetupCard } from './components/site-setup-card/site-setup-card';
 import { StreamedDomainCard } from './components/streamed-domain-card/streamed-domain-card';
+import { TrialNotice } from './components/trial-notice/trial-notice';
 import { YourSiteCard } from './components/your-site-card/your-site-card';
 import { ownerHomeViewVariants } from './owner-home-view-variants';
 
@@ -25,6 +27,7 @@ export type TOwnerHomeViewProps = {
   owner: TMaybeUndefined<TTenantOwnerMembership>;
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
+  trial?: TTrial;
 };
 
 export const OwnerHomeView = ({
@@ -33,6 +36,7 @@ export const OwnerHomeView = ({
   owner,
   siteSetup,
   getStarted,
+  trial,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, pair } = ownerHomeViewVariants();
@@ -48,6 +52,8 @@ export const OwnerHomeView = ({
       {tenant.deprovisionedAt && (
         <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
       )}
+
+      {trial && <TrialNotice trial={trial} />}
 
       {siteSetup && <SiteSetupCard siteSetup={siteSetup} />}
 
