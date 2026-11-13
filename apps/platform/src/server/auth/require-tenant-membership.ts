@@ -2,28 +2,21 @@ import 'server-only';
 
 import { queries } from '@blog/db';
 import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  type TPlatformTenant,
+  toPlatformTenant,
+} from '@platform/utils/platform-tenant/platform-tenant';
 import { notFound } from 'next/navigation';
 
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
 import { requireSessionUserId } from './require-session-user-id';
 
 export type TTenantMembershipContext = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
   membership: TMembership;
 };
 
-/**
- * The Tenant-section gate: no session redirects to sign-in; an unknown
- * tenant id and a session with no `memberships` row for a real tenant both
- * 404, indistinguishably — unless the session has any `admins` row, which
- * gets a virtual OWNER-level membership on any existing tenant instead,
- * regardless of any real `memberships` row or admin role. This matches
- * `requireAdmin`'s own floor: any admin role can reverse an in-app-state
- * edit. Called from a layout (not a page) so every route nested under a
- * gated tenant segment is protected by existing there, never by a per-page
- * check someone could forget to add.
- */
+/** The tenant-section gate, called from a layout so every nested route is protected; an admin gets a virtual OWNER membership on any tenant. */
 export const requireTenantMembership = async (
   tenantId: string,
 ): Promise<TTenantMembershipContext> => {
@@ -38,7 +31,7 @@ export const requireTenantMembership = async (
 
   if (admin) {
     return {
-      tenant,
+      tenant: toPlatformTenant(tenant),
       membership: buildVirtualAdminMembership(userId, tenant.id),
     };
   }
@@ -49,5 +42,5 @@ export const requireTenantMembership = async (
     notFound();
   }
 
-  return { tenant, membership };
+  return { tenant: toPlatformTenant(tenant), membership };
 };

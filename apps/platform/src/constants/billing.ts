@@ -74,20 +74,18 @@ export type TBillingInterval = TValueOf<typeof BILLING_INTERVAL>;
 
 export const UPGRADE_STATE = {
   AVAILABLE: 'AVAILABLE',
-  ON_GROWTH: 'ON_GROWTH',
+  SUBSCRIBED: 'SUBSCRIBED',
   NOT_OWNER: 'NOT_OWNER',
-  PAID_PLAN: 'PAID_PLAN',
   UNAVAILABLE: 'UNAVAILABLE',
 } as const;
 
 export type TUpgradeState = TValueOf<typeof UPGRADE_STATE>;
 
 export const UPGRADE_REFUSAL = {
-  ON_GROWTH: 'ON_GROWTH',
-  NOT_OWNER: 'NOT_OWNER',
-  PAID_PLAN: 'PAID_PLAN',
-  UNAVAILABLE: 'UNAVAILABLE',
   SUBSCRIBED: 'SUBSCRIBED',
+  NOT_OWNER: 'NOT_OWNER',
+  UNAVAILABLE: 'UNAVAILABLE',
+  PAYMENT_PENDING: 'PAYMENT_PENDING',
 } as const;
 
 export type TUpgradeRefusal = TValueOf<typeof UPGRADE_REFUSAL>;

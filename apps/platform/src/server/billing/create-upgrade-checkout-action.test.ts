@@ -1,5 +1,9 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  STRIPE_PRICE_LOOKUP_KEY,
+  TENANT_PLAN,
+  TENANT_STATUS,
+} from '@blog/db/constants';
 import { okResult } from '@blog/utils';
 import {
   BILLING_INTERVAL,
@@ -14,6 +18,7 @@ import {
   MOCK_CHECKOUT_CLIENT_SECRET,
   MOCK_CHECKOUT_SESSION_ID,
   MOCK_STRIPE_CUSTOMER_ID,
+  MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
 import { mockStripeCheckoutClient } from '@platform/testing/billing/stripe-checkout-client';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
@@ -23,11 +28,13 @@ import {
   MOCK_TENANT_ID,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
+import { MOCK_TRIAL_ENDS_AT } from '@platform/testing/tenants/mock-tenant';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { createUpgradeCheckoutAction } from './create-upgrade-checkout-action';
 import { getStripeClient } from './stripe-client';
+import type { TUpgradeCheckoutInput } from './upgrade-checkout-input';
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
@@ -45,6 +52,7 @@ vi.mock('./stripe-client', () => ({ getStripeClient: vi.fn() }));
 
 const {
   stripe,
+  listPrices,
   createSession,
   listSubscriptions,
   retrieveCustomer,
@@ -52,7 +60,16 @@ const {
   listSessions,
 } = mockStripeCheckoutClient();
 
-const MOCK_MONTHLY = { interval: BILLING_INTERVAL.MONTHLY };
+const MOCK_MONTHLY: TUpgradeCheckoutInput = {
+  plan: TENANT_PLAN.GROWTH,
+  interval: BILLING_INTERVAL.MONTHLY,
+};
+const MOCK_FREE_SITE = {};
+const MOCK_TRIAL_SITE = {
+  plan: TENANT_PLAN.GROWTH,
+  status: TENANT_STATUS.TRIAL,
+  trialEndsAt: MOCK_TRIAL_ENDS_AT,
+};
 
 const checkout = (input = MOCK_MONTHLY) =>
   createUpgradeCheckoutAction(MOCK_TENANT_ID, input);
@@ -102,21 +119,82 @@ describe(createUpgradeCheckoutAction, () => {
     );
   });
 
-  it('refuses a site the plan state rules out and opens no checkout', async () => {
-    asSite({ plan: TENANT_PLAN.STARTER, status: TENANT_STATUS.ACTIVE });
+  it.each([
+    [
+      'Free',
+      MOCK_FREE_SITE,
+      TENANT_PLAN.STARTER,
+      BILLING_INTERVAL.MONTHLY,
+      STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
+    ],
+    [
+      'Free',
+      MOCK_FREE_SITE,
+      TENANT_PLAN.STARTER,
+      BILLING_INTERVAL.YEARLY,
+      STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY,
+    ],
+    [
+      'Free',
+      MOCK_FREE_SITE,
+      TENANT_PLAN.GROWTH,
+      BILLING_INTERVAL.MONTHLY,
+      STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
+    ],
+    [
+      'Free',
+      MOCK_FREE_SITE,
+      TENANT_PLAN.GROWTH,
+      BILLING_INTERVAL.YEARLY,
+      STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+    ],
+    [
+      'trial',
+      MOCK_TRIAL_SITE,
+      TENANT_PLAN.STARTER,
+      BILLING_INTERVAL.MONTHLY,
+      STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
+    ],
+    [
+      'trial',
+      MOCK_TRIAL_SITE,
+      TENANT_PLAN.STARTER,
+      BILLING_INTERVAL.YEARLY,
+      STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY,
+    ],
+    [
+      'trial',
+      MOCK_TRIAL_SITE,
+      TENANT_PLAN.GROWTH,
+      BILLING_INTERVAL.MONTHLY,
+      STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
+    ],
+    [
+      'trial',
+      MOCK_TRIAL_SITE,
+      TENANT_PLAN.GROWTH,
+      BILLING_INTERVAL.YEARLY,
+      STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+    ],
+  ])(
+    'lets a %s owner buy %s %s',
+    async (_, site, plan, interval, lookupKey) => {
+      asSite(site);
 
-    const result = await checkout();
+      const result = await checkout({ plan, interval });
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPGRADE_REFUSAL.PAID_PLAN,
-    });
-    expect(createSession).not.toHaveBeenCalled();
-  });
+      const [{ lookup_keys }] = listPrices.mock.calls[0] as [
+        { lookup_keys: string[] },
+      ];
+      expect(result.outcome).toBe(ACTION_OUTCOME.SUCCESS);
+      expect(lookup_keys).toEqual([lookupKey]);
+    },
+  );
 
-  it('refuses a second checkout while a subscription is live', async () => {
-    listSubscriptions.mockResolvedValueOnce({
-      data: [{ status: STRIPE_SUBSCRIPTION_STATUS.ACTIVE }],
+  it('refuses a site with a live subscription and opens no checkout', async () => {
+    asSite({
+      plan: TENANT_PLAN.STARTER,
+      stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
     });
 
     const result = await checkout();
@@ -128,8 +206,34 @@ describe(createUpgradeCheckoutAction, () => {
     expect(createSession).not.toHaveBeenCalled();
   });
 
+  it('refuses a second checkout while Stripe already has a live subscription', async () => {
+    listSubscriptions.mockResolvedValueOnce({
+      data: [{ status: STRIPE_SUBSCRIPTION_STATUS.ACTIVE }],
+    });
+
+    const result = await checkout();
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: UPGRADE_REFUSAL.PAYMENT_PENDING,
+    });
+    expect(createSession).not.toHaveBeenCalled();
+  });
+
+  it('rejects the Free plan, which is not for sale', async () => {
+    const result = await checkout({ ...MOCK_MONTHLY, plan: TENANT_PLAN.FREE });
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.INVALID,
+      fieldErrors: {},
+    });
+  });
+
   it('rejects an unknown billing period', async () => {
-    const result = await checkout({ interval: 'WEEKLY' as never });
+    const result = await checkout({
+      ...MOCK_MONTHLY,
+      interval: 'WEEKLY' as never,
+    });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,

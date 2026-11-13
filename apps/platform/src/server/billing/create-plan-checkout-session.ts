@@ -1,9 +1,8 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_PRICE_LOOKUP_KEYS, TENANT_PLAN } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/db/constants';
 import {
-  BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_TENANT_METADATA_KEY,
   type TBillingInterval,
@@ -12,52 +11,19 @@ import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type Stripe from 'stripe';
 
-export type TGrowthCheckoutRequest = {
+import {
+  findPlanPrice,
+  findPromotionCodeId,
+  type TPromoContext,
+} from './find-checkout-catalogue';
+
+export type TPlanCheckoutRequest = {
   tenantId: string;
   customerId: string;
+  plan: TTenantPlan;
   interval: TBillingInterval;
   returnUrl: string;
   promo?: string;
-};
-
-type TPromoContext = { tenantId: string; promo?: string };
-
-const findGrowthPrice = async (
-  stripe: Stripe,
-  interval: TBillingInterval,
-): Promise<TMaybeUndefined<Stripe.Price>> => {
-  const keys = PLAN_PRICE_LOOKUP_KEYS[TENANT_PLAN.GROWTH];
-  if (!keys) return undefined;
-  const lookupKey =
-    interval === BILLING_INTERVAL.YEARLY ? keys.yearly : keys.monthly;
-  const { data } = await stripe.prices.list({
-    lookup_keys: [lookupKey],
-    active: true,
-    limit: 1,
-  });
-  return data[0];
-};
-
-const findPromotionCodeId = async (
-  stripe: Stripe,
-  { tenantId, promo }: TPromoContext,
-): Promise<TMaybeUndefined<string>> => {
-  if (!promo) return undefined;
-  try {
-    const { data } = await stripe.promotionCodes.list({
-      code: promo,
-      active: true,
-      limit: 1,
-    });
-    return data[0]?.id;
-  } catch (error) {
-    logger.warn(BILLING_LOG.CHECKOUT_PROMO_REFUSED, {
-      tenantId,
-      promo,
-      ...toLoggableError(error),
-    });
-    return undefined;
-  }
 };
 
 const createSession = async (
@@ -84,17 +50,28 @@ const createSession = async (
   }
 };
 
-export const createGrowthCheckoutSession = async (
+export const createPlanCheckoutSession = async (
   stripe: Stripe,
-  { tenantId, customerId, interval, returnUrl, promo }: TGrowthCheckoutRequest,
+  {
+    tenantId,
+    customerId,
+    plan,
+    interval,
+    returnUrl,
+    promo,
+  }: TPlanCheckoutRequest,
 ): Promise<TMaybeUndefined<string>> => {
   const context = { tenantId, promo };
   const [price, promotionCodeId] = await Promise.all([
-    findGrowthPrice(stripe, interval),
+    findPlanPrice(stripe, plan, interval),
     findPromotionCodeId(stripe, context),
   ]);
   if (!price) {
-    logger.error(BILLING_LOG.CHECKOUT_PRICE_MISSING, { tenantId, interval });
+    logger.error(BILLING_LOG.CHECKOUT_PRICE_MISSING, {
+      tenantId,
+      plan,
+      interval,
+    });
     return undefined;
   }
 

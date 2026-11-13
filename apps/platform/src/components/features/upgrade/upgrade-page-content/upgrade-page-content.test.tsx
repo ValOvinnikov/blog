@@ -1,9 +1,13 @@
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
-import { MOCK_STRIPE_PUBLISHABLE_KEY } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_STRIPE_PUBLISHABLE_KEY,
+  MOCK_STRIPE_SUBSCRIPTION_ID,
+} from '@platform/testing/billing/fixtures';
 import { EMBEDDED_CHECKOUT_TEST_ID } from '@platform/testing/billing/stripe-react-fake';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockedStripeEnv } from '@platform/testing/env/mocked-stripe-env';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
@@ -22,7 +26,8 @@ vi.mock('@platform/server/billing/create-upgrade-checkout-action');
 
 vi.mock('@platform/server/billing/get-upgrade-state-action');
 
-const { upgradePage } = messages;
+const { upgradePage, planNames } = messages;
+const t = makeEnTranslator('upgradePage');
 
 const setup = customRenderAsync(UpgradePageContent, {
   tenant: mockTenant(),
@@ -30,7 +35,10 @@ const setup = customRenderAsync(UpgradePageContent, {
   isReturning: false,
 });
 
-const MOCK_GROWTH_TENANT = mockTenant({ plan: TENANT_PLAN.GROWTH });
+const MOCK_SUBSCRIBED_TENANT = mockTenant({
+  plan: TENANT_PLAN.STARTER,
+  stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
+});
 
 describe(`<${UpgradePageContent.name}/>`, () => {
   beforeEach(() => {
@@ -64,11 +72,13 @@ describe(`<${UpgradePageContent.name}/>`, () => {
   });
 
   it.each([false, true])(
-    'shows a site on Growth its plan with a way back (returning: %s)',
+    'shows a paying site its plan with a way back (returning: %s)',
     async (isReturning) => {
-      await setup({ tenant: MOCK_GROWTH_TENANT, isReturning });
+      await setup({ tenant: MOCK_SUBSCRIBED_TENANT, isReturning });
 
-      const title = screen.getByText(upgradePage.onGrowthTitle);
+      const title = screen.getByText(
+        t('subscribedTitle', { plan: planNames.STARTER }),
+      );
       const back = screen.getByRole('link', {
         name: upgradePage.backToOverview,
       });
@@ -78,7 +88,7 @@ describe(`<${UpgradePageContent.name}/>`, () => {
     },
   );
 
-  it('confirms the payment after checkout until the site is on Growth', async () => {
+  it('confirms the payment after checkout until the subscription is live', async () => {
     await setup({ isReturning: true });
 
     const confirming = screen.getByText(upgradePage.confirmingTitle);

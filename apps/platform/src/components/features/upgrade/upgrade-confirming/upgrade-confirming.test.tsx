@@ -55,14 +55,14 @@ describe(`<${UpgradeConfirming.name}/>`, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
-  it('announces Growth in the same region and reloads once', async () => {
-    getStateMock.mockResolvedValueOnce(UPGRADE_STATE.ON_GROWTH);
+  it('announces the confirmed payment in the same region and reloads once', async () => {
+    getStateMock.mockResolvedValueOnce(UPGRADE_STATE.SUBSCRIBED);
 
     await advancePoll();
     await advancePoll();
 
     const status = screen.getByRole('status');
-    expect(status).toHaveTextContent(upgradePage.onGrowthTitle);
+    expect(status).toHaveTextContent(upgradePage.confirmedTitle);
     expect(refresh).toHaveBeenCalledOnce();
     expect(getStateMock).toHaveBeenCalledOnce();
   });

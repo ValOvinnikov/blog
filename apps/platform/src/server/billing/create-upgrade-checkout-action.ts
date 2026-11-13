@@ -21,7 +21,7 @@ import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
-import { createGrowthCheckoutSession } from './create-growth-checkout-session';
+import { createPlanCheckoutSession } from './create-plan-checkout-session';
 import { ensureStripeCustomer } from './ensure-stripe-customer';
 import {
   expireOpenCheckouts,
@@ -89,12 +89,12 @@ export const createUpgradeCheckoutAction = async (
     if (await hasLiveSubscription(stripe, customerId)) {
       return {
         outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPGRADE_REFUSAL.SUBSCRIBED,
+        reason: UPGRADE_REFUSAL.PAYMENT_PENDING,
       };
     }
     await expireOpenCheckouts(stripe, customerId);
 
-    const clientSecret = await createGrowthCheckoutSession(stripe, {
+    const clientSecret = await createPlanCheckoutSession(stripe, {
       ...parsed.data,
       tenantId,
       customerId,

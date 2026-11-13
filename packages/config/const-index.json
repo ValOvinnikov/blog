@@ -5594,15 +5594,15 @@
         "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
-    "ON_GROWTH": [
+    "SUBSCRIBED": [
       {
-        "ref": "UPGRADE_STATE.ON_GROWTH",
+        "ref": "UPGRADE_STATE.SUBSCRIBED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
       },
       {
-        "ref": "UPGRADE_REFUSAL.ON_GROWTH",
+        "ref": "UPGRADE_REFUSAL.SUBSCRIBED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -5622,23 +5622,9 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
-    "PAID_PLAN": [
+    "PAYMENT_PENDING": [
       {
-        "ref": "UPGRADE_STATE.PAID_PLAN",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      },
-      {
-        "ref": "UPGRADE_REFUSAL.PAID_PLAN",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "SUBSCRIBED": [
-      {
-        "ref": "UPGRADE_REFUSAL.SUBSCRIBED",
+        "ref": "UPGRADE_REFUSAL.PAYMENT_PENDING",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"

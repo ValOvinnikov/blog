@@ -2184,8 +2184,8 @@
     "copyButton": "Copiar referencia"
   },
   "upgradePage": {
-    "pageTitle": "Pasar a Growth",
-    "description": "Growth desbloquea todas las opciones de las páginas Aspecto e Inicio de sesión de tu sitio. Paga mensual o anualmente; los impuestos se calculan al pagar.",
+    "pageTitle": "Mejora tu plan",
+    "description": "Elige Starter o Growth y paga mensual o anualmente. Los impuestos se calculan al pagar.",
     "checkoutTitle": "Pago",
     "checkoutDescription": "Paga de forma segura sin salir de esta página. ¿Tienes un código promocional? Introdúcelo al pagar.",
     "intervalLabel": "Periodo de facturación",
@@ -2193,19 +2193,21 @@
     "YEARLY": "Anual",
     "checkoutFailed": "No se pudo iniciar el pago.",
     "unconfigured": "Ahora mismo no se puede mejorar el plan. Inténtalo más tarde.",
-    "onGrowthTitle": "Tu sitio está en Growth",
-    "onGrowthDescription": "Todas las opciones de Growth están disponibles en tu sitio.",
     "backToOverview": "Volver al resumen",
     "confirmingTitle": "Confirmando tu pago",
     "confirmingDescription": "Tu plan cambia en cuanto se confirme el pago, normalmente en menos de un minuto. Esta página se actualiza sola y también te enviaremos un correo.",
-    "ON_GROWTH": "Tu sitio ya está en Growth.",
     "NOT_OWNER": "Solo el propietario de tu sitio puede mejorar el plan.",
-    "PAID_PLAN": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que mejorar.",
     "UNAVAILABLE": "Podrás mejorar el plan cuando tu sitio vuelva a estar activo.",
     "tryAgain": "Reintentar",
-    "SUBSCRIBED": "Estamos confirmando tu pago. Tu plan cambiará en cuanto se confirme, así que no hace falta volver a pagar.",
     "slowTitle": "Esto está tardando más de lo habitual",
     "slowDescription": "Puede que tu pago aún se esté confirmando. Vuelve a comprobarlo en un momento; también te enviaremos un correo cuando cambie tu plan.",
-    "checkAgain": "Volver a comprobar"
+    "checkAgain": "Volver a comprobar",
+    "PAYMENT_PENDING": "Estamos confirmando tu pago. Tu plan cambiará en cuanto se confirme, así que no hace falta volver a pagar.",
+    "planLabel": "Plan",
+    "subscribedTitle": "Tu sitio está en {plan}",
+    "subscribedDescription": "Su suscripción está activa, así que aquí no hay nada que comprar.",
+    "confirmedTitle": "Tu pago está confirmado",
+    "confirmedDescription": "Tu nuevo plan ya está activo en tu sitio.",
+    "SUBSCRIBED": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que comprar."
   }
 }

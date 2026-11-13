@@ -1,4 +1,4 @@
-import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
+import { STRIPE_PRICE_LOOKUP_KEY, TENANT_PLAN } from '@blog/db/constants';
 import {
   BILLING_INTERVAL,
   BILLING_LOG,
@@ -17,9 +17,9 @@ import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import {
-  createGrowthCheckoutSession,
-  type TGrowthCheckoutRequest,
-} from './create-growth-checkout-session';
+  createPlanCheckoutSession,
+  type TPlanCheckoutRequest,
+} from './create-plan-checkout-session';
 
 const { stripe, listPrices, listPromotionCodes, createSession } =
   mockStripeCheckoutClient();
@@ -30,10 +30,11 @@ const MOCK_PROMOTION_DISCOUNTS = [
 ];
 
 const request = (
-  overrides: Partial<TGrowthCheckoutRequest> = {},
-): TGrowthCheckoutRequest => ({
+  overrides: Partial<TPlanCheckoutRequest> = {},
+): TPlanCheckoutRequest => ({
   tenantId: MOCK_TENANT_ID,
   customerId: MOCK_STRIPE_CUSTOMER_ID,
+  plan: TENANT_PLAN.GROWTH,
   interval: BILLING_INTERVAL.MONTHLY,
   returnUrl: MOCK_CHECKOUT_RETURN_URL,
   ...overrides,
@@ -47,9 +48,9 @@ const findsPromotionCode = () =>
     data: [{ id: MOCK_STRIPE_PROMOTION_CODE_ID }],
   });
 
-describe(createGrowthCheckoutSession, () => {
-  it("opens an embedded Growth checkout with tax for the site's customer", async () => {
-    const clientSecret = await createGrowthCheckoutSession(stripe, request());
+describe(createPlanCheckoutSession, () => {
+  it("opens an embedded subscription checkout with tax for the site's customer", async () => {
+    const clientSecret = await createPlanCheckoutSession(stripe, request());
 
     expect(clientSecret).toBe(MOCK_CHECKOUT_CLIENT_SECRET);
     expect(sessionParams()).toEqual({
@@ -68,10 +69,28 @@ describe(createGrowthCheckoutSession, () => {
   });
 
   it.each([
-    [BILLING_INTERVAL.MONTHLY, STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY],
-    [BILLING_INTERVAL.YEARLY, STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY],
-  ])('charges the %s Growth price', async (interval, lookupKey) => {
-    await createGrowthCheckoutSession(stripe, request({ interval }));
+    [
+      TENANT_PLAN.STARTER,
+      BILLING_INTERVAL.MONTHLY,
+      STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
+    ],
+    [
+      TENANT_PLAN.STARTER,
+      BILLING_INTERVAL.YEARLY,
+      STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY,
+    ],
+    [
+      TENANT_PLAN.GROWTH,
+      BILLING_INTERVAL.MONTHLY,
+      STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
+    ],
+    [
+      TENANT_PLAN.GROWTH,
+      BILLING_INTERVAL.YEARLY,
+      STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+    ],
+  ])('charges the %s %s price', async (plan, interval, lookupKey) => {
+    await createPlanCheckoutSession(stripe, request({ plan, interval }));
 
     expect(listPrices).toHaveBeenCalledWith({
       lookup_keys: [lookupKey],
@@ -81,7 +100,7 @@ describe(createGrowthCheckoutSession, () => {
   });
 
   it('offers the code field when the promotion code is unknown', async () => {
-    await createGrowthCheckoutSession(
+    await createPlanCheckoutSession(
       stripe,
       request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
     );
@@ -97,7 +116,7 @@ describe(createGrowthCheckoutSession, () => {
     });
 
     it('applies an active promotion code and hides the code field', async () => {
-      await createGrowthCheckoutSession(
+      await createPlanCheckoutSession(
         stripe,
         request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
       );
@@ -115,7 +134,7 @@ describe(createGrowthCheckoutSession, () => {
     it('retries with the code field and logs when Stripe refuses the code', async () => {
       createSession.mockRejectedValueOnce(new Error());
 
-      const clientSecret = await createGrowthCheckoutSession(
+      const clientSecret = await createPlanCheckoutSession(
         stripe,
         request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
       );
@@ -133,7 +152,7 @@ describe(createGrowthCheckoutSession, () => {
   it('opens checkout with the code field when the code lookup fails', async () => {
     listPromotionCodes.mockRejectedValueOnce(new Error());
 
-    const clientSecret = await createGrowthCheckoutSession(
+    const clientSecret = await createPlanCheckoutSession(
       stripe,
       request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
     );
@@ -144,23 +163,27 @@ describe(createGrowthCheckoutSession, () => {
     expect(event).toBe(BILLING_LOG.CHECKOUT_PROMO_REFUSED);
   });
 
-  it('opens no checkout and logs when Stripe has no Growth price', async () => {
+  it('opens no checkout and logs when Stripe has no price for the plan', async () => {
     listPrices.mockResolvedValueOnce({ data: [] });
 
-    const clientSecret = await createGrowthCheckoutSession(stripe, request());
+    const clientSecret = await createPlanCheckoutSession(stripe, request());
 
     expect(clientSecret).toBeUndefined();
     expect(createSession).not.toHaveBeenCalled();
     expect(vi.mocked(logger).error).toHaveBeenCalledWith(
       BILLING_LOG.CHECKOUT_PRICE_MISSING,
-      { tenantId: MOCK_TENANT_ID, interval: BILLING_INTERVAL.MONTHLY },
+      {
+        tenantId: MOCK_TENANT_ID,
+        plan: TENANT_PLAN.GROWTH,
+        interval: BILLING_INTERVAL.MONTHLY,
+      },
     );
   });
 
   it('logs a session that comes back without a client secret', async () => {
     createSession.mockResolvedValueOnce({ client_secret: null });
 
-    const clientSecret = await createGrowthCheckoutSession(stripe, request());
+    const clientSecret = await createPlanCheckoutSession(stripe, request());
 
     expect(clientSecret).toBeUndefined();
     expect(vi.mocked(logger).error).toHaveBeenCalledWith(

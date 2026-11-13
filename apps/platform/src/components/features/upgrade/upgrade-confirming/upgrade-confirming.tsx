@@ -20,8 +20,8 @@ export type TUpgradeConfirmingProps = {
   initialState: TUpgradeState;
 };
 
-const isAwaitingGrowth = (state: TUpgradeState) =>
-  state !== UPGRADE_STATE.ON_GROWTH;
+const isAwaitingSubscription = (state: TUpgradeState) =>
+  state !== UPGRADE_STATE.SUBSCRIBED;
 
 export const UpgradeConfirming = ({
   tenantId,
@@ -38,10 +38,10 @@ export const UpgradeConfirming = ({
     {
       intervalMs: UPGRADE_POLL.INTERVAL_MS,
       maxTicks: UPGRADE_POLL.MAX_TICKS,
-      isActive: isAwaitingGrowth,
+      isActive: isAwaitingSubscription,
       onResult: (next) => {
         setChecks((count) => count + 1);
-        if (!isAwaitingGrowth(next)) router.refresh();
+        if (!isAwaitingSubscription(next)) router.refresh();
       },
       onError: () => setHasFailed(true),
     },
@@ -54,12 +54,12 @@ export const UpgradeConfirming = ({
     router.refresh();
   };
 
-  if (!isAwaitingGrowth(state)) {
+  if (!isAwaitingSubscription(state)) {
     return (
       <Alert
         type={ALERT_TYPE.SUCCESS}
-        title={t('onGrowthTitle')}
-        description={t('onGrowthDescription')}
+        title={t('confirmedTitle')}
+        description={t('confirmedDescription')}
       />
     );
   }

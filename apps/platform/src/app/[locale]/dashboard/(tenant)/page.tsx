@@ -6,7 +6,6 @@ import { getStartedFor } from '@platform/server/onboarding/get-started-for';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { siteSetupFor } from '@platform/server/provisioning/site-setup-for';
-import { trialFor } from '@platform/utils/trial-for/trial-for';
 import type { Metadata } from 'next';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,7 +33,7 @@ export default async function DashboardOverviewPage() {
       owner={owner}
       siteSetup={siteSetupFor(tenant, membership, admin)}
       getStarted={getStarted}
-      trial={trialFor(tenant)}
+      trial={tenant.trial}
     />
   );
 }

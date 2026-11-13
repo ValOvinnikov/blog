@@ -2184,8 +2184,8 @@
     "copyButton": "Referenz kopieren"
   },
   "upgradePage": {
-    "pageTitle": "Upgrade auf Growth",
-    "description": "Growth schaltet alle Optionen auf den Seiten Erscheinungsbild und Anmeldung deiner Website frei. Zahle monatlich oder jährlich; die Steuer wird an der Kasse berechnet.",
+    "pageTitle": "Tarif upgraden",
+    "description": "Wähle Starter oder Growth und zahle monatlich oder jährlich. Die Steuer wird an der Kasse berechnet.",
     "checkoutTitle": "Kasse",
     "checkoutDescription": "Zahle sicher, ohne diese Seite zu verlassen. Hast du einen Aktionscode? Gib ihn an der Kasse ein.",
     "intervalLabel": "Abrechnungszeitraum",
@@ -2193,19 +2193,21 @@
     "YEARLY": "Jährlich",
     "checkoutFailed": "Die Kasse konnte nicht starten.",
     "unconfigured": "Ein Upgrade ist gerade nicht möglich. Versuche es später erneut.",
-    "onGrowthTitle": "Deine Website nutzt Growth",
-    "onGrowthDescription": "Alle Growth-Optionen sind auf deiner Website freigeschaltet.",
     "backToOverview": "Zurück zur Übersicht",
     "confirmingTitle": "Zahlung wird bestätigt",
     "confirmingDescription": "Dein Tarif ändert sich, sobald die Zahlung bestätigt ist, meist innerhalb einer Minute. Diese Seite aktualisiert sich von selbst, und wir schicken dir auch eine E-Mail.",
-    "ON_GROWTH": "Deine Website nutzt bereits Growth.",
     "NOT_OWNER": "Nur der Inhaber deiner Website kann ein Upgrade durchführen.",
-    "PAID_PLAN": "Deine Website hat bereits einen kostenpflichtigen Tarif, daher gibt es hier nichts zu upgraden.",
     "UNAVAILABLE": "Ein Upgrade ist wieder möglich, sobald deine Website läuft.",
     "tryAgain": "Erneut versuchen",
-    "SUBSCRIBED": "Deine Zahlung wird gerade bestätigt. Dein Tarif ändert sich, sobald sie bestätigt ist, du musst also nicht erneut zahlen.",
     "slowTitle": "Das dauert länger als üblich",
     "slowDescription": "Deine Zahlung wird vielleicht noch bestätigt. Prüfe es gleich noch einmal; wir schicken dir auch eine E-Mail, sobald sich dein Tarif ändert.",
-    "checkAgain": "Erneut prüfen"
+    "checkAgain": "Erneut prüfen",
+    "PAYMENT_PENDING": "Deine Zahlung wird gerade bestätigt. Dein Tarif ändert sich, sobald sie bestätigt ist, du musst also nicht erneut zahlen.",
+    "planLabel": "Tarif",
+    "subscribedTitle": "Deine Website nutzt {plan}",
+    "subscribedDescription": "Das Abonnement ist aktiv, hier gibt es also nichts zu kaufen.",
+    "confirmedTitle": "Deine Zahlung ist bestätigt",
+    "confirmedDescription": "Dein neuer Tarif ist auf deiner Website aktiv.",
+    "SUBSCRIBED": "Deine Website hat bereits einen kostenpflichtigen Tarif, hier gibt es also nichts zu kaufen."
   }
 }
