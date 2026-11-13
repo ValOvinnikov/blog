@@ -34,7 +34,7 @@ A site with no live subscription (Free, a trial, a lapsed site) buys Starter or 
 ## Surfaces and routes
 
 - `POST /api/stripe/webhook` (`apps/platform`) — public, outside the locale proxy. It verifies the `stripe-signature` header against `STRIPE_WEBHOOK_SECRET` with the Stripe SDK on the raw body, refusing a missing or wrong signature with 400 and changing nothing. Either secret unset answers 500 and logs `billing.webhook_secret_missing`. A handler failure answers 500 (`billing.webhook_handler_failed`) so Stripe retries; everything else answers 200.
-- `/dashboard/billing` (`apps/platform`) — the Billing page, for the site's real owner and a super admin only (`isBillingManager`): the sidebar's Account section links it only for them (`resolveTenantPageAccess` → `billing`), and anyone else — an editor, a moderator or another admin role — gets a 404 (`resolveGatedDashboardTenant('billing')`, the same resolver Leads uses).
+- `/dashboard/billing` (`apps/platform`) — the Billing page, for the site's real owner and a super admin only (`viewer.isOwner || viewer.isSuperAdmin`): the sidebar's Account section links it only for them (`resolveTenantPageAccess` → `billing`), and anyone else — an editor, a moderator or another admin role — gets a 404 (`resolveGatedDashboardTenant('billing')`, the same resolver Leads uses).
 
 ## Billing page
 

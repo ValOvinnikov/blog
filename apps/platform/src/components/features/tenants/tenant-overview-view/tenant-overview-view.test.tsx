@@ -29,6 +29,7 @@ import {
 } from '@platform/testing/email/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockFinding } from '@platform/testing/findings/fixtures';
+import { mockOperatorViewer } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -63,7 +64,6 @@ import { TenantOverviewView } from './tenant-overview-view';
 
 faker.seed(7319);
 
-const MOCK_ADMIN_ID = faker.string.uuid();
 const MOCK_STEP_ERROR = faker.lorem.sentence();
 const MOCK_ENCRYPTED_FORMER_OWNER_EMAIL = faker.string.alphanumeric(32);
 
@@ -72,14 +72,12 @@ const {
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
-  requireAdminMock,
   getNewsletterPausedAtMock,
 } = vi.hoisted(() => ({
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
   getDomainVerificationStatusMock: vi.fn(),
-  requireAdminMock: vi.fn(),
   getNewsletterPausedAtMock: vi.fn(),
 }));
 
@@ -94,10 +92,6 @@ vi.mock('@blog/db', async () => ({
 }));
 
 vi.mock('@platform/utils/env/env');
-
-vi.mock('@platform/server/auth/require-admin', () => ({
-  requireAdmin: requireAdminMock,
-}));
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
@@ -140,6 +134,7 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
 
 const setup = customRenderAsync(TenantOverviewView, {
   tenant: mockTenant(),
+  viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
 });
 
 const advancePoll = async () => {
@@ -166,11 +161,6 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockReset();
     listFindingsForTenantMock.mockResolvedValue([]);
-    requireAdminMock.mockReset();
-    requireAdminMock.mockResolvedValue({
-      id: MOCK_ADMIN_ID,
-      role: ADMIN_ROLE.SUPERADMIN,
-    });
     getDomainVerificationStatusMock.mockReset();
     getDomainVerificationStatusMock.mockResolvedValue(
       DOMAIN_VERIFICATION_STATUS.NOT_CONFIGURED,
@@ -254,12 +244,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       });
 
       it('shows a moderator the pause without the clear action', async () => {
-        requireAdminMock.mockResolvedValue({
-          id: MOCK_ADMIN_ID,
-          role: ADMIN_ROLE.MODERATOR,
-        });
-
-        await setup();
+        await setup({ viewer: mockOperatorViewer(ADMIN_ROLE.MODERATOR) });
 
         const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
         const clearPause = screen.queryByRole('button', CLEAR_PAUSE_BUTTON);
@@ -592,12 +577,13 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     describe.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
       'for a %s',
       (role) => {
-        beforeEach(() => {
-          requireAdminMock.mockResolvedValue({ id: MOCK_ADMIN_ID, role });
-        });
+        const viewer = mockOperatorViewer(role);
 
         it('never reads the tenant hosts', async () => {
-          await setup({ tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }) });
+          await setup({
+            tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }),
+            viewer,
+          });
 
           expect(resolveIsPlatformTenantMock).not.toHaveBeenCalled();
         });
@@ -605,6 +591,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         it('offers no Reactivate', async () => {
           await setup({
             tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }),
+            viewer,
           });
 
           const reactivateButton = screen.queryByRole('button', {

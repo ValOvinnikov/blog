@@ -232,6 +232,19 @@ The session authenticates; it does not authorize:
   depth, not the mechanism.
 - Never trust a tenant id from the client. Resolve the session's tenants from
   its `memberships`, then check the routed id against that set.
+- **Read tenant facts and viewer roles from the loaded fields, never from a raw
+  row.** Every platform read of a tenant that needs a derived fact goes
+  through `toPlatformTenant` (the three loaders, `listSessionTenants`,
+  `getPlatformTenant` in an action), which adds `isArchived`/`archivedAt`, `entitlements`, `pageAccess`,
+  `siteUrl` and `trial`; a component or action reads those, not
+  `deprovisionedAt`, `PLAN_ENTITLEMENTS[plan]`, `planPageAccess(plan)` or
+  `tenantSiteUrl(primaryDomain)`. The loaders also return a `viewer`
+  (`toPlatformViewer`): `isOwner` is the site's real owner only, `canManage`
+  is the owner or any operator, plus `isOperator` and `isSuperAdmin`. An
+  operator's virtual membership has the OWNER role, so a check on
+  `membership.role` silently admits operators — owner-only checks read
+  `viewer.isOwner`, and `requireTenantManager` gates on `canManage`. A value
+  read after a write in the same request keeps re-reading the row.
 
 ## Audit trail
 

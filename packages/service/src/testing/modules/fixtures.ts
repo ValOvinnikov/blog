@@ -12,7 +12,6 @@ import {
   LOCALE_ISO_CODES,
   MEDIA_ORDER,
   NEWSLETTER_VARIANT,
-  PRICE_PERIOD,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
   TIMELINE_MARKER_STYLE,
@@ -30,7 +29,6 @@ import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-
 import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
 import type { TRawLogoWallModule } from '@blog/service/features/modules/logo-wall/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
-import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawSectionPagesModule } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
 import type { TRawSectionPages } from '@blog/service/features/modules/section-pages/adaptor/pages/transformer';
 import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
@@ -69,7 +67,6 @@ export const MOCK_CTA_MODULE_ID = 'cta-1';
 export const MOCK_FAQ_MODULE_ID = 'faq-1';
 export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
 export const MOCK_NEWSLETTER_MODULE_ID = 'newsletter-1';
-export const MOCK_PRICING_MODULE_ID = 'pricing-1';
 export const MOCK_SECTION_PAGES_MODULE_ID = 'section-pages-1';
 export const MOCK_SECTION_PAGES_PARENT_ID = 'page-modules';
 export const MOCK_SECTION_PAGES_PARENT_PATH = 'section-home';
@@ -88,16 +85,6 @@ export const MOCK_COOKIE_SETTINGS_HEADING = 'Your cookie choices';
 const MOCK_NEWSLETTER_HEADING = 'Stay in the loop';
 export const MOCK_RECENT_POSTS_HEADING = 'Recent writing';
 export const MOCK_POST_LIST_PAGE_SIZE = 9;
-export const MOCK_UNLIMITED_POSTS_FEATURE = 'Unlimited posts';
-export const MOCK_PRIORITY_SUPPORT_FEATURE = 'Priority support';
-export const MOCK_PRICING_FEATURE_KEY = 'feature-1';
-export const MOCK_SECOND_PRICING_FEATURE_KEY = 'feature-2';
-export const MOCK_PRICING_FOOTNOTE = 'Prices exclude VAT.';
-export const MOCK_PRICING_HIGHLIGHT_LABEL = 'Most popular';
-export const MOCK_PRICING_TIER_DESCRIPTION = 'For growing teams';
-export const MOCK_PRICING_TIER_FOOTNOTE = 'Billed annually';
-export const MOCK_PRICING_TIER_ID = 'tier-pro';
-export const MOCK_PRICING_TIER_NAME = 'Pro';
 
 const FAQ_QUESTION = 'How long does onboarding take?';
 const FAQ_ANSWER = 'Most teams are live within a week.';
@@ -132,8 +119,6 @@ type TRawFeatureHighlightItem = NonNullable<
   TRawFeatureHighlightsModule['highlights']
 >[number];
 type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
-type TRawPricingTier = NonNullable<TRawPricingModule['tiers']>[number];
-type TRawPricingPrice = NonNullable<TRawPricingTier['prices']>[number];
 type TRawTestimonialItem = NonNullable<
   TRawTestimonialModule['testimonials']
 >[number];
@@ -443,60 +428,6 @@ export function mockRawLogoItem(
     image: mockRawLogoImage(),
     imageDark: null,
     link: null,
-    ...overrides,
-  };
-}
-
-export function mockRawPricingPrice(
-  overrides: Partial<TRawPricingPrice> = {},
-): TRawPricingPrice {
-  return {
-    _key: 'price-1',
-    period: PRICE_PERIOD.MONTH,
-    amount: 29,
-    compareAtAmount: null,
-    isStartingAt: null,
-    ...overrides,
-  };
-}
-
-export function mockRawPricingTier(
-  overrides: Partial<TRawPricingTier> = {},
-): TRawPricingTier {
-  return {
-    _key: 'tier-1',
-    name: MOCK_PRICING_TIER_NAME,
-    description: null,
-    prices: [mockRawPricingPrice()],
-    priceLabel: null,
-    features: [
-      { _key: MOCK_PRICING_FEATURE_KEY, text: MOCK_UNLIMITED_POSTS_FEATURE },
-      {
-        _key: MOCK_SECOND_PRICING_FEATURE_KEY,
-        text: MOCK_PRIORITY_SUPPORT_FEATURE,
-      },
-    ],
-    ctaButtons: null,
-    highlightLabel: null,
-    footnote: null,
-    ...overrides,
-  };
-}
-
-export function mockRawPricingModule(
-  overrides: Partial<TRawPricingModule> = {},
-): TRawPricingModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Pricing'),
-    tiers: [
-      mockRawPricingTier(),
-      mockRawPricingTier({ _key: 'tier-2', name: 'Team' }),
-    ],
-    footnote: null,
-    ctaButtons: null,
-    contentAlignment: null,
-    layout: null,
     ...overrides,
   };
 }

@@ -1,6 +1,5 @@
 import { AUDIT_TARGET_TYPE, FINDING_STATUS } from '@blog/config';
 import { queries, TENANT_STATUS } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { isNull, isUndefined } from '@blog/utils/primitives';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
@@ -14,14 +13,14 @@ import { TenantOverviewHeader } from '@platform/components/features/tenants/tena
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
 import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
 import { DOMAIN_CARD_ROW_COUNT } from '@platform/constants/domain';
-import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
-import { requireAdmin } from '@platform/server/auth/require-admin';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
 import { loadOperatorSuspension } from '@platform/server/tenants/load-operator-suspension';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
 import { env } from '@platform/utils/env/env';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { Suspense } from 'react';
 
@@ -29,26 +28,28 @@ import { TenantProvisioningSection } from './components/tenant-provisioning-sect
 import { tenantOverviewViewVariants } from './tenant-overview-view-variants';
 
 export type TTenantOverviewViewProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
+  viewer: TPlatformViewer;
 };
 
 export const TenantOverviewView = async ({
   tenant,
+  viewer,
 }: TTenantOverviewViewProps) => {
   const {
     id,
     primaryDomain,
     status,
-    deprovisionedAt,
+    isArchived,
     unsentReinviteFormerOwnerEmailEncrypted,
     name,
     plan,
+    siteUrl,
   } = tenant;
   const clientTenant = toClientTenant(tenant);
   const domainVerificationStatus = getDomainVerificationStatus(primaryDomain);
-  const [admin, owner, auditEvents, findings, suspension, newsletterPausedAt] =
+  const [owner, auditEvents, findings, suspension, newsletterPausedAt] =
     await Promise.all([
-      requireAdmin(),
       queries.memberships.getTenantOwnerMembership(id),
       queries.auditEvents.listAuditEventsForTarget(
         AUDIT_TARGET_TYPE.TENANT,
@@ -60,9 +61,7 @@ export const TenantOverviewView = async ({
       queries.emailConfig.getNewsletterPausedAt(id),
     ]);
   const canChangeSuspension =
-    isSuperAdmin(admin) &&
-    !deprovisionedAt &&
-    status !== TENANT_STATUS.ARCHIVED;
+    viewer.isSuperAdmin && !isArchived && status !== TENANT_STATUS.ARCHIVED;
   const isSuspensionControlShown =
     canChangeSuspension &&
     (status === TENANT_STATUS.SUSPENDED ||
@@ -72,7 +71,7 @@ export const TenantOverviewView = async ({
   return (
     <TenantOverviewFocusProvider>
       <div className={root()}>
-        <TenantOverviewHeader tenant={{ name, status, plan, primaryDomain }} />
+        <TenantOverviewHeader tenant={{ name, status, plan, siteUrl }} />
 
         <TenantProvisioningSection
           tenant={clientTenant}
@@ -104,7 +103,7 @@ export const TenantOverviewView = async ({
               <NewsletterPauseCard
                 tenantId={id}
                 pausedAt={newsletterPausedAt}
-                canClear={isSuperAdmin(admin)}
+                canClear={viewer.isSuperAdmin}
               />
             )}
             {canChangeSuspension &&

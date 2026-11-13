@@ -24,7 +24,6 @@ itself stays.
 - `apps/platform/src/components/features/look/look-form/use-look-save.ts` — SUCCESS
 - `apps/platform/src/components/features/voice/voice-settings/use-voice-draft.ts` — INVALID
 - `apps/platform/src/server/provisioning/delete-tenant-action.ts` — SUCCESS
-- `apps/platform/src/server/provisioning/reactivate-tenant-action.ts` — SUCCESS
 - `apps/platform/src/utils/staged-image/staged-image.ts` — SUCCESS
 - `apps/platform/src/utils/use-upload-error-text/use-upload-error-text.ts` — REFUSED
 - `apps/web/src/components/shared/bookmark-button/bookmark-button.tsx` — SUCCESS, UNAVAILABLE

@@ -1,9 +1,7 @@
-import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
-import { planPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 export const canEditContactRecipient = (
-  { plan }: TTenant,
-  membership: TMembership,
-): boolean => planPageAccess(plan).leads && isTenantOwner(membership);
+  { pageAccess }: TPlatformTenant,
+  { canManage }: TPlatformViewer,
+): boolean => pageAccess.leads && canManage;

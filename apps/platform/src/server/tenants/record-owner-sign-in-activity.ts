@@ -2,7 +2,7 @@ import 'server-only';
 
 import { queries } from '@blog/db';
 import { TENANT_LOG } from '@platform/constants/tenant';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
+import { toPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -32,7 +32,7 @@ export const recordOwnerSignInActivity = async (
 
     await Promise.all(
       memberships
-        .filter(({ membership }) => isTenantOwner(membership))
+        .filter(({ membership }) => toPlatformViewer({ membership }).isOwner)
         .map(({ tenant }) => touchAndWakeTenant(tenant.id, at)),
     );
   } catch (error) {

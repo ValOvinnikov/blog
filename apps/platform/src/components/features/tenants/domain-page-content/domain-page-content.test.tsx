@@ -14,7 +14,10 @@ import {
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { mockPendingProjectDomain } from '@platform/testing/domains/fixtures';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
   mockTenant,
@@ -66,6 +69,7 @@ const SUBDOMAIN_NOTE = makeEnTranslator('tenantDomainPage.ownDomain')(
 
 const setup = customRenderAsync(DomainPageContent, {
   tenant: mockTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
+  viewer: mockViewer({}),
 });
 
 describe(`<${DomainPageContent.name}/>`, () => {
@@ -176,7 +180,7 @@ describe(`<${DomainPageContent.name}/>`, () => {
     const renderForOwner = (tenantOverrides = {}) =>
       setup({
         tenant: growthTenant(tenantOverrides),
-        membership: mockMembership(),
+        viewer: mockViewer(),
       });
 
     const expectNoticeWithoutInput = (notice: string) => {
@@ -219,14 +223,19 @@ describe(`<${DomainPageContent.name}/>`, () => {
     it('hides the input from a member who is not the owner', async () => {
       await setup({
         tenant: growthTenant(),
-        membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        viewer: mockViewer({
+          membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        }),
       });
 
       expectNoticeWithoutInput(ownDomain.ownerOnly);
     });
 
     it('offers an operator the input without a membership', async () => {
-      await setup({ tenant: growthTenant(), admin: mockAdmin() });
+      await setup({
+        tenant: growthTenant(),
+        viewer: mockViewer({ admin: mockAdmin() }),
+      });
 
       expectDomainInput();
     });
@@ -305,14 +314,17 @@ describe(`<${DomainPageContent.name}/>`, () => {
       });
 
       it.each([
-        { viewer: 'the owner', access: { membership: mockMembership() } },
-        { viewer: 'an operator', access: { admin: mockAdmin() } },
+        { viewerName: 'the owner', viewer: mockViewer() },
+        {
+          viewerName: 'an operator',
+          viewer: mockViewer({ admin: mockAdmin() }),
+        },
       ])(
-        'names the subdomain that still works under a custom main address for $viewer',
-        async ({ access }) => {
+        'names the subdomain that still works under a custom main address for $viewerName',
+        async ({ viewer }) => {
           await setup({
             tenant: growthTenant({ primaryDomain: MOCK_CUSTOM_DOMAIN }),
-            ...access,
+            viewer,
           });
 
           const note = await screen.findByText(SUBDOMAIN_NOTE);

@@ -67,22 +67,18 @@ export const useDeprovisioningPoll = (
 
   const {
     value: { deprovisioningSteps: polledDeprovisioningSteps },
-  } = usePolledValue<TTenantDeprovisioningStatusResult>(
-    tenant.id,
-    tenant,
-    getTenantDeprovisioningStatusAction,
-    {
-      intervalMs: STEP_POLL_INTERVAL_MS,
-      maxTicks: MAX_POLL_TICKS,
-      isActive: (polled) =>
-        isEnabled && !isFinished(polled.deprovisioningSteps),
-      onResult: (polled) => {
-        if (isFinished(polled.deprovisioningSteps)) {
-          router.refresh();
-        }
-      },
+  } = usePolledValue<
+    Pick<TTenantDeprovisioningStatusResult, 'deprovisioningSteps'>
+  >(tenant.id, tenant, getTenantDeprovisioningStatusAction, {
+    intervalMs: STEP_POLL_INTERVAL_MS,
+    maxTicks: MAX_POLL_TICKS,
+    isActive: (polled) => isEnabled && !isFinished(polled.deprovisioningSteps),
+    onResult: (polled) => {
+      if (isFinished(polled.deprovisioningSteps)) {
+        router.refresh();
+      }
     },
-  );
+  });
 
   const deprovisioningSteps = currentRunSteps(polledDeprovisioningSteps);
   const run = deprovisioningSteps?.run;

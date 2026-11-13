@@ -2,7 +2,6 @@ import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
 import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
-import type { TMembership } from '@blog/db/schema/memberships';
 import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
 import { isOneOf } from '@blog/utils/primitives';
 import { type TUpgradeState, UPGRADE_STATE } from '@platform/constants/billing';
@@ -10,7 +9,7 @@ import {
   PLAN_CHANGE_REFUSAL,
   type TPlanChangeGate,
 } from '@platform/constants/plan-change';
-import { isRealTenantOwner } from '@platform/server/auth/is-real-tenant-owner';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 type TUpgradeTenant = Pick<
@@ -25,24 +24,24 @@ export const hasStoredSubscription = ({
 }: Pick<TUpgradeTenant, 'plan' | 'stripeSubscriptionId'>) =>
   Boolean(stripeSubscriptionId) && isOneOf(SELLABLE_TENANT_PLANS, plan);
 
-const ownerGate = (tenant: TUpgradeTenant, membership: TMembership) => {
-  if (!isRealTenantOwner(membership)) return UPGRADE_STATE.NOT_OWNER;
+const ownerGate = (tenant: TUpgradeTenant, { isOwner }: TPlatformViewer) => {
+  if (!isOwner) return UPGRADE_STATE.NOT_OWNER;
   if (!isTenantWritable(tenant)) return UPGRADE_STATE.UNAVAILABLE;
   return undefined;
 };
 
 export const upgradeStateFor = (
   tenant: TUpgradeTenant,
-  membership: TMembership,
+  viewer: TPlatformViewer,
 ): TUpgradeState => {
   if (hasStoredSubscription(tenant)) return UPGRADE_STATE.SUBSCRIBED;
-  return ownerGate(tenant, membership) ?? UPGRADE_STATE.AVAILABLE;
+  return ownerGate(tenant, viewer) ?? UPGRADE_STATE.AVAILABLE;
 };
 
 export const planChangeRefusalFor = (
   tenant: TUpgradeTenant,
-  membership: TMembership,
+  viewer: TPlatformViewer,
 ): TMaybeUndefined<TPlanChangeGate> => {
   if (!hasStoredSubscription(tenant)) return PLAN_CHANGE_REFUSAL.NOT_SUBSCRIBED;
-  return ownerGate(tenant, membership);
+  return ownerGate(tenant, viewer);
 };

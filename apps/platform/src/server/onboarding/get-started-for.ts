@@ -3,8 +3,6 @@ import 'server-only';
 import type { TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
-import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { isUndefined } from '@blog/utils/primitives';
 import {
   GET_STARTED_STEP,
@@ -14,31 +12,36 @@ import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
-import { isRealTenantOwner } from '@platform/server/auth/is-real-tenant-owner';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 export type TGetStarted = {
   tenantId: string;
   siteAddress: string;
+  siteUrl: string;
   doneSteps: Record<TGetStartedStep, boolean>;
   studioAccess: TOwnerStudioAccess;
 };
 
-const isFirstRunViewer = (tenant: TTenant, membership: TMembership) =>
-  tenant.provisioningStatus === TENANT_PROVISIONING_STATUS.READY &&
-  !tenant.deprovisionedAt &&
-  isRealTenantOwner(membership);
+const isFirstRunViewer = (
+  { provisioningStatus, isArchived }: TPlatformTenant,
+  { isOwner }: TPlatformViewer,
+) =>
+  provisioningStatus === TENANT_PROVISIONING_STATUS.READY &&
+  !isArchived &&
+  isOwner;
 
 export const getStartedFor = async (
-  tenant: TTenant,
-  membership: TMembership,
+  tenant: TPlatformTenant,
+  viewer: TPlatformViewer,
 ): Promise<TMaybeUndefined<TGetStarted>> => {
-  if (!isFirstRunViewer(tenant, membership)) {
+  if (!isFirstRunViewer(tenant, viewer)) {
     return undefined;
   }
 
   const siteConfig = await queries.siteConfig.getSiteConfig(tenant.id);
-  const studioAccess = ownerStudioAccessFor(tenant, membership);
+  const studioAccess = ownerStudioAccessFor(tenant, viewer);
   const isEditorUninvited = isUndefined(studioAccess);
   const doneSteps = {
     [GET_STARTED_STEP.LOOK]: !!siteConfig?.lookSavedAt,
@@ -55,6 +58,7 @@ export const getStartedFor = async (
   return {
     tenantId: tenant.id,
     siteAddress: tenant.primaryDomain,
+    siteUrl: tenant.siteUrl,
     doneSteps,
     studioAccess: studioAccess ?? OWNER_STUDIO_ACCESS.READY,
   };

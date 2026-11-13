@@ -5,6 +5,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import {
   appearanceFieldGroups,
   appearanceFields,
+  appearanceFieldsets,
 } from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
@@ -39,6 +40,7 @@ export const postFeaturedSchema = defineType({
       title: 'Posts',
       description: 'Which posts this spotlight features.',
     },
+    ...appearanceFieldsets,
   ],
   groups: appearanceFieldGroups,
   fields: appearanceFields({
@@ -129,8 +131,8 @@ export const postFeaturedSchema = defineType({
         title: 'Heading Alignment',
         alignsCarousel: true,
       }),
-      wideLayoutField,
     ],
+    layout: wideLayoutField,
     hasColumns: false,
   }),
   preview: {

@@ -2,8 +2,10 @@ import {
   CONTENT_ALIGNMENT,
   type TContentAlignment,
 } from '@blog/config/constants';
+import { AlignmentPicture } from '@blog/studio/schema-types/fields/alignment-fields/alignment-picture';
+import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
 import { hasArrayGotMultipleItems, toTitleCase } from '@blog/utils/primitives';
-import { defineField, type StringDefinition } from 'sanity';
+import type { StringDefinition } from 'sanity';
 
 type TAlignmentField = {
   name: string;
@@ -26,18 +28,15 @@ export const alignmentField = ({
   fieldset,
   validation,
 }: TAlignmentField) =>
-  defineField({
+  tileField({
     name,
     title,
-    type: 'string',
     description,
-    options: {
-      layout: 'dropdown',
-      list: (list ?? Object.values(CONTENT_ALIGNMENT)).map((value) => ({
-        title: toTitleCase(value),
-        value,
-      })),
-    },
+    tiles: (list ?? Object.values(CONTENT_ALIGNMENT)).map((value) => ({
+      title: toTitleCase(value),
+      value,
+    })),
+    Picture: AlignmentPicture,
     initialValue,
     hidden,
     fieldset,

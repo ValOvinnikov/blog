@@ -2,7 +2,12 @@ import {
   BRAND_VARIANT,
   CONTENT_ALIGNMENT,
   PRICE_PERIOD,
+  TENANT_PLAN,
 } from '@blog/config/constants';
+import {
+  mockCtaButtonView,
+  mockRawCtaButton,
+} from '@blog/service/testing/modules/fixtures';
 import {
   MOCK_PRICING_FEATURE_KEY,
   MOCK_PRICING_FOOTNOTE,
@@ -14,12 +19,10 @@ import {
   MOCK_PRIORITY_SUPPORT_FEATURE,
   MOCK_SECOND_PRICING_FEATURE_KEY,
   MOCK_UNLIMITED_POSTS_FEATURE,
-  mockCtaButtonView,
-  mockRawCtaButton,
   mockRawPricingModule,
   mockRawPricingPrice,
   mockRawPricingTier,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/pricing/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { toPricingModule } from './transformer';
@@ -35,6 +38,7 @@ const MOCK_SECOND_TIER_KEY = faker.string.uuid();
 const MOCK_THIRD_TIER_KEY = faker.string.uuid();
 const MOCK_FIRST_TIER_NAME = faker.lorem.word();
 const MOCK_THIRD_TIER_NAME = faker.lorem.word();
+const MOCK_PRICE_LABEL = faker.lorem.words(2);
 
 describe(toPricingModule, () => {
   it('maps a full module', () => {
@@ -223,5 +227,49 @@ describe(toPricingModule, () => {
     expect(module.footnote).toBeUndefined();
     expect(module.contentAlignment).toBeUndefined();
     expect(module.layout).toBeUndefined();
+  });
+
+  it('returns a linked tier with its plan and interval and no typed prices or label', () => {
+    const raw = mockRawPricingModule({
+      tiers: [
+        mockRawPricingTier({
+          platformPlan: TENANT_PLAN.GROWTH,
+          platformPlanInterval: PRICE_PERIOD.YEAR,
+          prices: [mockRawPricingPrice()],
+          priceLabel: MOCK_PRICE_LABEL,
+        }),
+      ],
+    });
+
+    const [tier] = toPricingModule(raw).tiers;
+
+    expect(tier).toMatchObject({
+      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.YEAR },
+      prices: [],
+      priceLabel: undefined,
+    });
+  });
+
+  it.each([
+    ['an unlinked tier', null],
+    ['a tier whose plan has no interval yet', TENANT_PLAN.STARTER],
+  ])('keeps the typed prices and label of %s', (_description, platformPlan) => {
+    const raw = mockRawPricingModule({
+      tiers: [
+        mockRawPricingTier({
+          platformPlan,
+          prices: [mockRawPricingPrice({ amount: MOCK_PRICE_AMOUNT })],
+          priceLabel: MOCK_PRICE_LABEL,
+        }),
+      ],
+    });
+
+    const [tier] = toPricingModule(raw).tiers;
+
+    expect(tier).toMatchObject({
+      platformPlan: undefined,
+      prices: [expect.objectContaining({ amount: MOCK_PRICE_AMOUNT })],
+      priceLabel: MOCK_PRICE_LABEL,
+    });
   });
 });

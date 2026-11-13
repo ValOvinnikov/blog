@@ -8,7 +8,7 @@ import {
   CUSTOM_DOMAIN_REFUSAL,
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { env } from '@platform/utils/env/env';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -27,11 +27,11 @@ const refused = (reason: TCustomDomainRefusal): TSwitchMainAddressResult => ({
 export const makeSubdomainMainAddressAction = async (
   tenantId: string,
 ): Promise<TSwitchMainAddressResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
-  const { id, deprovisionedAt, primaryDomain } = tenant;
+  const { tenant } = await requireTenantManager(tenantId);
+  const { id, isArchived, primaryDomain } = tenant;
   const rootDomain = env.TENANT_ROOT_DOMAIN;
 
-  if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
+  if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
   if (isPlatformAddress(primaryDomain, rootDomain)) {
     return refused(CUSTOM_DOMAIN_REFUSAL.ALREADY_MAIN_ADDRESS);
   }

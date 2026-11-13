@@ -2,6 +2,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import {
   appearanceFieldGroups,
   appearanceFields,
+  appearanceFieldsets,
 } from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import {
@@ -23,6 +24,7 @@ export const postRelatedSchema = defineType({
   description:
     'Other posts the reader might want next, chosen automatically from the tags and topic of the post being read. Only available on post pages.',
   icon: BookOpen,
+  fieldsets: appearanceFieldsets,
   groups: appearanceFieldGroups,
   fields: appearanceFields({
     content: [
@@ -42,8 +44,8 @@ export const postRelatedSchema = defineType({
       brandVariantField(),
       displayModeField(),
       ...alignmentFields([], { title: 'Heading Alignment' }),
-      wideLayoutField,
     ],
+    layout: wideLayoutField,
     columnsHidden: isCarouselMode,
   }),
   preview: limitPreview,

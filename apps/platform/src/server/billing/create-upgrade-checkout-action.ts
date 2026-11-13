@@ -53,14 +53,14 @@ export const createUpgradeCheckoutAction = async (
   tenantId: string,
   input: TUpgradeCheckoutInput,
 ): Promise<TCreateUpgradeCheckoutResult> => {
-  const { tenant, membership } = await requireTenantMembership(tenantId);
+  const { tenant, viewer } = await requireTenantMembership(tenantId);
 
   const parsed = upgradeCheckoutInputSchema.safeParse(input);
   if (!parsed.success) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const state = upgradeStateFor(tenant, membership);
+  const state = upgradeStateFor(tenant, viewer);
   if (state !== UPGRADE_STATE.AVAILABLE) {
     return { outcome: ACTION_OUTCOME.REFUSED, reason: state };
   }

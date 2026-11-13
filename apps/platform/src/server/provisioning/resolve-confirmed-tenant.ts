@@ -5,13 +5,13 @@ import {
   type TOutcome,
   type TReasonedFailure,
 } from '@blog/config';
-import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   TENANT_FIELD_ERROR,
   TENANT_REFUSAL,
   type TTenantRefusal,
 } from '@platform/constants/tenant';
+import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { z } from 'zod';
 
 export const confirmTenantInputSchema = z.object({
@@ -29,13 +29,15 @@ export type TConfirmTenantFieldError =
 type TResolveConfirmedTenantOptions<
   TPreconditionRefusal extends TTenantRefusal,
 > = {
-  precondition?: (tenant: TTenant) => TMaybeUndefined<TPreconditionRefusal>;
+  precondition?: (
+    tenant: TPlatformTenant,
+  ) => TMaybeUndefined<TPreconditionRefusal>;
 };
 
 export type TResolveConfirmedTenantResult<
   TPreconditionRefusal extends TTenantRefusal,
 > =
-  | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TTenant }
+  | { outcome: typeof ACTION_OUTCOME.SUCCESS; tenant: TPlatformTenant }
   | {
       outcome: typeof ACTION_OUTCOME.INVALID;
       fieldErrors: TFieldErrors<TConfirmTenantField, TConfirmTenantFieldError>;
@@ -50,7 +52,7 @@ export const resolveConfirmedTenant = async <
   confirm: string,
   { precondition }: TResolveConfirmedTenantOptions<TPreconditionRefusal> = {},
 ): Promise<TResolveConfirmedTenantResult<TPreconditionRefusal>> => {
-  const tenant = await queries.tenants.getTenantById(tenantId, {
+  const tenant = await getPlatformTenant(tenantId, {
     includeArchived: true,
   });
   if (!tenant) {

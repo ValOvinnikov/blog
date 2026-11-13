@@ -21,7 +21,10 @@ import {
   mockTenantDomainRows,
 } from '@platform/testing/custom-domain/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
@@ -88,13 +91,15 @@ describe(makeSubdomainMainAddressAction, () => {
     [
       'a member who is not the owner',
       () =>
-        vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-          tenant: mockReadyTenant({
-            id: MOCK_TENANT_ID,
-            primaryDomain: MOCK_CUSTOM_DOMAIN,
-          }),
-          membership: mockMembership({ role: MEMBERSHIP_ROLE.READER }),
-        }),
+        vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+          mockMembershipContext(
+            mockReadyTenant({
+              id: MOCK_TENANT_ID,
+              primaryDomain: MOCK_CUSTOM_DOMAIN,
+            }),
+            mockMembership({ role: MEMBERSHIP_ROLE.READER }),
+          ),
+        ),
     ],
   ])('rejects %s', async (_name, arrange) => {
     arrange();

@@ -2,6 +2,7 @@ import {
   BRAND_VARIANT,
   LOCALE_ISO_CODES,
   PRICE_PERIOD,
+  TENANT_PLAN,
 } from '@blog/config/constants';
 import {
   MOCK_PRICING_FEATURE_KEY,
@@ -18,7 +19,7 @@ import {
   mockRawPricingModule,
   mockRawPricingPrice,
   mockRawPricingTier,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/pricing/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
   mockLocalizedHeadingBlock,
@@ -160,6 +161,29 @@ describe('pricingModuleQuery', () => {
     };
 
     expect(pricingModuleQuery.parse(raw).tiers?.[0]?.prices).toBeNull();
+  });
+
+  it("projects a tier's platform plan and interval", async () => {
+    const [linkedTier, ...otherTiers] = MOCK_PRICING_DOCUMENT.tiers;
+    const pricing = await runPricing(
+      {
+        ...MOCK_PRICING_DOCUMENT,
+        tiers: [
+          {
+            ...linkedTier,
+            platformPlan: TENANT_PLAN.STARTER,
+            platformPlanInterval: PRICE_PERIOD.MONTH,
+          },
+          ...otherTiers,
+        ],
+      },
+      EN,
+    );
+
+    expect(pricing.tiers[0]).toMatchObject({
+      platformPlan: TENANT_PLAN.STARTER,
+      platformPlanInterval: PRICE_PERIOD.MONTH,
+    });
   });
 
   it('picks the heading, footnote and every tier text in the visitor language', async () => {

@@ -16,7 +16,10 @@ import {
   MOCK_OPERATOR_SESSION,
 } from '@platform/testing/admins/operator';
 import { mockedAuth } from '@platform/testing/auth/mocked-auth';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   mockReadyTenant,
   MOCK_TENANT_ID,
@@ -68,10 +71,14 @@ const { upsertEmailConfig } = queries.emailConfig;
 const { insertAuditEvent } = queries.auditEvents;
 
 const mockMemberOnPlan = (plan: TTenantPlan, role: TMembershipRole) =>
-  vi.mocked(requireTenantMembership).mockResolvedValue({
-    tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
-    membership: mockMembership({ role }),
-  });
+  vi
+    .mocked(requireTenantMembership)
+    .mockResolvedValue(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID, plan }),
+        mockMembership({ role }),
+      ),
+    );
 
 describe(updateEmailConfigAction, () => {
   beforeEach(() => {

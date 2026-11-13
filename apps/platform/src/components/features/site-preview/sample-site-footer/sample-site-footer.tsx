@@ -51,7 +51,12 @@ export const SampleSiteFooter = ({
       >
         <Footer.Logo>
           <SamplePart part={SAMPLE_PART.BRAND}>
-            <BrandMark size={SIZE.SM} title={name} src={logoSrc} />
+            <BrandMark
+              size={SIZE.SM}
+              title={name}
+              siteName={name}
+              src={logoSrc}
+            />
           </SamplePart>
         </Footer.Logo>
         <Footer.About>{t('footerAbout')}</Footer.About>

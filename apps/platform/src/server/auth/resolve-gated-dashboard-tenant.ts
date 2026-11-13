@@ -11,8 +11,8 @@ import { notFound } from 'next/navigation';
 export const resolveGatedDashboardTenant =
   (page: TPlanPage) => async (): Promise<TDashboardTenantContext> => {
     const context = await resolveDashboardTenant();
-    const { tenant, membership } = context;
-    const access = await resolveTenantPageAccess(tenant, membership);
+    const { tenant, viewer } = context;
+    const access = await resolveTenantPageAccess(tenant, viewer);
 
     if (!access[page]) notFound();
 

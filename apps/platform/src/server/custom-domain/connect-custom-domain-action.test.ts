@@ -17,7 +17,10 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
 import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
@@ -201,10 +204,12 @@ describe(connectCustomDomainAction, () => {
   });
 
   it('refuses a member who is not the owner', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-    });
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
+    );
 
     await expect(connect()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,

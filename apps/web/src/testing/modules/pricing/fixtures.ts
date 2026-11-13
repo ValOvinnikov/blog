@@ -21,6 +21,7 @@ export const mockPricingTier = (
   overrides: Partial<TPricingTier> = {},
 ): TPricingTier => ({
   id: 'tier-1',
+  platformPlan: undefined,
   name: 'Starter',
   description: undefined,
   prices: [mockPricingPrice()],

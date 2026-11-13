@@ -16,7 +16,10 @@ import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures'
 import { MOCK_GROWTH_MONTHLY_CHOICE } from '@platform/testing/billing/plan-choices';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -39,10 +42,11 @@ const MOCK_PAYING_SITE = {
 const siteFor = (
   tenant: Parameters<typeof mockReadyTenant>[0] = MOCK_PAYING_SITE,
   membership = mockMembership(),
-) => ({
-  tenant: mockReadyTenant({ id: MOCK_TENANT_ID, ...tenant }),
-  membership,
-});
+) =>
+  mockMembershipContext(
+    mockReadyTenant({ id: MOCK_TENANT_ID, ...tenant }),
+    membership,
+  );
 
 const withSubscription = (
   overrides: Partial<Parameters<typeof mockStripeSubscription>[0]> = {},

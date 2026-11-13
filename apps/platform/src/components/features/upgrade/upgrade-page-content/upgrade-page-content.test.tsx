@@ -11,7 +11,10 @@ import { EMBEDDED_CHECKOUT_TEST_ID } from '@platform/testing/billing/stripe-reac
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import { mockedStripeEnv } from '@platform/testing/env/mocked-stripe-env';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -40,8 +43,12 @@ const t = makeEnTranslator('upgradePage');
 
 const setup = customRenderAsync(UpgradePageContent, {
   tenant: mockTenant(),
-  membership: mockMembership(),
+  viewer: mockViewer(),
   isReturning: false,
+});
+
+const MOCK_EDITOR_VIEWER = mockViewer({
+  membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
 });
 
 const MOCK_SUBSCRIBED_TENANT = mockTenant({
@@ -96,7 +103,7 @@ describe(`<${UpgradePageContent.name}/>`, () => {
   it('shows a member who is not the owner the paid plan with a way back', async () => {
     await setup({
       tenant: MOCK_SUBSCRIBED_TENANT,
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      viewer: MOCK_EDITOR_VIEWER,
     });
 
     const title = screen.getByText(
@@ -123,9 +130,7 @@ describe(`<${UpgradePageContent.name}/>`, () => {
   });
 
   it('explains why a member who is not the owner cannot upgrade', async () => {
-    await setup({
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-    });
+    await setup({ viewer: MOCK_EDITOR_VIEWER });
 
     const note = screen.getByRole('note');
     const checkout = screen.queryByTestId(EMBEDDED_CHECKOUT_TEST_ID);

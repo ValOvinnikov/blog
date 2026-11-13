@@ -2,7 +2,6 @@
 
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CUSTOM_DOMAIN_LOG,
@@ -10,7 +9,7 @@ import {
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
@@ -41,17 +40,17 @@ export const makeCustomDomainMainAddressAction = async (
   tenantId: string,
   input: TCustomDomainInput,
 ): Promise<TMakeCustomDomainMainAddressResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   const parsed = customDomainInputSchema.safeParse(input);
   if (!parsed.success) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
   const { domain } = parsed.data;
-  const { id, plan, deprovisionedAt, primaryDomain } = tenant;
+  const { id, entitlements, isArchived, primaryDomain } = tenant;
 
-  if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
-  if (!PLAN_ENTITLEMENTS[plan].hasCustomDomain) {
+  if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
+  if (!entitlements.hasCustomDomain) {
     return refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN);
   }
 

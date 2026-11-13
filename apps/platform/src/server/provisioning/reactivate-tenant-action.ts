@@ -1,6 +1,11 @@
 'use server';
 
-import { ACTION_OUTCOME, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import {
+  ACTION_OUTCOME,
+  AUDIT_ACTION,
+  AUDIT_TARGET_TYPE,
+  isOutcomeSuccess,
+} from '@blog/config';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { PROVISIONING_LOG } from '@platform/constants/provisioning';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
@@ -43,16 +48,16 @@ export const reactivateTenantAction = async (
   }
 
   const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm, {
-    precondition: ({ deprovisionedAt }) =>
-      deprovisionedAt ? undefined : TENANT_REFUSAL.NOT_DEPROVISIONED,
+    precondition: ({ isArchived }) =>
+      isArchived ? undefined : TENANT_REFUSAL.NOT_DEPROVISIONED,
   });
-  if (resolved.outcome !== ACTION_OUTCOME.SUCCESS) {
+  if (!isOutcomeSuccess(resolved)) {
     return resolved;
   }
   const { tenant } = resolved;
 
   const started = await startProvisioning(tenantId);
-  if (started.outcome !== ACTION_OUTCOME.SUCCESS) {
+  if (!isOutcomeSuccess(started)) {
     return started;
   }
 

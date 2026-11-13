@@ -2,6 +2,7 @@
 
 import {
   ACTION_OUTCOME,
+  isOutcomeSuccess,
   type TActionResult,
   type TOutcome,
 } from '@blog/config';
@@ -17,6 +18,7 @@ import {
   completeTenantDetailsUpdate,
   type TTenantDetailsSaved,
 } from '@platform/server/tenants/complete-tenant-details-update';
+import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import {
   toUpdateTenantDetailsFieldErrors,
@@ -63,18 +65,9 @@ export const updateTenantDetailsAction = async (
     };
   }
 
-  const tenant = await queries.tenants.getTenantById(tenantId, {
-    includeArchived: true,
-  });
-  if (!tenant) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
-    };
-  }
-  if (tenant.deprovisionedAt) {
-    return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
-  }
+  const resolved = await resolveLiveTenant(tenantId);
+  if (!isOutcomeSuccess(resolved)) return resolved;
+  const { tenant } = resolved;
   if (
     parsed.data.primaryDomain !== tenant.primaryDomain &&
     isCustomDomain(tenant.primaryDomain, env.TENANT_ROOT_DOMAIN)

@@ -47,7 +47,7 @@ export const TenantDetailsPanel = ({
     values,
   );
   const [isPending, startTransition] = useTransition();
-  const isArchived = Boolean(tenant.deprovisionedAt);
+  const { isArchived } = tenant;
   const isDirty = hasArrayGotItems(changedFieldKeys);
 
   const effectiveFieldLocks = isArchived

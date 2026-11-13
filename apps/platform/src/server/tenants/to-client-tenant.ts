@@ -1,9 +1,9 @@
 import 'server-only';
 
-import type { TTenant } from '@blog/db/schema/tenants';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 export type TClientTenant = Pick<
-  TTenant,
+  TPlatformTenant,
   | 'id'
   | 'name'
   | 'primaryDomain'
@@ -13,7 +13,8 @@ export type TClientTenant = Pick<
   | 'sanityProjectId'
   | 'sanityDataset'
   | 'webhookCreatedAt'
-  | 'deprovisionedAt'
+  | 'isArchived'
+  | 'archivedAt'
   | 'provisioningStatus'
   | 'provisioningSteps'
   | 'deprovisioningSteps'
@@ -22,7 +23,7 @@ export type TClientTenant = Pick<
   hasSanityReadToken: boolean;
 };
 
-export const toClientTenant = (tenant: TTenant): TClientTenant => {
+export const toClientTenant = (tenant: TPlatformTenant): TClientTenant => {
   const {
     id,
     name,
@@ -34,7 +35,8 @@ export const toClientTenant = (tenant: TTenant): TClientTenant => {
     sanityDataset,
     sanityReadTokenEncrypted,
     webhookCreatedAt,
-    deprovisionedAt,
+    isArchived,
+    archivedAt,
     provisioningStatus,
     provisioningSteps,
     deprovisioningSteps,
@@ -52,7 +54,8 @@ export const toClientTenant = (tenant: TTenant): TClientTenant => {
     sanityDataset,
     hasSanityReadToken: Boolean(sanityReadTokenEncrypted),
     webhookCreatedAt,
-    deprovisionedAt,
+    isArchived,
+    archivedAt,
     provisioningStatus,
     provisioningSteps,
     deprovisioningSteps,

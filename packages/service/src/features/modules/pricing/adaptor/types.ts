@@ -1,9 +1,11 @@
 import type {
+  PricingTier,
   TBrandVariant,
   TContentAlignmentOf,
   THeadingBlock,
   TMaybeUndefined,
   TPricePeriod,
+  TSellableTenantPlan,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
@@ -15,8 +17,14 @@ export type TPricingPrice = {
   isStartingAt: boolean;
 };
 
+export type TPricingTierPlatformPlan = {
+  plan: TSellableTenantPlan;
+  interval: NonNullable<PricingTier['platformPlanInterval']>;
+};
+
 export type TPricingTier = {
   id: string;
+  platformPlan: TMaybeUndefined<TPricingTierPlatformPlan>;
   name: string;
   description: TMaybeUndefined<string>;
   prices: TPricingPrice[];

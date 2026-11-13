@@ -23,7 +23,10 @@ import {
   mockTenantDomainRows,
 } from '@platform/testing/custom-domain/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
@@ -99,10 +102,14 @@ describe(removeCustomDomainAction, () => {
     [
       'a member who is not the owner',
       () =>
-        vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-          tenant: mockReadyTenant({ id: MOCK_TENANT_ID }),
-          membership: mockMembership({ role: MEMBERSHIP_ROLE.READER }),
-        }),
+        vi
+          .mocked(requireTenantMembership)
+          .mockResolvedValueOnce(
+            mockMembershipContext(
+              mockReadyTenant({ id: MOCK_TENANT_ID }),
+              mockMembership({ role: MEMBERSHIP_ROLE.READER }),
+            ),
+          ),
     ],
   ])('rejects %s', async (_name, arrange) => {
     arrange();
@@ -138,46 +145,49 @@ describe(removeCustomDomainAction, () => {
     });
   });
 
-  it('restores the domain and reports a server error on a rejected disconnect', async () => {
-    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
+  describe('when the disconnect is rejected', () => {
+    beforeEach(() => {
+      vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
+    });
 
-    const result = await remove();
+    it('restores the domain and reports a server error on a rejected disconnect', async () => {
+      const result = await remove();
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(tenantDomains.addTenantDomain).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_CUSTOM_DOMAIN,
-    );
-    expect(logger.error).toHaveBeenCalledWith(
-      CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING,
-      {
-        tenantId: MOCK_TENANT_ID,
-        domain: MOCK_CUSTOM_DOMAIN,
-        responseStatus: null,
-      },
-    );
-    expect(recordAuditEvent).not.toHaveBeenCalled();
-  });
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(tenantDomains.addTenantDomain).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_CUSTOM_DOMAIN,
+      );
+      expect(logger.error).toHaveBeenCalledWith(
+        CUSTOM_DOMAIN_LOG.DISCONNECT_REJECTED_RESTORING,
+        {
+          tenantId: MOCK_TENANT_ID,
+          domain: MOCK_CUSTOM_DOMAIN,
+          responseStatus: null,
+        },
+      );
+      expect(recordAuditEvent).not.toHaveBeenCalled();
+    });
 
-  it('logs and reports a server error when putting the domain back fails', async () => {
-    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
-    vi.mocked(tenantDomains.addTenantDomain).mockResolvedValue({
-      ok: false,
-      error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
-    } as never);
-
-    const result = await remove();
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(
-      CUSTOM_DOMAIN_LOG.DISCONNECT_RESTORE_FAILED,
-      {
-        tenantId: MOCK_TENANT_ID,
-        domain: MOCK_CUSTOM_DOMAIN,
+    it('logs and reports a server error when putting the domain back fails', async () => {
+      vi.mocked(tenantDomains.addTenantDomain).mockResolvedValue({
+        ok: false,
         error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
-      },
-    );
-    expect(recordAuditEvent).not.toHaveBeenCalled();
+      } as never);
+
+      const result = await remove();
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(logger.error).toHaveBeenCalledWith(
+        CUSTOM_DOMAIN_LOG.DISCONNECT_RESTORE_FAILED,
+        {
+          tenantId: MOCK_TENANT_ID,
+          domain: MOCK_CUSTOM_DOMAIN,
+          error: ERROR_CODE.DB_DUPLICATE_DOMAIN,
+        },
+      );
+      expect(recordAuditEvent).not.toHaveBeenCalled();
+    });
   });
 
   it('reports input that is not a domain without removing anything', async () => {

@@ -30,11 +30,14 @@ vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
 vi.mock('@platform/server/provisioning/get-tenant-provisioning-status-action');
 
-const tenant = mockTenant({
-  name: MOCK_SITE_NAME,
-  primaryDomain: MOCK_CUSTOM_DOMAIN,
-  plan: TENANT_PLAN.GROWTH,
-});
+const ownerSite = (overrides: Parameters<typeof mockTenant>[0] = {}) =>
+  mockTenant({
+    name: MOCK_SITE_NAME,
+    primaryDomain: MOCK_CUSTOM_DOMAIN,
+    plan: TENANT_PLAN.GROWTH,
+    ...overrides,
+  });
+const tenant = ownerSite();
 
 const defaultProps: TOwnerHomeViewProps = {
   tenant,
@@ -135,6 +138,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       getStarted: {
         tenantId: tenant.id,
         siteAddress: MOCK_CUSTOM_DOMAIN,
+        siteUrl: MOCK_CUSTOM_DOMAIN_URL,
         doneSteps: {
           [GET_STARTED_STEP.LOOK]: true,
           [GET_STARTED_STEP.VOICE]: true,
@@ -160,10 +164,7 @@ describe(`<${OwnerHomeView.name}/>`, () => {
 
   it('shows the archived notice when the tenant has been deprovisioned', async () => {
     await setup({
-      tenant: {
-        ...tenant,
-        deprovisionedAt: MOCK_ARCHIVED_AT,
-      },
+      tenant: ownerSite({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);
@@ -178,10 +179,13 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     'notes a %s trial with its end date',
     async (_, hasEnded, title, endsOn) => {
       await setup({
-        trial: {
-          plan: TENANT_PLAN.GROWTH,
-          endsAt: MOCK_TRIAL_ENDS_AT,
-          hasEnded,
+        tenant: {
+          ...tenant,
+          trial: {
+            plan: TENANT_PLAN.GROWTH,
+            endsAt: MOCK_TRIAL_ENDS_AT,
+            hasEnded,
+          },
         },
       });
 
@@ -205,7 +209,10 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     };
 
     it('links the owner to the Upgrade page from the trial note', async () => {
-      await setup({ trial: MOCK_RUNNING_TRIAL, canUpgrade: true });
+      await setup({
+        tenant: { ...tenant, trial: MOCK_RUNNING_TRIAL },
+        canUpgrade: true,
+      });
 
       const notice = screen.getByRole('note');
       const upgrade = within(notice).getByRole('link', {
@@ -216,7 +223,10 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     });
 
     it('offers no Upgrade to a member who cannot upgrade', async () => {
-      await setup({ trial: MOCK_RUNNING_TRIAL, canUpgrade: false });
+      await setup({
+        tenant: { ...tenant, trial: MOCK_RUNNING_TRIAL },
+        canUpgrade: false,
+      });
 
       const notice = screen.getByRole('note');
       const upgrade = within(notice).queryByRole('link', {

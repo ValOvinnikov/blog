@@ -4,8 +4,8 @@ import type { TTenantPlan } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import type { TMembershipRole } from '@blog/db/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import type { TTenantSwitcherItem } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
 
 export type TTenantPickerItem = TTenantSwitcherItem & {
@@ -14,7 +14,7 @@ export type TTenantPickerItem = TTenantSwitcherItem & {
 };
 
 export const toTenantPickerItems = (
-  tenants: TTenant[],
+  tenants: TPlatformTenant[],
   memberships: TMembership[],
 ): TTenantPickerItem[] => {
   const roleByTenantId = new Map(
@@ -24,11 +24,11 @@ export const toTenantPickerItems = (
   );
 
   return tenants
-    .map(({ id, name, primaryDomain, deprovisionedAt, plan }) => ({
+    .map(({ id, name, primaryDomain, isArchived, plan }) => ({
       id,
       name,
       primaryDomain,
-      isArchived: Boolean(deprovisionedAt),
+      isArchived,
       role: roleByTenantId.get(id),
       plan,
     }))

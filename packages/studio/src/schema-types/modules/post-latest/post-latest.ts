@@ -4,6 +4,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import {
   appearanceFieldGroups,
   appearanceFields,
+  appearanceFieldsets,
 } from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import {
@@ -42,6 +43,7 @@ export const postLatestSchema = defineType({
   description:
     'A short list or carousel of the newest posts, used to surface recent content on any page.',
   icon: Clock,
+  fieldsets: appearanceFieldsets,
   groups: appearanceFieldGroups,
   fields: appearanceFields({
     content: [
@@ -63,8 +65,8 @@ export const postLatestSchema = defineType({
           rule.custom(validateCarouselHasEnoughPosts).warning(),
       }),
       ...alignmentFields([], { title: 'Heading Alignment' }),
-      wideLayoutField,
     ],
+    layout: wideLayoutField,
     columnsHidden: isCarouselMode,
   }),
   preview: limitPreview,

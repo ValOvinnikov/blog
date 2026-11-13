@@ -5,7 +5,10 @@ import {
   MOCK_CHECKOUT_SESSION_ID,
   MOCK_STRIPE_PROMOTION_CODE,
 } from '@platform/testing/billing/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
 
 import DashboardUpgradePage from './page';
@@ -21,6 +24,7 @@ vi.mock('@platform/components/features/upgrade/upgrade-page-content', () => ({
 const MOCK_CONTEXT = {
   tenant: mockTenant(),
   membership: mockMembership(),
+  viewer: mockViewer(),
   tenants: [mockTenant()],
 };
 

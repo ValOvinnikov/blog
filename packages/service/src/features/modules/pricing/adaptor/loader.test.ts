@@ -3,7 +3,7 @@ import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_PRICING_MODULE_ID,
   mockRawPricingModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/pricing/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,

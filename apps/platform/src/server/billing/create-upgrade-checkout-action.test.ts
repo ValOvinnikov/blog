@@ -19,7 +19,10 @@ import {
 } from '@platform/testing/billing/fixtures';
 import { mockStripeCheckoutClient } from '@platform/testing/billing/stripe-checkout-client';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import { MOCK_PLATFORM_APP_BASE_URL } from '@platform/testing/owner-email/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -71,10 +74,14 @@ const checkout = (input = MOCK_MONTHLY) =>
   createUpgradeCheckoutAction(MOCK_TENANT_ID, input);
 
 const asSite = (tenant: Parameters<typeof mockReadyTenant>[0]) =>
-  vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-    tenant: mockReadyTenant({ id: MOCK_TENANT_ID, ...tenant }),
-    membership: mockMembership(),
-  });
+  vi
+    .mocked(requireTenantMembership)
+    .mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID, ...tenant }),
+        mockMembership(),
+      ),
+    );
 
 describe(createUpgradeCheckoutAction, () => {
   beforeEach(() => {

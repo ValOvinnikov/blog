@@ -50,14 +50,14 @@ export const changePlanAction = async (
   tenantId: string,
   input: TPlanChoice,
 ): Promise<TChangePlanResult> => {
-  const { tenant, membership } = await requireTenantMembership(tenantId);
+  const { tenant, viewer } = await requireTenantMembership(tenantId);
 
   const parsed = planChoiceSchema.safeParse(input);
   if (!parsed.success) {
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const gate = planChangeRefusalFor(tenant, membership);
+  const gate = planChangeRefusalFor(tenant, viewer);
   if (gate) return refused(gate);
 
   const { stripeSubscriptionId } = tenant;
