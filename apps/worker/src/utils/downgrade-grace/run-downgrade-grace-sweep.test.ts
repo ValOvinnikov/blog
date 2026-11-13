@@ -314,25 +314,40 @@ describe(runDowngradeGraceSweep, () => {
       expect(lockMembershipsOverSeats).toHaveBeenCalled();
     });
 
-    it('gives the grace back and logs it when the address switch fails', async () => {
-      vi.mocked(setTenantPrimaryDomain).mockResolvedValue(
-        errorResult(ERROR_CODE.DB_NOT_FOUND),
-      );
-
-      await sweep();
-
-      expect(restoreDowngradeGrace).toHaveBeenCalledWith(MOCK_TENANT_ID, {
-        graceStartedAt: tenant.downgradeGraceStartedAt,
-        downgradedFromPlan: tenant.downgradedFromPlan,
+    describe('when the address switch fails', () => {
+      beforeEach(() => {
+        vi.mocked(setTenantPrimaryDomain).mockResolvedValue(
+          errorResult(ERROR_CODE.DB_NOT_FOUND),
+        );
       });
-      expect(logger.error).toHaveBeenCalledWith(
-        DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
-        {
-          tenantId: MOCK_TENANT_ID,
-          isGivenBack: true,
-          error: ERROR_CODE.DB_NOT_FOUND,
-        },
-      );
+
+      it('gives the grace back and logs it', async () => {
+        await sweep();
+
+        expect(restoreDowngradeGrace).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+          graceStartedAt: tenant.downgradeGraceStartedAt,
+          downgradedFromPlan: tenant.downgradedFromPlan,
+        });
+        expect(logger.error).toHaveBeenCalledWith(
+          DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
+          {
+            tenantId: MOCK_TENANT_ID,
+            isGivenBack: true,
+            error: ERROR_CODE.DB_NOT_FOUND,
+          },
+        );
+      });
+
+      it('logs no failure for a site that moved off Free while the sweep ran', async () => {
+        vi.mocked(restoreDowngradeGrace).mockResolvedValue(false);
+
+        await sweep();
+
+        expect(logger.error).not.toHaveBeenCalledWith(
+          DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
+          expect.anything(),
+        );
+      });
     });
 
     describe('when locking fails', () => {
@@ -354,17 +369,6 @@ describe(runDowngradeGraceSweep, () => {
           [DOWNGRADE_GRACE_STEP.GRACE_END]: 1,
         });
         expect(lockMembershipsOverSeats).toHaveBeenCalledTimes(2);
-      });
-
-      it('logs a site that paid in between as not given back', async () => {
-        vi.mocked(restoreDowngradeGrace).mockResolvedValue(false);
-
-        await sweep();
-
-        expect(logger.error).toHaveBeenCalledWith(
-          DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
-          { tenantId: MOCK_TENANT_ID, isGivenBack: false, error: MOCK_DB_DOWN },
-        );
       });
 
       it('still logs the failure when giving the grace back throws', async () => {
