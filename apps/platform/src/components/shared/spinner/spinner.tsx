@@ -4,6 +4,7 @@ export type TSpinnerProps = {
   label: string;
   hasLabel?: boolean;
   size?: TSpinnerVariants['size'];
+  tone?: TSpinnerVariants['tone'];
   className?: string;
 };
 
@@ -12,9 +13,13 @@ export const Spinner = ({
   label,
   hasLabel = false,
   size,
+  tone,
   className,
 }: TSpinnerProps) => {
-  const { root, glyph, text } = spinnerVariants({ size });
+  const { root, glyph, orbit, unlit, lit, text } = spinnerVariants({
+    size,
+    tone,
+  });
 
   return (
     <span
@@ -22,7 +27,12 @@ export const Spinner = ({
       aria-label={label}
       className={root({ class: className })}
     >
-      <span className={glyph()} aria-hidden="true" />
+      <span className={glyph()} aria-hidden="true">
+        <span className={orbit()}>
+          <span className={unlit()} />
+          <span className={lit()} />
+        </span>
+      </span>
       {hasLabel && (
         <span className={text()} aria-hidden="true">
           {label}

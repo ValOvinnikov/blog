@@ -53,11 +53,19 @@ const isRoleQueryArgument = ({ parent }) =>
       ROLE_QUERY_CALLEES.has(parent.callee.property.name)));
 
 const protocolAttributeName = (node) => {
-  const { parent } = node;
+  const value =
+    node.parent.type === 'AssignmentPattern' && node.parent.right === node
+      ? node.parent
+      : node;
+  const { parent } = value;
   if (parent.type === 'JSXAttribute') {
     return parent.name.name;
   }
-  if (parent.type === 'Property' && parent.value === node && !parent.computed) {
+  if (
+    parent.type === 'Property' &&
+    parent.value === value &&
+    !parent.computed
+  ) {
     return parent.key.name ?? parent.key.value;
   }
   return undefined;

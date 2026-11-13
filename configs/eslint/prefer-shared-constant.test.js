@@ -129,6 +129,10 @@ ruleTester.run('prefer-shared-constant', rule, {
     { code: 'const el = <a target="_blank" />;', filename: WEB_SOURCE },
     { code: "const link = { target: '_blank' };", filename: WEB_SOURCE },
     {
+      code: "const Button = ({ type = 'button' }) => type;",
+      filename: WEB_SOURCE,
+    },
+    {
       code: "type TBrand = TProps['brand'];",
       filename: WEB_SOURCE,
       languageOptions: typescript,

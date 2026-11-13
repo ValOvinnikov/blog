@@ -958,6 +958,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
+      },
+      {
+        "ref": "SPINNER_TONE.TEXT",
+        "scope": "app:platform",
+        "from": "@platform/constants/spinner",
+        "file": "apps/platform/src/constants/spinner.ts"
       }
     ],
     "LARGE_TEXT": [
@@ -7066,6 +7072,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-row",
         "file": "apps/platform/src/constants/look-row.ts"
+      },
+      {
+        "ref": "SPINNER_TONE.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/spinner",
+        "file": "apps/platform/src/constants/spinner.ts"
       }
     ],
     "TYPE": [
@@ -8202,6 +8214,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/site-config",
         "file": "apps/platform/src/constants/site-config.ts"
+      }
+    ],
+    "ON_BRAND": [
+      {
+        "ref": "SPINNER_TONE.ON_BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/spinner",
+        "file": "apps/platform/src/constants/spinner.ts"
       }
     ],
     "UPCOMING": [
