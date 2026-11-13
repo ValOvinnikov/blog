@@ -13,9 +13,11 @@ import {
   claimGraceEmail,
   endDowngradeGrace,
   endTenantTrial,
+  restoreDowngradeGrace,
   setTenantPrimaryDomain,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { sanitizeLogMessage } from '@blog/insight';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
 import { logger } from '@worker/utils/logger/logger';
@@ -61,6 +63,14 @@ async function moveMainAddressToSubdomain({
   await invalidateSiteCache(tenantId, ctx.env);
 }
 
+async function enforceFreePlan(input: TGraceStepInput): Promise<void> {
+  const { tenant, ctx } = input;
+  const { seats, hasCustomDomain } = PLAN_ENTITLEMENTS[tenant.plan];
+  await lockMembershipsOverSeats(tenant.id, seats, ctx.now);
+  await stopPendingInvitesOverSeats(tenant.id, seats);
+  if (!hasCustomDomain) await moveMainAddressToSubdomain(input);
+}
+
 export async function endGrace({
   tenant,
   hosts,
@@ -72,13 +82,21 @@ export async function endGrace({
   const ended = await endDowngradeGrace(id, downgradeGraceStartedAt);
   if (!ended) return false;
 
-  const { seats, hasCustomDomain } = PLAN_ENTITLEMENTS[ended.plan];
-  await lockMembershipsOverSeats(id, seats, ctx.now);
-  await stopPendingInvitesOverSeats(id, seats);
-  if (!hasCustomDomain) {
-    await moveMainAddressToSubdomain({ tenant: ended, hosts, ctx });
+  try {
+    await enforceFreePlan({ tenant: ended, hosts, ctx });
+    return true;
+  } catch (error) {
+    const isGivenBack = await restoreDowngradeGrace(id, {
+      graceStartedAt: downgradeGraceStartedAt,
+      downgradedFromPlan: ended.downgradedFromPlan,
+    });
+    logger.error(DOWNGRADE_GRACE_LOG.GRACE_END_FAILED, {
+      tenantId: id,
+      isGivenBack,
+      error: sanitizeLogMessage(error),
+    });
+    return false;
   }
-  return true;
 }
 
 export async function sendGraceEmail(

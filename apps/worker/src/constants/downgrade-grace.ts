@@ -5,6 +5,7 @@ export const DOWNGRADE_GRACE_LOG = {
   STEP_FAILED: 'downgrade_grace.step_failed',
   OWNER_MISSING: 'downgrade_grace.owner_missing',
   SUBDOMAIN_MISSING: 'downgrade_grace.subdomain_missing',
+  GRACE_END_FAILED: 'downgrade_grace.grace_end_failed',
   EMAIL_SEND_FAILED: 'downgrade_grace.email_send_failed',
 } as const;
 

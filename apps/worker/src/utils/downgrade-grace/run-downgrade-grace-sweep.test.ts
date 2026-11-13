@@ -20,10 +20,11 @@ import {
   listTenantsDueForGraceEmail,
   listTenantsDueForGraceEnd,
   listTenantsWithEndedTrial,
+  restoreDowngradeGrace,
   setTenantPrimaryDomain,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
+import { daysAfter, daysBefore } from '@blog/db/utils/day-offset/day-offset';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { sendEmail } from '@blog/email';
 import { errorResult, okResult } from '@blog/utils';
@@ -103,6 +104,7 @@ beforeEach(() => {
   vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
   vi.mocked(sendEmail).mockResolvedValue();
   vi.mocked(requestTenantCacheInvalidation).mockResolvedValue();
+  vi.mocked(restoreDowngradeGrace).mockResolvedValue(true);
   vi.mocked(endDowngradeGrace).mockImplementation(async (id) =>
     mockTenant({ id }),
   );
@@ -306,21 +308,58 @@ describe(runDowngradeGraceSweep, () => {
       expect(lockMembershipsOverSeats).toHaveBeenCalled();
     });
 
-    it('logs a failed address switch', async () => {
+    it('gives the grace back and logs it when the address switch fails', async () => {
       vi.mocked(setTenantPrimaryDomain).mockResolvedValue(
         errorResult(ERROR_CODE.DB_NOT_FOUND),
       );
 
       await sweep();
 
+      expect(restoreDowngradeGrace).toHaveBeenCalledWith(MOCK_TENANT_ID, {
+        graceStartedAt: tenant.downgradeGraceStartedAt,
+        downgradedFromPlan: tenant.downgradedFromPlan,
+      });
       expect(logger.error).toHaveBeenCalledWith(
-        DOWNGRADE_GRACE_LOG.STEP_FAILED,
+        DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
         {
           tenantId: MOCK_TENANT_ID,
-          step: DOWNGRADE_GRACE_STEP.GRACE_END,
+          isGivenBack: true,
           error: ERROR_CODE.DB_NOT_FOUND,
         },
       );
+    });
+
+    describe('when locking fails', () => {
+      beforeEach(() => {
+        vi.mocked(lockMembershipsOverSeats).mockRejectedValueOnce(
+          new Error(MOCK_DB_DOWN),
+        );
+      });
+
+      it('retries a failed lock on the next day’s sweep', async () => {
+        await expect(sweep()).resolves.toEqual(MOCK_NOTHING_DONE);
+        await expect(
+          runDowngradeGraceSweep({
+            now: daysAfter(MOCK_NOW, 1),
+            env: MOCK_SWEEP_ENV,
+          }),
+        ).resolves.toEqual({
+          ...MOCK_NOTHING_DONE,
+          [DOWNGRADE_GRACE_STEP.GRACE_END]: 1,
+        });
+        expect(lockMembershipsOverSeats).toHaveBeenCalledTimes(2);
+      });
+
+      it('logs a site that paid in between as not given back', async () => {
+        vi.mocked(restoreDowngradeGrace).mockResolvedValue(false);
+
+        await sweep();
+
+        expect(logger.error).toHaveBeenCalledWith(
+          DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
+          { tenantId: MOCK_TENANT_ID, isGivenBack: false, error: MOCK_DB_DOWN },
+        );
+      });
     });
   });
 
