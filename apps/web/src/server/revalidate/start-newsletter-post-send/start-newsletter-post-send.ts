@@ -12,9 +12,6 @@ import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 
 const isSiteSendingPosts = async (tenantId: string): Promise<boolean> => {
-  const tenant = await queries.tenants.getTenantById(tenantId);
-  if (!tenant || !isTenantActive(tenant)) return false;
-
   const [isNewsletterOn, isEmailNewPostsOn] = await Promise.all([
     isCapabilityEnabledForTenant(tenantId, CAPABILITY.NEWSLETTER),
     queries.emailConfig.getEmailNewPosts(tenantId),
@@ -59,8 +56,12 @@ export const startNewsletterPostSend = async ({
   }
 
   let claim;
+  let isSending;
   try {
-    if (!(await isSiteSendingPosts(tenantId))) return;
+    const tenant = await queries.tenants.getTenantById(tenantId);
+    if (!tenant || !isTenantActive(tenant)) return;
+
+    isSending = await isSiteSendingPosts(tenantId);
     claim = await queries.newsletterPostSends.claimNewsletterPostSend(
       tenantId,
       postId,
@@ -73,7 +74,8 @@ export const startNewsletterPostSend = async ({
     });
     return;
   }
-  if (!claim) return;
+  // A site not sending keeps the claim, so a republish once sending is on never emails an old post.
+  if (!claim || !isSending) return;
 
   const { claimedAt } = claim;
   const isStarted = await enqueueNewsletterPostSend({

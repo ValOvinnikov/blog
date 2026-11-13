@@ -108,30 +108,41 @@ describe(startNewsletterPostSend, () => {
   });
 
   it.each([
-    {
-      case: 'an archived site',
-      arrange: () => getTenantByIdMock.mockResolvedValue(undefined),
-    },
-    {
-      case: 'a suspended site',
-      arrange: () => getTenantByIdMock.mockResolvedValue(MOCK_SUSPENDED_TENANT),
-    },
-    {
-      case: 'a site whose plan or toggle leaves the newsletter off',
-      arrange: () => isCapabilityEnabledMock.mockResolvedValue(false),
-    },
-    {
-      case: 'a site that does not email new posts',
-      arrange: () => getEmailNewPostsMock.mockResolvedValue(false),
-    },
-  ])('claims nothing for $case', async ({ arrange }) => {
-    arrange();
+    ['an archived site', undefined],
+    ['a suspended site', MOCK_SUSPENDED_TENANT],
+  ])('claims nothing for %s', async (_label, tenant) => {
+    getTenantByIdMock.mockResolvedValue(tenant);
 
     await startNewsletterPostSend(FIRST_PUBLISH);
 
     expect(claimNewsletterPostSendMock).not.toHaveBeenCalled();
     expect(enqueueMock).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [
+      'whose plan or toggle leaves the newsletter off',
+      () => isCapabilityEnabledMock.mockResolvedValue(false),
+    ],
+    [
+      'that does not email new posts',
+      () => getEmailNewPostsMock.mockResolvedValue(false),
+    ],
+  ])(
+    'keeps the claim and starts nothing for a site %s',
+    async (_label, arrange) => {
+      arrange();
+
+      await startNewsletterPostSend(FIRST_PUBLISH);
+
+      expect(claimNewsletterPostSendMock).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_POST_ID,
+      );
+      expect(enqueueMock).not.toHaveBeenCalled();
+      expect(releaseNewsletterPostSendMock).not.toHaveBeenCalled();
+    },
+  );
 
   it('starts nothing for a post already claimed', async () => {
     claimNewsletterPostSendMock.mockResolvedValue(null);
