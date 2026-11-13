@@ -6,6 +6,7 @@ import {
   NEWSLETTER_POST_ID_MAX_LENGTH,
   NEWSLETTER_SEND_LOG,
 } from '@worker/constants/newsletter-send';
+import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
@@ -23,7 +24,11 @@ const postSendBodySchema = tenantRequestBodySchema.extend({
 });
 
 export async function POST(request: Request): Promise<Response> {
-  const signed = await readSignedRequest(request, postSendBodySchema);
+  const signed = await readSignedRequest(
+    request,
+    postSendBodySchema,
+    env.WORKER_NEWSLETTER_ENQUEUE_SECRET,
+  );
   if (!signed.ok) return signed.error;
   const { tenantId, postId, claimedAt } = signed.data;
 

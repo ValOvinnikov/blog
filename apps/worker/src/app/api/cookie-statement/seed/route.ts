@@ -3,6 +3,7 @@ import { getTenantById } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { COOKIE_STATEMENT_LOG } from '@worker/constants/cookie-statement';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
+import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
@@ -25,6 +26,7 @@ export async function POST(request: Request): Promise<Response> {
   const signed = await readSignedRequest(
     request,
     cookieStatementSeedBodySchema,
+    env.WORKER_ENQUEUE_SECRET,
   );
   if (!signed.ok) return signed.error;
   const { tenantId, locales } = signed.data;

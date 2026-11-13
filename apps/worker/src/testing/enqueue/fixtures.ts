@@ -7,3 +7,4 @@ export const MOCK_FORGED_SECRET = mockFaker.string.alphanumeric(32);
 export const MOCK_WORKER_ORIGIN = mockFaker.internet.url({
   appendSlash: false,
 });
+export const MOCK_NEWSLETTER_ENQUEUE_SECRET = mockFaker.string.alphanumeric(32);
