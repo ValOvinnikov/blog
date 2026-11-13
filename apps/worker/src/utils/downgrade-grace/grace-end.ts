@@ -56,6 +56,7 @@ async function giveGraceBack(
       graceStartedAt: downgradeGraceStartedAt,
       downgradedFromPlan,
     });
+    if (!isGivenBack) return;
     logger.error(DOWNGRADE_GRACE_LOG.GRACE_END_FAILED, {
       ...failure,
       isGivenBack,
