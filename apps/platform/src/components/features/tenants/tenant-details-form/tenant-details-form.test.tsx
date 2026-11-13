@@ -91,10 +91,15 @@ describe(`<${TenantDetailsForm.name}/>`, () => {
   const getLanguageSelect = () =>
     screen.getByRole('combobox', { name: tenantDetailsForm.localeLabel });
 
+  const pasteInto = async (field: HTMLElement, value: string) => {
+    await user.click(field);
+    await user.paste(value);
+  };
+
   const fillForm = async (ownerEmail = MOCK_OWNER_EMAIL) => {
-    await user.type(getNameInput(), MOCK_TENANT_NAME);
-    await user.type(getSiteAddressInput(), MOCK_TENANT_SLUG);
-    await user.type(getOwnerEmailInput(), ownerEmail);
+    await pasteInto(getNameInput(), MOCK_TENANT_NAME);
+    await pasteInto(getSiteAddressInput(), MOCK_TENANT_SLUG);
+    await pasteInto(getOwnerEmailInput(), ownerEmail);
   };
 
   const clickBeginProvisioning = async () => {
