@@ -1,5 +1,5 @@
 {
-  "id": "4d962fe8-2cbe-498b-bec8-cfb36af5e8bf",
+  "id": "c38d232b-08cb-4655-ae32-0ebb0c72e7fe",
   "prevId": "04f49178-294c-4cba-906c-20b7342b03a3",
   "version": "7",
   "dialect": "postgresql",
@@ -2512,6 +2512,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "downgraded_from_plan": {
+          "name": "downgraded_from_plan",
+          "type": "tenant_plan",
+          "primaryKey": false,
+          "notNull": false
+        },
         "status": {
           "name": "status",
           "type": "tenant_status",
@@ -2942,6 +2948,16 @@
       "schema": "public",
       "values": ["BRAILLE", "RING", "DOTS", "PULSE"]
     },
+    "public.tenant_plan": {
+      "name": "tenant_plan",
+      "schema": "public",
+      "values": ["FREE", "STARTER", "GROWTH"]
+    },
+    "public.tenant_status": {
+      "name": "tenant_status",
+      "schema": "public",
+      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED", "TRIAL", "PAST_DUE"]
+    },
     "public.locale_code": {
       "name": "locale_code",
       "schema": "public",
@@ -2959,16 +2975,6 @@
         "BUSINESS",
         "PRODUCT"
       ]
-    },
-    "public.tenant_plan": {
-      "name": "tenant_plan",
-      "schema": "public",
-      "values": ["FREE", "STARTER", "GROWTH"]
-    },
-    "public.tenant_status": {
-      "name": "tenant_status",
-      "schema": "public",
-      "values": ["ACTIVE", "SUSPENDED", "ARCHIVED", "TRIAL", "PAST_DUE"]
     }
   },
   "schemas": {},

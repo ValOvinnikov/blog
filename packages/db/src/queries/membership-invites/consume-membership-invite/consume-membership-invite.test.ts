@@ -1,4 +1,4 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
@@ -118,5 +118,43 @@ describe(consumeMembershipInvite, () => {
     const rows = await db().select().from(schema.memberships);
     expect(membership).toEqual(existingMembership);
     expect(rows).toEqual([existingMembership]);
+  });
+
+  describe('an editor invite on a site whose owner already holds a seat', () => {
+    let editorInviteId: string;
+
+    beforeEach(async () => {
+      const { id: ownerId } = await insertTestUser(db(), {
+        id: faker.string.uuid(),
+      });
+      await mockMembership(db(), { userId: ownerId, tenantId });
+      ({ id: editorInviteId } = await mockMembershipInvite(db(), tenantId, {
+        role: MEMBERSHIP_ROLE.EDITOR,
+      }));
+    });
+
+    it('stays pending while the Free plan has no seat left', async () => {
+      const membership = await consumeMembershipInvite(
+        editorInviteId,
+        MOCK_USER_ID,
+      );
+
+      expect(membership).toBeUndefined();
+      expect((await readInvite(editorInviteId))?.consumedAt).toBeNull();
+    });
+
+    it('is accepted once the plan has a seat for it', async () => {
+      await db()
+        .update(schema.tenants)
+        .set({ plan: TENANT_PLAN.GROWTH })
+        .where(eq(schema.tenants.id, tenantId));
+
+      const membership = await consumeMembershipInvite(
+        editorInviteId,
+        MOCK_USER_ID,
+      );
+
+      expect(membership?.role).toBe(MEMBERSHIP_ROLE.EDITOR);
+    });
   });
 });

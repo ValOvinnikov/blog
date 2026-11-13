@@ -1,6 +1,5 @@
 import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
   type TDeprovisioningStep,
   type TElevateTenantOwnerOutcome,
   type TTenantProvisioningStatus,
@@ -22,10 +21,9 @@ import { timestampColumns } from './columns';
 import { tenantBillingColumns } from './tenant-billing-columns';
 import { tenantInactivityColumns } from './tenant-inactivity-columns';
 import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
+import { tenantPlanColumns } from './tenant-plan-columns';
 import { selfServeOwnerSlotIndex } from './tenant-self-serve-owner-index';
 import { tenantStatusColumns } from './tenant-status-columns';
-
-export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);
 
 export const localeCodeEnum = pgEnum('locale_code', LOCALE_ISO_CODES);
 
@@ -93,7 +91,7 @@ export const tenants = pgTable(
       .array()
       .notNull()
       .default([]),
-    plan: tenantPlanEnum('plan').notNull(),
+    ...tenantPlanColumns,
     ...tenantStatusColumns,
     provisioningStatus: text(
       'provisioning_status',

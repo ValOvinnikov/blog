@@ -1,6 +1,6 @@
-import { DAY_MS } from '@blog/db/constants';
 import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
+import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
 
-export function graceStartedDaysAgo(days: number): Date {
-  return new Date(MOCK_NOW.getTime() - days * DAY_MS);
+export function daysBeforeNow(days: number): Date {
+  return daysBefore(MOCK_NOW, days);
 }

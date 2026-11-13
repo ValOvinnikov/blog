@@ -1,19 +1,22 @@
+import type { TMaybeNull } from '@blog/config/types';
 import {
   TENANT_PLAN,
   TENANT_STATUS,
   type TTenantPlan,
   type TTenantStatus,
 } from '@blog/db/constants';
-import { tenantPlanEnum, tenants } from '@blog/db/schema/tenants';
+import { tenantPlanEnum } from '@blog/db/schema/tenant-plan-columns';
+import { tenants } from '@blog/db/schema/tenants';
 import { or, type SQL, sql } from 'drizzle-orm';
 
 export type TPlanChangeFields = {
   plan: TTenantPlan;
   selfServeOwnerEmailIndex?: null;
-  downgradeGraceStartedAt: SQL | null;
-  graceStartedEmailSentAt: SQL | null;
-  graceHalfwayEmailSentAt: SQL | null;
-  graceEndingEmailSentAt: SQL | null;
+  downgradeGraceStartedAt: TMaybeNull<SQL>;
+  graceStartedEmailSentAt: TMaybeNull<SQL>;
+  graceHalfwayEmailSentAt: TMaybeNull<SQL>;
+  graceEndingEmailSentAt: TMaybeNull<SQL>;
+  downgradedFromPlan: TMaybeNull<SQL>;
 };
 
 const PAID_SITE_STATUSES: readonly TTenantStatus[] = [
@@ -39,6 +42,7 @@ function graceFields(plan: TTenantPlan, now: Date) {
       graceStartedEmailSentAt: null,
       graceHalfwayEmailSentAt: null,
       graceEndingEmailSentAt: null,
+      downgradedFromPlan: null,
     };
   }
 
@@ -58,6 +62,10 @@ function graceFields(plan: TTenantPlan, now: Date) {
     graceEndingEmailSentAt: startsGrace(
       sql`${tenants.graceEndingEmailSentAt}`,
       sql`null`,
+    ),
+    downgradedFromPlan: startsGrace(
+      sql`${tenants.downgradedFromPlan}`,
+      sql`${tenants.plan}`,
     ),
   };
 }

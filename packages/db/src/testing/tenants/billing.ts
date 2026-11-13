@@ -17,6 +17,7 @@ export const MOCK_NO_BILLING = {
   graceStartedEmailSentAt: null,
   graceHalfwayEmailSentAt: null,
   graceEndingEmailSentAt: null,
+  downgradedFromPlan: null,
 } as const satisfies Partial<TTenant>;
 
 export const MOCK_EMPTY_TENANT_BILLING: TTenantBilling = {

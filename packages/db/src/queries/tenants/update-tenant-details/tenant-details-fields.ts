@@ -66,6 +66,7 @@ export function restorableTenantFields(
     | 'graceStartedEmailSentAt'
     | 'graceHalfwayEmailSentAt'
     | 'graceEndingEmailSentAt'
+    | 'downgradedFromPlan'
   > {
   return {
     ...tenantDetailsFields(original),
@@ -76,5 +77,6 @@ export function restorableTenantFields(
     graceStartedEmailSentAt: original.graceStartedEmailSentAt,
     graceHalfwayEmailSentAt: original.graceHalfwayEmailSentAt,
     graceEndingEmailSentAt: original.graceEndingEmailSentAt,
+    downgradedFromPlan: original.downgradedFromPlan,
   };
 }

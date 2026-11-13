@@ -21,6 +21,7 @@ export * from './subscribers';
 export * from './tenant-analytics';
 export * from './tenant-domains';
 export * from './tenant-oauth-credentials';
+export * from './tenant-plan-columns';
 export * from './tenant-status-columns';
 export * from './tenant-suspensions';
 export * from './tenants';

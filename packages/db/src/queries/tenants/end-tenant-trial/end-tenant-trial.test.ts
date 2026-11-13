@@ -5,7 +5,7 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { mockStripeIds } from '@blog/db/testing/tenants/billing';
-import { graceStartedDaysAgo } from '@blog/db/testing/tenants/grace';
+import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
 import { MOCK_SELF_SERVE_OWNER_EMAIL_INDEX } from '@blog/db/testing/tenants/self-serve-fixtures';
 
 import { endTenantTrial } from './end-tenant-trial';
@@ -15,7 +15,7 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 useFrozenClock();
 
-const MOCK_TRIAL_ENDED_AT = graceStartedDaysAgo(1);
+const MOCK_TRIAL_ENDED_AT = daysBeforeNow(1);
 
 function insertTrial(
   overrides: Partial<typeof schema.tenants.$inferInsert> = {},

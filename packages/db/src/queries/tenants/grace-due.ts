@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import {
-  DAY_MS,
   DOWNGRADE_GRACE_DAYS,
   GRACE_EMAIL,
   GRACE_EMAIL_DAY,
@@ -8,7 +7,8 @@ import {
   type TGraceEmail,
 } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
-import { and, gt, isNull, lte, type SQL } from 'drizzle-orm';
+import { daysBefore, utcDayStart } from '@blog/db/utils/day-offset/day-offset';
+import { and, gte, isNull, lt, type SQL } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 
 export const GRACE_EMAIL_STAMP = {
@@ -17,8 +17,9 @@ export const GRACE_EMAIL_STAMP = {
   [GRACE_EMAIL.ENDING]: 'graceEndingEmailSentAt',
 } as const satisfies Record<TGraceEmail, keyof typeof tenants.$inferSelect>;
 
-function daysBefore(now: Date, days: number): Date {
-  return new Date(now.getTime() - days * DAY_MS);
+// Counts whole UTC days, so a sweep's time of day never moves a step to another day.
+function startedBeforeSweepDay(now: Date, days: number): Date {
+  return daysBefore(utcDayStart(now), days - 1);
 }
 
 export function graceEmailDue(
@@ -29,13 +30,13 @@ export function graceEmailDue(
 
   return and(
     isNull(tenants.deprovisionedAt),
-    lte(
+    lt(
       tenants.downgradeGraceStartedAt,
-      daysBefore(now, GRACE_EMAIL_DAY[email]),
+      startedBeforeSweepDay(now, GRACE_EMAIL_DAY[email]),
     ),
-    gt(
+    gte(
       tenants.downgradeGraceStartedAt,
-      daysBefore(now, GRACE_EMAIL_DUE_UNTIL_DAY[email]),
+      startedBeforeSweepDay(now, GRACE_EMAIL_DUE_UNTIL_DAY[email]),
     ),
     isNull(stamp),
   );
@@ -44,6 +45,9 @@ export function graceEmailDue(
 export function graceEndDue(now: Date): TMaybeUndefined<SQL> {
   return and(
     isNull(tenants.deprovisionedAt),
-    lte(tenants.downgradeGraceStartedAt, daysBefore(now, DOWNGRADE_GRACE_DAYS)),
+    lt(
+      tenants.downgradeGraceStartedAt,
+      startedBeforeSweepDay(now, DOWNGRADE_GRACE_DAYS),
+    ),
   );
 }

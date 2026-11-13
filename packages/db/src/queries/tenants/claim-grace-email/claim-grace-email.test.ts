@@ -4,7 +4,7 @@ import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { graceStartedDaysAgo } from '@blog/db/testing/tenants/grace';
+import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
 
 import { claimGraceEmail } from './claim-grace-email';
 
@@ -13,9 +13,11 @@ vi.mock('@blog/db/client');
 const db = useQueryTestDb();
 useFrozenClock();
 
+const MOCK_LATE_ON_START_DAY = new Date('2026-10-08T09:00:02.000Z');
+
 function insertInGrace(days: number) {
   return insertTestTenant(db(), {
-    downgradeGraceStartedAt: graceStartedDaysAgo(days),
+    downgradeGraceStartedAt: daysBeforeNow(days),
   });
 }
 
@@ -61,6 +63,20 @@ describe(claimGraceEmail, () => {
       ).resolves.toBeNull();
     },
   );
+
+  it('sends the day-13 email to a sweep that runs earlier in the day than the grace started', async () => {
+    const tenant = await insertTestTenant(db(), {
+      downgradeGraceStartedAt: MOCK_LATE_ON_START_DAY,
+    });
+
+    const claimed = await claimGraceEmail(
+      tenant.id,
+      GRACE_EMAIL.ENDING,
+      MOCK_NOW,
+    );
+
+    expect(claimed?.graceEndingEmailSentAt).toEqual(MOCK_NOW);
+  });
 
   it('claims nothing for a tenant with no grace', async () => {
     const tenant = await insertTestTenant(db());
