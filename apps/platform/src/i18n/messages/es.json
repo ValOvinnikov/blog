@@ -354,7 +354,9 @@
   "ownerHomePage": {
     "description": "Su sitio de un vistazo. Todo lo que aparece aquí está en vivo.",
     "trialTitle": "Prueba de {plan}",
-    "trialDescription": "Tu sitio tiene todas las funciones de {plan} hasta el {date}. No necesitas tarjeta; cuando termine la prueba, el sitio pasa a {freePlan}.",
+    "trialDescription": "Su sitio tiene todas las funciones de {plan} hasta el <time>{date}</time>. No necesita tarjeta; cuando termine la prueba, el sitio pasa a {freePlan}.",
+    "trialEndedTitle": "Prueba de {plan} terminada",
+    "trialEndedDescription": "Su prueba terminó el <time>{date}</time>. El sitio pasará a {freePlan} en breve.",
     "yourSiteCardTitle": "Su sitio",
     "nameLabel": "Nombre",
     "publicDomainLabel": "Dominio público",

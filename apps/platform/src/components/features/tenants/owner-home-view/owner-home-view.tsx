@@ -1,5 +1,4 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
@@ -10,6 +9,7 @@ import type { TDomainVerificationStatus } from '@platform/constants/domain';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import type { TTrial } from '@platform/utils/trial-for/trial-for';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
@@ -27,6 +27,7 @@ export type TOwnerHomeViewProps = {
   owner: TMaybeUndefined<TTenantOwnerMembership>;
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
+  trial?: TTrial;
 };
 
 export const OwnerHomeView = ({
@@ -35,6 +36,7 @@ export const OwnerHomeView = ({
   owner,
   siteSetup,
   getStarted,
+  trial,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, pair } = ownerHomeViewVariants();
@@ -51,9 +53,7 @@ export const OwnerHomeView = ({
         <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
       )}
 
-      {tenant.status === TENANT_STATUS.TRIAL && tenant.trialEndsAt && (
-        <TrialNotice plan={tenant.plan} trialEndsAt={tenant.trialEndsAt} />
-      )}
+      {trial && <TrialNotice trial={trial} />}
 
       {siteSetup && <SiteSetupCard siteSetup={siteSetup} />}
 

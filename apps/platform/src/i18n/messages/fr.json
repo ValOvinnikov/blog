@@ -354,7 +354,9 @@
   "ownerHomePage": {
     "description": "Votre site en un coup d'œil. Tout ce qui figure ici est en ligne.",
     "trialTitle": "Essai {plan}",
-    "trialDescription": "Votre site dispose de toutes les fonctionnalités {plan} jusqu'au {date}. Aucune carte n'est nécessaire ; à la fin de l'essai, le site passe à {freePlan}.",
+    "trialDescription": "Votre site dispose de toutes les fonctionnalités {plan} jusqu’au <time>{date}</time>. Aucune carte n’est nécessaire ; à la fin de l’essai, le site passe à {freePlan}.",
+    "trialEndedTitle": "Essai {plan} terminé",
+    "trialEndedDescription": "Votre essai a pris fin le <time>{date}</time>. Le site passera bientôt à {freePlan}.",
     "yourSiteCardTitle": "Votre site",
     "nameLabel": "Nom",
     "publicDomainLabel": "Domaine public",

@@ -354,7 +354,9 @@
   "ownerHomePage": {
     "description": "Uw site in één oogopslag. Alles hier is live.",
     "trialTitle": "{plan}-proefperiode",
-    "trialDescription": "Je site heeft tot {date} alle {plan}-functies. Je hebt geen kaart nodig; na de proefperiode gaat de site naar {freePlan}.",
+    "trialDescription": "Uw site heeft tot <time>{date}</time> alle {plan}-functies. U hebt geen kaart nodig; na de proefperiode gaat de site naar {freePlan}.",
+    "trialEndedTitle": "{plan}-proefperiode afgelopen",
+    "trialEndedDescription": "Uw proefperiode is op <time>{date}</time> geëindigd. De site gaat binnenkort naar {freePlan}.",
     "yourSiteCardTitle": "Uw site",
     "nameLabel": "Naam",
     "publicDomainLabel": "Openbaar domein",

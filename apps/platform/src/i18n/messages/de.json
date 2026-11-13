@@ -354,7 +354,9 @@
   "ownerHomePage": {
     "description": "Ihre Website auf einen Blick. Alles hier ist live.",
     "trialTitle": "{plan}-Testphase",
-    "trialDescription": "Deine Website hat bis {date} alle {plan}-Funktionen. Du brauchst keine Karte; nach der Testphase wechselt die Website zu {freePlan}.",
+    "trialDescription": "Ihre Website hat bis <time>{date}</time> alle {plan}-Funktionen. Sie brauchen keine Karte; nach der Testphase wechselt die Website zu {freePlan}.",
+    "trialEndedTitle": "{plan}-Testphase beendet",
+    "trialEndedDescription": "Ihre Testphase endete am <time>{date}</time>. Die Website wechselt in Kürze zu {freePlan}.",
     "yourSiteCardTitle": "Ihre Website",
     "nameLabel": "Name",
     "publicDomainLabel": "Öffentliche Domain",

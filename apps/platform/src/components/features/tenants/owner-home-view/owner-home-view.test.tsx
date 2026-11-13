@@ -1,4 +1,4 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/db/constants';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
@@ -46,7 +46,9 @@ const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
 );
 
 const MOCK_TRIAL_ENDS_AT = new Date('2026-11-26T09:00:00.000Z');
+const MOCK_TRIAL_ENDS_ON = 'Nov 26, 2026';
 const TRIAL_TITLE = 'Growth trial';
+const TRIAL_ENDED_TITLE = 'Growth trial ended';
 
 const GET_STARTED_HEADING = { level: 2, name: 'Get started' } as const;
 
@@ -166,25 +168,31 @@ describe(`<${OwnerHomeView.name}/>`, () => {
     expect(archivedNotice).toBeVisible();
   });
 
-  describe('for a site on a trial', () => {
-    beforeEach(async () => {
+  it.each([
+    ['running', false, TRIAL_TITLE, MOCK_TRIAL_ENDS_ON],
+    ['ended', true, TRIAL_ENDED_TITLE, MOCK_TRIAL_ENDS_ON],
+  ])(
+    'notes a %s trial with its end date',
+    async (_, hasEnded, title, endsOn) => {
       await setup({
-        tenant: {
-          ...tenant,
-          status: TENANT_STATUS.TRIAL,
-          trialEndsAt: MOCK_TRIAL_ENDS_AT,
+        trial: {
+          plan: TENANT_PLAN.GROWTH,
+          endsAt: MOCK_TRIAL_ENDS_AT,
+          hasEnded,
         },
       });
-    });
 
-    it('says the site is on a Growth trial and when it ends', () => {
-      const title = screen.getByText(TRIAL_TITLE);
-      const endDate = screen.getByText(/until Nov 26, 2026/);
+      const notice = screen.getByRole('note');
+      const noticeTitle = within(notice).getByText(title);
+      const endDate = within(notice).getByText(endsOn);
 
-      expect(title).toBeVisible();
-      expect(endDate).toBeVisible();
-    });
-  });
+      expect(noticeTitle).toBeVisible();
+      expect(endDate).toHaveAttribute(
+        'datetime',
+        MOCK_TRIAL_ENDS_AT.toISOString(),
+      );
+    },
+  );
 
   describe('with a pending domain', () => {
     beforeEach(async () => {
