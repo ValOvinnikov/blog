@@ -3,6 +3,10 @@ import 'server-only';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
+import {
+  type TPlatformTenant,
+  toPlatformTenant,
+} from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
@@ -11,17 +15,12 @@ import { cache } from 'react';
 import { listSessionTenants } from './list-session-tenants';
 
 export type TDashboardTenantContext = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
   membership: TMembership;
   tenants: TTenant[];
 };
 
-/**
- * `/dashboard`'s tenant gate — resolves "which tenant" from the session's
- * own `memberships` and the "active tenant" cookie instead of a URL
- * segment. `cache()`-wrapped: a layout can't pass this down to its page, so
- * a route's layout and page would otherwise each resolve it separately.
- */
+// `cache()`-wrapped because a layout cannot pass its tenant to its page.
 export const resolveDashboardTenant = cache(
   async (): Promise<TDashboardTenantContext> => {
     const { memberships, tenants } = await listSessionTenants();
@@ -35,7 +34,7 @@ export const resolveDashboardTenant = cache(
         notFound();
       }
 
-      return { tenant, membership, tenants };
+      return { tenant: toPlatformTenant(tenant), membership, tenants };
     }
 
     const cookieStore = await cookies();
@@ -50,6 +49,10 @@ export const resolveDashboardTenant = cache(
       redirect(adminRoutes.dashboardSelectTenant());
     }
 
-    return { tenant: activeTenant, membership: activeMembership, tenants };
+    return {
+      tenant: toPlatformTenant(activeTenant),
+      membership: activeMembership,
+      tenants,
+    };
   },
 );

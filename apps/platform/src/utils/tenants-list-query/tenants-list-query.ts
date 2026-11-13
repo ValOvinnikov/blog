@@ -1,5 +1,5 @@
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import type { TMaybeUndefined } from '@blog/config/types';
+import type { TMaybeUndefined, TSearchParam } from '@blog/config/types';
 import type { TTenantSort } from '@blog/db/queries/tenants/list-tenants';
 import { z } from 'zod';
 
@@ -8,8 +8,6 @@ export type TTenantsListQuery = {
   sort: TTenantSort;
   search: string;
 };
-
-type TSearchParam = TMaybeUndefined<string | string[]>;
 
 export type TTenantsListSearchParams = {
   archived?: TSearchParam;

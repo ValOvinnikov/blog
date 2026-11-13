@@ -27,7 +27,8 @@
     "dataRequestsPage": "Solicitudes de datos",
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
-    "billing": "Facturación · Administración"
+    "billing": "Facturación · Administración",
+    "upgrade": "Mejorar plan"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -387,7 +388,8 @@
     "siteSetupNotStartedDescription": "No pudimos empezar a configurar tu sitio. Iníciala ahora: no se pierde nada.",
     "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
     "siteSetupStart": "Iniciar configuración",
-    "siteSetupStarting": "Iniciando…"
+    "siteSetupStarting": "Iniciando…",
+    "trialUpgrade": "Elegir un plan"
   },
   "getStartedCard": {
     "title": "Primeros pasos",
@@ -2128,7 +2130,8 @@
     "description": "Las opciones marcadas con <badge></badge> en esta página se activan con el plan Growth.",
     "show": "Ver qué incluye",
     "hide": "Ocultar",
-    "listLabel": "Qué añade Growth en esta página"
+    "listLabel": "Qué añade Growth en esta página",
+    "askAboutGrowth": "Saber más sobre Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Abrir tu panel",
@@ -2220,5 +2223,32 @@
     },
     "unavailableTitle": "Pagos y facturas no disponibles",
     "unavailableDescription": "No se han podido cargar ahora. Vuelve a cargar la página en un momento."
+  },
+  "upgradePage": {
+    "pageTitle": "Mejora tu plan",
+    "description": "Elige Starter o Growth y paga mensual o anualmente. Los impuestos se calculan al pagar.",
+    "checkoutTitle": "Pago",
+    "checkoutDescription": "Paga de forma segura sin salir de esta página. ¿Tienes un código promocional? Introdúcelo al pagar.",
+    "intervalLabel": "Periodo de facturación",
+    "MONTHLY": "Mensual",
+    "YEARLY": "Anual",
+    "checkoutFailed": "No se pudo iniciar el pago.",
+    "unconfigured": "Ahora mismo no se puede mejorar el plan. Inténtalo más tarde.",
+    "backToOverview": "Volver al resumen",
+    "confirmingTitle": "Confirmando tu pago",
+    "confirmingDescription": "Tu plan cambia en cuanto se confirme el pago, normalmente en menos de un minuto. Esta página se actualiza sola y también te enviaremos un correo.",
+    "NOT_OWNER": "Solo el propietario de tu sitio puede mejorar el plan.",
+    "UNAVAILABLE": "Podrás mejorar el plan cuando tu sitio vuelva a estar activo.",
+    "tryAgain": "Reintentar",
+    "slowTitle": "Esto está tardando más de lo habitual",
+    "slowDescription": "Puede que tu pago aún se esté confirmando. Vuelve a comprobarlo en un momento; también te enviaremos un correo cuando cambie tu plan.",
+    "checkAgain": "Volver a comprobar",
+    "PAYMENT_PENDING": "Estamos confirmando tu pago. Tu plan cambiará en cuanto se confirme, así que no hace falta volver a pagar.",
+    "planLabel": "Plan",
+    "subscribedTitle": "Tu sitio está en {plan}",
+    "subscribedDescription": "Su suscripción está activa, así que aquí no hay nada que comprar.",
+    "confirmedTitle": "Tu pago está confirmado",
+    "confirmedDescription": "Tu nuevo plan ya está activo en tu sitio.",
+    "SUBSCRIBED": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que comprar."
   }
 }

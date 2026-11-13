@@ -8,9 +8,7 @@ export const MOCK_FREE_STUDIO_ENTITLEMENTS = {
   modulePacks: [MODULE_PACK.CORE],
 };
 
-export const mockStudioReadyTenant = (
-  overrides: Partial<TTenant> = {},
-): TTenant =>
+export const mockStudioReadyTenant = (overrides: Partial<TTenant> = {}) =>
   mockReadyTenant({
     sanityReadTokenEncrypted: MOCK_SANITY_READ_TOKEN_ENCRYPTED,
     ...overrides,

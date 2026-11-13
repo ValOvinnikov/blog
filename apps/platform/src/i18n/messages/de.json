@@ -27,7 +27,8 @@
     "dataRequestsPage": "Datenanfragen",
     "signUpTitle": "Konto erstellen",
     "onboarding": "Website erstellen",
-    "billing": "Abrechnung · Admin"
+    "billing": "Abrechnung · Admin",
+    "upgrade": "Upgrade"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -387,7 +388,8 @@
     "siteSetupNotStartedDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Starten Sie sie jetzt – es geht nichts verloren.",
     "siteSetupNotStartedContactDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Bitten Sie Ihren Plattform-Kontakt, sie zu starten.",
     "siteSetupStart": "Einrichtung starten",
-    "siteSetupStarting": "Wird gestartet…"
+    "siteSetupStarting": "Wird gestartet…",
+    "trialUpgrade": "Tarif wählen"
   },
   "getStartedCard": {
     "title": "Erste Schritte",
@@ -2128,7 +2130,8 @@
     "description": "Mit <badge></badge> markierte Optionen auf dieser Seite gibt es im Growth-Tarif.",
     "show": "Das ist enthalten",
     "hide": "Ausblenden",
-    "listLabel": "Was Growth auf dieser Seite ergänzt"
+    "listLabel": "Was Growth auf dieser Seite ergänzt",
+    "askAboutGrowth": "Mehr über Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Dashboard öffnen",
@@ -2220,5 +2223,32 @@
     },
     "unavailableTitle": "Zahlungen und Rechnungen nicht verfügbar",
     "unavailableDescription": "Sie konnten gerade nicht geladen werden. Laden Sie die Seite gleich neu."
+  },
+  "upgradePage": {
+    "pageTitle": "Tarif upgraden",
+    "description": "Wähle Starter oder Growth und zahle monatlich oder jährlich. Die Steuer wird an der Kasse berechnet.",
+    "checkoutTitle": "Kasse",
+    "checkoutDescription": "Zahle sicher, ohne diese Seite zu verlassen. Hast du einen Aktionscode? Gib ihn an der Kasse ein.",
+    "intervalLabel": "Abrechnungszeitraum",
+    "MONTHLY": "Monatlich",
+    "YEARLY": "Jährlich",
+    "checkoutFailed": "Die Kasse konnte nicht starten.",
+    "unconfigured": "Ein Upgrade ist gerade nicht möglich. Versuche es später erneut.",
+    "backToOverview": "Zurück zur Übersicht",
+    "confirmingTitle": "Zahlung wird bestätigt",
+    "confirmingDescription": "Dein Tarif ändert sich, sobald die Zahlung bestätigt ist, meist innerhalb einer Minute. Diese Seite aktualisiert sich von selbst, und wir schicken dir auch eine E-Mail.",
+    "NOT_OWNER": "Nur der Inhaber deiner Website kann ein Upgrade durchführen.",
+    "UNAVAILABLE": "Ein Upgrade ist wieder möglich, sobald deine Website läuft.",
+    "tryAgain": "Erneut versuchen",
+    "slowTitle": "Das dauert länger als üblich",
+    "slowDescription": "Deine Zahlung wird vielleicht noch bestätigt. Prüfe es gleich noch einmal; wir schicken dir auch eine E-Mail, sobald sich dein Tarif ändert.",
+    "checkAgain": "Erneut prüfen",
+    "PAYMENT_PENDING": "Deine Zahlung wird gerade bestätigt. Dein Tarif ändert sich, sobald sie bestätigt ist, du musst also nicht erneut zahlen.",
+    "planLabel": "Tarif",
+    "subscribedTitle": "Deine Website nutzt {plan}",
+    "subscribedDescription": "Das Abonnement ist aktiv, hier gibt es also nichts zu kaufen.",
+    "confirmedTitle": "Deine Zahlung ist bestätigt",
+    "confirmedDescription": "Dein neuer Tarif ist auf deiner Website aktiv.",
+    "SUBSCRIBED": "Deine Website hat bereits einen kostenpflichtigen Tarif, hier gibt es also nichts zu kaufen."
   }
 }

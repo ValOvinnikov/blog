@@ -25,8 +25,10 @@ export const {
   stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID,
   stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
 } = mockStripeIds();
-export const { stripeSubscriptionId: MOCK_OTHER_STRIPE_SUBSCRIPTION_ID } =
-  mockStripeIds();
+export const {
+  stripeCustomerId: MOCK_REPLACEMENT_STRIPE_CUSTOMER_ID,
+  stripeSubscriptionId: MOCK_OTHER_STRIPE_SUBSCRIPTION_ID,
+} = mockStripeIds();
 export const MOCK_STRIPE_INVOICE_ID = `in_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_STRIPE_PROMOTION_CODE = billingFaker.string
   .alphanumeric(8)
@@ -36,6 +38,12 @@ export const MOCK_STORED_PROMOTION_CODE = billingFaker.string
   .toUpperCase();
 export const MOCK_STRIPE_WEBHOOK_SECRET = `whsec_${billingFaker.string.alphanumeric(32)}`;
 export const MOCK_STRIPE_SECRET_KEY = `sk_test_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_STRIPE_PUBLISHABLE_KEY = `pk_test_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_STRIPE_PRICE_ID = `price_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_STRIPE_PROMOTION_CODE_ID = `promo_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_CHECKOUT_CLIENT_SECRET = `cs_test_${billingFaker.string.alphanumeric(32)}`;
+export const MOCK_CHECKOUT_SESSION_ID = `cs_test_${billingFaker.string.alphanumeric(24)}`;
+export const MOCK_CHECKOUT_RETURN_URL = billingFaker.internet.url();
 export const MOCK_INVOICE_PDF_URL = billingFaker.internet.url();
 export const MOCK_HOSTED_INVOICE_URL = billingFaker.internet.url();
 export const MOCK_BILLING_PORTAL_URL = billingFaker.internet.url();

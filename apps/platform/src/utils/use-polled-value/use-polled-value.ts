@@ -24,6 +24,7 @@ type TPolledValue<TValue> = {
   value: TValue;
   setValue: Dispatch<SetStateAction<TValue>>;
   restart: () => void;
+  isExhausted: boolean;
 };
 
 export const usePolledValue = <TValue>(
@@ -43,6 +44,7 @@ export const usePolledValue = <TValue>(
     useState(initialValue);
   const [value, setValue] = useState(initialValue);
   const [restartCount, setRestartCount] = useState(0);
+  const [isExhausted, setIsExhausted] = useState(false);
   const ticksRef = useRef(0);
   const isVisible = useDocumentVisible();
 
@@ -50,6 +52,7 @@ export const usePolledValue = <TValue>(
     setRenderedKey(key);
     setRenderedInitialValue(initialValue);
     setValue(initialValue);
+    setIsExhausted(false);
   }
 
   const shouldPoll = isActive(value) && isVisible;
@@ -76,6 +79,7 @@ export const usePolledValue = <TValue>(
       ticksRef.current += 1;
       if (ticksRef.current >= maxTicks) {
         clearInterval(intervalId);
+        setIsExhausted(true);
       }
 
       fetchValue()
@@ -97,7 +101,10 @@ export const usePolledValue = <TValue>(
     };
   }, [key, initialValue, restartCount, shouldPoll, intervalMs, maxTicks]);
 
-  const restart = () => setRestartCount((count) => count + 1);
+  const restart = () => {
+    setIsExhausted(false);
+    setRestartCount((count) => count + 1);
+  };
 
-  return { value, setValue, restart };
+  return { value, setValue, restart, isExhausted };
 };

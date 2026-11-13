@@ -27,7 +27,8 @@
     "dataRequestsPage": "Gegevensverzoeken",
     "signUpTitle": "Account aanmaken",
     "onboarding": "Je site maken",
-    "billing": "Facturering · Admin"
+    "billing": "Facturering · Admin",
+    "upgrade": "Upgraden"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -387,7 +388,8 @@
     "siteSetupNotStartedDescription": "We konden het inrichten van je site niet starten. Start het nu; er gaat niets verloren.",
     "siteSetupNotStartedContactDescription": "We konden het inrichten van je site niet starten. Vraag je platformcontactpersoon het te starten.",
     "siteSetupStart": "Inrichten starten",
-    "siteSetupStarting": "Wordt gestart…"
+    "siteSetupStarting": "Wordt gestart…",
+    "trialUpgrade": "Kies een abonnement"
   },
   "getStartedCard": {
     "title": "Aan de slag",
@@ -2128,7 +2130,8 @@
     "description": "Opties met <badge></badge> op deze pagina komen beschikbaar met het Growth-abonnement.",
     "show": "Bekijk wat erbij zit",
     "hide": "Verbergen",
-    "listLabel": "Wat Growth op deze pagina toevoegt"
+    "listLabel": "Wat Growth op deze pagina toevoegt",
+    "askAboutGrowth": "Meer over Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open je dashboard",
@@ -2220,5 +2223,32 @@
     },
     "unavailableTitle": "Betalingen en facturen niet beschikbaar",
     "unavailableDescription": "Ze konden nu niet worden geladen. Laad de pagina zo opnieuw."
+  },
+  "upgradePage": {
+    "pageTitle": "Je abonnement upgraden",
+    "description": "Kies Starter of Growth en betaal per maand of per jaar. Belasting wordt bij het afrekenen berekend.",
+    "checkoutTitle": "Afrekenen",
+    "checkoutDescription": "Betaal veilig zonder deze pagina te verlaten. Heb je een kortingscode? Vul die in bij het afrekenen.",
+    "intervalLabel": "Factuurperiode",
+    "MONTHLY": "Maandelijks",
+    "YEARLY": "Jaarlijks",
+    "checkoutFailed": "Afrekenen kon niet starten.",
+    "unconfigured": "Upgraden is nu niet mogelijk. Probeer het later opnieuw.",
+    "backToOverview": "Terug naar Overzicht",
+    "confirmingTitle": "Je betaling wordt bevestigd",
+    "confirmingDescription": "Je abonnement verandert zodra de betaling is bevestigd, meestal binnen een minuut. Deze pagina werkt zichzelf bij, en we sturen je ook een e-mail.",
+    "NOT_OWNER": "Alleen de eigenaar van je site kan upgraden.",
+    "UNAVAILABLE": "Upgraden kan weer zodra je site actief is.",
+    "tryAgain": "Opnieuw proberen",
+    "slowTitle": "Dit duurt langer dan normaal",
+    "slowDescription": "Je betaling wordt misschien nog bevestigd. Controleer het zo opnieuw; we sturen je ook een e-mail zodra je abonnement verandert.",
+    "checkAgain": "Opnieuw controleren",
+    "PAYMENT_PENDING": "Je betaling wordt bevestigd. Je abonnement verandert zodra dat gebeurd is, dus je hoeft niet opnieuw te betalen.",
+    "planLabel": "Abonnement",
+    "subscribedTitle": "Je site gebruikt {plan}",
+    "subscribedDescription": "Het abonnement is actief, dus hier valt niets te kopen.",
+    "confirmedTitle": "Je betaling is bevestigd",
+    "confirmedDescription": "Je nieuwe abonnement is actief op je site.",
+    "SUBSCRIBED": "Je site heeft al een betaald abonnement, dus hier valt niets te kopen."
   }
 }

@@ -27,7 +27,8 @@
     "dataRequestsPage": "Data requests",
     "signUpTitle": "Create an account",
     "onboarding": "Create your site",
-    "billing": "Billing · Admin"
+    "billing": "Billing · Admin",
+    "upgrade": "Upgrade"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -387,7 +388,8 @@
     "siteSetupNotStartedDescription": "We couldn't start setting up your site. Start it now — nothing is lost.",
     "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
     "siteSetupStart": "Start setup",
-    "siteSetupStarting": "Starting…"
+    "siteSetupStarting": "Starting…",
+    "trialUpgrade": "Choose a plan"
   },
   "getStartedCard": {
     "title": "Get started",
@@ -2128,7 +2130,8 @@
     "description": "Options marked <badge></badge> on this page open up on the Growth plan.",
     "show": "See what's included",
     "hide": "Hide",
-    "listLabel": "What Growth adds on this page"
+    "listLabel": "What Growth adds on this page",
+    "askAboutGrowth": "Ask about Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open your dashboard",
@@ -2220,5 +2223,32 @@
     },
     "unavailableTitle": "Payments and invoices unavailable",
     "unavailableDescription": "They couldn't be loaded just now. Reload the page in a moment."
+  },
+  "upgradePage": {
+    "pageTitle": "Upgrade your plan",
+    "description": "Choose Starter or Growth and pay monthly or yearly. Tax is worked out at checkout.",
+    "checkoutTitle": "Checkout",
+    "checkoutDescription": "Pay securely without leaving this page. Have a promotion code? Enter it at checkout.",
+    "intervalLabel": "Billing period",
+    "MONTHLY": "Monthly",
+    "YEARLY": "Yearly",
+    "checkoutFailed": "Checkout couldn't start.",
+    "unconfigured": "Upgrading isn't available right now. Try again later.",
+    "backToOverview": "Back to Overview",
+    "confirmingTitle": "Confirming your payment",
+    "confirmingDescription": "Your plan changes as soon as the payment is confirmed, usually within a minute. This page updates by itself, and we'll email you too.",
+    "NOT_OWNER": "Only your site's owner can upgrade it.",
+    "UNAVAILABLE": "Upgrading opens again once your site is running.",
+    "tryAgain": "Try again",
+    "slowTitle": "This is taking longer than usual",
+    "slowDescription": "Your payment may still be confirming. Check again in a moment; we'll also email you once your plan changes.",
+    "checkAgain": "Check again",
+    "PAYMENT_PENDING": "Your payment is being confirmed. Your plan changes as soon as it is, so there's no need to pay again.",
+    "planLabel": "Plan",
+    "subscribedTitle": "Your site is on {plan}",
+    "subscribedDescription": "Its subscription is active, so there's nothing to buy here.",
+    "confirmedTitle": "Your payment is confirmed",
+    "confirmedDescription": "Your new plan is active on your site.",
+    "SUBSCRIBED": "Your site already has a paid plan, so there's nothing to buy here."
   }
 }

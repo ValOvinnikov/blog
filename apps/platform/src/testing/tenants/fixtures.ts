@@ -1,22 +1,5 @@
-import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config';
-import {
-  DEPROVISIONING_STEP,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_PROVISIONING_STEP,
-  TENANT_PROVISIONING_STEP_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
-import type {
-  TDeprovisioningStepState,
-  TProvisioningStepState,
-  TTenant,
-  TTenantDeprovisioningState,
-  TTenantProvisioningState,
-} from '@blog/db/schema/tenants';
-import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
-import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
-import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
+import type { TTenant } from '@blog/db/schema/tenants';
 import { faker } from '@faker-js/faker';
 import {
   toClientTenant,
@@ -27,101 +10,13 @@ import {
   type TTenantsListQuery,
 } from '@platform/utils/tenants-list-query/tenants-list-query';
 
-export const mockIdleProvisioningSteps = (): TTenantProvisioningState => {
-  const idle: TProvisioningStepState = {
-    status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  };
+import { mockReadyTenant, mockTenant } from './mock-tenant';
+import { MOCK_TENANT_DOMAIN, MOCK_TENANT_NAME } from './tenant-identity';
 
-  return {
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: idle,
-    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: idle,
-    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: idle,
-    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: idle,
-    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: idle,
-    [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: idle,
-    [TENANT_PROVISIONING_STEP.OWNER_ELEVATION]: idle,
-  };
-};
+export * from './mock-tenant';
+export * from './provisioning-steps';
+export * from './tenant-identity';
 
-export const mockIdleDeprovisioningSteps = (): TTenantDeprovisioningState => {
-  const idle: TDeprovisioningStepState = {
-    status: TENANT_PROVISIONING_STEP_STATUS.IDLE,
-  };
-
-  return {
-    [DEPROVISIONING_STEP.REMOVE_DOMAIN]: idle,
-    [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: idle,
-    [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: idle,
-    [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: idle,
-    [DEPROVISIONING_STEP.ARCHIVE_TENANT]: idle,
-    [DEPROVISIONING_STEP.PURGE_READER_DATA]: idle,
-    [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: idle,
-  };
-};
-
-export const mockDoneDeprovisioningSteps = (): TTenantDeprovisioningState => {
-  const done: TDeprovisioningStepState = {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  };
-
-  return {
-    [DEPROVISIONING_STEP.REMOVE_DOMAIN]: done,
-    [DEPROVISIONING_STEP.ARCHIVE_SANITY_PROJECT]: done,
-    [DEPROVISIONING_STEP.REVOKE_SANITY_TOKENS]: done,
-    [DEPROVISIONING_STEP.CLEAR_ARTIFACTS]: done,
-    [DEPROVISIONING_STEP.ARCHIVE_TENANT]: done,
-    [DEPROVISIONING_STEP.PURGE_READER_DATA]: done,
-    [DEPROVISIONING_STEP.INVALIDATE_TENANT_CACHE]: done,
-  };
-};
-
-export const mockDoneProvisioningSteps = (): TTenantProvisioningState => {
-  const done: TProvisioningStepState = {
-    status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-  };
-
-  return {
-    ...mockIdleProvisioningSteps(),
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: done,
-    [TENANT_PROVISIONING_STEP.SEED_CONTENT]: done,
-    [TENANT_PROVISIONING_STEP.PERSIST_TOKEN]: done,
-    [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: done,
-    [TENANT_PROVISIONING_STEP.CREATE_WEBHOOK]: done,
-    [TENANT_PROVISIONING_STEP.VERIFY_CONTENT]: done,
-  };
-};
-
-export const mockFirstStepRunningProvisioningSteps =
-  (): TTenantProvisioningState => ({
-    ...mockIdleProvisioningSteps(),
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.RUNNING,
-    },
-  });
-
-export const mockFirstStepDoneProvisioningSteps =
-  (): TTenantProvisioningState => ({
-    ...mockIdleProvisioningSteps(),
-    [TENANT_PROVISIONING_STEP.SANITY_PROJECT]: {
-      status: TENANT_PROVISIONING_STEP_STATUS.DONE,
-    },
-  });
-
-export const mockMapDomainFailedProvisioningSteps = (
-  error: string,
-): TTenantProvisioningState => ({
-  ...mockIdleProvisioningSteps(),
-  [TENANT_PROVISIONING_STEP.MAP_DOMAIN]: {
-    status: TENANT_PROVISIONING_STEP_STATUS.FAILED,
-    error,
-  },
-});
-
-export const MOCK_TENANT_ID = faker.string.uuid();
-export const MOCK_TENANT_NAME = 'Acme Inc.';
-export const MOCK_TENANT_SLUG = 'acme';
-export const MOCK_TENANT_ROOT_DOMAIN = 'example.com';
-export const MOCK_TENANT_DOMAIN = `${MOCK_TENANT_SLUG}.${MOCK_TENANT_ROOT_DOMAIN}`;
 export const MOCK_TENANT_URL = `https://${MOCK_TENANT_DOMAIN}`;
 export const MOCK_VERCEL_A_RECORD = '76.76.21.21';
 export const MOCK_OTHER_TENANT_ID = faker.string.uuid();
@@ -161,61 +56,6 @@ export const MOCK_RUN_PLUS_2_MIN_AT = '2026-08-12T14:20:30.000Z';
 export const MOCK_RUN_PLUS_4_MIN_AT = '2026-08-12T14:22:30.000Z';
 export const MOCK_RUN_PLUS_6_MIN_AT = '2026-08-12T14:24:30.000Z';
 export const MOCK_RUN_PLUS_7_MIN_AT = '2026-08-12T14:25:30.000Z';
-
-export const MOCK_SANITY_PROJECT_ID = 'proj-1';
-export const MOCK_TENANT_CREATED_AT = new Date('2026-04-02T00:00:00.000Z');
-const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');
-
-export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
-  id: MOCK_TENANT_ID,
-  name: MOCK_TENANT_NAME,
-  primaryDomain: MOCK_TENANT_DOMAIN,
-  sanityProjectId: null,
-  sanityDataset: null,
-  sanityReadTokenEncrypted: null,
-  sanityWriteTokenEncrypted: null,
-  sanityManagementTokenEncrypted: null,
-  sanityManagementRobotId: null,
-  revalidateWebhookSecretEncrypted: null,
-  locale: LOCALE_ISO_CODES.EN,
-  additionalLocales: [],
-  plan: TENANT_PLAN.FREE,
-  status: TENANT_STATUS.ACTIVE,
-  provisioningStatus: TENANT_PROVISIONING_STATUS.PENDING,
-  provisioningSteps: mockIdleProvisioningSteps(),
-  deprovisioningSteps: null,
-  siteType: null,
-  siteTemplateVersion: null,
-  selfServeOwnerEmailIndex: null,
-  ...MOCK_NO_OWNER_ACCESS,
-  unsentReinviteFormerOwnerEmailEncrypted: null,
-  lastActivityAt: MOCK_TENANT_CREATED_AT,
-  ...MOCK_NO_HOLD,
-  ...MOCK_NO_BILLING,
-  contentMigrationFailedAt: null,
-  firstPostPublishedAt: null,
-  lastNotifiedOwnerElevationOutcome: null,
-  seededAt: null,
-  webhookCreatedAt: null,
-  deprovisionedAt: null,
-  createdAt: MOCK_TENANT_CREATED_AT,
-  updatedAt: MOCK_TENANT_CREATED_AT,
-  ...overrides,
-});
-
-const MOCK_READY_TENANT_DATASET = faker.word.noun();
-
-export const mockReadyTenant = (overrides: Partial<TTenant> = {}): TTenant =>
-  mockTenant({
-    sanityProjectId: MOCK_SANITY_PROJECT_ID,
-    sanityDataset: MOCK_READY_TENANT_DATASET,
-    locale: LOCALE_ISO_CODES.EN,
-    provisioningStatus: TENANT_PROVISIONING_STATUS.READY,
-    provisioningSteps: mockDoneProvisioningSteps(),
-    seededAt: TENANT_SEEDED_AT,
-    webhookCreatedAt: TENANT_SEEDED_AT,
-    ...overrides,
-  });
 
 export const mockClientTenant = (
   overrides: Partial<TTenant> = {},

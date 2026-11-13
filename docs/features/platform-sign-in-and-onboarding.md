@@ -213,13 +213,14 @@ site as a 14-day Growth trial, with no card.
 
 - **Trial on `/dashboard`.** While the site is in TRIAL with a
   `trial_ends_at`, the owner's Overview shows an info note under the header
-  (`TrialNotice`, `role="note"`; the page derives it with `trialFor`): the
+  (`TrialNotice`, `role="note"`; the page reads `tenant.trial`, which `toPlatformTenant` adds when the tenant loads): the
   plan, the end date in a `<time>` element, that no card is needed, and that
   the site then moves to Free. Once the end date has passed, and until the
   daily sweep moves the site to Free, it says the trial ended on that date
-  and the site moves to Free shortly (`ownerHomePage.trialEnded*`). It has no
-  Upgrade action until the Checkout page exists; every member sees the
-  Overview, so that action will need an owner gate.
+  and the site moves to Free shortly (`ownerHomePage.trialEnded*`). For the
+  real owner of a site that can buy a plan (`upgradeStateFor` is
+  `AVAILABLE`), it carries a "Choose a plan" link to the Upgrade page
+  ([billing](./billing.md)); other members see no action.
 
 - **First run on `/dashboard`.** Once provisioning is READY, the owner's
   Overview shows a "Get started" card after the site setup card and before
