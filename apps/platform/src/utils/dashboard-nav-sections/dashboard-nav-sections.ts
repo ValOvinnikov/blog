@@ -47,5 +47,19 @@ export const dashboardNavSections = (
       label: t('configurationSectionLabel'),
       items: configurationNavItems(t, hrefs, access, unreadLeadsCount),
     },
+    ...(access.billing
+      ? [
+          {
+            label: t('accountSectionLabel'),
+            items: [
+              {
+                label: t('billing'),
+                icon: ICONS.CHECK_SHEET,
+                href: adminRoutes.dashboardBilling(),
+              },
+            ],
+          },
+        ]
+      : []),
   ];
 };

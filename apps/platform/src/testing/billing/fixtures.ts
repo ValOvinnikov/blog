@@ -11,6 +11,7 @@ import {
 import {
   MILLISECONDS_PER_SECOND,
   STRIPE_EVENT_TYPE,
+  STRIPE_INVOICE_STATUS,
   STRIPE_SUBSCRIPTION_STATUS,
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
@@ -44,6 +45,8 @@ export const MOCK_CHECKOUT_CLIENT_SECRET = `cs_test_${billingFaker.string.alphan
 export const MOCK_CHECKOUT_SESSION_ID = `cs_test_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_CHECKOUT_RETURN_URL = billingFaker.internet.url();
 export const MOCK_INVOICE_PDF_URL = billingFaker.internet.url();
+export const MOCK_HOSTED_INVOICE_URL = billingFaker.internet.url();
+export const MOCK_BILLING_PORTAL_URL = billingFaker.internet.url();
 export const MOCK_UNHANDLED_EVENT_TYPE = 'customer.created';
 export const MOCK_INCOMPLETE_SUBSCRIPTION_STATUS = 'incomplete';
 export const MOCK_BAND_CEILING: TPaidSubscriberBandCeiling = 2_500;
@@ -54,7 +57,8 @@ export const MOCK_GROWTH_UPGRADE = {
   toPlan: TENANT_PLAN.GROWTH,
 };
 
-const MOCK_AMOUNT_PAID = 2900;
+export const MOCK_AMOUNT_PAID = 2900;
+export const MOCK_STRIPE_CURRENCY = 'usd';
 
 const mockSubscriptionItem = (
   lookupKey: TStripePriceLookupKey,
@@ -89,7 +93,11 @@ export const mockStripeInvoice = (
   ({
     id: MOCK_STRIPE_INVOICE_ID,
     amount_paid: MOCK_AMOUNT_PAID,
-    currency: 'usd',
+    amount_due: MOCK_AMOUNT_PAID,
+    total: MOCK_AMOUNT_PAID,
+    status: STRIPE_INVOICE_STATUS.PAID,
+    next_payment_attempt: null,
+    currency: MOCK_STRIPE_CURRENCY,
     invoice_pdf: MOCK_INVOICE_PDF_URL,
     hosted_invoice_url: null,
     created: Math.floor(

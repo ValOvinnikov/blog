@@ -17,6 +17,10 @@ export const BILLING_LOG = {
   CHECKOUT_FAILED: 'billing.checkout_failed',
   CHECKOUT_CUSTOMER_REPLACED: 'billing.checkout_customer_replaced',
   CHECKOUT_PROMO_REFUSED: 'billing.checkout_promo_refused',
+  STRIPE_UNCONFIGURED: 'billing.stripe_unconfigured',
+  OVERVIEW_FAILED: 'billing.overview_failed',
+  NEXT_PAYMENT_FAILED: 'billing.next_payment_failed',
+  PORTAL_FAILED: 'billing.portal_failed',
 } as const;
 
 export const STRIPE_EVENT_TYPE = {
@@ -39,10 +43,6 @@ export const STRIPE_CHECKOUT_SESSION_STATUS = {
   OPEN: 'open',
 } as const;
 
-export const STRIPE_ERROR_CODE = {
-  RESOURCE_MISSING: 'resource_missing',
-} as const;
-
 export const STRIPE_CUSTOMER_IDEMPOTENCY_PREFIX = 'tenant-customer-';
 
 export const STRIPE_LIVE_SUBSCRIPTION_STATUSES = [
@@ -50,6 +50,35 @@ export const STRIPE_LIVE_SUBSCRIPTION_STATUSES = [
   STRIPE_SUBSCRIPTION_STATUS.TRIALING,
   STRIPE_SUBSCRIPTION_STATUS.PAST_DUE,
 ] as const;
+
+export const STRIPE_INVOICE_STATUS = {
+  OPEN: 'open',
+  PAID: 'paid',
+  UNCOLLECTIBLE: 'uncollectible',
+  VOID: 'void',
+} as const;
+
+export const BILLED_INVOICE_STATUSES = Object.values(STRIPE_INVOICE_STATUS);
+
+export const STRIPE_ERROR_CODE = {
+  INVOICE_UPCOMING_NONE: 'invoice_upcoming_none',
+  RESOURCE_MISSING: 'resource_missing',
+} as const;
+
+export const BILLING_OVERVIEW_STATE = {
+  NO_CUSTOMER: 'NO_CUSTOMER',
+  LOADED: 'LOADED',
+  UNAVAILABLE: 'UNAVAILABLE',
+} as const;
+
+export const BILLING_REFUSAL = {
+  NO_CUSTOMER: 'NO_CUSTOMER',
+} as const;
+
+// Stripe's largest page, so one request lists eight years of monthly invoices.
+export const BILLING_INVOICE_LIMIT = 100;
+
+export const PLAN_CARD_ROW_COUNT = 2;
 
 export const BILLING_GRACE = {
   START: 'START',
@@ -100,3 +129,7 @@ export const UPGRADE_POLL = {
   INTERVAL_MS: 2_000,
   MAX_TICKS: 30,
 } as const;
+
+export type TBilledInvoiceStatus = TValueOf<typeof STRIPE_INVOICE_STATUS>;
+
+export type TBillingRefusal = TValueOf<typeof BILLING_REFUSAL>;

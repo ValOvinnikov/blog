@@ -60,6 +60,7 @@ describe(planPageAccess, () => {
       leads: false,
       subscribers: false,
       team: false,
+      billing: true,
     });
   });
 
@@ -72,6 +73,7 @@ describe(planPageAccess, () => {
       leads: true,
       subscribers: false,
       team: false,
+      billing: true,
     });
   });
 
@@ -84,6 +86,7 @@ describe(planPageAccess, () => {
       leads: true,
       subscribers: true,
       team: true,
+      billing: true,
     });
   });
 
@@ -131,19 +134,14 @@ describe(planPageAccess, () => {
     expect(team).toBe(false);
   });
 
-  it('opens Team on any plan with more than one seat', () => {
-    entitlements[TENANT_PLAN.FREE] = { seats: 2 };
+  it.each([
+    [2, true],
+    [1, false],
+  ])('opens Team on a plan with %i seats: %s', (seats, isOpen) => {
+    entitlements[TENANT_PLAN.FREE] = { seats };
 
     const { team } = planPageAccess(TENANT_PLAN.FREE);
 
-    expect(team).toBe(true);
-  });
-
-  it('keeps Team closed on a one-seat plan', () => {
-    entitlements[TENANT_PLAN.GROWTH] = { seats: 1 };
-
-    const { team } = planPageAccess(TENANT_PLAN.GROWTH);
-
-    expect(team).toBe(false);
+    expect(team).toBe(isOpen);
   });
 });

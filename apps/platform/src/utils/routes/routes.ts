@@ -73,6 +73,7 @@ export const adminRoutes = {
   dashboardEmail: () => '/dashboard/email',
   dashboardLeads: () => '/dashboard/leads',
   dashboardUpgrade: () => '/dashboard/upgrade',
+  dashboardBilling: () => '/dashboard/billing',
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>

@@ -3,7 +3,6 @@ import { queries, TENANT_STATUS } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isNull, isUndefined } from '@blog/utils/primitives';
 import { ContentWorkspaceCard } from '@platform/components/features/tenants/content-workspace-card';
-import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { FindingsCard } from '@platform/components/features/tenants/findings-card';
 import { LiveDomainCard } from '@platform/components/features/tenants/live-domain-card';
 import { NewsletterPauseCard } from '@platform/components/features/tenants/newsletter-pause-card';
@@ -13,6 +12,8 @@ import { RecentActivityCard } from '@platform/components/features/tenants/recent
 import { TenantOverviewFocusProvider } from '@platform/components/features/tenants/tenant-overview-focus-provider';
 import { TenantOverviewHeader } from '@platform/components/features/tenants/tenant-overview-header';
 import { TenantSuspensionControl } from '@platform/components/features/tenants/tenant-suspension-control';
+import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
+import { DOMAIN_CARD_ROW_COUNT } from '@platform/constants/domain';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
@@ -89,7 +90,9 @@ export const TenantOverviewView = async ({
 
         <div className={cardsGrid()}>
           <div className={cardsColumn()}>
-            <Suspense fallback={<DomainCardSkeleton />}>
+            <Suspense
+              fallback={<DetailCardSkeleton rowCount={DOMAIN_CARD_ROW_COUNT} />}
+            >
               <LiveDomainCard
                 tenant={clientTenant}
                 domainVerificationStatus={domainVerificationStatus}

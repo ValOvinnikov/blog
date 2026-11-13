@@ -4,20 +4,21 @@ import { detailListVariants } from '@platform/components/shared/detail-list/deta
 import { Skeleton } from '@platform/components/shared/skeleton';
 import { Fragment } from 'react';
 
-import { domainCardSkeletonVariants } from './domain-card-skeleton-variants';
+import { detailCardSkeletonVariants } from './detail-card-skeleton-variants';
 
-const ROW_KEYS = ['status', 'domain', 'last-checked'];
-
-export type TDomainCardSkeletonProps = {
+export type TDetailCardSkeletonProps = {
+  rowCount: number;
   isStackedToLg?: boolean;
 };
 
-export const DomainCardSkeleton = ({
+export const DetailCardSkeleton = ({
+  rowCount,
   isStackedToLg = false,
-}: TDomainCardSkeletonProps) => {
-  const { title, action, term, value } = domainCardSkeletonVariants();
+}: TDetailCardSkeletonProps) => {
+  const { title, action, term, value } = detailCardSkeletonVariants();
   const { header: cardHeader, headerActions, body: cardBody } = cardVariants();
   const { root: detailList } = detailListVariants({ isStackedToLg });
+  const rows = Array.from({ length: rowCount }, (_, index) => index);
 
   return (
     <Card>
@@ -29,8 +30,8 @@ export const DomainCardSkeleton = ({
       </div>
       <div className={cardBody()}>
         <div className={detailList()}>
-          {ROW_KEYS.map((key) => (
-            <Fragment key={key}>
+          {rows.map((row) => (
+            <Fragment key={row}>
               <Skeleton className={term()} />
               <Skeleton className={value()} />
             </Fragment>
