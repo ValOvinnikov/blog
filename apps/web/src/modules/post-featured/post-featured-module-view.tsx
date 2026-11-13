@@ -1,20 +1,22 @@
 import { DISPLAY_MODE } from '@blog/config';
 import type { TPostFeaturedModule } from '@blog/service';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { CardCarousel } from '@web/components/shared/card-carousel';
 import {
   type IMediaCardData,
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type ISectionProps } from '@web/components/shared/section';
 
 import { postFeaturedModuleViewVariants } from './post-featured-module-view-variants';
 
-export interface IPostFeaturedModuleViewProps extends Omit<
+export interface IPostFeaturedModuleViewProps extends Pick<
   TPostFeaturedModule,
-  'posts' | 'showImages'
+  'headingBlock' | 'contentAlignment' | 'displayMode'
 > {
+  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
   items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
@@ -22,10 +24,9 @@ export interface IPostFeaturedModuleViewProps extends Omit<
 }
 
 export const PostFeaturedModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   items,
-  layout,
   titleId,
   dataTestId,
   contentAlignment,
@@ -34,6 +35,7 @@ export const PostFeaturedModuleView = ({
 }: IPostFeaturedModuleViewProps) => {
   const v = postFeaturedModuleViewVariants();
 
+  const { brandVariant, layout, appearance } = section;
   const { heading } = headingBlock;
 
   const [leadPost, ...tailPosts] = items;
@@ -43,6 +45,7 @@ export const PostFeaturedModuleView = ({
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -79,7 +82,7 @@ export const PostFeaturedModuleView = ({
               dataTestId={`${dataTestId}-tail`}
             />
           )}
-          {tailPosts.length > 1 && (
+          {hasArrayGotMultipleItems(tailPosts) && (
             <CardGrid columns={2} dataTestId={`${dataTestId}-tail-grid`}>
               {tailPosts.map((post) => (
                 <MediaCardItem key={post.id} item={post} hasImage={hasImages} />

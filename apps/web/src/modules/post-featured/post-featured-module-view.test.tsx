@@ -10,6 +10,11 @@ import {
   mockPostListItem,
 } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_RADIUS_OVERRIDE_SECTION,
+  MOCK_RADIUS_OVERRIDE_VALUE,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
@@ -39,10 +44,9 @@ const MOCK_THIRD_POST = mockPostListItem({
 });
 
 const setup = customRender(PostFeaturedModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_POST_FEATURED_HEADING }),
   items: [MOCK_LEAD_POST],
-  layout: undefined,
   contentAlignment: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
@@ -147,6 +151,24 @@ describe(`<${PostFeaturedModuleView.name}/>`, () => {
     expect(leadTitle).not.toBeInTheDocument();
     expect(articles).toHaveLength(3);
   });
+
+  it.each([DISPLAY_MODE.GRID, DISPLAY_MODE.CAROUSEL])(
+    'scopes its style overrides to its section in %s mode',
+    (displayMode) => {
+      setup({
+        displayMode,
+        section: MOCK_RADIUS_OVERRIDE_SECTION,
+      });
+
+      const section = screen.getByRole('region', {
+        name: MOCK_POST_FEATURED_HEADING,
+      });
+
+      expect(section.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        MOCK_RADIUS_OVERRIDE_VALUE,
+      );
+    },
+  );
 
   it('renders the lead card media when images are enabled', () => {
     setup({ hasImages: true });
