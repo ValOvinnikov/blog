@@ -2,10 +2,10 @@ import { SIZE } from '@blog/config';
 import { CONTROL_MODE } from '@platform/constants/control-mode';
 import { DISABLED_READONLY_SURFACE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import {
+  EDITABLE_SHELL_FOCUS_CLASSES,
   FIELD_FOCUS_CLASSES,
   FIELD_SURFACE_CLASSES,
 } from '@platform/utils/field-surface-classes/field-surface-classes';
-import { SURFACE_EDITABLE_SHELL_FOCUS_RING_CLASSES } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { INVALID_SURFACE_CLASSES } from '@platform/utils/invalid-state-classes/invalid-state-classes';
 import { tv } from '@platform/utils/tv/tv';
 import type { VariantProps } from 'tailwind-variants';
@@ -30,7 +30,7 @@ export const portableTextEditorVariants = tv({
         root: [
           'rounded-admin-control border border-admin-control-line bg-admin-surface',
           'has-[[contenteditable][data-invalid]]:border-admin-bad-line',
-          SURFACE_EDITABLE_SHELL_FOCUS_RING_CLASSES,
+          EDITABLE_SHELL_FOCUS_CLASSES,
         ],
         editable: [
           'min-h-18 px-2.5 py-2 outline-hidden',

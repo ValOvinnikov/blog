@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const NAV_ROW_SHAPE =
@@ -40,8 +42,7 @@ export const sidebarVariants = tv({
     row: [
       NAV_ROW_SHAPE,
       'transition-colors duration-base ease-smooth',
-      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-admin-side-accent',
-      'focus-visible:ring-offset-2 focus-visible:ring-offset-admin-side',
+      focusRingClasses(FOCUS_RING_GROUND.SIDE),
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-0',
     ],
     note: [
@@ -54,8 +55,7 @@ export const sidebarVariants = tv({
     state: {
       active: {
         row: [
-          'bg-admin-side-raised font-semibold text-admin-text-strong shadow-admin',
-          'focus-visible:shadow-none',
+          'bg-admin-side-raised font-semibold text-admin-brand-ink shadow-admin',
           NAV_CURRENT_BAR,
           'before:inset-y-2 before:bg-admin-side-accent',
         ],

@@ -21,7 +21,9 @@ export const stepIndicatorVariants = tv({
       [STEP_INDICATOR_STATE.RUNNING]: {
         circle: ['bg-admin-warn text-admin-on-brand-ink'],
       },
-      [STEP_INDICATOR_STATE.ACTIVE]: { circle: ['bg-admin-brand text-white'] },
+      [STEP_INDICATOR_STATE.ACTIVE]: {
+        circle: ['bg-admin-brand text-admin-on-brand-ink'],
+      },
       [STEP_INDICATOR_STATE.UPCOMING]: {
         circle: ['bg-admin-line-2 text-admin-muted'],
       },

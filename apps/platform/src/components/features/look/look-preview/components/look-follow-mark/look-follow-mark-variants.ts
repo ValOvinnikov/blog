@@ -8,7 +8,7 @@ export const lookFollowMarkVariants = tv({
     ],
     tag: [
       'absolute left-0 z-2 flex items-center whitespace-nowrap',
-      'bg-admin-follow-mark font-admin leading-none font-semibold text-white',
+      'bg-admin-follow-mark font-admin leading-none font-semibold text-admin-on-brand-ink',
     ],
   },
   variants: {

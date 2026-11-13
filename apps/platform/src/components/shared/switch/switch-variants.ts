@@ -19,7 +19,7 @@ export const switchVariants = tv({
     thumb: [
       'absolute left-0.5 top-0.5 size-4 rounded-full bg-admin-switch-thumb shadow-[0_1px_2px_rgba(16,24,40,.25)]',
       'transition-transform duration-150',
-      'data-[checked]:translate-x-4',
+      'data-[checked]:translate-x-4 data-[checked]:bg-admin-switch-thumb-on',
     ],
     stateText: ['grid'],
     stateOption: ['col-start-1 row-start-1'],

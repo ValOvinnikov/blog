@@ -33,7 +33,7 @@ The public site and `@blog/ui` draw every colour, size, radius, spacing step, sh
 - Platform tokens for the onboarding surfaces, in that file:
   - `--text-admin-28` (28px, `text-admin-28`): the wizard's step heading.
   - `--radius-admin-bar` (2px, `rounded-admin-bar`): progress segments and preset mini bars; the one 2px radius in the platform.
-  - Six dark `rail` colours, as `admin-rail*` utilities: `--admin-rail` #0f1115 (the rail, the phone header and the Choose a workspace rail), `--admin-rail-line` #1c1f26 (rail borders and rules), `--admin-rail-text` #c9cfda (body text on the rail), `--admin-rail-muted` #7d8696 (upcoming steps, summaries), `--admin-rail-raised` #20242e (the current row, upcoming segments, hovers), `--admin-rail-accent` #a5b4fc (done circles and segments, the current ring).
+  - Six dark `rail` colours, as `admin-rail*` utilities: `--admin-rail` #0f1115 (the rail, the phone header and the Choose a workspace rail), `--admin-rail-line` #1c1f26 (rail borders and rules), `--admin-rail-text` #c9cfda (body text on the rail), `--admin-rail-muted` #7d8696 (upcoming steps, summaries), `--admin-rail-raised` #20242e (the current row, upcoming segments, hovers), `--admin-rail-accent` #ffc233 (done circles and segments, the current ring).
   - The `rail` colours are the same in Light and Dark and never follow the platform theme, unlike the sidebar's `side` tokens they were copied from. `tv()` lists `admin-28` and `admin-bar` so a later `text-admin-28` or `rounded-admin-bar` replaces an earlier platform size or radius.
 
 ## Data

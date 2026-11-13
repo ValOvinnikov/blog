@@ -375,6 +375,22 @@ save still settles as the form's generic server error.
   carries no visual marker; its item has `aria-current` for screen readers.
   The onboarding rail and the Choose a workspace page read the
   separate `rail` tokens and stay dark.
+- The platform's colours are near-black and yellow. In Light, `brand` and
+  `brand-ink` are near-black (#12141a) with `brand-strong`/`brand-hover`
+  #2a303b, and yellow is the highlight: `brand-weak` #fff1c2, `brand-line`
+  #ffd766 and `highlight` #ffc233. In Dark, yellow leads: `brand` #ffc233,
+  `brand-ink` #ffd466, `brand-strong` #ffe08a, `brand-hover` #ffcf5c,
+  `brand-weak` #33290d, `brand-line` #5c4a14. `side-accent` and
+  `follow-mark` follow `brand`; `rail-accent` is #ffc233 in both; `note-line`
+  is `brand` at 30%. `warn` is orange (#9a3d0b on #fdeee4 / #ffa066 on
+  #2e1a10), so a warning never reads as the brand; `ok` and `bad` are
+  unchanged. A primary button, an active chip, an avatar, the active step and
+  the follow mark's tag put `on-brand-ink` on `brand`. A switch that is on has
+  a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
+  focused field takes a `brand-ink` border and a 3px `brand-line` glow. A link
+  is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px
+  below it. The sidebar's current row is `side-raised` with a `side-accent`
+  bar and `brand-ink` text.
 - The platform has a dark palette. `:root` holds the light values with
   `color-scheme: light`; `:root[data-theme='dark']` holds the dark value of
   every colour and shadow token with `color-scheme: dark`, so native
@@ -392,9 +408,9 @@ save still settles as the form's generic server error.
   never the platform theme: the device frame draws it with `frame-track` /
   `frame-thumb` in a Light preview and `frame-track-dark` /
   `frame-thumb-dark` in a Dark one. The tenant site preview and the email preview body
-  are unaffected. `on-brand-ink` (#ffffff / #0f1115) is the mark on a
-  `brand-ink` or tone fill — the selected preset card's tick, and the step
-  indicator's done, failed and running numbers — and `preview-stage`
+  are unaffected. `on-brand-ink` (#ffffff / #0f1115) is the label or mark on
+  a `brand`, `brand-ink` or tone fill — the primary button, the active chip,
+  the selected preset card's tick, and the step indicator's numbers — and `preview-stage`
   (#eef0f3 / #1d2027) is the preview frame's stage ground. The selected
   preset card takes a `brand-ink` border and dot with a `brand-weak` halo.
   The shared Tooltip sits on `tooltip` (#12141a / #262b35) with a
@@ -463,7 +479,9 @@ save still settles as the form's generic server error.
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
   theme-track): a 2px gap in that ground, then a 2px `brand-ink` ring
   (`side-accent` on the sidebar), with no visible outline outside forced-colors mode. Text inputs, textareas
-  and the rich-text editor take it on `surface`, as do checkboxes, select
+  and the rich-text editor take no ring: focused, their border turns
+  `brand-ink` inside a 3px `brand-line` glow (`FIELD_FOCUS_CLASSES`,
+  `utils/field-surface-classes/`). The ring sits on `surface` for checkboxes, select
   triggers, closed accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
   hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
   segmented options take it on `bg`, and segmented view tabs on `theme-track`. A ring

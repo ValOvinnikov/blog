@@ -288,6 +288,14 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   hex, no raw palette colour, no site token outside `site-preview/`.
   The Shinefold logo's colours (`@blog/utils/shinefold-logo`) and the preset
   swatches are artwork and exempt.
+- The palette is near-black and yellow. In Light, `brand`/`brand-ink` are
+  near-black and yellow highlights (`brand-weak`, `brand-line`,
+  `highlight`); in Dark, yellow leads (`brand` #ffc233, `brand-ink` #ffd466)
+  over a dark yellow `brand-weak`. `warn` is orange so it never reads as the
+  brand. Text or a mark on a `brand` fill is `text-admin-on-brand-ink`, never
+  `text-white`. A link's underline is `TEXT_LINK_STROKE_CLASSES`
+  (`components/shared/text-link/text-link-variants`), a 2px `highlight`
+  stroke.
 - `text-admin-text` for content, labels and values. `text-admin-muted` for
   descriptions, hints, terms, table headers, meta and timestamps. Semantic
   colours (`ok`, `warn`, `bad`, `brand`) only for state. `text-admin-faint`
@@ -308,6 +316,9 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `Button` draws: pass the `FOCUS_RING_GROUND` (`@platform/constants/focus-ring`)
   the control sits on, so the offset matches its surface;
   `insetFocusRingClasses` where a clipping parent would cut the ring off.
+  A text field instead takes `FIELD_FOCUS_CLASSES`
+  (`@platform/utils/field-surface-classes/field-surface-classes`): a
+  `brand-ink` border in a 3px `brand-line` glow.
   Never hand-write a `focus-visible:ring-*` or `focus-visible:shadow-*` list.
   `outline-admin-brand-weak` (1.12:1) is not a focus indicator.
 - A colour transition is `COLOUR_TRANSITION_CLASSES`
