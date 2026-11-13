@@ -8,10 +8,10 @@ import {
 
 export type TUnreachedAction = TOutcome<typeof ACTION_OUTCOME.SERVER_ERROR>;
 
+// The out-of-date save never settles, so its form shows no error beneath the reload dialog.
 const UNSETTLED: Promise<never> = new Promise(() => {});
 
 // A lost request rejects, which a bare transition sends to `error.tsx`; an action's `redirect()` and `notFound()` reject too, so those are rethrown.
-// An action missing from the current build means the page is out of date: the save never settles, so the form shows no error beneath the reload dialog.
 export const settleAction = <TResult>(
   request: Promise<TResult>,
 ): Promise<TResult | TUnreachedAction> =>

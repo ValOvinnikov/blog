@@ -1,22 +1,27 @@
-import { customRender, screen } from '@platform/testing/custom-render';
+import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { useIsPageOutOfDate } from '@platform/utils/page-out-of-date/page-out-of-date';
 import { reloadPage } from '@platform/utils/reload-page/reload-page';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { OutOfDatePageDialog } from './out-of-date-page-dialog';
-
-vi.mock('@platform/utils/page-out-of-date/page-out-of-date');
 vi.mock('@platform/utils/reload-page/reload-page');
 
 const t = makeEnTranslator('outOfDatePageDialog');
 
-const setup = customRender(OutOfDatePageDialog, {});
+type TPageOutOfDateModule =
+  typeof import('@platform/utils/page-out-of-date/page-out-of-date');
 
-describe(`<${OutOfDatePageDialog.name}/>`, () => {
+describe('<OutOfDatePageDialog/>', () => {
+  let markPageOutOfDate: TPageOutOfDateModule['markPageOutOfDate'];
+
+  beforeEach(async () => {
+    vi.resetModules();
+    ({ markPageOutOfDate } =
+      await import('@platform/utils/page-out-of-date/page-out-of-date'));
+    const { OutOfDatePageDialog } = await import('./out-of-date-page-dialog');
+    customRender(OutOfDatePageDialog, {})();
+  });
+
   it('stays closed while the page is current', () => {
-    setup();
-
     const dialog = screen.queryByRole('alertdialog');
 
     expect(dialog).not.toBeInTheDocument();
@@ -27,8 +32,7 @@ describe(`<${OutOfDatePageDialog.name}/>`, () => {
 
     beforeEach(() => {
       user = userEvent.setup();
-      vi.mocked(useIsPageOutOfDate).mockReturnValue(true);
-      setup();
+      act(() => markPageOutOfDate());
     });
 
     it('tells the person to reload', () => {

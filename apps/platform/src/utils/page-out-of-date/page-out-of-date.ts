@@ -13,7 +13,7 @@ const subscribeToPageOutOfDate = (onChange: () => void) => {
   return () => listeners.delete(onChange);
 };
 
-const readIsPageOutOfDate = () => isPageOutOfDate;
+export const readIsPageOutOfDate = () => isPageOutOfDate;
 
 const readIsPageOutOfDateOnServer = () => false;
 
