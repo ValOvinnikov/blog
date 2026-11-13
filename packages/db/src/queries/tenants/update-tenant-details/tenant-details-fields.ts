@@ -43,11 +43,12 @@ export function tenantDetailsWrite(
   details: TTenantDetailsFields,
   status: TTenantStatus,
   clearsUnsentReinvite: boolean,
+  now: Date,
 ): TTenantDetailsFields &
   TPlanChangeFields & { unsentReinviteFormerOwnerEmailEncrypted?: null } {
   return {
     ...details,
-    ...planChangeFields(details.plan, status),
+    ...planChangeFields(details.plan, status, now),
     ...(clearsUnsentReinvite && {
       unsentReinviteFormerOwnerEmailEncrypted: null,
     }),
@@ -59,12 +60,21 @@ export function restorableTenantFields(
 ): TTenantDetailsFields &
   Pick<
     TTenant,
-    'unsentReinviteFormerOwnerEmailEncrypted' | 'selfServeOwnerEmailIndex'
+    | 'unsentReinviteFormerOwnerEmailEncrypted'
+    | 'selfServeOwnerEmailIndex'
+    | 'downgradeGraceStartedAt'
+    | 'graceStartedEmailSentAt'
+    | 'graceHalfwayEmailSentAt'
+    | 'graceEndingEmailSentAt'
   > {
   return {
     ...tenantDetailsFields(original),
     unsentReinviteFormerOwnerEmailEncrypted:
       original.unsentReinviteFormerOwnerEmailEncrypted,
     selfServeOwnerEmailIndex: original.selfServeOwnerEmailIndex,
+    downgradeGraceStartedAt: original.downgradeGraceStartedAt,
+    graceStartedEmailSentAt: original.graceStartedEmailSentAt,
+    graceHalfwayEmailSentAt: original.graceHalfwayEmailSentAt,
+    graceEndingEmailSentAt: original.graceEndingEmailSentAt,
   };
 }

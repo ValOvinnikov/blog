@@ -1,7 +1,7 @@
 import { getDb } from '@blog/db/client';
 import { memberships, type TMembership } from '@blog/db/schema/memberships';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { eq } from 'drizzle-orm';
+import { and, eq, isNull } from 'drizzle-orm';
 
 export type TMembershipWithTenant = {
   membership: TMembership;
@@ -17,5 +17,5 @@ export async function listMembershipsWithTenantsForUser(
     .select({ membership: memberships, tenant: tenants })
     .from(memberships)
     .innerJoin(tenants, eq(memberships.tenantId, tenants.id))
-    .where(eq(memberships.userId, userId));
+    .where(and(eq(memberships.userId, userId), isNull(memberships.lockedAt)));
 }

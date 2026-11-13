@@ -26,7 +26,7 @@ function reactivatedFields(now: Date) {
     deletionNotifiedAt: whenArchived(tenants.deletionNotifiedAt),
     suspendedAt: whenArchived(tenants.suspendedAt),
     suspensionReason: whenArchived(tenants.suspensionReason),
-    ...resumedTenantFields({ isResuming: isArchived, now }),
+    ...resumedTenantFields({ isResuming: isArchived }),
   };
 }
 

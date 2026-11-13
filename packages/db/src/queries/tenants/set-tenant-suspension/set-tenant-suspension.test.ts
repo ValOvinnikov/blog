@@ -81,6 +81,47 @@ describe(setTenantSuspension, () => {
     },
   );
 
+  it.each([TENANT_STATUS.TRIAL, TENANT_STATUS.PAST_DUE])(
+    'gives a %s tenant its status back when the suspension is lifted',
+    async (status) => {
+      const tenantId = await insertTenant(status);
+      await setTenantSuspension(tenantId, TENANT_STATUS.SUSPENDED);
+
+      const lifted = unwrapOk(
+        await setTenantSuspension(tenantId, TENANT_STATUS.ACTIVE),
+      );
+
+      expect(lifted.status).toBe(status);
+      expect(lifted.statusBeforeHold).toBeNull();
+    },
+  );
+
+  it('keeps the earlier status when an operator suspends a tenant already suspended for inactivity', async () => {
+    const tenant = await insertTestTenant(db(), {
+      status: TENANT_STATUS.SUSPENDED,
+      statusBeforeHold: TENANT_STATUS.TRIAL,
+      suspensionReason: SUSPENSION_REASON.INACTIVITY,
+    });
+
+    const { statusBeforeHold } = unwrapOk(
+      await setTenantSuspension(tenant.id, TENANT_STATUS.SUSPENDED),
+    );
+
+    expect(statusBeforeHold).toBe(TENANT_STATUS.TRIAL);
+  });
+
+  it.each([TENANT_STATUS.ACTIVE, TENANT_STATUS.TRIAL, TENANT_STATUS.PAST_DUE])(
+    'leaves a %s tenant that is not suspended untouched when asked to lift',
+    async (status) => {
+      const tenantId = await insertTenant(status);
+
+      const result = await setTenantSuspension(tenantId, TENANT_STATUS.ACTIVE);
+
+      expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+      expect(await readStatus(tenantId)).toBe(status);
+    },
+  );
+
   it('records an operator suspension over an inactivity one', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.SUSPENDED,

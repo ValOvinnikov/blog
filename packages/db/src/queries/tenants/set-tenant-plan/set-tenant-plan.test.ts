@@ -6,8 +6,10 @@ import {
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
+import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import { graceStartedDaysAgo } from '@blog/db/testing/tenants/grace';
 import {
   MOCK_SELF_SERVE_OWNER_EMAIL_INDEX,
   readSelfServeIndex,
@@ -19,12 +21,64 @@ import { setTenantPlan } from './set-tenant-plan';
 vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
+useFrozenClock();
 
 afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
+async function readGraceStart(tenantId: string) {
+  const [row] = await db()
+    .select({ startedAt: tenants.downgradeGraceStartedAt })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+  return row?.startedAt;
+}
+
 describe(setTenantPlan, () => {
+  describe('the downgrade grace', () => {
+    it.each([
+      ['a paid plan', TENANT_PLAN.STARTER, TENANT_STATUS.ACTIVE],
+      ['a trial', TENANT_PLAN.GROWTH, TENANT_STATUS.TRIAL],
+    ])('starts when a site leaves %s for Free', async (_, plan, status) => {
+      const { id } = await insertTestTenant(db(), { plan, status });
+
+      await setTenantPlan(id, {
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(await readGraceStart(id)).toEqual(MOCK_NOW);
+    });
+
+    it('keeps running when a Free site is written Free again', async () => {
+      const startedAt = graceStartedDaysAgo(3);
+      const { id } = await insertTestTenant(db(), {
+        downgradeGraceStartedAt: startedAt,
+      });
+
+      await setTenantPlan(id, {
+        plan: TENANT_PLAN.FREE,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(await readGraceStart(id)).toEqual(startedAt);
+    });
+
+    it('ends when the site moves to a paid plan', async () => {
+      const { id } = await insertTestTenant(db(), {
+        downgradeGraceStartedAt: graceStartedDaysAgo(3),
+      });
+
+      await setTenantPlan(id, {
+        plan: TENANT_PLAN.GROWTH,
+        status: TENANT_STATUS.ACTIVE,
+      });
+
+      expect(await readGraceStart(id)).toBeNull();
+    });
+  });
+
   describe('a self-serve Free tenant', () => {
     let tenantId: string;
 

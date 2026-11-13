@@ -169,6 +169,13 @@
       "when": 1794498424755,
       "tag": "0023_tricky_bucky",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794529547588,
+      "tag": "0024_tenant-held-status-and-membership-lock",
+      "breakpoints": true
     }
   ]
 }

@@ -43,7 +43,7 @@ export async function setTenantPlan(
   const [row] = await db
     .with(previous)
     .update(tenants)
-    .set({ ...planChangeFields(plan, status), status })
+    .set({ ...planChangeFields(plan, status, new Date()), status })
     .from(previous)
     .where(
       and(

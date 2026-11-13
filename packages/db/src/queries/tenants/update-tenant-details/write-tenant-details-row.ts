@@ -26,7 +26,9 @@ export async function writeTenantDetailsRow(
   try {
     const [tenant] = await getDb()
       .update(tenants)
-      .set(tenantDetailsWrite(details, status, clearsUnsentReinvite))
+      .set(
+        tenantDetailsWrite(details, status, clearsUnsentReinvite, new Date()),
+      )
       .where(eq(tenants.id, tenantId))
       .returning();
 

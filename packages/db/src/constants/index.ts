@@ -2,6 +2,7 @@ export * from './admin';
 export * from './audit-event';
 export * from './billing';
 export * from './blocked-signup-identity';
+export * from './downgrade-grace';
 export * from './email-config';
 export * from './email-template-defaults';
 export * from './email-usage';
