@@ -3,10 +3,10 @@ import {
   LOGO_RAMP_LIGHT,
   NEUTRAL_RAMP_DARK,
   NEUTRAL_RAMP_LIGHT,
+  oklchStopToHex,
   type TMaybeUndefined,
   type TOklchStop,
 } from '@blog/config';
-import { oklchToHex } from '@blog/utils/color';
 
 type TTileStops = { light: TOklchStop; dark: TOklchStop };
 
@@ -18,11 +18,8 @@ type TTileSvgInput = {
 
 const NEUTRAL_HUE = 0;
 
-const toHex = ({ l, c, h }: TOklchStop, hue: number): string =>
-  oklchToHex(l, c, h ?? hue);
-
 const fillRule = (selector: string, stop: TOklchStop, hue: number): string =>
-  `.${selector}{fill:${toHex(stop, hue)}}`;
+  `.${selector}{fill:${oklchStopToHex(stop, hue)}}`;
 
 const buildTileSvg = ({ hue, tile, letter }: TTileSvgInput): string => {
   const lightRules = [

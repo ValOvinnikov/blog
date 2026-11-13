@@ -2,11 +2,13 @@ import { HTTP_STATUS } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { toInitial } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
+import { CACHE_CONTROL } from '@web/constants/http';
 import { ICON_LOG } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
@@ -32,6 +34,7 @@ const MOCK_FAVICON_BYTES = new Uint8Array(
   }),
 );
 const MOCK_BRAND_NAME = faker.company.name();
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
 const MOCK_LOGO_HUE = faker.number.int({ min: 0, max: 179 });
 const MOCK_OTHER_LOGO_HUE = MOCK_LOGO_HUE + 180;
 const PNG_CONTENT_TYPE = 'image/png';
@@ -106,39 +109,43 @@ describe(Icon, () => {
     expect(getSiteConfigMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
-  it("draws the brand name's initial when no favicon is uploaded", async () => {
-    arrangeSiteConfig({ brandName: MOCK_BRAND_NAME });
-
-    const markup = await readSvg(await Icon());
-
-    expect(letterOf(markup)).toBe(toInitial(MOCK_BRAND_NAME));
-  });
-
   it.each([
+    {
+      case: 'a brand name is set',
+      arrange: () => {
+        arrangeSiteConfig({ brandName: MOCK_BRAND_NAME });
+      },
+      name: MOCK_BRAND_NAME,
+    },
     {
       case: 'no brand name is set',
       arrange: () => {
         arrangeSiteConfig();
       },
+      name: MOCK_TENANT_NAME,
     },
     {
       case: 'the tenant has no site config',
       arrange: () => {
         getSiteConfigMock.mockResolvedValue(okResult());
       },
+      name: MOCK_TENANT_NAME,
     },
-  ])("draws the tenant name's initial when $case", async ({ arrange }) => {
+  ])('draws the initial of "$name" when $case', async ({ arrange, name }) => {
     arrange();
 
     const markup = await readSvg(await Icon());
 
-    expect(letterOf(markup)).toBe(toInitial(MOCK_TENANT_NAME));
+    expect(letterOf(markup)).toBe(toInitial(name));
   });
 
   it("colours the initial tile by the site's logo hue", async () => {
-    arrangeSiteConfig({ logoHue: MOCK_LOGO_HUE });
+    arrangeSiteConfig({ accentHue: MOCK_ACCENT_HUE, logoHue: MOCK_LOGO_HUE });
     const markup = await readSvg(await Icon());
-    arrangeSiteConfig({ logoHue: MOCK_OTHER_LOGO_HUE });
+    arrangeSiteConfig({
+      accentHue: MOCK_ACCENT_HUE,
+      logoHue: MOCK_OTHER_LOGO_HUE,
+    });
 
     const otherMarkup = await readSvg(await Icon());
 
@@ -197,6 +204,9 @@ describe(Icon, () => {
       const response = await Icon();
 
       await expectNeutralTile(response);
+      expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
+        CACHE_CONTROL.PRIVATE_NO_STORE,
+      );
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(event, context);
     },
   );

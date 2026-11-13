@@ -125,7 +125,7 @@ const PANEL_ACTIONS_TEST_ID = 'primary-navigation-panel-actions';
 const SIGN_IN = 'Sign in';
 const ACCOUNT = 'Account';
 const CONTINUE_WITH_GITHUB = 'Continue with GitHub';
-const ACCOUNT_IN_PHONE_MENU = {
+const MOCK_ACCOUNT_IN_PHONE_MENU = {
   ...MOCK_ACCOUNT_CONTROL,
   phonePlacement: ACCOUNT_PHONE_PLACEMENT.MENU,
 };
@@ -158,7 +158,7 @@ describe(`<${SiteHeader.name}/>`, () => {
   };
 
   const openPhoneMenuWithAccountInIt = async () => {
-    getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+    getAccountControlMock.mockResolvedValueOnce(MOCK_ACCOUNT_IN_PHONE_MENU);
     await setup();
     await openPhoneMenu();
   };
@@ -362,14 +362,6 @@ describe(`<${SiteHeader.name}/>`, () => {
 
       expect(toggleButton).not.toBeInTheDocument();
     });
-
-    it('lists the account row in the phone menu with the account in the menu', async () => {
-      await openPhoneMenuWithAccountInIt();
-
-      const accountRow = getDrawerAccountRow(SIGN_IN);
-
-      expect(accountRow).toBeVisible();
-    });
   });
 
   describe('with the account in the phone menu', () => {
@@ -562,19 +554,31 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
   });
 
-  it('labels the phone menu account row "Account" for a signed-in reader', async () => {
-    getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
-    useSessionMock.mockReturnValue({
-      data: { user: MOCK_READER },
-      status: SESSION_STATUS.AUTHENTICATED,
-    });
-    await setup();
-    await openPhoneMenu();
+  it.each([
+    {
+      reader: 'a signed-out reader',
+      session: { data: null, status: SESSION_STATUS.UNAUTHENTICATED },
+      rowName: SIGN_IN,
+    },
+    {
+      reader: 'a signed-in reader',
+      session: {
+        data: { user: MOCK_READER },
+        status: SESSION_STATUS.AUTHENTICATED,
+      },
+      rowName: ACCOUNT,
+    },
+  ])(
+    'labels the phone menu account row "$rowName" for $reader',
+    async ({ session, rowName }) => {
+      useSessionMock.mockReturnValue(session);
+      await openPhoneMenuWithAccountInIt();
 
-    const accountRow = getDrawerAccountRow(ACCOUNT);
+      const accountRow = getDrawerAccountRow(rowName);
 
-    expect(accountRow).toBeVisible();
-  });
+      expect(accountRow).toBeVisible();
+    },
+  );
 
   describe('for a signed-in reader with Bookmarks off', () => {
     beforeEach(() => {
@@ -609,25 +613,26 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
   });
 
-  it('hides the language switcher when its toggle is off', async () => {
-    getRequestContextMock.mockResolvedValueOnce({
-      ...MOCK_REQUEST_CONTEXT,
-      liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
-    });
-
-    await setup();
-
-    const languageNav = screen.queryByRole('navigation', {
-      name: LANGUAGE_NAV_NAME,
-    });
-
-    expect(languageNav).not.toBeInTheDocument();
-  });
-
-  it('shows no language switcher with one live language, toggle on', async () => {
-    getNavigationMock.mockResolvedValue(
-      okResult({ items: [], showLanguageSwitcher: true }),
-    );
+  it.each([
+    {
+      case: 'when its toggle is off',
+      arrange: () => {
+        getRequestContextMock.mockResolvedValueOnce({
+          ...MOCK_REQUEST_CONTEXT,
+          liveLocales: [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.NL],
+        });
+      },
+    },
+    {
+      case: 'with one live language, toggle on',
+      arrange: () => {
+        getNavigationMock.mockResolvedValue(
+          okResult({ items: [], showLanguageSwitcher: true }),
+        );
+      },
+    },
+  ])('shows no language switcher $case', async ({ arrange }) => {
+    arrange();
 
     await setup();
 
@@ -686,7 +691,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('shows no phone menu button for an account in the menu with nothing else in it', async () => {
-      getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
+      getAccountControlMock.mockResolvedValueOnce(MOCK_ACCOUNT_IN_PHONE_MENU);
 
       await setup();
 

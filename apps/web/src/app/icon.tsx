@@ -1,6 +1,8 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { toInitial } from '@blog/utils/primitives';
+import { CACHE_CONTROL } from '@web/constants/http';
 import { ICON_LOG } from '@web/constants/icon';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import {
@@ -17,6 +19,15 @@ const FETCH_TIMEOUT_MS = 5000;
 const buildSvgResponse = (svg: string): Response => {
   return new Response(svg, {
     headers: { 'Content-Type': contentType },
+  });
+};
+
+const buildUncachedNeutralTileResponse = (): Response => {
+  return new Response(buildNeutralTileSvg(), {
+    headers: {
+      'Content-Type': contentType,
+      'Cache-Control': CACHE_CONTROL.PRIVATE_NO_STORE,
+    },
   });
 };
 
@@ -44,17 +55,23 @@ export default async function Icon() {
   const result = await getSiteConfig(tenant.id);
   if (!result.ok) {
     logger.error(ICON_LOG.SITE_CONFIG_FETCH_FAILED, { error: result.error });
-    return buildSvgResponse(buildNeutralTileSvg());
+    return buildUncachedNeutralTileResponse();
   }
 
   const siteConfig = result.data;
   const faviconUrl = siteConfig?.faviconAssetUrl;
   if (!faviconUrl) {
-    const brandName = siteConfig?.brandName ?? tenant.name;
+    const brandName = await getBrandName({
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+    });
     const { accentHue, logoHue } = toThemeTokens(siteConfig);
 
     return buildSvgResponse(
-      buildInitialTileSvg(toInitial(brandName), logoHue ?? accentHue),
+      buildInitialTileSvg(
+        brandName ? toInitial(brandName) : undefined,
+        logoHue ?? accentHue,
+      ),
     );
   }
 
@@ -74,5 +91,5 @@ export default async function Icon() {
     logger.error(ICON_LOG.FAVICON_FETCH_FAILED, { error });
   }
 
-  return buildSvgResponse(buildNeutralTileSvg());
+  return buildUncachedNeutralTileResponse();
 }
