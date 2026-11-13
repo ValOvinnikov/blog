@@ -26,7 +26,10 @@ import {
   mockCustomDomainClaim,
   mockOwnerContext,
 } from '@platform/testing/custom-domain/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_ID,
@@ -103,10 +106,12 @@ describe(verifyCustomDomainAction, () => {
   });
 
   it('rejects a member who is not the owner', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-    });
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
+    );
 
     await expect(verify()).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,

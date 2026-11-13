@@ -3,6 +3,7 @@ import { queries } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { requireAdmin } from '@platform/server/auth/require-admin';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { mockViewer } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_ID,
@@ -102,7 +103,11 @@ describe(requireTenantById, () => {
 
       const result = await requireTenantById(MOCK_TENANT_ID);
 
-      expect(result).toEqual({ tenant: resolvedTenant, admin: mockAdmin() });
+      expect(result).toEqual({
+        tenant: resolvedTenant,
+        admin: mockAdmin(),
+        viewer: mockViewer({ admin: mockAdmin() }),
+      });
       expect(getTenantById).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         includeArchived: true,
       });

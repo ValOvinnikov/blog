@@ -7,7 +7,6 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { hasLength } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
@@ -49,15 +48,15 @@ export const saveSignInAppAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
   const { provider, clientId, clientSecret } = parsed.data;
-  const { id, plan, primaryDomain, deprovisionedAt } = tenant;
+  const { id, entitlements, primaryDomain, isArchived } = tenant;
 
-  if (deprovisionedAt) {
+  if (isArchived) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_IN_APP_REFUSAL.ARCHIVED,
     };
   }
-  if (!PLAN_ENTITLEMENTS[plan].hasOwnOAuthApps) {
+  if (!entitlements.hasOwnOAuthApps) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_IN_APP_REFUSAL.NOT_ON_PLAN,

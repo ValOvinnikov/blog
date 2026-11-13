@@ -1,7 +1,10 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 
@@ -17,6 +20,7 @@ vi.mock('@platform/server/auth/resolve-tenant-page-access', () => ({
 const MOCK_CONTEXT = {
   tenant: mockReadyTenant(),
   membership: mockMembership(),
+  viewer: mockViewer(),
   tenants: [],
 };
 const MOCK_SIGN_IN_REDIRECT = new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
@@ -63,7 +67,7 @@ describe(resolveGatedDashboardTenant, () => {
       );
       expect(resolveTenantPageAccessMock).toHaveBeenCalledWith(
         MOCK_CONTEXT.tenant,
-        MOCK_CONTEXT.membership,
+        MOCK_CONTEXT.viewer,
       );
     },
   );

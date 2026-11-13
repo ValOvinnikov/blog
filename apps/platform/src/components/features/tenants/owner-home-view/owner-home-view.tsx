@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
@@ -11,8 +10,8 @@ import {
 } from '@platform/constants/domain';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import type { TTrial } from '@platform/utils/trial-for/trial-for';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
@@ -25,12 +24,11 @@ import { YourSiteCard } from './components/your-site-card/your-site-card';
 import { ownerHomeViewVariants } from './owner-home-view-variants';
 
 export type TOwnerHomeViewProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
   domainVerificationStatus: Promise<TDomainVerificationStatus>;
   owner: TMaybeUndefined<TTenantOwnerMembership>;
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
-  trial?: TTrial;
   canUpgrade?: boolean;
 };
 
@@ -40,10 +38,10 @@ export const OwnerHomeView = ({
   owner,
   siteSetup,
   getStarted,
-  trial,
   canUpgrade = false,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
+  const { archivedAt, trial } = tenant;
   const { root, pair } = ownerHomeViewVariants();
 
   return (
@@ -54,9 +52,7 @@ export const OwnerHomeView = ({
         hasPlanBadge={false}
       />
 
-      {tenant.deprovisionedAt && (
-        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
-      )}
+      {archivedAt && <ArchivedTenantNotice archivedAt={archivedAt} />}
 
       {trial && <TrialNotice trial={trial} canUpgrade={canUpgrade} />}
 

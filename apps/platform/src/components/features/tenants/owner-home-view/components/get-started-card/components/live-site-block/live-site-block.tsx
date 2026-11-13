@@ -2,20 +2,22 @@ import { CheckMark } from '@platform/components/features/tenants/owner-home-view
 import { CopyButton } from '@platform/components/shared/copy-button';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { BUTTON_VARIANT } from '@platform/constants/button';
-import { tenantSiteUrl } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 
 import { liveSiteBlockVariants } from './live-site-block-variants';
 
 export type TLiveSiteBlockProps = {
   siteAddress: string;
+  siteUrl: string;
 };
 
-export const LiveSiteBlock = ({ siteAddress }: TLiveSiteBlockProps) => {
+export const LiveSiteBlock = ({
+  siteAddress,
+  siteUrl,
+}: TLiveSiteBlockProps) => {
   const t = useTranslations('getStartedCard');
   const { root, summary, text, title, address, actions, openSite } =
     liveSiteBlockVariants();
-  const siteUrl = tenantSiteUrl(siteAddress);
 
   return (
     <div className={root()}>

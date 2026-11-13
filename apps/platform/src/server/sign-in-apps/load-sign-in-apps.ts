@@ -3,8 +3,6 @@ import 'server-only';
 import type { TMaybeUndefined } from '@blog/config';
 import type { TOAuthProvider } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   OAUTH_PROVIDERS,
   SIGN_IN_APPS_MODE,
@@ -12,6 +10,7 @@ import {
 } from '@platform/constants/sign-in-apps';
 import { maskClientId } from '@platform/utils/mask-client-id/mask-client-id';
 import { oauthCallbackUrl } from '@platform/utils/oauth-callback-url/oauth-callback-url';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 export type TSignInAppView = {
   provider: TOAuthProvider;
@@ -34,15 +33,15 @@ const shownClientId = (mode: TSignInAppsMode, clientId: string) => {
 };
 
 export const loadSignInApps = async (
-  tenant: TTenant,
+  tenant: TPlatformTenant,
   mode: TSignInAppsMode,
 ): Promise<TSignInAppView[]> => {
-  const { id, plan, primaryDomain, deprovisionedAt } = tenant;
-  const isEntitled = PLAN_ENTITLEMENTS[plan].hasOwnOAuthApps;
+  const { id, entitlements, primaryDomain, isArchived } = tenant;
+  const isEntitled = entitlements.hasOwnOAuthApps;
   const clients =
     await queries.tenantOAuthCredentials.listTenantOAuthClients(id);
   const isWarnable =
-    !deprovisionedAt &&
+    !isArchived &&
     (mode === SIGN_IN_APPS_MODE.EDIT || mode === SIGN_IN_APPS_MODE.READ_ONLY);
 
   return OAUTH_PROVIDERS.map((provider) => {

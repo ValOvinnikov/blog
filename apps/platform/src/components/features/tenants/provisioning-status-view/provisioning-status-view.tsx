@@ -12,6 +12,7 @@ import { Button } from '@platform/components/shared/button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
@@ -54,7 +55,7 @@ export const ProvisioningStatusView = ({
   const { stagedStatuses, isRevealing } =
     useStagedStepStatuses(displayStepStatuses);
 
-  const isArchived = Boolean(tenant.deprovisionedAt);
+  const { isArchived, archivedAt } = tenant;
   const archivedNoticeId = useId();
   const { root, ownerRow, cardsRow } = provisioningStatusViewVariants();
 
@@ -101,17 +102,16 @@ export const ProvisioningStatusView = ({
         actions={startButtonNode}
       />
 
-      {tenant.deprovisionedAt && (
-        <ArchivedTenantNotice
-          id={archivedNoticeId}
-          archivedAt={tenant.deprovisionedAt}
-        />
+      {archivedAt && (
+        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
       )}
 
       {!ownerEmail && (
         <div className={ownerRow()}>
           <Text variant="meta">{t('ownerLabel')}</Text>
-          <StatusBadge tone="warn">{t('ownerInvitedPendingBadge')}</StatusBadge>
+          <StatusBadge tone={BADGE_TONE.WARN}>
+            {t('ownerInvitedPendingBadge')}
+          </StatusBadge>
         </div>
       )}
 

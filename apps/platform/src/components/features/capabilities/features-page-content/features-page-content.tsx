@@ -1,14 +1,14 @@
 import { PLAN_REGISTRY } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { FeaturesSettings } from '@platform/components/features/capabilities/features-settings';
 import { getSettingsFeaturesOrDefaults } from '@platform/server/settings-features/settings-features-or-defaults';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   clampToEntitlement,
   withComingSoonOff,
 } from '@platform/utils/settings-features-fields/settings-features-fields';
 
 export type TFeaturesPageContentProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
 };
 
 export const FeaturesPageContent = async ({
@@ -26,7 +26,7 @@ export const FeaturesPageContent = async ({
       entitledCapabilities={entitledCapabilities}
       initialValues={initialValues}
       savedAt={savedAt}
-      archivedAt={tenant.deprovisionedAt ?? undefined}
+      archivedAt={tenant.archivedAt}
     />
   );
 };

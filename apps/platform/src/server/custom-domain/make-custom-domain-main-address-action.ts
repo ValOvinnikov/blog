@@ -2,7 +2,6 @@
 
 import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   CUSTOM_DOMAIN_LOG,
@@ -48,10 +47,10 @@ export const makeCustomDomainMainAddressAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
   const { domain } = parsed.data;
-  const { id, plan, deprovisionedAt, primaryDomain } = tenant;
+  const { id, entitlements, isArchived, primaryDomain } = tenant;
 
-  if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
-  if (!PLAN_ENTITLEMENTS[plan].hasCustomDomain) {
+  if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
+  if (!entitlements.hasCustomDomain) {
     return refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN);
   }
 

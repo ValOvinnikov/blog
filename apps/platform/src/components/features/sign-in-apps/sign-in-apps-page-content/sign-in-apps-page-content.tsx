@@ -1,8 +1,4 @@
 import { ALERT_TYPE } from '@blog/config';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { SignInAppCard } from '@platform/components/features/sign-in-apps/sign-in-app-card';
 import { SignInAppReadOnlyCard } from '@platform/components/features/sign-in-apps/sign-in-app-read-only-card';
 import { SignInAppsFreeCard } from '@platform/components/features/sign-in-apps/sign-in-apps-free-card';
@@ -14,31 +10,29 @@ import {
   SIGN_IN_APPS_MODE,
   type TSignInAppsMode,
 } from '@platform/constants/sign-in-apps';
-import { isOperatorView } from '@platform/server/auth/is-operator-view';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { loadSignInApps } from '@platform/server/sign-in-apps/load-sign-in-apps';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { getTranslations } from 'next-intl/server';
 
 import { signInAppsPageContentVariants } from './sign-in-apps-page-content-variants';
 
 export type TSignInAppsPageContentProps = {
-  tenant: TTenant;
-  membership?: TMembership;
-  admin?: TAdmin;
+  tenant: TPlatformTenant;
+  viewer: TPlatformViewer;
 };
 
 const resolveMode = ({
   tenant,
-  membership,
-  admin,
+  viewer,
 }: TSignInAppsPageContentProps): TSignInAppsMode => {
-  if (isOperatorView({ admin, membership })) {
+  if (viewer.isOperator) {
     return SIGN_IN_APPS_MODE.OPERATOR;
   }
-  if (!PLAN_ENTITLEMENTS[tenant.plan].hasOwnOAuthApps) {
+  if (!tenant.entitlements.hasOwnOAuthApps) {
     return SIGN_IN_APPS_MODE.FREE;
   }
-  if (tenant.deprovisionedAt || !membership || !isTenantOwner(membership)) {
+  if (tenant.isArchived || !viewer.isOwner) {
     return SIGN_IN_APPS_MODE.READ_ONLY;
   }
   return SIGN_IN_APPS_MODE.EDIT;
@@ -48,13 +42,13 @@ export const SignInAppsPageContent = async (
   context: TSignInAppsPageContentProps,
 ) => {
   const { tenant } = context;
-  const { id, primaryDomain, deprovisionedAt } = tenant;
+  const { id, primaryDomain, isArchived } = tenant;
   const mode = resolveMode(context);
   const [t, apps] = await Promise.all([
     getTranslations('signInAppsPage'),
     loadSignInApps(tenant, mode),
   ]);
-  const notice = deprovisionedAt ? 'archivedNotice' : 'notOwnerNotice';
+  const notice = isArchived ? 'archivedNotice' : 'notOwnerNotice';
   const { root } = signInAppsPageContentVariants();
 
   return (

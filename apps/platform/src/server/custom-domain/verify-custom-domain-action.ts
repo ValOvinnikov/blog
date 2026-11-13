@@ -8,7 +8,6 @@ import {
   type TActionResult,
 } from '@blog/config';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
@@ -43,10 +42,10 @@ export const verifyCustomDomainAction = async (
   tenantId: string,
 ): Promise<TVerifyCustomDomainResult> => {
   const { tenant } = await requireTenantOwner(tenantId);
-  const { id, plan, deprovisionedAt } = tenant;
+  const { id, entitlements, isArchived } = tenant;
 
-  if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
-  if (!PLAN_ENTITLEMENTS[plan].hasCustomDomain) {
+  if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
+  if (!entitlements.hasCustomDomain) {
     return refused(CUSTOM_DOMAIN_REFUSAL.NOT_ON_PLAN);
   }
 

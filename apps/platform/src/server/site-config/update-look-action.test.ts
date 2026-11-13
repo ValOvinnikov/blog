@@ -46,7 +46,10 @@ import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -143,10 +146,14 @@ const FREE_WRITTEN_INPUT = {
 };
 
 const onPlan = (plan: TTenantPlan) =>
-  vi.mocked(requireTenantMembership).mockImplementation(async (tenantId) => ({
-    tenant: mockReadyTenant({ id: tenantId, plan }),
-    membership: mockMembership({ tenantId }),
-  }));
+  vi
+    .mocked(requireTenantMembership)
+    .mockImplementation(async (tenantId) =>
+      mockMembershipContext(
+        mockReadyTenant({ id: tenantId, plan }),
+        mockMembership({ tenantId }),
+      ),
+    );
 
 describe(updateLookAction, () => {
   beforeEach(() => {

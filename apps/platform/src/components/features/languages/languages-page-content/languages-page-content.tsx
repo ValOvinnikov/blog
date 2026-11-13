@@ -1,17 +1,16 @@
 import { queries } from '@blog/db';
 import { PLAN_LOCALE_LIMIT } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { LanguagesSettings } from '@platform/components/features/languages/languages-settings';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 export type TLanguagesPageContentProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
 };
 
 export const LanguagesPageContent = async ({
   tenant,
 }: TLanguagesPageContentProps) => {
-  const { id, locale, additionalLocales, plan, updatedAt, deprovisionedAt } =
-    tenant;
+  const { id, locale, additionalLocales, plan, updatedAt, archivedAt } = tenant;
 
   const [, ...liveAdditionalLocales] =
     queries.tenants.selectLiveLocales(tenant);
@@ -26,7 +25,7 @@ export const LanguagesPageContent = async ({
         limit: PLAN_LOCALE_LIMIT[plan] - 1,
       }}
       savedAt={updatedAt}
-      archivedAt={deprovisionedAt ?? undefined}
+      archivedAt={archivedAt}
     />
   );
 };

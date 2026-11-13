@@ -2,6 +2,7 @@ import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockViewer } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_TENANT_ID,
@@ -14,14 +15,12 @@ import TenantOverviewPage from './page';
 
 const {
   requireTenantByIdMock,
-  requireAdminMock,
   getTenantOwnerMembershipMock,
   listAuditEventsForTargetMock,
   listFindingsForTenantMock,
   getDomainVerificationStatusMock,
 } = vi.hoisted(() => ({
   requireTenantByIdMock: vi.fn(),
-  requireAdminMock: vi.fn(),
   getTenantOwnerMembershipMock: vi.fn(),
   listAuditEventsForTargetMock: vi.fn(),
   listFindingsForTenantMock: vi.fn(),
@@ -32,10 +31,6 @@ vi.mock('@platform/utils/env/env');
 
 vi.mock('@platform/server/auth/require-tenant-by-id', () => ({
   requireTenantById: requireTenantByIdMock,
-}));
-
-vi.mock('@platform/server/auth/require-admin', () => ({
-  requireAdmin: requireAdminMock,
 }));
 
 vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
@@ -86,8 +81,11 @@ const setup = customRenderAsync(TenantOverviewPage, {
 
 describe(`<${TenantOverviewPage.name}/>`, () => {
   beforeEach(() => {
-    requireTenantByIdMock.mockResolvedValue({ tenant: mockTenant() });
-    requireAdminMock.mockResolvedValue(mockAdmin());
+    requireTenantByIdMock.mockResolvedValue({
+      tenant: mockTenant(),
+      admin: mockAdmin(),
+      viewer: mockViewer({ admin: mockAdmin() }),
+    });
     getTenantOwnerMembershipMock.mockResolvedValue(mockJoinedOwner());
     listAuditEventsForTargetMock.mockResolvedValue([]);
     listFindingsForTenantMock.mockResolvedValue([]);

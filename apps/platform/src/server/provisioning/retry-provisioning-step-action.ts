@@ -1,10 +1,14 @@
 'use server';
 
-import { ACTION_OUTCOME, type TActionResult } from '@blog/config';
-import { queries } from '@blog/db';
+import {
+  ACTION_OUTCOME,
+  isOutcomeSuccess,
+  type TActionResult,
+} from '@blog/config';
 import { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
+import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
 
 import {
   startProvisioning,
@@ -27,18 +31,8 @@ export const retryProvisioningStepAction = async (
 ): Promise<TRetryProvisioningStepResult> => {
   await requireTenantOwnerOrAdmin(tenantId, isSuperAdmin);
 
-  const tenant = await queries.tenants.getTenantById(tenantId, {
-    includeArchived: true,
-  });
-  if (!tenant) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: TENANT_REFUSAL.NOT_FOUND,
-    };
-  }
-  if (tenant.deprovisionedAt) {
-    return { outcome: ACTION_OUTCOME.REFUSED, reason: TENANT_REFUSAL.ARCHIVED };
-  }
+  const resolved = await resolveLiveTenant(tenantId);
+  if (!isOutcomeSuccess(resolved)) return resolved;
 
   return startProvisioning(tenantId);
 };

@@ -49,9 +49,9 @@ export const removeCustomDomainAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
   const { domain } = parsed.data;
-  const { id, deprovisionedAt, primaryDomain } = tenant;
+  const { id, isArchived, primaryDomain } = tenant;
 
-  if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
+  if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
 
   try {
     const claim = await queries.customDomainClaims.getCustomDomainClaim(id);

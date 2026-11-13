@@ -1,11 +1,11 @@
 import { queries } from '@blog/db';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import { OwnerSuspensionBanner } from '@platform/components/features/tenants/owner-suspension-banner';
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
 import { TenantPlanProvider } from '@platform/context/tenant-plan-provider';
-import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
@@ -20,19 +20,20 @@ type TProps = {
 };
 
 export default async function DashboardTenantLayout({ children }: TProps) {
-  const { tenant, membership, tenants } = await resolveDashboardTenant();
+  const { tenant, membership, viewer, tenants } =
+    await resolveDashboardTenant();
   const [{ admin: sessionAdmin }, chrome, access, unreadLeadsCount] =
     await Promise.all([
       listSessionTenants(),
       loadAdminShellChrome(),
-      resolveTenantPageAccess(tenant, membership),
+      resolveTenantPageAccess(tenant, viewer),
       queries.leads.countUnreadLeadsForTenant(tenant.id),
     ]);
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
     chrome;
-  const studioAccess = ownerStudioAccessFor(tenant, membership);
+  const studioAccess = ownerStudioAccessFor(tenant, viewer);
 
-  const admin = isVirtualAdminMembership(membership) ? sessionAdmin : undefined;
+  const admin = viewer.isOperator ? sessionAdmin : undefined;
 
   return (
     <AdminShell
@@ -44,7 +45,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
         unreadLeadsCount,
       )}
       switcher={
-        tenants.length > 1 ? (
+        hasArrayGotMultipleItems(tenants) ? (
           <TenantSwitcher
             tenants={toTenantSwitcherItems(tenants)}
             activeTenantId={tenant.id}

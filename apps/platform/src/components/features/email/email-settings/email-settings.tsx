@@ -6,7 +6,6 @@ import {
   type TEmailTemplateType,
   type TLocaleIsoCode,
 } from '@blog/config';
-import type { TTenant } from '@blog/db/schema/tenants';
 import type { TTenantEmailBrand } from '@blog/email/html';
 import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { EmailEditPane } from '@platform/components/features/email/email-settings/components/email-edit-pane';
@@ -21,6 +20,7 @@ import {
   type TEmailPageItem,
 } from '@platform/utils/email-draft/email-draft';
 import { countCustomisedTemplates } from '@platform/utils/email-draft-changes/email-draft-changes';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -29,7 +29,7 @@ import { useEmailItems } from './use-email-items';
 import { useEmailSettingsDraft } from './use-email-settings-draft';
 
 export type TEmailSettingsProps = {
-  tenant: Pick<TTenant, 'id' | 'locale' | 'deprovisionedAt'>;
+  tenant: Pick<TPlatformTenant, 'id' | 'locale' | 'archivedAt'>;
   initialDraft: TEmailDraft;
   liveLocales: TLocaleIsoCode[];
   brand: TTenantEmailBrand;
@@ -45,7 +45,7 @@ export const EmailSettings = ({
   brandName,
   savedAt,
 }: TEmailSettingsProps) => {
-  const { id: tenantId, locale: defaultLocale, deprovisionedAt } = tenant;
+  const { id: tenantId, locale: defaultLocale, archivedAt } = tenant;
   const t = useTranslations('emailForm');
   const [selectedItem, setSelectedItem] =
     useState<TEmailPageItem>(EMAIL_SENDER_ITEM);
@@ -75,7 +75,7 @@ export const EmailSettings = ({
     initialDraft,
     liveLocales,
     savedAt,
-    archivedAt: deprovisionedAt ?? undefined,
+    archivedAt,
     revealSenderName,
   });
 

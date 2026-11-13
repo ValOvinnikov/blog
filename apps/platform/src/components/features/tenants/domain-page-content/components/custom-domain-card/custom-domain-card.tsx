@@ -1,7 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import type { TCustomDomainClaim } from '@blog/db/schema/custom-domain-claims';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { ConnectCustomDomainForm } from '@platform/components/features/tenants/domain-page-content/components/connect-custom-domain-form/connect-custom-domain-form';
 import { CustomDomainActions } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-actions/custom-domain-actions';
 import { CustomDomainClaimCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-claim-card/custom-domain-claim-card';
@@ -12,11 +10,15 @@ import { DomainVerificationCard } from '@platform/components/features/tenants/do
 import { DomainVerificationCardSkeleton } from '@platform/components/features/tenants/domain-page-content/components/domain-verification-card-skeleton/domain-verification-card-skeleton';
 import type { TProjectDomain } from '@platform/server/provisioning/project-domain';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
 export type TCustomDomainCardProps = {
-  tenant: Pick<TTenant, 'id' | 'plan' | 'deprovisionedAt' | 'primaryDomain'>;
+  tenant: Pick<
+    TPlatformTenant,
+    'id' | 'isArchived' | 'entitlements' | 'primaryDomain'
+  >;
   customDomain: TMaybeUndefined<string>;
   subdomain: TMaybeUndefined<string>;
   claim: TMaybeUndefined<Pick<TCustomDomainClaim, 'domain' | 'token'>>;
@@ -35,9 +37,8 @@ export const CustomDomainCard = ({
   canManage,
 }: TCustomDomainCardProps) => {
   const t = useTranslations('tenantDomainPage.ownDomain');
-  const { id, plan, deprovisionedAt, primaryDomain } = tenant;
-  const isArchived = Boolean(deprovisionedAt);
-  const { hasCustomDomain } = PLAN_ENTITLEMENTS[plan];
+  const { id, isArchived, entitlements, primaryDomain } = tenant;
+  const { hasCustomDomain } = entitlements;
   const domain = customDomain ?? (isPrimaryCustom ? primaryDomain : null);
   const shown = domain && {
     domain,

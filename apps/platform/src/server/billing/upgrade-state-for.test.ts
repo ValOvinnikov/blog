@@ -4,7 +4,10 @@ import { UPGRADE_STATE } from '@platform/constants/billing';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';
 import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_ID,
@@ -14,8 +17,10 @@ import { mockTrialTenant } from '@platform/testing/tenants/mock-tenant';
 
 import { upgradeStateFor } from './upgrade-state-for';
 
-const MOCK_OWNER = mockMembership();
-const MOCK_EDITOR = mockMembership({ role: MEMBERSHIP_ROLE.EDITOR });
+const MOCK_OWNER = mockViewer();
+const MOCK_EDITOR = mockViewer({
+  membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+});
 
 describe(upgradeStateFor, () => {
   it.each([
@@ -58,7 +63,12 @@ describe(upgradeStateFor, () => {
     ['a member who is not the owner', MOCK_EDITOR],
     [
       'an operator viewing the site as its owner',
-      buildVirtualAdminMembership(MOCK_OPERATOR_ID, MOCK_TENANT_ID),
+      mockViewer({
+        membership: buildVirtualAdminMembership(
+          MOCK_OPERATOR_ID,
+          MOCK_TENANT_ID,
+        ),
+      }),
     ],
   ])('refuses %s', (_, membership) => {
     expect(upgradeStateFor(mockTenant(), membership)).toBe(

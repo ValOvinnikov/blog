@@ -28,10 +28,10 @@ export const makeSubdomainMainAddressAction = async (
   tenantId: string,
 ): Promise<TSwitchMainAddressResult> => {
   const { tenant } = await requireTenantOwner(tenantId);
-  const { id, deprovisionedAt, primaryDomain } = tenant;
+  const { id, isArchived, primaryDomain } = tenant;
   const rootDomain = env.TENANT_ROOT_DOMAIN;
 
-  if (deprovisionedAt) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
+  if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);
   if (isPlatformAddress(primaryDomain, rootDomain)) {
     return refused(CUSTOM_DOMAIN_REFUSAL.ALREADY_MAIN_ADDRESS);
   }

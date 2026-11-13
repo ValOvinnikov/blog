@@ -7,12 +7,16 @@ import { GET_STARTED_STEP } from '@platform/constants/get-started';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  MOCK_TENANT_URL,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
 
@@ -28,7 +32,7 @@ vi.mock('@blog/db', () => ({
   queries: { siteConfig: { getSiteConfig: getSiteConfigMock } },
 }));
 
-const owner = mockMembership();
+const owner = mockViewer();
 const MOCK_SAVED_AT = faker.date.recent();
 const MOCK_SANITY_USER_ID = faker.string.uuid();
 
@@ -47,6 +51,7 @@ describe(getStartedFor, () => {
     expect(getStarted).toEqual({
       tenantId: MOCK_TENANT_ID,
       siteAddress: MOCK_TENANT_DOMAIN,
+      siteUrl: MOCK_TENANT_URL,
       doneSteps: {
         [GET_STARTED_STEP.LOOK]: false,
         [GET_STARTED_STEP.VOICE]: false,
@@ -134,7 +139,9 @@ describe(getStartedFor, () => {
   });
 
   it('shows nothing to a member who is not the owner', async () => {
-    const editor = mockMembership({ role: MEMBERSHIP_ROLE.EDITOR });
+    const editor = mockViewer({
+      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+    });
 
     const getStarted = await getStartedFor(justInvited(), editor);
 
@@ -142,10 +149,12 @@ describe(getStartedFor, () => {
   });
 
   it('shows nothing to an operator viewing the site', async () => {
-    const operator = buildVirtualAdminMembership(
-      mockAdmin().userId,
-      owner.tenantId,
-    );
+    const operator = mockViewer({
+      membership: buildVirtualAdminMembership(
+        mockAdmin().userId,
+        MOCK_TENANT_ID,
+      ),
+    });
 
     const getStarted = await getStartedFor(justInvited(), operator);
 

@@ -32,6 +32,7 @@ import {
   MOCK_CUSTOM_DOMAIN,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
+  mockTenant,
 } from '@platform/testing/tenants/fixtures';
 import { customDomainTxtName } from '@platform/utils/custom-domain-txt-name/custom-domain-txt-name';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
@@ -73,13 +74,15 @@ const COPY_TXT_VALUE = tDomainPage('copyRecordValue', {
   type: CUSTOM_DOMAIN_TXT_TYPE,
 });
 
-const BASE_PROPS: TCustomDomainCardProps = {
-  tenant: {
-    id: MOCK_TENANT_ID,
+const siteOn = (overrides: Parameters<typeof mockTenant>[0] = {}) =>
+  mockTenant({
     plan: TENANT_PLAN.GROWTH,
-    deprovisionedAt: null,
     primaryDomain: MOCK_TENANT_DOMAIN,
-  },
+    ...overrides,
+  });
+
+const BASE_PROPS: TCustomDomainCardProps = {
+  tenant: siteOn(),
   customDomain: undefined,
   subdomain: MOCK_TENANT_DOMAIN,
   claim: undefined,
@@ -191,7 +194,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     it('does not poll the custom domain of an archived site', async () => {
       await renderCard({
         customDomain: MOCK_CUSTOM_DOMAIN,
-        tenant: { ...BASE_PROPS.tenant, deprovisionedAt: MOCK_ARCHIVED_AT },
+        tenant: siteOn({ deprovisionedAt: MOCK_ARCHIVED_AT }),
       });
 
       await pollOnce();
@@ -271,7 +274,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     it('offers the way back to the subdomain on a Free site', async () => {
       await renderCard({
         isPrimaryCustom: true,
-        tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.FREE },
+        tenant: siteOn({ plan: TENANT_PLAN.FREE }),
       });
 
       await expectSwitchBackVisible();
@@ -285,7 +288,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       {
         scenario: 'on an archived site',
         props: {
-          tenant: { ...BASE_PROPS.tenant, deprovisionedAt: MOCK_ARCHIVED_AT },
+          tenant: siteOn({ deprovisionedAt: MOCK_ARCHIVED_AT }),
         },
       },
     ])('offers no switch $scenario', async ({ props }) => {
@@ -358,7 +361,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
     it('offers it on a Starter site', async () => {
       await renderCard({
         customDomain: MOCK_CUSTOM_DOMAIN,
-        tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.STARTER },
+        tenant: siteOn({ plan: TENANT_PLAN.STARTER }),
       });
 
       const makeMainButton = await screen.findByRole('button', {
@@ -375,7 +378,7 @@ describe(`<${CustomDomainCard.name}/>`, () => {
       },
       {
         scenario: 'no Free site',
-        props: { tenant: { ...BASE_PROPS.tenant, plan: TENANT_PLAN.FREE } },
+        props: { tenant: siteOn({ plan: TENANT_PLAN.FREE }) },
       },
     ])('offers it to $scenario', async ({ props }) => {
       await renderCard({ customDomain: MOCK_CUSTOM_DOMAIN, ...props });

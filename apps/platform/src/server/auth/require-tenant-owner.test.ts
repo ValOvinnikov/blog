@@ -1,7 +1,10 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -23,10 +26,12 @@ describe(requireTenantOwner, () => {
   });
 
   it('404s for an editor', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID }),
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-    });
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID }),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
+    );
 
     await expect(requireTenantOwner(MOCK_TENANT_ID)).rejects.toThrow(
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,

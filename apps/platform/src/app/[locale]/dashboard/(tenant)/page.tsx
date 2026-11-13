@@ -1,7 +1,6 @@
 import { queries } from '@blog/db';
 import { OwnerHomeView } from '@platform/components/features/tenants/owner-home-view';
 import { UPGRADE_STATE } from '@platform/constants/billing';
-import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
 import { getStartedFor } from '@platform/server/onboarding/get-started-for';
@@ -15,17 +14,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DashboardOverviewPage() {
-  const [{ tenant, membership }, { admin }] = await Promise.all([
-    resolveDashboardTenant(),
-    listSessionTenants(),
-  ]);
+  const { tenant, viewer } = await resolveDashboardTenant();
 
   const domainVerificationStatus = getDomainVerificationStatus(
     tenant.primaryDomain,
   );
   const [owner, getStarted] = await Promise.all([
     queries.memberships.getTenantOwnerMembership(tenant.id),
-    getStartedFor(tenant, membership),
+    getStartedFor(tenant, viewer),
   ]);
 
   return (
@@ -33,12 +29,9 @@ export default async function DashboardOverviewPage() {
       tenant={tenant}
       domainVerificationStatus={domainVerificationStatus}
       owner={owner}
-      siteSetup={siteSetupFor(tenant, membership, admin)}
+      siteSetup={siteSetupFor(tenant, viewer)}
       getStarted={getStarted}
-      trial={tenant.trial}
-      canUpgrade={
-        upgradeStateFor(tenant, membership) === UPGRADE_STATE.AVAILABLE
-      }
+      canUpgrade={upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE}
     />
   );
 }

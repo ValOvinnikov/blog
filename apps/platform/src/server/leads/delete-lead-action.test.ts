@@ -4,7 +4,10 @@ import { faker } from '@faker-js/faker';
 import { LEAD_LOG, LEAD_REFUSAL } from '@platform/constants/lead';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { MOCK_LEAD_ID } from '@platform/testing/leads/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   mockReadyTenant,
   MOCK_TENANT_ID,
@@ -45,10 +48,12 @@ describe(deleteLeadAction, () => {
   });
 
   it('deletes nothing for an editor', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID }),
-      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-    });
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID }),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
+    );
 
     await expect(
       deleteLeadAction(MOCK_TENANT_ID, MOCK_LEAD_ID),
