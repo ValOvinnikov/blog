@@ -11,6 +11,7 @@
   --admin-control-line-tint: #7c8493;
   --admin-text: #12141a;
   --admin-text-strong: #12141a;
+  --admin-logo-ink: #12141a;
   --admin-muted: #5b6472;
   --admin-faint: #7a8394;
   --admin-brand: #4f46e5;
@@ -120,6 +121,7 @@
   --admin-control-line-tint: #737d8d;
   --admin-text: #e8eaef;
   --admin-text-strong: #ffffff;
+  --admin-logo-ink: #e8eaef;
   --admin-muted: #a3abb8;
   --admin-faint: #8590a0;
   --admin-brand: #5850ec;
@@ -196,6 +198,7 @@
     --admin-control-line-tint: #737d8d;
     --admin-text: #e8eaef;
     --admin-text-strong: #ffffff;
+    --admin-logo-ink: #e8eaef;
     --admin-muted: #a3abb8;
     --admin-faint: #8590a0;
     --admin-brand: #5850ec;
@@ -274,6 +277,7 @@
   --color-admin-control-line-tint: var(--admin-control-line-tint);
   --color-admin-text: var(--admin-text);
   --color-admin-text-strong: var(--admin-text-strong);
+  --color-admin-logo-ink: var(--admin-logo-ink);
   --color-admin-muted: var(--admin-muted);
   --color-admin-faint: var(--admin-faint);
   --color-admin-brand: var(--admin-brand);

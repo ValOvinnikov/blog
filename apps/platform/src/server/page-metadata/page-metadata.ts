@@ -7,3 +7,8 @@ export const pageMetadata = async (titleKey: string): Promise<Metadata> => {
   const t = await getTranslations('pageMetadata');
   return { title: t(titleKey) };
 };
+
+export const rootPageMetadata = async (): Promise<Metadata> => {
+  const t = await getTranslations('pageMetadata');
+  return { title: { default: t('root'), template: t('titleTemplate') } };
+};

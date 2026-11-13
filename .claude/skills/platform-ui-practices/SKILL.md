@@ -286,7 +286,8 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 
 - Colours come only from the `admin-*` tokens in `styles/admin-theme.css`: no
   hex, no raw palette colour, no site token outside `site-preview/`.
-  `BrandMark`'s gradient and the preset swatches are artwork and exempt.
+  The Shinefold logo's colours (`@blog/utils/shinefold-logo`) and the preset
+  swatches are artwork and exempt.
 - `text-admin-text` for content, labels and values. `text-admin-muted` for
   descriptions, hints, terms, table headers, meta and timestamps. Semantic
   colours (`ok`, `warn`, `bad`, `brand`) only for state. `text-admin-faint`

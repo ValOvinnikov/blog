@@ -257,7 +257,7 @@ site, never at the top of the step.
 - The admin's colours are `--admin-*` tokens in `styles/admin-theme.css`,
   each with a `--color-admin-*` Tailwind colour; shadows read `--admin-shadow`
   and `--admin-shadow-menu`. The light sidebar is grey (`side` #eef0f3 with
-  `side-line` rules); its wordmark is `text-strong`, its text `side-text` and
+  `side-line` rules); its text is `side-text` and
   `side-muted`, and no sidebar text is drawn in `faint`, which is for icons
   and chevrons only. A nav row rests in `side-text` with a `side-muted`
   icon (a colour, never an opacity) and hovers to a `side-line` ground; the
@@ -280,8 +280,18 @@ site, never at the top of the step.
   so the operator's "Tenant · {name}" group reads on hover; the "Platform
   actions" rows take the row colours with a neutral "platform" pill.
   The sidebar is an `<aside id="sidebar">` named "Sidebar"; its brand row is
-  the gradient mark, wordmark and "admin" expanded, and the mark alone,
-  centred, collapsed. The collapse toggle is the topbar's first item from
+  the Shinefold full logo (`BrandLogo`, 28px tall) with a 12px `side-muted`
+  "Platform" under its lettering expanded, and the S box alone (`BrandMark`,
+  28px), centred, collapsed. The full logo's lettering is `logo-ink`
+  (#12141a light, #e8eaef dark); each logo is one image named "Shinefold"
+  (docs/brand/README.md).
+- Every page's tab title is "<page> · Shinefold": the `[locale]` root layout
+  sets the title template and the default "Shinefold", and each page's
+  `pageMetadata` key holds the page name alone. The tab and home-screen icon
+  is the S box, served by `app/icon.ts` (SVG), `app/apple-icon.tsx` (180px
+  PNG on yellow) and listed in `app/manifest.ts`, all drawn from
+  `@blog/utils/shinefold-logo`; the proxy leaves `/icon` and `/apple-icon`
+  unrewritten. The collapse toggle is the topbar's first item from
   `md` (below `md` that slot holds the phone Menu button and the toggle never
   renders): a 36×36 `control-line` box on `surface` with the unrotated 16px
   `ICONS.SIDEBAR` glyph in `muted`, hovering and focusing to a `brand-ink`

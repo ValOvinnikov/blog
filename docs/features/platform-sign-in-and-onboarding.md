@@ -49,8 +49,8 @@ site as a 14-day Growth trial, with no card.
 ## Surfaces and routes
 
 - `/sign-in` is Auth.js's `pages.signIn`, public, in the same frame as the
-  dead-end pages (`CenteredCardFrame`: the Valstack mark and wordmark centred
-  above a white card). Inside the card: the title and description, any
+  dead-end pages (`CenteredCardFrame`: the Shinefold full logo alone, 36px
+  tall, centred above a white card). Inside the card: the title and description, any
   sign-in error, a button per configured OAuth provider, an "or" divider and
   an email field that sends a magic link and says to check your inbox on the same page,
   or, when the send limit refused it, that too many links were requested and
@@ -105,13 +105,14 @@ site as a 14-day Growth trial, with no card.
 - `/onboarding`: a four-step setup wizard for a signed-in user with no
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
   to their own home, so an invited member never sees it). A dark left rail
-  (the `admin-rail*` tokens) carries the Valstack mark, "Create your
+  (the `admin-rail*` tokens) carries the Shinefold full logo in its dark-ground colours, "Create your
   site" and the step list (an `ol` named "Setup steps", no `nav`), where a
   done step shows a tick and its choice ("Blog · Field Notes", the site
   address, the preset) and is announced as "Site, Complete, Blog · Field
   Notes", and the current step carries `aria-current="step"`. The rail draws
-  its brand mark and intro at the wizard sizes through an `isWizard` prop on
-  `RailBrand` / `RailIntro`, so Choose a workspace keeps its own. The current
+  its intro at the wizard size, and below 768px the S box in place of the
+  full logo, through an `isWizard` prop on `RailBrand` / `RailIntro`; Choose
+  a workspace shows the full logo at every width. The current
   step's fields sit
   beside it with Back / Continue, and the live site preview follows every
   step. The preview is the Look page's shared device frame (`PreviewFrame`
