@@ -3086,6 +3086,28 @@
         },
         "optional": true
       },
+      "headingBlock": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "moduleHeadingBlock"
+        },
+        "optional": true
+      },
+      "limit": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
+        },
+        "optional": true
+      },
+      "showImages": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "brandVariant": {
         "type": "objectAttribute",
         "value": {
@@ -3107,25 +3129,20 @@
         },
         "optional": true
       },
-      "headingBlock": {
+      "displayMode": {
         "type": "objectAttribute",
         "value": {
-          "type": "inline",
-          "name": "moduleHeadingBlock"
-        },
-        "optional": true
-      },
-      "limit": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "number"
-        },
-        "optional": true
-      },
-      "showImages": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "GRID"
+            },
+            {
+              "type": "string",
+              "value": "CAROUSEL"
+            }
+          ]
         },
         "optional": true
       },
@@ -3153,6 +3170,207 @@
           "name": "wideLayout"
         },
         "optional": true
+      },
+      "cardStyle": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "ACCENT_BAR"
+            },
+            {
+              "type": "string",
+              "value": "OUTLINED"
+            },
+            {
+              "type": "string",
+              "value": "FILLED"
+            },
+            {
+              "type": "string",
+              "value": "RAISED"
+            },
+            {
+              "type": "string",
+              "value": "PLAIN"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "radiusScale": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "NONE"
+            },
+            {
+              "type": "string",
+              "value": "SM"
+            },
+            {
+              "type": "string",
+              "value": "MD"
+            },
+            {
+              "type": "string",
+              "value": "LG"
+            },
+            {
+              "type": "string",
+              "value": "XL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "density": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "DEFAULT"
+            },
+            {
+              "type": "string",
+              "value": "COMPACT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "columns": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "TWO"
+            },
+            {
+              "type": "string",
+              "value": "THREE"
+            },
+            {
+              "type": "string",
+              "value": "FOUR"
+            }
+          ]
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "wideLayout",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "wideLayout"
+          }
+        },
+        "spacingTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "spacingBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "NONE"
+              },
+              {
+                "type": "string",
+                "value": "SM"
+              },
+              {
+                "type": "string",
+                "value": "MD"
+              },
+              {
+                "type": "string",
+                "value": "LG"
+              },
+              {
+                "type": "string",
+                "value": "XL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "containerWidth": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "WIDE"
+              },
+              {
+                "type": "string",
+                "value": "FULL"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "dividerTop": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        },
+        "dividerBottom": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
       }
     }
   },
@@ -3426,111 +3644,6 @@
           ]
         },
         "optional": true
-      }
-    }
-  },
-  {
-    "name": "wideLayout",
-    "type": "type",
-    "value": {
-      "type": "object",
-      "attributes": {
-        "_type": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "string",
-            "value": "wideLayout"
-          }
-        },
-        "spacingTop": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NONE"
-              },
-              {
-                "type": "string",
-                "value": "SM"
-              },
-              {
-                "type": "string",
-                "value": "MD"
-              },
-              {
-                "type": "string",
-                "value": "LG"
-              },
-              {
-                "type": "string",
-                "value": "XL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "spacingBottom": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "NONE"
-              },
-              {
-                "type": "string",
-                "value": "SM"
-              },
-              {
-                "type": "string",
-                "value": "MD"
-              },
-              {
-                "type": "string",
-                "value": "LG"
-              },
-              {
-                "type": "string",
-                "value": "XL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "containerWidth": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "union",
-            "of": [
-              {
-                "type": "string",
-                "value": "WIDE"
-              },
-              {
-                "type": "string",
-                "value": "FULL"
-              }
-            ]
-          },
-          "optional": true
-        },
-        "dividerTop": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        },
-        "dividerBottom": {
-          "type": "objectAttribute",
-          "value": {
-            "type": "boolean"
-          },
-          "optional": true
-        }
       }
     }
   },

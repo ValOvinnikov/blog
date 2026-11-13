@@ -6,28 +6,21 @@ import {
   appearanceFields,
 } from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
-import { displayModeField } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
+import {
+  displayModeField,
+  isCarouselMode,
+} from '@blog/studio/schema-types/fields/display-mode-field/display-mode-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
 import { moduleHeadingBlockField } from '@blog/studio/schema-types/objects/module-heading-block/module-heading-block-field';
 import { wideLayoutField } from '@blog/studio/schema-types/objects/wide-layout/wide-layout-field';
 import { moduleSubtitle } from '@blog/studio/schema-types/preview/module-subtitle/module-subtitle';
 import { Clock } from 'lucide-react';
-import {
-  type ConditionalPropertyCallback,
-  defineField,
-  defineType,
-  type ValidationContext,
-} from 'sanity';
+import { defineField, defineType, type ValidationContext } from 'sanity';
 
 type TPostLatestDocument = {
   limit?: number;
-  displayMode?: string;
 };
-
-const isCarousel: ConditionalPropertyCallback = ({ parent }) =>
-  (parent as TMaybeUndefined<TPostLatestDocument>)?.displayMode ===
-  DISPLAY_MODE.CAROUSEL;
 
 const validateCarouselHasEnoughPosts = (
   value: TMaybeUndefined<string>,
@@ -72,7 +65,7 @@ export const postLatestSchema = defineType({
       ...alignmentFields([], { title: 'Heading Alignment' }),
       wideLayoutField,
     ],
-    columnsHidden: isCarousel,
+    columnsHidden: isCarouselMode,
   }),
   preview: {
     select: {
