@@ -1,13 +1,15 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { SIZE, type TMaybeUndefined } from '@blog/config';
 import type { TTenantPlan } from '@blog/config/constants';
 import type { TTenantStatus } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
+import { LinkButton } from '@platform/components/shared/link-button';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { Text } from '@platform/components/shared/text';
 import type { TBillingNextPayment } from '@platform/server/billing/fetch-stripe-billing';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { useLocale, useTranslations } from 'next-intl';
 
@@ -15,6 +17,7 @@ export type TPlanCardProps = {
   plan: TTenantPlan;
   status: TTenantStatus;
   hasPayments: boolean;
+  isSubscribed: boolean;
   nextPayment?: TBillingNextPayment;
 };
 
@@ -22,6 +25,7 @@ export const PlanCard = ({
   plan,
   status,
   hasPayments,
+  isSubscribed,
   nextPayment,
 }: TPlanCardProps) => {
   const t = useTranslations('billingPage');
@@ -62,6 +66,11 @@ export const PlanCard = ({
         </DetailList>
         {!hasPayments && <Text>{t('noPayments')}</Text>}
       </Card.Body>
+      <Card.Footer>
+        <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
+          {isSubscribed ? t('changePlan') : t('upgrade')}
+        </LinkButton>
+      </Card.Footer>
     </Card>
   );
 };

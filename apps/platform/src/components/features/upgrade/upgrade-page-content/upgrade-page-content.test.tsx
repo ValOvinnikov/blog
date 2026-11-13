@@ -5,6 +5,7 @@ import messages from '@platform/i18n/messages/en.json';
 import {
   MOCK_STRIPE_PUBLISHABLE_KEY,
   MOCK_STRIPE_SUBSCRIPTION_ID,
+  PLAN_CHANGE_SECTION_TEST_ID,
 } from '@platform/testing/billing/fixtures';
 import { EMBEDDED_CHECKOUT_TEST_ID } from '@platform/testing/billing/stripe-react-fake';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
@@ -26,6 +27,13 @@ vi.mock('@stripe/react-stripe-js');
 vi.mock('@platform/server/billing/create-upgrade-checkout-action');
 
 vi.mock('@platform/server/billing/get-upgrade-state-action');
+
+vi.mock(
+  '@platform/components/features/upgrade/upgrade-page-content/components/plan-change-section/plan-change-section',
+  () => ({
+    PlanChangeSection: () => <div data-testid={PLAN_CHANGE_SECTION_TEST_ID} />,
+  }),
+);
 
 const { upgradePage, planNames } = messages;
 const t = makeEnTranslator('upgradePage');
@@ -73,21 +81,36 @@ describe(`<${UpgradePageContent.name}/>`, () => {
   });
 
   it.each([false, true])(
-    'shows a paying site its plan with a way back (returning: %s)',
+    'offers the owner of a paying site a plan change, never checkout (returning: %s)',
     async (isReturning) => {
       await setup({ tenant: MOCK_SUBSCRIBED_TENANT, isReturning });
 
-      const title = screen.getByText(
-        t('subscribedTitle', { plan: planNames.STARTER }),
-      );
-      const back = screen.getByRole('link', {
-        name: upgradePage.backToOverview,
-      });
+      const planChange = screen.getByTestId(PLAN_CHANGE_SECTION_TEST_ID);
+      const checkout = screen.queryByTestId(EMBEDDED_CHECKOUT_TEST_ID);
 
-      expect(title).toBeVisible();
-      expect(back).toHaveAttribute('href', adminRoutes.dashboard());
+      expect(planChange).toBeInTheDocument();
+      expect(checkout).not.toBeInTheDocument();
     },
   );
+
+  it('shows a member who is not the owner the paid plan with a way back', async () => {
+    await setup({
+      tenant: MOCK_SUBSCRIBED_TENANT,
+      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+    });
+
+    const title = screen.getByText(
+      t('subscribedTitle', { plan: planNames.STARTER }),
+    );
+    const back = screen.getByRole('link', {
+      name: upgradePage.backToOverview,
+    });
+    const planChange = screen.queryByTestId(PLAN_CHANGE_SECTION_TEST_ID);
+
+    expect(title).toBeVisible();
+    expect(back).toHaveAttribute('href', adminRoutes.dashboard());
+    expect(planChange).not.toBeInTheDocument();
+  });
 
   it('confirms the payment after checkout until the subscription is live', async () => {
     await setup({ isReturning: true });

@@ -47,6 +47,7 @@ export const MOCK_CHECKOUT_RETURN_URL = billingFaker.internet.url();
 export const MOCK_INVOICE_PDF_URL = billingFaker.internet.url();
 export const MOCK_HOSTED_INVOICE_URL = billingFaker.internet.url();
 export const MOCK_BILLING_PORTAL_URL = billingFaker.internet.url();
+export const PLAN_CHANGE_SECTION_TEST_ID = 'plan-change-section';
 export const MOCK_UNHANDLED_EVENT_TYPE = 'customer.created';
 export const MOCK_INCOMPLETE_SUBSCRIPTION_STATUS = 'incomplete';
 export const MOCK_BAND_CEILING: TPaidSubscriberBandCeiling = 2_500;

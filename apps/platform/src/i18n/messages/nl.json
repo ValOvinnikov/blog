@@ -2222,7 +2222,9 @@
       "void": "Geannuleerd"
     },
     "unavailableTitle": "Betalingen en facturen niet beschikbaar",
-    "unavailableDescription": "Ze konden nu niet worden geladen. Laad de pagina zo opnieuw."
+    "unavailableDescription": "Ze konden nu niet worden geladen. Laad de pagina zo opnieuw.",
+    "upgrade": "Upgraden",
+    "changePlan": "Abonnement wijzigen"
   },
   "upgradePage": {
     "pageTitle": "Je abonnement upgraden",
@@ -2249,6 +2251,26 @@
     "subscribedDescription": "Het abonnement is actief, dus hier valt niets te kopen.",
     "confirmedTitle": "Je betaling is bevestigd",
     "confirmedDescription": "Je nieuwe abonnement is actief op je site.",
-    "SUBSCRIBED": "Je site heeft al een betaald abonnement, dus hier valt niets te kopen."
+    "SUBSCRIBED": "Je site heeft al een betaald abonnement, dus hier valt niets te kopen.",
+    "changePlanTitle": "Abonnement wijzigen",
+    "currentPlan": "Je site zit op {plan}, {interval, select, YEARLY {per jaar} other {per maand}} betaald.",
+    "pendingChange": "Je site gaat op <time>{date}</time> over naar {plan}, {interval, select, YEARLY {per jaar} other {per maand}} betaald.",
+    "changeNow": "De wijziging gaat vandaag in. Je betaalt nu het verschil voor de rest van de huidige periode.",
+    "changeAtRenewal": "De wijziging gaat in op <time>{date}</time>, als de huidige periode afloopt. Tot dan verandert er niets.",
+    "keepCurrentDescription": "Je site blijft op {plan} en de wijziging die voor <time>{date}</time> gepland stond, wordt geannuleerd.",
+    "changeUnchanged": "Dit is je huidige abonnement. Kies een ander abonnement of een andere betaalperiode om het te wijzigen.",
+    "keepCurrent": "{plan} houden",
+    "changeSubmit": "Abonnement wijzigen",
+    "changePending": "Bezig met wijzigen…",
+    "changeFailed": "Je abonnement kon niet worden gewijzigd. Probeer het zo opnieuw.",
+    "changeConfirmingTitle": "Je wijziging wordt bevestigd",
+    "changeConfirmingDescription": "Je abonnement wijzigt zodra de betaling is bevestigd, meestal binnen een minuut. Deze pagina werkt zichzelf bij.",
+    "changeSlowDescription": "Je wijziging wordt misschien nog bevestigd. Controleer het zo opnieuw; we mailen je ook zodra je abonnement wijzigt.",
+    "planLoadFailed": "Je abonnement kon niet worden geladen. Laad de pagina zo opnieuw.",
+    "billingLink": "Facturering",
+    "NOT_SUBSCRIBED": "Je site heeft nog geen betaald abonnement om te wijzigen. Kies er een bij het afrekenen.",
+    "NOT_ACTIVE": "Je abonnement vraagt eerst je aandacht voordat het kan wijzigen. Open Facturering om het op te lossen.",
+    "UNCHANGED": "Je site zit al op dit abonnement.",
+    "CARD_DECLINED": "Je kaart is geweigerd, dus er is niets gewijzigd. Werk hem bij in Facturering en probeer het opnieuw."
   }
 }

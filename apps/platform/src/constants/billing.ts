@@ -21,6 +21,9 @@ export const BILLING_LOG = {
   OVERVIEW_FAILED: 'billing.overview_failed',
   NEXT_PAYMENT_FAILED: 'billing.next_payment_failed',
   PORTAL_FAILED: 'billing.portal_failed',
+  PLAN_CHANGE_FAILED: 'billing.plan_change_failed',
+  PLAN_CHANGE_PRICE_MISSING: 'billing.plan_change_price_missing',
+  PLAN_CHANGE_LOAD_FAILED: 'billing.plan_change_load_failed',
 } as const;
 
 export const STRIPE_EVENT_TYPE = {

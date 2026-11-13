@@ -28,7 +28,7 @@
     "signUpTitle": "Crear una cuenta",
     "onboarding": "Crear tu sitio",
     "billing": "Facturación · Administración",
-    "upgrade": "Mejorar plan"
+    "upgrade": "Elegir un plan"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -2222,7 +2222,9 @@
       "void": "Anulada"
     },
     "unavailableTitle": "Pagos y facturas no disponibles",
-    "unavailableDescription": "No se han podido cargar ahora. Vuelve a cargar la página en un momento."
+    "unavailableDescription": "No se han podido cargar ahora. Vuelve a cargar la página en un momento.",
+    "upgrade": "Elegir un plan",
+    "changePlan": "Cambiar de plan"
   },
   "upgradePage": {
     "pageTitle": "Mejora tu plan",
@@ -2249,6 +2251,26 @@
     "subscribedDescription": "Su suscripción está activa, así que aquí no hay nada que comprar.",
     "confirmedTitle": "Tu pago está confirmado",
     "confirmedDescription": "Tu nuevo plan ya está activo en tu sitio.",
-    "SUBSCRIBED": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que comprar."
+    "SUBSCRIBED": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que comprar.",
+    "changePlanTitle": "Cambiar de plan",
+    "currentPlan": "Tu sitio está en {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}.",
+    "pendingChange": "Tu sitio pasa a {plan}, con pago {interval, select, YEARLY {anual} other {mensual}}, el <time>{date}</time>.",
+    "changeNow": "El cambio empieza hoy. Pagas ahora la diferencia por el resto del periodo actual.",
+    "changeAtRenewal": "El cambio empieza el <time>{date}</time>, cuando termina el periodo actual. Hasta entonces no cambia nada.",
+    "keepCurrentDescription": "Tu sitio se queda en {plan} y se cancela el cambio previsto para el <time>{date}</time>.",
+    "changeUnchanged": "Este es tu plan actual. Elige otro plan u otro periodo de facturación para cambiarlo.",
+    "keepCurrent": "Mantener {plan}",
+    "changeSubmit": "Cambiar de plan",
+    "changePending": "Cambiando…",
+    "changeFailed": "No se ha podido cambiar tu plan. Inténtalo de nuevo en un momento.",
+    "changeConfirmingTitle": "Confirmando tu cambio",
+    "changeConfirmingDescription": "Tu plan cambia en cuanto se confirma el pago, normalmente en menos de un minuto. Esta página se actualiza sola.",
+    "changeSlowDescription": "Puede que tu cambio aún se esté confirmando. Vuelve a comprobarlo en un momento; también te enviaremos un correo cuando cambie tu plan.",
+    "planLoadFailed": "No se ha podido cargar tu plan. Vuelve a cargar la página en un momento.",
+    "billingLink": "Facturación",
+    "NOT_SUBSCRIBED": "Tu sitio aún no tiene un plan de pago que cambiar. Elige uno en el pago.",
+    "NOT_ACTIVE": "Tu suscripción necesita atención antes de poder cambiar de plan. Abre Facturación para resolverlo.",
+    "UNCHANGED": "Tu sitio ya está en este plan.",
+    "CARD_DECLINED": "Tu tarjeta ha sido rechazada, así que no ha cambiado nada. Actualízala en Facturación e inténtalo de nuevo."
   }
 }

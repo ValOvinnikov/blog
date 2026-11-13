@@ -8,6 +8,7 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { TENANT_PLAN, type TSellableTenantPlan } from '@blog/config/constants';
+import { PlanChoices } from '@platform/components/features/upgrade/plan-choices';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -15,6 +16,7 @@ import {
   BILLING_INTERVAL,
   type TUpgradeRefusal,
 } from '@platform/constants/billing';
+import { type TPlanChoice } from '@platform/constants/plan-change';
 import { createUpgradeCheckoutAction } from '@platform/server/billing/create-upgrade-checkout-action';
 import {
   EmbeddedCheckout,
@@ -23,11 +25,6 @@ import {
 import { loadStripe } from '@stripe/stripe-js';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
-import {
-  CheckoutChoices,
-  type TCheckoutChoice,
-} from './components/checkout-choices/checkout-choices';
 
 export type TUpgradeCheckoutProps = {
   tenantId: string;
@@ -44,7 +41,7 @@ export const UpgradeCheckout = ({
 }: TUpgradeCheckoutProps) => {
   const t = useTranslations('upgradePage');
   const [stripePromise] = useState(() => loadStripe(publishableKey));
-  const [choice, setChoice] = useState<TCheckoutChoice>({
+  const [choice, setChoice] = useState<TPlanChoice>({
     plan: initialPlan,
     interval: BILLING_INTERVAL.MONTHLY,
   });
@@ -63,7 +60,7 @@ export const UpgradeCheckout = ({
     throw new Error(result.outcome);
   };
 
-  const changeChoice = (nextChoice: TCheckoutChoice) => {
+  const changeChoice = (nextChoice: TPlanChoice) => {
     setHasFailed(false);
     setChoice(nextChoice);
   };
@@ -106,7 +103,7 @@ export const UpgradeCheckout = ({
       <Card.Header
         title={t('checkoutTitle')}
         supportingText={t('checkoutDescription')}
-        actions={<CheckoutChoices choice={choice} onChange={changeChoice} />}
+        actions={<PlanChoices choice={choice} onChange={changeChoice} />}
       />
       <Card.Body>{body()}</Card.Body>
     </Card>
