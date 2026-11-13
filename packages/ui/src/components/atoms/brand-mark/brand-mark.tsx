@@ -18,7 +18,7 @@ export type TBrandMarkProps = IWithClassName &
 const LETTER_OR_DIGIT = /[\p{L}\p{N}]/u;
 
 const toInitial = (siteName: string) =>
-  siteName.match(LETTER_OR_DIGIT)?.[0]?.toUpperCase();
+  siteName.normalize('NFC').match(LETTER_OR_DIGIT)?.[0]?.toUpperCase();
 
 /** The site's logo: its uploaded image, or a tile holding the initial of the site's name when it has none. */
 export const BrandMark = ({

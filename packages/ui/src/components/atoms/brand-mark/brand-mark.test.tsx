@@ -1,4 +1,5 @@
 import { customRender, screen } from '@blog/ui/testing/custom-render';
+import { MOCK_SITE_INITIAL, MOCK_SITE_NAME } from '@blog/ui/testing/fixtures';
 import { faker } from '@faker-js/faker';
 
 import { BrandMark } from './brand-mark';
@@ -8,8 +9,6 @@ faker.seed(123);
 const MOCK_SRC = faker.image.url();
 const MOCK_TITLE = faker.company.name();
 const MOCK_MARK_TEST_ID = 'brand-mark';
-const MOCK_SITE_NAME = 'northern notes';
-const MOCK_INITIAL = 'N';
 
 const setup = customRender(BrandMark, {});
 
@@ -31,9 +30,10 @@ describe(`<${BrandMark.name}/>`, () => {
   });
 
   it.each([
-    { siteName: MOCK_SITE_NAME, initial: MOCK_INITIAL },
+    { siteName: MOCK_SITE_NAME, initial: MOCK_SITE_INITIAL },
     { siteName: '42 field notes', initial: '4' },
     { siteName: '  — émile’s log', initial: 'É' },
+    { siteName: 'e\u0301mile’s log', initial: 'É' },
   ])(
     'shows "$initial" in the tile for a site named "$siteName"',
     ({ siteName, initial }) => {
@@ -69,7 +69,7 @@ describe(`<${BrandMark.name}/>`, () => {
     });
 
     it('shows no initial', () => {
-      const initial = screen.queryByText(MOCK_INITIAL);
+      const initial = screen.queryByText(MOCK_SITE_INITIAL);
 
       expect(initial).not.toBeInTheDocument();
     });

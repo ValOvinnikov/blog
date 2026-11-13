@@ -1,3 +1,4 @@
+import { MOCK_SITE_NAME } from '@blog/ui/testing/fixtures';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BrandLockup } from './brand-lockup';
@@ -9,7 +10,7 @@ const meta = {
   title: 'Molecules/BrandLockup',
   component: BrandLockup,
   tags: ['autodocs'],
-  args: { siteName: 'Northern Notes' },
+  args: { siteName: MOCK_SITE_NAME },
 } satisfies Meta<typeof BrandLockup>;
 
 export default meta;
