@@ -60,7 +60,7 @@ dark grounds it can be text, a line or a control.
 Mail clients such as Gmail and Outlook strip inline SVG, so emails show the
 logos as hosted PNGs at twice their display size. The uploaded files are kept
 in [`email/`](email/): `shinefold-logo-light-v1-2x.png`,
-`shinefold-logo-dark-v1-2x.png` and `shinefold-mark-v1-2x.png`. A changed
+`shinefold-logo-dark-v1-2x.png`, `shinefold-mark-v1-2x.png` and `shinefold-logo-dark-v2-2x.png` (opaque, near-black ground baked in; the one platform emails use). A changed
 file is uploaded under a new version number, never over the old one, because
 sent emails keep loading the old address.
 

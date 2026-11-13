@@ -41,8 +41,8 @@ export function renderEmailHeader(
 ): string {
   if ('fullLogoImage' in logo) {
     const { fullLogoImage, groundColor, altTextColor } = logo;
-    // A fixed dark ground keeps the light lettering legible when a client's dark mode recolours backgrounds; the text styles reach the alt text when images are blocked.
-    return `<tr><td bgcolor="${groundColor}" style="padding:24px 32px;background-color:${groundColor};border-radius:7px 7px 0 0;color:${altTextColor};font-family:${FONT_STACK};font-size:18px;font-weight:700;">${renderImage(fullLogoImage)}${CELL_ROW_END}`;
+    // The logo image carries its own dark ground and 12px of padding, so it stays legible if a client's dark mode recolours the band; the text styles reach the alt text when images are blocked.
+    return `<tr><td bgcolor="${groundColor}" style="padding:12px 20px;background-color:${groundColor};border-radius:7px 7px 0 0;color:${altTextColor};font-family:${FONT_STACK};font-size:18px;font-weight:700;">${renderImage(fullLogoImage)}${CELL_ROW_END}`;
   }
 
   const mark =

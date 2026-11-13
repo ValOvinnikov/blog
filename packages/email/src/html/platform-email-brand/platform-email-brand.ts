@@ -22,9 +22,9 @@ const PLATFORM_EMAIL_IMAGE_BASE_URL =
 
 // Gmail and Outlook strip inline SVG, so the logo is a hosted 2x PNG drawn at half its pixel size.
 export const PLATFORM_EMAIL_FULL_LOGO: TEmailLogoImage = {
-  url: `${PLATFORM_EMAIL_IMAGE_BASE_URL}/shinefold-logo-dark-v1-2x.png`,
-  width: 152,
-  height: 32,
+  url: `${PLATFORM_EMAIL_IMAGE_BASE_URL}/shinefold-logo-dark-v2-2x.png`,
+  width: 176,
+  height: 56,
   alt: PLATFORM_EMAIL_BRAND_NAME,
 };
 
