@@ -21,6 +21,7 @@ import {
   EVERY_MODULE_PACK,
   getEntitledModulePacks,
 } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
+import { getCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
 import { faker } from '@faker-js/faker';
 import {
   type DocumentActionComponent,
@@ -28,10 +29,8 @@ import {
   type TemplateItem,
 } from 'sanity';
 
-import {
-  buildStudioConfig,
-  type TBuildStudioConfigParams,
-} from './studio-config';
+import { buildStudioConfig } from './studio-config';
+import type { TBuildStudioConfigParams } from './studio-config-params';
 
 vi.mock('sanity/structure');
 vi.mock('sanity-plugin-media');
@@ -167,31 +166,37 @@ describe(buildStudioConfig, () => {
     return newDocumentOptions;
   };
 
-  it('hides the migration ledger from the new-document menu', () => {
-    const newDocumentOptions = getNewDocumentOptions();
-    const ledgerItem = {
-      templateId: migrationStateSchema.name,
-    } as TemplateItem;
-    const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
+  describe('the new-document menu', () => {
+    let newDocumentOptions: ReturnType<typeof getNewDocumentOptions>;
 
-    const options = newDocumentOptions([ledgerItem, otherItem]);
+    beforeEach(() => {
+      newDocumentOptions = getNewDocumentOptions();
+    });
 
-    expect(options).toEqual([otherItem]);
-  });
+    it('hides the migration ledger from the new-document menu', () => {
+      const ledgerItem = {
+        templateId: migrationStateSchema.name,
+      } as TemplateItem;
+      const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
 
-  it('hides the cookie statement from the new-document menu in every language', () => {
-    const newDocumentOptions = getNewDocumentOptions();
-    const cookieStatementItems = Object.values(LOCALE_ISO_CODES).map(
-      (locale) =>
-        ({
-          templateId: `${PAGE_COOKIE_STATEMENT_TYPE}-${locale}`,
-        }) as TemplateItem,
-    );
-    const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
+      const options = newDocumentOptions([ledgerItem, otherItem]);
 
-    const options = newDocumentOptions([...cookieStatementItems, otherItem]);
+      expect(options).toEqual([otherItem]);
+    });
 
-    expect(options).toEqual([otherItem]);
+    it('hides the cookie statement from the new-document menu in every language', () => {
+      const cookieStatementItems = Object.values(LOCALE_ISO_CODES).map(
+        (locale) =>
+          ({
+            templateId: `${PAGE_COOKIE_STATEMENT_TYPE}-${locale}`,
+          }) as TemplateItem,
+      );
+      const otherItem = { templateId: MOCK_UNTRANSLATED_TYPE } as TemplateItem;
+
+      const options = newDocumentOptions([...cookieStatementItems, otherItem]);
+
+      expect(options).toEqual([otherItem]);
+    });
   });
 
   it.each([
@@ -291,6 +296,22 @@ describe(buildStudioConfig, () => {
       buildConfig({ entitlements: {} });
 
       expect(getEntitledModulePacks()).toEqual(EVERY_MODULE_PACK);
+    });
+  });
+
+  describe('platform plan links', () => {
+    beforeEach(() => {
+      buildConfig({ canLinkPlatformPlans: true });
+    });
+
+    it('lets a pricing tier link a platform plan when asked', () => {
+      expect(getCanLinkPlatformPlans()).toBe(true);
+    });
+
+    it('withholds platform plan links by default', () => {
+      buildConfig();
+
+      expect(getCanLinkPlatformPlans()).toBe(false);
     });
   });
 });

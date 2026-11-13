@@ -102,6 +102,9 @@ module types whose capability is off for the tenant carry a warning.
   be created new, and
   its documents and page references carry the plan warning instead
   ([plans-and-entitlements](./plans-and-entitlements.md)).
+- `canLinkPlatformPlans` (default off) shows a pricing tier's platform plan
+  fields ([pricing-module](./pricing-module.md)); only the marketing tenant's
+  Studio turns it on.
 - With a single live locale the language filter is hidden and
   single-language inputs apply.
 - Look and Voice do not reach the Studio; its UI is Sanity's own, in English.
@@ -109,7 +112,7 @@ module types whose capability is off for the tenant carry a warning.
 ## Constraints and invariants
 
 - `StudioMount` takes plain props only (`projectId`, `dataset`, `basePath`,
-  `title`, `enabledCapabilities`, `entitlements`, `defaultLocale`,
+  `title`, `enabledCapabilities`, `entitlements`, `canLinkPlatformPlans`, `defaultLocale`,
   `liveLocales`, `loginProvider`, `scheme`, plus the `onSchemeChange` and
   `onSignedIn` callbacks) and calls
   `buildStudioConfig` itself. It is the only `'use client'` file in

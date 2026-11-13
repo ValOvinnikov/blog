@@ -1,4 +1,10 @@
-import { type TPricePeriod } from '@blog/config/constants';
+import {
+  PRICE_PERIOD,
+  SELLABLE_TENANT_PLANS,
+  type TPricePeriod,
+  type TSellableTenantPlan,
+} from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
 import { pricingFeatureSchema } from '@blog/studio/schema-types/objects/pricing-feature/pricing-feature';
@@ -7,10 +13,13 @@ import {
   pricingPriceSchema,
 } from '@blog/studio/schema-types/objects/pricing-price/pricing-price';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { getCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
 import { validatePricingPricePeriodsUnique } from '@blog/studio/schema-types/validation/validate-pricing-price-periods-unique/validate-pricing-price-periods-unique';
+import { validatePricingTierPlanIntervalRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-plan-interval-required/validate-pricing-tier-plan-interval-required';
 import { validatePricingTierPriceLabelRequired } from '@blog/studio/schema-types/validation/validate-pricing-tier-price-label-required/validate-pricing-tier-price-label-required';
+import { isUndefined, toTitleCase } from '@blog/utils/primitives';
 import { CreditCard } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
@@ -19,10 +28,35 @@ const DESCRIPTION_MAX_LENGTH = 160;
 const LABEL_MAX_LENGTH = 24;
 const FOOTNOTE_MAX_LENGTH = 120;
 
+const PLATFORM_PLAN_INTERVALS = [
+  PRICE_PERIOD.MONTH,
+  PRICE_PERIOD.YEAR,
+] as const;
+
 type TPricingTierPricePreviewItem = {
   amount?: number;
   period?: TPricePeriod;
 };
+
+type TPricingTierParent = { platformPlan?: TSellableTenantPlan };
+
+const isLinkedToPlatformPlan = ({ parent }: { parent?: TPricingTierParent }) =>
+  Boolean(parent?.platformPlan);
+
+type TPricingTierPreview = {
+  name?: unknown;
+  prices?: TPricingTierPricePreviewItem[];
+  platformPlan?: TSellableTenantPlan;
+  platformPlanInterval?: TPricePeriod;
+  highlightLabel?: unknown;
+};
+
+const toPriceSubtitle = (
+  firstPrice: TMaybeUndefined<TPricingTierPricePreviewItem>,
+) =>
+  !isUndefined(firstPrice?.amount) && firstPrice.period
+    ? `${String(firstPrice.amount)} · ${PRICING_PERIOD_TITLE[firstPrice.period]}`
+    : undefined;
 
 export const pricingTierSchema = defineType({
   name: 'pricingTier',
@@ -58,12 +92,44 @@ export const pricingTierSchema = defineType({
         ),
     }),
     defineField({
+      name: 'platformPlan',
+      title: 'Platform Plan',
+      type: 'string',
+      description:
+        'Pick a plan to show its live price, in the visitor’s currency and with any running discount, instead of typed prices.',
+      options: {
+        layout: 'dropdown',
+        list: SELLABLE_TENANT_PLANS.map((value) => ({
+          title: toTitleCase(value),
+          value,
+        })),
+      },
+      hidden: () => !getCanLinkPlatformPlans(),
+    }),
+    defineField({
+      name: 'platformPlanInterval',
+      title: 'Billing Interval',
+      type: 'string',
+      description: 'Which of the plan’s prices the tier shows.',
+      options: {
+        layout: 'radio',
+        list: PLATFORM_PLAN_INTERVALS.map((value) => ({
+          title: PRICING_PERIOD_TITLE[value],
+          value,
+        })),
+      },
+      hidden: (context) => !isLinkedToPlatformPlan(context),
+      validation: (rule) =>
+        rule.custom(validatePricingTierPlanIntervalRequired),
+    }),
+    defineField({
       name: 'prices',
       title: 'Prices',
       type: 'array',
       description:
         'The amounts this tier costs. Add more than one to let readers switch periods.',
       of: [defineArrayMember({ type: pricingPriceSchema.name })],
+      hidden: isLinkedToPlatformPlan,
       validation: (rule) => [
         rule.max(3).error('A tier holds at most three prices.'),
         rule.custom(validatePricingPricePeriodsUnique),
@@ -74,6 +140,7 @@ export const pricingTierSchema = defineType({
       title: 'Price Label',
       description:
         'Shown instead of a price for a tier with none, such as "Contact us".',
+      hidden: isLinkedToPlatformPlan,
       validation: (rule) => [
         rule.custom(
           validateLocalizedMaxLength(
@@ -124,23 +191,31 @@ export const pricingTierSchema = defineType({
     select: {
       name: 'name',
       prices: 'prices',
+      platformPlan: 'platformPlan',
+      platformPlanInterval: 'platformPlanInterval',
       highlightLabel: 'highlightLabel',
     },
-    prepare({ name, prices, highlightLabel }) {
+    prepare({
+      name,
+      prices,
+      platformPlan,
+      platformPlanInterval,
+      highlightLabel,
+    }: TPricingTierPreview) {
       const tierName = defaultLanguageValue(name) ?? 'Unknown';
-      const firstPrice = (
-        prices as TPricingTierPricePreviewItem[] | undefined
-      )?.[0];
-      const priceSubtitle =
-        firstPrice?.amount !== undefined && firstPrice.period
-          ? `${String(firstPrice.amount)} · ${PRICING_PERIOD_TITLE[firstPrice.period]}`
-          : undefined;
+      const priceSubtitle = platformPlan
+        ? [
+            toTitleCase(platformPlan),
+            platformPlanInterval && PRICING_PERIOD_TITLE[platformPlanInterval],
+          ]
+            .filter(Boolean)
+            .join(' · ')
+        : toPriceSubtitle(prices?.[0]);
 
       return {
-        title:
-          defaultLanguageValue(highlightLabel) === undefined
-            ? tierName
-            : `★ ${tierName}`,
+        title: isUndefined(defaultLanguageValue(highlightLabel))
+          ? tierName
+          : `★ ${tierName}`,
         subtitle: priceSubtitle,
       };
     },

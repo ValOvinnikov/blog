@@ -13,7 +13,8 @@ import {
   useCurrentUser,
 } from 'sanity';
 
-import { buildStudioConfig, type TStudioEntitlements } from './studio-config';
+import { buildStudioConfig } from './studio-config';
+import type { TStudioEntitlements } from './studio-config-params';
 
 export type TStudioMountProps = {
   projectId: string;
@@ -22,6 +23,7 @@ export type TStudioMountProps = {
   title: string;
   enabledCapabilities?: readonly TCapability[];
   entitlements?: TStudioEntitlements;
+  canLinkPlatformPlans?: boolean;
   defaultLocale?: TLocaleIsoCode;
   liveLocales?: readonly TLocaleIsoCode[];
   loginProvider?: TSanityLoginProvider;
@@ -53,13 +55,7 @@ const SignedInSignal: FC<TSignedInSignalProps> = ({
 // Unlike next-sanity's NextStudio, fills the parent slot instead of hardcoding 100vh.
 const containerStyle = { height: '100%' };
 
-/**
- * The only file in this package carrying `'use client'`. It must be the one
- * that *calls* `buildStudioConfig` — a Server Component calling the builder
- * and passing the config object out pulls the Sanity SDK into the RSC server
- * graph, where it breaks under the `react-server` export condition. Callers
- * pass only plain strings.
- */
+// The one caller of `buildStudioConfig`: building it in a Server Component drags the Sanity SDK into the RSC graph.
 export const StudioMount: FC<TStudioMountProps> = ({
   projectId,
   dataset,
@@ -67,6 +63,7 @@ export const StudioMount: FC<TStudioMountProps> = ({
   title,
   enabledCapabilities,
   entitlements,
+  canLinkPlatformPlans,
   defaultLocale,
   liveLocales,
   loginProvider,
@@ -81,12 +78,12 @@ export const StudioMount: FC<TStudioMountProps> = ({
     title,
     enabledCapabilities,
     entitlements,
+    canLinkPlatformPlans,
     defaultLocale,
     liveLocales,
     loginProvider,
   };
-  // Keyed by value: a new config makes Sanity re-resolve the workspace and
-  // reset pane state, and callers pass fresh arrays on every render.
+  // Keyed by value: callers pass fresh arrays each render, and a new config resets Sanity's pane state.
   const paramsKey = JSON.stringify(params);
   const [built, setBuilt] = useState(() => ({
     paramsKey,
