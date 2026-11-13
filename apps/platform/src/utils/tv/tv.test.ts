@@ -1,6 +1,12 @@
 import { tv } from './tv';
 
 describe(tv, () => {
+  it('keeps a platform text size alongside a platform text colour', () => {
+    const variants = tv({ base: 'text-platform-13 text-platform-muted' });
+
+    expect(variants()).toBe('text-platform-13 text-platform-muted');
+  });
+
   it('keeps a custom text size alongside a text colour in the same slot', () => {
     const variants = tv({
       slots: {
@@ -14,7 +20,7 @@ describe(tv, () => {
     expect(classes).toContain('text-platform-faint');
   });
 
-  it('keeps an admin shadow beside a shadow colour and replaces an earlier radius', () => {
+  it('keeps a platform shadow beside a shadow colour and replaces an earlier radius', () => {
     const variants = tv({ base: 'rounded-platform shadow-platform' });
 
     const classes = variants({

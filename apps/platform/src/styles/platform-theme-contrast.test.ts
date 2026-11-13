@@ -270,7 +270,7 @@ const DARK_PAIRS: readonly TPair[] = [
 describe.each([
   ['light', LIGHT_PAIRS, colourIn(lightTokens)],
   ['dark', DARK_PAIRS, colourIn(darkTokens)],
-] as const)('admin %s palette contrast', (_palette, pairs, colourOf) => {
+] as const)('platform %s palette contrast', (_palette, pairs, colourOf) => {
   it.each(pairs)(
     '%s (%s on %s) meets %d:1',
     (_pair, foreground, background, threshold) => {
@@ -283,7 +283,7 @@ describe.each([
   );
 });
 
-describe('admin dark palette', () => {
+describe('platform dark palette', () => {
   it('applies the same values when the device is dark as when Dark is chosen', () => {
     expect(declarationsOf(SYSTEM_DARK_SELECTOR)).toEqual(
       declarationsOf(DARK_SELECTOR),

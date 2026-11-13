@@ -1,9 +1,7 @@
 import { createTV } from 'tailwind-variants';
 
+import { platformTokens } from './platform-tokens';
 import { SHADOW_TOKENS } from './shadow-tokens';
-
-const platformTokens = (...suffixes: string[]) =>
-  suffixes.map((suffix) => `platform-${suffix}`);
 
 // Keep these lists and `SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `platform-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
@@ -50,7 +48,7 @@ const FONT_FAMILY_TOKENS = [
   'mono',
   'ui',
   'platform',
-  'platform-mono',
+  ...platformTokens('mono'),
 ];
 
 const TRACKING_TOKENS = [
@@ -70,7 +68,7 @@ const SPACING_TOKENS = [
   'site-y',
   'card-x',
   'card-y',
-  'platform-card',
+  ...platformTokens('card'),
 ];
 
 const RADIUS_TOKENS = [
@@ -91,7 +89,7 @@ const RADIUS_TOKENS = [
 
 const LEADING_TOKENS = platformTokens('1-4', '1-45', '18', '19', '22');
 
-const FONT_WEIGHT_TOKENS = ['platform-650'];
+const FONT_WEIGHT_TOKENS = platformTokens('650');
 
 /** Import this instead of `tv` from `tailwind-variants`. */
 export const tv = createTV({
