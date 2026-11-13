@@ -83,7 +83,7 @@ the email in the platform's own look, and sends it.
   - Otherwise one email per recipient: 200 when all send, 207
     `{ sent, failed }` when some fail, 502 when all fail. Each failure is
     logged as `operator_alert.send_failed`.
-- Operator mail renders through `buildOperatorShell`, which takes no brand.
+- Operator mail renders through `buildOperatorShell`, which takes no brand: the platform palette with the small Shinefold logo (a hosted PNG) beside the fixed name "Tenant Alerts". Its copy stays hardcoded English.
   An alert cannot render in a tenant's colours.
 - From address: `OPERATOR_ALERT_FROM_ADDRESS`, else
   `Tenant Alerts <onboarding@resend.dev>`.
