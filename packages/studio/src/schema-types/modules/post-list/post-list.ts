@@ -2,6 +2,7 @@ import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fiel
 import {
   appearanceFieldGroups,
   appearanceFields,
+  appearanceFieldsets,
 } from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { showImagesField } from '@blog/studio/schema-types/fields/show-images-field/show-images-field';
@@ -19,6 +20,7 @@ export const postListSchema = defineType({
   description:
     "The paginated archive of posts for the page it sits on — all of them, or only the ones in that page's topic or tag.",
   icon: List,
+  fieldsets: appearanceFieldsets,
   groups: appearanceFieldGroups,
   fields: appearanceFields({
     content: [
@@ -36,8 +38,8 @@ export const postListSchema = defineType({
     appearance: [
       brandVariantField(),
       ...alignmentFields([], { title: 'Heading Alignment' }),
-      wideLayoutField,
     ],
+    layout: wideLayoutField,
   }),
   preview: {
     select: {
