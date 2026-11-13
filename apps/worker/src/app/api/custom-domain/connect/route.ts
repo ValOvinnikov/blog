@@ -5,6 +5,7 @@ import { sanitizeLogMessage } from '@blog/insight';
 import { CUSTOM_DOMAIN_LOG } from '@worker/constants/custom-domain';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { customDomainRequestBodySchema } from '@worker/utils/custom-domain-request/custom-domain-request';
+import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
@@ -18,6 +19,7 @@ export async function POST(request: Request): Promise<Response> {
   const signed = await readSignedRequest(
     request,
     customDomainRequestBodySchema,
+    env.WORKER_ENQUEUE_SECRET,
   );
   if (!signed.ok) return signed.error;
   const { tenantId, domain } = signed.data;

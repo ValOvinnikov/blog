@@ -1,9 +1,11 @@
 import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
+import { isUndefined } from '@blog/utils/primitives';
 import { errorResult, okResult, type TResult } from '@blog/utils/result';
 import {
   ENQUEUE_ERROR,
@@ -35,12 +37,12 @@ function reject(status: THttpStatus, error: TEnqueueError) {
 export async function readSignedRequest<TBody>(
   request: Request,
   schema: z.ZodType<TBody>,
+  secret: TMaybeUndefined<string>,
 ): Promise<TResult<TBody, Response>> {
-  const secret = env.WORKER_ENQUEUE_SECRET;
   const rawBody = await request.text();
 
   const authenticated =
-    secret !== undefined &&
+    !isUndefined(secret) &&
     isValidEnqueueSignature({
       secret,
       timestamp: request.headers.get(ENQUEUE_TIMESTAMP_HEADER),
@@ -68,6 +70,10 @@ export async function readSignedRequest<TBody>(
 export async function readSignedTenantRequest(
   request: Request,
 ): Promise<TResult<string, Response>> {
-  const signed = await readSignedRequest(request, tenantRequestBodySchema);
+  const signed = await readSignedRequest(
+    request,
+    tenantRequestBodySchema,
+    env.WORKER_ENQUEUE_SECRET,
+  );
   return signed.ok ? okResult(signed.data.tenantId) : signed;
 }

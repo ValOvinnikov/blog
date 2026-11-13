@@ -20,7 +20,7 @@ export const enqueueNewsletterPostSend = async (
 ): Promise<boolean> => {
   const { tenantId, postId } = request;
   const workerUrl = env.WORKER_ENQUEUE_URL;
-  const secret = env.WORKER_ENQUEUE_SECRET;
+  const secret = env.WORKER_NEWSLETTER_ENQUEUE_SECRET;
 
   if (!workerUrl || !secret) {
     logger.error(REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_SKIPPED, {

@@ -18,7 +18,7 @@ import {
 const { envMock } = vi.hoisted(() => ({
   envMock: {} as {
     WORKER_ENQUEUE_URL?: string;
-    WORKER_ENQUEUE_SECRET?: string;
+    WORKER_NEWSLETTER_ENQUEUE_SECRET?: string;
   },
 }));
 
@@ -42,7 +42,7 @@ describe(enqueueNewsletterPostSend, () => {
 
   beforeEach(() => {
     envMock.WORKER_ENQUEUE_URL = MOCK_WORKER_URL;
-    envMock.WORKER_ENQUEUE_SECRET = MOCK_SECRET;
+    envMock.WORKER_NEWSLETTER_ENQUEUE_SECRET = MOCK_SECRET;
     fetchMock = vi
       .fn()
       .mockResolvedValue(new Response(null, { status: HTTP_STATUS.ACCEPTED }));
@@ -71,7 +71,7 @@ describe(enqueueNewsletterPostSend, () => {
 
   it.each([
     ['worker url', 'WORKER_ENQUEUE_URL'],
-    ['secret', 'WORKER_ENQUEUE_SECRET'],
+    ['secret', 'WORKER_NEWSLETTER_ENQUEUE_SECRET'],
   ] as const)(
     'logs and sends nothing without the %s',
     async (_label, variable) => {

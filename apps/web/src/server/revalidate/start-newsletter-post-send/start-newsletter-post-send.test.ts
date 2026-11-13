@@ -107,11 +107,8 @@ describe(startNewsletterPostSend, () => {
     expect(enqueueMock).not.toHaveBeenCalled();
   });
 
-  it.each([
-    ['an archived site', undefined],
-    ['a suspended site', MOCK_SUSPENDED_TENANT],
-  ])('claims nothing for %s', async (_label, tenant) => {
-    getTenantByIdMock.mockResolvedValue(tenant);
+  it('claims nothing for an archived site', async () => {
+    getTenantByIdMock.mockResolvedValue(undefined);
 
     await startNewsletterPostSend(FIRST_PUBLISH);
 
@@ -120,6 +117,10 @@ describe(startNewsletterPostSend, () => {
   });
 
   it.each([
+    [
+      'that is suspended',
+      () => getTenantByIdMock.mockResolvedValue(MOCK_SUSPENDED_TENANT),
+    ],
     [
       'whose plan or toggle leaves the newsletter off',
       () => isCapabilityEnabledMock.mockResolvedValue(false),

@@ -67,12 +67,12 @@ export const env = createEnv({
     PRODUCT_NAME: z.string().trim().min(1).optional(),
     // @env-optional
     MARKETING_SITE_URL: z.string().url().optional(),
-    // Absent, or with WORKER_ENQUEUE_SECRET absent, no published post is emailed to subscribers.
+    // Absent, or with WORKER_NEWSLETTER_ENQUEUE_SECRET absent, no published post is emailed to subscribers.
     // @env-optional
     WORKER_ENQUEUE_URL: z.string().url().optional(),
-    // Must be byte-identical to `apps/worker`'s own `WORKER_ENQUEUE_SECRET`.
+    // Must be byte-identical to `apps/worker`'s own `WORKER_NEWSLETTER_ENQUEUE_SECRET`.
     // @env-optional
-    WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
+    WORKER_NEWSLETTER_ENQUEUE_SECRET: z.string().min(1).optional(),
   },
   client: {
     // @env-optional
@@ -103,7 +103,8 @@ export const env = createEnv({
     PRODUCT_NAME: process.env.PRODUCT_NAME,
     MARKETING_SITE_URL: process.env.MARKETING_SITE_URL,
     WORKER_ENQUEUE_URL: process.env.WORKER_ENQUEUE_URL,
-    WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
+    WORKER_NEWSLETTER_ENQUEUE_SECRET:
+      process.env.WORKER_NEWSLETTER_ENQUEUE_SECRET,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

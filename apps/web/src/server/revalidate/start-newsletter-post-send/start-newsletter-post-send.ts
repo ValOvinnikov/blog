@@ -1,5 +1,7 @@
 import { CAPABILITY, SANITY_WEBHOOK_OPERATION } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { queries } from '@blog/db';
+import type { TTenant } from '@blog/db/schema/tenants';
 import {
   REVALIDATE_LOG,
   STARTER_DOCUMENT_ID_PREFIX,
@@ -11,12 +13,30 @@ import { isCapabilityEnabledForTenant } from '@web/server/settings-features/is-c
 import { isTenantActive } from '@web/server/tenant/write-gate/write-gate';
 import { logger } from '@web/utils/logger/logger';
 
-const isSiteSendingPosts = async (tenantId: string): Promise<boolean> => {
+const isSiteSendingPosts = async (tenant: TTenant): Promise<boolean> => {
+  if (!isTenantActive(tenant)) return false;
+
   const [isNewsletterOn, isEmailNewPostsOn] = await Promise.all([
-    isCapabilityEnabledForTenant(tenantId, CAPABILITY.NEWSLETTER),
-    queries.emailConfig.getEmailNewPosts(tenantId),
+    isCapabilityEnabledForTenant(tenant.id, CAPABILITY.NEWSLETTER),
+    queries.emailConfig.getEmailNewPosts(tenant.id),
   ]);
   return isNewsletterOn && isEmailNewPostsOn;
+};
+
+/** Resolves the claim's time only when the site sends posts: a site not sending still keeps the claim, so a later republish emails nothing. */
+const claimFirstPublish = async (
+  tenantId: string,
+  postId: string,
+): Promise<TMaybeUndefined<Date>> => {
+  const tenant = await queries.tenants.getTenantById(tenantId);
+  if (!tenant) return undefined;
+
+  const isSending = await isSiteSendingPosts(tenant);
+  const claim = await queries.newsletterPostSends.claimNewsletterPostSend(
+    tenantId,
+    postId,
+  );
+  return isSending ? claim?.claimedAt : undefined;
 };
 
 const releaseClaim = async (
@@ -55,29 +75,18 @@ export const startNewsletterPostSend = async ({
     return;
   }
 
-  let claim;
-  let isSending;
-  try {
-    const tenant = await queries.tenants.getTenantById(tenantId);
-    if (!tenant || !isTenantActive(tenant)) return;
+  const claimedAt = await claimFirstPublish(tenantId, postId).catch(
+    (error: unknown) => {
+      logger.error(REVALIDATE_LOG.NEWSLETTER_SEND_START_FAILED, {
+        tenantId,
+        postId,
+        error,
+      });
+      return undefined;
+    },
+  );
+  if (!claimedAt) return;
 
-    isSending = await isSiteSendingPosts(tenantId);
-    claim = await queries.newsletterPostSends.claimNewsletterPostSend(
-      tenantId,
-      postId,
-    );
-  } catch (error) {
-    logger.error(REVALIDATE_LOG.NEWSLETTER_SEND_START_FAILED, {
-      tenantId,
-      postId,
-      error,
-    });
-    return;
-  }
-  // A site not sending keeps the claim, so a republish once sending is on never emails an old post.
-  if (!claim || !isSending) return;
-
-  const { claimedAt } = claim;
   const isStarted = await enqueueNewsletterPostSend({
     tenantId,
     postId,
