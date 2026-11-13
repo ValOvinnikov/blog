@@ -2194,6 +2194,17 @@
     "contest": "To contest this decision, reply to the suspension email or write to support quoting {reference}.",
     "copyButton": "Copy reference"
   },
+  "billingStatusNotice": {
+    "pastDueTitle": "Your last payment failed",
+    "pastDueDescription": "Update your payment method to keep {plan}.",
+    "pastDueAction": "Update payment method",
+    "graceTitle": "Your site is now on {plan}",
+    "graceMembers": "On <time>{date}</time>, {count, plural, one {# team member loses} other {# team members lose}} access to this site's admin.",
+    "graceDomain": "On <time>{date}</time>, {customDomain} stops being the main address and redirects to {subdomain}.",
+    "graceKeep": "Upgrade before then to keep everything as it is.",
+    "graceKeepAskOwner": "The site owner can upgrade before then to keep everything as it is.",
+    "graceUpgrade": "Upgrade"
+  },
   "billingPage": {
     "title": "Billing",
     "description": "Your plan, your next payment and your invoices.",

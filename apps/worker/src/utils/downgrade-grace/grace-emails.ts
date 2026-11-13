@@ -2,6 +2,7 @@ import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
 import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { graceEndDate } from '@blog/db/utils/grace-end-date/grace-end-date';
 import {
   buildOwnerDowngradeGraceEmail,
   PLATFORM_EMAIL_BRAND_NAME,
@@ -19,7 +20,6 @@ import type {
 import { OWNER_GRACE_EMAIL_COPY } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy';
 import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
 
-import { graceEndDate } from './grace-dates';
 import { hasGraceLocks, type TGraceLocks } from './grace-locks';
 
 export type TGraceEmailInput = {

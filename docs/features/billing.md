@@ -19,6 +19,8 @@ code:
   - apps/platform/src/utils/format-stripe-amount/**
   - apps/platform/src/utils/invoice-status-tone/**
   - apps/platform/src/server/auth/resolve-gated-dashboard-tenant.ts
+  - apps/platform/src/components/features/billing/billing-status-notice/**
+  - packages/db/src/utils/grace-end-date/**
   - packages/db/src/queries/tenants/set-tenant-plan/**
   - packages/db/src/queries/tenants/get-tenant-id-by-stripe-ids/**
   - packages/db/src/queries/stripe-webhook-events/**
@@ -49,9 +51,18 @@ A site with no live subscription (Free, a trial, a lapsed site) buys Starter or 
 - **Manage billing** (`openBillingPortalAction`) re-checks the caller with `requireTenantOwnerOrAdmin(tenantId, isSuperAdmin)` — the real owner or a super admin, any other caller 404s — creates a Customer Portal session for the stored customer with `return_url` `PLATFORM_APP_BASE_URL` + `/dashboard/billing`, and redirects to it. No customer, or an id that is not a site → refused (`NO_CUSTOMER`); no key or base URL, or a failed session → a toast, logged `billing.stripe_unconfigured` / `billing.portal_failed`. The Portal's features (payment method, cancellation) and branding are set in the Stripe dashboard.
 - Cost: per Billing page view, one Stripe read for the invoices plus two (the subscription, then the preview) for a site with a live subscription; one per Manage billing click; free.
 
+- Every tenant admin page (`apps/platform`, the `(tenant)` layout's notice slot) — the billing status notice; see Behaviour.
 - `/dashboard/upgrade` (`apps/platform`, owner tree) — Upgrade. The Growth note's "Ask about Growth" on Look and Sign-in links here. `?promo=<code>` applies a promotion code; `?session_id=` marks the return from Checkout.
 
 ## Behaviour
+
+### Billing status notice
+
+- `BillingStatusNotice` streams into the tenant layout's notice slot, under the suspension banner, so it shows on every tenant admin page. Its copy is fixed platform copy in the five catalogues (`billingStatusNotice`), never Voice, and it never reads Stripe.
+- **Past due** (`PAST_DUE`): "Your last payment failed. Update your payment method to keep {plan}." with **Update payment method** linking to Billing. No date: the plan is kept through `PAST_DUE` and nothing is scheduled to lock until Stripe gives up and the grace starts. Shown only to Billing's audience, the real owner and a super admin (`access.billing`); anyone else sees nothing (decided, owner, 2026-11-13).
+- **Downgrade grace** (a stored `downgrade_grace_started_at`, not archived): shown to every member. It names only what applies, decided the way the sweep decides it ([plans and entitlements](./plans-and-entitlements.md)) by `loadGraceLocks`: the memberships over the current plan's seats (`countMembershipsOverSeats`), and, on a plan without `hasCustomDomain`, a custom main address and the subdomain it will redirect to. Each line carries the grace's end date (`graceEndDate` from `@blog/db`, the date the worker's emails print) in a `<time>`. The viewer who can upgrade (`upgradeStateFor` is `AVAILABLE`) gets **Upgrade** to the Upgrade page; any other member reads that the site owner can upgrade. A grace with nothing to lock or redirect shows no notice, as the day-7 and day-13 emails are skipped.
+- The notice goes as soon as the grace ends, early or at day 14: an upgrade or a paid invoice clears `downgrade_grace_started_at` through the plan change, and the next page load renders nothing.
+- Cost: none outside a grace or `PAST_DUE`; in a grace, one membership count per admin page load, plus a tenant-domains read when the main address is a custom domain on a plan without one.
 
 ### Upgrade
 
@@ -125,15 +136,18 @@ A site with no live subscription (Free, a trial, a lapsed site) buys Starter or 
 - `apps/platform/src/server/tenants/on-tenant-plan-change.ts` — `onTenantPlanChange`
 - `apps/platform/src/server/billing/load-billing-overview.ts` — `loadBillingOverview`, the Billing page's Stripe reads
 - `apps/platform/src/server/billing/open-billing-portal-action.ts` — `openBillingPortalAction`
+- `apps/platform/src/components/features/billing/billing-status-notice/billing-status-notice.tsx` — `BillingStatusNotice`
+- `apps/platform/src/server/billing/load-grace-locks.ts` — `loadGraceLocks`
 
 ## Tests
 
 - Platform, Upgrade: `upgrade-state-for.test.ts`, `ensure-stripe-customer.test.ts`, `prepare-customer-checkout.test.ts`, `create-plan-checkout-session.test.ts` (each plan and period), `create-upgrade-checkout-action.test.ts` (a Free and a trial owner each buying Starter and Growth, monthly and yearly), `platform-tenant.test.ts`, `upgrade-page-content.test.tsx`, `upgrade-checkout.test.tsx` (Stripe.js and React Stripe.js faked), `upgrade-confirming.test.tsx`, `upgrade-search-params.test.ts`, the route's `page.test.tsx`, and the Growth note's link in `growth-note.test.tsx`.
 - Platform, plan change: `plan-change-timing.test.ts`, `load-subscription-plan.test.ts`, `change-subscription-plan.test.ts` (Starter → Growth now and Growth → Starter at renewal on one subscription, monthly ↔ yearly, bands, a planned change kept or replaced), `change-plan-action.test.ts`, `read-tenant-subscription-plan.test.ts`, `plan-change.test.tsx`, `plan-change-section.test.tsx`.
 - Platform, webhook and Billing page: `route.test.ts` (signed with the Stripe SDK's test header), `handle-stripe-event.test.ts`, `sync-stripe-subscription.test.ts`, `resolve-stripe-tenant.test.ts`, `send-payment-receipt.test.ts`, `plan-from-price-keys.test.ts`, `tenant-state-from-subscription.test.ts`, `grace-billing-fields.test.ts`, `subscription-id-from-event.test.ts`, `fetch-stripe-billing.test.ts`, `load-billing-overview.test.ts`, `open-billing-portal-action.test.ts`, `resolve-gated-dashboard-tenant.test.ts`, `resolve-tenant-page-access.test.ts`, and the `plan-card`, `invoices-table` and `manage-billing-button` component tests.
+- Platform, billing status notice: `billing-status-notice.test.tsx`, `load-grace-locks.test.ts`; db: `grace-end-date.test.ts`.
 - db: `set-tenant-plan.test.ts`, `get-tenant-id-by-stripe-ids.test.ts`, `record-stripe-event.test.ts`.
 - Not covered by tests: an owner of a paying test-mode tenant opening every invoice PDF, and Manage billing opening the Portal and returning to the page (#6883); a test-mode plan change (Starter → Growth paying the proration, Growth → Starter at a test clock's renewal, a 3-D Secure test card on a move up reaching `CARD_DECLINED`, and the Customer Portal's cancel on a subscription with a schedule attached); a real test-mode purchase through Embedded Checkout (test card, a `?promo=` code, tax) ending on the chosen plan once the webhook arrives, and test-mode events from the Stripe CLI moving a tenant through Growth, `PAST_DUE`, `ACTIVE` and Free — a manual check against the dev deployment.
 
 ## Related
 
-- #6876 — this webhook. #6877 — Upgrade through Embedded Checkout, plan and period chosen, which sets `metadata.tenantId`. #6878 — the Billing page. #7333 — a paying site changes plan. #5066 — where a price lives. #5714 — the Growth template layer. #6875 — the downgrade grace sweep. #7162, #7164 — readers of the band.
+- #6876 — this webhook. #6877 — Upgrade through Embedded Checkout, plan and period chosen, which sets `metadata.tenantId`. #6878 — the Billing page. #7333 — a paying site changes plan. #5066 — where a price lives. #5714 — the Growth template layer. #6875 — the downgrade grace sweep. #6879 — the billing status notice. #7162, #7164 — readers of the band.

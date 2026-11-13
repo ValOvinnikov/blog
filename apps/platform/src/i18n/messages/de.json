@@ -2194,6 +2194,17 @@
     "contest": "Um diese Entscheidung anzufechten, antworte auf die Sperr-E-Mail oder schreibe an den Support und gib {reference} an.",
     "copyButton": "Referenz kopieren"
   },
+  "billingStatusNotice": {
+    "pastDueTitle": "Deine letzte Zahlung ist fehlgeschlagen",
+    "pastDueDescription": "Aktualisiere deine Zahlungsmethode, um {plan} zu behalten.",
+    "pastDueAction": "Zahlungsmethode aktualisieren",
+    "graceTitle": "Deine Website ist jetzt auf {plan}",
+    "graceMembers": "Am <time>{date}</time> {count, plural, one {verliert # Teammitglied} other {verlieren # Teammitglieder}} den Zugang zur Verwaltung dieser Website.",
+    "graceDomain": "Am <time>{date}</time> ist {customDomain} nicht mehr die Hauptadresse und leitet auf {subdomain} weiter.",
+    "graceKeep": "Führe vorher ein Upgrade durch, um alles zu behalten.",
+    "graceKeepAskOwner": "Der Websiteinhaber kann vorher ein Upgrade durchführen, um alles zu behalten.",
+    "graceUpgrade": "Upgrade"
+  },
   "billingPage": {
     "title": "Abrechnung",
     "description": "Ihr Tarif, Ihre nächste Zahlung und Ihre Rechnungen.",
