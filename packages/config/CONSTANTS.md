@@ -328,6 +328,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
 
+### `@blog/db/constants` — `packages/db/src/constants/downgrade-grace.ts`
+
+- **GRACE_EMAIL**: `STARTED`, `HALFWAY`, `ENDING`
+
 ### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
 
 - **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
@@ -933,6 +937,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@worker/constants/custom-domain` — `apps/worker/src/constants/custom-domain.ts`
 
 - **CUSTOM_DOMAIN_LOG**: `CONNECT_START_FAILED`=`"custom_domain.connect_start_failed"`, `DISCONNECT_START_FAILED`=`"custom_domain.disconnect_start_failed"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+
+### `@worker/constants/downgrade-grace` — `apps/worker/src/constants/downgrade-grace.ts`
+
+- **DOWNGRADE_GRACE_LOG**: `FAILED`=`"downgrade_grace.failed"`, `STEP_FAILED`=`"downgrade_grace.step_failed"`, `OWNER_MISSING`=`"downgrade_grace.owner_missing"`, `SUBDOMAIN_MISSING`=`"downgrade_grace.subdomain_missing"`, `EMAIL_SEND_FAILED`=`"downgrade_grace.email_send_failed"`
+- **DOWNGRADE_GRACE_STEP**: `TRIAL_END`, `GRACE_END`
 
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
 
