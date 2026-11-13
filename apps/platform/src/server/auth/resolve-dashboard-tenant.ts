@@ -1,13 +1,10 @@
 import 'server-only';
 
 import type { TMembership } from '@blog/db/schema/memberships';
-import { readRenamedCookie } from '@platform/server/renamed-cookie/read-renamed-cookie';
-import {
-  ACTIVE_TENANT_COOKIE,
-  LEGACY_ACTIVE_TENANT_COOKIE,
-} from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
+import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { cache } from 'react';
 
@@ -43,10 +40,8 @@ export const resolveDashboardTenant = cache(
       };
     }
 
-    const activeTenantId = await readRenamedCookie({
-      name: ACTIVE_TENANT_COOKIE,
-      legacyName: LEGACY_ACTIVE_TENANT_COOKIE,
-    });
+    const cookieStore = await cookies();
+    const activeTenantId = cookieStore.get(ACTIVE_TENANT_COOKIE)?.value;
     const activeMembership = memberships.find(
       (membership) => membership.tenantId === activeTenantId,
     );

@@ -44,7 +44,7 @@ The platform decides who may run which tenant. Platform operators hold an `admin
 - **Operator tree.** `/tenants`, `/tenants/new` and `/findings` sit in the `(operator)` group, which requires any `admins` row. `/tenants/{id}/*` also needs any admin, and resolves archived tenants too. `/tenants/{id}/danger` additionally requires SUPERADMIN.
 - **Owner tree.** `/dashboard/*` resolves the tenant from the session's own memberships:
   - with one membership, it uses that tenant;
-  - with several, it reads the `platform-active-tenant` cookie, and without the cookie it redirects to `/dashboard/select-tenant`;
+  - with several, it reads the `admin-active-tenant` cookie, and without the cookie it redirects to `/dashboard/select-tenant`;
   - with none, it redirects to `/onboarding`.
     This tree hides the Platform nav, so an owner never sees that the platform has other tenants.
 - **Tenant switching.** `GET /api/dashboard/select-tenant?tenantId=` sets the active-tenant cookie (httpOnly, 30 days) after checking access, and 404s otherwise. The tenant switcher in the shell only appears for users with more than one tenant.

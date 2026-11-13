@@ -57,7 +57,7 @@ site as a 14-day Growth trial, with no card.
   to try again in an hour.
   `adminRoutes.signIn(callbackUrl)` builds it, always with an explicit
   `callbackUrl` (`/` by default). A session gate passes the page the visitor
-  asked for, which `src/proxy.ts` records in the `x-platform-requested-path`
+  asked for, which `src/proxy.ts` records in the `x-admin-requested-path`
   request header; a sign-in therefore lands on that page, by email link,
   GitHub or Google alike. `toSafeCallbackPath` keeps only a same-origin path,
   so a crafted `callbackUrl` falls back to `/`. Auth.js's own
