@@ -42,18 +42,27 @@ dark grounds it can be text, a line or a control.
 
 ## Which logo each surface shows
 
-| Surface                                     | Shows                                                      |
-| ------------------------------------------- | ---------------------------------------------------------- |
-| Platform sidebar, expanded                  | Full logo with a small "Platform" label under the name     |
-| Platform sidebar, collapsed                 | Small logo                                                 |
-| Sign-in, sign-up, not-found and error pages | Full logo alone                                            |
-| Tenant picker and onboarding rail           | Full logo alone, dark-ground file                          |
-| Platform emails                             | Full logo in the header; the text says "Shinefold"         |
-| Operator alert emails                       | Small logo beside "Tenant Alerts"                          |
-| "Powered by" in a Free site's footer        | "Powered by" and the one-colour full logo                  |
-| Browser tab                                 | Small logo as the icon; the title reads "Page · Shinefold" |
-| Marketing site                              | Full logo in the header, small logo as the icon            |
-| A tenant site that has uploaded no logo     | The site's own initial in a tile, never a Shinefold logo   |
+| Surface                                     | Shows                                                                   |
+| ------------------------------------------- | ----------------------------------------------------------------------- |
+| Platform sidebar, expanded                  | Full logo with a small "Platform" label under the name                  |
+| Platform sidebar, collapsed                 | Small logo                                                              |
+| Sign-in, sign-up, not-found and error pages | Full logo alone                                                         |
+| Tenant picker and onboarding rail           | Full logo alone, dark-ground file                                       |
+| Platform emails                             | Full logo in the header on a near-black band; the text says "Shinefold" |
+| Operator alert emails                       | Small logo beside "Tenant Alerts"                                       |
+| "Powered by" in a Free site's footer        | "Powered by" and the one-colour full logo                               |
+| Browser tab                                 | Small logo as the icon; the title reads "Page · Shinefold"              |
+| Marketing site                              | Full logo in the header, small logo as the icon                         |
+| A tenant site that has uploaded no logo     | The site's own initial in a tile, never a Shinefold logo                |
+
+## Email images
+
+Mail clients such as Gmail and Outlook strip inline SVG, so emails show the
+logos as hosted PNGs at twice their display size. The uploaded files are kept
+in [`email/`](email/): `shinefold-logo-light-v1-2x.png`,
+`shinefold-logo-dark-v1-2x.png`, `shinefold-mark-v1-2x.png` and `shinefold-logo-dark-v2-2x.png` (opaque, near-black ground baked in; the one platform emails use). A changed
+file is uploaded under a new version number, never over the old one, because
+sent emails keep loading the old address.
 
 ## Rules
 

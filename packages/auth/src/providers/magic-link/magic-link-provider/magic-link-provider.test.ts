@@ -64,7 +64,7 @@ const MOCK_LINK_EXPIRES = faker.date.future();
 const MOCK_AUTHORED_BODY_TEXT = faker.lorem.sentence();
 const MOCK_PHISHING_URL = faker.internet.url();
 const MIMICKED_ACTION_LABEL = 'Sign in';
-const PLATFORM_LAYOUT_MARK = `>${PLATFORM_EMAIL_BRAND_NAME}</td>`;
+const PLATFORM_LAYOUT_MARK = `alt="${PLATFORM_EMAIL_BRAND_NAME}"`;
 const COPYRIGHT_MARK = '&copy;';
 const BLOCKED_REFUSAL = { reason: MAGIC_LINK_REFUSAL.BLOCKED };
 const LIMIT_REFUSAL = { reason: MAGIC_LINK_REFUSAL.ADDRESS_LIMIT };

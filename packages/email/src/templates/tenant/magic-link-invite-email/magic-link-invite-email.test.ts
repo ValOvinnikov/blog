@@ -2,6 +2,7 @@ import { NEUTRAL_EMAIL_PALETTE } from '@blog/email/html/neutral-shell/neutral-sh
 import {
   PLATFORM_EMAIL_BRAND,
   PLATFORM_EMAIL_BRAND_NAME,
+  PLATFORM_EMAIL_FULL_LOGO,
 } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
   COPYRIGHT_ENTITY,
@@ -168,15 +169,15 @@ describe(buildInviteMagicLinkEmail, () => {
       );
     });
 
-    it('shows the platform logo mark next to the platform name', () => {
-      expect(email.html).toContain('<svg');
-      expect(email.html).toContain(PLATFORM_EMAIL_BRAND.logo1);
+    it('shows the hosted full platform logo and names the platform in the footer', () => {
+      expect(email.html).not.toContain('<svg');
+      expect(email.html).toContain(PLATFORM_EMAIL_FULL_LOGO.url);
       expect(email.html).toContain(
         `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${PLATFORM_EMAIL_BRAND_NAME}`,
       );
     });
 
-    it('never replaces the mark with an uploaded logo image', () => {
+    it('never replaces the logo with an uploaded logo image', () => {
       expect(email.html).not.toContain(MOCK_LOGO_URL);
     });
   });
