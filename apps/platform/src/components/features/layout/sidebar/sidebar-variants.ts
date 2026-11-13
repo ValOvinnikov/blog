@@ -15,17 +15,16 @@ export const sidebarVariants = tv({
       'group-data-[collapsed=true]/shell:md:w-admin-rail',
     ],
     brand: [
-      'flex flex-none items-center gap-2.5 border-b border-admin-side-line px-[18px] py-4',
+      'flex flex-none items-center border-b border-admin-side-line px-[18px] py-4',
       'group-data-[collapsed=true]/shell:justify-center group-data-[collapsed=true]/shell:px-2',
     ],
-    brandMeta: [
-      'flex min-w-0 flex-col',
+    brandExpanded: [
+      'flex min-w-0 flex-col gap-[5px]',
       'group-data-[collapsed=true]/shell:hidden',
     ],
-    brandName: [
-      'text-admin-14 font-bold tracking-[0.2px] text-admin-text-strong',
-    ],
-    brandTagline: ['text-admin-12 text-admin-side-muted'],
+    brandCollapsed: ['hidden', 'group-data-[collapsed=true]/shell:block'],
+    // Starts where the full logo's lettering starts at its 28px height.
+    brandTagline: ['pl-9 text-admin-12 font-medium text-admin-side-muted'],
     switcherSlot: [
       'flex-none px-3 pt-3 pb-1',
       'group-data-[collapsed=true]/shell:hidden',

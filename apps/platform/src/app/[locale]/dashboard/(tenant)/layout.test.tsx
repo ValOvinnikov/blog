@@ -21,7 +21,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import DashboardTenantLayout from './layout';
 
@@ -91,7 +91,10 @@ const setup = customRenderAsync(DashboardTenantLayout, {
 });
 
 describe(`<${DashboardTenantLayout.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listTenantsMock.mockResolvedValue([MOCK_FREE_TENANT]);
     countLeadsForTenantMock.mockResolvedValue(0);
@@ -171,7 +174,9 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     it('links the nav to /dashboard pages, without a Platform section', () => {
       const lookLink = screen.getByRole('link', { name: navSections.look });
-      const platformSection = screen.queryByText(navSections.platformLabel);
+      const platformSection = screen.queryByRole('navigation', {
+        name: navSections.platformLabel,
+      });
 
       expect(lookLink).toHaveAttribute('href', adminRoutes.dashboardLook());
       expect(platformSection).not.toBeInTheDocument();
@@ -184,7 +189,6 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     );
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
-    const user = userEvent.setup();
     await setup();
     const session = await auth();
 
