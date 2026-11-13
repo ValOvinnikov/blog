@@ -13,10 +13,12 @@ CREATE TABLE "stripe_promotion_codes" (
 	"code" text NOT NULL,
 	"percent_off" double precision,
 	"amount_off_by_currency" jsonb,
+	"duration" text NOT NULL,
+	"duration_in_months" integer,
 	"applies_to_product_ids" text[],
 	"expires_at" timestamp,
-	"updated_at" timestamp NOT NULL,
-	CONSTRAINT "stripe_promotion_codes_code_unique" UNIQUE("code")
+	"updated_at" timestamp NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX "stripe_prices_stripe_price_id_idx" ON "stripe_prices" USING btree ("stripe_price_id");
+CREATE INDEX "stripe_prices_stripe_price_id_idx" ON "stripe_prices" USING btree ("stripe_price_id");--> statement-breakpoint
+CREATE INDEX "stripe_promotion_codes_code_idx" ON "stripe_promotion_codes" USING btree ("code");

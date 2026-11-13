@@ -1,4 +1,8 @@
-import { BILLING_CURRENCY, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
+import {
+  BILLING_CURRENCY,
+  STRIPE_COUPON_DURATION,
+  STRIPE_PRICE_LOOKUP_KEY,
+} from '@blog/db/constants';
 import type { TSaveStripePriceInput } from '@blog/db/queries/stripe-catalogue/save-stripe-price';
 import type { TSaveStripePromotionCodeInput } from '@blog/db/queries/stripe-catalogue/save-stripe-promotion-code';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
@@ -20,6 +24,11 @@ export const MOCK_PROMOTION_CODE_ID = `promo_${catalogueFaker.string.alphanumeri
 export const MOCK_PROMOTION_CODE = catalogueFaker.string.alpha({
   length: 8,
   casing: 'upper',
+});
+export const MOCK_OTHER_PROMOTION_CODE_ID = `promo_${catalogueFaker.string.alphanumeric(14)}`;
+export const MOCK_DURATION_IN_MONTHS = catalogueFaker.number.int({
+  min: 2,
+  max: 12,
 });
 export const MOCK_PERCENT_OFF = catalogueFaker.number.int({ min: 5, max: 50 });
 
@@ -46,6 +55,8 @@ export function mockSaveStripePromotionCodeInput(
     code: MOCK_PROMOTION_CODE,
     percentOff: MOCK_PERCENT_OFF,
     amountOffByCurrency: undefined,
+    duration: STRIPE_COUPON_DURATION.FOREVER,
+    durationInMonths: undefined,
     appliesToProductIds: undefined,
     expiresAt: undefined,
     ...overrides,

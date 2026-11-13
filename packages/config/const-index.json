@@ -4100,6 +4100,30 @@
         "file": "packages/db/src/constants/billing.ts"
       }
     ],
+    "ONCE": [
+      {
+        "ref": "STRIPE_COUPON_DURATION.ONCE",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "REPEATING": [
+      {
+        "ref": "STRIPE_COUPON_DURATION.REPEATING",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "FOREVER": [
+      {
+        "ref": "STRIPE_COUPON_DURATION.FOREVER",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
     "STARTER_MONTHLY": [
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY",

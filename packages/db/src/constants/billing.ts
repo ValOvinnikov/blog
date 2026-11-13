@@ -17,6 +17,14 @@ export const BILLING_CURRENCY = {
 
 export type TBillingCurrency = TValueOf<typeof BILLING_CURRENCY>;
 
+export const STRIPE_COUPON_DURATION = {
+  ONCE: 'ONCE',
+  REPEATING: 'REPEATING',
+  FOREVER: 'FOREVER',
+} as const;
+
+export type TStripeCouponDuration = TValueOf<typeof STRIPE_COUPON_DURATION>;
+
 export const STRIPE_PRICE_LOOKUP_KEY = {
   STARTER_MONTHLY: 'STARTER_MONTHLY',
   STARTER_YEARLY: 'STARTER_YEARLY',

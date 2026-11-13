@@ -1,5 +1,5 @@
 {
-  "id": "27cb961b-5ead-4988-8a42-544e872e9715",
+  "id": "b00d3c50-12b9-4f62-a550-db8eaf43eecf",
   "prevId": "c38d232b-08cb-4655-ae32-0ebb0c72e7fe",
   "version": "7",
   "dialect": "postgresql",
@@ -2042,6 +2042,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "duration": {
+          "name": "duration",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "duration_in_months": {
+          "name": "duration_in_months",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "applies_to_product_ids": {
           "name": "applies_to_product_ids",
           "type": "text[]",
@@ -2061,16 +2073,26 @@
           "notNull": true
         }
       },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "stripe_promotion_codes_code_unique": {
-          "name": "stripe_promotion_codes_code_unique",
-          "nullsNotDistinct": false,
-          "columns": ["code"]
+      "indexes": {
+        "stripe_promotion_codes_code_idx": {
+          "name": "stripe_promotion_codes_code_idx",
+          "columns": [
+            {
+              "expression": "code",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

@@ -1,5 +1,6 @@
 import type {
   TBillingCurrency,
+  TStripeCouponDuration,
   TStripePriceLookupKey,
 } from '@blog/db/constants';
 import {
@@ -33,16 +34,24 @@ export type TStripePriceRow = typeof stripePrices.$inferSelect;
 
 export type TAmountOffByCurrency = Partial<Record<TBillingCurrency, number>>;
 
-export const stripePromotionCodes = pgTable('stripe_promotion_codes', {
-  promotionCodeId: text('promotion_code_id').primaryKey(),
-  code: text('code').notNull().unique(),
-  percentOff: doublePrecision('percent_off'),
-  amountOffByCurrency: jsonb(
-    'amount_off_by_currency',
-  ).$type<TAmountOffByCurrency>(),
-  appliesToProductIds: text('applies_to_product_ids').array(),
-  expiresAt: timestamp('expires_at', { mode: 'date' }),
-  updatedAt: timestamp('updated_at', { mode: 'date' }).notNull(),
-});
+export const stripePromotionCodes = pgTable(
+  'stripe_promotion_codes',
+  {
+    promotionCodeId: text('promotion_code_id').primaryKey(),
+    code: text('code').notNull(),
+    percentOff: doublePrecision('percent_off'),
+    amountOffByCurrency: jsonb(
+      'amount_off_by_currency',
+    ).$type<TAmountOffByCurrency>(),
+    duration: text('duration').$type<TStripeCouponDuration>().notNull(),
+    durationInMonths: integer('duration_in_months'),
+    appliesToProductIds: text('applies_to_product_ids').array(),
+    expiresAt: timestamp('expires_at', { mode: 'date' }),
+    updatedAt: timestamp('updated_at', { mode: 'date' }).notNull(),
+  },
+  (promotionCode) => [
+    index('stripe_promotion_codes_code_idx').on(promotionCode.code),
+  ],
+);
 
 export type TStripePromotionCodeRow = typeof stripePromotionCodes.$inferSelect;
