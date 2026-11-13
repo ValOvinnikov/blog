@@ -14,7 +14,6 @@
   "apps/platform/src/testing/email/email-settings.ts": 132,
   "apps/platform/src/testing/look/look-form-interactions.ts": 122,
   "apps/platform/src/testing/onboarding/onboarding-view.ts": 189,
-  "apps/platform/src/testing/tenants/fixtures.ts": 167,
   "apps/platform/src/utils/device-frame-scale/device-frame-scale.ts": 157,
   "apps/platform/src/utils/email-draft-changes/email-draft-changes.ts": 129,
   "apps/platform/src/utils/env/env.ts": 124,

@@ -14,14 +14,16 @@ import {
 } from '@platform/utils/platform-tenant/platform-tenant';
 
 import {
+  mockDoneProvisioningSteps,
+  mockIdleProvisioningSteps,
+} from './provisioning-steps';
+import {
   MOCK_SANITY_PROJECT_ID,
   MOCK_TENANT_CREATED_AT,
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
-  mockDoneProvisioningSteps,
-  mockIdleProvisioningSteps,
-} from './fixtures';
+} from './tenant-identity';
 
 export const MOCK_TRIAL_ENDS_AT = new Date('2026-04-16T00:00:00.000Z');
 const TENANT_SEEDED_AT = new Date('2026-01-01T00:00:00.000Z');

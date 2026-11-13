@@ -24,8 +24,10 @@ export const {
   stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID,
   stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
 } = mockStripeIds();
-export const { stripeSubscriptionId: MOCK_OTHER_STRIPE_SUBSCRIPTION_ID } =
-  mockStripeIds();
+export const {
+  stripeCustomerId: MOCK_REPLACEMENT_STRIPE_CUSTOMER_ID,
+  stripeSubscriptionId: MOCK_OTHER_STRIPE_SUBSCRIPTION_ID,
+} = mockStripeIds();
 export const MOCK_STRIPE_INVOICE_ID = `in_${billingFaker.string.alphanumeric(24)}`;
 export const MOCK_STRIPE_PROMOTION_CODE = billingFaker.string
   .alphanumeric(8)

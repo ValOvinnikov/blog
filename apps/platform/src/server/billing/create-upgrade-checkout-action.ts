@@ -10,7 +10,7 @@ import {
   BILLING_LOG,
   STRIPE_CHECKOUT_SESSION_ID_TEMPLATE,
   type TUpgradeRefusal,
-  UPGRADE_REFUSAL,
+  UPGRADE_PAYMENT,
   UPGRADE_SEARCH_PARAM,
   UPGRADE_STATE,
 } from '@platform/constants/billing';
@@ -82,14 +82,10 @@ export const createUpgradeCheckoutAction = async (
       tenant,
       await getSessionEmail(),
     );
-    if (!customerId) {
-      logger.error(BILLING_LOG.CHECKOUT_CUSTOMER_MISSING, { tenantId });
-      return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-    }
     if (await hasLiveSubscription(stripe, customerId)) {
       return {
         outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPGRADE_REFUSAL.PAYMENT_PENDING,
+        reason: UPGRADE_PAYMENT.PENDING,
       };
     }
     await expireOpenCheckouts(stripe, customerId);

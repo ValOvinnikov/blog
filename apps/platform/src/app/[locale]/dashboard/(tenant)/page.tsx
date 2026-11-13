@@ -1,7 +1,9 @@
 import { queries } from '@blog/db';
 import { OwnerHomeView } from '@platform/components/features/tenants/owner-home-view';
+import { UPGRADE_STATE } from '@platform/constants/billing';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
+import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
 import { getStartedFor } from '@platform/server/onboarding/get-started-for';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { getDomainVerificationStatus } from '@platform/server/provisioning/get-domain-verification-status';
@@ -34,6 +36,9 @@ export default async function DashboardOverviewPage() {
       siteSetup={siteSetupFor(tenant, membership, admin)}
       getStarted={getStarted}
       trial={tenant.trial}
+      canUpgrade={
+        upgradeStateFor(tenant, membership) === UPGRADE_STATE.AVAILABLE
+      }
     />
   );
 }

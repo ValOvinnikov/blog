@@ -13,14 +13,16 @@ type TUpgradeTenant = Pick<
 >;
 
 // The webhook keeps a cancelled subscription's id and moves the site to Free, so the id alone is not enough.
-const hasLiveSubscription = ({ plan, stripeSubscriptionId }: TUpgradeTenant) =>
-  Boolean(stripeSubscriptionId) && isSellablePlan(plan);
+const hasStoredSubscription = ({
+  plan,
+  stripeSubscriptionId,
+}: TUpgradeTenant) => Boolean(stripeSubscriptionId) && isSellablePlan(plan);
 
 export const upgradeStateFor = (
   tenant: TUpgradeTenant,
   membership: TMembership,
 ): TUpgradeState => {
-  if (hasLiveSubscription(tenant)) return UPGRADE_STATE.SUBSCRIBED;
+  if (hasStoredSubscription(tenant)) return UPGRADE_STATE.SUBSCRIBED;
   if (!isRealTenantOwner(membership)) return UPGRADE_STATE.NOT_OWNER;
   if (!isTenantWritable(tenant)) return UPGRADE_STATE.UNAVAILABLE;
   return UPGRADE_STATE.AVAILABLE;

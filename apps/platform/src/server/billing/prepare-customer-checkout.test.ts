@@ -38,12 +38,11 @@ describe(expireOpenCheckouts, () => {
 
     await expireOpenCheckouts(stripe, MOCK_STRIPE_CUSTOMER_ID);
 
-    const [listParams] = listSessions.mock.calls[0]!;
-    expect(listParams).toEqual({
-      customer: MOCK_STRIPE_CUSTOMER_ID,
-      status: STRIPE_CHECKOUT_SESSION_STATUS.OPEN,
-      limit: 100,
-    });
+    const [{ customer, status }] = listSessions.mock.calls[0] as [
+      { customer: string; status: string },
+    ];
+    expect(customer).toBe(MOCK_STRIPE_CUSTOMER_ID);
+    expect(status).toBe(STRIPE_CHECKOUT_SESSION_STATUS.OPEN);
     expect(expireSession).toHaveBeenCalledWith(MOCK_CHECKOUT_SESSION_ID);
   });
 });

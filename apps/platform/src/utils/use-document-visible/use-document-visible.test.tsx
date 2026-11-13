@@ -1,40 +1,40 @@
-import { fireEvent, renderHook } from '@platform/testing/custom-render';
+import { renderHook } from '@platform/testing/custom-render';
+import {
+  changeDocumentVisibility,
+  DOCUMENT_HIDDEN,
+  DOCUMENT_VISIBLE,
+} from '@platform/testing/document-visibility';
 
 import { useDocumentVisible } from './use-document-visible';
 
-const HIDDEN: DocumentVisibilityState = 'hidden';
-const VISIBLE: DocumentVisibilityState = 'visible';
-
-const changeVisibility = (state: DocumentVisibilityState) => {
-  vi.spyOn(document, 'visibilityState', 'get').mockReturnValue(state);
-  fireEvent(document, new Event('visibilitychange'));
-};
-
 describe(useDocumentVisible, () => {
+  let result: { current: boolean };
+
+  beforeEach(() => {
+    ({ result } = renderHook(() => useDocumentVisible()));
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
   it('reports a visible document', () => {
-    const { result } = renderHook(() => useDocumentVisible());
-
     expect(result.current).toBe(true);
   });
 
-  it('reports the document hidden once it is', () => {
-    const { result } = renderHook(() => useDocumentVisible());
+  describe('once the document is hidden', () => {
+    beforeEach(() => {
+      changeDocumentVisibility(DOCUMENT_HIDDEN);
+    });
 
-    changeVisibility(HIDDEN);
+    it('reports it hidden', () => {
+      expect(result.current).toBe(false);
+    });
 
-    expect(result.current).toBe(false);
-  });
+    it('reports it visible again once it returns', () => {
+      changeDocumentVisibility(DOCUMENT_VISIBLE);
 
-  it('reports the document visible again once it returns', () => {
-    const { result } = renderHook(() => useDocumentVisible());
-
-    changeVisibility(HIDDEN);
-    changeVisibility(VISIBLE);
-
-    expect(result.current).toBe(true);
+      expect(result.current).toBe(true);
+    });
   });
 });

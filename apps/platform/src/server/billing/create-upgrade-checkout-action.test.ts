@@ -10,14 +10,14 @@ import {
   BILLING_LOG,
   STRIPE_CHECKOUT_SESSION_ID_TEMPLATE,
   STRIPE_SUBSCRIPTION_STATUS,
-  UPGRADE_REFUSAL,
+  UPGRADE_PAYMENT,
+  UPGRADE_STATE,
   UPGRADE_SEARCH_PARAM,
 } from '@platform/constants/billing';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import {
   MOCK_CHECKOUT_CLIENT_SECRET,
   MOCK_CHECKOUT_SESSION_ID,
-  MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
 } from '@platform/testing/billing/fixtures';
 import { mockStripeCheckoutClient } from '@platform/testing/billing/stripe-checkout-client';
@@ -55,7 +55,6 @@ const {
   listPrices,
   createSession,
   listSubscriptions,
-  retrieveCustomer,
   expireSession,
   listSessions,
 } = mockStripeCheckoutClient();
@@ -201,7 +200,7 @@ describe(createUpgradeCheckoutAction, () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPGRADE_REFUSAL.SUBSCRIBED,
+      reason: UPGRADE_STATE.SUBSCRIBED,
     });
     expect(createSession).not.toHaveBeenCalled();
   });
@@ -215,7 +214,7 @@ describe(createUpgradeCheckoutAction, () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPGRADE_REFUSAL.PAYMENT_PENDING,
+      reason: UPGRADE_PAYMENT.PENDING,
     });
     expect(createSession).not.toHaveBeenCalled();
   });
@@ -250,19 +249,6 @@ describe(createUpgradeCheckoutAction, () => {
     expect(vi.mocked(logger).error).toHaveBeenCalledWith(
       BILLING_LOG.CHECKOUT_UNCONFIGURED,
       { tenantId: MOCK_TENANT_ID, hasStripeKey: false, hasBaseUrl: true },
-    );
-  });
-
-  it("fails and logs when the site's stored customer is gone from Stripe", async () => {
-    asSite({ stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID });
-    retrieveCustomer.mockResolvedValueOnce({ deleted: true });
-
-    const result = await checkout();
-
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(vi.mocked(logger).error).toHaveBeenCalledWith(
-      BILLING_LOG.CHECKOUT_CUSTOMER_MISSING,
-      { tenantId: MOCK_TENANT_ID },
     );
   });
 

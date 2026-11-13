@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/db/constants';
-import { BILLING_INTERVAL, UPGRADE_REFUSAL } from '@platform/constants/billing';
+import { BILLING_INTERVAL, UPGRADE_PAYMENT } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import { createUpgradeCheckoutAction } from '@platform/server/billing/create-upgrade-checkout-action';
 import {
@@ -76,7 +76,7 @@ describe(`<${UpgradeCheckout.name}/>`, () => {
   it('says why checkout was refused and offers no retry', async () => {
     createCheckoutMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPGRADE_REFUSAL.PAYMENT_PENDING,
+      reason: UPGRADE_PAYMENT.PENDING,
     });
     setup();
 

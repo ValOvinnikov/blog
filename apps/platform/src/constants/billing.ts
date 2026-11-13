@@ -15,7 +15,7 @@ export const BILLING_LOG = {
   CHECKOUT_UNCONFIGURED: 'billing.checkout_unconfigured',
   CHECKOUT_PRICE_MISSING: 'billing.checkout_price_missing',
   CHECKOUT_FAILED: 'billing.checkout_failed',
-  CHECKOUT_CUSTOMER_MISSING: 'billing.checkout_customer_missing',
+  CHECKOUT_CUSTOMER_REPLACED: 'billing.checkout_customer_replaced',
   CHECKOUT_PROMO_REFUSED: 'billing.checkout_promo_refused',
 } as const;
 
@@ -81,14 +81,13 @@ export const UPGRADE_STATE = {
 
 export type TUpgradeState = TValueOf<typeof UPGRADE_STATE>;
 
-export const UPGRADE_REFUSAL = {
-  SUBSCRIBED: 'SUBSCRIBED',
-  NOT_OWNER: 'NOT_OWNER',
-  UNAVAILABLE: 'UNAVAILABLE',
-  PAYMENT_PENDING: 'PAYMENT_PENDING',
+export const UPGRADE_PAYMENT = {
+  PENDING: 'PAYMENT_PENDING',
 } as const;
 
-export type TUpgradeRefusal = TValueOf<typeof UPGRADE_REFUSAL>;
+export type TUpgradeRefusal =
+  | Exclude<TUpgradeState, typeof UPGRADE_STATE.AVAILABLE>
+  | TValueOf<typeof UPGRADE_PAYMENT>;
 
 export const UPGRADE_SEARCH_PARAM = {
   PROMO: 'promo',

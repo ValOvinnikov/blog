@@ -75,9 +75,7 @@ export const UpgradeCheckout = ({
 
   const body = () => {
     if (refusal) {
-      return (
-        <Alert type={ALERT_TYPE.INFO} role="note" description={t(refusal)} />
-      );
+      return <Alert type={ALERT_TYPE.INFO} description={t(refusal)} />;
     }
     if (hasFailed) {
       return (

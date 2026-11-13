@@ -29,26 +29,22 @@ export const UpgradeConfirming = ({
 }: TUpgradeConfirmingProps) => {
   const t = useTranslations('upgradePage');
   const router = useRouter();
-  const [checks, setChecks] = useState(0);
   const [hasFailed, setHasFailed] = useState(false);
-  const { value: state, restart } = usePolledValue(
-    tenantId,
-    initialState,
-    getUpgradeStateAction,
-    {
-      intervalMs: UPGRADE_POLL.INTERVAL_MS,
-      maxTicks: UPGRADE_POLL.MAX_TICKS,
-      isActive: isAwaitingSubscription,
-      onResult: (next) => {
-        setChecks((count) => count + 1);
-        if (!isAwaitingSubscription(next)) router.refresh();
-      },
-      onError: () => setHasFailed(true),
+  const {
+    value: state,
+    restart,
+    isExhausted,
+  } = usePolledValue(tenantId, initialState, getUpgradeStateAction, {
+    intervalMs: UPGRADE_POLL.INTERVAL_MS,
+    maxTicks: UPGRADE_POLL.MAX_TICKS,
+    isActive: isAwaitingSubscription,
+    onResult: (next) => {
+      if (!isAwaitingSubscription(next)) router.refresh();
     },
-  );
+    onError: () => setHasFailed(true),
+  });
 
   const checkAgain = () => {
-    setChecks(0);
     setHasFailed(false);
     restart();
     router.refresh();
@@ -64,7 +60,7 @@ export const UpgradeConfirming = ({
     );
   }
 
-  if (hasFailed || checks >= UPGRADE_POLL.MAX_TICKS) {
+  if (hasFailed || isExhausted) {
     return (
       <Alert
         type={ALERT_TYPE.WARNING}

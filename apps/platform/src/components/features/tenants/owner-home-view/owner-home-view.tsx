@@ -28,6 +28,7 @@ export type TOwnerHomeViewProps = {
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
   trial?: TTrial;
+  canUpgrade?: boolean;
 };
 
 export const OwnerHomeView = ({
@@ -37,6 +38,7 @@ export const OwnerHomeView = ({
   siteSetup,
   getStarted,
   trial,
+  canUpgrade = false,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, pair } = ownerHomeViewVariants();
@@ -53,7 +55,7 @@ export const OwnerHomeView = ({
         <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
       )}
 
-      {trial && <TrialNotice trial={trial} />}
+      {trial && <TrialNotice trial={trial} canUpgrade={canUpgrade} />}
 
       {siteSetup && <SiteSetupCard siteSetup={siteSetup} />}
 

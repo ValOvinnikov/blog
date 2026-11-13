@@ -385,7 +385,8 @@
     "siteSetupNotStartedDescription": "We couldn't start setting up your site. Start it now — nothing is lost.",
     "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
     "siteSetupStart": "Start setup",
-    "siteSetupStarting": "Starting…"
+    "siteSetupStarting": "Starting…",
+    "trialUpgrade": "Choose a plan"
   },
   "getStartedCard": {
     "title": "Get started",

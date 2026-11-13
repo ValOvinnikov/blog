@@ -385,7 +385,8 @@
     "siteSetupNotStartedDescription": "No pudimos empezar a configurar tu sitio. Iníciala ahora: no se pierde nada.",
     "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
     "siteSetupStart": "Iniciar configuración",
-    "siteSetupStarting": "Iniciando…"
+    "siteSetupStarting": "Iniciando…",
+    "trialUpgrade": "Elegir un plan"
   },
   "getStartedCard": {
     "title": "Primeros pasos",

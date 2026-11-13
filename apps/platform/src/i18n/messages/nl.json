@@ -385,7 +385,8 @@
     "siteSetupNotStartedDescription": "We konden het inrichten van je site niet starten. Start het nu; er gaat niets verloren.",
     "siteSetupNotStartedContactDescription": "We konden het inrichten van je site niet starten. Vraag je platformcontactpersoon het te starten.",
     "siteSetupStart": "Inrichten starten",
-    "siteSetupStarting": "Wordt gestart…"
+    "siteSetupStarting": "Wordt gestart…",
+    "trialUpgrade": "Kies een abonnement"
   },
   "getStartedCard": {
     "title": "Aan de slag",

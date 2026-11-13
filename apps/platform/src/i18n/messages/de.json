@@ -385,7 +385,8 @@
     "siteSetupNotStartedDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Starten Sie sie jetzt – es geht nichts verloren.",
     "siteSetupNotStartedContactDescription": "Wir konnten die Einrichtung Ihrer Website nicht starten. Bitten Sie Ihren Plattform-Kontakt, sie zu starten.",
     "siteSetupStart": "Einrichtung starten",
-    "siteSetupStarting": "Wird gestartet…"
+    "siteSetupStarting": "Wird gestartet…",
+    "trialUpgrade": "Tarif wählen"
   },
   "getStartedCard": {
     "title": "Erste Schritte",

@@ -5,6 +5,7 @@ import {
 } from '@platform/constants/domain';
 import { GET_STARTED_STEP } from '@platform/constants/get-started';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
+import messages from '@platform/i18n/messages/en.json';
 import {
   customRenderAsync,
   screen,
@@ -22,6 +23,8 @@ import {
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { OwnerHomeView, type TOwnerHomeViewProps } from './owner-home-view';
+
+const { ownerHomePage } = messages;
 
 vi.mock('@platform/server/provisioning/retry-provisioning-step-action');
 
@@ -193,6 +196,36 @@ describe(`<${OwnerHomeView.name}/>`, () => {
       );
     },
   );
+
+  describe('with a running trial', () => {
+    const MOCK_RUNNING_TRIAL = {
+      plan: TENANT_PLAN.GROWTH,
+      endsAt: MOCK_TRIAL_ENDS_AT,
+      hasEnded: false,
+    };
+
+    it('links the owner to the Upgrade page from the trial note', async () => {
+      await setup({ trial: MOCK_RUNNING_TRIAL, canUpgrade: true });
+
+      const notice = screen.getByRole('note');
+      const upgrade = within(notice).getByRole('link', {
+        name: ownerHomePage.trialUpgrade,
+      });
+
+      expect(upgrade).toHaveAttribute('href', adminRoutes.dashboardUpgrade());
+    });
+
+    it('offers no Upgrade to a member who cannot upgrade', async () => {
+      await setup({ trial: MOCK_RUNNING_TRIAL, canUpgrade: false });
+
+      const notice = screen.getByRole('note');
+      const upgrade = within(notice).queryByRole('link', {
+        name: ownerHomePage.trialUpgrade,
+      });
+
+      expect(upgrade).not.toBeInTheDocument();
+    });
+  });
 
   describe('with a pending domain', () => {
     beforeEach(async () => {

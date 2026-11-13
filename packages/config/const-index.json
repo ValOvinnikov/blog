@@ -168,12 +168,6 @@
         "file": "apps/platform/src/constants/billing.ts"
       },
       {
-        "ref": "UPGRADE_REFUSAL.UNAVAILABLE",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      },
-      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -5416,9 +5410,9 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
-    "billing.checkout_customer_missing": [
+    "billing.checkout_customer_replaced": [
       {
-        "ref": "BILLING_LOG.CHECKOUT_CUSTOMER_MISSING",
+        "ref": "BILLING_LOG.CHECKOUT_CUSTOMER_REPLACED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -5600,12 +5594,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
-      },
-      {
-        "ref": "UPGRADE_REFUSAL.SUBSCRIBED",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
       }
     ],
     "NOT_OWNER": [
@@ -5614,17 +5602,11 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
-      },
-      {
-        "ref": "UPGRADE_REFUSAL.NOT_OWNER",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
       }
     ],
     "PAYMENT_PENDING": [
       {
-        "ref": "UPGRADE_REFUSAL.PAYMENT_PENDING",
+        "ref": "UPGRADE_PAYMENT.PENDING",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"

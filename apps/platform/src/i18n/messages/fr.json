@@ -385,7 +385,8 @@
     "siteSetupNotStartedDescription": "Nous n'avons pas pu lancer la configuration de votre site. Lancez-la maintenant : rien n'est perdu.",
     "siteSetupNotStartedContactDescription": "Nous n'avons pas pu lancer la configuration de votre site. Demandez à votre contact plateforme de la lancer.",
     "siteSetupStart": "Lancer la configuration",
-    "siteSetupStarting": "Lancement…"
+    "siteSetupStarting": "Lancement…",
+    "trialUpgrade": "Choisir une offre"
   },
   "getStartedCard": {
     "title": "Premiers pas",

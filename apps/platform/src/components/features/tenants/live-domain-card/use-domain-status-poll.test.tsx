@@ -3,7 +3,12 @@ import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,
 } from '@platform/constants/domain';
-import { act, fireEvent, renderHook } from '@platform/testing/custom-render';
+import { act, renderHook } from '@platform/testing/custom-render';
+import {
+  changeDocumentVisibility,
+  DOCUMENT_HIDDEN,
+  DOCUMENT_VISIBLE,
+} from '@platform/testing/document-visibility';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { useDomainStatusPoll } from './use-domain-status-poll';
@@ -119,9 +124,7 @@ describe(useDomainStatusPoll, () => {
   });
 
   it('sends nothing while the tab is hidden and resumes once it is visible', async () => {
-    const visibility = vi
-      .spyOn(document, 'visibilityState', 'get')
-      .mockReturnValue('hidden');
+    changeDocumentVisibility(DOCUMENT_HIDDEN);
     renderHook(() =>
       useDomainStatusPoll(MOCK_TENANT_ID, DOMAIN_VERIFICATION_STATUS.PENDING),
     );
@@ -129,8 +132,7 @@ describe(useDomainStatusPoll, () => {
     await advance(DOMAIN_POLL_INTERVAL_MS * 3);
     expect(getDomainVerificationStatusActionMock).not.toHaveBeenCalled();
 
-    visibility.mockReturnValue('visible');
-    fireEvent(document, new Event('visibilitychange'));
+    changeDocumentVisibility(DOCUMENT_VISIBLE);
     await advance(DOMAIN_POLL_INTERVAL_MS);
     expect(getDomainVerificationStatusActionMock).toHaveBeenCalledOnce();
   });

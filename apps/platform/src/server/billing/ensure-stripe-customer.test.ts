@@ -2,16 +2,21 @@ import { ERROR_CODE } from '@blog/config';
 import { queries } from '@blog/db';
 import { errorResult, okResult } from '@blog/utils';
 import {
+  BILLING_LOG,
   STRIPE_CUSTOMER_IDEMPOTENCY_PREFIX,
   STRIPE_ERROR_CODE,
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
-import { MOCK_STRIPE_CUSTOMER_ID } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_REPLACEMENT_STRIPE_CUSTOMER_ID,
+  MOCK_STRIPE_CUSTOMER_ID,
+} from '@platform/testing/billing/fixtures';
 import { mockStripeCheckoutClient } from '@platform/testing/billing/stripe-checkout-client';
 import {
   MOCK_OWNER_EMAIL,
   MOCK_TENANT_ID,
 } from '@platform/testing/tenants/fixtures';
+import { logger } from '@platform/utils/logger/logger';
 import Stripe from 'stripe';
 
 import { ensureStripeCustomer } from './ensure-stripe-customer';
@@ -89,15 +94,36 @@ describe(ensureStripeCustomer, () => {
           }),
         ),
     ],
-  ])('returns nothing for a stored customer that is %s', async (_, arrange) => {
-    arrange();
+  ])(
+    'replaces a stored customer that is %s and logs it',
+    async (_, arrange) => {
+      arrange();
+      createCustomer.mockResolvedValueOnce({
+        id: MOCK_REPLACEMENT_STRIPE_CUSTOMER_ID,
+      });
 
-    const customerId = await ensureStripeCustomer(
-      stripe,
-      MOCK_CUSTOMER_SITE,
-      MOCK_OWNER_EMAIL,
-    );
+      const customerId = await ensureStripeCustomer(
+        stripe,
+        MOCK_CUSTOMER_SITE,
+        MOCK_OWNER_EMAIL,
+      );
 
-    expect(customerId).toBeUndefined();
-  });
+      const [, { idempotencyKey }] = createCustomer.mock.calls[0] as [
+        unknown,
+        { idempotencyKey: string },
+      ];
+      expect(customerId).toBe(MOCK_REPLACEMENT_STRIPE_CUSTOMER_ID);
+      expect(idempotencyKey).toBe(
+        `${STRIPE_CUSTOMER_IDEMPOTENCY_PREFIX}${MOCK_TENANT_ID}-${MOCK_STRIPE_CUSTOMER_ID}`,
+      );
+      expect(queries.tenants.setTenantBilling).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        { stripeCustomerId: MOCK_REPLACEMENT_STRIPE_CUSTOMER_ID },
+      );
+      expect(vi.mocked(logger).warn).toHaveBeenCalledWith(
+        BILLING_LOG.CHECKOUT_CUSTOMER_REPLACED,
+        { tenantId: MOCK_TENANT_ID, stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID },
+      );
+    },
+  );
 });

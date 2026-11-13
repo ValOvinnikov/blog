@@ -417,7 +417,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
 
-- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_MISSING`=`"billing.checkout_customer_missing"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`
 - **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`
 - **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
 - **STRIPE_CHECKOUT_SESSION_STATUS**: `OPEN`=`"open"`
@@ -425,7 +425,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **BILLING_GRACE**: `START`, `END`, `KEEP`
 - **BILLING_INTERVAL**: `MONTHLY`, `YEARLY`
 - **UPGRADE_STATE**: `AVAILABLE`, `SUBSCRIBED`, `NOT_OWNER`, `UNAVAILABLE`
-- **UPGRADE_REFUSAL**: `SUBSCRIBED`, `NOT_OWNER`, `UNAVAILABLE`, `PAYMENT_PENDING`
+- **UPGRADE_PAYMENT**: `PENDING`=`"PAYMENT_PENDING"`
 - **UPGRADE_SEARCH_PARAM**: `PROMO`=`"promo"`, `SESSION_ID`=`"session_id"`
 - **UPGRADE_POLL**: `INTERVAL_MS`=`2000`, `MAX_TICKS`=`30`
 

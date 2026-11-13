@@ -1,7 +1,16 @@
-import { UPGRADE_POLL, UPGRADE_STATE } from '@platform/constants/billing';
+import {
+  type TUpgradeState,
+  UPGRADE_POLL,
+  UPGRADE_STATE,
+} from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import { getUpgradeStateAction } from '@platform/server/billing/get-upgrade-state-action';
 import { act, customRender, screen } from '@platform/testing/custom-render';
+import {
+  changeDocumentVisibility,
+  DOCUMENT_HIDDEN,
+  DOCUMENT_VISIBLE,
+} from '@platform/testing/document-visibility';
 import { mockLocaleRouter } from '@platform/testing/mock-locale-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { fireEvent } from '@testing-library/react';
@@ -38,6 +47,7 @@ describe(`<${UpgradeConfirming.name}/>`, () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
   it('says the payment is being confirmed in one status region', () => {
@@ -102,5 +112,26 @@ describe(`<${UpgradeConfirming.name}/>`, () => {
       expect(getStateMock).toHaveBeenCalledTimes(UPGRADE_POLL.MAX_TICKS + 1);
       expect(status).toHaveTextContent(upgradePage.confirmingTitle);
     });
+  });
+
+  it('says it is taking longer when a check is dropped while the tab is hidden', async () => {
+    let resolveHiddenCheck: (state: TUpgradeState) => void = () => undefined;
+    getStateMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveHiddenCheck = resolve;
+        }),
+    );
+
+    await advancePoll();
+    changeDocumentVisibility(DOCUMENT_HIDDEN);
+    resolveHiddenCheck(UPGRADE_STATE.AVAILABLE);
+    changeDocumentVisibility(DOCUMENT_VISIBLE);
+    for (let tick = 1; tick < UPGRADE_POLL.MAX_TICKS; tick += 1) {
+      await advancePoll();
+    }
+
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(upgradePage.slowTitle);
   });
 });
