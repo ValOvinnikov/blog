@@ -25,10 +25,10 @@ export const voiceSectionChipVariants = tv({
       },
       true: {
         link: [
-          'border-admin-brand bg-admin-brand text-admin-on-brand-ink',
-          'hover:border-admin-brand-hover hover:bg-admin-brand-hover',
+          'border-admin-brand bg-admin-selected text-admin-on-selected',
+          'hover:border-admin-brand-hover hover:bg-admin-selected-hover',
         ],
-        count: ['text-admin-on-brand-ink'],
+        count: ['text-admin-on-selected'],
         errorPill: ['h-5 rounded-full bg-admin-surface px-1.5'],
       },
     },

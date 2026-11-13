@@ -21,6 +21,9 @@
   --admin-brand-line: #ffd766;
   --admin-brand-hover: #2a303b;
   --admin-on-brand-ink: #ffffff;
+  --admin-selected: #12141a;
+  --admin-selected-hover: #2a303b;
+  --admin-on-selected: #ffffff;
   --admin-ok: #16794d;
   --admin-ok-weak: #e7f6ee;
   --admin-warn: #9a3d0b;
@@ -133,6 +136,9 @@
   --admin-brand-line: #5c4a14;
   --admin-brand-hover: #ffcf5c;
   --admin-on-brand-ink: #0f1115;
+  --admin-selected: #33290d;
+  --admin-selected-hover: #40330f;
+  --admin-on-selected: #ffd466;
   --admin-ok: #6ee7a7;
   --admin-ok-weak: #10291d;
   --admin-warn: #ffa066;
@@ -212,6 +218,9 @@
     --admin-brand-line: #5c4a14;
     --admin-brand-hover: #ffcf5c;
     --admin-on-brand-ink: #0f1115;
+    --admin-selected: #33290d;
+    --admin-selected-hover: #40330f;
+    --admin-on-selected: #ffd466;
     --admin-ok: #6ee7a7;
     --admin-ok-weak: #10291d;
     --admin-warn: #ffa066;
@@ -294,6 +303,9 @@
   --color-admin-brand-line: var(--admin-brand-line);
   --color-admin-brand-hover: var(--admin-brand-hover);
   --color-admin-on-brand-ink: var(--admin-on-brand-ink);
+  --color-admin-selected: var(--admin-selected);
+  --color-admin-selected-hover: var(--admin-selected-hover);
+  --color-admin-on-selected: var(--admin-on-selected);
   --color-admin-ok: var(--admin-ok);
   --color-admin-ok-weak: var(--admin-ok-weak);
   --color-admin-warn: var(--admin-warn);

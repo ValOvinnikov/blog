@@ -384,8 +384,11 @@ save still settles as the form's generic server error.
   `follow-mark` follow `brand`; `rail-accent` is #ffc233 in both; `note-line`
   is `brand` at 30%. `warn` is orange (#9a3d0b on #fdeee4 / #ffa066 on
   #2e1a10), so a warning never reads as the brand; `ok` and `bad` are
-  unchanged. A primary button, an active chip, an avatar, the active step and
-  the follow mark's tag put `on-brand-ink` on `brand`. A switch that is on has
+  unchanged. A primary button, an avatar, the active step and the follow
+  mark's tag put `on-brand-ink` on `brand`. A selected chip or jump-index tab
+  is `on-selected` on `selected` (`selected-hover` on hover): solid near-black
+  with a white label in Light, `brand-ink` yellow on the dark yellow tint in
+  Dark, so yellow is never a selected fill in Light. A switch that is on has
   a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
   focused field takes a `brand-ink` border and a 3px `brand-line` glow. A link
   is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px

@@ -293,7 +293,9 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `highlight`); in Dark, yellow leads (`brand` #ffc233, `brand-ink` #ffd466)
   over a dark yellow `brand-weak`. `warn` is orange so it never reads as the
   brand. Text or a mark on a `brand` fill is `text-admin-on-brand-ink`, never
-  `text-white`. A link's underline is `TEXT_LINK_STROKE_CLASSES`
+  `text-white`. A selected chip or tab is `bg-admin-selected
+text-admin-on-selected` — near-black and white in Light, yellow on a dark
+  yellow tint in Dark; yellow is never a selected fill in Light. A link's underline is `TEXT_LINK_STROKE_CLASSES`
   (`components/shared/text-link/text-link-variants`), a 2px `highlight`
   stroke.
 - `text-admin-text` for content, labels and values. `text-admin-muted` for
