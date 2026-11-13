@@ -1657,6 +1657,7 @@
     "notDeprovisioned": "Deze tenant is niet ontmanteld.",
     "alreadyInProgress": "De inrichting loopt al.",
     "notArchived": "Deze tenant moet worden gearchiveerd voordat hij kan worden verwijderd.",
+    "notSuspended": "Deze tenant is niet geschorst, dus er valt niets op te heffen.",
     "platformTenant": "Dit is de eigen site van het platform, dus deze kan niet worden opgeschort of verwijderd.",
     "deprovisionFailed": "De ontmanteling kon niet worden gestart — probeer het opnieuw.",
     "reactivateFailed": "Het opnieuw activeren kon niet worden gestart — probeer het opnieuw.",

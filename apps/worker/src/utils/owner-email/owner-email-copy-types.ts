@@ -1,4 +1,8 @@
-import type { INACTIVITY_STAGE, TGraceEmail } from '@blog/db/constants';
+import type {
+  INACTIVITY_STAGE,
+  TENANT_PLAN,
+  TGraceEmail,
+} from '@blog/db/constants';
 
 type TOwnerEmailCopyInput = {
   siteName: string;
@@ -55,7 +59,11 @@ type TDomainLockInput = {
   date: string;
 };
 
+export type TDowngradedPlan =
+  typeof TENANT_PLAN.STARTER | typeof TENANT_PLAN.GROWTH;
+
 export type TOwnerGraceEmailCopy = {
+  stopped: Record<TDowngradedPlan, string>;
   upgradeAnyTime: string;
   keepAsTheyAre: (date: string) => string;
   memberLock: (input: TMemberLockInput) => string;

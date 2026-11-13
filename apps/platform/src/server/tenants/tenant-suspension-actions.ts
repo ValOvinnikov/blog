@@ -33,6 +33,7 @@ import { z } from 'zod';
 export type TTenantSuspensionResult = TTenantLifecycleResult<
   | typeof TENANT_REFUSAL.NOT_FOUND
   | typeof TENANT_REFUSAL.ARCHIVED
+  | typeof TENANT_REFUSAL.NOT_SUSPENDED
   | typeof TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN
   | typeof TENANT_REFUSAL.PLATFORM_TENANT
 >;

@@ -8122,6 +8122,14 @@
         "file": "apps/worker/src/constants/provisioning.ts"
       }
     ],
+    "NOT_SUSPENDED": [
+      {
+        "ref": "TENANT_REFUSAL.NOT_SUSPENDED",
+        "scope": "app:platform",
+        "from": "@platform/constants/tenant",
+        "file": "apps/platform/src/constants/tenant.ts"
+      }
+    ],
     "PLATFORM_TENANT": [
       {
         "ref": "TENANT_REFUSAL.PLATFORM_TENANT",

@@ -10,24 +10,30 @@ export type TGraceLocks = {
   subdomain: TMaybeUndefined<string>;
 };
 
-export function isUnderRootDomain(host: string, rootDomain: string): boolean {
+function isUnderRootDomain(host: string, rootDomain: string): boolean {
   return host.endsWith(`.${rootDomain}`);
 }
 
+export function findSubdomain(
+  hosts: string[],
+  rootDomain: string,
+): TMaybeUndefined<string> {
+  return hosts.find((host) => isUnderRootDomain(host, rootDomain));
+}
+
 export async function findGraceLocks(
-  { id, plan }: TTenant,
+  { id, plan, primaryDomain }: TTenant,
   hosts: string[],
   rootDomain: string,
 ): Promise<TGraceLocks> {
   const { seats, hasCustomDomain } = PLAN_ENTITLEMENTS[plan];
-  const lockedMemberCount = await countMembershipsOverSeats(id, seats);
+  const isCustomDomainMain =
+    !hasCustomDomain && !isUnderRootDomain(primaryDomain, rootDomain);
 
   return {
-    lockedMemberCount,
-    customDomain: hasCustomDomain
-      ? undefined
-      : hosts.find((host) => !isUnderRootDomain(host, rootDomain)),
-    subdomain: hosts.find((host) => isUnderRootDomain(host, rootDomain)),
+    lockedMemberCount: await countMembershipsOverSeats(id, seats),
+    customDomain: isCustomDomainMain ? primaryDomain : undefined,
+    subdomain: findSubdomain(hosts, rootDomain),
   };
 }
 

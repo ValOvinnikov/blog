@@ -46,6 +46,7 @@ export {
   type TOwnerInactivityWarningEmailInput,
   buildOwnerDeletionNoticeEmail,
   type TOwnerDeletionNoticeEmailInput,
+  type TOwnerEmail,
   buildOwnerDowngradeGraceEmail,
   type TOwnerDowngradeGraceEmailInput,
   buildOwnerPlanChangeEmail,

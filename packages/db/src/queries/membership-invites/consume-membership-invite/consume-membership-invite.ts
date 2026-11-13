@@ -1,11 +1,14 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import {
   planSeats,
   unlockedMembershipsCount,
 } from '@blog/db/queries/membership-invites/create-membership-invite/seat-limit';
-import { createMembership } from '@blog/db/queries/memberships';
+import {
+  createMembership,
+  lockMembershipsOverSeats,
+} from '@blog/db/queries/memberships';
 import { membershipInvites } from '@blog/db/schema/membership-invites';
 import type { TMembership } from '@blog/db/schema/memberships';
 import { tenants } from '@blog/db/schema/tenants';
@@ -39,8 +42,9 @@ export async function consumeMembershipInvite(
 
   if (!claimed) return undefined;
 
+  let membership: TMembership;
   try {
-    return await createMembership(userId, claimed.tenantId, claimed.role);
+    membership = await createMembership(userId, claimed.tenantId, claimed.role);
   } catch (error) {
     await db
       .update(membershipInvites)
@@ -48,4 +52,25 @@ export async function consumeMembershipInvite(
       .where(eq(membershipInvites.id, claimed.id));
     throw error;
   }
+
+  if (claimed.role !== MEMBERSHIP_ROLE.OWNER) {
+    await lockMembershipsPastPlanSeats(claimed.tenantId);
+  }
+  return membership;
+}
+
+// Two invites accepted at once can both pass the claim's seat check, so the
+// member who joined last is locked whenever the site ends up over its seats.
+async function lockMembershipsPastPlanSeats(tenantId: string): Promise<void> {
+  const [tenant] = await getDb()
+    .select({ plan: tenants.plan })
+    .from(tenants)
+    .where(eq(tenants.id, tenantId));
+  if (!tenant) return;
+
+  await lockMembershipsOverSeats(
+    tenantId,
+    PLAN_ENTITLEMENTS[tenant.plan].seats,
+    new Date(),
+  );
 }

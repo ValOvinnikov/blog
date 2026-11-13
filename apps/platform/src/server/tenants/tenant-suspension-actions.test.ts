@@ -308,6 +308,19 @@ describe('tenant suspension actions', () => {
     });
   });
 
+  it('refuses to lift a tenant that is not suspended and records nothing', async () => {
+    getTenantByIdMock.mockResolvedValue(ACTIVE_TENANT);
+
+    const result = await liftTenantSuspensionAction(ACTIVE_TENANT.id);
+
+    expect(result).toEqual({
+      outcome: ACTION_OUTCOME.REFUSED,
+      reason: TENANT_REFUSAL.NOT_SUSPENDED,
+    });
+    expect(setTenantSuspensionMock).not.toHaveBeenCalled();
+    expect(recordAuditEventMock).not.toHaveBeenCalled();
+  });
+
   it('refuses an unknown tenant', async () => {
     getTenantByIdMock.mockResolvedValue(undefined);
 

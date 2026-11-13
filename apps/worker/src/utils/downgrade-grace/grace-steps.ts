@@ -4,6 +4,7 @@ import {
   type TGraceEmail,
 } from '@blog/db/constants';
 import { deleteCustomDomainClaim } from '@blog/db/queries/custom-domain-claims';
+import { stopPendingInvitesOverSeats } from '@blog/db/queries/membership-invites';
 import {
   getTenantOwnerEmail,
   lockMembershipsOverSeats,
@@ -15,34 +16,19 @@ import {
   setTenantPrimaryDomain,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
 import { logger } from '@worker/utils/logger/logger';
+import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';
 
 import { sendOwnerGraceEmail } from './grace-emails';
-import {
-  findGraceLocks,
-  hasGraceLocks,
-  isUnderRootDomain,
-} from './grace-locks';
+import { findGraceLocks, findSubdomain, hasGraceLocks } from './grace-locks';
 
 export type TGraceStepInput = {
   tenant: TTenant;
   hosts: string[];
   ctx: TInactivitySweepContext;
 };
-
-function invalidateSiteCache(
-  tenantId: string,
-  { env }: TInactivitySweepContext,
-) {
-  return requestTenantCacheInvalidation({
-    webAppUrl: env.webAppBaseUrl,
-    secret: env.siteConfigRevalidateSecret,
-    tenantId,
-  });
-}
 
 export async function endTrial({
   tenant,
@@ -51,7 +37,7 @@ export async function endTrial({
   const ended = await endTenantTrial(tenant.id, ctx.now);
   if (!ended) return false;
 
-  await invalidateSiteCache(tenant.id, ctx);
+  await invalidateSiteCache(tenant.id, ctx.env);
   return true;
 }
 
@@ -61,9 +47,7 @@ async function moveMainAddressToSubdomain({
   ctx,
 }: TGraceStepInput) {
   const { id: tenantId, primaryDomain } = tenant;
-  const subdomain = hosts.find((host) =>
-    isUnderRootDomain(host, ctx.env.tenantRootDomain),
-  );
+  const subdomain = findSubdomain(hosts, ctx.env.tenantRootDomain);
 
   await deleteCustomDomainClaim(tenantId);
   if (!subdomain) {
@@ -74,19 +58,27 @@ async function moveMainAddressToSubdomain({
 
   const moved = await setTenantPrimaryDomain(tenantId, subdomain);
   if (!moved.ok) throw new Error(moved.error);
-  await invalidateSiteCache(tenantId, ctx);
+  await invalidateSiteCache(tenantId, ctx.env);
 }
 
-export async function endGrace(input: TGraceStepInput): Promise<boolean> {
-  const { tenant, ctx } = input;
-  const { id, plan, downgradeGraceStartedAt } = tenant;
+export async function endGrace({
+  tenant,
+  hosts,
+  ctx,
+}: TGraceStepInput): Promise<boolean> {
+  const { id, downgradeGraceStartedAt } = tenant;
   if (!downgradeGraceStartedAt) return false;
 
-  const { seats, hasCustomDomain } = PLAN_ENTITLEMENTS[plan];
-  await lockMembershipsOverSeats(id, seats, ctx.now);
-  if (!hasCustomDomain) await moveMainAddressToSubdomain(input);
+  const ended = await endDowngradeGrace(id, downgradeGraceStartedAt);
+  if (!ended) return false;
 
-  return endDowngradeGrace(id, downgradeGraceStartedAt);
+  const { seats, hasCustomDomain } = PLAN_ENTITLEMENTS[ended.plan];
+  await lockMembershipsOverSeats(id, seats, ctx.now);
+  await stopPendingInvitesOverSeats(id, seats);
+  if (!hasCustomDomain) {
+    await moveMainAddressToSubdomain({ tenant: ended, hosts, ctx });
+  }
+  return true;
 }
 
 export async function sendGraceEmail(

@@ -1657,6 +1657,7 @@
     "notDeprovisioned": "Este cliente no está desaprovisionado.",
     "alreadyInProgress": "El aprovisionamiento ya está en curso.",
     "notArchived": "Este cliente debe archivarse antes de poder eliminarlo.",
+    "notSuspended": "Este cliente no está suspendido, así que no hay nada que levantar.",
     "platformTenant": "Este es el sitio propio de la plataforma, así que no se puede suspender ni eliminar.",
     "deprovisionFailed": "No se pudo iniciar el desaprovisionamiento. Vuelva a intentarlo.",
     "reactivateFailed": "No se pudo iniciar la reactivación. Vuelva a intentarlo.",

@@ -1,12 +1,12 @@
 import { ERROR_CODE } from '@blog/config/constants';
 import {
-  DAY_MS,
   GRACE_EMAIL,
   PLAN_ENTITLEMENTS,
   TENANT_PLAN,
   type TGraceEmail,
 } from '@blog/db/constants';
 import { deleteCustomDomainClaim } from '@blog/db/queries/custom-domain-claims';
+import { stopPendingInvitesOverSeats } from '@blog/db/queries/membership-invites';
 import {
   countMembershipsOverSeats,
   getTenantOwnerEmail,
@@ -23,6 +23,7 @@ import {
   setTenantPrimaryDomain,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
 import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { sendEmail } from '@blog/email';
 import { errorResult, okResult } from '@blog/utils';
@@ -63,6 +64,7 @@ const MOCK_NOTHING_DONE = {
 
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@blog/db/queries/memberships');
+vi.mock('@blog/db/queries/membership-invites');
 vi.mock('@blog/db/queries/custom-domain-claims');
 vi.mock('@blog/db/queries/tenant-domains/list-tenant-hosts');
 vi.mock('@blog/db/utils/tenant-cache/request-tenant-cache-invalidation');
@@ -70,7 +72,7 @@ vi.mock('@blog/email/transport/send-email');
 
 function inGraceFor(days: number, overrides: Partial<TTenant> = {}): TTenant {
   return mockTenant({
-    downgradeGraceStartedAt: new Date(MOCK_NOW.getTime() - days * DAY_MS),
+    downgradeGraceStartedAt: daysBefore(MOCK_NOW, days),
     ...overrides,
   });
 }
@@ -101,7 +103,9 @@ beforeEach(() => {
   vi.mocked(getTenantOwnerEmail).mockResolvedValue(MOCK_OWNER_EMAIL);
   vi.mocked(sendEmail).mockResolvedValue();
   vi.mocked(requestTenantCacheInvalidation).mockResolvedValue();
-  vi.mocked(endDowngradeGrace).mockResolvedValue(true);
+  vi.mocked(endDowngradeGrace).mockImplementation(async (id) =>
+    mockTenant({ id }),
+  );
   vi.mocked(setTenantPrimaryDomain).mockImplementation(async (id) =>
     okResult(mockTenant({ id })),
   );
@@ -169,6 +173,18 @@ describe(runDowngradeGraceSweep, () => {
       );
     });
 
+    it('names what a site leaving Starter lost', async () => {
+      emailDue(GRACE_EMAIL.STARTED, [
+        inGraceFor(0, { downgradedFromPlan: TENANT_PLAN.STARTER }),
+      ]);
+
+      await sweep();
+
+      expect(sentEmails()[0]?.text).toContain(
+        COPY.stopped[TENANT_PLAN.STARTER],
+      );
+    });
+
     it('sends nothing when another sweep already sent it', async () => {
       vi.mocked(claimGraceEmail).mockResolvedValue(null);
 
@@ -197,6 +213,10 @@ describe(runDowngradeGraceSweep, () => {
     (email, days, graceEndDate) => {
       beforeEach(() => {
         emailDue(email, [inGraceFor(days)]);
+        vi.mocked(listTenantHosts).mockResolvedValue([
+          MOCK_CUSTOM_DOMAIN,
+          MOCK_TENANT_DOMAIN,
+        ]);
       });
 
       it('is neither claimed nor sent when nothing will lock', async () => {
@@ -207,9 +227,8 @@ describe(runDowngradeGraceSweep, () => {
       });
 
       it('names the custom domain that will stop being the main address', async () => {
-        vi.mocked(listTenantHosts).mockResolvedValue([
-          MOCK_CUSTOM_DOMAIN,
-          MOCK_TENANT_DOMAIN,
+        emailDue(email, [
+          inGraceFor(days, { primaryDomain: MOCK_CUSTOM_DOMAIN }),
         ]);
 
         await sweep();
@@ -230,6 +249,10 @@ describe(runDowngradeGraceSweep, () => {
 
     beforeEach(() => {
       vi.mocked(listTenantsDueForGraceEnd).mockResolvedValue([tenant]);
+      vi.mocked(endDowngradeGrace).mockResolvedValue({
+        ...tenant,
+        downgradeGraceStartedAt: null,
+      });
       vi.mocked(listTenantHosts).mockResolvedValue([
         MOCK_CUSTOM_DOMAIN,
         MOCK_TENANT_DOMAIN,
@@ -250,6 +273,10 @@ describe(runDowngradeGraceSweep, () => {
         MOCK_TENANT_ID,
         MOCK_TENANT_DOMAIN,
       );
+      expect(stopPendingInvitesOverSeats).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].seats,
+      );
       expect(deleteCustomDomainClaim).toHaveBeenCalledWith(MOCK_TENANT_ID);
       expect(requestTenantCacheInvalidation).toHaveBeenCalled();
       expect(endDowngradeGrace).toHaveBeenCalledWith(
@@ -258,22 +285,15 @@ describe(runDowngradeGraceSweep, () => {
       );
     });
 
-    it('keeps the custom domain of a tenant that upgraded', async () => {
-      vi.mocked(listTenantsDueForGraceEnd).mockResolvedValue([
-        { ...tenant, plan: TENANT_PLAN.GROWTH },
-      ]);
+    it('touches nothing on a site that upgraded while the sweep ran', async () => {
+      vi.mocked(endDowngradeGrace).mockResolvedValue(null);
 
-      await sweep();
-
-      expect(lockMembershipsOverSeats).toHaveBeenCalledWith(
-        MOCK_TENANT_ID,
-        PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].seats,
-        MOCK_NOW,
-      );
+      await expect(sweep()).resolves.toEqual(MOCK_NOTHING_DONE);
+      expect(lockMembershipsOverSeats).not.toHaveBeenCalled();
       expect(setTenantPrimaryDomain).not.toHaveBeenCalled();
     });
 
-    it('logs a site with no subdomain and still ends its grace', async () => {
+    it('logs a site with no subdomain and still locks its members', async () => {
       vi.mocked(listTenantHosts).mockResolvedValue([MOCK_CUSTOM_DOMAIN]);
 
       await sweep();
@@ -283,17 +303,16 @@ describe(runDowngradeGraceSweep, () => {
         DOWNGRADE_GRACE_LOG.SUBDOMAIN_MISSING,
         { tenantId: MOCK_TENANT_ID },
       );
-      expect(endDowngradeGrace).toHaveBeenCalled();
+      expect(lockMembershipsOverSeats).toHaveBeenCalled();
     });
 
-    it('logs a failed address switch and keeps the grace for the next sweep', async () => {
+    it('logs a failed address switch', async () => {
       vi.mocked(setTenantPrimaryDomain).mockResolvedValue(
         errorResult(ERROR_CODE.DB_NOT_FOUND),
       );
 
       await sweep();
 
-      expect(endDowngradeGrace).not.toHaveBeenCalled();
       expect(logger.error).toHaveBeenCalledWith(
         DOWNGRADE_GRACE_LOG.STEP_FAILED,
         {
@@ -327,9 +346,8 @@ describe(runDowngradeGraceSweep, () => {
       ...MOCK_NOTHING_DONE,
       [DOWNGRADE_GRACE_STEP.GRACE_END]: 1,
     });
-    expect(endDowngradeGrace).toHaveBeenCalledExactlyOnceWith(
+    expect(vi.mocked(lockMembershipsOverSeats).mock.lastCall?.[0]).toBe(
       secondTenant.id,
-      secondTenant.downgradeGraceStartedAt,
     );
   });
 });
