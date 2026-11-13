@@ -10,6 +10,7 @@ import {
   type TTenantProvisioningStatus,
 } from '@blog/db/constants';
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
+import { lockMembershipsOverSeats } from '@blog/db/queries/memberships/lock-memberships-over-seats';
 import {
   getUnsentStudioReinviteEmail,
   setUnsentStudioReinvite,
@@ -33,6 +34,10 @@ import {
   insertTestTenant,
   insertTestUser,
 } from '@blog/db/testing/fixtures';
+import {
+  countLockedMemberships,
+  insertTeam,
+} from '@blog/db/testing/memberships/fixtures';
 import {
   decryptTestPersonalValue,
   testPersonalEmailIndex,
@@ -879,6 +884,22 @@ describe(updateTenantDetails, () => {
       expect(details?.name).toBe(MOCK_TENANT_NAME);
     },
   );
+
+  it('gives back the members a Free site locked when an operator moves it to Growth', async () => {
+    const tenantId = await insertTenantWithDomain();
+    await insertTeam(db(), tenantId, [
+      MEMBERSHIP_ROLE.OWNER,
+      MEMBERSHIP_ROLE.EDITOR,
+    ]);
+    await lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, new Date());
+
+    await updateTenantDetails(tenantId, {
+      ...MOCK_VALID_INPUT,
+      plan: TENANT_PLAN.GROWTH,
+    });
+
+    await expect(countLockedMemberships(db())).resolves.toBe(0);
+  });
 
   it('still updates when every step is IDLE', async () => {
     const tenantId = await insertTenantWithDomain({

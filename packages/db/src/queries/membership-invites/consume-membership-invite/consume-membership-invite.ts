@@ -1,6 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { MEMBERSHIP_ROLE, PLAN_ENTITLEMENTS } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import {
   planSeats,
   unlockedMembershipsCount,
@@ -68,9 +68,5 @@ async function lockMembershipsPastPlanSeats(tenantId: string): Promise<void> {
     .where(eq(tenants.id, tenantId));
   if (!tenant) return;
 
-  await lockMembershipsOverSeats(
-    tenantId,
-    PLAN_ENTITLEMENTS[tenant.plan].seats,
-    new Date(),
-  );
+  await lockMembershipsOverSeats(tenantId, tenant.plan, new Date());
 }

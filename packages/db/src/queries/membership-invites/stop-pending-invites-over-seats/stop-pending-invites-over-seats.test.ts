@@ -1,11 +1,10 @@
-import {
-  MEMBERSHIP_ROLE,
-  PLAN_ENTITLEMENTS,
-  TENANT_PLAN,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
-import { mockMembershipInvite } from '@blog/db/testing/membership-invites/fixtures';
+import {
+  deleteSeatRows,
+  mockMembershipInvite,
+} from '@blog/db/testing/membership-invites/fixtures';
 import {
   mockMembership,
   MOCK_USER_ID,
@@ -18,13 +17,8 @@ vi.mock('@blog/db/client');
 
 const db = useQueryTestDb();
 
-const FREE_SEATS = PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].seats;
-
 afterEach(async () => {
-  await db().delete(schema.memberships);
-  await db().delete(schema.membershipInvites);
-  await db().delete(schema.tenants);
-  await db().delete(schema.users);
+  await deleteSeatRows(db());
 });
 
 describe(stopPendingInvitesOverSeats, () => {
@@ -36,41 +30,54 @@ describe(stopPendingInvitesOverSeats, () => {
     await mockMembership(db(), { userId: MOCK_USER_ID, tenantId });
   });
 
-  it('stops every editor invite once the owner fills the Free seat', async () => {
-    await mockMembershipInvite(db(), tenantId, {
-      role: MEMBERSHIP_ROLE.EDITOR,
-    });
-    await mockMembershipInvite(db(), tenantId, {
-      role: MEMBERSHIP_ROLE.EDITOR,
+  describe('two editor invites beside the owner', () => {
+    let keptId: string;
+
+    beforeEach(async () => {
+      ({ id: keptId } = await mockMembershipInvite(db(), tenantId, {
+        role: MEMBERSHIP_ROLE.EDITOR,
+      }));
+      await mockMembershipInvite(db(), tenantId, {
+        role: MEMBERSHIP_ROLE.EDITOR,
+      });
     });
 
-    await expect(
-      stopPendingInvitesOverSeats(tenantId, FREE_SEATS),
-    ).resolves.toBe(2);
-    await expect(db().select().from(schema.membershipInvites)).resolves.toEqual(
-      [],
-    );
+    it('stops every one once the owner fills the Free seat', async () => {
+      await expect(
+        stopPendingInvitesOverSeats(tenantId, TENANT_PLAN.FREE),
+      ).resolves.toBe(2);
+    });
+
+    describe('once the site has moved to Growth', () => {
+      beforeEach(async () => {
+        await db().update(schema.tenants).set({ plan: TENANT_PLAN.GROWTH });
+      });
+
+      it('keeps the earliest ones that still fit the seats', async () => {
+        await mockMembershipInvite(db(), tenantId, {
+          role: MEMBERSHIP_ROLE.EDITOR,
+        });
+
+        await stopPendingInvitesOverSeats(tenantId, TENANT_PLAN.GROWTH);
+
+        const remaining = await db().select().from(schema.membershipInvites);
+        expect(remaining).toHaveLength(2);
+        expect(remaining.map(({ id }) => id)).toContain(keptId);
+      });
+
+      it('stops nothing when asked to hold them to Free', async () => {
+        await expect(
+          stopPendingInvitesOverSeats(tenantId, TENANT_PLAN.FREE),
+        ).resolves.toBe(0);
+      });
+    });
   });
 
   it('keeps an owner invite', async () => {
     await mockMembershipInvite(db(), tenantId);
 
     await expect(
-      stopPendingInvitesOverSeats(tenantId, FREE_SEATS),
+      stopPendingInvitesOverSeats(tenantId, TENANT_PLAN.FREE),
     ).resolves.toBe(0);
-  });
-
-  it('keeps the earliest invites that still fit the seats', async () => {
-    const kept = await mockMembershipInvite(db(), tenantId, {
-      role: MEMBERSHIP_ROLE.EDITOR,
-    });
-    await mockMembershipInvite(db(), tenantId, {
-      role: MEMBERSHIP_ROLE.EDITOR,
-    });
-
-    await stopPendingInvitesOverSeats(tenantId, 2);
-
-    const remaining = await db().select().from(schema.membershipInvites);
-    expect(remaining.map(({ id }) => id)).toEqual([kept.id]);
   });
 });

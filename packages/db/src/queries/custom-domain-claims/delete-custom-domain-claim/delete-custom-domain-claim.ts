@@ -1,14 +1,23 @@
 import { getDb } from '@blog/db/client';
+import type { TTenantPlan } from '@blog/db/constants';
+import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
 import { customDomainClaims } from '@blog/db/schema/custom-domain-claims';
-import { eq } from 'drizzle-orm';
+import { hasLength } from '@blog/utils/primitives';
+import { and, eq } from 'drizzle-orm';
 
 export async function deleteCustomDomainClaim(
   tenantId: string,
+  onlyWhilePlan?: TTenantPlan,
 ): Promise<boolean> {
   const deleted = await getDb()
     .delete(customDomainClaims)
-    .where(eq(customDomainClaims.tenantId, tenantId))
+    .where(
+      and(
+        eq(customDomainClaims.tenantId, tenantId),
+        onlyWhilePlan && isTenantOnPlan(tenantId, onlyWhilePlan),
+      ),
+    )
     .returning({ id: customDomainClaims.id });
 
-  return deleted.length > 0;
+  return hasLength(deleted);
 }

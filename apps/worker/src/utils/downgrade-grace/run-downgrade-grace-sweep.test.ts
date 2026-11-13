@@ -1,10 +1,5 @@
 import { ERROR_CODE } from '@blog/config/constants';
-import {
-  GRACE_EMAIL,
-  PLAN_ENTITLEMENTS,
-  TENANT_PLAN,
-  type TGraceEmail,
-} from '@blog/db/constants';
+import { GRACE_EMAIL, TENANT_PLAN, type TGraceEmail } from '@blog/db/constants';
 import { deleteCustomDomainClaim } from '@blog/db/queries/custom-domain-claims';
 import { stopPendingInvitesOverSeats } from '@blog/db/queries/membership-invites';
 import {
@@ -35,7 +30,10 @@ import {
 import { MOCK_NOW } from '@worker/testing/clock/frozen-clock';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
 import { createMockFaker } from '@worker/testing/mock-faker';
-import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
+import {
+  MOCK_DB_DOWN,
+  MOCK_RESEND_DOWN,
+} from '@worker/testing/outage/fixtures';
 import { MOCK_OWNER_EMAIL } from '@worker/testing/owner-access/fixtures';
 import {
   MOCK_CUSTOM_DOMAIN,
@@ -106,7 +104,7 @@ beforeEach(() => {
   vi.mocked(requestTenantCacheInvalidation).mockResolvedValue();
   vi.mocked(restoreDowngradeGrace).mockResolvedValue(true);
   vi.mocked(endDowngradeGrace).mockImplementation(async (id) =>
-    mockTenant({ id }),
+    mockTenant({ id, downgradeGraceStartedAt: null, downgradedFromPlan: null }),
   );
   vi.mocked(setTenantPrimaryDomain).mockImplementation(async (id) =>
     okResult(mockTenant({ id })),
@@ -247,13 +245,17 @@ describe(runDowngradeGraceSweep, () => {
   );
 
   describe('on day 14', () => {
-    const tenant = inGraceFor(14, { primaryDomain: MOCK_CUSTOM_DOMAIN });
+    const tenant = inGraceFor(14, {
+      primaryDomain: MOCK_CUSTOM_DOMAIN,
+      downgradedFromPlan: TENANT_PLAN.GROWTH,
+    });
 
     beforeEach(() => {
       vi.mocked(listTenantsDueForGraceEnd).mockResolvedValue([tenant]);
       vi.mocked(endDowngradeGrace).mockResolvedValue({
         ...tenant,
         downgradeGraceStartedAt: null,
+        downgradedFromPlan: null,
       });
       vi.mocked(listTenantHosts).mockResolvedValue([
         MOCK_CUSTOM_DOMAIN,
@@ -268,18 +270,22 @@ describe(runDowngradeGraceSweep, () => {
       });
       expect(lockMembershipsOverSeats).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
-        PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].seats,
+        TENANT_PLAN.FREE,
         MOCK_NOW,
       );
       expect(setTenantPrimaryDomain).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
         MOCK_TENANT_DOMAIN,
+        TENANT_PLAN.FREE,
       );
       expect(stopPendingInvitesOverSeats).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
-        PLAN_ENTITLEMENTS[TENANT_PLAN.FREE].seats,
+        TENANT_PLAN.FREE,
       );
-      expect(deleteCustomDomainClaim).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(deleteCustomDomainClaim).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        TENANT_PLAN.FREE,
+      );
       expect(requestTenantCacheInvalidation).toHaveBeenCalled();
       expect(endDowngradeGrace).toHaveBeenCalledWith(
         MOCK_TENANT_ID,
@@ -358,6 +364,24 @@ describe(runDowngradeGraceSweep, () => {
         expect(logger.error).toHaveBeenCalledWith(
           DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
           { tenantId: MOCK_TENANT_ID, isGivenBack: false, error: MOCK_DB_DOWN },
+        );
+      });
+
+      it('still logs the failure when giving the grace back throws', async () => {
+        vi.mocked(restoreDowngradeGrace).mockRejectedValue(
+          new Error(MOCK_RESEND_DOWN),
+        );
+
+        await sweep();
+
+        expect(logger.error).toHaveBeenCalledWith(
+          DOWNGRADE_GRACE_LOG.GRACE_END_FAILED,
+          {
+            tenantId: MOCK_TENANT_ID,
+            isGivenBack: false,
+            error: MOCK_DB_DOWN,
+            giveBackError: MOCK_RESEND_DOWN,
+          },
         );
       });
     });

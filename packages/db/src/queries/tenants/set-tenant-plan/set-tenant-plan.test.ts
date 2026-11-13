@@ -7,9 +7,12 @@ import {
 import { lockMembershipsOverSeats } from '@blog/db/queries/memberships/lock-memberships-over-seats';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
-import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
+import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
-import { mockMembership } from '@blog/db/testing/memberships/fixtures';
+import {
+  countLockedMemberships,
+  insertTeam,
+} from '@blog/db/testing/memberships/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
 import { daysBeforeNow } from '@blog/db/testing/tenants/grace';
@@ -32,11 +35,6 @@ afterEach(async () => {
   await db().delete(schema.tenants);
 });
 
-async function countLocked() {
-  const rows = await db().select().from(schema.memberships);
-  return rows.filter(({ lockedAt }) => lockedAt).length;
-}
-
 async function readGraceStart(tenantId: string) {
   const [row] = await db()
     .select({ startedAt: tenants.downgradeGraceStartedAt })
@@ -51,13 +49,11 @@ describe(setTenantPlan, () => {
 
     beforeEach(async () => {
       ({ id: tenantId } = await insertTestTenant(db()));
-      for (const role of [MEMBERSHIP_ROLE.OWNER, MEMBERSHIP_ROLE.EDITOR]) {
-        const { id: userId } = await insertTestUser(db(), {
-          id: crypto.randomUUID(),
-        });
-        await mockMembership(db(), { userId, tenantId, role });
-      }
-      await lockMembershipsOverSeats(tenantId, 1, MOCK_NOW);
+      await insertTeam(db(), tenantId, [
+        MEMBERSHIP_ROLE.OWNER,
+        MEMBERSHIP_ROLE.EDITOR,
+      ]);
+      await lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, MOCK_NOW);
     });
 
     it('gets its members back when it moves to a paid plan', async () => {
@@ -66,7 +62,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.ACTIVE,
       });
 
-      await expect(countLocked()).resolves.toBe(0);
+      await expect(countLockedMemberships(db())).resolves.toBe(0);
     });
 
     it('keeps them locked when the plan write is refused', async () => {
@@ -80,7 +76,7 @@ describe(setTenantPlan, () => {
         status: TENANT_STATUS.ACTIVE,
       });
 
-      await expect(countLocked()).resolves.toBe(1);
+      await expect(countLockedMemberships(db())).resolves.toBe(1);
     });
   });
 

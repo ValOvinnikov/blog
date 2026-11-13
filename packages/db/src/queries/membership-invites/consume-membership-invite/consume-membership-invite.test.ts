@@ -1,4 +1,5 @@
 import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { createMembership } from '@blog/db/queries/memberships';
 import * as schema from '@blog/db/schema';
 import {
   insertTestTenant,
@@ -6,10 +7,13 @@ import {
   MOCK_INVITE_EMAIL,
 } from '@blog/db/testing/fixtures';
 import {
+  deleteSeatRows,
   MOCK_INVITE_CONSUMED_AT,
   mockMembershipInvite,
 } from '@blog/db/testing/membership-invites/fixtures';
 import {
+  countLockedMemberships,
+  insertTeam,
   mockMembership,
   MOCK_USER_ID,
   MOCK_MISSING_USER_ID,
@@ -21,6 +25,12 @@ import { eq } from 'drizzle-orm';
 import { consumeMembershipInvite } from './consume-membership-invite';
 
 vi.mock('@blog/db/client');
+vi.mock('@blog/db/queries/memberships', async (importOriginal) => {
+  const actual = await importOriginal<{
+    createMembership: typeof createMembership;
+  }>();
+  return { ...actual, createMembership: vi.fn(actual.createMembership) };
+});
 
 faker.seed(6022);
 
@@ -38,10 +48,7 @@ async function readInvite(inviteId: string) {
 
 afterEach(async () => {
   vi.useRealTimers();
-  await db().delete(schema.memberships);
-  await db().delete(schema.membershipInvites);
-  await db().delete(schema.tenants);
-  await db().delete(schema.users);
+  await deleteSeatRows(db());
 });
 
 describe(consumeMembershipInvite, () => {
@@ -156,5 +163,20 @@ describe(consumeMembershipInvite, () => {
 
       expect(membership?.role).toBe(MEMBERSHIP_ROLE.EDITOR);
     });
+  });
+
+  it('locks the member who joined last when a racing accept filled the seat', async () => {
+    const { id: editorInviteId } = await mockMembershipInvite(db(), tenantId, {
+      role: MEMBERSHIP_ROLE.EDITOR,
+    });
+    const realCreate = vi.mocked(createMembership).getMockImplementation();
+    vi.mocked(createMembership).mockImplementationOnce(async (...args) => {
+      await insertTeam(db(), tenantId, [MEMBERSHIP_ROLE.EDITOR]);
+      return realCreate!(...args);
+    });
+
+    await consumeMembershipInvite(editorInviteId, MOCK_USER_ID);
+
+    await expect(countLockedMemberships(db())).resolves.toBe(1);
   });
 });

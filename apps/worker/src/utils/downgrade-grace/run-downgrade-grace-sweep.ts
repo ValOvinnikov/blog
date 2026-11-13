@@ -16,12 +16,8 @@ import {
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
 import { logger } from '@worker/utils/logger/logger';
 
-import {
-  endGrace,
-  endTrial,
-  sendGraceEmail,
-  type TGraceStepInput,
-} from './grace-steps';
+import { endGrace } from './grace-end';
+import { endTrial, sendGraceEmail, type TGraceStepInput } from './grace-steps';
 
 export type TDowngradeGraceSweepResult = Record<
   TValueOf<typeof DOWNGRADE_GRACE_STEP>,
