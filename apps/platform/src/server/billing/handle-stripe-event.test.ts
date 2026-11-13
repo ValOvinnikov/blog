@@ -1,7 +1,8 @@
 import { TENANT_PLAN } from '@blog/config/constants';
 import { STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db/constants';
 import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
-import { BILLING_LOG, STRIPE_EVENT_TYPE } from '@platform/constants/billing';
+import { BILLING_LOG } from '@platform/constants/billing';
+import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import {
   MOCK_GROWTH_UPGRADE,
@@ -18,6 +19,7 @@ import { logger } from '@platform/utils/logger/logger';
 import { after } from 'next/server';
 import type Stripe from 'stripe';
 
+import { handleCatalogueEvent } from './catalogue/handle-catalogue-event';
 import { handleStripeEvent } from './handle-stripe-event';
 import { sendPaymentReceipt } from './send-payment-receipt';
 import { syncStripeSubscription } from './sync-stripe-subscription';
@@ -44,6 +46,9 @@ vi.mock('./sync-stripe-subscription', () => ({
   syncStripeSubscription: vi.fn(),
 }));
 vi.mock('./send-payment-receipt', () => ({ sendPaymentReceipt: vi.fn() }));
+vi.mock('./catalogue/handle-catalogue-event', () => ({
+  handleCatalogueEvent: vi.fn(),
+}));
 vi.mock('@platform/server/tenants/on-tenant-plan-change', () => ({
   onTenantPlanChange: vi.fn(),
 }));
@@ -59,6 +64,7 @@ const handle = async (event: Stripe.Event) => {
 describe(handleStripeEvent, () => {
   beforeEach(() => {
     vi.mocked(syncStripeSubscription).mockResolvedValue(MOCK_GROWTH_UPGRADE);
+    vi.mocked(handleCatalogueEvent).mockResolvedValue(false);
     recordStripeEventMock.mockResolvedValue(
       STRIPE_EVENT_RECORD_OUTCOME.RECORDED,
     );
@@ -143,6 +149,15 @@ describe(handleStripeEvent, () => {
     vi.mocked(syncStripeSubscription).mockRejectedValue(new Error());
 
     await expect(handle(invoicePaidEvent())).rejects.toThrow();
+    expect(recordStripeEventMock).not.toHaveBeenCalled();
+  });
+
+  it('leaves a catalogue event to the catalogue sync alone', async () => {
+    vi.mocked(handleCatalogueEvent).mockResolvedValue(true);
+
+    await handle(mockStripeEvent(STRIPE_EVENT_TYPE.PRICE_UPDATED));
+
+    expect(syncStripeSubscription).not.toHaveBeenCalled();
     expect(recordStripeEventMock).not.toHaveBeenCalled();
   });
 

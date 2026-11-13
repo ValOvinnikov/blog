@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { STRIPE_EVENT_TYPE } from '@platform/constants/billing';
+import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import { stripeIdOf } from '@platform/server/billing/stripe-id';
 import type Stripe from 'stripe';
 

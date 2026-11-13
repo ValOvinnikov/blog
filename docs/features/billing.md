@@ -14,6 +14,7 @@ code:
   - apps/platform/src/server/billing/**
   - apps/platform/src/server/tenants/on-tenant-plan-change.ts
   - apps/platform/src/constants/billing.ts
+  - apps/platform/src/constants/stripe-event.ts
   - apps/platform/src/utils/stripe-env/**
   - apps/platform/src/utils/format-stripe-amount/**
   - apps/platform/src/utils/invoice-status-tone/**
@@ -21,6 +22,7 @@ code:
   - packages/db/src/queries/tenants/set-tenant-plan/**
   - packages/db/src/queries/tenants/get-tenant-id-by-stripe-ids/**
   - packages/db/src/queries/stripe-webhook-events/**
+  - apps/platform/src/cli/sync-stripe-catalogue.ts
   - packages/email/src/templates/owner/owner-receipt/**
 epics: [4840]
 ---
@@ -91,11 +93,13 @@ A site with no live subscription (Free, a trial, a lapsed site) buys Starter or 
 - Follow-ups run after the response. When the plan write changed the plan — decided by that write, so the burst of events Stripe sends at checkout triggers it once — `onTenantPlanChange`, the one step every plan change runs, operator or Stripe, which today emails the owner the plan-change notice. On an `invoice.paid` event recorded for the first time, the receipt.
 - The receipt (`buildOwnerReceiptEmail`, platform mail from `OWNER_EMAIL_FROM_ADDRESS` to the owner) re-reads the invoice and gives the amount paid in the invoice's currency, the payment date and the plan in the site's default language, with a "View your invoice" link to the invoice PDF (the hosted invoice page when Stripe has no PDF). An invoice that charged nothing sends no receipt. With no sender address or owner it is skipped and logged (`billing.receipt_unconfigured`, `billing.receipt_owner_missing`); a failed send is logged (`billing.receipt_failed`) and never makes Stripe retry.
 - No worker step yet: a move to Growth starts the template-layer run once #5714 adds the enqueue to `onTenantPlanChange`; until then a Stripe upgrade, like an operator's, adds no template sections. Stripe secrets never go to the worker.
+- **Price catalogue** ([pricing-module](./pricing-module.md)): `price.created`, `price.updated`, `promotion_code.created`, `promotion_code.updated` and `coupon.deleted` are handled before the subscription path (`handleCatalogueEvent`). Each re-reads the Price (with `currency_options`) or promotion code (with `promotion.coupon.applies_to`) from Stripe and saves it to `stripe_prices` / `stripe_promotion_codes`, or removes it when it no longer belongs: a Price that is archived or has no plan lookup key, a code that is inactive, restricted to a customer, to first-time buyers or to a minimum amount, past its `max_redemptions`, or whose coupon is no longer valid. `price.deleted` removes the Price's rows without a read; `coupon.deleted` re-reads that coupon's codes. Only `USD`, `EUR` and `GBP` amounts are kept. These events are not recorded with `recordStripeEvent`: each save is a re-read, so a replay writes the same rows.
 
 ## Configuration
 
 - `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` (platform, `src/utils/stripe-env/stripe-env.ts`; required in production). `STRIPE_PUBLISHABLE_KEY` (same file, required in production) is the matching publishable key, passed from the server to the Upgrade page's Stripe.js; unset, Upgrade says it is unavailable and logs `billing.checkout_unconfigured`, as does a missing secret key or `PLATFORM_APP_BASE_URL` (Checkout's return URL). The SDK (`stripe` 23.1.0) calls the API at version `2026-10-28.endive`, and the webhook endpoint must be created at that version too: the handler reads an invoice's subscription from `invoice.parent.subscription_details`, which older versions do not send, so an older endpoint would silently write nothing and send no receipts on invoice events. The Stripe dashboard's webhook endpoint points at `https://<platform host>/api/stripe/webhook` and sends the five events above; Stripe's customer emails (receipts, failed-payment notices) are turned off there. Setting both is console work, human-gated.
 - `OWNER_EMAIL_FROM_ADDRESS` and `RESEND_PLATFORM_API_KEY` for the receipt.
+- The Stripe webhook endpoint must be subscribed to the catalogue events above as well as the subscription and invoice ones (Stripe dashboard, both modes). Once per mode, an operator copies what Stripe already holds: `pnpm --filter platform sync-stripe-catalogue`, run with the platform's `STRIPE_SECRET_KEY` and `DATABASE_URL` loaded; it lists every Price by plan lookup key (ten keys per call, Stripe's limit) and every active promotion code, and saves or removes each as the webhook would, logging `billing.catalogue_synced` with the counts.
 - Stripe Tax needs its registrations set in the Stripe dashboard, and the Starter and Growth Prices must exist with the lookup keys in `STRIPE_PRICE_LOOKUP_KEY` and carry no trial period, so a trial owner pays at checkout — console work, human-gated.
 - Cost: one Stripe API read per handled event (two for `invoice.paid`), free; one Resend email per paid invoice; per Upgrade mount a customer read or create, a subscription and an open-session list (plus an expire per open session), one Price lookup, one promotion-code lookup when `?promo=` is set, and one Checkout Session (two when Stripe refuses the code), all free. Each payment carries Stripe's fees (card processing, Billing ~0.7%, Tax ~0.5%).
 

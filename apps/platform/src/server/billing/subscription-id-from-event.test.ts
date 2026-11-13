@@ -1,4 +1,4 @@
-import { STRIPE_EVENT_TYPE } from '@platform/constants/billing';
+import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import {
   MOCK_STRIPE_SUBSCRIPTION_ID,
   MOCK_UNHANDLED_EVENT_TYPE,
