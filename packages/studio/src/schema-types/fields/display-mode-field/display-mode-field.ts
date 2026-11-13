@@ -1,8 +1,13 @@
 import { DISPLAY_MODE } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { DisplayModePicture } from '@blog/studio/schema-types/fields/display-mode-field/display-mode-picture';
 import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
 import { toTitleCase } from '@blog/utils/primitives';
-import type { StringDefinition } from 'sanity';
+import type { ConditionalPropertyCallback, StringDefinition } from 'sanity';
+
+export const isCarouselMode: ConditionalPropertyCallback = ({ parent }) =>
+  (parent as TMaybeUndefined<{ displayMode?: string }>)?.displayMode ===
+  DISPLAY_MODE.CAROUSEL;
 
 export const displayModeField = (options?: {
   description?: string;
