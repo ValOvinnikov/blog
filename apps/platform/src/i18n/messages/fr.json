@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Inscriptions bloquées · Admin",
     "dataRequestsPage": "Demandes de données · Admin",
     "signUpTitle": "Créer un compte",
-    "onboarding": "Créer votre site · Administration"
+    "onboarding": "Créer votre site · Administration",
+    "upgrade": "Passer à Growth · Administration"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -2114,7 +2115,8 @@
     "description": "Les options marquées <badge></badge> sur cette page sont disponibles avec l'offre Growth.",
     "show": "Voir ce qui est inclus",
     "hide": "Masquer",
-    "listLabel": "Ce que Growth ajoute sur cette page"
+    "listLabel": "Ce que Growth ajoute sur cette page",
+    "askAboutGrowth": "En savoir plus sur Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Ouvrir votre tableau de bord",
@@ -2176,5 +2178,25 @@
     "category": "Motif : {category}.",
     "contest": "Pour contester cette décision, répondez à l’e-mail de suspension ou écrivez au support en indiquant {reference}.",
     "copyButton": "Copier la référence"
+  },
+  "upgradePage": {
+    "pageTitle": "Passer à Growth",
+    "description": "Growth débloque toutes les options des pages Apparence et Connexion de votre site. Payez au mois ou à l'année ; la taxe est calculée au paiement.",
+    "checkoutTitle": "Paiement",
+    "checkoutDescription": "Payez en toute sécurité sans quitter cette page. Vous avez un code promo ? Saisissez-le au paiement.",
+    "intervalLabel": "Période de facturation",
+    "MONTHLY": "Mensuel",
+    "YEARLY": "Annuel",
+    "checkoutFailed": "Le paiement n'a pas pu démarrer. Choisissez une période de facturation pour réessayer.",
+    "unconfigured": "Le changement d'offre n'est pas disponible pour le moment. Réessayez plus tard.",
+    "onGrowthTitle": "Votre site est sur Growth",
+    "onGrowthDescription": "Toutes les options Growth sont ouvertes sur votre site.",
+    "backToOverview": "Retour à la vue d'ensemble",
+    "confirmingTitle": "Confirmation de votre paiement",
+    "confirmingDescription": "Votre offre change dès que le paiement est confirmé, généralement en moins d'une minute. Cette page se met à jour d'elle-même, et nous vous enverrons aussi un e-mail.",
+    "ON_GROWTH": "Votre site est déjà sur Growth.",
+    "NOT_OWNER": "Seul le propriétaire de votre site peut changer d'offre.",
+    "PAID_PLAN": "Votre site a déjà une offre payante, il n'y a donc rien à changer ici.",
+    "UNAVAILABLE": "Le changement d'offre sera de nouveau possible dès que votre site fonctionnera."
   }
 }

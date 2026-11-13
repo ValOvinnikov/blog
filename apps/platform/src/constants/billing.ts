@@ -12,6 +12,9 @@ export const BILLING_LOG = {
   RECEIPT_UNCONFIGURED: 'billing.receipt_unconfigured',
   RECEIPT_OWNER_MISSING: 'billing.receipt_owner_missing',
   RECEIPT_FAILED: 'billing.receipt_failed',
+  CHECKOUT_UNCONFIGURED: 'billing.checkout_unconfigured',
+  CHECKOUT_PRICE_MISSING: 'billing.checkout_price_missing',
+  CHECKOUT_FAILED: 'billing.checkout_failed',
 } as const;
 
 export const STRIPE_EVENT_TYPE = {
@@ -49,3 +52,37 @@ export const STRIPE_SIGNATURE_HEADER = 'stripe-signature';
 export const STRIPE_TENANT_METADATA_KEY = 'tenantId';
 
 export type TBillingGrace = TValueOf<typeof BILLING_GRACE>;
+
+export const BILLING_INTERVAL = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY',
+} as const;
+
+export type TBillingInterval = TValueOf<typeof BILLING_INTERVAL>;
+
+export const UPGRADE_STATE = {
+  AVAILABLE: 'AVAILABLE',
+  ON_GROWTH: 'ON_GROWTH',
+  NOT_OWNER: 'NOT_OWNER',
+  PAID_PLAN: 'PAID_PLAN',
+  UNAVAILABLE: 'UNAVAILABLE',
+} as const;
+
+export type TUpgradeState = TValueOf<typeof UPGRADE_STATE>;
+
+export type TUpgradeRefusal = Exclude<
+  TUpgradeState,
+  typeof UPGRADE_STATE.AVAILABLE
+>;
+
+export const UPGRADE_SEARCH_PARAM = {
+  PROMO: 'promo',
+  SESSION_ID: 'session_id',
+} as const;
+
+export const STRIPE_CHECKOUT_SESSION_ID_TEMPLATE = '{CHECKOUT_SESSION_ID}';
+
+export const UPGRADE_POLL = {
+  INTERVAL_MS: 2_000,
+  MAX_TICKS: 30,
+} as const;

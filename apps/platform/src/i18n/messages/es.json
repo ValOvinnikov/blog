@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Registros bloqueados · Admin",
     "dataRequestsPage": "Solicitudes de datos · Admin",
     "signUpTitle": "Crear una cuenta",
-    "onboarding": "Crear tu sitio · Administración"
+    "onboarding": "Crear tu sitio · Administración",
+    "upgrade": "Mejorar plan · Administración"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -2114,7 +2115,8 @@
     "description": "Las opciones marcadas con <badge></badge> en esta página se activan con el plan Growth.",
     "show": "Ver qué incluye",
     "hide": "Ocultar",
-    "listLabel": "Qué añade Growth en esta página"
+    "listLabel": "Qué añade Growth en esta página",
+    "askAboutGrowth": "Saber más sobre Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Abrir tu panel",
@@ -2176,5 +2178,25 @@
     "category": "Motivo: {category}.",
     "contest": "Para impugnar esta decisión, responde al correo de suspensión o escribe a soporte indicando {reference}.",
     "copyButton": "Copiar referencia"
+  },
+  "upgradePage": {
+    "pageTitle": "Pasar a Growth",
+    "description": "Growth desbloquea todas las opciones de las páginas Aspecto e Inicio de sesión de tu sitio. Paga mensual o anualmente; los impuestos se calculan al pagar.",
+    "checkoutTitle": "Pago",
+    "checkoutDescription": "Paga de forma segura sin salir de esta página. ¿Tienes un código promocional? Introdúcelo al pagar.",
+    "intervalLabel": "Periodo de facturación",
+    "MONTHLY": "Mensual",
+    "YEARLY": "Anual",
+    "checkoutFailed": "No se pudo iniciar el pago. Elige un periodo de facturación para volver a intentarlo.",
+    "unconfigured": "Ahora mismo no se puede mejorar el plan. Inténtalo más tarde.",
+    "onGrowthTitle": "Tu sitio está en Growth",
+    "onGrowthDescription": "Todas las opciones de Growth están disponibles en tu sitio.",
+    "backToOverview": "Volver al resumen",
+    "confirmingTitle": "Confirmando tu pago",
+    "confirmingDescription": "Tu plan cambia en cuanto se confirme el pago, normalmente en menos de un minuto. Esta página se actualiza sola y también te enviaremos un correo.",
+    "ON_GROWTH": "Tu sitio ya está en Growth.",
+    "NOT_OWNER": "Solo el propietario de tu sitio puede mejorar el plan.",
+    "PAID_PLAN": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que mejorar.",
+    "UNAVAILABLE": "Podrás mejorar el plan cuando tu sitio vuelva a estar activo."
   }
 }

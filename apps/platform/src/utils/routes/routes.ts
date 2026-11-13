@@ -72,6 +72,7 @@ export const adminRoutes = {
   dashboardLanguages: () => '/dashboard/languages',
   dashboardEmail: () => '/dashboard/email',
   dashboardLeads: () => '/dashboard/leads',
+  dashboardUpgrade: () => '/dashboard/upgrade',
   dashboardStudio: () => `/dashboard/${STUDIO_SEGMENT}`,
   dashboardSelectTenant: () => '/dashboard/select-tenant',
   dashboardSelectTenantHref: (tenantId: string) =>

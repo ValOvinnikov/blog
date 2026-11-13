@@ -162,6 +162,12 @@
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
+        "ref": "UPGRADE_STATE.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -5350,6 +5356,30 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.checkout_unconfigured": [
+      {
+        "ref": "BILLING_LOG.CHECKOUT_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.checkout_price_missing": [
+      {
+        "ref": "BILLING_LOG.CHECKOUT_PRICE_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.checkout_failed": [
+      {
+        "ref": "BILLING_LOG.CHECKOUT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "customer.subscription.created": [
       {
         "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
@@ -5455,6 +5485,82 @@
     "KEEP": [
       {
         "ref": "BILLING_GRACE.KEEP",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "MONTHLY": [
+      {
+        "ref": "BILLING_INTERVAL.MONTHLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "YEARLY": [
+      {
+        "ref": "BILLING_INTERVAL.YEARLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "AVAILABLE": [
+      {
+        "ref": "UPGRADE_STATE.AVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "DOMAIN_AVAILABILITY.AVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/domain",
+        "file": "apps/platform/src/constants/domain.ts"
+      },
+      {
+        "ref": "SITE_ADDRESS_STATUS.AVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/onboarding",
+        "file": "apps/platform/src/constants/onboarding.ts"
+      }
+    ],
+    "ON_GROWTH": [
+      {
+        "ref": "UPGRADE_STATE.ON_GROWTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "NOT_OWNER": [
+      {
+        "ref": "UPGRADE_STATE.NOT_OWNER",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "PAID_PLAN": [
+      {
+        "ref": "UPGRADE_STATE.PAID_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "promo": [
+      {
+        "ref": "UPGRADE_SEARCH_PARAM.PROMO",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "session_id": [
+      {
+        "ref": "UPGRADE_SEARCH_PARAM.SESSION_ID",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -6148,20 +6254,6 @@
         "scope": "app:platform",
         "from": "@platform/constants/domain",
         "file": "apps/platform/src/constants/domain.ts"
-      }
-    ],
-    "AVAILABLE": [
-      {
-        "ref": "DOMAIN_AVAILABILITY.AVAILABLE",
-        "scope": "app:platform",
-        "from": "@platform/constants/domain",
-        "file": "apps/platform/src/constants/domain.ts"
-      },
-      {
-        "ref": "SITE_ADDRESS_STATUS.AVAILABLE",
-        "scope": "app:platform",
-        "from": "@platform/constants/onboarding",
-        "file": "apps/platform/src/constants/onboarding.ts"
       }
     ],
     "IN_USE": [
@@ -10080,6 +10172,14 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       }
     ],
+    "30": [
+      {
+        "ref": "UPGRADE_POLL.MAX_TICKS",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "40": [
       {
         "ref": "CUSTOM_DOMAIN_VERIFY_POLL.maxTicks",
@@ -10290,6 +10390,14 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-follow",
         "file": "apps/platform/src/constants/look-follow.ts"
+      }
+    ],
+    "2000": [
+      {
+        "ref": "UPGRADE_POLL.INTERVAL_MS",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
       }
     ],
     "10000": [

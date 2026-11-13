@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Gesperrte Registrierungen · Admin",
     "dataRequestsPage": "Datenanfragen · Admin",
     "signUpTitle": "Konto erstellen",
-    "onboarding": "Website erstellen · Admin"
+    "onboarding": "Website erstellen · Admin",
+    "upgrade": "Upgrade · Admin"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -2114,7 +2115,8 @@
     "description": "Mit <badge></badge> markierte Optionen auf dieser Seite gibt es im Growth-Tarif.",
     "show": "Das ist enthalten",
     "hide": "Ausblenden",
-    "listLabel": "Was Growth auf dieser Seite ergänzt"
+    "listLabel": "Was Growth auf dieser Seite ergänzt",
+    "askAboutGrowth": "Mehr über Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Dashboard öffnen",
@@ -2176,5 +2178,25 @@
     "category": "Grund: {category}.",
     "contest": "Um diese Entscheidung anzufechten, antworte auf die Sperr-E-Mail oder schreibe an den Support und gib {reference} an.",
     "copyButton": "Referenz kopieren"
+  },
+  "upgradePage": {
+    "pageTitle": "Upgrade auf Growth",
+    "description": "Growth schaltet alle Optionen auf den Seiten Erscheinungsbild und Anmeldung deiner Website frei. Zahle monatlich oder jährlich; die Steuer wird an der Kasse berechnet.",
+    "checkoutTitle": "Kasse",
+    "checkoutDescription": "Zahle sicher, ohne diese Seite zu verlassen. Hast du einen Aktionscode? Gib ihn an der Kasse ein.",
+    "intervalLabel": "Abrechnungszeitraum",
+    "MONTHLY": "Monatlich",
+    "YEARLY": "Jährlich",
+    "checkoutFailed": "Die Kasse konnte nicht starten. Wähle einen Abrechnungszeitraum, um es erneut zu versuchen.",
+    "unconfigured": "Ein Upgrade ist gerade nicht möglich. Versuche es später erneut.",
+    "onGrowthTitle": "Deine Website nutzt Growth",
+    "onGrowthDescription": "Alle Growth-Optionen sind auf deiner Website freigeschaltet.",
+    "backToOverview": "Zurück zur Übersicht",
+    "confirmingTitle": "Zahlung wird bestätigt",
+    "confirmingDescription": "Dein Tarif ändert sich, sobald die Zahlung bestätigt ist, meist innerhalb einer Minute. Diese Seite aktualisiert sich von selbst, und wir schicken dir auch eine E-Mail.",
+    "ON_GROWTH": "Deine Website nutzt bereits Growth.",
+    "NOT_OWNER": "Nur der Inhaber deiner Website kann ein Upgrade durchführen.",
+    "PAID_PLAN": "Deine Website hat bereits einen kostenpflichtigen Tarif, daher gibt es hier nichts zu upgraden.",
+    "UNAVAILABLE": "Ein Upgrade ist wieder möglich, sobald deine Website läuft."
   }
 }

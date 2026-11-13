@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_CONTROLS, ARIA_EXPANDED } from '@platform/testing/aria';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { GrowthNote } from './growth-note';
@@ -49,6 +50,12 @@ describe(`<${GrowthNote.name}/>`, () => {
     expect(list).not.toBeInTheDocument();
   });
 
+  it('links Ask about Growth to the Upgrade page', () => {
+    const link = screen.getByRole('link', { name: growthNote.askAboutGrowth });
+
+    expect(link).toHaveAttribute('href', adminRoutes.dashboardUpgrade());
+  });
+
   describe('when opened', () => {
     beforeEach(async () => {
       const showButton = screen.getByRole('button', { name: growthNote.show });
@@ -83,7 +90,9 @@ describe(`<${GrowthNote.name}/>`, () => {
     it('lists a plain item without a link and a link item with its description', () => {
       const plain = screen.getByText(MOCK_PLAIN_LABEL);
       const description = screen.getByText(MOCK_LINK_DESCRIPTION);
-      const links = screen.getAllByRole('link');
+      const links = screen.getAllByRole('link', {
+        name: new RegExp(MOCK_LINK_LABEL),
+      });
 
       expect(plain).toBeVisible();
       expect(description).toBeVisible();

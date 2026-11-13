@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Blocked sign-ups · Admin",
     "dataRequestsPage": "Data requests · Admin",
     "signUpTitle": "Create an account",
-    "onboarding": "Create your site · Admin"
+    "onboarding": "Create your site · Admin",
+    "upgrade": "Upgrade · Admin"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -2114,7 +2115,8 @@
     "description": "Options marked <badge></badge> on this page open up on the Growth plan.",
     "show": "See what's included",
     "hide": "Hide",
-    "listLabel": "What Growth adds on this page"
+    "listLabel": "What Growth adds on this page",
+    "askAboutGrowth": "Ask about Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open your dashboard",
@@ -2176,5 +2178,25 @@
     "category": "Reason: {category}.",
     "contest": "To contest this decision, reply to the suspension email or write to support quoting {reference}.",
     "copyButton": "Copy reference"
+  },
+  "upgradePage": {
+    "pageTitle": "Upgrade to Growth",
+    "description": "Growth opens up every option on your site's Look and Sign-in pages. Pay monthly or yearly; tax is worked out at checkout.",
+    "checkoutTitle": "Checkout",
+    "checkoutDescription": "Pay securely without leaving this page. Have a promotion code? Enter it at checkout.",
+    "intervalLabel": "Billing period",
+    "MONTHLY": "Monthly",
+    "YEARLY": "Yearly",
+    "checkoutFailed": "Checkout couldn't start. Choose a billing period to try again.",
+    "unconfigured": "Upgrading isn't available right now. Try again later.",
+    "onGrowthTitle": "Your site is on Growth",
+    "onGrowthDescription": "Every Growth option is open on your site.",
+    "backToOverview": "Back to Overview",
+    "confirmingTitle": "Confirming your payment",
+    "confirmingDescription": "Your plan changes as soon as the payment is confirmed, usually within a minute. This page updates by itself, and we'll email you too.",
+    "ON_GROWTH": "Your site is already on Growth.",
+    "NOT_OWNER": "Only your site's owner can upgrade it.",
+    "PAID_PLAN": "Your site already has a paid plan, so there's nothing to upgrade here.",
+    "UNAVAILABLE": "Upgrading opens again once your site is running."
   }
 }

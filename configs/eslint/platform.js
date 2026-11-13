@@ -37,7 +37,7 @@ const platformTestingRestrictedGroup = {
 const TESTING_IMPORT_ALLOWED_FILES = [
   '**/*.test.{ts,tsx}',
   'src/testing/**/*.{ts,tsx}',
-  '**/__mocks__/*.{ts,tsx}',
+  '**/__mocks__/**/*.{ts,tsx}',
   '**/*.stories.{ts,tsx}',
 ];
 

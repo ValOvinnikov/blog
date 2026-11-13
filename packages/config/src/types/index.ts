@@ -15,6 +15,8 @@ export type TMaybeNull<T> = T | null;
 
 export type TNullable<T> = T | null | undefined;
 
+export type TSearchParam = TMaybeUndefined<string | string[]>;
+
 /** A row that may have been through `JSON.stringify` and back, so each `Date` field may arrive as its ISO string. */
 export type TMaybeJsonDates<T> = {
   [K in keyof T]: T[K] extends Date

@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
     "dataRequestsPage": "Gegevensverzoeken · Admin",
     "signUpTitle": "Account aanmaken",
-    "onboarding": "Je site maken · Admin"
+    "onboarding": "Je site maken · Admin",
+    "upgrade": "Upgraden · Admin"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -2114,7 +2115,8 @@
     "description": "Opties met <badge></badge> op deze pagina komen beschikbaar met het Growth-abonnement.",
     "show": "Bekijk wat erbij zit",
     "hide": "Verbergen",
-    "listLabel": "Wat Growth op deze pagina toevoegt"
+    "listLabel": "Wat Growth op deze pagina toevoegt",
+    "askAboutGrowth": "Meer over Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open je dashboard",
@@ -2176,5 +2178,25 @@
     "category": "Reden: {category}.",
     "contest": "Wil je dit besluit aanvechten? Beantwoord de schorsingsmail of schrijf naar support en vermeld {reference}.",
     "copyButton": "Referentie kopiëren"
+  },
+  "upgradePage": {
+    "pageTitle": "Upgraden naar Growth",
+    "description": "Growth ontgrendelt alle opties op de pagina's Uiterlijk en Inloggen van je site. Betaal per maand of per jaar; belasting wordt bij het afrekenen berekend.",
+    "checkoutTitle": "Afrekenen",
+    "checkoutDescription": "Betaal veilig zonder deze pagina te verlaten. Heb je een kortingscode? Vul die in bij het afrekenen.",
+    "intervalLabel": "Factuurperiode",
+    "MONTHLY": "Maandelijks",
+    "YEARLY": "Jaarlijks",
+    "checkoutFailed": "Afrekenen kon niet starten. Kies een factuurperiode om het opnieuw te proberen.",
+    "unconfigured": "Upgraden is nu niet mogelijk. Probeer het later opnieuw.",
+    "onGrowthTitle": "Je site gebruikt Growth",
+    "onGrowthDescription": "Alle Growth-opties zijn open op je site.",
+    "backToOverview": "Terug naar Overzicht",
+    "confirmingTitle": "Je betaling wordt bevestigd",
+    "confirmingDescription": "Je abonnement verandert zodra de betaling is bevestigd, meestal binnen een minuut. Deze pagina werkt zichzelf bij, en we sturen je ook een e-mail.",
+    "ON_GROWTH": "Je site gebruikt Growth al.",
+    "NOT_OWNER": "Alleen de eigenaar van je site kan upgraden.",
+    "PAID_PLAN": "Je site heeft al een betaald abonnement, dus hier valt niets te upgraden.",
+    "UNAVAILABLE": "Upgraden kan weer zodra je site actief is."
   }
 }
