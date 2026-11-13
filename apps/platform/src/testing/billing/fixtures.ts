@@ -4,9 +4,7 @@ import {
   type TPaidSubscriberBandCeiling,
   type TStripePriceLookupKey,
 } from '@blog/db/constants';
-import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import {
-  MOCK_EMPTY_TENANT_BILLING,
   MOCK_STRIPE_EVENT_ID,
   mockStripeIds,
 } from '@blog/db/testing/tenants/billing';
@@ -45,11 +43,6 @@ export const MOCK_UNHANDLED_EVENT_TYPE = 'customer.created';
 export const MOCK_INCOMPLETE_SUBSCRIPTION_STATUS = 'incomplete';
 export const MOCK_BAND_CEILING: TPaidSubscriberBandCeiling = 2_500;
 export const MOCK_STRIPE_CLIENT = {} as Stripe;
-export const MOCK_PAYING_TENANT_BILLING: TTenantBilling = {
-  ...MOCK_EMPTY_TENANT_BILLING,
-  stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID,
-  stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
-};
 export const MOCK_GROWTH_UPGRADE = {
   tenantId: MOCK_TENANT_ID,
   fromPlan: TENANT_PLAN.FREE,

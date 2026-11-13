@@ -30,9 +30,12 @@ export const PlanCard = ({
 
   const nextPaymentText = (payment: TMaybeUndefined<TBillingNextPayment>) =>
     payment
-      ? t('nextPayment', {
+      ? t.rich('nextPayment', {
           amount: formatStripeAmount(payment.amount, locale),
           date: formatDate(payment.dueAt, locale),
+          time: (chunks) => (
+            <time dateTime={payment.dueAt.toISOString()}>{chunks}</time>
+          ),
         })
       : t('noNextPayment');
 

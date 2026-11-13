@@ -1,12 +1,8 @@
 import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { MOCK_NEXT_PAYMENT } from '@platform/testing/billing/overview';
 import { customRender, screen } from '@platform/testing/custom-render';
 
 import { PlanCard } from './plan-card';
-
-const MOCK_NEXT_PAYMENT = {
-  dueAt: new Date('2026-12-02T00:00:00.000Z'),
-  amount: { minorUnits: 2900, currency: 'eur' },
-};
 
 const setup = customRender(PlanCard, {
   plan: TENANT_PLAN.GROWTH,
@@ -30,9 +26,14 @@ describe(`<${PlanCard.name}/>`, () => {
     });
 
     it('shows the amount and date of the next payment', () => {
-      const nextPayment = screen.getByText('€29.00 on Dec 2, 2026');
+      const nextPayment = screen.getByText(/^\$29\.00 on/);
+      const dueDate = screen.getByText('Dec 2, 2026');
 
-      expect(nextPayment).toBeVisible();
+      expect(nextPayment).toHaveTextContent('$29.00 on Dec 2, 2026');
+      expect(dueDate).toHaveAttribute(
+        'dateTime',
+        MOCK_NEXT_PAYMENT.dueAt.toISOString(),
+      );
     });
   });
 

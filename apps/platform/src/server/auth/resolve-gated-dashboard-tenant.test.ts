@@ -5,7 +5,7 @@ import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockReadyTenant } from '@platform/testing/tenants/fixtures';
 import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 
-import { resolveBillingPageTenant } from './resolve-billing-page-tenant';
+import { resolveGatedDashboardTenant } from './resolve-gated-dashboard-tenant';
 
 vi.mock('@platform/server/auth/resolve-dashboard-tenant', () => ({
   resolveDashboardTenant: vi.fn(),
@@ -20,11 +20,12 @@ const MOCK_CONTEXT = {
   tenants: [],
 };
 const MOCK_SIGN_IN_REDIRECT = new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
+const GATED_PAGES = ['leads', 'billing'] as const;
 
 const resolveDashboardTenantMock = vi.mocked(resolveDashboardTenant);
 const resolveTenantPageAccessMock = vi.mocked(resolveTenantPageAccess);
 
-describe(resolveBillingPageTenant, () => {
+describe(resolveGatedDashboardTenant, () => {
   beforeEach(() => {
     resolveDashboardTenantMock.mockResolvedValue(MOCK_CONTEXT);
   });
@@ -32,30 +33,38 @@ describe(resolveBillingPageTenant, () => {
   it('never reaches the access check without a session', async () => {
     resolveDashboardTenantMock.mockRejectedValue(MOCK_SIGN_IN_REDIRECT);
 
-    await expect(resolveBillingPageTenant()).rejects.toBe(
+    await expect(resolveGatedDashboardTenant('billing')()).rejects.toBe(
       MOCK_SIGN_IN_REDIRECT,
     );
     expect(resolveTenantPageAccessMock).not.toHaveBeenCalled();
   });
 
-  it('is not found for a member who cannot see Billing', async () => {
-    resolveTenantPageAccessMock.mockResolvedValue({
-      ...EVERY_PLAN_PAGE,
-      billing: false,
-    });
+  it.each(GATED_PAGES)(
+    'is not found for a member who cannot open %s',
+    async (page) => {
+      resolveTenantPageAccessMock.mockResolvedValue({
+        ...EVERY_PLAN_PAGE,
+        [page]: false,
+      });
 
-    await expect(resolveBillingPageTenant()).rejects.toThrow(
-      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
-    );
-  });
+      await expect(resolveGatedDashboardTenant(page)()).rejects.toThrow(
+        NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+      );
+    },
+  );
 
-  it('returns the dashboard tenant to its owner', async () => {
-    resolveTenantPageAccessMock.mockResolvedValue(EVERY_PLAN_PAGE);
+  it.each(GATED_PAGES)(
+    'returns the dashboard tenant to a member who can open %s',
+    async (page) => {
+      resolveTenantPageAccessMock.mockResolvedValue(EVERY_PLAN_PAGE);
 
-    await expect(resolveBillingPageTenant()).resolves.toBe(MOCK_CONTEXT);
-    expect(resolveTenantPageAccessMock).toHaveBeenCalledWith(
-      MOCK_CONTEXT.tenant,
-      MOCK_CONTEXT.membership,
-    );
-  });
+      await expect(resolveGatedDashboardTenant(page)()).resolves.toBe(
+        MOCK_CONTEXT,
+      );
+      expect(resolveTenantPageAccessMock).toHaveBeenCalledWith(
+        MOCK_CONTEXT.tenant,
+        MOCK_CONTEXT.membership,
+      );
+    },
+  );
 });

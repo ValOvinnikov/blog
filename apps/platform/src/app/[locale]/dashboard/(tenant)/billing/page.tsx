@@ -1,5 +1,5 @@
 import { BillingPageContent } from '@platform/components/features/billing/billing-page-content';
-import { resolveBillingPageTenant } from '@platform/server/billing/resolve-billing-page-tenant';
+import { resolveGatedDashboardTenant } from '@platform/server/auth/resolve-gated-dashboard-tenant';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { renderTenantScopedPage } from '@platform/server/tenant-pages/render-tenant-scoped-page';
 import type { Metadata } from 'next';
@@ -9,5 +9,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function DashboardBillingPage() {
-  return renderTenantScopedPage(resolveBillingPageTenant, BillingPageContent);
+  return renderTenantScopedPage(
+    resolveGatedDashboardTenant('billing'),
+    BillingPageContent,
+  );
 }

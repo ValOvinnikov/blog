@@ -7,7 +7,8 @@ import {
   BILLING_INVOICE_LIMIT,
   MILLISECONDS_PER_SECOND,
   STRIPE_ERROR_CODE,
-  type TStripeInvoiceStatus,
+  STRIPE_LIVE_SUBSCRIPTION_STATUSES,
+  type TBilledInvoiceStatus,
 } from '@platform/constants/billing';
 import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import Stripe from 'stripe';
@@ -16,7 +17,7 @@ export type TBillingInvoice = {
   id: string;
   issuedAt: Date;
   amount: TStripeAmount;
-  status: TStripeInvoiceStatus;
+  status: TBilledInvoiceStatus;
   url: TMaybeUndefined<string>;
 };
 
@@ -52,7 +53,7 @@ export const listBillingInvoices = async (
   customer: string,
 ): Promise<TBillingInvoice[]> => {
   const invoices = await stripe.invoices
-    .list({ customer })
+    .list({ customer, limit: BILLING_INVOICE_LIMIT })
     .autoPagingToArray({ limit: BILLING_INVOICE_LIMIT });
 
   return invoices.flatMap((invoice) => toBillingInvoice(invoice) ?? []);
@@ -67,6 +68,15 @@ export const previewNextPayment = async (
   customer: string,
   subscription: string,
 ): Promise<TMaybeUndefined<TBillingNextPayment>> => {
+  const { status, cancel_at_period_end } =
+    await stripe.subscriptions.retrieve(subscription);
+  if (
+    cancel_at_period_end ||
+    !isOneOf(STRIPE_LIVE_SUBSCRIPTION_STATUSES, status)
+  ) {
+    return undefined;
+  }
+
   try {
     const { next_payment_attempt, created, amount_due, currency } =
       await stripe.invoices.createPreview({ customer, subscription });

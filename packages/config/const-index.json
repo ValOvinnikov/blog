@@ -5372,6 +5372,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.next_payment_failed": [
+      {
+        "ref": "BILLING_LOG.NEXT_PAYMENT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.portal_failed": [
       {
         "ref": "BILLING_LOG.PORTAL_FAILED",
@@ -5455,14 +5463,6 @@
     "unpaid": [
       {
         "ref": "STRIPE_SUBSCRIPTION_STATUS.UNPAID",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "draft": [
-      {
-        "ref": "STRIPE_INVOICE_STATUS.DRAFT",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"

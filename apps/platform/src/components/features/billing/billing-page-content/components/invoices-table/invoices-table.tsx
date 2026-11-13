@@ -36,15 +36,14 @@ export const InvoicesTable = ({ invoices }: TInvoicesTableProps) => {
       ]}
       renderRow={({ id, issuedAt, amount, status, url }) => {
         const date = formatDate(issuedAt, locale);
+        const formattedAmount = formatStripeAmount(amount, locale);
 
         return (
           <DataTableShell.Row key={id}>
             <DataTableShell.Cell>
               <time dateTime={issuedAt.toISOString()}>{date}</time>
             </DataTableShell.Cell>
-            <DataTableShell.Cell>
-              {formatStripeAmount(amount, locale)}
-            </DataTableShell.Cell>
+            <DataTableShell.Cell>{formattedAmount}</DataTableShell.Cell>
             <DataTableShell.Cell>
               <StatusBadge tone={invoiceStatusTone(status)}>
                 {t(`invoiceStatus.${status}`)}
@@ -56,9 +55,14 @@ export const InvoicesTable = ({ invoices }: TInvoicesTableProps) => {
                   href={url}
                   variant={BUTTON_VARIANT.SECONDARY}
                   size={SIZE.SM}
-                  ariaLabel={t('viewInvoiceAriaLabel', { date })}
                 >
-                  {t('viewInvoice')}
+                  {t.rich('viewInvoice', {
+                    date,
+                    amount: formattedAmount,
+                    context: (chunks) => (
+                      <span className={visuallyHidden()}>{chunks}</span>
+                    ),
+                  })}
                 </ExternalLinkButton>
               )}
             </DataTableShell.Cell>

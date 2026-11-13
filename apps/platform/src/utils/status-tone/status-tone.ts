@@ -27,7 +27,7 @@ import {
 } from '@platform/constants/release';
 import type { TEmailItemStatus } from '@platform/utils/email-draft-changes/email-draft-changes';
 
-type TBadgeTone = NonNullable<TStatusBadgeProps['tone']>;
+export type TBadgeTone = NonNullable<TStatusBadgeProps['tone']>;
 
 const TENANT_STATUS_TONE: Record<TTenantStatus, TBadgeTone> = {
   [TENANT_STATUS.ACTIVE]: BADGE_TONE.OK,

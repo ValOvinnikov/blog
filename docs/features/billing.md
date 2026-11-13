@@ -12,6 +12,7 @@ code:
   - apps/platform/src/utils/stripe-env/**
   - apps/platform/src/utils/format-stripe-amount/**
   - apps/platform/src/utils/invoice-status-tone/**
+  - apps/platform/src/server/auth/resolve-gated-dashboard-tenant.ts
   - packages/db/src/queries/tenants/set-tenant-plan/**
   - packages/db/src/queries/tenants/get-tenant-id-by-stripe-ids/**
   - packages/db/src/queries/stripe-webhook-events/**
@@ -28,17 +29,17 @@ Stripe is the source of truth for a paying site's plan and status. A Stripe webh
 ## Surfaces and routes
 
 - `POST /api/stripe/webhook` (`apps/platform`) — public, outside the locale proxy. It verifies the `stripe-signature` header against `STRIPE_WEBHOOK_SECRET` with the Stripe SDK on the raw body, refusing a missing or wrong signature with 400 and changing nothing. Either secret unset answers 500 and logs `billing.webhook_secret_missing`. A handler failure answers 500 (`billing.webhook_handler_failed`) so Stripe retries; everything else answers 200.
-- `/dashboard/billing` (`apps/platform`) — the Billing page, owner-only: the sidebar's Account section links it only for an owner (`resolveTenantPageAccess` → `billing`), and any other member gets a 404 (`resolveBillingPageTenant`). An operator viewing the dashboard holds a virtual owner membership and sees it too.
+- `/dashboard/billing` (`apps/platform`) — the Billing page, for the site's real owner and a super admin only (`isBillingManager`): the sidebar's Account section links it only for them (`resolveTenantPageAccess` → `billing`), and anyone else — an editor, a moderator or another admin role — gets a 404 (`resolveGatedDashboardTenant('billing')`, the same resolver Leads uses).
 
 ## Billing page
 
 - The header renders at once; the Stripe reads stream in under a skeleton. `PageHeader` carries **Manage billing** whenever the site has a Stripe customer.
-- **Plan card:** the plan name and the tenant's status badge, and the next payment as "{amount} on {date}" from `invoices.createPreview` for the stored subscription (dated by `next_payment_attempt`, else the invoice's date); "None scheduled" when Stripe has no upcoming invoice (`invoice_upcoming_none`, e.g. a subscription cancelled at period end). A site on Free reads no preview.
-- **Invoices table:** every finalised invoice for the customer, newest first (`invoices.list`, auto-paginated to 100): date, total in the invoice's currency, status (Paid, Due, Unpaid, Cancelled) and a "View PDF" link to `invoice_pdf`, or the hosted invoice page when there is no PDF. Drafts are left out.
+- **Plan card:** the plan name and the tenant's status badge, and the next payment as "{amount} on {date}" (the date in a `<time>`). The next payment needs a stored subscription id: the subscription is read first, and only a live one (`active`, `trialing`, `past_due`) not set to cancel at period end is previewed with `invoices.createPreview` (dated by `next_payment_attempt`, else the invoice's date). Otherwise, or when Stripe has no upcoming invoice (`invoice_upcoming_none`), it reads "None scheduled". A failed preview also reads "None scheduled", keeps the invoice list, and logs `billing.next_payment_failed`.
+- **Invoices table:** every finalised invoice for the customer, newest first (`invoices.list` at Stripe's page size of 100, so one request lists eight years of monthly invoices): date, total in the invoice's currency (zero-decimal currencies formatted by their own minor units), status (Paid, Due, Unpaid, Cancelled) and a "View invoice" link to `invoice_pdf`, or the hosted invoice page when there is no PDF; its accessible name adds the date and amount, since a proration invoice can share a regular one's date. Drafts are left out.
 - **No Stripe customer** (a trial, or Free that never paid): the plan card shows the plan and "Your site has no payments yet." and no table. The Upgrade action is not on the page yet: Embedded Checkout (#6877) adds it.
-- **Stripe unreachable or unconfigured:** an error notice in place of the cards, logged `billing.overview_failed` or `billing.stripe_unconfigured`.
-- **Manage billing** (`openBillingPortalAction`) re-checks the owner, creates a Customer Portal session for the stored customer with `return_url` `PLATFORM_APP_BASE_URL` + `/dashboard/billing`, and redirects to it. No customer → refused (`NO_CUSTOMER`); no key or base URL, or a failed session → a toast, logged `billing.stripe_unconfigured` / `billing.portal_failed`. The Portal's features (payment method, cancellation) and branding are set in the Stripe dashboard.
-- Cost: two Stripe reads per Billing page view for a paying site (one for a Free site with past invoices), one per Manage billing click; free.
+- **Stripe unreachable or unconfigured:** an error notice in place of the cards when the invoice list cannot be read, logged `billing.overview_failed` or `billing.stripe_unconfigured`.
+- **Manage billing** (`openBillingPortalAction`) re-checks the caller with `requireTenantOwnerOrAdmin(tenantId, isSuperAdmin)` — the real owner or a super admin, any other caller 404s — creates a Customer Portal session for the stored customer with `return_url` `PLATFORM_APP_BASE_URL` + `/dashboard/billing`, and redirects to it. No customer, or an id that is not a site → refused (`NO_CUSTOMER`); no key or base URL, or a failed session → a toast, logged `billing.stripe_unconfigured` / `billing.portal_failed`. The Portal's features (payment method, cancellation) and branding are set in the Stripe dashboard.
+- Cost: per Billing page view, one Stripe read for the invoices plus two (the subscription, then the preview) for a site with a live subscription; one per Manage billing click; free.
 
 ## Behaviour
 
@@ -75,7 +76,7 @@ Stripe is the source of truth for a paying site's plan and status. A Stripe webh
 
 ## Tests
 
-- Platform: `route.test.ts` (signed with the Stripe SDK's test header), `handle-stripe-event.test.ts`, `sync-stripe-subscription.test.ts`, `resolve-stripe-tenant.test.ts`, `send-payment-receipt.test.ts`, `plan-from-price-keys.test.ts`, `tenant-state-from-subscription.test.ts`, `grace-billing-fields.test.ts`, `subscription-id-from-event.test.ts`, `fetch-stripe-billing.test.ts`, `load-billing-overview.test.ts`, `open-billing-portal-action.test.ts`, `resolve-billing-page-tenant.test.ts`, and the `plan-card`, `invoices-table` and `manage-billing-button` component tests.
+- Platform: `route.test.ts` (signed with the Stripe SDK's test header), `handle-stripe-event.test.ts`, `sync-stripe-subscription.test.ts`, `resolve-stripe-tenant.test.ts`, `send-payment-receipt.test.ts`, `plan-from-price-keys.test.ts`, `tenant-state-from-subscription.test.ts`, `grace-billing-fields.test.ts`, `subscription-id-from-event.test.ts`, `fetch-stripe-billing.test.ts`, `load-billing-overview.test.ts`, `open-billing-portal-action.test.ts`, `resolve-gated-dashboard-tenant.test.ts`, `resolve-tenant-page-access.test.ts`, and the `plan-card`, `invoices-table` and `manage-billing-button` component tests.
 - db: `set-tenant-plan.test.ts`, `get-tenant-id-by-stripe-ids.test.ts`, `record-stripe-event.test.ts`.
 - Not covered by tests: an owner of a paying test-mode tenant opening every invoice PDF, and Manage billing opening the Portal and returning to the page — manual checks against the dev deployment (#6883). Test-mode events from the Stripe CLI moving a tenant through Growth, `PAST_DUE`, `ACTIVE` and Free — a manual check against the dev deployment.
 

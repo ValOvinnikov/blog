@@ -23,7 +23,7 @@ export const BillingOverview = async ({
 }: TBillingOverviewProps) => {
   const [t, overview] = await Promise.all([
     getTranslations('billingPage'),
-    loadBillingOverview(tenantId, plan, billing),
+    loadBillingOverview(tenantId, billing),
   ]);
 
   if (overview.state === BILLING_OVERVIEW_STATE.UNAVAILABLE) {

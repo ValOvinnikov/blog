@@ -14,6 +14,7 @@ export const BILLING_LOG = {
   RECEIPT_FAILED: 'billing.receipt_failed',
   STRIPE_UNCONFIGURED: 'billing.stripe_unconfigured',
   OVERVIEW_FAILED: 'billing.overview_failed',
+  NEXT_PAYMENT_FAILED: 'billing.next_payment_failed',
   PORTAL_FAILED: 'billing.portal_failed',
 } as const;
 
@@ -40,19 +41,13 @@ export const STRIPE_LIVE_SUBSCRIPTION_STATUSES = [
 ] as const;
 
 export const STRIPE_INVOICE_STATUS = {
-  DRAFT: 'draft',
   OPEN: 'open',
   PAID: 'paid',
   UNCOLLECTIBLE: 'uncollectible',
   VOID: 'void',
 } as const;
 
-export const BILLED_INVOICE_STATUSES = [
-  STRIPE_INVOICE_STATUS.OPEN,
-  STRIPE_INVOICE_STATUS.PAID,
-  STRIPE_INVOICE_STATUS.UNCOLLECTIBLE,
-  STRIPE_INVOICE_STATUS.VOID,
-] as const;
+export const BILLED_INVOICE_STATUSES = Object.values(STRIPE_INVOICE_STATUS);
 
 export const STRIPE_ERROR_CODE = {
   INVOICE_UPCOMING_NONE: 'invoice_upcoming_none',
@@ -68,7 +63,7 @@ export const BILLING_REFUSAL = {
   NO_CUSTOMER: 'NO_CUSTOMER',
 } as const;
 
-// Monthly billing reaches this after eight years; Stripe pages at most 100 per request.
+// Stripe's largest page, so one request lists eight years of monthly invoices.
 export const BILLING_INVOICE_LIMIT = 100;
 
 export const PLAN_CARD_ROW_COUNT = 2;
@@ -87,6 +82,6 @@ export const STRIPE_TENANT_METADATA_KEY = 'tenantId';
 
 export type TBillingGrace = TValueOf<typeof BILLING_GRACE>;
 
-export type TStripeInvoiceStatus = TValueOf<typeof STRIPE_INVOICE_STATUS>;
+export type TBilledInvoiceStatus = TValueOf<typeof STRIPE_INVOICE_STATUS>;
 
 export type TBillingRefusal = TValueOf<typeof BILLING_REFUSAL>;

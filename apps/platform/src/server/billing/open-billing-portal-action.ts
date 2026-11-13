@@ -12,13 +12,17 @@ import {
   BILLING_REFUSAL,
   type TBillingRefusal,
 } from '@platform/constants/billing';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
+import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import { getStripeClient } from '@platform/server/billing/stripe-client';
 import { env } from '@platform/utils/env/env';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
+import { z } from 'zod';
+
+const tenantIdSchema = z.uuid();
 
 export type TOpenBillingPortalResult = TActionResult<
   typeof ACTION_OUTCOME.REFUSED | typeof ACTION_OUTCOME.SERVER_ERROR,
@@ -26,6 +30,11 @@ export type TOpenBillingPortalResult = TActionResult<
   never,
   TBillingRefusal
 >;
+
+const NO_CUSTOMER = {
+  outcome: ACTION_OUTCOME.REFUSED,
+  reason: BILLING_REFUSAL.NO_CUSTOMER,
+} as const;
 
 const createPortalUrl = async (
   tenantId: string,
@@ -56,17 +65,15 @@ const createPortalUrl = async (
 export const openBillingPortalAction = async (
   tenantId: string,
 ): Promise<TOpenBillingPortalResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
-  const billing = await queries.tenants.getTenantBilling(tenant.id);
-  const customer = billing?.stripeCustomerId;
-  if (!customer) {
-    return {
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: BILLING_REFUSAL.NO_CUSTOMER,
-    };
-  }
+  const parsed = tenantIdSchema.safeParse(tenantId);
+  if (!parsed.success) return NO_CUSTOMER;
 
-  const url = await createPortalUrl(tenant.id, customer);
+  await requireTenantOwnerOrAdmin(parsed.data, isSuperAdmin);
+  const billing = await queries.tenants.getTenantBilling(parsed.data);
+  const customer = billing?.stripeCustomerId;
+  if (!customer) return NO_CUSTOMER;
+
+  const url = await createPortalUrl(parsed.data, customer);
   if (!url) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
 
   redirect(url);

@@ -3,17 +3,21 @@ import {
   MILLISECONDS_PER_SECOND,
   STRIPE_ERROR_CODE,
   STRIPE_INVOICE_STATUS,
+  STRIPE_SUBSCRIPTION_STATUS,
 } from '@platform/constants/billing';
 import {
-  MOCK_AMOUNT_PAID,
   MOCK_HOSTED_INVOICE_URL,
   MOCK_INVOICE_PDF_URL,
-  MOCK_STRIPE_CURRENCY,
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_INVOICE_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
   mockStripeInvoice,
+  mockStripeSubscription,
 } from '@platform/testing/billing/fixtures';
+import {
+  MOCK_DRAFT_INVOICE_STATUS,
+  MOCK_STRIPE_AMOUNT,
+} from '@platform/testing/billing/overview';
 import Stripe from 'stripe';
 
 import {
@@ -21,26 +25,27 @@ import {
   previewNextPayment,
 } from './fetch-stripe-billing';
 
-const { autoPagingToArrayMock, listMock, createPreviewMock } = vi.hoisted(
-  () => {
-    const autoPagingToArray = vi.fn();
-    return {
-      autoPagingToArrayMock: autoPagingToArray,
-      listMock: vi.fn(() => ({ autoPagingToArray })),
-      createPreviewMock: vi.fn(),
-    };
-  },
-);
+const {
+  autoPagingToArrayMock,
+  listMock,
+  createPreviewMock,
+  retrieveSubscriptionMock,
+} = vi.hoisted(() => {
+  const autoPagingToArray = vi.fn();
+  return {
+    autoPagingToArrayMock: autoPagingToArray,
+    listMock: vi.fn(() => ({ autoPagingToArray })),
+    createPreviewMock: vi.fn(),
+    retrieveSubscriptionMock: vi.fn(),
+  };
+});
 const MOCK_STRIPE = {
   invoices: { list: listMock, createPreview: createPreviewMock },
+  subscriptions: { retrieve: retrieveSubscriptionMock },
 } as unknown as Stripe;
 
 const MOCK_NEXT_ATTEMPT_SECONDS = 1_800_000_000;
 const MOCK_CREATED_SECONDS = 1_790_000_000;
-const MOCK_AMOUNT = {
-  minorUnits: MOCK_AMOUNT_PAID,
-  currency: MOCK_STRIPE_CURRENCY,
-};
 
 const stripeError = (code: string) =>
   Stripe.errors.StripeError.generate({ type: 'invalid_request_error', code });
@@ -53,6 +58,7 @@ describe(listBillingInvoices, () => {
 
     expect(listMock).toHaveBeenCalledWith({
       customer: MOCK_STRIPE_CUSTOMER_ID,
+      limit: BILLING_INVOICE_LIMIT,
     });
     expect(autoPagingToArrayMock).toHaveBeenCalledWith({
       limit: BILLING_INVOICE_LIMIT,
@@ -71,7 +77,7 @@ describe(listBillingInvoices, () => {
     expect(listed).toEqual({
       id: MOCK_STRIPE_INVOICE_ID,
       issuedAt: new Date(MOCK_CREATED_SECONDS * MILLISECONDS_PER_SECOND),
-      amount: MOCK_AMOUNT,
+      amount: MOCK_STRIPE_AMOUNT,
       status: STRIPE_INVOICE_STATUS.PAID,
       url: MOCK_INVOICE_PDF_URL,
     });
@@ -95,7 +101,7 @@ describe(listBillingInvoices, () => {
 
   it('leaves out draft invoices', async () => {
     autoPagingToArrayMock.mockResolvedValue([
-      mockStripeInvoice({ status: STRIPE_INVOICE_STATUS.DRAFT }),
+      mockStripeInvoice({ status: MOCK_DRAFT_INVOICE_STATUS }),
       mockStripeInvoice({ status: STRIPE_INVOICE_STATUS.OPEN }),
     ]);
 
@@ -111,6 +117,10 @@ describe(listBillingInvoices, () => {
 });
 
 describe(previewNextPayment, () => {
+  beforeEach(() => {
+    retrieveSubscriptionMock.mockResolvedValue(mockStripeSubscription());
+  });
+
   const preview = () =>
     previewNextPayment(
       MOCK_STRIPE,
@@ -131,7 +141,7 @@ describe(previewNextPayment, () => {
     });
     expect(nextPayment).toEqual({
       dueAt: new Date(MOCK_NEXT_ATTEMPT_SECONDS * MILLISECONDS_PER_SECOND),
-      amount: MOCK_AMOUNT,
+      amount: MOCK_STRIPE_AMOUNT,
     });
   });
 
@@ -154,6 +164,25 @@ describe(previewNextPayment, () => {
 
     await expect(preview()).resolves.toBeUndefined();
   });
+
+  it.each([
+    [
+      'has ended',
+      mockStripeSubscription({ status: STRIPE_SUBSCRIPTION_STATUS.CANCELED }),
+    ],
+    [
+      'cancels at the end of its period',
+      { ...mockStripeSubscription(), cancel_at_period_end: true },
+    ],
+  ])(
+    'finds no next payment without a preview when the subscription %s',
+    async (_label, subscription) => {
+      retrieveSubscriptionMock.mockResolvedValue(subscription);
+
+      await expect(preview()).resolves.toBeUndefined();
+      expect(createPreviewMock).not.toHaveBeenCalled();
+    },
+  );
 
   it('rethrows any other failure', async () => {
     const failure = stripeError('rate_limit');

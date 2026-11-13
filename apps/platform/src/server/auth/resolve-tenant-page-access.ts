@@ -3,6 +3,8 @@ import 'server-only';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
+import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
+import { isBillingManager } from '@platform/server/billing/is-billing-manager';
 import { hasStoredLeads } from '@platform/server/leads/has-stored-leads';
 import {
   planPageAccess,
@@ -13,9 +15,12 @@ export const resolveTenantPageAccess = async (
   { id, plan }: TTenant,
   membership: TMembership,
 ): Promise<TPlanPageAccess> => {
-  const access = planPageAccess(plan);
-  if (!isTenantOwner(membership))
-    return { ...access, leads: false, billing: false };
+  const { admin } = await listSessionTenants();
+  const access = {
+    ...planPageAccess(plan),
+    billing: isBillingManager(membership, admin),
+  };
+  if (!isTenantOwner(membership)) return { ...access, leads: false };
   if (access.leads) return access;
 
   return { ...access, leads: await hasStoredLeads(id) };
