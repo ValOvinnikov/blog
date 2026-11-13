@@ -1,3 +1,4 @@
+import type { TMaybeUndefined } from '@blog/config';
 import type { TLocaleIsoCode, TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { tenants } from '@blog/db/schema/tenants';
@@ -11,7 +12,7 @@ export type TTenantLocales = {
 
 export async function getTenantLocales(
   tenantId: string,
-): Promise<TTenantLocales | undefined> {
+): Promise<TMaybeUndefined<TTenantLocales>> {
   const db = getDb();
 
   const [row] = await db

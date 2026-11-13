@@ -1,4 +1,4 @@
-import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
+import { type TMaybeNull, AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
 import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
@@ -30,7 +30,7 @@ const MOCK_DETAILS = {
   plan: TENANT_PLAN.GROWTH,
 };
 
-const authMock = vi.mocked<() => Promise<Session | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Session>>>(auth);
 
 const AUDITED_TENANT_CREATION = {
   logEvent: MOCK_LOG_EVENT,

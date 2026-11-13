@@ -1,4 +1,5 @@
 import {
+  type TMaybeNull,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
@@ -53,7 +54,7 @@ const MOCK_SAVE_ERROR = new Error(faker.lorem.sentence());
 const setTenantAdditionalLocalesMock = vi.mocked(
   queries.tenants.setTenantAdditionalLocales,
 );
-const authMock = vi.mocked<() => Promise<Session | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Session>>>(auth);
 const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;

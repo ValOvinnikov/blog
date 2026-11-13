@@ -1,4 +1,5 @@
 import {
+  type TMaybeNull,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
@@ -64,7 +65,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_SAVED_AT = faker.date.past({ refDate: '2026-10-01' });
 const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
@@ -137,11 +138,11 @@ describe(updateFeaturesAction, () => {
       await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
     });
 
-    it('revalidates the site config after a successful save', async () => {
+    it('revalidates the site config after a successful save', () => {
       expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
     });
 
-    it('records a SETTINGS_UPDATED audit event with the operator as actor', async () => {
+    it('records a SETTINGS_UPDATED audit event with the operator as actor', () => {
       expect(insertAuditEventMock).toHaveBeenCalledWith({
         actorId: MOCK_OPERATOR_ID,
         action: AUDIT_ACTION.SETTINGS_UPDATED,
@@ -280,7 +281,7 @@ describe(updateFeaturesAction, () => {
       arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
     });
 
-    it('lets a GROWTH tenant switch every plan-gated toggle back off', async () => {
+    it('lets every plan-gated toggle be switched back off', async () => {
       arrangeStoredValues({ ...ALL_OFF, ...PLAN_GATED_ON });
 
       await updateFeaturesAction(MOCK_OTHER_TENANT_ID, VALID_INPUT);
@@ -291,7 +292,7 @@ describe(updateFeaturesAction, () => {
       );
     });
 
-    it('keeps Bookmarks off when a GROWTH tenant switches it on with Reader accounts off', async () => {
+    it('keeps Bookmarks off when it is switched on with Reader accounts off', async () => {
       const result = await updateFeaturesAction(MOCK_OTHER_TENANT_ID, {
         ...VALID_INPUT,
         bookmarksEnabled: true,
@@ -304,7 +305,7 @@ describe(updateFeaturesAction, () => {
       );
     });
 
-    it('keeps stored Bookmarks when a GROWTH tenant switches Reader accounts off', async () => {
+    it('keeps stored Bookmarks when Reader accounts is switched off', async () => {
       const stored = {
         ...VALID_INPUT,
         readerAccountsEnabled: true,

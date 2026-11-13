@@ -1,4 +1,5 @@
 // Seeds one tenant's registry rows and grants an existing user OWNER on it; manual, human-run only.
+// `db:seed-tenant` runs with `--conditions=react-server` so `getDb()`'s `server-only` import resolves outside Next.js.
 import { pathToFileURL } from 'node:url';
 
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
@@ -194,9 +195,7 @@ async function main(): Promise<void> {
   console.warn(`Granted OWNER on "${tenant.name}" to "${args.ownerEmail}".`);
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx seed-tenant.ts`)
-// — guards against `main()` firing as an import side effect when a test
-// imports `resolveOrCreateTenant` from this same module.
+// The test imports this module, so main() runs only as the CLI entrypoint.
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href

@@ -6,12 +6,12 @@ import { defaultLookFormValues } from '@platform/utils/default-look-values/defau
 import { listRefusedLookFields } from './refused-look-fields';
 
 const STORED = { ...defaultLookFormValues(), radiusScale: RADIUS_SCALE.LG };
-const SMALLER_RADIUS = { ...STORED, radiusScale: RADIUS_SCALE.SM };
+const MOCK_SMALLER_RADIUS = { ...STORED, radiusScale: RADIUS_SCALE.SM };
 
 describe(listRefusedLookFields, () => {
   it('lists a Growth-only field changed from its stored value on Free', () => {
     expect(
-      listRefusedLookFields(SMALLER_RADIUS, STORED, TENANT_PLAN.FREE),
+      listRefusedLookFields(MOCK_SMALLER_RADIUS, STORED, TENANT_PLAN.FREE),
     ).toEqual(['radiusScale']);
   });
 
@@ -40,7 +40,7 @@ describe(listRefusedLookFields, () => {
 
   it('passes every change on Growth', () => {
     expect(
-      listRefusedLookFields(SMALLER_RADIUS, STORED, TENANT_PLAN.GROWTH),
+      listRefusedLookFields(MOCK_SMALLER_RADIUS, STORED, TENANT_PLAN.GROWTH),
     ).toEqual([]);
   });
 });

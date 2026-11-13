@@ -1,4 +1,5 @@
 import {
+  type TMaybeNull,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
@@ -107,7 +108,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);
 const requireAdminMock = vi.mocked(requireAdmin);
 const startProvisioningMock = vi.mocked(startProvisioning);

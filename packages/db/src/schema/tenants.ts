@@ -1,17 +1,14 @@
-import { LOCALE_ISO_CODES, SITE_TYPE, TENANT_PLAN } from '@blog/config';
-import {
-  TENANT_STATUS,
-  type TDeprovisioningStep,
-  type TElevateTenantOwnerOutcome,
-  type TTenantProvisioningStatus,
-  type TTenantProvisioningStep,
-  type TTenantProvisioningStepStatus,
-  type TWorkerProvisioningStep,
+import type {
+  TDeprovisioningStep,
+  TElevateTenantOwnerOutcome,
+  TTenantProvisioningStatus,
+  TTenantProvisioningStep,
+  TTenantProvisioningStepStatus,
+  TWorkerProvisioningStep,
 } from '@blog/db/constants';
 import {
   integer,
   jsonb,
-  pgEnum,
   pgTable,
   text,
   timestamp,
@@ -20,17 +17,15 @@ import {
 
 import { timestampColumns } from './columns';
 import { tenantBillingColumns } from './tenant-billing-columns';
+import {
+  localeCodeEnum,
+  siteTypeEnum,
+  tenantPlanEnum,
+  tenantStatusEnum,
+} from './tenant-enums';
 import { tenantInactivityColumns } from './tenant-inactivity-columns';
 import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
 import { selfServeOwnerSlotIndex } from './tenant-self-serve-owner-index';
-
-export const tenantPlanEnum = pgEnum('tenant_plan', TENANT_PLAN);
-
-export const localeCodeEnum = pgEnum('locale_code', LOCALE_ISO_CODES);
-
-export const tenantStatusEnum = pgEnum('tenant_status', TENANT_STATUS);
-
-export const siteTypeEnum = pgEnum('site_type', SITE_TYPE);
 
 export type TProvisioningStepState = {
   status: TTenantProvisioningStepStatus;

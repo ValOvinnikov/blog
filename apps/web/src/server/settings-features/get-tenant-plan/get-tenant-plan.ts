@@ -1,4 +1,7 @@
-import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
+import {
+  TENANT_CONFIG_REVALIDATE_SECONDS,
+  type TMaybeUndefined,
+} from '@blog/config';
 import type { TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { safeAsync } from '@blog/utils';
@@ -8,7 +11,7 @@ import { unstable_cache } from 'next/cache';
 
 const getCachedTenantPlanForTenant = (tenantId: string) =>
   unstable_cache(
-    async (id: string): Promise<TTenantPlan | undefined> => {
+    async (id: string): Promise<TMaybeUndefined<TTenantPlan>> => {
       const tenant = await queries.tenants.getTenantById(id, {
         includeArchived: true,
       });
@@ -22,7 +25,7 @@ const getCachedTenantPlanForTenant = (tenantId: string) =>
   )(tenantId);
 
 const getTenantPlanForTenantId = safeAsync(
-  async (tenantId?: string): Promise<TTenantPlan | undefined> => {
+  async (tenantId?: string): Promise<TMaybeUndefined<TTenantPlan>> => {
     if (!tenantId) return undefined;
     return getCachedTenantPlanForTenant(tenantId);
   },

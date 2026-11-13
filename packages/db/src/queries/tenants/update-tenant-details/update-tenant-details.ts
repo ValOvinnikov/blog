@@ -55,8 +55,7 @@ export type TUpdateTenantDetailsResult =
   | TOwnerEmailRefusal
   | TOutcome<typeof OUTCOME.OWNS_FREE_TENANT>;
 
-// Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
-// a completed step; name/plan/locale never lock.
+// Only primaryDomain is baked into an external resource (`MAP_DOMAIN`), so only it locks.
 function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,
@@ -79,9 +78,7 @@ function lockedFieldOutcome(
   return undefined;
 }
 
-// Domain conflicts are pre-checked rather than caught off the
-// `tenant_domains.domain` unique constraint, so the caller gets a typed
-// outcome instead of a Postgres throw.
+// Domain conflicts are pre-checked so the caller gets a typed outcome, not a unique-constraint throw.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,

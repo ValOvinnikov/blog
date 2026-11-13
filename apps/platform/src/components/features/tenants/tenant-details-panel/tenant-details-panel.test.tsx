@@ -10,6 +10,7 @@ import {
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import messages from '@platform/i18n/messages/en.json';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { ARIA_DESCRIBEDBY } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -391,7 +392,7 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
       it('leaves Save undescribed without an archived notice', () => {
         const saveButton = getSaveButton();
 
-        expect(saveButton).not.toHaveAttribute('aria-describedby');
+        expect(saveButton).not.toHaveAttribute(ARIA_DESCRIBEDBY);
       });
     });
 
