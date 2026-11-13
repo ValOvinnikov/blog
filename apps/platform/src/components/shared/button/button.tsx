@@ -1,4 +1,5 @@
 import { ICONS, SIZE } from '@blog/config';
+import type { IWithClassName } from '@blog/config/types';
 import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
@@ -8,7 +9,7 @@ import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
 
-export type TButtonProps = {
+export type TButtonProps = IWithClassName & {
   id?: string;
   variant?: TButtonVariants['variant'];
   size?: TButtonVariants['size'];
@@ -20,7 +21,6 @@ export type TButtonProps = {
   pendingLabel?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children?: ReactNode;
-  className?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
   'aria-expanded'?: AriaAttributes['aria-expanded'];
   'aria-controls'?: AriaAttributes['aria-controls'];

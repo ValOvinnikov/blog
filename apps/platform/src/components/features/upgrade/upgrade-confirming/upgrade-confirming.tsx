@@ -9,6 +9,7 @@ import {
   UPGRADE_POLL,
   UPGRADE_STATE,
 } from '@platform/constants/billing';
+import { SPINNER_TONE } from '@platform/constants/spinner';
 import { useRouter } from '@platform/i18n/navigation';
 import { getUpgradeStateAction } from '@platform/server/billing/get-upgrade-state-action';
 import { usePolledValue } from '@platform/utils/use-polled-value/use-polled-value';
@@ -82,7 +83,7 @@ export const UpgradeConfirming = ({
       description={t('confirmingDescription')}
       action={
         <span aria-hidden="true">
-          <Spinner label={t('confirmingTitle')} />
+          <Spinner label={t('confirmingTitle')} tone={SPINNER_TONE.TEXT} />
         </span>
       }
     />

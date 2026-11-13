@@ -21,9 +21,9 @@
   --admin-brand-line: #ffd766;
   --admin-brand-hover: #2a303b;
   --admin-on-brand-ink: #ffffff;
-  --admin-spinner-on-brand-lit: #ffc233;
+  --admin-spinner-on-brand-lit: var(--admin-highlight);
   --admin-spinner-on-brand-unlit: #e8eaef;
-  --admin-spinner-on-brand-line: #e8eaef;
+  --admin-spinner-on-brand-line: var(--admin-spinner-on-brand-unlit);
   --admin-selected: #12141a;
   --admin-selected-hover: #2a303b;
   --admin-on-selected: #ffffff;
@@ -101,6 +101,8 @@
   --admin-view-tabs: calc(var(--admin-view-tab) + var(--admin-view-tab-border));
   /* The Look jump index's rendered height: the phone chip row, then the desktop bar from lg. */
   --admin-look-index: 65px;
+  --admin-spinner-loop: 3s;
+  --admin-spinner-ease: cubic-bezier(0.6, 0, 0.3, 1);
 }
 
 @media (width >= 48rem) {
@@ -140,9 +142,9 @@
   --admin-brand-line: #5c4a14;
   --admin-brand-hover: #ffcf5c;
   --admin-on-brand-ink: #0f1115;
-  --admin-spinner-on-brand-lit: #0f1115;
+  --admin-spinner-on-brand-lit: var(--admin-on-brand-ink);
   --admin-spinner-on-brand-unlit: transparent;
-  --admin-spinner-on-brand-line: #0f1115;
+  --admin-spinner-on-brand-line: var(--admin-on-brand-ink);
   --admin-selected: #33290d;
   --admin-selected-hover: #40330f;
   --admin-on-selected: #ffdc7a;
@@ -224,9 +226,9 @@
     --admin-brand-line: #5c4a14;
     --admin-brand-hover: #ffcf5c;
     --admin-on-brand-ink: #0f1115;
-    --admin-spinner-on-brand-lit: #0f1115;
+    --admin-spinner-on-brand-lit: var(--admin-on-brand-ink);
     --admin-spinner-on-brand-unlit: transparent;
-    --admin-spinner-on-brand-line: #0f1115;
+    --admin-spinner-on-brand-line: var(--admin-on-brand-ink);
     --admin-selected: #33290d;
     --admin-selected-hover: #40330f;
     --admin-on-selected: #ffdc7a;
@@ -452,12 +454,12 @@
 }
 
 @theme {
-  --animate-admin-spinner-orbit: admin-spinner-orbit 3s
-    cubic-bezier(0.6, 0, 0.3, 1) infinite;
-  --animate-admin-spinner-lit: admin-spinner-lit 3s cubic-bezier(0.6, 0, 0.3, 1)
-    infinite;
-  --animate-admin-spinner-unlit: admin-spinner-unlit 3s
-    cubic-bezier(0.6, 0, 0.3, 1) infinite;
+  --animate-admin-spinner-orbit: admin-spinner-orbit var(--admin-spinner-loop)
+    var(--admin-spinner-ease) infinite;
+  --animate-admin-spinner-lit: admin-spinner-lit var(--admin-spinner-loop)
+    var(--admin-spinner-ease) infinite;
+  --animate-admin-spinner-unlit: admin-spinner-unlit var(--admin-spinner-loop)
+    var(--admin-spinner-ease) infinite;
 
   @keyframes admin-spinner-orbit {
     0%,

@@ -77,8 +77,8 @@
 - `literal-vocabulary.js` — `isStandardVocabulary`, the literals an outside
   standard spells, which both rules above and below skip: a value compared
   with an env read, a `stubEnv` argument, a Testing Library role query's role
-  (`getByRole('button')`), a protocol-attribute value in an object property or
-  a JSX attribute (any `sameSite`, `target="_blank"`,
+  (`getByRole('button')`), a protocol-attribute value in an object property, a JSX
+  attribute or a destructuring default (any `sameSite`, `target="_blank"`,
   `type="button"`/`"submit"`/`"reset"`), and a TypeScript literal type
   (`TProps['brand']`, `'a' | 'b'`). Tested through both rules' suites.
 - `no-duplicate-string.js` — `eslint-plugin-sonarjs`'s `no-duplicate-string`

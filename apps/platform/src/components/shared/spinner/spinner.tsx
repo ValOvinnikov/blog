@@ -1,11 +1,12 @@
+import type { IWithClassName } from '@blog/config/types';
+
 import { spinnerVariants, type TSpinnerVariants } from './spinner-variants';
 
-export type TSpinnerProps = {
+export type TSpinnerProps = IWithClassName & {
   label: string;
   hasLabel?: boolean;
   size?: TSpinnerVariants['size'];
   tone?: TSpinnerVariants['tone'];
-  className?: string;
 };
 
 /** `role="status"` takes no name from content, so `label` is always the `aria-label`; `hasLabel` only also shows it. */

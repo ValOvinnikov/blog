@@ -30,7 +30,7 @@ const hexTokensOf = (selector: string) =>
   new Map(
     [
       ...blockOf(selector).matchAll(
-        /--(admin-[a-z0-9-]+):\s*(#[0-9a-f]{6});/gi,
+        /--(admin-[a-z0-9-]+):\s*(#[0-9a-f]{6}|var\(--admin-[a-z0-9-]+\));/gi,
       ),
     ].map(([, name, hex]) => [name, hex]),
   );
@@ -38,13 +38,21 @@ const hexTokensOf = (selector: string) =>
 const lightTokens = hexTokensOf(LIGHT_SELECTOR);
 const darkTokens = new Map([...lightTokens, ...hexTokensOf(DARK_SELECTOR)]);
 
-const colourIn =
-  (tokens: ReturnType<typeof hexTokensOf>) => (token: string) => {
-    const hex = tokens.get(token);
-    if (!hex) throw new Error(`--${token} has no hex value`);
+const ALIAS = /^var\(--(admin-[a-z0-9-]+)\)$/;
 
-    return hexToOklch(hex);
-  };
+const hexOf = (
+  tokens: ReturnType<typeof hexTokensOf>,
+  token: string,
+): string => {
+  const value = tokens.get(token);
+  if (!value) throw new Error(`--${token} has no hex value`);
+  const alias = ALIAS.exec(value)?.[1];
+
+  return alias ? hexOf(tokens, alias) : value;
+};
+
+const colourIn = (tokens: ReturnType<typeof hexTokensOf>) => (token: string) =>
+  hexToOklch(hexOf(tokens, token));
 
 const TOKEN = {
   BAD: 'admin-bad',
