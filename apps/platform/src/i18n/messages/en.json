@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Blocked sign-ups · Admin",
     "dataRequestsPage": "Data requests · Admin",
     "signUpTitle": "Create an account",
-    "onboarding": "Create your site · Admin"
+    "onboarding": "Create your site · Admin",
+    "billing": "Billing · Admin"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -210,6 +211,7 @@
     "platformSectionLabel": "Platform actions",
     "contentSectionLabel": "Content",
     "configurationSectionLabel": "Configuration",
+    "accountSectionLabel": "Account",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
     "findings": "Findings",
@@ -230,6 +232,7 @@
     "badgePlatform": "platform",
     "features": "Features",
     "leads": "Leads",
+    "billing": "Billing",
     "releases": "Releases",
     "studioAccessLine": {
       "INVITE_SENT": "Invite sent — check your email",
@@ -2176,5 +2179,37 @@
     "category": "Reason: {category}.",
     "contest": "To contest this decision, reply to the suspension email or write to support quoting {reference}.",
     "copyButton": "Copy reference"
+  },
+  "billingPage": {
+    "title": "Billing",
+    "description": "Your plan, your next payment and your invoices.",
+    "manage": "Manage billing",
+    "managePending": "Opening…",
+    "manageFailed": "Billing couldn't be opened. Try again in a moment.",
+    "noCustomer": "Your site has no billing account yet.",
+    "planTitle": "Plan",
+    "planDescription": "What your site is on and when it's charged next.",
+    "planLabel": "Plan",
+    "nextPaymentLabel": "Next payment",
+    "nextPayment": "{amount} on {date}",
+    "noNextPayment": "None scheduled",
+    "noPayments": "Your site has no payments yet.",
+    "invoicesTitle": "Invoices",
+    "invoicesEmpty": "No invoices yet.",
+    "columnDate": "Date",
+    "columnAmount": "Amount",
+    "columnStatus": "Status",
+    "columnInvoice": "Invoice",
+    "viewInvoice": "View PDF",
+    "viewInvoiceAriaLabel": "View the invoice from {date}",
+    "invoiceStatus": {
+      "draft": "Draft",
+      "open": "Due",
+      "paid": "Paid",
+      "uncollectible": "Unpaid",
+      "void": "Cancelled"
+    },
+    "unavailableTitle": "Payments and invoices unavailable",
+    "unavailableDescription": "They couldn't be loaded just now. Reload the page in a moment."
   }
 }

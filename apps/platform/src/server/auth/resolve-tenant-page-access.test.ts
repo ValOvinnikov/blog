@@ -66,4 +66,22 @@ describe(resolveTenantPageAccess, () => {
 
     expect(leads).toBe(false);
   });
+
+  it('opens Billing to an owner', async () => {
+    const { billing } = await resolveFor(
+      TENANT_PLAN.FREE,
+      MEMBERSHIP_ROLE.OWNER,
+    );
+
+    expect(billing).toBe(true);
+  });
+
+  it('closes Billing to an editor', async () => {
+    const { billing } = await resolveFor(
+      TENANT_PLAN.GROWTH,
+      MEMBERSHIP_ROLE.EDITOR,
+    );
+
+    expect(billing).toBe(false);
+  });
 });

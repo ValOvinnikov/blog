@@ -14,7 +14,8 @@ export const resolveTenantPageAccess = async (
   membership: TMembership,
 ): Promise<TPlanPageAccess> => {
   const access = planPageAccess(plan);
-  if (!isTenantOwner(membership)) return { ...access, leads: false };
+  if (!isTenantOwner(membership))
+    return { ...access, leads: false, billing: false };
   if (access.leads) return access;
 
   return { ...access, leads: await hasStoredLeads(id) };

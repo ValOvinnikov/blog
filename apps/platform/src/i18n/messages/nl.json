@@ -25,7 +25,8 @@
     "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
     "dataRequestsPage": "Gegevensverzoeken · Admin",
     "signUpTitle": "Account aanmaken",
-    "onboarding": "Je site maken · Admin"
+    "onboarding": "Je site maken · Admin",
+    "billing": "Facturering · Admin"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -210,6 +211,7 @@
     "platformSectionLabel": "Platformacties",
     "contentSectionLabel": "Content",
     "configurationSectionLabel": "Configuratie",
+    "accountSectionLabel": "Account",
     "tenants": "Tenants",
     "addTenant": "Tenant toevoegen",
     "findings": "Bevindingen",
@@ -230,6 +232,7 @@
     "badgePlatform": "platform",
     "features": "Functies",
     "leads": "Berichten",
+    "billing": "Facturering",
     "releases": "Releases",
     "studioAccessLine": {
       "INVITE_SENT": "Uitnodiging verstuurd — controleer uw e-mail",
@@ -2176,5 +2179,37 @@
     "category": "Reden: {category}.",
     "contest": "Wil je dit besluit aanvechten? Beantwoord de schorsingsmail of schrijf naar support en vermeld {reference}.",
     "copyButton": "Referentie kopiëren"
+  },
+  "billingPage": {
+    "title": "Facturering",
+    "description": "Je abonnement, je volgende betaling en je facturen.",
+    "manage": "Facturering beheren",
+    "managePending": "Openen…",
+    "manageFailed": "Facturering kon niet worden geopend. Probeer het zo opnieuw.",
+    "noCustomer": "Je site heeft nog geen factureringsaccount.",
+    "planTitle": "Abonnement",
+    "planDescription": "Op welk abonnement je site zit en wanneer de volgende betaling is.",
+    "planLabel": "Abonnement",
+    "nextPaymentLabel": "Volgende betaling",
+    "nextPayment": "{amount} op {date}",
+    "noNextPayment": "Geen gepland",
+    "noPayments": "Je site heeft nog geen betalingen.",
+    "invoicesTitle": "Facturen",
+    "invoicesEmpty": "Nog geen facturen.",
+    "columnDate": "Datum",
+    "columnAmount": "Bedrag",
+    "columnStatus": "Status",
+    "columnInvoice": "Factuur",
+    "viewInvoice": "PDF bekijken",
+    "viewInvoiceAriaLabel": "Factuur van {date} bekijken",
+    "invoiceStatus": {
+      "draft": "Concept",
+      "open": "Te betalen",
+      "paid": "Betaald",
+      "uncollectible": "Onbetaald",
+      "void": "Geannuleerd"
+    },
+    "unavailableTitle": "Betalingen en facturen niet beschikbaar",
+    "unavailableDescription": "Ze konden nu niet worden geladen. Laad de pagina zo opnieuw."
   }
 }

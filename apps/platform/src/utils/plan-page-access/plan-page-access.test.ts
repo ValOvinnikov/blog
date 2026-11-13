@@ -60,6 +60,7 @@ describe(planPageAccess, () => {
       leads: false,
       subscribers: false,
       team: false,
+      billing: true,
     });
   });
 
@@ -72,6 +73,7 @@ describe(planPageAccess, () => {
       leads: true,
       subscribers: false,
       team: false,
+      billing: true,
     });
   });
 
@@ -84,6 +86,7 @@ describe(planPageAccess, () => {
       leads: true,
       subscribers: true,
       team: true,
+      billing: true,
     });
   });
 

@@ -162,6 +162,12 @@
         "file": "packages/config/src/constants/action-outcome.ts"
       },
       {
+        "ref": "BILLING_OVERVIEW_STATE.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -5350,6 +5356,30 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.stripe_unconfigured": [
+      {
+        "ref": "BILLING_LOG.STRIPE_UNCONFIGURED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.overview_failed": [
+      {
+        "ref": "BILLING_LOG.OVERVIEW_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.portal_failed": [
+      {
+        "ref": "BILLING_LOG.PORTAL_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "customer.subscription.created": [
       {
         "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
@@ -5425,6 +5455,76 @@
     "unpaid": [
       {
         "ref": "STRIPE_SUBSCRIPTION_STATUS.UNPAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "draft": [
+      {
+        "ref": "STRIPE_INVOICE_STATUS.DRAFT",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "open": [
+      {
+        "ref": "STRIPE_INVOICE_STATUS.OPEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "paid": [
+      {
+        "ref": "STRIPE_INVOICE_STATUS.PAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "uncollectible": [
+      {
+        "ref": "STRIPE_INVOICE_STATUS.UNCOLLECTIBLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "void": [
+      {
+        "ref": "STRIPE_INVOICE_STATUS.VOID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "invoice_upcoming_none": [
+      {
+        "ref": "STRIPE_ERROR_CODE.INVOICE_UPCOMING_NONE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "NO_CUSTOMER": [
+      {
+        "ref": "BILLING_OVERVIEW_STATE.NO_CUSTOMER",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "BILLING_REFUSAL.NO_CUSTOMER",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "LOADED": [
+      {
+        "ref": "BILLING_OVERVIEW_STATE.LOADED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
