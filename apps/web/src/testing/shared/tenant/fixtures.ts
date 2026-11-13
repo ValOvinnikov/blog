@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
 import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';

@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STEP } from '@blog/db';
 import { tenantDetailsValuesOf } from '@platform/components/features/tenants/tenant-details-panel/tenant-details-values';
 import {
   TENANT_FIELD_ERROR,
@@ -129,12 +130,11 @@ describe(`<${TenantDetailsFields.name}/>`, () => {
     await user.click(dutchButton);
     await user.click(growthButton);
 
-    expect(onChange).toHaveBeenCalledWith(
-      'ownerEmail',
-      `${MOCK_OWNER_EMAIL}${MOCK_TYPED_CHARACTER}`,
-    );
-    expect(onChange).toHaveBeenCalledWith('locale', LOCALE_ISO_CODES.NL);
-    expect(onChange).toHaveBeenCalledWith('plan', TENANT_PLAN.GROWTH);
+    expect(Object.fromEntries(onChange.mock.calls)).toStrictEqual({
+      ownerEmail: `${MOCK_OWNER_EMAIL}${MOCK_TYPED_CHARACTER}`,
+      locale: LOCALE_ISO_CODES.NL,
+      plan: TENANT_PLAN.GROWTH,
+    });
   });
 
   it('disables a locked text field and states why, leaving the others editable', () => {

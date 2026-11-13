@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { getRequestContext } from '@web/server/request-context/request-context';

@@ -1,10 +1,6 @@
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
-import {
-  GRACE_EMAIL,
-  TENANT_PLAN,
-  type TGraceEmail,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   buildOwnerDowngradeGraceEmail,

@@ -1,6 +1,7 @@
+import { TENANT_PLAN } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import { hasEndedUnpaidTrial } from '@blog/db/queries/tenants/ended-trial';
 import { planChangeFields } from '@blog/db/queries/tenants/plan-change-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';

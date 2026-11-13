@@ -1,5 +1,6 @@
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN, TENANT_PROVISIONING_STEP } from '@blog/db';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STEP } from '@blog/db';
 import { faker } from '@faker-js/faker';
 import { GuardedLink } from '@platform/components/shared/guarded-link';
 import {
@@ -9,6 +10,7 @@ import {
 import { useRouter as useGuardRouter } from '@platform/i18n/base-navigation';
 import messages from '@platform/i18n/messages/en.json';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { ARIA_DESCRIBEDBY } from '@platform/testing/aria';
 import {
   customRender,
   renderWithIntl,
@@ -135,26 +137,36 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     refreshMock = mockRouterRefresh();
   });
 
-  it('exposes the fields as a named group', () => {
-    setup();
+  describe('with the saved values', () => {
+    beforeEach(() => {
+      setup();
+    });
 
-    const fieldsGroup = screen.getByRole('group', { name: FIELDS_GROUP_LABEL });
+    it('exposes the fields as a named group', () => {
+      const fieldsGroup = screen.getByRole('group', {
+        name: FIELDS_GROUP_LABEL,
+      });
 
-    expect(fieldsGroup).toBeVisible();
-  });
+      expect(fieldsGroup).toBeVisible();
+    });
 
-  it('enables Save only while a field differs from its saved value', async () => {
-    setup();
+    it('enables Save only while a field differs from its saved value', async () => {
+      const nameInput = getNameInput();
+      const saveButton = getSaveButton();
+      expect(saveButton).toBeDisabled();
 
-    const nameInput = getNameInput();
-    const saveButton = getSaveButton();
-    expect(saveButton).toBeDisabled();
+      await replaceValue(nameInput, MOCK_RENAMED_TENANT_NAME);
+      expect(saveButton).toBeEnabled();
 
-    await replaceValue(nameInput, MOCK_RENAMED_TENANT_NAME);
-    expect(saveButton).toBeEnabled();
+      await replaceValue(nameInput, MOCK_TENANT_NAME);
+      expect(saveButton).toBeDisabled();
+    });
 
-    await replaceValue(nameInput, MOCK_TENANT_NAME);
-    expect(saveButton).toBeDisabled();
+    it('shows no unsent Studio invite notice when no re-invite is owed', () => {
+      const notice = screen.queryByText(UNSENT_INVITE_NOTICE);
+
+      expect(notice).not.toBeInTheDocument();
+    });
   });
 
   it('shows a failed save beside Save and keeps the edits', async () => {
@@ -294,14 +306,6 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
     expect(fieldsGroup).toHaveFocus();
   });
 
-  it('shows no unsent Studio invite notice when no re-invite is owed', () => {
-    setup();
-
-    const notice = screen.queryByText(UNSENT_INVITE_NOTICE);
-
-    expect(notice).not.toBeInTheDocument();
-  });
-
   describe('with an unsent Studio re-invite', () => {
     const getResendButton = () =>
       screen.getByRole('button', { name: RESEND_INVITE_LABEL });
@@ -352,44 +356,44 @@ describe(`<${TenantDetailsPanel.name}/>`, () => {
   });
 
   describe('with an archived tenant', () => {
-    it('disables every field and Save, and never calls the action', async () => {
-      setup({ tenant: ARCHIVED_TENANT });
+    describe('without a page-level notice', () => {
+      beforeEach(() => {
+        setup({ tenant: ARCHIVED_TENANT });
+      });
 
-      const controls = [
-        getNameInput(),
-        getDomainInput(),
-        screen.getByRole('textbox', { name: OWNER_EMAIL_LABEL }),
-        screen.getByRole('button', { name: ENGLISH_LABEL }),
-        screen.getByRole('button', { name: FREE_LABEL }),
-      ];
-      const saveButton = getSaveButton();
-      await user.click(saveButton);
+      it('disables every field and Save, and never calls the action', async () => {
+        const controls = [
+          getNameInput(),
+          getDomainInput(),
+          screen.getByRole('textbox', { name: OWNER_EMAIL_LABEL }),
+          screen.getByRole('button', { name: ENGLISH_LABEL }),
+          screen.getByRole('button', { name: FREE_LABEL }),
+        ];
+        const saveButton = getSaveButton();
+        await user.click(saveButton);
 
-      controls.forEach((control) => expect(control).toBeDisabled());
-      expect(saveButton).toBeDisabled();
-      expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
-    });
+        controls.forEach((control) => expect(control).toBeDisabled());
+        expect(saveButton).toBeDisabled();
+        expect(updateTenantDetailsActionMock).not.toHaveBeenCalled();
+      });
 
-    it('states on each field that the tenant is archived', () => {
-      setup({ tenant: ARCHIVED_TENANT });
+      it('states on each field that the tenant is archived', () => {
+        const nameInput = getNameInput();
+        const planGroup = screen.getByRole('group', { name: PLAN_LABEL });
 
-      const nameInput = getNameInput();
-      const planGroup = screen.getByRole('group', { name: PLAN_LABEL });
+        expect(nameInput).toHaveAccessibleDescription(
+          tenantDetailsPanel.fieldLockedReasonArchived,
+        );
+        expect(planGroup).toHaveAccessibleDescription(
+          tenantDetailsPanel.fieldLockedReasonArchived,
+        );
+      });
 
-      expect(nameInput).toHaveAccessibleDescription(
-        tenantDetailsPanel.fieldLockedReasonArchived,
-      );
-      expect(planGroup).toHaveAccessibleDescription(
-        tenantDetailsPanel.fieldLockedReasonArchived,
-      );
-    });
+      it('leaves Save undescribed without an archived notice', () => {
+        const saveButton = getSaveButton();
 
-    it('leaves Save undescribed without an archived notice', () => {
-      setup({ tenant: ARCHIVED_TENANT });
-
-      const saveButton = getSaveButton();
-
-      expect(saveButton).not.toHaveAttribute('aria-describedby');
+        expect(saveButton).not.toHaveAttribute(ARIA_DESCRIBEDBY);
+      });
     });
 
     it('describes the disabled Save with the page-level archived notice', () => {

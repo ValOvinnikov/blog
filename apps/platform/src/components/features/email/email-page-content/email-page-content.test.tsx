@@ -1,9 +1,6 @@
 import { EMAIL_TEMPLATE_TYPE, LOCALE_ISO_CODES } from '@blog/config';
-import {
-  EMAIL_NEW_POSTS_DEFAULT,
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { EMAIL_NEW_POSTS_DEFAULT, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TEmailConfig } from '@blog/db/schema/email-config';
 import { faker } from '@faker-js/faker';
 import en from '@platform/i18n/messages/en.json';

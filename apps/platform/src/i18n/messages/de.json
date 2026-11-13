@@ -1764,6 +1764,11 @@
     "saveAndLeave": "Speichern und verlassen",
     "saving": "Wird gespeichert…"
   },
+  "outOfDatePageDialog": {
+    "title": "Diese Seite ist veraltet.",
+    "description": "Lade sie neu, um fortzufahren.",
+    "reload": "Neu laden"
+  },
   "draftRecovery": {
     "title": "Du hast ungespeicherte Änderungen von {takenAt}.",
     "description": "Sie wurden auf diesem Gerät aufbewahrt, als du die Seite verlassen hast.",

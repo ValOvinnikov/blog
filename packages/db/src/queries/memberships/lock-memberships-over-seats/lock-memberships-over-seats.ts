@@ -1,5 +1,6 @@
+import { type TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { PLAN_ENTITLEMENTS, type TTenantPlan } from '@blog/db/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { unlockedMembershipsOverSeats } from '@blog/db/queries/memberships/memberships-over-seats';
 import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
 import { memberships } from '@blog/db/schema/memberships';

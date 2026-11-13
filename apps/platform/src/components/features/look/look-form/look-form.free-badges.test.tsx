@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED } from '@platform/testing/aria';

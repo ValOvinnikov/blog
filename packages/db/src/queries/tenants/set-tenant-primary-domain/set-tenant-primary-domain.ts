@@ -1,6 +1,9 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  type TErrorCode,
+  type TTenantPlan,
+} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import type { TTenantPlan } from '@blog/db/constants';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';

@@ -1,4 +1,5 @@
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant, insertTestUser } from '@blog/db/testing/fixtures';
 import {

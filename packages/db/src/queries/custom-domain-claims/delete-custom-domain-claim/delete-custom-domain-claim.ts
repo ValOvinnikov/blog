@@ -1,5 +1,5 @@
+import { type TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import type { TTenantPlan } from '@blog/db/constants';
 import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
 import { customDomainClaims } from '@blog/db/schema/custom-domain-claims';
 import { hasLength } from '@blog/utils/primitives';

@@ -1,4 +1,5 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
 import { createMockFaker } from '@blog/db/testing/mock-faker';

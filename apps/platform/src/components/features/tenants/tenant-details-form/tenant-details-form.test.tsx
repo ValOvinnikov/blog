@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { TENANT_FIELD_ERROR, TENANT_REFUSAL } from '@platform/constants/tenant';
 import en from '@platform/i18n/messages/en.json';

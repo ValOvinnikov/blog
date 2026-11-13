@@ -1,8 +1,5 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  type TMembershipRole,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import { countMembershipsOverSeats } from '@blog/db/queries/memberships/count-memberships-over-seats';
 import { getMembership } from '@blog/db/queries/memberships/get-membership';
 import { listMembershipsWithTenantsForUser } from '@blog/db/queries/memberships/list-memberships-with-tenants-for-user';

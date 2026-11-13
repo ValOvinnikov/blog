@@ -1,11 +1,7 @@
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
-import {
-  TENANT_PLAN,
-  TENANT_STATUS,
-  type TTenantPlan,
-  type TTenantStatus,
-} from '@blog/db/constants';
-import { tenantPlanEnum } from '@blog/db/schema/tenant-plan-columns';
+import { TENANT_STATUS, type TTenantStatus } from '@blog/db/constants';
+import { tenantPlanEnum } from '@blog/db/schema/tenant-enums';
 import { tenants } from '@blog/db/schema/tenants';
 import { or, type SQL, sql } from 'drizzle-orm';
 

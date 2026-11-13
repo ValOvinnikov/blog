@@ -1,5 +1,5 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { mockTenant } from '@platform/testing/tenants/fixtures';

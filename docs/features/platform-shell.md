@@ -18,6 +18,9 @@ code:
   - apps/platform/src/utils/studio-nav-item/**
   - apps/platform/src/utils/persistent-cookie/**
   - apps/platform/src/utils/routes/**
+  - apps/platform/src/utils/settle-action/**
+  - apps/platform/src/utils/page-out-of-date/**
+  - apps/platform/src/utils/reload-page/**
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/utils/sidebar-collapsed-cookie/**
   - apps/platform/src/utils/theme-preference-cookie/**
@@ -181,6 +184,19 @@ button, the email sign-in refusal two rows above its send button, and
 onboarding's failed Create site in the pinned footer above Back and Create
 site, never at the top of the step.
 
+A save from a page whose build is gone — the action no longer exists on the
+server, so the tab was opened before a deploy and outlived Skew Protection —
+shows none of those. Every save goes through `settleAction`, which opens one
+app-wide alert dialog mounted in the locale layout: "This page is out of
+date." / "Reload to continue." with a single Reload button. It has no
+dismiss, and the page reloads only from that button; on a settings form with
+unsaved changes the browser's leave-site prompt comes first, so the person can
+still copy what they typed. The rejected save never settles, so the form keeps
+its values and shows no error of its own beneath the dialog. Its pending
+transition also holds every later navigation and refresh in the tab until the
+reload, which Reload being the only way out makes harmless. Any other rejected
+save still settles as the form's generic server error.
+
 ## Data
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through
@@ -289,7 +305,8 @@ site, never at the top of the step.
   sets the title template and the default "Shinefold", and each page's
   `pageMetadata` key holds the page name alone. The tab and home-screen icon
   is the S box, served by `app/icon.ts` (SVG), `app/apple-icon.tsx` (180px
-  PNG on yellow) and listed in `app/manifest.ts`, all drawn from
+  PNG on yellow), `/favicon.ico` (16, 32 and 48px, for browsers that skip the
+  SVG) and listed in `app/manifest.ts`, all drawn from
   `@blog/utils/shinefold-logo`; the proxy leaves `/icon` and `/apple-icon`
   unrewritten. The collapse toggle is the topbar's first item from
   `md` (below `md` that slot holds the phone Menu button and the toggle never

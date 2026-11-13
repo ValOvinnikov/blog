@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestCustomDomainClaim } from '@blog/db/testing/custom-domain-claims/fixtures';
 import { insertTestTenant } from '@blog/db/testing/fixtures';

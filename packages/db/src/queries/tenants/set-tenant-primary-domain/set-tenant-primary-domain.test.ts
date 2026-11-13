@@ -1,5 +1,4 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';

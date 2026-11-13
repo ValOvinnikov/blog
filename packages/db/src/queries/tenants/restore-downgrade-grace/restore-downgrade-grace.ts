@@ -1,6 +1,6 @@
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
 import { hasLength } from '@blog/utils/primitives';
 import { and, eq, isNull } from 'drizzle-orm';

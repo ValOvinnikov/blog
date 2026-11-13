@@ -1,7 +1,8 @@
 import 'server-only';
 
+import type { TTenantPlan } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
-import type { TMembershipRole, TTenantPlan } from '@blog/db/constants';
+import type { TMembershipRole } from '@blog/db/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';

@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { endDowngradeGrace } from '@blog/db/queries/tenants/end-downgrade-grace';
 import { listTenantsDueForGraceEnd } from '@blog/db/queries/tenants/list-tenants-due-for-grace-end';
 import * as schema from '@blog/db/schema';

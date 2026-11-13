@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { okResult } from '@blog/utils';
 import type * as TModule from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 

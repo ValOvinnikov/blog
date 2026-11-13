@@ -1,7 +1,6 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
-  TENANT_PLAN,
   TENANT_STATUS,
   type TMembershipRole,
 } from '@blog/db/constants';

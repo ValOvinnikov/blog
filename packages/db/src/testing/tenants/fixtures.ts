@@ -1,7 +1,6 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
 import {
   DEPROVISIONING_STEP,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,

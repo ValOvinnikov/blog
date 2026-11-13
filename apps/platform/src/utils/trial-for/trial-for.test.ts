@@ -1,5 +1,6 @@
 import type { TMaybeNull } from '@blog/config';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import { mockTenant } from '@platform/testing/tenants/fixtures';
 
 import { trialFor } from './trial-for';

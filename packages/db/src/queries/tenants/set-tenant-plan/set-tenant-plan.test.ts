@@ -1,6 +1,6 @@
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
-  TENANT_PLAN,
   TENANT_PLAN_WRITE_OUTCOME,
   TENANT_STATUS,
 } from '@blog/db/constants';

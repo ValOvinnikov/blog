@@ -2,7 +2,8 @@ import type { TEmailTemplateType } from '@blog/config/constants';
 import { jsonb, pgTable, primaryKey, text, uuid } from 'drizzle-orm/pg-core';
 
 import { timestampColumns } from './columns';
-import { localeCodeEnum, tenants } from './tenants';
+import { localeCodeEnum } from './tenant-enums';
+import { tenants } from './tenants';
 
 // A Portable Text block, typed loosely on purpose — this package never
 // interprets its contents (the email-HTML serializer that does lives in

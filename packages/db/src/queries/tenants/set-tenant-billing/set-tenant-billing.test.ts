@@ -1,5 +1,4 @@
-import { ERROR_CODE } from '@blog/config/constants';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
 import { getTenantBilling } from '@blog/db/queries/tenants/get-tenant-billing';
 import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import * as schema from '@blog/db/schema';

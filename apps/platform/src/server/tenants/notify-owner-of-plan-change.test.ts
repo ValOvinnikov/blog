@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { sendEmail } from '@blog/email';
 import { TENANT_LOG } from '@platform/constants/tenant';
 import enMessages from '@platform/i18n/messages/en.json';

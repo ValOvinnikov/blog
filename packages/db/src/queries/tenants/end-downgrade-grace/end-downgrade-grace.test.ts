@@ -1,4 +1,5 @@
-import { GRACE_EMAIL, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { GRACE_EMAIL } from '@blog/db/constants';
 import { claimGraceEmail } from '@blog/db/queries/tenants/claim-grace-email';
 import { listTenantsDueForGraceEnd } from '@blog/db/queries/tenants/list-tenants-due-for-grace-end';
 import * as schema from '@blog/db/schema';

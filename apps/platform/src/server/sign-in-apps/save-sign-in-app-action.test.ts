@@ -4,9 +4,9 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   SIGN_IN_APP_FIELD_ERROR,
@@ -134,31 +134,51 @@ describe(saveSignInAppAction, () => {
     });
   });
 
-  it('changes a saved client ID and keeps the stored secret when none is given', async () => {
-    vi.mocked(tenantOAuthCredentials.listTenantOAuthClients).mockResolvedValue([
-      mockOAuthClient(),
-    ]);
-
-    const result = await saveSignInAppAction(MOCK_TENANT_ID, {
-      provider: OAUTH_PROVIDER.GOOGLE,
-      clientId: MOCK_REPLACEMENT_CLIENT_ID,
+  describe('with a saved app', () => {
+    beforeEach(() => {
+      vi.mocked(
+        tenantOAuthCredentials.listTenantOAuthClients,
+      ).mockResolvedValue([mockOAuthClient()]);
     });
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(tenantOAuthCredentials.updateTenantOAuthClient).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      {
+    it('changes a saved client ID and keeps the stored secret when none is given', async () => {
+      const result = await saveSignInAppAction(MOCK_TENANT_ID, {
+        provider: OAUTH_PROVIDER.GOOGLE,
+        clientId: MOCK_REPLACEMENT_CLIENT_ID,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(
+        tenantOAuthCredentials.updateTenantOAuthClient,
+      ).toHaveBeenCalledWith(MOCK_TENANT_ID, {
         provider: OAUTH_PROVIDER.GOOGLE,
         clientId: MOCK_REPLACEMENT_CLIENT_ID,
         callbackDomain: MOCK_TENANT_DOMAIN,
-      },
-    );
-    expect(
-      tenantOAuthCredentials.saveTenantOAuthCredentials,
-    ).not.toHaveBeenCalled();
-    expect(recordAuditEvent).toHaveBeenCalledWith(
-      expect.objectContaining({ action: AUDIT_ACTION.OAUTH_APP_REPLACED }),
-    );
+      });
+      expect(
+        tenantOAuthCredentials.saveTenantOAuthCredentials,
+      ).not.toHaveBeenCalled();
+      expect(recordAuditEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ action: AUDIT_ACTION.OAUTH_APP_REPLACED }),
+      );
+    });
+
+    it('refuses a client ID change for an app removed meanwhile, recording nothing', async () => {
+      vi.mocked(
+        tenantOAuthCredentials.updateTenantOAuthClient,
+      ).mockResolvedValue(false);
+
+      const result = await saveSignInAppAction(MOCK_TENANT_ID, {
+        provider: OAUTH_PROVIDER.GOOGLE,
+        clientId: MOCK_REPLACEMENT_CLIENT_ID,
+      });
+
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: SIGN_IN_APP_REFUSAL.NO_SAVED_APP,
+      });
+      expect(recordAuditEvent).not.toHaveBeenCalled();
+    });
   });
 
   it('marks every empty field and saves nothing', async () => {
@@ -200,26 +220,6 @@ describe(saveSignInAppAction, () => {
     expect(
       tenantOAuthCredentials.saveTenantOAuthCredentials,
     ).not.toHaveBeenCalled();
-  });
-
-  it('refuses a client ID change for an app removed meanwhile, recording nothing', async () => {
-    vi.mocked(tenantOAuthCredentials.listTenantOAuthClients).mockResolvedValue([
-      mockOAuthClient(),
-    ]);
-    vi.mocked(tenantOAuthCredentials.updateTenantOAuthClient).mockResolvedValue(
-      false,
-    );
-
-    const result = await saveSignInAppAction(MOCK_TENANT_ID, {
-      provider: OAUTH_PROVIDER.GOOGLE,
-      clientId: MOCK_REPLACEMENT_CLIENT_ID,
-    });
-
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: SIGN_IN_APP_REFUSAL.NO_SAVED_APP,
-    });
-    expect(recordAuditEvent).not.toHaveBeenCalled();
   });
 
   it('logs and reports a server error, recording nothing, when the write throws', async () => {

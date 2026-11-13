@@ -1,9 +1,6 @@
+import { type TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import {
-  MEMBERSHIP_ROLE,
-  PLAN_ENTITLEMENTS,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { memberships } from '@blog/db/schema/memberships';
 import { tenants } from '@blog/db/schema/tenants';
 import {

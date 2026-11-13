@@ -1,7 +1,4 @@
-import { TENANT_STATUS } from '@blog/db/constants';
-import { pgEnum } from 'drizzle-orm/pg-core';
-
-export const tenantStatusEnum = pgEnum('tenant_status', TENANT_STATUS);
+import { tenantStatusEnum } from './tenant-enums';
 
 export const tenantStatusColumns = {
   status: tenantStatusEnum('status').notNull(),

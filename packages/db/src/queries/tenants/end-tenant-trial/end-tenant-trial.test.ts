@@ -1,4 +1,5 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import { listTenantsWithEndedTrial } from '@blog/db/queries/tenants/list-tenants-with-ended-trial';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';

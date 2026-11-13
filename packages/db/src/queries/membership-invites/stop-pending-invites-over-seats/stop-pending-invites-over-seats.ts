@@ -1,9 +1,6 @@
+import { type TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import {
-  MEMBERSHIP_ROLE,
-  PLAN_ENTITLEMENTS,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { unlockedMembershipsCount } from '@blog/db/queries/membership-invites/create-membership-invite/seat-limit';
 import { isTenantOnPlan } from '@blog/db/queries/tenants/tenant-on-plan';
 import { membershipInvites } from '@blog/db/schema/membership-invites';

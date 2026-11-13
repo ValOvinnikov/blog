@@ -1,8 +1,5 @@
-import {
-  LOOK_FIELD,
-  type TLookField,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
+import { LOOK_FIELD, type TLookField } from '@blog/db/constants';
 import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TModuleAppearance } from '@blog/service';
 

@@ -1,5 +1,9 @@
-import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config/constants';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import {
+  SORT_DIRECTION,
+  TENANT_SORT_COLUMN,
+  TENANT_PLAN,
+} from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';

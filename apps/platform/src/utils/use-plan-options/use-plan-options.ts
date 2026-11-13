@@ -1,6 +1,6 @@
 'use client';
 
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { toOptions } from '@blog/utils/primitives';
 import { useTranslations } from 'next-intl';
 

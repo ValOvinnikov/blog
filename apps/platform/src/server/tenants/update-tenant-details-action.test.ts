@@ -1,13 +1,14 @@
 import {
+  type TMaybeNull,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   TENANT_DETAILS_UPDATE_OUTCOME,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
@@ -107,7 +108,7 @@ vi.mock('@blog/db', async () => ({
 }));
 
 const requireAdminMock = vi.mocked(requireAdmin);
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 const loggerErrorMock = vi.mocked(logger.error);
 const revalidateSiteConfigMock = vi.mocked(revalidateSiteConfig);
 const sendOwnerInviteEmailMock = vi.mocked(sendOwnerInviteEmail);

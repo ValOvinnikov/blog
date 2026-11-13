@@ -1,7 +1,10 @@
-import { ERROR_CODE, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  LOCALE_ISO_CODES,
+  TENANT_PLAN,
+} from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';
@@ -126,35 +129,37 @@ describe(createTenantDraft, () => {
       });
     });
 
-    it('inserts the primary domain into tenant_domains', async () => {
-      const { id: tenantId } = unwrapOk(
-        await createTenantDraft(MOCK_DRAFT_INPUT),
-      );
+    describe('once created', () => {
+      let tenantId: string;
 
-      const domainRows = await db()
-        .select({
-          tenantId: schema.tenantDomains.tenantId,
-          domain: schema.tenantDomains.domain,
-        })
-        .from(schema.tenantDomains);
-      expect(domainRows).toEqual([{ tenantId, domain: MOCK_TENANT_DOMAIN }]);
-    });
+      beforeEach(async () => {
+        ({ id: tenantId } = unwrapOk(
+          await createTenantDraft(MOCK_DRAFT_INPUT),
+        ));
+      });
 
-    it('inserts an OWNER membership row for the given owner user id', async () => {
-      const { id: tenantId } = unwrapOk(
-        await createTenantDraft(MOCK_DRAFT_INPUT),
-      );
+      it('inserts the primary domain into tenant_domains', async () => {
+        const domainRows = await db()
+          .select({
+            tenantId: schema.tenantDomains.tenantId,
+            domain: schema.tenantDomains.domain,
+          })
+          .from(schema.tenantDomains);
+        expect(domainRows).toEqual([{ tenantId, domain: MOCK_TENANT_DOMAIN }]);
+      });
 
-      const membershipRows = await db()
-        .select({
-          tenantId: schema.memberships.tenantId,
-          userId: schema.memberships.userId,
-          role: schema.memberships.role,
-        })
-        .from(schema.memberships);
-      expect(membershipRows).toEqual([
-        { tenantId, userId: MOCK_OWNER_USER_ID, role: MEMBERSHIP_ROLE.OWNER },
-      ]);
+      it('inserts an OWNER membership row for the given owner user id', async () => {
+        const membershipRows = await db()
+          .select({
+            tenantId: schema.memberships.tenantId,
+            userId: schema.memberships.userId,
+            role: schema.memberships.role,
+          })
+          .from(schema.memberships);
+        expect(membershipRows).toEqual([
+          { tenantId, userId: MOCK_OWNER_USER_ID, role: MEMBERSHIP_ROLE.OWNER },
+        ]);
+      });
     });
 
     it('rejects a colliding domain and cleans up the second tenant and dependents', async () => {
