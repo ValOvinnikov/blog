@@ -81,11 +81,11 @@ function renderMark(
   return renderInitialTile(brandName, tileColor);
 }
 
-// Gmail and Outlook strip inline SVG, so the tile is a fixed-size table cell; white meets 4.5:1 on the logo ramp's light stop at every hue.
+// Gmail and Outlook strip inline SVG, so the tile is a fixed-size table cell.
 function renderInitialTile(brandName: string, tileColor: string): string {
   return [
-    `<table role="presentation" cellpadding="0" cellspacing="0" width="${MARK_SIZE_PX}" height="${MARK_SIZE_PX}" style="border-collapse:separate;">`,
-    `<tr><td align="center" valign="middle" bgcolor="${tileColor}" width="${MARK_SIZE_PX}" height="${MARK_SIZE_PX}" style="width:${MARK_SIZE_PX}px;height:${MARK_SIZE_PX}px;background-color:${tileColor};border-radius:8px;color:${EMAIL_WHITE};font-family:${FONT_STACK};font-size:18px;font-weight:700;line-height:${MARK_SIZE_PX}px;text-align:center;">`,
+    `<table role="presentation" aria-hidden="true" cellpadding="0" cellspacing="0" width="${MARK_SIZE_PX}" height="${MARK_SIZE_PX}" style="border-collapse:separate;">`,
+    `<tr><td align="center" valign="middle" bgcolor="${tileColor}" width="${MARK_SIZE_PX}" height="${MARK_SIZE_PX}" style="width:${MARK_SIZE_PX}px;height:${MARK_SIZE_PX}px;background-color:${tileColor};border-radius:8px;color:${EMAIL_WHITE};font-family:${FONT_STACK};font-size:18px;font-weight:700;line-height:${MARK_SIZE_PX}px;mso-line-height-rule:exactly;text-align:center;">`,
     escapeHtml(toInitial(brandName) ?? ''),
     CELL_ROW_END,
     '</table>',

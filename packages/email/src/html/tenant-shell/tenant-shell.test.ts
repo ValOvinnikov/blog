@@ -79,6 +79,10 @@ describe(buildTenantShell, () => {
       expect(html).toContain(`>${MOCK_TENANT_INITIAL}</td>`);
     });
 
+    it('hides the tile from screen readers so the name is read once', () => {
+      expect(html).toContain('role="presentation" aria-hidden="true"');
+    });
+
     it.each([
       'actionHtml',
       'structuralHtml',
