@@ -4,18 +4,18 @@ import { tv } from '@platform/utils/tv/tv';
 export const voiceSurfacePreviewVariants = tv({
   slots: {
     column: [
-      'lg:rounded-br-admin lg:border-l lg:border-admin-line-2 lg:bg-admin-bg lg:p-admin-card',
+      'lg:rounded-br-platform lg:border-l lg:border-platform-line-2 lg:bg-platform-bg lg:p-platform-card',
     ],
     content: [
-      'flex flex-col gap-2.5 lg:sticky lg:top-[calc(var(--spacing-admin-topbar)+var(--admin-voice-bar-height,0px)+--spacing(4))] lg:max-h-[calc(100dvh-var(--spacing-admin-topbar)-var(--admin-voice-bar-height,0px)-(--spacing(4))-var(--spacing-admin-dock))] lg:overflow-y-auto lg:overscroll-contain',
+      'flex flex-col gap-2.5 lg:sticky lg:top-[calc(var(--spacing-platform-topbar)+var(--platform-voice-bar-height,0px)+--spacing(4))] lg:max-h-[calc(100dvh-var(--spacing-platform-topbar)-var(--platform-voice-bar-height,0px)-(--spacing(4))-var(--spacing-platform-dock))] lg:overflow-y-auto lg:overscroll-contain',
     ],
     toggle: ['w-full md:h-11 lg:hidden'],
     preview: [
       'flex flex-col gap-2.5',
-      'max-lg:rounded-admin max-lg:border max-lg:border-admin-line-2 max-lg:bg-admin-bg max-lg:p-3.5',
+      'max-lg:rounded-platform max-lg:border max-lg:border-platform-line-2 max-lg:bg-platform-bg max-lg:p-3.5',
     ],
     label: [
-      'font-admin-mono text-admin-11 leading-admin-15 font-medium tracking-admin-caps text-admin-muted uppercase',
+      'font-platform-mono text-platform-11 leading-platform-15 font-medium tracking-platform-caps text-platform-muted uppercase',
     ],
     specimen: ['grid'],
   },
@@ -23,7 +23,7 @@ export const voiceSurfacePreviewVariants = tv({
     isArchive: {
       true: {
         column: [
-          'max-lg:px-admin-card max-lg:pt-1.5 max-lg:pb-admin-card',
+          'max-lg:px-platform-card max-lg:pt-1.5 max-lg:pb-platform-card',
           'max-md:px-3.5 max-md:pb-2.5',
         ],
         specimen: ['min-h-[260px]'],

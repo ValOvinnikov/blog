@@ -6,34 +6,34 @@ export const stepIndicatorVariants = tv({
     root: ['flex flex-none flex-col items-center self-stretch'],
     circle: [
       'flex h-6 w-6 flex-none items-center justify-center',
-      'rounded-full text-admin-12-5 font-bold',
+      'rounded-full text-platform-12-5 font-bold',
     ],
-    connector: ['my-1 w-0.5 flex-1 bg-admin-line-2'],
+    connector: ['my-1 w-0.5 flex-1 bg-platform-line-2'],
   },
   variants: {
     state: {
       [STEP_INDICATOR_STATE.DONE]: {
-        circle: ['bg-admin-ok text-admin-on-brand-ink'],
+        circle: ['bg-platform-ok text-platform-on-brand-ink'],
       },
       [STEP_INDICATOR_STATE.FAILED]: {
-        circle: ['bg-admin-bad text-admin-on-brand-ink'],
+        circle: ['bg-platform-bad text-platform-on-brand-ink'],
       },
       [STEP_INDICATOR_STATE.RUNNING]: {
-        circle: ['bg-admin-warn text-admin-on-brand-ink'],
+        circle: ['bg-platform-warn text-platform-on-brand-ink'],
       },
       [STEP_INDICATOR_STATE.ACTIVE]: {
-        circle: ['bg-admin-brand text-admin-on-brand-ink'],
+        circle: ['bg-platform-brand text-platform-on-brand-ink'],
       },
       [STEP_INDICATOR_STATE.UPCOMING]: {
-        circle: ['bg-admin-line-2 text-admin-muted'],
+        circle: ['bg-platform-line-2 text-platform-muted'],
       },
     },
     isConnectorDone: {
-      true: { connector: ['bg-admin-ok'] },
+      true: { connector: ['bg-platform-ok'] },
       false: {},
     },
     isOnDark: {
-      true: { circle: ['text-admin-12 font-semibold'] },
+      true: { circle: ['text-platform-12 font-semibold'] },
       false: {},
     },
   },
@@ -41,14 +41,14 @@ export const stepIndicatorVariants = tv({
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.DONE,
-      class: { circle: ['bg-admin-rail-accent text-admin-rail'] },
+      class: { circle: ['bg-platform-rail-accent text-platform-rail'] },
     },
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.ACTIVE,
       class: {
         circle: [
-          'border-2 border-admin-rail-accent bg-transparent text-admin-rail-accent',
+          'border-2 border-platform-rail-accent bg-transparent text-platform-rail-accent',
         ],
       },
     },
@@ -57,7 +57,7 @@ export const stepIndicatorVariants = tv({
       state: STEP_INDICATOR_STATE.UPCOMING,
       class: {
         circle: [
-          'border-[1.5px] border-admin-rail-muted bg-transparent text-admin-rail-muted',
+          'border-[1.5px] border-platform-rail-muted bg-transparent text-platform-rail-muted',
         ],
       },
     },

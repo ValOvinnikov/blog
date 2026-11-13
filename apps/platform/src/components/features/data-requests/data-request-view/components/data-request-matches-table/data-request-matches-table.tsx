@@ -6,6 +6,7 @@ import { OptionSelect } from '@platform/components/shared/option-select';
 import { Pagination } from '@platform/components/shared/pagination';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { TextInput } from '@platform/components/shared/text-input';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import {
   DATA_REQUEST_KIND_FILTER,
   DATA_REQUEST_MATCH_COLUMN,
@@ -20,7 +21,7 @@ import { useDataRequestMatchesTable } from './use-data-request-matches-table';
 
 const dataRequestMatchesTableVariants = tv({
   slots: {
-    secondary: ['text-admin-muted'],
+    secondary: ['text-platform-muted'],
     searchField: ['min-w-0 flex-1 basis-56'],
     kindField: ['w-full sm:w-56'],
   },
@@ -113,7 +114,7 @@ export const DataRequestMatchesTable = ({
         renderRow={({ key, kind, siteName, email, recordedAt }) => (
           <DataTableShell.Row key={key}>
             <DataTableShell.Cell>
-              <StatusBadge tone="neutral" hasDot={false}>
+              <StatusBadge tone={BADGE_TONE.NEUTRAL} hasDot={false}>
                 {tKind(kind)}
               </StatusBadge>
             </DataTableShell.Cell>

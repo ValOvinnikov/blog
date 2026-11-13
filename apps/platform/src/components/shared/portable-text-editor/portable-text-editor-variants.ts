@@ -15,26 +15,26 @@ export const portableTextEditorVariants = tv({
     root: ['flex', 'flex-col'],
     editable: [
       'w-full',
-      '[&_p]:relative [&_h2]:relative [&_p]:m-0 [&_h2]:m-0 [&_h2]:text-admin-16 [&_h2]:font-semibold [&_h2]:font-admin [&_h2]:tracking-normal',
+      '[&_p]:relative [&_h2]:relative [&_p]:m-0 [&_h2]:m-0 [&_h2]:text-platform-16 [&_h2]:font-semibold [&_h2]:font-platform [&_h2]:tracking-normal',
       '[&_ul]:m-0 [&_ul]:pl-5 [&_ol]:m-0 [&_ol]:pl-5',
     ],
-    placeholder: ['text-admin-muted'],
+    placeholder: ['text-platform-muted'],
     token: [
-      'rounded-admin-3 bg-admin-line-2 px-1 py-px',
-      'font-admin-mono text-admin-12-5 font-medium',
+      'rounded-platform-3 bg-platform-line-2 px-1 py-px',
+      'font-platform-mono text-platform-12-5 font-medium',
     ],
   },
   variants: {
     size: {
       [SIZE.SM]: {
         root: [
-          'rounded-admin-control border border-admin-control-line bg-admin-surface',
-          'has-[[contenteditable][data-invalid]]:border-admin-bad-line',
+          'rounded-platform-control border border-platform-control-line bg-platform-surface',
+          'has-[[contenteditable][data-invalid]]:border-platform-bad-line',
           EDITABLE_SHELL_FOCUS_CLASSES,
         ],
         editable: [
           'min-h-18 px-2.5 py-2 outline-hidden',
-          'text-admin-16 leading-6 md:min-h-14 md:text-admin-13-5 md:leading-5 text-admin-text',
+          'text-platform-16 leading-6 md:min-h-14 md:text-platform-13-5 md:leading-5 text-platform-text',
         ],
       },
       [SIZE.MD]: {
@@ -49,12 +49,12 @@ export const portableTextEditorVariants = tv({
     mode: {
       [CONTROL_MODE.EDITABLE]: {},
       [CONTROL_MODE.READ_ONLY]: {
-        editable: [DISABLED_READONLY_SURFACE_CLASSES, 'text-admin-muted'],
+        editable: [DISABLED_READONLY_SURFACE_CLASSES, 'text-platform-muted'],
       },
       [CONTROL_MODE.DISABLED]: {
         editable: [
           DISABLED_READONLY_SURFACE_CLASSES,
-          'cursor-not-allowed text-admin-muted',
+          'cursor-not-allowed text-platform-muted',
         ],
       },
     },

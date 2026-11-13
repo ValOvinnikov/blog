@@ -10,7 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 const releaseCommitsVariants = tv({
   slots: {
     root: ['flex flex-col gap-4'],
-    sha: ['font-mono text-admin-12-5'],
+    sha: ['font-mono text-platform-12-5'],
   },
 });
 

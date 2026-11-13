@@ -5,24 +5,24 @@ import { tv } from '@platform/utils/tv/tv';
 export const signedInAccountVariants = tv({
   slots: {
     root: ['flex flex-wrap items-center justify-between gap-x-3 gap-y-2'],
-    email: ['min-w-0 text-admin-12 [overflow-wrap:anywhere]'],
+    email: ['min-w-0 text-platform-12 [overflow-wrap:anywhere]'],
     signOut: [],
   },
   variants: {
     surface: {
       card: {},
       rail: {
-        email: ['hidden text-admin-rail-muted md:block'],
+        email: ['hidden text-platform-rail-muted md:block'],
         signOut: [
-          'text-admin-rail-text hover:bg-admin-rail-raised hover:text-white',
+          'text-platform-rail-text hover:bg-platform-rail-raised hover:text-white',
           // Keeps the 44px tap target from growing the 26px brand row of the phone band.
           '-my-[9px] md:my-0',
         ],
       },
       railFooter: {
-        email: ['text-admin-rail-text'],
+        email: ['text-platform-rail-text'],
         signOut: [
-          'text-admin-rail-text hover:bg-admin-rail-raised hover:text-white',
+          'text-platform-rail-text hover:bg-platform-rail-raised hover:text-white',
         ],
       },
     },

@@ -18,11 +18,11 @@ import { tv } from '@platform/utils/tv/tv';
 const iconToggleGroupOptionVariants = tv({
   base: [
     'inline-flex size-11 cursor-pointer items-center justify-center md:size-7.5 pointer-coarse:size-11',
-    'rounded-admin-3 border-0 bg-transparent text-admin-muted',
-    'hover:bg-admin-hover hover:text-admin-text',
-    'data-[pressed]:bg-admin-segment-on data-[pressed]:text-admin-brand-strong',
-    'data-[pressed]:hover:bg-admin-segment-on data-[pressed]:hover:text-admin-brand-strong',
-    'data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1.5px_var(--admin-brand-ink)]',
+    'rounded-platform-3 border-0 bg-transparent text-platform-muted',
+    'hover:bg-platform-hover hover:text-platform-text',
+    'data-[pressed]:bg-platform-segment-on data-[pressed]:text-platform-brand-strong',
+    'data-[pressed]:hover:bg-platform-segment-on data-[pressed]:hover:text-platform-brand-strong',
+    'data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1.5px_var(--platform-brand-ink)]',
     focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
   ],
 });

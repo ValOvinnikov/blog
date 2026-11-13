@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const saveBarLocationVariants = tv({
   slots: {
-    root: ['whitespace-nowrap text-admin-muted'],
+    root: ['whitespace-nowrap text-platform-muted'],
     link: [...saveBarLinkClasses, 'cursor-pointer font-semibold'],
   },
 });

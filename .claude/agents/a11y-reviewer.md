@@ -44,7 +44,7 @@ elsewhere.
 `apps/platform` is internal, which lowers the traffic, not the standard: the
 checklist applies there too, except the clauses that are `@blog/ui`
 contracts — the `ariaLabel` prop (rule 1), date formatting (rule 2) and
-`linkAs` (rule 4). An admin page may format its own date and links with
+`linkAs` (rule 4). A platform page may format its own date and links with
 `@platform/i18n/navigation`'s `Link`. Its interactive primitives come from
 Base UI, whose parts carry their own ARIA wiring: flag a hand-rolled
 `div`-and-`useState` re-implementation of one, not the library's markup.

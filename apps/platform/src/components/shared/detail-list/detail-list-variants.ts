@@ -3,15 +3,15 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const detailListVariants = tv({
   slots: {
-    root: ['group/detail-list text-admin-13-5 leading-5 text-admin-text'],
+    root: ['group/detail-list text-platform-13-5 leading-5 text-platform-text'],
     row: [
       'contents',
       'group-data-bordered/detail-list:flex group-data-bordered/detail-list:min-h-13 group-data-bordered/detail-list:items-center group-data-bordered/detail-list:gap-4',
-      'group-data-bordered/detail-list:border-b group-data-bordered/detail-list:border-admin-line-2 group-data-bordered/detail-list:first:border-t',
+      'group-data-bordered/detail-list:border-b group-data-bordered/detail-list:border-platform-line-2 group-data-bordered/detail-list:first:border-t',
     ],
     term: [
-      'text-admin-12-5 leading-5 font-normal text-admin-muted',
-      'group-data-bordered/detail-list:w-30 group-data-bordered/detail-list:flex-none group-data-bordered/detail-list:text-admin-13',
+      'text-platform-12-5 leading-5 font-normal text-platform-muted',
+      'group-data-bordered/detail-list:w-30 group-data-bordered/detail-list:flex-none group-data-bordered/detail-list:text-platform-13',
     ],
     description: [
       'm-0 flex min-w-0 flex-wrap items-center gap-2',
@@ -19,14 +19,14 @@ export const detailListVariants = tv({
     ],
     value: [
       'min-w-0 wrap-anywhere',
-      'text-admin-13-5 leading-5 font-normal text-admin-text',
-      'group-data-bordered/detail-list:text-admin-14 group-data-bordered/detail-list:font-medium',
+      'text-platform-13-5 leading-5 font-normal text-platform-text',
+      'group-data-bordered/detail-list:text-platform-14 group-data-bordered/detail-list:font-medium',
     ],
   },
   variants: {
     isMono: {
       true: {
-        value: ['font-admin-mono text-admin-12-5 leading-5 font-medium'],
+        value: ['font-platform-mono text-platform-12-5 leading-5 font-medium'],
       },
       false: {},
     },

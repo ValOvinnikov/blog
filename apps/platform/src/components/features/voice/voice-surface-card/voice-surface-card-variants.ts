@@ -4,7 +4,7 @@ export const voiceSurfaceCardVariants = tv({
   slots: {
     card: ['[&_h3]:outline-hidden'],
     body: ['grid grid-cols-1 p-0 lg:grid-cols-2'],
-    fields: ['flex min-w-0 flex-col gap-5 p-admin-card'],
+    fields: ['flex min-w-0 flex-col gap-5 p-platform-card'],
   },
   variants: {
     isArchive: {

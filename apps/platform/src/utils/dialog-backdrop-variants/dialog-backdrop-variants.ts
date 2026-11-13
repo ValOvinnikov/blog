@@ -9,8 +9,8 @@ export const dialogBackdropVariants = tv({
   ],
   variants: {
     tone: {
-      [DIALOG_BACKDROP_TONE.DIM]: 'bg-admin-text/50',
-      [DIALOG_BACKDROP_TONE.SCRIM]: 'bg-admin-scrim',
+      [DIALOG_BACKDROP_TONE.DIM]: 'bg-platform-text/50',
+      [DIALOG_BACKDROP_TONE.SCRIM]: 'bg-platform-scrim',
     },
   },
 });

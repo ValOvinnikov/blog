@@ -2,7 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const skeletonVariants = tv({
   base: [
-    'block rounded-admin-control bg-admin-line',
+    'block rounded-platform-control bg-platform-line',
     'animate-pulse motion-reduce:animate-none',
   ],
 });

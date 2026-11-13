@@ -6,7 +6,7 @@ import {
 
 /**
  * The final path segment both Studio routes share — also matched against
- * `useSelectedLayoutSegment()` by `ShellFrame` to switch `AdminShell`'s
+ * `useSelectedLayoutSegment()` by `ShellFrame` to switch `PlatformShell`'s
  * content column into full-bleed mode.
  */
 export const STUDIO_SEGMENT = 'studio';

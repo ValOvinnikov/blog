@@ -2,7 +2,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookFormVariants = tv({
   slots: {
-    layout: ['@container flex flex-col gap-admin-form-gap max-lg:gap-3.5'],
+    layout: ['@container flex flex-col gap-platform-form-gap max-lg:gap-3.5'],
     columns: [
       'flex flex-col @min-look-split:flex-row @min-look-split:items-start @min-look-split:gap-6',
     ],
@@ -12,7 +12,7 @@ export const lookFormVariants = tv({
     ],
     previewPanel: [
       'min-w-0 @min-look-split:flex-1',
-      '@min-look-split:sticky @min-look-split:top-[calc(var(--spacing-admin-topbar)+var(--spacing-admin-look-index)+var(--spacing-admin-form-gap)-(--spacing(1)))] @min-look-split:-m-1 @min-look-split:self-start @min-look-split:p-1',
+      '@min-look-split:sticky @min-look-split:top-[calc(var(--spacing-platform-topbar)+var(--spacing-platform-look-index)+var(--spacing-platform-form-gap)-(--spacing(1)))] @min-look-split:-m-1 @min-look-split:self-start @min-look-split:p-1',
     ],
   },
   variants: {

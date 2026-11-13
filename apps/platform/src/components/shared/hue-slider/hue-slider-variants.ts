@@ -6,23 +6,23 @@ export const hueSliderVariants = tv({
     root: ['min-w-24 flex-1 self-stretch touch-none select-none'],
     control: ['flex h-full min-h-11 items-center md:min-h-9'],
     track: [
-      'relative w-full grow bg-admin-line-2',
+      'relative w-full grow bg-platform-line-2',
       'data-[disabled]:opacity-50',
     ],
     thumb: [
       'block size-5 rounded-full bg-white',
-      'border border-admin-thumb-line shadow-admin-thumb',
+      'border border-platform-thumb-line shadow-platform-thumb',
       'transition-colors',
       // The focusable element is the thumb's hidden range input, not the thumb itself.
-      'has-[:focus-visible]:not-data-[dragging]:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]',
+      'has-[:focus-visible]:not-data-[dragging]:shadow-[0_0_0_2px_var(--platform-surface),0_0_0_4px_var(--platform-brand-ink)]',
     ],
   },
   variants: {
     track: {
       [HUE_SLIDER_TRACK.PALETTE]: {
-        track: ['h-2.5 rounded-full inset-ring inset-ring-admin-thumb-line'],
+        track: ['h-2.5 rounded-full inset-ring inset-ring-platform-thumb-line'],
       },
-      [HUE_SLIDER_TRACK.RAINBOW]: { track: ['h-3 rounded-admin'] },
+      [HUE_SLIDER_TRACK.RAINBOW]: { track: ['h-3 rounded-platform'] },
     },
   },
   defaultVariants: { track: HUE_SLIDER_TRACK.PALETTE },

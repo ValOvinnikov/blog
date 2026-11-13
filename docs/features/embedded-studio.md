@@ -134,7 +134,7 @@ module types whose capability is off for the tenant carry a warning.
   `prefers-color-scheme` itself, live, and checks System in its Appearance
   menu. It passes `onSchemeChange` too, which keeps the Studio's own
   Appearance menu: choosing Light, Dark or System there stores the matching
-  admin preference (the `admin-theme` cookie and `<html data-theme>`, the
+  platform preference (the `platform-theme` cookie and `<html data-theme>`, the
   same write as the account menu's Theme section), so the platform shell around
   the Studio switches at once. Both read the preference through
   `utils/use-theme-preference/`, so a change from either side reaches the

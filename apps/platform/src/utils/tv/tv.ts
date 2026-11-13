@@ -1,8 +1,9 @@
 import { createTV } from 'tailwind-variants';
 
+import { platformTokens } from './platform-tokens';
 import { SHADOW_TOKENS } from './shadow-tokens';
 
-// Keep these lists and `SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `admin-theme.css`, or `tailwind-merge` misclassifies or drops them.
+// Keep these lists and `SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `platform-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
   'display',
   'hero',
@@ -22,20 +23,22 @@ const FONT_SIZE_TOKENS = [
   'meta',
   'label',
   'code',
-  'admin-10-5',
-  'admin-11',
-  'admin-11-5',
-  'admin-12',
-  'admin-12-5',
-  'admin-13',
-  'admin-13-5',
-  'admin-14',
-  'admin-15',
-  'admin-16',
-  'admin-20',
-  'admin-22',
-  'admin-24',
-  'admin-28',
+  ...platformTokens(
+    '10-5',
+    '11',
+    '11-5',
+    '12',
+    '12-5',
+    '13',
+    '13-5',
+    '14',
+    '15',
+    '16',
+    '20',
+    '22',
+    '24',
+    '28',
+  ),
 ];
 
 const FONT_FAMILY_TOKENS = [
@@ -44,8 +47,8 @@ const FONT_FAMILY_TOKENS = [
   'read',
   'mono',
   'ui',
-  'admin',
-  'admin-mono',
+  'platform',
+  ...platformTokens('mono'),
 ];
 
 const TRACKING_TOKENS = [
@@ -65,32 +68,28 @@ const SPACING_TOKENS = [
   'site-y',
   'card-x',
   'card-y',
-  'admin-card',
+  ...platformTokens('card'),
 ];
 
 const RADIUS_TOKENS = [
-  'admin',
-  'admin-control',
-  'admin-bar',
-  'admin-3',
-  'admin-5',
-  'admin-8',
-  'admin-10',
-  'admin-12',
-  'admin-14',
-  'admin-18',
-  'admin-22',
+  'platform',
+  ...platformTokens(
+    'control',
+    'bar',
+    '3',
+    '5',
+    '8',
+    '10',
+    '12',
+    '14',
+    '18',
+    '22',
+  ),
 ];
 
-const LEADING_TOKENS = [
-  'admin-1-4',
-  'admin-1-45',
-  'admin-18',
-  'admin-19',
-  'admin-22',
-];
+const LEADING_TOKENS = platformTokens('1-4', '1-45', '18', '19', '22');
 
-const FONT_WEIGHT_TOKENS = ['admin-650'];
+const FONT_WEIGHT_TOKENS = platformTokens('650');
 
 /** Import this instead of `tv` from `tailwind-variants`. */
 export const tv = createTV({

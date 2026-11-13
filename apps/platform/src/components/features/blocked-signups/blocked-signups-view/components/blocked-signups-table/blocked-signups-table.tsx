@@ -1,6 +1,7 @@
 import { RemoveBlockedIdentityControl } from '@platform/components/features/blocked-signups/blocked-signups-view/components/blocked-signups-table/components/remove-blocked-identity-control/remove-blocked-identity-control';
 import { DataTableShell } from '@platform/components/shared/data-table-shell';
 import { StatusBadge } from '@platform/components/shared/status-badge';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import type { TBlockedSignupEntry } from '@platform/server/signup-block/load-blocked-signup-entries';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { tv } from '@platform/utils/tv/tv';
@@ -9,7 +10,7 @@ import { useLocale, useTranslations } from 'next-intl';
 const blockedSignupsTableVariants = tv({
   slots: {
     visuallyHidden: ['sr-only'],
-    value: ['font-mono text-admin-12-5 break-all'],
+    value: ['font-mono text-platform-12-5 break-all'],
   },
 });
 
@@ -33,7 +34,7 @@ export const BlockedSignupsTable = ({ entries }: TBlockedSignupsTableProps) => {
         { key: 'value', label: t('columnValue') },
         { key: 'reason', label: t('columnReason') },
         { key: 'addedBy', label: t('columnAddedBy') },
-        { key: 'added', label: t('columnAdded') },
+        { key: 'addedAt', label: t('columnAdded') },
         {
           key: 'actions',
           label: <span className={visuallyHidden()}>{t('columnActions')}</span>,
@@ -42,7 +43,7 @@ export const BlockedSignupsTable = ({ entries }: TBlockedSignupsTableProps) => {
       renderRow={(entry) => (
         <DataTableShell.Row key={entry.id}>
           <DataTableShell.Cell>
-            <StatusBadge tone="neutral" hasDot={false}>
+            <StatusBadge tone={BADGE_TONE.NEUTRAL} hasDot={false}>
               {tKind(entry.kind)}
             </StatusBadge>
           </DataTableShell.Cell>

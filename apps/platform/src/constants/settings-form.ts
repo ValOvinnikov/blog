@@ -7,4 +7,4 @@ export const SETTINGS_FORM_STACK = {
 
 export type TSettingsFormStack = TValueOf<typeof SETTINGS_FORM_STACK>;
 
-export const SAVE_BAR_HEIGHT_PROPERTY = '--admin-save-bar-height';
+export const SAVE_BAR_HEIGHT_PROPERTY = '--platform-save-bar-height';

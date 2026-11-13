@@ -4,7 +4,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const emailTemplatePreviewVariants = tv({
   slots: {
     root: [
-      'overflow-x-auto rounded-admin border border-admin-line bg-admin-surface-2',
+      'overflow-x-auto rounded-platform border border-platform-line bg-platform-surface-2',
     ],
     frame: ['mx-auto block h-[560px] max-w-none bg-white'],
   },

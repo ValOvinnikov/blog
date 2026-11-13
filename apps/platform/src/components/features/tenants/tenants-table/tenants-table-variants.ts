@@ -4,7 +4,7 @@ export const tenantsTableVariants = tv({
   slots: {
     visuallyHidden: ['sr-only'],
     tname: ['flex items-center gap-2.5'],
-    name: ['text-admin-text'],
-    domain: ['text-admin-12 text-admin-muted'],
+    name: ['text-platform-text'],
+    domain: ['text-platform-12 text-platform-muted'],
   },
 });

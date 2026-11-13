@@ -12,7 +12,7 @@ import {
 const iconToggleGroupVariants = tv({
   base: [
     'inline-flex flex-none gap-0.5 p-0.5',
-    'rounded-admin-5 border border-admin-control-line bg-admin-theme-track',
+    'rounded-platform-5 border border-platform-control-line bg-platform-theme-track',
   ],
 });
 

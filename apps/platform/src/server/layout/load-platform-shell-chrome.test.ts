@@ -3,7 +3,7 @@ import { auth } from '@platform/server/auth/auth';
 import { makeEnTranslator } from '@platform/testing/en-translator';
 import type { Session } from 'next-auth';
 
-import { loadAdminShellChrome } from './load-admin-shell-chrome';
+import { loadPlatformShellChrome } from './load-platform-shell-chrome';
 
 faker.seed(5998);
 
@@ -25,7 +25,7 @@ const sessionFor = (user: { name?: string; email: string }) => ({
   expires: MOCK_SESSION_EXPIRES,
 });
 
-describe(loadAdminShellChrome, () => {
+describe(loadPlatformShellChrome, () => {
   beforeEach(() => {
     cookiesMock.mockReset();
     cookiesMock.mockResolvedValue({ get: vi.fn(() => ({ value: 'true' })) });
@@ -50,14 +50,14 @@ describe(loadAdminShellChrome, () => {
   ])('%s', async (_title, session, expected) => {
     authMock.mockResolvedValueOnce(session);
 
-    const { userName, userEmail } = await loadAdminShellChrome();
+    const { userName, userEmail } = await loadPlatformShellChrome();
 
     expect({ userName, userEmail }).toEqual(expected);
   });
 
   it('carries the sidebar preference and the nav translator', async () => {
     const { isSidebarInitiallyCollapsed, tNavSections } =
-      await loadAdminShellChrome();
+      await loadPlatformShellChrome();
 
     expect(isSidebarInitiallyCollapsed).toBe(true);
     expect(tNavSections(NAV_SECTIONS_KEY)).toBe(

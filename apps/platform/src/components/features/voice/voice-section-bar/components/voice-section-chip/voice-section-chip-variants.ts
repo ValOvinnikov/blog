@@ -7,29 +7,29 @@ export const voiceSectionChipVariants = tv({
     item: ['flex shrink-0'],
     link: [
       'flex h-11 items-center gap-2 rounded-full border px-3.5 whitespace-nowrap no-underline md:h-8 md:px-3',
-      'text-admin-13-5 leading-4 font-semibold md:text-admin-13',
+      'text-platform-13-5 leading-4 font-semibold md:text-platform-13',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
-    count: ['text-admin-12 leading-admin-15 font-medium'],
+    count: ['text-platform-12 leading-platform-15 font-medium'],
     errorPill: [
-      'inline-flex items-center justify-center gap-1 text-admin-12 leading-admin-15 font-semibold text-admin-bad',
+      'inline-flex items-center justify-center gap-1 text-platform-12 leading-platform-15 font-semibold text-platform-bad',
     ],
   },
   variants: {
     isActive: {
       false: {
         link: [
-          'border-admin-control-line bg-admin-surface text-admin-text hover:bg-admin-surface-2',
+          'border-platform-control-line bg-platform-surface text-platform-text hover:bg-platform-surface-2',
         ],
-        count: ['text-admin-muted'],
+        count: ['text-platform-muted'],
       },
       true: {
         link: [
-          'border-admin-brand bg-admin-selected text-admin-on-selected',
-          'hover:border-admin-brand-hover hover:bg-admin-selected-hover',
+          'border-platform-brand bg-platform-selected text-platform-on-selected',
+          'hover:border-platform-brand-hover hover:bg-platform-selected-hover',
         ],
-        count: ['text-admin-on-selected'],
-        errorPill: ['h-5 rounded-full bg-admin-surface px-1.5'],
+        count: ['text-platform-on-selected'],
+        errorPill: ['h-5 rounded-full bg-platform-surface px-1.5'],
       },
     },
   },

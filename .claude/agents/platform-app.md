@@ -343,8 +343,8 @@ this rule across.
 ## Tailwind
 
 - Platform chrome is styled from this app's own token layer,
-  `src/styles/admin-theme.css` (`bg-admin-surface`, `text-admin-13`,
-  `rounded-admin`). `index.css` also imports `@blog/tailwind-config/theme.css`,
+  `src/styles/platform-theme.css` (`bg-platform-surface`, `text-platform-13`,
+  `rounded-platform`). `index.css` also imports `@blog/tailwind-config/theme.css`,
   but only for `site-preview/`; a site token, a hex or a raw palette colour
   anywhere else is wrong (`platform-ui-practices` → "Colour and contrast").
 - **No class strings inline in JSX** — classes live in a module-scope `tv()`

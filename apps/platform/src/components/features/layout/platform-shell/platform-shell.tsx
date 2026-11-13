@@ -11,24 +11,24 @@ import type { ReactNode } from 'react';
 
 import { ShellFrame } from './components/shell-frame';
 
-type TAdminShellAccount = {
+type TPlatformShellAccount = {
   name: TMaybeUndefined<string>;
   email: TMaybeUndefined<string>;
   role: TAdminRole | TMembershipRole;
   scope: string;
 };
 
-export type TAdminShellProps = {
+export type TPlatformShellProps = {
   sections: TSidebarNavSection[];
   switcher?: ReactNode;
   crumb: ReactNode;
-  account: TAdminShellAccount;
+  account: TPlatformShellAccount;
   notice?: ReactNode;
   isSidebarInitiallyCollapsed?: boolean;
   children: ReactNode;
 };
 
-export const AdminShell = ({
+export const PlatformShell = ({
   sections,
   switcher,
   crumb,
@@ -36,7 +36,7 @@ export const AdminShell = ({
   notice,
   isSidebarInitiallyCollapsed = false,
   children,
-}: TAdminShellProps) => {
+}: TPlatformShellProps) => {
   const t = useTranslations('account');
   const tRole = useTranslations('roleLabel');
   const { name, email, role, scope } = account;

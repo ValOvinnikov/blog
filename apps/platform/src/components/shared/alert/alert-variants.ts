@@ -4,45 +4,47 @@ import type { VariantProps } from 'tailwind-variants';
 
 export const alertVariants = tv({
   slots: {
-    root: ['flex w-full rounded-admin border'],
+    root: ['flex w-full rounded-platform border'],
     icon: ['mt-0.5 self-start'],
     text: [],
-    title: ['block text-admin-13-5 font-semibold'],
+    title: ['block text-platform-13-5 font-semibold'],
     description: [],
     action: ['flex flex-wrap items-center gap-2'],
   },
   variants: {
     type: {
       [ALERT_TYPE.SUCCESS]: {
-        root: ['bg-admin-ok-weak border-admin-ok/30'],
-        icon: ['text-admin-ok'],
+        root: ['bg-platform-ok-weak border-platform-ok/30'],
+        icon: ['text-platform-ok'],
       },
       [ALERT_TYPE.WARNING]: {
-        root: ['bg-admin-warn-weak border-admin-warn/30'],
-        icon: ['text-admin-warn'],
+        root: ['bg-platform-warn-weak border-platform-warn/30'],
+        icon: ['text-platform-warn'],
       },
       [ALERT_TYPE.ERROR]: {
-        root: ['bg-admin-bad-weak border-admin-bad/30'],
-        icon: ['text-admin-bad'],
+        root: ['bg-platform-bad-weak border-platform-bad/30'],
+        icon: ['text-platform-bad'],
       },
       [ALERT_TYPE.INFO]: {
-        root: ['bg-admin-brand-weak border-admin-brand/30'],
-        icon: ['text-admin-brand'],
+        root: ['bg-platform-brand-weak border-platform-brand/30'],
+        icon: ['text-platform-brand'],
       },
     },
     isNote: {
       false: {
         root: [
           'flex-wrap items-center gap-3 px-4 py-3.5',
-          'shadow-admin in-data-[slot=card]:shadow-none',
+          'shadow-platform in-data-[slot=card]:shadow-none',
         ],
         text: ['min-w-50 flex-1'],
-        description: ['text-admin-muted text-admin-12-5'],
+        description: ['text-platform-muted text-platform-12-5'],
       },
       true: {
         root: ['gap-2.5 px-3.5 py-2.5'],
         text: ['min-w-0 flex-1'],
-        description: ['text-admin-13 leading-admin-19 text-admin-text'],
+        description: [
+          'text-platform-13 leading-platform-19 text-platform-text',
+        ],
       },
     },
   },
@@ -50,7 +52,7 @@ export const alertVariants = tv({
     {
       type: ALERT_TYPE.INFO,
       isNote: true,
-      class: { root: ['border-admin-brand-line'] },
+      class: { root: ['border-platform-brand-line'] },
     },
   ],
   defaultVariants: {

@@ -6,7 +6,7 @@ import {
   SIDEBAR_COLLAPSED_COOKIE,
 } from '@platform/utils/sidebar-collapsed-cookie/sidebar-collapsed-cookie';
 
-// Each gated layout calls this so `AdminShell` can stay a synchronous Server Component.
+// Each gated layout calls this so `PlatformShell` can stay a synchronous Server Component.
 export const resolveIsSidebarCollapsed = async (): Promise<boolean> => {
   const isCollapsed = await readRenamedCookie({
     name: SIDEBAR_COLLAPSED_COOKIE,

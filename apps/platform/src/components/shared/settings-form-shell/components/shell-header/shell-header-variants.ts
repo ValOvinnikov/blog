@@ -4,7 +4,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const shellHeaderVariants = tv({
   slots: {
     root: [],
-    savedStatus: ['text-admin-12 text-admin-ok'],
+    savedStatus: ['text-platform-12 text-platform-ok'],
   },
   variants: {
     stack: {
