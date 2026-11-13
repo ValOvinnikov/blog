@@ -5,7 +5,7 @@ import { toPostCard } from '@blog/service/shared/transformers/post/to-post-card'
 import {
   MOCK_POST_RELATED_MODULE_ID,
   mockRawPostRelatedModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/post-related/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_MISSING_ID,

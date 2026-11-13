@@ -1,11 +1,19 @@
-import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@blog/config/constants';
+import {
+  BRAND_VARIANT,
+  CARD_STYLE,
+  DENSITY,
+  DISPLAY_MODE,
+  GRID_COLUMNS,
+  LOCALE_ISO_CODES,
+  RADIUS_SCALE,
+} from '@blog/config/constants';
 import {
   MOCK_DUTCH_MODULE_HEADING,
   MOCK_ENGLISH_MODULE_HEADING,
   MOCK_MODULE_ID,
   mockModuleDocument,
-  mockRawPostRelatedModule,
 } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostRelatedModule } from '@blog/service/testing/modules/post-related/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import { faker } from '@faker-js/faker';
 
@@ -22,10 +30,13 @@ const MOCK_MODULE_DOCUMENT = mockModuleDocument({
   limit: MOCK_LIMIT,
 });
 
-async function runPostRelated(locale: string) {
+async function runPostRelated(
+  locale: string,
+  document: Record<string, unknown> = MOCK_MODULE_DOCUMENT,
+) {
   const raw = await evaluateGroqExpression(
     postRelatedModuleQuery.query,
-    [MOCK_MODULE_DOCUMENT],
+    [document],
     undefined,
     { id: MOCK_MODULE_ID, locale, defaultLocale: EN },
   );
@@ -57,6 +68,35 @@ describe('postRelatedModuleQuery', () => {
     it('defaults showImages to true for a document authored without it', () => {
       expect(postRelated.showImages).toBe(true);
     });
+  });
+
+  it('reads no appearance or display mode from an unauthored document', async () => {
+    const postRelated = await runPostRelated(EN);
+
+    expect(postRelated).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+      columns: null,
+      displayMode: null,
+    });
+  });
+
+  it('reads the authored appearance and display mode', async () => {
+    const authored = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.TWO,
+      displayMode: DISPLAY_MODE.CAROUSEL,
+    };
+
+    const postRelated = await runPostRelated(EN, {
+      ...MOCK_MODULE_DOCUMENT,
+      ...authored,
+    });
+
+    expect(postRelated).toMatchObject(authored);
   });
 
   it('picks the heading in the visitor language', async () => {

@@ -30,7 +30,6 @@ import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-
 import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
 import type { TRawLogoWallModule } from '@blog/service/features/modules/logo-wall/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
-import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
 import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawSectionPagesModule } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
 import type { TRawSectionPages } from '@blog/service/features/modules/section-pages/adaptor/pages/transformer';
@@ -70,7 +69,6 @@ export const MOCK_CTA_MODULE_ID = 'cta-1';
 export const MOCK_FAQ_MODULE_ID = 'faq-1';
 export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
 export const MOCK_NEWSLETTER_MODULE_ID = 'newsletter-1';
-export const MOCK_POST_RELATED_MODULE_ID = 'post-related-1';
 export const MOCK_PRICING_MODULE_ID = 'pricing-1';
 export const MOCK_SECTION_PAGES_MODULE_ID = 'section-pages-1';
 export const MOCK_SECTION_PAGES_PARENT_ID = 'page-modules';
@@ -240,20 +238,6 @@ export function mockRawSectionPage(
       supportingText: 'Answers to common questions.',
     }),
     image: mockRawSanityImage(),
-    ...overrides,
-  };
-}
-
-export function mockRawPostRelatedModule(
-  overrides: Partial<TRawPostRelatedModule> = {},
-): TRawPostRelatedModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Related reading'),
-    limit: 3,
-    layout: null,
-    contentAlignment: null,
-    showImages: true,
     ...overrides,
   };
 }
