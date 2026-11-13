@@ -147,7 +147,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@blog/config/constants` — `packages/config/src/constants/http-statuses.ts`
 
-- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `CONFLICT`=`409`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
+- **HTTP_STATUS**: `OK`=`200`, `CREATED`=`201`, `ACCEPTED`=`202`, `NO_CONTENT`=`204`, `MOVED_PERMANENTLY`=`301`, `SEE_OTHER`=`303`, `TEMPORARY_REDIRECT`=`307`, `BAD_REQUEST`=`400`, `UNAUTHORIZED`=`401`, `PAYMENT_REQUIRED`=`402`, `FORBIDDEN`=`403`, `NOT_FOUND`=`404`, `CONFLICT`=`409`, `TOO_MANY_REQUESTS`=`429`, `INTERNAL_SERVER_ERROR`=`500`, `BAD_GATEWAY`=`502`, `SERVICE_UNAVAILABLE`=`503`
 
 ### `@blog/config/constants` — `packages/config/src/constants/icon.ts`
 

@@ -39,6 +39,7 @@ vi.mock('@blog/db', async () => ({
 }));
 
 const MOCK_UNKNOWN_HOST = faker.internet.domainName();
+const MOCK_SECONDARY_HOST = faker.internet.domainName();
 
 const MOCK_LIVE_LOCALES = [LOCALE_ISO_CODES.EN, LOCALE_ISO_CODES.DE];
 
@@ -288,32 +289,62 @@ describe(resolveTenantId, () => {
 });
 
 describe(resolveTenantRouting, () => {
-  it('resolves the routing for the tenant owning the host', async () => {
-    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
-      MOCK_TENANT,
-    );
-    vi.mocked(queries.tenants.selectLiveLocales).mockReturnValue(
-      MOCK_LIVE_LOCALES,
-    );
-
-    await expect(resolveTenantRouting(MOCK_TENANT_HOST)).resolves.toEqual({
-      tenant: MOCK_TENANT,
-      tenantId: MOCK_TENANT_ID,
-      defaultLocale: MOCK_TENANT.locale,
-      liveLocales: MOCK_LIVE_LOCALES,
+  describe('for a host a tenant owns', () => {
+    beforeEach(() => {
+      vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+        MOCK_TENANT,
+      );
     });
-    expect(queries.tenants.selectLiveLocales).toHaveBeenCalledWith(MOCK_TENANT);
+
+    it('resolves the routing for the tenant owning the host', async () => {
+      vi.mocked(queries.tenants.selectLiveLocales).mockReturnValue(
+        MOCK_LIVE_LOCALES,
+      );
+
+      await expect(resolveTenantRouting(MOCK_TENANT_HOST)).resolves.toEqual({
+        tenant: MOCK_TENANT,
+        tenantId: MOCK_TENANT_ID,
+        defaultLocale: MOCK_TENANT.locale,
+        liveLocales: MOCK_LIVE_LOCALES,
+        isSecondaryHost: false,
+      });
+      expect(queries.tenants.selectLiveLocales).toHaveBeenCalledWith(
+        MOCK_TENANT,
+      );
+    });
+
+    it('marks a host that is not its main address as secondary', async () => {
+      await expect(
+        resolveTenantRouting(MOCK_SECONDARY_HOST),
+      ).resolves.toMatchObject({ isSecondaryHost: true });
+    });
   });
 
-  it('resolves undefined when no tenant resolves for the host', async () => {
-    vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
-      undefined,
-    );
-    vi.mocked(queries.tenants.listTenants).mockResolvedValue([]);
+  describe('for a host no tenant owns', () => {
+    beforeEach(() => {
+      vi.mocked(queries.tenantDomains.getTenantByDomain).mockResolvedValue(
+        undefined,
+      );
+    });
 
-    await expect(
-      resolveTenantRouting(MOCK_UNKNOWN_HOST),
-    ).resolves.toBeUndefined();
-    expect(queries.tenants.selectLiveLocales).not.toHaveBeenCalled();
+    it('never marks the sole-tenant fallback as secondary', async () => {
+      vi.mocked(queries.tenants.listTenants).mockResolvedValue([MOCK_TENANT]);
+
+      await expect(
+        resolveTenantRouting(MOCK_UNKNOWN_HOST),
+      ).resolves.toMatchObject({
+        tenantId: MOCK_TENANT_ID,
+        isSecondaryHost: false,
+      });
+    });
+
+    it('resolves undefined with no sole tenant to fall back to', async () => {
+      vi.mocked(queries.tenants.listTenants).mockResolvedValue([]);
+
+      await expect(
+        resolveTenantRouting(MOCK_UNKNOWN_HOST),
+      ).resolves.toBeUndefined();
+      expect(queries.tenants.selectLiveLocales).not.toHaveBeenCalled();
+    });
   });
 });

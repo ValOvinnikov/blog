@@ -175,6 +175,7 @@ const tenantRouting = (
   tenantId: MOCK_TENANT_ID,
   defaultLocale,
   liveLocales,
+  isSecondaryHost: false,
 });
 
 const rewriteToDefaultLocale = (
@@ -645,6 +646,26 @@ describe(proxy, () => {
           { host: MOCK_TENANT_HOST, error: MOCK_ERROR },
         );
       });
+    });
+  });
+
+  describe('on an address that is not the main one', () => {
+    beforeEach(() => {
+      resolveTenantRoutingMock.mockResolvedValue({
+        ...tenantRouting(),
+        isSecondaryHost: true,
+      });
+    });
+
+    it('moves permanently to the main address, keeping the path and query', async () => {
+      const response = await visit(`${BLOG_POST_PATH}${MOCK_QUERY}`, {
+        host: MOCK_UNKNOWN_HOST,
+      });
+
+      expect(response.status).toBe(HTTP_STATUS.MOVED_PERMANENTLY);
+      expect(response.headers.get('location')).toBe(
+        `https://${MOCK_TENANT_HOST}${BLOG_POST_PATH}${MOCK_QUERY}`,
+      );
     });
   });
 
