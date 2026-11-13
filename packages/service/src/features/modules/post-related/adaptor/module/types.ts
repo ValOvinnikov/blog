@@ -15,5 +15,5 @@ export type TPostRelatedModuleDocument = TModuleAppearance & {
   layout: TMaybeUndefined<TWideLayout>;
   contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   showImages: boolean;
-  displayMode: TDisplayMode;
+  displayMode?: TDisplayMode;
 };
