@@ -1,7 +1,7 @@
 'use client';
 
 import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
 import { createContext, useContext, type ReactNode } from 'react';
 
 const TenantPlanContext =

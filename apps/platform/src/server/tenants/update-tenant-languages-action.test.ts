@@ -5,8 +5,8 @@ import {
   ERROR_CODE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';

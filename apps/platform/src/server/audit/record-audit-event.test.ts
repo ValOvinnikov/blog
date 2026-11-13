@@ -1,5 +1,5 @@
 import { AUDIT_ACTION, AUDIT_TARGET_TYPE } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';

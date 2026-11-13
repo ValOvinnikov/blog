@@ -1,4 +1,5 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import {
   tenantPlanEnum,
   tenants,

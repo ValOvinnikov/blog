@@ -2,12 +2,12 @@ import {
   LANGUAGE_SWITCHER_STYLE,
   PRESET_REGISTRY,
   type TPresetId,
+  type TTenantPlan,
 } from '@blog/config/constants';
 import {
   LOOK_FIELDS,
   PLAN_ENTITLEMENTS,
   type TLookField,
-  type TTenantPlan,
 } from '@blog/db/constants';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config/get-site-config';
 

@@ -1,5 +1,6 @@
 import { TENANT_CONFIG_REVALIDATE_SECONDS } from '@blog/config';
-import { queries, type TTenantPlan } from '@blog/db';
+import type { TTenantPlan } from '@blog/config/constants';
+import { queries } from '@blog/db';
 import { safeAsync } from '@blog/utils';
 import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { buildTenantPlanCacheTag } from '@web/utils/tenant-cache-tags';

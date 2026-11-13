@@ -4,13 +4,9 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  type TMembershipRole,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { EMAIL_CONFIG_LOG } from '@platform/constants/email-config';
 import { EMAIL_SENDER_FIELD_ERROR } from '@platform/constants/email-sender';

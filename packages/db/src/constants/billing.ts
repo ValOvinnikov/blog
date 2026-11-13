@@ -1,11 +1,8 @@
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
 import type { TValueOf } from '@blog/config/utils';
 
-import {
-  SUBSCRIBER_BAND_CEILINGS,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from './tenant';
+import { SUBSCRIBER_BAND_CEILINGS } from './tenant';
 
 export const TRIAL_LENGTH_DAYS = 14;
 

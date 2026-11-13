@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import {

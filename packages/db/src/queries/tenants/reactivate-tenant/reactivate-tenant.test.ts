@@ -1,8 +1,7 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
 import {
   INACTIVITY_STAGE,
   SUSPENSION_REASON,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
 } from '@blog/db/constants';

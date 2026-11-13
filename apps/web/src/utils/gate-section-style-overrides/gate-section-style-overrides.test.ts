@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   MOCK_NO_SECTION_STYLE_OVERRIDES,
   MOCK_SECTION_STYLE_OVERRIDES,

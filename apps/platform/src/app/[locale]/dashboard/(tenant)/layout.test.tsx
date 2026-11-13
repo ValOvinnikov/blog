@@ -1,4 +1,5 @@
-import { ADMIN_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { ADMIN_ROLE } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { auth } from '@platform/server/auth/auth';
@@ -21,7 +22,7 @@ import {
 } from '@platform/testing/tenants/fixtures';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import DashboardTenantLayout from './layout';
 
@@ -91,7 +92,10 @@ const setup = customRenderAsync(DashboardTenantLayout, {
 });
 
 describe(`<${DashboardTenantLayout.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     getAdminByUserIdMock.mockResolvedValue(undefined);
     listTenantsMock.mockResolvedValue([MOCK_FREE_TENANT]);
     countLeadsForTenantMock.mockResolvedValue(0);
@@ -184,7 +188,6 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
     );
     listMembershipsWithTenantsForUserMock.mockResolvedValue([]);
 
-    const user = userEvent.setup();
     await setup();
     const session = await auth();
 

@@ -1,10 +1,12 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@blog/config/constants';
 import {
   STRIPE_PRICE_LOOKUP_KEY,
-  TENANT_PLAN,
   TENANT_PLAN_WRITE_OUTCOME,
   TENANT_STATUS,
-  type TTenantPlan,
 } from '@blog/db/constants';
 import { MOCK_EMPTY_TENANT_BILLING } from '@blog/db/testing/tenants/billing';
 import {

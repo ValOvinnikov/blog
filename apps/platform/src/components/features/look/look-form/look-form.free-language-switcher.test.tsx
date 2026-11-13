@@ -1,5 +1,5 @@
 import { LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW } from '@platform/constants/look-row';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED, ARIA_PRESSED } from '@platform/testing/aria';

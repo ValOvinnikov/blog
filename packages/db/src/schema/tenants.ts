@@ -1,6 +1,5 @@
-import { LOCALE_ISO_CODES, SITE_TYPE } from '@blog/config/constants';
+import { LOCALE_ISO_CODES, SITE_TYPE, TENANT_PLAN } from '@blog/config';
 import {
-  TENANT_PLAN,
   TENANT_STATUS,
   type TDeprovisioningStep,
   type TElevateTenantOwnerOutcome,

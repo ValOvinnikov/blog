@@ -1,9 +1,5 @@
-import {
-  DAY_MS,
-  TENANT_PLAN,
-  TENANT_STATUS,
-  TRIAL_LENGTH_DAYS,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { DAY_MS, TENANT_STATUS, TRIAL_LENGTH_DAYS } from '@blog/db/constants';
 
 export function selfServeTrialValues(createdAt: Date) {
   return {

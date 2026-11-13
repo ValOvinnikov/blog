@@ -1,5 +1,5 @@
 import type { TLocaleIsoCode } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { routing } from '@platform/i18n/routing';
 import { useState } from 'react';
 
@@ -22,15 +22,12 @@ const INITIAL_VALUES: TTenantDetailsValues = {
 export const useTenantDetailsValues = (onOwnerEmailChange: () => void) => {
   const [values, setValues] = useState<TTenantDetailsValues>(INITIAL_VALUES);
 
-  const updateField = <K extends keyof TTenantDetailsValues>(
-    key: K,
-    value: TTenantDetailsValues[K],
-  ) => {
-    setValues((prev) => ({ ...prev, [key]: value }));
-    if (key === 'ownerEmail') {
+  const updateValues = (patch: Partial<TTenantDetailsValues>) => {
+    setValues((prev) => ({ ...prev, ...patch }));
+    if ('ownerEmail' in patch) {
       onOwnerEmailChange();
     }
   };
 
-  return { values, updateField };
+  return { values, updateValues };
 };

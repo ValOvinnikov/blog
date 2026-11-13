@@ -92,20 +92,21 @@ Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator se
 - Seats: `createMembershipInvite` refuses a new invite with the `MEMBERSHIP_INVITE_OUTCOME.SEAT_LIMIT` outcome, writing nothing, once the tenant's memberships plus pending invites reach the plan's `seats`. Two invites sent at once can both pass that check, so each re-counts the tenant's memberships plus pending invites in a fresh statement after inserting; while the count is over the plan's `seats`, the invite deletes itself and returns `SEAT_LIMIT`, whatever its rank. The tenant never ends over its limit: if two racing invites both see the overflow, both are refused and the owner retries. A caller sends the invite email only for a `CREATED` result. A re-invite of an address already invited reports that invite, even at the limit. Accepting an invite (`consumeMembershipInvite`) and seating the owner at tenant creation never check the limit, because the invite already holds its seat and the owner is always within it. A downgrade removes no membership or invite; it only refuses new ones until the tenant is under the limit.
 - A reader account exists only while `READER_ACCOUNTS` is on, so a `FREE` or `STARTER` site has none.
 - Saving a tenant's details (plan, default language, domain) or its additional languages calls the revalidation route, so the site serves the change on its next load. A failed call is logged and does not fail the save; the site then catches up within 3600s.
-- `PLAN_REGISTRY` lives in `@blog/db` because it keys off `TENANT_PLAN`, which `db` owns and `config` cannot import.
+- `TENANT_PLAN` lives in `@blog/config` because `@blog/studio` reads it; `PLAN_REGISTRY` and the other plan maps stay in `@blog/db`, read only by `db` and the apps above it.
 - `TENANT_PLAN` backs a pgEnum: reordering it reorders the enum, and a new plan needs a migration plus entries in every `Record<TTenantPlan, …>` map.
 - A new Growth-only Look column joins `LOOK_FIELDS` and the effective-Look fallback in the change that adds it.
 - A new capability means a `CAPABILITY` key, every `Record<TCapability, …>` map, a `settings_features` column with its migration, a `CAPABILITY_TOGGLES` row and the mapping in `to-effective-settings-features`.
 
 ## Dependencies
 
-- Layers: `config` (`CAPABILITY`, preset `featureDefaults`), `db`, `studio`, `web`, `platform`.
+- Layers: `config` (`TENANT_PLAN`, `CAPABILITY`, preset `featureDefaults`), `db`, `studio`, `web`, `platform`.
 - Features: [multi-tenancy](./multi-tenancy.md), [tenant-access](./tenant-access.md), [platform-shell](./platform-shell.md), [embedded-studio](./embedded-studio.md), [languages](./languages.md), [look](./look.md) (presets carry the feature defaults), [bookmarks](./bookmarks.md), [newsletter](./newsletter.md), [comments-and-ratings](./comments-and-ratings.md), [consent-and-analytics](./consent-and-analytics.md), [reader-account](./reader-account.md), [email](./email.md), [rendering-and-caching](./rendering-and-caching.md).
 - Env: `SITE_CONFIG_REVALIDATE_SECRET` (both apps), `WEB_APP_URL` (platform), `WEB_ANALYTICS_ENABLED` (web, ANDed with `ANALYTICS`), `PRODUCT_NAME` (web and platform) and `MARKETING_SITE_URL` (web), for the powered-by mark.
 
 ## Entry points
 
-- `packages/db/src/constants/tenant.ts` — `TENANT_PLAN`, `PLAN_REGISTRY`, `PLAN_LOCALE_LIMIT`, `PLAN_MONTHLY_SENDS_PER_SUBSCRIBER`, `SUBSCRIBER_BAND_CEILINGS`, `PLAN_ENTITLEMENTS`
+- `packages/config/src/constants/tenant-plan.ts` — `TENANT_PLAN`
+- `packages/db/src/constants/tenant.ts` — `PLAN_REGISTRY`, `PLAN_LOCALE_LIMIT`, `PLAN_MONTHLY_SENDS_PER_SUBSCRIBER`, `SUBSCRIBER_BAND_CEILINGS`, `PLAN_ENTITLEMENTS`
 - `packages/db/src/utils/monthly-send-allowance/monthly-send-allowance.ts` — `monthlySendAllowance`
 - `packages/db/src/constants/billing.ts` — `STRIPE_PRICE_LOOKUP_KEY`, `PLAN_PRICE_LOOKUP_KEYS`
 - `packages/db/src/queries/tenants/get-tenant-billing/`, `set-tenant-billing/` — the tenant's billing state

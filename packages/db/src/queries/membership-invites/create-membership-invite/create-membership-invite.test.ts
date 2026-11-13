@@ -1,8 +1,8 @@
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   MEMBERSHIP_INVITE_OUTCOME,
   MEMBERSHIP_ROLE,
   PLAN_ENTITLEMENTS,
-  TENANT_PLAN,
 } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TMembershipInvite } from '@blog/db/schema/membership-invites';

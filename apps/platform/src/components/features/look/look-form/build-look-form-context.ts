@@ -1,9 +1,6 @@
 import { isAccentHueAccessible, type TPresetId } from '@blog/config';
-import {
-  LOOK_FIELDS,
-  type TLookField,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
+import { LOOK_FIELDS, type TLookField } from '@blog/db/constants';
 import { isLookFieldEntitled } from '@blog/db/utils/effective-look/effective-look';
 import type { TLookFormContext } from '@platform/components/features/look/look-form-provider';
 import type { TLookCard } from '@platform/constants/look-card';

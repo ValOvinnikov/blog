@@ -5,9 +5,9 @@ import {
   LOCALE_ISO_CODES,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   TENANT_DETAILS_UPDATE_OUTCOME,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';

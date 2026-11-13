@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';

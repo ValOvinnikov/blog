@@ -21,8 +21,8 @@ import {
   PRESET_ID,
   RADIUS_SCALE,
   SPINNER_STYLE,
+  TENANT_PLAN,
 } from '@blog/config/constants';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { MOCK_ACCENT_HUE } from '@blog/db/testing/site-config/fixtures';
 import { faker } from '@faker-js/faker';
 

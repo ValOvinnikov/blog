@@ -3,8 +3,9 @@ import {
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   PRESET_ID,
+  TENANT_PLAN,
 } from '@blog/config/constants';
-import { EMAIL_TEMPLATE_DEFAULT_COPY, TENANT_PLAN } from '@blog/db/constants';
+import { EMAIL_TEMPLATE_DEFAULT_COPY } from '@blog/db/constants';
 import type { TEmailConfigResult } from '@blog/db/queries/email-config/get-email-config/get-email-config';
 import type { TEmailTemplateResult } from '@blog/db/queries/email-templates/get-email-template/get-email-template';
 import type { TTenant } from '@blog/db/schema/tenants';

@@ -1,6 +1,6 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { sendEmail } from '@blog/email';
 import type * as TEmail from '@blog/email';
 import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
@@ -112,21 +112,23 @@ describe(submitContactMessage, () => {
     expect(queries.leads.createLead).toHaveBeenCalledWith(mockLeadInput());
   });
 
-  it('emails the tenant recipient with Reply-To set to the visitor', async () => {
-    await submit();
+  describe('once submitted', () => {
+    beforeEach(async () => {
+      await submit();
+    });
 
-    const { to, replyTo } = firstSentEmail(vi.mocked(sendEmail));
-    expect(sendEmail).toHaveBeenCalledOnce();
-    expect(to).toBe(MOCK_RECIPIENT);
-    expect(replyTo).toBe(MOCK_CONTACT_MESSAGE.email);
-  });
+    it('emails the tenant recipient with Reply-To set to the visitor', async () => {
+      const { to, replyTo } = firstSentEmail(vi.mocked(sendEmail));
+      expect(sendEmail).toHaveBeenCalledOnce();
+      expect(to).toBe(MOCK_RECIPIENT);
+      expect(replyTo).toBe(MOCK_CONTACT_MESSAGE.email);
+    });
 
-  it('reads the capability toggles of the resolved tenant', async () => {
-    await submit();
-
-    expect(queries.settingsFeatures.getSettingsFeatures).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-    );
+    it('reads the capability toggles of the resolved tenant', async () => {
+      expect(queries.settingsFeatures.getSettingsFeatures).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+      );
+    });
   });
 
   it.each([

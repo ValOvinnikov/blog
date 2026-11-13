@@ -7,7 +7,7 @@ import {
   NEXT_NAVIGATION_ERROR,
   RESERVED_SUBDOMAINS,
 } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { DOMAIN_AVAILABILITY } from '@platform/constants/domain';

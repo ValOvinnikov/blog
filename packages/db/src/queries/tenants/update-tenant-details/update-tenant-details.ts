@@ -1,11 +1,10 @@
-import type { TMaybeUndefined, TOutcome } from '@blog/config';
+import type { TMaybeUndefined, TOutcome, TTenantPlan } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import {
   PROVISIONING_STATE,
   TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
