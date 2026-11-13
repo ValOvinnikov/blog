@@ -15,8 +15,8 @@ export const phoneSaveFooterVariants = tv({
     ],
     save: [
       'ml-auto min-w-29',
-      'disabled:border-admin-brand-line disabled:bg-admin-brand-line disabled:text-admin-brand-strong disabled:opacity-100',
-      'aria-busy:border-admin-brand-line aria-busy:bg-admin-brand-line aria-busy:text-admin-brand-strong',
+      'disabled:border-admin-control-line-locked disabled:bg-admin-pill-neutral disabled:text-admin-muted disabled:shadow-none disabled:opacity-100',
+      'aria-busy:border-admin-control-line-locked aria-busy:bg-admin-pill-neutral aria-busy:text-admin-muted aria-busy:shadow-none',
     ],
   },
   variants: {

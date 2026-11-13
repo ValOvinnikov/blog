@@ -278,7 +278,7 @@ save still settles as the form's generic server error.
   and chevrons only. A nav row rests in `side-text` with a `side-muted`
   icon (a colour, never an opacity) and hovers to a `side-line` ground; the
   current page's row is a `side-raised` plate with the raised shadow, its
-  text and icon `text-strong` at 600, and a 3px `side-accent` bar on its left
+  text and icon `brand-ink` at 600, and a 3px `side-accent` bar on its left
   edge, on the collapsed rail too. A focused row keeps its rest colours and
   shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
   An inert row (no destination) keeps the rest colours with no hover ground,
@@ -379,18 +379,24 @@ save still settles as the form's generic server error.
   `brand-ink` are near-black (#12141a) with `brand-strong`/`brand-hover`
   #2a303b, and yellow is the highlight: `brand-weak` #fff1c2, `brand-line`
   #ffd766 and `highlight` #ffc233. In Dark, yellow leads: `brand` #ffc233,
-  `brand-ink` #ffd466, `brand-strong` #ffe08a, `brand-hover` #ffcf5c,
-  `brand-weak` #33290d, `brand-line` #5c4a14. `side-accent` and
-  `follow-mark` follow `brand`; `rail-accent` is #ffc233 in both; `note-line`
+  `brand-ink` #ffdc7a (lifted from #ffd466 so a focused field's border keeps 3:1 against its resting border), `brand-strong` #ffe08a, `brand-hover` #ffcf5c,
+  `brand-weak` #33290d, `brand-line` #5c4a14. `side-accent` follows `brand`;
+  the Look preview's `follow-mark` is #ffc233 with a `follow-mark-ink`
+  #12141a edge and label in both themes, since it sits over a site preview
+  whose scheme is its own; `rail-accent` is #ffc233 in both; `note-line`
   is `brand` at 30%. `warn` is orange (#9a3d0b on #fdeee4 / #ffa066 on
   #2e1a10), so a warning never reads as the brand; `ok` and `bad` are
-  unchanged. A primary button, an avatar, the active step and the follow
-  mark's tag put `on-brand-ink` on `brand`. A selected chip or jump-index tab
+  unchanged. A primary button, an avatar and the active step put
+  `on-brand-ink` on `brand`. A selected chip or jump-index tab
   is `on-selected` on `selected` (`selected-hover` on hover): solid near-black
   with a white label in Light, `brand-ink` yellow on the dark yellow tint in
-  Dark, so yellow is never a selected fill in Light. A switch that is on has
+  Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
   a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
-  focused field takes a `brand-ink` border and a 3px `brand-line` glow. A link
+  focused field takes a `brand-ink` border, kept over an invalid field's
+  `bad-line` border, and a 3px `brand-line` glow (`shadow-admin-focus-glow`).
+  The phone save footer's disabled or busy Save is the neutral
+  `pill-neutral` ground with `muted` text and a `control-line-locked`
+  border. A link
   is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px
   below it. The sidebar's current row is `side-raised` with a `side-accent`
   bar and `brand-ink` text.

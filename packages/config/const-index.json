@@ -10140,6 +10140,12 @@
         "file": "apps/platform/src/constants/device-frame.ts"
       },
       {
+        "ref": "LOOK_FOLLOW_MARK.EDGE_WIDTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/look-follow",
+        "file": "apps/platform/src/constants/look-follow.ts"
+      },
+      {
         "ref": "LOOK_FOLLOW_LIMIT.SCROLL_TOLERANCE",
         "scope": "app:platform",
         "from": "@platform/constants/look-follow",

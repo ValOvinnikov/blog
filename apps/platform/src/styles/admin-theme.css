@@ -37,7 +37,8 @@
   --admin-side-muted: #5b6472;
   --admin-side-raised: #ffffff;
   --admin-side-accent: #12141a;
-  --admin-follow-mark: #12141a;
+  --admin-follow-mark: #ffc233;
+  --admin-follow-mark-ink: #12141a;
   --admin-side-field: #ffffff;
   --admin-side-field-line: #7c8493;
   --admin-rail: #0f1115;
@@ -130,7 +131,7 @@
   --admin-muted: #a3abb8;
   --admin-faint: #8590a0;
   --admin-brand: #ffc233;
-  --admin-brand-ink: #ffd466;
+  --admin-brand-ink: #ffdc7a;
   --admin-brand-strong: #ffe08a;
   --admin-brand-weak: #33290d;
   --admin-brand-line: #5c4a14;
@@ -138,7 +139,7 @@
   --admin-on-brand-ink: #0f1115;
   --admin-selected: #33290d;
   --admin-selected-hover: #40330f;
-  --admin-on-selected: #ffd466;
+  --admin-on-selected: #ffdc7a;
   --admin-ok: #6ee7a7;
   --admin-ok-weak: #10291d;
   --admin-warn: #ffa066;
@@ -152,7 +153,6 @@
   --admin-side-muted: #8d96a6;
   --admin-side-raised: #20242e;
   --admin-side-accent: #ffc233;
-  --admin-follow-mark: #ffc233;
   --admin-side-field: #171a20;
   --admin-side-field-line: #737d8d;
   --admin-popover: #262b35;
@@ -212,7 +212,7 @@
     --admin-muted: #a3abb8;
     --admin-faint: #8590a0;
     --admin-brand: #ffc233;
-    --admin-brand-ink: #ffd466;
+    --admin-brand-ink: #ffdc7a;
     --admin-brand-strong: #ffe08a;
     --admin-brand-weak: #33290d;
     --admin-brand-line: #5c4a14;
@@ -220,7 +220,7 @@
     --admin-on-brand-ink: #0f1115;
     --admin-selected: #33290d;
     --admin-selected-hover: #40330f;
-    --admin-on-selected: #ffd466;
+    --admin-on-selected: #ffdc7a;
     --admin-ok: #6ee7a7;
     --admin-ok-weak: #10291d;
     --admin-warn: #ffa066;
@@ -234,7 +234,6 @@
     --admin-side-muted: #8d96a6;
     --admin-side-raised: #20242e;
     --admin-side-accent: #ffc233;
-    --admin-follow-mark: #ffc233;
     --admin-side-field: #171a20;
     --admin-side-field-line: #737d8d;
     --admin-popover: #262b35;
@@ -297,6 +296,7 @@
   --color-admin-faint: var(--admin-faint);
   --color-admin-brand: var(--admin-brand);
   --color-admin-follow-mark: var(--admin-follow-mark);
+  --color-admin-follow-mark-ink: var(--admin-follow-mark-ink);
   --color-admin-brand-ink: var(--admin-brand-ink);
   --color-admin-brand-strong: var(--admin-brand-strong);
   --color-admin-brand-weak: var(--admin-brand-weak);
@@ -436,4 +436,5 @@
   --shadow-admin-glyph: var(--admin-shadow-glyph);
   --shadow-admin-thumb: var(--admin-shadow-thumb);
   --shadow-admin-choice-ring: 0 0 0 3px var(--admin-brand-weak);
+  --shadow-admin-focus-glow: 0 0 0 3px var(--admin-brand-line);
 }
