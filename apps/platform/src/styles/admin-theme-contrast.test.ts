@@ -30,7 +30,7 @@ const hexTokensOf = (selector: string) =>
   new Map(
     [
       ...blockOf(selector).matchAll(
-        /--(admin-[a-z0-9-]+):\s*(#[0-9a-f]{6});/gi,
+        /--(admin-[a-z0-9-]+):\s*(#[0-9a-f]{6}|var\(--admin-[a-z0-9-]+\));/gi,
       ),
     ].map(([, name, hex]) => [name, hex]),
   );
@@ -38,13 +38,21 @@ const hexTokensOf = (selector: string) =>
 const lightTokens = hexTokensOf(LIGHT_SELECTOR);
 const darkTokens = new Map([...lightTokens, ...hexTokensOf(DARK_SELECTOR)]);
 
-const colourIn =
-  (tokens: ReturnType<typeof hexTokensOf>) => (token: string) => {
-    const hex = tokens.get(token);
-    if (!hex) throw new Error(`--${token} has no hex value`);
+const ALIAS = /^var\(--(admin-[a-z0-9-]+)\)$/;
 
-    return hexToOklch(hex);
-  };
+const hexOf = (
+  tokens: ReturnType<typeof hexTokensOf>,
+  token: string,
+): string => {
+  const value = tokens.get(token);
+  if (!value) throw new Error(`--${token} has no hex value`);
+  const alias = ALIAS.exec(value)?.[1];
+
+  return alias ? hexOf(tokens, alias) : value;
+};
+
+const colourIn = (tokens: ReturnType<typeof hexTokensOf>) => (token: string) =>
+  hexToOklch(hexOf(tokens, token));
 
 const TOKEN = {
   BAD: 'admin-bad',
@@ -83,6 +91,8 @@ const TOKEN = {
   SIDE_MUTED: 'admin-side-muted',
   SIDE_RAISED: 'admin-side-raised',
   SIDE_TEXT: 'admin-side-text',
+  SPINNER_ON_BRAND_LINE: 'admin-spinner-on-brand-line',
+  SPINNER_ON_BRAND_LIT: 'admin-spinner-on-brand-lit',
   SURFACE: 'admin-surface',
   SURFACE_2: 'admin-surface-2',
   SURFACE_HEAD: 'admin-surface-head',
@@ -196,6 +206,18 @@ const SHARED_PAIRS: readonly TPair[] = [
     BOUNDARY,
   ],
   ['Running step number', TOKEN.ON_BRAND_INK, TOKEN.WARN, TEXT],
+  [
+    'Spinner lit half on primary',
+    TOKEN.SPINNER_ON_BRAND_LIT,
+    TOKEN.BRAND,
+    BOUNDARY,
+  ],
+  [
+    'Spinner unlit half on primary',
+    TOKEN.SPINNER_ON_BRAND_LINE,
+    TOKEN.BRAND,
+    BOUNDARY,
+  ],
   ['Selected chip border on page', TOKEN.BRAND, TOKEN.BG, BOUNDARY],
   ['Selected chip hover border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],

@@ -4,9 +4,10 @@ import {
   type TOutcome,
   type TReasonedFailure,
 } from '@blog/config';
-import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
+import { TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { TENANT_LOG, TENANT_REFUSAL } from '@platform/constants/tenant';
+import { getPlatformTenant } from '@platform/server/tenants/get-platform-tenant';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { logger } from '@platform/utils/logger/logger';
 
@@ -32,11 +33,11 @@ export const resolveSuspendableTenant = async (
   tenantId: string,
   status: TSuspensionStatus,
 ): Promise<TResolveSuspendableTenantResult> => {
-  const tenant = await queries.tenants.getTenantById(tenantId, {
+  const tenant = await getPlatformTenant(tenantId, {
     includeArchived: true,
   });
   if (!tenant) return refused(TENANT_REFUSAL.NOT_FOUND);
-  if (tenant.deprovisionedAt || tenant.status === TENANT_STATUS.ARCHIVED) {
+  if (tenant.isArchived || tenant.status === TENANT_STATUS.ARCHIVED) {
     return refused(TENANT_REFUSAL.ARCHIVED);
   }
   if (

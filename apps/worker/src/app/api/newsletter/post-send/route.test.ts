@@ -8,6 +8,7 @@ import {
 import {
   MOCK_ENQUEUE_SECRET,
   MOCK_FORGED_SECRET,
+  MOCK_NEWSLETTER_ENQUEUE_SECRET,
   MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
@@ -43,7 +44,7 @@ vi.mock('@blog/db/queries/tenants');
 
 function postSendRequest(
   body: Record<string, unknown> = MOCK_BODY,
-  secret: string = MOCK_ENQUEUE_SECRET,
+  secret: string = MOCK_NEWSLETTER_ENQUEUE_SECRET,
 ): Request {
   return mockSignedRequest(MOCK_POST_SEND_URL, JSON.stringify(body), {
     secret,
@@ -53,6 +54,7 @@ function postSendRequest(
 describe('POST /api/newsletter/post-send', () => {
   beforeEach(() => {
     mockEnv.WORKER_ENQUEUE_SECRET = MOCK_ENQUEUE_SECRET;
+    mockEnv.WORKER_NEWSLETTER_ENQUEUE_SECRET = MOCK_NEWSLETTER_ENQUEUE_SECRET;
     vi.mocked(getTenantById).mockResolvedValue(
       mockProvisionedTenant({ sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN }),
     );
@@ -83,8 +85,11 @@ describe('POST /api/newsletter/post-send', () => {
     expect(start).not.toHaveBeenCalled();
   });
 
-  it('refuses a request signed with the wrong secret', async () => {
-    const response = await POST(postSendRequest(undefined, MOCK_FORGED_SECRET));
+  it.each([
+    ['a forged secret', MOCK_FORGED_SECRET],
+    ["the other routes' enqueue secret", MOCK_ENQUEUE_SECRET],
+  ])('refuses a request signed with %s', async (_label, secret) => {
+    const response = await POST(postSendRequest(undefined, secret));
 
     expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
     expect(start).not.toHaveBeenCalled();

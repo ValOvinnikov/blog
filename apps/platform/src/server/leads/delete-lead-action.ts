@@ -8,7 +8,7 @@ import {
   LEAD_REFUSAL,
   type TLeadRefusal,
 } from '@platform/constants/lead';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -34,7 +34,7 @@ export const deleteLeadAction = async (
     return { outcome: ACTION_OUTCOME.INVALID, fieldErrors: {} };
   }
 
-  const { tenant } = await requireTenantOwner(parsed.data.tenantId);
+  const { tenant } = await requireTenantManager(parsed.data.tenantId);
 
   try {
     const isDeleted = await queries.leads.deleteLead({

@@ -1,29 +1,27 @@
 import 'server-only';
 
 import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
-import {
-  type TPlatformTenant,
-  toPlatformTenant,
-} from '@platform/utils/platform-tenant/platform-tenant';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 import { cache } from 'react';
 
 import { listSessionTenants } from './list-session-tenants';
+import { type TPlatformViewer, toPlatformViewer } from './platform-viewer';
 
 export type TDashboardTenantContext = {
   tenant: TPlatformTenant;
   membership: TMembership;
-  tenants: TTenant[];
+  viewer: TPlatformViewer;
+  tenants: TPlatformTenant[];
 };
 
 // `cache()`-wrapped because a layout cannot pass its tenant to its page.
 export const resolveDashboardTenant = cache(
   async (): Promise<TDashboardTenantContext> => {
-    const { memberships, tenants } = await listSessionTenants();
+    const { admin, memberships, tenants } = await listSessionTenants();
     const tenantById = new Map(tenants.map((tenant) => [tenant.id, tenant]));
 
     if (memberships.length === 1) {
@@ -34,7 +32,12 @@ export const resolveDashboardTenant = cache(
         notFound();
       }
 
-      return { tenant: toPlatformTenant(tenant), membership, tenants };
+      return {
+        tenant,
+        membership,
+        viewer: toPlatformViewer({ membership, admin }),
+        tenants,
+      };
     }
 
     const cookieStore = await cookies();
@@ -50,8 +53,9 @@ export const resolveDashboardTenant = cache(
     }
 
     return {
-      tenant: toPlatformTenant(activeTenant),
+      tenant: activeTenant,
       membership: activeMembership,
+      viewer: toPlatformViewer({ membership: activeMembership, admin }),
       tenants,
     };
   },

@@ -4,13 +4,12 @@ import {
   OWNER_ACCESS_STALL_AFTER_MS,
   TENANT_PROVISIONING_STEP,
 } from '@blog/db/constants';
-import type { TMembership } from '@blog/db/schema/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   OWNER_STUDIO_ACCESS,
   type TOwnerStudioAccess,
 } from '@platform/constants/owner-studio-access';
-import { isRealTenantOwner } from '@platform/server/auth/is-real-tenant-owner';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 
 type TOwnerAccessTenant = Pick<
   TTenant,
@@ -62,10 +61,10 @@ const accessStateOf = (
 /** Undefined when the viewer is not the tenant's own OWNER, or the worker never invited them — those get the Studio unconditionally. */
 export const ownerStudioAccessFor = (
   tenant: TOwnerAccessTenant,
-  membership: TMembership,
+  { isOwner }: TPlatformViewer,
   now: Date = new Date(),
 ): TMaybeUndefined<TOwnerStudioAccess> => {
-  return isRealTenantOwner(membership) && tenant.ownerInviteSentAt
+  return isOwner && tenant.ownerInviteSentAt
     ? accessStateOf(tenant, now)
     : undefined;
 };

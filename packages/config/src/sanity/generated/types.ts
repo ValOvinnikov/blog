@@ -475,11 +475,11 @@ export type Module_postRelated = {
   brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
-  layout?: WideLayout;
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
   columns?: 'TWO' | 'THREE' | 'FOUR';
+  layout?: WideLayout;
 };
 
 export type WideLayout = {
@@ -517,10 +517,10 @@ export type Module_postFeatured = {
   brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
-  layout?: WideLayout;
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
+  layout?: WideLayout;
 };
 
 export type Module_postLatest = {
@@ -536,11 +536,11 @@ export type Module_postLatest = {
   brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
-  layout?: WideLayout;
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
   columns?: 'TWO' | 'THREE' | 'FOUR';
+  layout?: WideLayout;
 };
 
 export type Module_postList = {
@@ -555,11 +555,11 @@ export type Module_postList = {
   showImages?: boolean;
   brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   contentAlignment?: 'LEFT' | 'CENTER';
-  layout?: WideLayout;
   cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
   radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
   density?: 'DEFAULT' | 'COMPACT';
   columns?: 'TWO' | 'THREE' | 'FOUR';
+  layout?: WideLayout;
 };
 
 export type ExpandableSectionText = Array<

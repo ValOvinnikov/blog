@@ -1,9 +1,10 @@
 import { service } from '@blog/service';
+import { hasLength } from '@blog/utils/primitives';
+import { POST_RELATED_LOG } from '@web/constants/post-related';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
+import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { logger } from '@web/utils/logger/logger';
-import { renderPostCardImage } from '@web/utils/render-post-card-image';
-import { toPostListItems } from '@web/utils/to-post-list-items';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -15,11 +16,11 @@ export const PostRelatedModule = async ({
 }: TPostRelatedModuleProps) => {
   const postId = context?.post?.id;
   if (!postId) {
-    logger.warn('post_related_module.missing_post_context', { id });
+    logger.warn(POST_RELATED_LOG.MISSING_POST_CONTEXT, { id });
     return null;
   }
 
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.postRelated.v1.getPostRelated(
     id,
     postId,
@@ -27,7 +28,7 @@ export const PostRelatedModule = async ({
   );
 
   if (!result.ok) {
-    logger.error('post_related_module.fetch_failed', {
+    logger.error(POST_RELATED_LOG.MODULE_FETCH_FAILED, {
       id,
       postId,
       error: result.error,
@@ -38,27 +39,29 @@ export const PostRelatedModule = async ({
   const {
     brandVariant,
     headingBlock,
-    posts,
     layout,
     contentAlignment,
     showImages,
+    displayMode,
+    columns,
   } = result.data;
 
-  const items = await toPostListItems(
-    posts,
-    showImages ? renderPostCardImage : undefined,
+  const { items, appearance } = await getPostCardsSection(
+    tenantId,
+    result.data,
   );
 
-  if (items.length === 0) return null;
+  if (!hasLength(items)) return null;
 
   return (
     <PostRelatedModuleView
-      brandVariant={brandVariant}
+      section={{ brandVariant, layout, appearance }}
       headingBlock={headingBlock}
       items={items}
-      layout={layout}
+      columns={columns}
       contentAlignment={contentAlignment}
       hasImages={showImages}
+      displayMode={displayMode}
       titleId={`related-posts-${id}`}
       dataTestId={`post-related-module-${id}`}
     />

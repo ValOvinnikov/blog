@@ -55,8 +55,8 @@ export const deprovisionTenantAction = async (
   }
 
   const resolved = await resolveConfirmedTenant(tenantId, parsed.data.confirm, {
-    precondition: ({ deprovisionedAt }) =>
-      deprovisionedAt ? TENANT_REFUSAL.ALREADY_DEPROVISIONED : undefined,
+    precondition: ({ isArchived }) =>
+      isArchived ? TENANT_REFUSAL.ALREADY_DEPROVISIONED : undefined,
   });
   if (!isOutcomeSuccess(resolved)) {
     return resolved;

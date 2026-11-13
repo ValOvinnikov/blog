@@ -17,7 +17,7 @@ import {
   arrangeLookPageQueries,
   setupLookPageContent as setup,
 } from '@platform/testing/look/look-page-content-setup';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import { mockViewer } from '@platform/testing/memberships/fixtures';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
 import {
   MOCK_ARCHIVED_AT,
@@ -51,8 +51,6 @@ const MOCK_ACCENT_HUE = 28;
 const { radiusScaleOptionLabel: RADIUS_LABEL } = messages.lookForm;
 
 const tLogoHue = makeEnTranslator('logoHueField');
-
-const tenant = mockReadyTenant();
 
 describe(`<${LookPageContent.name}/>`, () => {
   let user: UserEvent;
@@ -100,7 +98,7 @@ describe(`<${LookPageContent.name}/>`, () => {
     const freeTenant = mockReadyTenant({ plan: TENANT_PLAN.FREE });
 
     it('shows an owner the note', async () => {
-      await setup({ tenant: freeTenant, membership: mockMembership() });
+      await setup({ tenant: freeTenant, viewer: mockViewer() });
 
       const title = screen.getByText(messages.growthNote.title);
 
@@ -108,20 +106,20 @@ describe(`<${LookPageContent.name}/>`, () => {
     });
 
     it.each([
-      ['an admin', { admin: mockAdmin() }],
+      ['an admin', mockViewer({ admin: mockAdmin() })],
       [
         'an admin with a virtual membership',
-        {
+        mockViewer({
           membership: buildVirtualAdminMembership(
             mockAdmin().userId,
             MOCK_TENANT_ID,
           ),
-        },
+        }),
       ],
     ])(
       'shows %s no note, but the badges and locked fields',
-      async (_name, access) => {
-        await setup({ tenant: freeTenant, ...access });
+      async (_name, viewer) => {
+        await setup({ tenant: freeTenant, viewer });
         await openLookRow(user, LOOK_ROW.SHAPE);
 
         const title = screen.queryByText(messages.growthNote.title);
@@ -172,7 +170,9 @@ describe(`<${LookPageContent.name}/>`, () => {
   });
 
   it('shows the archived notice for a deprovisioned tenant', async () => {
-    await setup({ tenant: { ...tenant, deprovisionedAt: MOCK_ARCHIVED_AT } });
+    await setup({
+      tenant: mockReadyTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
+    });
 
     expectArchivedOffersNoSave();
   });

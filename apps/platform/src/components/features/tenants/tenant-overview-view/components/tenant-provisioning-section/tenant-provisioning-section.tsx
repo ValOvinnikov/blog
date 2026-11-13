@@ -23,18 +23,15 @@ export const TenantProvisioningSection = ({
   isPrimaryCustom,
   isStudioReinviteUnsent,
 }: TTenantProvisioningSectionProps) => {
-  const { id, deprovisionedAt } = tenant;
+  const { id, archivedAt } = tenant;
   const archivedNoticeId = useId();
   const poll = useProvisioningPoll(tenant);
   const { provisioningSteps, provisioningStatus } = poll;
 
   return (
     <>
-      {deprovisionedAt && (
-        <ArchivedTenantNotice
-          id={archivedNoticeId}
-          archivedAt={deprovisionedAt}
-        />
+      {archivedAt && (
+        <ArchivedTenantNotice id={archivedNoticeId} archivedAt={archivedAt} />
       )}
 
       <ProvisioningBanner tenantId={id} poll={poll} />

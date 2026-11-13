@@ -17,7 +17,10 @@ import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import {
@@ -95,10 +98,12 @@ const arrangeTenantPlan = (
   plan: typeof TENANT_PLAN.FREE | typeof TENANT_PLAN.GROWTH,
   id = MOCK_TENANT_ID,
 ) => {
-  vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-    tenant: mockTenant({ id, plan }),
-    membership: mockMembership({ tenantId: id }),
-  });
+  vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+    mockMembershipContext(
+      mockTenant({ id, plan }),
+      mockMembership({ tenantId: id }),
+    ),
+  );
 };
 
 const arrangeStoredValues = (values: TUpdateFeaturesInput) => {

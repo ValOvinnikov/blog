@@ -37,9 +37,9 @@ export const removeSignInAppAction = async (
 
   const parsed = signInAppProviderSchema.safeParse(provider);
   if (!parsed.success) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
-  const { id, deprovisionedAt } = tenant;
+  const { id, isArchived } = tenant;
 
-  if (deprovisionedAt) {
+  if (isArchived) {
     return {
       outcome: ACTION_OUTCOME.REFUSED,
       reason: SIGN_IN_APP_REFUSAL.ARCHIVED,

@@ -46,6 +46,7 @@ const {
   resolveReferencingModuleTagsMock,
   recordTenantActivityMock,
   stampFirstPostPublishedMock,
+  startNewsletterPostSendMock,
   envMock,
 } = vi.hoisted(() => ({
   verifyRevalidateSignatureMock: vi.fn(),
@@ -58,6 +59,7 @@ const {
   resolveReferencingModuleTagsMock: vi.fn(),
   recordTenantActivityMock: vi.fn(),
   stampFirstPostPublishedMock: vi.fn(),
+  startNewsletterPostSendMock: vi.fn(),
   envMock: {} as { SANITY_REVALIDATE_SECRET?: string },
 }));
 
@@ -111,6 +113,13 @@ vi.mock(
   '@web/server/revalidate/stamp-first-post-published/stamp-first-post-published',
   () => ({
     stampFirstPostPublished: stampFirstPostPublishedMock,
+  }),
+);
+
+vi.mock(
+  '@web/server/revalidate/start-newsletter-post-send/start-newsletter-post-send',
+  () => ({
+    startNewsletterPostSend: startNewsletterPostSendMock,
   }),
 );
 
@@ -275,20 +284,26 @@ describe(POST, () => {
       );
     });
 
-    it("hands the webhook's operation, document and tenant to the first-post stamp", async () => {
-      await POST(
-        makePostRequest({
-          [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.CREATE,
-        }),
-      );
+    it.each([
+      ['first-post stamp', stampFirstPostPublishedMock],
+      ['newsletter send', startNewsletterPostSendMock],
+    ])(
+      "hands the webhook's operation, document and tenant to the %s",
+      async (_label, handlerMock) => {
+        await POST(
+          makePostRequest({
+            [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.CREATE,
+          }),
+        );
 
-      expect(stampFirstPostPublishedMock).toHaveBeenCalledWith({
-        operation: SANITY_WEBHOOK_OPERATION.CREATE,
-        type: POST_TYPE,
-        id: MOCK_POST_ID,
-        tenantId: MOCK_TENANT_ID,
-      });
-    });
+        expect(handlerMock).toHaveBeenCalledWith({
+          operation: SANITY_WEBHOOK_OPERATION.CREATE,
+          type: POST_TYPE,
+          id: MOCK_POST_ID,
+          tenantId: MOCK_TENANT_ID,
+        });
+      },
+    );
 
     it('ignores the event and revalidates nothing when the tenant is archived', async () => {
       getTenantByIdMock.mockResolvedValue(undefined);

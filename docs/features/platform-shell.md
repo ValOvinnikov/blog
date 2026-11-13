@@ -525,10 +525,23 @@ save still settles as the form's generic server error.
   `@blog/ui` outside `components/features/site-preview/`.
 - A busy platform `Button` stays at full colour and keeps focus: it is
   `aria-disabled` and `aria-busy`, never `disabled`, and ignores clicks and
-  form submission until it settles. It shows a ring spinner in its text colour
-  beside its busy label, and holds the wider of its idle and busy widths so it
-  never resizes. This is fixed, not a setting; the `unstyled` variant keeps
+  form submission until it settles. It shows the spinner beside its busy
+  label, and holds the wider of its idle and busy widths so it never resizes.
+  On `primary` the spinner reads on the brand fill — a yellow and an
+  off-white half on near-black in Light, the one-colour form in the label's
+  colour on yellow in Dark; every other variant shows the one-colour form in
+  its text colour. This is fixed, not a setting; the `unstyled` variant keeps
   its own layout and does not hold its width.
+- The platform `Spinner` is the Shinefold logo's folded o: at rest a disc
+  creased from upper right to lower left, its upper-left half lit. In a
+  three-second loop the halves part along the crease, each rounds into a small
+  circle, the circles go twice round the centre, then turn back into halves
+  and close. It comes at 14, 18 and 24px. Its default two-colour form lights
+  the half in brand yellow over a `logo-ink` half (near-black in Light,
+  off-white in Dark); its one-colour form draws a solid half and an outlined
+  half in the surrounding text colour. With reduced motion it is the still
+  disc. It is a `status` named by its label, which it can also show beside
+  it.
 
 ## Dependencies
 

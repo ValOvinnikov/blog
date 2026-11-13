@@ -900,6 +900,44 @@ describe(updateTenantDetails, () => {
     await expect(countLockedMemberships(db())).resolves.toBe(0);
   });
 
+  describe('a Free site whose operator save fails after the row is written', () => {
+    let tenantId: string;
+
+    beforeEach(async () => {
+      const tenant = await insertTestTenant(db(), {
+        name: MOCK_TENANT_NAME,
+        primaryDomain: MOCK_TENANT_DOMAIN,
+      });
+      tenantId = tenant.id;
+      await insertTeam(db(), tenantId, [
+        MEMBERSHIP_ROLE.OWNER,
+        MEMBERSHIP_ROLE.EDITOR,
+      ]);
+    });
+
+    function saveGrowthOnNewDomain() {
+      return updateTenantDetails(tenantId, {
+        ...MOCK_VALID_INPUT,
+        plan: TENANT_PLAN.GROWTH,
+        primaryDomain: MOCK_NEW_DOMAIN,
+      });
+    }
+
+    it('locks no member that was still unlocked during the grace', async () => {
+      await expect(saveGrowthOnNewDomain()).rejects.toThrow();
+
+      await expect(countLockedMemberships(db())).resolves.toBe(0);
+    });
+
+    it('locks again the members the save unlocked', async () => {
+      await lockMembershipsOverSeats(tenantId, TENANT_PLAN.FREE, new Date());
+
+      await expect(saveGrowthOnNewDomain()).rejects.toThrow();
+
+      await expect(countLockedMemberships(db())).resolves.toBe(1);
+    });
+  });
+
   it('still updates when every step is IDLE', async () => {
     const tenantId = await insertTenantWithDomain({
       provisioningSteps: MOCK_IDLE_PROVISIONING_STEPS,

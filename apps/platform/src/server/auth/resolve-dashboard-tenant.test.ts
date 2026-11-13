@@ -1,7 +1,11 @@
 import { NEXT_NAVIGATION_ERROR, type TMaybeUndefined } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
@@ -48,7 +52,7 @@ const MISSING_ACTIVE_TENANT_COOKIES = [
 
 const mockCookie = (value: TMaybeUndefined<string>) => {
   cookiesMock.mockResolvedValue({
-    get: vi.fn(() => (value === undefined ? undefined : { value })),
+    get: vi.fn(() => (isUndefined(value) ? undefined : { value })),
   });
 };
 
@@ -92,6 +96,7 @@ describe(resolveDashboardTenant, () => {
     expect(result).toEqual({
       tenant: tenant1,
       membership: membership1,
+      viewer: mockViewer({ membership: membership1 }),
       tenants: [tenant1],
     });
     expect(cookiesMock).not.toHaveBeenCalled();
@@ -106,6 +111,7 @@ describe(resolveDashboardTenant, () => {
     expect(result).toEqual({
       tenant: tenant2,
       membership: membership2,
+      viewer: mockViewer({ membership: membership2 }),
       tenants: [tenant1, tenant2],
     });
     expect(redirect).not.toHaveBeenCalled();

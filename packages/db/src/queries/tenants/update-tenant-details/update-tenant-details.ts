@@ -14,7 +14,7 @@ import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';
 import { isUndefined } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
-import { and, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 import {
   applyOwnerEmailChange,
@@ -22,6 +22,7 @@ import {
   type TOwnerEmailChange,
   type TOwnerEmailRefusal,
 } from './owner-email-change';
+import { renameTenantDomain } from './rename-tenant-domain';
 import {
   changesProvisionedTenantDetails,
   tenantDetailsFields,
@@ -146,35 +147,31 @@ export async function updateTenantDetails(
     ownerEmailChange = found;
   }
 
-  const tenant = await writeTenantDetailsRow(tenantId, {
+  const written = await writeTenantDetailsRow(tenantId, {
     details,
     status: existing.status,
     clearsUnsentReinvite: !isUndefined(ownerEmailChange),
   });
-  if ('outcome' in tenant) return tenant;
+  if ('outcome' in written) return written;
+  const { tenant, unlockedMembershipIds } = written;
 
   const domainChanged = input.primaryDomain !== existing.primaryDomain;
 
   if (domainChanged) {
     try {
-      const domainRows = await db
-        .update(tenantDomains)
-        .set({ domain: input.primaryDomain })
-        .where(
-          and(
-            eq(tenantDomains.tenantId, tenantId),
-            eq(tenantDomains.domain, existing.primaryDomain),
-          ),
-        )
-        .returning();
+      const isRenamed = await renameTenantDomain(
+        tenantId,
+        existing.primaryDomain,
+        input.primaryDomain,
+      );
 
-      if (!domainRows[0]) {
+      if (!isRenamed) {
         throw new Error(
           `updateTenantDetails: no tenant_domains row matched tenant "${tenantId}"'s previous primary domain "${existing.primaryDomain}".`,
         );
       }
     } catch (error) {
-      await restoreTenantDetailsRow(tenantId, existing);
+      await restoreTenantDetailsRow(tenantId, existing, unlockedMembershipIds);
       throw error;
     }
   }
@@ -184,17 +181,13 @@ export async function updateTenantDetails(
       await applyOwnerEmailChange(ownerEmailChange);
     } catch (error) {
       if (domainChanged) {
-        await db
-          .update(tenantDomains)
-          .set({ domain: existing.primaryDomain })
-          .where(
-            and(
-              eq(tenantDomains.tenantId, tenantId),
-              eq(tenantDomains.domain, input.primaryDomain),
-            ),
-          );
+        await renameTenantDomain(
+          tenantId,
+          input.primaryDomain,
+          existing.primaryDomain,
+        );
       }
-      await restoreTenantDetailsRow(tenantId, existing);
+      await restoreTenantDetailsRow(tenantId, existing, unlockedMembershipIds);
       throw error;
     }
   }

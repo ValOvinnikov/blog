@@ -1,11 +1,10 @@
 import 'server-only';
 
 import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
-import type { TMembership } from '@blog/db/schema/memberships';
 import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
 import { isOneOf } from '@blog/utils/primitives';
 import { type TUpgradeState, UPGRADE_STATE } from '@platform/constants/billing';
-import { isRealTenantOwner } from '@platform/server/auth/is-real-tenant-owner';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 type TUpgradeTenant = Pick<
@@ -22,10 +21,10 @@ const hasStoredSubscription = ({
 
 export const upgradeStateFor = (
   tenant: TUpgradeTenant,
-  membership: TMembership,
+  { isOwner }: TPlatformViewer,
 ): TUpgradeState => {
   if (hasStoredSubscription(tenant)) return UPGRADE_STATE.SUBSCRIBED;
-  if (!isRealTenantOwner(membership)) return UPGRADE_STATE.NOT_OWNER;
+  if (!isOwner) return UPGRADE_STATE.NOT_OWNER;
   if (!isTenantWritable(tenant)) return UPGRADE_STATE.UNAVAILABLE;
   return UPGRADE_STATE.AVAILABLE;
 };

@@ -958,6 +958,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/contrast.ts"
+      },
+      {
+        "ref": "SPINNER_TONE.TEXT",
+        "scope": "app:platform",
+        "from": "@platform/constants/spinner",
+        "file": "apps/platform/src/constants/spinner.ts"
       }
     ],
     "LARGE_TEXT": [
@@ -7090,6 +7096,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/look-row",
         "file": "apps/platform/src/constants/look-row.ts"
+      },
+      {
+        "ref": "SPINNER_TONE.BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/spinner",
+        "file": "apps/platform/src/constants/spinner.ts"
       }
     ],
     "TYPE": [
@@ -8228,6 +8240,14 @@
         "file": "apps/platform/src/constants/site-config.ts"
       }
     ],
+    "ON_BRAND": [
+      {
+        "ref": "SPINNER_TONE.ON_BRAND",
+        "scope": "app:platform",
+        "from": "@platform/constants/spinner",
+        "file": "apps/platform/src/constants/spinner.ts"
+      }
+    ],
     "UPCOMING": [
       {
         "ref": "STEP_INDICATOR_STATE.UPCOMING",
@@ -9320,6 +9340,30 @@
         "file": "apps/web/src/constants/http.ts"
       }
     ],
+    "icon.site_config_fetch_failed": [
+      {
+        "ref": "ICON_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/icon",
+        "file": "apps/web/src/constants/icon.ts"
+      }
+    ],
+    "icon.favicon_response_not_ok": [
+      {
+        "ref": "ICON_LOG.FAVICON_RESPONSE_NOT_OK",
+        "scope": "app:web",
+        "from": "@web/constants/icon",
+        "file": "apps/web/src/constants/icon.ts"
+      }
+    ],
+    "icon.favicon_fetch_failed": [
+      {
+        "ref": "ICON_LOG.FAVICON_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/icon",
+        "file": "apps/web/src/constants/icon.ts"
+      }
+    ],
     "internal_pages.secret_missing": [
       {
         "ref": "INTERNAL_PAGES_LOG.SECRET_MISSING",
@@ -9504,6 +9548,22 @@
         "file": "apps/web/src/constants/post-featured.ts"
       }
     ],
+    "post_index_page.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
+    "post_index_breadcrumbs.fetch_failed": [
+      {
+        "ref": "POST_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-index",
+        "file": "apps/web/src/constants/post-index.ts"
+      }
+    ],
     "post_latest_module.fetch_failed": [
       {
         "ref": "POST_LATEST_LOG.MODULE_FETCH_FAILED",
@@ -9518,6 +9578,22 @@
         "scope": "app:web",
         "from": "@web/constants/post-list",
         "file": "apps/web/src/constants/post-list.ts"
+      }
+    ],
+    "post_related_module.missing_post_context": [
+      {
+        "ref": "POST_RELATED_LOG.MISSING_POST_CONTEXT",
+        "scope": "app:web",
+        "from": "@web/constants/post-related",
+        "file": "apps/web/src/constants/post-related.ts"
+      }
+    ],
+    "post_related_module.fetch_failed": [
+      {
+        "ref": "POST_RELATED_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-related",
+        "file": "apps/web/src/constants/post-related.ts"
       }
     ],
     "pricing_module.fetch_failed": [
@@ -9699,6 +9775,46 @@
     "revalidate.first_post_stamp_failed": [
       {
         "ref": "REVALIDATE_LOG.FIRST_POST_STAMP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_start_failed": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_START_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_enqueue_skipped": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_SKIPPED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_enqueue_refused": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_REFUSED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_enqueue_failed": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_release_failed": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_RELEASE_FAILED",
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
@@ -9944,6 +10060,38 @@
         "file": "apps/web/src/constants/stats.ts"
       }
     ],
+    "tag_index_page.fetch_failed": [
+      {
+        "ref": "TAG_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag-index",
+        "file": "apps/web/src/constants/tag-index.ts"
+      }
+    ],
+    "tag_index_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TAG_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag-index",
+        "file": "apps/web/src/constants/tag-index.ts"
+      }
+    ],
+    "tag_page.fetch_failed": [
+      {
+        "ref": "TAG_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
+    "tag_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TAG_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/tag",
+        "file": "apps/web/src/constants/tag.ts"
+      }
+    ],
     "taxonomy_list_module.fetch_failed": [
       {
         "ref": "TAXONOMY_LIST_LOG.MODULE_FETCH_FAILED",
@@ -9974,6 +10122,38 @@
         "scope": "app:web",
         "from": "@web/constants/theme-tokens",
         "file": "apps/web/src/constants/theme-tokens.ts"
+      }
+    ],
+    "topic_index_page.fetch_failed": [
+      {
+        "ref": "TOPIC_INDEX_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic-index",
+        "file": "apps/web/src/constants/topic-index.ts"
+      }
+    ],
+    "topic_index_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TOPIC_INDEX_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic-index",
+        "file": "apps/web/src/constants/topic-index.ts"
+      }
+    ],
+    "topic_page.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.PAGE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
+      }
+    ],
+    "topic_breadcrumbs.fetch_failed": [
+      {
+        "ref": "TOPIC_LOG.BREADCRUMBS_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/topic",
+        "file": "apps/web/src/constants/topic.ts"
       }
     ],
     "cookie_statement.seed_start_failed": [

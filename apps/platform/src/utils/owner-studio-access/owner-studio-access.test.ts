@@ -14,8 +14,12 @@ import { faker } from '@faker-js/faker';
 import { OWNER_STUDIO_ACCESS } from '@platform/constants/owner-studio-access';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_TENANT_ID,
   mockIdleProvisioningSteps,
   mockReadyTenant,
 } from '@platform/testing/tenants/fixtures';
@@ -24,7 +28,7 @@ import { ownerStudioAccessFor } from './owner-studio-access';
 
 faker.seed(1);
 
-const owner = mockMembership();
+const owner = mockViewer();
 const MOCK_INVITED_AT = new Date('2026-10-18T09:00:00.000Z');
 const MOCK_ACCEPTED_AT = new Date('2026-10-18T10:00:00.000Z');
 const MOCK_BEFORE_STALL = new Date(
@@ -144,7 +148,9 @@ describe(ownerStudioAccessFor, () => {
     expect(
       ownerStudioAccessFor(
         invitedTenant(),
-        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        mockViewer({
+          membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        }),
       ),
     ).toBeUndefined();
   });
@@ -153,7 +159,12 @@ describe(ownerStudioAccessFor, () => {
     expect(
       ownerStudioAccessFor(
         invitedTenant(),
-        buildVirtualAdminMembership(mockAdmin().userId, owner.tenantId),
+        mockViewer({
+          membership: buildVirtualAdminMembership(
+            mockAdmin().userId,
+            MOCK_TENANT_ID,
+          ),
+        }),
       ),
     ).toBeUndefined();
   });

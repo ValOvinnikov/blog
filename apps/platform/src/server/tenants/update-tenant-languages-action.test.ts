@@ -21,7 +21,10 @@ import {
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
 import { MOCK_SESSION_EXPIRES } from '@platform/testing/auth/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,
   mockReadyTenant,
@@ -146,10 +149,12 @@ describe(updateTenantLanguagesAction, () => {
   });
 
   it('names only the languages the save would add over the plan limit', async () => {
-    vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-      tenant: mockReadyTenant({ id: MOCK_TENANT_ID, additionalLocales: [NL] }),
-      membership: mockMembership({ tenantId: MOCK_TENANT_ID }),
-    });
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID, additionalLocales: [NL] }),
+        mockMembership({ tenantId: MOCK_TENANT_ID }),
+      ),
+    );
     setTenantAdditionalLocalesMock.mockResolvedValueOnce(
       errorResult(ERROR_CODE.DB_LOCALE_LIMIT_EXCEEDED),
     );

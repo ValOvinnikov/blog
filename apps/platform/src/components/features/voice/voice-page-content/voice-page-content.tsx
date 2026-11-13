@@ -1,14 +1,14 @@
 import { queries } from '@blog/db';
-import type { TTenant } from '@blog/db/schema/tenants';
 import type { TVoiceListSamples } from '@platform/components/features/site-preview/voice-specimen';
 import { VoiceListSamplesProvider } from '@platform/components/features/voice/voice-list-samples-provider';
 import { VoiceSettings } from '@platform/components/features/voice/voice-settings';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 import { buildVoiceDraft } from '@platform/utils/voice-draft-builder/voice-draft-builder';
 import { getTranslations } from 'next-intl/server';
 
 export type TVoicePageContentProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
 };
 
 export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
@@ -60,7 +60,7 @@ export const VoicePageContent = async ({ tenant }: TVoicePageContentProps) => {
           navLinkStyle,
         }}
         savedAt={config?.updatedAt}
-        archivedAt={tenant.deprovisionedAt ?? undefined}
+        archivedAt={tenant.archivedAt}
       />
     </VoiceListSamplesProvider>
   );

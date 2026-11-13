@@ -9,11 +9,13 @@ import {
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
 
+import { type TPlatformViewer, toPlatformViewer } from './platform-viewer';
 import { requireAdmin } from './require-admin';
 
 export type TTenantByIdContext = {
   tenant: TPlatformTenant;
   admin: TAdmin;
+  viewer: TPlatformViewer;
 };
 
 /** Gates `/tenants/{id}/*` for any admin, archived tenants included, so only an unknown id 404s. */
@@ -39,6 +41,12 @@ export const requireTenantById = cache(
       notFound();
     }
 
-    return { tenant: toPlatformTenant(tenant), admin: adminResult.value };
+    const admin = adminResult.value;
+
+    return {
+      tenant: toPlatformTenant(tenant),
+      admin,
+      viewer: toPlatformViewer({ admin }),
+    };
   },
 );

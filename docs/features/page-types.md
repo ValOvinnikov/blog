@@ -78,6 +78,7 @@ Every public page of a tenant's site is a Sanity page document of one of thirtee
 - Slugged types (Post, Topic, Tag) require a slug unique within their type and language; Landing slugs are unique among siblings (see [landing-tree](./landing-tree.md)).
 - A page whose template differs from its default-language version's template gets a warning, not an error.
 - When a template sets a hero, the hero owns the page's `<h1>` and the page's own heading block is not rendered; with no hero, `PageHeading` renders the heading block. The heading block is still required, because posts, cards, breadcrumbs and section navigation read it.
+- Wherever `PageHeading` renders — a Landing, Post Index, Topic, Topic Index, Tag or Tag Index page with no hero — the breadcrumb strip above it takes the heading band's background with no dividing line (`isAbovePageHeading`); a page with a hero, and a Post page, keep the default strip.
 - A module type absent from a page's renderer map is skipped with a `module_renderer.unknown_module_type` warning.
 - A missing Home, Post Index, Topic Index or Tag Index in a non-default language redirects to the site root. Every other missing document returns a 404, and a loader failure a 500 through the error boundary (`guardPageLoaderResult`).
 - `/blog/page/1` and `/{archive}/{slug}/page/1` 308 to the unnumbered URL; a non-numeric page number 404s.

@@ -1,16 +1,15 @@
-import type { TTenant } from '@blog/db/schema/tenants';
 import { ExternalLinkButton } from '@platform/components/shared/external-link-button';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { StatusBadge } from '@platform/components/shared/status-badge';
 import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { tenantSiteUrl } from '@platform/utils/routes/routes';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { tenantStatusTone } from '@platform/utils/status-tone/status-tone';
 import { useTranslations } from 'next-intl';
 import type { ReactNode, Ref } from 'react';
 
 export type TTenantPageHeaderProps = {
-  tenant: Pick<TTenant, 'name' | 'status' | 'plan' | 'primaryDomain'>;
+  tenant: Pick<TPlatformTenant, 'name' | 'status' | 'plan' | 'siteUrl'>;
   description?: ReactNode;
   hasPlanBadge?: boolean;
   titleRef?: Ref<HTMLHeadingElement>;
@@ -22,7 +21,7 @@ export const TenantPageHeader = ({
   hasPlanBadge = true,
   titleRef,
 }: TTenantPageHeaderProps) => {
-  const { name, status, plan, primaryDomain } = tenant;
+  const { name, status, plan, siteUrl } = tenant;
   const tTenantsTable = useTranslations('tenantsTable');
   const tPlan = useTranslations('planNames');
   const t = useTranslations('tenantOverviewPage');
@@ -45,10 +44,7 @@ export const TenantPageHeader = ({
         </>
       }
       actions={
-        <ExternalLinkButton
-          href={tenantSiteUrl(primaryDomain)}
-          focusGround={FOCUS_RING_GROUND.BG}
-        >
+        <ExternalLinkButton href={siteUrl} focusGround={FOCUS_RING_GROUND.BG}>
           {t('openSiteAction')}
         </ExternalLinkButton>
       }

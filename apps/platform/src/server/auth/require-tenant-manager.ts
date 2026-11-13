@@ -2,18 +2,17 @@ import 'server-only';
 
 import { notFound } from 'next/navigation';
 
-import { isTenantOwner } from './is-tenant-owner';
 import {
   requireTenantMembership,
   type TTenantMembershipContext,
 } from './require-tenant-membership';
 
-export const requireTenantOwner = async (
+export const requireTenantManager = async (
   tenantId: string,
 ): Promise<TTenantMembershipContext> => {
   const context = await requireTenantMembership(tenantId);
 
-  if (!isTenantOwner(context.membership)) {
+  if (!context.viewer.canManage) {
     notFound();
   }
 

@@ -10,7 +10,10 @@ import {
   MOCK_CONTACT_RECIPIENT,
   SEND_CONTACT_MESSAGES_TO,
 } from '@platform/testing/email/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import { mockSiteConfig } from '@platform/testing/site-config/fixtures';
@@ -80,7 +83,7 @@ vi.mock('@platform/server/email/send-test-email-action');
 const { senderNameLabel, replyToLabel } = en.emailSettingsForm;
 
 const MOCK_TENANT = mockReadyTenant();
-const MOCK_GROWTH_TENANT = { ...MOCK_TENANT, plan: TENANT_PLAN.GROWTH };
+const MOCK_GROWTH_TENANT = mockReadyTenant({ plan: TENANT_PLAN.GROWTH });
 const MOCK_INVITE_SUBJECT = faker.lorem.sentence();
 const MOCK_CONFIG_DATE = faker.date.past();
 const MOCK_BRAND_NAME = faker.company.name();
@@ -222,13 +225,12 @@ describe(`<${EmailPageContent.name}/>`, () => {
   });
 
   it('hides the contact recipient field from an editor', async () => {
-    vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) => ({
-      tenant: mockReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
-      membership: mockMembership({
-        tenantId: id,
-        role: MEMBERSHIP_ROLE.EDITOR,
-      }),
-    }));
+    vi.mocked(requireTenantMembership).mockImplementationOnce(async (id) =>
+      mockMembershipContext(
+        mockReadyTenant({ id, plan: TENANT_PLAN.GROWTH }),
+        mockMembership({ tenantId: id, role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
+    );
 
     await setup({ tenant: MOCK_GROWTH_TENANT });
 
@@ -241,7 +243,7 @@ describe(`<${EmailPageContent.name}/>`, () => {
 
   it('shows the archived notice for a deprovisioned tenant', async () => {
     await setup({
-      tenant: { ...MOCK_TENANT, deprovisionedAt: MOCK_ARCHIVED_AT },
+      tenant: mockReadyTenant({ deprovisionedAt: MOCK_ARCHIVED_AT }),
     });
 
     const archivedNotice = screen.getByText(ARCHIVED_NOTICE_TEXT);

@@ -3,6 +3,7 @@ import { EMAIL_ACCOUNT, isEmailAccountConfigured } from '@blog/email';
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { toPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import {
   parseTenantsListQuery,
   type TTenantsListSearchParams,
@@ -29,7 +30,9 @@ export default async function TenantsPage({ searchParams }: TProps) {
 
   return (
     <TenantsView
-      tenants={tenants.map(toClientTenant)}
+      tenants={tenants.map((tenant) =>
+        toClientTenant(toPlatformTenant(tenant)),
+      )}
       listQuery={listQuery}
       isEmailAlertingConfigured={isEmailAccountConfigured(
         EMAIL_ACCOUNT.PLATFORM,

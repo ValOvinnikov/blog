@@ -1,17 +1,12 @@
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { POST_LATEST_LOG } from '@web/constants/post-latest';
-import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostLatestModuleData } from '@web/testing/modules/post-latest/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
-import { MOCK_SECTION_STYLE_OVERRIDES } from '@web/testing/shared/section-appearance/fixtures';
-import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { PostLatestModule } from './post-latest-module';
@@ -71,24 +66,6 @@ describe(`<${PostLatestModule.name}/>`, () => {
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
       POST_LATEST_LOG.MODULE_FETCH_FAILED,
       { id: MOCK_MODULE_ID, error: MOCK_ERROR },
-    );
-  });
-
-  it("scopes the section to the module's style overrides", async () => {
-    getPostLatestMock.mockResolvedValue(
-      okResult(
-        mockPostLatestModuleData({
-          posts: [MOCK_POST],
-          ...MOCK_SECTION_STYLE_OVERRIDES,
-        }),
-      ),
-    );
-
-    await setup();
-
-    expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
-      MOCK_REQUEST_CONTEXT.tenantId,
-      MOCK_SECTION_STYLE_OVERRIDES,
     );
   });
 

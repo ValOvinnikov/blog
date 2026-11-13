@@ -718,6 +718,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **SITE_CONFIG_LOG**: `BRAND_ASSET_CLEAR_AUDIT_FAILED`=`"site_config.brand_asset_clear_audit_failed"`, `BRAND_ASSET_CLEAR_FAILED`=`"site_config.brand_asset_clear_failed"`, `BRAND_ASSET_DELETE_FAILED`=`"site_config.brand_asset_delete_failed"`, `BRAND_ASSET_UPLOAD_AUDIT_FAILED`=`"site_config.brand_asset_upload_audit_failed"`, `BRAND_ASSET_UPLOAD_FAILED`=`"site_config.brand_asset_upload_failed"`, `LOOK_AUDIT_FAILED`=`"site_config.look_audit_failed"`, `LOOK_SAVE_FAILED`=`"site_config.look_save_failed"`, `REVALIDATE_ERROR`=`"site_config.revalidate_error"`, `REVALIDATE_FAILED`=`"site_config.revalidate_failed"`, `REVALIDATE_SKIPPED`=`"site_config.revalidate_skipped"`, `SAVED_AT_STAMP_FAILED`=`"site_config.saved_at_stamp_failed"`, `SVG_SANITIZE_FAILED`=`"site_config.svg_sanitize_failed"`, `VOICE_AUDIT_FAILED`=`"site_config.voice_audit_failed"`, `VOICE_SAVE_FAILED`=`"site_config.voice_save_failed"`
 
+### `@platform/constants/spinner` — `apps/platform/src/constants/spinner.ts`
+
+- **SPINNER_TONE**: `BRAND`, `TEXT`, `ON_BRAND`
+
 ### `@platform/constants/step-indicator` — `apps/platform/src/constants/step-indicator.ts`
 
 - **STEP_INDICATOR_STATE**: `DONE`, `FAILED`, `RUNNING`, `ACTIVE`, `UPCOMING`
@@ -839,6 +843,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
 - **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
+### `@web/constants/icon` — `apps/web/src/constants/icon.ts`
+
+- **ICON_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"icon.site_config_fetch_failed"`, `FAVICON_RESPONSE_NOT_OK`=`"icon.favicon_response_not_ok"`, `FAVICON_FETCH_FAILED`=`"icon.favicon_fetch_failed"`
+
 ### `@web/constants/internal-pages` — `apps/web/src/constants/internal-pages.ts`
 
 - **INTERNAL_PAGES_LOG**: `SECRET_MISSING`=`"internal_pages.secret_missing"`, `TENANT_LOOKUP_FAILED`=`"internal_pages.tenant_lookup_failed"`, `TITLE_FETCH_FAILED`=`"internal_pages.title_fetch_failed"`, `PATH_FETCH_FAILED`=`"internal_pages.path_fetch_failed"`
@@ -861,6 +869,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **POST_FEATURED_LOG**: `MODULE_FETCH_FAILED`=`"post_featured_module.fetch_failed"`
 
+### `@web/constants/post-index` — `apps/web/src/constants/post-index.ts`
+
+- **POST_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"post_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"post_index_breadcrumbs.fetch_failed"`
+
 ### `@web/constants/post-latest` — `apps/web/src/constants/post-latest.ts`
 
 - **POST_LATEST_LOG**: `MODULE_FETCH_FAILED`=`"post_latest_module.fetch_failed"`
@@ -868,6 +880,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/post-list` — `apps/web/src/constants/post-list.ts`
 
 - **POST_LIST_LOG**: `MODULE_FETCH_FAILED`=`"post_list_module.fetch_failed"`
+
+### `@web/constants/post-related` — `apps/web/src/constants/post-related.ts`
+
+- **POST_RELATED_LOG**: `MISSING_POST_CONTEXT`=`"post_related_module.missing_post_context"`, `MODULE_FETCH_FAILED`=`"post_related_module.fetch_failed"`
 
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
@@ -891,7 +907,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/revalidate` — `apps/web/src/constants/revalidate.ts`
 
-- **REVALIDATE_LOG**: `SECRET_MISSING`=`"revalidate.secret_missing"`, `TENANT_ID_LOOKUP_FAILED`=`"revalidate.tenant_id_lookup_failed"`, `TENANT_BY_ID_LOOKUP_FAILED`=`"revalidate.tenant_by_id_lookup_failed"`, `TENANT_ARCHIVED`=`"revalidate.tenant_archived"`, `TENANT_SANITY_CREDENTIALS_MISSING`=`"revalidate.tenant_sanity_credentials_missing"`, `TENANT_SANITY_CREDENTIALS_FETCH_THREW`=`"revalidate.tenant_sanity_credentials_fetch_threw"`, `TENANT_ACTIVITY_TOUCH_FAILED`=`"revalidate.tenant_activity_touch_failed"`, `PATH_PURGE_FALLBACK`=`"revalidate.path_purge_fallback"`, `REFERENCING_MODULES_LOOKUP_FAILED`=`"revalidate.referencing_modules_lookup_failed"`, `POST_LOOKUP_FAILED`=`"revalidate.post_lookup_failed"`, `BLOG_PAGINATION_LOOKUP_FAILED`=`"revalidate.blog_pagination_lookup_failed"`, `TAG_PARAMS_LOOKUP_FAILED`=`"revalidate.tag_params_lookup_failed"`, `TAG_PAGINATION_LOOKUP_FAILED`=`"revalidate.tag_pagination_lookup_failed"`, `TOPIC_PARAMS_LOOKUP_FAILED`=`"revalidate.topic_params_lookup_failed"`, `TOPIC_PAGINATION_LOOKUP_FAILED`=`"revalidate.topic_pagination_lookup_failed"`, `BOOKMARK_CLEANUP_FAILED`=`"revalidate.bookmark_cleanup_failed"`, `FIRST_POST_STAMP_FAILED`=`"revalidate.first_post_stamp_failed"`
+- **REVALIDATE_LOG**: `SECRET_MISSING`=`"revalidate.secret_missing"`, `TENANT_ID_LOOKUP_FAILED`=`"revalidate.tenant_id_lookup_failed"`, `TENANT_BY_ID_LOOKUP_FAILED`=`"revalidate.tenant_by_id_lookup_failed"`, `TENANT_ARCHIVED`=`"revalidate.tenant_archived"`, `TENANT_SANITY_CREDENTIALS_MISSING`=`"revalidate.tenant_sanity_credentials_missing"`, `TENANT_SANITY_CREDENTIALS_FETCH_THREW`=`"revalidate.tenant_sanity_credentials_fetch_threw"`, `TENANT_ACTIVITY_TOUCH_FAILED`=`"revalidate.tenant_activity_touch_failed"`, `PATH_PURGE_FALLBACK`=`"revalidate.path_purge_fallback"`, `REFERENCING_MODULES_LOOKUP_FAILED`=`"revalidate.referencing_modules_lookup_failed"`, `POST_LOOKUP_FAILED`=`"revalidate.post_lookup_failed"`, `BLOG_PAGINATION_LOOKUP_FAILED`=`"revalidate.blog_pagination_lookup_failed"`, `TAG_PARAMS_LOOKUP_FAILED`=`"revalidate.tag_params_lookup_failed"`, `TAG_PAGINATION_LOOKUP_FAILED`=`"revalidate.tag_pagination_lookup_failed"`, `TOPIC_PARAMS_LOOKUP_FAILED`=`"revalidate.topic_params_lookup_failed"`, `TOPIC_PAGINATION_LOOKUP_FAILED`=`"revalidate.topic_pagination_lookup_failed"`, `BOOKMARK_CLEANUP_FAILED`=`"revalidate.bookmark_cleanup_failed"`, `FIRST_POST_STAMP_FAILED`=`"revalidate.first_post_stamp_failed"`, `NEWSLETTER_SEND_START_FAILED`=`"revalidate.newsletter_send_start_failed"`, `NEWSLETTER_SEND_ENQUEUE_SKIPPED`=`"revalidate.newsletter_send_enqueue_skipped"`, `NEWSLETTER_SEND_ENQUEUE_REFUSED`=`"revalidate.newsletter_send_enqueue_refused"`, `NEWSLETTER_SEND_ENQUEUE_FAILED`=`"revalidate.newsletter_send_enqueue_failed"`, `NEWSLETTER_SEND_RELEASE_FAILED`=`"revalidate.newsletter_send_release_failed"`
 
 ### `@web/constants/rss` — `apps/web/src/constants/rss.ts`
 
@@ -930,6 +946,14 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **STATS_LOG**: `MODULE_FETCH_FAILED`=`"stats_module.fetch_failed"`
 
+### `@web/constants/tag-index` — `apps/web/src/constants/tag-index.ts`
+
+- **TAG_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"tag_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_index_breadcrumbs.fetch_failed"`
+
+### `@web/constants/tag` — `apps/web/src/constants/tag.ts`
+
+- **TAG_LOG**: `PAGE_FETCH_FAILED`=`"tag_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"tag_breadcrumbs.fetch_failed"`
+
 ### `@web/constants/taxonomy-list` — `apps/web/src/constants/taxonomy-list.ts`
 
 - **TAXONOMY_LIST_LOG**: `MODULE_FETCH_FAILED`=`"taxonomy_list_module.fetch_failed"`
@@ -945,6 +969,14 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/theme-tokens` — `apps/web/src/constants/theme-tokens.ts`
 
 - **THEME_TOKENS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"theme_tokens.site_config_fetch_failed"`
+
+### `@web/constants/topic-index` — `apps/web/src/constants/topic-index.ts`
+
+- **TOPIC_INDEX_LOG**: `PAGE_FETCH_FAILED`=`"topic_index_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_index_breadcrumbs.fetch_failed"`
+
+### `@web/constants/topic` — `apps/web/src/constants/topic.ts`
+
+- **TOPIC_LOG**: `PAGE_FETCH_FAILED`=`"topic_page.fetch_failed"`, `BREADCRUMBS_FETCH_FAILED`=`"topic_breadcrumbs.fetch_failed"`
 
 ## app:worker
 
