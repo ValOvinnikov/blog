@@ -15,13 +15,13 @@ const setup = customRender(CenteredCardFrame, {
 });
 
 describe(`<${CenteredCardFrame.name}/>`, () => {
-  it('names the product above its content and footer in one main landmark', () => {
+  it('shows the named logo, content and footer in one main landmark', () => {
     setup();
 
     const main = screen.getByRole('main');
-    const wordmark = within(main).getByText(
-      messages.centeredCardFrame.brandName,
-    );
+    const wordmark = within(main).getByRole('img', {
+      name: messages.centeredCardFrame.brandName,
+    });
     const content = within(main).getByText(MOCK_CARD_CONTENT);
     const footer = within(main).getByText(MOCK_FOOTER);
 

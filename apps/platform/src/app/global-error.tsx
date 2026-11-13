@@ -6,13 +6,16 @@ import { LOCALE_BCP47_TAGS, LOCALE_ISO_CODES } from '@blog/config';
 import { DeadEndView } from '@platform/components/features/layout/dead-end-view';
 import { Button } from '@platform/components/shared/button';
 import { inter } from '@platform/config/font-loaders/inter-font';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { BUTTON_VARIANT } from '@platform/constants/button';
 import { NextIntlClientProvider } from 'next-intl';
 
+const PRODUCT_NAME = 'Shinefold';
+
 const globalErrorCopy = {
-  brandName: 'Valstack',
+  brandName: PRODUCT_NAME,
   badge: 'Error',
-  title: 'Valstack is having trouble',
+  title: `${PRODUCT_NAME} is having trouble`,
   description:
     'Something broke on our side. Reload the page, and if it keeps happening, come back in a few minutes.',
   reload: 'Reload',
@@ -35,7 +38,7 @@ export default function GlobalError({ retry }: TProps) {
           }}
         >
           <DeadEndView
-            badge={{ label: globalErrorCopy.badge, tone: 'bad' }}
+            badge={{ label: globalErrorCopy.badge, tone: BADGE_TONE.BAD }}
             title={globalErrorCopy.title}
             description={globalErrorCopy.description}
             action={

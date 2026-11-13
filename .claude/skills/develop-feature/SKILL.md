@@ -149,7 +149,7 @@ intervening typegen commit). Mechanism: `docs/context/claude-code.md`
 | Shared Auth.js config (providers, adapter, session, cookies) | `auth`         | `testing-practices`                                                                 |
 | Components                                                   | `ui`           | `ui-library-practices`, `ui-storybook`, `testing-practices`                         |
 | Routes / metadata / feeds                                    | `web`          | `web-component-practices`, `seo-and-metadata`, `web-storybook`, `testing-practices` |
-| Admin-panel routes, Server Actions, Base UI forms            | `platform-app` | `platform-ui-practices`, `testing-practices`                                        |
+| Platform routes, Server Actions, Base UI forms               | `platform-app` | `platform-ui-practices`, `testing-practices`                                        |
 | Provisioning Workflow runs (`apps/worker`)                   | `worker`       | `testing-practices`                                                                 |
 | Structured logging (`createLogger`, log sanitization)        | `insight`      | `testing-practices`                                                                 |
 | Email shell, `escapeHtml`, `sendEmail` transport             | `email`        | `testing-practices`                                                                 |
@@ -525,7 +525,7 @@ what each package owns is in `CLAUDE.md` "Layer contracts":
   (the `site-preview/` exception is in `CLAUDE.md` "Layer contracts").
 - **`worker`** is a sibling to `platform-app`: `config → db → worker`, never
   waiting on `studio`/`service`/`ui`/`auth`, which it does not consume. A
-  change to what the admin panel enqueues is `platform-app` work; the run
+  change to what the platform enqueues is `platform-app` work; the run
   itself is `worker` work.
 - **`insight`** is independent, like `utils`. Dispatch it only for the logger
   core itself; a change to how an app _uses_ the logger belongs to

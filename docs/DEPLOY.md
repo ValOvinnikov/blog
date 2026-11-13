@@ -7,11 +7,11 @@ How this blog deploys, and the one-time setup that makes the pipeline live.
 - **Push a `vX.Y.Z` git tag** → **production** environment (`production`
   dataset).
 
-On a `main` merge, the Next.js **web app** and the **admin panel** each deploy
+On a `main` merge, the Next.js **web app** and the **platform** each deploy
 only when the merge touches their turbo graph (`turbo-ignore`; a manual
 `workflow_dispatch` run deploys both). A production tag has no such gate and
 always deploys both. The Studio is not a deploy target — it ships as the
-`@blog/studio` package and is mounted by the admin panel; change detection
+`@blog/studio` package and is mounted by the platform; change detection
 still tracks it, but only to decide whether the Sanity content-migration job
 needs to run.
 Architecture rationale lives in `SPEC.md` §13 and
@@ -30,24 +30,24 @@ Architecture rationale lives in `SPEC.md` §13 and
 
 ## Environment matrix
 
-| Concern                 | Development                       | Production                         |
-| ----------------------- | --------------------------------- | ---------------------------------- |
-| Sanity project          | separate dev project (id via env) | separate prod project (id via env) |
-| Sanity dataset          | `development`                     | `production`                       |
-| Vercel project (web)    | `web-dev`                         | `web-prod`                         |
-| Vercel project (admin)  | `platform-dev`                    | `platform-prod`                    |
-| Vercel project (worker) | `worker-dev`                      | `worker-prod`                      |
-| Web URL (initial)       | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
-| Admin URL (initial)     | `<DEV_ADMIN_URL>`                 | `<PRD_ADMIN_URL>`                  |
-| Deploy trigger          | push/merge to `main`              | push git tag `v*`                  |
-| Web deploy              | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
-| Admin deploy            | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
-| CI gate before deploy   | `verify` job on `main`            | Full gate on the `v*` tag          |
-| Revalidation webhook    | dev → dev site                    | prod → prod site                   |
+| Concern                   | Development                       | Production                         |
+| ------------------------- | --------------------------------- | ---------------------------------- |
+| Sanity project            | separate dev project (id via env) | separate prod project (id via env) |
+| Sanity dataset            | `development`                     | `production`                       |
+| Vercel project (web)      | `web-dev`                         | `web-prod`                         |
+| Vercel project (platform) | `platform-dev`                    | `platform-prod`                    |
+| Vercel project (worker)   | `worker-dev`                      | `worker-prod`                      |
+| Web URL (initial)         | `<DEV_WEB_URL>`                   | `<PRD_WEB_URL>`                    |
+| Platform URL (initial)    | `<DEV_PLATFORM_URL>`              | `<PRD_PLATFORM_URL>`               |
+| Deploy trigger            | push/merge to `main`              | push git tag `v*`                  |
+| Web deploy                | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
+| Platform deploy           | Vercel CLI (GitHub Actions)       | Vercel CLI (GitHub Actions)        |
+| CI gate before deploy     | `verify` job on `main`            | Full gate on the `v*` tag          |
+| Revalidation webhook      | dev → dev site                    | prod → prod site                   |
 
 > **Project name vs. hostname.** The Vercel _projects_ are named `web-dev`/`web-prod` and `platform-dev`/`platform-prod`; the _hostnames_ they serve are `blog-dev.{your-hosting}` and `platform.dev.{your-hosting}` (and the apex plus `platform.{your-hosting}` in production; the old `admin-dev` host was retired on 2026-10-22). The gap is deliberate and it widened when the projects were renamed off their `blog-` prefix (#2426): the product is no longer a blog, but the hostnames are live DNS records wired into OAuth callback registrations, so renaming them is separate work with its own checklist — not a side effect of tidying project names. Both forms appear in this file on purpose: `vercel link` and the project settings use the project name, while anything you visit in a browser uses the hostname. The two Storybook projects follow the same split — `ui-library` happens to match its `ui-library.{your_hosting}` hostname, while `web-ui-library`'s intended hostname, `web-storybook.{your_hosting}`, is not attached to it yet and does not resolve.
 
-> `<DEV_ADMIN_URL>` / `<PRD_ADMIN_URL>` are the admin panel's equivalents, on
+> `<DEV_PLATFORM_URL>` / `<PRD_PLATFORM_URL>` are the platform's equivalents, on
 > its own two projects.
 >
 > `<DEV_WEB_URL>` / `<PRD_WEB_URL>` are each project's `*.vercel.app` URL — either
@@ -73,11 +73,11 @@ within this doc; the real values live in GitHub / Vercel / local `.env` and are
 | Revalidate secret (`openssl rand -hex 32`)             | `<DEV_REVALIDATE_SECRET>`  | `<PRD_REVALIDATE_SECRET>`  |
 | Site-config revalidate secret (`openssl rand -hex 32`) | `<DEV_SITE_CONFIG_SECRET>` | `<PRD_SITE_CONFIG_SECRET>` |
 
-Vercel (needed for **both** environments — the web app and the admin panel each
+Vercel (needed for **both** environments — the web app and the platform each
 deploy via the Vercel CLI in CI): `<VERCEL_TOKEN>` (account token) and
 `<VERCEL_ORG_ID>` are shared across all four projects; `<VERCEL_PROJECT_ID>` is
 **per project** (`web-dev` / `web-prod` and `platform-dev` / `platform-prod`, each
-read from `vercel link`) — the web and admin project ids are stored as two
+read from `vercel link`) — the web and platform project ids are stored as two
 distinct GitHub Environment variables (`VERCEL_PROJECT_ID_WEB` /
 `VERCEL_PROJECT_ID_PLATFORM`).
 
@@ -107,8 +107,8 @@ project-scoped, so mint them **inside** the matching project):
         privilege, scoped to migrations only.)
 
 > No `ci-deploy` / Deploy-Studio token anymore — the Studio is not deployed at
-> all: it ships as the `@blog/studio` package and is mounted by the admin
-> panel, so nothing needs Sanity's own deploy permission. If a project still
+> all: it ships as the `@blog/studio` package and is mounted by the
+> platform, so nothing needs Sanity's own deploy permission. If a project still
 > has an old `ci-deploy` token from before this change, it can be revoked.
 
 ### 2. Secrets to generate locally
@@ -137,23 +137,23 @@ take different values.
 
 ### 3. Vercel — six projects · https://vercel.com
 
-Three projects per environment — a web project, an admin-panel project and a
+Three projects per environment — a web project, a platform project and a
 worker project. The
 Studio is no longer a deploy target of its own: it ships as the `@blog/studio`
-package and is mounted by the admin panel, so it has no project, no hostname
+package and is mounted by the platform, so it has no project, no hostname
 and no deploy job.
 
 - **Web:** `web-dev`, `web-prod` — Add New → Project → import
   `{github_account}/blog`; **Root Directory `apps/web`** + tick _"Include files
   outside of the root directory"_; **Node.js 24.x**.
-- **Admin:** `platform-dev`, `platform-prod` — same import flow; **Root Directory
+- **Platform:** `platform-dev`, `platform-prod` — same import flow; **Root Directory
   `apps/platform`** + tick _"Include files outside of the root directory"_;
   **Node.js 24.x**. A separate project rather than a second domain on
   `web-dev`/`web-prod`: a Vercel project has exactly one Root Directory,
   and the panel is a second Next.js app under `apps/platform`.
 - **Worker:** `worker-dev`, `worker-prod` — same import flow; **Root Directory
   `apps/worker`** + tick _"Include files outside of the root directory"_;
-  **Node.js 24.x**. No public hostname: the admin panel reaches it through
+  **Node.js 24.x**. No public hostname: the platform reaches it through
   `WORKER_ENQUEUE_URL`. Its env is listed in
   [`docs/context/environment-variables.md`](context/environment-variables.md);
   `platform-*` gets `WORKER_ENQUEUE_URL` (this project's origin) and
@@ -174,9 +174,9 @@ _saving_ config is the one surface a pre-merge preview would genuinely help
 review) and deliberately left disabled: each preview gets its own
 `*.vercel.app` hostname, and signing in on one would mean registering that
 exact callback URL with Google and creating a whole new GitHub OAuth App
-(one callback each) — neither supports wildcards — for every branch, and the admin accepts only sessions it issued itself. A preview you can't sign
+(one callback each) — neither supports wildcards — for every branch, and the platform accepts only sessions it issued itself. A preview you can't sign
 in to can't be reviewed, so previews would cost a standing OAuth chore and a
-new grant of preview database access while delivering nothing. Admin changes
+new grant of preview database access while delivering nothing. Platform changes
 are reviewed on `platform.dev.{your-hosting}`, which deploys automatically on
 merge.
 
@@ -212,7 +212,7 @@ linking + domains remain:
         `VERCEL_PROJECT_ID_WORKER` for the `development` GitHub Environment.
         (Then delete the local `.vercel/` dir.)
 - [ ] **`worker-prod`** — same; no deploy job reads its id yet, since
-      `deploy-production.yml` deploys web and admin only.
+      `deploy-production.yml` deploys web and platform only.
 
 #### Tenant subdomains — the wildcard and the domains that beat it
 
@@ -227,9 +227,9 @@ claims a production host:
       (Production environment).
 - [x] **`platform-dev`** → add `platform.dev.{your-hosting}`. An explicitly
       assigned domain on another project beats the wildcard — this host serves
-      the admin, not the public site (checked on dev 2026-10-22).
+      the platform, not the public site (checked on dev 2026-10-22).
 - [x] **`platform-dev`** env → `TENANT_ROOT_DOMAIN=dev.{your-hosting}`, so the
-      admin's slug check uses the dev root.
+      platform's slug check uses the dev root.
 - [ ] Production repeats the three with `*.{your-hosting}`,
       `platform.{your-hosting}` and `TENANT_ROOT_DOMAIN={your-hosting}` when
       self-serve signup ships (epic #4840).
@@ -302,8 +302,8 @@ Production scope like the rest:
 | Key                       | `web-dev` / `web-prod` value                                  |
 | ------------------------- | ------------------------------------------------------------- |
 | `RESEND_TENANT_API_KEY`   | the tenant-mail Resend account's API key                      |
-| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <sign-in@mail.{your-hosting}>`                 |
-| `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>`              |
+| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Shinefold <sign-in@mail.{your-hosting}>`                |
+| `NEWSLETTER_FROM_ADDRESS` | e.g. `Shinefold <newsletter@mail.{your-hosting}>`             |
 | `RESEND_WEBHOOK_SECRET`   | the signing secret of that project's Resend webhook (step 5a) |
 
 > **Set every `*_FROM_ADDRESS` to an address on a domain verified in
@@ -429,7 +429,7 @@ Provisioning notes for recreating this from scratch:
       mis-set `production` secret fails it loudly instead of silently
       migrating the wrong branch (or nothing at all) while reporting success.
 
-**Admin** (`platform-dev` / `platform-prod`, Production scope). The panel runs its
+**Platform** (`platform-dev` / `platform-prod`, Production scope). The panel runs its
 **own** Node process, so it needs
 its own copy of every variable it reads: `@blog/auth` declares the auth set
 with `runtimeEnv: process.env` and neither app declares them itself any more
@@ -490,24 +490,24 @@ not fully functional until they are set:
 > Every key above is **Production scope only**, same as the web projects — see
 > the Preview-scope note under the web keys above.
 
-#### OAuth callback URLs for the admin origin
+#### OAuth callback URLs for the platform origin
 
 `apps/platform` hosts sign-in too — its URL can be shared as a link or typed
 directly, which is why it carries the full provider set rather than a
 session-reader subset. The two providers register callbacks differently:
 
-- **Google** — one OAuth client takes several redirect URIs, so add the admin
+- **Google** — one OAuth client takes several redirect URIs, so add the platform
   origin's callback to the client the web projects already use:
   - [ ] `https://platform.{your-hosting}/api/auth/callback/google`
   - [ ] `https://platform.dev.{your-hosting}/api/auth/callback/google`
 - **GitHub** — an OAuth App takes exactly **one** callback URL and rejects any
-  other host, so each origin needs its own OAuth App. Create one per admin
+  other host, so each origin needs its own OAuth App. Create one per platform
   origin and set its `AUTH_GITHUB_ID` / `_SECRET` on that platform project
   only, leaving the web projects' values untouched:
   - [ ] `platform-prod` — callback `https://platform.{your-hosting}/api/auth/callback/github`
   - [ ] `platform-dev` — callback `https://platform.dev.{your-hosting}/api/auth/callback/github`
 
-Without these, OAuth from admin fails at the provider with a redirect-URI
+Without these, OAuth from the platform fails at the provider with a redirect-URI
 mismatch — before it ever reaches our code, so nothing in this repo can
 detect or report it. On GitHub it reads "The redirect_uri is not associated
 with this application."
@@ -616,7 +616,7 @@ provisions a tenant.
 
 `.github/workflows/deprovision-tenant.yml`/
 `invalidate-tenant-cache.yml` (`workflow_dispatch` only, the first the
-break-glass deprovision for an operator without the admin) and
+break-glass deprovision for an operator without the platform) and
 `.github/workflows/recheck-tenant-owners.yml`/`validate-tenant-documents.yml`
 all bind to whichever
 Environment their dispatch's `environment` input names (`development`/
@@ -902,24 +902,24 @@ account. Both keys are also GitHub Environment secrets on `development` and
 - [ ] `http://localhost:3333` — credentials **on** (local Studio).
 - [ ] `http://localhost:3001` — credentials **on** (the Studio mounted in a
       locally-running `apps/platform`).
-- [ ] `https://platform.dev.{your-hosting}` — credentials **on** (the dev admin
-      panel, which mounts the Studio).
-- [ ] `https://platform.{your-hosting}` — credentials **on** (the prod admin panel).
+- [ ] `https://platform.dev.{your-hosting}` — credentials **on** (the dev
+      platform, which mounts the Studio).
+- [ ] `https://platform.{your-hosting}` — credentials **on** (the prod platform).
 - [ ] `https://<DEV_WEB_URL>` — credentials **off** (token reads).
 - [ ] `https://<PRD_WEB_URL>` — credentials **off**.
 - [ ] Remove the old `https://valovinnikov-blog-dev.sanity.studio` /
       `https://valovinnikov-blog.sanity.studio` origins (see "Decommissioning
       the old `*.sanity.studio` Studio" below).
 
-> The Studio is served from the admin panel's own origin, so its CORS origin is
-> the admin panel's — there is no separate Studio hostname to allow. Per-tenant
+> The Studio is served from the platform's own origin, so its CORS origin is
+> the platform's — there is no separate Studio hostname to allow. Per-tenant
 > Sanity projects get this same origin registered automatically by
 > `provision-tenant`; the two rows above are for the dev/prod projects, which
 > predate provisioning and are set by hand.
 
 ### 6a. Decommissioning the old `*.sanity.studio` Studio
 
-Once the Studio mounted in the admin panel is live and verified (it loads,
+Once the Studio mounted in the platform is live and verified (it loads,
 signs in, and can read/write the correct dataset):
 
 - [ ] From `packages/studio`, with each project's env pointed at it (`SANITY_STUDIO_HOSTNAME`
@@ -1115,7 +1115,7 @@ migrate, migrate-db]` (see step 4 below for `migrate-db`). No
    above, for the separate `@blog/db` (Drizzle/Neon) relational store: applies
    any un-applied schema migrations to the **development** Neon branch via
    `pnpm --filter @blog/db db:migrate` (`drizzle-kit migrate`, a no-op when
-   none are pending). Gated on `web`, `admin` or `worker` (the Studio never
+   none are pending). Gated on `web`, `platform` or `worker` (the Studio never
    touches Postgres, so a studio-only change doesn't trigger it);
    `deploy-web`, `deploy-platform` and `deploy-worker` `need` it. No artifact backup here,
    same disposable-staging-line stance as `migrate`; a missing
@@ -1181,7 +1181,7 @@ gate`, which fails with `No app was promoted`, naming every job that did
    therefore leaves every site on its previous deployment, and an app the
    change detection skipped is neither staged nor waited for. Migrations
    still run before the stage jobs, so a failed check leaves the database
-   migrated and the code unchanged. Web and admin are requested at
+   migrated and the code unchanged. Web and platform are requested at
    `/`, where the proxy runs; the worker has no page, so it is requested at
    `/api/inactivity-sweep`, which loads its env and answers 401 without the
    cron secret. Deployment Protection answers before the app does: a `302` to
@@ -1346,15 +1346,15 @@ commit or redeploy a prior Vercel build.
 - [ ] Home page renders (hero + latest posts) with `cdn.sanity.io` images.
 - [ ] Response headers include the CSP / security headers (`next.config.ts`).
 - [ ] A merge to `main` runs `Deploy Development` → `verify` passes → the
-      affected app(s) among web / admin deploy (no deploy runs before `verify`
+      affected app(s) among web / platform deploy (no deploy runs before `verify`
       is green, and no PR deploys either of them).
 - [ ] Publishing in the Studio updates the corresponding site within seconds
       (webhook). Dev publishes hit the dev site; prod publishes hit prod.
-- [ ] **Sign in on the admin domain, then again on the main site.** A green
+- [ ] **Sign in on the platform domain, then again on the main site.** A green
       deploy proves none of the auth wiring — `AUTH_SECRET`, the provider
       credentials, and the OAuth callback registrations all fail only at
       runtime, and the first of those fails silently. Each app must be
-      signed into on its own: the admin accepts only sessions it issued, so
+      signed into on its own: the platform accepts only sessions it issued, so
       a second sign-in being required is the expected result, not a fault.
 
 ---

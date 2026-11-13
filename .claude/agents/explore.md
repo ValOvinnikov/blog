@@ -42,7 +42,7 @@ about.
 ```
 apps/
   web        Next.js frontend: routes, SEO, i18n, composition         (web)
-  platform   Next.js admin panel: separate deploy, mounts Studio      (platform-app)
+  platform   Next.js operator/tenant app: own deploy, mounts Studio   (platform-app)
   worker     Tenant provisioning runs: non-public, Vercel Workflow    (worker)
 packages/
   studio     Sanity Studio library: schema, desk, migrations          (@blog/studio)

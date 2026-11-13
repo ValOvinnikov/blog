@@ -1,5 +1,6 @@
 import { LOCALE_BCP47_TAGS } from '@blog/config';
 import { faker } from '@faker-js/faker';
+import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -12,6 +13,7 @@ const MOCK_ERROR = Object.assign(new Error(faker.lorem.sentence()), {
 });
 
 const MOCK_RETRY = vi.fn();
+const MOCK_PRODUCT_NAME = messages.centeredCardFrame.brandName;
 
 const setup = customRender(GlobalError, {
   error: MOCK_ERROR,
@@ -37,6 +39,12 @@ describe(`<${GlobalError.name}/>`, () => {
     const headings = screen.getAllByRole('heading', { level: 1 });
 
     expect(headings).toHaveLength(1);
+  });
+
+  it('shows one logo named for the product', () => {
+    const logo = screen.getByRole('img', { name: MOCK_PRODUCT_NAME });
+
+    expect(logo).toBeVisible();
   });
 
   it('retries the render from its one action', async () => {

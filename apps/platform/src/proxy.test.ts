@@ -52,9 +52,11 @@ describe('proxy matcher', () => {
     '/api/auth/signin',
     '/_next/static/chunk.js',
     '/_vercel/insights',
+    '/icon',
+    '/apple-icon',
     '/favicon.ico',
     '/robots.txt',
-  ])('excludes the api, _next, _vercel or dotted path %s', (path) => {
+  ])('excludes the api, _next, _vercel, icon or dotted path %s', (path) => {
     expect(MATCHER.test(path)).toBe(false);
   });
 });

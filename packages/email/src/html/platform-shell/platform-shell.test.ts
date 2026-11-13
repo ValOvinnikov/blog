@@ -1,4 +1,7 @@
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import {
+  PLATFORM_EMAIL_BRAND,
+  PLATFORM_EMAIL_FULL_LOGO,
+} from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
@@ -47,7 +50,19 @@ describe(buildPlatformShell, () => {
 
     it('renders in the fixed platform palette', () => {
       expect(html).toContain(PLATFORM_EMAIL_BRAND.surface2);
-      expect(html).toContain(PLATFORM_EMAIL_BRAND.logo1);
+    });
+
+    it('shows the hosted full logo at half size with the product name as alt', () => {
+      const { url, width, height, alt } = PLATFORM_EMAIL_FULL_LOGO;
+
+      expect(html).toContain(
+        `<img src="${url}" width="${width}" height="${height}" alt="${alt}"`,
+      );
+    });
+
+    it('draws no inline SVG and sets no brand name beside the logo', () => {
+      expect(html).not.toContain('<svg');
+      expect(html).not.toContain(`>${MOCK_PLATFORM_BRAND_NAME}</td>`);
     });
   });
 

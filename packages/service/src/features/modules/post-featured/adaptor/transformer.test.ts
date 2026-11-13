@@ -1,10 +1,13 @@
 import {
   BRAND_VARIANT,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
+  DENSITY,
   DISPLAY_MODE,
   POST_SOURCE,
+  RADIUS_SCALE,
 } from '@blog/config/constants';
-import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/post-featured/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   mockRawHeadingBlock,
@@ -48,6 +51,11 @@ describe(toPostFeaturedModule, () => {
     { showImages: true },
     { showImages: false },
     { displayMode: DISPLAY_MODE.CAROUSEL },
+    {
+      cardStyle: CARD_STYLE.FILLED,
+      radiusScale: RADIUS_SCALE.LG,
+      density: DENSITY.COMPACT,
+    },
   ])('maps an authored %o straight through', (authored) => {
     const module = toPostFeaturedModule(mockRawPostFeaturedModule(authored));
 
@@ -57,6 +65,10 @@ describe(toPostFeaturedModule, () => {
   it.each([
     [{ contentAlignment: null }, { contentAlignment: undefined }],
     [{ layout: null }, { layout: undefined }],
+    [
+      { cardStyle: null, radiusScale: null, density: null },
+      { cardStyle: undefined, radiusScale: undefined, density: undefined },
+    ],
   ])('maps an unset %o to %o', (unset, expected) => {
     const module = toPostFeaturedModule(mockRawPostFeaturedModule(unset));
 

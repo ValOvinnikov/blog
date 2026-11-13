@@ -38,7 +38,7 @@ export function buildTenantShell({
   return renderEmailShell({
     palette: brand,
     title: brandName,
-    identity: { brandName, markPalette: brand, logoImageUrl },
+    identity: { brandName, logo: { markPalette: brand, logoImageUrl } },
     previewText,
     bodyHtml,
     structuralHtml,
