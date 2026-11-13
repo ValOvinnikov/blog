@@ -24,3 +24,7 @@ export const MOCK_TAG = {
   label: faker.lorem.words(2),
   href: `/tags/${faker.lorem.slug(2)}`,
 };
+
+export const MOCK_SITE_NAME = 'Northern Notes';
+
+export const MOCK_SITE_INITIAL = 'N';

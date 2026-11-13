@@ -1,9 +1,13 @@
 import { SIZE } from '@blog/config';
+import { MOCK_SITE_NAME } from '@blog/ui/testing/fixtures';
 import { objectKeys } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BrandMark } from './brand-mark';
 import { brandMarkVariants } from './brand-mark-variants';
+
+const MOCK_TITLE = 'Brand mark';
+const MOCK_WIDE_SRC = 'https://placehold.co/320x64';
 
 const meta = {
   title: 'Atoms/BrandMark',
@@ -11,6 +15,7 @@ const meta = {
   tags: ['autodocs'],
   args: {
     size: SIZE.MD,
+    siteName: MOCK_SITE_NAME,
   },
   argTypes: {
     size: {
@@ -25,6 +30,18 @@ type TStory = StoryObj<typeof meta>;
 
 export const Default: TStory = {};
 
+export const Dark: TStory = {
+  globals: { theme: 'dark' },
+};
+
+export const NameStartingWithDigit: TStory = {
+  args: { siteName: '42 Field Notes' },
+};
+
+export const EmptyName: TStory = {
+  args: { siteName: '' },
+};
+
 export const Small: TStory = {
   args: { size: SIZE.SM },
 };
@@ -34,21 +51,21 @@ export const Large: TStory = {
 };
 
 export const Standalone: TStory = {
-  args: { title: 'Brand mark' },
+  args: { title: MOCK_TITLE },
 };
 
 export const WithImageSource: TStory = {
-  args: { src: 'https://placehold.co/64x64', title: 'Brand mark' },
+  args: { src: 'https://placehold.co/64x64', title: MOCK_TITLE },
 };
 
 export const WithWideImageSource: TStory = {
-  args: { src: 'https://placehold.co/320x64', title: 'Brand mark' },
+  args: { src: MOCK_WIDE_SRC, title: MOCK_TITLE },
 };
 
 export const StackedWithWideImageSource: TStory = {
   args: {
-    src: 'https://placehold.co/320x64',
-    title: 'Brand mark',
+    src: MOCK_WIDE_SRC,
+    title: MOCK_TITLE,
     isStacked: true,
   },
 };
@@ -59,8 +76,8 @@ export const StackedWithWideImageSource: TStory = {
 export const StackedWithWideImageSourceNarrowViewport: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    src: 'https://placehold.co/320x64',
-    title: 'Brand mark',
+    src: MOCK_WIDE_SRC,
+    title: MOCK_TITLE,
     isStacked: true,
   },
 };

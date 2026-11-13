@@ -32,8 +32,8 @@ Variants: isBookmarked: (boolean)
 
 ### BrandMark — `components/atoms/brand-mark/brand-mark.tsx`
 
-The brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities).
-Props: size?: TBrandMarkVariants['size'] · title?: string · src?: string · isStacked?: boolean _(extends IWithClassName, IWithDataTestId)_
+The site's logo: its uploaded image, or a tile holding the initial of the site's name when it has none.
+Props: size?: TBrandMarkVariants['size'] · title?: string · src?: string · siteName?: string · isStacked?: boolean _(extends IWithClassName, IWithDataTestId)_
 Variants: size: SIZE.SM|SIZE.MD|SIZE.LG
 
 ### Button — `components/atoms/button/button.tsx`
@@ -184,7 +184,7 @@ Props: kind: TAsideKind · label: string · children: ReactNode _(extends IWithC
 ### BrandLockup — `components/molecules/brand-lockup/brand-lockup.tsx`
 
 The brand mark plus an optional monospace tagline, stacked with the mark above.
-Props: src?: string · size?: TBrandMarkProps['size'] · tagline?: string _(extends IWithClassName, IWithDataTestId)_
+Props: src?: string · siteName?: string · size?: TBrandMarkProps['size'] · tagline?: string _(extends IWithClassName, IWithDataTestId)_
 
 ### Breadcrumbs — `components/molecules/breadcrumbs/breadcrumbs.tsx`
 

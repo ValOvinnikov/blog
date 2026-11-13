@@ -11,15 +11,22 @@ export type TBrandMarkProps = IWithClassName &
     size?: TBrandMarkVariants['size'];
     title?: string;
     src?: string;
+    siteName?: string;
     isStacked?: boolean;
   };
 
-/** The brand mark, rendered from an uploaded image when `src` is supplied, or as three stacked polygon layers coloured from the `--logo-1/2/3` design tokens via inline `style` otherwise (these tokens aren't mirrored into `@theme inline` as Tailwind utilities). */
+const LETTER_OR_DIGIT = /[\p{L}\p{N}]/u;
+
+const toInitial = (siteName: string) =>
+  siteName.normalize('NFC').match(LETTER_OR_DIGIT)?.[0]?.toUpperCase();
+
+/** The site's logo: its uploaded image, or a tile holding the initial of the site's name when it has none. */
 export const BrandMark = ({
   src,
   size,
   isStacked,
   title,
+  siteName = '',
   className,
   dataTestId,
 }: TBrandMarkProps) => {
@@ -39,23 +46,14 @@ export const BrandMark = ({
   }
 
   return (
-    <svg
-      viewBox="0 0 24 24"
-      className={brandMarkVariants({ size, class: className })}
+    <span
       role={title ? 'img' : undefined}
+      aria-label={title}
       aria-hidden={title ? undefined : true}
+      className={brandMarkVariants({ size, class: className })}
       data-testid={dataTestId}
     >
-      {title && <title>{title}</title>}
-      <polygon points="12,3 22,7 12,11 2,7" style={{ fill: 'var(--logo-1)' }} />
-      <polygon
-        points="12,8 22,12 12,16 2,12"
-        style={{ fill: 'var(--logo-2)' }}
-      />
-      <polygon
-        points="12,13 22,17 12,21 2,17"
-        style={{ fill: 'var(--logo-3)' }}
-      />
-    </svg>
+      {toInitial(siteName)}
+    </span>
   );
 };
