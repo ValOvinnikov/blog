@@ -1,5 +1,5 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
-import type { TTenantPlan, TTenantStatus } from '@blog/db/constants';
+import type { TLocaleIsoCode, TTenantPlan } from '@blog/config/constants';
+import type { TTenantStatus } from '@blog/db/constants';
 import {
   planChangeFields,
   type TPlanChangeFields,

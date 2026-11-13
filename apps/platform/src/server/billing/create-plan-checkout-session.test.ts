@@ -1,4 +1,5 @@
-import { STRIPE_PRICE_LOOKUP_KEY, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   BILLING_INTERVAL,
   BILLING_LOG,

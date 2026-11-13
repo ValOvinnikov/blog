@@ -1765,6 +1765,11 @@
     "saveAndLeave": "Save and leave",
     "saving": "Saving…"
   },
+  "outOfDatePageDialog": {
+    "title": "This page is out of date.",
+    "description": "Reload to continue.",
+    "reload": "Reload"
+  },
   "draftRecovery": {
     "title": "You have unsaved changes from {takenAt}.",
     "description": "They were kept on this device when you left the page.",

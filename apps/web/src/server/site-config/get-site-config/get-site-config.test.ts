@@ -1,6 +1,5 @@
-import { PRESET_ID } from '@blog/config/constants';
+import { PRESET_ID, TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';

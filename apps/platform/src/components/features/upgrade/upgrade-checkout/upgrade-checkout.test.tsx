@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { BILLING_INTERVAL, UPGRADE_PAYMENT } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import { createUpgradeCheckoutAction } from '@platform/server/billing/create-upgrade-checkout-action';

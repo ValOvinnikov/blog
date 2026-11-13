@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { TTenantPlan } from '@blog/db';
+import type { TTenantPlan } from '@blog/config/constants';
 import { notifyOwnerOfPlanChange } from '@platform/server/tenants/notify-owner-of-plan-change';
 
 /** The one step every plan change runs once its write has landed, whether an operator or Stripe made it. */

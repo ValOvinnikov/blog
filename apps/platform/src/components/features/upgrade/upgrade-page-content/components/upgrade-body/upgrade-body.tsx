@@ -1,5 +1,7 @@
 import { ALERT_TYPE, SIZE } from '@blog/config';
+import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
+import { isOneOf } from '@blog/utils/primitives';
 import { UpgradeCheckout } from '@platform/components/features/upgrade/upgrade-checkout';
 import { UpgradeConfirming } from '@platform/components/features/upgrade/upgrade-confirming';
 import { Alert } from '@platform/components/shared/alert';
@@ -65,7 +67,11 @@ export const UpgradeBody = ({
       tenantId={tenantId}
       publishableKey={publishableKey}
       promo={promo}
-      initialPlan={trial?.plan}
+      initialPlan={
+        trial && isOneOf(SELLABLE_TENANT_PLANS, trial.plan)
+          ? trial.plan
+          : undefined
+      }
     />
   );
 };

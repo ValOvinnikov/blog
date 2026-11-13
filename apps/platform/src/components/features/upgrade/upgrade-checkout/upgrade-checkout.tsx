@@ -7,7 +7,7 @@ import {
   SIZE,
   type TMaybeUndefined,
 } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { TENANT_PLAN, type TSellableTenantPlan } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -33,7 +33,7 @@ export type TUpgradeCheckoutProps = {
   tenantId: string;
   publishableKey: string;
   promo?: string;
-  initialPlan?: TTenantPlan;
+  initialPlan?: TSellableTenantPlan;
 };
 
 export const UpgradeCheckout = ({

@@ -1,4 +1,5 @@
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import {

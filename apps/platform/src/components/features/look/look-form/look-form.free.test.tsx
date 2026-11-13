@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { LOOK_ROW_TITLE_KEY } from '@platform/components/features/look/look-form/look-row-title-key';
 import { FONT_OPTIONS } from '@platform/config/fonts';
 import { LOOK_ROW } from '@platform/constants/look-row';

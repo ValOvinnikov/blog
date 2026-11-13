@@ -2,12 +2,10 @@
 
 import {
   ACTION_OUTCOME,
-  DOMAIN_PATTERN,
-  isLocaleIsoCode,
   type TActionResult,
   type TOutcome,
 } from '@blog/config';
-import { queries, TENANT_DETAILS_UPDATE_OUTCOME, TENANT_PLAN } from '@blog/db';
+import { queries, TENANT_DETAILS_UPDATE_OUTCOME } from '@blog/db';
 import { toOutcome } from '@blog/utils/to-outcome';
 import {
   TENANT_FIELD_ERROR,
@@ -19,27 +17,16 @@ import {
   completeTenantDetailsUpdate,
   type TTenantDetailsSaved,
 } from '@platform/server/tenants/complete-tenant-details-update';
+import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import {
-  toTenantFieldErrors,
-  type TTenantDetailsFieldError,
-} from '@platform/server/tenants/tenant-field-error';
+  toUpdateTenantDetailsFieldErrors,
+  type TUpdateTenantDetailsActionInput,
+  updateTenantDetailsInputSchema,
+} from '@platform/server/tenants/update-tenant-details-input';
 import { env } from '@platform/utils/env/env';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
-import { z } from 'zod';
-
-const updateTenantDetailsInputSchema = z.object({
-  name: z.string().trim().min(1),
-  primaryDomain: z.string().trim().toLowerCase().regex(DOMAIN_PATTERN),
-  plan: z.enum(TENANT_PLAN),
-  locale: z.string().refine(isLocaleIsoCode),
-  ownerEmail: z.string().trim().toLowerCase().email().optional(),
-});
-
-export type TUpdateTenantDetailsActionInput = z.input<
-  typeof updateTenantDetailsInputSchema
->;
 
 export type TUpdateTenantDetailsRefusal =
   | typeof TENANT_REFUSAL.NOT_FOUND
@@ -72,16 +59,7 @@ export const updateTenantDetailsAction = async (
   if (!parsed.success) {
     return {
       outcome: ACTION_OUTCOME.INVALID,
-      fieldErrors: toTenantFieldErrors<keyof TUpdateTenantDetailsActionInput>(
-        parsed.error.issues,
-        {
-          name: TENANT_FIELD_ERROR.NAME_REQUIRED,
-          primaryDomain: TENANT_FIELD_ERROR.DOMAIN_INVALID,
-          plan: TENANT_FIELD_ERROR.PLAN_UNSUPPORTED,
-          locale: TENANT_FIELD_ERROR.LOCALE_UNSUPPORTED,
-          ownerEmail: TENANT_FIELD_ERROR.EMAIL_INVALID,
-        },
-      ),
+      fieldErrors: toUpdateTenantDetailsFieldErrors(parsed.error.issues),
     };
   }
 

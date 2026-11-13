@@ -1,4 +1,5 @@
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
@@ -103,31 +104,31 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
       expect(main).toHaveAccessibleName(messages.dashboardTenantPicker.heading);
     });
 
-    it('links each tenant to selecting it', () => {
-      const tenantLink = screen.getByRole('link', {
-        name: TENANT_NAME_PATTERN,
+    describe('the active tenant link', () => {
+      let tenantLink: HTMLElement;
+
+      beforeEach(() => {
+        tenantLink = screen.getByRole('link', { name: TENANT_NAME_PATTERN });
       });
 
-      expect(tenantLink).toHaveAttribute(
-        'href',
-        adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
-      );
-    });
-
-    it('shows each active tenant’s domain, role and plan', () => {
-      const tenantLink = screen.getByRole('link', {
-        name: TENANT_NAME_PATTERN,
+      it('links each tenant to selecting it', () => {
+        expect(tenantLink).toHaveAttribute(
+          'href',
+          adminRoutes.dashboardSelectTenantHref(MOCK_TENANT_ID),
+        );
       });
 
-      const domain = within(tenantLink).getByText(MOCK_TENANT_DOMAIN);
-      const role = within(tenantLink).getByText(messages.roleLabel.OWNER);
-      const plan = within(tenantLink).getByText(
-        messages.planNames[TENANT_PLAN.GROWTH],
-      );
+      it('shows each active tenant’s domain, role and plan', () => {
+        const domain = within(tenantLink).getByText(MOCK_TENANT_DOMAIN);
+        const role = within(tenantLink).getByText(messages.roleLabel.OWNER);
+        const plan = within(tenantLink).getByText(
+          messages.planNames[TENANT_PLAN.GROWTH],
+        );
 
-      expect(domain).toBeVisible();
-      expect(role).toBeVisible();
-      expect(plan).toBeVisible();
+        expect(domain).toBeVisible();
+        expect(role).toBeVisible();
+        expect(plan).toBeVisible();
+      });
     });
 
     it('shows only the plan when the role is not known', () => {
@@ -184,15 +185,16 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
 
   describe('with more tenants than the viewport fits', () => {
     let user: UserEvent;
+    let filter: HTMLElement;
 
     beforeEach(() => {
       user = userEvent.setup();
       overflowViewport();
       setup();
+      filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
     });
 
     it('offers a filter and counts the tenants shown', () => {
-      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
       const status = screen.getByRole('status');
 
       expect(filter).toBeVisible();
@@ -200,7 +202,6 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
     });
 
     it('narrows the tenants by name', async () => {
-      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
       await user.type(filter, MOCK_OTHER_TENANT_NAME);
 
       const links = screen.getAllByRole('link');
@@ -212,7 +213,6 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
     });
 
     it('narrows the tenants by domain, keeping an archived match under its label', async () => {
-      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
       await user.type(filter, MOCK_ARCHIVED_TENANT_DOMAIN);
 
       const archivedList = screen.getByRole('list', { name: ARCHIVED_LABEL });
@@ -226,7 +226,6 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
     });
 
     it('says so when nothing matches', async () => {
-      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
       await user.type(filter, MOCK_UNMATCHED_QUERY);
 
       const noMatch = screen.getByText(
@@ -239,7 +238,6 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
     });
 
     it('keeps a filter holding text after the tenants fit again', async () => {
-      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
       await user.type(filter, MOCK_TENANT_NAME);
       vi.restoreAllMocks();
       fireEvent(window, new Event('resize'));
@@ -249,7 +247,6 @@ describe(`<${DashboardTenantPicker.name}/>`, () => {
 
     it('keeps focus in the filter when a query that made the tenants fit is cleared', async () => {
       overflowViewportWhileUnfiltered();
-      const filter = screen.getByRole('searchbox', { name: FILTER_LABEL });
       await user.type(filter, MOCK_OTHER_TENANT_NAME);
 
       await user.clear(filter);

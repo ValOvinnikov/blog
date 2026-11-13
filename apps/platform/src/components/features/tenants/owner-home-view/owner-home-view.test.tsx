@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   DOMAIN_VERIFICATION_STATUS,
   type TDomainVerificationStatus,

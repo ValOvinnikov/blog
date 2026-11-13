@@ -1,11 +1,11 @@
-import type { TMaybeNull } from '@blog/config/types';
+import {
+  TENANT_PLAN,
+  type TSellableTenantPlan,
+  type TTenantPlan,
+} from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 
-import {
-  SUBSCRIBER_BAND_CEILINGS,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from './tenant';
+import { SUBSCRIBER_BAND_CEILINGS } from './tenant';
 
 export const TRIAL_LENGTH_DAYS = 14;
 
@@ -55,11 +55,14 @@ export type TPlanPriceLookupKeys = TIntervalPriceLookupKeys & {
   >;
 };
 
+type TPlanPriceLookupKeysByPlan = {
+  [P in TTenantPlan]: P extends TSellableTenantPlan
+    ? TPlanPriceLookupKeys
+    : null;
+};
+
 // Stripe lookup keys, never Price ids: one key names the same Price in test and live mode.
-export const PLAN_PRICE_LOOKUP_KEYS: Record<
-  TTenantPlan,
-  TMaybeNull<TPlanPriceLookupKeys>
-> = {
+export const PLAN_PRICE_LOOKUP_KEYS: TPlanPriceLookupKeysByPlan = {
   [TENANT_PLAN.FREE]: null,
   [TENANT_PLAN.STARTER]: {
     monthly: STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,

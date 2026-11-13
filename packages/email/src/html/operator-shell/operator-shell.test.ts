@@ -1,4 +1,8 @@
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import {
+  PLATFORM_EMAIL_BRAND,
+  PLATFORM_EMAIL_FULL_LOGO,
+  PLATFORM_EMAIL_MARK,
+} from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
@@ -40,6 +44,16 @@ describe(buildOperatorShell, () => {
       expect(html).toContain(
         `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${OPERATOR_BRAND_NAME}`,
       );
+    });
+
+    it('shows the hosted small logo beside the operator name', () => {
+      const { url, width, height, alt } = PLATFORM_EMAIL_MARK;
+
+      expect(html).toContain(
+        `<img src="${url}" width="${width}" height="${height}" alt="${alt}"`,
+      );
+      expect(html).toContain(`>${OPERATOR_BRAND_NAME}</td>`);
+      expect(html).not.toContain(PLATFORM_EMAIL_FULL_LOGO.url);
     });
 
     it('omits the preheader when no preview text is given', () => {

@@ -1,5 +1,5 @@
 import { CAPABILITY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { mockAllOnSettingsFeaturesValues } from '@platform/testing/settings-features/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
@@ -28,11 +28,10 @@ const arrangeSavedValues = (values = MOCK_ALL_ON) => {
 describe(getEnabledCapabilities, () => {
   beforeEach(() => {
     getSettingsFeaturesOrDefaultsMock.mockReset();
+    arrangeSavedValues();
   });
 
   it('includes a capability the plan entitles and the toggle enables', async () => {
-    arrangeSavedValues();
-
     const result = await getEnabledCapabilities({
       id: MOCK_TENANT_ID,
       plan: TENANT_PLAN.GROWTH,
@@ -57,8 +56,6 @@ describe(getEnabledCapabilities, () => {
   });
 
   it('omits a capability the plan does not entitle', async () => {
-    arrangeSavedValues();
-
     const result = await getEnabledCapabilities({
       id: MOCK_TENANT_ID,
       plan: TENANT_PLAN.FREE,

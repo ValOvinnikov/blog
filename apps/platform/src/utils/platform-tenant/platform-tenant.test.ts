@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
   MOCK_TENANT_CREATED_AT,
   mockTenant,

@@ -1,45 +1,11 @@
-/**
- * Seeds the tenant registry (`tenants`, `tenant_domains`, `memberships`)
- * for one tenant and grants an existing user the `OWNER` role on it.
- *
- * MANUAL, HUMAN-RUN ONLY — never wired into CI or any deploy pipeline. Run
- * it by hand, once, against the target Neon branch:
- *
- *   set -a && source apps/web/.env.local && set +a
- *   pnpm --filter @blog/db db:seed-tenant -- \
- *     --name="Acme" \
- *     --primary-domain=acme.example.com \
- *     --sanity-project-id=<project id> \
- *     --sanity-dataset=production \
- *     --locale=en \
- *     --owner-email=owner@example.com \
- *     [--plan=FREE|GROWTH] [--status=ACTIVE|SUSPENDED] \
- *     [--domain=extra.example.com ...] [--sanity-read-token=<token>]
- *
- * Idempotent: re-running resolves the tenant by primary domain or, failing
- * that, by Sanity project id, and reuses the existing row instead of
- * creating a duplicate — so a run interrupted partway through (e.g. between
- * creating the tenant and writing its domain row) recovers on re-run rather
- * than failing on a unique-constraint conflict. A domain match whose tenant
- * already holds a different Sanity project id is refused, never repointed.
- * Every write below (domain, membership) is itself a no-op-safe upsert.
- * `--owner-email` must already have a `users` row — this script does not
- * create one; the owner signs in once first (via the site's normal Auth.js
- * flow) so a real, correctly-linked account exists before it is granted a
- * membership.
- *
- * `db:seed-tenant`'s `--conditions=react-server` node flag makes `getDb()`'s
- * `import 'server-only'` resolve to its no-op export outside Next.js's own
- * build (the condition Next.js itself sets), so this plain-Node script can
- * reuse the real query functions instead of duplicating their SQL.
- */
+// Seeds one tenant's registry rows and grants an existing user OWNER on it; manual, human-run only.
+// `db:seed-tenant` runs with `--conditions=react-server` so `getDb()`'s `server-only` import resolves outside Next.js.
 import { pathToFileURL } from 'node:url';
 
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
-  TENANT_PLAN,
   TENANT_STATUS,
-  type TTenantPlan,
   type TTenantStatus,
 } from '@blog/db/constants';
 import { createMembership } from '@blog/db/queries/memberships';
@@ -56,6 +22,7 @@ import {
 import { findUserByEmail } from '@blog/db/queries/users';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
+import { isNull } from '@blog/utils/primitives';
 
 type TParsedArgs = {
   name: string;
@@ -147,7 +114,7 @@ export async function resolveOrCreateTenant(
   const existing = await getTenantByDomain(args.primaryDomain);
   if (existing) {
     if (
-      existing.sanityProjectId !== null &&
+      !isNull(existing.sanityProjectId) &&
       existing.sanityProjectId !== args.sanityProjectId
     ) {
       throw new Error(
@@ -170,7 +137,7 @@ export async function resolveOrCreateTenant(
         `seed-tenant: Sanity project id "${args.sanityProjectId}" resolved to tenant id "${existingId}", but that tenant no longer exists.`,
       );
     }
-    if (existingBySanityProjectId.deprovisionedAt !== null) {
+    if (!isNull(existingBySanityProjectId.deprovisionedAt)) {
       throw new Error(
         `seed-tenant: Sanity project id "${args.sanityProjectId}" is already held by archived tenant "${existingBySanityProjectId.id}".`,
       );
@@ -228,9 +195,7 @@ async function main(): Promise<void> {
   console.warn(`Granted OWNER on "${tenant.name}" to "${args.ownerEmail}".`);
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx seed-tenant.ts`)
-// — guards against `main()` firing as an import side effect when a test
-// imports `resolveOrCreateTenant` from this same module.
+// The test imports this module, so main() runs only as the CLI entrypoint.
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href

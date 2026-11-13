@@ -1,5 +1,5 @@
 import { ALERT_TYPE, SIZE } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
 import { formatDate } from '@platform/utils/format-date/format-date';

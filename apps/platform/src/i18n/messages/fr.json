@@ -1765,6 +1765,11 @@
     "saveAndLeave": "Enregistrer et quitter",
     "saving": "Enregistrement…"
   },
+  "outOfDatePageDialog": {
+    "title": "Cette page n'est plus à jour.",
+    "description": "Rechargez-la pour continuer.",
+    "reload": "Recharger"
+  },
   "draftRecovery": {
     "title": "Vous avez des modifications non enregistrées de {takenAt}.",
     "description": "Elles ont été conservées sur cet appareil quand vous avez quitté la page.",

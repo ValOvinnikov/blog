@@ -1,5 +1,5 @@
+import { TENANT_PLAN } from '@blog/config/constants';
 import {
-  TENANT_PLAN,
   TENANT_STATUS,
   NEWSLETTER_POST_SEND_OUTCOME,
 } from '@blog/db/constants';

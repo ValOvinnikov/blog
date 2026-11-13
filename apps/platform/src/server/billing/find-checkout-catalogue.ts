@@ -1,7 +1,8 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_PRICE_LOOKUP_KEYS, type TTenantPlan } from '@blog/db/constants';
+import { type TTenantPlan } from '@blog/config/constants';
+import { PLAN_PRICE_LOOKUP_KEYS } from '@blog/db/constants';
 import {
   BILLING_INTERVAL,
   BILLING_LOG,

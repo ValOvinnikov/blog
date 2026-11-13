@@ -1,7 +1,7 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import { type TTenantPlan } from '@blog/config/constants';
 import {
   BILLING_LOG,
   STRIPE_TENANT_METADATA_KEY,

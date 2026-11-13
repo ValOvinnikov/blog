@@ -1,10 +1,12 @@
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_ARCHIVED_AT,
   MOCK_OTHER_TENANT_ID,
   MOCK_OTHER_TENANT_NAME,
+  MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,
   MOCK_TENANT_NAME,
   mockTenant,
@@ -65,13 +67,13 @@ describe(toTenantPickerItems, () => {
   it('leaves out every tenant field the picker does not show', () => {
     const [item] = toTenantPickerItems([mockTenant()], []);
 
-    expect(Object.keys(item ?? {}).toSorted()).toEqual([
-      'id',
-      'isArchived',
-      'name',
-      'plan',
-      'primaryDomain',
-      'role',
-    ]);
+    expect(item).toStrictEqual({
+      id: MOCK_TENANT_ID,
+      name: MOCK_TENANT_NAME,
+      primaryDomain: MOCK_TENANT_DOMAIN,
+      isArchived: false,
+      role: undefined,
+      plan: TENANT_PLAN.FREE,
+    });
   });
 });

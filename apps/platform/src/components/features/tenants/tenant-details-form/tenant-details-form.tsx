@@ -1,7 +1,7 @@
 'use client';
 
 import { ALERT_TYPE, SIZE, type TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
@@ -37,7 +37,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
     isPending,
     submit,
   } = useCreateTenantSubmit();
-  const { values, updateField } = useTenantDetailsValues(
+  const { values, updateValues } = useTenantDetailsValues(
     clearOwnerInviteConfirmation,
   );
 
@@ -68,7 +68,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                 label={t('nameLabel')}
                 error={fieldErrorText(fieldErrors.name)}
                 value={values.name}
-                onChange={(value) => updateField('name', value)}
+                onChange={(value) => updateValues({ name: value })}
               />
 
               <FormSiteAddressInput
@@ -76,7 +76,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                 hint={t('siteAddressHint')}
                 error={fieldErrorText(fieldErrors.slug)}
                 value={values.slug}
-                onChange={(value) => updateField('slug', value)}
+                onChange={(value) => updateValues({ slug: value })}
                 rootDomain={rootDomain}
               />
 
@@ -85,7 +85,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                 hint={t('localeHint')}
                 error={fieldErrorText(fieldErrors.locale)}
                 value={values.locale}
-                onChange={(locale) => updateField('locale', locale)}
+                onChange={(locale) => updateValues({ locale })}
               />
 
               <FormField
@@ -96,7 +96,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                   aria={{ label: t('planLabel') }}
                   options={planOptions}
                   value={values.plan}
-                  onChange={(plan) => updateField('plan', plan)}
+                  onChange={(plan) => updateValues({ plan })}
                   className={planControl()}
                 />
               </FormField>
@@ -119,7 +119,7 @@ export const TenantDetailsForm = ({ rootDomain }: TTenantDetailsFormProps) => {
                 <TextInput
                   type="email"
                   value={values.ownerEmail}
-                  onChange={(value) => updateField('ownerEmail', value)}
+                  onChange={(value) => updateValues({ ownerEmail: value })}
                 />
               </FormField>
             </div>

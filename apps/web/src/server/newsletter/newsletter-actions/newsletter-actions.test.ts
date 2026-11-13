@@ -5,7 +5,8 @@ import {
   resolveTenantEmailBrand,
   SUBSCRIBER_OUTCOME,
 } from '@blog/config';
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { FORWARDED_FOR_HEADER } from '@blog/utils/client-key';
 import { faker } from '@faker-js/faker';

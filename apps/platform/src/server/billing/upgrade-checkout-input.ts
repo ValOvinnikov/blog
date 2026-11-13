@@ -1,12 +1,11 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
 import { BILLING_INTERVAL } from '@platform/constants/billing';
-import { isSellablePlan } from '@platform/utils/sellable-plans/sellable-plans';
 import { z } from 'zod';
 
 const MAX_PROMOTION_CODE_LENGTH = 64;
 
 export const upgradeCheckoutInputSchema = z.object({
-  plan: z.enum(TENANT_PLAN).refine(isSellablePlan),
+  plan: z.enum(SELLABLE_TENANT_PLANS),
   interval: z.enum(BILLING_INTERVAL),
   promo: z
     .string()

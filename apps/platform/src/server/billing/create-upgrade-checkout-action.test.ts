@@ -1,9 +1,6 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import {
-  STRIPE_PRICE_LOOKUP_KEY,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { STRIPE_PRICE_LOOKUP_KEY, TENANT_STATUS } from '@blog/db/constants';
 import { okResult } from '@blog/utils';
 import {
   BILLING_INTERVAL,
@@ -220,7 +217,11 @@ describe(createUpgradeCheckoutAction, () => {
   });
 
   it('rejects the Free plan, which is not for sale', async () => {
-    const result = await checkout({ ...MOCK_MONTHLY, plan: TENANT_PLAN.FREE });
+    const result = await checkout({
+      ...MOCK_MONTHLY,
+      // @ts-expect-error -- Free is deliberately not a sellable plan
+      plan: TENANT_PLAN.FREE,
+    });
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.INVALID,

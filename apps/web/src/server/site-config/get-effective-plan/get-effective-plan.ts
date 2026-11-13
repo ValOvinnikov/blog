@@ -1,4 +1,4 @@
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';
 import { logger } from '@web/utils/logger/logger';

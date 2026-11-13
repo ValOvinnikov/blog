@@ -1,6 +1,6 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
@@ -21,7 +21,7 @@ import {
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
-import userEvent from '@testing-library/user-event';
+import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { SignInAppsPageContent } from './sign-in-apps-page-content';
 
@@ -45,7 +45,10 @@ const setup = customRenderAsync(SignInAppsPageContent, {
 });
 
 describe(`<${SignInAppsPageContent.name}/>`, () => {
+  let user: UserEvent;
+
   beforeEach(() => {
+    user = userEvent.setup();
     vi.mocked(listTenantOAuthClients)
       .mockReset()
       .mockResolvedValue([mockOAuthClient()]);
@@ -156,9 +159,8 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
   it('lists both own apps a Free owner gets on Growth, as plain text', async () => {
     await setup({ tenant: mockTenant() });
 
-    await userEvent
-      .setup()
-      .click(screen.getByRole('button', { name: growthNote.show }));
+    const showButton = screen.getByRole('button', { name: growthNote.show });
+    await user.click(showButton);
 
     const list = screen.getByRole('list', { name: growthNote.listLabel });
     const items = within(list).getAllByRole('listitem');

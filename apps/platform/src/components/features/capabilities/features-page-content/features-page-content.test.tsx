@@ -1,5 +1,5 @@
 import { CAPABILITY, type TPresetId } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import messages from '@platform/i18n/messages/en.json';
 import { ARIA_DISABLED } from '@platform/testing/aria';
 import { expectArchivedOffersNoSave } from '@platform/testing/assert-archived-save';

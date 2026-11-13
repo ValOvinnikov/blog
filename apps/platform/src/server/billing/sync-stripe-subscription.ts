@@ -1,10 +1,10 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
+import type { TTenantPlan } from '@blog/config/constants';
 import {
   queries,
   TENANT_PLAN_WRITE_OUTCOME,
-  type TTenantPlan,
   WRITABLE_TENANT_STATUSES,
 } from '@blog/db';
 import { isOneOf, isString } from '@blog/utils/primitives';

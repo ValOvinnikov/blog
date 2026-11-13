@@ -1,8 +1,5 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MEMBERSHIP_ROLE, TENANT_STATUS } from '@blog/db/constants';
 import { UPGRADE_STATE } from '@platform/constants/billing';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';

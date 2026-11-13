@@ -1,10 +1,9 @@
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import {
   PAID_SUBSCRIBER_BAND_CEILINGS,
   PLAN_PRICE_LOOKUP_KEYS,
-  TENANT_PLAN,
   type TPaidSubscriberBandCeiling,
-  type TTenantPlan,
 } from '@blog/db/constants';
 import { hasArrayGotMultipleItems, isUndefined } from '@blog/utils/primitives';
 

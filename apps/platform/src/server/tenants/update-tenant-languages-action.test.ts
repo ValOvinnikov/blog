@@ -1,12 +1,13 @@
 import {
+  type TMaybeNull,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   ERROR_CODE,
   LOCALE_ISO_CODES,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
@@ -53,7 +54,7 @@ const MOCK_SAVE_ERROR = new Error(faker.lorem.sentence());
 const setTenantAdditionalLocalesMock = vi.mocked(
   queries.tenants.setTenantAdditionalLocales,
 );
-const authMock = vi.mocked<() => Promise<Session | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Session>>>(auth);
 const insertAuditEventMock = vi.mocked(queries.auditEvents.insertAuditEvent);
 
 const { EN, NL, FR } = LOCALE_ISO_CODES;

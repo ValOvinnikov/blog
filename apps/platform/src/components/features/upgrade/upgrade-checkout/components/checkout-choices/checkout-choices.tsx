@@ -1,16 +1,18 @@
-import type { TTenantPlan } from '@blog/db/constants';
+import {
+  SELLABLE_TENANT_PLANS,
+  type TSellableTenantPlan,
+} from '@blog/config/constants';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import {
   BILLING_INTERVAL,
   type TBillingInterval,
 } from '@platform/constants/billing';
-import { SELLABLE_PLANS } from '@platform/utils/sellable-plans/sellable-plans';
 import { useTranslations } from 'next-intl';
 
 import { checkoutChoicesVariants } from './checkout-choices-variants';
 
 export type TCheckoutChoice = {
-  plan: TTenantPlan;
+  plan: TSellableTenantPlan;
   interval: TBillingInterval;
 };
 
@@ -31,7 +33,7 @@ export const CheckoutChoices = ({
   return (
     <div className={choices()}>
       <SegmentedControl
-        options={SELLABLE_PLANS.map((value) => ({
+        options={SELLABLE_TENANT_PLANS.map((value) => ({
           value,
           label: tPlan(value),
         }))}

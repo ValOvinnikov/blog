@@ -1,10 +1,7 @@
 import 'server-only';
 
-import {
-  queries,
-  STRIPE_EVENT_RECORD_OUTCOME,
-  type TTenantPlan,
-} from '@blog/db';
+import type { TTenantPlan } from '@blog/config/constants';
+import { queries, STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db';
 import { BILLING_LOG, STRIPE_EVENT_TYPE } from '@platform/constants/billing';
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import { subscriptionIdFromEvent } from '@platform/server/billing/subscription-id-from-event';
