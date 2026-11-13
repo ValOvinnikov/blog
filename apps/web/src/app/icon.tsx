@@ -1,38 +1,34 @@
-import { FAVICON_RESPONSE_NOT_OK_EVENT } from '@web/constants/icon';
+import type { TMaybeUndefined } from '@blog/config';
+import { toInitial } from '@blog/utils/primitives';
+import { ICON_LOG } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import {
+  buildInitialTileSvg,
+  buildNeutralTileSvg,
+} from '@web/utils/build-tile-icon-svg';
 import { logger } from '@web/utils/logger/logger';
+import { toThemeTokens } from '@web/utils/to-theme-tokens';
 
 export const contentType = 'image/svg+xml';
 
 const FETCH_TIMEOUT_MS = 5000;
 
-// Inlined, not read from a file: it is the fallback for every failure below, so it must be zero-I/O.
-const FALLBACK_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
-  <style>
-    .l1{fill:#2E6BD6}.l2{fill:#4F87E8}.l3{fill:#7AA6F0}
-    @media (prefers-color-scheme:dark){.l1{fill:#3D78DE}.l2{fill:#5F92EC}.l3{fill:#93B8F5}}
-  </style>
-  <polygon class="l1" points="40,42 66,51 40,60 14,51"/>
-  <polygon class="l2" points="40,27 66,36 40,45 14,36"/>
-  <polygon class="l3" points="40,12 66,21 40,30 14,21"/>
-</svg>`;
-
-const buildFallbackResponse = (): Response => {
-  return new Response(FALLBACK_MARK_SVG, {
+const buildSvgResponse = (svg: string): Response => {
+  return new Response(svg, {
     headers: { 'Content-Type': contentType },
   });
 };
 
 const fetchFavicon = async (
   faviconUrl: string,
-): Promise<Response | undefined> => {
+): Promise<TMaybeUndefined<Response>> => {
   const response = await fetch(faviconUrl, {
     signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
   });
 
   if (!response.ok) {
-    logger.error(FAVICON_RESPONSE_NOT_OK_EVENT, { status: response.status });
+    logger.error(ICON_LOG.FAVICON_RESPONSE_NOT_OK, { status: response.status });
     return undefined;
   }
 
@@ -42,18 +38,24 @@ const fetchFavicon = async (
 export default async function Icon() {
   const tenant = await resolveRequestTenant();
   if (!tenant) {
-    return buildFallbackResponse();
+    return buildSvgResponse(buildNeutralTileSvg());
   }
 
   const result = await getSiteConfig(tenant.id);
   if (!result.ok) {
-    logger.error('icon.site_config_fetch_failed', { error: result.error });
-    return buildFallbackResponse();
+    logger.error(ICON_LOG.SITE_CONFIG_FETCH_FAILED, { error: result.error });
+    return buildSvgResponse(buildNeutralTileSvg());
   }
 
-  const faviconUrl = result.data?.faviconAssetUrl;
+  const siteConfig = result.data;
+  const faviconUrl = siteConfig?.faviconAssetUrl;
   if (!faviconUrl) {
-    return buildFallbackResponse();
+    const brandName = siteConfig?.brandName ?? tenant.name;
+    const { accentHue, logoHue } = toThemeTokens(siteConfig);
+
+    return buildSvgResponse(
+      buildInitialTileSvg(toInitial(brandName), logoHue ?? accentHue),
+    );
   }
 
   try {
@@ -69,8 +71,8 @@ export default async function Icon() {
       });
     }
   } catch (error) {
-    logger.error('icon.favicon_fetch_failed', { error });
+    logger.error(ICON_LOG.FAVICON_FETCH_FAILED, { error });
   }
 
-  return buildFallbackResponse();
+  return buildSvgResponse(buildNeutralTileSvg());
 }

@@ -1,4 +1,5 @@
 import { routes } from '@blog/config';
+import { toInitial } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { customRender, screen, waitFor } from '@web/testing/custom-render';
 
@@ -8,9 +9,14 @@ faker.seed(5301);
 
 const MOCK_LOGO_URL = faker.image.url();
 const MOCK_TAGLINE = faker.lorem.words(3);
+const MOCK_SITE_NAME = faker.company.name();
+const MOCK_SITE_INITIAL = toInitial(MOCK_SITE_NAME)!;
 const HOME_LINK_NAME = 'Home';
 
-const setup = customRender(BrandLockupLink, { logoUrl: MOCK_LOGO_URL });
+const setup = customRender(BrandLockupLink, {
+  logoUrl: MOCK_LOGO_URL,
+  siteName: MOCK_SITE_NAME,
+});
 
 describe(`<${BrandLockupLink.name}/>`, () => {
   afterEach(() => {
@@ -27,17 +33,17 @@ describe(`<${BrandLockupLink.name}/>`, () => {
     expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
   });
 
-  it('falls through to the polygon mark when no logo is uploaded', () => {
+  it("shows the site's initial tile when no logo is uploaded", () => {
     setup({ logoUrl: undefined });
 
     const logo = screen.queryByRole('presentation');
-    const link = screen.getByRole('link', { name: HOME_LINK_NAME });
+    const initial = screen.getByText(MOCK_SITE_INITIAL);
 
     expect(logo).not.toBeInTheDocument();
-    expect(link).not.toBeEmptyDOMElement();
+    expect(initial).toBeInTheDocument();
   });
 
-  it('falls back to the polygon mark when the logo fails to load', async () => {
+  it("falls back to the site's initial tile when the logo fails to load", async () => {
     vi.spyOn(HTMLImageElement.prototype, 'decode').mockRejectedValue(
       new Error(faker.lorem.sentence()),
     );
@@ -48,8 +54,8 @@ describe(`<${BrandLockupLink.name}/>`, () => {
       const logo = screen.queryByRole('presentation');
       expect(logo).not.toBeInTheDocument();
     });
-    const link = screen.getByRole('link', { name: HOME_LINK_NAME });
-    expect(link).not.toBeEmptyDOMElement();
+    const initial = screen.getByText(MOCK_SITE_INITIAL);
+    expect(initial).toBeInTheDocument();
   });
 
   it('shows the tagline when set', () => {

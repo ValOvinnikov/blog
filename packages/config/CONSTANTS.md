@@ -838,6 +838,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
 - **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
+### `@web/constants/icon` — `apps/web/src/constants/icon.ts`
+
+- **ICON_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"icon.site_config_fetch_failed"`, `FAVICON_RESPONSE_NOT_OK`=`"icon.favicon_response_not_ok"`, `FAVICON_FETCH_FAILED`=`"icon.favicon_fetch_failed"`
+
 ### `@web/constants/internal-pages` — `apps/web/src/constants/internal-pages.ts`
 
 - **INTERNAL_PAGES_LOG**: `SECRET_MISSING`=`"internal_pages.secret_missing"`, `TENANT_LOOKUP_FAILED`=`"internal_pages.tenant_lookup_failed"`, `TITLE_FETCH_FAILED`=`"internal_pages.title_fetch_failed"`, `PATH_FETCH_FAILED`=`"internal_pages.path_fetch_failed"`

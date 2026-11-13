@@ -86,7 +86,9 @@ export const SiteFooter = async () => {
         dataTestId="site-footer"
       >
         <Footer.Logo>
-          {brandLogoUrl && <BrandLockupLink logoUrl={brandLogoUrl} />}
+          {brandLogoUrl && (
+            <BrandLockupLink logoUrl={brandLogoUrl} siteName={brandName} />
+          )}
         </Footer.Logo>
         <Footer.About>{footer?.about}</Footer.About>
         <Footer.Address>{footer?.address}</Footer.Address>

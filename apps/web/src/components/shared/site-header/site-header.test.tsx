@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import { OAUTH_PROVIDER } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
+import { toInitial } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import { NAVIGATION_LOG } from '@web/constants/navigation';
@@ -17,6 +18,7 @@ import {
 } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { customRenderAsync, screen, within } from '@web/testing/custom-render';
 import { MOCK_SITE_OAUTH_CREDENTIALS } from '@web/testing/server/auth/site-oauth-credentials-fixtures';
@@ -39,7 +41,10 @@ import {
   stubHidePopover,
   unstubHidePopover,
 } from '@web/testing/shared/popover/stub-hide-popover';
-import { MOCK_REQUEST_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_NAME,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import { SiteHeader } from './site-header';
@@ -67,6 +72,8 @@ vi.mock(
     getBrandLogoUrl: vi.fn(),
   }),
 );
+
+vi.mock('@web/server/site-config/get-brand-name/get-brand-name');
 
 vi.mock('@web/server/site-config/get-header-style/get-header-style');
 
@@ -140,6 +147,16 @@ describe(`<${SiteHeader.name}/>`, () => {
     await user.click(queryPhoneMenuToggle()!);
   };
 
+  const openAccountMenu = async () => {
+    await setup();
+    const banner = screen.getByRole('banner');
+    const [accountButton] = within(banner).getAllByRole('button', {
+      name: ACCOUNT,
+    });
+    await user.click(accountButton!);
+    return screen.getByRole('menu', { name: ACCOUNT_MENU });
+  };
+
   const openPhoneMenuWithAccountInIt = async () => {
     getAccountControlMock.mockResolvedValueOnce(ACCOUNT_IN_PHONE_MENU);
     await setup();
@@ -187,14 +204,19 @@ describe(`<${SiteHeader.name}/>`, () => {
       );
     });
 
-    it('shows the default mark without a Look logo', async () => {
+    it("shows the site's initial tile without a Look logo", async () => {
       await setup();
 
       const homeLink = screen.getByRole('link', { name: HOME_LINK_NAME });
       const presentation = within(homeLink).queryByRole('presentation');
+      const initial = within(homeLink).getByText(toInitial(MOCK_TENANT_NAME)!);
 
       expect(presentation).not.toBeInTheDocument();
-      expect(homeLink).not.toBeEmptyDOMElement();
+      expect(initial).toBeInTheDocument();
+      expect(vi.mocked(getBrandName)).toHaveBeenCalledWith({
+        tenantId: MOCK_REQUEST_CONTEXT.tenantId,
+        tenantName: MOCK_REQUEST_CONTEXT.tenantName,
+      });
     });
   });
 
@@ -293,28 +315,31 @@ describe(`<${SiteHeader.name}/>`, () => {
       await setup();
     });
 
-    it('closes the phone menu when the phone circle opens its panel', async () => {
-      await openPhoneMenu();
-      const [, phoneCircle] = getBarSignInButtons();
-      await user.click(phoneCircle!);
-
-      const toggleButton = queryPhoneMenuToggle();
-
-      expect(toggleButton).toHaveAttribute(ARIA_EXPANDED, 'false');
-    });
-
     it('adds a circle beside the wide pill', () => {
       const signInButtons = getBarSignInButtons();
 
       expect(signInButtons).toHaveLength(2);
     });
 
-    it('adds no account row to the phone menu', async () => {
-      await openPhoneMenu();
+    describe('with the phone menu open', () => {
+      beforeEach(async () => {
+        await openPhoneMenu();
+      });
 
-      const drawerActions = screen.queryByTestId(DRAWER_ACTIONS_TEST_ID);
+      it('closes the phone menu when the phone circle opens its panel', async () => {
+        const [, phoneCircle] = getBarSignInButtons();
+        await user.click(phoneCircle!);
 
-      expect(drawerActions).not.toBeInTheDocument();
+        const toggleButton = queryPhoneMenuToggle();
+
+        expect(toggleButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+      });
+
+      it('adds no account row to the phone menu', () => {
+        const drawerActions = screen.queryByTestId(DRAWER_ACTIONS_TEST_ID);
+
+        expect(drawerActions).not.toBeInTheDocument();
+      });
     });
 
     it('returns focus to the phone circle when Escape closes its panel', async () => {
@@ -361,12 +386,15 @@ describe(`<${SiteHeader.name}/>`, () => {
       };
     };
 
+    let panelRows: ReturnType<typeof getPanelRows>;
+
     beforeEach(async () => {
       stubHidePopover();
       getNavigationMock.mockResolvedValue(
         okResult({ items: [MOCK_TOPICS_GROUP, MOCK_BLOG_LINK] }),
       );
       await openPhoneMenuWithAccountInIt();
+      panelRows = getPanelRows();
     });
 
     afterEach(() => {
@@ -374,13 +402,11 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('focuses the leading sub-menu row when the menu opens', () => {
-      const { subMenuRow } = getPanelRows();
-
-      expect(subMenuRow).toHaveFocus();
+      expect(panelRows.subMenuRow).toHaveFocus();
     });
 
     it('reaches the account row with ArrowDown, past the closed sub-menu', async () => {
-      const { blogLink, accountRow } = getPanelRows();
+      const { blogLink, accountRow } = panelRows;
 
       await user.keyboard(KEY_ARROW_DOWN);
       expect(blogLink).toHaveFocus();
@@ -390,16 +416,17 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('reaches the sub-menu row with ArrowUp from the account row', async () => {
-      const { subMenuRow } = getPanelRows();
       await user.keyboard(KEY_END);
 
       await user.keyboard(`${KEY_ARROW_UP}${KEY_ARROW_UP}`);
+
+      const { subMenuRow } = panelRows;
 
       expect(subMenuRow).toHaveFocus();
     });
 
     it('wraps Tab from the account row to the first row, and Shift+Tab back', async () => {
-      const { subMenuRow, accountRow } = getPanelRows();
+      const { subMenuRow, accountRow } = panelRows;
       await user.keyboard(KEY_END);
       expect(accountRow).toHaveFocus();
 
@@ -411,8 +438,7 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('puts the rows of an opened sub-menu into the arrow-key order', async () => {
-      const { subMenuRow } = getPanelRows();
-      await user.click(subMenuRow);
+      await user.click(panelRows.subMenuRow);
       const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
       const [leadSubLink] = within(mobilePanel).getAllByRole('link', {
         name: MOCK_TOPICS_LINK.label,
@@ -429,30 +455,29 @@ describe(`<${SiteHeader.name}/>`, () => {
       expect(barTriggers).toHaveLength(1);
     });
 
-    it('opens the sign-in panel in place and keeps the menu open', async () => {
-      const accountRow = getDrawerAccountRow(SIGN_IN);
-      await user.click(accountRow);
+    describe('with the account row pressed', () => {
+      let githubButton: HTMLElement;
 
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
-      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-      const githubButton = await within(drawerActions).findByRole('button', {
-        name: CONTINUE_WITH_GITHUB,
+      beforeEach(async () => {
+        await user.click(panelRows.accountRow);
+        const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
+        githubButton = await within(drawerActions).findByRole('button', {
+          name: CONTINUE_WITH_GITHUB,
+        });
       });
 
-      expect(mobilePanel).toBeVisible();
-      expect(githubButton).toBeVisible();
-    });
+      it('opens the sign-in panel in place and keeps the menu open', () => {
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
 
-    it('folds the account group when its row is pressed again', async () => {
-      const accountRow = getDrawerAccountRow(SIGN_IN);
-      await user.click(accountRow);
-      const drawerActions = screen.getByTestId(DRAWER_ACTIONS_TEST_ID);
-      const githubButton = await within(drawerActions).findByRole('button', {
-        name: CONTINUE_WITH_GITHUB,
+        expect(mobilePanel).toBeVisible();
+        expect(githubButton).toBeVisible();
       });
-      await user.click(accountRow);
 
-      expect(githubButton).not.toBeVisible();
+      it('folds the account group when its row is pressed again', async () => {
+        await user.click(panelRows.accountRow);
+
+        expect(githubButton).not.toBeVisible();
+      });
     });
   });
 
@@ -487,19 +512,6 @@ describe(`<${SiteHeader.name}/>`, () => {
       unstubHidePopover();
     });
 
-    it('keeps the phone menu open when the language menu opens inside it', async () => {
-      const languageButton = getPanelLanguageButton();
-      await user.click(languageButton);
-
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
-      const languageMenu = within(mobilePanel).getByRole('menu', {
-        name: LANGUAGE_NAV_NAME,
-      });
-
-      expect(mobilePanel).toBeVisible();
-      expect(languageMenu).toBeVisible();
-    });
-
     it('folds the open account row when the language menu opens', async () => {
       const githubButton = await openAccountRow();
 
@@ -512,28 +524,41 @@ describe(`<${SiteHeader.name}/>`, () => {
       expect(mobilePanel).toBeVisible();
     });
 
-    it('closes the open language menu when the account row opens', async () => {
-      const languageButton = getPanelLanguageButton();
-      await user.click(languageButton);
+    describe('with the language menu open', () => {
+      let languageButton: HTMLElement;
 
-      const githubButton = await openAccountRow();
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+      beforeEach(async () => {
+        languageButton = getPanelLanguageButton();
+        await user.click(languageButton);
+      });
 
-      expect(languageButton).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(githubButton).toBeVisible();
-      expect(mobilePanel).toBeVisible();
-    });
+      it('keeps the phone menu open', () => {
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+        const languageMenu = within(mobilePanel).getByRole('menu', {
+          name: LANGUAGE_NAV_NAME,
+        });
 
-    it('closes only the language menu on Escape inside the phone menu', async () => {
-      const languageButton = getPanelLanguageButton();
-      await user.click(languageButton);
+        expect(mobilePanel).toBeVisible();
+        expect(languageMenu).toBeVisible();
+      });
 
-      await user.keyboard(KEY_ESCAPE);
+      it('closes the language menu when the account row opens', async () => {
+        const githubButton = await openAccountRow();
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
 
-      const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+        expect(languageButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(githubButton).toBeVisible();
+        expect(mobilePanel).toBeVisible();
+      });
 
-      expect(languageButton).toHaveAttribute(ARIA_EXPANDED, 'false');
-      expect(mobilePanel).toBeVisible();
+      it('closes only the language menu on Escape', async () => {
+        await user.keyboard(KEY_ESCAPE);
+
+        const mobilePanel = screen.getByTestId(MOBILE_PANEL_TEST_ID);
+
+        expect(languageButton).toHaveAttribute(ARIA_EXPANDED, 'false');
+        expect(mobilePanel).toBeVisible();
+      });
     });
   });
 
@@ -561,14 +586,8 @@ describe(`<${SiteHeader.name}/>`, () => {
     });
 
     it('leaves My bookmarks out of the account menu', async () => {
-      await setup();
-      const banner = screen.getByRole('banner');
-      const [accountButton] = within(banner).getAllByRole('button', {
-        name: ACCOUNT,
-      });
-      await user.click(accountButton!);
+      const accountMenu = await openAccountMenu();
 
-      const accountMenu = screen.getByRole('menu', { name: ACCOUNT_MENU });
       const settingsText = within(accountMenu).getByText(ACCOUNT_SETTINGS);
       const bookmarksText = within(accountMenu).queryByText(MY_BOOKMARKS);
 
@@ -685,14 +704,8 @@ describe(`<${SiteHeader.name}/>`, () => {
       });
 
       it('keeps the account menu in the header', async () => {
-        await setup();
-        const banner = screen.getByRole('banner');
-        const [accountButton] = within(banner).getAllByRole('button', {
-          name: ACCOUNT,
-        });
-        await user.click(accountButton!);
+        const accountMenu = await openAccountMenu();
 
-        const accountMenu = screen.getByRole('menu', { name: ACCOUNT_MENU });
         const settingsText = within(accountMenu).getByText(ACCOUNT_SETTINGS);
         const signOutItem = within(accountMenu).getByRole('menuitem', {
           name: SIGN_OUT,
