@@ -15,7 +15,7 @@ import {
   MOCK_SCOPED_RADIUS_TOKEN,
 } from '@web/testing/shared/section-appearance/fixtures';
 
-import { PostLatestModuleView } from './post-latest-module-view';
+import { PostCardsSection } from './post-cards-section';
 
 vi.mock('@web/i18n/navigation');
 
@@ -27,17 +27,18 @@ const CAROUSEL_LABEL = `${MOCK_POST_LIST_HEADING} carousel`;
 
 const MOCK_POST_ITEM = mockPostListItem({ id: faker.string.uuid() });
 
-const setup = customRender(PostLatestModuleView, {
+const setup = customRender(PostCardsSection, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   items: [MOCK_POST_ITEM],
+  gridColumns: undefined,
   contentAlignment: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
   displayMode: DISPLAY_MODE.GRID,
 });
 
-describe(`<${PostLatestModuleView.name}/>`, () => {
+describe(`<${PostCardsSection.name}/>`, () => {
   describe('with default props', () => {
     beforeEach(() => {
       setup();

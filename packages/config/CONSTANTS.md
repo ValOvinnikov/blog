@@ -868,6 +868,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **POST_LIST_LOG**: `MODULE_FETCH_FAILED`=`"post_list_module.fetch_failed"`
 
+### `@web/constants/post-related` — `apps/web/src/constants/post-related.ts`
+
+- **POST_RELATED_LOG**: `MISSING_POST_CONTEXT`=`"post_related_module.missing_post_context"`, `MODULE_FETCH_FAILED`=`"post_related_module.fetch_failed"`
+
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
 - **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`
