@@ -4,12 +4,12 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const growthNoteItemVariants = tv({
   slots: {
-    plain: ['text-admin-13 leading-admin-19 text-admin-text'],
+    plain: ['text-platform-13 leading-platform-19 text-platform-text'],
     link: [
-      '-mx-2 flex min-h-11 flex-col gap-px rounded-admin-control px-2 py-[7px] no-underline hover:bg-admin-hover',
+      '-mx-2 flex min-h-11 flex-col gap-px rounded-platform-control px-2 py-[7px] no-underline hover:bg-platform-hover',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
-    name: ['text-admin-13 font-semibold text-admin-brand-ink'],
-    description: ['text-admin-12 leading-admin-1-45 text-admin-muted'],
+    name: ['text-platform-13 font-semibold text-platform-brand-ink'],
+    description: ['text-platform-12 leading-platform-1-45 text-platform-muted'],
   },
 });

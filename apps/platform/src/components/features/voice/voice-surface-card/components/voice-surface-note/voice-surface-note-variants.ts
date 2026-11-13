@@ -1,7 +1,7 @@
 import { tv } from '@platform/utils/tv/tv';
 
 export const voiceSurfaceNoteVariants = tv({
-  base: ['text-admin-12 leading-4 text-admin-muted'],
+  base: ['text-platform-12 leading-4 text-platform-muted'],
   variants: {
     isClosingCard: {
       true: ['lg:hidden'],

@@ -6,9 +6,9 @@ import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/tr
 import { tv } from '@platform/utils/tv/tv';
 
 const SIDEBAR_TRIGGER = [
-  'rounded-admin border border-admin-control-line-tint bg-transparent',
-  'hover:bg-admin-side-raised',
-  'data-[popup-open]:border-admin-side-accent data-[popup-open]:bg-admin-side-raised',
+  'rounded-platform border border-platform-control-line-tint bg-transparent',
+  'hover:bg-platform-side-raised',
+  'data-[popup-open]:border-platform-side-accent data-[popup-open]:bg-platform-side-raised',
   focusRingClasses(FOCUS_RING_GROUND.SIDE),
 ];
 
@@ -20,18 +20,20 @@ export const accountMenuVariants = tv({
     trigger: [COLOUR_TRANSITION_CLASSES],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameLine: [
-      'truncate text-admin-13 leading-[18px] font-semibold text-admin-text',
+      'truncate text-platform-13 leading-[18px] font-semibold text-platform-text',
     ],
-    emailLine: ['truncate text-admin-12 leading-4 text-admin-muted'],
-    chevron: ['text-admin-muted'],
+    emailLine: ['truncate text-platform-12 leading-4 text-platform-muted'],
+    chevron: ['text-platform-muted'],
     popup: [],
     header: [
-      'mb-1 flex flex-col gap-0.5 border-b border-admin-popover-line px-2 py-2.5',
+      'mb-1 flex flex-col gap-0.5 border-b border-platform-popover-line px-2 py-2.5',
     ],
-    headerName: ['text-admin-13 font-semibold wrap-anywhere text-admin-text'],
-    headerEmail: ['text-admin-12 wrap-anywhere text-admin-muted'],
-    headerRole: ['mt-1 text-admin-12 text-admin-muted'],
-    signOutIcon: ['text-admin-muted'],
+    headerName: [
+      'text-platform-13 font-semibold wrap-anywhere text-platform-text',
+    ],
+    headerEmail: ['text-platform-12 wrap-anywhere text-platform-muted'],
+    headerRole: ['mt-1 text-platform-12 text-platform-muted'],
+    signOutIcon: ['text-platform-muted'],
   },
   variants: {
     placement: {
@@ -47,7 +49,7 @@ export const accountMenuVariants = tv({
         popup: ['w-60'],
       },
       [ACCOUNT_MENU_PLACEMENT.MENU]: {
-        trigger: [EXPANDED_TRIGGER, 'rounded-admin'],
+        trigger: [EXPANDED_TRIGGER, 'rounded-platform'],
         popup: ['w-[var(--anchor-width)]'],
       },
     },

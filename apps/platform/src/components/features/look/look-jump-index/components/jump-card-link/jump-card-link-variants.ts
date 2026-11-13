@@ -15,19 +15,19 @@ export const jumpCardLinkVariants = tv({
     isPhone: {
       true: {
         link: [
-          'h-11 rounded-admin-22 border border-admin-control-line bg-admin-surface px-3.5',
-          'text-admin-13-5 font-medium text-admin-text',
+          'h-11 rounded-platform-22 border border-platform-control-line bg-platform-surface px-3.5',
+          'text-platform-13-5 font-medium text-platform-text',
         ],
       },
       false: {
         link: [
-          'h-8 rounded-admin-control px-2.5 text-admin-13 font-medium text-admin-muted',
+          'h-8 rounded-platform-control px-2.5 text-platform-13 font-medium text-platform-muted',
         ],
       },
     },
     isCurrent: {
       true: {
-        link: ['bg-admin-selected font-semibold text-admin-on-selected'],
+        link: ['bg-platform-selected font-semibold text-platform-on-selected'],
       },
     },
   },
@@ -35,12 +35,12 @@ export const jumpCardLinkVariants = tv({
     {
       isPhone: true,
       isCurrent: true,
-      class: { link: ['border-admin-brand'] },
+      class: { link: ['border-platform-brand'] },
     },
     {
       isPhone: false,
       isCurrent: false,
-      class: { link: ['hover:bg-admin-bg hover:text-admin-text'] },
+      class: { link: ['hover:bg-platform-bg hover:text-platform-text'] },
     },
   ],
 });

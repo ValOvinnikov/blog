@@ -36,7 +36,7 @@ code:
   - apps/platform/src/components/shared/breadcrumbs/**
   - apps/platform/src/i18n/**
   - apps/platform/src/proxy.ts
-  - apps/platform/src/styles/admin-theme*
+  - apps/platform/src/styles/platform-theme*
 epics: [4979, 4980, 4840, 4959]
 ---
 
@@ -112,7 +112,7 @@ Every settings page (Voice, Look, Email, Languages, Features) renders through
 `SettingsFormShell`, whose save bar appears only while the page has unsaved
 changes and never for an archived tenant. From `md` it docks to the viewport
 bottom, from the sidebar's right edge (rail edge when collapsed) to the right
-edge: 64px tall, flat, top border and `shadow-admin-dock`. It shows a dot,
+edge: 64px tall, flat, top border and `shadow-platform-dock`. It shows a dot,
 "N unsaved changes", the "⌘S / Ctrl+S" hint (from `lg` only), Discard and Save
 changes. With invalid fields the left side becomes "N fields need attention",
 "Go to the first one" and "Not saved" — one line from `lg`, stacked on two
@@ -122,7 +122,7 @@ Discard is disabled and the bar is `aria-busy`. A save that fails with no
 field errors — a server error, offline, or a plan refusal — shows the page's
 failure message in the bar's left side in place of the dot, count and hint, as
 one `role="alert"`, and the changes stay unsaved; invalid fields keep that slot
-until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--admin-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as scroll-padding fallbacks. When the
+until they are cleared. A retry withdraws it while it is in flight, so a second failure announces again, and the next edit or a successful save clears it. The bar grows past 64px to fit a long message, and while it shows, the page's bottom room and scroll padding follow its measured height (`--platform-save-bar-height` on `<html>`), with the 64px dock and 85px phone footer as scroll-padding fallbacks. When the
 failure leaves nothing unsaved (a plan refusal that restored every refused
 value), the message is an error toast instead, which stays until it is
 dismissed or the next save starts; the toast viewport sits above the bar's
@@ -135,7 +135,7 @@ is left while no bar shows (archived included). From `md` the document's
 plus 16px so a focused field never sits under the bar, and when the bar
 first appears the focused control is scrolled into view (`block: 'nearest'`),
 since the bar's new room grows the page without scrolling it. The 64 and 16 are the
-`--spacing-admin-dock` / `-clearance` tokens, kept equal to
+`--spacing-platform-dock` / `-clearance` tokens, kept equal to
 `LOOK_LAYOUT_LIMIT`. A page may opt out of the head's "All changes saved"
 status (`hasSavedStatus={false}`); Voice does. Below `md` the bar spans the
 viewport bottom edge to edge with Discard and Save.
@@ -159,7 +159,7 @@ saving it is `aria-busy` and Save reads "Saving…" and keeps focus; it renders
 outside Voice's `inert` content. Below `md` Voice's bottom room is the
 16px gutter plus the footer's measured height, and its `scroll-padding-bottom`
 is that height plus 16 (85px plus 16 before it is measured,
-`--spacing-admin-phone-footer-max`, the two-row error footer); an archived
+`--spacing-platform-phone-footer-max`, the two-row error footer); an archived
 Voice page shows no footer, so it ends at the 16px gutter.
 
 A successful save pressed from Save changes — in the docked bar or Voice's
@@ -203,9 +203,10 @@ save still settles as the form's generic server error.
   `@blog/db` queries; nothing is written except the cookies below.
 - Cookies: `admin-active-tenant` (httpOnly, 30 days, set only by the
   select-tenant route), `admin-sidebar-collapsed` (client-written, one
-  year; read server-side for the first render), `admin-theme` (the
+  year; read server-side for the first render), `platform-theme` (the
   per-device theme preference, one year; read server-side for the first
-  render) and the per-tenant
+  render, falling back to a choice saved under the earlier `admin-theme`
+  name, which is read but never written) and the per-tenant
   `studio-entered-<tenantId>` (client-written, one year), which no
   surface reads any more (`embedded-studio.md`).
 - Request caching: `listSessionTenants`, `resolveDashboardTenant`,
@@ -270,9 +271,9 @@ save still settles as the form's generic server error.
   unsaved changes.
 - The platform's language is next-intl's: the `NEXT_LOCALE` cookie first, then
   the browser's language, falling back to English.
-- The admin's colours are `--admin-*` tokens in `styles/admin-theme.css`,
-  each with a `--color-admin-*` Tailwind colour; shadows read `--admin-shadow`
-  and `--admin-shadow-menu`. The light sidebar is grey (`side` #eef0f3 with
+- The platform's colours are `--platform-*` tokens in `styles/platform-theme.css`,
+  each with a `--color-platform-*` Tailwind colour; shadows read `--platform-shadow`
+  and `--platform-shadow-menu`. The light sidebar is grey (`side` #eef0f3 with
   `side-line` rules); its text is `side-text` and
   `side-muted`, and no sidebar text is drawn in `faint`, which is for icons
   and chevrons only. A nav row rests in `side-text` with a `side-muted`
@@ -316,16 +317,16 @@ save still settles as the form's generic server error.
   named "Collapse sidebar" or "Expand sidebar" with `aria-expanded` and
   `aria-controls="sidebar"`, carries no native `title`, and shows that name in
   the shared Tooltip below it, left-aligned, 6px away. The topbar is 59px tall
-  from `md` and 67px below it, and `--spacing-admin-topbar` (a media-query
-  override of `--admin-topbar`) holds that real height, so
-  `scroll-pt-admin-topbar` anchors and every `top-admin-topbar` sticky panel
+  from `md` and 67px below it, and `--spacing-platform-topbar` (a media-query
+  override of `--platform-topbar`) holds that real height, so
+  `scroll-pt-platform-topbar` anchors and every `top-platform-topbar` sticky panel
   sit flush under the bar.
   Only the sidebar's nav area scrolls: the brand row and the Workspace field
   stay at the top and the foot at the bottom. The foot (12px padding, a 1px
   `side-line` top rule) holds `AccountMenu`, from
   `components/features/layout/account-menu/`. Expanded, its trigger is full
   width and 52px tall: padding 8px 10px, a 10px gap, a 1px
-  `control-line-tint` border, `rounded-admin`, transparent; a 30px `brand`
+  `control-line-tint` border, `rounded-platform`, transparent; a 30px `brand`
   circle avatar with white initials, the name (13px/600 `text`, 18px line,
   its full text as `title`) over the email (12px `muted`, 16px line), each
   cut with an ellipsis, and a 16px `muted` up chevron. With no name the email
@@ -347,7 +348,7 @@ save still settles as the form's generic server error.
   group of Light (sun), Dark (moon) and System (monitor) `menuitemradio`
   items, described by "System follows your device setting.", with the stored
   choice checked (System when none is stored). Choosing one writes the
-  `admin-theme` cookie and sets or clears `data-theme` on `<html>` at once,
+  `platform-theme` cookie and sets or clears `data-theme` on `<html>` at once,
   without a reload and without closing the menu; the menu reads the current
   choice back from `<html>`, since the root layout never re-renders on client
   navigation, and follows a choice made in the embedded Studio's Appearance
@@ -361,7 +362,7 @@ save still settles as the form's generic server error.
   active workspace's full name as its `title`, so a name cut by its ellipsis
   reads on hover. Focused, it shows the side-gapped ring in place of its
   shadow. The field is 52px tall at full sidebar width: padding 8px 8px 8px
-  10px, a 9px gap, `rounded-admin-control`, the 22×22 initials avatar, the
+  10px, a 9px gap, `rounded-platform-control`, the 22×22 initials avatar, the
   name (13px/600) on an 18px line over the domain (11px Mono) on a 16px line,
   each cut to one line with an ellipsis, and one unrotated 16px down chevron;
   it carries no "Workspace" label. Its dropdown opens 4px below it,
@@ -369,7 +370,7 @@ save still settles as the form's generic server error.
   growing to fit a long name or domain up to 300px, never wider than the
   viewport less 16px (`MENU_POPUP_FIT_WIDTH`). Each item is
   the name (13px/500 `text`) over the Mono domain (11px `muted`), padding 6px
-  8px, `rounded-admin-control`, wrapping long text in full; the highlighted
+  8px, `rounded-platform-control`, wrapping long text in full; the highlighted
   item takes a `popover-hover` ground and no focus ring, and below `md` every
   item is at least 44px tall with its lines centred. The current workspace
   carries no visual marker; its item has `aria-current` for screen readers.
@@ -393,7 +394,7 @@ save still settles as the form's generic server error.
   Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
   a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
   focused field takes a `brand-ink` border, kept over an invalid field's
-  `bad-line` border, and a 3px `brand-line` glow (`shadow-admin-focus-glow`).
+  `bad-line` border, and a 3px `brand-line` glow (`shadow-platform-focus-glow`).
   The phone save footer's disabled or busy Save is the neutral
   `pill-neutral` ground with `muted` text and a `control-line-locked`
   border. A link
@@ -408,7 +409,7 @@ save still settles as the form's generic server error.
   repeats those dark values, so with no stored choice the platform follows the
   device setting, live, without a reload. The stored choice is
   `THEME_PREFERENCE` (Light, Dark or System) in the per-device
-  `admin-theme` cookie; the root layout reads it and sets
+  `platform-theme` cookie; the root layout reads it and sets
   `data-theme='light'` or `'dark'` on `<html>` (none for System, or for an
   unrecognised value), so the first paint already has the chosen theme on
   every page, sign-in and onboarding included. The `rail` tokens, `scrim`,
@@ -424,19 +425,19 @@ save still settles as the form's generic server error.
   preset card takes a `brand-ink` border and dot with a `brand-weak` halo.
   The shared Tooltip sits on `tooltip` (#12141a / #262b35) with a
   `tooltip-line` edge. The toast follows the theme with the popover look
-  (`popover` ground, `popover-line` border, `shadow-admin-lg`), `text` copy
+  (`popover` ground, `popover-line` border, `shadow-platform-lg`), `text` copy
   and a `muted` time and key hint. Each state has a 3px left edge, clipped
   by the toast's radius, and an `Icon` in its colour: `ok`, `brand-ink`,
   `warn` and `bad`. Toast and `Alert` read the same `STATUS_ICON` map from
   `components/shared/icon/`.
 - The platform's Mono font is JetBrains Mono, from
   `config/font-loaders/jetbrains-mono-font.ts`, applied on the platform `<body>`
-  and read through `--font-admin-mono` (`font-admin-mono`), with
+  and read through `--font-platform-mono` (`font-platform-mono`), with
   `ui-monospace, monospace` behind it.
 - Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
   `components/shared/menu-surface/`: `popover` ground, 1px `popover-line`
-  border, `rounded-admin` on every corner, 4px padding, `text` colour and
-  `shadow-admin-lg`. Its `positioner` slot puts every shell popup — the
+  border, `rounded-platform` on every corner, 4px padding, `text` colour and
+  `shadow-platform-lg`. Its `positioner` slot puts every shell popup — the
   phone Menu, the full-path menu, the account menu, the Workspace dropdown,
   `Select` and More presets — on one layer, `z-30`: above the sticky
   `ViewTabs` (`z-21`) and `LookJumpIndex` (`z-20`), below dialogs (`z-40`)
@@ -452,7 +453,7 @@ save still settles as the form's generic server error.
   least 44px tall, 13px/400 `text` with `muted` icons and `title` = the label
   (none on a row with a status line): highlight and hover take a
   `popover-hover` plate with no ring; the current row adds a 3px `brand-ink`
-  bar (`w-admin-bar`, shared with the sidebar's current row) flush left,
+  bar (`w-platform-bar`, shared with the sidebar's current row) flush left,
   inset 10px, a 600 label and a `text` icon. A pinned foot
   zone (padding 8px 2px 2px, a `popover-line` rule above) holds `AccountMenu`
   in its expanded form. The Menu wraps both pinned zones in
@@ -477,11 +478,11 @@ save still settles as the form's generic server error.
   not the page's `pill-neutral`. Its `item` slot (the account menu's Sign
   out) is a flex row with a 10px gap, at least 44px tall at every width,
   padding 6px 8px,
-  `rounded-admin-control`, 13px/500, 2px from the next item, taking a
+  `rounded-platform-control`, 13px/500, 2px from the next item, taking a
   `popover-hover` ground and no ring when highlighted.
-- `styles/admin-theme-contrast.test.ts` guards both palettes: each pair
+- `styles/platform-theme-contrast.test.ts` guards both palettes: each pair
   of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
-  and focus rings, measured from the values in `admin-theme.css`, and the
+  and focus rings, measured from the values in `platform-theme.css`, and the
   device-dark block must repeat the chosen-Dark block exactly.
 - Focus is one gapped ring, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
@@ -557,9 +558,9 @@ save still settles as the form's generic server error.
 ## Entry points
 
 - `apps/platform/src/app/[locale]/layout.tsx` (providers), and the three
-  `AdminShell` trees: `(operator)/layout.tsx`,
+  `PlatformShell` trees: `(operator)/layout.tsx`,
   `tenants/[tenantId]/(detail)/layout.tsx`, `dashboard/(tenant)/layout.tsx`.
-- `apps/platform/src/components/features/layout/admin-shell/admin-shell.tsx`
+- `apps/platform/src/components/features/layout/platform-shell/platform-shell.tsx`
 - `apps/platform/src/server/auth/list-session-tenants.ts`,
   `apps/platform/src/server/auth/resolve-dashboard-tenant.ts`
 - `apps/platform/src/utils/nav-sections/nav-sections.ts`,
@@ -572,7 +573,7 @@ save still settles as the form's generic server error.
   `resolve-dashboard-tenant`, `nav-sections`, `routes`), plus
   `app/api/dashboard/select-tenant/route.test.ts`, `i18n/routing.test.ts` and
   `proxy.test.ts`, and the palette contrast guard
-  `styles/admin-theme-contrast.test.ts`. `apps/platform` has no Storybook.
+  `styles/platform-theme-contrast.test.ts`. `apps/platform` has no Storybook.
 
 ## Related
 

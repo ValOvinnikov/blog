@@ -3,9 +3,9 @@ import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-
 import { tv } from '@platform/utils/tv/tv';
 
 export const NESTED_TRIGGER_CLASSES = [
-  'border border-admin-side-field-line bg-admin-side-field outline-none',
-  'hover:border-admin-side-field-line hover:bg-admin-popover-hover',
-  'data-[popup-open]:border-admin-side-accent data-[popup-open]:bg-admin-side-field',
+  'border border-platform-side-field-line bg-platform-side-field outline-none',
+  'hover:border-platform-side-field-line hover:bg-platform-popover-hover',
+  'data-[popup-open]:border-platform-side-accent data-[popup-open]:bg-platform-side-field',
   focusRingClasses(FOCUS_RING_GROUND.POPOVER),
 ];
 

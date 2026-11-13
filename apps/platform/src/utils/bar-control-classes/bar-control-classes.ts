@@ -3,9 +3,9 @@ import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-
 import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 
 export const BAR_CONTROL_CLASSES = [
-  'rounded-admin-control border border-admin-control-line bg-admin-surface',
+  'rounded-platform-control border border-platform-control-line bg-platform-surface',
   'cursor-pointer',
   COLOUR_TRANSITION_CLASSES,
-  'hover:border-admin-brand-ink data-[popup-open]:border-admin-brand-ink',
+  'hover:border-platform-brand-ink data-[popup-open]:border-platform-brand-ink',
   focusRingClasses(FOCUS_RING_GROUND.BG),
 ];

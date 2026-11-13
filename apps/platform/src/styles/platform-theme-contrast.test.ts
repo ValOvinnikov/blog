@@ -11,11 +11,15 @@ const LIGHT_SELECTOR = ':root {';
 const DARK_SELECTOR = ":root[data-theme='dark'] {";
 const SYSTEM_DARK_SELECTOR = ":root:not([data-theme='light']) {";
 
-const css = readFileSync(new URL('./admin-theme.css', import.meta.url), 'utf8');
+const css = readFileSync(
+  new URL('./platform-theme.css', import.meta.url),
+  'utf8',
+);
 
 const blockOf = (selector: string) => {
   const start = css.indexOf(selector);
-  if (start === -1) throw new Error(`admin-theme.css has no ${selector} block`);
+  if (start === -1)
+    throw new Error(`platform-theme.css has no ${selector} block`);
 
   return css.slice(start + selector.length, css.indexOf('}', start));
 };
@@ -30,7 +34,7 @@ const hexTokensOf = (selector: string) =>
   new Map(
     [
       ...blockOf(selector).matchAll(
-        /--(admin-[a-z0-9-]+):\s*(#[0-9a-f]{6}|var\(--admin-[a-z0-9-]+\));/gi,
+        /--(platform-[a-z0-9-]+):\s*(#[0-9a-f]{6}|var\(--platform-[a-z0-9-]+\));/gi,
       ),
     ].map(([, name, hex]) => [name, hex]),
   );
@@ -38,7 +42,7 @@ const hexTokensOf = (selector: string) =>
 const lightTokens = hexTokensOf(LIGHT_SELECTOR);
 const darkTokens = new Map([...lightTokens, ...hexTokensOf(DARK_SELECTOR)]);
 
-const ALIAS = /^var\(--(admin-[a-z0-9-]+)\)$/;
+const ALIAS = /^var\(--(platform-[a-z0-9-]+)\)$/;
 
 const hexOf = (
   tokens: ReturnType<typeof hexTokensOf>,
@@ -55,53 +59,53 @@ const colourIn = (tokens: ReturnType<typeof hexTokensOf>) => (token: string) =>
   hexToOklch(hexOf(tokens, token));
 
 const TOKEN = {
-  BAD: 'admin-bad',
-  BAD_LINE: 'admin-bad-line',
-  BAD_WEAK: 'admin-bad-weak',
-  BG: 'admin-bg',
-  BRAND: 'admin-brand',
-  BRAND_HOVER: 'admin-brand-hover',
-  BRAND_INK: 'admin-brand-ink',
-  BRAND_STRONG: 'admin-brand-strong',
-  BRAND_WEAK: 'admin-brand-weak',
-  CONTROL_LINE: 'admin-control-line',
-  CONTROL_LINE_TINT: 'admin-control-line-tint',
-  FOLLOW_MARK: 'admin-follow-mark',
-  FOLLOW_MARK_INK: 'admin-follow-mark-ink',
-  GLYPH_ACCENT: 'admin-glyph-accent',
-  GLYPH_FILL: 'admin-glyph-fill',
-  GLYPH_LINE_SOFT: 'admin-glyph-line-soft',
-  GLYPH_RAISED: 'admin-glyph-raised',
-  HOVER: 'admin-hover',
-  MUTED: 'admin-muted',
-  OK: 'admin-ok',
-  OK_WEAK: 'admin-ok-weak',
-  ON_BRAND_INK: 'admin-on-brand-ink',
-  ON_SELECTED: 'admin-on-selected',
-  PILL_NEUTRAL: 'admin-pill-neutral',
-  PILL_NEUTRAL_POPOVER: 'admin-pill-neutral-popover',
-  POPOVER: 'admin-popover',
-  POPOVER_HOVER: 'admin-popover-hover',
-  SEGMENT_ON: 'admin-segment-on',
-  SELECTED: 'admin-selected',
-  SELECTED_HOVER: 'admin-selected-hover',
-  SIDE: 'admin-side',
-  SIDE_ACCENT: 'admin-side-accent',
-  SIDE_FIELD_LINE: 'admin-side-field-line',
-  SIDE_MUTED: 'admin-side-muted',
-  SIDE_RAISED: 'admin-side-raised',
-  SIDE_TEXT: 'admin-side-text',
-  SPINNER_ON_BRAND_LINE: 'admin-spinner-on-brand-line',
-  SPINNER_ON_BRAND_LIT: 'admin-spinner-on-brand-lit',
-  SURFACE: 'admin-surface',
-  SURFACE_2: 'admin-surface-2',
-  SURFACE_HEAD: 'admin-surface-head',
-  SWITCH_THUMB_ON: 'admin-switch-thumb-on',
-  TEXT: 'admin-text',
-  TEXT_STRONG: 'admin-text-strong',
-  THEME_TRACK: 'admin-theme-track',
-  WARN: 'admin-warn',
-  WARN_WEAK: 'admin-warn-weak',
+  BAD: 'platform-bad',
+  BAD_LINE: 'platform-bad-line',
+  BAD_WEAK: 'platform-bad-weak',
+  BG: 'platform-bg',
+  BRAND: 'platform-brand',
+  BRAND_HOVER: 'platform-brand-hover',
+  BRAND_INK: 'platform-brand-ink',
+  BRAND_STRONG: 'platform-brand-strong',
+  BRAND_WEAK: 'platform-brand-weak',
+  CONTROL_LINE: 'platform-control-line',
+  CONTROL_LINE_TINT: 'platform-control-line-tint',
+  FOLLOW_MARK: 'platform-follow-mark',
+  FOLLOW_MARK_INK: 'platform-follow-mark-ink',
+  GLYPH_ACCENT: 'platform-glyph-accent',
+  GLYPH_FILL: 'platform-glyph-fill',
+  GLYPH_LINE_SOFT: 'platform-glyph-line-soft',
+  GLYPH_RAISED: 'platform-glyph-raised',
+  HOVER: 'platform-hover',
+  MUTED: 'platform-muted',
+  OK: 'platform-ok',
+  OK_WEAK: 'platform-ok-weak',
+  ON_BRAND_INK: 'platform-on-brand-ink',
+  ON_SELECTED: 'platform-on-selected',
+  PILL_NEUTRAL: 'platform-pill-neutral',
+  PILL_NEUTRAL_POPOVER: 'platform-pill-neutral-popover',
+  POPOVER: 'platform-popover',
+  POPOVER_HOVER: 'platform-popover-hover',
+  SEGMENT_ON: 'platform-segment-on',
+  SELECTED: 'platform-selected',
+  SELECTED_HOVER: 'platform-selected-hover',
+  SIDE: 'platform-side',
+  SIDE_ACCENT: 'platform-side-accent',
+  SIDE_FIELD_LINE: 'platform-side-field-line',
+  SIDE_MUTED: 'platform-side-muted',
+  SIDE_RAISED: 'platform-side-raised',
+  SIDE_TEXT: 'platform-side-text',
+  SPINNER_ON_BRAND_LINE: 'platform-spinner-on-brand-line',
+  SPINNER_ON_BRAND_LIT: 'platform-spinner-on-brand-lit',
+  SURFACE: 'platform-surface',
+  SURFACE_2: 'platform-surface-2',
+  SURFACE_HEAD: 'platform-surface-head',
+  SWITCH_THUMB_ON: 'platform-switch-thumb-on',
+  TEXT: 'platform-text',
+  TEXT_STRONG: 'platform-text-strong',
+  THEME_TRACK: 'platform-theme-track',
+  WARN: 'platform-warn',
+  WARN_WEAK: 'platform-warn-weak',
 } as const;
 
 type TPair = readonly [string, string, string, number];

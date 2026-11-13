@@ -4,8 +4,10 @@ export const voiceSectionVariants = tv({
   slots: {
     disclosure: ['flex flex-col gap-2'],
     titleBlock: ['flex min-w-0 flex-col'],
-    title: ['text-admin-16 leading-admin-22 font-semibold text-admin-text'],
-    meta: ['text-admin-12-5 leading-admin-18 text-admin-muted'],
+    title: [
+      'text-platform-16 leading-platform-22 font-semibold text-platform-text',
+    ],
+    meta: ['text-platform-12-5 leading-platform-18 text-platform-muted'],
     cards: ['flex flex-col gap-4 md:gap-6'],
   },
   variants: {
@@ -14,7 +16,7 @@ export const voiceSectionVariants = tv({
       true: { disclosure: ['md:gap-3'] },
     },
     hasErrors: {
-      true: { meta: ['text-admin-bad'] },
+      true: { meta: ['text-platform-bad'] },
     },
   },
 });

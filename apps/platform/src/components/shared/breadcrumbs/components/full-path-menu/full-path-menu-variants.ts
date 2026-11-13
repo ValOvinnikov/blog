@@ -6,7 +6,7 @@ export const fullPathMenuVariants = tv({
     trigger: [
       ...BAR_CONTROL_CLASSES,
       'flex h-11 min-w-11 items-center justify-center px-1.5',
-      'text-admin-14 font-semibold text-admin-text',
+      'text-platform-14 font-semibold text-platform-text',
     ],
     popup: ['w-55'],
   },

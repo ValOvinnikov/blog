@@ -4,8 +4,8 @@ import { tv } from '@platform/utils/tv/tv';
 export const settingsFormShellVariants = tv({
   slots: {
     root: [
-      'flex flex-col gap-6 pb-[var(--admin-save-bar-height,0px)]',
-      'md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-dock))+var(--spacing-admin-dock-clearance))]',
+      'flex flex-col gap-6 pb-[var(--platform-save-bar-height,0px)]',
+      'md:[html:has(&)]:scroll-pb-[calc(var(--platform-save-bar-height,var(--spacing-platform-dock))+var(--spacing-platform-dock-clearance))]',
     ],
     liveStatus: ['sr-only'],
   },
@@ -14,7 +14,7 @@ export const settingsFormShellVariants = tv({
       false: { root: ['max-w-3xl'] },
     },
     stack: {
-      [SETTINGS_FORM_STACK.LOOK]: { root: ['gap-admin-form-gap'] },
+      [SETTINGS_FORM_STACK.LOOK]: { root: ['gap-platform-form-gap'] },
       [SETTINGS_FORM_STACK.VOICE]: {
         // The content column's 16px phone padding less 2: the board's 14.
         root: ['gap-4 max-md:-mt-0.5 md:gap-5'],
@@ -39,7 +39,7 @@ export const settingsFormShellVariants = tv({
       isSaveBarShown: true,
       class: {
         root: [
-          'max-md:[html:has(&)]:scroll-pb-[max(var(--spacing-admin-dock-room),var(--admin-save-bar-height,0px)+var(--spacing-admin-dock-clearance))]',
+          'max-md:[html:has(&)]:scroll-pb-[max(var(--spacing-platform-dock-room),var(--platform-save-bar-height,0px)+var(--spacing-platform-dock-clearance))]',
         ],
       },
     },
@@ -48,7 +48,7 @@ export const settingsFormShellVariants = tv({
       isArchived: false,
       class: {
         root: [
-          'max-md:[html:has(&)]:scroll-pb-[calc(var(--admin-save-bar-height,var(--spacing-admin-phone-footer-max))+var(--spacing-admin-dock-clearance))]',
+          'max-md:[html:has(&)]:scroll-pb-[calc(var(--platform-save-bar-height,var(--spacing-platform-phone-footer-max))+var(--spacing-platform-dock-clearance))]',
         ],
       },
     },

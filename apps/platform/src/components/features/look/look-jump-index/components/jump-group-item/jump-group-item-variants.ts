@@ -9,7 +9,7 @@ export const jumpGroupItemVariants = tv({
     item: ['flex shrink-0'],
     divider: [LOOK_INDEX_DIVIDER],
     link: [
-      'flex h-8 items-center rounded-admin-control pr-1.5 pl-2.5 whitespace-nowrap no-underline hover:text-admin-text',
+      'flex h-8 items-center rounded-platform-control pr-1.5 pl-2.5 whitespace-nowrap no-underline hover:text-platform-text',
       LOOK_GROUP_LABEL_TEXT,
       insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],

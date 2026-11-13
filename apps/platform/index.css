@@ -9,7 +9,7 @@
    later-registered layer otherwise wins regardless of specificity. */
 @layer sui;
 @import '@blog/tailwind-config/theme.css';
-@import './src/styles/admin-theme.css';
+@import './src/styles/platform-theme.css';
 
 /* Scans @blog/ui source so Tailwind emits the classes site-preview/ uses */
 @source '../../packages/ui/src/**/*.{ts,tsx}';

@@ -12,23 +12,23 @@ export const viewTabsVariants = tv({
   variants: {
     variant: {
       [VIEW_TABS_VARIANT.SEGMENTED]: {
-        list: ['gap-[3px] rounded-admin-control bg-admin-line-2 p-[3px]'],
+        list: ['gap-[3px] rounded-platform-control bg-platform-line-2 p-[3px]'],
         tab: [
-          'min-h-11 rounded-admin-control px-[14px] py-[7px] md:min-h-0',
-          'text-admin-13 font-medium text-admin-muted',
-          'data-[active]:bg-admin-surface data-[active]:text-admin-text data-[active]:not-focus-visible:shadow-admin',
+          'min-h-11 rounded-platform-control px-[14px] py-[7px] md:min-h-0',
+          'text-platform-13 font-medium text-platform-muted',
+          'data-[active]:bg-platform-surface data-[active]:text-platform-text data-[active]:not-focus-visible:shadow-platform',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
       },
       [VIEW_TABS_VARIANT.UNDERLINE]: {
         root: [
-          'border-b-(length:--admin-view-tab-border) border-admin-line bg-admin-surface px-4',
-          'lg:rounded-admin lg:border-(length:--admin-view-tab-border) lg:shadow-admin-index',
+          'border-b-(length:--platform-view-tab-border) border-platform-line bg-platform-surface px-4',
+          'lg:rounded-platform lg:border-(length:--platform-view-tab-border) lg:shadow-platform-index',
         ],
         tab: [
-          'h-admin-view-tab border-b-2 border-transparent text-center',
-          'text-admin-14 font-medium text-admin-muted not-data-[active]:hover:text-admin-text',
-          'data-[active]:border-admin-brand data-[active]:font-semibold data-[active]:text-admin-brand-strong',
+          'h-platform-view-tab border-b-2 border-transparent text-center',
+          'text-platform-14 font-medium text-platform-muted not-data-[active]:hover:text-platform-text',
+          'data-[active]:border-platform-brand data-[active]:font-semibold data-[active]:text-platform-brand-strong',
           focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
       },
@@ -40,8 +40,8 @@ export const viewTabsVariants = tv({
     isSticky: {
       true: {
         root: [
-          'sticky top-admin-topbar z-21',
-          '[html:has(&)]:scroll-pt-[calc(var(--admin-topbar)+var(--admin-view-tabs))]!',
+          'sticky top-platform-topbar z-21',
+          '[html:has(&)]:scroll-pt-[calc(var(--platform-topbar)+var(--platform-view-tabs))]!',
         ],
       },
     },

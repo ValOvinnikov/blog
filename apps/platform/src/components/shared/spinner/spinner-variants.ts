@@ -10,23 +10,23 @@ const HALF = [
 
 export const spinnerVariants = tv({
   slots: {
-    root: ['inline-flex items-center gap-2', 'text-admin-muted'],
+    root: ['inline-flex items-center gap-2', 'text-platform-muted'],
     glyph: ['relative inline-block shrink-0 -rotate-45'],
     orbit: [
       'absolute inset-0',
-      'animate-admin-spinner-orbit motion-reduce:animate-none',
+      'animate-platform-spinner-orbit motion-reduce:animate-none',
     ],
     unlit: [
       ...HALF,
       'rounded-[0_0_50%_50%/0_0_100%_100%]',
-      'animate-admin-spinner-unlit',
+      'animate-platform-spinner-unlit',
     ],
     lit: [
       ...HALF,
       '-translate-y-full border-0 rounded-[50%_50%_0_0/100%_100%_0_0]',
-      'animate-admin-spinner-lit',
+      'animate-platform-spinner-lit',
     ],
-    text: ['text-admin-14'],
+    text: ['text-platform-14'],
   },
   variants: {
     size: {
@@ -36,8 +36,8 @@ export const spinnerVariants = tv({
     },
     tone: {
       [SPINNER_TONE.BRAND]: {
-        unlit: ['border-admin-logo-ink bg-admin-logo-ink'],
-        lit: ['bg-admin-highlight'],
+        unlit: ['border-platform-logo-ink bg-platform-logo-ink'],
+        lit: ['bg-platform-highlight'],
       },
       [SPINNER_TONE.TEXT]: {
         unlit: ['border-current bg-transparent'],
@@ -45,9 +45,9 @@ export const spinnerVariants = tv({
       },
       [SPINNER_TONE.ON_BRAND]: {
         unlit: [
-          'border-admin-spinner-on-brand-line bg-admin-spinner-on-brand-unlit',
+          'border-platform-spinner-on-brand-line bg-platform-spinner-on-brand-unlit',
         ],
-        lit: ['bg-admin-spinner-on-brand-lit'],
+        lit: ['bg-platform-spinner-on-brand-lit'],
       },
     },
   },

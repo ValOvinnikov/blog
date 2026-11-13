@@ -263,7 +263,7 @@ values are stored as plain `text`, so none of them needs a db migration:
 - `ReleasesView` (`apps/platform/src/components/features/releases/`).
 - `ContrastDueBanner`
   (`apps/platform/src/components/features/releases/contrast-due-banner/`),
-  passed to `AdminShell`'s `notice` slot by the operator layout.
+  passed to `PlatformShell`'s `notice` slot by the operator layout.
 
 ## Tests and stories
 

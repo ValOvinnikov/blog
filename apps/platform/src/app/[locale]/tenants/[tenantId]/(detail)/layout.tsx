@@ -1,8 +1,8 @@
 import { queries } from '@blog/db';
-import { AdminShell } from '@platform/components/features/layout/admin-shell';
+import { PlatformShell } from '@platform/components/features/layout/platform-shell';
 import { TenantBreadcrumb } from '@platform/components/features/layout/tenant-breadcrumb';
 import { requireTenantById } from '@platform/server/auth/require-tenant-by-id';
-import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
+import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import {
   operatorNavSections,
   tenantNavSections,
@@ -23,13 +23,13 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
     t,
     unreadLeadsCount,
   ] = await Promise.all([
-    loadAdminShellChrome(),
+    loadPlatformShellChrome(),
     getTranslations('tenantLayout'),
     queries.leads.countUnreadLeadsForTenant(tenant.id),
   ]);
 
   return (
-    <AdminShell
+    <PlatformShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={[
         ...operatorNavSections(tNavSections, admin.role),
@@ -49,6 +49,6 @@ export default async function TenantDetailLayout({ children, params }: TProps) {
       }}
     >
       {children}
-    </AdminShell>
+    </PlatformShell>
   );
 }

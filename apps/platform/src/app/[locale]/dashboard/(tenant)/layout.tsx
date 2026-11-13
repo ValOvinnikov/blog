@@ -1,7 +1,7 @@
 import { queries } from '@blog/db';
 import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
-import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
+import { PlatformShell } from '@platform/components/features/layout/platform-shell';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import { OwnerSuspensionBanner } from '@platform/components/features/tenants/owner-suspension-banner';
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
@@ -9,7 +9,7 @@ import { TenantPlanProvider } from '@platform/context/tenant-plan-provider';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
-import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
+import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
 import { toTenantSwitcherItems } from '@platform/utils/tenant-switcher-items/tenant-switcher-items';
@@ -25,7 +25,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   const [{ admin: sessionAdmin }, chrome, access, unreadLeadsCount] =
     await Promise.all([
       listSessionTenants(),
-      loadAdminShellChrome(),
+      loadPlatformShellChrome(),
       resolveTenantPageAccess(tenant, viewer),
       queries.leads.countUnreadLeadsForTenant(tenant.id),
     ]);
@@ -36,7 +36,7 @@ export default async function DashboardTenantLayout({ children }: TProps) {
   const admin = viewer.isOperator ? sessionAdmin : undefined;
 
   return (
-    <AdminShell
+    <PlatformShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={dashboardNavSections(
         tNavSections,
@@ -68,6 +68,6 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       <ShellStudioAccessProvider studioAccess={studioAccess}>
         <TenantPlanProvider plan={tenant.plan}>{children}</TenantPlanProvider>
       </ShellStudioAccessProvider>
-    </AdminShell>
+    </PlatformShell>
   );
 }

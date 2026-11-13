@@ -11,12 +11,12 @@ export const presetChipsVariants = tv({
   slots: {
     root: ['flex flex-none flex-nowrap gap-3'],
     chip: [
-      'flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-admin-control bg-admin-surface pr-3 pl-1.5 lg:h-10',
-      'text-admin-13-5 font-semibold whitespace-nowrap text-admin-text',
+      'flex h-11 shrink-0 cursor-pointer items-center gap-2 rounded-platform-control bg-platform-surface pr-3 pl-1.5 lg:h-10',
+      'text-platform-13-5 font-semibold whitespace-nowrap text-platform-text',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
     ],
-    tick: ['text-admin-brand-ink'],
+    tick: ['text-platform-brand-ink'],
     description: ['sr-only'],
   },
   variants: {
@@ -27,7 +27,7 @@ export const presetChipsVariants = tv({
       false: {
         chip: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-admin-control-line not-data-[disabled]:hover:border-admin-brand-ink',
+          'border-platform-control-line not-data-[disabled]:hover:border-platform-brand-ink',
         ],
       },
     },

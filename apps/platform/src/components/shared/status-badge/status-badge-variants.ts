@@ -6,22 +6,22 @@ export const statusBadgeVariants = tv({
     root: [
       'inline-flex items-center gap-1.5',
       'rounded-full px-2.5 py-0.5',
-      'text-admin-11-5 leading-4 font-semibold whitespace-nowrap',
+      'text-platform-11-5 leading-4 font-semibold whitespace-nowrap',
     ],
     dot: ['size-1.5 shrink-0 rounded-full bg-current'],
   },
   variants: {
     tone: {
-      ok: { root: ['text-admin-ok bg-admin-ok-weak'] },
-      warn: { root: ['text-admin-warn bg-admin-warn-weak'] },
-      bad: { root: ['text-admin-bad bg-admin-bad-weak'] },
-      neutral: { root: ['text-admin-muted bg-admin-pill-neutral'] },
-      brand: { root: ['text-admin-brand bg-admin-brand-weak'] },
-      plan: { root: ['text-admin-brand-strong bg-admin-brand-weak'] },
+      ok: { root: ['text-platform-ok bg-platform-ok-weak'] },
+      warn: { root: ['text-platform-warn bg-platform-warn-weak'] },
+      bad: { root: ['text-platform-bad bg-platform-bad-weak'] },
+      neutral: { root: ['text-platform-muted bg-platform-pill-neutral'] },
+      brand: { root: ['text-platform-brand bg-platform-brand-weak'] },
+      plan: { root: ['text-platform-brand-strong bg-platform-brand-weak'] },
       growth: {
         root: [
-          'h-5 shrink-0 rounded-admin-10 border border-admin-line px-[7px] py-0',
-          'leading-none tracking-[0.1px] text-admin-muted bg-admin-pill-neutral',
+          'h-5 shrink-0 rounded-platform-10 border border-platform-line px-[7px] py-0',
+          'leading-none tracking-[0.1px] text-platform-muted bg-platform-pill-neutral',
         ],
         dot: ['hidden'],
       },

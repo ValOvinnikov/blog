@@ -11,7 +11,7 @@ export const brandLogoVariants = tv({
     },
     isOnDark: {
       true: [],
-      false: ['text-admin-logo-ink'],
+      false: ['text-platform-logo-ink'],
     },
   },
   defaultVariants: {

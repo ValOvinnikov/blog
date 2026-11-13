@@ -51,7 +51,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
       data-theme={colorScheme && DATA_THEME[colorScheme]}
     >
       <body
-        className={`${inter.variable} ${jetbrainsMono.variable} font-admin text-admin-14`}
+        className={`${inter.variable} ${jetbrainsMono.variable} font-platform text-platform-14`}
       >
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>

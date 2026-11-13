@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 import type { ReactNode } from 'react';
 
 const domainNameVariants = tv({
-  base: ['font-admin-mono font-medium'],
+  base: ['font-platform-mono font-medium'],
 });
 
 const DomainName = ({ children }: IWithChildren) => (

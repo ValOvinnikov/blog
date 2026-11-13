@@ -6,12 +6,12 @@ export const leadsInboxVariants = tv({
   slots: {
     root: ['grid grid-cols-1 items-start gap-6 lg:grid-cols-2'],
     listColumn: [
-      'min-w-0 rounded-admin',
+      'min-w-0 rounded-platform',
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
     paneColumn: [
       'min-w-0',
-      'lg:sticky lg:top-admin-topbar lg:max-h-[calc(100dvh-160px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain',
+      'lg:sticky lg:top-platform-topbar lg:max-h-[calc(100dvh-160px)] lg:self-start lg:overflow-y-auto lg:overscroll-contain',
     ],
   },
   variants: {

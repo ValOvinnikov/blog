@@ -12,14 +12,16 @@ export const presetPickerVariants = tv({
   slots: {
     root: ['grid'],
     card: [
-      'relative flex min-w-0 cursor-pointer flex-col gap-2.5 rounded-admin bg-admin-surface p-2 text-left',
+      'relative flex min-w-0 cursor-pointer flex-col gap-2.5 rounded-platform bg-platform-surface p-2 text-left',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
     ],
     footer: ['flex items-start gap-2 px-1 pb-1'],
     footerText: ['flex min-w-0 flex-1 flex-col gap-0.5'],
-    name: ['text-admin-14 font-semibold text-admin-text'],
-    description: ['text-admin-12-5 leading-admin-1-4 text-admin-muted'],
+    name: ['text-platform-14 font-semibold text-platform-text'],
+    description: [
+      'text-platform-12-5 leading-platform-1-4 text-platform-muted',
+    ],
     dot: [
       'flex size-[18px] shrink-0 items-center justify-center rounded-full border-[1.5px]',
     ],
@@ -37,12 +39,12 @@ export const presetPickerVariants = tv({
       true: {
         card: SELECTED_CHOICE_CLASSES,
         dot: [
-          'border-admin-brand-ink bg-admin-brand-ink text-admin-on-brand-ink',
+          'border-platform-brand-ink bg-platform-brand-ink text-platform-on-brand-ink',
         ],
       },
       false: {
-        card: [...UNSELECTED_CHOICE_CLASSES, 'border-admin-line'],
-        dot: ['border-admin-control-line'],
+        card: [...UNSELECTED_CHOICE_CLASSES, 'border-platform-line'],
+        dot: ['border-platform-control-line'],
       },
     },
   },

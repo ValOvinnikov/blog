@@ -41,7 +41,7 @@ contracts:
     `config`, `db` and `auth` (with `@blog/ui` confined to `site-preview/`), so
     it never waits on `studio`/`service`, which it must not import. Interactive
     primitives come from Base UI installed in that app and styled from its own
-    `admin-*` tokens; reusable blocks are built on them per
+    `platform-*` tokens; reusable blocks are built on them per
     `platform-ui-practices` and placed per `react-component-practices` →
     "Where a component lives", and nothing is added to `@blog/ui` for it. Its
     "Start here" names the

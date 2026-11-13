@@ -4,14 +4,14 @@ import { tv } from '@platform/utils/tv/tv';
 export const segmentedProgressVariants = tv({
   slots: {
     root: ['flex flex-col gap-2.5'],
-    label: ['text-admin-13 font-semibold'],
+    label: ['text-platform-13 font-semibold'],
     track: ['flex gap-1.5'],
-    segment: ['h-1 flex-1 rounded-admin-bar'],
+    segment: ['h-1 flex-1 rounded-platform-bar'],
   },
   variants: {
     isOnDark: {
-      true: { label: ['text-admin-rail-text'] },
-      false: { label: ['text-admin-muted'] },
+      true: { label: ['text-platform-rail-text'] },
+      false: { label: ['text-platform-muted'] },
     },
     state: {
       [STEP_INDICATOR_STATE.DONE]: {},
@@ -23,17 +23,17 @@ export const segmentedProgressVariants = tv({
     {
       isOnDark: false,
       state: [STEP_INDICATOR_STATE.DONE, STEP_INDICATOR_STATE.ACTIVE],
-      class: { segment: ['bg-admin-brand'] },
+      class: { segment: ['bg-platform-brand'] },
     },
     {
       isOnDark: false,
       state: STEP_INDICATOR_STATE.UPCOMING,
-      class: { segment: ['bg-admin-line-2'] },
+      class: { segment: ['bg-platform-line-2'] },
     },
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.DONE,
-      class: { segment: ['bg-admin-rail-accent'] },
+      class: { segment: ['bg-platform-rail-accent'] },
     },
     {
       isOnDark: true,
@@ -43,7 +43,7 @@ export const segmentedProgressVariants = tv({
     {
       isOnDark: true,
       state: STEP_INDICATOR_STATE.UPCOMING,
-      class: { segment: ['bg-admin-rail-raised'] },
+      class: { segment: ['bg-platform-rail-raised'] },
     },
   ],
   defaultVariants: { isOnDark: false },
