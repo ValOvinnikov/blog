@@ -102,7 +102,8 @@ export const extractEnvKeys = (sf) => {
 export const RUNTIME_ONLY_EXCLUDED_VARS = new Set([
   // apps/worker: read only in its route handler bodies (WORKER_ENQUEUE_SECRET)
   // and in provision-env.ts, called from workflow steps. apps/platform reads
-  // WORKER_ENQUEUE_SECRET only inside the enqueue its Server Actions call.
+  // WORKER_ENQUEUE_SECRET only inside the enqueue its Server Actions call, and
+  // apps/web only inside its /api/revalidate route.
   // apps/web reads INTERNAL_PAGES_SECRET only in its /api/internal/pages route;
   // apps/platform only inside the Server Action that asks that route for a title.
   'INTERNAL_PAGES_SECRET',

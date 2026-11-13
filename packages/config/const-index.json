@@ -9680,6 +9680,46 @@
         "file": "apps/web/src/constants/revalidate.ts"
       }
     ],
+    "revalidate.newsletter_send_start_failed": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_START_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_enqueue_skipped": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_SKIPPED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_enqueue_refused": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_REFUSED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_enqueue_failed": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.newsletter_send_release_failed": [
+      {
+        "ref": "REVALIDATE_LOG.NEWSLETTER_SEND_RELEASE_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
     "rss.posts_fetch_failed": [
       {
         "ref": "RSS_LOG.POSTS_FETCH_FAILED",
