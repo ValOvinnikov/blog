@@ -4,9 +4,12 @@ import { z } from 'zod';
 
 const MAX_PROMOTION_CODE_LENGTH = 64;
 
-export const upgradeCheckoutInputSchema = z.object({
+export const planChoiceSchema = z.object({
   plan: z.enum(SELLABLE_TENANT_PLANS),
   interval: z.enum(BILLING_INTERVAL),
+});
+
+export const upgradeCheckoutInputSchema = planChoiceSchema.extend({
   promo: z
     .string()
     .trim()

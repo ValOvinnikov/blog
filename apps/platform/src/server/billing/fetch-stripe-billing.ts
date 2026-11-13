@@ -5,13 +5,14 @@ import { isOneOf } from '@blog/utils/primitives';
 import {
   BILLED_INVOICE_STATUSES,
   BILLING_INVOICE_LIMIT,
-  MILLISECONDS_PER_SECOND,
   STRIPE_ERROR_CODE,
   STRIPE_LIVE_SUBSCRIPTION_STATUSES,
   type TBilledInvoiceStatus,
 } from '@platform/constants/billing';
 import type { TStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import Stripe from 'stripe';
+
+import { fromStripeTime } from './stripe-time';
 
 export type TBillingInvoice = {
   id: string;
@@ -25,9 +26,6 @@ export type TBillingNextPayment = {
   dueAt: Date;
   amount: TStripeAmount;
 };
-
-const fromStripeTime = (seconds: number): Date =>
-  new Date(seconds * MILLISECONDS_PER_SECOND);
 
 const toBillingInvoice = ({
   id,

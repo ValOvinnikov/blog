@@ -24,9 +24,7 @@ import { logger } from '@platform/utils/logger/logger';
 
 import { loadBillingOverview } from './load-billing-overview';
 
-vi.mock('@platform/server/billing/stripe-client', () => ({
-  getStripeClient: vi.fn(),
-}));
+vi.mock('@platform/server/billing/stripe-client');
 vi.mock('@platform/server/billing/fetch-stripe-billing', () => ({
   listBillingInvoices: vi.fn(),
   previewNextPayment: vi.fn(),

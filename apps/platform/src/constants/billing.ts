@@ -21,6 +21,9 @@ export const BILLING_LOG = {
   OVERVIEW_FAILED: 'billing.overview_failed',
   NEXT_PAYMENT_FAILED: 'billing.next_payment_failed',
   PORTAL_FAILED: 'billing.portal_failed',
+  PLAN_CHANGE_FAILED: 'billing.plan_change_failed',
+  PLAN_CHANGE_PRICE_MISSING: 'billing.plan_change_price_missing',
+  PLAN_CHANGE_LOAD_FAILED: 'billing.plan_change_load_failed',
 } as const;
 
 export const STRIPE_EVENT_TYPE = {
@@ -37,6 +40,16 @@ export const STRIPE_SUBSCRIPTION_STATUS = {
   PAST_DUE: 'past_due',
   CANCELED: 'canceled',
   UNPAID: 'unpaid',
+} as const;
+
+export const STRIPE_RECURRING_INTERVAL = {
+  MONTHLY: 'month',
+  YEARLY: 'year',
+} as const;
+
+export const STRIPE_PRORATION_BEHAVIOR = {
+  NONE: 'none',
+  ALWAYS_INVOICE: 'always_invoice',
 } as const;
 
 export const STRIPE_CHECKOUT_SESSION_STATUS = {

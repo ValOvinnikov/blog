@@ -7,6 +7,7 @@ import { PlanCard } from '@platform/components/features/billing/billing-page-con
 import { Alert } from '@platform/components/shared/alert';
 import { BILLING_OVERVIEW_STATE } from '@platform/constants/billing';
 import { loadBillingOverview } from '@platform/server/billing/load-billing-overview';
+import { hasStoredSubscription } from '@platform/server/billing/upgrade-state-for';
 import { getTranslations } from 'next-intl/server';
 
 export type TBillingOverviewProps = {
@@ -37,8 +38,20 @@ export const BillingOverview = async ({
     );
   }
 
+  const isSubscribed = hasStoredSubscription({
+    plan,
+    stripeSubscriptionId: billing?.stripeSubscriptionId ?? null,
+  });
+
   if (overview.state === BILLING_OVERVIEW_STATE.NO_CUSTOMER) {
-    return <PlanCard plan={plan} status={status} hasPayments={false} />;
+    return (
+      <PlanCard
+        plan={plan}
+        status={status}
+        hasPayments={false}
+        isSubscribed={isSubscribed}
+      />
+    );
   }
 
   const { nextPayment, invoices } = overview;
@@ -49,6 +62,7 @@ export const BillingOverview = async ({
         plan={plan}
         status={status}
         hasPayments={true}
+        isSubscribed={isSubscribed}
         nextPayment={nextPayment}
       />
       <InvoicesTable invoices={invoices} />

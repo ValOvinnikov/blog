@@ -2222,7 +2222,9 @@
       "void": "Storniert"
     },
     "unavailableTitle": "Zahlungen und Rechnungen nicht verfügbar",
-    "unavailableDescription": "Sie konnten gerade nicht geladen werden. Laden Sie die Seite gleich neu."
+    "unavailableDescription": "Sie konnten gerade nicht geladen werden. Laden Sie die Seite gleich neu.",
+    "upgrade": "Upgraden",
+    "changePlan": "Tarif ändern"
   },
   "upgradePage": {
     "pageTitle": "Tarif upgraden",
@@ -2249,6 +2251,26 @@
     "subscribedDescription": "Das Abonnement ist aktiv, hier gibt es also nichts zu kaufen.",
     "confirmedTitle": "Deine Zahlung ist bestätigt",
     "confirmedDescription": "Dein neuer Tarif ist auf deiner Website aktiv.",
-    "SUBSCRIBED": "Deine Website hat bereits einen kostenpflichtigen Tarif, hier gibt es also nichts zu kaufen."
+    "SUBSCRIBED": "Deine Website hat bereits einen kostenpflichtigen Tarif, hier gibt es also nichts zu kaufen.",
+    "changePlanTitle": "Tarif ändern",
+    "currentPlan": "Deine Website nutzt {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
+    "pendingChange": "Deine Website wechselt am <time>{date}</time> zu {plan}, {interval, select, YEARLY {jährlich} other {monatlich}} bezahlt.",
+    "changeNow": "Die Änderung gilt ab heute. Du zahlst jetzt die Differenz für den Rest des laufenden Zeitraums.",
+    "changeAtRenewal": "Die Änderung gilt ab dem <time>{date}</time>, wenn der laufende Zeitraum endet. Bis dahin ändert sich nichts.",
+    "keepCurrentDescription": "Deine Website bleibt bei {plan}, und die für den <time>{date}</time> geplante Änderung wird storniert.",
+    "changeUnchanged": "Das ist dein aktueller Tarif. Wähle einen anderen Tarif oder Abrechnungszeitraum, um ihn zu ändern.",
+    "keepCurrent": "{plan} behalten",
+    "changeSubmit": "Tarif ändern",
+    "changePending": "Wird geändert…",
+    "changeFailed": "Dein Tarif konnte nicht geändert werden. Versuch es gleich noch einmal.",
+    "changeConfirmingTitle": "Deine Änderung wird bestätigt",
+    "changeConfirmingDescription": "Dein Tarif ändert sich, sobald die Zahlung bestätigt ist, meist innerhalb einer Minute. Diese Seite aktualisiert sich von selbst.",
+    "changeSlowDescription": "Deine Änderung wird möglicherweise noch bestätigt. Prüf es gleich noch einmal; wir schicken dir auch eine E-Mail, sobald sich dein Tarif ändert.",
+    "planLoadFailed": "Dein Tarif konnte nicht geladen werden. Lade die Seite gleich neu.",
+    "billingLink": "Abrechnung",
+    "NOT_SUBSCRIBED": "Deine Website hat noch keinen bezahlten Tarif, der geändert werden kann. Wähle einen an der Kasse.",
+    "NOT_ACTIVE": "Dein Abonnement braucht deine Aufmerksamkeit, bevor sich der Tarif ändern kann. Öffne die Abrechnung, um das zu klären.",
+    "UNCHANGED": "Deine Website nutzt diesen Tarif bereits.",
+    "CARD_DECLINED": "Deine Karte wurde abgelehnt, daher hat sich nichts geändert. Aktualisiere sie in der Abrechnung und versuch es erneut."
   }
 }

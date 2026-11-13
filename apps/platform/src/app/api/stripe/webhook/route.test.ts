@@ -8,8 +8,8 @@ import { handleStripeEvent } from '@platform/server/billing/handle-stripe-event'
 import {
   MOCK_STRIPE_SECRET_KEY,
   MOCK_STRIPE_WEBHOOK_SECRET,
-  mockStripeEvent,
 } from '@platform/testing/billing/fixtures';
+import { mockStripeEvent } from '@platform/testing/billing/stripe-subscription';
 import { mockedStripeEnv } from '@platform/testing/env/mocked-stripe-env';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { logger } from '@platform/utils/logger/logger';

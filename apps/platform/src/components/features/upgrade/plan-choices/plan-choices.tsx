@@ -1,34 +1,21 @@
-import {
-  SELLABLE_TENANT_PLANS,
-  type TSellableTenantPlan,
-} from '@blog/config/constants';
+import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import {
-  BILLING_INTERVAL,
-  type TBillingInterval,
-} from '@platform/constants/billing';
+import { BILLING_INTERVAL } from '@platform/constants/billing';
+import { type TPlanChoice } from '@platform/constants/plan-change';
 import { useTranslations } from 'next-intl';
 
-import { checkoutChoicesVariants } from './checkout-choices-variants';
+import { planChoicesVariants } from './plan-choices-variants';
 
-export type TCheckoutChoice = {
-  plan: TSellableTenantPlan;
-  interval: TBillingInterval;
+export type TPlanChoicesProps = {
+  choice: TPlanChoice;
+  onChange: (choice: TPlanChoice) => void;
 };
 
-export type TCheckoutChoicesProps = {
-  choice: TCheckoutChoice;
-  onChange: (choice: TCheckoutChoice) => void;
-};
-
-export const CheckoutChoices = ({
-  choice,
-  onChange,
-}: TCheckoutChoicesProps) => {
+export const PlanChoices = ({ choice, onChange }: TPlanChoicesProps) => {
   const t = useTranslations('upgradePage');
   const tPlan = useTranslations('planNames');
   const { plan, interval } = choice;
-  const { choices } = checkoutChoicesVariants();
+  const { choices } = planChoicesVariants();
 
   return (
     <div className={choices()}>

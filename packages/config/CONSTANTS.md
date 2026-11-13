@@ -424,9 +424,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
 
-- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`
 - **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`
 - **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
+- **STRIPE_RECURRING_INTERVAL**: `MONTHLY`=`"month"`, `YEARLY`=`"year"`
+- **STRIPE_PRORATION_BEHAVIOR**: `NONE`=`"none"`, `ALWAYS_INVOICE`=`"always_invoice"`
 - **STRIPE_CHECKOUT_SESSION_STATUS**: `OPEN`=`"open"`
 - **STRIPE_INVOICE_STATUS**: `OPEN`=`"open"`, `PAID`=`"paid"`, `UNCOLLECTIBLE`=`"uncollectible"`, `VOID`=`"void"`
 - **STRIPE_ERROR_CODE**: `INVOICE_UPCOMING_NONE`=`"invoice_upcoming_none"`, `RESOURCE_MISSING`=`"resource_missing"`
@@ -628,6 +630,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/owner-studio-access` — `apps/platform/src/constants/owner-studio-access.ts`
 
 - **OWNER_STUDIO_ACCESS**: `INVITE_SENT`, `ACTIVATING`, `READY`, `STALLED`
+
+### `@platform/constants/plan-change` — `apps/platform/src/constants/plan-change.ts`
+
+- **PLAN_CHANGE_TIMING**: `NOW`, `AT_RENEWAL`, `CANCEL_PENDING`
+- **PLAN_CHANGE_REFUSAL**: `NOT_SUBSCRIBED`, `NOT_ACTIVE`, `UNCHANGED`, `CARD_DECLINED`
 
 ### `@platform/constants/preset-list` — `apps/platform/src/constants/preset-list.ts`
 

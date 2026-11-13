@@ -3,8 +3,8 @@ import { BILLING_LOG } from '@platform/constants/billing';
 import {
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
-  mockStripeSubscription,
 } from '@platform/testing/billing/fixtures';
+import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import {
   MOCK_OTHER_TENANT_ID,

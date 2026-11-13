@@ -1,7 +1,13 @@
 import { TENANT_PLAN } from '@blog/config/constants';
 import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
+import { BILLING_INTERVAL } from '@platform/constants/billing';
+import { MOCK_BAND_CEILING } from '@platform/testing/billing/fixtures';
 
-import { planFromPriceKeys } from './plan-from-price-keys';
+import {
+  bandKeyFor,
+  planFromPriceKeys,
+  pricesFromKeys,
+} from './plan-from-price-keys';
 
 describe(planFromPriceKeys, () => {
   it.each([
@@ -61,5 +67,37 @@ describe(planFromPriceKeys, () => {
     ],
   ])('refuses a subscription with %s', (_case, keys) => {
     expect(planFromPriceKeys(keys)).toBeUndefined();
+  });
+});
+
+describe(pricesFromKeys, () => {
+  it.each([
+    [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY, BILLING_INTERVAL.MONTHLY],
+    [STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY, BILLING_INTERVAL.YEARLY],
+  ])('reads the billing period from %s', (key, interval) => {
+    expect(pricesFromKeys([key])).toEqual({
+      plan: TENANT_PLAN.STARTER,
+      interval,
+      subscriberBandCeiling: null,
+    });
+  });
+});
+
+describe(bandKeyFor, () => {
+  it('names the band Price for the period on a plan with bands', () => {
+    expect(
+      bandKeyFor(
+        TENANT_PLAN.GROWTH,
+        BILLING_INTERVAL.YEARLY,
+        MOCK_BAND_CEILING,
+      ),
+    ).toBe(STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY);
+  });
+
+  it.each([
+    ['a plan without bands', TENANT_PLAN.STARTER, MOCK_BAND_CEILING],
+    ['the included band', TENANT_PLAN.GROWTH, null],
+  ])('names none for %s', (_case, plan, ceiling) => {
+    expect(bandKeyFor(plan, BILLING_INTERVAL.MONTHLY, ceiling)).toBeUndefined();
   });
 });
