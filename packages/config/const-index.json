@@ -9296,6 +9296,30 @@
         "file": "apps/web/src/constants/http.ts"
       }
     ],
+    "icon.site_config_fetch_failed": [
+      {
+        "ref": "ICON_LOG.SITE_CONFIG_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/icon",
+        "file": "apps/web/src/constants/icon.ts"
+      }
+    ],
+    "icon.favicon_response_not_ok": [
+      {
+        "ref": "ICON_LOG.FAVICON_RESPONSE_NOT_OK",
+        "scope": "app:web",
+        "from": "@web/constants/icon",
+        "file": "apps/web/src/constants/icon.ts"
+      }
+    ],
+    "icon.favicon_fetch_failed": [
+      {
+        "ref": "ICON_LOG.FAVICON_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/icon",
+        "file": "apps/web/src/constants/icon.ts"
+      }
+    ],
     "internal_pages.secret_missing": [
       {
         "ref": "INTERNAL_PAGES_LOG.SECRET_MISSING",

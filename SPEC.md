@@ -1717,8 +1717,9 @@ observed outcomes here, not verified against Next's own source or docs — so
 `app/global-not-found.tsx` avoids the read rather than relying on any general claim
 about when Next treats it as fatal. The favicon route
 (`apps/web/src/app/icon.tsx`) serves the tenant's Look favicon
-(`site_config.favicon_asset_url`) when present, falling back to one static
-default mark with no per-tenant recoloring. The former
+(`site_config.favicon_asset_url`) when present; with none it draws the
+site's initial tile in its logo colour, and an unknown host or a failed
+read or fetch answers an uncached neutral tile with no letter. The former
 `siteSettings.brand.variant`/`BRAND_VARIANTS` binary look toggle (and its
 `.indigo` CSS class) is retired in favor of this — its one prior look
 ("Indigo") is expressible as a theme override (`accentHue`/`logoHue`) rather

@@ -1,11 +1,18 @@
 import { HTTP_STATUS } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { toInitial } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
-import { FAVICON_RESPONSE_NOT_OK_EVENT } from '@web/constants/icon';
+import { CACHE_CONTROL } from '@web/constants/http';
+import { ICON_LOG } from '@web/constants/icon';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
+import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
+import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
+import {
+  MOCK_TENANT_ID,
+  MOCK_TENANT_NAME,
+} from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
 import Icon, { contentType } from './icon';
@@ -26,25 +33,40 @@ const MOCK_FAVICON_BYTES = new Uint8Array(
     count: 3,
   }),
 );
+const MOCK_BRAND_NAME = faker.company.name();
+const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 359 });
+const MOCK_LOGO_HUE = faker.number.int({ min: 0, max: 179 });
+const MOCK_OTHER_LOGO_HUE = MOCK_LOGO_HUE + 180;
 const PNG_CONTENT_TYPE = 'image/png';
 const CONTENT_TYPE_HEADER = 'content-type';
 const SVG_MARKUP_START = '<svg';
+const RETIRED_MARK_ELEMENT = '<polygon';
 
-const mockSiteConfig = (faviconAssetUrl: string | undefined) => {
-  getSiteConfigMock.mockResolvedValue(
-    okResult({ faviconAssetUrl }) as Awaited<ReturnType<typeof getSiteConfig>>,
-  );
+const arrangeSiteConfig = (
+  overrides: Parameters<typeof mockSiteConfig>[0] = {},
+) => {
+  getSiteConfigMock.mockResolvedValue(okResult(mockSiteConfig(overrides)));
+};
+
+const letterOf = (markup: string) =>
+  markup.match(/<text[^>]*>([^<]*)<\/text>/)?.[1];
+
+const readSvg = async (response: Response) => {
+  expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(contentType);
+  const markup = await response.text();
+  expect(markup).toContain(SVG_MARKUP_START);
+  expect(markup).not.toContain(RETIRED_MARK_ELEMENT);
+  return markup;
 };
 
 const stubFetch = (fetchMock: ReturnType<typeof vi.fn>) => {
   vi.stubGlobal('fetch', fetchMock);
 };
 
-const expectFallbackMark = async (response: Response) => {
-  const markup = await response.text();
+const expectNeutralTile = async (response: Response) => {
+  const markup = await readSvg(response);
 
-  expect(response.headers.get(CONTENT_TYPE_HEADER)).toBe(contentType);
-  expect(markup).toContain(SVG_MARKUP_START);
+  expect(letterOf(markup)).toBeUndefined();
 };
 
 describe(Icon, () => {
@@ -57,7 +79,7 @@ describe(Icon, () => {
   });
 
   it('serves the uploaded favicon with its own content type', async () => {
-    mockSiteConfig(MOCK_FAVICON_URL);
+    arrangeSiteConfig({ faviconAssetUrl: MOCK_FAVICON_URL });
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(MOCK_FAVICON_BYTES, {
         status: HTTP_STATUS.OK,
@@ -80,7 +102,7 @@ describe(Icon, () => {
   });
 
   it('reads the site config of the tenant resolved from the host', async () => {
-    mockSiteConfig(undefined);
+    arrangeSiteConfig();
 
     await Icon();
 
@@ -89,31 +111,53 @@ describe(Icon, () => {
 
   it.each([
     {
-      case: 'no favicon is uploaded',
+      case: 'a brand name is set',
       arrange: () => {
-        mockSiteConfig(undefined);
+        arrangeSiteConfig({ brandName: MOCK_BRAND_NAME });
       },
+      name: MOCK_BRAND_NAME,
+    },
+    {
+      case: 'no brand name is set',
+      arrange: () => {
+        arrangeSiteConfig();
+      },
+      name: MOCK_TENANT_NAME,
     },
     {
       case: 'the tenant has no site config',
       arrange: () => {
         getSiteConfigMock.mockResolvedValue(okResult());
       },
+      name: MOCK_TENANT_NAME,
     },
-  ])('falls back to the default mark when $case', async ({ arrange }) => {
+  ])('draws the initial of "$name" when $case', async ({ arrange, name }) => {
     arrange();
 
-    const response = await Icon();
+    const markup = await readSvg(await Icon());
 
-    await expectFallbackMark(response);
+    expect(letterOf(markup)).toBe(toInitial(name));
   });
 
-  it('falls back to the default mark without reading site config for an unknown host', async () => {
+  it("colours the initial tile by the site's logo hue", async () => {
+    arrangeSiteConfig({ accentHue: MOCK_ACCENT_HUE, logoHue: MOCK_LOGO_HUE });
+    const markup = await readSvg(await Icon());
+    arrangeSiteConfig({
+      accentHue: MOCK_ACCENT_HUE,
+      logoHue: MOCK_OTHER_LOGO_HUE,
+    });
+
+    const otherMarkup = await readSvg(await Icon());
+
+    expect(otherMarkup).not.toBe(markup);
+  });
+
+  it('answers a neutral tile without reading site config for an unknown host', async () => {
     vi.mocked(resolveRequestTenant).mockResolvedValueOnce(undefined);
 
     const response = await Icon();
 
-    await expectFallbackMark(response);
+    await expectNeutralTile(response);
     expect(getSiteConfigMock).not.toHaveBeenCalled();
   });
 
@@ -125,13 +169,13 @@ describe(Icon, () => {
           errorResult(MOCK_ERROR) as Awaited<ReturnType<typeof getSiteConfig>>,
         );
       },
-      event: 'icon.site_config_fetch_failed',
+      event: ICON_LOG.SITE_CONFIG_FETCH_FAILED,
       context: { error: MOCK_ERROR },
     },
     {
       case: 'the favicon responds with a non-2xx status',
       arrange: () => {
-        mockSiteConfig(MOCK_FAVICON_URL);
+        arrangeSiteConfig({ faviconAssetUrl: MOCK_FAVICON_URL });
         stubFetch(
           vi
             .fn()
@@ -140,26 +184,29 @@ describe(Icon, () => {
             ),
         );
       },
-      event: FAVICON_RESPONSE_NOT_OK_EVENT,
+      event: ICON_LOG.FAVICON_RESPONSE_NOT_OK,
       context: { status: HTTP_STATUS.NOT_FOUND },
     },
     {
       case: 'the favicon fetch throws',
       arrange: () => {
-        mockSiteConfig(MOCK_FAVICON_URL);
+        arrangeSiteConfig({ faviconAssetUrl: MOCK_FAVICON_URL });
         stubFetch(vi.fn().mockRejectedValue(MOCK_ERROR));
       },
-      event: 'icon.favicon_fetch_failed',
+      event: ICON_LOG.FAVICON_FETCH_FAILED,
       context: { error: MOCK_ERROR },
     },
   ])(
-    'falls back to the default mark and logs when $case',
+    'answers a neutral tile and logs when $case',
     async ({ arrange, event, context }) => {
       arrange();
 
       const response = await Icon();
 
-      await expectFallbackMark(response);
+      await expectNeutralTile(response);
+      expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
+        CACHE_CONTROL.PRIVATE_NO_STORE,
+      );
       expect(vi.mocked(logger.error)).toHaveBeenCalledWith(event, context);
     },
   );

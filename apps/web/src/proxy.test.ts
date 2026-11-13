@@ -27,6 +27,7 @@ import {
 } from '@web/server/tenant/constants/constants';
 import type { TTenantRouting } from '@web/server/tenant/resolve-tenant/resolve-tenant';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import { MOCK_TAG_SLUG } from '@web/testing/shared/tag/fixtures';
 import {
   MOCK_TENANT_BASE_URL,
@@ -122,7 +123,6 @@ const MOCK_PLATFORM_ORIGIN = 'https://platform.example.test';
 const FRAME_OPTIONS_HEADER = 'x-frame-options';
 const CSP_HEADER = 'content-security-policy';
 const REFERRER_POLICY_HEADER = 'referrer-policy';
-const CACHE_CONTROL_HEADER = 'cache-control';
 const ROBOTS_TAG_HEADER = 'x-robots-tag';
 const REVALIDATE_API_PATH = '/api/revalidate';
 const MOCK_PREVIEW_CLAIMS: IPreviewTokenClaims = {

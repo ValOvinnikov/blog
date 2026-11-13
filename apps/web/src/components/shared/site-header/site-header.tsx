@@ -16,6 +16,7 @@ import {
 } from '@web/server/settings-features/is-reader-account-enabled/is-reader-account-enabled';
 import { getAccountControl } from '@web/server/site-config/get-account-control/get-account-control';
 import { getBrandLogoUrl } from '@web/server/site-config/get-brand-logo-url/get-brand-logo-url';
+import { getBrandName } from '@web/server/site-config/get-brand-name/get-brand-name';
 import { getHeaderStyle } from '@web/server/site-config/get-header-style/get-header-style';
 import { getLanguageSwitcherStyle } from '@web/server/site-config/get-language-switcher-style/get-language-switcher-style';
 import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
@@ -25,8 +26,14 @@ import { AuthMenu } from './components/auth-menu/auth-menu';
 import { StickyHeaderFrame } from './components/sticky-header-frame/sticky-header-frame';
 
 export const SiteHeader = async () => {
-  const { tenantId, sanityContext, locale, defaultLocale, liveLocales } =
-    await getRequestContext();
+  const {
+    tenantId,
+    tenantName,
+    sanityContext,
+    locale,
+    defaultLocale,
+    liveLocales,
+  } = await getRequestContext();
   const siteConfigTenant = tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER;
   const [
     navResult,
@@ -34,6 +41,7 @@ export const SiteHeader = async () => {
     hasBookmarks,
     switcherStyle,
     brandLogoUrl,
+    brandName,
     accountControl,
     headerStyle,
     siteOAuthCredentials,
@@ -43,6 +51,7 @@ export const SiteHeader = async () => {
     isReaderAccountFeatureEnabled(CAPABILITY.BOOKMARKS),
     getLanguageSwitcherStyle(siteConfigTenant),
     getBrandLogoUrl(siteConfigTenant),
+    getBrandName({ tenantId, tenantName }),
     getAccountControl(siteConfigTenant),
     getHeaderStyle(siteConfigTenant),
     getSiteOAuthCredentials(tenantId),
@@ -67,7 +76,11 @@ export const SiteHeader = async () => {
     <StickyHeaderFrame>
       <Header layout={layout} barStyle={barStyle}>
         <Header.Brand>
-          <BrandLockupLink logoUrl={brandLogoUrl} tagline={tagline} />
+          <BrandLockupLink
+            logoUrl={brandLogoUrl}
+            siteName={brandName}
+            tagline={tagline}
+          />
         </Header.Brand>
         <SiteNavigation
           links={navItems}
