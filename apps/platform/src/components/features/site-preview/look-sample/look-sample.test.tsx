@@ -74,6 +74,8 @@ const MOCK_LOGO_URL = faker.image.url();
 const CURRENT_LANGUAGE_TEST_ID = 'sample-language-code-current';
 const TOPICS = 'Topics';
 const ALL_TOPICS = 'All topics';
+const HARBOUR_NOTES = 'harbour notes';
+const HARBOUR_NOTES_INITIAL = 'H';
 
 const {
   accountHeading: ACCOUNT,
@@ -358,6 +360,17 @@ describe(`<${LookSample.name}/>`, () => {
     expect(logos).toHaveLength(3);
     logos.forEach((logo) => {
       expect(logo).toHaveAttribute('src', MOCK_LOGO_URL);
+    });
+  });
+
+  it("draws the site's initial in both headers and the footer without a logo", () => {
+    setup({ brand: { name: HARBOUR_NOTES, logoSrc: undefined } });
+
+    const marks = screen.getAllByRole('img', { name: HARBOUR_NOTES });
+
+    expect(marks).toHaveLength(3);
+    marks.forEach((mark) => {
+      expect(mark).toHaveTextContent(HARBOUR_NOTES_INITIAL);
     });
   });
 
