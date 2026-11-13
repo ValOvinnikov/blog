@@ -34,3 +34,11 @@ export {
   buildOwnerReceiptEmail,
   type TOwnerReceiptEmailInput,
 } from './owner-receipt/owner-receipt';
+export {
+  buildOwnerNewsletterPausedEmail,
+  type TOwnerNewsletterPausedEmailInput,
+} from './owner-newsletter-paused/owner-newsletter-paused';
+export {
+  buildOwnerNewsletterLimitNearEmail,
+  type TOwnerNewsletterLimitNearEmailInput,
+} from './owner-newsletter-limit-near/owner-newsletter-limit-near';

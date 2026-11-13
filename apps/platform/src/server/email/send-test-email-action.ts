@@ -1,6 +1,5 @@
 'use server';
 
-import { applyTenantSenderName } from '@blog/auth/providers/magic-link/apply-tenant-sender-name/apply-tenant-sender-name';
 import {
   ACTION_OUTCOME,
   type TActionResult,
@@ -8,7 +7,7 @@ import {
 } from '@blog/config';
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { applyTenantSenderName, EMAIL_ACCOUNT, sendEmail } from '@blog/email';
 import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';

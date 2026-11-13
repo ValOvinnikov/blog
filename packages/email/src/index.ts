@@ -30,6 +30,10 @@ export {
   type TSelfServeLimitAlertInput,
   buildArchivedSanityProjectAlertEmail,
   type TArchivedSanityProjectAlertInput,
+  buildNewsletterReputationAlertEmail,
+  NEWSLETTER_REPUTATION_ALERT_LEVEL,
+  type TNewsletterReputationAlertInput,
+  type TNewsletterReputationAlertLevel,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,
@@ -50,6 +54,10 @@ export {
   type TOwnerSuspensionEmailInput,
   buildOwnerSuspensionLiftedEmail,
   type TOwnerSuspensionLiftedEmailInput,
+  buildOwnerNewsletterPausedEmail,
+  type TOwnerNewsletterPausedEmailInput,
+  buildOwnerNewsletterLimitNearEmail,
+  type TOwnerNewsletterLimitNearEmailInput,
 } from './templates/owner';
 export {
   buildMagicLinkEmail,
@@ -69,6 +77,7 @@ export {
   type TContactNotificationEmailContent,
   type TTenantEmailIdentity,
 } from './templates/tenant';
+export { applyTenantSenderName } from './sender-name';
 export { buildSiteEmailTag, SITE_EMAIL_TAG_NAME, type TEmailTag } from './tags';
 export { EMAIL_ACCOUNT, type TEmailAccount } from './transport/email-account';
 export {
@@ -76,4 +85,8 @@ export {
   sendEmail,
   type TSendEmailInput,
 } from './transport/send-email';
+export {
+  isRetryableSendError,
+  SendEmailError,
+} from './transport/send-email-error';
 export { isValidEmailAddress } from './validation';

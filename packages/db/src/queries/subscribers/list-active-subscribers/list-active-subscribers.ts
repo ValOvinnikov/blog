@@ -2,13 +2,13 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { getDb } from '@blog/db/client';
 import { SUBSCRIBER_STATUS } from '@blog/db/constants';
 import { subscribers } from '@blog/db/schema/subscribers';
-import { decryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
+import { decryptPersonalValueOrUndefined } from '@blog/db/utils/personal-data/personal-data';
 import { isUndefined } from '@blog/utils/primitives';
 import { and, asc, eq, gt } from 'drizzle-orm';
 
 export interface IActiveSubscriber {
   id: string;
-  email: string;
+  email: TMaybeUndefined<string>;
 }
 
 export async function listActiveSubscribers(
@@ -31,6 +31,6 @@ export async function listActiveSubscribers(
 
   return rows.map(({ id, emailEncrypted }) => ({
     id,
-    email: decryptPersonalValue(emailEncrypted),
+    email: decryptPersonalValueOrUndefined(emailEncrypted),
   }));
 }

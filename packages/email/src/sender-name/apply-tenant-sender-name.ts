@@ -1,14 +1,9 @@
-import type { TMaybeUndefined } from '@blog/config';
-
 const FROM_WITH_DISPLAY_NAME_PATTERN = /^(.*)<([^<>]+)>\s*$/;
 
-/**
- * A tenant may brand who a sign-in email appears to be from, never which
- * address it sends from.
- */
+/** A tenant may brand who an email appears to be from, never which address it sends from. */
 export function applyTenantSenderName(
   from: string,
-  senderName: TMaybeUndefined<string>,
+  senderName: string | undefined,
 ): string {
   if (!senderName) return from;
 
