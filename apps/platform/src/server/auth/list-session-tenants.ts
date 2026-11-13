@@ -4,7 +4,11 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { queries } from '@blog/db';
 import type { TAdmin } from '@blog/db/schema/admins';
 import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
+import { hasLength } from '@blog/utils/primitives';
+import {
+  type TPlatformTenant,
+  toPlatformTenant,
+} from '@platform/utils/platform-tenant/platform-tenant';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
@@ -17,7 +21,7 @@ export type TSessionTenants = {
   userId: string;
   admin: TMaybeUndefined<TAdmin>;
   memberships: TMembership[];
-  tenants: TTenant[];
+  tenants: TPlatformTenant[];
 };
 
 /** Zero memberships sends the user to `/onboarding`; a SUPERADMIN resolves against every tenant through virtual memberships. */
@@ -39,11 +43,11 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
       memberships: tenants.map((tenant) =>
         buildVirtualAdminMembership(userId, tenant.id),
       ),
-      tenants,
+      tenants: tenants.map((tenant) => toPlatformTenant(tenant)),
     };
   }
 
-  if (membershipsWithTenants.length === 0) {
+  if (!hasLength(membershipsWithTenants)) {
     redirect(adminRoutes.onboarding());
   }
 
@@ -51,6 +55,8 @@ export const listSessionTenants = cache(async (): Promise<TSessionTenants> => {
     userId,
     admin,
     memberships: membershipsWithTenants.map(({ membership }) => membership),
-    tenants: membershipsWithTenants.map(({ tenant }) => tenant),
+    tenants: membershipsWithTenants.map(({ tenant }) =>
+      toPlatformTenant(tenant),
+    ),
   };
 });

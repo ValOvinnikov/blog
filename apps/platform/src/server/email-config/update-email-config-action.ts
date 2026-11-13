@@ -63,8 +63,8 @@ export const updateEmailConfigAction = async (
     };
   }
 
-  const { tenant, membership } = await requireTenantMembership(tenantId);
-  const data = canEditContactRecipient(tenant, membership)
+  const { tenant, viewer } = await requireTenantMembership(tenantId);
+  const data = canEditContactRecipient(tenant, viewer)
     ? parsed.data
     : { ...parsed.data, contactRecipient: undefined };
 

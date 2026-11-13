@@ -11,11 +11,15 @@ import { retryProvisioningStepAction } from '@platform/server/provisioning/retry
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 import {
   act,
-  fireEvent,
   renderHookWithIntl,
   screen,
   waitFor,
 } from '@platform/testing/custom-render';
+import {
+  changeDocumentVisibility,
+  DOCUMENT_HIDDEN,
+  DOCUMENT_VISIBLE,
+} from '@platform/testing/document-visibility';
 import {
   mockIdleProvisioningSteps,
   mockClientTenant,
@@ -91,6 +95,9 @@ describe(useProvisioningPoll, () => {
   describe('step-status polling', () => {
     beforeEach(() => {
       vi.useFakeTimers();
+      getTenantProvisioningStatusActionMock.mockResolvedValue(
+        mockProvisioningStatusResult(),
+      );
     });
 
     afterEach(() => {
@@ -195,9 +202,6 @@ describe(useProvisioningPoll, () => {
     });
 
     it('polls after Start until the cap when no runner picks the run up', async () => {
-      getTenantProvisioningStatusActionMock.mockResolvedValue(
-        mockProvisioningStatusResult(),
-      );
       const { result } = renderPoll(mockClientTenant());
 
       await act(async () => {
@@ -211,19 +215,9 @@ describe(useProvisioningPoll, () => {
     });
 
     describe('tab visibility', () => {
-      let visibility: ReturnType<typeof vi.spyOn>;
-
       beforeEach(() => {
-        getTenantProvisioningStatusActionMock.mockResolvedValue(
-          mockProvisioningStatusResult(),
-        );
-        visibility = vi.spyOn(document, 'visibilityState', 'get');
-        visibility.mockReturnValue('hidden');
+        changeDocumentVisibility(DOCUMENT_HIDDEN);
         renderPoll(mockClientTenant({ provisioningStatus: PROVISIONING }));
-      });
-
-      afterEach(() => {
-        visibility.mockRestore();
       });
 
       it('sends no status request while the tab is hidden', async () => {
@@ -233,8 +227,7 @@ describe(useProvisioningPoll, () => {
       });
 
       it('resumes polling once the tab is visible again', async () => {
-        visibility.mockReturnValue('visible');
-        fireEvent(document, new Event('visibilitychange'));
+        changeDocumentVisibility(DOCUMENT_VISIBLE);
         await advance(STEP_POLL_INTERVAL_MS);
 
         expect(getTenantProvisioningStatusActionMock).toHaveBeenCalledTimes(1);
@@ -242,9 +235,6 @@ describe(useProvisioningPoll, () => {
     });
 
     it('stops polling once the hook unmounts', async () => {
-      getTenantProvisioningStatusActionMock.mockResolvedValue(
-        mockProvisioningStatusResult(),
-      );
       const { unmount } = renderPoll(
         mockClientTenant({ provisioningStatus: PROVISIONING }),
       );

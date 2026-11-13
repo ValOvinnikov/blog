@@ -9,11 +9,13 @@ import {
 import { notFound } from 'next/navigation';
 
 import { buildVirtualAdminMembership } from './build-virtual-admin-membership';
+import { type TPlatformViewer, toPlatformViewer } from './platform-viewer';
 import { requireSessionUserId } from './require-session-user-id';
 
 export type TTenantMembershipContext = {
   tenant: TPlatformTenant;
   membership: TMembership;
+  viewer: TPlatformViewer;
 };
 
 /** The tenant-section gate, called from a layout so every nested route is protected; an admin gets a virtual OWNER membership on any tenant. */
@@ -29,18 +31,17 @@ export const requireTenantMembership = async (
 
   const admin = await queries.admins.getAdminByUserId(userId);
 
-  if (admin) {
-    return {
-      tenant: toPlatformTenant(tenant),
-      membership: buildVirtualAdminMembership(userId, tenant.id),
-    };
-  }
-
-  const membership = await queries.memberships.getMembership(userId, tenant.id);
+  const membership = admin
+    ? buildVirtualAdminMembership(userId, tenant.id)
+    : await queries.memberships.getMembership(userId, tenant.id);
 
   if (!membership) {
     notFound();
   }
 
-  return { tenant: toPlatformTenant(tenant), membership };
+  return {
+    tenant: toPlatformTenant(tenant),
+    membership,
+    viewer: toPlatformViewer({ membership, admin }),
+  };
 };

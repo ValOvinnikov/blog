@@ -32,7 +32,8 @@ export type TGetStartedCardProps = {
 };
 
 export const GetStartedCard = ({ getStarted }: TGetStartedCardProps) => {
-  const { tenantId, siteAddress, doneSteps, studioAccess } = getStarted;
+  const { tenantId, siteAddress, siteUrl, doneSteps, studioAccess } =
+    getStarted;
   const t = useTranslations('getStartedCard');
   const { body, list } = getStartedCardVariants();
   const isEditorReady = studioAccess === OWNER_STUDIO_ACCESS.READY;
@@ -95,7 +96,7 @@ export const GetStartedCard = ({ getStarted }: TGetStartedCardProps) => {
         }
       />
       <Card.Body className={body()}>
-        <LiveSiteBlock siteAddress={siteAddress} />
+        <LiveSiteBlock siteAddress={siteAddress} siteUrl={siteUrl} />
         <ol className={list()}>
           {steps.map(({ step, description, isLocked, actions }) => (
             <ChecklistRow

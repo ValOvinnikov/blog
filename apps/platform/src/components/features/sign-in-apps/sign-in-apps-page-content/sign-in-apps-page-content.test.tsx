@@ -9,7 +9,10 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockViewer,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CLIENT_ID,
   MOCK_GOOGLE_CALLBACK_URL,
@@ -41,7 +44,7 @@ const growthTenant = (overrides = {}) =>
 
 const setup = customRenderAsync(SignInAppsPageContent, {
   tenant: growthTenant(),
-  membership: mockMembership(),
+  viewer: mockViewer(),
 });
 
 describe(`<${SignInAppsPageContent.name}/>`, () => {
@@ -75,7 +78,9 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
     [
       'a member who is not the owner',
       {
-        membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        viewer: mockViewer({
+          membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+        }),
       },
       page.notOwnerNotice,
     ],
@@ -103,14 +108,16 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
   );
 
   it.each([
-    ['on the operator route', { membership: undefined, admin: mockAdmin() }],
+    ['on the operator route', { viewer: mockViewer({ admin: mockAdmin() }) }],
     [
       'through a virtual owner membership',
       {
-        membership: buildVirtualAdminMembership(
-          mockAdmin().userId,
-          MOCK_TENANT_ID,
-        ),
+        viewer: mockViewer({
+          membership: buildVirtualAdminMembership(
+            mockAdmin().userId,
+            MOCK_TENANT_ID,
+          ),
+        }),
       },
     ],
   ])(
@@ -132,7 +139,10 @@ describe(`<${SignInAppsPageContent.name}/>`, () => {
   );
 
   it('shows an operator on a Free tenant no Growth note', async () => {
-    await setup({ tenant: mockTenant(), admin: mockAdmin() });
+    await setup({
+      tenant: mockTenant(),
+      viewer: mockViewer({ admin: mockAdmin() }),
+    });
 
     const note = screen.queryByText(growthNote.title);
 

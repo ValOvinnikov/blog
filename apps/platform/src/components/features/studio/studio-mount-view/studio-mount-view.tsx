@@ -1,19 +1,18 @@
 import { ALERT_TYPE, type TSanityLoginProvider } from '@blog/config';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { PlatformStudioMount } from '@platform/components/features/studio/platform-studio-mount';
 import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { getTranslations } from 'next-intl/server';
 
 import { studioMountViewVariants } from './studio-mount-view-variants';
 
 export type TStudioMountViewProps = {
-  tenant: TTenant;
+  tenant: TPlatformTenant;
   basePath: string;
   loginProvider?: TSanityLoginProvider;
   shouldRecordFirstEntry?: boolean;
@@ -28,11 +27,11 @@ export const StudioMountView = async ({
   const t = await getTranslations('studioPage');
   const { root } = studioMountViewVariants();
 
-  if (tenant.deprovisionedAt) {
+  if (tenant.archivedAt) {
     return (
       <div className={root()}>
         <PageHeader title={t('title')} />
-        <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+        <ArchivedTenantNotice archivedAt={tenant.archivedAt} />
       </div>
     );
   }
@@ -57,7 +56,7 @@ export const StudioMountView = async ({
     resolveIsPlatformTenant(tenant),
   ]);
   const liveLocales = queries.tenants.selectLiveLocales(tenant);
-  const { modulePacks } = PLAN_ENTITLEMENTS[tenant.plan];
+  const { modulePacks } = tenant.entitlements;
 
   return (
     <PlatformStudioMount

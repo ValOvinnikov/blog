@@ -5,7 +5,10 @@ import { faker } from '@faker-js/faker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_SIGN_IN_HREF } from '@platform/testing/auth/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
@@ -111,7 +114,7 @@ describe(requireTenantMembership, () => {
 
     const result = await requireTenantMembership(MOCK_TENANT_ID);
 
-    expect(result).toEqual({ tenant, membership });
+    expect(result).toEqual(mockMembershipContext(tenant, membership));
     expect(redirect).not.toHaveBeenCalled();
   });
 });

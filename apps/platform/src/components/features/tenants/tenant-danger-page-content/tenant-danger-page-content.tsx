@@ -40,9 +40,9 @@ export const TenantDangerPageContent = ({
     <div className={root()}>
       <PageHeader title={t('title')} description={t('description')} />
 
-      {tenant.deprovisionedAt ? (
+      {tenant.archivedAt ? (
         <>
-          <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
+          <ArchivedTenantNotice archivedAt={tenant.archivedAt} />
           <div className={actionsRow()}>
             <ReactivateTenantControl tenant={tenant} />
             <DeleteTenantControl tenant={tenant} />

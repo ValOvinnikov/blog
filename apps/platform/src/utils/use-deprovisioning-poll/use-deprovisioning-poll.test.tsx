@@ -4,7 +4,13 @@ import {
 } from '@blog/db/constants';
 import type { TTenantDeprovisioningState } from '@blog/db/schema/tenants';
 import { getTenantDeprovisioningStatusAction } from '@platform/server/provisioning/get-tenant-deprovisioning-status-action';
-import { act, fireEvent, renderHook } from '@platform/testing/custom-render';
+import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
+import { act, renderHook } from '@platform/testing/custom-render';
+import {
+  changeDocumentVisibility,
+  DOCUMENT_HIDDEN,
+  DOCUMENT_VISIBLE,
+} from '@platform/testing/document-visibility';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
   mockDoneDeprovisioningSteps,
@@ -177,49 +183,54 @@ describe(useDeprovisioningPoll, () => {
       expect(result.current.isFailed).toBe(false);
     });
 
-    it('reports FAILED with the failing step and its classified error', () => {
-      const tenant = mockFailedRevokeTenant();
-      const { result } = renderHook(() =>
-        useDeprovisioningPoll(tenant, ENABLED),
-      );
+    describe('with a failed revoke run', () => {
+      let tenant: TClientTenant;
 
-      expect(result.current.overallStatus).toBe(STEP_STATUS.FAILED);
-      expect(result.current.isInProgress).toBe(false);
-      expect(result.current.isFailed).toBe(true);
-      expect(result.current.failedStep).toBe(REVOKE_SANITY_TOKENS);
-      expect(result.current.failedStepError).toBe(MOCK_STEP_ERROR);
-      expect(result.current.errorKind).toBe('permission');
-    });
+      beforeEach(() => {
+        tenant = mockFailedRevokeTenant();
+      });
 
-    it('treats a request newer than a stale FAILED run as a fresh start', () => {
-      const tenant = mockFailedRevokeTenant();
-      const { result } = renderHook(() =>
-        useDeprovisioningPoll(tenant, {
-          isEnabled: true,
-          deprovisionRequestedAt: MOCK_RUN_PLUS_2_MIN_AT,
-        }),
-      );
+      it('reports FAILED with the failing step and its classified error', () => {
+        const { result } = renderHook(() =>
+          useDeprovisioningPoll(tenant, ENABLED),
+        );
 
-      expect(result.current.deprovisioningSteps).toBeNull();
-      expect(result.current.overallStatus).toBe(STEP_STATUS.IDLE);
-      expect(result.current.isInProgress).toBe(true);
-      expect(result.current.isFailed).toBe(false);
-      expect(result.current.run).toBeUndefined();
-    });
+        expect(result.current.overallStatus).toBe(STEP_STATUS.FAILED);
+        expect(result.current.isInProgress).toBe(false);
+        expect(result.current.isFailed).toBe(true);
+        expect(result.current.failedStep).toBe(REVOKE_SANITY_TOKENS);
+        expect(result.current.failedStepError).toBe(MOCK_STEP_ERROR);
+        expect(result.current.errorKind).toBe('permission');
+      });
 
-    it('keeps a stale FAILED run when the request is not newer than it', () => {
-      const tenant = mockFailedRevokeTenant();
-      const { result } = renderHook(() =>
-        useDeprovisioningPoll(tenant, {
-          isEnabled: true,
-          deprovisionRequestedAt: MOCK_RUN_STARTED_AT,
-        }),
-      );
+      it('treats a request newer than a stale FAILED run as a fresh start', () => {
+        const { result } = renderHook(() =>
+          useDeprovisioningPoll(tenant, {
+            isEnabled: true,
+            deprovisionRequestedAt: MOCK_RUN_PLUS_2_MIN_AT,
+          }),
+        );
 
-      expect(result.current.overallStatus).toBe(STEP_STATUS.FAILED);
-      expect(result.current.isRunning).toBe(false);
-      expect(result.current.isFailed).toBe(true);
-      expect(result.current.failedStep).toBe(REVOKE_SANITY_TOKENS);
+        expect(result.current.deprovisioningSteps).toBeNull();
+        expect(result.current.overallStatus).toBe(STEP_STATUS.IDLE);
+        expect(result.current.isInProgress).toBe(true);
+        expect(result.current.isFailed).toBe(false);
+        expect(result.current.run).toBeUndefined();
+      });
+
+      it('keeps a stale FAILED run when the request is not newer than it', () => {
+        const { result } = renderHook(() =>
+          useDeprovisioningPoll(tenant, {
+            isEnabled: true,
+            deprovisionRequestedAt: MOCK_RUN_STARTED_AT,
+          }),
+        );
+
+        expect(result.current.overallStatus).toBe(STEP_STATUS.FAILED);
+        expect(result.current.isRunning).toBe(false);
+        expect(result.current.isFailed).toBe(true);
+        expect(result.current.failedStep).toBe(REVOKE_SANITY_TOKENS);
+      });
     });
 
     it('reports DONE only once every step is done', () => {
@@ -264,58 +275,67 @@ describe(useDeprovisioningPoll, () => {
       vi.useRealTimers();
     });
 
-    it('refreshes the page once a polled run reports finished', async () => {
-      const refresh = mockRouterRefresh();
-      getTenantDeprovisioningStatusActionMock.mockResolvedValue(
-        mockStatusResult(mockDoneSteps()),
-      );
-      const tenant = mockClientTenant({
-        deprovisioningSteps: mockRunningSteps(),
+    describe('the page refresh', () => {
+      let refresh: ReturnType<typeof mockRouterRefresh>;
+
+      beforeEach(() => {
+        refresh = mockRouterRefresh();
       });
-      renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
-      await advance(STEP_POLL_INTERVAL_MS);
-      await advance(STEP_POLL_INTERVAL_MS);
+      it('refreshes the page once a polled run reports finished', async () => {
+        getTenantDeprovisioningStatusActionMock.mockResolvedValue(
+          mockStatusResult(mockDoneSteps()),
+        );
+        const tenant = mockClientTenant({
+          deprovisioningSteps: mockRunningSteps(),
+        });
+        renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
-      expect(refresh).toHaveBeenCalledTimes(1);
-    });
+        await advance(STEP_POLL_INTERVAL_MS);
+        await advance(STEP_POLL_INTERVAL_MS);
 
-    it('does not refresh the page while the polled run is unfinished', async () => {
-      const refresh = mockRouterRefresh();
-      getTenantDeprovisioningStatusActionMock.mockResolvedValue(
-        mockStatusResult(mockRunningSteps()),
-      );
-      const tenant = mockClientTenant({
-        deprovisioningSteps: mockRunningSteps(),
+        expect(refresh).toHaveBeenCalledTimes(1);
       });
-      renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
-      await advance(STEP_POLL_INTERVAL_MS * 2);
+      it('does not refresh the page while the polled run is unfinished', async () => {
+        getTenantDeprovisioningStatusActionMock.mockResolvedValue(
+          mockStatusResult(mockRunningSteps()),
+        );
+        const tenant = mockClientTenant({
+          deprovisioningSteps: mockRunningSteps(),
+        });
+        renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
 
-      expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(2);
-      expect(refresh).not.toHaveBeenCalled();
-    });
+        await advance(STEP_POLL_INTERVAL_MS * 2);
 
-    it('does not refresh the page while a retry still sees the previous finished run', async () => {
-      const refresh = mockRouterRefresh();
-      getTenantDeprovisioningStatusActionMock.mockResolvedValue(
-        mockStatusResult(mockFailedSteps()),
-      );
-      const tenant = mockClientTenant({
-        deprovisioningSteps: mockFailedSteps(),
+        expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
+          2,
+        );
+        expect(refresh).not.toHaveBeenCalled();
       });
-      renderHook(() =>
-        useDeprovisioningPoll(tenant, {
-          isEnabled: true,
-          deprovisionRequestedAt: MOCK_RUN_PLUS_2_MIN_AT,
-        }),
-      );
 
-      await advance(STEP_POLL_INTERVAL_MS);
-      await advance(STEP_POLL_INTERVAL_MS);
+      it('does not refresh the page while a retry still sees the previous finished run', async () => {
+        getTenantDeprovisioningStatusActionMock.mockResolvedValue(
+          mockStatusResult(mockFailedSteps()),
+        );
+        const tenant = mockClientTenant({
+          deprovisioningSteps: mockFailedSteps(),
+        });
+        renderHook(() =>
+          useDeprovisioningPoll(tenant, {
+            isEnabled: true,
+            deprovisionRequestedAt: MOCK_RUN_PLUS_2_MIN_AT,
+          }),
+        );
 
-      expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(2);
-      expect(refresh).not.toHaveBeenCalled();
+        await advance(STEP_POLL_INTERVAL_MS);
+        await advance(STEP_POLL_INTERVAL_MS);
+
+        expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(
+          2,
+        );
+        expect(refresh).not.toHaveBeenCalled();
+      });
     });
 
     it.each([
@@ -434,17 +454,10 @@ describe(useDeprovisioningPoll, () => {
     });
 
     describe('tab visibility', () => {
-      let visibility: ReturnType<typeof vi.spyOn>;
-
       beforeEach(() => {
-        visibility = vi.spyOn(document, 'visibilityState', 'get');
-        visibility.mockReturnValue('hidden');
+        changeDocumentVisibility(DOCUMENT_HIDDEN);
         const tenant = mockClientTenant({ deprovisioningSteps: null });
         renderHook(() => useDeprovisioningPoll(tenant, ENABLED));
-      });
-
-      afterEach(() => {
-        visibility.mockRestore();
       });
 
       it('pauses polling while the tab is hidden', async () => {
@@ -454,8 +467,7 @@ describe(useDeprovisioningPoll, () => {
       });
 
       it('resumes polling once the tab is visible again', async () => {
-        visibility.mockReturnValue('visible');
-        fireEvent(document, new Event('visibilitychange'));
+        changeDocumentVisibility(DOCUMENT_VISIBLE);
         await advance(STEP_POLL_INTERVAL_MS);
 
         expect(getTenantDeprovisioningStatusActionMock).toHaveBeenCalledTimes(

@@ -1,26 +1,16 @@
 import 'server-only';
 
-import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
-import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
-import { isBillingManager } from '@platform/server/billing/is-billing-manager';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { hasStoredLeads } from '@platform/server/leads/has-stored-leads';
-import {
-  planPageAccess,
-  type TPlanPageAccess,
-} from '@platform/utils/plan-page-access/plan-page-access';
+import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
 export const resolveTenantPageAccess = async (
-  { id, plan }: TTenant,
-  membership: TMembership,
+  { id, pageAccess }: TPlatformTenant,
+  { isOwner, canManage, isSuperAdmin }: TPlatformViewer,
 ): Promise<TPlanPageAccess> => {
-  const { admin } = await listSessionTenants();
-  const access = {
-    ...planPageAccess(plan),
-    billing: isBillingManager(membership, admin),
-  };
-  if (!isTenantOwner(membership)) return { ...access, leads: false };
+  const access = { ...pageAccess, billing: isOwner || isSuperAdmin };
+  if (!canManage) return { ...access, leads: false };
   if (access.leads) return access;
 
   return { ...access, leads: await hasStoredLeads(id) };

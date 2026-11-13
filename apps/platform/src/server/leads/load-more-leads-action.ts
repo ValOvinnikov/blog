@@ -1,7 +1,7 @@
 'use server';
 
 import { LEAD_LOG } from '@platform/constants/lead';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import { z } from 'zod';
@@ -23,7 +23,7 @@ export const loadMoreLeadsAction = async (
   const parsed = loadMoreLeadsInputSchema.safeParse({ tenantId, after });
   if (!parsed.success) return { isLoaded: false };
 
-  const { tenant } = await requireTenantOwner(parsed.data.tenantId);
+  const { tenant } = await requireTenantManager(parsed.data.tenantId);
 
   try {
     return {

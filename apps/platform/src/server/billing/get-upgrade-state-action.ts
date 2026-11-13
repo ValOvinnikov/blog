@@ -8,6 +8,6 @@ import { upgradeStateFor } from './upgrade-state-for';
 export const getUpgradeStateAction = async (
   tenantId: string,
 ): Promise<TUpgradeState> => {
-  const { tenant, membership } = await requireTenantMembership(tenantId);
-  return upgradeStateFor(tenant, membership);
+  const { tenant, viewer } = await requireTenantMembership(tenantId);
+  return upgradeStateFor(tenant, viewer);
 };

@@ -1,0 +1,61 @@
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
+import {
+  MOCK_TENANT_ID,
+  mockReadyTenant,
+} from '@platform/testing/tenants/fixtures';
+
+import { requireTenantManager } from './require-tenant-manager';
+
+vi.mock('@platform/server/auth/require-tenant-membership');
+
+describe(requireTenantManager, () => {
+  it('passes on the failure of the membership gate', async () => {
+    vi.mocked(requireTenantMembership).mockRejectedValueOnce(
+      new Error(NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND),
+    );
+
+    await expect(requireTenantManager(MOCK_TENANT_ID)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
+  });
+
+  it('404s for an editor', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID }),
+        mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      ),
+    );
+
+    await expect(requireTenantManager(MOCK_TENANT_ID)).rejects.toThrow(
+      NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
+    );
+  });
+
+  it('admits an owner', async () => {
+    const { membership } = await requireTenantManager(MOCK_TENANT_ID);
+
+    expect(membership.role).toBe(MEMBERSHIP_ROLE.OWNER);
+  });
+
+  it('admits an operator through a virtual membership', async () => {
+    vi.mocked(requireTenantMembership).mockResolvedValueOnce(
+      mockMembershipContext(
+        mockReadyTenant({ id: MOCK_TENANT_ID }),
+        buildVirtualAdminMembership(mockAdmin().userId, MOCK_TENANT_ID),
+      ),
+    );
+
+    const { viewer } = await requireTenantManager(MOCK_TENANT_ID);
+
+    expect(viewer.isOperator).toBe(true);
+  });
+});

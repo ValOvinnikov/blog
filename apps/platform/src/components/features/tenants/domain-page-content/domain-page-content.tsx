@@ -1,12 +1,9 @@
 import { queries } from '@blog/db';
-import type { TAdmin } from '@blog/db/schema/admins';
-import type { TMembership } from '@blog/db/schema/memberships';
-import type { TTenant } from '@blog/db/schema/tenants';
 import { CustomDomainCard } from '@platform/components/features/tenants/domain-page-content/components/custom-domain-card/custom-domain-card';
 import { MainAddressSignInAppsProvider } from '@platform/components/features/tenants/domain-page-content/components/main-address-sign-in-apps-provider/main-address-sign-in-apps-provider';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
-import { isTenantOwner } from '@platform/server/auth/is-tenant-owner';
+import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { listOwnSignInAppProviders } from '@platform/server/sign-in-apps/list-own-sign-in-app-providers';
 import { env } from '@platform/utils/env/env';
@@ -14,6 +11,7 @@ import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom
 import { findSubdomain } from '@platform/utils/find-subdomain/find-subdomain';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { isPlatformAddress } from '@platform/utils/is-platform-address/is-platform-address';
+import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 import { getTranslations } from 'next-intl/server';
 import { Suspense } from 'react';
 
@@ -22,23 +20,21 @@ import { DomainVerificationCardSkeleton } from './components/domain-verification
 import { domainPageContentVariants } from './domain-page-content-variants';
 
 export type TDomainPageContentProps = {
-  tenant: TTenant;
-  membership?: TMembership;
-  admin?: TAdmin;
+  tenant: TPlatformTenant;
+  viewer: TPlatformViewer;
 };
 
 export const DomainPageContent = async ({
   tenant,
-  membership,
-  admin,
+  viewer,
 }: TDomainPageContentProps) => {
-  const { id, primaryDomain, deprovisionedAt, plan } = tenant;
+  const { id, primaryDomain, archivedAt } = tenant;
   const projectDomain = getProjectDomain(primaryDomain);
   const [t, tenantDomains, claim, signInAppProviders] = await Promise.all([
     getTranslations('tenantDomainPage'),
     queries.tenantDomains.listTenantDomains(id),
     queries.customDomainClaims.getCustomDomainClaim(id),
-    listOwnSignInAppProviders(id, plan),
+    listOwnSignInAppProviders(tenant),
   ]);
   const customDomain = findCustomDomain(
     tenantDomains,
@@ -52,7 +48,7 @@ export const DomainPageContent = async ({
     <div className={root()}>
       <PageHeader title={t('pageTitle')} description={t('subCopy')} />
 
-      {deprovisionedAt && <ArchivedTenantNotice archivedAt={deprovisionedAt} />}
+      {archivedAt && <ArchivedTenantNotice archivedAt={archivedAt} />}
 
       <Suspense fallback={<DomainVerificationCardSkeleton />}>
         <DomainVerificationCard
@@ -76,9 +72,7 @@ export const DomainPageContent = async ({
             primaryDomain,
             env.TENANT_ROOT_DOMAIN,
           )}
-          canManage={
-            Boolean(admin) || (membership ? isTenantOwner(membership) : false)
-          }
+          canManage={viewer.canManage}
         />
       </MainAddressSignInAppsProvider>
     </div>

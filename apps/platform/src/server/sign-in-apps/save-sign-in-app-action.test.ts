@@ -19,7 +19,10 @@ import { requireTenantMembership } from '@platform/server/auth/require-tenant-me
 import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { mockOwnerContext } from '@platform/testing/custom-domain/fixtures';
-import { mockMembership } from '@platform/testing/memberships/fixtures';
+import {
+  mockMembership,
+  mockMembershipContext,
+} from '@platform/testing/memberships/fixtures';
 import {
   MOCK_CLIENT_ID,
   MOCK_CLIENT_SECRET,
@@ -87,21 +90,26 @@ describe(saveSignInAppAction, () => {
     [
       'a member who is not the owner',
       () =>
-        vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-          ...mockOwnerContext({ plan: TENANT_PLAN.GROWTH }),
-          membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
-        }),
+        vi
+          .mocked(requireTenantMembership)
+          .mockResolvedValueOnce(
+            mockMembershipContext(
+              mockOwnerContext({ plan: TENANT_PLAN.GROWTH }).tenant,
+              mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+            ),
+          ),
     ],
     [
       'an operator acting through a virtual owner membership',
       () =>
-        vi.mocked(requireTenantMembership).mockResolvedValueOnce({
-          ...mockOwnerContext({ plan: TENANT_PLAN.GROWTH }),
-          membership: buildVirtualAdminMembership(
-            mockAdmin().userId,
-            MOCK_TENANT_ID,
+        vi
+          .mocked(requireTenantMembership)
+          .mockResolvedValueOnce(
+            mockMembershipContext(
+              mockOwnerContext({ plan: TENANT_PLAN.GROWTH }).tenant,
+              buildVirtualAdminMembership(mockAdmin().userId, MOCK_TENANT_ID),
+            ),
           ),
-        }),
     ],
   ])('rejects %s', async (_name, arrange) => {
     arrange();

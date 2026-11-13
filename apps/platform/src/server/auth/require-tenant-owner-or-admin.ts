@@ -4,7 +4,7 @@ import { queries } from '@blog/db';
 import type { TAdmin } from '@blog/db/schema/admins';
 import { notFound } from 'next/navigation';
 
-import { isTenantOwner } from './is-tenant-owner';
+import { toPlatformViewer } from './platform-viewer';
 import { requireSessionUserId } from './require-session-user-id';
 
 export const requireTenantOwnerOrAdmin = async (
@@ -20,7 +20,7 @@ export const requireTenantOwnerOrAdmin = async (
 
   const membership = await queries.memberships.getMembership(userId, tenantId);
 
-  if (!membership || !isTenantOwner(membership)) {
+  if (!membership || !toPlatformViewer({ membership }).isOwner) {
     notFound();
   }
 };

@@ -29,6 +29,7 @@ const MOCK_NONE_DONE = {
 const MOCK_GET_STARTED: TGetStarted = {
   tenantId: MOCK_TENANT_ID,
   siteAddress: MOCK_TENANT_DOMAIN,
+  siteUrl: MOCK_TENANT_URL,
   doneSteps: MOCK_NONE_DONE,
   studioAccess: OWNER_STUDIO_ACCESS.INVITE_SENT,
 };
