@@ -5572,41 +5572,17 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
-    "customer.subscription.created": [
+    "billing.catalogue_synced": [
       {
-        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
+        "ref": "BILLING_LOG.CATALOGUE_SYNCED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
-    "customer.subscription.updated": [
+    "billing.catalogue_sync_failed": [
       {
-        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_UPDATED",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "customer.subscription.deleted": [
-      {
-        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_DELETED",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "invoice.paid": [
-      {
-        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAID",
-        "scope": "app:platform",
-        "from": "@platform/constants/billing",
-        "file": "apps/platform/src/constants/billing.ts"
-      }
-    ],
-    "invoice.payment_failed": [
-      {
-        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED",
+        "ref": "BILLING_LOG.CATALOGUE_SYNC_FAILED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -8388,6 +8364,94 @@
         "scope": "app:platform",
         "from": "@platform/constants/step-indicator",
         "file": "apps/platform/src/constants/step-indicator.ts"
+      }
+    ],
+    "customer.subscription.created": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "customer.subscription.updated": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_UPDATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "customer.subscription.deleted": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_DELETED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "invoice.paid": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "invoice.payment_failed": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.INVOICE_PAYMENT_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "price.created": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.PRICE_CREATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "price.updated": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.PRICE_UPDATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "price.deleted": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.PRICE_DELETED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "promotion_code.created": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.PROMOTION_CODE_CREATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "promotion_code.updated": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.PROMOTION_CODE_UPDATED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
+      }
+    ],
+    "coupon.deleted": [
+      {
+        "ref": "STRIPE_EVENT_TYPE.COUPON_DELETED",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-event",
+        "file": "apps/platform/src/constants/stripe-event.ts"
       }
     ],
     "CONFIRM_REQUIRED": [

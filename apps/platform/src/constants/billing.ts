@@ -24,14 +24,8 @@ export const BILLING_LOG = {
   PLAN_CHANGE_FAILED: 'billing.plan_change_failed',
   PLAN_CHANGE_PRICE_MISSING: 'billing.plan_change_price_missing',
   PLAN_CHANGE_LOAD_FAILED: 'billing.plan_change_load_failed',
-} as const;
-
-export const STRIPE_EVENT_TYPE = {
-  SUBSCRIPTION_CREATED: 'customer.subscription.created',
-  SUBSCRIPTION_UPDATED: 'customer.subscription.updated',
-  SUBSCRIPTION_DELETED: 'customer.subscription.deleted',
-  INVOICE_PAID: 'invoice.paid',
-  INVOICE_PAYMENT_FAILED: 'invoice.payment_failed',
+  CATALOGUE_SYNCED: 'billing.catalogue_synced',
+  CATALOGUE_SYNC_FAILED: 'billing.catalogue_sync_failed',
 } as const;
 
 export const STRIPE_SUBSCRIPTION_STATUS = {

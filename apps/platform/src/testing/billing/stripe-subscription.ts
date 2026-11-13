@@ -1,10 +1,10 @@
 import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import {
-  STRIPE_EVENT_TYPE,
   STRIPE_SUBSCRIPTION_STATUS,
   STRIPE_TENANT_METADATA_KEY,
 } from '@platform/constants/billing';
+import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import {
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
