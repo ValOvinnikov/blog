@@ -9,6 +9,7 @@ import { brandLockupVariants } from './brand-lockup-variants';
 export type TBrandLockupProps = IWithClassName &
   IWithDataTestId & {
     src?: string;
+    siteName?: string;
     size?: TBrandMarkProps['size'];
     tagline?: string;
   };
@@ -16,6 +17,7 @@ export type TBrandLockupProps = IWithClassName &
 /** The brand mark plus an optional monospace tagline, stacked with the mark above. */
 export const BrandLockup = ({
   src,
+  siteName,
   size,
   tagline,
   className,
@@ -25,7 +27,12 @@ export const BrandLockup = ({
 
   return (
     <div className={root({ class: className })} data-testid={dataTestId}>
-      <BrandMark src={src} size={size} isStacked={Boolean(tagline)} />
+      <BrandMark
+        src={src}
+        siteName={siteName}
+        size={size}
+        isStacked={Boolean(tagline)}
+      />
       {tagline && <span className={taglineSlot()}>{tagline}</span>}
     </div>
   );

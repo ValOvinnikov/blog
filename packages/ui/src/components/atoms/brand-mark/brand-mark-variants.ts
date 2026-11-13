@@ -2,14 +2,17 @@ import { SIZE } from '@blog/config';
 import { tv } from '@blog/ui/lib/styling';
 import type { VariantProps } from 'tailwind-variants';
 
-/** Polygon fallback mark — always drawn on a square viewBox, so a fixed square box never distorts it. */
 export const brandMarkVariants = tv({
-  base: ['inline-block shrink-0'],
+  base: [
+    'inline-flex shrink-0 items-center justify-center rounded-[25%]',
+    'bg-(--logo-tile) text-(--logo-tile-contrast)',
+    'font-display font-bold',
+  ],
   variants: {
     size: {
-      [SIZE.SM]: ['size-5'],
-      [SIZE.MD]: ['size-7'],
-      [SIZE.LG]: ['size-9'],
+      [SIZE.SM]: ['size-5 text-xs'],
+      [SIZE.MD]: ['size-7 text-base'],
+      [SIZE.LG]: ['size-9 text-lg'],
     },
   },
   defaultVariants: {

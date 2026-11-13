@@ -2,10 +2,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { BrandLockup } from './brand-lockup';
 
+const MOCK_WIDE_SRC = 'https://placehold.co/320x64';
+const MOCK_TAGLINE = 'v1.0.0 · build/local';
+
 const meta = {
   title: 'Molecules/BrandLockup',
   component: BrandLockup,
   tags: ['autodocs'],
+  args: { siteName: 'Northern Notes' },
 } satisfies Meta<typeof BrandLockup>;
 
 export default meta;
@@ -18,17 +22,17 @@ export const WithImageSource: TStory = {
 };
 
 export const WithWideImageSource: TStory = {
-  args: { src: 'https://placehold.co/320x64' },
+  args: { src: MOCK_WIDE_SRC },
 };
 
 export const WithTagline: TStory = {
-  args: { tagline: 'v1.0.0 · build/local' },
+  args: { tagline: MOCK_TAGLINE },
 };
 
 export const WithWideImageSourceAndTagline: TStory = {
   args: {
-    src: 'https://placehold.co/320x64',
-    tagline: 'v1.0.0 · build/local',
+    src: MOCK_WIDE_SRC,
+    tagline: MOCK_TAGLINE,
   },
 };
 
@@ -43,7 +47,7 @@ export const NarrowViewport: TStory = {
 export const NarrowViewportWithWideImageSourceAndTagline: TStory = {
   globals: { viewport: 'phone' },
   args: {
-    src: 'https://placehold.co/320x64',
-    tagline: 'v1.0.0 · build/local',
+    src: MOCK_WIDE_SRC,
+    tagline: MOCK_TAGLINE,
   },
 };

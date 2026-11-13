@@ -7,6 +7,8 @@ faker.seed(123);
 
 const MOCK_TAGLINE = faker.hacker.phrase();
 const MOCK_SRC = faker.image.url();
+const MOCK_SITE_NAME = 'northern notes';
+const MOCK_INITIAL = 'N';
 
 const setup = customRender(BrandLockup, {});
 
@@ -17,6 +19,14 @@ describe(`<${BrandLockup.name}/>`, () => {
     const mark = screen.getByRole('presentation');
 
     expect(mark).toHaveAttribute('src', MOCK_SRC);
+  });
+
+  it('passes the site name to the mark', () => {
+    setup({ siteName: MOCK_SITE_NAME });
+
+    const initial = screen.getByText(MOCK_INITIAL);
+
+    expect(initial).toBeInTheDocument();
   });
 
   describe('with the default props', () => {
