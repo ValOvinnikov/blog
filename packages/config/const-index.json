@@ -5606,7 +5606,7 @@
     ],
     "PAYMENT_PENDING": [
       {
-        "ref": "UPGRADE_PAYMENT.PENDING",
+        "ref": "UPGRADE_PAYMENT.PAYMENT_PENDING",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"

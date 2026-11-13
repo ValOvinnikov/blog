@@ -76,7 +76,7 @@ describe(`<${UpgradeCheckout.name}/>`, () => {
   it('says why checkout was refused and offers no retry', async () => {
     createCheckoutMock.mockResolvedValueOnce({
       outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPGRADE_PAYMENT.PENDING,
+      reason: UPGRADE_PAYMENT.PAYMENT_PENDING,
     });
     setup();
 

@@ -82,7 +82,7 @@ export const UPGRADE_STATE = {
 export type TUpgradeState = TValueOf<typeof UPGRADE_STATE>;
 
 export const UPGRADE_PAYMENT = {
-  PENDING: 'PAYMENT_PENDING',
+  PAYMENT_PENDING: 'PAYMENT_PENDING',
 } as const;
 
 export type TUpgradeRefusal =

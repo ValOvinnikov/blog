@@ -428,7 +428,7 @@ Every key/value const an agent should reuse before writing a literal. The
 - **BILLING_GRACE**: `START`, `END`, `KEEP`
 - **BILLING_INTERVAL**: `MONTHLY`, `YEARLY`
 - **UPGRADE_STATE**: `AVAILABLE`, `SUBSCRIBED`, `NOT_OWNER`, `UNAVAILABLE`
-- **UPGRADE_PAYMENT**: `PENDING`=`"PAYMENT_PENDING"`
+- **UPGRADE_PAYMENT**: `PAYMENT_PENDING`
 - **UPGRADE_SEARCH_PARAM**: `PROMO`=`"promo"`, `SESSION_ID`=`"session_id"`
 - **UPGRADE_POLL**: `INTERVAL_MS`=`2000`, `MAX_TICKS`=`30`
 

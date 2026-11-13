@@ -85,7 +85,7 @@ export const createUpgradeCheckoutAction = async (
     if (await hasLiveSubscription(stripe, customerId)) {
       return {
         outcome: ACTION_OUTCOME.REFUSED,
-        reason: UPGRADE_PAYMENT.PENDING,
+        reason: UPGRADE_PAYMENT.PAYMENT_PENDING,
       };
     }
     await expireOpenCheckouts(stripe, customerId);

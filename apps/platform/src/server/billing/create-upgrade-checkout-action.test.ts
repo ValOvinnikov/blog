@@ -211,7 +211,7 @@ describe(createUpgradeCheckoutAction, () => {
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
-      reason: UPGRADE_PAYMENT.PENDING,
+      reason: UPGRADE_PAYMENT.PAYMENT_PENDING,
     });
     expect(createSession).not.toHaveBeenCalled();
   });
