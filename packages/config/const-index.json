@@ -9786,6 +9786,14 @@
         "file": "apps/worker/src/constants/downgrade-grace.ts"
       }
     ],
+    "downgrade_grace.grace_end_failed": [
+      {
+        "ref": "DOWNGRADE_GRACE_LOG.GRACE_END_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/downgrade-grace",
+        "file": "apps/worker/src/constants/downgrade-grace.ts"
+      }
+    ],
     "downgrade_grace.email_send_failed": [
       {
         "ref": "DOWNGRADE_GRACE_LOG.EMAIL_SEND_FAILED",

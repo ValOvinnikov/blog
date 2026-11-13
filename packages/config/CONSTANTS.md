@@ -940,7 +940,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@worker/constants/downgrade-grace` — `apps/worker/src/constants/downgrade-grace.ts`
 
-- **DOWNGRADE_GRACE_LOG**: `FAILED`=`"downgrade_grace.failed"`, `STEP_FAILED`=`"downgrade_grace.step_failed"`, `OWNER_MISSING`=`"downgrade_grace.owner_missing"`, `SUBDOMAIN_MISSING`=`"downgrade_grace.subdomain_missing"`, `EMAIL_SEND_FAILED`=`"downgrade_grace.email_send_failed"`
+- **DOWNGRADE_GRACE_LOG**: `FAILED`=`"downgrade_grace.failed"`, `STEP_FAILED`=`"downgrade_grace.step_failed"`, `OWNER_MISSING`=`"downgrade_grace.owner_missing"`, `SUBDOMAIN_MISSING`=`"downgrade_grace.subdomain_missing"`, `GRACE_END_FAILED`=`"downgrade_grace.grace_end_failed"`, `EMAIL_SEND_FAILED`=`"downgrade_grace.email_send_failed"`
 - **DOWNGRADE_GRACE_STEP**: `TRIAL_END`, `GRACE_END`
 
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
