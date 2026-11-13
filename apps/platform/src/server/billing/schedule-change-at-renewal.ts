@@ -9,7 +9,7 @@ import {
 import Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';
-import { releaseSchedule } from './release-schedule';
+import { hasScheduleEnded, releaseSchedule } from './release-schedule';
 import { stripeIdOf } from './stripe-id';
 
 export type TTargetPrices = { plan: string; band: TMaybeUndefined<string> };
@@ -77,6 +77,18 @@ const createScheduleFrom = async (stripe: Stripe, subscriptionId: string) => {
   }
 };
 
+const isSupersededByAnotherTab = async (
+  stripe: Stripe,
+  error: unknown,
+  scheduleId: string,
+  subscriptionId: string,
+) => {
+  if (!(error instanceof Stripe.errors.StripeInvalidRequestError)) return false;
+  if (!(await hasScheduleEnded(stripe, scheduleId))) return false;
+  const { schedule } = await stripe.subscriptions.retrieve(subscriptionId);
+  return Boolean(schedule);
+};
+
 export const scheduleChangeAtRenewal = async (
   stripe: Stripe,
   subscription: TSubscriptionPlan,
@@ -92,12 +104,17 @@ export const scheduleChangeAtRenewal = async (
       `scheduleChangeAtRenewal: schedule "${id}" has no current phase.`,
     );
   }
-  await stripe.subscriptionSchedules.update(id, {
-    end_behavior: 'release',
-    proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
-    phases: [
-      currentPhaseParams(current),
-      nextPhaseParams(current, subscription, prices, interval),
-    ],
-  });
+  try {
+    await stripe.subscriptionSchedules.update(id, {
+      end_behavior: 'release',
+      proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
+      phases: [
+        currentPhaseParams(current),
+        nextPhaseParams(current, subscription, prices, interval),
+      ],
+    });
+  } catch (error) {
+    if (!(await isSupersededByAnotherTab(stripe, error, id, subscription.id)))
+      throw error;
+  }
 };

@@ -11,6 +11,7 @@ import { OWNER_ACCESS_LOG } from '@platform/constants/owner-access';
 import { WORKER_LOG } from '@platform/constants/worker';
 import { auth } from '@platform/server/auth/auth';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_OWNER_EMAIL,
@@ -50,7 +51,6 @@ const MOCK_USER_ID = faker.string.uuid();
 const MOCK_WORKER_PATH = `/${faker.lorem.slug()}`;
 const MOCK_WORKER_URL = `https://${faker.internet.domainName()}`;
 const MOCK_SECRET = faker.string.alphanumeric(32);
-const MOCK_NETWORK_ERROR = new Error(faker.lorem.words(2));
 
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);

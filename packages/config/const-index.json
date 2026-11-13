@@ -5572,6 +5572,14 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.plan_change_release_failed": [
+      {
+        "ref": "BILLING_LOG.PLAN_CHANGE_RELEASE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "billing.catalogue_synced": [
       {
         "ref": "BILLING_LOG.CATALOGUE_SYNCED",
