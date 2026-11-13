@@ -31,7 +31,7 @@ epics: []
 
 ## What it does
 
-A reader who hits a missing page sees the tenant's own 404 in its theme and language, with copy the owner can rewrite in Voice and a link home. A render failure inside a page shows a translated error panel with **Try again** and **Go home**; a failure in the site's root layout falls back to a fixed English page that owns the whole document. Every public-site error boundary reports the failure to the server log (see [client-error-capture](./client-error-capture.md)). The platform has its own branded dead-end pages — the Valstack mark and wordmark above a card with a status badge — and its error page reports nothing.
+A reader who hits a missing page sees the tenant's own 404 in its theme and language, with copy the owner can rewrite in Voice and a link home. A render failure inside a page shows a translated error panel with **Try again** and **Go home**; a failure in the site's root layout falls back to a fixed English page that owns the whole document. Every public-site error boundary reports the failure to the server log (see [client-error-capture](./client-error-capture.md)). The platform has its own branded dead-end pages — the Shinefold logo above a card with a status badge — and its error page reports nothing.
 
 ## Surfaces and routes
 

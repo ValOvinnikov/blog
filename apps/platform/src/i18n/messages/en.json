@@ -1,32 +1,33 @@
 {
   "pageMetadata": {
-    "root": "Admin",
-    "tenants": "Tenants · Admin",
-    "ownerHome": "Dashboard · Admin",
-    "look": "Look · Admin",
-    "voice": "Voice · Admin",
-    "selectTenant": "Choose a workspace · Admin",
+    "root": "Shinefold",
+    "titleTemplate": "%s · Shinefold",
+    "tenants": "Tenants",
+    "ownerHome": "Dashboard",
+    "look": "Look",
+    "voice": "Voice",
+    "selectTenant": "Choose a workspace",
     "signInTitle": "Sign in",
     "signInError": "Sign-in problem",
-    "addTenant": "Add tenant · Admin",
-    "tenantOverview": "Tenant overview · Admin",
-    "tenantActivity": "Tenant activity · Admin",
-    "tenantProvisioning": "Provisioning · Admin",
-    "tenantDanger": "Danger zone · Admin",
-    "tenantDomain": "Domain · Admin",
-    "signInApps": "Sign-in · Admin",
-    "features": "Features · Admin",
-    "languages": "Languages · Admin",
-    "studio": "Studio · Admin",
-    "findings": "Findings · Admin",
-    "email": "Email · Admin",
-    "leads": "Leads · Admin",
-    "releases": "Releases · Admin",
-    "blockedSignupsPage": "Blocked sign-ups · Admin",
-    "dataRequestsPage": "Data requests · Admin",
+    "addTenant": "Add tenant",
+    "tenantOverview": "Tenant overview",
+    "tenantActivity": "Tenant activity",
+    "tenantProvisioning": "Provisioning",
+    "tenantDanger": "Danger zone",
+    "tenantDomain": "Domain",
+    "signInApps": "Sign-in",
+    "features": "Features",
+    "languages": "Languages",
+    "studio": "Studio",
+    "findings": "Findings",
+    "email": "Email",
+    "leads": "Leads",
+    "releases": "Releases",
+    "blockedSignupsPage": "Blocked sign-ups",
+    "dataRequestsPage": "Data requests",
     "signUpTitle": "Create an account",
-    "onboarding": "Create your site · Admin",
-    "upgrade": "Upgrade · Admin"
+    "onboarding": "Create your site",
+    "upgrade": "Upgrade"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -52,7 +53,7 @@
   "onboardingPage": {
     "heading": "Create your site",
     "description": "Choose what kind of site you want, its address and its look. You can change everything except the address later.",
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "onboardingForm": {
     "siteTypeLabel": "Site type",
@@ -151,7 +152,7 @@
     "homeLink": "Back to home"
   },
   "centeredCardFrame": {
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "deadEndView": {
     "errorId": "Error ID: {errorId}"
@@ -161,8 +162,8 @@
   },
   "sidebar": {
     "ariaLabel": "Sidebar",
-    "brandName": "Valstack",
-    "brandTagline": "admin",
+    "brandName": "Shinefold",
+    "brandTagline": "Platform",
     "collapseToggle": "Collapse sidebar",
     "expandToggle": "Expand sidebar"
   },

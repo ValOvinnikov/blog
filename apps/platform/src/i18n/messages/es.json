@@ -1,32 +1,33 @@
 {
   "pageMetadata": {
-    "root": "Administración",
-    "tenants": "Clientes · Administración",
-    "ownerHome": "Panel · Administración",
-    "look": "Aspecto · Administración",
-    "voice": "Voz · Administración",
-    "selectTenant": "Elija un espacio de trabajo · Administración",
+    "root": "Shinefold",
+    "titleTemplate": "%s · Shinefold",
+    "tenants": "Clientes",
+    "ownerHome": "Panel",
+    "look": "Aspecto",
+    "voice": "Voz",
+    "selectTenant": "Elija un espacio de trabajo",
     "signInTitle": "Iniciar sesión",
     "signInError": "Problema al iniciar sesión",
-    "addTenant": "Añadir cliente · Administración",
-    "tenantOverview": "Resumen del cliente · Administración",
-    "tenantActivity": "Actividad del cliente · Administración",
-    "tenantProvisioning": "Aprovisionamiento · Administración",
-    "tenantDanger": "Zona de peligro · Administración",
-    "tenantDomain": "Dominio · Administración",
-    "signInApps": "Inicio de sesión · Admin",
-    "features": "Funciones · Administración",
-    "languages": "Idiomas · Administración",
-    "studio": "Studio · Administración",
-    "findings": "Incidencias · Administración",
-    "email": "Correo electrónico · Administración",
-    "leads": "Contactos · Administración",
-    "releases": "Versiones · Admin",
-    "blockedSignupsPage": "Registros bloqueados · Admin",
-    "dataRequestsPage": "Solicitudes de datos · Admin",
+    "addTenant": "Añadir cliente",
+    "tenantOverview": "Resumen del cliente",
+    "tenantActivity": "Actividad del cliente",
+    "tenantProvisioning": "Aprovisionamiento",
+    "tenantDanger": "Zona de peligro",
+    "tenantDomain": "Dominio",
+    "signInApps": "Inicio de sesión",
+    "features": "Funciones",
+    "languages": "Idiomas",
+    "studio": "Studio",
+    "findings": "Incidencias",
+    "email": "Correo electrónico",
+    "leads": "Contactos",
+    "releases": "Versiones",
+    "blockedSignupsPage": "Registros bloqueados",
+    "dataRequestsPage": "Solicitudes de datos",
     "signUpTitle": "Crear una cuenta",
-    "onboarding": "Crear tu sitio · Administración",
-    "upgrade": "Mejorar plan · Administración"
+    "onboarding": "Crear tu sitio",
+    "upgrade": "Mejorar plan"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -52,7 +53,7 @@
   "onboardingPage": {
     "heading": "Crea tu sitio",
     "description": "Elige qué tipo de sitio quieres, su dirección y su aspecto. Podrás cambiarlo todo más adelante, salvo la dirección.",
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "onboardingForm": {
     "siteTypeLabel": "Tipo de sitio",
@@ -151,7 +152,7 @@
     "homeLink": "Volver al inicio"
   },
   "centeredCardFrame": {
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "deadEndView": {
     "errorId": "ID del error: {errorId}"
@@ -161,8 +162,8 @@
   },
   "sidebar": {
     "ariaLabel": "Barra lateral",
-    "brandName": "Valstack",
-    "brandTagline": "admin",
+    "brandName": "Shinefold",
+    "brandTagline": "Platform",
     "collapseToggle": "Contraer barra lateral",
     "expandToggle": "Expandir barra lateral"
   },

@@ -19,5 +19,5 @@ export default function proxy(request: NextRequest) {
 // The UUID is BotID's fixed path prefix, which `[locale]` would otherwise swallow.
 export const config = {
   matcher:
-    '/((?!api|_next|_vercel|149e9513-01fa-4fb0-aad4-566afd725d1b|[^/]*\\.[^/]*$).*)',
+    '/((?!api|_next|_vercel|icon|apple-icon|149e9513-01fa-4fb0-aad4-566afd725d1b|[^/]*\\.[^/]*$).*)',
 };

@@ -96,6 +96,6 @@ A tenant's site is published in one or more languages from a curated list — En
 
 ## Related
 
-- #4979 — epic: the public sites and the admin share no browser state, language included.
+- #4979 — epic: the public sites and the platform share no browser state, language included.
 - #4981 — only the language switcher writes the remembered language.
 - #4998 — the header language pill cancels the nav link's current-page cue.

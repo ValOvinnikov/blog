@@ -15,7 +15,7 @@
  * carve-out, not the default — tokens shared by more than one workspace
  * still belong here.
  *
- * `apps/platform` is a second named exception: it owns its own admin-only
+ * `apps/platform` is a second named exception: it owns its own platform-only
  * token layer (`apps/platform/src/styles/admin-theme.css`) rather than
  * consuming this file's tokens, since its design system is deliberately
  * separate from `packages/ui`'s. It still imports this file for the base
@@ -369,6 +369,8 @@
   --logo-1: oklch(0.52 0.17 250);
   --logo-2: oklch(0.63 0.16 250);
   --logo-3: oklch(0.73 0.13 250);
+  --logo-tile: oklch(0.52 0.17 250);
+  --logo-tile-contrast: oklch(1 0 0);
 
   --shadow-card:
     0 1px 2px oklch(0.2 0.02 250 / 0.05), 0 14px 34px oklch(0.2 0.04 250 / 0.07);
@@ -471,6 +473,8 @@
   --logo-1: oklch(0.58 0.17 250);
   --logo-2: oklch(0.68 0.16 250);
   --logo-3: oklch(0.8 0.14 250);
+  --logo-tile: oklch(0.8 0.14 250);
+  --logo-tile-contrast: oklch(0.22 0.06 250);
 
   --shadow-card: 0 1px 2px oklch(0 0 0 / 0.3), 0 16px 40px oklch(0 0 0 / 0.35);
 }

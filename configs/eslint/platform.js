@@ -25,7 +25,7 @@ const contentLayerRestrictedGroup = {
 const uiRestrictedGroup = {
   group: ['@blog/ui', '@blog/ui/*'],
   message:
-    'apps/platform has dropped @blog/ui everywhere except site-preview/ (its samples render real blog UI for the tenant preview) — build admin UI from in-app Base UI-based primitives instead.',
+    'apps/platform has dropped @blog/ui everywhere except site-preview/ (its samples render real blog UI for the tenant preview) — build platform UI from in-app Base UI-based primitives instead.',
 };
 
 const platformTestingRestrictedGroup = {

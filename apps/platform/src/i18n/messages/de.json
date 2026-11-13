@@ -1,32 +1,33 @@
 {
   "pageMetadata": {
-    "root": "Admin",
-    "tenants": "Mandanten · Admin",
-    "ownerHome": "Dashboard · Admin",
-    "look": "Erscheinungsbild · Admin",
-    "voice": "Tonalität · Admin",
-    "selectTenant": "Arbeitsbereich wählen · Admin",
+    "root": "Shinefold",
+    "titleTemplate": "%s · Shinefold",
+    "tenants": "Mandanten",
+    "ownerHome": "Dashboard",
+    "look": "Erscheinungsbild",
+    "voice": "Tonalität",
+    "selectTenant": "Arbeitsbereich wählen",
     "signInTitle": "Anmelden",
     "signInError": "Problem bei der Anmeldung",
-    "addTenant": "Mandant hinzufügen · Admin",
-    "tenantOverview": "Mandantenübersicht · Admin",
-    "tenantActivity": "Mandantenaktivität · Admin",
-    "tenantProvisioning": "Bereitstellung · Admin",
-    "tenantDanger": "Gefahrenzone · Admin",
-    "tenantDomain": "Domain · Admin",
-    "signInApps": "Anmeldung · Admin",
-    "features": "Funktionen · Admin",
-    "languages": "Sprachen · Admin",
-    "studio": "Studio · Admin",
-    "findings": "Befunde · Admin",
-    "email": "E-Mail · Admin",
-    "leads": "Anfragen · Admin",
-    "releases": "Releases · Admin",
-    "blockedSignupsPage": "Gesperrte Registrierungen · Admin",
-    "dataRequestsPage": "Datenanfragen · Admin",
+    "addTenant": "Mandant hinzufügen",
+    "tenantOverview": "Mandantenübersicht",
+    "tenantActivity": "Mandantenaktivität",
+    "tenantProvisioning": "Bereitstellung",
+    "tenantDanger": "Gefahrenzone",
+    "tenantDomain": "Domain",
+    "signInApps": "Anmeldung",
+    "features": "Funktionen",
+    "languages": "Sprachen",
+    "studio": "Studio",
+    "findings": "Befunde",
+    "email": "E-Mail",
+    "leads": "Anfragen",
+    "releases": "Releases",
+    "blockedSignupsPage": "Gesperrte Registrierungen",
+    "dataRequestsPage": "Datenanfragen",
     "signUpTitle": "Konto erstellen",
-    "onboarding": "Website erstellen · Admin",
-    "upgrade": "Upgrade · Admin"
+    "onboarding": "Website erstellen",
+    "upgrade": "Upgrade"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -52,7 +53,7 @@
   "onboardingPage": {
     "heading": "Erstelle deine Website",
     "description": "Wähle, welche Art von Website du möchtest, ihre Adresse und ihr Aussehen. Bis auf die Adresse kannst du später alles ändern.",
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "onboardingForm": {
     "siteTypeLabel": "Art der Website",
@@ -151,7 +152,7 @@
     "homeLink": "Zur Startseite"
   },
   "centeredCardFrame": {
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "deadEndView": {
     "errorId": "Fehler-ID: {errorId}"
@@ -161,8 +162,8 @@
   },
   "sidebar": {
     "ariaLabel": "Seitenleiste",
-    "brandName": "Valstack",
-    "brandTagline": "admin",
+    "brandName": "Shinefold",
+    "brandTagline": "Platform",
     "collapseToggle": "Seitenleiste einklappen",
     "expandToggle": "Seitenleiste ausklappen"
   },
