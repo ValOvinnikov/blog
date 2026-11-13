@@ -1,9 +1,10 @@
-import { BRAND_VARIANT, RADIUS_DECLARATIONS, RADIUS_SCALE } from '@blog/config';
+import { BRAND_VARIANT } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen } from '@web/testing/custom-render';
 import {
+  MOCK_RADIUS_OVERRIDE_SECTION,
+  MOCK_RADIUS_OVERRIDE_VALUE,
   MOCK_SCOPED_RADIUS_TOKEN,
-  MOCK_SECTION_LOOK,
 } from '@web/testing/shared/section-appearance/fixtures';
 
 import { Section } from './section';
@@ -45,17 +46,12 @@ describe(`<${Section.name}/>`, () => {
   });
 
   it('scopes its style overrides to the region', () => {
-    setup({
-      appearance: {
-        overrides: { radiusScale: RADIUS_SCALE.XL },
-        look: MOCK_SECTION_LOOK,
-      },
-    });
+    setup({ appearance: MOCK_RADIUS_OVERRIDE_SECTION.appearance });
 
     const region = screen.getByRole('region', { name: MOCK_HEADING });
 
     expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
-      RADIUS_DECLARATIONS[RADIUS_SCALE.XL][MOCK_SCOPED_RADIUS_TOKEN],
+      MOCK_RADIUS_OVERRIDE_VALUE,
     );
   });
 });
