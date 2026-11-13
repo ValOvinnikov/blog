@@ -64,6 +64,7 @@ vi.mock('next/navigation', async () => {
     permanentRedirect: vi.fn(() => {
       throw new Error(NEXT_NAVIGATION_ERROR.NEXT_REDIRECT);
     }),
+    unstable_isUnrecognizedActionError: vi.fn(() => false),
     unstable_rethrow: vi.fn(),
     useParams: vi.fn(() => ({})),
     usePathname: vi.fn(() => '/'),

@@ -1763,6 +1763,11 @@
     "saveAndLeave": "Opslaan en weggaan",
     "saving": "Opslaan…"
   },
+  "outOfDatePageDialog": {
+    "title": "Deze pagina is verouderd.",
+    "description": "Laad de pagina opnieuw om verder te gaan.",
+    "reload": "Opnieuw laden"
+  },
   "draftRecovery": {
     "title": "Je hebt niet-opgeslagen wijzigingen van {takenAt}.",
     "description": "Ze zijn op dit apparaat bewaard toen je de pagina verliet.",

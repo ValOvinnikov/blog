@@ -1763,6 +1763,11 @@
     "saveAndLeave": "Guardar y salir",
     "saving": "Guardando…"
   },
+  "outOfDatePageDialog": {
+    "title": "Esta página está desactualizada.",
+    "description": "Vuelve a cargarla para continuar.",
+    "reload": "Volver a cargar"
+  },
   "draftRecovery": {
     "title": "Tienes cambios sin guardar de {takenAt}.",
     "description": "Se guardaron en este dispositivo al salir de la página.",

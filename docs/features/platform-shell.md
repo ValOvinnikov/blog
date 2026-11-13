@@ -18,6 +18,9 @@ code:
   - apps/platform/src/utils/studio-nav-item/**
   - apps/platform/src/utils/persistent-cookie/**
   - apps/platform/src/utils/routes/**
+  - apps/platform/src/utils/settle-action/**
+  - apps/platform/src/utils/page-out-of-date/**
+  - apps/platform/src/utils/reload-page/**
   - apps/platform/src/utils/active-tenant-cookie/**
   - apps/platform/src/utils/sidebar-collapsed-cookie/**
   - apps/platform/src/utils/theme-preference-cookie/**
@@ -180,6 +183,19 @@ retry directly below the notice holding its Try again or Start setup
 button, the email sign-in refusal two rows above its send button, and
 onboarding's failed Create site in the pinned footer above Back and Create
 site, never at the top of the step.
+
+A save from a page whose build is gone — the action no longer exists on the
+server, so the tab was opened before a deploy and outlived Skew Protection —
+shows none of those. Every save goes through `settleAction`, which opens one
+app-wide alert dialog mounted in the locale layout: "This page is out of
+date." / "Reload to continue." with a single Reload button. It has no
+dismiss, and the page reloads only from that button; on a settings form with
+unsaved changes the browser's leave-site prompt comes first, so the person can
+still copy what they typed. The rejected save never settles, so the form keeps
+its values and shows no error of its own beneath the dialog. Its pending
+transition also holds every later navigation and refresh in the tab until the
+reload, which Reload being the only way out makes harmless. Any other rejected
+save still settles as the form's generic server error.
 
 ## Data
 
