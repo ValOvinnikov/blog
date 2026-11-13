@@ -64,7 +64,7 @@ describe(claimGraceEmail, () => {
     },
   );
 
-  it('sends the day-13 email to a sweep that runs earlier in the day than the grace started', async () => {
+  it('claims day 13 for a sweep earlier in the day than the grace start', async () => {
     const tenant = await insertTestTenant(db(), {
       downgradeGraceStartedAt: MOCK_LATE_ON_START_DAY,
     });
