@@ -67,7 +67,10 @@ export const PostCardsSection = ({
           contentAlignment={contentAlignment}
         />
       ) : (
-        <CardGrid columns={gridColumns}>
+        <CardGrid
+          columns={gridColumns}
+          dataTestId={`${dataTestId}-grid-${gridColumns}`}
+        >
           {items.map((item) => (
             <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
           ))}

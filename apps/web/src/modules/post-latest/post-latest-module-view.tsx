@@ -1,3 +1,4 @@
+import { GRID_COLUMNS } from '@blog/config';
 import type { TPostLatestModule } from '@blog/service';
 import {
   type IPostCardsSectionProps,
@@ -16,6 +17,6 @@ export const PostLatestModuleView = ({
 }: IPostLatestModuleViewProps) => (
   <PostCardsSection
     {...sectionProps}
-    gridColumns={toCardGridColumns(columns)}
+    gridColumns={toCardGridColumns(columns ?? GRID_COLUMNS.THREE)}
   />
 );

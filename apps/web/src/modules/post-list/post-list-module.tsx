@@ -3,15 +3,13 @@ import { service } from '@blog/service';
 import { VoiceRichText } from '@web/components/shared/voice-rich-text';
 import { POST_LIST_LOG } from '@web/constants/post-list';
 import type { TModuleComponentProps } from '@web/modules/module-renderer';
+import { getPostCardsSection } from '@web/server/post-cards/get-post-cards-section/get-post-cards-section';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { fillVoicePlaceholders } from '@web/utils/fill-voice-placeholders';
 import { markErrorLogged } from '@web/utils/logged-error';
 import { logger } from '@web/utils/logger/logger';
-import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import type { TVoiceRichFieldId } from '@web/utils/resolve-voice-rich-fields';
-import { toPostListItems } from '@web/utils/to-post-list-items';
 import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 
@@ -74,15 +72,11 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
   const {
     brandVariant,
     headingBlock,
-    posts,
     layout,
     currentPage,
     totalPages,
     contentAlignment,
     showImages,
-    cardStyle,
-    radiusScale,
-    density,
     columns,
   } = result.data;
 
@@ -90,10 +84,10 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
     notFound();
   }
 
-  const [items, appearance] = await Promise.all([
-    toPostListItems(posts, showImages ? renderPostCardImage : undefined),
-    getSectionAppearance(tenantId, { cardStyle, radiusScale, density }),
-  ]);
+  const { items, appearance } = await getPostCardsSection(
+    tenantId,
+    result.data,
+  );
 
   const scopedParams = archive ? { name: archive.name } : undefined;
   const createHref = archive
