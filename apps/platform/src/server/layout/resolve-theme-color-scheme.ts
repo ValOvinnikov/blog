@@ -6,21 +6,19 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
+import { readRenamedCookie } from '@platform/server/renamed-cookie/read-renamed-cookie';
 import {
   LEGACY_THEME_PREFERENCE_COOKIE,
   THEME_PREFERENCE_COOKIE,
 } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
-import { cookies } from 'next/headers';
 
 export const resolveThemeColorScheme = async (): Promise<
   TMaybeUndefined<TColorScheme>
 > => {
-  const cookieStore = await cookies();
-
-  const storedPreference = (
-    cookieStore.get(THEME_PREFERENCE_COOKIE) ??
-    cookieStore.get(LEGACY_THEME_PREFERENCE_COOKIE)
-  )?.value;
+  const storedPreference = await readRenamedCookie({
+    name: THEME_PREFERENCE_COOKIE,
+    legacyName: LEGACY_THEME_PREFERENCE_COOKIE,
+  });
 
   switch (storedPreference) {
     case THEME_PREFERENCE.LIGHT:
