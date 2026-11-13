@@ -2,14 +2,14 @@
 name: platform-ui-practices
 description:
   Use when building or changing any UI in apps/platform, the operator/tenant
-  admin app — a page, card, form field, settings form, table, notice, dialog,
+  platform — a page, card, form field, settings form, table, notice, dialog,
   empty or loading state, phone layout, or any text size, colour, spacing,
   radius or visible copy there.
 ---
 
 # Platform UI practices (`apps/platform`)
 
-What an admin page, card, field and state look like, with the decided values.
+What a platform page, card, field and state look like, with the decided values.
 It sits on top of `react-component-practices` (§ Props, § Where a component
 lives, § Styling files, § Size and splitting, DOM ids from `useId`) and
 `.claude/agents/platform-app.md` (Base UI, one component per file, the ghost
@@ -241,7 +241,7 @@ from `useSettingsFormState()`:
 editor's `h2` set `font-admin` and `tracking-normal` themselves, because the
 site's base layer gives `h1`–`h4` its display font and `-0.02em` tracking.
 Nothing else names a family: no `font-sans`, `font-ui` or inline `fontFamily`
-on admin chrome. Font specimens (`FontPicker`, `PresetPicker`) are exempt,
+on platform chrome. Font specimens (`FontPicker`, `PresetPicker`) are exempt,
 like the colour section's artwork. No `tracking-*` beyond the table's and the
 sidebar's own (`sidebar-variants.ts`: brand name `tracking-[0.2px]`, section
 labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
@@ -391,7 +391,7 @@ No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
   `react-component-practices` § Where a component lives.
 - A block is built on the Base UI part that owns the behaviour (`Field`,
   `Select`, `Collapsible`, `Tabs`, `Toolbar`, `Dialog`, `Switch`, …), styled
-  from admin tokens in its `tv()` (→ `react-component-practices` § Styling
+  from the platform's tokens in its `tv()` (→ `react-component-practices` § Styling
   files). It owns keyboard, focus and ARIA; callers pass content through
   compound slots (`Card.Header`) or a small closed prop set, a hook or a
   context, never a long prop list.
@@ -560,7 +560,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
   is `h3`. Nothing skipped, and what sits under a section heading nests below
   it.
 - A site preview's root (`SiteThemeFrame`) is `inert`: its links and buttons
-  take no focus and its headings stay out of the admin outline.
+  take no focus and its headings stay out of the platform's outline.
 - A landmark matches its content: no `<nav>` around a list with no links, no
   `<aside>` around main content.
 
@@ -638,7 +638,7 @@ of them:
 | `outline-admin-brand-weak` as the only focus cue                                                                 | `focusRingClasses(ground)`, the ring `Button` draws                                                                               |
 | `gap-[18px]` or `gap-5` between cards, `gap-5` or `mb-[18px]` between fields                                     | `gap-6` between cards, `gap-4` on the fields' parent                                                                              |
 | `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin` or `rounded-admin-control`                                                                                        |
-| `font-sans`, `font-ui` or an inline `fontFamily` on admin chrome                                                 | Nothing; the font is set once on `<body>`                                                                                         |
+| `font-sans`, `font-ui` or an inline `fontFamily` on platform chrome                                              | Nothing; the font is set once on `<body>`                                                                                         |
 | `sm:grid-cols-2` inside a half-width column                                                                      | `@container` on the body, `@sm:grid-cols-2` on the grid                                                                           |
 | `@base-ui/react/switch` imported outside `shared/switch/`                                                        | The shared `Switch`; raise a missing mode                                                                                         |
 | `{isPending ? t('saving') : t('save')}` as button children                                                       | `isPending` + `pendingLabel`                                                                                                      |
