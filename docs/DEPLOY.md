@@ -302,8 +302,8 @@ Production scope like the rest:
 | Key                       | `web-dev` / `web-prod` value                                  |
 | ------------------------- | ------------------------------------------------------------- |
 | `RESEND_TENANT_API_KEY`   | the tenant-mail Resend account's API key                      |
-| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Valstack <sign-in@mail.{your-hosting}>`                 |
-| `NEWSLETTER_FROM_ADDRESS` | e.g. `Valstack <newsletter@mail.{your-hosting}>`              |
+| `MAGIC_LINK_FROM_ADDRESS` | e.g. `Shinefold <sign-in@mail.{your-hosting}>`                |
+| `NEWSLETTER_FROM_ADDRESS` | e.g. `Shinefold <newsletter@mail.{your-hosting}>`             |
 | `RESEND_WEBHOOK_SECRET`   | the signing secret of that project's Resend webhook (step 5a) |
 
 > **Set every `*_FROM_ADDRESS` to an address on a domain verified in

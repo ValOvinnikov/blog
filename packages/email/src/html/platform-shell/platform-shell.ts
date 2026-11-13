@@ -1,5 +1,8 @@
 import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
-import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
+import {
+  PLATFORM_EMAIL_BRAND,
+  PLATFORM_EMAIL_FULL_LOGO,
+} from '@blog/email/html/platform-email-brand/platform-email-brand';
 
 export type TBuildPlatformShellInput = {
   brandName: string;
@@ -10,11 +13,7 @@ export type TBuildPlatformShellInput = {
   actionHtml?: string;
 };
 
-/**
- * Wraps mail the platform sends in its own name, in the fixed platform
- * palette — never a tenant's, because there is no parameter through which one
- * could arrive.
- */
+/** Wraps mail the platform sends in its own name; no tenant palette or logo can reach it. */
 export function buildPlatformShell({
   brandName,
   title,
@@ -26,7 +25,14 @@ export function buildPlatformShell({
   return renderEmailShell({
     palette: PLATFORM_EMAIL_BRAND,
     title,
-    identity: { brandName, markPalette: PLATFORM_EMAIL_BRAND },
+    identity: {
+      brandName,
+      logo: {
+        fullLogoImage: PLATFORM_EMAIL_FULL_LOGO,
+        groundColor: PLATFORM_EMAIL_BRAND.brandPrimarySolid,
+        altTextColor: PLATFORM_EMAIL_BRAND.brandPrimaryContrast,
+      },
+    },
     previewText,
     bodyHtml,
     structuralHtml,
