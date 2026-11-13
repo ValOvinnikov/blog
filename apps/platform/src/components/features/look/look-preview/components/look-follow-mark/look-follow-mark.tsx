@@ -27,10 +27,11 @@ export const LookFollowMark = ({
   const [first] = boxes;
   const outlineWidth = LOOK_FOLLOW_MARK.OUTLINE_WIDTH / scale;
   const outlineOffset = LOOK_FOLLOW_MARK.OUTLINE_OFFSET / scale;
+  const edgeWidth = LOOK_FOLLOW_MARK.EDGE_WIDTH / scale;
   const tagHeight = LOOK_FOLLOW_MARK.TAG_HEIGHT / scale;
   const ringOutset = first?.isInset ? 0 : outlineOffset + outlineWidth;
   const isTagBelow = !!first && first.top < tagHeight + ringOutset;
-  const { root, mark, tag } = lookFollowMarkVariants({ isTagBelow });
+  const { root, mark, edge, tag } = lookFollowMarkVariants({ isTagBelow });
   const radius = `${LOOK_FOLLOW_MARK.TAG_RADIUS / scale}px`;
 
   return (
@@ -47,6 +48,14 @@ export const LookFollowMark = ({
           }}
           data-testid={LOOK_FOLLOW_TEST_ID.OUTLINE}
         >
+          <span
+            className={edge()}
+            style={{
+              inset: isInset ? outlineWidth : -(outlineOffset + outlineWidth),
+              outlineWidth: edgeWidth,
+              outlineOffset: isInset ? -edgeWidth : 0,
+            }}
+          />
           {index === 0 && (
             <span
               className={tag()}

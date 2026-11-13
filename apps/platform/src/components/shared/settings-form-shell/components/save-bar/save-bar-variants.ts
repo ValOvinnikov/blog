@@ -1,9 +1,11 @@
+import { TEXT_LINK_STROKE_CLASSES } from '@platform/components/shared/text-link/text-link-variants';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const saveBarLinkClasses = [
-  'rounded-admin-control text-admin-brand underline underline-offset-2 outline-hidden',
+  'rounded-admin-control text-admin-brand outline-hidden',
+  TEXT_LINK_STROKE_CLASSES,
   'hover:text-admin-brand-strong',
   focusRingClasses(FOCUS_RING_GROUND.SURFACE),
 ];

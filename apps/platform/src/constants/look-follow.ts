@@ -20,6 +20,7 @@ export type TLookFollowOutcome = TValueOf<typeof LOOK_FOLLOW_OUTCOME>;
 
 export const LOOK_FOLLOW_MARK = {
   OUTLINE_WIDTH: 2,
+  EDGE_WIDTH: 1,
   TAG_FONT_SIZE: 11,
   TAG_HEIGHT: 20,
   TAG_PADDING_X: 7,

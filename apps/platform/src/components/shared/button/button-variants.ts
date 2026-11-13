@@ -47,7 +47,9 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       [BUTTON_VARIANT.PRIMARY]: {
-        root: ['border-admin-brand bg-admin-brand text-white shadow-admin'],
+        root: [
+          'border-admin-brand bg-admin-brand text-admin-on-brand-ink shadow-admin',
+        ],
       },
       [BUTTON_VARIANT.SECONDARY]: {
         root: [

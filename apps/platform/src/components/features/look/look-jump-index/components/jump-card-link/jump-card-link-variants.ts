@@ -27,7 +27,7 @@ export const jumpCardLinkVariants = tv({
     },
     isCurrent: {
       true: {
-        link: ['bg-admin-brand-weak font-semibold text-admin-brand-strong'],
+        link: ['bg-admin-selected font-semibold text-admin-on-selected'],
       },
     },
   },

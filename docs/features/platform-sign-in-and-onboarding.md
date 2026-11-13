@@ -182,7 +182,7 @@ site as a 14-day Growth trial, with no card.
      suffix, the hint, then the error; the actions' `role="status"` region
      repeats it as screen-reader-only text so it is announced as it appears.
      The other verdicts — checking,
-     "<address> is yours" and the amber "couldn't check" note — are a tinted
+     "<address> is yours" and the orange (`warn`) "couldn't check" note — are a tinted
      chip in a `role="status"` region in the pinned actions, between Back and
      Continue (on its own line above the buttons in the phone action bar).
   3. **Look** — the preset and accent colour. Each site type starts on its

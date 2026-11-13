@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { CONTRAST_ROLE, CONTRAST_ROLE_MIN } from '@blog/config';
 import { hexToOklch, renderedContrastRatio } from '@blog/utils/color';
 
-const WHITE = 'white';
 const TEXT = CONTRAST_ROLE_MIN[CONTRAST_ROLE.TEXT];
 const BOUNDARY = CONTRAST_ROLE_MIN[CONTRAST_ROLE.UI_BOUNDARY];
 const FOCUS = CONTRAST_ROLE_MIN[CONTRAST_ROLE.FOCUS];
@@ -41,7 +40,6 @@ const darkTokens = new Map([...lightTokens, ...hexTokensOf(DARK_SELECTOR)]);
 
 const colourIn =
   (tokens: ReturnType<typeof hexTokensOf>) => (token: string) => {
-    if (token === WHITE) return { l: 1, c: 0, h: 0 };
     const hex = tokens.get(token);
     if (!hex) throw new Error(`--${token} has no hex value`);
 
@@ -60,6 +58,8 @@ const TOKEN = {
   BRAND_WEAK: 'admin-brand-weak',
   CONTROL_LINE: 'admin-control-line',
   CONTROL_LINE_TINT: 'admin-control-line-tint',
+  FOLLOW_MARK: 'admin-follow-mark',
+  FOLLOW_MARK_INK: 'admin-follow-mark-ink',
   GLYPH_ACCENT: 'admin-glyph-accent',
   GLYPH_FILL: 'admin-glyph-fill',
   GLYPH_LINE_SOFT: 'admin-glyph-line-soft',
@@ -69,11 +69,14 @@ const TOKEN = {
   OK: 'admin-ok',
   OK_WEAK: 'admin-ok-weak',
   ON_BRAND_INK: 'admin-on-brand-ink',
+  ON_SELECTED: 'admin-on-selected',
   PILL_NEUTRAL: 'admin-pill-neutral',
   PILL_NEUTRAL_POPOVER: 'admin-pill-neutral-popover',
   POPOVER: 'admin-popover',
   POPOVER_HOVER: 'admin-popover-hover',
   SEGMENT_ON: 'admin-segment-on',
+  SELECTED: 'admin-selected',
+  SELECTED_HOVER: 'admin-selected-hover',
   SIDE: 'admin-side',
   SIDE_ACCENT: 'admin-side-accent',
   SIDE_FIELD_LINE: 'admin-side-field-line',
@@ -83,6 +86,7 @@ const TOKEN = {
   SURFACE: 'admin-surface',
   SURFACE_2: 'admin-surface-2',
   SURFACE_HEAD: 'admin-surface-head',
+  SWITCH_THUMB_ON: 'admin-switch-thumb-on',
   TEXT: 'admin-text',
   TEXT_STRONG: 'admin-text-strong',
   THEME_TRACK: 'admin-theme-track',
@@ -101,10 +105,11 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Muted on page', TOKEN.MUTED, TOKEN.BG, TEXT],
   ['Nav text on sidebar', TOKEN.SIDE_TEXT, TOKEN.SIDE, TEXT],
   ['Section label on sidebar', TOKEN.SIDE_MUTED, TOKEN.SIDE, TEXT],
-  ['Active row text', TOKEN.TEXT_STRONG, TOKEN.SIDE_RAISED, TEXT],
+  ['Active row text', TOKEN.BRAND_INK, TOKEN.SIDE_RAISED, TEXT],
+  ['Active row bar', TOKEN.SIDE_ACCENT, TOKEN.SIDE_RAISED, BOUNDARY],
   ['Link on card', TOKEN.BRAND_INK, TOKEN.SURFACE, TEXT],
   ['Link hover on card', TOKEN.BRAND_STRONG, TOKEN.SURFACE, TEXT],
-  ['White on primary', WHITE, TOKEN.BRAND, TEXT],
+  ['Label on primary', TOKEN.ON_BRAND_INK, TOKEN.BRAND, TEXT],
   ['Live pill', TOKEN.OK, TOKEN.OK_WEAK, TEXT],
   ['Provisioning pill', TOKEN.WARN, TOKEN.WARN_WEAK, TEXT],
   ['Failed pill', TOKEN.BAD, TOKEN.BAD_WEAK, TEXT],
@@ -114,6 +119,13 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Input border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
   ['Switch off track on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
   ['Switch on track on card', TOKEN.BRAND, TOKEN.SURFACE, BOUNDARY],
+  ['Switch on thumb on track', TOKEN.SWITCH_THUMB_ON, TOKEN.BRAND, BOUNDARY],
+  [
+    'Focused field border against resting border',
+    TOKEN.BRAND_INK,
+    TOKEN.CONTROL_LINE,
+    FOCUS,
+  ],
   ['Switcher border on sidebar', TOKEN.SIDE_FIELD_LINE, TOKEN.SIDE, BOUNDARY],
   [
     'Control on card header',
@@ -169,9 +181,23 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Chip count on chip', TOKEN.MUTED, TOKEN.SURFACE, TEXT],
   ['Chip text on chip hover', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
   ['Chip border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
-  ['White on active chip', WHITE, TOKEN.BRAND, TEXT],
-  ['White on active chip hover', WHITE, TOKEN.BRAND_HOVER, TEXT],
-  ['Active chip hover on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
+  ['Label on selected chip', TOKEN.ON_SELECTED, TOKEN.SELECTED, TEXT],
+  [
+    'Label on selected chip hover',
+    TOKEN.ON_SELECTED,
+    TOKEN.SELECTED_HOVER,
+    TEXT,
+  ],
+  ['Follow mark tag label', TOKEN.FOLLOW_MARK_INK, TOKEN.FOLLOW_MARK, TEXT],
+  [
+    'Follow mark edge on its outline',
+    TOKEN.FOLLOW_MARK_INK,
+    TOKEN.FOLLOW_MARK,
+    BOUNDARY,
+  ],
+  ['Running step number', TOKEN.ON_BRAND_INK, TOKEN.WARN, TEXT],
+  ['Selected chip border on page', TOKEN.BRAND, TOKEN.BG, BOUNDARY],
+  ['Selected chip hover border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Locked text on page', TOKEN.MUTED, TOKEN.BG, TEXT],
   ['Focus ring on toolbar track', TOKEN.BRAND_INK, TOKEN.THEME_TRACK, FOCUS],
