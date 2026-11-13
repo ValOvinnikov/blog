@@ -1,0 +1,75 @@
+import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
+import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  buildOwnerDowngradeGraceEmail,
+  PLATFORM_EMAIL_BRAND_NAME,
+} from '@blog/email';
+import { isUndefined } from '@blog/utils/primitives';
+import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
+import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
+import { formatInactivityDate } from '@worker/utils/inactivity-sweep/inactivity-dates';
+import type { TInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
+import { OWNER_GRACE_EMAIL_COPY } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy-type';
+import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
+
+import { graceEndDate } from './grace-dates';
+import { hasGraceLocks, type TGraceLocks } from './grace-locks';
+
+export type TGraceEmailInput = {
+  tenant: TTenant;
+  graceStartedAt: Date;
+  ownerEmail: string;
+  locks: TGraceLocks;
+  env: TInactivitySweepEnv;
+};
+
+function lockParagraphs(
+  copy: TOwnerGraceEmailCopy,
+  { lockedMemberCount, customDomain, subdomain }: TGraceLocks,
+  date: string,
+): string[] {
+  const members =
+    lockedMemberCount > 0
+      ? [copy.memberLock({ count: lockedMemberCount, date })]
+      : [];
+  const domain =
+    isUndefined(customDomain) || isUndefined(subdomain)
+      ? []
+      : [copy.domainLock({ customDomain, subdomain, date })];
+
+  return [...members, ...domain];
+}
+
+export async function sendOwnerGraceEmail(
+  email: TGraceEmail,
+  { tenant, graceStartedAt, ownerEmail, locks, env }: TGraceEmailInput,
+): Promise<void> {
+  const { id: tenantId, name, locale } = tenant;
+  const copy = OWNER_GRACE_EMAIL_COPY[locale];
+  const date = formatInactivityDate(graceEndDate(graceStartedAt), locale);
+  const { paragraphs, ...text } = copy.emails[email]({ siteName: name, date });
+  const closing =
+    email === GRACE_EMAIL.STARTED && !hasGraceLocks(locks)
+      ? copy.upgradeAnyTime
+      : copy.keepAsTheyAre(date);
+
+  await sendOwnerMessage({
+    to: ownerEmail,
+    message: buildOwnerDowngradeGraceEmail({
+      brandName: PLATFORM_EMAIL_BRAND_NAME,
+      ...text,
+      paragraphs: [
+        ...paragraphs,
+        ...lockParagraphs(copy, locks, date),
+        closing,
+      ],
+      action: {
+        label: copy.actionLabel,
+        url: new URL(OWNER_DASHBOARD_PATH, env.platformAppBaseUrl).toString(),
+      },
+    }),
+    failedEvent: DOWNGRADE_GRACE_LOG.EMAIL_SEND_FAILED,
+    context: { tenantId, email },
+  });
+}

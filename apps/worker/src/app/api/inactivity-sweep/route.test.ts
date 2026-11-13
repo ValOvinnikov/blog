@@ -1,5 +1,9 @@
 import { HTTP_STATUS } from '@blog/config/constants';
-import { INACTIVITY_STAGE } from '@blog/db/constants';
+import { GRACE_EMAIL, INACTIVITY_STAGE } from '@blog/db/constants';
+import {
+  DOWNGRADE_GRACE_LOG,
+  DOWNGRADE_GRACE_STEP,
+} from '@worker/constants/downgrade-grace';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { RETENTION_KIND } from '@worker/constants/retention';
@@ -14,6 +18,7 @@ import {
 } from '@worker/testing/enqueue/fixtures';
 import { mockInactivitySweepEnv } from '@worker/testing/inactivity-sweep-env/fake-inactivity-sweep-env';
 import { MOCK_DB_DOWN } from '@worker/testing/outage/fixtures';
+import { runDowngradeGraceSweep } from '@worker/utils/downgrade-grace/run-downgrade-grace-sweep';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { getInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
 import { runInactivitySweep } from '@worker/utils/inactivity-sweep/run-inactivity-sweep';
@@ -30,12 +35,20 @@ const MOCK_ADVANCED = {
   [INACTIVITY_STAGE.DELETION_NOTICE]: 0,
   [INACTIVITY_STAGE.DEPROVISIONING]: 0,
 };
+const MOCK_GRACE = {
+  [DOWNGRADE_GRACE_STEP.TRIAL_END]: 1,
+  [DOWNGRADE_GRACE_STEP.GRACE_END]: 0,
+  [GRACE_EMAIL.STARTED]: 1,
+  [GRACE_EMAIL.HALFWAY]: 0,
+  [GRACE_EMAIL.ENDING]: 0,
+};
 const MOCK_DELETED = {
   [RETENTION_KIND.LEADS]: 4,
   [RETENTION_KIND.SESSIONS]: 9,
 };
 
 vi.mock('@worker/utils/env/env');
+vi.mock('@worker/utils/downgrade-grace/run-downgrade-grace-sweep');
 vi.mock('@worker/utils/inactivity-sweep/inactivity-sweep-env');
 vi.mock('@worker/utils/inactivity-sweep/run-inactivity-sweep');
 vi.mock('@worker/utils/retention/run-retention-cleanups');
@@ -50,6 +63,7 @@ describe('GET /api/inactivity-sweep', () => {
     mockEnv.CRON_SECRET = MOCK_CRON_SECRET;
     vi.mocked(getInactivitySweepEnv).mockReturnValue(MOCK_SWEEP_ENV);
     vi.mocked(runInactivitySweep).mockResolvedValue(MOCK_ADVANCED);
+    vi.mocked(runDowngradeGraceSweep).mockResolvedValue(MOCK_GRACE);
     vi.mocked(runRetentionCleanups).mockResolvedValue(MOCK_DELETED);
   });
 
@@ -57,15 +71,20 @@ describe('GET /api/inactivity-sweep', () => {
     vi.useRealTimers();
   });
 
-  it('runs the sweep and retention cleanups for now and answers with both results', async () => {
+  it('runs both sweeps and the retention cleanups for now and answers with every result', async () => {
     const response = await GET(cronRequest());
 
     expect(response.status).toBe(HTTP_STATUS.OK);
     await expect(response.json()).resolves.toEqual({
       advanced: MOCK_ADVANCED,
+      grace: MOCK_GRACE,
       deleted: MOCK_DELETED,
     });
     expect(runInactivitySweep).toHaveBeenCalledWith({
+      now: MOCK_NOW,
+      env: MOCK_SWEEP_ENV,
+    });
+    expect(runDowngradeGraceSweep).toHaveBeenCalledWith({
       now: MOCK_NOW,
       env: MOCK_SWEEP_ENV,
     });
@@ -94,25 +113,42 @@ describe('GET /api/inactivity-sweep', () => {
     expect(runInactivitySweep).not.toHaveBeenCalled();
   });
 
-  it('logs and answers a server error when the sweep cannot run', async () => {
-    vi.mocked(runInactivitySweep).mockRejectedValue(new Error(MOCK_DB_DOWN));
+  describe('when the inactivity sweep cannot run', () => {
+    beforeEach(() => {
+      vi.mocked(runInactivitySweep).mockRejectedValue(new Error(MOCK_DB_DOWN));
+    });
+
+    it('logs and answers a server error', async () => {
+      const response = await GET(cronRequest());
+
+      expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+      await expect(response.json()).resolves.toEqual({
+        error: ENQUEUE_ERROR.SERVER_ERROR,
+      });
+      expect(logger.error).toHaveBeenCalledWith(INACTIVITY_SWEEP_LOG.FAILED, {
+        error: MOCK_DB_DOWN,
+      });
+    });
+
+    it('still runs the grace sweep and the retention cleanups', async () => {
+      await GET(cronRequest());
+
+      expect(runDowngradeGraceSweep).toHaveBeenCalled();
+      expect(runRetentionCleanups).toHaveBeenCalledWith(MOCK_NOW);
+    });
+  });
+
+  it('logs and answers a server error when the grace sweep cannot run, after running the inactivity sweep', async () => {
+    vi.mocked(runDowngradeGraceSweep).mockRejectedValue(
+      new Error(MOCK_DB_DOWN),
+    );
 
     const response = await GET(cronRequest());
 
     expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
-    await expect(response.json()).resolves.toEqual({
-      error: ENQUEUE_ERROR.SERVER_ERROR,
-    });
-    expect(logger.error).toHaveBeenCalledWith(INACTIVITY_SWEEP_LOG.FAILED, {
+    expect(runInactivitySweep).toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(DOWNGRADE_GRACE_LOG.FAILED, {
       error: MOCK_DB_DOWN,
     });
-  });
-
-  it('still runs the retention cleanups when the sweep fails', async () => {
-    vi.mocked(runInactivitySweep).mockRejectedValue(new Error(MOCK_DB_DOWN));
-
-    await GET(cronRequest());
-
-    expect(runRetentionCleanups).toHaveBeenCalledWith(MOCK_NOW);
   });
 });

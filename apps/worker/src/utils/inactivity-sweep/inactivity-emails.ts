@@ -5,23 +5,17 @@ import {
   buildInactivityWarningAlertEmail,
   buildOwnerDeletionNoticeEmail,
   buildOwnerInactivityWarningEmail,
-  EMAIL_ACCOUNT,
   PLATFORM_EMAIL_BRAND_NAME,
-  sendEmail,
 } from '@blog/email';
-import { sanitizeLogMessage } from '@blog/insight';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
-import { logger } from '@worker/utils/logger/logger';
 import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-email';
-import {
-  ownerEmailFromAddress,
-  tenantSiteUrl,
-} from '@worker/utils/owner-email/owner-email-context';
+import { tenantSiteUrl } from '@worker/utils/owner-email/owner-email-context';
 import {
   OWNER_INACTIVITY_EMAIL_COPY,
   type TOwnerInactivityEmail,
 } from '@worker/utils/owner-email/owner-inactivity-email-copy';
+import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
 
 import { formatInactivityDate } from './inactivity-dates';
 import type { TInactivitySweepEnv } from './inactivity-sweep-env';
@@ -58,20 +52,12 @@ export async function sendOwnerInactivityEmail(
     },
   });
 
-  try {
-    await sendEmail({
-      account: EMAIL_ACCOUNT.PLATFORM,
-      to: ownerEmail,
-      from: ownerEmailFromAddress(),
-      ...message,
-    });
-  } catch (error) {
-    logger.error(INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED, {
-      tenantId,
-      stage: email,
-      error: sanitizeLogMessage(error),
-    });
-  }
+  await sendOwnerMessage({
+    to: ownerEmail,
+    message,
+    failedEvent: INACTIVITY_SWEEP_LOG.EMAIL_SEND_FAILED,
+    context: { tenantId, stage: email },
+  });
 }
 
 export async function alertOperatorsOfSuspensionWarning({
