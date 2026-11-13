@@ -7,15 +7,14 @@ import { and, eq, isNull, sql } from 'drizzle-orm';
 
 const hasNoDeprovisioningRecorded = sql`coalesce(${tenants.deprovisioningSteps}, '{}'::jsonb) = '{}'::jsonb`;
 
-// Returns the tenant only to the one caller that woke it; a tenant not
-// suspended for inactivity, or whose deletion has started, returns null.
+// Returns the tenant only to the one caller that woke it.
 export async function wakeTenantFromInactivity(
   tenantId: string,
 ): Promise<TMaybeNull<TTenant>> {
   const [woken] = await getDb()
     .update(tenants)
     .set({
-      ...resumedTenantFields({ isResuming: sql`true`, now: new Date() }),
+      ...resumedTenantFields({ isResuming: sql`true` }),
       suspendedAt: null,
       suspensionReason: null,
     })

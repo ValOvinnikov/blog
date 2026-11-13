@@ -2,7 +2,6 @@ import {
   PENDING_SUBSCRIBER_RETENTION_DAYS,
   SUBSCRIBER_STATUS,
 } from '@blog/db/constants';
-import { daysBefore } from '@blog/db/queries/retention/retention-cutoff';
 import * as schema from '@blog/db/schema';
 import {
   insertTestSubscriber,
@@ -15,6 +14,7 @@ import {
   MOCK_RETENTION_LIMIT,
   MOCK_RETENTION_NOW,
 } from '@blog/db/testing/retention/fixtures';
+import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
 import { faker } from '@faker-js/faker';
 
 import { deletePendingSubscribersPastRetention } from './delete-pending-subscribers-past-retention';
@@ -59,19 +59,6 @@ describe(deletePendingSubscribersPastRetention, () => {
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
-  });
-
-  it('deletes a pending subscriber whose confirmation email is past the period', async () => {
-    await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
-
-    const deleted = await deletePendingSubscribersPastRetention(
-      MOCK_RETENTION_NOW,
-      MOCK_RETENTION_LIMIT,
-    );
-    const remaining = await remainingIds();
-
-    expect(deleted).toBe(1);
-    expect(remaining).toEqual([]);
   });
 
   it('keeps a pending subscriber whose confirmation email is within the period', async () => {
@@ -123,32 +110,47 @@ describe(deletePendingSubscribersPastRetention, () => {
     expect(remaining).toEqual([activeId]);
   });
 
-  it('deletes at most the given number of subscribers per call', async () => {
-    await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
-    await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
+  describe('with a pending subscriber past the period', () => {
+    beforeEach(async () => {
+      await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
+    });
 
-    const deleted = await deletePendingSubscribersPastRetention(
-      MOCK_RETENTION_NOW,
-      1,
-    );
-    const remaining = await remainingIds();
-
-    expect(deleted).toBe(1);
-    expect(remaining).toHaveLength(1);
-  });
-
-  it('deletes nothing when run a second time', async () => {
-    await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
-    await deletePendingSubscribersPastRetention(
-      MOCK_RETENTION_NOW,
-      MOCK_RETENTION_LIMIT,
-    );
-
-    await expect(
-      deletePendingSubscribersPastRetention(
+    it('deletes a pending subscriber whose confirmation email is past the period', async () => {
+      const deleted = await deletePendingSubscribersPastRetention(
         MOCK_RETENTION_NOW,
         MOCK_RETENTION_LIMIT,
-      ),
-    ).resolves.toBe(0);
+      );
+      const remaining = await remainingIds();
+
+      expect(deleted).toBe(1);
+      expect(remaining).toEqual([]);
+    });
+
+    it('deletes at most the given number of subscribers per call', async () => {
+      await insertSubscriber({ confirmationSentAt: justPast(CUTOFF) });
+
+      const deleted = await deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        1,
+      );
+      const remaining = await remainingIds();
+
+      expect(deleted).toBe(1);
+      expect(remaining).toHaveLength(1);
+    });
+
+    it('deletes nothing when run a second time', async () => {
+      await deletePendingSubscribersPastRetention(
+        MOCK_RETENTION_NOW,
+        MOCK_RETENTION_LIMIT,
+      );
+
+      await expect(
+        deletePendingSubscribersPastRetention(
+          MOCK_RETENTION_NOW,
+          MOCK_RETENTION_LIMIT,
+        ),
+      ).resolves.toBe(0);
+    });
   });
 });

@@ -17,15 +17,12 @@ import {
 
 import { timestampColumns } from './columns';
 import { tenantBillingColumns } from './tenant-billing-columns';
-import {
-  localeCodeEnum,
-  siteTypeEnum,
-  tenantPlanEnum,
-  tenantStatusEnum,
-} from './tenant-enums';
+import { localeCodeEnum, siteTypeEnum } from './tenant-enums';
 import { tenantInactivityColumns } from './tenant-inactivity-columns';
 import { tenantOwnerAccessColumns } from './tenant-owner-access-columns';
+import { tenantPlanColumns } from './tenant-plan-columns';
 import { selfServeOwnerSlotIndex } from './tenant-self-serve-owner-index';
+import { tenantStatusColumns } from './tenant-status-columns';
 
 export type TProvisioningStepState = {
   status: TTenantProvisioningStepStatus;
@@ -89,8 +86,8 @@ export const tenants = pgTable(
       .array()
       .notNull()
       .default([]),
-    plan: tenantPlanEnum('plan').notNull(),
-    status: tenantStatusEnum('status').notNull(),
+    ...tenantPlanColumns,
+    ...tenantStatusColumns,
     provisioningStatus: text(
       'provisioning_status',
     ).$type<TTenantProvisioningStatus>(),

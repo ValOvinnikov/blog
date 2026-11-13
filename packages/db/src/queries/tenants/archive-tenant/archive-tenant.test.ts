@@ -5,7 +5,10 @@ import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { MOCK_NOW, useFrozenClock } from '@blog/db/testing/frozen-clock';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
-import { MOCK_MISSING_TENANT_ID } from '@blog/db/testing/tenants/fixtures';
+import {
+  MOCK_MISSING_TENANT_ID,
+  unwrapOk,
+} from '@blog/db/testing/tenants/fixtures';
 import { eq } from 'drizzle-orm';
 
 import { archiveTenant } from './archive-tenant';
@@ -26,6 +29,7 @@ describe(archiveTenant, () => {
       ...tenant,
       deprovisionedAt: MOCK_NOW,
       status: TENANT_STATUS.ARCHIVED,
+      statusBeforeHold: tenant.status,
       updatedAt: MOCK_NOW,
     };
 
@@ -37,6 +41,17 @@ describe(archiveTenant, () => {
       .where(eq(tenants.id, tenant.id));
     expect(result).toEqual({ ok: true, data: archived });
     expect(row).toEqual(archived);
+  });
+
+  it('keeps the status a suspended tenant had before its suspension', async () => {
+    const tenant = await insertTestTenant(db(), {
+      status: TENANT_STATUS.SUSPENDED,
+      statusBeforeHold: TENANT_STATUS.PAST_DUE,
+    });
+
+    const { statusBeforeHold } = unwrapOk(await archiveTenant(tenant.id));
+
+    expect(statusBeforeHold).toBe(TENANT_STATUS.PAST_DUE);
   });
 
   it('returns DB_NOT_FOUND for a tenant id that does not exist', async () => {

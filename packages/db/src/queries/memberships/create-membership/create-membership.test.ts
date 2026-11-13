@@ -46,6 +46,7 @@ describe(createMembership, () => {
       userId: MOCK_USER_ID,
       tenantId,
       role: MEMBERSHIP_ROLE.OWNER,
+      lockedAt: null,
     });
   });
 

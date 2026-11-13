@@ -1,14 +1,11 @@
 import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { TENANT_STATUS } from '@blog/db/constants';
+import { heldStatusFields } from '@blog/db/queries/tenants/held-status-fields';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { eq } from 'drizzle-orm';
 
-// Marks a tenant deprovisioned by stamping `deprovisionedAt` and setting
-// `status` to ARCHIVED — the row is archived, never hard-deleted. `tenantId`
-// not matching any row (a stale id, or a second concurrent deprovision
-// attempt) is a real, reachable outcome, not a bug.
 export async function archiveTenant(
   tenantId: string,
 ): Promise<TResult<TTenant, TErrorCode>> {
@@ -16,7 +13,11 @@ export async function archiveTenant(
 
   const [tenant] = await db
     .update(tenants)
-    .set({ deprovisionedAt: new Date(), status: TENANT_STATUS.ARCHIVED })
+    .set({
+      ...heldStatusFields(),
+      deprovisionedAt: new Date(),
+      status: TENANT_STATUS.ARCHIVED,
+    })
     .where(eq(tenants.id, tenantId))
     .returning();
 

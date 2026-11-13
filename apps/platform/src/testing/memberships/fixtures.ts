@@ -10,5 +10,6 @@ export const mockMembership = (
   tenantId: MOCK_TENANT_ID,
   role: MEMBERSHIP_ROLE.OWNER,
   createdAt: new Date('2026-10-01T00:00:00.000Z'),
+  lockedAt: null,
   ...overrides,
 });
