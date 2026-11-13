@@ -9,6 +9,14 @@ import { SUBSCRIBER_BAND_CEILINGS } from './tenant';
 
 export const TRIAL_LENGTH_DAYS = 14;
 
+export const BILLING_CURRENCY = {
+  USD: 'USD',
+  EUR: 'EUR',
+  GBP: 'GBP',
+} as const;
+
+export type TBillingCurrency = TValueOf<typeof BILLING_CURRENCY>;
+
 export const STRIPE_PRICE_LOOKUP_KEY = {
   STARTER_MONTHLY: 'STARTER_MONTHLY',
   STARTER_YEARLY: 'STARTER_YEARLY',

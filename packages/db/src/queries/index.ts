@@ -19,6 +19,7 @@ export * as readerData from './reader-data';
 export * as retention from './retention';
 export * as settingsFeatures from './settings-features';
 export * as siteConfig from './site-config';
+export * as stripeCatalogue from './stripe-catalogue';
 export * as stripeWebhookEvents from './stripe-webhook-events';
 export * as subscribers from './subscribers';
 export * as tenantAnalytics from './tenant-analytics';

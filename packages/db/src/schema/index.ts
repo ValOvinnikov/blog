@@ -16,6 +16,7 @@ export * from './newsletter-post-sends';
 export * from './settings-features';
 export * from './site-config';
 export * from './site-config-enums';
+export * from './stripe-catalogue';
 export * from './stripe-webhook-events';
 export * from './subscribers';
 export * from './tenant-analytics';

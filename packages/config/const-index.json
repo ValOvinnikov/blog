@@ -4070,6 +4070,30 @@
         "file": "packages/db/src/constants/admin.ts"
       }
     ],
+    "USD": [
+      {
+        "ref": "BILLING_CURRENCY.USD",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "EUR": [
+      {
+        "ref": "BILLING_CURRENCY.EUR",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
+    "GBP": [
+      {
+        "ref": "BILLING_CURRENCY.GBP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/billing.ts"
+      }
+    ],
     "STARTER_MONTHLY": [
       {
         "ref": "STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY",

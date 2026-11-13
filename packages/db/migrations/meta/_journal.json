@@ -176,6 +176,13 @@
       "when": 1794558493720,
       "tag": "0024_tenant-held-status-and-membership-lock",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794586311113,
+      "tag": "0025_stripe-catalogue",
+      "breakpoints": true
     }
   ]
 }
