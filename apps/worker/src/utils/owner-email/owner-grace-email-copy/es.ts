@@ -1,9 +1,7 @@
 import { GRACE_EMAIL } from '@blog/db/constants';
-
-import type { TOwnerGraceEmailCopy } from './owner-grace-email-copy-type';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_ES: TOwnerGraceEmailCopy = {
-  actionLabel: 'Abrir su panel',
   upgradeAnyTime:
     'Puede mejorar su plan en cualquier momento para volver a activarlas.',
   keepAsTheyAre: (date) =>

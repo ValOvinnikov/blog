@@ -9,8 +9,9 @@ import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { formatInactivityDate } from '@worker/utils/inactivity-sweep/inactivity-dates';
 import type { TInactivitySweepEnv } from '@worker/utils/inactivity-sweep/inactivity-sweep-env';
+import { OWNER_DASHBOARD_ACTION_LABEL } from '@worker/utils/owner-email/owner-dashboard-action-label';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 import { OWNER_GRACE_EMAIL_COPY } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy';
-import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-grace-email-copy/owner-grace-email-copy-type';
 import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
 
 import { graceEndDate } from './grace-dates';
@@ -65,7 +66,7 @@ export async function sendOwnerGraceEmail(
         closing,
       ],
       action: {
-        label: copy.actionLabel,
+        label: OWNER_DASHBOARD_ACTION_LABEL[locale],
         url: new URL(OWNER_DASHBOARD_PATH, env.platformAppBaseUrl).toString(),
       },
     }),

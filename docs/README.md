@@ -30,6 +30,8 @@ What lives where, and which docs are live vs. historical. See the "Design-doc re
 - **`docs/ROADMAP.md`** — the order the open epics ship in, open decisions,
   and the release plan (Release 1 promote, Release 2 sell).
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
+- **`docs/brand/`** — the Shinefold name, logo files and colours, and which
+  logo each surface shows (`docs/brand/README.md`).
 - **`docs/design-reference/`** — design-system reference (HTML mockup +
   component specs + tokens), a separate concern from the specs/plans below.
   Standalone; not tied to the archive lifecycle.

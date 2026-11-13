@@ -1,11 +1,11 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 import { OWNER_GRACE_EMAIL_COPY_DE } from './de';
 import { OWNER_GRACE_EMAIL_COPY_EN } from './en';
 import { OWNER_GRACE_EMAIL_COPY_ES } from './es';
 import { OWNER_GRACE_EMAIL_COPY_FR } from './fr';
 import { OWNER_GRACE_EMAIL_COPY_NL } from './nl';
-import type { TOwnerGraceEmailCopy } from './owner-grace-email-copy-type';
 
 export const OWNER_GRACE_EMAIL_COPY = {
   [LOCALE_ISO_CODES.EN]: OWNER_GRACE_EMAIL_COPY_EN,

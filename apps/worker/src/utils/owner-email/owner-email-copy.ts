@@ -1,24 +1,7 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 
-type TOwnerEmailCopyInput = {
-  siteName: string;
-  siteUrl: string;
-  ownerEmail: string;
-};
-
-export type TOwnerEmailText = {
-  subject: string;
-  previewText: string;
-  paragraphs: string[];
-};
-
-type TOwnerEmailTextWithAction = TOwnerEmailText & { actionLabel: string };
-
-type TOwnerEmailCopy = {
-  inviteHeadsUp: (input: TOwnerEmailCopyInput) => TOwnerEmailText;
-  inviteNudge: (input: TOwnerEmailCopyInput) => TOwnerEmailTextWithAction;
-  siteReady: (input: TOwnerEmailCopyInput) => TOwnerEmailTextWithAction;
-};
+import { OWNER_DASHBOARD_ACTION_LABEL } from './owner-dashboard-action-label';
+import type { TOwnerEmailCopy } from './owner-email-copy-types';
 
 export const OWNER_EMAIL_COPY = {
   [LOCALE_ISO_CODES.EN]: {
@@ -38,7 +21,7 @@ export const OWNER_EMAIL_COPY = {
         `Sanity emailed an invite to ${ownerEmail} a day ago, and it hasn’t been accepted yet.`,
         'Look for an email from Sanity, including in your spam folder, and accept it. Can’t find it? Send a new invite from your dashboard.',
       ],
-      actionLabel: 'Open your dashboard',
+      actionLabel: OWNER_DASHBOARD_ACTION_LABEL[LOCALE_ISO_CODES.EN],
     }),
     siteReady: ({ siteName, siteUrl }) => ({
       subject: `${siteName} is ready`,
@@ -67,7 +50,7 @@ export const OWNER_EMAIL_COPY = {
         `Sanity heeft een dag geleden een uitnodiging gestuurd naar ${ownerEmail}, en die is nog niet geaccepteerd.`,
         'Zoek een e-mail van Sanity, ook in je spammap, en accepteer de uitnodiging. Kun je hem niet vinden? Stuur een nieuwe uitnodiging vanuit je dashboard.',
       ],
-      actionLabel: 'Open je dashboard',
+      actionLabel: OWNER_DASHBOARD_ACTION_LABEL[LOCALE_ISO_CODES.NL],
     }),
     siteReady: ({ siteName, siteUrl }) => ({
       subject: `${siteName} is klaar`,
@@ -96,7 +79,7 @@ export const OWNER_EMAIL_COPY = {
         `Sanity a envoyé une invitation à ${ownerEmail} il y a un jour, et elle n’a pas encore été acceptée.`,
         'Cherchez un e-mail de Sanity, y compris dans vos spams, et acceptez l’invitation. Vous ne la trouvez pas ? Envoyez-en une nouvelle depuis votre tableau de bord.',
       ],
-      actionLabel: 'Ouvrir le tableau de bord',
+      actionLabel: OWNER_DASHBOARD_ACTION_LABEL[LOCALE_ISO_CODES.FR],
     }),
     siteReady: ({ siteName, siteUrl }) => ({
       subject: `${siteName} est prêt`,
@@ -125,7 +108,7 @@ export const OWNER_EMAIL_COPY = {
         `Sanity hat vor einem Tag eine Einladung an ${ownerEmail} geschickt, die noch nicht angenommen wurde.`,
         'Suchen Sie nach einer E-Mail von Sanity, auch im Spam-Ordner, und nehmen Sie die Einladung an. Sie finden sie nicht? Senden Sie über Ihr Dashboard eine neue Einladung.',
       ],
-      actionLabel: 'Dashboard öffnen',
+      actionLabel: OWNER_DASHBOARD_ACTION_LABEL[LOCALE_ISO_CODES.DE],
     }),
     siteReady: ({ siteName, siteUrl }) => ({
       subject: `${siteName} ist bereit`,
@@ -154,7 +137,7 @@ export const OWNER_EMAIL_COPY = {
         `Sanity envió una invitación a ${ownerEmail} hace un día y todavía no se ha aceptado.`,
         'Busque un correo de Sanity, también en la carpeta de spam, y acepte la invitación. ¿No lo encuentra? Envíe una nueva invitación desde su panel.',
       ],
-      actionLabel: 'Abrir el panel',
+      actionLabel: OWNER_DASHBOARD_ACTION_LABEL[LOCALE_ISO_CODES.ES],
     }),
     siteReady: ({ siteName, siteUrl }) => ({
       subject: `${siteName} está listo`,

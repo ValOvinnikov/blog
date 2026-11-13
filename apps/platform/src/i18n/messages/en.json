@@ -81,7 +81,7 @@
     "creating": "Creating your site…",
     "failureTitle": "We couldn’t create your site",
     "failures": {
-      "alreadyOwnsFreeSite": "You already have a free site. Each person can have one.",
+      "alreadyOwnsFreeSite": "You already have a free or trial site. Each person can have one at a time.",
       "tryAgainLater": "Try again later.",
       "serverError": "Something went wrong. Try again."
     },
@@ -353,6 +353,10 @@
   },
   "ownerHomePage": {
     "description": "Your site at a glance. Everything here is live.",
+    "trialTitle": "{plan} trial",
+    "trialDescription": "Your site has every {plan} feature until <time>{date}</time>. No card is needed; when the trial ends, the site moves to {freePlan}.",
+    "trialEndedTitle": "{plan} trial ended",
+    "trialEndedDescription": "Your trial ended on <time>{date}</time>. The site moves to {freePlan} shortly.",
     "yourSiteCardTitle": "Your site",
     "nameLabel": "Name",
     "publicDomainLabel": "Public domain",

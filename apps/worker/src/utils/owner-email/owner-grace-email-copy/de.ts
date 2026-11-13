@@ -1,9 +1,7 @@
 import { GRACE_EMAIL } from '@blog/db/constants';
-
-import type { TOwnerGraceEmailCopy } from './owner-grace-email-copy-type';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_DE: TOwnerGraceEmailCopy = {
-  actionLabel: 'Zum Dashboard',
   upgradeAnyTime: 'Sie können jederzeit upgraden, um sie wieder einzuschalten.',
   keepAsTheyAre: (date) =>
     `Upgraden Sie vor dem ${date}, damit alles so bleibt, wie es ist.`,

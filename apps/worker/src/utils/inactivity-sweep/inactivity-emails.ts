@@ -11,10 +11,8 @@ import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { OWNER_DASHBOARD_PATH } from '@worker/constants/owner-email';
 import { sendOperatorEmail } from '@worker/utils/operator-email/send-operator-email';
 import { tenantSiteUrl } from '@worker/utils/owner-email/owner-email-context';
-import {
-  OWNER_INACTIVITY_EMAIL_COPY,
-  type TOwnerInactivityEmail,
-} from '@worker/utils/owner-email/owner-inactivity-email-copy';
+import type { TOwnerInactivityEmail } from '@worker/utils/owner-email/owner-email-copy-types';
+import { OWNER_INACTIVITY_EMAIL_COPY } from '@worker/utils/owner-email/owner-inactivity-email-copy';
 import { sendOwnerMessage } from '@worker/utils/owner-email/send-owner-message';
 
 import { formatInactivityDate } from './inactivity-dates';

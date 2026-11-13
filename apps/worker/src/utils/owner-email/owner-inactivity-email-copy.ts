@@ -1,26 +1,7 @@
 import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import { INACTIVITY_STAGE } from '@blog/db/constants';
 
-import type { TOwnerEmailText } from './owner-email-copy';
-
-type TOwnerInactivityEmailCopyInput = {
-  siteName: string;
-  siteUrl: string;
-  date: string;
-};
-
-type TOwnerInactivityEmailText = (
-  input: TOwnerInactivityEmailCopyInput,
-) => TOwnerEmailText;
-
-export type TOwnerInactivityEmail =
-  | typeof INACTIVITY_STAGE.SUSPENSION_WARNING
-  | typeof INACTIVITY_STAGE.DELETION_NOTICE;
-
-type TOwnerInactivityEmailCopy = Record<
-  TOwnerInactivityEmail,
-  TOwnerInactivityEmailText
-> & { actionLabel: string };
+import type { TOwnerInactivityEmailCopy } from './owner-email-copy-types';
 
 export const OWNER_INACTIVITY_EMAIL_COPY = {
   [LOCALE_ISO_CODES.EN]: {

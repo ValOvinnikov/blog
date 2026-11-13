@@ -1,9 +1,7 @@
 import { GRACE_EMAIL } from '@blog/db/constants';
-
-import type { TOwnerGraceEmailCopy } from './owner-grace-email-copy-type';
+import type { TOwnerGraceEmailCopy } from '@worker/utils/owner-email/owner-email-copy-types';
 
 export const OWNER_GRACE_EMAIL_COPY_EN: TOwnerGraceEmailCopy = {
-  actionLabel: 'Open your dashboard',
   upgradeAnyTime: 'You can upgrade at any time to switch them back on.',
   keepAsTheyAre: (date) => `Upgrade before ${date} to keep things as they are.`,
   memberLock: ({ count, date }) =>

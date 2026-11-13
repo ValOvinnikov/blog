@@ -2390,6 +2390,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/icon.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_GATE.SEND",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "COOKIE": [
@@ -4280,6 +4286,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_PACE.SLOW",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "STOP": [
@@ -4342,6 +4354,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SUBSCRIBER_SEND.SENT",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "SKIPPED": [
@@ -4350,6 +4368,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/newsletter.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_GATE.SKIPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "OVER_SUBSCRIBER_BAND": [
@@ -4650,6 +4674,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/owner-studio-access",
         "file": "apps/platform/src/constants/owner-studio-access.ts"
+      },
+      {
+        "ref": "NEWSLETTER_POST_STATE.READY",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "FAILED": [
@@ -6156,6 +6186,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/domain",
         "file": "apps/platform/src/constants/domain.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_GATE.NOT_CONFIGURED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "NOT_ADDED": [
@@ -9860,6 +9896,158 @@
         "scope": "app:worker",
         "from": "@worker/constants/inactivity-sweep",
         "file": "apps/worker/src/constants/inactivity-sweep.ts"
+      }
+    ],
+    "newsletter_send.start_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.no_tenant_mail_key": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.NO_TENANT_MAIL_KEY",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.no_unsubscribe_key": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.NO_UNSUBSCRIBE_KEY",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.no_platform_url": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.NO_PLATFORM_URL",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.subscribers_unreadable": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.SUBSCRIBERS_UNREADABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.page_unreadable": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.PAGE_UNREADABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.send_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.SEND_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.owner_email_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.OWNER_EMAIL_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.owner_email_missing": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.OWNER_EMAIL_MISSING",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.alert_no_recipients": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.ALERT_NO_RECIPIENTS",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.alert_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.ALERT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "newsletter_send.run_failed": [
+      {
+        "ref": "NEWSLETTER_SEND_LOG.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "SCHEDULED": [
+      {
+        "ref": "NEWSLETTER_POST_STATE.SCHEDULED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "CANCELLED": [
+      {
+        "ref": "NEWSLETTER_POST_STATE.CANCELLED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "UNCLAIMED": [
+      {
+        "ref": "NEWSLETTER_POST_STATE.UNCLAIMED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "NORMAL": [
+      {
+        "ref": "NEWSLETTER_SEND_PACE.NORMAL",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "STOPPED": [
+      {
+        "ref": "NEWSLETTER_SEND_PACE.STOPPED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "UNREADABLE": [
+      {
+        "ref": "NEWSLETTER_SUBSCRIBER_SEND.UNREADABLE",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "REJECTED": [
+      {
+        "ref": "NEWSLETTER_SUBSCRIBER_SEND.REJECTED",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
       }
     ],
     "owner_access.check_failed": [
