@@ -199,7 +199,7 @@ export const WithoutGroupsAboutOrAddress: TStory = {
 const PoweredBy = (
   <Footer.PoweredBy
     label="Powered by"
-    productName="Inkwell"
+    productName="Shinefold"
     href="https://example.com"
   />
 );
@@ -227,6 +227,17 @@ export const PoweredByBigWordmark: TStory = {
   args: { layout: FOOTER_LAYOUT.BIG_WORDMARK, children: WithPoweredBy },
 };
 
+export const PoweredByTones: TStory = {
+  args: { children: WithPoweredBy },
+  render: AllTones,
+};
+
+export const PoweredByTonesDark: TStory = {
+  args: { children: WithPoweredBy },
+  render: AllTones,
+  globals: { theme: 'dark' },
+};
+
 export const PoweredByLongCopyright: TStory = {
   render: AllLayoutsNarrow,
   args: {
@@ -250,7 +261,7 @@ export const PoweredByLongCopyright: TStory = {
         </Footer.FinePrint>
         <Footer.PoweredBy
           label="Mogelijk gemaakt door"
-          productName="Inkwell"
+          productName="Shinefold"
           href="https://example.com"
         />
       </>
