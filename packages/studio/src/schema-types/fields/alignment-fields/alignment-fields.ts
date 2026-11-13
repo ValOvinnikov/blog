@@ -5,6 +5,7 @@ import {
 import { AlignmentPicture } from '@blog/studio/schema-types/fields/alignment-fields/alignment-picture';
 import { tileField } from '@blog/studio/schema-types/fields/tile-field/tile-field';
 import { hasArrayGotMultipleItems, toTitleCase } from '@blog/utils/primitives';
+import type { ComponentType } from 'react';
 import type { StringDefinition } from 'sanity';
 
 type TAlignmentField = {
@@ -16,6 +17,7 @@ type TAlignmentField = {
   hidden?: StringDefinition['hidden'];
   fieldset?: string;
   validation?: StringDefinition['validation'];
+  Picture?: ComponentType<{ value: TContentAlignment }>;
 };
 
 export const alignmentField = ({
@@ -27,6 +29,7 @@ export const alignmentField = ({
   hidden,
   fieldset,
   validation,
+  Picture = AlignmentPicture,
 }: TAlignmentField) =>
   tileField({
     name,
@@ -36,7 +39,7 @@ export const alignmentField = ({
       title: toTitleCase(value),
       value,
     })),
-    Picture: AlignmentPicture,
+    Picture,
     initialValue,
     hidden,
     fieldset,
