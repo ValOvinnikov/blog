@@ -5,7 +5,7 @@ import type {
   TSanityLoginProvider,
 } from '@blog/config/constants';
 
-export type TStudioEntitlements = {
+type TStudioEntitlements = {
   modulePacks?: readonly TModulePack[];
 };
 

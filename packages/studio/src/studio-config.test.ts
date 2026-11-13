@@ -299,19 +299,12 @@ describe(buildStudioConfig, () => {
     });
   });
 
-  describe('platform plan links', () => {
-    beforeEach(() => {
-      buildConfig({ canLinkPlatformPlans: true });
-    });
+  it.each([
+    ['lets a pricing tier link a platform plan when asked', true, true],
+    ['withholds platform plan links by default', undefined, false],
+  ])('%s', (_description, canLinkPlatformPlans, expected) => {
+    buildConfig({ canLinkPlatformPlans });
 
-    it('lets a pricing tier link a platform plan when asked', () => {
-      expect(getCanLinkPlatformPlans()).toBe(true);
-    });
-
-    it('withholds platform plan links by default', () => {
-      buildConfig();
-
-      expect(getCanLinkPlatformPlans()).toBe(false);
-    });
+    expect(getCanLinkPlatformPlans()).toBe(expected);
   });
 });

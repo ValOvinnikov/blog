@@ -13,6 +13,7 @@ import {
   pricingPriceSchema,
 } from '@blog/studio/schema-types/objects/pricing-price/pricing-price';
 import { defaultLanguageValue } from '@blog/studio/schema-types/validation/default-language-value/default-language-value';
+import { isPricingTierLinked } from '@blog/studio/schema-types/validation/is-pricing-tier-linked/is-pricing-tier-linked';
 import { getCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
 import { validateDefaultLanguageFilled } from '@blog/studio/schema-types/validation/validate-default-language-filled/validate-default-language-filled';
 import { validateLocalizedMaxLength } from '@blog/studio/schema-types/validation/validate-localized-max-length/validate-localized-max-length';
@@ -38,10 +39,8 @@ type TPricingTierPricePreviewItem = {
   period?: TPricePeriod;
 };
 
-type TPricingTierParent = { platformPlan?: TSellableTenantPlan };
-
-const isLinkedToPlatformPlan = ({ parent }: { parent?: TPricingTierParent }) =>
-  Boolean(parent?.platformPlan);
+const isParentLinked = ({ parent }: { parent?: unknown }) =>
+  isPricingTierLinked(parent);
 
 type TPricingTierPreview = {
   name?: unknown;
@@ -104,7 +103,7 @@ export const pricingTierSchema = defineType({
           value,
         })),
       },
-      hidden: () => !getCanLinkPlatformPlans(),
+      hidden: ({ value }) => !getCanLinkPlatformPlans() && !value,
     }),
     defineField({
       name: 'platformPlanInterval',
@@ -118,7 +117,7 @@ export const pricingTierSchema = defineType({
           value,
         })),
       },
-      hidden: (context) => !isLinkedToPlatformPlan(context),
+      hidden: (context) => !isParentLinked(context),
       validation: (rule) =>
         rule.custom(validatePricingTierPlanIntervalRequired),
     }),
@@ -129,7 +128,7 @@ export const pricingTierSchema = defineType({
       description:
         'The amounts this tier costs. Add more than one to let readers switch periods.',
       of: [defineArrayMember({ type: pricingPriceSchema.name })],
-      hidden: isLinkedToPlatformPlan,
+      hidden: isParentLinked,
       validation: (rule) => [
         rule.max(3).error('A tier holds at most three prices.'),
         rule.custom(validatePricingPricePeriodsUnique),
@@ -140,7 +139,7 @@ export const pricingTierSchema = defineType({
       title: 'Price Label',
       description:
         'Shown instead of a price for a tier with none, such as "Contact us".',
-      hidden: isLinkedToPlatformPlan,
+      hidden: isParentLinked,
       validation: (rule) => [
         rule.custom(
           validateLocalizedMaxLength(

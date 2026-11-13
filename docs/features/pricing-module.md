@@ -7,6 +7,8 @@ code:
   - packages/studio/src/schema-types/modules/pricing/**
   - packages/studio/src/schema-types/objects/pricing-*/**
   - packages/studio/src/schema-types/validation/validate-pricing-*/**
+  - packages/studio/src/schema-types/validation/is-pricing-tier-linked/**
+  - packages/studio/src/schema-types/validation/platform-plan-links/**
   - packages/service/src/features/modules/pricing/**
   - packages/ui/src/components/molecules/pricing-card/**
   - packages/ui/src/components/organisms/pricing-card-grid/**
@@ -49,7 +51,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 ## Constraints and invariants
 
 - 1–4 tiers; at most one tier highlighted (counted on the default-language `highlightLabel`).
-- `platformPlan` shows only when `StudioMount` gets `canLinkPlatformPlans` (the marketing tenant). A filled `platformPlan` is the link: it hides `prices` and `priceLabel`, needs no typed price or label to validate, and requires `platformPlanInterval`. The offered plans come from `SELLABLE_TENANT_PLANS`, so the Studio names no plan.
+- `platformPlan` shows only when `StudioMount` gets `canLinkPlatformPlans` (the marketing tenant). A filled `platformPlan` is the link: it hides `prices` and `priceLabel`, needs no typed price or label to validate, and requires `platformPlanInterval`. The offered plans come from `SELLABLE_TENANT_PLANS`, so the Studio names no plan. The plan field also shows while it holds a value, so a link stays clearable where the gate is off. A linked tier keeps any typed prices and label stored, and clearing the plan keeps a stale interval, so readers decide on `platformPlan` alone; `MONTH`/`YEAR` map to `PLAN_PRICE_LOOKUP_KEYS`' monthly/yearly keys.
 - Per tier: at most three prices, each period at most once; at most 12 features; a `priceLabel` is required when the tier has no prices. A compare-at amount must exceed the amount.
 - Length limits are errors: name 40, description 160, price and highlight labels 24, tier footnote 120, module footnote 160, feature 80.
 - Amounts are formatted with `Intl.NumberFormat` for the request locale and the site currency, dropping `.00`. An amount of 0 reads "Free" with no period.

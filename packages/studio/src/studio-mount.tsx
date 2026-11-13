@@ -1,10 +1,5 @@
 'use client';
 
-import type {
-  TCapability,
-  TLocaleIsoCode,
-  TSanityLoginProvider,
-} from '@blog/config/constants';
 import { type FC, type RefObject, useEffect, useRef, useState } from 'react';
 import {
   StudioLayout,
@@ -14,19 +9,10 @@ import {
 } from 'sanity';
 
 import { buildStudioConfig } from './studio-config';
-import type { TStudioEntitlements } from './studio-config-params';
+import type { TBuildStudioConfigParams } from './studio-config-params';
 
-export type TStudioMountProps = {
-  projectId: string;
-  dataset: string;
+export type TStudioMountProps = TBuildStudioConfigParams & {
   basePath: string;
-  title: string;
-  enabledCapabilities?: readonly TCapability[];
-  entitlements?: TStudioEntitlements;
-  canLinkPlatformPlans?: boolean;
-  defaultLocale?: TLocaleIsoCode;
-  liveLocales?: readonly TLocaleIsoCode[];
-  loginProvider?: TSanityLoginProvider;
   scheme?: StudioThemeColorSchemeKey;
   onSchemeChange?: (nextScheme: StudioThemeColorSchemeKey) => void;
   onSignedIn?: () => void;
@@ -55,7 +41,7 @@ const SignedInSignal: FC<TSignedInSignalProps> = ({
 // Unlike next-sanity's NextStudio, fills the parent slot instead of hardcoding 100vh.
 const containerStyle = { height: '100%' };
 
-// The one caller of `buildStudioConfig`: building it in a Server Component drags the Sanity SDK into the RSC graph.
+// No Server Component may call `buildStudioConfig`: it drags the Sanity SDK into the RSC graph.
 export const StudioMount: FC<TStudioMountProps> = ({
   projectId,
   dataset,

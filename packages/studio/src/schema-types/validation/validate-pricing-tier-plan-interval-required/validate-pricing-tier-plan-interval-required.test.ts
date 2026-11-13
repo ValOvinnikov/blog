@@ -5,17 +5,19 @@ import { mockValidationContext } from '@blog/studio/testing/mock-validation-cont
 const PLAN_INTERVAL_REQUIRED_MESSAGE =
   'Choose which of the plan’s prices the tier shows.';
 
+const MOCK_LINKED_PARENT = { platformPlan: TENANT_PLAN.GROWTH };
+
 describe(validatePricingTierPlanIntervalRequired, () => {
   it.each([
     [
       'passes a linked tier with an interval',
-      { platformPlan: TENANT_PLAN.GROWTH },
+      MOCK_LINKED_PARENT,
       PRICE_PERIOD.YEAR,
       true,
     ],
     [
       'fails a linked tier without an interval',
-      { platformPlan: TENANT_PLAN.GROWTH },
+      MOCK_LINKED_PARENT,
       undefined,
       PLAN_INTERVAL_REQUIRED_MESSAGE,
     ],
