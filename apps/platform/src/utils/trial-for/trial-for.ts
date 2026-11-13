@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { TENANT_STATUS, type TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
 export type TTrial = {

@@ -293,6 +293,10 @@ Every key/value const an agent should reuse before writing a literal. The
 - **TAXONOMY_KIND**: `TOPICS`, `TAGS`
 - **TAXONOMY_SORT**: `ALPHABETICAL`, `MOST_POSTS`
 
+### `@blog/config/constants` — `packages/config/src/constants/tenant-plan.ts`
+
+- **TENANT_PLAN**: `FREE`, `STARTER`, `GROWTH`
+
 ### `@blog/config/constants` — `packages/config/src/constants/tenant-sort.ts`
 
 - **TENANT_SORT_COLUMN**: `NAME`, `PLAN`, `STATUS`, `CREATED`
@@ -386,7 +390,6 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/db/constants` — `packages/db/src/constants/tenant.ts`
 
 - **TENANT_STATUS**: `ACTIVE`, `SUSPENDED`, `ARCHIVED`, `TRIAL`, `PAST_DUE`
-- **TENANT_PLAN**: `FREE`, `STARTER`, `GROWTH`
 - **TENANT_DETAILS_UPDATE_OUTCOME**: `UPDATED`, `DOMAIN_TAKEN`, `DOMAIN_LOCKED`, `DOMAIN_INVALID`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_EMAIL_TAKEN`, `OWNS_FREE_TENANT`
 
 ## app:platform

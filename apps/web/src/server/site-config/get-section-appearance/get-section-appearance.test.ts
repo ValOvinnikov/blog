@@ -1,6 +1,6 @@
 import { PRESET_ID, PRESET_REGISTRY } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { SECTION_APPEARANCE_LOG } from '@web/constants/section-appearance';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';

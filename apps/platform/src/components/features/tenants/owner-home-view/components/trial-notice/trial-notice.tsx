@@ -1,5 +1,5 @@
 import { ALERT_TYPE } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { Alert } from '@platform/components/shared/alert';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import type { TTrial } from '@platform/utils/trial-for/trial-for';

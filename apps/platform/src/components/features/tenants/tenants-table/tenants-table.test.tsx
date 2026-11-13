@@ -1,9 +1,6 @@
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import {
-  TENANT_PLAN,
-  TENANT_PROVISIONING_STATUS,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PROVISIONING_STATUS, TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { customRender, screen } from '@platform/testing/custom-render';
 import { mockLocaleRouterPush } from '@platform/testing/mock-locale-router';

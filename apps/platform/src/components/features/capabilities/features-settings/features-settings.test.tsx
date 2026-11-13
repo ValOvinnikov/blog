@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME, CAPABILITY } from '@blog/config';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import messages from '@platform/i18n/messages/en.json';
 import {
   updateFeaturesAction,

@@ -70,6 +70,7 @@ export * from './size';
 export * from './sort';
 export * from './table';
 export * from './taxonomy';
+export * from './tenant-plan';
 export * from './tenant-sort';
 export * from './tenant-write-refusal';
 export * from './terms';

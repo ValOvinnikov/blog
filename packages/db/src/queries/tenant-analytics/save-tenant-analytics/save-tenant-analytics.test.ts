@@ -1,5 +1,4 @@
-import { ANALYTICS_PROVIDER } from '@blog/config/constants';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { ANALYTICS_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
 import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {

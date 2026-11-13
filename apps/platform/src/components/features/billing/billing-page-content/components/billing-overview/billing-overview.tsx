@@ -1,5 +1,6 @@
 import { ALERT_TYPE, type TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan, TTenantStatus } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
+import type { TTenantStatus } from '@blog/db/constants';
 import type { TTenantBilling } from '@blog/db/queries/tenants/tenant-billing';
 import { InvoicesTable } from '@platform/components/features/billing/billing-page-content/components/invoices-table/invoices-table';
 import { PlanCard } from '@platform/components/features/billing/billing-page-content/components/plan-card/plan-card';

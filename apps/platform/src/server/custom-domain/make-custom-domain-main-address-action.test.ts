@@ -5,8 +5,9 @@ import {
   ERROR_CODE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import {
   CUSTOM_DOMAIN_LOG,

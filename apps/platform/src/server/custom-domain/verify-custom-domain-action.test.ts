@@ -6,8 +6,9 @@ import {
   HTTP_STATUS,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { errorResult, okResult } from '@blog/utils';
 import {
@@ -247,31 +248,37 @@ describe(verifyCustomDomainAction, () => {
     },
   );
 
-  it('logs and reports a server error when the claim cannot be restored', async () => {
-    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
-    vi.mocked(customDomainClaims.restoreCustomDomainClaim).mockResolvedValue(
-      errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS),
-    );
+  describe('when the worker gives no response', () => {
+    beforeEach(() => {
+      vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
+    });
 
-    const result = await verify();
+    it('logs and reports a server error when the claim cannot be restored', async () => {
+      vi.mocked(customDomainClaims.restoreCustomDomainClaim).mockResolvedValue(
+        errorResult(ERROR_CODE.DB_DOMAIN_CLAIM_EXISTS),
+      );
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(logger.error).toHaveBeenCalledWith(
-      CUSTOM_DOMAIN_LOG.CLAIM_RESTORE_FAILED,
-      expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
-    );
-    expect(recordAuditEvent).not.toHaveBeenCalled();
-  });
+      const result = await verify();
 
-  it('reports a server error without restoring when the domain could not be removed', async () => {
-    vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
-    vi.mocked(tenantDomains.removeTenantDomain).mockResolvedValue(false);
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(logger.error).toHaveBeenCalledWith(
+        CUSTOM_DOMAIN_LOG.CLAIM_RESTORE_FAILED,
+        expect.objectContaining({ tenantId: MOCK_TENANT_ID }),
+      );
+      expect(recordAuditEvent).not.toHaveBeenCalled();
+    });
 
-    const result = await verify();
+    it('reports a server error without restoring when the domain could not be removed', async () => {
+      vi.mocked(tenantDomains.removeTenantDomain).mockResolvedValue(false);
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
-    expect(customDomainClaims.restoreCustomDomainClaim).not.toHaveBeenCalled();
-    expect(recordAuditEvent).not.toHaveBeenCalled();
+      const result = await verify();
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
+      expect(
+        customDomainClaims.restoreCustomDomainClaim,
+      ).not.toHaveBeenCalled();
+      expect(recordAuditEvent).not.toHaveBeenCalled();
+    });
   });
 
   it.each([

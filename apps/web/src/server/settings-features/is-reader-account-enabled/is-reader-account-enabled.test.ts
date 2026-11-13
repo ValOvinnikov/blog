@@ -1,6 +1,6 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { mockSettingsFeaturesRowEnabling } from '@web/testing/server/settings-features/fixtures';
 import {

@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME, FORM_STATUS, type TActionOutcome } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import {
   act,
@@ -8,6 +8,7 @@ import {
 } from '@platform/testing/custom-render';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import { toNotInPlanRefusal } from '@platform/utils/plan-refusal/plan-refusal';
+import type { Mock } from 'vitest';
 
 import {
   useSettingsForm,
@@ -127,27 +128,33 @@ describe(useSettingsForm, () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('reveals the first invalid control when the values cannot be saved', async () => {
-    const revealFirst = vi.fn();
-    const { result } = renderSettingsForm({
-      canSave: () => false,
-      invalidControls: () => ({ ids: [MOCK_FIELD_ID], revealFirst }),
+  describe('with an invalid control', () => {
+    let revealFirst: Mock<() => void>;
+
+    beforeEach(() => {
+      revealFirst = vi.fn();
     });
 
-    await editAndSave(result);
+    it('reveals the first invalid control when the values cannot be saved', async () => {
+      const { result } = renderSettingsForm({
+        canSave: () => false,
+        invalidControls: () => ({ ids: [MOCK_FIELD_ID], revealFirst }),
+      });
 
-    expect(revealFirst).toHaveBeenCalledTimes(1);
-  });
+      await editAndSave(result);
 
-  it('reveals nothing when a form without a save check saves', async () => {
-    const revealFirst = vi.fn();
-    const { result } = renderSettingsForm({
-      invalidControls: () => ({ ids: [MOCK_FIELD_ID], revealFirst }),
+      expect(revealFirst).toHaveBeenCalledTimes(1);
     });
 
-    await editAndSave(result);
+    it('reveals nothing when a form without a save check saves', async () => {
+      const { result } = renderSettingsForm({
+        invalidControls: () => ({ ids: [MOCK_FIELD_ID], revealFirst }),
+      });
 
-    expect(revealFirst).not.toHaveBeenCalled();
+      await editAndSave(result);
+
+      expect(revealFirst).not.toHaveBeenCalled();
+    });
   });
 
   it('returns to the saved values and calls onDiscard on discard', () => {
@@ -186,39 +193,27 @@ describe(useSettingsForm, () => {
     const refusePlan = async () =>
       toNotInPlanRefusal(TENANT_PLAN.FREE, ['name']);
     let refresh: ReturnType<typeof mockRouterRefresh>;
+    let result: ReturnType<typeof renderSettingsForm>['result'];
 
-    beforeEach(() => {
+    beforeEach(async () => {
       refresh = mockRouterRefresh();
+      ({ result } = renderSettingsForm({ onSubmit: refusePlan }));
+      await editAndSave(result);
     });
 
     it('names the plan and the refused fields', async () => {
-      const { result } = renderSettingsForm({ onSubmit: refusePlan });
-
-      await editAndSave(result);
-
       expect(result.current.form.planRefusal).toBe(MOCK_PLAN_REFUSAL_MESSAGE);
     });
 
     it('puts the refused fields back to their saved values', async () => {
-      const { result } = renderSettingsForm({ onSubmit: refusePlan });
-
-      await editAndSave(result);
-
       expect(result.current.values).toEqual(MOCK_SAVED_VALUES);
     });
 
     it('refreshes the page once so it takes the current plan', async () => {
-      const { result } = renderSettingsForm({ onSubmit: refusePlan });
-
-      await editAndSave(result);
-
       expect(refresh).toHaveBeenCalledTimes(1);
     });
 
     it('stops naming the refusal once the edits are discarded', async () => {
-      const { result } = renderSettingsForm({ onSubmit: refusePlan });
-      await editAndSave(result);
-
       act(() => result.current.form.discard());
 
       expect(result.current.form.planRefusal).toBeUndefined();

@@ -1,9 +1,6 @@
 import type { TCapability } from '@blog/config';
-import {
-  PLAN_REGISTRY,
-  TENANT_PLAN,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
+import { PLAN_REGISTRY } from '@blog/db/constants';
 
 // TENANT_PLAN lists the plans cheapest first, and GROWTH holds every capability.
 export const lowestPlanWithCapability = (

@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { saveTenantAnalytics } from '@blog/db/queries/tenant-analytics/save-tenant-analytics';
 import { tenantAnalytics } from '@blog/db/schema/tenant-analytics';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';

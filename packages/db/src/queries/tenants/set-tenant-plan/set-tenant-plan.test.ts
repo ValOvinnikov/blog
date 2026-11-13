@@ -1,8 +1,5 @@
-import {
-  TENANT_PLAN,
-  TENANT_PLAN_WRITE_OUTCOME,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_PLAN_WRITE_OUTCOME, TENANT_STATUS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';

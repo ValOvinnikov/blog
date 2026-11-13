@@ -1,5 +1,5 @@
 import type { TFieldErrors, TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
 import type { TTenantDetailsFieldError } from '@platform/server/tenants/tenant-field-error';
 import type { TClientTenant } from '@platform/server/tenants/to-client-tenant';
 

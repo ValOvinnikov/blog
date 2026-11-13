@@ -1,9 +1,7 @@
-import { TENANT_PLAN, TENANT_STATUS } from '@blog/db/constants';
-import {
-  tenantPlanEnum,
-  tenants,
-  tenantStatusEnum,
-} from '@blog/db/schema/tenants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { TENANT_STATUS } from '@blog/db/constants';
+import { tenantPlanEnum, tenantStatusEnum } from '@blog/db/schema/tenant-enums';
+import { tenants } from '@blog/db/schema/tenants';
 import { lte, type SQL, sql } from 'drizzle-orm';
 
 const isUnpaidTrial = sql`(${tenants.trialEndsAt} is not null and ${tenants.stripeSubscriptionId} is null)`;

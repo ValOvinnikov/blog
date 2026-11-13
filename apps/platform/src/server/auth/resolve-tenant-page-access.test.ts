@@ -1,10 +1,9 @@
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import {
   ADMIN_ROLE,
   MEMBERSHIP_ROLE,
-  TENANT_PLAN,
   type TMembershipRole,
-  type TTenantPlan,
 } from '@blog/db/constants';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';

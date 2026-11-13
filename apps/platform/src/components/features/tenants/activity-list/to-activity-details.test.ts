@@ -1,5 +1,5 @@
 import { AUDIT_ACTION } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { faker } from '@faker-js/faker';
 import { ACTIVITY_DETAIL } from '@platform/constants/activity';
 import { TENANT_DETAILS_FIELD } from '@platform/constants/tenant';

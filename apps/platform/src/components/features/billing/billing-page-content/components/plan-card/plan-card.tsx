@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
-import type { TTenantPlan, TTenantStatus } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
+import type { TTenantStatus } from '@blog/db/constants';
 import { Card } from '@platform/components/shared/card';
 import { DetailList } from '@platform/components/shared/detail-list';
 import { StatusBadge } from '@platform/components/shared/status-badge';

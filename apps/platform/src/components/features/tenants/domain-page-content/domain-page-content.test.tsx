@@ -1,6 +1,6 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE } from '@blog/db/constants';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
 import en from '@platform/i18n/messages/en.json';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';

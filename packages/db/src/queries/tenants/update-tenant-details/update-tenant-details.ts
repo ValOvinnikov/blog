@@ -1,11 +1,10 @@
-import type { TMaybeUndefined, TOutcome } from '@blog/config';
+import type { TMaybeUndefined, TOutcome, TTenantPlan } from '@blog/config';
 import { getDb } from '@blog/db/client';
 import {
   PROVISIONING_STATE,
   TENANT_DETAILS_UPDATE_OUTCOME,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
-  type TTenantPlan,
   type TTenantProvisioningStep,
 } from '@blog/db/constants';
 import { tenantDomains } from '@blog/db/schema/tenant-domains';
@@ -56,8 +55,7 @@ export type TUpdateTenantDetailsResult =
   | TOwnerEmailRefusal
   | TOutcome<typeof OUTCOME.OWNS_FREE_TENANT>;
 
-// Only primaryDomain (`MAP_DOMAIN`) gets baked into an external resource by
-// a completed step; name/plan/locale never lock.
+// Only primaryDomain is baked into an external resource (`MAP_DOMAIN`), so only it locks.
 function lockedFieldOutcome(
   input: TUpdateTenantDetailsInput,
   existing: TTenant,
@@ -80,9 +78,7 @@ function lockedFieldOutcome(
   return undefined;
 }
 
-// Domain conflicts are pre-checked rather than caught off the
-// `tenant_domains.domain` unique constraint, so the caller gets a typed
-// outcome instead of a Postgres throw.
+// Domain conflicts are pre-checked so the caller gets a typed outcome, not a unique-constraint throw.
 export async function updateTenantDetails(
   tenantId: string,
   input: TUpdateTenantDetailsInput,

@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { errorResult, okResult } from '@blog/utils';
 import { SITE_CONFIG_LOG } from '@web/constants/site-config';
 import { getTenantPlan } from '@web/server/settings-features/get-tenant-plan/get-tenant-plan';

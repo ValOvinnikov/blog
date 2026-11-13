@@ -1,8 +1,8 @@
+import type { TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import {
   ROW_LOCK,
   TENANT_PLAN_WRITE_OUTCOME,
-  type TTenantPlan,
   type TTenantStatus,
   WRITABLE_TENANT_STATUSES,
 } from '@blog/db/constants';

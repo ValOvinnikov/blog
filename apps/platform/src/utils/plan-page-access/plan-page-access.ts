@@ -1,9 +1,9 @@
 import { CAPABILITY } from '@blog/config';
+import type { TTenantPlan } from '@blog/config/constants';
 import {
   PLAN_ENTITLEMENTS,
   PLAN_LOCALE_LIMIT,
   PLAN_REGISTRY,
-  type TTenantPlan,
 } from '@blog/db/constants';
 
 export type TPlanPageAccess = {

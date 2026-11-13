@@ -1,6 +1,6 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
 import type * as DbConstants from '@blog/db/constants';
-import { TENANT_PLAN } from '@blog/db/constants';
 
 import { planPageAccess, type TPlanPage } from './plan-page-access';
 

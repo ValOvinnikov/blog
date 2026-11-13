@@ -1,5 +1,5 @@
 import { ACTION_OUTCOME } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 
 import { isNotInPlanRefusal, toNotInPlanRefusal } from './plan-refusal';

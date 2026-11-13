@@ -2,8 +2,9 @@ import {
   ERROR_CODE,
   LOCALE_ISO_CODES,
   type TLocaleIsoCode,
+  TENANT_PLAN,
+  type TTenantPlan,
 } from '@blog/config/constants';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { tenants } from '@blog/db/schema/tenants';
 import { insertTestTenant } from '@blog/db/testing/fixtures';

@@ -1,6 +1,10 @@
-import { ERROR_CODE, type TErrorCode } from '@blog/config/constants';
+import {
+  ERROR_CODE,
+  type TErrorCode,
+  type TTenantPlan,
+} from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import { type TTenantPlan, type TTenantStatus } from '@blog/db/constants';
+import { type TTenantStatus } from '@blog/db/constants';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { normalizeLocaleCode } from '@blog/db/utils/normalize-locale-code/normalize-locale-code';

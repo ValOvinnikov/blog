@@ -1,6 +1,7 @@
 import '../../../index.css';
 
 import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { OutOfDatePageDialog } from '@platform/components/features/layout/out-of-date-page-dialog';
 import { inter } from '@platform/config/font-loaders/inter-font';
 import { jetbrainsMono } from '@platform/config/font-loaders/jetbrains-mono-font';
 import { DATA_THEME } from '@platform/constants/theme';
@@ -55,6 +56,7 @@ export default async function LocaleLayout({ children, params }: TProps) {
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ToastProvider>
             <UnsavedChangesProvider>{children}</UnsavedChangesProvider>
+            <OutOfDatePageDialog />
           </ToastProvider>
         </NextIntlClientProvider>
       </body>

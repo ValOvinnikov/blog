@@ -30,11 +30,10 @@ import {
   SPINNER_STYLE,
   type TMaybeNull,
 } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import {
   BRAND_NAME_MAX_LENGTH,
   SITE_CONFIG_SAVED_AT,
-  TENANT_PLAN,
-  type TTenantPlan,
 } from '@blog/db/constants';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { faker } from '@faker-js/faker';
