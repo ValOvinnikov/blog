@@ -7,10 +7,10 @@ import {
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { stampTenantInactivityStage } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { requestTenantCacheInvalidation } from '@blog/db/utils/tenant-cache/request-tenant-cache-invalidation';
 import { INACTIVITY_SWEEP_LOG } from '@worker/constants/inactivity-sweep';
 import { reportDeprovisioningRunStart } from '@worker/utils/deprovisioning-report/deprovisioning-report';
 import { logger } from '@worker/utils/logger/logger';
+import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';
 import { deprovisionTenant } from '@worker/workflows/deprovision-tenant';
 import { start } from 'workflow/api';
 
@@ -77,11 +77,7 @@ async function suspend(
   );
   if (!tenant) return false;
 
-  await requestTenantCacheInvalidation({
-    webAppUrl: env.webAppBaseUrl,
-    secret: env.siteConfigRevalidateSecret,
-    tenantId: id,
-  });
+  await invalidateSiteCache(id, env);
   return true;
 }
 

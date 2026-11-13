@@ -332,6 +332,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **BLOCKED_IDENTITY_KIND**: `ADDRESS`, `DOMAIN`
 
+### `@blog/db/constants` — `packages/db/src/constants/downgrade-grace.ts`
+
+- **GRACE_EMAIL**: `STARTED`, `HALFWAY`, `ENDING`
+
 ### `@blog/db/constants` — `packages/db/src/constants/email-usage.ts`
 
 - **EMAIL_DELIVERY_OUTCOME**: `DELIVERED`, `BOUNCED`, `COMPLAINED`
@@ -420,10 +424,20 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
 
-- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`
 - **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`
 - **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
+- **STRIPE_CHECKOUT_SESSION_STATUS**: `OPEN`=`"open"`
+- **STRIPE_INVOICE_STATUS**: `OPEN`=`"open"`, `PAID`=`"paid"`, `UNCOLLECTIBLE`=`"uncollectible"`, `VOID`=`"void"`
+- **STRIPE_ERROR_CODE**: `INVOICE_UPCOMING_NONE`=`"invoice_upcoming_none"`, `RESOURCE_MISSING`=`"resource_missing"`
+- **BILLING_OVERVIEW_STATE**: `NO_CUSTOMER`, `LOADED`, `UNAVAILABLE`
+- **BILLING_REFUSAL**: `NO_CUSTOMER`
 - **BILLING_GRACE**: `START`, `END`, `KEEP`
+- **BILLING_INTERVAL**: `MONTHLY`, `YEARLY`
+- **UPGRADE_STATE**: `AVAILABLE`, `SUBSCRIBED`, `NOT_OWNER`, `UNAVAILABLE`
+- **UPGRADE_PAYMENT**: `PAYMENT_PENDING`
+- **UPGRADE_SEARCH_PARAM**: `PROMO`=`"promo"`, `SESSION_ID`=`"session_id"`
+- **UPGRADE_POLL**: `INTERVAL_MS`=`2000`, `MAX_TICKS`=`30`
 
 ### `@platform/constants/button` — `apps/platform/src/constants/button.ts`
 
@@ -710,7 +724,7 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
-- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `PLATFORM_TENANT`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`
+- **TENANT_REFUSAL**: `NOT_FOUND`, `ARCHIVED`, `ALREADY_DEPROVISIONED`, `NOT_DEPROVISIONED`, `ALREADY_IN_PROGRESS`, `NOT_ARCHIVED`, `NOT_SUSPENDED`, `PLATFORM_TENANT`, `LOCALE_IS_ADDITIONAL`, `PROVISIONING_STARTED`, `OWNER_ALREADY_JOINED`, `OWNER_HAS_FREE_TENANT`, `OWNER_INVITE_UNCONFIRMED`, `OWNER_EMAIL_UNKNOWN`, `STUDIO_NOT_PROVISIONED`
 - **TENANT_DETAILS_FIELD**: `NAME`, `PRIMARY_DOMAIN`, `PLAN`, `LOCALE`, `OWNER_EMAIL`
 - **TENANT_FIELD_LOCK_KIND**: `STEP`, `RUNNING`, `SUCCEEDED`, `ARCHIVED`, `CUSTOM_MAIN_DOMAIN`
 - **TENANT_LOG**: `CREATE_AUDIT_FAILED`=`"tenants.create_audit_failed"`, `CREATE_DRAFT_FAILED`=`"tenants.create_draft_failed"`, `DELETE_AUDIT_FAILED`=`"tenants.delete_audit_failed"`, `DELETE_FAILED`=`"tenants.delete_failed"`, `DOMAIN_AVAILABILITY_APEX_UNDETERMINED`=`"tenants.domain_availability_apex_undetermined"`, `DOMAIN_AVAILABILITY_CHECK_ERROR`=`"tenants.domain_availability_check_error"`, `DOMAIN_AVAILABILITY_CHECK_FAILED`=`"tenants.domain_availability_check_failed"`, `DOMAIN_AVAILABILITY_CHECK_PAGINATION_EXHAUSTED`=`"tenants.domain_availability_check_pagination_exhausted"`, `DOMAIN_AVAILABILITY_INVALID_DOMAIN`=`"tenants.domain_availability_invalid_domain"`, `OWNER_INVITE_EMAIL_FAILED`=`"tenants.owner_invite_email_failed"`, `PLAN_CHANGE_EMAIL_FAILED`=`"tenants.plan_change_email_failed"`, `PLAN_CHANGE_EMAIL_OWNER_MISSING`=`"tenants.plan_change_email_owner_missing"`, `PLAN_CHANGE_EMAIL_UNCONFIGURED`=`"tenants.plan_change_email_unconfigured"`, `PLATFORM_TENANT_REFUSED`=`"tenants.platform_tenant_refused"`, `ROOT_DOMAIN_MISSING`=`"tenants.root_domain_missing"`, `SIGN_IN_ACTIVITY_FAILED`=`"tenant.sign_in_activity_failed"`, `SIGN_IN_OWNER_LOOKUP_FAILED`=`"tenant.sign_in_owner_lookup_failed"`, `SUSPENSION_AUDIT_FAILED`=`"tenant.suspension_audit_failed"`, `SUSPENSION_BLOCK_FAILED`=`"tenant.suspension_block_failed"`, `SUSPENSION_BLOCK_UNDO_FAILED`=`"tenant.suspension_block_undo_failed"`, `SUSPENSION_CASE_DISCARD_FAILED`=`"tenant.suspension_case_discard_failed"`, `SUSPENSION_CASE_REOPEN_FAILED`=`"tenant.suspension_case_reopen_failed"`, `SUSPENSION_EMAIL_FAILED`=`"tenant.suspension_email_failed"`, `SUSPENSION_EMAIL_OWNER_MISSING`=`"tenant.suspension_email_owner_missing"`, `SUSPENSION_EMAIL_REPLY_TO_MISSING`=`"tenant.suspension_email_reply_to_missing"`, `SUSPENSION_EMAIL_UNCONFIGURED`=`"tenant.suspension_email_unconfigured"`, `SUSPENSION_SAVE_FAILED`=`"tenant.suspension_save_failed"`, `UPDATE_DETAILS_AUDIT_FAILED`=`"tenants.update_details_audit_failed"`, `UPDATE_DETAILS_FAILED`=`"tenants.update_details_failed"`, `UPDATE_LANGUAGES_AUDIT_FAILED`=`"tenants.update_languages_audit_failed"`, `UPDATE_LANGUAGES_FAILED`=`"tenants.update_languages_failed"`, `UPDATE_LANGUAGES_REJECTED`=`"tenants.update_languages_rejected"`
@@ -940,6 +954,11 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@worker/constants/custom-domain` — `apps/worker/src/constants/custom-domain.ts`
 
 - **CUSTOM_DOMAIN_LOG**: `CONNECT_START_FAILED`=`"custom_domain.connect_start_failed"`, `DISCONNECT_START_FAILED`=`"custom_domain.disconnect_start_failed"`, `CONNECT_FAILED`=`"custom_domain.connect_failed"`, `DISCONNECT_FAILED`=`"custom_domain.disconnect_failed"`
+
+### `@worker/constants/downgrade-grace` — `apps/worker/src/constants/downgrade-grace.ts`
+
+- **DOWNGRADE_GRACE_LOG**: `FAILED`=`"downgrade_grace.failed"`, `STEP_FAILED`=`"downgrade_grace.step_failed"`, `OWNER_MISSING`=`"downgrade_grace.owner_missing"`, `SUBDOMAIN_MISSING`=`"downgrade_grace.subdomain_missing"`, `GRACE_END_FAILED`=`"downgrade_grace.grace_end_failed"`, `EMAIL_SEND_FAILED`=`"downgrade_grace.email_send_failed"`
+- **DOWNGRADE_GRACE_STEP**: `TRIAL_END`, `GRACE_END`
 
 ### `@worker/constants/enqueue-error` — `apps/worker/src/constants/enqueue-error.ts`
 

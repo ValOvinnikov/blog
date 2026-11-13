@@ -6,16 +6,19 @@ import {
   TENANT_STATUS,
   type TStampedInactivityStage,
 } from '@blog/db/constants';
+import { heldStatusFields } from '@blog/db/queries/tenants/held-status-fields';
 import { inactivityStageDue } from '@blog/db/queries/tenants/inactivity-stage-due';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { and, eq } from 'drizzle-orm';
+import type { PgUpdateSetSource } from 'drizzle-orm/pg-core';
 
 const stageStamp: Record<
   TStampedInactivityStage,
-  (now: Date) => Partial<TTenant>
+  (now: Date) => PgUpdateSetSource<typeof tenants>
 > = {
   [INACTIVITY_STAGE.SUSPENSION_WARNING]: (now) => ({ inactivityWarnedAt: now }),
   [INACTIVITY_STAGE.SUSPENSION]: (now) => ({
+    ...heldStatusFields(),
     suspendedAt: now,
     status: TENANT_STATUS.SUSPENDED,
     suspensionReason: SUSPENSION_REASON.INACTIVITY,
@@ -23,8 +26,7 @@ const stageStamp: Record<
   [INACTIVITY_STAGE.DELETION_NOTICE]: (now) => ({ deletionNotifiedAt: now }),
 };
 
-// Returns the tenant only to the one caller that moved it into the stage;
-// a tenant not (or no longer) due returns null.
+// Returns the tenant only to the one caller that moved it into the stage.
 export async function stampTenantInactivityStage(
   tenantId: string,
   stage: TStampedInactivityStage,

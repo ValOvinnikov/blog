@@ -19,6 +19,12 @@ export function membershipsCount(tenantId: SQLWrapper | string): SQL<number> {
   return sql<number>`(select count(*) from ${memberships} where ${eq(memberships.tenantId, tenantId)})`;
 }
 
+export function unlockedMembershipsCount(
+  tenantId: SQLWrapper | string,
+): SQL<number> {
+  return sql<number>`(select count(*) from ${memberships} where ${and(eq(memberships.tenantId, tenantId), isNull(memberships.lockedAt))})`;
+}
+
 export function pendingInvitesCount(tenantId: string): SQL<number> {
   return sql<number>`(select count(*) from ${membershipInvites}
     where ${and(eq(membershipInvites.tenantId, tenantId), isNull(membershipInvites.consumedAt))})`;

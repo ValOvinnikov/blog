@@ -2,8 +2,8 @@ import { FINDING_STATUS } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
 import { RESOLVED_FINDING_RETENTION_DAYS } from '@blog/db/constants';
 import { isInBatch } from '@blog/db/queries/retention/retention-batch';
-import { daysBefore } from '@blog/db/queries/retention/retention-cutoff';
 import { findings } from '@blog/db/schema/findings';
+import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
 import { and, eq, lt } from 'drizzle-orm';
 
 export async function deleteResolvedFindingsPastRetention(

@@ -3,6 +3,7 @@ import { TENANT_PLAN } from '@blog/config/constants';
 import { TENANT_STATUS } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
+import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
 import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import type { TTenantSanityContext } from '@blog/service';
 import type { TRequestContext } from '@web/server/request-context/request-context';
@@ -68,10 +69,7 @@ export const mockTenant = (overrides: Partial<TTenant> = {}): TTenant => ({
   ...MOCK_NO_OWNER_ACCESS,
   unsentReinviteFormerOwnerEmailEncrypted: null,
   lastActivityAt: MOCK_TENANT_CREATED_AT,
-  inactivityWarnedAt: null,
-  suspendedAt: null,
-  deletionNotifiedAt: null,
-  suspensionReason: null,
+  ...MOCK_NO_HOLD,
   ...MOCK_NO_BILLING,
   contentMigrationFailedAt: null,
   firstPostPublishedAt: null,

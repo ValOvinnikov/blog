@@ -8,9 +8,10 @@ import type {
 import { BADGE_TONE } from '@platform/constants/badge-tone';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
-import type {
-  TPlanPage,
-  TPlanPageAccess,
+import {
+  EVERY_PLAN_PAGE,
+  type TPlanPage,
+  type TPlanPageAccess,
 } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { studioNavItem } from '@platform/utils/studio-nav-item/studio-nav-item';
@@ -126,14 +127,6 @@ export const configurationNavItems = (
       badge: comingSoon,
     }),
   ];
-};
-
-export const EVERY_PLAN_PAGE: TPlanPageAccess = {
-  languages: true,
-  email: true,
-  leads: true,
-  subscribers: true,
-  team: true,
 };
 
 export const tenantNavSections = (

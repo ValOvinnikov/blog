@@ -1,5 +1,10 @@
 import type { TMaybeUndefined } from '@blog/config';
 import { act, renderHook } from '@platform/testing/custom-render';
+import {
+  changeDocumentVisibility,
+  DOCUMENT_HIDDEN,
+  DOCUMENT_VISIBLE,
+} from '@platform/testing/document-visibility';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 
 import { usePolledValue, type TPolledValueOptions } from './use-polled-value';
@@ -38,15 +43,7 @@ describe(usePolledValue, () => {
 
   afterEach(() => {
     vi.useRealTimers();
-  });
-
-  it('polls with its key and returns each result', async () => {
-    const { result } = renderPoll();
-
-    await advanceTicks(1);
-
-    expect(pollMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
-    expect(result.current.value).toBe(POLLED_VALUE);
+    vi.restoreAllMocks();
   });
 
   it('stops once the caller is no longer active', async () => {
@@ -78,15 +75,65 @@ describe(usePolledValue, () => {
     expect(result.current.value).toBe(POLLED_VALUE);
   });
 
-  it('polls again after a restart once it has reached its cap', async () => {
+  it('is out of checks after its cap even when a check is dropped while hidden', async () => {
+    let resolveHiddenCheck: (value: string) => void = () => undefined;
+    pollMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveHiddenCheck = resolve;
+        }),
+    );
     const { result } = renderPoll();
 
-    await advanceTicks(OPTIONS.maxTicks + 2);
-    act(() => {
-      result.current.restart();
-    });
     await advanceTicks(1);
+    changeDocumentVisibility(DOCUMENT_HIDDEN);
+    resolveHiddenCheck(POLLED_VALUE);
+    changeDocumentVisibility(DOCUMENT_VISIBLE);
+    await advanceTicks(OPTIONS.maxTicks);
 
-    expect(pollMock).toHaveBeenCalledTimes(OPTIONS.maxTicks + 1);
+    expect(result.current.isExhausted).toBe(true);
+  });
+
+  describe('with the default options', () => {
+    let result: ReturnType<typeof renderPoll>['result'];
+
+    beforeEach(() => {
+      ({ result } = renderPoll());
+    });
+
+    it('polls with its key and returns each result', async () => {
+      await advanceTicks(1);
+
+      expect(pollMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
+      expect(result.current.value).toBe(POLLED_VALUE);
+    });
+
+    it('polls again after a restart once it has reached its cap', async () => {
+      await advanceTicks(OPTIONS.maxTicks + 2);
+      act(() => {
+        result.current.restart();
+      });
+      await advanceTicks(1);
+
+      expect(pollMock).toHaveBeenCalledTimes(OPTIONS.maxTicks + 1);
+    });
+
+    describe('once it has reached its cap', () => {
+      beforeEach(async () => {
+        await advanceTicks(OPTIONS.maxTicks);
+      });
+
+      it('reports it is out of checks', () => {
+        expect(result.current.isExhausted).toBe(true);
+      });
+
+      it('has checks left again after a restart', () => {
+        act(() => {
+          result.current.restart();
+        });
+
+        expect(result.current.isExhausted).toBe(false);
+      });
+    });
   });
 });

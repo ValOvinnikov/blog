@@ -1,11 +1,14 @@
 import type { TMaybeUndefined } from '@blog/config';
 import type { TTenantOwnerMembership } from '@blog/db/queries/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { DomainCardSkeleton } from '@platform/components/features/tenants/domain-card-skeleton';
 import { OwnerCard } from '@platform/components/features/tenants/owner-card';
 import { TenantPageHeader } from '@platform/components/features/tenants/tenant-page-header';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
-import type { TDomainVerificationStatus } from '@platform/constants/domain';
+import { DetailCardSkeleton } from '@platform/components/shared/detail-card-skeleton';
+import {
+  type TDomainVerificationStatus,
+  DOMAIN_CARD_ROW_COUNT,
+} from '@platform/constants/domain';
 import type { TGetStarted } from '@platform/server/onboarding/get-started-for';
 import type { TSiteSetup } from '@platform/server/provisioning/site-setup-for';
 import { adminRoutes } from '@platform/utils/routes/routes';
@@ -28,6 +31,7 @@ export type TOwnerHomeViewProps = {
   siteSetup?: TSiteSetup;
   getStarted?: TGetStarted;
   trial?: TTrial;
+  canUpgrade?: boolean;
 };
 
 export const OwnerHomeView = ({
@@ -37,6 +41,7 @@ export const OwnerHomeView = ({
   siteSetup,
   getStarted,
   trial,
+  canUpgrade = false,
 }: TOwnerHomeViewProps) => {
   const tOwnerHome = useTranslations('ownerHomePage');
   const { root, pair } = ownerHomeViewVariants();
@@ -53,7 +58,7 @@ export const OwnerHomeView = ({
         <ArchivedTenantNotice archivedAt={tenant.deprovisionedAt} />
       )}
 
-      {trial && <TrialNotice trial={trial} />}
+      {trial && <TrialNotice trial={trial} canUpgrade={canUpgrade} />}
 
       {siteSetup && <SiteSetupCard siteSetup={siteSetup} />}
 
@@ -62,7 +67,14 @@ export const OwnerHomeView = ({
       <YourSiteCard tenant={tenant} />
 
       <div className={pair()}>
-        <Suspense fallback={<DomainCardSkeleton isStackedToLg={true} />}>
+        <Suspense
+          fallback={
+            <DetailCardSkeleton
+              rowCount={DOMAIN_CARD_ROW_COUNT}
+              isStackedToLg={true}
+            />
+          }
+        >
           <StreamedDomainCard
             tenant={tenant}
             domainVerificationStatus={domainVerificationStatus}

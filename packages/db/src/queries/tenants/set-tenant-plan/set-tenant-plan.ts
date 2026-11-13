@@ -6,6 +6,7 @@ import {
   type TTenantStatus,
   WRITABLE_TENANT_STATUSES,
 } from '@blog/db/constants';
+import { unlockMembershipsWithinPlan } from '@blog/db/queries/memberships/memberships-over-seats';
 import { planChangeFields } from '@blog/db/queries/tenants/plan-change-fields';
 import { tenants } from '@blog/db/schema/tenants';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -40,10 +41,15 @@ export async function setTenantPlan(
         .where(eq(tenants.id, tenantId))
         .for(ROW_LOCK.UPDATE),
     );
+  const unlocked = unlockMembershipsWithinPlan(
+    tenantId,
+    plan,
+    inArray(tenants.status, WRITABLE_TENANT_STATUSES),
+  );
   const [row] = await db
-    .with(previous)
+    .with(previous, unlocked)
     .update(tenants)
-    .set({ ...planChangeFields(plan, status), status })
+    .set({ ...planChangeFields(plan, status, new Date()), status })
     .from(previous)
     .where(
       and(

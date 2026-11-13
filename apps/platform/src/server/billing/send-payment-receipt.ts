@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { LOCALE_BCP47_TAGS } from '@blog/config';
 import type { TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import {
@@ -15,11 +14,10 @@ import {
 } from '@platform/constants/billing';
 import { env } from '@platform/utils/env/env';
 import { formatDate } from '@platform/utils/format-date/format-date';
+import { formatStripeAmount } from '@platform/utils/format-stripe-amount/format-stripe-amount';
 import { logger } from '@platform/utils/logger/logger';
 import { getTranslations } from 'next-intl/server';
 import type Stripe from 'stripe';
-
-const MINOR_UNITS_PER_MAJOR = 100;
 
 export const sendPaymentReceipt = async (
   stripe: Stripe,
@@ -55,10 +53,10 @@ export const sendPaymentReceipt = async (
     getTranslations({ locale, namespace: 'ownerReceiptEmail' }),
     getTranslations({ locale, namespace: 'planNames' }),
   ]);
-  const amount = new Intl.NumberFormat(LOCALE_BCP47_TAGS[locale], {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amount_paid / MINOR_UNITS_PER_MAJOR);
+  const amount = formatStripeAmount(
+    { minorUnits: amount_paid, currency },
+    locale,
+  );
   const paidAt = invoice.status_transitions.paid_at ?? invoice.created;
   const values = { siteName, amount };
 

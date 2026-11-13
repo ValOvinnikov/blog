@@ -9,8 +9,10 @@ import {
   tNavSections as t,
   translated,
 } from '@platform/testing/layout/nav-sections';
-import { EVERY_PLAN_PAGE } from '@platform/utils/nav-sections/nav-sections';
-import type { TPlanPageAccess } from '@platform/utils/plan-page-access/plan-page-access';
+import {
+  EVERY_PLAN_PAGE,
+  type TPlanPageAccess,
+} from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { dashboardNavSections } from './dashboard-nav-sections';
@@ -122,5 +124,23 @@ describe(dashboardNavSections, () => {
     expect(
       labels.filter((label) => label.startsWith(tenantLabelPrefix)),
     ).toEqual([]);
+  });
+
+  it('ends with an Account section linking Billing when the member can see it', () => {
+    const account = dashboardNavSections(t, EVERY_PLAN_PAGE).at(-1)!;
+    const [billing, ...rest] = account.items;
+
+    expect(account.label).toBe(t('accountSectionLabel'));
+    expect(billing?.label).toBe(t('billing'));
+    expect(billing?.href).toBe(adminRoutes.dashboardBilling());
+    expect(rest).toEqual([]);
+  });
+
+  it('has no Account section for a member who cannot see Billing', () => {
+    const labels = dashboardNavSections(t, NO_PLAN_PAGE).map(
+      (section) => section.label,
+    );
+
+    expect(labels).not.toContain(t('accountSectionLabel'));
   });
 });

@@ -24,10 +24,12 @@ import {
 } from './owner-email-change';
 import {
   changesProvisionedTenantDetails,
-  restorableTenantFields,
   tenantDetailsFields,
 } from './tenant-details-fields';
-import { writeTenantDetailsRow } from './write-tenant-details-row';
+import {
+  restoreTenantDetailsRow,
+  writeTenantDetailsRow,
+} from './write-tenant-details-row';
 
 export type TUpdateTenantDetailsInput = {
   name: string;
@@ -151,13 +153,6 @@ export async function updateTenantDetails(
   });
   if ('outcome' in tenant) return tenant;
 
-  async function restoreTenantRow(original: TTenant): Promise<void> {
-    await db
-      .update(tenants)
-      .set(restorableTenantFields(original))
-      .where(eq(tenants.id, tenantId));
-  }
-
   const domainChanged = input.primaryDomain !== existing.primaryDomain;
 
   if (domainChanged) {
@@ -179,7 +174,7 @@ export async function updateTenantDetails(
         );
       }
     } catch (error) {
-      await restoreTenantRow(existing);
+      await restoreTenantDetailsRow(tenantId, existing);
       throw error;
     }
   }
@@ -199,7 +194,7 @@ export async function updateTenantDetails(
             ),
           );
       }
-      await restoreTenantRow(existing);
+      await restoreTenantDetailsRow(tenantId, existing);
       throw error;
     }
   }

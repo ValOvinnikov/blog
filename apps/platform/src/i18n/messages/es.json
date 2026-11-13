@@ -26,7 +26,9 @@
     "blockedSignupsPage": "Registros bloqueados",
     "dataRequestsPage": "Solicitudes de datos",
     "signUpTitle": "Crear una cuenta",
-    "onboarding": "Crear tu sitio"
+    "onboarding": "Crear tu sitio",
+    "billing": "Facturación · Administración",
+    "upgrade": "Mejorar plan"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -211,6 +213,7 @@
     "platformSectionLabel": "Acciones de la plataforma",
     "contentSectionLabel": "Contenido",
     "configurationSectionLabel": "Configuración",
+    "accountSectionLabel": "Cuenta",
     "tenants": "Clientes",
     "addTenant": "Añadir cliente",
     "findings": "Incidencias",
@@ -231,6 +234,7 @@
     "badgePlatform": "plataforma",
     "features": "Funciones",
     "leads": "Contactos",
+    "billing": "Facturación",
     "releases": "Versiones",
     "studioAccessLine": {
       "INVITE_SENT": "Invitación enviada — revise su correo",
@@ -384,7 +388,8 @@
     "siteSetupNotStartedDescription": "No pudimos empezar a configurar tu sitio. Iníciala ahora: no se pierde nada.",
     "siteSetupNotStartedContactDescription": "No pudimos empezar a configurar tu sitio. Pide a tu contacto de la plataforma que la inicie.",
     "siteSetupStart": "Iniciar configuración",
-    "siteSetupStarting": "Iniciando…"
+    "siteSetupStarting": "Iniciando…",
+    "trialUpgrade": "Elegir un plan"
   },
   "getStartedCard": {
     "title": "Primeros pasos",
@@ -1658,6 +1663,7 @@
     "notDeprovisioned": "Este cliente no está desaprovisionado.",
     "alreadyInProgress": "El aprovisionamiento ya está en curso.",
     "notArchived": "Este cliente debe archivarse antes de poder eliminarlo.",
+    "notSuspended": "Este cliente no está suspendido, así que no hay nada que levantar.",
     "platformTenant": "Este es el sitio propio de la plataforma, así que no se puede suspender ni eliminar.",
     "deprovisionFailed": "No se pudo iniciar el desaprovisionamiento. Vuelva a intentarlo.",
     "reactivateFailed": "No se pudo iniciar la reactivación. Vuelva a intentarlo.",
@@ -2124,7 +2130,8 @@
     "description": "Las opciones marcadas con <badge></badge> en esta página se activan con el plan Growth.",
     "show": "Ver qué incluye",
     "hide": "Ocultar",
-    "listLabel": "Qué añade Growth en esta página"
+    "listLabel": "Qué añade Growth en esta página",
+    "askAboutGrowth": "Saber más sobre Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Abrir tu panel",
@@ -2186,5 +2193,62 @@
     "category": "Motivo: {category}.",
     "contest": "Para impugnar esta decisión, responde al correo de suspensión o escribe a soporte indicando {reference}.",
     "copyButton": "Copiar referencia"
+  },
+  "billingPage": {
+    "title": "Facturación",
+    "description": "Tu plan, tu próximo pago y tus facturas.",
+    "manage": "Gestionar facturación",
+    "managePending": "Abriendo…",
+    "manageFailed": "No se pudo abrir la facturación. Inténtalo de nuevo en un momento.",
+    "noCustomer": "Tu sitio aún no tiene una cuenta de facturación.",
+    "planTitle": "Plan",
+    "planDescription": "El plan de tu sitio y cuándo se cobra el próximo pago.",
+    "planLabel": "Plan",
+    "nextPaymentLabel": "Próximo pago",
+    "nextPayment": "{amount} el <time>{date}</time>",
+    "noNextPayment": "Ninguno programado",
+    "noPayments": "Tu sitio aún no tiene pagos.",
+    "invoicesTitle": "Facturas",
+    "invoicesEmpty": "Aún no hay facturas.",
+    "columnDate": "Fecha",
+    "columnAmount": "Importe",
+    "columnStatus": "Estado",
+    "columnInvoice": "Factura",
+    "viewInvoice": "Ver factura <context>del {date}, {amount}</context>",
+    "invoiceStatus": {
+      "open": "Pendiente",
+      "paid": "Pagada",
+      "uncollectible": "Impagada",
+      "void": "Anulada"
+    },
+    "unavailableTitle": "Pagos y facturas no disponibles",
+    "unavailableDescription": "No se han podido cargar ahora. Vuelve a cargar la página en un momento."
+  },
+  "upgradePage": {
+    "pageTitle": "Mejora tu plan",
+    "description": "Elige Starter o Growth y paga mensual o anualmente. Los impuestos se calculan al pagar.",
+    "checkoutTitle": "Pago",
+    "checkoutDescription": "Paga de forma segura sin salir de esta página. ¿Tienes un código promocional? Introdúcelo al pagar.",
+    "intervalLabel": "Periodo de facturación",
+    "MONTHLY": "Mensual",
+    "YEARLY": "Anual",
+    "checkoutFailed": "No se pudo iniciar el pago.",
+    "unconfigured": "Ahora mismo no se puede mejorar el plan. Inténtalo más tarde.",
+    "backToOverview": "Volver al resumen",
+    "confirmingTitle": "Confirmando tu pago",
+    "confirmingDescription": "Tu plan cambia en cuanto se confirme el pago, normalmente en menos de un minuto. Esta página se actualiza sola y también te enviaremos un correo.",
+    "NOT_OWNER": "Solo el propietario de tu sitio puede mejorar el plan.",
+    "UNAVAILABLE": "Podrás mejorar el plan cuando tu sitio vuelva a estar activo.",
+    "tryAgain": "Reintentar",
+    "slowTitle": "Esto está tardando más de lo habitual",
+    "slowDescription": "Puede que tu pago aún se esté confirmando. Vuelve a comprobarlo en un momento; también te enviaremos un correo cuando cambie tu plan.",
+    "checkAgain": "Volver a comprobar",
+    "PAYMENT_PENDING": "Estamos confirmando tu pago. Tu plan cambiará en cuanto se confirme, así que no hace falta volver a pagar.",
+    "planLabel": "Plan",
+    "subscribedTitle": "Tu sitio está en {plan}",
+    "subscribedDescription": "Su suscripción está activa, así que aquí no hay nada que comprar.",
+    "confirmedTitle": "Tu pago está confirmado",
+    "confirmedDescription": "Tu nuevo plan ya está activo en tu sitio.",
+    "SUBSCRIBED": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que comprar."
   }
 }

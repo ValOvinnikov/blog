@@ -4,12 +4,17 @@ import {
   TENANT_DETAILS_UPDATE_OUTCOME,
   type TTenantStatus,
 } from '@blog/db/constants';
+import { lockMembershipsOverSeats } from '@blog/db/queries/memberships/lock-memberships-over-seats';
+import { unlockMembershipsWithinPlan } from '@blog/db/queries/memberships/memberships-over-seats';
 import { isFreeOwnerViolation } from '@blog/db/queries/tenants/is-free-owner-violation';
 import { tenants, type TTenant } from '@blog/db/schema/tenants';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { eq } from 'drizzle-orm';
 
-import { tenantDetailsWrite } from './tenant-details-fields';
+import {
+  restorableTenantFields,
+  tenantDetailsWrite,
+} from './tenant-details-fields';
 
 type TTenantDetailsRowWrite = {
   details: Parameters<typeof tenantDetailsWrite>[0];
@@ -24,9 +29,13 @@ export async function writeTenantDetailsRow(
   TTenant | TOutcome<typeof TENANT_DETAILS_UPDATE_OUTCOME.OWNS_FREE_TENANT>
 > {
   try {
+    const unlocked = unlockMembershipsWithinPlan(tenantId, details.plan);
     const [tenant] = await getDb()
+      .with(unlocked)
       .update(tenants)
-      .set(tenantDetailsWrite(details, status, clearsUnsentReinvite))
+      .set(
+        tenantDetailsWrite(details, status, clearsUnsentReinvite, new Date()),
+      )
       .where(eq(tenants.id, tenantId))
       .returning();
 
@@ -43,4 +52,15 @@ export async function writeTenantDetailsRow(
     }
     throw error;
   }
+}
+
+export async function restoreTenantDetailsRow(
+  tenantId: string,
+  original: TTenant,
+): Promise<void> {
+  await getDb()
+    .update(tenants)
+    .set(restorableTenantFields(original))
+    .where(eq(tenants.id, tenantId));
+  await lockMembershipsOverSeats(tenantId, original.plan, new Date());
 }

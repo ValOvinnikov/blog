@@ -26,7 +26,9 @@
     "blockedSignupsPage": "Inscriptions bloquées",
     "dataRequestsPage": "Demandes de données",
     "signUpTitle": "Créer un compte",
-    "onboarding": "Créer votre site"
+    "onboarding": "Créer votre site",
+    "billing": "Facturation · Administration",
+    "upgrade": "Changer d'offre"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -211,6 +213,7 @@
     "platformSectionLabel": "Actions de la plateforme",
     "contentSectionLabel": "Contenu",
     "configurationSectionLabel": "Configuration",
+    "accountSectionLabel": "Compte",
     "tenants": "Locataires",
     "addTenant": "Ajouter un locataire",
     "findings": "Constats",
@@ -231,6 +234,7 @@
     "badgePlatform": "plateforme",
     "features": "Fonctionnalités",
     "leads": "Messages reçus",
+    "billing": "Facturation",
     "releases": "Versions",
     "studioAccessLine": {
       "INVITE_SENT": "Invitation envoyée — consultez vos e-mails",
@@ -384,7 +388,8 @@
     "siteSetupNotStartedDescription": "Nous n'avons pas pu lancer la configuration de votre site. Lancez-la maintenant : rien n'est perdu.",
     "siteSetupNotStartedContactDescription": "Nous n'avons pas pu lancer la configuration de votre site. Demandez à votre contact plateforme de la lancer.",
     "siteSetupStart": "Lancer la configuration",
-    "siteSetupStarting": "Lancement…"
+    "siteSetupStarting": "Lancement…",
+    "trialUpgrade": "Choisir une offre"
   },
   "getStartedCard": {
     "title": "Premiers pas",
@@ -1658,6 +1663,7 @@
     "notDeprovisioned": "Ce locataire n'est pas déprovisionné.",
     "alreadyInProgress": "Le provisionnement est déjà en cours.",
     "notArchived": "Ce locataire doit être archivé avant de pouvoir être supprimé.",
+    "notSuspended": "Ce locataire n’est pas suspendu : il n’y a rien à lever.",
     "platformTenant": "Il s'agit du site de la plateforme elle-même : il ne peut être ni suspendu ni supprimé.",
     "deprovisionFailed": "Impossible de lancer le déprovisionnement — veuillez réessayer.",
     "reactivateFailed": "Impossible de lancer la réactivation — veuillez réessayer.",
@@ -2124,7 +2130,8 @@
     "description": "Les options marquées <badge></badge> sur cette page sont disponibles avec l'offre Growth.",
     "show": "Voir ce qui est inclus",
     "hide": "Masquer",
-    "listLabel": "Ce que Growth ajoute sur cette page"
+    "listLabel": "Ce que Growth ajoute sur cette page",
+    "askAboutGrowth": "En savoir plus sur Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Ouvrir votre tableau de bord",
@@ -2186,5 +2193,62 @@
     "category": "Motif : {category}.",
     "contest": "Pour contester cette décision, répondez à l’e-mail de suspension ou écrivez au support en indiquant {reference}.",
     "copyButton": "Copier la référence"
+  },
+  "billingPage": {
+    "title": "Facturation",
+    "description": "Votre formule, votre prochain paiement et vos factures.",
+    "manage": "Gérer la facturation",
+    "managePending": "Ouverture…",
+    "manageFailed": "La facturation n'a pas pu s'ouvrir. Réessayez dans un instant.",
+    "noCustomer": "Votre site n'a pas encore de compte de facturation.",
+    "planTitle": "Formule",
+    "planDescription": "La formule de votre site et la date du prochain prélèvement.",
+    "planLabel": "Formule",
+    "nextPaymentLabel": "Prochain paiement",
+    "nextPayment": "{amount} le <time>{date}</time>",
+    "noNextPayment": "Aucun prévu",
+    "noPayments": "Votre site n'a encore aucun paiement.",
+    "invoicesTitle": "Factures",
+    "invoicesEmpty": "Aucune facture pour l'instant.",
+    "columnDate": "Date",
+    "columnAmount": "Montant",
+    "columnStatus": "Statut",
+    "columnInvoice": "Facture",
+    "viewInvoice": "Voir la facture <context>du {date}, {amount}</context>",
+    "invoiceStatus": {
+      "open": "À payer",
+      "paid": "Payée",
+      "uncollectible": "Impayée",
+      "void": "Annulée"
+    },
+    "unavailableTitle": "Paiements et factures indisponibles",
+    "unavailableDescription": "Ils n'ont pas pu être chargés pour l'instant. Rechargez la page dans un instant."
+  },
+  "upgradePage": {
+    "pageTitle": "Changer d'offre",
+    "description": "Choisissez Starter ou Growth et payez au mois ou à l'année. La taxe est calculée au paiement.",
+    "checkoutTitle": "Paiement",
+    "checkoutDescription": "Payez en toute sécurité sans quitter cette page. Vous avez un code promo ? Saisissez-le au paiement.",
+    "intervalLabel": "Période de facturation",
+    "MONTHLY": "Mensuel",
+    "YEARLY": "Annuel",
+    "checkoutFailed": "Le paiement n'a pas pu démarrer.",
+    "unconfigured": "Le changement d'offre n'est pas disponible pour le moment. Réessayez plus tard.",
+    "backToOverview": "Retour à la vue d'ensemble",
+    "confirmingTitle": "Confirmation de votre paiement",
+    "confirmingDescription": "Votre offre change dès que le paiement est confirmé, généralement en moins d'une minute. Cette page se met à jour d'elle-même, et nous vous enverrons aussi un e-mail.",
+    "NOT_OWNER": "Seul le propriétaire de votre site peut changer d'offre.",
+    "UNAVAILABLE": "Le changement d'offre sera de nouveau possible dès que votre site fonctionnera.",
+    "tryAgain": "Réessayer",
+    "slowTitle": "Cela prend plus de temps que d'habitude",
+    "slowDescription": "Votre paiement est peut-être encore en cours de confirmation. Vérifiez de nouveau dans un instant ; nous vous enverrons aussi un e-mail dès que votre offre change.",
+    "checkAgain": "Vérifier de nouveau",
+    "PAYMENT_PENDING": "Votre paiement est en cours de confirmation. Votre offre change dès qu'il est confirmé ; inutile de payer à nouveau.",
+    "planLabel": "Offre",
+    "subscribedTitle": "Votre site est sur {plan}",
+    "subscribedDescription": "Son abonnement est actif, il n'y a donc rien à acheter ici.",
+    "confirmedTitle": "Votre paiement est confirmé",
+    "confirmedDescription": "Votre nouvelle offre est active sur votre site.",
+    "SUBSCRIBED": "Votre site a déjà une offre payante, il n'y a donc rien à acheter ici."
   }
 }

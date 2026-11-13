@@ -1,6 +1,14 @@
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
+import {
+  ADMIN_ROLE,
+  MEMBERSHIP_ROLE,
+  type TMembershipRole,
+} from '@blog/db/constants';
+import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
+import { MOCK_SIGN_IN_USER_ID } from '@platform/testing/auth/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -13,7 +21,23 @@ vi.mock('@blog/db', () => ({
   queries: { leads: { countLeadsForTenant: vi.fn() } },
 }));
 
+vi.mock('@platform/server/auth/list-session-tenants', () => ({
+  listSessionTenants: vi.fn(),
+}));
+
 const MOCK_STORED_LEAD_COUNT = 2;
+const MOCK_VIRTUAL_MEMBERSHIP = buildVirtualAdminMembership(
+  MOCK_SIGN_IN_USER_ID,
+  MOCK_TENANT_ID,
+);
+const MOCK_SESSION_TENANTS = {
+  userId: MOCK_SIGN_IN_USER_ID,
+  admin: undefined,
+  memberships: [],
+  tenants: [],
+};
+
+const listSessionTenantsMock = vi.mocked(listSessionTenants);
 
 const countLeadsForTenant = vi.mocked(queries.leads.countLeadsForTenant);
 
@@ -27,6 +51,7 @@ describe(resolveTenantPageAccess, () => {
   beforeEach(() => {
     countLeadsForTenant.mockReset();
     countLeadsForTenant.mockResolvedValue(0);
+    listSessionTenantsMock.mockResolvedValue(MOCK_SESSION_TENANTS);
   });
 
   it('opens Leads to an owner on a plan with the contact form', async () => {
@@ -61,5 +86,39 @@ describe(resolveTenantPageAccess, () => {
     );
 
     expect(leads).toBe(false);
+  });
+
+  it.each([
+    ['the real owner', mockMembership(), undefined, true],
+    [
+      'an editor',
+      mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
+      undefined,
+      false,
+    ],
+    [
+      'a super admin',
+      MOCK_VIRTUAL_MEMBERSHIP,
+      mockAdmin({ role: ADMIN_ROLE.SUPERADMIN }),
+      true,
+    ],
+    [
+      'a moderator',
+      MOCK_VIRTUAL_MEMBERSHIP,
+      mockAdmin({ role: ADMIN_ROLE.MODERATOR }),
+      false,
+    ],
+  ])('opens Billing to %s: %s', async (_label, membership, admin, isOpen) => {
+    listSessionTenantsMock.mockResolvedValue({
+      ...MOCK_SESSION_TENANTS,
+      admin,
+    });
+
+    const { billing } = await resolveTenantPageAccess(
+      mockReadyTenant({ id: MOCK_TENANT_ID }),
+      membership,
+    );
+
+    expect(billing).toBe(isOpen);
   });
 });

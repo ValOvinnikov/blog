@@ -26,7 +26,9 @@
     "blockedSignupsPage": "Blocked sign-ups",
     "dataRequestsPage": "Data requests",
     "signUpTitle": "Create an account",
-    "onboarding": "Create your site"
+    "onboarding": "Create your site",
+    "billing": "Billing · Admin",
+    "upgrade": "Upgrade"
   },
   "signInPage": {
     "heading": "Sign in",
@@ -211,6 +213,7 @@
     "platformSectionLabel": "Platform actions",
     "contentSectionLabel": "Content",
     "configurationSectionLabel": "Configuration",
+    "accountSectionLabel": "Account",
     "tenants": "Tenants",
     "addTenant": "Add tenant",
     "findings": "Findings",
@@ -231,6 +234,7 @@
     "badgePlatform": "platform",
     "features": "Features",
     "leads": "Leads",
+    "billing": "Billing",
     "releases": "Releases",
     "studioAccessLine": {
       "INVITE_SENT": "Invite sent — check your email",
@@ -384,7 +388,8 @@
     "siteSetupNotStartedDescription": "We couldn't start setting up your site. Start it now — nothing is lost.",
     "siteSetupNotStartedContactDescription": "We couldn't start setting up your site. Ask your platform contact to start it.",
     "siteSetupStart": "Start setup",
-    "siteSetupStarting": "Starting…"
+    "siteSetupStarting": "Starting…",
+    "trialUpgrade": "Choose a plan"
   },
   "getStartedCard": {
     "title": "Get started",
@@ -1658,6 +1663,7 @@
     "notDeprovisioned": "This tenant is not deprovisioned.",
     "alreadyInProgress": "Provisioning is already running.",
     "notArchived": "This tenant must be archived before it can be deleted.",
+    "notSuspended": "This tenant is not suspended, so there is nothing to lift.",
     "platformTenant": "This is the platform's own site, so it can't be suspended or deleted.",
     "deprovisionFailed": "Couldn't start deprovisioning — try again.",
     "reactivateFailed": "Couldn't start reactivation — try again.",
@@ -2124,7 +2130,8 @@
     "description": "Options marked <badge></badge> on this page open up on the Growth plan.",
     "show": "See what's included",
     "hide": "Hide",
-    "listLabel": "What Growth adds on this page"
+    "listLabel": "What Growth adds on this page",
+    "askAboutGrowth": "Ask about Growth"
   },
   "ownerPlanChangeEmail": {
     "actionLabel": "Open your dashboard",
@@ -2186,5 +2193,62 @@
     "category": "Reason: {category}.",
     "contest": "To contest this decision, reply to the suspension email or write to support quoting {reference}.",
     "copyButton": "Copy reference"
+  },
+  "billingPage": {
+    "title": "Billing",
+    "description": "Your plan, your next payment and your invoices.",
+    "manage": "Manage billing",
+    "managePending": "Opening…",
+    "manageFailed": "Billing couldn't be opened. Try again in a moment.",
+    "noCustomer": "Your site has no billing account yet.",
+    "planTitle": "Plan",
+    "planDescription": "What your site is on and when it's charged next.",
+    "planLabel": "Plan",
+    "nextPaymentLabel": "Next payment",
+    "nextPayment": "{amount} on <time>{date}</time>",
+    "noNextPayment": "None scheduled",
+    "noPayments": "Your site has no payments yet.",
+    "invoicesTitle": "Invoices",
+    "invoicesEmpty": "No invoices yet.",
+    "columnDate": "Date",
+    "columnAmount": "Amount",
+    "columnStatus": "Status",
+    "columnInvoice": "Invoice",
+    "viewInvoice": "View invoice <context>from {date}, {amount}</context>",
+    "invoiceStatus": {
+      "open": "Due",
+      "paid": "Paid",
+      "uncollectible": "Unpaid",
+      "void": "Cancelled"
+    },
+    "unavailableTitle": "Payments and invoices unavailable",
+    "unavailableDescription": "They couldn't be loaded just now. Reload the page in a moment."
+  },
+  "upgradePage": {
+    "pageTitle": "Upgrade your plan",
+    "description": "Choose Starter or Growth and pay monthly or yearly. Tax is worked out at checkout.",
+    "checkoutTitle": "Checkout",
+    "checkoutDescription": "Pay securely without leaving this page. Have a promotion code? Enter it at checkout.",
+    "intervalLabel": "Billing period",
+    "MONTHLY": "Monthly",
+    "YEARLY": "Yearly",
+    "checkoutFailed": "Checkout couldn't start.",
+    "unconfigured": "Upgrading isn't available right now. Try again later.",
+    "backToOverview": "Back to Overview",
+    "confirmingTitle": "Confirming your payment",
+    "confirmingDescription": "Your plan changes as soon as the payment is confirmed, usually within a minute. This page updates by itself, and we'll email you too.",
+    "NOT_OWNER": "Only your site's owner can upgrade it.",
+    "UNAVAILABLE": "Upgrading opens again once your site is running.",
+    "tryAgain": "Try again",
+    "slowTitle": "This is taking longer than usual",
+    "slowDescription": "Your payment may still be confirming. Check again in a moment; we'll also email you once your plan changes.",
+    "checkAgain": "Check again",
+    "PAYMENT_PENDING": "Your payment is being confirmed. Your plan changes as soon as it is, so there's no need to pay again.",
+    "planLabel": "Plan",
+    "subscribedTitle": "Your site is on {plan}",
+    "subscribedDescription": "Its subscription is active, so there's nothing to buy here.",
+    "confirmedTitle": "Your payment is confirmed",
+    "confirmedDescription": "Your new plan is active on your site.",
+    "SUBSCRIBED": "Your site already has a paid plan, so there's nothing to buy here."
   }
 }

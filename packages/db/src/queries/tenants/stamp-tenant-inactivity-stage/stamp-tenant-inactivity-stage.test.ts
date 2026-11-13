@@ -87,6 +87,7 @@ describe(stampTenantInactivityStage, () => {
     expect(stamped).toEqual({
       ...tenant,
       status: TENANT_STATUS.SUSPENDED,
+      statusBeforeHold: tenant.status,
       suspendedAt: MOCK_DAY_30,
       suspensionReason: SUSPENSION_REASON.INACTIVITY,
       updatedAt: MOCK_NOW,

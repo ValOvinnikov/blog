@@ -23,6 +23,7 @@ const REFUSAL_KEYS = {
   [TENANT_REFUSAL.NOT_DEPROVISIONED]: 'notDeprovisioned',
   [TENANT_REFUSAL.ALREADY_IN_PROGRESS]: 'alreadyInProgress',
   [TENANT_REFUSAL.NOT_ARCHIVED]: 'notArchived',
+  [TENANT_REFUSAL.NOT_SUSPENDED]: 'notSuspended',
   [TENANT_REFUSAL.PLATFORM_TENANT]: 'platformTenant',
   [TENANT_REFUSAL.OWNER_EMAIL_UNKNOWN]: 'ownerEmailUnknown',
 } satisfies Record<TTenantLifecycleRefusal, string>;

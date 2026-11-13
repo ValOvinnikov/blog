@@ -1,4 +1,4 @@
-import { ERROR_CODE } from '@blog/config/constants';
+import { ERROR_CODE, TENANT_PLAN } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
@@ -11,6 +11,7 @@ import {
   MOCK_MISSING_TENANT_ID,
   MOCK_TENANT_DOMAIN,
 } from '@blog/db/testing/tenants/fixtures';
+import { eq } from 'drizzle-orm';
 
 import { setTenantPrimaryDomain } from './set-tenant-primary-domain';
 
@@ -119,4 +120,33 @@ describe(setTenantPrimaryDomain, () => {
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     expect(await readPrimaryDomain(tenantId)).toBe(MOCK_TENANT_DOMAIN);
   });
+
+  it('leaves the main address alone once the site has left the given plan', async () => {
+    await db()
+      .update(schema.tenants)
+      .set({ plan: TENANT_PLAN.GROWTH })
+      .where(eq(schema.tenants.id, tenantId));
+
+    const result = await moveWhileOnFree();
+
+    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
+    await expect(readPrimaryDomain(tenantId)).resolves.toBe(MOCK_TENANT_DOMAIN);
+  });
+
+  it('moves the main address while the site is still on the given plan', async () => {
+    const result = await moveWhileOnFree();
+
+    expect(result.ok).toBe(true);
+    await expect(readPrimaryDomain(tenantId)).resolves.toBe(
+      MOCK_WWW_TENANT_DOMAIN,
+    );
+  });
+
+  function moveWhileOnFree() {
+    return setTenantPrimaryDomain(
+      tenantId,
+      MOCK_WWW_TENANT_DOMAIN,
+      TENANT_PLAN.FREE,
+    );
+  }
 });

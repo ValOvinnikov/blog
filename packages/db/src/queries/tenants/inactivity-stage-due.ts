@@ -1,6 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config/types';
 import {
-  DAY_MS,
   INACTIVITY_STAGE,
   INACTIVITY_STAGE_DAY,
   WRITABLE_TENANT_STATUSES,
@@ -9,6 +8,7 @@ import {
   type TInactivityStage,
 } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
+import { daysBefore } from '@blog/db/utils/day-offset/day-offset';
 import {
   and,
   eq,
@@ -58,7 +58,7 @@ export function inactivityStageDue(
   stage: TInactivityStage,
   now: Date,
 ): TMaybeUndefined<SQL> {
-  const cutoff = new Date(now.getTime() - INACTIVITY_STAGE_DAY[stage] * DAY_MS);
+  const cutoff = daysBefore(now, INACTIVITY_STAGE_DAY[stage]);
 
   return and(
     isNull(tenants.deprovisionedAt),

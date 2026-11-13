@@ -14,6 +14,7 @@ import type {
 import { MOCK_NOW } from '@blog/db/testing/frozen-clock';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
 import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
+import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
 import { MOCK_NO_OWNER_ACCESS } from '@blog/db/testing/tenants/owner-access';
 import type { TResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
@@ -82,10 +83,7 @@ export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
     ...MOCK_NO_OWNER_ACCESS,
     unsentReinviteFormerOwnerEmailEncrypted: null,
     lastActivityAt: createdAt,
-    inactivityWarnedAt: null,
-    suspendedAt: null,
-    deletionNotifiedAt: null,
-    suspensionReason: null,
+    ...MOCK_NO_HOLD,
     ...MOCK_NO_BILLING,
     contentMigrationFailedAt: null,
     firstPostPublishedAt: null,
