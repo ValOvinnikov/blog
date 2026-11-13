@@ -1,4 +1,4 @@
-import { BRAND_VARIANT } from '@blog/config';
+import { BRAND_VARIANT, DISPLAY_MODE } from '@blog/config';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
 import { mockRawHeadingBlock } from '@blog/service/testing/shared/fixtures';
 import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
@@ -15,7 +15,7 @@ export function mockRawPostRelatedModule(
     layout: null,
     contentAlignment: null,
     showImages: true,
-    displayMode: null,
+    displayMode: DISPLAY_MODE.GRID,
     ...mockRawModuleAppearance(),
     ...overrides,
   };

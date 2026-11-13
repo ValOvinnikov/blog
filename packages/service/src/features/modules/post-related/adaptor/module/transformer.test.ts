@@ -42,7 +42,7 @@ describe(toPostRelatedModuleDocument, () => {
     expect(module).toMatchObject(authored);
   });
 
-  it('maps unset appearance overrides and display mode to undefined', () => {
+  it('maps unset appearance overrides to undefined', () => {
     const module = toPostRelatedModuleDocument(mockRawPostRelatedModule());
 
     expect(module).toMatchObject({
@@ -50,7 +50,6 @@ describe(toPostRelatedModuleDocument, () => {
       radiusScale: undefined,
       density: undefined,
       columns: undefined,
-      displayMode: undefined,
     });
   });
 });

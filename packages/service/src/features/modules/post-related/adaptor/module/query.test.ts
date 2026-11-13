@@ -65,12 +65,15 @@ describe('postRelatedModuleQuery', () => {
       expect(limit).toBe(MOCK_LIMIT);
     });
 
-    it('defaults showImages to true for a document authored without it', () => {
-      expect(postRelated.showImages).toBe(true);
+    it('defaults showImages and displayMode for a document authored without them', () => {
+      const { showImages, displayMode } = postRelated;
+
+      expect(showImages).toBe(true);
+      expect(displayMode).toBe(DISPLAY_MODE.GRID);
     });
   });
 
-  it('reads no appearance or display mode from an unauthored document', async () => {
+  it('reads no appearance overrides from an unauthored document', async () => {
     const postRelated = await runPostRelated(EN);
 
     expect(postRelated).toMatchObject({
@@ -78,7 +81,6 @@ describe('postRelatedModuleQuery', () => {
       radiusScale: null,
       density: null,
       columns: null,
-      displayMode: null,
     });
   });
 
