@@ -2,6 +2,7 @@ import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostFeaturedModuleView } from './post-featured-module-view';
 
@@ -46,10 +47,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
@@ -60,10 +57,9 @@ const meta = {
     },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Featured' }),
     items: [leadItem, secondItem, thirdItem],
-    layout: undefined,
     contentAlignment: undefined,
     titleId: 'featured-posts-title',
     dataTestId: 'post-featured-module-featured-1',
@@ -85,7 +81,25 @@ export const LeadOnly: TStory = {
 };
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
+};
+
+export const LeadWithSingleTailOutlinedOnBrandTint: TStory = {
+  args: {
+    items: [leadItem, secondItem],
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
 };
 
 export const CenterAligned: TStory = {

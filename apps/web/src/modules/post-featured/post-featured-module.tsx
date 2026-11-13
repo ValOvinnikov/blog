@@ -1,5 +1,8 @@
 import { service, type TPostCard } from '@blog/service';
+import { hasLength } from '@blog/utils/primitives';
+import { POST_FEATURED_LOG } from '@web/constants/post-featured';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { logger } from '@web/utils/logger/logger';
 import { renderPostCardImage } from '@web/utils/render-post-card-image';
 import { renderPostLeadImage } from '@web/utils/render-post-lead-image';
@@ -12,14 +15,14 @@ export interface IPostFeaturedModuleProps {
 }
 
 export const PostFeaturedModule = async ({ id }: IPostFeaturedModuleProps) => {
-  const { sanityContext } = await getRequestContext();
+  const { sanityContext, tenantId } = await getRequestContext();
   const result = await service.modules.postFeatured.v1.getPostFeatured(
     id,
     sanityContext,
   );
 
   if (!result.ok) {
-    logger.error('post_featured_module.fetch_failed', {
+    logger.error(POST_FEATURED_LOG.MODULE_FETCH_FAILED, {
       id,
       error: result.error,
     });
@@ -34,6 +37,9 @@ export const PostFeaturedModule = async ({ id }: IPostFeaturedModuleProps) => {
     contentAlignment,
     showImages,
     displayMode,
+    cardStyle,
+    radiusScale,
+    density,
   } = result.data;
 
   const leadPostId = posts[0]?.id;
@@ -47,14 +53,19 @@ export const PostFeaturedModule = async ({ id }: IPostFeaturedModuleProps) => {
     showImages ? renderImage : undefined,
   );
 
-  if (items.length === 0) return null;
+  if (!hasLength(items)) return null;
+
+  const appearance = await getSectionAppearance(tenantId, {
+    cardStyle,
+    radiusScale,
+    density,
+  });
 
   return (
     <PostFeaturedModuleView
-      brandVariant={brandVariant}
+      section={{ brandVariant, layout, appearance }}
       headingBlock={headingBlock}
       items={items}
-      layout={layout}
       contentAlignment={contentAlignment}
       hasImages={showImages}
       displayMode={displayMode}
