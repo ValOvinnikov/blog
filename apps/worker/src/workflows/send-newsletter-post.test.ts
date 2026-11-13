@@ -14,6 +14,7 @@ import {
 } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { fakeRunHook } from '@worker/testing/workflow/run-hook';
 import { checkNewsletterPost } from '@worker/units/newsletter-send/check-newsletter-post';
 import { gateNewsletterSend } from '@worker/units/newsletter-send/gate-newsletter-send';
 import { sendNewsletterPage } from '@worker/units/newsletter-send/send-newsletter-page';
@@ -23,7 +24,7 @@ import {
   releaseNewsletterSendClaim,
   reportNewsletterSendFailed,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
-import { createHook, type Hook, sleep } from 'workflow';
+import { sleep } from 'workflow';
 
 import { sendNewsletterPost } from './send-newsletter-post';
 
@@ -43,15 +44,6 @@ const MOCK_FIRST_PAGE = mockNewsletterPage({
   isLastPage: false,
   unreadableCount: 2,
 });
-
-function fakeRunHook(hasConflict = false) {
-  const hook = {
-    getConflict: vi.fn(async () => (hasConflict ? ({} as never) : null)),
-    dispose: vi.fn(),
-  };
-  vi.mocked(createHook).mockReturnValue(hook as unknown as Hook<null>);
-  return hook;
-}
 
 function runSend() {
   return sendNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);

@@ -64,7 +64,7 @@ default to zero".
 - **Nothing imports `apps/worker`.** The platform reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
   `POST /api/owner-access/*`, `POST /api/custom-domain/*` and
-  `POST /api/newsletter/post-send`
+  `POST /api/newsletter/post-send` and `POST /api/scheduled-post-purge`
   — every one authenticated by the shared enqueue secret. The other routes
   are Vercel Cron's `GET /api/inactivity-sweep` and
   `GET /api/owner-access-sweep`, authenticated by `CRON_SECRET`.
