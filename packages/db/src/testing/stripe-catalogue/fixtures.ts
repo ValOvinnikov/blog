@@ -26,6 +26,10 @@ export const MOCK_PROMOTION_CODE = catalogueFaker.string.alpha({
   casing: 'upper',
 });
 export const MOCK_OTHER_PROMOTION_CODE_ID = `promo_${catalogueFaker.string.alphanumeric(14)}`;
+export const MOCK_OTHER_PROMOTION_CODE = catalogueFaker.string.alpha({
+  length: 8,
+  casing: 'upper',
+});
 export const MOCK_DURATION_IN_MONTHS = catalogueFaker.number.int({
   min: 2,
   max: 12,
