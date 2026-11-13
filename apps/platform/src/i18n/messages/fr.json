@@ -1,31 +1,32 @@
 {
   "pageMetadata": {
-    "root": "Administration",
-    "tenants": "Locataires · Administration",
-    "ownerHome": "Tableau de bord · Administration",
-    "look": "Apparence · Administration",
-    "voice": "Voix · Administration",
-    "selectTenant": "Choisir un espace de travail · Administration",
+    "root": "Shinefold",
+    "titleTemplate": "%s · Shinefold",
+    "tenants": "Locataires",
+    "ownerHome": "Tableau de bord",
+    "look": "Apparence",
+    "voice": "Voix",
+    "selectTenant": "Choisir un espace de travail",
     "signInTitle": "Connexion",
     "signInError": "Problème de connexion",
-    "addTenant": "Ajouter un locataire · Administration",
-    "tenantOverview": "Aperçu du locataire · Administration",
-    "tenantActivity": "Activité du locataire · Administration",
-    "tenantProvisioning": "Provisionnement · Administration",
-    "tenantDanger": "Zone de danger · Administration",
-    "tenantDomain": "Domaine · Administration",
-    "signInApps": "Connexion · Admin",
-    "features": "Fonctionnalités · Administration",
-    "languages": "Langues · Administration",
-    "studio": "Studio · Administration",
-    "findings": "Constats · Administration",
-    "email": "E-mail · Administration",
-    "leads": "Messages reçus · Administration",
-    "releases": "Versions · Admin",
-    "blockedSignupsPage": "Inscriptions bloquées · Admin",
-    "dataRequestsPage": "Demandes de données · Admin",
+    "addTenant": "Ajouter un locataire",
+    "tenantOverview": "Aperçu du locataire",
+    "tenantActivity": "Activité du locataire",
+    "tenantProvisioning": "Provisionnement",
+    "tenantDanger": "Zone de danger",
+    "tenantDomain": "Domaine",
+    "signInApps": "Connexion",
+    "features": "Fonctionnalités",
+    "languages": "Langues",
+    "studio": "Studio",
+    "findings": "Constats",
+    "email": "E-mail",
+    "leads": "Messages reçus",
+    "releases": "Versions",
+    "blockedSignupsPage": "Inscriptions bloquées",
+    "dataRequestsPage": "Demandes de données",
     "signUpTitle": "Créer un compte",
-    "onboarding": "Créer votre site · Administration"
+    "onboarding": "Créer votre site"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -51,7 +52,7 @@
   "onboardingPage": {
     "heading": "Créez votre site",
     "description": "Choisissez le type de site, son adresse et son apparence. Vous pourrez tout modifier plus tard, sauf l’adresse.",
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "onboardingForm": {
     "siteTypeLabel": "Type de site",
@@ -150,7 +151,7 @@
     "homeLink": "Retour à l'accueil"
   },
   "centeredCardFrame": {
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "deadEndView": {
     "errorId": "ID de l’erreur : {errorId}"
@@ -160,8 +161,8 @@
   },
   "sidebar": {
     "ariaLabel": "Barre latérale",
-    "brandName": "Valstack",
-    "brandTagline": "admin",
+    "brandName": "Shinefold",
+    "brandTagline": "Platform",
     "collapseToggle": "Réduire la barre latérale",
     "expandToggle": "Développer la barre latérale"
   },

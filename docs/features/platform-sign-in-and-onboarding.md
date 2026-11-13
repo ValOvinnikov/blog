@@ -49,8 +49,8 @@ site as a 14-day Growth trial, with no card.
 ## Surfaces and routes
 
 - `/sign-in` is Auth.js's `pages.signIn`, public, in the same frame as the
-  dead-end pages (`CenteredCardFrame`: the Valstack mark and wordmark centred
-  above a white card). Inside the card: the title and description, any
+  dead-end pages (`CenteredCardFrame`: the Shinefold full logo alone, 36px
+  tall, centred above a white card). Inside the card: the title and description, any
   sign-in error, a button per configured OAuth provider, an "or" divider and
   an email field that sends a magic link and says to check your inbox on the same page,
   or, when the send limit refused it, that too many links were requested and
@@ -105,13 +105,14 @@ site as a 14-day Growth trial, with no card.
 - `/onboarding`: a four-step setup wizard for a signed-in user with no
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
   to their own home, so an invited member never sees it). A dark left rail
-  (the `admin-rail*` tokens) carries the Valstack mark, "Create your
+  (the `admin-rail*` tokens) carries the Shinefold full logo in its dark-ground colours, "Create your
   site" and the step list (an `ol` named "Setup steps", no `nav`), where a
   done step shows a tick and its choice ("Blog · Field Notes", the site
   address, the preset) and is announced as "Site, Complete, Blog · Field
   Notes", and the current step carries `aria-current="step"`. The rail draws
-  its brand mark and intro at the wizard sizes through an `isWizard` prop on
-  `RailBrand` / `RailIntro`, so Choose a workspace keeps its own. The current
+  its intro at the wizard size, and below 768px the S box in place of the
+  full logo, through an `isWizard` prop on `RailBrand` / `RailIntro`; Choose
+  a workspace shows the full logo at every width. The current
   step's fields sit
   beside it with Back / Continue, and the live site preview follows every
   step. The preview is the Look page's shared device frame (`PreviewFrame`
@@ -159,17 +160,17 @@ site as a 14-day Growth trial, with no card.
   progress bar once, as one progressbar named "Setup steps" whose value text
   is the visible line; the line and the segments themselves are hidden from
   it. From 768px up the step header reads "Step N of 4" above the heading
-  instead. The wizard follows the admin's Light / Dark theme through
-  the admin tokens, while the rail and the phone header stay dark in both. In
+  instead. The wizard follows the platform's Light / Dark theme through
+  the platform tokens, while the rail and the phone header stay dark in both. In
   Dark the Full preview column is ruled off from the content column, the
   phone header gains a 1px bottom border and the hue thumb takes a dark
   border and deeper shadow; Light draws none of these, and the preview's own
-  Light / Dark stays independent of the admin theme. Each step's fields stack at every width. A wizard field puts its
+  Light / Dark stays independent of the platform theme. Each step's fields stack at every width. A wizard field puts its
   hint directly below the control and any error below the hint (13.5px
   labels, 14px controls from 768px, 6px between label, control, hint and
   error), and the control is described by the hint, then the error, through
   the `FIELD_APPEARANCE.WIZARD` option on `FormField` (`control.appearance`),
-  `OptionSelect` and `FormSiteAddressInput`; every other admin form keeps the
+  `OptionSelect` and `FormSiteAddressInput`; every other platform form keeps the
   hint above its control. The steps:
   1. **Site** — the site type (Blog, Portfolio, Personal / résumé, Docs or
      Blank) and the site name.
@@ -342,7 +343,7 @@ site as a 14-day Growth trial, with no card.
 
 ## Constraints and invariants
 
-- The admin panel is not indexed: `[locale]/layout.tsx` sets
+- The platform is not indexed: `[locale]/layout.tsx` sets
   `robots: { index: false, follow: false }`, so every page under it, public or
   session-gated, serves `noindex, nofollow`. There is no `robots.txt`, because
   a crawler must fetch a page to read its noindex.
@@ -369,12 +370,12 @@ site as a 14-day Growth trial, with no card.
   `/onboarding`. `/dashboard` with no membership redirects to `/onboarding`.
 - The Sanity project is created by the provisioning run Create site starts,
   never at signup.
-- The admin builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
+- The platform builds Auth.js with `AUTH_APP.PLATFORM`: its cookies carry
   their own names, each session it creates is stamped `PLATFORM` in
   `sessions.app`, and a session stamped otherwise reads as signed out. Invite
   side effects run only here: the invite-consuming and terms-recording
   sign-in events and the invite email template.
-- The admin's sign-in and invite emails render in the platform layout
+- The platform's sign-in and invite emails render in the platform layout
   (the stacked logo mark and "Platform" in the top band). A site's sign-in
   email keeps its tenant's layout, or the neutral one on an unknown host.
 
@@ -436,7 +437,7 @@ site as a 14-day Growth trial, with no card.
 - #4840 epic: platform front door (Order 6b is the design of record).
 - #4960 shared `/sign-in`, `/signup`, `/onboarding` and self-serve tenant
   creation.
-- #4979 epic: web and platform stay separate; #4982 the admin keeps its own
+- #4979 epic: web and platform stay separate; #4982 the platform keeps its own
   sign-in and refuses sessions it did not issue.
 - #4958 magic-link send limits and terms acceptance on first sign-in.
 - #4949 reserved subdomains and a slug availability check.

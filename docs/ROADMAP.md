@@ -146,7 +146,7 @@ Free or trial site at a time (#6874).
 - **Yearly** is two months free. The 14-day trial with no card stands.
 - The contact form moves out of the Growth module pack so Starter can hold it.
 
-## The admin redesign
+## The platform redesign
 
 Specs merged in #6427; run in its own session, alongside the launch work.
 Umbrella #6313. The building is done but for the Voice save bar on phones
@@ -218,7 +218,7 @@ reading (#2799), live subscriber count (#2801) and module presets (#2803).
 
 ## Open decisions
 
-- **Domain:** the admin is `platform.<domain>`, but the domain itself is not
+- **Domain:** the platform is `platform.<domain>`, but the domain itself is not
   chosen. It doesn't block development.
 - **Translation model:** Sonnet or Haiku for translation drafts, settled by
   testing both on real posts. Sonnet costs about $0.05 a post and language,
@@ -232,7 +232,7 @@ reading (#2799), live subscriber count (#2801) and module presets (#2803).
 - **Production stand-up** (owner, 2026-10-31): Vercel projects, env,
   domains, crons and the Upstash Redis integration.
 - **Production deploy testing** (owner, 2026-10-18): #5502 and #5264.
-- **A platform visual audit**, owed after the admin redesign.
+- **A platform visual audit**, owed after the platform redesign.
 - **Stripe's custom billing domain** (owner, 2026-11-08): a paid add-on,
   about $10 a month, that serves the Customer Portal and Stripe's hosted pages
   from `billing.<domain>` instead of a stripe.com address. One DNS record and

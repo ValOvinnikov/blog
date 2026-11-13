@@ -12,7 +12,6 @@ import {
   LOCALE_ISO_CODES,
   MEDIA_ORDER,
   NEWSLETTER_VARIANT,
-  POST_SOURCE,
   PRICE_PERIOD,
   TAXONOMY_KIND,
   TAXONOMY_SORT,
@@ -31,7 +30,6 @@ import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-
 import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
 import type { TRawLogoWallModule } from '@blog/service/features/modules/logo-wall/adaptor/transformer';
 import type { TRawNewsletterModule } from '@blog/service/features/modules/newsletter/adaptor/transformer';
-import type { TRawPostFeaturedModule } from '@blog/service/features/modules/post-featured/adaptor/transformer';
 import type { TRawPostRelatedModule } from '@blog/service/features/modules/post-related/adaptor/module/transformer';
 import type { TRawPricingModule } from '@blog/service/features/modules/pricing/adaptor/transformer';
 import type { TRawSectionPagesModule } from '@blog/service/features/modules/section-pages/adaptor/module/transformer';
@@ -216,23 +214,6 @@ export function mockRawHeroProfileModule(
     contentAlignment: null,
     mediaOrderSplit: null,
     layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawPostFeaturedModule(
-  overrides: Partial<TRawPostFeaturedModule> = {},
-): TRawPostFeaturedModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Featured'),
-    postSource: POST_SOURCE.PINNED,
-    posts: [],
-    limit: null,
-    layout: null,
-    contentAlignment: null,
-    showImages: true,
-    displayMode: DISPLAY_MODE.GRID,
     ...overrides,
   };
 }

@@ -61,7 +61,7 @@ default to zero".
   `vitest.config.ts` — the `config` agent's wiring, so report it.
 - **Never import** React, `@blog/ui`, `@blog/service`, `@blog/auth` or
   `@blog/studio`. Needing one is a signal to stop and report.
-- **Nothing imports `apps/worker`.** The admin panel reaches it only through
+- **Nothing imports `apps/worker`.** The platform reaches it only through
   its signed endpoints — `POST /api/provision`, `POST /api/deprovision`,
   `POST /api/owner-access/*`, `POST /api/custom-domain/*` and
   `POST /api/newsletter/post-send`
@@ -72,7 +72,7 @@ default to zero".
   functions** — no Drizzle, no Neon client, no SQL here. A missing query is a
   `db` request you report.
 - **Never edit outside `apps/worker`.** Implement your side and report the
-  change another layer needs — what the admin panel enqueues is
+  change another layer needs — what the platform enqueues is
   `platform-app` work.
 
 ## Contract
@@ -117,7 +117,7 @@ default to zero".
   older than 45 minutes, which can only be one left on an earlier deploy.
 - **Secrets.** `SANITY_MANAGEMENT_TOKEN`, `TENANT_TOKEN_ENCRYPTION_KEY`, the
   registry `DATABASE_URL`, `SANITY_REVALIDATE_SECRET` and `VERCEL_TOKEN` live
-  on this app alone, plus the enqueue secret it shares with the admin panel.
+  on this app alone, plus the enqueue secret it shares with the platform.
   Never return one in a result, a log line or an error message. A new env var
   is reported for `docs/context/environment-variables.md` and
   `turbo.json`.

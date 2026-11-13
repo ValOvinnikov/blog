@@ -1,6 +1,10 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
+import {
+  SHINEFOLD_LOGO,
+  SHINEFOLD_LOGO_VARIANT,
+} from '@blog/utils/shinefold-logo';
 
 import { footerPoweredByVariants } from './footer-powered-by-variants';
 
@@ -12,6 +16,8 @@ export type TFooterPoweredByProps = IWithClassName &
     linkAs?: TAnchorElementType;
   };
 
+const { viewBox, shapes } = SHINEFOLD_LOGO[SHINEFOLD_LOGO_VARIANT.MONO];
+
 /** The platform's attribution link, always the last item of the footer's bottom row and outside the site's own legal links. */
 export const FooterPoweredBy = ({
   label,
@@ -21,7 +27,7 @@ export const FooterPoweredBy = ({
   className,
   dataTestId,
 }: TFooterPoweredByProps) => {
-  const { root, name } = footerPoweredByVariants();
+  const { root, label: labelClass, logo } = footerPoweredByVariants();
 
   return (
     <TextLink
@@ -32,7 +38,17 @@ export const FooterPoweredBy = ({
       dataTestId={dataTestId}
     >
       <span>
-        {label} <span className={name()}>{productName}</span>
+        <span className={labelClass()}>{label}</span>{' '}
+        <svg
+          viewBox={viewBox}
+          role="img"
+          aria-label={productName}
+          className={logo()}
+        >
+          {shapes.map(({ d, fill, fillRule }) => (
+            <path key={d} d={d} fill={fill} fillRule={fillRule} />
+          ))}
+        </svg>
       </span>
     </TextLink>
   );

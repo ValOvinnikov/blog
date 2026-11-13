@@ -64,13 +64,13 @@ describe(`<${Sidebar.name}/>`, () => {
     vi.mocked(usePathname).mockReset();
   });
 
-  it("lists each section's label and its nav links", () => {
+  it("lists each section's label, titled with its full text, and its links", () => {
     renderSidebar({ sections: [MOCK_SECTION] });
 
     const sectionLabel = screen.getByText(MOCK_SECTION.label);
     const link = screen.getByRole('link', { name: MOCK_LOOK_ITEM.label });
 
-    expect(sectionLabel).toBeVisible();
+    expect(sectionLabel).toHaveAttribute('title', MOCK_SECTION.label);
     expect(link).toHaveAttribute('href', MOCK_LOOK_ITEM.href);
   });
 
@@ -84,14 +84,6 @@ describe(`<${Sidebar.name}/>`, () => {
 
     expect(note).toBeVisible();
     expect(link).not.toBeInTheDocument();
-  });
-
-  it("carries a section label's full text for the hover hint", () => {
-    renderSidebar({ sections: [MOCK_SECTION] });
-
-    const sectionLabel = screen.getByText(MOCK_SECTION.label);
-
-    expect(sectionLabel).toHaveAttribute('title', MOCK_SECTION.label);
   });
 
   it('renders the switcher slot when provided', () => {
@@ -113,28 +105,32 @@ describe(`<${Sidebar.name}/>`, () => {
     expect(sidebar).toHaveTextContent(new RegExp(`${MOCK_FOOT_TEXT}$`));
   });
 
-  it('renders the brand name and tagline', () => {
-    renderSidebar();
-
-    const brandName = screen.getByText(messages.sidebar.brandName);
-    const brandTagline = screen.getByText(messages.sidebar.brandTagline);
-
-    expect(brandName).toBeVisible();
-    expect(brandTagline).toBeVisible();
-  });
-
-  it('is a landmark named Sidebar with no collapse toggle of its own', () => {
-    renderSidebar();
-
-    const sidebar = screen.getByRole('complementary', {
-      name: messages.sidebar.ariaLabel,
-    });
-    const toggle = screen.queryByRole('button', {
-      name: messages.sidebar.collapseToggle,
+  describe('with no sections', () => {
+    beforeEach(() => {
+      renderSidebar();
     });
 
-    expect(sidebar).toBeVisible();
-    expect(toggle).not.toBeInTheDocument();
+    it('names both logos for the product beside the tagline', () => {
+      const logos = screen.getAllByRole('img', {
+        name: messages.sidebar.brandName,
+      });
+      const brandTagline = screen.getByText(messages.sidebar.brandTagline);
+
+      expect(logos).toHaveLength(2);
+      expect(brandTagline).toBeVisible();
+    });
+
+    it('is a landmark named Sidebar with no collapse toggle of its own', () => {
+      const sidebar = screen.getByRole('complementary', {
+        name: messages.sidebar.ariaLabel,
+      });
+      const toggle = screen.queryByRole('button', {
+        name: messages.sidebar.collapseToggle,
+      });
+
+      expect(sidebar).toBeVisible();
+      expect(toggle).not.toBeInTheDocument();
+    });
   });
 
   it("carries a link item's badge as visible text inside the link", () => {
@@ -213,6 +209,7 @@ describe(`<${Sidebar.name}/>`, () => {
 
   describe('when the sidebar starts collapsed', () => {
     let user: UserEvent;
+    let row: HTMLElement;
 
     beforeEach(() => {
       user = userEvent.setup();
@@ -224,6 +221,9 @@ describe(`<${Sidebar.name}/>`, () => {
         },
         true,
       );
+      row = screen.getByRole('link', {
+        name: new RegExp(MOCK_INERT_ITEM.label),
+      });
     });
 
     it('keeps a nav link named with no native title', () => {
@@ -234,9 +234,6 @@ describe(`<${Sidebar.name}/>`, () => {
     });
 
     it('keeps an inert row labelled, its badge visible and no native title', () => {
-      const row = screen.getByRole('link', {
-        name: new RegExp(MOCK_INERT_ITEM.label),
-      });
       const label = screen.getByText(MOCK_INERT_ITEM.label);
       const badge = screen.getByText(MOCK_BADGE.label);
 
@@ -274,10 +271,6 @@ describe(`<${Sidebar.name}/>`, () => {
     });
 
     it("shows only an inert row's name in its tooltip on hover", async () => {
-      const row = screen.getByRole('link', {
-        name: new RegExp(MOCK_INERT_ITEM.label),
-      });
-
       await user.hover(row);
 
       await waitFor(() => {
@@ -311,26 +304,29 @@ describe(`<${Sidebar.name}/>`, () => {
       expect(link).not.toHaveAttribute('title');
     });
 
-    it('shows only the status tooltip on keyboard focus', async () => {
-      await user.tab();
+    describe('on keyboard focus', () => {
+      beforeEach(async () => {
+        await user.tab();
+      });
 
-      const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
-      const names = screen.getAllByText(MOCK_STATUS_ITEM.label);
-
-      expect(link).toHaveFocus();
-      expect(statusTexts).toHaveLength(2);
-      expect(statusTexts[1]).toHaveAttribute(ARIA_HIDDEN, 'true');
-      expect(names).toHaveLength(1);
-    });
-
-    it('hides the status tooltip on Escape', async () => {
-      await user.tab();
-      await user.keyboard('{Escape}');
-
-      await waitFor(() => {
+      it('shows only the status tooltip', () => {
         const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
+        const names = screen.getAllByText(MOCK_STATUS_ITEM.label);
 
-        expect(statusTexts).toHaveLength(1);
+        expect(link).toHaveFocus();
+        expect(statusTexts).toHaveLength(2);
+        expect(statusTexts[1]).toHaveAttribute(ARIA_HIDDEN, 'true');
+        expect(names).toHaveLength(1);
+      });
+
+      it('hides the status tooltip on Escape', async () => {
+        await user.keyboard('{Escape}');
+
+        await waitFor(() => {
+          const statusTexts = screen.getAllByText(MOCK_STATUS_TOOLTIP);
+
+          expect(statusTexts).toHaveLength(1);
+        });
       });
     });
 

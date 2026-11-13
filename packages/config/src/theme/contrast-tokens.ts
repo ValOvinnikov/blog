@@ -2,32 +2,21 @@ import type { TMaybeUndefined } from '@blog/config/types';
 import { renderedContrastRatio, type TOklchColor } from '@blog/utils/color';
 import { isUndefined } from '@blog/utils/primitives';
 
-import {
-  COLOR_SCHEME,
-  type TCardStyle,
-  type TColorScheme,
-  type THeaderControlStyle,
-  type TNavLinkStyle,
+import type {
+  TCardStyle,
+  TColorScheme,
+  THeaderControlStyle,
+  TNavLinkStyle,
 } from '@blog/config/constants';
 
-import { ACCENT_RAMP_DARK, ACCENT_RAMP_LIGHT } from './accent-ramps';
 import { CARD_STYLE_DECLARATIONS } from './card-style-declarations';
 import type { TThemeToken } from './contrast-pairs';
+import { SCHEME_RAMPS } from './contrast-scheme-ramps';
 import { NAV_LINK_STYLE_DECLARATIONS } from './nav-link-declarations';
 import {
   HEADER_CONTROL_STYLE_DECLARATIONS,
-  IMAGE_SCRIM_RAMP,
   type TOklchRamp,
 } from './theme-declarations';
-import {
-  CODE_SYNTAX_RAMP_DARK,
-  CODE_SYNTAX_RAMP_LIGHT,
-  NEUTRAL_RAMP_DARK,
-  NEUTRAL_RAMP_LIGHT,
-  NEUTRAL_SCRIM_RAMP,
-  STATUS_RAMP_DARK,
-  STATUS_RAMP_LIGHT,
-} from './theme-ramps';
 
 export type TContrastStyles = {
   cardStyle: TCardStyle;
@@ -38,25 +27,6 @@ export type TContrastStyles = {
 export type TContrastContext = TContrastStyles & {
   scheme: TColorScheme;
   hue: number;
-};
-
-const SCHEME_RAMPS: Record<TColorScheme, TOklchRamp> = {
-  [COLOR_SCHEME.LIGHT]: {
-    ...NEUTRAL_RAMP_LIGHT,
-    ...STATUS_RAMP_LIGHT,
-    ...ACCENT_RAMP_LIGHT,
-    ...IMAGE_SCRIM_RAMP,
-    ...NEUTRAL_SCRIM_RAMP,
-    ...CODE_SYNTAX_RAMP_LIGHT,
-  },
-  [COLOR_SCHEME.DARK]: {
-    ...NEUTRAL_RAMP_DARK,
-    ...STATUS_RAMP_DARK,
-    ...ACCENT_RAMP_DARK,
-    ...IMAGE_SCRIM_RAMP,
-    ...NEUTRAL_SCRIM_RAMP,
-    ...CODE_SYNTAX_RAMP_DARK,
-  },
 };
 
 const BRAND_PRIMARY: TThemeToken = '--brand-primary';
