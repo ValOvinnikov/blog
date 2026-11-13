@@ -1,8 +1,9 @@
+import { MOCK_SESSION_EXPIRES } from '@platform/testing/auth/fixtures';
 import type { Session } from 'next-auth';
 
 export const auth = vi.fn(async (): Promise<Session | null> => ({
   user: { id: 'user-1', email: 'user@example.com' },
-  expires: '2099-01-01T00:00:00.000Z',
+  expires: MOCK_SESSION_EXPIRES,
 }));
 
 export const getSession = vi.fn(() => auth());

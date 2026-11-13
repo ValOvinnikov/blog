@@ -19,7 +19,7 @@ export const buildContentSecurityPolicy = ({
     "font-src 'self' https://design-system-static.sanity.io",
     // Wildcard on purpose: Studio calls a browser-redacted sanity.io host that could not be listed; `sanity-cdn.com` is its version check.
     "connect-src 'self' https://*.sanity.io https://sanity-cdn.com https://api.stripe.com https://checkout.stripe.com",
-    // Stripe's Embedded Checkout on Upgrade; `hooks.stripe.com` is its 3D Secure and redirect-method step.
+    // `hooks.stripe.com` is Stripe's 3D Secure and redirect-method step.
     'frame-src https://js.stripe.com https://*.js.stripe.com https://checkout.stripe.com https://hooks.stripe.com',
     "frame-ancestors 'none'",
     "base-uri 'self'",

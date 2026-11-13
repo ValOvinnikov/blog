@@ -35,7 +35,6 @@ describe(`<${GrowthNote.name}/>`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
-    onSelect.mockReset();
     setup();
   });
 

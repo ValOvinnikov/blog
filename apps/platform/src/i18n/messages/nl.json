@@ -2187,7 +2187,7 @@
     "intervalLabel": "Factuurperiode",
     "MONTHLY": "Maandelijks",
     "YEARLY": "Jaarlijks",
-    "checkoutFailed": "Afrekenen kon niet starten. Kies een factuurperiode om het opnieuw te proberen.",
+    "checkoutFailed": "Afrekenen kon niet starten.",
     "unconfigured": "Upgraden is nu niet mogelijk. Probeer het later opnieuw.",
     "onGrowthTitle": "Je site gebruikt Growth",
     "onGrowthDescription": "Alle Growth-opties zijn open op je site.",
@@ -2197,6 +2197,11 @@
     "ON_GROWTH": "Je site gebruikt Growth al.",
     "NOT_OWNER": "Alleen de eigenaar van je site kan upgraden.",
     "PAID_PLAN": "Je site heeft al een betaald abonnement, dus hier valt niets te upgraden.",
-    "UNAVAILABLE": "Upgraden kan weer zodra je site actief is."
+    "UNAVAILABLE": "Upgraden kan weer zodra je site actief is.",
+    "tryAgain": "Opnieuw proberen",
+    "SUBSCRIBED": "Je betaling wordt bevestigd. Je abonnement verandert zodra dat gebeurd is, dus je hoeft niet opnieuw te betalen.",
+    "slowTitle": "Dit duurt langer dan normaal",
+    "slowDescription": "Je betaling wordt misschien nog bevestigd. Controleer het zo opnieuw; we sturen je ook een e-mail zodra je abonnement verandert.",
+    "checkAgain": "Opnieuw controleren"
   }
 }

@@ -4,14 +4,17 @@ import {
   ALERT_TYPE,
   isOutcomeRefused,
   isOutcomeSuccess,
+  SIZE,
   type TMaybeUndefined,
 } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
+import { Button } from '@platform/components/shared/button';
 import { Card } from '@platform/components/shared/card';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import {
   BILLING_INTERVAL,
   type TBillingInterval,
+  type TUpgradeRefusal,
 } from '@platform/constants/billing';
 import { createUpgradeCheckoutAction } from '@platform/server/billing/create-upgrade-checkout-action';
 import {
@@ -38,7 +41,9 @@ export const UpgradeCheckout = ({
   const [interval, setBillingInterval] = useState<TBillingInterval>(
     BILLING_INTERVAL.MONTHLY,
   );
-  const [error, setError] = useState<TMaybeUndefined<string>>();
+  const [attempt, setAttempt] = useState(0);
+  const [refusal, setRefusal] = useState<TMaybeUndefined<TUpgradeRefusal>>();
+  const [hasFailed, setHasFailed] = useState(false);
 
   const fetchClientSecret = async (): Promise<string> => {
     const result = await createUpgradeCheckoutAction(tenantId, {
@@ -46,13 +51,49 @@ export const UpgradeCheckout = ({
       promo,
     });
     if (isOutcomeSuccess(result)) return result.clientSecret;
-    setError(isOutcomeRefused(result) ? t(result.reason) : t('checkoutFailed'));
+    if (isOutcomeRefused(result)) setRefusal(result.reason);
+    else setHasFailed(true);
     throw new Error(result.outcome);
   };
 
   const changeInterval = (nextInterval: TBillingInterval) => {
-    setError(undefined);
+    setHasFailed(false);
     setBillingInterval(nextInterval);
+  };
+
+  const tryAgain = () => {
+    setHasFailed(false);
+    setAttempt((count) => count + 1);
+  };
+
+  const body = () => {
+    if (refusal) {
+      return (
+        <Alert type={ALERT_TYPE.INFO} role="note" description={t(refusal)} />
+      );
+    }
+    if (hasFailed) {
+      return (
+        <Alert
+          type={ALERT_TYPE.ERROR}
+          description={t('checkoutFailed')}
+          action={
+            <Button size={SIZE.SM} onClick={tryAgain}>
+              {t('tryAgain')}
+            </Button>
+          }
+        />
+      );
+    }
+    return (
+      <EmbeddedCheckoutProvider
+        key={`${interval}-${attempt}`}
+        stripe={stripePromise}
+        options={{ fetchClientSecret }}
+      >
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
+    );
   };
 
   return (
@@ -72,19 +113,7 @@ export const UpgradeCheckout = ({
           />
         }
       />
-      <Card.Body>
-        {error ? (
-          <Alert type={ALERT_TYPE.ERROR} description={error} />
-        ) : (
-          <EmbeddedCheckoutProvider
-            key={interval}
-            stripe={stripePromise}
-            options={{ fetchClientSecret }}
-          >
-            <EmbeddedCheckout />
-          </EmbeddedCheckoutProvider>
-        )}
-      </Card.Body>
+      <Card.Body>{body()}</Card.Body>
     </Card>
   );
 };

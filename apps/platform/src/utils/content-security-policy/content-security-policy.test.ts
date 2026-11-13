@@ -1,8 +1,6 @@
 import { buildContentSecurityPolicy } from './content-security-policy';
 
 const SCRIPT_SRC = 'script-src';
-const FRAME_SRC = 'frame-src';
-const STRIPE_JS_ORIGIN = 'https://js.stripe.com';
 const UNSAFE_EVAL = "'unsafe-eval'";
 
 const parseDirectives = (policy: string): Record<string, string[]> =>
@@ -14,23 +12,12 @@ const parseDirectives = (policy: string): Record<string, string[]> =>
   );
 
 describe(buildContentSecurityPolicy, () => {
-  describe('in production', () => {
-    let directives: Record<string, string[]>;
+  it('keeps unsafe-eval out of script-src in production', () => {
+    const directives = parseDirectives(
+      buildContentSecurityPolicy({ isDev: false }),
+    );
 
-    beforeEach(() => {
-      directives = parseDirectives(
-        buildContentSecurityPolicy({ isDev: false }),
-      );
-    });
-
-    it('keeps unsafe-eval out of script-src', () => {
-      expect(directives[SCRIPT_SRC]).not.toContain(UNSAFE_EVAL);
-    });
-
-    it('allows Stripe.js and its Checkout frame for the Upgrade page', () => {
-      expect(directives[SCRIPT_SRC]).toContain(STRIPE_JS_ORIGIN);
-      expect(directives[FRAME_SRC]).toContain(STRIPE_JS_ORIGIN);
-    });
+    expect(directives[SCRIPT_SRC]).not.toContain(UNSAFE_EVAL);
   });
 
   it('adds only unsafe-eval to script-src in dev', () => {

@@ -10,6 +10,7 @@ import {
   BILLING_LOG,
   STRIPE_CHECKOUT_SESSION_ID_TEMPLATE,
   type TUpgradeRefusal,
+  UPGRADE_REFUSAL,
   UPGRADE_SEARCH_PARAM,
   UPGRADE_STATE,
 } from '@platform/constants/billing';
@@ -21,6 +22,11 @@ import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { createGrowthCheckoutSession } from './create-growth-checkout-session';
+import { ensureStripeCustomer } from './ensure-stripe-customer';
+import {
+  expireOpenCheckouts,
+  hasLiveSubscription,
+} from './prepare-customer-checkout';
 import { getStripeClient } from './stripe-client';
 import {
   type TUpgradeCheckoutInput,
@@ -71,10 +77,27 @@ export const createUpgradeCheckoutAction = async (
   }
 
   try {
+    const customerId = await ensureStripeCustomer(
+      stripe,
+      tenant,
+      await getSessionEmail(),
+    );
+    if (!customerId) {
+      logger.error(BILLING_LOG.CHECKOUT_CUSTOMER_MISSING, { tenantId });
+      return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
+    }
+    if (await hasLiveSubscription(stripe, customerId)) {
+      return {
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: UPGRADE_REFUSAL.SUBSCRIBED,
+      };
+    }
+    await expireOpenCheckouts(stripe, customerId);
+
     const clientSecret = await createGrowthCheckoutSession(stripe, {
       ...parsed.data,
-      tenant,
-      email: await getSessionEmail(),
+      tenantId,
+      customerId,
       returnUrl: toReturnUrl(baseUrl),
     });
     if (!clientSecret) return toOutcome(ACTION_OUTCOME.SERVER_ERROR);

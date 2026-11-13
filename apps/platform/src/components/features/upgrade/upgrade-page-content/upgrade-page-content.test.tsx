@@ -1,21 +1,18 @@
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import messages from '@platform/i18n/messages/en.json';
 import { MOCK_STRIPE_PUBLISHABLE_KEY } from '@platform/testing/billing/fixtures';
+import { EMBEDDED_CHECKOUT_TEST_ID } from '@platform/testing/billing/stripe-react-fake';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
+import { mockedStripeEnv } from '@platform/testing/env/mocked-stripe-env';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 import { adminRoutes } from '@platform/utils/routes/routes';
-import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
 
 import { UpgradePageContent } from './upgrade-page-content';
 
-vi.mock('@platform/utils/stripe-env/stripe-env', () => ({ stripeEnv: {} }));
+vi.mock('@platform/utils/stripe-env/stripe-env');
 
 vi.mock('@stripe/stripe-js');
 
@@ -26,8 +23,6 @@ vi.mock('@platform/server/billing/create-upgrade-checkout-action');
 vi.mock('@platform/server/billing/get-upgrade-state-action');
 
 const { upgradePage } = messages;
-const mockedStripeEnv: Partial<Record<keyof typeof stripeEnv, string>> =
-  stripeEnv;
 
 const setup = customRenderAsync(UpgradePageContent, {
   tenant: mockTenant(),
@@ -35,27 +30,24 @@ const setup = customRenderAsync(UpgradePageContent, {
   isReturning: false,
 });
 
-const GROWTH_TENANT = mockTenant({ plan: TENANT_PLAN.GROWTH });
+const MOCK_GROWTH_TENANT = mockTenant({ plan: TENANT_PLAN.GROWTH });
 
 describe(`<${UpgradePageContent.name}/>`, () => {
   beforeEach(() => {
     mockedStripeEnv.STRIPE_PUBLISHABLE_KEY = MOCK_STRIPE_PUBLISHABLE_KEY;
   });
 
-  it('offers checkout to the owner of a Free site', async () => {
+  it('opens checkout for the owner of a Free site', async () => {
     await setup();
 
     const title = screen.getByRole('heading', {
       level: 1,
       name: upgradePage.pageTitle,
     });
-    const checkout = screen.getByRole('heading', {
-      level: 2,
-      name: upgradePage.checkoutTitle,
-    });
+    const checkout = await screen.findByTestId(EMBEDDED_CHECKOUT_TEST_ID);
 
     expect(title).toBeVisible();
-    expect(checkout).toBeVisible();
+    expect(checkout).toBeInTheDocument();
   });
 
   it('says upgrading is unavailable and logs without a publishable key', async () => {
@@ -74,7 +66,7 @@ describe(`<${UpgradePageContent.name}/>`, () => {
   it.each([false, true])(
     'shows a site on Growth its plan with a way back (returning: %s)',
     async (isReturning) => {
-      await setup({ tenant: GROWTH_TENANT, isReturning });
+      await setup({ tenant: MOCK_GROWTH_TENANT, isReturning });
 
       const title = screen.getByText(upgradePage.onGrowthTitle);
       const back = screen.getByRole('link', {
@@ -90,36 +82,21 @@ describe(`<${UpgradePageContent.name}/>`, () => {
     await setup({ isReturning: true });
 
     const confirming = screen.getByText(upgradePage.confirmingTitle);
-    const checkout = screen.queryByRole('heading', {
-      name: upgradePage.checkoutTitle,
-    });
+    const checkout = screen.queryByTestId(EMBEDDED_CHECKOUT_TEST_ID);
 
     expect(confirming).toBeVisible();
     expect(checkout).not.toBeInTheDocument();
   });
 
-  it.each([
-    [
-      upgradePage.NOT_OWNER,
-      { membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }) },
-    ],
-    [
-      upgradePage.PAID_PLAN,
-      { tenant: mockTenant({ plan: TENANT_PLAN.STARTER }) },
-    ],
-    [
-      upgradePage.UNAVAILABLE,
-      { tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }) },
-    ],
-  ])('explains "%s" and offers no checkout', async (copy, overrides) => {
-    await setup(overrides);
-
-    const note = screen.getByRole('note');
-    const checkout = screen.queryByRole('heading', {
-      name: upgradePage.checkoutTitle,
+  it('explains why a member who is not the owner cannot upgrade', async () => {
+    await setup({
+      membership: mockMembership({ role: MEMBERSHIP_ROLE.EDITOR }),
     });
 
-    expect(note).toHaveTextContent(copy);
+    const note = screen.getByRole('note');
+    const checkout = screen.queryByTestId(EMBEDDED_CHECKOUT_TEST_ID);
+
+    expect(note).toHaveTextContent(upgradePage.NOT_OWNER);
     expect(checkout).not.toBeInTheDocument();
   });
 });

@@ -2187,7 +2187,7 @@
     "intervalLabel": "Période de facturation",
     "MONTHLY": "Mensuel",
     "YEARLY": "Annuel",
-    "checkoutFailed": "Le paiement n'a pas pu démarrer. Choisissez une période de facturation pour réessayer.",
+    "checkoutFailed": "Le paiement n'a pas pu démarrer.",
     "unconfigured": "Le changement d'offre n'est pas disponible pour le moment. Réessayez plus tard.",
     "onGrowthTitle": "Votre site est sur Growth",
     "onGrowthDescription": "Toutes les options Growth sont ouvertes sur votre site.",
@@ -2197,6 +2197,11 @@
     "ON_GROWTH": "Votre site est déjà sur Growth.",
     "NOT_OWNER": "Seul le propriétaire de votre site peut changer d'offre.",
     "PAID_PLAN": "Votre site a déjà une offre payante, il n'y a donc rien à changer ici.",
-    "UNAVAILABLE": "Le changement d'offre sera de nouveau possible dès que votre site fonctionnera."
+    "UNAVAILABLE": "Le changement d'offre sera de nouveau possible dès que votre site fonctionnera.",
+    "tryAgain": "Réessayer",
+    "SUBSCRIBED": "Votre paiement est en cours de confirmation. Votre offre change dès qu'il est confirmé ; inutile de payer à nouveau.",
+    "slowTitle": "Cela prend plus de temps que d'habitude",
+    "slowDescription": "Votre paiement est peut-être encore en cours de confirmation. Vérifiez de nouveau dans un instant ; nous vous enverrons aussi un e-mail dès que votre offre change.",
+    "checkAgain": "Vérifier de nouveau"
   }
 }

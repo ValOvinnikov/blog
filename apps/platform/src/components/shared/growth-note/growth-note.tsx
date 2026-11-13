@@ -6,7 +6,6 @@ import { buttonVariants } from '@platform/components/shared/button/button-varian
 import { GrowthBadge } from '@platform/components/shared/growth-badge';
 import { Icon, STATUS_ICON } from '@platform/components/shared/icon';
 import { LinkButton } from '@platform/components/shared/link-button';
-import { BUTTON_VARIANT } from '@platform/constants/button';
 import { ICON_SIZE } from '@platform/constants/icon';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
@@ -66,11 +65,7 @@ export const GrowthNote = ({ items, closingLine }: TGrowthNoteProps) => {
             className={chevron()}
           />
         </Collapsible.Trigger>
-        <LinkButton
-          href={adminRoutes.dashboardUpgrade()}
-          variant={BUTTON_VARIANT.PRIMARY}
-          size={SIZE.SM}
-        >
+        <LinkButton href={adminRoutes.dashboardUpgrade()} size={SIZE.SM}>
           {t('askAboutGrowth')}
         </LinkButton>
       </div>

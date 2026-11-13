@@ -19,6 +19,7 @@ import {
   MOCK_OPERATOR_EMAIL,
   MOCK_OPERATOR_ID,
 } from '@platform/testing/admins/operator';
+import { MOCK_SESSION_EXPIRES } from '@platform/testing/auth/fixtures';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -47,7 +48,6 @@ vi.mock('@blog/db', () => ({
 
 faker.seed(5997);
 
-const MOCK_SESSION_EXPIRES = '2099-01-01T00:00:00.000Z';
 const MOCK_SAVE_ERROR = new Error(faker.lorem.sentence());
 
 const setTenantAdditionalLocalesMock = vi.mocked(

@@ -10,14 +10,15 @@ import {
   MOCK_STRIPE_WEBHOOK_SECRET,
   mockStripeEvent,
 } from '@platform/testing/billing/fixtures';
+import { mockedStripeEnv } from '@platform/testing/env/mocked-stripe-env';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import { logger } from '@platform/utils/logger/logger';
-import { stripeEnv } from '@platform/utils/stripe-env/stripe-env';
 import Stripe from 'stripe';
 
 import { POST } from './route';
 
-vi.mock('@platform/utils/stripe-env/stripe-env', () => ({ stripeEnv: {} }));
+vi.mock('@platform/utils/stripe-env/stripe-env');
+
 vi.mock('@platform/server/billing/handle-stripe-event', () => ({
   handleStripeEvent: vi.fn(),
 }));
@@ -25,9 +26,6 @@ vi.mock('@platform/server/billing/handle-stripe-event', () => ({
 const MOCK_ENDPOINT = createMockFaker(6876).internet.url();
 const MOCK_SIGNER = new Stripe(MOCK_STRIPE_SECRET_KEY);
 const MOCK_PAYLOAD = JSON.stringify(mockStripeEvent());
-
-const mockedStripeEnv: Partial<Record<keyof typeof stripeEnv, string>> =
-  stripeEnv;
 
 const webhookRequest = (signature?: string): Request =>
   new Request(MOCK_ENDPOINT, {

@@ -2187,7 +2187,7 @@
     "intervalLabel": "Abrechnungszeitraum",
     "MONTHLY": "Monatlich",
     "YEARLY": "Jährlich",
-    "checkoutFailed": "Die Kasse konnte nicht starten. Wähle einen Abrechnungszeitraum, um es erneut zu versuchen.",
+    "checkoutFailed": "Die Kasse konnte nicht starten.",
     "unconfigured": "Ein Upgrade ist gerade nicht möglich. Versuche es später erneut.",
     "onGrowthTitle": "Deine Website nutzt Growth",
     "onGrowthDescription": "Alle Growth-Optionen sind auf deiner Website freigeschaltet.",
@@ -2197,6 +2197,11 @@
     "ON_GROWTH": "Deine Website nutzt bereits Growth.",
     "NOT_OWNER": "Nur der Inhaber deiner Website kann ein Upgrade durchführen.",
     "PAID_PLAN": "Deine Website hat bereits einen kostenpflichtigen Tarif, daher gibt es hier nichts zu upgraden.",
-    "UNAVAILABLE": "Ein Upgrade ist wieder möglich, sobald deine Website läuft."
+    "UNAVAILABLE": "Ein Upgrade ist wieder möglich, sobald deine Website läuft.",
+    "tryAgain": "Erneut versuchen",
+    "SUBSCRIBED": "Deine Zahlung wird gerade bestätigt. Dein Tarif ändert sich, sobald sie bestätigt ist, du musst also nicht erneut zahlen.",
+    "slowTitle": "Das dauert länger als üblich",
+    "slowDescription": "Deine Zahlung wird vielleicht noch bestätigt. Prüfe es gleich noch einmal; wir schicken dir auch eine E-Mail, sobald sich dein Tarif ändert.",
+    "checkAgain": "Erneut prüfen"
   }
 }

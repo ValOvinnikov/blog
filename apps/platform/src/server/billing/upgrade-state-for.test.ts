@@ -5,6 +5,7 @@ import {
 } from '@blog/db/constants';
 import { UPGRADE_STATE } from '@platform/constants/billing';
 import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
+import { MOCK_OPERATOR_ID } from '@platform/testing/admins/operator';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_CREATED_AT,
@@ -14,7 +15,7 @@ import {
 
 import { upgradeStateFor } from './upgrade-state-for';
 
-const OWNER = mockMembership();
+const MOCK_OWNER = mockMembership();
 
 describe(upgradeStateFor, () => {
   it.each([
@@ -26,7 +27,7 @@ describe(upgradeStateFor, () => {
     [TENANT_PLAN.FREE, TENANT_STATUS.SUSPENDED, UPGRADE_STATE.UNAVAILABLE],
     [TENANT_PLAN.FREE, TENANT_STATUS.ARCHIVED, UPGRADE_STATE.UNAVAILABLE],
   ])('gives a %s site in %s the %s state', (plan, status, expected) => {
-    const state = upgradeStateFor(mockTenant({ plan, status }), OWNER);
+    const state = upgradeStateFor(mockTenant({ plan, status }), MOCK_OWNER);
 
     expect(state).toBe(expected);
   });
@@ -34,7 +35,7 @@ describe(upgradeStateFor, () => {
   it('makes a deprovisioned Free site unavailable', () => {
     const tenant = mockTenant({ deprovisionedAt: MOCK_TENANT_CREATED_AT });
 
-    expect(upgradeStateFor(tenant, OWNER)).toBe(UPGRADE_STATE.UNAVAILABLE);
+    expect(upgradeStateFor(tenant, MOCK_OWNER)).toBe(UPGRADE_STATE.UNAVAILABLE);
   });
 
   it.each([MEMBERSHIP_ROLE.EDITOR, MEMBERSHIP_ROLE.READER])(
@@ -47,7 +48,10 @@ describe(upgradeStateFor, () => {
   );
 
   it('refuses an operator viewing the site as its owner', () => {
-    const operator = buildVirtualAdminMembership('operator-1', MOCK_TENANT_ID);
+    const operator = buildVirtualAdminMembership(
+      MOCK_OPERATOR_ID,
+      MOCK_TENANT_ID,
+    );
 
     expect(upgradeStateFor(mockTenant(), operator)).toBe(
       UPGRADE_STATE.NOT_OWNER,

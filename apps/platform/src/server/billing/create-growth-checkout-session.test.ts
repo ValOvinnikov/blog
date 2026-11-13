@@ -12,73 +12,58 @@ import {
   MOCK_STRIPE_PROMOTION_CODE,
   MOCK_STRIPE_PROMOTION_CODE_ID,
 } from '@platform/testing/billing/fixtures';
-import {
-  MOCK_OWNER_EMAIL,
-  MOCK_TENANT_ID,
-} from '@platform/testing/tenants/fixtures';
+import { mockStripeCheckoutClient } from '@platform/testing/billing/stripe-checkout-client';
+import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
-import type Stripe from 'stripe';
 
 import {
   createGrowthCheckoutSession,
   type TGrowthCheckoutRequest,
 } from './create-growth-checkout-session';
 
-const { listPricesMock, listPromotionCodesMock, createSessionMock } =
-  vi.hoisted(() => ({
-    listPricesMock: vi.fn(),
-    listPromotionCodesMock: vi.fn(),
-    createSessionMock: vi.fn(),
-  }));
+const { stripe, listPrices, listPromotionCodes, createSession } =
+  mockStripeCheckoutClient();
 
-const MOCK_STRIPE = {
-  prices: { list: listPricesMock },
-  promotionCodes: { list: listPromotionCodesMock },
-  checkout: { sessions: { create: createSessionMock } },
-} as unknown as Stripe;
-
-const NEW_CUSTOMER_TENANT = { id: MOCK_TENANT_ID, stripeCustomerId: null };
-const METADATA = { [STRIPE_TENANT_METADATA_KEY]: MOCK_TENANT_ID };
+const MOCK_METADATA = { [STRIPE_TENANT_METADATA_KEY]: MOCK_TENANT_ID };
+const MOCK_PROMOTION_DISCOUNTS = [
+  { promotion_code: MOCK_STRIPE_PROMOTION_CODE_ID },
+];
 
 const request = (
   overrides: Partial<TGrowthCheckoutRequest> = {},
 ): TGrowthCheckoutRequest => ({
-  tenant: NEW_CUSTOMER_TENANT,
+  tenantId: MOCK_TENANT_ID,
+  customerId: MOCK_STRIPE_CUSTOMER_ID,
   interval: BILLING_INTERVAL.MONTHLY,
   returnUrl: MOCK_CHECKOUT_RETURN_URL,
-  email: MOCK_OWNER_EMAIL,
   ...overrides,
 });
 
-const createdSession = () => createSessionMock.mock.calls[0]?.[0];
+const sessionParams = (call = 0) =>
+  createSession.mock.calls[call]?.[0] as Record<string, unknown>;
 
-describe(createGrowthCheckoutSession, () => {
-  beforeEach(() => {
-    listPricesMock.mockResolvedValue({ data: [{ id: MOCK_STRIPE_PRICE_ID }] });
-    listPromotionCodesMock.mockResolvedValue({ data: [] });
-    createSessionMock.mockResolvedValue({
-      client_secret: MOCK_CHECKOUT_CLIENT_SECRET,
-    });
+const findsPromotionCode = () =>
+  listPromotionCodes.mockResolvedValueOnce({
+    data: [{ id: MOCK_STRIPE_PROMOTION_CODE_ID }],
   });
 
-  it('opens an embedded Growth subscription checkout with tax for a new customer', async () => {
-    const clientSecret = await createGrowthCheckoutSession(
-      MOCK_STRIPE,
-      request(),
-    );
+describe(createGrowthCheckoutSession, () => {
+  it("opens an embedded Growth checkout with tax for the site's customer", async () => {
+    const clientSecret = await createGrowthCheckoutSession(stripe, request());
 
     expect(clientSecret).toBe(MOCK_CHECKOUT_CLIENT_SECRET);
-    expect(createdSession()).toEqual({
+    expect(sessionParams()).toEqual({
       ui_mode: 'embedded_page',
       mode: 'subscription',
       line_items: [{ price: MOCK_STRIPE_PRICE_ID, quantity: 1 }],
       automatic_tax: { enabled: true },
-      allow_promotion_codes: true,
-      customer_email: MOCK_OWNER_EMAIL,
+      customer: MOCK_STRIPE_CUSTOMER_ID,
+      customer_update: { address: 'auto', name: 'auto' },
       client_reference_id: MOCK_TENANT_ID,
-      metadata: METADATA,
-      subscription_data: { metadata: METADATA },
+      metadata: MOCK_METADATA,
+      subscription_data: { metadata: MOCK_METADATA },
       return_url: MOCK_CHECKOUT_RETURN_URL,
+      allow_promotion_codes: true,
     });
   });
 
@@ -86,78 +71,101 @@ describe(createGrowthCheckoutSession, () => {
     [BILLING_INTERVAL.MONTHLY, STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY],
     [BILLING_INTERVAL.YEARLY, STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY],
   ])('charges the %s Growth price', async (interval, lookupKey) => {
-    await createGrowthCheckoutSession(MOCK_STRIPE, request({ interval }));
+    await createGrowthCheckoutSession(stripe, request({ interval }));
 
-    expect(listPricesMock).toHaveBeenCalledWith({
+    expect(listPrices).toHaveBeenCalledWith({
       lookup_keys: [lookupKey],
       active: true,
       limit: 1,
     });
   });
 
-  it('reuses a stored customer and keeps its address current for tax', async () => {
-    await createGrowthCheckoutSession(
-      MOCK_STRIPE,
-      request({
-        tenant: {
-          id: MOCK_TENANT_ID,
-          stripeCustomerId: MOCK_STRIPE_CUSTOMER_ID,
-        },
-      }),
-    );
-
-    const { customer, customer_update, customer_email } = createdSession();
-    expect(customer).toBe(MOCK_STRIPE_CUSTOMER_ID);
-    expect(customer_update).toEqual({ address: 'auto', name: 'auto' });
-    expect(customer_email).toBeUndefined();
-  });
-
-  it('applies an active promotion code and hides the code field', async () => {
-    listPromotionCodesMock.mockResolvedValueOnce({
-      data: [{ id: MOCK_STRIPE_PROMOTION_CODE_ID }],
-    });
-
-    await createGrowthCheckoutSession(
-      MOCK_STRIPE,
-      request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
-    );
-
-    const { discounts, allow_promotion_codes } = createdSession();
-    expect(listPromotionCodesMock).toHaveBeenCalledWith({
-      code: MOCK_STRIPE_PROMOTION_CODE,
-      active: true,
-      limit: 1,
-    });
-    expect(discounts).toEqual([
-      { promotion_code: MOCK_STRIPE_PROMOTION_CODE_ID },
-    ]);
-    expect(allow_promotion_codes).toBeUndefined();
-  });
-
   it('offers the code field when the promotion code is unknown', async () => {
     await createGrowthCheckoutSession(
-      MOCK_STRIPE,
+      stripe,
       request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
     );
 
-    const { discounts, allow_promotion_codes } = createdSession();
+    const { discounts, allow_promotion_codes } = sessionParams();
     expect(discounts).toBeUndefined();
     expect(allow_promotion_codes).toBe(true);
   });
 
-  it('opens no checkout and logs when Stripe has no Growth price', async () => {
-    listPricesMock.mockResolvedValueOnce({ data: [] });
+  describe('with an active promotion code', () => {
+    beforeEach(() => {
+      findsPromotionCode();
+    });
+
+    it('applies an active promotion code and hides the code field', async () => {
+      await createGrowthCheckoutSession(
+        stripe,
+        request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
+      );
+
+      const { discounts, allow_promotion_codes } = sessionParams();
+      expect(listPromotionCodes).toHaveBeenCalledWith({
+        code: MOCK_STRIPE_PROMOTION_CODE,
+        active: true,
+        limit: 1,
+      });
+      expect(discounts).toEqual(MOCK_PROMOTION_DISCOUNTS);
+      expect(allow_promotion_codes).toBeUndefined();
+    });
+
+    it('retries with the code field and logs when Stripe refuses the code', async () => {
+      createSession.mockRejectedValueOnce(new Error());
+
+      const clientSecret = await createGrowthCheckoutSession(
+        stripe,
+        request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
+      );
+
+      const { discounts, allow_promotion_codes } = sessionParams(1);
+      const [event, context] = vi.mocked(logger).warn.mock.calls[0]!;
+      expect(clientSecret).toBe(MOCK_CHECKOUT_CLIENT_SECRET);
+      expect(discounts).toBeUndefined();
+      expect(allow_promotion_codes).toBe(true);
+      expect(event).toBe(BILLING_LOG.CHECKOUT_PROMO_REFUSED);
+      expect(context?.promo).toBe(MOCK_STRIPE_PROMOTION_CODE);
+    });
+  });
+
+  it('opens checkout with the code field when the code lookup fails', async () => {
+    listPromotionCodes.mockRejectedValueOnce(new Error());
 
     const clientSecret = await createGrowthCheckoutSession(
-      MOCK_STRIPE,
-      request(),
+      stripe,
+      request({ promo: MOCK_STRIPE_PROMOTION_CODE }),
     );
 
+    const [event] = vi.mocked(logger).warn.mock.calls[0]!;
+    expect(clientSecret).toBe(MOCK_CHECKOUT_CLIENT_SECRET);
+    expect(sessionParams().allow_promotion_codes).toBe(true);
+    expect(event).toBe(BILLING_LOG.CHECKOUT_PROMO_REFUSED);
+  });
+
+  it('opens no checkout and logs when Stripe has no Growth price', async () => {
+    listPrices.mockResolvedValueOnce({ data: [] });
+
+    const clientSecret = await createGrowthCheckoutSession(stripe, request());
+
     expect(clientSecret).toBeUndefined();
-    expect(createSessionMock).not.toHaveBeenCalled();
+    expect(createSession).not.toHaveBeenCalled();
     expect(vi.mocked(logger).error).toHaveBeenCalledWith(
       BILLING_LOG.CHECKOUT_PRICE_MISSING,
       { tenantId: MOCK_TENANT_ID, interval: BILLING_INTERVAL.MONTHLY },
+    );
+  });
+
+  it('logs a session that comes back without a client secret', async () => {
+    createSession.mockResolvedValueOnce({ client_secret: null });
+
+    const clientSecret = await createGrowthCheckoutSession(stripe, request());
+
+    expect(clientSecret).toBeUndefined();
+    expect(vi.mocked(logger).error).toHaveBeenCalledWith(
+      BILLING_LOG.CHECKOUT_FAILED,
+      { tenantId: MOCK_TENANT_ID, hasClientSecret: false },
     );
   });
 });

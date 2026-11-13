@@ -168,6 +168,12 @@
         "file": "apps/platform/src/constants/billing.ts"
       },
       {
+        "ref": "UPGRADE_REFUSAL.UNAVAILABLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
         "ref": "SITE_ADDRESS_STATUS.UNAVAILABLE",
         "scope": "app:platform",
         "from": "@platform/constants/onboarding",
@@ -5380,6 +5386,22 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.checkout_customer_missing": [
+      {
+        "ref": "BILLING_LOG.CHECKOUT_CUSTOMER_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.checkout_promo_refused": [
+      {
+        "ref": "BILLING_LOG.CHECKOUT_PROMO_REFUSED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "customer.subscription.created": [
       {
         "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
@@ -5460,6 +5482,22 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "open": [
+      {
+        "ref": "STRIPE_CHECKOUT_SESSION_STATUS.OPEN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "resource_missing": [
+      {
+        "ref": "STRIPE_ERROR_CODE.RESOURCE_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "START": [
       {
         "ref": "BILLING_GRACE.START",
@@ -5532,6 +5570,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "UPGRADE_REFUSAL.ON_GROWTH",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
       }
     ],
     "NOT_OWNER": [
@@ -5540,11 +5584,31 @@
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "UPGRADE_REFUSAL.NOT_OWNER",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
       }
     ],
     "PAID_PLAN": [
       {
         "ref": "UPGRADE_STATE.PAID_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      },
+      {
+        "ref": "UPGRADE_REFUSAL.PAID_PLAN",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "SUBSCRIBED": [
+      {
+        "ref": "UPGRADE_REFUSAL.SUBSCRIBED",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"

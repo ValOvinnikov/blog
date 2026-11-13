@@ -2,23 +2,25 @@ import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
 import { PLAN_PRICE_LOOKUP_KEYS, TENANT_PLAN } from '@blog/db/constants';
-import type { TTenant } from '@blog/db/schema/tenants';
 import {
   BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_TENANT_METADATA_KEY,
   type TBillingInterval,
 } from '@platform/constants/billing';
+import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
 import type Stripe from 'stripe';
 
 export type TGrowthCheckoutRequest = {
-  tenant: Pick<TTenant, 'id' | 'stripeCustomerId'>;
+  tenantId: string;
+  customerId: string;
   interval: TBillingInterval;
   returnUrl: string;
   promo?: string;
-  email?: string;
 };
+
+type TPromoContext = { tenantId: string; promo?: string };
 
 const findGrowthPrice = async (
   stripe: Stripe,
@@ -38,25 +40,58 @@ const findGrowthPrice = async (
 
 const findPromotionCodeId = async (
   stripe: Stripe,
-  code: TMaybeUndefined<string>,
+  { tenantId, promo }: TPromoContext,
 ): Promise<TMaybeUndefined<string>> => {
-  if (!code) return undefined;
-  const { data } = await stripe.promotionCodes.list({
-    code,
-    active: true,
-    limit: 1,
-  });
-  return data[0]?.id;
+  if (!promo) return undefined;
+  try {
+    const { data } = await stripe.promotionCodes.list({
+      code: promo,
+      active: true,
+      limit: 1,
+    });
+    return data[0]?.id;
+  } catch (error) {
+    logger.warn(BILLING_LOG.CHECKOUT_PROMO_REFUSED, {
+      tenantId,
+      promo,
+      ...toLoggableError(error),
+    });
+    return undefined;
+  }
+};
+
+const createSession = async (
+  stripe: Stripe,
+  params: Stripe.Checkout.SessionCreateParams,
+  promotionCodeId: TMaybeUndefined<string>,
+  context: TPromoContext,
+): Promise<Stripe.Checkout.Session> => {
+  const withCodeField = () =>
+    stripe.checkout.sessions.create({ ...params, allow_promotion_codes: true });
+  if (!promotionCodeId) return withCodeField();
+
+  try {
+    return await stripe.checkout.sessions.create({
+      ...params,
+      discounts: [{ promotion_code: promotionCodeId }],
+    });
+  } catch (error) {
+    logger.warn(BILLING_LOG.CHECKOUT_PROMO_REFUSED, {
+      ...context,
+      ...toLoggableError(error),
+    });
+    return withCodeField();
+  }
 };
 
 export const createGrowthCheckoutSession = async (
   stripe: Stripe,
-  { tenant, interval, returnUrl, promo, email }: TGrowthCheckoutRequest,
+  { tenantId, customerId, interval, returnUrl, promo }: TGrowthCheckoutRequest,
 ): Promise<TMaybeUndefined<string>> => {
-  const { id: tenantId, stripeCustomerId } = tenant;
+  const context = { tenantId, promo };
   const [price, promotionCodeId] = await Promise.all([
     findGrowthPrice(stripe, interval),
-    findPromotionCodeId(stripe, promo),
+    findPromotionCodeId(stripe, context),
   ]);
   if (!price) {
     logger.error(BILLING_LOG.CHECKOUT_PRICE_MISSING, { tenantId, interval });
@@ -64,25 +99,29 @@ export const createGrowthCheckoutSession = async (
   }
 
   const metadata = { [STRIPE_TENANT_METADATA_KEY]: tenantId };
-  const session = await stripe.checkout.sessions.create({
-    ui_mode: 'embedded_page',
-    mode: 'subscription',
-    line_items: [{ price: price.id, quantity: 1 }],
-    automatic_tax: { enabled: true },
-    ...(promotionCodeId
-      ? { discounts: [{ promotion_code: promotionCodeId }] }
-      : { allow_promotion_codes: true }),
-    ...(stripeCustomerId
-      ? {
-          customer: stripeCustomerId,
-          customer_update: { address: 'auto', name: 'auto' },
-        }
-      : { customer_email: email }),
-    client_reference_id: tenantId,
-    metadata,
-    subscription_data: { metadata },
-    return_url: returnUrl,
-  });
-
-  return session.client_secret ?? undefined;
+  const { client_secret } = await createSession(
+    stripe,
+    {
+      ui_mode: 'embedded_page',
+      mode: 'subscription',
+      line_items: [{ price: price.id, quantity: 1 }],
+      automatic_tax: { enabled: true },
+      customer: customerId,
+      customer_update: { address: 'auto', name: 'auto' },
+      client_reference_id: tenantId,
+      metadata,
+      subscription_data: { metadata },
+      return_url: returnUrl,
+    },
+    promotionCodeId,
+    context,
+  );
+  if (!client_secret) {
+    logger.error(BILLING_LOG.CHECKOUT_FAILED, {
+      tenantId,
+      hasClientSecret: false,
+    });
+    return undefined;
+  }
+  return client_secret;
 };

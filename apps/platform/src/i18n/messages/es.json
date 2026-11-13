@@ -2187,7 +2187,7 @@
     "intervalLabel": "Periodo de facturación",
     "MONTHLY": "Mensual",
     "YEARLY": "Anual",
-    "checkoutFailed": "No se pudo iniciar el pago. Elige un periodo de facturación para volver a intentarlo.",
+    "checkoutFailed": "No se pudo iniciar el pago.",
     "unconfigured": "Ahora mismo no se puede mejorar el plan. Inténtalo más tarde.",
     "onGrowthTitle": "Tu sitio está en Growth",
     "onGrowthDescription": "Todas las opciones de Growth están disponibles en tu sitio.",
@@ -2197,6 +2197,11 @@
     "ON_GROWTH": "Tu sitio ya está en Growth.",
     "NOT_OWNER": "Solo el propietario de tu sitio puede mejorar el plan.",
     "PAID_PLAN": "Tu sitio ya tiene un plan de pago, así que aquí no hay nada que mejorar.",
-    "UNAVAILABLE": "Podrás mejorar el plan cuando tu sitio vuelva a estar activo."
+    "UNAVAILABLE": "Podrás mejorar el plan cuando tu sitio vuelva a estar activo.",
+    "tryAgain": "Reintentar",
+    "SUBSCRIBED": "Estamos confirmando tu pago. Tu plan cambiará en cuanto se confirme, así que no hace falta volver a pagar.",
+    "slowTitle": "Esto está tardando más de lo habitual",
+    "slowDescription": "Puede que tu pago aún se esté confirmando. Vuelve a comprobarlo en un momento; también te enviaremos un correo cuando cambie tu plan.",
+    "checkAgain": "Volver a comprobar"
   }
 }

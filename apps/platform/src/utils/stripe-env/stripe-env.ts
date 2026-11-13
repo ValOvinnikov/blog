@@ -7,7 +7,7 @@ export const stripeEnv = createEnv({
     STRIPE_SECRET_KEY: z.string().min(1).optional(),
     // @env-required: production
     STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
-    // Public by design: the server hands it to the Upgrade page's Stripe.js as a prop.
+    // Public by design: it reaches the browser as a prop, so it needs no NEXT_PUBLIC_ copy.
     // @env-required: production
     STRIPE_PUBLISHABLE_KEY: z.string().min(1).optional(),
   },

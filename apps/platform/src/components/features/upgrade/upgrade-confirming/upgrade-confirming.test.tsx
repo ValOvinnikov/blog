@@ -4,6 +4,7 @@ import { getUpgradeStateAction } from '@platform/server/billing/get-upgrade-stat
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { mockLocaleRouter } from '@platform/testing/mock-locale-router';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
+import { fireEvent } from '@testing-library/react';
 import type { Mock } from 'vitest';
 
 import { UpgradeConfirming } from './upgrade-confirming';
@@ -33,17 +34,16 @@ describe(`<${UpgradeConfirming.name}/>`, () => {
     vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval'] });
     ({ refresh } = mockLocaleRouter());
     setup();
-    getStateMock.mockResolvedValue(UPGRADE_STATE.AVAILABLE);
   });
 
   afterEach(() => {
     vi.useRealTimers();
   });
 
-  it('says the payment is being confirmed', () => {
-    const title = screen.getByText(upgradePage.confirmingTitle);
+  it('says the payment is being confirmed in one status region', () => {
+    const status = screen.getByRole('status');
 
-    expect(title).toBeVisible();
+    expect(status).toHaveTextContent(upgradePage.confirmingTitle);
   });
 
   it('keeps checking without reloading while the plan has not changed', async () => {
@@ -55,13 +55,52 @@ describe(`<${UpgradeConfirming.name}/>`, () => {
     expect(refresh).not.toHaveBeenCalled();
   });
 
-  it('reloads the page once the site is on Growth and stops checking', async () => {
+  it('announces Growth in the same region and reloads once', async () => {
     getStateMock.mockResolvedValueOnce(UPGRADE_STATE.ON_GROWTH);
 
     await advancePoll();
     await advancePoll();
 
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(upgradePage.onGrowthTitle);
     expect(refresh).toHaveBeenCalledOnce();
     expect(getStateMock).toHaveBeenCalledOnce();
+  });
+
+  it('says it is taking longer when a check fails', async () => {
+    getStateMock.mockRejectedValueOnce(new Error());
+
+    await advancePoll();
+
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent(upgradePage.slowTitle);
+  });
+
+  describe('once every check has run without a change', () => {
+    beforeEach(async () => {
+      for (let tick = 0; tick < UPGRADE_POLL.MAX_TICKS; tick += 1) {
+        await advancePoll();
+      }
+    });
+
+    it('says it is taking longer than usual', () => {
+      const status = screen.getByRole('status');
+
+      expect(status).toHaveTextContent(upgradePage.slowTitle);
+    });
+
+    it('checks again and reloads from Check again', async () => {
+      const checkAgain = screen.getByRole('button', {
+        name: upgradePage.checkAgain,
+      });
+
+      fireEvent.click(checkAgain);
+      await advancePoll();
+
+      const status = screen.getByRole('status');
+      expect(refresh).toHaveBeenCalledOnce();
+      expect(getStateMock).toHaveBeenCalledTimes(UPGRADE_POLL.MAX_TICKS + 1);
+      expect(status).toHaveTextContent(upgradePage.confirmingTitle);
+    });
   });
 });

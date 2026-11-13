@@ -15,6 +15,8 @@ export const BILLING_LOG = {
   CHECKOUT_UNCONFIGURED: 'billing.checkout_unconfigured',
   CHECKOUT_PRICE_MISSING: 'billing.checkout_price_missing',
   CHECKOUT_FAILED: 'billing.checkout_failed',
+  CHECKOUT_CUSTOMER_MISSING: 'billing.checkout_customer_missing',
+  CHECKOUT_PROMO_REFUSED: 'billing.checkout_promo_refused',
 } as const;
 
 export const STRIPE_EVENT_TYPE = {
@@ -32,6 +34,16 @@ export const STRIPE_SUBSCRIPTION_STATUS = {
   CANCELED: 'canceled',
   UNPAID: 'unpaid',
 } as const;
+
+export const STRIPE_CHECKOUT_SESSION_STATUS = {
+  OPEN: 'open',
+} as const;
+
+export const STRIPE_ERROR_CODE = {
+  RESOURCE_MISSING: 'resource_missing',
+} as const;
+
+export const STRIPE_CUSTOMER_IDEMPOTENCY_PREFIX = 'tenant-customer-';
 
 export const STRIPE_LIVE_SUBSCRIPTION_STATUSES = [
   STRIPE_SUBSCRIPTION_STATUS.ACTIVE,
@@ -70,10 +82,15 @@ export const UPGRADE_STATE = {
 
 export type TUpgradeState = TValueOf<typeof UPGRADE_STATE>;
 
-export type TUpgradeRefusal = Exclude<
-  TUpgradeState,
-  typeof UPGRADE_STATE.AVAILABLE
->;
+export const UPGRADE_REFUSAL = {
+  ON_GROWTH: 'ON_GROWTH',
+  NOT_OWNER: 'NOT_OWNER',
+  PAID_PLAN: 'PAID_PLAN',
+  UNAVAILABLE: 'UNAVAILABLE',
+  SUBSCRIBED: 'SUBSCRIBED',
+} as const;
+
+export type TUpgradeRefusal = TValueOf<typeof UPGRADE_REFUSAL>;
 
 export const UPGRADE_SEARCH_PARAM = {
   PROMO: 'promo',

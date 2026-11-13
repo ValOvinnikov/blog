@@ -18,7 +18,7 @@ vi.mock('@platform/components/features/upgrade/upgrade-page-content', () => ({
   UpgradePageContent: vi.fn(async () => null),
 }));
 
-const CONTEXT = {
+const MOCK_CONTEXT = {
   tenant: mockTenant(),
   membership: mockMembership(),
   tenants: [mockTenant()],
@@ -26,7 +26,7 @@ const CONTEXT = {
 
 describe(`<${DashboardUpgradePage.name}/>`, () => {
   beforeEach(() => {
-    vi.mocked(resolveDashboardTenant).mockResolvedValue(CONTEXT);
+    vi.mocked(resolveDashboardTenant).mockResolvedValue(MOCK_CONTEXT);
   });
 
   it("hands the session tenant and the checkout's query to the page", async () => {
@@ -38,7 +38,7 @@ describe(`<${DashboardUpgradePage.name}/>`, () => {
     });
 
     expect(UpgradePageContent).toHaveBeenCalledWith({
-      ...CONTEXT,
+      ...MOCK_CONTEXT,
       promo: MOCK_STRIPE_PROMOTION_CODE,
       isReturning: true,
     });

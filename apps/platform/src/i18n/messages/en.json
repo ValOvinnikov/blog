@@ -2187,7 +2187,7 @@
     "intervalLabel": "Billing period",
     "MONTHLY": "Monthly",
     "YEARLY": "Yearly",
-    "checkoutFailed": "Checkout couldn't start. Choose a billing period to try again.",
+    "checkoutFailed": "Checkout couldn't start.",
     "unconfigured": "Upgrading isn't available right now. Try again later.",
     "onGrowthTitle": "Your site is on Growth",
     "onGrowthDescription": "Every Growth option is open on your site.",
@@ -2197,6 +2197,11 @@
     "ON_GROWTH": "Your site is already on Growth.",
     "NOT_OWNER": "Only your site's owner can upgrade it.",
     "PAID_PLAN": "Your site already has a paid plan, so there's nothing to upgrade here.",
-    "UNAVAILABLE": "Upgrading opens again once your site is running."
+    "UNAVAILABLE": "Upgrading opens again once your site is running.",
+    "tryAgain": "Try again",
+    "SUBSCRIBED": "Your payment is being confirmed. Your plan changes as soon as it is, so there's no need to pay again.",
+    "slowTitle": "This is taking longer than usual",
+    "slowDescription": "Your payment may still be confirming. Check again in a moment; we'll also email you once your plan changes.",
+    "checkAgain": "Check again"
   }
 }
