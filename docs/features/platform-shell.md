@@ -289,7 +289,8 @@ site, never at the top of the step.
   sets the title template and the default "Shinefold", and each page's
   `pageMetadata` key holds the page name alone. The tab and home-screen icon
   is the S box, served by `app/icon.ts` (SVG), `app/apple-icon.tsx` (180px
-  PNG on yellow) and listed in `app/manifest.ts`, all drawn from
+  PNG on yellow), `/favicon.ico` (16, 32 and 48px, for browsers that skip the
+  SVG) and listed in `app/manifest.ts`, all drawn from
   `@blog/utils/shinefold-logo`; the proxy leaves `/icon` and `/apple-icon`
   unrewritten. The collapse toggle is the topbar's first item from
   `md` (below `md` that slot holds the phone Menu button and the toggle never
