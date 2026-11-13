@@ -103,7 +103,9 @@ describe(`<${PlanChange.name}/>`, () => {
       const confirming = await screen.findByText(
         upgradePage.changeConfirmingTitle,
       );
-      const submit = submitButton();
+      const submit = await screen.findByRole('button', {
+        name: upgradePage.changeSubmit,
+      });
 
       expect(changePlanAction).toHaveBeenCalledExactlyOnceWith(
         MOCK_TENANT_ID,
