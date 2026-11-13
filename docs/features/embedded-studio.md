@@ -103,8 +103,8 @@ module types whose capability is off for the tenant carry a warning.
   its documents and page references carry the plan warning instead
   ([plans-and-entitlements](./plans-and-entitlements.md)).
 - `canLinkPlatformPlans` (default off) shows a pricing tier's platform plan
-  fields ([pricing-module](./pricing-module.md)); only the marketing tenant's
-  Studio turns it on.
+  fields ([pricing-module](./pricing-module.md)); `StudioMountView` sets it from
+  `resolveIsPlatformTenant`, so only the platform tenant's Studio has it.
 - With a single live locale the language filter is hidden and
   single-language inputs apply.
 - Look and Voice do not reach the Studio; its UI is Sanity's own, in English.

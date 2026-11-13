@@ -7,6 +7,7 @@ import { Alert } from '@platform/components/shared/alert';
 import { ArchivedTenantNotice } from '@platform/components/shared/archived-tenant-notice';
 import { PageHeader } from '@platform/components/shared/page-header';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { getTranslations } from 'next-intl/server';
 
 import { studioMountViewVariants } from './studio-mount-view-variants';
@@ -51,7 +52,10 @@ export const StudioMountView = async ({
     );
   }
 
-  const enabledCapabilities = await getEnabledCapabilities(tenant);
+  const [enabledCapabilities, canLinkPlatformPlans] = await Promise.all([
+    getEnabledCapabilities(tenant),
+    resolveIsPlatformTenant(tenant),
+  ]);
   const liveLocales = queries.tenants.selectLiveLocales(tenant);
   const { modulePacks } = PLAN_ENTITLEMENTS[tenant.plan];
 
@@ -63,6 +67,7 @@ export const StudioMountView = async ({
       title={tenant.name}
       enabledCapabilities={enabledCapabilities}
       entitlements={{ modulePacks }}
+      canLinkPlatformPlans={canLinkPlatformPlans}
       defaultLocale={tenant.locale}
       liveLocales={liveLocales}
       loginProvider={loginProvider}
