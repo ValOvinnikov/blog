@@ -8,9 +8,9 @@ import {
 
 // Each gated layout calls this so `PlatformShell` can stay a synchronous Server Component.
 export const resolveIsSidebarCollapsed = async (): Promise<boolean> => {
-  const isCollapsed = await readRenamedCookie({
+  const storedState = await readRenamedCookie({
     name: SIDEBAR_COLLAPSED_COOKIE,
     legacyName: LEGACY_SIDEBAR_COLLAPSED_COOKIE,
   });
-  return isCollapsed === 'true';
+  return storedState === String(true);
 };

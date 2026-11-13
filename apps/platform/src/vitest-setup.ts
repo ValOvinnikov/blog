@@ -100,9 +100,14 @@ afterEach(() => {
 
 vi.mock('@platform/utils/logger/logger');
 
-vi.mock('next/headers', () => ({
-  headers: vi.fn(async () => new Headers()),
-}));
+vi.mock('next/headers', async () => {
+  const { cookieStoreWith } = await import('@platform/testing/cookie-store');
+
+  return {
+    headers: vi.fn(async () => new Headers()),
+    cookies: vi.fn(async () => cookieStoreWith({})),
+  };
+});
 
 // Unsaved settings drafts persist in localStorage, so one test's draft would
 // otherwise be offered for restore in the next.
