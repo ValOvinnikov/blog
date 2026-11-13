@@ -16,17 +16,19 @@ import {
   MOCK_RENEWS_AT,
   MOCK_SCHEDULE_ID,
   mockPlanSchedule,
-  mockPlanSubscription,
-  type TMockPlanSubscription,
 } from '@platform/testing/billing/plan-subscription';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
+import {
+  mockStripeSubscription,
+  type TMockStripeSubscription,
+} from '@platform/testing/billing/stripe-subscription';
 
 import { loadSubscriptionPlan } from './load-subscription-plan';
 import { fromStripeTime } from './stripe-time';
 
-const load = (subscription: TMockPlanSubscription) => {
+const load = (subscription: TMockStripeSubscription) => {
   const { stripe } = mockStripePlanChangeClient(
-    mockPlanSubscription(subscription),
+    mockStripeSubscription(subscription),
   );
   return loadSubscriptionPlan(stripe, MOCK_STRIPE_SUBSCRIPTION_ID);
 };
@@ -34,7 +36,7 @@ const load = (subscription: TMockPlanSubscription) => {
 describe(loadSubscriptionPlan, () => {
   it('reads the plan, period and renewal of a monthly Starter subscription', async () => {
     const plan = await load({
-      planKey: STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
+      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
     });
 
     expect(plan).toEqual({
@@ -55,8 +57,10 @@ describe(loadSubscriptionPlan, () => {
 
   it('keeps the band item of a Growth subscription', async () => {
     const plan = await load({
-      planKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
-      bandKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY,
+      lookupKeys: [
+        STRIPE_PRICE_LOOKUP_KEY.GROWTH_YEARLY,
+        STRIPE_PRICE_LOOKUP_KEY.GROWTH_BAND_2500_YEARLY,
+      ],
     });
 
     expect(plan?.current.ceiling).toBe(MOCK_BAND_CEILING);
@@ -68,7 +72,7 @@ describe(loadSubscriptionPlan, () => {
 
   it('reads the plan a schedule moves the site to at renewal', async () => {
     const plan = await load({
-      planKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
+      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY],
       schedule: mockPlanSchedule([STRIPE_PRICE_LOOKUP_KEY.STARTER_YEARLY]),
     });
 
@@ -82,7 +86,7 @@ describe(loadSubscriptionPlan, () => {
 
   it('reports no pending change when the next phase keeps the plan', async () => {
     const plan = await load({
-      planKey: STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY,
+      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY],
       schedule: mockPlanSchedule([STRIPE_PRICE_LOOKUP_KEY.GROWTH_MONTHLY]),
     });
 
@@ -94,7 +98,7 @@ describe(loadSubscriptionPlan, () => {
     ['set to cancel', { cancelAtPeriodEnd: true }],
   ])('marks a subscription %s as not changeable', async (_case, overrides) => {
     const plan = await load({
-      planKey: STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
+      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
       ...overrides,
     });
 
@@ -102,7 +106,7 @@ describe(loadSubscriptionPlan, () => {
   });
 
   it('reads nothing from a subscription on an unknown Price', async () => {
-    const plan = await load({ planKey: 'SOMETHING_ELSE' });
+    const plan = await load({ lookupKeys: ['SOMETHING_ELSE'] });
 
     expect(plan).toBeUndefined();
   });

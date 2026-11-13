@@ -1,8 +1,7 @@
-import { ALERT_TYPE, SIZE } from '@blog/config';
+import { ALERT_TYPE } from '@blog/config';
 import type { TPlanChangeProgress } from '@platform/components/features/upgrade/plan-change/use-plan-change';
+import { WebhookWaitStatus } from '@platform/components/features/upgrade/webhook-wait-status';
 import { Alert } from '@platform/components/shared/alert';
-import { Button } from '@platform/components/shared/button';
-import { Spinner } from '@platform/components/shared/spinner';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 
@@ -17,31 +16,19 @@ export const PlanChangeStatus = ({
 }: TPlanChangeStatusProps) => {
   const t = useTranslations('upgradePage');
 
-  if (isSlow || (isConfirming && hasFailed)) {
-    return (
-      <Alert
-        type={ALERT_TYPE.WARNING}
-        title={t('slowTitle')}
-        description={t('changeSlowDescription')}
-        action={
-          <Button size={SIZE.SM} onClick={checkAgain}>
-            {t('checkAgain')}
-          </Button>
-        }
-      />
-    );
-  }
   if (isConfirming) {
     return (
-      <Alert
-        type={ALERT_TYPE.INFO}
-        title={t('changeConfirmingTitle')}
-        description={t('changeConfirmingDescription')}
-        action={
-          <span aria-hidden="true">
-            <Spinner label={t('changeConfirmingTitle')} />
-          </span>
-        }
+      <WebhookWaitStatus
+        isSlow={isSlow}
+        confirming={{
+          title: t('changeConfirmingTitle'),
+          description: t('changeConfirmingDescription'),
+        }}
+        slow={{
+          title: t('slowTitle'),
+          description: t('changeSlowDescription'),
+        }}
+        onCheckAgain={checkAgain}
       />
     );
   }

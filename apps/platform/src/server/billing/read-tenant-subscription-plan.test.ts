@@ -1,21 +1,23 @@
 import { STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
-import { mockPlanSubscription } from '@platform/testing/billing/plan-subscription';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
+import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';
 
 import { readTenantSubscriptionPlan } from './read-tenant-subscription-plan';
 import { getStripeClient } from './stripe-client';
 
-vi.mock('./stripe-client', () => ({ getStripeClient: vi.fn() }));
+vi.mock('./stripe-client');
 
 const read = () =>
   readTenantSubscriptionPlan(MOCK_TENANT_ID, MOCK_STRIPE_SUBSCRIPTION_ID);
 
 const withPlanKey = (planKey: string) => {
-  const client = mockStripePlanChangeClient(mockPlanSubscription({ planKey }));
+  const client = mockStripePlanChangeClient(
+    mockStripeSubscription({ lookupKeys: [planKey] }),
+  );
   vi.mocked(getStripeClient).mockReturnValue(client.stripe);
   return client;
 };

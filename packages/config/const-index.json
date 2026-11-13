@@ -5598,6 +5598,38 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "month": [
+      {
+        "ref": "STRIPE_RECURRING_INTERVAL.MONTHLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "year": [
+      {
+        "ref": "STRIPE_RECURRING_INTERVAL.YEARLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "none": [
+      {
+        "ref": "STRIPE_PRORATION_BEHAVIOR.NONE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "always_invoice": [
+      {
+        "ref": "STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "open": [
       {
         "ref": "STRIPE_CHECKOUT_SESSION_STATUS.OPEN",

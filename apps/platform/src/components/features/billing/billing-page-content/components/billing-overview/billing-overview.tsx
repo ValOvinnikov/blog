@@ -40,7 +40,7 @@ export const BillingOverview = async ({
 
   const isSubscribed = hasStoredSubscription({
     plan,
-    stripeSubscriptionId: billing?.stripeSubscriptionId,
+    stripeSubscriptionId: billing?.stripeSubscriptionId ?? null,
   });
 
   if (overview.state === BILLING_OVERVIEW_STATE.NO_CUSTOMER) {

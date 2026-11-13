@@ -42,6 +42,16 @@ export const STRIPE_SUBSCRIPTION_STATUS = {
   UNPAID: 'unpaid',
 } as const;
 
+export const STRIPE_RECURRING_INTERVAL = {
+  MONTHLY: 'month',
+  YEARLY: 'year',
+} as const;
+
+export const STRIPE_PRORATION_BEHAVIOR = {
+  NONE: 'none',
+  ALWAYS_INVOICE: 'always_invoice',
+} as const;
+
 export const STRIPE_CHECKOUT_SESSION_STATUS = {
   OPEN: 'open',
 } as const;

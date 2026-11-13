@@ -12,12 +12,12 @@ import {
   MOCK_STRIPE_INVOICE_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
   mockStripeInvoice,
-  mockStripeSubscription,
 } from '@platform/testing/billing/fixtures';
 import {
   MOCK_DRAFT_INVOICE_STATUS,
   MOCK_STRIPE_AMOUNT,
 } from '@platform/testing/billing/overview';
+import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import Stripe from 'stripe';
 
 import {

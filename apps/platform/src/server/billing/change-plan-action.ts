@@ -2,6 +2,7 @@
 
 import {
   ACTION_OUTCOME,
+  HTTP_STATUS,
   type TActionResult,
   type TOutcome,
 } from '@blog/config';
@@ -34,6 +35,11 @@ export type TChangePlanResult =
       >,
       TOutcome<typeof ACTION_OUTCOME.SUCCESS>
     >;
+
+const isPaymentFailure = (error: unknown): boolean =>
+  error instanceof Stripe.errors.StripeError &&
+  (error instanceof Stripe.errors.StripeCardError ||
+    error.statusCode === HTTP_STATUS.PAYMENT_REQUIRED);
 
 const refused = (reason: TPlanChangeRefusal): TChangePlanResult => ({
   outcome: ACTION_OUTCOME.REFUSED,
@@ -75,7 +81,7 @@ export const changePlanAction = async (
     if (result === PLAN_CHANGE_REFUSAL.UNCHANGED) return refused(result);
     return { outcome: ACTION_OUTCOME.SUCCESS, timing: result };
   } catch (error) {
-    if (error instanceof Stripe.errors.StripeCardError) {
+    if (isPaymentFailure(error)) {
       return refused(PLAN_CHANGE_REFUSAL.CARD_DECLINED);
     }
     logger.error(BILLING_LOG.PLAN_CHANGE_FAILED, {

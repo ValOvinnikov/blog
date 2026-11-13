@@ -2,7 +2,10 @@ import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
 import { PLAN_PRICE_LOOKUP_KEYS } from '@blog/db/constants';
-import { BILLING_LOG } from '@platform/constants/billing';
+import {
+  BILLING_LOG,
+  STRIPE_PRORATION_BEHAVIOR,
+} from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
   PLAN_CHANGE_TIMING,
@@ -15,6 +18,7 @@ import type Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';
 import { bandKeyFor, lookupKeyFor } from './plan-from-price-keys';
+import { releaseSchedule } from './release-schedule';
 import {
   scheduleChangeAtRenewal,
   type TTargetPrices,
@@ -58,7 +62,7 @@ const changeNow = (
     : [];
   return stripe.subscriptions.update(id, {
     items: [{ id: planItemId, price: prices.plan }, ...bandItems],
-    proration_behavior: 'always_invoice',
+    proration_behavior: STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE,
     payment_behavior: 'error_if_incomplete',
   });
 };
@@ -79,13 +83,16 @@ export const changeSubscriptionPlan = async (
     return undefined;
   }
 
-  if (scheduleId) await stripe.subscriptionSchedules.release(scheduleId);
-  if (!timing || !prices) return PLAN_CHANGE_TIMING.CANCEL_PENDING;
-
-  if (timing === PLAN_CHANGE_TIMING.NOW) {
-    await changeNow(stripe, subscription, prices);
-  } else {
-    await scheduleChangeAtRenewal(stripe, subscription, prices, to.interval);
+  if (!timing || !prices) {
+    if (scheduleId) await releaseSchedule(stripe, scheduleId);
+    return PLAN_CHANGE_TIMING.CANCEL_PENDING;
   }
+
+  if (timing === PLAN_CHANGE_TIMING.AT_RENEWAL) {
+    await scheduleChangeAtRenewal(stripe, subscription, prices, to.interval);
+    return timing;
+  }
+  await changeNow(stripe, subscription, prices);
+  if (scheduleId) await releaseSchedule(stripe, scheduleId);
   return timing;
 };

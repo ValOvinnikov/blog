@@ -1,15 +1,9 @@
-import {
-  MILLISECONDS_PER_SECOND,
-  STRIPE_SUBSCRIPTION_STATUS,
-} from '@platform/constants/billing';
-import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
+import { MILLISECONDS_PER_SECOND } from '@platform/constants/billing';
+import { toStripeTime } from '@platform/testing/billing/stripe-time';
 import { createMockFaker } from '@platform/testing/mock-faker';
 import type Stripe from 'stripe';
 
 const planChangeFaker = createMockFaker(7333);
-
-const toStripeTime = (date: Date) =>
-  Math.floor(date.getTime() / MILLISECONDS_PER_SECOND);
 
 export const MOCK_PLAN_ITEM_ID = `si_${planChangeFaker.string.alphanumeric(14)}`;
 export const MOCK_BAND_ITEM_ID = `si_${planChangeFaker.string.alphanumeric(14)}`;
@@ -28,16 +22,6 @@ export const mockPrice = (lookupKey: string) => ({
   lookup_key: lookupKey,
 });
 
-export type TMockPlanSubscription = {
-  planKey: string;
-  bandKey?: string;
-  status?: string;
-  cancelAtPeriodEnd?: boolean;
-  schedule?: TMaybeSchedule;
-};
-
-type TMaybeSchedule = Stripe.SubscriptionSchedule | string | null;
-
 export const mockPlanSchedule = (
   nextKeys: string[],
 ): Stripe.SubscriptionSchedule =>
@@ -52,40 +36,6 @@ export const mockPlanSchedule = (
       },
     ],
   }) as unknown as Stripe.SubscriptionSchedule;
-
-export const mockPlanSubscription = ({
-  planKey,
-  bandKey,
-  status = STRIPE_SUBSCRIPTION_STATUS.ACTIVE,
-  cancelAtPeriodEnd = false,
-  schedule = null,
-}: TMockPlanSubscription): Stripe.Subscription =>
-  ({
-    id: MOCK_STRIPE_SUBSCRIPTION_ID,
-    status,
-    cancel_at_period_end: cancelAtPeriodEnd,
-    schedule,
-    items: {
-      data: [
-        {
-          id: MOCK_PLAN_ITEM_ID,
-          price: mockPrice(planKey),
-          quantity: 1,
-          current_period_end: MOCK_PERIOD_END,
-        },
-        ...(bandKey
-          ? [
-              {
-                id: MOCK_BAND_ITEM_ID,
-                price: mockPrice(bandKey),
-                quantity: MOCK_BAND_QUANTITY,
-                current_period_end: MOCK_PERIOD_END,
-              },
-            ]
-          : []),
-      ],
-    },
-  }) as unknown as Stripe.Subscription;
 
 export const mockCreatedSchedule = (
   items: { price: string; quantity: number }[],

@@ -4,11 +4,14 @@ import { BILLING_INTERVAL, UPGRADE_POLL } from '@platform/constants/billing';
 import {
   PLAN_CHANGE_REFUSAL,
   PLAN_CHANGE_TIMING,
-  type TPlanChoice,
 } from '@platform/constants/plan-change';
 import messages from '@platform/i18n/messages/en.json';
 import { changePlanAction } from '@platform/server/billing/change-plan-action';
 import { getTenantPlanAction } from '@platform/server/billing/get-tenant-plan-action';
+import {
+  MOCK_GROWTH_MONTHLY_CHOICE,
+  MOCK_STARTER_MONTHLY_CHOICE,
+} from '@platform/testing/billing/plan-choices';
 import { MOCK_RENEWS_AT } from '@platform/testing/billing/plan-subscription';
 import { act, customRender, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
@@ -29,18 +32,9 @@ vi.mock('@platform/server/billing/get-tenant-plan-action');
 const { upgradePage, planNames } = messages;
 const t = makeEnTranslator('upgradePage');
 
-const STARTER_MONTHLY: TPlanChoice = {
-  plan: TENANT_PLAN.STARTER,
-  interval: BILLING_INTERVAL.MONTHLY,
-};
-const GROWTH_MONTHLY: TPlanChoice = {
-  plan: TENANT_PLAN.GROWTH,
-  interval: BILLING_INTERVAL.MONTHLY,
-};
-
 const setup = customRender(PlanChange, {
   tenantId: MOCK_TENANT_ID,
-  current: STARTER_MONTHLY,
+  current: MOCK_STARTER_MONTHLY_CHOICE,
   renewsAt: MOCK_RENEWS_AT,
   pending: undefined,
 });
@@ -109,12 +103,14 @@ describe(`<${PlanChange.name}/>`, () => {
       const confirming = await screen.findByText(
         upgradePage.changeConfirmingTitle,
       );
+      const submit = submitButton();
 
       expect(changePlanAction).toHaveBeenCalledExactlyOnceWith(
         MOCK_TENANT_ID,
-        GROWTH_MONTHLY,
+        MOCK_GROWTH_MONTHLY_CHOICE,
       );
       expect(confirming).toBeVisible();
+      expect(submit).toBeDisabled();
       expect(refresh).not.toHaveBeenCalled();
 
       vi.mocked(getTenantPlanAction).mockResolvedValue(TENANT_PLAN.GROWTH);
@@ -157,22 +153,22 @@ describe(`<${PlanChange.name}/>`, () => {
       outcome: ACTION_OUTCOME.SUCCESS,
       timing: PLAN_CHANGE_TIMING.AT_RENEWAL,
     });
-    setup({ current: GROWTH_MONTHLY });
+    setup({ current: MOCK_GROWTH_MONTHLY_CHOICE });
 
     await choose(user, planNames.STARTER);
     await user.click(submitButton());
 
     expect(changePlanAction).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      STARTER_MONTHLY,
+      MOCK_STARTER_MONTHLY_CHOICE,
     );
     expect(refresh).toHaveBeenCalledOnce();
   });
 
   it('offers to keep the current plan while a change is planned', async () => {
     setup({
-      current: GROWTH_MONTHLY,
-      pending: { ...STARTER_MONTHLY, startsAt: MOCK_RENEWS_AT },
+      current: MOCK_GROWTH_MONTHLY_CHOICE,
+      pending: { ...MOCK_STARTER_MONTHLY_CHOICE, startsAt: MOCK_RENEWS_AT },
     });
 
     const note = screen.getByRole('note');
@@ -184,7 +180,7 @@ describe(`<${PlanChange.name}/>`, () => {
     expect(note).toHaveTextContent(planNames.STARTER);
     expect(changePlanAction).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      GROWTH_MONTHLY,
+      MOCK_GROWTH_MONTHLY_CHOICE,
     );
   });
 });

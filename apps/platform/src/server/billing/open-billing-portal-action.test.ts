@@ -27,9 +27,7 @@ vi.mock('@platform/utils/env/env');
 vi.mock('@platform/server/auth/require-session-user-id', () => ({
   requireSessionUserId: vi.fn(async () => MOCK_SIGN_IN_USER_ID),
 }));
-vi.mock('@platform/server/billing/stripe-client', () => ({
-  getStripeClient: vi.fn(),
-}));
+vi.mock('@platform/server/billing/stripe-client');
 vi.mock('@blog/db', () => ({
   queries: {
     tenants: { getTenantBilling: vi.fn() },

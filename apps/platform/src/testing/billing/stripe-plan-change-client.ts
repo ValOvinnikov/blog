@@ -2,9 +2,8 @@ import {
   mockCreatedSchedule,
   mockPrice,
 } from '@platform/testing/billing/plan-subscription';
+import { type TStripeCall } from '@platform/testing/billing/stripe-call';
 import type Stripe from 'stripe';
-
-type TStripeCall = (...args: unknown[]) => Promise<unknown>;
 
 export const mockStripePlanChangeClient = (
   subscription: Stripe.Subscription,
@@ -25,6 +24,7 @@ export const mockStripePlanChangeClient = (
     ),
     updateSchedule: vi.fn<TStripeCall>(async () => ({})),
     releaseSchedule: vi.fn<TStripeCall>(async () => ({})),
+    retrieveSchedule: vi.fn<TStripeCall>(async () => ({})),
   };
   const stripe = {
     subscriptions: {
@@ -36,6 +36,7 @@ export const mockStripePlanChangeClient = (
       create: calls.createSchedule,
       update: calls.updateSchedule,
       release: calls.releaseSchedule,
+      retrieve: calls.retrieveSchedule,
     },
   } as unknown as Stripe;
 

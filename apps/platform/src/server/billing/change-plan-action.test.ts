@@ -2,7 +2,6 @@ import { ACTION_OUTCOME } from '@blog/config';
 import { TENANT_PLAN } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
-  BILLING_INTERVAL,
   BILLING_LOG,
   STRIPE_SUBSCRIPTION_STATUS,
   UPGRADE_STATE,
@@ -14,8 +13,9 @@ import {
 } from '@platform/constants/plan-change';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures';
-import { mockPlanSubscription } from '@platform/testing/billing/plan-subscription';
+import { MOCK_GROWTH_MONTHLY_CHOICE } from '@platform/testing/billing/plan-choices';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
+import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,
@@ -29,12 +29,8 @@ import { getStripeClient } from './stripe-client';
 
 vi.mock('@platform/server/auth/require-tenant-membership');
 
-vi.mock('./stripe-client', () => ({ getStripeClient: vi.fn() }));
+vi.mock('./stripe-client');
 
-const TO_GROWTH: TPlanChoice = {
-  plan: TENANT_PLAN.GROWTH,
-  interval: BILLING_INTERVAL.MONTHLY,
-};
 const MOCK_PAYING_SITE = {
   plan: TENANT_PLAN.STARTER,
   stripeSubscriptionId: MOCK_STRIPE_SUBSCRIPTION_ID,
@@ -49,11 +45,11 @@ const siteFor = (
 });
 
 const withSubscription = (
-  overrides: Partial<Parameters<typeof mockPlanSubscription>[0]> = {},
+  overrides: Partial<Parameters<typeof mockStripeSubscription>[0]> = {},
 ) => {
   const client = mockStripePlanChangeClient(
-    mockPlanSubscription({
-      planKey: STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY,
+    mockStripeSubscription({
+      lookupKeys: [STRIPE_PRICE_LOOKUP_KEY.STARTER_MONTHLY],
       ...overrides,
     }),
   );
@@ -70,7 +66,10 @@ describe(changePlanAction, () => {
   });
 
   it('moves the owner of a Starter site to Growth now', async () => {
-    const result = await changePlanAction(MOCK_TENANT_ID, TO_GROWTH);
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.SUCCESS,
@@ -93,7 +92,10 @@ describe(changePlanAction, () => {
       vi.mocked(requireTenantMembership).mockResolvedValueOnce(
         siteFor(tenant, membership),
       );
-      const result = await changePlanAction(MOCK_TENANT_ID, TO_GROWTH);
+      const result = await changePlanAction(
+        MOCK_TENANT_ID,
+        MOCK_GROWTH_MONTHLY_CHOICE,
+      );
 
       expect(result).toEqual({ outcome: ACTION_OUTCOME.REFUSED, reason });
       expect(client.retrieveSubscription).not.toHaveBeenCalled();
@@ -105,7 +107,10 @@ describe(changePlanAction, () => {
       status: STRIPE_SUBSCRIPTION_STATUS.PAST_DUE,
     });
 
-    const result = await changePlanAction(MOCK_TENANT_ID, TO_GROWTH);
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -116,7 +121,7 @@ describe(changePlanAction, () => {
 
   it('refuses a free plan as invalid', async () => {
     const result = await changePlanAction(MOCK_TENANT_ID, {
-      ...TO_GROWTH,
+      ...MOCK_GROWTH_MONTHLY_CHOICE,
       plan: TENANT_PLAN.FREE,
     } as unknown as TPlanChoice);
 
@@ -131,7 +136,10 @@ describe(changePlanAction, () => {
       new Stripe.errors.StripeCardError({ message: 'declined' }),
     );
 
-    const result = await changePlanAction(MOCK_TENANT_ID, TO_GROWTH);
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
 
     expect(result).toEqual({
       outcome: ACTION_OUTCOME.REFUSED,
@@ -143,7 +151,10 @@ describe(changePlanAction, () => {
   it('logs any other Stripe failure', async () => {
     client.updateSubscription.mockRejectedValue(new Error('network'));
 
-    const result = await changePlanAction(MOCK_TENANT_ID, TO_GROWTH);
+    const result = await changePlanAction(
+      MOCK_TENANT_ID,
+      MOCK_GROWTH_MONTHLY_CHOICE,
+    );
 
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(vi.mocked(logger).error).toHaveBeenCalledWith(

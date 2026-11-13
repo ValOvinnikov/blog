@@ -1,20 +1,14 @@
 import type { TSellableTenantPlan } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
-import {
-  type UPGRADE_STATE,
-  BILLING_INTERVAL,
-  type TBillingInterval,
+import type {
+  TBillingInterval,
+  UPGRADE_STATE,
 } from '@platform/constants/billing';
 
 export type TPlanChoice = {
   plan: TSellableTenantPlan;
   interval: TBillingInterval;
 };
-
-export const STRIPE_RECURRING_INTERVAL = {
-  [BILLING_INTERVAL.MONTHLY]: 'month',
-  [BILLING_INTERVAL.YEARLY]: 'year',
-} as const;
 
 export const PLAN_CHANGE_TIMING = {
   NOW: 'NOW',
@@ -37,4 +31,6 @@ export type TPlanChangeGate =
   | typeof PLAN_CHANGE_REFUSAL.NOT_SUBSCRIBED;
 
 export type TPlanChangeRefusal =
-  TPlanChangeGate | TValueOf<typeof PLAN_CHANGE_REFUSAL>;
+  | typeof UPGRADE_STATE.NOT_OWNER
+  | typeof UPGRADE_STATE.UNAVAILABLE
+  | TValueOf<typeof PLAN_CHANGE_REFUSAL>;

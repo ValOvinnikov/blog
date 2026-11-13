@@ -21,8 +21,8 @@ import {
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_PROMOTION_CODE,
   MOCK_STRIPE_SUBSCRIPTION_ID,
-  mockStripeSubscription,
 } from '@platform/testing/billing/fixtures';
+import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID, mockTenant } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';

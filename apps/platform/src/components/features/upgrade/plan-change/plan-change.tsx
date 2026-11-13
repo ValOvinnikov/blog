@@ -85,7 +85,7 @@ export const PlanChange = ({
         </LinkButton>
         <Button
           variant={BUTTON_VARIANT.PRIMARY}
-          isDisabled={isCurrent && !pending}
+          isDisabled={(isCurrent && !pending) || progress.isConfirming}
           isPending={isPending}
           pendingLabel={t('changePending')}
           onClick={() => submit(choice)}

@@ -1,10 +1,7 @@
 import 'server-only';
 
-import type { TMaybeUndefined, TNullable } from '@blog/config';
-import {
-  SELLABLE_TENANT_PLANS,
-  type TTenantPlan,
-} from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config';
+import { SELLABLE_TENANT_PLANS } from '@blog/config/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
 import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-writable';
 import { isOneOf } from '@blog/utils/primitives';
@@ -25,10 +22,8 @@ type TUpgradeTenant = Pick<
 export const hasStoredSubscription = ({
   plan,
   stripeSubscriptionId,
-}: {
-  plan: TTenantPlan;
-  stripeSubscriptionId: TNullable<string>;
-}) => Boolean(stripeSubscriptionId) && isOneOf(SELLABLE_TENANT_PLANS, plan);
+}: Pick<TUpgradeTenant, 'plan' | 'stripeSubscriptionId'>) =>
+  Boolean(stripeSubscriptionId) && isOneOf(SELLABLE_TENANT_PLANS, plan);
 
 const ownerGate = (tenant: TUpgradeTenant, membership: TMembership) => {
   if (!isRealTenantOwner(membership)) return UPGRADE_STATE.NOT_OWNER;

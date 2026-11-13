@@ -1,11 +1,15 @@
 import 'server-only';
 
 import type { TMaybeUndefined } from '@blog/config';
-import { type TBillingInterval } from '@platform/constants/billing';
-import { STRIPE_RECURRING_INTERVAL } from '@platform/constants/plan-change';
-import type Stripe from 'stripe';
+import {
+  STRIPE_PRORATION_BEHAVIOR,
+  STRIPE_RECURRING_INTERVAL,
+  type TBillingInterval,
+} from '@platform/constants/billing';
+import Stripe from 'stripe';
 
 import type { TSubscriptionPlan } from './load-subscription-plan';
+import { releaseSchedule } from './release-schedule';
 import { stripeIdOf } from './stripe-id';
 
 export type TTargetPrices = { plan: string; band: TMaybeUndefined<string> };
@@ -55,8 +59,23 @@ const nextPhaseParams = (
     interval: STRIPE_RECURRING_INTERVAL[interval],
     interval_count: 1,
   },
-  proration_behavior: 'none',
+  proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
 });
+
+const createScheduleFrom = async (stripe: Stripe, subscriptionId: string) => {
+  const create = () =>
+    stripe.subscriptionSchedules.create({ from_subscription: subscriptionId });
+  try {
+    return await create();
+  } catch (error) {
+    if (!(error instanceof Stripe.errors.StripeInvalidRequestError))
+      throw error;
+    const { schedule } = await stripe.subscriptions.retrieve(subscriptionId);
+    if (!schedule) throw error;
+    await releaseSchedule(stripe, stripeIdOf(schedule));
+    return create();
+  }
+};
 
 export const scheduleChangeAtRenewal = async (
   stripe: Stripe,
@@ -64,9 +83,9 @@ export const scheduleChangeAtRenewal = async (
   prices: TTargetPrices,
   interval: TBillingInterval,
 ): Promise<void> => {
-  const { id, phases } = await stripe.subscriptionSchedules.create({
-    from_subscription: subscription.id,
-  });
+  const { scheduleId } = subscription;
+  if (scheduleId) await releaseSchedule(stripe, scheduleId);
+  const { id, phases } = await createScheduleFrom(stripe, subscription.id);
   const [current] = phases;
   if (!current) {
     throw new Error(
@@ -75,7 +94,7 @@ export const scheduleChangeAtRenewal = async (
   }
   await stripe.subscriptionSchedules.update(id, {
     end_behavior: 'release',
-    proration_behavior: 'none',
+    proration_behavior: STRIPE_PRORATION_BEHAVIOR.NONE,
     phases: [
       currentPhaseParams(current),
       nextPhaseParams(current, subscription, prices, interval),
