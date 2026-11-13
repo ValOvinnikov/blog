@@ -81,7 +81,7 @@
     "creating": "Je site wordt gemaakt…",
     "failureTitle": "We konden je site niet maken",
     "failures": {
-      "alreadyOwnsFreeSite": "Je hebt al een gratis site. Iedereen kan er één hebben.",
+      "alreadyOwnsFreeSite": "Je hebt al een gratis site of een site in een proefperiode. Iedereen kan er één tegelijk hebben.",
       "tryAgainLater": "Probeer het later opnieuw.",
       "serverError": "Er ging iets mis. Probeer het opnieuw."
     },
@@ -353,6 +353,10 @@
   },
   "ownerHomePage": {
     "description": "Uw site in één oogopslag. Alles hier is live.",
+    "trialTitle": "{plan}-proefperiode",
+    "trialDescription": "Uw site heeft tot <time>{date}</time> alle {plan}-functies. U hebt geen kaart nodig; na de proefperiode gaat de site naar {freePlan}.",
+    "trialEndedTitle": "{plan}-proefperiode afgelopen",
+    "trialEndedDescription": "Uw proefperiode is op <time>{date}</time> geëindigd. De site gaat binnenkort naar {freePlan}.",
     "yourSiteCardTitle": "Uw site",
     "nameLabel": "Naam",
     "publicDomainLabel": "Openbaar domein",
