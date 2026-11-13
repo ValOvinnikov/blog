@@ -9,6 +9,7 @@ import type {
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 
 export type TPricingPrice = {
   period: TPricePeriod;
@@ -35,7 +36,7 @@ export type TPricingTier = {
   footnote: TMaybeUndefined<string>;
 };
 
-export type TPricingModule = {
+export type TPricingModule = TModuleAppearance & {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   tiers: TPricingTier[];
