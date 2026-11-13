@@ -12,6 +12,7 @@ import { purgeRevalidatedCache } from '@web/server/revalidate/purge-revalidated-
 import { removeDeletedPostBookmarks } from '@web/server/revalidate/remove-deleted-post-bookmarks/remove-deleted-post-bookmarks';
 import { resolveWebhookTenant } from '@web/server/revalidate/resolve-webhook-tenant/resolve-webhook-tenant';
 import { stampFirstPostPublished } from '@web/server/revalidate/stamp-first-post-published/stamp-first-post-published';
+import { startNewsletterPostSend } from '@web/server/revalidate/start-newsletter-post-send/start-newsletter-post-send';
 import { verifyRevalidateSignature } from '@web/server/revalidate/verify-revalidate-signature/verify-revalidate-signature';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
@@ -113,13 +114,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     tenant: tenantSanity,
   });
   const operation = request.headers.get(SANITY_OPERATION_HEADER);
-  const bookmarksRemoved = await removeDeletedPostBookmarks({
-    operation,
-    type,
-    id,
-    tenantId,
-  });
-  await stampFirstPostPublished({ operation, type, id, tenantId });
+  const postEvent = { operation, type, id, tenantId };
+  const bookmarksRemoved = await removeDeletedPostBookmarks(postEvent);
+  await stampFirstPostPublished(postEvent);
+  await startNewsletterPostSend(postEvent);
 
   return NextResponse.json(
     { revalidated, pathPurged, type, id, bookmarksRemoved },

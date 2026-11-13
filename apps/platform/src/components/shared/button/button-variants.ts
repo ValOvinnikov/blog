@@ -93,7 +93,7 @@ export const buttonVariants = tv({
     },
     isPending: {
       true: { idleFace: ['invisible'] },
-      false: { busyFace: ['invisible'] },
+      false: { busyFace: ['invisible'], busyGlyph: ['[&_*]:animate-none'] },
     },
   },
   compoundVariants: [

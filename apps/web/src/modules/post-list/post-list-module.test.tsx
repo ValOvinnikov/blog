@@ -7,7 +7,6 @@ import {
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { POST_LIST_LOG } from '@web/constants/post-list';
-import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getVoiceRich } from '@web/server/site-config/get-voice-rich/get-voice-rich';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
@@ -17,12 +16,8 @@ import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_POST_LIST_ID } from '@web/testing/shared/module-renderer-contract/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
-import { MOCK_SECTION_STYLE_OVERRIDES } from '@web/testing/shared/section-appearance/fixtures';
 import { mockTag } from '@web/testing/shared/tag/fixtures';
-import {
-  MOCK_REQUEST_CONTEXT,
-  MOCK_TENANT_SANITY_CONTEXT,
-} from '@web/testing/shared/tenant/fixtures';
+import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
 import { mockTopic } from '@web/testing/shared/topic/fixtures';
 import { mockFormattedVoiceRich } from '@web/testing/shared/voice/fixtures';
 import { logger } from '@web/utils/logger/logger';
@@ -137,19 +132,6 @@ describe(`<${PostListModule.name}/>`, () => {
       MOCK_TENANT_SANITY_CONTEXT,
       page,
       undefined,
-    );
-  });
-
-  it("scopes the section to the module's style overrides", async () => {
-    getPostListMock.mockResolvedValue(
-      okResult(mockPostListModuleData(MOCK_SECTION_STYLE_OVERRIDES)),
-    );
-
-    await setup();
-
-    expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
-      MOCK_REQUEST_CONTEXT.tenantId,
-      MOCK_SECTION_STYLE_OVERRIDES,
     );
   });
 

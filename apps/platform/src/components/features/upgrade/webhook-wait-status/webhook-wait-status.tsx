@@ -4,6 +4,7 @@ import { ALERT_TYPE, SIZE } from '@blog/config';
 import { Alert } from '@platform/components/shared/alert';
 import { Button } from '@platform/components/shared/button';
 import { Spinner } from '@platform/components/shared/spinner';
+import { SPINNER_TONE } from '@platform/constants/spinner';
 import { useTranslations } from 'next-intl';
 
 type TWebhookWaitCopy = { title: string; description: string };
@@ -51,7 +52,7 @@ export const WebhookWaitStatus = ({
       {...confirming}
       action={
         <span aria-hidden="true">
-          <Spinner label="" />
+          <Spinner label="" tone={SPINNER_TONE.TEXT} />
         </span>
       }
     />

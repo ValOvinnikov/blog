@@ -1,5 +1,6 @@
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { POST_RELATED_LOG } from '@web/constants/post-related';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockPostRelatedModuleData } from '@web/testing/modules/post-related/fixtures';
@@ -27,6 +28,9 @@ vi.mock('@blog/service', () => ({
 }));
 
 vi.mock('@web/server/request-context/request-context');
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
 
 const loggerWarnMock = vi.mocked(logger.warn);
 
@@ -70,18 +74,26 @@ describe(`<${PostRelatedModule.name}/>`, () => {
     it('warns once about the missing post context', () => {
       expect(loggerWarnMock).toHaveBeenCalledTimes(1);
       expect(loggerWarnMock).toHaveBeenCalledWith(
-        'post_related_module.missing_post_context',
+        POST_RELATED_LOG.MISSING_POST_CONTEXT,
         { id: MOCK_POST_RELATED_ID },
       );
     });
   });
 
-  it('renders nothing when the fetch fails', async () => {
+  it('logs and renders nothing when the fetch fails', async () => {
     getPostRelatedMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      POST_RELATED_LOG.MODULE_FETCH_FAILED,
+      {
+        id: MOCK_POST_RELATED_ID,
+        postId: MOCK_ANCHOR_POST_ID,
+        error: MOCK_ERROR,
+      },
+    );
   });
 
   it('renders nothing when no posts resolve', async () => {

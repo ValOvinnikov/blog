@@ -19,6 +19,11 @@ export const REVALIDATE_LOG = {
   TOPIC_PAGINATION_LOOKUP_FAILED: 'revalidate.topic_pagination_lookup_failed',
   BOOKMARK_CLEANUP_FAILED: 'revalidate.bookmark_cleanup_failed',
   FIRST_POST_STAMP_FAILED: 'revalidate.first_post_stamp_failed',
+  NEWSLETTER_SEND_START_FAILED: 'revalidate.newsletter_send_start_failed',
+  NEWSLETTER_SEND_ENQUEUE_SKIPPED: 'revalidate.newsletter_send_enqueue_skipped',
+  NEWSLETTER_SEND_ENQUEUE_REFUSED: 'revalidate.newsletter_send_enqueue_refused',
+  NEWSLETTER_SEND_ENQUEUE_FAILED: 'revalidate.newsletter_send_enqueue_failed',
+  NEWSLETTER_SEND_RELEASE_FAILED: 'revalidate.newsletter_send_release_failed',
 } as const;
 
 export const TENANT_LOOKUP_FAILED_MESSAGE = 'Tenant lookup failed.';

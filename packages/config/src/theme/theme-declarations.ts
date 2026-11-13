@@ -1,3 +1,4 @@
+import { oklchToHex } from '@blog/utils/color';
 import { isUndefined } from '@blog/utils/primitives';
 
 import {
@@ -109,6 +110,9 @@ export const DERIVED_SPACING_DECLARATIONS: TThemeDeclarations = {
   '--spacing-band-lg': 'calc(var(--spacing-band) * 4)',
   '--spacing-band-xl': 'calc(var(--spacing-band) * 6)',
 };
+
+export const oklchStopToHex = ({ l, c, h }: TOklchStop, hue: number): string =>
+  oklchToHex(l, c, h ?? hue);
 
 /** A stop without its own `h` takes the tenant's hue. */
 export const formatOklchRamp = <TRamp extends TOklchRamp>(

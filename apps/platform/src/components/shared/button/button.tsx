@@ -1,13 +1,15 @@
 import { ICONS, SIZE } from '@blog/config';
+import type { IWithClassName } from '@blog/config/types';
 import { isUndefined } from '@blog/utils/primitives';
 import { Icon } from '@platform/components/shared/icon';
 import { Spinner } from '@platform/components/shared/spinner';
 import { BUTTON_VARIANT } from '@platform/constants/button';
+import { SPINNER_TONE } from '@platform/constants/spinner';
 import type { AriaAttributes, MouseEventHandler, ReactNode, Ref } from 'react';
 
 import { buttonVariants, type TButtonVariants } from './button-variants';
 
-export type TButtonProps = {
+export type TButtonProps = IWithClassName & {
   id?: string;
   variant?: TButtonVariants['variant'];
   size?: TButtonVariants['size'];
@@ -19,7 +21,6 @@ export type TButtonProps = {
   pendingLabel?: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   children?: ReactNode;
-  className?: string;
   'aria-describedby'?: AriaAttributes['aria-describedby'];
   'aria-expanded'?: AriaAttributes['aria-expanded'];
   'aria-controls'?: AriaAttributes['aria-controls'];
@@ -60,6 +61,11 @@ export const Button = ({
   const isUnstyled =
     variant === BUTTON_VARIANT.UNSTYLED || variant === BUTTON_VARIANT.LINK;
 
+  const busyTone =
+    variant === BUTTON_VARIANT.PRIMARY
+      ? SPINNER_TONE.ON_BRAND
+      : SPINNER_TONE.TEXT;
+
   const hasClickBehaviour = !isUndefined(onClick) || isBlocked;
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
@@ -73,7 +79,12 @@ export const Button = ({
   const busyContent = (
     <>
       <span aria-hidden="true">
-        <Spinner label="" size={SIZE.SM} className={busyGlyph()} />
+        <Spinner
+          label=""
+          size={SIZE.SM}
+          tone={busyTone}
+          className={busyGlyph()}
+        />
       </span>
       {pendingLabel ?? children}
     </>

@@ -43,6 +43,9 @@ export const env = createEnv({
       .optional(),
     // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
+    // Only `/api/newsletter/post-send` accepts it, so apps/web never holds WORKER_ENQUEUE_SECRET.
+    // @env-optional
+    WORKER_NEWSLETTER_ENQUEUE_SECRET: z.string().min(1).optional(),
     // @env-optional
     OPERATOR_ALERT_SECRET: z.string().min(1).optional(),
     // @env-optional
@@ -86,6 +89,8 @@ export const env = createEnv({
     SITE_CONFIG_REVALIDATE_SECRET: process.env.SITE_CONFIG_REVALIDATE_SECRET,
     TENANT_ROOT_DOMAIN: process.env.TENANT_ROOT_DOMAIN,
     WORKER_ENQUEUE_SECRET: process.env.WORKER_ENQUEUE_SECRET,
+    WORKER_NEWSLETTER_ENQUEUE_SECRET:
+      process.env.WORKER_NEWSLETTER_ENQUEUE_SECRET,
     OPERATOR_ALERT_SECRET: process.env.OPERATOR_ALERT_SECRET,
     CRON_SECRET: process.env.CRON_SECRET,
     OPERATOR_ALERT_FROM_ADDRESS: process.env.OPERATOR_ALERT_FROM_ADDRESS,
