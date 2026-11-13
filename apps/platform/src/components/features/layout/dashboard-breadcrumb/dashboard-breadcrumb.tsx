@@ -6,10 +6,8 @@ import {
 } from '@platform/components/shared/breadcrumbs';
 import { usePathname } from '@platform/i18n/navigation';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
-import {
-  EVERY_PLAN_PAGE,
-  navLabelForPathname,
-} from '@platform/utils/nav-sections/nav-sections';
+import { navLabelForPathname } from '@platform/utils/nav-sections/nav-sections';
+import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useTranslations } from 'next-intl';
 

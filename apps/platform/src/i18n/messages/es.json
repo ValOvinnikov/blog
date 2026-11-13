@@ -26,7 +26,8 @@
     "blockedSignupsPage": "Registros bloqueados",
     "dataRequestsPage": "Solicitudes de datos",
     "signUpTitle": "Crear una cuenta",
-    "onboarding": "Crear tu sitio"
+    "onboarding": "Crear tu sitio",
+    "billing": "Facturación · Administración"
   },
   "signInPage": {
     "heading": "Iniciar sesión",
@@ -211,6 +212,7 @@
     "platformSectionLabel": "Acciones de la plataforma",
     "contentSectionLabel": "Contenido",
     "configurationSectionLabel": "Configuración",
+    "accountSectionLabel": "Cuenta",
     "tenants": "Clientes",
     "addTenant": "Añadir cliente",
     "findings": "Incidencias",
@@ -231,6 +233,7 @@
     "badgePlatform": "plataforma",
     "features": "Funciones",
     "leads": "Contactos",
+    "billing": "Facturación",
     "releases": "Versiones",
     "studioAccessLine": {
       "INVITE_SENT": "Invitación enviada — revise su correo",
@@ -2186,5 +2189,35 @@
     "category": "Motivo: {category}.",
     "contest": "Para impugnar esta decisión, responde al correo de suspensión o escribe a soporte indicando {reference}.",
     "copyButton": "Copiar referencia"
+  },
+  "billingPage": {
+    "title": "Facturación",
+    "description": "Tu plan, tu próximo pago y tus facturas.",
+    "manage": "Gestionar facturación",
+    "managePending": "Abriendo…",
+    "manageFailed": "No se pudo abrir la facturación. Inténtalo de nuevo en un momento.",
+    "noCustomer": "Tu sitio aún no tiene una cuenta de facturación.",
+    "planTitle": "Plan",
+    "planDescription": "El plan de tu sitio y cuándo se cobra el próximo pago.",
+    "planLabel": "Plan",
+    "nextPaymentLabel": "Próximo pago",
+    "nextPayment": "{amount} el <time>{date}</time>",
+    "noNextPayment": "Ninguno programado",
+    "noPayments": "Tu sitio aún no tiene pagos.",
+    "invoicesTitle": "Facturas",
+    "invoicesEmpty": "Aún no hay facturas.",
+    "columnDate": "Fecha",
+    "columnAmount": "Importe",
+    "columnStatus": "Estado",
+    "columnInvoice": "Factura",
+    "viewInvoice": "Ver factura <context>del {date}, {amount}</context>",
+    "invoiceStatus": {
+      "open": "Pendiente",
+      "paid": "Pagada",
+      "uncollectible": "Impagada",
+      "void": "Anulada"
+    },
+    "unavailableTitle": "Pagos y facturas no disponibles",
+    "unavailableDescription": "No se han podido cargar ahora. Vuelve a cargar la página en un momento."
   }
 }

@@ -15,10 +15,10 @@ import {
   MOCK_TENANT_NAME,
 } from '@platform/testing/tenants/fixtures';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
+import { EVERY_PLAN_PAGE } from '@platform/utils/plan-page-access/plan-page-access';
 import { adminRoutes, STUDIO_SEGMENT } from '@platform/utils/routes/routes';
 
 import {
-  EVERY_PLAN_PAGE,
   navLabelForPathname,
   operatorNavSections,
   tenantNavSections,

@@ -10,6 +10,7 @@ export const NO_PLAN_PAGE: TPlanPageAccess = {
   leads: false,
   subscribers: false,
   team: false,
+  billing: false,
 };
 
 export const CONFIGURATION_KEYS = [

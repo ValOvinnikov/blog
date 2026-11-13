@@ -25,3 +25,5 @@ export const ROUTING_RECORD_TYPE = {
   A: 'A',
   CNAME: 'CNAME',
 } as const;
+
+export const DOMAIN_CARD_ROW_COUNT = 3;

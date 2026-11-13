@@ -26,7 +26,8 @@
     "blockedSignupsPage": "Inscriptions bloquées",
     "dataRequestsPage": "Demandes de données",
     "signUpTitle": "Créer un compte",
-    "onboarding": "Créer votre site"
+    "onboarding": "Créer votre site",
+    "billing": "Facturation · Administration"
   },
   "signInPage": {
     "heading": "Connexion",
@@ -211,6 +212,7 @@
     "platformSectionLabel": "Actions de la plateforme",
     "contentSectionLabel": "Contenu",
     "configurationSectionLabel": "Configuration",
+    "accountSectionLabel": "Compte",
     "tenants": "Locataires",
     "addTenant": "Ajouter un locataire",
     "findings": "Constats",
@@ -231,6 +233,7 @@
     "badgePlatform": "plateforme",
     "features": "Fonctionnalités",
     "leads": "Messages reçus",
+    "billing": "Facturation",
     "releases": "Versions",
     "studioAccessLine": {
       "INVITE_SENT": "Invitation envoyée — consultez vos e-mails",
@@ -2186,5 +2189,35 @@
     "category": "Motif : {category}.",
     "contest": "Pour contester cette décision, répondez à l’e-mail de suspension ou écrivez au support en indiquant {reference}.",
     "copyButton": "Copier la référence"
+  },
+  "billingPage": {
+    "title": "Facturation",
+    "description": "Votre formule, votre prochain paiement et vos factures.",
+    "manage": "Gérer la facturation",
+    "managePending": "Ouverture…",
+    "manageFailed": "La facturation n'a pas pu s'ouvrir. Réessayez dans un instant.",
+    "noCustomer": "Votre site n'a pas encore de compte de facturation.",
+    "planTitle": "Formule",
+    "planDescription": "La formule de votre site et la date du prochain prélèvement.",
+    "planLabel": "Formule",
+    "nextPaymentLabel": "Prochain paiement",
+    "nextPayment": "{amount} le <time>{date}</time>",
+    "noNextPayment": "Aucun prévu",
+    "noPayments": "Votre site n'a encore aucun paiement.",
+    "invoicesTitle": "Factures",
+    "invoicesEmpty": "Aucune facture pour l'instant.",
+    "columnDate": "Date",
+    "columnAmount": "Montant",
+    "columnStatus": "Statut",
+    "columnInvoice": "Facture",
+    "viewInvoice": "Voir la facture <context>du {date}, {amount}</context>",
+    "invoiceStatus": {
+      "open": "À payer",
+      "paid": "Payée",
+      "uncollectible": "Impayée",
+      "void": "Annulée"
+    },
+    "unavailableTitle": "Paiements et factures indisponibles",
+    "unavailableDescription": "Ils n'ont pas pu être chargés pour l'instant. Rechargez la page dans un instant."
   }
 }

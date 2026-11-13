@@ -12,9 +12,19 @@ export type TPlanPageAccess = {
   leads: boolean;
   subscribers: boolean;
   team: boolean;
+  billing: boolean;
 };
 
 export type TPlanPage = keyof TPlanPageAccess;
+
+export const EVERY_PLAN_PAGE: TPlanPageAccess = {
+  languages: true,
+  email: true,
+  leads: true,
+  subscribers: true,
+  team: true,
+  billing: true,
+};
 
 const EMAIL_SENDING_CAPABILITIES = [
   CAPABILITY.BOOKMARKS,
@@ -34,5 +44,6 @@ export const planPageAccess = (plan: TTenantPlan): TPlanPageAccess => {
     leads: capabilities.includes(CAPABILITY.CONTACT_FORM),
     subscribers: capabilities.includes(CAPABILITY.NEWSLETTER),
     team: PLAN_ENTITLEMENTS[plan].seats > 1,
+    billing: true,
   };
 };

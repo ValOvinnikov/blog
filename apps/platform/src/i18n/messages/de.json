@@ -26,7 +26,8 @@
     "blockedSignupsPage": "Gesperrte Registrierungen",
     "dataRequestsPage": "Datenanfragen",
     "signUpTitle": "Konto erstellen",
-    "onboarding": "Website erstellen"
+    "onboarding": "Website erstellen",
+    "billing": "Abrechnung · Admin"
   },
   "signInPage": {
     "heading": "Anmelden",
@@ -211,6 +212,7 @@
     "platformSectionLabel": "Plattformaktionen",
     "contentSectionLabel": "Inhalte",
     "configurationSectionLabel": "Konfiguration",
+    "accountSectionLabel": "Konto",
     "tenants": "Mandanten",
     "addTenant": "Mandant hinzufügen",
     "findings": "Befunde",
@@ -231,6 +233,7 @@
     "badgePlatform": "Plattform",
     "features": "Funktionen",
     "leads": "Anfragen",
+    "billing": "Abrechnung",
     "releases": "Releases",
     "studioAccessLine": {
       "INVITE_SENT": "Einladung gesendet — E-Mail prüfen",
@@ -2186,5 +2189,35 @@
     "category": "Grund: {category}.",
     "contest": "Um diese Entscheidung anzufechten, antworte auf die Sperr-E-Mail oder schreibe an den Support und gib {reference} an.",
     "copyButton": "Referenz kopieren"
+  },
+  "billingPage": {
+    "title": "Abrechnung",
+    "description": "Ihr Tarif, Ihre nächste Zahlung und Ihre Rechnungen.",
+    "manage": "Abrechnung verwalten",
+    "managePending": "Wird geöffnet…",
+    "manageFailed": "Die Abrechnung konnte nicht geöffnet werden. Versuchen Sie es gleich noch einmal.",
+    "noCustomer": "Ihre Website hat noch kein Abrechnungskonto.",
+    "planTitle": "Tarif",
+    "planDescription": "Welchen Tarif Ihre Website hat und wann sie als Nächstes belastet wird.",
+    "planLabel": "Tarif",
+    "nextPaymentLabel": "Nächste Zahlung",
+    "nextPayment": "{amount} am <time>{date}</time>",
+    "noNextPayment": "Keine geplant",
+    "noPayments": "Für Ihre Website gibt es noch keine Zahlungen.",
+    "invoicesTitle": "Rechnungen",
+    "invoicesEmpty": "Noch keine Rechnungen.",
+    "columnDate": "Datum",
+    "columnAmount": "Betrag",
+    "columnStatus": "Status",
+    "columnInvoice": "Rechnung",
+    "viewInvoice": "Rechnung ansehen <context>vom {date}, {amount}</context>",
+    "invoiceStatus": {
+      "open": "Fällig",
+      "paid": "Bezahlt",
+      "uncollectible": "Unbezahlt",
+      "void": "Storniert"
+    },
+    "unavailableTitle": "Zahlungen und Rechnungen nicht verfügbar",
+    "unavailableDescription": "Sie konnten gerade nicht geladen werden. Laden Sie die Seite gleich neu."
   }
 }
