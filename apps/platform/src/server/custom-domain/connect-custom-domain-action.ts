@@ -10,7 +10,7 @@ import {
   type TCustomDomainFieldError,
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { env } from '@platform/utils/env/env';
 import { isCustomDomain } from '@platform/utils/is-custom-domain/is-custom-domain';
 import { isReservedDomain } from '@platform/utils/is-reserved-domain/is-reserved-domain';
@@ -45,7 +45,7 @@ export const connectCustomDomainAction = async (
   tenantId: string,
   input: TCustomDomainInput,
 ): Promise<TConnectCustomDomainResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   const parsed = customDomainInputSchema.safeParse(input);
   if (!parsed.success) {

@@ -7,7 +7,7 @@ import {
   type TTenantMembershipContext,
 } from './require-tenant-membership';
 
-export const requireTenantOwner = async (
+export const requireTenantManager = async (
   tenantId: string,
 ): Promise<TTenantMembershipContext> => {
   const context = await requireTenantMembership(tenantId);

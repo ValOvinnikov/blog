@@ -243,8 +243,8 @@ The session authenticates; it does not authorize:
   is the owner or any operator, plus `isOperator` and `isSuperAdmin`. An
   operator's virtual membership has the OWNER role, so a check on
   `membership.role` silently admits operators — owner-only checks read
-  `viewer.isOwner`. A value read after a write in the same request keeps
-  re-reading the row.
+  `viewer.isOwner`, and `requireTenantManager` gates on `canManage`. A value
+  read after a write in the same request keeps re-reading the row.
 
 ## Audit trail
 

@@ -18,7 +18,7 @@ import {
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { enqueueCustomDomainConnectOrUndo } from '@platform/server/custom-domain/enqueue-custom-domain-connect-or-undo';
 import { lookupTxtRecords } from '@platform/server/custom-domain/lookup-txt-records';
 import { restoreClaimAfterRejection } from '@platform/server/custom-domain/restore-claim-after-rejection';
@@ -41,7 +41,7 @@ const refused = (reason: TCustomDomainRefusal): TVerifyCustomDomainResult => ({
 export const verifyCustomDomainAction = async (
   tenantId: string,
 ): Promise<TVerifyCustomDomainResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
   const { id, entitlements, isArchived } = tenant;
 
   if (isArchived) return refused(CUSTOM_DOMAIN_REFUSAL.ARCHIVED);

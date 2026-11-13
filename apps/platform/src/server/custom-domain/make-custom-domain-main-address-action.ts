@@ -9,7 +9,7 @@ import {
   type TCustomDomainRefusal,
 } from '@platform/constants/custom-domain';
 import { DOMAIN_VERIFICATION_STATUS } from '@platform/constants/domain';
-import { requireTenantOwner } from '@platform/server/auth/require-tenant-owner';
+import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
 import { getProjectDomain } from '@platform/server/provisioning/vercel-domains-api';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
@@ -40,7 +40,7 @@ export const makeCustomDomainMainAddressAction = async (
   tenantId: string,
   input: TCustomDomainInput,
 ): Promise<TMakeCustomDomainMainAddressResult> => {
-  const { tenant } = await requireTenantOwner(tenantId);
+  const { tenant } = await requireTenantManager(tenantId);
 
   const parsed = customDomainInputSchema.safeParse(input);
   if (!parsed.success) {
