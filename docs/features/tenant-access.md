@@ -37,7 +37,7 @@ epics: [4840, 4979, 5649]
 
 ## What it does
 
-The admin decides who may run which tenant. Platform operators hold an `admins` row and reach every tenant. Tenant owners hold a `memberships` row and reach only their own sites. An owner who has never signed in has a pending `membership_invites` row instead. Their first sign-in turns that invite into a real membership. A denied request 404s, so it looks the same as a page that does not exist.
+The platform decides who may run which tenant. Platform operators hold an `admins` row and reach every tenant. Tenant owners hold a `memberships` row and reach only their own sites. An owner who has never signed in has a pending `membership_invites` row instead. Their first sign-in turns that invite into a real membership. A denied request 404s, so it looks the same as a page that does not exist.
 
 ## Surfaces and routes
 
@@ -67,7 +67,7 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
 
 ## Configuration
 
-- **Operators** are granted only by the manual `db:seed-admin` CLI. It writes BREAK_GLASS, never changes the role on an existing row, and requires the user to have signed in once first. The admin has no screen for granting operators.
+- **Operators** are granted only by the manual `db:seed-admin` CLI. It writes BREAK_GLASS, never changes the role on an existing row, and requires the user to have signed in once first. The platform has no screen for granting operators.
 - **Owners** are set when an operator creates the tenant ([tenant provisioning](./tenant-provisioning.md)):
   - a known user gets an OWNER membership;
   - an unknown email gets an OWNER invite and a `TENANT_INVITE` magic-link email, whose link signs the owner in, selects that tenant and lands on `/dashboard`, never the operator's `/tenants/<id>` page, whichever page the operator sent it from.
@@ -91,7 +91,7 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
   - Membership roles never gate anything: only OWNER is ever written, and nothing reads EDITOR or READER.
 - **Admins get a virtual OWNER membership.** Any `admins` row passes `requireTenantMembership` on any tenant through a virtual membership. Its id starts with `admin-virtual:`, so it can never pass as a foreign key. Call `isVirtualAdminMembership` before showing `membership.role`; the role chip shows the admin role instead.
 - **Invite consumption is atomic.** The claim stamps `consumedAt` only if it is still null. A failed membership insert resets it, and an existing membership is returned as-is.
-- **Invites are consumed best-effort, in the admin only.** `@blog/auth`'s `events.signIn` consumes invites on sign-in to the admin; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next admin sign-in.
+- **Invites are consumed best-effort, in the platform only.** `@blog/auth`'s `events.signIn` consumes invites on sign-in to the platform; signing in as a reader on a site leaves them pending. A failure is swallowed and retried on the next platform sign-in.
 - **The blocklist is checked live.** Create site refuses a blocked address or domain with its neutral reply, even for a user who already holds a session, and enqueues nothing ([platform sign-in and onboarding](./platform-sign-in-and-onboarding.md)). Removing an entry restores sign-up at once. Blocking while suspending saves the block, then suspends. `neon-http` has no transactions, so a refused or failed suspension removes the block again, but only one this request created; an older entry stays. A failed removal is logged, and the operator still sees the suspension fail. `SIGNUP_BLOCK_ADDED` is recorded only once the suspension is saved. A failed block, or an owner with no email on record, leaves the tenant unsuspended.
 - **Platform access is not Studio access.** Studio rights come from the tenant's Sanity project ACL. The owner is invited as `viewer` and raised to `administrator` by owner elevation ([embedded studio](./embedded-studio.md)). The worker sends that invite and removes the `viewer` role with the tenant's own Sanity management token, so both survive rotation of the organisation token. Granting `administrator`, and removing it from a former owner, stay on the organisation token, because Sanity refuses a project-scoped token any change to an `administrator` role: after a rotation, the owner of a tenant created before it is promoted by hand in Sanity Manage. Owner discovery — listing the organisation's users while the owner is not yet a project member, the usual case before their first Studio sign-in — uses the organisation token. A replacement organisation token keeps that lookup working only if it can read the organisation's members ([tenant provisioning](./tenant-provisioning.md)).
 - **Site sign-in is separate.** A public site's readers sign in through the same `users` table, but `memberships` never gate anything in `apps/web` ([reader auth](./reader-auth.md)).
@@ -135,6 +135,6 @@ The admin decides who may run which tenant. Platform operators hold an `admins` 
 - 4955: owner Studio access through invite tracking, acceptance polling and grant.
 - 4959: owner provisioning status and Studio access states.
 - 4979: web and platform stay separate (sessions, language).
-- 4982: the admin refuses sessions it did not issue.
+- 4982: the platform refuses sessions it did not issue.
 - 4983: public sites never act on platform invites.
-- 4986: manual test that the admin and public sites sign in separately.
+- 4986: manual test that the platform and public sites sign in separately.

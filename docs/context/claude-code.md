@@ -35,7 +35,7 @@ contracts:
     context. Establishes identity only; authorization stays each app's call.
   - `ui` — building the pure, publishable `@blog/ui` design system.
   - `web` — App Router routes, SEO, composition of `ui` + `service` + `db`.
-  - `platform-app` — `apps/platform`, the operator/tenant admin panel: a second Next.js
+  - `platform-app` — `apps/platform`, the platform, the operator and tenant app: a second Next.js
     app with its own deployment and domain, gated by the session `apps/web`
     already issues. A sibling to `web`, not a step after it — its upstreams are
     `config`, `db` and `auth` (with `@blog/ui` confined to `site-preview/`), so
@@ -45,7 +45,7 @@ contracts:
     `platform-ui-practices` and placed per `react-component-practices` →
     "Where a component lives", and nothing is added to `@blog/ui` for it. Its
     "Start here" names the
-    three admin design documents — the product-design spec (intent), the
+    three platform design documents — the product-design spec (intent), the
     interactive mock (approved information architecture and layout), and the
     corrections brief (real token values, and the defects the mock still
     contains) — as required reading before any visual work, whether or not a
@@ -58,7 +58,7 @@ contracts:
     auditing is a separate concern from logging, and a false record is worse
     than a missing one.
   - `worker` — `apps/worker`, a third, non-public app that runs tenant
-    provisioning as Vercel Workflow (5.x, pinned exactly) durable runs the admin panel
+    provisioning as Vercel Workflow (5.x, pinned exactly) durable runs the platform
     enqueues with a shared secret. A sibling to `platform-app`
     (`config → db → worker`): it consumes `db`, `config`, `utils`, `insight`,
     `email` and `@sanity/client`, is imported by nothing, and alone holds the
@@ -863,7 +863,7 @@ file` are all denied alike) — an earlier version only handled the
   - `studio-schema-practices` — Sanity schema quality bar + content-migration workflow.
   - `react-component-practices` — the React rules shared by `ui`, `web` and `platform-app`: server-first, where a component lives (`shared/` only for one imported by two domains), the props contract with its ceiling (7 in `apps/platform`, 10 in `packages/ui` and `apps/web`) and the drop → group → slot → hook → context ladder (the `reviewer` blocks a touched component over it), derived state, provider hooks that throw outside their provider, styling files (a component's `tv()` in a sibling `*-variants.ts`, repeated styles kept in the workspace that renders them, a `lib/styling/` recipe only once a second `packages/ui` component imports it), sizes (a size derived from another element reads its token, an arbitrary value written twice becomes a token or const, a calculation names its terms), size and splitting, no unmeasured memo, accessible by construction.
   - `ui-library-practices` — building pure, prop-driven design-system components.
-  - `platform-ui-practices` — the `apps/platform` admin design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, and a red-flags table; placement, props and size defer to `react-component-practices`. The reviewer checks platform diffs against it.
+  - `platform-ui-practices` — the `apps/platform` design standard with its decided values (type scale, cards, fields, spacing, colour, states, phones, copy), reusable blocks built on Base UI, and a red-flags table; placement, props and size defer to `react-component-practices`. The reviewer checks platform diffs against it.
   - `web-component-practices` — building interactive `apps/web` components (compose `@blog/ui` via slots, client behaviour in ref-based hooks, split a growing island at its state branches, a `@blog/ui` atom before raw markup, merge Portable Text component maps rather than spreading them).
   - `ui-storybook` / `web-storybook` — Storybook conventions per workspace.
   - `testing-practices` — Vitest + Testing Library conventions: render through each workspace's `testing/custom-render`, repeated arrangement in `beforeEach` or one named setup helper (mandatory and judged by shape — any statement or run that opens two or more cases with the same arguments, whatever it calls, with a run shared by some cases moved into a nested `describe`; one prop bag rendered three or more times is blocking), fake only the edges, a `vi.mock` factory moved to `__mocks__/` at its third copy and its defaults never restated, repeated fixtures as `testing/` builders, an exported fixture named `mock<Thing>` (builder) and every fixed fake value `MOCK_<THING>`, a test file's own consts included, with render and setup helpers exempt, made-up data from seeded `@faker-js/faker` where the workspace's `package.json` has it (and the user asked before it is added where it doesn't), never our own components faked, every asserted or acted-on element bound to a named `const` before its `expect` or `user.*` call (never a query nested inside another call, a `within(…)` scope included), exact expected values with no nested `expect.*` matcher (a touched test file converted whole for both), behaviour titles of 80 characters or fewer, a mandatory pruning pass over every touched test file (duplicates deleted, cases another unit owns moved to it, input/output repeats tabled, each removal reported with where its behaviour is still asserted), each workspace's Vitest pool (`threads` / `vmThreads`, and why `isolate: false` is only safe where files mock no modules), and act warnings — which fail the test in both apps — traced to their usual causes (a missing await, raw `element.focus()`, an async tree rendered without the awaited-`act` helper, a selector returning a fresh object), plus the settled edge cases: `@ts-expect-error -- reason` as an allowed directive, `container` only for an empty render, `act` only around a hook's `result.current` call or a file's one fake-timer advance helper, a query object `describe` cannot take named by its exact identifier with sub-behaviours as nested `describe`s, `user.keyboard` before `fireEvent`, a third thin-dispatcher exception for a Workflow orchestrator, `MOCK_` only for invented values, no real timers, and a cleanup ticket counting as touching the test files it names.
@@ -936,7 +936,7 @@ file` are all denied alike) — an earlier version only handled the
     helpers deliberately not built) in `config.md`; the preset's reset
     flags, service's `query` mock, `useTestTenant` and
     `mockValidationContext` in `testing-practices`; the
-    `lib/styling` recipes in `ui-library-practices`; the admin focus-ring
+    `lib/styling` recipes in `ui-library-practices`; the platform focus-ring
     and transition classes and `Card isDanger` in `platform-ui-practices`.
   - Test setup — render wrappers, `beforeEach`/setup helpers, `__mocks__/`,
     fixture builders → `testing-practices`.

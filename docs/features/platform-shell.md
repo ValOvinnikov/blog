@@ -252,7 +252,7 @@ site, never at the top of the step.
 - `adminRoutes` is the only place platform URLs are built.
 - The shell's `Link` is `GuardedLink`, which asks before leaving a page with
   unsaved changes.
-- The admin's language is next-intl's: the `NEXT_LOCALE` cookie first, then
+- The platform's language is next-intl's: the `NEXT_LOCALE` cookie first, then
   the browser's language, falling back to English.
 - The admin's colours are `--admin-*` tokens in `styles/admin-theme.css`,
   each with a `--color-admin-*` Tailwind colour; shadows read `--admin-shadow`
@@ -348,12 +348,12 @@ site, never at the top of the step.
   carries no visual marker; its item has `aria-current` for screen readers.
   The onboarding rail and the Choose a workspace page read the
   separate `rail` tokens and stay dark.
-- The admin has a dark palette. `:root` holds the light values with
+- The platform has a dark palette. `:root` holds the light values with
   `color-scheme: light`; `:root[data-theme='dark']` holds the dark value of
   every colour and shadow token with `color-scheme: dark`, so native
   scrollbars and form controls follow; and
   `@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) }`
-  repeats those dark values, so with no stored choice the admin follows the
+  repeats those dark values, so with no stored choice the platform follows the
   device setting, live, without a reload. The stored choice is
   `THEME_PREFERENCE` (Light, Dark or System) in the per-device
   `admin-theme` cookie; the root layout reads it and sets
@@ -362,7 +362,7 @@ site, never at the top of the step.
   every page, sign-in and onboarding included. The `rail` tokens, `scrim`,
   `frame-track` and `frame-thumb` have no dark value: the rail is dark in both
   themes, and the preview scrollbar follows the preview's own Light / Dark,
-  never the admin theme: the device frame draws it with `frame-track` /
+  never the platform theme: the device frame draws it with `frame-track` /
   `frame-thumb` in a Light preview and `frame-track-dark` /
   `frame-thumb-dark` in a Dark one. The tenant site preview and the email preview body
   are unaffected. `on-brand-ink` (#ffffff / #0f1115) is the mark on a
@@ -377,8 +377,8 @@ site, never at the top of the step.
   by the toast's radius, and an `Icon` in its colour: `ok`, `brand-ink`,
   `warn` and `bad`. Toast and `Alert` read the same `STATUS_ICON` map from
   `components/shared/icon/`.
-- The admin's Mono font is JetBrains Mono, from
-  `config/font-loaders/jetbrains-mono-font.ts`, applied on the admin `<body>`
+- The platform's Mono font is JetBrains Mono, from
+  `config/font-loaders/jetbrains-mono-font.ts`, applied on the platform `<body>`
   and read through `--font-admin-mono` (`font-admin-mono`), with
   `ui-monospace, monospace` behind it.
 - Shell popups share one frame, `menuSurfaceVariants`' `popup` slot in
@@ -510,7 +510,7 @@ site, never at the top of the step.
 ## Related
 
 - #4979 epic: web and platform stay separate (language, sign-in, sessions).
-- #4980 the admin takes its language from the browser, not the site's cookie.
+- #4980 the platform takes its language from the browser, not the site's cookie.
 - #4840 epic: platform front door.
 - #4959 owner provisioning status, overview card and Studio access states in
   the sidebar.

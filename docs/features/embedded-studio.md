@@ -125,14 +125,14 @@ module types whose capability is off for the tenant carry a warning.
   user, and never while the sign-in, loading or no-access screen shows.
   Neither callback is part of the config key, so changing one never rebuilds
   the Studio.
-- **The Studio follows the admin theme.** `PlatformStudioMount` passes
+- **The Studio follows the platform theme.** `PlatformStudioMount` passes
   `scheme` from `useStudioScheme`: `light`, `dark` or `system` for the stored
-  admin preference. Studio resolves `system` against the device's
+  platform preference. Studio resolves `system` against the device's
   `prefers-color-scheme` itself, live, and checks System in its Appearance
   menu. It passes `onSchemeChange` too, which keeps the Studio's own
   Appearance menu: choosing Light, Dark or System there stores the matching
   admin preference (the `admin-theme` cookie and `<html data-theme>`, the
-  same write as the account menu's Theme section), so the admin shell around
+  same write as the account menu's Theme section), so the platform shell around
   the Studio switches at once. Both read the preference through
   `utils/use-theme-preference/`, so a change from either side reaches the
   other without a reload.

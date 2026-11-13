@@ -15,7 +15,7 @@
  * carve-out, not the default — tokens shared by more than one workspace
  * still belong here.
  *
- * `apps/platform` is a second named exception: it owns its own admin-only
+ * `apps/platform` is a second named exception: it owns its own platform-only
  * token layer (`apps/platform/src/styles/admin-theme.css`) rather than
  * consuming this file's tokens, since its design system is deliberately
  * separate from `packages/ui`'s. It still imports this file for the base

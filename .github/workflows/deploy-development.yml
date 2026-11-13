@@ -5,16 +5,16 @@ name: Deploy Development
 # currently-suspended behaviour. See the block above `on:` for why and how to
 # restore it (#2648).
 #
-# The dev web app, dev admin panel and dev worker deploy from here on merge to
+# The dev web app, dev platform and dev worker deploy from here on merge to
 # `main` — but only the app(s) whose turbo graph the merge actually touched (see
 # the `changes` job), and ONLY after the `verify` gate (type-check/lint/test/build on the
 # merged commit) passes. The Studio is not deployed: it ships as the
-# `@blog/studio` package and is mounted by the admin panel, so `changes` tracks
+# `@blog/studio` package and is mounted by the platform, so `changes` tracks
 # it only to decide whether the Sanity content migration needs to run. Vercel's
 # native Git integration is disabled for every deployed project declaratively via
 # each app's own vercel.json `git.deploymentEnabled: false` (#445) so nothing
 # deploys pre-merge or ungated — every dev deploy goes through this workflow.
-# deploy-production.yml deploys web and admin unconditionally (a tag is a
+# deploy-production.yml deploys web and platform unconditionally (a tag is a
 # deliberate full release).
 #
 # TEMPORARY (2026-09-04): automatic deploy-on-merge is disabled to stay inside
@@ -550,7 +550,7 @@ jobs:
           set -euo pipefail
           # Every value is checked here rather than in an `if:`, because a
           # skipped step reports green — a merge that deployed the web app but
-          # not the admin panel would otherwise look like a complete deploy.
+          # not the platform would otherwise look like a complete deploy.
           : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the development environment}"
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the development environment}"
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the development environment}"

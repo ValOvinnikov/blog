@@ -157,7 +157,7 @@ jobs:
           set -euo pipefail
           # Every value is checked here rather than in an `if:`, because a
           # skipped step reports green — a tag that shipped the web app but not
-          # the admin panel would otherwise look like a complete release.
+          # the platform would otherwise look like a complete release.
           : "${VERCEL_TOKEN:?empty — set the VERCEL_TOKEN secret on the production environment}"
           : "${VERCEL_ORG_ID:?empty — set the VERCEL_ORG_ID Variable on the production environment}"
           : "${VERCEL_PROJECT_ID:?empty — set the VERCEL_PROJECT_ID_PLATFORM Variable on the production environment}"
