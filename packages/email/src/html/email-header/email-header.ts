@@ -1,9 +1,11 @@
 import {
   CELL_ROW_END,
+  EMAIL_WHITE,
   FONT_STACK,
 } from '@blog/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeImageUrl } from '@blog/email/html/sanitize-image-url/sanitize-image-url';
+import { toInitial } from '@blog/utils/primitives';
 
 export type TEmailLogoImage = {
   url: string;
@@ -12,19 +14,13 @@ export type TEmailLogoImage = {
   alt: string;
 };
 
-type TEmailMarkPalette = {
-  logo1: string;
-  logo2: string;
-  logo3: string;
-};
-
 type TEmailHeaderPalette = {
   border: string;
   text: string;
 };
 
 export type TEmailHeaderLogo =
-  | { markPalette: TEmailMarkPalette; logoImageUrl?: string }
+  | { tileColor: string; logoImageUrl?: string }
   | { markImage: TEmailLogoImage }
   | {
       fullLogoImage: TEmailLogoImage;
@@ -48,7 +44,7 @@ export function renderEmailHeader(
   const mark =
     'markImage' in logo
       ? renderImage(logo.markImage)
-      : renderMark(brandName, logo.markPalette, logo.logoImageUrl);
+      : renderMark(brandName, logo.tileColor, logo.logoImageUrl);
 
   return [
     `<tr><td style="padding:24px 32px;border-bottom:1px solid ${palette.border};">`,
@@ -68,7 +64,7 @@ function renderImage({ url, width, height, alt }: TEmailLogoImage): string {
 
 function renderMark(
   brandName: string,
-  markPalette: TEmailMarkPalette,
+  tileColor: string,
   logoImageUrl?: string,
 ): string {
   const sanitizedLogoUrl = logoImageUrl ? sanitizeImageUrl(logoImageUrl) : null;
@@ -82,11 +78,16 @@ function renderMark(
     });
   }
 
+  return renderInitialTile(brandName, tileColor);
+}
+
+// Gmail and Outlook strip inline SVG, so the tile is a fixed-size table cell; white meets 4.5:1 on the logo ramp's light stop at every hue.
+function renderInitialTile(brandName: string, tileColor: string): string {
   return [
-    '<svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-hidden="true">',
-    `<polygon points="12,3 22,7 12,11 2,7" fill="${markPalette.logo1}" />`,
-    `<polygon points="12,8 22,12 12,16 2,12" fill="${markPalette.logo2}" />`,
-    `<polygon points="12,13 22,17 12,21 2,17" fill="${markPalette.logo3}" />`,
-    '</svg>',
+    `<table role="presentation" cellpadding="0" cellspacing="0" width="${MARK_SIZE_PX}" height="${MARK_SIZE_PX}" style="border-collapse:separate;">`,
+    `<tr><td align="center" valign="middle" bgcolor="${tileColor}" width="${MARK_SIZE_PX}" height="${MARK_SIZE_PX}" style="width:${MARK_SIZE_PX}px;height:${MARK_SIZE_PX}px;background-color:${tileColor};border-radius:8px;color:${EMAIL_WHITE};font-family:${FONT_STACK};font-size:18px;font-weight:700;line-height:${MARK_SIZE_PX}px;text-align:center;">`,
+    escapeHtml(toInitial(brandName) ?? ''),
+    CELL_ROW_END,
+    '</table>',
   ].join('');
 }

@@ -1,6 +1,7 @@
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
+  INLINE_SVG,
   MOCK_BODY_HTML,
   MOCK_ESCAPED_SCRIPT_MARKUP,
   MOCK_ESCAPED_UNSAFE_MARKUP,
@@ -11,11 +12,17 @@ import {
   MOCK_POSTAL_ADDRESS,
   MOCK_SCRIPT_MARKUP,
   MOCK_STRUCTURAL_HTML,
+  MOCK_TENANT_INITIAL,
   MOCK_TENANT_NAME,
   MOCK_UNSAFE_MARKUP,
   PREHEADER_STYLE,
 } from '@blog/email/testing/email-fixtures';
 import { MOCK_TENANT_EMAIL_BRAND } from '@blog/email/testing/tenant-email-brand';
+import {
+  hexToOklch,
+  renderedContrastRatio,
+  WCAG_AA_CONTRAST_MIN,
+} from '@blog/utils/color';
 import { faker } from '@faker-js/faker';
 
 import { buildTenantShell, type TTenantEmailBrand } from './tenant-shell';
@@ -65,9 +72,11 @@ describe(buildTenantShell, () => {
       );
     });
 
-    it('draws the generated mark when no logo is uploaded', () => {
+    it('draws the initial on a logo-coloured tile without a logo', () => {
       expect(html).not.toContain('<img');
-      expect(html).toContain('<svg');
+      expect(html).not.toContain(INLINE_SVG);
+      expect(html).toContain(`bgcolor="${MOCK_TENANT_EMAIL_BRAND.logo1}"`);
+      expect(html).toContain(`>${MOCK_TENANT_INITIAL}</td>`);
     });
 
     it.each([
@@ -179,17 +188,33 @@ describe(buildTenantShell, () => {
     expect(html).toContain(`<img src="${MOCK_LOGO_URL}"`);
     expect(html).toContain('width="32" height="32"');
     expect(html).toContain(`alt="${MOCK_ESCAPED_UNSAFE_MARKUP} logo"`);
-    expect(html).not.toContain('<svg');
+    expect(html).not.toContain(`bgcolor="${MOCK_TENANT_EMAIL_BRAND.logo1}"`);
   });
 
-  it('falls back to the generated mark when the logo URL is unsafe', () => {
+  it('falls back to the initial tile when the logo URL is unsafe', () => {
     const html = buildTenantShell({
       ...MOCK_SHELL_INPUT,
       logoImageUrl: MOCK_JAVASCRIPT_URL,
     });
 
     expect(html).not.toContain('<img');
-    expect(html).toContain('<svg');
+    expect(html).toContain(`>${MOCK_TENANT_INITIAL}</td>`);
+  });
+
+  it('meets 4.5:1 between the tile letter and the logo colour', () => {
+    const html = buildTenantShell(MOCK_SHELL_INPUT);
+    const letterColour = html.match(
+      new RegExp(
+        `bgcolor="${MOCK_TENANT_EMAIL_BRAND.logo1}"[^>]*;color:(#[0-9a-f]{6});`,
+      ),
+    )?.[1];
+
+    expect(letterColour).toBeDefined();
+    expect(
+      renderedContrastRatio(hexToOklch(letterColour ?? ''), [
+        hexToOklch(MOCK_TENANT_EMAIL_BRAND.logo1),
+      ]),
+    ).toBeGreaterThanOrEqual(WCAG_AA_CONTRAST_MIN);
   });
 
   it('renders the escaped postal address beneath the copyright line', () => {

@@ -5,8 +5,10 @@ import {
   PLATFORM_EMAIL_FULL_LOGO,
 } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
+  BRAND_HEADER_DIVIDER,
   COPYRIGHT_ENTITY,
   DOCTYPE,
+  INLINE_SVG,
   MOCK_ATTACKER_URL,
   MOCK_ATTRIBUTE_BREAKOUT,
   MOCK_ESCAPED_UNSAFE_MARKUP,
@@ -132,7 +134,7 @@ describe(buildInviteMagicLinkEmail, () => {
     });
 
     it('names no brand in a header mark or a copyright line', () => {
-      expect(email.html).not.toContain('<svg');
+      expect(email.html).not.toContain(BRAND_HEADER_DIVIDER);
       expect(email.html).not.toContain(COPYRIGHT_ENTITY);
     });
 
@@ -170,7 +172,7 @@ describe(buildInviteMagicLinkEmail, () => {
     });
 
     it('shows the hosted full platform logo and names the platform in the footer', () => {
-      expect(email.html).not.toContain('<svg');
+      expect(email.html).not.toContain(INLINE_SVG);
       expect(email.html).toContain(PLATFORM_EMAIL_FULL_LOGO.url);
       expect(email.html).toContain(
         `${COPYRIGHT_ENTITY} ${MOCK_NOW.getFullYear()} ${PLATFORM_EMAIL_BRAND_NAME}`,

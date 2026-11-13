@@ -1,5 +1,6 @@
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import {
+  BRAND_HEADER_DIVIDER,
   COPYRIGHT_ENTITY,
   DOCTYPE,
   MOCK_BODY_HTML,
@@ -36,7 +37,7 @@ describe(buildNeutralShell, () => {
     });
 
     it('renders no brand header and no footer', () => {
-      expect(html).not.toContain('<svg');
+      expect(html).not.toContain(BRAND_HEADER_DIVIDER);
       expect(html).not.toContain('<img');
       expect(html).not.toContain(COPYRIGHT_ENTITY);
       expect(html).not.toContain('border-top');
