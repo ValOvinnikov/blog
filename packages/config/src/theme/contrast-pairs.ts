@@ -1,10 +1,10 @@
 import { CONTRAST_ROLE, type TContrastRole } from '@blog/config/constants';
 
+import { CODE_CONTRAST_PAIRS } from './code-contrast-pairs';
 import {
   BANDS,
   BRAND_PRIMARY,
   BRAND_PRIMARY_MUTED,
-  CODE_SURFACES,
   ERROR_MUTED,
   FIELD_SURFACES,
   FILLED_ITEM_SURFACES,
@@ -99,6 +99,12 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.UI_BOUNDARY,
     followsAccentHue: true,
   },
+  LOGO_TILE_CONTRAST: {
+    foreground: '--logo-tile-contrast',
+    surfaces: ['--logo-tile'],
+    role: CONTRAST_ROLE.TEXT,
+    followsAccentHue: true,
+  },
   ON_IMAGE: {
     foreground: '--on-image',
     surfaces: SCRIM_STOPS_UNDER_COPY,
@@ -136,54 +142,7 @@ export const CONTRAST_PAIRS = {
     role: CONTRAST_ROLE.TEXT,
     followsAccentHue: true,
   },
-  CODE_FG: {
-    foreground: '--code-fg',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_COMMENT: {
-    foreground: '--code-comment',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_KEYWORD: {
-    foreground: '--code-keyword',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_PROPERTY: {
-    foreground: '--code-property',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_STRING: {
-    foreground: '--code-string',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_VARIABLE: {
-    foreground: '--code-variable',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_CONSTANT: {
-    foreground: '--code-constant',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
-  CODE_URL: {
-    foreground: '--code-url',
-    surfaces: CODE_SURFACES,
-    role: CONTRAST_ROLE.TEXT,
-    followsAccentHue: true,
-  },
+  ...CODE_CONTRAST_PAIRS,
 } as const satisfies Record<string, TContrastPair>;
 
 export type TContrastPairId = keyof typeof CONTRAST_PAIRS;
