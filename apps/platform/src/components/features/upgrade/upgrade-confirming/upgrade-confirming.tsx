@@ -1,20 +1,12 @@
 'use client';
 
-import { ALERT_TYPE, SIZE } from '@blog/config';
-import { Alert } from '@platform/components/shared/alert';
-import { Button } from '@platform/components/shared/button';
-import { Spinner } from '@platform/components/shared/spinner';
 import {
-  type TUpgradeState,
-  UPGRADE_POLL,
-  UPGRADE_STATE,
-} from '@platform/constants/billing';
-import { SPINNER_TONE } from '@platform/constants/spinner';
-import { useRouter } from '@platform/i18n/navigation';
+  useWebhookWait,
+  WebhookWaitStatus,
+} from '@platform/components/features/upgrade/webhook-wait-status';
+import { type TUpgradeState, UPGRADE_STATE } from '@platform/constants/billing';
 import { getUpgradeStateAction } from '@platform/server/billing/get-upgrade-state-action';
-import { usePolledValue } from '@platform/utils/use-polled-value/use-polled-value';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
 
 export type TUpgradeConfirmingProps = {
   tenantId: string;
@@ -29,63 +21,31 @@ export const UpgradeConfirming = ({
   initialState,
 }: TUpgradeConfirmingProps) => {
   const t = useTranslations('upgradePage');
-  const router = useRouter();
-  const [hasFailed, setHasFailed] = useState(false);
   const {
     value: state,
-    restart,
-    isExhausted,
-  } = usePolledValue(tenantId, initialState, getUpgradeStateAction, {
-    intervalMs: UPGRADE_POLL.INTERVAL_MS,
-    maxTicks: UPGRADE_POLL.MAX_TICKS,
-    isActive: isAwaitingSubscription,
-    onResult: (next) => {
-      if (!isAwaitingSubscription(next)) router.refresh();
-    },
-    onError: () => setHasFailed(true),
-  });
-
-  const checkAgain = () => {
-    setHasFailed(false);
-    restart();
-    router.refresh();
-  };
-
-  if (!isAwaitingSubscription(state)) {
-    return (
-      <Alert
-        type={ALERT_TYPE.SUCCESS}
-        title={t('confirmedTitle')}
-        description={t('confirmedDescription')}
-      />
-    );
-  }
-
-  if (hasFailed || isExhausted) {
-    return (
-      <Alert
-        type={ALERT_TYPE.WARNING}
-        title={t('slowTitle')}
-        description={t('slowDescription')}
-        action={
-          <Button size={SIZE.SM} onClick={checkAgain}>
-            {t('checkAgain')}
-          </Button>
-        }
-      />
-    );
-  }
+    isSlow,
+    checkAgain,
+  } = useWebhookWait(
+    tenantId,
+    initialState,
+    getUpgradeStateAction,
+    isAwaitingSubscription,
+  );
 
   return (
-    <Alert
-      type={ALERT_TYPE.INFO}
-      title={t('confirmingTitle')}
-      description={t('confirmingDescription')}
-      action={
-        <span aria-hidden="true">
-          <Spinner label={t('confirmingTitle')} tone={SPINNER_TONE.TEXT} />
-        </span>
-      }
+    <WebhookWaitStatus
+      isSlow={isSlow}
+      isConfirmed={!isAwaitingSubscription(state)}
+      confirming={{
+        title: t('confirmingTitle'),
+        description: t('confirmingDescription'),
+      }}
+      slow={{ title: t('slowTitle'), description: t('slowDescription') }}
+      confirmed={{
+        title: t('confirmedTitle'),
+        description: t('confirmedDescription'),
+      }}
+      onCheckAgain={checkAgain}
     />
   );
 };

@@ -48,7 +48,7 @@ vi.mock('@blog/db', () => ({
   },
 }));
 
-vi.mock('./stripe-client', () => ({ getStripeClient: vi.fn() }));
+vi.mock('./stripe-client');
 
 const {
   stripe,

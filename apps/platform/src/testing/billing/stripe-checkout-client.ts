@@ -3,11 +3,8 @@ import {
   MOCK_STRIPE_CUSTOMER_ID,
   MOCK_STRIPE_PRICE_ID,
 } from '@platform/testing/billing/fixtures';
+import { stripeCall } from '@platform/testing/billing/stripe-call';
 import type Stripe from 'stripe';
-
-type TStripeCall = (...args: unknown[]) => Promise<unknown>;
-
-const stripeCall = (value: unknown) => vi.fn<TStripeCall>(async () => value);
 
 export const mockStripeCheckoutClient = () => {
   const calls = {

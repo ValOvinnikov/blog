@@ -9,9 +9,9 @@ import {
   MOCK_STRIPE_INVOICE_ID,
   MOCK_STRIPE_SUBSCRIPTION_ID,
   MOCK_UNHANDLED_EVENT_TYPE,
-  mockStripeEvent,
   mockStripeInvoice,
 } from '@platform/testing/billing/fixtures';
+import { mockStripeEvent } from '@platform/testing/billing/stripe-subscription';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import { logger } from '@platform/utils/logger/logger';

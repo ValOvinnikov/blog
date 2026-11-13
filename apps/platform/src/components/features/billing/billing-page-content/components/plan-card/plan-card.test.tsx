@@ -2,6 +2,7 @@ import { TENANT_PLAN } from '@blog/config/constants';
 import { TENANT_STATUS } from '@blog/db/constants';
 import { MOCK_NEXT_PAYMENT } from '@platform/testing/billing/overview';
 import { customRender, screen } from '@platform/testing/custom-render';
+import { adminRoutes } from '@platform/utils/routes/routes';
 
 import { PlanCard } from './plan-card';
 
@@ -9,6 +10,7 @@ const setup = customRender(PlanCard, {
   plan: TENANT_PLAN.GROWTH,
   status: TENANT_STATUS.PAST_DUE,
   hasPayments: true,
+  isSubscribed: true,
   nextPayment: MOCK_NEXT_PAYMENT,
 });
 
@@ -24,6 +26,15 @@ describe(`<${PlanCard.name}/>`, () => {
 
       expect(plan).toBeVisible();
       expect(status).toBeVisible();
+    });
+
+    it('links to the plan change', () => {
+      const changePlan = screen.getByRole('link', { name: 'Change plan' });
+
+      expect(changePlan).toHaveAttribute(
+        'href',
+        adminRoutes.dashboardUpgrade(),
+      );
     });
 
     it('shows the amount and date of the next payment', () => {
@@ -51,13 +62,16 @@ describe(`<${PlanCard.name}/>`, () => {
       plan: TENANT_PLAN.FREE,
       status: TENANT_STATUS.TRIAL,
       hasPayments: false,
+      isSubscribed: false,
       nextPayment: undefined,
     });
 
     const noPayments = screen.getByText('Your site has no payments yet.');
     const nextPaymentLabel = screen.queryByText('Next payment');
+    const upgrade = screen.getByRole('link', { name: 'Upgrade' });
 
     expect(noPayments).toBeVisible();
     expect(nextPaymentLabel).not.toBeInTheDocument();
+    expect(upgrade).toHaveAttribute('href', adminRoutes.dashboardUpgrade());
   });
 });

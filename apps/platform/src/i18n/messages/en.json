@@ -2222,7 +2222,9 @@
       "void": "Cancelled"
     },
     "unavailableTitle": "Payments and invoices unavailable",
-    "unavailableDescription": "They couldn't be loaded just now. Reload the page in a moment."
+    "unavailableDescription": "They couldn't be loaded just now. Reload the page in a moment.",
+    "upgrade": "Upgrade",
+    "changePlan": "Change plan"
   },
   "upgradePage": {
     "pageTitle": "Upgrade your plan",
@@ -2249,6 +2251,26 @@
     "subscribedDescription": "Its subscription is active, so there's nothing to buy here.",
     "confirmedTitle": "Your payment is confirmed",
     "confirmedDescription": "Your new plan is active on your site.",
-    "SUBSCRIBED": "Your site already has a paid plan, so there's nothing to buy here."
+    "SUBSCRIBED": "Your site already has a paid plan, so there's nothing to buy here.",
+    "changePlanTitle": "Change plan",
+    "currentPlan": "Your site is on {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}.",
+    "pendingChange": "Your site moves to {plan}, paid {interval, select, YEARLY {yearly} other {monthly}}, on <time>{date}</time>.",
+    "changeNow": "The change starts today. You pay the difference for the rest of the current period now.",
+    "changeAtRenewal": "The change starts on <time>{date}</time>, when the current period ends. Nothing changes until then.",
+    "keepCurrentDescription": "Your site stays on {plan}, and the change planned for <time>{date}</time> is cancelled.",
+    "changeUnchanged": "This is your current plan. Choose another plan or billing period to change it.",
+    "keepCurrent": "Keep {plan}",
+    "changeSubmit": "Change plan",
+    "changePending": "Changing…",
+    "changeFailed": "Your plan couldn't be changed. Try again in a moment.",
+    "changeConfirmingTitle": "Confirming your change",
+    "changeConfirmingDescription": "Your plan changes as soon as the payment is confirmed, usually within a minute. This page updates by itself.",
+    "changeSlowDescription": "Your change may still be confirming. Check again in a moment; we'll also email you once your plan changes.",
+    "planLoadFailed": "Your plan couldn't be loaded. Reload the page in a moment.",
+    "billingLink": "Billing",
+    "NOT_SUBSCRIBED": "Your site has no paid plan to change yet. Choose one at checkout.",
+    "NOT_ACTIVE": "Your subscription needs attention before its plan can change. Open Billing to settle it.",
+    "UNCHANGED": "Your site is already on this plan.",
+    "CARD_DECLINED": "Your card was declined, so nothing changed. Update it in Billing and try again."
   }
 }

@@ -2222,7 +2222,9 @@
       "void": "Annulée"
     },
     "unavailableTitle": "Paiements et factures indisponibles",
-    "unavailableDescription": "Ils n'ont pas pu être chargés pour l'instant. Rechargez la page dans un instant."
+    "unavailableDescription": "Ils n'ont pas pu être chargés pour l'instant. Rechargez la page dans un instant.",
+    "upgrade": "Choisir une offre",
+    "changePlan": "Changer de formule"
   },
   "upgradePage": {
     "pageTitle": "Changer d'offre",
@@ -2249,6 +2251,26 @@
     "subscribedDescription": "Son abonnement est actif, il n'y a donc rien à acheter ici.",
     "confirmedTitle": "Votre paiement est confirmé",
     "confirmedDescription": "Votre nouvelle offre est active sur votre site.",
-    "SUBSCRIBED": "Votre site a déjà une offre payante, il n'y a donc rien à acheter ici."
+    "SUBSCRIBED": "Votre site a déjà une offre payante, il n'y a donc rien à acheter ici.",
+    "changePlanTitle": "Changer de formule",
+    "currentPlan": "Votre site est sur {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}.",
+    "pendingChange": "Votre site passe à {plan}, payé {interval, select, YEARLY {à l'année} other {au mois}}, le <time>{date}</time>.",
+    "changeNow": "Le changement commence aujourd'hui. Vous payez maintenant la différence pour le reste de la période en cours.",
+    "changeAtRenewal": "Le changement commence le <time>{date}</time>, à la fin de la période en cours. Rien ne change d'ici là.",
+    "keepCurrentDescription": "Votre site reste sur {plan}, et le changement prévu le <time>{date}</time> est annulé.",
+    "changeUnchanged": "C'est votre formule actuelle. Choisissez une autre formule ou période de facturation pour la changer.",
+    "keepCurrent": "Garder {plan}",
+    "changeSubmit": "Changer de formule",
+    "changePending": "Changement…",
+    "changeFailed": "Votre formule n'a pas pu être changée. Réessayez dans un instant.",
+    "changeConfirmingTitle": "Confirmation de votre changement",
+    "changeConfirmingDescription": "Votre formule change dès que le paiement est confirmé, généralement en moins d'une minute. Cette page se met à jour toute seule.",
+    "changeSlowDescription": "Votre changement est peut-être encore en cours de confirmation. Vérifiez de nouveau dans un instant ; nous vous enverrons aussi un e-mail dès que votre formule change.",
+    "planLoadFailed": "Votre formule n'a pas pu être chargée. Rechargez la page dans un instant.",
+    "billingLink": "Facturation",
+    "NOT_SUBSCRIBED": "Votre site n'a pas encore de formule payante à changer. Choisissez-en une au paiement.",
+    "NOT_ACTIVE": "Votre abonnement demande votre attention avant de pouvoir changer de formule. Ouvrez Facturation pour le régler.",
+    "UNCHANGED": "Votre site est déjà sur cette formule.",
+    "CARD_DECLINED": "Votre carte a été refusée, donc rien n'a changé. Mettez-la à jour dans Facturation et réessayez."
   }
 }

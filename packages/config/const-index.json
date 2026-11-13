@@ -3886,6 +3886,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/subscriber-outcome.ts"
+      },
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.NOT_SUBSCRIBED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
       }
     ],
     "TOPICS": [
@@ -5542,6 +5548,30 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.plan_change_failed": [
+      {
+        "ref": "BILLING_LOG.PLAN_CHANGE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.plan_change_price_missing": [
+      {
+        "ref": "BILLING_LOG.PLAN_CHANGE_PRICE_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.plan_change_load_failed": [
+      {
+        "ref": "BILLING_LOG.PLAN_CHANGE_LOAD_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "customer.subscription.created": [
       {
         "ref": "STRIPE_EVENT_TYPE.SUBSCRIPTION_CREATED",
@@ -5617,6 +5647,38 @@
     "unpaid": [
       {
         "ref": "STRIPE_SUBSCRIPTION_STATUS.UNPAID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "month": [
+      {
+        "ref": "STRIPE_RECURRING_INTERVAL.MONTHLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "year": [
+      {
+        "ref": "STRIPE_RECURRING_INTERVAL.YEARLY",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "none": [
+      {
+        "ref": "STRIPE_PRORATION_BEHAVIOR.NONE",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "always_invoice": [
+      {
+        "ref": "STRIPE_PRORATION_BEHAVIOR.ALWAYS_INVOICE",
         "scope": "app:platform",
         "from": "@platform/constants/billing",
         "file": "apps/platform/src/constants/billing.ts"
@@ -7410,6 +7472,54 @@
         "scope": "app:platform",
         "from": "@platform/constants/owner-studio-access",
         "file": "apps/platform/src/constants/owner-studio-access.ts"
+      }
+    ],
+    "NOW": [
+      {
+        "ref": "PLAN_CHANGE_TIMING.NOW",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "AT_RENEWAL": [
+      {
+        "ref": "PLAN_CHANGE_TIMING.AT_RENEWAL",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "CANCEL_PENDING": [
+      {
+        "ref": "PLAN_CHANGE_TIMING.CANCEL_PENDING",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "NOT_ACTIVE": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.NOT_ACTIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "UNCHANGED": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.UNCHANGED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
+      }
+    ],
+    "CARD_DECLINED": [
+      {
+        "ref": "PLAN_CHANGE_REFUSAL.CARD_DECLINED",
+        "scope": "app:platform",
+        "from": "@platform/constants/plan-change",
+        "file": "apps/platform/src/constants/plan-change.ts"
       }
     ],
     "ROWS": [
