@@ -76,7 +76,6 @@ export type Module_pricing = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   tiers?: Array<
     {
@@ -89,8 +88,21 @@ export type Module_pricing = {
       _key: string;
     } & CtaButton
   >;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   contentAlignment?: 'LEFT' | 'CENTER';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
   layout?: WideLayout;
+};
+
+export type WideLayout = {
+  _type: 'wideLayout';
+  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  containerWidth?: 'WIDE' | 'FULL';
+  dividerTop?: boolean;
+  dividerBottom?: boolean;
 };
 
 export type InternationalizedArrayString = Array<
@@ -480,15 +492,6 @@ export type Module_postRelated = {
   density?: 'DEFAULT' | 'COMPACT';
   columns?: 'TWO' | 'THREE' | 'FOUR';
   layout?: WideLayout;
-};
-
-export type WideLayout = {
-  _type: 'wideLayout';
-  spacingTop?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  spacingBottom?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
-  containerWidth?: 'WIDE' | 'FULL';
-  dividerTop?: boolean;
-  dividerBottom?: boolean;
 };
 
 export type Page_postReference = {
@@ -2661,6 +2664,7 @@ export type AllSanitySchemaTypes =
   | ModuleHeadingBlock
   | Module_sectionPages
   | Module_pricing
+  | WideLayout
   | InternationalizedArrayString
   | Module_cookieSettings
   | Module_contactForm
@@ -2687,7 +2691,6 @@ export type AllSanitySchemaTypes =
   | Block_featureReference
   | Module_featureList
   | Module_postRelated
-  | WideLayout
   | Page_postReference
   | Module_postFeatured
   | Module_postLatest

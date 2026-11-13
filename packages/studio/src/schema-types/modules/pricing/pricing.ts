@@ -1,4 +1,9 @@
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import {
+  appearanceFieldGroups,
+  appearanceFields,
+  appearanceFieldsets,
+} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { localizedOneLineTextField } from '@blog/studio/schema-types/fields/localized-one-line-text-field/localized-one-line-text-field';
@@ -13,6 +18,7 @@ import { DollarSign } from 'lucide-react';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 
 const FOOTNOTE_MAX_LENGTH = 160;
+const NO_TIERS_ERROR = 'Add at least one tier.';
 
 export const pricingSchema = defineType({
   name: 'module_pricing',
@@ -20,41 +26,48 @@ export const pricingSchema = defineType({
   type: 'document',
   description: 'A table of plans and their prices, used to sell an offer.',
   icon: DollarSign,
-  fields: [
-    titleField(),
-    brandVariantField(),
-    moduleHeadingBlockField(),
-    defineField({
-      name: 'tiers',
-      title: 'Tiers',
-      type: 'array',
-      description:
-        'The tiers, left to right. Prices use the currency set in Site Settings (change it there).',
-      of: [defineArrayMember({ type: pricingTierSchema.name })],
-      validation: (rule) => [
-        rule.required().error('Add at least one tier.'),
-        rule.min(1).error('Add at least one tier.'),
-        rule.max(4).error('Pricing holds at most four tiers.'),
-        rule.custom(validatePricingSingleHighlightedTier),
-      ],
-    }),
-    localizedOneLineTextField({
-      name: 'footnote',
-      title: 'Footnote',
-      description:
-        'One line under the tiers — the currency, taxes, or a caveat.',
-      validation: (rule) =>
-        rule.custom(
-          validateLocalizedMaxLength(
-            FOOTNOTE_MAX_LENGTH,
-            'A footnote is one line, not a paragraph.',
+  fieldsets: appearanceFieldsets,
+  groups: appearanceFieldGroups,
+  fields: appearanceFields({
+    content: [
+      titleField(),
+      moduleHeadingBlockField(),
+      defineField({
+        name: 'tiers',
+        title: 'Tiers',
+        type: 'array',
+        description:
+          'The tiers, left to right. Prices use the currency set in Site Settings (change it there).',
+        of: [defineArrayMember({ type: pricingTierSchema.name })],
+        validation: (rule) => [
+          rule.required().error(NO_TIERS_ERROR),
+          rule.min(1).error(NO_TIERS_ERROR),
+          rule.max(4).error('Pricing holds at most four tiers.'),
+          rule.custom(validatePricingSingleHighlightedTier),
+        ],
+      }),
+      localizedOneLineTextField({
+        name: 'footnote',
+        title: 'Footnote',
+        description:
+          'One line under the tiers — the currency, taxes, or a caveat.',
+        validation: (rule) =>
+          rule.custom(
+            validateLocalizedMaxLength(
+              FOOTNOTE_MAX_LENGTH,
+              'A footnote is one line, not a paragraph.',
+            ),
           ),
-        ),
-    }),
-    ctaButtonsField(),
-    ...alignmentFields([], { hasActions: true }),
-    wideLayoutField,
-  ],
+      }),
+      ctaButtonsField(),
+    ],
+    appearance: [
+      brandVariantField(),
+      ...alignmentFields([], { title: 'Heading Alignment', hasActions: true }),
+    ],
+    layout: wideLayoutField,
+    hasColumns: false,
+  }),
   preview: {
     select: {
       title: 'title',
