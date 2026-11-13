@@ -687,6 +687,8 @@ export type PricingTier = {
   _type: 'pricingTier';
   name?: InternationalizedArrayString;
   description?: InternationalizedArrayString;
+  platformPlan?: 'STARTER' | 'GROWTH';
+  platformPlanInterval?: 'MONTH' | 'YEAR';
   prices?: Array<
     {
       _key: string;

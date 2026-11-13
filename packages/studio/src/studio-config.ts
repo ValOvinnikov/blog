@@ -1,10 +1,4 @@
-import {
-  LOCALE_ISO_CODES,
-  type TCapability,
-  type TLocaleIsoCode,
-  type TModulePack,
-  type TSanityLoginProvider,
-} from '@blog/config/constants';
+import { LOCALE_ISO_CODES, type TLocaleIsoCode } from '@blog/config/constants';
 import { buildLoginProviderAuth } from '@blog/studio/auth/login-provider-auth';
 import { documentOptions } from '@blog/studio/document-actions/document-options/document-options';
 import { schemaTypes } from '@blog/studio/schema-types';
@@ -43,6 +37,7 @@ import {
   setEntitledModulePacks,
 } from '@blog/studio/schema-types/validation/entitled-module-packs/entitled-module-packs';
 import { setLiveLanguages } from '@blog/studio/schema-types/validation/live-languages/live-languages';
+import { setCanLinkPlatformPlans } from '@blog/studio/schema-types/validation/platform-plan-links/platform-plan-links';
 import { isSingleLanguage } from '@blog/studio/structure/locales/is-single-language';
 import { orderLocales } from '@blog/studio/structure/locales/order-locales';
 import { codeInput } from '@sanity/code-input';
@@ -53,23 +48,8 @@ import { structureTool } from 'sanity/structure';
 import { internationalizedArray } from 'sanity-plugin-internationalized-array';
 import { media, mediaAssetSource } from 'sanity-plugin-media';
 
+import type { TBuildStudioConfigParams } from './studio-config-params';
 import { createStudioStructure } from './studio-structure';
-
-export type TStudioEntitlements = {
-  modulePacks?: readonly TModulePack[];
-};
-
-export type TBuildStudioConfigParams = {
-  projectId: string;
-  dataset: string;
-  basePath?: string;
-  title: string;
-  enabledCapabilities?: readonly TCapability[];
-  entitlements?: TStudioEntitlements;
-  defaultLocale?: TLocaleIsoCode;
-  liveLocales?: readonly TLocaleIsoCode[];
-  loginProvider?: TSanityLoginProvider;
-};
 
 const ONE_PER_LANGUAGE_DOCUMENT_TYPES: string[] = [
   PAGE_HOME_TYPE,
@@ -136,6 +116,7 @@ export const buildStudioConfig = ({
   title,
   enabledCapabilities,
   entitlements,
+  canLinkPlatformPlans = false,
   defaultLocale = LOCALE_ISO_CODES.EN,
   liveLocales,
   loginProvider,
@@ -144,6 +125,7 @@ export const buildStudioConfig = ({
   setDefaultLanguage(defaultLocale);
   setLiveLanguages(liveLocales ?? []);
   setEntitledModulePacks(entitledModulePacks);
+  setCanLinkPlatformPlans(canLinkPlatformPlans);
 
   const offeredLocales = orderLocales(defaultLocale, liveLocales);
   const languages = offeredLocales.map((locale) => ({

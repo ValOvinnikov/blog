@@ -4892,6 +4892,40 @@
           },
           "optional": true
         },
+        "platformPlan": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "STARTER"
+              },
+              {
+                "type": "string",
+                "value": "GROWTH"
+              }
+            ]
+          },
+          "optional": true
+        },
+        "platformPlanInterval": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "MONTH"
+              },
+              {
+                "type": "string",
+                "value": "YEAR"
+              }
+            ]
+          },
+          "optional": true
+        },
         "prices": {
           "type": "objectAttribute",
           "value": {

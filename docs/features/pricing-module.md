@@ -7,6 +7,8 @@ code:
   - packages/studio/src/schema-types/modules/pricing/**
   - packages/studio/src/schema-types/objects/pricing-*/**
   - packages/studio/src/schema-types/validation/validate-pricing-*/**
+  - packages/studio/src/schema-types/validation/is-pricing-tier-linked/**
+  - packages/studio/src/schema-types/validation/platform-plan-links/**
   - packages/service/src/features/modules/pricing/**
   - packages/ui/src/components/molecules/pricing-card/**
   - packages/ui/src/components/organisms/pricing-card-grid/**
@@ -14,14 +16,14 @@ code:
   - apps/web/src/utils/to-pricing-panels/**
   - apps/web/src/utils/format-price-amount/**
   - apps/web/src/testing/modules/pricing/**
-epics: [5047, 5028]
+epics: [5047, 5028, 4840]
 ---
 
 # Pricing module
 
 ## What it does
 
-An editor sells an offer with a table of up to four plans. Each tier has a name, a line on who it is for, one or more prices (or a label such as "Contact us"), a feature list, its own actions, an optional recommendation badge and a footnote. When the tiers carry both monthly and yearly prices, readers get a Monthly/Yearly switch. Every tier, price and feature is written by the editor in Studio; nothing is read from the platform's plans.
+An editor sells an offer with a table of up to four plans. Each tier has a name, a line on who it is for, one or more prices (or a label such as "Contact us"), a feature list, its own actions, an optional recommendation badge and a footnote. When the tiers carry both monthly and yearly prices, readers get a Monthly/Yearly switch. Every tier, price and feature is written by the editor in Studio. In the marketing tenant's Studio a tier can instead link a platform plan and interval, to show that plan's live price.
 
 ## Surfaces and routes
 
@@ -32,7 +34,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 ## Data
 
 - **`module_pricing`** — `title`, `brandVariant`, `headingBlock`, `tiers[]` (`pricingTier`), `footnote` (per language), `ctaButtons`, `contentAlignment` (Left or Center), `layout` (`wideLayout`).
-- **`pricingTier`** — `name`, `description`, `priceLabel`, `highlightLabel` and `footnote` (each per-language one line), `prices[]` (`pricingPrice`), `features[]` (`pricingFeature`: one per-language `text`; the list itself is shared by every language), `ctaButtons`.
+- **`pricingTier`** — `name`, `description`, `priceLabel`, `highlightLabel` and `footnote` (each per-language one line), `prices[]` (`pricingPrice`), `features[]` (`pricingFeature`: one per-language `text`; the list itself is shared by every language), `ctaButtons`, and `platformPlan` (a `SELLABLE_TENANT_PLANS` value) with `platformPlanInterval` (`PRICE_PERIOD` `MONTH` or `YEAR`).
 - **`pricingPrice`** — `period` (`PRICE_PERIOD`: `ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`), `amount` (number, ≥ 0, two decimals), `compareAtAmount` (optional, struck through), `isStartingAt` (shows "From").
 - **`settings_site.pricePeriodSuffix`** — one per-language one-line string per `PRICE_PERIOD`, the editor's wording for that period after a price; any may be left empty. A tenant created from starter content gets the `pricingModule.period.*` catalogue wording in its starter language.
 - **Service** — `getSiteSettings` returns `pricePeriodWording`, each period's wording in the request language, falling back to the default language, else `undefined`. `getPricingModule` returns `TPricingModule`. The transformer reads feature `text` through `getLocalizedField` (request language, falling back to the default language) and drops a feature with text in neither, trims `highlightLabel` (blank means not highlighted) and reads `isStartingAt` as false when unset.
@@ -49,6 +51,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 ## Constraints and invariants
 
 - 1–4 tiers; at most one tier highlighted (counted on the default-language `highlightLabel`).
+- `platformPlan` shows only when `StudioMount` gets `canLinkPlatformPlans` (the marketing tenant). A filled `platformPlan` is the link: it hides `prices` and `priceLabel`, needs no typed price or label to validate, and requires `platformPlanInterval`. The offered plans come from `SELLABLE_TENANT_PLANS`, so the Studio names no plan. The plan field also shows while it holds a value, so a link stays clearable where the gate is off. A linked tier keeps any typed prices and label stored, and clearing the plan keeps a stale interval, so readers decide on `platformPlan` alone; `MONTH`/`YEAR` map to `PLAN_PRICE_LOOKUP_KEYS`' monthly/yearly keys.
 - Per tier: at most three prices, each period at most once; at most 12 features; a `priceLabel` is required when the tier has no prices. A compare-at amount must exceed the amount.
 - Length limits are errors: name 40, description 160, price and highlight labels 24, tier footnote 120, module footnote 160, feature 80.
 - Amounts are formatted with `Intl.NumberFormat` for the request locale and the site currency, dropping `.00`. An amount of 0 reads "Free" with no period.
@@ -60,7 +63,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 ## Dependencies
 
 - Layers: `config` (`PRICE_PERIOD`, the message catalogue), `studio`, `service`, `ui` (`PricingCard`, `SegmentedControl`), `web`.
-- Features: [module-system](./module-system.md), [voice](./voice.md) (fixed catalogue keys), [languages](./languages.md), [links](./links.md) (tier and module actions), [page-types](./page-types.md), [rendering-and-caching](./rendering-and-caching.md). Unrelated to the platform's own plans ([plans-and-entitlements](./plans-and-entitlements.md)) and the front door's pricing page ([public-front-door](./public-front-door.md)).
+- Features: [module-system](./module-system.md), [voice](./voice.md) (fixed catalogue keys), [languages](./languages.md), [links](./links.md) (tier and module actions), [page-types](./page-types.md), [rendering-and-caching](./rendering-and-caching.md). A linked tier reads the platform's sellable plans ([plans-and-entitlements](./plans-and-entitlements.md)); the marketing site's pricing page is built from such tiers ([public-front-door](./public-front-door.md)).
 - No env vars of its own.
 
 ## Entry points
@@ -78,7 +81,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 ## Tests and stories
 
 - Config: `starter-content.test.ts` (the seeded period wording).
-- Studio: `validate-pricing-{compare-at-above-amount,price-periods-unique,single-highlighted-tier,tier-price-label-required}.test.ts`.
+- Studio: `validate-pricing-{compare-at-above-amount,price-periods-unique,single-highlighted-tier,tier-price-label-required,tier-plan-interval-required}.test.ts`, `studio-config.test.ts` (the `canLinkPlatformPlans` gate).
 - Service: `features/modules/pricing/adaptor/{loader,query,transformer}.test.ts`, `features/global/site-settings/adaptor/loader.test.ts` (the period wording).
 - UI: `pricing-card.test.tsx`, `pricing-card.stories.tsx`, `pricing-card-grid.stories.tsx`.
 - Web: `pricing-module.test.tsx`, `pricing-module-view.test.tsx`, `pricing-period-switch.test.tsx`, `to-pricing-panels.test.ts`, `format-price-amount.test.ts`; fixtures in `apps/web/src/testing/modules/pricing/fixtures.ts`; story `pricing-module-view.stories.tsx`.
