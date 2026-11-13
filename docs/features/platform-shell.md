@@ -201,13 +201,16 @@ save still settles as the form's generic server error.
 
 - Neon: `admins` (role), `memberships` and `tenants`, read through
   `@blog/db` queries; nothing is written except the cookies below.
-- Cookies: `admin-active-tenant` (httpOnly, 30 days, set only by the
-  select-tenant route), `admin-sidebar-collapsed` (client-written, one
+- Cookies: `platform-active-tenant` (httpOnly, 30 days, set only by the
+  select-tenant route), `platform-sidebar-collapsed` (client-written, one
   year; read server-side for the first render), `admin-theme` (the
   per-device theme preference, one year; read server-side for the first
   render) and the per-tenant
   `studio-entered-<tenantId>` (client-written, one year), which no
-  surface reads any more (`embedded-studio.md`).
+  surface reads any more (`embedded-studio.md`). The first two still read
+  their earlier `admin-` name (`admin-active-tenant`,
+  `admin-sidebar-collapsed`) when the new one is absent; the old names are
+  never written.
 - Request caching: `listSessionTenants`, `resolveDashboardTenant`,
   `requireAdmin` and `requireTenantById` are React `cache()`-wrapped, so a
   layout and its page share one lookup per request. Nothing is cached across
@@ -250,7 +253,7 @@ save still settles as the form's generic server error.
   SUPERADMIN gets every tenant, as virtual OWNER memberships; an ADMIN or
   MODERATOR with no membership is sent to `/onboarding` too.
 - With one membership the tenant is implicit. With several, a valid
-  `admin-active-tenant` cookie picks it, otherwise the picker opens. The
+  `platform-active-tenant` cookie picks it, otherwise the picker opens. The
   select-tenant route re-checks membership (or SUPERADMIN) before setting the
   cookie, and every link to it passes `prefetch={false}`.
 - The account's role line never shows a virtual membership's OWNER role; it
