@@ -233,9 +233,9 @@ The session authenticates; it does not authorize:
 - Never trust a tenant id from the client. Resolve the session's tenants from
   its `memberships`, then check the routed id against that set.
 - **Read tenant facts and viewer roles from the loaded fields, never from a raw
-  row.** Every platform read of a tenant goes through `toPlatformTenant`
-  (the three loaders, `listSessionTenants`, `getPlatformTenant` in an action),
-  which adds `isArchived`/`archivedAt`, `entitlements`, `pageAccess`,
+  row.** Every platform read of a tenant that needs a derived fact goes
+  through `toPlatformTenant` (the three loaders, `listSessionTenants`,
+  `getPlatformTenant` in an action), which adds `isArchived`/`archivedAt`, `entitlements`, `pageAccess`,
   `siteUrl` and `trial`; a component or action reads those, not
   `deprovisionedAt`, `PLAN_ENTITLEMENTS[plan]`, `planPageAccess(plan)` or
   `tenantSiteUrl(primaryDomain)`. The loaders also return a `viewer`

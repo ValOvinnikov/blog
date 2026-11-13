@@ -16,7 +16,7 @@ export type TPlatformViewer = {
   isSuperAdmin: boolean;
 };
 
-type TViewerRecords = {
+export type TViewerRecords = {
   membership?: TMembership;
   admin?: TNullable<TAdmin>;
 };

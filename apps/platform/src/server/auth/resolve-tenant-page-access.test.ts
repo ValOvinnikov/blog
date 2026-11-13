@@ -3,14 +3,11 @@ import { queries } from '@blog/db';
 import {
   ADMIN_ROLE,
   MEMBERSHIP_ROLE,
-  type TAdminRole,
   type TMembershipRole,
 } from '@blog/db/constants';
-import { buildVirtualAdminMembership } from '@platform/server/auth/build-virtual-admin-membership';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
-import { MOCK_SIGN_IN_USER_ID } from '@platform/testing/auth/fixtures';
 import {
   mockMembership,
+  mockOperatorViewer,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
 import {
@@ -25,17 +22,6 @@ vi.mock('@blog/db', () => ({
 }));
 
 const MOCK_STORED_LEAD_COUNT = 2;
-const MOCK_OPERATOR_MEMBERSHIP = buildVirtualAdminMembership(
-  MOCK_SIGN_IN_USER_ID,
-  MOCK_TENANT_ID,
-);
-
-const operatorViewer = (role: TAdminRole) =>
-  mockViewer({
-    membership: MOCK_OPERATOR_MEMBERSHIP,
-    admin: mockAdmin({ role }),
-  });
-
 const countLeadsForTenant = vi.mocked(queries.leads.countLeadsForTenant);
 
 const resolveFor = (plan: TTenantPlan, role: TMembershipRole) =>
@@ -87,7 +73,7 @@ describe(resolveTenantPageAccess, () => {
   it('opens Leads to an operator on a plan with the contact form', async () => {
     const { leads } = await resolveTenantPageAccess(
       mockReadyTenant({ id: MOCK_TENANT_ID, plan: TENANT_PLAN.GROWTH }),
-      operatorViewer(ADMIN_ROLE.MODERATOR),
+      mockOperatorViewer(ADMIN_ROLE.MODERATOR),
     );
 
     expect(leads).toBe(true);
@@ -102,8 +88,8 @@ describe(resolveTenantPageAccess, () => {
       }),
       false,
     ],
-    ['a super admin', operatorViewer(ADMIN_ROLE.SUPERADMIN), true],
-    ['a moderator', operatorViewer(ADMIN_ROLE.MODERATOR), false],
+    ['a super admin', mockOperatorViewer(ADMIN_ROLE.SUPERADMIN), true],
+    ['a moderator', mockOperatorViewer(ADMIN_ROLE.MODERATOR), false],
   ])('opens Billing to %s: %s', async (_label, viewer, isOpen) => {
     const { billing } = await resolveTenantPageAccess(
       mockReadyTenant({ id: MOCK_TENANT_ID }),

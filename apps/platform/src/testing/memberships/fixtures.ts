@@ -1,10 +1,12 @@
-import { MEMBERSHIP_ROLE } from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, type TAdminRole } from '@blog/db/constants';
 import type { TMembership } from '@blog/db/schema/memberships';
 import {
   type TPlatformViewer,
   toPlatformViewer,
+  type TViewerRecords,
 } from '@platform/server/auth/platform-viewer';
 import type { TTenantMembershipContext } from '@platform/server/auth/require-tenant-membership';
+import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { MOCK_TENANT_ID } from '@platform/testing/tenants/fixtures';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
 
@@ -21,10 +23,13 @@ export const mockMembership = (
 });
 
 export const mockViewer = (
-  records: Parameters<typeof toPlatformViewer>[0] = {
+  records: TViewerRecords = {
     membership: mockMembership(),
   },
 ): TPlatformViewer => toPlatformViewer(records);
+
+export const mockOperatorViewer = (role: TAdminRole): TPlatformViewer =>
+  mockViewer({ admin: mockAdmin({ role }) });
 
 export const mockMembershipContext = (
   tenant: TPlatformTenant,

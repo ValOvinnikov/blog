@@ -2,7 +2,6 @@ import { AUDIT_TARGET_TYPE } from '@blog/config';
 import { FINDING_STATUS } from '@blog/config/constants';
 import {
   ADMIN_ROLE,
-  type TAdminRole,
   TENANT_PROVISIONING_STATUS,
   TENANT_PROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -14,7 +13,6 @@ import en from '@platform/i18n/messages/en.json';
 import { getTenantProvisioningStatusAction } from '@platform/server/provisioning/get-tenant-provisioning-status-action';
 import { retryProvisioningStepAction } from '@platform/server/provisioning/retry-provisioning-step-action';
 import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
-import { mockAdmin } from '@platform/testing/admins/fixtures';
 import {
   mockAuditEvent,
   MOCK_AUDIT_ACTOR_EMAIL,
@@ -31,7 +29,7 @@ import {
 } from '@platform/testing/email/fixtures';
 import { mockedEnv } from '@platform/testing/env/mocked-env';
 import { mockFinding } from '@platform/testing/findings/fixtures';
-import { mockViewer } from '@platform/testing/memberships/fixtures';
+import { mockOperatorViewer } from '@platform/testing/memberships/fixtures';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';
 import { mockRouterRefresh } from '@platform/testing/mock-router';
 import {
@@ -134,12 +132,9 @@ vi.mock('@platform/server/tenants/update-tenant-details-action', () => ({
   updateTenantDetailsAction: vi.fn(),
 }));
 
-const operatorViewer = (role: TAdminRole) =>
-  mockViewer({ admin: mockAdmin({ role }) });
-
 const setup = customRenderAsync(TenantOverviewView, {
   tenant: mockTenant(),
-  viewer: operatorViewer(ADMIN_ROLE.SUPERADMIN),
+  viewer: mockOperatorViewer(ADMIN_ROLE.SUPERADMIN),
 });
 
 const advancePoll = async () => {
@@ -249,7 +244,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
       });
 
       it('shows a moderator the pause without the clear action', async () => {
-        await setup({ viewer: operatorViewer(ADMIN_ROLE.MODERATOR) });
+        await setup({ viewer: mockOperatorViewer(ADMIN_ROLE.MODERATOR) });
 
         const pausedOn = screen.getByText(MOCK_NEWSLETTER_PAUSED_ON_TEXT);
         const clearPause = screen.queryByRole('button', CLEAR_PAUSE_BUTTON);
@@ -582,10 +577,12 @@ describe(`<${TenantOverviewView.name}/>`, () => {
     describe.each([ADMIN_ROLE.ADMIN, ADMIN_ROLE.MODERATOR])(
       'for a %s',
       (role) => {
+        const viewer = mockOperatorViewer(role);
+
         it('never reads the tenant hosts', async () => {
           await setup({
             tenant: mockTenant({ status: TENANT_STATUS.ACTIVE }),
-            viewer: operatorViewer(role),
+            viewer,
           });
 
           expect(resolveIsPlatformTenantMock).not.toHaveBeenCalled();
@@ -594,7 +591,7 @@ describe(`<${TenantOverviewView.name}/>`, () => {
         it('offers no Reactivate', async () => {
           await setup({
             tenant: mockTenant({ status: TENANT_STATUS.SUSPENDED }),
-            viewer: operatorViewer(role),
+            viewer,
           });
 
           const reactivateButton = screen.queryByRole('button', {

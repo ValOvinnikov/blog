@@ -1,5 +1,6 @@
 import { isLocaleIsoCode, LOCALE_ISO_CODES } from '@blog/config';
 import { TENANT_PLAN } from '@blog/config/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import { getSessionEmail } from '@platform/server/auth/get-session-email';
@@ -24,7 +25,10 @@ export default async function OnboardingPage() {
 
   return (
     <PoweredByMarkProvider
-      productName={toPoweredByProductName(TENANT_PLAN.GROWTH, env.PRODUCT_NAME)}
+      productName={toPoweredByProductName(
+        PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH],
+        env.PRODUCT_NAME,
+      )}
     >
       <OnboardingView
         rootDomain={env.TENANT_ROOT_DOMAIN}

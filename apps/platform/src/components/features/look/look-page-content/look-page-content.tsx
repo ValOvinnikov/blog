@@ -27,7 +27,10 @@ export const LookPageContent = async ({
 
   return (
     <PoweredByMarkProvider
-      productName={toPoweredByProductName(tenant.plan, env.PRODUCT_NAME)}
+      productName={toPoweredByProductName(
+        tenant.entitlements,
+        env.PRODUCT_NAME,
+      )}
     >
       <LookForm
         tenant={{

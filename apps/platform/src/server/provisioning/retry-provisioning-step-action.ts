@@ -1,11 +1,11 @@
 'use server';
 
 import {
-  ACTION_OUTCOME,
+  type ACTION_OUTCOME,
   isOutcomeSuccess,
   type TActionResult,
 } from '@blog/config';
-import { TENANT_REFUSAL } from '@platform/constants/tenant';
+import type { TENANT_REFUSAL } from '@platform/constants/tenant';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireTenantOwnerOrAdmin } from '@platform/server/auth/require-tenant-owner-or-admin';
 import { resolveLiveTenant } from '@platform/server/tenants/resolve-live-tenant';
