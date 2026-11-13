@@ -9496,6 +9496,22 @@
         "file": "apps/web/src/constants/post-list.ts"
       }
     ],
+    "post_related_module.missing_post_context": [
+      {
+        "ref": "POST_RELATED_LOG.MISSING_POST_CONTEXT",
+        "scope": "app:web",
+        "from": "@web/constants/post-related",
+        "file": "apps/web/src/constants/post-related.ts"
+      }
+    ],
+    "post_related_module.fetch_failed": [
+      {
+        "ref": "POST_RELATED_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/post-related",
+        "file": "apps/web/src/constants/post-related.ts"
+      }
+    ],
     "pricing_module.fetch_failed": [
       {
         "ref": "PRICING_LOG.MODULE_FETCH_FAILED",

@@ -1,50 +1,25 @@
 import type { TPostRelatedModule } from '@blog/service';
-import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import {
-  type IMediaCardData,
-  MediaCardItem,
-} from '@web/components/shared/media-card-item';
-import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+  type IPostCardsSectionProps,
+  PostCardsSection,
+} from '@web/components/shared/post-cards-section';
+import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toModuleGridColumns } from '@web/utils/to-module-grid-columns';
 
-export interface IPostRelatedModuleViewProps extends Omit<
-  TPostRelatedModule,
-  'posts' | 'showImages'
-> {
-  items: IMediaCardData[];
-  titleId: string;
-  dataTestId: string;
-  hasImages?: boolean;
-}
+export interface IPostRelatedModuleViewProps
+  extends
+    Omit<IPostCardsSectionProps, 'gridColumns'>,
+    Pick<TPostRelatedModule, 'columns'> {}
 
 export const PostRelatedModuleView = ({
-  brandVariant,
-  headingBlock,
-  items,
-  layout,
-  titleId,
-  dataTestId,
-  contentAlignment,
-  hasImages,
+  columns,
+  ...sectionProps
 }: IPostRelatedModuleViewProps) => (
-  <Section
-    brandVariant={brandVariant}
-    layout={layout}
-    titleId={titleId}
-    dataTestId={dataTestId}
-  >
-    <ModuleHeading
-      headingBlock={headingBlock}
-      id={titleId}
-      level={2}
-      align={contentAlignment}
-      variant="section"
-    />
-    <CardGrid columns={toModuleGridColumns(items.length)}>
-      {items.map((item) => (
-        <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
-      ))}
-    </CardGrid>
-  </Section>
+  <PostCardsSection
+    {...sectionProps}
+    gridColumns={
+      toCardGridColumns(columns) ??
+      toModuleGridColumns(sectionProps.items.length)
+    }
+  />
 );

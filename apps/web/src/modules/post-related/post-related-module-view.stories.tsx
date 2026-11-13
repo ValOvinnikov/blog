@@ -1,7 +1,13 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  GRID_COLUMNS,
+} from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { PostRelatedModuleView } from './post-related-module-view';
 
@@ -29,23 +35,27 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
+    columns: {
       control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
+      options: [GRID_COLUMNS.TWO, GRID_COLUMNS.THREE, GRID_COLUMNS.FOUR],
     },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
+    displayMode: {
+      control: 'select',
+      options: Object.values(DISPLAY_MODE),
+    },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Related reading' }),
     items,
-    layout: undefined,
     contentAlignment: undefined,
     titleId: 'related-posts-title',
     dataTestId: 'post-related-module-post-related-1',
+    displayMode: DISPLAY_MODE.GRID,
   },
 } satisfies Meta<typeof PostRelatedModuleView>;
 
@@ -55,7 +65,26 @@ type TStory = StoryObj<typeof meta>;
 export const Default: TStory = {};
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
+};
+
+export const FourColumns: TStory = {
+  args: { columns: GRID_COLUMNS.FOUR },
+};
+
+export const Carousel: TStory = {
+  args: { displayMode: DISPLAY_MODE.CAROUSEL },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
 };
 
 export const CenterAligned: TStory = {
