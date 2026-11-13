@@ -7,9 +7,9 @@ export const portableTextEditorToggleButtonVariants = tv({
   slots: {
     button: [
       'inline-flex items-center justify-center',
-      'rounded-admin-control border border-transparent',
-      'text-admin-text',
-      'hover:bg-admin-line-2',
+      'rounded-platform-control border border-transparent',
+      'text-platform-text',
+      'hover:bg-platform-line-2',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       'cursor-pointer',
     ],
@@ -19,18 +19,18 @@ export const portableTextEditorToggleButtonVariants = tv({
       [SIZE.SM]: {
         button: [
           'min-h-11 min-w-11 md:min-h-7 md:min-w-7 px-2',
-          'text-admin-15 leading-4 md:text-admin-13',
+          'text-platform-15 leading-4 md:text-platform-13',
         ],
       },
       [SIZE.MD]: {
         button: [
           'px-2 py-1 min-h-11 min-w-11 md:min-h-0 md:min-w-0',
-          'text-admin-12-5',
+          'text-platform-12-5',
         ],
       },
     },
     isActive: {
-      true: { button: 'border-admin-brand bg-admin-brand-weak' },
+      true: { button: 'border-platform-brand bg-platform-brand-weak' },
     },
     isIconOnly: {
       true: {},

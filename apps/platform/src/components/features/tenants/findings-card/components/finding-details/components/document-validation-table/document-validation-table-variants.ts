@@ -4,14 +4,14 @@ export const documentValidationTableVariants = tv({
   slots: {
     table: ['mt-2 w-full border-collapse text-left'],
     head: [
-      'border-b border-admin-line-2 px-2.5 py-2',
-      'text-left text-admin-11 font-bold text-admin-muted uppercase tracking-admin-caps',
+      'border-b border-platform-line-2 px-2.5 py-2',
+      'text-left text-platform-11 font-bold text-platform-muted uppercase tracking-platform-caps',
     ],
-    row: ['border-b border-admin-line-2 last:border-b-0'],
+    row: ['border-b border-platform-line-2 last:border-b-0'],
     cell: [
-      'px-2.5 py-2 align-top text-admin-12-5 text-admin-text wrap-anywhere',
+      'px-2.5 py-2 align-top text-platform-12-5 text-platform-text wrap-anywhere',
     ],
-    documentType: ['block text-admin-text'],
-    documentId: ['block text-admin-12 text-admin-muted'],
+    documentType: ['block text-platform-text'],
+    documentId: ['block text-platform-12 text-platform-muted'],
   },
 });

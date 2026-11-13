@@ -15,46 +15,46 @@ export const segmentedRadioGroupVariants = tv({
   slots: {
     root: ['w-full'],
     track: ['w-full'],
-    option: ['text-admin-text'],
+    option: ['text-platform-text'],
     optionLabel: [],
     optionDescription: [
-      'block text-admin-12 leading-4 font-normal text-admin-muted md:leading-3.75',
+      'block text-platform-12 leading-4 font-normal text-platform-muted md:leading-3.75',
     ],
     glyph: ['flex shrink-0'],
     check: [],
     fade: [
-      'pointer-events-none absolute inset-y-0 w-7 from-admin-theme-track to-admin-theme-track/0 md:hidden',
+      'pointer-events-none absolute inset-y-0 w-7 from-platform-theme-track to-platform-theme-track/0 md:hidden',
     ],
-    fadeStart: ['left-0 rounded-l-admin bg-linear-to-r'],
-    fadeEnd: ['right-0 rounded-r-admin bg-linear-to-l'],
+    fadeStart: ['left-0 rounded-l-platform bg-linear-to-r'],
+    fadeEnd: ['right-0 rounded-r-platform bg-linear-to-l'],
   },
   variants: {
     layout: {
       [SEGMENTED_RADIO_LAYOUT.TRACK]: {
         root: ['relative flex md:w-auto md:flex-none md:self-start'],
         track: [
-          'relative flex gap-0.5 rounded-admin bg-admin-theme-track p-0.75',
+          'relative flex gap-0.5 rounded-platform bg-platform-theme-track p-0.75',
           'max-md:overflow-x-auto max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden',
           'md:inline-flex md:w-auto',
         ],
         option: [
           'flex min-h-11 min-w-30 shrink-0 cursor-pointer flex-col items-start justify-center',
-          'rounded-admin-control px-3 py-1.5 text-left md:min-h-0',
-          'data-[checked]:bg-admin-surface data-[checked]:not-focus-visible:shadow-admin-xs',
+          'rounded-platform-control px-3 py-1.5 text-left md:min-h-0',
+          'data-[checked]:bg-platform-surface data-[checked]:not-focus-visible:shadow-platform-xs',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
         optionLabel: [
-          'block text-admin-13 leading-admin-18 font-semibold md:leading-4',
+          'block text-platform-13 leading-platform-18 font-semibold md:leading-4',
         ],
       },
       [SEGMENTED_RADIO_LAYOUT.TILES]: {
         root: ['@container flex flex-col gap-1.5'],
         track: ['grid grid-cols-2 gap-2 @sm:grid-cols-5'],
         option: [
-          'relative flex min-h-14 min-w-0 items-center justify-start gap-2.5 rounded-admin-control bg-admin-surface',
-          'px-2.5 py-2 text-left text-admin-13-5 leading-admin-18 font-medium',
+          'relative flex min-h-14 min-w-0 items-center justify-start gap-2.5 rounded-platform-control bg-platform-surface',
+          'px-2.5 py-2 text-left text-platform-13-5 leading-platform-18 font-medium',
           '@sm:min-h-0 @sm:flex-col @sm:justify-normal @sm:gap-1.5 @sm:px-1 @sm:pt-3.5 @sm:pb-1.75',
-          '@sm:text-center @sm:text-admin-12 @sm:leading-4',
+          '@sm:text-center @sm:text-platform-12 @sm:leading-4',
           COLOUR_TRANSITION_CLASSES,
           focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
@@ -78,7 +78,7 @@ export const segmentedRadioGroupVariants = tv({
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
       isLocked: false,
-      class: { option: ['cursor-pointer'], check: ['text-admin-brand-ink'] },
+      class: { option: ['cursor-pointer'], check: ['text-platform-brand-ink'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
@@ -93,7 +93,7 @@ export const segmentedRadioGroupVariants = tv({
       class: {
         option: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-admin-control-line hover:border-admin-muted hover:bg-admin-hover',
+          'border-platform-control-line hover:border-platform-muted hover:bg-platform-hover',
         ],
       },
     },
@@ -102,15 +102,15 @@ export const segmentedRadioGroupVariants = tv({
       isLocked: true,
       class: {
         option: [...UNSELECTED_CHOICE_CLASSES, 'cursor-not-allowed'],
-        glyph: ['opacity-(--admin-locked-fade)'],
-        check: ['text-admin-muted'],
+        glyph: ['opacity-(--platform-locked-fade)'],
+        check: ['text-platform-muted'],
       },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
       isLocked: true,
       isSelected: true,
-      class: { option: ['border-admin-control-line'] },
+      class: { option: ['border-platform-control-line'] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
@@ -118,7 +118,7 @@ export const segmentedRadioGroupVariants = tv({
       isSelected: false,
       class: {
         option: [
-          'border-admin-control-line-locked bg-admin-bg text-admin-muted',
+          'border-platform-control-line-locked bg-platform-bg text-platform-muted',
         ],
       },
     },

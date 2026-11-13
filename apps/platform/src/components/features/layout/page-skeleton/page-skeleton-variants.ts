@@ -9,7 +9,7 @@ export const pageSkeletonVariants = tv({
     cardTitle: ['h-4 w-40'],
     row: [
       'flex items-center gap-4 py-3',
-      'border-b border-admin-line-2 last:border-b-0',
+      'border-b border-platform-line-2 last:border-b-0',
     ],
     primaryCell: ['h-4 flex-1'],
     secondaryCell: ['h-4 w-24'],

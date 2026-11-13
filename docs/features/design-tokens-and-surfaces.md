@@ -14,7 +14,7 @@ code:
   - packages/ui/src/lib/design-tokens/**
   - packages/ui/index.css
   - apps/web/index.css
-  - apps/platform/src/styles/admin-theme.css
+  - apps/platform/src/styles/platform-theme.css
 epics: [4987, 4990, 4991, 4994, 4996, 4997, 4858, 5459]
 ---
 
@@ -29,12 +29,12 @@ The public site and `@blog/ui` draw every colour, size, radius, spacing step, sh
 - No route. Every public page and every `@blog/ui` component consumes the tokens.
 - `packages/ui`'s Storybook has a design-tokens story that parses `theme.css` (`token-registry.ts`, the `@role` comments) and renders colour, type, radius, spacing, layout and motion tables.
 - Editors reach surfaces only through a module's `brandVariant` field in Studio (`PRIMARY`, `SECONDARY`, `BRAND_PRIMARY`), which picks the band `Section` paints.
-- `apps/platform` keeps its own `--admin-*` token layer (`apps/platform/src/styles/admin-theme.css`). It imports `theme.css` for the Tailwind base and for the site preview components.
+- `apps/platform` keeps its own `--platform-*` token layer (`apps/platform/src/styles/platform-theme.css`). It imports `theme.css` for the Tailwind base and for the site preview components.
 - Platform tokens for the onboarding surfaces, in that file:
-  - `--text-admin-28` (28px, `text-admin-28`): the wizard's step heading.
-  - `--radius-admin-bar` (2px, `rounded-admin-bar`): progress segments and preset mini bars; the one 2px radius in the platform.
-  - Six dark `rail` colours, as `admin-rail*` utilities: `--admin-rail` #0f1115 (the rail, the phone header and the Choose a workspace rail), `--admin-rail-line` #1c1f26 (rail borders and rules), `--admin-rail-text` #c9cfda (body text on the rail), `--admin-rail-muted` #7d8696 (upcoming steps, summaries), `--admin-rail-raised` #20242e (the current row, upcoming segments, hovers), `--admin-rail-accent` #ffc233 (done circles and segments, the current ring).
-  - The `rail` colours are the same in Light and Dark and never follow the platform theme, unlike the sidebar's `side` tokens they were copied from. `tv()` lists `admin-28` and `admin-bar` so a later `text-admin-28` or `rounded-admin-bar` replaces an earlier platform size or radius.
+  - `--text-platform-28` (28px, `text-platform-28`): the wizard's step heading.
+  - `--radius-platform-bar` (2px, `rounded-platform-bar`): progress segments and preset mini bars; the one 2px radius in the platform.
+  - Six dark `rail` colours, as `platform-rail*` utilities: `--platform-rail` #0f1115 (the rail, the phone header and the Choose a workspace rail), `--platform-rail-line` #1c1f26 (rail borders and rules), `--platform-rail-text` #c9cfda (body text on the rail), `--platform-rail-muted` #7d8696 (upcoming steps, summaries), `--platform-rail-raised` #20242e (the current row, upcoming segments, hovers), `--platform-rail-accent` #ffc233 (done circles and segments, the current ring).
+  - The `rail` colours are the same in Light and Dark and never follow the platform theme, unlike the sidebar's `side` tokens they were copied from. `tv()` lists `platform-28` and `platform-bar` so a later `text-platform-28` or `rounded-platform-bar` replaces an earlier platform size or radius.
 
 ## Data
 
@@ -75,7 +75,7 @@ Nothing is stored; these are static CSS and TypeScript tables.
 - **Control boundaries.** An enabled `TextInput`'s border and an off `Switch`'s track use `field-boundary`, which reaches 3:1 (WCAG 1.4.11) against the `surface` field fill and against the band behind it on every brand variant, in both modes and at every accent hue: `border-emphasis` on page and card surfaces, and the darker (light) or lighter (dark) `--field-boundary-tinted` on secondary and brand bands, where `border-emphasis` falls short. A disabled `TextInput` drops to `border-strong`, since inactive controls are exempt.
 - **The accent and logo hues are the only tenant colour inputs.** Ramp lightness and chroma never vary, so a token pair's contrast depends on the hue alone. `isAccentHueAccessible` checks one pair (`--text` on `--brand-primary-muted`, both modes) and accepts every hue. Every other checked pair, the field boundary included, is registered in `CONTRAST_PAIRS` (`packages/config/src/theme/contrast-pairs.ts`) with its role minimum; `contrast-check.test.ts` measures each one on every surface it lists, in both modes and at every hue, and fails `pnpm verify` on any shortfall not recorded in `contrast-known-failures.ts`.
 - **Focus under forced colours.** Components draw focus as a `ring` and drop the outline with `focus-visible:outline-none`; Windows High Contrast discards the ring's box-shadow. An unlayered `@media (forced-colors: active)` rule in `theme.css` restores a 2px `Highlight` outline on every `:focus-visible`, on the site and in the platform. It must stay outside `@layer`, since any layered rule loses to `@layer utilities`. Outside forced colours it does nothing.
-- **Type scale in even pixels.** At a 16px root every fixed text size, and every fluid size's smallest and largest value, is an even number of pixels, and body and reading text (`text-base`, `text-prose`) is 16px. Fixed: `label`, `xs` and `meta` 12; `sm`, `copy`, `caption`, `code` and `card-copy` 14; `lead`, `card-title`, `base` and `prose` 16; `lg` 20. Fluid, smallest–largest: `prose-h4` 18–20, `prose-h3` 20–24, `xl` 22–26, `prose-h2` 24–30, `title-section` 26–32, `2xl`/`title-2xl` 28–36, `post-title` 30–40, `hero` 32–48, `3xl` 34–48, `4xl` 38–54, `display`/`wordmark` 42–74. A size change re-solves the clamp's middle term so it still spans the same viewport range. The admin's `text-admin-*` scale is separate.
+- **Type scale in even pixels.** At a 16px root every fixed text size, and every fluid size's smallest and largest value, is an even number of pixels, and body and reading text (`text-base`, `text-prose`) is 16px. Fixed: `label`, `xs` and `meta` 12; `sm`, `copy`, `caption`, `code` and `card-copy` 14; `lead`, `card-title`, `base` and `prose` 16; `lg` 20. Fluid, smallest–largest: `prose-h4` 18–20, `prose-h3` 20–24, `xl` 22–26, `prose-h2` 24–30, `title-section` 26–32, `2xl`/`title-2xl` 28–36, `post-title` 30–40, `hero` 32–48, `3xl` 34–48, `4xl` 38–54, `display`/`wordmark` 42–74. A size change re-solves the clamp's middle term so it still spans the same viewport range. The platform's `text-platform-*` scale is separate.
 - **`text-subtle` is `text-muted`.** The `text-subtle` and `subtle` utilities resolve to `--text-muted`; there is no separate dimmer ink, because no lighter grey reaches 4.5:1 on every surface. Size and font carry the lower step in the hierarchy.
 - **Static defaults equal Console.** `theme.css`'s static values equal `buildThemeStyleBlock`'s Console output (`MD`, `DEFAULT`, `ACCENT_BAR`, hue 250), and a test reads `theme.css` for the radius, spacing, item-card and scrim tokens and checks the brand and logo ramps against fixed literals. Changing a static token means changing its declaration table too.
 - The platform preview re-derives `--radius-card`, `--radius-media` and `--radius-item`, because `@theme` derives them on `:root`.

@@ -9,13 +9,13 @@ export const segmentedControlVariants = tv({
     root: [
       'grid w-full grid-cols-2 gap-[6px]',
       'lg:inline-flex lg:w-auto lg:flex-wrap lg:items-center lg:gap-[2px] lg:self-start',
-      'lg:rounded-admin-control lg:border lg:bg-admin-bg lg:p-[2px]',
-      'data-[disabled]:opacity-(--admin-locked-fade)',
+      'lg:rounded-platform-control lg:border lg:bg-platform-bg lg:p-[2px]',
+      'data-[disabled]:opacity-(--platform-locked-fade)',
     ],
     option: [
-      'flex min-h-11 items-center justify-start rounded-admin-control border px-3 text-left',
-      'text-admin-13-5 font-medium data-[pressed]:font-semibold',
-      'lg:h-[30px] lg:min-h-0 lg:justify-center lg:rounded-admin-3 lg:border-0 lg:bg-transparent lg:text-center lg:text-admin-13',
+      'flex min-h-11 items-center justify-start rounded-platform-control border px-3 text-left',
+      'text-platform-13-5 font-medium data-[pressed]:font-semibold',
+      'lg:h-[30px] lg:min-h-0 lg:justify-center lg:rounded-platform-3 lg:border-0 lg:bg-transparent lg:text-center lg:text-platform-13',
       'disabled:cursor-not-allowed',
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
@@ -25,7 +25,7 @@ export const segmentedControlVariants = tv({
     hasGlyphs: {
       true: {
         option: [
-          'min-h-[60px] flex-col justify-center gap-1 px-1.5 text-center leading-admin-14',
+          'min-h-[60px] flex-col justify-center gap-1 px-1.5 text-center leading-platform-14',
           'lg:h-auto lg:min-h-[52px] lg:min-w-14 lg:gap-[3px] lg:px-2.5 lg:py-1.5',
         ],
       },
@@ -42,21 +42,21 @@ export const segmentedControlVariants = tv({
     },
     isLocked: {
       true: {
-        root: ['lg:border-admin-control-line-locked'],
+        root: ['lg:border-platform-control-line-locked'],
         option: [
-          'cursor-not-allowed border-admin-control-line-locked bg-admin-bg text-admin-muted',
-          'data-[pressed]:border-admin-control-line data-[pressed]:bg-admin-surface data-[pressed]:text-admin-text',
-          'lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1px_var(--admin-control-line)]',
+          'cursor-not-allowed border-platform-control-line-locked bg-platform-bg text-platform-muted',
+          'data-[pressed]:border-platform-control-line data-[pressed]:bg-platform-surface data-[pressed]:text-platform-text',
+          'lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1px_var(--platform-control-line)]',
         ],
       },
       false: {
-        root: ['lg:border-admin-control-line'],
+        root: ['lg:border-platform-control-line'],
         option: [
-          'cursor-pointer border-admin-control-line bg-admin-surface text-admin-text lg:text-admin-muted',
-          'data-[pressed]:border-admin-brand-ink data-[pressed]:bg-admin-brand-weak data-[pressed]:text-admin-brand-strong',
-          'max-lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_0.5px_var(--admin-brand-ink)]',
-          'lg:data-[pressed]:bg-admin-surface lg:data-[pressed]:text-admin-text',
-          'lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1.5px_var(--admin-brand-ink)]',
+          'cursor-pointer border-platform-control-line bg-platform-surface text-platform-text lg:text-platform-muted',
+          'data-[pressed]:border-platform-brand-ink data-[pressed]:bg-platform-brand-weak data-[pressed]:text-platform-brand-strong',
+          'max-lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_0.5px_var(--platform-brand-ink)]',
+          'lg:data-[pressed]:bg-platform-surface lg:data-[pressed]:text-platform-text',
+          'lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1.5px_var(--platform-brand-ink)]',
         ],
       },
     },
@@ -67,7 +67,7 @@ export const segmentedControlVariants = tv({
       hasGlyphs: true,
       class: {
         option: [
-          'lg:hover:not-data-[pressed]:bg-admin-hover lg:hover:not-data-[pressed]:text-admin-text',
+          'lg:hover:not-data-[pressed]:bg-platform-hover lg:hover:not-data-[pressed]:text-platform-text',
         ],
       },
     },

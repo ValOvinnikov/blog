@@ -7,50 +7,50 @@ export const toastVariants = tv({
   slots: {
     root: [
       'pointer-events-auto relative flex max-w-[400px] items-center gap-[9px] overflow-hidden',
-      'rounded-admin border border-l-0 border-admin-popover-line bg-admin-popover px-[14px] py-[11px]',
-      'text-admin-13 text-admin-text shadow-admin-lg',
-      'before:absolute before:inset-y-0 before:left-0 before:w-admin-bar',
+      'rounded-platform border border-l-0 border-platform-popover-line bg-platform-popover px-[14px] py-[11px]',
+      'text-platform-13 text-platform-text shadow-platform-lg',
+      'before:absolute before:inset-y-0 before:left-0 before:w-platform-bar',
       'transition-[opacity,transform] duration-[300ms] ease-out',
       'motion-reduce:transition-none',
     ],
     icon: [],
     spinner: [
       'inline-block size-3.5 shrink-0 animate-spin rounded-full',
-      'border-2 border-admin-text/25 border-t-admin-text',
+      'border-2 border-platform-text/25 border-t-platform-text',
       'motion-reduce:animate-none',
     ],
     message: ['min-w-0 flex-1'],
     titleText: ['mr-1 font-semibold'],
-    time: ['shrink-0 text-admin-muted'],
+    time: ['shrink-0 text-platform-muted'],
     action: [
-      'shrink-0 cursor-pointer font-semibold text-admin-text underline-offset-2',
+      'shrink-0 cursor-pointer font-semibold text-platform-text underline-offset-2',
       'hover:underline',
     ],
-    actionKey: ['ml-1 text-admin-muted'],
+    actionKey: ['ml-1 text-platform-muted'],
     dismiss: [
-      'shrink-0 cursor-pointer rounded-admin-control text-admin-muted',
-      'hover:text-admin-text',
-      'focus-visible:text-admin-text',
+      'shrink-0 cursor-pointer rounded-platform-control text-platform-muted',
+      'hover:text-platform-text',
+      'focus-visible:text-platform-text',
       focusRingClasses(FOCUS_RING_GROUND.POPOVER),
     ],
   },
   variants: {
     type: {
       [TOAST_TYPE.SUCCESS]: {
-        root: ['before:bg-admin-ok'],
-        icon: ['text-admin-ok'],
+        root: ['before:bg-platform-ok'],
+        icon: ['text-platform-ok'],
       },
       [TOAST_TYPE.INFO]: {
-        root: ['before:bg-admin-brand-ink'],
-        icon: ['text-admin-brand-ink'],
+        root: ['before:bg-platform-brand-ink'],
+        icon: ['text-platform-brand-ink'],
       },
       [TOAST_TYPE.WARNING]: {
-        root: ['before:bg-admin-warn'],
-        icon: ['text-admin-warn'],
+        root: ['before:bg-platform-warn'],
+        icon: ['text-platform-warn'],
       },
       [TOAST_TYPE.ERROR]: {
-        root: ['before:bg-admin-bad'],
-        icon: ['text-admin-bad'],
+        root: ['before:bg-platform-bad'],
+        icon: ['text-platform-bad'],
       },
     },
     phase: {

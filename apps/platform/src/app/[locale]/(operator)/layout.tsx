@@ -1,9 +1,9 @@
-import { AdminShell } from '@platform/components/features/layout/admin-shell';
 import { OperatorBreadcrumb } from '@platform/components/features/layout/operator-breadcrumb';
+import { PlatformShell } from '@platform/components/features/layout/platform-shell';
 import { ContrastDueBanner } from '@platform/components/features/releases/contrast-due-banner';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { requireAdmin } from '@platform/server/auth/require-admin';
-import { loadAdminShellChrome } from '@platform/server/layout/load-admin-shell-chrome';
+import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import { operatorNavSections } from '@platform/utils/nav-sections/nav-sections';
 import { Suspense } from 'react';
 
@@ -11,25 +11,14 @@ type TProps = {
   children: React.ReactNode;
 };
 
-/**
- * Gates page rendering for everything nested under this segment behind an
- * `admins` row (`requireAdmin`) — the Platform section, as opposed to a
- * tenant's own `memberships`-gated section. Route Handlers and Server Actions
- * placed under this segment are not covered by a layout and must call
- * `requireAdmin()` themselves.
- *
- * Its own directory path (`(operator)/layout.tsx`) has no dynamic segment —
- * `tenantId` belongs to routes several directories deeper — so it can't type
- * a `tenantId` param itself; `OperatorBreadcrumb` resolves that at runtime
- * instead via `useParams`.
- */
+// A layout gates pages only: Route Handlers and Server Actions under this segment must call `requireAdmin()` themselves.
 export default async function OperatorLayout({ children }: TProps) {
   const admin = await requireAdmin();
   const { isSidebarInitiallyCollapsed, tNavSections, userName, userEmail } =
-    await loadAdminShellChrome();
+    await loadPlatformShellChrome();
 
   return (
-    <AdminShell
+    <PlatformShell
       isSidebarInitiallyCollapsed={isSidebarInitiallyCollapsed}
       sections={operatorNavSections(tNavSections, admin.role)}
       crumb={<OperatorBreadcrumb role={admin.role} />}
@@ -48,6 +37,6 @@ export default async function OperatorLayout({ children }: TProps) {
       }
     >
       {children}
-    </AdminShell>
+    </PlatformShell>
   );
 }

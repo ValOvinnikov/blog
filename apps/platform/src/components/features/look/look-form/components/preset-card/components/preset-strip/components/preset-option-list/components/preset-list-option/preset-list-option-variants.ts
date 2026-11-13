@@ -9,24 +9,24 @@ export const presetListOptionVariants = tv({
   slots: {
     option: [
       'flex min-h-16 cursor-pointer items-center text-left',
-      'data-[highlighted]:outline-admin-brand-ink group-focus-visible:data-[highlighted]:outline-2',
+      'data-[highlighted]:outline-platform-brand-ink group-focus-visible:data-[highlighted]:outline-2',
     ],
     text: ['flex min-w-0 flex-1 flex-col gap-0.5'],
-    name: ['text-admin-13-5 font-semibold text-admin-text'],
-    description: ['text-admin-12-5 leading-[17px] text-admin-muted'],
-    tick: ['shrink-0 text-admin-brand-ink'],
+    name: ['text-platform-13-5 font-semibold text-platform-text'],
+    description: ['text-platform-12-5 leading-[17px] text-platform-muted'],
+    tick: ['shrink-0 text-platform-brand-ink'],
   },
   variants: {
     layout: {
       [PRESET_LIST_LAYOUT.GRID]: {
         option: [
-          'gap-2.5 rounded-admin-control bg-admin-surface px-2.5 py-2',
+          'gap-2.5 rounded-platform-control bg-platform-surface px-2.5 py-2',
           'data-[highlighted]:outline-offset-2',
         ],
       },
       [PRESET_LIST_LAYOUT.ROWS]: {
         option: [
-          'gap-3 border-b border-admin-line-2 px-4 py-2',
+          'gap-3 border-b border-platform-line-2 px-4 py-2',
           'data-[highlighted]:-outline-offset-2',
         ],
       },
@@ -45,7 +45,7 @@ export const presetListOptionVariants = tv({
       class: {
         option: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-admin-control-line hover:border-admin-muted hover:bg-admin-surface-2',
+          'border-platform-control-line hover:border-platform-muted hover:bg-platform-surface-2',
         ],
       },
     },
@@ -54,7 +54,7 @@ export const presetListOptionVariants = tv({
       selected: true,
       class: {
         option: [
-          'bg-admin-brand-weak shadow-[inset_3px_0_0_var(--admin-brand-ink)]',
+          'bg-platform-brand-weak shadow-[inset_3px_0_0_var(--platform-brand-ink)]',
         ],
       },
     },

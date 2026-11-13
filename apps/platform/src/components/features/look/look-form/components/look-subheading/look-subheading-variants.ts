@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const lookSubheadingVariants = tv({
   base: [
-    'm-0 border-t border-admin-line pt-4 leading-admin-14',
+    'm-0 border-t border-platform-line pt-4 leading-platform-14',
     LOOK_GROUP_LABEL_TEXT,
   ],
 });

@@ -1,1 +1,2 @@
-export const INVALID_SURFACE_CLASSES = 'data-[invalid]:border-admin-bad-line';
+export const INVALID_SURFACE_CLASSES =
+  'data-[invalid]:border-platform-bad-line';

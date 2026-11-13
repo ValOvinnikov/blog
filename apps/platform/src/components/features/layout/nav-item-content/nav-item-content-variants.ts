@@ -3,17 +3,17 @@ import type { VariantProps } from 'tailwind-variants';
 
 // The sidebar renders only from `md` and the phone Menu only below it, so `md:` scopes a class to the sidebar and `max-md:` to the Menu.
 const STATUS_TEXT_MUTED = [
-  'text-admin-muted',
-  'md:text-admin-side-muted md:group-hover:text-admin-side-text',
+  'text-platform-muted',
+  'md:text-platform-side-muted md:group-hover:text-platform-side-text',
 ];
 
 export const navItemContentVariants = tv({
   slots: {
     // The icon reads `aria-current` off its ancestor row via `group-aria-*`, not a state prop.
     rowIcon: [
-      'text-admin-side-muted transition-colors duration-base ease-smooth',
-      'group-aria-[current=page]:text-admin-text-strong',
-      'max-md:text-admin-muted max-md:group-aria-[current=page]:text-admin-text',
+      'text-platform-side-muted transition-colors duration-base ease-smooth',
+      'group-aria-[current=page]:text-platform-text-strong',
+      'max-md:text-platform-muted max-md:group-aria-[current=page]:text-platform-text',
     ],
     // `sr-only`, not `hidden`, so the label stays the row's accessible name when collapsed.
     rowBody: [
@@ -21,7 +21,7 @@ export const navItemContentVariants = tv({
       'group-data-[collapsed=true]/shell:sr-only',
     ],
     rowLabel: ['truncate'],
-    rowReason: ['text-admin-12 leading-4 text-admin-side-muted'],
+    rowReason: ['text-platform-12 leading-4 text-platform-side-muted'],
     badgeSlot: [
       'ml-auto shrink-0',
       'group-data-[collapsed=true]/shell:sr-only',
@@ -29,7 +29,7 @@ export const navItemContentVariants = tv({
     statusSeparator: ['sr-only'],
     statusLine: [
       'mt-0.5 flex items-start gap-1.5',
-      'text-admin-12 leading-4 font-medium',
+      'text-platform-12 leading-4 font-medium',
     ],
     statusIcon: ['mt-px'],
     statusText: ['min-w-0 transition-colors duration-base ease-smooth'],
@@ -37,8 +37,8 @@ export const navItemContentVariants = tv({
     // The 14px badge overlaps the 16px nav icon's lower-right corner by 6.5px on each axis.
     railBadge: [
       'absolute -right-[7.5px] -bottom-[7.5px] flex size-3.5 items-center justify-center rounded-full',
-      'bg-admin-side transition-colors duration-base ease-smooth',
-      'group-hover:bg-admin-side-line group-aria-[current=page]:bg-admin-side-raised',
+      'bg-platform-side transition-colors duration-base ease-smooth',
+      'group-hover:bg-platform-side-line group-aria-[current=page]:bg-platform-side-raised',
     ],
   },
   variants: {
@@ -49,29 +49,29 @@ export const navItemContentVariants = tv({
     },
     hasRailBadge: {
       true: {
-        rowIcon: ['group-focus-visible:text-admin-text-strong'],
+        rowIcon: ['group-focus-visible:text-platform-text-strong'],
       },
     },
     hasNeutralBadge: {
       true: {
-        badgeSlot: ['max-md:bg-admin-pill-neutral-popover'],
+        badgeSlot: ['max-md:bg-platform-pill-neutral-popover'],
       },
     },
     tone: {
       warn: {
-        statusIcon: ['text-admin-warn'],
-        railBadge: ['text-admin-warn'],
+        statusIcon: ['text-platform-warn'],
+        railBadge: ['text-platform-warn'],
         statusText: STATUS_TEXT_MUTED,
       },
       brand: {
-        statusIcon: ['text-admin-brand-ink'],
-        railBadge: ['text-admin-brand-ink'],
+        statusIcon: ['text-platform-brand-ink'],
+        railBadge: ['text-platform-brand-ink'],
         statusText: STATUS_TEXT_MUTED,
       },
       bad: {
-        statusIcon: ['text-admin-bad'],
-        railBadge: ['text-admin-bad'],
-        statusText: ['text-admin-bad'],
+        statusIcon: ['text-platform-bad'],
+        railBadge: ['text-platform-bad'],
+        statusText: ['text-platform-bad'],
       },
     },
   },

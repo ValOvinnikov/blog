@@ -7,9 +7,9 @@ export const deviceFrameVariants = tv({
     stage: ['flex w-full justify-center'],
     frame: [
       'flex w-fit flex-none flex-col overflow-hidden',
-      'border-admin-control-line bg-admin-surface shadow-admin-frame',
+      'border-platform-control-line bg-platform-surface shadow-platform-frame',
     ],
-    viewport: ['relative overflow-hidden bg-admin-surface'],
+    viewport: ['relative overflow-hidden bg-platform-surface'],
     scroller: [
       'absolute inset-0 overflow-x-hidden overflow-y-auto overscroll-contain',
       '[scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
@@ -21,28 +21,28 @@ export const deviceFrameVariants = tv({
     ],
     browserBar: [
       'flex flex-none items-center gap-2.5 px-2.5',
-      'border-b border-admin-line bg-admin-surface',
+      'border-b border-platform-line bg-platform-surface',
     ],
     dots: ['flex gap-[5px]'],
-    dot: ['size-2 rounded-full bg-admin-frame-dot'],
+    dot: ['size-2 rounded-full bg-platform-frame-dot'],
     host: [
       'min-w-0 flex-1 truncate text-center',
-      'font-admin-mono text-admin-11-5 font-medium text-admin-muted',
+      'font-platform-mono text-platform-11-5 font-medium text-platform-muted',
     ],
     hostSpacer: ['w-[39px] flex-none'],
     scrollbar: ['pointer-events-none absolute'],
-    thumb: ['absolute rounded-admin-3'],
+    thumb: ['absolute rounded-platform-3'],
   },
   variants: {
     device: {
-      [PREVIEW_DEVICE.DESKTOP]: { frame: ['rounded-admin'] },
+      [PREVIEW_DEVICE.DESKTOP]: { frame: ['rounded-platform'] },
       [PREVIEW_DEVICE.TABLET]: {
-        frame: ['rounded-admin-14'],
-        viewport: ['rounded-admin-8'],
+        frame: ['rounded-platform-14'],
+        viewport: ['rounded-platform-8'],
       },
       [PREVIEW_DEVICE.PHONE]: {
-        frame: ['rounded-admin-18'],
-        viewport: ['rounded-admin-12'],
+        frame: ['rounded-platform-18'],
+        viewport: ['rounded-platform-12'],
       },
     },
     isMeasured: {
@@ -67,21 +67,21 @@ export const deviceFrameVariants = tv({
     },
     isDark: {
       true: {
-        scrollbar: ['bg-admin-frame-track-dark'],
-        thumb: ['bg-admin-frame-thumb-dark'],
+        scrollbar: ['bg-platform-frame-track-dark'],
+        thumb: ['bg-platform-frame-thumb-dark'],
       },
       false: {
-        scrollbar: ['bg-admin-frame-track'],
-        thumb: ['bg-admin-frame-thumb'],
+        scrollbar: ['bg-platform-frame-track'],
+        thumb: ['bg-platform-frame-thumb'],
       },
     },
     axis: {
       [DEVICE_FRAME_AXIS.VERTICAL]: {
-        scrollbar: ['top-1 right-[3px] bottom-1 w-[5px] rounded-admin-3'],
+        scrollbar: ['top-1 right-[3px] bottom-1 w-[5px] rounded-platform-3'],
         thumb: ['inset-x-0'],
       },
       [DEVICE_FRAME_AXIS.HORIZONTAL]: {
-        scrollbar: ['right-3 bottom-[3px] left-1 h-[5px] rounded-admin-3'],
+        scrollbar: ['right-3 bottom-[3px] left-1 h-[5px] rounded-platform-3'],
         thumb: ['inset-y-0'],
       },
     },

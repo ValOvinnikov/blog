@@ -9,12 +9,12 @@ export const leadReadingPaneVariants = tv({
     back: ['lg:hidden'],
     card: ['w-full'],
     name: [
-      'break-words rounded-admin-control',
+      'break-words rounded-platform-control',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE_HEAD),
     ],
     body: ['flex flex-col gap-4'],
     email: [
-      'break-all rounded-admin-control text-admin-brand',
+      'break-all rounded-platform-control text-platform-brand',
       TEXT_LINK_STROKE_CLASSES,
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],

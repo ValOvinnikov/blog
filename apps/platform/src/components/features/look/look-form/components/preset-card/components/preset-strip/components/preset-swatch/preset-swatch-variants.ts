@@ -3,7 +3,7 @@ import { tv } from '@platform/utils/tv/tv';
 
 export const presetSwatchVariants = tv({
   base: [
-    'flex shrink-0 items-center justify-center rounded-admin-3 font-semibold',
+    'flex shrink-0 items-center justify-center rounded-platform-3 font-semibold',
   ],
   variants: {
     size: {
@@ -12,8 +12,8 @@ export const presetSwatchVariants = tv({
       [SIZE.LG]: 'size-9',
     },
     glyphSize: {
-      [SIZE.SM]: 'text-admin-11',
-      [SIZE.LG]: 'text-admin-15',
+      [SIZE.SM]: 'text-platform-11',
+      [SIZE.LG]: 'text-platform-15',
     },
   },
 });

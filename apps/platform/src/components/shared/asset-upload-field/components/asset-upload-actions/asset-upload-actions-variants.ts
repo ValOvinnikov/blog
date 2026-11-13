@@ -2,7 +2,7 @@ import { SIZE } from '@blog/config';
 import { ASSET_UPLOAD_LAYOUT } from '@platform/constants/asset-upload';
 import { tv } from '@platform/utils/tv/tv';
 
-const BARE_BUTTON = 'h-8 py-0 text-admin-13 font-semibold';
+const BARE_BUTTON = 'h-8 py-0 text-platform-13 font-semibold';
 
 export const assetUploadActionsVariants = tv({
   slots: {
@@ -25,7 +25,7 @@ export const assetUploadActionsVariants = tv({
         pickContent: ['inline-flex items-center gap-2'],
         removeButton: [
           BARE_BUTTON,
-          'px-[10px] text-admin-brand-strong md:px-[10px] md:py-0',
+          'px-[10px] text-platform-brand-strong md:px-[10px] md:py-0',
         ],
       },
     },

@@ -6,7 +6,7 @@ export const assetUploadThumbVariants = tv({
   slots: {
     root: [
       'relative flex shrink-0 items-center justify-center overflow-hidden',
-      'rounded-admin-control border border-admin-line',
+      'rounded-platform-control border border-platform-line',
     ],
     image: ['object-contain'],
   },
@@ -17,9 +17,9 @@ export const assetUploadThumbVariants = tv({
     },
     layout: {
       [ASSET_UPLOAD_LAYOUT.FRAMED]: {
-        root: ['bg-admin-surface text-[10px] text-admin-muted'],
+        root: ['bg-platform-surface text-[10px] text-platform-muted'],
       },
-      [ASSET_UPLOAD_LAYOUT.BARE]: { root: ['size-13 bg-admin-surface-2'] },
+      [ASSET_UPLOAD_LAYOUT.BARE]: { root: ['size-13 bg-platform-surface-2'] },
     },
     isEmpty: {
       true: {},
@@ -30,7 +30,9 @@ export const assetUploadThumbVariants = tv({
       layout: ASSET_UPLOAD_LAYOUT.BARE,
       isEmpty: true,
       class: {
-        root: ['border-dashed border-admin-control-line bg-admin-surface'],
+        root: [
+          'border-dashed border-platform-control-line bg-platform-surface',
+        ],
       },
     },
   ],

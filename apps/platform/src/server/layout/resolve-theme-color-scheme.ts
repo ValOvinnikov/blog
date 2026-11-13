@@ -6,7 +6,10 @@ import {
   type TMaybeUndefined,
 } from '@blog/config';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
-import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import {
+  LEGACY_THEME_PREFERENCE_COOKIE,
+  THEME_PREFERENCE_COOKIE,
+} from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
 import { cookies } from 'next/headers';
 
 export const resolveThemeColorScheme = async (): Promise<
@@ -14,7 +17,12 @@ export const resolveThemeColorScheme = async (): Promise<
 > => {
   const cookieStore = await cookies();
 
-  switch (cookieStore.get(THEME_PREFERENCE_COOKIE)?.value) {
+  const storedPreference = (
+    cookieStore.get(THEME_PREFERENCE_COOKIE) ??
+    cookieStore.get(LEGACY_THEME_PREFERENCE_COOKIE)
+  )?.value;
+
+  switch (storedPreference) {
     case THEME_PREFERENCE.LIGHT:
       return COLOR_SCHEME.LIGHT;
     case THEME_PREFERENCE.DARK:

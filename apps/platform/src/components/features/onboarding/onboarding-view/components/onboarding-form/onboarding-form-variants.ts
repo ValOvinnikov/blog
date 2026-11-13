@@ -3,16 +3,16 @@ import { tv } from '@platform/utils/tv/tv';
 export const onboardingFormVariants = tv({
   slots: {
     root: [
-      'flex min-h-dvh w-full flex-col bg-admin-bg text-admin-text',
+      'flex min-h-dvh w-full flex-col bg-platform-bg text-platform-text',
       'md:grid md:h-dvh md:grid-cols-[300px_minmax(0,1fr)] md:overflow-hidden',
     ],
     form: [
       'flex flex-1 flex-col',
-      'md:grid md:min-h-0 md:grid-cols-1 md:grid-rows-[minmax(0,1fr)_auto] md:bg-admin-surface',
+      'md:grid md:min-h-0 md:grid-cols-1 md:grid-rows-[minmax(0,1fr)_auto] md:bg-platform-surface',
       'min-[85rem]:grid-cols-[minmax(0,1fr)_560px]',
     ],
     main: [
-      'min-w-0 bg-admin-surface px-4 pt-6 pb-7',
+      'min-w-0 bg-platform-surface px-4 pt-6 pb-7',
       'md:col-start-1 md:row-start-1 md:flex md:min-h-0 md:flex-col md:p-0',
     ],
     scrollArea: [
@@ -23,10 +23,10 @@ export const onboardingFormVariants = tv({
     fields: ['mt-5 flex flex-col gap-6 md:mt-8 md:gap-7'],
     railPreview: ['mt-8'],
     previewColumn: [
-      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-admin-bg px-7 py-8 shadow-[inset_1px_0_0_var(--admin-preview-column-line)]',
+      'col-start-2 row-span-2 row-start-1 flex min-h-0 flex-col overflow-hidden bg-platform-bg px-7 py-8 shadow-[inset_1px_0_0_var(--platform-preview-column-line)]',
     ],
     phonePreview: [
-      'flex-1 border-t border-admin-line bg-admin-bg px-3 pt-5 pb-6 md:hidden',
+      'flex-1 border-t border-platform-line bg-platform-bg px-3 pt-5 pb-6 md:hidden',
     ],
   },
 });

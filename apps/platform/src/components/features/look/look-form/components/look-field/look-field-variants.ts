@@ -5,10 +5,10 @@ export const lookFieldVariants = tv({
     field: ['flex min-w-0 flex-col gap-1.5'],
     labelRow: ['flex flex-wrap items-center gap-2'],
     label: [
-      'flex items-center gap-2 text-admin-13 leading-admin-18 font-semibold text-admin-text',
+      'flex items-center gap-2 text-platform-13 leading-platform-18 font-semibold text-platform-text',
     ],
-    optional: ['text-admin-12 font-medium text-admin-muted'],
-    hint: ['m-0 text-admin-12-5 leading-admin-18 text-admin-muted'],
-    error: ['text-admin-11-5 text-admin-bad'],
+    optional: ['text-platform-12 font-medium text-platform-muted'],
+    hint: ['m-0 text-platform-12-5 leading-platform-18 text-platform-muted'],
+    error: ['text-platform-11-5 text-platform-bad'],
   },
 });

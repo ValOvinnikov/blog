@@ -16,22 +16,22 @@ const formFieldVariants = tv({
   slots: {
     root: ['flex flex-col'],
     header: ['flex flex-wrap items-center justify-between gap-x-3 gap-y-1.5'],
-    label: ['flex items-center gap-[7px]', 'font-semibold text-admin-text'],
+    label: ['flex items-center gap-[7px]', 'font-semibold text-platform-text'],
     hint: [],
-    error: ['text-admin-bad'],
+    error: ['text-platform-bad'],
   },
   variants: {
     appearance: {
       [FIELD_APPEARANCE.DEFAULT]: {
         root: ['gap-[5px]'],
-        label: ['text-admin-13'],
-        error: ['text-admin-11-5'],
+        label: ['text-platform-13'],
+        error: ['text-platform-11-5'],
       },
       [FIELD_APPEARANCE.WIZARD]: {
         root: ['gap-1.5'],
-        label: ['text-admin-13-5'],
-        hint: ['leading-admin-1-45'],
-        error: ['text-admin-12 leading-admin-1-45 font-medium'],
+        label: ['text-platform-13-5'],
+        hint: ['leading-platform-1-45'],
+        error: ['text-platform-12 leading-platform-1-45 font-medium'],
       },
     },
   },

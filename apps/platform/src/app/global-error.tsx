@@ -30,7 +30,7 @@ type TProps = {
 export default function GlobalError({ retry }: TProps) {
   return (
     <html lang={LOCALE_BCP47_TAGS.EN}>
-      <body className={`${inter.variable} font-admin text-admin-14`}>
+      <body className={`${inter.variable} font-platform text-platform-14`}>
         <NextIntlClientProvider
           locale={LOCALE_ISO_CODES.EN}
           messages={{

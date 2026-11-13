@@ -3,8 +3,8 @@ import { tv } from '@platform/utils/tv/tv';
 export const findingDetailsVariants = tv({
   slots: {
     pre: [
-      'mt-2 overflow-x-auto rounded-admin-control bg-admin-surface-2 p-2.5',
-      'text-admin-12 text-admin-muted',
+      'mt-2 overflow-x-auto rounded-platform-control bg-platform-surface-2 p-2.5',
+      'text-platform-12 text-platform-muted',
     ],
   },
 });

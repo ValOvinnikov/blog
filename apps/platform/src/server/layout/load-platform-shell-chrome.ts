@@ -5,7 +5,7 @@ import { resolveIsSidebarCollapsed } from '@platform/server/layout/resolve-is-si
 import type { TLooseTranslator } from '@platform/utils/loose-translator/loose-translator';
 import { getTranslations } from 'next-intl/server';
 
-export const loadAdminShellChrome = async () => {
+export const loadPlatformShellChrome = async () => {
   const [session, isSidebarInitiallyCollapsed, tNavSections] =
     await Promise.all([
       getSession(),

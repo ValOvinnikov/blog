@@ -18,13 +18,13 @@ export const textInputVariants = tv({
   variants: {
     appearance: {
       [FIELD_APPEARANCE.DEFAULT]: '',
-      [FIELD_APPEARANCE.WIZARD]: 'md:h-10 md:px-3 md:py-0 md:text-admin-14',
+      [FIELD_APPEARANCE.WIZARD]: 'md:h-10 md:px-3 md:py-0 md:text-platform-14',
     },
     isDisabled: {
-      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-muted cursor-not-allowed`,
+      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-platform-muted cursor-not-allowed`,
     },
     isReadOnly: {
-      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-admin-muted`,
+      true: `${DISABLED_READONLY_SURFACE_CLASSES} text-platform-muted`,
     },
   },
 });

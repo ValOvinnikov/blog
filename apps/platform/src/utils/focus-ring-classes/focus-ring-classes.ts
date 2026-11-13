@@ -7,24 +7,24 @@ import {
 // Whole literals per ground: Tailwind only generates classes it finds spelled out in source.
 const FOCUS_RING_SHADOW_CLASSES: Record<TFocusRingGround, string> = {
   [FOCUS_RING_GROUND.SIDE]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-side),0_0_0_4px_var(--admin-side-accent)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-side),0_0_0_4px_var(--platform-side-accent)]',
   [FOCUS_RING_GROUND.BG]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-bg),0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-bg),0_0_0_4px_var(--platform-brand-ink)]',
   [FOCUS_RING_GROUND.SURFACE]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-surface),0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-surface),0_0_0_4px_var(--platform-brand-ink)]',
   [FOCUS_RING_GROUND.SURFACE_2]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-surface-2),0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-surface-2),0_0_0_4px_var(--platform-brand-ink)]',
   [FOCUS_RING_GROUND.SURFACE_HEAD]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-surface-head),0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-surface-head),0_0_0_4px_var(--platform-brand-ink)]',
   [FOCUS_RING_GROUND.POPOVER]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-popover),0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-popover),0_0_0_4px_var(--platform-brand-ink)]',
   [FOCUS_RING_GROUND.THEME_TRACK]:
-    'focus-visible:shadow-[0_0_0_2px_var(--admin-theme-track),0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[0_0_0_2px_var(--platform-theme-track),0_0_0_4px_var(--platform-brand-ink)]',
 };
 
 const INSET_FOCUS_RING_SHADOW_CLASSES: Record<TInsetFocusRingGround, string> = {
   [FOCUS_RING_GROUND.SURFACE]:
-    'focus-visible:shadow-[inset_0_0_0_2px_var(--admin-surface),inset_0_0_0_4px_var(--admin-brand-ink)]',
+    'focus-visible:shadow-[inset_0_0_0_2px_var(--platform-surface),inset_0_0_0_4px_var(--platform-brand-ink)]',
 };
 
 export const focusRingClasses = (ground: TFocusRingGround): string =>

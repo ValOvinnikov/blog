@@ -8,7 +8,7 @@ export const domainVerificationCardSkeletonVariants = tv({
     copy: ['mb-3.5 h-4 w-full max-w-md'],
     row: [
       'flex items-center gap-4 px-[10px] py-2.5',
-      'border-b border-admin-line-2 last:border-b-0',
+      'border-b border-platform-line-2 last:border-b-0',
     ],
     typeCell: ['h-4 w-12'],
     nameCell: ['h-4 w-28'],

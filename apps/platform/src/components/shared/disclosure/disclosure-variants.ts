@@ -17,28 +17,28 @@ export const disclosureVariants = tv({
     variant: {
       card: {
         root: [
-          'overflow-hidden rounded-admin border border-admin-line shadow-admin',
+          'overflow-hidden rounded-platform border border-platform-line shadow-platform',
         ],
         trigger: [
-          'w-full gap-2.5 bg-admin-surface px-[18px] py-[14px] text-admin-13-5 font-semibold text-admin-text',
+          'w-full gap-2.5 bg-platform-surface px-[18px] py-[14px] text-platform-13-5 font-semibold text-platform-text',
         ],
-        chevron: ['ml-auto text-admin-faint'],
-        inner: ['border-t border-admin-line-2 p-[18px]'],
+        chevron: ['ml-auto text-platform-faint'],
+        inner: ['border-t border-platform-line-2 p-[18px]'],
       },
       inline: {
         trigger: [
-          'gap-1 text-admin-13 font-medium text-admin-text',
+          'gap-1 text-platform-13 font-medium text-platform-text',
           'underline-offset-2 hover:underline',
         ],
-        chevron: ['order-first text-admin-text'],
+        chevron: ['order-first text-platform-text'],
       },
       section: {
         trigger: [
-          'min-h-11 w-full gap-3 rounded-admin bg-transparent py-1.5 pr-2 pl-1 text-admin-text',
+          'min-h-11 w-full gap-3 rounded-platform bg-transparent py-1.5 pr-2 pl-1 text-platform-text',
           focusRingClasses(FOCUS_RING_GROUND.BG),
         ],
         chevron: [
-          'order-first text-admin-muted duration-150 motion-reduce:transition-none',
+          'order-first text-platform-muted duration-150 motion-reduce:transition-none',
         ],
       },
     },

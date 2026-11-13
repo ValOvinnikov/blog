@@ -2,5 +2,5 @@ import { TEXT_LINK_STROKE_CLASSES } from '@platform/components/shared/text-link/
 import { tv } from '@platform/utils/tv/tv';
 
 export const portableTextEditorLinkAnnotationVariants = tv({
-  base: ['text-admin-brand', TEXT_LINK_STROKE_CLASSES],
+  base: ['text-platform-brand', TEXT_LINK_STROKE_CLASSES],
 });

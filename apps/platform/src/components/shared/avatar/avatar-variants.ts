@@ -7,16 +7,16 @@ export const avatarVariants = tv({
   variants: {
     variant: {
       [AVATAR_VARIANT.TABLE]: [
-        'size-7.5 rounded-admin-control text-admin-12-5 font-bold',
-        'bg-admin-brand text-admin-on-brand-ink',
+        'size-7.5 rounded-platform-control text-platform-12-5 font-bold',
+        'bg-platform-brand text-platform-on-brand-ink',
       ],
       [AVATAR_VARIANT.ACCOUNT]: [
-        'size-7.5 rounded-full text-admin-12 font-semibold',
-        'bg-admin-brand text-admin-on-brand-ink',
+        'size-7.5 rounded-full text-platform-12 font-semibold',
+        'bg-platform-brand text-platform-on-brand-ink',
       ],
       [AVATAR_VARIANT.SWITCHER]: [
-        'size-[22px] rounded-admin-control text-admin-11 font-bold',
-        'bg-admin-brand-weak text-admin-brand-strong',
+        'size-[22px] rounded-platform-control text-platform-11 font-bold',
+        'bg-platform-brand-weak text-platform-brand-strong',
       ],
     },
   },

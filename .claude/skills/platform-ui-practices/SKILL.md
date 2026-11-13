@@ -45,7 +45,7 @@ class and prop it shows; the sections after the recipes give the rules.
 ```
 
 - `root` is `flex flex-col gap-6`. `Text`'s default body variant (13.5px
-  `admin-text`) is for primary content and values: a sentence, a count, a
+  `platform-text`) is for primary content and values: a sentence, a count, a
   name. `variant="muted"` (12.5px) is only for a description or a secondary line,
   `supporting` only for `PageHeader`'s description: never pick either to get a
   size.
@@ -163,7 +163,7 @@ from `useSettingsFormState()`:
   classes (11px uppercase muted heads, 14px cell padding, row hover, a centred
   empty line); never restyle them. Your component's own `tv()` adds content
   slots only: `visuallyHidden` is `sr-only`, `secondary` is
-  `block text-admin-12 text-admin-muted`.
+  `block text-platform-12 text-platform-muted`.
 - A translated label on every column (`sr-only` for actions), `<time dateTime>`
   for dates, `emptyMessage` for the empty list. `ariaLabel`, the page's title,
   names the scroll region. A mode the shell lacks (a card title) goes into the
@@ -173,15 +173,15 @@ from `useSettingsFormState()`:
 
 - Change only what your task needs. A gap you do fix is fixed in full, every
   class its rule names, never the colour without the size.
-- A control you build gets `border-admin-control-line`, `Button`'s focus ring
+- A control you build gets `border-platform-control-line`, `Button`'s focus ring
   and the type table's sizes. A primitive at its prop ceiling: restructure it
   first or compose its parts (→ `react-component-practices` § Props).
 - Drift elsewhere in a file you touch: CLAUDE.md → "Examine before you change".
 
 ## Page anatomy
 
-- Every gated page renders inside `AdminShell`, whose `ShellFrame` owns the
-  content column (`max-w-[1180px] p-4 md:p-[26px]` on `bg-admin-bg`). A page
+- Every gated page renders inside `PlatformShell`, whose `ShellFrame` owns the
+  content column (`max-w-[1180px] p-4 md:p-[26px]` on `bg-platform-bg`). A page
   adds no outer padding, max-width or background; its root is
   `flex flex-col gap-6` (header, notices, then card rows).
 - `PageHeader` is the page's only title block: `title` (the one `h1`),
@@ -199,7 +199,7 @@ from `useSettingsFormState()`:
   page fills the shell.
 - Columns collapse to one below `lg` (`grid-cols-1 lg:grid-cols-2` with
   `items-start`), never at `md`. A preview column is
-  `lg:sticky lg:top-admin-topbar lg:self-start` (the token clears the sticky
+  `lg:sticky lg:top-platform-topbar lg:self-start` (the token clears the sticky
   topbar). Email puts its item picker in the page header (`SettingsFormShell`
   `headerActions`) and, like Look, splits editor and preview 50/50 from `lg`.
 - A grid inside a column sizes from that column: `@container` on the card body
@@ -227,7 +227,7 @@ from `useSettingsFormState()`:
 - Padding comes from the parts (header `px-[18px] py-3.5`, body `p-[18px]`);
   don't re-pad `Card.Body`.
 - A failure card (a failed run, a danger zone) is a `Card isDanger`, which
-  tints its border and title with `admin-bad`; never rebuild that tint by hand.
+  tints its border and title with `platform-bad`; never rebuild that tint by hand.
 - On an editing page with columns, the list, the editor and the preview are each
   their own `Card`. Voice is the exception: each surface's preview sits inside
   its surface card.
@@ -237,8 +237,8 @@ from `useSettingsFormState()`:
 ## Type
 
 **Font:** Inter at a 14px base, set once on `<body>` in
-`app/[locale]/layout.tsx` (`font-admin text-admin-14`). `Heading` and the
-editor's `h2` set `font-admin` and `tracking-normal` themselves, because the
+`app/[locale]/layout.tsx` (`font-platform text-platform-14`). `Heading` and the
+editor's `h2` set `font-platform` and `tracking-normal` themselves, because the
 site's base layer gives `h1`–`h4` its display font and `-0.02em` tracking.
 Nothing else names a family: no `font-sans`, `font-ui` or inline `fontFamily`
 on platform chrome. Font specimens (`FontPicker`, `PresetPicker`) are exempt,
@@ -247,32 +247,32 @@ sidebar's own (`sidebar-variants.ts`: brand name `tracking-[0.2px]`, section
 labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 (`DetailList.Row isMono`).
 
-| Role                                                         | Write                                                   | Renders                                                                                                      |
-| ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Page title                                                   | `PageHeader` `title`                                    | 24px, 600, `tracking-[-0.01em]`                                                                              |
-| Page description                                             | `PageHeader` `description`                              | 13.5px muted (`Text variant="supporting"`, kept for page descriptions only)                                  |
-| Card title                                                   | `Card.Header` `title`                                   | 15px, 650 (`Heading size="cardTitle"`)                                                                       |
-| Dialog title                                                 | `AlertDialog.Title` at `cardTitle`                      | 15px, 650                                                                                                    |
-| Card description                                             | `Card.Header` `supportingText`                          | 12.5px muted                                                                                                 |
-| Description or prose inside a card                           | `Text variant="muted"`                                  | 12.5px muted, never larger than the label above it                                                           |
-| Small title inside a card (step, notice, list item, summary) | the primitive's title slot                              | 13.5px, 600                                                                                                  |
-| Field label                                                  | `FormField` `label`                                     | 13px, 600, field labels only                                                                                 |
-| Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control                                                               |
-| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                   |
-| Field error                                                  | `FormField` `error`                                     | 11.5px `admin-bad`, inline under the field                                                                   |
-| Body: primary content and values                             | `Text`                                                  | 13.5px `admin-text`                                                                                          |
-| Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                               |
-| Control text                                                 | `TextInput`, `Textarea`; `Button`                       | 13.5px (16px below `md`); 13px at `md`, 12px at `sm`                                                         |
-| Table header; table cell                                     | `DataTableShell`                                        | 11px, 700, uppercase, `tracking-[.06em]`, muted (not `faint`); 13.5px `admin-text`, a second line 12px muted |
-| Badge                                                        | `StatusBadge`                                           | 11.5px, 600                                                                                                  |
-| Caption, meta (a header count, a step time, a caption)       | `Text variant="meta"`                                   | 12px muted                                                                                                   |
-| Empty state                                                  | one sentence in `Card.Body`; `emptyMessage` for a table | 13.5px muted; centred in a table                                                                             |
-| Save status                                                  | `SettingsFormShell` only                                | 12px `admin-ok`                                                                                              |
+| Role                                                         | Write                                                   | Renders                                                                                                         |
+| ------------------------------------------------------------ | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Page title                                                   | `PageHeader` `title`                                    | 24px, 600, `tracking-[-0.01em]`                                                                                 |
+| Page description                                             | `PageHeader` `description`                              | 13.5px muted (`Text variant="supporting"`, kept for page descriptions only)                                     |
+| Card title                                                   | `Card.Header` `title`                                   | 15px, 650 (`Heading size="cardTitle"`)                                                                          |
+| Dialog title                                                 | `AlertDialog.Title` at `cardTitle`                      | 15px, 650                                                                                                       |
+| Card description                                             | `Card.Header` `supportingText`                          | 12.5px muted                                                                                                    |
+| Description or prose inside a card                           | `Text variant="muted"`                                  | 12.5px muted, never larger than the label above it                                                              |
+| Small title inside a card (step, notice, list item, summary) | the primitive's title slot                              | 13.5px, 600                                                                                                     |
+| Field label                                                  | `FormField` `label`                                     | 13px, 600, field labels only                                                                                    |
+| Field hint                                                   | `FormField` `hint`, a plain string                      | 12px muted, under the label, above the control                                                                  |
+| Lock reason                                                  | `SettingRow` `lockedReason`                             | 12px muted, the hint style                                                                                      |
+| Field error                                                  | `FormField` `error`                                     | 11.5px `platform-bad`, inline under the field                                                                   |
+| Body: primary content and values                             | `Text`                                                  | 13.5px `platform-text`                                                                                          |
+| Read-only facts                                              | `DetailList` (`isMono` for domains, ids)                | 13.5px values, 12.5px muted terms, mono 12.5px                                                                  |
+| Control text                                                 | `TextInput`, `Textarea`; `Button`                       | 13.5px (16px below `md`); 13px at `md`, 12px at `sm`                                                            |
+| Table header; table cell                                     | `DataTableShell`                                        | 11px, 700, uppercase, `tracking-[.06em]`, muted (not `faint`); 13.5px `platform-text`, a second line 12px muted |
+| Badge                                                        | `StatusBadge`                                           | 11.5px, 600                                                                                                     |
+| Caption, meta (a header count, a step time, a caption)       | `Text variant="meta"`                                   | 12px muted                                                                                                      |
+| Empty state                                                  | one sentence in `Card.Body`; `emptyMessage` for a table | 13.5px muted; centred in a table                                                                                |
+| Save status                                                  | `SettingsFormShell` only                                | 12px `platform-ok`                                                                                              |
 
-- Sizes are the `--text-admin-*` tokens in `styles/admin-theme.css`, one per
-  pixel value: `text-admin-11`, `text-admin-11-5`, `text-admin-12`,
-  `text-admin-12-5`, `text-admin-13`, `text-admin-13-5`, `text-admin-14`,
-  `text-admin-15`, `text-admin-16`, `text-admin-20`, `text-admin-24`. A new one is registered in
+- Sizes are the `--text-platform-*` tokens in `styles/platform-theme.css`, one per
+  pixel value: `text-platform-11`, `text-platform-11-5`, `text-platform-12`,
+  `text-platform-12-5`, `text-platform-13`, `text-platform-13-5`, `text-platform-14`,
+  `text-platform-15`, `text-platform-16`, `text-platform-20`, `text-platform-24`. A new one is registered in
   `FONT_SIZE_TOKENS` in `utils/tv/tv.ts`, or tailwind-merge drops it as a
   colour. No arbitrary `text-[Npx]` and no size off the scale; the site's named
   sizes (`text-xs`, `text-sm`, `text-base`, `text-label`, `text-meta`, …)
@@ -284,7 +284,7 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
 
 ## Colour and contrast
 
-- Colours come only from the `admin-*` tokens in `styles/admin-theme.css`: no
+- Colours come only from the `platform-*` tokens in `styles/platform-theme.css`: no
   hex, no raw palette colour, no site token outside `site-preview/`.
   The Shinefold logo's colours (`@blog/utils/shinefold-logo`) and the preset
   swatches are artwork and exempt.
@@ -292,26 +292,26 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   near-black and yellow highlights (`brand-weak`, `brand-line`,
   `highlight`); in Dark, yellow leads (`brand` #ffc233, `brand-ink` #ffdc7a)
   over a dark yellow `brand-weak`. `warn` is orange so it never reads as the
-  brand. Text or a mark on a `brand` fill is `text-admin-on-brand-ink`, never
-  `text-white`. A selected chip or tab is `bg-admin-selected
-text-admin-on-selected` — near-black and white in Light, yellow on a dark
+  brand. Text or a mark on a `brand` fill is `text-platform-on-brand-ink`, never
+  `text-white`. A selected chip or tab is `bg-platform-selected
+text-platform-on-selected` — near-black and white in Light, yellow on a dark
   yellow tint in Dark; a selected tab or chip is never yellow in Light. A link's underline is `TEXT_LINK_STROKE_CLASSES`
   (`components/shared/text-link/text-link-variants`), a 2px `highlight`
   stroke.
-- `text-admin-text` for content, labels and values. `text-admin-muted` for
+- `text-platform-text` for content, labels and values. `text-platform-muted` for
   descriptions, hints, terms, table headers, meta and timestamps. Semantic
-  colours (`ok`, `warn`, `bad`, `brand`) only for state. `text-admin-faint`
+  colours (`ok`, `warn`, `bad`, `brand`) only for state. `text-platform-faint`
   (3.1:1 on surface) only for decorative separators, placeholder glyphs and
   disabled text. `StatusBadge`'s `plan` tone is for plan tiers only.
-- Readable text is at least 4.5:1 against its surface (`admin-muted` is 5.98:1
+- Readable text is at least 4.5:1 against its surface (`platform-muted` is 5.98:1
   on surface, 5.58:1 on bg). Control boundaries, selection markers and focus
   indicators are at least 3:1 against what they sit on.
-- Every control boundary is `border-admin-control-line` (3.48:1): text fields,
+- Every control boundary is `border-platform-control-line` (3.48:1): text fields,
   the editor, selects, radio circles, the switch's off track, the segmented
-  track, menu triggers. `border-admin-line` (1.24:1) is decorative structure
+  track, menu triggers. `border-platform-line` (1.24:1) is decorative structure
   only: card borders, dividers, the dashed upload box.
-- A selected item shows a 3:1 marker (`border-admin-brand`, a bar), not a
-  `bg-admin-brand-weak` fill alone, and announces itself as pressed, checked or
+- A selected item shows a 3:1 marker (`border-platform-brand`, a bar), not a
+  `bg-platform-brand-weak` fill alone, and announces itself as pressed, checked or
   selected.
 - Focus is `focusRingClasses(ground)`
   (`@platform/utils/focus-ring-classes/focus-ring-classes`), the ring
@@ -322,31 +322,31 @@ text-admin-on-selected` — near-black and white in Light, yellow on a dark
   (`@platform/utils/field-surface-classes/field-surface-classes`): a
   `brand-ink` border in a 3px `brand-line` glow.
   Never hand-write a `focus-visible:ring-*` or `focus-visible:shadow-*` list.
-  `outline-admin-brand-weak` (1.12:1) is not a focus indicator.
+  `outline-platform-brand-weak` (1.12:1) is not a focus indicator.
 - A colour transition is `COLOUR_TRANSITION_CLASSES`
   (`@platform/utils/transition-classes/transition-classes`), never
   `transition-colors` with its own duration.
 
 ## Spacing, radius, elevation
 
-| Between                                                   | Value                                           |
-| --------------------------------------------------------- | ----------------------------------------------- |
-| Header, notices and card rows; cards in a column; columns | `gap-6` (24px)                                  |
-| Fields in a card                                          | `gap-4` (16px)                                  |
-| Label, hint, control and error of one field               | `FormField`'s own `gap-[5px]`                   |
-| Buttons or badges in a row                                | `gap-2`                                         |
-| Collapsed rows of one list                                | none: one list divided by `border-admin-line-2` |
+| Between                                                   | Value                                              |
+| --------------------------------------------------------- | -------------------------------------------------- |
+| Header, notices and card rows; cards in a column; columns | `gap-6` (24px)                                     |
+| Fields in a card                                          | `gap-4` (16px)                                     |
+| Label, hint, control and error of one field               | `FormField`'s own `gap-[5px]`                      |
+| Buttons or badges in a row                                | `gap-2`                                            |
+| Collapsed rows of one list                                | none: one list divided by `border-platform-line-2` |
 
 No other value between those things: no `gap-5`, `gap-[18px]`, `mb-[18px]`, or
 `mb-3.5` between sections.
 
-- Radius: two tokens. `rounded-admin` (6px) for surfaces: cards, dialogs,
-  popovers, menus, toasts, notices, the save bar. `rounded-admin-control` (4px)
+- Radius: two tokens. `rounded-platform` (6px) for surfaces: cards, dialogs,
+  popovers, menus, toasts, notices, the save bar. `rounded-platform-control` (4px)
   for everything interactive or small: buttons, inputs, selects, pickers,
   segmented tracks and thumbs, list rows, chips, image thumbnails, code blocks. `rounded-full`
   only for pills and circles. Never a site radius (`rounded-md`, `-lg`, `-xl`)
   or an arbitrary `rounded-[Npx]`.
-- Elevation: `shadow-admin` on resting surfaces and controls, `shadow-admin-lg`
+- Elevation: `shadow-platform` on resting surfaces and controls, `shadow-platform-lg`
   on floating layers only (save bar, dialog, toast, popup). A notice nested in a
   card has no shadow.
 
@@ -546,7 +546,7 @@ tools you have are `loading.tsx`, `<Suspense>`, `cache`, `use`,
 
 ## Phones (below `md`)
 
-- Text fields are at least 16px (`text-admin-16 md:text-admin-13-5`) so iOS
+- Text fields are at least 16px (`text-platform-16 md:text-platform-13-5`) so iOS
   doesn't zoom, and touch targets at least 44px (`min-h-11 md:min-h-0`). Both
   live in the primitives; add no call-site overrides to a shared primitive. A
   control you build yourself carries both.
@@ -630,27 +630,27 @@ of them:
 | ---------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | `variant="muted"` / `"supporting"` to size a card's main content or value                                        | Plain `<Text>` (its body variant)                                                                                                 |
 | `<Text variant="hint">`                                                                                          | `FormField` `hint` for a field; `variant="meta"` for a caption or meta                                                            |
-| `text-sm`, `text-xs`, `text-base`, `text-label`, `text-meta`, or an arbitrary `text-[13.5px]`                    | The role's token, e.g. `text-admin-13-5`                                                                                          |
+| `text-sm`, `text-xs`, `text-base`, `text-label`, `text-meta`, or an arbitrary `text-[13.5px]`                    | The role's token, e.g. `text-platform-13-5`                                                                                       |
 | Table classes of your own: 18px cell padding, no row hover, a left-aligned empty line                            | `DataTableShell` with its `Row` and `Cell` parts, unrestyled                                                                      |
-| A `div` with `rounded-admin border p-[18px] shadow-admin`                                                        | `<Card>` with `Card.Header` and `Card.Body`                                                                                       |
+| A `div` with `rounded-platform border p-[18px] shadow-platform`                                                  | `<Card>` with `Card.Header` and `Card.Body`                                                                                       |
 | A `calc()` or offset worked out from another element's size, or a size another component writes                  | That element's token or a shared const (→ `react-component-practices` § Sizes)                                                    |
 | A paragraph opening `Card.Body` that says what the card is for                                                   | `Card.Header` `supportingText`                                                                                                    |
 | A hand-built tinted box with a glyph                                                                             | `Alert`; a failure card is a `Card isDanger`                                                                                      |
 | A second `h1`, or `<Heading level={1}>` in a page body                                                           | `PageHeader` `title`, once per page                                                                                               |
 | `<h2>`, `<h3>` or a `font-semibold` span as a section title                                                      | `Card.Header` `title`                                                                                                             |
-| `hint={<span className="text-admin-11-5 …">…</span>}`                                                            | `hint={t('…')}`                                                                                                                   |
+| `hint={<span className="text-platform-11-5 …">…</span>}`                                                         | `hint={t('…')}`                                                                                                                   |
 | A field with a format rule and no `error` or `invalidControls.ids` entry, or an entry naming a wrapper           | The settings-fields recipe's error path, all four parts, with the focusable control's own id                                      |
 | ``aria-describedby={`${id}-error`}`` beside `FormField`, or ids threaded past `SettingRow`                       | Nothing at the call site; `Field` links them                                                                                      |
 | `<Alert>` inside a field for its validation error                                                                | `FormField` `error`                                                                                                               |
 | A switch blocked by the plan or a limit with no `lockedReason`                                                   | `isLocked` + a reason for every lock (settings-fields recipe)                                                                     |
 | A plan or limit lock passed to `isDisabled`                                                                      | The control's `isLocked` (`isAriaDisabled` on `Button`), so it stays in the Tab order                                             |
 | Half a fix in a primitive (the colour but not the size)                                                          | Fix every class its rule names, or leave it for its own change                                                                    |
-| `border-admin-line` on a text field, select, track or radio                                                      | `border-admin-control-line`                                                                                                       |
-| `text-admin-faint` on text someone has to read                                                                   | `text-admin-muted`                                                                                                                |
-| `text-indigo-800`, a hex, any raw palette colour                                                                 | An `admin-*` token                                                                                                                |
-| `outline-admin-brand-weak` as the only focus cue                                                                 | `focusRingClasses(ground)`, the ring `Button` draws                                                                               |
+| `border-platform-line` on a text field, select, track or radio                                                   | `border-platform-control-line`                                                                                                    |
+| `text-platform-faint` on text someone has to read                                                                | `text-platform-muted`                                                                                                             |
+| `text-indigo-800`, a hex, any raw palette colour                                                                 | A `platform-*` token                                                                                                              |
+| `outline-platform-brand-weak` as the only focus cue                                                              | `focusRingClasses(ground)`, the ring `Button` draws                                                                               |
 | `gap-[18px]` or `gap-5` between cards, `gap-5` or `mb-[18px]` between fields                                     | `gap-6` between cards, `gap-4` on the fields' parent                                                                              |
-| `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-admin` or `rounded-admin-control`                                                                                        |
+| `rounded-[10px]`, `rounded-[5px]`, `rounded-lg`, `rounded-xl`                                                    | `rounded-platform` or `rounded-platform-control`                                                                                  |
 | `font-sans`, `font-ui` or an inline `fontFamily` on platform chrome                                              | Nothing; the font is set once on `<body>`                                                                                         |
 | `sm:grid-cols-2` inside a half-width column                                                                      | `@container` on the body, `@sm:grid-cols-2` on the grid                                                                           |
 | `@base-ui/react/switch` imported outside `shared/switch/`                                                        | The shared `Switch`; raise a missing mode                                                                                         |
@@ -658,7 +658,7 @@ of them:
 | The page's main action in the body, a non-form action in `Card.Footer`, a default-size `Button` in `Card.Header` | `PageHeader` `actions`; a card-scoped one as `size={SIZE.SM}` in `Card.Header` `actions`                                          |
 | An English literal in JSX, an `aria-label` or a placeholder                                                      | A key in all five catalogues                                                                                                      |
 | `label.toLowerCase()`, `` `${a} — ${b}` ``, `` `${hue}°` ``                                                      | One ICU message with arguments                                                                                                    |
-| `min-h-11` or `text-admin-16` at a shared primitive's call site                                                  | Nothing; the primitive owns phone sizing                                                                                          |
+| `min-h-11` or `text-platform-16` at a shared primitive's call site                                               | Nothing; the primitive owns phone sizing                                                                                          |
 | More code in a file over its size budget                                                                         | Extract the part you change first (`react-component-practices` § Size and splitting)                                              |
 | A feature component styling a Base UI part another page also uses                                                | A block at the level its consumers share (`react-component-practices` § Where a component lives), used from both                  |
 | A new prop on a component at seven (`FormField`, `FormTextInput`)                                                | Restructure first (`react-component-practices` § Props), or compose its parts, as `FormField` around `TextInput`                  |

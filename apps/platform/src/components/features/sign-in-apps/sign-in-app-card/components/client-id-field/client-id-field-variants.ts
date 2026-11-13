@@ -10,7 +10,7 @@ export const clientIdFieldVariants = tv({
       true: { input: ['pr-11 md:pr-9'] },
     },
     isMasked: {
-      true: { input: ['font-mono text-admin-12'] },
+      true: { input: ['font-mono text-platform-12'] },
     },
   },
 });

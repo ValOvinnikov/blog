@@ -8,7 +8,7 @@ import { makeEnTranslator } from '@platform/testing/en-translator';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
-import { AdminShell } from './admin-shell';
+import { PlatformShell } from './platform-shell';
 
 vi.mock('@platform/i18n/navigation');
 vi.mock('@platform/server/auth/sign-out-action');
@@ -28,7 +28,7 @@ const MOCK_ROLE_LINE = makeEnTranslator('account')('roleLine', {
   scope: MOCK_SCOPE,
 });
 
-const setup = customRender(AdminShell, {
+const setup = customRender(PlatformShell, {
   sections: [
     {
       label: MOCK_SECTION_LABEL,
@@ -51,7 +51,7 @@ const setup = customRender(AdminShell, {
   children: <p>{MOCK_PAGE_CONTENT}</p>,
 });
 
-describe(`<${AdminShell.name}/>`, () => {
+describe(`<${PlatformShell.name}/>`, () => {
   let user: UserEvent;
 
   beforeEach(() => {

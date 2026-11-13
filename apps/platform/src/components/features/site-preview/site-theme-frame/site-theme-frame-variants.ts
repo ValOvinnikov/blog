@@ -1,6 +1,6 @@
 import { tv } from '@platform/utils/tv/tv';
 
-// Every class here reads a site token rather than an `--admin-*` one, since this box renders the tenant's theme.
+// Every class here reads a site token rather than an `--platform-*` one, since this box renders the tenant's theme.
 export const siteThemeFrameVariants = tv({
   base: [
     'rounded-md border border-border bg-primary px-card-x py-card-y font-read text-[1rem] text-text',

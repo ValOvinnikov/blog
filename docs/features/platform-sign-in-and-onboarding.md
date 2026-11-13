@@ -105,7 +105,7 @@ site as a 14-day Growth trial, with no card.
 - `/onboarding`: a four-step setup wizard for a signed-in user with no
   membership and no `admins` row (`requireOnboardingUser`; anyone else is sent
   to their own home, so an invited member never sees it). A dark left rail
-  (the `admin-rail*` tokens) carries the Shinefold full logo in its dark-ground colours, "Create your
+  (the `platform-rail*` tokens) carries the Shinefold full logo in its dark-ground colours, "Create your
   site" and the step list (an `ol` named "Setup steps", no `nav`), where a
   done step shows a tick and its choice ("Blog · Field Notes", the site
   address, the preset) and is announced as "Site, Complete, Blog · Field

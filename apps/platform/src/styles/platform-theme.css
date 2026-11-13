@@ -1,0 +1,529 @@
+/* `--platform-*` prefixed: the tenant theme preview renders the site's unprefixed tokens in this same document. */
+:root {
+  color-scheme: light;
+  --platform-bg: #f6f7f9;
+  --platform-surface: #ffffff;
+  --platform-surface-2: #fbfbfd;
+  --platform-surface-head: #eef1f6;
+  --platform-line: #e5e7eb;
+  --platform-line-2: #eef0f3;
+  --platform-control-line: #878f9d;
+  --platform-control-line-tint: #7c8493;
+  --platform-text: #12141a;
+  --platform-text-strong: #12141a;
+  --platform-logo-ink: #12141a;
+  --platform-muted: #5b6472;
+  --platform-faint: #7a8394;
+  --platform-brand: #12141a;
+  --platform-brand-ink: #12141a;
+  --platform-brand-strong: #2a303b;
+  --platform-brand-weak: #fff1c2;
+  --platform-brand-line: #ffd766;
+  --platform-brand-hover: #2a303b;
+  --platform-on-brand-ink: #ffffff;
+  --platform-spinner-on-brand-lit: var(--platform-highlight);
+  --platform-spinner-on-brand-unlit: #e8eaef;
+  --platform-spinner-on-brand-line: var(--platform-spinner-on-brand-unlit);
+  --platform-selected: #12141a;
+  --platform-selected-hover: #2a303b;
+  --platform-on-selected: #ffffff;
+  --platform-ok: #16794d;
+  --platform-ok-weak: #e7f6ee;
+  --platform-warn: #9a3d0b;
+  --platform-warn-weak: #fdeee4;
+  --platform-bad: #b42318;
+  --platform-bad-weak: #fdeceb;
+  --platform-bad-line: #dd6152;
+  --platform-side: #eef0f3;
+  --platform-side-line: #d9dde4;
+  --platform-side-text: #2a303b;
+  --platform-side-muted: #5b6472;
+  --platform-side-raised: #ffffff;
+  --platform-side-accent: #12141a;
+  --platform-follow-mark: #ffc233;
+  --platform-follow-mark-ink: #12141a;
+  --platform-side-field: #ffffff;
+  --platform-side-field-line: #7c8493;
+  --platform-rail: #0f1115;
+  --platform-rail-line: #1c1f26;
+  --platform-rail-text: #c9cfda;
+  --platform-rail-muted: #7d8696;
+  --platform-rail-raised: #20242e;
+  --platform-rail-accent: #ffc233;
+  --platform-popover: #ffffff;
+  --platform-popover-line: #e5e7eb;
+  --platform-popover-hover: #eef1f6;
+  --platform-pill-neutral: #eef0f3;
+  --platform-pill-neutral-popover: #eef0f3;
+  --platform-segment-on: #ffffff;
+  --platform-switch-thumb: #ffffff;
+  --platform-switch-thumb-on: #ffc233;
+  --platform-highlight: #ffc233;
+  --platform-theme-track: #eef0f3;
+  --platform-tooltip: #12141a;
+  --platform-tooltip-text: #ffffff;
+  --platform-tooltip-line: transparent;
+  --platform-scrim: rgba(10, 12, 15, 0.35);
+  --platform-shadow:
+    0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --platform-shadow-menu: 0 12px 40px rgba(16, 24, 40, 0.14);
+  --platform-hover: #e2e5ea;
+  --platform-note-line: rgba(18, 20, 26, 0.3);
+  --platform-control-line-locked: #c5cad3;
+  --platform-glyph-accent: #0d6466;
+  --platform-glyph-fill: #b3dad7;
+  --platform-glyph-line-soft: #6b7484;
+  --platform-glyph-raised: #ffffff;
+  --platform-locked-fade: 0.55;
+  --platform-frame-dot: #d5d9e0;
+  --platform-frame-track: rgba(18, 20, 26, 0.08);
+  --platform-frame-thumb: #5b6472;
+  --platform-frame-track-dark: rgba(232, 234, 239, 0.14);
+  --platform-frame-thumb-dark: #a3abb8;
+  --platform-fade-end: rgba(246, 247, 249, 0);
+  --platform-fade-end-surface: rgba(255, 255, 255, 0);
+  --platform-preview-stage: #eef0f3;
+  --platform-shadow-frame: 0 6px 20px rgba(16, 24, 40, 0.1);
+  --platform-shadow-sheet: 0 -8px 24px rgba(16, 24, 40, 0.18);
+  --platform-shadow-index: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --platform-shadow-unsaved: 0 -4px 12px rgba(16, 24, 40, 0.08);
+  --platform-shadow-bar: 0 2px 8px rgba(16, 24, 40, 0.08);
+  --platform-shadow-dock: 0 -2px 8px rgba(16, 24, 40, 0.06);
+  --platform-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.08);
+  --platform-shadow-glyph: 0 2px 5px rgba(16, 24, 40, 0.22);
+  --platform-shadow-thumb: 0 1px 3px rgba(16, 24, 40, 0.25);
+  --platform-thumb-line: rgba(16, 24, 40, 0.12);
+  --platform-preview-column-line: transparent;
+  --platform-rail-header-line: transparent;
+  --platform-topbar: 67px;
+  --platform-view-tab: 44px;
+  --platform-view-tab-border: 1px;
+  --platform-view-tabs: calc(
+    var(--platform-view-tab) + var(--platform-view-tab-border)
+  );
+  /* The Look jump index's rendered height: the phone chip row, then the desktop bar from lg. */
+  --platform-look-index: 65px;
+  --platform-spinner-loop: 3s;
+  --platform-spinner-ease: cubic-bezier(0.6, 0, 0.3, 1);
+}
+
+@media (width >= 48rem) {
+  :root {
+    --platform-topbar: 59px;
+  }
+}
+
+@media (width >= 64rem) {
+  :root {
+    --platform-view-tabs: calc(
+      var(--platform-view-tab) + 2 * var(--platform-view-tab-border)
+    );
+    --platform-look-index: 46px;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --platform-bg: #0f1115;
+  --platform-surface: #171a20;
+  --platform-surface-2: #1b1e25;
+  --platform-surface-head: #1d2027;
+  --platform-line: #2b303a;
+  --platform-line-2: #232730;
+  --platform-control-line: #737d8d;
+  --platform-control-line-tint: #737d8d;
+  --platform-text: #e8eaef;
+  --platform-text-strong: #ffffff;
+  --platform-logo-ink: #e8eaef;
+  --platform-muted: #a3abb8;
+  --platform-faint: #8590a0;
+  --platform-brand: #ffc233;
+  --platform-brand-ink: #ffdc7a;
+  --platform-brand-strong: #ffe08a;
+  --platform-brand-weak: #33290d;
+  --platform-brand-line: #5c4a14;
+  --platform-brand-hover: #ffcf5c;
+  --platform-on-brand-ink: #0f1115;
+  --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
+  --platform-spinner-on-brand-unlit: transparent;
+  --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
+  --platform-selected: #33290d;
+  --platform-selected-hover: #40330f;
+  --platform-on-selected: #ffdc7a;
+  --platform-ok: #6ee7a7;
+  --platform-ok-weak: #10291d;
+  --platform-warn: #ffa066;
+  --platform-warn-weak: #2e1a10;
+  --platform-bad: #fca5a0;
+  --platform-bad-weak: #331716;
+  --platform-bad-line: #e5675a;
+  --platform-side: #0a0c0f;
+  --platform-side-line: #1c1f26;
+  --platform-side-text: #c9cfda;
+  --platform-side-muted: #8d96a6;
+  --platform-side-raised: #20242e;
+  --platform-side-accent: #ffc233;
+  --platform-side-field: #171a20;
+  --platform-side-field-line: #737d8d;
+  --platform-popover: #262b35;
+  --platform-popover-line: #4a5260;
+  --platform-popover-hover: #323845;
+  --platform-pill-neutral: #262a33;
+  --platform-pill-neutral-popover: #323845;
+  --platform-segment-on: #323845;
+  --platform-switch-thumb: #e8eaef;
+  --platform-switch-thumb-on: #0f1115;
+  --platform-theme-track: #0f1115;
+  --platform-tooltip: #262b35;
+  --platform-tooltip-text: #e8eaef;
+  --platform-tooltip-line: #4a5260;
+  --platform-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --platform-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --platform-hover: #22262f;
+  --platform-note-line: rgba(255, 194, 51, 0.3);
+  --platform-control-line-locked: #424956;
+  --platform-glyph-accent: #4fb3ad;
+  --platform-glyph-fill: #24504f;
+  --platform-glyph-line-soft: #8f99a8;
+  --platform-glyph-raised: #323945;
+  --platform-frame-dot: #3a404b;
+  --platform-fade-end: rgba(15, 17, 21, 0);
+  --platform-fade-end-surface: rgba(23, 26, 32, 0);
+  --platform-preview-stage: #1d2027;
+  --platform-shadow-frame: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --platform-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+  --platform-shadow-index: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --platform-shadow-unsaved: 0 -4px 12px rgba(0, 0, 0, 0.45);
+  --platform-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --platform-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
+  --platform-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --platform-shadow-glyph: 0 2px 5px rgba(0, 0, 0, 0.6);
+  --platform-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --platform-thumb-line: #0f1115;
+  --platform-preview-column-line: #2b303a;
+  --platform-rail-header-line: #1c1f26;
+}
+
+/* Same values as the block above: with no stored choice the platform follows the device. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --platform-bg: #0f1115;
+    --platform-surface: #171a20;
+    --platform-surface-2: #1b1e25;
+    --platform-surface-head: #1d2027;
+    --platform-line: #2b303a;
+    --platform-line-2: #232730;
+    --platform-control-line: #737d8d;
+    --platform-control-line-tint: #737d8d;
+    --platform-text: #e8eaef;
+    --platform-text-strong: #ffffff;
+    --platform-logo-ink: #e8eaef;
+    --platform-muted: #a3abb8;
+    --platform-faint: #8590a0;
+    --platform-brand: #ffc233;
+    --platform-brand-ink: #ffdc7a;
+    --platform-brand-strong: #ffe08a;
+    --platform-brand-weak: #33290d;
+    --platform-brand-line: #5c4a14;
+    --platform-brand-hover: #ffcf5c;
+    --platform-on-brand-ink: #0f1115;
+    --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
+    --platform-spinner-on-brand-unlit: transparent;
+    --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
+    --platform-selected: #33290d;
+    --platform-selected-hover: #40330f;
+    --platform-on-selected: #ffdc7a;
+    --platform-ok: #6ee7a7;
+    --platform-ok-weak: #10291d;
+    --platform-warn: #ffa066;
+    --platform-warn-weak: #2e1a10;
+    --platform-bad: #fca5a0;
+    --platform-bad-weak: #331716;
+    --platform-bad-line: #e5675a;
+    --platform-side: #0a0c0f;
+    --platform-side-line: #1c1f26;
+    --platform-side-text: #c9cfda;
+    --platform-side-muted: #8d96a6;
+    --platform-side-raised: #20242e;
+    --platform-side-accent: #ffc233;
+    --platform-side-field: #171a20;
+    --platform-side-field-line: #737d8d;
+    --platform-popover: #262b35;
+    --platform-popover-line: #4a5260;
+    --platform-popover-hover: #323845;
+    --platform-pill-neutral: #262a33;
+    --platform-pill-neutral-popover: #323845;
+    --platform-segment-on: #323845;
+    --platform-switch-thumb: #e8eaef;
+    --platform-switch-thumb-on: #0f1115;
+    --platform-theme-track: #0f1115;
+    --platform-tooltip: #262b35;
+    --platform-tooltip-text: #e8eaef;
+    --platform-tooltip-line: #4a5260;
+    --platform-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --platform-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
+    --platform-hover: #22262f;
+    --platform-note-line: rgba(255, 194, 51, 0.3);
+    --platform-control-line-locked: #424956;
+    --platform-glyph-accent: #4fb3ad;
+    --platform-glyph-fill: #24504f;
+    --platform-glyph-line-soft: #8f99a8;
+    --platform-glyph-raised: #323945;
+    --platform-frame-dot: #3a404b;
+    --platform-fade-end: rgba(15, 17, 21, 0);
+    --platform-fade-end-surface: rgba(23, 26, 32, 0);
+    --platform-preview-stage: #1d2027;
+    --platform-shadow-frame: 0 6px 20px rgba(0, 0, 0, 0.45);
+    --platform-shadow-sheet: 0 -8px 24px rgba(0, 0, 0, 0.55);
+    --platform-shadow-index: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --platform-shadow-unsaved: 0 -4px 12px rgba(0, 0, 0, 0.45);
+    --platform-shadow-bar: 0 2px 8px rgba(0, 0, 0, 0.45);
+    --platform-shadow-dock: 0 -2px 8px rgba(0, 0, 0, 0.4);
+    --platform-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --platform-shadow-glyph: 0 2px 5px rgba(0, 0, 0, 0.6);
+    --platform-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.6);
+    --platform-thumb-line: #0f1115;
+    --platform-preview-column-line: #2b303a;
+    --platform-rail-header-line: #1c1f26;
+  }
+}
+
+@theme inline {
+  --font-platform: var(--font-platform-family, 'Inter', system-ui, sans-serif);
+  --font-platform-mono:
+    var(--font-platform-mono-family, 'JetBrains Mono'), ui-monospace, monospace;
+
+  --color-platform-bg: var(--platform-bg);
+  --color-platform-surface: var(--platform-surface);
+  --color-platform-surface-2: var(--platform-surface-2);
+  --color-platform-surface-head: var(--platform-surface-head);
+  --color-platform-line: var(--platform-line);
+  --color-platform-line-2: var(--platform-line-2);
+  --color-platform-control-line: var(--platform-control-line);
+  --color-platform-control-line-tint: var(--platform-control-line-tint);
+  --color-platform-text: var(--platform-text);
+  --color-platform-text-strong: var(--platform-text-strong);
+  --color-platform-logo-ink: var(--platform-logo-ink);
+  --color-platform-muted: var(--platform-muted);
+  --color-platform-faint: var(--platform-faint);
+  --color-platform-brand: var(--platform-brand);
+  --color-platform-follow-mark: var(--platform-follow-mark);
+  --color-platform-follow-mark-ink: var(--platform-follow-mark-ink);
+  --color-platform-brand-ink: var(--platform-brand-ink);
+  --color-platform-brand-strong: var(--platform-brand-strong);
+  --color-platform-brand-weak: var(--platform-brand-weak);
+  --color-platform-brand-line: var(--platform-brand-line);
+  --color-platform-brand-hover: var(--platform-brand-hover);
+  --color-platform-on-brand-ink: var(--platform-on-brand-ink);
+  --color-platform-spinner-on-brand-lit: var(--platform-spinner-on-brand-lit);
+  --color-platform-spinner-on-brand-unlit: var(
+    --platform-spinner-on-brand-unlit
+  );
+  --color-platform-spinner-on-brand-line: var(--platform-spinner-on-brand-line);
+  --color-platform-selected: var(--platform-selected);
+  --color-platform-selected-hover: var(--platform-selected-hover);
+  --color-platform-on-selected: var(--platform-on-selected);
+  --color-platform-ok: var(--platform-ok);
+  --color-platform-ok-weak: var(--platform-ok-weak);
+  --color-platform-warn: var(--platform-warn);
+  --color-platform-warn-weak: var(--platform-warn-weak);
+  --color-platform-bad: var(--platform-bad);
+  --color-platform-bad-weak: var(--platform-bad-weak);
+  --color-platform-bad-line: var(--platform-bad-line);
+  --color-platform-side: var(--platform-side);
+  --color-platform-side-line: var(--platform-side-line);
+  --color-platform-side-text: var(--platform-side-text);
+  --color-platform-side-muted: var(--platform-side-muted);
+  --color-platform-side-raised: var(--platform-side-raised);
+  --color-platform-side-accent: var(--platform-side-accent);
+  --color-platform-side-field: var(--platform-side-field);
+  --color-platform-side-field-line: var(--platform-side-field-line);
+  --color-platform-rail: var(--platform-rail);
+  --color-platform-rail-line: var(--platform-rail-line);
+  --color-platform-rail-text: var(--platform-rail-text);
+  --color-platform-rail-muted: var(--platform-rail-muted);
+  --color-platform-rail-raised: var(--platform-rail-raised);
+  --color-platform-rail-accent: var(--platform-rail-accent);
+  --color-platform-popover: var(--platform-popover);
+  --color-platform-popover-line: var(--platform-popover-line);
+  --color-platform-popover-hover: var(--platform-popover-hover);
+  --color-platform-pill-neutral: var(--platform-pill-neutral);
+  --color-platform-pill-neutral-popover: var(--platform-pill-neutral-popover);
+  --color-platform-segment-on: var(--platform-segment-on);
+  --color-platform-switch-thumb: var(--platform-switch-thumb);
+  --color-platform-switch-thumb-on: var(--platform-switch-thumb-on);
+  --color-platform-highlight: var(--platform-highlight);
+  --color-platform-theme-track: var(--platform-theme-track);
+  --color-platform-tooltip: var(--platform-tooltip);
+  --color-platform-tooltip-text: var(--platform-tooltip-text);
+  --color-platform-tooltip-line: var(--platform-tooltip-line);
+  --color-platform-scrim: var(--platform-scrim);
+  --color-platform-hover: var(--platform-hover);
+  --color-platform-note-line: var(--platform-note-line);
+  --color-platform-control-line-locked: var(--platform-control-line-locked);
+  --color-platform-glyph-accent: var(--platform-glyph-accent);
+  --color-platform-glyph-fill: var(--platform-glyph-fill);
+  --color-platform-glyph-line-soft: var(--platform-glyph-line-soft);
+  --color-platform-glyph-raised: var(--platform-glyph-raised);
+  --color-platform-frame-dot: var(--platform-frame-dot);
+  --color-platform-frame-track: var(--platform-frame-track);
+  --color-platform-frame-thumb: var(--platform-frame-thumb);
+  --color-platform-thumb-line: var(--platform-thumb-line);
+  --color-platform-frame-track-dark: var(--platform-frame-track-dark);
+  --color-platform-frame-thumb-dark: var(--platform-frame-thumb-dark);
+  --color-platform-fade-end: var(--platform-fade-end);
+  --color-platform-fade-end-surface: var(--platform-fade-end-surface);
+  --color-platform-preview-stage: var(--platform-preview-stage);
+
+  --text-platform-10-5: 10.5px;
+  --text-platform-11: 11px;
+  --text-platform-11-5: 11.5px;
+  --text-platform-12: 12px;
+  --text-platform-12-5: 12.5px;
+  --text-platform-13: 13px;
+  --text-platform-13-5: 13.5px;
+  --text-platform-14: 14px;
+  --text-platform-15: 15px;
+  --text-platform-16: 16px;
+  --text-platform-20: 20px;
+  --text-platform-22: 22px;
+  --text-platform-24: 24px;
+  --text-platform-28: 28px;
+
+  --tracking-platform-label: 0.09em;
+  --tracking-platform-caps: 0.06em;
+
+  --leading-platform-14: 14px;
+  --leading-platform-15: 15px;
+  --leading-platform-1-4: 1.4;
+  --leading-platform-1-45: 1.45;
+  --leading-platform-18: 18px;
+  --leading-platform-19: 19px;
+  --leading-platform-22: 22px;
+
+  --font-weight-platform-650: 650;
+
+  /* Clears the sticky topbar for sticky panels and scroll targets. */
+  --spacing-platform-topbar: var(--platform-topbar);
+  --spacing-platform-card: 18px;
+  --spacing-platform-hue-readout: 62px;
+  --spacing-platform-bar: 3px;
+  --spacing-platform-view-tab: var(--platform-view-tab);
+  --spacing-platform-view-tabs: var(--platform-view-tabs);
+  --spacing-platform-look-index: var(--platform-look-index);
+  --spacing-platform-form-gap: 18px;
+  --spacing-platform-content: 26px;
+  --spacing-platform-sidebar: 264px;
+  --spacing-platform-rail: 76px;
+  /* Keep equal to LOOK_LAYOUT_LIMIT.DOCKED_SAVE_BAR_HEIGHT and _CLEARANCE in constants/look-layout.ts. */
+  --spacing-platform-dock: 64px;
+  --spacing-platform-dock-clearance: 16px;
+  --spacing-platform-dock-room: 120px;
+  /* A preview status row's trailing button height less its −7px lift: 32px from `lg`, 44px touch targets. */
+  --spacing-platform-status-row: calc(var(--spacing) * 8 - 7px);
+  --spacing-platform-status-row-touch: calc(var(--spacing) * 11 - 7px);
+  /* Three 18px lines: the longest paused line beside its button on the phone Preview tab. */
+  --spacing-platform-status-row-phone: 54px;
+  --spacing-platform-phone-footer-max: 85px;
+
+  /* Keep equal to LOOK_LAYOUT_LIMIT.TWO_COLUMN_MIN_WIDTH in constants/look-layout.ts. */
+  --container-look-split: 900px;
+
+  --radius-platform: 6px;
+  --radius-platform-control: 4px;
+  --radius-platform-bar: 2px;
+  --radius-platform-3: 3px;
+  --radius-platform-5: 5px;
+  --radius-platform-8: 8px;
+  --radius-platform-10: 10px;
+  --radius-platform-12: 12px;
+  --radius-platform-14: 14px;
+  --radius-platform-18: 18px;
+  --radius-platform-22: 22px;
+
+  --shadow-platform: var(--platform-shadow);
+  --shadow-platform-lg: var(--platform-shadow-menu);
+  --shadow-platform-frame: var(--platform-shadow-frame);
+  --shadow-platform-sheet: var(--platform-shadow-sheet);
+  --shadow-platform-index: var(--platform-shadow-index);
+  --shadow-platform-unsaved: var(--platform-shadow-unsaved);
+  --shadow-platform-bar: var(--platform-shadow-bar);
+  --shadow-platform-dock: var(--platform-shadow-dock);
+  --shadow-platform-xs: var(--platform-shadow-xs);
+  --shadow-platform-glyph: var(--platform-shadow-glyph);
+  --shadow-platform-thumb: var(--platform-shadow-thumb);
+  --shadow-platform-choice-ring: 0 0 0 3px var(--platform-brand-weak);
+  --shadow-platform-focus-glow: 0 0 0 3px var(--platform-brand-line);
+}
+
+@theme {
+  --animate-platform-spinner-orbit: platform-spinner-orbit
+    var(--platform-spinner-loop) var(--platform-spinner-ease) infinite;
+  --animate-platform-spinner-lit: platform-spinner-lit
+    var(--platform-spinner-loop) var(--platform-spinner-ease) infinite;
+  --animate-platform-spinner-unlit: platform-spinner-unlit
+    var(--platform-spinner-loop) var(--platform-spinner-ease) infinite;
+
+  @keyframes platform-spinner-orbit {
+    0%,
+    34% {
+      rotate: 0deg;
+    }
+    80%,
+    100% {
+      rotate: 720deg;
+    }
+  }
+
+  /* Each half rounds into a circle by size and corner radius alone, so no browser has to morph a path. */
+  @keyframes platform-spinner-lit {
+    0%,
+    8%,
+    100% {
+      top: 50%;
+      width: 64%;
+      height: 32%;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+    20%,
+    90% {
+      top: 40%;
+      width: 64%;
+      height: 32%;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    }
+    34%,
+    80% {
+      top: 38%;
+      width: 30%;
+      height: 30%;
+      border-radius: 50%;
+    }
+  }
+
+  @keyframes platform-spinner-unlit {
+    0%,
+    8%,
+    100% {
+      top: 50%;
+      width: 64%;
+      height: 32%;
+      border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    }
+    20%,
+    90% {
+      top: 60%;
+      width: 64%;
+      height: 32%;
+      border-radius: 0 0 50% 50% / 0 0 100% 100%;
+    }
+    34%,
+    80% {
+      top: 62%;
+      width: 30%;
+      height: 30%;
+      border-radius: 50%;
+    }
+  }
+}
