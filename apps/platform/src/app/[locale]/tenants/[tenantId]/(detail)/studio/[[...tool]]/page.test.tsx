@@ -31,6 +31,8 @@ vi.mock('@platform/server/auth/auth');
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
+
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
   queries: {

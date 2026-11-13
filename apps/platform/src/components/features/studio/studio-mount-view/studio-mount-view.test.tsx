@@ -6,6 +6,7 @@ import {
 import { TENANT_PLAN } from '@blog/config/constants';
 import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
+import { resolveIsPlatformTenant } from '@platform/server/tenants/resolve-is-platform-tenant';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';
 import {
@@ -42,6 +43,8 @@ vi.mock('@blog/db', () => ({
 vi.mock('@platform/server/settings-features/get-enabled-capabilities', () => ({
   getEnabledCapabilities: getEnabledCapabilitiesMock,
 }));
+
+vi.mock('@platform/server/tenants/resolve-is-platform-tenant');
 
 vi.mock('@blog/studio', () => ({
   StudioMount: (props: unknown) => {
@@ -172,6 +175,20 @@ describe(`<${StudioMountView.name}/>`, () => {
       );
     },
   );
+
+  it.each([
+    ['lets the platform tenant link platform plans', true],
+    ['withholds platform plan links from any other tenant', false],
+  ])('%s', async (_description, isPlatformTenant) => {
+    vi.mocked(resolveIsPlatformTenant).mockResolvedValue(isPlatformTenant);
+
+    await setup();
+
+    expect(resolveIsPlatformTenant).toHaveBeenCalledWith(MOCK_TENANT);
+    expect(studioMountMock).toHaveBeenCalledWith(
+      expect.objectContaining({ canLinkPlatformPlans: isPlatformTenant }),
+    );
+  });
 
   it("passes the tenant's default and live languages to Studio", async () => {
     const tenant = mockProvisionedTenant({ locale: LOCALE_ISO_CODES.NL });
