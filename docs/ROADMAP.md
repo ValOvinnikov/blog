@@ -146,7 +146,7 @@ Free or trial site at a time (#6874).
 - **Yearly** is two months free. The 14-day trial with no card stands.
 - The contact form moves out of the Growth module pack so Starter can hold it.
 
-## The admin redesign
+## The platform redesign
 
 Specs merged in #6427; run in its own session, alongside the launch work.
 Umbrella #6313. The building is done but for the Voice save bar on phones
@@ -158,13 +158,14 @@ of them also deletes `2026-10-30-admin-redesign-resolutions.md`.
 
 ## Alongside
 
-| Epic      | What it delivers                                                                                                                                                                                                                                                                  |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **#5251** | Tiered CI. Left: Lighthouse after a production deploy (#5264) and taking the repo private (#5269).                                                                                                                                                                                |
-| **#5271** | Releases from the platform. Left: the commit-pinned Release button (#5502), the Deploy to dev action (#5282), and manual tests. Later: restoring one tenant from its pre-migration export into its second dataset (#7277).                                                        |
-| **#7273** | A page opened before a deploy still saves: each prebuilt deploy gets its own deployment id so Skew Protection applies (#7274, first), and a save from a page too old says so and offers a reload (#7275). Manual test #7276. Later: the same reload prompt in the Studio (#7279). |
-| **#5459** | Header controls are one round family, with a per-site style on the Look page. Left: its manual tests.                                                                                                                                                                             |
-| **#6152** | Deploy first, then migrate: content migrations return after the launch in the expand/contract form.                                                                                                                                                                               |
+| Epic      | What it delivers                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **#5251** | Tiered CI. Left: Lighthouse after a production deploy (#5264) and taking the repo private (#5269).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **#5271** | Releases from the platform. Left: the commit-pinned Release button (#5502), the Deploy to dev action (#5282), and manual tests. Later: restoring one tenant from its pre-migration export into its second dataset (#7277).                                                                                                                                                                                                                                                                                                                                                                              |
+| **#7273** | A page opened before a deploy still saves: each prebuilt deploy gets its own deployment id so Skew Protection applies (#7274, first), and a save from a page too old says so and offers a reload (#7275). Manual test #7276. Later: the same reload prompt in the Studio (#7279).                                                                                                                                                                                                                                                                                                                       |
+| **#5459** | Header controls are one round family, with a per-site style on the Look page. Left: its manual tests.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **#7303** | The product is Shinefold: one logo on every surface and a near-black and yellow platform. The logo files and their shared geometry first (#7304), then platform emails (#7305), the platform's logo, name, tab titles and favicon (#7306) and the Free-tier footer mark (#7307). A site with no logo shows its initial in a tile (#7308, #7309, #7310). The platform's colours follow its logo (#7311). Manual tests #7312 and #7313; rollout checklist #7314. The app's old name goes too: "admin" becomes "platform" in docs and CI comments (#7315) and, last, in the platform's code names (#7316). |
+| **#6152** | Deploy first, then migrate: content migrations return after the launch in the expand/contract form.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ## After the launch
 
@@ -217,7 +218,7 @@ reading (#2799), live subscriber count (#2801) and module presets (#2803).
 
 ## Open decisions
 
-- **Domain:** the admin is `platform.<domain>`, but the domain itself is not
+- **Domain:** the platform is `platform.<domain>`, but the domain itself is not
   chosen. It doesn't block development.
 - **Translation model:** Sonnet or Haiku for translation drafts, settled by
   testing both on real posts. Sonnet costs about $0.05 a post and language,
@@ -231,7 +232,7 @@ reading (#2799), live subscriber count (#2801) and module presets (#2803).
 - **Production stand-up** (owner, 2026-10-31): Vercel projects, env,
   domains, crons and the Upstash Redis integration.
 - **Production deploy testing** (owner, 2026-10-18): #5502 and #5264.
-- **A platform visual audit**, owed after the admin redesign.
+- **A platform visual audit**, owed after the platform redesign.
 - **Stripe's custom billing domain** (owner, 2026-11-08): a paid add-on,
   about $10 a month, that serves the Customer Portal and Stripe's hosted pages
   from `billing.<domain>` instead of a stripe.com address. One DNS record and

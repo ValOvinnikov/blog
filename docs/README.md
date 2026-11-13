@@ -30,6 +30,8 @@ What lives where, and which docs are live vs. historical. See the "Design-doc re
 - **`docs/ROADMAP.md`** — the order the open epics ship in, open decisions,
   and the release plan (Release 1 promote, Release 2 sell).
 - **`docs/DEPLOY.md`** — deploy & release runbook, one-time environment setup.
+- **`docs/brand/`** — the Shinefold name, logo files and colours, and which
+  logo each surface shows (`docs/brand/README.md`).
 - **`docs/design-reference/`** — design-system reference (HTML mockup +
   component specs + tokens), a separate concern from the specs/plans below.
   Standalone; not tied to the archive lifecycle.
@@ -48,7 +50,7 @@ retirement into an epic body.
 - `superpowers/specs/2026-10-30-owner-dashboard-design.md` — the owner Overview (Layout B site band, Studio status, cards).
 - `superpowers/specs/2026-10-30-voice-page-design.md` — the Voice page (V3a chip bar, docked save bar, previews).
 - `superpowers/specs/2026-10-30-onboarding-wizard-parity-design.md` — the onboarding wizard matching the W2 boards.
-- `superpowers/specs/2026-10-30-admin-redesign-resolutions.md` — the cross-set rulings, shared-primitive owners, dependencies and undrawn frames for the admin redesign specs above.
+- `superpowers/specs/2026-10-30-admin-redesign-resolutions.md` — the cross-set rulings, shared-primitive owners, dependencies and undrawn frames for the platform redesign specs above.
 - `superpowers/specs/2026-11-05-entitlement-grants-design.md` — spike: a super admin grants one tenant a feature outside its plan (storage, resolver, granularity, UI, billing).
 
 ## Archived design docs (frozen history — pre-2026-07-27 only)

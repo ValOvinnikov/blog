@@ -1,31 +1,32 @@
 {
   "pageMetadata": {
-    "root": "Admin",
-    "tenants": "Tenants · Admin",
-    "ownerHome": "Dashboard · Admin",
-    "look": "Uiterlijk · Admin",
-    "voice": "Toon · Admin",
-    "selectTenant": "Kies een werkruimte · Admin",
+    "root": "Shinefold",
+    "titleTemplate": "%s · Shinefold",
+    "tenants": "Tenants",
+    "ownerHome": "Dashboard",
+    "look": "Uiterlijk",
+    "voice": "Toon",
+    "selectTenant": "Kies een werkruimte",
     "signInTitle": "Inloggen",
     "signInError": "Probleem bij inloggen",
-    "addTenant": "Tenant toevoegen · Admin",
-    "tenantOverview": "Tenantoverzicht · Admin",
-    "tenantActivity": "Tenantactiviteit · Admin",
-    "tenantProvisioning": "Inrichting · Admin",
-    "tenantDanger": "Gevarenzone · Admin",
-    "tenantDomain": "Domein · Admin",
-    "signInApps": "Inloggen · Admin",
-    "features": "Functies · Admin",
-    "languages": "Talen · Admin",
-    "studio": "Studio · Admin",
-    "findings": "Bevindingen · Admin",
-    "email": "E-mail · Admin",
-    "leads": "Berichten · Admin",
-    "releases": "Releases · Admin",
-    "blockedSignupsPage": "Geblokkeerde aanmeldingen · Admin",
-    "dataRequestsPage": "Gegevensverzoeken · Admin",
+    "addTenant": "Tenant toevoegen",
+    "tenantOverview": "Tenantoverzicht",
+    "tenantActivity": "Tenantactiviteit",
+    "tenantProvisioning": "Inrichting",
+    "tenantDanger": "Gevarenzone",
+    "tenantDomain": "Domein",
+    "signInApps": "Inloggen",
+    "features": "Functies",
+    "languages": "Talen",
+    "studio": "Studio",
+    "findings": "Bevindingen",
+    "email": "E-mail",
+    "leads": "Berichten",
+    "releases": "Releases",
+    "blockedSignupsPage": "Geblokkeerde aanmeldingen",
+    "dataRequestsPage": "Gegevensverzoeken",
     "signUpTitle": "Account aanmaken",
-    "onboarding": "Je site maken · Admin"
+    "onboarding": "Je site maken"
   },
   "signInPage": {
     "heading": "Inloggen",
@@ -51,7 +52,7 @@
   "onboardingPage": {
     "heading": "Maak je site",
     "description": "Kies wat voor site je wilt, het adres en het uiterlijk. Alles behalve het adres kun je later nog wijzigen.",
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "onboardingForm": {
     "siteTypeLabel": "Type site",
@@ -81,7 +82,7 @@
     "creating": "Je site wordt gemaakt…",
     "failureTitle": "We konden je site niet maken",
     "failures": {
-      "alreadyOwnsFreeSite": "Je hebt al een gratis site. Iedereen kan er één hebben.",
+      "alreadyOwnsFreeSite": "Je hebt al een gratis site of een site in een proefperiode. Iedereen kan er één tegelijk hebben.",
       "tryAgainLater": "Probeer het later opnieuw.",
       "serverError": "Er ging iets mis. Probeer het opnieuw."
     },
@@ -150,7 +151,7 @@
     "homeLink": "Terug naar start"
   },
   "centeredCardFrame": {
-    "brandName": "Valstack"
+    "brandName": "Shinefold"
   },
   "deadEndView": {
     "errorId": "Fout-ID: {errorId}"
@@ -160,8 +161,8 @@
   },
   "sidebar": {
     "ariaLabel": "Zijbalk",
-    "brandName": "Valstack",
-    "brandTagline": "admin",
+    "brandName": "Shinefold",
+    "brandTagline": "Platform",
     "collapseToggle": "Zijbalk inklappen",
     "expandToggle": "Zijbalk uitklappen"
   },
@@ -353,6 +354,10 @@
   },
   "ownerHomePage": {
     "description": "Uw site in één oogopslag. Alles hier is live.",
+    "trialTitle": "{plan}-proefperiode",
+    "trialDescription": "Uw site heeft tot <time>{date}</time> alle {plan}-functies. U hebt geen kaart nodig; na de proefperiode gaat de site naar {freePlan}.",
+    "trialEndedTitle": "{plan}-proefperiode afgelopen",
+    "trialEndedDescription": "Uw proefperiode is op <time>{date}</time> geëindigd. De site gaat binnenkort naar {freePlan}.",
     "yourSiteCardTitle": "Uw site",
     "nameLabel": "Naam",
     "publicDomainLabel": "Openbaar domein",

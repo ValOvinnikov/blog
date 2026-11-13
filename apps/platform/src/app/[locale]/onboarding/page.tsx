@@ -24,7 +24,7 @@ export default async function OnboardingPage() {
 
   return (
     <PoweredByMarkProvider
-      productName={toPoweredByProductName(TENANT_PLAN.FREE, env.PRODUCT_NAME)}
+      productName={toPoweredByProductName(TENANT_PLAN.GROWTH, env.PRODUCT_NAME)}
     >
       <OnboardingView
         rootDomain={env.TENANT_ROOT_DOMAIN}

@@ -48,7 +48,7 @@ A visitor sends the site's owner a message from a contact form placed on a page,
 - **Owner or operator** — sets the recipient override on the Email page, reads and deletes leads.
 - **Editor** — places the module and writes the success message and privacy note in Studio.
 - **Voice** — the success message and privacy note are editor content in Sanity, not Voice fields; everything else is fixed `contactForm.*` copy on `VOICE_FIXED_KEYS`.
-- **Env** — `PLATFORM_APP_URL` (`apps/web`, optional) is the admin panel's origin for the notification's "View all leads" link. Unset, the email still sends with an inert link and the send logs `contact_form.platform_url_missing`. `INTERNAL_PAGES_SECRET` (both apps, optional, byte-identical) signs the panel's request for a source page's title, sent to `WEB_APP_URL`; unset on either side, the pane keeps the path and the panel logs `leads.page_title_skipped`.
+- **Env** — `PLATFORM_APP_URL` (`apps/web`, optional) is the platform's origin for the notification's "View all leads" link. Unset, the email still sends with an inert link and the send logs `contact_form.platform_url_missing`. `INTERNAL_PAGES_SECRET` (both apps, optional, byte-identical) signs the panel's request for a source page's title, sent to `WEB_APP_URL`; unset on either side, the pane keeps the path and the panel logs `leads.page_title_skipped`.
 
 ## Constraints and invariants
 

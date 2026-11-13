@@ -15,7 +15,7 @@ epics: [1040, 1041]
 
 ## What it does
 
-Signed-in readers will be able to leave threaded comments on a post and give it a 1–5 rating, one per reader per post. New comments wait for moderation before they show. Neither feature exists on the public site today: only the stored toggles and the plan entitlement are in place, and the admin shows neither. Switching them on renders no comment or rating UI, though `COMMENTS` already opens the reader account surfaces (see Constraints).
+Signed-in readers will be able to leave threaded comments on a post and give it a 1–5 rating, one per reader per post. New comments wait for moderation before they show. Neither feature exists on the public site today: only the stored toggles and the plan entitlement are in place, and the platform shows neither. Switching them on renders no comment or rating UI, though `COMMENTS` already opens the reader account surfaces (see Constraints).
 
 ## Surfaces and routes
 

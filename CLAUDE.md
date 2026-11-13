@@ -55,7 +55,7 @@ graph is acyclic
   `buildAuthConfig(app)`, and each app names its own cookies and reads another
   app's session as no session. See `.claude/agents/auth.md`.
 - `apps/platform` is a separate Next.js app (its own deployment and domain) for
-  the operator/tenant admin panel — it consumes `db`, `auth`, `config`, `utils`,
+  the platform, the operator and tenant app — it consumes `db`, `auth`, `config`, `utils`,
   `insight`, `email` and `@blog/studio`, and **never Sanity or `@blog/service` directly**: it
   reaches the Studio only through `@blog/studio`'s mount component, and ESLint
   `no-restricted-imports` bans `sanity`, `next-sanity`, `@sanity/*`, `groqd`
@@ -251,7 +251,7 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   `apps/web` (popover/menu/disclosure/clipboard/focus) or composing `@blog/ui`
   with client state.
 - `platform-ui-practices` when building or changing any UI in `apps/platform`
-  — the admin design standard, reusable blocks on Base UI, and the red flags to
+  — the platform design standard, reusable blocks on Base UI, and the red flags to
   stop on.
 - `ui-storybook` / `web-storybook` when adding or editing stories in
   `packages/ui` / `apps/web`.

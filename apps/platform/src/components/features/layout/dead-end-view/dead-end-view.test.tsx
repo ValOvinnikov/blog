@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 import messages from '@platform/i18n/messages/en.json';
 import { MOCK_SIGN_IN_EMAIL } from '@platform/testing/auth/fixtures';
 import { customRender, screen } from '@platform/testing/custom-render';
@@ -16,7 +17,7 @@ const MOCK_ACTION_LABEL = faker.lorem.words(2);
 const MOCK_ERROR_ID = faker.string.alphanumeric(10);
 
 const setup = customRender(DeadEndView, {
-  badge: { label: MOCK_BADGE_LABEL, tone: 'bad' },
+  badge: { label: MOCK_BADGE_LABEL, tone: BADGE_TONE.BAD },
   title: MOCK_TITLE,
   description: MOCK_DESCRIPTION,
   action: <button type="button">{MOCK_ACTION_LABEL}</button>,
@@ -43,15 +44,6 @@ describe(`<${DeadEndView.name}/>`, () => {
       expect(badge).toBeVisible();
       expect(description).toBeVisible();
       expect(action).toBeVisible();
-    });
-
-    it('names the product in text, with the mark hidden', () => {
-      const main = screen.getByRole('main');
-      const wordmark = screen.getByText(messages.centeredCardFrame.brandName);
-      const image = screen.queryByRole('img');
-
-      expect(main).toContainElement(wordmark);
-      expect(image).not.toBeInTheDocument();
     });
 
     it('shows no error id line', () => {

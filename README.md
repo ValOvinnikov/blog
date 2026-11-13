@@ -1,8 +1,8 @@
-# Blog
+# Shinefold
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/mark-dark.svg">
-  <img src="docs/brand/mark-light.svg" width="72" alt="Brand mark">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/brand/shinefold-logo-dark.svg">
+  <img src="docs/brand/shinefold-logo-light.svg" width="280" alt="Shinefold">
 </picture>
 
 ```

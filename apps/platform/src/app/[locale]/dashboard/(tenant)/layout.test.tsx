@@ -175,7 +175,9 @@ describe(`<${DashboardTenantLayout.name}/>`, () => {
 
     it('links the nav to /dashboard pages, without a Platform section', () => {
       const lookLink = screen.getByRole('link', { name: navSections.look });
-      const platformSection = screen.queryByText(navSections.platformLabel);
+      const platformSection = screen.queryByRole('navigation', {
+        name: navSections.platformLabel,
+      });
 
       expect(lookLink).toHaveAttribute('href', adminRoutes.dashboardLook());
       expect(platformSection).not.toBeInTheDocument();

@@ -45,6 +45,11 @@ const OwnerHomeViewElement = (props: TOwnerHomeViewProps) => (
   <OwnerHomeView {...props} />
 );
 
+const MOCK_TRIAL_ENDS_AT = new Date('2026-11-26T09:00:00.000Z');
+const MOCK_TRIAL_ENDS_ON = 'Nov 26, 2026';
+const TRIAL_TITLE = 'Growth trial';
+const TRIAL_ENDED_TITLE = 'Growth trial ended';
+
 const GET_STARTED_HEADING = { level: 2, name: 'Get started' } as const;
 
 const setup = customRenderAsync(OwnerHomeViewElement, defaultProps);
@@ -53,6 +58,12 @@ describe(`<${OwnerHomeView.name}/>`, () => {
   describe('for a live tenant', () => {
     beforeEach(async () => {
       await setup();
+    });
+
+    it('shows no trial notice', () => {
+      const title = screen.queryByText(TRIAL_TITLE);
+
+      expect(title).not.toBeInTheDocument();
     });
 
     it("shows the tenant's name and status without a plan pill, and an Open site link", () => {
@@ -156,6 +167,32 @@ describe(`<${OwnerHomeView.name}/>`, () => {
 
     expect(archivedNotice).toBeVisible();
   });
+
+  it.each([
+    ['running', false, TRIAL_TITLE, MOCK_TRIAL_ENDS_ON],
+    ['ended', true, TRIAL_ENDED_TITLE, MOCK_TRIAL_ENDS_ON],
+  ])(
+    'notes a %s trial with its end date',
+    async (_, hasEnded, title, endsOn) => {
+      await setup({
+        trial: {
+          plan: TENANT_PLAN.GROWTH,
+          endsAt: MOCK_TRIAL_ENDS_AT,
+          hasEnded,
+        },
+      });
+
+      const notice = screen.getByRole('note');
+      const noticeTitle = within(notice).getByText(title);
+      const endDate = within(notice).getByText(endsOn);
+
+      expect(noticeTitle).toBeVisible();
+      expect(endDate).toHaveAttribute(
+        'datetime',
+        MOCK_TRIAL_ENDS_AT.toISOString(),
+      );
+    },
+  );
 
   describe('with a pending domain', () => {
     beforeEach(async () => {

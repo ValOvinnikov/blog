@@ -1,10 +1,10 @@
 # platform
 
-> The operator/tenant admin panel: a Next.js app for managing tenants and their site configuration.
+> The platform: the operator and tenant Next.js app for managing tenants and their site configuration.
 
 This app is a **sibling to `apps/web`**, not downstream of it — its own
 Next.js deployment and domain, sharing only the Auth.js session and the Neon
-database. It exists because the admin surface is a form-heavy internal tool
+database. It exists because the platform is a form-heavy internal tool
 (tenant provisioning, Look/Voice site config) with no public traffic and no
 SEO surface, so it has none of `apps/web`'s content-rendering or
 Sanity-fetching concerns.
@@ -45,7 +45,7 @@ supplies authentication only — it has no opinion on either.
 - `src/app/api/` — Route Handlers: the Auth.js catch-all and the dashboard
   tenant-select endpoint.
 - `src/components/` — one folder per component (component file,
-  `*-variants.ts`, co-located test, `index.ts` barrel), covering the admin
+  `*-variants.ts`, co-located test, `index.ts` barrel), covering the platform
   shell, sidebar/topbar, tenant management, and the Look/Voice settings forms.
 - `src/server/` — Server Actions and server-only helpers, grouped by feature:
   `auth/` (the authorization gates), `provisioning/`, `site-config/`,
@@ -81,7 +81,7 @@ workspace's equivalent script through Turborepo, this one included.
 ## Further reading
 
 - [`../../SPEC.md`](../../SPEC.md) — architecture, layer contracts, and the
-  admin panel's place in the monorepo.
+  platform's place in the monorepo.
 - [`../../packages/ui/COMPONENTS.md`](../../packages/ui/COMPONENTS.md) —
   every `@blog/ui` component, its props, and its compound slots.
 - [`../../docs/context/environment-variables.md`](../../docs/context/environment-variables.md) —

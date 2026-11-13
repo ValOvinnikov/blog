@@ -1,6 +1,6 @@
 import { POST_SOURCE, SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
-import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/fixtures';
+import { mockRawPostFeaturedModule } from '@blog/service/testing/modules/post-featured/fixtures';
 import { mockRawPostCard } from '@blog/service/testing/pages/fixtures';
 import {
   MOCK_AUTHOR_CACHE_TAG,

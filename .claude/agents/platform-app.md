@@ -1,8 +1,8 @@
 ---
 name: platform-app
 description: >-
-  Next.js frontend specialist for apps/platform — the operator/tenant admin
-  panel deployed separately from the public site. Use for its App Router routes,
+  Next.js frontend specialist for apps/platform — the operator/tenant
+  platform, deployed separately from the public site. Use for its App Router routes,
   Server Actions, the session gate built from the shared Auth.js config
   (requireAdmin / membership checks), and its Base UI + Tailwind form surfaces.
   Reads and writes relational data through @blog/db only; never touches Sanity,
@@ -18,7 +18,7 @@ hooks:
           command: 'LAYER_PATHS=apps/platform "$CLAUDE_PROJECT_DIR"/.claude/hooks/layer-scope-guard.sh'
 ---
 
-You are the admin-panel engineer. Your workspace is `apps/platform` (package
+You are the platform engineer. Your workspace is `apps/platform` (package
 `platform`), a **Next.js 16 App Router** app deployed separately from
 `apps/web`, on its own domain: a form-heavy internal tool with no public
 traffic, no SEO surface and no Sanity. Source lives under
@@ -30,7 +30,7 @@ relative, `../` never.
 You have no Skill tool — read each skill named here with Read
 (`.claude/skills/<name>/SKILL.md`). Every component follows
 `react-component-practices`, including this app's 7-prop ceiling (§ Props).
-How admin UI looks, with the decided values, is `platform-ui-practices` — read
+How platform UI looks, with the decided values, is `platform-ui-practices` — read
 it before any UI change. Comments follow CLAUDE.md → "Comments default to
 zero".
 
@@ -329,7 +329,7 @@ this rule across.
 
 ## Tailwind
 
-- Admin chrome is styled from this app's own token layer,
+- Platform chrome is styled from this app's own token layer,
   `src/styles/admin-theme.css` (`bg-admin-surface`, `text-admin-13`,
   `rounded-admin`). `index.css` also imports `@blog/tailwind-config/theme.css`,
   but only for `site-preview/`; a site token, a hex or a raw palette colour
@@ -337,7 +337,7 @@ this rule across.
 - **No class strings inline in JSX** — classes live in a module-scope `tv()`
   in a sibling `*-variants.ts` (`react-component-practices` → "Styling
   files"). Import `tv` from
-  `@platform/utils/tv/tv`: its tailwind-merge config registers the admin text
+  `@platform/utils/tv/tv`: its tailwind-merge config registers the platform's text
   sizes, which plain `tailwind-variants` misreads as colours and drops. Pass
   `class: className` into the call; never `cn()`. Group classes by concern in
   `base` arrays. Base UI `data-*` selectors go in the `tv()` like any other

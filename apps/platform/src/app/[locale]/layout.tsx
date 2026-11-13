@@ -8,7 +8,7 @@ import { ToastProvider } from '@platform/context/toast-provider';
 import { UnsavedChangesProvider } from '@platform/context/unsaved-changes-provider';
 import { routing } from '@platform/i18n/routing';
 import { resolveThemeColorScheme } from '@platform/server/layout/resolve-theme-color-scheme';
-import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
+import { rootPageMetadata } from '@platform/server/page-metadata/page-metadata';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
@@ -25,7 +25,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    ...(await pageMetadata('root')),
+    ...(await rootPageMetadata()),
     robots: { index: false, follow: false },
   };
 }
