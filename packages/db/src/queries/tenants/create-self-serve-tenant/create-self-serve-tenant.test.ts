@@ -5,12 +5,12 @@ import {
   LOCALE_ISO_CODES,
   PRESET_ID,
   SITE_TYPE,
+  TENANT_PLAN,
 } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import {
   DAY_MS,
   MEMBERSHIP_ROLE,
-  TENANT_PLAN,
   TENANT_PROVISIONING_STATUS,
   TENANT_STATUS,
   TRIAL_LENGTH_DAYS,

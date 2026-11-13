@@ -4,9 +4,8 @@ import {
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import {
   SIGN_IN_APP_LOG,
   SIGN_IN_APP_REFUSAL,

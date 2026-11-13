@@ -1,5 +1,6 @@
 import { NEXT_NAVIGATION_ERROR } from '@blog/config';
-import { ADMIN_ROLE, MEMBERSHIP_ROLE, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { ADMIN_ROLE, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import messages from '@platform/i18n/messages/en.json';
 import { mockAdmin } from '@platform/testing/admins/fixtures';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';

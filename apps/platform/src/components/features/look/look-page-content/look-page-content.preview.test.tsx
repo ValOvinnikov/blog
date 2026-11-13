@@ -1,5 +1,5 @@
 import { CAPABILITY } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';

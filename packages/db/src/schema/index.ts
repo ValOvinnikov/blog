@@ -20,6 +20,7 @@ export * from './stripe-webhook-events';
 export * from './subscribers';
 export * from './tenant-analytics';
 export * from './tenant-domains';
+export * from './tenant-enums';
 export * from './tenant-oauth-credentials';
 export * from './tenant-suspensions';
 export * from './tenants';

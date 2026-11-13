@@ -1,6 +1,5 @@
-import { OAUTH_PROVIDER } from '@blog/config/constants';
+import { OAUTH_PROVIDER, TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { SIGN_IN_APPS_MODE } from '@platform/constants/sign-in-apps';
 import {

@@ -1,6 +1,6 @@
 import { CAPABILITY, type TCapability } from '@blog/config';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN, type TTenantPlan } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import {
   EFFECTIVE_FETCH_FAILED_EVENT,

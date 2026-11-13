@@ -1,10 +1,6 @@
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import {
-  MEMBERSHIP_ROLE,
-  TENANT_PLAN,
-  type TMembershipRole,
-  type TTenantPlan,
-} from '@blog/db/constants';
+import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import { mockMembership } from '@platform/testing/memberships/fixtures';
 import {
   MOCK_TENANT_ID,

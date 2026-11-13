@@ -4,7 +4,7 @@ import {
   type TActionOutcome,
   type TOutcome,
 } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 
 export type TNotInPlanRefusal = {

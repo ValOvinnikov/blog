@@ -1,8 +1,10 @@
 import {
   CAPABILITY,
   MODULE_PACK,
+  TENANT_PLAN,
   type TCapability,
   type TModulePack,
+  type TTenantPlan,
 } from '@blog/config/constants';
 import type { TValueOf } from '@blog/config/utils';
 
@@ -26,14 +28,6 @@ export const WRITABLE_TENANT_STATUSES = [
 
 export type TSuspensionStatus =
   typeof TENANT_STATUS.ACTIVE | typeof TENANT_STATUS.SUSPENDED;
-
-export const TENANT_PLAN = {
-  FREE: 'FREE',
-  STARTER: 'STARTER',
-  GROWTH: 'GROWTH',
-} as const;
-
-export type TTenantPlan = TValueOf<typeof TENANT_PLAN>;
 
 export const TENANT_DETAILS_UPDATE_OUTCOME = {
   UPDATED: 'UPDATED',

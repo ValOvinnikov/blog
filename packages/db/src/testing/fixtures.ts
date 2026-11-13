@@ -2,13 +2,9 @@ import {
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   LOCALE_ISO_CODES,
-} from '@blog/config/constants';
-import {
-  ADMIN_ROLE,
-  GRANTED_VIA,
   TENANT_PLAN,
-  TENANT_STATUS,
-} from '@blog/db/constants';
+} from '@blog/config/constants';
+import { ADMIN_ROLE, GRANTED_VIA, TENANT_STATUS } from '@blog/db/constants';
 import {
   leadContentColumns,
   type TLeadContent,

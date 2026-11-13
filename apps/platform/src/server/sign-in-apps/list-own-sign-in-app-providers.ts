@@ -1,8 +1,8 @@
 import 'server-only';
 
-import type { TOAuthProvider } from '@blog/config/constants';
+import type { TOAuthProvider, TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { PLAN_ENTITLEMENTS, type TTenantPlan } from '@blog/db/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { OAUTH_PROVIDERS } from '@platform/constants/sign-in-apps';
 
 export const listOwnSignInAppProviders = async (

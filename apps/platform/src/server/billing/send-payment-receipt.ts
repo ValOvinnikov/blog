@@ -1,7 +1,8 @@
 import 'server-only';
 
 import { LOCALE_BCP47_TAGS } from '@blog/config';
-import { queries, type TTenantPlan } from '@blog/db';
+import type { TTenantPlan } from '@blog/config/constants';
+import { queries } from '@blog/db';
 import {
   buildOwnerReceiptEmail,
   EMAIL_ACCOUNT,

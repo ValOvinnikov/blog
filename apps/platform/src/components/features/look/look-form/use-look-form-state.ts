@@ -1,5 +1,4 @@
-import { isAccentHueAccessible } from '@blog/config';
-import type { TTenantPlan } from '@blog/db/constants';
+import { isAccentHueAccessible, type TTenantPlan } from '@blog/config';
 import { toEffectiveLook } from '@blog/db/utils/effective-look/effective-look';
 import { LOOK_ROW, type TLookRow } from '@platform/constants/look-row';
 import { useToast } from '@platform/context/toast-provider';

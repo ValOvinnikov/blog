@@ -3,7 +3,8 @@ import {
   LOCALE_ISO_CODES,
   SANITY_LOGIN_PROVIDER,
 } from '@blog/config';
-import { PLAN_ENTITLEMENTS, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';
 import { ARCHIVED_NOTICE_TEXT } from '@platform/testing/render-in-settings-form';

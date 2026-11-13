@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
-import { PLAN_ENTITLEMENTS, type TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
+import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
 
 export const toPoweredByProductName = (
   plan: TTenantPlan,

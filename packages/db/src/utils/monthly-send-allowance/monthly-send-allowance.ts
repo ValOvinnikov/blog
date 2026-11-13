@@ -1,7 +1,7 @@
+import type { TTenantPlan } from '@blog/config/constants';
 import {
   PLAN_MONTHLY_SENDS_PER_SUBSCRIBER,
   SUBSCRIBER_BAND_CEILINGS,
-  type TTenantPlan,
 } from '@blog/db/constants';
 
 function subscriberBandCeiling(activeSubscriberCount: number): number {

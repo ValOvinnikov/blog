@@ -1,4 +1,5 @@
-import { STRIPE_EVENT_RECORD_OUTCOME, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db/constants';
 import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import { BILLING_LOG, STRIPE_EVENT_TYPE } from '@platform/constants/billing';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';

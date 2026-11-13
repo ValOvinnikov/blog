@@ -1,4 +1,4 @@
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
 
 import { toPoweredByProductName } from './powered-by-product-name';

@@ -5,12 +5,15 @@ import {
   type TLocaleIsoCode,
   type TMaybeNull,
 } from '@blog/config';
-import { OAUTH_PROVIDER, type TOAuthProvider } from '@blog/config/constants';
+import {
+  OAUTH_PROVIDER,
+  type TOAuthProvider,
+  TENANT_PLAN,
+  type TTenantPlan,
+} from '@blog/config/constants';
 import {
   SUSPENSION_CATEGORY,
-  TENANT_PLAN,
   type TSuspensionCategory,
-  type TTenantPlan,
 } from '@blog/db/constants';
 import { hasArrayGotItems, hasLength } from '@blog/utils/primitives';
 import { ACTIVITY_DETAIL } from '@platform/constants/activity';

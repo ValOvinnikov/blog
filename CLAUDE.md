@@ -434,14 +434,15 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   - **A storage layer's own vocabulary lives with that layer** — a const whose
     values that layer persists, read _only_ by that layer and the app on top of
     it; "only one app happens to use it today" is not enough. `@blog/db` owns
-    `TENANT_STATUS`, `TENANT_PLAN`, `MEMBERSHIP_ROLE`, `ADMIN_ROLE`,
-    `GRANTED_VIA` and `TENANT_PROVISIONING_*` on that basis.
+    `TENANT_STATUS`, `MEMBERSHIP_ROLE`, `ADMIN_ROLE`, `GRANTED_VIA` and
+    `TENANT_PROVISIONING_*` on that basis.
 
-  **Reach is the test — not how the column is typed.** Those six are stored as
-  a `pgEnum`, plain `text().$type<>()` and a `jsonb` map alike.
+  **Reach is the test — not how the column is typed.** Those five are stored
+  as a `pgEnum`, plain `text().$type<>()` and a `jsonb` map alike.
   `PRESET_ID` / `FONT_CHOICE` / `RADIUS_SCALE` / `DENSITY` back `pgEnum`
   columns in `site-config.ts` yet stay in `@blog/config`, because both apps
-  read all four and `packages/studio` reads `PRESET_ID`.
+  read all four and `packages/studio` reads `PRESET_ID`; `TENANT_PLAN` backs
+  `tenants.plan` and lives there because `packages/studio` reads it.
   **`AUDIT_ACTION` / `AUDIT_TARGET_TYPE` deliberately stay in `@blog/config`**
   although only `db` and `apps/platform` read them: auditing is cross-cutting,
   its vocabulary grows as surfaces become auditable, and `audit_events` stores

@@ -1,5 +1,5 @@
+import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { TENANT_PLAN } from '@blog/db/constants';
 import { AUTH_ACTION } from '@web/constants/session';
 import { SIGN_IN_LOG } from '@web/constants/sign-in';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';

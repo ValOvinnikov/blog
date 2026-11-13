@@ -1,10 +1,6 @@
 import type { TMaybeUndefined } from '@blog/config';
-import {
-  TENANT_PLAN,
-  TENANT_STATUS,
-  type TTenantPlan,
-  type TTenantStatus,
-} from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
+import { TENANT_STATUS, type TTenantStatus } from '@blog/db/constants';
 import {
   BILLING_GRACE,
   STRIPE_SUBSCRIPTION_STATUS,

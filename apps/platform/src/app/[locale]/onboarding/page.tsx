@@ -1,5 +1,5 @@
 import { isLocaleIsoCode, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { OnboardingView } from '@platform/components/features/onboarding/onboarding-view';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import { getSessionEmail } from '@platform/server/auth/get-session-email';

@@ -1,4 +1,4 @@
-import type { TTenantPlan } from '@blog/db/constants';
+import type { TTenantPlan } from '@blog/config/constants';
 import {
   isLookFieldEntitled,
   toEffectiveLook,

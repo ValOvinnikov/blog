@@ -1,9 +1,5 @@
-import {
-  TENANT_PLAN,
-  TENANT_STATUS,
-  type TTenantPlan,
-  type TTenantStatus,
-} from '@blog/db/constants';
+import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
+import { TENANT_STATUS, type TTenantStatus } from '@blog/db/constants';
 
 export type TPlanChangeFields = {
   plan: TTenantPlan;

@@ -1,8 +1,7 @@
-import { EMAIL_TYPE } from '@blog/config/constants';
+import { EMAIL_TYPE, TENANT_PLAN } from '@blog/config/constants';
 import {
   PLAN_MONTHLY_SENDS_PER_SUBSCRIBER,
   SUBSCRIBER_BAND_CEILINGS,
-  TENANT_PLAN,
 } from '@blog/db/constants';
 import { countEmailSendsThisMonth } from '@blog/db/queries/email-usage';
 import { countActiveSubscribers } from '@blog/db/queries/subscribers';

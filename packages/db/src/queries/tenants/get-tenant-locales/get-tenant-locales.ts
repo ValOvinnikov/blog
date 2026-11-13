@@ -1,6 +1,6 @@
-import type { TLocaleIsoCode } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config';
+import type { TLocaleIsoCode, TTenantPlan } from '@blog/config/constants';
 import { getDb } from '@blog/db/client';
-import type { TTenantPlan } from '@blog/db/constants';
 import { tenants } from '@blog/db/schema/tenants';
 import { eq } from 'drizzle-orm';
 
@@ -12,7 +12,7 @@ export type TTenantLocales = {
 
 export async function getTenantLocales(
   tenantId: string,
-): Promise<TTenantLocales | undefined> {
+): Promise<TMaybeUndefined<TTenantLocales>> {
   const db = getDb();
 
   const [row] = await db

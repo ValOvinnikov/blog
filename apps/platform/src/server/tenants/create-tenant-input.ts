@@ -1,5 +1,5 @@
 import { DOMAIN_LABEL_PATTERN, LOCALE_ISO_CODES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
 import { TENANT_FIELD_ERROR } from '@platform/constants/tenant';
 import { toTenantFieldErrors } from '@platform/server/tenants/tenant-field-error';
 import { z } from 'zod';

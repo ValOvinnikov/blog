@@ -1,10 +1,12 @@
 import {
+  type TMaybeNull,
   ACTION_OUTCOME,
   AUDIT_ACTION,
   AUDIT_TARGET_TYPE,
   NEXT_NAVIGATION_ERROR,
 } from '@blog/config';
-import { PLAN_REGISTRY, TENANT_PLAN } from '@blog/db/constants';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { PLAN_REGISTRY } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import { SETTINGS_REFUSAL } from '@platform/constants/settings';
 import { SETTINGS_FEATURES_LOG } from '@platform/constants/settings-features';
@@ -63,7 +65,7 @@ vi.mock('@blog/db', async () => ({
   },
 }));
 
-const authMock = vi.mocked<() => Promise<Partial<Session> | null>>(auth);
+const authMock = vi.mocked<() => Promise<TMaybeNull<Partial<Session>>>>(auth);
 
 const MOCK_SAVED_AT = faker.date.past({ refDate: '2026-10-01' });
 const MOCK_DB_ERROR_MESSAGE = faker.lorem.words(3);
@@ -131,10 +133,24 @@ describe(updateFeaturesAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
   });
 
-  it('revalidates the site config after a successful save', async () => {
-    await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
+  describe('once saved', () => {
+    beforeEach(async () => {
+      await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
+    });
 
-    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    it('revalidates the site config after a successful save', () => {
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
+    it('records a SETTINGS_UPDATED audit event with the operator as actor', () => {
+      expect(insertAuditEventMock).toHaveBeenCalledWith({
+        actorId: MOCK_OPERATOR_ID,
+        action: AUDIT_ACTION.SETTINGS_UPDATED,
+        targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
+        targetId: MOCK_TENANT_ID,
+        details: VALID_INPUT,
+      });
+    });
   });
 
   it('rejects a non-boolean field before reaching the tenant gate', async () => {
@@ -260,49 +276,51 @@ describe(updateFeaturesAction, () => {
     expect(upsertSettingsFeaturesMock).not.toHaveBeenCalled();
   });
 
-  it('lets a GROWTH tenant switch every plan-gated toggle back off', async () => {
-    arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
-    arrangeStoredValues({ ...ALL_OFF, ...PLAN_GATED_ON });
-
-    await updateFeaturesAction(MOCK_OTHER_TENANT_ID, VALID_INPUT);
-
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      MOCK_OTHER_TENANT_ID,
-      VALID_INPUT,
-    );
-  });
-
-  it('keeps Bookmarks off when a GROWTH tenant switches it on with Reader accounts off', async () => {
-    arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
-
-    const result = await updateFeaturesAction(MOCK_OTHER_TENANT_ID, {
-      ...VALID_INPUT,
-      bookmarksEnabled: true,
+  describe('for a GROWTH tenant', () => {
+    beforeEach(() => {
+      arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
     });
 
-    expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      MOCK_OTHER_TENANT_ID,
-      VALID_INPUT,
-    );
-  });
+    it('lets every plan-gated toggle be switched back off', async () => {
+      arrangeStoredValues({ ...ALL_OFF, ...PLAN_GATED_ON });
 
-  it('keeps stored Bookmarks when a GROWTH tenant switches Reader accounts off', async () => {
-    arrangeTenantPlan(TENANT_PLAN.GROWTH, MOCK_OTHER_TENANT_ID);
-    const stored = {
-      ...VALID_INPUT,
-      readerAccountsEnabled: true,
-      bookmarksEnabled: true,
-    };
-    arrangeStoredValues(stored);
-    const input = { ...stored, readerAccountsEnabled: false };
+      await updateFeaturesAction(MOCK_OTHER_TENANT_ID, VALID_INPUT);
 
-    await updateFeaturesAction(MOCK_OTHER_TENANT_ID, input);
+      expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+        MOCK_OTHER_TENANT_ID,
+        VALID_INPUT,
+      );
+    });
 
-    expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
-      MOCK_OTHER_TENANT_ID,
-      input,
-    );
+    it('keeps Bookmarks off when it is switched on with Reader accounts off', async () => {
+      const result = await updateFeaturesAction(MOCK_OTHER_TENANT_ID, {
+        ...VALID_INPUT,
+        bookmarksEnabled: true,
+      });
+
+      expect(result).toEqual({ outcome: ACTION_OUTCOME.SUCCESS });
+      expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+        MOCK_OTHER_TENANT_ID,
+        VALID_INPUT,
+      );
+    });
+
+    it('keeps stored Bookmarks when Reader accounts is switched off', async () => {
+      const stored = {
+        ...VALID_INPUT,
+        readerAccountsEnabled: true,
+        bookmarksEnabled: true,
+      };
+      arrangeStoredValues(stored);
+      const input = { ...stored, readerAccountsEnabled: false };
+
+      await updateFeaturesAction(MOCK_OTHER_TENANT_ID, input);
+
+      expect(upsertSettingsFeaturesMock).toHaveBeenCalledWith(
+        MOCK_OTHER_TENANT_ID,
+        input,
+      );
+    });
   });
 
   it.each([TENANT_PLAN.FREE, TENANT_PLAN.GROWTH])(
@@ -344,18 +362,6 @@ describe(updateFeaturesAction, () => {
     expect(result).toEqual({ outcome: ACTION_OUTCOME.SERVER_ERROR });
     expect(revalidateSiteConfig).not.toHaveBeenCalled();
     expect(insertAuditEventMock).not.toHaveBeenCalled();
-  });
-
-  it('records a SETTINGS_UPDATED audit event with the operator as actor', async () => {
-    await updateFeaturesAction(MOCK_TENANT_ID, VALID_INPUT);
-
-    expect(insertAuditEventMock).toHaveBeenCalledWith({
-      actorId: MOCK_OPERATOR_ID,
-      action: AUDIT_ACTION.SETTINGS_UPDATED,
-      targetType: AUDIT_TARGET_TYPE.SETTINGS_FEATURES,
-      targetId: MOCK_TENANT_ID,
-      details: VALID_INPUT,
-    });
   });
 
   it('still succeeds when the audit write fails, and logs the failure', async () => {
