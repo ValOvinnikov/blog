@@ -236,7 +236,7 @@ describe(runDowngradeGraceSweep, () => {
       ]);
     });
 
-    it('locks the members over the Free seats and moves the main address to the subdomain', async () => {
+    it('locks members over the Free seats and moves to the subdomain', async () => {
       await expect(sweep()).resolves.toEqual({
         ...MOCK_NOTHING_DONE,
         [DOWNGRADE_GRACE_STEP.GRACE_END]: 1,

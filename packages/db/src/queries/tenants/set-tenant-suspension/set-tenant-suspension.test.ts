@@ -96,7 +96,7 @@ describe(setTenantSuspension, () => {
     },
   );
 
-  it('keeps the earlier status when an operator suspends a tenant already suspended for inactivity', async () => {
+  it('keeps the earlier status when an operator suspends an inactive tenant', async () => {
     const tenant = await insertTestTenant(db(), {
       status: TENANT_STATUS.SUSPENDED,
       statusBeforeHold: TENANT_STATUS.TRIAL,

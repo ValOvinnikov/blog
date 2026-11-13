@@ -71,7 +71,7 @@ describe('GET /api/inactivity-sweep', () => {
     vi.useRealTimers();
   });
 
-  it('runs both sweeps and the retention cleanups for now and answers with every result', async () => {
+  it('runs both sweeps and the cleanups and answers with every result', async () => {
     const response = await GET(cronRequest());
 
     expect(response.status).toBe(HTTP_STATUS.OK);
@@ -138,7 +138,7 @@ describe('GET /api/inactivity-sweep', () => {
     });
   });
 
-  it('logs and answers a server error when the grace sweep cannot run, after running the inactivity sweep', async () => {
+  it('logs a grace sweep that cannot run and answers a server error', async () => {
     vi.mocked(runDowngradeGraceSweep).mockRejectedValue(
       new Error(MOCK_DB_DOWN),
     );
