@@ -5,8 +5,8 @@ import {
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
 import { WEB_SCHEDULED_POST_PURGE_PATH } from '@worker/constants/scheduled-post-purge';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
-import { MOCK_SCHEDULED_POST_ID } from '@worker/testing/scheduled-post-purge/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { FatalError } from 'workflow';
@@ -21,7 +21,7 @@ const { webAppBaseUrl, revalidateSecret } = MOCK_PROVISION_ENV;
 const fetchMock = vi.fn();
 
 function runPurge() {
-  return purgeScheduledPostPages(MOCK_TENANT_ID, MOCK_SCHEDULED_POST_ID);
+  return purgeScheduledPostPages(MOCK_TENANT_ID, MOCK_POST_ID);
 }
 
 describe(purgeScheduledPostPages, () => {
@@ -48,7 +48,7 @@ describe(purgeScheduledPostPages, () => {
     expect(init.method).toBe(HTTP_METHOD.POST);
     expect(JSON.parse(rawBody)).toEqual({
       tenantId: MOCK_TENANT_ID,
-      postId: MOCK_SCHEDULED_POST_ID,
+      postId: MOCK_POST_ID,
     });
     expect(
       isValidEnqueueSignature({
@@ -61,14 +61,23 @@ describe(purgeScheduledPostPages, () => {
     ).toBe(true);
   });
 
-  it('throws so the step retries when web refuses the purge', async () => {
+  it('throws a retryable error when web fails', async () => {
     fetchMock.mockResolvedValue(
       new Response('', { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
     );
 
-    await expect(runPurge()).rejects.toThrow(
-      String(HTTP_STATUS.INTERNAL_SERVER_ERROR),
+    const error = await runPurge().catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error).not.toBeInstanceOf(FatalError);
+  });
+
+  it('fails for good when web refuses the purge', async () => {
+    fetchMock.mockResolvedValue(
+      new Response('', { status: HTTP_STATUS.UNAUTHORIZED }),
     );
+
+    await expect(runPurge()).rejects.toThrow(FatalError);
   });
 
   it.each(['WEB_APP_URL', 'SANITY_REVALIDATE_SECRET'])(

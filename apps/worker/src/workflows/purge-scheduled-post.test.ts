@@ -1,9 +1,7 @@
-import { DAY_MS } from '@blog/db/constants';
 import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
-import {
-  MOCK_PUBLISHED_AT,
-  MOCK_SCHEDULED_POST_ID,
-} from '@worker/testing/scheduled-post-purge/fixtures';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
+import { MOCK_PUBLISHED_AT } from '@worker/testing/scheduled-post-purge/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { fakeRunHook } from '@worker/testing/workflow/run-hook';
 import { checkScheduledPost } from '@worker/units/scheduled-post-purge/check-scheduled-post';
@@ -18,15 +16,11 @@ vi.mock('workflow');
 
 const MOCK_SCHEDULED = {
   state: SCHEDULED_POST_STATE.SCHEDULED,
-  waitMs: DAY_MS,
+  waitMs: SCHEDULED_POST_RECHECK_MS,
 } as const;
 
 function runPurge() {
-  return purgeScheduledPost(
-    MOCK_TENANT_ID,
-    MOCK_SCHEDULED_POST_ID,
-    MOCK_PUBLISHED_AT,
-  );
+  return purgeScheduledPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_PUBLISHED_AT);
 }
 
 describe(purgeScheduledPost, () => {
@@ -46,11 +40,11 @@ describe(purgeScheduledPost, () => {
     await runPurge();
 
     expect(sleep).toHaveBeenCalledTimes(2);
-    expect(sleep).toHaveBeenCalledWith(DAY_MS);
+    expect(sleep).toHaveBeenCalledWith(SCHEDULED_POST_RECHECK_MS);
     expect(purgeScheduledPostPages).toHaveBeenCalledOnce();
     expect(purgeScheduledPostPages).toHaveBeenCalledWith(
       MOCK_TENANT_ID,
-      MOCK_SCHEDULED_POST_ID,
+      MOCK_POST_ID,
     );
     expect(hook.dispose).toHaveBeenCalled();
   });

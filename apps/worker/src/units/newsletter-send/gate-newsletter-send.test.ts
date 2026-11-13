@@ -12,10 +12,10 @@ import {
   NEWSLETTER_SEND_PACE,
 } from '@worker/constants/newsletter-send';
 import {
-  MOCK_POST_ID,
   MOCK_UNSUBSCRIBE_KEY,
   mockNewsletterLimits,
 } from '@worker/testing/newsletter-send/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
 import { logger } from '@worker/utils/logger/logger';

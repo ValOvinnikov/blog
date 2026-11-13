@@ -1,4 +1,4 @@
-import { HTTP_METHOD } from '@blog/config/constants';
+import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { buildEnqueueHeaders } from '@blog/utils/enqueue-signature';
 import {
   SCHEDULED_POST_PURGE_TIMEOUT_MS,
@@ -29,9 +29,10 @@ export async function purgeScheduledPostPages(
     body: rawBody,
     signal: AbortSignal.timeout(SCHEDULED_POST_PURGE_TIMEOUT_MS),
   });
-  if (!response.ok) {
-    throw new Error(
-      `Scheduled post purge failed for tenant "${tenantId}": ${response.status}`,
-    );
-  }
+  if (response.ok) return;
+
+  const message = `Scheduled post purge failed for tenant "${tenantId}": ${response.status}`;
+  throw response.status < HTTP_STATUS.INTERNAL_SERVER_ERROR
+    ? new FatalError(message)
+    : new Error(message);
 }

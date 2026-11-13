@@ -1,15 +1,16 @@
-import { DAY_MS } from '@blog/db/constants';
-import {
-  getTenantSanityCredentials,
-  type TTenantSanityCredentials,
-} from '@blog/db/queries/tenants';
+import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
 import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
+import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import {
   MOCK_LATER_PUBLISHED_AT,
   MOCK_PUBLISHED_AT,
-  MOCK_SCHEDULED_POST_ID,
 } from '@worker/testing/scheduled-post-purge/fixtures';
-import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import {
+  MOCK_SANITY_CREDENTIALS,
+  MOCK_TENANT_ID,
+} from '@worker/testing/tenant/fixtures';
 import { readPostPublishedAt } from '@worker/utils/scheduled-post-purge/read-post-published-at';
 
 import { checkScheduledPost } from './check-scheduled-post';
@@ -17,17 +18,11 @@ import { checkScheduledPost } from './check-scheduled-post';
 vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/scheduled-post-purge/read-post-published-at');
 
-const MOCK_CREDENTIALS = {} as TTenantSanityCredentials;
-const MOCK_ONE_HOUR_MS = 60 * 60_000;
 const MOCK_PUBLISH_MS = Date.parse(MOCK_PUBLISHED_AT);
 const STALE = { state: SCHEDULED_POST_STATE.STALE };
 
 function runCheck() {
-  return checkScheduledPost(
-    MOCK_TENANT_ID,
-    MOCK_SCHEDULED_POST_ID,
-    MOCK_PUBLISHED_AT,
-  );
+  return checkScheduledPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_PUBLISHED_AT);
 }
 
 function atTime(ms: number) {
@@ -37,7 +32,9 @@ function atTime(ms: number) {
 describe(checkScheduledPost, () => {
   beforeEach(() => {
     atTime(MOCK_PUBLISH_MS - MOCK_ONE_HOUR_MS);
-    vi.mocked(getTenantSanityCredentials).mockResolvedValue(MOCK_CREDENTIALS);
+    vi.mocked(getTenantSanityCredentials).mockResolvedValue(
+      MOCK_SANITY_CREDENTIALS,
+    );
     vi.mocked(readPostPublishedAt).mockResolvedValue(MOCK_PUBLISHED_AT);
   });
 
@@ -51,17 +48,17 @@ describe(checkScheduledPost, () => {
       waitMs: MOCK_ONE_HOUR_MS,
     });
     expect(readPostPublishedAt).toHaveBeenCalledWith(
-      MOCK_CREDENTIALS,
-      MOCK_SCHEDULED_POST_ID,
+      MOCK_SANITY_CREDENTIALS,
+      MOCK_POST_ID,
     );
   });
 
   it('wakes at least daily to re-read a post dated further out', async () => {
-    atTime(MOCK_PUBLISH_MS - 3 * DAY_MS);
+    atTime(MOCK_PUBLISH_MS - 3 * SCHEDULED_POST_RECHECK_MS);
 
     await expect(runCheck()).resolves.toEqual({
       state: SCHEDULED_POST_STATE.SCHEDULED,
-      waitMs: DAY_MS,
+      waitMs: SCHEDULED_POST_RECHECK_MS,
     });
   });
 
@@ -73,14 +70,11 @@ describe(checkScheduledPost, () => {
     });
   });
 
-  it('is stale when the post was rescheduled', async () => {
-    vi.mocked(readPostPublishedAt).mockResolvedValue(MOCK_LATER_PUBLISHED_AT);
-
-    await expect(runCheck()).resolves.toEqual(STALE);
-  });
-
-  it('is stale when the post was unpublished or deleted', async () => {
-    vi.mocked(readPostPublishedAt).mockResolvedValue(undefined);
+  it.each([
+    ['rescheduled', MOCK_LATER_PUBLISHED_AT],
+    ['unpublished or deleted', undefined],
+  ])('is stale when the post was %s', async (_label, currentPublishedAt) => {
+    vi.mocked(readPostPublishedAt).mockResolvedValue(currentPublishedAt);
 
     await expect(runCheck()).resolves.toEqual(STALE);
   });

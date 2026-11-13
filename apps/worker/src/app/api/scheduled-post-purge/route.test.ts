@@ -10,11 +10,9 @@ import {
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_RUN_ID } from '@worker/testing/run/fixtures';
-import {
-  MOCK_PUBLISHED_AT,
-  MOCK_SCHEDULED_POST_ID,
-} from '@worker/testing/scheduled-post-purge/fixtures';
+import { MOCK_PUBLISHED_AT } from '@worker/testing/scheduled-post-purge/fixtures';
 import {
   MOCK_ENCRYPTED_TOKEN,
   MOCK_TENANT_ID,
@@ -30,7 +28,7 @@ import { POST } from './route';
 const MOCK_PURGE_URL = `${MOCK_WORKER_ORIGIN}/api/scheduled-post-purge`;
 const MOCK_BODY = {
   tenantId: MOCK_TENANT_ID,
-  postId: MOCK_SCHEDULED_POST_ID,
+  postId: MOCK_POST_ID,
   publishedAt: MOCK_PUBLISHED_AT,
 };
 
@@ -63,7 +61,19 @@ describe('POST /api/scheduled-post-purge', () => {
     await expect(response.json()).resolves.toEqual({ runId: MOCK_RUN_ID });
     expect(start).toHaveBeenCalledWith(purgeScheduledPost, [
       MOCK_TENANT_ID,
-      MOCK_SCHEDULED_POST_ID,
+      MOCK_POST_ID,
+      MOCK_PUBLISHED_AT,
+    ]);
+  });
+
+  it('starts one run per instant, however the publish time is spelled', async () => {
+    const offsetSpelling = MOCK_PUBLISHED_AT.replace('Z', '+00:00');
+
+    await POST(purgeRequest({ ...MOCK_BODY, publishedAt: offsetSpelling }));
+
+    expect(start).toHaveBeenCalledWith(purgeScheduledPost, [
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
       MOCK_PUBLISHED_AT,
     ]);
   });
@@ -92,8 +102,9 @@ describe('POST /api/scheduled-post-purge', () => {
 
   it.each([
     { tenantId: MOCK_TENANT_ID, publishedAt: MOCK_PUBLISHED_AT },
-    { tenantId: MOCK_TENANT_ID, postId: MOCK_SCHEDULED_POST_ID },
+    { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID },
     { ...MOCK_BODY, publishedAt: 'tomorrow' },
+    { ...MOCK_BODY, publishedAt: new Date(0).toISOString() },
   ])('refuses a malformed body %j', async (body) => {
     const response = await POST(purgeRequest(body));
 
@@ -131,7 +142,7 @@ describe('POST /api/scheduled-post-purge', () => {
       SCHEDULED_POST_PURGE_LOG.START_FAILED,
       {
         tenantId: MOCK_TENANT_ID,
-        postId: MOCK_SCHEDULED_POST_ID,
+        postId: MOCK_POST_ID,
         error: MOCK_QUEUE_DOWN,
       },
     );

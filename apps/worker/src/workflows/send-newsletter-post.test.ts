@@ -1,18 +1,18 @@
 import {
   NEWSLETTER_POST_STATE,
-  NEWSLETTER_SCHEDULE_RECHECK_MS,
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SLOW_PAUSE_MS,
 } from '@worker/constants/newsletter-send';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import {
   MOCK_CLAIMED_AT,
   MOCK_NEWSLETTER_POST,
-  MOCK_POST_ID,
   MOCK_SUBSCRIBER_IDS,
   mockNewsletterPage,
 } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { fakeRunHook } from '@worker/testing/workflow/run-hook';
 import { checkNewsletterPost } from '@worker/units/newsletter-send/check-newsletter-post';
@@ -138,13 +138,13 @@ describe(sendNewsletterPost, () => {
     vi.mocked(checkNewsletterPost)
       .mockResolvedValueOnce({
         state: NEWSLETTER_POST_STATE.SCHEDULED,
-        waitMs: NEWSLETTER_SCHEDULE_RECHECK_MS,
+        waitMs: SCHEDULED_POST_RECHECK_MS,
       })
       .mockResolvedValueOnce(MOCK_READY);
 
     await runSend();
 
-    expect(sleep).toHaveBeenCalledWith(NEWSLETTER_SCHEDULE_RECHECK_MS);
+    expect(sleep).toHaveBeenCalledWith(SCHEDULED_POST_RECHECK_MS);
     expect(checkNewsletterPost).toHaveBeenNthCalledWith(
       2,
       MOCK_TENANT_ID,

@@ -1,6 +1,6 @@
-import { DAY_MS } from '@blog/db/constants';
 import { getTenantSanityCredentials } from '@blog/db/queries/tenants';
 import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { readPostPublishedAt } from '@worker/utils/scheduled-post-purge/read-post-published-at';
 
 export type TScheduledPostCheck =
@@ -30,7 +30,7 @@ export async function checkScheduledPost(
   return waitMs > 0
     ? {
         state: SCHEDULED_POST_STATE.SCHEDULED,
-        waitMs: Math.min(waitMs, DAY_MS),
+        waitMs: Math.min(waitMs, SCHEDULED_POST_RECHECK_MS),
       }
     : { state: SCHEDULED_POST_STATE.DUE };
 }

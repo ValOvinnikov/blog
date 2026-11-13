@@ -17,7 +17,10 @@ import { z } from 'zod';
 
 const scheduledPostPurgeBodySchema = tenantRequestBodySchema.extend({
   postId: z.string().min(1),
-  publishedAt: z.iso.datetime(),
+  publishedAt: z.iso
+    .datetime({ offset: true })
+    .transform((value) => new Date(value))
+    .refine((date) => date.getTime() > Date.now()),
 });
 
 export async function POST(request: Request): Promise<Response> {
@@ -36,7 +39,7 @@ export async function POST(request: Request): Promise<Response> {
     const run = await start(purgeScheduledPost, [
       tenantId,
       postId,
-      publishedAt,
+      publishedAt.toISOString(),
     ]);
     return respond(HTTP_STATUS.ACCEPTED, { runId: run.runId });
   } catch (error) {
