@@ -54,7 +54,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 ## Configuration
 
 - No editor or operator settings. Editors trigger purges by publishing; owners trigger them by saving Look, Voice or Features (see [look](./look.md), [voice](./voice.md), [plans-and-entitlements](./plans-and-entitlements.md)).
-- Provisioning creates each tenant project's Sanity webhook (`createSanityWebhook` in `@blog/db`). Its projection sends `_type`, `_id`, `slug` and `previousSlug` — the slug before the change, from `before()`, `null` on a create — so a renamed page's old address is known. `listSanityWebhooks` exposes each hook's projection and `updateSanityWebhookProjection` replaces it, changing nothing else on the hook.
+- Provisioning creates each tenant project's Sanity webhook (`createSanityWebhook` in `@blog/db`). Its projection sends `_type`, `_id`, `slug` and `previousSlug` — the slug before the change, from `before()`, `null` on a create — so a renamed page's old address is known. `listSanityWebhooks` exposes each hook's projection and `updateSanityWebhookProjection` replaces it by sending the whole rule (`on` and `projection`), so a `filter` set on the hook is dropped — provisioned hooks set none — and the hook's secret is untouched.
 
 ## Constraints and invariants
 

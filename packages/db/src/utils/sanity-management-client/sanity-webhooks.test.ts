@@ -36,7 +36,7 @@ const MOCK_ROTATED_SECRET = faker.string.alphanumeric(12);
 const MOCK_OTHER_URL = faker.internet.url({ appendSlash: false });
 const MOCK_HOOK = { id: MOCK_SANITY_WEBHOOK_ID, url: MOCK_SANITY_WEBHOOK_URL };
 const MOCK_STALE_PROJECTION = '{_type, _id}';
-const EXPECTED_RULE = {
+const MOCK_EXPECTED_WEBHOOK_RULE = {
   on: [
     SANITY_WEBHOOK_OPERATION.CREATE,
     SANITY_WEBHOOK_OPERATION.UPDATE,
@@ -116,7 +116,7 @@ describe(createSanityWebhook, () => {
       apiVersion: 'v2021-06-07',
       httpMethod: HTTP_METHOD.POST,
       includeDrafts: false,
-      rule: EXPECTED_RULE,
+      rule: MOCK_EXPECTED_WEBHOOK_RULE,
       secret: MOCK_CREATE_INPUT.secret,
     });
   });
@@ -188,7 +188,7 @@ describe(updateSanityWebhookProjection, () => {
     const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.webhook);
     expect(method).toBe(HTTP_METHOD.PATCH);
-    expect(body).toEqual({ rule: EXPECTED_RULE });
+    expect(body).toEqual({ rule: MOCK_EXPECTED_WEBHOOK_RULE });
   });
 
   it('throws naming the hook when the response is not the updated hook', async () => {
