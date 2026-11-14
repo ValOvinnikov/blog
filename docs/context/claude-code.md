@@ -70,7 +70,7 @@ contracts:
   - `email` owns `packages/email` (`@blog/email`) — the single home for every
     email the product sends: the shared branded HTML shell, the canonical
     `escapeHtml`, and the typed `sendEmail` Resend transport. It sits low in
-    the graph (`@blog/utils` only) so both apps and `@blog/auth` can all
+    the graph (`@blog/config` and `@blog/utils` only) so both apps and `@blog/auth` can all
     consume it without a cycle, and it is side-effecting by
     design — it owns the send call — while never logging and never resolving
     tenants or fetching content itself. Its own agent exists because HTML email
@@ -99,8 +99,8 @@ contracts:
     the generated const index, the way `ui` and `web` point at
     `packages/ui/COMPONENTS.md`, and at `CLAUDE.md`'s **Reuse a const; never
     retype its value**: check the index before writing a literal, and turn a
-    value written a second time into a const, tests included. `email` and
-    `insight` sit below `@blog/config`, so for them only the second half
+    value written a second time into a const, tests included. `insight` sits
+    below `@blog/config`, so for it only the second half
     applies. `explore` lists the index among its first stops;
     `testing-practices` and `code-review-practices` carry the test and review
     sides. Lint enforces it on touched files (the `BLOG_LINT_TOUCHED` rules

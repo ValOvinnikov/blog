@@ -34,7 +34,7 @@ export default [
           paths: [noVitestGlobalsImportPath],
           patterns: [
             {
-              regex: '^react(-dom)?(/.*)?$',
+              regex: '^(?!@blog/config/react(/|$))(.*/)?react(-dom)?(/.*)?$',
               message: noReactImportMessage,
             },
             {
