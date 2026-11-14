@@ -27,8 +27,7 @@ function toFeatureListItem(raw: TRawFeatureListItem): TFeatureListItem {
   };
 }
 
-// Mirrors the schema's own `min(2)` cards rule — fewer than 2 cards degrades
-// to an empty list rather than failing the whole module.
+// Mirrors the schema's `min(2)`: fewer cards degrade to an empty list.
 function toFeatureListItems(
   raw: TRawFeatureListModule['features'],
 ): TFeatureListItem[] {

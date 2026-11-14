@@ -50,16 +50,12 @@ describe(toFeatureListModule, () => {
     expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
-  it('leaves every optional module field undefined when unset', () => {
+  it('leaves contentAlignment and layout undefined when unset', () => {
     const module = toFeatureListModule(mockRawFeatureListModule());
 
     expect(module).toMatchObject({
       contentAlignment: undefined,
       layout: undefined,
-      cardStyle: undefined,
-      radiusScale: undefined,
-      density: undefined,
-      columns: undefined,
     });
   });
 

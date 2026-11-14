@@ -3,7 +3,6 @@ import type {
   ISanityImage,
   TBrandVariant,
   TCardImageShape,
-  TContentAlignment,
   TContentAlignmentOf,
   TDisplayMode,
   TFeatureIconName,
@@ -30,6 +29,6 @@ export type TFeatureListModule = TModuleAppearance & {
   imageShape: TCardImageShape;
   displayMode: TDisplayMode;
   contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
-  cardAlignment: Extract<TContentAlignment, 'LEFT' | 'CENTER'>;
+  cardAlignment: TContentAlignmentOf<'LEFT' | 'CENTER'>;
   layout: TMaybeUndefined<TWideLayout>;
 };
