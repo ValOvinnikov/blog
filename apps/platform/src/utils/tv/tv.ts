@@ -1,7 +1,7 @@
 import { createTV } from 'tailwind-variants';
 
 import { platformTokens } from './platform-tokens';
-import { SHADOW_TOKENS } from './shadow-tokens';
+import { INSET_SHADOW_TOKENS, SHADOW_TOKENS } from './shadow-tokens';
 
 // Keep these lists and `SHADOW_TOKENS` in sync with the custom tokens in `theme.css` and `platform-theme.css`, or `tailwind-merge` misclassifies or drops them.
 const FONT_SIZE_TOKENS = [
@@ -106,6 +106,7 @@ export const tv = createTV({
         'rounded-b': [{ 'rounded-b': RADIUS_TOKENS }],
         'rounded-br': [{ 'rounded-br': RADIUS_TOKENS }],
         shadow: [{ shadow: SHADOW_TOKENS }],
+        'inset-shadow': [{ 'inset-shadow': INSET_SHADOW_TOKENS }],
         p: [{ p: SPACING_TOKENS }],
         px: [{ px: SPACING_TOKENS }],
         py: [{ py: SPACING_TOKENS }],

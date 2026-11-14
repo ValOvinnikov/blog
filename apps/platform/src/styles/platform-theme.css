@@ -27,6 +27,8 @@
   --platform-selected: #12141a;
   --platform-selected-hover: #2a303b;
   --platform-on-selected: #ffffff;
+  --platform-focus-ring: #ffc233;
+  --platform-focus-edge: #12141a;
   --platform-ok: #16794d;
   --platform-ok-weak: #e7f6ee;
   --platform-warn: #9a3d0b;
@@ -150,6 +152,7 @@
   --platform-selected: #33290d;
   --platform-selected-hover: #40330f;
   --platform-on-selected: #ffdc7a;
+  --platform-focus-edge: transparent;
   --platform-ok: #6ee7a7;
   --platform-ok-weak: #10291d;
   --platform-warn: #ffa066;
@@ -234,6 +237,7 @@
     --platform-selected: #33290d;
     --platform-selected-hover: #40330f;
     --platform-on-selected: #ffdc7a;
+    --platform-focus-edge: transparent;
     --platform-ok: #6ee7a7;
     --platform-ok-weak: #10291d;
     --platform-warn: #ffa066;
@@ -454,7 +458,15 @@
   --shadow-platform-glyph: var(--platform-shadow-glyph);
   --shadow-platform-thumb: var(--platform-shadow-thumb);
   --shadow-platform-choice-ring: 0 0 0 3px var(--platform-brand-weak);
-  --shadow-platform-focus-glow: 0 0 0 3px var(--platform-brand-line);
+  --shadow-platform-focus-glow: 0 0 0 3px var(--platform-focus-ring);
+  /* `--platform-focus-ground` is set per element by `focusRingClasses` and `insetFocusRingClasses`. */
+  --shadow-platform-focus-ring:
+    0 0 0 2px var(--platform-focus-ground),
+    0 0 0 4px var(--platform-focus-ring), 0 0 0 5px var(--platform-focus-edge);
+  --inset-shadow-platform-focus-ring:
+    inset 0 0 0 2px var(--platform-focus-ground),
+    inset 0 0 0 4px var(--platform-focus-ring),
+    inset 0 0 0 5px var(--platform-focus-edge);
 }
 
 @theme {
