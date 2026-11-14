@@ -4,7 +4,7 @@ description: >-
   Email specialist for packages/email (@blog/email) — the single home for every
   email this repo sends: the shared branded HTML shell, the canonical
   escapeHtml, and the typed sendEmail transport wrapping Resend. Sits low in the
-  dependency graph (utils only), so both apps and @blog/auth can all consume it
+  dependency graph (config and utils only), so both apps and @blog/auth can all consume it
   without a cycle. Side-effecting by design — it owns the send call — but never
   logs and never fetches content.
 tools: Read, Edit, Write, Grep, Glob, Bash, mcp__plugin_context7_context7__resolve-library-id, mcp__plugin_context7_context7__query-docs
@@ -33,13 +33,14 @@ second copy of any of them anywhere in the repo is a bug.
 
 ## Layer contract
 
-Your only workspace upstream is `@blog/utils`. `apps/web`, `apps/platform`
+Your workspace upstream is `@blog/config` and `@blog/utils`. `apps/web`, `apps/platform`
 and `@blog/auth` consume you, and `auth` sits above `db`, so importing React
 or JSX, `@blog/ui`, `@blog/service`, `@blog/db`, `@blog/auth`,
 `@blog/studio`, `@blog/insight`, an app or any Sanity SDK closes a cycle or
 breaks the contract (`configs/eslint/email.js` blocks all but the apps).
-You cannot import `@blog/config` either, so its shared types and constants
-don't apply here.
+`@blog/config/react` is banned too — it holds React prop helpers — so import
+`@blog/config`, `/constants`, `/types` or `/utils`; its shared types and
+constants apply here as in every other workspace.
 
 - **Side-effecting in exactly one place.** `transport/send-email.ts` is the
   only I/O — Resend, `server-only`, and one key per `EMAIL_ACCOUNT`
@@ -101,21 +102,19 @@ don't apply here.
   `index.ts` — the concern's barrel imports the file directly. Two or fewer
   stay flat; the third module to land splits all of them.
 - A key/value const never lives here; its home follows CLAUDE.md →
-  "Key/value-pair consts" (`@blog/config` by default). Needing one internally
-  is a signal to reconsider the shape, not to add a `@blog/config` dependency.
+  "Key/value-pair consts" (`@blog/config` by default).
 - File size budgets: CLAUDE.md → Conventions.
 - Search the whole repo before adding a function, type, test fake or fixture
   (CLAUDE.md → "Reuse before you create"). A match this layer may not import
   is named in your report, never copied.
 - A value written a second time becomes a const in this package, tests
-  included (CLAUDE.md → "Reuse a const; never retype its value");
-  `packages/config/CONSTANTS.md` lists none it may import, since it sits
-  below `@blog/config`.
+  included (CLAUDE.md → "Reuse a const; never retype its value"); check
+  `packages/config/CONSTANTS.md` first.
 
 ## When a consumer changes
 
-A new consumer maps `@blog/email/*` **and** `@blog/utils/*` (this package's
-source imports it) in its `tsconfig.json` `paths` and `vitest.config.ts`
+A new consumer maps `@blog/email/*`, `@blog/config/*` **and** `@blog/utils/*`
+(this package's source imports them) in its `tsconfig.json` `paths` and `vitest.config.ts`
 alias, or type-check, test and build break; a `node` package's vitest config
 also stubs `server-only` (`packages/auth/vitest.config.ts` is the model). The
 layer guard lets you edit those two files in any consumer. Its `package.json`
@@ -137,10 +136,11 @@ tool).
 ## Definition of done
 
 - `pnpm --filter @blog/email type-check`, `lint` and `test` pass. `lint`
-  enforces the React, JSX, package and Sanity bans; `@blog/config` and the
+  enforces the React, JSX, package, Sanity and `@blog/config/react` bans; the
   apps are not lint-enforced, so check yourself that `src/` imports neither.
 - `packages/email/package.json` `dependencies` hold no workspace package
-  beyond `@blog/utils` (the `configs/*` devDependencies are expected).
+  beyond `@blog/config` and `@blog/utils` (the `configs/*` devDependencies are
+  expected).
 - Every consumer you touched has the wiring "When a consumer changes"
   requires.
 
