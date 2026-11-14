@@ -1,6 +1,7 @@
 import { MEMBERSHIP_ROLE, type TMembershipRole } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import type { TMembership } from '@blog/db/schema/memberships';
+import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
 import { insertTestUser, type TTestDb } from '@blog/db/testing/fixtures';
 import { createMockFaker } from '@blog/db/testing/mock-faker';
 
@@ -17,14 +18,13 @@ export async function mockMembership(
   > &
     Partial<typeof schema.memberships.$inferInsert>,
 ): Promise<TMembership> {
-  const [membership] = await db
-    .insert(schema.memberships)
-    .values({ role: MEMBERSHIP_ROLE.OWNER, ...overrides })
-    .returning();
-
-  if (!membership) throw new Error('mockMembership: insert returned no row.');
-
-  return membership;
+  return firstRowOrThrow(
+    await db
+      .insert(schema.memberships)
+      .values({ role: MEMBERSHIP_ROLE.OWNER, ...overrides })
+      .returning(),
+    'mockMembership',
+  );
 }
 
 export async function insertTeam(
