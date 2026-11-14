@@ -9,6 +9,7 @@ import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/headi
 import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 import { getLocalizedField } from '@blog/service/shared/localization/get-localized-field/get-localized-field';
 import { getLocalizedPortableTextBlock } from '@blog/service/shared/localization/get-localized-portable-text-block/get-localized-portable-text-block';
@@ -55,5 +56,6 @@ export const testimonialModuleQuery = q
     cardAlignment: sub.raw(CARD_ALIGNMENT_EXPRESSION, cardAlignmentParser),
     ...moduleContentAlignmentFragment,
     ...moduleWideLayoutFragment,
+    ...moduleAppearanceFragment,
   }))
   .notNull();

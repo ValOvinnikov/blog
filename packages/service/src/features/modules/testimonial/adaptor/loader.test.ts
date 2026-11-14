@@ -4,7 +4,7 @@ import {
   MOCK_TESTIMONIAL_MODULE_ID,
   mockRawTestimonialItem,
   mockRawTestimonialModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/testimonial/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
@@ -19,6 +19,7 @@ import { faker } from '@faker-js/faker';
 
 import { getTestimonialModule } from './loader';
 import { testimonialModuleQuery } from './query';
+import type { TTestimonialModule } from './types';
 
 vi.mock('@blog/service/sanity/query/query');
 
@@ -41,26 +42,27 @@ describe(getTestimonialModule, () => {
     );
   });
 
-  it('resolves the module in a single round trip', async () => {
-    const testimonial = await getTestimonialModule(
-      MOCK_TESTIMONIAL_MODULE_ID,
-      MOCK_TENANT,
-    );
+  describe('for a module with two quotes', () => {
+    let testimonial: TTestimonialModule;
 
-    expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(testimonial.headingBlock.heading).toBe(MOCK_HEADING);
-  });
+    beforeEach(async () => {
+      testimonial = await getTestimonialModule(
+        MOCK_TESTIMONIAL_MODULE_ID,
+        MOCK_TENANT,
+      );
+    });
 
-  it('returns the referenced quotes in authored order', async () => {
-    const testimonial = await getTestimonialModule(
-      MOCK_TESTIMONIAL_MODULE_ID,
-      MOCK_TENANT,
-    );
+    it('resolves the module in a single round trip', () => {
+      expect(mockRun).toHaveBeenCalledTimes(1);
+      expect(testimonial.headingBlock.heading).toBe(MOCK_HEADING);
+    });
 
-    expect(testimonial.testimonials.map((item) => item.id)).toEqual([
-      MOCK_FIRST_QUOTE_ID,
-      MOCK_SECOND_QUOTE_ID,
-    ]);
+    it('returns the referenced quotes in authored order', () => {
+      expect(testimonial.testimonials.map((item) => item.id)).toEqual([
+        MOCK_FIRST_QUOTE_ID,
+        MOCK_SECOND_QUOTE_ID,
+      ]);
+    });
   });
 
   it('propagates when the module document is missing', async () => {
