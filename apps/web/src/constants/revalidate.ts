@@ -36,6 +36,8 @@ export const DOCUMENT_NOT_FOUND_REASON = 'document_not_found';
 
 export const FETCH_FAILED_REASON = 'fetch_failed';
 
+export const PATH_UNDERIVABLE_REASON = 'path_underivable';
+
 export const TENANT_UNRESOLVED_REASON = 'tenant_unresolved';
 
 export const REVALIDATE_SIGNATURE_MAX_AGE_MS = 5 * 60 * 1000;

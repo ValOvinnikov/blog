@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import type { TMaybeNull, TMaybeUndefined } from '@blog/config';
 import type { TTenantSanityContext } from '@blog/service';
 import { errorResult, type TResult } from '@blog/utils';
 import {
@@ -11,6 +11,7 @@ export type TResolveDerivedRevalidatePathsInput = {
   type: string;
   id: string;
   slug: TMaybeUndefined<string>;
+  operation: TMaybeNull<string>;
   tenantId: TMaybeUndefined<string>;
   tenant: TMaybeUndefined<TTenantSanityContext>;
 };
@@ -19,6 +20,7 @@ export const resolveDerivedRevalidatePaths = async ({
   type,
   id,
   slug,
+  operation,
   tenantId,
   tenant,
 }: TResolveDerivedRevalidatePathsInput): Promise<TResult<string[], string>> => {
@@ -29,5 +31,12 @@ export const resolveDerivedRevalidatePaths = async ({
     return errorResult(FETCH_FAILED_REASON);
   }
 
-  return deriveRevalidatePaths({ type, id, slug, tenantId, tenant });
+  return deriveRevalidatePaths({
+    type,
+    id,
+    slug,
+    operation,
+    tenantId,
+    tenant,
+  });
 };

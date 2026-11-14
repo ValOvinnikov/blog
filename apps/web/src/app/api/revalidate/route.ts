@@ -106,15 +106,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     tenantProjectId,
     tenantSanity,
   });
+  const operation = request.headers.get(SANITY_OPERATION_HEADER);
   const pathPurged = await purgeRevalidatedCache({
     tags: revalidated,
     type,
     id,
     slug: slug ?? undefined,
+    operation,
     tenantId,
     tenant: tenantSanity,
   });
-  const operation = request.headers.get(SANITY_OPERATION_HEADER);
   const postEvent = { operation, type, id, tenantId };
   const bookmarksRemoved = await removeDeletedPostBookmarks(postEvent);
   await stampFirstPostPublished(postEvent);

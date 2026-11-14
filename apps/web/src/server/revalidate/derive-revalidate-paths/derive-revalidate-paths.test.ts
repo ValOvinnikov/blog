@@ -1,8 +1,10 @@
+import { SANITY_WEBHOOK_OPERATION } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import {
   DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
+  PATH_UNDERIVABLE_REASON,
 } from '@web/constants/revalidate';
 import { derivePostPublishPaths } from '@web/server/revalidate/derive-post-publish-paths/derive-post-publish-paths';
 import { deriveTenantSitePaths } from '@web/server/revalidate/derive-tenant-site-paths/derive-tenant-site-paths';
@@ -36,6 +38,7 @@ const MOCK_POST_INPUT = {
   type: POST_TYPE,
   id: faker.string.uuid(),
   slug: MOCK_SLUG,
+  operation: SANITY_WEBHOOK_OPERATION.UPDATE,
 };
 
 describe(deriveRevalidatePaths, () => {
@@ -75,20 +78,6 @@ describe(deriveRevalidatePaths, () => {
     expect(deriveTenantSitePaths).not.toHaveBeenCalled();
   });
 
-  it('resolves every tenant page and the post’s path when the post is gone', async () => {
-    vi.mocked(derivePostPublishPaths).mockResolvedValue(
-      errorResult(DOCUMENT_NOT_FOUND_REASON),
-    );
-
-    const result = await deriveRevalidatePaths(MOCK_POST_INPUT);
-
-    expect(result).toEqual(okResult(MOCK_SITE_PATHS));
-    expect(deriveTenantSitePaths).toHaveBeenCalledWith({
-      ...MOCK_TENANT_INPUT,
-      documentHref: `/blog/${MOCK_SLUG}`,
-    });
-  });
-
   it('reports fetch_failed when the post lookup fails', async () => {
     vi.mocked(derivePostPublishPaths).mockResolvedValue(
       errorResult(FETCH_FAILED_REASON),
@@ -98,5 +87,51 @@ describe(deriveRevalidatePaths, () => {
 
     expect(result).toEqual(errorResult(FETCH_FAILED_REASON));
     expect(deriveTenantSitePaths).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    { type: 'redirect', operation: SANITY_WEBHOOK_OPERATION.UPDATE },
+    { type: 'module_postList', operation: SANITY_WEBHOOK_OPERATION.UPDATE },
+    { type: 'page_landing', operation: SANITY_WEBHOOK_OPERATION.DELETE },
+    { type: 'blog_tag', operation: SANITY_WEBHOOK_OPERATION.DELETE },
+  ])(
+    'reports path_underivable for a $type $operation',
+    async ({ type, operation }) => {
+      const result = await deriveRevalidatePaths({
+        ...MOCK_POST_INPUT,
+        type,
+        operation,
+      });
+
+      expect(result).toEqual(errorResult(PATH_UNDERIVABLE_REASON));
+      expect(deriveTenantSitePaths).not.toHaveBeenCalled();
+    },
+  );
+
+  describe('when the post is gone', () => {
+    beforeEach(() => {
+      vi.mocked(derivePostPublishPaths).mockResolvedValue(
+        errorResult(DOCUMENT_NOT_FOUND_REASON),
+      );
+    });
+
+    it('resolves every tenant page and the post’s own path', async () => {
+      const result = await deriveRevalidatePaths(MOCK_POST_INPUT);
+
+      expect(result).toEqual(okResult(MOCK_SITE_PATHS));
+      expect(deriveTenantSitePaths).toHaveBeenCalledWith({
+        ...MOCK_TENANT_INPUT,
+        documentHref: `/blog/${MOCK_SLUG}`,
+      });
+    });
+
+    it('still resolves the tenant’s pages on a delete', async () => {
+      const result = await deriveRevalidatePaths({
+        ...MOCK_POST_INPUT,
+        operation: SANITY_WEBHOOK_OPERATION.DELETE,
+      });
+
+      expect(result).toEqual(okResult(MOCK_SITE_PATHS));
+    });
   });
 });

@@ -103,10 +103,11 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   any need to know a post's _previous_ taxonomy, which the webhook payload
   does not carry.
 
-  **Known limitation, accepted rather than solved:** a renamed post slug is
-  not recoverable from the webhook payload, so the page at the _old_ slug
-  keeps its stale prerendered HTML (still listing the post) until the
-  route-level backstop below expires it. Fixing this properly would require
+  **Known limitation, accepted rather than solved:** a renamed slug — of a
+  post, topic, tag, landing page or privacy or legal document — is not
+  recoverable from the webhook payload, so the page at the _old_ slug keeps
+  its stale prerendered HTML until the route-level backstop below expires
+  it. Fixing this properly would require
   reconfiguring the Sanity webhook to project the document's previous slug,
   which is human-gated console work.
 
@@ -121,8 +122,14 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   from the webhook's projected `slug` through `pageHref` — so a deleted or
   unpublished landing page, topic, tag or section document is purged too. A
   large tenant costs roughly one `revalidatePath` per listed page and
-  pagination page, plus about sixteen per live language. Any undeliverable
-  derivation — an unresolved tenant, a thrown Sanity-credentials or
+  pagination page, plus one next page per topic and tag and about sixteen
+  per live language. Three cases skip the derivation because no list holds
+  their stale paths: a `delete` (which includes an unpublish) of any type but
+  a post — the projected slug is a landing page's last segment only, and a
+  deleted topic's or tag's pagination is gone from the lists — a `redirect`,
+  whose old path is unknown, and a `module_postList` change, whose page-size
+  change can drop many pages. Those, and any undeliverable derivation — an
+  unresolved tenant, a thrown Sanity-credentials or
   live-locales lookup, or a failed page-list lookup — falls back to the
   whole-site `revalidatePath('/', 'layout')` purge, always logged
   (`revalidate.path_purge_fallback`) rather than left silently incomplete.

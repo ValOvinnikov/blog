@@ -659,6 +659,7 @@ describe(POST, () => {
         type: POST_TYPE,
         id: MOCK_POST_ID,
         slug: MOCK_POST_SLUG,
+        operation: null,
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
@@ -678,9 +679,25 @@ describe(POST, () => {
         type: NAVIGATION_DOCUMENT_TYPE,
         id: MOCK_DOCUMENT_ID,
         slug: undefined,
+        operation: null,
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
+    });
+
+    it('hands the webhook operation to the path derivation', async () => {
+      await POST(
+        makeTenantRequest(
+          { _type: AUTHOR_DOCUMENT_TYPE, _id: MOCK_AUTHOR_ID },
+          { [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.DELETE },
+        ),
+      );
+
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operation: SANITY_WEBHOOK_OPERATION.DELETE,
+        }),
+      );
     });
 
     it('purges only the derived tenant paths for a non-post type', async () => {
@@ -696,6 +713,7 @@ describe(POST, () => {
         type: AUTHOR_DOCUMENT_TYPE,
         id: MOCK_AUTHOR_ID,
         slug: undefined,
+        operation: null,
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });

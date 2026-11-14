@@ -23,6 +23,7 @@ const [
   string,
   string,
 ];
+const MOCK_PAGE = '2';
 const MOCK_DOCUMENT_HREF = `/${faker.lorem.slug()}`;
 const EN_ROOT = `/${MOCK_TENANT_ID}/${EN}`;
 const NL_ROOT = `/${MOCK_TENANT_ID}/${NL}`;
@@ -73,9 +74,9 @@ describe(buildTenantSitePaths, () => {
           },
         ],
         topics: [{ slug: MOCK_TOPIC_SLUG, language: EN }],
-        topicPages: [{ slug: MOCK_TOPIC_SLUG, language: EN, page: '2' }],
+        topicPages: [{ slug: MOCK_TOPIC_SLUG, language: EN, page: MOCK_PAGE }],
         tags: [{ slug: MOCK_TAG_SLUG, language: NL }],
-        blogPages: [{ page: '2' }],
+        blogPages: [{ page: MOCK_PAGE }],
         landingPages: [{ slug: MOCK_LANDING_SLUG, language: EN }],
         privacyDocuments: [{ slug: MOCK_PRIVACY_SLUG, language: EN }],
         legalDocuments: [{ slug: MOCK_LEGAL_SLUG, language: NL }],
