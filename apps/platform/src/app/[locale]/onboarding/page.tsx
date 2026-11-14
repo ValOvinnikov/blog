@@ -8,7 +8,6 @@ import { requireOnboardingUser } from '@platform/server/onboarding/require-onboa
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { env } from '@platform/utils/env/env';
 import { toLegalPageUrls } from '@platform/utils/legal-page-urls/legal-page-urls';
-import { toPoweredByProductName } from '@platform/utils/powered-by-product-name/powered-by-product-name';
 import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
 
@@ -25,10 +24,7 @@ export default async function OnboardingPage() {
 
   return (
     <PoweredByMarkProvider
-      productName={toPoweredByProductName(
-        PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH],
-        env.PRODUCT_NAME,
-      )}
+      hasPoweredByMark={PLAN_ENTITLEMENTS[TENANT_PLAN.GROWTH].hasPoweredByMark}
     >
       <OnboardingView
         rootDomain={env.TENANT_ROOT_DOMAIN}

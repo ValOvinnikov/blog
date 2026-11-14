@@ -1,25 +1,24 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import { renderWithIntl, screen } from '@platform/testing/custom-render';
 import { makeEnTranslator } from '@platform/testing/en-translator';
-import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
 
 import { FooterPoweredByNote } from './footer-powered-by-note';
 
 const NOTE = makeEnTranslator('lookForm')('footerPoweredByNote', {
-  productName: MOCK_PRODUCT_NAME,
+  productName: SHINEFOLD_LOGO_NAME,
 });
 
-const setup = (productName: TMaybeUndefined<string>) =>
+const setup = (hasPoweredByMark: boolean) =>
   renderWithIntl(
-    <PoweredByMarkProvider productName={productName}>
+    <PoweredByMarkProvider hasPoweredByMark={hasPoweredByMark}>
       <FooterPoweredByNote />
     </PoweredByMarkProvider>,
   );
 
 describe(`<${FooterPoweredByNote.name}/>`, () => {
-  it('explains the mark by the product name', () => {
-    setup(MOCK_PRODUCT_NAME);
+  it('explains the mark by the Shinefold name', () => {
+    setup(true);
 
     const note = screen.getByText(NOTE);
 
@@ -27,7 +26,7 @@ describe(`<${FooterPoweredByNote.name}/>`, () => {
   });
 
   it('says nothing while no mark is drawn', () => {
-    setup(undefined);
+    setup(false);
 
     const note = screen.queryByRole('paragraph');
 

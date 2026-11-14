@@ -1,6 +1,6 @@
 import { LOCALE_BCP47_TAGS } from '@blog/config';
+import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
-import messages from '@platform/i18n/messages/en.json';
 import { customRender, screen } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 
@@ -13,7 +13,6 @@ const MOCK_ERROR = Object.assign(new Error(faker.lorem.sentence()), {
 });
 
 const MOCK_RETRY = vi.fn();
-const MOCK_PRODUCT_NAME = messages.centeredCardFrame.brandName;
 
 const setup = customRender(GlobalError, {
   error: MOCK_ERROR,
@@ -41,8 +40,8 @@ describe(`<${GlobalError.name}/>`, () => {
     expect(headings).toHaveLength(1);
   });
 
-  it('shows one logo named for the product', () => {
-    const logo = screen.getByRole('img', { name: MOCK_PRODUCT_NAME });
+  it('shows one logo named Shinefold', () => {
+    const logo = screen.getByRole('img', { name: SHINEFOLD_LOGO_NAME });
 
     expect(logo).toBeVisible();
   });
