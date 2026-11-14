@@ -37,7 +37,7 @@
   "apps/worker/src/utils/owner-email/owner-email-copy.ts": 150,
   "packages/config/src/constants/icon.ts": 125,
   "packages/config/src/theme/contrast-pairs.ts": 143,
-  "packages/config/src/voice/voice-fixed-keys.ts": 250,
+  "packages/config/src/voice/voice-fixed-keys.ts": 213,
   "packages/db/scripts/deprovision-tenant/run.ts": 246,
   "packages/db/scripts/recheck-tenant-owners/run.ts": 133,
   "packages/db/scripts/seed-tenant.ts": 187,

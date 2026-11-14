@@ -306,7 +306,11 @@
       "MONTH": "Monthly",
       "YEAR": "Yearly"
     },
-    "periodSwitchLabel": "Billing period"
+    "periodSwitchLabel": "Billing period",
+    "promo": {
+      "once": "on your first payment",
+      "repeating": "for {months, plural, one {# month} other {# months}}"
+    }
   },
   "consent": {
     "banner": {
@@ -354,6 +358,10 @@
       },
       "LANGUAGE": {
         "purpose": "Remembers the language you chose for this site.",
+        "duration": "1 year"
+      },
+      "CURRENCY": {
+        "purpose": "Remembers which currency to show prices in, based on the country you visit from.",
         "duration": "1 year"
       },
       "SESSION": {

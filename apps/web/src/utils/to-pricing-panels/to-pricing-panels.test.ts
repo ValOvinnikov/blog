@@ -1,10 +1,13 @@
 import { PRICE_PERIOD } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { BILLING_CURRENCY } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import {
   mockPricingPrice,
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
+import { mockStripePrice } from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toPricingPanels } from './to-pricing-panels';
 
@@ -24,8 +27,9 @@ const formatPounds = (amount: number) => `£${amount}`;
 const setup = (tiers: Parameters<typeof toPricingPanels>[0]['tiers']) =>
   toPricingPanels({
     tiers,
+    planPrices: [mockStripePrice()],
     locale: 'en-GB',
-    currency: 'GBP',
+    currency: BILLING_CURRENCY.GBP,
     labels: MOCK_PRICING_LABELS,
   });
 
@@ -212,5 +216,42 @@ describe(toPricingPanels, () => {
     expect(monthly?.cards[1]?.headline?.amount).toBe(
       formatPounds(MOCK_SALE_AMOUNT),
     );
+  });
+
+  describe('with a tier linked to a platform plan', () => {
+    const yearlyLinkedTier = mockPricingTier({
+      id: faker.string.uuid(),
+      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.YEAR },
+      prices: [],
+    });
+    const monthlyLinkedTier = mockPricingTier({
+      id: faker.string.uuid(),
+      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.MONTH },
+      prices: [],
+    });
+
+    it('counts the linked interval towards the monthly/yearly switch', () => {
+      const panels = setup([mockPricingTier(), yearlyLinkedTier]);
+
+      expect(panels.map(({ period }) => period)).toEqual([
+        PRICE_PERIOD.MONTH,
+        PRICE_PERIOD.YEAR,
+      ]);
+    });
+
+    it('carries the live price of the linked plan with no typed headline', () => {
+      const [panel] = setup([monthlyLinkedTier]);
+
+      expect(panel?.cards[0]?.headline).toBeUndefined();
+      expect(panel?.cards[0]?.livePrice?.period).toBe(
+        periods[PRICE_PERIOD.MONTH],
+      );
+    });
+
+    it('leaves an unlinked tier without a live price', () => {
+      const [panel] = setup([mockPricingTier()]);
+
+      expect(panel?.cards[0]?.livePrice).toBeUndefined();
+    });
   });
 });

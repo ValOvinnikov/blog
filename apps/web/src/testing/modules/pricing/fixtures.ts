@@ -5,7 +5,10 @@ import type {
   TPricingTier,
 } from '@blog/service';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import type { IPricingLabels } from '@web/utils/to-pricing-panels';
+import type {
+  IPricingCardData,
+  IPricingLabels,
+} from '@web/utils/to-pricing-panels';
 
 export const mockPricingPrice = (
   overrides: Partial<TPricingPrice> = {},
@@ -58,3 +61,20 @@ export const MOCK_PRICING_LABELS: IPricingLabels = {
     [PRICE_PERIOD.YEAR]: 'per year',
   },
 };
+
+export const mockPricingCard = (
+  overrides: Partial<IPricingCardData> = {},
+): IPricingCardData => ({
+  id: 'tier-1',
+  name: 'Starter',
+  description: undefined,
+  headline: undefined,
+  label: undefined,
+  extras: [],
+  features: [],
+  ctaButtons: [],
+  highlightLabel: undefined,
+  footnote: undefined,
+  livePrice: undefined,
+  ...overrides,
+});

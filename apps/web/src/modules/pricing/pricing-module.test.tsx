@@ -1,7 +1,10 @@
 import { PRICE_PERIOD, SITE_MESSAGES } from '@blog/config';
+import { TENANT_PLAN } from '@blog/config/constants';
+import { MOCK_DOLLAR_AMOUNT } from '@blog/db/testing/stripe-catalogue/fixtures';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { PRICING_LOG } from '@web/constants/pricing';
+import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
@@ -10,6 +13,7 @@ import {
   mockPricingPrice,
   mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
+import { mockStripePrice } from '@web/testing/modules/pricing/live-price-fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_NO_SECTION_STYLE_OVERRIDES,
@@ -44,10 +48,23 @@ vi.mock(
   '@web/server/site-config/get-section-appearance/get-section-appearance',
 );
 
+vi.mock('@web/server/pricing/get-plan-prices/get-plan-prices', () => ({
+  getPlanPrices: vi.fn(),
+}));
+
 faker.seed(13);
 
 const MOCK_PRICING_MODULE_ID = faker.string.uuid();
 const MOCK_MONTH_WORDING = 'a month';
+const MINOR_UNITS = 100;
+const MOCK_LINKED_MODULE = mockPricingModule({
+  tiers: [
+    mockPricingTier({
+      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.MONTH },
+      prices: [],
+    }),
+  ],
+});
 
 const setup = customRenderAsync(PricingModule, {
   id: MOCK_PRICING_MODULE_ID,
@@ -57,6 +74,8 @@ describe(`<${PricingModule.name}/>`, () => {
   beforeEach(() => {
     getPricingModuleMock.mockReset();
     getPricingModuleMock.mockResolvedValue(okResult(mockPricingModule()));
+    vi.mocked(getPlanPrices).mockReset();
+    vi.mocked(getPlanPrices).mockResolvedValue(okResult([mockStripePrice()]));
   });
 
   describe('with the default module', () => {
@@ -170,5 +189,45 @@ describe(`<${PricingModule.name}/>`, () => {
     const period = screen.getByText(MOCK_MONTH_WORDING);
 
     expect(period).toBeVisible();
+  });
+
+  it('reads no plan prices when no tier links a platform plan', async () => {
+    await setup();
+
+    expect(vi.mocked(getPlanPrices)).not.toHaveBeenCalled();
+  });
+
+  describe('with a tier linked to a platform plan', () => {
+    beforeEach(() => {
+      getPricingModuleMock.mockResolvedValue(okResult(MOCK_LINKED_MODULE));
+    });
+
+    it("shows the tier's live price from the catalogue", async () => {
+      await setup();
+
+      const price = screen.getByText(
+        new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: mockStripePrice().currency,
+          trailingZeroDisplay: 'stripIfInteger',
+        }).format(MOCK_DOLLAR_AMOUNT / MINOR_UNITS),
+      );
+
+      expect(price).toBeVisible();
+    });
+
+    it('logs and still renders the tier when the plan prices fail', async () => {
+      vi.mocked(getPlanPrices).mockResolvedValue(errorResult(MOCK_ERROR));
+
+      await setup();
+
+      const tierName = screen.getByText(mockPricingTier().name);
+
+      expect(tierName).toBeVisible();
+      expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+        PRICING_LOG.PLAN_PRICES_FETCH_FAILED,
+        { id: MOCK_PRICING_MODULE_ID, error: MOCK_ERROR },
+      );
+    });
   });
 });

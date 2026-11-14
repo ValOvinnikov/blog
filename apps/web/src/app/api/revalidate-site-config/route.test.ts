@@ -1,4 +1,5 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
 import {
@@ -11,6 +12,7 @@ import {
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,
+  STRIPE_CATALOGUE_CACHE_TAG,
   TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
 
@@ -57,7 +59,7 @@ const purgedTags = (): unknown[] =>
 
 const makeRequest = (authorization?: string, body?: string): Request => {
   const headers = new Headers();
-  if (authorization !== undefined) {
+  if (!isUndefined(authorization)) {
     headers.set(AUTHORIZATION_HEADER, authorization);
   }
   return new Request(MOCK_REVALIDATE_URL, {
@@ -80,7 +82,7 @@ describe(POST, () => {
     vi.mocked(logger.warn).mockReset();
   });
 
-  it('revalidates the given tenant’s scoped tags and the host lookups when a tenantId is given', async () => {
+  it('revalidates only the given tenant’s tags plus the shared ones', async () => {
     const request = makeRequest(
       BEARER_SECRET,
       JSON.stringify({ tenantId: MOCK_TENANT_ID }),
@@ -91,6 +93,7 @@ describe(POST, () => {
     const expectedTags = [
       ...tagsForTenant(MOCK_TENANT_ID),
       TENANT_BY_HOST_CACHE_TAG,
+      STRIPE_CATALOGUE_CACHE_TAG,
     ];
 
     expect(response.status).toBe(HTTP_STATUS.OK);
@@ -117,7 +120,7 @@ describe(POST, () => {
     },
     { case: 'the body is malformed JSON', body: MALFORMED_JSON_BODY },
   ])(
-    'revalidates every tenant’s scoped tags and the host lookups when $case',
+    'revalidates every tenant’s tags plus the shared ones when $case',
     async ({ body }) => {
       const request = makeRequest(BEARER_SECRET, body);
       const response = await POST(request);
@@ -127,6 +130,7 @@ describe(POST, () => {
         ...tagsForTenant(MOCK_TENANT_ID),
         ...tagsForTenant(MOCK_OTHER_TENANT_ID),
         TENANT_BY_HOST_CACHE_TAG,
+        STRIPE_CATALOGUE_CACHE_TAG,
       ];
 
       expect(response.status).toBe(HTTP_STATUS.OK);

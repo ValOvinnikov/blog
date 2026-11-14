@@ -306,7 +306,11 @@
       "MONTH": "Mensuel",
       "YEAR": "Annuel"
     },
-    "periodSwitchLabel": "Période de facturation"
+    "periodSwitchLabel": "Période de facturation",
+    "promo": {
+      "once": "sur votre premier paiement",
+      "repeating": "pendant {months, plural, one {# mois} other {# mois}}"
+    }
   },
   "consent": {
     "banner": {
@@ -354,6 +358,10 @@
       },
       "LANGUAGE": {
         "purpose": "Mémorise la langue que vous avez choisie pour ce site.",
+        "duration": "1 an"
+      },
+      "CURRENCY": {
+        "purpose": "Mémorise la devise dans laquelle afficher les prix, selon le pays depuis lequel vous visitez le site.",
         "duration": "1 an"
       },
       "SESSION": {

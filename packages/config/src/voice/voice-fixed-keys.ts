@@ -1,4 +1,6 @@
 import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
+import { COOKIE_LIST_VOICE_FIXED_KEYS } from './voice-fixed-keys-cookie-list';
+import { PRICING_VOICE_FIXED_KEYS } from './voice-fixed-keys-pricing';
 
 /**
  * Every `site-messages.en.json` key that stays fixed rather than
@@ -7,6 +9,8 @@ import { CONSENT_VOICE_FIXED_KEYS } from './voice-fixed-keys-consent';
  */
 export const VOICE_FIXED_KEYS = [
   ...CONSENT_VOICE_FIXED_KEYS,
+  ...COOKIE_LIST_VOICE_FIXED_KEYS,
+  ...PRICING_VOICE_FIXED_KEYS,
   'breadcrumbs.ariaLabel',
   'localeErrorPage.announcement',
   'siteUnavailable.heading',
@@ -47,17 +51,6 @@ export const VOICE_FIXED_KEYS = [
   'carousel.nextAriaLabel',
   'carousel.regionLabel',
   'codeBlock.regionLabel',
-  'pricingModule.free',
-  'pricingModule.from',
-  'pricingModule.compareAtLabel',
-  'pricingModule.period.ONE_TIME',
-  'pricingModule.period.HOUR',
-  'pricingModule.period.SESSION',
-  'pricingModule.period.MONTH',
-  'pricingModule.period.YEAR',
-  'pricingModule.tabs.MONTH',
-  'pricingModule.tabs.YEAR',
-  'pricingModule.periodSwitchLabel',
 
   'blogPostPage.asideKind.WHY_NOT',
   'blogPostPage.asideKind.DIGRESSION',
@@ -224,35 +217,5 @@ export const VOICE_FIXED_KEYS = [
   'accountPage.identity.displayNameDescription',
   'accountPage.identity.saveButton',
   'accountPage.identity.savingLabel',
-  'cookieList.ariaLabel',
-  'cookieList.intro',
-  'cookieList.columns.name',
-  'cookieList.columns.purpose',
-  'cookieList.columns.duration',
-  'cookieList.cookies.CONSENT.purpose',
-  'cookieList.cookies.CONSENT.duration',
-  'cookieList.cookies.LANGUAGE.purpose',
-  'cookieList.cookies.LANGUAGE.duration',
-  'cookieList.cookies.SESSION.purpose',
-  'cookieList.cookies.SESSION.duration',
-  'cookieList.cookies.CSRF.purpose',
-  'cookieList.cookies.CSRF.duration',
-  'cookieList.cookies.SIGN_IN_RETURN.purpose',
-  'cookieList.cookies.SIGN_IN_RETURN.duration',
-  'cookieList.cookies.OAUTH_VERIFIER.purpose',
-  'cookieList.cookies.OAUTH_VERIFIER.duration',
-  'cookieList.cookies.OAUTH_STATE.purpose',
-  'cookieList.cookies.OAUTH_STATE.duration',
-  'cookieList.cookies.SIGNED_IN_HINT.purpose',
-  'cookieList.cookies.SIGNED_IN_HINT.duration',
-  'cookieList.cookies.NEWSLETTER_SUBSCRIBED.purpose',
-  'cookieList.cookies.NEWSLETTER_SUBSCRIBED.duration',
-  'cookieList.cookies.NEWSLETTER_UNSUBSCRIBE_TOKEN.purpose',
-  'cookieList.cookies.NEWSLETTER_UNSUBSCRIBE_TOKEN.duration',
-  'cookieList.cookies.READING_DEPTH.purpose',
-  'cookieList.cookies.READING_DEPTH.duration',
-  'cookieList.cookies.THEME.purpose',
-  'cookieList.cookies.THEME.duration',
-  'cookieList.analyticsNote',
   'table.regionLabel',
 ] as const;
