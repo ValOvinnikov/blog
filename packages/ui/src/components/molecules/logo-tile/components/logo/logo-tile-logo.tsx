@@ -1,4 +1,5 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
+import { isUndefined } from '@blog/utils/primitives';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { logoTileLogoVariants } from './logo-tile-logo-variants';
@@ -18,13 +19,13 @@ export const LogoTileLogo = ({
 }: TLogoTileLogoProps) => (
   <div
     className={logoTileLogoVariants({
-      hasAspectRatio: aspectRatio !== undefined,
+      hasAspectRatio: !isUndefined(aspectRatio),
       class: className,
     })}
     style={
-      aspectRatio !== undefined
-        ? ({ '--logo-aspect': aspectRatio } as CSSProperties)
-        : undefined
+      isUndefined(aspectRatio)
+        ? undefined
+        : ({ '--logo-aspect': aspectRatio } as CSSProperties)
     }
     data-testid={dataTestId}
   >

@@ -4,6 +4,7 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { Fragment, type ElementType } from 'react';
 
 import { PricingCardActions } from './components/actions/pricing-card-actions';
@@ -59,7 +60,7 @@ const PricingCardRoot = ({
       {Name && <div className={s.name()}>{Name}</div>}
       {Description && <div className={s.description()}>{Description}</div>}
       {Price && <div className={s.price()}>{Price}</div>}
-      {(Extra || unmatched.length > 0) && (
+      {(Extra || hasArrayGotItems(unmatched)) && (
         <div className={s.extras()}>
           {Extra}
           {unmatched.map((node, i) => (
