@@ -1,22 +1,23 @@
-import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
+import {
+  SCHEDULED_POST_PURGE_LOG,
+  SCHEDULED_POST_STATE,
+} from '@worker/constants/scheduled-post-purge';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
 import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_PUBLISHED_AT } from '@worker/testing/scheduled-post-purge/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { fakeRunHook } from '@worker/testing/workflow/run-hook';
+import { reportRunFailed } from '@worker/units/report-run-failed';
 import { checkScheduledPost } from '@worker/units/scheduled-post-purge/check-scheduled-post';
 import { purgeScheduledPostPages } from '@worker/units/scheduled-post-purge/purge-scheduled-post-pages';
-import { reportScheduledPostPurgeFailed } from '@worker/units/scheduled-post-purge/report-scheduled-post-purge-failed';
 import { sleep } from 'workflow';
 
 import { purgeScheduledPost } from './purge-scheduled-post';
 
 vi.mock('@worker/units/scheduled-post-purge/check-scheduled-post');
 vi.mock('@worker/units/scheduled-post-purge/purge-scheduled-post-pages');
-vi.mock(
-  '@worker/units/scheduled-post-purge/report-scheduled-post-purge-failed',
-);
+vi.mock('@worker/units/report-run-failed');
 vi.mock('workflow');
 
 const MOCK_SCHEDULED = {
@@ -84,7 +85,8 @@ describe(purgeScheduledPost, () => {
     );
 
     await expect(runPurge()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
-    expect(reportScheduledPostPurgeFailed).toHaveBeenCalledWith(
+    expect(reportRunFailed).toHaveBeenCalledExactlyOnceWith(
+      SCHEDULED_POST_PURGE_LOG.RUN_FAILED,
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       MOCK_WORKFLOW_CRASH,

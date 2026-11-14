@@ -3,6 +3,11 @@ import { getTenantById } from '@blog/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import { SCHEDULED_POST_PURGE_LOG } from '@worker/constants/scheduled-post-purge';
 import {
+  MOCK_NOW,
+  MOCK_ONE_HOUR_MS,
+  freezeClock,
+} from '@worker/testing/clock/frozen-clock';
+import {
   MOCK_ENQUEUE_SECRET,
   MOCK_FORGED_SECRET,
   MOCK_NEWSLETTER_ENQUEUE_SECRET,
@@ -46,12 +51,17 @@ function purgeRequest(
 
 describe('POST /api/scheduled-post-purge', () => {
   beforeEach(() => {
+    freezeClock();
     mockEnv.WORKER_ENQUEUE_SECRET = MOCK_ENQUEUE_SECRET;
     mockEnv.WORKER_NEWSLETTER_ENQUEUE_SECRET = MOCK_NEWSLETTER_ENQUEUE_SECRET;
     vi.mocked(getTenantById).mockResolvedValue(
       mockProvisionedTenant({ sanityReadTokenEncrypted: MOCK_ENCRYPTED_TOKEN }),
     );
     vi.mocked(start).mockResolvedValue({ runId: MOCK_RUN_ID } as never);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('starts the purge run for the scheduled post and answers with its id', async () => {
@@ -104,9 +114,21 @@ describe('POST /api/scheduled-post-purge', () => {
     { tenantId: MOCK_TENANT_ID, publishedAt: MOCK_PUBLISHED_AT },
     { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID },
     { ...MOCK_BODY, publishedAt: 'tomorrow' },
-    { ...MOCK_BODY, publishedAt: new Date(0).toISOString() },
   ])('refuses a malformed body %j', async (body) => {
     const response = await POST(purgeRequest(body));
+
+    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
+    expect(start).not.toHaveBeenCalled();
+  });
+
+  it('refuses a publish time already in the past', async () => {
+    const pastPublishedAt = new Date(
+      MOCK_NOW.getTime() - MOCK_ONE_HOUR_MS,
+    ).toISOString();
+
+    const response = await POST(
+      purgeRequest({ ...MOCK_BODY, publishedAt: pastPublishedAt }),
+    );
 
     expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
     expect(start).not.toHaveBeenCalled();
