@@ -1,7 +1,10 @@
 import type { TEmailLogoImage } from '@blog/email/html/email-header/email-header';
 import { EMAIL_WHITE } from '@blog/email/html/email-metrics/email-metrics';
 import { oklchToHex } from '@blog/utils/color';
-import { SHINEFOLD_LOGO_COLOR } from '@blog/utils/shinefold-logo';
+import {
+  SHINEFOLD_LOGO_COLOR,
+  SHINEFOLD_LOGO_NAME,
+} from '@blog/utils/shinefold-logo';
 
 // Email clients can't read CSS custom properties, so the neutrals mirror
 // `configs/tailwind/theme.css`'s light-mode `:root` OKLCH values as static hex.
@@ -16,7 +19,7 @@ export const PLATFORM_EMAIL_BRAND = {
   brandPrimaryContrast: EMAIL_WHITE,
 } as const;
 
-export const PLATFORM_EMAIL_BRAND_NAME = 'Shinefold';
+export const PLATFORM_EMAIL_BRAND_NAME = SHINEFOLD_LOGO_NAME;
 
 const PLATFORM_EMAIL_IMAGE_BASE_URL =
   'https://9g0lu6877s8zu2lj.public.blob.vercel-storage.com/images';
