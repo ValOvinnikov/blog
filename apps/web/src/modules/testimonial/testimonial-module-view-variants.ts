@@ -9,6 +9,7 @@ export const testimonialModuleViewVariants = tv({
     columns: {
       2: { grid: ['lg:grid-cols-4'] },
       3: { grid: ['lg:grid-cols-6'] },
+      4: { grid: ['lg:grid-cols-8'] },
     },
     isLoneBelowLg: { true: {}, false: {} },
     isLoneFromLg: { true: {}, false: {} },
@@ -21,6 +22,12 @@ export const testimonialModuleViewVariants = tv({
       class: { item: ['sm:max-lg:col-start-2'] },
     },
     { columns: 3, isLoneFromLg: true, class: { item: ['lg:col-start-3'] } },
+    {
+      columns: 4,
+      isLoneBelowLg: true,
+      class: { item: ['sm:max-lg:col-start-2'] },
+    },
+    { columns: 4, isLoneFromLg: true, class: { item: ['lg:col-start-4'] } },
   ],
   defaultVariants: { isLoneBelowLg: false, isLoneFromLg: false },
 });

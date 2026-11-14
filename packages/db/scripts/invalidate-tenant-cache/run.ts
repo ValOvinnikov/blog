@@ -1,8 +1,8 @@
-import { pathToFileURL } from 'node:url';
-
+// Re-runs only deprovision-tenant's cache purge for one tenant, which that workflow's `deprovisionedAt` guard blocks once the tenant is archived.
 import { getTenantRow } from '../deprovision-tenant/lib/get-tenant-row';
 import { invalidateTenantCache } from '../deprovision-tenant/steps/invalidate-tenant-cache';
 import { parseDryRun, readRequiredTenantId } from '../lib/cli-flags';
+import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import { loadInvalidateCacheEnv, type TInvalidateCacheEnv } from './lib/env';
 
@@ -44,13 +44,4 @@ async function main(): Promise<void> {
   }
 }
 
-// Keeps `main()` from running as a side effect when a test imports this module.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((error: unknown) => {
-    console.error('invalidate-tenant-cache: unexpected failure:', error);
-    process.exitCode = 1;
-  });
-}
+runIfEntrypoint(import.meta.url, main, TOOL);

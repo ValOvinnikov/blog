@@ -1,4 +1,4 @@
-import { hasArrayGotItems } from '@blog/utils/primitives';
+import { hasArrayGotItems, isUndefined } from '@blog/utils/primitives';
 import {
   Children,
   type ComponentProps,
@@ -48,8 +48,7 @@ export const mapCompoundSlots = <M extends TComponentMap>(
       return;
     }
     const match = pairs.find(
-      ([key, Component]) =>
-        child.type === Component && slots[key] === undefined,
+      ([key, Component]) => child.type === Component && isUndefined(slots[key]),
     );
     if (match) {
       const [key] = match;

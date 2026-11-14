@@ -9904,14 +9904,6 @@
         "file": "apps/web/src/constants/revalidate-site-config.ts"
       }
     ],
-    "revalidate_site_config.whole_site_purge": [
-      {
-        "ref": "REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE",
-        "scope": "app:web",
-        "from": "@web/constants/revalidate-site-config",
-        "file": "apps/web/src/constants/revalidate-site-config.ts"
-      }
-    ],
     "revalidate.secret_missing": [
       {
         "ref": "REVALIDATE_LOG.SECRET_MISSING",
@@ -9987,6 +9979,22 @@
     "revalidate.post_lookup_failed": [
       {
         "ref": "REVALIDATE_LOG.POST_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.live_locales_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
+    "revalidate.tenant_page_list_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.TENANT_PAGE_LIST_LOOKUP_FAILED",
         "scope": "app:web",
         "from": "@web/constants/revalidate",
         "file": "apps/web/src/constants/revalidate.ts"
@@ -10382,6 +10390,14 @@
         "scope": "app:web",
         "from": "@web/constants/tenant-write",
         "file": "apps/web/src/constants/tenant-write.ts"
+      }
+    ],
+    "testimonial_module.fetch_failed": [
+      {
+        "ref": "TESTIMONIAL_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/testimonial",
+        "file": "apps/web/src/constants/testimonial.ts"
       }
     ],
     "theme_tokens.site_config_fetch_failed": [

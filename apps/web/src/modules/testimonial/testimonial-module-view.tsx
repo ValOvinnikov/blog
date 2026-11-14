@@ -1,34 +1,47 @@
 import { CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import type { TTestimonialModule } from '@blog/service';
 import { CardGrid } from '@blog/ui/components/organisms/card-grid';
+import { hasLength } from '@blog/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section } from '@web/components/shared/section';
+import { Section, type ISectionProps } from '@web/components/shared/section';
 import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
 import { TestimonialCarousel } from '@web/modules/testimonial/components/testimonial-carousel/testimonial-carousel';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
+import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import { toTestimonialGridColumns } from '@web/utils/to-testimonial-grid-columns';
 
 import { testimonialModuleViewVariants } from './testimonial-module-view-variants';
 
-export interface ITestimonialModuleViewProps extends TTestimonialModule {
+export interface ITestimonialModuleViewProps extends Pick<
+  TTestimonialModule,
+  | 'headingBlock'
+  | 'testimonials'
+  | 'ctaButtons'
+  | 'displayMode'
+  | 'contentAlignment'
+  | 'cardAlignment'
+  | 'columns'
+> {
+  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
   titleId: string;
   dataTestId: string;
 }
 
 export const TestimonialModuleView = ({
-  brandVariant,
+  section,
   headingBlock,
   testimonials,
   ctaButtons,
   displayMode,
   contentAlignment,
   cardAlignment,
-  layout,
+  columns: storedColumns,
   titleId,
   dataTestId,
 }: ITestimonialModuleViewProps) => {
+  const { brandVariant, layout, appearance } = section;
   const [spotlightItem] = testimonials;
   const isSpotlight = testimonials.length === 1;
   const carouselAlign =
@@ -37,7 +50,9 @@ export const TestimonialModuleView = ({
       : CONTENT_ALIGNMENT.LEFT;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
-  const columns = toTestimonialGridColumns(testimonials.length);
+  const columns =
+    toCardGridColumns(storedColumns) ??
+    toTestimonialGridColumns(testimonials.length);
   const s = moduleGridActionsVariants({ align: contentAlignment });
   const v = testimonialModuleViewVariants({ columns });
   const lastIndex = testimonials.length - 1;
@@ -48,6 +63,7 @@ export const TestimonialModuleView = ({
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
@@ -78,7 +94,7 @@ export const TestimonialModuleView = ({
         <CardGrid
           columns={columns}
           className={v.grid()}
-          dataTestId={`${dataTestId}-grid`}
+          dataTestId={`${dataTestId}-grid-${columns}`}
         >
           {testimonials.map((item, index) => (
             <TestimonialCard
@@ -94,7 +110,7 @@ export const TestimonialModuleView = ({
           ))}
         </CardGrid>
       )}
-      {ctaButtons.length > 0 && (
+      {hasLength(ctaButtons) && (
         <div className={s.actions()}>
           <ActionGroup actions={ctaButtons} />
         </div>

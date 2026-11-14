@@ -1,5 +1,3 @@
-import { pathToFileURL } from 'node:url';
-
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -17,6 +15,7 @@ import {
   parseFlagValue,
   readRequiredTenantId,
 } from '../lib/cli-flags';
+import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
 
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
@@ -251,13 +250,4 @@ async function main(): Promise<void> {
   }
 }
 
-// Without this guard, importing `runSteps` in a test would also run `main()`.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((error: unknown) => {
-    console.error('deprovision-tenant: unexpected failure:', error);
-    process.exitCode = 1;
-  });
-}
+runIfEntrypoint(import.meta.url, main, TOOL);

@@ -1,6 +1,4 @@
 // Run only by `.github/workflows/validate-tenant-documents.yml`, never by hand against a shared or production tenant registry.
-import { pathToFileURL } from 'node:url';
-
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
@@ -24,6 +22,7 @@ import { sanitizeLogMessage } from '@blog/insight';
 import { hasLength } from '@blog/utils/primitives';
 
 import { readOptionalTenantId } from '../lib/cli-flags';
+import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import { notifyOperatorsOfDocumentValidationFailure } from './lib/notify-operators';
 import {
@@ -31,6 +30,7 @@ import {
   type TSanityValidationResult,
 } from './lib/run-sanity-documents-validate';
 
+// `tenantId` + `source` + `kind` already scope the dedupe key, so this need not vary per document.
 export const DOCUMENT_VALIDATION_IDENTIFIER = 'documents';
 
 export type TValidateSummary = {
@@ -181,6 +181,7 @@ export async function runValidationForTenant(
   return validateCandidates(tenant ? [tenant] : []);
 }
 
+// `errors` counts only sweeps that failed to decide validity — WARNING/CRITICAL outcomes are not failures.
 export function hasSystemicFailures(summary: TValidateSummary): boolean {
   return summary.errors > 0;
 }
@@ -205,13 +206,4 @@ async function main(): Promise<void> {
   }
 }
 
-// Keeps `main()` from running as a side effect when a test imports this module.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((error: unknown) => {
-    console.error('validate-tenant-documents: unexpected failure:', error);
-    process.exitCode = 1;
-  });
-}
+runIfEntrypoint(import.meta.url, main, 'validate-tenant-documents');

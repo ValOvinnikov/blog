@@ -1,6 +1,4 @@
-// Manual, human-run only: never wire it into CI or a deploy pipeline.
-import { pathToFileURL } from 'node:url';
-
+// Manual, human-run only (a dry run that lists by default; `--dry-run=false` writes): moves tenants wedged at PROVISIONING after a FAILED step to FAILED, so a normal Retry re-dispatches them.
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import {
   listTenantsWedgedInProvisioning,
@@ -8,6 +6,7 @@ import {
 } from '@blog/db/queries/tenants';
 
 import { parseDryRun } from './lib/cli-flags';
+import { runIfEntrypoint } from './lib/run-if-entrypoint';
 
 export async function recoverWedgedTenants(dryRun: boolean): Promise<number> {
   const wedged = await listTenantsWedgedInProvisioning();
@@ -37,14 +36,4 @@ async function main(): Promise<void> {
   );
 }
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main()
-    .then(() => process.exit(0))
-    .catch((error: unknown) => {
-      console.error(error);
-      process.exit(1);
-    });
-}
+runIfEntrypoint(import.meta.url, main);
