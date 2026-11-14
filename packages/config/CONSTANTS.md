@@ -981,6 +981,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`
 
+### `@web/constants/testimonial` — `apps/web/src/constants/testimonial.ts`
+
+- **TESTIMONIAL_LOG**: `MODULE_FETCH_FAILED`=`"testimonial_module.fetch_failed"`
+
 ### `@web/constants/theme-tokens` — `apps/web/src/constants/theme-tokens.ts`
 
 - **THEME_TOKENS_LOG**: `SITE_CONFIG_FETCH_FAILED`=`"theme_tokens.site_config_fetch_failed"`

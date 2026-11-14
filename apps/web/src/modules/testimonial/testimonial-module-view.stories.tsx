@@ -1,9 +1,15 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  GRID_COLUMNS,
+} from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockTestimonialItem } from '@web/testing/modules/testimonial/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
@@ -44,10 +50,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: Object.values(CONTENT_ALIGNMENT),
@@ -60,16 +62,20 @@ const meta = {
       control: 'select',
       options: Object.values(DISPLAY_MODE),
     },
+    columns: {
+      control: 'select',
+      options: [undefined, ...Object.values(GRID_COLUMNS)],
+    },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'What our customers say' }),
     testimonials,
     ctaButtons: [],
     displayMode: DISPLAY_MODE.GRID,
     contentAlignment: undefined,
     cardAlignment: CONTENT_ALIGNMENT.LEFT,
-    layout: undefined,
+    columns: undefined,
     titleId: 'testimonial-title',
     dataTestId: 'testimonial-module-testimonial-1',
   },
@@ -147,4 +153,33 @@ export const TabletCarouselTwoPerView: TStory = {
     displayMode: DISPLAY_MODE.CAROUSEL,
     testimonials: SevenTestimonialsLastCardCentred.args?.testimonials,
   },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const SpotlightOutlinedOnBrandTint: TStory = {
+  args: {
+    testimonials: [testimonials[0]!],
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const FourColumnsFiveTestimonials: TStory = {
+  args: {
+    columns: GRID_COLUMNS.FOUR,
+    testimonials: [...testimonials, ...moreTestimonials.slice(0, 2)],
+  },
+};
+
+export const TwoColumnsThreeTestimonials: TStory = {
+  args: { columns: GRID_COLUMNS.TWO },
 };

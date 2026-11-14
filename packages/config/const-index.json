@@ -10384,6 +10384,14 @@
         "file": "apps/web/src/constants/tenant-write.ts"
       }
     ],
+    "testimonial_module.fetch_failed": [
+      {
+        "ref": "TESTIMONIAL_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/testimonial",
+        "file": "apps/web/src/constants/testimonial.ts"
+      }
+    ],
     "theme_tokens.site_config_fetch_failed": [
       {
         "ref": "THEME_TOKENS_LOG.SITE_CONFIG_FETCH_FAILED",
