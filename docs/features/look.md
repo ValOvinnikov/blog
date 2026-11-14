@@ -62,7 +62,7 @@ The Look page is where a tenant owner styles their public site without touching 
 - `PRESET_REGISTRY` (`@blog/config`) — `CONSOLE`: hue 250, Space Grotesk / Newsreader, `MD`, `DEFAULT`, `ACCENT_BAR`. `EDITORIAL`: hue 28, Fraunces / Inter, `SM`, `COMPACT`, `OUTLINED`. Each preset also carries the capability `featureDefaults`.
 - Provisioning writes no row. With no row, the site renders the Console preset and the form opens on Console defaults.
 - Brand images live in Vercel Blob at `tenants/<id>/<logo|favicon>-<random suffix>.<ext>`, public. Every upload gets a unique name, so a same-type replacement never collides with the old file or its cached copy. A replaced or cleared image's old blob is deleted best-effort.
-- **Caching (web)** — `getSiteConfig` is `unstable_cache` per tenant, tag `site-config:<id>`, 3600s fallback (`TENANT_CONFIG_REVALIDATE_SECONDS`). `updateLookAction`, `uploadBrandAssetAction` and `clearBrandAssetAction` each POST `/api/revalidate-site-config` after their write, which expires the tenant's tags and purges the whole layout.
+- **Caching (web)** — `getSiteConfig` is `unstable_cache` per tenant, tag `site-config:<id>`, 3600s fallback (`TENANT_CONFIG_REVALIDATE_SECONDS`). `updateLookAction`, `uploadBrandAssetAction` and `clearBrandAssetAction` each POST `/api/revalidate-site-config` after their write, which expires the tenant's tags and purges that tenant's own pages ([rendering-and-caching](./rendering-and-caching.md)).
 
 ## Configuration
 

@@ -8,13 +8,12 @@ import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
 import { SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 import {
-  DOCUMENT_NOT_FOUND_REASON,
   FETCH_FAILED_REASON,
   REVALIDATE_LOG,
   SIGNATURE_REFUSED_REASON,
   TENANT_LOOKUP_FAILED_MESSAGE,
   TENANT_UNRESOLVED_REASON,
-  UNSUPPORTED_TYPE_REASON,
+  WHOLE_SITE_PURGE_ARGS,
 } from '@web/constants/revalidate';
 import type * as DeriveRevalidatePathsModule from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
@@ -126,7 +125,7 @@ vi.mock(
 const TOPIC_DOCUMENT_TYPE = 'page_topic';
 const AUTHOR_DOCUMENT_TYPE = 'person';
 const UNTAGGED_DOCUMENT_TYPE = 'settings_voice';
-const WHOLE_SITE_PURGE_ARGS = ['/', 'layout'];
+const NAVIGATION_DOCUMENT_TYPE = 'settings_navigation';
 const EXPIRE_NOW = { expire: 0 };
 
 const MOCK_NOW = faker.date.between({
@@ -134,6 +133,7 @@ const MOCK_NOW = faker.date.between({
   to: '2026-01-01T00:00:00Z',
 });
 const MOCK_POST_ID = faker.string.uuid();
+const MOCK_POST_SLUG = faker.lorem.slug();
 const MOCK_TOPIC_ID = faker.string.uuid();
 const MOCK_AUTHOR_ID = faker.string.uuid();
 const MOCK_DOCUMENT_ID = faker.string.uuid();
@@ -201,6 +201,7 @@ describe(POST, () => {
     getTenantSanityCredentialsMock.mockReset();
     removeBookmarksForPostMock.mockReset();
     deriveRevalidatePathsMock.mockReset();
+    deriveRevalidatePathsMock.mockResolvedValue(okResult([]));
     resolveReferencingModuleTagsMock.mockReset();
     resolveReferencingModuleTagsMock.mockResolvedValue([]);
     recordTenantActivityMock.mockReset();
@@ -398,6 +399,10 @@ describe(POST, () => {
   it.each([
     { case: 'a body that is not JSON', body: faker.lorem.word() },
     { case: 'JSON missing _type and _id', body: JSON.stringify({}) },
+    {
+      case: 'a slug that is not a string',
+      body: JSON.stringify({ _type: POST_TYPE, _id: MOCK_POST_ID, slug: 1 }),
+    },
   ])('rejects $case as a bad request', async ({ body }) => {
     const request = new Request(MOCK_REVALIDATE_URL, {
       method: HTTP_METHOD.POST,
@@ -602,7 +607,7 @@ describe(POST, () => {
 
     it('falls back to the whole-site purge and logs when paths cannot be derived', async () => {
       deriveRevalidatePathsMock.mockResolvedValue(
-        errorResult(DOCUMENT_NOT_FOUND_REASON),
+        errorResult(FETCH_FAILED_REASON),
       );
 
       const request = makePostRequest();
@@ -614,7 +619,7 @@ describe(POST, () => {
           type: POST_TYPE,
           id: MOCK_POST_ID,
           tenantId: MOCK_TENANT_ID,
-          reason: DOCUMENT_NOT_FOUND_REASON,
+          reason: FETCH_FAILED_REASON,
         },
       );
       expect(revalidatePathMock).toHaveBeenCalledWith(...WHOLE_SITE_PURGE_ARGS);
@@ -641,36 +646,79 @@ describe(POST, () => {
       expect(revalidatePathMock).toHaveBeenCalledWith(...WHOLE_SITE_PURGE_ARGS);
     });
 
-    describe('for a type it cannot derive', () => {
-      beforeEach(async () => {
-        await POST(
-          makeTenantRequest({
-            _type: AUTHOR_DOCUMENT_TYPE,
-            _id: MOCK_AUTHOR_ID,
-          }),
-        );
-      });
+    it('hands the webhook slug to the path derivation', async () => {
+      await POST(
+        makeTenantRequest({
+          _type: POST_TYPE,
+          _id: MOCK_POST_ID,
+          slug: MOCK_POST_SLUG,
+        }),
+      );
 
-      it('falls back to the whole-site purge and logs', () => {
-        expect(logger.warn).toHaveBeenCalledWith(
-          REVALIDATE_LOG.PATH_PURGE_FALLBACK,
-          {
-            type: AUTHOR_DOCUMENT_TYPE,
-            id: MOCK_AUTHOR_ID,
-            tenantId: MOCK_TENANT_ID,
-            reason: UNSUPPORTED_TYPE_REASON,
-          },
-        );
-        expect(revalidatePathMock).toHaveBeenCalledWith(
-          ...WHOLE_SITE_PURGE_ARGS,
-        );
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith({
+        type: POST_TYPE,
+        id: MOCK_POST_ID,
+        slug: MOCK_POST_SLUG,
+        operation: null,
+        tenantId: MOCK_TENANT_ID,
+        tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
+    });
 
-      it('still resolves tenant credentials', () => {
-        expect(getTenantSanityCredentialsMock).toHaveBeenCalledWith(
-          MOCK_TENANT_ID,
-        );
+    it('accepts a null slug as absent for a document without one', async () => {
+      const response = await POST(
+        makeTenantRequest({
+          _type: NAVIGATION_DOCUMENT_TYPE,
+          _id: MOCK_DOCUMENT_ID,
+          slug: null,
+        }),
+      );
+
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith({
+        type: NAVIGATION_DOCUMENT_TYPE,
+        id: MOCK_DOCUMENT_ID,
+        slug: undefined,
+        operation: null,
+        tenantId: MOCK_TENANT_ID,
+        tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
+    });
+
+    it('hands the webhook operation to the path derivation', async () => {
+      await POST(
+        makeTenantRequest(
+          { _type: AUTHOR_DOCUMENT_TYPE, _id: MOCK_AUTHOR_ID },
+          { [SANITY_OPERATION_HEADER]: SANITY_WEBHOOK_OPERATION.DELETE },
+        ),
+      );
+
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          operation: SANITY_WEBHOOK_OPERATION.DELETE,
+        }),
+      );
+    });
+
+    it('purges only the derived tenant paths for a non-post type', async () => {
+      deriveRevalidatePathsMock.mockResolvedValue(
+        okResult([MOCK_TENANT_HOME_PATH]),
+      );
+
+      await POST(
+        makeTenantRequest({ _type: AUTHOR_DOCUMENT_TYPE, _id: MOCK_AUTHOR_ID }),
+      );
+
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith({
+        type: AUTHOR_DOCUMENT_TYPE,
+        id: MOCK_AUTHOR_ID,
+        slug: undefined,
+        operation: null,
+        tenantId: MOCK_TENANT_ID,
+        tenant: MOCK_TENANT_SANITY_CONTEXT,
+      });
+      expect(revalidatePathMock.mock.calls).toEqual([[MOCK_TENANT_HOME_PATH]]);
+      expect(logger.warn).not.toHaveBeenCalled();
     });
   });
 

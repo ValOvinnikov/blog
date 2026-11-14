@@ -2447,10 +2447,18 @@ precisely derived for a published `page_post`: its own page, the home and blog
 archive with pagination, and **every** tag/topic page of the tenant with their
 own pagination, not only the ones the post currently belongs to (a
 re-categorisation or removal would otherwise leave stale HTML on the page the
-post no longer occupies, with no way to detect it). A renamed post slug is a
-known, unsolved gap — the old slug isn't recoverable from the webhook payload,
-so the page at the old URL stays stale until the route-level backstop below
-expires it. Anything without a precise derivation yet falls back to a logged
+post no longer occupies, with no way to detect it). A renamed slug — of a
+post, topic, tag or privacy or legal document — is a known, unsolved gap (a
+renamed landing page is covered: its path change writes a `redirect`, whose
+publish runs the whole-site purge): the old slug isn't recoverable from the webhook payload, so the
+page at the old URL stays stale until the route-level backstop below expires
+it. Every other tagged type, a post the lookup no longer finds and a
+Look, Voice or Features save purge every page the publishing tenant renders —
+the sitemap's page lists plus the index, legal and newsletter pages, the page
+after each listing's last, and the changed document's own path — so one
+tenant's change never expires another tenant's pages. A `delete` of any type
+but a post, a `redirect` and a `module_postList` change — whose stale paths no
+list holds — and an unresolved tenant or failed lookup fall back to a logged
 whole-site purge.
 
 The webhook also purges **by reverse lookup**. On every publish of a type that
