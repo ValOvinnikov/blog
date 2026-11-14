@@ -426,7 +426,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
 
-- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`, `CATALOGUE_SYNCED`=`"billing.catalogue_synced"`, `CATALOGUE_SYNC_FAILED`=`"billing.catalogue_sync_failed"`
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`, `PLAN_CHANGE_RELEASE_FAILED`=`"billing.plan_change_release_failed"`, `CATALOGUE_SYNCED`=`"billing.catalogue_synced"`, `CATALOGUE_SYNC_FAILED`=`"billing.catalogue_sync_failed"`
 - **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
 - **STRIPE_RECURRING_INTERVAL**: `MONTHLY`=`"month"`, `YEARLY`=`"year"`
 - **STRIPE_PRORATION_BEHAVIOR**: `NONE`=`"none"`, `ALWAYS_INVOICE`=`"always_invoice"`
@@ -1032,6 +1032,11 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **RETENTION_KIND**: `PENDING_SUBSCRIBERS`, `LEADS`, `SESSIONS`, `VERIFICATION_TOKENS`, `AUDIT_EVENTS`, `RESOLVED_FINDINGS`
 - **RETENTION_LOG**: `DELETED`=`"retention.deleted"`, `CLEANUP_FAILED`=`"retention.cleanup_failed"`, `DEADLINE_REACHED`=`"retention.deadline_reached"`
+
+### `@worker/constants/scheduled-post-purge` — `apps/worker/src/constants/scheduled-post-purge.ts`
+
+- **SCHEDULED_POST_PURGE_LOG**: `START_FAILED`=`"scheduled_post_purge.start_failed"`, `RUN_FAILED`=`"scheduled_post_purge.run_failed"`
+- **SCHEDULED_POST_STATE**: `DUE`, `SCHEDULED`, `STALE`
 
 ### `@worker/constants/workflow` — `apps/worker/src/constants/workflow.ts`
 

@@ -1,4 +1,4 @@
-import { ACTION_OUTCOME } from '@blog/config';
+import { ACTION_OUTCOME, HTTP_STATUS } from '@blog/config';
 import { TENANT_PLAN } from '@blog/config/constants';
 import { MEMBERSHIP_ROLE, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
@@ -16,6 +16,7 @@ import { MOCK_STRIPE_SUBSCRIPTION_ID } from '@platform/testing/billing/fixtures'
 import { MOCK_GROWTH_MONTHLY_CHOICE } from '@platform/testing/billing/plan-choices';
 import { mockStripePlanChangeClient } from '@platform/testing/billing/stripe-plan-change-client';
 import { mockStripeSubscription } from '@platform/testing/billing/stripe-subscription';
+import { MOCK_NETWORK_ERROR } from '@platform/testing/http/network-error';
 import {
   mockMembership,
   mockMembershipContext,
@@ -135,25 +136,38 @@ describe(changePlanAction, () => {
     });
   });
 
-  it('says the card was declined without logging', async () => {
-    client.updateSubscription.mockRejectedValue(
+  it.each([
+    [
+      'a card error',
       new Stripe.errors.StripeCardError({ message: 'declined' }),
-    );
+    ],
+    [
+      'a payment-required response',
+      new Stripe.errors.StripeInvalidRequestError({
+        message: 'payment required',
+        statusCode: HTTP_STATUS.PAYMENT_REQUIRED,
+      }),
+    ],
+  ])(
+    'says the card was declined on %s without logging',
+    async (_case, error) => {
+      client.updateSubscription.mockRejectedValue(error);
 
-    const result = await changePlanAction(
-      MOCK_TENANT_ID,
-      MOCK_GROWTH_MONTHLY_CHOICE,
-    );
+      const result = await changePlanAction(
+        MOCK_TENANT_ID,
+        MOCK_GROWTH_MONTHLY_CHOICE,
+      );
 
-    expect(result).toEqual({
-      outcome: ACTION_OUTCOME.REFUSED,
-      reason: PLAN_CHANGE_REFUSAL.CARD_DECLINED,
-    });
-    expect(vi.mocked(logger).error).not.toHaveBeenCalled();
-  });
+      expect(result).toEqual({
+        outcome: ACTION_OUTCOME.REFUSED,
+        reason: PLAN_CHANGE_REFUSAL.CARD_DECLINED,
+      });
+      expect(vi.mocked(logger).error).not.toHaveBeenCalled();
+    },
+  );
 
   it('logs any other Stripe failure', async () => {
-    client.updateSubscription.mockRejectedValue(new Error('network'));
+    client.updateSubscription.mockRejectedValue(MOCK_NETWORK_ERROR);
 
     const result = await changePlanAction(
       MOCK_TENANT_ID,

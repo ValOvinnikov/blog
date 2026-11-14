@@ -7,6 +7,8 @@ import {
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
+import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
@@ -70,7 +72,7 @@ const panelsFor = (selected: typeof tiers) =>
   toPricingPanels({
     tiers: selected,
     locale: 'en-GB',
-    currency: 'GBP',
+    currency: MOCK_SITE_SETTINGS.currency,
     labels: MOCK_PRICING_LABELS,
   });
 
@@ -80,23 +82,18 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
     },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Simple pricing' }),
     panels: panelsFor(tiers),
     footnote: undefined,
     ctaButtons: [],
     contentAlignment: undefined,
-    layout: undefined,
     titleId: 'pricing-title',
     dataTestId: 'pricing-module-pricing-1',
   },
@@ -149,7 +146,19 @@ export const CenterAligned: TStory = {
 };
 
 export const Secondary: TStory = {
-  args: { brandVariant: BRAND_VARIANT.SECONDARY },
+  args: { section: { brandVariant: BRAND_VARIANT.SECONDARY } },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
+};
+
+export const ThreeTiersOutlinedOnBrandTintPhone: TStory = {
+  args: {
+    panels: panelsFor(tiers.slice(0, 3)),
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+  globals: { viewport: 'mobile' },
 };
 
 export const SidebarColumn: TStory = {

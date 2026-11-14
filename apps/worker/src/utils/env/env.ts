@@ -43,7 +43,7 @@ export const env = createEnv({
       .optional(),
     // @env-optional
     WORKER_ENQUEUE_SECRET: z.string().min(1).optional(),
-    // Only `/api/newsletter/post-send` accepts it, so apps/web never holds WORKER_ENQUEUE_SECRET.
+    // Only the post routes web enqueues accept it, so apps/web never holds WORKER_ENQUEUE_SECRET.
     // @env-optional
     WORKER_NEWSLETTER_ENQUEUE_SECRET: z.string().min(1).optional(),
     // @env-optional

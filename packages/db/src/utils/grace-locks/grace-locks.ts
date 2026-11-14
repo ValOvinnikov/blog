@@ -1,5 +1,5 @@
 import type { TMaybeUndefined } from '@blog/config/types';
-import { PLAN_ENTITLEMENTS } from '@blog/db/constants';
+import type { TPlanEntitlements } from '@blog/db/constants';
 import { countMembershipsOverSeats } from '@blog/db/queries/memberships';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isUndefined } from '@blog/utils/primitives';
@@ -22,11 +22,14 @@ export function findSubdomain(
 }
 
 export async function findGraceLocks(
-  { id, plan, primaryDomain }: TTenant,
+  { id, primaryDomain }: Pick<TTenant, 'id' | 'primaryDomain'>,
+  {
+    seats,
+    hasCustomDomain,
+  }: Pick<TPlanEntitlements, 'seats' | 'hasCustomDomain'>,
   hosts: string[],
   rootDomain: string,
 ): Promise<TGraceLocks> {
-  const { seats, hasCustomDomain } = PLAN_ENTITLEMENTS[plan];
   const isCustomDomainMain =
     !hasCustomDomain && !isUnderRootDomain(primaryDomain, rootDomain);
 

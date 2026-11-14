@@ -1,7 +1,10 @@
 import {
   BRAND_VARIANT,
+  CARD_STYLE,
+  DENSITY,
   LOCALE_ISO_CODES,
   PRICE_PERIOD,
+  RADIUS_SCALE,
   TENANT_PLAN,
 } from '@blog/config/constants';
 import {
@@ -184,6 +187,31 @@ describe('pricingModuleQuery', () => {
       platformPlan: TENANT_PLAN.STARTER,
       platformPlanInterval: PRICE_PERIOD.MONTH,
     });
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const pricing = await runPricing(MOCK_PRICING_DOCUMENT, EN);
+
+    expect(pricing).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.RAISED,
+      radiusScale: RADIUS_SCALE.XL,
+      density: DENSITY.COMPACT,
+    };
+
+    const pricing = await runPricing(
+      { ...MOCK_PRICING_DOCUMENT, ...appearance },
+      EN,
+    );
+
+    expect(pricing).toMatchObject(appearance);
   });
 
   it('picks the heading, footnote and every tier text in the visitor language', async () => {

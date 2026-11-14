@@ -1,5 +1,6 @@
 import { HTTP_STATUS, type THttpStatus } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
+import { getTenantById } from '@blog/db/queries/tenants';
 import {
   ENQUEUE_SIGNATURE_HEADER,
   ENQUEUE_TIMESTAMP_HEADER,
@@ -76,4 +77,17 @@ export async function readSignedTenantRequest(
     env.WORKER_ENQUEUE_SECRET,
   );
   return signed.ok ? okResult(signed.data.tenantId) : signed;
+}
+
+export async function refuseUnreadableTenant(
+  tenantId: string,
+): Promise<TMaybeUndefined<Response>> {
+  const tenant = await getTenantById(tenantId);
+  if (!tenant) {
+    return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
+  }
+  if (!tenant.sanityProjectId || !tenant.sanityReadTokenEncrypted) {
+    return respondError(HTTP_STATUS.CONFLICT, ENQUEUE_ERROR.NOT_PROVISIONED);
+  }
+  return undefined;
 }

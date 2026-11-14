@@ -1,5 +1,4 @@
 import type { TValueOf } from '@blog/config/utils';
-import { DAY_MS } from '@blog/db/constants';
 
 export const NEWSLETTER_SEND_LOG = {
   START_FAILED: 'newsletter_send.start_failed',
@@ -35,8 +34,6 @@ export const NEWSLETTER_SEND_PAGE_SIZE = 50;
 export const NEWSLETTER_SLOW_PAUSE_MS = 60 * 60_000;
 // Resend's default rate limit is two requests a second per account.
 export const NEWSLETTER_SEND_INTERVAL_MS = 500;
-// A run re-reads a scheduled post at least daily, so a re-dated or unpublished post is noticed.
-export const NEWSLETTER_SCHEDULE_RECHECK_MS = DAY_MS;
 export const NEWSLETTER_LIMIT_NEAR_RATIO = 0.8;
 export const NEWSLETTER_UNIT_MAX_RETRIES = 3;
 // Resend ignores an empty idempotency key and refuses one of 256 characters or more.

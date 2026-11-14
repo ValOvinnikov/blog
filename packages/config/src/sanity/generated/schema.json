@@ -2537,27 +2537,6 @@
         },
         "optional": true
       },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            },
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            }
-          ]
-        },
-        "optional": true
-      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
@@ -2607,6 +2586,27 @@
               "name": "ctaButton"
             }
           }
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
         },
         "optional": true
       },
@@ -2660,6 +2660,102 @@
             {
               "type": "string",
               "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "cardStyle": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "ACCENT_BAR"
+            },
+            {
+              "type": "string",
+              "value": "OUTLINED"
+            },
+            {
+              "type": "string",
+              "value": "FILLED"
+            },
+            {
+              "type": "string",
+              "value": "RAISED"
+            },
+            {
+              "type": "string",
+              "value": "PLAIN"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "radiusScale": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "NONE"
+            },
+            {
+              "type": "string",
+              "value": "SM"
+            },
+            {
+              "type": "string",
+              "value": "MD"
+            },
+            {
+              "type": "string",
+              "value": "LG"
+            },
+            {
+              "type": "string",
+              "value": "XL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "density": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "DEFAULT"
+            },
+            {
+              "type": "string",
+              "value": "COMPACT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "columns": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "TWO"
+            },
+            {
+              "type": "string",
+              "value": "THREE"
+            },
+            {
+              "type": "string",
+              "value": "FOUR"
             }
           ]
         },
@@ -3065,27 +3161,6 @@
         },
         "optional": true
       },
-      "brandVariant": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "PRIMARY"
-            },
-            {
-              "type": "string",
-              "value": "SECONDARY"
-            },
-            {
-              "type": "string",
-              "value": "BRAND_PRIMARY"
-            }
-          ]
-        },
-        "optional": true
-      },
       "headingBlock": {
         "type": "objectAttribute",
         "value": {
@@ -3135,6 +3210,27 @@
               "name": "ctaButton"
             }
           }
+        },
+        "optional": true
+      },
+      "brandVariant": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "PRIMARY"
+            },
+            {
+              "type": "string",
+              "value": "SECONDARY"
+            },
+            {
+              "type": "string",
+              "value": "BRAND_PRIMARY"
+            }
+          ]
         },
         "optional": true
       },
@@ -3209,6 +3305,102 @@
             {
               "type": "string",
               "value": "CENTER"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "cardStyle": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "ACCENT_BAR"
+            },
+            {
+              "type": "string",
+              "value": "OUTLINED"
+            },
+            {
+              "type": "string",
+              "value": "FILLED"
+            },
+            {
+              "type": "string",
+              "value": "RAISED"
+            },
+            {
+              "type": "string",
+              "value": "PLAIN"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "radiusScale": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "NONE"
+            },
+            {
+              "type": "string",
+              "value": "SM"
+            },
+            {
+              "type": "string",
+              "value": "MD"
+            },
+            {
+              "type": "string",
+              "value": "LG"
+            },
+            {
+              "type": "string",
+              "value": "XL"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "density": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "DEFAULT"
+            },
+            {
+              "type": "string",
+              "value": "COMPACT"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "columns": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "TWO"
+            },
+            {
+              "type": "string",
+              "value": "THREE"
+            },
+            {
+              "type": "string",
+              "value": "FOUR"
             }
           ]
         },

@@ -1,5 +1,7 @@
 import { SHINEFOLD_LOGO_PATH as PATH } from './paths';
 
+export const SHINEFOLD_LOGO_NAME = 'Shinefold';
+
 export const SHINEFOLD_LOGO_COLOR = {
   YELLOW: '#ffc233',
   BLOCK: '#0e1726',

@@ -1,28 +1,29 @@
-import { NEXT_NAVIGATION_ERROR, type TMaybeUndefined } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
+import { NEXT_NAVIGATION_ERROR } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import {
   mockMembership,
   mockViewer,
 } from '@platform/testing/memberships/fixtures';
+import { mockCookies } from '@platform/testing/mock-cookies';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
   mockTenant,
 } from '@platform/testing/tenants/fixtures';
+import {
+  ACTIVE_TENANT_COOKIE,
+  LEGACY_ACTIVE_TENANT_COOKIE,
+} from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { resolveDashboardTenant } from './resolve-dashboard-tenant';
 
-const cookiesMock = vi.hoisted(() => vi.fn());
-
 vi.mock('@platform/server/auth/list-session-tenants', () => ({
   listSessionTenants: vi.fn(),
 }));
-
-vi.mock('next/headers', () => ({ cookies: cookiesMock }));
 
 faker.seed(5997);
 
@@ -50,15 +51,8 @@ const MISSING_ACTIVE_TENANT_COOKIES = [
   },
 ];
 
-const mockCookie = (value: TMaybeUndefined<string>) => {
-  cookiesMock.mockResolvedValue({
-    get: vi.fn(() => (isUndefined(value) ? undefined : { value })),
-  });
-};
-
 describe(resolveDashboardTenant, () => {
   beforeEach(() => {
-    cookiesMock.mockReset();
     vi.mocked(listSessionTenants).mockResolvedValue({
       userId: MOCK_USER_ID,
       admin: undefined,
@@ -79,7 +73,7 @@ describe(resolveDashboardTenant, () => {
       NEXT_NAVIGATION_ERROR.NEXT_NOT_FOUND,
     );
 
-    expect(cookiesMock).not.toHaveBeenCalled();
+    expect(cookies).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
   });
 
@@ -99,12 +93,12 @@ describe(resolveDashboardTenant, () => {
       viewer: mockViewer({ membership: membership1 }),
       tenants: [tenant1],
     });
-    expect(cookiesMock).not.toHaveBeenCalled();
+    expect(cookies).not.toHaveBeenCalled();
     expect(redirect).not.toHaveBeenCalled();
   });
 
   it('resolves the tenant named by a valid cookie when there are multiple memberships', async () => {
-    mockCookie(MOCK_OTHER_TENANT_ID);
+    mockCookies({ [ACTIVE_TENANT_COOKIE]: MOCK_OTHER_TENANT_ID });
 
     const result = await resolveDashboardTenant();
 
@@ -120,7 +114,7 @@ describe(resolveDashboardTenant, () => {
   it.each(MISSING_ACTIVE_TENANT_COOKIES)(
     'redirects to the picker with multiple memberships and $cookieCase',
     async ({ value }) => {
-      mockCookie(value);
+      mockCookies({ [ACTIVE_TENANT_COOKIE]: value });
 
       await expect(resolveDashboardTenant()).rejects.toThrow(
         NEXT_NAVIGATION_ERROR.NEXT_REDIRECT,
@@ -131,4 +125,19 @@ describe(resolveDashboardTenant, () => {
       );
     },
   );
+
+  it('resolves the tenant named by the legacy cookie when the current one is absent', async () => {
+    mockCookies({ [LEGACY_ACTIVE_TENANT_COOKIE]: MOCK_OTHER_TENANT_ID });
+
+    expect((await resolveDashboardTenant()).tenant).toEqual(tenant2);
+  });
+
+  it('prefers the current cookie over the legacy one', async () => {
+    mockCookies({
+      [ACTIVE_TENANT_COOKIE]: MOCK_TENANT_ID,
+      [LEGACY_ACTIVE_TENANT_COOKIE]: MOCK_OTHER_TENANT_ID,
+    });
+
+    expect((await resolveDashboardTenant()).tenant).toEqual(tenant1);
+  });
 });

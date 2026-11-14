@@ -1,6 +1,8 @@
 import { PRICE_PERIOD, SITE_MESSAGES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { PRICING_LOG } from '@web/constants/pricing';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
@@ -9,8 +11,16 @@ import {
   mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import {
+  MOCK_NO_SECTION_STYLE_OVERRIDES,
+  MOCK_SECTION_STYLE_OVERRIDES,
+} from '@web/testing/shared/section-appearance/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { PricingModule } from './pricing-module';
 
@@ -30,6 +40,10 @@ vi.mock('@web/server/request-context/request-context');
 
 vi.mock('@web/server/site-settings/get-site-settings/get-site-settings');
 
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
+
 faker.seed(13);
 
 const MOCK_PRICING_MODULE_ID = faker.string.uuid();
@@ -45,29 +59,68 @@ describe(`<${PricingModule.name}/>`, () => {
     getPricingModuleMock.mockResolvedValue(okResult(mockPricingModule()));
   });
 
-  it('fetches the module with the tenant Sanity context', async () => {
-    await setup();
+  describe('with the default module', () => {
+    beforeEach(async () => {
+      await setup();
+    });
 
-    expect(getPricingModuleMock).toHaveBeenCalledWith(
-      MOCK_PRICING_MODULE_ID,
-      MOCK_TENANT_SANITY_CONTEXT,
-    );
+    it('fetches the module with the tenant Sanity context', () => {
+      expect(getPricingModuleMock).toHaveBeenCalledWith(
+        MOCK_PRICING_MODULE_ID,
+        MOCK_TENANT_SANITY_CONTEXT,
+      );
+    });
+
+    it('shows the catalogue wording for a period the site leaves empty', () => {
+      const period = screen.getByText(
+        SITE_MESSAGES.pricingModule.period[PRICE_PERIOD.MONTH],
+      );
+
+      expect(period).toBeVisible();
+    });
   });
 
-  it('renders nothing when the module fetch fails', async () => {
+  it('logs and renders nothing when the module fetch fails', async () => {
     getPricingModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      PRICING_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_PRICING_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 
-  it('renders nothing when the site settings fetch fails', async () => {
+  it('logs and renders nothing when the site settings fetch fails', async () => {
     vi.mocked(getSiteSettings).mockResolvedValueOnce(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      PRICING_LOG.SITE_SETTINGS_FAILED,
+      { id: MOCK_PRICING_MODULE_ID, error: MOCK_ERROR },
+    );
+  });
+
+  it.each([
+    {
+      title: "the module's style overrides",
+      overrides: MOCK_SECTION_STYLE_OVERRIDES,
+    },
+    { title: 'no overrides', overrides: MOCK_NO_SECTION_STYLE_OVERRIDES },
+  ])('scopes the section to $title', async ({ overrides }) => {
+    getPricingModuleMock.mockResolvedValue(
+      okResult(mockPricingModule(overrides)),
+    );
+
+    await setup();
+
+    expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+      MOCK_REQUEST_CONTEXT.tenantId,
+      overrides,
+    );
   });
 
   it.each([
@@ -115,16 +168,6 @@ describe(`<${PricingModule.name}/>`, () => {
     await setup();
 
     const period = screen.getByText(MOCK_MONTH_WORDING);
-
-    expect(period).toBeVisible();
-  });
-
-  it('shows the catalogue wording for a period the site leaves empty', async () => {
-    await setup();
-
-    const period = screen.getByText(
-      SITE_MESSAGES.pricingModule.period[PRICE_PERIOD.MONTH],
-    );
 
     expect(period).toBeVisible();
   });

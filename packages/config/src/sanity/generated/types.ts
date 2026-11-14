@@ -375,7 +375,6 @@ export type Module_testimonial = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   testimonials?: Array<
     {
@@ -387,9 +386,14 @@ export type Module_testimonial = {
       _key: string;
     } & CtaButton
   >;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER' | 'RIGHT';
   cardAlignment?: 'LEFT' | 'CENTER';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+  columns?: 'TWO' | 'THREE' | 'FOUR';
   layout?: WideLayout;
 };
 
@@ -455,7 +459,6 @@ export type Module_featureList = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   features?: Array<
     {
@@ -467,10 +470,15 @@ export type Module_featureList = {
       _key: string;
     } & CtaButton
   >;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   imageShape?: 'WIDE' | 'SQUARE' | 'CIRCLE' | 'ICON';
   displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardAlignment?: 'LEFT' | 'CENTER';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+  columns?: 'TWO' | 'THREE' | 'FOUR';
   layout?: WideLayout;
 };
 

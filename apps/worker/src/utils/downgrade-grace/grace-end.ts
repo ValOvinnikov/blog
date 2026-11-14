@@ -8,12 +8,12 @@ import {
   setTenantPrimaryDomain,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import { findSubdomain } from '@blog/db/utils/grace-locks/grace-locks';
 import { sanitizeLogMessage } from '@blog/insight';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import { logger } from '@worker/utils/logger/logger';
 import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';
 
-import { findSubdomain } from './grace-locks';
 import type { TGraceStepInput } from './grace-steps';
 
 async function moveMainAddressToSubdomain({

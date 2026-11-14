@@ -1,13 +1,17 @@
 import {
   BRAND_VARIANT,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
+  DENSITY,
   DISPLAY_MODE,
+  GRID_COLUMNS,
   LOCALE_ISO_CODES,
+  RADIUS_SCALE,
 } from '@blog/config/constants';
 import {
   MOCK_TESTIMONIAL_MODULE_ID,
   mockRawTestimonialModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/testimonial/fixtures';
 import {
   mockRawPortableTextMarkDef,
   mockReference,
@@ -202,5 +206,32 @@ describe('testimonialModuleQuery', () => {
     });
 
     expect(cardAlignment).toBe(expected);
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const testimonial = await runTestimonial(EN);
+
+    expect(testimonial).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+      columns: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.RAISED,
+      radiusScale: RADIUS_SCALE.XL,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.FOUR,
+    };
+
+    const testimonial = await runTestimonial(EN, {
+      ...MOCK_TESTIMONIAL_MODULE_DOCUMENT,
+      ...appearance,
+    });
+
+    expect(testimonial).toMatchObject(appearance);
   });
 });

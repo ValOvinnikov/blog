@@ -2194,6 +2194,17 @@
     "contest": "Pour contester cette décision, répondez à l’e-mail de suspension ou écrivez au support en indiquant {reference}.",
     "copyButton": "Copier la référence"
   },
+  "billingStatusNotice": {
+    "pastDueTitle": "Votre dernier paiement a échoué",
+    "pastDueDescription": "Mettez à jour votre moyen de paiement pour conserver {plan}.",
+    "pastDueAction": "Mettre à jour le moyen de paiement",
+    "graceTitle": "Votre site est désormais sur {plan}",
+    "graceMembers": "Le <time>{date}</time>, {count, plural, one {# membre de l’équipe perdra} other {# membres de l’équipe perdront}} l’accès à l’administration de ce site.",
+    "graceDomain": "Le <time>{date}</time>, {customDomain} ne sera plus l’adresse principale et redirigera vers {subdomain}.",
+    "graceKeep": "Passez à une offre supérieure avant cette date pour tout conserver.",
+    "graceKeepAskOwner": "Le propriétaire du site peut passer à une offre supérieure avant cette date pour tout conserver.",
+    "graceUpgrade": "Changer d’offre"
+  },
   "billingPage": {
     "title": "Facturation",
     "description": "Votre formule, votre prochain paiement et vos factures.",

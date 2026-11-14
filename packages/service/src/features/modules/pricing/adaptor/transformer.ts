@@ -2,6 +2,7 @@ import type { TMaybeUndefined } from '@blog/config';
 import { toCtaButtons } from '@blog/service/shared/transformers/cta/to-cta-buttons';
 import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/to-heading-block';
 import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import { toModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 import type { InferResultType } from 'groqd';
 
 import type { pricingModuleQuery } from './query';
@@ -66,5 +67,6 @@ export function toPricingModule(raw: TRawPricingModule): TPricingModule {
     ctaButtons: toCtaButtons(raw.ctaButtons),
     contentAlignment: raw.contentAlignment ?? undefined,
     layout: toLayout(raw.layout),
+    ...toModuleAppearance(raw),
   };
 }

@@ -34,7 +34,6 @@ import type { TRawSectionPages } from '@blog/service/features/modules/section-pa
 import type { TRawStatsModule } from '@blog/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@blog/service/features/modules/taxonomy-list/adaptor/transformer';
 import type { TRawTeamModule } from '@blog/service/features/modules/team/adaptor/transformer';
-import type { TRawTestimonialModule } from '@blog/service/features/modules/testimonial/adaptor/transformer';
 import type { TRawTimelineModule } from '@blog/service/features/modules/timeline/adaptor/transformer';
 import type { TFaqModuleQuestions } from '@blog/service/shared/adaptors/faq-questions/types';
 import type {
@@ -72,7 +71,6 @@ export const MOCK_SECTION_PAGES_PARENT_ID = 'page-modules';
 export const MOCK_SECTION_PAGES_PARENT_PATH = 'section-home';
 export const MOCK_STATS_MODULE_ID = 'stats-1';
 export const MOCK_TAXONOMY_LIST_MODULE_ID = 'taxonomy-list-1';
-export const MOCK_TESTIMONIAL_MODULE_ID = 'testimonial-1';
 export const MOCK_TIMELINE_MODULE_ID = 'timeline-1';
 export const MOCK_ENGLISH_MODULE_HEADING = 'Latest posts';
 export const MOCK_DUTCH_MODULE_HEADING = 'Nieuwste berichten';
@@ -88,7 +86,7 @@ export const MOCK_POST_LIST_PAGE_SIZE = 9;
 
 const FAQ_QUESTION = 'How long does onboarding take?';
 const FAQ_ANSWER = 'Most teams are live within a week.';
-const PERSON_NAME = 'Jamie Rivera';
+export const MOCK_PERSON_NAME = 'Jamie Rivera';
 const INBOX_SUPPORTING_TEXT = 'Get new posts in your inbox.';
 const SHIP_FASTER = 'Ship faster';
 
@@ -119,9 +117,6 @@ type TRawFeatureHighlightItem = NonNullable<
   TRawFeatureHighlightsModule['highlights']
 >[number];
 type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
-type TRawTestimonialItem = NonNullable<
-  TRawTestimonialModule['testimonials']
->[number];
 type TRawTeamMember = TRawTeamModule['members'][number];
 type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
@@ -184,7 +179,7 @@ export function mockRawHeroProfileModule(
     showBio: true,
     author: {
       _id: MOCK_AUTHOR_ID,
-      name: PERSON_NAME,
+      name: MOCK_PERSON_NAME,
       image: null,
       profilePage: null,
       role: null,
@@ -432,20 +427,6 @@ export function mockRawLogoItem(
   };
 }
 
-export function mockRawTestimonialItem(
-  overrides: Partial<TRawTestimonialItem> = {},
-): TRawTestimonialItem {
-  return {
-    _id: 'block-testimonial-1',
-    name: PERSON_NAME,
-    quote: [mockRawContentBlock({ text: 'Great work.' })],
-    role: null,
-    image: null,
-    link: null,
-    ...overrides,
-  };
-}
-
 export function mockRawLogoWallModule(
   overrides: Partial<TRawLogoWallModule> = {},
 ): TRawLogoWallModule {
@@ -530,31 +511,12 @@ export function mockRawStatsModule(
   };
 }
 
-export function mockRawTestimonialModule(
-  overrides: Partial<TRawTestimonialModule> = {},
-): TRawTestimonialModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('What people say'),
-    testimonials: [
-      mockRawTestimonialItem(),
-      mockRawTestimonialItem({ _id: 'block-testimonial-2' }),
-    ],
-    ctaButtons: null,
-    displayMode: DISPLAY_MODE.GRID,
-    cardAlignment: CONTENT_ALIGNMENT.LEFT,
-    contentAlignment: null,
-    layout: null,
-    ...overrides,
-  };
-}
-
 export function mockRawTeamMember(
   overrides: Partial<TRawTeamMember> = {},
 ): TRawTeamMember {
   return {
     _id: 'person-1',
-    name: PERSON_NAME,
+    name: MOCK_PERSON_NAME,
     image: null,
     profilePage: null,
     role: null,

@@ -1,7 +1,10 @@
 import {
   BRAND_VARIANT,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
+  DENSITY,
   PRICE_PERIOD,
+  RADIUS_SCALE,
   TENANT_PLAN,
 } from '@blog/config/constants';
 import {
@@ -215,18 +218,29 @@ describe(toPricingModule, () => {
     expect(module.tiers[0]?.prices[0]?.isStartingAt).toBe(false);
   });
 
-  it('leaves the optional footnote, alignment and layout undefined when unset', () => {
-    const raw = mockRawPricingModule({
-      footnote: null,
-      contentAlignment: null,
-      layout: null,
+  it('leaves every optional module field undefined when unset', () => {
+    const module = toPricingModule(mockRawPricingModule());
+
+    expect(module).toMatchObject({
+      footnote: undefined,
+      contentAlignment: undefined,
+      layout: undefined,
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
     });
+  });
 
-    const module = toPricingModule(raw);
+  it('maps the authored appearance overrides straight through', () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+    };
 
-    expect(module.footnote).toBeUndefined();
-    expect(module.contentAlignment).toBeUndefined();
-    expect(module.layout).toBeUndefined();
+    const module = toPricingModule(mockRawPricingModule(appearance));
+
+    expect(module).toMatchObject(appearance);
   });
 
   it('returns a linked tier with its plan and interval and no typed prices or label', () => {

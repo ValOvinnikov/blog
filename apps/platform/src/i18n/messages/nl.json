@@ -2194,6 +2194,17 @@
     "contest": "Wil je dit besluit aanvechten? Beantwoord de schorsingsmail of schrijf naar support en vermeld {reference}.",
     "copyButton": "Referentie kopiëren"
   },
+  "billingStatusNotice": {
+    "pastDueTitle": "Je laatste betaling is mislukt",
+    "pastDueDescription": "Werk je betaalmethode bij om {plan} te behouden.",
+    "pastDueAction": "Betaalmethode bijwerken",
+    "graceTitle": "Je site staat nu op {plan}",
+    "graceMembers": "Op <time>{date}</time> {count, plural, one {verliest # teamlid} other {verliezen # teamleden}} de toegang tot het beheer van deze site.",
+    "graceDomain": "Op <time>{date}</time> is {customDomain} niet langer het hoofdadres en wordt het doorgestuurd naar {subdomain}.",
+    "graceKeep": "Upgrade vóór die datum om alles te behouden.",
+    "graceKeepAskOwner": "De site-eigenaar kan vóór die datum upgraden om alles te behouden.",
+    "graceUpgrade": "Upgraden"
+  },
   "billingPage": {
     "title": "Facturering",
     "description": "Je abonnement, je volgende betaling en je facturen.",
