@@ -4,13 +4,12 @@ import { MODULE_RENDERER_LOG } from '@web/constants/module-renderer';
 import { ModuleGate } from '@web/modules/module-gate/module-gate';
 import { isModuleEntitled } from '@web/server/settings-features/is-module-entitled/is-module-entitled';
 import { logger } from '@web/utils/logger/logger';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
 
 import { moduleSlotVariants } from './module-renderer-variants';
 
-export type TModuleComponentProps = {
+export type TModuleComponentProps = PropsWithChildren<{
   id: string;
-  children?: ReactNode;
   context?: {
     post?: { id: string };
     homePage?: { id: string };
@@ -23,7 +22,7 @@ export type TModuleComponentProps = {
       name: string;
     };
   };
-};
+}>;
 
 export type TModuleComponent = (
   props: TModuleComponentProps,
