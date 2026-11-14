@@ -1,5 +1,6 @@
 import { CAPABILITY } from '@blog/config';
 import { TENANT_PLAN } from '@blog/config/constants';
+import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
@@ -34,7 +35,7 @@ vi.mock('@platform/server/settings-features/get-enabled-capabilities');
 vi.mock('@platform/utils/env/env');
 
 const SIGN_IN = 'Sign in';
-const POWERED_BY_MARK = `${messages.lookPreview.footerPoweredByLabel} ${MOCK_PRODUCT_NAME}`;
+const POWERED_BY_MARK = `${messages.lookPreview.footerPoweredByLabel} ${SHINEFOLD_LOGO_NAME}`;
 
 describe(`<${LookPageContent.name}/> preview`, () => {
   beforeEach(() => {
