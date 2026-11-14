@@ -30,7 +30,6 @@ export const toastVariants = tv({
     dismiss: [
       'shrink-0 cursor-pointer rounded-platform-control text-platform-muted',
       'hover:text-platform-text',
-      'focus-visible:text-platform-text',
       focusRingClasses(FOCUS_RING_GROUND.POPOVER),
     ],
   },

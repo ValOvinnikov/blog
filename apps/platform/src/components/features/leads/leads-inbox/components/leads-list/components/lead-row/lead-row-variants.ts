@@ -24,9 +24,10 @@ export const leadRowVariants = tv({
     isSelected: {
       true: {
         row: [
-          'bg-platform-brand-weak ring-1 ring-inset ring-platform-brand hover:bg-platform-brand-weak',
-          // 3px and 5px, not 2px and 4px: the 1px brand edge stays outermost, then the 2px gap and ring.
-          'focus-visible:outline-hidden focus-visible:shadow-[inset_0_0_0_3px_var(--platform-brand-weak),inset_0_0_0_5px_var(--platform-brand-ink)]',
+          'relative bg-platform-brand-weak hover:bg-platform-brand-weak',
+          // A border on a pseudo-element, so it paints above the inset focus ring instead of under it.
+          'after:pointer-events-none after:absolute after:inset-0 after:border after:border-platform-brand',
+          insetFocusRingClasses(FOCUS_RING_GROUND.BRAND_WEAK),
         ],
       },
       false: { row: [insetFocusRingClasses(FOCUS_RING_GROUND.SURFACE)] },
