@@ -1,35 +1,27 @@
 import {
   BRAND_VARIANT,
-  COOKIE_SETTINGS_BUTTON,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
   type TBrandVariant,
-  type TCookieSettingsButton,
   type TFooterLayout,
   type TFooterSurface,
 } from '@blog/config';
-import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import {
+  FooterBackgroundGlyph,
+  LookOptionGlyph,
+} from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
-import { textVariants } from '@platform/components/shared/text/text-variants';
 import { LOOK_ROW } from '@platform/constants/look-row';
-import { useSettingsFormState } from '@platform/context/settings-form-provider';
-import { joinIds } from '@platform/utils/join-ids/join-ids';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
-import { useId } from 'react';
 
+import { CookieSettingsButtonField } from './components/cookie-settings-button-field/cookie-settings-button-field';
 import { FooterPoweredByNote } from './components/footer-powered-by-note';
-
-const COOKIE_SETTINGS_BUTTON_ORDER = [
-  COOKIE_SETTINGS_BUTTON.HIDDEN,
-  COOKIE_SETTINGS_BUTTON.ONLY,
-  COOKIE_SETTINGS_BUTTON.SHOWN,
-];
 
 export type TFooterCardProps = {
   hasCookieBanner: boolean;
@@ -38,39 +30,32 @@ export type TFooterCardProps = {
 
 export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   const {
-    values: {
-      footerLayout,
-      footerBackground,
-      footerSurface,
-      cookieSettingsButton,
-    },
+    values: { footerLayout, footerBackground, footerSurface, accentHue },
     updateField,
   } = useLookForm();
-  const { isArchived, archivedDescribedBy } = useSettingsFormState();
   const t = useTranslations('lookForm');
   const layoutLock = useLookFieldLock('footerLayout');
   const backgroundLock = useLookFieldLock('footerBackground');
   const surfaceLock = useLookFieldLock('footerSurface');
   const { lockLine } = useLookRowLock(CARD_FIELDS[LOOK_ROW.FOOTER]);
-  const bannerOffNoteId = useId();
 
-  const layoutOptions = toOptions(FOOTER_LAYOUT, (layout) =>
-    t(`footerLayoutOptionLabel.${layout}`),
-  );
-  const backgroundOptions = toOptions(BRAND_VARIANT, (background) =>
-    t(`footerBackgroundOptionLabel.${background}`),
-  );
-  const surfaceOptions = toOptions(FOOTER_SURFACE, (surface) =>
-    t(`footerSurfaceOptionLabel.${surface}`),
-  );
-  const cookieButtonOptions = COOKIE_SETTINGS_BUTTON_ORDER.map((reach) => ({
-    value: reach,
-    label: t(`cookieSettingsButtonOptionLabel.${reach}`),
+  const layoutOptions = Object.values(FOOTER_LAYOUT).map((layout) => ({
+    value: layout,
+    label: t(`footerLayoutOptionLabel.${layout}`),
+    glyph: <LookOptionGlyph field="footerLayout" value={layout} />,
   }));
-  const cookieButtonDescribedBy = joinIds(
-    archivedDescribedBy,
-    hasCookieBanner ? undefined : bannerOffNoteId,
-  );
+  const backgroundOptions = Object.values(BRAND_VARIANT).map((background) => ({
+    value: background,
+    label: t(`footerBackgroundOptionLabel.${background}`),
+    glyph: (
+      <FooterBackgroundGlyph background={background} accentHue={accentHue} />
+    ),
+  }));
+  const surfaceOptions = Object.values(FOOTER_SURFACE).map((surface) => ({
+    value: surface,
+    label: t(`footerSurfaceOptionLabel.${surface}`),
+    glyph: <LookOptionGlyph field="footerSurface" value={surface} />,
+  }));
 
   return (
     <LookCard
@@ -130,25 +115,7 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
         />
       </LookField>
 
-      <LookField
-        field="cookieSettingsButton"
-        label={t('cookieSettingsButtonLabel')}
-        hint={t('cookieSettingsButtonDescription')}
-        isGroup={true}
-      >
-        <SegmentedControl<TCookieSettingsButton>
-          aria={{ describedBy: cookieButtonDescribedBy }}
-          options={cookieButtonOptions}
-          value={cookieSettingsButton}
-          onChange={(reach) => updateField('cookieSettingsButton', reach)}
-          lock={{ isDisabled: isArchived || !hasCookieBanner }}
-        />
-        {!hasCookieBanner && (
-          <p id={bannerOffNoteId} className={textVariants({ variant: 'hint' })}>
-            {t('cookieSettingsButtonBannerOff')}
-          </p>
-        )}
-      </LookField>
+      <CookieSettingsButtonField hasCookieBanner={hasCookieBanner} />
       <FooterPoweredByNote />
     </LookCard>
   );
