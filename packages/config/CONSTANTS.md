@@ -426,7 +426,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/billing` — `apps/platform/src/constants/billing.ts`
 
-- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`, `PLAN_CHANGE_RELEASE_FAILED`=`"billing.plan_change_release_failed"`, `CATALOGUE_SYNCED`=`"billing.catalogue_synced"`, `CATALOGUE_SYNC_FAILED`=`"billing.catalogue_sync_failed"`
+- **BILLING_LOG**: `WEBHOOK_SECRET_MISSING`=`"billing.webhook_secret_missing"`, `WEBHOOK_SIGNATURE_INVALID`=`"billing.webhook_signature_invalid"`, `WEBHOOK_HANDLER_FAILED`=`"billing.webhook_handler_failed"`, `TENANT_NOT_FOUND`=`"billing.tenant_not_found"`, `TENANT_CONFLICT`=`"billing.tenant_conflict"`, `TENANT_NOT_WRITABLE`=`"billing.tenant_not_writable"`, `PRICE_UNKNOWN`=`"billing.price_unknown"`, `SUBSCRIPTION_SUPERSEDED`=`"billing.subscription_superseded"`, `RECEIPT_UNCONFIGURED`=`"billing.receipt_unconfigured"`, `RECEIPT_OWNER_MISSING`=`"billing.receipt_owner_missing"`, `RECEIPT_FAILED`=`"billing.receipt_failed"`, `CHECKOUT_UNCONFIGURED`=`"billing.checkout_unconfigured"`, `CHECKOUT_PRICE_MISSING`=`"billing.checkout_price_missing"`, `CHECKOUT_FAILED`=`"billing.checkout_failed"`, `CHECKOUT_CUSTOMER_REPLACED`=`"billing.checkout_customer_replaced"`, `CHECKOUT_PROMO_REFUSED`=`"billing.checkout_promo_refused"`, `STRIPE_UNCONFIGURED`=`"billing.stripe_unconfigured"`, `OVERVIEW_FAILED`=`"billing.overview_failed"`, `NEXT_PAYMENT_FAILED`=`"billing.next_payment_failed"`, `PORTAL_FAILED`=`"billing.portal_failed"`, `PLAN_CHANGE_FAILED`=`"billing.plan_change_failed"`, `PLAN_CHANGE_PRICE_MISSING`=`"billing.plan_change_price_missing"`, `PLAN_CHANGE_LOAD_FAILED`=`"billing.plan_change_load_failed"`, `PLAN_CHANGE_RELEASE_FAILED`=`"billing.plan_change_release_failed"`, `CATALOGUE_SYNCED`=`"billing.catalogue_synced"`, `CATALOGUE_SYNC_FAILED`=`"billing.catalogue_sync_failed"`, `CATALOGUE_SYNC_MODE_INVALID`=`"billing.catalogue_sync_mode_invalid"`, `CATALOGUE_SYNC_MODE_MISMATCH`=`"billing.catalogue_sync_mode_mismatch"`, `CATALOGUE_REVALIDATE_SKIPPED`=`"billing.catalogue_revalidate_skipped"`, `CATALOGUE_REVALIDATE_FAILED`=`"billing.catalogue_revalidate_failed"`, `CATALOGUE_PLATFORM_TENANT_MISSING`=`"billing.catalogue_platform_tenant_missing"`
 - **STRIPE_SUBSCRIPTION_STATUS**: `ACTIVE`=`"active"`, `TRIALING`=`"trialing"`, `PAST_DUE`=`"past_due"`, `CANCELED`=`"canceled"`, `UNPAID`=`"unpaid"`
 - **STRIPE_RECURRING_INTERVAL**: `MONTHLY`=`"month"`, `YEARLY`=`"year"`
 - **STRIPE_PRORATION_BEHAVIOR**: `NONE`=`"none"`, `ALWAYS_INVOICE`=`"always_invoice"`
@@ -737,6 +737,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **STRIPE_EVENT_TYPE**: `SUBSCRIPTION_CREATED`=`"customer.subscription.created"`, `SUBSCRIPTION_UPDATED`=`"customer.subscription.updated"`, `SUBSCRIPTION_DELETED`=`"customer.subscription.deleted"`, `INVOICE_PAID`=`"invoice.paid"`, `INVOICE_PAYMENT_FAILED`=`"invoice.payment_failed"`, `PRICE_CREATED`=`"price.created"`, `PRICE_UPDATED`=`"price.updated"`, `PRICE_DELETED`=`"price.deleted"`, `PROMOTION_CODE_CREATED`=`"promotion_code.created"`, `PROMOTION_CODE_UPDATED`=`"promotion_code.updated"`, `COUPON_DELETED`=`"coupon.deleted"`
 
+### `@platform/constants/stripe-key-mode` — `apps/platform/src/constants/stripe-key-mode.ts`
+
+- **STRIPE_KEY_MODE**: `TEST`=`"test"`, `LIVE`=`"live"`
+
 ### `@platform/constants/tenant` — `apps/platform/src/constants/tenant.ts`
 
 - **TENANT_FIELD_ERROR**: `CONFIRM_REQUIRED`, `NAME_MISMATCH`, `NAME_REQUIRED`, `DOMAIN_INVALID`, `DOMAIN_TAKEN`, `DOMAIN_ATTACHED_ELSEWHERE`, `DOMAIN_LOCKED`, `DOMAIN_CUSTOM_MAIN`, `SLUG_REQUIRED`, `SLUG_INVALID`, `SLUG_RESERVED`, `SLUG_TAKEN`, `EMAIL_INVALID`, `LOCALE_UNSUPPORTED`, `PLAN_UNSUPPORTED`, `OWNER_EMAIL_TAKEN`
@@ -976,6 +980,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@web/constants/tenant-write` — `apps/web/src/constants/tenant-write.ts`
 
 - **TENANT_WRITE_LOG**: `UNRESOLVED`=`"tenant_write.unresolved"`
+
+### `@web/constants/testimonial` — `apps/web/src/constants/testimonial.ts`
+
+- **TESTIMONIAL_LOG**: `MODULE_FETCH_FAILED`=`"testimonial_module.fetch_failed"`
 
 ### `@web/constants/theme-tokens` — `apps/web/src/constants/theme-tokens.ts`
 

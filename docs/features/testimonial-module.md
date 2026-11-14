@@ -9,6 +9,7 @@ code:
   - packages/ui/src/components/molecules/quote-card/**
   - apps/web/src/modules/testimonial/**
   - apps/web/src/utils/to-testimonial-grid-columns/**
+  - apps/web/src/constants/testimonial.ts
   - apps/web/src/testing/modules/testimonial/**
 epics: [5028, 5047, 5016, 4987]
 ---
@@ -27,7 +28,7 @@ An editor shows quotes from clients or readers as social proof. Quotes are reusa
 
 ## Data
 
-- **`module_testimonial`** — `title`, `brandVariant`, `headingBlock`, `testimonials[]` (references to `block_testimonial`), `ctaButtons`, `displayMode` (Grid or Carousel), `contentAlignment` (Left, Center or Right), `cardAlignment` (Left or Center, initial Left), `layout` (`wideLayout`).
+- **`module_testimonial`** — `title`, `brandVariant`, `headingBlock`, `testimonials[]` (references to `block_testimonial`), `ctaButtons`, `displayMode` (Grid or Carousel), `contentAlignment` (Left, Center or Right), `cardAlignment` (Left or Center, initial Left), `layout` (`wideLayout`), and the Appearance group's `cardStyle`, `radiusScale` (Corners), `density` and `columns` (`GRID_COLUMNS`; empty is Auto) via `moduleAppearanceFragment`.
 - **`block_testimonial`** — `title` (Studio label), `name` (required, one string for every language), `quote` (per-language rich text; required in the default language), `role` (per-language one line), `image` (`localizedImageWithAlt`; per-language alt), `link` (optional reference to a `link` document).
 - **Service** — `getTestimonialModule` dereferences every quote and returns `TTestimonialModule`; each `TTestimonialItem` has `id` (the block's `_id`), `name`, `quote` (Portable Text), `role`, `image` and a resolved `link`. `cardAlignment` reads Left when unset.
 - **Caching** — tagged `modules:testimonial`, `module:<id>`, `block_testimonial`, `link`, `homePage` and `page_landing`. Publishing any `block_testimonial` revalidates every testimonial module ([rendering-and-caching](./rendering-and-caching.md)).
@@ -35,14 +36,14 @@ An editor shows quotes from clients or readers as social proof. Quotes are reusa
 ## Configuration
 
 - Editors (Studio) write the quotes and build the modules. No platform setting.
-- Not plan-gated or capability-gated today ([plans-and-entitlements](./plans-and-entitlements.md)).
-- Look reach: card style, radius, fonts and the band background restyle `QuoteCard` through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Voice has no reach.
+- The module itself is not plan-gated or capability-gated; only its section overrides are, by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
+- Look reach: card style, radius, fonts and the band background restyle `QuoteCard` through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). On Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling the quote cards in the grid and the carousel; the single-quote spotlight has no card frame, so it takes only the section's spacing. On Free they have no effect ([module-system](./module-system.md)). Voice has no reach.
 
 ## Constraints and invariants
 
 - A module picks 1–8 quotes, each at most once (`unique()`).
 - A module with a single quote always renders it as the spotlight: centred, larger avatar, `displayMode` and `cardAlignment` ignored.
-- The grid's column count comes from `toTestimonialGridColumns` (2→2, 3→3, 4→2, 5→3, 6→3, 7→3, 8→2), not the shared module rule; a lone last card in a row is centred.
+- In Grid mode with two or more quotes, a stored Columns value (2, 3 or 4) sets the grid's column count from `lg` up, through `toCardGridColumns`. On Auto the count comes from `toTestimonialGridColumns` (2→2, 3→3, 4→2, 5→3, 6→3, 7→3, 8→2), not the shared module rule. Below `sm` the grid shows one per row and from `sm` to `lg` two per row, either way; a lone last card in a row is centred. Columns is not plan-gated.
 - The carousel aligns Left or Center only; a Right content alignment lays the carousel out from the left. It is the shared `LabelledCarousel`, named after the heading.
 - The quote renders as rich text inside `QuoteCard`'s `<blockquote>`, in the italic read font. No typed quotation marks are added; the card shows a decorative brand-coloured quote-mark icon (`ICONS.QUOTE`, `text-brand-primary`) above every quote.
 - Without an image the card shows an `Avatar` with the person's initials.

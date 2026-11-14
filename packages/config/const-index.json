@@ -5596,6 +5596,46 @@
         "file": "apps/platform/src/constants/billing.ts"
       }
     ],
+    "billing.catalogue_sync_mode_invalid": [
+      {
+        "ref": "BILLING_LOG.CATALOGUE_SYNC_MODE_INVALID",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.catalogue_sync_mode_mismatch": [
+      {
+        "ref": "BILLING_LOG.CATALOGUE_SYNC_MODE_MISMATCH",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.catalogue_revalidate_skipped": [
+      {
+        "ref": "BILLING_LOG.CATALOGUE_REVALIDATE_SKIPPED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.catalogue_revalidate_failed": [
+      {
+        "ref": "BILLING_LOG.CATALOGUE_REVALIDATE_FAILED",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
+    "billing.catalogue_platform_tenant_missing": [
+      {
+        "ref": "BILLING_LOG.CATALOGUE_PLATFORM_TENANT_MISSING",
+        "scope": "app:platform",
+        "from": "@platform/constants/billing",
+        "file": "apps/platform/src/constants/billing.ts"
+      }
+    ],
     "active": [
       {
         "ref": "STRIPE_SUBSCRIPTION_STATUS.ACTIVE",
@@ -8468,6 +8508,22 @@
         "file": "apps/platform/src/constants/stripe-event.ts"
       }
     ],
+    "test": [
+      {
+        "ref": "STRIPE_KEY_MODE.TEST",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-key-mode",
+        "file": "apps/platform/src/constants/stripe-key-mode.ts"
+      }
+    ],
+    "live": [
+      {
+        "ref": "STRIPE_KEY_MODE.LIVE",
+        "scope": "app:platform",
+        "from": "@platform/constants/stripe-key-mode",
+        "file": "apps/platform/src/constants/stripe-key-mode.ts"
+      }
+    ],
     "CONFIRM_REQUIRED": [
       {
         "ref": "TENANT_FIELD_ERROR.CONFIRM_REQUIRED",
@@ -10326,6 +10382,14 @@
         "scope": "app:web",
         "from": "@web/constants/tenant-write",
         "file": "apps/web/src/constants/tenant-write.ts"
+      }
+    ],
+    "testimonial_module.fetch_failed": [
+      {
+        "ref": "TESTIMONIAL_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/testimonial",
+        "file": "apps/web/src/constants/testimonial.ts"
       }
     ],
     "theme_tokens.site_config_fetch_failed": [

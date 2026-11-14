@@ -6,7 +6,10 @@ import { customRenderAsync } from '@web/testing/custom-render';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { mockModule } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
-  testChildrenBetweenHeroAndModules,
+  testChildrenBetweenHeroAndModulesWithoutPostList,
+  testChildrenInsideFirstPostList,
+} from '@web/testing/shared/module-renderer-contract/module-renderer-children-contract';
+import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testRendersAllowedModulesInOrder,
@@ -51,7 +54,8 @@ describe(`<${PostIndexModuleRenderer.name}/>`, () => {
     heroBlogModuleMock: vi.mocked(HeroBlogModule),
     headingText: MOCK_PAGE_HEADING,
   });
-  testChildrenBetweenHeroAndModules({ setup });
+  testChildrenInsideFirstPostList({ setup });
+  testChildrenBetweenHeroAndModulesWithoutPostList({ setup });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,

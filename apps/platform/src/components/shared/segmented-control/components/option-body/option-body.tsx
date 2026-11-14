@@ -1,3 +1,4 @@
+import { DecorativeGlyph } from '@platform/components/shared/decorative-glyph';
 import type { ReactNode } from 'react';
 
 type TOptionBodyIds = { labelId: string; descriptionId: string };
@@ -32,11 +33,7 @@ export const OptionBody = ({
   classNames,
 }: TOptionBodyProps) => (
   <>
-    {glyph && (
-      <span aria-hidden={true} className={classNames.glyph}>
-        {glyph}
-      </span>
-    )}
+    <DecorativeGlyph glyph={glyph} className={classNames.glyph} />
     <span id={labelId} className={classNames.label}>
       {label}
     </span>

@@ -8,8 +8,7 @@ import {
 import { MOCK_PRICING_LABELS } from '@web/testing/modules/pricing/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
-  MOCK_RADIUS_OVERRIDE_SECTION,
-  MOCK_RADIUS_OVERRIDE_VALUE,
+  MOCK_RADIUS_SCOPE_CASES,
   MOCK_SCOPED_RADIUS_TOKEN,
 } from '@web/testing/shared/section-appearance/fixtures';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
@@ -151,18 +150,7 @@ describe(`<${PricingModuleView.name}/>`, () => {
     expect(footnote).toBeVisible();
   });
 
-  it.each([
-    {
-      title: 'with',
-      section: MOCK_RADIUS_OVERRIDE_SECTION,
-      scoped: MOCK_RADIUS_OVERRIDE_VALUE,
-    },
-    {
-      title: 'without',
-      section: { brandVariant: BRAND_VARIANT.PRIMARY },
-      scoped: '',
-    },
-  ])(
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
     'scopes the radius token to its section $title an override',
     ({ section, scoped }) => {
       setup({ section });

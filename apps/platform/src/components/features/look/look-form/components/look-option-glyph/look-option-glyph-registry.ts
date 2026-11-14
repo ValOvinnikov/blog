@@ -3,17 +3,25 @@ import {
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
   BUTTON_SHAPE,
+  COOKIE_SETTINGS_BUTTON,
   DENSITY,
+  FOOTER_LAYOUT,
+  FOOTER_SURFACE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
+  LANGUAGE_SWITCHER_STYLE,
   RADIUS_SCALE,
   type TAccountButtonStyle,
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
   type TButtonShape,
+  type TCookieSettingsButton,
   type TDensity,
+  type TFooterLayout,
+  type TFooterSurface,
   type THeaderControlShape,
   type THeaderControlStyle,
+  type TLanguageSwitcherStyle,
   type TRadiusScale,
 } from '@blog/config';
 import AccountButtonStyleCircle from '@platform/assets/look-glyphs/account-button-style-circle.svg';
@@ -26,14 +34,26 @@ import AccountPhonePlacementMenu from '@platform/assets/look-glyphs/account-phon
 import ButtonShapePill from '@platform/assets/look-glyphs/button-shape-pill.svg';
 import ButtonShapeRounded from '@platform/assets/look-glyphs/button-shape-rounded.svg';
 import ButtonShapeSquare from '@platform/assets/look-glyphs/button-shape-square.svg';
+import CookieSettingsButtonHidden from '@platform/assets/look-glyphs/cookie-settings-button-hidden.svg';
+import CookieSettingsButtonOnly from '@platform/assets/look-glyphs/cookie-settings-button-only.svg';
+import CookieSettingsButtonShown from '@platform/assets/look-glyphs/cookie-settings-button-shown.svg';
 import DensityCompact from '@platform/assets/look-glyphs/density-compact.svg';
 import DensityDefault from '@platform/assets/look-glyphs/density-default.svg';
+import FooterLayoutBigWordmark from '@platform/assets/look-glyphs/footer-layout-big-wordmark.svg';
+import FooterLayoutCentred from '@platform/assets/look-glyphs/footer-layout-centred.svg';
+import FooterLayoutColumns from '@platform/assets/look-glyphs/footer-layout-columns.svg';
+import FooterLayoutCompact from '@platform/assets/look-glyphs/footer-layout-compact.svg';
+import FooterSurfaceCard from '@platform/assets/look-glyphs/footer-surface-card.svg';
+import FooterSurfaceFullWidth from '@platform/assets/look-glyphs/footer-surface-full-width.svg';
 import HeaderControlShapeRound from '@platform/assets/look-glyphs/header-control-shape-round.svg';
 import HeaderControlShapeRounded from '@platform/assets/look-glyphs/header-control-shape-rounded.svg';
 import HeaderControlShapeSquare from '@platform/assets/look-glyphs/header-control-shape-square.svg';
 import HeaderControlStyleOutlined from '@platform/assets/look-glyphs/header-control-style-outlined.svg';
 import HeaderControlStylePlain from '@platform/assets/look-glyphs/header-control-style-plain.svg';
 import HeaderControlStyleSoft from '@platform/assets/look-glyphs/header-control-style-soft.svg';
+import LanguageSwitcherStyleCodes from '@platform/assets/look-glyphs/language-switcher-style-codes.svg';
+import LanguageSwitcherStyleMenuCode from '@platform/assets/look-glyphs/language-switcher-style-menu-code.svg';
+import LanguageSwitcherStyleMenuGlobe from '@platform/assets/look-glyphs/language-switcher-style-menu-globe.svg';
 import RadiusScaleLg from '@platform/assets/look-glyphs/radius-scale-lg.svg';
 import RadiusScaleMd from '@platform/assets/look-glyphs/radius-scale-md.svg';
 import RadiusScaleNone from '@platform/assets/look-glyphs/radius-scale-none.svg';
@@ -50,6 +70,10 @@ type TLookOptionGlyphValues = {
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;
+  footerLayout: TFooterLayout;
+  footerSurface: TFooterSurface;
+  cookieSettingsButton: TCookieSettingsButton;
+  languageSwitcherStyle: TLanguageSwitcherStyle;
 };
 
 type TLookOptionGlyphRegistry = {
@@ -98,6 +122,26 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
   accountPhonePlacement: {
     [ACCOUNT_PHONE_PLACEMENT.BAR]: AccountPhonePlacementBar,
     [ACCOUNT_PHONE_PLACEMENT.MENU]: AccountPhonePlacementMenu,
+  },
+  footerLayout: {
+    [FOOTER_LAYOUT.COLUMNS]: FooterLayoutColumns,
+    [FOOTER_LAYOUT.CENTRED]: FooterLayoutCentred,
+    [FOOTER_LAYOUT.COMPACT]: FooterLayoutCompact,
+    [FOOTER_LAYOUT.BIG_WORDMARK]: FooterLayoutBigWordmark,
+  },
+  footerSurface: {
+    [FOOTER_SURFACE.FULL_WIDTH]: FooterSurfaceFullWidth,
+    [FOOTER_SURFACE.CARD]: FooterSurfaceCard,
+  },
+  cookieSettingsButton: {
+    [COOKIE_SETTINGS_BUTTON.HIDDEN]: CookieSettingsButtonHidden,
+    [COOKIE_SETTINGS_BUTTON.SHOWN]: CookieSettingsButtonShown,
+    [COOKIE_SETTINGS_BUTTON.ONLY]: CookieSettingsButtonOnly,
+  },
+  languageSwitcherStyle: {
+    [LANGUAGE_SWITCHER_STYLE.MENU_CODE]: LanguageSwitcherStyleMenuCode,
+    [LANGUAGE_SWITCHER_STYLE.MENU_GLOBE]: LanguageSwitcherStyleMenuGlobe,
+    [LANGUAGE_SWITCHER_STYLE.CODES]: LanguageSwitcherStyleCodes,
   },
 };
 

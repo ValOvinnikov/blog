@@ -5,6 +5,7 @@ import {
   DENSITY,
   RADIUS_DECLARATIONS,
   RADIUS_SCALE,
+  type TMaybeUndefined,
 } from '@blog/config';
 import type { ISectionProps } from '@web/components/shared/section';
 import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
@@ -36,6 +37,23 @@ export const MOCK_RADIUS_OVERRIDE_SECTION: Pick<
 
 export const MOCK_RADIUS_OVERRIDE_VALUE =
   RADIUS_DECLARATIONS[RADIUS_SCALE.XL][MOCK_SCOPED_RADIUS_TOKEN];
+
+export const MOCK_RADIUS_SCOPE_CASES: {
+  title: string;
+  section: Pick<ISectionProps, 'brandVariant' | 'appearance'>;
+  scoped: TMaybeUndefined<string>;
+}[] = [
+  {
+    title: 'with',
+    section: MOCK_RADIUS_OVERRIDE_SECTION,
+    scoped: MOCK_RADIUS_OVERRIDE_VALUE,
+  },
+  {
+    title: 'without',
+    section: { brandVariant: BRAND_VARIANT.PRIMARY },
+    scoped: '',
+  },
+];
 
 export const MOCK_OUTLINED_BRAND_TINT_SECTION: Pick<
   ISectionProps,

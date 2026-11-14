@@ -7,6 +7,7 @@ import {
   screen,
 } from '@web/testing/custom-render';
 import { logger } from '@web/utils/logger/logger';
+import type { PropsWithChildren } from 'react';
 
 import {
   type IRenderModulesProps,
@@ -31,12 +32,16 @@ const { STUB_TEST_ID, STUB_PAGE_TEST_ID, StubModule, StubHeroModule } =
       StubModule: ({
         id,
         context,
-      }: {
+        children,
+      }: PropsWithChildren<{
         id: string;
         context?: { page?: number };
-      }) => (
+      }>) => (
         <>
-          <div data-testid={stubTestId}>{id}</div>
+          <div data-testid={stubTestId}>
+            {id}
+            {children}
+          </div>
           <output data-testid={stubPageTestId}>{context?.page}</output>
         </>
       ),
@@ -63,6 +68,15 @@ const MOCK_HERO_ID = faker.string.uuid();
 const MOCK_PAGE = faker.number.int({ min: 2, max: 9 });
 const MOCK_UNKNOWN_MODULE_TYPE = 'module_unknown';
 const MOCK_UNKNOWN_HERO_TYPE = 'module_heroUnknown';
+const MOCK_CTA_AND_POST_LIST_MODULES = [
+  { type: 'module_cta' as const, id: MOCK_CTA_ID },
+  { type: 'module_postList' as const, id: MOCK_POST_LIST_ID },
+];
+const MOCK_SLOT_TEST_ID = 'slot-content';
+const MOCK_SLOT = {
+  moduleType: 'module_postList' as const,
+  node: <span data-testid={MOCK_SLOT_TEST_ID} />,
+};
 
 const setupModules = customRenderServerAsync(
   async (props: IRenderModulesProps) => renderModules(props),
@@ -121,10 +135,7 @@ describe(renderModules, () => {
 
   it('renders every module in the given order', async () => {
     await setupModules({
-      modules: [
-        { type: 'module_cta', id: MOCK_CTA_ID },
-        { type: 'module_postList', id: MOCK_POST_LIST_ID },
-      ],
+      modules: MOCK_CTA_AND_POST_LIST_MODULES,
     });
 
     const stubs = screen.getAllByTestId(STUB_TEST_ID);
@@ -150,6 +161,33 @@ describe(renderModules, () => {
     const renderedIds = stubs.map((stub) => stub.textContent);
 
     expect(renderedIds).toEqual([MOCK_CTA_ID, MOCK_POST_LIST_ID]);
+  });
+});
+
+describe(`${renderModules.name} with a slot`, () => {
+  it('renders the slot inside the first module of its type', async () => {
+    await setupModules({
+      modules: MOCK_CTA_AND_POST_LIST_MODULES,
+      slot: MOCK_SLOT,
+    });
+
+    const slot = screen.getByTestId(MOCK_SLOT_TEST_ID);
+    const [ctaStub, postListStub] = screen.getAllByTestId(STUB_TEST_ID);
+
+    expect(postListStub).toContainElement(slot);
+    expect(ctaStub).not.toContainElement(slot);
+  });
+
+  it('renders the slot before the modules when none is of its type', async () => {
+    await setupModules({ slot: MOCK_SLOT });
+
+    const slot = screen.getByTestId(MOCK_SLOT_TEST_ID);
+    const stub = screen.getByTestId(STUB_TEST_ID);
+
+    expect(stub).not.toContainElement(slot);
+    expect(slot.compareDocumentPosition(stub)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 });
 

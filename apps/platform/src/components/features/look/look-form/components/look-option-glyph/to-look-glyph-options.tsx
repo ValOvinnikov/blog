@@ -8,7 +8,9 @@ import type {
 
 export const toLookGlyphOptions = <TField extends TLookOptionGlyphField>(
   field: TField,
-  values: Record<string, TLookOptionGlyphValue<TField>>,
+  values:
+    | Record<string, TLookOptionGlyphValue<TField>>
+    | readonly TLookOptionGlyphValue<TField>[],
   labelFor: (value: TLookOptionGlyphValue<TField>) => string,
   descriptionFor?: (value: TLookOptionGlyphValue<TField>) => string,
 ): TSegmentedControlProps<TLookOptionGlyphValue<TField>>['options'] =>

@@ -5,11 +5,13 @@ import {
 import { LOOK_FIELD } from '@blog/db/constants';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { LOOK_ROW } from '@platform/constants/look-row';
+import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { CARD_FIELDS } from '@platform/utils/look-form-values/look-form-values';
 import { useTranslations } from 'next-intl';
 
@@ -36,12 +38,11 @@ export const LanguageSwitcherCard = ({
   );
   const isStylePlanLocked = isPlanLocked(LOOK_FIELD.LANGUAGE_SWITCHER_STYLE);
 
-  const languageSwitcherOptions = Object.values(LANGUAGE_SWITCHER_STYLE).map(
-    (style) => ({
-      value: style,
-      label: t(`languageSwitcherOptionLabel.${style}`),
-      description: t(`languageSwitcherOptionDescription.${style}`),
-    }),
+  const languageSwitcherOptions = toLookGlyphOptions(
+    'languageSwitcherStyle',
+    LANGUAGE_SWITCHER_STYLE,
+    (style) => t(`languageSwitcherOptionLabel.${style}`),
+    (style) => t(`languageSwitcherOptionDescription.${style}`),
   );
   const description = t('languageSwitcherDescription');
 
@@ -70,6 +71,7 @@ export const LanguageSwitcherCard = ({
             value={languageSwitcherStyle}
             onChange={(style) => updateField('languageSwitcherStyle', style)}
             lock={lock}
+            layout={SEGMENTED_LAYOUT.WIDE}
           />
         </LookField>
       ) : (
