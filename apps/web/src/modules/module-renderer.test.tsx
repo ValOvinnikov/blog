@@ -7,7 +7,7 @@ import {
   screen,
 } from '@web/testing/custom-render';
 import { logger } from '@web/utils/logger/logger';
-import type { ReactNode } from 'react';
+import type { PropsWithChildren } from 'react';
 
 import {
   type IRenderModulesProps,
@@ -33,11 +33,10 @@ const { STUB_TEST_ID, STUB_PAGE_TEST_ID, StubModule, StubHeroModule } =
         id,
         context,
         children,
-      }: {
+      }: PropsWithChildren<{
         id: string;
         context?: { page?: number };
-        children?: ReactNode;
-      }) => (
+      }>) => (
         <>
           <div data-testid={stubTestId}>
             {id}
