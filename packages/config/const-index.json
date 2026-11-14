@@ -11274,9 +11274,25 @@
         "file": "packages/config/src/constants/http-statuses.ts"
       }
     ],
+    "408": [
+      {
+        "ref": "HTTP_STATUS.REQUEST_TIMEOUT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
     "409": [
       {
         "ref": "HTTP_STATUS.CONFLICT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/http-statuses.ts"
+      }
+    ],
+    "425": [
+      {
+        "ref": "HTTP_STATUS.TOO_EARLY",
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/http-statuses.ts"

@@ -1,6 +1,7 @@
 import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_SEND_GATE,
+  NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SLOW_PAUSE_MS,
 } from '@worker/constants/newsletter-send';
@@ -22,8 +23,8 @@ import {
   completeNewsletterSend,
   recordNewsletterSends,
   releaseNewsletterSendClaim,
-  reportNewsletterSendFailed,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
+import { reportRunFailed } from '@worker/units/report-run-failed';
 import { sleep } from 'workflow';
 
 import { sendNewsletterPost } from './send-newsletter-post';
@@ -32,6 +33,7 @@ vi.mock('@worker/units/newsletter-send/check-newsletter-post');
 vi.mock('@worker/units/newsletter-send/gate-newsletter-send');
 vi.mock('@worker/units/newsletter-send/send-newsletter-page');
 vi.mock('@worker/units/newsletter-send/settle-newsletter-send');
+vi.mock('@worker/units/report-run-failed');
 vi.mock('workflow');
 
 const MOCK_READY = {
@@ -211,7 +213,8 @@ describe(sendNewsletterPost, () => {
     );
 
     await expect(runSend()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
-    expect(reportNewsletterSendFailed).toHaveBeenCalledWith(
+    expect(reportRunFailed).toHaveBeenCalledExactlyOnceWith(
+      NEWSLETTER_SEND_LOG.RUN_FAILED,
       MOCK_TENANT_ID,
       MOCK_POST_ID,
       MOCK_WORKFLOW_CRASH,

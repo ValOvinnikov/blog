@@ -4,12 +4,20 @@ import {
   ENQUEUE_TIMESTAMP_HEADER,
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
-import { WEB_SCHEDULED_POST_PURGE_PATH } from '@worker/constants/scheduled-post-purge';
+import {
+  RETRY_AFTER_HEADER,
+  RETRY_AFTER_SECOND_MS,
+} from '@worker/constants/retry-after';
+import {
+  SCHEDULED_POST_PURGE_RETRYABLE_STATUSES,
+  WEB_SCHEDULED_POST_PURGE_PATH,
+} from '@worker/constants/scheduled-post-purge';
+import { MOCK_NOW, freezeClock } from '@worker/testing/clock/frozen-clock';
 import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_PROVISION_ENV } from '@worker/testing/provision-env/fake-provision-env';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { env as mockEnv } from '@worker/utils/env/__mocks__/env';
-import { FatalError } from 'workflow';
+import { FatalError, RetryableError } from 'workflow';
 
 import { purgeScheduledPostPages } from './purge-scheduled-post-pages';
 
@@ -19,6 +27,7 @@ vi.mock('workflow');
 const { webAppBaseUrl, revalidateSecret } = MOCK_PROVISION_ENV;
 
 const fetchMock = vi.fn();
+const MOCK_RETRY_SECONDS = 30;
 
 function runPurge() {
   return purgeScheduledPostPages(MOCK_TENANT_ID, MOCK_POST_ID);
@@ -34,6 +43,7 @@ describe(purgeScheduledPostPages, () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.useRealTimers();
   });
 
   it("posts the post to web's purge route, signed with the revalidate secret", async () => {
@@ -72,13 +82,48 @@ describe(purgeScheduledPostPages, () => {
     expect(error).not.toBeInstanceOf(FatalError);
   });
 
-  it('fails for good when web refuses the purge', async () => {
-    fetchMock.mockResolvedValue(
-      new Response('', { status: HTTP_STATUS.UNAUTHORIZED }),
-    );
+  it.each([HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.NOT_FOUND])(
+    'fails for good when web answers %i',
+    async (status) => {
+      fetchMock.mockResolvedValue(new Response('', { status }));
 
-    await expect(runPurge()).rejects.toThrow(FatalError);
-  });
+      await expect(runPurge()).rejects.toThrow(FatalError);
+    },
+  );
+
+  it.each(SCHEDULED_POST_PURGE_RETRYABLE_STATUSES)(
+    'retries at the time web asks for when it answers %i',
+    async (status) => {
+      freezeClock();
+      fetchMock.mockResolvedValue(
+        new Response('', {
+          status,
+          headers: { [RETRY_AFTER_HEADER]: String(MOCK_RETRY_SECONDS) },
+        }),
+      );
+
+      const error = await runPurge().catch((caught: unknown) => caught);
+
+      expect(error).toBeInstanceOf(RetryableError);
+      expect((error as RetryableError).retryAfter).toEqual(
+        new Date(
+          MOCK_NOW.getTime() + MOCK_RETRY_SECONDS * RETRY_AFTER_SECOND_MS,
+        ),
+      );
+    },
+  );
+
+  it.each(SCHEDULED_POST_PURGE_RETRYABLE_STATUSES)(
+    'retries on its own schedule when web answers %i without a retry time',
+    async (status) => {
+      fetchMock.mockResolvedValue(new Response('', { status }));
+
+      const error = await runPurge().catch((caught: unknown) => caught);
+
+      expect(error).toBeInstanceOf(Error);
+      expect(error).not.toBeInstanceOf(FatalError);
+    },
+  );
 
   it.each(['WEB_APP_URL', 'SANITY_REVALIDATE_SECRET'])(
     'fails for good without calling web when %s is unset',
