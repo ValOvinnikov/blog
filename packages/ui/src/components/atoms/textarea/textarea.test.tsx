@@ -1,3 +1,4 @@
+import { itActsAsAControlledTextbox } from '@blog/ui/testing/atoms/controlled-textbox';
 import {
   customRender,
   renderElement,
@@ -12,12 +13,10 @@ import { Textarea } from './textarea';
 faker.seed(123);
 
 const MOCK_ARIA_LABEL = faker.lorem.words(2);
-const MOCK_VALUE = faker.lorem.paragraphs(2);
 const MOCK_ERROR = faker.lorem.sentence();
 const MOCK_ERROR_ID = faker.lorem.slug(2);
 const MOCK_FIRST_LINE = faker.lorem.word();
 const MOCK_SECOND_LINE = faker.lorem.word();
-const MOCK_TYPED_CHARACTER = faker.string.alpha(1);
 
 const setup = customRender(Textarea, {
   value: '',
@@ -40,32 +39,7 @@ describe(`<${Textarea.name}/>`, () => {
     user = userEvent.setup();
   });
 
-  it('renders a textbox named by the ariaLabel', () => {
-    setup();
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-
-    expect(textbox).toBeVisible();
-  });
-
-  it('renders the controlled value', () => {
-    setup({ value: MOCK_VALUE });
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-
-    expect(textbox).toHaveValue(MOCK_VALUE);
-  });
-
-  it('reports typed input without keeping its own state', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-    await user.type(textbox, MOCK_TYPED_CHARACTER);
-
-    expect(onChange).toHaveBeenCalledWith(MOCK_TYPED_CHARACTER);
-    expect(textbox).toHaveValue('');
-  });
+  itActsAsAControlledTextbox(Textarea);
 
   it('updates the value as the user types across lines under a controlling parent', async () => {
     renderElement(<ControlledTextarea />);
@@ -94,14 +68,6 @@ describe(`<${Textarea.name}/>`, () => {
 
     expect(textbox).toBeInvalid();
     expect(textbox).toHaveAccessibleDescription(MOCK_ERROR);
-  });
-
-  it('disables the field when isDisabled is true', () => {
-    setup({ isDisabled: true });
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-
-    expect(textbox).toBeDisabled();
   });
 
   it('requires the field when isRequired is true', () => {
