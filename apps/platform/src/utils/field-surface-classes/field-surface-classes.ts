@@ -4,5 +4,8 @@ export const FIELD_SURFACE_CLASSES =
 export const FIELD_FOCUS_CLASSES =
   'focus-visible:outline-hidden focus-visible:border-platform-brand-ink data-[invalid]:focus-visible:border-platform-brand-ink focus-visible:shadow-platform-focus-glow';
 
+export const FIELD_POPUP_OPEN_CLASSES =
+  'data-[popup-open]:border-platform-brand-ink data-[popup-open]:shadow-platform-focus-glow';
+
 export const EDITABLE_SHELL_FOCUS_CLASSES =
   'has-[[contenteditable]:focus-visible]:border-platform-brand-ink has-[[contenteditable][data-invalid]:focus-visible]:border-platform-brand-ink has-[[contenteditable]:focus-visible]:shadow-platform-focus-glow';

@@ -4,6 +4,7 @@ import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
 import type { TControlAria } from '@blog/config';
 import type { IWithClassName } from '@blog/config/types';
+import { DecorativeGlyph } from '@platform/components/shared/decorative-glyph';
 import {
   SEGMENTED_LAYOUT,
   type TSegmentedLayout,
@@ -82,11 +83,7 @@ export const SegmentedControl = <TValue extends string>({
           aria-disabled={isLocked || undefined}
           className={option()}
         >
-          {glyph && (
-            <span aria-hidden={true} className={glyphSlot()}>
-              {glyph}
-            </span>
-          )}
+          <DecorativeGlyph glyph={glyph} className={glyphSlot()} />
           {label}
         </Toggle>
       ))}
