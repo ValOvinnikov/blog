@@ -313,16 +313,24 @@ text-platform-on-selected` — near-black and white in Light, yellow on a dark
 - A selected item shows a 3:1 marker (`border-platform-brand`, a bar), not a
   `bg-platform-brand-weak` fill alone, and announces itself as pressed, checked or
   selected.
-- Focus is `focusRingClasses(ground)`
+- **Focus is one rule for every control:** a 2px gap in the control's ground,
+  a 2px yellow `focus-ring`, and in Light a 1px near-black `focus-edge`
+  around it. Write `focusRingClasses(ground)`
   (`@platform/utils/focus-ring-classes/focus-ring-classes`), the ring
   `Button` draws: pass the `FOCUS_RING_GROUND` (`@platform/constants/focus-ring`)
-  the control sits on, so the offset matches its surface;
-  `insetFocusRingClasses` where a clipping parent would cut the ring off.
-  A text field instead takes `FIELD_FOCUS_CLASSES`
+  the control sits on, so the gap matches its surface;
+  `insetFocusRingClasses` for a row or menu item a clipping parent would cut
+  the ring off (its ground is the row's own fill). A mark shown on something
+  other than `:focus-visible` (a highlighted menu item or list option, a
+  focused input inside the control) passes the `FOCUS_RING_TRIGGER`. A text
+  field, textarea, link field or rich-text editor instead takes
+  `FIELD_FOCUS_CLASSES` or `EDITABLE_SHELL_FOCUS_CLASSES`
   (`@platform/utils/field-surface-classes/field-surface-classes`): a
-  `brand-ink` border in a 3px `brand-line` glow.
-  Never hand-write a `focus-visible:ring-*` or `focus-visible:shadow-*` list.
-  `outline-platform-brand-weak` (1.12:1) is not a focus indicator.
+  `brand-ink` border in a 3px `focus-ring` glow, kept when invalid.
+  Never hand-write a focus style — no `focus-visible:`, `data-[highlighted]:`
+  ring, shadow, outline or border outside these helpers; a missing ground or
+  trigger is added to the helper. `outline-platform-brand-weak` (1.12:1) is
+  not a focus indicator.
 - A colour transition is `COLOUR_TRANSITION_CLASSES`
   (`@platform/utils/transition-classes/transition-classes`), never
   `transition-colors` with its own duration.

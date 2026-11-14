@@ -35,6 +35,7 @@ The public site and `@blog/ui` draw every colour, size, radius, spacing step, sh
   - `--radius-platform-bar` (2px, `rounded-platform-bar`): progress segments and preset mini bars; the one 2px radius in the platform.
   - Six dark `rail` colours, as `platform-rail*` utilities: `--platform-rail` #0f1115 (the rail, the phone header and the Choose a workspace rail), `--platform-rail-line` #1c1f26 (rail borders and rules), `--platform-rail-text` #c9cfda (body text on the rail), `--platform-rail-muted` #7d8696 (upcoming steps, summaries), `--platform-rail-raised` #20242e (the current row, upcoming segments, hovers), `--platform-rail-accent` #ffc233 (done circles and segments, the current ring).
   - The `rail` colours are the same in Light and Dark and never follow the platform theme, unlike the sidebar's `side` tokens they were copied from. `tv()` lists `platform-28` and `platform-bar` so a later `text-platform-28` or `rounded-platform-bar` replaces an earlier platform size or radius.
+- Platform focus tokens: `--platform-focus-ring` (#ffc233 in every theme) and `--platform-focus-edge` (#12141a in Light, `transparent` in Dark and system-dark). `--shadow-platform-focus-ring` and `--inset-shadow-platform-focus-ring` draw a 2px gap in `--platform-focus-ground`, the 2px ring and the 1px edge; `--shadow-platform-focus-glow` is the fields' 3px ring. `tv()` lists the shadows (and the inset one as an `inset-shadow`), so the inset ring stacks with a drop shadow and the outer one replaces an earlier platform shadow.
 
 ## Data
 

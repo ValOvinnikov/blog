@@ -6,6 +6,5 @@ export const sidebarCollapseToggleVariants = tv({
     ...BAR_CONTROL_CLASSES,
     'hidden size-9 shrink-0 items-center justify-center text-platform-muted md:inline-flex',
     'hover:text-platform-text',
-    'focus-visible:border-platform-brand-ink focus-visible:text-platform-text',
   ],
 });

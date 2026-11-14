@@ -1,4 +1,9 @@
+import {
+  FOCUS_RING_GROUND,
+  FOCUS_RING_TRIGGER,
+} from '@platform/constants/focus-ring';
 import { HUE_SLIDER_TRACK } from '@platform/constants/hue-slider';
+import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const hueSliderVariants = tv({
@@ -13,8 +18,10 @@ export const hueSliderVariants = tv({
       'block size-5 rounded-full bg-white',
       'border border-platform-thumb-line shadow-platform-thumb',
       'transition-colors',
-      // The focusable element is the thumb's hidden range input, not the thumb itself.
-      'has-[:focus-visible]:not-data-[dragging]:shadow-[0_0_0_2px_var(--platform-surface),0_0_0_4px_var(--platform-brand-ink)]',
+      focusRingClasses(
+        FOCUS_RING_GROUND.SURFACE,
+        FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE,
+      ),
     ],
   },
   variants: {

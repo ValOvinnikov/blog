@@ -6778,9 +6778,57 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "POPOVER_HOVER": [
+      {
+        "ref": "FOCUS_RING_GROUND.POPOVER_HOVER",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
     "THEME_TRACK": [
       {
         "ref": "FOCUS_RING_GROUND.THEME_TRACK",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "BRAND_WEAK": [
+      {
+        "ref": "FOCUS_RING_GROUND.BRAND_WEAK",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "FOCUS_VISIBLE": [
+      {
+        "ref": "FOCUS_RING_TRIGGER.FOCUS_VISIBLE",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "HIGHLIGHTED": [
+      {
+        "ref": "FOCUS_RING_TRIGGER.HIGHLIGHTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "LIST_HIGHLIGHTED": [
+      {
+        "ref": "FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
+    "INNER_FOCUS_VISIBLE": [
+      {
+        "ref": "FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE",
         "scope": "app:platform",
         "from": "@platform/constants/focus-ring",
         "file": "apps/platform/src/constants/focus-ring.ts"

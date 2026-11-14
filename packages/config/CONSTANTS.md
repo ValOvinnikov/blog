@@ -535,7 +535,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@platform/constants/focus-ring` — `apps/platform/src/constants/focus-ring.ts`
 
-- **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_2`, `SURFACE_HEAD`, `POPOVER`, `THEME_TRACK`
+- **FOCUS_RING_GROUND**: `SIDE`, `BG`, `SURFACE`, `SURFACE_2`, `SURFACE_HEAD`, `POPOVER`, `POPOVER_HOVER`, `THEME_TRACK`, `BRAND_WEAK`
+- **FOCUS_RING_TRIGGER**: `FOCUS_VISIBLE`, `HIGHLIGHTED`, `LIST_HIGHLIGHTED`, `INNER_FOCUS_VISIBLE`
 
 ### `@platform/constants/get-started` — `apps/platform/src/constants/get-started.ts`
 

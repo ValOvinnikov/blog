@@ -1,35 +1,62 @@
 import {
   FOCUS_RING_GROUND,
+  FOCUS_RING_TRIGGER,
   type TFocusRingGround,
-  type TInsetFocusRingGround,
+  type TFocusRingTrigger,
 } from '@platform/constants/focus-ring';
 
-// Whole literals per ground: Tailwind only generates classes it finds spelled out in source.
-const FOCUS_RING_SHADOW_CLASSES: Record<TFocusRingGround, string> = {
-  [FOCUS_RING_GROUND.SIDE]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-side),0_0_0_4px_var(--platform-side-accent)]',
-  [FOCUS_RING_GROUND.BG]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-bg),0_0_0_4px_var(--platform-brand-ink)]',
+// Whole literals: Tailwind only generates classes it finds spelled out in source.
+const FOCUS_RING_GROUND_CLASSES: Record<TFocusRingGround, string> = {
+  [FOCUS_RING_GROUND.SIDE]: '[--platform-focus-ground:var(--platform-side)]',
+  [FOCUS_RING_GROUND.BG]: '[--platform-focus-ground:var(--platform-bg)]',
   [FOCUS_RING_GROUND.SURFACE]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-surface),0_0_0_4px_var(--platform-brand-ink)]',
+    '[--platform-focus-ground:var(--platform-surface)]',
   [FOCUS_RING_GROUND.SURFACE_2]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-surface-2),0_0_0_4px_var(--platform-brand-ink)]',
+    '[--platform-focus-ground:var(--platform-surface-2)]',
   [FOCUS_RING_GROUND.SURFACE_HEAD]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-surface-head),0_0_0_4px_var(--platform-brand-ink)]',
+    '[--platform-focus-ground:var(--platform-surface-head)]',
   [FOCUS_RING_GROUND.POPOVER]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-popover),0_0_0_4px_var(--platform-brand-ink)]',
+    '[--platform-focus-ground:var(--platform-popover)]',
+  [FOCUS_RING_GROUND.POPOVER_HOVER]:
+    '[--platform-focus-ground:var(--platform-popover-hover)]',
   [FOCUS_RING_GROUND.THEME_TRACK]:
-    'focus-visible:shadow-[0_0_0_2px_var(--platform-theme-track),0_0_0_4px_var(--platform-brand-ink)]',
+    '[--platform-focus-ground:var(--platform-theme-track)]',
+  [FOCUS_RING_GROUND.BRAND_WEAK]:
+    '[--platform-focus-ground:var(--platform-brand-weak)]',
 };
 
-const INSET_FOCUS_RING_SHADOW_CLASSES: Record<TInsetFocusRingGround, string> = {
-  [FOCUS_RING_GROUND.SURFACE]:
-    'focus-visible:shadow-[inset_0_0_0_2px_var(--platform-surface),inset_0_0_0_4px_var(--platform-brand-ink)]',
+const FOCUS_RING_TRIGGER_CLASSES: Record<TFocusRingTrigger, string> = {
+  [FOCUS_RING_TRIGGER.FOCUS_VISIBLE]:
+    'focus-visible:outline-hidden focus-visible:shadow-platform-focus-ring',
+  [FOCUS_RING_TRIGGER.HIGHLIGHTED]:
+    'data-[highlighted]:shadow-platform-focus-ring',
+  [FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED]:
+    'group-focus-visible:data-[highlighted]:shadow-platform-focus-ring',
+  [FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE]:
+    'has-[:focus-visible]:not-data-[dragging]:shadow-platform-focus-ring',
 };
 
-export const focusRingClasses = (ground: TFocusRingGround): string =>
-  `focus-visible:outline-hidden ${FOCUS_RING_SHADOW_CLASSES[ground]}`;
+// An inset shadow, so it stacks with the element's own drop shadow instead of replacing it.
+const INSET_FOCUS_RING_TRIGGER_CLASSES: Record<TFocusRingTrigger, string> = {
+  [FOCUS_RING_TRIGGER.FOCUS_VISIBLE]:
+    'focus-visible:outline-hidden focus-visible:inset-shadow-platform-focus-ring',
+  [FOCUS_RING_TRIGGER.HIGHLIGHTED]:
+    'data-[highlighted]:inset-shadow-platform-focus-ring',
+  [FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED]:
+    'group-focus-visible:data-[highlighted]:inset-shadow-platform-focus-ring',
+  [FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE]:
+    'has-[:focus-visible]:not-data-[dragging]:inset-shadow-platform-focus-ring',
+};
+
+export const focusRingClasses = (
+  ground: TFocusRingGround,
+  trigger: TFocusRingTrigger = FOCUS_RING_TRIGGER.FOCUS_VISIBLE,
+): string =>
+  `${FOCUS_RING_TRIGGER_CLASSES[trigger]} ${FOCUS_RING_GROUND_CLASSES[ground]}`;
 
 // For an element whose clipping parent would cut off a ring drawn outside it.
-export const insetFocusRingClasses = (ground: TInsetFocusRingGround): string =>
-  `focus-visible:outline-hidden ${INSET_FOCUS_RING_SHADOW_CLASSES[ground]}`;
+export const insetFocusRingClasses = (
+  ground: TFocusRingGround,
+  trigger: TFocusRingTrigger = FOCUS_RING_TRIGGER.FOCUS_VISIBLE,
+): string =>
+  `${INSET_FOCUS_RING_TRIGGER_CLASSES[trigger]} ${FOCUS_RING_GROUND_CLASSES[ground]}`;

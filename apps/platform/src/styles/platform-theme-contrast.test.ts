@@ -70,6 +70,8 @@ const TOKEN = {
   BRAND_WEAK: 'platform-brand-weak',
   CONTROL_LINE: 'platform-control-line',
   CONTROL_LINE_TINT: 'platform-control-line-tint',
+  FOCUS_EDGE: 'platform-focus-edge',
+  FOCUS_RING: 'platform-focus-ring',
   FOLLOW_MARK: 'platform-follow-mark',
   FOLLOW_MARK_INK: 'platform-follow-mark-ink',
   GLYPH_ACCENT: 'platform-glyph-accent',
@@ -147,19 +149,11 @@ const SHARED_PAIRS: readonly TPair[] = [
     TOKEN.SURFACE_HEAD,
     BOUNDARY,
   ],
-  ['2px focus ring on card', TOKEN.BRAND_INK, TOKEN.SURFACE, FOCUS],
-  ['Focus ring on open row', TOKEN.BRAND_INK, TOKEN.SURFACE_2, FOCUS],
-  ['Focus ring on sidebar', TOKEN.SIDE_ACCENT, TOKEN.SIDE, FOCUS],
   ['Error text on card', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Invalid border on card', TOKEN.BAD_LINE, TOKEN.SURFACE, BOUNDARY],
   ['Text on menu', TOKEN.TEXT, TOKEN.POPOVER, TEXT],
   ['Muted on hovered menu row', TOKEN.MUTED, TOKEN.POPOVER_HOVER, TEXT],
-  [
-    'Check and focus ring on hovered row',
-    TOKEN.BRAND_INK,
-    TOKEN.POPOVER_HOVER,
-    FOCUS,
-  ],
+  ['Check on hovered row', TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, FOCUS],
   ['Theme switch border on menu', TOKEN.CONTROL_LINE, TOKEN.POPOVER, BOUNDARY],
   [
     'Name on hovered account trigger',
@@ -226,7 +220,6 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Selected chip hover border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Locked text on page', TOKEN.MUTED, TOKEN.BG, TEXT],
-  ['Focus ring on toolbar track', TOKEN.BRAND_INK, TOKEN.THEME_TRACK, FOCUS],
   ['Success edge and icon on toast', TOKEN.OK, TOKEN.POPOVER, BOUNDARY],
   ['Warning edge and icon on toast', TOKEN.WARN, TOKEN.POPOVER, BOUNDARY],
   ['Error edge and icon on toast', TOKEN.BAD, TOKEN.POPOVER, BOUNDARY],
@@ -257,14 +250,37 @@ const SHARED_PAIRS: readonly TPair[] = [
   ],
 ];
 
+const FOCUS_GROUNDS = [
+  TOKEN.BG,
+  TOKEN.SURFACE,
+  TOKEN.SURFACE_2,
+  TOKEN.SURFACE_HEAD,
+  TOKEN.POPOVER,
+  TOKEN.POPOVER_HOVER,
+  TOKEN.THEME_TRACK,
+  TOKEN.SIDE,
+  TOKEN.BRAND_WEAK,
+] as const;
+
+const focusMarkPairs = (mark: string): TPair[] =>
+  FOCUS_GROUNDS.map((ground) => [
+    `Focus mark on ${ground}`,
+    mark,
+    ground,
+    FOCUS,
+  ]);
+
 const LIGHT_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
   [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.THEME_TRACK, BOUNDARY],
+  ['Focus edge around the ring', TOKEN.FOCUS_EDGE, TOKEN.FOCUS_RING, FOCUS],
+  ...focusMarkPairs(TOKEN.FOCUS_EDGE),
 ];
 
 const DARK_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
   [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, BOUNDARY],
+  ...focusMarkPairs(TOKEN.FOCUS_RING),
 ];
 
 describe.each([

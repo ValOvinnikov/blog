@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const lookFullscreenDialogVariants = tv({
@@ -22,7 +24,7 @@ export const lookFullscreenDialogVariants = tv({
     close: ['col-start-2 row-start-1 flex flex-none items-center'],
     stage: [
       'flex min-h-0 flex-1 flex-col bg-platform-theme-track p-2.5 lg:p-6',
-      'focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-platform-brand-ink',
+      insetFocusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
     ],
   },
 });

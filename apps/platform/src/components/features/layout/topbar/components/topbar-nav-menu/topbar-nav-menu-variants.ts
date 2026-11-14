@@ -11,7 +11,7 @@ export const topbarNavMenuVariants = tv({
       ...BAR_CONTROL_CLASSES,
       'md:hidden',
       'inline-flex size-11 shrink-0 items-center justify-center text-platform-muted',
-      'focus-visible:border-platform-brand-ink data-[popup-open]:text-platform-text',
+      'data-[popup-open]:text-platform-text',
     ],
     popup: [
       'flex w-72 max-w-[var(--available-width)] flex-col overflow-hidden p-1.5',
