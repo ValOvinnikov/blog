@@ -1,6 +1,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import type { ReactNode } from 'react';
 
 import { bookmarksListVariants } from './bookmarks-list-variants';
@@ -39,7 +40,7 @@ export const BookmarksList = ({
     hint: hintSlot,
     emptyMessage: emptyMessageSlot,
   } = bookmarksListVariants();
-  const isEmpty = rows.length === 0;
+  const isEmpty = !hasArrayGotItems(rows);
 
   return (
     <div className={root({ class: className })} data-testid={dataTestId}>
