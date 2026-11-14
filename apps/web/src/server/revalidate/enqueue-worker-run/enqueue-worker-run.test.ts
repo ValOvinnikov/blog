@@ -5,15 +5,11 @@ import {
   isValidEnqueueSignature,
 } from '@blog/utils/enqueue-signature';
 import { faker } from '@faker-js/faker';
-import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
-import {
-  enqueueNewsletterPostSend,
-  NEWSLETTER_POST_SEND_PATH,
-} from './enqueue-newsletter-post-send';
+import { enqueueWorkerRun } from './enqueue-worker-run';
 
 const { envMock } = vi.hoisted(() => ({
   envMock: {} as {
@@ -28,16 +24,23 @@ faker.seed(7163);
 
 const MOCK_WORKER_URL = faker.internet.url({ appendSlash: false });
 const MOCK_SECRET = faker.string.alphanumeric(32);
+const MOCK_PATH = `/api/${faker.lorem.slug()}`;
 const MOCK_REQUEST = {
   tenantId: MOCK_TENANT_ID,
   postId: faker.string.uuid(),
   claimedAt: faker.date.recent().toISOString(),
 };
 const { postId: MOCK_POST_ID } = MOCK_REQUEST;
+const MOCK_LOG = {
+  SKIPPED: faker.lorem.slug(),
+  REFUSED: faker.lorem.slug(),
+  FAILED: faker.lorem.slug(),
+};
+const MOCK_INPUT = { path: MOCK_PATH, request: MOCK_REQUEST, log: MOCK_LOG };
 
 const loggerErrorMock = vi.mocked(logger.error);
 
-describe(enqueueNewsletterPostSend, () => {
+describe(enqueueWorkerRun, () => {
   let fetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -49,13 +52,13 @@ describe(enqueueNewsletterPostSend, () => {
     vi.stubGlobal('fetch', fetchMock);
   });
 
-  it('posts the claim to the worker with a signature the worker accepts', async () => {
-    expect(await enqueueNewsletterPostSend(MOCK_REQUEST)).toBe(true);
+  it('posts the request to the worker path with a signature the worker accepts', async () => {
+    expect(await enqueueWorkerRun(MOCK_INPUT)).toBe(true);
 
     const [url, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
     const headers = new Headers(init.headers);
     const rawBody = String(init.body);
-    expect(url.href).toBe(`${MOCK_WORKER_URL}${NEWSLETTER_POST_SEND_PATH}`);
+    expect(url.href).toBe(`${MOCK_WORKER_URL}${MOCK_PATH}`);
     expect(init.method).toBe(HTTP_METHOD.POST);
     expect(JSON.parse(rawBody)).toEqual(MOCK_REQUEST);
     expect(
@@ -63,7 +66,7 @@ describe(enqueueNewsletterPostSend, () => {
         secret: MOCK_SECRET,
         timestamp: headers.get(ENQUEUE_TIMESTAMP_HEADER),
         signature: headers.get(ENQUEUE_SIGNATURE_HEADER),
-        path: NEWSLETTER_POST_SEND_PATH,
+        path: MOCK_PATH,
         rawBody,
       }),
     ).toBe(true);
@@ -77,11 +80,11 @@ describe(enqueueNewsletterPostSend, () => {
     async (_label, variable) => {
       envMock[variable] = undefined;
 
-      expect(await enqueueNewsletterPostSend(MOCK_REQUEST)).toBe(false);
+      expect(await enqueueWorkerRun(MOCK_INPUT)).toBe(false);
 
       expect(fetchMock).not.toHaveBeenCalled();
       expect(loggerErrorMock).toHaveBeenCalledWith(
-        REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_SKIPPED,
+        MOCK_LOG.SKIPPED,
         expect.objectContaining({
           tenantId: MOCK_TENANT_ID,
           postId: MOCK_POST_ID,
@@ -95,26 +98,24 @@ describe(enqueueNewsletterPostSend, () => {
       new Response(null, { status: HTTP_STATUS.CONFLICT }),
     );
 
-    expect(await enqueueNewsletterPostSend(MOCK_REQUEST)).toBe(false);
+    expect(await enqueueWorkerRun(MOCK_INPUT)).toBe(false);
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_REFUSED,
-      {
-        tenantId: MOCK_TENANT_ID,
-        postId: MOCK_POST_ID,
-        status: HTTP_STATUS.CONFLICT,
-      },
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith(MOCK_LOG.REFUSED, {
+      tenantId: MOCK_TENANT_ID,
+      postId: MOCK_POST_ID,
+      status: HTTP_STATUS.CONFLICT,
+    });
   });
 
   it('logs and resolves when the worker cannot be reached', async () => {
     fetchMock.mockRejectedValue(MOCK_ERROR);
 
-    expect(await enqueueNewsletterPostSend(MOCK_REQUEST)).toBe(false);
+    expect(await enqueueWorkerRun(MOCK_INPUT)).toBe(false);
 
-    expect(loggerErrorMock).toHaveBeenCalledWith(
-      REVALIDATE_LOG.NEWSLETTER_SEND_ENQUEUE_FAILED,
-      { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID, error: MOCK_ERROR },
-    );
+    expect(loggerErrorMock).toHaveBeenCalledWith(MOCK_LOG.FAILED, {
+      tenantId: MOCK_TENANT_ID,
+      postId: MOCK_POST_ID,
+      error: MOCK_ERROR,
+    });
   });
 });
