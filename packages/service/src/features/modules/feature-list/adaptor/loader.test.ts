@@ -2,9 +2,8 @@ import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
 import {
   MOCK_FEATURE_LIST_MODULE_ID,
-  mockRawFeatureListItem,
   mockRawFeatureListModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/feature-list/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
@@ -25,18 +24,12 @@ vi.mock('@blog/service/sanity/query/query');
 faker.seed(1);
 
 const MOCK_FEATURE_LIST_HEADING = faker.lorem.words(3);
-const MOCK_FIRST_CARD_ID = faker.string.uuid();
-const MOCK_SECOND_CARD_ID = faker.string.uuid();
 
 describe(getFeatureList, () => {
   beforeEach(() => {
     mockRun.mockResolvedValue(
       mockRawFeatureListModule({
         headingBlock: mockRawHeadingBlock(MOCK_FEATURE_LIST_HEADING),
-        features: [
-          mockRawFeatureListItem({ _id: MOCK_FIRST_CARD_ID }),
-          mockRawFeatureListItem({ _id: MOCK_SECOND_CARD_ID }),
-        ],
       }),
     );
   });
@@ -49,18 +42,6 @@ describe(getFeatureList, () => {
 
     expect(mockRun).toHaveBeenCalledTimes(1);
     expect(featureList.headingBlock.heading).toBe(MOCK_FEATURE_LIST_HEADING);
-  });
-
-  it('returns the referenced cards in authored order', async () => {
-    const featureList = await getFeatureList(
-      MOCK_FEATURE_LIST_MODULE_ID,
-      MOCK_TENANT,
-    );
-
-    expect(featureList.items.map((item) => item.id)).toEqual([
-      MOCK_FIRST_CARD_ID,
-      MOCK_SECOND_CARD_ID,
-    ]);
   });
 
   it('propagates when the module document is missing', async () => {

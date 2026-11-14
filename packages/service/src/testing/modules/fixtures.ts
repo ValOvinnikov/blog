@@ -7,7 +7,6 @@ import {
   CTA_VARIANT,
   DISPLAY_MODE,
   HERO_VARIANT,
-  ICONS,
   LINK_TYPE,
   LOCALE_ISO_CODES,
   MEDIA_ORDER,
@@ -23,7 +22,6 @@ import type { TRawCookieSettingsModule } from '@blog/service/features/modules/co
 import type { TRawCtaModule } from '@blog/service/features/modules/cta/adaptor/transformer';
 import type { TRawFaqModule } from '@blog/service/features/modules/faq/adaptor/transformer';
 import type { TRawFeatureHighlightsModule } from '@blog/service/features/modules/feature-highlights/adaptor/transformer';
-import type { TRawFeatureListModule } from '@blog/service/features/modules/feature-list/adaptor/transformer';
 import type { TRawHeroBlogModule } from '@blog/service/features/modules/hero-blog/adaptor/transformer';
 import type { TRawHeroProfileModule } from '@blog/service/features/modules/hero-profile/adaptor/transformer';
 import type { TRawHeroStatementModule } from '@blog/service/features/modules/hero-statement/adaptor/transformer';
@@ -64,7 +62,6 @@ export const MOCK_CONTENT_MODULE_ID = 'content-1';
 export const MOCK_COOKIE_SETTINGS_MODULE_ID = 'cookie-settings-1';
 export const MOCK_CTA_MODULE_ID = 'cta-1';
 export const MOCK_FAQ_MODULE_ID = 'faq-1';
-export const MOCK_FEATURE_LIST_MODULE_ID = 'feature-list-1';
 export const MOCK_NEWSLETTER_MODULE_ID = 'newsletter-1';
 export const MOCK_SECTION_PAGES_MODULE_ID = 'section-pages-1';
 export const MOCK_SECTION_PAGES_PARENT_ID = 'page-modules';
@@ -88,7 +85,7 @@ const FAQ_QUESTION = 'How long does onboarding take?';
 const FAQ_ANSWER = 'Most teams are live within a week.';
 export const MOCK_PERSON_NAME = 'Jamie Rivera';
 const INBOX_SUPPORTING_TEXT = 'Get new posts in your inbox.';
-const SHIP_FASTER = 'Ship faster';
+export const MOCK_SHIP_FASTER_HEADING = 'Ship faster';
 
 export function mockModuleDocument(
   fields: { _type: string } & Record<string, unknown>,
@@ -107,9 +104,6 @@ export function mockModuleDocument(
 type TRawCtaContentBlock = NonNullable<TRawCtaModule['content']>[number];
 type TRawCtaContentMarkDef = NonNullable<
   TRawCtaContentBlock['markDefs']
->[number];
-type TRawFeatureListItem = NonNullable<
-  TRawFeatureListModule['features']
 >[number];
 type TRawTaxonomyEntry = NonNullable<TRawTaxonomyListModule['entries']>[number];
 type TRawLogoItem = NonNullable<TRawLogoWallModule['logos']>[number];
@@ -375,39 +369,6 @@ export function mockRawCookieSettingsModule(
   };
 }
 
-export function mockRawFeatureListItem(
-  overrides: Partial<TRawFeatureListItem> = {},
-): TRawFeatureListItem {
-  return {
-    _id: 'block-feature-1',
-    headingBlock: mockRawHeadingBlock(SHIP_FASTER),
-    icon: ICONS.ROCKET,
-    image: null,
-    link: null,
-    ...overrides,
-  };
-}
-
-export function mockRawFeatureListModule(
-  overrides: Partial<TRawFeatureListModule> = {},
-): TRawFeatureListModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Features'),
-    features: [
-      mockRawFeatureListItem(),
-      mockRawFeatureListItem({ _id: 'block-feature-2' }),
-    ],
-    ctaButtons: null,
-    imageShape: CARD_IMAGE_SHAPE.WIDE,
-    displayMode: DISPLAY_MODE.GRID,
-    contentAlignment: null,
-    cardAlignment: CONTENT_ALIGNMENT.LEFT,
-    layout: null,
-    ...overrides,
-  };
-}
-
 export function mockRawLogoImage(): TRawLogoItem['image'] {
   const { asset, hotspot, crop } = mockRawSanityImage();
 
@@ -451,7 +412,7 @@ export function mockRawFeatureHighlightItem(
 ): TRawFeatureHighlightItem {
   return {
     _key: 'block-highlight-1',
-    heading: SHIP_FASTER,
+    heading: MOCK_SHIP_FASTER_HEADING,
     body: [mockRawContentBlock({ text: 'Ship faster with less friction.' })],
     image: mockRawSanityImage(),
     action: null,
