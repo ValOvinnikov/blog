@@ -1,33 +1,13 @@
 import { COLOR_SCHEME } from '@blog/config';
-import { isUndefined } from '@blog/utils/primitives';
 import { THEME_PREFERENCE } from '@platform/constants/theme';
-import {
-  LEGACY_THEME_PREFERENCE_COOKIE,
-  THEME_PREFERENCE_COOKIE,
-} from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
+import { mockCookies } from '@platform/testing/mock-cookies';
+import { THEME_PREFERENCE_COOKIE } from '@platform/utils/theme-preference-cookie/theme-preference-cookie';
 
 import { resolveThemeColorScheme } from './resolve-theme-color-scheme';
 
-const { cookiesMock } = vi.hoisted(() => ({ cookiesMock: vi.fn() }));
-
-vi.mock('next/headers', () => ({ cookies: cookiesMock }));
-
 const MOCK_UNKNOWN_PREFERENCE = 'SEPIA';
 
-const mockCookies = (stored: Partial<Record<string, string>>) => {
-  cookiesMock.mockResolvedValue({
-    get: vi.fn((name: string) => {
-      const value = stored[name];
-      return isUndefined(value) ? undefined : { value };
-    }),
-  });
-};
-
 describe(resolveThemeColorScheme, () => {
-  beforeEach(() => {
-    cookiesMock.mockReset();
-  });
-
   it.each([
     {
       cookie: 'Light',
@@ -60,19 +40,4 @@ describe(resolveThemeColorScheme, () => {
       expect(await resolveThemeColorScheme()).toBeUndefined();
     },
   );
-
-  it('keeps a choice saved under the legacy cookie', async () => {
-    mockCookies({ [LEGACY_THEME_PREFERENCE_COOKIE]: THEME_PREFERENCE.DARK });
-
-    expect(await resolveThemeColorScheme()).toBe(COLOR_SCHEME.DARK);
-  });
-
-  it('prefers the current cookie over the legacy one', async () => {
-    mockCookies({
-      [THEME_PREFERENCE_COOKIE]: THEME_PREFERENCE.SYSTEM,
-      [LEGACY_THEME_PREFERENCE_COOKIE]: THEME_PREFERENCE.DARK,
-    });
-
-    expect(await resolveThemeColorScheme()).toBeUndefined();
-  });
 });

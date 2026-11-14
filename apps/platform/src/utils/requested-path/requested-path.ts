@@ -1,4 +1,4 @@
-export const REQUESTED_PATH_HEADER = 'x-admin-requested-path';
+export const REQUESTED_PATH_HEADER = 'x-platform-requested-path';
 
 // A client navigation's `_rsc` cache-buster must not survive into the URL sign-in returns to.
 export const toRequestedPath = (url: URL): string => {
