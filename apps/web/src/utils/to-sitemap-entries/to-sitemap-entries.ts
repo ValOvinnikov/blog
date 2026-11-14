@@ -1,4 +1,5 @@
 import { routes, type TLocaleIsoCode } from '@blog/config';
+import type { TTenantPageLists } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import { toLanguagePageEntries } from '@web/utils/to-language-page-entries';
 import { toPaginatedPageEntry } from '@web/utils/to-paginated-page-entry';
 import { toSitemapEntry } from '@web/utils/to-sitemap-entry';
@@ -9,22 +10,10 @@ import {
 } from '@web/utils/to-translated-sitemap-entry';
 import type { MetadataRoute } from 'next';
 
-type TPaginatedPage = TTranslatedPage & { page: string };
-
-type TSitemapLists = {
-  posts: (TTranslatedPage & { publishedAt: string })[];
-  topics: TTranslatedPage[];
-  tags: TTranslatedPage[];
-  topicPages: TPaginatedPage[];
-  tagPages: TPaginatedPage[];
-  blogPages: { page: string }[];
-  landingPages: TTranslatedPage[];
-  privacyDocuments: TTranslatedPage[];
-  legalDocuments: TTranslatedPage[];
-};
+type TPaginatedPage = TTenantPageLists['topicPages'][number];
 
 type TSitemapEntriesParams = TTranslatedSitemapContext & {
-  lists: TSitemapLists;
+  lists: TTenantPageLists;
 };
 
 export const toSitemapEntries = ({

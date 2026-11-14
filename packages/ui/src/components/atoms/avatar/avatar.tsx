@@ -1,4 +1,5 @@
 import type { IWithDataTestId } from '@blog/config';
+import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
 
 import {
   avatarImageVariants,
@@ -17,26 +18,22 @@ export type TAvatarProps = {
   onImageError?: () => void;
 } & IWithDataTestId;
 
+const joinFirstTwoInitials = (parts: readonly string[]): string =>
+  parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('');
+
 const getInitials = (name: string): string => {
   const words = name.trim().split(/\s+/).filter(Boolean);
 
-  if (words.length > 1) {
-    return words
-      .slice(0, 2)
-      .map((word) => word[0]?.toUpperCase() ?? '')
-      .join('');
-  }
+  if (hasArrayGotMultipleItems(words)) return joinFirstTwoInitials(words);
 
   const token = words[0] ?? '';
   const localPart = token.split('@')[0] ?? token;
   const segments = localPart.split(/[._-]+/).filter(Boolean);
 
-  if (segments.length > 1) {
-    return segments
-      .slice(0, 2)
-      .map((segment) => segment[0]?.toUpperCase() ?? '')
-      .join('');
-  }
+  if (hasArrayGotMultipleItems(segments)) return joinFirstTwoInitials(segments);
 
   return localPart.slice(0, 2).toUpperCase();
 };

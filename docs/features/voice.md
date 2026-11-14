@@ -40,7 +40,7 @@ Voice lets a site owner reword the page-level prose the public site writes in it
 - **Catalog:** `site-messages.{en,nl,fr,de,es}.json`, exposed as `SITE_MESSAGES_BY_LOCALE`; every language `satisfies` the English shape, so a missing key fails type-check. `VOICE_FIXED_KEYS` lists every catalog key that stays fixed.
 - **Rich text shape:** `TVoicePortableText` — `normal` blocks of spans with `strong`/`em` decorators and `link` annotations (`VOICE_PORTABLE_TEXT_SCHEMA`).
 - **Neon:** `site_config.voice_overrides` (jsonb, not null, default `{}`), typed `voiceOverridesByLocale`: `{ [locale]: { [fieldId]: string | TVoicePortableText } }`. One row per tenant, shared with Look.
-- **Cache:** `apps/web` reads the row through `getSiteConfig` — `unstable_cache` under the tenant's site-config tag with a `TENANT_CONFIG_REVALIDATE_SECONDS` (3600s) fallback — the same read that feeds theme tokens. A save POSTs to `apps/web`'s `/api/revalidate-site-config`, which expires that tenant's site-config, features and plan tags and purges `revalidatePath('/', 'layout')`.
+- **Cache:** `apps/web` reads the row through `getSiteConfig` — `unstable_cache` under the tenant's site-config tag with a `TENANT_CONFIG_REVALIDATE_SECONDS` (3600s) fallback — the same read that feeds theme tokens. A save POSTs to `apps/web`'s `/api/revalidate-site-config`, which expires that tenant's site-config, features and plan tags and purges that tenant's own pages ([rendering-and-caching](./rendering-and-caching.md)).
 
 ## Configuration
 

@@ -2,9 +2,9 @@ import { AUDIT_ACTION, ERROR_CODE } from '@blog/config/constants';
 import { ADMIN_ROLE, GRANTED_VIA, MEMBERSHIP_ROLE } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
 import { GITHUB_PROVIDER } from '@blog/db/testing/account/fixtures';
+import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
 import {
   insertTestAccount,
-  insertTestAuditEvent,
   insertTestTenant,
   insertTestUser,
 } from '@blog/db/testing/fixtures';

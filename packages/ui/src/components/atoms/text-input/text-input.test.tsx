@@ -1,16 +1,14 @@
 import { ICONS, SIZE } from '@blog/config';
 import { Icon } from '@blog/ui/components/atoms/icon';
+import { itActsAsAControlledTextbox } from '@blog/ui/testing/atoms/controlled-textbox';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { faker } from '@faker-js/faker';
-import userEvent, { type UserEvent } from '@testing-library/user-event';
 
 import { TextInput } from './text-input';
 
 faker.seed(123);
 
 const MOCK_ARIA_LABEL = faker.lorem.words(2);
-const MOCK_VALUE = faker.internet.email();
-const MOCK_TYPED_CHARACTER = faker.string.alpha(1);
 const MOCK_LEADING_GLYPH = faker.string.symbol(1);
 const MOCK_TRAILING_GLYPH = faker.string.symbol(1);
 const ARIA_HIDDEN = 'aria-hidden';
@@ -28,38 +26,7 @@ const renderIcon = (dataTestId: string) => (
 );
 
 describe(`<${TextInput.name}/>`, () => {
-  let user: UserEvent;
-
-  beforeEach(() => {
-    user = userEvent.setup();
-  });
-
-  it('renders a textbox named by the ariaLabel', () => {
-    setup();
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-
-    expect(textbox).toBeVisible();
-  });
-
-  it('renders the controlled value', () => {
-    setup({ value: MOCK_VALUE });
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-
-    expect(textbox).toHaveValue(MOCK_VALUE);
-  });
-
-  it('reports typed input without keeping its own state', async () => {
-    const onChange = vi.fn();
-    setup({ onChange });
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-    await user.type(textbox, MOCK_TYPED_CHARACTER);
-
-    expect(onChange).toHaveBeenCalledWith(MOCK_TYPED_CHARACTER);
-    expect(textbox).toHaveValue('');
-  });
+  itActsAsAControlledTextbox(TextInput);
 
   it('renders a decorative leading glyph hidden from assistive tech', () => {
     setup({ leadingIcon: MOCK_LEADING_GLYPH });
@@ -119,13 +86,5 @@ describe(`<${TextInput.name}/>`, () => {
     const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
 
     expect(textbox).toBeInvalid();
-  });
-
-  it('disables the field when isDisabled is true', () => {
-    setup({ isDisabled: true });
-
-    const textbox = screen.getByRole('textbox', { name: MOCK_ARIA_LABEL });
-
-    expect(textbox).toBeDisabled();
   });
 });

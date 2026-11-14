@@ -46,7 +46,7 @@ Landing pages are the site's free-form pages, and they nest: an editor puts a pa
 - `page_landing` — the [page-types](./page-types.md) fields plus `parent` (optional reference to another Landing page in the same language), `slug` (one segment), `orderRank`, `sectionNavigation` (boolean, default off), `sectionNavigationTitle` (shown only when section navigation is on), `showSectionNavigation` (boolean, default on) and the `template_landing` reference.
 - `redirect` — `language` (required), `source` and `destination` (site paths), `isPrefix` ("Include Sub-pages"), `status` (`PERMANENT` default, or `TEMPORARY`), an editor-only `description`, and a read-only `isAutomatic`.
 - The path is computed in GROQ (`LANDING_PAGE_PATH_EXPRESSION`) by joining the parent chain's slugs; `PAGE_PATH_EXPRESSION` is the variant used where page types mix (sitemap, translation map). Section navigation is computed from the page's ancestor chain (`LANDING_PAGE_SECTION_CHAIN_EXPRESSION`).
-- **Caching** — the page loader is tagged `page_landing` and `template_landing`; the redirect loader fetches every redirect for the language, tagged `redirect`. Publishing either purges its tags and falls back to a whole-layout path purge (see [rendering-and-caching](./rendering-and-caching.md)).
+- **Caching** — the page loader is tagged `page_landing` and `template_landing`; the redirect loader fetches every redirect for the language, tagged `redirect`. Publishing a page or template purges its tags and every page of that tenant, including the page's own path; publishing a redirect, which a changed landing path writes, and deleting or unpublishing a page fall back to a logged whole-site purge (see [rendering-and-caching](./rendering-and-caching.md)).
 
 ## Configuration
 

@@ -1,6 +1,6 @@
 import { AUDIT_ACTION } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
-import { insertTestAuditEvent } from '@blog/db/testing/fixtures';
+import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 

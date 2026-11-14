@@ -5,12 +5,11 @@ import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { logger } from '@web/utils/logger/logger';
 
 export type TLoadTenantSanityCredentialsInput = {
-  type: string;
-  id: string;
+  type?: string;
+  id?: string;
   tenantId: string;
 };
 
-/** Called once per webhook: the module lookup and the path derivation both need it, and a second fetch would report one failure as two. */
 export const loadTenantSanityCredentials = async ({
   type,
   id,

@@ -27,7 +27,7 @@ function readOptional(encrypted: TMaybeNull<string>): TMaybeUndefined<string> {
   return decryptOptionalPersonalValue(encrypted) ?? undefined;
 }
 
-// TODO: fold in comments and ratings once each lands (#1040, #1041).
+// TODO: fold in comments once they land (#1040).
 // Performs no authorization check: pass the session's own user id.
 export async function exportAccountData(
   tenantId: string,

@@ -1,3 +1,4 @@
+import { testControlActions } from '@blog/ui/testing/control-actions-contract';
 import {
   customRender,
   renderElement,
@@ -82,28 +83,11 @@ describe(`<${ConsentPlaceholder.name}/>`, () => {
       },
     );
 
-    it.each(CONTROLS)(
-      'runs the $control action when clicked',
-      async ({ label, handler }) => {
-        const button = screen.getByRole('button', { name: label });
-
-        await user.click(button);
-
-        expect(handlers[handler]).toHaveBeenCalledTimes(1);
-      },
-    );
-
-    it.each(CONTROLS)(
-      'runs the $control action when activated by keyboard',
-      async ({ handler, tabs }) => {
-        for (let i = 0; i < tabs; i++) {
-          await user.tab();
-        }
-        await user.keyboard('{Enter}');
-
-        expect(handlers[handler]).toHaveBeenCalledTimes(1);
-      },
-    );
+    testControlActions({
+      controls: CONTROLS,
+      getUser: () => user,
+      getHandlers: () => handlers,
+    });
   });
 
   it('describes each placeholder by its own scope note when two share a page', () => {

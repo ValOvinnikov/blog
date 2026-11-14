@@ -4,11 +4,14 @@ import {
   MOCK_DEPROVISION_AUDIT_ACTOR,
   MOCK_DEPROVISION_AUDIT_DETAILS,
   MOCK_DEPROVISION_ENV,
+  MOCK_PURGED_READER_DATA_COUNTS,
 } from '@blog/db/testing/deprovision-tenant/fixtures';
 import { MOCK_STEP_ERROR } from '@blog/db/testing/tenants/fixtures';
 import { faker } from '@faker-js/faker';
 
+import type { TDeprovisionEnv } from './env';
 import { recordDeprovisionAuditEvent } from './record-deprovision-audit-event';
+import { recordReaderDataPurgeAuditEvent } from './record-reader-data-purge-audit-event';
 
 vi.mock('@blog/db/queries/audit-events');
 
@@ -24,16 +27,38 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe(recordDeprovisionAuditEvent, () => {
-  it('records a DEPROVISIONED tenant event attributed to the GitHub actor', async () => {
-    await recordDeprovisionAuditEvent(MOCK_TENANT_ID, MOCK_DEPROVISION_ENV);
+describe.each([
+  {
+    recorder: recordDeprovisionAuditEvent.name,
+    record: (env: TDeprovisionEnv) =>
+      recordDeprovisionAuditEvent(MOCK_TENANT_ID, env),
+    action: AUDIT_ACTION.DEPROVISIONED,
+    details: MOCK_DEPROVISION_AUDIT_DETAILS,
+  },
+  {
+    recorder: recordReaderDataPurgeAuditEvent.name,
+    record: (env: TDeprovisionEnv) =>
+      recordReaderDataPurgeAuditEvent(
+        MOCK_TENANT_ID,
+        env,
+        MOCK_PURGED_READER_DATA_COUNTS,
+      ),
+    action: AUDIT_ACTION.READER_DATA_PURGED,
+    details: {
+      ...MOCK_DEPROVISION_AUDIT_DETAILS,
+      ...MOCK_PURGED_READER_DATA_COUNTS,
+    },
+  },
+])('$recorder', ({ record, action, details }) => {
+  it('records the tenant event attributed to the GitHub actor', async () => {
+    await record(MOCK_DEPROVISION_ENV);
 
     expect(insertAuditEvent).toHaveBeenCalledWith({
       ...MOCK_DEPROVISION_AUDIT_ACTOR,
-      action: AUDIT_ACTION.DEPROVISIONED,
+      action,
       targetType: AUDIT_TARGET_TYPE.TENANT,
       targetId: MOCK_TENANT_ID,
-      details: MOCK_DEPROVISION_AUDIT_DETAILS,
+      details,
     });
   });
 
@@ -42,18 +67,13 @@ describe(recordDeprovisionAuditEvent, () => {
       new Error(MOCK_STEP_ERROR),
     );
 
-    await expect(
-      recordDeprovisionAuditEvent(MOCK_TENANT_ID, MOCK_DEPROVISION_ENV),
-    ).resolves.toBeUndefined();
+    await expect(record(MOCK_DEPROVISION_ENV)).resolves.toBeUndefined();
 
     expect(console.error).toHaveBeenCalled();
   });
 
   it('logs and skips the insert when the GitHub actor is unset', async () => {
-    await recordDeprovisionAuditEvent(MOCK_TENANT_ID, {
-      ...MOCK_DEPROVISION_ENV,
-      githubActor: undefined,
-    });
+    await record({ ...MOCK_DEPROVISION_ENV, githubActor: undefined });
 
     expect(insertAuditEvent).not.toHaveBeenCalled();
     expect(console.error).toHaveBeenCalled();

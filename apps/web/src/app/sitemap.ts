@@ -4,6 +4,7 @@ import { SITEMAP_LOG } from '@web/constants/sitemap';
 import { routing } from '@web/i18n/routing';
 import { resolveRequestTenant } from '@web/server/tenant/request-tenant/request-tenant';
 import { getTenantBaseUrl } from '@web/server/tenant/tenant-base-url/tenant-base-url';
+import { getTenantPageListResults } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import { getHostTenantSanityContext } from '@web/server/tenant/tenant-sanity-context/tenant-sanity-context';
 import { logger } from '@web/utils/logger/logger';
 import { toListOrEmpty } from '@web/utils/to-list-or-empty';
@@ -29,35 +30,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ? queries.tenants.selectLiveLocales(tenantRow)
     : [routing.defaultLocale];
 
-  const [
-    postParamsResult,
-    topicParamsResult,
-    tagParamsResult,
-    topicPaginationParamsResult,
-    tagPaginationParamsResult,
-    blogParamsResult,
-    landingPageSlugsResult,
-    privacyDocumentParamsResult,
-    legalDocumentParamsResult,
-    translationMapResult,
-  ] = await Promise.all([
-    service.pages.post.v1.getPostParams(tenant, liveLocales),
-    service.pages.topic.v1.getTopicParams(tenant, liveLocales),
-    service.pages.tag.v1.getTagParams(tenant, liveLocales),
-    service.pages.topic.v1.getTopicPaginationParams(tenant, liveLocales),
-    service.pages.tag.v1.getTagPaginationParams(tenant, liveLocales),
-    service.pages.blog.v1.getIndexPageParams(tenant),
-    service.pages.landing.v1.getPageSlugs(tenant, liveLocales),
-    service.pages.sectionDocument.v1.getSectionDocumentParams(
-      'page_privacyDocument',
-      tenant,
-      liveLocales,
-    ),
-    service.pages.sectionDocument.v1.getSectionDocumentParams(
-      'page_legalDocument',
-      tenant,
-      liveLocales,
-    ),
+  const [pageLists, translationMapResult] = await Promise.all([
+    getTenantPageListResults(tenant, liveLocales),
     service.global.translationMap.v1.getTranslationMap(tenant),
   ]);
 
@@ -86,36 +60,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     siteUrl,
     lists: {
       posts: toListOrEmpty(
-        postParamsResult,
+        pageLists.posts,
         SITEMAP_LOG.POST_PARAMS_FETCH_FAILED,
       ),
       topics: toListOrEmpty(
-        topicParamsResult,
+        pageLists.topics,
         SITEMAP_LOG.TOPIC_PARAMS_FETCH_FAILED,
       ),
-      tags: toListOrEmpty(tagParamsResult, SITEMAP_LOG.TAG_PARAMS_FETCH_FAILED),
+      tags: toListOrEmpty(pageLists.tags, SITEMAP_LOG.TAG_PARAMS_FETCH_FAILED),
       topicPages: toListOrEmpty(
-        topicPaginationParamsResult,
+        pageLists.topicPages,
         SITEMAP_LOG.TOPIC_PAGINATION_PARAMS_FETCH_FAILED,
       ),
       tagPages: toListOrEmpty(
-        tagPaginationParamsResult,
+        pageLists.tagPages,
         SITEMAP_LOG.TAG_PAGINATION_PARAMS_FETCH_FAILED,
       ),
       blogPages: toListOrEmpty(
-        blogParamsResult,
+        pageLists.blogPages,
         SITEMAP_LOG.BLOG_PAGE_PARAMS_FETCH_FAILED,
       ),
       landingPages: toListOrEmpty(
-        landingPageSlugsResult,
+        pageLists.landingPages,
         SITEMAP_LOG.LANDING_PAGE_SLUGS_FETCH_FAILED,
       ),
       privacyDocuments: toListOrEmpty(
-        privacyDocumentParamsResult,
+        pageLists.privacyDocuments,
         SITEMAP_LOG.PRIVACY_DOCUMENT_PARAMS_FETCH_FAILED,
       ),
       legalDocuments: toListOrEmpty(
-        legalDocumentParamsResult,
+        pageLists.legalDocuments,
         SITEMAP_LOG.LEGAL_DOCUMENT_PARAMS_FETCH_FAILED,
       ),
     },

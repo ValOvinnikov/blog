@@ -6,6 +6,7 @@ import {
   type TCompoundChildren,
   type TCompoundComponent,
 } from '@blog/ui/lib/react';
+import { hasLength } from '@blog/utils/primitives';
 import { cloneElement, Fragment, type ElementType } from 'react';
 
 import { MediaCardFooter } from './components/footer/media-card-footer';
@@ -81,7 +82,7 @@ const MediaCardRoot = ({
         {unmatched.map((node, i) => (
           <Fragment key={i}>{node}</Fragment>
         ))}
-        {tags && tags.length > 0 && (
+        {hasLength(tags) && (
           <div className={s.tags()}>
             {tags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>

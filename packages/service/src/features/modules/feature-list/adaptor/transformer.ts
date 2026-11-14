@@ -3,6 +3,7 @@ import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/
 import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import { toModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 import type { InferResultType } from 'groqd';
 
 import type { featureListModuleQuery } from './query';
@@ -26,8 +27,7 @@ function toFeatureListItem(raw: TRawFeatureListItem): TFeatureListItem {
   };
 }
 
-// Mirrors the schema's own `min(2)` cards rule — fewer than 2 cards degrades
-// to an empty list rather than failing the whole module.
+// Mirrors the schema's `min(2)`: fewer cards degrade to an empty list.
 function toFeatureListItems(
   raw: TRawFeatureListModule['features'],
 ): TFeatureListItem[] {
@@ -49,5 +49,6 @@ export function toFeatureListModule(
     contentAlignment: raw.contentAlignment ?? undefined,
     cardAlignment: raw.cardAlignment,
     layout: toLayout(raw.layout),
+    ...toModuleAppearance(raw),
   };
 }

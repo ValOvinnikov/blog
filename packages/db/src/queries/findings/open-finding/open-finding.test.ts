@@ -5,8 +5,11 @@ import {
   FINDING_SOURCE,
   FINDING_STATUS,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { buildDedupeKey } from '@blog/db/queries/findings/build-dedupe-key';
+import type { TOpenFindingInput } from '@blog/db/queries/findings/open-finding';
 import * as schema from '@blog/db/schema';
+import type { TFinding } from '@blog/db/schema/findings';
 import {
   MOCK_FINDING_LATER_AT,
   MOCK_FINDING_NOW,
@@ -36,22 +39,30 @@ afterEach(async () => {
 
 describe(openFinding, () => {
   let tenantId: string;
+  let input: TOpenFindingInput;
 
   beforeEach(async () => {
     ({ id: tenantId } = await insertTestTenant(db()));
+    input = mockOpenFindingInput({ tenantId });
     vi.useFakeTimers({ now: MOCK_FINDING_NOW, toFake: ['Date'] });
   });
 
-  it('inserts a fresh OPEN finding when none exists for the condition', async () => {
-    const input = mockOpenFindingInput({ tenantId });
-
-    const result = await openFinding(input);
+  async function openOnlyFinding(
+    findingInput: TOpenFindingInput,
+  ): Promise<TMaybeUndefined<TFinding>> {
+    const result = await openFinding(findingInput);
 
     const [row] = await db().select().from(schema.findings);
     expect(result).toEqual({
       ok: true,
       data: { finding: row, isNewlyOpened: true },
     });
+    return row;
+  }
+
+  it('inserts a fresh OPEN finding when none exists for the condition', async () => {
+    const row = await openOnlyFinding(input);
+
     expect(row).toEqual({
       id: row?.id,
       tenantId,
@@ -68,16 +79,16 @@ describe(openFinding, () => {
   });
 
   it('detecting the same condition twice yields one open row, not two', async () => {
-    const input = mockOpenFindingInput({
+    const stalledInput = mockOpenFindingInput({
       tenantId,
       source: FINDING_SOURCE.RECHECK_TENANT_OWNERS,
       kind: FINDING_KIND.OWNER_CHECK_STALLED,
     });
     const details = { attempts: faker.number.int({ min: 2, max: 9 }) };
 
-    await openFinding(input);
+    await openFinding(stalledInput);
     const second = await openFinding({
-      ...input,
+      ...stalledInput,
       severity: FINDING_SEVERITY.CRITICAL,
       details,
     });
@@ -101,22 +112,7 @@ describe(openFinding, () => {
     expect(rows).toHaveLength(1);
   });
 
-  it('bumps lastSeenAt without changing firstSeenAt on a repeat sighting', async () => {
-    const input = mockOpenFindingInput({ tenantId });
-
-    await openFinding(input);
-    vi.setSystemTime(MOCK_FINDING_LATER_AT);
-    const second = await openFinding(input);
-
-    expect(second.ok).toBe(true);
-    if (!second.ok) return;
-    const { firstSeenAt, lastSeenAt } = second.data.finding;
-    expect(firstSeenAt).toEqual(MOCK_FINDING_NOW);
-    expect(lastSeenAt).toEqual(MOCK_FINDING_LATER_AT);
-  });
-
   it('reopens as a new row once the prior finding for the same condition was resolved', async () => {
-    const input = mockOpenFindingInput({ tenantId });
     const first = await openFinding(input);
     expect(first.ok).toBe(true);
     if (!first.ok) return;
@@ -137,45 +133,49 @@ describe(openFinding, () => {
   });
 
   it('supports a nullable tenantId for a platform-wide condition', async () => {
-    const input = mockOpenFindingInput({
-      source: FINDING_SOURCE.TENANT_PROVISIONING,
-      kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
-    });
+    const row = await openOnlyFinding(
+      mockOpenFindingInput({
+        source: FINDING_SOURCE.TENANT_PROVISIONING,
+        kind: FINDING_KIND.PROVISIONING_STEP_FAILED,
+      }),
+    );
 
-    const result = await openFinding(input);
-
-    const [row] = await db().select().from(schema.findings);
-    expect(result).toEqual({
-      ok: true,
-      data: { finding: row, isNewlyOpened: true },
-    });
     expect(row?.tenantId).toBeNull();
   });
 
   it('returns DB_NOT_FOUND when the open row vanishes before the follow-up update', async () => {
-    const input = mockOpenFindingInput({ tenantId });
-    await openFinding(input);
-
     vi.spyOn(db(), 'insert').mockReturnValueOnce({
       values: () => ({
         onConflictDoNothing: () => ({ returning: () => Promise.resolve([]) }),
       }),
     } as unknown as ReturnType<ReturnType<typeof db>['insert']>);
-    vi.spyOn(db(), 'update').mockReturnValueOnce({
-      set: () => ({ where: () => ({ returning: () => Promise.resolve([]) }) }),
-    } as unknown as ReturnType<ReturnType<typeof db>['update']>);
 
     const result = await openFinding(input);
 
     expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
   });
 
-  it('removes a finding when its owning tenant is deleted', async () => {
-    await openFinding(mockOpenFindingInput({ tenantId }));
+  describe('with the finding already open', () => {
+    beforeEach(async () => {
+      await openFinding(input);
+    });
 
-    await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
+    it('bumps lastSeenAt without changing firstSeenAt on a repeat sighting', async () => {
+      vi.setSystemTime(MOCK_FINDING_LATER_AT);
+      const second = await openFinding(input);
 
-    const rows = await db().select().from(schema.findings);
-    expect(rows).toHaveLength(0);
+      expect(second.ok).toBe(true);
+      if (!second.ok) return;
+      const { firstSeenAt, lastSeenAt } = second.data.finding;
+      expect(firstSeenAt).toEqual(MOCK_FINDING_NOW);
+      expect(lastSeenAt).toEqual(MOCK_FINDING_LATER_AT);
+    });
+
+    it('removes a finding when its owning tenant is deleted', async () => {
+      await db().delete(schema.tenants).where(eq(schema.tenants.id, tenantId));
+
+      const rows = await db().select().from(schema.findings);
+      expect(rows).toHaveLength(0);
+    });
   });
 });

@@ -1,6 +1,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { TagList } from '@blog/ui/components/molecules/tag-list';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 
 import { articleFooterVariants } from './article-footer-variants';
 
@@ -22,7 +23,7 @@ export const ArticleFooter = ({
   className,
   dataTestId,
 }: TArticleFooterProps) => {
-  if (tags.length === 0) return null;
+  if (!hasArrayGotItems(tags)) return null;
 
   const s = articleFooterVariants();
 

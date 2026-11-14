@@ -1,3 +1,4 @@
+import { testControlActions } from '@blog/ui/testing/control-actions-contract';
 import { customRender, screen } from '@blog/ui/testing/custom-render';
 import { MOCK_LINK_TEST_ID, MockLink } from '@blog/ui/testing/mock-link';
 import { faker } from '@faker-js/faker';
@@ -73,28 +74,11 @@ describe(`<${ConsentBanner.name}/>`, () => {
     expect(button).toBeVisible();
   });
 
-  it.each(CONTROLS)(
-    'runs the $control action when clicked',
-    async ({ label, handler }) => {
-      const button = screen.getByRole('button', { name: label });
-
-      await user.click(button);
-
-      expect(handlers[handler]).toHaveBeenCalledTimes(1);
-    },
-  );
-
-  it.each(CONTROLS)(
-    'runs the $control action when activated by keyboard',
-    async ({ handler, tabs }) => {
-      for (let i = 0; i < tabs; i++) {
-        await user.tab();
-      }
-      await user.keyboard('{Enter}');
-
-      expect(handlers[handler]).toHaveBeenCalledTimes(1);
-    },
-  );
+  testControlActions({
+    controls: CONTROLS,
+    getUser: () => user,
+    getHandlers: () => handlers,
+  });
 
   it('renders no link without a policy link', () => {
     const link = screen.queryByRole('link');
@@ -108,28 +92,16 @@ describe(`<${ConsentBanner.name}/> with a policy link`, () => {
 
   beforeEach(() => {
     user = userEvent.setup();
+    setup({ policyLink: MOCK_POLICY_LINK });
   });
 
   it('renders the policy link named by its label', () => {
-    setup({ policyLink: MOCK_POLICY_LINK });
-
     const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
 
     expect(link).toHaveAttribute('href', MOCK_POLICY_LINK.href);
   });
 
-  it('renders the policy link through the supplied link component', () => {
-    setup({ policyLink: MOCK_POLICY_LINK, linkAs: MockLink });
-
-    const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
-    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
-
-    expect(link).toBe(mockLink);
-  });
-
   it('reaches the policy link by keyboard before the accept control', async () => {
-    setup({ policyLink: MOCK_POLICY_LINK });
-
     await user.tab();
     const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
     expect(link).toHaveFocus();
@@ -137,5 +109,16 @@ describe(`<${ConsentBanner.name}/> with a policy link`, () => {
     await user.tab();
     const accept = screen.getByRole('button', { name: MOCK_ACCEPT_LABEL });
     expect(accept).toHaveFocus();
+  });
+});
+
+describe(`<${ConsentBanner.name}/> with a policy link and a link component`, () => {
+  it('renders the policy link through the supplied link component', () => {
+    setup({ policyLink: MOCK_POLICY_LINK, linkAs: MockLink });
+
+    const link = screen.getByRole('link', { name: MOCK_POLICY_LINK.label });
+    const mockLink = screen.getByTestId(MOCK_LINK_TEST_ID);
+
+    expect(link).toBe(mockLink);
   });
 });

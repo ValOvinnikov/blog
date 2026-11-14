@@ -103,20 +103,34 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   any need to know a post's _previous_ taxonomy, which the webhook payload
   does not carry.
 
-  **Known limitation, accepted rather than solved:** a renamed post slug is
-  not recoverable from the webhook payload, so the page at the _old_ slug
-  keeps its stale prerendered HTML (still listing the post) until the
-  route-level backstop below expires it. Fixing this properly would require
+  **Known limitation, accepted rather than solved:** a renamed slug — of a
+  post, topic, tag or privacy or legal document — is not
+  recoverable from the webhook payload, so the page at the _old_ slug keeps
+  its stale prerendered HTML until the route-level backstop below expires
+  it. Fixing this properly would require
   reconfiguring the Sanity webhook to project the document's previous slug,
-  which is human-gated console work.
+  which is human-gated console work. A renamed landing page is covered: its
+  path change writes a `redirect`, whose publish runs the whole-site purge.
 
   Every other `_type` (including the `posts`-tagged
   `person`/`blog_topic`/`blog_tag`, whose edit can affect every
-  post-list-bearing page of a tenant) has no precise derivation yet — full
-  enumeration for those is unbounded in the number of `revalidatePath` calls
-  for a large tenant, a design tradeoff not yet resolved. Any undeliverable
-  derivation — an unresolved tenant, a `_type` with no derivation, a thrown
-  Sanity-credentials lookup, or a failed lookup — falls back to the
+  post-list-bearing page of a tenant), and a `page_post` the lookup no longer
+  finds (deleted, unpublished or future-dated), purges every page the tenant
+  renders (`derive-tenant-site-paths`): the page lists the sitemap reads
+  (`server/tenant/tenant-page-lists`), the index, legal and newsletter pages
+  in every live language, the page after each listing's current last (a
+  removed entry can leave it cached), and the changed document's own path
+  from the webhook's projected `slug` through `pageHref`. A
+  large tenant costs roughly one `revalidatePath` per listed page and
+  pagination page, plus one next page per topic and tag and about sixteen
+  per live language. Three cases skip the derivation because no list holds
+  their stale paths: a `delete` (which includes an unpublish) of any type but
+  a post — the projected slug is a landing page's last segment only, and a
+  deleted topic's or tag's pagination is gone from the lists — a `redirect`,
+  whose old path is unknown, and a `module_postList` change, whose page-size
+  change can drop many pages. Those, and any undeliverable derivation — an
+  unresolved tenant, a thrown Sanity-credentials or
+  live-locales lookup, or a failed page-list lookup — falls back to the
   whole-site `revalidatePath('/', 'layout')` purge, always logged
   (`revalidate.path_purge_fallback`) rather than left silently incomplete.
   The credentials lookup (`getTenantSanityCredentials`, which throws when
@@ -176,15 +190,12 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   leaving that fallback as a safety net for a future caller rather than a path
   the panel takes.
 
-  Unlike `/api/revalidate`, this route makes no attempt at a resolved-path
-  derivation and is expected to stay that way permanently (#2666) — a
+  Its path purge reuses `/api/revalidate`'s tenant-wide derivation: a
   Look/Voice/Features save changes theme tokens, nav or feature flags on
-  _every_ page the tenant renders, so there is no smaller path set that would
-  be correct to purge instead of the whole site; a full per-tenant path
-  enumeration would be no more correct here, only more code. It always falls
-  back to `revalidatePath('/', 'layout')`, logged
-  (`revalidate_site_config.whole_site_purge`, with the resolved `tenantIds`)
-  rather than silent.
+  every page the tenant renders, so it purges exactly that tenant's page set
+  (`resolve-tenant-site-paths`). With no `tenantId`, or when the credentials
+  or page-list lookup fails, it falls back to `revalidatePath('/', 'layout')`,
+  logged as `revalidate.path_purge_fallback`.
 
   It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is

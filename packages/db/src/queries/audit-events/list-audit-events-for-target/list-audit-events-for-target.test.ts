@@ -5,11 +5,8 @@ import {
 } from '@blog/config/constants';
 import * as schema from '@blog/db/schema';
 import type { TAuditEvent } from '@blog/db/schema/audit-events';
-import {
-  MOCK_OPERATOR_EMAIL,
-  insertTestAuditEvent,
-  insertTestUser,
-} from '@blog/db/testing/fixtures';
+import { insertTestAuditEvent } from '@blog/db/testing/audit-events/fixtures';
+import { MOCK_OPERATOR_EMAIL, insertTestUser } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { encryptPersonalValue } from '@blog/db/utils/personal-data/personal-data';
 import { faker } from '@faker-js/faker';
@@ -112,39 +109,41 @@ describe(listAuditEventsForTarget, () => {
     expect(result.map((event) => event.createdAt)).toEqual([MOCK_FIRST_DAY]);
   });
 
-  it('breaks a tie on the same timestamp by id, so paging neither repeats nor skips', async () => {
-    await insertEvent();
-    await insertEvent();
-    const all = await listTargetEvents();
-    const idsNewestFirst = all
-      .map((event) => event.id)
-      .sort()
-      .reverse();
+  describe('with one event already on the target', () => {
+    beforeEach(async () => {
+      await insertEvent();
+    });
 
-    const [first] = await listTargetEvents({ limit: 1 });
-    const [second] = await listTargetEvents({ limit: 1, offset: 1 });
+    it('breaks a tie on the same timestamp by id, so paging neither repeats nor skips', async () => {
+      await insertEvent();
+      const all = await listTargetEvents();
+      const idsNewestFirst = all
+        .map((event) => event.id)
+        .sort()
+        .reverse();
 
-    expect([first?.id, second?.id]).toEqual(idsNewestFirst);
-  });
+      const [first] = await listTargetEvents({ limit: 1 });
+      const [second] = await listTargetEvents({ limit: 1, offset: 1 });
 
-  it('treats a negative offset as the first page', async () => {
-    await insertEvent();
+      expect([first?.id, second?.id]).toEqual(idsNewestFirst);
+    });
 
-    const result = await listTargetEvents({ offset: -25 });
+    it('treats a negative offset as the first page', async () => {
+      const result = await listTargetEvents({ offset: -25 });
 
-    expect(result).toHaveLength(1);
-  });
+      expect(result).toHaveLength(1);
+    });
 
-  it("does not leak another target's events", async () => {
-    await insertEvent();
-    await insertEvent({ targetId: faker.string.uuid() });
-    await insertEvent({ targetType: AUDIT_TARGET_TYPE.SITE_CONFIG });
+    it("does not leak another target's events", async () => {
+      await insertEvent({ targetId: faker.string.uuid() });
+      await insertEvent({ targetType: AUDIT_TARGET_TYPE.SITE_CONFIG });
 
-    const result = await listTargetEvents();
+      const result = await listTargetEvents();
 
-    expect(result).toHaveLength(1);
-    expect(result[0]?.targetId).toBe(MOCK_TARGET_ID);
-    expect(result[0]?.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
+      expect(result).toHaveLength(1);
+      expect(result[0]?.targetId).toBe(MOCK_TARGET_ID);
+      expect(result[0]?.targetType).toBe(AUDIT_TARGET_TYPE.TENANT);
+    });
   });
 
   it("returns the actor's account email, read from the encrypted column", async () => {

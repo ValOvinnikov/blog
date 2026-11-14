@@ -36,7 +36,7 @@ A person is one reusable record for someone the site credits or introduces: an a
 - `socialProfile` — a required reference to a `link` document and a required `platform` from `SOCIAL_PLATFORMS` in `@blog/config` (X, GitHub, LinkedIn, YouTube, Instagram, Mastodon, Bluesky, Facebook, Threads, RSS), which picks the icon.
 - `person` is not a translated document: there is one record per person, and only the role, bio and image alt vary by language.
 - Service shapes: `personCardFragment` → `TPersonCard` (id, name, image, `profileUrl` resolved from the link) for post cards and bylines; `personDetailFragment` → `TPersonProfile` (adds role, bio, social links) for the post detail, the profile hero and team.
-- **Caching** — loaders that read a person carry the `author` tag (post detail, profile hero) or `modules:team`. Publishing a person purges `author`, `posts` and `modules:team`, then falls back to a whole-layout path purge (see [rendering-and-caching](./rendering-and-caching.md)).
+- **Caching** — loaders that read a person carry the `author` tag (post detail, profile hero) or `modules:team`. Publishing a person purges `author`, `posts` and `modules:team`, then every page of that tenant (see [rendering-and-caching](./rendering-and-caching.md)).
 
 ## Configuration
 

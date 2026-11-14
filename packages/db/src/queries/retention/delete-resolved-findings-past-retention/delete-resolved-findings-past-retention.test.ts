@@ -6,6 +6,7 @@ import {
 } from '@blog/config/constants';
 import { RESOLVED_FINDING_RETENTION_DAYS } from '@blog/db/constants';
 import * as schema from '@blog/db/schema';
+import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import {
   justPast,
@@ -34,19 +35,21 @@ describe(deleteResolvedFindingsPastRetention, () => {
   async function insertFinding(
     overrides: Partial<typeof schema.findings.$inferInsert>,
   ): Promise<string> {
-    const [finding] = await db()
-      .insert(schema.findings)
-      .values({
-        source: FINDING_SOURCE.DOMAIN_VERIFICATION,
-        kind: FINDING_KIND.DOMAIN_NOT_ADDED,
-        severity: FINDING_SEVERITY.WARNING,
-        status: FINDING_STATUS.RESOLVED,
-        dedupeKey: faker.string.uuid(),
-        ...overrides,
-      })
-      .returning({ id: schema.findings.id });
-    if (!finding) throw new Error('insertFinding: insert returned no row.');
-    return finding.id;
+    const { id } = firstRowOrThrow(
+      await db()
+        .insert(schema.findings)
+        .values({
+          source: FINDING_SOURCE.DOMAIN_VERIFICATION,
+          kind: FINDING_KIND.DOMAIN_NOT_ADDED,
+          severity: FINDING_SEVERITY.WARNING,
+          status: FINDING_STATUS.RESOLVED,
+          dedupeKey: faker.string.uuid(),
+          ...overrides,
+        })
+        .returning({ id: schema.findings.id }),
+      'insertFinding',
+    );
+    return id;
   }
 
   async function remainingIds(): Promise<string[]> {

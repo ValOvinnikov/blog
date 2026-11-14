@@ -1,6 +1,7 @@
 import type { IWithClassName, IWithDataTestId } from '@blog/config';
 import type { TAnchorElementType } from '@blog/config/react';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 
 import { taxonomyCardPostsVariants } from './taxonomy-card-posts-variants';
 
@@ -29,7 +30,7 @@ export const TaxonomyCardPosts = ({
   className,
   dataTestId,
 }: TTaxonomyCardPostsProps) => {
-  if (posts.length === 0) return null;
+  if (!hasArrayGotItems(posts)) return null;
 
   return (
     <div className={s.root({ class: className })} data-testid={dataTestId}>

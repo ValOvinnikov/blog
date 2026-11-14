@@ -1,12 +1,12 @@
 'use client';
 
 import type { TControlAria, TControlLock, TMaybeNull } from '@blog/config';
+import type { TDecorativeGlyphProps } from '@platform/components/shared/decorative-glyph';
 import { Select } from '@platform/components/shared/select';
-import type { TSelectItemProps } from '@platform/components/shared/select/components/item/select-item';
 import type { TSelectAppearance } from '@platform/constants/select-appearance';
 
 type TOptionSelectOption<TValue extends string> = Pick<
-  TSelectItemProps,
+  TDecorativeGlyphProps,
   'glyph'
 > & {
   value: TValue;
