@@ -13,26 +13,21 @@ vi.mock('@web/utils/env/env');
 
 faker.seed(6796);
 
-const MOCK_PRODUCT_NAME = faker.company.name();
 const MOCK_MARKETING_SITE_URL = faker.internet.url();
 
 const getEffectivePlanMock = vi.mocked(getEffectivePlan);
 
 describe(getPoweredByMark, () => {
   beforeEach(() => {
-    setMockEnv({
-      PRODUCT_NAME: MOCK_PRODUCT_NAME,
-      MARKETING_SITE_URL: MOCK_MARKETING_SITE_URL,
-    });
+    setMockEnv({ MARKETING_SITE_URL: MOCK_MARKETING_SITE_URL });
   });
 
-  it('returns the product name and marketing site on a Free site', async () => {
+  it('returns the marketing site on a Free site', async () => {
     getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.FREE);
 
-    await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toEqual({
-      productName: MOCK_PRODUCT_NAME,
-      href: MOCK_MARKETING_SITE_URL,
-    });
+    await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toBe(
+      MOCK_MARKETING_SITE_URL,
+    );
     expect(getEffectivePlanMock).toHaveBeenCalledWith(MOCK_TENANT_ID);
   });
 
@@ -43,28 +38,13 @@ describe(getPoweredByMark, () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it.each([
-    [
-      'the product name',
-      { MARKETING_SITE_URL: MOCK_MARKETING_SITE_URL },
-      { hasProductName: false, hasMarketingSiteUrl: true },
-    ],
-    [
-      'the marketing site address',
-      { PRODUCT_NAME: MOCK_PRODUCT_NAME },
-      { hasProductName: true, hasMarketingSiteUrl: false },
-    ],
-  ])(
-    'returns no mark on a Free site and logs when %s is unset',
-    async (_, values, context) => {
-      setMockEnv(values);
-      getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.FREE);
+  it('returns no mark on a Free site and logs when the marketing site address is unset', async () => {
+    setMockEnv({});
+    getEffectivePlanMock.mockResolvedValueOnce(TENANT_PLAN.FREE);
 
-      await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toBeUndefined();
-      expect(logger.error).toHaveBeenCalledWith(
-        FOOTER_LOG.POWERED_BY_UNCONFIGURED,
-        context,
-      );
-    },
-  );
+    await expect(getPoweredByMark(MOCK_TENANT_ID)).resolves.toBeUndefined();
+    expect(logger.error).toHaveBeenCalledWith(
+      FOOTER_LOG.POWERED_BY_UNCONFIGURED,
+    );
+  });
 });

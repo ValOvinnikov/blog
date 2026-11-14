@@ -44,7 +44,7 @@ export const SiteFooter = async () => {
     footerStyle,
     brandLogoUrl,
     isConsentBannerEnabled,
-    poweredByMark,
+    poweredByHref,
   ] = await Promise.all([
     getBrandName({ tenantId, tenantName }),
     service.global.footer.v1.getFooter(sanityContext),
@@ -140,12 +140,8 @@ export const SiteFooter = async () => {
           )}
           {hasRssFeed && <FooterRssLink label={tRss('feedLinkLabel')} />}
         </Footer.Nav>
-        {poweredByMark && (
-          <Footer.PoweredBy
-            label={t('poweredByLabel')}
-            productName={poweredByMark.productName}
-            href={poweredByMark.href}
-          />
+        {isString(poweredByHref) && (
+          <Footer.PoweredBy label={t('poweredByLabel')} href={poweredByHref} />
         )}
       </Footer>
       {hasCookieSettingsButton && <FloatingCookieSettingsButton />}

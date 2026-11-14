@@ -87,11 +87,7 @@ export const SampleSiteFooter = ({
           )}
         </Footer.FinePrint>
         {!isUndefined(poweredByProductName) && (
-          <Footer.PoweredBy
-            label={t('footerPoweredByLabel')}
-            productName={poweredByProductName}
-            href="#"
-          />
+          <Footer.PoweredBy label={t('footerPoweredByLabel')} href="#" />
         )}
       </Footer>
     </div>

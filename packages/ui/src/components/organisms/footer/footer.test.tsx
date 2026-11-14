@@ -1,6 +1,7 @@
 import { FOOTER_LAYOUT, type TFooterLayout } from '@blog/config';
 import { TextLink } from '@blog/ui/components/atoms/text-link';
 import { renderElement, screen, within } from '@blog/ui/testing/custom-render';
+import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
 
 import { Footer } from './footer';
@@ -28,7 +29,6 @@ const MOCK_PRIVACY_LINK = {
 
 const MOCK_POWERED_BY = {
   label: faker.lorem.words(2),
-  productName: faker.company.name(),
   href: faker.internet.url(),
 };
 
@@ -118,35 +118,6 @@ describe(`<${Footer.name}/>`, () => {
     },
   );
 
-  it('names the link groups and the fine print as two distinct navigation landmarks', () => {
-    renderFullFooter(FOOTER_LAYOUT.COLUMNS);
-
-    const groups = screen.getByRole('navigation', { name: MOCK_GROUPS_LABEL });
-    const finePrint = screen.getByRole('navigation', {
-      name: MOCK_FINE_PRINT_LABEL,
-    });
-    const groupLink = within(groups).getByRole('link', {
-      name: MOCK_LINK.label,
-    });
-    const privacyLink = within(finePrint).getByRole('link', {
-      name: MOCK_PRIVACY_LINK.label,
-    });
-
-    expect(groupLink).toHaveAttribute('href', MOCK_LINK.href);
-    expect(privacyLink).toHaveAttribute('href', MOCK_PRIVACY_LINK.href);
-  });
-
-  it('heads each link group with the heading level it is given', () => {
-    renderFullFooter(FOOTER_LAYOUT.COLUMNS);
-
-    const heading = screen.getByRole('heading', {
-      level: 2,
-      name: MOCK_GROUP_HEADING,
-    });
-
-    expect(heading).toBeInTheDocument();
-  });
-
   it('shows the site name as a wordmark hidden from assistive technology in the Big wordmark layout', () => {
     renderFullFooter(FOOTER_LAYOUT.BIG_WORDMARK);
 
@@ -165,15 +136,48 @@ describe(`<${Footer.name}/>`, () => {
     expect(wordmark).not.toBeInTheDocument();
   });
 
-  it('lists plain text in a link group as an item beside the links', () => {
-    renderFullFooter(FOOTER_LAYOUT.COLUMNS);
+  describe('in the Columns layout', () => {
+    beforeEach(() => {
+      renderFullFooter(FOOTER_LAYOUT.COLUMNS);
+    });
 
-    const groups = screen.getByRole('navigation', { name: MOCK_GROUPS_LABEL });
-    const items = within(groups).getAllByRole('listitem');
-    const textItem = within(groups).getByText(MOCK_GROUP_TEXT);
+    it('names the link groups and the fine print as two distinct navigation landmarks', () => {
+      const finePrint = screen.getByRole('navigation', {
+        name: MOCK_FINE_PRINT_LABEL,
+      });
+      const groups = screen.getByRole('navigation', {
+        name: MOCK_GROUPS_LABEL,
+      });
+      const groupLink = within(groups).getByRole('link', {
+        name: MOCK_LINK.label,
+      });
+      const privacyLink = within(finePrint).getByRole('link', {
+        name: MOCK_PRIVACY_LINK.label,
+      });
 
-    expect(items).toHaveLength(2);
-    expect(textItem).toBeVisible();
+      expect(groupLink).toHaveAttribute('href', MOCK_LINK.href);
+      expect(privacyLink).toHaveAttribute('href', MOCK_PRIVACY_LINK.href);
+    });
+
+    it('heads each link group with the heading level it is given', () => {
+      const heading = screen.getByRole('heading', {
+        level: 2,
+        name: MOCK_GROUP_HEADING,
+      });
+
+      expect(heading).toBeInTheDocument();
+    });
+
+    it('lists plain text in a link group as an item beside the links', () => {
+      const groups = screen.getByRole('navigation', {
+        name: MOCK_GROUPS_LABEL,
+      });
+      const items = within(groups).getAllByRole('listitem');
+      const textItem = within(groups).getByText(MOCK_GROUP_TEXT);
+
+      expect(items).toHaveLength(2);
+      expect(textItem).toBeVisible();
+    });
   });
 
   it('draws no navigation for link groups that have no items', () => {
@@ -234,7 +238,7 @@ describe(`<${Footer.name}/>`, () => {
         name: MOCK_FINE_PRINT_LABEL,
       });
       const poweredBy = screen.getByRole('link', {
-        name: `${MOCK_POWERED_BY.label} ${MOCK_POWERED_BY.productName}`,
+        name: `${MOCK_POWERED_BY.label} ${SHINEFOLD_LOGO_NAME}`,
       });
       const followsFinePrint =
         finePrint.compareDocumentPosition(poweredBy) &

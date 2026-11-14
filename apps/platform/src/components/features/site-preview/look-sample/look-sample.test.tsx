@@ -13,6 +13,7 @@ import {
   SPINNER_STYLE,
   type IBusyStyle,
 } from '@blog/config';
+import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
 import { LOOK_SAMPLE_TOKENS_TEST_ID } from '@platform/constants/look-sample';
 import {
@@ -605,7 +606,7 @@ describe(`<${LookSample.name}/>`, () => {
       );
 
       const mark = screen.getByRole('link', {
-        name: `${POWERED_BY} ${MOCK_PRODUCT_NAME}`,
+        name: `${POWERED_BY} ${SHINEFOLD_LOGO_NAME}`,
       });
 
       expect(mark).toBeVisible();
