@@ -1,59 +1,34 @@
-import {
-  PRICE_PERIOD,
-  type TMaybeUndefined,
-  type TPricePeriod,
-} from '@blog/config';
-import type { TCtaButton, TPricingPrice, TPricingTier } from '@blog/service';
+import type { TMaybeUndefined } from '@blog/config';
+import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
+import type { TPricingPrice, TPricingTier } from '@blog/service';
+import { isUndefined } from '@blog/utils/primitives';
 import { formatPriceAmount } from '@web/utils/format-price-amount';
+import { toLivePlanPrice } from '@web/utils/to-live-plan-price';
 
-const PRICING_TAB_PERIODS = [PRICE_PERIOD.MONTH, PRICE_PERIOD.YEAR] as const;
-
-export type TPricingTabPeriod = (typeof PRICING_TAB_PERIODS)[number];
-
-interface IPricingHeadline {
-  amount: string;
-  compareAt: TMaybeUndefined<{ amount: string; label: string }>;
-  period: TMaybeUndefined<string>;
-  prefix: TMaybeUndefined<string>;
-}
-
-export interface IPricingCardData {
-  id: string;
-  name: string;
-  description: TMaybeUndefined<string>;
-  headline: TMaybeUndefined<IPricingHeadline>;
-  label: TMaybeUndefined<string>;
-  extras: string[];
-  features: string[];
-  ctaButtons: TCtaButton[];
-  highlightLabel: TMaybeUndefined<string>;
-  footnote: TMaybeUndefined<string>;
-}
-
-export interface IPricingPanel {
-  period: TMaybeUndefined<TPricingTabPeriod>;
-  cards: IPricingCardData[];
-}
-
-export interface IPricingLabels {
-  free: string;
-  compareAtLabel: string;
-  from: string;
-  periods: Record<TPricePeriod, string>;
-}
+import type {
+  IPricingCardData,
+  IPricingHeadline,
+  IPricingLabels,
+  IPricingPanel,
+} from './pricing-panel';
+import {
+  isTabPeriod,
+  periodsOf,
+  PRICING_TAB_PERIODS,
+  type TPricingTabPeriod,
+} from './pricing-tab-period';
 
 export interface IToPricingPanelsArgs {
   tiers: TPricingTier[];
+  planPrices: readonly TStripePrice[];
   locale: string;
   currency: string;
   labels: IPricingLabels;
 }
 
-const isTabPeriod = (period: TPricePeriod): period is TPricingTabPeriod =>
-  PRICING_TAB_PERIODS.some((tabPeriod) => tabPeriod === period);
-
 export const toPricingPanels = ({
   tiers,
+  planPrices,
   locale,
   currency,
   labels,
@@ -63,13 +38,12 @@ export const toPricingPanels = ({
 
   const toHeadline = (price: TPricingPrice): IPricingHeadline => ({
     amount: formatAmount(price.amount),
-    compareAt:
-      price.compareAtAmount === undefined
-        ? undefined
-        : {
-            amount: formatAmount(price.compareAtAmount),
-            label: labels.compareAtLabel,
-          },
+    compareAt: isUndefined(price.compareAtAmount)
+      ? undefined
+      : {
+          amount: formatAmount(price.compareAtAmount),
+          label: labels.compareAtLabel,
+        },
     period: price.amount === 0 ? undefined : labels.periods[price.period],
     prefix: price.isStartingAt ? labels.from : undefined,
   });
@@ -103,11 +77,17 @@ export const toPricingPanels = ({
       ctaButtons: tier.ctaButtons,
       highlightLabel: tier.highlightLabel,
       footnote: tier.footnote,
+      livePrice: toLivePlanPrice({
+        tier,
+        planPrices,
+        siteCurrency: currency,
+        periods: labels.periods,
+      }),
     };
   };
 
   const hasSwitch = PRICING_TAB_PERIODS.every((period) =>
-    tiers.some((tier) => tier.prices.some((price) => price.period === period)),
+    tiers.some((tier) => periodsOf(tier).includes(period)),
   );
 
   if (!hasSwitch) {

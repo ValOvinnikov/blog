@@ -1,6 +1,8 @@
 import { PRICE_PERIOD } from '@blog/config';
-import { service } from '@blog/service';
+import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
+import { service, type TPricingTier } from '@blog/service';
 import { PRICING_LOG } from '@web/constants/pricing';
+import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
 import { getRequestContext } from '@web/server/request-context/request-context';
 import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
@@ -13,6 +15,20 @@ import { PricingModuleView } from './pricing-module-view';
 export interface IPricingModuleProps {
   id: string;
 }
+
+const getLinkedPlanPrices = async (
+  id: string,
+  tiers: TPricingTier[],
+): Promise<TStripePrice[]> => {
+  if (!tiers.some((tier) => tier.platformPlan)) return [];
+  const result = await getPlanPrices();
+  if (result.ok) return result.data;
+  logger.error(PRICING_LOG.PLAN_PRICES_FETCH_FAILED, {
+    id,
+    error: result.error,
+  });
+  return [];
+};
 
 export const PricingModule = async ({ id }: IPricingModuleProps) => {
   const { sanityContext, locale, tenantId } = await getRequestContext();
@@ -47,13 +63,13 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
     density,
   } = result.data;
   const { currency, pricePeriodWording } = settingsResult.data;
-  const appearance = await getSectionAppearance(tenantId, {
-    cardStyle,
-    radiusScale,
-    density,
-  });
+  const [appearance, planPrices] = await Promise.all([
+    getSectionAppearance(tenantId, { cardStyle, radiusScale, density }),
+    getLinkedPlanPrices(id, tiers),
+  ]);
   const panels = toPricingPanels({
     tiers,
+    planPrices,
     locale,
     currency,
     labels: {

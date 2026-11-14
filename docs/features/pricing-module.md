@@ -1,7 +1,7 @@
 ---
 title: Pricing module
 status: built
-layers: [config, studio, service, ui, web]
+layers: [config, db, studio, service, ui, web]
 code:
   - packages/config/src/constants/price-period.ts
   - packages/studio/src/schema-types/modules/pricing/**
@@ -16,6 +16,17 @@ code:
   - apps/web/src/utils/to-pricing-panels/**
   - apps/web/src/utils/format-price-amount/**
   - apps/web/src/testing/modules/pricing/**
+  - apps/web/src/utils/to-live-plan-price/**
+  - apps/web/src/utils/to-live-pricing-card/**
+  - apps/web/src/utils/promotion-discount/**
+  - apps/web/src/utils/currency-cookie/**
+  - apps/web/src/utils/with-search-param/**
+  - apps/web/src/utils/is-billing-currency/**
+  - apps/web/src/constants/country.ts
+  - apps/web/src/server/pricing/get-plan-prices/**
+  - apps/web/src/server/proxy/remember-visitor-currency/**
+  - apps/web/src/context/promotion-code-provider/**
+  - apps/web/src/app/api/promotion-code/**
 epics: [5047, 5028, 4840]
 ---
 
@@ -23,7 +34,7 @@ epics: [5047, 5028, 4840]
 
 ## What it does
 
-An editor sells an offer with a table of up to four plans. Each tier has a name, a line on who it is for, one or more prices (or a label such as "Contact us"), a feature list, its own actions, an optional recommendation badge and a footnote. When the tiers carry both monthly and yearly prices, readers get a Monthly/Yearly switch. Every tier, price and feature is written by the editor in Studio. In the marketing tenant's Studio a tier can instead link a platform plan and interval, to show that plan's live price.
+An editor sells an offer with a table of up to four plans. Each tier has a name, a line on who it is for, one or more prices (or a label such as "Contact us"), a feature list, its own actions, an optional recommendation badge and a footnote. When the tiers carry both monthly and yearly prices, readers get a Monthly/Yearly switch. Every tier, price and feature is written by the editor in Studio. In the marketing tenant's Studio a tier can instead link a platform plan and interval, to show that plan's live Stripe price in the visitor's currency, discounted when the address carries a valid `?promo=` code.
 
 ## Surfaces and routes
 
@@ -39,12 +50,15 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - **`settings_site.pricePeriodSuffix`** — one per-language one-line string per `PRICE_PERIOD`, the editor's wording for that period after a price; any may be left empty. A tenant created from starter content gets the `pricingModule.period.*` catalogue wording in its starter language.
 - **Service** — `getSiteSettings` returns `pricePeriodWording`, each period's wording in the request language, falling back to the default language, else `undefined`. `getPricingModule` returns `TPricingModule`. The transformer reads feature `text` through `getLocalizedField` (request language, falling back to the default language) and drops a feature with text in neither, trims `highlightLabel` (blank means not highlighted) and reads `isStartingAt` as false when unset. A tier with both `platformPlan` and `platformPlanInterval` comes back with `platformPlan: { plan, interval }` and no `prices` or `priceLabel`; any other tier comes back with `platformPlan` undefined and its typed prices, whatever stale values it stores.
 - **Web** — `PricingModule` also reads Site Settings for the currency and the `pricingModule.*` catalogue for "Free", "From", "Regular price" and the tab labels. Each period reads the site's `pricePeriodWording`, falling back to the `pricingModule.period.*` catalogue wording in the reader's language. `toPricingPanels` turns tiers into one panel, or a Monthly and a Yearly panel, of formatted cards.
-- **Caching** — the module query is tagged `modules:pricing`, `module:<id>`, `link`, `homePage` and `page_landing`; Site Settings carries its own tags ([rendering-and-caching](./rendering-and-caching.md)).
+- **Linked tiers (web)** — when a tier links a plan, `PricingModule` reads the price catalogue (`getPlanPrices`: `listStripePrices` in `unstable_cache`, tag `stripe-catalogue`, `TENANT_CONFIG_REVALIDATE_SECONDS` fallback); a failed read logs `pricing_module.plan_prices_fetch_failed` and the linked tiers render without a price. `toLivePlanPrice` maps the tier's `MONTH`/`YEAR` to the plan's `PLAN_PRICE_LOOKUP_KEYS` key and carries its amount and Stripe product in every listed currency (`BILLING_CURRENCY`), with a default currency: the Site Settings currency when it has a price, else USD, else the first listed. The cached page carries all of them; the client `LinkedPricingTierCard` shows the one the `visitor_currency` cookie names, or the default until it hydrates and when the plan has no price in that currency.
+- **Visitor currency** — the proxy (`rememberVisitorCurrency`) reads Vercel's `x-vercel-ip-country` header on every tenant's page requests and sets the `visitor_currency` cookie (1 year, listed as necessary in the cookie statement) only when it changes: `US` → USD, `GB` → GBP, the euro area with its outermost regions (GP, MQ, GF, RE, YT, MF) and AD, BL, ME, MC, PM, SM, VA, XK → EUR; any other country clears it.
+- **Promo codes** — `PromotionCodeProvider` (rendered only around tiers with a live price) reads `?promo=` on the client and asks `GET /api/promotion-code?promo=<code>`, which returns only that active code's `code`, `percentOff` or `amountOffByCurrency`, `duration`, `durationInMonths` and `appliesToProductIds` (`getActiveStripePromotionCode`), `public, max-age=60, s-maxage=60`; 404 for an unknown or expired code, 400 for a missing or over-64-character one, 500 (logged `pricing_module.promotion_code_lookup_failed`) on a failed read. A failed request is reported from the browser (`pricing_module.promotion_code_fetch_failed`); a 404 is not. A code that covers the tier's product (or every product) shows the discounted price as the headline with the full price struck through ("Regular price"), adds "on your first payment" (`ONCE`) or "for N months" (`REPEATING`) as an extra line, and adds `?promo=<code>` to the tier's http(s) and relative actions, leaving a same-page `#` link and any other scheme (`mailto:`) as written. An amount-off code with no amount in the shown currency, or a code for other products, leaves the tier at its full price.
+- **Caching** — the module query is tagged `modules:pricing`, `module:<id>`, `link`, `homePage` and `page_landing`; Site Settings carries its own tags ([rendering-and-caching](./rendering-and-caching.md)). `POST /api/revalidate-site-config` also expires `stripe-catalogue`, so a catalogue write by the Stripe webhook shows on the next load with no deploy ([billing](./billing.md)).
 
 ## Configuration
 
 - Editors (Studio) author tiers and prices; the currency is a required Site Settings field, and the price period wording an optional one.
-- The `pricingModule.*` strings are fixed (`period.*` is the fallback for a period the site leaves empty) (`VOICE_FIXED_KEYS`), translated per site language, not tenant-editable ([voice](./voice.md)).
+- The `pricingModule.*` strings, `promo.once` and `promo.repeating` included, are fixed (`period.*` is the fallback for a period the site leaves empty) (`VOICE_FIXED_KEYS`), translated per site language, not tenant-editable ([voice](./voice.md)).
 - The module itself is not plan-gated or capability-gated; only its section overrides are, by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
 - Look reach: the accent hue colours the highlighted tier and the badge; radius, card style and fonts apply through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Each tier is an item card following the radius scale: borderless with a straight brand bar on its left under Accent bar, outlined under Outlined. The highlighted tier adds a brand-colour border on all sides and the card shadow in both styles. On Growth, the module's section overrides win over the Look for its own band, restyling every tier card; the highlighted tier still sets its own border, accent and shadow on top, and tier rows stay aligned. On Free the overrides have no effect ([module-system](./module-system.md)).
 
@@ -77,6 +91,8 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - `apps/web/src/modules/pricing/pricing-module.tsx`, `pricing-module-view.tsx`
 - `apps/web/src/modules/pricing/components/pricing-tier-card/pricing-tier-card.tsx`, `components/pricing-period-switch/pricing-period-switch.tsx`
 - `apps/web/src/utils/to-pricing-panels/to-pricing-panels.ts`, `apps/web/src/utils/format-price-amount/format-price-amount.ts`
+- `apps/web/src/modules/pricing/components/linked-pricing-tier-card/linked-pricing-tier-card.tsx`, `apps/web/src/utils/to-live-pricing-card/to-live-pricing-card.ts`
+- `apps/web/src/app/api/promotion-code/route.ts`, `apps/web/src/server/proxy/remember-visitor-currency/remember-visitor-currency.ts`
 
 ## Tests and stories
 
@@ -84,10 +100,11 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 - Studio: `validate-pricing-{compare-at-above-amount,price-periods-unique,single-highlighted-tier,tier-price-label-required,tier-plan-interval-required}.test.ts`, `studio-config.test.ts` (the `canLinkPlatformPlans` gate).
 - Service: `features/modules/pricing/adaptor/{loader,query,transformer}.test.ts`, `features/global/site-settings/adaptor/loader.test.ts` (the period wording).
 - UI: `pricing-card.test.tsx`, `pricing-card.stories.tsx`, `pricing-card-grid.stories.tsx`.
-- Web: `pricing-module.test.tsx`, `pricing-module-view.test.tsx`, `pricing-period-switch.test.tsx`, `to-pricing-panels.test.ts`, `format-price-amount.test.ts`; fixtures in `apps/web/src/testing/modules/pricing/fixtures.ts`; story `pricing-module-view.stories.tsx`.
+- Web: `pricing-module.test.tsx`, `pricing-module-view.test.tsx`, `pricing-period-switch.test.tsx`, `linked-pricing-tier-card.test.tsx`, `to-pricing-panels.test.ts`, `to-live-plan-price.test.ts`, `to-live-pricing-card.test.ts`, `format-price-amount.test.ts`, `currency-cookie.test.ts`, `remember-visitor-currency.test.ts`, `app/api/promotion-code/route.test.ts`; fixtures in `apps/web/src/testing/modules/pricing/fixtures.ts`; story `pricing-module-view.stories.tsx` (`LinkedPlanLivePrice`).
 
 ## Related
 
+- #6882 — linked tiers show the live Stripe price in the visitor's currency, with `?promo=` discounts.
 - #5047 — epic: plans and entitlements. Proposes Pricing as a Growth module.
 - #4840 — epic: platform front door (cross-reference, not an epic of this module). Its pricing page renders from `PLAN_REGISTRY` plus a price source, not from CMS-authored tiers.
 - #5028 — epic: text roles. #5036 gives pricing amounts and footnotes one shared style; #5039 moves the module footnote onto the footnote role.

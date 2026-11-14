@@ -19,6 +19,7 @@ import {
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,
+  STRIPE_CATALOGUE_CACHE_TAG,
   TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
 
@@ -111,6 +112,7 @@ describe(POST, () => {
     const expectedTags = [
       ...tagsForTenant(MOCK_TENANT_ID),
       TENANT_BY_HOST_CACHE_TAG,
+      STRIPE_CATALOGUE_CACHE_TAG,
     ];
 
     expect(response.status).toBe(HTTP_STATUS.OK);
@@ -172,6 +174,7 @@ describe(POST, () => {
         ...tagsForTenant(MOCK_TENANT_ID),
         ...tagsForTenant(MOCK_OTHER_TENANT_ID),
         TENANT_BY_HOST_CACHE_TAG,
+        STRIPE_CATALOGUE_CACHE_TAG,
       ];
 
       expect(response.status).toBe(HTTP_STATUS.OK);

@@ -5,6 +5,7 @@ import type { TValueOf } from '@blog/config/utils';
 import { DEPTH_STORAGE_KEY } from '@web/config/depth-script';
 import { THEME_STORAGE_KEY } from '@web/config/theme-script';
 import { CONSENT_COOKIE_NAME } from '@web/utils/consent-cookie';
+import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
 import { LANGUAGE_COOKIE_NAME } from '@web/utils/language-cookie';
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
 import { NEWSLETTER_UNSUBSCRIBE_TOKEN_COOKIE_NAME } from '@web/utils/newsletter-unsubscribe-token-cookie-name';
@@ -19,6 +20,7 @@ type TCookieProvider = TValueOf<typeof COOKIE_PROVIDER>;
 export const COOKIE_ID = {
   CONSENT: 'CONSENT',
   LANGUAGE: 'LANGUAGE',
+  CURRENCY: 'CURRENCY',
   SESSION: 'SESSION',
   CSRF: 'CSRF',
   SIGN_IN_RETURN: 'SIGN_IN_RETURN',
@@ -56,6 +58,7 @@ const necessaryFirstPartyEntry = (
 export const COOKIE_LIST: readonly ICookieListEntry[] = [
   necessaryFirstPartyEntry(COOKIE_ID.CONSENT, CONSENT_COOKIE_NAME),
   necessaryFirstPartyEntry(COOKIE_ID.LANGUAGE, LANGUAGE_COOKIE_NAME),
+  necessaryFirstPartyEntry(COOKIE_ID.CURRENCY, CURRENCY_COOKIE_NAME),
   necessaryFirstPartyEntry(
     COOKIE_ID.SESSION,
     SIGN_IN_COOKIES.sessionToken.name,

@@ -11,6 +11,7 @@ import {
   buildSettingsFeaturesCacheTag,
   buildSiteConfigCacheTag,
   buildTenantPlanCacheTag,
+  STRIPE_CATALOGUE_CACHE_TAG,
   TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
 import { revalidateTag } from 'next/cache';
@@ -78,6 +79,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   const revalidatedTags = [
     ...tenantIds.flatMap(buildTagsForTenant),
     TENANT_BY_HOST_CACHE_TAG,
+    STRIPE_CATALOGUE_CACHE_TAG,
   ];
 
   for (const tag of revalidatedTags) {
