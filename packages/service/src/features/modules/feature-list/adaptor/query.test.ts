@@ -1,12 +1,8 @@
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
-  CARD_STYLE,
   CONTENT_ALIGNMENT,
-  DENSITY,
-  GRID_COLUMNS,
   LOCALE_ISO_CODES,
-  RADIUS_SCALE,
 } from '@blog/config/constants';
 import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/feature-list/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
@@ -16,6 +12,7 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedImage,
 } from '@blog/service/testing/shared/localized';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { featureListModuleQuery } from './query';
@@ -139,18 +136,11 @@ describe('featureListModuleQuery', () => {
   });
 
   it('reads the authored appearance overrides', async () => {
-    const appearance = {
-      cardStyle: CARD_STYLE.RAISED,
-      radiusScale: RADIUS_SCALE.XL,
-      density: DENSITY.COMPACT,
-      columns: GRID_COLUMNS.TWO,
-    };
-
     const module = await runFeatureList(EN, {
       ...MOCK_FEATURE_LIST_DOCUMENT,
-      ...appearance,
+      ...MOCK_AUTHORED_MODULE_APPEARANCE,
     });
 
-    expect(module).toMatchObject(appearance);
+    expect(module).toMatchObject(MOCK_AUTHORED_MODULE_APPEARANCE);
   });
 });

@@ -1,14 +1,10 @@
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
-  CARD_STYLE,
   CONTENT_ALIGNMENT,
-  DENSITY,
   DISPLAY_MODE,
-  GRID_COLUMNS,
   ICONS,
   LINK_TYPE,
-  RADIUS_SCALE,
 } from '@blog/config';
 import {
   mockRawFeatureListItem,
@@ -22,6 +18,7 @@ import {
   mockLinkView,
   mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { toFeatureListModule } from './transformer';
@@ -67,16 +64,11 @@ describe(toFeatureListModule, () => {
   });
 
   it('maps the authored appearance overrides straight through', () => {
-    const appearance = {
-      cardStyle: CARD_STYLE.OUTLINED,
-      radiusScale: RADIUS_SCALE.LG,
-      density: DENSITY.COMPACT,
-      columns: GRID_COLUMNS.FOUR,
-    };
+    const module = toFeatureListModule(
+      mockRawFeatureListModule(MOCK_AUTHORED_MODULE_APPEARANCE),
+    );
 
-    const module = toFeatureListModule(mockRawFeatureListModule(appearance));
-
-    expect(module).toMatchObject(appearance);
+    expect(module).toMatchObject(MOCK_AUTHORED_MODULE_APPEARANCE);
   });
 
   it('keeps the cards in authored order', () => {
