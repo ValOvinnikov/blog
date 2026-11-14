@@ -19,6 +19,8 @@ import { NextResponse } from 'next/server';
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
 export const runtime = 'nodejs';
 
+const BEARER_PREFIX = 'Bearer ';
+
 const buildTagsForTenant = (tenantId: string): string[] => [
   buildSiteConfigCacheTag(tenantId),
   buildSettingsFeaturesCacheTag(tenantId),
@@ -60,8 +62,8 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const authHeader = request.headers.get('authorization');
-  const providedSecret = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice('Bearer '.length)
+  const providedSecret = authHeader?.startsWith(BEARER_PREFIX)
+    ? authHeader.slice(BEARER_PREFIX.length)
     : null;
 
   if (!isSecretMatch(providedSecret, secret)) {

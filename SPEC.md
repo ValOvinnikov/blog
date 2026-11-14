@@ -2450,8 +2450,12 @@ re-categorisation or removal would otherwise leave stale HTML on the page the
 post no longer occupies, with no way to detect it). A renamed post slug is a
 known, unsolved gap — the old slug isn't recoverable from the webhook payload,
 so the page at the old URL stays stale until the route-level backstop below
-expires it. Anything without a precise derivation yet falls back to a logged
-whole-site purge.
+expires it. Every other tagged type, a post the lookup no longer finds and a
+Look, Voice or Features save purge every page the publishing tenant renders —
+the sitemap's page lists plus the index, legal and newsletter pages, the page
+after each listing's last, and the changed document's own path — so one
+tenant's change never expires another tenant's pages. Only an unresolved
+tenant or a failed lookup falls back to a logged whole-site purge.
 
 The webhook also purges **by reverse lookup**. On every publish of a type that
 carries tags of its own, it resolves which page-builder modules reach the

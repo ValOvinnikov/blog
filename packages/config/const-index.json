@@ -9914,6 +9914,14 @@
         "file": "apps/web/src/constants/revalidate.ts"
       }
     ],
+    "revalidate.live_locales_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
     "revalidate.tenant_page_list_lookup_failed": [
       {
         "ref": "REVALIDATE_LOG.TENANT_PAGE_LIST_LOOKUP_FAILED",

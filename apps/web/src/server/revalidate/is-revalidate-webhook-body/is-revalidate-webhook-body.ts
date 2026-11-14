@@ -1,13 +1,14 @@
+import type { TNullable } from '@blog/config';
 import { isNull, isString, isUndefined } from '@blog/utils/primitives';
 
 export interface IRevalidateWebhookBody {
   _type: string;
   _id: string;
-  slug?: string;
+  slug?: TNullable<string>;
 }
 
-const isOptionalString = (value: unknown): boolean =>
-  isUndefined(value) || isString(value);
+const isNullableString = (value: unknown): boolean =>
+  isUndefined(value) || isNull(value) || isString(value);
 
 export const isRevalidateWebhookBody = (
   value: unknown,
@@ -17,6 +18,6 @@ export const isRevalidateWebhookBody = (
     !isNull(value) &&
     isString((value as Record<string, unknown>)['_type']) &&
     isString((value as Record<string, unknown>)['_id']) &&
-    isOptionalString((value as Record<string, unknown>)['slug'])
+    isNullableString((value as Record<string, unknown>)['slug'])
   );
 };

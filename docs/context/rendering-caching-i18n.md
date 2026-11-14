@@ -112,11 +112,18 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
 
   Every other `_type` (including the `posts`-tagged
   `person`/`blog_topic`/`blog_tag`, whose edit can affect every
-  post-list-bearing page of a tenant) has no precise derivation yet — full
-  enumeration for those is unbounded in the number of `revalidatePath` calls
-  for a large tenant, a design tradeoff not yet resolved. Any undeliverable
-  derivation — an unresolved tenant, a `_type` with no derivation, a thrown
-  Sanity-credentials lookup, or a failed lookup — falls back to the
+  post-list-bearing page of a tenant), and a `page_post` the lookup no longer
+  finds (deleted, unpublished or future-dated), purges every page the tenant
+  renders (`derive-tenant-site-paths`): the page lists the sitemap reads
+  (`server/tenant/tenant-page-lists`), the index, legal and newsletter pages
+  in every live language, the page after each listing's current last (a
+  removed entry can leave it cached), and the changed document's own path
+  from the webhook's projected `slug` through `pageHref` — so a deleted or
+  unpublished landing page, topic, tag or section document is purged too. A
+  large tenant costs roughly one `revalidatePath` per listed page and
+  pagination page, plus about sixteen per live language. Any undeliverable
+  derivation — an unresolved tenant, a thrown Sanity-credentials or
+  live-locales lookup, or a failed page-list lookup — falls back to the
   whole-site `revalidatePath('/', 'layout')` purge, always logged
   (`revalidate.path_purge_fallback`) rather than left silently incomplete.
   The credentials lookup (`getTenantSanityCredentials`, which throws when
@@ -176,15 +183,12 @@ detected`, and a re-export with `it mustn't be reexported`, so a wrong form
   leaving that fallback as a safety net for a future caller rather than a path
   the panel takes.
 
-  Unlike `/api/revalidate`, this route makes no attempt at a resolved-path
-  derivation and is expected to stay that way permanently (#2666) — a
+  Its path purge reuses `/api/revalidate`'s tenant-wide derivation: a
   Look/Voice/Features save changes theme tokens, nav or feature flags on
-  _every_ page the tenant renders, so there is no smaller path set that would
-  be correct to purge instead of the whole site; a full per-tenant path
-  enumeration would be no more correct here, only more code. It always falls
-  back to `revalidatePath('/', 'layout')`, logged
-  (`revalidate_site_config.whole_site_purge`, with the resolved `tenantIds`)
-  rather than silent.
+  every page the tenant renders, so it purges exactly that tenant's page set
+  (`resolve-tenant-site-paths`). With no `tenantId`, or when the credentials
+  or page-list lookup fails, it falls back to `revalidatePath('/', 'layout')`,
+  logged as `revalidate.path_purge_fallback`.
 
   It calls the endpoint best-effort
   (`@platform/server/site-config/revalidate-site-config`) — a failed call is

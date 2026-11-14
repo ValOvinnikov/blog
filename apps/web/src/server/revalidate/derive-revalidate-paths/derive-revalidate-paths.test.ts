@@ -24,7 +24,7 @@ vi.mock(
   () => ({ deriveTenantSitePaths: vi.fn() }),
 );
 
-const MOCK_POST_SLUG = faker.lorem.slug();
+const MOCK_SLUG = faker.lorem.slug();
 const MOCK_POST_PATHS = [faker.system.directoryPath()];
 const MOCK_SITE_PATHS = [faker.system.directoryPath()];
 const MOCK_TENANT_INPUT = {
@@ -35,7 +35,7 @@ const MOCK_POST_INPUT = {
   ...MOCK_TENANT_INPUT,
   type: POST_TYPE,
   id: faker.string.uuid(),
-  slug: MOCK_POST_SLUG,
+  slug: MOCK_SLUG,
 };
 
 describe(deriveRevalidatePaths, () => {
@@ -48,13 +48,22 @@ describe(deriveRevalidatePaths, () => {
     );
   });
 
-  it.each(['page_landing', 'settings_navigation', 'module_heroBlog'])(
-    'resolves every page of the tenant for a %s change',
-    async (type) => {
+  it.each([
+    { type: 'settings_navigation', documentHref: undefined },
+    { type: 'module_heroBlog', documentHref: undefined },
+    { type: 'page_landing', documentHref: `/${MOCK_SLUG}` },
+    { type: 'blog_tag', documentHref: undefined },
+    { type: 'page_tag', documentHref: `/tags/${MOCK_SLUG}` },
+  ])(
+    'resolves every page of the tenant for a $type change',
+    async ({ type, documentHref }) => {
       const result = await deriveRevalidatePaths({ ...MOCK_POST_INPUT, type });
 
       expect(result).toEqual(okResult(MOCK_SITE_PATHS));
-      expect(deriveTenantSitePaths).toHaveBeenCalledWith(MOCK_TENANT_INPUT);
+      expect(deriveTenantSitePaths).toHaveBeenCalledWith({
+        ...MOCK_TENANT_INPUT,
+        documentHref,
+      });
       expect(derivePostPublishPaths).not.toHaveBeenCalled();
     },
   );
@@ -76,7 +85,7 @@ describe(deriveRevalidatePaths, () => {
     expect(result).toEqual(okResult(MOCK_SITE_PATHS));
     expect(deriveTenantSitePaths).toHaveBeenCalledWith({
       ...MOCK_TENANT_INPUT,
-      removedPostSlug: MOCK_POST_SLUG,
+      documentHref: `/blog/${MOCK_SLUG}`,
     });
   });
 

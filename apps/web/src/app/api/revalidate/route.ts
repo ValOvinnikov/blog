@@ -110,7 +110,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     tags: revalidated,
     type,
     id,
-    slug,
+    slug: slug ?? undefined,
     tenantId,
     tenant: tenantSanity,
   });

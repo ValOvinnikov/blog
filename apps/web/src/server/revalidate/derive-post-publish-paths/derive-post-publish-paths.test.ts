@@ -6,6 +6,7 @@ import {
   FETCH_FAILED_REASON,
   REVALIDATE_LOG,
 } from '@web/constants/revalidate';
+import { resolveTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { mockPostCard } from '@web/testing/shared/post/fixtures';
 import { mockTag } from '@web/testing/shared/tag/fixtures';
@@ -36,16 +37,9 @@ const {
   getTopicPaginationParamsMock: vi.fn(),
 }));
 
-vi.mock('@blog/db', async () => {
-  const { LOCALE_ISO_CODES } = await import('@blog/config');
-  return {
-    queries: {
-      tenants: {
-        getTenantLiveLocales: vi.fn().mockResolvedValue([LOCALE_ISO_CODES.EN]),
-      },
-    },
-  };
-});
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales', () => ({
+  resolveTenantLiveLocales: vi.fn(),
+}));
 
 vi.mock('@blog/service', () => ({
   service: {
@@ -96,6 +90,9 @@ describe(derivePostPublishPaths, () => {
     getTagPaginationParamsMock.mockReset();
     getTopicParamsMock.mockReset();
     getTopicPaginationParamsMock.mockReset();
+    vi.mocked(resolveTenantLiveLocales).mockResolvedValue(
+      okResult([LOCALE_ISO_CODES.EN]),
+    );
     getPostsByIdsMock.mockResolvedValue(okResult([MOCK_POST]));
     getIndexPageParamsMock.mockResolvedValue(okResult([]));
     getTagParamsMock.mockResolvedValue(okResult([]));
@@ -178,4 +175,19 @@ describe(derivePostPublishPaths, () => {
       });
     },
   );
+
+  it('reports fetch_failed and logs when the live locales lookup fails', async () => {
+    vi.mocked(resolveTenantLiveLocales).mockResolvedValue(
+      errorResult(MOCK_ERROR),
+    );
+
+    const result = await derivePostPublishPaths(MOCK_POST_INPUT);
+
+    expect(result).toEqual(errorResult(FETCH_FAILED_REASON));
+    expect(getPostsByIdsMock).not.toHaveBeenCalled();
+    expect(loggerErrorMock).toHaveBeenCalledWith(
+      REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED,
+      { id: MOCK_POST.id, error: MOCK_ERROR },
+    );
+  });
 });

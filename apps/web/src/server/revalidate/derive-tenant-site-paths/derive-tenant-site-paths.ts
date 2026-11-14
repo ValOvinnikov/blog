@@ -1,8 +1,7 @@
-import { queries } from '@blog/db';
 import type { TTenantSanityContext } from '@blog/service';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import { FETCH_FAILED_REASON, REVALIDATE_LOG } from '@web/constants/revalidate';
-import { routing } from '@web/i18n/routing';
+import { resolveTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import {
   getTenantPageListResults,
   type TTenantPageListResults,
@@ -14,33 +13,65 @@ import { logger } from '@web/utils/logger/logger';
 export type TDeriveTenantSitePathsInput = {
   tenantId: string;
   tenant: TTenantSanityContext;
-  removedPostSlug?: string;
+  documentHref?: string;
 };
+
+type TPageListFailure = { list: string; error: unknown };
+
+const isFailedEntry = (
+  entry: [string, TResult<unknown>],
+): entry is [string, { ok: false; error: unknown }] => !entry[1].ok;
 
 const toPageLists = (
   results: TTenantPageListResults,
-): TResult<TTenantPageLists, { list: string; error: unknown }> => {
-  const lists: Partial<Record<string, unknown>> = {};
-  for (const [list, result] of Object.entries(results)) {
-    if (!result.ok) {
-      return errorResult({ list, error: result.error });
-    }
-    lists[list] = result.data;
+): TResult<TTenantPageLists, TPageListFailure> => {
+  const { posts, topics, tags, topicPages, tagPages, blogPages } = results;
+  const { landingPages, privacyDocuments, legalDocuments } = results;
+  if (
+    posts.ok &&
+    topics.ok &&
+    tags.ok &&
+    topicPages.ok &&
+    tagPages.ok &&
+    blogPages.ok &&
+    landingPages.ok &&
+    privacyDocuments.ok &&
+    legalDocuments.ok
+  ) {
+    return okResult({
+      posts: posts.data,
+      topics: topics.data,
+      tags: tags.data,
+      topicPages: topicPages.data,
+      tagPages: tagPages.data,
+      blogPages: blogPages.data,
+      landingPages: landingPages.data,
+      privacyDocuments: privacyDocuments.data,
+      legalDocuments: legalDocuments.data,
+    });
   }
-  return okResult(lists as TTenantPageLists);
+  const [list = '', failed] = Object.entries(results).find(isFailedEntry) ?? [];
+  return errorResult({ list, error: failed?.error });
 };
 
 export const deriveTenantSitePaths = async ({
   tenantId,
   tenant,
-  removedPostSlug,
+  documentHref,
 }: TDeriveTenantSitePathsInput): Promise<
   TResult<string[], typeof FETCH_FAILED_REASON>
 > => {
-  const locales = (await queries.tenants.getTenantLiveLocales(tenantId)) ?? [
-    routing.defaultLocale,
-  ];
-  const lists = toPageLists(await getTenantPageListResults(tenant, locales));
+  const locales = await resolveTenantLiveLocales(tenantId);
+  if (!locales.ok) {
+    logger.error(REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED, {
+      tenantId,
+      error: locales.error,
+    });
+    return errorResult(FETCH_FAILED_REASON);
+  }
+  const lists = toPageLists(
+    await getTenantPageListResults(tenant, locales.data),
+  );
   if (!lists.ok) {
     logger.error(REVALIDATE_LOG.TENANT_PAGE_LIST_LOOKUP_FAILED, {
       tenantId,
@@ -51,9 +82,9 @@ export const deriveTenantSitePaths = async ({
   return okResult(
     buildTenantSitePaths({
       tenantId,
-      locales,
+      locales: locales.data,
       lists: lists.data,
-      removedPostSlug,
+      documentHref,
     }),
   );
 };

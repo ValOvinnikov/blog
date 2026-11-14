@@ -95,12 +95,8 @@ describe(POST, () => {
       mockTenant({ id: MOCK_OTHER_TENANT_ID }),
     ]);
     vi.mocked(logger.warn).mockReset();
-    vi.mocked(resolveTenantSitePaths).mockImplementation((tenantId) =>
-      Promise.resolve(
-        tenantId
-          ? okResult(MOCK_TENANT_PATHS)
-          : errorResult(TENANT_UNRESOLVED_REASON),
-      ),
+    vi.mocked(resolveTenantSitePaths).mockResolvedValue(
+      okResult(MOCK_TENANT_PATHS),
     );
   });
 
@@ -164,6 +160,10 @@ describe(POST, () => {
   ])(
     'revalidates every tenant’s scoped tags and purges the whole site when $case',
     async ({ body }) => {
+      vi.mocked(resolveTenantSitePaths).mockResolvedValue(
+        errorResult(TENANT_UNRESOLVED_REASON),
+      );
+
       const request = makeRequest(BEARER_SECRET, body);
       const response = await POST(request);
       const json = await response.json();
@@ -177,6 +177,7 @@ describe(POST, () => {
       expect(response.status).toBe(HTTP_STATUS.OK);
       expect(json).toEqual({ revalidated: expectedTags, pathPurged: true });
       expect(purgedTags()).toEqual(expectedTags);
+      expect(resolveTenantSitePaths).toHaveBeenCalledWith(undefined);
       expect(revalidatePathMock.mock.calls).toEqual([WHOLE_SITE_PURGE_ARGS]);
       expect(logger.warn).toHaveBeenCalledWith(
         REVALIDATE_LOG.PATH_PURGE_FALLBACK,

@@ -1,4 +1,3 @@
-import { queries } from '@blog/db';
 import { service, type TTenantSanityContext } from '@blog/service';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
@@ -6,7 +5,7 @@ import {
   FETCH_FAILED_REASON,
   REVALIDATE_LOG,
 } from '@web/constants/revalidate';
-import { routing } from '@web/i18n/routing';
+import { resolveTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
 import { buildPostPublishPaths } from '@web/utils/build-post-publish-paths';
 import { logger } from '@web/utils/logger/logger';
 
@@ -26,9 +25,15 @@ export const derivePostPublishPaths = async ({
     typeof DOCUMENT_NOT_FOUND_REASON | typeof FETCH_FAILED_REASON
   >
 > => {
-  const locales = (await queries.tenants.getTenantLiveLocales(tenantId)) ?? [
-    routing.defaultLocale,
-  ];
+  const liveLocales = await resolveTenantLiveLocales(tenantId);
+  if (!liveLocales.ok) {
+    logger.error(REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED, {
+      id,
+      error: liveLocales.error,
+    });
+    return errorResult(FETCH_FAILED_REASON);
+  }
+  const locales = liveLocales.data;
   const [
     postsResult,
     blogParamsResult,

@@ -1,4 +1,4 @@
-import type { TMaybeUndefined } from '@blog/config';
+import { pageHref, type TMaybeUndefined } from '@blog/config';
 import type { TTenantSanityContext } from '@blog/service';
 import { errorResult, okResult, type TResult } from '@blog/utils';
 import {
@@ -23,13 +23,13 @@ export type TDeriveRevalidatePathsInput = {
   tenant: TTenantSanityContext;
 };
 
-/** The resolved paths of the publishing tenant that a document change affects: a live post's own set, otherwise every page the tenant renders. */
 export const deriveRevalidatePaths = async (
   input: TDeriveRevalidatePathsInput,
 ): Promise<TDeriveRevalidatePathsResult> => {
   const { type, slug, tenantId, tenant } = input;
+  const tenantSite = { tenantId, tenant, documentHref: pageHref(type, slug) };
   if (type !== POST_TYPE) {
-    return deriveTenantSitePaths({ tenantId, tenant });
+    return deriveTenantSitePaths(tenantSite);
   }
 
   const postPaths = await derivePostPublishPaths(input);
@@ -39,5 +39,5 @@ export const deriveRevalidatePaths = async (
   if (postPaths.error !== DOCUMENT_NOT_FOUND_REASON) {
     return errorResult(postPaths.error);
   }
-  return deriveTenantSitePaths({ tenantId, tenant, removedPostSlug: slug });
+  return deriveTenantSitePaths(tenantSite);
 };

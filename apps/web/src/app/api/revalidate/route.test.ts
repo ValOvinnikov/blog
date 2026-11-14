@@ -125,6 +125,7 @@ vi.mock(
 const TOPIC_DOCUMENT_TYPE = 'page_topic';
 const AUTHOR_DOCUMENT_TYPE = 'person';
 const UNTAGGED_DOCUMENT_TYPE = 'settings_voice';
+const NAVIGATION_DOCUMENT_TYPE = 'settings_navigation';
 const EXPIRE_NOW = { expire: 0 };
 
 const MOCK_NOW = faker.date.between({
@@ -658,6 +659,25 @@ describe(POST, () => {
         type: POST_TYPE,
         id: MOCK_POST_ID,
         slug: MOCK_POST_SLUG,
+        tenantId: MOCK_TENANT_ID,
+        tenant: MOCK_TENANT_SANITY_CONTEXT,
+      });
+    });
+
+    it('accepts a null slug as absent for a document without one', async () => {
+      const response = await POST(
+        makeTenantRequest({
+          _type: NAVIGATION_DOCUMENT_TYPE,
+          _id: MOCK_DOCUMENT_ID,
+          slug: null,
+        }),
+      );
+
+      expect(response.status).toBe(HTTP_STATUS.OK);
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith({
+        type: NAVIGATION_DOCUMENT_TYPE,
+        id: MOCK_DOCUMENT_ID,
+        slug: undefined,
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });

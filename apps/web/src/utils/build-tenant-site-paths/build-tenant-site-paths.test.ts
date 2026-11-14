@@ -1,8 +1,7 @@
-import { LOCALE_ISO_CODES, NEWSLETTER_RESULT, routes } from '@blog/config';
+import { LOCALE_ISO_CODES } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { mockTenantPageLists } from '@web/testing/shared/tenant-page-lists/fixtures';
-import { toTenantScopedPath } from '@web/utils/to-tenant-scoped-path';
 
 import { buildTenantSitePaths } from './build-tenant-site-paths';
 
@@ -11,14 +10,12 @@ faker.seed(7382);
 const { EN, NL } = LOCALE_ISO_CODES;
 const [
   MOCK_POST_SLUG,
-  MOCK_REMOVED_POST_SLUG,
   MOCK_TOPIC_SLUG,
   MOCK_TAG_SLUG,
   MOCK_LANDING_SLUG,
   MOCK_PRIVACY_SLUG,
   MOCK_LEGAL_SLUG,
-] = faker.helpers.uniqueArray(faker.lorem.slug, 7) as [
-  string,
+] = faker.helpers.uniqueArray(faker.lorem.slug, 6) as [
   string,
   string,
   string,
@@ -26,23 +23,28 @@ const [
   string,
   string,
 ];
-const MOCK_PAGE = '2';
+const MOCK_DOCUMENT_HREF = `/${faker.lorem.slug()}`;
+const EN_ROOT = `/${MOCK_TENANT_ID}/${EN}`;
+const NL_ROOT = `/${MOCK_TENANT_ID}/${NL}`;
 
-const scoped = (locale: string, path: string) =>
-  toTenantScopedPath(MOCK_TENANT_ID, locale, path);
-
-const everyLanguagePaths = (locale: string): string[] =>
-  [
-    routes.home(),
-    routes.blogIndex(),
-    routes.topics(),
-    routes.tags(),
-    routes.privacy(),
-    routes.legal(),
-    routes.cookieStatement(),
-    routes.newsletterUnsubscribeConfirmation(),
-    ...Object.values(NEWSLETTER_RESULT).map(routes.newsletterResult),
-  ].map((path) => scoped(locale, path));
+const everyLanguagePaths = (root: string): string[] => [
+  root,
+  `${root}/blog`,
+  `${root}/blog/page/2`,
+  `${root}/topics`,
+  `${root}/tags`,
+  `${root}/privacy`,
+  `${root}/legal`,
+  `${root}/legal/cookie-statement`,
+  `${root}/newsletter/unsubscribe`,
+  `${root}/newsletter/confirmed`,
+  `${root}/newsletter/confirm-invalid`,
+  `${root}/newsletter/confirm-unavailable`,
+  `${root}/newsletter/confirm-failed`,
+  `${root}/newsletter/unsubscribed`,
+  `${root}/newsletter/unsubscribe-invalid`,
+  `${root}/newsletter/unsubscribe-failed`,
+];
 
 describe(buildTenantSitePaths, () => {
   it('builds the index, legal and newsletter paths in every locale', () => {
@@ -53,15 +55,15 @@ describe(buildTenantSitePaths, () => {
     });
 
     expect(paths).toEqual([
-      ...everyLanguagePaths(EN),
-      ...everyLanguagePaths(NL),
+      ...everyLanguagePaths(EN_ROOT),
+      ...everyLanguagePaths(NL_ROOT),
     ]);
   });
 
-  it('adds every listed page in its own language and blog pagination in every locale', () => {
+  it('adds every listed page in its own language, with the page after each last one', () => {
     const paths = buildTenantSitePaths({
       tenantId: MOCK_TENANT_ID,
-      locales: [EN, NL],
+      locales: [EN],
       lists: mockTenantPageLists({
         posts: [
           {
@@ -71,10 +73,9 @@ describe(buildTenantSitePaths, () => {
           },
         ],
         topics: [{ slug: MOCK_TOPIC_SLUG, language: EN }],
-        topicPages: [{ slug: MOCK_TOPIC_SLUG, language: EN, page: MOCK_PAGE }],
+        topicPages: [{ slug: MOCK_TOPIC_SLUG, language: EN, page: '2' }],
         tags: [{ slug: MOCK_TAG_SLUG, language: NL }],
-        tagPages: [{ slug: MOCK_TAG_SLUG, language: NL, page: MOCK_PAGE }],
-        blogPages: [{ page: MOCK_PAGE }],
+        blogPages: [{ page: '2' }],
         landingPages: [{ slug: MOCK_LANDING_SLUG, language: EN }],
         privacyDocuments: [{ slug: MOCK_PRIVACY_SLUG, language: EN }],
         legalDocuments: [{ slug: MOCK_LEGAL_SLUG, language: NL }],
@@ -83,33 +84,34 @@ describe(buildTenantSitePaths, () => {
 
     expect(paths).toEqual(
       expect.arrayContaining([
-        scoped(EN, routes.blogIndex(Number(MOCK_PAGE))),
-        scoped(NL, routes.blogIndex(Number(MOCK_PAGE))),
-        scoped(NL, routes.post(MOCK_POST_SLUG)),
-        scoped(EN, routes.topic(MOCK_TOPIC_SLUG)),
-        scoped(EN, routes.topic(MOCK_TOPIC_SLUG, Number(MOCK_PAGE))),
-        scoped(NL, routes.tag(MOCK_TAG_SLUG)),
-        scoped(NL, routes.tag(MOCK_TAG_SLUG, Number(MOCK_PAGE))),
-        scoped(EN, routes.landingPage(MOCK_LANDING_SLUG)),
-        scoped(EN, routes.privacyDocument(MOCK_PRIVACY_SLUG)),
-        scoped(NL, routes.legalDocument(MOCK_LEGAL_SLUG)),
+        `${EN_ROOT}/blog/page/2`,
+        `${EN_ROOT}/blog/page/3`,
+        `${NL_ROOT}/blog/${MOCK_POST_SLUG}`,
+        `${EN_ROOT}/topics/${MOCK_TOPIC_SLUG}`,
+        `${EN_ROOT}/topics/${MOCK_TOPIC_SLUG}/page/2`,
+        `${EN_ROOT}/topics/${MOCK_TOPIC_SLUG}/page/3`,
+        `${NL_ROOT}/tags/${MOCK_TAG_SLUG}`,
+        `${NL_ROOT}/tags/${MOCK_TAG_SLUG}/page/2`,
+        `${EN_ROOT}/${MOCK_LANDING_SLUG}`,
+        `${EN_ROOT}/privacy/${MOCK_PRIVACY_SLUG}`,
+        `${NL_ROOT}/legal/${MOCK_LEGAL_SLUG}`,
       ]),
     );
-    expect(paths).not.toContain(scoped(EN, routes.post(MOCK_POST_SLUG)));
+    expect(paths).not.toContain(`${EN_ROOT}/blog/${MOCK_POST_SLUG}`);
   });
 
-  it('adds a removed post’s path in every locale', () => {
+  it('adds the changed document’s own path in every locale', () => {
     const paths = buildTenantSitePaths({
       tenantId: MOCK_TENANT_ID,
       locales: [EN, NL],
       lists: mockTenantPageLists(),
-      removedPostSlug: MOCK_REMOVED_POST_SLUG,
+      documentHref: MOCK_DOCUMENT_HREF,
     });
 
     expect(paths).toEqual(
       expect.arrayContaining([
-        scoped(EN, routes.post(MOCK_REMOVED_POST_SLUG)),
-        scoped(NL, routes.post(MOCK_REMOVED_POST_SLUG)),
+        `${EN_ROOT}${MOCK_DOCUMENT_HREF}`,
+        `${NL_ROOT}${MOCK_DOCUMENT_HREF}`,
       ]),
     );
   });
@@ -121,6 +123,6 @@ describe(buildTenantSitePaths, () => {
       lists: mockTenantPageLists(),
     });
 
-    expect(paths).toEqual(everyLanguagePaths(EN));
+    expect(paths).toEqual(everyLanguagePaths(EN_ROOT));
   });
 });

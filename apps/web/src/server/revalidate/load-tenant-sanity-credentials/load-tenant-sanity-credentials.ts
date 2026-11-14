@@ -10,7 +10,6 @@ export type TLoadTenantSanityCredentialsInput = {
   tenantId: string;
 };
 
-/** Called once per webhook: the module lookup and the path derivation both need it, and a second fetch would report one failure as two. */
 export const loadTenantSanityCredentials = async ({
   type,
   id,

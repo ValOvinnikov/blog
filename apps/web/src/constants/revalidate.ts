@@ -12,6 +12,7 @@ export const REVALIDATE_LOG = {
   REFERENCING_MODULES_LOOKUP_FAILED:
     'revalidate.referencing_modules_lookup_failed',
   POST_LOOKUP_FAILED: 'revalidate.post_lookup_failed',
+  LIVE_LOCALES_LOOKUP_FAILED: 'revalidate.live_locales_lookup_failed',
   TENANT_PAGE_LIST_LOOKUP_FAILED: 'revalidate.tenant_page_list_lookup_failed',
   BLOG_PAGINATION_LOOKUP_FAILED: 'revalidate.blog_pagination_lookup_failed',
   TAG_PARAMS_LOOKUP_FAILED: 'revalidate.tag_params_lookup_failed',

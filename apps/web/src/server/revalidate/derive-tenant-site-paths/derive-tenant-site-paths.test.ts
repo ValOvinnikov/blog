@@ -2,34 +2,35 @@ import { LOCALE_ISO_CODES } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
 import { FETCH_FAILED_REASON, REVALIDATE_LOG } from '@web/constants/revalidate';
-import { routing } from '@web/i18n/routing';
-import { getTenantPageListResults } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
+import { resolveTenantLiveLocales } from '@web/server/tenant/tenant-live-locales/tenant-live-locales';
+import {
+  getTenantPageListResults,
+  type TTenantPageListResults,
+} from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_TENANT_ID,
   MOCK_TENANT_SANITY_CONTEXT,
 } from '@web/testing/shared/tenant/fixtures';
 import { mockTenantPageLists } from '@web/testing/shared/tenant-page-lists/fixtures';
-import { buildTenantSitePaths } from '@web/utils/build-tenant-site-paths';
 import { logger } from '@web/utils/logger/logger';
 
 import { deriveTenantSitePaths } from './derive-tenant-site-paths';
 
 faker.seed(7383);
 
-const { getTenantLiveLocalesMock } = vi.hoisted(() => ({
-  getTenantLiveLocalesMock: vi.fn(),
+vi.mock('@web/server/tenant/tenant-live-locales/tenant-live-locales', () => ({
+  resolveTenantLiveLocales: vi.fn(),
 }));
 
-vi.mock('@blog/db', () => ({
-  queries: { tenants: { getTenantLiveLocales: getTenantLiveLocalesMock } },
+vi.mock('@web/server/tenant/tenant-page-lists/tenant-page-lists', () => ({
+  getTenantPageListResults: vi.fn(),
 }));
 
-vi.mock('@web/server/tenant/tenant-page-lists/tenant-page-lists');
-
-const { EN, NL } = LOCALE_ISO_CODES;
+const { NL } = LOCALE_ISO_CODES;
 const MOCK_LANDING_SLUG = faker.lorem.slug();
-const MOCK_REMOVED_POST_SLUG = faker.lorem.slug();
+const MOCK_DOCUMENT_HREF = `/${faker.lorem.slug()}`;
+const NL_ROOT = `/${MOCK_TENANT_ID}/${NL}`;
 const MOCK_PAGE_LISTS = mockTenantPageLists({
   landingPages: [{ slug: MOCK_LANDING_SLUG, language: NL }],
 });
@@ -38,54 +39,57 @@ const MOCK_INPUT = {
   tenant: MOCK_TENANT_SANITY_CONTEXT,
 };
 
-const toPageListResults = (lists = MOCK_PAGE_LISTS) => ({
-  posts: okResult(lists.posts),
-  topics: okResult(lists.topics),
-  tags: okResult(lists.tags),
-  topicPages: okResult(lists.topicPages),
-  tagPages: okResult(lists.tagPages),
-  blogPages: okResult(lists.blogPages),
-  landingPages: okResult(lists.landingPages),
-  privacyDocuments: okResult(lists.privacyDocuments),
-  legalDocuments: okResult(lists.legalDocuments),
+const toPageListResults = (): TTenantPageListResults => ({
+  posts: okResult(MOCK_PAGE_LISTS.posts),
+  topics: okResult(MOCK_PAGE_LISTS.topics),
+  tags: okResult(MOCK_PAGE_LISTS.tags),
+  topicPages: okResult(MOCK_PAGE_LISTS.topicPages),
+  tagPages: okResult(MOCK_PAGE_LISTS.tagPages),
+  blogPages: okResult(MOCK_PAGE_LISTS.blogPages),
+  landingPages: okResult(MOCK_PAGE_LISTS.landingPages),
+  privacyDocuments: okResult(MOCK_PAGE_LISTS.privacyDocuments),
+  legalDocuments: okResult(MOCK_PAGE_LISTS.legalDocuments),
 });
 
 describe(deriveTenantSitePaths, () => {
   beforeEach(() => {
-    getTenantLiveLocalesMock.mockResolvedValue([EN, NL]);
+    vi.mocked(resolveTenantLiveLocales).mockResolvedValue(okResult([NL]));
     vi.mocked(getTenantPageListResults).mockResolvedValue(toPageListResults());
   });
 
-  it('resolves every page of the tenant in its live languages', async () => {
+  it('resolves the tenant’s pages and the changed document in its live languages', async () => {
     const result = await deriveTenantSitePaths({
       ...MOCK_INPUT,
-      removedPostSlug: MOCK_REMOVED_POST_SLUG,
+      documentHref: MOCK_DOCUMENT_HREF,
     });
 
     expect(getTenantPageListResults).toHaveBeenCalledWith(
       MOCK_TENANT_SANITY_CONTEXT,
-      [EN, NL],
+      [NL],
     );
     expect(result).toEqual(
       okResult(
-        buildTenantSitePaths({
-          tenantId: MOCK_TENANT_ID,
-          locales: [EN, NL],
-          lists: MOCK_PAGE_LISTS,
-          removedPostSlug: MOCK_REMOVED_POST_SLUG,
-        }),
+        expect.arrayContaining([
+          NL_ROOT,
+          `${NL_ROOT}/${MOCK_LANDING_SLUG}`,
+          `${NL_ROOT}${MOCK_DOCUMENT_HREF}`,
+        ]),
       ),
     );
   });
 
-  it('falls back to the default locale when the tenant has no live locales', async () => {
-    getTenantLiveLocalesMock.mockResolvedValue(undefined);
+  it('reports fetch_failed and logs when the live locales lookup fails', async () => {
+    vi.mocked(resolveTenantLiveLocales).mockResolvedValue(
+      errorResult(MOCK_ERROR),
+    );
 
-    await deriveTenantSitePaths(MOCK_INPUT);
+    const result = await deriveTenantSitePaths(MOCK_INPUT);
 
-    expect(getTenantPageListResults).toHaveBeenCalledWith(
-      MOCK_TENANT_SANITY_CONTEXT,
-      [routing.defaultLocale],
+    expect(result).toEqual(errorResult(FETCH_FAILED_REASON));
+    expect(getTenantPageListResults).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      REVALIDATE_LOG.LIVE_LOCALES_LOOKUP_FAILED,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
     );
   });
 
