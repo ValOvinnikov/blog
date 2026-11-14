@@ -12,11 +12,9 @@ import {
   MOCK_WORKER_ORIGIN,
 } from '@worker/testing/enqueue/fixtures';
 import { mockSignedRequest } from '@worker/testing/enqueue/sign-enqueue-request';
-import {
-  MOCK_CLAIMED_AT,
-  MOCK_POST_ID,
-} from '@worker/testing/newsletter-send/fixtures';
+import { MOCK_CLAIMED_AT } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_QUEUE_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_RUN_ID } from '@worker/testing/run/fixtures';
 import {
   MOCK_ENCRYPTED_TOKEN,

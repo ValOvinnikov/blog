@@ -1,5 +1,6 @@
 import { LOCALE_ISO_CODES, TENANT_PLAN } from '@blog/config/constants';
 import { TENANT_STATUS } from '@blog/db/constants';
+import type { TTenantSanityCredentials } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { MOCK_NO_BILLING } from '@blog/db/testing/tenants/billing';
 import { MOCK_NO_HOLD } from '@blog/db/testing/tenants/inactivity';
@@ -19,6 +20,7 @@ export const MOCK_SANITY_READ_TOKEN = 'sk-read';
 export const MOCK_TENANT_MANAGEMENT_TOKEN = 'sk-tenant-management';
 export const MOCK_TENANT_MANAGEMENT_ROBOT_ID = 'robot-tenant-management';
 export const MOCK_ENCRYPTED_TOKEN = 'encrypted-read-token';
+export const MOCK_SANITY_CREDENTIALS = {} as TTenantSanityCredentials;
 
 export function mockTenant(overrides: Partial<TTenant> = {}): TTenant {
   return {

@@ -1,9 +1,7 @@
 import type { Page_post } from '@blog/config';
-import { SANITY_PERSPECTIVE } from '@blog/config/constants';
 import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
 import type { TTenantSanityCredentials } from '@blog/db/queries/tenants';
-import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
-import { createClientWithTimeout } from '@worker/utils/step-deps/step-deps';
+import { createPublishedTenantClient } from '@worker/utils/tenant-content/published-tenant-client';
 
 type TRawNewsletterPost = Pick<
   Page_post,
@@ -50,17 +48,12 @@ function toNewsletterPost(
 }
 
 export async function readNewsletterPost(
-  { projectId, dataset, token }: TTenantSanityCredentials,
+  credentials: TTenantSanityCredentials,
   postId: string,
 ): Promise<TMaybeUndefined<TNewsletterPost>> {
-  const raw = await createClientWithTimeout({
-    projectId,
-    dataset,
-    token,
-    apiVersion: SANITY_API_VERSION,
-    useCdn: false,
-    perspective: SANITY_PERSPECTIVE.PUBLISHED,
-  }).fetch<TMaybeNull<TRawNewsletterPost>>(NEWSLETTER_POST_QUERY, { postId });
+  const raw = await createPublishedTenantClient(credentials).fetch<
+    TMaybeNull<TRawNewsletterPost>
+  >(NEWSLETTER_POST_QUERY, { postId });
 
   return raw ? toNewsletterPost(raw) : undefined;
 }
