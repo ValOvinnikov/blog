@@ -5,6 +5,7 @@ import { queries, STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
 import { handleCatalogueEvent } from '@platform/server/billing/catalogue/handle-catalogue-event';
+import { revalidatePlatformSite } from '@platform/server/billing/catalogue/revalidate-platform-site';
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import { subscriptionIdFromEvent } from '@platform/server/billing/subscription-id-from-event';
 import { syncStripeSubscription } from '@platform/server/billing/sync-stripe-subscription';
@@ -35,7 +36,10 @@ export const handleStripeEvent = async (
   stripe: Stripe,
   event: Stripe.Event,
 ): Promise<void> => {
-  if (await handleCatalogueEvent(stripe, event)) return;
+  if (await handleCatalogueEvent(stripe, event)) {
+    after(revalidatePlatformSite);
+    return;
+  }
 
   const subscriptionId = subscriptionIdFromEvent(event);
   if (!subscriptionId) return;

@@ -1,8 +1,14 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, GRID_COLUMNS } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
+import { TopicChipList } from '@web/components/shared/topic-chip-list';
 import { mockPostListItem } from '@web/testing/modules/post-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_ENGINEERING_TOPIC,
+  MOCK_SECOND_TOPIC,
+  MOCK_THIRD_TOPIC,
+} from '@web/testing/shared/topic/fixtures';
 
 import { PostListModuleView } from './post-list-module-view';
 
@@ -24,16 +30,14 @@ const items = [
   }),
 ];
 
+const topics = [MOCK_ENGINEERING_TOPIC, MOCK_SECOND_TOPIC, MOCK_THIRD_TOPIC];
+
 const meta = {
   title: 'Modules/PostListModule',
   component: PostListModuleView,
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    columns: {
-      control: 'select',
-      options: [GRID_COLUMNS.TWO, GRID_COLUMNS.THREE, GRID_COLUMNS.FOUR],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
@@ -41,6 +45,7 @@ const meta = {
   },
   args: {
     section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
+    grid: { columns: undefined, showImages: false },
     headingBlock: mockHeadingBlock({ heading: 'Latest posts' }),
     items,
     contentAlignment: undefined,
@@ -60,12 +65,12 @@ export const Secondary: TStory = {
 };
 
 export const TwoColumns: TStory = {
-  args: { columns: GRID_COLUMNS.TWO },
+  args: { grid: { columns: GRID_COLUMNS.TWO, showImages: false } },
 };
 
 export const FourColumns: TStory = {
   args: {
-    columns: GRID_COLUMNS.FOUR,
+    grid: { columns: GRID_COLUMNS.FOUR, showImages: false },
     items: [...items, ...items].map((item, index) => ({
       ...item,
       id: `post-${index + 1}`,
@@ -75,6 +80,20 @@ export const FourColumns: TStory = {
 
 export const OutlinedOnBrandTint: TStory = {
   args: { section: MOCK_OUTLINED_BRAND_TINT_SECTION },
+};
+
+export const WithTopicChipsOnBrandTint: TStory = {
+  args: {
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+    children: <TopicChipList topics={topics} />,
+  },
+};
+
+export const WithTopicChipsCenterAligned: TStory = {
+  args: {
+    contentAlignment: CONTENT_ALIGNMENT.CENTER,
+    children: <TopicChipList topics={topics} />,
+  },
 };
 
 export const CenterAligned: TStory = {
@@ -105,7 +124,7 @@ const placeholderImage = (alt: string) => (
 
 export const WithImages: TStory = {
   args: {
-    hasImages: true,
+    grid: { columns: undefined, showImages: true },
     items: items.map((item) => ({
       ...item,
       image: placeholderImage(item.title),

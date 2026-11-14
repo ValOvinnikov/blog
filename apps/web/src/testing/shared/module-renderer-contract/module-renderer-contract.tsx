@@ -4,8 +4,6 @@ import type { TAsyncSetup } from '@web/testing/shared/async-setup/async-setup';
 import type { Mock } from 'vitest';
 
 import {
-  MOCK_CHILDREN_STUB_TEST_ID,
-  MOCK_CTA_STUB_TEST_ID,
   MOCK_FEATURE_LIST_STUB_TEST_ID,
   MOCK_HERO_PROFILE_STUB_TEST_ID,
   MOCK_HERO_STUB_TEST_ID,
@@ -18,7 +16,7 @@ export const getStubTestIds = () =>
     .getAllByTestId(/^stub-/)
     .map((stub) => stub.getAttribute('data-testid'));
 
-interface IWithSetup {
+export interface IWithSetup {
   setup: TAsyncSetup;
 }
 
@@ -176,23 +174,5 @@ export const testRendersAllowedModulesInOrder = ({
     const stubTexts = stubs.map((stub) => stub.textContent);
 
     expect(stubTexts).toEqual(modules.map(({ id }) => id));
-  });
-};
-
-export const testChildrenBetweenHeroAndModules = ({ setup }: IWithSetup) => {
-  it('renders the given children between the hero and the modules', async () => {
-    await setup({
-      hero: mockModule('module_heroBlog'),
-      modules: [mockModule('module_cta')],
-      children: <div data-testid={MOCK_CHILDREN_STUB_TEST_ID} />,
-    });
-
-    const stubTestIds = getStubTestIds();
-
-    expect(stubTestIds).toEqual([
-      MOCK_HERO_STUB_TEST_ID,
-      MOCK_CHILDREN_STUB_TEST_ID,
-      MOCK_CTA_STUB_TEST_ID,
-    ]);
   });
 };

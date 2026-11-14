@@ -43,7 +43,11 @@ const ARCHIVE_TITLE_ID: Record<TTaxonomyKind, string> = {
   [TAXONOMY_KIND.TAGS]: 'tag-posts-title',
 };
 
-export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
+export const PostListModule = async ({
+  id,
+  context,
+  children,
+}: TPostListModuleProps) => {
   const resolvedPage = context?.page ?? 1;
   const archive = context?.archive;
 
@@ -109,10 +113,9 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
     <PostListModuleView
       section={{ brandVariant, layout, appearance }}
       headingBlock={headingBlock}
+      grid={{ columns, showImages }}
       items={items}
-      columns={columns}
       contentAlignment={contentAlignment}
-      hasImages={showImages}
       titleId={titleId}
       dataTestId={`post-list-module-${id}`}
       emptyMessage={
@@ -121,6 +124,8 @@ export const PostListModule = async ({ id, context }: TPostListModuleProps) => {
         />
       }
       pagination={pagination}
-    />
+    >
+      {children}
+    </PostListModuleView>
   );
 };

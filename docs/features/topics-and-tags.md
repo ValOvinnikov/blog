@@ -55,7 +55,7 @@ Posts are classified two ways: each post has exactly one **topic** (its primary 
 ## Surfaces and routes
 
 - **Public** — `/topics/{slug}` and `/tags/{slug}` (archives, paginated at `…/page/{n}`), `/topics` and `/tags` (indexes), `/tags/{slug}/rss.xml` (per-tag feed). Topics have no feed of their own.
-- Chips: `TopicChipList` ("All" plus one chip per topic) above the posts on `/blog` and `/topics/{slug}`; the post article footer lists the post's tags.
+- Chips: `TopicChipList` ("All" plus one chip per topic) inside the first Post List on `/blog` and `/topics/{slug}`, under its heading (in their own band under the page heading when there is no Post List — [post-modules](./post-modules.md)); the post article footer lists the post's tags.
 - **Studio** — Taxonomy → Topic, Tag (the terms, shared across languages). Pages → Blog → Topic Index Page, Topic Page, Tag Index Page, Tag Page (per language; each label is the schema title). Each archive and index page points at its own template.
 - No platform surface.
 

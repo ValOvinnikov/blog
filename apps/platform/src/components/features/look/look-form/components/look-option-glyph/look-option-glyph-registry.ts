@@ -6,6 +6,7 @@ import {
   FOOTER_SURFACE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
+  LANGUAGE_SWITCHER_STYLE,
   RADIUS_SCALE,
   type TButtonShape,
   type TCookieSettingsButton,
@@ -14,6 +15,7 @@ import {
   type TFooterSurface,
   type THeaderControlShape,
   type THeaderControlStyle,
+  type TLanguageSwitcherStyle,
   type TRadiusScale,
 } from '@blog/config';
 import ButtonShapePill from '@platform/assets/look-glyphs/button-shape-pill.svg';
@@ -36,6 +38,9 @@ import HeaderControlShapeSquare from '@platform/assets/look-glyphs/header-contro
 import HeaderControlStyleOutlined from '@platform/assets/look-glyphs/header-control-style-outlined.svg';
 import HeaderControlStylePlain from '@platform/assets/look-glyphs/header-control-style-plain.svg';
 import HeaderControlStyleSoft from '@platform/assets/look-glyphs/header-control-style-soft.svg';
+import LanguageSwitcherStyleCodes from '@platform/assets/look-glyphs/language-switcher-style-codes.svg';
+import LanguageSwitcherStyleMenuCode from '@platform/assets/look-glyphs/language-switcher-style-menu-code.svg';
+import LanguageSwitcherStyleMenuGlobe from '@platform/assets/look-glyphs/language-switcher-style-menu-globe.svg';
 import RadiusScaleLg from '@platform/assets/look-glyphs/radius-scale-lg.svg';
 import RadiusScaleMd from '@platform/assets/look-glyphs/radius-scale-md.svg';
 import RadiusScaleNone from '@platform/assets/look-glyphs/radius-scale-none.svg';
@@ -52,6 +57,7 @@ type TLookOptionGlyphValues = {
   footerLayout: TFooterLayout;
   footerSurface: TFooterSurface;
   cookieSettingsButton: TCookieSettingsButton;
+  languageSwitcherStyle: TLanguageSwitcherStyle;
 };
 
 type TLookOptionGlyphRegistry = {
@@ -102,6 +108,11 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
     [COOKIE_SETTINGS_BUTTON.HIDDEN]: CookieSettingsButtonHidden,
     [COOKIE_SETTINGS_BUTTON.SHOWN]: CookieSettingsButtonShown,
     [COOKIE_SETTINGS_BUTTON.ONLY]: CookieSettingsButtonOnly,
+  },
+  languageSwitcherStyle: {
+    [LANGUAGE_SWITCHER_STYLE.MENU_CODE]: LanguageSwitcherStyleMenuCode,
+    [LANGUAGE_SWITCHER_STYLE.MENU_GLOBE]: LanguageSwitcherStyleMenuGlobe,
+    [LANGUAGE_SWITCHER_STYLE.CODES]: LanguageSwitcherStyleCodes,
   },
 };
 

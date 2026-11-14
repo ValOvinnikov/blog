@@ -27,6 +27,12 @@ export const BILLING_LOG = {
   PLAN_CHANGE_RELEASE_FAILED: 'billing.plan_change_release_failed',
   CATALOGUE_SYNCED: 'billing.catalogue_synced',
   CATALOGUE_SYNC_FAILED: 'billing.catalogue_sync_failed',
+  CATALOGUE_SYNC_MODE_INVALID: 'billing.catalogue_sync_mode_invalid',
+  CATALOGUE_SYNC_MODE_MISMATCH: 'billing.catalogue_sync_mode_mismatch',
+  CATALOGUE_REVALIDATE_SKIPPED: 'billing.catalogue_revalidate_skipped',
+  CATALOGUE_REVALIDATE_FAILED: 'billing.catalogue_revalidate_failed',
+  CATALOGUE_PLATFORM_TENANT_MISSING:
+    'billing.catalogue_platform_tenant_missing',
 } as const;
 
 export const STRIPE_SUBSCRIPTION_STATUS = {

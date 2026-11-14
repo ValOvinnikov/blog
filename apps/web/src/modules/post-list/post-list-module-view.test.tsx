@@ -27,11 +27,13 @@ const MOCK_PAGER_LABEL = faker.lorem.words(2);
 const MOCK_PREVIOUS_LABEL = faker.lorem.words(2);
 const MOCK_NEXT_LABEL = faker.lorem.words(2);
 const MOCK_ARCHIVE_SLUG = faker.lorem.slug(2);
+const MOCK_CHILDREN_TEST_ID = 'post-list-children';
 
 const post = mockPostListItem();
 
 const setup = customRender(PostListModuleView, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
+  grid: { columns: undefined, showImages: false },
   headingBlock: mockHeadingBlock({ heading: MOCK_POST_LIST_HEADING }),
   items: [post],
   contentAlignment: undefined,
@@ -71,7 +73,7 @@ describe(`<${PostListModuleView.name}/>`, () => {
       expect(pagination).not.toBeInTheDocument();
     });
 
-    it('renders no media region when hasImages is not given', () => {
+    it('renders no media region when images are off', () => {
       const media = screen.queryByTestId(MEDIA_CARD_MEDIA_TEST_ID);
 
       expect(media).not.toBeInTheDocument();
@@ -136,9 +138,9 @@ describe(`<${PostListModuleView.name}/>`, () => {
     expect(link).not.toBeInTheDocument();
   });
 
-  it('renders a media region for each item when hasImages is true', () => {
+  it('renders a media region for each item when images are on', () => {
     setup({
-      hasImages: true,
+      grid: { columns: undefined, showImages: true },
       items: [
         { ...post, image: <div data-testid={MOCK_POST_IMAGE_TEST_ID} /> },
       ],
@@ -149,5 +151,28 @@ describe(`<${PostListModuleView.name}/>`, () => {
 
     expect(media).toBeVisible();
     expect(image).toBeVisible();
+  });
+
+  it('renders its children between the heading and the cards', () => {
+    setup({ children: <div data-testid={MOCK_CHILDREN_TEST_ID} /> });
+
+    const heading = screen.getByRole('heading', {
+      level: 2,
+      name: MOCK_POST_LIST_HEADING,
+    });
+    const children = screen.getByTestId(MOCK_CHILDREN_TEST_ID);
+    const card = screen.getByRole('heading', { level: 3, name: post.title });
+    const section = screen.getByRole('region', {
+      name: MOCK_POST_LIST_HEADING,
+    });
+
+    expect(section).toContainElement(children);
+    expect(
+      heading.compareDocumentPosition(children) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      children.compareDocumentPosition(card) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

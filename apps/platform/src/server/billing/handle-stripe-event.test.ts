@@ -20,6 +20,7 @@ import { after } from 'next/server';
 import type Stripe from 'stripe';
 
 import { handleCatalogueEvent } from './catalogue/handle-catalogue-event';
+import { revalidatePlatformSite } from './catalogue/revalidate-platform-site';
 import { handleStripeEvent } from './handle-stripe-event';
 import { sendPaymentReceipt } from './send-payment-receipt';
 import { syncStripeSubscription } from './sync-stripe-subscription';
@@ -48,6 +49,9 @@ vi.mock('./sync-stripe-subscription', () => ({
 vi.mock('./send-payment-receipt', () => ({ sendPaymentReceipt: vi.fn() }));
 vi.mock('./catalogue/handle-catalogue-event', () => ({
   handleCatalogueEvent: vi.fn(),
+}));
+vi.mock('./catalogue/revalidate-platform-site', () => ({
+  revalidatePlatformSite: vi.fn(),
 }));
 vi.mock('@platform/server/tenants/on-tenant-plan-change', () => ({
   onTenantPlanChange: vi.fn(),
@@ -152,13 +156,20 @@ describe(handleStripeEvent, () => {
     expect(recordStripeEventMock).not.toHaveBeenCalled();
   });
 
-  it('leaves a catalogue event to the catalogue sync alone', async () => {
+  it('hands a catalogue event to the catalogue sync and refreshes the platform site', async () => {
     vi.mocked(handleCatalogueEvent).mockResolvedValue(true);
 
     await handle(mockStripeEvent(STRIPE_EVENT_TYPE.PRICE_UPDATED));
 
     expect(syncStripeSubscription).not.toHaveBeenCalled();
     expect(recordStripeEventMock).not.toHaveBeenCalled();
+    expect(revalidatePlatformSite).toHaveBeenCalledOnce();
+  });
+
+  it('leaves the platform site alone after a subscription event', async () => {
+    await handle(invoicePaidEvent());
+
+    expect(revalidatePlatformSite).not.toHaveBeenCalled();
   });
 
   it('ignores an event type it does not handle', async () => {
