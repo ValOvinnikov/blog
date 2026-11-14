@@ -3,12 +3,11 @@
   "extends": "@blog/tsconfig/base.json",
   "compilerOptions": {
     "noEmit": true,
-    // Declare ambient globals explicitly so type resolution does not depend on
-    // pnpm's hoisting layout: "node" for node:crypto/process.env, "vitest/globals"
-    // for the `globals: true` test config — matches @blog/utils and @blog/db.
+    // Explicit so type resolution does not depend on pnpm's hoisting layout.
     "types": ["node", "vitest/globals"],
     "paths": {
       "@blog/email/*": ["./src/*"],
+      "@blog/config/*": ["../../packages/config/src/*"],
       "@blog/utils/*": ["../../packages/utils/src/*"]
     }
   },

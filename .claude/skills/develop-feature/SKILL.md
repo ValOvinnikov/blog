@@ -530,7 +530,7 @@ what each package owns is in `CLAUDE.md` "Layer contracts":
 - **`insight`** is independent, like `utils`. Dispatch it only for the logger
   core itself; a change to how an app _uses_ the logger belongs to
   `web`/`platform-app`.
-- **`email`** sits low, upstream of `utils` only. Dispatch it for the email
+- **`email`** sits low, upstream of `config` and `utils` only. Dispatch it for the email
   templates and transport; a change to _which_ copy a caller passes belongs to
   that caller's layer.
 

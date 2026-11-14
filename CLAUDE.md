@@ -22,7 +22,7 @@ service → config, utils (no React)          studio → config, utils (typegen 
 ui → config, utils (no Sanity/fetch)        configs/* → consumed by all
 db → config, utils (no React/Sanity)        auth → db, config, utils, email
 config → utils (OKLCH maths behind the shared contrast guard)
-email → utils (sits low; the apps and auth consume it)
+email → config, utils (sits low; the apps and auth consume it)
 insight → nothing (base of graph)           utils → nothing (base of graph)
 graph is acyclic
 ```
@@ -99,8 +99,9 @@ graph is acyclic
   above are the one exception). See `.claude/agents/insight.md`.
 - `@blog/email` (`packages/email`) is the single home for every email the
   product sends — the shared branded HTML shell, the canonical `escapeHtml`,
-  and the typed `sendEmail` Resend transport. Upstream is `utils` only, so both
-  apps **and** `@blog/auth` consume it without a cycle. It owns the send call
+  and the typed `sendEmail` Resend transport. Upstream is `config` and `utils`, so
+  both apps **and** `@blog/auth` consume it without a cycle; it never imports
+  `@blog/config/react`. It owns the send call
   but **never logs**, and never resolves tenants or fetches content: callers
   pass it resolved copy and URLs, the way `@blog/ui` takes props, which keeps it
   usable from an Auth.js callback with no request context. Operator-alert copy
@@ -366,7 +367,7 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   writing a type, check `packages/config/src/types/` for one that already says
   it, and add a missing one there rather than locally. Exempt are the
   generated Sanity types and the workspaces below `@blog/config` in the graph,
-  which cannot import it: `@blog/utils`, `@blog/insight` and `@blog/email`. The
+  which cannot import it: `@blog/utils` and `@blog/insight`. The
   raw forms already in the repo are converted file by file as each file is
   touched, the same steady-state rule as comments. Where helpers and shared
   constants live: `.claude/agents/config.md`.

@@ -1,10 +1,5 @@
-import { fileURLToPath } from 'node:url';
-
-import preset from '@blog/vitest-config/preset';
+import preset, { blogPackageAlias } from '@blog/vitest-config/preset';
 import { defineConfig, mergeConfig } from 'vitest/config';
-
-const src = fileURLToPath(new URL('./src', import.meta.url));
-const utilsSrc = fileURLToPath(new URL('../utils/src', import.meta.url));
 
 export default mergeConfig(
   preset,
@@ -19,8 +14,9 @@ export default mergeConfig(
     },
     resolve: {
       alias: [
-        { find: /^@blog\/email\//, replacement: `${src}/` },
-        { find: /^@blog\/utils\//, replacement: `${utilsSrc}/` },
+        blogPackageAlias('email', import.meta.url),
+        blogPackageAlias('config', import.meta.url),
+        blogPackageAlias('utils', import.meta.url),
       ],
     },
   }),
