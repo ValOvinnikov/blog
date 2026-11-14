@@ -59,8 +59,12 @@ export const TopicModuleRenderer = async ({
       {heroNode ?? (
         <PageHeading headingBlock={headingBlock} align={headingAlignment} />
       )}
-      {children}
-      {renderModules({ modules, map: TOPIC_MAP, context })}
+      {renderModules({
+        modules,
+        map: TOPIC_MAP,
+        context,
+        slot: { moduleType: 'module_postList', node: children },
+      })}
     </>
   );
 };

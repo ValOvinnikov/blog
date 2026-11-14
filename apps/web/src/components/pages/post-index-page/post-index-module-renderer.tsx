@@ -59,8 +59,12 @@ export const PostIndexModuleRenderer = async ({
       {heroNode ?? (
         <PageHeading headingBlock={headingBlock} align={headingAlignment} />
       )}
-      {children}
-      {renderModules({ modules, map: POST_INDEX_MAP, context })}
+      {renderModules({
+        modules,
+        map: POST_INDEX_MAP,
+        context,
+        slot: { moduleType: 'module_postList', node: children },
+      })}
     </>
   );
 };
