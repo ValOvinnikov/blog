@@ -64,8 +64,6 @@ export const env = createEnv({
     // @env-optional
     PREVIEW_LINK_SECRET: z.string().min(32).optional(),
     // @env-optional
-    PRODUCT_NAME: z.string().trim().min(1).optional(),
-    // @env-optional
     MARKETING_SITE_URL: z.string().url().optional(),
     // Absent, or with WORKER_NEWSLETTER_ENQUEUE_SECRET absent, no published post is emailed to subscribers.
     // @env-optional
@@ -100,7 +98,6 @@ export const env = createEnv({
     PERSONAL_DATA_INDEX_KEY: process.env.PERSONAL_DATA_INDEX_KEY,
     NEWSLETTER_UNSUBSCRIBE_KEY: process.env.NEWSLETTER_UNSUBSCRIBE_KEY,
     PREVIEW_LINK_SECRET: process.env.PREVIEW_LINK_SECRET,
-    PRODUCT_NAME: process.env.PRODUCT_NAME,
     MARKETING_SITE_URL: process.env.MARKETING_SITE_URL,
     WORKER_ENQUEUE_URL: process.env.WORKER_ENQUEUE_URL,
     WORKER_NEWSLETTER_ENQUEUE_SECRET:

@@ -197,11 +197,7 @@ export const WithoutGroupsAboutOrAddress: TStory = {
 };
 
 const PoweredBy = (
-  <Footer.PoweredBy
-    label="Powered by"
-    productName="Shinefold"
-    href="https://example.com"
-  />
+  <Footer.PoweredBy label="Powered by" href="https://example.com" />
 );
 
 const WithPoweredBy = (
@@ -261,7 +257,6 @@ export const PoweredByLongCopyright: TStory = {
         </Footer.FinePrint>
         <Footer.PoweredBy
           label="Mogelijk gemaakt door"
-          productName="Shinefold"
           href="https://example.com"
         />
       </>
