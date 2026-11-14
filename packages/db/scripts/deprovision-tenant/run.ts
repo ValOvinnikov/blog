@@ -1,5 +1,3 @@
-import { pathToFileURL } from 'node:url';
-
 import type { TMaybeUndefined } from '@blog/config/types';
 import {
   DEPROVISIONING_STEP,
@@ -11,7 +9,9 @@ import { listTenantHosts } from '@blog/db/queries/tenant-domains/list-tenant-hos
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isPlatformTenant } from '@blog/db/utils/is-platform-tenant/is-platform-tenant';
 import { sanitizeLogMessage } from '@blog/insight';
+import { isUndefined } from '@blog/utils/primitives';
 
+import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
 
 import { loadDeprovisionEnv, type TDeprovisionEnv } from './lib/env';
@@ -118,7 +118,7 @@ async function recordStepStatus(
       tenantId,
       step,
       status,
-      ...(error === undefined ? {} : { error }),
+      ...(isUndefined(error) ? {} : { error }),
     });
   } catch (reportError) {
     console.error(
@@ -140,7 +140,7 @@ async function recordRunStart(
 
     await reportDeprovisioningRunStart({
       tenantId: tenant.id,
-      ...(runUrl === undefined ? {} : { workflowRunUrl: runUrl }),
+      ...(isUndefined(runUrl) ? {} : { workflowRunUrl: runUrl }),
     });
   } catch (error) {
     console.error(
@@ -267,13 +267,4 @@ async function main(): Promise<void> {
   }
 }
 
-// Without this guard, importing `runSteps` in a test would also run `main()`.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((error: unknown) => {
-    console.error('deprovision-tenant: unexpected failure:', error);
-    process.exitCode = 1;
-  });
-}
+runIfEntrypoint(import.meta.url, main, 'deprovision-tenant');
