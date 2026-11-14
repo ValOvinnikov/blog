@@ -2,6 +2,7 @@ import { SIGNUP_TERMS_COOKIE_NAME, TERMS_VERSION } from '@blog/config';
 import { SIGN_UP_LOG } from '@platform/constants/sign-up';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
+import { toServerCookieOptions } from '@platform/utils/server-cookie-options/server-cookie-options';
 import { checkBotId } from 'botid/server';
 import { cookies } from 'next/headers';
 
@@ -25,11 +26,9 @@ const isBotOrUnverified = async (): Promise<boolean> => {
 export const setSignupTermsCookie = async (): Promise<void> => {
   if (await isBotOrUnverified()) return;
 
-  (await cookies()).set(SIGNUP_TERMS_COOKIE_NAME, TERMS_VERSION, {
-    maxAge: SIGNUP_TERMS_COOKIE_MAX_AGE_SECONDS,
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-  });
+  (await cookies()).set(
+    SIGNUP_TERMS_COOKIE_NAME,
+    TERMS_VERSION,
+    toServerCookieOptions(SIGNUP_TERMS_COOKIE_MAX_AGE_SECONDS),
+  );
 };
