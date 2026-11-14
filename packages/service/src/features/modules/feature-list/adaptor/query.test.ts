@@ -1,10 +1,14 @@
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
+  DENSITY,
+  GRID_COLUMNS,
   LOCALE_ISO_CODES,
+  RADIUS_SCALE,
 } from '@blog/config/constants';
-import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/fixtures';
+import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/feature-list/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
@@ -75,11 +79,14 @@ const MOCK_ENGLISH_ONLY_FEATURE_DOCUMENT = {
   image: mockLocalizedImage({ [EN]: MOCK_ENGLISH_ONLY_FEATURE.alt }),
 };
 
-async function runFeatureList(locale: string) {
+async function runFeatureList(
+  locale: string,
+  document: Record<string, unknown> = MOCK_FEATURE_LIST_DOCUMENT,
+) {
   const raw = await evaluateGroqExpression(
     featureListModuleQuery.query,
     [
-      MOCK_FEATURE_LIST_DOCUMENT,
+      document,
       MOCK_TRANSLATED_FEATURE,
       MOCK_ENGLISH_ONLY_FEATURE_DOCUMENT,
       MOCK_IMAGE_ASSET_DOCUMENT,
@@ -118,5 +125,32 @@ describe('featureListModuleQuery', () => {
       copy.feature,
       MOCK_ENGLISH_ONLY_FEATURE,
     ]);
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const module = await runFeatureList(EN);
+
+    expect(module).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+      columns: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.RAISED,
+      radiusScale: RADIUS_SCALE.XL,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.TWO,
+    };
+
+    const module = await runFeatureList(EN, {
+      ...MOCK_FEATURE_LIST_DOCUMENT,
+      ...appearance,
+    });
+
+    expect(module).toMatchObject(appearance);
   });
 });

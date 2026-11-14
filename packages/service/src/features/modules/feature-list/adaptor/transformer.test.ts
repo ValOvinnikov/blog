@@ -1,16 +1,22 @@
 import {
   BRAND_VARIANT,
   CARD_IMAGE_SHAPE,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
+  DENSITY,
   DISPLAY_MODE,
+  GRID_COLUMNS,
   ICONS,
   LINK_TYPE,
+  RADIUS_SCALE,
 } from '@blog/config';
+import {
+  mockRawFeatureListItem,
+  mockRawFeatureListModule,
+} from '@blog/service/testing/modules/feature-list/fixtures';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
-  mockRawFeatureListItem,
-  mockRawFeatureListModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
   mockLinkView,
@@ -47,16 +53,30 @@ describe(toFeatureListModule, () => {
     expect(module.cardAlignment).toBe(CONTENT_ALIGNMENT.CENTER);
   });
 
-  it('leaves contentAlignment and layout undefined when unset', () => {
-    const raw = mockRawFeatureListModule({
-      contentAlignment: null,
-      layout: null,
+  it('leaves every optional module field undefined when unset', () => {
+    const module = toFeatureListModule(mockRawFeatureListModule());
+
+    expect(module).toMatchObject({
+      contentAlignment: undefined,
+      layout: undefined,
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
+      columns: undefined,
     });
+  });
 
-    const module = toFeatureListModule(raw);
+  it('maps the authored appearance overrides straight through', () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.LG,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.FOUR,
+    };
 
-    expect(module.contentAlignment).toBeUndefined();
-    expect(module.layout).toBeUndefined();
+    const module = toFeatureListModule(mockRawFeatureListModule(appearance));
+
+    expect(module).toMatchObject(appearance);
   });
 
   it('keeps the cards in authored order', () => {

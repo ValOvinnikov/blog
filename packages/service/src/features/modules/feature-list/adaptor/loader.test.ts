@@ -4,7 +4,7 @@ import {
   MOCK_FEATURE_LIST_MODULE_ID,
   mockRawFeatureListItem,
   mockRawFeatureListModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/feature-list/fixtures';
 import {
   MOCK_LINK_TARGET_CACHE_TAGS,
   mockCacheTag,
@@ -41,7 +41,7 @@ describe(getFeatureList, () => {
     );
   });
 
-  it('resolves the module with a single query', async () => {
+  it('resolves the module and its cards in authored order with a single query', async () => {
     const featureList = await getFeatureList(
       MOCK_FEATURE_LIST_MODULE_ID,
       MOCK_TENANT,
@@ -49,14 +49,6 @@ describe(getFeatureList, () => {
 
     expect(mockRun).toHaveBeenCalledTimes(1);
     expect(featureList.headingBlock.heading).toBe(MOCK_FEATURE_LIST_HEADING);
-  });
-
-  it('returns the referenced cards in authored order', async () => {
-    const featureList = await getFeatureList(
-      MOCK_FEATURE_LIST_MODULE_ID,
-      MOCK_TENANT,
-    );
-
     expect(featureList.items.map((item) => item.id)).toEqual([
       MOCK_FIRST_CARD_ID,
       MOCK_SECOND_CARD_ID,

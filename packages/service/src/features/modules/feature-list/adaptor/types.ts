@@ -12,6 +12,7 @@ import type {
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 
 export type TFeatureListItem = {
   id: string;
@@ -21,7 +22,7 @@ export type TFeatureListItem = {
   link: TMaybeUndefined<ILink>;
 };
 
-export type TFeatureListModule = {
+export type TFeatureListModule = TModuleAppearance & {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   items: TFeatureListItem[];

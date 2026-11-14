@@ -8,6 +8,7 @@ import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/headi
 import { localizedImageWithAltOptionalFragment } from '@blog/service/shared/fragments/image/localized-image-with-alt';
 import { moduleWideLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
 import { linkDocumentFragment } from '@blog/service/shared/fragments/link/link-document';
+import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const featureListModuleQuery = q
@@ -48,5 +49,6 @@ export const featureListModuleQuery = q
     ...moduleContentAlignmentLeftCenterFragment,
     cardAlignment: sub.field('cardAlignment').notNull(),
     ...moduleWideLayoutFragment,
+    ...moduleAppearanceFragment,
   }))
   .notNull();
