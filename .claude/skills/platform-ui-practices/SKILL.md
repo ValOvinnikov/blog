@@ -313,6 +313,16 @@ text-platform-on-selected` — near-black and white in Light, yellow on a dark
 - A selected item shows a 3:1 marker (`border-platform-brand`, a bar), not a
   `bg-platform-brand-weak` fill alone, and announces itself as pressed, checked or
   selected.
+- **Hover is one rule per kind of control.** A primary button darkens to
+  `bg-platform-brand-hover`; a danger button to `bg-platform-bad-hover`.
+  Every other pressable control, and every unselected option (segment,
+  toggle, chip, tile, card, tab, menu radio), takes
+  `hover:bg-platform-hover-tint` at every width, never `lg:`-only, and a
+  bordered one also turns its border `brand-ink`. A field or select changes
+  only its border. Rows (tables, lists, menus, the sidebar) keep their grey
+  hover. Gate the hover so a selected, pressed, checked, current, open,
+  disabled or locked control does not change (`not-data-[pressed]:`,
+  `not-aria-disabled:`, or the `isSelected: false` variant).
 - **Focus is one rule for every control:** a 2px gap in the control's ground,
   a 2px yellow `focus-ring`, and in Light a 1px near-black `focus-edge`
   around it. Write `focusRingClasses(ground)`

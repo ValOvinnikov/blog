@@ -51,7 +51,7 @@ export const presetListOptionVariants = tv({
       class: {
         option: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-platform-control-line hover:border-platform-muted hover:bg-platform-surface-2',
+          'border-platform-control-line hover:border-platform-muted hover:bg-platform-hover-tint',
         ],
       },
     },

@@ -76,6 +76,12 @@ export const segmentedRadioGroupVariants = tv({
   },
   compoundVariants: [
     {
+      layout: SEGMENTED_RADIO_LAYOUT.TRACK,
+      isLocked: false,
+      isSelected: false,
+      class: { option: ['hover:bg-platform-hover-tint'] },
+    },
+    {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
       isLocked: false,
       class: { option: ['cursor-pointer'], check: ['text-platform-brand-ink'] },
@@ -93,7 +99,7 @@ export const segmentedRadioGroupVariants = tv({
       class: {
         option: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-platform-control-line hover:border-platform-muted hover:bg-platform-hover',
+          'border-platform-control-line hover:border-platform-muted hover:bg-platform-hover-tint',
         ],
       },
     },

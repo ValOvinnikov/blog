@@ -32,7 +32,10 @@ export const switchVariants = tv({
       },
       false: {
         root: ['cursor-pointer'],
-        track: ['cursor-pointer data-[checked]:bg-platform-brand'],
+        track: [
+          'cursor-pointer data-[checked]:bg-platform-brand',
+          'not-data-[disabled]:not-data-[checked]:hover:bg-platform-control-line-hover',
+        ],
       },
     },
     isShown: {

@@ -6,7 +6,7 @@ export const growthNoteItemVariants = tv({
   slots: {
     plain: ['text-platform-13 leading-platform-19 text-platform-text'],
     link: [
-      '-mx-2 flex min-h-11 flex-col gap-px rounded-platform-control px-2 py-[7px] no-underline hover:bg-platform-hover',
+      '-mx-2 flex min-h-11 flex-col gap-px rounded-platform-control px-2 py-[7px] no-underline hover:bg-platform-hover-tint',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     name: ['text-platform-13 font-semibold text-platform-brand-ink'],

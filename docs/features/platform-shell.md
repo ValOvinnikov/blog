@@ -313,8 +313,8 @@ save still settles as the form's generic server error.
   unrewritten. The collapse toggle is the topbar's first item from
   `md` (below `md` that slot holds the phone Menu button and the toggle never
   renders): a 36×36 `control-line` box on `surface` with the unrotated 16px
-  `ICONS.SIDEBAR` glyph in `muted`, hovering to a `brand-ink` border and
-  `text` icon; focus is the `bg`-gapped focus ring alone. It is
+  `ICONS.SIDEBAR` glyph in `muted`, hovering to a `brand-ink` border, the
+  `hover-tint` ground and a `text` icon; focus is the `bg`-gapped focus ring alone. It is
   named "Collapse sidebar" or "Expand sidebar" with `aria-expanded` and
   `aria-controls="sidebar"`, carries no native `title`, and shows that name in
   the shared Tooltip below it, left-aligned, 6px away. The topbar is 59px tall
@@ -332,7 +332,8 @@ save still settles as the form's generic server error.
   its full text as `title`) over the email (12px `muted`, 16px line), each
   cut with an ellipsis, and a 16px `muted` up chevron. With no name the email
   takes the name line, there is no email line, and the avatar shows the
-  email's first letter. Hover takes a `side-raised` ground; open adds a
+  email's first letter. Hover takes the `hover-tint` ground; open takes a
+  `side-raised` ground and adds a
   `side-accent` border; focus is the side-gapped ring. Collapsed, the trigger
   is the 52×52 avatar alone, titled by the name and named "Account: {name},
   {email}" ("Account: {email}" with no name). The menu, named "Account" on
@@ -391,7 +392,7 @@ save still settles as the form's generic server error.
   #2e1a10), so a warning never reads as the brand; `ok` and `bad` are
   unchanged. A primary button, an avatar and the active step put
   `on-brand-ink` on `brand`. A selected chip or jump-index tab
-  is `on-selected` on `selected` (`selected-hover` on hover): solid near-black
+  is `on-selected` on `selected`, unchanged on hover: solid near-black
   with a white label in Light, `brand-ink` yellow on the dark yellow tint in
   Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
   a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
@@ -464,14 +465,14 @@ save still settles as the form's generic server error.
   and `AccountMenu` open through `NestableMenuRoot`/`NestableMenuTrigger`
   (`components/shared/nestable-menu-root/` and `nestable-menu-trigger/`) as Base UI submenus: their triggers
   are menu items in the Menu's arrow-key order (switcher, rows, account) on a
-  `side-field` ground with a `side-field-line` border, a `popover-hover`
+  `side-field` ground with a `side-field-line` border, a `hover-tint`
   hover, a `side-accent` border while open and the popover-gapped ring. The
   switcher's dropdown opens 6px below it and the account menu 6px above the
   foot, each at least its trigger's width (the account menu exactly it), with
   the Menu open behind; Escape closes
   the inner popup onto its trigger, a second Escape closes the Menu onto its
   button, and choosing a workspace closes both. The Menu button takes a
-  `brand-ink` border on hover and open, the bg-gapped focus ring on focus, and
+  `brand-ink` border on hover (with the `hover-tint` ground) and open, the bg-gapped focus ring on focus, and
   a `text` icon while open. It is named "Menu", carries no native `title`,
   and shows that name in the shared Tooltip below it, left-aligned, 6px away.
   Its inert rows are disabled menu items (`role="menuitem"`,
@@ -488,6 +489,27 @@ save still settles as the form's generic server error.
   of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
   and focus rings, measured from the values in `platform-theme.css`, and the
   device-dark block must repeat the chosen-Dark block exactly.
+- Hover is one rule per kind of control. The primary button darkens to
+  `brand-hover` and the danger button to `bad-hover`. Secondary and ghost
+  buttons, the reveal toggle, growth notes, breadcrumb links, the
+  more-presets button, the bar controls (top-bar menu, full-path menu,
+  sidebar collapse toggle) and the sidebar's popup triggers (tenant
+  switcher, account menu, their nested triggers in the phone menu, the
+  preset sheet) take the `hover-tint` ground (#fff1c2 light, #33290d
+  dark); a secondary button's border also turns `brand-ink`. Every
+  unselected option control takes the same tint at every width: segmented
+  options with or without glyphs, segmented radio tracks and tiles,
+  preview toolbar toggles, the Follow and full-screen solos, rich-text
+  toolbar toggles, segmented view tabs, appearance menu radio items, Voice
+  section chips, preset chips, cards, grid options and jump index entries.
+  An unchecked checkbox takes the tint and a `brand-ink` border; a switch
+  that is off darkens its track to `control-line-hover`; a text link's
+  `highlight` stroke thickens from 2px to 3px; the asset upload drop area
+  takes the tint and a `brand-ink` dashed border. A select keeps the
+  field rule (a `brand-ink` border, no tint). Table, list, accordion,
+  tenant picker, menu and sidebar rows keep their grey hover, and a
+  selected, pressed, checked, current or open control does not change on
+  hover. Disabled and `aria-disabled` controls take no hover.
 - Focus is one gapped ring on every control, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
@@ -536,7 +558,8 @@ save still settles as the form's generic server error.
   hiding only the "Platform" label, and every one- or two-crumb trail,
   renders in full, as does every trail from `md` up. The "…" is a 44×44
   `FullPathMenu` button named "Show full path": a `control-line` border on
-  `surface`, `brand-ink` on hover and while open, the ring on `bg` on keyboard
+  `surface`, `brand-ink` with the `hover-tint` ground on hover, `brand-ink`
+  while open, the ring on `bg` on keyboard
   focus only, no tooltip. It opens the "Full path" menu, 220px wide, 7px below
   it with left edges aligned, on the shared popup frame. A hidden crumb with
   no page is a group label (the `groupLabel` slot: 11px/700 uppercase

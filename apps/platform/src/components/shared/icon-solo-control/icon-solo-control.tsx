@@ -19,7 +19,7 @@ const iconSoloControlVariants = tv({
     // md:size-11 outranks the md:h-8 of the Button this control may render.
     'inline-flex size-11 flex-none cursor-pointer items-center justify-center md:size-11 lg:size-8.5 pointer-coarse:size-11',
     'rounded-platform-5 border border-platform-control-line bg-platform-surface text-platform-text',
-    'hover:bg-platform-hover',
+    'hover:bg-platform-hover-tint',
     'data-[pressed]:border-platform-brand-ink data-[pressed]:bg-platform-brand-weak data-[pressed]:text-platform-brand-strong',
     'data-[pressed]:hover:bg-platform-brand-weak',
     'data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1px_var(--platform-brand-ink)]',

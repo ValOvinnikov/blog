@@ -81,7 +81,11 @@ export const AssetUploadField = ({
     root,
     top,
     error: errorSlot,
-  } = assetUploadFieldVariants({ size, isInvalid: Boolean(shownError) });
+  } = assetUploadFieldVariants({
+    size,
+    isInvalid: Boolean(shownError),
+    isDisabled,
+  });
 
   const thumb = (
     <AssetUploadThumb

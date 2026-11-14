@@ -18,6 +18,7 @@ export const checkboxVariants = tv({
       'rounded-[4px] border border-platform-control-line bg-platform-surface',
       'transition-colors duration-150',
       'data-[checked]:border-platform-brand data-[checked]:bg-platform-brand',
+      'not-data-[disabled]:not-data-[checked]:hover:border-platform-brand-ink not-data-[disabled]:not-data-[checked]:hover:bg-platform-hover-tint',
       'data-[disabled]:cursor-not-allowed',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
