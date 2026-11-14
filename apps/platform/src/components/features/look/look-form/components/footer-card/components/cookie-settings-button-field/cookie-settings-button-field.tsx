@@ -3,7 +3,7 @@ import {
   type TCookieSettingsButton,
 } from '@blog/config';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
-import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
 import { textVariants } from '@platform/components/shared/text/text-variants';
@@ -33,11 +33,11 @@ export const CookieSettingsButtonField = ({
   const t = useTranslations('lookForm');
   const bannerOffNoteId = useId();
 
-  const options = COOKIE_SETTINGS_BUTTON_ORDER.map((reach) => ({
-    value: reach,
-    label: t(`cookieSettingsButtonOptionLabel.${reach}`),
-    glyph: <LookOptionGlyph field="cookieSettingsButton" value={reach} />,
-  }));
+  const options = toLookGlyphOptions(
+    'cookieSettingsButton',
+    COOKIE_SETTINGS_BUTTON_ORDER,
+    (reach) => t(`cookieSettingsButtonOptionLabel.${reach}`),
+  );
   const describedBy = joinIds(
     archivedDescribedBy,
     hasCookieBanner ? undefined : bannerOffNoteId,

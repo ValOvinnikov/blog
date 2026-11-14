@@ -32,7 +32,10 @@ export const BUDGET = { COMPONENT: 150, HOOK: 120, MODULE: 120 };
 
 const KIND = { COMPONENT: 'component', HOOK: 'hook', MODULE: 'module' };
 
-const REGISTRIES = new Set(['icon-registry.ts']);
+const REGISTRIES = new Set([
+  'icon-registry.ts',
+  'look-option-glyph-registry.ts',
+]);
 
 const EXEMPT_PATTERNS = [
   /-variants\.ts$/,

@@ -381,8 +381,8 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   that list in the same change.
 - **File size budgets, in non-blank lines:** a component `.tsx` 150, a hook
   120, any other `.ts` 120. Exempt: `*-variants` files, registries and
-  catalogs (`icon-registry.ts`), Studio schema definitions, generated files,
-  tests and stories. A file over budget sits in
+  catalogs (`icon-registry.ts`, `look-option-glyph-registry.ts`), Studio
+  schema definitions, generated files, tests and stories. A file over budget sits in
   `scripts/file-size-baseline.json` at its exact count and never grows, and a
   diff that edits one extracts the part it changes — not the whole file, and
   never as a sweep — so the file ends below its entry on the merge-base;

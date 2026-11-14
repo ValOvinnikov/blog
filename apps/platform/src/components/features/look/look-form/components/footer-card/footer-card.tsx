@@ -10,7 +10,7 @@ import { LookCard } from '@platform/components/features/look/look-form/component
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import {
   FooterBackgroundGlyph,
-  LookOptionGlyph,
+  toLookGlyphOptions,
 } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
@@ -39,11 +39,11 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
   const surfaceLock = useLookFieldLock('footerSurface');
   const { lockLine } = useLookRowLock(CARD_FIELDS[LOOK_ROW.FOOTER]);
 
-  const layoutOptions = Object.values(FOOTER_LAYOUT).map((layout) => ({
-    value: layout,
-    label: t(`footerLayoutOptionLabel.${layout}`),
-    glyph: <LookOptionGlyph field="footerLayout" value={layout} />,
-  }));
+  const layoutOptions = toLookGlyphOptions(
+    'footerLayout',
+    FOOTER_LAYOUT,
+    (layout) => t(`footerLayoutOptionLabel.${layout}`),
+  );
   const backgroundOptions = Object.values(BRAND_VARIANT).map((background) => ({
     value: background,
     label: t(`footerBackgroundOptionLabel.${background}`),
@@ -51,11 +51,11 @@ export const FooterCard = ({ hasCookieBanner, summary }: TFooterCardProps) => {
       <FooterBackgroundGlyph background={background} accentHue={accentHue} />
     ),
   }));
-  const surfaceOptions = Object.values(FOOTER_SURFACE).map((surface) => ({
-    value: surface,
-    label: t(`footerSurfaceOptionLabel.${surface}`),
-    glyph: <LookOptionGlyph field="footerSurface" value={surface} />,
-  }));
+  const surfaceOptions = toLookGlyphOptions(
+    'footerSurface',
+    FOOTER_SURFACE,
+    (surface) => t(`footerSurfaceOptionLabel.${surface}`),
+  );
 
   return (
     <LookCard

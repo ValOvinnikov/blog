@@ -6,8 +6,8 @@ import {
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
 } from '@blog/config';
-import { toOptions } from '@blog/utils/primitives';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
@@ -23,14 +23,20 @@ export const AccountFields = () => {
   const panelLock = useLookFieldLock('accountPanelStyle');
   const placementLock = useLookFieldLock('accountPhonePlacement');
 
-  const buttonOptions = toOptions(ACCOUNT_BUTTON_STYLE, (style) =>
-    t(`accountButtonStyleOptionLabel.${style}`),
+  const buttonOptions = toLookGlyphOptions(
+    'accountButtonStyle',
+    ACCOUNT_BUTTON_STYLE,
+    (style) => t(`accountButtonStyleOptionLabel.${style}`),
   );
-  const panelOptions = toOptions(ACCOUNT_PANEL_STYLE, (style) =>
-    t(`accountPanelStyleOptionLabel.${style}`),
+  const panelOptions = toLookGlyphOptions(
+    'accountPanelStyle',
+    ACCOUNT_PANEL_STYLE,
+    (style) => t(`accountPanelStyleOptionLabel.${style}`),
   );
-  const placementOptions = toOptions(ACCOUNT_PHONE_PLACEMENT, (placement) =>
-    t(`accountPhonePlacementOptionLabel.${placement}`),
+  const placementOptions = toLookGlyphOptions(
+    'accountPhonePlacement',
+    ACCOUNT_PHONE_PLACEMENT,
+    (placement) => t(`accountPhonePlacementOptionLabel.${placement}`),
   );
 
   return (
