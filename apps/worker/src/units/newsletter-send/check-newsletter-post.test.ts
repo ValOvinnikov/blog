@@ -12,18 +12,20 @@ import {
 import {
   getTenantById,
   getTenantSanityCredentials,
-  type TTenantSanityCredentials,
 } from '@blog/db/queries/tenants';
-import {
-  NEWSLETTER_POST_STATE,
-  NEWSLETTER_SCHEDULE_RECHECK_MS,
-} from '@worker/constants/newsletter-send';
+import { NEWSLETTER_POST_STATE } from '@worker/constants/newsletter-send';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
+import { MOCK_ONE_HOUR_MS } from '@worker/testing/clock/frozen-clock';
 import {
   MOCK_CLAIMED_AT,
   MOCK_NEWSLETTER_POST,
-  MOCK_POST_ID,
 } from '@worker/testing/newsletter-send/fixtures';
-import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
+import {
+  MOCK_SANITY_CREDENTIALS,
+  MOCK_TENANT_ID,
+  mockTenant,
+} from '@worker/testing/tenant/fixtures';
 import { readNewsletterPost } from '@worker/utils/newsletter-send/read-newsletter-post';
 
 import { checkNewsletterPost } from './check-newsletter-post';
@@ -35,9 +37,7 @@ vi.mock('@blog/db/queries/tenants');
 vi.mock('@worker/utils/newsletter-send/read-newsletter-post');
 
 const MOCK_NOW = new Date('2031-05-15T12:00:00Z');
-const MOCK_CREDENTIALS = {} as TTenantSanityCredentials;
 const CANCELLED = { state: NEWSLETTER_POST_STATE.CANCELLED };
-const MOCK_ONE_HOUR_MS = 60 * 60_000;
 
 function runCheck() {
   return checkNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);
@@ -53,7 +53,9 @@ describe(checkNewsletterPost, () => {
       newsletterEnabled: true,
     } as TSettingsFeaturesResult);
     vi.mocked(getEmailNewPosts).mockResolvedValue(true);
-    vi.mocked(getTenantSanityCredentials).mockResolvedValue(MOCK_CREDENTIALS);
+    vi.mocked(getTenantSanityCredentials).mockResolvedValue(
+      MOCK_SANITY_CREDENTIALS,
+    );
     vi.mocked(readNewsletterPost).mockResolvedValue(MOCK_NEWSLETTER_POST);
     vi.mocked(getNewsletterPostSend).mockResolvedValue({
       claimedAt: new Date(MOCK_CLAIMED_AT),
@@ -72,7 +74,7 @@ describe(checkNewsletterPost, () => {
       post: MOCK_NEWSLETTER_POST,
     });
     expect(readNewsletterPost).toHaveBeenCalledWith(
-      MOCK_CREDENTIALS,
+      MOCK_SANITY_CREDENTIALS,
       MOCK_POST_ID,
     );
   });
@@ -95,13 +97,13 @@ describe(checkNewsletterPost, () => {
     vi.mocked(readNewsletterPost).mockResolvedValue({
       ...MOCK_NEWSLETTER_POST,
       publishedAt: new Date(
-        MOCK_NOW.getTime() + 3 * NEWSLETTER_SCHEDULE_RECHECK_MS,
+        MOCK_NOW.getTime() + 3 * SCHEDULED_POST_RECHECK_MS,
       ).toISOString(),
     });
 
     await expect(runCheck()).resolves.toEqual({
       state: NEWSLETTER_POST_STATE.SCHEDULED,
-      waitMs: NEWSLETTER_SCHEDULE_RECHECK_MS,
+      waitMs: SCHEDULED_POST_RECHECK_MS,
     });
   });
 

@@ -10,11 +10,11 @@ import { RESEND_IDEMPOTENCY_KEY_MAX_LENGTH } from '@worker/constants/newsletter-
 import {
   MOCK_NEWSLETTER_FROM_ADDRESS,
   MOCK_NEWSLETTER_POST,
-  MOCK_POST_ID,
   MOCK_SUBSCRIBER_EMAILS,
   MOCK_SUBSCRIBER_IDS,
   MOCK_UNSUBSCRIBE_KEY,
 } from '@worker/testing/newsletter-send/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import {
   MOCK_TENANT_DOMAIN,
   MOCK_TENANT_ID,

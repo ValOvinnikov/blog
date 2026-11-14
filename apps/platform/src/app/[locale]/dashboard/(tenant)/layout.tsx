@@ -1,14 +1,17 @@
 import { queries } from '@blog/db';
 import { hasArrayGotMultipleItems } from '@blog/utils/primitives';
+import { BillingStatusNotice } from '@platform/components/features/billing/billing-status-notice';
 import { DashboardBreadcrumb } from '@platform/components/features/layout/dashboard-breadcrumb';
 import { PlatformShell } from '@platform/components/features/layout/platform-shell';
 import { TenantSwitcher } from '@platform/components/features/layout/tenant-switcher';
 import { OwnerSuspensionBanner } from '@platform/components/features/tenants/owner-suspension-banner';
+import { UPGRADE_STATE } from '@platform/constants/billing';
 import { ShellStudioAccessProvider } from '@platform/context/shell-studio-access-provider';
 import { TenantPlanProvider } from '@platform/context/tenant-plan-provider';
 import { listSessionTenants } from '@platform/server/auth/list-session-tenants';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
 import { resolveTenantPageAccess } from '@platform/server/auth/resolve-tenant-page-access';
+import { upgradeStateFor } from '@platform/server/billing/upgrade-state-for';
 import { loadPlatformShellChrome } from '@platform/server/layout/load-platform-shell-chrome';
 import { dashboardNavSections } from '@platform/utils/dashboard-nav-sections/dashboard-nav-sections';
 import { ownerStudioAccessFor } from '@platform/utils/owner-studio-access/owner-studio-access';
@@ -54,9 +57,20 @@ export default async function DashboardTenantLayout({ children }: TProps) {
       }
       crumb={<DashboardBreadcrumb />}
       notice={
-        <Suspense fallback={null}>
-          <OwnerSuspensionBanner tenant={tenant} />
-        </Suspense>
+        <>
+          <Suspense fallback={null}>
+            <OwnerSuspensionBanner tenant={tenant} />
+          </Suspense>
+          <Suspense fallback={null}>
+            <BillingStatusNotice
+              tenant={tenant}
+              canOpenBilling={access.billing}
+              canUpgrade={
+                upgradeStateFor(tenant, viewer) === UPGRADE_STATE.AVAILABLE
+              }
+            />
+          </Suspense>
+        </>
       }
       account={{
         name: userName,

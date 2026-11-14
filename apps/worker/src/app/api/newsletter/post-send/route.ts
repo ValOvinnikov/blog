@@ -1,5 +1,4 @@
 import { HTTP_STATUS } from '@blog/config/constants';
-import { getTenantById } from '@blog/db/queries/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
 import {
@@ -10,6 +9,7 @@ import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
   readSignedRequest,
+  refuseUnreadableTenant,
   respond,
   respondError,
   tenantRequestBodySchema,
@@ -33,13 +33,8 @@ export async function POST(request: Request): Promise<Response> {
   const { tenantId, postId, claimedAt } = signed.data;
 
   try {
-    const tenant = await getTenantById(tenantId);
-    if (!tenant) {
-      return respondError(HTTP_STATUS.NOT_FOUND, ENQUEUE_ERROR.NOT_FOUND);
-    }
-    if (!tenant.sanityProjectId || !tenant.sanityReadTokenEncrypted) {
-      return respondError(HTTP_STATUS.CONFLICT, ENQUEUE_ERROR.NOT_PROVISIONED);
-    }
+    const refusal = await refuseUnreadableTenant(tenantId);
+    if (refusal) return refusal;
 
     const run = await start(sendNewsletterPost, [tenantId, postId, claimedAt]);
     return respond(HTTP_STATUS.ACCEPTED, { runId: run.runId });

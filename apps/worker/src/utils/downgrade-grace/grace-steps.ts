@@ -1,14 +1,21 @@
-import { GRACE_EMAIL, type TGraceEmail } from '@blog/db/constants';
+import {
+  GRACE_EMAIL,
+  PLAN_ENTITLEMENTS,
+  type TGraceEmail,
+} from '@blog/db/constants';
 import { getTenantOwnerEmail } from '@blog/db/queries/memberships';
 import { claimGraceEmail, endTenantTrial } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
+import {
+  findGraceLocks,
+  hasGraceLocks,
+} from '@blog/db/utils/grace-locks/grace-locks';
 import { DOWNGRADE_GRACE_LOG } from '@worker/constants/downgrade-grace';
 import type { TInactivitySweepContext } from '@worker/utils/inactivity-sweep/inactivity-stages';
 import { logger } from '@worker/utils/logger/logger';
 import { invalidateSiteCache } from '@worker/utils/site-cache/invalidate-site-cache';
 
 import { sendOwnerGraceEmail } from './grace-emails';
-import { findGraceLocks, hasGraceLocks } from './grace-locks';
 
 export type TGraceStepInput = {
   tenant: TTenant;
@@ -33,7 +40,12 @@ export async function sendGraceEmail(
 ): Promise<boolean> {
   const { id: tenantId } = tenant;
   const { now, env } = ctx;
-  const locks = await findGraceLocks(tenant, hosts, env.tenantRootDomain);
+  const locks = await findGraceLocks(
+    tenant,
+    PLAN_ENTITLEMENTS[tenant.plan],
+    hosts,
+    env.tenantRootDomain,
+  );
   if (email !== GRACE_EMAIL.STARTED && !hasGraceLocks(locks)) return false;
 
   const claimed = await claimGraceEmail(tenantId, email, now);

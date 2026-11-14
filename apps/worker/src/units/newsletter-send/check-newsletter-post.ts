@@ -6,9 +6,9 @@ import {
 import { isUndefined } from '@blog/utils/primitives';
 import {
   NEWSLETTER_POST_STATE,
-  NEWSLETTER_SCHEDULE_RECHECK_MS,
   NEWSLETTER_UNIT_MAX_RETRIES,
 } from '@worker/constants/newsletter-send';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import { isSiteSendingPosts } from '@worker/utils/newsletter-send/is-site-sending-posts';
 import {
   readNewsletterPost,
@@ -62,7 +62,7 @@ export async function checkNewsletterPost(
   return waitMs > 0
     ? {
         state: NEWSLETTER_POST_STATE.SCHEDULED,
-        waitMs: Math.min(waitMs, NEWSLETTER_SCHEDULE_RECHECK_MS),
+        waitMs: Math.min(waitMs, SCHEDULED_POST_RECHECK_MS),
       }
     : { state: NEWSLETTER_POST_STATE.READY, post };
 }

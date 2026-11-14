@@ -1,19 +1,20 @@
 import {
   NEWSLETTER_POST_STATE,
-  NEWSLETTER_SCHEDULE_RECHECK_MS,
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SLOW_PAUSE_MS,
 } from '@worker/constants/newsletter-send';
+import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
 import {
   MOCK_CLAIMED_AT,
   MOCK_NEWSLETTER_POST,
-  MOCK_POST_ID,
   MOCK_SUBSCRIBER_IDS,
   mockNewsletterPage,
 } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
+import { fakeRunHook } from '@worker/testing/workflow/run-hook';
 import { checkNewsletterPost } from '@worker/units/newsletter-send/check-newsletter-post';
 import { gateNewsletterSend } from '@worker/units/newsletter-send/gate-newsletter-send';
 import { sendNewsletterPage } from '@worker/units/newsletter-send/send-newsletter-page';
@@ -23,7 +24,7 @@ import {
   releaseNewsletterSendClaim,
   reportNewsletterSendFailed,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
-import { createHook, type Hook, sleep } from 'workflow';
+import { sleep } from 'workflow';
 
 import { sendNewsletterPost } from './send-newsletter-post';
 
@@ -43,15 +44,6 @@ const MOCK_FIRST_PAGE = mockNewsletterPage({
   isLastPage: false,
   unreadableCount: 2,
 });
-
-function fakeRunHook(hasConflict = false) {
-  const hook = {
-    getConflict: vi.fn(async () => (hasConflict ? ({} as never) : null)),
-    dispose: vi.fn(),
-  };
-  vi.mocked(createHook).mockReturnValue(hook as unknown as Hook<null>);
-  return hook;
-}
 
 function runSend() {
   return sendNewsletterPost(MOCK_TENANT_ID, MOCK_POST_ID, MOCK_CLAIMED_AT);
@@ -146,13 +138,13 @@ describe(sendNewsletterPost, () => {
     vi.mocked(checkNewsletterPost)
       .mockResolvedValueOnce({
         state: NEWSLETTER_POST_STATE.SCHEDULED,
-        waitMs: NEWSLETTER_SCHEDULE_RECHECK_MS,
+        waitMs: SCHEDULED_POST_RECHECK_MS,
       })
       .mockResolvedValueOnce(MOCK_READY);
 
     await runSend();
 
-    expect(sleep).toHaveBeenCalledWith(NEWSLETTER_SCHEDULE_RECHECK_MS);
+    expect(sleep).toHaveBeenCalledWith(SCHEDULED_POST_RECHECK_MS);
     expect(checkNewsletterPost).toHaveBeenNthCalledWith(
       2,
       MOCK_TENANT_ID,

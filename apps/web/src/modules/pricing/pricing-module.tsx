@@ -2,6 +2,7 @@ import { PRICE_PERIOD } from '@blog/config';
 import { service } from '@blog/service';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { getRequestContext } from '@web/server/request-context/request-context';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
@@ -14,7 +15,7 @@ export interface IPricingModuleProps {
 }
 
 export const PricingModule = async ({ id }: IPricingModuleProps) => {
-  const { sanityContext, locale } = await getRequestContext();
+  const { sanityContext, locale, tenantId } = await getRequestContext();
   const [result, settingsResult, t] = await Promise.all([
     service.modules.pricing.v1.getPricingModule(id, sanityContext),
     getSiteSettings(),
@@ -33,8 +34,24 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
     return null;
   }
 
-  const { tiers, ...pricingModule } = result.data;
+  const {
+    brandVariant,
+    layout,
+    headingBlock,
+    tiers,
+    footnote,
+    ctaButtons,
+    contentAlignment,
+    cardStyle,
+    radiusScale,
+    density,
+  } = result.data;
   const { currency, pricePeriodWording } = settingsResult.data;
+  const appearance = await getSectionAppearance(tenantId, {
+    cardStyle,
+    radiusScale,
+    density,
+  });
   const panels = toPricingPanels({
     tiers,
     locale,
@@ -60,7 +77,11 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
 
   return (
     <PricingModuleView
-      {...pricingModule}
+      section={{ brandVariant, layout, appearance }}
+      headingBlock={headingBlock}
+      footnote={footnote}
+      ctaButtons={ctaButtons}
+      contentAlignment={contentAlignment}
       panels={panels}
       titleId={`pricing-${id}`}
       dataTestId={`pricing-module-${id}`}

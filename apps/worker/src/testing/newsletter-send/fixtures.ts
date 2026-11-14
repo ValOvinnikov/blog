@@ -6,7 +6,6 @@ import type { TNewsletterPost } from '@worker/utils/newsletter-send/read-newslet
 
 const mockFaker = createMockFaker(7162);
 
-export const MOCK_POST_ID = mockFaker.string.uuid();
 export const MOCK_CLAIMED_AT = mockFaker.date.recent().toISOString();
 export const MOCK_SUBSCRIBER_IDS = Array.from({ length: 3 }, () =>
   mockFaker.string.uuid(),

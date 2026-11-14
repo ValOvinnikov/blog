@@ -2194,6 +2194,17 @@
     "contest": "Para impugnar esta decisión, responde al correo de suspensión o escribe a soporte indicando {reference}.",
     "copyButton": "Copiar referencia"
   },
+  "billingStatusNotice": {
+    "pastDueTitle": "Tu último pago no se ha podido cobrar",
+    "pastDueDescription": "Actualiza tu método de pago para conservar {plan}.",
+    "pastDueAction": "Actualizar método de pago",
+    "graceTitle": "Tu sitio está ahora en {plan}",
+    "graceMembers": "El <time>{date}</time>, {count, plural, one {# miembro del equipo perderá} other {# miembros del equipo perderán}} el acceso a la administración de este sitio.",
+    "graceDomain": "El <time>{date}</time>, {customDomain} dejará de ser la dirección principal y redirigirá a {subdomain}.",
+    "graceKeep": "Mejora tu plan antes de esa fecha para conservarlo todo.",
+    "graceKeepAskOwner": "El propietario del sitio puede mejorar el plan antes de esa fecha para conservarlo todo.",
+    "graceUpgrade": "Mejorar plan"
+  },
   "billingPage": {
     "title": "Facturación",
     "description": "Tu plan, tu próximo pago y tus facturas.",

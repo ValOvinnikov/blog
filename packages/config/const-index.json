@@ -7696,6 +7696,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/release",
         "file": "apps/platform/src/constants/release.ts"
+      },
+      {
+        "ref": "SCHEDULED_POST_STATE.DUE",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-purge",
+        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
       }
     ],
     "development": [
@@ -10712,6 +10718,12 @@
         "scope": "app:worker",
         "from": "@worker/constants/newsletter-send",
         "file": "apps/worker/src/constants/newsletter-send.ts"
+      },
+      {
+        "ref": "SCHEDULED_POST_STATE.SCHEDULED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-purge",
+        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
       }
     ],
     "CANCELLED": [
@@ -10896,6 +10908,30 @@
         "scope": "app:worker",
         "from": "@worker/constants/retention",
         "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "scheduled_post_purge.start_failed": [
+      {
+        "ref": "SCHEDULED_POST_PURGE_LOG.START_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-purge",
+        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+      }
+    ],
+    "scheduled_post_purge.run_failed": [
+      {
+        "ref": "SCHEDULED_POST_PURGE_LOG.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-purge",
+        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+      }
+    ],
+    "STALE": [
+      {
+        "ref": "SCHEDULED_POST_STATE.STALE",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-purge",
+        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
       }
     ],
     "pending": [

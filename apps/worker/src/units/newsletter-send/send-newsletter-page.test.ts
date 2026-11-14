@@ -11,11 +11,11 @@ import {
 } from '@worker/constants/newsletter-send';
 import {
   MOCK_NEWSLETTER_POST,
-  MOCK_POST_ID,
   MOCK_SUBSCRIBER_EMAILS,
   MOCK_SUBSCRIBER_IDS,
 } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_RESEND_DOWN } from '@worker/testing/outage/fixtures';
+import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_TENANT_ID, mockTenant } from '@worker/testing/tenant/fixtures';
 import { logger } from '@worker/utils/logger/logger';
 import { buildPostSend } from '@worker/utils/newsletter-send/build-post-send';

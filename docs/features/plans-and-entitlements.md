@@ -30,6 +30,8 @@ code:
   - packages/db/src/queries/tenants/grace-due.ts
   - packages/db/src/queries/memberships/*-memberships-over-seats/**
   - apps/worker/src/utils/downgrade-grace/**
+  - packages/db/src/utils/grace-locks/**
+  - packages/db/src/utils/grace-end-date/**
   - apps/worker/src/utils/owner-email/owner-grace-email-copy/**
   - apps/platform/src/components/features/capabilities/**
   - apps/web/src/server/settings-features/**
@@ -131,7 +133,8 @@ Every tenant is on one plan, `FREE`, `STARTER` or `GROWTH`, which an operator se
 - `packages/db/src/constants/downgrade-grace.ts` — `GRACE_EMAIL`, `GRACE_EMAIL_DAY`, `DOWNGRADE_GRACE_DAYS`
 - `packages/db/src/queries/tenants/end-tenant-trial/`, `claim-grace-email/`, `end-downgrade-grace/`, `restore-downgrade-grace/` and their due-lists; `grace-due.ts`
 - `packages/db/src/queries/memberships/lock-memberships-over-seats/`, `count-memberships-over-seats/`
-- `apps/worker/src/utils/downgrade-grace/run-downgrade-grace-sweep.ts` — `runDowngradeGraceSweep`; `grace-steps.ts`, `grace-locks.ts`, `grace-emails.ts`
+- `apps/worker/src/utils/downgrade-grace/run-downgrade-grace-sweep.ts` — `runDowngradeGraceSweep`; `grace-steps.ts`, `grace-emails.ts`
+- `packages/db/src/utils/grace-locks/grace-locks.ts` — `findGraceLocks`, `hasGraceLocks`, what locks on day 14, shared by the sweep and the platform's grace notice; `packages/db/src/utils/grace-end-date/grace-end-date.ts` — `graceEndDate`
 - `packages/db/src/utils/effective-look/effective-look.ts` — `toEffectiveLook`, `pickEntitledLook`, `isLookFieldEntitled`
 - `apps/web/src/server/settings-features/is-capability-enabled/is-capability-enabled.ts`
 - `apps/web/src/server/settings-features/is-reader-account-enabled/is-reader-account-enabled.ts`
