@@ -3,6 +3,7 @@ import type { TCreateMembershipInviteResult } from '@blog/db/queries/membership-
 import { inviteEmailColumns } from '@blog/db/queries/membership-invites/invite-email-columns';
 import * as schema from '@blog/db/schema';
 import type { TMembershipInvite } from '@blog/db/schema/membership-invites';
+import { firstRowOrThrow } from '@blog/db/testing/first-row-or-throw';
 import type { TTestDb } from '@blog/db/testing/fixtures';
 import { faker } from '@faker-js/faker';
 
@@ -18,21 +19,18 @@ export async function mockMembershipInvite(
     typeof schema.membershipInvites.$inferInsert & { email: string }
   > = {},
 ): Promise<TMembershipInvite> {
-  const [invite] = await db
-    .insert(schema.membershipInvites)
-    .values({
-      tenantId,
-      ...inviteEmailColumns(email),
-      role: MEMBERSHIP_ROLE.OWNER,
-      ...overrides,
-    })
-    .returning();
-
-  if (!invite) {
-    throw new Error('mockMembershipInvite: insert returned no row.');
-  }
-
-  return invite;
+  return firstRowOrThrow(
+    await db
+      .insert(schema.membershipInvites)
+      .values({
+        tenantId,
+        ...inviteEmailColumns(email),
+        role: MEMBERSHIP_ROLE.OWNER,
+        ...overrides,
+      })
+      .returning(),
+    'mockMembershipInvite',
+  );
 }
 
 export function inviteOf(
