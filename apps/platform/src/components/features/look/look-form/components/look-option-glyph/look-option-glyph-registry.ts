@@ -2,6 +2,7 @@ import {
   ACCOUNT_BUTTON_STYLE,
   ACCOUNT_PANEL_STYLE,
   ACCOUNT_PHONE_PLACEMENT,
+  BUSY_BUTTON_STYLE,
   BUTTON_SHAPE,
   COOKIE_SETTINGS_BUTTON,
   DENSITY,
@@ -14,6 +15,7 @@ import {
   type TAccountButtonStyle,
   type TAccountPanelStyle,
   type TAccountPhonePlacement,
+  type TBusyButtonStyle,
   type TButtonShape,
   type TCookieSettingsButton,
   type TDensity,
@@ -31,6 +33,9 @@ import AccountPanelStyleHub from '@platform/assets/look-glyphs/account-panel-sty
 import AccountPanelStyleProfile from '@platform/assets/look-glyphs/account-panel-style-profile.svg';
 import AccountPhonePlacementBar from '@platform/assets/look-glyphs/account-phone-placement-bar.svg';
 import AccountPhonePlacementMenu from '@platform/assets/look-glyphs/account-phone-placement-menu.svg';
+import BusyButtonStyleEdge from '@platform/assets/look-glyphs/busy-button-style-edge.svg';
+import BusyButtonStyleKept from '@platform/assets/look-glyphs/busy-button-style-kept.svg';
+import BusyButtonStyleLabel from '@platform/assets/look-glyphs/busy-button-style-label.svg';
 import ButtonShapePill from '@platform/assets/look-glyphs/button-shape-pill.svg';
 import ButtonShapeRounded from '@platform/assets/look-glyphs/button-shape-rounded.svg';
 import ButtonShapeSquare from '@platform/assets/look-glyphs/button-shape-square.svg';
@@ -67,6 +72,7 @@ type TLookOptionGlyphValues = {
   headerControlStyle: THeaderControlStyle;
   headerControlShape: THeaderControlShape;
   buttonShape: TButtonShape;
+  busyButtonStyle: TBusyButtonStyle;
   accountButtonStyle: TAccountButtonStyle;
   accountPanelStyle: TAccountPanelStyle;
   accountPhonePlacement: TAccountPhonePlacement;
@@ -109,6 +115,11 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
     [BUTTON_SHAPE.SQUARE]: ButtonShapeSquare,
     [BUTTON_SHAPE.ROUNDED]: ButtonShapeRounded,
     [BUTTON_SHAPE.PILL]: ButtonShapePill,
+  },
+  busyButtonStyle: {
+    [BUSY_BUTTON_STYLE.LABEL]: BusyButtonStyleLabel,
+    [BUSY_BUTTON_STYLE.KEPT]: BusyButtonStyleKept,
+    [BUSY_BUTTON_STYLE.EDGE]: BusyButtonStyleEdge,
   },
   accountButtonStyle: {
     [ACCOUNT_BUTTON_STYLE.PILL]: AccountButtonStylePill,

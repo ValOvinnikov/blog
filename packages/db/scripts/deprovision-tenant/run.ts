@@ -1,4 +1,3 @@
-import type { TMaybeUndefined } from '@blog/config/types';
 import {
   DEPROVISIONING_STEP,
   TENANT_PROVISIONING_STEP_STATUS,
@@ -11,6 +10,11 @@ import { isPlatformTenant } from '@blog/db/utils/is-platform-tenant/is-platform-
 import { sanitizeLogMessage } from '@blog/insight';
 import { isUndefined } from '@blog/utils/primitives';
 
+import {
+  parseDryRun,
+  parseFlagValue,
+  readRequiredTenantId,
+} from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 import { workflowRunUrl } from '../lib/workflow-run-url/workflow-run-url';
 
@@ -29,38 +33,17 @@ import { purgeTenantReaderData } from './steps/purge-reader-data';
 import { removeTenantDomain } from './steps/remove-domain';
 import { revokeTenantSanityTokens } from './steps/revoke-sanity-tokens';
 
-const TENANT_ID_FLAG = '--tenant-id=';
+const TOOL = 'deprovision-tenant';
 const CONFIRM_FLAG = '--confirm=';
-const DRY_RUN_FLAG = '--dry-run=';
-
-function parseFlagValue(argv: string[], flag: string): TMaybeUndefined<string> {
-  return argv.find((arg) => arg.startsWith(flag))?.slice(flag.length);
-}
-
-function parseTenantId(argv: string[]): string {
-  const value =
-    parseFlagValue(argv, TENANT_ID_FLAG) ?? process.env['TENANT_ID'];
-  if (!value) {
-    throw new Error(
-      'deprovision-tenant: missing required --tenant-id=<uuid> (or TENANT_ID env var).',
-    );
-  }
-  return value;
-}
 
 function parseConfirm(argv: string[]): string {
   const value = parseFlagValue(argv, CONFIRM_FLAG) ?? process.env['CONFIRM'];
   if (!value) {
     throw new Error(
-      'deprovision-tenant: missing required --confirm=<tenant-name> (or CONFIRM env var).',
+      `${TOOL}: missing required ${CONFIRM_FLAG}<tenant-name> (or CONFIRM env var).`,
     );
   }
   return value;
-}
-
-function parseDryRun(argv: string[]): boolean {
-  const value = parseFlagValue(argv, DRY_RUN_FLAG) ?? process.env['DRY_RUN'];
-  return value !== 'false';
 }
 
 type TStep = {
@@ -254,7 +237,7 @@ export async function runDeprovisioning(
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
-  const tenantId = parseTenantId(argv);
+  const tenantId = readRequiredTenantId(argv, TOOL);
   const confirm = parseConfirm(argv);
   const dryRun = parseDryRun(argv);
   const env = loadDeprovisionEnv(dryRun);
@@ -267,4 +250,4 @@ async function main(): Promise<void> {
   }
 }
 
-runIfEntrypoint(import.meta.url, main, 'deprovision-tenant');
+runIfEntrypoint(import.meta.url, main, TOOL);
