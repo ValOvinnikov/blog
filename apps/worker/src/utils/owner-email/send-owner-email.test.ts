@@ -1,10 +1,10 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@blog/config/constants';
 import { DAY_MS, TENANT_OWNER_EMAIL } from '@blog/db/constants';
 import {
   claimTenantOwnerEmail,
   releaseTenantOwnerEmail,
 } from '@blog/db/queries/tenants';
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { sendEmail } from '@blog/email';
 import {
   DEFAULT_OWNER_EMAIL_FROM_ADDRESS,
   OWNER_EMAIL_RELEASE_FAILED_EVENT,

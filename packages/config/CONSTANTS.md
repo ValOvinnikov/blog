@@ -86,6 +86,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **DISPLAY_MODE**: `GRID`, `CAROUSEL`
 
+### `@blog/config/constants` — `packages/config/src/constants/email-account.ts`
+
+- **EMAIL_ACCOUNT**: `PLATFORM`, `TENANT`
+
 ### `@blog/config/constants` — `packages/config/src/constants/email-template.ts`
 
 - **EMAIL_TEMPLATE_TYPE**: `MAGIC_LINK`, `TENANT_INVITE`, `NEWSLETTER_CONFIRMATION`
@@ -200,6 +204,10 @@ Every key/value const an agent should reuse before writing a literal. The
 ### `@blog/config/constants` — `packages/config/src/constants/nav-link-style.ts`
 
 - **NAV_LINK_STYLE**: `PLAIN`, `UNDERLINE`, `SOFT`, `PILL`
+
+### `@blog/config/constants` — `packages/config/src/constants/newsletter-reputation.ts`
+
+- **NEWSLETTER_REPUTATION_ALERT_LEVEL**: `WARN`, `SLOW`, `STOP`
 
 ### `@blog/config/constants` — `packages/config/src/constants/newsletter-result.ts`
 

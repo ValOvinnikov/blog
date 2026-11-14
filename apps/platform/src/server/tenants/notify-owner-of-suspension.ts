@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import { queries, TENANT_STATUS, type TSuspensionStatus } from '@blog/db';
 import type { TTenantSuspension } from '@blog/db/schema/tenant-suspensions';
 import type { TTenant } from '@blog/db/schema/tenants';
@@ -7,7 +8,6 @@ import {
   buildOwnerSuspensionEmail,
   buildOwnerSuspensionLiftedEmail,
   PLATFORM_EMAIL_BRAND_NAME,
-  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { TENANT_LOG } from '@platform/constants/tenant';

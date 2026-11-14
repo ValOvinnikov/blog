@@ -1,3 +1,4 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import type { TMaybeNull } from '@blog/config/types';
 import { TENANT_OWNER_EMAIL, type TTenantOwnerEmail } from '@blog/db/constants';
 import {
@@ -5,7 +6,7 @@ import {
   releaseTenantOwnerEmail,
 } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { sendEmail } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
 import {
   OWNER_EMAIL_RELEASE_FAILED_EVENT,

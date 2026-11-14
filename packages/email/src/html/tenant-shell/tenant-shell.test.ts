@@ -1,3 +1,4 @@
+import type { TTenantEmailBrand } from '@blog/config';
 import {
   COPYRIGHT_ENTITY,
   DOCTYPE,
@@ -25,7 +26,7 @@ import {
 } from '@blog/utils/color';
 import { faker } from '@faker-js/faker';
 
-import { buildTenantShell, type TTenantEmailBrand } from './tenant-shell';
+import { buildTenantShell } from './tenant-shell';
 
 faker.seed(6026);
 

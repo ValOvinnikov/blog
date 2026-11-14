@@ -1,3 +1,4 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import { buildSiteEmailTag } from '@blog/email/tags';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
@@ -12,7 +13,6 @@ import {
 } from '@blog/email/testing/email-fixtures';
 import { faker } from '@faker-js/faker';
 
-import { EMAIL_ACCOUNT } from './email-account';
 import {
   isEmailAccountConfigured,
   sendEmail,

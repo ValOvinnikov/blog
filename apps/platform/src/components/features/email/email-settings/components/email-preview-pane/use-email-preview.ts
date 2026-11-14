@@ -1,7 +1,10 @@
 'use client';
 
-import type { TEmailTemplateType, TLocaleIsoCode } from '@blog/config';
-import type { TTenantEmailBrand } from '@blog/email/html';
+import type {
+  TEmailTemplateType,
+  TLocaleIsoCode,
+  TTenantEmailBrand,
+} from '@blog/config';
 import { isUndefined } from '@blog/utils/primitives';
 import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';
 import { resolveEmailPreview } from '@platform/utils/email-fallback-copy/email-fallback-copy';

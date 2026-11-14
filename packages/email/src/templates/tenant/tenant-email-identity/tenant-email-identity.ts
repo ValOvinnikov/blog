@@ -1,4 +1,4 @@
-import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
+import type { TTenantEmailBrand } from '@blog/config';
 
 export type TTenantEmailIdentity = {
   brand: TTenantEmailBrand;

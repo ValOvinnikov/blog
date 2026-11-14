@@ -1,10 +1,9 @@
 import { routes } from '@blog/config';
-import { EMAIL_TYPE } from '@blog/config/constants';
+import { EMAIL_ACCOUNT, EMAIL_TYPE } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import {
   buildNewsletterConfirmationEmail,
   buildSiteEmailTag,
-  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { recordEmailSendSafely } from '@web/server/email-usage/record-email-send-safely/record-email-send-safely';

@@ -1,8 +1,6 @@
 import type { TTenantEmailBrand } from '@blog/config';
 import { renderEmailShell } from '@blog/email/html/email-layout/email-layout';
 
-export type { TTenantEmailBrand };
-
 export type TBuildTenantShellInput = {
   brand: TTenantEmailBrand;
   brandName: string;

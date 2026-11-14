@@ -8,7 +8,6 @@ export {
   type TBuildOperatorShellInput,
   buildTenantShell,
   type TBuildTenantShellInput,
-  type TTenantEmailBrand,
   PLATFORM_EMAIL_BRAND_NAME,
 } from './html';
 export {
@@ -31,9 +30,7 @@ export {
   buildArchivedSanityProjectAlertEmail,
   type TArchivedSanityProjectAlertInput,
   buildNewsletterReputationAlertEmail,
-  NEWSLETTER_REPUTATION_ALERT_LEVEL,
   type TNewsletterReputationAlertInput,
-  type TNewsletterReputationAlertLevel,
 } from './templates/operator';
 export {
   buildOwnerInviteHeadsUpEmail,
@@ -82,7 +79,6 @@ export {
 } from './templates/tenant';
 export { applyTenantSenderName } from './sender-name';
 export { buildSiteEmailTag, SITE_EMAIL_TAG_NAME, type TEmailTag } from './tags';
-export { EMAIL_ACCOUNT, type TEmailAccount } from './transport/email-account';
 export {
   isEmailAccountConfigured,
   sendEmail,

@@ -1,7 +1,10 @@
 'use client';
 
-import type { TEmailTemplateType, TLocaleIsoCode } from '@blog/config';
-import type { TTenantEmailBrand } from '@blog/email/html';
+import type {
+  TEmailTemplateType,
+  TLocaleIsoCode,
+  TTenantEmailBrand,
+} from '@blog/config';
 import { EmailPreview } from '@platform/components/features/email/email-preview';
 import { SendTestEmailButton } from '@platform/components/features/email/email-settings/components/send-test-email-button';
 import type { TEmailDraft } from '@platform/utils/email-draft/email-draft';

@@ -6,9 +6,9 @@ import {
   routes,
   type TLocaleIsoCode,
 } from '@blog/config';
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import {
   buildSiteEmailTag,
-  EMAIL_ACCOUNT,
   escapeHtml,
   LIST_UNSUBSCRIBE_ONE_CLICK,
 } from '@blog/email';

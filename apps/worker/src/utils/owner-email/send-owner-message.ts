@@ -1,4 +1,5 @@
-import { EMAIL_ACCOUNT, sendEmail, type TOwnerEmail } from '@blog/email';
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
+import { sendEmail, type TOwnerEmail } from '@blog/email';
 import { sanitizeLogMessage } from '@blog/insight';
 import { logger } from '@worker/utils/logger/logger';
 

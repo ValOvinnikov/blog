@@ -14,5 +14,4 @@ export { sanitizeHref } from '@blog/utils';
 export {
   buildTenantShell,
   type TBuildTenantShellInput,
-  type TTenantEmailBrand,
 } from './tenant-shell/tenant-shell';

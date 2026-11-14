@@ -1,5 +1,6 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import { listSuperadminEmails } from '@blog/db/queries/admins';
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { sendEmail } from '@blog/email';
 import {
   DEPROVISIONING_ALERT_NO_RECIPIENTS_EVENT,
   DEPROVISIONING_ALERT_SEND_FAILED_EVENT,

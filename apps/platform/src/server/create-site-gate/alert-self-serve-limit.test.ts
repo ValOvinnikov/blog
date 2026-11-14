@@ -1,4 +1,5 @@
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
+import { sendEmail } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { CREATE_SITE_GATE_LOG } from '@platform/constants/create-site-gate';
 import { mockDbConstants } from '@platform/testing/mock-db-constants';

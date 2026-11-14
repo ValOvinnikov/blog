@@ -30,6 +30,7 @@ import {
   LOCALE_ISO_CODES,
   MAGIC_LINK_REFUSAL,
   type TLocaleIsoCode,
+  EMAIL_ACCOUNT,
 } from '@blog/config/constants';
 import {
   EMAIL_TEMPLATE_DEFAULT_COPY,
@@ -37,7 +38,6 @@ import {
 } from '@blog/db/constants';
 import {
   buildSiteEmailTag,
-  EMAIL_ACCOUNT,
   escapeHtml,
   PLATFORM_EMAIL_BRAND_NAME,
   type TSendEmailInput,

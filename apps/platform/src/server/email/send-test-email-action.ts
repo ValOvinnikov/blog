@@ -5,9 +5,10 @@ import {
   type TActionResult,
   type TOutcome,
 } from '@blog/config';
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import { applyTenantSenderName, EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { applyTenantSenderName, sendEmail } from '@blog/email';
 import { isNull } from '@blog/utils/primitives';
 import { toOutcome } from '@blog/utils/to-outcome';
 import { EMAIL_TEST_LOG } from '@platform/constants/email-test';

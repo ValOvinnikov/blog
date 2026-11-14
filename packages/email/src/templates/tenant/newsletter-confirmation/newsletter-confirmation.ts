@@ -1,8 +1,6 @@
+import type { TTenantEmailBrand } from '@blog/config';
 import { renderEmailAction } from '@blog/email/html/email-action/email-action';
-import {
-  buildTenantShell,
-  type TTenantEmailBrand,
-} from '@blog/email/html/tenant-shell/tenant-shell';
+import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import {
   serializePortableText,
   type TPortableTextContent,

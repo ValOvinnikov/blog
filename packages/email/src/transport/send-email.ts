@@ -1,10 +1,7 @@
 import 'server-only';
 
+import { EMAIL_ACCOUNT, type TEmailAccount } from '@blog/config/constants';
 import type { TEmailTag } from '@blog/email/tags';
-import {
-  EMAIL_ACCOUNT,
-  type TEmailAccount,
-} from '@blog/email/transport/email-account';
 import { SendEmailError } from '@blog/email/transport/send-email-error';
 import { env } from '@blog/email/utils/env/env';
 import { isUndefined } from '@blog/utils/primitives';

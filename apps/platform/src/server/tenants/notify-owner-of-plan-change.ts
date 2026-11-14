@@ -1,10 +1,9 @@
 import 'server-only';
 
-import type { TTenantPlan } from '@blog/config/constants';
+import { EMAIL_ACCOUNT, type TTenantPlan } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import {
   buildOwnerPlanChangeEmail,
-  EMAIL_ACCOUNT,
   PLATFORM_EMAIL_BRAND_NAME,
   sendEmail,
 } from '@blog/email';

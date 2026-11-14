@@ -5,8 +5,8 @@ import {
   FORM_STATUS,
   type TEmailTemplateType,
   type TLocaleIsoCode,
+  type TTenantEmailBrand,
 } from '@blog/config';
-import type { TTenantEmailBrand } from '@blog/email/html';
 import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { EmailEditPane } from '@platform/components/features/email/email-settings/components/email-edit-pane';
 import { EmailPreviewPane } from '@platform/components/features/email/email-settings/components/email-preview-pane';

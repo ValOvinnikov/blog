@@ -1,4 +1,4 @@
-import type { TTenantEmailBrand } from '@blog/email/html/tenant-shell/tenant-shell';
+import type { TTenantEmailBrand } from '@blog/config';
 import type { TPortableTextContent } from '@blog/email/portable-text';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {

@@ -1,5 +1,6 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { EMAIL_ACCOUNT, isEmailAccountConfigured } from '@blog/email';
+import { isEmailAccountConfigured } from '@blog/email';
 import { TenantsView } from '@platform/components/features/tenants/tenants-view';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { toClientTenant } from '@platform/server/tenants/to-client-tenant';

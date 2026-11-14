@@ -1,4 +1,8 @@
 import {
+  NEWSLETTER_REPUTATION_ALERT_LEVEL,
+  type TNewsletterReputationAlertLevel,
+} from '@blog/config/constants';
+import {
   EMAIL_REPUTATION_LEVEL,
   EMAIL_REPUTATION_WINDOW_DAYS,
 } from '@blog/db/constants';
@@ -9,11 +13,7 @@ import {
 } from '@blog/db/queries/email-usage';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { emailReputationLevel } from '@blog/db/utils/email-reputation-level/email-reputation-level';
-import {
-  buildNewsletterReputationAlertEmail,
-  NEWSLETTER_REPUTATION_ALERT_LEVEL,
-  type TNewsletterReputationAlertLevel,
-} from '@blog/email';
+import { buildNewsletterReputationAlertEmail } from '@blog/email';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
