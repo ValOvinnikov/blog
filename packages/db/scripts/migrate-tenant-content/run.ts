@@ -1,10 +1,10 @@
 // `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
 // resolve to a no-op outside Next.js's own build.
 
-import type { TMaybeUndefined } from '@blog/config/types';
 import { getTenantById, listActiveTenants } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 
+import { readOptionalTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import {
@@ -12,15 +12,6 @@ import {
   migrateTenant,
   type TMigrateSummary,
 } from './lib/migrate-tenant';
-
-const TENANT_ID_FLAG = '--tenant-id=';
-
-function parseTenantId(argv: string[]): TMaybeUndefined<string> {
-  const flag = argv.find((arg) => arg.startsWith(TENANT_ID_FLAG));
-  return (
-    flag?.slice(TENANT_ID_FLAG.length) || process.env['TENANT_ID'] || undefined
-  );
-}
 
 async function migrateCandidates(
   candidates: TTenant[],
@@ -58,7 +49,7 @@ export function hasSystemicFailures(summary: TMigrateSummary): boolean {
 }
 
 async function main(): Promise<void> {
-  const tenantId = parseTenantId(process.argv.slice(2));
+  const tenantId = readOptionalTenantId(process.argv.slice(2));
 
   const summary = tenantId
     ? await runMigrationForTenant(tenantId)

@@ -6,7 +6,6 @@ import {
   FINDING_STATUS,
   type TFindingSeverity,
 } from '@blog/config/constants';
-import type { TMaybeUndefined } from '@blog/config/types';
 import {
   listFindingsForTenant,
   openFinding,
@@ -22,6 +21,7 @@ import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-wr
 import { sanitizeLogMessage } from '@blog/insight';
 import { hasLength } from '@blog/utils/primitives';
 
+import { readOptionalTenantId } from '../lib/cli-flags';
 import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import { notifyOperatorsOfDocumentValidationFailure } from './lib/notify-operators';
@@ -30,17 +30,8 @@ import {
   type TSanityValidationResult,
 } from './lib/run-sanity-documents-validate';
 
-const TENANT_ID_FLAG = '--tenant-id=';
-
 // `tenantId` + `source` + `kind` already scope the dedupe key, so this need not vary per document.
 export const DOCUMENT_VALIDATION_IDENTIFIER = 'documents';
-
-function parseTenantId(argv: string[]): TMaybeUndefined<string> {
-  const flag = argv.find((arg) => arg.startsWith(TENANT_ID_FLAG));
-  return (
-    flag?.slice(TENANT_ID_FLAG.length) || process.env['TENANT_ID'] || undefined
-  );
-}
 
 export type TValidateSummary = {
   checked: number;
@@ -196,7 +187,7 @@ export function hasSystemicFailures(summary: TValidateSummary): boolean {
 }
 
 async function main(): Promise<void> {
-  const tenantId = parseTenantId(process.argv.slice(2));
+  const tenantId = readOptionalTenantId(process.argv.slice(2));
 
   const summary = tenantId
     ? await runValidationForTenant(tenantId)
