@@ -7,6 +7,11 @@ import {
 } from '@web/testing/modules/cta/fixtures';
 import { MOCK_PRICING_LABELS } from '@web/testing/modules/pricing/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_RADIUS_OVERRIDE_SECTION,
+  MOCK_RADIUS_OVERRIDE_VALUE,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 
 import { PricingModuleView } from './pricing-module-view';
@@ -17,6 +22,7 @@ faker.seed(11);
 
 const MOCK_TIER_ID = faker.string.uuid();
 const MOCK_TIER_NAME = faker.commerce.productName();
+const MOCK_PRICING_HEADING = faker.lorem.words(3);
 const MOCK_MONTHLY_PRICE = `£${faker.number.int({ min: 10, max: 99 })}`;
 const MOCK_YEARLY_PRICE = `£${faker.number.int({ min: 100, max: 999 })}`;
 const MOCK_PRICE_LABEL = faker.lorem.words(2);
@@ -48,13 +54,12 @@ const mockPricingCard = (
 });
 
 const setup = customRender(PricingModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock(),
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
+  headingBlock: mockHeadingBlock({ heading: MOCK_PRICING_HEADING }),
   panels: [{ period: undefined, cards: [mockPricingCard()] }],
   footnote: undefined,
   ctaButtons: [],
   contentAlignment: undefined,
-  layout: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });
@@ -145,6 +150,30 @@ describe(`<${PricingModuleView.name}/>`, () => {
 
     expect(footnote).toBeVisible();
   });
+
+  it.each([
+    {
+      title: 'with',
+      section: MOCK_RADIUS_OVERRIDE_SECTION,
+      scoped: MOCK_RADIUS_OVERRIDE_VALUE,
+    },
+    {
+      title: 'without',
+      section: { brandVariant: BRAND_VARIANT.PRIMARY },
+      scoped: '',
+    },
+  ])(
+    'scopes the radius token to its section $title an override',
+    ({ section, scoped }) => {
+      setup({ section });
+
+      const region = screen.getByRole('region', { name: MOCK_PRICING_HEADING });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
 
   it('renders the module actions', () => {
     setup({ ctaButtons: MOCK_CTA_ACTIONS });

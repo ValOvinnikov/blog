@@ -33,7 +33,7 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 
 ## Data
 
-- **`module_pricing`** — `title`, `brandVariant`, `headingBlock`, `tiers[]` (`pricingTier`), `footnote` (per language), `ctaButtons`, `contentAlignment` (Left or Center), `layout` (`wideLayout`).
+- **`module_pricing`** — `title`, `brandVariant`, `headingBlock`, `tiers[]` (`pricingTier`), `footnote` (per language), `ctaButtons`, `contentAlignment` (Left or Center), `layout` (`wideLayout`), and the Appearance group's `cardStyle`, `radiusScale` (Corners) and `density` section overrides via `moduleAppearanceFragment`.
 - **`pricingTier`** — `name`, `description`, `priceLabel`, `highlightLabel` and `footnote` (each per-language one line), `prices[]` (`pricingPrice`), `features[]` (`pricingFeature`: one per-language `text`; the list itself is shared by every language), `ctaButtons`, and `platformPlan` (a `SELLABLE_TENANT_PLANS` value) with `platformPlanInterval` (`PRICE_PERIOD` `MONTH` or `YEAR`).
 - **`pricingPrice`** — `period` (`PRICE_PERIOD`: `ONE_TIME`, `HOUR`, `SESSION`, `MONTH`, `YEAR`), `amount` (number, ≥ 0, two decimals), `compareAtAmount` (optional, struck through), `isStartingAt` (shows "From").
 - **`settings_site.pricePeriodSuffix`** — one per-language one-line string per `PRICE_PERIOD`, the editor's wording for that period after a price; any may be left empty. A tenant created from starter content gets the `pricingModule.period.*` catalogue wording in its starter language.
@@ -45,8 +45,8 @@ An editor sells an offer with a table of up to four plans. Each tier has a name,
 
 - Editors (Studio) author tiers and prices; the currency is a required Site Settings field, and the price period wording an optional one.
 - The `pricingModule.*` strings are fixed (`period.*` is the fallback for a period the site leaves empty) (`VOICE_FIXED_KEYS`), translated per site language, not tenant-editable ([voice](./voice.md)).
-- Not plan-gated or capability-gated today ([plans-and-entitlements](./plans-and-entitlements.md)).
-- Look reach: the accent hue colours the highlighted tier and the badge; radius, card style and fonts apply through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Each tier is an item card following the radius scale: borderless with a straight brand bar on its left under Accent bar, outlined under Outlined. The highlighted tier adds a brand-colour border on all sides and the card shadow in both styles.
+- The module itself is not plan-gated or capability-gated; only its section overrides are, by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
+- Look reach: the accent hue colours the highlighted tier and the badge; radius, card style and fonts apply through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). Each tier is an item card following the radius scale: borderless with a straight brand bar on its left under Accent bar, outlined under Outlined. The highlighted tier adds a brand-colour border on all sides and the card shadow in both styles. On Growth, the module's section overrides win over the Look for its own band, restyling every tier card; the highlighted tier still sets its own border, accent and shadow on top, and tier rows stay aligned. On Free the overrides have no effect ([module-system](./module-system.md)).
 
 ## Constraints and invariants
 
