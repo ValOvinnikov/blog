@@ -5,6 +5,7 @@ import {
   SPINNER_STYLE,
   type TBusyButtonStyle,
 } from '@blog/config';
+import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
 import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
@@ -52,10 +53,11 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     (style) => t(`busyButtonStyleOptionLabel.${style}`),
   );
 
-  const spinnerOptions = Object.values(SPINNER_STYLE).map((style) => ({
-    value: style,
-    label: t(`spinnerStyleOptionLabel.${style}`),
-    glyph: <SampleSpinner variant={style} />,
+  const spinnerOptions = toOptions(SPINNER_STYLE, (style) =>
+    t(`spinnerStyleOptionLabel.${style}`),
+  ).map((option) => ({
+    ...option,
+    glyph: <SampleSpinner variant={option.value} />,
   }));
 
   const spinnerStyleLabel = t('spinnerStyleLabel');

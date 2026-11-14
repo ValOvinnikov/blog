@@ -6,5 +6,5 @@ export type TSampleSpinnerProps = {
 };
 
 export const SampleSpinner = ({ variant }: TSampleSpinnerProps) => (
-  <Spinner label="" variant={variant} aria-hidden={true} />
+  <Spinner label="" variant={variant} />
 );
