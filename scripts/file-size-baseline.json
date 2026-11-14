@@ -26,7 +26,6 @@
   "apps/web/src/hooks/use-dismissible-menu/use-dismissible-menu.ts": 149,
   "apps/web/src/server/request-context/request-context.ts": 176,
   "apps/web/src/testing/shared/breadcrumbs-page-contract/breadcrumbs-page-contract.tsx": 173,
-  "apps/web/src/testing/shared/module-renderer-contract/module-renderer-contract.tsx": 160,
   "apps/web/src/testing/shared/portable-text/fixtures.ts": 155,
   "apps/web/src/utils/find-translated-path/find-translated-path.ts": 135,
   "apps/web/src/vitest-setup.ts": 166,

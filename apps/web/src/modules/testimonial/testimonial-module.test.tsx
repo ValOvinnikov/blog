@@ -1,14 +1,22 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
+import { TESTIMONIAL_LOG } from '@web/constants/testimonial';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
-  MOCK_TESTIMONIAL_HEADING,
   MOCK_TESTIMONIAL_ITEMS,
   MOCK_TESTIMONIAL_MODULE_ID,
+  mockTestimonialModule,
 } from '@web/testing/modules/testimonial/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import {
+  MOCK_NO_SECTION_STYLE_OVERRIDES,
+  MOCK_SECTION_STYLE_OVERRIDES,
+} from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { TestimonialModule } from './testimonial-module';
 
@@ -28,16 +36,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const MOCK_TESTIMONIAL_MODULE = {
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
-  ctaButtons: [],
-  displayMode: DISPLAY_MODE.GRID,
-  contentAlignment: undefined,
-  cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
-  testimonials: MOCK_TESTIMONIAL_ITEMS,
-};
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
 
 const setup = customRenderAsync(TestimonialModule, {
   id: MOCK_TESTIMONIAL_MODULE_ID,
@@ -45,15 +46,13 @@ const setup = customRenderAsync(TestimonialModule, {
 
 describe(`<${TestimonialModule.name}/>`, () => {
   beforeEach(() => {
-    getTestimonialModuleMock.mockReset();
+    getTestimonialModuleMock.mockResolvedValue(
+      okResult(mockTestimonialModule()),
+    );
   });
 
   describe('when the module resolves', () => {
     beforeEach(async () => {
-      getTestimonialModuleMock.mockResolvedValue(
-        okResult(MOCK_TESTIMONIAL_MODULE),
-      );
-
       await setup();
     });
 
@@ -71,11 +70,34 @@ describe(`<${TestimonialModule.name}/>`, () => {
     });
   });
 
-  it('renders nothing when the fetch fails', async () => {
+  it.each([
+    {
+      title: "the module's style overrides",
+      overrides: MOCK_SECTION_STYLE_OVERRIDES,
+    },
+    { title: 'no overrides', overrides: MOCK_NO_SECTION_STYLE_OVERRIDES },
+  ])('scopes the section to $title', async ({ overrides }) => {
+    getTestimonialModuleMock.mockResolvedValue(
+      okResult(mockTestimonialModule(overrides)),
+    );
+
+    await setup();
+
+    expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+      MOCK_REQUEST_CONTEXT.tenantId,
+      overrides,
+    );
+  });
+
+  it('logs and renders nothing when the fetch fails', async () => {
     getTestimonialModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      TESTIMONIAL_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_TESTIMONIAL_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 });

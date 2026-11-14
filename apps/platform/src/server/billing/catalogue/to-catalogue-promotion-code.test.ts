@@ -63,6 +63,18 @@ describe(toCataloguePromotionCode, () => {
     });
   });
 
+  it('leaves out an amount-off code with no billing currency', () => {
+    const coupon = mockStripeCoupon({
+      percent_off: null,
+      amount_off: MOCK_DOLLAR_AMOUNT,
+      currency: MOCK_UNSUPPORTED_CURRENCY,
+    });
+
+    expect(
+      toCataloguePromotionCode(mockStripeCataloguePromotionCode({}, coupon)),
+    ).toBeUndefined();
+  });
+
   it('expires at the earlier of the code expiry and the coupon redeem-by', () => {
     const promotionCode = mockStripeCataloguePromotionCode(
       { expires_at: MOCK_LATER_SECONDS },

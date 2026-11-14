@@ -1,4 +1,9 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT, DISPLAY_MODE } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  GRID_COLUMNS,
+} from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
 import {
@@ -12,6 +17,10 @@ import {
   mockTestimonialItem,
 } from '@web/testing/modules/testimonial/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_RADIUS_SCOPE_CASES,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { TestimonialModuleView } from './testimonial-module-view';
 
@@ -23,15 +32,20 @@ const MOCK_TITLE_ID = faker.string.uuid();
 const MOCK_DATA_TEST_ID = faker.string.uuid();
 const CAROUSEL_LABEL = `${MOCK_TESTIMONIAL_HEADING} carousel`;
 
+const mockItems = (count: number) =>
+  Array.from({ length: count }, () =>
+    mockTestimonialItem({ id: faker.string.uuid() }),
+  );
+
 const setup = customRender(TestimonialModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_TESTIMONIAL_HEADING }),
   testimonials: MOCK_TESTIMONIAL_ITEMS,
   ctaButtons: [],
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
+  columns: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });
@@ -123,5 +137,36 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
       'href',
       MOCK_CTA_SECONDARY_ACTION.link.href,
     );
+  });
+
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
+    'scopes the radius token to its section $title an override',
+    ({ section, scoped }) => {
+      setup({ section });
+
+      const region = screen.getByRole('region', {
+        name: MOCK_TESTIMONIAL_HEADING,
+      });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
+
+  it('lays the grid out in the stored column count over the quote count', () => {
+    setup({ columns: GRID_COLUMNS.FOUR, testimonials: mockItems(2) });
+
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-4`);
+
+    expect(grid).toBeVisible();
+  });
+
+  it('falls back to columns that fit the quote count on Auto', () => {
+    setup({ columns: undefined, testimonials: mockItems(4) });
+
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-2`);
+
+    expect(grid).toBeVisible();
   });
 });

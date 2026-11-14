@@ -63,14 +63,31 @@ describe('catalogue sync', () => {
     );
   });
 
-  it('saves a public promotion code it re-reads', async () => {
+  it("saves a public code re-read with its coupon's products and currencies", async () => {
     await syncCataloguePromotionCode(stripe, MOCK_STRIPE_PROMOTION_CODE_ID);
 
+    expect(stripe.promotionCodes.retrieve).toHaveBeenCalledWith(
+      MOCK_STRIPE_PROMOTION_CODE_ID,
+      {
+        expand: [
+          'promotion.coupon.applies_to',
+          'promotion.coupon.currency_options',
+        ],
+      },
+    );
     expect(catalogueMocks.saveStripePromotionCode).toHaveBeenCalledOnce();
   });
 
   it("removes a deleted coupon's codes that no longer apply", async () => {
     await syncCouponPromotionCodes(stripe, MOCK_STRIPE_COUPON_ID);
+
+    expect(stripe.promotionCodes.list).toHaveBeenCalledWith({
+      coupon: MOCK_STRIPE_COUPON_ID,
+      expand: [
+        'data.promotion.coupon.applies_to',
+        'data.promotion.coupon.currency_options',
+      ],
+    });
 
     expect(catalogueMocks.removeStripePromotionCode).toHaveBeenCalledWith(
       MOCK_STRIPE_PROMOTION_CODE_ID,
