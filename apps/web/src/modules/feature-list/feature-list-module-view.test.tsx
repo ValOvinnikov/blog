@@ -3,6 +3,7 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
@@ -14,8 +15,13 @@ import {
 import {
   MOCK_FEATURE_LIST_HEADING,
   MOCK_FEATURE_LIST_ITEMS,
+  mockFeatureListItem,
 } from '@web/testing/modules/feature-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_RADIUS_SCOPE_CASES,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
@@ -27,8 +33,13 @@ const MOCK_TITLE_ID = faker.string.uuid();
 const MOCK_DATA_TEST_ID = faker.string.uuid();
 const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
 
+const mockItems = (count: number) =>
+  Array.from({ length: count }, () =>
+    mockFeatureListItem({ id: faker.string.uuid() }),
+  );
+
 const setup = customRender(FeatureListModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
   items: MOCK_FEATURE_LIST_ITEMS,
   ctaButtons: [],
@@ -36,7 +47,7 @@ const setup = customRender(FeatureListModuleView, {
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
+  columns: undefined,
   titleId: MOCK_TITLE_ID,
   dataTestId: MOCK_DATA_TEST_ID,
 });
@@ -112,5 +123,36 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       'href',
       MOCK_CTA_SECONDARY_ACTION.link.href,
     );
+  });
+
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
+    'scopes the radius token to its section $title an override',
+    ({ section, scoped }) => {
+      setup({ section });
+
+      const region = screen.getByRole('region', {
+        name: MOCK_FEATURE_LIST_HEADING,
+      });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
+
+  it('lays the grid out in the stored column count over the card count', () => {
+    setup({ columns: GRID_COLUMNS.TWO, items: mockItems(3) });
+
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-2`);
+
+    expect(grid).toBeVisible();
+  });
+
+  it('falls back to columns that fit the card count on Auto', () => {
+    setup({ columns: undefined, items: mockItems(5) });
+
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-3`);
+
+    expect(grid).toBeVisible();
   });
 });

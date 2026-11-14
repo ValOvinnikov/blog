@@ -1,5 +1,11 @@
-import { ICONS } from '@blog/config';
-import type { TFeatureListItem } from '@blog/service';
+import {
+  BRAND_VARIANT,
+  CARD_IMAGE_SHAPE,
+  CONTENT_ALIGNMENT,
+  DISPLAY_MODE,
+  ICONS,
+} from '@blog/config';
+import type { TFeatureListItem, TFeatureListModule } from '@blog/service';
 import { createMockFaker } from '@web/testing/mock-faker';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 
@@ -28,3 +34,18 @@ export const MOCK_FEATURE_LIST_ITEMS: TFeatureListItem[] = [
     headingBlock: mockHeadingBlock({ heading: 'Built for scale' }),
   }),
 ];
+
+export const mockFeatureListModule = (
+  overrides: Partial<TFeatureListModule> = {},
+): TFeatureListModule => ({
+  brandVariant: BRAND_VARIANT.PRIMARY,
+  headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
+  items: MOCK_FEATURE_LIST_ITEMS,
+  ctaButtons: [],
+  imageShape: CARD_IMAGE_SHAPE.WIDE,
+  displayMode: DISPLAY_MODE.GRID,
+  contentAlignment: undefined,
+  cardAlignment: CONTENT_ALIGNMENT.LEFT,
+  layout: undefined,
+  ...overrides,
+});

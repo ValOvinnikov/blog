@@ -7,6 +7,7 @@ code:
   - packages/studio/src/schema-types/documents/blocks/feature/**
   - packages/service/src/features/modules/feature-list/**
   - apps/web/src/modules/feature-list/**
+  - apps/web/src/constants/feature-list.ts
   - apps/web/src/testing/modules/feature-list/**
 epics: [5016, 5028, 4987]
 ---
@@ -26,15 +27,15 @@ A grid or carousel of feature cards that summarises a set of capabilities or off
 ## Data
 
 - **`block_feature`:** `title` (Studio label), `headingBlock` (`moduleHeadingBlock`: per-language `heading`, required in the default language, and `supportingText`), `icon` (one of `FEATURE_ICONS`, a 31-name subset of `ICONS`), `image` (`localizedImageWithAlt`), `link` (reference to a `link` document).
-- **`module_featureList`:** `title`, `brandVariant` (initial `PRIMARY`), `headingBlock`, `features` (references to `block_feature`), `ctaButtons` (see ./cta-module.md), `imageShape` (`CARD_IMAGE_SHAPE`: `WIDE` initial, `SQUARE`, `CIRCLE`, `ICON`; required — Team offers only `CIRCLE` and `SQUARE`), `displayMode` (`GRID` initial, `CAROUSEL`), `contentAlignment` (Left/Center, initial Left), `cardAlignment` (Left/Center, initial Left), `layout` (`wideLayout`: spacing, Wide/Full width, dividers).
+- **`module_featureList`:** `title`, `brandVariant` (initial `PRIMARY`), `headingBlock`, `features` (references to `block_feature`), `ctaButtons` (see ./cta-module.md), `imageShape` (`CARD_IMAGE_SHAPE`: `WIDE` initial, `SQUARE`, `CIRCLE`, `ICON`; required — Team offers only `CIRCLE` and `SQUARE`), `displayMode` (`GRID` initial, `CAROUSEL`), `contentAlignment` (Left/Center, initial Left), `cardAlignment` (Left/Center, initial Left), `layout` (`wideLayout`: spacing, Wide/Full width, dividers), and the Appearance group's `cardStyle`, `radiusScale` (Corners), `density` and `columns` (`GRID_COLUMNS`; empty is Auto) via `moduleAppearanceFragment`.
 - **Service shape** (`TFeatureListModule`): `items` as `{ id, headingBlock, sanityImage, icon, link }`; `displayMode` coalesces to `GRID`; card links resolve through the `link` document (an unresolvable link becomes `undefined`); an action whose `link` document resolves without a label or href is dropped, but an action whose `link` document does not resolve (deleted or never published) fails the module's query, so the module renders nothing and `feature_list_module.fetch_failed` is logged.
 - **Cache:** `getFeatureList` tags `modules:featureList`, `module:<id>`, `block_feature`, `link`, `homePage`, `page_landing`. The publish webhook maps `module_featureList` → `modules:featureList` and `block_feature` → `block_feature`.
 
 ## Configuration
 
 - **Editors** write Feature Cards under Blocks → Cards and assemble them in Features modules.
-- **Look** reaches the cards through tokens: card style (`ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED` or `PLAIN`), radius, card padding and gap from density, fonts, accent. Voice does not reach card copy; the carousel's region and previous/next labels are fixed catalog strings (`carousel` namespace).
-- **Plans:** not gated.
+- **Look** reaches the cards through tokens: card style (`ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED` or `PLAIN`), radius, card padding and gap from density, fonts, accent. On Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling the feature cards in the grid and the carousel; Corners also reaches the card images and icon panels. On Free they have no effect ([module-system](./module-system.md)). Voice does not reach card copy; the carousel's region and previous/next labels are fixed catalog strings (`carousel` namespace).
+- **Plans:** the module itself is not gated; only its section overrides are, by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
 
 ## Constraints and invariants
 
@@ -43,7 +44,7 @@ A grid or carousel of feature cards that summarises a set of capabilities or off
 - Icon versus image is decided per card at render time: an image wins over an icon. `imageShape` only describes how images are cropped; there is no show-images switch.
 - When any card in the module has an image, every card takes the image shape, and an icon-only card fills a media slot of that size with the brand tint, icon centred, so headings line up. With Circle the slot is a tinted circle the size of the image circles, left with Left card alignment and centred with Center. When no card has an image, cards render the icon tile alone.
 - With Icon, every card's media is the small rounded icon tile (48px): an image is cropped into it, an icon sits on its tint, and the tile follows card alignment. Headings line up without a panel.
-- Grid columns come from the card count, not from an authored field: 2→2, 3→3, 4→4, 5→3, 6→3, 7→4, 8→4 (`toModuleGridColumns`, shared with other card modules). The carousel ignores the rule.
+- In Grid mode a stored Columns value (2, 3 or 4) sets the grid's column count through `toCardGridColumns`. On Auto the count comes from the card count: 2→2, 3→3, 4→4, 5→3, 6→3, 7→4, 8→4 (`toModuleGridColumns`, shared with other card modules). The carousel ignores both. Columns is not plan-gated.
 - `cardAlignment` stores uppercase `CONTENT_ALIGNMENT` values; the view maps them to `MediaCard`'s lowercase `left`/`center`. `contentAlignment` aligns the heading and actions, and a carousel that does not overflow lines up the same way.
 - A card with a link is interactive: the heading becomes a stretched link to the resolved `href`. Card headings are `h3` under the module's `h2`.
 - `FeatureListCarousel` is the module's `'use client'` leaf; the grid is server-rendered.
@@ -60,7 +61,7 @@ A grid or carousel of feature cards that summarises a set of capabilities or off
 - `packages/service/src/features/modules/feature-list/adaptor/query.ts`, `transformer.ts`, `loader.ts`
 - `apps/web/src/modules/feature-list/feature-list-module.tsx`, `feature-list-module-view.tsx`
 - `apps/web/src/modules/feature-list/components/feature-list-card/feature-list-card.tsx`, `components/feature-list-carousel/feature-list-carousel.tsx`
-- `apps/web/src/utils/to-module-grid-columns/to-module-grid-columns.ts`
+- `apps/web/src/utils/to-module-grid-columns/to-module-grid-columns.ts`, `apps/web/src/utils/to-card-grid-columns/to-card-grid-columns.ts`
 - `packages/config/src/constants/icon.ts` (`FEATURE_ICONS`)
 
 ## Tests and stories

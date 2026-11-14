@@ -834,6 +834,10 @@ Every key/value const an agent should reuse before writing a literal. The
 
 - **FAQ_LOG**: `MODULE_FETCH_FAILED`=`"faq_module.fetch_failed"`
 
+### `@web/constants/feature-list` — `apps/web/src/constants/feature-list.ts`
+
+- **FEATURE_LIST_LOG**: `MODULE_FETCH_FAILED`=`"feature_list_module.fetch_failed"`
+
 ### `@web/constants/field-error` — `apps/web/src/constants/field-error.ts`
 
 - **FIELD_ERROR**: `INVALID`

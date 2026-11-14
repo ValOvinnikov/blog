@@ -3,6 +3,7 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
   ICONS,
 } from '@blog/config';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
@@ -10,6 +11,7 @@ import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import { mockFeatureListItem } from '@web/testing/modules/feature-list/fixtures';
 import { mockSanityImage } from '@web/testing/modules/hero/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
@@ -53,10 +55,6 @@ const meta = {
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
   argTypes: {
-    brandVariant: {
-      control: 'select',
-      options: [BRAND_VARIANT.PRIMARY, BRAND_VARIANT.SECONDARY],
-    },
     contentAlignment: {
       control: 'select',
       options: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
@@ -73,9 +71,13 @@ const meta = {
       control: 'select',
       options: Object.values(CARD_IMAGE_SHAPE),
     },
+    columns: {
+      control: 'select',
+      options: [undefined, ...Object.values(GRID_COLUMNS)],
+    },
   },
   args: {
-    brandVariant: BRAND_VARIANT.PRIMARY,
+    section: { brandVariant: BRAND_VARIANT.PRIMARY, layout: undefined },
     headingBlock: mockHeadingBlock({ heading: 'Why teams choose us' }),
     items,
     ctaButtons: [],
@@ -83,7 +85,7 @@ const meta = {
     displayMode: DISPLAY_MODE.GRID,
     contentAlignment: undefined,
     cardAlignment: CONTENT_ALIGNMENT.LEFT,
-    layout: undefined,
+    columns: undefined,
     titleId: 'feature-list-title',
     dataTestId: 'feature-list-module-feature-list-1',
   },
@@ -185,4 +187,31 @@ export const FiveCards: TStory = {
       mockFeatureListItem({ id: 'feature-5', icon: ICONS.STAR }),
     ],
   },
+};
+
+export const OutlinedOnBrandTint: TStory = {
+  args: {
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+    items: items.map((item, index) =>
+      index === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
+    ),
+  },
+};
+
+export const CarouselOutlinedOnBrandTint: TStory = {
+  args: {
+    displayMode: DISPLAY_MODE.CAROUSEL,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const IconShapeOutlinedOnBrandTint: TStory = {
+  args: {
+    imageShape: CARD_IMAGE_SHAPE.ICON,
+    section: MOCK_OUTLINED_BRAND_TINT_SECTION,
+  },
+};
+
+export const TwoColumnsThreeCards: TStory = {
+  args: { columns: GRID_COLUMNS.TWO },
 };
