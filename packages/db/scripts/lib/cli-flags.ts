@@ -2,6 +2,7 @@ import type { TMaybeUndefined } from '@blog/config/types';
 
 const TENANT_ID_FLAG = '--tenant-id=';
 const DRY_RUN_FLAG = '--dry-run=';
+export const DRY_RUN_OFF = 'false';
 
 export function parseFlagValue(
   argv: string[],
@@ -31,6 +32,7 @@ export function readRequiredTenantId(argv: string[], tool: string): string {
 // Dry run unless explicitly `false`, so a typo or a bare `--dry-run` never applies changes.
 export function parseDryRun(argv: string[]): boolean {
   return (
-    (parseFlagValue(argv, DRY_RUN_FLAG) ?? process.env['DRY_RUN']) !== 'false'
+    (parseFlagValue(argv, DRY_RUN_FLAG) ?? process.env['DRY_RUN']) !==
+    DRY_RUN_OFF
   );
 }

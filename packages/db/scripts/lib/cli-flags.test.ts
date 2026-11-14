@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 import {
+  DRY_RUN_OFF,
   parseDryRun,
   parseFlagValue,
   readOptionalTenantId,
@@ -14,7 +15,6 @@ const MOCK_ENV_TENANT_ID = faker.string.uuid();
 const MOCK_TOOL = 'mock-tool';
 const MOCK_FLAG = '--mock=';
 const MOCK_FLAG_VALUE = faker.lorem.word();
-const DRY_RUN_FALSE = 'false';
 
 beforeEach(() => {
   vi.stubEnv('TENANT_ID', undefined);
@@ -70,25 +70,18 @@ describe(readRequiredTenantId, () => {
 });
 
 describe(parseDryRun, () => {
-  it('defaults to a dry run with no flag or env var', () => {
-    expect(parseDryRun([])).toBe(true);
-  });
-
-  it('applies changes for --dry-run=false', () => {
-    expect(parseDryRun([`--dry-run=${DRY_RUN_FALSE}`])).toBe(false);
-  });
-
-  it('stays a dry run for a bare --dry-run', () => {
-    expect(parseDryRun(['--dry-run'])).toBe(true);
-  });
-
-  it('stays a dry run for any value but false', () => {
-    expect(parseDryRun(['--dry-run=no'])).toBe(true);
+  it.each([
+    { argv: [], isDryRun: true },
+    { argv: [`--dry-run=${DRY_RUN_OFF}`], isDryRun: false },
+    { argv: ['--dry-run'], isDryRun: true },
+    { argv: ['--dry-run=no'], isDryRun: true },
+  ])('returns $isDryRun for $argv', ({ argv, isDryRun }) => {
+    expect(parseDryRun(argv)).toBe(isDryRun);
   });
 
   describe('when the DRY_RUN env var is false', () => {
     beforeEach(() => {
-      vi.stubEnv('DRY_RUN', DRY_RUN_FALSE);
+      vi.stubEnv('DRY_RUN', DRY_RUN_OFF);
     });
 
     it('applies changes', () => {

@@ -1,4 +1,4 @@
-// Manual, human-run only (a dry run that lists by default; `--dry-run=false` writes): moves tenants wedged at PROVISIONING after a FAILED step to FAILED, so a normal Retry re-dispatches them.
+// Manual, human-run only: moves tenants wedged at PROVISIONING after a FAILED step to FAILED, so a normal Retry re-dispatches them.
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import {
   listTenantsWedgedInProvisioning,
