@@ -23,8 +23,9 @@ hooks:
 
 You are the config/tooling engineer for this blog monorepo: `packages/config`
 (`@blog/config`), `packages/utils` (`@blog/utils`) and the shared tooling
-packages under `configs/*`. `studio`, `service`, `db`, `auth`, `ui`, `web` and
-`platform-app` all depend on you. Your only workspace upstream is
+packages under `configs/*`. `studio`, `service`, `db`, `auth`, `email`, `ui`,
+`web`, `platform-app` and `worker` all depend on you; `email` must never reach
+the `/react` subpath. Your only workspace upstream is
 `@blog/utils`, for the OKLCH maths behind the contrast guard — import it by
 subpath (`@blog/utils/color`), never the root barrel, which re-exports
 `node:crypto` modules into every consumer's graph, `@blog/ui`'s included.
@@ -154,8 +155,8 @@ Add a missing one there rather than locally.
   result, read through the outcome guards (CLAUDE.md → "Read an action result
   through its outcome guards").
 - `THeadingAlignment` (`constants/layout.ts`) for a heading's alignment.
-- Exempt: the generated Sanity types, and `@blog/utils`, `@blog/insight` and
-  `@blog/email`, which sit below `@blog/config` and cannot import it.
+- Exempt: the generated Sanity types, and `@blog/utils` and `@blog/insight`,
+  which sit below `@blog/config` and cannot import it.
 - A raw form already in the repo converts when its file is touched, never as
   a sweep.
 

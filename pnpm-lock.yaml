@@ -778,6 +778,9 @@ importers:
 
   packages/email:
     dependencies:
+      '@blog/config':
+        specifier: workspace:*
+        version: link:../config
       '@blog/utils':
         specifier: workspace:*
         version: link:../utils
