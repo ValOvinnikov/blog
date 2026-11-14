@@ -36,8 +36,7 @@ type TModuleMap = Partial<
   >
 >;
 
-/** Content placed inside the first module of `moduleType`, or in its own band before the modules when the page has none. */
-export interface IModuleSlot {
+interface IModuleSlot {
   moduleType: TModule['type'];
   node: ReactNode;
 }
