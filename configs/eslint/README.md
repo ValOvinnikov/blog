@@ -70,7 +70,7 @@
   `email`, `@blog/db`'s in `db`, `auth` and the three apps, and an app's own
   in that app. Exempt: import and `vi.mock` paths, directives, property keys,
   HTML attribute names passed to `getAttribute`/`toHaveAttribute` and their
-  siblings,
+  siblings, the method name passed to `spyOn`,
   `className` values and `cn`/`clsx`/`tv`/`cva` arguments, JSX children, the
   standard vocabulary below, the const files themselves, and `0`/`1`/`-1` and
   the single space `' '`. Co-located `prefer-shared-constant.test.js`.
