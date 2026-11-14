@@ -1,7 +1,9 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
+import { FIELD_POPUP_OPEN_CLASSES } from '@platform/utils/field-surface-classes/field-surface-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const selectVariants = tv({
@@ -10,10 +12,13 @@ export const selectVariants = tv({
       'flex min-h-11 w-full min-w-0 items-center justify-between gap-2.5 md:min-h-10',
       'rounded-platform-control border px-[11px] py-[3px] text-left',
       'text-platform-16 text-platform-text md:text-platform-13-5',
+      COLOUR_TRANSITION_CLASSES,
+      FIELD_POPUP_OPEN_CLASSES,
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
     ],
     value: ['contents'],
+    glyph: ['flex shrink-0'],
     icon: ['shrink-0 text-platform-muted'],
     popup: [
       'max-h-[var(--available-height)] w-[min(20rem,calc(100vw-2rem))] min-w-[var(--anchor-width)] overflow-y-auto',
@@ -22,8 +27,7 @@ export const selectVariants = tv({
     item: [
       'flex min-h-11 cursor-pointer items-center gap-2 rounded-platform-control px-2 py-2',
       'outline-none',
-      'data-[selected]:bg-platform-brand-weak',
-      'data-[highlighted]:bg-platform-popover-hover data-[highlighted]:data-[selected]:bg-platform-popover-hover',
+      'data-[selected]:bg-platform-popover-hover data-[highlighted]:bg-platform-popover-hover',
     ],
     indicator: ['w-4 shrink-0 text-platform-brand-ink'],
   },
@@ -53,12 +57,20 @@ export const selectVariants = tv({
       false: {
         trigger: [
           'cursor-pointer border-platform-control-line bg-platform-surface',
+          'not-data-[disabled]:hover:border-platform-brand-ink',
         ],
       },
+    },
+    hasGlyph: {
+      true: {
+        value: ['flex min-w-0 items-center gap-2'],
+      },
+      false: {},
     },
   },
   defaultVariants: {
     appearance: SELECT_APPEARANCE.DEFAULT,
     isLocked: false,
+    hasGlyph: false,
   },
 });
