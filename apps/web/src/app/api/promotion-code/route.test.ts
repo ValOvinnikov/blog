@@ -9,7 +9,9 @@ import { CACHE_CONTROL } from '@web/constants/http';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
 import { mockPromotionDiscount } from '@web/testing/modules/pricing/live-price-fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
+import { CACHE_CONTROL_HEADER } from '@web/testing/shared/http/constants';
 import { logger } from '@web/utils/logger/logger';
+import { PROMOTION_CODE_PATH } from '@web/utils/promotion-discount';
 
 import { GET } from './route';
 
@@ -31,7 +33,7 @@ const MOCK_BASE_URL = faker.internet.url({ appendSlash: false });
 const MOCK_TOO_LONG_CODE = faker.string.alpha(65);
 
 const requestFor = (code?: string) => {
-  const url = new URL('/api/promotion-code', MOCK_BASE_URL);
+  const url = new URL(PROMOTION_CODE_PATH, MOCK_BASE_URL);
   if (!isUndefined(code)) {
     url.searchParams.set(PRICING_SEARCH_PARAM.PROMO, code);
   }
@@ -54,7 +56,7 @@ describe(GET, () => {
     expect(getActiveStripePromotionCodeMock).toHaveBeenCalledWith(
       MOCK_PROMOTION_CODE,
     );
-    expect(response.headers.get('Cache-Control')).toBe(
+    expect(response.headers.get(CACHE_CONTROL_HEADER)).toBe(
       CACHE_CONTROL.PUBLIC_ONE_MINUTE,
     );
     expect(await response.json()).toEqual({

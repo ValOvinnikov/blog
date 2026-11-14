@@ -813,7 +813,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/country` — `apps/web/src/constants/country.ts`
 
-- **COUNTRY_CODE**: `AD`, `AT`, `BE`, `BG`, `CY`, `DE`, `EE`, `ES`, `FI`, `FR`, `GB`, `GR`, `HR`, `IE`, `IT`, `LT`, `LU`, `LV`, `MC`, `MT`, `NL`, `PT`, `SI`, `SK`, `SM`, `US`, `VA`
+- **COUNTRY_CODE**: `AD`, `AT`, `BE`, `BG`, `BL`, `CY`, `DE`, `EE`, `ES`, `FI`, `FR`, `GB`, `GF`, `GP`, `GR`, `HR`, `IE`, `IT`, `LT`, `LU`, `LV`, `MC`, `ME`, `MF`, `MQ`, `MT`, `NL`, `PM`, `PT`, `RE`, `SI`, `SK`, `SM`, `US`, `VA`, `XK`, `YT`
 
 ### `@web/constants/cta` — `apps/web/src/constants/cta.ts`
 

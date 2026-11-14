@@ -1,5 +1,4 @@
 import { PRICE_PERIOD } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { BILLING_CURRENCY, STRIPE_PRICE_LOOKUP_KEY } from '@blog/db/constants';
 import {
   MOCK_DOLLAR_AMOUNT,
@@ -10,7 +9,11 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockStripePrice } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockStripePrice,
+  mockLinkedPricingTier,
+  MOCK_UNLISTED_CURRENCY,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toLivePlanPrice } from './to-live-plan-price';
 
@@ -26,19 +29,11 @@ const MOCK_YEARLY_DOLLAR_PRICE = mockStripePrice({
   unitAmount: MOCK_EURO_AMOUNT,
 });
 
-const linkedTier = (
-  interval: typeof PRICE_PERIOD.MONTH | typeof PRICE_PERIOD.YEAR,
-) =>
-  mockPricingTier({
-    platformPlan: { plan: TENANT_PLAN.GROWTH, interval },
-    prices: [],
-  });
-
 const setup = (
   overrides: Partial<Parameters<typeof toLivePlanPrice>[0]> = {},
 ) =>
   toLivePlanPrice({
-    tier: linkedTier(PRICE_PERIOD.MONTH),
+    tier: mockLinkedPricingTier(PRICE_PERIOD.MONTH),
     planPrices: [MOCK_DOLLAR_PRICE, MOCK_EURO_PRICE, MOCK_YEARLY_DOLLAR_PRICE],
     siteCurrency: BILLING_CURRENCY.EUR,
     periods,
@@ -64,7 +59,7 @@ describe(toLivePlanPrice, () => {
   });
 
   it('reads the yearly lookup key for a yearly tier', () => {
-    const livePrice = setup({ tier: linkedTier(PRICE_PERIOD.YEAR) });
+    const livePrice = setup({ tier: mockLinkedPricingTier(PRICE_PERIOD.YEAR) });
 
     expect(livePrice?.period).toBe(periods[PRICE_PERIOD.YEAR]);
     expect(livePrice?.amounts[BILLING_CURRENCY.USD]?.unitAmount).toBe(
@@ -75,7 +70,7 @@ describe(toLivePlanPrice, () => {
   it.each([
     {
       case: 'the site currency is not a billing currency',
-      siteCurrency: 'JPY',
+      siteCurrency: MOCK_UNLISTED_CURRENCY,
       planPrices: [MOCK_DOLLAR_PRICE, MOCK_EURO_PRICE],
       expected: BILLING_CURRENCY.USD,
     },

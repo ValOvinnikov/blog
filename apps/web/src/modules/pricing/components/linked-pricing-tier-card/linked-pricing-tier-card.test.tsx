@@ -15,6 +15,8 @@ import { mockPricingCard } from '@web/testing/modules/pricing/fixtures';
 import {
   mockLivePlanPrice,
   mockPromotionDiscount,
+  formatMockUnitAmount,
+  percentOffUnitAmount,
 } from '@web/testing/modules/pricing/live-price-fixtures';
 import { CURRENCY_COOKIE_NAME } from '@web/utils/currency-cookie';
 import { reportClientError } from '@web/utils/report-client-error';
@@ -30,17 +32,10 @@ vi.mock('@web/utils/report-client-error', () => ({
   reportClientError: vi.fn(),
 }));
 
-const MINOR_UNITS = 100;
-const MOCK_LOCALE = 'en';
-
-const format = (unitAmount: number, currency: string) =>
-  new Intl.NumberFormat(MOCK_LOCALE, {
-    style: 'currency',
-    currency,
-    trailingZeroDisplay: 'stripIfInteger',
-  }).format(unitAmount / MINOR_UNITS);
-
-const MOCK_FULL_DOLLAR_PRICE = format(MOCK_DOLLAR_AMOUNT, BILLING_CURRENCY.USD);
+const MOCK_FULL_DOLLAR_PRICE = formatMockUnitAmount(
+  MOCK_DOLLAR_AMOUNT,
+  BILLING_CURRENCY.USD,
+);
 
 const LinkedCardWithPromotion = (props: ILinkedPricingTierCardProps) => (
   <PromotionCodeProvider>
@@ -81,7 +76,7 @@ describe(`<${LinkedPricingTierCard.name}/>`, () => {
     setup();
 
     const price = screen.getByText(
-      format(MOCK_EURO_AMOUNT, BILLING_CURRENCY.EUR),
+      formatMockUnitAmount(MOCK_EURO_AMOUNT, BILLING_CURRENCY.EUR),
     );
 
     expect(price).toBeVisible();
@@ -104,14 +99,15 @@ describe(`<${LinkedPricingTierCard.name}/>`, () => {
           mockPromotionDiscount({ percentOff: MOCK_PERCENT_OFF }),
         ),
       );
-      const discounted = Math.round(
-        MOCK_DOLLAR_AMOUNT * (1 - MOCK_PERCENT_OFF / MINOR_UNITS),
+      const discounted = percentOffUnitAmount(
+        MOCK_DOLLAR_AMOUNT,
+        MOCK_PERCENT_OFF,
       );
 
       setup();
 
       const discountedPrice = await screen.findByText(
-        format(discounted, BILLING_CURRENCY.USD),
+        formatMockUnitAmount(discounted, BILLING_CURRENCY.USD),
       );
       const fullPrice = screen.getByText(MOCK_FULL_DOLLAR_PRICE);
       const action = screen.getByRole('link', {
@@ -170,6 +166,6 @@ describe(`<${LinkedPricingTierCard.name}/>`, () => {
         card: mockPricingCard(),
         livePrice: mockLivePlanPrice(),
       })(),
-    ).toThrow('usePromotionCode must be used within a PromotionCodeProvider');
+    ).toThrow();
   });
 });

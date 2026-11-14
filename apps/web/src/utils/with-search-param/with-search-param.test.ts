@@ -8,6 +8,9 @@ const MOCK_NAME = faker.lorem.word();
 const MOCK_VALUE = faker.string.alphanumeric(8);
 const MOCK_PATH = `/${faker.lorem.word()}`;
 const MOCK_ORIGIN = faker.internet.url({ appendSlash: false });
+const MOCK_BARE_PATH = faker.lorem.word();
+const MOCK_HASH_HREF = `#${faker.lorem.word()}`;
+const MOCK_MAILTO_HREF = `mailto:${faker.internet.email()}`;
 
 describe(withSearchParam, () => {
   it.each([
@@ -22,6 +25,11 @@ describe(withSearchParam, () => {
       expected: `${MOCK_PATH}?a=b&${MOCK_NAME}=${MOCK_VALUE}#top`,
     },
     {
+      case: 'a bare relative path, keeping it relative',
+      href: MOCK_BARE_PATH,
+      expected: `${MOCK_BARE_PATH}?${MOCK_NAME}=${MOCK_VALUE}`,
+    },
+    {
       case: 'an absolute URL',
       href: `${MOCK_ORIGIN}${MOCK_PATH}`,
       expected: `${MOCK_ORIGIN}${MOCK_PATH}?${MOCK_NAME}=${MOCK_VALUE}`,
@@ -34,5 +42,12 @@ describe(withSearchParam, () => {
     expect(
       withSearchParam(`${MOCK_PATH}?${MOCK_NAME}=old`, MOCK_NAME, MOCK_VALUE),
     ).toBe(`${MOCK_PATH}?${MOCK_NAME}=${MOCK_VALUE}`);
+  });
+
+  it.each([
+    { case: 'a same-page hash', href: MOCK_HASH_HREF },
+    { case: 'a mailto link', href: MOCK_MAILTO_HREF },
+  ])('leaves $case unchanged', ({ href }) => {
+    expect(withSearchParam(href, MOCK_NAME, MOCK_VALUE)).toBe(href);
   });
 });

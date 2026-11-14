@@ -17,6 +17,8 @@ import {
 import {
   mockLivePlanPrice,
   mockPromotionDiscount,
+  formatMockUnitAmount,
+  percentOffUnitAmount,
 } from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toLivePricingCard } from './to-live-pricing-card';
@@ -28,17 +30,12 @@ const MOCK_ONCE_LABEL = faker.lorem.words(3);
 const MOCK_REPEATING_LABEL = faker.lorem.words(2);
 const MOCK_AMOUNT_OFF = faker.number.int({ min: 100, max: 400 });
 const MOCK_OTHER_PRODUCT_ID = `prod_${faker.string.alphanumeric(14)}`;
-const MINOR_UNITS = 100;
 
 const { free, compareAtLabel } = MOCK_PRICING_LABELS;
 const repeatingLabel = (months: number) => `${MOCK_REPEATING_LABEL} ${months}`;
 
 const format = (unitAmount: number, currency: string) =>
-  new Intl.NumberFormat(MOCK_LOCALE, {
-    style: 'currency',
-    currency,
-    trailingZeroDisplay: 'stripIfInteger',
-  }).format(unitAmount / MINOR_UNITS);
+  formatMockUnitAmount(unitAmount, currency, MOCK_LOCALE);
 
 const setup = (
   overrides: Partial<Parameters<typeof toLivePricingCard>[0]> = {},
@@ -87,8 +84,9 @@ describe(toLivePricingCard, () => {
     const { headline } = setup({
       discount: mockPromotionDiscount({ percentOff: MOCK_PERCENT_OFF }),
     });
-    const discounted = Math.round(
-      MOCK_DOLLAR_AMOUNT * (1 - MOCK_PERCENT_OFF / MINOR_UNITS),
+    const discounted = percentOffUnitAmount(
+      MOCK_DOLLAR_AMOUNT,
+      MOCK_PERCENT_OFF,
     );
 
     expect(headline?.amount).toBe(format(discounted, BILLING_CURRENCY.USD));

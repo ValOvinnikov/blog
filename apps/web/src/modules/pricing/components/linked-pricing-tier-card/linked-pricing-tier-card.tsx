@@ -1,20 +1,18 @@
 'use client';
 
 import { usePromotionCode } from '@web/context/promotion-code-provider';
+import { useClientSnapshot } from '@web/hooks/use-client-snapshot';
 import { PricingTierCard } from '@web/modules/pricing/components/pricing-tier-card/pricing-tier-card';
 import { readCurrencyCookie } from '@web/utils/currency-cookie';
 import type { ILivePlanPrice } from '@web/utils/to-live-plan-price';
 import { toLivePricingCard } from '@web/utils/to-live-pricing-card';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 import { useLocale, useTranslations } from 'next-intl';
-import { useSyncExternalStore } from 'react';
 
 export interface ILinkedPricingTierCardProps {
   card: IPricingCardData;
   livePrice: ILivePlanPrice;
 }
-
-const subscribeToNothing = () => () => {};
 
 export const LinkedPricingTierCard = ({
   card,
@@ -24,10 +22,9 @@ export const LinkedPricingTierCard = ({
   const locale = useLocale();
   const { discount } = usePromotionCode();
   const { defaultCurrency } = livePrice;
-  const currency = useSyncExternalStore(
-    subscribeToNothing,
+  const currency = useClientSnapshot(
     () => readCurrencyCookie(document.cookie) ?? defaultCurrency,
-    () => defaultCurrency,
+    defaultCurrency,
   );
 
   return (

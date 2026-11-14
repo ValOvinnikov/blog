@@ -2,26 +2,24 @@
 
 import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
 import { PRICING_LOG, PRICING_SEARCH_PARAM } from '@web/constants/pricing';
+import { useClientSnapshot } from '@web/hooks/use-client-snapshot';
 import {
+  PROMOTION_CODE_PATH,
   promotionDiscountSchema,
   type TPromotionDiscount,
 } from '@web/utils/promotion-discount';
 import { reportClientError } from '@web/utils/report-client-error';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState } from 'react';
 
-const PROMOTION_CODE_ENDPOINT = '/api/promotion-code';
-
-const subscribeToNothing = () => () => {};
 const readPromoParam = (): TMaybeUndefined<string> =>
   new URLSearchParams(window.location.search).get(PRICING_SEARCH_PARAM.PROMO) ??
   undefined;
-const readNoPromoParam = (): TMaybeUndefined<string> => undefined;
 
 const fetchPromotionDiscount = async (
   code: string,
 ): Promise<TMaybeUndefined<TPromotionDiscount>> => {
   const query = new URLSearchParams({ [PRICING_SEARCH_PARAM.PROMO]: code });
-  const response = await fetch(`${PROMOTION_CODE_ENDPOINT}?${query}`);
+  const response = await fetch(`${PROMOTION_CODE_PATH}?${query}`);
   if (response.status >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
     throw new Error(`Promotion code lookup answered ${response.status}`);
   }
@@ -31,11 +29,7 @@ const fetchPromotionDiscount = async (
 };
 
 export const usePromotionDiscount = (): TMaybeUndefined<TPromotionDiscount> => {
-  const code = useSyncExternalStore(
-    subscribeToNothing,
-    readPromoParam,
-    readNoPromoParam,
-  );
+  const code = useClientSnapshot(readPromoParam, undefined);
   const [discount, setDiscount] =
     useState<TMaybeUndefined<TPromotionDiscount>>(undefined);
 

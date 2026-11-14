@@ -10,7 +10,8 @@ import {
 } from '@blog/db/constants';
 import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe-prices';
 import type { TPricingTier } from '@blog/service';
-import { isOneOf, isUndefined } from '@blog/utils/primitives';
+import { isUndefined } from '@blog/utils/primitives';
+import { isBillingCurrency } from '@web/utils/is-billing-currency';
 
 interface IPlanPriceAmount {
   unitAmount: number;
@@ -40,7 +41,7 @@ const toDefaultCurrency = (
 ): TMaybeUndefined<TBillingCurrency> =>
   [siteCurrency, BILLING_CURRENCY.USD, ...BILLING_CURRENCIES].find(
     (currency): currency is TBillingCurrency =>
-      isOneOf(BILLING_CURRENCIES, currency) && !isUndefined(amounts[currency]),
+      isBillingCurrency(currency) && !isUndefined(amounts[currency]),
   );
 
 export const toLivePlanPrice = ({

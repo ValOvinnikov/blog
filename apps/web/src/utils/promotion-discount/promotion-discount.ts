@@ -7,6 +7,8 @@ import {
 import { isUndefined } from '@blog/utils/primitives';
 import { z } from 'zod';
 
+export const PROMOTION_CODE_PATH = '/api/promotion-code';
+
 export const promotionDiscountSchema = z.object({
   code: z.string(),
   percentOff: z.number().optional(),

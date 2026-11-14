@@ -1,5 +1,4 @@
 import { PRICE_PERIOD, SITE_MESSAGES } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { MOCK_DOLLAR_AMOUNT } from '@blog/db/testing/stripe-catalogue/fixtures';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
@@ -13,7 +12,11 @@ import {
   mockPricingPrice,
   mockPricingTier,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockStripePrice } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockStripePrice,
+  formatMockUnitAmount,
+  mockLinkedPricingTier,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
   MOCK_NO_SECTION_STYLE_OVERRIDES,
@@ -56,14 +59,8 @@ faker.seed(13);
 
 const MOCK_PRICING_MODULE_ID = faker.string.uuid();
 const MOCK_MONTH_WORDING = 'a month';
-const MINOR_UNITS = 100;
 const MOCK_LINKED_MODULE = mockPricingModule({
-  tiers: [
-    mockPricingTier({
-      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.MONTH },
-      prices: [],
-    }),
-  ],
+  tiers: [mockLinkedPricingTier(PRICE_PERIOD.MONTH)],
 });
 
 const setup = customRenderAsync(PricingModule, {
@@ -206,11 +203,7 @@ describe(`<${PricingModule.name}/>`, () => {
       await setup();
 
       const price = screen.getByText(
-        new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: mockStripePrice().currency,
-          trailingZeroDisplay: 'stripIfInteger',
-        }).format(MOCK_DOLLAR_AMOUNT / MINOR_UNITS),
+        formatMockUnitAmount(MOCK_DOLLAR_AMOUNT, mockStripePrice().currency),
       );
 
       expect(price).toBeVisible();

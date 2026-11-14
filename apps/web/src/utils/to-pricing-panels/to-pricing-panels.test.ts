@@ -1,5 +1,4 @@
 import { PRICE_PERIOD } from '@blog/config';
-import { TENANT_PLAN } from '@blog/config/constants';
 import { BILLING_CURRENCY } from '@blog/db/constants';
 import { faker } from '@faker-js/faker';
 import {
@@ -7,7 +6,10 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
-import { mockStripePrice } from '@web/testing/modules/pricing/live-price-fixtures';
+import {
+  mockStripePrice,
+  mockLinkedPricingTier,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 
 import { toPricingPanels } from './to-pricing-panels';
 
@@ -219,15 +221,11 @@ describe(toPricingPanels, () => {
   });
 
   describe('with a tier linked to a platform plan', () => {
-    const yearlyLinkedTier = mockPricingTier({
+    const yearlyLinkedTier = mockLinkedPricingTier(PRICE_PERIOD.YEAR, {
       id: faker.string.uuid(),
-      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.YEAR },
-      prices: [],
     });
-    const monthlyLinkedTier = mockPricingTier({
+    const monthlyLinkedTier = mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
       id: faker.string.uuid(),
-      platformPlan: { plan: TENANT_PLAN.GROWTH, interval: PRICE_PERIOD.MONTH },
-      prices: [],
     });
 
     it('counts the linked interval towards the monthly/yearly switch', () => {

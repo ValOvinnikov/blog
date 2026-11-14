@@ -9474,6 +9474,14 @@
         "file": "apps/web/src/constants/country.ts"
       }
     ],
+    "BL": [
+      {
+        "ref": "COUNTRY_CODE.BL",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
     "CY": [
       {
         "ref": "COUNTRY_CODE.CY",
@@ -9501,6 +9509,22 @@
     "GB": [
       {
         "ref": "COUNTRY_CODE.GB",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "GF": [
+      {
+        "ref": "COUNTRY_CODE.GF",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "GP": [
+      {
+        "ref": "COUNTRY_CODE.GP",
         "scope": "app:web",
         "from": "@web/constants/country",
         "file": "apps/web/src/constants/country.ts"
@@ -9570,6 +9594,30 @@
         "file": "apps/web/src/constants/country.ts"
       }
     ],
+    "ME": [
+      {
+        "ref": "COUNTRY_CODE.ME",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "MF": [
+      {
+        "ref": "COUNTRY_CODE.MF",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "MQ": [
+      {
+        "ref": "COUNTRY_CODE.MQ",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
     "MT": [
       {
         "ref": "COUNTRY_CODE.MT",
@@ -9578,9 +9626,25 @@
         "file": "apps/web/src/constants/country.ts"
       }
     ],
+    "PM": [
+      {
+        "ref": "COUNTRY_CODE.PM",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
     "PT": [
       {
         "ref": "COUNTRY_CODE.PT",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "RE": [
+      {
+        "ref": "COUNTRY_CODE.RE",
         "scope": "app:web",
         "from": "@web/constants/country",
         "file": "apps/web/src/constants/country.ts"
@@ -9613,6 +9677,22 @@
     "VA": [
       {
         "ref": "COUNTRY_CODE.VA",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "XK": [
+      {
+        "ref": "COUNTRY_CODE.XK",
+        "scope": "app:web",
+        "from": "@web/constants/country",
+        "file": "apps/web/src/constants/country.ts"
+      }
+    ],
+    "YT": [
+      {
+        "ref": "COUNTRY_CODE.YT",
         "scope": "app:web",
         "from": "@web/constants/country",
         "file": "apps/web/src/constants/country.ts"
