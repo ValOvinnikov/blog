@@ -8,7 +8,7 @@ import {
 import { toOptions } from '@blog/utils/primitives';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
 import { LookField } from '@platform/components/features/look/look-form/components/look-field';
-import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { LookSubsection } from '@platform/components/features/look/look-form/components/look-subsection';
 import { PresetValueButton } from '@platform/components/features/look/look-form/components/preset-value-button';
@@ -40,11 +40,11 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     CARD_FIELDS[LOOK_ROW.BUTTONS],
   );
 
-  const shapeOptions = Object.values(BUTTON_SHAPE).map((shape) => ({
-    value: shape,
-    label: t(`buttonShapeOptionLabel.${shape}`),
-    glyph: <LookOptionGlyph field="buttonShape" value={shape} />,
-  }));
+  const shapeOptions = toLookGlyphOptions(
+    'buttonShape',
+    BUTTON_SHAPE,
+    (shape) => t(`buttonShapeOptionLabel.${shape}`),
+  );
 
   const busyOptions = toOptions(BUSY_BUTTON_STYLE, (style) =>
     t(`busyButtonStyleOptionLabel.${style}`),

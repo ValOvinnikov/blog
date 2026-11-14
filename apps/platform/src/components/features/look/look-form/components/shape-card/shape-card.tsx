@@ -1,6 +1,6 @@
 import { DENSITY, RADIUS_SCALE } from '@blog/config';
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -17,17 +17,15 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
     CARD_FIELDS[LOOK_ROW.SHAPE],
   );
 
-  const radiusOptions = Object.values(RADIUS_SCALE).map((scale) => ({
-    value: scale,
-    label: t(`radiusScaleOptionLabel.${scale}`),
-    glyph: <LookOptionGlyph field="radiusScale" value={scale} />,
-  }));
+  const radiusOptions = toLookGlyphOptions(
+    'radiusScale',
+    RADIUS_SCALE,
+    (scale) => t(`radiusScaleOptionLabel.${scale}`),
+  );
 
-  const densityOptions = Object.values(DENSITY).map((option) => ({
-    value: option,
-    label: t(`densityOptionLabel.${option}`),
-    glyph: <LookOptionGlyph field="density" value={option} />,
-  }));
+  const densityOptions = toLookGlyphOptions('density', DENSITY, (option) =>
+    t(`densityOptionLabel.${option}`),
+  );
 
   return (
     <LookCard
