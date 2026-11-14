@@ -4,7 +4,7 @@ import {
   CONTENT_ALIGNMENT,
   LOCALE_ISO_CODES,
 } from '@blog/config/constants';
-import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/fixtures';
+import { MOCK_FEATURE_LIST_MODULE_ID } from '@blog/service/testing/modules/feature-list/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
@@ -12,6 +12,7 @@ import {
   mockLocalizedHeadingBlock,
   mockLocalizedImage,
 } from '@blog/service/testing/shared/localized';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { featureListModuleQuery } from './query';
@@ -75,11 +76,14 @@ const MOCK_ENGLISH_ONLY_FEATURE_DOCUMENT = {
   image: mockLocalizedImage({ [EN]: MOCK_ENGLISH_ONLY_FEATURE.alt }),
 };
 
-async function runFeatureList(locale: string) {
+async function runFeatureList(
+  locale: string,
+  document: Record<string, unknown> = MOCK_FEATURE_LIST_DOCUMENT,
+) {
   const raw = await evaluateGroqExpression(
     featureListModuleQuery.query,
     [
-      MOCK_FEATURE_LIST_DOCUMENT,
+      document,
       MOCK_TRANSLATED_FEATURE,
       MOCK_ENGLISH_ONLY_FEATURE_DOCUMENT,
       MOCK_IMAGE_ASSET_DOCUMENT,
@@ -118,5 +122,25 @@ describe('featureListModuleQuery', () => {
       copy.feature,
       MOCK_ENGLISH_ONLY_FEATURE,
     ]);
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const module = await runFeatureList(EN);
+
+    expect(module).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+      columns: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const module = await runFeatureList(EN, {
+      ...MOCK_FEATURE_LIST_DOCUMENT,
+      ...MOCK_AUTHORED_MODULE_APPEARANCE,
+    });
+
+    expect(module).toMatchObject(MOCK_AUTHORED_MODULE_APPEARANCE);
   });
 });

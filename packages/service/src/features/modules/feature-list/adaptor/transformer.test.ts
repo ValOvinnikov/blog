@@ -7,15 +7,18 @@ import {
   LINK_TYPE,
 } from '@blog/config';
 import {
-  mockCtaButtonView,
-  mockRawCtaButton,
   mockRawFeatureListItem,
   mockRawFeatureListModule,
+} from '@blog/service/testing/modules/feature-list/fixtures';
+import {
+  mockCtaButtonView,
+  mockRawCtaButton,
 } from '@blog/service/testing/modules/fixtures';
 import {
   mockLinkView,
   mockRawSanityImage,
 } from '@blog/service/testing/shared/fixtures';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { toFeatureListModule } from './transformer';
@@ -48,15 +51,20 @@ describe(toFeatureListModule, () => {
   });
 
   it('leaves contentAlignment and layout undefined when unset', () => {
-    const raw = mockRawFeatureListModule({
-      contentAlignment: null,
-      layout: null,
+    const module = toFeatureListModule(mockRawFeatureListModule());
+
+    expect(module).toMatchObject({
+      contentAlignment: undefined,
+      layout: undefined,
     });
+  });
 
-    const module = toFeatureListModule(raw);
+  it('maps the authored appearance overrides straight through', () => {
+    const module = toFeatureListModule(
+      mockRawFeatureListModule(MOCK_AUTHORED_MODULE_APPEARANCE),
+    );
 
-    expect(module.contentAlignment).toBeUndefined();
-    expect(module.layout).toBeUndefined();
+    expect(module).toMatchObject(MOCK_AUTHORED_MODULE_APPEARANCE);
   });
 
   it('keeps the cards in authored order', () => {
