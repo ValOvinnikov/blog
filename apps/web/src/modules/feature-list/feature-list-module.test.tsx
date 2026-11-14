@@ -8,10 +8,7 @@ import {
   mockFeatureListModule,
 } from '@web/testing/modules/feature-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import {
-  MOCK_NO_SECTION_STYLE_OVERRIDES,
-  MOCK_SECTION_STYLE_OVERRIDES,
-} from '@web/testing/shared/section-appearance/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
   MOCK_TENANT_SANITY_CONTEXT,
@@ -72,24 +69,21 @@ describe(`<${FeatureListModule.name}/>`, () => {
     });
   });
 
-  it.each([
-    {
-      title: "the module's style overrides",
-      overrides: MOCK_SECTION_STYLE_OVERRIDES,
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getFeatureListMock.mockResolvedValue(
+        okResult(mockFeatureListModule(overrides)),
+      );
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
     },
-    { title: 'no overrides', overrides: MOCK_NO_SECTION_STYLE_OVERRIDES },
-  ])('scopes the section to $title', async ({ overrides }) => {
-    getFeatureListMock.mockResolvedValue(
-      okResult(mockFeatureListModule(overrides)),
-    );
-
-    await setup();
-
-    expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
-      MOCK_REQUEST_CONTEXT.tenantId,
-      overrides,
-    );
-  });
+  );
 
   it('logs and renders nothing when the fetch fails', async () => {
     getFeatureListMock.mockResolvedValue(errorResult(MOCK_ERROR));

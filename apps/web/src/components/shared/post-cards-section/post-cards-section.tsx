@@ -15,10 +15,10 @@ import {
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type ISectionProps } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 
 export interface IPostCardsSectionProps {
-  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
+  section: TModuleSection;
   headingBlock: THeadingBlock;
   contentAlignment: TMaybeUndefined<TContentAlignmentOf<'LEFT' | 'CENTER'>>;
   displayMode?: TDisplayMode;

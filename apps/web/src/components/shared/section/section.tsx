@@ -16,6 +16,11 @@ export interface ISectionProps extends IWithDataTestId {
   className?: string;
 }
 
+export type TModuleSection = Pick<
+  ISectionProps,
+  'brandVariant' | 'layout' | 'appearance'
+>;
+
 export const Section = ({
   brandVariant,
   layout,

@@ -18,10 +18,7 @@ import {
   mockLinkedPricingTier,
 } from '@web/testing/modules/pricing/live-price-fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import {
-  MOCK_NO_SECTION_STYLE_OVERRIDES,
-  MOCK_SECTION_STYLE_OVERRIDES,
-} from '@web/testing/shared/section-appearance/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
 import {
   MOCK_REQUEST_CONTEXT,
@@ -120,24 +117,21 @@ describe(`<${PricingModule.name}/>`, () => {
     );
   });
 
-  it.each([
-    {
-      title: "the module's style overrides",
-      overrides: MOCK_SECTION_STYLE_OVERRIDES,
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getPricingModuleMock.mockResolvedValue(
+        okResult(mockPricingModule(overrides)),
+      );
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
     },
-    { title: 'no overrides', overrides: MOCK_NO_SECTION_STYLE_OVERRIDES },
-  ])('scopes the section to $title', async ({ overrides }) => {
-    getPricingModuleMock.mockResolvedValue(
-      okResult(mockPricingModule(overrides)),
-    );
-
-    await setup();
-
-    expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
-      MOCK_REQUEST_CONTEXT.tenantId,
-      overrides,
-    );
-  });
+  );
 
   it.each([
     { title: 'without trailing zeros', amount: 49, formatted: '£49' },

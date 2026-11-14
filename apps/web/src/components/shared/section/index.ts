@@ -1,1 +1,1 @@
-export { Section, type ISectionProps } from './section';
+export { Section, type ISectionProps, type TModuleSection } from './section';

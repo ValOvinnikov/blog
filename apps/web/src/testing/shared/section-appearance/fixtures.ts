@@ -75,4 +75,15 @@ export const MOCK_NO_SECTION_STYLE_OVERRIDES: TSectionStyleOverrides = {
   density: undefined,
 };
 
+export const MOCK_SECTION_STYLE_OVERRIDE_CASES: {
+  title: string;
+  overrides: TSectionStyleOverrides;
+}[] = [
+  {
+    title: "the module's style overrides",
+    overrides: MOCK_SECTION_STYLE_OVERRIDES,
+  },
+  { title: 'no overrides', overrides: MOCK_NO_SECTION_STYLE_OVERRIDES },
+];
+
 export const MOCK_STALE_OPTION = 'RETIRED';

@@ -34,8 +34,8 @@ A grid or carousel of feature cards that summarises a set of capabilities or off
 ## Configuration
 
 - **Editors** write Feature Cards under Blocks → Cards and assemble them in Features modules.
-- **Look** reaches the cards through tokens: card style (`ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED` or `PLAIN`), radius, card padding and gap from density, fonts, accent. On Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling the feature cards in the grid and the carousel; Corners also reaches the card images and icon panels. On Free they have no effect ([module-system](./module-system.md)). Voice does not reach card copy; the carousel's region and previous/next labels are fixed catalog strings (`carousel` namespace).
-- **Plans:** the module itself is not gated; only its section overrides are, by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
+- **Look** reaches the cards through tokens: card style (`ACCENT_BAR`, `OUTLINED`, `FILLED`, `RAISED` or `PLAIN`), radius, card padding and gap from density, fonts, accent. On Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling the feature cards in the grid and the carousel; Corners also reaches the card images and icon panels. The overrides need the Look entitlement; the module itself needs Growth ([module-system](./module-system.md)). Voice does not reach card copy; the carousel's region and previous/next labels are fixed catalog strings (`carousel` namespace).
+- **Plans:** the module is in the Growth module pack (`MODULE_PACK.GROWTH`), so `ModuleGate` renders nothing for it on Free; its section overrides are further gated by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
 
 ## Constraints and invariants
 

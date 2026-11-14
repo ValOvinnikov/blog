@@ -4,7 +4,7 @@ import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { hasLength } from '@blog/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type ISectionProps } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { FeatureListCard } from '@web/modules/feature-list/components/feature-list-card/feature-list-card';
 import { FeatureListCarousel } from '@web/modules/feature-list/components/feature-list-carousel/feature-list-carousel';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
@@ -26,9 +26,8 @@ export interface IFeatureListModuleViewProps extends Pick<
   | 'cardAlignment'
   | 'columns'
 > {
-  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
-  titleId: string;
-  dataTestId: string;
+  section: TModuleSection;
+  id: string;
 }
 
 export const FeatureListModuleView = ({
@@ -41,10 +40,11 @@ export const FeatureListModuleView = ({
   contentAlignment,
   cardAlignment,
   columns: storedColumns,
-  titleId,
-  dataTestId,
+  id,
 }: IFeatureListModuleViewProps) => {
   const { brandVariant, layout, appearance } = section;
+  const titleId = `feature-list-${id}`;
+  const dataTestId = `feature-list-module-${id}`;
   const cardAlign =
     cardAlignment === CONTENT_ALIGNMENT.CENTER ? 'center' : 'left';
   const columns =

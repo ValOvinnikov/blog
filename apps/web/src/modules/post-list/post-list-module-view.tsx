@@ -7,7 +7,7 @@ import {
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type ISectionProps } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { SmartLink } from '@web/components/shared/smart-link';
 import { toCardGridColumns } from '@web/utils/to-card-grid-columns';
 import type { ReactNode } from 'react';
@@ -27,7 +27,7 @@ export interface IPostListModuleViewProps extends Pick<
   TPostListModule,
   'headingBlock' | 'contentAlignment'
 > {
-  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
+  section: TModuleSection;
   grid: Pick<TPostListModule, 'columns' | 'showImages'>;
   items: IMediaCardData[];
   titleId: string;

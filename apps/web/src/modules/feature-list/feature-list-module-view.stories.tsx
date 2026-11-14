@@ -49,6 +49,10 @@ const items = [
   }),
 ];
 
+const itemsWithFirstImage = items.map((item, index) =>
+  index === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
+);
+
 const meta = {
   title: 'Modules/FeatureListModule',
   component: FeatureListModuleView,
@@ -86,8 +90,7 @@ const meta = {
     contentAlignment: undefined,
     cardAlignment: CONTENT_ALIGNMENT.LEFT,
     columns: undefined,
-    titleId: 'feature-list-title',
-    dataTestId: 'feature-list-module-feature-list-1',
+    id: 'feature-list-1',
   },
 } satisfies Meta<typeof FeatureListModuleView>;
 
@@ -137,11 +140,7 @@ export const IconShapeImagesAndIcons: TStory = {
 
 /** One card has an image, so the icon-only cards render their icon in the same size panel and every heading starts on the same line. */
 export const MixedImagesAndIcons: TStory = {
-  args: {
-    items: items.map((item, index) =>
-      index === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
-    ),
-  },
+  args: { items: itemsWithFirstImage },
 };
 
 export const Carousel: TStory = {
@@ -192,9 +191,7 @@ export const FiveCards: TStory = {
 export const OutlinedOnBrandTint: TStory = {
   args: {
     section: MOCK_OUTLINED_BRAND_TINT_SECTION,
-    items: items.map((item, index) =>
-      index === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
-    ),
+    items: itemsWithFirstImage,
   },
 };
 

@@ -1,7 +1,7 @@
 import { service } from '@blog/service';
 import { FEATURE_LIST_LOG } from '@web/constants/feature-list';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
+import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';
 import { logger } from '@web/utils/logger/logger';
 
 import { FeatureListModuleView } from './feature-list-module-view';
@@ -25,26 +25,7 @@ export const FeatureListModule = async ({ id }: IFeatureListModuleProps) => {
     return null;
   }
 
-  const {
-    brandVariant,
-    layout,
-    cardStyle,
-    radiusScale,
-    density,
-    ...featureListModule
-  } = result.data;
-  const appearance = await getSectionAppearance(tenantId, {
-    cardStyle,
-    radiusScale,
-    density,
-  });
+  const { section, content } = await getModuleSection(tenantId, result.data);
 
-  return (
-    <FeatureListModuleView
-      {...featureListModule}
-      section={{ brandVariant, layout, appearance }}
-      titleId={`feature-list-${id}`}
-      dataTestId={`feature-list-module-${id}`}
-    />
-  );
+  return <FeatureListModuleView {...content} section={section} id={id} />;
 };

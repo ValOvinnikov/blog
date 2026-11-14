@@ -4,7 +4,7 @@ import { CardGrid } from '@blog/ui/components/organisms/card-grid';
 import { hasLength } from '@blog/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type ISectionProps } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { TestimonialCard } from '@web/modules/testimonial/components/testimonial-card/testimonial-card';
 import { TestimonialCarousel } from '@web/modules/testimonial/components/testimonial-carousel/testimonial-carousel';
 import { isLoneLastInRow } from '@web/utils/is-lone-last-in-row';
@@ -24,7 +24,7 @@ export interface ITestimonialModuleViewProps extends Pick<
   | 'cardAlignment'
   | 'columns'
 > {
-  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
+  section: TModuleSection;
   titleId: string;
   dataTestId: string;
 }

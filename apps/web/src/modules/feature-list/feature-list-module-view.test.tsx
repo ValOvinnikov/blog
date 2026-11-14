@@ -29,8 +29,9 @@ vi.mock('@web/i18n/navigation');
 
 faker.seed(6011);
 
-const MOCK_TITLE_ID = faker.string.uuid();
-const MOCK_DATA_TEST_ID = faker.string.uuid();
+const MOCK_MODULE_ID = faker.string.uuid();
+const MOCK_TITLE_ID = `feature-list-${MOCK_MODULE_ID}`;
+const MOCK_DATA_TEST_ID = `feature-list-module-${MOCK_MODULE_ID}`;
 const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
 
 const mockItems = (count: number) =>
@@ -48,8 +49,7 @@ const setup = customRender(FeatureListModuleView, {
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
   columns: undefined,
-  titleId: MOCK_TITLE_ID,
-  dataTestId: MOCK_DATA_TEST_ID,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${FeatureListModuleView.name}/>`, () => {
@@ -140,18 +140,23 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
     },
   );
 
-  it('lays the grid out in the stored column count over the card count', () => {
-    setup({ columns: GRID_COLUMNS.TWO, items: mockItems(3) });
+  it.each([
+    {
+      title: 'in the stored column count over the card count',
+      columns: GRID_COLUMNS.TWO,
+      itemCount: 3,
+      expected: 2,
+    },
+    {
+      title: 'in columns that fit the card count on Auto',
+      columns: undefined,
+      itemCount: 5,
+      expected: 3,
+    },
+  ])('lays the grid out $title', ({ columns, itemCount, expected }) => {
+    setup({ columns, items: mockItems(itemCount) });
 
-    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-2`);
-
-    expect(grid).toBeVisible();
-  });
-
-  it('falls back to columns that fit the card count on Auto', () => {
-    setup({ columns: undefined, items: mockItems(5) });
-
-    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-3`);
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
 
     expect(grid).toBeVisible();
   });
