@@ -8,7 +8,7 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import {
   createSanityWebhook,
   listSanityWebhooks,
-  type TSanityWebhook,
+  type TListedSanityWebhook,
   updateSanityWebhookSecret,
 } from '@blog/db/utils/sanity-management-client/sanity-webhooks';
 import { faker } from '@faker-js/faker';
@@ -60,7 +60,7 @@ function baseTenant(overrides: Partial<TTenant> = {}): TTenant {
   });
 }
 
-function givenHooksUntilCreated(before: TSanityWebhook[] = []) {
+function givenHooksUntilCreated(before: TListedSanityWebhook[] = []) {
   vi.mocked(listSanityWebhooks)
     .mockResolvedValueOnce(before)
     .mockResolvedValueOnce([...before, MOCK_CURRENT_WEBHOOK]);
@@ -101,38 +101,89 @@ describe(createTenantRevalidateWebhook, () => {
     ).rejects.toThrow(/has no Sanity project yet/);
   });
 
-  it('creates the webhook signed with a new secret, stored first', async () => {
-    givenHooksUntilCreated();
-    vi.mocked(setTenantRevalidateWebhookSecret).mockImplementation(async () => {
-      expect(createSanityWebhook).not.toHaveBeenCalled();
+  describe('when the project has no revalidate hook yet', () => {
+    beforeEach(() => {
+      givenHooksUntilCreated();
     });
 
-    await createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV);
+    it('creates the webhook signed with a new secret, stored first', async () => {
+      vi.mocked(setTenantRevalidateWebhookSecret).mockImplementation(
+        async () => {
+          expect(createSanityWebhook).not.toHaveBeenCalled();
+        },
+      );
 
-    const { name, ...created } = createdWebhook();
-    const secret = created.secret;
-    const [storedFirst] = vi.mocked(setTenantRevalidateWebhookSecret).mock
-      .invocationCallOrder;
-    const [createdAfter] =
-      vi.mocked(createSanityWebhook).mock.invocationCallOrder;
-    expect(secret).not.toBe(revalidateSecret);
-    expect(created).toEqual({
-      token: MOCK_TENANT_MANAGEMENT_TOKEN,
-      projectId: MOCK_SANITY_PROJECT_ID,
-      dataset: MOCK_SANITY_DATASET,
-      url: MOCK_REVALIDATE_WEBHOOK_URL,
-      secret,
+      await createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV);
+
+      const { name, ...created } = createdWebhook();
+      const secret = created.secret;
+      const [storedFirst] = vi.mocked(setTenantRevalidateWebhookSecret).mock
+        .invocationCallOrder;
+      const [createdAfter] =
+        vi.mocked(createSanityWebhook).mock.invocationCallOrder;
+      expect(secret).not.toBe(revalidateSecret);
+      expect(created).toEqual({
+        token: MOCK_TENANT_MANAGEMENT_TOKEN,
+        projectId: MOCK_SANITY_PROJECT_ID,
+        dataset: MOCK_SANITY_DATASET,
+        url: MOCK_REVALIDATE_WEBHOOK_URL,
+        secret,
+      });
+      expect(name).not.toBe('');
+      expect(setTenantRevalidateWebhookSecret).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        secret,
+      );
+      expect(storedFirst).toBeLessThan(createdAfter ?? 0);
+      expect(setTenantWebhookCreatedAt).toHaveBeenCalledWith(
+        MOCK_TENANT_ID,
+        MOCK_NOW,
+      );
     });
-    expect(name).not.toBe('');
-    expect(setTenantRevalidateWebhookSecret).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      secret,
-    );
-    expect(storedFirst).toBeLessThan(createdAfter ?? 0);
-    expect(setTenantWebhookCreatedAt).toHaveBeenCalledWith(
-      MOCK_TENANT_ID,
-      MOCK_NOW,
-    );
+
+    it('gives two tenants different secrets', async () => {
+      givenHooksUntilCreated();
+
+      await createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV);
+      await createTenantRevalidateWebhook(
+        baseTenant({
+          id: MOCK_OTHER_TENANT_ID,
+          sanityProjectId: MOCK_OTHER_PROJECT_ID,
+        }),
+        MOCK_PROVISION_ENV,
+      );
+
+      const [first, second] = vi
+        .mocked(createSanityWebhook)
+        .mock.calls.map(([input]) => input.secret);
+      expect(first).not.toBe(second);
+    });
+
+    it('reuses the stored secret when a retry finds the hook still missing', async () => {
+      vi.mocked(getTenantRevalidateWebhookSecret).mockResolvedValue({
+        tenantId: MOCK_TENANT_ID,
+        secret: MOCK_STORED_TENANT_SECRET,
+      });
+
+      await createTenantRevalidateWebhook(
+        baseTenant({ revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_SECRET }),
+        MOCK_PROVISION_ENV,
+      );
+
+      expect(secretPassedToCreate()).toBe(MOCK_STORED_TENANT_SECRET);
+      expect(setTenantRevalidateWebhookSecret).not.toHaveBeenCalled();
+    });
+
+    it("never signs with another tenant's secret stored under the same project", async () => {
+      vi.mocked(getTenantRevalidateWebhookSecret).mockResolvedValue({
+        tenantId: MOCK_OTHER_TENANT_ID,
+        secret: MOCK_STORED_TENANT_SECRET,
+      });
+
+      await createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV);
+
+      expect(secretPassedToCreate()).not.toBe(MOCK_STORED_TENANT_SECRET);
+    });
   });
 
   it.each([
@@ -159,53 +210,6 @@ describe(createTenantRevalidateWebhook, () => {
       createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV),
     ).rejects.toThrow(new RegExp(MOCK_SANITY_PROJECT_ID));
     expect(setTenantWebhookCreatedAt).not.toHaveBeenCalled();
-  });
-
-  it('gives two tenants different secrets', async () => {
-    givenHooksUntilCreated();
-    givenHooksUntilCreated();
-
-    await createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV);
-    await createTenantRevalidateWebhook(
-      baseTenant({
-        id: MOCK_OTHER_TENANT_ID,
-        sanityProjectId: MOCK_OTHER_PROJECT_ID,
-      }),
-      MOCK_PROVISION_ENV,
-    );
-
-    const [first, second] = vi
-      .mocked(createSanityWebhook)
-      .mock.calls.map(([input]) => input.secret);
-    expect(first).not.toBe(second);
-  });
-
-  it('reuses the stored secret when a retry finds the hook still missing', async () => {
-    givenHooksUntilCreated();
-    vi.mocked(getTenantRevalidateWebhookSecret).mockResolvedValue({
-      tenantId: MOCK_TENANT_ID,
-      secret: MOCK_STORED_TENANT_SECRET,
-    });
-
-    await createTenantRevalidateWebhook(
-      baseTenant({ revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_SECRET }),
-      MOCK_PROVISION_ENV,
-    );
-
-    expect(secretPassedToCreate()).toBe(MOCK_STORED_TENANT_SECRET);
-    expect(setTenantRevalidateWebhookSecret).not.toHaveBeenCalled();
-  });
-
-  it("never signs with another tenant's secret stored under the same project", async () => {
-    givenHooksUntilCreated();
-    vi.mocked(getTenantRevalidateWebhookSecret).mockResolvedValue({
-      tenantId: MOCK_OTHER_TENANT_ID,
-      secret: MOCK_STORED_TENANT_SECRET,
-    });
-
-    await createTenantRevalidateWebhook(baseTenant(), MOCK_PROVISION_ENV);
-
-    expect(secretPassedToCreate()).not.toBe(MOCK_STORED_TENANT_SECRET);
   });
 
   describe('when the hook exists and its secret is stored', () => {

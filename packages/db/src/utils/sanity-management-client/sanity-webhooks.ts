@@ -1,50 +1,44 @@
-import { SANITY_API_SURFACE, HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import { HTTP_METHOD, SANITY_WEBHOOK_OPERATION } from '@blog/config';
+import type { TMaybeNull } from '@blog/config/types';
 import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-api-paths';
-import {
-  sanityApiError,
-  sanityWebhooksResponse,
-} from '@blog/db/utils/sanity-management-client/sanity-api-request';
+import { sanityWebhooksRequest } from '@blog/db/utils/sanity-management-client/sanity-webhooks-request';
 
-function webhooksUnauthorizedHint(projectId: string): string {
-  return `SANITY_MANAGEMENT_TOKEN is either invalid or not a member of project "${projectId}" — it is only an implicit administrator of projects it created itself. If this tenant points at a project created elsewhere (such as a shared dev project), add the token's robot to that project as administrator in Sanity Manage, or provision the tenant into its own project.`;
-}
+// `before()` is null on a create, so `previousSlug` is too.
+const REVALIDATE_WEBHOOK_PROJECTION =
+  '{_type, _id, "slug": slug.current, "previousSlug": before().slug.current}';
 
-async function sanityWebhooksRequest<T>(
-  projectId: string,
-  token: string,
-  init: RequestInit = {},
-  path: string = SANITY_API_PATH.projectWebhooks(projectId),
-): Promise<T> {
-  // A followed redirect replays a POST as a GET, whose 2xx list reads as success.
-  const response = await sanityWebhooksResponse(
-    path,
-    token,
-    { ...init, redirect: 'error' },
-    [HTTP_STATUS.UNAUTHORIZED],
-  );
-
-  if (response.status === HTTP_STATUS.UNAUTHORIZED) {
-    const body = await response.text().catch(() => '');
-    throw sanityApiError(
-      SANITY_API_SURFACE.WEBHOOKS,
-      init.method ?? HTTP_METHOD.GET,
-      path,
-      response,
-      `${body} ${webhooksUnauthorizedHint(projectId)}`,
-    );
-  }
-
-  const text = await response.text();
-  return (text ? JSON.parse(text) : undefined) as T;
-}
+const REVALIDATE_WEBHOOK_RULE = {
+  on: [
+    SANITY_WEBHOOK_OPERATION.CREATE,
+    SANITY_WEBHOOK_OPERATION.UPDATE,
+    SANITY_WEBHOOK_OPERATION.DELETE,
+  ],
+  projection: REVALIDATE_WEBHOOK_PROJECTION,
+};
 
 export type TSanityWebhook = { id: string; url: string };
+
+export type TListedSanityWebhook = TSanityWebhook & {
+  projection: TMaybeNull<string>;
+};
+
+type TSanityWebhookResponse = TSanityWebhook & {
+  rule?: { projection?: TMaybeNull<string> };
+};
 
 export async function listSanityWebhooks(input: {
   token: string;
   projectId: string;
-}): Promise<TSanityWebhook[]> {
-  return sanityWebhooksRequest<TSanityWebhook[]>(input.projectId, input.token);
+}): Promise<TListedSanityWebhook[]> {
+  const webhooks = await sanityWebhooksRequest<TSanityWebhookResponse[]>(
+    input.projectId,
+    input.token,
+  );
+  return webhooks.map(({ id, url, rule }) => ({
+    id,
+    url,
+    projection: rule?.projection ?? null,
+  }));
 }
 
 export async function createSanityWebhook(input: {
@@ -68,10 +62,7 @@ export async function createSanityWebhook(input: {
         apiVersion: 'v2021-06-07',
         httpMethod: HTTP_METHOD.POST,
         includeDrafts: false,
-        rule: {
-          on: ['create', 'update', 'delete'],
-          projection: '{_type, _id, "slug": slug.current}',
-        },
+        rule: REVALIDATE_WEBHOOK_RULE,
         secret: input.secret,
       }),
     },
@@ -86,25 +77,38 @@ export async function createSanityWebhook(input: {
   return { id: created.id, url: created.url };
 }
 
+async function patchSanityWebhook(
+  input: { token: string; projectId: string; webhookId: string },
+  patch: object,
+): Promise<void> {
+  const { token, projectId, webhookId } = input;
+  const updated = await sanityWebhooksRequest<Partial<TSanityWebhook>>(
+    projectId,
+    token,
+    { method: HTTP_METHOD.PATCH, body: JSON.stringify(patch) },
+    SANITY_API_PATH.projectWebhook(projectId, webhookId),
+  );
+
+  if (updated?.id !== webhookId) {
+    throw new Error(
+      `Sanity Webhooks API: updating webhook "${webhookId}" of project "${projectId}" returned no matching hook.`,
+    );
+  }
+}
+
 export async function updateSanityWebhookSecret(input: {
   token: string;
   projectId: string;
   webhookId: string;
   secret: string;
 }): Promise<void> {
-  const updated = await sanityWebhooksRequest<Partial<TSanityWebhook>>(
-    input.projectId,
-    input.token,
-    {
-      method: HTTP_METHOD.PATCH,
-      body: JSON.stringify({ secret: input.secret }),
-    },
-    SANITY_API_PATH.projectWebhook(input.projectId, input.webhookId),
-  );
+  await patchSanityWebhook(input, { secret: input.secret });
+}
 
-  if (updated?.id !== input.webhookId) {
-    throw new Error(
-      `Sanity Webhooks API: updating webhook "${input.webhookId}" of project "${input.projectId}" returned no matching hook.`,
-    );
-  }
+export async function updateSanityWebhookProjection(input: {
+  token: string;
+  projectId: string;
+  webhookId: string;
+}): Promise<void> {
+  await patchSanityWebhook(input, { rule: REVALIDATE_WEBHOOK_RULE });
 }
