@@ -7,8 +7,11 @@ import {
   DENSITY,
   FOOTER_LAYOUT,
   FOOTER_SURFACE,
+  HEADER_BAR_STYLE,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
+  HEADER_LAYOUT,
+  HEADER_SUBMENU_STYLE,
   LANGUAGE_SWITCHER_STYLE,
   RADIUS_SCALE,
   type TAccountButtonStyle,
@@ -19,8 +22,11 @@ import {
   type TDensity,
   type TFooterLayout,
   type TFooterSurface,
+  type THeaderBarStyle,
   type THeaderControlShape,
   type THeaderControlStyle,
+  type THeaderLayout,
+  type THeaderSubmenuStyle,
   type TLanguageSwitcherStyle,
   type TRadiusScale,
 } from '@blog/config';
@@ -45,12 +51,22 @@ import FooterLayoutColumns from '@platform/assets/look-glyphs/footer-layout-colu
 import FooterLayoutCompact from '@platform/assets/look-glyphs/footer-layout-compact.svg';
 import FooterSurfaceCard from '@platform/assets/look-glyphs/footer-surface-card.svg';
 import FooterSurfaceFullWidth from '@platform/assets/look-glyphs/footer-surface-full-width.svg';
+import HeaderBarStyleFloating from '@platform/assets/look-glyphs/header-bar-style-floating.svg';
+import HeaderBarStyleFullWidth from '@platform/assets/look-glyphs/header-bar-style-full-width.svg';
 import HeaderControlShapeRound from '@platform/assets/look-glyphs/header-control-shape-round.svg';
 import HeaderControlShapeRounded from '@platform/assets/look-glyphs/header-control-shape-rounded.svg';
 import HeaderControlShapeSquare from '@platform/assets/look-glyphs/header-control-shape-square.svg';
 import HeaderControlStyleOutlined from '@platform/assets/look-glyphs/header-control-style-outlined.svg';
 import HeaderControlStylePlain from '@platform/assets/look-glyphs/header-control-style-plain.svg';
 import HeaderControlStyleSoft from '@platform/assets/look-glyphs/header-control-style-soft.svg';
+import HeaderLayoutCentredBrand from '@platform/assets/look-glyphs/header-layout-centred-brand.svg';
+import HeaderLayoutCentredLinks from '@platform/assets/look-glyphs/header-layout-centred-links.svg';
+import HeaderLayoutClassic from '@platform/assets/look-glyphs/header-layout-classic.svg';
+import HeaderLayoutLinksBesideBrand from '@platform/assets/look-glyphs/header-layout-links-beside-brand.svg';
+import HeaderLayoutMenuButton from '@platform/assets/look-glyphs/header-layout-menu-button.svg';
+import HeaderLayoutTwoRows from '@platform/assets/look-glyphs/header-layout-two-rows.svg';
+import HeaderSubmenuStyleDropdown from '@platform/assets/look-glyphs/header-submenu-style-dropdown.svg';
+import HeaderSubmenuStyleWidePanel from '@platform/assets/look-glyphs/header-submenu-style-wide-panel.svg';
 import LanguageSwitcherStyleCodes from '@platform/assets/look-glyphs/language-switcher-style-codes.svg';
 import LanguageSwitcherStyleMenuCode from '@platform/assets/look-glyphs/language-switcher-style-menu-code.svg';
 import LanguageSwitcherStyleMenuGlobe from '@platform/assets/look-glyphs/language-switcher-style-menu-globe.svg';
@@ -64,6 +80,9 @@ import type { TGlyph } from '@platform/components/shared/icon';
 type TLookOptionGlyphValues = {
   radiusScale: TRadiusScale;
   density: TDensity;
+  headerLayout: THeaderLayout;
+  headerSubmenuStyle: THeaderSubmenuStyle;
+  headerBarStyle: THeaderBarStyle;
   headerControlStyle: THeaderControlStyle;
   headerControlShape: THeaderControlShape;
   buttonShape: TButtonShape;
@@ -94,6 +113,22 @@ export const LOOK_OPTION_GLYPH_REGISTRY: TLookOptionGlyphRegistry = {
   density: {
     [DENSITY.DEFAULT]: DensityDefault,
     [DENSITY.COMPACT]: DensityCompact,
+  },
+  headerLayout: {
+    [HEADER_LAYOUT.CLASSIC]: HeaderLayoutClassic,
+    [HEADER_LAYOUT.LINKS_BESIDE_BRAND]: HeaderLayoutLinksBesideBrand,
+    [HEADER_LAYOUT.CENTRED_LINKS]: HeaderLayoutCentredLinks,
+    [HEADER_LAYOUT.TWO_ROWS]: HeaderLayoutTwoRows,
+    [HEADER_LAYOUT.CENTRED_BRAND]: HeaderLayoutCentredBrand,
+    [HEADER_LAYOUT.MENU_BUTTON]: HeaderLayoutMenuButton,
+  },
+  headerSubmenuStyle: {
+    [HEADER_SUBMENU_STYLE.DROPDOWN]: HeaderSubmenuStyleDropdown,
+    [HEADER_SUBMENU_STYLE.WIDE_PANEL]: HeaderSubmenuStyleWidePanel,
+  },
+  headerBarStyle: {
+    [HEADER_BAR_STYLE.FULL_WIDTH]: HeaderBarStyleFullWidth,
+    [HEADER_BAR_STYLE.FLOATING]: HeaderBarStyleFloating,
   },
   headerControlStyle: {
     [HEADER_CONTROL_STYLE.OUTLINED]: HeaderControlStyleOutlined,

@@ -1,10 +1,14 @@
 'use client';
 
-import type { TControlAria, TMaybeNull } from '@blog/config';
+import type { TControlAria, TControlLock, TMaybeNull } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
+import type { TSelectItemProps } from '@platform/components/shared/select/components/item/select-item';
 import type { TSelectAppearance } from '@platform/constants/select-appearance';
 
-type TOptionSelectOption<TValue extends string> = {
+type TOptionSelectOption<TValue extends string> = Pick<
+  TSelectItemProps,
+  'glyph'
+> & {
   value: TValue;
   label: string;
 };
@@ -14,8 +18,7 @@ export type TOptionSelectProps<TValue extends string> = {
   value: TMaybeNull<TValue>;
   onChange: (value: TValue) => void;
   aria?: TControlAria;
-  isDisabled?: boolean;
-  isLocked?: boolean;
+  lock?: TControlLock;
   appearance?: TSelectAppearance;
   placeholder?: string;
 };
@@ -25,11 +28,11 @@ export const OptionSelect = <TValue extends string>({
   value,
   onChange,
   aria,
-  isDisabled,
-  isLocked,
+  lock = {},
   appearance,
   placeholder,
 }: TOptionSelectProps<TValue>) => {
+  const { isDisabled, isLocked } = lock;
   const selected = options.find((option) => option.value === value);
 
   return (
@@ -39,12 +42,21 @@ export const OptionSelect = <TValue extends string>({
       isDisabled={isDisabled}
       isLocked={isLocked}
     >
-      <Select.Trigger aria={aria} isLocked={isLocked} appearance={appearance}>
+      <Select.Trigger
+        aria={aria}
+        isLocked={isLocked}
+        appearance={appearance}
+        glyph={selected?.glyph}
+      >
         {selected?.label ?? placeholder}
       </Select.Trigger>
       <Select.Popup>
         {options.map((option) => (
-          <Select.Item key={option.value} value={option.value}>
+          <Select.Item
+            key={option.value}
+            value={option.value}
+            glyph={option.glyph}
+          >
             <Select.ItemText>{option.label}</Select.ItemText>
           </Select.Item>
         ))}

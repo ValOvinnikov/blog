@@ -102,8 +102,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
             options={spinnerOptions}
             value={spinnerStyle}
             onChange={(style) => updateField('spinnerStyle', style)}
-            isDisabled={spinnerLock.isDisabled}
-            isLocked={spinnerLock.isLocked}
+            lock={spinnerLock}
           />
           {busyButtonStyle === BUSY_BUTTON_STYLE.EDGE && (
             <LockedReason icon={ICONS.INFO}>

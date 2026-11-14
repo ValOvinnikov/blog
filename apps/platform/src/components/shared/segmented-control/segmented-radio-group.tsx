@@ -2,7 +2,7 @@
 
 import { Radio } from '@base-ui/react/radio';
 import { RadioGroup } from '@base-ui/react/radio-group';
-import type { TMaybeNull, TNamedControlAria } from '@blog/config';
+import type { TControlLock, TMaybeNull, TNamedControlAria } from '@blog/config';
 import type { IWithClassName } from '@blog/config/types';
 import {
   SEGMENTED_RADIO_LAYOUT,
@@ -17,7 +17,6 @@ import {
 } from './components/option-body/option-body';
 import { SelectedDescription } from './components/selected-description/selected-description';
 import { TileCheck } from './components/tile-check/tile-check';
-import type { TSegmentedControlLock } from './segmented-control';
 import {
   SEGMENTED_FADE_WIDTH_PX,
   segmentedRadioGroupVariants,
@@ -38,7 +37,7 @@ type TSegmentedRadioGroupProps<TValue extends string> = IWithClassName & {
   value: TValue;
   onChange: (value: TValue) => void;
   aria: TNamedControlAria;
-  lock?: TSegmentedControlLock;
+  lock?: TControlLock;
   layout?: TSegmentedRadioLayout;
 };
 
