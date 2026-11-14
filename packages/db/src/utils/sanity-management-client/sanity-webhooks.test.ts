@@ -1,4 +1,8 @@
-import { HTTP_METHOD, HTTP_STATUS } from '@blog/config';
+import {
+  HTTP_METHOD,
+  HTTP_STATUS,
+  SANITY_WEBHOOK_OPERATION,
+} from '@blog/config';
 import {
   firstFetchCall,
   jsonResponse,
@@ -19,6 +23,7 @@ import { faker } from '@faker-js/faker';
 import {
   createSanityWebhook,
   listSanityWebhooks,
+  updateSanityWebhookProjection,
   updateSanityWebhookSecret,
 } from './sanity-webhooks';
 
@@ -30,6 +35,18 @@ const MOCK_WEBHOOK_SECRET = faker.string.alphanumeric(12);
 const MOCK_ROTATED_SECRET = faker.string.alphanumeric(12);
 const MOCK_OTHER_URL = faker.internet.url({ appendSlash: false });
 const MOCK_HOOK = { id: MOCK_SANITY_WEBHOOK_ID, url: MOCK_SANITY_WEBHOOK_URL };
+const MOCK_STALE_PROJECTION = '{_type, _id}';
+const MOCK_EXPECTED_WEBHOOK_RULE = {
+  on: [
+    SANITY_WEBHOOK_OPERATION.CREATE,
+    SANITY_WEBHOOK_OPERATION.UPDATE,
+    SANITY_WEBHOOK_OPERATION.DELETE,
+  ],
+  projection: expect.stringContaining('"previousSlug": before().slug.current'),
+};
+const MOCK_UPDATE_INPUT = mockSanityProjectInput({
+  webhookId: MOCK_SANITY_WEBHOOK_ID,
+});
 const MOCK_CREATE_INPUT = mockSanityProjectInput({
   dataset: MOCK_SANITY_DATASET,
   name: MOCK_WEBHOOK_NAME,
@@ -46,10 +63,24 @@ describe(listSanityWebhooks, () => {
     const result = await listSanityWebhooks(mockSanityProjectInput({}));
 
     const { url, init, method } = firstFetchCall(fetchMock);
-    expect(result).toEqual([MOCK_HOOK]);
+    expect(result).toEqual([{ ...MOCK_HOOK, projection: null }]);
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.webhooks);
     expect(method).toBe(HTTP_METHOD.GET);
     expect(init.redirect).toBe(REDIRECT_MODE_ERROR);
+  });
+
+  it('exposes each hook rule projection', async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse([
+        { ...MOCK_HOOK, rule: { projection: MOCK_STALE_PROJECTION } },
+      ]),
+    );
+
+    const result = await listSanityWebhooks(mockSanityProjectInput({}));
+
+    expect(result).toEqual([
+      { ...MOCK_HOOK, projection: MOCK_STALE_PROJECTION },
+    ]);
   });
 
   it('explains project membership when the management token is unauthorized', async () => {
@@ -85,10 +116,7 @@ describe(createSanityWebhook, () => {
       apiVersion: 'v2021-06-07',
       httpMethod: HTTP_METHOD.POST,
       includeDrafts: false,
-      rule: {
-        on: ['create', 'update', 'delete'],
-        projection: '{_type, _id, "slug": slug.current}',
-      },
+      rule: MOCK_EXPECTED_WEBHOOK_RULE,
       secret: MOCK_CREATE_INPUT.secret,
     });
   });
@@ -126,27 +154,58 @@ describe(createSanityWebhook, () => {
 });
 
 describe(updateSanityWebhookSecret, () => {
-  const MOCK_UPDATE_INPUT = mockSanityProjectInput({
-    webhookId: MOCK_SANITY_WEBHOOK_ID,
+  const MOCK_SECRET_INPUT = {
+    ...MOCK_UPDATE_INPUT,
     secret: MOCK_ROTATED_SECRET,
-  });
+  };
 
   it('PATCHes only the secret of the named hook', async () => {
     fetchMock.mockResolvedValue(jsonResponse(MOCK_HOOK));
 
-    await updateSanityWebhookSecret(MOCK_UPDATE_INPUT);
+    await updateSanityWebhookSecret(MOCK_SECRET_INPUT);
 
     const { url, body, method } = firstFetchCall(fetchMock);
     expect(url).toBe(MOCK_SANITY_EXPECTED_URL.webhook);
     expect(method).toBe(HTTP_METHOD.PATCH);
-    expect(body).toEqual({ secret: MOCK_UPDATE_INPUT.secret });
+    expect(body).toEqual({ secret: MOCK_SECRET_INPUT.secret });
   });
 
   it('throws naming the hook when the response is not that hook', async () => {
     fetchMock.mockResolvedValue(jsonResponse([]));
 
-    await expect(updateSanityWebhookSecret(MOCK_UPDATE_INPUT)).rejects.toThrow(
+    await expect(updateSanityWebhookSecret(MOCK_SECRET_INPUT)).rejects.toThrow(
       MOCK_SANITY_WEBHOOK_ID,
     );
+  });
+});
+
+describe(updateSanityWebhookProjection, () => {
+  it('PATCHes only the rule of the named hook, leaving its secret alone', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(MOCK_HOOK));
+
+    await updateSanityWebhookProjection(MOCK_UPDATE_INPUT);
+
+    const { url, body, method } = firstFetchCall(fetchMock);
+    expect(url).toBe(MOCK_SANITY_EXPECTED_URL.webhook);
+    expect(method).toBe(HTTP_METHOD.PATCH);
+    expect(body).toEqual({ rule: MOCK_EXPECTED_WEBHOOK_RULE });
+  });
+
+  it('throws naming the hook when the response is not the updated hook', async () => {
+    fetchMock.mockResolvedValue(jsonResponse([]));
+
+    await expect(
+      updateSanityWebhookProjection(MOCK_UPDATE_INPUT),
+    ).rejects.toThrow(MOCK_SANITY_WEBHOOK_ID);
+  });
+
+  it('throws with the response status on failure', async () => {
+    fetchMock.mockResolvedValue(
+      textResponse(MOCK_SANITY_ERROR_BODY, HTTP_STATUS.BAD_REQUEST),
+    );
+
+    await expect(
+      updateSanityWebhookProjection(MOCK_UPDATE_INPUT),
+    ).rejects.toThrow(new RegExp(`${HTTP_STATUS.BAD_REQUEST}`));
   });
 });
