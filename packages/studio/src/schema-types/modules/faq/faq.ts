@@ -1,6 +1,11 @@
 import { CONTENT_ALIGNMENT } from '@blog/config/constants';
 import { faqBlockSchema } from '@blog/studio/schema-types/documents/blocks/faq/faq';
 import { alignmentFields } from '@blog/studio/schema-types/fields/alignment-fields/alignment-fields';
+import {
+  appearanceFieldGroups,
+  appearanceFields,
+  appearanceFieldsets,
+} from '@blog/studio/schema-types/fields/appearance-fields/appearance-fields';
 import { brandVariantField } from '@blog/studio/schema-types/fields/brand-variant-field/brand-variant-field';
 import { ctaButtonsField } from '@blog/studio/schema-types/fields/cta-buttons-field/cta-buttons-field';
 import { titleField } from '@blog/studio/schema-types/fields/title-field/title-field';
@@ -17,41 +22,49 @@ export const faqSchema = defineType({
   description:
     'The questions a visitor asks before getting in touch, gathered here with their answers.',
   icon: MessageCircleQuestion,
-  fields: [
-    titleField(),
-    brandVariantField(),
-    moduleHeadingBlockField(),
-    defineField({
-      name: 'questions',
-      title: 'Questions',
-      type: 'array',
-      description:
-        'The questions shown in this section, in the order they should be read.',
-      of: [
-        defineArrayMember({
-          type: 'reference',
-          to: [{ type: faqBlockSchema.name }],
-        }),
-      ],
-      validation: (rule) => [
-        rule.required().error('Add at least two questions.'),
-        rule.unique().error('Each question can only appear once.'),
-        rule.min(2).error('An FAQ needs at least two questions.'),
-        rule
-          .max(20)
-          .error(
-            'An FAQ holds at most twenty questions — split it into two sections.',
-          ),
-      ],
-    }),
-    ctaButtonsField(),
-    ...alignmentFields([], {
-      allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
-      hasActions: true,
-      alignsItems: true,
-    }),
-    layoutField,
-  ],
+  fieldsets: appearanceFieldsets,
+  groups: appearanceFieldGroups,
+  fields: appearanceFields({
+    content: [
+      titleField(),
+      moduleHeadingBlockField(),
+      defineField({
+        name: 'questions',
+        title: 'Questions',
+        type: 'array',
+        description:
+          'The questions shown in this section, in the order they should be read.',
+        of: [
+          defineArrayMember({
+            type: 'reference',
+            to: [{ type: faqBlockSchema.name }],
+          }),
+        ],
+        validation: (rule) => [
+          rule.required().error('Add at least two questions.'),
+          rule.unique().error('Each question can only appear once.'),
+          rule.min(2).error('An FAQ needs at least two questions.'),
+          rule
+            .max(20)
+            .error(
+              'An FAQ holds at most twenty questions — split it into two sections.',
+            ),
+        ],
+      }),
+      ctaButtonsField(),
+    ],
+    appearance: [
+      brandVariantField(),
+      ...alignmentFields([], {
+        title: 'Heading Alignment',
+        allow: [CONTENT_ALIGNMENT.LEFT, CONTENT_ALIGNMENT.CENTER],
+        hasActions: true,
+        alignsItems: true,
+      }),
+    ],
+    layout: layoutField,
+    hasColumns: false,
+  }),
   preview: {
     select: {
       title: 'title',
