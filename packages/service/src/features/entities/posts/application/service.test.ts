@@ -1,5 +1,6 @@
 import { getAllPublishedPosts } from '@blog/service/features/entities/posts/adaptor/all-published/loader';
 import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get-by-ids/loader';
+import { getPostPublishedAt } from '@blog/service/features/entities/posts/adaptor/get-published-at/loader';
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
 import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
 import { mockTenant } from '@blog/service/testing/tenant';
@@ -11,6 +12,13 @@ vi.mock(
   '@blog/service/features/entities/posts/adaptor/get-by-ids/loader',
   () => ({
     getPostsByIds: vi.fn(),
+  }),
+);
+
+vi.mock(
+  '@blog/service/features/entities/posts/adaptor/get-published-at/loader',
+  () => ({
+    getPostPublishedAt: vi.fn(),
   }),
 );
 
@@ -31,6 +39,7 @@ vi.mock(
 faker.seed(6104);
 
 const MOCK_POST_IDS = [faker.string.uuid(), faker.string.uuid()];
+const MOCK_POST_ID = faker.string.uuid();
 
 const tenant = mockTenant();
 
@@ -45,6 +54,12 @@ describe(createPostsService, () => {
     await createPostsService().v1.getPostsByIds(MOCK_POST_IDS, tenant);
 
     expect(getPostsByIds).toHaveBeenCalledWith(MOCK_POST_IDS, tenant);
+  });
+
+  it('threads tenant context through to the publish-date loader', async () => {
+    await createPostsService().v1.getPostPublishedAt(MOCK_POST_ID, tenant);
+
+    expect(getPostPublishedAt).toHaveBeenCalledWith(MOCK_POST_ID, tenant);
   });
 
   it('threads tenant context through to the tag-scoped loader', async () => {
