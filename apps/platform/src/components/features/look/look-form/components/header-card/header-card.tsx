@@ -80,8 +80,7 @@ export const HeaderCard = ({ summary }: THeaderCardProps) => {
           options={layoutOptions}
           value={headerLayout}
           onChange={(layout) => updateField('headerLayout', layout)}
-          isDisabled={layoutLock.isDisabled}
-          isLocked={layoutLock.isLocked}
+          lock={layoutLock}
         />
       </LookField>
 

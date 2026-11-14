@@ -1,14 +1,16 @@
 'use client';
 
-import type { TControlAria, TMaybeNull } from '@blog/config';
+import type { TControlAria, TControlLock, TMaybeNull } from '@blog/config';
 import { Select } from '@platform/components/shared/select';
+import type { TSelectItemProps } from '@platform/components/shared/select/components/item/select-item';
 import type { TSelectAppearance } from '@platform/constants/select-appearance';
-import type { ReactNode } from 'react';
 
-type TOptionSelectOption<TValue extends string> = {
+type TOptionSelectOption<TValue extends string> = Pick<
+  TSelectItemProps,
+  'glyph'
+> & {
   value: TValue;
   label: string;
-  glyph?: ReactNode;
 };
 
 export type TOptionSelectProps<TValue extends string> = {
@@ -16,8 +18,7 @@ export type TOptionSelectProps<TValue extends string> = {
   value: TMaybeNull<TValue>;
   onChange: (value: TValue) => void;
   aria?: TControlAria;
-  isDisabled?: boolean;
-  isLocked?: boolean;
+  lock?: TControlLock;
   appearance?: TSelectAppearance;
   placeholder?: string;
 };
@@ -27,11 +28,11 @@ export const OptionSelect = <TValue extends string>({
   value,
   onChange,
   aria,
-  isDisabled,
-  isLocked,
+  lock = {},
   appearance,
   placeholder,
 }: TOptionSelectProps<TValue>) => {
+  const { isDisabled, isLocked } = lock;
   const selected = options.find((option) => option.value === value);
 
   return (

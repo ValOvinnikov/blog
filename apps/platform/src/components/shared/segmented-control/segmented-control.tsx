@@ -2,7 +2,7 @@
 
 import { Toggle } from '@base-ui/react/toggle';
 import { ToggleGroup } from '@base-ui/react/toggle-group';
-import type { TControlAria } from '@blog/config';
+import type { TControlAria, TControlLock } from '@blog/config';
 import type { IWithClassName } from '@blog/config/types';
 import { DecorativeGlyph } from '@platform/components/shared/decorative-glyph';
 import {
@@ -24,17 +24,12 @@ type TSegmentedControlOption<TValue extends string> = {
   glyph?: ReactNode;
 };
 
-export type TSegmentedControlLock = {
-  isDisabled?: boolean;
-  isLocked?: boolean;
-};
-
 export type TSegmentedControlProps<TValue extends string> = IWithClassName & {
   options: TSegmentedControlOption<TValue>[];
   value: TValue;
   onChange: (value: TValue) => void;
   aria?: TControlAria;
-  lock?: TSegmentedControlLock;
+  lock?: TControlLock;
   layout?: TSegmentedLayout;
 };
 
