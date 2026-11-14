@@ -7,7 +7,7 @@ import { enqueueWorkerRun } from '@web/server/revalidate/enqueue-worker-run/enqu
 import type { TPostWebhookEvent } from '@web/server/revalidate/post-webhook-event/post-webhook-event';
 import { logger } from '@web/utils/logger/logger';
 
-export const SCHEDULED_POST_PURGE_PATH = '/api/scheduled-post-purge';
+const SCHEDULED_POST_PURGE_PATH = '/api/scheduled-post-purge';
 
 export type TSchedulePostPurgeInput = TPostWebhookEvent & {
   tenant: TMaybeUndefined<TTenantSanityContext>;

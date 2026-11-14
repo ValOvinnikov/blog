@@ -10426,6 +10426,14 @@
         "file": "apps/web/src/constants/revalidate.ts"
       }
     ],
+    "revalidate.scheduled_purge_tenant_lookup_failed": [
+      {
+        "ref": "REVALIDATE_LOG.SCHEDULED_PURGE_TENANT_LOOKUP_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/revalidate",
+        "file": "apps/web/src/constants/revalidate.ts"
+      }
+    ],
     "revalidate.scheduled_post_lookup_failed": [
       {
         "ref": "REVALIDATE_LOG.SCHEDULED_POST_LOOKUP_FAILED",

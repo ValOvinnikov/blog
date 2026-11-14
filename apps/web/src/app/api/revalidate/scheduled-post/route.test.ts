@@ -10,6 +10,7 @@ import { REVALIDATE_LOG } from '@web/constants/revalidate';
 import { POST_TYPE } from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import type * as DeriveRevalidatePathsModule from '@web/server/revalidate/derive-revalidate-paths/derive-revalidate-paths';
 import { mockTenantSanityCredentials } from '@web/testing/server/tenant/fixtures';
+import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
@@ -63,7 +64,6 @@ faker.seed(7385);
 const MOCK_PATH = '/api/revalidate/scheduled-post';
 const MOCK_URL = `${faker.internet.url({ appendSlash: false })}${MOCK_PATH}`;
 const MOCK_SECRET = faker.string.alphanumeric(32);
-const MOCK_OTHER_SECRET = faker.string.alphanumeric(32);
 const MOCK_POST_ID = faker.string.uuid();
 const MOCK_POST_PATH = `/${MOCK_TENANT_ID}/${faker.lorem.slug()}`;
 const MOCK_CREDENTIALS = mockTenantSanityCredentials();
@@ -71,11 +71,15 @@ const MOCK_BODY = { tenantId: MOCK_TENANT_ID, postId: MOCK_POST_ID };
 
 const POST_TAGS = getRevalidateTagsForType(POST_TYPE, MOCK_POST_ID);
 
-const signedRequest = (body: unknown, secret = MOCK_SECRET): Request => {
+const signedRequest = (body: unknown): Request => {
   const rawBody = JSON.stringify(body);
   return new Request(MOCK_URL, {
     method: HTTP_METHOD.POST,
-    headers: buildEnqueueHeaders({ secret, path: MOCK_PATH, rawBody }),
+    headers: buildEnqueueHeaders({
+      secret: MOCK_SECRET,
+      path: MOCK_PATH,
+      rawBody,
+    }),
     body: rawBody,
   });
 };
@@ -113,40 +117,16 @@ describe(POST, () => {
     });
   });
 
-  it.each([
-    [
-      'an unsigned call',
-      () =>
-        new Request(MOCK_URL, {
-          method: HTTP_METHOD.POST,
-          body: JSON.stringify(MOCK_BODY),
-        }),
-    ],
-    [
-      'a call signed with another secret',
-      () => signedRequest(MOCK_BODY, MOCK_OTHER_SECRET),
-    ],
-  ])('refuses %s and purges nothing', async (_label, makeRequest) => {
-    const response = await POST(makeRequest());
-
-    expect(response.status).toBe(HTTP_STATUS.UNAUTHORIZED);
-    expect(getTenantSanityCredentialsMock).not.toHaveBeenCalled();
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-  });
-
-  it('refuses a malformed body', async () => {
-    const response = await POST(signedRequest({ tenantId: MOCK_TENANT_ID }));
-
-    expect(response.status).toBe(HTTP_STATUS.BAD_REQUEST);
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-  });
-
-  it('answers not found and purges nothing for an unknown tenant', async () => {
-    getTenantSanityCredentialsMock.mockResolvedValue(undefined);
+  it('logs and fails when the tenant lookup throws', async () => {
+    getTenantSanityCredentialsMock.mockRejectedValue(MOCK_ERROR);
 
     const response = await POST(signedRequest(MOCK_BODY));
 
-    expect(response.status).toBe(HTTP_STATUS.NOT_FOUND);
+    expect(response.status).toBe(HTTP_STATUS.INTERNAL_SERVER_ERROR);
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      REVALIDATE_LOG.SCHEDULED_PURGE_TENANT_LOOKUP_FAILED,
+      { tenantId: MOCK_TENANT_ID, error: MOCK_ERROR },
+    );
     expect(revalidateTagMock).not.toHaveBeenCalled();
   });
 

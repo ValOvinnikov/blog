@@ -9,7 +9,6 @@ import { getRevalidateTagsForType } from '@web/utils/revalidate-tags';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-// `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
 export const runtime = 'nodejs';
 
 const requestBodySchema = z.object({
@@ -22,7 +21,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     secret: env.SANITY_REVALIDATE_SECRET,
     log: {
       SECRET_MISSING: REVALIDATE_LOG.SECRET_MISSING,
-      TENANT_LOOKUP_FAILED: REVALIDATE_LOG.TENANT_BY_ID_LOOKUP_FAILED,
+      TENANT_LOOKUP_FAILED: REVALIDATE_LOG.SCHEDULED_PURGE_TENANT_LOOKUP_FAILED,
     },
   });
   if ('refusal' in signed) {

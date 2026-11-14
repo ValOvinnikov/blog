@@ -11,10 +11,7 @@ import {
 } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 
-import {
-  SCHEDULED_POST_PURGE_PATH,
-  schedulePostPurge,
-} from './schedule-post-purge';
+import { schedulePostPurge } from './schedule-post-purge';
 
 const { getPostPublishedAtMock } = vi.hoisted(() => ({
   getPostPublishedAtMock: vi.fn(),
@@ -44,7 +41,7 @@ const MOCK_PAST_PUBLISHED_AT = faker.date
   .toISOString();
 const MOCK_OTHER_TYPE = faker.string.alphanumeric(12);
 
-const PUBLISH = {
+const MOCK_PUBLISH = {
   operation: SANITY_WEBHOOK_OPERATION.UPDATE,
   type: POST_TYPE,
   id: MOCK_POST_ID,
@@ -70,11 +67,11 @@ describe(schedulePostPurge, () => {
   it.each([SANITY_WEBHOOK_OPERATION.CREATE, SANITY_WEBHOOK_OPERATION.UPDATE])(
     'enqueues one run for a post dated in the future on %s',
     async (operation) => {
-      await schedulePostPurge({ ...PUBLISH, operation });
+      await schedulePostPurge({ ...MOCK_PUBLISH, operation });
 
       expect(enqueueMock).toHaveBeenCalledOnce();
       expect(enqueueMock).toHaveBeenCalledWith({
-        path: SCHEDULED_POST_PURGE_PATH,
+        path: '/api/scheduled-post-purge',
         request: {
           tenantId: MOCK_TENANT_ID,
           postId: MOCK_POST_ID,
@@ -90,7 +87,7 @@ describe(schedulePostPurge, () => {
   );
 
   it('reads the date from the published post in its tenant', async () => {
-    await schedulePostPurge(PUBLISH);
+    await schedulePostPurge(MOCK_PUBLISH);
 
     expect(getPostPublishedAtMock).toHaveBeenCalledWith(
       MOCK_POST_ID,
@@ -105,7 +102,7 @@ describe(schedulePostPurge, () => {
   ])('enqueues nothing for a post with %s', async (_label, publishedAt) => {
     getPostPublishedAtMock.mockResolvedValue(okResult(publishedAt));
 
-    await schedulePostPurge(PUBLISH);
+    await schedulePostPurge(MOCK_PUBLISH);
 
     expect(enqueueMock).not.toHaveBeenCalled();
   });
@@ -116,7 +113,7 @@ describe(schedulePostPurge, () => {
     ['an unresolved tenant', { tenantId: undefined }],
     ['no tenant Sanity context', { tenant: undefined }],
   ])('reads and enqueues nothing for %s', async (_label, override) => {
-    await schedulePostPurge({ ...PUBLISH, ...override });
+    await schedulePostPurge({ ...MOCK_PUBLISH, ...override });
 
     expect(getPostPublishedAtMock).not.toHaveBeenCalled();
     expect(enqueueMock).not.toHaveBeenCalled();
@@ -125,7 +122,7 @@ describe(schedulePostPurge, () => {
   it('logs and enqueues nothing when the date cannot be read', async () => {
     getPostPublishedAtMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
-    await schedulePostPurge(PUBLISH);
+    await schedulePostPurge(MOCK_PUBLISH);
 
     expect(enqueueMock).not.toHaveBeenCalled();
     expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
