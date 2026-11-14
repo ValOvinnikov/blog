@@ -5,7 +5,10 @@ import {
   MOCK_CTA_ACTIONS,
   MOCK_CTA_PRIMARY_ACTION,
 } from '@web/testing/modules/cta/fixtures';
-import { MOCK_PRICING_LABELS } from '@web/testing/modules/pricing/fixtures';
+import {
+  MOCK_PRICING_LABELS,
+  mockPricingCard,
+} from '@web/testing/modules/pricing/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import {
   MOCK_RADIUS_SCOPE_CASES,
@@ -31,31 +34,23 @@ const MOCK_FOOTNOTE = faker.lorem.sentence();
 const MOCK_TITLE_ID = faker.lorem.slug();
 const MOCK_DATA_TEST_ID = faker.lorem.slug();
 
-const mockPricingCard = (
-  overrides: Partial<IPricingCardData> = {},
-): IPricingCardData => ({
-  id: MOCK_TIER_ID,
-  name: MOCK_TIER_NAME,
-  description: undefined,
-  headline: {
-    amount: MOCK_MONTHLY_PRICE,
-    compareAt: undefined,
-    period: MOCK_PRICING_LABELS.periods[PRICE_PERIOD.MONTH],
-    prefix: undefined,
-  },
-  label: undefined,
-  extras: [],
-  features: [],
-  ctaButtons: [],
-  highlightLabel: undefined,
-  footnote: undefined,
-  ...overrides,
-});
+const mockCard = (overrides: Partial<IPricingCardData> = {}) =>
+  mockPricingCard({
+    id: MOCK_TIER_ID,
+    name: MOCK_TIER_NAME,
+    headline: {
+      amount: MOCK_MONTHLY_PRICE,
+      compareAt: undefined,
+      period: MOCK_PRICING_LABELS.periods[PRICE_PERIOD.MONTH],
+      prefix: undefined,
+    },
+    ...overrides,
+  });
 
 const setup = customRender(PricingModuleView, {
   section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_PRICING_HEADING }),
-  panels: [{ period: undefined, cards: [mockPricingCard()] }],
+  panels: [{ period: undefined, cards: [mockCard()] }],
   footnote: undefined,
   ctaButtons: [],
   contentAlignment: undefined,
@@ -65,7 +60,7 @@ const setup = customRender(PricingModuleView, {
 
 const setupWithCard = (overrides: Partial<IPricingCardData>) =>
   setup({
-    panels: [{ period: undefined, cards: [mockPricingCard(overrides)] }],
+    panels: [{ period: undefined, cards: [mockCard(overrides)] }],
   });
 
 describe(`<${PricingModuleView.name}/>`, () => {
@@ -92,11 +87,11 @@ describe(`<${PricingModuleView.name}/>`, () => {
   it('renders a period switch and shows only the monthly price', () => {
     setup({
       panels: [
-        { period: PRICE_PERIOD.MONTH, cards: [mockPricingCard()] },
+        { period: PRICE_PERIOD.MONTH, cards: [mockCard()] },
         {
           period: PRICE_PERIOD.YEAR,
           cards: [
-            mockPricingCard({
+            mockCard({
               headline: {
                 amount: MOCK_YEARLY_PRICE,
                 compareAt: undefined,

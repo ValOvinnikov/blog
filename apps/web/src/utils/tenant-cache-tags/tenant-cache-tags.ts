@@ -4,7 +4,8 @@ const TENANT_PLAN_BASE_TAG = 'tenant-plan';
 
 export const TENANT_BY_HOST_CACHE_TAG = 'tenant-by-host';
 
-/** Shared by the `site_config` cache reader and `/api/revalidate-site-config` so both agree on the same tenant-scoped tag string. */
+export const STRIPE_CATALOGUE_CACHE_TAG = 'stripe-catalogue';
+
 export const buildSiteConfigCacheTag = (tenantId: string): string =>
   `${SITE_CONFIG_BASE_TAG}:${tenantId}`;
 

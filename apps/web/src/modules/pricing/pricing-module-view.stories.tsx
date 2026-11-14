@@ -1,4 +1,6 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT, PRICE_PERIOD } from '@blog/config';
+import { BILLING_CURRENCY } from '@blog/db/constants';
+import { MOCK_EURO_AMOUNT } from '@blog/db/testing/stripe-catalogue/fixtures';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { MOCK_CTA_ACTIONS } from '@web/testing/modules/cta/fixtures';
 import {
@@ -6,6 +8,10 @@ import {
   mockPricingTier,
   MOCK_PRICING_LABELS,
 } from '@web/testing/modules/pricing/fixtures';
+import {
+  mockStripePrice,
+  mockLinkedPricingTier,
+} from '@web/testing/modules/pricing/live-price-fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
 import { MOCK_OUTLINED_BRAND_TINT_SECTION } from '@web/testing/shared/section-appearance/fixtures';
 import { MOCK_SITE_SETTINGS } from '@web/testing/shared/site-settings/fixtures';
@@ -71,6 +77,13 @@ const tiers = [
 const panelsFor = (selected: typeof tiers) =>
   toPricingPanels({
     tiers: selected,
+    planPrices: [
+      mockStripePrice(),
+      mockStripePrice({
+        currency: BILLING_CURRENCY.EUR,
+        unitAmount: MOCK_EURO_AMOUNT,
+      }),
+    ],
     locale: 'en-GB',
     currency: MOCK_SITE_SETTINGS.currency,
     labels: MOCK_PRICING_LABELS,
@@ -183,4 +196,19 @@ export const PhoneStacked: TStory = {
 export const ThreeTiersPhone: TStory = {
   args: { panels: panelsFor(tiers.slice(0, 3)) },
   globals: { viewport: 'mobile' },
+};
+
+export const LinkedPlanLivePrice: TStory = {
+  args: {
+    panels: panelsFor([
+      tiers[0]!,
+      mockLinkedPricingTier(PRICE_PERIOD.MONTH, {
+        id: 'growth',
+        name: 'Growth',
+        description: 'The platform plan, at its live price.',
+        features,
+        ctaButtons: MOCK_CTA_ACTIONS.slice(0, 1),
+      }),
+    ]),
+  },
 };

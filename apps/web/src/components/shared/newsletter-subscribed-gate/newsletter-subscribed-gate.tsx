@@ -1,8 +1,9 @@
 'use client';
 
+import { useClientSnapshot } from '@web/hooks/use-client-snapshot';
 import { hasNewsletterSubscribedCookie } from '@web/utils/has-newsletter-subscribed-cookie';
 import { NEWSLETTER_SUBSCRIBED_COOKIE_NAME } from '@web/utils/newsletter-subscribed-cookie-name';
-import { type ReactNode, useRef, useSyncExternalStore } from 'react';
+import { type ReactNode, useRef } from 'react';
 
 import { useIsReaderSubscribed } from './hooks/use-is-reader-subscribed';
 
@@ -14,9 +15,6 @@ const HIDE_IF_SUBSCRIBED_SCRIPT = `(function(){var s=document.currentScript;var 
 
 type TPhase = 'pending' | 'open' | 'subscribed';
 
-const subscribeToNothing = () => () => {};
-const getServerPhase = (): TPhase => 'pending';
-
 export const NewsletterSubscribedGate = ({
   children,
 }: TNewsletterSubscribedGateProps) => {
@@ -27,11 +25,7 @@ export const NewsletterSubscribedGate = ({
       : 'open';
     return frozenPhase.current;
   };
-  const phase = useSyncExternalStore(
-    subscribeToNothing,
-    getClientPhase,
-    getServerPhase,
-  );
+  const phase = useClientSnapshot<TPhase>(getClientPhase, 'pending');
 
   const isReaderSubscribed = useIsReaderSubscribed();
 

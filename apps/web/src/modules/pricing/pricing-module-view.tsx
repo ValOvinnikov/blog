@@ -5,6 +5,8 @@ import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
 import { Section, type ISectionProps } from '@web/components/shared/section';
+import { PromotionCodeProvider } from '@web/context/promotion-code-provider';
+import { LinkedPricingTierCard } from '@web/modules/pricing/components/linked-pricing-tier-card/linked-pricing-tier-card';
 import { PricingPeriodSwitch } from '@web/modules/pricing/components/pricing-period-switch/pricing-period-switch';
 import { PricingTierCard } from '@web/modules/pricing/components/pricing-tier-card/pricing-tier-card';
 import { moduleGridActionsVariants } from '@web/utils/module-grid-actions-variants';
@@ -42,9 +44,17 @@ export const PricingModuleView = ({
 
   const renderCards = (panel: IPricingPanel) => (
     <PricingCardGrid columns={columns}>
-      {panel.cards.map((card) => (
-        <PricingTierCard key={card.id} card={card} />
-      ))}
+      {panel.cards.map((card) =>
+        card.livePrice ? (
+          <LinkedPricingTierCard
+            key={card.id}
+            card={card}
+            livePrice={card.livePrice}
+          />
+        ) : (
+          <PricingTierCard key={card.id} card={card} />
+        ),
+      )}
     </PricingCardGrid>
   );
 
@@ -52,6 +62,14 @@ export const PricingModuleView = ({
     panel.period ? [{ period: panel.period, content: renderCards(panel) }] : [],
   );
   const [singlePanel] = panels;
+  const hasLivePrice = panels.some((panel) =>
+    panel.cards.some((card) => card.livePrice),
+  );
+  const tiers = hasArrayGotMultipleItems(switchPanels) ? (
+    <PricingPeriodSwitch panels={switchPanels} align={contentAlignment} />
+  ) : (
+    singlePanel && renderCards(singlePanel)
+  );
 
   return (
     <Section
@@ -68,10 +86,10 @@ export const PricingModuleView = ({
         align={contentAlignment}
         variant="section"
       />
-      {hasArrayGotMultipleItems(switchPanels) ? (
-        <PricingPeriodSwitch panels={switchPanels} align={contentAlignment} />
+      {hasLivePrice ? (
+        <PromotionCodeProvider>{tiers}</PromotionCodeProvider>
       ) : (
-        singlePanel && renderCards(singlePanel)
+        tiers
       )}
       {footnote && (
         <Text variant="footnote" className={v.footnote()}>

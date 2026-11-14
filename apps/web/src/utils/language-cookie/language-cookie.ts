@@ -1,5 +1,5 @@
 import type { TLocaleIsoCode, TMaybeUndefined } from '@blog/config';
-import { ONE_YEAR_IN_SECONDS } from '@web/constants/time';
+import { REMEMBERED_COOKIE_OPTIONS } from '@web/utils/remembered-cookie-options';
 
 export const LANGUAGE_COOKIE_NAME = 'NEXT_LOCALE';
 
@@ -11,7 +11,7 @@ type TCookieWriter = {
   set: (
     name: string,
     value: string,
-    options: { path: string; maxAge: number; sameSite: 'lax' },
+    options: typeof REMEMBERED_COOKIE_OPTIONS,
   ) => unknown;
 };
 
@@ -27,9 +27,5 @@ export const rememberLanguage = (
   cookies: TCookieWriter,
   locale: TLocaleIsoCode,
 ) => {
-  cookies.set(LANGUAGE_COOKIE_NAME, locale, {
-    path: '/',
-    maxAge: ONE_YEAR_IN_SECONDS,
-    sameSite: 'lax',
-  });
+  cookies.set(LANGUAGE_COOKIE_NAME, locale, REMEMBERED_COOKIE_OPTIONS);
 };

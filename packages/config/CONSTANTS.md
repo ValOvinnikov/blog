@@ -805,11 +805,15 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/cookie-list` — `apps/web/src/constants/cookie-list.ts`
 
-- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
+- **COOKIE_ID**: `CONSENT`, `LANGUAGE`, `CURRENCY`, `SESSION`, `CSRF`, `SIGN_IN_RETURN`, `OAUTH_VERIFIER`, `OAUTH_STATE`, `SIGNED_IN_HINT`, `NEWSLETTER_SUBSCRIBED`, `NEWSLETTER_UNSUBSCRIBE_TOKEN`, `READING_DEPTH`, `THEME`
 
 ### `@web/constants/cookie-statement` — `apps/web/src/constants/cookie-statement.ts`
 
 - **COOKIE_STATEMENT_LOG**: `PAGE_FETCH_FAILED`=`"cookie_statement_page.fetch_failed"`, `METADATA_FETCH_FAILED`=`"cookie_statement_metadata.fetch_failed"`
+
+### `@web/constants/country` — `apps/web/src/constants/country.ts`
+
+- **COUNTRY_CODE**: `AD`, `AT`, `BE`, `BG`, `BL`, `CY`, `DE`, `EE`, `ES`, `FI`, `FR`, `GB`, `GF`, `GP`, `GR`, `HR`, `IE`, `IT`, `LT`, `LU`, `LV`, `MC`, `ME`, `MF`, `MQ`, `MT`, `NL`, `PM`, `PT`, `RE`, `SI`, `SK`, `SM`, `US`, `VA`, `XK`, `YT`
 
 ### `@web/constants/cta` — `apps/web/src/constants/cta.ts`
 
@@ -855,7 +859,7 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/http` — `apps/web/src/constants/http.ts`
 
-- **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`
+- **CACHE_CONTROL**: `PRIVATE_NO_STORE`=`"private, no-store"`, `PUBLIC_ONE_MINUTE`=`"public, max-age=60, s-maxage=60"`
 - **ROBOTS_DIRECTIVE**: `NOINDEX`=`"noindex"`
 
 ### `@web/constants/icon` — `apps/web/src/constants/icon.ts`
@@ -902,7 +906,8 @@ Every key/value const an agent should reuse before writing a literal. The
 
 ### `@web/constants/pricing` — `apps/web/src/constants/pricing.ts`
 
-- **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`
+- **PRICING_LOG**: `MODULE_FETCH_FAILED`=`"pricing_module.fetch_failed"`, `SITE_SETTINGS_FAILED`=`"pricing_module.site_settings_failed"`, `PLAN_PRICES_FETCH_FAILED`=`"pricing_module.plan_prices_fetch_failed"`, `PROMOTION_CODE_LOOKUP_FAILED`=`"pricing_module.promotion_code_lookup_failed"`, `PROMOTION_CODE_FETCH_FAILED`=`"pricing_module.promotion_code_fetch_failed"`
+- **PRICING_SEARCH_PARAM**: `PROMO`=`"promo"`
 
 ### `@web/constants/proxy` — `apps/web/src/constants/proxy.ts`
 

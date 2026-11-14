@@ -1,0 +1,15 @@
+export const PRICING_VOICE_FIXED_KEYS = [
+  'pricingModule.free',
+  'pricingModule.from',
+  'pricingModule.compareAtLabel',
+  'pricingModule.period.ONE_TIME',
+  'pricingModule.period.HOUR',
+  'pricingModule.period.SESSION',
+  'pricingModule.period.MONTH',
+  'pricingModule.period.YEAR',
+  'pricingModule.tabs.MONTH',
+  'pricingModule.tabs.YEAR',
+  'pricingModule.periodSwitchLabel',
+  'pricingModule.promo.once',
+  'pricingModule.promo.repeating',
+] as const;
