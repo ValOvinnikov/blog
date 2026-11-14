@@ -152,6 +152,7 @@
   --platform-selected: #33290d;
   --platform-selected-hover: #40330f;
   --platform-on-selected: #ffdc7a;
+  --platform-focus-ring: #ffc233;
   --platform-focus-edge: transparent;
   --platform-ok: #6ee7a7;
   --platform-ok-weak: #10291d;
@@ -237,6 +238,7 @@
     --platform-selected: #33290d;
     --platform-selected-hover: #40330f;
     --platform-on-selected: #ffdc7a;
+    --platform-focus-ring: #ffc233;
     --platform-focus-edge: transparent;
     --platform-ok: #6ee7a7;
     --platform-ok-weak: #10291d;

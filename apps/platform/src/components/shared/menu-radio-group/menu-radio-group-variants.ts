@@ -1,10 +1,10 @@
 import { MENU_GROUP_LABEL_TYPE } from '@platform/components/shared/menu-surface';
-import {
-  FOCUS_RING_GROUND,
-  FOCUS_RING_TRIGGER,
-} from '@platform/constants/focus-ring';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { MENU_RADIO_GROUP_SIZE } from '@platform/constants/menu-radio-group';
-import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import {
+  checkedFocusRingGroundClasses,
+  insetFocusRingClasses,
+} from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const menuRadioGroupVariants = tv({
@@ -22,10 +22,8 @@ export const menuRadioGroupVariants = tv({
       'cursor-pointer text-platform-12-5 font-medium text-platform-muted',
       'data-[checked]:bg-platform-segment-on data-[checked]:font-semibold data-[checked]:text-platform-text data-[checked]:shadow-platform',
       'data-[highlighted]:not-data-[checked]:bg-platform-popover-hover data-[highlighted]:not-data-[checked]:text-platform-text',
-      insetFocusRingClasses(
-        FOCUS_RING_GROUND.POPOVER_HOVER,
-        FOCUS_RING_TRIGGER.HIGHLIGHTED,
-      ),
+      insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
+      checkedFocusRingGroundClasses(FOCUS_RING_GROUND.SEGMENT_ON),
     ],
     hint: ['text-platform-12 leading-4 text-platform-muted'],
   },

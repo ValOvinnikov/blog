@@ -2,7 +2,9 @@ import {
   NAV_CURRENT_BAR,
   NAV_ROW_SHAPE,
 } from '@platform/components/features/layout/sidebar/sidebar-variants';
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { BAR_CONTROL_CLASSES } from '@platform/utils/bar-control-classes/bar-control-classes';
+import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const topbarNavMenuVariants = tv({
@@ -29,6 +31,7 @@ export const topbarNavMenuVariants = tv({
     row: [
       NAV_ROW_SHAPE,
       'min-h-11 font-normal text-platform-text outline-none',
+      insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
     ],
     note: ['text-platform-muted'],
   },

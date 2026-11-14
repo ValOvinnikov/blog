@@ -11,6 +11,7 @@ import {
   StatusBadge,
   type TStatusBadgeProps,
 } from '@platform/components/shared/status-badge';
+import { BADGE_TONE } from '@platform/constants/badge-tone';
 
 import { navItemContentVariants } from './nav-item-content-variants';
 
@@ -42,8 +43,7 @@ export const NavItemContent = ({
   const { rowIcon, rowBody, rowLabel, rowReason, badgeSlot, iconFrame } =
     navItemContentVariants({
       hasStatus: !!lineStatus,
-      hasRailBadge: !!railStatus,
-      hasNeutralBadge: badge?.tone === 'neutral',
+      hasNeutralBadge: badge?.tone === BADGE_TONE.NEUTRAL,
     });
 
   const rowIconElement = <Icon name={icon} className={rowIcon()} />;

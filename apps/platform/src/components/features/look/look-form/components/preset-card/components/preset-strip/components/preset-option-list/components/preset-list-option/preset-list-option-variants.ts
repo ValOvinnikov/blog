@@ -1,3 +1,4 @@
+import { NAV_CURRENT_BAR } from '@platform/components/features/layout/sidebar/sidebar-variants';
 import {
   FOCUS_RING_GROUND,
   FOCUS_RING_TRIGGER,
@@ -33,13 +34,7 @@ export const presetListOptionVariants = tv({
         ],
       },
       [PRESET_LIST_LAYOUT.ROWS]: {
-        option: [
-          'gap-3 border-b border-platform-line-2 px-4 py-2',
-          insetFocusRingClasses(
-            FOCUS_RING_GROUND.SURFACE,
-            FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED,
-          ),
-        ],
+        option: ['relative gap-3 border-b border-platform-line-2 px-4 py-2'],
       },
     },
     selected: { true: {}, false: {} },
@@ -65,7 +60,25 @@ export const presetListOptionVariants = tv({
       selected: true,
       class: {
         option: [
-          'bg-platform-brand-weak shadow-[inset_3px_0_0_var(--platform-brand-ink)]',
+          'bg-platform-brand-weak',
+          NAV_CURRENT_BAR,
+          'before:inset-y-0 before:bg-platform-brand-ink',
+          insetFocusRingClasses(
+            FOCUS_RING_GROUND.BRAND_WEAK,
+            FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED,
+          ),
+        ],
+      },
+    },
+    {
+      layout: PRESET_LIST_LAYOUT.ROWS,
+      selected: false,
+      class: {
+        option: [
+          insetFocusRingClasses(
+            FOCUS_RING_GROUND.SURFACE,
+            FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED,
+          ),
         ],
       },
     },

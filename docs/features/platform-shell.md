@@ -372,7 +372,8 @@ save still settles as the form's generic server error.
   viewport less 16px (`MENU_POPUP_FIT_WIDTH`). Each item is
   the name (13px/500 `text`) over the Mono domain (11px `muted`), padding 6px
   8px, `rounded-platform-control`, wrapping long text in full; the highlighted
-  item takes a `popover-hover` ground and no focus ring, and below `md` every
+  item takes a `popover-hover` ground, plus the inset focus ring when it was
+  reached by keyboard, and below `md` every
   item is at least 44px tall with its lines centred. The current workspace
   carries no visual marker; its item has `aria-current` for screen readers.
   The onboarding rail and the Choose a workspace page read the
@@ -481,7 +482,8 @@ save still settles as the form's generic server error.
   out) is a flex row with a 10px gap, at least 44px tall at every width,
   padding 6px 8px,
   `rounded-platform-control`, 13px/500, 2px from the next item, taking a
-  `popover-hover` ground and no ring when highlighted.
+  `popover-hover` ground when highlighted, and the inset focus ring only when
+  the keyboard highlighted it.
 - `styles/platform-theme-contrast.test.ts` guards both palettes: each pair
   of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
   and focus rings, measured from the values in `platform-theme.css`, and the
@@ -494,10 +496,11 @@ save still settles as the form's generic server error.
   (#12141a) around it; Dark has no edge. The ground reaches the
   `shadow-platform-focus-ring` token through `--platform-focus-ground`, which
   the helper sets on the element. No visible outline shows outside
-  forced-colors mode. A trigger other than `:focus-visible` is a
-  `FOCUS_RING_TRIGGER`: a highlighted menu item, a highlighted option in a
-  focused list, or a focused input inside the control (the hue slider's
-  thumb). No focus style is written outside these helpers. Text inputs,
+  forced-colors mode, where the theme's `:focus-visible` outline shows
+  instead. A trigger other than `:focus-visible` is a `FOCUS_RING_TRIGGER`
+  (a highlighted option in a focused list, or a focused input inside the
+  control, the hue slider's thumb), and the helper gives each one its own
+  `Highlight` outline under forced colours. No focus style is written outside these helpers. Text inputs,
   textareas, the link field and the rich-text editor take no ring: focused,
   their border turns `brand-ink` inside a 3px `focus-ring` glow
   (`FIELD_FOCUS_CLASSES`, `EDITABLE_SHELL_FOCUS_CLASSES`,
@@ -508,9 +511,13 @@ save still settles as the form's generic server error.
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
   the data table's scroll region and its sort buttons, which fill their head
-  cell; lead rows (on `brand-weak` when selected); the highlighted appearance
-  menu radio item (on `popover-hover`); the Look preset sheet's rows; and the
-  full-screen preview stage (on `theme-track`). The more-presets grid's
+  cell; lead rows (on `brand-weak` when selected, the selected 1px `brand`
+  edge drawn above the ring); menu, select, tenant switcher and top-bar menu
+  items and the appearance menu radio items, on keyboard focus only (on
+  `popover-hover`, or `segment-on` for the checked radio); the Look preset
+  sheet's rows (on `brand-weak` when selected, the 3px bar a pseudo-element
+  above the ring); and the full-screen preview stage (on `theme-track`). An
+  inset ring's ground is the row's own fill. The more-presets grid's
   highlighted option takes the outer ring on `popover`. The toast's dismiss
   button takes it on `popover`. A raised shadow gives way to the
   ring while focused. Fields have a

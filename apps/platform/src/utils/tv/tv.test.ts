@@ -1,8 +1,7 @@
 import { tv } from './tv';
 
-const DROP_AND_INSET_SHADOW =
-  'shadow-platform inset-shadow-platform-focus-ring';
 const FOCUS_RING_SHADOW = 'shadow-platform-focus-ring';
+const INSET_FOCUS_RING_SHADOW = 'inset-shadow-platform-focus-ring';
 
 describe(tv, () => {
   it('keeps a platform text size alongside a platform text colour', () => {
@@ -36,10 +35,12 @@ describe(tv, () => {
     );
   });
 
-  it('keeps an inset platform shadow beside a platform drop shadow', () => {
-    const variants = tv({ base: DROP_AND_INSET_SHADOW });
+  it('replaces an earlier inset shadow with the inset focus ring', () => {
+    const variants = tv({ base: 'inset-shadow-sm' });
 
-    expect(variants()).toBe(DROP_AND_INSET_SHADOW);
+    expect(variants({ class: INSET_FOCUS_RING_SHADOW })).toBe(
+      INSET_FOCUS_RING_SHADOW,
+    );
   });
 
   it('replaces an earlier platform shadow with the focus ring', () => {

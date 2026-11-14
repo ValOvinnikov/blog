@@ -1,3 +1,5 @@
+import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
+import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const MENU_GROUP_LABEL_TYPE =
@@ -18,6 +20,7 @@ export const menuSurfaceVariants = tv({
       'flex min-h-11 cursor-pointer items-center gap-2.5 rounded-platform-control px-2 py-1.5',
       'text-platform-13 font-medium text-platform-text outline-none [&+&]:mt-0.5',
       'data-[highlighted]:bg-platform-popover-hover',
+      insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
     ],
     groupLabel: [MENU_GROUP_LABEL_TYPE, 'px-2 pt-2 pb-1'],
   },

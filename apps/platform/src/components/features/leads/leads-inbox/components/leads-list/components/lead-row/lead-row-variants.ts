@@ -24,7 +24,9 @@ export const leadRowVariants = tv({
     isSelected: {
       true: {
         row: [
-          'bg-platform-brand-weak ring-1 ring-inset ring-platform-brand hover:bg-platform-brand-weak',
+          'relative bg-platform-brand-weak hover:bg-platform-brand-weak',
+          // A border on a pseudo-element, so it paints above the inset focus ring instead of under it.
+          'after:pointer-events-none after:absolute after:inset-0 after:border after:border-platform-brand',
           insetFocusRingClasses(FOCUS_RING_GROUND.BRAND_WEAK),
         ],
       },

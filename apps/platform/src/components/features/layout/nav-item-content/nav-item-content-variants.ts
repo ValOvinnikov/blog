@@ -47,11 +47,6 @@ export const navItemContentVariants = tv({
         rowIcon: ['mt-0.5 self-start'],
       },
     },
-    hasRailBadge: {
-      true: {
-        rowIcon: ['group-focus-visible:text-platform-text-strong'],
-      },
-    },
     hasNeutralBadge: {
       true: {
         badgeSlot: ['max-md:bg-platform-pill-neutral-popover'],

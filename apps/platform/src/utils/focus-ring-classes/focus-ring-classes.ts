@@ -1,6 +1,7 @@
 import {
   FOCUS_RING_GROUND,
   FOCUS_RING_TRIGGER,
+  type TCheckedFocusRingGround,
   type TFocusRingGround,
   type TFocusRingTrigger,
 } from '@platform/constants/focus-ring';
@@ -19,33 +20,40 @@ const FOCUS_RING_GROUND_CLASSES: Record<TFocusRingGround, string> = {
     '[--platform-focus-ground:var(--platform-popover)]',
   [FOCUS_RING_GROUND.POPOVER_HOVER]:
     '[--platform-focus-ground:var(--platform-popover-hover)]',
+  [FOCUS_RING_GROUND.SEGMENT_ON]:
+    '[--platform-focus-ground:var(--platform-segment-on)]',
   [FOCUS_RING_GROUND.THEME_TRACK]:
     '[--platform-focus-ground:var(--platform-theme-track)]',
   [FOCUS_RING_GROUND.BRAND_WEAK]:
     '[--platform-focus-ground:var(--platform-brand-weak)]',
 };
 
+const CHECKED_FOCUS_RING_GROUND_CLASSES: Record<
+  TCheckedFocusRingGround,
+  string
+> = {
+  [FOCUS_RING_GROUND.SEGMENT_ON]:
+    'data-[checked]:[--platform-focus-ground:var(--platform-segment-on)]',
+};
+
+// Forced colours drop box-shadows; the theme's `:focus-visible` outline covers only the default trigger.
 const FOCUS_RING_TRIGGER_CLASSES: Record<TFocusRingTrigger, string> = {
   [FOCUS_RING_TRIGGER.FOCUS_VISIBLE]:
     'focus-visible:outline-hidden focus-visible:shadow-platform-focus-ring',
-  [FOCUS_RING_TRIGGER.HIGHLIGHTED]:
-    'data-[highlighted]:shadow-platform-focus-ring',
   [FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED]:
-    'group-focus-visible:data-[highlighted]:shadow-platform-focus-ring',
+    'group-focus-visible:data-[highlighted]:shadow-platform-focus-ring forced-colors:group-focus-visible:data-[highlighted]:outline-2 forced-colors:group-focus-visible:data-[highlighted]:outline-offset-2 forced-colors:group-focus-visible:data-[highlighted]:outline-[Highlight]',
   [FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE]:
-    'has-[:focus-visible]:not-data-[dragging]:shadow-platform-focus-ring',
+    'has-[:focus-visible]:not-data-[dragging]:shadow-platform-focus-ring forced-colors:has-[:focus-visible]:outline-2 forced-colors:has-[:focus-visible]:outline-offset-2 forced-colors:has-[:focus-visible]:outline-[Highlight]',
 };
 
 // An inset shadow, so it stacks with the element's own drop shadow instead of replacing it.
 const INSET_FOCUS_RING_TRIGGER_CLASSES: Record<TFocusRingTrigger, string> = {
   [FOCUS_RING_TRIGGER.FOCUS_VISIBLE]:
     'focus-visible:outline-hidden focus-visible:inset-shadow-platform-focus-ring',
-  [FOCUS_RING_TRIGGER.HIGHLIGHTED]:
-    'data-[highlighted]:inset-shadow-platform-focus-ring',
   [FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED]:
-    'group-focus-visible:data-[highlighted]:inset-shadow-platform-focus-ring',
+    'group-focus-visible:data-[highlighted]:inset-shadow-platform-focus-ring forced-colors:group-focus-visible:data-[highlighted]:outline-2 forced-colors:group-focus-visible:data-[highlighted]:-outline-offset-2 forced-colors:group-focus-visible:data-[highlighted]:outline-[Highlight]',
   [FOCUS_RING_TRIGGER.INNER_FOCUS_VISIBLE]:
-    'has-[:focus-visible]:not-data-[dragging]:inset-shadow-platform-focus-ring',
+    'has-[:focus-visible]:not-data-[dragging]:inset-shadow-platform-focus-ring forced-colors:has-[:focus-visible]:outline-2 forced-colors:has-[:focus-visible]:-outline-offset-2 forced-colors:has-[:focus-visible]:outline-[Highlight]',
 };
 
 export const focusRingClasses = (
@@ -60,3 +68,7 @@ export const insetFocusRingClasses = (
   trigger: TFocusRingTrigger = FOCUS_RING_TRIGGER.FOCUS_VISIBLE,
 ): string =>
   `${INSET_FOCUS_RING_TRIGGER_CLASSES[trigger]} ${FOCUS_RING_GROUND_CLASSES[ground]}`;
+
+export const checkedFocusRingGroundClasses = (
+  ground: TCheckedFocusRingGround,
+): string => CHECKED_FOCUS_RING_GROUND_CLASSES[ground];

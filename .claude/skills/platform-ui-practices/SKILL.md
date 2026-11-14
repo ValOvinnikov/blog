@@ -320,9 +320,13 @@ text-platform-on-selected` — near-black and white in Light, yellow on a dark
   `Button` draws: pass the `FOCUS_RING_GROUND` (`@platform/constants/focus-ring`)
   the control sits on, so the gap matches its surface;
   `insetFocusRingClasses` for a row or menu item a clipping parent would cut
-  the ring off (its ground is the row's own fill). A mark shown on something
-  other than `:focus-visible` (a highlighted menu item or list option, a
-  focused input inside the control) passes the `FOCUS_RING_TRIGGER`. A text
+  the ring off, including menu and select items, which ring on keyboard focus
+  only. Its ground is the row's own fill, per state (a checked item adds
+  `checkedFocusRingGroundClasses`), and a selected marker on it (a bar, an
+  edge) is a pseudo-element, which paints above the inset shadow. A mark
+  shown on something other than `:focus-visible` (an option highlighted in a
+  focused list, a focused input inside the control) passes the
+  `FOCUS_RING_TRIGGER`; the helper adds its forced-colours outline. A text
   field, textarea, link field or rich-text editor instead takes
   `FIELD_FOCUS_CLASSES` or `EDITABLE_SHELL_FOCUS_CLASSES`
   (`@platform/utils/field-surface-classes/field-surface-classes`): a
