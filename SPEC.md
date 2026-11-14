@@ -2448,8 +2448,9 @@ archive with pagination, and **every** tag/topic page of the tenant with their
 own pagination, not only the ones the post currently belongs to (a
 re-categorisation or removal would otherwise leave stale HTML on the page the
 post no longer occupies, with no way to detect it). A renamed slug — of a
-post, topic, tag, landing page or privacy or legal document — is a known,
-unsolved gap: the old slug isn't recoverable from the webhook payload, so the
+post, topic, tag or privacy or legal document — is a known, unsolved gap (a
+renamed landing page is covered: its path change writes a `redirect`, whose
+publish runs the whole-site purge): the old slug isn't recoverable from the webhook payload, so the
 page at the old URL stays stale until the route-level backstop below expires
 it. Every other tagged type, a post the lookup no longer finds and a
 Look, Voice or Features save purge every page the publishing tenant renders —

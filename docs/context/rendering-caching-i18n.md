@@ -104,12 +104,13 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   does not carry.
 
   **Known limitation, accepted rather than solved:** a renamed slug — of a
-  post, topic, tag, landing page or privacy or legal document — is not
+  post, topic, tag or privacy or legal document — is not
   recoverable from the webhook payload, so the page at the _old_ slug keeps
   its stale prerendered HTML until the route-level backstop below expires
   it. Fixing this properly would require
   reconfiguring the Sanity webhook to project the document's previous slug,
-  which is human-gated console work.
+  which is human-gated console work. A renamed landing page is covered: its
+  path change writes a `redirect`, whose publish runs the whole-site purge.
 
   Every other `_type` (including the `posts`-tagged
   `person`/`blog_topic`/`blog_tag`, whose edit can affect every
@@ -119,8 +120,7 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   (`server/tenant/tenant-page-lists`), the index, legal and newsletter pages
   in every live language, the page after each listing's current last (a
   removed entry can leave it cached), and the changed document's own path
-  from the webhook's projected `slug` through `pageHref` — so a deleted or
-  unpublished landing page, topic, tag or section document is purged too. A
+  from the webhook's projected `slug` through `pageHref`. A
   large tenant costs roughly one `revalidatePath` per listed page and
   pagination page, plus one next page per topic and tag and about sixteen
   per live language. Three cases skip the derivation because no list holds
