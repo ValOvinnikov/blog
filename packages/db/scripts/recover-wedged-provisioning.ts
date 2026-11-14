@@ -1,21 +1,4 @@
-/**
- * Settles every tenant stuck at `provisioningStatus: PROVISIONING` despite
- * one of its steps recording FAILED — a state `beginTenantProvisioning`'s
- * retry guard cannot get a wedged row out of on its own, since the guard
- * only admits a row that is NULL or not PROVISIONING. Moves each one to
- * FAILED, from which a normal Retry re-dispatches it.
- *
- * MANUAL, HUMAN-RUN ONLY — never wired into CI or any deploy pipeline. Run
- * it by hand, once, against the target Neon branch:
- *
- *   set -a && source apps/web/.env.local && set +a
- *   pnpm --filter @blog/db db:recover-wedged-provisioning -- --dry-run
- *   pnpm --filter @blog/db db:recover-wedged-provisioning
- *
- * `--dry-run` lists the affected tenant ids without writing; omit it to
- * apply. Idempotent: re-running finds nothing once every wedged tenant has
- * been settled.
- */
+// Manual, human-run only: never wire it into CI or a deploy pipeline.
 import { pathToFileURL } from 'node:url';
 
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
@@ -24,7 +7,7 @@ import {
   setTenantProvisioningStatus,
 } from '@blog/db/queries/tenants';
 
-import { hasDryRunFlag } from './lib/dry-run-flag';
+import { parseDryRun } from './lib/cli-flags';
 
 export async function recoverWedgedTenants(dryRun: boolean): Promise<number> {
   const wedged = await listTenantsWedgedInProvisioning();
@@ -46,7 +29,7 @@ export async function recoverWedgedTenants(dryRun: boolean): Promise<number> {
 }
 
 async function main(): Promise<void> {
-  const dryRun = hasDryRunFlag(process.argv);
+  const dryRun = parseDryRun(process.argv.slice(2));
   const count = await recoverWedgedTenants(dryRun);
 
   console.warn(

@@ -82,6 +82,7 @@ The run then verifies all of it. The platform polls each step's progress and off
 - **Manual CLIs:** `db:seed-tenant` and `db:recover-wedged-provisioning`, run by hand against a chosen Neon branch, never from CI.
   - `pnpm --filter @blog/db db:seed-tenant -- --name=<name> --primary-domain=<host> --sanity-project-id=<id> --sanity-dataset=<dataset> --locale=<locale> --owner-email=<email> [--plan=<TENANT_PLAN>] [--status=ACTIVE|SUSPENDED] [--domain=<host> ...] [--sanity-read-token=<token>]`, with the app's env loaded.
   - It is idempotent: it finds the tenant by primary domain, then by Sanity project id, and reuses it; a domain whose tenant holds a different Sanity project id is refused. The owner must have signed in once, since it creates no `users` row.
+  - `pnpm --filter @blog/db db:recover-wedged-provisioning` lists the tenants stuck at PROVISIONING with a FAILED step, writing nothing; `-- --dry-run=false` (or `DRY_RUN=false`) moves each one to FAILED, from which Retry re-dispatches it. It is idempotent.
 - **Break-glass CLI:** `pnpm --filter worker provision-tenant -- --tenant-id=<uuid>`, run with the worker's env, provisions one tenant when the worker deployment cannot. It runs the same units in the same order behind the same `beginTenantProvisioning` guard, but once: no durable retries, so a unit's first failure marks its step FAILED. It never starts owner access and logs `provisioning.cli_owner_access_not_started`; a signed `POST /api/owner-access/check` starts it. Its run id starts `cli-`.
 
 ## Data
