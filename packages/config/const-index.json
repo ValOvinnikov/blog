@@ -10854,6 +10854,14 @@
         "file": "apps/worker/src/constants/scheduled-post-purge.ts"
       }
     ],
+    "scheduled_post_purge.run_failed": [
+      {
+        "ref": "SCHEDULED_POST_PURGE_LOG.RUN_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/scheduled-post-purge",
+        "file": "apps/worker/src/constants/scheduled-post-purge.ts"
+      }
+    ],
     "STALE": [
       {
         "ref": "SCHEDULED_POST_STATE.STALE",

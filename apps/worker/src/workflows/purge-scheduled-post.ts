@@ -4,6 +4,7 @@ import {
 } from '@worker/constants/scheduled-post-purge';
 import { checkScheduledPost } from '@worker/units/scheduled-post-purge/check-scheduled-post';
 import { purgeScheduledPostPages } from '@worker/units/scheduled-post-purge/purge-scheduled-post-pages';
+import { reportScheduledPostPurgeFailed } from '@worker/units/scheduled-post-purge/report-scheduled-post-purge-failed';
 import { createHook, sleep } from 'workflow';
 
 export async function purgeScheduledPost(
@@ -27,6 +28,13 @@ export async function purgeScheduledPost(
     if (check.state === SCHEDULED_POST_STATE.DUE) {
       await purgeScheduledPostPages(tenantId, postId);
     }
+  } catch (error) {
+    await reportScheduledPostPurgeFailed(
+      tenantId,
+      postId,
+      error instanceof Error ? error.message : String(error),
+    );
+    throw error;
   } finally {
     run.dispose();
   }

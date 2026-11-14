@@ -1,17 +1,22 @@
 import { SCHEDULED_POST_STATE } from '@worker/constants/scheduled-post-purge';
 import { SCHEDULED_POST_RECHECK_MS } from '@worker/constants/workflow';
+import { MOCK_WORKFLOW_CRASH } from '@worker/testing/outage/fixtures';
 import { MOCK_POST_ID } from '@worker/testing/post/fixtures';
 import { MOCK_PUBLISHED_AT } from '@worker/testing/scheduled-post-purge/fixtures';
 import { MOCK_TENANT_ID } from '@worker/testing/tenant/fixtures';
 import { fakeRunHook } from '@worker/testing/workflow/run-hook';
 import { checkScheduledPost } from '@worker/units/scheduled-post-purge/check-scheduled-post';
 import { purgeScheduledPostPages } from '@worker/units/scheduled-post-purge/purge-scheduled-post-pages';
+import { reportScheduledPostPurgeFailed } from '@worker/units/scheduled-post-purge/report-scheduled-post-purge-failed';
 import { sleep } from 'workflow';
 
 import { purgeScheduledPost } from './purge-scheduled-post';
 
 vi.mock('@worker/units/scheduled-post-purge/check-scheduled-post');
 vi.mock('@worker/units/scheduled-post-purge/purge-scheduled-post-pages');
+vi.mock(
+  '@worker/units/scheduled-post-purge/report-scheduled-post-purge-failed',
+);
 vi.mock('workflow');
 
 const MOCK_SCHEDULED = {
@@ -67,6 +72,23 @@ describe(purgeScheduledPost, () => {
 
     expect(checkScheduledPost).not.toHaveBeenCalled();
     expect(purgeScheduledPostPages).not.toHaveBeenCalled();
+    expect(hook.dispose).toHaveBeenCalled();
+  });
+
+  it('reports a run that fails after its retries, then rethrows', async () => {
+    vi.mocked(checkScheduledPost).mockResolvedValue({
+      state: SCHEDULED_POST_STATE.DUE,
+    });
+    vi.mocked(purgeScheduledPostPages).mockRejectedValue(
+      new Error(MOCK_WORKFLOW_CRASH),
+    );
+
+    await expect(runPurge()).rejects.toThrow(MOCK_WORKFLOW_CRASH);
+    expect(reportScheduledPostPurgeFailed).toHaveBeenCalledWith(
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      MOCK_WORKFLOW_CRASH,
+    );
     expect(hook.dispose).toHaveBeenCalled();
   });
 });

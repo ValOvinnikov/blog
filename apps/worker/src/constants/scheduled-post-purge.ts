@@ -1,5 +1,6 @@
 export const SCHEDULED_POST_PURGE_LOG = {
   START_FAILED: 'scheduled_post_purge.start_failed',
+  RUN_FAILED: 'scheduled_post_purge.run_failed',
 } as const;
 
 export const SCHEDULED_POST_STATE = {
