@@ -15,6 +15,7 @@ import { PresetValueButton } from '@platform/components/features/look/look-form/
 import { useLookFieldLock } from '@platform/components/features/look/look-form/use-look-field-lock';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { useLookForm } from '@platform/components/features/look/look-form-provider';
+import { SampleSpinner } from '@platform/components/features/site-preview/sample-spinner';
 import { LockedReason } from '@platform/components/shared/locked-reason';
 import { OptionSelect } from '@platform/components/shared/option-select';
 import { SegmentedControl } from '@platform/components/shared/segmented-control';
@@ -46,13 +47,18 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
     (shape) => t(`buttonShapeOptionLabel.${shape}`),
   );
 
-  const busyOptions = toOptions(BUSY_BUTTON_STYLE, (style) =>
-    t(`busyButtonStyleOptionLabel.${style}`),
+  const busyOptions = toLookGlyphOptions(
+    'busyButtonStyle',
+    BUSY_BUTTON_STYLE,
+    (style) => t(`busyButtonStyleOptionLabel.${style}`),
   );
 
   const spinnerOptions = toOptions(SPINNER_STYLE, (style) =>
     t(`spinnerStyleOptionLabel.${style}`),
-  );
+  ).map((option) => ({
+    ...option,
+    glyph: <SampleSpinner variant={option.value} />,
+  }));
 
   const spinnerStyleLabel = t('spinnerStyleLabel');
 
