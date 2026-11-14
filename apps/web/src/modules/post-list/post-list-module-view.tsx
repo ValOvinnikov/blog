@@ -25,31 +25,32 @@ export interface IPostListModulePagination {
 
 export interface IPostListModuleViewProps extends Pick<
   TPostListModule,
-  'headingBlock' | 'contentAlignment' | 'columns'
+  'headingBlock' | 'contentAlignment'
 > {
   section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
+  grid: Pick<TPostListModule, 'columns' | 'showImages'>;
   items: IMediaCardData[];
   titleId: string;
   dataTestId: string;
   emptyMessage?: ReactNode;
   pagination?: IPostListModulePagination;
-  hasImages?: boolean;
+  children?: ReactNode;
 }
 
 export const PostListModuleView = ({
   section,
   headingBlock,
+  grid,
   items,
-  columns,
   titleId,
   dataTestId,
   emptyMessage,
   pagination,
   contentAlignment,
-  hasImages,
+  children,
 }: IPostListModuleViewProps) => {
   const isEmpty = !hasLength(items);
-  const v = postListModuleViewVariants();
+  const v = postListModuleViewVariants({ align: contentAlignment });
 
   return (
     <Section
@@ -66,12 +67,17 @@ export const PostListModuleView = ({
         align={contentAlignment}
         variant="section"
       />
+      {children ? <div className={v.leadIn()}>{children}</div> : null}
       {isEmpty ? (
         <p className={v.emptyMessage()}>{emptyMessage}</p>
       ) : (
-        <CardGrid columns={toCardGridColumns(columns)}>
+        <CardGrid columns={toCardGridColumns(grid.columns)}>
           {items.map((item) => (
-            <MediaCardItem key={item.id} item={item} hasImage={hasImages} />
+            <MediaCardItem
+              key={item.id}
+              item={item}
+              hasImage={grid.showImages}
+            />
           ))}
         </CardGrid>
       )}

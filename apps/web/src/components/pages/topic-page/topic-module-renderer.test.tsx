@@ -11,7 +11,10 @@ import {
   mockModule,
 } from '@web/testing/shared/module-renderer-contract/fixtures';
 import {
-  testChildrenBetweenHeroAndModules,
+  testChildrenBetweenHeroAndModulesWithoutPostList,
+  testChildrenInsideFirstPostList,
+} from '@web/testing/shared/module-renderer-contract/module-renderer-children-contract';
+import {
   testFallsBackToHeadingWithoutHero,
   testHeadingWithoutHero,
   testRendersAllowedModulesInOrder,
@@ -68,7 +71,8 @@ describe(`<${TopicModuleRenderer.name}/>`, () => {
     heroBlogModuleMock: vi.mocked(HeroBlogModule),
     headingText: MOCK_PAGE_HEADING,
   });
-  testChildrenBetweenHeroAndModules({ setup });
+  testChildrenInsideFirstPostList({ setup });
+  testChildrenBetweenHeroAndModulesWithoutPostList({ setup });
   testWarnsForUnknownModule({
     setup,
     loggerWarnMock,

@@ -6,8 +6,11 @@ import { isModuleEntitled } from '@web/server/settings-features/is-module-entitl
 import { logger } from '@web/utils/logger/logger';
 import type { ReactNode } from 'react';
 
+import { moduleSlotVariants } from './module-renderer-variants';
+
 export type TModuleComponentProps = {
   id: string;
+  children?: ReactNode;
   context?: {
     post?: { id: string };
     homePage?: { id: string };
@@ -33,33 +36,55 @@ type TModuleMap = Partial<
   >
 >;
 
+/** Content placed inside the first module of `moduleType`, or in its own band before the modules when the page has none. */
+export interface IModuleSlot {
+  moduleType: TModule['type'];
+  node: ReactNode;
+}
+
 export interface IRenderModulesProps {
   modules: TModule[];
   map: TModuleMap;
   context?: TModuleComponentProps['context'];
+  slot?: IModuleSlot;
 }
 
 export const renderModules = ({
   modules,
   map,
   context,
-}: IRenderModulesProps): ReactNode =>
-  modules.map((module) => {
-    const Component = map[module.type];
+  slot,
+}: IRenderModulesProps): ReactNode => {
+  const slotHostId = slot
+    ? modules.find(({ type }) => type === slot.moduleType)?.id
+    : undefined;
 
-    if (!Component) {
-      logger.warn(MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE, {
-        moduleType: module.type,
-      });
-      return null;
-    }
+  return (
+    <>
+      {slot && !slotHostId ? (
+        <div className={moduleSlotVariants()}>{slot.node}</div>
+      ) : null}
+      {modules.map((module) => {
+        const Component = map[module.type];
 
-    return (
-      <ModuleGate key={module.id} moduleType={module.type}>
-        <Component id={module.id} context={context} />
-      </ModuleGate>
-    );
-  });
+        if (!Component) {
+          logger.warn(MODULE_RENDERER_LOG.UNKNOWN_MODULE_TYPE, {
+            moduleType: module.type,
+          });
+          return null;
+        }
+
+        return (
+          <ModuleGate key={module.id} moduleType={module.type}>
+            <Component id={module.id} context={context}>
+              {module.id === slotHostId ? slot?.node : undefined}
+            </Component>
+          </ModuleGate>
+        );
+      })}
+    </>
+  );
+};
 
 export interface IRenderHeroModuleProps {
   hero: TModule;
