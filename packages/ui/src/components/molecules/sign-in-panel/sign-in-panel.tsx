@@ -5,6 +5,7 @@ import {
 } from '@blog/config';
 import type { TButtonProps } from '@blog/ui/components/atoms/button';
 import type { TSpinnerProps } from '@blog/ui/components/atoms/spinner';
+import { hasArrayGotItems } from '@blog/utils/primitives';
 import { useId, type ReactNode, type Ref } from 'react';
 
 import {
@@ -90,7 +91,7 @@ export const SignInPanel = ({
       ) : (
         <>
           {title}
-          {providers.length > 0 && (
+          {hasArrayGotItems(providers) && (
             <>
               <div className={s.providers()}>
                 {providers.map((provider) => (

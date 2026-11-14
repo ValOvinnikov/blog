@@ -1,5 +1,5 @@
 import { HEADER_CONTROL_STYLE } from '@blog/config';
-import { LookOptionGlyph } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { SEGMENTED_LAYOUT } from '@platform/constants/segmented-control';
 import { useTranslations } from 'next-intl';
@@ -7,12 +7,12 @@ import { useTranslations } from 'next-intl';
 export const HeaderControlStyleField = () => {
   const t = useTranslations('lookForm');
 
-  const options = Object.values(HEADER_CONTROL_STYLE).map((style) => ({
-    value: style,
-    label: t(`headerControlStyleOptionLabel.${style}`),
-    description: t(`headerControlStyleOptionDescription.${style}`),
-    glyph: <LookOptionGlyph field="headerControlStyle" value={style} />,
-  }));
+  const options = toLookGlyphOptions(
+    'headerControlStyle',
+    HEADER_CONTROL_STYLE,
+    (style) => t(`headerControlStyleOptionLabel.${style}`),
+    (style) => t(`headerControlStyleOptionDescription.${style}`),
+  );
 
   return (
     <LookPresetChoiceField

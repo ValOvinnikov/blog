@@ -1,22 +1,11 @@
-/**
- * Owner-elevation sweep entrypoint — periodically re-checks every fully
- * core-provisioned, active tenant's Sanity project ACL and promotes its
- * owner from `viewer` to `administrator` once they've accepted their
- * invite (see `elevateTenantOwner`).
- *
- * Invoked only by `.github/workflows/recheck-tenant-owners.yml` via
- * `pnpm --filter @blog/db db:recheck-tenant-owners` — never run by hand
- * against a shared/production tenant registry outside that workflow.
- *
- * `--conditions=react-server` makes `getDb()`'s `import 'server-only'`
- * resolve to a no-op outside Next.js's own build.
- */
-import { pathToFileURL } from 'node:url';
-
+// Promotes each core-provisioned active tenant's owner to Sanity `administrator` once they have accepted their invite.
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import { listTenantsPendingOwnerElevation } from '@blog/db/queries/tenants';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { sanitizeLogMessage } from '@blog/insight';
+import { isUndefined } from '@blog/utils/primitives';
+
+import { runIfEntrypoint } from '../lib/run-if-entrypoint';
 
 import { elevateTenantOwner } from './lib/elevate-tenant-owner';
 import { loadRecheckEnv, type TRecheckEnv } from './lib/env';
@@ -59,7 +48,7 @@ async function recheckOne(
     await reportOwnerElevationOutcome(
       tenant.id,
       outcome,
-      ...(notifiedOutcome === undefined ? [] : [notifiedOutcome]),
+      ...(isUndefined(notifiedOutcome) ? [] : [notifiedOutcome]),
     );
 
     switch (outcome) {
@@ -93,8 +82,6 @@ async function recheckOne(
   }
 }
 
-// Exported for direct testing of the sweep logic without also exercising
-// env loading.
 export async function runRecheck(env: TRecheckEnv): Promise<TRecheckSummary> {
   const candidates = await listTenantsPendingOwnerElevation();
   const summary = emptySummary();
@@ -114,12 +101,7 @@ export async function runRecheck(env: TRecheckEnv): Promise<TRecheckSummary> {
   return summary;
 }
 
-// Exported for direct testing of the exit-code decision without also
-// exercising env loading or the sweep itself. `errors` means the per-tenant
-// call itself threw (e.g. a network/API failure) — the expected
-// STALLED/PENDING_ACCEPTANCE/AMBIGUOUS_MEMBERSHIP outcomes never count
-// here, since `recheckOne` already tallies those separately and they are
-// not failures.
+// `errors` counts only calls that threw — STALLED/PENDING_ACCEPTANCE/AMBIGUOUS_MEMBERSHIP outcomes are not failures.
 export function hasSystemicFailures(summary: TRecheckSummary): boolean {
   return summary.errors > 0;
 }
@@ -132,15 +114,4 @@ async function main(): Promise<void> {
   }
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
-// against `main()` firing as an import side effect when a test imports
-// `runRecheck` from this same module.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((error: unknown) => {
-    console.error('recheck-tenant-owners: unexpected failure:', error);
-    process.exitCode = 1;
-  });
-}
+runIfEntrypoint(import.meta.url, main, 'recheck-tenant-owners');

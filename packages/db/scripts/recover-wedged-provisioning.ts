@@ -1,23 +1,4 @@
-/**
- * Settles every tenant stuck at `provisioningStatus: PROVISIONING` despite
- * one of its steps recording FAILED — a state `beginTenantProvisioning`'s
- * retry guard cannot get a wedged row out of on its own, since the guard
- * only admits a row that is NULL or not PROVISIONING. Moves each one to
- * FAILED, from which a normal Retry re-dispatches it.
- *
- * MANUAL, HUMAN-RUN ONLY — never wired into CI or any deploy pipeline. Run
- * it by hand, once, against the target Neon branch:
- *
- *   set -a && source apps/web/.env.local && set +a
- *   pnpm --filter @blog/db db:recover-wedged-provisioning -- --dry-run
- *   pnpm --filter @blog/db db:recover-wedged-provisioning
- *
- * `--dry-run` lists the affected tenant ids without writing; omit it to
- * apply. Idempotent: re-running finds nothing once every wedged tenant has
- * been settled.
- */
-import { pathToFileURL } from 'node:url';
-
+// Manual, human-run only (`--dry-run` lists without writing): moves tenants wedged at PROVISIONING after a FAILED step to FAILED, so a normal Retry re-dispatches them.
 import { TENANT_PROVISIONING_STATUS } from '@blog/db/constants';
 import {
   listTenantsWedgedInProvisioning,
@@ -25,6 +6,7 @@ import {
 } from '@blog/db/queries/tenants';
 
 import { hasDryRunFlag } from './lib/dry-run-flag';
+import { runIfEntrypoint } from './lib/run-if-entrypoint';
 
 export async function recoverWedgedTenants(dryRun: boolean): Promise<number> {
   const wedged = await listTenantsWedgedInProvisioning();
@@ -54,14 +36,4 @@ async function main(): Promise<void> {
   );
 }
 
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main()
-    .then(() => process.exit(0))
-    .catch((error: unknown) => {
-      console.error(error);
-      process.exit(1);
-    });
-}
+runIfEntrypoint(import.meta.url, main);

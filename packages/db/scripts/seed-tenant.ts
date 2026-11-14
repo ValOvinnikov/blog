@@ -1,7 +1,5 @@
 // Seeds one tenant's registry rows and grants an existing user OWNER on it; manual, human-run only.
 // `db:seed-tenant` runs with `--conditions=react-server` so `getDb()`'s `server-only` import resolves outside Next.js.
-import { pathToFileURL } from 'node:url';
-
 import { TENANT_PLAN, type TTenantPlan } from '@blog/config/constants';
 import {
   MEMBERSHIP_ROLE,
@@ -23,6 +21,8 @@ import { findUserByEmail } from '@blog/db/queries/users';
 import type { TTenant } from '@blog/db/schema/tenants';
 import { isValidDomain } from '@blog/db/utils/is-valid-domain/is-valid-domain';
 import { isNull } from '@blog/utils/primitives';
+
+import { runIfEntrypoint } from './lib/run-if-entrypoint';
 
 type TParsedArgs = {
   name: string;
@@ -195,15 +195,4 @@ async function main(): Promise<void> {
   console.warn(`Granted OWNER on "${tenant.name}" to "${args.ownerEmail}".`);
 }
 
-// The test imports this module, so main() runs only as the CLI entrypoint.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main()
-    .then(() => process.exit(0))
-    .catch((error: unknown) => {
-      console.error(error);
-      process.exit(1);
-    });
-}
+runIfEntrypoint(import.meta.url, main);

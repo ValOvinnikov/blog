@@ -1,6 +1,4 @@
 // Run only by `.github/workflows/validate-tenant-documents.yml`, never by hand against a shared or production tenant registry.
-import { pathToFileURL } from 'node:url';
-
 import {
   FINDING_KIND,
   FINDING_SEVERITY,
@@ -8,6 +6,7 @@ import {
   FINDING_STATUS,
   type TFindingSeverity,
 } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import {
   listFindingsForTenant,
   openFinding,
@@ -23,6 +22,8 @@ import { isTenantWritable } from '@blog/db/utils/is-tenant-writable/is-tenant-wr
 import { sanitizeLogMessage } from '@blog/insight';
 import { hasLength } from '@blog/utils/primitives';
 
+import { runIfEntrypoint } from '../lib/run-if-entrypoint';
+
 import { notifyOperatorsOfDocumentValidationFailure } from './lib/notify-operators';
 import {
   validateTenantDocuments,
@@ -31,12 +32,10 @@ import {
 
 const TENANT_ID_FLAG = '--tenant-id=';
 
-// Stable across tenants — `tenantId` + `source` + `kind` already scope the
-// dedupe key to one tenant's document-validation state, so this only needs
-// to be a constant, not per-document.
+// `tenantId` + `source` + `kind` already scope the dedupe key, so this need not vary per document.
 export const DOCUMENT_VALIDATION_IDENTIFIER = 'documents';
 
-function parseTenantId(argv: string[]): string | undefined {
+function parseTenantId(argv: string[]): TMaybeUndefined<string> {
   const flag = argv.find((arg) => arg.startsWith(TENANT_ID_FLAG));
   return (
     flag?.slice(TENANT_ID_FLAG.length) || process.env['TENANT_ID'] || undefined
@@ -179,15 +178,11 @@ async function validateCandidates(
   return summary;
 }
 
-// Exported for direct testing of the sweep logic without also exercising
-// tenant enumeration.
 export async function runValidation(): Promise<TValidateSummary> {
   const candidates = await listActiveTenants();
   return validateCandidates(candidates);
 }
 
-// Exported for direct testing of the single-tenant path — used by an
-// operator's scoped `workflow_dispatch` and by the post-provisioning check.
 export async function runValidationForTenant(
   tenantId: string,
 ): Promise<TValidateSummary> {
@@ -195,11 +190,7 @@ export async function runValidationForTenant(
   return validateCandidates(tenant ? [tenant] : []);
 }
 
-// Exported for direct testing of the exit-code decision without also
-// exercising env loading or the sweep itself. `errors` means the sweep
-// itself failed to determine a tenant's validity (a CLI/network failure, or
-// a findings-store write failure) — the expected WARNING/CRITICAL outcomes
-// are reportable results, not failures, and never count here.
+// `errors` counts only sweeps that failed to decide validity — WARNING/CRITICAL outcomes are not failures.
 export function hasSystemicFailures(summary: TValidateSummary): boolean {
   return summary.errors > 0;
 }
@@ -224,15 +215,4 @@ async function main(): Promise<void> {
   }
 }
 
-// Only auto-run when this file is the CLI entrypoint (`tsx run.ts`) — guards
-// against `main()` firing as an import side effect when a test imports
-// `runValidation` from this same module.
-if (
-  process.argv[1] &&
-  import.meta.url === pathToFileURL(process.argv[1]).href
-) {
-  main().catch((error: unknown) => {
-    console.error('validate-tenant-documents: unexpected failure:', error);
-    process.exitCode = 1;
-  });
-}
+runIfEntrypoint(import.meta.url, main, 'validate-tenant-documents');

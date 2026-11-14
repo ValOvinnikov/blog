@@ -1,7 +1,10 @@
 import { HTTP_STATUS, type TMaybeUndefined } from '@blog/config';
 import { queries } from '@blog/db';
 import { isSecretMatch } from '@blog/utils';
+import { hasLength, isNull, isString } from '@blog/utils/primitives';
 import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
+import { purgeDerivedPaths } from '@web/server/revalidate/purge-derived-paths/purge-derived-paths';
+import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
 import { env } from '@web/utils/env/env';
 import { logger } from '@web/utils/logger/logger';
 import {
@@ -11,12 +14,13 @@ import {
   STRIPE_CATALOGUE_CACHE_TAG,
   TENANT_BY_HOST_CACHE_TAG,
 } from '@web/utils/tenant-cache-tags';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
 // `revalidateTag` requires the Node.js runtime (it isn't supported on Edge).
 export const runtime = 'nodejs';
+
+const BEARER_PREFIX = 'Bearer ';
 
 const buildTagsForTenant = (tenantId: string): string[] => [
   buildSiteConfigCacheTag(tenantId),
@@ -24,14 +28,16 @@ const buildTagsForTenant = (tenantId: string): string[] => [
   buildTenantPlanCacheTag(tenantId),
 ];
 
-const revalidateBodySchema = z.object({ tenantId: z.string().min(1) });
-
 const parseTenantId = async (
   request: Request,
 ): Promise<TMaybeUndefined<string>> => {
   try {
-    const parsed = revalidateBodySchema.safeParse(await request.json());
-    return parsed.success ? parsed.data.tenantId : undefined;
+    const body: unknown = await request.json();
+    if (typeof body !== 'object' || isNull(body)) {
+      return undefined;
+    }
+    const tenantId = (body as Record<string, unknown>)['tenantId'];
+    return isString(tenantId) && hasLength(tenantId) ? tenantId : undefined;
   } catch {
     return undefined;
   }
@@ -57,8 +63,8 @@ export async function POST(request: Request): Promise<NextResponse> {
   }
 
   const authHeader = request.headers.get('authorization');
-  const providedSecret = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice('Bearer '.length)
+  const providedSecret = authHeader?.startsWith(BEARER_PREFIX)
+    ? authHeader.slice(BEARER_PREFIX.length)
     : null;
 
   if (!isSecretMatch(providedSecret, secret)) {
@@ -80,11 +86,9 @@ export async function POST(request: Request): Promise<NextResponse> {
     revalidateTag(tag, { expire: 0 });
   }
 
-  logger.warn(REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE, {
-    tenantIds,
-    requestedTenantId,
+  purgeDerivedPaths(await resolveTenantSitePaths(requestedTenantId), {
+    tenantId: requestedTenantId,
   });
-  revalidatePath('/', 'layout');
 
   return NextResponse.json(
     { revalidated: revalidatedTags, pathPurged: true },

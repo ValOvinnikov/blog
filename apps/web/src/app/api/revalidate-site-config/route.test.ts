@@ -1,7 +1,14 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
+import { errorResult, okResult } from '@blog/utils';
 import { isUndefined } from '@blog/utils/primitives';
 import { faker } from '@faker-js/faker';
-import { REVALIDATE_SITE_CONFIG_LOG } from '@web/constants/revalidate-site-config';
+import {
+  FETCH_FAILED_REASON,
+  REVALIDATE_LOG,
+  TENANT_UNRESOLVED_REASON,
+  WHOLE_SITE_PURGE_ARGS,
+} from '@web/constants/revalidate';
+import { resolveTenantSitePaths } from '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths';
 import {
   MOCK_OTHER_TENANT_ID,
   MOCK_TENANT_ID,
@@ -41,12 +48,21 @@ vi.mock('@blog/db', () => ({
 
 vi.mock('@web/utils/env/env', () => ({ env: envMock }));
 
+vi.mock(
+  '@web/server/revalidate/resolve-tenant-site-paths/resolve-tenant-site-paths',
+  () => ({ resolveTenantSitePaths: vi.fn() }),
+);
+
 const AUTHORIZATION_HEADER = 'authorization';
 const MOCK_REVALIDATE_URL = faker.internet.url();
 const MOCK_REVALIDATE_SECRET = faker.string.alphanumeric(32);
 const MOCK_WRONG_SECRET = faker.string.alphanumeric(32);
 const BEARER_SECRET = `Bearer ${MOCK_REVALIDATE_SECRET}`;
 const MALFORMED_JSON_BODY = faker.lorem.word();
+const MOCK_TENANT_PATHS = [
+  faker.system.directoryPath(),
+  faker.system.directoryPath(),
+];
 
 const tagsForTenant = (tenantId: string): string[] => [
   buildSiteConfigCacheTag(tenantId),
@@ -80,9 +96,12 @@ describe(POST, () => {
       mockTenant({ id: MOCK_OTHER_TENANT_ID }),
     ]);
     vi.mocked(logger.warn).mockReset();
+    vi.mocked(resolveTenantSitePaths).mockResolvedValue(
+      okResult(MOCK_TENANT_PATHS),
+    );
   });
 
-  it('revalidates only the given tenant’s tags plus the shared ones', async () => {
+  it('revalidates the given tenant’s scoped tags and the host lookups when a tenantId is given', async () => {
     const request = makeRequest(
       BEARER_SECRET,
       JSON.stringify({ tenantId: MOCK_TENANT_ID }),
@@ -102,13 +121,34 @@ describe(POST, () => {
       expectedTags.map((tag) => [tag, { expire: 0 }]),
     );
     expect(listTenantsMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+  });
+
+  it('purges only the given tenant’s own paths', async () => {
+    await POST(
+      makeRequest(BEARER_SECRET, JSON.stringify({ tenantId: MOCK_TENANT_ID })),
+    );
+
+    expect(resolveTenantSitePaths).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    expect(revalidatePathMock.mock.calls).toEqual(
+      MOCK_TENANT_PATHS.map((path) => [path]),
+    );
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('purges the whole site and logs when the tenant’s paths fail', async () => {
+    vi.mocked(resolveTenantSitePaths).mockResolvedValue(
+      errorResult(FETCH_FAILED_REASON),
+    );
+
+    const response = await POST(
+      makeRequest(BEARER_SECRET, JSON.stringify({ tenantId: MOCK_TENANT_ID })),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(revalidatePathMock.mock.calls).toEqual([WHOLE_SITE_PURGE_ARGS]);
     expect(logger.warn).toHaveBeenCalledWith(
-      REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE,
-      {
-        tenantIds: [MOCK_TENANT_ID],
-        requestedTenantId: MOCK_TENANT_ID,
-      },
+      REVALIDATE_LOG.PATH_PURGE_FALLBACK,
+      { tenantId: MOCK_TENANT_ID, reason: FETCH_FAILED_REASON },
     );
   });
 
@@ -120,8 +160,12 @@ describe(POST, () => {
     },
     { case: 'the body is malformed JSON', body: MALFORMED_JSON_BODY },
   ])(
-    'revalidates every tenant’s tags plus the shared ones when $case',
+    'revalidates every tenant’s scoped tags and purges the whole site when $case',
     async ({ body }) => {
+      vi.mocked(resolveTenantSitePaths).mockResolvedValue(
+        errorResult(TENANT_UNRESOLVED_REASON),
+      );
+
       const request = makeRequest(BEARER_SECRET, body);
       const response = await POST(request);
       const json = await response.json();
@@ -136,13 +180,11 @@ describe(POST, () => {
       expect(response.status).toBe(HTTP_STATUS.OK);
       expect(json).toEqual({ revalidated: expectedTags, pathPurged: true });
       expect(purgedTags()).toEqual(expectedTags);
-      expect(revalidatePathMock).toHaveBeenCalledWith('/', 'layout');
+      expect(resolveTenantSitePaths).toHaveBeenCalledWith(undefined);
+      expect(revalidatePathMock.mock.calls).toEqual([WHOLE_SITE_PURGE_ARGS]);
       expect(logger.warn).toHaveBeenCalledWith(
-        REVALIDATE_SITE_CONFIG_LOG.WHOLE_SITE_PURGE,
-        {
-          tenantIds: [MOCK_TENANT_ID, MOCK_OTHER_TENANT_ID],
-          requestedTenantId: undefined,
-        },
+        REVALIDATE_LOG.PATH_PURGE_FALLBACK,
+        { tenantId: undefined, reason: TENANT_UNRESOLVED_REASON },
       );
     },
   );

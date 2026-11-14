@@ -1,56 +1,26 @@
-import type { TMaybeNull, TMaybeUndefined } from '@blog/config/types';
-import { getDb } from '@blog/db/client';
-import type {
-  TTenantProvisioningStatus,
-  TTenantStatus,
-} from '@blog/db/constants';
-import { tenants, type TTenant } from '@blog/db/schema/tenants';
-import { requireTenantTokenEncryptionKey } from '@blog/db/utils/tenant-token-encryption-key/tenant-token-encryption-key';
-import { decryptSecret } from '@blog/utils';
-import { eq } from 'drizzle-orm';
+import type { TMaybeUndefined } from '@blog/config/types';
+import { getTenantById } from '@blog/db/queries/tenants/get-tenant-by-id';
+import {
+  toTenantSanityTokenCredentials,
+  type TTenantSanityTokenCredentials,
+} from '@blog/db/queries/tenants/tenant-sanity-token-credentials';
+import type { TTenant } from '@blog/db/schema/tenants';
 
-export type TTenantSanityWriteCredentials = {
-  projectId: string;
-  dataset: string;
-  token: string;
-  status: TTenantStatus;
-  deprovisionedAt: TMaybeNull<Date>;
-  provisioningStatus: TMaybeNull<TTenantProvisioningStatus>;
-};
+export type TTenantSanityWriteCredentials = TTenantSanityTokenCredentials;
 
 export function toTenantSanityWriteCredentials(
   tenant: TTenant,
 ): TMaybeUndefined<TTenantSanityWriteCredentials> {
-  if (
-    !tenant.sanityWriteTokenEncrypted ||
-    !tenant.sanityProjectId ||
-    !tenant.sanityDataset
-  ) {
-    return undefined;
-  }
-
-  return {
-    projectId: tenant.sanityProjectId,
-    dataset: tenant.sanityDataset,
-    token: decryptSecret(
-      tenant.sanityWriteTokenEncrypted,
-      requireTenantTokenEncryptionKey(),
-    ),
-    status: tenant.status,
-    deprovisionedAt: tenant.deprovisionedAt,
-    provisioningStatus: tenant.provisioningStatus,
-  };
+  return toTenantSanityTokenCredentials(
+    tenant,
+    tenant.sanityWriteTokenEncrypted,
+  );
 }
 
 export async function getTenantSanityWriteCredentials(
   tenantId: string,
 ): Promise<TMaybeUndefined<TTenantSanityWriteCredentials>> {
-  const db = getDb();
-
-  const [tenant] = await db
-    .select()
-    .from(tenants)
-    .where(eq(tenants.id, tenantId));
+  const tenant = await getTenantById(tenantId, { includeArchived: true });
 
   return tenant && toTenantSanityWriteCredentials(tenant);
 }
