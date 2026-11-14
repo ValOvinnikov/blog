@@ -1,15 +1,21 @@
 import {
   BRAND_VARIANT,
+  CARD_STYLE,
   CONTENT_ALIGNMENT,
+  DENSITY,
   DISPLAY_MODE,
+  GRID_COLUMNS,
   PORTABLE_TEXT_BLOCK_TYPE,
+  RADIUS_SCALE,
 } from '@blog/config/constants';
 import {
   mockCtaButtonView,
   mockRawCtaButton,
+} from '@blog/service/testing/modules/fixtures';
+import {
   mockRawTestimonialItem,
   mockRawTestimonialModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/testimonial/fixtures';
 import {
   MOCK_EXTERNAL_URL,
   mockLinkView,
@@ -75,6 +81,30 @@ describe(toTestimonialModule, () => {
 
     expect(module.contentAlignment).toBeUndefined();
     expect(module.layout).toBeUndefined();
+  });
+
+  it('leaves every appearance override undefined when unset', () => {
+    const module = toTestimonialModule(mockRawTestimonialModule());
+
+    expect(module).toMatchObject({
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
+      columns: undefined,
+    });
+  });
+
+  it('maps the authored appearance overrides straight through', () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.OUTLINED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+      columns: GRID_COLUMNS.TWO,
+    };
+
+    const module = toTestimonialModule(mockRawTestimonialModule(appearance));
+
+    expect(module).toMatchObject(appearance);
   });
 
   it('passes through an authored cardAlignment and contentAlignment', () => {

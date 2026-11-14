@@ -3,6 +3,7 @@ import { toHeadingBlock } from '@blog/service/shared/transformers/heading-block/
 import { toSanityImage } from '@blog/service/shared/transformers/image/to-sanity-image';
 import { toLayout } from '@blog/service/shared/transformers/layout/to-layout';
 import { toLinkDocument } from '@blog/service/shared/transformers/link/to-link-document';
+import { toModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 import { toPortableText } from '@blog/service/shared/transformers/portable-text/to-portable-text-mark-def';
 import type { InferResultType } from 'groqd';
 
@@ -38,5 +39,6 @@ export function toTestimonialModule(
     cardAlignment: raw.cardAlignment,
     contentAlignment: raw.contentAlignment ?? undefined,
     layout: toLayout(raw.layout),
+    ...toModuleAppearance(raw),
   };
 }
