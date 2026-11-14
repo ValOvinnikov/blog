@@ -10,6 +10,7 @@ import {
 } from '@blog/config';
 import type { TFooter } from '@blog/service';
 import { errorResult, okResult } from '@blog/utils';
+import { SHINEFOLD_LOGO_NAME } from '@blog/utils/shinefold-logo';
 import { faker } from '@faker-js/faker';
 import { FOOTER_LOG } from '@web/constants/footer';
 import { getRequestContext } from '@web/server/request-context/request-context';
@@ -78,11 +79,8 @@ const FLOATING_COOKIE_SETTINGS_TEST_ID = 'floating-cookie-settings-button';
 const COOKIE_SETTINGS_NAME = SITE_MESSAGES.consent.footerSettingsLabel;
 const GROUPS_NAV_NAME = SITE_MESSAGES.siteFooter.groupsAriaLabel;
 const FINE_PRINT_NAV_NAME = SITE_MESSAGES.siteFooter.finePrintAriaLabel;
-const MOCK_POWERED_BY_MARK = {
-  productName: faker.company.name(),
-  href: faker.internet.url(),
-};
-const POWERED_BY_NAME = `${SITE_MESSAGES.siteFooter.poweredByLabel} ${MOCK_POWERED_BY_MARK.productName}`;
+const MOCK_POWERED_BY_HREF = faker.internet.url();
+const POWERED_BY_NAME = `${SITE_MESSAGES.siteFooter.poweredByLabel} ${SHINEFOLD_LOGO_NAME}`;
 const [MOCK_ABOUT, MOCK_ADDRESS, MOCK_GROUP_HEADING] =
   faker.helpers.uniqueArray(faker.lorem.word, 3);
 const MOCK_COPYRIGHT_NAME = faker.company.name();
@@ -484,7 +482,7 @@ describe(`<${SiteFooter.name}/>`, () => {
 
   describe('with the powered-by mark', () => {
     beforeEach(async () => {
-      getPoweredByMarkMock.mockResolvedValueOnce(MOCK_POWERED_BY_MARK);
+      getPoweredByMarkMock.mockResolvedValueOnce(MOCK_POWERED_BY_HREF);
       getFooterMock.mockResolvedValue(
         okResult(mockFooter({ finePrint: [linkItem(MOCK_ABOUT_LINK)] })),
       );
@@ -500,7 +498,7 @@ describe(`<${SiteFooter.name}/>`, () => {
     it('links to the marketing site in the same tab', () => {
       const link = screen.getByRole('link', { name: POWERED_BY_NAME });
 
-      expect(link).toHaveAttribute('href', MOCK_POWERED_BY_MARK.href);
+      expect(link).toHaveAttribute('href', MOCK_POWERED_BY_HREF);
       expect(link).not.toHaveAttribute('target');
     });
 
