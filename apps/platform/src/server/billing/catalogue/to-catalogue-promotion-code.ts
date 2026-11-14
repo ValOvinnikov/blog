@@ -47,7 +47,7 @@ const toAmountOffByCurrency = ({
       ? [[billingCurrency, option.amount_off] as const]
       : [];
   });
-  return Object.fromEntries(entries);
+  return hasLength(entries) ? Object.fromEntries(entries) : undefined;
 };
 
 const earliestExpiry = (
@@ -64,12 +64,15 @@ export const toCataloguePromotionCode = (
   if (!coupon || isString(coupon) || !coupon.valid) return undefined;
   const duration = COUPON_DURATION[coupon.duration];
   if (!duration || !isPublic(promotionCode)) return undefined;
+  const percentOff = coupon.percent_off ?? undefined;
+  const amountOffByCurrency = toAmountOffByCurrency(coupon);
+  if (!percentOff && !amountOffByCurrency) return undefined;
 
   return {
     promotionCodeId: promotionCode.id,
     code: promotionCode.code,
-    percentOff: coupon.percent_off ?? undefined,
-    amountOffByCurrency: toAmountOffByCurrency(coupon),
+    percentOff,
+    amountOffByCurrency,
     duration,
     durationInMonths: coupon.duration_in_months ?? undefined,
     appliesToProductIds: coupon.applies_to?.products,
