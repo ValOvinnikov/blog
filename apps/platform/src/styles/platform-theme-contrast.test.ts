@@ -6,6 +6,7 @@ import { hexToOklch, renderedContrastRatio } from '@blog/utils/color';
 const TEXT = CONTRAST_ROLE_MIN[CONTRAST_ROLE.TEXT];
 const BOUNDARY = CONTRAST_ROLE_MIN[CONTRAST_ROLE.UI_BOUNDARY];
 const FOCUS = CONTRAST_ROLE_MIN[CONTRAST_ROLE.FOCUS];
+const DECORATIVE = CONTRAST_ROLE_MIN[CONTRAST_ROLE.DECORATIVE];
 
 const LIGHT_SELECTOR = ':root {';
 const DARK_SELECTOR = ":root[data-theme='dark'] {";
@@ -92,6 +93,7 @@ const TOKEN = {
   POPOVER_HOVER: 'platform-popover-hover',
   SEGMENT_ON: 'platform-segment-on',
   SELECTED: 'platform-selected',
+  SELECTED_TINT: 'platform-selected-tint',
   SIDE: 'platform-side',
   SIDE_ACCENT: 'platform-side-accent',
   SIDE_FIELD_LINE: 'platform-side-field-line',
@@ -157,18 +159,8 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Muted on hovered menu row', TOKEN.MUTED, TOKEN.POPOVER_HOVER, TEXT],
   ['Check on hovered row', TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, FOCUS],
   ['Theme switch border on menu', TOKEN.CONTROL_LINE, TOKEN.POPOVER, BOUNDARY],
-  [
-    'Name on hovered account trigger',
-    TOKEN.TEXT_STRONG,
-    TOKEN.SIDE_RAISED,
-    TEXT,
-  ],
-  [
-    'Email on hovered account trigger',
-    TOKEN.SIDE_MUTED,
-    TOKEN.SIDE_RAISED,
-    TEXT,
-  ],
+  ['Name on open account trigger', TOKEN.TEXT_STRONG, TOKEN.SIDE_RAISED, TEXT],
+  ['Email on open account trigger', TOKEN.SIDE_MUTED, TOKEN.SIDE_RAISED, TEXT],
   ['Muted on menu', TOKEN.MUTED, TOKEN.POPOVER, TEXT],
   ['Row text on highlighted row', TOKEN.TEXT, TOKEN.POPOVER_HOVER, TEXT],
   ['Current bar on menu', TOKEN.BRAND_INK, TOKEN.POPOVER, BOUNDARY],
@@ -181,7 +173,6 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Name on account trigger at rest', TOKEN.TEXT_STRONG, TOKEN.SIDE, TEXT],
   ['Neutral pill in a menu', TOKEN.MUTED, TOKEN.PILL_NEUTRAL_POPOVER, TEXT],
   ['Selected preset tick', TOKEN.ON_BRAND_INK, TOKEN.BRAND_INK, BOUNDARY],
-  ['Hovered icon on hover tint', TOKEN.TEXT, TOKEN.HOVER_TINT, BOUNDARY],
   ['Rest icon on toolbar track', TOKEN.MUTED, TOKEN.THEME_TRACK, BOUNDARY],
   ['Label on hover tint', TOKEN.TEXT, TOKEN.HOVER_TINT, TEXT],
   ['Muted on hover tint', TOKEN.MUTED, TOKEN.HOVER_TINT, TEXT],
@@ -204,10 +195,17 @@ const SHARED_PAIRS: readonly TPair[] = [
   ],
   ['Pressed icon on plate', TOKEN.BRAND_STRONG, TOKEN.SEGMENT_ON, BOUNDARY],
   ['Toolbar track border on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
-  ['Solo pressed icon', TOKEN.BRAND_STRONG, TOKEN.BRAND_WEAK, BOUNDARY],
+  [
+    'Pressed label on selected tint',
+    TOKEN.BRAND_STRONG,
+    TOKEN.SELECTED_TINT,
+    TEXT,
+  ],
+  ['Label on selected tint', TOKEN.TEXT, TOKEN.SELECTED_TINT, TEXT],
+  ['Muted on selected tint', TOKEN.MUTED, TOKEN.SELECTED_TINT, TEXT],
   ['Chip text on chip', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
   ['Chip count on chip', TOKEN.MUTED, TOKEN.SURFACE, TEXT],
-  ['Chip text on chip hover', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
+  ['Text on hovered row', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
   ['Chip border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
   ['Label on selected chip', TOKEN.ON_SELECTED, TOKEN.SELECTED, TEXT],
   ['Follow mark tag label', TOKEN.FOLLOW_MARK_INK, TOKEN.FOLLOW_MARK, TEXT],
@@ -275,7 +273,7 @@ const FOCUS_GROUNDS = [
   TOKEN.HOVER_TINT,
   TOKEN.THEME_TRACK,
   TOKEN.SIDE,
-  TOKEN.BRAND_WEAK,
+  TOKEN.SELECTED_TINT,
 ] as const;
 
 const focusMarkPairs = (mark: string): TPair[] =>
@@ -313,6 +311,19 @@ describe.each([
       expect(ratio).toBeGreaterThanOrEqual(threshold);
     },
   );
+});
+
+describe.each([
+  ['light', colourIn(lightTokens)],
+  ['dark', colourIn(darkTokens)],
+] as const)('platform %s palette fills', (_palette, colourOf) => {
+  it('keeps the selected tint apart from the hover tint', () => {
+    const ratio = renderedContrastRatio(colourOf(TOKEN.SELECTED_TINT), [
+      colourOf(TOKEN.HOVER_TINT),
+    ]);
+
+    expect(ratio).toBeGreaterThan(DECORATIVE);
+  });
 });
 
 describe('platform dark palette', () => {

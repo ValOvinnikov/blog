@@ -29,7 +29,7 @@ export const portableTextEditorToggleButtonVariants = tv({
       },
     },
     isActive: {
-      true: { button: 'border-platform-brand bg-platform-brand-weak' },
+      true: { button: 'border-platform-brand bg-platform-selected-tint' },
       false: { button: 'hover:bg-platform-hover-tint' },
     },
     isIconOnly: {

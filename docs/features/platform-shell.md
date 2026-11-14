@@ -393,8 +393,8 @@ save still settles as the form's generic server error.
   unchanged. A primary button, an avatar and the active step put
   `on-brand-ink` on `brand`. A selected chip or jump-index tab
   is `on-selected` on `selected`, unchanged on hover: solid near-black
-  with a white label in Light, `brand-ink` yellow on the dark yellow tint in
-  Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
+  with a white label in Light, `brand-ink` yellow on the `selected-tint`
+  (#4a3b10) in Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
   a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
   focused field takes a `brand-ink` border (near-black in Light, yellow in
   Dark), kept over an invalid field's `bad-line` border, and a 3px
@@ -513,7 +513,7 @@ save still settles as the form's generic server error.
 - Focus is one gapped ring on every control, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
-  popover-hover, theme-track, brand-weak): a 2px gap in that ground, then a
+  popover-hover, segment-on, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
   2px `focus-ring` (#ffc233 in both themes), then in Light a 1px `focus-edge`
   (#12141a) around it; Dark has no edge. The ground reaches the
   `shadow-platform-focus-ring` token through `--platform-focus-ground`, which
@@ -533,11 +533,12 @@ save still settles as the form's generic server error.
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
   the data table's scroll region and its sort buttons, which fill their head
-  cell; lead rows (on `brand-weak` when selected, the selected 1px `brand`
+  cell; lead rows (on `selected-tint` when selected, the selected 1px `brand`
   edge drawn above the ring); menu, select, tenant switcher and top-bar menu
-  items and the appearance menu radio items, on keyboard focus only (on
-  `popover-hover`, or `segment-on` for the checked radio); the Look preset
-  sheet's rows (on `brand-weak` when selected, the 3px bar a pseudo-element
+  items on keyboard focus only (on `popover-hover`); the appearance menu
+  radio items on keyboard focus only (on `hover-tint`, or `segment-on` for
+  the checked radio); the Look preset sheet's rows (on `selected-tint` when
+  selected, the 3px bar a pseudo-element
   above the ring); and the full-screen preview stage (on `theme-track`). An
   inset ring's ground is the row's own fill. The more-presets grid's
   highlighted option takes the outer ring on `popover`. The toast's dismiss

@@ -11,7 +11,7 @@ export const FOCUS_RING_GROUND = {
   SEGMENT_ON: 'SEGMENT_ON',
   HOVER_TINT: 'HOVER_TINT',
   THEME_TRACK: 'THEME_TRACK',
-  BRAND_WEAK: 'BRAND_WEAK',
+  SELECTED_TINT: 'SELECTED_TINT',
 } as const;
 
 export type TFocusRingGround = TValueOf<typeof FOCUS_RING_GROUND>;

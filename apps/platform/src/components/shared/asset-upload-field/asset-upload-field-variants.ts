@@ -36,9 +36,13 @@ export const assetUploadFieldVariants = tv({
     {
       size: SIZE.MD,
       isDisabled: false,
-      class: {
-        root: ['hover:border-platform-brand-ink hover:bg-platform-hover-tint'],
-      },
+      class: { root: ['hover:bg-platform-hover-tint'] },
+    },
+    {
+      size: SIZE.MD,
+      isDisabled: false,
+      isInvalid: false,
+      class: { root: ['hover:border-platform-brand-ink'] },
     },
   ],
   defaultVariants: {

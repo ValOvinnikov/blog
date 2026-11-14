@@ -29,6 +29,7 @@
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: #12141a;
   --platform-hover-tint: #fff1c2;
+  --platform-selected-tint: #ffe08a;
   --platform-bad-hover: #fbdcd9;
   --platform-control-line-hover: #5b6472;
   --platform-ok: #16794d;
@@ -150,11 +151,12 @@
   --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
   --platform-spinner-on-brand-unlit: transparent;
   --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
-  --platform-selected: #33290d;
+  --platform-selected: var(--platform-selected-tint);
   --platform-on-selected: #ffdc7a;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: transparent;
   --platform-hover-tint: #33290d;
+  --platform-selected-tint: #4a3b10;
   --platform-bad-hover: #442020;
   --platform-control-line-hover: #5c6676;
   --platform-ok: #6ee7a7;
@@ -237,11 +239,12 @@
     --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
     --platform-spinner-on-brand-unlit: transparent;
     --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
-    --platform-selected: #33290d;
+    --platform-selected: var(--platform-selected-tint);
     --platform-on-selected: #ffdc7a;
     --platform-focus-ring: #ffc233;
     --platform-focus-edge: transparent;
     --platform-hover-tint: #33290d;
+    --platform-selected-tint: #4a3b10;
     --platform-bad-hover: #442020;
     --platform-control-line-hover: #5c6676;
     --platform-ok: #6ee7a7;
@@ -368,6 +371,7 @@
   --color-platform-tooltip-line: var(--platform-tooltip-line);
   --color-platform-scrim: var(--platform-scrim);
   --color-platform-hover-tint: var(--platform-hover-tint);
+  --color-platform-selected-tint: var(--platform-selected-tint);
   --color-platform-bad-hover: var(--platform-bad-hover);
   --color-platform-control-line-hover: var(--platform-control-line-hover);
   --color-platform-note-line: var(--platform-note-line);
