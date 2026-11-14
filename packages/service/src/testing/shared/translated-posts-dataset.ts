@@ -27,7 +27,7 @@ export const MOCK_PUBLISHED_FEED_SLUGS: Record<string, string[]> = {
 };
 
 const PUBLISHED_AT_LATER = '2026-01-02T00:00:00Z';
-const PUBLISHED_AT_FUTURE = '2999-01-01T00:00:00Z';
+export const MOCK_PUBLISHED_AT_FUTURE = '2999-01-01T00:00:00Z';
 const TRANSLATION_METADATA_TYPE = 'translation.metadata';
 
 function post(
@@ -63,7 +63,9 @@ export const MOCK_TRANSLATED_POST_DOCUMENTS = [
     featured: true,
     publishedAt: '2026-01-03T00:00:00Z',
   }),
-  post(MOCK_SCHEDULED_NL_POST_ID, NL, { publishedAt: PUBLISHED_AT_FUTURE }),
+  post(MOCK_SCHEDULED_NL_POST_ID, NL, {
+    publishedAt: MOCK_PUBLISHED_AT_FUTURE,
+  }),
   {
     _id: 'meta-design',
     _type: TRANSLATION_METADATA_TYPE,
@@ -78,7 +80,7 @@ export const MOCK_PINNED_POST_DOCUMENTS = [
   ...MOCK_TRANSLATED_POST_DOCUMENTS,
   post(MOCK_SOLO_NL_POST_ID, NL),
   post(MOCK_LAUNCH_EN_POST_ID, EN),
-  post(LAUNCH_NL_POST_ID, NL, { publishedAt: PUBLISHED_AT_FUTURE }),
+  post(LAUNCH_NL_POST_ID, NL, { publishedAt: MOCK_PUBLISHED_AT_FUTURE }),
   {
     _id: 'meta-launch',
     _type: TRANSLATION_METADATA_TYPE,
