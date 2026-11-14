@@ -1,7 +1,6 @@
 import { TENANT_PLAN } from '@blog/config/constants';
 import { TENANT_STATUS } from '@blog/db/constants';
 import en from '@platform/i18n/messages/en.json';
-import { mockTenantDomainRows } from '@platform/testing/custom-domain/fixtures';
 import {
   customRenderAsync,
   screen,
@@ -23,19 +22,20 @@ import { BillingStatusNotice } from './billing-status-notice';
 
 vi.mock('@platform/utils/env/env');
 
-const { countMembershipsOverSeatsMock, listTenantDomainsMock } = vi.hoisted(
+const { countMembershipsOverSeatsMock, listTenantHostsMock } = vi.hoisted(
   () => ({
     countMembershipsOverSeatsMock: vi.fn(),
-    listTenantDomainsMock: vi.fn(),
+    listTenantHostsMock: vi.fn(),
   }),
 );
 
 vi.mock('@blog/db', async () => ({
   ...(await mockDbConstants()),
-  queries: {
-    memberships: { countMembershipsOverSeats: countMembershipsOverSeatsMock },
-    tenantDomains: { listTenantDomains: listTenantDomainsMock },
-  },
+  queries: { tenantDomains: { listTenantHosts: listTenantHostsMock } },
+}));
+
+vi.mock('@blog/db/queries/memberships', () => ({
+  countMembershipsOverSeats: countMembershipsOverSeatsMock,
 }));
 const envMock: Partial<Record<keyof typeof env, string>> = env;
 const { billingStatusNotice } = en;
@@ -71,7 +71,9 @@ describe(`<${BillingStatusNotice.name}/>`, () => {
     countMembershipsOverSeatsMock
       .mockReset()
       .mockResolvedValue(MOCK_LOCKED_MEMBER_COUNT);
-    listTenantDomainsMock.mockReset().mockResolvedValue(mockTenantDomainRows());
+    listTenantHostsMock
+      .mockReset()
+      .mockResolvedValue([MOCK_CUSTOM_DOMAIN, MOCK_TENANT_DOMAIN]);
   });
 
   describe('a site in its downgrade grace', () => {
@@ -160,7 +162,10 @@ describe(`<${BillingStatusNotice.name}/>`, () => {
 
   it.each([
     ['out of grace', { ...IN_GRACE, downgradeGraceStartedAt: null }],
-    ['archived', { ...IN_GRACE, deprovisionedAt: MOCK_ARCHIVED_AT }],
+    [
+      'archived',
+      mockTenant({ ...IN_GRACE, deprovisionedAt: MOCK_ARCHIVED_AT }),
+    ],
   ])('renders nothing and reads nothing for a site %s', async (_, tenant) => {
     await setup({ tenant });
 

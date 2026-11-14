@@ -1,8 +1,8 @@
 import { ALERT_TYPE, SIZE } from '@blog/config';
 import type { TTenantPlan } from '@blog/config/constants';
+import type { TGraceLocks } from '@blog/db/utils/grace-locks/grace-locks';
 import { Alert } from '@platform/components/shared/alert';
 import { LinkButton } from '@platform/components/shared/link-button';
-import type { TGraceLocks } from '@platform/server/billing/load-grace-locks';
 import { formatDate } from '@platform/utils/format-date/format-date';
 import { adminRoutes } from '@platform/utils/routes/routes';
 import { useLocale, useTranslations } from 'next-intl';
@@ -18,7 +18,7 @@ export type TGraceNoticeProps = {
 export const GraceNotice = ({
   plan,
   endsAt,
-  locks: { lockedMemberCount, domainRedirect },
+  locks: { lockedMemberCount, customDomain, subdomain },
   canUpgrade,
 }: TGraceNoticeProps) => {
   const t = useTranslations('billingStatusNotice');
@@ -45,8 +45,14 @@ export const GraceNotice = ({
               })}
             </p>
           )}
-          {domainRedirect && (
-            <p>{t.rich('graceDomain', { ...dateValues, ...domainRedirect })}</p>
+          {customDomain && subdomain && (
+            <p>
+              {t.rich('graceDomain', {
+                ...dateValues,
+                customDomain,
+                subdomain,
+              })}
+            </p>
           )}
           <p>{t(canUpgrade ? 'graceKeep' : 'graceKeepAskOwner')}</p>
         </>
