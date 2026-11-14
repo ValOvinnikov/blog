@@ -71,17 +71,6 @@ describe(purgeScheduledPostPages, () => {
     ).toBe(true);
   });
 
-  it('throws a retryable error when web fails', async () => {
-    fetchMock.mockResolvedValue(
-      new Response('', { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }),
-    );
-
-    const error = await runPurge().catch((caught: unknown) => caught);
-
-    expect(error).toBeInstanceOf(Error);
-    expect(error).not.toBeInstanceOf(FatalError);
-  });
-
   it.each([HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.NOT_FOUND])(
     'fails for good when web answers %i',
     async (status) => {
@@ -113,7 +102,10 @@ describe(purgeScheduledPostPages, () => {
     },
   );
 
-  it.each(SCHEDULED_POST_PURGE_RETRYABLE_STATUSES)(
+  it.each([
+    HTTP_STATUS.INTERNAL_SERVER_ERROR,
+    ...SCHEDULED_POST_PURGE_RETRYABLE_STATUSES,
+  ])(
     'retries on its own schedule when web answers %i without a retry time',
     async (status) => {
       fetchMock.mockResolvedValue(new Response('', { status }));

@@ -39,7 +39,7 @@ describe(readRetryAfter, () => {
     ).toEqual(MOCK_RETRY_DATE);
   });
 
-  it.each([undefined, '', 'soon'])(
+  it.each([undefined, '', 'soon', '9'.repeat(13)])(
     'has no retry time for the header %j',
     (value) => {
       expect(readRetryAfter(responseRetryingAfter(value))).toBeUndefined();
