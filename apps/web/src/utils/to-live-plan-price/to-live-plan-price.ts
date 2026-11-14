@@ -12,14 +12,12 @@ import type { TStripePrice } from '@blog/db/queries/stripe-catalogue/list-stripe
 import type { TPricingTier } from '@blog/service';
 import { isOneOf, isUndefined } from '@blog/utils/primitives';
 
-export interface IPlanPriceAmount {
+interface IPlanPriceAmount {
   unitAmount: number;
   productId: string;
 }
 
-export type TPlanPriceAmounts = Partial<
-  Record<TBillingCurrency, IPlanPriceAmount>
->;
+type TPlanPriceAmounts = Partial<Record<TBillingCurrency, IPlanPriceAmount>>;
 
 export interface ILivePlanPrice {
   period: string;

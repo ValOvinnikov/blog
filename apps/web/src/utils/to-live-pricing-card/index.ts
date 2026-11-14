@@ -1,4 +1,1 @@
-export {
-  toLivePricingCard,
-  type ILivePricingLabels,
-} from './to-live-pricing-card';
+export { toLivePricingCard } from './to-live-pricing-card';

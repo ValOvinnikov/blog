@@ -14,7 +14,7 @@ import type { ILivePlanPrice } from '@web/utils/to-live-plan-price';
 import type { IPricingCardData } from '@web/utils/to-pricing-panels';
 import { withSearchParam } from '@web/utils/with-search-param';
 
-export interface ILivePricingLabels {
+interface ILivePricingLabels {
   free: string;
   compareAtLabel: string;
   once: string;
