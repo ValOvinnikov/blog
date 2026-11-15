@@ -13,6 +13,8 @@ export const SCHEDULED_POST_STATE = {
 
 export const SCHEDULED_POST_PURGE_HOOK_PREFIX = 'scheduled-post-purge:';
 export const WEB_SCHEDULED_POST_PURGE_PATH = '/api/revalidate/scheduled-post';
+// Covers web's enqueue hop for a post dated only seconds ahead.
+export const SCHEDULED_POST_PURGE_GRACE_MS = 60_000;
 // Web resolves the post's paths in every live language before it answers.
 export const SCHEDULED_POST_PURGE_TIMEOUT_MS = 30_000;
 export const SCHEDULED_POST_PURGE_RETRYABLE_STATUSES: readonly number[] = [
