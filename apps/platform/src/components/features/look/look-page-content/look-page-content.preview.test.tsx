@@ -5,8 +5,6 @@ import { SAMPLE_HEADER_FULL_TEST_ID } from '@platform/constants/sample-header';
 import messages from '@platform/i18n/messages/en.json';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
 import { screen, within } from '@platform/testing/custom-render';
-import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
-import { mockedEnv } from '@platform/testing/env/mocked-env';
 import {
   arrangeLookPageQueries,
   setupLookPageContent as setup,
@@ -31,8 +29,6 @@ vi.mock('@blog/db', async () => ({
 }));
 
 vi.mock('@platform/server/settings-features/get-enabled-capabilities');
-
-vi.mock('@platform/utils/env/env');
 
 const SIGN_IN = 'Sign in';
 const POWERED_BY_MARK = `${messages.lookPreview.footerPoweredByLabel} ${SHINEFOLD_LOGO_NAME}`;
@@ -73,29 +69,19 @@ describe(`<${LookPageContent.name}/> preview`, () => {
     expect(signInButton).not.toBeInTheDocument();
   });
 
-  describe('with the product name set', () => {
-    beforeEach(() => {
-      mockedEnv.PRODUCT_NAME = MOCK_PRODUCT_NAME;
-    });
+  it('previews the Powered by mark on Free', async () => {
+    await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
 
-    afterEach(() => {
-      delete mockedEnv.PRODUCT_NAME;
-    });
+    const mark = screen.getByRole('link', { name: POWERED_BY_MARK });
 
-    it('previews the Powered by mark on Free', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.FREE }) });
+    expect(mark).toBeInTheDocument();
+  });
 
-      const mark = screen.getByRole('link', { name: POWERED_BY_MARK });
+  it('previews no Powered by mark on Growth', async () => {
+    await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
 
-      expect(mark).toBeInTheDocument();
-    });
+    const mark = screen.queryByRole('link', { name: POWERED_BY_MARK });
 
-    it('previews no Powered by mark on Growth', async () => {
-      await setup({ tenant: mockReadyTenant({ plan: TENANT_PLAN.GROWTH }) });
-
-      const mark = screen.queryByRole('link', { name: POWERED_BY_MARK });
-
-      expect(mark).not.toBeInTheDocument();
-    });
+    expect(mark).not.toBeInTheDocument();
   });
 });

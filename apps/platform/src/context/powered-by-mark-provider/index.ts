@@ -1,4 +1,4 @@
 export {
   PoweredByMarkProvider,
-  usePoweredByProductName,
+  useHasPoweredByMark,
 } from './powered-by-mark-provider';

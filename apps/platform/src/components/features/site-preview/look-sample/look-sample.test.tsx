@@ -48,7 +48,6 @@ import {
   screen,
   within,
 } from '@platform/testing/custom-render';
-import { MOCK_PRODUCT_NAME } from '@platform/testing/env/fixtures';
 import { MOCK_SAMPLE_HEADER_STYLE } from '@platform/testing/sample-header-style';
 import { MOCK_SITE_PREVIEW_THEME } from '@platform/testing/site-preview-theme';
 import { MOCK_TENANT_NAME } from '@platform/testing/tenants/fixtures';
@@ -598,9 +597,9 @@ describe(`<${LookSample.name}/>`, () => {
       expect(cookieSettingsLink).not.toBeInTheDocument();
     });
 
-    it('draws the Powered by mark when given a product name', () => {
+    it('draws the Powered by mark when the plan carries it', () => {
       renderWithIntl(
-        <PoweredByMarkProvider productName={MOCK_PRODUCT_NAME}>
+        <PoweredByMarkProvider hasPoweredByMark={true}>
           <LookSample {...LOOK_SAMPLE_PROPS} />
         </PoweredByMarkProvider>,
       );
@@ -612,7 +611,7 @@ describe(`<${LookSample.name}/>`, () => {
       expect(mark).toBeVisible();
     });
 
-    it('draws no Powered by mark without a product name', () => {
+    it('draws no Powered by mark by default', () => {
       setup();
 
       const mark = screen.queryByRole('link', {

@@ -1,24 +1,22 @@
 'use client';
 
-import type { TMaybeUndefined } from '@blog/config';
-import { createContext, useContext, type ReactNode } from 'react';
+import type { IWithChildren } from '@blog/config/react';
+import { createContext, useContext } from 'react';
 
-const PoweredByMarkContext = createContext<TMaybeUndefined<string>>(undefined);
+const PoweredByMarkContext = createContext(false);
 
-type TPoweredByMarkProviderProps = {
-  productName: TMaybeUndefined<string>;
-  children: ReactNode;
+type TPoweredByMarkProviderProps = IWithChildren & {
+  hasPoweredByMark: boolean;
 };
 
-/** Names the product in a site preview's "Powered by" mark; no name means the previewed plan draws none. */
 export const PoweredByMarkProvider = ({
-  productName,
+  hasPoweredByMark,
   children,
 }: TPoweredByMarkProviderProps) => (
-  <PoweredByMarkContext.Provider value={productName}>
+  <PoweredByMarkContext.Provider value={hasPoweredByMark}>
     {children}
   </PoweredByMarkContext.Provider>
 );
 
-export const usePoweredByProductName = (): TMaybeUndefined<string> =>
+export const useHasPoweredByMark = (): boolean =>
   useContext(PoweredByMarkContext);

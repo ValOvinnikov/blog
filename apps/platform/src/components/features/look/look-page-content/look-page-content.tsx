@@ -5,9 +5,7 @@ import { LookForm } from '@platform/components/features/look/look-form';
 import { PoweredByMarkProvider } from '@platform/context/powered-by-mark-provider';
 import type { TPlatformViewer } from '@platform/server/auth/platform-viewer';
 import { getEnabledCapabilities } from '@platform/server/settings-features/get-enabled-capabilities';
-import { env } from '@platform/utils/env/env';
 import type { TPlatformTenant } from '@platform/utils/platform-tenant/platform-tenant';
-import { toPoweredByProductName } from '@platform/utils/powered-by-product-name/powered-by-product-name';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 
 export type TLookPageContentProps = {
@@ -27,10 +25,7 @@ export const LookPageContent = async ({
 
   return (
     <PoweredByMarkProvider
-      productName={toPoweredByProductName(
-        tenant.entitlements,
-        env.PRODUCT_NAME,
-      )}
+      hasPoweredByMark={tenant.entitlements.hasPoweredByMark}
     >
       <LookForm
         tenant={{
