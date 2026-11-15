@@ -55,6 +55,20 @@ describe(purgeScheduledPost, () => {
     expect(hook.dispose).toHaveBeenCalled();
   });
 
+  it('purges once without sleeping when the publish time has already passed', async () => {
+    vi.mocked(checkScheduledPost).mockResolvedValueOnce({
+      state: SCHEDULED_POST_STATE.DUE,
+    });
+
+    await runPurge();
+
+    expect(sleep).not.toHaveBeenCalled();
+    expect(purgeScheduledPostPages).toHaveBeenCalledExactlyOnceWith(
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+    );
+  });
+
   it('ends without a purge when the post went stale while it slept', async () => {
     vi.mocked(checkScheduledPost)
       .mockResolvedValueOnce(MOCK_SCHEDULED)

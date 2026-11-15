@@ -1,7 +1,10 @@
 import { HTTP_STATUS } from '@blog/config/constants';
 import { sanitizeLogMessage } from '@blog/insight';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import { SCHEDULED_POST_PURGE_LOG } from '@worker/constants/scheduled-post-purge';
+import {
+  SCHEDULED_POST_PURGE_GRACE_MS,
+  SCHEDULED_POST_PURGE_LOG,
+} from '@worker/constants/scheduled-post-purge';
 import { env } from '@worker/utils/env/env';
 import { logger } from '@worker/utils/logger/logger';
 import {
@@ -20,7 +23,9 @@ const scheduledPostPurgeBodySchema = tenantRequestBodySchema.extend({
   publishedAt: z.iso
     .datetime({ offset: true })
     .transform((value) => new Date(value))
-    .refine((date) => date.getTime() > Date.now()),
+    .refine(
+      (date) => date.getTime() > Date.now() - SCHEDULED_POST_PURGE_GRACE_MS,
+    ),
 });
 
 export async function POST(request: Request): Promise<Response> {

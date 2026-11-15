@@ -1,7 +1,10 @@
 import { HTTP_METHOD, HTTP_STATUS } from '@blog/config/constants';
 import { getTenantById } from '@blog/db/queries/tenants';
 import { ENQUEUE_ERROR } from '@worker/constants/enqueue-error';
-import { SCHEDULED_POST_PURGE_LOG } from '@worker/constants/scheduled-post-purge';
+import {
+  SCHEDULED_POST_PURGE_GRACE_MS,
+  SCHEDULED_POST_PURGE_LOG,
+} from '@worker/constants/scheduled-post-purge';
 import {
   MOCK_NOW,
   MOCK_ONE_HOUR_MS,
@@ -121,10 +124,28 @@ describe('POST /api/scheduled-post-purge', () => {
     expect(start).not.toHaveBeenCalled();
   });
 
-  it('refuses a publish time already in the past', async () => {
-    const pastPublishedAt = new Date(
-      MOCK_NOW.getTime() - MOCK_ONE_HOUR_MS,
+  it('starts the run for a publish time that passed within the grace window', async () => {
+    const justPassed = new Date(
+      MOCK_NOW.getTime() - SCHEDULED_POST_PURGE_GRACE_MS + 1,
     ).toISOString();
+
+    const response = await POST(
+      purgeRequest({ ...MOCK_BODY, publishedAt: justPassed }),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.ACCEPTED);
+    expect(start).toHaveBeenCalledWith(purgeScheduledPost, [
+      MOCK_TENANT_ID,
+      MOCK_POST_ID,
+      justPassed,
+    ]);
+  });
+
+  it.each([
+    ['just past the grace window', SCHEDULED_POST_PURGE_GRACE_MS],
+    ['an hour ago', MOCK_ONE_HOUR_MS],
+  ])('refuses a publish time %s', async (_label, agoMs) => {
+    const pastPublishedAt = new Date(MOCK_NOW.getTime() - agoMs).toISOString();
 
     const response = await POST(
       purgeRequest({ ...MOCK_BODY, publishedAt: pastPublishedAt }),
