@@ -7,6 +7,7 @@ import type {
   TPortableTextBlock,
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
+import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 
 export type TFaqQuestion = {
   id: string;
@@ -14,7 +15,7 @@ export type TFaqQuestion = {
   answer: TPortableTextBlock[];
 };
 
-export type TFaqModule = {
+export type TFaqModule = TModuleAppearance & {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   questions: TFaqQuestion[];

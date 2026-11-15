@@ -1,9 +1,15 @@
-import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import {
+  BRAND_VARIANT,
+  CARD_STYLE,
+  CONTENT_ALIGNMENT,
+  DENSITY,
+  RADIUS_SCALE,
+} from '@blog/config';
+import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
 import {
   mockCtaButtonView,
   mockRawContentBlock,
   mockRawCtaButton,
-  mockRawFaqModule,
   mockRawFaqQuestionItem,
 } from '@blog/service/testing/modules/fixtures';
 import { faker } from '@faker-js/faker';
@@ -38,6 +44,28 @@ describe(toFaqModule, () => {
     const module = toFaqModule(raw);
 
     expect(module.contentAlignment).toBe(expected);
+  });
+
+  it('leaves every appearance override undefined when unset', () => {
+    const module = toFaqModule(mockRawFaqModule());
+
+    expect(module).toMatchObject({
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
+    });
+  });
+
+  it('maps the authored appearance overrides straight through', () => {
+    const appearance = {
+      cardStyle: CARD_STYLE.RAISED,
+      radiusScale: RADIUS_SCALE.NONE,
+      density: DENSITY.COMPACT,
+    };
+
+    const module = toFaqModule(mockRawFaqModule(appearance));
+
+    expect(module).toMatchObject(appearance);
   });
 
   it('keeps the questions in authored order', () => {
