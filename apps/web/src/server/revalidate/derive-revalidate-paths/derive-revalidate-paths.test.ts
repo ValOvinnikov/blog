@@ -26,7 +26,10 @@ vi.mock(
   () => ({ deriveTenantSitePaths: vi.fn() }),
 );
 
-const MOCK_SLUG = faker.lorem.slug();
+const [MOCK_SLUG, MOCK_PREVIOUS_SLUG] = faker.helpers.uniqueArray(
+  faker.lorem.slug,
+  2,
+) as [string, string];
 const MOCK_POST_PATHS = [faker.system.directoryPath()];
 const MOCK_SITE_PATHS = [faker.system.directoryPath()];
 const MOCK_TENANT_INPUT = {
@@ -70,6 +73,52 @@ describe(deriveRevalidatePaths, () => {
       expect(derivePostPublishPaths).not.toHaveBeenCalled();
     },
   );
+
+  it('hands a renamed document to the tenant page derivation', async () => {
+    await deriveRevalidatePaths({
+      ...MOCK_POST_INPUT,
+      type: 'page_topic',
+      previousSlug: MOCK_PREVIOUS_SLUG,
+    });
+
+    expect(deriveTenantSitePaths).toHaveBeenCalledWith({
+      ...MOCK_TENANT_INPUT,
+      documentHref: `/topics/${MOCK_SLUG}`,
+      renamedDocument: {
+        type: 'page_topic',
+        slug: MOCK_SLUG,
+        previousSlug: MOCK_PREVIOUS_SLUG,
+      },
+    });
+  });
+
+  it.each([
+    { case: 'an unchanged slug', previousSlug: MOCK_SLUG },
+    { case: 'no previous slug', previousSlug: undefined },
+  ])('reports no renamed document for $case', async ({ previousSlug }) => {
+    await deriveRevalidatePaths({
+      ...MOCK_POST_INPUT,
+      type: 'page_topic',
+      previousSlug,
+    });
+
+    expect(deriveTenantSitePaths).toHaveBeenCalledWith(
+      expect.objectContaining({ renamedDocument: undefined }),
+    );
+  });
+
+  it('hands a renamed post’s previous slug to the post derivation', async () => {
+    await deriveRevalidatePaths({
+      ...MOCK_POST_INPUT,
+      previousSlug: MOCK_PREVIOUS_SLUG,
+    });
+
+    expect(derivePostPublishPaths).toHaveBeenCalledWith({
+      ...MOCK_TENANT_INPUT,
+      id: MOCK_POST_INPUT.id,
+      previousSlug: MOCK_PREVIOUS_SLUG,
+    });
+  });
 
   it('resolves a live post’s own paths', async () => {
     const result = await deriveRevalidatePaths(MOCK_POST_INPUT);

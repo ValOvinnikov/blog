@@ -13,12 +13,14 @@ export type TDerivePostPublishPathsInput = {
   id: string;
   tenantId: string;
   tenant: TTenantSanityContext;
+  previousSlug?: string;
 };
 
 export const derivePostPublishPaths = async ({
   id,
   tenantId,
   tenant,
+  previousSlug,
 }: TDerivePostPublishPathsInput): Promise<
   TResult<
     string[],
@@ -102,6 +104,7 @@ export const derivePostPublishPaths = async ({
     tenantId,
     locales,
     postSlug: post.slug,
+    previousPostSlug: previousSlug,
     tagSlugs: tagSlugsResult.data.map(({ slug }) => slug),
     topicSlugs: topicSlugsResult.data.map(({ slug }) => slug),
     blogIndexPageParams: blogParamsResult.data,

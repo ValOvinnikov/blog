@@ -121,6 +121,24 @@ describe(derivePostPublishPaths, () => {
     );
   });
 
+  it('adds a renamed post’s old address', async () => {
+    const previousSlug = faker.lorem.slug();
+
+    const result = await derivePostPublishPaths({
+      ...MOCK_POST_INPUT,
+      previousSlug,
+    });
+
+    expect(result).toEqual(
+      okResult([
+        MOCK_LOCALE_ROOT,
+        `${MOCK_LOCALE_ROOT}/blog`,
+        `${MOCK_LOCALE_ROOT}/blog/${MOCK_POST.slug}`,
+        `${MOCK_LOCALE_ROOT}/blog/${previousSlug}`,
+      ]),
+    );
+  });
+
   it('reports document_not_found when the id matches no post', async () => {
     getPostsByIdsMock.mockResolvedValue(okResult([]));
 

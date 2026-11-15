@@ -5,6 +5,7 @@ export interface IRevalidateWebhookBody {
   _type: string;
   _id: string;
   slug?: TNullable<string>;
+  previousSlug?: TNullable<string>;
 }
 
 const isNullableString = (value: unknown): boolean =>
@@ -13,11 +14,14 @@ const isNullableString = (value: unknown): boolean =>
 export const isRevalidateWebhookBody = (
   value: unknown,
 ): value is IRevalidateWebhookBody => {
+  if (typeof value !== 'object' || isNull(value)) {
+    return false;
+  }
+  const { _type, _id, slug, previousSlug } = value as Record<string, unknown>;
   return (
-    typeof value === 'object' &&
-    !isNull(value) &&
-    isString((value as Record<string, unknown>)['_type']) &&
-    isString((value as Record<string, unknown>)['_id']) &&
-    isNullableString((value as Record<string, unknown>)['slug'])
+    isString(_type) &&
+    isString(_id) &&
+    isNullableString(slug) &&
+    isNullableString(previousSlug)
   );
 };

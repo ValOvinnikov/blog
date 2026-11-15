@@ -5,6 +5,10 @@ import {
   buildNextPagePaths,
   type TLocalizedPath,
 } from '@web/utils/build-next-page-paths';
+import {
+  buildRenamedDocumentHrefs,
+  type TRenamedDocument,
+} from '@web/utils/build-renamed-document-hrefs';
 import { toTenantScopedPath } from '@web/utils/to-tenant-scoped-path';
 
 export type TBuildTenantSitePathsInput = {
@@ -12,6 +16,7 @@ export type TBuildTenantSitePathsInput = {
   locales: readonly string[];
   lists: TTenantPageLists;
   documentHref?: string;
+  renamedDocument?: TRenamedDocument;
 };
 
 const toLocalizedPaths = (
@@ -34,6 +39,7 @@ export const buildTenantSitePaths = ({
   locales,
   lists,
   documentHref,
+  renamedDocument,
 }: TBuildTenantSitePathsInput): string[] => {
   const { posts, topics, tags, topicPages, tagPages, blogPages } = lists;
   const { landingPages, privacyDocuments, legalDocuments } = lists;
@@ -51,6 +57,7 @@ export const buildTenantSitePaths = ({
     routes.newsletterUnsubscribeConfirmation(),
     ...Object.values(NEWSLETTER_RESULT).map(routes.newsletterResult),
     ...(documentHref ? [documentHref] : []),
+    ...buildRenamedDocumentHrefs(renamedDocument, lists),
   ];
   const localizedPaths = [
     ...toLocalizedPaths(posts, routes.post),

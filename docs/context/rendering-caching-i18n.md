@@ -103,13 +103,11 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   any need to know a post's _previous_ taxonomy, which the webhook payload
   does not carry.
 
-  **Known limitation, accepted rather than solved:** a renamed slug — of a
-  post, topic, tag or privacy or legal document — is not
-  recoverable from the webhook payload, so the page at the _old_ slug keeps
-  its stale prerendered HTML until the route-level backstop below expires
-  it. Fixing this properly would require
-  reconfiguring the Sanity webhook to project the document's previous slug,
-  which is human-gated console work. A renamed landing page is covered: its
+  A renamed slug — of a post, topic, tag or privacy or legal document —
+  arrives as the webhook's `previousSlug`, and the old address (a topic's or
+  tag's with its pagination) is purged in every live language of the
+  publishing tenant. A body without it (a project still on the old
+  projection) purges as before. A renamed landing page is covered: its
   path change writes a `redirect`, whose publish runs the whole-site purge.
 
   Every other `_type` (including the `posts`-tagged
@@ -146,7 +144,7 @@ blog/my-post')` matches the resolved-pathname tag exactly — and is how the
   across users. This governs the **Full Route Cache** and is a different
   mechanism from the 3600s **Data Cache** TTL that `isr()` sets on fetches;
   same unit, different cache, and the two should not be conflated. Its purpose
-  is that a purge which never happens — a derivation bug, a renamed slug, a
+  is that a purge which never happens — a derivation bug, a project on the old webhook projection, a
   failed request — self-heals within a bounded window instead of leaving a
   page wrong indefinitely. It is a correctness floor for a rare failure, not a
   freshness target: the webhook remains the mechanism that makes a publish
