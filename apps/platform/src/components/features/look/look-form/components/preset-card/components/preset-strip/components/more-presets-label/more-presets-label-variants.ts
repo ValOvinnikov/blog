@@ -17,7 +17,7 @@ export const morePresetsButtonVariants = tv({
 export const morePresetsLabelVariants = tv({
   slots: {
     pill: [
-      'inline-flex h-5 min-w-5 items-center justify-center rounded-platform-10 bg-platform-brand-weak px-1.5',
+      'inline-flex h-5 min-w-5 items-center justify-center rounded-platform-10 bg-platform-selected-tint px-1.5',
       'text-platform-11-5 font-semibold text-platform-brand-strong',
     ],
   },

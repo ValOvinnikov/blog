@@ -6,7 +6,7 @@ import { hexToOklch, renderedContrastRatio } from '@blog/utils/color';
 const TEXT = CONTRAST_ROLE_MIN[CONTRAST_ROLE.TEXT];
 const BOUNDARY = CONTRAST_ROLE_MIN[CONTRAST_ROLE.UI_BOUNDARY];
 const FOCUS = CONTRAST_ROLE_MIN[CONTRAST_ROLE.FOCUS];
-const DECORATIVE = CONTRAST_ROLE_MIN[CONTRAST_ROLE.DECORATIVE];
+const SELECTED_OVER_HOVER_TINT_MIN = 1.1;
 
 const LIGHT_SELECTOR = ':root {';
 const DARK_SELECTOR = ":root[data-theme='dark'] {";
@@ -322,7 +322,7 @@ describe.each([
       colourOf(TOKEN.HOVER_TINT),
     ]);
 
-    expect(ratio).toBeGreaterThan(DECORATIVE);
+    expect(ratio).toBeGreaterThanOrEqual(SELECTED_OVER_HOVER_TINT_MIN);
   });
 });
 
