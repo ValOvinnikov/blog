@@ -24,8 +24,9 @@
   --platform-spinner-on-brand-lit: var(--platform-highlight);
   --platform-spinner-on-brand-unlit: #e8eaef;
   --platform-spinner-on-brand-line: var(--platform-spinner-on-brand-unlit);
-  --platform-selected: #12141a;
-  --platform-on-selected: #ffffff;
+  --platform-selected: #ffc233;
+  --platform-on-selected: #12141a;
+  --platform-selected-line: #ffc233;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: #12141a;
   --platform-hover-tint: #fff1c2;
@@ -62,7 +63,7 @@
   --platform-pill-neutral-popover: #eef0f3;
   --platform-segment-on: #ffffff;
   --platform-switch-thumb: #ffffff;
-  --platform-switch-thumb-on: #ffc233;
+  --platform-switch-thumb-on: #12141a;
   --platform-highlight: #ffc233;
   --platform-theme-track: #eef0f3;
   --platform-tooltip: #12141a;
@@ -151,8 +152,9 @@
   --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
   --platform-spinner-on-brand-unlit: transparent;
   --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
-  --platform-selected: var(--platform-selected-tint);
-  --platform-on-selected: #ffdc7a;
+  --platform-selected: #ffc233;
+  --platform-on-selected: #0f1115;
+  --platform-selected-line: #ffc233;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: transparent;
   --platform-hover-tint: #33290d;
@@ -239,8 +241,9 @@
     --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
     --platform-spinner-on-brand-unlit: transparent;
     --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
-    --platform-selected: var(--platform-selected-tint);
-    --platform-on-selected: #ffdc7a;
+    --platform-selected: #ffc233;
+    --platform-on-selected: #0f1115;
+    --platform-selected-line: #ffc233;
     --platform-focus-ring: #ffc233;
     --platform-focus-edge: transparent;
     --platform-hover-tint: #33290d;
@@ -335,6 +338,7 @@
   --color-platform-spinner-on-brand-line: var(--platform-spinner-on-brand-line);
   --color-platform-selected: var(--platform-selected);
   --color-platform-on-selected: var(--platform-on-selected);
+  --color-platform-selected-line: var(--platform-selected-line);
   --color-platform-ok: var(--platform-ok);
   --color-platform-ok-weak: var(--platform-ok-weak);
   --color-platform-warn: var(--platform-warn);
@@ -467,7 +471,7 @@
   --shadow-platform-xs: var(--platform-shadow-xs);
   --shadow-platform-glyph: var(--platform-shadow-glyph);
   --shadow-platform-thumb: var(--platform-shadow-thumb);
-  --shadow-platform-choice-ring: 0 0 0 3px var(--platform-brand-weak);
+  --shadow-platform-choice-ring: 0 0 0 1px var(--platform-on-selected);
   --shadow-platform-focus-glow: 0 0 0 3px var(--platform-focus-ring);
   /* `--platform-focus-ground` is set per element by `focusRingClasses` and `insetFocusRingClasses`. */
   --shadow-platform-focus-ring:
