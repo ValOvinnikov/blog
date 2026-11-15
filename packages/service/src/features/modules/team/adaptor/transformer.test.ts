@@ -7,13 +7,14 @@ import {
 import {
   mockRawTeamMember,
   mockRawTeamModule,
-} from '@blog/service/testing/modules/fixtures';
+} from '@blog/service/testing/modules/team/fixtures';
 import {
   MOCK_BIO_BLOCK_KEY,
   mockRawExternalLinkDocument,
   mockRawPersonBioBlock,
   mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
+import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { toTeamModule } from './transformer';
@@ -59,6 +60,25 @@ describe(toTeamModule, () => {
     expect(member?.profileUrl).toBe(MOCK_PROFILE_URL);
     expect(member?.bio).toEqual([{ ...bioBlock, markDefs: undefined }]);
     expect(member?.socialLinks).toHaveLength(1);
+  });
+
+  it('leaves every appearance override undefined when unset', () => {
+    const module = toTeamModule(mockRawTeamModule());
+
+    expect(module).toMatchObject({
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
+      columns: undefined,
+    });
+  });
+
+  it('maps the authored appearance overrides straight through', () => {
+    const module = toTeamModule(
+      mockRawTeamModule(MOCK_AUTHORED_MODULE_APPEARANCE),
+    );
+
+    expect(module).toMatchObject(MOCK_AUTHORED_MODULE_APPEARANCE);
   });
 
   it('keeps the members in authored order', () => {
