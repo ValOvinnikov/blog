@@ -36,8 +36,8 @@ An editor shows quotes from clients or readers as social proof. Quotes are reusa
 ## Configuration
 
 - Editors (Studio) write the quotes and build the modules. No platform setting.
-- The module itself is not plan-gated or capability-gated; only its section overrides are, by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
-- Look reach: card style, radius, fonts and the band background restyle `QuoteCard` through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). On Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling the quote cards in the grid and the carousel; the single-quote spotlight has no card frame, so it takes only the section's spacing. On Free they have no effect ([module-system](./module-system.md)). Voice has no reach.
+- **Plans:** the module is in the Growth module pack (`MODULE_PACK.GROWTH`), so `ModuleGate` renders nothing for it on Free or Starter; its section overrides are further gated by the Look entitlement ([plans-and-entitlements](./plans-and-entitlements.md)).
+- Look reach: card style, radius, fonts and the band background restyle `QuoteCard` through tokens ([look](./look.md), [design-tokens-and-surfaces](./design-tokens-and-surfaces.md)). On Growth, the module's card style, corners and density overrides win over the Look for its own band, restyling the quote cards in the grid and the carousel; the single-quote spotlight has no card frame, so it takes only the section's spacing. Below Growth the module does not render, so its overrides never show ([module-system](./module-system.md)). Voice has no reach.
 
 ## Constraints and invariants
 

@@ -49,6 +49,11 @@ const items = [
   }),
 ];
 
+const itemsWithImages = items.map((item) => ({
+  ...item,
+  sanityImage: mockSanityImage(),
+}));
+
 const itemsWithFirstImage = items.map((item, index) =>
   index === 0 ? { ...item, sanityImage: mockSanityImage() } : item,
 );
@@ -102,30 +107,21 @@ export const Default: TStory = {};
 
 export const WithImages: TStory = {
   args: {
-    items: items.map((item) => ({
-      ...item,
-      sanityImage: mockSanityImage(),
-    })),
+    items: itemsWithImages,
   },
 };
 
 export const SquareImages: TStory = {
   args: {
     imageShape: CARD_IMAGE_SHAPE.SQUARE,
-    items: items.map((item) => ({
-      ...item,
-      sanityImage: mockSanityImage(),
-    })),
+    items: itemsWithImages,
   },
 };
 
 export const CircleImages: TStory = {
   args: {
     imageShape: CARD_IMAGE_SHAPE.CIRCLE,
-    items: items.map((item) => ({
-      ...item,
-      sanityImage: mockSanityImage(),
-    })),
+    items: itemsWithImages,
   },
 };
 
