@@ -27,7 +27,7 @@ The public site and `@blog/ui` draw every colour, size, radius, spacing step, sh
 ## Surfaces and routes
 
 - No route. Every public page and every `@blog/ui` component consumes the tokens.
-- `packages/ui`'s Storybook has a design-tokens story that parses `theme.css` (`token-registry.ts`, the `@role` comments) and renders colour, type, radius, spacing, layout, motion and role tables.
+- `packages/ui`'s Storybook has a design-tokens story that parses `theme.css` (`token-registry.ts`, the `@role` comments) and renders colour, type, radius, spacing, layout, motion and hook tables.
 - Editors reach surfaces only through a module's `brandVariant` field in Studio (`PRIMARY`, `SECONDARY`, `BRAND_PRIMARY`), which picks the band `Section` paints.
 - `apps/platform` keeps its own `--platform-*` token layer (`apps/platform/src/styles/platform-theme.css`). It imports `theme.css` for the Tailwind base and for the site preview components.
 - Platform tokens for the onboarding surfaces, in that file:

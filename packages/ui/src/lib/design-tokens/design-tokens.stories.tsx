@@ -73,7 +73,7 @@ export const Motion: TStory = {
     section('Motion', tokensByCategory.motion, (t) => <KvList tokens={t} />),
 };
 
-export const Roles: TStory = {
+export const Hooks: TStory = {
   render: () =>
-    section('Roles', tokensByCategory.role, (t) => <KvList tokens={t} />),
+    section('Hooks', tokensByCategory.hook, (t) => <KvList tokens={t} />),
 };

@@ -6,7 +6,7 @@ export type TCategory =
   | 'spacing'
   | 'layout'
   | 'motion'
-  | 'role';
+  | 'hook';
 
 export type TToken = {
   name: string;
@@ -21,10 +21,10 @@ const PREFIX_CATEGORY: ReadonlyArray<readonly [string, TCategory]> = [
   ['container', 'layout'],
   ['spacing', 'spacing'],
   ['radius', 'radius'],
-  ['font-weight', 'role'],
-  ['heading', 'role'],
-  ['aspect', 'role'],
-  ['divider', 'role'],
+  ['font-weight', 'hook'],
+  ['heading', 'hook'],
+  ['aspect', 'hook'],
+  ['divider', 'hook'],
   ['font', 'font'],
   ['text', 'typography'],
   ['ease', 'motion'],
@@ -60,11 +60,8 @@ const parseDeclarations = (block: string, seen: Set<string>): TToken[] => {
     if (!hit) continue;
 
     const [prefix, category] = hit;
-    // A role token's prefix is part of what it names (`heading-case`, `aspect-card`), so it keeps its full name.
-    const name =
-      category === 'role' || bare === prefix
-        ? bare
-        : bare.slice(prefix.length + 1);
+    const keepsFullName = category === 'hook' || bare === prefix;
+    const name = keepsFullName ? bare : bare.slice(prefix.length + 1);
     const value = m[2]!.replace(/\s+/g, ' ').trim();
 
     seen.add(cssVar);
@@ -74,12 +71,10 @@ const parseDeclarations = (block: string, seen: Set<string>): TToken[] => {
   return tokens;
 };
 
-/** Parses `@blog/tailwind-config`'s `theme.css` into a flat list of design tokens, auto-discovering every `--<prefix>-<name>` custom property (and its value) so the gallery never needs manual edits when a token is renamed, added, or removed. */
 export const parseThemeTokens = (css: string): TToken[] => {
   const seen = new Set<string>();
   const themeTokens = parseDeclarations(themeBlocks(css), seen);
 
-  // Durations live in `:root` (so the @layer base transition utilities keep their `var()` references), so pull just the motion tokens from there — filtering out the raw colour palette that would otherwise leak in.
   const root = /:root\s*\{([\s\S]*?)\}/.exec(css)?.[1] ?? '';
   const rootMotion = parseDeclarations(root, seen).filter(
     (token) => token.category === 'motion',

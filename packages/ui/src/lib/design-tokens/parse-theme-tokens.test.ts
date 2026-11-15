@@ -51,7 +51,7 @@ describe(parseThemeTokens, () => {
     it.each([
       [CSS_VAR_FONT_WEIGHT_HEADING, 'font-weight-heading'],
       [CSS_VAR_ASPECT_CARD, 'aspect-card'],
-    ])('keeps the full name of the role token %s', (cssVar, name) => {
+    ])('keeps the full name of the hook token %s', (cssVar, name) => {
       expect(findToken(cssVar)?.name).toBe(name);
     });
 
@@ -75,8 +75,8 @@ describe(parseThemeTokens, () => {
     it.each([
       [CSS_VAR_COLOR_BG, 'color'],
       ['--font-mono', 'font'],
-      [CSS_VAR_FONT_WEIGHT_HEADING, 'role'],
-      [CSS_VAR_ASPECT_CARD, 'role'],
+      [CSS_VAR_FONT_WEIGHT_HEADING, 'hook'],
+      [CSS_VAR_ASPECT_CARD, 'hook'],
       [CSS_VAR_RADIUS_SM, 'radius'],
       ['--spacing-gutter', 'spacing'],
       ['--container-content', 'layout'],
