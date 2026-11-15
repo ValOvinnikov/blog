@@ -4,6 +4,7 @@ import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-clas
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import {
   SELECTED_CHOICE_CLASSES,
+  SELECTED_COMPACT_FILL_CLASSES,
   UNSELECTED_CHOICE_CLASSES,
 } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -38,9 +39,7 @@ export const presetPickerVariants = tv({
     selected: {
       true: {
         card: SELECTED_CHOICE_CLASSES,
-        dot: [
-          'border-platform-brand-ink bg-platform-brand-ink text-platform-on-brand-ink',
-        ],
+        dot: [SELECTED_COMPACT_FILL_CLASSES],
       },
       false: {
         card: [

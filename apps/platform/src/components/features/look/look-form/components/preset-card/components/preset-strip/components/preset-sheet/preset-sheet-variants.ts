@@ -1,6 +1,7 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { OPEN_TRIGGER_CLASSES } from '@platform/utils/open-trigger-classes/open-trigger-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const presetSheetVariants = tv({
@@ -8,7 +9,7 @@ export const presetSheetVariants = tv({
     trigger: [
       'flex min-h-14 w-full cursor-pointer items-center gap-2.5 rounded-platform-control border border-platform-control-line bg-platform-surface px-2.5 py-2 text-left',
       'not-data-[disabled]:hover:bg-platform-hover-tint',
-      'data-[popup-open]:border-platform-brand-ink data-[popup-open]:shadow-platform-choice-ring',
+      OPEN_TRIGGER_CLASSES,
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,
     ],

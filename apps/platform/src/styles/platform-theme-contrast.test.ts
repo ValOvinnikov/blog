@@ -91,11 +91,11 @@ const TOKEN = {
   PILL_NEUTRAL_POPOVER: 'platform-pill-neutral-popover',
   POPOVER: 'platform-popover',
   POPOVER_HOVER: 'platform-popover-hover',
-  SEGMENT_ON: 'platform-segment-on',
   SELECTED: 'platform-selected',
+  SELECTED_EDGE: 'platform-selected-edge',
+  SELECTED_LINE: 'platform-selected-line',
   SELECTED_TINT: 'platform-selected-tint',
   SIDE: 'platform-side',
-  SIDE_ACCENT: 'platform-side-accent',
   SIDE_FIELD_LINE: 'platform-side-field-line',
   SIDE_MUTED: 'platform-side-muted',
   SIDE_RAISED: 'platform-side-raised',
@@ -116,8 +116,6 @@ const TOKEN = {
 
 type TPair = readonly [string, string, string, number];
 
-const PRESSED_RING = 'Pressed ring';
-
 const SHARED_PAIRS: readonly TPair[] = [
   ['Text on card', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
   ['Text on card header', TOKEN.TEXT, TOKEN.SURFACE_HEAD, TEXT],
@@ -126,7 +124,6 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Nav text on sidebar', TOKEN.SIDE_TEXT, TOKEN.SIDE, TEXT],
   ['Section label on sidebar', TOKEN.SIDE_MUTED, TOKEN.SIDE, TEXT],
   ['Active row text', TOKEN.BRAND_INK, TOKEN.SIDE_RAISED, TEXT],
-  ['Active row bar', TOKEN.SIDE_ACCENT, TOKEN.SIDE_RAISED, BOUNDARY],
   ['Link on card', TOKEN.BRAND_INK, TOKEN.SURFACE, TEXT],
   ['Link hover on card', TOKEN.BRAND_STRONG, TOKEN.SURFACE, TEXT],
   ['Label on primary', TOKEN.ON_BRAND_INK, TOKEN.BRAND, TEXT],
@@ -138,8 +135,7 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Input border on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
   ['Input border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
   ['Switch off track on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
-  ['Switch on track on card', TOKEN.BRAND, TOKEN.SURFACE, BOUNDARY],
-  ['Switch on thumb on track', TOKEN.SWITCH_THUMB_ON, TOKEN.BRAND, BOUNDARY],
+  ['Switch on thumb on track', TOKEN.SWITCH_THUMB_ON, TOKEN.SELECTED, BOUNDARY],
   [
     'Focused field border against resting border',
     TOKEN.BRAND_INK,
@@ -163,7 +159,6 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Email on open account trigger', TOKEN.SIDE_MUTED, TOKEN.SIDE_RAISED, TEXT],
   ['Muted on menu', TOKEN.MUTED, TOKEN.POPOVER, TEXT],
   ['Row text on highlighted row', TOKEN.TEXT, TOKEN.POPOVER_HOVER, TEXT],
-  ['Current bar on menu', TOKEN.BRAND_INK, TOKEN.POPOVER, BOUNDARY],
   [
     'Pinned trigger border on menu',
     TOKEN.SIDE_FIELD_LINE,
@@ -172,7 +167,6 @@ const SHARED_PAIRS: readonly TPair[] = [
   ],
   ['Name on account trigger at rest', TOKEN.TEXT_STRONG, TOKEN.SIDE, TEXT],
   ['Neutral pill in a menu', TOKEN.MUTED, TOKEN.PILL_NEUTRAL_POPOVER, TEXT],
-  ['Selected preset tick', TOKEN.ON_BRAND_INK, TOKEN.BRAND_INK, BOUNDARY],
   ['Rest icon on toolbar track', TOKEN.MUTED, TOKEN.THEME_TRACK, BOUNDARY],
   ['Label on hover tint', TOKEN.TEXT, TOKEN.HOVER_TINT, TEXT],
   ['Muted on hover tint', TOKEN.MUTED, TOKEN.HOVER_TINT, TEXT],
@@ -193,14 +187,7 @@ const SHARED_PAIRS: readonly TPair[] = [
     TOKEN.CONTROL_LINE_HOVER,
     BOUNDARY,
   ],
-  ['Pressed icon on plate', TOKEN.BRAND_STRONG, TOKEN.SEGMENT_ON, BOUNDARY],
   ['Toolbar track border on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
-  [
-    'Pressed label on selected tint',
-    TOKEN.BRAND_STRONG,
-    TOKEN.SELECTED_TINT,
-    TEXT,
-  ],
   ['Label on selected tint', TOKEN.TEXT, TOKEN.SELECTED_TINT, TEXT],
   ['Muted on selected tint', TOKEN.MUTED, TOKEN.SELECTED_TINT, TEXT],
   ['Chip text on chip', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
@@ -228,7 +215,12 @@ const SHARED_PAIRS: readonly TPair[] = [
     TOKEN.BRAND,
     BOUNDARY,
   ],
-  ['Selected chip border on page', TOKEN.BRAND, TOKEN.BG, BOUNDARY],
+  [
+    "Focus ring on a checked item's gap",
+    TOKEN.FOCUS_RING,
+    TOKEN.ON_SELECTED,
+    FOCUS,
+  ],
   ['Hovered primary border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Locked text on page', TOKEN.MUTED, TOKEN.BG, TEXT],
@@ -269,7 +261,6 @@ const FOCUS_GROUNDS = [
   TOKEN.SURFACE_HEAD,
   TOKEN.POPOVER,
   TOKEN.POPOVER_HOVER,
-  TOKEN.SEGMENT_ON,
   TOKEN.HOVER_TINT,
   TOKEN.THEME_TRACK,
   TOKEN.SIDE,
@@ -284,16 +275,46 @@ const focusMarkPairs = (mark: string): TPair[] =>
     FOCUS,
   ]);
 
+const SELECTION_GROUNDS = [
+  TOKEN.BG,
+  TOKEN.SURFACE,
+  TOKEN.POPOVER,
+  TOKEN.THEME_TRACK,
+] as const;
+
+const selectionMarkPairs = (mark: string): TPair[] =>
+  SELECTION_GROUNDS.map((ground) => [
+    `Selection mark on ${ground}`,
+    mark,
+    ground,
+    BOUNDARY,
+  ]);
+
 const LIGHT_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
-  [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.THEME_TRACK, BOUNDARY],
+  ...selectionMarkPairs(TOKEN.SELECTED_EDGE),
+  [
+    'Selected row edge on tint',
+    TOKEN.SELECTED_EDGE,
+    TOKEN.SELECTED_TINT,
+    BOUNDARY,
+  ],
+  ['Tile hairline on card', TOKEN.SELECTED_EDGE, TOKEN.SURFACE, BOUNDARY],
   ['Focus edge around the ring', TOKEN.FOCUS_EDGE, TOKEN.FOCUS_RING, FOCUS],
   ...focusMarkPairs(TOKEN.FOCUS_EDGE),
 ];
 
 const DARK_PAIRS: readonly TPair[] = [
   ...SHARED_PAIRS,
-  [PRESSED_RING, TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, BOUNDARY],
+  ...selectionMarkPairs(TOKEN.SELECTED),
+  [
+    'Selected row bar on tint',
+    TOKEN.SELECTED_LINE,
+    TOKEN.SELECTED_TINT,
+    BOUNDARY,
+  ],
+  ['Tile border on card', TOKEN.SELECTED_LINE, TOKEN.SURFACE, BOUNDARY],
+  ['Sidebar current bar', TOKEN.SELECTED_LINE, TOKEN.SIDE_RAISED, BOUNDARY],
   ...focusMarkPairs(TOKEN.FOCUS_RING),
 ];
 

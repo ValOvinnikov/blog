@@ -1,5 +1,6 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { SELECTED_ROW_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const leadRowVariants = tv({
@@ -24,9 +25,9 @@ export const leadRowVariants = tv({
     isSelected: {
       true: {
         row: [
-          'relative bg-platform-selected-tint hover:bg-platform-selected-tint',
-          // A border on a pseudo-element, so it paints above the inset focus ring instead of under it.
-          'after:pointer-events-none after:absolute after:inset-0 after:border after:border-platform-brand',
+          ...SELECTED_ROW_CLASSES,
+          'border-l-transparent hover:bg-platform-selected-tint',
+          'before:-left-platform-bar after:-left-platform-bar',
           insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
       },

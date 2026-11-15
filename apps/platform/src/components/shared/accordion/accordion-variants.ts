@@ -4,6 +4,7 @@ import {
   focusRingClasses,
   insetFocusRingClasses,
 } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { SELECTED_ROW_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -99,11 +100,12 @@ export const accordionVariants = tv({
       variant: ACCORDION_VARIANT.ROW,
       isOpen: true,
       class: {
-        item: [
-          'bg-platform-surface',
-          'after:pointer-events-none after:absolute after:inset-y-0 after:left-0 after:w-[3px] after:bg-platform-brand',
+        item: ['bg-platform-surface'],
+        trigger: [
+          ...SELECTED_ROW_CLASSES,
+          'hover:bg-platform-selected-tint max-lg:min-h-12',
+          insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
-        trigger: ['max-lg:min-h-12'],
       },
     },
   ],

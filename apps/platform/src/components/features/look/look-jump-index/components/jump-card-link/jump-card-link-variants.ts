@@ -1,5 +1,6 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { SELECTED_COMPACT_FILL_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const jumpCardLinkVariants = tv({
@@ -26,16 +27,25 @@ export const jumpCardLinkVariants = tv({
       },
     },
     isCurrent: {
-      true: {
-        link: ['bg-platform-selected font-semibold text-platform-on-selected'],
-      },
+      true: { link: ['font-semibold'] },
     },
   },
   compoundVariants: [
     {
       isPhone: true,
       isCurrent: true,
-      class: { link: ['border-platform-brand'] },
+      class: {
+        link: [SELECTED_COMPACT_FILL_CLASSES],
+      },
+    },
+    {
+      isPhone: false,
+      isCurrent: true,
+      class: {
+        link: [
+          'text-platform-text shadow-[inset_0_-2px_0_var(--platform-selected-line)]',
+        ],
+      },
     },
     {
       isCurrent: false,

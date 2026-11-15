@@ -54,10 +54,8 @@ export const segmentedControlVariants = tv({
         option: [
           'cursor-pointer border-platform-control-line bg-platform-surface text-platform-text lg:text-platform-muted',
           'not-disabled:hover:not-data-[pressed]:bg-platform-hover-tint not-disabled:hover:not-data-[pressed]:text-platform-text',
-          'data-[pressed]:border-platform-brand-ink data-[pressed]:bg-platform-selected-tint data-[pressed]:text-platform-brand-strong',
-          'max-lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_0.5px_var(--platform-brand-ink)]',
-          'lg:data-[pressed]:bg-platform-surface lg:data-[pressed]:text-platform-text',
-          'lg:data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1.5px_var(--platform-brand-ink)]',
+          'data-[pressed]:border-platform-selected-edge data-[pressed]:bg-platform-selected data-[pressed]:text-platform-on-selected',
+          'lg:data-[pressed]:inset-ring lg:data-[pressed]:inset-ring-platform-selected-edge',
         ],
       },
     },
