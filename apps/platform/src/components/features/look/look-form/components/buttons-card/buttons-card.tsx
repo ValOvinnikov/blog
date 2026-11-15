@@ -58,6 +58,7 @@ export const ButtonsCard = ({ summary }: TButtonsCardProps) => {
   ).map((option) => ({
     ...option,
     glyph: <SampleSpinner variant={option.value} />,
+    triggerGlyph: <SampleSpinner variant={option.value} isStill={true} />,
   }));
 
   const spinnerStyleLabel = t('spinnerStyleLabel');

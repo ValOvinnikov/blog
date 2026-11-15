@@ -25,6 +25,7 @@ const MOCK_BADGE = faker.lorem.word();
 const MOCK_PLACEHOLDER = faker.lorem.words(3);
 const MOCK_FIRST_GLYPH_TEST_ID = faker.string.alpha(8);
 const MOCK_SECOND_GLYPH_TEST_ID = faker.string.alpha(8);
+const MOCK_TRIGGER_GLYPH_TEST_ID = faker.string.alpha(8);
 
 const MOCK_OPTIONS = [
   { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL },
@@ -91,6 +92,40 @@ describe(`<${OptionSelect.name}/>`, () => {
 
     expect(triggerGlyph).toBeInTheDocument();
     expect(secondOptionGlyph).toBeInTheDocument();
+  });
+
+  it('shows the selected trigger glyph in the trigger and its glyph in its row', async () => {
+    setup({
+      options: [
+        {
+          value: MOCK_FIRST_VALUE,
+          label: MOCK_FIRST_LABEL,
+          glyph: <svg data-testid={MOCK_FIRST_GLYPH_TEST_ID} />,
+          triggerGlyph: <svg data-testid={MOCK_TRIGGER_GLYPH_TEST_ID} />,
+        },
+      ],
+    });
+
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+    const triggerGlyph = within(trigger).getByTestId(
+      MOCK_TRIGGER_GLYPH_TEST_ID,
+    );
+    const listGlyphInTrigger = within(trigger).queryByTestId(
+      MOCK_FIRST_GLYPH_TEST_ID,
+    );
+    await user.click(trigger);
+    const option = await screen.findByRole('option', {
+      name: MOCK_FIRST_LABEL,
+    });
+    const optionGlyph = within(option).getByTestId(MOCK_FIRST_GLYPH_TEST_ID);
+    const triggerGlyphInOption = within(option).queryByTestId(
+      MOCK_TRIGGER_GLYPH_TEST_ID,
+    );
+
+    expect(triggerGlyph).toBeInTheDocument();
+    expect(listGlyphInTrigger).not.toBeInTheDocument();
+    expect(optionGlyph).toBeInTheDocument();
+    expect(triggerGlyphInOption).not.toBeInTheDocument();
   });
 
   it('reports the option chosen from the list', async () => {
