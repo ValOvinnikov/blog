@@ -21,3 +21,4 @@ export const MOCK_OTHER_WEBHOOK: TListedSanityWebhook = {
   url: MOCK_OTHER_WEBHOOK_URL,
   projection: null,
 };
+export const MOCK_ENCRYPTED_WEBHOOK_SECRET = 'encrypted-webhook-secret';

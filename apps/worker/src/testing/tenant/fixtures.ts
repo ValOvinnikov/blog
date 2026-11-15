@@ -70,3 +70,13 @@ export function mockProvisionedTenant(
     ...overrides,
   });
 }
+
+export function mockTenantWithWebhook(
+  overrides: Partial<TTenant> = {},
+): TTenant {
+  return mockProvisionedTenant({
+    id: mockFaker.string.uuid(),
+    webhookCreatedAt: new Date(0),
+    ...overrides,
+  });
+}

@@ -37,7 +37,9 @@ export async function ensureInfrastructure(
     },
     {
       step: TENANT_PROVISIONING_STEP.CREATE_WEBHOOK,
-      run: () => createTenantRevalidateWebhook(tenant, env),
+      run: async () => {
+        await createTenantRevalidateWebhook(tenant, env);
+      },
     },
     {
       step: TENANT_PROVISIONING_STEP.MAP_DOMAIN,

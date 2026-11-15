@@ -5140,6 +5140,12 @@
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/tenant.ts"
+      },
+      {
+        "ref": "REVALIDATE_WEBHOOK_CHANGE.UPDATED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
       }
     ],
     "DOMAIN_TAKEN": [
@@ -7664,6 +7670,12 @@
         "scope": "app:platform",
         "from": "@platform/constants/plan-change",
         "file": "apps/platform/src/constants/plan-change.ts"
+      },
+      {
+        "ref": "REVALIDATE_WEBHOOK_CHANGE.UNCHANGED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
       }
     ],
     "CARD_DECLINED": [
@@ -11388,6 +11400,54 @@
         "scope": "app:worker",
         "from": "@worker/constants/retention",
         "file": "apps/worker/src/constants/retention.ts"
+      }
+    ],
+    "webhook_secret_rotation.tenant_failed": [
+      {
+        "ref": "REVALIDATE_WEBHOOK_LOG.ROTATION_TENANT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
+      }
+    ],
+    "webhook_secret_rotation.finished": [
+      {
+        "ref": "REVALIDATE_WEBHOOK_LOG.ROTATION_FINISHED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
+      }
+    ],
+    "webhook_secret_rotation.failed": [
+      {
+        "ref": "REVALIDATE_WEBHOOK_LOG.ROTATION_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
+      }
+    ],
+    "revalidate_webhook_sync.tenant_failed": [
+      {
+        "ref": "REVALIDATE_WEBHOOK_LOG.SYNC_TENANT_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
+      }
+    ],
+    "revalidate_webhook_sync.finished": [
+      {
+        "ref": "REVALIDATE_WEBHOOK_LOG.SYNC_FINISHED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
+      }
+    ],
+    "revalidate_webhook_sync.failed": [
+      {
+        "ref": "REVALIDATE_WEBHOOK_LOG.SYNC_FAILED",
+        "scope": "app:worker",
+        "from": "@worker/constants/revalidate-webhook",
+        "file": "apps/worker/src/constants/revalidate-webhook.ts"
       }
     ],
     "scheduled_post_purge.start_failed": [
