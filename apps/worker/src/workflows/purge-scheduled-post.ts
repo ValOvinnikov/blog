@@ -1,10 +1,12 @@
 import {
   SCHEDULED_POST_PURGE_HOOK_PREFIX,
+  SCHEDULED_POST_PURGE_LOG,
   SCHEDULED_POST_STATE,
 } from '@worker/constants/scheduled-post-purge';
+import { reportRunFailed } from '@worker/units/report-run-failed';
 import { checkScheduledPost } from '@worker/units/scheduled-post-purge/check-scheduled-post';
 import { purgeScheduledPostPages } from '@worker/units/scheduled-post-purge/purge-scheduled-post-pages';
-import { reportScheduledPostPurgeFailed } from '@worker/units/scheduled-post-purge/report-scheduled-post-purge-failed';
+import { errorMessage } from '@worker/utils/error-message/error-message';
 import { createHook, sleep } from 'workflow';
 
 export async function purgeScheduledPost(
@@ -29,10 +31,11 @@ export async function purgeScheduledPost(
       await purgeScheduledPostPages(tenantId, postId);
     }
   } catch (error) {
-    await reportScheduledPostPurgeFailed(
+    await reportRunFailed(
+      SCHEDULED_POST_PURGE_LOG.RUN_FAILED,
       tenantId,
       postId,
-      error instanceof Error ? error.message : String(error),
+      errorMessage(error),
     );
     throw error;
   } finally {

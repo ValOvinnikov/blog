@@ -4,6 +4,7 @@ import {
   customRender,
   renderWithIntl,
   screen,
+  within,
 } from '@platform/testing/custom-render';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import type { Mock } from 'vitest';
@@ -22,6 +23,8 @@ const MOCK_BADGE_ID = faker.string.alpha(8);
 const MOCK_FIELD_LABEL = faker.lorem.word();
 const MOCK_BADGE = faker.lorem.word();
 const MOCK_PLACEHOLDER = faker.lorem.words(3);
+const MOCK_FIRST_GLYPH_TEST_ID = faker.string.alpha(8);
+const MOCK_SECOND_GLYPH_TEST_ID = faker.string.alpha(8);
 
 const MOCK_OPTIONS = [
   { value: MOCK_FIRST_VALUE, label: MOCK_FIRST_LABEL },
@@ -60,6 +63,36 @@ describe(`<${OptionSelect.name}/>`, () => {
     },
   );
 
+  it('shows the selected glyph in the trigger and each option glyph in its row', async () => {
+    setup({
+      options: [
+        {
+          value: MOCK_FIRST_VALUE,
+          label: MOCK_FIRST_LABEL,
+          glyph: <svg data-testid={MOCK_FIRST_GLYPH_TEST_ID} />,
+        },
+        {
+          value: MOCK_SECOND_VALUE,
+          label: MOCK_SECOND_LABEL,
+          glyph: <svg data-testid={MOCK_SECOND_GLYPH_TEST_ID} />,
+        },
+      ],
+    });
+
+    const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
+    const triggerGlyph = within(trigger).getByTestId(MOCK_FIRST_GLYPH_TEST_ID);
+    await user.click(trigger);
+    const secondOption = await screen.findByRole('option', {
+      name: MOCK_SECOND_LABEL,
+    });
+    const secondOptionGlyph = within(secondOption).getByTestId(
+      MOCK_SECOND_GLYPH_TEST_ID,
+    );
+
+    expect(triggerGlyph).toBeInTheDocument();
+    expect(secondOptionGlyph).toBeInTheDocument();
+  });
+
   it('reports the option chosen from the list', async () => {
     const onChange = vi.fn();
     setup({ onChange });
@@ -75,7 +108,7 @@ describe(`<${OptionSelect.name}/>`, () => {
   });
 
   it('leaves the Tab order when disabled', async () => {
-    setup({ isDisabled: true });
+    setup({ lock: { isDisabled: true } });
 
     await user.tab();
     const trigger = screen.getByRole('combobox', { name: MOCK_ARIA_LABEL });
@@ -98,7 +131,7 @@ describe(`<${OptionSelect.name}/>`, () => {
             options={MOCK_OPTIONS}
             value={MOCK_FIRST_VALUE}
             onChange={onChange}
-            isLocked={true}
+            lock={{ isLocked: true }}
           />
         </div>,
       );

@@ -61,6 +61,11 @@ export type TControlAria = {
   describedBy?: string;
 };
 
+export type TControlLock = {
+  isDisabled?: boolean;
+  isLocked?: boolean;
+};
+
 export type TNamedControlAria = TControlAria &
   ({ label: string } | { labelledBy: string });
 

@@ -2,7 +2,10 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { SELECT_APPEARANCE } from '@platform/constants/select-appearance';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { FIELD_POPUP_OPEN_CLASSES } from '@platform/utils/field-surface-classes/field-surface-classes';
-import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import {
+  focusRingClasses,
+  insetFocusRingClasses,
+} from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
@@ -28,6 +31,7 @@ export const selectVariants = tv({
       'flex min-h-11 cursor-pointer items-center gap-2 rounded-platform-control px-2 py-2',
       'outline-none',
       'data-[selected]:bg-platform-popover-hover data-[highlighted]:bg-platform-popover-hover',
+      insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
     ],
     indicator: ['w-4 shrink-0 text-platform-brand-ink'],
   },

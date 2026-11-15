@@ -282,7 +282,7 @@ save still settles as the form's generic server error.
   current page's row is a `side-raised` plate with the raised shadow, its
   text and icon `brand-ink` at 600, and a 3px `side-accent` bar on its left
   edge, on the collapsed rail too. A focused row keeps its rest colours and
-  shows the side-gapped `side-accent` ring, which replaces the plate's shadow.
+  shows the side-gapped focus ring, which replaces the plate's shadow.
   An inert row (no destination) keeps the rest colours with no hover ground,
   is exposed as a disabled link (`role="link"`, `aria-disabled`, no `href`),
   and shows its reason under the label at 12px / 16 in `side-muted`, wrapping
@@ -313,8 +313,8 @@ save still settles as the form's generic server error.
   unrewritten. The collapse toggle is the topbar's first item from
   `md` (below `md` that slot holds the phone Menu button and the toggle never
   renders): a 36×36 `control-line` box on `surface` with the unrotated 16px
-  `ICONS.SIDEBAR` glyph in `muted`, hovering and focusing to a `brand-ink`
-  border and `text` icon, focus adding the `bg`-gapped `brand-ink` ring. It is
+  `ICONS.SIDEBAR` glyph in `muted`, hovering to a `brand-ink` border and
+  `text` icon; focus is the `bg`-gapped focus ring alone. It is
   named "Collapse sidebar" or "Expand sidebar" with `aria-expanded` and
   `aria-controls="sidebar"`, carries no native `title`, and shows that name in
   the shared Tooltip below it, left-aligned, 6px away. The topbar is 59px tall
@@ -372,7 +372,8 @@ save still settles as the form's generic server error.
   viewport less 16px (`MENU_POPUP_FIT_WIDTH`). Each item is
   the name (13px/500 `text`) over the Mono domain (11px `muted`), padding 6px
   8px, `rounded-platform-control`, wrapping long text in full; the highlighted
-  item takes a `popover-hover` ground and no focus ring, and below `md` every
+  item takes a `popover-hover` ground, plus the inset focus ring when it was
+  reached by keyboard, and below `md` every
   item is at least 44px tall with its lines centred. The current workspace
   carries no visual marker; its item has `aria-current` for screen readers.
   The onboarding rail and the Choose a workspace page read the
@@ -394,8 +395,9 @@ save still settles as the form's generic server error.
   with a white label in Light, `brand-ink` yellow on the dark yellow tint in
   Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
   a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
-  focused field takes a `brand-ink` border, kept over an invalid field's
-  `bad-line` border, and a 3px `brand-line` glow (`shadow-platform-focus-glow`).
+  focused field takes a `brand-ink` border (near-black in Light, yellow in
+  Dark), kept over an invalid field's `bad-line` border, and a 3px
+  `focus-ring` glow (`shadow-platform-focus-glow`).
   The phone save footer's disabled or busy Save is the neutral
   `pill-neutral` ground with `muted` text and a `control-line-locked`
   border. A link
@@ -469,7 +471,7 @@ save still settles as the form's generic server error.
   the Menu open behind; Escape closes
   the inner popup onto its trigger, a second Escape closes the Menu onto its
   button, and choosing a workspace closes both. The Menu button takes a
-  `brand-ink` border on hover, focus (with the bg-gapped ring) and open, and
+  `brand-ink` border on hover and open, the bg-gapped focus ring on focus, and
   a `text` icon while open. It is named "Menu", carries no native `title`,
   and shows that name in the shared Tooltip below it, left-aligned, 6px away.
   Its inert rows are disabled menu items (`role="menuitem"`,
@@ -480,26 +482,44 @@ save still settles as the form's generic server error.
   out) is a flex row with a 10px gap, at least 44px tall at every width,
   padding 6px 8px,
   `rounded-platform-control`, 13px/500, 2px from the next item, taking a
-  `popover-hover` ground and no ring when highlighted.
+  `popover-hover` ground when highlighted, and the inset focus ring only when
+  the keyboard highlighted it.
 - `styles/platform-theme-contrast.test.ts` guards both palettes: each pair
   of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
   and focus rings, measured from the values in `platform-theme.css`, and the
   device-dark block must repeat the chosen-Dark block exactly.
-- Focus is one gapped ring, built by
+- Focus is one gapped ring on every control, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
-  theme-track): a 2px gap in that ground, then a 2px `brand-ink` ring
-  (`side-accent` on the sidebar), with no visible outline outside forced-colors mode. Text inputs, textareas
-  and the rich-text editor take no ring: focused, their border turns
-  `brand-ink` inside a 3px `brand-line` glow (`FIELD_FOCUS_CLASSES`,
-  `utils/field-surface-classes/`). The ring sits on `surface` for checkboxes, select
+  popover-hover, theme-track, brand-weak): a 2px gap in that ground, then a
+  2px `focus-ring` (#ffc233 in both themes), then in Light a 1px `focus-edge`
+  (#12141a) around it; Dark has no edge. The ground reaches the
+  `shadow-platform-focus-ring` token through `--platform-focus-ground`, which
+  the helper sets on the element. No visible outline shows outside
+  forced-colors mode, where the theme's `:focus-visible` outline shows
+  instead. A trigger other than `:focus-visible` is a `FOCUS_RING_TRIGGER`
+  (a highlighted option in a focused list, or a focused input inside the
+  control, the hue slider's thumb), and the helper gives each one its own
+  `Highlight` outline under forced colours. No focus style is written outside these helpers. Text inputs,
+  textareas, the link field and the rich-text editor take no ring: focused,
+  their border turns `brand-ink` inside a 3px `focus-ring` glow
+  (`FIELD_FOCUS_CLASSES`, `EDITABLE_SHELL_FOCUS_CLASSES`,
+  `utils/field-surface-classes/`), kept when the field is invalid. The ring sits on `surface` for checkboxes, select
   triggers, closed accordion triggers (an open one takes it on `surface-2`), underline view tabs, preset cards, the
   hue slider's thumb (focused or dragged) and the rich-text toolbar buttons;
   segmented options take it on `bg`, and segmented view tabs on `theme-track`. A ring
   that a clipping parent would cut off is drawn inset
-  (`insetFocusRingClasses`): the data table's scroll region, and its sort
-  buttons, which fill their head cell. The toast's dismiss button takes it
-  on `popover`. A raised shadow gives way to the
+  (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
+  the data table's scroll region and its sort buttons, which fill their head
+  cell; lead rows (on `brand-weak` when selected, the selected 1px `brand`
+  edge drawn above the ring); menu, select, tenant switcher and top-bar menu
+  items and the appearance menu radio items, on keyboard focus only (on
+  `popover-hover`, or `segment-on` for the checked radio); the Look preset
+  sheet's rows (on `brand-weak` when selected, the 3px bar a pseudo-element
+  above the ring); and the full-screen preview stage (on `theme-track`). An
+  inset ring's ground is the row's own fill. The more-presets grid's
+  highlighted option takes the outer ring on `popover`. The toast's dismiss
+  button takes it on `popover`. A raised shadow gives way to the
   ring while focused. Fields have a
   `control-line` border, or `control-line-tint` on a card header or
   toolbar. An invalid field has a `bad-line` border, with its error in

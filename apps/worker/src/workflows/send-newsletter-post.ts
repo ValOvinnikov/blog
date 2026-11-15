@@ -3,6 +3,7 @@ import {
   NEWSLETTER_POST_STATE,
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_HOOK_PREFIX,
+  NEWSLETTER_SEND_LOG,
   NEWSLETTER_SEND_PACE,
   NEWSLETTER_SLOW_PAUSE_MS,
 } from '@worker/constants/newsletter-send';
@@ -13,8 +14,9 @@ import {
   completeNewsletterSend,
   recordNewsletterSends,
   releaseNewsletterSendClaim,
-  reportNewsletterSendFailed,
 } from '@worker/units/newsletter-send/settle-newsletter-send';
+import { reportRunFailed } from '@worker/units/report-run-failed';
+import { errorMessage } from '@worker/utils/error-message/error-message';
 import { createHook, sleep } from 'workflow';
 
 async function runNewsletterSend(
@@ -72,10 +74,11 @@ export async function sendNewsletterPost(
     if (await run.getConflict()) return;
     await runNewsletterSend(tenantId, postId, claimedAt);
   } catch (error) {
-    await reportNewsletterSendFailed(
+    await reportRunFailed(
+      NEWSLETTER_SEND_LOG.RUN_FAILED,
       tenantId,
       postId,
-      error instanceof Error ? error.message : String(error),
+      errorMessage(error),
     );
     throw error;
   } finally {

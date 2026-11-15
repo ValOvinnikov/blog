@@ -1,6 +1,9 @@
 import { MENU_POPUP_FIT_WIDTH } from '@platform/components/shared/menu-surface';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
-import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import {
+  focusRingClasses,
+  insetFocusRingClasses,
+} from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const tenantSwitcherVariants = tv({
@@ -27,6 +30,7 @@ export const tenantSwitcherVariants = tv({
     item: [
       'flex min-h-11 cursor-pointer flex-col justify-center rounded-platform-control px-2 py-1.5 outline-none md:min-h-0',
       'data-[highlighted]:bg-platform-popover-hover',
+      insetFocusRingClasses(FOCUS_RING_GROUND.POPOVER_HOVER),
     ],
     itemNameRow: ['flex min-w-0 items-center gap-1.5'],
     itemName: [

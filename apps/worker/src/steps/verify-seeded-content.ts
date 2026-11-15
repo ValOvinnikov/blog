@@ -8,6 +8,7 @@ import {
 import { hasLength } from '@blog/utils/primitives';
 import { createClient } from '@sanity/client';
 import { SANITY_API_VERSION } from '@worker/constants/sanity-api';
+import { errorMessage } from '@worker/utils/error-message/error-message';
 import { grantPropagationRetryOptions } from '@worker/utils/grant-propagation-retry/grant-propagation-retry';
 import { assertHomeMetaTitleLength } from '@worker/utils/home-meta-title-length/home-meta-title-length';
 import type { TProvisionEnv } from '@worker/utils/provision-env/provision-env';
@@ -55,10 +56,6 @@ async function readWithGrantPropagationRetry<T>(
   } catch (error) {
     throw wrapError(error);
   }
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
 }
 
 type THomePageParseFields = TMaybeNull<{

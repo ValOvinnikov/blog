@@ -4,7 +4,6 @@ import {
   markNewsletterPostSent,
   releaseNewsletterPostSend,
 } from '@blog/db/queries/newsletter-post-sends';
-import { sanitizeLogMessage } from '@blog/insight';
 import {
   NEWSLETTER_SEND_LOG,
   NEWSLETTER_UNIT_MAX_RETRIES,
@@ -54,17 +53,3 @@ export async function completeNewsletterSend(
 }
 
 completeNewsletterSend.maxRetries = NEWSLETTER_UNIT_MAX_RETRIES;
-
-export async function reportNewsletterSendFailed(
-  tenantId: string,
-  postId: string,
-  error: string,
-): Promise<void> {
-  'use step';
-
-  logger.error(NEWSLETTER_SEND_LOG.RUN_FAILED, {
-    tenantId,
-    postId,
-    error: sanitizeLogMessage(error),
-  });
-}
