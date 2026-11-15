@@ -27,7 +27,7 @@ export const heroMediaVariants = tv({
     {
       variant: HERO_VARIANT.SPLIT,
       ratio: 'video',
-      class: ['lg:aspect-[4/3]'],
+      class: ['aspect-card lg:aspect-split'],
     },
     {
       variant: HERO_VARIANT.SPLIT,

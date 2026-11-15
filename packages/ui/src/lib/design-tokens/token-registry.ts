@@ -21,5 +21,6 @@ export const tokensByCategory: Record<TCategory, TToken[]> = parseThemeTokens(
     spacing: [],
     layout: [],
     motion: [],
+    role: [],
   } as Record<TCategory, TToken[]>,
 );

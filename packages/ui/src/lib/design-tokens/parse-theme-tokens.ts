@@ -1,5 +1,12 @@
 export type TCategory =
-  'color' | 'typography' | 'font' | 'radius' | 'spacing' | 'layout' | 'motion';
+  | 'color'
+  | 'typography'
+  | 'font'
+  | 'radius'
+  | 'spacing'
+  | 'layout'
+  | 'motion'
+  | 'role';
 
 export type TToken = {
   name: string;
@@ -14,6 +21,10 @@ const PREFIX_CATEGORY: ReadonlyArray<readonly [string, TCategory]> = [
   ['container', 'layout'],
   ['spacing', 'spacing'],
   ['radius', 'radius'],
+  ['font-weight', 'role'],
+  ['heading', 'role'],
+  ['aspect', 'role'],
+  ['divider', 'role'],
   ['font', 'font'],
   ['text', 'typography'],
   ['ease', 'motion'],
@@ -49,7 +60,11 @@ const parseDeclarations = (block: string, seen: Set<string>): TToken[] => {
     if (!hit) continue;
 
     const [prefix, category] = hit;
-    const name = bare === prefix ? prefix : bare.slice(prefix.length + 1);
+    // A role token's prefix is part of what it names (`heading-case`, `aspect-card`), so it keeps its full name.
+    const name =
+      category === 'role' || bare === prefix
+        ? bare
+        : bare.slice(prefix.length + 1);
     const value = m[2]!.replace(/\s+/g, ' ').trim();
 
     seen.add(cssVar);

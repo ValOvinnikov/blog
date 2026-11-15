@@ -137,6 +137,11 @@
   --radius-card: var(--radius-md);
   --radius-media: var(--radius-lg);
   --radius-item: var(--item-radius);
+  --font-weight-heading: 500; /* @role heading weight */
+  --heading-case: none; /* @role page and section title case */
+  --aspect-card: 16 / 9; /* @role card and stacked media */
+  --aspect-split: 4 / 3; /* @role media beside text */
+  --divider-width: 1px; /* @role divider weight */
 
   /* Layout */
   --container-content: 72rem;
@@ -509,7 +514,7 @@
       system-ui,
       sans-serif
     );
-    letter-spacing: -0.02em;
+    letter-spacing: var(--tracking-tight-display);
   }
 
   ::selection {
@@ -540,6 +545,10 @@
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }
+}
+
+@utility heading-case {
+  text-transform: var(--heading-case);
 }
 
 @utility duration-fast {
