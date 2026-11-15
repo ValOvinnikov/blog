@@ -7,6 +7,7 @@ import {
   type TTenantPageListResults,
   type TTenantPageLists,
 } from '@web/server/tenant/tenant-page-lists/tenant-page-lists';
+import type { TRenamedDocument } from '@web/utils/build-renamed-document-hrefs';
 import { buildTenantSitePaths } from '@web/utils/build-tenant-site-paths';
 import { logger } from '@web/utils/logger/logger';
 
@@ -14,6 +15,7 @@ export type TDeriveTenantSitePathsInput = {
   tenantId: string;
   tenant: TTenantSanityContext;
   documentHref?: string;
+  renamedDocument?: TRenamedDocument;
 };
 
 type TPageListFailure = { list: string; error: unknown };
@@ -58,6 +60,7 @@ export const deriveTenantSitePaths = async ({
   tenantId,
   tenant,
   documentHref,
+  renamedDocument,
 }: TDeriveTenantSitePathsInput): Promise<
   TResult<string[], typeof FETCH_FAILED_REASON>
 > => {
@@ -85,6 +88,7 @@ export const deriveTenantSitePaths = async ({
       locales: locales.data,
       lists: lists.data,
       documentHref,
+      renamedDocument,
     }),
   );
 };

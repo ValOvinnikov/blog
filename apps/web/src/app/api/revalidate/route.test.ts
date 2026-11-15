@@ -143,6 +143,7 @@ const MOCK_NOW = faker.date.between({
 });
 const MOCK_POST_ID = faker.string.uuid();
 const MOCK_POST_SLUG = faker.lorem.slug();
+const MOCK_PREVIOUS_POST_SLUG = faker.lorem.slug();
 const MOCK_TOPIC_ID = faker.string.uuid();
 const MOCK_AUTHOR_ID = faker.string.uuid();
 const MOCK_DOCUMENT_ID = faker.string.uuid();
@@ -432,6 +433,14 @@ describe(POST, () => {
       case: 'a slug that is not a string',
       body: JSON.stringify({ _type: POST_TYPE, _id: MOCK_POST_ID, slug: 1 }),
     },
+    {
+      case: 'a previous slug that is not a string',
+      body: JSON.stringify({
+        _type: POST_TYPE,
+        _id: MOCK_POST_ID,
+        previousSlug: 1,
+      }),
+    },
   ])('rejects $case as a bad request', async ({ body }) => {
     const request = new Request(MOCK_REVALIDATE_URL, {
       method: HTTP_METHOD.POST,
@@ -681,6 +690,7 @@ describe(POST, () => {
           _type: POST_TYPE,
           _id: MOCK_POST_ID,
           slug: MOCK_POST_SLUG,
+          previousSlug: MOCK_PREVIOUS_POST_SLUG,
         }),
       );
 
@@ -688,30 +698,29 @@ describe(POST, () => {
         type: POST_TYPE,
         id: MOCK_POST_ID,
         slug: MOCK_POST_SLUG,
+        previousSlug: MOCK_PREVIOUS_POST_SLUG,
         operation: null,
         tenantId: MOCK_TENANT_ID,
         tenant: MOCK_TENANT_SANITY_CONTEXT,
       });
     });
 
-    it('accepts a null slug as absent for a document without one', async () => {
+    it.each([
+      { field: 'slug', body: { slug: null } },
+      { field: 'previousSlug', body: { previousSlug: null } },
+    ])('accepts a null $field as absent', async ({ field, body }) => {
       const response = await POST(
         makeTenantRequest({
           _type: NAVIGATION_DOCUMENT_TYPE,
           _id: MOCK_DOCUMENT_ID,
-          slug: null,
+          ...body,
         }),
       );
 
       expect(response.status).toBe(HTTP_STATUS.OK);
-      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith({
-        type: NAVIGATION_DOCUMENT_TYPE,
-        id: MOCK_DOCUMENT_ID,
-        slug: undefined,
-        operation: null,
-        tenantId: MOCK_TENANT_ID,
-        tenant: MOCK_TENANT_SANITY_CONTEXT,
-      });
+      expect(deriveRevalidatePathsMock).toHaveBeenCalledWith(
+        expect.objectContaining({ [field]: undefined }),
+      );
     });
 
     it('hands the webhook operation to the path derivation', async () => {

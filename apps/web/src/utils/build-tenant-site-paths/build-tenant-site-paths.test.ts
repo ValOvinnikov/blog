@@ -117,6 +117,32 @@ describe(buildTenantSitePaths, () => {
     );
   });
 
+  it('adds a renamed document’s old address in every locale', () => {
+    const previousSlug = faker.lorem.slug();
+
+    const paths = buildTenantSitePaths({
+      tenantId: MOCK_TENANT_ID,
+      locales: [EN, NL],
+      lists: mockTenantPageLists({
+        tags: [{ slug: MOCK_TAG_SLUG, language: EN }],
+      }),
+      renamedDocument: {
+        type: 'page_tag',
+        slug: MOCK_TAG_SLUG,
+        previousSlug,
+      },
+    });
+
+    expect(paths).toEqual(
+      expect.arrayContaining([
+        `${EN_ROOT}/tags/${previousSlug}`,
+        `${EN_ROOT}/tags/${previousSlug}/page/2`,
+        `${NL_ROOT}/tags/${previousSlug}`,
+        `${NL_ROOT}/tags/${previousSlug}/page/2`,
+      ]),
+    );
+  });
+
   it('returns no duplicate paths', () => {
     const paths = buildTenantSitePaths({
       tenantId: MOCK_TENANT_ID,

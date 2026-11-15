@@ -5,6 +5,7 @@ export type TBuildPostPublishPathsInput = {
   tenantId: string;
   locales: readonly string[];
   postSlug: string;
+  previousPostSlug?: string;
   tagSlugs: string[];
   topicSlugs: string[];
   blogIndexPageParams: { page: string }[];
@@ -26,6 +27,7 @@ export const buildPostPublishPaths = (
     tenantId,
     locales,
     postSlug,
+    previousPostSlug,
     tagSlugs,
     topicSlugs,
     blogIndexPageParams,
@@ -40,6 +42,7 @@ export const buildPostPublishPaths = (
       routes.blogIndex(Number(params.page)),
     ),
     routes.post(postSlug),
+    ...(previousPostSlug ? [routes.post(previousPostSlug)] : []),
     ...tagSlugs.map((slug) => routes.tag(slug)),
     ...tagPaginationParams.map((tagPage) =>
       routes.tag(tagPage.slug, Number(tagPage.page)),
