@@ -343,7 +343,6 @@ export type Module_team = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   members?: Array<
     {
@@ -352,15 +351,20 @@ export type Module_team = {
   >;
   showBios?: boolean;
   showSocialLinks?: boolean;
-  imageShape?: 'CIRCLE' | 'SQUARE';
-  displayMode?: 'GRID' | 'CAROUSEL';
   ctaButtons?: Array<
     {
       _key: string;
     } & CtaButton
   >;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
+  imageShape?: 'CIRCLE' | 'SQUARE';
+  displayMode?: 'GRID' | 'CAROUSEL';
   contentAlignment?: 'LEFT' | 'CENTER';
   cardAlignment?: 'LEFT' | 'CENTER';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
+  columns?: 'TWO' | 'THREE' | 'FOUR';
   layout?: WideLayout;
 };
 
