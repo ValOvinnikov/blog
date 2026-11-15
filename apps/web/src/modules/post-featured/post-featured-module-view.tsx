@@ -8,7 +8,7 @@ import {
   MediaCardItem,
 } from '@web/components/shared/media-card-item';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type ISectionProps } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 
 import { postFeaturedModuleViewVariants } from './post-featured-module-view-variants';
 
@@ -16,7 +16,7 @@ export interface IPostFeaturedModuleViewProps extends Pick<
   TPostFeaturedModule,
   'headingBlock' | 'contentAlignment' | 'displayMode'
 > {
-  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
+  section: TModuleSection;
   items: IMediaCardData[];
   titleId: string;
   dataTestId: string;

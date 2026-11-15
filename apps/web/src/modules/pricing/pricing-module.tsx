@@ -4,7 +4,7 @@ import { service, type TPricingTier } from '@blog/service';
 import { PRICING_LOG } from '@web/constants/pricing';
 import { getPlanPrices } from '@web/server/pricing/get-plan-prices/get-plan-prices';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
+import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';
 import { getSiteSettings } from '@web/server/site-settings/get-site-settings/get-site-settings';
 import { logger } from '@web/utils/logger/logger';
 import { toPricingPanels } from '@web/utils/to-pricing-panels';
@@ -50,23 +50,13 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
     return null;
   }
 
-  const {
-    brandVariant,
-    layout,
-    headingBlock,
-    tiers,
-    footnote,
-    ctaButtons,
-    contentAlignment,
-    cardStyle,
-    radiusScale,
-    density,
-  } = result.data;
+  const { tiers } = result.data;
   const { currency, pricePeriodWording } = settingsResult.data;
-  const [appearance, planPrices] = await Promise.all([
-    getSectionAppearance(tenantId, { cardStyle, radiusScale, density }),
+  const [{ section, content }, planPrices] = await Promise.all([
+    getModuleSection(tenantId, result.data),
     getLinkedPlanPrices(id, tiers),
   ]);
+  const { headingBlock, footnote, ctaButtons, contentAlignment } = content;
   const panels = toPricingPanels({
     tiers,
     planPrices,
@@ -93,7 +83,7 @@ export const PricingModule = async ({ id }: IPricingModuleProps) => {
 
   return (
     <PricingModuleView
-      section={{ brandVariant, layout, appearance }}
+      section={section}
       headingBlock={headingBlock}
       footnote={footnote}
       ctaButtons={ctaButtons}

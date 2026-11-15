@@ -1,7 +1,7 @@
 import { service } from '@blog/service';
 import { TESTIMONIAL_LOG } from '@web/constants/testimonial';
 import { getRequestContext } from '@web/server/request-context/request-context';
-import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
+import { getModuleSection } from '@web/server/site-config/get-module-section/get-module-section';
 import { logger } from '@web/utils/logger/logger';
 
 import { TestimonialModuleView } from './testimonial-module-view';
@@ -25,24 +25,12 @@ export const TestimonialModule = async ({ id }: ITestimonialModuleProps) => {
     return null;
   }
 
-  const {
-    brandVariant,
-    layout,
-    cardStyle,
-    radiusScale,
-    density,
-    ...testimonialModule
-  } = result.data;
-  const appearance = await getSectionAppearance(tenantId, {
-    cardStyle,
-    radiusScale,
-    density,
-  });
+  const { section, content } = await getModuleSection(tenantId, result.data);
 
   return (
     <TestimonialModuleView
-      {...testimonialModule}
-      section={{ brandVariant, layout, appearance }}
+      {...content}
+      section={section}
       titleId={`testimonial-${id}`}
       dataTestId={`testimonial-module-${id}`}
     />

@@ -1,19 +1,19 @@
-import {
-  BRAND_VARIANT,
-  CARD_IMAGE_SHAPE,
-  CONTENT_ALIGNMENT,
-  DISPLAY_MODE,
-} from '@blog/config';
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { FEATURE_LIST_LOG } from '@web/constants/feature-list';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
-  MOCK_FEATURE_LIST_HEADING,
   MOCK_FEATURE_LIST_ITEMS,
+  mockFeatureListModule,
 } from '@web/testing/modules/feature-list/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { FeatureListModule } from './feature-list-module';
 
@@ -37,16 +37,9 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
-const MOCK_BASE_MODULE = {
-  brandVariant: BRAND_VARIANT.PRIMARY,
-  headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
-  ctaButtons: [],
-  imageShape: CARD_IMAGE_SHAPE.WIDE,
-  displayMode: DISPLAY_MODE.GRID,
-  contentAlignment: undefined,
-  cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
-};
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
 
 const setup = customRenderAsync(FeatureListModule, {
   id: MOCK_MODULE_ID,
@@ -54,15 +47,11 @@ const setup = customRenderAsync(FeatureListModule, {
 
 describe(`<${FeatureListModule.name}/>`, () => {
   beforeEach(() => {
-    getFeatureListMock.mockReset();
+    getFeatureListMock.mockResolvedValue(okResult(mockFeatureListModule()));
   });
 
   describe('when the module resolves', () => {
     beforeEach(async () => {
-      getFeatureListMock.mockResolvedValue(
-        okResult({ ...MOCK_BASE_MODULE, items: MOCK_FEATURE_LIST_ITEMS }),
-      );
-
       await setup();
     });
 
@@ -80,11 +69,31 @@ describe(`<${FeatureListModule.name}/>`, () => {
     });
   });
 
-  it('renders nothing when the fetch fails', async () => {
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getFeatureListMock.mockResolvedValue(
+        okResult(mockFeatureListModule(overrides)),
+      );
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
+    },
+  );
+
+  it('logs and renders nothing when the fetch fails', async () => {
     getFeatureListMock.mockResolvedValue(errorResult(MOCK_ERROR));
 
     const { container } = await setup();
 
     expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      FEATURE_LIST_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 });

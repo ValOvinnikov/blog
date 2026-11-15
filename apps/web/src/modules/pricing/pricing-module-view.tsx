@@ -4,7 +4,7 @@ import { PricingCardGrid } from '@blog/ui/components/organisms/pricing-card-grid
 import { hasArrayGotMultipleItems, hasLength } from '@blog/utils/primitives';
 import { ActionGroup } from '@web/components/shared/action-group';
 import { ModuleHeading } from '@web/components/shared/module-heading';
-import { Section, type ISectionProps } from '@web/components/shared/section';
+import { Section, type TModuleSection } from '@web/components/shared/section';
 import { PromotionCodeProvider } from '@web/context/promotion-code-provider';
 import { LinkedPricingTierCard } from '@web/modules/pricing/components/linked-pricing-tier-card/linked-pricing-tier-card';
 import { PricingPeriodSwitch } from '@web/modules/pricing/components/pricing-period-switch/pricing-period-switch';
@@ -18,7 +18,7 @@ export interface IPricingModuleViewProps extends Pick<
   TPricingModule,
   'headingBlock' | 'footnote' | 'ctaButtons' | 'contentAlignment'
 > {
-  section: Pick<ISectionProps, 'brandVariant' | 'layout' | 'appearance'>;
+  section: TModuleSection;
   panels: IPricingPanel[];
   titleId: string;
   dataTestId: string;

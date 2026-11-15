@@ -9904,6 +9904,14 @@
         "file": "apps/web/src/constants/faq.ts"
       }
     ],
+    "feature_list_module.fetch_failed": [
+      {
+        "ref": "FEATURE_LIST_LOG.MODULE_FETCH_FAILED",
+        "scope": "app:web",
+        "from": "@web/constants/feature-list",
+        "file": "apps/web/src/constants/feature-list.ts"
+      }
+    ],
     "footer.layout_fetch_failed": [
       {
         "ref": "FOOTER_LOG.CONTENT_FETCH_FAILED",

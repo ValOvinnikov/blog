@@ -3,6 +3,7 @@ import {
   CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   DISPLAY_MODE,
+  GRID_COLUMNS,
 } from '@blog/config';
 import { faker } from '@faker-js/faker';
 import { customRender, screen, within } from '@web/testing/custom-render';
@@ -14,8 +15,13 @@ import {
 import {
   MOCK_FEATURE_LIST_HEADING,
   MOCK_FEATURE_LIST_ITEMS,
+  mockFeatureListItem,
 } from '@web/testing/modules/feature-list/fixtures';
 import { mockHeadingBlock } from '@web/testing/shared/heading-block/fixtures';
+import {
+  MOCK_RADIUS_SCOPE_CASES,
+  MOCK_SCOPED_RADIUS_TOKEN,
+} from '@web/testing/shared/section-appearance/fixtures';
 
 import { FeatureListModuleView } from './feature-list-module-view';
 
@@ -23,12 +29,18 @@ vi.mock('@web/i18n/navigation');
 
 faker.seed(6011);
 
-const MOCK_TITLE_ID = faker.string.uuid();
-const MOCK_DATA_TEST_ID = faker.string.uuid();
+const MOCK_MODULE_ID = faker.string.uuid();
+const MOCK_TITLE_ID = `feature-list-${MOCK_MODULE_ID}`;
+const MOCK_DATA_TEST_ID = `feature-list-module-${MOCK_MODULE_ID}`;
 const CAROUSEL_LABEL = `${MOCK_FEATURE_LIST_HEADING} carousel`;
 
+const mockItems = (count: number) =>
+  Array.from({ length: count }, () =>
+    mockFeatureListItem({ id: faker.string.uuid() }),
+  );
+
 const setup = customRender(FeatureListModuleView, {
-  brandVariant: BRAND_VARIANT.PRIMARY,
+  section: { brandVariant: BRAND_VARIANT.PRIMARY },
   headingBlock: mockHeadingBlock({ heading: MOCK_FEATURE_LIST_HEADING }),
   items: MOCK_FEATURE_LIST_ITEMS,
   ctaButtons: [],
@@ -36,9 +48,8 @@ const setup = customRender(FeatureListModuleView, {
   displayMode: DISPLAY_MODE.GRID,
   contentAlignment: undefined,
   cardAlignment: CONTENT_ALIGNMENT.LEFT,
-  layout: undefined,
-  titleId: MOCK_TITLE_ID,
-  dataTestId: MOCK_DATA_TEST_ID,
+  columns: undefined,
+  id: MOCK_MODULE_ID,
 });
 
 describe(`<${FeatureListModuleView.name}/>`, () => {
@@ -112,5 +123,41 @@ describe(`<${FeatureListModuleView.name}/>`, () => {
       'href',
       MOCK_CTA_SECONDARY_ACTION.link.href,
     );
+  });
+
+  it.each(MOCK_RADIUS_SCOPE_CASES)(
+    'scopes the radius token to its section $title an override',
+    ({ section, scoped }) => {
+      setup({ section });
+
+      const region = screen.getByRole('region', {
+        name: MOCK_FEATURE_LIST_HEADING,
+      });
+
+      expect(region.style.getPropertyValue(MOCK_SCOPED_RADIUS_TOKEN)).toBe(
+        scoped,
+      );
+    },
+  );
+
+  it.each([
+    {
+      title: 'in the stored column count over the card count',
+      columns: GRID_COLUMNS.TWO,
+      itemCount: 3,
+      expected: 2,
+    },
+    {
+      title: 'in columns that fit the card count on Auto',
+      columns: undefined,
+      itemCount: 5,
+      expected: 3,
+    },
+  ])('lays the grid out $title', ({ columns, itemCount, expected }) => {
+    setup({ columns, items: mockItems(itemCount) });
+
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
+
+    expect(grid).toBeVisible();
   });
 });
