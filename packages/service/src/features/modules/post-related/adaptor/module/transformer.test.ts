@@ -7,6 +7,7 @@ import {
   RADIUS_SCALE,
 } from '@blog/config/constants';
 import { mockRawPostRelatedModule } from '@blog/service/testing/modules/post-related/fixtures';
+import { MOCK_UNSET_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { toPostRelatedModuleDocument } from './transformer';
@@ -45,11 +46,6 @@ describe(toPostRelatedModuleDocument, () => {
   it('maps unset appearance overrides to undefined', () => {
     const module = toPostRelatedModuleDocument(mockRawPostRelatedModule());
 
-    expect(module).toMatchObject({
-      cardStyle: undefined,
-      radiusScale: undefined,
-      density: undefined,
-      columns: undefined,
-    });
+    expect(module).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
   });
 });

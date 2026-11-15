@@ -11,6 +11,7 @@ import type {
 } from '@blog/config';
 import type { TCtaButton } from '@blog/service/shared/transformers/cta/to-cta-button';
 import type { TWideLayout } from '@blog/service/shared/transformers/layout/to-layout';
+import type { TModuleAppearance } from '@blog/service/shared/transformers/module/to-module-appearance';
 import type { TSocialProfile } from '@blog/service/shared/transformers/social-profile/to-social-profile';
 
 export type TTeamMember = {
@@ -23,7 +24,7 @@ export type TTeamMember = {
   profileUrl: TMaybeUndefined<string>;
 };
 
-export type TTeamModule = {
+export type TTeamModule = TModuleAppearance & {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   members: TTeamMember[];
