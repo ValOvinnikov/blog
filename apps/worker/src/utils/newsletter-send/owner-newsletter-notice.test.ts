@@ -1,4 +1,4 @@
-import { LOCALE_ISO_CODES } from '@blog/config/constants';
+import { EMAIL_ACCOUNT, LOCALE_ISO_CODES } from '@blog/config/constants';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
@@ -8,7 +8,7 @@ import {
   markNewsletterLimitNoticeSent,
   releaseNewsletterLimitNotice,
 } from '@blog/db/queries/newsletter-post-sends';
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { sendEmail } from '@blog/email';
 import { NEWSLETTER_SEND_LOG } from '@worker/constants/newsletter-send';
 import { mockNewsletterLimits } from '@worker/testing/newsletter-send/fixtures';
 import { MOCK_RESEND_DOWN } from '@worker/testing/outage/fixtures';

@@ -1,9 +1,12 @@
 import 'server-only';
 
-import { resolveTenantEmailBrand, type TMaybeUndefined } from '@blog/config';
+import {
+  resolveTenantEmailBrand,
+  type TMaybeUndefined,
+  type TTenantEmailBrand,
+} from '@blog/config';
 import { queries } from '@blog/db';
 import type { TSiteConfigResult } from '@blog/db/queries/site-config';
-import type { TTenantEmailBrand } from '@blog/email/html';
 import { lookFormValuesOrDefaults } from '@platform/utils/to-look-form-values/to-look-form-values';
 
 export const toTenantEmailBrand = (

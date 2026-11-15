@@ -1,10 +1,8 @@
 import 'server-only';
 
+import { EMAIL_ACCOUNT, type TEmailAccount } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import type { TEmailTag } from '@blog/email/tags';
-import {
-  EMAIL_ACCOUNT,
-  type TEmailAccount,
-} from '@blog/email/transport/email-account';
 import { SendEmailError } from '@blog/email/transport/send-email-error';
 import { env } from '@blog/email/utils/env/env';
 import { isUndefined } from '@blog/utils/primitives';
@@ -30,7 +28,7 @@ function sanitizeEmailSubject(subject: string): string {
   return subject.replace(/[\r\n]+/g, ' ');
 }
 
-function readApiKey(account: TEmailAccount): string | undefined {
+function readApiKey(account: TEmailAccount): TMaybeUndefined<string> {
   return account === EMAIL_ACCOUNT.PLATFORM
     ? env.RESEND_PLATFORM_API_KEY
     : env.RESEND_TENANT_API_KEY;

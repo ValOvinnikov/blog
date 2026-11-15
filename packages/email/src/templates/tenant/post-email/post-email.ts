@@ -1,3 +1,4 @@
+import type { TTenantEmailBrand } from '@blog/config';
 import {
   renderEmailAction,
   type TEmailAction,
@@ -8,10 +9,7 @@ import {
 } from '@blog/email/html/email-metrics/email-metrics';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { sanitizeImageUrl } from '@blog/email/html/sanitize-image-url/sanitize-image-url';
-import {
-  buildTenantShell,
-  type TTenantEmailBrand,
-} from '@blog/email/html/tenant-shell/tenant-shell';
+import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import { buildPlainTextBody } from '@blog/email/plain-text/plain-text-body';
 import {
   buildListUnsubscribeHeaders,

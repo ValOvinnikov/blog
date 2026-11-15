@@ -1,3 +1,4 @@
+import { NEWSLETTER_REPUTATION_ALERT_LEVEL } from '@blog/config/constants';
 import {
   MOCK_ESCAPED_UNSAFE_MARKUP,
   MOCK_SIGN_IN_URL,
@@ -6,10 +7,7 @@ import {
   MOCK_UNSAFE_MARKUP,
 } from '@blog/email/testing/email-fixtures';
 
-import {
-  buildNewsletterReputationAlertEmail,
-  NEWSLETTER_REPUTATION_ALERT_LEVEL,
-} from './newsletter-reputation-alert';
+import { buildNewsletterReputationAlertEmail } from './newsletter-reputation-alert';
 
 const { WARN, SLOW, STOP } = NEWSLETTER_REPUTATION_ALERT_LEVEL;
 const MOCK_WINDOW_DAYS = 7;

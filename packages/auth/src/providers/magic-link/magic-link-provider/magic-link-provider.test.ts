@@ -24,6 +24,7 @@ import {
 import { resolveTenantEmailBrand } from '@blog/config';
 import {
   AUTH_APP,
+  EMAIL_ACCOUNT,
   EMAIL_TEMPLATE_TYPE,
   EMAIL_TYPE,
   LOCALE_BCP47_TAGS,
@@ -37,7 +38,6 @@ import {
 } from '@blog/db/constants';
 import {
   buildSiteEmailTag,
-  EMAIL_ACCOUNT,
   escapeHtml,
   PLATFORM_EMAIL_BRAND_NAME,
   type TSendEmailInput,

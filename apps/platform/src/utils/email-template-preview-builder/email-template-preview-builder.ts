@@ -1,6 +1,9 @@
-import { EMAIL_TEMPLATE_TYPE, type TEmailTemplateType } from '@blog/config';
+import {
+  EMAIL_TEMPLATE_TYPE,
+  type TEmailTemplateType,
+  type TTenantEmailBrand,
+} from '@blog/config';
 import type { TEmailTemplateBlock } from '@blog/db/schema/email-templates';
-import type { TTenantEmailBrand } from '@blog/email/html';
 import {
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,

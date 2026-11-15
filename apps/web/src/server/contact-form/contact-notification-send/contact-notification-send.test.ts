@@ -1,5 +1,6 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import { queries } from '@blog/db';
-import { EMAIL_ACCOUNT, sendEmail } from '@blog/email';
+import { sendEmail } from '@blog/email';
 import type * as TEmail from '@blog/email';
 import { faker } from '@faker-js/faker';
 import { mockLeadInput } from '@web/testing/server/contact-form/fixtures';

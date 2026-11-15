@@ -1,17 +1,12 @@
+import {
+  NEWSLETTER_REPUTATION_ALERT_LEVEL,
+  type TNewsletterReputationAlertLevel,
+} from '@blog/config/constants';
 import { renderEmailAction } from '@blog/email/html/email-action/email-action';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
 import { buildOperatorShell } from '@blog/email/html/operator-shell/operator-shell';
 import { PLATFORM_EMAIL_BRAND } from '@blog/email/html/platform-email-brand/platform-email-brand';
 import { buildPlainTextBody } from '@blog/email/plain-text/plain-text-body';
-
-export const NEWSLETTER_REPUTATION_ALERT_LEVEL = {
-  WARN: 'WARN',
-  SLOW: 'SLOW',
-  STOP: 'STOP',
-} as const;
-
-export type TNewsletterReputationAlertLevel =
-  (typeof NEWSLETTER_REPUTATION_ALERT_LEVEL)[keyof typeof NEWSLETTER_REPUTATION_ALERT_LEVEL];
 
 export type TNewsletterReputationAlertInput = {
   tenantName: string;

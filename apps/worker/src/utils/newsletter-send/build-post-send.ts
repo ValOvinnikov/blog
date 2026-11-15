@@ -1,8 +1,8 @@
 import { routes } from '@blog/config';
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import {
   buildPostEmail,
   buildSiteEmailTag,
-  EMAIL_ACCOUNT,
   type TSendEmailInput,
 } from '@blog/email';
 import { signNewsletterUnsubscribeToken } from '@blog/utils/newsletter-unsubscribe-token';

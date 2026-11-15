@@ -8,6 +8,7 @@ import { resolveRecipientLocale } from '@blog/auth/providers/magic-link/resolve-
 import { resolveTenantEmailIdentity } from '@blog/auth/providers/magic-link/resolve-tenant-email-identity/resolve-tenant-email-identity';
 import {
   AUTH_APP,
+  EMAIL_ACCOUNT,
   EMAIL_TEMPLATE_TYPE,
   type TAuthApp,
 } from '@blog/config/constants';
@@ -18,7 +19,6 @@ import {
   buildInviteMagicLinkEmail,
   buildMagicLinkEmail,
   buildSiteEmailTag,
-  EMAIL_ACCOUNT,
   sendEmail,
 } from '@blog/email';
 import { hasLength } from '@blog/utils/primitives';

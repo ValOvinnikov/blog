@@ -1,3 +1,4 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
   NEWSLETTER_SKIP_REASON,
@@ -5,7 +6,7 @@ import {
 } from '@blog/db/constants';
 import { getNewsletterPausedAt } from '@blog/db/queries/email-config';
 import { markNewsletterPostSkipped } from '@blog/db/queries/newsletter-post-sends';
-import { EMAIL_ACCOUNT, isEmailAccountConfigured } from '@blog/email';
+import { isEmailAccountConfigured } from '@blog/email';
 import {
   NEWSLETTER_SEND_GATE,
   NEWSLETTER_SEND_LOG,

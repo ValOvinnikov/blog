@@ -1,3 +1,4 @@
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
 import type { TMaybeUndefined } from '@blog/config/types';
 import {
   NEWSLETTER_LIMIT_NOTICE_KIND,
@@ -14,7 +15,6 @@ import type { TTenant } from '@blog/db/schema/tenants';
 import {
   buildOwnerNewsletterLimitNearEmail,
   buildOwnerNewsletterPausedEmail,
-  EMAIL_ACCOUNT,
   PLATFORM_EMAIL_BRAND_NAME,
   sendEmail,
 } from '@blog/email';

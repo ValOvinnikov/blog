@@ -1,5 +1,6 @@
 import { SORT_DIRECTION, TENANT_SORT_COLUMN } from '@blog/config';
-import { EMAIL_ACCOUNT, isEmailAccountConfigured } from '@blog/email';
+import { EMAIL_ACCOUNT } from '@blog/config/constants';
+import { isEmailAccountConfigured } from '@blog/email';
 import { faker } from '@faker-js/faker';
 import messages from '@platform/i18n/messages/en.json';
 import { customRenderAsync, screen } from '@platform/testing/custom-render';

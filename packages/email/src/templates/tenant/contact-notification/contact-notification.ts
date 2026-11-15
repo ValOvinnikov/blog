@@ -1,9 +1,7 @@
+import type { TTenantEmailBrand } from '@blog/config';
 import { renderEmailAction } from '@blog/email/html/email-action/email-action';
 import { escapeHtml } from '@blog/email/html/escape-html/escape-html';
-import {
-  buildTenantShell,
-  type TTenantEmailBrand,
-} from '@blog/email/html/tenant-shell/tenant-shell';
+import { buildTenantShell } from '@blog/email/html/tenant-shell/tenant-shell';
 import { sanitizeHref } from '@blog/utils';
 
 export type TContactNotificationEmailInput = {
@@ -38,10 +36,7 @@ function renderMessageQuote(message: string, brand: TTenantEmailBrand): string {
   return `<blockquote style="margin:0 0 16px;padding:12px 16px;border-left:3px solid ${brand.border};background-color:${brand.surface2};color:${brand.text};">${messageHtml}</blockquote>`;
 }
 
-/**
- * The site owner's notice of a contact form message. The caller sends it with
- * `replyTo` set to the visitor, which is what makes the reply line true.
- */
+/** Send it with `replyTo` set to the visitor, or its "reply to this email" line is false. */
 export function buildContactNotificationEmail({
   siteName,
   visitorName,

@@ -332,6 +332,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/audit.ts"
+      },
+      {
+        "ref": "EMAIL_ACCOUNT.TENANT",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-account.ts"
       }
     ],
     "SITE_CONFIG": [
@@ -622,6 +628,12 @@
         "scope": "config",
         "from": "@blog/config/constants",
         "file": "packages/config/src/constants/auth-app.ts"
+      },
+      {
+        "ref": "EMAIL_ACCOUNT.PLATFORM",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/email-account.ts"
       }
     ],
     "DOT": [
@@ -3026,6 +3038,54 @@
         "file": "apps/platform/src/constants/view-tabs.ts"
       }
     ],
+    "WARN": [
+      {
+        "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.WARN",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-reputation.ts"
+      },
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.WARN",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
+    "SLOW": [
+      {
+        "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.SLOW",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-reputation.ts"
+      },
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.SLOW",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      },
+      {
+        "ref": "NEWSLETTER_SEND_PACE.SLOW",
+        "scope": "app:worker",
+        "from": "@worker/constants/newsletter-send",
+        "file": "apps/worker/src/constants/newsletter-send.ts"
+      }
+    ],
+    "STOP": [
+      {
+        "ref": "NEWSLETTER_REPUTATION_ALERT_LEVEL.STOP",
+        "scope": "config",
+        "from": "@blog/config/constants",
+        "file": "packages/config/src/constants/newsletter-reputation.ts"
+      },
+      {
+        "ref": "EMAIL_REPUTATION_LEVEL.STOP",
+        "scope": "db",
+        "from": "@blog/db/constants",
+        "file": "packages/db/src/constants/email-usage.ts"
+      }
+    ],
     "CONFIRMED": [
       {
         "ref": "NEWSLETTER_RESULT.CONFIRMED",
@@ -4383,36 +4443,6 @@
     "OK": [
       {
         "ref": "EMAIL_REPUTATION_LEVEL.OK",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/email-usage.ts"
-      }
-    ],
-    "WARN": [
-      {
-        "ref": "EMAIL_REPUTATION_LEVEL.WARN",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/email-usage.ts"
-      }
-    ],
-    "SLOW": [
-      {
-        "ref": "EMAIL_REPUTATION_LEVEL.SLOW",
-        "scope": "db",
-        "from": "@blog/db/constants",
-        "file": "packages/db/src/constants/email-usage.ts"
-      },
-      {
-        "ref": "NEWSLETTER_SEND_PACE.SLOW",
-        "scope": "app:worker",
-        "from": "@worker/constants/newsletter-send",
-        "file": "apps/worker/src/constants/newsletter-send.ts"
-      }
-    ],
-    "STOP": [
-      {
-        "ref": "EMAIL_REPUTATION_LEVEL.STOP",
         "scope": "db",
         "from": "@blog/db/constants",
         "file": "packages/db/src/constants/email-usage.ts"
