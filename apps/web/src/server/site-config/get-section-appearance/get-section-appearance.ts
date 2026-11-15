@@ -3,6 +3,7 @@ import { TENANT_PLAN } from '@blog/config/constants';
 import { SECTION_APPEARANCE_LOG } from '@web/constants/section-appearance';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
 import { getSiteConfigWithPreset } from '@web/server/site-config/get-site-config-with-preset/get-site-config-with-preset';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
 import type { TSectionAppearance } from '@web/utils/build-section-scope-declarations';
 import {
   gateSectionStyleOverrides,
@@ -16,7 +17,7 @@ export const getSectionAppearance = async (
   const [{ row, preset }, plan] = await Promise.all([
     getSiteConfigWithPreset(
       SECTION_APPEARANCE_LOG.SITE_CONFIG_FETCH_FAILED,
-      tenantId,
+      tenantId ?? UNRESOLVED_TENANT_PLACEHOLDER,
     ),
     tenantId ? getEffectivePlan(tenantId) : TENANT_PLAN.FREE,
   ]);
