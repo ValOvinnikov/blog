@@ -8,6 +8,7 @@ import {
 import type { TMaybeUndefined } from '@blog/config/types';
 import { buildDedupeKey } from '@blog/db/queries/findings/build-dedupe-key';
 import type { TOpenFindingInput } from '@blog/db/queries/findings/open-finding';
+import { resolveFinding } from '@blog/db/queries/findings/resolve-finding';
 import * as schema from '@blog/db/schema';
 import type { TFinding } from '@blog/db/schema/findings';
 import {
@@ -19,8 +20,6 @@ import { insertTestTenant } from '@blog/db/testing/fixtures';
 import { useQueryTestDb } from '@blog/db/testing/query-test-db';
 import { faker } from '@faker-js/faker';
 import { eq } from 'drizzle-orm';
-
-import { resolveFinding } from '../resolve-finding';
 
 import { openFinding } from './open-finding';
 
@@ -143,18 +142,6 @@ describe(openFinding, () => {
     expect(row?.tenantId).toBeNull();
   });
 
-  it('returns DB_NOT_FOUND when the open row vanishes before the follow-up update', async () => {
-    vi.spyOn(db(), 'insert').mockReturnValueOnce({
-      values: () => ({
-        onConflictDoNothing: () => ({ returning: () => Promise.resolve([]) }),
-      }),
-    } as unknown as ReturnType<ReturnType<typeof db>['insert']>);
-
-    const result = await openFinding(input);
-
-    expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
-  });
-
   describe('with the finding already open', () => {
     beforeEach(async () => {
       await openFinding(input);
@@ -169,6 +156,18 @@ describe(openFinding, () => {
       const { firstSeenAt, lastSeenAt } = second.data.finding;
       expect(firstSeenAt).toEqual(MOCK_FINDING_NOW);
       expect(lastSeenAt).toEqual(MOCK_FINDING_LATER_AT);
+    });
+
+    it('returns DB_NOT_FOUND when the open row vanishes before the follow-up update', async () => {
+      vi.spyOn(db(), 'update').mockReturnValueOnce({
+        set: () => ({
+          where: () => ({ returning: () => Promise.resolve([]) }),
+        }),
+      } as unknown as ReturnType<ReturnType<typeof db>['update']>);
+
+      const result = await openFinding(input);
+
+      expect(result).toEqual({ ok: false, error: ERROR_CODE.DB_NOT_FOUND });
     });
 
     it('removes a finding when its owning tenant is deleted', async () => {

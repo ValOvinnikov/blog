@@ -148,11 +148,21 @@ const isAttributeName = (node) => {
   );
 };
 
+const isSpiedMethodName = (node) => {
+  const { parent } = node;
+  return (
+    parent.type === 'CallExpression' &&
+    parent.arguments[1] === node &&
+    calleeName(parent.callee) === 'spyOn'
+  );
+};
+
 const isExemptString = (node) =>
   isStandardVocabulary(node) ||
   node.parent.type === 'ExpressionStatement' ||
   isModulePath(node) ||
   isAttributeName(node) ||
+  isSpiedMethodName(node) ||
   isKey(node) ||
   isClassString(node) ||
   isJsxChild(node);

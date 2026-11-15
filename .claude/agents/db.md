@@ -4,7 +4,7 @@ description: >-
   Relational data-access specialist for packages/db (@blog/db) — Neon
   Postgres via Drizzle ORM. Owns the Auth.js adapter tables, the
   tenant-registry and platform tables, and the engagement tables (bookmarks,
-  subscribers; comments and ratings planned), their drizzle-kit migrations,
+  subscribers; comments planned), their drizzle-kit migrations,
   and typed query/mutation functions. The sibling to `service` for non-Sanity
   data: same contract (typed async functions, no React), different store
   (Neon, not Sanity). Consumed by the three apps (`apps/web`, `apps/platform`,

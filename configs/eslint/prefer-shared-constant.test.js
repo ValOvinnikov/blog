@@ -96,6 +96,7 @@ ruleTester.run('prefer-shared-constant', rule, {
       filename: WEB_TEST,
     },
     { code: "img.getAttribute('INTERNAL');", filename: WEB_TEST },
+    { code: "vi.spyOn(db, 'INTERNAL');", filename: WEB_TEST },
     {
       code: "const status = 'INTERNAL';",
       filename: '/repo/packages/utils/src/a.ts',
@@ -144,6 +145,7 @@ ruleTester.run('prefer-shared-constant', rule, {
     },
   ],
   invalid: [
+    { code: "vi.fn(db, 'INTERNAL');", filename: WEB_TEST, errors: [INTERNAL] },
     {
       code: 'const response = { status: 404 };',
       filename: WEB_SOURCE,

@@ -36,7 +36,7 @@ graph is acyclic
   invites, admins, site config, feature toggles, owner analytics ids, email
   config and templates, subscribers, bookmarks, contact-form leads, magic-link send counters, email
   send and delivery-outcome counts, newsletter post-send claims, Stripe
-  billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments and ratings are planned; no tables exist yet). It never imports React or `@blog/service`
+  billing state, handled Stripe webhook event ids and the Stripe price and promotion-code catalogue, audit events and findings (comments are planned; no table exists yet). It never imports React or `@blog/service`
   (siblings, not dependents — `.claude/agents/db.md`), and is **imported only
   by the three apps (`web`, `platform`, `worker`) and `@blog/auth`**, which
   binds the Auth.js adapter to its tables. It imports no Sanity SDK, and its `src/` never imports
@@ -466,6 +466,7 @@ except the Gate 0 `board-keeper` dispatch and the board write after
   ("Never assert the source back at itself"). Exempt: generated Sanity types,
   Sanity migrations, a Sanity `_type` value and a literal type (the
   generated types already check both), Tailwind class strings, import paths, directives,
+  the method name a `spyOn` call names,
   public-site copy (it belongs in the Voice catalog), `0`, `1`, `-1`, the
   single space `' '` (a separator or a JSX space, never `KEY.SPACE`), and
   vocabulary an outside standard spells — a value compared with an env read
