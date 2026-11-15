@@ -13,7 +13,7 @@ export const breadcrumbsVariants = tv({
     sep: ['flex-none text-platform-12-5 text-platform-faint'],
     link: [
       'block min-w-0 truncate rounded-platform-control px-1 py-0.5 leading-10 text-platform-muted no-underline md:leading-normal',
-      'hover:bg-platform-line-2 hover:text-platform-text',
+      'hover:bg-platform-hover-tint hover:text-platform-text',
       focusRingClasses(FOCUS_RING_GROUND.BG),
     ],
     current: ['max-w-[280px] truncate font-semibold text-platform-text'],

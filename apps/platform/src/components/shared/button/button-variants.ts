@@ -49,21 +49,25 @@ export const buttonVariants = tv({
       [BUTTON_VARIANT.PRIMARY]: {
         root: [
           'border-platform-brand bg-platform-brand text-platform-on-brand-ink shadow-platform',
+          'not-aria-disabled:hover:border-platform-brand-hover not-aria-disabled:hover:bg-platform-brand-hover',
         ],
       },
       [BUTTON_VARIANT.SECONDARY]: {
         root: [
-          'border-platform-control-line bg-platform-surface text-platform-text shadow-platform hover:border-platform-brand-ink',
+          'border-platform-control-line bg-platform-surface text-platform-text shadow-platform',
+          'not-aria-disabled:hover:border-platform-brand-ink not-aria-disabled:hover:bg-platform-hover-tint',
         ],
       },
       [BUTTON_VARIANT.GHOST]: {
         root: [
-          'border-transparent bg-transparent text-platform-text hover:bg-platform-hover',
+          'border-transparent bg-transparent text-platform-text',
+          'not-aria-disabled:hover:bg-platform-hover-tint',
         ],
       },
       [BUTTON_VARIANT.DANGER]: {
         root: [
           'border-platform-bad-line bg-platform-bad-weak text-platform-bad shadow-platform',
+          'not-aria-disabled:hover:bg-platform-bad-hover',
         ],
       },
       [BUTTON_VARIANT.UNSTYLED]: {

@@ -14,7 +14,7 @@ export const signedInAccountVariants = tv({
       rail: {
         email: ['hidden text-platform-rail-muted md:block'],
         signOut: [
-          'text-platform-rail-text hover:bg-platform-rail-raised hover:text-white',
+          'text-platform-rail-text not-aria-disabled:hover:bg-platform-rail-raised not-aria-disabled:hover:text-white',
           // Keeps the 44px tap target from growing the 26px brand row of the phone band.
           '-my-[9px] md:my-0',
         ],
@@ -22,7 +22,7 @@ export const signedInAccountVariants = tv({
       railFooter: {
         email: ['text-platform-rail-text'],
         signOut: [
-          'text-platform-rail-text hover:bg-platform-rail-raised hover:text-white',
+          'text-platform-rail-text not-aria-disabled:hover:bg-platform-rail-raised not-aria-disabled:hover:text-white',
         ],
       },
     },

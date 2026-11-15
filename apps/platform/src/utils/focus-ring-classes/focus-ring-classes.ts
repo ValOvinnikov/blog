@@ -22,10 +22,12 @@ const FOCUS_RING_GROUND_CLASSES: Record<TFocusRingGround, string> = {
     '[--platform-focus-ground:var(--platform-popover-hover)]',
   [FOCUS_RING_GROUND.SEGMENT_ON]:
     '[--platform-focus-ground:var(--platform-segment-on)]',
+  [FOCUS_RING_GROUND.HOVER_TINT]:
+    '[--platform-focus-ground:var(--platform-hover-tint)]',
   [FOCUS_RING_GROUND.THEME_TRACK]:
     '[--platform-focus-ground:var(--platform-theme-track)]',
-  [FOCUS_RING_GROUND.BRAND_WEAK]:
-    '[--platform-focus-ground:var(--platform-brand-weak)]',
+  [FOCUS_RING_GROUND.SELECTED_TINT]:
+    '[--platform-focus-ground:var(--platform-selected-tint)]',
 };
 
 const CHECKED_FOCUS_RING_GROUND_CLASSES: Record<

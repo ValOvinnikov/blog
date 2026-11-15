@@ -43,7 +43,10 @@ export const presetPickerVariants = tv({
         ],
       },
       false: {
-        card: [...UNSELECTED_CHOICE_CLASSES, 'border-platform-line'],
+        card: [
+          ...UNSELECTED_CHOICE_CLASSES,
+          'border-platform-line not-data-[disabled]:hover:bg-platform-hover-tint',
+        ],
         dot: ['border-platform-control-line'],
       },
     },

@@ -7,6 +7,7 @@ export const presetSheetVariants = tv({
   slots: {
     trigger: [
       'flex min-h-14 w-full cursor-pointer items-center gap-2.5 rounded-platform-control border border-platform-control-line bg-platform-surface px-2.5 py-2 text-left',
+      'not-data-[disabled]:hover:bg-platform-hover-tint',
       'data-[popup-open]:border-platform-brand-ink data-[popup-open]:shadow-platform-choice-ring',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       ...DISABLED_AFFORDANCE_CLASSES,

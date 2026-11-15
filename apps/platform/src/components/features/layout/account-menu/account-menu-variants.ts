@@ -7,8 +7,8 @@ import { tv } from '@platform/utils/tv/tv';
 
 const SIDEBAR_TRIGGER = [
   'rounded-platform border border-platform-control-line-tint bg-transparent',
-  'hover:bg-platform-side-raised',
-  'data-[popup-open]:border-platform-side-accent data-[popup-open]:bg-platform-side-raised',
+  'hover:bg-platform-hover-tint',
+  'data-[popup-open]:border-platform-side-accent data-[popup-open]:bg-platform-side-raised data-[popup-open]:hover:bg-platform-side-raised',
   focusRingClasses(FOCUS_RING_GROUND.SIDE),
 ];
 

@@ -38,9 +38,10 @@ export const jumpCardLinkVariants = tv({
       class: { link: ['border-platform-brand'] },
     },
     {
-      isPhone: false,
       isCurrent: false,
-      class: { link: ['hover:bg-platform-bg hover:text-platform-text'] },
+      class: {
+        link: ['hover:bg-platform-hover-tint hover:text-platform-text'],
+      },
     },
   ],
 });

@@ -9,7 +9,6 @@ export const portableTextEditorToggleButtonVariants = tv({
       'inline-flex items-center justify-center',
       'rounded-platform-control border border-transparent',
       'text-platform-text',
-      'hover:bg-platform-line-2',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
       'cursor-pointer',
     ],
@@ -30,7 +29,8 @@ export const portableTextEditorToggleButtonVariants = tv({
       },
     },
     isActive: {
-      true: { button: 'border-platform-brand bg-platform-brand-weak' },
+      true: { button: 'border-platform-brand bg-platform-selected-tint' },
+      false: { button: 'hover:bg-platform-hover-tint' },
     },
     isIconOnly: {
       true: {},
@@ -50,5 +50,6 @@ export const portableTextEditorToggleButtonVariants = tv({
   ],
   defaultVariants: {
     size: SIZE.MD,
+    isActive: false,
   },
 });

@@ -6,6 +6,7 @@ import { hexToOklch, renderedContrastRatio } from '@blog/utils/color';
 const TEXT = CONTRAST_ROLE_MIN[CONTRAST_ROLE.TEXT];
 const BOUNDARY = CONTRAST_ROLE_MIN[CONTRAST_ROLE.UI_BOUNDARY];
 const FOCUS = CONTRAST_ROLE_MIN[CONTRAST_ROLE.FOCUS];
+const SELECTED_OVER_HOVER_TINT_MIN = 1.1;
 
 const LIGHT_SELECTOR = ':root {';
 const DARK_SELECTOR = ":root[data-theme='dark'] {";
@@ -78,7 +79,9 @@ const TOKEN = {
   GLYPH_FILL: 'platform-glyph-fill',
   GLYPH_LINE_SOFT: 'platform-glyph-line-soft',
   GLYPH_RAISED: 'platform-glyph-raised',
-  HOVER: 'platform-hover',
+  BAD_HOVER: 'platform-bad-hover',
+  CONTROL_LINE_HOVER: 'platform-control-line-hover',
+  HOVER_TINT: 'platform-hover-tint',
   MUTED: 'platform-muted',
   OK: 'platform-ok',
   OK_WEAK: 'platform-ok-weak',
@@ -90,7 +93,7 @@ const TOKEN = {
   POPOVER_HOVER: 'platform-popover-hover',
   SEGMENT_ON: 'platform-segment-on',
   SELECTED: 'platform-selected',
-  SELECTED_HOVER: 'platform-selected-hover',
+  SELECTED_TINT: 'platform-selected-tint',
   SIDE: 'platform-side',
   SIDE_ACCENT: 'platform-side-accent',
   SIDE_FIELD_LINE: 'platform-side-field-line',
@@ -102,6 +105,7 @@ const TOKEN = {
   SURFACE: 'platform-surface',
   SURFACE_2: 'platform-surface-2',
   SURFACE_HEAD: 'platform-surface-head',
+  SWITCH_THUMB: 'platform-switch-thumb',
   SWITCH_THUMB_ON: 'platform-switch-thumb-on',
   TEXT: 'platform-text',
   TEXT_STRONG: 'platform-text-strong',
@@ -155,18 +159,8 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Muted on hovered menu row', TOKEN.MUTED, TOKEN.POPOVER_HOVER, TEXT],
   ['Check on hovered row', TOKEN.BRAND_INK, TOKEN.POPOVER_HOVER, FOCUS],
   ['Theme switch border on menu', TOKEN.CONTROL_LINE, TOKEN.POPOVER, BOUNDARY],
-  [
-    'Name on hovered account trigger',
-    TOKEN.TEXT_STRONG,
-    TOKEN.SIDE_RAISED,
-    TEXT,
-  ],
-  [
-    'Email on hovered account trigger',
-    TOKEN.SIDE_MUTED,
-    TOKEN.SIDE_RAISED,
-    TEXT,
-  ],
+  ['Name on open account trigger', TOKEN.TEXT_STRONG, TOKEN.SIDE_RAISED, TEXT],
+  ['Email on open account trigger', TOKEN.SIDE_MUTED, TOKEN.SIDE_RAISED, TEXT],
   ['Muted on menu', TOKEN.MUTED, TOKEN.POPOVER, TEXT],
   ['Row text on highlighted row', TOKEN.TEXT, TOKEN.POPOVER_HOVER, TEXT],
   ['Current bar on menu', TOKEN.BRAND_INK, TOKEN.POPOVER, BOUNDARY],
@@ -179,23 +173,41 @@ const SHARED_PAIRS: readonly TPair[] = [
   ['Name on account trigger at rest', TOKEN.TEXT_STRONG, TOKEN.SIDE, TEXT],
   ['Neutral pill in a menu', TOKEN.MUTED, TOKEN.PILL_NEUTRAL_POPOVER, TEXT],
   ['Selected preset tick', TOKEN.ON_BRAND_INK, TOKEN.BRAND_INK, BOUNDARY],
-  ['Hovered icon on hover', TOKEN.TEXT, TOKEN.HOVER, BOUNDARY],
   ['Rest icon on toolbar track', TOKEN.MUTED, TOKEN.THEME_TRACK, BOUNDARY],
-  ['Rest icon on hover', TOKEN.MUTED, TOKEN.HOVER, BOUNDARY],
+  ['Label on hover tint', TOKEN.TEXT, TOKEN.HOVER_TINT, TEXT],
+  ['Muted on hover tint', TOKEN.MUTED, TOKEN.HOVER_TINT, TEXT],
+  ['Name on hover tint', TOKEN.TEXT_STRONG, TOKEN.HOVER_TINT, TEXT],
+  ['Link label on hover tint', TOKEN.BRAND_STRONG, TOKEN.HOVER_TINT, TEXT],
+  ['Hovered border on hover tint', TOKEN.BRAND_INK, TOKEN.HOVER_TINT, BOUNDARY],
+  ['Label on hovered primary', TOKEN.ON_BRAND_INK, TOKEN.BRAND_HOVER, TEXT],
+  ['Label on hovered danger', TOKEN.BAD, TOKEN.BAD_HOVER, TEXT],
+  [
+    'Hovered switch track on card',
+    TOKEN.CONTROL_LINE_HOVER,
+    TOKEN.SURFACE,
+    BOUNDARY,
+  ],
+  [
+    'Switch thumb on hovered track',
+    TOKEN.SWITCH_THUMB,
+    TOKEN.CONTROL_LINE_HOVER,
+    BOUNDARY,
+  ],
   ['Pressed icon on plate', TOKEN.BRAND_STRONG, TOKEN.SEGMENT_ON, BOUNDARY],
   ['Toolbar track border on card', TOKEN.CONTROL_LINE, TOKEN.SURFACE, BOUNDARY],
-  ['Solo pressed icon', TOKEN.BRAND_STRONG, TOKEN.BRAND_WEAK, BOUNDARY],
-  ['Chip text on chip', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
-  ['Chip count on chip', TOKEN.MUTED, TOKEN.SURFACE, TEXT],
-  ['Chip text on chip hover', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
-  ['Chip border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
-  ['Label on selected chip', TOKEN.ON_SELECTED, TOKEN.SELECTED, TEXT],
   [
-    'Label on selected chip hover',
-    TOKEN.ON_SELECTED,
-    TOKEN.SELECTED_HOVER,
+    'Pressed label on selected tint',
+    TOKEN.BRAND_STRONG,
+    TOKEN.SELECTED_TINT,
     TEXT,
   ],
+  ['Label on selected tint', TOKEN.TEXT, TOKEN.SELECTED_TINT, TEXT],
+  ['Muted on selected tint', TOKEN.MUTED, TOKEN.SELECTED_TINT, TEXT],
+  ['Chip text on chip', TOKEN.TEXT, TOKEN.SURFACE, TEXT],
+  ['Chip count on chip', TOKEN.MUTED, TOKEN.SURFACE, TEXT],
+  ['Text on hovered row', TOKEN.TEXT, TOKEN.SURFACE_2, TEXT],
+  ['Chip border on page', TOKEN.CONTROL_LINE, TOKEN.BG, BOUNDARY],
+  ['Label on selected chip', TOKEN.ON_SELECTED, TOKEN.SELECTED, TEXT],
   ['Follow mark tag label', TOKEN.FOLLOW_MARK_INK, TOKEN.FOLLOW_MARK, TEXT],
   [
     'Follow mark edge on its outline',
@@ -217,7 +229,7 @@ const SHARED_PAIRS: readonly TPair[] = [
     BOUNDARY,
   ],
   ['Selected chip border on page', TOKEN.BRAND, TOKEN.BG, BOUNDARY],
-  ['Selected chip hover border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
+  ['Hovered primary border on page', TOKEN.BRAND_HOVER, TOKEN.BG, BOUNDARY],
   ['Error pill on active chip', TOKEN.BAD, TOKEN.SURFACE, TEXT],
   ['Locked text on page', TOKEN.MUTED, TOKEN.BG, TEXT],
   ['Success edge and icon on toast', TOKEN.OK, TOKEN.POPOVER, BOUNDARY],
@@ -258,9 +270,10 @@ const FOCUS_GROUNDS = [
   TOKEN.POPOVER,
   TOKEN.POPOVER_HOVER,
   TOKEN.SEGMENT_ON,
+  TOKEN.HOVER_TINT,
   TOKEN.THEME_TRACK,
   TOKEN.SIDE,
-  TOKEN.BRAND_WEAK,
+  TOKEN.SELECTED_TINT,
 ] as const;
 
 const focusMarkPairs = (mark: string): TPair[] =>
@@ -298,6 +311,19 @@ describe.each([
       expect(ratio).toBeGreaterThanOrEqual(threshold);
     },
   );
+});
+
+describe.each([
+  ['light', colourIn(lightTokens)],
+  ['dark', colourIn(darkTokens)],
+] as const)('platform %s palette fills', (_palette, colourOf) => {
+  it('keeps the selected tint apart from the hover tint', () => {
+    const ratio = renderedContrastRatio(colourOf(TOKEN.SELECTED_TINT), [
+      colourOf(TOKEN.HOVER_TINT),
+    ]);
+
+    expect(ratio).toBeGreaterThanOrEqual(SELECTED_OVER_HOVER_TINT_MIN);
+  });
 });
 
 describe('platform dark palette', () => {

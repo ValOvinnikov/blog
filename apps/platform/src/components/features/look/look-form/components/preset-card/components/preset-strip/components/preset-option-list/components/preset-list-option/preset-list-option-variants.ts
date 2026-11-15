@@ -51,7 +51,7 @@ export const presetListOptionVariants = tv({
       class: {
         option: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-platform-control-line hover:border-platform-muted hover:bg-platform-surface-2',
+          'border-platform-control-line hover:border-platform-muted hover:bg-platform-hover-tint',
         ],
       },
     },
@@ -60,11 +60,11 @@ export const presetListOptionVariants = tv({
       selected: true,
       class: {
         option: [
-          'bg-platform-brand-weak',
+          'bg-platform-selected-tint',
           NAV_CURRENT_BAR,
           'before:inset-y-0 before:bg-platform-brand-ink',
           insetFocusRingClasses(
-            FOCUS_RING_GROUND.BRAND_WEAK,
+            FOCUS_RING_GROUND.SELECTED_TINT,
             FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED,
           ),
         ],

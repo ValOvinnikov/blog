@@ -25,10 +25,13 @@
   --platform-spinner-on-brand-unlit: #e8eaef;
   --platform-spinner-on-brand-line: var(--platform-spinner-on-brand-unlit);
   --platform-selected: #12141a;
-  --platform-selected-hover: #2a303b;
   --platform-on-selected: #ffffff;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: #12141a;
+  --platform-hover-tint: #fff1c2;
+  --platform-selected-tint: #ffe08a;
+  --platform-bad-hover: #fbdcd9;
+  --platform-control-line-hover: #5b6472;
   --platform-ok: #16794d;
   --platform-ok-weak: #e7f6ee;
   --platform-warn: #9a3d0b;
@@ -69,7 +72,6 @@
   --platform-shadow:
     0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
   --platform-shadow-menu: 0 12px 40px rgba(16, 24, 40, 0.14);
-  --platform-hover: #e2e5ea;
   --platform-note-line: rgba(18, 20, 26, 0.3);
   --platform-control-line-locked: #c5cad3;
   --platform-glyph-accent: #0d6466;
@@ -149,11 +151,14 @@
   --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
   --platform-spinner-on-brand-unlit: transparent;
   --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
-  --platform-selected: #33290d;
-  --platform-selected-hover: #40330f;
+  --platform-selected: var(--platform-selected-tint);
   --platform-on-selected: #ffdc7a;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: transparent;
+  --platform-hover-tint: #33290d;
+  --platform-selected-tint: #4a3b10;
+  --platform-bad-hover: #442020;
+  --platform-control-line-hover: #5c6676;
   --platform-ok: #6ee7a7;
   --platform-ok-weak: #10291d;
   --platform-warn: #ffa066;
@@ -183,7 +188,6 @@
   --platform-tooltip-line: #4a5260;
   --platform-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
   --platform-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
-  --platform-hover: #22262f;
   --platform-note-line: rgba(255, 194, 51, 0.3);
   --platform-control-line-locked: #424956;
   --platform-glyph-accent: #4fb3ad;
@@ -235,11 +239,14 @@
     --platform-spinner-on-brand-lit: var(--platform-on-brand-ink);
     --platform-spinner-on-brand-unlit: transparent;
     --platform-spinner-on-brand-line: var(--platform-on-brand-ink);
-    --platform-selected: #33290d;
-    --platform-selected-hover: #40330f;
+    --platform-selected: var(--platform-selected-tint);
     --platform-on-selected: #ffdc7a;
     --platform-focus-ring: #ffc233;
     --platform-focus-edge: transparent;
+    --platform-hover-tint: #33290d;
+    --platform-selected-tint: #4a3b10;
+    --platform-bad-hover: #442020;
+    --platform-control-line-hover: #5c6676;
     --platform-ok: #6ee7a7;
     --platform-ok-weak: #10291d;
     --platform-warn: #ffa066;
@@ -269,7 +276,6 @@
     --platform-tooltip-line: #4a5260;
     --platform-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     --platform-shadow-menu: 0 12px 40px rgba(0, 0, 0, 0.55);
-    --platform-hover: #22262f;
     --platform-note-line: rgba(255, 194, 51, 0.3);
     --platform-control-line-locked: #424956;
     --platform-glyph-accent: #4fb3ad;
@@ -328,7 +334,6 @@
   );
   --color-platform-spinner-on-brand-line: var(--platform-spinner-on-brand-line);
   --color-platform-selected: var(--platform-selected);
-  --color-platform-selected-hover: var(--platform-selected-hover);
   --color-platform-on-selected: var(--platform-on-selected);
   --color-platform-ok: var(--platform-ok);
   --color-platform-ok-weak: var(--platform-ok-weak);
@@ -365,7 +370,10 @@
   --color-platform-tooltip-text: var(--platform-tooltip-text);
   --color-platform-tooltip-line: var(--platform-tooltip-line);
   --color-platform-scrim: var(--platform-scrim);
-  --color-platform-hover: var(--platform-hover);
+  --color-platform-hover-tint: var(--platform-hover-tint);
+  --color-platform-selected-tint: var(--platform-selected-tint);
+  --color-platform-bad-hover: var(--platform-bad-hover);
+  --color-platform-control-line-hover: var(--platform-control-line-hover);
   --color-platform-note-line: var(--platform-note-line);
   --color-platform-control-line-locked: var(--platform-control-line-locked);
   --color-platform-glyph-accent: var(--platform-glyph-accent);

@@ -311,8 +311,23 @@ text-platform-on-selected` — near-black and white in Light, yellow on a dark
   track, menu triggers. `border-platform-line` (1.24:1) is decorative structure
   only: card borders, dividers, the dashed upload box.
 - A selected item shows a 3:1 marker (`border-platform-brand`, a bar), not a
-  `bg-platform-brand-weak` fill alone, and announces itself as pressed, checked or
+  `bg-platform-selected-tint` fill alone, and announces itself as pressed, checked or
   selected.
+- **Hover is one rule per kind of control.** A primary button darkens to
+  `bg-platform-brand-hover`; a danger button to `bg-platform-bad-hover`.
+  Every other pressable control, and every unselected option (segment,
+  toggle, chip, tile, card, tab, menu radio), takes
+  `hover:bg-platform-hover-tint` at every width, never `lg:`-only. Only a
+  secondary button, an unchecked checkbox and the upload drop area also
+  turn their border `brand-ink`. A field or select changes only its border.
+  Hover and selected never share a fill: selected lead and preset rows, a
+  pressed solo or editor toolbar toggle, and a pressed segment below `lg`
+  fill with `selected-tint`, a step stronger than the hover tint. Rows
+  (tables, lists, menus, the sidebar) keep their grey hover. Gate the hover so a selected, pressed, checked, current, open,
+  disabled or locked control does not change (`not-data-[pressed]:`,
+  `not-aria-disabled:`, or the `isSelected: false` variant). A caller that
+  overrides a primitive's hover repeats the primitive's modifiers, or
+  tailwind-merge keeps both.
 - **Focus is one rule for every control:** a 2px gap in the control's ground,
   a 2px yellow `focus-ring`, and in Light a 1px near-black `focus-edge`
   around it. Write `focusRingClasses(ground)`

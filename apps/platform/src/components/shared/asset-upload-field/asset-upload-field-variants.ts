@@ -27,9 +27,27 @@ export const assetUploadFieldVariants = tv({
     isInvalid: {
       true: { root: ['border-platform-bad-line'] },
     },
+    isDisabled: {
+      true: {},
+      false: {},
+    },
   },
+  compoundVariants: [
+    {
+      size: SIZE.MD,
+      isDisabled: false,
+      class: { root: ['hover:bg-platform-hover-tint'] },
+    },
+    {
+      size: SIZE.MD,
+      isDisabled: false,
+      isInvalid: false,
+      class: { root: ['hover:border-platform-brand-ink'] },
+    },
+  ],
   defaultVariants: {
     isInvalid: false,
+    isDisabled: false,
     size: SIZE.MD,
   },
 });

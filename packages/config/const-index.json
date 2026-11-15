@@ -6866,6 +6866,14 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
+    "HOVER_TINT": [
+      {
+        "ref": "FOCUS_RING_GROUND.HOVER_TINT",
+        "scope": "app:platform",
+        "from": "@platform/constants/focus-ring",
+        "file": "apps/platform/src/constants/focus-ring.ts"
+      }
+    ],
     "THEME_TRACK": [
       {
         "ref": "FOCUS_RING_GROUND.THEME_TRACK",
@@ -6874,9 +6882,9 @@
         "file": "apps/platform/src/constants/focus-ring.ts"
       }
     ],
-    "BRAND_WEAK": [
+    "SELECTED_TINT": [
       {
-        "ref": "FOCUS_RING_GROUND.BRAND_WEAK",
+        "ref": "FOCUS_RING_GROUND.SELECTED_TINT",
         "scope": "app:platform",
         "from": "@platform/constants/focus-ring",
         "file": "apps/platform/src/constants/focus-ring.ts"

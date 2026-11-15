@@ -9,7 +9,7 @@ export const tileVariants = tv({
       'md:min-h-0 md:flex-col md:items-start md:gap-0',
       'rounded-platform border border-platform-line bg-platform-surface p-3.5',
       'shadow-platform no-underline',
-      'hover:border-platform-brand hover:bg-platform-surface-2',
+      'hover:border-platform-brand hover:bg-platform-hover-tint',
       focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ],
     icon: ['text-platform-brand'],

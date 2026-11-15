@@ -27,7 +27,7 @@ export const presetChipsVariants = tv({
       false: {
         chip: [
           ...UNSELECTED_CHOICE_CLASSES,
-          'border-platform-control-line not-data-[disabled]:hover:border-platform-brand-ink',
+          'border-platform-control-line not-data-[disabled]:hover:border-platform-brand-ink not-data-[disabled]:hover:bg-platform-hover-tint',
         ],
       },
     },

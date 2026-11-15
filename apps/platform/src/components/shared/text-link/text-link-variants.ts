@@ -5,7 +5,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const TEXT_LINK_COLOUR_CLASSES = 'text-platform-brand-ink';
 
 export const TEXT_LINK_STROKE_CLASSES =
-  'underline decoration-platform-highlight decoration-2 underline-offset-3';
+  'underline decoration-platform-highlight decoration-2 underline-offset-3 hover:decoration-3';
 
 export const textLinkVariants = tv({
   base: [

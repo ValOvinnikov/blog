@@ -19,14 +19,13 @@ export const voiceSectionChipVariants = tv({
     isActive: {
       false: {
         link: [
-          'border-platform-control-line bg-platform-surface text-platform-text hover:bg-platform-surface-2',
+          'border-platform-control-line bg-platform-surface text-platform-text hover:bg-platform-hover-tint',
         ],
         count: ['text-platform-muted'],
       },
       true: {
         link: [
           'border-platform-brand bg-platform-selected text-platform-on-selected',
-          'hover:border-platform-brand-hover hover:bg-platform-selected-hover',
         ],
         count: ['text-platform-on-selected'],
         errorPill: ['h-5 rounded-full bg-platform-surface px-1.5'],
