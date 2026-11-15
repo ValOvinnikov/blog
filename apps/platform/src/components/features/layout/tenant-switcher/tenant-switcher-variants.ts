@@ -14,7 +14,7 @@ export const tenantSwitcherVariants = tv({
       'transition-colors duration-base ease-smooth',
       'hover:border-platform-side-accent/40 hover:bg-platform-hover-tint',
       focusRingClasses(FOCUS_RING_GROUND.SIDE),
-      'data-[popup-open]:border-platform-side-accent',
+      'data-[popup-open]:border-platform-brand-ink data-[popup-open]:bg-platform-hover-tint',
     ],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameRow: ['flex min-w-0 items-center gap-1.5'],

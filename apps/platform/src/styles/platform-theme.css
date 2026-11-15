@@ -27,6 +27,7 @@
   --platform-selected: #ffc233;
   --platform-on-selected: #12141a;
   --platform-selected-line: #ffc233;
+  --platform-selected-edge: #12141a;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: #12141a;
   --platform-hover-tint: #fff1c2;
@@ -61,7 +62,6 @@
   --platform-popover-hover: #eef1f6;
   --platform-pill-neutral: #eef0f3;
   --platform-pill-neutral-popover: #eef0f3;
-  --platform-segment-on: #ffffff;
   --platform-switch-thumb: #ffffff;
   --platform-switch-thumb-on: #12141a;
   --platform-highlight: #ffc233;
@@ -155,6 +155,7 @@
   --platform-selected: #ffc233;
   --platform-on-selected: #0f1115;
   --platform-selected-line: #ffc233;
+  --platform-selected-edge: transparent;
   --platform-focus-ring: #ffc233;
   --platform-focus-edge: transparent;
   --platform-hover-tint: #33290d;
@@ -181,7 +182,6 @@
   --platform-popover-hover: #323845;
   --platform-pill-neutral: #262a33;
   --platform-pill-neutral-popover: #323845;
-  --platform-segment-on: #323845;
   --platform-switch-thumb: #e8eaef;
   --platform-switch-thumb-on: #0f1115;
   --platform-theme-track: #0f1115;
@@ -244,6 +244,7 @@
     --platform-selected: #ffc233;
     --platform-on-selected: #0f1115;
     --platform-selected-line: #ffc233;
+    --platform-selected-edge: transparent;
     --platform-focus-ring: #ffc233;
     --platform-focus-edge: transparent;
     --platform-hover-tint: #33290d;
@@ -270,7 +271,6 @@
     --platform-popover-hover: #323845;
     --platform-pill-neutral: #262a33;
     --platform-pill-neutral-popover: #323845;
-    --platform-segment-on: #323845;
     --platform-switch-thumb: #e8eaef;
     --platform-switch-thumb-on: #0f1115;
     --platform-theme-track: #0f1115;
@@ -339,6 +339,7 @@
   --color-platform-selected: var(--platform-selected);
   --color-platform-on-selected: var(--platform-on-selected);
   --color-platform-selected-line: var(--platform-selected-line);
+  --color-platform-selected-edge: var(--platform-selected-edge);
   --color-platform-ok: var(--platform-ok);
   --color-platform-ok-weak: var(--platform-ok-weak);
   --color-platform-warn: var(--platform-warn);
@@ -365,7 +366,6 @@
   --color-platform-popover-hover: var(--platform-popover-hover);
   --color-platform-pill-neutral: var(--platform-pill-neutral);
   --color-platform-pill-neutral-popover: var(--platform-pill-neutral-popover);
-  --color-platform-segment-on: var(--platform-segment-on);
   --color-platform-switch-thumb: var(--platform-switch-thumb);
   --color-platform-switch-thumb-on: var(--platform-switch-thumb-on);
   --color-platform-highlight: var(--platform-highlight);

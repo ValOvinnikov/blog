@@ -39,7 +39,7 @@ export const presetPickerVariants = tv({
       true: {
         card: SELECTED_CHOICE_CLASSES,
         dot: [
-          'border-platform-brand-ink bg-platform-brand-ink text-platform-on-brand-ink',
+          'border-platform-selected-edge bg-platform-selected text-platform-on-selected',
         ],
       },
       false: {

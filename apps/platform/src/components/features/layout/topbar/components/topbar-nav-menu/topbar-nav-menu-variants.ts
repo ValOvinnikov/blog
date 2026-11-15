@@ -1,10 +1,8 @@
-import {
-  NAV_CURRENT_BAR,
-  NAV_ROW_SHAPE,
-} from '@platform/components/features/layout/sidebar/sidebar-variants';
+import { NAV_ROW_SHAPE } from '@platform/components/features/layout/sidebar/sidebar-variants';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { BAR_CONTROL_CLASSES } from '@platform/utils/bar-control-classes/bar-control-classes';
 import { insetFocusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { SELECTED_ROW_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const topbarNavMenuVariants = tv({
@@ -39,9 +37,9 @@ export const topbarNavMenuVariants = tv({
     state: {
       current: {
         row: [
-          'cursor-pointer bg-platform-popover-hover font-semibold',
-          NAV_CURRENT_BAR,
-          'before:inset-y-2.5 before:bg-platform-brand-ink',
+          'cursor-pointer font-semibold',
+          ...SELECTED_ROW_CLASSES,
+          insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
       },
       resting: {

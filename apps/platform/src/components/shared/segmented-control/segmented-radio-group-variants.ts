@@ -3,6 +3,7 @@ import { SEGMENTED_RADIO_LAYOUT } from '@platform/constants/segmented-control';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import {
   SELECTED_CHOICE_CLASSES,
+  SELECTED_TICK_CLASSES,
   UNSELECTED_CHOICE_CLASSES,
 } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
@@ -19,6 +20,7 @@ export const segmentedRadioGroupVariants = tv({
     optionLabel: [],
     optionDescription: [
       'block text-platform-12 leading-4 font-normal text-platform-muted md:leading-3.75',
+      'in-data-[checked]:text-platform-on-selected',
     ],
     glyph: ['flex shrink-0'],
     check: [],
@@ -40,7 +42,8 @@ export const segmentedRadioGroupVariants = tv({
         option: [
           'flex min-h-11 min-w-30 shrink-0 cursor-pointer flex-col items-start justify-center',
           'rounded-platform-control px-3 py-1.5 text-left md:min-h-0',
-          'data-[checked]:bg-platform-surface data-[checked]:not-focus-visible:shadow-platform-xs',
+          'data-[checked]:bg-platform-selected data-[checked]:text-platform-on-selected',
+          'data-[checked]:inset-ring data-[checked]:inset-ring-platform-selected-edge',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
         optionLabel: [
@@ -84,7 +87,7 @@ export const segmentedRadioGroupVariants = tv({
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,
       isLocked: false,
-      class: { option: ['cursor-pointer'], check: ['text-platform-brand-ink'] },
+      class: { option: ['cursor-pointer'], check: [SELECTED_TICK_CLASSES] },
     },
     {
       layout: SEGMENTED_RADIO_LAYOUT.TILES,

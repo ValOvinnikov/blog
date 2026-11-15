@@ -293,9 +293,7 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `highlight`); in Dark, yellow leads (`brand` #ffc233, `brand-ink` #ffdc7a)
   over a dark yellow `brand-weak`. `warn` is orange so it never reads as the
   brand. Text or a mark on a `brand` fill is `text-platform-on-brand-ink`, never
-  `text-white`. A selected chip or tab is `bg-platform-selected
-text-platform-on-selected` — near-black and white in Light, yellow on a dark
-  yellow tint in Dark; a selected tab or chip is never yellow in Light. A link's underline is `TEXT_LINK_STROKE_CLASSES`
+  `text-white`. A link's underline is `TEXT_LINK_STROKE_CLASSES`
   (`components/shared/text-link/text-link-variants`), a 2px `highlight`
   stroke.
 - `text-platform-text` for content, labels and values. `text-platform-muted` for
@@ -310,9 +308,19 @@ text-platform-on-selected` — near-black and white in Light, yellow on a dark
   the editor, selects, radio circles, the switch's off track, the segmented
   track, menu triggers. `border-platform-line` (1.24:1) is decorative structure
   only: card borders, dividers, the dashed upload box.
-- A selected item shows a 3:1 marker (`border-platform-brand`, a bar), not a
-  `bg-platform-selected-tint` fill alone, and announces itself as pressed, checked or
-  selected.
+- **Selected is one rule per family**, from
+  `@platform/utils/selected-choice-classes/selected-choice-classes`. A
+  compact control (segment, toolbar toggle, solo, chip, menu radio, view
+  tab) is solid `bg-platform-selected text-platform-on-selected` with a
+  `selected-edge` border or inset ring (`SELECTED_COMPACT_CHOICE_CLASSES`
+  for a bordered chip); a tile takes `SELECTED_CHOICE_CLASSES` and a tick
+  `SELECTED_TICK_CLASSES`; a row takes `SELECTED_ROW_CLASSES`. Yellow on
+  white is 1.61:1, so in Light every yellow mark carries its 3:1 on a
+  near-black part: the `selected-edge` (transparent in Dark, where yellow
+  passes alone), a tile's hairline, a switch's thumb. The sidebar's current
+  row is the one exception, carried by its raised plate and bold label.
+  Every selected item also announces itself as pressed, checked, selected
+  or current.
 - **Hover is one rule per kind of control.** A primary button darkens to
   `bg-platform-brand-hover`; a danger button to `bg-platform-bad-hover`.
   Every other pressable control, and every unselected option (segment,

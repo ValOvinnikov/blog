@@ -20,9 +20,9 @@ const iconToggleGroupOptionVariants = tv({
     'inline-flex size-11 cursor-pointer items-center justify-center md:size-7.5 pointer-coarse:size-11',
     'rounded-platform-3 border-0 bg-transparent text-platform-muted',
     'hover:bg-platform-hover-tint hover:text-platform-text',
-    'data-[pressed]:bg-platform-segment-on data-[pressed]:text-platform-brand-strong',
-    'data-[pressed]:hover:bg-platform-segment-on data-[pressed]:hover:text-platform-brand-strong',
-    'data-[pressed]:not-focus-visible:shadow-[inset_0_0_0_1.5px_var(--platform-brand-ink)]',
+    'data-[pressed]:bg-platform-selected data-[pressed]:text-platform-on-selected',
+    'data-[pressed]:hover:bg-platform-selected data-[pressed]:hover:text-platform-on-selected',
+    'data-[pressed]:inset-ring data-[pressed]:inset-ring-platform-selected-edge',
     focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
   ],
 });

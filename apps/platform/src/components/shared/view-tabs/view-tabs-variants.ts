@@ -17,7 +17,8 @@ export const viewTabsVariants = tv({
           'min-h-11 rounded-platform-control px-[14px] py-[7px] md:min-h-0',
           'text-platform-13 font-medium text-platform-muted',
           'not-data-[active]:hover:bg-platform-hover-tint not-data-[active]:hover:text-platform-text',
-          'data-[active]:bg-platform-surface data-[active]:text-platform-text data-[active]:not-focus-visible:shadow-platform',
+          'data-[active]:bg-platform-selected data-[active]:text-platform-on-selected',
+          'data-[active]:inset-ring data-[active]:inset-ring-platform-selected-edge',
           focusRingClasses(FOCUS_RING_GROUND.THEME_TRACK),
         ],
       },
@@ -29,7 +30,7 @@ export const viewTabsVariants = tv({
         tab: [
           'h-platform-view-tab border-b-2 border-transparent text-center',
           'text-platform-14 font-medium text-platform-muted not-data-[active]:hover:text-platform-text',
-          'data-[active]:border-platform-brand data-[active]:font-semibold data-[active]:text-platform-brand-strong',
+          'data-[active]:border-platform-selected-line data-[active]:font-semibold data-[active]:text-platform-text',
           focusRingClasses(FOCUS_RING_GROUND.SURFACE),
         ],
       },

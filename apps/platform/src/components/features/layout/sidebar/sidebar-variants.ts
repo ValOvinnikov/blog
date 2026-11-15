@@ -5,7 +5,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const NAV_ROW_SHAPE =
   'group relative flex items-center gap-2.5 rounded-platform-control px-2.5 py-2 text-platform-13';
 
-export const NAV_CURRENT_BAR =
+const NAV_CURRENT_BAR =
   'before:absolute before:left-0 before:w-platform-bar before:rounded-r-platform-bar';
 
 export const sidebarVariants = tv({
@@ -59,7 +59,7 @@ export const sidebarVariants = tv({
         row: [
           'bg-platform-side-raised font-semibold text-platform-brand-ink shadow-platform',
           NAV_CURRENT_BAR,
-          'before:inset-y-2 before:bg-platform-side-accent',
+          'before:inset-y-2 before:bg-platform-selected-line',
         ],
       },
       resting: {

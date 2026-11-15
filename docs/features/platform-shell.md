@@ -280,8 +280,8 @@ save still settles as the form's generic server error.
   and chevrons only. A nav row rests in `side-text` with a `side-muted`
   icon (a colour, never an opacity) and hovers to a `side-line` ground; the
   current page's row is a `side-raised` plate with the raised shadow, its
-  text and icon `brand-ink` at 600, and a 3px `side-accent` bar on its left
-  edge, on the collapsed rail too. A focused row keeps its rest colours and
+  text and icon `brand-ink` at 600, and a 3px `selected-line` (yellow) bar
+  on its left edge, on the collapsed rail too. A focused row keeps its rest colours and
   shows the side-gapped focus ring, which replaces the plate's shadow.
   An inert row (no destination) keeps the rest colours with no hover ground,
   is exposed as a disabled link (`role="link"`, `aria-disabled`, no `href`),
@@ -332,9 +332,8 @@ save still settles as the form's generic server error.
   its full text as `title`) over the email (12px `muted`, 16px line), each
   cut with an ellipsis, and a 16px `muted` up chevron. With no name the email
   takes the name line, there is no email line, and the avatar shows the
-  email's first letter. Hover takes the `hover-tint` ground; open takes a
-  `side-raised` ground and adds a
-  `side-accent` border; focus is the side-gapped ring. Collapsed, the trigger
+  email's first letter. Hover takes the `hover-tint` ground; open keeps it
+  and adds a `brand-ink` border; focus is the side-gapped ring. Collapsed, the trigger
   is the 52×52 avatar alone, titled by the name and named "Account: {name},
   {email}" ("Account: {email}" with no name). The menu, named "Account" on
   the shared popup frame, opens 6px above the trigger from its left edge, at
@@ -358,7 +357,8 @@ save still settles as the form's generic server error.
   carries no account control at any width: below `md` the account lives at
   the foot of the phone Menu (below).
   The Workspace field is a `side-field` plate with a `side-field-line` border
-  and the raised shadow, its border `side-accent` while its dropdown is open;
+  and the raised shadow, a `brand-ink` border and the `hover-tint` ground
+  while its dropdown is open;
   its initials are `brand-strong` at 700 on `brand-weak`, its name `text`, its
   domain `muted` in the Mono font and its chevron `muted`. It carries the
   active workspace's full name as its `title`, so a name cut by its ellipsis
@@ -391,11 +391,8 @@ save still settles as the form's generic server error.
   is `brand` at 30%. `warn` is orange (#9a3d0b on #fdeee4 / #ffa066 on
   #2e1a10), so a warning never reads as the brand; `ok` and `bad` are
   unchanged. A primary button, an avatar and the active step put
-  `on-brand-ink` on `brand`. A selected chip or jump-index tab
-  is `on-selected` on `selected`, unchanged on hover: solid near-black
-  with a white label in Light, `brand-ink` yellow on the `selected-tint`
-  (#4a3b10) in Dark, so a selected tab or chip is never yellow in Light. A switch that is on has
-  a `brand` track and a `switch-thumb-on` thumb (yellow / near-black). A
+  `on-brand-ink` on `brand`. Selected states follow the rule under
+  "Selected is one rule per family" below. A
   focused field takes a `brand-ink` border (near-black in Light, yellow in
   Dark), kept over an invalid field's `bad-line` border, and a 3px
   `focus-ring` glow (`shadow-platform-focus-glow`).
@@ -403,8 +400,8 @@ save still settles as the form's generic server error.
   `pill-neutral` ground with `muted` text and a `control-line-locked`
   border. A link
   is `brand-ink` (or `brand-strong`) with a 2px `highlight` underline 3px
-  below it. The sidebar's current row is `side-raised` with a `side-accent`
-  bar and `brand-ink` text.
+  below it. The sidebar's current row is `side-raised` with a
+  `selected-line` bar and `brand-ink` text.
 - The platform has a dark palette. `:root` holds the light values with
   `color-scheme: light`; `:root[data-theme='dark']` holds the dark value of
   every colour and shadow token with `color-scheme: dark`, so native
@@ -423,10 +420,9 @@ save still settles as the form's generic server error.
   `frame-thumb` in a Light preview and `frame-track-dark` /
   `frame-thumb-dark` in a Dark one. The tenant site preview and the email preview body
   are unaffected. `on-brand-ink` (#ffffff / #0f1115) is the label or mark on
-  a `brand`, `brand-ink` or tone fill — the primary button, the active chip,
-  the selected preset card's tick, and the step indicator's numbers — and `preview-stage`
-  (#eef0f3 / #1d2027) is the preview frame's stage ground. The selected
-  preset card takes a `brand-ink` border and dot with a `brand-weak` halo.
+  a `brand`, `brand-ink` or tone fill — the primary button and the step
+  indicator's numbers — and `preview-stage`
+  (#eef0f3 / #1d2027) is the preview frame's stage ground.
   The shared Tooltip sits on `tooltip` (#12141a / #262b35) with a
   `tooltip-line` edge. The toast follows the theme with the popover look
   (`popover` ground, `popover-line` border, `shadow-platform-lg`), `text` copy
@@ -466,7 +462,8 @@ save still settles as the form's generic server error.
   (`components/shared/nestable-menu-root/` and `nestable-menu-trigger/`) as Base UI submenus: their triggers
   are menu items in the Menu's arrow-key order (switcher, rows, account) on a
   `side-field` ground with a `side-field-line` border, a `hover-tint`
-  hover, a `side-accent` border while open and the popover-gapped ring. The
+  hover, a `brand-ink` border on the `hover-tint` ground while open, and the
+  popover-gapped ring. The
   switcher's dropdown opens 6px below it and the account menu 6px above the
   foot, each at least its trigger's width (the account menu exactly it), with
   the Menu open behind; Escape closes
@@ -489,6 +486,33 @@ save still settles as the form's generic server error.
   of token names must meet 4.5:1 for text and 3:1 for borders, icons, tracks
   and focus rings, measured from the values in `platform-theme.css`, and the
   device-dark block must repeat the chosen-Dark block exactly.
+- Selected is one rule per family, from `utils/selected-choice-classes/`.
+  `selected` and `selected-line` are #ffc233 in every theme, `on-selected`
+  is #12141a / #0f1115, `selected-tint` is #ffe08a / #4a3b10, and
+  `selected-edge` is #12141a in Light and transparent in Dark, because
+  yellow on white is 1.61:1, below 3:1, while in Dark yellow passes alone.
+  Compact controls (segmented options at every width, preview toolbar
+  toggles, the Follow and full-screen solos, rich-text toolbar toggles,
+  segmented view tabs, the language picker and other segmented radio
+  tracks, appearance menu radio items, Voice section chips, preset chips
+  and the phone jump index) are solid `selected` with an `on-selected`
+  label and a `selected-edge` border or inset ring
+  (`SELECTED_COMPACT_CHOICE_CLASSES` for the bordered chips). Tiles (card
+  style tiles, preset picker cards, the preset grid) are `selected-tint`
+  with a 1.5px `selected-line` border and a 1px `on-selected` hairline
+  (`SELECTED_CHOICE_CLASSES`), and a yellow tick (`SELECTED_TICK_CLASSES`).
+  Rows (preset rows, the selected lead, the open accordion row, the
+  current top-bar menu row) are `selected-tint` with a 3px `selected-line`
+  bar and a 1px `selected-edge` (`SELECTED_ROW_CLASSES`). A switch that is
+  on has a `selected` track with a `selected-edge` ring and an
+  `switch-thumb-on` thumb (#12141a / #0f1115); a checked checkbox and the
+  chosen preset's dot are `selected` with an `on-selected` tick. Underline
+  tabs and the desktop jump index mark the current entry with a
+  `selected-line` underline and a bold `text` label. An open popup trigger
+  other than a select has a `brand-ink` border on the `hover-tint` ground.
+  The preview toolbar's groups and the Follow solo rest on `theme-track`.
+  The sidebar's current-row bar is the one yellow mark below 3:1 in Light;
+  its raised plate and bold label carry the selection.
 - Hover is one rule per kind of control. The primary button darkens to
   `brand-hover` and the danger button to `bad-hover`. Secondary and ghost
   buttons, the reveal toggle, growth notes, breadcrumb links, the
@@ -513,7 +537,7 @@ save still settles as the form's generic server error.
 - Focus is one gapped ring on every control, built by
   `utils/focus-ring-classes/focus-ring-classes.ts` for a named
   `FOCUS_RING_GROUND` (side, bg, surface, surface-2, surface-head, popover,
-  popover-hover, segment-on, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
+  popover-hover, on-selected, hover-tint, theme-track, selected-tint): a 2px gap in that ground, then a
   2px `focus-ring` (#ffc233 in both themes), then in Light a 1px `focus-edge`
   (#12141a) around it; Dark has no edge. The ground reaches the
   `shadow-platform-focus-ring` token through `--platform-focus-ground`, which
@@ -533,11 +557,12 @@ save still settles as the form's generic server error.
   that a clipping parent would cut off is drawn inset
   (`insetFocusRingClasses`, an inset shadow that stacks with a drop shadow):
   the data table's scroll region and its sort buttons, which fill their head
-  cell; lead rows (on `selected-tint` when selected, the selected 1px `brand`
-  edge drawn above the ring); menu, select, tenant switcher and top-bar menu
+  cell; lead rows, the open accordion row and the current top-bar menu row
+  (on `selected-tint` when selected, the bar and edge drawn above the ring);
+  menu, select, tenant switcher and top-bar menu
   items on keyboard focus only (on `popover-hover`); the appearance menu
-  radio items on keyboard focus only (on `hover-tint`, or `segment-on` for
-  the checked radio); the Look preset sheet's rows (on `selected-tint` when
+  radio items on keyboard focus only (on `hover-tint`, or `on-selected` for
+  the checked radio, so the yellow ring shows against its yellow fill); the Look preset sheet's rows (on `selected-tint` when
   selected, the 3px bar a pseudo-element
   above the ring); and the full-screen preview stage (on `theme-track`). An
   inset ring's ground is the row's own fill. The more-presets grid's

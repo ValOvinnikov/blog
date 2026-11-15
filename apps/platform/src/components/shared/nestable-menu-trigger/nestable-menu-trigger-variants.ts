@@ -5,7 +5,7 @@ import { tv } from '@platform/utils/tv/tv';
 export const NESTED_TRIGGER_CLASSES = [
   'border border-platform-side-field-line bg-platform-side-field outline-none',
   'hover:border-platform-side-field-line hover:bg-platform-hover-tint',
-  'data-[popup-open]:border-platform-side-accent data-[popup-open]:bg-platform-side-field',
+  'data-[popup-open]:border-platform-brand-ink data-[popup-open]:bg-platform-hover-tint',
   focusRingClasses(FOCUS_RING_GROUND.POPOVER),
 ];
 

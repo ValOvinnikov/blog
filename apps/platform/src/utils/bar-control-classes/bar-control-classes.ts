@@ -6,6 +6,6 @@ export const BAR_CONTROL_CLASSES = [
   'rounded-platform-control border border-platform-control-line bg-platform-surface',
   'cursor-pointer',
   COLOUR_TRANSITION_CLASSES,
-  'hover:border-platform-brand-ink hover:bg-platform-hover-tint data-[popup-open]:border-platform-brand-ink',
+  'hover:border-platform-brand-ink hover:bg-platform-hover-tint data-[popup-open]:border-platform-brand-ink data-[popup-open]:bg-platform-hover-tint',
   focusRingClasses(FOCUS_RING_GROUND.BG),
 ];

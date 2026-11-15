@@ -26,16 +26,27 @@ export const jumpCardLinkVariants = tv({
       },
     },
     isCurrent: {
-      true: {
-        link: ['bg-platform-selected font-semibold text-platform-on-selected'],
-      },
+      true: { link: ['font-semibold'] },
     },
   },
   compoundVariants: [
     {
       isPhone: true,
       isCurrent: true,
-      class: { link: ['border-platform-brand'] },
+      class: {
+        link: [
+          'border-platform-selected-edge bg-platform-selected text-platform-on-selected',
+        ],
+      },
+    },
+    {
+      isPhone: false,
+      isCurrent: true,
+      class: {
+        link: [
+          'text-platform-text shadow-[inset_0_-2px_0_var(--platform-selected-line)]',
+        ],
+      },
     },
     {
       isCurrent: false,

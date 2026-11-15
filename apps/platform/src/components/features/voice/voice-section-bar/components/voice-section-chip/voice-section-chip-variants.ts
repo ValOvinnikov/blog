@@ -25,7 +25,7 @@ export const voiceSectionChipVariants = tv({
       },
       true: {
         link: [
-          'border-platform-brand bg-platform-selected text-platform-on-selected',
+          'border-platform-selected-edge bg-platform-selected text-platform-on-selected',
         ],
         count: ['text-platform-on-selected'],
         errorPill: ['h-5 rounded-full bg-platform-surface px-1.5'],
