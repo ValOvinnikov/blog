@@ -26,6 +26,12 @@ export const REVALIDATE_LOG = {
   NEWSLETTER_SEND_ENQUEUE_REFUSED: 'revalidate.newsletter_send_enqueue_refused',
   NEWSLETTER_SEND_ENQUEUE_FAILED: 'revalidate.newsletter_send_enqueue_failed',
   NEWSLETTER_SEND_RELEASE_FAILED: 'revalidate.newsletter_send_release_failed',
+  SCHEDULED_PURGE_TENANT_LOOKUP_FAILED:
+    'revalidate.scheduled_purge_tenant_lookup_failed',
+  SCHEDULED_POST_LOOKUP_FAILED: 'revalidate.scheduled_post_lookup_failed',
+  SCHEDULED_PURGE_ENQUEUE_SKIPPED: 'revalidate.scheduled_purge_enqueue_skipped',
+  SCHEDULED_PURGE_ENQUEUE_REFUSED: 'revalidate.scheduled_purge_enqueue_refused',
+  SCHEDULED_PURGE_ENQUEUE_FAILED: 'revalidate.scheduled_purge_enqueue_failed',
 } as const;
 
 export const WHOLE_SITE_PURGE_ARGS = ['/', 'layout'] as const;
