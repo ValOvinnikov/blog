@@ -41,6 +41,7 @@ const MOCK_POST_INPUT = {
   type: POST_TYPE,
   id: faker.string.uuid(),
   slug: MOCK_SLUG,
+  previousSlug: undefined,
   operation: SANITY_WEBHOOK_OPERATION.UPDATE,
 };
 
@@ -171,6 +172,23 @@ describe(deriveRevalidatePaths, () => {
       expect(deriveTenantSitePaths).toHaveBeenCalledWith({
         ...MOCK_TENANT_INPUT,
         documentHref: `/blog/${MOCK_SLUG}`,
+      });
+    });
+
+    it('hands a renamed post to the tenant page derivation', async () => {
+      await deriveRevalidatePaths({
+        ...MOCK_POST_INPUT,
+        previousSlug: MOCK_PREVIOUS_SLUG,
+      });
+
+      expect(deriveTenantSitePaths).toHaveBeenCalledWith({
+        ...MOCK_TENANT_INPUT,
+        documentHref: `/blog/${MOCK_SLUG}`,
+        renamedDocument: {
+          type: POST_TYPE,
+          slug: MOCK_SLUG,
+          previousSlug: MOCK_PREVIOUS_SLUG,
+        },
       });
     });
 

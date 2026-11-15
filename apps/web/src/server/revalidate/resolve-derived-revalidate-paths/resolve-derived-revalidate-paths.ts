@@ -11,7 +11,7 @@ export type TResolveDerivedRevalidatePathsInput = {
   type: string;
   id: string;
   slug: TMaybeUndefined<string>;
-  previousSlug?: string;
+  previousSlug: TMaybeUndefined<string>;
   operation: TMaybeNull<string>;
   tenantId: TMaybeUndefined<string>;
   tenant: TMaybeUndefined<TTenantSanityContext>;

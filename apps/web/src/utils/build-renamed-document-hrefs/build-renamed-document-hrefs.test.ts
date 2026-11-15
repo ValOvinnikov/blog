@@ -14,8 +14,14 @@ const MOCK_PAGE_TWO = '2';
 const MOCK_PAGE_THREE = '3';
 
 describe(buildRenamedDocumentHrefs, () => {
-  it('returns nothing when no document was renamed', () => {
-    expect(buildRenamedDocumentHrefs(undefined, mockTenantPageLists())).toEqual(
+  it.each([
+    { case: 'no document was renamed', renamed: undefined },
+    {
+      case: 'a renamed landing page',
+      renamed: { ...MOCK_RENAMED, type: 'page_landing' },
+    },
+  ])('returns nothing for $case', ({ renamed }) => {
+    expect(buildRenamedDocumentHrefs(renamed, mockTenantPageLists())).toEqual(
       [],
     );
   });
@@ -31,15 +37,6 @@ describe(buildRenamedDocumentHrefs, () => {
     );
 
     expect(hrefs).toEqual([href]);
-  });
-
-  it('returns nothing for a renamed landing page', () => {
-    const hrefs = buildRenamedDocumentHrefs(
-      { ...MOCK_RENAMED, type: 'page_landing' },
-      mockTenantPageLists(),
-    );
-
-    expect(hrefs).toEqual([]);
   });
 
   it.each([

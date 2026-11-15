@@ -29,7 +29,7 @@ export type TDeriveRevalidatePathsInput = {
   type: string;
   id: string;
   slug: TMaybeUndefined<string>;
-  previousSlug?: string;
+  previousSlug: TMaybeUndefined<string>;
   operation: TMaybeNull<string>;
   tenantId: string;
   tenant: TTenantSanityContext;

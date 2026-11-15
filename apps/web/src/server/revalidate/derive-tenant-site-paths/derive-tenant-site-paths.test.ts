@@ -78,6 +78,23 @@ describe(deriveTenantSitePaths, () => {
     );
   });
 
+  it('resolves a renamed document’s old address in its live languages', async () => {
+    const previousSlug = faker.lorem.slug();
+
+    const result = await deriveTenantSitePaths({
+      ...MOCK_INPUT,
+      renamedDocument: {
+        type: 'page_legalDocument',
+        slug: faker.lorem.slug(),
+        previousSlug,
+      },
+    });
+
+    expect(result).toEqual(
+      okResult(expect.arrayContaining([`${NL_ROOT}/legal/${previousSlug}`])),
+    );
+  });
+
   it('reports fetch_failed and logs when the live locales lookup fails', async () => {
     vi.mocked(resolveTenantLiveLocales).mockResolvedValue(
       errorResult(MOCK_ERROR),
