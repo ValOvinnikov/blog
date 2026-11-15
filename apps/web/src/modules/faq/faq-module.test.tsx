@@ -1,12 +1,19 @@
 import { errorResult, okResult } from '@blog/utils';
 import { faker } from '@faker-js/faker';
+import { FAQ_LOG } from '@web/constants/faq';
+import { getSectionAppearance } from '@web/server/site-config/get-section-appearance/get-section-appearance';
 import { customRenderAsync, screen } from '@web/testing/custom-render';
 import {
   mockFaqModule,
   mockFaqQuestion,
 } from '@web/testing/modules/faq/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
-import { MOCK_TENANT_SANITY_CONTEXT } from '@web/testing/shared/tenant/fixtures';
+import { MOCK_SECTION_STYLE_OVERRIDE_CASES } from '@web/testing/shared/section-appearance/fixtures';
+import {
+  MOCK_REQUEST_CONTEXT,
+  MOCK_TENANT_SANITY_CONTEXT,
+} from '@web/testing/shared/tenant/fixtures';
+import { logger } from '@web/utils/logger/logger';
 
 import { FaqModule } from './faq-module';
 
@@ -26,6 +33,10 @@ vi.mock('@blog/service', () => ({
 
 vi.mock('@web/server/request-context/request-context');
 
+vi.mock(
+  '@web/server/site-config/get-section-appearance/get-section-appearance',
+);
+
 faker.seed(31);
 
 const MOCK_FAQ_MODULE_ID = faker.string.uuid();
@@ -38,7 +49,6 @@ const setup = customRenderAsync(FaqModule, {
 
 describe(`<${FaqModule.name}/>`, () => {
   beforeEach(() => {
-    getFaqModuleMock.mockReset();
     getFaqModuleMock.mockResolvedValue(okResult(mockFaqModule()));
   });
 
@@ -49,14 +59,6 @@ describe(`<${FaqModule.name}/>`, () => {
       MOCK_FAQ_MODULE_ID,
       MOCK_TENANT_SANITY_CONTEXT,
     );
-  });
-
-  it('renders nothing when the fetch fails', async () => {
-    getFaqModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
-
-    const { container } = await setup();
-
-    expect(container).toBeEmptyDOMElement();
   });
 
   it('renders the resolved questions as accordion triggers', async () => {
@@ -88,5 +90,31 @@ describe(`<${FaqModule.name}/>`, () => {
 
     expect(firstTrigger).toBeVisible();
     expect(secondTrigger).toBeVisible();
+  });
+
+  it.each(MOCK_SECTION_STYLE_OVERRIDE_CASES)(
+    'scopes the section to $title',
+    async ({ overrides }) => {
+      getFaqModuleMock.mockResolvedValue(okResult(mockFaqModule(overrides)));
+
+      await setup();
+
+      expect(vi.mocked(getSectionAppearance)).toHaveBeenCalledWith(
+        MOCK_REQUEST_CONTEXT.tenantId,
+        overrides,
+      );
+    },
+  );
+
+  it('logs and renders nothing when the fetch fails', async () => {
+    getFaqModuleMock.mockResolvedValue(errorResult(MOCK_ERROR));
+
+    const { container } = await setup();
+
+    expect(container).toBeEmptyDOMElement();
+    expect(vi.mocked(logger.error)).toHaveBeenCalledWith(
+      FAQ_LOG.MODULE_FETCH_FAILED,
+      { id: MOCK_FAQ_MODULE_ID, error: MOCK_ERROR },
+    );
   });
 });

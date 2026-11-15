@@ -9,7 +9,10 @@ import type { IModuleHeadingProps } from '@web/components/shared/module-heading/
 import { Section } from '@web/components/shared/section';
 import type { ISectionProps } from '@web/components/shared/section/section';
 
-type TModuleSectionModule = Pick<ISectionProps, 'brandVariant' | 'layout'> &
+type TModuleSectionModule = Pick<
+  ISectionProps,
+  'brandVariant' | 'layout' | 'appearance'
+> &
   Pick<IModuleHeadingProps, 'headingBlock'> & {
     contentAlignment: TMaybeUndefined<TContentAlignment>;
   };
@@ -25,12 +28,14 @@ export const ModuleSection = ({
   dataTestId,
   children,
 }: IModuleSectionProps) => {
-  const { brandVariant, layout, headingBlock, contentAlignment } = module;
+  const { brandVariant, layout, appearance, headingBlock, contentAlignment } =
+    module;
 
   return (
     <Section
       brandVariant={brandVariant}
       layout={layout}
+      appearance={appearance}
       titleId={titleId}
       dataTestId={dataTestId}
     >
