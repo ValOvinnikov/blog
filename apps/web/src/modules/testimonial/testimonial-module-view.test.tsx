@@ -154,18 +154,23 @@ describe(`<${TestimonialModuleView.name}/>`, () => {
     },
   );
 
-  it('lays the grid out in the stored column count over the quote count', () => {
-    setup({ columns: GRID_COLUMNS.FOUR, testimonials: mockItems(2) });
+  it.each([
+    {
+      title: 'in the stored column count over the quote count',
+      columns: GRID_COLUMNS.FOUR,
+      itemCount: 2,
+      expected: 4,
+    },
+    {
+      title: 'in columns that fit the quote count on Auto',
+      columns: undefined,
+      itemCount: 4,
+      expected: 2,
+    },
+  ])('lays the grid out $title', ({ columns, itemCount, expected }) => {
+    setup({ columns, testimonials: mockItems(itemCount) });
 
-    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-4`);
-
-    expect(grid).toBeVisible();
-  });
-
-  it('falls back to columns that fit the quote count on Auto', () => {
-    setup({ columns: undefined, testimonials: mockItems(4) });
-
-    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-2`);
+    const grid = screen.getByTestId(`${MOCK_DATA_TEST_ID}-grid-${expected}`);
 
     expect(grid).toBeVisible();
   });
