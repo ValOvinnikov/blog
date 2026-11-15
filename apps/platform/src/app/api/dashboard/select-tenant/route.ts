@@ -1,9 +1,12 @@
+import { HTTP_STATUS } from '@blog/config/constants';
 import { queries } from '@blog/db';
+import { hasLength } from '@blog/utils/primitives';
 import { auth } from '@platform/server/auth/auth';
 import { isSuperAdmin } from '@platform/server/auth/is-super-admin';
 import { ACTIVE_TENANT_COOKIE } from '@platform/utils/active-tenant-cookie/active-tenant-cookie';
 import { toRequestedPath } from '@platform/utils/requested-path/requested-path';
 import { adminRoutes } from '@platform/utils/routes/routes';
+import { toServerCookieOptions } from '@platform/utils/server-cookie-options/server-cookie-options';
 import { NextResponse } from 'next/server';
 
 const ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
@@ -32,21 +35,19 @@ export async function GET(request: Request): Promise<NextResponse> {
   const authorized = membership
     ? true
     : isSuperAdmin(await queries.admins.getAdminByUserId(userId)) &&
-      (await queries.tenants.listTenantsByIds([tenantId])).length > 0;
+      hasLength(await queries.tenants.listTenantsByIds([tenantId]));
 
   if (!authorized) {
-    return NextResponse.json(null, { status: 404 });
+    return NextResponse.json(null, { status: HTTP_STATUS.NOT_FOUND });
   }
 
   const response = NextResponse.redirect(new URL(adminRoutes.dashboard(), url));
 
-  response.cookies.set(ACTIVE_TENANT_COOKIE, tenantId, {
-    maxAge: ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS,
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-  });
+  response.cookies.set(
+    ACTIVE_TENANT_COOKIE,
+    tenantId,
+    toServerCookieOptions(ACTIVE_TENANT_COOKIE_MAX_AGE_SECONDS),
+  );
 
   return response;
 }

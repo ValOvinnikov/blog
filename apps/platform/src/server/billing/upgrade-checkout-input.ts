@@ -9,14 +9,16 @@ export const planChoiceSchema = z.object({
   interval: z.enum(BILLING_INTERVAL),
 });
 
+export const promoCodeSchema = z
+  .string()
+  .trim()
+  .min(1)
+  .max(MAX_PROMOTION_CODE_LENGTH)
+  .optional()
+  .catch(undefined);
+
 export const upgradeCheckoutInputSchema = planChoiceSchema.extend({
-  promo: z
-    .string()
-    .trim()
-    .min(1)
-    .max(MAX_PROMOTION_CODE_LENGTH)
-    .optional()
-    .catch(undefined),
+  promo: promoCodeSchema,
 });
 
 export type TUpgradeCheckoutInput = z.input<typeof upgradeCheckoutInputSchema>;
