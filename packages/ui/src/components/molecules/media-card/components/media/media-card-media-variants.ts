@@ -6,7 +6,6 @@ const TINTED_FILL = [
   'group-hover:bg-transparent group-focus-within:bg-transparent',
 ];
 
-/** `isLead`'s 4:3 ratio must always match `mediaFrameVariants`'s `classic` ratio, not a value invented locally. */
 export const mediaCardMediaVariants = tv({
   base: ['relative overflow-hidden', 'bg-surface-2'],
   variants: {
@@ -37,8 +36,8 @@ export const mediaCardMediaVariants = tv({
     },
   },
   compoundVariants: [
-    { shape: 'wide', isLead: false, class: 'aspect-video' },
-    { shape: 'wide', isLead: true, class: 'aspect-[4/3]' },
+    { shape: 'wide', isLead: false, class: 'aspect-card' },
+    { shape: 'wide', isLead: true, class: 'aspect-split' },
     { shape: 'wideFlat', class: 'aspect-[2/1]' },
     { shape: 'circle', align: 'left', class: 'mx-card-x' },
     { shape: 'circle', align: 'center', class: 'mx-auto' },

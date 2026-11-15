@@ -8,6 +8,8 @@ const MOCK_STYLESHEET = `
   --spacing-gutter: clamp(1rem, 5vw, 2.5rem);
   --radius-sm: 3px;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-weight-heading: 500;
+  --aspect-card: 16 / 9;
   --text-xl: clamp(1.35rem, 1.15rem + 0.7vw, 1.6rem);
   --text-xl--line-height: 1.35;
   --text-display--letter-spacing: -0.02em;
@@ -29,6 +31,8 @@ h2 {
 const CSS_VAR_COLOR_BG = '--color-bg';
 const CSS_VAR_ACCENT_SOLID = '--color-accent-solid';
 const CSS_VAR_RADIUS_SM = '--radius-sm';
+const CSS_VAR_FONT_WEIGHT_HEADING = '--font-weight-heading';
+const CSS_VAR_ASPECT_CARD = '--aspect-card';
 
 describe(parseThemeTokens, () => {
   describe('with the sample stylesheet', () => {
@@ -41,18 +45,21 @@ describe(parseThemeTokens, () => {
     });
 
     it('strips the matched prefix from the name and keeps the full cssVar', () => {
-      const accentSolid = findToken(CSS_VAR_ACCENT_SOLID);
+      expect(findToken(CSS_VAR_ACCENT_SOLID)?.name).toBe('accent-solid');
+    });
 
-      expect(accentSolid?.name).toBe('accent-solid');
+    it.each([
+      [CSS_VAR_FONT_WEIGHT_HEADING, 'font-weight-heading'],
+      [CSS_VAR_ASPECT_CARD, 'aspect-card'],
+    ])('keeps the full name of the hook token %s', (cssVar, name) => {
+      expect(findToken(cssVar)?.name).toBe(name);
     });
 
     it.each([
       [CSS_VAR_COLOR_BG, 'var(--bg)'],
       [CSS_VAR_RADIUS_SM, '3px'],
     ])('captures the declared value of %s', (cssVar, value) => {
-      const token = findToken(cssVar);
-
-      expect(token?.value).toBe(value);
+      expect(findToken(cssVar)?.value).toBe(value);
     });
 
     it('reads an @role comment when present', () => {
@@ -62,14 +69,14 @@ describe(parseThemeTokens, () => {
     });
 
     it('leaves role undefined when no @role comment is present', () => {
-      const accentSolid = findToken(CSS_VAR_ACCENT_SOLID);
-
-      expect(accentSolid?.role).toBeUndefined();
+      expect(findToken(CSS_VAR_ACCENT_SOLID)?.role).toBeUndefined();
     });
 
     it.each([
       [CSS_VAR_COLOR_BG, 'color'],
       ['--font-mono', 'font'],
+      [CSS_VAR_FONT_WEIGHT_HEADING, 'hook'],
+      [CSS_VAR_ASPECT_CARD, 'hook'],
       [CSS_VAR_RADIUS_SM, 'radius'],
       ['--spacing-gutter', 'spacing'],
       ['--container-content', 'layout'],
@@ -77,9 +84,7 @@ describe(parseThemeTokens, () => {
       ['--ease-smooth', 'motion'],
       ['--duration-fast', 'motion'],
     ] as const)('maps %s to category %s', (cssVar, category) => {
-      const token = findToken(cssVar);
-
-      expect(token?.category).toBe(category);
+      expect(findToken(cssVar)?.category).toBe(category);
     });
 
     it.each(['--text-xl--line-height', '--text-display--letter-spacing'])(

@@ -40,7 +40,7 @@ export const ctaModuleVariants = tv({
           ...CARD,
           'grid grid-cols-1 gap-8 md:grid-cols-[1.05fr_0.95fr] md:items-center',
         ],
-        media: ['sm:aspect-[4/3]'],
+        media: ['aspect-card sm:aspect-split'],
       },
       [CTA_VARIANT.CALLOUT]: {
         root: CARD,
