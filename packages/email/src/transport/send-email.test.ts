@@ -1,4 +1,5 @@
 import { EMAIL_ACCOUNT } from '@blog/config/constants';
+import type { TMaybeUndefined } from '@blog/config/types';
 import { buildSiteEmailTag } from '@blog/email/tags';
 import { LIST_UNSUBSCRIBE_ONE_CLICK } from '@blog/email/templates/tenant/unsubscribe/unsubscribe';
 import {
@@ -27,7 +28,7 @@ const { sendMock, resendCtorMock } = vi.hoisted(() => ({
 vi.mock('resend', () => ({
   Resend: class {
     emails = { send: sendMock };
-    constructor(key: string | undefined) {
+    constructor(key: TMaybeUndefined<string>) {
       resendCtorMock(key);
     }
   },
@@ -56,7 +57,7 @@ async function importFreshSendEmailModule(): Promise<TSendEmailModule> {
   return import('./send-email');
 }
 
-function sentEmail(): Partial<TSendEmailInput> | undefined {
+function sentEmail(): TMaybeUndefined<Partial<TSendEmailInput>> {
   return sendMock.mock.calls[0]?.[0];
 }
 

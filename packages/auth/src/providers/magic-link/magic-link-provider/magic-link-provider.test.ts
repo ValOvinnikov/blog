@@ -24,13 +24,13 @@ import {
 import { resolveTenantEmailBrand } from '@blog/config';
 import {
   AUTH_APP,
+  EMAIL_ACCOUNT,
   EMAIL_TEMPLATE_TYPE,
   EMAIL_TYPE,
   LOCALE_BCP47_TAGS,
   LOCALE_ISO_CODES,
   MAGIC_LINK_REFUSAL,
   type TLocaleIsoCode,
-  EMAIL_ACCOUNT,
 } from '@blog/config/constants';
 import {
   EMAIL_TEMPLATE_DEFAULT_COPY,

@@ -1,8 +1,8 @@
 import {
+  EMAIL_ACCOUNT,
   HTTP_METHOD,
   HTTP_STATUS,
   OPERATOR_ALERT_KIND,
-  EMAIL_ACCOUNT,
 } from '@blog/config/constants';
 import { ELEVATE_TENANT_OWNER_OUTCOME } from '@blog/db/constants';
 import {
