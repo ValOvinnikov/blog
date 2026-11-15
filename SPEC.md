@@ -2483,13 +2483,14 @@ cards carries them for the same reason: `personCardFragment` derefs the
 author's `profilePage` link.
 
 That purge is best-effort, and the backstop behind it is a time-based
-expiry declared per content route: `export const revalidate = 21600` (6 hours)
-on each of the eleven `[tenant]/[locale]` content routes, excluding
-`account`/`bookmarks`, which stay `force-dynamic`. It governs the Full Route
-Cache, distinct from the 3600s Data Cache TTL `isr()` sets on fetches, and
-exists so a purge that never happens self-heals within a bounded window rather
-than leaving a page wrong indefinitely — a correctness floor, not a freshness
-target. Next requires the value to be a literal and rejects it on a shared
+expiry declared per content route: `export const revalidate = 86400` (24 hours)
+on each `[tenant]/[locale]` content route, excluding `account`/`bookmarks`,
+which stay `force-dynamic`. It governs the Full Route Cache, and exists so a
+purge that never happens self-heals within a bounded window rather than
+leaving a page wrong indefinitely — a correctness floor, not a freshness
+target. A page caches only as long as the shortest window it reads, and the
+Sanity fetches (`isr()`) and the tenant-config `unstable_cache` reads each
+lower it to their own, so all three windows are held at 86400s. Next requires the value to be a literal and rejects it on a shared
 layout that has a `force-dynamic` child, both as hard build errors, so each
 route declares its own, kept in step with `@shinefold/config`'s
 `CONTENT_ROUTE_REVALIDATE_SECONDS` by test rather than by import.
