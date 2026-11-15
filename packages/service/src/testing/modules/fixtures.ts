@@ -538,23 +538,6 @@ export function mockRawFaqModuleQuestions(
   };
 }
 
-export function mockRawFaqModule(
-  overrides: Partial<TRawFaqModule> = {},
-): TRawFaqModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Frequently asked questions'),
-    questions: [
-      mockRawFaqQuestionItem(),
-      mockRawFaqQuestionItem({ _id: MOCK_SECOND_FAQ_QUESTION_ID }),
-    ],
-    ctaButtons: null,
-    contentAlignment: null,
-    layout: null,
-    ...overrides,
-  };
-}
-
 export function mockRawTimelineItem(
   overrides: Partial<TRawTimelineItem> = {},
 ): TRawTimelineItem {
