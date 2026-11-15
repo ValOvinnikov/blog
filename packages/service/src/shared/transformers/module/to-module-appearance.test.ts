@@ -4,7 +4,10 @@ import {
   GRID_COLUMNS,
   RADIUS_SCALE,
 } from '@blog/config/constants';
-import { mockRawModuleAppearance } from '@blog/service/testing/shared/module-appearance';
+import {
+  MOCK_UNSET_MODULE_APPEARANCE,
+  mockRawModuleAppearance,
+} from '@blog/service/testing/shared/module-appearance';
 
 import { toModuleAppearance } from './to-module-appearance';
 
@@ -23,11 +26,8 @@ describe(toModuleAppearance, () => {
   });
 
   it('leaves every unset override empty', () => {
-    expect(toModuleAppearance(mockRawModuleAppearance())).toEqual({
-      cardStyle: undefined,
-      radiusScale: undefined,
-      density: undefined,
-      columns: undefined,
-    });
+    expect(toModuleAppearance(mockRawModuleAppearance())).toEqual(
+      MOCK_UNSET_MODULE_APPEARANCE,
+    );
   });
 });

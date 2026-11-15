@@ -1,5 +1,6 @@
 import { UpgradePageContent } from '@platform/components/features/upgrade/upgrade-page-content';
 import { resolveDashboardTenant } from '@platform/server/auth/resolve-dashboard-tenant';
+import { readSignupPromo } from '@platform/server/billing/read-signup-promo';
 import { pageMetadata } from '@platform/server/page-metadata/page-metadata';
 import { renderTenantScopedPage } from '@platform/server/tenant-pages/render-tenant-scoped-page';
 import {
@@ -17,7 +18,11 @@ type TProps = {
 };
 
 export default async function DashboardUpgradePage({ searchParams }: TProps) {
-  const upgradeQuery = parseUpgradeSearchParams(await searchParams);
+  const { promo, isReturning } = parseUpgradeSearchParams(await searchParams);
+  const upgradeQuery = {
+    promo: promo ?? (await readSignupPromo()),
+    isReturning,
+  };
 
   return renderTenantScopedPage(resolveDashboardTenant, (context) =>
     UpgradePageContent({ ...context, ...upgradeQuery }),

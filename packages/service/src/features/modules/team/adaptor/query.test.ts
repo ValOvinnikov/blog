@@ -8,7 +8,10 @@ import { MOCK_TEAM_MODULE_ID } from '@blog/service/testing/modules/team/fixtures
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateModuleQuery } from '@blog/service/testing/shared/groq';
 import { mockLocalizedHeadingBlock } from '@blog/service/testing/shared/localized';
-import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
+import {
+  MOCK_AUTHORED_MODULE_APPEARANCE,
+  mockRawModuleAppearance,
+} from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { teamModuleQuery } from './query';
@@ -50,12 +53,7 @@ describe('teamModuleQuery', () => {
   it('reads no appearance overrides from a document authored without them', async () => {
     const module = await runTeam();
 
-    expect(module).toMatchObject({
-      cardStyle: null,
-      radiusScale: null,
-      density: null,
-      columns: null,
-    });
+    expect(module).toMatchObject(mockRawModuleAppearance());
   });
 
   it('reads the authored appearance overrides', async () => {

@@ -14,7 +14,10 @@ import {
   mockRawPersonBioBlock,
   mockRawSocialProfile,
 } from '@blog/service/testing/shared/fixtures';
-import { MOCK_AUTHORED_MODULE_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
+import {
+  MOCK_AUTHORED_MODULE_APPEARANCE,
+  MOCK_UNSET_MODULE_APPEARANCE,
+} from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { toTeamModule } from './transformer';
@@ -65,12 +68,7 @@ describe(toTeamModule, () => {
   it('leaves every appearance override undefined when unset', () => {
     const module = toTeamModule(mockRawTeamModule());
 
-    expect(module).toMatchObject({
-      cardStyle: undefined,
-      radiusScale: undefined,
-      density: undefined,
-      columns: undefined,
-    });
+    expect(module).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
   });
 
   it('maps the authored appearance overrides straight through', () => {

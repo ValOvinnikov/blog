@@ -1,8 +1,6 @@
 import { BRAND_VARIANT, LOCALE_ISO_CODES } from '@blog/config/constants';
-import {
-  MOCK_FAQ_MODULE_ID,
-  mockRawFaqModule,
-} from '@blog/service/testing/modules/fixtures';
+import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
+import { MOCK_FAQ_MODULE_ID } from '@blog/service/testing/modules/fixtures';
 import { mockReference } from '@blog/service/testing/shared/fixtures';
 import { evaluateGroqExpression } from '@blog/service/testing/shared/groq';
 import {
@@ -10,6 +8,7 @@ import {
   mockLocalizedListedText,
   mockLocalizedStrings,
 } from '@blog/service/testing/shared/localized';
+import { MOCK_AUTHORED_CARD_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { faqModuleQuery } from './query';
@@ -71,6 +70,12 @@ const MOCK_UNTRANSLATED_QUESTION_DOCUMENT = {
   question: mockLocalizedStrings({ [EN]: MOCK_UNTRANSLATED_QUESTION }),
   answer: mockLocalizedListedText({ [EN]: MOCK_UNTRANSLATED_ANSWER }),
 };
+
+const MOCK_FAQ_DATASET = [
+  MOCK_FAQ_MODULE_DOCUMENT,
+  MOCK_TRANSLATED_QUESTION,
+  MOCK_UNTRANSLATED_QUESTION_DOCUMENT,
+];
 
 async function runFaq(dataset: Record<string, unknown>[], locale: string) {
   const raw = await evaluateGroqExpression(
@@ -138,14 +143,7 @@ describe('faqModuleQuery', () => {
       MOCK_EN_COPY,
     ],
   ])('%s', async (_, locale, copy) => {
-    const module = await runFaq(
-      [
-        MOCK_FAQ_MODULE_DOCUMENT,
-        MOCK_TRANSLATED_QUESTION,
-        MOCK_UNTRANSLATED_QUESTION_DOCUMENT,
-      ],
-      locale,
-    );
+    const module = await runFaq(MOCK_FAQ_DATASET, locale);
 
     expect(module.headingBlock.heading).toBe(copy.heading);
     expect(questionText(module)).toEqual([
@@ -171,5 +169,29 @@ describe('faqModuleQuery', () => {
         NL,
       ),
     ).rejects.toThrow();
+  });
+
+  it('reads no appearance overrides from a document authored without them', async () => {
+    const module = await runFaq(MOCK_FAQ_DATASET, EN);
+
+    expect(module).toMatchObject({
+      cardStyle: null,
+      radiusScale: null,
+      density: null,
+    });
+  });
+
+  it('reads the authored appearance overrides', async () => {
+    const [, ...questions] = MOCK_FAQ_DATASET;
+
+    const module = await runFaq(
+      [
+        { ...MOCK_FAQ_MODULE_DOCUMENT, ...MOCK_AUTHORED_CARD_APPEARANCE },
+        ...questions,
+      ],
+      EN,
+    );
+
+    expect(module).toMatchObject(MOCK_AUTHORED_CARD_APPEARANCE);
   });
 });

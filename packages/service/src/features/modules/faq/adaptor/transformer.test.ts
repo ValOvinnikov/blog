@@ -1,11 +1,12 @@
 import { BRAND_VARIANT, CONTENT_ALIGNMENT } from '@blog/config';
+import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
 import {
   mockCtaButtonView,
   mockRawContentBlock,
   mockRawCtaButton,
-  mockRawFaqModule,
   mockRawFaqQuestionItem,
 } from '@blog/service/testing/modules/fixtures';
+import { MOCK_AUTHORED_CARD_APPEARANCE } from '@blog/service/testing/shared/module-appearance';
 import { faker } from '@faker-js/faker';
 
 import { toFaqModule } from './transformer';
@@ -38,6 +39,22 @@ describe(toFaqModule, () => {
     const module = toFaqModule(raw);
 
     expect(module.contentAlignment).toBe(expected);
+  });
+
+  it('leaves every appearance override undefined when unset', () => {
+    const module = toFaqModule(mockRawFaqModule());
+
+    expect(module).toMatchObject({
+      cardStyle: undefined,
+      radiusScale: undefined,
+      density: undefined,
+    });
+  });
+
+  it('maps the authored appearance overrides straight through', () => {
+    const module = toFaqModule(mockRawFaqModule(MOCK_AUTHORED_CARD_APPEARANCE));
+
+    expect(module).toMatchObject(MOCK_AUTHORED_CARD_APPEARANCE);
   });
 
   it('keeps the questions in authored order', () => {

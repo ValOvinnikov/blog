@@ -13,9 +13,20 @@ export function mockRawModuleAppearance(
   };
 }
 
-export const MOCK_AUTHORED_MODULE_APPEARANCE = {
+export const MOCK_AUTHORED_CARD_APPEARANCE = {
   cardStyle: CARD_STYLE.RAISED,
   radiusScale: RADIUS_SCALE.XL,
   density: DENSITY.COMPACT,
+} as const;
+
+export const MOCK_AUTHORED_MODULE_APPEARANCE = {
+  ...MOCK_AUTHORED_CARD_APPEARANCE,
   columns: GRID_COLUMNS.FOUR,
+} as const;
+
+export const MOCK_UNSET_MODULE_APPEARANCE = {
+  cardStyle: undefined,
+  radiusScale: undefined,
+  density: undefined,
+  columns: undefined,
 } as const;

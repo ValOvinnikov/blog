@@ -1,3 +1,4 @@
+import { rememberSignupPromo } from '@platform/server/proxy/remember-signup-promo/remember-signup-promo';
 import {
   REQUESTED_PATH_HEADER,
   toRequestedPath,
@@ -12,7 +13,10 @@ const handleI18nRouting = createMiddleware(routing);
 export default function proxy(request: NextRequest) {
   request.headers.set(REQUESTED_PATH_HEADER, toRequestedPath(request.nextUrl));
 
-  return handleI18nRouting(request);
+  const response = handleI18nRouting(request);
+  rememberSignupPromo(request, response);
+
+  return response;
 }
 
 // Root-level dotted paths only: Studio structure ids contain dots, and a skipped request is never rewritten onto `[locale]`.
