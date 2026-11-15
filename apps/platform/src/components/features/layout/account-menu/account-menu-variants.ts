@@ -2,13 +2,14 @@ import { MENU_POPUP_FIT_WIDTH } from '@platform/components/shared/menu-surface';
 import { ACCOUNT_MENU_PLACEMENT } from '@platform/constants/account-menu';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { OPEN_TRIGGER_CLASSES } from '@platform/utils/open-trigger-classes/open-trigger-classes';
 import { COLOUR_TRANSITION_CLASSES } from '@platform/utils/transition-classes/transition-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 const SIDEBAR_TRIGGER = [
   'rounded-platform border border-platform-control-line-tint bg-transparent',
   'hover:bg-platform-hover-tint',
-  'data-[popup-open]:border-platform-brand-ink data-[popup-open]:bg-platform-hover-tint data-[popup-open]:hover:bg-platform-hover-tint',
+  OPEN_TRIGGER_CLASSES,
   focusRingClasses(FOCUS_RING_GROUND.SIDE),
 ];
 

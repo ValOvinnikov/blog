@@ -1,6 +1,7 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { OPEN_TRIGGER_CLASSES } from '@platform/utils/open-trigger-classes/open-trigger-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const morePresetsButtonVariants = tv({
@@ -8,7 +9,7 @@ export const morePresetsButtonVariants = tv({
     'inline-flex h-10 flex-none cursor-pointer items-center gap-1.5 rounded-platform-control border border-platform-control-line bg-platform-surface pr-2.5 pl-3',
     'text-platform-13 font-semibold whitespace-nowrap text-platform-brand-strong',
     'not-data-[disabled]:hover:bg-platform-hover-tint',
-    'data-[popup-open]:border-platform-brand-ink data-[popup-open]:bg-platform-hover-tint data-[popup-open]:hover:bg-platform-hover-tint',
+    OPEN_TRIGGER_CLASSES,
     focusRingClasses(FOCUS_RING_GROUND.SURFACE),
     ...DISABLED_AFFORDANCE_CLASSES,
   ],

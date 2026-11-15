@@ -317,8 +317,10 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `SELECTED_TICK_CLASSES`; a row takes `SELECTED_ROW_CLASSES`. Yellow on
   white is 1.61:1, so in Light every yellow mark carries its 3:1 on a
   near-black part: the `selected-edge` (transparent in Dark, where yellow
-  passes alone), a tile's hairline, a switch's thumb. The sidebar's current
-  row is the one exception, carried by its raised plate and bold label.
+  passes alone), a tile's hairline, a switch's thumb. Three yellow marks
+  stay below 3:1 in Light, and a bold near-black label carries their state:
+  the sidebar's current-row bar (with its raised plate), and the underline
+  under the current underline tab and desktop jump index entry.
   Every selected item also announces itself as pressed, checked, selected
   or current.
 - **Hover is one rule per kind of control.** A primary button darkens to
@@ -328,9 +330,9 @@ labels `tracking-[0.09em]`). `font-mono` is for domains, ids and DNS values
   `hover:bg-platform-hover-tint` at every width, never `lg:`-only. Only a
   secondary button, an unchecked checkbox and the upload drop area also
   turn their border `brand-ink`. A field or select changes only its border.
-  Hover and selected never share a fill: selected lead and preset rows, a
-  pressed solo or editor toolbar toggle, and a pressed segment below `lg`
-  fill with `selected-tint`, a step stronger than the hover tint. Rows
+  Hover and selected never share a fill: the selected lead, preset and
+  current top-bar menu rows and the open accordion row fill with
+  `selected-tint`, a step stronger than the hover tint. Rows
   (tables, lists, menus, the sidebar) keep their grey hover. Gate the hover so a selected, pressed, checked, current, open,
   disabled or locked control does not change (`not-data-[pressed]:`,
   `not-aria-disabled:`, or the `isSelected: false` variant). A caller that

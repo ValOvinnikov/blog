@@ -4,6 +4,7 @@ import {
   focusRingClasses,
   insetFocusRingClasses,
 } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { OPEN_TRIGGER_CLASSES } from '@platform/utils/open-trigger-classes/open-trigger-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const tenantSwitcherVariants = tv({
@@ -14,7 +15,7 @@ export const tenantSwitcherVariants = tv({
       'transition-colors duration-base ease-smooth',
       'hover:border-platform-side-accent/40 hover:bg-platform-hover-tint',
       focusRingClasses(FOCUS_RING_GROUND.SIDE),
-      'data-[popup-open]:border-platform-brand-ink data-[popup-open]:bg-platform-hover-tint',
+      OPEN_TRIGGER_CLASSES,
     ],
     meta: ['flex min-w-0 flex-1 flex-col'],
     nameRow: ['flex min-w-0 items-center gap-1.5'],

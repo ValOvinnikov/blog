@@ -10,6 +10,7 @@ import {
 import {
   SELECTED_CHOICE_CLASSES,
   SELECTED_ROW_CLASSES,
+  SELECTED_TICK_CLASSES,
   UNSELECTED_CHOICE_CLASSES,
 } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -45,9 +46,7 @@ export const presetListOptionVariants = tv({
       selected: true,
       class: {
         option: SELECTED_CHOICE_CLASSES,
-        tick: [
-          'rounded-full bg-platform-selected p-0.5 text-platform-on-selected',
-        ],
+        tick: [SELECTED_TICK_CLASSES],
       },
     },
     {

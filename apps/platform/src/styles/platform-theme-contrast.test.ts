@@ -299,7 +299,7 @@ const LIGHT_PAIRS: readonly TPair[] = [
     TOKEN.SELECTED_TINT,
     BOUNDARY,
   ],
-  ['Tile hairline on card', TOKEN.ON_SELECTED, TOKEN.SURFACE, BOUNDARY],
+  ['Tile hairline on card', TOKEN.SELECTED_EDGE, TOKEN.SURFACE, BOUNDARY],
   ['Focus edge around the ring', TOKEN.FOCUS_EDGE, TOKEN.FOCUS_RING, FOCUS],
   ...focusMarkPairs(TOKEN.FOCUS_EDGE),
 ];
@@ -314,6 +314,7 @@ const DARK_PAIRS: readonly TPair[] = [
     BOUNDARY,
   ],
   ['Tile border on card', TOKEN.SELECTED_LINE, TOKEN.SURFACE, BOUNDARY],
+  ['Sidebar current bar', TOKEN.SELECTED_LINE, TOKEN.SIDE_RAISED, BOUNDARY],
   ...focusMarkPairs(TOKEN.FOCUS_RING),
 ];
 

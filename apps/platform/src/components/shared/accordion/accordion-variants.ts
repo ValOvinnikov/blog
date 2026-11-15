@@ -103,7 +103,7 @@ export const accordionVariants = tv({
         item: ['bg-platform-surface'],
         trigger: [
           ...SELECTED_ROW_CLASSES,
-          'max-lg:min-h-12',
+          'hover:bg-platform-selected-tint max-lg:min-h-12',
           insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
       },

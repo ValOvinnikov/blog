@@ -492,14 +492,14 @@ save still settles as the form's generic server error.
   `selected-edge` is #12141a in Light and transparent in Dark, because
   yellow on white is 1.61:1, below 3:1, while in Dark yellow passes alone.
   Compact controls (segmented options at every width, preview toolbar
-  toggles, the Follow and full-screen solos, rich-text toolbar toggles,
+  toggles, the Follow solo, rich-text toolbar toggles,
   segmented view tabs, the language picker and other segmented radio
   tracks, appearance menu radio items, Voice section chips, preset chips
   and the phone jump index) are solid `selected` with an `on-selected`
   label and a `selected-edge` border or inset ring
   (`SELECTED_COMPACT_CHOICE_CLASSES` for the bordered chips). Tiles (card
   style tiles, preset picker cards, the preset grid) are `selected-tint`
-  with a 1.5px `selected-line` border and a 1px `on-selected` hairline
+  with a 1.5px `selected-line` border and a 1px `selected-edge` hairline
   (`SELECTED_CHOICE_CLASSES`), and a yellow tick (`SELECTED_TICK_CLASSES`).
   Rows (preset rows, the selected lead, the open accordion row, the
   current top-bar menu row) are `selected-tint` with a 3px `selected-line`
@@ -511,8 +511,10 @@ save still settles as the form's generic server error.
   `selected-line` underline and a bold `text` label. An open popup trigger
   other than a select has a `brand-ink` border on the `hover-tint` ground.
   The preview toolbar's groups and the Follow solo rest on `theme-track`.
-  The sidebar's current-row bar is the one yellow mark below 3:1 in Light;
-  its raised plate and bold label carry the selection.
+  Three yellow marks stay below 3:1 in Light, and a bold near-black label
+  carries their state: the sidebar's current-row bar (with its raised
+  plate), and the underline under the current underline tab and desktop
+  jump index entry. In Dark all three pass.
 - Hover is one rule per kind of control. The primary button darkens to
   `brand-hover` and the danger button to `bad-hover`. Secondary and ghost
   buttons, the reveal toggle, growth notes, breadcrumb links, the

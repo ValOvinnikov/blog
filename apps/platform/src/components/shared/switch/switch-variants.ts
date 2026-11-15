@@ -29,6 +29,7 @@ export const switchVariants = tv({
       true: {
         root: ['cursor-not-allowed'],
         track: ['cursor-not-allowed data-[checked]:bg-platform-control-line'],
+        thumb: ['data-[checked]:bg-platform-switch-thumb'],
       },
       false: {
         root: ['cursor-pointer'],

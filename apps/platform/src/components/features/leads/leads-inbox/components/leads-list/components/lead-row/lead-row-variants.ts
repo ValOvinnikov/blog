@@ -27,8 +27,7 @@ export const leadRowVariants = tv({
         row: [
           ...SELECTED_ROW_CLASSES,
           'border-l-transparent hover:bg-platform-selected-tint',
-          // The row's 3px left border sits outside the pseudo-elements' box; this pulls the bar and edge over it.
-          'before:-left-[3px] after:-left-[3px]',
+          'before:-left-platform-bar after:-left-platform-bar',
           insetFocusRingClasses(FOCUS_RING_GROUND.SELECTED_TINT),
         ],
       },
