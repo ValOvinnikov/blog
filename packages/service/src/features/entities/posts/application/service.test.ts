@@ -3,7 +3,8 @@ import { getPostsByIds } from '@blog/service/features/entities/posts/adaptor/get
 import { getPostPublishedAt } from '@blog/service/features/entities/posts/adaptor/get-published-at/loader';
 import { getPublishedPostsByTag } from '@blog/service/features/entities/posts/adaptor/tag-scoped-published/loader';
 import { MOCK_TAG_ID } from '@blog/service/testing/entities/fixtures';
-import { mockTenant } from '@blog/service/testing/tenant';
+import { MOCK_POST_ID } from '@blog/service/testing/shared/fixtures';
+import { MOCK_TENANT } from '@blog/service/testing/tenant';
 import { faker } from '@faker-js/faker';
 
 import { createPostsService } from './service';
@@ -39,9 +40,6 @@ vi.mock(
 faker.seed(6104);
 
 const MOCK_POST_IDS = [faker.string.uuid(), faker.string.uuid()];
-const MOCK_POST_ID = faker.string.uuid();
-
-const tenant = mockTenant();
 
 describe(createPostsService, () => {
   beforeEach(() => {
@@ -51,26 +49,32 @@ describe(createPostsService, () => {
   });
 
   it('threads tenant context through to the id-list loader', async () => {
-    await createPostsService().v1.getPostsByIds(MOCK_POST_IDS, tenant);
+    await createPostsService().v1.getPostsByIds(MOCK_POST_IDS, MOCK_TENANT);
 
-    expect(getPostsByIds).toHaveBeenCalledWith(MOCK_POST_IDS, tenant);
+    expect(getPostsByIds).toHaveBeenCalledWith(MOCK_POST_IDS, MOCK_TENANT);
   });
 
   it('threads tenant context through to the publish-date loader', async () => {
-    await createPostsService().v1.getPostPublishedAt(MOCK_POST_ID, tenant);
+    await createPostsService().v1.getPostPublishedAt(MOCK_POST_ID, MOCK_TENANT);
 
-    expect(getPostPublishedAt).toHaveBeenCalledWith(MOCK_POST_ID, tenant);
+    expect(getPostPublishedAt).toHaveBeenCalledWith(MOCK_POST_ID, MOCK_TENANT);
   });
 
   it('threads tenant context through to the tag-scoped loader', async () => {
-    await createPostsService().v1.getPublishedPostsByTag(MOCK_TAG_ID, tenant);
+    await createPostsService().v1.getPublishedPostsByTag(
+      MOCK_TAG_ID,
+      MOCK_TENANT,
+    );
 
-    expect(getPublishedPostsByTag).toHaveBeenCalledWith(MOCK_TAG_ID, tenant);
+    expect(getPublishedPostsByTag).toHaveBeenCalledWith(
+      MOCK_TAG_ID,
+      MOCK_TENANT,
+    );
   });
 
   it('threads tenant context through to the all-published loader', async () => {
-    await createPostsService().v1.getAllPublishedPosts(tenant);
+    await createPostsService().v1.getAllPublishedPosts(MOCK_TENANT);
 
-    expect(getAllPublishedPosts).toHaveBeenCalledWith(tenant);
+    expect(getAllPublishedPosts).toHaveBeenCalledWith(MOCK_TENANT);
   });
 });

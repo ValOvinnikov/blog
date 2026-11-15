@@ -45,7 +45,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 
 ## Data
 
-- **Sanity Data Cache** — every `@blog/service` loader passes `isr(tags, projectId)`, which emits `revalidate: 3600` (`SANITY_CONTENT_REVALIDATE_SECONDS`) and tags prefixed `t:<projectId>:<tag>`. With `SANITY_LIVE_CONTENT=1` in development it returns `cache: 'no-store'`. The Sanity client runs with `useCdn: false`.
+- **Sanity Data Cache** — every `@blog/service` loader passes `isr(tags, projectId)`, which emits `revalidate: 3600` (`SANITY_CONTENT_REVALIDATE_SECONDS`) and tags prefixed `t:<projectId>:<tag>`. The one exception is the publish-date read (`getPostPublishedAt`), which passes `cache: 'no-store'` so a publish webhook sees the date it was fired for. With `SANITY_LIVE_CONTENT=1` in development it returns `cache: 'no-store'`. The Sanity client runs with `useCdn: false`.
 - **Tenant config Data Cache** — `getSiteConfig`, `getTenantPlan` and `getEffectiveSettingsFeatures` wrap their `@blog/db` reads in `unstable_cache`, tagged `site-config:<tenantId>`, `tenant-plan:<tenantId>` and `settings-features:<tenantId>`, `revalidate: 3600` (`TENANT_CONFIG_REVALIDATE_SECONDS`).
 - **Full Route Cache** — `CONTENT_ROUTE_REVALIDATE_SECONDS` (21600) is the backstop; each route hardcodes the literal.
 - **`REVALIDATE_TAGS`** (`apps/web/src/utils/revalidate-tags`) maps a document `_type` to the tags its publish purges. Module types also purge `module:<id>`; any module whose markup embeds the published document is found through `service.entities.modules.v1.getReferencingModuleIds` and purged by its `module:<id>` too.
