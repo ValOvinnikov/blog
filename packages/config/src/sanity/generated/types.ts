@@ -260,7 +260,6 @@ export type Module_faq = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   headingBlock?: ModuleHeadingBlock;
   questions?: Array<
     {
@@ -272,7 +271,11 @@ export type Module_faq = {
       _key: string;
     } & CtaButton
   >;
+  brandVariant?: 'PRIMARY' | 'SECONDARY' | 'BRAND_PRIMARY';
   contentAlignment?: 'LEFT' | 'CENTER';
+  cardStyle?: 'ACCENT_BAR' | 'OUTLINED' | 'FILLED' | 'RAISED' | 'PLAIN';
+  radiusScale?: 'NONE' | 'SM' | 'MD' | 'LG' | 'XL';
+  density?: 'DEFAULT' | 'COMPACT';
   layout?: Layout;
 };
 
