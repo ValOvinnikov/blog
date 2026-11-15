@@ -1,3 +1,4 @@
+import { hasLength } from '@blog/utils/primitives';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ReactElement } from 'react';
 
@@ -18,16 +19,15 @@ export default meta;
 
 type TStory = StoryObj<typeof meta>;
 
-/** Render a titled section, or nothing when the category has no tokens. */
 const section = (
   title: string,
   tokens: TToken[],
   render: (tokens: TToken[]) => ReactElement,
 ): ReactElement =>
-  tokens.length === 0 ? (
-    <></>
-  ) : (
+  hasLength(tokens) ? (
     <TokenSection title={title}>{render(tokens)}</TokenSection>
+  ) : (
+    <></>
   );
 
 export const Colour: TStory = {
@@ -71,4 +71,9 @@ export const Layout: TStory = {
 export const Motion: TStory = {
   render: () =>
     section('Motion', tokensByCategory.motion, (t) => <KvList tokens={t} />),
+};
+
+export const Hooks: TStory = {
+  render: () =>
+    section('Hooks', tokensByCategory.hook, (t) => <KvList tokens={t} />),
 };

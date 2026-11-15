@@ -4,7 +4,7 @@ import { SANITY_API_PATH } from '@blog/db/utils/sanity-management-client/sanity-
 import { sanityWebhooksRequest } from '@blog/db/utils/sanity-management-client/sanity-webhooks-request';
 
 // `before()` is null on a create, so `previousSlug` is too.
-const REVALIDATE_WEBHOOK_PROJECTION =
+export const REVALIDATE_WEBHOOK_PROJECTION =
   '{_type, _id, "slug": slug.current, "previousSlug": before().slug.current}';
 
 const REVALIDATE_WEBHOOK_RULE = {

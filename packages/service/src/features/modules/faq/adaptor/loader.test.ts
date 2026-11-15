@@ -1,10 +1,10 @@
 import { SANITY_CONTENT_REVALIDATE_SECONDS } from '@blog/config';
 import { mockRun } from '@blog/service/testing/mock-run-query';
+import { mockRawFaqModule } from '@blog/service/testing/modules/faq/fixtures';
 import {
   MOCK_FAQ_MODULE_ID,
   MOCK_FAQ_QUESTION_ID,
   MOCK_SECOND_FAQ_QUESTION_ID,
-  mockRawFaqModule,
 } from '@blog/service/testing/modules/fixtures';
 import {
   MOCK_BLOCK_FAQ_CACHE_TAG,
@@ -38,16 +38,11 @@ describe(getFaqModule, () => {
     );
   });
 
-  it('resolves the module with a single query', async () => {
+  it('resolves the module and its questions in authored order with a single query', async () => {
     const faq = await getFaqModule(MOCK_FAQ_MODULE_ID, MOCK_TENANT);
 
     expect(mockRun).toHaveBeenCalledTimes(1);
     expect(faq.headingBlock.heading).toBe(MOCK_FAQ_HEADING);
-  });
-
-  it('returns the referenced questions in authored order', async () => {
-    const faq = await getFaqModule(MOCK_FAQ_MODULE_ID, MOCK_TENANT);
-
     expect(faq.questions.map((question) => question.id)).toEqual([
       MOCK_FAQ_QUESTION_ID,
       MOCK_SECOND_FAQ_QUESTION_ID,

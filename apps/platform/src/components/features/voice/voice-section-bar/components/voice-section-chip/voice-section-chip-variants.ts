@@ -1,5 +1,6 @@
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { SELECTED_COMPACT_FILL_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const voiceSectionChipVariants = tv({
@@ -24,9 +25,7 @@ export const voiceSectionChipVariants = tv({
         count: ['text-platform-muted'],
       },
       true: {
-        link: [
-          'border-platform-brand bg-platform-selected text-platform-on-selected',
-        ],
+        link: [SELECTED_COMPACT_FILL_CLASSES],
         count: ['text-platform-on-selected'],
         errorPill: ['h-5 rounded-full bg-platform-surface px-1.5'],
       },

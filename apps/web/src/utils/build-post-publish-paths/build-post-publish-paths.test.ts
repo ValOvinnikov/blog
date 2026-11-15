@@ -93,6 +93,23 @@ describe(buildPostPublishPaths, () => {
     ]);
   });
 
+  it('adds the post’s previous address in every locale', () => {
+    const previousPostSlug = faker.lorem.slug();
+
+    const paths = buildPostPublishPaths({
+      ...MOCK_INPUT,
+      locales: [EN, NL],
+      previousPostSlug,
+    });
+
+    expect(paths).toEqual(
+      expect.arrayContaining([
+        scoped(EN, routes.post(previousPostSlug)),
+        scoped(NL, routes.post(previousPostSlug)),
+      ]),
+    );
+  });
+
   it('scopes every path to each configured locale', () => {
     const paths = buildPostPublishPaths({ ...MOCK_INPUT, locales: [EN, NL] });
 

@@ -58,6 +58,9 @@ export const tv = createTV({
             font: ['display', 'body', 'read', 'mono'],
           },
         ],
+        'font-weight': [{ font: ['heading'] }],
+        'text-transform': ['heading-case'],
+        aspect: [{ aspect: ['card', 'split'] }],
         tracking: [{ tracking: TRACKING_TOKENS }],
         rounded: [
           {

@@ -2,7 +2,7 @@ import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { DISABLED_AFFORDANCE_CLASSES } from '@platform/utils/disabled-state-classes/disabled-state-classes';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import {
-  SELECTED_CHOICE_CLASSES,
+  SELECTED_COMPACT_CHOICE_CLASSES,
   UNSELECTED_CHOICE_CLASSES,
 } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -22,7 +22,8 @@ export const presetChipsVariants = tv({
   variants: {
     selected: {
       true: {
-        chip: SELECTED_CHOICE_CLASSES,
+        chip: SELECTED_COMPACT_CHOICE_CLASSES,
+        tick: ['text-platform-on-selected'],
       },
       false: {
         chip: [

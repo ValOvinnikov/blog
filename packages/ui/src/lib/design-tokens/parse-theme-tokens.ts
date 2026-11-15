@@ -1,5 +1,12 @@
 export type TCategory =
-  'color' | 'typography' | 'font' | 'radius' | 'spacing' | 'layout' | 'motion';
+  | 'color'
+  | 'typography'
+  | 'font'
+  | 'radius'
+  | 'spacing'
+  | 'layout'
+  | 'motion'
+  | 'hook';
 
 export type TToken = {
   name: string;
@@ -14,6 +21,10 @@ const PREFIX_CATEGORY: ReadonlyArray<readonly [string, TCategory]> = [
   ['container', 'layout'],
   ['spacing', 'spacing'],
   ['radius', 'radius'],
+  ['font-weight', 'hook'],
+  ['heading', 'hook'],
+  ['aspect', 'hook'],
+  ['divider', 'hook'],
   ['font', 'font'],
   ['text', 'typography'],
   ['ease', 'motion'],
@@ -49,7 +60,8 @@ const parseDeclarations = (block: string, seen: Set<string>): TToken[] => {
     if (!hit) continue;
 
     const [prefix, category] = hit;
-    const name = bare === prefix ? prefix : bare.slice(prefix.length + 1);
+    const keepsFullName = category === 'hook' || bare === prefix;
+    const name = keepsFullName ? bare : bare.slice(prefix.length + 1);
     const value = m[2]!.replace(/\s+/g, ' ').trim();
 
     seen.add(cssVar);
@@ -59,12 +71,10 @@ const parseDeclarations = (block: string, seen: Set<string>): TToken[] => {
   return tokens;
 };
 
-/** Parses `@blog/tailwind-config`'s `theme.css` into a flat list of design tokens, auto-discovering every `--<prefix>-<name>` custom property (and its value) so the gallery never needs manual edits when a token is renamed, added, or removed. */
 export const parseThemeTokens = (css: string): TToken[] => {
   const seen = new Set<string>();
   const themeTokens = parseDeclarations(themeBlocks(css), seen);
 
-  // Durations live in `:root` (so the @layer base transition utilities keep their `var()` references), so pull just the motion tokens from there — filtering out the raw colour palette that would otherwise leak in.
   const root = /:root\s*\{([\s\S]*?)\}/.exec(css)?.[1] ?? '';
   const rootMotion = parseDeclarations(root, seen).filter(
     (token) => token.category === 'motion',

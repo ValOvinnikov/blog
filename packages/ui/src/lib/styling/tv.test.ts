@@ -15,6 +15,7 @@ const TAILWIND_BUILT_IN_SIZES = [
 
 const FONT_DISPLAY = 'font-display';
 const FONT_MONO = 'font-mono';
+const FONT_HEADING = 'font-heading';
 const PY_SECTION = 'py-section';
 const PY_ZERO = 'py-0';
 const TEXT_COPY = 'text-copy';
@@ -32,6 +33,9 @@ describe(tv, () => {
     { base: PY_SECTION, added: PY_ZERO },
     { base: 'tracking-tight', added: 'tracking-label' },
     { base: 'tracking-eyebrow', added: 'tracking-tight-card' },
+    { base: FONT_HEADING, added: 'font-semibold' },
+    { base: 'aspect-video', added: 'aspect-card' },
+    { base: 'normal-case', added: 'heading-case' },
   ])('lets $added replace the conflicting $base', ({ base, added }) => {
     const styles = tv({ base });
 
@@ -48,6 +52,11 @@ describe(tv, () => {
       base: TEXT_CONTRAST,
       added: TEXT_COPY,
       merged: `${TEXT_CONTRAST} ${TEXT_COPY}`,
+    },
+    {
+      base: FONT_DISPLAY,
+      added: FONT_HEADING,
+      merged: `${FONT_DISPLAY} ${FONT_HEADING}`,
     },
     {
       base: `${PY_SECTION} px-gutter`,

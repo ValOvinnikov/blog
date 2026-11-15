@@ -45,6 +45,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     type: POST_TYPE,
     id: postId,
     slug: undefined,
+    previousSlug: undefined,
     operation: SANITY_WEBHOOK_OPERATION.UPDATE,
     tenantId,
     tenant,

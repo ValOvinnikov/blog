@@ -65,6 +65,9 @@ site as a 14-day Growth trial, with no card.
 - Auth.js sends a sign-in failure back to `/sign-in?error=…`.
   `OAuthAccountNotLinked` (the email already signs in with another provider)
   gets its own message; any other error a general one.
+- `/signup?promo=<code>` (the marketing pricing page's tier actions) keeps
+  the code for the visitor's first Checkout in the `platform-signup-promo`
+  cookie ([billing](./billing.md)); the page itself renders the same.
 - `/` redirects by `resolveHomeHref`: an admin to `/tenants`, a member to
   `/dashboard`, a user with no membership to `/onboarding`, a signed-out
   visitor to sign-in.

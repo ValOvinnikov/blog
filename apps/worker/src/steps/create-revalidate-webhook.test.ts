@@ -9,6 +9,7 @@ import {
   createSanityWebhook,
   listSanityWebhooks,
   type TListedSanityWebhook,
+  updateSanityWebhookProjection,
   updateSanityWebhookSecret,
 } from '@blog/db/utils/sanity-management-client/sanity-webhooks';
 import { faker } from '@faker-js/faker';
@@ -29,6 +30,7 @@ import {
 import {
   MOCK_CURRENT_WEBHOOK,
   MOCK_OTHER_WEBHOOK,
+  MOCK_STALE_PROJECTION_WEBHOOK,
   MOCK_WEBHOOK_ID,
 } from '@worker/testing/webhook/fixtures';
 
@@ -229,6 +231,7 @@ describe(createTenantRevalidateWebhook, () => {
 
       expect(createSanityWebhook).not.toHaveBeenCalled();
       expect(updateSanityWebhookSecret).not.toHaveBeenCalled();
+      expect(updateSanityWebhookProjection).not.toHaveBeenCalled();
       expect(setTenantRevalidateWebhookSecret).not.toHaveBeenCalled();
       expect(setTenantWebhookCreatedAt).not.toHaveBeenCalled();
     });
@@ -244,6 +247,48 @@ describe(createTenantRevalidateWebhook, () => {
         MOCK_TENANT_ID,
         MOCK_NOW,
       );
+    });
+  });
+
+  describe('when the hook carries an old projection', () => {
+    beforeEach(() => {
+      vi.mocked(listSanityWebhooks).mockResolvedValue([
+        MOCK_STALE_PROJECTION_WEBHOOK,
+        { ...MOCK_OTHER_WEBHOOK, projection: null },
+      ]);
+    });
+
+    it('updates that hook in place and creates no second one', async () => {
+      await createTenantRevalidateWebhook(
+        baseTenant({
+          revalidateWebhookSecretEncrypted: MOCK_ENCRYPTED_SECRET,
+          webhookCreatedAt: MOCK_NOW,
+        }),
+        MOCK_PROVISION_ENV,
+      );
+
+      expect(vi.mocked(updateSanityWebhookProjection).mock.calls).toEqual([
+        [
+          {
+            token: MOCK_TENANT_MANAGEMENT_TOKEN,
+            projectId: MOCK_SANITY_PROJECT_ID,
+            webhookId: MOCK_WEBHOOK_ID,
+          },
+        ],
+      ]);
+      expect(createSanityWebhook).not.toHaveBeenCalled();
+      expect(updateSanityWebhookSecret).not.toHaveBeenCalled();
+      expect(setTenantRevalidateWebhookSecret).not.toHaveBeenCalled();
+    });
+
+    it('rotates a missing secret and updates the projection both', async () => {
+      await createTenantRevalidateWebhook(
+        baseTenant({ webhookCreatedAt: MOCK_NOW }),
+        MOCK_PROVISION_ENV,
+      );
+
+      expect(updateSanityWebhookSecret).toHaveBeenCalledTimes(1);
+      expect(updateSanityWebhookProjection).toHaveBeenCalledTimes(1);
     });
   });
 

@@ -3,6 +3,7 @@ import { ctaButtonsFragment } from '@blog/service/shared/fragments/cta/cta-butto
 import { blockFaqFragment } from '@blog/service/shared/fragments/faq/block-faq';
 import { moduleHeadingBlockFragment } from '@blog/service/shared/fragments/heading-block/module-heading-block';
 import { moduleLayoutFragment } from '@blog/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@blog/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentLeftCenterFragment } from '@blog/service/shared/fragments/module/module-content-alignment';
 
 export const faqModuleQuery = q
@@ -28,5 +29,6 @@ export const faqModuleQuery = q
     ...ctaButtonsFragment,
     ...moduleContentAlignmentLeftCenterFragment,
     ...moduleLayoutFragment,
+    ...moduleAppearanceFragment,
   }))
   .notNull();

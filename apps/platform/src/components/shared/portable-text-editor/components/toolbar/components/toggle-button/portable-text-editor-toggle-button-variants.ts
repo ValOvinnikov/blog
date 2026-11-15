@@ -1,6 +1,7 @@
 import { SIZE } from '@blog/config';
 import { FOCUS_RING_GROUND } from '@platform/constants/focus-ring';
 import { focusRingClasses } from '@platform/utils/focus-ring-classes/focus-ring-classes';
+import { SELECTED_COMPACT_FILL_CLASSES } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
 
 export const portableTextEditorToggleButtonVariants = tv({
@@ -29,7 +30,9 @@ export const portableTextEditorToggleButtonVariants = tv({
       },
     },
     isActive: {
-      true: { button: 'border-platform-brand bg-platform-selected-tint' },
+      true: {
+        button: SELECTED_COMPACT_FILL_CLASSES,
+      },
       false: { button: 'hover:bg-platform-hover-tint' },
     },
     isIconOnly: {

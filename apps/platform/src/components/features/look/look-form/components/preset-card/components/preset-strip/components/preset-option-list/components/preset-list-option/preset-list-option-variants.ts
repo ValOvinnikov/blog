@@ -1,4 +1,3 @@
-import { NAV_CURRENT_BAR } from '@platform/components/features/layout/sidebar/sidebar-variants';
 import {
   FOCUS_RING_GROUND,
   FOCUS_RING_TRIGGER,
@@ -10,6 +9,8 @@ import {
 } from '@platform/utils/focus-ring-classes/focus-ring-classes';
 import {
   SELECTED_CHOICE_CLASSES,
+  SELECTED_ROW_CLASSES,
+  SELECTED_TICK_CLASSES,
   UNSELECTED_CHOICE_CLASSES,
 } from '@platform/utils/selected-choice-classes/selected-choice-classes';
 import { tv } from '@platform/utils/tv/tv';
@@ -20,7 +21,7 @@ export const presetListOptionVariants = tv({
     text: ['flex min-w-0 flex-1 flex-col gap-0.5'],
     name: ['text-platform-13-5 font-semibold text-platform-text'],
     description: ['text-platform-12-5 leading-[17px] text-platform-muted'],
-    tick: ['shrink-0 text-platform-brand-ink'],
+    tick: ['shrink-0 text-platform-text'],
   },
   variants: {
     layout: {
@@ -34,7 +35,7 @@ export const presetListOptionVariants = tv({
         ],
       },
       [PRESET_LIST_LAYOUT.ROWS]: {
-        option: ['relative gap-3 border-b border-platform-line-2 px-4 py-2'],
+        option: ['gap-3 border-b border-platform-line-2 px-4 py-2'],
       },
     },
     selected: { true: {}, false: {} },
@@ -43,7 +44,10 @@ export const presetListOptionVariants = tv({
     {
       layout: PRESET_LIST_LAYOUT.GRID,
       selected: true,
-      class: { option: SELECTED_CHOICE_CLASSES },
+      class: {
+        option: SELECTED_CHOICE_CLASSES,
+        tick: [SELECTED_TICK_CLASSES],
+      },
     },
     {
       layout: PRESET_LIST_LAYOUT.GRID,
@@ -60,9 +64,7 @@ export const presetListOptionVariants = tv({
       selected: true,
       class: {
         option: [
-          'bg-platform-selected-tint',
-          NAV_CURRENT_BAR,
-          'before:inset-y-0 before:bg-platform-brand-ink',
+          ...SELECTED_ROW_CLASSES,
           insetFocusRingClasses(
             FOCUS_RING_GROUND.SELECTED_TINT,
             FOCUS_RING_TRIGGER.LIST_HIGHLIGHTED,

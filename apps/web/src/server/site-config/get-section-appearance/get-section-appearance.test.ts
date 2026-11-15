@@ -3,6 +3,8 @@ import { TENANT_PLAN } from '@blog/config/constants';
 import { queries } from '@blog/db';
 import { SECTION_APPEARANCE_LOG } from '@web/constants/section-appearance';
 import { getEffectivePlan } from '@web/server/site-config/get-effective-plan/get-effective-plan';
+import { UNRESOLVED_TENANT_PLACEHOLDER } from '@web/server/tenant/constants/constants';
+import { getRequestTenantId } from '@web/server/tenant/request-tenant/request-tenant';
 import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_ERROR } from '@web/testing/shared/error/fixtures';
 import {
@@ -66,6 +68,14 @@ describe(getSectionAppearance, () => {
     );
 
     expect(overrides).toEqual(MOCK_NO_SECTION_STYLE_OVERRIDES);
+  });
+
+  it('reads the site config without a request header lookup when no tenant resolved', async () => {
+    await getSectionAppearance(undefined, MOCK_SECTION_STYLE_OVERRIDES);
+
+    expect(getRequestTenantId).toHaveBeenCalledWith(
+      UNRESOLVED_TENANT_PLACEHOLDER,
+    );
   });
 
   describe('when the site config read fails', () => {

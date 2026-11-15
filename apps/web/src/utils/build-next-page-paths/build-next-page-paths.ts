@@ -4,7 +4,7 @@ type TTranslatedPage = TTenantPageLists['topics'][number];
 type TPaginatedPage = TTenantPageLists['topicPages'][number];
 export type TLocalizedPath = { language: string; path: string };
 
-const toLastPage = (pages: { page: string }[]): number =>
+export const toLastPage = (pages: { page: string }[]): number =>
   Math.max(1, ...pages.map(({ page }) => Number(page)));
 
 /** The page after each listing's current last, which a removed entry can leave cached with stale content. */

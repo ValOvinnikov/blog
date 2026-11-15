@@ -29,11 +29,13 @@ export const switchVariants = tv({
       true: {
         root: ['cursor-not-allowed'],
         track: ['cursor-not-allowed data-[checked]:bg-platform-control-line'],
+        thumb: ['data-[checked]:bg-platform-switch-thumb'],
       },
       false: {
         root: ['cursor-pointer'],
         track: [
-          'cursor-pointer data-[checked]:bg-platform-brand',
+          'cursor-pointer data-[checked]:bg-platform-selected',
+          'data-[checked]:inset-ring data-[checked]:inset-ring-platform-selected-edge',
           'not-data-[disabled]:not-data-[checked]:hover:bg-platform-control-line-hover',
         ],
       },

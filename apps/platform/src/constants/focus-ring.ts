@@ -8,7 +8,7 @@ export const FOCUS_RING_GROUND = {
   SURFACE_HEAD: 'SURFACE_HEAD',
   POPOVER: 'POPOVER',
   POPOVER_HOVER: 'POPOVER_HOVER',
-  SEGMENT_ON: 'SEGMENT_ON',
+  ON_SELECTED: 'ON_SELECTED',
   HOVER_TINT: 'HOVER_TINT',
   THEME_TRACK: 'THEME_TRACK',
   SELECTED_TINT: 'SELECTED_TINT',
@@ -16,7 +16,7 @@ export const FOCUS_RING_GROUND = {
 
 export type TFocusRingGround = TValueOf<typeof FOCUS_RING_GROUND>;
 
-export type TCheckedFocusRingGround = typeof FOCUS_RING_GROUND.SEGMENT_ON;
+export type TCheckedFocusRingGround = typeof FOCUS_RING_GROUND.ON_SELECTED;
 
 export const FOCUS_RING_TRIGGER = {
   FOCUS_VISIBLE: 'FOCUS_VISIBLE',

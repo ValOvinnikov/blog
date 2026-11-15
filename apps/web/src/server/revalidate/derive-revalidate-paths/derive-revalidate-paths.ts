@@ -13,6 +13,7 @@ import {
 } from '@web/constants/revalidate';
 import { derivePostPublishPaths } from '@web/server/revalidate/derive-post-publish-paths/derive-post-publish-paths';
 import { deriveTenantSitePaths } from '@web/server/revalidate/derive-tenant-site-paths/derive-tenant-site-paths';
+import type { TRenamedDocument } from '@web/utils/build-renamed-document-hrefs';
 
 export const POST_TYPE = 'page_post';
 
@@ -28,6 +29,7 @@ export type TDeriveRevalidatePathsInput = {
   type: string;
   id: string;
   slug: TMaybeUndefined<string>;
+  previousSlug: TMaybeUndefined<string>;
   operation: TMaybeNull<string>;
   tenantId: string;
   tenant: TTenantSanityContext;
@@ -37,19 +39,39 @@ const isUnderivable = (type: string, operation: TMaybeNull<string>) =>
   UNDERIVABLE_TYPES.has(type) ||
   (type !== POST_TYPE && operation === SANITY_WEBHOOK_OPERATION.DELETE);
 
+const toRenamedDocument = ({
+  type,
+  slug,
+  previousSlug,
+}: TDeriveRevalidatePathsInput): TMaybeUndefined<TRenamedDocument> =>
+  slug && previousSlug && previousSlug !== slug
+    ? { type, slug, previousSlug }
+    : undefined;
+
 export const deriveRevalidatePaths = async (
   input: TDeriveRevalidatePathsInput,
 ): Promise<TDeriveRevalidatePathsResult> => {
-  const { type, slug, operation, tenantId, tenant } = input;
+  const { type, id, slug, operation, tenantId, tenant } = input;
   if (isUnderivable(type, operation)) {
     return errorResult(PATH_UNDERIVABLE_REASON);
   }
-  const tenantSite = { tenantId, tenant, documentHref: pageHref(type, slug) };
+  const renamedDocument = toRenamedDocument(input);
+  const tenantSite = {
+    tenantId,
+    tenant,
+    documentHref: pageHref(type, slug),
+    renamedDocument,
+  };
   if (type !== POST_TYPE) {
     return deriveTenantSitePaths(tenantSite);
   }
 
-  const postPaths = await derivePostPublishPaths(input);
+  const postPaths = await derivePostPublishPaths({
+    id,
+    tenantId,
+    tenant,
+    previousSlug: renamedDocument?.previousSlug,
+  });
   if (postPaths.ok) {
     return okResult(postPaths.data);
   }
