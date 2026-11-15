@@ -3,6 +3,7 @@ import { STRIPE_EVENT_RECORD_OUTCOME } from '@blog/db/constants';
 import { MOCK_STRIPE_EVENT_ID } from '@blog/db/testing/tenants/billing';
 import { BILLING_LOG } from '@platform/constants/billing';
 import { STRIPE_EVENT_TYPE } from '@platform/constants/stripe-event';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import {
   MOCK_GROWTH_UPGRADE,
@@ -56,6 +57,7 @@ vi.mock('./catalogue/revalidate-platform-site', () => ({
 vi.mock('@platform/server/tenants/on-tenant-plan-change', () => ({
   onTenantPlanChange: vi.fn(),
 }));
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 const invoicePaidEvent = () =>
   mockStripeEvent(STRIPE_EVENT_TYPE.INVOICE_PAID, mockStripeInvoice());
@@ -98,6 +100,10 @@ describe(handleStripeEvent, () => {
       );
     });
 
+    it("purges the tenant's site config", () => {
+      expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+    });
+
     it('sends one receipt', () => {
       expect(sendPaymentReceipt).toHaveBeenCalledOnce();
       expect(sendPaymentReceipt).toHaveBeenCalledWith(
@@ -138,6 +144,7 @@ describe(handleStripeEvent, () => {
     await handle(mockStripeEvent());
 
     expect(onTenantPlanChange).not.toHaveBeenCalled();
+    expect(revalidateSiteConfig).not.toHaveBeenCalled();
   });
 
   it('records the event but follows up on nothing when no tenant was written', async () => {

@@ -38,7 +38,7 @@ A member can see an unpublished draft on the tenant's real site through a signed
 ## Surfaces and routes
 
 - `POST /api/revalidate` — Sanity publish/unpublish/delete webhook (signature-verified).
-- `POST /api/revalidate-site-config` — called by `apps/platform` after a Look save or brand-image upload or clear, a Voice, Features, tenant-details or languages save, and a Stripe price-catalogue write (Bearer secret, optional `{ tenantId }` body).
+- `POST /api/revalidate-site-config` — called by `apps/platform` after a Look save or brand-image upload or clear, a Voice, Features, tenant-details or languages save, a Stripe price-catalogue write, a plan change from the Stripe webhook, and a connected custom domain's removal (Bearer secret, optional `{ tenantId }` body).
 - Every content route under `apps/web/src/app/[tenant]/[locale]/` declares `export const revalidate = 21600`, and every route with a dynamic segment (`[...slug]`, `blog/[slug]`, `blog/page/[page]`, and the topic and tag slug and pagination routes) declares an empty `generateStaticParams`, so none of them is prerendered at build and each path is cached on first request. The `[tenant]/[locale]` layout's `generateStaticParams` returns the default locale only.
 - `account`, `bookmarks` and `newsletter/unsubscribe` are `force-dynamic` and never cached across readers.
 - `[tenant]/[locale]/~preview/blog/[slug]` and `[tenant]/[locale]/~preview/[...slug]` — the draft render of a post and a landing page, `force-dynamic`. Reached only by the proxy's rewrite of a request carrying a verified `?preview=<token>`; the `[tenant]` segment is then `<tenantId>~preview`.

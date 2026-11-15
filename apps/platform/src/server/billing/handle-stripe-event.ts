@@ -9,6 +9,7 @@ import { revalidatePlatformSite } from '@platform/server/billing/catalogue/reval
 import { sendPaymentReceipt } from '@platform/server/billing/send-payment-receipt';
 import { subscriptionIdFromEvent } from '@platform/server/billing/subscription-id-from-event';
 import { syncStripeSubscription } from '@platform/server/billing/sync-stripe-subscription';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { onTenantPlanChange } from '@platform/server/tenants/on-tenant-plan-change';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
 import { logger } from '@platform/utils/logger/logger';
@@ -47,6 +48,7 @@ export const handleStripeEvent = async (
   const synced = await syncStripeSubscription(stripe, subscriptionId);
   if (synced && synced.fromPlan !== synced.toPlan) {
     const { tenantId, fromPlan, toPlan } = synced;
+    after(() => revalidateSiteConfig(tenantId));
     after(() => onTenantPlanChange(tenantId, fromPlan, toPlan));
   }
 
