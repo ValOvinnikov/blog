@@ -785,7 +785,7 @@
       "BOLD": "Negrita"
     },
     "headingCaseLabel": "Mayúsculas en títulos",
-    "headingCaseDescription": "Títulos de páginas y secciones. Los títulos de tarjetas y de entradas mantienen cómo los escribiste, para que los textos largos se lean bien.",
+    "headingCaseDescription": "Cambia los títulos de páginas y secciones. Los títulos de tarjetas y de entradas mantienen cómo los escribiste, para que los textos largos se lean bien.",
     "headingCaseOptionLabel": {
       "AS_WRITTEN": "Como se escribió",
       "UPPERCASE": "Mayúsculas"

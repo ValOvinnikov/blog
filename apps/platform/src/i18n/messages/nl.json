@@ -785,7 +785,7 @@
       "BOLD": "Vet"
     },
     "headingCaseLabel": "Hoofdletters in koppen",
-    "headingCaseDescription": "Pagina- en sectietitels. Kaarttitels en koppen in berichten blijven zoals je ze schreef, zodat langere tekst goed leesbaar blijft.",
+    "headingCaseDescription": "Verandert pagina- en sectietitels. Kaarttitels en koppen in berichten blijven zoals je ze schreef, zodat langere tekst goed leesbaar blijft.",
     "headingCaseOptionLabel": {
       "AS_WRITTEN": "Zoals geschreven",
       "UPPERCASE": "Hoofdletters"

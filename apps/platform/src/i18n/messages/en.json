@@ -785,7 +785,7 @@
       "BOLD": "Bold"
     },
     "headingCaseLabel": "Heading case",
-    "headingCaseDescription": "Page and section titles. Card titles and headings in posts keep the case you wrote, so longer text stays easy to read.",
+    "headingCaseDescription": "Changes page and section titles. Card titles and headings in posts keep the case you wrote, so longer text stays easy to read.",
     "headingCaseOptionLabel": {
       "AS_WRITTEN": "As written",
       "UPPERCASE": "Uppercase"

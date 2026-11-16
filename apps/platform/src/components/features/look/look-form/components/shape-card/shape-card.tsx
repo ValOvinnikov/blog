@@ -1,5 +1,8 @@
 import { LookCard } from '@platform/components/features/look/look-form/components/look-card';
-import { toLookGlyphOptions } from '@platform/components/features/look/look-form/components/look-option-glyph';
+import {
+  toLookGlyphOptions,
+  toLookLabelOptions,
+} from '@platform/components/features/look/look-form/components/look-option-glyph';
 import { LookPresetChoiceField } from '@platform/components/features/look/look-form/components/look-preset-choice-field';
 import { useLookRowLock } from '@platform/components/features/look/look-form/use-look-row-lock';
 import { LOOK_ROW } from '@platform/constants/look-row';
@@ -32,17 +35,14 @@ export const ShapeCard = ({ summary }: TShapeCardProps) => {
     t(`densityOptionLabel.${option}`),
   );
 
-  const imageProportionOptions = Object.values(IMAGE_PROPORTION).map(
-    (proportion) => ({
-      value: proportion,
-      label: t(`imageProportionOptionLabel.${proportion}`),
-    }),
+  const imageProportionOptions = toLookLabelOptions(
+    IMAGE_PROPORTION,
+    (proportion) => t(`imageProportionOptionLabel.${proportion}`),
   );
 
-  const dividerWidthOptions = Object.values(DIVIDER_WIDTH).map((width) => ({
-    value: width,
-    label: t(`dividerWidthOptionLabel.${width}`),
-  }));
+  const dividerWidthOptions = toLookLabelOptions(DIVIDER_WIDTH, (width) =>
+    t(`dividerWidthOptionLabel.${width}`),
+  );
 
   return (
     <LookCard

@@ -785,7 +785,7 @@
       "BOLD": "Gras"
     },
     "headingCaseLabel": "Casse des titres",
-    "headingCaseDescription": "Titres des pages et des sections. Les titres des cartes et des articles gardent la casse saisie, pour que les textes longs restent lisibles.",
+    "headingCaseDescription": "Change les titres des pages et des sections. Les titres des cartes et des articles gardent la casse saisie, pour que les textes longs restent lisibles.",
     "headingCaseOptionLabel": {
       "AS_WRITTEN": "Telle quelle",
       "UPPERCASE": "Majuscules"

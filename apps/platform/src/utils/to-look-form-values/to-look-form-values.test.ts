@@ -5,6 +5,7 @@ import {
   mockSiteConfig,
 } from '@platform/testing/site-config/fixtures';
 import { defaultLookFormValues } from '@platform/utils/default-look-values/default-look-values';
+import { HUE_MAX, HUE_MIN } from '@shinefold/config';
 
 import {
   lookFormValuesOrDefaults,
@@ -16,7 +17,7 @@ faker.seed(6006);
 const MOCK_BRAND_NAME = faker.company.name();
 
 const MOCK_SITE_CONFIG = mockSiteConfig({
-  logoHue: faker.number.int({ min: 0, max: 360 }),
+  logoHue: faker.number.int({ min: HUE_MIN, max: HUE_MAX }),
   brandName: MOCK_BRAND_NAME,
   logoAssetUrl: MOCK_LOGO_URL,
   faviconAssetUrl: MOCK_FAVICON_URL,

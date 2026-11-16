@@ -14,6 +14,6 @@ export const lookSampleVariants = tv({
     ],
     lead: ['text-[1.0625rem] leading-[1.6]'],
     actionsRow: ['flex flex-wrap items-center gap-2.5 pt-1.5'],
-    divider: ['border-0 border-t-[length:var(--divider-width)] border-divider'],
+    divider: ['border-0 border-t-[length:var(--divider-width)] border-border'],
   },
 });

@@ -785,7 +785,7 @@
       "BOLD": "Fett"
     },
     "headingCaseLabel": "Schreibweise der Überschriften",
-    "headingCaseDescription": "Seiten- und Abschnittstitel. Kartentitel und Überschriften in Beiträgen bleiben, wie du sie geschrieben hast, damit längere Texte gut lesbar bleiben.",
+    "headingCaseDescription": "Ändert Seiten- und Abschnittstitel. Kartentitel und Überschriften in Beiträgen bleiben, wie du sie geschrieben hast, damit längere Texte gut lesbar bleiben.",
     "headingCaseOptionLabel": {
       "AS_WRITTEN": "Wie geschrieben",
       "UPPERCASE": "Großbuchstaben"

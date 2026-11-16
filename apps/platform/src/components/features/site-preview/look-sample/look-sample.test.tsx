@@ -55,7 +55,11 @@ import {
 import { SHINEFOLD_LOGO_NAME } from '@shinefold/utils/shinefold-logo';
 import type { CSSProperties } from 'react';
 
-import { LookSample, type TLookSampleProps } from './look-sample';
+import {
+  LookSample,
+  type TLookSampleHeaderState,
+  type TLookSampleProps,
+} from './look-sample';
 
 faker.seed(5994);
 
@@ -123,10 +127,17 @@ const LOOK_SAMPLE_PROPS: TLookSampleProps = {
   header: MOCK_SAMPLE_HEADER_STYLE,
   footer: MOCK_FOOTER,
   busy: MOCK_BUSY,
-  hasReaderAccounts: true,
+  headerState: { hasReaderAccounts: true },
 };
 
 const setup = customRender(LookSample, LOOK_SAMPLE_PROPS);
+
+const withHeaderState = (
+  headerState: Partial<TLookSampleHeaderState>,
+): TLookSampleHeaderState => ({
+  ...LOOK_SAMPLE_PROPS.headerState,
+  ...headerState,
+});
 
 const withinFullHeader = () => {
   const fullHeader = screen.getByTestId(SAMPLE_HEADER_FULL_TEST_ID);
@@ -392,7 +403,7 @@ describe(`<${LookSample.name}/>`, () => {
 
   describe('without reader accounts', () => {
     beforeEach(() => {
-      setup({ hasReaderAccounts: false });
+      setup({ headerState: withHeaderState({ hasReaderAccounts: false }) });
     });
 
     it('shows no Sign in', () => {
@@ -433,7 +444,7 @@ describe(`<${LookSample.name}/>`, () => {
     });
 
     it('opens the account menu from the Account button while signed in', () => {
-      setup({ isSignedIn: true });
+      setup({ headerState: withHeaderState({ isSignedIn: true }) });
       const accountButton = withinFullHeader().getByRole('button', {
         name: ACCOUNT,
       });
@@ -452,7 +463,10 @@ describe(`<${LookSample.name}/>`, () => {
     ])(
       'describes the account links only in the hub panel ($panelStyle)',
       ({ panelStyle, hasDescriptions }) => {
-        setupWithAccount({ panelStyle }, { isSignedIn: true });
+        setupWithAccount(
+          { panelStyle },
+          { headerState: withHeaderState({ isSignedIn: true }) },
+        );
 
         const description = withinFullHeader().queryByText(
           BOOKMARKS_DESCRIPTION,
@@ -517,7 +531,7 @@ describe(`<${LookSample.name}/>`, () => {
   it('keeps the switcher with one live language when told to', () => {
     setup({
       liveLocales: [LOCALE_ISO_CODES.EN],
-      shouldAlwaysShowLanguageSwitcher: true,
+      headerState: withHeaderState({ shouldAlwaysShowLanguageSwitcher: true }),
     });
 
     const current = screen.getByTestId(CURRENT_LANGUAGE_TEST_ID);
@@ -675,7 +689,12 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_LAYOUT))(
       'shows the same bar with the %s layout',
       (layout) => {
-        setupWithHeader({ layout }, { isSubmenuOpen: true });
+        setupWithHeader(
+          { layout },
+          {
+            headerState: withHeaderState({ isSubmenuOpen: true }),
+          },
+        );
         const menuButton = withinBar().getByRole('button', { name: MENU });
         const postsLink = withinBar().queryByRole('link', { name: POSTS });
         const submenu = withinBar().queryByTestId(SAMPLE_SUBMENU_TEST_ID);
@@ -717,7 +736,12 @@ describe(`<${LookSample.name}/>`, () => {
     it.each(Object.values(HEADER_SUBMENU_STYLE))(
       'draws the %s sub-menu open under the Topics link when asked',
       (submenuStyle) => {
-        setupWithHeader({ submenuStyle }, { isSubmenuOpen: true });
+        setupWithHeader(
+          { submenuStyle },
+          {
+            headerState: withHeaderState({ isSubmenuOpen: true }),
+          },
+        );
 
         const submenu = screen.getByTestId(SAMPLE_SUBMENU_TEST_ID);
         const topicsTrigger = screen.getByText(TOPICS);

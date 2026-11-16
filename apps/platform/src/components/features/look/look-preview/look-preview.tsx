@@ -84,9 +84,11 @@ export const LookPreview = ({
         header={toSampleHeaderStyle(values)}
         footer={footer}
         busy={toSampleBusyStyle(values)}
-        hasReaderAccounts={hasReaderAccounts}
-        isSignedIn={isSignedIn}
-        isSubmenuOpen={isSubmenuPreviewOpen}
+        headerState={{
+          hasReaderAccounts,
+          isSignedIn,
+          isSubmenuOpen: isSubmenuPreviewOpen,
+        }}
       />
       {footer.hasCookieSettingsButton && (
         <DeviceFrame.Overlay>
