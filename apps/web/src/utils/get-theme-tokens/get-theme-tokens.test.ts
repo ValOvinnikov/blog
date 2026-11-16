@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { PRESET_ID } from '@shinefold/config';
+import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { THEME_TOKENS_LOG } from '@web/constants/theme-tokens';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
@@ -14,7 +14,10 @@ faker.seed(115);
 
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 
-const MOCK_SITE_CONFIG_ROW = mockSiteConfig({ preset: PRESET_ID.EDITORIAL });
+const MOCK_SITE_CONFIG_ROW = mockSiteConfig({
+  preset: PRESET_ID.EDITORIAL,
+  ...PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens,
+});
 
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
