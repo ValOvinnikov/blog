@@ -135,6 +135,23 @@ describe(POST, () => {
     expect(logger.warn).not.toHaveBeenCalled();
   });
 
+  it('leaves every page cached when the tenant has no path to purge', async () => {
+    vi.mocked(resolveTenantSitePaths).mockResolvedValue(okResult([]));
+
+    const response = await POST(
+      makeRequest(BEARER_SECRET, JSON.stringify({ tenantId: MOCK_TENANT_ID })),
+    );
+
+    expect(response.status).toBe(HTTP_STATUS.OK);
+    expect(purgedTags()).toEqual([
+      ...tagsForTenant(MOCK_TENANT_ID),
+      TENANT_BY_HOST_CACHE_TAG,
+      STRIPE_CATALOGUE_CACHE_TAG,
+    ]);
+    expect(revalidatePathMock).not.toHaveBeenCalled();
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
   it('purges the whole site and logs when the tenant’s paths fail', async () => {
     vi.mocked(resolveTenantSitePaths).mockResolvedValue(
       errorResult(FETCH_FAILED_REASON),
