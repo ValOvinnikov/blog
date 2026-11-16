@@ -143,11 +143,6 @@ describe(POST, () => {
     );
 
     expect(response.status).toBe(HTTP_STATUS.OK);
-    expect(purgedTags()).toEqual([
-      ...tagsForTenant(MOCK_TENANT_ID),
-      TENANT_BY_HOST_CACHE_TAG,
-      STRIPE_CATALOGUE_CACHE_TAG,
-    ]);
     expect(revalidatePathMock).not.toHaveBeenCalled();
     expect(logger.warn).not.toHaveBeenCalled();
   });

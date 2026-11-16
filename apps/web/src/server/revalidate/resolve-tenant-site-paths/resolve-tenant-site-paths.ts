@@ -1,5 +1,6 @@
 import type { TMaybeUndefined } from '@shinefold/config';
 import { queries, TENANT_STATUS } from '@shinefold/db';
+import type { TTenant } from '@shinefold/db/schema/tenants';
 import { errorResult, okResult, type TResult } from '@shinefold/utils';
 import {
   FETCH_FAILED_REASON,
@@ -7,19 +8,14 @@ import {
   TENANT_UNRESOLVED_REASON,
 } from '@web/constants/revalidate';
 import { deriveTenantSitePaths } from '@web/server/revalidate/derive-tenant-site-paths/derive-tenant-site-paths';
-import { loadTenantSanityCredentials } from '@web/server/revalidate/load-tenant-sanity-credentials/load-tenant-sanity-credentials';
 import { logger } from '@web/utils/logger/logger';
 
-const loadIsTenantArchived = async (
+const loadTenant = async (
   tenantId: string,
-): Promise<TResult<boolean, string>> => {
+): Promise<TResult<TMaybeUndefined<TTenant>, string>> => {
   try {
-    const tenant = await queries.tenants.getTenantById(tenantId, {
-      includeArchived: true,
-    });
     return okResult(
-      tenant?.status === TENANT_STATUS.ARCHIVED ||
-        Boolean(tenant?.deprovisionedAt),
+      await queries.tenants.getTenantById(tenantId, { includeArchived: true }),
     );
   } catch (error) {
     logger.error(REVALIDATE_LOG.TENANT_BY_ID_LOOKUP_FAILED, {
@@ -30,6 +26,9 @@ const loadIsTenantArchived = async (
   }
 };
 
+const isTenantArchived = ({ status, deprovisionedAt }: TTenant): boolean =>
+  status === TENANT_STATUS.ARCHIVED || Boolean(deprovisionedAt);
+
 /** An archived tenant has no pages to purge: the proxy already answers every one of them 404. */
 export const resolveTenantSitePaths = async (
   tenantId: TMaybeUndefined<string>,
@@ -37,16 +36,21 @@ export const resolveTenantSitePaths = async (
   if (!tenantId) {
     return errorResult(TENANT_UNRESOLVED_REASON);
   }
-  const isArchived = await loadIsTenantArchived(tenantId);
-  if (!isArchived.ok) {
-    return isArchived;
+  const loaded = await loadTenant(tenantId);
+  if (!loaded.ok) {
+    return loaded;
   }
-  if (isArchived.data) {
+  const { data: tenant } = loaded;
+  if (tenant && isTenantArchived(tenant)) {
     return okResult([]);
   }
-  const tenant = await loadTenantSanityCredentials({ tenantId });
-  if (!tenant) {
+  const credentials =
+    tenant && queries.tenants.toTenantSanityCredentials(tenant);
+  if (!credentials) {
+    logger.error(REVALIDATE_LOG.TENANT_SANITY_CREDENTIALS_MISSING, {
+      tenantId,
+    });
     return errorResult(FETCH_FAILED_REASON);
   }
-  return deriveTenantSitePaths({ tenantId, tenant });
+  return deriveTenantSitePaths({ tenantId, tenant: credentials });
 };
