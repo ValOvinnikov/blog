@@ -7,6 +7,7 @@ import {
 } from '@platform/constants/custom-domain';
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantManager } from '@platform/server/auth/require-tenant-manager';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import { env } from '@platform/utils/env/env';
 import { findCustomDomain } from '@platform/utils/find-custom-domain/find-custom-domain';
 import { toLoggableError } from '@platform/utils/loggable-error/loggable-error';
@@ -79,6 +80,7 @@ export const removeCustomDomainAction = async (
       return toOutcome(ACTION_OUTCOME.SERVER_ERROR);
     }
 
+    await revalidateSiteConfig(id);
     await recordAuditEvent({
       logEvent: CUSTOM_DOMAIN_LOG.DISCONNECT_AUDIT_FAILED,
       action: AUDIT_ACTION.SETTINGS_UPDATED,

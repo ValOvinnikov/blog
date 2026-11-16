@@ -6,6 +6,7 @@ import {
 import { recordAuditEvent } from '@platform/server/audit/record-audit-event';
 import { requireTenantMembership } from '@platform/server/auth/require-tenant-membership';
 import { enqueueWorkerRequest } from '@platform/server/provisioning/enqueue-provisioning';
+import { revalidateSiteConfig } from '@platform/server/site-config/revalidate-site-config';
 import {
   mockCustomDomainClaim,
   mockOwnerContext,
@@ -44,6 +45,8 @@ vi.mock('@platform/server/auth/require-tenant-membership');
 vi.mock('@platform/server/audit/record-audit-event');
 
 vi.mock('@platform/server/provisioning/enqueue-provisioning');
+
+vi.mock('@platform/server/site-config/revalidate-site-config');
 
 vi.mock('@platform/utils/env/env');
 
@@ -145,6 +148,12 @@ describe(removeCustomDomainAction, () => {
     });
   });
 
+  it("purges the tenant's site config once the disconnect is accepted", async () => {
+    await remove();
+
+    expect(revalidateSiteConfig).toHaveBeenCalledWith(MOCK_TENANT_ID);
+  });
+
   describe('when the disconnect is rejected', () => {
     beforeEach(() => {
       vi.mocked(enqueueWorkerRequest).mockResolvedValue(null);
@@ -167,6 +176,7 @@ describe(removeCustomDomainAction, () => {
         },
       );
       expect(recordAuditEvent).not.toHaveBeenCalled();
+      expect(revalidateSiteConfig).not.toHaveBeenCalled();
     });
 
     it('logs and reports a server error when putting the domain back fails', async () => {
@@ -264,6 +274,7 @@ describe(removeCustomDomainAction, () => {
       );
       expect(tenantDomains.removeTenantDomain).not.toHaveBeenCalled();
       expect(enqueueWorkerRequest).not.toHaveBeenCalled();
+      expect(revalidateSiteConfig).not.toHaveBeenCalled();
     });
 
     it('refuses when the claim is already gone', async () => {
