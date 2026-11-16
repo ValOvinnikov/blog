@@ -224,6 +224,33 @@ const INVALID_INPUTS: [string, Partial<TUpdateSiteConfigInput>][] = [
   ],
   ['a blank brand name', { brandName: ' ' }],
   [
+    'an unknown heading weight',
+    {
+      headingWeight:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headingWeight'],
+    },
+  ],
+  [
+    'an unknown heading case',
+    {
+      headingCase: MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['headingCase'],
+    },
+  ],
+  [
+    'an unknown image proportion',
+    {
+      imageProportion:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['imageProportion'],
+    },
+  ],
+  [
+    'an unknown divider width',
+    {
+      dividerWidth:
+        MOCK_UNKNOWN_VALUE as TUpdateSiteConfigInput['dividerWidth'],
+    },
+  ],
+  [
     'an unknown spinner style',
     {
       spinnerStyle:

@@ -7,6 +7,7 @@ import {
 
 import type { TThemeDeclarations } from './theme-declarations';
 
+const TITLE_TRACKING = '-0.02em';
 const UPPERCASE_TRACKING = '0.02em';
 
 export const HEADING_WEIGHT_DECLARATIONS: Record<
@@ -26,9 +27,9 @@ export const HEADING_CASE_DECLARATIONS: Record<
   [HEADING_CASE.AS_WRITTEN]: {
     '--heading-case': 'none',
     '--text-hero--letter-spacing': '-0.025em',
-    '--text-post-title--letter-spacing': '-0.02em',
-    '--text-title-2xl--letter-spacing': '-0.02em',
-    '--text-title-section--letter-spacing': '-0.02em',
+    '--text-post-title--letter-spacing': TITLE_TRACKING,
+    '--text-title-2xl--letter-spacing': TITLE_TRACKING,
+    '--text-title-section--letter-spacing': TITLE_TRACKING,
   },
   [HEADING_CASE.UPPERCASE]: {
     '--heading-case': 'uppercase',
