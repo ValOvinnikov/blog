@@ -35,7 +35,7 @@ Four modules put posts on a page as cards. **Latest Posts** shows the newest pos
 - **Post List** — `pageSize` (required, 1–24). Always a grid. Appearance: `cardStyle`, `radiusScale` (Corners) and `density` section overrides, and `columns` (Auto, 2, 3, 4; Auto keeps three), via `moduleAppearanceFragment`.
 - **Related Reading** — `limit` (required, 1–6, default 3), `displayMode` (Grid/Carousel). Appearance: the same section overrides and `columns` as Post List; `columns` applies in Grid only, Auto keeps the post-count-based columns (no row left with a single card), and a carousel ignores it.
 - **Post cards** — `postCardFragment` via `toPostCard`; web turns them into `MediaCardItem` data with `toPostListItems`, adding a card image (or the larger lead image for the first Featured post) only when `showImages` is on. A post with no hero image gets no media slot, so its card lays out as imageless rather than showing an empty image box.
-- **Caching** — module query `modules:<kind>` + `module:<id>`; post queries `posts`, `author`, `topic` (+ `tag` for Post List and Related Reading). Fallback revalidate 3600s.
+- **Caching** — module query `modules:<kind>` + `module:<id>`; post queries `posts`, `author`, `topic` (+ `tag` for Post List and Related Reading). Fallback revalidate 86400s (`SANITY_CONTENT_REVALIDATE_SECONDS`).
 
 ## Configuration
 

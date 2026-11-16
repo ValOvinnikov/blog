@@ -28,7 +28,7 @@ The Taxonomy List shows a browsable grid of topics or tags, each card carrying t
 - **`module_taxonomyList`** — `title`, `brandVariant`, required `headingBlock`, `taxonomy` (`TOPICS` or `TAGS`, optional), `sortOrder` (`ALPHABETICAL` default, or `MOST_POSTS`), `limit` (integer ≥ 1; empty shows every term), `showLatestPosts` (default on), `contentAlignment` (Left/Center), `layout` (`wideLayout`).
 - **Entries** — every `blog_topic` or `blog_tag` with its localized title and description, its archive page slug in the request language, a post count, and its two newest posts. Counts and latest posts include only published posts in the request language.
 - `page_topicIndex` and `page_tagIndex` still hold a read-only, deprecated `taxonomyList` reference that nothing renders.
-- **Caching** — `modules:taxonomyList`, `module:<id>`, `topics`, `tags`, `posts`; fallback revalidate 3600s.
+- **Caching** — `modules:taxonomyList`, `module:<id>`, `topics`, `tags`, `posts`; fallback revalidate 86400s (`SANITY_CONTENT_REVALIDATE_SECONDS`).
 
 ## Configuration
 

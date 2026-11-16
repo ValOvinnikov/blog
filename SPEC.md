@@ -1809,7 +1809,7 @@ empty page. (Theme's own fallback to the `CONSOLE` preset is a separate
 thing: copy has no preset layer to fall back to.) Same per-request tenant
 resolution as theme, above.
 
-`get-site-config.ts`'s cache carries a 3600s
+`get-site-config.ts`'s cache carries a 24-hour (86400s)
 (`TENANT_CONFIG_REVALIDATE_SECONDS`, `@shinefold/config`) fallback window as its
 safety net, but `apps/platform`'s Look/Voice/Features save
 actions (`update-look-action.ts`/`save-voice-overrides-action.ts`/
@@ -1830,7 +1830,7 @@ two apps' own deployments — not a Sanity webhook, so it doesn't reuse
 `@sanity/webhook`'s HMAC verification. Calling it is best-effort from the
 platform side: a failure (missing config, network error, non-2xx) is logged and
 swallowed, never thrown, since the save itself has already succeeded and the
-3600s window still covers it. That best-effort stance belongs to the platform
+24-hour window still covers it. That best-effort stance belongs to the platform
 caller, not to the route: deprovisioning's final step (`deprovision-tenant.yml`
 and the worker's deprovisioning run, through `@shinefold/db`'s
 `requestTenantCacheInvalidation`) is a second caller, POSTing the same `{ tenantId }` body to purge an archived tenant's
