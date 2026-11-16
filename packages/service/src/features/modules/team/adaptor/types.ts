@@ -11,6 +11,7 @@ import type {
 } from '@shinefold/config';
 import type { TCtaButton } from '@shinefold/service/shared/transformers/cta/to-cta-button';
 import type { TWideLayout } from '@shinefold/service/shared/transformers/layout/to-layout';
+import type { TModuleAppearance } from '@shinefold/service/shared/transformers/module/to-module-appearance';
 import type { TSocialProfile } from '@shinefold/service/shared/transformers/social-profile/to-social-profile';
 
 export type TTeamMember = {
@@ -23,7 +24,7 @@ export type TTeamMember = {
   profileUrl: TMaybeUndefined<string>;
 };
 
-export type TTeamModule = {
+export type TTeamModule = TModuleAppearance & {
   brandVariant: TBrandVariant;
   headingBlock: THeadingBlock;
   members: TTeamMember[];

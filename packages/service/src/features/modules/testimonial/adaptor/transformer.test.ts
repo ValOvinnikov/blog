@@ -25,6 +25,7 @@ import {
   mockRawPortableTextMarkDef,
   mockRawSanityImage,
 } from '@shinefold/service/testing/shared/fixtures';
+import { MOCK_UNSET_MODULE_APPEARANCE } from '@shinefold/service/testing/shared/module-appearance';
 
 import { toTestimonialModule } from './transformer';
 
@@ -86,12 +87,7 @@ describe(toTestimonialModule, () => {
   it('leaves every appearance override undefined when unset', () => {
     const module = toTestimonialModule(mockRawTestimonialModule());
 
-    expect(module).toMatchObject({
-      cardStyle: undefined,
-      radiusScale: undefined,
-      density: undefined,
-      columns: undefined,
-    });
+    expect(module).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
   });
 
   it('maps the authored appearance overrides straight through', () => {

@@ -8,13 +8,17 @@ import {
 import {
   mockRawTeamMember,
   mockRawTeamModule,
-} from '@shinefold/service/testing/modules/fixtures';
+} from '@shinefold/service/testing/modules/team/fixtures';
 import {
   MOCK_BIO_BLOCK_KEY,
   mockRawExternalLinkDocument,
   mockRawPersonBioBlock,
   mockRawSocialProfile,
 } from '@shinefold/service/testing/shared/fixtures';
+import {
+  MOCK_AUTHORED_MODULE_APPEARANCE,
+  MOCK_UNSET_MODULE_APPEARANCE,
+} from '@shinefold/service/testing/shared/module-appearance';
 
 import { toTeamModule } from './transformer';
 
@@ -59,6 +63,20 @@ describe(toTeamModule, () => {
     expect(member?.profileUrl).toBe(MOCK_PROFILE_URL);
     expect(member?.bio).toEqual([{ ...bioBlock, markDefs: undefined }]);
     expect(member?.socialLinks).toHaveLength(1);
+  });
+
+  it('leaves every appearance override undefined when unset', () => {
+    const module = toTeamModule(mockRawTeamModule());
+
+    expect(module).toMatchObject(MOCK_UNSET_MODULE_APPEARANCE);
+  });
+
+  it('maps the authored appearance overrides straight through', () => {
+    const module = toTeamModule(
+      mockRawTeamModule(MOCK_AUTHORED_MODULE_APPEARANCE),
+    );
+
+    expect(module).toMatchObject(MOCK_AUTHORED_MODULE_APPEARANCE);
   });
 
   it('keeps the members in authored order', () => {

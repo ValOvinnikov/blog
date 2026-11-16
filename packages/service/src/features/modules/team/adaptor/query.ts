@@ -9,6 +9,7 @@ import {
 import { ctaButtonsFragment } from '@shinefold/service/shared/fragments/cta/cta-buttons';
 import { moduleHeadingBlockFragment } from '@shinefold/service/shared/fragments/heading-block/module-heading-block';
 import { moduleWideLayoutFragment } from '@shinefold/service/shared/fragments/layout/layout';
+import { moduleAppearanceFragment } from '@shinefold/service/shared/fragments/module/module-appearance';
 import { moduleContentAlignmentLeftCenterFragment } from '@shinefold/service/shared/fragments/module/module-content-alignment';
 import { personDetailFragment } from '@shinefold/service/shared/fragments/person/person';
 import { z } from 'zod';
@@ -37,5 +38,6 @@ export const teamModuleQuery = q
     ...ctaButtonsFragment,
     ...moduleContentAlignmentLeftCenterFragment,
     ...moduleWideLayoutFragment,
+    ...moduleAppearanceFragment,
   }))
   .notNull();

@@ -1,6 +1,5 @@
 import {
   BRAND_VARIANT,
-  CARD_IMAGE_SHAPE,
   CONTENT_ALIGNMENT,
   CTA_ACTION_APPEARANCE,
   CTA_ACTION_VARIANT,
@@ -31,7 +30,6 @@ import type { TRawSectionPagesModule } from '@shinefold/service/features/modules
 import type { TRawSectionPages } from '@shinefold/service/features/modules/section-pages/adaptor/pages/transformer';
 import type { TRawStatsModule } from '@shinefold/service/features/modules/stats/adaptor/transformer';
 import type { TRawTaxonomyListModule } from '@shinefold/service/features/modules/taxonomy-list/adaptor/transformer';
-import type { TRawTeamModule } from '@shinefold/service/features/modules/team/adaptor/transformer';
 import type { TRawTimelineModule } from '@shinefold/service/features/modules/timeline/adaptor/transformer';
 import type { TFaqModuleQuestions } from '@shinefold/service/shared/adaptors/faq-questions/types';
 import type {
@@ -111,7 +109,6 @@ type TRawFeatureHighlightItem = NonNullable<
   TRawFeatureHighlightsModule['highlights']
 >[number];
 type TRawStatItem = NonNullable<TRawStatsModule['stats']>[number];
-type TRawTeamMember = TRawTeamModule['members'][number];
 type TRawFaqQuestionItem = TRawFaqModule['questions'][number];
 type TRawTimelineItem = NonNullable<TRawTimelineModule['items']>[number];
 type TRawTimelineItemBody = NonNullable<TRawTimelineItem['body']>[number];
@@ -465,43 +462,6 @@ export function mockRawStatsModule(
       }),
     ],
     footnote: null,
-    ctaButtons: null,
-    contentAlignment: null,
-    layout: null,
-    ...overrides,
-  };
-}
-
-export function mockRawTeamMember(
-  overrides: Partial<TRawTeamMember> = {},
-): TRawTeamMember {
-  return {
-    _id: 'person-1',
-    name: MOCK_PERSON_NAME,
-    image: null,
-    profilePage: null,
-    role: null,
-    bio: null,
-    socialLinks: null,
-    ...overrides,
-  };
-}
-
-export function mockRawTeamModule(
-  overrides: Partial<TRawTeamModule> = {},
-): TRawTeamModule {
-  return {
-    brandVariant: BRAND_VARIANT.PRIMARY,
-    headingBlock: mockRawHeadingBlock('Meet the team'),
-    members: [
-      mockRawTeamMember(),
-      mockRawTeamMember({ _id: 'person-2', name: 'Alex Chen' }),
-    ],
-    showBios: false,
-    showSocialLinks: true,
-    imageShape: CARD_IMAGE_SHAPE.CIRCLE,
-    displayMode: DISPLAY_MODE.GRID,
-    cardAlignment: CONTENT_ALIGNMENT.CENTER,
     ctaButtons: null,
     contentAlignment: null,
     layout: null,
