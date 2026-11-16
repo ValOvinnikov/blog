@@ -6,11 +6,19 @@ import {
   CARD_STYLE,
   CARD_STYLE_DECLARATIONS,
   DENSITY_DECLARATIONS,
+  DIVIDER_WIDTH,
+  DIVIDER_WIDTH_DECLARATIONS,
   formatOklchRamp,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
   HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
+  HEADING_CASE,
+  HEADING_CASE_DECLARATIONS,
+  HEADING_WEIGHT,
+  HEADING_WEIGHT_DECLARATIONS,
+  IMAGE_PROPORTION,
+  IMAGE_PROPORTION_DECLARATIONS,
   IMAGE_SCRIM_RAMP,
   LOGO_RAMP_DARK,
   LOGO_RAMP_LIGHT,
@@ -42,6 +50,10 @@ export const buildThemeStyleBlock = ({
   headerControlShape = HEADER_CONTROL_SHAPE.ROUND,
   buttonShape = BUTTON_SHAPE.ROUNDED,
   navLinkStyle = NAV_LINK_STYLE.PLAIN,
+  headingWeight = HEADING_WEIGHT.MEDIUM,
+  headingCase = HEADING_CASE.AS_WRITTEN,
+  imageProportion = IMAGE_PROPORTION.AS_DESIGNED,
+  dividerWidth = DIVIDER_WIDTH.HAIRLINE,
 }: TThemeTokens): string => {
   const resolvedLogoHue = logoHue ?? accentHue;
 
@@ -57,6 +69,10 @@ export const buildThemeStyleBlock = ({
       ...HEADER_CONTROL_STYLE_DECLARATIONS[headerControlStyle],
       ...HEADER_CONTROL_SHAPE_DECLARATIONS[headerControlShape],
       ...NAV_LINK_STYLE_DECLARATIONS[navLinkStyle],
+      ...HEADING_WEIGHT_DECLARATIONS[headingWeight],
+      ...HEADING_CASE_DECLARATIONS[headingCase],
+      ...IMAGE_PROPORTION_DECLARATIONS[imageProportion],
+      ...DIVIDER_WIDTH_DECLARATIONS[dividerWidth],
     })}
 }
 .dark {

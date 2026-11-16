@@ -2,11 +2,16 @@ import { faker } from '@faker-js/faker';
 import {
   BUTTON_SHAPE,
   CARD_STYLE,
+  DIVIDER_WIDTH,
   HEADER_CONTROL_SHAPE,
   HEADER_CONTROL_STYLE,
+  HEADING_CASE,
+  HEADING_WEIGHT,
+  IMAGE_PROPORTION,
   NAV_LINK_STYLE,
   PRESET_ID,
   PRESET_REGISTRY,
+  type TPresetBundle,
 } from '@shinefold/config';
 
 import { toThemeTokens } from './to-theme-tokens';
@@ -19,24 +24,38 @@ const MOCK_ACCENT_HUE = faker.number.int({ min: 0, max: 360 });
 const MOCK_LOGO_HUE = faker.number.int({ min: 0, max: 360 });
 const MOCK_UNUSABLE_ACCENT_HUE = Number.NaN;
 
+const presetStyles = ({
+  cardStyle,
+  headerControlStyle,
+  headerControlShape,
+  buttonShape,
+  navLinkStyle,
+  headingWeight,
+  headingCase,
+  imageProportion,
+  dividerWidth,
+}: TPresetBundle) => ({
+  cardStyle,
+  headerControlStyle,
+  headerControlShape,
+  buttonShape,
+  navLinkStyle,
+  headingWeight,
+  headingCase,
+  imageProportion,
+  dividerWidth,
+});
+
 const CONSOLE_ROW = {
   preset: PRESET_ID.CONSOLE,
   ...CONSOLE.themeTokens,
-  cardStyle: CONSOLE.cardStyle,
-  headerControlStyle: CONSOLE.headerControlStyle,
-  headerControlShape: CONSOLE.headerControlShape,
-  buttonShape: CONSOLE.buttonShape,
-  navLinkStyle: CONSOLE.navLinkStyle,
+  ...presetStyles(CONSOLE),
 };
 
 const EDITORIAL_ROW = {
   preset: PRESET_ID.EDITORIAL,
   ...EDITORIAL.themeTokens,
-  cardStyle: EDITORIAL.cardStyle,
-  headerControlStyle: EDITORIAL.headerControlStyle,
-  headerControlShape: EDITORIAL.headerControlShape,
-  buttonShape: EDITORIAL.buttonShape,
-  navLinkStyle: EDITORIAL.navLinkStyle,
+  ...presetStyles(EDITORIAL),
 };
 
 describe(toThemeTokens, () => {
@@ -46,11 +65,7 @@ describe(toThemeTokens, () => {
     expect(result).toEqual({
       ...CONSOLE.themeTokens,
       logoHue: CONSOLE.themeTokens.accentHue,
-      cardStyle: CONSOLE.cardStyle,
-      headerControlStyle: CONSOLE.headerControlStyle,
-      headerControlShape: CONSOLE.headerControlShape,
-      buttonShape: CONSOLE.buttonShape,
-      navLinkStyle: CONSOLE.navLinkStyle,
+      ...presetStyles(CONSOLE),
     });
   });
 
@@ -60,11 +75,7 @@ describe(toThemeTokens, () => {
     expect(result).toEqual({
       ...EDITORIAL.themeTokens,
       logoHue: EDITORIAL.themeTokens.accentHue,
-      cardStyle: EDITORIAL.cardStyle,
-      headerControlStyle: EDITORIAL.headerControlStyle,
-      headerControlShape: EDITORIAL.headerControlShape,
-      buttonShape: EDITORIAL.buttonShape,
-      navLinkStyle: EDITORIAL.navLinkStyle,
+      ...presetStyles(EDITORIAL),
     });
   });
 
@@ -74,6 +85,10 @@ describe(toThemeTokens, () => {
     { field: 'headerControlShape', value: HEADER_CONTROL_SHAPE.SQUARE },
     { field: 'buttonShape', value: BUTTON_SHAPE.PILL },
     { field: 'navLinkStyle', value: NAV_LINK_STYLE.UNDERLINE },
+    { field: 'headingWeight', value: HEADING_WEIGHT.BOLD },
+    { field: 'headingCase', value: HEADING_CASE.UPPERCASE },
+    { field: 'imageProportion', value: IMAGE_PROPORTION.SQUARE },
+    { field: 'dividerWidth', value: DIVIDER_WIDTH.BOLD },
   ] as const)(
     "keeps the row's $field over its preset's",
     ({ field, value }) => {

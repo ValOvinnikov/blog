@@ -3,6 +3,7 @@ import { PRESET_ID, PRESET_REGISTRY } from '@shinefold/config';
 import { errorResult, okResult } from '@shinefold/utils';
 import { THEME_TOKENS_LOG } from '@web/constants/theme-tokens';
 import { getSiteConfig } from '@web/server/site-config/get-site-config/get-site-config';
+import { mockSiteConfig } from '@web/testing/server/site-config/fixtures';
 import { MOCK_TENANT_ID } from '@web/testing/shared/tenant/fixtures';
 import { logger } from '@web/utils/logger/logger';
 import { toThemeTokens } from '@web/utils/to-theme-tokens';
@@ -11,29 +12,12 @@ import { getThemeTokens } from './get-theme-tokens';
 
 faker.seed(115);
 
-const {
-  themeTokens: EDITORIAL_TOKENS,
-  cardStyle,
-  headerControlStyle,
-  headerControlShape,
-  buttonShape,
-  navLinkStyle,
-} = PRESET_REGISTRY[PRESET_ID.EDITORIAL];
 const MOCK_ERROR = new Error(faker.lorem.sentence());
 
-const MOCK_SITE_CONFIG_ROW = {
+const MOCK_SITE_CONFIG_ROW = mockSiteConfig({
   preset: PRESET_ID.EDITORIAL,
-  accentHue: EDITORIAL_TOKENS.accentHue,
-  headingFont: EDITORIAL_TOKENS.headingFont,
-  bodyFont: EDITORIAL_TOKENS.bodyFont,
-  radiusScale: EDITORIAL_TOKENS.radiusScale,
-  density: EDITORIAL_TOKENS.density,
-  cardStyle,
-  headerControlStyle,
-  headerControlShape,
-  buttonShape,
-  navLinkStyle,
-};
+  ...PRESET_REGISTRY[PRESET_ID.EDITORIAL].themeTokens,
+});
 
 vi.mock('@web/server/site-config/get-site-config/get-site-config', () => ({
   getSiteConfig: vi.fn(),
@@ -43,7 +27,7 @@ describe(getThemeTokens, () => {
   describe('when the site config fetch succeeds', () => {
     beforeEach(() => {
       vi.mocked(getSiteConfig).mockResolvedValueOnce(
-        okResult(MOCK_SITE_CONFIG_ROW as never),
+        okResult(MOCK_SITE_CONFIG_ROW),
       );
     });
 

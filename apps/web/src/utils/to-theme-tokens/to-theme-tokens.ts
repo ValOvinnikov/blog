@@ -2,32 +2,11 @@ import {
   isAccentHueAccessible,
   PRESET_ID,
   PRESET_REGISTRY,
-  type TButtonShape,
-  type TCardStyle,
-  type TFontChoice,
-  type THeaderControlShape,
-  type THeaderControlStyle,
-  type TNavLinkStyle,
   type TPresetId,
-  type TRadiusScale,
-  type TDensity,
   type TThemeTokens,
 } from '@shinefold/config';
 
-type TThemeTokensRow = {
-  preset: TPresetId;
-  accentHue: number;
-  logoHue?: number;
-  headingFont: TFontChoice;
-  bodyFont: TFontChoice;
-  radiusScale: TRadiusScale;
-  density: TDensity;
-  cardStyle: TCardStyle;
-  headerControlStyle: THeaderControlStyle;
-  headerControlShape: THeaderControlShape;
-  buttonShape: TButtonShape;
-  navLinkStyle: TNavLinkStyle;
-};
+type TThemeTokensRow = TThemeTokens & { preset: TPresetId };
 
 export const toThemeTokens = (
   row: TThemeTokensRow | undefined,
@@ -40,6 +19,10 @@ export const toThemeTokens = (
     headerControlShape,
     buttonShape,
     navLinkStyle,
+    headingWeight,
+    headingCase,
+    imageProportion,
+    dividerWidth,
   } = PRESET_REGISTRY[preset];
 
   const requestedAccentHue = row?.accentHue ?? base.accentHue;
@@ -59,5 +42,9 @@ export const toThemeTokens = (
     headerControlShape: row?.headerControlShape ?? headerControlShape,
     buttonShape: row?.buttonShape ?? buttonShape,
     navLinkStyle: row?.navLinkStyle ?? navLinkStyle,
+    headingWeight: row?.headingWeight ?? headingWeight,
+    headingCase: row?.headingCase ?? headingCase,
+    imageProportion: row?.imageProportion ?? imageProportion,
+    dividerWidth: row?.dividerWidth ?? dividerWidth,
   };
 };

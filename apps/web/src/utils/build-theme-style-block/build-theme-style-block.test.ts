@@ -5,17 +5,17 @@ import { faker } from '@faker-js/faker';
 import {
   type TThemeDeclarations,
   type TThemeTokens,
-  BUTTON_SHAPE,
   BUTTON_SHAPE_DECLARATIONS,
   CARD_STYLE,
   CARD_STYLE_DECLARATIONS,
   DENSITY,
   DENSITY_DECLARATIONS,
-  HEADER_CONTROL_SHAPE,
+  DIVIDER_WIDTH_DECLARATIONS,
   HEADER_CONTROL_SHAPE_DECLARATIONS,
-  HEADER_CONTROL_STYLE,
   HEADER_CONTROL_STYLE_DECLARATIONS,
-  NAV_LINK_STYLE,
+  HEADING_CASE_DECLARATIONS,
+  HEADING_WEIGHT_DECLARATIONS,
+  IMAGE_PROPORTION_DECLARATIONS,
   NAV_LINK_STYLE_DECLARATIONS,
   PRESET_ID,
   PRESET_REGISTRY,
@@ -85,6 +85,11 @@ const DARK_EXCLUDED_PREFIXES = [
   '--nav-link-',
   '--scrim-',
   '--on-image',
+  '--font-weight-heading',
+  '--heading-case',
+  '--text-',
+  '--aspect-',
+  '--divider-width',
 ];
 
 const splitModes = (css: string) => ({
@@ -94,33 +99,43 @@ const splitModes = (css: string) => ({
 
 const STYLE_AXES: {
   field: keyof TThemeTokens;
-  defaultValue: string;
   declarations: Record<string, TThemeDeclarations>;
 }[] = [
   {
     field: 'cardStyle',
-    defaultValue: CARD_STYLE.ACCENT_BAR,
     declarations: CARD_STYLE_DECLARATIONS,
   },
   {
     field: 'headerControlStyle',
-    defaultValue: HEADER_CONTROL_STYLE.OUTLINED,
     declarations: HEADER_CONTROL_STYLE_DECLARATIONS,
   },
   {
     field: 'headerControlShape',
-    defaultValue: HEADER_CONTROL_SHAPE.ROUND,
     declarations: HEADER_CONTROL_SHAPE_DECLARATIONS,
   },
   {
     field: 'buttonShape',
-    defaultValue: BUTTON_SHAPE.ROUNDED,
     declarations: BUTTON_SHAPE_DECLARATIONS,
   },
   {
     field: 'navLinkStyle',
-    defaultValue: NAV_LINK_STYLE.PLAIN,
     declarations: NAV_LINK_STYLE_DECLARATIONS,
+  },
+  {
+    field: 'headingWeight',
+    declarations: HEADING_WEIGHT_DECLARATIONS,
+  },
+  {
+    field: 'headingCase',
+    declarations: HEADING_CASE_DECLARATIONS,
+  },
+  {
+    field: 'imageProportion',
+    declarations: IMAGE_PROPORTION_DECLARATIONS,
+  },
+  {
+    field: 'dividerWidth',
+    declarations: DIVIDER_WIDTH_DECLARATIONS,
   },
 ];
 
@@ -221,20 +236,33 @@ describe(buildThemeStyleBlock, () => {
       expect(missing).toEqual([]);
     });
 
-    it('reproduces the radius and layout spacing tokens', () => {
-      const staticDeclarations = declarationsMatching(
-        THEME_CSS,
-        'radius[\\w-]*|spacing-(?:gutter|section|page-y|site-x|site-y|card-x|card-y|card-gap|band)',
-      );
-      const { root } = splitModes(buildThemeStyleBlock(CONSOLE_TOKENS));
+    it.each([
+      {
+        group: 'radius and layout spacing tokens',
+        names:
+          'radius[\\w-]*|spacing-(?:gutter|section|page-y|site-x|site-y|card-x|card-y|card-gap|band)',
+        declarationCount: 14,
+      },
+      {
+        group: 'heading, image proportion and divider tokens',
+        names:
+          'font-weight-heading|heading-case|aspect-(?:card|split)|divider-width|text-(?:hero|post-title|title-2xl|title-section)--letter-spacing',
+        declarationCount: 9,
+      },
+    ])(
+      'reproduces all $declarationCount $group',
+      ({ names, declarationCount }) => {
+        const staticDeclarations = declarationsMatching(THEME_CSS, names);
+        const { root } = splitModes(buildThemeStyleBlock(CONSOLE_TOKENS));
 
-      const missing = staticDeclarations.filter(
-        (declaration) => !root.includes(declaration),
-      );
+        const missing = staticDeclarations.filter(
+          (declaration) => !root.includes(declaration),
+        );
 
-      expect(staticDeclarations.length).toBeGreaterThan(0);
-      expect(missing).toEqual([]);
-    });
+        expect(staticDeclarations).toHaveLength(declarationCount);
+        expect(missing).toEqual([]);
+      },
+    );
   });
 
   it('derives brand colours from accentHue and logo colours from logoHue', () => {
@@ -282,19 +310,6 @@ describe(buildThemeStyleBlock, () => {
     expect(readHue(css, '--scrim-brand-mid')).toBe(MOCK_ACCENT_HUE);
     expect(readHue(css, '--scrim-brand-weak')).toBe(MOCK_ACCENT_HUE);
   });
-
-  it.each(STYLE_AXES)(
-    'defaults $field to $defaultValue',
-    ({ field, defaultValue }) => {
-      const defaultCss = buildThemeStyleBlock(CONSOLE_TOKENS);
-      const explicitCss = buildThemeStyleBlock({
-        ...CONSOLE_TOKENS,
-        [field]: defaultValue,
-      });
-
-      expect(defaultCss).toBe(explicitCss);
-    },
-  );
 
   it.each(STYLE_VALUES)(
     'writes $field $value into the :root block',
